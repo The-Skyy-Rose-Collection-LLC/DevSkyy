@@ -208,7 +208,7 @@ async def upload_single_image(
     background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     category: str = Form("general"),
-    description: Optional[str] = Form(None),
+    description: str | None = Form(None),
     auto_process: bool = Form(True),
 ):
     """
@@ -1297,7 +1297,7 @@ class ImageQualityProcessor:
 
         return validation_result
 
-    def create_backup(self, image_path: Path) -> Optional[Path]:
+    def create_backup(self, image_path: Path) -> Path | None:
         """Create backup of original image."""
         if not self.config["backup_originals"]:
             return None

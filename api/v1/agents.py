@@ -29,8 +29,8 @@ class LegacyAgentExecutionRequest(BaseModel):
     """Legacy agent execution request - use AgentExecutionRequest instead"""
 
     parameters: dict[str, Any] = Field(default_factory=dict)
-    timeout: Optional[int] = Field(default=300, description="Execution timeout in seconds")
-    priority: Optional[str] = Field(default="medium", description="Execution priority")
+    timeout: int | None = Field(default=300, description="Execution timeout in seconds")
+    priority: str | None = Field(default="medium", description="Execution priority")
 
 
 class AgentExecuteResponse(BaseModel):

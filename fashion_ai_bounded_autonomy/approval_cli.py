@@ -101,7 +101,7 @@ class ApprovalCLI:
         if details["status"] == "pending":
             pass
 
-    async def approve_action(self, action_id: str, operator: str, notes: Optional[str] = None):
+    async def approve_action(self, action_id: str, operator: str, notes: str | None = None):
         """Approve an action"""
 
         result = await self.approval_system.approve(action_id, operator, notes)
@@ -117,7 +117,7 @@ class ApprovalCLI:
         if result.get("error"):
             return
 
-    async def show_statistics(self, operator: Optional[str] = None):
+    async def show_statistics(self, operator: str | None = None):
         """Show approval statistics"""
 
         stats = await self.approval_system.get_operator_statistics(operator)

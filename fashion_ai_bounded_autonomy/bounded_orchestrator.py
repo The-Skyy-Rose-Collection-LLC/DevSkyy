@@ -96,7 +96,7 @@ class BoundedOrchestrator(AgentOrchestrator):
         parameters: dict[str, Any],
         required_capabilities: list[str],
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
-        require_approval: Optional[bool] = None,
+        require_approval: bool | None = None,
     ) -> dict[str, Any]:
         """
         Execute task with bounded autonomy controls.

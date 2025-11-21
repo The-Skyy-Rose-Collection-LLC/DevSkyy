@@ -100,15 +100,15 @@ class Task:
     allow_failure: bool = False  # Continue workflow even if this task fails
 
     # Compensation (for Saga pattern)
-    compensation_method: Optional[str] = None
+    compensation_method: str | None = None
     compensation_parameters: dict[str, Any] = field(default_factory=dict)
 
     # State
     status: TaskStatus = TaskStatus.PENDING
-    result: Optional[Any] = None
-    error: Optional[str] = None
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
+    result: Any | None = None
+    error: str | None = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
     attempts: int = 0
 
     # Metadata
@@ -144,15 +144,15 @@ class Workflow:
     errors: dict[str, str] = field(default_factory=dict)
 
     # Timing
-    start_time: Optional[datetime] = None
-    end_time: Optional[datetime] = None
-    estimated_duration_seconds: Optional[int] = None
+    start_time: datetime | None = None
+    end_time: datetime | None = None
+    estimated_duration_seconds: int | None = None
 
     # Events
     events: list[dict[str, Any]] = field(default_factory=list)
 
     # Metadata
-    created_by: Optional[str] = None
+    created_by: str | None = None
     tags: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -241,7 +241,7 @@ class EnterpriseWorkflowEngine:
 
         Parameters:
             workflow_type (WorkflowType): The workflow template type or WorkflowType.CUSTOM for custom definitions.
-            workflow_data (Dict[str, Any]): Configuration for the workflow or template; for custom workflows this may include keys such as `name`, `description`, `max_parallel_tasks`, `enable_rollback`, `continue_on_failure`, `created_by`, and a `tasks` list of task definitions.
+            workflow_data (dict[str, Any]): Configuration for the workflow or template; for custom workflows this may include keys such as `name`, `description`, `max_parallel_tasks`, `enable_rollback`, `continue_on_failure`, `created_by`, and a `tasks` list of task definitions.
 
         Returns:
             Workflow: The created and stored Workflow instance.
@@ -703,7 +703,7 @@ class EnterpriseWorkflowEngine:
         - Launch Marketing Campaign (depends on website and visual assets)
 
         Parameters:
-            workflow_data (Dict[str, Any]): Optional configuration values used to customize the workflow. Recognized keys:
+            workflow_data (dict[str, Any]): Optional configuration values used to customize the workflow. Recognized keys:
                 - "max_parallel_tasks" (int): maximum concurrent tasks for the workflow.
                 - "visual_assets_params" (dict): parameters for the visual content generation task.
                 - "website_params" (dict): parameters for the website build task.
@@ -771,7 +771,7 @@ class EnterpriseWorkflowEngine:
         Create a product launch workflow template tailored for launching a single product.
 
         Parameters:
-            workflow_data (Dict[str, Any]): Optional overrides and configuration for the template (e.g., custom name, description, task definitions, max_parallel_tasks, enable_rollback, metadata). Keys not provided use sensible defaults for a product launch workflow.
+            workflow_data (dict[str, Any]): Optional overrides and configuration for the template (e.g., custom name, description, task definitions, max_parallel_tasks, enable_rollback, metadata). Keys not provided use sensible defaults for a product launch workflow.
 
         Returns:
             Workflow: A constructed Workflow instance configured for a product launch.
@@ -792,7 +792,7 @@ class EnterpriseWorkflowEngine:
         Accepts optional configuration in `workflow_data` to customize the template (for example: overriding name/description, supplying task definitions, tuning max_parallel_tasks, enable_rollback, or attaching metadata). The returned Workflow is initialized with type `WorkflowType.MARKETING_CAMPAIGN` and is ready for downstream topological sorting and execution.
 
         Parameters:
-            workflow_data (Dict[str, Any]): Optional template overrides and task definitions used to customize the created workflow.
+            workflow_data (dict[str, Any]): Optional template overrides and task definitions used to customize the created workflow.
 
         Returns:
             Workflow: A Workflow instance configured as a Marketing Campaign template.
@@ -810,7 +810,7 @@ class EnterpriseWorkflowEngine:
         Builds a Content Generation Pipeline workflow template.
 
         Parameters:
-            workflow_data (Dict[str, Any]): Optional configuration to customize the template (for example overrides for name, description, max_parallel_tasks, task definitions, or metadata). Unknown keys are passed through to the constructed Workflow where applicable.
+            workflow_data (dict[str, Any]): Optional configuration to customize the template (for example overrides for name, description, max_parallel_tasks, task definitions, or metadata). Unknown keys are passed through to the constructed Workflow where applicable.
 
         Returns:
             Workflow: A Workflow pre-populated with tasks and settings for generating visual and written content (content generation template).
@@ -891,8 +891,8 @@ class EnterpriseWorkflowEngine:
                     - tasks_executed (int): Total tasks executed by the engine.
                 - reliability (dict):
                     - rollbacks_performed (int): Total rollbacks performed.
-                - registered_agents (List[str]): Registered agent types.
-                - available_templates (List[str]): Available workflow template names.
+                - registered_agents (list[str]): Registered agent types.
+                - available_templates (list[str]): Available workflow template names.
         """
         return {
             "engine_name": self.engine_name,

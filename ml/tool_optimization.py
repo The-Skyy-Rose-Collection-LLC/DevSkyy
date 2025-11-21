@@ -71,19 +71,19 @@ class ToolUsagePattern:
     avg_tokens_used: int = 0
     context_keywords: set[str] = field(default_factory=set)
     success_rate: float = 1.0
-    last_used: Optional[datetime] = None
+    last_used: datetime | None = None
 
 
 @dataclass
 class ToolSelectionContext:
     """Context for intelligent tool selection"""
     task_description: str
-    task_type: Optional[str] = None
+    task_type: str | None = None
     required_capabilities: list[str] = field(default_factory=list)
     max_tools: int = 10  # Research shows limiting tools improves performance
     prefer_fast: bool = False
     prefer_cheap: bool = False
-    user_id: Optional[str] = None
+    user_id: str | None = None
 
 
 # ============================================================================
@@ -355,7 +355,7 @@ class ParallelFunctionCaller:
         self,
         function_calls: list[dict[str, Any]],
         available_functions: dict[str, tuple[Callable, dict, ToolCallConfig]],
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED
     ) -> list[ToolCallResponse]:
         """
@@ -419,7 +419,7 @@ class ParallelFunctionCaller:
         func_name: str,
         arguments: dict[str, Any],
         available_functions: dict[str, tuple[Callable, dict, ToolCallConfig]],
-        user_id: Optional[str],
+        user_id: str | None,
         permission_level: ToolPermissionLevel
     ) -> ToolCallResponse:
         """Execute a single function with safeguards"""
@@ -483,7 +483,7 @@ class StructuredOutputValidator:
         self,
         output: Any,
         schema_name: str
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """
         Validate output against registered schema.
 
@@ -582,8 +582,8 @@ class TokenOptimizationManager:
         context: ToolSelectionContext,
         available_tools: list[str],
         function_calls: Optional[list[dict[str, Any]]] = None,
-        available_functions: Optional[dict] = None,
-        user_id: Optional[str] = None
+        available_functions: dict | None = None,
+        user_id: str | None = None
     ) -> dict[str, Any]:
         """
         Execute optimized tool calling workflow.
@@ -651,7 +651,7 @@ class TokenOptimizationManager:
 # GLOBAL INSTANCE
 # ============================================================================
 
-_global_optimization_manager: Optional[TokenOptimizationManager] = None
+_global_optimization_manager: TokenOptimizationManager | None = None
 
 
 def get_optimization_manager() -> TokenOptimizationManager:

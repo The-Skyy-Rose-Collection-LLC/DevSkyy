@@ -69,7 +69,7 @@ class SafeguardViolation(BaseModel):
     operation_type: OperationType
     is_consequential: bool
     details: dict[str, Any]
-    stack_trace: Optional[str] = None
+    stack_trace: str | None = None
     resolved: bool = False
 
 
@@ -80,14 +80,14 @@ class AuditLogEntry(BaseModel):
     operation_id: str
     operation_type: OperationType
     is_consequential: bool
-    user_id: Optional[str] = None
-    ip_address: Optional[str] = None
+    user_id: str | None = None
+    ip_address: str | None = None
     request_params: dict[str, Any] = Field(default_factory=dict)
-    response_summary: Optional[str] = None
+    response_summary: str | None = None
     success: bool
-    error_message: Optional[str] = None
+    error_message: str | None = None
     execution_time_ms: float
-    cost_estimate_usd: Optional[float] = None
+    cost_estimate_usd: float | None = None
 
 
 class CircuitBreakerState(str, Enum):
@@ -170,7 +170,7 @@ class RateLimiter:
         self.consequential_requests: list[float] = []
         self.lock = asyncio.Lock()
 
-    async def check_rate_limit(self, is_consequential: bool = False) -> tuple[bool, Optional[str]]:
+    async def check_rate_limit(self, is_consequential: bool = False) -> tuple[bool, str | None]:
         """
         Check if request is within rate limits
 
@@ -216,7 +216,7 @@ class CircuitBreaker:
 
         self.state = CircuitBreakerState.CLOSED
         self.failures = 0
-        self.last_failure_time: Optional[float] = None
+        self.last_failure_time: float | None = None
         self.lock = asyncio.Lock()
 
     async def call(self, func: Callable, *args, **kwargs) -> Any:
@@ -308,7 +308,7 @@ class RequestValidator:
     def __init__(self, config: SafeguardConfig):
         self.config = config
 
-    def validate_prompt(self, prompt: str) -> tuple[bool, Optional[str]]:
+    def validate_prompt(self, prompt: str) -> tuple[bool, str | None]:
         """Validate prompt content"""
         # Length check
         if len(prompt) > self.config.max_prompt_length:
@@ -347,7 +347,7 @@ class RequestValidator:
 class OpenAISafeguardManager:
     """Central manager for all OpenAI API safeguards"""
 
-    def __init__(self, config: Optional[SafeguardConfig] = None):
+    def __init__(self, config: SafeguardConfig | None = None):
         self.config = config or SafeguardConfig()
 
         # Initialize components
@@ -388,9 +388,9 @@ class OpenAISafeguardManager:
         self,
         operation_type: OperationType,
         is_consequential: bool,
-        prompt: Optional[str] = None,
+        prompt: str | None = None,
         params: Optional[dict[str, Any]] = None
-    ) -> tuple[bool, Optional[str]]:
+    ) -> tuple[bool, str | None]:
         """
         Validate request before sending to OpenAI API
 
@@ -447,7 +447,7 @@ class OpenAISafeguardManager:
         func: Callable,
         operation_type: OperationType,
         is_consequential: bool,
-        prompt: Optional[str] = None,
+        prompt: str | None = None,
         params: Optional[dict[str, Any]] = None,
         *args,
         **kwargs,
@@ -597,10 +597,10 @@ def with_safeguards(operation_type: OperationType, is_consequential: bool = True
 # GLOBAL MANAGER INSTANCE
 # ============================================================================
 
-_safeguard_manager: Optional[OpenAISafeguardManager] = None
+_safeguard_manager: OpenAISafeguardManager | None = None
 
 
-def get_safeguard_manager(config: Optional[SafeguardConfig] = None) -> OpenAISafeguardManager:
+def get_safeguard_manager(config: SafeguardConfig | None = None) -> OpenAISafeguardManager:
     """Get or create global safeguard manager instance"""
     global _safeguard_manager
 
@@ -610,7 +610,7 @@ def get_safeguard_manager(config: Optional[SafeguardConfig] = None) -> OpenAISaf
     return _safeguard_manager
 
 
-def reload_safeguard_manager(config: Optional[SafeguardConfig] = None) -> OpenAISafeguardManager:
+def reload_safeguard_manager(config: SafeguardConfig | None = None) -> OpenAISafeguardManager:
     """Reload safeguard manager with new configuration"""
     global _safeguard_manager
     _safeguard_manager = OpenAISafeguardManager(config)

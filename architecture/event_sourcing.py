@@ -86,7 +86,7 @@ class EventStore:
         return True
 
     async def get_events(
-        self, aggregate_id: str, from_version: int = 0, to_version: Optional[int] = None
+        self, aggregate_id: str, from_version: int = 0, to_version: int | None = None
     ) -> list[DomainEvent]:
         """
         Get events for an aggregate
@@ -242,8 +242,8 @@ class AgentAggregate(AggregateRoot):
 
     def __init__(self, aggregate_id: str):
         super().__init__(aggregate_id)
-        self.name: Optional[str] = None
-        self.agent_type: Optional[str] = None
+        self.name: str | None = None
+        self.agent_type: str | None = None
         self.status: str = "inactive"
         self.capabilities: dict[str, Any] = {}
 

@@ -87,7 +87,7 @@ class RedisManager:
         self,
         host: str = "localhost",
         port: int = 6379,
-        password: Optional[str] = None,
+        password: str | None = None,
         db: int = 0,
         max_connections: int = 20,
         min_connections: int = 10,
@@ -197,7 +197,7 @@ class RedisManager:
 
         self.metrics.last_updated = datetime.now()
 
-    async def set(self, key: str, value: Any, ttl: Optional[int] = None, prefix: str = "api_cache") -> bool:
+    async def set(self, key: str, value: Any, ttl: int | None = None, prefix: str = "api_cache") -> bool:
         """Set cache value with optional TTL"""
         start_time = time.time()
 
@@ -225,7 +225,7 @@ class RedisManager:
             logger.error(f"Redis SET error for key {key}: {e}")
             return False
 
-    async def get(self, key: str, prefix: str = "api_cache", deserialize_json: bool = True) -> Optional[Any]:
+    async def get(self, key: str, prefix: str = "api_cache", deserialize_json: bool = True) -> Any | None:
         """Get cache value"""
         start_time = time.time()
 
@@ -327,7 +327,7 @@ class RedisManager:
             logger.error(f"Session creation error: {e}")
             return False
 
-    async def get_session(self, session_id: str) -> Optional[SessionData]:
+    async def get_session(self, session_id: str) -> SessionData | None:
         """Get session data"""
         try:
             session_key = self._generate_key("session", session_id)

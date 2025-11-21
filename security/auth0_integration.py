@@ -62,20 +62,20 @@ class Auth0User(BaseModel):
     """Auth0 user model."""
 
     sub: str  # User ID
-    email: Optional[str] = None
-    email_verified: Optional[bool] = False
-    name: Optional[str] = None
-    given_name: Optional[str] = None
-    family_name: Optional[str] = None
-    picture: Optional[str] = None
-    locale: Optional[str] = None
-    updated_at: Optional[str] = None
+    email: str | None = None
+    email_verified: bool | None = False
+    name: str | None = None
+    given_name: str | None = None
+    family_name: str | None = None
+    picture: str | None = None
+    locale: str | None = None
+    updated_at: str | None = None
 
     # Custom DevSkyy fields
-    role: Optional[str] = "user"
+    role: str | None = "user"
     permissions: list[str] = []
-    organization: Optional[str] = None
-    subscription_tier: Optional[str] = "free"
+    organization: str | None = None
+    subscription_tier: str | None = "free"
 
 
 class TokenPayload(BaseModel):
@@ -86,16 +86,16 @@ class TokenPayload(BaseModel):
     iss: str
     exp: int
     iat: int
-    scope: Optional[str] = ""
+    scope: str | None = ""
     permissions: list[str] = []
 
     # Auth0 specific fields
-    azp: Optional[str] = None  # Authorized party
-    gty: Optional[str] = None  # Grant type
+    azp: str | None = None  # Authorized party
+    gty: str | None = None  # Grant type
 
     # Custom DevSkyy fields
-    role: Optional[str] = "user"
-    organization: Optional[str] = None
+    role: str | None = "user"
+    organization: str | None = None
 
 
 # ============================================================================
@@ -443,7 +443,7 @@ def require_scope(required_scope: str):
 # ============================================================================
 
 
-def create_devskyy_jwt_token(user_data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_devskyy_jwt_token(user_data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
     """Create DevSkyy JWT token with Auth0 user data."""
     expire = datetime.utcnow() + expires_delta if expires_delta else datetime.utcnow() + timedelta(minutes=30)
 
@@ -537,8 +537,8 @@ def verify_devskyy_jwt_token(token: str) -> dict[str, Any]:
 
 async def log_auth_event(
     event_type: str,
-    user_id: Optional[str] = None,
-    request: Optional[Request] = None,
+    user_id: str | None = None,
+    request: Request | None = None,
     details: Optional[dict[str, Any]] = None,
 ):
     """Log authentication events for monitoring."""
@@ -554,7 +554,7 @@ async def log_auth_event(
     logger.info(f"AUTH_EVENT: {json.dumps(event_data)}")
 
 
-def get_auth0_login_url(redirect_uri: str, state: Optional[str] = None, scope: str = "openid profile email") -> str:
+def get_auth0_login_url(redirect_uri: str, state: str | None = None, scope: str = "openid profile email") -> str:
     """Generate Auth0 login URL."""
     params = {
         "response_type": "code",

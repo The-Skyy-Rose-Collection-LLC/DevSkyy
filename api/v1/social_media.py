@@ -479,7 +479,7 @@ async def _publish_to_platform(
     media_urls: Optional[list[str]],
     hashtags: Optional[list[str]],
     mentions: Optional[list[str]],
-    location: Optional[str],
+    location: str | None,
     user_id: int,
 ) -> dict[str, Any]:
     """
@@ -530,7 +530,7 @@ async def _trigger_webhook(event_type: str, payload: dict[str, Any], user_id: in
         logger.error(f"Failed to trigger webhook: {e}")
 
 
-async def _test_platform_connection(platform: str, credentials: dict, account_id: Optional[str]) -> dict:
+async def _test_platform_connection(platform: str, credentials: dict, account_id: str | None) -> dict:
     """Test platform connection"""
     # Would test actual platform API connection
     return {

@@ -247,12 +247,12 @@ class AgentRegistry:
 
         return False
 
-    def get_agent(self, agent_name: str) -> Optional[BaseAgent]:
+    def get_agent(self, agent_name: str) -> BaseAgent | None:
         """Get a registered agent by name"""
         agent_info = self.registered_agents.get(agent_name)
         return agent_info["instance"] if agent_info else None
 
-    def list_agents(self, capability: Optional[str] = None) -> list[str]:
+    def list_agents(self, capability: str | None = None) -> list[str]:
         """
         List all registered agents.
 

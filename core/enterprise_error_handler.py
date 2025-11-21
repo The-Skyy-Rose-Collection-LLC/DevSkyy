@@ -34,10 +34,10 @@ class ErrorRecord(BaseModel):
     error_type: str
     severity: str  # CRITICAL, HIGH, MEDIUM, LOW
     message: str
-    context: Dict[str, Any] = Field(default_factory=dict)
-    trace: Optional[str] = None
-    user_id: Optional[str] = None
-    request_id: Optional[str] = None
+    context: dict[str, Any] = Field(default_factory=dict)
+    trace: str | None = None
+    user_id: str | None = None
+    request_id: str | None = None
     environment: str  # development, staging, production
     component: str
     action: str  # "continue" or "halt"
@@ -123,10 +123,10 @@ class EnterpriseErrorHandler:
         error_type: str,
         message: str,
         severity: str = "MEDIUM",
-        context: Optional[Dict[str, Any]] = None,
-        exception: Optional[Exception] = None,
-        user_id: Optional[str] = None,
-        request_id: Optional[str] = None,
+        context: Optional[dict[str, Any]] = None,
+        exception: Exception | None = None,
+        user_id: str | None = None,
+        request_id: str | None = None,
         component: str = "unknown",
         action: str = "continue",
     ) -> ErrorRecord:
@@ -246,7 +246,7 @@ class EnterpriseErrorHandler:
         except Exception as e:
             logger.exception(f"Failed to write error ledger: {e}")
 
-    def _get_summary(self) -> Dict[str, int]:
+    def _get_summary(self) -> dict[str, int]:
         """Get error summary statistics"""
         summary = {
             "total": len(self.errors),
@@ -266,7 +266,7 @@ class EnterpriseErrorHandler:
         critical_count = sum(1 for e in self.errors if e.severity == "CRITICAL")
         return critical_count > 0
 
-    def export_ledger(self) -> Dict[str, Any]:
+    def export_ledger(self) -> dict[str, Any]:
         """Export error ledger"""
         return {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -277,7 +277,7 @@ class EnterpriseErrorHandler:
 
 
 # Global error handler instance
-_global_error_handler: Optional[EnterpriseErrorHandler] = None
+_global_error_handler: EnterpriseErrorHandler | None = None
 
 
 def get_error_handler() -> EnterpriseErrorHandler:
@@ -292,8 +292,8 @@ def record_error(
     error_type: str,
     message: str,
     severity: str = "MEDIUM",
-    context: Optional[Dict[str, Any]] = None,
-    exception: Optional[Exception] = None,
+    context: Optional[dict[str, Any]] = None,
+    exception: Exception | None = None,
     **kwargs: Any,
 ) -> ErrorRecord:
     """Convenience function to record error using global handler"""

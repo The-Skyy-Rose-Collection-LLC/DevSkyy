@@ -52,13 +52,13 @@ class WordPressCredentials:
     site_url: str
     username: str
     password: str
-    application_password: Optional[str] = None
-    ftp_host: Optional[str] = None
-    ftp_username: Optional[str] = None
-    ftp_password: Optional[str] = None
-    sftp_host: Optional[str] = None
-    sftp_username: Optional[str] = None
-    sftp_private_key: Optional[str] = None
+    application_password: str | None = None
+    ftp_host: str | None = None
+    ftp_username: str | None = None
+    ftp_password: str | None = None
+    sftp_host: str | None = None
+    sftp_username: str | None = None
+    sftp_private_key: str | None = None
 
 
 @dataclass
@@ -85,8 +85,8 @@ class DeploymentResult:
     status: DeploymentStatus
     theme_package: ThemePackage
     upload_method: UploadMethod
-    deployed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
+    deployed_at: datetime | None = None
+    error_message: str | None = None
     rollback_available: bool = False
     validation_results: dict[str, Any] = field(default_factory=dict)
 
@@ -583,7 +583,7 @@ class AutomatedThemeUploader:
             enterprise_logger.error(f"Theme activation error: {e}", category=LogCategory.SYSTEM, error=e)
             return False
 
-    def get_deployment_status(self, deployment_id: str) -> Optional[DeploymentResult]:
+    def get_deployment_status(self, deployment_id: str) -> DeploymentResult | None:
         """Get deployment status by ID."""
         # Check active deployments
         if deployment_id in self.active_deployments:

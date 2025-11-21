@@ -81,7 +81,7 @@ class ModelConfig(BaseModel):
 
     provider: ModelProvider
     model_name: str
-    api_key: Optional[str] = None
+    api_key: str | None = None
     max_tokens: int = 4096
     temperature: float = 0.7
     capabilities: list[ModelCapability] = Field(default_factory=list)
@@ -96,14 +96,14 @@ class AIRequest(BaseModel):
 
     request_id: str = Field(default_factory=lambda: f"req_{int(time.time())}")
     prompt: str
-    system_prompt: Optional[str] = None
-    model_preference: Optional[str] = None
-    capability_required: Optional[ModelCapability] = None
+    system_prompt: str | None = None
+    model_preference: str | None = None
+    capability_required: ModelCapability | None = None
     priority: RequestPriority = RequestPriority.NORMAL
-    max_tokens: Optional[int] = None
-    temperature: Optional[float] = None
+    max_tokens: int | None = None
+    temperature: float | None = None
     metadata: dict[str, Any] = Field(default_factory=dict)
-    cache_key: Optional[str] = None
+    cache_key: str | None = None
     cache_ttl: int = 3600
 
 
@@ -297,7 +297,7 @@ class EnhancedAIOrchestrator:
             # Try fallback if available
             return await self._handle_fallback(request, str(e))
 
-    async def _select_model(self, request: AIRequest) -> Optional[str]:
+    async def _select_model(self, request: AIRequest) -> str | None:
         """Select the optimal model for the request."""
         # Filter models by capability if specified
         available_models = []
@@ -439,7 +439,7 @@ class EnhancedAIOrchestrator:
             },
         }
 
-    async def _get_cached_response(self, cache_key: str) -> Optional[AIResponse]:
+    async def _get_cached_response(self, cache_key: str) -> AIResponse | None:
         """Get cached response from Redis."""
         try:
             if not self.redis_client:

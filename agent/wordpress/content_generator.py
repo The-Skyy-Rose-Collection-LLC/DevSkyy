@@ -29,7 +29,7 @@ class ContentGenerator:
     Creates SEO-optimized, engaging content for blogs and pages.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.api_key = api_key
         if api_key:
             self.client = anthropic.Anthropic(api_key=api_key)
@@ -126,7 +126,7 @@ Meta Description: [150 chars]
         self,
         page_type: str,
         brand_info: dict[str, Any],
-        additional_context: Optional[dict] = None,
+        additional_context: dict | None = None,
     ) -> dict[str, Any]:
         """
         Generate WordPress page content

@@ -64,7 +64,7 @@ class PartnershipStatus(BaseModel):
 class DeliverableUpdate(BaseModel):
     completion_percentage: float = Field(..., ge=0, le=100, description="Completion percentage")
     status: str = Field(..., description="Current status description")
-    last_updated: Optional[datetime] = Field(default=None, description="Last update timestamp")
+    last_updated: datetime | None = Field(default=None, description="Last update timestamp")
 
 
 # Dependency for authentication
@@ -659,7 +659,7 @@ async def get_api_documentation(current_user: dict = Depends(get_current_user)) 
                 "path": "/api/v1/orchestration/metrics",
                 "description": "Get real-time metrics from all partnerships",
                 "authentication": "Required (JWT Bearer token)",
-                "response_model": "List[MetricsResponse]",
+                "response_model": "list[MetricsResponse]",
                 "example_response": [
                     {
                         "partnership_type": "cursor_technical",
@@ -691,7 +691,7 @@ async def get_api_documentation(current_user: dict = Depends(get_current_user)) 
                 "path": "/api/v1/orchestration/partnerships",
                 "description": "Get status of all partnerships",
                 "authentication": "Required (JWT Bearer token)",
-                "response_model": "List[PartnershipStatus]",
+                "response_model": "list[PartnershipStatus]",
                 "example_response": [
                     {
                         "id": "cursor_technical",

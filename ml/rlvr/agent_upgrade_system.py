@@ -468,7 +468,7 @@ class AgentUpgradeSystem:
 
         return agent_id
 
-    async def _get_latest_execution(self, agent_id: uuid.UUID) -> Optional[uuid.UUID]:
+    async def _get_latest_execution(self, agent_id: uuid.UUID) -> uuid.UUID | None:
         """Get most recent execution for agent."""
         query = """
             SELECT id FROM agent_executions

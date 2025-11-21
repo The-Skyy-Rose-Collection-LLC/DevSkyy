@@ -29,17 +29,17 @@ class CreateWebhookRequest(BaseModel):
 
     endpoint: HttpUrl
     events: list[WebhookEvent]
-    secret: Optional[str] = None
+    secret: str | None = None
     max_retries: int = 3
 
 
 class UpdateWebhookRequest(BaseModel):
     """Update webhook subscription request"""
 
-    endpoint: Optional[HttpUrl] = None
+    endpoint: HttpUrl | None = None
     events: Optional[list[WebhookEvent]] = None
-    active: Optional[bool] = None
-    max_retries: Optional[int] = None
+    active: bool | None = None
+    max_retries: int | None = None
 
 
 class TestWebhookRequest(BaseModel):
@@ -162,8 +162,8 @@ async def delete_webhook_subscription(subscription_id: str, current_user: TokenD
 
 @router.get("/deliveries", response_model=list[dict])
 async def list_webhook_deliveries(
-    subscription_id: Optional[str] = None,
-    status_filter: Optional[str] = None,
+    subscription_id: str | None = None,
+    status_filter: str | None = None,
     limit: int = 100,
     current_user: TokenData = Depends(get_current_active_user),
 ):

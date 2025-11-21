@@ -216,8 +216,8 @@ class ModelRegistry:
     def load_model(
         self,
         model_name: str,
-        version: Optional[str] = None,
-        stage: Optional[ModelStage] = None,
+        version: str | None = None,
+        stage: ModelStage | None = None,
     ) -> Any:
         """
         Load a model from registry
@@ -339,7 +339,7 @@ class ModelRegistry:
             "stage2": meta2.stage,
         }
 
-    def _get_latest_version_by_stage(self, model_name: str, stage: ModelStage) -> Optional[str]:
+    def _get_latest_version_by_stage(self, model_name: str, stage: ModelStage) -> str | None:
         """Get latest version in a specific stage"""
         if model_name not in self.index["models"]:
             return None

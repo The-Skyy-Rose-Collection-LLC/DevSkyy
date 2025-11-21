@@ -483,7 +483,7 @@ class WordPressSEOOptimizer:
         self,
         allow_all: bool = True,
         disallow_paths: Optional[list[str]] = None,
-        sitemap_url: Optional[str] = None,
+        sitemap_url: str | None = None,
     ) -> str:
         """
         Generate robots.txt file

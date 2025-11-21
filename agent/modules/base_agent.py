@@ -60,8 +60,8 @@ class HealthMetrics:
     error_count: int = 0
     warning_count: int = 0
     total_operations: int = 0
-    last_error: Optional[str] = None
-    last_error_time: Optional[datetime] = None
+    last_error: str | None = None
+    last_error_time: datetime | None = None
     uptime_seconds: float = 0.0
     memory_usage_mb: float = 0.0
     cpu_usage_percent: float = 0.0
@@ -90,7 +90,7 @@ class Issue:
     detected_at: datetime = field(default_factory=datetime.now)
     resolved: bool = False
     resolution_attempted: bool = False
-    resolution_strategy: Optional[str] = None
+    resolution_strategy: str | None = None
 
 
 class CircuitBreaker:
@@ -100,7 +100,7 @@ class CircuitBreaker:
         self.failure_threshold = failure_threshold
         self.timeout = timeout
         self.failure_count = 0
-        self.last_failure_time: Optional[datetime] = None
+        self.last_failure_time: datetime | None = None
         self.state = "closed"  # closed, open, half-open
 
     def call(self, func: Callable, *args, **kwargs) -> Any:

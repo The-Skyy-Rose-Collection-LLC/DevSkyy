@@ -109,17 +109,17 @@ class GenerationRequest:
 
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     content_type: ContentType = ContentType.PRODUCT_PHOTO
-    provider: Optional[ContentProvider] = None  # Auto-select if None
+    provider: ContentProvider | None = None  # Auto-select if None
 
     # Content specifications
     prompt: str = ""
     negative_prompt: str = "low quality, blurry, distorted, watermark, text"
-    style_preset: Optional[StylePreset] = StylePreset.MINIMALIST_LUXURY
+    style_preset: StylePreset | None = StylePreset.MINIMALIST_LUXURY
 
     # Image parameters
     width: int = 1024
     height: int = 1024
-    aspect_ratio: Optional[str] = None  # "16:9", "4:3", "1:1", "9:16"
+    aspect_ratio: str | None = None  # "16:9", "4:3", "1:1", "9:16"
 
     # Quality settings
     quality: str = "high"  # "low", "medium", "high", "ultra"
@@ -131,7 +131,7 @@ class GenerationRequest:
     color_palette: list[str] = field(default_factory=list)
 
     # Advanced options
-    seed: Optional[int] = None
+    seed: int | None = None
     variations: int = 1
     upscale: bool = False
     apply_watermark: bool = True
@@ -157,19 +157,19 @@ class GenerationResult:
 
     # Generation details
     prompt_used: str = ""
-    style_applied: Optional[StylePreset] = None
-    seed_used: Optional[int] = None
+    style_applied: StylePreset | None = None
+    seed_used: int | None = None
 
     # Performance metrics
     generation_time: float = 0.0
     cost: float = 0.0
 
     # Quality metrics
-    quality_score: Optional[float] = None
-    brand_alignment_score: Optional[float] = None
+    quality_score: float | None = None
+    brand_alignment_score: float | None = None
 
     # Metadata
-    error: Optional[str] = None
+    error: str | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     created_at: datetime = field(default_factory=datetime.now)
 
@@ -247,7 +247,7 @@ class VisualContentGenerationAgent:
         Checks environment variables and optional libraries to register supported content providers (DALL‑E 3 when OpenAI client and API key are present, Stable Diffusion XL when PyTorch with CUDA is available, Midjourney when its API key is present, and Claude Artifacts when the Anthropic client and API key are present) and returns a mapping of ContentProvider to provider-specific configuration used by the agent.
 
         Returns:
-            Dict[ContentProvider, Dict[str, Any]]: A dictionary where keys are available ContentProvider members and values are their configuration dictionaries (capabilities, availability flags, client or pipeline placeholders, cost and quality hints, etc.).
+            dict[ContentProvider, dict[str, Any]]: A dictionary where keys are available ContentProvider members and values are their configuration dictionaries (capabilities, availability flags, client or pipeline placeholders, cost and quality hints, etc.).
         """
         providers = {}
 
@@ -319,7 +319,7 @@ class VisualContentGenerationAgent:
 
         return providers
 
-    def _select_optimal_provider(self, request: GenerationRequest) -> Optional[ContentProvider]:
+    def _select_optimal_provider(self, request: GenerationRequest) -> ContentProvider | None:
         """
         Choose the most suitable content provider for the given generation request.
 
@@ -607,7 +607,7 @@ class VisualContentGenerationAgent:
             error="Claude Artifacts provider not yet implemented",
         )
 
-    def _enhance_prompt_for_luxury(self, prompt: str, style: Optional[StylePreset]) -> str:
+    def _enhance_prompt_for_luxury(self, prompt: str, style: StylePreset | None) -> str:
         """
         Append luxury fashion descriptors to a prompt based on an optional style preset.
 
@@ -615,7 +615,7 @@ class VisualContentGenerationAgent:
 
         Parameters:
             prompt (str): Original text prompt to enhance.
-            style (Optional[StylePreset]): Optional luxury fashion style preset that selects additional descriptive modifiers.
+            style (StylePreset | None): Optional luxury fashion style preset that selects additional descriptive modifiers.
 
         Returns:
             str: The enhanced prompt including style-specific modifiers (when applicable) and base quality descriptors.
@@ -698,7 +698,7 @@ class VisualContentGenerationAgent:
         key_string = json.dumps(key_data, sort_keys=True)
         return hashlib.sha256(key_string.encode()).hexdigest()
 
-    async def _check_cache(self, cache_key: str) -> Optional[GenerationResult]:
+    async def _check_cache(self, cache_key: str) -> GenerationResult | None:
         """
         Retrieve a cached GenerationResult by cache key if available and readable.
 
@@ -775,10 +775,10 @@ class VisualContentGenerationAgent:
         Processes each GenerationRequest in parallel and returns a list of GenerationResult objects in the same order as the input. If an individual generation raises an exception, it is converted into a failed GenerationResult preserving the original request_id and the exception message in `error`.
 
         Parameters:
-            requests (List[GenerationRequest]): The generation requests to process.
+            requests (list[GenerationRequest]): The generation requests to process.
 
         Returns:
-            List[GenerationResult]: A list of results corresponding to the provided requests, where failed entries have `success=False` and an `error` message.
+            list[GenerationResult]: A list of results corresponding to the provided requests, where failed entries have `success=False` and an `error` message.
         """
         logger.info(f"🎨 Batch generating {len(requests)} items")
 
@@ -809,13 +809,13 @@ class VisualContentGenerationAgent:
         Provide a snapshot of the agent's current system status.
 
         Returns:
-            status (Dict[str, Any]): Mapping containing runtime and configuration summaries:
+            status (dict[str, Any]): Mapping containing runtime and configuration summaries:
                 - agent_name (str): Agent's name.
                 - version (str): Agent version string.
-                - available_providers (List[ContentProvider]): Providers currently configured (keys).
+                - available_providers (list[ContentProvider]): Providers currently configured (keys).
                 - generation_count (int): Total number of generation requests processed.
                 - avg_generation_time (float): Average generation time in seconds (0.0 if none).
-                - provider_performance (Dict[ContentProvider, Dict[str, Any]]): Per-provider metrics such as total_requests, successful_requests, total_time, avg_time, and success_rate.
+                - provider_performance (dict[ContentProvider, dict[str, Any]]): Per-provider metrics such as total_requests, successful_requests, total_time, avg_time, and success_rate.
                 - output_directory (str): Path to the directory where generated content is saved.
                 - cache_directory (str): Path to the cache directory used for generation results.
         """

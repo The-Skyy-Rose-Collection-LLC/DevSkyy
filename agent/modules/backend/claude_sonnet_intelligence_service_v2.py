@@ -312,7 +312,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     # === Helper Methods ===
 
-    def _check_cache(self, key: str, context: Optional[dict] = None) -> Optional[dict[str, Any]]:
+    def _check_cache(self, key: str, context: dict | None = None) -> Optional[dict[str, Any]]:
         """Check if we have a cached response"""
         cache_key = self._generate_cache_key(key, context)
 
@@ -328,7 +328,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
         return None
 
-    def _cache_response(self, key: str, context: Optional[dict], response: dict[str, Any]):
+    def _cache_response(self, key: str, context: dict | None, response: dict[str, Any]):
         """Cache a response for future use"""
         cache_key = self._generate_cache_key(key, context)
 
@@ -345,7 +345,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "cached_at": datetime.now(),
         }
 
-    def _generate_cache_key(self, key: str, context: Optional[dict]) -> str:
+    def _generate_cache_key(self, key: str, context: dict | None) -> str:
         """Generate a unique cache key"""
         if context:
             context_str = json.dumps(context, sort_keys=True)

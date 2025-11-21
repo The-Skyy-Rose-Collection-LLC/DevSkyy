@@ -68,10 +68,10 @@ class AgentTask:
     priority: ExecutionPriority
     status: TaskStatus = TaskStatus.PENDING
     result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
 
 class AgentOrchestrator:
@@ -491,7 +491,7 @@ class AgentOrchestrator:
             ),
         }
 
-    def get_agent_metrics(self, agent_name: Optional[str] = None) -> dict[str, Any]:
+    def get_agent_metrics(self, agent_name: str | None = None) -> dict[str, Any]:
         """Get performance metrics for agent(s)"""
         if agent_name:
             return self.agent_metrics.get(agent_name, {})
@@ -505,7 +505,7 @@ class AgentOrchestrator:
     # INTER-AGENT COMMUNICATION
     # ============================================================================
 
-    def share_data(self, key: str, value: Any, ttl: Optional[int] = None):
+    def share_data(self, key: str, value: Any, ttl: int | None = None):
         """Share data between agents"""
         self.shared_context[key] = {
             "value": value,
@@ -513,7 +513,7 @@ class AgentOrchestrator:
             "ttl": ttl,
         }
 
-    def get_shared_data(self, key: str) -> Optional[Any]:
+    def get_shared_data(self, key: str) -> Any | None:
         """Get shared data"""
         data = self.shared_context.get(key)
         if not data:

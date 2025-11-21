@@ -31,7 +31,7 @@ class WebhookSubscribeRequest(BaseModel):
 
     endpoint: HttpUrl
     events: list[str]
-    secret: Optional[str] = None
+    secret: str | None = None
     metadata: Optional[dict[str, Any]] = None
 
 
@@ -54,11 +54,11 @@ class WebhookDeliveryResponse(BaseModel):
     event_id: str
     status: str
     attempt_number: int
-    response_status_code: Optional[int]
-    error_message: Optional[str]
+    response_status_code: int | None
+    error_message: str | None
     created_at: datetime
     updated_at: datetime
-    next_retry_at: Optional[datetime]
+    next_retry_at: datetime | None
 
 
 class WebhookTestResponse(BaseModel):
@@ -66,8 +66,8 @@ class WebhookTestResponse(BaseModel):
 
     status: str
     delivery_id: str
-    response_status_code: Optional[int]
-    error_message: Optional[str]
+    response_status_code: int | None
+    error_message: str | None
 
 
 # ============================================================================

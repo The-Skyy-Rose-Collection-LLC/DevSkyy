@@ -51,9 +51,9 @@ class BoundedAction:
     requires_approval: bool
     approval_status: ApprovalStatus = ApprovalStatus.PENDING
     created_at: datetime = field(default_factory=datetime.now)
-    approved_at: Optional[datetime] = None
-    approved_by: Optional[str] = None
-    executed_at: Optional[datetime] = None
+    approved_at: datetime | None = None
+    approved_by: str | None = None
+    executed_at: datetime | None = None
     result: Optional[dict[str, Any]] = None
     audit_trail: list[dict[str, Any]] = field(default_factory=list)
 
@@ -98,7 +98,7 @@ class BoundedAutonomyWrapper:
         logger.info(f"🔒 Bounded autonomy wrapper initialized for {wrapped_agent.agent_name}")
 
     async def execute(
-        self, function_name: str, parameters: dict[str, Any], require_approval: Optional[bool] = None
+        self, function_name: str, parameters: dict[str, Any], require_approval: bool | None = None
     ) -> dict[str, Any]:
         """
         Execute an agent function with bounded autonomy controls.
@@ -270,7 +270,7 @@ class BoundedAutonomyWrapper:
         # Default to low risk (read operations)
         return ActionRiskLevel.LOW
 
-    def _requires_approval(self, function_name: str, parameters: dict[str, Any], override: Optional[bool]) -> bool:
+    def _requires_approval(self, function_name: str, parameters: dict[str, Any], override: bool | None) -> bool:
         """Determine if action requires approval"""
         if override is not None:
             return override

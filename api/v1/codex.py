@@ -39,8 +39,8 @@ class CodeGenerationRequest(BaseModel):
     prompt: str = Field(..., description="Natural language description of what to generate")
     language: str = Field(default="python", description="Programming language")
     model: Literal["gpt-4", "gpt-3.5"] = Field(default="gpt-4", description="Model to use")
-    max_tokens: Optional[int] = Field(default=None, description="Maximum tokens to generate")
-    temperature: Optional[float] = Field(default=None, description="Sampling temperature (0.0-1.0)")
+    max_tokens: int | None = Field(default=None, description="Maximum tokens to generate")
+    temperature: float | None = Field(default=None, description="Sampling temperature (0.0-1.0)")
     context: Optional[list[str]] = Field(default=None, description="Additional context")
 
 
@@ -358,7 +358,7 @@ class CodeHealingRequest(BaseModel):
 
     code: str = Field(..., description="Code to heal")
     language: str = Field(default="python", description="Programming language")
-    context: Optional[dict] = Field(default=None, description="Additional context")
+    context: dict | None = Field(default=None, description="Additional context")
     auto_apply: bool = Field(default=False, description="Automatically apply fixes (use with caution)")
 
 

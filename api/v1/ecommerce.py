@@ -36,11 +36,11 @@ class ImportProductsResponse(BaseModel):
 
     success: bool
     message: str
-    job_id: Optional[str] = None
+    job_id: str | None = None
     total: int = 0
     succeeded: int = 0
     failed: int = 0
-    duration_seconds: Optional[float] = None
+    duration_seconds: float | None = None
 
 
 class GenerateSEORequest(BaseModel):
@@ -50,16 +50,16 @@ class GenerateSEORequest(BaseModel):
     category: str = Field(default="")
     short_description: str = Field(default="")
     description: str = Field(default="")
-    keywords: Optional[str] = None
+    keywords: str | None = None
 
 
 class GenerateSEOResponse(BaseModel):
     """Response with generated SEO tags"""
 
     success: bool
-    metatitle: Optional[str] = None
-    metadescription: Optional[str] = None
-    error: Optional[str] = None
+    metatitle: str | None = None
+    metadescription: str | None = None
+    error: str | None = None
 
 
 class WorkflowRequest(BaseModel):
@@ -79,7 +79,7 @@ class WorkflowResponse(BaseModel):
     message: str
     products_imported: int = 0
     products_with_seo: int = 0
-    duration_seconds: Optional[float] = None
+    duration_seconds: float | None = None
 
 
 # Dependency injection for services

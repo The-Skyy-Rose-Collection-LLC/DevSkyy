@@ -423,7 +423,7 @@ class PersonalizedWebsiteRenderer:
 
         return profile
 
-    async def _enrich_location(self, ip_address: Optional[str]) -> dict[str, Any]:
+    async def _enrich_location(self, ip_address: str | None) -> dict[str, Any]:
         """Enrich location data from IP address."""
         if not ip_address:
             return {"country": "United States", "city": "Unknown", "region": "Unknown"}
@@ -510,7 +510,7 @@ class PersonalizedWebsiteRenderer:
             "social_media_active": "Instagram" in user_agent or "TikTok" in user_agent,
         }
 
-    def _detect_device(self, user_agent: Optional[str]) -> dict[str, Any]:
+    def _detect_device(self, user_agent: str | None) -> dict[str, Any]:
         """Detect device type from user agent."""
         if not user_agent:
             return {"type": "desktop", "screen_size": "large"}
@@ -759,7 +759,7 @@ class PersonalizedWebsiteRenderer:
 
         return relevant_products[:6]  # Return top 6 products
 
-    def _get_urgency_messaging(self, segment: str) -> Optional[str]:
+    def _get_urgency_messaging(self, segment: str) -> str | None:
         """Get urgency messaging based on segment."""
         if segment == "collector":
             return "Only 3 pieces remaining in this exclusive collection"

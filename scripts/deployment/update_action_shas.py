@@ -88,7 +88,7 @@ class ActionSHAUpdater:
         }
         colors.get(level, "")
 
-    def get_repo_from_action(self, action: str) -> Optional[str]:
+    def get_repo_from_action(self, action: str) -> str | None:
         """Extract repository name from action string."""
         # Handle paths like github/codeql-action/init
         for key, repo in ACTION_REPOS.items():
@@ -103,7 +103,7 @@ class ActionSHAUpdater:
 
         return None
 
-    def fetch_sha_for_tag(self, repo: str, tag: str) -> Optional[str]:
+    def fetch_sha_for_tag(self, repo: str, tag: str) -> str | None:
         """Fetch commit SHA for a given tag using GitHub API."""
         cache_key = f"{repo}@{tag}"
 
@@ -175,7 +175,7 @@ class ActionSHAUpdater:
 
         return None
 
-    def fetch_sha_for_branch(self, repo: str, branch: str) -> Optional[str]:
+    def fetch_sha_for_branch(self, repo: str, branch: str) -> str | None:
         """Fetch commit SHA for a branch."""
         url = f"{GITHUB_API}/repos/{repo}/commits/{branch}"
         self.log(f"Fetching SHA for branch: {url}", "VERBOSE")

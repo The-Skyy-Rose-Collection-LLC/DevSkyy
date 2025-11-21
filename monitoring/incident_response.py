@@ -48,7 +48,7 @@ class IncidentResponse:
     delay_seconds: int = 0
     max_retries: int = 3
     timeout_seconds: int = 300
-    condition: Optional[str] = None  # Condition to execute action
+    condition: str | None = None  # Condition to execute action
 
 
 @dataclass
@@ -62,11 +62,11 @@ class Incident:
     status: IncidentStatus
     created_at: datetime
     updated_at: datetime
-    resolved_at: Optional[datetime] = None
+    resolved_at: datetime | None = None
     alerts: list[Alert] = field(default_factory=list)
     responses_executed: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
-    assignee: Optional[str] = None
+    assignee: str | None = None
     tags: list[str] = field(default_factory=list)
 
 

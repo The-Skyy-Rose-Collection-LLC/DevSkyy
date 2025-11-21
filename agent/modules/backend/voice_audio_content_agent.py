@@ -221,7 +221,7 @@ Return the enhanced text optimized for voice generation."""
             logger.warning(f"Text enhancement failed, using original: {e}")
             return text
 
-    async def _generate_elevenlabs_speech(self, text: str, voice_style: str) -> Optional[bytes]:
+    async def _generate_elevenlabs_speech(self, text: str, voice_style: str) -> bytes | None:
         """
         Generate speech using ElevenLabs API.
         """
@@ -438,8 +438,8 @@ Consider this is for a luxury fashion brand customer interaction."""
         self,
         script: str,
         episode_title: str,
-        intro_text: Optional[str] = None,
-        outro_text: Optional[str] = None,
+        intro_text: str | None = None,
+        outro_text: str | None = None,
         voice_style: str = "narrator",
     ) -> dict[str, Any]:
         """

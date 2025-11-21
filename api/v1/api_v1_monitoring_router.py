@@ -280,7 +280,7 @@ async def get_performance_metrics(current_user: dict = Depends(get_current_user)
 
 
 @router.get("/alerts", response_model=list[AlertResponse])
-async def get_active_alerts(severity: Optional[str] = None, current_user: dict = Depends(get_current_user)):
+async def get_active_alerts(severity: str | None = None, current_user: dict = Depends(get_current_user)):
     """
     Get active system alerts
 

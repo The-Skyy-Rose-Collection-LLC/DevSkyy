@@ -128,7 +128,7 @@ class SkyRose3DPipeline:
         }
 
     async def load_3d_model(
-        self, file_path: str, model_format: ModelFormat, brand_context: Optional[str] = None
+        self, file_path: str, model_format: ModelFormat, brand_context: str | None = None
     ) -> Model3D:
         """Load and process a 3D model file."""
         try:
@@ -254,7 +254,7 @@ class SkyRose3DPipeline:
         materials.append(base_material)
         return materials
 
-    def _match_brand_attributes(self, metadata: dict[str, Any], brand_context: Optional[str]) -> list[str]:
+    def _match_brand_attributes(self, metadata: dict[str, Any], brand_context: str | None) -> list[str]:
         """Match model attributes with brand database."""
         brand_tags = []
 

@@ -123,7 +123,7 @@ class PineconeManager:
 
     def create_index(
         self,
-        index_name: Optional[str] = None,
+        index_name: str | None = None,
         dimension: int = 1536,  # OpenAI ada-002 embedding size
         metric: str = "cosine"
     ):

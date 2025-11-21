@@ -77,10 +77,10 @@ class RewardVerifier:
     async def _verify_user_feedback(
         self,
         execution_id: uuid.UUID,
-        user_rating: Optional[int] = None,
-        user_feedback: Optional[str] = None,
-        thumbs_up: Optional[bool] = None,
-        user_id: Optional[uuid.UUID] = None
+        user_rating: int | None = None,
+        user_feedback: str | None = None,
+        thumbs_up: bool | None = None,
+        user_id: uuid.UUID | None = None
     ) -> Dict[str, Any]:
         """Verify based on explicit user feedback."""
 
@@ -110,7 +110,7 @@ class RewardVerifier:
         execution_id: uuid.UUID,
         tests_passed: int,
         tests_total: int,
-        test_output: Optional[str] = None
+        test_output: str | None = None
     ) -> Dict[str, Any]:
         """Verify based on automated test execution."""
 
@@ -130,9 +130,9 @@ class RewardVerifier:
     async def _verify_code_analysis(
         self,
         execution_id: uuid.UUID,
-        lint_score: Optional[float] = None,
-        complexity_score: Optional[float] = None,
-        security_score: Optional[float] = None
+        lint_score: float | None = None,
+        complexity_score: float | None = None,
+        security_score: float | None = None
     ) -> Dict[str, Any]:
         """Verify based on static code analysis."""
 
@@ -153,9 +153,9 @@ class RewardVerifier:
     async def _verify_business_metrics(
         self,
         execution_id: uuid.UUID,
-        revenue_impact_usd: Optional[float] = None,
-        conversion_rate: Optional[float] = None,
-        retention_impact: Optional[float] = None
+        revenue_impact_usd: float | None = None,
+        conversion_rate: float | None = None,
+        retention_impact: float | None = None
     ) -> Dict[str, Any]:
         """Verify based on business impact metrics."""
 

@@ -145,8 +145,8 @@ class PerformanceConfig(BaseModel):
 class AIConfig(BaseModel):
     """AI services configuration"""
 
-    openai_api_key: Optional[str] = None
-    anthropic_api_key: Optional[str] = None
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
     default_model: str = Field(default="claude-sonnet-4-5")
     max_tokens: int = Field(default=4096, ge=256, le=200000)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
@@ -188,12 +188,12 @@ class UnifiedConfig:
         secret = config.security.secret_key
     """
 
-    def __init__(self, environment: Optional[str] = None):
+    def __init__(self, environment: str | None = None):
         """
         Initialize the unified configuration for the application.
 
         Parameters:
-            environment (Optional[str]): Optional override for the runtime environment. If omitted,
+            environment (str | None): Optional override for the runtime environment. If omitted,
                 the ENVIRONMENT environment variable is used; defaults to "development". Accepted
                 values are "development", "production", and "testing".
 
@@ -517,7 +517,7 @@ class UnifiedConfig:
         Reads the `TRUSTED_HOSTS` environment variable and parses it into a list of hostnames; when not set, a production default and a non-production default are used.
 
         Returns:
-            List[str]: A list of hostnames from `TRUSTED_HOSTS`, each trimmed of surrounding whitespace.
+            list[str]: A list of hostnames from `TRUSTED_HOSTS`, each trimmed of surrounding whitespace.
         """
         if self.is_production():
             hosts_str = os.getenv("TRUSTED_HOSTS", "theskyy-rose-collection.com")
@@ -590,10 +590,10 @@ class UnifiedConfig:
 # ============================================================================
 
 # Singleton configuration instance
-_config: Optional[UnifiedConfig] = None
+_config: UnifiedConfig | None = None
 
 
-def get_config(environment: Optional[str] = None) -> UnifiedConfig:
+def get_config(environment: str | None = None) -> UnifiedConfig:
     """
     Return the module-level singleton UnifiedConfig, creating it if necessary.
 
@@ -601,7 +601,7 @@ def get_config(environment: Optional[str] = None) -> UnifiedConfig:
     environment name.
 
     Parameters:
-        environment (Optional[str]): Optional environment name to initialize the configuration
+        environment (str | None): Optional environment name to initialize the configuration
             (for example "development", "production", or "testing"). If omitted, the
             UnifiedConfig will determine the environment from environment variables or defaults.
 
@@ -616,12 +616,12 @@ def get_config(environment: Optional[str] = None) -> UnifiedConfig:
     return _config
 
 
-def reload_config(environment: Optional[str] = None) -> UnifiedConfig:
+def reload_config(environment: str | None = None) -> UnifiedConfig:
     """
     Reinitialize the module-level UnifiedConfig singleton and return the new instance for the specified environment.
 
     Parameters:
-        environment (Optional[str]): Optional environment name to force configuration initialization for (e.g., "production", "development", "testing"). If omitted, the environment detection in UnifiedConfig is used.
+        environment (str | None): Optional environment name to force configuration initialization for (e.g., "production", "development", "testing"). If omitted, the environment detection in UnifiedConfig is used.
 
     Returns:
         UnifiedConfig: The newly created UnifiedConfig singleton.
@@ -644,7 +644,7 @@ def validate_production_config(config: UnifiedConfig) -> list[str]:
         config (UnifiedConfig): The configuration to validate.
 
     Returns:
-        errors (List[str]): A list of validation error messages; empty if the configuration passes all production checks.
+        errors (list[str]): A list of validation error messages; empty if the configuration passes all production checks.
     """
     errors = []
 

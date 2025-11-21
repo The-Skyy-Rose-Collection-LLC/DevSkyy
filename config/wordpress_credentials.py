@@ -25,15 +25,15 @@ class WordPressCredentials:
     site_url: str
     username: str
     password: str
-    application_password: Optional[str] = None
-    ftp_host: Optional[str] = None
-    ftp_username: Optional[str] = None
-    ftp_password: Optional[str] = None
+    application_password: str | None = None
+    ftp_host: str | None = None
+    ftp_username: str | None = None
+    ftp_password: str | None = None
     ftp_port: int = 21
-    sftp_host: Optional[str] = None
-    sftp_username: Optional[str] = None
-    sftp_password: Optional[str] = None
-    sftp_private_key_path: Optional[str] = None
+    sftp_host: str | None = None
+    sftp_username: str | None = None
+    sftp_password: str | None = None
+    sftp_private_key_path: str | None = None
     sftp_port: int = 22
 
     def __post_init__(self):
@@ -107,7 +107,7 @@ class WordPressCredentialsManager:
         except Exception as e:
             logger.error(f"❌ Failed to load default credentials: {e}")
 
-    def _load_credentials_from_env(self, prefix: str) -> Optional[WordPressCredentials]:
+    def _load_credentials_from_env(self, prefix: str) -> WordPressCredentials | None:
         """Load credentials from environment variables with given prefix."""
         site_url = os.getenv(f"{prefix}_SITE_URL")
         username = os.getenv(f"{prefix}_USERNAME")
@@ -132,7 +132,7 @@ class WordPressCredentialsManager:
             sftp_port=int(os.getenv(f"{prefix}_SFTP_PORT", "22")),
         )
 
-    def get_credentials(self, site_key: str = "skyy_rose") -> Optional[WordPressCredentials]:
+    def get_credentials(self, site_key: str = "skyy_rose") -> WordPressCredentials | None:
         """Get credentials for a specific site."""
         return self._credentials_cache.get(site_key)
 
@@ -163,7 +163,7 @@ class WordPressCredentialsManager:
 
         return validation_result
 
-    def get_default_credentials(self) -> Optional[WordPressCredentials]:
+    def get_default_credentials(self) -> WordPressCredentials | None:
         """Get default Skyy Rose Collection credentials."""
         return self.get_credentials("skyy_rose")
 
@@ -173,12 +173,12 @@ wordpress_credentials_manager = WordPressCredentialsManager()
 
 
 # Convenience functions
-def get_skyy_rose_credentials() -> Optional[WordPressCredentials]:
+def get_skyy_rose_credentials() -> WordPressCredentials | None:
     """Get Skyy Rose Collection credentials."""
     return wordpress_credentials_manager.get_default_credentials()
 
 
-def get_credentials_for_site(site_key: str) -> Optional[WordPressCredentials]:
+def get_credentials_for_site(site_key: str) -> WordPressCredentials | None:
     """Get credentials for any configured site."""
     return wordpress_credentials_manager.get_credentials(site_key)
 

@@ -52,7 +52,7 @@ class RateLimiter:
             "admin": 30,
         }
 
-    def is_allowed(self, client_ip: str, endpoint_category: str = "default") -> tuple[bool, Optional[str]]:
+    def is_allowed(self, client_ip: str, endpoint_category: str = "default") -> tuple[bool, str | None]:
         """Check if request is allowed based on rate limits"""
         now = datetime.now()
 
@@ -137,7 +137,7 @@ class ThreatDetector:
             "burpsuite",
         ]
 
-    def analyze_request(self, request: Request) -> tuple[bool, Optional[str], Optional[str]]:
+    def analyze_request(self, request: Request) -> tuple[bool, str | None, str | None]:
         """Analyze request for security threats"""
 
         # Check User-Agent

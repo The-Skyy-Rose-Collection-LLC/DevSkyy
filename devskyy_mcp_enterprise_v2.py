@@ -164,7 +164,7 @@ class QueryResult(BaseModel):
     query_type: str
     cache_hit: bool
     data: dict[str, Any]
-    cached_at: Optional[datetime] = None
+    cached_at: datetime | None = None
 
 
 # Tool 4: Analyze
@@ -184,7 +184,7 @@ class AnalyzeResult(BaseModel):
     confidence: float = Field(ge=0.0, le=1.0)
     top_insights: list[str] = Field(max_length=5, description="Top 5 insights only")
     recommendations: list[str] = Field(max_length=3, description="Top 3 actions")
-    full_report_url: Optional[str] = None
+    full_report_url: str | None = None
 
 
 # Tool 5: Status
@@ -203,7 +203,7 @@ class StatusResult(BaseModel):
     active_agents: int
     recent_errors: int
     summary: str
-    details_url: Optional[str] = None
+    details_url: str | None = None
 
 
 # ===========================
@@ -216,7 +216,7 @@ class DevSkyyAppContext:
     """Shared application resources."""
 
     http_client: httpx.AsyncClient
-    redis_client: Optional[Any]  # redis.Redis if available
+    redis_client: Any | None  # redis.Redis if available
     api_base_url: str
     api_key: str
     start_time: datetime

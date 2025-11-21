@@ -11,6 +11,7 @@ Combines LlamaIndex RAG with MCP infrastructure for enterprise-grade fine-tuning
 import os
 import uuid
 import asyncio
+import html
 import logging
 from typing import Dict, Any, Optional, List
 from datetime import datetime
@@ -73,8 +74,8 @@ class MCPLlamaIndexOrchestrator:
         session: AsyncSession,
         mcp_gateway_url: str = "http://localhost:3000/mcp",
         index_dir: str = "./mcp_llamaindex_storage",
-        openai_api_key: Optional[str] = None,
-        anthropic_api_key: Optional[str] = None
+        openai_api_key: str | None = None,
+        anthropic_api_key: str | None = None
     ):
         """
         Initialize MCP + LlamaIndex orchestrator.
@@ -197,10 +198,10 @@ class MCPLlamaIndexOrchestrator:
     async def hybrid_retrieve_best_examples(
         self,
         agent_id: uuid.UUID,
-        query: Optional[str] = None,
+        query: str | None = None,
         min_score: float = 0.7,
         top_k: int = 10,
-        example_type: Optional[str] = "positive"
+        example_type: str | None = "positive"
     ) -> List[Dict[str, Any]]:
         """
         Hybrid retrieval: SQL filtering + vector semantic search.
@@ -403,15 +404,20 @@ Think through your analysis step by step, then provide the optimized prompt."""
         """Format examples with XML for Claude."""
         formatted = []
         for i, ex in enumerate(examples, 1):
+            # Escape XML special characters to prevent injection
+            escaped_input = html.escape(ex['input'][:500])
+            escaped_output = html.escape(ex['output'][:500])
+            escaped_type = html.escape(str(ex.get('type', 'unknown')))
+            escaped_created = html.escape(str(ex.get('created_at', 'unknown')))
             formatted.append(f"""
 <example id="{i}" score="{ex['score']:.2f}" similarity="{ex.get('similarity', 0):.2f}" hybrid_rank="{ex.get('hybrid_rank', 0):.2f}">
   <input>
-{ex['input'][:500]}
+{escaped_input}
   </input>
   <output>
-{ex['output'][:500]}
+{escaped_output}
   </output>
-  <metadata type="{ex.get('type', 'unknown')}" created="{ex.get('created_at', 'unknown')}" />
+  <metadata type="{escaped_type}" created="{escaped_created}" />
 </example>""")
         return "\n".join(formatted)
 

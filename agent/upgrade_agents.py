@@ -126,7 +126,7 @@ class {original_class_name}V2(BaseAgent):
             self.status = BaseAgent.AgentStatus.FAILED
             return False
 
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Core agent functionality with self-healing.
         Implement your main agent logic here.
@@ -135,7 +135,7 @@ class {original_class_name}V2(BaseAgent):
         return await self.health_check()
 
     @BaseAgent.with_healing
-    async def your_main_method(self, param1: str, param2: Optional[Dict] = None) -> Dict[str, Any]:
+    async def your_main_method(self, param1: str, param2: Dict | None = None) -> dict[str, Any]:
         """
         Main agent method with automatic self-healing.
 
@@ -158,7 +158,7 @@ class {original_class_name}V2(BaseAgent):
             logger.error(f"Method failed: {{e}}")
             raise  # Let BaseAgent.with_healing handle retry
 
-    async def _optimize_resources(self) -> Dict[str, any]:
+    async def _optimize_resources(self) -> dict[str, any]:
         """
         Implement comprehensive agent-specific resource optimization.
 
@@ -166,7 +166,7 @@ class {original_class_name}V2(BaseAgent):
         cache management, and resource monitoring for optimal performance.
 
         Returns:
-            Dict[str, any]: Resource optimization results and metrics
+            dict[str, any]: Resource optimization results and metrics
         """
         optimization_results = {
             "timestamp": asyncio.get_event_loop().time(),

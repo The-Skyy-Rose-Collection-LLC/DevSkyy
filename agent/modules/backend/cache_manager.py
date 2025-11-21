@@ -65,7 +65,7 @@ class CacheManager:
         logger.debug(f"Cache miss for key: {cache_key}")
         return default
 
-    def set(self, key: Union[str, dict], value: Any, ttl: Optional[int] = None) -> None:
+    def set(self, key: Union[str, dict], value: Any, ttl: int | None = None) -> None:
         """Set value in cache with TTL."""
         cache_key = self._generate_key(key)
         ttl = ttl or self.default_ttl
