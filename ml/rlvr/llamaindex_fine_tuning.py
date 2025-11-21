@@ -10,6 +10,7 @@ import uuid
 import asyncio
 import tempfile
 import logging
+import json
 from typing import Dict, Any, Optional, List
 from datetime import datetime
 from pathlib import Path
@@ -343,7 +344,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
                         {"role": "assistant", "content": example["output"]}
                     ]
                 }
-                temp_file.write(str(training_example) + "\n")
+                temp_file.write(json.dumps(training_example) + "\n")
 
         try:
             # Upload training file
