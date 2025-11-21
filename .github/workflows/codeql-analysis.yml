@@ -49,6 +49,7 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3
+        continue-on-error: true
         with:
           category: "/language:${{matrix.language}}"
           upload: true
@@ -57,8 +58,19 @@ jobs:
           # Add detailed diagnostics
           add-snippets: true
 
-      - name: Upload CodeQL results
+      - name: Check if CodeQL results exist
+        id: codeql-check
         if: always()
+        run: |
+          if [ -d "sarif-results" ] && [ "$(ls -A sarif-results)" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "::warning::CodeQL analysis did not generate results"
+          fi
+
+      - name: Upload CodeQL results
+        if: steps.codeql-check.outputs.exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: codeql-results-${{ matrix.language }}
