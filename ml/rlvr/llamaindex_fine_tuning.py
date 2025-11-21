@@ -6,7 +6,6 @@ instead of database queries. Works without MCP infrastructure.
 """
 
 import os
-import uuid
 import asyncio
 import tempfile
 import logging
