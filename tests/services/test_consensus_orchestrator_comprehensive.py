@@ -30,6 +30,7 @@ from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
+from urllib.parse import urlparse
 
 from services.consensus_orchestrator import (
     AgentReview,
@@ -963,7 +964,9 @@ class TestConsensusOrchestrator:
         assert "reject_url" in urls
         assert workflow.approval_token in urls["approve_url"]
         assert workflow.rejection_token in urls["reject_url"]
-        assert "https://example.com" in urls["approve_url"]
+        parsed_approve = urlparse(urls["approve_url"])
+        assert parsed_approve.scheme == "https"
+        assert parsed_approve.netloc == "example.com"
         assert f"/api/v1/consensus/approve/{workflow.workflow_id}" in urls["approve_url"]
 
     def test_get_approval_urls_workflow_not_found(self, mock_content_generator, brand_config):
