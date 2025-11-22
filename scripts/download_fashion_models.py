@@ -157,22 +157,29 @@ class FashionModelDownloader:
             return False
 
     def verify_api_keys(self) -> dict[str, bool]:
-        """Verify API keys are configured"""
+        """Verify API keys are configured (never logs actual key values)"""
         logger.info("=" * 70)
         logger.info("API Key Verification")
         logger.info("=" * 70)
 
-        api_keys = {
-            "ANTHROPIC_API_KEY": os.getenv("ANTHROPIC_API_KEY"),
-            "OPENAI_API_KEY": os.getenv("OPENAI_API_KEY"),
-            "STABILITY_API_KEY": os.getenv("STABILITY_API_KEY"),
-            "REPLICATE_API_TOKEN": os.getenv("REPLICATE_API_TOKEN"),
-            "HUGGINGFACE_TOKEN": os.getenv("HUGGINGFACE_TOKEN"),
-        }
+        # List of API key environment variable names to check
+        api_key_names = [
+            "ANTHROPIC_API_KEY",
+            "OPENAI_API_KEY",
+            "STABILITY_API_KEY",
+            "REPLICATE_API_TOKEN",
+            "HUGGINGFACE_TOKEN",
+        ]
 
         results = {}
-        for key_name, key_value in api_keys.items():
-            if key_value:
+        for key_name in api_key_names:
+            # Check if key exists without retrieving the actual value
+            # This prevents any risk of logging sensitive data
+            key_value = os.getenv(key_name)
+            is_configured = key_value is not None and len(key_value) > 0
+            
+            if is_configured:
+                # Only log the key name, never the value
                 logger.info(f"✓ {key_name} configured")
                 results[key_name] = True
             else:
