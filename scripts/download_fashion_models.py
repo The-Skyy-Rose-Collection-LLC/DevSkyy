@@ -173,13 +173,13 @@ class FashionModelDownloader:
 
         results = {}
         for key_name in api_key_names:
-            # Check if key exists without retrieving the actual value
-            # This prevents any risk of logging sensitive data
+            # Retrieve key value only to check existence, never log it
+            # Only the key name is logged, never the actual sensitive value
             key_value = os.getenv(key_name)
             is_configured = key_value is not None and len(key_value) > 0
             
             if is_configured:
-                # Only log the key name, never the value
+                # Security: Only log the key name, never the value
                 logger.info(f"✓ {key_name} configured")
                 results[key_name] = True
             else:
