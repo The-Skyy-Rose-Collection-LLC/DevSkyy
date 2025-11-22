@@ -1,0 +1,92 @@
+{
+  "brand": {
+    "name": "Skyy Rose Collection",
+    "tagline": "Luxury Fashion Redefined",
+    "description": "Premium fashion boutique specializing in high-end designer clothing and accessories",
+    "industry": "luxury_fashion",
+    "target_audience": "affluent fashion-conscious consumers aged 25-45"
+  },
+  "colors": {
+    "primary": "#1a1a1a",
+    "secondary": "#d4af37",
+    "accent": "#ffffff",
+    "background": "#f8f8f8",
+    "text_primary": "#2c2c2c",
+    "text_secondary": "#6c6c6c"
+  },
+  "typography": {
+    "heading_font": "Playfair Display",
+    "body_font": "Montserrat",
+    "font_weights": {
+      "light": 300,
+      "regular": 400,
+      "medium": 500,
+      "bold": 700
+    }
+  },
+  "assets": {
+    "logo": "assets/brand/logo.png",
+    "logo_white": "assets/brand/logo-white.png",
+    "favicon": "assets/brand/favicon.ico",
+    "hero_images": [
+      "assets/brand/hero-1.jpg",
+      "assets/brand/hero-2.jpg",
+      "assets/brand/hero-3.jpg"
+    ],
+    "about_image": "assets/brand/about.jpg",
+    "product_placeholder": "assets/brand/product-placeholder.jpg"
+  },
+  "theme": {
+    "type": "luxury_fashion",
+    "layout_style": "full-width",
+    "animation_style": "subtle",
+    "header_style": "transparent",
+    "footer_style": "dark"
+  },
+  "pages": [
+    "home",
+    "shop",
+    "product",
+    "about",
+    "contact",
+    "blog"
+  ],
+  "features": {
+    "woocommerce": true,
+    "blog": true,
+    "newsletter": true,
+    "instagram_feed": true,
+    "live_chat": false,
+    "multilingual": false
+  },
+  "seo": {
+    "site_title": "Skyy Rose Collection | Luxury Fashion Boutique",
+    "meta_description": "Discover premium designer fashion at Skyy Rose Collection. Shop exclusive luxury clothing and accessories.",
+    "keywords": [
+      "luxury fashion",
+      "designer clothing",
+      "premium fashion boutique",
+      "high-end fashion",
+      "designer accessories"
+    ],
+    "social_media": {
+      "facebook": "https://facebook.com/skyyrosecollection",
+      "instagram": "https://instagram.com/skyyrosecollection",
+      "twitter": "https://twitter.com/skyyrose",
+      "pinterest": "https://pinterest.com/skyyrosecollection"
+    }
+  },
+  "contact": {
+    "email": "info@skyyrosecollection.com",
+    "phone": "+1 (555) 123-4567",
+    "address": "123 Fashion Ave, New York, NY 10001",
+    "business_hours": "Mon-Sat: 10AM-8PM, Sun: 12PM-6PM"
+  },
+  "deployment": {
+    "wordpress_url": "",
+    "staging_url": "",
+    "deploy_method": "wordpress_rest_api",
+    "auto_activate": false,
+    "backup_before_deploy": true
+  }
+}

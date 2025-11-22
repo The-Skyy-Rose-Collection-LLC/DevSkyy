@@ -1,0 +1,69 @@
+{
+  "brand": {
+    "name": "Urban Street Co",
+    "tagline": "Street Style. Elevated.",
+    "description": "Bold streetwear for the modern urban lifestyle",
+    "industry": "streetwear",
+    "target_audience": "urban youth aged 18-30 seeking authentic street fashion"
+  },
+  "colors": {
+    "primary": "#ff0000",
+    "secondary": "#000000",
+    "accent": "#ffff00",
+    "background": "#ffffff",
+    "text_primary": "#1a1a1a",
+    "text_secondary": "#666666"
+  },
+  "typography": {
+    "heading_font": "Bebas Neue",
+    "body_font": "Roboto",
+    "font_weights": {
+      "light": 300,
+      "regular": 400,
+      "bold": 700,
+      "black": 900
+    }
+  },
+  "assets": {
+    "logo": "assets/brand/urban-logo.png",
+    "logo_white": "assets/brand/urban-logo-white.png",
+    "favicon": "assets/brand/favicon.ico",
+    "hero_images": [
+      "assets/brand/streetwear-hero-1.jpg",
+      "assets/brand/streetwear-hero-2.jpg"
+    ],
+    "about_image": "assets/brand/about-urban.jpg"
+  },
+  "theme": {
+    "type": "streetwear",
+    "layout_style": "grid",
+    "animation_style": "dynamic",
+    "header_style": "sticky",
+    "footer_style": "minimal"
+  },
+  "pages": [
+    "home",
+    "shop",
+    "drops",
+    "lookbook",
+    "about"
+  ],
+  "features": {
+    "woocommerce": true,
+    "blog": true,
+    "newsletter": true,
+    "instagram_feed": true,
+    "countdown_timer": true
+  },
+  "seo": {
+    "site_title": "Urban Street Co | Bold Streetwear Fashion",
+    "meta_description": "Shop authentic streetwear and urban fashion. Limited drops, exclusive collections.",
+    "keywords": [
+      "streetwear",
+      "urban fashion",
+      "street style",
+      "limited edition drops",
+      "sneakers"
+    ]
+  }
+}
