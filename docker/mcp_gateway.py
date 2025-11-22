@@ -99,7 +99,7 @@ class MCPResponse(BaseModel):
     """MCP protocol response"""
 
     jsonrpc: str = Field(default="2.0", description="JSON-RPC version")
-    result: Optional[Any] = Field(default=None, description="Method result")
+    result: Any | None = Field(default=None, description="Method result")
     error: Optional[dict[str, Any]] = Field(default=None, description="Error object")
     id: Optional[str | int] = Field(default=None, description="Request ID")
 
@@ -116,7 +116,7 @@ class StdioMCPClient:
         self.command = server_config["command"]
         self.args = server_config.get("args", [])
         self.env = server_config.get("env", {})
-        self.process: Optional[subprocess.Popen] = None
+        self.process: subprocess.Popen | None = None
 
     async def start(self):
         """Start the stdio process"""

@@ -160,7 +160,7 @@ CREATE TRIGGER update_consensus_workflows_updated_at
 """
 
 
-def get_database_url() -> Optional[str]:
+def get_database_url() -> str | None:
     """Get database URL from environment"""
     return os.getenv("DATABASE_URL") or os.getenv("NEON_DATABASE_URL")
 

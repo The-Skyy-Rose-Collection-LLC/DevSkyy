@@ -26,7 +26,7 @@ class AudioSegment:
     start: float
     end: float
     text: str
-    confidence: Optional[float] = None
+    confidence: float | None = None
 
 
 @dataclass
@@ -319,7 +319,7 @@ class VideoCompositor:
     async def create_video(
         self,
         video_inputs: list[str],
-        audio_track: Optional[str] = None,
+        audio_track: str | None = None,
         editing_instructions: str = "",
         output_format: str = "mp4",
         resolution: str = "1080p",

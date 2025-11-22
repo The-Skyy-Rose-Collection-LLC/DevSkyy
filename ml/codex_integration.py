@@ -38,7 +38,7 @@ class CodexIntegration:
     Provides Codex-style functionality with improved capabilities.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         """
         Initialize Codex integration
 
@@ -119,8 +119,8 @@ class CodexIntegration:
         prompt: str,
         language: str = "python",
         model: Literal["gpt-4", "gpt-3.5"] = "gpt-4",
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None,
+        max_tokens: int | None = None,
+        temperature: float | None = None,
         context: Optional[list[str]] = None,
     ) -> dict[str, Any]:
         """

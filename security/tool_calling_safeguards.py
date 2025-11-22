@@ -95,7 +95,7 @@ class ToolCallRequest(BaseModel):
     request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     tool_name: str
     provider: ToolProvider
-    user_id: Optional[str] = None
+    user_id: str | None = None
     permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED
     parameters: dict[str, Any] = Field(default_factory=dict)
     metadata: dict[str, Any] = Field(default_factory=dict)
@@ -109,7 +109,7 @@ class ToolCallResponse(BaseModel):
     tool_name: str
     success: bool
     result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float
     tokens_used: int = 0
     timestamp: datetime = Field(default_factory=datetime.utcnow)
@@ -122,16 +122,16 @@ class ToolCallAuditEntry(BaseModel):
     request_id: str
     tool_name: str
     provider: ToolProvider
-    user_id: Optional[str]
+    user_id: str | None
     permission_level: ToolPermissionLevel
     risk_level: ToolRiskLevel
     parameters: dict[str, Any]  # Sanitized
     success: bool
-    error: Optional[str] = None
+    error: str | None = None
     execution_time_ms: float
     tokens_used: int
     violation: bool = False
-    violation_reason: Optional[str] = None
+    violation_reason: str | None = None
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
     def to_json(self) -> str:
@@ -153,7 +153,7 @@ class ToolRateLimiter:
         self.tool_calls: dict[str, list[datetime]] = {}
         self.lock = asyncio.Lock()
 
-    async def check_rate_limit(self, tool_name: str, config: ToolCallConfig) -> tuple[bool, Optional[str]]:
+    async def check_rate_limit(self, tool_name: str, config: ToolCallConfig) -> tuple[bool, str | None]:
         """
         Check if tool call is within rate limits
 
@@ -222,7 +222,7 @@ class ToolAuthorizationManager:
         """Set user permission levels"""
         self.user_permissions[user_id] = permissions
 
-    async def authorize_tool_call(self, request: ToolCallRequest) -> tuple[bool, Optional[str]]:
+    async def authorize_tool_call(self, request: ToolCallRequest) -> tuple[bool, str | None]:
         """
         Authorize a tool call request
 
@@ -267,7 +267,7 @@ class ToolAuthorizationManager:
 
         return True, None
 
-    def get_tool_config(self, tool_name: str) -> Optional[ToolCallConfig]:
+    def get_tool_config(self, tool_name: str) -> ToolCallConfig | None:
         """Get configuration for a tool"""
         return self.tool_configs.get(tool_name)
 
@@ -283,7 +283,7 @@ class ToolCallValidator:
     def __init__(self, config: SafeguardConfig):
         self.config = config
 
-    def validate_parameters(self, tool_name: str, parameters: dict[str, Any]) -> tuple[bool, Optional[str]]:
+    def validate_parameters(self, tool_name: str, parameters: dict[str, Any]) -> tuple[bool, str | None]:
         """
         Validate tool call parameters
 
@@ -417,7 +417,7 @@ class ToolCallingSafeguardManager:
         """Register a tool with the safeguard manager"""
         self.auth_manager.register_tool(config)
 
-    async def validate_tool_call(self, request: ToolCallRequest) -> tuple[bool, Optional[str]]:
+    async def validate_tool_call(self, request: ToolCallRequest) -> tuple[bool, str | None]:
         """
         Validate a tool call request through all safeguard layers
 
@@ -591,10 +591,10 @@ class ToolCallingSafeguardManager:
 # GLOBAL MANAGER
 # ============================================================================
 
-_global_manager: Optional[ToolCallingSafeguardManager] = None
+_global_manager: ToolCallingSafeguardManager | None = None
 
 
-def get_tool_safeguard_manager(config: Optional[SafeguardConfig] = None) -> ToolCallingSafeguardManager:
+def get_tool_safeguard_manager(config: SafeguardConfig | None = None) -> ToolCallingSafeguardManager:
     """
     Get global tool calling safeguard manager instance
 

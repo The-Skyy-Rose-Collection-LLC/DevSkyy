@@ -145,7 +145,7 @@ class MetricsCollector:
             load_average=load_average,
         )
 
-    def get_latest_metrics(self) -> Optional[SystemMetrics]:
+    def get_latest_metrics(self) -> SystemMetrics | None:
         """Get the latest metrics"""
         return self.metrics_history[-1] if self.metrics_history else None
 

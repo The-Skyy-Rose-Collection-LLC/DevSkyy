@@ -22,7 +22,7 @@ class RateLimiter:
 
     def is_allowed(
         self, client_identifier: str, max_requests: int = 100, window_seconds: int = 60
-    ) -> tuple[bool, Optional[dict]]:
+    ) -> tuple[bool, dict | None]:
         """
         Check if request is allowed under rate limit
 

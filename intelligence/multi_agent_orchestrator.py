@@ -69,7 +69,7 @@ class TaskRequest:
     content: str
     metadata: dict[str, Any] = field(default_factory=dict)
     priority: int = 1  # 1=highest, 5=lowest
-    max_tokens: Optional[int] = None
+    max_tokens: int | None = None
     temperature: float = 0.7
     requires_streaming: bool = False
     requires_vision: bool = False
@@ -88,7 +88,7 @@ class TaskResult:
     token_usage: dict[str, int] = field(default_factory=dict)
     cost: float = 0.0
     success: bool = True
-    error: Optional[str] = None
+    error: str | None = None
 
 
 class MultiAgentOrchestrator:
@@ -201,7 +201,7 @@ class MultiAgentOrchestrator:
 
         logger.info(f"✅ Initialized {len(self.providers)} AI providers")
 
-    def get_optimal_provider(self, task: TaskRequest) -> Optional[AIProvider]:
+    def get_optimal_provider(self, task: TaskRequest) -> AIProvider | None:
         """
         Select optimal AI provider for a task based on capabilities,
         performance, cost, and current load.

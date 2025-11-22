@@ -34,7 +34,7 @@ class EncryptionSettings:
     """
 
     # Master encryption key (must be 32 bytes for AES-256)
-    MASTER_KEY: Optional[bytes] = None
+    MASTER_KEY: bytes | None = None
 
     # PBKDF2 Key Derivation (NIST SP 800-132)
     PBKDF2_ITERATIONS: int = 100_000  # NIST recommendation: 100k+ iterations
@@ -74,7 +74,7 @@ settings = EncryptionSettings()
 # ============================================================================
 
 
-def derive_key(password: str, salt: Optional[bytes] = None) -> tuple[bytes, bytes]:
+def derive_key(password: str, salt: bytes | None = None) -> tuple[bytes, bytes]:
     """
     Derive encryption key from password using PBKDF2 (NIST SP 800-132)
 
@@ -102,7 +102,7 @@ def derive_key(password: str, salt: Optional[bytes] = None) -> tuple[bytes, byte
     return key, salt
 
 
-def encrypt_field(plaintext: str, master_key: Optional[bytes] = None) -> str:
+def encrypt_field(plaintext: str, master_key: bytes | None = None) -> str:
     """
     Encrypt a single field using AES-256-GCM
 
@@ -147,7 +147,7 @@ def encrypt_field(plaintext: str, master_key: Optional[bytes] = None) -> str:
 
 
 def decrypt_field(
-    encrypted_base64: str, master_key: Optional[bytes] = None, legacy_key_id: Optional[str] = None
+    encrypted_base64: str, master_key: bytes | None = None, legacy_key_id: str | None = None
 ) -> str:
     """
     Decrypt a field encrypted with AES-256-GCM
@@ -327,12 +327,12 @@ def generate_master_key() -> str:
 class KeyManager:
     """Backward compatible KeyManager (delegates to v2 functions)."""
 
-    def __init__(self, master_key: Optional[str] = None):
+    def __init__(self, master_key: str | None = None):
         self.master_key = master_key or os.getenv("ENCRYPTION_MASTER_KEY")
         if self.master_key and not isinstance(self.master_key, bytes):
             self.master_key = base64.b64decode(self.master_key)
 
-    def derive_key(self, password: str, salt: Optional[bytes] = None, key_size: int = 32) -> tuple[bytes, bytes]:
+    def derive_key(self, password: str, salt: bytes | None = None, key_size: int = 32) -> tuple[bytes, bytes]:
         """Derive key from password (delegates to module function)."""
         return derive_key(password, salt)
 
@@ -344,7 +344,7 @@ class KeyManager:
 class AESEncryption:
     """Backward compatible AES encryption (delegates to v2 functions)."""
 
-    def __init__(self, key_manager: Optional[KeyManager] = None):
+    def __init__(self, key_manager: KeyManager | None = None):
         self.key_manager = key_manager or KeyManager()
 
     def encrypt(self, plaintext: str, key_id: str = "default") -> str:
@@ -361,7 +361,7 @@ class AESEncryption:
 class FieldEncryption:
     """Backward compatible field-level encryption."""
 
-    def __init__(self, encryption_engine: Optional[AESEncryption] = None):
+    def __init__(self, encryption_engine: AESEncryption | None = None):
         self.engine = encryption_engine or AESEncryption()
 
     def encrypt_field(self, value: any, field_name: str = "default") -> dict:
@@ -399,7 +399,7 @@ class EncryptionManager:
     Provides high-level API for all encryption operations.
     """
 
-    def __init__(self, master_key: Optional[str] = None):
+    def __init__(self, master_key: str | None = None):
         """Initialize encryption manager."""
         if master_key:
             if isinstance(master_key, str):

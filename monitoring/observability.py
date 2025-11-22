@@ -141,7 +141,7 @@ class MetricsCollector:
         key = self._make_key(name, labels)
         return self.counters.get(key, 0.0)
 
-    def get_gauge(self, name: str, labels: Optional[dict[str, str]] = None) -> Optional[float]:
+    def get_gauge(self, name: str, labels: Optional[dict[str, str]] = None) -> float | None:
         """Get current gauge value"""
         key = self._make_key(name, labels)
         return self.gauges.get(key)
@@ -378,14 +378,14 @@ class Span:
         trace_id: str,
         span_id: str,
         operation: str,
-        parent_id: Optional[str] = None,
+        parent_id: str | None = None,
     ):
         self.trace_id = trace_id
         self.span_id = span_id
         self.operation = operation
         self.parent_id = parent_id
         self.start_time = time.time()
-        self.end_time: Optional[float] = None
+        self.end_time: float | None = None
         self.tags: dict[str, Any] = {}
         self.logs: list[dict[str, Any]] = []
 

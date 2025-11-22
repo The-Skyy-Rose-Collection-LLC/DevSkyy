@@ -189,7 +189,7 @@ class DeploymentExecution:
     deployment_id: str = field(default_factory=lambda: f"deploy_{uuid4().hex[:12]}")
     status: JobStatus = JobStatus.DEPLOYING
     start_time: datetime = field(default_factory=datetime.now)
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
 
     # Resource tracking
     allocated_resources: dict[str, Any] = field(default_factory=dict)
@@ -872,7 +872,7 @@ class AutomatedDeploymentOrchestrator:
 # GLOBAL INSTANCE
 # ============================================================================
 
-_global_orchestrator: Optional[AutomatedDeploymentOrchestrator] = None
+_global_orchestrator: AutomatedDeploymentOrchestrator | None = None
 
 
 def get_deployment_orchestrator() -> AutomatedDeploymentOrchestrator:

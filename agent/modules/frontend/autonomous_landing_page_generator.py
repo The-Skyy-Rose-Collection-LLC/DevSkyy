@@ -548,7 +548,7 @@ class AutonomousLandingPageGenerator:
         test_id: str,
         variant_id: str,
         event_type: str,
-        data: Optional[dict] = None,
+        data: dict | None = None,
     ) -> bool:
         """
         Track user interaction event for A/B testing.
@@ -661,7 +661,7 @@ class AutonomousLandingPageGenerator:
 
         return (max(0, lower), min(1, upper))
 
-    def _get_recommendation(self, results: list[dict], winner: Optional[dict]) -> str:
+    def _get_recommendation(self, results: list[dict], winner: dict | None) -> str:
         """Generate recommendation based on test results."""
         if winner:
             elements = winner["elements"]

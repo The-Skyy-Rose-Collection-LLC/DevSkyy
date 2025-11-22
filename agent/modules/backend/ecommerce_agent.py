@@ -692,7 +692,7 @@ class EcommerceAgent:
         pattern = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$"
         return re.match(pattern, email) is not None
 
-    def _find_customer_by_email(self, email: str) -> Optional[dict]:
+    def _find_customer_by_email(self, email: str) -> dict | None:
         """Find existing customer by email."""
         for customer in self.customers.values():
             if customer["email"] == email:

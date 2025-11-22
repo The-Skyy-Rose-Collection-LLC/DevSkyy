@@ -2,6 +2,55 @@
 
 This directory contains utility scripts for managing and validating the DevSkyy platform.
 
+## Installation Scripts
+
+### install_fashion_dependencies.sh
+
+**Purpose:** Install all fashion-specific dependencies for e-commerce and 3D modeling features
+**Runtime:** ~5-15 minutes (depending on internet speed and system)
+**Used in:** Initial setup, development environment setup
+
+**Features:**
+- ✅ Validates Python 3.11+ requirement
+- ✅ Installs core dependencies from requirements.txt
+- ✅ Installs fashion-specific ML packages (computer vision, NLP, trend analysis)
+- ✅ Installs 3D modeling dependencies (optional)
+- ✅ Downloads NLTK data for text processing
+- ✅ Creates required storage directories
+- ✅ Verifies key package installations
+- ✅ Provides system library installation guidance
+
+**Usage:**
+```bash
+# Make executable (if not already)
+chmod +x scripts/install_fashion_dependencies.sh
+
+# Run installation
+./scripts/install_fashion_dependencies.sh
+```
+
+**What it installs:**
+- Computer Vision: opencv-python, Pillow
+- ML/AI: scikit-learn, pandas, numpy, transformers
+- NLP: nltk (with required datasets)
+- Image Generation: diffusers
+- Color Tools: colorthief, webcolors
+- Data Visualization: matplotlib, seaborn
+- 3D Modeling: trimesh, pygltflib, pyrender (optional)
+
+**System Requirements:**
+```bash
+# Ubuntu/Debian
+sudo apt-get install libgl1-mesa-glx libglib2.0-0
+
+# macOS
+brew install mesa glib
+```
+
+**Exit Codes:**
+- `0`: All dependencies installed successfully
+- `1`: Critical installation failure
+
 ## Requirements Validation Scripts
 
 ### validate_requirements_fast.py (Recommended for CI/CD)

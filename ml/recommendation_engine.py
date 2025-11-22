@@ -54,7 +54,7 @@ class RecommendationItem(BaseModel):
     item_id: str
     item_type: str
     title: str
-    description: Optional[str] = None
+    description: str | None = None
     score: float = Field(ge=0.0, le=1.0)
     reason: str
     metadata: dict[str, Any] = Field(default_factory=dict)

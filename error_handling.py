@@ -88,7 +88,7 @@ class DevSkyError(Exception):
         error_code: ErrorCode,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
         details: Optional[dict[str, Any]] = None,
-        correlation_id: Optional[str] = None,
+        correlation_id: str | None = None,
     ):
         super().__init__(message)
         self.message = message
@@ -333,7 +333,7 @@ class ErrorHandler:
         self.circuit_breakers[name] = circuit_breaker
         return circuit_breaker
 
-    def get_circuit_breaker(self, name: str) -> Optional[CircuitBreaker]:
+    def get_circuit_breaker(self, name: str) -> CircuitBreaker | None:
         """Get circuit breaker by name"""
         return self.circuit_breakers.get(name)
 

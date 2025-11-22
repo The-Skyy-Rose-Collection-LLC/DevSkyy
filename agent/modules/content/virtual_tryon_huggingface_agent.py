@@ -152,17 +152,17 @@ class TryOnRequest:
 
     # Product asset
     product_asset_id: str = ""  # From preprocessed assets
-    product_image_path: Optional[str] = None  # Direct path
+    product_image_path: str | None = None  # Direct path
 
     # Model specification
     model_spec: ModelSpecification = field(default_factory=ModelSpecification)
     use_custom_model: bool = False
-    custom_model_image: Optional[str] = None
+    custom_model_image: str | None = None
 
     # Generation settings
     model_type: ModelType = ModelType.VIRTUAL_TRYON
     num_variations: int = 4
-    seed: Optional[int] = None
+    seed: int | None = None
 
     # Advanced options
     maintain_product_details: bool = True
@@ -177,7 +177,7 @@ class TryOnRequest:
     generate_3d_preview: bool = False
 
     # Style options
-    style_prompt: Optional[str] = None
+    style_prompt: str | None = None
     negative_prompt: str = "low quality, blurry, distorted"
 
     # Metadata
@@ -194,11 +194,11 @@ class TryOnResult:
     # Generated outputs
     images: list[str] = field(default_factory=list)  # Paths to generated images
     videos: list[str] = field(default_factory=list)  # Paths to generated videos
-    model_3d: Optional[str] = None  # Path to 3D model with product
+    model_3d: str | None = None  # Path to 3D model with product
 
     # Generation details
     model_used: str = ""
-    seed_used: Optional[int] = None
+    seed_used: int | None = None
     variations_generated: int = 0
 
     # Quality metrics
@@ -211,7 +211,7 @@ class TryOnResult:
     cost: float = 0.0
 
     # Metadata
-    error: Optional[str] = None
+    error: str | None = None
     warnings: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
 
@@ -283,7 +283,7 @@ class VirtualTryOnHuggingFaceAgent:
         Create and return a registry of HuggingFace models with metadata used by the agent.
 
         Returns:
-            registry (Dict[str, Dict[str, Any]]): Mapping from internal model keys to metadata objects. Each metadata object contains:
+            registry (dict[str, dict[str, Any]]): Mapping from internal model keys to metadata objects. Each metadata object contains:
                 - name: human-readable model name
                 - model_id: HuggingFace model identifier
                 - task: high-level task or capability
@@ -633,7 +633,7 @@ class VirtualTryOnHuggingFaceAgent:
             request (TryOnRequest): Controls generation options (e.g., number of variations, realistic_shadows, fabric_physics, pose settings).
 
         Returns:
-            List[PIL.Image.Image]: A list of composited try-on images (one per variation) showing the product fitted to the model.
+            list[PIL.Image.Image]: A list of composited try-on images (one per variation) showing the product fitted to the model.
 
         Raises:
             NotImplementedError: If no virtual-tryon integration (e.g., IDM-VTON or OOTDiffusion) is configured or available.
@@ -674,7 +674,7 @@ class VirtualTryOnHuggingFaceAgent:
             request (TryOnRequest): Request object containing generation options and model specification that influence outputs (variations count, prompts, realism controls, etc.).
 
         Returns:
-            List[PIL.Image.Image]: A list of generated model images styled to incorporate the product's appearance.
+            list[PIL.Image.Image]: A list of generated model images styled to incorporate the product's appearance.
 
         Raises:
             NotImplementedError: If no style-transfer or conditioning pipeline (e.g., IP-Adapter, ControlNet) has been integrated and configured.
@@ -782,10 +782,10 @@ class VirtualTryOnHuggingFaceAgent:
         Run multiple try-on generations concurrently.
 
         Parameters:
-            requests (List[TryOnRequest]): Sequence of try-on requests to process.
+            requests (list[TryOnRequest]): Sequence of try-on requests to process.
 
         Returns:
-            results (List[TryOnResult]): A list of TryOnResult objects in the same order as `requests`. For requests that raised exceptions, the corresponding TryOnResult will have `success=False` and `error` set to the exception message; successful generations return their normal TryOnResult.
+            results (list[TryOnResult]): A list of TryOnResult objects in the same order as `requests`. For requests that raised exceptions, the corresponding TryOnResult will have `success=False` and `error` set to the exception message; successful generations return their normal TryOnResult.
         """
         logger.info(f"👗 Batch generating {len(requests)} try-ons")
 
@@ -837,7 +837,7 @@ class VirtualTryOnHuggingFaceAgent:
         Return a snapshot of the agent's current system and performance status.
 
         Returns:
-            status (Dict[str, Any]): A dictionary containing:
+            status (dict[str, Any]): A dictionary containing:
                 - agent_name (str): The agent's configured name.
                 - version (str): Agent version string.
                 - device (str): Execution device identifier (e.g., "cuda" or "cpu").
@@ -848,7 +848,7 @@ class VirtualTryOnHuggingFaceAgent:
                 - available_models (int): Count of registered HuggingFace models.
                 - loaded_models (int): Count of currently loaded model instances.
                 - output_directory (str): Path to the directory where outputs are written.
-                - capabilities (List[str]): Human-readable list of supported capabilities.
+                - capabilities (list[str]): Human-readable list of supported capabilities.
         """
         return {
             "agent_name": self.agent_name,

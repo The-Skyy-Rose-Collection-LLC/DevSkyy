@@ -223,7 +223,7 @@ class SecureSessionManager:
         self.session_stats = defaultdict(int)
 
     @asynccontextmanager
-    async def get_secure_session(self, user_id: Optional[str] = None) -> AsyncGenerator[AsyncSession, None]:
+    async def get_secure_session(self, user_id: str | None = None) -> AsyncGenerator[AsyncSession, None]:
         """Get a secure database session with monitoring"""
         session_id = f"session_{int(time.time() * 1000)}"
 
@@ -263,7 +263,7 @@ class SecureSessionManager:
             self.session_stats["active_sessions"] -= 1
             logger.debug(f"🧹 Session cleaned up: {session_id}")
 
-    async def _setup_session_security(self, session: AsyncSession, user_id: Optional[str]):
+    async def _setup_session_security(self, session: AsyncSession, user_id: str | None):
         """Set up session-level security configurations"""
         try:
             # Set session timeout (PostgreSQL)
@@ -316,7 +316,7 @@ class DatabaseSecurityManager:
         self.security_events = deque(maxlen=1000)
         self.threat_level = "LOW"  # LOW, MEDIUM, HIGH, CRITICAL
 
-    async def get_secure_session(self, user_id: Optional[str] = None) -> AsyncGenerator[AsyncSession, None]:
+    async def get_secure_session(self, user_id: str | None = None) -> AsyncGenerator[AsyncSession, None]:
         """Get a secure database session"""
         async with self.session_manager.get_secure_session(user_id) as session:
             yield session

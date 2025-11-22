@@ -227,7 +227,7 @@ async def get_job_status(
     description="List all deployment jobs"
 )
 async def list_jobs(
-    category: Optional[AgentCategory] = None,
+    category: AgentCategory | None = None,
     current_user: dict = Depends(get_current_user)
 ):
     """List all deployment jobs, optionally filtered by category."""

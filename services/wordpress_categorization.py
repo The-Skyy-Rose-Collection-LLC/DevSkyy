@@ -38,8 +38,8 @@ class CategorizationResult(BaseModel):
     assigned_category_id: int
     assigned_category_name: str
     confidence: float = Field(ge=0.0, le=1.0)
-    reasoning: Optional[str] = None
-    error: Optional[str] = None
+    reasoning: str | None = None
+    error: str | None = None
 
 
 class WordPressCategorizationService:
@@ -131,12 +131,12 @@ class WordPressCategorizationService:
 
     def __init__(
         self,
-        anthropic_api_key: Optional[str] = None,
-        openai_api_key: Optional[str] = None,
+        anthropic_api_key: str | None = None,
+        openai_api_key: str | None = None,
         categories: Optional[list[CategoryMapping]] = None,
         default_category_id: int = 13,
         use_mcp: bool = True,
-        mcp_client: Optional[MCPToolClient] = None,
+        mcp_client: MCPToolClient | None = None,
     ):
         """
         Initialize categorization service
@@ -502,7 +502,7 @@ Output only valid JSON."""
 
         return results
 
-    def get_category_by_id(self, category_id: int) -> Optional[CategoryMapping]:
+    def get_category_by_id(self, category_id: int) -> CategoryMapping | None:
         """Get category mapping by ID"""
         return next((c for c in self.categories if c.category_id == category_id), None)
 

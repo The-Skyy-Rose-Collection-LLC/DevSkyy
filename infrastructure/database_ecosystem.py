@@ -42,7 +42,7 @@ class DatabaseConfig:
     max_overflow: int = 20
     pool_timeout: int = 30
     ssl_enabled: bool = False
-    ssl_cert_path: Optional[str] = None
+    ssl_cert_path: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert to dictionary"""

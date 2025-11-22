@@ -334,7 +334,7 @@ async def generate_advanced_code(
     self,
     code_request: str,
     language: str = "python",
-    framework: Optional[str] = None,
+    framework: str | None = None,
 ) -> dict[str, Any]:
     """
     Generate production-ready code using Claude's superior coding abilities.

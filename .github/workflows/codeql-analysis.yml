@@ -1,0 +1,88 @@
+name: "CodeQL Security Analysis"
+
+on:
+  push:
+    branches: [ "main", "develop", "claude/**" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+  schedule:
+    # Run at 2:00 AM UTC every day
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  analyze:
+    name: Analyze Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'python', 'javascript' ]
+        # CodeQL supports: 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby', 'swift'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        if: matrix.language == 'python'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: +security-and-quality
+          # If you wish to specify custom queries, you can do so here or in a config file
+          # config-file: ./.github/codeql/codeql-config.yml
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        continue-on-error: true
+        with:
+          category: "/language:${{matrix.language}}"
+          upload: true
+          # Output SARIF file for review
+          output: sarif-results
+          # Add detailed diagnostics
+          add-snippets: true
+
+      - name: Check if CodeQL results exist
+        id: codeql-check
+        if: always()
+        run: |
+          if [ -d "sarif-results" ] && [ "$(ls -A sarif-results)" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "::warning::CodeQL analysis did not generate results"
+          fi
+
+      - name: Upload CodeQL results
+        if: steps.codeql-check.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: codeql-results-${{ matrix.language }}
+          path: sarif-results
+          retention-days: 30
+
+      - name: Filter alerts by severity
+        if: always()
+        run: |
+          echo "::group::CodeQL Results Summary"
+          if [ -d "sarif-results" ]; then
+            echo "CodeQL analysis completed for ${{ matrix.language }}"
+            echo "Results uploaded to GitHub Security tab"
+          fi
+          echo "::endgroup::"

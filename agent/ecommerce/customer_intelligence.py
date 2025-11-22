@@ -316,7 +316,7 @@ class CustomerIntelligence:
         self,
         customer_id: str,
         n_recommendations: int = 10,
-        context: Optional[dict] = None,
+        context: dict | None = None,
     ) -> dict[str, Any]:
         """
         Generate personalized product recommendations
@@ -365,7 +365,7 @@ class CustomerIntelligence:
 
         return recommendations
 
-    async def map_customer_journey(self, customer_id: str, session_id: Optional[str] = None) -> dict[str, Any]:
+    async def map_customer_journey(self, customer_id: str, session_id: str | None = None) -> dict[str, Any]:
         """
         Map customer journey and touchpoints
 

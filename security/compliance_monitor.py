@@ -66,8 +66,8 @@ class ComplianceViolation(BaseModel):
     evidence: dict[str, Any] = Field(default_factory=dict)
     remediation_steps: list[str] = Field(default_factory=list)
     resolved: bool = False
-    resolution_date: Optional[datetime] = None
-    resolution_notes: Optional[str] = None
+    resolution_date: datetime | None = None
+    resolution_notes: str | None = None
 
 
 class ComplianceControl(BaseModel):

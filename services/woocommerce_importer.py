@@ -28,9 +28,9 @@ class ProductData(BaseModel):
     title: str = Field(..., min_length=1, max_length=200)
     sku: str = Field(..., min_length=1, max_length=100)
     regular_price: float = Field(..., gt=0)
-    sale_price: Optional[float] = Field(None, gt=0)
+    sale_price: float | None = Field(None, gt=0)
     category: list[int] = Field(default_factory=list)
-    image: Optional[str] = Field(None, max_length=500)
+    image: str | None = Field(None, max_length=500)
     short_description: str = Field(default="", max_length=1000)
     description: str = Field(default="", max_length=10000)
     stock_qty: int = Field(default=0, ge=0)
@@ -55,9 +55,9 @@ class ProductImportResult(BaseModel):
     """Result of product import operation"""
 
     success: bool
-    product_id: Optional[int] = None
-    permalink: Optional[str] = None
-    error: Optional[str] = None
+    product_id: int | None = None
+    permalink: str | None = None
+    error: str | None = None
     row_number: int
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -93,8 +93,8 @@ class WooCommerceImporterService:
         woo_consumer_key: str,
         woo_consumer_secret: str,
         google_credentials: Credentials,
-        telegram_bot_token: Optional[str] = None,
-        telegram_chat_id: Optional[str] = None,
+        telegram_bot_token: str | None = None,
+        telegram_chat_id: str | None = None,
         batch_size: int = 10,
         max_retries: int = 3,
     ):

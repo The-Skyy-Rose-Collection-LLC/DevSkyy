@@ -49,7 +49,7 @@ class EnhancedAutoFix:
     def run_enhanced_autofix(
         self,
         create_branch: bool = True,
-        branch_name: Optional[str] = None,
+        branch_name: str | None = None,
         auto_commit: bool = True,
         fix_types: list[str] | None = None,
     ) -> dict[str, Any]:
@@ -128,7 +128,7 @@ class EnhancedAutoFix:
                 "timestamp": datetime.now().isoformat(),
             }
 
-    def _get_current_branch(self) -> Optional[str]:
+    def _get_current_branch(self) -> str | None:
         """Get current git branch"""
         try:
             result = subprocess.run(
@@ -390,7 +390,7 @@ class EnhancedAutoFix:
 # Convenience functions for easy usage
 def run_auto_fix_session(
     create_branch: bool = True,
-    branch_name: Optional[str] = None,
+    branch_name: str | None = None,
     auto_commit: bool = True,
 ) -> dict[str, Any]:
     """Run a complete auto-fix session"""

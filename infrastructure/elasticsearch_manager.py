@@ -362,7 +362,7 @@ class ElasticsearchManager:
         self.metrics.avg_response_time = self.metrics.total_response_time / self.metrics.total_queries
         self.metrics.last_updated = datetime.now()
 
-    async def index_document(self, index_type: str, document: dict[str, Any], doc_id: Optional[str] = None) -> bool:
+    async def index_document(self, index_type: str, document: dict[str, Any], doc_id: str | None = None) -> bool:
         """Index a document"""
         start_time = time.time()
 
@@ -490,9 +490,9 @@ class ElasticsearchManager:
     async def fashion_trend_search(
         self,
         search_text: str,
-        season: Optional[str] = None,
-        category: Optional[str] = None,
-        year: Optional[int] = None,
+        season: str | None = None,
+        category: str | None = None,
+        year: int | None = None,
         min_popularity: float = 0.0,
     ) -> dict[str, Any]:
         """Fashion-specific trend search"""

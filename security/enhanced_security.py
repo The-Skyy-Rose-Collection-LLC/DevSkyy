@@ -66,14 +66,14 @@ class SecurityEvent(BaseModel):
     event_type: SecurityEventType
     threat_level: ThreatLevel
     timestamp: datetime = Field(default_factory=datetime.now)
-    source_ip: Optional[str] = None
-    user_id: Optional[str] = None
-    endpoint: Optional[str] = None
-    user_agent: Optional[str] = None
+    source_ip: str | None = None
+    user_id: str | None = None
+    endpoint: str | None = None
+    user_agent: str | None = None
     description: str
     metadata: dict[str, Any] = Field(default_factory=dict)
     resolved: bool = False
-    resolution_notes: Optional[str] = None
+    resolution_notes: str | None = None
 
 
 class SecurityPolicy(BaseModel):
@@ -112,7 +112,7 @@ class EnhancedSecurityManager:
         self.blocked_ips: set[str] = set()
         self.suspicious_patterns: dict[str, int] = {}
         self.security_policies: dict[str, SecurityPolicy] = {}
-        self.encryption_key: Optional[bytes] = None
+        self.encryption_key: bytes | None = None
 
         # Security metrics
         self.metrics = {

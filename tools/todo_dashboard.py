@@ -35,10 +35,10 @@ class TodoDashboard:
 
         @self.app.get("/api/todos")
         async def get_todos(
-            status: Optional[str] = None,
-            priority: Optional[str] = None,
-            category: Optional[str] = None,
-            file_path: Optional[str] = None,
+            status: str | None = None,
+            priority: str | None = None,
+            category: str | None = None,
+            file_path: str | None = None,
         ):
             """Get TODO items with optional filters"""
             todos = list(self.tracker.todos.values())

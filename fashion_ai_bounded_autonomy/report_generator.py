@@ -174,7 +174,7 @@ Generated: {timestamp.isoformat()}
         logger.info(f"✅ Weekly report generated: {report_file}")
         return report_file
 
-    async def export_metrics_csv(self, metrics_data: dict[str, Any], filename: Optional[str] = None) -> Path:
+    async def export_metrics_csv(self, metrics_data: dict[str, Any], filename: str | None = None) -> Path:
         """Export metrics to CSV for analysis"""
         if not filename:
             filename = f"metrics_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"

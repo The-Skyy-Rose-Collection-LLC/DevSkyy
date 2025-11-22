@@ -47,13 +47,13 @@ class PublishContentResponse(BaseModel):
 
     success: bool
     message: str
-    title: Optional[str] = None
-    wordpress_url: Optional[str] = None
-    wordpress_id: Optional[int] = None
-    word_count: Optional[int] = None
-    image_url: Optional[str] = None
-    duration_seconds: Optional[float] = None
-    delay_applied_seconds: Optional[float] = None
+    title: str | None = None
+    wordpress_url: str | None = None
+    wordpress_id: int | None = None
+    word_count: int | None = None
+    image_url: str | None = None
+    duration_seconds: float | None = None
+    delay_applied_seconds: float | None = None
 
 
 class ScheduledPublishRequest(BaseModel):
@@ -76,8 +76,8 @@ class ScheduledPublishResponse(BaseModel):
 
     success: bool
     message: str
-    schedule_id: Optional[str] = None
-    next_execution: Optional[str] = None
+    schedule_id: str | None = None
+    next_execution: str | None = None
 
 
 # Dependency injection for orchestrator service
@@ -329,7 +329,7 @@ async def schedule_content_publishing(
 @router.post("/categorize", response_model=dict)
 async def categorize_wordpress_posts(
     post_ids: Optional[list[int]] = None,
-    wordpress_site_url: Optional[str] = None,
+    wordpress_site_url: str | None = None,
     use_ai: bool = True,
 ):
     """

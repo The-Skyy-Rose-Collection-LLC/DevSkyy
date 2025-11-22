@@ -92,7 +92,7 @@ class ContentDraft(BaseModel):
     word_count: int
     keywords: list[str] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=datetime.now)
-    feedback_applied: Optional[str] = None  # Feedback from previous iteration
+    feedback_applied: str | None = None  # Feedback from previous iteration
 
 
 class WorkflowState(BaseModel):
@@ -105,12 +105,12 @@ class WorkflowState(BaseModel):
     review_history: list[ConsensusVote] = Field(default_factory=list)
     iteration_count: int = Field(default=0)
     human_decision: HumanDecision = Field(default=HumanDecision.PENDING)
-    human_feedback: Optional[str] = None
+    human_feedback: str | None = None
     approval_token: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     rejection_token: str = Field(default_factory=lambda: secrets.token_urlsafe(32))
     created_at: datetime = Field(default_factory=datetime.now)
     updated_at: datetime = Field(default_factory=datetime.now)
-    webhook_expires_at: Optional[datetime] = None
+    webhook_expires_at: datetime | None = None
 
 
 class BrandIntelligenceReviewer:
@@ -128,7 +128,7 @@ class BrandIntelligenceReviewer:
     - Target audience fit
     """
 
-    def __init__(self, brand_config: dict[str, Any], mcp_client: Optional[MCPToolClient] = None):
+    def __init__(self, brand_config: dict[str, Any], mcp_client: MCPToolClient | None = None):
         self.brand_config = brand_config
         self.agent_name = "Brand Intelligence Agent"
         self.mcp_client = mcp_client or MCPToolClient()
@@ -278,7 +278,7 @@ class SEOMarketingReviewer:
     - CTA effectiveness
     """
 
-    def __init__(self, mcp_client: Optional[MCPToolClient] = None):
+    def __init__(self, mcp_client: MCPToolClient | None = None):
         self.agent_name = "SEO Marketing Agent"
         self.mcp_client = mcp_client or MCPToolClient()
 
@@ -442,7 +442,7 @@ class SecurityComplianceReviewer:
     - Legal disclaimers for regulated content
     """
 
-    def __init__(self, compliance_standards: list[str] | None = None, mcp_client: Optional[MCPToolClient] = None):
+    def __init__(self, compliance_standards: list[str] | None = None, mcp_client: MCPToolClient | None = None):
         self.agent_name = "Security & Compliance Agent"
         self.compliance_standards = compliance_standards or ["GDPR"]
         self.mcp_client = mcp_client or MCPToolClient()
@@ -878,7 +878,7 @@ class ConsensusOrchestrator:
         return workflow
 
     async def submit_human_decision(
-        self, workflow_id: str, decision_token: str, feedback: Optional[str] = None
+        self, workflow_id: str, decision_token: str, feedback: str | None = None
     ) -> WorkflowState:
         """
         Submit human approval decision
@@ -910,7 +910,7 @@ class ConsensusOrchestrator:
 
         return workflow
 
-    def get_workflow(self, workflow_id: str) -> Optional[WorkflowState]:
+    def get_workflow(self, workflow_id: str) -> WorkflowState | None:
         """Get workflow state by ID"""
         return self.workflows.get(workflow_id)
 

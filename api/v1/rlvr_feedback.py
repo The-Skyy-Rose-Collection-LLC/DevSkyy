@@ -28,9 +28,9 @@ router = APIRouter(prefix="/api/v1/rlvr", tags=["rlvr", "feedback"])
 class FeedbackRequest(BaseModel):
     """User feedback on an agent execution."""
     execution_id: uuid.UUID
-    thumbs_up: Optional[bool] = None
-    rating: Optional[int] = Field(None, ge=1, le=5)
-    feedback_text: Optional[str] = None
+    thumbs_up: bool | None = None
+    rating: int | None = Field(None, ge=1, le=5)
+    feedback_text: str | None = None
 
 
 class TestResultRequest(BaseModel):
@@ -38,15 +38,15 @@ class TestResultRequest(BaseModel):
     execution_id: uuid.UUID
     tests_passed: int = Field(ge=0)
     tests_total: int = Field(gt=0)
-    test_output: Optional[str] = None
+    test_output: str | None = None
 
 
 class CodeAnalysisRequest(BaseModel):
     """Code quality analysis results."""
     execution_id: uuid.UUID
-    lint_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    complexity_score: Optional[float] = Field(None, ge=0.0, le=1.0)
-    security_score: Optional[float] = Field(None, ge=0.0, le=1.0)
+    lint_score: float | None = Field(None, ge=0.0, le=1.0)
+    complexity_score: float | None = Field(None, ge=0.0, le=1.0)
+    security_score: float | None = Field(None, ge=0.0, le=1.0)
 
 
 class TrainingDataCollectionRequest(BaseModel):
@@ -60,9 +60,9 @@ class FineTuningRequest(BaseModel):
     """Request to start fine-tuning an agent."""
     agent_id: uuid.UUID
     provider: str = Field("openai", pattern="^(openai|anthropic|local)$")
-    base_model: Optional[str] = None
-    epochs: Optional[int] = Field(None, ge=1, le=10)
-    learning_rate: Optional[float] = Field(None, gt=0.0)
+    base_model: str | None = None
+    epochs: int | None = Field(None, ge=1, le=10)
+    learning_rate: float | None = Field(None, gt=0.0)
 
 
 # ============================================================================

@@ -115,7 +115,7 @@ class PexelsImageService:
             logger.exception(f"Pexels image search failed for query '{query}'")
             return None
 
-    async def download_image(self, image_url: str) -> Optional[bytes]:
+    async def download_image(self, image_url: str) -> bytes | None:
         """
         Download image from URL
 
@@ -266,10 +266,10 @@ class ContentPublishingOrchestrator:
         self,
         anthropic_api_key: str,
         pexels_api_key: str,
-        telegram_bot_token: Optional[str] = None,
-        telegram_chat_id: Optional[str] = None,
-        google_credentials: Optional[Credentials] = None,
-        google_sheets_id: Optional[str] = None,
+        telegram_bot_token: str | None = None,
+        telegram_chat_id: str | None = None,
+        google_credentials: Credentials | None = None,
+        google_sheets_id: str | None = None,
     ):
         """
         Initialize content publishing orchestrator
@@ -389,7 +389,7 @@ class ContentPublishingOrchestrator:
     async def publish_to_wordpress(
         self,
         content: dict[str, Any],
-        image_url: Optional[str] = None,
+        image_url: str | None = None,
         status: str = "publish",
     ) -> dict[str, Any]:
         """

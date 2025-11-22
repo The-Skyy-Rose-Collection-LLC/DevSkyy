@@ -82,8 +82,6 @@ class ExactMatchCache:
             print(f"⚠ Cache retrieval error: {e}")
             return None
 
-    async def set(self, tool: str, params: dict[str, Any], response: dict[str, Any],
-                  tokens_consumed: int = 500) -> None:
     async def set(
         self, tool: str, params: dict[str, Any], response: dict[str, Any], tokens_consumed: int = 500
     ) -> None:
@@ -285,9 +283,9 @@ class BatchRequest:
     tool: str
     params: dict[str, Any]
     submitted_at: str
-    completed_at: Optional[str] = None
+    completed_at: str | None = None
     result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    error: str | None = None
     status: str = "queued"
 
     def to_dict(self) -> dict:
@@ -341,10 +339,6 @@ class BatchProcessor:
             print(f"⚠ Queue error: {e}")
             return ""
 
-    async def execute_batch(self,
-                           tool_handlers: dict[str, Callable],
-                           batch_size: int = 50,
-                           timeout_seconds: int = 10) -> dict[str, dict[str, Any]]:
     async def execute_batch(
         self, tool_handlers: dict[str, Callable], batch_size: int = 50, timeout_seconds: int = 10
     ) -> dict[str, dict[str, Any]]:
@@ -424,8 +418,6 @@ class BatchProcessor:
 
         return results
 
-    async def _execute_request(self, request: BatchRequest,
-                               handler: Callable) -> dict[str, Any]:
     async def _execute_request(self, request: BatchRequest, handler: Callable) -> dict[str, Any]:
         """Execute single request handler."""
         try:

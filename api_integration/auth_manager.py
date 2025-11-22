@@ -41,8 +41,8 @@ class AuthCredentials:
     api_id: str
     auth_type: AuthenticationType
     credentials: dict[str, Any]
-    expires_at: Optional[datetime] = None
-    refresh_token: Optional[str] = None
+    expires_at: datetime | None = None
+    refresh_token: str | None = None
     scopes: list[str] = None
     created_at: datetime = None
     last_used: datetime = None
@@ -119,7 +119,7 @@ class AuthenticationManager:
         api_id: str,
         auth_type: AuthenticationType,
         credentials: dict[str, Any],
-        expires_at: Optional[datetime] = None,
+        expires_at: datetime | None = None,
         scopes: list[str] | None = None,
     ) -> bool:
         """Store API credentials securely"""
@@ -155,7 +155,7 @@ class AuthenticationManager:
             logger.error(f"Error storing credentials for {api_id}: {e}")
             return False
 
-    async def get_credentials(self, api_id: str) -> Optional[AuthCredentials]:
+    async def get_credentials(self, api_id: str) -> AuthCredentials | None:
         """Get API credentials"""
 
         # Check memory first
@@ -482,7 +482,7 @@ class RateLimitManager:
 
         logger.info(f"Set rate limit for API: {api_id}")
 
-    async def get_rate_limit(self, api_id: str) -> Optional[RateLimitRule]:
+    async def get_rate_limit(self, api_id: str) -> RateLimitRule | None:
         """Get rate limit for API"""
 
         # Check memory first

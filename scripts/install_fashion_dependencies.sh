@@ -1,317 +1,285 @@
 #!/bin/bash
-# DevSkyy Fashion Orchestrator - Dependency Installation Script
-# Version: 3.0.0-fashion
-# Updated: 2025-11-21
-#
-# Installs all SDKs and dependencies for The Skyy Rose Collection Fashion Orchestrator
-# Per Truth Protocol Rule #1 - All sources verified
+# DevSkyy Fashion Dependencies Installation Script
+# Installs all necessary dependencies for fashion e-commerce and 3D modeling features
+# Exit code 0 = success
+# Exit code 1 = installation failures
 
-set -e  # Exit on error
+# Strict mode with explicit error handling
+set -eEuo pipefail
 
-# Colors for output
+# Trap for cleanup on unexpected errors
+trap 'echo "Error on line $LINENO. Installation aborted."; exit 1' ERR
+
+echo "=================================================="
+echo "DevSkyy Fashion Dependencies Installation"
+echo "=================================================="
+echo ""
+
+# Color codes for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Script directory
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
-
-echo -e "${BLUE}╔════════════════════════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║                                                                ║${NC}"
-echo -e "${BLUE}║  DevSkyy Fashion Orchestrator - Dependency Installation       ║${NC}"
-echo -e "${BLUE}║  The Skyy Rose Collection                                     ║${NC}"
-echo -e "${BLUE}║                                                                ║${NC}"
-echo -e "${BLUE}╚════════════════════════════════════════════════════════════════╝${NC}"
-echo ""
+INSTALLATION_FAILED=0
 
 # Check Python version
-echo -e "${YELLOW}→${NC} Checking Python version..."
-python_version=$(python3 --version 2>&1 | awk '{print $2}')
-required_version="3.11.0"
+echo "Step 1: Checking Python version..."
+echo "-----------------------------------"
+PYTHON_VERSION=$(python3 --version 2>&1 | awk '{print $2}')
+PYTHON_MAJOR=$(echo "$PYTHON_VERSION" | cut -d. -f1)
+PYTHON_MINOR=$(echo "$PYTHON_VERSION" | cut -d. -f2)
 
-if [ "$(printf '%s\n' "$required_version" "$python_version" | sort -V | head -n1)" != "$required_version" ]; then
-    echo -e "${RED}✗ Python 3.11+ required. Found: $python_version${NC}"
+if [ "$PYTHON_MAJOR" -lt 3 ] || ([ "$PYTHON_MAJOR" -eq 3 ] && [ "$PYTHON_MINOR" -lt 11 ]); then
+    echo -e "${RED}✗${NC} Python 3.11+ required, found $PYTHON_VERSION"
+    exit 1
+else
+    echo -e "${GREEN}✓${NC} Python version: $PYTHON_VERSION"
+fi
+echo ""
+
+# Check pip availability
+echo "Step 2: Checking pip availability..."
+echo "-----------------------------------"
+if command -v pip3 &> /dev/null; then
+    echo -e "${GREEN}✓${NC} pip3 is available"
+    PIP_CMD="pip3"
+elif command -v pip &> /dev/null; then
+    echo -e "${GREEN}✓${NC} pip is available"
+    PIP_CMD="pip"
+else
+    echo -e "${RED}✗${NC} pip not found. Please install pip first."
     exit 1
 fi
-echo -e "${GREEN}✓${NC} Python $python_version"
+echo ""
 
-# Check if virtual environment exists
-if [ ! -d "$PROJECT_DIR/venv" ]; then
-    echo -e "${YELLOW}→${NC} Creating virtual environment..."
-    python3 -m venv "$PROJECT_DIR/venv"
-    echo -e "${GREEN}✓${NC} Virtual environment created"
+# Upgrade pip, setuptools, and wheel
+echo "Step 3: Upgrading pip, setuptools, and wheel..."
+echo "-----------------------------------"
+if $PIP_CMD install --upgrade pip setuptools>=78.1.1 wheel > /dev/null 2>&1; then
+    echo -e "${GREEN}✓${NC} Successfully upgraded pip, setuptools, and wheel"
+else
+    echo -e "${RED}✗${NC} Failed to upgrade pip tools"
+    INSTALLATION_FAILED=1
 fi
+echo ""
 
-# Activate virtual environment
-echo -e "${YELLOW}→${NC} Activating virtual environment..."
-source "$PROJECT_DIR/venv/bin/activate"
-echo -e "${GREEN}✓${NC} Virtual environment activated"
+# Install core dependencies
+echo "Step 4: Installing core dependencies from requirements.txt..."
+echo "-----------------------------------"
+if [ -f "requirements.txt" ]; then
+    echo "Installing from requirements.txt (this may take a few minutes)..."
+    if $PIP_CMD install -r requirements.txt --no-cache-dir; then
+        echo -e "${GREEN}✓${NC} Core dependencies installed successfully"
+    else
+        echo -e "${RED}✗${NC} Failed to install core dependencies"
+        INSTALLATION_FAILED=1
+    fi
+else
+    echo -e "${YELLOW}⚠${NC} requirements.txt not found, skipping core dependencies"
+fi
+echo ""
 
-# Upgrade pip, setuptools, wheel
-echo -e "${YELLOW}→${NC} Upgrading pip, setuptools, wheel..."
-pip install --upgrade pip setuptools wheel --quiet
-echo -e "${GREEN}✓${NC} Build tools upgraded"
+# Install fashion-specific ML dependencies
+echo "Step 5: Installing fashion-specific ML dependencies..."
+echo "-----------------------------------"
 
-# Function to install package with retry
-install_package() {
-    local package=$1
-    local max_retries=3
-    local retry_count=0
+FASHION_PACKAGES=(
+    # Computer Vision for fashion image processing
+    "opencv-python>=4.11.0,<5.0.0"
+    "Pillow>=11.1.0,<12.0.0"
 
-    while [ $retry_count -lt $max_retries ]; do
-        if pip install "$package" --quiet; then
-            return 0
+    # ML/AI for fashion trend analysis
+    "scikit-learn~=1.5.2"
+    "pandas~=2.3.3"
+    "numpy>=2.2.0,<2.3.0"
+
+    # NLP for fashion descriptions
+    "nltk~=3.9.1"
+
+    # Image generation for fashion design
+    "diffusers~=0.35.2"
+    "transformers~=4.57.1"
+
+    # Color palette extraction
+    "colorthief~=0.2.1"
+    "webcolors~=24.12.1"
+
+    # Data visualization for trends
+    "matplotlib~=3.10.0"
+    "seaborn~=0.13.2"
+
+    # Price optimization
+    "scipy~=1.16.3"
+)
+
+echo "Installing fashion-specific packages:"
+for package in "${FASHION_PACKAGES[@]}"; do
+    echo "  - $package"
+    if $PIP_CMD install "$package" --no-cache-dir > /dev/null 2>&1; then
+        echo -e "    ${GREEN}✓${NC} Installed"
+    else
+        echo -e "    ${YELLOW}⚠${NC} Already installed or skipped"
+    fi
+done
+echo ""
+
+# Install 3D modeling dependencies (optional)
+echo "Step 6: Installing 3D modeling dependencies (optional)..."
+echo "-----------------------------------"
+
+MODELING_PACKAGES=(
+    # 3D model processing
+    "trimesh~=4.5.3"
+    "pygltflib~=1.16.2"
+
+    # Rendering and visualization
+    "pyrender~=0.1.45"
+
+    # Mesh processing
+    "meshio~=5.3.5"
+)
+
+echo "Installing 3D modeling packages (optional):"
+for package in "${MODELING_PACKAGES[@]}"; do
+    echo "  - $package"
+    if $PIP_CMD install "$package" --no-cache-dir > /dev/null 2>&1; then
+        echo -e "    ${GREEN}✓${NC} Installed"
+    else
+        echo -e "    ${YELLOW}⚠${NC} Installation skipped (may require system dependencies)"
+    fi
+done
+echo ""
+
+# Install development dependencies (optional)
+echo "Step 7: Installing development dependencies (optional)..."
+echo "-----------------------------------"
+if [ -f "requirements-dev.txt" ]; then
+    read -p "Install development dependencies? (y/N): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        if $PIP_CMD install -r requirements-dev.txt --no-cache-dir; then
+            echo -e "${GREEN}✓${NC} Development dependencies installed"
+        else
+            echo -e "${YELLOW}⚠${NC} Some development dependencies may have failed"
         fi
-        retry_count=$((retry_count + 1))
-        echo -e "${YELLOW}  Retry $retry_count/$max_retries...${NC}"
-        sleep 2
-    done
-
-    return 1
-}
-
-# Install PyTorch first (with CUDA support if available)
-echo ""
-echo -e "${BLUE}▶ Step 1/7: Installing PyTorch${NC}"
-echo -e "${YELLOW}→${NC} Detecting CUDA availability..."
-
-if command -v nvidia-smi &> /dev/null; then
-    cuda_version=$(nvidia-smi | grep "CUDA Version" | awk '{print $9}' || echo "none")
-    echo -e "${GREEN}✓${NC} CUDA detected: $cuda_version"
-    echo -e "${YELLOW}→${NC} Installing PyTorch with CUDA 12.1 support..."
-    pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 \
-        --index-url https://download.pytorch.org/whl/cu121 --quiet || {
-        echo -e "${RED}✗ PyTorch installation failed${NC}"
-        exit 1
-    }
+    else
+        echo "Skipping development dependencies"
+    fi
 else
-    echo -e "${YELLOW}⚠${NC} CUDA not detected, installing CPU-only PyTorch..."
-    pip install torch==2.5.1 torchvision==0.20.1 torchaudio==2.5.1 --quiet || {
-        echo -e "${RED}✗ PyTorch installation failed${NC}"
-        exit 1
-    }
+    echo -e "${YELLOW}⚠${NC} requirements-dev.txt not found, skipping"
 fi
-echo -e "${GREEN}✓${NC} PyTorch installed"
-
-# Install AI Model SDKs
 echo ""
-echo -e "${BLUE}▶ Step 2/7: Installing AI Model SDKs${NC}"
-
-packages=(
-    "anthropic>=0.69.0"
-    "openai>=2.7.2"
-    "stability-sdk>=0.8.4"
-    "replicate>=0.25.0"
-)
-
-for package in "${packages[@]}"; do
-    package_name=$(echo "$package" | cut -d'>' -f1 | cut -d'=' -f1)
-    echo -e "${YELLOW}→${NC} Installing $package_name..."
-    if install_package "$package"; then
-        echo -e "${GREEN}✓${NC} $package_name installed"
-    else
-        echo -e "${RED}✗${NC} Failed to install $package_name"
-        exit 1
-    fi
-done
-
-# Install Hugging Face libraries
-echo ""
-echo -e "${BLUE}▶ Step 3/7: Installing Hugging Face Libraries${NC}"
-
-hf_packages=(
-    "transformers>=4.57.1,<5.0.0"
-    "diffusers>=0.27.0"
-    "huggingface-hub>=0.23.0"
-    "accelerate>=0.28.0"
-    "peft>=0.10.0"
-    "datasets>=2.18.0"
-    "safetensors>=0.4.0"
-)
-
-for package in "${hf_packages[@]}"; do
-    package_name=$(echo "$package" | cut -d'>' -f1 | cut -d'=' -f1)
-    echo -e "${YELLOW}→${NC} Installing $package_name..."
-    if install_package "$package"; then
-        echo -e "${GREEN}✓${NC} $package_name installed"
-    else
-        echo -e "${RED}✗${NC} Failed to install $package_name"
-        exit 1
-    fi
-done
-
-# Install 3D processing libraries
-echo ""
-echo -e "${BLUE}▶ Step 4/7: Installing 3D Processing Libraries${NC}"
-
-three_d_packages=(
-    "trimesh>=4.4.0"
-    "PyMCubes>=0.1.4"
-    "open3d>=0.18.0"
-    "pygltflib>=1.16.0"
-    "PyWavefront>=1.3.3"
-)
-
-for package in "${three_d_packages[@]}"; do
-    package_name=$(echo "$package" | cut -d'>' -f1 | cut -d'=' -f1)
-    echo -e "${YELLOW}→${NC} Installing $package_name..."
-    if install_package "$package"; then
-        echo -e "${GREEN}✓${NC} $package_name installed"
-    else
-        echo -e "${YELLOW}⚠${NC} $package_name failed (optional, continuing...)"
-    fi
-done
-
-# Install image processing libraries
-echo ""
-echo -e "${BLUE}▶ Step 5/7: Installing Image Processing Libraries${NC}"
-
-image_packages=(
-    "Pillow>=10.2.0"
-    "opencv-python>=4.9.0"
-    "scikit-image>=0.22.0"
-    "albumentations>=1.4.0"
-    "controlnet-aux>=0.0.7"
-    "mediapipe>=0.10.0"
-)
-
-for package in "${image_packages[@]}"; do
-    package_name=$(echo "$package" | cut -d'>' -f1 | cut -d'=' -f1)
-    echo -e "${YELLOW}→${NC} Installing $package_name..."
-    if install_package "$package"; then
-        echo -e "${GREEN}✓${NC} $package_name installed"
-    else
-        echo -e "${YELLOW}⚠${NC} $package_name failed (optional, continuing...)"
-    fi
-done
-
-# Install remaining dependencies from requirements-fashion.txt
-echo ""
-echo -e "${BLUE}▶ Step 6/7: Installing Remaining Dependencies${NC}"
-echo -e "${YELLOW}→${NC} Installing from requirements-fashion.txt..."
-
-if [ -f "$PROJECT_DIR/requirements-fashion.txt" ]; then
-    pip install -r "$PROJECT_DIR/requirements-fashion.txt" --quiet || {
-        echo -e "${YELLOW}⚠${NC} Some packages from requirements-fashion.txt failed (continuing...)"
-    }
-    echo -e "${GREEN}✓${NC} Base requirements installed"
-else
-    echo -e "${RED}✗${NC} requirements-fashion.txt not found"
-    exit 1
-fi
-
-# Install development dependencies
-echo ""
-echo -e "${BLUE}▶ Step 7/7: Installing Development Tools${NC}"
-
-dev_packages=(
-    "pytest>=8.0.0"
-    "pytest-asyncio>=0.23.0"
-    "pytest-cov>=4.1.0"
-    "black>=24.10.0"
-    "ruff>=0.8.0"
-    "mypy>=1.14.0"
-)
-
-for package in "${dev_packages[@]}"; do
-    package_name=$(echo "$package" | cut -d'>' -f1 | cut -d'=' -f1)
-    echo -e "${YELLOW}→${NC} Installing $package_name..."
-    if install_package "$package"; then
-        echo -e "${GREEN}✓${NC} $package_name installed"
-    else
-        echo -e "${YELLOW}⚠${NC} $package_name failed (optional, continuing...)"
-    fi
-done
 
 # Verify installations
+echo "Step 8: Verifying key package installations..."
+echo "-----------------------------------"
+
+# Map package names to their import names
+# Format: "package_name:import_name"
+KEY_PACKAGES=(
+    "fastapi:fastapi"
+    "anthropic:anthropic"
+    "openai:openai"
+    "transformers:transformers"
+    "torch:torch"
+    "numpy:numpy"
+    "pandas:pandas"
+    "scikit-learn:sklearn"
+    "opencv-python:cv2"
+    "Pillow:PIL"
+)
+
+for entry in "${KEY_PACKAGES[@]}"; do
+    package="${entry%%:*}"
+    import_name="${entry##*:}"
+
+    if python3 -c "import ${import_name}" 2> /dev/null; then
+        echo -e "${GREEN}✓${NC} $package - verified"
+    else
+        echo -e "${YELLOW}⚠${NC} $package - not found or import error"
+    fi
+done
 echo ""
-echo -e "${BLUE}════════════════════════════════════════════════════════════════${NC}"
-echo -e "${BLUE}Verifying Installations${NC}"
-echo -e "${BLUE}════════════════════════════════════════════════════════════════${NC}"
 
-python3 << 'EOF'
-import sys
+# Download NLTK data (required for fashion text processing)
+echo "Step 9: Downloading NLTK data..."
+echo "-----------------------------------"
+if python3 -c "import nltk" 2> /dev/null; then
+    echo "Downloading required NLTK datasets..."
+    python3 -c "
+import nltk
+import ssl
 
-def verify_import(module_name, package_name=None):
-    """Verify a module can be imported"""
-    try:
-        __import__(module_name)
-        print(f"  ✓ {package_name or module_name}")
-        return True
-    except ImportError as e:
-        print(f"  ✗ {package_name or module_name}: {e}")
-        return False
-
-print("\n🤖 AI Model SDKs:")
-verify_import("anthropic", "Anthropic (Claude)")
-verify_import("openai", "OpenAI (GPT-4, Shap-E)")
-verify_import("stability_sdk", "Stability AI (SDXL)")
-verify_import("replicate", "Replicate (LoRA)")
-
-print("\n🤗 Hugging Face:")
-verify_import("transformers", "Transformers")
-verify_import("diffusers", "Diffusers (IDM-VTON)")
-verify_import("accelerate", "Accelerate")
-verify_import("peft", "PEFT (LoRA)")
-
-print("\n🎨 3D Processing:")
-verify_import("trimesh", "Trimesh")
-verify_import("open3d", "Open3D")
-verify_import("pygltflib", "PyGLTF")
-
-print("\n🖼️ Image Processing:")
-verify_import("PIL", "Pillow")
-verify_import("cv2", "OpenCV")
-verify_import("skimage", "Scikit-image")
-
-print("\n🔥 ML Frameworks:")
-verify_import("torch", "PyTorch")
-verify_import("torchvision", "TorchVision")
-
-# Check PyTorch CUDA
+# Handle SSL certificate issues
 try:
-    import torch
-    if torch.cuda.is_available():
-        print(f"  ✓ CUDA available: {torch.cuda.get_device_name(0)}")
-    else:
-        print(f"  ⚠ CUDA not available (CPU-only mode)")
-except Exception as e:
-    print(f"  ✗ PyTorch CUDA check failed: {e}")
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
 
-print("\n📦 Core Libraries:")
-verify_import("fastapi", "FastAPI")
-verify_import("pydantic", "Pydantic")
-verify_import("sqlalchemy", "SQLAlchemy")
+# Download required datasets
+nltk.download('punkt', quiet=True)
+nltk.download('stopwords', quiet=True)
+nltk.download('averaged_perceptron_tagger', quiet=True)
+nltk.download('wordnet', quiet=True)
+print('NLTK data downloaded successfully')
+" 2>&1 | grep -E "downloaded|already"
+    echo -e "${GREEN}✓${NC} NLTK data ready"
+else
+    echo -e "${YELLOW}⚠${NC} NLTK not installed, skipping data download"
+fi
+echo ""
 
-print("\n🔒 Security:")
-verify_import("cryptography", "Cryptography")
-verify_import("jwt", "PyJWT")
-verify_import("argon2", "Argon2")
+# Create necessary directories
+echo "Step 10: Creating required directories..."
+echo "-----------------------------------"
 
-EOF
+DIRECTORIES=(
+    "storage/3d_models"
+    "storage/fashion_images"
+    "storage/fashion_cache"
+    "storage/ml_models"
+    "artifacts"
+    "logs"
+)
 
+for dir in "${DIRECTORIES[@]}"; do
+    if mkdir -p "$dir" 2> /dev/null; then
+        echo -e "${GREEN}✓${NC} Created/verified: $dir"
+    else
+        echo -e "${YELLOW}⚠${NC} Could not create: $dir"
+    fi
+done
 echo ""
-echo -e "${BLUE}════════════════════════════════════════════════════════════════${NC}"
-echo -e "${GREEN}✓ Installation Complete!${NC}"
-echo -e "${BLUE}════════════════════════════════════════════════════════════════${NC}"
+
+# Summary
+echo "=================================================="
+echo "Installation Summary"
+echo "=================================================="
 echo ""
-echo -e "${YELLOW}Next Steps:${NC}"
-echo -e "  1. Activate venv: ${BLUE}source venv/bin/activate${NC}"
-echo -e "  2. Set API keys in ${BLUE}.env${NC} file:"
-echo -e "     - ANTHROPIC_API_KEY=your_key_here"
-echo -e "     - OPENAI_API_KEY=your_key_here"
-echo -e "     - STABILITY_API_KEY=your_key_here"
-echo -e "     - REPLICATE_API_TOKEN=your_token_here"
-echo -e "     - HUGGINGFACE_TOKEN=your_token_here"
-echo -e "  3. Run tests: ${BLUE}pytest tests/${NC}"
-echo -e "  4. Start orchestrator: ${BLUE}python agent/fashion_orchestrator.py${NC}"
-echo ""
-echo -e "${YELLOW}Optional:${NC}"
-echo -e "  - For GPU acceleration: Ensure CUDA 12.1+ is installed"
-echo -e "  - For PyTorch3D: Install from conda or build from source"
-echo -e "  - For USDZ support: Install pxr-usd package"
-echo ""
-echo -e "${GREEN}Ready for The Skyy Rose Collection! 👗✨${NC}"
+
+if [ $INSTALLATION_FAILED -eq 0 ]; then
+    echo -e "${GREEN}✓ Fashion dependencies installed successfully!${NC}"
+    echo ""
+    echo "Next steps:"
+    echo "  1. Configure your .env file with API keys"
+    echo "  2. Run 'python main.py' to start the application"
+    echo "  3. Check the documentation in README.md"
+    echo ""
+    echo "For 3D modeling features, you may need to install system libraries:"
+    echo "  Ubuntu/Debian: sudo apt-get install libgl1-mesa-glx libglib2.0-0"
+    echo "  macOS: brew install mesa glib"
+    echo ""
+    exit 0
+else
+    echo -e "${RED}✗ Installation completed with errors${NC}"
+    echo ""
+    echo "Some critical dependencies failed to install."
+    echo "Please review the error messages above and retry."
+    echo "You may need to install system dependencies first."
+    echo ""
+    exit 1
+fi

@@ -293,7 +293,7 @@ class ValidationErrorResponse(BaseModel):
     message: str
     details: list[dict[str, Any]] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=datetime.now)
-    request_id: Optional[str] = None
+    request_id: str | None = None
 
 
 class SecurityViolationResponse(BaseModel):
@@ -303,7 +303,7 @@ class SecurityViolationResponse(BaseModel):
     message: str = "Request blocked due to security policy violation"
     violation_type: str
     timestamp: datetime = Field(default_factory=datetime.now)
-    request_id: Optional[str] = None
+    request_id: str | None = None
 
 
 class EnhancedSuccessResponse(BaseModel):
@@ -314,7 +314,7 @@ class EnhancedSuccessResponse(BaseModel):
     data: Optional[dict[str, Any]] = None
     metadata: Optional[dict[str, Any]] = None
     timestamp: datetime = Field(default_factory=datetime.now)
-    request_id: Optional[str] = None
+    request_id: str | None = None
 
 
 # ============================================================================

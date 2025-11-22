@@ -78,11 +78,11 @@ class User(BaseModel):
     user_id: str
     email: EmailStr
     username: str
-    password_hash: Optional[str] = None  # Hashed password
+    password_hash: str | None = None  # Hashed password
     role: str = UserRole.API_USER
     is_active: bool = True
     created_at: datetime = Field(default_factory=datetime.now)
-    last_login: Optional[datetime] = None
+    last_login: datetime | None = None
     permissions: list[str] = Field(default_factory=list)
 
 
@@ -221,7 +221,7 @@ def validate_token_security(token: str, token_data: TokenData) -> bool:
 # ============================================================================
 
 
-def create_access_token(data: dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+def create_access_token(data: dict[str, Any], expires_delta: timedelta | None = None) -> str:
     """
     Create a new access token
 
@@ -535,7 +535,7 @@ class UserManager:
         """Verify a password against its hash"""
         return pwd_context.verify(plain_password, hashed_password)
 
-    def authenticate_user(self, username_or_email: str, password: str) -> Optional[User]:
+    def authenticate_user(self, username_or_email: str, password: str) -> User | None:
         """Authenticate a user by username/email and password"""
         # Try to find user by email first
         user = self.get_user_by_email(username_or_email)
@@ -581,18 +581,18 @@ class UserManager:
 
         logger.info(f"Created {len(self.users)} default users")
 
-    def get_user_by_id(self, user_id: str) -> Optional[User]:
+    def get_user_by_id(self, user_id: str) -> User | None:
         """Get user by ID"""
         return self.users.get(user_id)
 
-    def get_user_by_email(self, email: str) -> Optional[User]:
+    def get_user_by_email(self, email: str) -> User | None:
         """Get user by email"""
         user_id = self.email_index.get(email)
         if user_id:
             return self.users.get(user_id)
         return None
 
-    def get_user_by_username(self, username: str) -> Optional[User]:
+    def get_user_by_username(self, username: str) -> User | None:
         """Get user by username"""
         user_id = self.username_index.get(username)
         if user_id:
@@ -682,7 +682,7 @@ class JWTManager:
         """Verify and decode token"""
         return verify_token(token, token_type)
 
-    def authenticate_user(self, username_or_email: str, password: str) -> Optional[User]:
+    def authenticate_user(self, username_or_email: str, password: str) -> User | None:
         """Authenticate user with credentials"""
         return self.user_manager.authenticate_user(username_or_email, password)
 

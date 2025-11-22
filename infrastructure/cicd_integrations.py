@@ -73,15 +73,15 @@ class PipelineEvent:
     commit_message: str
     author: str
     timestamp: datetime
-    duration: Optional[int] = None
-    build_number: Optional[int] = None
-    environment: Optional[str] = None
+    duration: int | None = None
+    build_number: int | None = None
+    environment: str | None = None
     artifacts: list[str] = None
     test_results: dict[str, Any] = None
     code_quality_metrics: dict[str, Any] = None
     security_scan_results: dict[str, Any] = None
-    deployment_url: Optional[str] = None
-    logs_url: Optional[str] = None
+    deployment_url: str | None = None
+    logs_url: str | None = None
     raw_payload: dict[str, Any] = None
 
     def __post_init__(self):
@@ -105,10 +105,10 @@ class CICDConnection:
     name: str
     base_url: str
     api_token: str
-    username: Optional[str] = None
-    webhook_secret: Optional[str] = None
-    project_id: Optional[str] = None
-    organization: Optional[str] = None
+    username: str | None = None
+    webhook_secret: str | None = None
+    project_id: str | None = None
+    organization: str | None = None
     enabled: bool = True
     rate_limit_per_hour: int = 1000
     timeout: int = 30
@@ -166,7 +166,7 @@ class CICDIntegrationManager:
         self,
         platform: CICDPlatform,
         request: Request,
-        connection_name: Optional[str] = None,
+        connection_name: str | None = None,
     ) -> dict[str, Any]:
         """Process incoming webhook from CI/CD platform"""
 

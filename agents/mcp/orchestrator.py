@@ -80,12 +80,12 @@ class Task:
     input_data: dict[str, Any] = field(default_factory=dict)
     status: TaskStatus = TaskStatus.PENDING
     output: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
-    def duration_seconds(self) -> Optional[float]:
+    def duration_seconds(self) -> float | None:
         """Calculate task duration"""
         if self.started_at and self.completed_at:
             return (self.completed_at - self.started_at).total_seconds()

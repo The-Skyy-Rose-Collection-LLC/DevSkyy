@@ -87,7 +87,7 @@ class AgentPerformanceSnapshot:
     performance_score: float  # 0.0-1.0
     execution_time_ms: float
     tokens_used: int
-    user_feedback: Optional[float] = None  # If available
+    user_feedback: float | None = None  # If available
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -109,8 +109,8 @@ class FinetuningConfig(BaseModel):
     category: AgentCategory
     provider: FinetuningProvider
     base_model: str  # e.g., "gpt-4o-mini", "claude-sonnet-4"
-    training_file: Optional[str] = None
-    validation_file: Optional[str] = None
+    training_file: str | None = None
+    validation_file: str | None = None
 
     # Hyperparameters
     n_epochs: int = Field(default=3, ge=1, le=50)
@@ -138,8 +138,8 @@ class FinetuningJob(BaseModel):
     config: FinetuningConfig
     status: FinetuningStatus
     created_at: datetime
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
     # Training metrics
     training_samples: int = 0
@@ -149,12 +149,12 @@ class FinetuningJob(BaseModel):
     validation_accuracy: float = 0.0
 
     # Results
-    finetuned_model_id: Optional[str] = None
-    model_path: Optional[str] = None
+    finetuned_model_id: str | None = None
+    model_path: str | None = None
     cost_usd: float = 0.0
 
     # Error tracking
-    error_message: Optional[str] = None
+    error_message: str | None = None
     error_logs: list[str] = Field(default_factory=list)
 
 
@@ -204,7 +204,7 @@ class AgentFinetuningSystem:
         performance_score: float,
         execution_time_ms: float,
         tokens_used: int = 0,
-        user_feedback: Optional[float] = None,
+        user_feedback: float | None = None,
         metadata: Optional[dict[str, Any]] = None
     ):
         """
@@ -562,7 +562,7 @@ class AgentFinetuningSystem:
         job.model_path = str(self.data_dir / f"{job.job_id}_model.bin")
         job.cost_usd = 10.0  # Simulated cost
 
-    def get_job_status(self, job_id: str) -> Optional[FinetuningJob]:
+    def get_job_status(self, job_id: str) -> FinetuningJob | None:
         """Get status of a finetuning job"""
         return self.jobs.get(job_id)
 
@@ -605,7 +605,7 @@ class AgentFinetuningSystem:
 # GLOBAL INSTANCE
 # ============================================================================
 
-_global_finetuning_system: Optional[AgentFinetuningSystem] = None
+_global_finetuning_system: AgentFinetuningSystem | None = None
 
 
 def get_finetuning_system() -> AgentFinetuningSystem:

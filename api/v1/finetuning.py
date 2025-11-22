@@ -63,7 +63,7 @@ class PerformanceSnapshotRequest(BaseModel):
     performance_score: float = Field(ge=0.0, le=1.0)
     execution_time_ms: float = Field(gt=0)
     tokens_used: int = Field(default=0, ge=0)
-    user_feedback: Optional[float] = Field(default=None, ge=0.0, le=1.0)
+    user_feedback: float | None = Field(default=None, ge=0.0, le=1.0)
     metadata: Optional[dict[str, Any]] = None
 
 
@@ -110,22 +110,22 @@ class FinetuningJobResponse(BaseModel):
     category: AgentCategory
     status: str
     created_at: datetime
-    started_at: Optional[datetime]
-    completed_at: Optional[datetime]
+    started_at: datetime | None
+    completed_at: datetime | None
     training_samples: int
     validation_samples: int
     current_epoch: int
     training_loss: float
     validation_accuracy: float
-    finetuned_model_id: Optional[str]
+    finetuned_model_id: str | None
     cost_usd: float
-    error_message: Optional[str]
+    error_message: str | None
 
 
 class ToolSelectionRequest(BaseModel):
     """Request for optimized tool selection"""
     task_description: str
-    task_type: Optional[str] = None
+    task_type: str | None = None
     required_capabilities: list[str] = Field(default_factory=list)
     max_tools: int = Field(default=10, ge=1, le=50)
     prefer_fast: bool = False
@@ -144,7 +144,7 @@ class ToolSelectionResponse(BaseModel):
 class ParallelExecutionRequest(BaseModel):
     """Request for parallel function execution"""
     function_calls: list[dict[str, Any]]
-    user_id: Optional[str] = None
+    user_id: str | None = None
 
 
 class ParallelExecutionResponse(BaseModel):

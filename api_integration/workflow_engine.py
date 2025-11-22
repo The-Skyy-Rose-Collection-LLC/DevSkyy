@@ -99,9 +99,9 @@ class WorkflowStep:
     timeout: int = 300
     rollback_config: Optional[dict[str, Any]] = None
     status: StepStatus = StepStatus.PENDING
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    error_message: str | None = None
     result: Any = None
 
     def to_dict(self) -> dict[str, Any]:
@@ -128,8 +128,8 @@ class Workflow:
     variables: dict[str, Any] = field(default_factory=dict)
     status: WorkflowStatus = WorkflowStatus.PENDING
     created_at: datetime = field(default_factory=datetime.now)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
     execution_time: float = 0.0
     fashion_context: bool = False
 

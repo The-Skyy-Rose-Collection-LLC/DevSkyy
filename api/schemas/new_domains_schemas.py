@@ -64,10 +64,10 @@ class SocialPostCreateRequest(BaseModel):
     content: constr(min_length=1, max_length=5000) = Field(..., description="Post content")
     platforms: list[str] = Field(..., description="Target platforms")
     media_urls: Optional[list[str]] = Field(None, description="Media attachments")
-    scheduled_for: Optional[datetime] = Field(None, description="Schedule post")
+    scheduled_for: datetime | None = Field(None, description="Schedule post")
     hashtags: Optional[list[str]] = Field(None, description="Hashtags")
     mentions: Optional[list[str]] = Field(None, description="User mentions")
-    location: Optional[str] = Field(None, max_length=200)
+    location: str | None = Field(None, max_length=200)
     ai_optimize: bool = Field(default=True, description="AI optimization")
 
     @validator("platforms")
@@ -94,8 +94,8 @@ class SocialPostAnalytics(BaseModel):
     total_comments: int = 0
     engagement_rate: float = 0.0
     platform_breakdown: dict[str, dict[str, int]]
-    best_performing_platform: Optional[str] = None
-    sentiment_score: Optional[float] = None
+    best_performing_platform: str | None = None
+    sentiment_score: float | None = None
 
 
 class SocialPostCreateResponse(BaseModel):
@@ -105,11 +105,11 @@ class SocialPostCreateResponse(BaseModel):
     post_id: str
     status: str
     platform_results: dict[str, dict[str, Any]]
-    scheduled_for: Optional[datetime] = None
+    scheduled_for: datetime | None = None
     ai_optimizations: Optional[dict[str, str]] = None
-    analytics_url: Optional[str] = None
+    analytics_url: str | None = None
     created_at: datetime
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class SocialScheduleRequest(BaseModel):
@@ -135,9 +135,9 @@ class SocialPlatformConnectRequest(BaseModel):
 
     platform: str
     credentials: dict[str, str] = Field(..., description="Encrypted credentials")
-    account_id: Optional[str] = None
+    account_id: str | None = None
     permissions: list[str] = Field(default=["read", "write"])
-    webhook_url: Optional[str] = None
+    webhook_url: str | None = None
 
 
 class SocialCampaignRequest(BaseModel):
@@ -148,7 +148,7 @@ class SocialCampaignRequest(BaseModel):
     platforms: list[str]
     content_plan: list[dict[str, Any]]
     target_audience: dict[str, Any]
-    budget: Optional[float] = Field(None, gt=0)
+    budget: float | None = Field(None, gt=0)
     start_date: datetime
     end_date: datetime
     hashtags: list[str] = Field(default=[])
@@ -175,14 +175,14 @@ class EmailCampaignRequest(BaseModel):
     subject_line: constr(min_length=1, max_length=150)
     from_name: constr(min_length=1, max_length=100)
     from_email: EmailStr
-    reply_to: Optional[EmailStr] = None
-    template_id: Optional[str] = None
-    content_html: Optional[str] = None
-    content_text: Optional[str] = None
+    reply_to: EmailStr | None = None
+    template_id: str | None = None
+    content_html: str | None = None
+    content_text: str | None = None
     mailing_lists: list[str] = Field(..., min_items=1)
     segment_filters: Optional[dict[str, Any]] = None
     personalization_fields: Optional[list[str]] = None
-    scheduled_for: Optional[datetime] = None
+    scheduled_for: datetime | None = None
     ab_test_config: Optional[dict[str, Any]] = None
     tracking_enabled: bool = Field(default=True)
     utm_parameters: Optional[dict[str, str]] = None
@@ -220,8 +220,8 @@ class EmailCampaignAnalytics(BaseModel):
     spam_rate: float
     engagement_score: float
     top_clicked_links: list[dict]
-    geographic_breakdown: Optional[dict] = None
-    device_breakdown: Optional[dict] = None
+    geographic_breakdown: dict | None = None
+    device_breakdown: dict | None = None
 
 
 class EmailCampaignResponse(BaseModel):
@@ -232,25 +232,25 @@ class EmailCampaignResponse(BaseModel):
     name: str
     status: str
     total_recipients: int
-    scheduled_for: Optional[datetime] = None
-    estimated_send_time: Optional[str] = None
+    scheduled_for: datetime | None = None
+    estimated_send_time: str | None = None
     preview_url: str
     created_at: datetime
-    error_message: Optional[str] = None
+    error_message: str | None = None
 
 
 class EmailSendRequest(BaseModel):
     """Transactional email send"""
 
     to_email: EmailStr
-    to_name: Optional[str] = Field(None, max_length=100)
+    to_name: str | None = Field(None, max_length=100)
     subject: constr(min_length=1, max_length=150)
-    from_email: Optional[EmailStr] = None
-    from_name: Optional[str] = None
-    template_id: Optional[str] = None
+    from_email: EmailStr | None = None
+    from_name: str | None = None
+    template_id: str | None = None
     template_variables: Optional[dict[str, Any]] = None
-    content_html: Optional[str] = None
-    content_text: Optional[str] = None
+    content_html: str | None = None
+    content_text: str | None = None
     attachments: Optional[list[dict]] = Field(None, max_items=10)
     tags: Optional[list[str]] = None
     tracking_enabled: bool = Field(default=False)
@@ -270,12 +270,12 @@ class EmailTemplateRequest(BaseModel):
     """Email template creation"""
 
     name: constr(min_length=1, max_length=200)
-    description: Optional[str] = Field(None, max_length=500)
+    description: str | None = Field(None, max_length=500)
     subject_template: constr(min_length=1, max_length=150)
     html_template: str
-    text_template: Optional[str] = None
+    text_template: str | None = None
     template_variables: list[str]
-    category: Optional[str] = None
+    category: str | None = None
     is_active: bool = Field(default=True)
     preview_data: Optional[dict[str, str]] = None
 
@@ -284,7 +284,7 @@ class MailingListRequest(BaseModel):
     """Mailing list creation"""
 
     name: constr(min_length=1, max_length=200)
-    description: Optional[str] = Field(None, max_length=500)
+    description: str | None = Field(None, max_length=500)
     default_from_name: str = Field(..., max_length=100)
     default_from_email: EmailStr
     subscription_type: str = Field(default="double_opt_in")
@@ -304,11 +304,11 @@ class SubscriberAddRequest(BaseModel):
 
     email: EmailStr
     list_ids: list[str] = Field(..., min_items=1)
-    first_name: Optional[str] = Field(None, max_length=100)
-    last_name: Optional[str] = Field(None, max_length=100)
+    first_name: str | None = Field(None, max_length=100)
+    last_name: str | None = Field(None, max_length=100)
     custom_fields: Optional[dict[str, Any]] = None
     tags: Optional[list[str]] = None
-    source: Optional[str] = None
+    source: str | None = None
     confirmed: bool = Field(default=False)
     send_welcome_email: bool = Field(default=True)
 
@@ -355,14 +355,14 @@ class SupportTicketCreateRequest(BaseModel):
     """Create support ticket"""
 
     customer_email: EmailStr
-    customer_name: Optional[str] = Field(None, max_length=100)
+    customer_name: str | None = Field(None, max_length=100)
     subject: constr(min_length=1, max_length=200)
     description: constr(min_length=1, max_length=10000)
     category: str
     priority: str = Field(default="medium")
     channel: str = Field(default="web")
-    product_id: Optional[str] = None
-    order_id: Optional[str] = None
+    product_id: str | None = None
+    order_id: str | None = None
     attachments: Optional[list[str]] = Field(None, max_items=5)
     metadata: Optional[dict[str, Any]] = None
     ai_categorization: bool = Field(default=True)
@@ -410,21 +410,21 @@ class SupportTicketCreateResponse(BaseModel):
     ticket_number: str
     status: str
     priority: str
-    assigned_to: Optional[str] = None
+    assigned_to: str | None = None
     ai_suggestions: Optional[dict[str, Any]] = None
-    estimated_resolution_time: Optional[str] = None
+    estimated_resolution_time: str | None = None
     created_at: datetime
 
 
 class SupportTicketUpdateRequest(BaseModel):
     """Update support ticket"""
 
-    status: Optional[str] = None
-    priority: Optional[str] = None
-    assigned_to: Optional[str] = None
-    category: Optional[str] = None
+    status: str | None = None
+    priority: str | None = None
+    assigned_to: str | None = None
+    category: str | None = None
     tags: Optional[list[str]] = None
-    internal_notes: Optional[str] = Field(None, max_length=5000)
+    internal_notes: str | None = Field(None, max_length=5000)
 
     @validator("status")
     def validate_status(cls, v):
@@ -454,10 +454,10 @@ class TicketResponseAddRequest(BaseModel):
 class LiveChatStartRequest(BaseModel):
     """Start live chat session"""
 
-    customer_email: Optional[EmailStr] = None
-    customer_name: Optional[str] = Field(None, max_length=100)
+    customer_email: EmailStr | None = None
+    customer_name: str | None = Field(None, max_length=100)
     initial_message: constr(min_length=1, max_length=1000)
-    department: Optional[str] = None
+    department: str | None = None
     language: str = Field(default="en")
     metadata: Optional[dict[str, Any]] = None
     enable_ai_assist: bool = Field(default=True)
@@ -475,13 +475,13 @@ class KnowledgeBaseArticleRequest(BaseModel):
     title: constr(min_length=1, max_length=200)
     content: constr(min_length=1, max_length=50000)
     category: str
-    subcategory: Optional[str] = None
+    subcategory: str | None = None
     tags: list[str] = Field(default=[])
     keywords: list[str] = Field(default=[])
     related_articles: Optional[list[str]] = None
     is_published: bool = Field(default=False)
     visibility: str = Field(default="public")
-    author_id: Optional[str] = None
+    author_id: str | None = None
 
     @validator("content")
     def validate_content(cls, v):
@@ -533,8 +533,8 @@ class PaymentProcessRequest(BaseModel):
     currency: constr(min_length=3, max_length=3) = Field(default="USD")
     payment_method: str
     payment_details: dict[str, Any]
-    customer_id: Optional[str] = None
-    order_id: Optional[str] = None
+    customer_id: str | None = None
+    order_id: str | None = None
     description: constr(max_length=500)
     metadata: Optional[dict[str, Any]] = None
     idempotency_key: str
@@ -562,11 +562,11 @@ class PaymentProcessResponse(BaseModel):
     amount: float
     currency: str
     payment_method: str
-    receipt_url: Optional[str] = None
+    receipt_url: str | None = None
     requires_action: bool = False
-    action_url: Optional[str] = None
-    error_code: Optional[str] = None
-    error_message: Optional[str] = None
+    action_url: str | None = None
+    error_code: str | None = None
+    error_message: str | None = None
     processed_at: datetime
 
 
@@ -578,15 +578,15 @@ class PaymentProcessResponse(BaseModel):
 class NotificationSendRequest(BaseModel):
     """Send notification"""
 
-    recipient_id: Optional[str] = None
-    recipient_email: Optional[EmailStr] = None
+    recipient_id: str | None = None
+    recipient_email: EmailStr | None = None
     channels: list[str] = Field(..., min_items=1)
     notification_type: str
     title: constr(min_length=1, max_length=200)
     message: constr(min_length=1, max_length=5000)
-    action_url: Optional[str] = None
+    action_url: str | None = None
     priority: str = Field(default="normal")
-    scheduled_for: Optional[datetime] = None
+    scheduled_for: datetime | None = None
     metadata: Optional[dict[str, Any]] = None
 
     @validator("channels")
@@ -605,8 +605,8 @@ class NotificationSendResponse(BaseModel):
     notification_id: str
     status: str
     channel_results: dict[str, dict[str, Any]]
-    scheduled_for: Optional[datetime] = None
-    sent_at: Optional[datetime] = None
+    scheduled_for: datetime | None = None
+    sent_at: datetime | None = None
 
 
 # ============================================================================
@@ -639,7 +639,7 @@ class FileUploadResponse(BaseModel):
     file_id: str
     file_name: str
     file_url: str
-    cdn_url: Optional[str] = None
+    cdn_url: str | None = None
     file_size: int
     content_type: str
     uploaded_at: datetime

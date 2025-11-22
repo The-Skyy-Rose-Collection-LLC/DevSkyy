@@ -44,7 +44,7 @@ class DevSkyyLightning:
     """
 
     def __init__(
-        self, service_name: str = "devskyy-agents", otlp_endpoint: Optional[str] = None, enable_console: bool = False
+        self, service_name: str = "devskyy-agents", otlp_endpoint: str | None = None, enable_console: bool = False
     ):
         """
         Initialize AgentLightning integration
@@ -92,7 +92,7 @@ class DevSkyyLightning:
         self.otel_tracer = OtelTracer()
 
     def trace_agent_operation(
-        self, operation_name: str, agent_id: Optional[str] = None, metadata: Optional[dict[str, Any]] = None
+        self, operation_name: str, agent_id: str | None = None, metadata: Optional[dict[str, Any]] = None
     ):
         """
         Decorator to trace agent operations
@@ -170,7 +170,7 @@ class DevSkyyLightning:
 
         return decorator
 
-    def trace_llm_call(self, model: str, provider: Optional[str] = None, metadata: Optional[dict[str, Any]] = None):
+    def trace_llm_call(self, model: str, provider: str | None = None, metadata: Optional[dict[str, Any]] = None):
         """
         Decorator to trace LLM API calls
 
@@ -217,7 +217,7 @@ class DevSkyyLightning:
 
         return decorator
 
-    def create_lit_agent(self, agent_id: str, agent_func: Callable, description: Optional[str] = None) -> LitAgent:
+    def create_lit_agent(self, agent_id: str, agent_func: Callable, description: str | None = None) -> LitAgent:
         """
         Create a LitAgent wrapped with observability
 
@@ -271,7 +271,7 @@ class DevSkyyLightning:
         }
 
     def create_llm_proxy(
-        self, model: str = "gpt-4", api_key: Optional[str] = None, base_url: Optional[str] = None
+        self, model: str = "gpt-4", api_key: str | None = None, base_url: str | None = None
     ) -> LLMProxy:
         """
         Create LLM proxy with observability
@@ -288,7 +288,7 @@ class DevSkyyLightning:
 
 
 # Global instance for easy access
-_lightning_instance: Optional[DevSkyyLightning] = None
+_lightning_instance: DevSkyyLightning | None = None
 
 
 def get_lightning() -> DevSkyyLightning:
@@ -307,7 +307,7 @@ def get_lightning() -> DevSkyyLightning:
 
 
 def init_lightning(
-    service_name: str = "devskyy-agents", otlp_endpoint: Optional[str] = None, enable_console: bool = False
+    service_name: str = "devskyy-agents", otlp_endpoint: str | None = None, enable_console: bool = False
 ) -> DevSkyyLightning:
     """
     Initialize global DevSkyyLightning instance
@@ -328,7 +328,7 @@ def init_lightning(
 
 
 # Convenience decorators using global instance
-def trace_agent(operation_name: str, agent_id: Optional[str] = None, **metadata):
+def trace_agent(operation_name: str, agent_id: str | None = None, **metadata):
     """
     Convenience decorator for tracing agent operations
 
@@ -341,7 +341,7 @@ def trace_agent(operation_name: str, agent_id: Optional[str] = None, **metadata)
     return lightning.trace_agent_operation(operation_name, agent_id, metadata)
 
 
-def trace_llm(model: str, provider: Optional[str] = None, **metadata):
+def trace_llm(model: str, provider: str | None = None, **metadata):
     """
     Convenience decorator for tracing LLM calls
 

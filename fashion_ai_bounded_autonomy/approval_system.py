@@ -172,7 +172,7 @@ class ApprovalSystem:
             "timeout_at": timeout_at.isoformat(),
         }
 
-    async def approve(self, action_id: str, operator: str, notes: Optional[str] = None) -> dict[str, Any]:
+    async def approve(self, action_id: str, operator: str, notes: str | None = None) -> dict[str, Any]:
         """
         Approve an action.
 
@@ -460,7 +460,7 @@ class ApprovalSystem:
 
         return expired_count
 
-    async def get_operator_statistics(self, operator: Optional[str] = None) -> dict[str, Any]:
+    async def get_operator_statistics(self, operator: str | None = None) -> dict[str, Any]:
         """Get operator activity statistics"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()
