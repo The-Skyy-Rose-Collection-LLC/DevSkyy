@@ -176,21 +176,26 @@ echo ""
 echo "Step 8: Verifying key package installations..."
 echo "-----------------------------------"
 
+# Map package names to their import names
+# Format: "package_name:import_name"
 KEY_PACKAGES=(
-    "fastapi"
-    "anthropic"
-    "openai"
-    "transformers"
-    "torch"
-    "numpy"
-    "pandas"
-    "scikit-learn"
-    "opencv-python"
-    "PIL"
+    "fastapi:fastapi"
+    "anthropic:anthropic"
+    "openai:openai"
+    "transformers:transformers"
+    "torch:torch"
+    "numpy:numpy"
+    "pandas:pandas"
+    "scikit-learn:sklearn"
+    "opencv-python:cv2"
+    "Pillow:PIL"
 )
 
-for package in "${KEY_PACKAGES[@]}"; do
-    if python3 -c "import ${package//-/_}" 2> /dev/null; then
+for entry in "${KEY_PACKAGES[@]}"; do
+    package="${entry%%:*}"
+    import_name="${entry##*:}"
+
+    if python3 -c "import ${import_name}" 2> /dev/null; then
         echo -e "${GREEN}✓${NC} $package - verified"
     else
         echo -e "${YELLOW}⚠${NC} $package - not found or import error"
@@ -270,11 +275,11 @@ if [ $INSTALLATION_FAILED -eq 0 ]; then
     echo ""
     exit 0
 else
-    echo -e "${YELLOW}⚠ Installation completed with some warnings${NC}"
+    echo -e "${RED}✗ Installation completed with errors${NC}"
     echo ""
-    echo "Some optional dependencies may not have installed."
-    echo "This is normal if system libraries are missing."
-    echo "Core functionality should still work."
+    echo "Some critical dependencies failed to install."
+    echo "Please review the error messages above and retry."
+    echo "You may need to install system dependencies first."
     echo ""
-    exit 0
+    exit 1
 fi
