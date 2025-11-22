@@ -199,6 +199,38 @@
 
 ---
 
+## Logging & Troubleshooting
+
+### Log Locations
+All logs are in **`logs/`** directory:
+- 📄 **devskyy.log** - Main application log (all levels)
+- 🔴 **error.log** - Error-level logs only
+- 🔒 **security.log** - Security events and audit trail
+- 🌐 **access.log** - HTTP access logs (production)
+
+### Quick Commands
+```bash
+# View error logs
+tail -n 50 logs/error.log
+
+# Follow logs in real-time
+tail -f logs/devskyy.log
+
+# Interactive log viewer
+python scripts/view_logs.py
+
+# Show log locations
+bash scripts/show_log_locations.sh
+
+# Search for errors
+grep ERROR logs/devskyy.log
+```
+
+### Documentation
+📚 **Complete Guide:** [LOGGING_GUIDE.md](LOGGING_GUIDE.md)
+
+---
+
 ## Competitive Positioning
 
 ### vs OpenAI/Azure
