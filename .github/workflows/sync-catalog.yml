@@ -1,0 +1,132 @@
+name: Catalog Sync
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  sync-catalog:
+    runs-on: ubuntu-latest
+    env:
+      SHOPIFY_API_KEY: ${{ secrets.SHOPIFY_API_KEY }}
+      WOOCOMMERCE_KEY: ${{ secrets.WOOCOMMERCE_KEY }}
+      WOOCOMMERCE_SECRET: ${{ secrets.WOOCOMMERCE_SECRET }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests openai
+
+      - name: Fetch products from Shopify
+        id: fetch_products
+        run: |
+          import os, json, sys, requests
+          try:
+              api_key = os.environ.get('SHOPIFY_API_KEY')
+              # Placeholder for Shopify product fetch logic
+              # Replace STORE_DOMAIN and API_VERSION accordingly
+              response = requests.get(
+                  f"https://yourshop.myshopify.com/admin/api/2023-10/products.json",
+                  headers={"X-Shopify-Access-Token": api_key},
+                  timeout=30
+              )
+              response.raise_for_status()
+              products = response.json().get("products", [])
+              with open("products.json", "w") as f:
+                  json.dump(products, f)
+              print(f"Fetched {len(products)} products")
+          except Exception as e:
+              print(f"Error fetching products: {e}", file=sys.stderr)
+              raise
+
+      - name: Map fields to WooCommerce format
+        id: map_fields
+        run: |
+          import json, sys
+          try:
+              with open("products.json") as f:
+                  products = json.load(f)
+              mapped = []
+              for product in products:
+                  wc_product = {
+                      "name": product.get("title"),
+                      "type": "simple",
+                      "regular_price": product.get("variants", [{}])[0].get("price"),
+                      "description": product.get("body_html"),
+                      "images": [img.get("src") for img in product.get("images", [])],
+                      "sku": product.get("variants", [{}])[0].get("sku"),
+                  }
+                  mapped.append(wc_product)
+              with open("mapped_products.json", "w") as f:
+                  json.dump(mapped, f)
+              print(f"Mapped {len(mapped)} products")
+          except Exception as e:
+              print(f"Error mapping products: {e}", file=sys.stderr)
+              raise
+
+      - name: Tag images with OpenAI Vision
+        id: tag_images
+        run: |
+          import os, json, sys
+          try:
+              import openai
+              openai.api_key = os.environ.get("OPENAI_API_KEY", "")
+              with open("mapped_products.json") as f:
+                  products = json.load(f)
+              for product in products:
+                  tagged_images = []
+                  for img_url in product.get("images", []):
+                      # Placeholder: call OpenAI Vision to extract tags
+                      # tags = openai.Image.create(image=img_url, model="vision-1").get("tags")
+                      tags = []
+                      tagged_images.append({"src": img_url, "alt": ", ".join(tags)})
+                  product["images"] = tagged_images
+              with open("tagged_products.json", "w") as f:
+                  json.dump(products, f)
+              print("Tagged images")
+          except Exception as e:
+              print(f"Error tagging images: {e}", file=sys.stderr)
+              raise
+
+      - name: Upsert products to WooCommerce
+        id: upsert_products
+        run: |
+          import os, json, sys, requests
+          try:
+              wc_key = os.environ.get('WOOCOMMERCE_KEY')
+              wc_secret = os.environ.get('WOOCOMMERCE_SECRET')
+              base_url = "https://yourwoocommercesite.com/wp-json/wc/v3/products"
+              auth = (wc_key, wc_secret)
+              with open("tagged_products.json") as f:
+                  products = json.load(f)
+              for product in products:
+                  sku = product.get("sku")
+                  r = requests.get(base_url, params={"sku": sku}, auth=auth, timeout=30)
+                  if r.status_code == 200 and r.json():
+                      existing_id = r.json()[0]["id"]
+                      update_resp = requests.put(f"{base_url}/{existing_id}", json=product, auth=auth, timeout=30)
+                      update_resp.raise_for_status()
+                      print(f"Updated product {sku}")
+                  else:
+                      create_resp = requests.post(base_url, json=product, auth=auth, timeout=30)
+                      create_resp.raise_for_status()
+                      print(f"Created product {sku}")
+          except Exception as e:
+              print(f"Error upserting products: {e}", file=sys.stderr)
+              raise
+
+      - name: Test workflow run
+        run: |
+          echo "Catalog sync workflow completed successfully"
