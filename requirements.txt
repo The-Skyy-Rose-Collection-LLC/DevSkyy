@@ -27,8 +27,8 @@ itsdangerous>=2.2.0,<3.0.0  # SECURITY: Secure data signing for Flask
 # ============================================================================
 # AGENT FRAMEWORK & MCP
 # ============================================================================
-claude-agent-sdk~=0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0
-mcp~=1.21.0  # Model Context Protocol - official implementation
+claude-agent-sdk~=0.1.9  # Official Anthropic Agent SDK with MCP 1.22.0
+mcp~=1.22.0  # Model Context Protocol - official implementation
 fastmcp>=2.13.0,<3.0.0  # SECURITY FIX: GHSA-mxxr-jv3v-6pgc (XSS), GHSA-rj5c-58rq-j5g5 (Command Injection)
 
 # ============================================================================
