@@ -914,5 +914,29 @@ async def main():
         pass
 
 
+def render_safe_template(template_string: str, **context) -> str:
+    """
+    Safely render a Jinja2 template with automatic HTML escaping to prevent XSS attacks.
+
+    Args:
+        template_string: The Jinja2 template string to render
+        **context: Context variables to pass to the template
+
+    Returns:
+        Rendered template with HTML-escaped content
+
+    Note:
+        Jinja2 autoescape is enabled by default to prevent XSS vulnerabilities.
+        Per Truth Protocol Rule #7: Input validation and XSS protection required.
+    """
+    from jinja2 import Environment, select_autoescape
+
+    # Create environment with autoescape enabled for security
+    env = Environment(autoescape=select_autoescape(enabled_extensions=('html', 'xml'), default_for_string=True))
+
+    template = env.from_string(template_string)
+    return template.render(**context)
+
+
 if __name__ == "__main__":
     asyncio.run(main())
