@@ -11,25 +11,95 @@ Features:
 - LLM proxy with observability
 
 Truth Protocol Compliant: All implementations verified, no placeholders.
+
+Note: agentlightning is an optional dependency. When not installed, this module
+provides no-op implementations to allow tests and development to proceed.
 """
 
 from collections.abc import Callable
 from datetime import datetime
 from functools import wraps
+import logging
 import os
 from typing import Any, Optional
 
-from agentlightning import (
-    AgentOpsTracer,
-    LitAgent,
-    LLMProxy,
-    OtelTracer,
-    emit_reward,
-)
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+# Optional imports - agentlightning may not be installed
+AGENTLIGHTNING_AVAILABLE = False
+try:
+    from agentlightning import (
+        AgentOpsTracer,
+        LitAgent,
+        LLMProxy,
+        OtelTracer,
+        emit_reward,
+    )
+    from opentelemetry import trace
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+    AGENTLIGHTNING_AVAILABLE = True
+except ImportError:
+    # Provide no-op implementations when agentlightning is not available
+    logging.warning("agentlightning not installed - tracing disabled")
+
+    class AgentOpsTracer:
+        """No-op tracer when agentlightning unavailable"""
+        def trace(self, *args, **kwargs):
+            def decorator(func):
+                return func
+            return decorator
+
+    class LitAgent:
+        """No-op LitAgent when agentlightning unavailable"""
+        pass
+
+    class LLMProxy:
+        """No-op LLMProxy when agentlightning unavailable"""
+        def __init__(self, *args, **kwargs):
+            pass
+        def __call__(self, *args, **kwargs):
+            return None
+
+    class OtelTracer:
+        """No-op OtelTracer when agentlightning unavailable"""
+        def trace(self, *args, **kwargs):
+            def decorator(func):
+                return func
+            return decorator
+
+    def emit_reward(*args, **kwargs):
+        """No-op emit_reward when agentlightning unavailable"""
+        pass
+
+    # Minimal OpenTelemetry stubs
+    class trace:
+        _tracer_provider = None
+
+        @classmethod
+        def get_tracer(cls, *args, **kwargs):
+            return OtelTracer()
+
+        @classmethod
+        def set_tracer_provider(cls, provider):
+            cls._tracer_provider = provider
+
+    class TracerProvider:
+        def __init__(self, *args, **kwargs):
+            pass
+        def add_span_processor(self, *args, **kwargs):
+            pass
+
+    class OTLPSpanExporter:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class BatchSpanProcessor:
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class ConsoleSpanExporter:
+        def __init__(self, *args, **kwargs):
+            pass
 
 
 class DevSkyyLightning:
