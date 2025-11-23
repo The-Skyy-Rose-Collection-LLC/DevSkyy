@@ -11,7 +11,6 @@ Truth Protocol: Input validation, error handling, audit trails, webhook security
 from datetime import datetime
 import logging
 import os
-from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from fastapi.responses import HTMLResponse

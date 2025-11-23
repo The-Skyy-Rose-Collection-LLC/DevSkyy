@@ -10,20 +10,19 @@ This example demonstrates:
 4. Automatic promotion or rollback based on composite scores
 """
 
-import asyncio
 import uuid
-from datetime import datetime
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
 from ml.rlvr.agent_upgrade_system import AgentUpgradeSystem
-from ml.rlvr.reward_verifier import VerificationMethod
 from ml.rlvr.agent_upgrades_implementations import (
-    RealTimeCodeQualityScorer,
     AutomatedModelComparison,
     CompetitorPriceMonitor,
-    ContentGapAnalyzer
+    ContentGapAnalyzer,
+    RealTimeCodeQualityScorer,
 )
+from ml.rlvr.reward_verifier import VerificationMethod
 
 
 # ============================================================================
@@ -77,11 +76,11 @@ async def example_deploy_all_upgrades():
         # Deploy upgrades to ALL agents
         result = await upgrade_system.deploy_all_upgrades(user_id)
 
-        print(f"✅ Deployment Summary:")
+        print("✅ Deployment Summary:")
         print(f"   Total Agents: {result['total_agents']}")
         print(f"   Successful: {result['successful_deployments']}")
         print(f"   Failed: {result['failed_deployments']}")
-        print(f"\nDeployments:")
+        print("\nDeployments:")
 
         for deployment in result['deployments']:
             status_icon = "✅" if deployment['status'] == 'success' else "❌"
@@ -140,7 +139,7 @@ async def example_verify_upgrade_multi_source():
         print(f"   Reward Score: {user_feedback_result['reward_score']}")
 
         if user_feedback_result['all_verifications_complete']:
-            print(f"\n🎉 All verifications complete!")
+            print("\n🎉 All verifications complete!")
             print(f"   Status: {user_feedback_result['status']}")
             print(f"   Composite Score: {user_feedback_result['composite_score']}")
             print(f"   Threshold: {user_feedback_result['threshold']}")
@@ -178,11 +177,11 @@ def apply_discount(total, discount_percentage):
     result = await scorer.score_code_realtime(code_snippet)
 
     print(f"✅ Code Quality Score: {result['quality_score']:.1f}/100")
-    print(f"\nFeatures Analyzed:")
+    print("\nFeatures Analyzed:")
     for feature, value in result['features'].items():
         print(f"   - {feature}: {value}")
 
-    print(f"\nRecommendations:")
+    print("\nRecommendations:")
     for rec in result['recommendations']:
         priority_icon = "🔴" if rec['priority'] == 'high' else "🟡"
         print(f"   {priority_icon} [{rec['category']}] {rec['message']}")
@@ -215,7 +214,7 @@ async def example_model_comparison():
     print(f"🏆 Best Model: {result['best_model']}")
     print(f"📊 Reasoning: {result['reasoning']}")
 
-    print(f"\nModel Comparison:")
+    print("\nModel Comparison:")
     for model_name, comparison in result['model_comparisons'].items():
         if comparison.get('status') == 'success':
             print(f"   {model_name}:")
@@ -255,7 +254,7 @@ async def example_price_monitoring():
 
     print(f"📊 Competitor Price Analysis for {result['product_id']}")
 
-    print(f"\nCompetitor Prices:")
+    print("\nCompetitor Prices:")
     for comp in result['competitor_prices']:
         stock_status = "✅ In Stock" if comp['in_stock'] else "❌ Out of Stock"
         print(f"   {comp['competitor']}: ${comp['price']:.2f} {comp['currency']} - {stock_status}")
@@ -267,7 +266,7 @@ async def example_price_monitoring():
     print(f"   Market Average: ${analysis['competitor_avg']:.2f}")
     print(f"   Price Gap: ${analysis['price_gap']:.2f}")
 
-    print(f"\nRecommendations:")
+    print("\nRecommendations:")
     for rec in result['recommendations']:
         priority_icon = "🔴" if rec['priority'] == 'high' else "🟡" if rec['priority'] == 'medium' else "🟢"
         print(f"   {priority_icon} {rec['action'].replace('_', ' ').title()}")
@@ -314,7 +313,7 @@ async def example_content_gap_analysis():
     print(f"   Keywords Analyzed: {result['keywords_analyzed']}")
     print(f"   Content Gaps Found: {result['content_gaps_found']}")
 
-    print(f"\n🎯 Top Content Opportunities:")
+    print("\n🎯 Top Content Opportunities:")
     for i, opportunity in enumerate(result['top_opportunities'][:5], 1):
         priority_icon = "🔴" if opportunity['priority'] == 'high' else "🟡"
         print(f"\n   {i}. {opportunity['keyword']} {priority_icon}")
@@ -328,7 +327,7 @@ async def example_content_gap_analysis():
             print(f"      Quality Difference: {opportunity['quality_difference']:.2f}")
 
     traffic_potential = result['estimated_traffic_potential']
-    print(f"\n📈 Traffic Potential:")
+    print("\n📈 Traffic Potential:")
     print(f"   Estimated Monthly Visits: {traffic_potential['estimated_monthly_visits']:,}")
     print(f"   Estimated Annual Visits: {traffic_potential['estimated_annual_visits']:,}")
     print(f"   Confidence: {traffic_potential['confidence'].upper()}")
@@ -353,13 +352,13 @@ async def example_track_all_upgrades():
         # Get all upgrades status
         status = await upgrade_system.get_all_upgrades_status()
 
-        print(f"📊 Overall Upgrade Status")
+        print("📊 Overall Upgrade Status")
         print(f"   Total Upgrades: {status['total_upgrades']}")
         print(f"   Completed Verifications: {status['completed_verifications']}")
         print(f"   In Progress: {status['in_progress']}")
         print(f"   Average Progress: {status['average_progress']}")
 
-        print(f"\n📋 Individual Upgrades:")
+        print("\n📋 Individual Upgrades:")
         for upgrade in status['upgrades']:
             progress_bar = "█" * int(upgrade['progress'] / 10) + "░" * (10 - int(upgrade['progress'] / 10))
             print(f"\n   {upgrade['agent_type']}:")

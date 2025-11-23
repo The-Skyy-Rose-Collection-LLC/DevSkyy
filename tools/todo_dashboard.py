@@ -6,7 +6,6 @@ A web-based dashboard for managing TODO items, technical debt,
 and development tasks across the DevSkyy platform.
 """
 import logging
-from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse

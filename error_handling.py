@@ -6,7 +6,7 @@ from enum import Enum
 from functools import wraps
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException, status
 
@@ -87,7 +87,7 @@ class DevSkyError(Exception):
         message: str,
         error_code: ErrorCode,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
-        details: Optional[dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
         correlation_id: str | None = None,
     ):
         super().__init__(message)

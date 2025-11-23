@@ -9,9 +9,10 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol - Enterprise security standards
 """
 
-import pytest
+from unittest.mock import AsyncMock, Mock
+
 from fastapi import HTTPException, Request
-from unittest.mock import AsyncMock, Mock, patch
+import pytest
 
 from security.input_validation import (
     AlphanumericValidator,

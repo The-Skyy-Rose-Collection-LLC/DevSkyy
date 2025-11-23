@@ -6,15 +6,10 @@ when OpenAI API is unavailable.
 """
 
 import asyncio
-from pathlib import Path
-from llama_index.core import (
-    VectorStoreIndex,
-    Document,
-    Settings,
-    SimpleDirectoryReader
-)
+
+from llama_index.core import Settings, SimpleDirectoryReader, VectorStoreIndex
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
-from llama_index.llms.openai import OpenAI
+
 
 # Use local embeddings instead of OpenAI
 Settings.embed_model = HuggingFaceEmbedding(

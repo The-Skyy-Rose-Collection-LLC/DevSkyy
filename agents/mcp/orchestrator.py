@@ -12,7 +12,7 @@ from enum import Enum
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Union
 from uuid import uuid4
 
 
@@ -79,7 +79,7 @@ class Task:
     tool_name: str = ""
     input_data: dict[str, Any] = field(default_factory=dict)
     status: TaskStatus = TaskStatus.PENDING
-    output: Optional[dict[str, Any]] = None
+    output: dict[str, Any] | None = None
     error: str | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
     started_at: datetime | None = None

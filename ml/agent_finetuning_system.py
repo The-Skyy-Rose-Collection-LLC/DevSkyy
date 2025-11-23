@@ -20,16 +20,17 @@ Features:
 """
 
 import asyncio
-import json
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from enum import Enum
+import json
+import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from pydantic import BaseModel, Field
+
 
 logger = logging.getLogger(__name__)
 
@@ -205,7 +206,7 @@ class AgentFinetuningSystem:
         execution_time_ms: float,
         tokens_used: int = 0,
         user_feedback: float | None = None,
-        metadata: Optional[dict[str, Any]] = None
+        metadata: dict[str, Any] | None = None
     ):
         """
         Collect a performance snapshot from an agent for training data.
@@ -620,12 +621,12 @@ def get_finetuning_system() -> AgentFinetuningSystem:
 
 __all__ = [
     "AgentCategory",
+    "AgentFinetuningSystem",
+    "AgentPerformanceSnapshot",
+    "FinetuningConfig",
+    "FinetuningDataset",
+    "FinetuningJob",
     "FinetuningProvider",
     "FinetuningStatus",
-    "AgentPerformanceSnapshot",
-    "FinetuningDataset",
-    "FinetuningConfig",
-    "FinetuningJob",
-    "AgentFinetuningSystem",
     "get_finetuning_system",
 ]

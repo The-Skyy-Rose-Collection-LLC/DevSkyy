@@ -19,7 +19,7 @@ from datetime import datetime
 import logging
 from pathlib import Path
 import tempfile
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
@@ -48,7 +48,7 @@ class IngestTextRequest(BaseModel):
 
     text: str = Field(..., description="Text content to ingest", min_length=10)
     source: str = Field(default="api_input", description="Source identifier")
-    metadata: Optional[dict[str, Any]] = Field(
+    metadata: dict[str, Any] | None = Field(
         default=None,
         description="Additional metadata",
     )
@@ -68,7 +68,7 @@ class SearchRequest(BaseModel):
 
     query: str = Field(..., description="Search query", min_length=1)
     top_k: int = Field(default=5, description="Number of results", ge=1, le=20)
-    filters: Optional[dict[str, Any]] = Field(
+    filters: dict[str, Any] | None = Field(
         default=None,
         description="Metadata filters",
     )
@@ -131,7 +131,7 @@ class QueryResponse(BaseModel):
     sources: list[SearchResult] = Field(..., description="Source documents")
     context_used: int = Field(..., description="Number of context chunks used")
     model: str | None = Field(None, description="LLM model used")
-    tokens_used: Optional[dict[str, int]] = Field(None, description="Token usage")
+    tokens_used: dict[str, int] | None = Field(None, description="Token usage")
 
 
 class StatsResponse(BaseModel):

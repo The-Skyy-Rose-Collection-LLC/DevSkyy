@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic
 
@@ -40,7 +40,7 @@ class ElementorThemeBuilder:
     - Advanced gallery options with pro lightbox and filters
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.anthropic = Anthropic(api_key=api_key) if api_key else None
         self.theme_templates = self._load_theme_templates()
         self.widget_library = self._initialize_widget_library()
@@ -412,7 +412,7 @@ class ElementorThemeBuilder:
         self,
         brand_info: dict[str, Any],
         theme_type: str = "luxury_fashion",
-        pages: Optional[list[str]] = None,
+        pages: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Generate complete WordPress/Elementor theme

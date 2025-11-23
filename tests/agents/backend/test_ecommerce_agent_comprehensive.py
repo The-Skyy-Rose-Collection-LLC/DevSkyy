@@ -16,16 +16,15 @@ Truth Protocol: Rules #1, #8, #15
 Coverage Target: ≥75% (338/451 lines minimum)
 """
 
-import pytest
-from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest.mock import Mock, patch, MagicMock
 import uuid
+
+import pytest
 
 from agent.modules.backend.ecommerce_agent import (
     EcommerceAgent,
-    ProductCategory,
     OrderStatus,
+    ProductCategory,
     optimize_marketing,
 )
 

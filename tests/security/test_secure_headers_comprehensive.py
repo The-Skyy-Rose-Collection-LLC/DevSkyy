@@ -13,7 +13,6 @@ Version: 1.0.0
 Python: >=3.11.0
 """
 
-import pytest
 from security.secure_headers import SecurityHeaders, security_headers_manager
 
 

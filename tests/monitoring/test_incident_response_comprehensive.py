@@ -4,9 +4,8 @@ Comprehensive test suite for incident_response.py
 Target: ≥75% coverage (173/231 lines)
 """
 
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import datetime
+from unittest.mock import patch
 
 import pytest
 

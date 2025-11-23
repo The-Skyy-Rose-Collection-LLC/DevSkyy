@@ -7,7 +7,7 @@ from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
@@ -23,7 +23,13 @@ from pydantic import BaseModel, EmailStr, Field
 logger = logging.getLogger(__name__)
 
 # JWT Configuration - Enhanced Security
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME"))
+# Truth Protocol Rule #5: No Secrets in Code - Must be set via environment variable
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY")
+if not JWT_SECRET_KEY:
+    raise ValueError(
+        "JWT_SECRET_KEY or SECRET_KEY environment variable must be set. "
+        "Set JWT_SECRET_KEY in your .env file for production deployment."
+    )
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -276,7 +282,7 @@ def create_refresh_token(data: dict[str, Any]) -> str:
     return encoded_jwt
 
 
-def get_token_payload(token: str) -> Optional[dict[str, Any]]:
+def get_token_payload(token: str) -> dict[str, Any] | None:
     """
     Get token payload without validation (for testing purposes)
 

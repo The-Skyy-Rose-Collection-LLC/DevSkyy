@@ -13,7 +13,7 @@ from enum import Enum
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.base_agent import BaseAgent
 
@@ -54,7 +54,7 @@ class BoundedAction:
     approved_at: datetime | None = None
     approved_by: str | None = None
     executed_at: datetime | None = None
-    result: Optional[dict[str, Any]] = None
+    result: dict[str, Any] | None = None
     audit_trail: list[dict[str, Any]] = field(default_factory=list)
 
 
@@ -308,7 +308,7 @@ class BoundedAutonomyWrapper:
 
         return f"{self.wrapped_agent.agent_name}_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:8]}"
 
-    def _audit_log(self, action: BoundedAction, event: str, metadata: Optional[dict[str, Any]] = None):
+    def _audit_log(self, action: BoundedAction, event: str, metadata: dict[str, Any] | None = None):
         """Write to audit log"""
         log_entry = {
             "timestamp": datetime.now().isoformat(),

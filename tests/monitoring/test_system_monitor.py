@@ -11,8 +11,7 @@ Per CLAUDE.md Truth Protocol Rule #8 (Test Coverage ≥90%)
 
 import asyncio
 from datetime import datetime, timedelta
-from typing import Any
-from unittest.mock import AsyncMock, Mock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 

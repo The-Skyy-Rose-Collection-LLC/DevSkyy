@@ -15,7 +15,7 @@ Truth Protocol: Standard MCP compliance, full observability, secure access
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from mcp.server import Server
 from mcp.types import TextContent, Tool

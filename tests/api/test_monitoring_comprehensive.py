@@ -12,7 +12,6 @@ Per CLAUDE.md Truth Protocol requirements
 from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
-from fastapi import HTTPException
 
 from security.jwt_auth import TokenData, UserRole
 

@@ -3,10 +3,8 @@ Test database_ecosystem module
 Comprehensive tests for PostgreSQL, MongoDB, ClickHouse managers and DatabaseEcosystem
 """
 
-import asyncio
 from datetime import datetime
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 

@@ -5,14 +5,12 @@ Computes and verifies reward scores for agent executions based on
 multiple verification methods.
 """
 
-import uuid
-from typing import Optional, Dict, Any, List
 from datetime import datetime
 from decimal import Decimal
 from enum import Enum
-import asyncio
+from typing import Any
+import uuid
 
-from sqlalchemy import select, and_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 
@@ -42,7 +40,7 @@ class RewardVerifier:
         execution_id: uuid.UUID,
         verification_method: VerificationMethod,
         **kwargs
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Verify an agent execution and compute reward score.
 
@@ -81,7 +79,7 @@ class RewardVerifier:
         user_feedback: str | None = None,
         thumbs_up: bool | None = None,
         user_id: uuid.UUID | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Verify based on explicit user feedback."""
 
         # Convert feedback to score
@@ -111,7 +109,7 @@ class RewardVerifier:
         tests_passed: int,
         tests_total: int,
         test_output: str | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Verify based on automated test execution."""
 
         # Pass rate = reward score
@@ -133,7 +131,7 @@ class RewardVerifier:
         lint_score: float | None = None,
         complexity_score: float | None = None,
         security_score: float | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Verify based on static code analysis."""
 
         # Average of available scores
@@ -156,7 +154,7 @@ class RewardVerifier:
         revenue_impact_usd: float | None = None,
         conversion_rate: float | None = None,
         retention_impact: float | None = None
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Verify based on business impact metrics."""
 
         # Normalize business metrics to 0-1 range
@@ -185,8 +183,8 @@ class RewardVerifier:
     async def _verify_automated_check(
         self,
         execution_id: uuid.UUID,
-        check_results: Dict[str, bool]
-    ) -> Dict[str, Any]:
+        check_results: dict[str, bool]
+    ) -> dict[str, Any]:
         """Verify based on automated checks (e.g., formatting, compilation)."""
 
         # Pass rate of all checks
@@ -240,7 +238,7 @@ class RewardVerifier:
     async def _save_reward_score(
         self,
         execution_id: uuid.UUID,
-        reward_data: Dict[str, Any]
+        reward_data: dict[str, Any]
     ) -> uuid.UUID:
         """Save reward score to database."""
         reward_id = uuid.uuid4()

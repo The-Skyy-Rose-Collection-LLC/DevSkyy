@@ -20,7 +20,7 @@ import hashlib
 import logging
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from anthropic import Anthropic
@@ -271,7 +271,7 @@ class VectorDatabase:
         self,
         query: str,
         top_k: int = RAGConfig.TOP_K_RESULTS,
-        filters: Optional[dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         """
         Semantic search in vector database
@@ -407,7 +407,7 @@ class RAGService:
         self,
         text: str,
         source: str = "direct_input",
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Ingest text content directly
@@ -448,7 +448,7 @@ class RAGService:
         self,
         query: str,
         top_k: int = RAGConfig.TOP_K_RESULTS,
-        filters: Optional[dict[str, Any]] = None,
+        filters: dict[str, Any] | None = None,
         min_similarity: float = RAGConfig.SIMILARITY_THRESHOLD,
     ) -> list[dict[str, Any]]:
         """

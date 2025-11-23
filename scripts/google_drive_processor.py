@@ -10,7 +10,7 @@ import json
 import logging
 from pathlib import Path
 import re
-from typing import Any, Optional
+from typing import Any
 
 from PIL import Image, ImageOps
 import requests

@@ -1,0 +1,377 @@
+{
+  "timestamp": "2025-11-23T00:00:00Z",
+  "run_id": "4e29e896c72f48fa",
+  "scan_type": "comprehensive_security_vulnerability_scan",
+  "errors": [
+    {
+      "error_id": "err_cve_001",
+      "error_type": "CriticalDependencyVulnerability",
+      "severity": "CRITICAL",
+      "message": "cryptography package outdated with 4 CVEs",
+      "component": "dependencies.cryptography",
+      "details": {
+        "package": "cryptography",
+        "installed_version": "41.0.7",
+        "required_version": ">=46.0.3,<47.0.0",
+        "cves": [
+          {
+            "id": "CVE-2024-26130",
+            "cvss": "HIGH",
+            "description": "NULL pointer dereference in pkcs12.serialize_key_and_certificates",
+            "fix_version": "42.0.4"
+          },
+          {
+            "id": "CVE-2023-50782",
+            "cvss": "HIGH",
+            "description": "RSA key exchange vulnerability in TLS servers",
+            "fix_version": "42.0.0"
+          },
+          {
+            "id": "CVE-2024-0727",
+            "cvss": "MEDIUM",
+            "description": "PKCS12 malformed file DoS attack",
+            "fix_version": "42.0.2"
+          },
+          {
+            "id": "GHSA-h4gh-qq45-vh27",
+            "cvss": "HIGH",
+            "description": "OpenSSL vulnerabilities in statically linked copy",
+            "fix_version": "43.0.1"
+          }
+        ]
+      },
+      "action": "halt",
+      "remediation": "Run: pip install 'cryptography>=46.0.3,<47.0.0' --upgrade"
+    },
+    {
+      "error_id": "err_cve_002",
+      "error_type": "HighDependencyVulnerability",
+      "severity": "HIGH",
+      "message": "setuptools package vulnerable to RCE",
+      "component": "dependencies.setuptools",
+      "details": {
+        "package": "setuptools",
+        "installed_version": "68.1.2",
+        "required_version": ">=78.1.1",
+        "cves": [
+          {
+            "id": "CVE-2025-47273",
+            "cvss": "HIGH",
+            "description": "Path traversal vulnerability in PackageIndex allowing arbitrary file write and RCE",
+            "fix_version": "78.1.1"
+          },
+          {
+            "id": "CVE-2024-6345",
+            "cvss": "HIGH",
+            "description": "Remote code execution via package_index download functions",
+            "fix_version": "70.0.0"
+          }
+        ]
+      },
+      "action": "halt",
+      "remediation": "Run: pip install 'setuptools>=78.1.1' --upgrade"
+    },
+    {
+      "error_id": "err_cve_003",
+      "error_type": "MediumDependencyVulnerability",
+      "severity": "MEDIUM",
+      "message": "pip package vulnerable to path traversal",
+      "component": "dependencies.pip",
+      "details": {
+        "package": "pip",
+        "installed_version": "24.0",
+        "required_version": ">=25.3",
+        "cves": [
+          {
+            "id": "CVE-2025-8869",
+            "cvss": "MEDIUM",
+            "description": "Path traversal in fallback extraction for sdist, allowing symbolic/hard link escape",
+            "fix_version": "25.3"
+          }
+        ]
+      },
+      "action": "continue",
+      "remediation": "Run: pip install 'pip>=25.3' --upgrade"
+    },
+    {
+      "error_id": "err_bandit_001",
+      "error_type": "InsecureSSHConfiguration",
+      "severity": "HIGH",
+      "message": "SSH host key verification disabled (B507)",
+      "component": "agent.modules.backend.wordpress_server_access",
+      "details": {
+        "file": "./agent/modules/backend/wordpress_server_access.py",
+        "line": 78,
+        "cwe": "CWE-295",
+        "description": "Paramiko call with policy set to automatically trust unknown host key"
+      },
+      "action": "continue",
+      "remediation": "Implement proper SSH host key verification with known_hosts file"
+    },
+    {
+      "error_id": "err_bandit_002",
+      "error_type": "InsecureSSHConfiguration",
+      "severity": "HIGH",
+      "message": "SSH host key verification disabled (B507)",
+      "component": "agent.wordpress.automated_theme_uploader",
+      "details": {
+        "file": "./agent/wordpress/automated_theme_uploader.py",
+        "line": 485,
+        "cwe": "CWE-295",
+        "description": "Paramiko call with policy set to automatically trust unknown host key"
+      },
+      "action": "continue",
+      "remediation": "Implement proper SSH host key verification with known_hosts file"
+    },
+    {
+      "error_id": "err_bandit_003",
+      "error_type": "InsecureProtocol",
+      "severity": "HIGH",
+      "message": "FTP protocol usage (insecure, plaintext)",
+      "component": "agent.wordpress.automated_theme_uploader",
+      "details": {
+        "file": "./agent/wordpress/automated_theme_uploader.py",
+        "lines": [12, 409],
+        "cwe": "CWE-319",
+        "description": "FTP-related module imported and FTP functions called (B402, B321)"
+      },
+      "action": "continue",
+      "remediation": "Replace FTP with SFTP or SCP for encrypted file transfer"
+    },
+    {
+      "error_id": "err_bandit_004",
+      "error_type": "WeakCryptography",
+      "severity": "HIGH",
+      "message": "MD5 hash usage for security (B324)",
+      "component": "tests.utils.test_utilities_comprehensive",
+      "details": {
+        "file": "./tests/utils/test_utilities_comprehensive.py",
+        "line": 368,
+        "cwe": "CWE-327",
+        "description": "Use of weak MD5 hash for security purposes"
+      },
+      "action": "continue",
+      "remediation": "Use SHA-256 or SHA-3 for cryptographic hashing. For non-security checksums, set usedforsecurity=False"
+    },
+    {
+      "error_id": "err_bandit_005",
+      "error_type": "UnsafeDeserialization",
+      "severity": "MEDIUM",
+      "message": "Pickle deserialization without validation (B301)",
+      "component": "agent.modules.backend.self_learning_system",
+      "details": {
+        "file": "./agent/modules/backend/self_learning_system.py",
+        "line": 780,
+        "cwe": "CWE-502",
+        "description": "Pickle deserialization can be unsafe with untrusted data"
+      },
+      "action": "continue",
+      "remediation": "Validate pickle data source or use safer serialization (JSON, msgpack)"
+    },
+    {
+      "error_id": "err_bandit_006",
+      "error_type": "UnsafeDeserialization",
+      "severity": "MEDIUM",
+      "message": "Pickle deserialization without validation (B301)",
+      "component": "infrastructure.redis_manager",
+      "details": {
+        "file": "./infrastructure/redis_manager.py",
+        "line": 254,
+        "cwe": "CWE-502",
+        "description": "Pickle deserialization can be unsafe with untrusted data"
+      },
+      "action": "continue",
+      "remediation": "Validate pickle data source or use safer serialization (JSON, msgpack)"
+    },
+    {
+      "error_id": "err_bandit_007",
+      "error_type": "UnpinnedModelDownload",
+      "severity": "MEDIUM",
+      "message": "Hugging Face model downloads without revision pinning (B615)",
+      "component": "ml.model_downloads",
+      "details": {
+        "files": [
+          "./agent/modules/backend/brand_model_trainer.py (lines 112, 113)",
+          "./agent/modules/frontend/fashion_computer_vision_agent.py (lines 58, 59, 68, 69)",
+          "./scripts/download_fashion_models.py (lines 67, 72)"
+        ],
+        "cwe": "CWE-494",
+        "description": "Hugging Face downloads without revision hash allow supply chain attacks",
+        "count": 8
+      },
+      "action": "continue",
+      "remediation": "Pin model revisions: model.from_pretrained('name', revision='commit_hash')"
+    },
+    {
+      "error_id": "err_bandit_008",
+      "error_type": "RequestsWithoutTimeout",
+      "severity": "MEDIUM",
+      "message": "HTTP requests without timeout (B113)",
+      "component": "http.requests",
+      "details": {
+        "files": [
+          "./agent/modules/backend/wordpress_direct_service.py (lines 248, 273, 299, 323)",
+          "./scripts/google_drive_processor.py (line 414)",
+          "./tests/integration/test_quality_processing.py (multiple lines)"
+        ],
+        "cwe": "CWE-400",
+        "description": "Requests without timeout can cause indefinite hangs",
+        "count": 11
+      },
+      "action": "continue",
+      "remediation": "Add timeout parameter to all requests: requests.get(url, timeout=30)"
+    },
+    {
+      "error_id": "err_bandit_009",
+      "error_type": "BindAllInterfaces",
+      "severity": "MEDIUM",
+      "message": "Server binding to 0.0.0.0 (all interfaces)",
+      "component": "api.servers",
+      "details": {
+        "files": [
+          "./api/training_data_interface.py (line 2161)",
+          "./backend/server.py (line 22)",
+          "./main.py (line 1477)",
+          "./docker/mcp_gateway.py (line 352)"
+        ],
+        "cwe": "CWE-605",
+        "description": "Binding to 0.0.0.0 exposes service to external network",
+        "count": 9
+      },
+      "action": "continue",
+      "remediation": "In production, bind to 127.0.0.1 or specific internal IP. Use reverse proxy for external access."
+    },
+    {
+      "error_id": "err_bandit_010",
+      "error_type": "HardcodedTmpDirectory",
+      "severity": "MEDIUM",
+      "message": "Hardcoded /tmp directory usage (B108)",
+      "component": "file.handling",
+      "details": {
+        "files": [
+          "./agents/mcp/orchestrator.py (line 101)",
+          "./tests/agents/test_orchestrator.py (multiple lines)",
+          "./tests/services/test_rag_service_comprehensive.py (multiple lines)"
+        ],
+        "cwe": "CWE-377",
+        "description": "Hardcoded /tmp can lead to race conditions or permission issues",
+        "count": 9
+      },
+      "action": "continue",
+      "remediation": "Use tempfile.mkdtemp() or tempfile.TemporaryDirectory() for secure temp directories"
+    },
+    {
+      "error_id": "err_bandit_011",
+      "error_type": "PotentialSQLInjection",
+      "severity": "MEDIUM",
+      "message": "Possible SQL injection via string-based query (B608)",
+      "component": "scripts.enhanced_drive_processor",
+      "details": {
+        "file": "./scripts/enhanced_drive_processor.py",
+        "line": 224,
+        "cwe": "CWE-89",
+        "description": "String-based SQL query construction may be vulnerable to injection"
+      },
+      "action": "continue",
+      "remediation": "Use parameterized queries via SQLAlchemy ORM or prepared statements"
+    },
+    {
+      "error_id": "err_bandit_012",
+      "error_type": "InsecureFilePermissions",
+      "severity": "MEDIUM",
+      "message": "Permissive file permissions 0o755 (B103)",
+      "component": "scripts.enhanced_drive_processor",
+      "details": {
+        "file": "./scripts/enhanced_drive_processor.py",
+        "line": 379,
+        "cwe": "CWE-732",
+        "description": "chmod 0o755 allows group/world read access"
+      },
+      "action": "continue",
+      "remediation": "Use restrictive permissions 0o600 or 0o700 for sensitive files/scripts"
+    }
+  ],
+  "summary": {
+    "total": 12,
+    "critical": 1,
+    "high": 4,
+    "medium": 7,
+    "low": 0
+  },
+  "compliance_status": {
+    "truth_protocol_rule_13": "VIOLATED",
+    "violations": [
+      "cryptography package outdated (41.0.7 vs required >=46.0.3)",
+      "setuptools vulnerable to RCE (CVE-2025-47273, CVE-2024-6345)",
+      "SSH host key verification disabled (2 instances)",
+      "Insecure FTP protocol usage",
+      "Weak MD5 hash for security purposes"
+    ]
+  },
+  "owasp_top_10_status": {
+    "A01_broken_access_control": "PASS",
+    "A02_cryptographic_failures": "FAIL - cryptography outdated, MD5 usage",
+    "A03_injection": "WARN - Potential SQL injection vector detected",
+    "A04_insecure_design": "PASS",
+    "A05_security_misconfiguration": "FAIL - SSH, FTP, bind all interfaces",
+    "A06_vulnerable_components": "FAIL - 3 packages with CVEs",
+    "A07_authentication_failures": "PASS - JWT/Argon2id implemented",
+    "A08_software_data_integrity": "WARN - Unpinned ML model downloads",
+    "A09_security_logging_failures": "PASS - Structured logging implemented",
+    "A10_ssrf": "PASS"
+  },
+  "recommendations": [
+    {
+      "priority": "P0_CRITICAL",
+      "action": "Upgrade cryptography to >=46.0.3 immediately",
+      "command": "pip install 'cryptography>=46.0.3,<47.0.0' --upgrade"
+    },
+    {
+      "priority": "P0_CRITICAL",
+      "action": "Upgrade setuptools to >=78.1.1 immediately",
+      "command": "pip install 'setuptools>=78.1.1' --upgrade"
+    },
+    {
+      "priority": "P1_HIGH",
+      "action": "Replace FTP with SFTP in automated_theme_uploader.py"
+    },
+    {
+      "priority": "P1_HIGH",
+      "action": "Implement SSH host key verification in wordpress_server_access.py and automated_theme_uploader.py"
+    },
+    {
+      "priority": "P1_HIGH",
+      "action": "Replace MD5 with SHA-256 in test_utilities_comprehensive.py"
+    },
+    {
+      "priority": "P2_MEDIUM",
+      "action": "Pin Hugging Face model revisions with commit hashes"
+    },
+    {
+      "priority": "P2_MEDIUM",
+      "action": "Add timeout parameter to all requests.* calls"
+    },
+    {
+      "priority": "P2_MEDIUM",
+      "action": "Use tempfile module instead of hardcoded /tmp paths"
+    },
+    {
+      "priority": "P2_MEDIUM",
+      "action": "Review and parameterize SQL queries in enhanced_drive_processor.py"
+    },
+    {
+      "priority": "P3_LOW",
+      "action": "Document server binding to 0.0.0.0 as development-only, use 127.0.0.1 in production"
+    }
+  ],
+  "scan_metadata": {
+    "tools_used": [
+      "pip-audit 2.9.0",
+      "bandit 1.9.1",
+      "detect-secrets 1.5.0"
+    ],
+    "scan_duration_seconds": 120,
+    "files_scanned": 145,
+    "lines_of_code": "~50000"
+  }
+}

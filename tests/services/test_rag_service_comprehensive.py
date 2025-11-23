@@ -14,15 +14,13 @@ Author: DevSkyy Test Team
 Version: 1.0.0
 """
 
-import asyncio
 import hashlib
 import os
 import sys
-from pathlib import Path
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch, mock_open
+from unittest.mock import MagicMock, Mock, mock_open, patch
 
 import pytest
+
 
 # Mock external dependencies before importing the module under test
 sys.modules['anthropic'] = MagicMock()
@@ -36,10 +34,10 @@ sys.modules['tiktoken'] = MagicMock()
 
 # Import modules under test AFTER mocking dependencies
 from services.rag_service import (
-    RAGConfig,
     DocumentProcessor,
-    VectorDatabase,
+    RAGConfig,
     RAGService,
+    VectorDatabase,
     get_rag_service,
 )
 

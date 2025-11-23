@@ -9,17 +9,18 @@ Implements comprehensive middleware stack per Truth Protocol requirements:
 - Error tracking with sanitization (Rule #10: Error Ledger Required)
 """
 
-import time
-import logging
-import json
-import re
-from typing import Callable, Optional
+from collections.abc import Callable
 from datetime import datetime
+import json
+import logging
 from pathlib import Path
+import re
+import time
 
 from fastapi import Request, status
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
+
 
 logger = logging.getLogger(__name__)
 
@@ -408,7 +409,7 @@ def add_enterprise_middleware(app, **kwargs):
     app.add_middleware(BaseHTTPMiddleware, dispatch=SecurityHeadersMiddleware(app).dispatch)
 
     logger.info("✅ Enterprise middleware stack configured:")
-    logger.info(f"   - Security headers: CSP, HSTS, X-Frame-Options, etc.")
+    logger.info("   - Security headers: CSP, HSTS, X-Frame-Options, etc.")
     logger.info(f"   - Rate limiting: {kwargs.get('rate_limit', 100)}/min per IP")
     logger.info(f"   - Performance monitoring: P95 < {kwargs.get('p95_threshold', 200)}ms")
     logger.info(f"   - Request logging: {log_file}")

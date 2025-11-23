@@ -13,7 +13,7 @@ from enum import Enum
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Body, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
@@ -60,10 +60,10 @@ class AddServerRequest(BaseModel):
     transport: TransportType = Field(..., description="Transport type (stdio, http, etc.)")
     url: str | None = Field(default=None, description="Server URL (required for HTTP transport)")
     command: str | None = Field(default=None, description="Command to run (required for stdio transport)")
-    args: Optional[list[str]] = Field(default=None, description="Command arguments (for stdio transport)")
-    env: Optional[dict[str, str]] = Field(default=None, description="Environment variables")
-    headers: Optional[dict[str, str]] = Field(default=None, description="HTTP headers (for HTTP transport)")
-    metadata: Optional[dict[str, Any]] = Field(default=None, description="Server metadata")
+    args: list[str] | None = Field(default=None, description="Command arguments (for stdio transport)")
+    env: dict[str, str] | None = Field(default=None, description="Environment variables")
+    headers: dict[str, str] | None = Field(default=None, description="HTTP headers (for HTTP transport)")
+    metadata: dict[str, Any] | None = Field(default=None, description="Server metadata")
 
 
 class MultiServerConfigRequest(BaseModel):

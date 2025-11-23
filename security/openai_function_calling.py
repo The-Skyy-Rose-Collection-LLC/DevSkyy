@@ -21,7 +21,7 @@ from collections.abc import Callable
 import inspect
 import json
 import logging
-from typing import Any, Optional, get_type_hints
+from typing import Any, get_type_hints
 
 import openai
 
@@ -215,7 +215,7 @@ class OpenAIFunctionCallingClient:
     async def call_function_with_ai(
         self,
         prompt: str,
-        function_names: Optional[list[str]] = None,
+        function_names: list[str] | None = None,
         user_id: str | None = None,
         permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
         max_tokens: int = 1000,

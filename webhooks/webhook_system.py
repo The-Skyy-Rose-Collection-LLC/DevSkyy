@@ -14,7 +14,7 @@ import hashlib
 import hmac
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 import httpx

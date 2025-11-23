@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import logging
 import os
 import time
-from typing import Optional
 
 from cryptography.fernet import Fernet
 from sqlalchemy import event, text

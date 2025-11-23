@@ -16,7 +16,7 @@ from datetime import datetime
 from enum import Enum
 import hashlib
 import json
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 import numpy as np
@@ -58,7 +58,7 @@ class ExactMatchCache:
         hash_digest = hashlib.sha256(normalized.encode()).hexdigest()[:12]
         return f"{self.namespace}:{tool}:{hash_digest}"
 
-    async def get(self, tool: str, params: dict[str, Any]) -> Optional[dict[str, Any]]:
+    async def get(self, tool: str, params: dict[str, Any]) -> dict[str, Any] | None:
         """
         Retrieve cached response if exists.
 
@@ -177,7 +177,7 @@ class SemanticCache:
 
         return float(np.dot(a, b) / (norm_a * norm_b))
 
-    async def get_similar(self, query: str, tool: str) -> Optional[dict[str, Any]]:
+    async def get_similar(self, query: str, tool: str) -> dict[str, Any] | None:
         """
         Find cached response from semantically similar query.
 
@@ -284,7 +284,7 @@ class BatchRequest:
     params: dict[str, Any]
     submitted_at: str
     completed_at: str | None = None
-    result: Optional[dict[str, Any]] = None
+    result: dict[str, Any] | None = None
     error: str | None = None
     status: str = "queued"
 

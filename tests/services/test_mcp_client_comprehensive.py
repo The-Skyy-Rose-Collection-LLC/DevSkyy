@@ -18,13 +18,13 @@ Truth Protocol: Rule #8 (Test Coverage ≥90%), Rule #1 (Never Guess)
 
 import json
 import os
+from pathlib import Path
 import sys
 import tempfile
-from pathlib import Path
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import MagicMock, Mock, patch
 
 import pytest
+
 
 # Mock the anthropic and logfire modules before importing mcp_client
 sys.modules["anthropic"] = MagicMock()

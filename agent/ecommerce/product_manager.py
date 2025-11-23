@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import re
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic
 import numpy as np

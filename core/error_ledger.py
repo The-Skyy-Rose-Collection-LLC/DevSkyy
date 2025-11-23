@@ -22,7 +22,7 @@ import logging
 from pathlib import Path
 import sys
 import traceback
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 
@@ -169,7 +169,7 @@ class ErrorLedger:
         error: Exception,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
         category: ErrorCategory = ErrorCategory.UNKNOWN,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         correlation_id: str | None = None,
         user_id: str | None = None,
         endpoint: str | None = None,

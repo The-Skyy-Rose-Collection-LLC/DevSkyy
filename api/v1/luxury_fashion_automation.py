@@ -38,7 +38,7 @@ Role Requirements by Endpoint Type:
 
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -186,7 +186,7 @@ class CampaignRequest(BaseModel):
     channels: list[str] = Field(default=["email"])
     target_segments: list[str] = Field(default=[])
     enable_testing: bool = Field(default=False)
-    variants: Optional[list[dict[str, Any]]] = Field(default=None)
+    variants: list[dict[str, Any]] | None = Field(default=None)
     budget: float = Field(default=0.0)
     scheduled_start: datetime | None = None
     scheduled_end: datetime | None = None

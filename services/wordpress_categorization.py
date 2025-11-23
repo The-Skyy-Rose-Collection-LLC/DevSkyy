@@ -9,7 +9,7 @@ Truth Protocol: Validated category IDs, explicit error handling, no placeholders
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import anthropic
 from openai import OpenAI
@@ -133,7 +133,7 @@ class WordPressCategorizationService:
         self,
         anthropic_api_key: str | None = None,
         openai_api_key: str | None = None,
-        categories: Optional[list[CategoryMapping]] = None,
+        categories: list[CategoryMapping] | None = None,
         default_category_id: int = 13,
         use_mcp: bool = True,
         mcp_client: MCPToolClient | None = None,

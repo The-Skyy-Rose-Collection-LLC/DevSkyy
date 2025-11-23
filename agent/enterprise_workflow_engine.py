@@ -34,7 +34,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 

@@ -19,7 +19,7 @@ Architecture:
 
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from ml.codex_integration import codex
 
@@ -100,7 +100,7 @@ class CodexOrchestrator:
         self,
         code: str,
         language: str = "python",
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         auto_apply: bool = False,
     ) -> dict[str, Any]:
         """

@@ -10,7 +10,7 @@ Per CLAUDE.md Truth Protocol requirements
 """
 
 import logging
-from unittest.mock import Mock, patch
+
 import pytest
 
 

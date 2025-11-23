@@ -8,8 +8,8 @@ Author: DevSkyy Team
 Per Truth Protocol Rule #8: Test coverage ≥90% required
 """
 
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 
 # Import main module - let it initialize naturally
 import main
@@ -295,8 +295,9 @@ class TestModuleFunctions:
     @pytest.mark.asyncio
     async def test_http_exception_handler(self):
         """Test http_exception_handler function."""
-        from fastapi import HTTPException
         from unittest.mock import MagicMock
+
+        from fastapi import HTTPException
 
         request = MagicMock()
         request.url = "http://test.com/test"
@@ -308,8 +309,9 @@ class TestModuleFunctions:
     @pytest.mark.asyncio
     async def test_validation_exception_handler(self):
         """Test validation_exception_handler function."""
-        from fastapi.exceptions import RequestValidationError
         from unittest.mock import MagicMock
+
+        from fastapi.exceptions import RequestValidationError
 
         request = MagicMock()
         request.url = "http://test.com/test"

@@ -5,7 +5,8 @@ Demonstrates the new ClaudeAgentOptions API for managing settings
 """
 
 import asyncio
-from claude_agent_sdk import query, ClaudeAgentOptions
+
+from claude_agent_sdk import ClaudeAgentOptions, query
 
 
 async def example_default_settings():

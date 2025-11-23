@@ -10,13 +10,11 @@ Applies common code quality improvements per Ruff recommendations:
 - Combines context managers
 """
 
-import os
-import re
 from pathlib import Path
-from typing import List, Tuple
+import re
 
 
-def fix_unused_imports(content: str) -> Tuple[str, list[str]]:
+def fix_unused_imports(content: str) -> tuple[str, list[str]]:
     """Remove common unused imports."""
     changes = []
     lines = content.split('\n')
@@ -34,7 +32,7 @@ def fix_unused_imports(content: str) -> Tuple[str, list[str]]:
     return '\n'.join(fixed_lines), changes
 
 
-def fix_type_hints(content: str) -> Tuple[str, list[str]]:
+def fix_type_hints(content: str) -> tuple[str, list[str]]:
     """Replace typing.Dict/List with built-in dict/list for Python 3.11+."""
     changes = []
 
@@ -79,7 +77,7 @@ def fix_type_hints(content: str) -> Tuple[str, list[str]]:
     return content, changes
 
 
-def fix_equality_checks(content: str) -> Tuple[str, list[str]]:
+def fix_equality_checks(content: str) -> tuple[str, list[str]]:
     """Simplify multiple equality checks using 'in' operator."""
     changes = []
 
@@ -98,7 +96,7 @@ def fix_equality_checks(content: str) -> Tuple[str, list[str]]:
     return content, changes
 
 
-def fix_context_managers(content: str) -> Tuple[str, list[str]]:
+def fix_context_managers(content: str) -> tuple[str, list[str]]:
     """Combine nested context managers."""
     changes = []
 
@@ -108,7 +106,7 @@ def fix_context_managers(content: str) -> Tuple[str, list[str]]:
     return content, changes
 
 
-def fix_ternary_operators(content: str) -> Tuple[str, list[str]]:
+def fix_ternary_operators(content: str) -> tuple[str, list[str]]:
     """Convert simple if/else to ternary operators."""
     changes = []
 
@@ -118,7 +116,7 @@ def fix_ternary_operators(content: str) -> Tuple[str, list[str]]:
     return content, changes
 
 
-def process_file(filepath: Path) -> Tuple[bool, list[str]]:
+def process_file(filepath: Path) -> tuple[bool, list[str]]:
     """Process a single Python file."""
     try:
         content = filepath.read_text(encoding='utf-8')

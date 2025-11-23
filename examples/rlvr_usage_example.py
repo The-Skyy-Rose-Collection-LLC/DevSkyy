@@ -12,15 +12,15 @@ Complete workflow:
 5. Deploy improved agent
 """
 
-import asyncio
-import uuid
 from datetime import datetime
-from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+import uuid
+
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker
 
+from ml.rlvr.fine_tuning_orchestrator import FineTuningOrchestrator
 from ml.rlvr.reward_verifier import RewardVerifier, VerificationMethod
 from ml.rlvr.training_collector import TrainingDataCollector
-from ml.rlvr.fine_tuning_orchestrator import FineTuningOrchestrator
 
 
 # ============================================================================
@@ -179,7 +179,7 @@ async def collect_training_data(session: AsyncSession, agent_id: uuid.UUID):
         days_lookback=30
     )
 
-    print(f"✅ Training data collected:")
+    print("✅ Training data collected:")
     print(f"   - Positive examples: {result['positive_examples']}")
     print(f"   - Negative examples: {result['negative_examples']}")
     print(f"   - Neutral examples: {result['neutral_examples']}")
@@ -201,7 +201,7 @@ async def check_training_readiness(session: AsyncSession, agent_id: uuid.UUID):
 
     stats = await collector.get_collection_stats(agent_id)
 
-    print(f"✅ Training statistics:")
+    print("✅ Training statistics:")
     print(f"   - Total examples: {stats['total_examples']}")
     print(f"   - Ready: {stats['ready_for_training']}")
 
@@ -234,7 +234,7 @@ async def start_fine_tuning(session: AsyncSession, agent_id: uuid.UUID):
         }
     )
 
-    print(f"✅ Fine-tuning started:")
+    print("✅ Fine-tuning started:")
     print(f"   - Provider: {result['provider']}")
     print(f"   - Job ID: {result.get('job_id', 'N/A')}")
     print(f"   - Status: {result.get('status', 'running')}")
@@ -259,7 +259,7 @@ async def deploy_fine_tuned_agent(session: AsyncSession, run_id: uuid.UUID):
         deploy_to_production=True  # Set to False for staging first
     )
 
-    print(f"✅ Agent deployed:")
+    print("✅ Agent deployed:")
     print(f"   - Agent ID: {result['agent_id']}")
     print(f"   - Model ID: {result['model_id']}")
     print(f"   - Deployed at: {result['deployed_at']}")

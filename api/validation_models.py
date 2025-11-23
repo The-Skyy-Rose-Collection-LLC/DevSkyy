@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 import re
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field, validator
 from pydantic.types import confloat, conint, constr
@@ -101,8 +101,8 @@ class EnhancedRegisterRequest(BaseModel):
     username: constr(min_length=3, max_length=50) = Field(..., description="Username (3-50 chars, alphanumeric, _, -)")
     password: constr(min_length=8, max_length=128) = Field(..., description="Password (8-128 chars)")
     role: str = Field(default="api_user", description="User role")
-    full_name: Optional[constr(max_length=100)] = Field(None, description="Full name (max 100 chars)")
-    company: Optional[constr(max_length=100)] = Field(None, description="Company name (max 100 chars)")
+    full_name: constr(max_length=100) | None = Field(None, description="Full name (max 100 chars)")
+    company: constr(max_length=100) | None = Field(None, description="Company name (max 100 chars)")
 
     @validator("password")
     def validate_password_strength(cls, v):
@@ -256,9 +256,9 @@ class ContentGenerationRequest(BaseModel):
 
     prompt: constr(min_length=1, max_length=10000) = Field(..., description="Content generation prompt")
 
-    target_audience: Optional[constr(max_length=200)] = Field(None, description="Target audience description")
+    target_audience: constr(max_length=200) | None = Field(None, description="Target audience description")
 
-    tone: Optional[constr(max_length=50)] = Field(None, description="Content tone")
+    tone: constr(max_length=50) | None = Field(None, description="Content tone")
 
     max_length: conint(ge=1, le=50000) = Field(default=1000, description="Maximum content length")
 
@@ -311,8 +311,8 @@ class EnhancedSuccessResponse(BaseModel):
 
     success: bool = True
     message: str
-    data: Optional[dict[str, Any]] = None
-    metadata: Optional[dict[str, Any]] = None
+    data: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
     timestamp: datetime = Field(default_factory=datetime.now)
     request_id: str | None = None
 
@@ -335,7 +335,7 @@ class GDPRDataRequest(BaseModel):
 
     anonymize_instead_of_delete: bool = Field(default=False, description="Anonymize data instead of deletion")
 
-    reason: Optional[constr(max_length=500)] = Field(None, description="Reason for request (max 500 chars)")
+    reason: constr(max_length=500) | None = Field(None, description="Reason for request (max 500 chars)")
 
     @validator("request_type")
     def validate_request_type(cls, v):

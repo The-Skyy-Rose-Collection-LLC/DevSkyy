@@ -7,16 +7,14 @@ Per Truth Protocol Rule #8: Test coverage ≥90% required
 Per Truth Protocol Rule #1: Never guess - all code verified against FastAPI docs
 """
 
-import asyncio
 from datetime import datetime
 import os
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch, mock_open
+from unittest.mock import MagicMock, patch
 
-import pytest
 from fastapi import HTTPException, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.testclient import TestClient
+import pytest
 
 
 # Skip conftest by setting up environment here
@@ -34,11 +32,10 @@ os.environ.setdefault("REDIS_URL", "redis://localhost:6379")
 def test_client():
     """Create a test client for the FastAPI application."""
     # Mock problematic imports before loading main
-    with patch("main.RedisCache"):
-        with patch("main.ModelRegistry"):
-            import main
-            client = TestClient(main.app)
-            yield client
+    with patch("main.RedisCache"), patch("main.ModelRegistry"):
+        import main
+        client = TestClient(main.app)
+        yield client
 
 
 # ============================================================================
@@ -81,6 +78,7 @@ class TestModuleVariables:
         """Test CORS origins are parsed from environment."""
         with patch.dict(os.environ, {"CORS_ORIGINS": "http://test1.com,http://test2.com"}):
             import importlib
+
             import main as main_module
             importlib.reload(main_module)
             # Verify module reloaded
@@ -90,6 +88,7 @@ class TestModuleVariables:
         """Test trusted hosts are parsed from environment."""
         with patch.dict(os.environ, {"TRUSTED_HOSTS": "test1.com,test2.com"}):
             import importlib
+
             import main as main_module
             importlib.reload(main_module)
             # Verify module reloaded
@@ -576,6 +575,7 @@ class TestConfigurationValidation:
         with patch.dict(os.environ, {"ENVIRONMENT": "development"}, clear=False):
             with patch.dict(os.environ, {"SECRET_KEY": ""}, clear=False):
                 import importlib
+
                 import main as main_module
                 importlib.reload(main_module)
                 # Verify reload happened

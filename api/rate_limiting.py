@@ -1,7 +1,6 @@
 from collections import defaultdict
 import threading
 import time
-from typing import Optional
 
 
 """

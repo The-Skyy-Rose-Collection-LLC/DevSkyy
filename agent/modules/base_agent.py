@@ -23,7 +23,7 @@ from functools import wraps
 import inspect
 import logging
 import traceback
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 

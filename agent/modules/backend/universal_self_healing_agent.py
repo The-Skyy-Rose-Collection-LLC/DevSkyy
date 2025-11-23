@@ -23,7 +23,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import AsyncAnthropic
 import astroid
@@ -127,7 +127,7 @@ class UniversalSelfHealingAgent:
     async def scan_and_heal(
         self,
         codebase_path: str,
-        languages: Optional[list[str]] = None,
+        languages: list[str] | None = None,
         auto_fix: bool = True,
     ) -> dict[str, Any]:
         """
@@ -687,6 +687,6 @@ self_healing_agent = create_self_healing_agent()
 
 
 # Convenience functions
-async def auto_heal_codebase(path: str, languages: Optional[list[str]] = None) -> dict[str, Any]:
+async def auto_heal_codebase(path: str, languages: list[str] | None = None) -> dict[str, Any]:
     """Automatically scan and heal codebase."""
     return await self_healing_agent.scan_and_heal(path, languages)

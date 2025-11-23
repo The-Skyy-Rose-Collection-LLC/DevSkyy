@@ -13,7 +13,7 @@ import logging
 import os
 from pathlib import Path
 import sys
-from typing import Any, Optional
+from typing import Any
 
 # Core FastAPI imports
 from fastapi import FastAPI, HTTPException, Request, Response, status

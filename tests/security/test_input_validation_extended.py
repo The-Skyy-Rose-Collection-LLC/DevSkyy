@@ -14,10 +14,11 @@ OWASP References:
 - CWE Top 25
 """
 
-import pytest
+from unittest.mock import AsyncMock, Mock
+
 from fastapi import HTTPException
-from unittest.mock import AsyncMock, Mock, patch
 from pydantic import ValidationError
+import pytest
 
 from security.input_validation import (
     AlphanumericValidator,

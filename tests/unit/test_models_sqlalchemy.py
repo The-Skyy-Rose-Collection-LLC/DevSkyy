@@ -5,16 +5,15 @@ Coverage target: ≥90% (129/143 lines)
 """
 
 from datetime import datetime
-from unittest.mock import patch
-
-import sys
 from pathlib import Path
+import sys
 
-import pytest
 from pydantic import ValidationError
+import pytest
 from sqlalchemy import create_engine, inspect
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.orm import sessionmaker
+
 
 # Create Base for testing (synchronous for unit tests)
 Base = declarative_base()

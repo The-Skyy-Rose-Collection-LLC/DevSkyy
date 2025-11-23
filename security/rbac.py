@@ -16,7 +16,6 @@ Roles Hierarchy (highest to lowest):
 """
 
 from enum import Enum
-from typing import Set
 
 
 class Role(str, Enum):
@@ -39,7 +38,7 @@ class Role(str, Enum):
 
 
 # Role hierarchy for permission inheritance
-ROLE_HIERARCHY: dict[Role, Set[Role]] = {
+ROLE_HIERARCHY: dict[Role, set[Role]] = {
     Role.SUPER_ADMIN: {Role.SUPER_ADMIN, Role.ADMIN, Role.DEVELOPER, Role.API_USER, Role.READ_ONLY},
     Role.ADMIN: {Role.ADMIN, Role.DEVELOPER, Role.API_USER, Role.READ_ONLY},
     Role.DEVELOPER: {Role.DEVELOPER, Role.API_USER, Role.READ_ONLY},
@@ -49,7 +48,7 @@ ROLE_HIERARCHY: dict[Role, Set[Role]] = {
 
 
 # Permission definitions per role
-ROLE_PERMISSIONS: dict[Role, Set[str]] = {
+ROLE_PERMISSIONS: dict[Role, set[str]] = {
     Role.SUPER_ADMIN: {
         # Full access
         "manage:users",

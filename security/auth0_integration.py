@@ -3,7 +3,7 @@ from functools import lru_cache
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import quote_plus, urlencode
 
 from authlib.integrations.httpx_client import AsyncOAuth2Client
@@ -539,7 +539,7 @@ async def log_auth_event(
     event_type: str,
     user_id: str | None = None,
     request: Request | None = None,
-    details: Optional[dict[str, Any]] = None,
+    details: dict[str, Any] | None = None,
 ):
     """Log authentication events for monitoring."""
     event_data = {

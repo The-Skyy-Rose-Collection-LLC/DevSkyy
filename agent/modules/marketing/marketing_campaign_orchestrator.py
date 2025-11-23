@@ -38,7 +38,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 
@@ -262,7 +262,7 @@ class CampaignAnalytics:
 
     # Recommendations
     optimization_suggestions: list[str] = field(default_factory=list)
-    predicted_performance: Optional[dict[str, float]] = None
+    predicted_performance: dict[str, float] | None = None
 
     # Timestamps
     generated_at: datetime = field(default_factory=datetime.now)

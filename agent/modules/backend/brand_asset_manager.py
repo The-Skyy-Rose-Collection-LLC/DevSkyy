@@ -3,7 +3,7 @@ import json
 import logging
 import mimetypes
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
@@ -127,7 +127,7 @@ class BrandAssetManager:
         """Get all assets in a specific category."""
         return [asset for asset in self.metadata["assets"].values() if asset["category"] == category]
 
-    def get_asset_info(self, asset_id: str) -> Optional[dict[str, Any]]:
+    def get_asset_info(self, asset_id: str) -> dict[str, Any] | None:
         """Get detailed information about a specific asset."""
         return self.metadata["assets"].get(asset_id)
 

@@ -3,7 +3,7 @@ from decimal import Decimal
 from enum import Enum
 import hashlib
 import logging
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 import numpy as np

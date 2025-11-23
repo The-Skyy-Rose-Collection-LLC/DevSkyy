@@ -20,7 +20,7 @@ import hashlib
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
@@ -120,7 +120,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
     async def advanced_reasoning(
         self,
         task: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         max_tokens: int = 4096,
         use_cache: bool = True,
     ) -> dict[str, Any]:
@@ -312,7 +312,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     # === Helper Methods ===
 
-    def _check_cache(self, key: str, context: dict | None = None) -> Optional[dict[str, Any]]:
+    def _check_cache(self, key: str, context: dict | None = None) -> dict[str, Any] | None:
         """Check if we have a cached response"""
         cache_key = self._generate_cache_key(key, context)
 

@@ -5,19 +5,20 @@ Provides comprehensive middleware stack per Truth Protocol standards.
 """
 
 from .enterprise_middleware import (
-    SecurityHeadersMiddleware,
+    PerformanceMonitoringMiddleware,
     RateLimitMiddleware,
     RequestLoggingMiddleware,
-    PerformanceMonitoringMiddleware,
+    SecurityHeadersMiddleware,
     add_enterprise_middleware,
     redact_sensitive_data,
 )
 
+
 __all__ = [
-    "SecurityHeadersMiddleware",
+    "PerformanceMonitoringMiddleware",
     "RateLimitMiddleware",
     "RequestLoggingMiddleware",
-    "PerformanceMonitoringMiddleware",
+    "SecurityHeadersMiddleware",
     "add_enterprise_middleware",
     "redact_sensitive_data",
 ]

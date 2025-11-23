@@ -25,15 +25,13 @@ Features:
 """
 
 import asyncio
-import hashlib
-import json
-import logging
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import datetime
-from enum import Enum
-from typing import Any, Callable, Optional
+import json
+import logging
+from typing import Any
 
-import numpy as np
 from pydantic import BaseModel, Field
 
 from security.tool_calling_safeguards import (
@@ -41,10 +39,9 @@ from security.tool_calling_safeguards import (
     ToolCallRequest,
     ToolCallResponse,
     ToolPermissionLevel,
-    ToolProvider,
-    ToolRiskLevel,
     get_tool_safeguard_manager,
 )
+
 
 logger = logging.getLogger(__name__)
 
@@ -158,7 +155,7 @@ class DynamicToolSelector:
     def select_tools(
         self,
         context: ToolSelectionContext,
-        available_tools: Optional[list[str]] = None
+        available_tools: list[str] | None = None
     ) -> list[str]:
         """
         Dynamically select most relevant tools based on context.
@@ -286,7 +283,7 @@ class DynamicToolSelector:
         success: bool,
         execution_time_ms: float,
         tokens_used: int,
-        context_keywords: Optional[set[str]] = None
+        context_keywords: set[str] | None = None
     ):
         """Update tool performance metrics for learning"""
         if tool_name not in self.tool_patterns:
@@ -423,8 +420,8 @@ class ParallelFunctionCaller:
         permission_level: ToolPermissionLevel
     ) -> ToolCallResponse:
         """Execute a single function with safeguards"""
-        import time
         import inspect
+        import time
 
         start_time = time.time()
 
@@ -519,7 +516,7 @@ class StructuredOutputValidator:
             return True, None
 
         except Exception as e:
-            return False, f"Validation error: {str(e)}"
+            return False, f"Validation error: {e!s}"
 
     def create_output_constraint(
         self,
@@ -581,7 +578,7 @@ class TokenOptimizationManager:
         self,
         context: ToolSelectionContext,
         available_tools: list[str],
-        function_calls: Optional[list[dict[str, Any]]] = None,
+        function_calls: list[dict[str, Any]] | None = None,
         available_functions: dict | None = None,
         user_id: str | None = None
     ) -> dict[str, Any]:
@@ -666,11 +663,11 @@ def get_optimization_manager() -> TokenOptimizationManager:
 
 __all__ = [
     "CompressedToolSchema",
-    "ToolUsagePattern",
-    "ToolSelectionContext",
     "DynamicToolSelector",
     "ParallelFunctionCaller",
     "StructuredOutputValidator",
     "TokenOptimizationManager",
+    "ToolSelectionContext",
+    "ToolUsagePattern",
     "get_optimization_manager",
 ]

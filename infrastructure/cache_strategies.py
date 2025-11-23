@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from infrastructure.redis_manager import redis_manager
 

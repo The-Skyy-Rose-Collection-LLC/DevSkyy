@@ -4,7 +4,7 @@ Database models using SQLAlchemy ORM
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String, Text
@@ -196,8 +196,8 @@ class ProductRequest(BaseModel):
     category: str | None = None
     sku: str | None = None
     stock_quantity: int | None = 0
-    tags: Optional[list[str]] = []
-    images: Optional[list[str]] = []
+    tags: list[str] | None = []
+    images: list[str] | None = []
 
 
 class PaymentRequest(BaseModel):
@@ -209,4 +209,4 @@ class PaymentRequest(BaseModel):
     customer_id: str | None = None
     order_id: str | None = None
     description: str | None = None
-    metadata: Optional[dict[str, Any]] = {}
+    metadata: dict[str, Any] | None = {}

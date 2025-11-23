@@ -13,7 +13,7 @@ Features:
 
 from datetime import datetime, timedelta
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
 import numpy as np
@@ -40,7 +40,7 @@ class CustomerIntelligence:
         self.ltv_model = None
 
     async def segment_customers(
-        self, customer_data: Optional[list[dict]] = None, n_segments: int = 5
+        self, customer_data: list[dict] | None = None, n_segments: int = 5
     ) -> dict[str, Any]:
         """
         Segment customers using ML clustering

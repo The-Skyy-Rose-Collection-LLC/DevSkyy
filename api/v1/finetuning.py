@@ -21,19 +21,18 @@ Endpoints:
 - GET /api/v1/finetuning/tools/statistics - Get optimization stats
 """
 
-import logging
 from datetime import datetime
-from typing import Any, Optional
+import logging
+from typing import Any
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from core.dependencies import get_current_user, require_role
 from ml.agent_finetuning_system import (
     AgentCategory,
-    FinetuningProvider,
     FinetuningConfig,
-    FinetuningJob,
+    FinetuningProvider,
     get_finetuning_system,
 )
 from ml.tool_optimization import (
@@ -41,6 +40,7 @@ from ml.tool_optimization import (
     get_optimization_manager,
 )
 from security.rbac import Role
+
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ class PerformanceSnapshotRequest(BaseModel):
     execution_time_ms: float = Field(gt=0)
     tokens_used: int = Field(default=0, ge=0)
     user_feedback: float | None = Field(default=None, ge=0.0, le=1.0)
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 class PrepareDatasetRequest(BaseModel):
@@ -130,7 +130,7 @@ class ToolSelectionRequest(BaseModel):
     max_tools: int = Field(default=10, ge=1, le=50)
     prefer_fast: bool = False
     prefer_cheap: bool = False
-    available_tools: Optional[list[str]] = None
+    available_tools: list[str] | None = None
 
 
 class ToolSelectionResponse(BaseModel):
@@ -204,7 +204,7 @@ async def collect_performance_snapshot(
         logger.error(f"Failed to collect snapshot: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to collect snapshot: {str(e)}"
+            detail=f"Failed to collect snapshot: {e!s}"
         )
 
 
@@ -255,7 +255,7 @@ async def prepare_dataset(
         logger.error(f"Failed to prepare dataset: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to prepare dataset: {str(e)}"
+            detail=f"Failed to prepare dataset: {e!s}"
         )
 
 
@@ -328,7 +328,7 @@ async def create_finetuning_job(
         logger.error(f"Failed to create finetuning job: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create job: {str(e)}"
+            detail=f"Failed to create job: {e!s}"
         )
 
 
@@ -467,7 +467,7 @@ async def optimize_tool_selection(
         logger.error(f"Failed to optimize tool selection: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to optimize: {str(e)}"
+            detail=f"Failed to optimize: {e!s}"
         )
 
 
@@ -515,7 +515,7 @@ async def execute_parallel_calls(
         logger.error(f"Failed to execute parallel calls: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to execute: {str(e)}"
+            detail=f"Failed to execute: {e!s}"
         )
 
 

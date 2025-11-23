@@ -16,7 +16,6 @@ import os
 from pathlib import Path
 import re
 import sys
-from typing import Optional
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 

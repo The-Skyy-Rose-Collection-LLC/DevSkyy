@@ -25,7 +25,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import aiofiles
 from anthropic import AsyncAnthropic
@@ -322,7 +322,7 @@ class ContinuousLearningBackgroundAgent:
         logger.info(f"Found {len(updates)} framework updates")
         return updates
 
-    async def _check_npm_update(self, package_name: str, client: httpx.AsyncClient) -> Optional[dict[str, Any]]:
+    async def _check_npm_update(self, package_name: str, client: httpx.AsyncClient) -> dict[str, Any] | None:
         """
         Check for npm package updates.
         """
@@ -345,7 +345,7 @@ class ContinuousLearningBackgroundAgent:
 
         return None
 
-    async def _check_pip_update(self, package_name: str, client: httpx.AsyncClient) -> Optional[dict[str, Any]]:
+    async def _check_pip_update(self, package_name: str, client: httpx.AsyncClient) -> dict[str, Any] | None:
         """
         Check for pip package updates.
         """
@@ -368,7 +368,7 @@ class ContinuousLearningBackgroundAgent:
 
         return None
 
-    async def _check_github_releases(self, repo: str, client: httpx.AsyncClient) -> Optional[dict[str, Any]]:
+    async def _check_github_releases(self, repo: str, client: httpx.AsyncClient) -> dict[str, Any] | None:
         """
         Check for new GitHub releases.
         """
@@ -417,7 +417,7 @@ class ContinuousLearningBackgroundAgent:
 
         return learnings
 
-    async def _extract_doc_insights(self, technology: str, doc_content: str) -> Optional[dict[str, Any]]:
+    async def _extract_doc_insights(self, technology: str, doc_content: str) -> dict[str, Any] | None:
         """
         Use AI to extract insights from documentation.
         """

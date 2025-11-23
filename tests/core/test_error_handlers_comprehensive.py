@@ -9,9 +9,9 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol requirements
 """
 
-import pytest
+
 from fastapi import HTTPException
-from unittest.mock import Mock, patch
+import pytest
 
 
 # ============================================================================

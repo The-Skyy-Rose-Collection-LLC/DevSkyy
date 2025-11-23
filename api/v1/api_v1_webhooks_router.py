@@ -9,7 +9,7 @@ Date: October 26, 2025
 
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jwt_auth import get_current_user
@@ -32,7 +32,7 @@ class WebhookSubscribeRequest(BaseModel):
     endpoint: HttpUrl
     events: list[str]
     secret: str | None = None
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
 
 class WebhookSubscribeResponse(BaseModel):

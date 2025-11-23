@@ -6,7 +6,7 @@ from enum import Enum
 import hashlib
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from httpx import AsyncClient
 
@@ -590,7 +590,7 @@ class NotificationManager:
 
         self.metrics["last_updated"] = datetime.now()
 
-    async def get_message_status(self, message_id: str) -> Optional[dict[str, Any]]:
+    async def get_message_status(self, message_id: str) -> dict[str, Any] | None:
         """Get notification message status"""
 
         # Check all message stores

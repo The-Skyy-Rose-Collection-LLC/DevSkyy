@@ -42,7 +42,7 @@ import logging
 import os
 from pathlib import Path
 import re
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from fastapi import HTTPException

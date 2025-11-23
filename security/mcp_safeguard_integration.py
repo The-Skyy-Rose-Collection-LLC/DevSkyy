@@ -18,7 +18,7 @@ Features:
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from config.unified_config import get_config
 from security.tool_calling_safeguards import (

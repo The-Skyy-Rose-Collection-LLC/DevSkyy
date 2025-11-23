@@ -20,13 +20,15 @@ Usage:
         ...
 """
 
+from collections.abc import Callable
 import logging
-from typing import Callable
 
 from fastapi import Depends, HTTPException, status
 
-from security.jwt_auth import get_current_user as jwt_get_current_user, TokenData
-from security.rbac import Role, is_role_higher_or_equal, has_permission
+from security.jwt_auth import TokenData
+from security.jwt_auth import get_current_user as jwt_get_current_user
+from security.rbac import Role, has_permission, is_role_higher_or_equal
+
 
 logger = logging.getLogger(__name__)
 

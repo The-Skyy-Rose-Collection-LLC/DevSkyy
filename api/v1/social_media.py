@@ -11,7 +11,7 @@ Truth Protocol: Input validation, error handling, RBAC, no placeholders
 from datetime import datetime
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 
@@ -135,8 +135,9 @@ async def create_social_post(
             )
 
         # Save to database
-        from database import get_db
         from models.new_business_domains import SocialPost
+
+        from database import get_db
 
         db = next(get_db())
         social_post = SocialPost(
@@ -200,8 +201,9 @@ async def get_social_post(
     **Rate Limit:** 300 requests/hour
     """
     try:
-        from database import get_db
         from models.new_business_domains import SocialPost
+
+        from database import get_db
 
         db = next(get_db())
         post = db.query(SocialPost).filter(SocialPost.post_id == post_id).first()
@@ -309,7 +311,7 @@ async def schedule_social_posts(
 async def get_social_analytics(
     date_from: datetime,
     date_to: datetime,
-    platforms: Optional[list[str]] = None,
+    platforms: list[str] | None = None,
     current_user: User = Depends(jwt_manager.get_current_user),
 ):
     """
@@ -319,8 +321,9 @@ async def get_social_analytics(
     **Rate Limit:** 200 requests/hour
     """
     try:
-        from database import get_db
         from models.new_business_domains import SocialPost
+
+        from database import get_db
 
         db = next(get_db())
 
@@ -421,8 +424,9 @@ async def connect_social_platform(
             raise HTTPException(status_code=400, detail=f"Failed to connect to {platform}: {connection_test['error']}")
 
         # Save connection
-        from database import get_db
         from models.new_business_domains import SocialPlatformConnection
+
+        from database import get_db
 
         db = next(get_db())
         connection = SocialPlatformConnection(
@@ -476,9 +480,9 @@ def _get_platform_max_length(platform: str) -> int:
 async def _publish_to_platform(
     platform: str,
     content: str,
-    media_urls: Optional[list[str]],
-    hashtags: Optional[list[str]],
-    mentions: Optional[list[str]],
+    media_urls: list[str] | None,
+    hashtags: list[str] | None,
+    mentions: list[str] | None,
     location: str | None,
     user_id: int,
 ) -> dict[str, Any]:

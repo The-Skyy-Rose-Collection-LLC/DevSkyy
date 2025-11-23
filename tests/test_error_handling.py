@@ -11,7 +11,7 @@ Per CLAUDE.md Truth Protocol requirements (Rule #8, Rule #10)
 
 import asyncio
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, patch
+
 import pytest
 
 # Import error_handling module

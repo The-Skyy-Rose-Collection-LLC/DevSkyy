@@ -17,7 +17,7 @@ from collections.abc import Callable
 from datetime import datetime
 from functools import wraps
 import os
-from typing import Any, Optional
+from typing import Any
 
 from agentlightning import (
     AgentOpsTracer,
@@ -92,7 +92,7 @@ class DevSkyyLightning:
         self.otel_tracer = OtelTracer()
 
     def trace_agent_operation(
-        self, operation_name: str, agent_id: str | None = None, metadata: Optional[dict[str, Any]] = None
+        self, operation_name: str, agent_id: str | None = None, metadata: dict[str, Any] | None = None
     ):
         """
         Decorator to trace agent operations
@@ -170,7 +170,7 @@ class DevSkyyLightning:
 
         return decorator
 
-    def trace_llm_call(self, model: str, provider: str | None = None, metadata: Optional[dict[str, Any]] = None):
+    def trace_llm_call(self, model: str, provider: str | None = None, metadata: dict[str, Any] | None = None):
         """
         Decorator to trace LLM API calls
 

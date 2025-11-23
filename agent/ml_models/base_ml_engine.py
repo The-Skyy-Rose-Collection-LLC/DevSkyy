@@ -6,7 +6,7 @@ Foundational machine learning capabilities for all agents
 from abc import ABC, abstractmethod
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 from sklearn.model_selection import train_test_split
@@ -113,7 +113,7 @@ class BaseMLEngine(ABC):
             logger.error(f"Model evaluation failed: {e}")
             return {"error": str(e)}
 
-    async def get_feature_importance(self) -> Optional[dict[str, float]]:
+    async def get_feature_importance(self) -> dict[str, float] | None:
         """Get feature importance scores if model supports it"""
         try:
             if hasattr(self.model, "feature_importances_"):

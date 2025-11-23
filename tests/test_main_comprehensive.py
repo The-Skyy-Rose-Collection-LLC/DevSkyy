@@ -7,15 +7,12 @@ Per Truth Protocol Rule #8: Test coverage ≥90% required
 """
 
 import asyncio
-from datetime import datetime
-import os
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import HTTPException, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.testclient import TestClient
+import pytest
 
 
 # ============================================================================
@@ -145,6 +142,7 @@ class TestApplicationInitialization:
 
         # Reimport main to pick up production environment
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 
@@ -232,21 +230,20 @@ class TestAgentFactory:
         # Clear cache first
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.SecurityAgent") as mock_security_agent:
-                mock_instance = MagicMock()
-                mock_security_agent.return_value = mock_instance
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.SecurityAgent") as mock_security_agent:
+            mock_instance = MagicMock()
+            mock_security_agent.return_value = mock_instance
 
-                # First call creates agent
-                agent1 = main.get_agent("backend", "security")
-                assert agent1 == mock_instance
-                assert mock_security_agent.called
+            # First call creates agent
+            agent1 = main.get_agent("backend", "security")
+            assert agent1 == mock_instance
+            assert mock_security_agent.called
 
-                # Second call uses cache
-                mock_security_agent.reset_mock()
-                agent2 = main.get_agent("backend", "security")
-                assert agent2 == mock_instance
-                assert not mock_security_agent.called
+            # Second call uses cache
+            mock_security_agent.reset_mock()
+            agent2 = main.get_agent("backend", "security")
+            assert agent2 == mock_instance
+            assert not mock_security_agent.called
 
     def test_get_agent_backend_security(self):
         """Test creating backend security agent."""
@@ -254,13 +251,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.SecurityAgent") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.SecurityAgent") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("backend", "security")
-                assert agent == mock_instance
+            agent = main.get_agent("backend", "security")
+            assert agent == mock_instance
 
     def test_get_agent_backend_financial(self):
         """Test creating backend financial agent."""
@@ -268,13 +264,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.FinancialAgent") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.FinancialAgent") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("backend", "financial")
-                assert agent == mock_instance
+            agent = main.get_agent("backend", "financial")
+            assert agent == mock_instance
 
     def test_get_agent_backend_ecommerce(self):
         """Test creating backend ecommerce agent."""
@@ -282,13 +277,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.EcommerceAgent") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.EcommerceAgent") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("backend", "ecommerce")
-                assert agent == mock_instance
+            agent = main.get_agent("backend", "ecommerce")
+            assert agent == mock_instance
 
     def test_get_agent_frontend_design(self):
         """Test creating frontend design agent."""
@@ -296,13 +290,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.DesignAutomationAgent") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.DesignAutomationAgent") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("frontend", "design")
-                assert agent == mock_instance
+            agent = main.get_agent("frontend", "design")
+            assert agent == mock_instance
 
     def test_get_agent_frontend_web_development(self):
         """Test creating frontend web development agent."""
@@ -310,13 +303,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.WebDevelopmentAgent") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.WebDevelopmentAgent") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("frontend", "web_development")
-                assert agent == mock_instance
+            agent = main.get_agent("frontend", "web_development")
+            assert agent == mock_instance
 
     def test_get_agent_frontend_fashion_cv(self):
         """Test creating frontend fashion CV agent."""
@@ -366,13 +358,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AI_SERVICES_AVAILABLE", True):
-            with patch("main.OpenAIIntelligenceService") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AI_SERVICES_AVAILABLE", True), patch("main.OpenAIIntelligenceService") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("intelligence", "openai")
-                assert agent == mock_instance
+            agent = main.get_agent("intelligence", "openai")
+            assert agent == mock_instance
 
     def test_get_agent_intelligence_multi_model(self):
         """Test creating intelligence multi-model agent."""
@@ -380,13 +371,12 @@ class TestAgentFactory:
 
         main._agent_cache.clear()
 
-        with patch("main.AI_SERVICES_AVAILABLE", True):
-            with patch("main.MultiModelOrchestrator") as mock_agent:
-                mock_instance = MagicMock()
-                mock_agent.return_value = mock_instance
+        with patch("main.AI_SERVICES_AVAILABLE", True), patch("main.MultiModelOrchestrator") as mock_agent:
+            mock_instance = MagicMock()
+            mock_agent.return_value = mock_instance
 
-                agent = main.get_agent("intelligence", "multi_model")
-                assert agent == mock_instance
+            agent = main.get_agent("intelligence", "multi_model")
+            assert agent == mock_instance
 
     def test_get_agent_unknown_backend(self):
         """Test creating agent with unknown backend type."""
@@ -470,13 +460,12 @@ class TestStartupShutdown:
         """Test that startup event initializes webhook system."""
         import main
 
-        with patch("main.WEBHOOK_SYSTEM_AVAILABLE", True):
-            with patch("main.WebhookManager") as mock_webhook:
-                mock_webhook.return_value = MagicMock()
+        with patch("main.WEBHOOK_SYSTEM_AVAILABLE", True), patch("main.WebhookManager") as mock_webhook:
+            mock_webhook.return_value = MagicMock()
 
-                await main.startup_event()
+            await main.startup_event()
 
-                assert mock_webhook.called
+            assert mock_webhook.called
 
     @pytest.mark.asyncio
     async def test_startup_event_initializes_ml_cache(self):
@@ -495,16 +484,15 @@ class TestStartupShutdown:
         """Test that startup event initializes agent systems."""
         import main
 
-        with patch("main.CORE_MODULES_AVAILABLE", True):
-            with patch("main.AgentRegistry") as mock_registry:
-                with patch("main.AgentOrchestrator") as mock_orchestrator:
-                    mock_registry.return_value = MagicMock()
-                    mock_orchestrator.return_value = MagicMock()
+        with patch("main.CORE_MODULES_AVAILABLE", True), patch("main.AgentRegistry") as mock_registry:
+            with patch("main.AgentOrchestrator") as mock_orchestrator:
+                mock_registry.return_value = MagicMock()
+                mock_orchestrator.return_value = MagicMock()
 
-                    await main.startup_event()
+                await main.startup_event()
 
-                    assert mock_registry.called
-                    assert mock_orchestrator.called
+                assert mock_registry.called
+                assert mock_orchestrator.called
 
     @pytest.mark.asyncio
     async def test_startup_event_initializes_model_registry(self):
@@ -664,17 +652,16 @@ class TestAgentEndpoints:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.SecurityAgent") as mock_agent:
-                mock_agent.return_value = MagicMock()
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.SecurityAgent") as mock_agent:
+            mock_agent.return_value = MagicMock()
 
-                response = client.get("/api/v1/agents/backend/security")
-                assert response.status_code == 200
+            response = client.get("/api/v1/agents/backend/security")
+            assert response.status_code == 200
 
-                data = response.json()
-                assert data["agent_type"] == "backend"
-                assert data["agent_name"] == "security"
-                assert data["status"] == "active"
+            data = response.json()
+            assert data["agent_type"] == "backend"
+            assert data["agent_name"] == "security"
+            assert data["status"] == "active"
 
     def test_get_agent_endpoint_not_found(self, client):
         """Test GET agent endpoint with invalid agent."""
@@ -691,18 +678,17 @@ class TestAgentEndpoints:
 
         main._agent_cache.clear()
 
-        with patch("main.AGENT_MODULES_AVAILABLE", True):
-            with patch("main.SecurityAgent") as mock_agent:
-                mock_agent.return_value = MagicMock()
+        with patch("main.AGENT_MODULES_AVAILABLE", True), patch("main.SecurityAgent") as mock_agent:
+            mock_agent.return_value = MagicMock()
 
-                task_data = {"task": "test_task", "data": {"key": "value"}}
-                response = client.post("/api/v1/agents/backend/security/execute", json=task_data)
+            task_data = {"task": "test_task", "data": {"key": "value"}}
+            response = client.post("/api/v1/agents/backend/security/execute", json=task_data)
 
-                assert response.status_code == 200
-                data = response.json()
-                assert data["agent_type"] == "backend"
-                assert data["agent_name"] == "security"
-                assert data["status"] == "completed"
+            assert response.status_code == 200
+            data = response.json()
+            assert data["agent_type"] == "backend"
+            assert data["agent_name"] == "security"
+            assert data["status"] == "completed"
 
     def test_execute_agent_task_endpoint_not_found(self, client):
         """Test execute agent task endpoint with invalid agent."""
@@ -720,16 +706,15 @@ class TestAgentEndpoints:
 
         main._agent_cache.clear()
 
-        with patch("main.PROMETHEUS_AVAILABLE", True):
-            with patch("main.AI_PREDICTIONS") as mock_metric:
-                with patch("main.AGENT_MODULES_AVAILABLE", True):
-                    with patch("main.SecurityAgent") as mock_agent:
-                        mock_agent.return_value = MagicMock()
+        with patch("main.PROMETHEUS_AVAILABLE", True), patch("main.AI_PREDICTIONS") as mock_metric:
+            with patch("main.AGENT_MODULES_AVAILABLE", True):
+                with patch("main.SecurityAgent") as mock_agent:
+                    mock_agent.return_value = MagicMock()
 
-                        task_data = {"task": "test_task"}
-                        response = client.post("/api/v1/agents/backend/security/execute", json=task_data)
+                    task_data = {"task": "test_task"}
+                    response = client.post("/api/v1/agents/backend/security/execute", json=task_data)
 
-                        assert response.status_code == 200
+                    assert response.status_code == 200
 
 
 # ============================================================================
@@ -742,14 +727,12 @@ class TestMetricsEndpoint:
 
     def test_metrics_endpoint_when_prometheus_available(self, client):
         """Test metrics endpoint when Prometheus is available."""
-        import main
 
-        with patch("main.PROMETHEUS_AVAILABLE", True):
-            with patch("main.generate_latest") as mock_generate:
-                mock_generate.return_value = b"# HELP test_metric Test metric\n"
+        with patch("main.PROMETHEUS_AVAILABLE", True), patch("main.generate_latest") as mock_generate:
+            mock_generate.return_value = b"# HELP test_metric Test metric\n"
 
-                response = client.get("/metrics")
-                assert response.status_code == 200
+            response = client.get("/metrics")
+            assert response.status_code == 200
 
     def test_get_prometheus_metrics_endpoint_with_collector(self, client):
         """Test get_prometheus_metrics endpoint with metrics collector."""
@@ -894,6 +877,7 @@ class TestDevelopmentEndpoints:
         monkeypatch.setenv("ENVIRONMENT", "development")
 
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 
@@ -911,6 +895,7 @@ class TestDevelopmentEndpoints:
         monkeypatch.setenv("ENVIRONMENT", "development")
 
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 
@@ -942,6 +927,7 @@ class TestStaticFilesMounting:
         static_dir.mkdir()
 
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 
@@ -964,6 +950,7 @@ class TestSecretKeyValidation:
 
         with pytest.raises(ValueError, match="SECRET_KEY environment variable must be set"):
             import importlib
+
             import main as main_module
             importlib.reload(main_module)
 
@@ -973,6 +960,7 @@ class TestSecretKeyValidation:
         monkeypatch.delenv("SECRET_KEY", raising=False)
 
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 
@@ -993,6 +981,7 @@ class TestCORSAndMiddleware:
         monkeypatch.setenv("CORS_ORIGINS", "http://example.com,http://test.com")
 
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 
@@ -1004,6 +993,7 @@ class TestCORSAndMiddleware:
         monkeypatch.setenv("TRUSTED_HOSTS", "example.com,test.com")
 
         import importlib
+
         import main as main_module
         importlib.reload(main_module)
 

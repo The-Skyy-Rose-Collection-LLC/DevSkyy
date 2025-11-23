@@ -17,9 +17,9 @@ Usage:
 import asyncio
 import logging
 import os
-import sys
-from datetime import datetime
 from pathlib import Path
+import sys
+
 
 # Add project root to path
 project_root = Path(__file__).parent.parent.parent
@@ -27,16 +27,9 @@ sys.path.insert(0, str(project_root))
 
 from dotenv import load_dotenv
 
-from ml.agent_deployment_system import (
-    ToolRequirement,
-    ResourceRequirement,
-    ResourceType,
-    get_deployment_orchestrator
-)
-from config.wordpress_credentials import (
-    get_skyy_rose_credentials,
-    validate_environment_setup
-)
+from config.wordpress_credentials import validate_environment_setup
+from ml.agent_deployment_system import ResourceType, get_deployment_orchestrator
+
 
 # Load environment variables
 load_dotenv()
@@ -323,7 +316,7 @@ class WordPressInfrastructureSetup:
         has_woocommerce = bool(os.getenv("SKYY_ROSE_APP_PASSWORD"))
         self.validator.register_api_key("wordpress_woocommerce", has_woocommerce)
 
-        logger.info(f"\n📊 API Key Status:")
+        logger.info("\n📊 API Key Status:")
         logger.info(f"   WordPress OAuth: {'✅' if has_oauth else '❌'}")
         logger.info(f"   WordPress Basic Auth: {'✅' if has_basic else '❌'}")
         logger.info(f"   WooCommerce: {'✅' if has_woocommerce else '❌'}")
@@ -445,7 +438,7 @@ class WordPressInfrastructureSetup:
 
         readiness_score = available_tool_count / max(total_tools, 1)
 
-        logger.info(f"📊 Infrastructure Readiness Report:")
+        logger.info("📊 Infrastructure Readiness Report:")
         logger.info(f"   Total WordPress Tools: {total_tools}")
         logger.info(f"   Available Tools: {available_tool_count}")
         logger.info(f"   Resources: {len(available_resources)}")
@@ -453,11 +446,11 @@ class WordPressInfrastructureSetup:
         logger.info(f"   Readiness Score: {readiness_score:.1%}")
 
         if readiness_score >= 0.8:
-            logger.info(f"\n✅ WordPress infrastructure is READY for deployment!")
+            logger.info("\n✅ WordPress infrastructure is READY for deployment!")
         elif readiness_score >= 0.5:
-            logger.info(f"\n⚠️  WordPress infrastructure is PARTIALLY ready")
+            logger.info("\n⚠️  WordPress infrastructure is PARTIALLY ready")
         else:
-            logger.info(f"\n❌ WordPress infrastructure needs configuration")
+            logger.info("\n❌ WordPress infrastructure needs configuration")
 
         return readiness_score
 

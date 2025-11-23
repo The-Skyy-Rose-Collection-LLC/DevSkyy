@@ -11,17 +11,18 @@ Implements one key upgrade per agent category, all verified through multiple sou
 Each upgrade is tracked through RLVR system for continuous improvement.
 """
 
-import uuid
-import asyncio
-import logging
-from typing import Dict, Any, List, Optional
 from datetime import datetime
 from decimal import Decimal
+import logging
+from typing import Any
+import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from ml.rlvr.fine_tuning_orchestrator import FineTuningOrchestrator
 from ml.rlvr.reward_verifier import RewardVerifier, VerificationMethod
 from ml.rlvr.training_collector import TrainingDataCollector
-from ml.rlvr.fine_tuning_orchestrator import FineTuningOrchestrator
+
 
 logger = logging.getLogger(__name__)
 
@@ -48,7 +49,7 @@ class AgentUpgradeSystem:
         self.orchestrator = FineTuningOrchestrator(session)
 
         # Track upgrade deployments
-        self.active_upgrades: Dict[str, Dict[str, Any]] = {}
+        self.active_upgrades: dict[str, dict[str, Any]] = {}
 
         # Define upgrades per agent category
         self.upgrade_catalog = {
@@ -139,7 +140,7 @@ class AgentUpgradeSystem:
         agent_type: str,
         user_id: uuid.UUID,
         enable_ab_test: bool = True
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Deploy an upgrade to a specific agent with RLVR tracking.
 
@@ -206,7 +207,7 @@ class AgentUpgradeSystem:
         upgrade_id: uuid.UUID,
         verification_method: VerificationMethod,
         **verification_data
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Submit verification data for an upgrade.
 
@@ -283,7 +284,7 @@ class AgentUpgradeSystem:
             "all_verifications_complete": False
         }
 
-    async def get_upgrade_status(self, upgrade_id: uuid.UUID) -> Dict[str, Any]:
+    async def get_upgrade_status(self, upgrade_id: uuid.UUID) -> dict[str, Any]:
         """Get current status of an upgrade deployment."""
         upgrade_key = str(upgrade_id)
 
@@ -316,7 +317,7 @@ class AgentUpgradeSystem:
             "progress": self._calculate_progress(upgrade_info)
         }
 
-    async def deploy_all_upgrades(self, user_id: uuid.UUID) -> Dict[str, Any]:
+    async def deploy_all_upgrades(self, user_id: uuid.UUID) -> dict[str, Any]:
         """
         Deploy all upgrades across all agent categories.
 
@@ -362,7 +363,7 @@ class AgentUpgradeSystem:
 
         return results
 
-    async def get_all_upgrades_status(self) -> Dict[str, Any]:
+    async def get_all_upgrades_status(self) -> dict[str, Any]:
         """Get status of all active upgrades."""
         statuses = []
 
@@ -389,7 +390,7 @@ class AgentUpgradeSystem:
 
     # Private helper methods
 
-    async def _store_deployment(self, deployment_record: Dict[str, Any]):
+    async def _store_deployment(self, deployment_record: dict[str, Any]):
         """Store deployment record in database."""
         query = """
             INSERT INTO agent_upgrades (
@@ -486,7 +487,7 @@ class AgentUpgradeSystem:
         self,
         agent_id: uuid.UUID,
         upgrade_id: uuid.UUID,
-        verification_data: Dict[str, Any]
+        verification_data: dict[str, Any]
     ) -> uuid.UUID:
         """Create synthetic execution record for upgrade."""
         execution_id = uuid.uuid4()
@@ -517,7 +518,7 @@ class AgentUpgradeSystem:
 
         return execution_id
 
-    async def _get_verification_scores(self, execution_id: uuid.UUID) -> Dict[str, float]:
+    async def _get_verification_scores(self, execution_id: uuid.UUID) -> dict[str, float]:
         """Get all verification scores for an execution."""
         query = """
             SELECT verification_method, reward_score
@@ -528,7 +529,7 @@ class AgentUpgradeSystem:
         result = await self.session.execute(query, {"execution_id": execution_id})
         return {row[0]: float(row[1]) for row in result.fetchall()}
 
-    def _calculate_progress(self, upgrade_info: Dict[str, Any]) -> float:
+    def _calculate_progress(self, upgrade_info: dict[str, Any]) -> float:
         """Calculate deployment progress percentage."""
         total_verifications = len(
             self.upgrade_catalog[upgrade_info["agent_type"]]["verification_methods"]
@@ -577,7 +578,7 @@ class AgentUpgradeSystem:
         })
         await self.session.commit()
 
-    async def _get_upgrade_from_db(self, upgrade_id: uuid.UUID) -> Dict[str, Any]:
+    async def _get_upgrade_from_db(self, upgrade_id: uuid.UUID) -> dict[str, Any]:
         """Get upgrade record from database."""
         query = """
             SELECT upgrade_id, agent_type, upgrade_name, deployed_at, status, final_score

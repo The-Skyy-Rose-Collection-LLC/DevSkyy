@@ -6,7 +6,7 @@ import hashlib
 import json
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 import aiohttp
@@ -473,7 +473,7 @@ class APIGateway:
             else:
                 return await response.read()
 
-    async def _get_cached_response(self, api_request: APIRequest) -> Optional[dict[str, Any]]:
+    async def _get_cached_response(self, api_request: APIRequest) -> dict[str, Any] | None:
         """Get cached API response"""
 
         cache_key = self._generate_cache_key(api_request)

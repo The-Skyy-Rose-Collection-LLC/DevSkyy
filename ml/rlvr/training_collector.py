@@ -4,14 +4,15 @@ Training Data Collection System
 Collects high-quality training examples from agent executions with verified rewards.
 """
 
-import uuid
-from typing import List, Dict, Any, Optional
 from datetime import datetime, timedelta
 from decimal import Decimal
 import json
+import logging
+from typing import Any
+import uuid
 
 from sqlalchemy.ext.asyncio import AsyncSession
-import logging
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +42,7 @@ class TrainingDataCollector:
         agent_id: uuid.UUID,
         max_examples: int = 1000,
         days_lookback: int = 30
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Collect training examples for a specific agent.
 
@@ -90,7 +91,7 @@ class TrainingDataCollector:
         agent_id: uuid.UUID,
         since_date: datetime,
         limit: int
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get high-quality positive examples (high reward scores)."""
         query = """
             SELECT
@@ -140,7 +141,7 @@ class TrainingDataCollector:
         agent_id: uuid.UUID,
         since_date: datetime,
         limit: int
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get informative negative examples (low reward scores with corrections)."""
         query = """
             SELECT
@@ -192,7 +193,7 @@ class TrainingDataCollector:
         agent_id: uuid.UUID,
         since_date: datetime,
         limit: int
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Get neutral examples for calibration."""
         query = """
             SELECT
@@ -242,7 +243,7 @@ class TrainingDataCollector:
     async def _save_training_examples(
         self,
         agent_id: uuid.UUID,
-        examples: List[Dict[str, Any]]
+        examples: list[dict[str, Any]]
     ) -> int:
         """Save collected examples to training_examples table."""
         saved_count = 0
@@ -290,7 +291,7 @@ class TrainingDataCollector:
         self,
         agent_id: uuid.UUID,
         output_file: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Export training data in OpenAI fine-tuning format (JSONL).
 
@@ -334,7 +335,7 @@ class TrainingDataCollector:
             "format": "openai_jsonl"
         }
 
-    async def get_collection_stats(self, agent_id: uuid.UUID) -> Dict[str, Any]:
+    async def get_collection_stats(self, agent_id: uuid.UUID) -> dict[str, Any]:
         """Get statistics about collected training data."""
         query = """
             SELECT

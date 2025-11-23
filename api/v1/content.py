@@ -11,7 +11,6 @@ Truth Protocol: Input validation, error handling, logging, no placeholders
 from datetime import datetime
 import logging
 import os
-from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -328,7 +327,7 @@ async def schedule_content_publishing(
 
 @router.post("/categorize", response_model=dict)
 async def categorize_wordpress_posts(
-    post_ids: Optional[list[int]] = None,
+    post_ids: list[int] | None = None,
     wordpress_site_url: str | None = None,
     use_ai: bool = True,
 ):

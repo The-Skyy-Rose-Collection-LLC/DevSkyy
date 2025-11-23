@@ -10,7 +10,7 @@ Date: October 26, 2025
 from datetime import datetime
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from jwt_auth import get_current_user

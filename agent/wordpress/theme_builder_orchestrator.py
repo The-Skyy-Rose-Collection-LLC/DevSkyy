@@ -9,7 +9,7 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 import tempfile
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.frontend.wordpress_fullstack_theme_builder_agent import WordPressFullStackThemeBuilderAgent
 from agent.wordpress.automated_theme_uploader import AutomatedThemeUploader, DeploymentResult, UploadMethod
@@ -77,12 +77,12 @@ class ThemeBuildResult:
     build_id: str
     request: ThemeBuildRequest
     status: BuildStatus
-    theme_path: Optional[str] = None
-    deployment_result: Optional[DeploymentResult] = None
+    theme_path: str | None = None
+    deployment_result: DeploymentResult | None = None
     build_log: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
-    completed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
+    completed_at: datetime | None = None
+    error_message: str | None = None
 
 
 class ThemeBuilderOrchestrator:
@@ -251,7 +251,7 @@ class ThemeBuilderOrchestrator:
 
         return result
 
-    async def _generate_theme(self, request: ThemeBuildRequest, result: ThemeBuildResult) -> Optional[str]:
+    async def _generate_theme(self, request: ThemeBuildRequest, result: ThemeBuildResult) -> str | None:
         """Generate theme files based on request."""
         try:
             # Get template for theme type
@@ -803,7 +803,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
 
         return deployment_result
 
-    def get_build_status(self, build_id: str) -> Optional[ThemeBuildResult]:
+    def get_build_status(self, build_id: str) -> ThemeBuildResult | None:
         """Get build status by ID."""
         # Check active builds
         if build_id in self.active_builds:
@@ -838,7 +838,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
         activate_after_deploy: bool = False,
         upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
         site_key: str = "skyy_rose",
-    ) -> Optional[ThemeBuildRequest]:
+    ) -> ThemeBuildRequest | None:
         """Create a theme build request for Skyy Rose Collection with default credentials."""
         credentials = wordpress_credentials_manager.get_credentials(site_key)
 
@@ -882,7 +882,7 @@ class Fashion_Product_Widget extends \\Elementor\\Widget_Base {
         auto_deploy: bool = True,
         activate_after_deploy: bool = False,
         site_key: str = "skyy_rose",
-    ) -> Optional[ThemeBuildResult]:
+    ) -> ThemeBuildResult | None:
         """Build and deploy a theme for Skyy Rose Collection with default settings."""
         build_request = self.create_skyy_rose_build_request(
             theme_name=theme_name,

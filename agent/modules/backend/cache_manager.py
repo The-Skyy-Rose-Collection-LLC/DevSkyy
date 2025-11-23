@@ -4,7 +4,7 @@ from functools import wraps
 import hashlib
 import json
 import logging
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import redis.asyncio as redis
 

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from elasticsearch import AsyncElasticsearch
 from elasticsearch.exceptions import ElasticsearchException, NotFoundError, RequestError

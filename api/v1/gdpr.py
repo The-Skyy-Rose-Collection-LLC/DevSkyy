@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import re
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -71,7 +71,7 @@ class GDPRDeleteResponse(BaseModel):
     deletion_timestamp: datetime
     status: str
     deleted_records: dict[str, int]
-    retained_records: Optional[dict[str, int]] = None  # For audit purposes
+    retained_records: dict[str, int] | None = None  # For audit purposes
 
 
 class DataRetentionPolicyResponse(BaseModel):

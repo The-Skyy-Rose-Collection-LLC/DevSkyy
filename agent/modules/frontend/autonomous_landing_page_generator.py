@@ -19,7 +19,7 @@ import asyncio
 from datetime import datetime
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 from jinja2 import Template

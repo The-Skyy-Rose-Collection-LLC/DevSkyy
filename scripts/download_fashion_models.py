@@ -11,9 +11,9 @@ Per Truth Protocol Rule #1 - All sources verified
 import argparse
 import logging
 import os
-import sys
 from pathlib import Path
-from typing import Optional
+import sys
+
 
 # Configure logging
 logging.basicConfig(
@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 class FashionModelDownloader:
     """Download and cache fashion AI models"""
 
-    def __init__(self, cache_dir: Optional[str] = None):
+    def __init__(self, cache_dir: str | None = None):
         """Initialize model downloader"""
         self.cache_dir = Path(cache_dir) if cache_dir else Path.home() / ".cache" / "devskyy" / "models"
         self.cache_dir.mkdir(parents=True, exist_ok=True)
@@ -177,7 +177,7 @@ class FashionModelDownloader:
             # Only the key name is logged, never the actual sensitive value
             key_value = os.getenv(key_name)
             is_configured = key_value is not None and len(key_value) > 0
-            
+
             if is_configured:
                 # Security: Only log the key name, never the value
                 logger.info(f"✓ {key_name} configured")

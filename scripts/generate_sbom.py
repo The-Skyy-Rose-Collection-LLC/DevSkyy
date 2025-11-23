@@ -39,13 +39,11 @@ def parse_requirements(requirements_file: Path) -> list[dict[str, Any]]:
                 # Try to get actual installed version
                 try:
                     result = subprocess.run(
-       
                         ["pip", "show", name],
-                        check=False, capture_output=True,
+                        check=False,
+                        capture_output=True,
                         text=True,
                         timeout=5
-                        ["pip", "show", name], check=False, capture_output=True, text=True, timeout=5
-          main
                     )
                     if result.returncode == 0:
                         for show_line in result.stdout.split("\n"):

@@ -11,7 +11,7 @@ import hashlib
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
@@ -295,7 +295,7 @@ class SkyRose3DPipeline:
         self,
         avatar_type: AvatarType,
         customization_options: dict[str, Any],
-        voice_settings: Optional[dict[str, Any]] = None,
+        voice_settings: dict[str, Any] | None = None,
     ) -> Avatar:
         """Create a new avatar with customization options."""
         try:
@@ -329,7 +329,7 @@ class SkyRose3DPipeline:
         return f"avatar_{options_hash[:12]}"
 
     async def _create_ready_player_me_avatar(
-        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: Optional[dict[str, Any]]
+        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: dict[str, Any] | None
     ) -> Avatar:
         """Create Ready Player Me avatar."""
         return Avatar(
@@ -343,7 +343,7 @@ class SkyRose3DPipeline:
         )
 
     async def _create_vroid_avatar(
-        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: Optional[dict[str, Any]]
+        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: dict[str, Any] | None
     ) -> Avatar:
         """Create VRoid Studio avatar."""
         return Avatar(
@@ -357,7 +357,7 @@ class SkyRose3DPipeline:
         )
 
     async def _create_custom_avatar(
-        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: Optional[dict[str, Any]]
+        self, avatar_id: str, customization_options: dict[str, Any], voice_settings: dict[str, Any] | None
     ) -> Avatar:
         """Create custom avatar."""
         return Avatar(

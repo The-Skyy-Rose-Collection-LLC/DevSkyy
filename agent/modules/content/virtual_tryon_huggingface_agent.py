@@ -44,7 +44,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 

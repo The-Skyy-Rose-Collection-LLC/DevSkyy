@@ -1,6 +1,5 @@
 import logging
 import re
-from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, HttpUrl
@@ -37,7 +36,7 @@ class UpdateWebhookRequest(BaseModel):
     """Update webhook subscription request"""
 
     endpoint: HttpUrl | None = None
-    events: Optional[list[WebhookEvent]] = None
+    events: list[WebhookEvent] | None = None
     active: bool | None = None
     max_retries: int | None = None
 

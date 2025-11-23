@@ -5,7 +5,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 import psutil
 from pydantic import BaseModel
@@ -86,21 +86,21 @@ class MetricsCollector:
     # METRIC RECORDING
     # ========================================================================
 
-    def increment_counter(self, name: str, value: float = 1.0, labels: Optional[dict[str, str]] = None):
+    def increment_counter(self, name: str, value: float = 1.0, labels: dict[str, str] | None = None):
         """Increment a counter metric"""
         key = self._make_key(name, labels)
         self.counters[key] += value
 
         self._record_metric(name, MetricType.COUNTER, self.counters[key], labels or {})
 
-    def set_gauge(self, name: str, value: float, labels: Optional[dict[str, str]] = None):
+    def set_gauge(self, name: str, value: float, labels: dict[str, str] | None = None):
         """Set a gauge metric"""
         key = self._make_key(name, labels)
         self.gauges[key] = value
 
         self._record_metric(name, MetricType.GAUGE, value, labels or {})
 
-    def record_histogram(self, name: str, value: float, labels: Optional[dict[str, str]] = None):
+    def record_histogram(self, name: str, value: float, labels: dict[str, str] | None = None):
         """Record a histogram value"""
         key = self._make_key(name, labels)
         self.histograms[key].append(value)
@@ -124,7 +124,7 @@ class MetricsCollector:
         self.metrics[name].append(metric)
 
     @staticmethod
-    def _make_key(name: str, labels: Optional[dict[str, str]]) -> str:
+    def _make_key(name: str, labels: dict[str, str] | None) -> str:
         """Create a unique key for a metric with labels"""
         if not labels:
             return name
@@ -136,17 +136,17 @@ class MetricsCollector:
     # METRIC QUERIES
     # ========================================================================
 
-    def get_counter(self, name: str, labels: Optional[dict[str, str]] = None) -> float:
+    def get_counter(self, name: str, labels: dict[str, str] | None = None) -> float:
         """Get current counter value"""
         key = self._make_key(name, labels)
         return self.counters.get(key, 0.0)
 
-    def get_gauge(self, name: str, labels: Optional[dict[str, str]] = None) -> float | None:
+    def get_gauge(self, name: str, labels: dict[str, str] | None = None) -> float | None:
         """Get current gauge value"""
         key = self._make_key(name, labels)
         return self.gauges.get(key)
 
-    def get_histogram_stats(self, name: str, labels: Optional[dict[str, str]] = None) -> dict[str, float]:
+    def get_histogram_stats(self, name: str, labels: dict[str, str] | None = None) -> dict[str, float]:
         """Get histogram statistics"""
         key = self._make_key(name, labels)
         values = self.histograms.get(key, [])

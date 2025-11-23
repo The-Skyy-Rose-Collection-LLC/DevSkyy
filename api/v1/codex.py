@@ -1,5 +1,5 @@
 import logging
-from typing import Literal, Optional
+from typing import Literal
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
@@ -41,7 +41,7 @@ class CodeGenerationRequest(BaseModel):
     model: Literal["gpt-4", "gpt-3.5"] = Field(default="gpt-4", description="Model to use")
     max_tokens: int | None = Field(default=None, description="Maximum tokens to generate")
     temperature: float | None = Field(default=None, description="Sampling temperature (0.0-1.0)")
-    context: Optional[list[str]] = Field(default=None, description="Additional context")
+    context: list[str] | None = Field(default=None, description="Additional context")
 
 
 class CodeCompletionRequest(BaseModel):
