@@ -122,6 +122,12 @@ class RegisterRequest(BaseModel):
     role: str = UserRole.API_USER
 
 
+class RefreshTokenRequest(BaseModel):
+    """Refresh token request"""
+
+    refresh_token: str
+
+
 # ============================================================================
 # PASSWORD UTILITIES
 # ============================================================================

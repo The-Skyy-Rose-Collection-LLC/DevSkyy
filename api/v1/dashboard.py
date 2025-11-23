@@ -1,10 +1,10 @@
 from monitoring.system_monitor import SystemMonitor
-from security.jwt_auth import UserRole, get_current_user, require_role
+from security.jwt_auth import UserRole, get_current_user, require_authenticated
 
 
 # Security availability check
 try:
-    from security.jwt_auth import UserRole, require_role
+    from security.jwt_auth import UserRole, require_authenticated
 
     SECURITY_AVAILABLE = True
 except ImportError:
@@ -301,7 +301,7 @@ async def get_dashboard_page(request: Request):
 async def get_dashboard_data(
     request: Request,
     current_user: dict[str, Any] = Depends(
-        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+        require_authenticated if SECURITY_AVAILABLE else get_current_user
     ),
 ):
     """
@@ -344,7 +344,7 @@ async def get_dashboard_data(
 async def get_system_metrics(
     request: Request,
     current_user: dict[str, Any] = Depends(
-        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+        require_authenticated if SECURITY_AVAILABLE else get_current_user
     ),
 ):
     """
@@ -365,7 +365,7 @@ async def get_system_metrics(
 async def get_agent_status(
     request: Request,
     current_user: dict[str, Any] = Depends(
-        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+        require_authenticated if SECURITY_AVAILABLE else get_current_user
     ),
 ):
     """
@@ -387,7 +387,7 @@ async def get_recent_activities(
     request: Request,
     limit: int = 10,
     current_user: dict[str, Any] = Depends(
-        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+        require_authenticated if SECURITY_AVAILABLE else get_current_user
     ),
 ):
     """
@@ -412,7 +412,7 @@ async def get_performance_history(
     request: Request,
     hours: int = 24,
     current_user: dict[str, Any] = Depends(
-        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+        require_authenticated if SECURITY_AVAILABLE else get_current_user
     ),
 ):
     """

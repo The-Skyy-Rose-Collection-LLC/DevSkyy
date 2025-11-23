@@ -1,0 +1,686 @@
+> """
+> DevSkyy Unified Configuration System
+> Enterprise-grade configuration with clear precedence and validation
+  
+> Configuration Precedence (highest to lowest):
+> 1. Environment variables
+> 2. .env file
+> 3. Config class defaults
+> 4. Runtime overrides
+  
+> Per Truth Protocol Rule #1: Never guess - Verify all configurations
+> Per Truth Protocol Rule #5: No secrets in code - Environment variables only
+> Per Truth Protocol Rule #11: Verified languages - Python 3.11.* only
+> """
+  
+! import logging
+! import os
+! from pathlib import Path
+! import secrets
+! from typing import Any, Optional
+! from urllib.parse import quote_plus
+  
+! from dotenv import load_dotenv
+! from pydantic import BaseModel, Field, validator
+  
+  
+  # Load environment variables from .env file
+! load_dotenv()
+  
+! logger = logging.getLogger(__name__)
+  
+  
+  # ============================================================================
+  # BASE CONFIGURATION MODELS
+  # ============================================================================
+  
+  
+! class DatabaseConfig(BaseModel):
+!     """Database configuration with validation"""
+  
+!     url: str = Field(default="sqlite+aiosqlite:///./devskyy.db")
+!     pool_size: int = Field(default=5, ge=1, le=100)
+!     max_overflow: int = Field(default=10, ge=0, le=50)
+!     pool_timeout: int = Field(default=30, ge=5, le=300)
+!     pool_recycle: int = Field(default=3600, ge=300, le=7200)
+!     pool_pre_ping: bool = Field(default=True)
+!     echo: bool = Field(default=False)
+  
+!     class Config:
+!         frozen = True  # Immutable after creation
+  
+  
+! class SecurityConfig(BaseModel):
+!     """Security configuration with validation"""
+  
+!     secret_key: str
+!     algorithm: str = Field(default="HS256")
+!     access_token_expire_minutes: int = Field(default=30, ge=5, le=1440)
+!     refresh_token_expire_days: int = Field(default=7, ge=1, le=30)
+!     password_hash_algorithm: str = Field(default="argon2id")
+!     min_password_length: int = Field(default=12, ge=8, le=128)
+!     require_special_chars: bool = Field(default=True)
+!     max_login_attempts: int = Field(default=5, ge=3, le=10)
+!     lockout_duration_minutes: int = Field(default=30, ge=5, le=1440)
+  
+!     @validator("secret_key")
+!     def validate_secret_key(cls, v):
+!         """
+!         Ensure the provided SECRET_KEY is at least 32 characters long.
+  
+!         Parameters:
+!             v (str): The secret key to validate.
+  
+!         Returns:
+!             str: The validated secret key.
+  
+!         Raises:
+!             ValueError: If the secret key is shorter than 32 characters.
+!         """
+!         if len(v) < 32:
+!             raise ValueError("SECRET_KEY must be at least 32 characters")
+!         return v
+  
+!     class Config:
+!         frozen = True
+  
+  
+! class LoggingConfig(BaseModel):
+!     """Logging configuration with validation"""
+  
+!     level: str = Field(default="INFO")
+!     format: str = Field(default="json")
+!     enable_console: bool = Field(default=True)
+!     enable_file: bool = Field(default=True)
+!     log_dir: Path = Field(default=Path("logs"))
+!     max_file_size_mb: int = Field(default=10, ge=1, le=100)
+!     backup_count: int = Field(default=5, ge=1, le=20)
+!     enable_correlation_id: bool = Field(default=True)
+!     sanitize_sensitive_data: bool = Field(default=True)
+  
+!     class Config:
+!         frozen = True
+  
+  
+! class RedisConfig(BaseModel):
+!     """Redis configuration with validation"""
+  
+!     url: str = Field(default="redis://localhost:6379")
+!     max_connections: int = Field(default=50, ge=10, le=200)
+!     socket_timeout: int = Field(default=5, ge=1, le=30)
+!     socket_connect_timeout: int = Field(default=5, ge=1, le=30)
+!     retry_on_timeout: bool = Field(default=True)
+!     default_ttl: int = Field(default=3600, ge=60, le=86400)
+  
+!     class Config:
+!         frozen = True
+  
+  
+! class CORSConfig(BaseModel):
+!     """CORS configuration with validation"""
+  
+!     origins: list[str] = Field(default_factory=lambda: ["http://localhost:3000"])
+!     allow_credentials: bool = Field(default=True)
+!     allow_methods: list[str] = Field(default_factory=lambda: ["GET", "POST", "PUT", "DELETE", "OPTIONS"])
+!     allow_headers: list[str] = Field(default_factory=lambda: ["Content-Type", "Authorization", "X-Requested-With"])
+!     max_age: int = Field(default=600, ge=0, le=86400)
+  
+!     class Config:
+!         frozen = True
+  
+  
+! class PerformanceConfig(BaseModel):
+!     """Performance configuration with validation"""
+  
+!     max_content_length_mb: int = Field(default=16, ge=1, le=100)
+!     request_timeout_seconds: int = Field(default=300, ge=30, le=3600)
+!     worker_count: int = Field(default=4, ge=1, le=32)
+!     enable_gzip: bool = Field(default=True)
+!     gzip_minimum_size: int = Field(default=1000, ge=100, le=10000)
+  
+!     class Config:
+!         frozen = True
+  
+  
+! class AIConfig(BaseModel):
+!     """AI services configuration"""
+  
+!     openai_api_key: Optional[str] = None
+!     anthropic_api_key: Optional[str] = None
+!     default_model: str = Field(default="claude-sonnet-4-5")
+!     max_tokens: int = Field(default=4096, ge=256, le=200000)
+!     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
+!     timeout_seconds: int = Field(default=120, ge=10, le=300)
+!     openai_is_consequential: bool = Field(default=True)
+  
+      # Safeguard configuration
+!     enable_safeguards: bool = Field(default=True)
+!     safeguard_level: str = Field(default="strict")  # strict, moderate, permissive
+!     enable_rate_limiting: bool = Field(default=True)
+!     max_requests_per_minute: int = Field(default=60, ge=1, le=1000)
+!     max_consequential_per_hour: int = Field(default=100, ge=1, le=10000)
+!     enable_circuit_breaker: bool = Field(default=True)
+!     enable_audit_logging: bool = Field(default=True)
+!     enforce_production_safeguards: bool = Field(default=True)
+  
+!     class Config:
+!         frozen = True
+  
+  
+  # ============================================================================
+  # UNIFIED CONFIGURATION CLASS
+  # ============================================================================
+  
+  
+! class UnifiedConfig:
+!     """
+!     Unified configuration system for DevSkyy Platform
+  
+!     Configuration precedence:
+!     1. Environment variables (highest)
+!     2. .env file
+!     3. Config class defaults
+!     4. Runtime overrides (lowest)
+  
+!     Usage:
+!         config = UnifiedConfig()
+!         db_url = config.database.url
+!         secret = config.security.secret_key
+!     """
+  
+!     def __init__(self, environment: Optional[str] = None):
+!         """
+!         Initialize the unified configuration for the application.
+  
+!         Parameters:
+!             environment (Optional[str]): Optional override for the runtime environment. If omitted,
+!                 the ENVIRONMENT environment variable is used; defaults to "development". Accepted
+!                 values are "development", "production", and "testing".
+  
+!         Raises:
+!             ValueError: If `environment` (after resolution) is not one of the accepted values.
+  
+!         Notes:
+!             This initializer loads all sub-configurations (database, security, logging, Redis,
+!             CORS, performance, and AI), sets the configuration version, and emits an informational
+!             log entry after successful initialization.
+!         """
+!         self.environment = environment or os.getenv("ENVIRONMENT", "development").lower()
+!         self.version = "5.1.0-enterprise"
+  
+          # Validate environment
+!         if self.environment not in ["development", "production", "testing"]:
+!             raise ValueError(f"Invalid environment: {self.environment}")
+  
+          # Load configurations
+!         self._load_database_config()
+!         self._load_security_config()
+!         self._load_logging_config()
+!         self._load_redis_config()
+!         self._load_cors_config()
+!         self._load_performance_config()
+!         self._load_ai_config()
+  
+          # Log configuration loaded
+!         logger.info(f"✅ Unified configuration loaded - Environment: {self.environment}, " f"Version: {self.version}")
+  
+!     def _load_database_config(self):
+!         """
+!         Initialize the DatabaseConfig for this UnifiedConfig instance using the resolved database URL and environment overrides.
+  
+!         Resolves the effective database URL according to the module's precedence rules and constructs a DatabaseConfig populated from environment variables (with sensible defaults for pool size, overflow, timeouts, and flags). The resulting DatabaseConfig is assigned to self.database.
+!         """
+          # Build database URL with precedence
+!         db_url = self._get_database_url()
+  
+!         self.database = DatabaseConfig(
+!             url=db_url,
+!             pool_size=int(os.getenv("DB_POOL_SIZE", 5)),
+!             max_overflow=int(os.getenv("DB_MAX_OVERFLOW", 10)),
+!             pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", 30)),
+!             pool_recycle=int(os.getenv("DB_POOL_RECYCLE", 3600)),
+!             pool_pre_ping=os.getenv("DB_POOL_PRE_PING", "true").lower() == "true",
+!             echo=os.getenv("DB_ECHO", "false").lower() == "true",
+!         )
+  
+!     def _get_database_url(self) -> str:
+!         """
+!         Resolve the effective database connection URL using environment-variable precedence.
+  
+!         Precedence (highest to lowest):
+!         1. DATABASE_URL
+!         2. NEON_DATABASE_URL
+!         3. SUPABASE_DATABASE_URL
+!         4. PLANETSCALE_DATABASE_URL
+!         5. Individual DB credentials (DB_HOST, DB_USER, DB_PASSWORD, DB_NAME)
+!         6. SQLite fallback (sqlite+aiosqlite:///./devskyy.db)
+  
+!         Returns:
+!             database_url (str): Normalized database URL suitable for async drivers.
+!         """
+          # Check for explicit DATABASE_URL (highest priority)
+!         if db_url := os.getenv("DATABASE_URL"):
+!             return self._normalize_database_url(db_url)
+  
+          # Check for Neon (Serverless PostgreSQL - Recommended)
+!         if neon_url := os.getenv("NEON_DATABASE_URL"):
+!             return self._normalize_database_url(neon_url)
+  
+          # Check for Supabase (PostgreSQL with real-time)
+!         if supabase_url := os.getenv("SUPABASE_DATABASE_URL"):
+!             return self._normalize_database_url(supabase_url)
+  
+          # Check for PlanetScale (MySQL)
+!         if planetscale_url := os.getenv("PLANETSCALE_DATABASE_URL"):
+!             return self._normalize_database_url(planetscale_url)
+  
+          # Check for individual PostgreSQL credentials
+!         if all([os.getenv("DB_HOST"), os.getenv("DB_USER"), os.getenv("DB_PASSWORD"), os.getenv("DB_NAME")]):
+!             return self._build_postgres_url()
+  
+          # Default: SQLite (development/testing)
+!         return "sqlite+aiosqlite:///./devskyy.db"
+  
+!     def _normalize_database_url(self, url: str) -> str:
+!         """
+!         Convert common database URL schemes to their async-driver equivalents.
+  
+!         Rewrites scheme prefixes so async-compatible SQLAlchemy URLs are produced:
+!         - "postgres://" or "postgresql://" -> "postgresql+asyncpg://"
+!         - "mysql://" -> "mysql+aiomysql://"
+!         - "sqlite://" -> "sqlite+aiosqlite://"
+  
+!         Parameters:
+!             url (str): The database URL to normalize.
+  
+!         Returns:
+!             str: The normalized URL using an async driver scheme when applicable; otherwise the original URL.
+!         """
+!         if url.startswith("postgres://"):
+              # Heroku/Railway format
+!             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
+!         elif url.startswith("postgresql://") and "+asyncpg" not in url:
+!             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
+!         elif url.startswith("mysql://") and "+aiomysql" not in url:
+!             url = url.replace("mysql://", "mysql+aiomysql://", 1)
+!         elif url.startswith("sqlite://") and "+aiosqlite" not in url:
+!             url = url.replace("sqlite://", "sqlite+aiosqlite://", 1)
+  
+!         return url
+  
+!     def _build_postgres_url(self) -> str:
+!         """
+!         Constructs a PostgreSQL connection URL from individual database environment variables.
+  
+!         Reads DB_HOST, DB_PORT, DB_USER, DB_PASSWORD, and DB_NAME from the environment and URL-encodes the password before composing the connection string.
+  
+!         Returns:
+!             str: A PostgreSQL connection URL using the asyncpg driver (scheme `postgresql+asyncpg`) with the password URL-encoded.
+!         """
+!         host = os.getenv("DB_HOST")
+!         port = os.getenv("DB_PORT", "5432")
+!         user = os.getenv("DB_USER")
+!         password = os.getenv("DB_PASSWORD")
+!         database = os.getenv("DB_NAME")
+  
+          # URL encode password to handle special characters
+!         encoded_password = quote_plus(password)
+  
+!         return f"postgresql+asyncpg://{user}:{encoded_password}@{host}:{port}/{database}"
+  
+!     def _load_security_config(self):
+!         """
+!         Load and set the SecurityConfig from environment variables, enforcing production requirements.
+  
+!         Raises:
+!             ValueError: If SECRET_KEY is not provided when running in production.
+  
+!         Description:
+!             - Ensures a SECRET_KEY is present; raises in production or generates a development-only key and logs a warning in non-production environments.
+!             - Builds a SecurityConfig using environment-provided values with sensible defaults for JWT algorithm, token expiry, password policy, and lockout settings.
+!             - Assigns the constructed SecurityConfig to self.security.
+!         """
+          # Get SECRET_KEY with validation
+!         secret_key = os.getenv("SECRET_KEY")
+  
+!         if not secret_key:
+!             if self.environment == "production":
+!                 raise ValueError(
+!                     "SECRET_KEY environment variable must be set in production. "
+!                     "Generate a secure key using: python -c 'import secrets; print(secrets.token_urlsafe(32))'"
+!                 )
+!             else:
+                  # Development/testing only
+!                 secret_key = "dev-only-insecure-key-DO-NOT-USE-IN-PRODUCTION-" + secrets.token_urlsafe(16)
+!                 logger.warning(
+!                     "⚠️  Using auto-generated SECRET_KEY for development. "
+!                     "Set SECRET_KEY environment variable before deploying to production!"
+!                 )
+  
+!         self.security = SecurityConfig(
+!             secret_key=secret_key,
+!             algorithm=os.getenv("JWT_ALGORITHM", "HS256"),
+!             access_token_expire_minutes=int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", 30)),
+!             refresh_token_expire_days=int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", 7)),
+!             password_hash_algorithm=os.getenv("PASSWORD_HASH_ALGORITHM", "argon2id"),
+!             min_password_length=int(os.getenv("MIN_PASSWORD_LENGTH", 12)),
+!             require_special_chars=os.getenv("REQUIRE_SPECIAL_CHARS", "true").lower() == "true",
+!             max_login_attempts=int(os.getenv("MAX_LOGIN_ATTEMPTS", 5)),
+!             lockout_duration_minutes=int(os.getenv("LOCKOUT_DURATION_MINUTES", 30)),
+!         )
+  
+!     def _load_logging_config(self):
+!         """
+!         Populate the instance's `logging` attribute with a LoggingConfig constructed from environment variables and sensible defaults.
+  
+!         Reads logging-related environment variables (e.g., LOG_LEVEL, LOG_FORMAT, LOG_ENABLE_CONSOLE, LOG_ENABLE_FILE, LOG_DIR, LOG_MAX_FILE_SIZE_MB, LOG_BACKUP_COUNT, LOG_ENABLE_CORRELATION_ID, LOG_SANITIZE_SENSITIVE) and applies type/coercion rules to produce an immutable LoggingConfig assigned to `self.logging`.
+!         """
+!         self.logging = LoggingConfig(
+!             level=os.getenv("LOG_LEVEL", "INFO").upper(),
+!             format=os.getenv("LOG_FORMAT", "json"),
+!             enable_console=os.getenv("LOG_ENABLE_CONSOLE", "true").lower() == "true",
+!             enable_file=os.getenv("LOG_ENABLE_FILE", "true").lower() == "true",
+!             log_dir=Path(os.getenv("LOG_DIR", "logs")),
+!             max_file_size_mb=int(os.getenv("LOG_MAX_FILE_SIZE_MB", 10)),
+!             backup_count=int(os.getenv("LOG_BACKUP_COUNT", 5)),
+!             enable_correlation_id=os.getenv("LOG_ENABLE_CORRELATION_ID", "true").lower() == "true",
+!             sanitize_sensitive_data=os.getenv("LOG_SANITIZE_SENSITIVE", "true").lower() == "true",
+!         )
+  
+!     def _load_redis_config(self):
+!         """
+!         Load Redis configuration from environment and assign a validated RedisConfig to self.redis.
+  
+!         Reads REDIS_URL, REDIS_MAX_CONNECTIONS, REDIS_SOCKET_TIMEOUT, REDIS_SOCKET_CONNECT_TIMEOUT, REDIS_RETRY_ON_TIMEOUT, and REDIS_DEFAULT_TTL (with sensible defaults), constructs a RedisConfig instance, and stores it on self.redis. Raises pydantic.ValidationError if the resulting configuration fails validation.
+!         """
+!         self.redis = RedisConfig(
+!             url=os.getenv("REDIS_URL", "redis://localhost:6379"),
+!             max_connections=int(os.getenv("REDIS_MAX_CONNECTIONS", 50)),
+!             socket_timeout=int(os.getenv("REDIS_SOCKET_TIMEOUT", 5)),
+!             socket_connect_timeout=int(os.getenv("REDIS_SOCKET_CONNECT_TIMEOUT", 5)),
+!             retry_on_timeout=os.getenv("REDIS_RETRY_ON_TIMEOUT", "true").lower() == "true",
+!             default_ttl=int(os.getenv("REDIS_DEFAULT_TTL", 3600)),
+!         )
+  
+!     def _load_cors_config(self):
+!         """
+!         Load CORS settings from environment variables and assign a CORSConfig instance to self.cors.
+  
+!         Reads these environment variables (with defaults) and maps them to CORSConfig fields:
+!         - CORS_ORIGINS: comma-separated origins (default: "http://localhost:3000,http://localhost:5173")
+!         - CORS_METHODS: comma-separated HTTP methods (default: "GET,POST,PUT,DELETE,OPTIONS")
+!         - CORS_HEADERS: comma-separated allowed headers (default: "Content-Type,Authorization,X-Requested-With")
+!         - CORS_ALLOW_CREDENTIALS: "true" or "false" (default: "true")
+!         - CORS_MAX_AGE: integer seconds for preflight cache (default: 600)
+!         """
+!         origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173")
+!         origins = [origin.strip() for origin in origins_str.split(",")]
+  
+!         methods_str = os.getenv("CORS_METHODS", "GET,POST,PUT,DELETE,OPTIONS")
+!         methods = [method.strip() for method in methods_str.split(",")]
+  
+!         headers_str = os.getenv("CORS_HEADERS", "Content-Type,Authorization,X-Requested-With")
+!         headers = [header.strip() for header in headers_str.split(",")]
+  
+!         self.cors = CORSConfig(
+!             origins=origins,
+!             allow_credentials=os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true",
+!             allow_methods=methods,
+!             allow_headers=headers,
+!             max_age=int(os.getenv("CORS_MAX_AGE", 600)),
+!         )
+  
+!     def _load_performance_config(self):
+!         """
+!         Load performance-related settings from environment and assign a PerformanceConfig to self.performance.
+  
+!         Reads the following environment variables (with defaults) and constructs the configuration:
+!         - MAX_CONTENT_LENGTH_MB (default: 16)
+!         - REQUEST_TIMEOUT_SECONDS (default: 300)
+!         - WORKER_COUNT (default: 4)
+!         - ENABLE_GZIP (default: "true")
+!         - GZIP_MINIMUM_SIZE (default: 1000)
+!         """
+!         self.performance = PerformanceConfig(
+!             max_content_length_mb=int(os.getenv("MAX_CONTENT_LENGTH_MB", 16)),
+!             request_timeout_seconds=int(os.getenv("REQUEST_TIMEOUT_SECONDS", 300)),
+!             worker_count=int(os.getenv("WORKER_COUNT", 4)),
+!             enable_gzip=os.getenv("ENABLE_GZIP", "true").lower() == "true",
+!             gzip_minimum_size=int(os.getenv("GZIP_MINIMUM_SIZE", 1000)),
+!         )
+  
+!     def _load_ai_config(self):
+!         """
+!         Populate the UnifiedConfig.ai attribute from environment variables.
+  
+!         Constructs an AIConfig using values read from environment variables and assigns it to self.ai. Environment variables used and defaults:
+!         - OPENAI_API_KEY: no default
+!         - ANTHROPIC_API_KEY: no default
+!         - AI_DEFAULT_MODEL: "claude-sonnet-4-5"
+!         - AI_MAX_TOKENS: 4096
+!         - AI_TEMPERATURE: 0.7
+!         - AI_TIMEOUT_SECONDS: 120
+!         - OPENAI_IS_CONSEQUENTIAL: "true" (marks OpenAI requests as having real-world consequences per OpenAI safety features)
+!         - OPENAI_ENABLE_SAFEGUARDS: "true" (enable comprehensive safeguards)
+!         - OPENAI_SAFEGUARD_LEVEL: "strict" (strict, moderate, permissive)
+!         - OPENAI_ENABLE_RATE_LIMITING: "true"
+!         - OPENAI_MAX_REQUESTS_PER_MINUTE: 60
+!         - OPENAI_MAX_CONSEQUENTIAL_PER_HOUR: 100
+!         - OPENAI_ENABLE_CIRCUIT_BREAKER: "true"
+!         - OPENAI_ENABLE_AUDIT_LOGGING: "true"
+!         - OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS: "true"
+!         """
+!         self.ai = AIConfig(
+!             openai_api_key=os.getenv("OPENAI_API_KEY"),
+!             anthropic_api_key=os.getenv("ANTHROPIC_API_KEY"),
+!             default_model=os.getenv("AI_DEFAULT_MODEL", "claude-sonnet-4-5"),
+!             max_tokens=int(os.getenv("AI_MAX_TOKENS", 4096)),
+!             temperature=float(os.getenv("AI_TEMPERATURE", 0.7)),
+!             timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120)),
+!             openai_is_consequential=os.getenv("OPENAI_IS_CONSEQUENTIAL", "true").lower() == "true",
+!             enable_safeguards=os.getenv("OPENAI_ENABLE_SAFEGUARDS", "true").lower() == "true",
+!             safeguard_level=os.getenv("OPENAI_SAFEGUARD_LEVEL", "strict").lower(),
+!             enable_rate_limiting=os.getenv("OPENAI_ENABLE_RATE_LIMITING", "true").lower() == "true",
+!             max_requests_per_minute=int(os.getenv("OPENAI_MAX_REQUESTS_PER_MINUTE", 60)),
+!             max_consequential_per_hour=int(os.getenv("OPENAI_MAX_CONSEQUENTIAL_PER_HOUR", 100)),
+!             enable_circuit_breaker=os.getenv("OPENAI_ENABLE_CIRCUIT_BREAKER", "true").lower() == "true",
+!             enable_audit_logging=os.getenv("OPENAI_ENABLE_AUDIT_LOGGING", "true").lower() == "true",
+!             enforce_production_safeguards=os.getenv("OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS", "true").lower() == "true",
+!         )
+  
+!     def is_production(self) -> bool:
+!         """
+!         Return whether the unified configuration is for the production environment.
+  
+!         Returns:
+!             True if the configuration's environment is "production", False otherwise.
+!         """
+!         return self.environment == "production"
+  
+!     def is_development(self) -> bool:
+!         """Check if running in development environment"""
+!         return self.environment == "development"
+  
+!     def is_testing(self) -> bool:
+!         """
+!         Return whether the configuration's environment is testing.
+  
+!         Returns:
+!             `true` if the environment equals "testing", `false` otherwise.
+!         """
+!         return self.environment == "testing"
+  
+!     def get_trusted_hosts(self) -> list[str]:
+!         """
+!         Provide trusted hostnames appropriate for the current environment.
+  
+!         Reads the `TRUSTED_HOSTS` environment variable and parses it into a list of hostnames; when not set, a production default and a non-production default are used.
+  
+!         Returns:
+!             List[str]: A list of hostnames from `TRUSTED_HOSTS`, each trimmed of surrounding whitespace.
+!         """
+!         if self.is_production():
+!             hosts_str = os.getenv("TRUSTED_HOSTS", "theskyy-rose-collection.com")
+!         else:
+!             hosts_str = os.getenv("TRUSTED_HOSTS", "localhost,127.0.0.1,testserver")
+  
+!         return [host.strip() for host in hosts_str.split(",")]
+  
+!     def to_dict(self) -> dict[str, Any]:
+!         """
+!         Return a sanitized dictionary summary of the unified configuration.
+  
+!         Sensitive fields (for example: secret keys, full database URLs, and API keys) are omitted; each top-level key contains a concise, non-sensitive subset of settings for that area.
+  
+!         Returns:
+!             dict: A dictionary mapping top-level config areas (environment, version, database, security, logging, redis, performance) to their non-sensitive summary values.
+!         """
+!         return {
+!             "environment": self.environment,
+!             "version": self.version,
+!             "database": {
+!                 "provider": self._detect_database_provider(),
+!                 "pool_size": self.database.pool_size,
+!                 "echo": self.database.echo,
+!             },
+!             "security": {
+!                 "algorithm": self.security.algorithm,
+!                 "access_token_expire_minutes": self.security.access_token_expire_minutes,
+!                 "password_hash_algorithm": self.security.password_hash_algorithm,
+!             },
+!             "logging": {
+!                 "level": self.logging.level,
+!                 "format": self.logging.format,
+!                 "enable_correlation_id": self.logging.enable_correlation_id,
+!             },
+!             "redis": {"max_connections": self.redis.max_connections, "default_ttl": self.redis.default_ttl},
+!             "performance": {
+!                 "worker_count": self.performance.worker_count,
+!                 "enable_gzip": self.performance.enable_gzip,
+!             },
+!         }
+  
+!     def _detect_database_provider(self) -> str:
+!         """
+!         Identify the database provider based on the configured database URL.
+  
+!         @returns: The provider name: one of "Neon (Serverless PostgreSQL)", "Supabase (PostgreSQL)",
+!         "PlanetScale (MySQL)", "PostgreSQL", "MySQL", "SQLite", or "Unknown".
+!         """
+!         url = self.database.url.lower()
+  
+!         if "neon" in url or "neon.tech" in url:
+!             return "Neon (Serverless PostgreSQL)"
+!         elif "supabase" in url:
+!             return "Supabase (PostgreSQL)"
+!         elif "planetscale" in url:
+!             return "PlanetScale (MySQL)"
+!         elif "postgresql" in url:
+!             return "PostgreSQL"
+!         elif "mysql" in url:
+!             return "MySQL"
+!         elif "sqlite" in url:
+!             return "SQLite"
+!         else:
+!             return "Unknown"
+  
+  
+  # ============================================================================
+  # GLOBAL CONFIGURATION INSTANCE
+  # ============================================================================
+  
+  # Singleton configuration instance
+! _config: Optional[UnifiedConfig] = None
+  
+  
+! def get_config(environment: Optional[str] = None) -> UnifiedConfig:
+!     """
+!     Return the module-level singleton UnifiedConfig, creating it if necessary.
+  
+!     If the singleton does not exist, initializes a new UnifiedConfig using the provided
+!     environment name.
+  
+!     Parameters:
+!         environment (Optional[str]): Optional environment name to initialize the configuration
+!             (for example "development", "production", or "testing"). If omitted, the
+!             UnifiedConfig will determine the environment from environment variables or defaults.
+  
+!     Returns:
+!         The module-level singleton UnifiedConfig instance.
+!     """
+!     global _config
+  
+!     if _config is None:
+!         _config = UnifiedConfig(environment=environment)
+  
+!     return _config
+  
+  
+! def reload_config(environment: Optional[str] = None) -> UnifiedConfig:
+!     """
+!     Reinitialize the module-level UnifiedConfig singleton and return the new instance for the specified environment.
+  
+!     Parameters:
+!         environment (Optional[str]): Optional environment name to force configuration initialization for (e.g., "production", "development", "testing"). If omitted, the environment detection in UnifiedConfig is used.
+  
+!     Returns:
+!         UnifiedConfig: The newly created UnifiedConfig singleton.
+!     """
+!     global _config
+!     _config = UnifiedConfig(environment=environment)
+!     return _config
+  
+  
+  # ============================================================================
+  # CONFIGURATION VALIDATION
+  # ============================================================================
+  
+  
+! def validate_production_config(config: UnifiedConfig) -> list[str]:
+!     """
+!     Validate that a UnifiedConfig is suitable for production deployment.
+  
+!     Parameters:
+!         config (UnifiedConfig): The configuration to validate.
+  
+!     Returns:
+!         errors (List[str]): A list of validation error messages; empty if the configuration passes all production checks.
+!     """
+!     errors = []
+  
+      # Security validation
+!     if len(config.security.secret_key) < 32:
+!         errors.append("SECRET_KEY must be at least 32 characters for production")
+  
+!     if "dev" in config.security.secret_key.lower() or "test" in config.security.secret_key.lower():
+!         errors.append("SECRET_KEY appears to be a development/test key")
+  
+      # Database validation
+!     if "sqlite" in config.database.url.lower():
+!         errors.append("SQLite is not recommended for production - use PostgreSQL or MySQL")
+  
+      # AI validation
+!     if not config.ai.openai_api_key and not config.ai.anthropic_api_key:
+!         errors.append("At least one AI API key (OpenAI or Anthropic) should be configured")
+  
+      # Logging validation
+!     if not config.logging.sanitize_sensitive_data:
+!         errors.append("Sensitive data sanitization should be enabled in production")
+  
+!     return errors
+  
+  
+  # Export main configuration getter
+! __all__ = [
+!     "AIConfig",
+!     "CORSConfig",
+!     "DatabaseConfig",
+!     "LoggingConfig",
+!     "PerformanceConfig",
+!     "RedisConfig",
+!     "SecurityConfig",
+!     "UnifiedConfig",
+!     "get_config",
+!     "reload_config",
+!     "validate_production_config",
+! ]

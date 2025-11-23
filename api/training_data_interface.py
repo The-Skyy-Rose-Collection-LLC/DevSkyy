@@ -30,6 +30,8 @@ try:
 except ImportError:
     logger.error("PIL/Pillow not available - image processing will be limited")
     PIL_AVAILABLE = False
+    # Create dummy Image class for type hints
+    Image = type('Image', (), {'Image': Any})
 
 try:
     import cv2

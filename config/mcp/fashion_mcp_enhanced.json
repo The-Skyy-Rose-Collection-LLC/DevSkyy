@@ -1,0 +1,731 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "3.0.0-fashion",
+  "metadata": {
+    "name": "DevSkyy Fashion MCP Configuration",
+    "description": "Enhanced MCP configuration for The Skyy Rose Collection with 3D fashion, avatars, and AI agent selection",
+    "created": "2025-11-21",
+    "author": "DevSkyy Enterprise - The Skyy Rose Collection",
+    "brand": "The Skyy Rose Collection LLC",
+    "platform_compatibility": ["anthropic", "openai", "azure", "google", "replicate", "huggingface", "custom"]
+  },
+
+  "ai_model_selection": {
+    "description": "Dynamic AI model selection based on task requirements",
+    "selection_strategy": "capability_based",
+    "models": {
+      "product_description": {
+        "primary": {
+          "provider": "anthropic",
+          "model": "claude-3-5-sonnet-20241022",
+          "reason": "Superior creative writing and brand voice consistency",
+          "verified_source": "https://www.anthropic.com/claude"
+        },
+        "fallback": {
+          "provider": "openai",
+          "model": "gpt-4-turbo-preview",
+          "reason": "Alternative for high-quality creative content"
+        }
+      },
+      "image_generation": {
+        "primary": {
+          "provider": "stability",
+          "model": "stable-diffusion-xl-1024-v1-0",
+          "reason": "High-quality fashion imagery, SDXL architecture",
+          "verified_source": "https://platform.stability.ai/docs/api-reference#tag/v1generation"
+        },
+        "fashion_specific": {
+          "provider": "replicate",
+          "model": "stability-ai/sdxl",
+          "lora_support": true,
+          "reason": "Fine-tuning support for brand-specific styles"
+        }
+      },
+      "3d_generation": {
+        "primary": {
+          "provider": "openai",
+          "model": "shap-e",
+          "reason": "3D object generation from text/images",
+          "verified_source": "https://github.com/openai/shap-e",
+          "output_formats": ["glb", "obj", "ply", "stl"]
+        },
+        "alternative": {
+          "provider": "meshy",
+          "model": "meshy-3",
+          "reason": "Text-to-3D and image-to-3D for fashion assets",
+          "verified_source": "https://www.meshy.ai/",
+          "output_formats": ["fbx", "glb", "obj", "usdz"]
+        }
+      },
+      "avatar_generation": {
+        "primary": {
+          "provider": "readyplayerme",
+          "model": "rpm-avatar-creator",
+          "reason": "Industry standard for customizable 3D avatars",
+          "verified_source": "https://docs.readyplayer.me/",
+          "features": ["full_body", "rigged", "game_ready"]
+        },
+        "alternative": {
+          "provider": "meshcapade",
+          "model": "meshcapade-avatar",
+          "reason": "Photorealistic body models with accurate measurements",
+          "verified_source": "https://meshcapade.com/"
+        }
+      },
+      "virtual_try_on": {
+        "primary": {
+          "provider": "huggingface",
+          "model": "yisol/IDM-VTON",
+          "reason": "State-of-the-art virtual try-on diffusion model",
+          "verified_source": "https://huggingface.co/yisol/IDM-VTON",
+          "paper": "https://arxiv.org/abs/2403.05139"
+        }
+      },
+      "3d_clothing": {
+        "primary": {
+          "provider": "clo3d",
+          "model": "clo-api",
+          "reason": "Industry standard for 3D garment design",
+          "verified_source": "https://www.clo3d.com/",
+          "features": ["physics_simulation", "pattern_making", "draping"]
+        },
+        "alternative": {
+          "provider": "browzwear",
+          "model": "vstitcher",
+          "reason": "Professional 3D fashion design platform"
+        }
+      }
+    },
+
+    "selection_rules": {
+      "product_description": {
+        "task_type": "text_generation",
+        "required_capabilities": ["creative_writing", "brand_voice", "luxury_fashion"],
+        "preferred_models": ["claude-3-5-sonnet-20241022", "gpt-4-turbo-preview"]
+      },
+      "3d_asset_creation": {
+        "task_type": "3d_generation",
+        "required_capabilities": ["3d_modeling", "fashion_understanding"],
+        "preferred_models": ["shap-e", "meshy-3"]
+      },
+      "avatar_with_clothing": {
+        "task_type": "avatar_generation",
+        "required_capabilities": ["avatar_creation", "clothing_physics", "rigging"],
+        "preferred_models": ["rpm-avatar-creator", "meshcapade-avatar"]
+      },
+      "virtual_try_on": {
+        "task_type": "image_generation",
+        "required_capabilities": ["try_on", "garment_transfer"],
+        "preferred_models": ["IDM-VTON"]
+      }
+    }
+  },
+
+  "fashion_tool_definitions": {
+    "product_description_writer": {
+      "description": "Generate luxury product descriptions for The Skyy Rose Collection",
+      "category": "content_generation",
+      "ai_model": "claude-3-5-sonnet-20241022",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "product_name": {"type": "string", "description": "Product name"},
+          "product_type": {"type": "string", "enum": ["dress", "handbag", "shoes", "accessories", "jewelry", "outerwear"]},
+          "materials": {"type": "array", "items": {"type": "string"}},
+          "colors": {"type": "array", "items": {"type": "string"}},
+          "price_point": {"type": "string", "enum": ["luxury", "ultra_luxury", "haute_couture"]},
+          "target_audience": {"type": "string"},
+          "unique_features": {"type": "array", "items": {"type": "string"}},
+          "brand_values": {"type": "array", "items": {"type": "string"}, "default": ["elegance", "sophistication", "empowerment", "timeless_beauty"]},
+          "tone": {"type": "string", "enum": ["elegant", "bold", "romantic", "modern", "classic"], "default": "elegant"},
+          "length": {"type": "string", "enum": ["short", "medium", "long"], "default": "medium"}
+        },
+        "required": ["product_name", "product_type", "materials", "colors"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "title": {"type": "string"},
+          "short_description": {"type": "string", "description": "50-100 words"},
+          "long_description": {"type": "string", "description": "200-300 words"},
+          "features_list": {"type": "array", "items": {"type": "string"}},
+          "care_instructions": {"type": "string"},
+          "styling_suggestions": {"type": "array", "items": {"type": "string"}},
+          "seo_keywords": {"type": "array", "items": {"type": "string"}},
+          "brand_story_integration": {"type": "string"}
+        }
+      },
+      "fine_tuning": {
+        "enabled": true,
+        "base_model": "claude-3-5-sonnet-20241022",
+        "training_examples": "/data/brand/skyy_rose_descriptions.jsonl",
+        "brand_voice_guidelines": "/data/brand/voice_guidelines.md"
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+        "rate_limit": 100
+      }
+    },
+
+    "3d_fashion_asset_generator": {
+      "description": "Generate 3D models of fashion items for The Skyy Rose Collection",
+      "category": "3d_generation",
+      "ai_model": "shap-e",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "asset_type": {"type": "string", "enum": ["handbag", "shoes", "jewelry", "accessory", "garment"]},
+          "style_reference": {"type": "string", "description": "Text description or image URL"},
+          "dimensions": {
+            "type": "object",
+            "properties": {
+              "width_cm": {"type": "number"},
+              "height_cm": {"type": "number"},
+              "depth_cm": {"type": "number"}
+            }
+          },
+          "output_format": {"type": "string", "enum": ["glb", "obj", "fbx", "usdz", "stl"], "default": "glb"},
+          "polycount": {"type": "string", "enum": ["low", "medium", "high", "ultra"], "default": "high"},
+          "texture_resolution": {"type": "integer", "enum": [1024, 2048, 4096], "default": 2048},
+          "pbr_materials": {"type": "boolean", "default": true, "description": "Physically Based Rendering materials"}
+        },
+        "required": ["asset_type", "style_reference"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "model_url": {"type": "string", "format": "uri"},
+          "format": {"type": "string"},
+          "polycount": {"type": "integer"},
+          "texture_maps": {
+            "type": "object",
+            "properties": {
+              "albedo": {"type": "string"},
+              "normal": {"type": "string"},
+              "metallic": {"type": "string"},
+              "roughness": {"type": "string"},
+              "ao": {"type": "string"}
+            }
+          },
+          "bounding_box": {"type": "object"},
+          "file_size_mb": {"type": "number"}
+        }
+      },
+      "providers": {
+        "primary": "openai/shap-e",
+        "fallback": "meshy/meshy-3"
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+        "rate_limit": 50
+      }
+    },
+
+    "avatar_creator": {
+      "description": "Create customizable 3D avatars for The Skyy Rose Collection virtual try-on",
+      "category": "avatar_generation",
+      "ai_model": "rpm-avatar-creator",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "avatar_type": {"type": "string", "enum": ["realistic", "stylized", "high_fashion"], "default": "realistic"},
+          "gender": {"type": "string", "enum": ["female", "male", "unisex"]},
+          "body_measurements": {
+            "type": "object",
+            "properties": {
+              "height_cm": {"type": "number", "minimum": 150, "maximum": 200},
+              "bust_cm": {"type": "number"},
+              "waist_cm": {"type": "number"},
+              "hips_cm": {"type": "number"},
+              "shoe_size_us": {"type": "number"}
+            }
+          },
+          "skin_tone": {"type": "string"},
+          "customization": {
+            "type": "object",
+            "properties": {
+              "face_reference": {"type": "string", "description": "Optional face photo URL"},
+              "hair_style": {"type": "string"},
+              "hair_color": {"type": "string"}
+            }
+          },
+          "output_format": {"type": "string", "enum": ["glb", "fbx", "usdz"], "default": "glb"},
+          "rigging": {"type": "boolean", "default": true, "description": "Include skeletal rig for animation"},
+          "lod_levels": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3, "description": "Level of detail variants"}
+        },
+        "required": ["gender", "body_measurements"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "avatar_url": {"type": "string", "format": "uri"},
+          "avatar_id": {"type": "string"},
+          "format": {"type": "string"},
+          "rigged": {"type": "boolean"},
+          "bone_count": {"type": "integer"},
+          "measurements": {"type": "object"},
+          "texture_url": {"type": "string"},
+          "lod_variants": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "providers": {
+        "primary": "readyplayerme",
+        "alternative": "meshcapade"
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+        "rate_limit": 30
+      }
+    },
+
+    "virtual_try_on": {
+      "description": "Apply The Skyy Rose Collection garments to avatars or photos",
+      "category": "image_generation",
+      "ai_model": "IDM-VTON",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "person_image": {"type": "string", "description": "URL or path to person/avatar image"},
+          "garment_image": {"type": "string", "description": "URL or path to garment product image"},
+          "garment_type": {"type": "string", "enum": ["upper_body", "lower_body", "dress", "outerwear"]},
+          "pose_guidance": {"type": "boolean", "default": true, "description": "Maintain original pose"},
+          "resolution": {"type": "integer", "enum": [512, 768, 1024], "default": 1024},
+          "preserve_background": {"type": "boolean", "default": true}
+        },
+        "required": ["person_image", "garment_image", "garment_type"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "result_image_url": {"type": "string"},
+          "masked_garment_url": {"type": "string"},
+          "confidence_score": {"type": "number", "minimum": 0, "maximum": 1},
+          "processing_time_ms": {"type": "number"}
+        }
+      },
+      "verified_source": {
+        "model": "https://huggingface.co/yisol/IDM-VTON",
+        "paper": "https://arxiv.org/abs/2403.05139",
+        "citation": "Choi et al., 'Improving Diffusion Models for Virtual Try-on', arXiv 2024"
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+        "rate_limit": 50
+      }
+    },
+
+    "3d_garment_simulator": {
+      "description": "Simulate 3D garments with physics on avatars",
+      "category": "3d_simulation",
+      "ai_model": "clo-api",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "garment_3d_model": {"type": "string", "description": "Path to 3D garment model"},
+          "avatar_3d_model": {"type": "string", "description": "Path to avatar 3D model"},
+          "fabric_properties": {
+            "type": "object",
+            "properties": {
+              "material_type": {"type": "string", "enum": ["silk", "cotton", "leather", "wool", "synthetic"]},
+              "weight_gsm": {"type": "number"},
+              "stretch_percentage": {"type": "number"},
+              "drape_coefficient": {"type": "number"}
+            }
+          },
+          "simulation_quality": {"type": "string", "enum": ["draft", "preview", "final"], "default": "preview"},
+          "animation": {
+            "type": "object",
+            "properties": {
+              "enabled": {"type": "boolean", "default": false},
+              "animation_type": {"type": "string", "enum": ["walk", "stand", "turn", "custom"]},
+              "fps": {"type": "integer", "default": 30},
+              "duration_seconds": {"type": "number"}
+            }
+          }
+        },
+        "required": ["garment_3d_model", "avatar_3d_model"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "simulated_model_url": {"type": "string"},
+          "animation_url": {"type": "string"},
+          "preview_images": {"type": "array", "items": {"type": "string"}},
+          "fit_analysis": {
+            "type": "object",
+            "properties": {
+              "overall_fit": {"type": "string", "enum": ["tight", "perfect", "loose"]},
+              "tension_map_url": {"type": "string"},
+              "recommendations": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        }
+      },
+      "providers": {
+        "primary": "clo3d",
+        "alternative": "browzwear"
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+        "rate_limit": 20
+      }
+    },
+
+    "brand_fine_tuner": {
+      "description": "Fine-tune AI models for The Skyy Rose Collection brand consistency",
+      "category": "model_training",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "model_type": {"type": "string", "enum": ["text_generation", "image_generation", "style_transfer"]},
+          "base_model": {"type": "string"},
+          "training_data_path": {"type": "string"},
+          "training_config": {
+            "type": "object",
+            "properties": {
+              "epochs": {"type": "integer", "default": 10},
+              "learning_rate": {"type": "number", "default": 0.0001},
+              "batch_size": {"type": "integer", "default": 4},
+              "lora_rank": {"type": "integer", "default": 16, "description": "LoRA rank for efficient fine-tuning"},
+              "validation_split": {"type": "number", "default": 0.1}
+            }
+          },
+          "brand_guidelines": {
+            "type": "object",
+            "properties": {
+              "color_palette": {"type": "array", "items": {"type": "string"}},
+              "typography": {"type": "array", "items": {"type": "string"}},
+              "voice_keywords": {"type": "array", "items": {"type": "string"}},
+              "prohibited_terms": {"type": "array", "items": {"type": "string"}}
+            }
+          }
+        },
+        "required": ["model_type", "base_model", "training_data_path"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "model_id": {"type": "string"},
+          "model_url": {"type": "string"},
+          "training_metrics": {
+            "type": "object",
+            "properties": {
+              "final_loss": {"type": "number"},
+              "validation_accuracy": {"type": "number"},
+              "epochs_completed": {"type": "integer"}
+            }
+          },
+          "sample_outputs": {"type": "array", "items": {"type": "string"}}
+        }
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin"],
+        "rate_limit": 5
+      }
+    },
+
+    "ar_scene_composer": {
+      "description": "Compose AR scenes with The Skyy Rose Collection products",
+      "category": "ar_generation",
+      "input_schema": {
+        "type": "object",
+        "properties": {
+          "scene_type": {"type": "string", "enum": ["product_showcase", "virtual_showroom", "try_on"]},
+          "products_3d": {"type": "array", "items": {"type": "string"}, "description": "Array of 3D product model URLs"},
+          "environment": {"type": "string", "enum": ["studio", "boutique", "outdoor", "custom"]},
+          "lighting": {"type": "string", "enum": ["natural", "studio", "dramatic", "soft"]},
+          "camera_angles": {"type": "array", "items": {"type": "string"}},
+          "export_format": {"type": "string", "enum": ["usdz", "glb", "reality"], "default": "usdz"}
+        },
+        "required": ["scene_type", "products_3d"]
+      },
+      "output_schema": {
+        "type": "object",
+        "properties": {
+          "scene_url": {"type": "string"},
+          "preview_images": {"type": "array", "items": {"type": "string"}},
+          "ar_quick_look_url": {"type": "string", "description": "iOS AR Quick Look compatible"},
+          "webxr_url": {"type": "string", "description": "WebXR compatible scene"}
+        }
+      },
+      "security": {
+        "requires_auth": true,
+        "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+        "rate_limit": 30
+      }
+    }
+  },
+
+  "fashion_workflows": {
+    "complete_product_pipeline": {
+      "description": "End-to-end product creation: description → 3D asset → avatar try-on → AR scene",
+      "parallel": false,
+      "steps": [
+        {
+          "step": 1,
+          "name": "Generate Product Description",
+          "tool": "product_description_writer",
+          "ai_model": "claude-3-5-sonnet-20241022",
+          "input": "${product.details}",
+          "output": "product_description"
+        },
+        {
+          "step": 2,
+          "name": "Create 3D Asset",
+          "tool": "3d_fashion_asset_generator",
+          "ai_model": "shap-e",
+          "input": {
+            "asset_type": "${product.type}",
+            "style_reference": "${product_description.title}"
+          },
+          "output": "3d_asset"
+        },
+        {
+          "step": 3,
+          "name": "Generate Avatar",
+          "tool": "avatar_creator",
+          "ai_model": "rpm-avatar-creator",
+          "input": "${avatar.specifications}",
+          "output": "avatar_model"
+        },
+        {
+          "step": 4,
+          "name": "Apply Garment to Avatar",
+          "tool": "3d_garment_simulator",
+          "ai_model": "clo-api",
+          "input": {
+            "garment_3d_model": "${3d_asset.model_url}",
+            "avatar_3d_model": "${avatar_model.avatar_url}"
+          },
+          "output": "dressed_avatar"
+        },
+        {
+          "step": 5,
+          "name": "Compose AR Scene",
+          "tool": "ar_scene_composer",
+          "input": {
+            "scene_type": "product_showcase",
+            "products_3d": ["${dressed_avatar.simulated_model_url}"]
+          },
+          "output": "ar_scene"
+        }
+      ]
+    },
+
+    "virtual_try_on_workflow": {
+      "description": "Customer photo → Virtual try-on with The Skyy Rose Collection items",
+      "parallel": false,
+      "steps": [
+        {
+          "step": 1,
+          "name": "Process Customer Photo",
+          "tool": "avatar_creator",
+          "ai_model": "meshcapade-avatar",
+          "input": "${customer.photo}",
+          "output": "customer_avatar"
+        },
+        {
+          "step": 2,
+          "name": "Apply Virtual Try-On",
+          "tool": "virtual_try_on",
+          "ai_model": "IDM-VTON",
+          "input": {
+            "person_image": "${customer.photo}",
+            "garment_image": "${product.image}"
+          },
+          "output": "try_on_result"
+        },
+        {
+          "step": 3,
+          "name": "Generate Multiple Angles",
+          "tool": "3d_garment_simulator",
+          "ai_model": "clo-api",
+          "input": {
+            "garment_3d_model": "${product.3d_model}",
+            "avatar_3d_model": "${customer_avatar.avatar_url}"
+          },
+          "output": "multi_angle_views"
+        }
+      ]
+    },
+
+    "brand_content_generation": {
+      "description": "Generate brand-consistent content at scale",
+      "parallel": true,
+      "steps": [
+        {
+          "step": 1,
+          "name": "Generate Product Descriptions",
+          "tool": "product_description_writer",
+          "ai_model": "claude-3-5-sonnet-20241022",
+          "input": "${products.catalog}",
+          "output": "descriptions"
+        },
+        {
+          "step": 2,
+          "name": "Generate Product Images",
+          "tool": "3d_fashion_asset_generator",
+          "ai_model": "stable-diffusion-xl-1024-v1-0",
+          "input": "${products.specifications}",
+          "output": "product_images"
+        },
+        {
+          "step": 3,
+          "name": "Create Social Media Content",
+          "tool": "product_description_writer",
+          "ai_model": "claude-3-5-sonnet-20241022",
+          "input": {
+            "product_name": "${products.name}",
+            "tone": "bold",
+            "length": "short"
+          },
+          "output": "social_content"
+        }
+      ]
+    },
+
+    "collection_launch_pipeline": {
+      "description": "Launch new collection with full 3D assets and AR experiences",
+      "parallel": false,
+      "steps": [
+        {
+          "step": 1,
+          "name": "Fine-tune Brand Models",
+          "tool": "brand_fine_tuner",
+          "input": {
+            "model_type": "image_generation",
+            "training_data_path": "${collection.training_data}"
+          },
+          "output": "fine_tuned_models"
+        },
+        {
+          "step": 2,
+          "name": "Generate Collection Descriptions",
+          "tool": "product_description_writer",
+          "ai_model": "${fine_tuned_models.text_model_id}",
+          "input": "${collection.products}",
+          "output": "collection_descriptions"
+        },
+        {
+          "step": 3,
+          "name": "Create 3D Assets for All Products",
+          "tool": "3d_fashion_asset_generator",
+          "ai_model": "meshy-3",
+          "input": "${collection.products}",
+          "output": "3d_assets_collection"
+        },
+        {
+          "step": 4,
+          "name": "Create Diverse Avatar Models",
+          "tool": "avatar_creator",
+          "input": "${collection.model_specifications}",
+          "output": "avatar_lineup"
+        },
+        {
+          "step": 5,
+          "name": "Generate AR Showroom",
+          "tool": "ar_scene_composer",
+          "input": {
+            "scene_type": "virtual_showroom",
+            "products_3d": "${3d_assets_collection.all_models}",
+            "environment": "boutique"
+          },
+          "output": "ar_showroom"
+        }
+      ]
+    }
+  },
+
+  "brand_configuration": {
+    "brand_name": "The Skyy Rose Collection",
+    "brand_identity": {
+      "color_palette": {
+        "primary": ["#1C1C1C", "#FFFFFF", "#C9A86A"],
+        "secondary": ["#8B7355", "#D4AF37", "#2F2F2F"],
+        "accent": ["#E6C79C", "#A67C52"]
+      },
+      "typography": {
+        "headings": "Playfair Display",
+        "body": "Montserrat",
+        "accent": "Cormorant Garamond"
+      },
+      "brand_voice": {
+        "tone": ["elegant", "sophisticated", "empowering", "timeless"],
+        "keywords": ["luxury", "craftsmanship", "elegance", "confidence", "contemporary", "refined"],
+        "avoid": ["cheap", "trendy", "fast fashion", "disposable"]
+      }
+    },
+    "product_categories": [
+      "handbags",
+      "ready_to_wear",
+      "shoes",
+      "accessories",
+      "jewelry",
+      "eyewear"
+    ],
+    "target_audience": {
+      "demographics": "Women 25-55, high income, urban professionals",
+      "psychographics": "Values quality, sophistication, timeless style over trends",
+      "lifestyle": "Career-focused, socially active, appreciates luxury"
+    }
+  },
+
+  "verifiable_sources": {
+    "3d_generation": {
+      "shap_e": {
+        "source": "https://github.com/openai/shap-e",
+        "paper": "https://arxiv.org/abs/2305.02463",
+        "citation": "Jun & Nichol, 'Shap-E: Generating Conditional 3D Implicit Functions', arXiv 2023"
+      },
+      "meshy": {
+        "source": "https://www.meshy.ai/",
+        "documentation": "https://docs.meshy.ai/"
+      }
+    },
+    "avatar_generation": {
+      "ready_player_me": {
+        "source": "https://readyplayer.me/",
+        "documentation": "https://docs.readyplayer.me/",
+        "api_reference": "https://docs.readyplayer.me/ready-player-me/api-reference"
+      },
+      "meshcapade": {
+        "source": "https://meshcapade.com/",
+        "technology": "SMPL body model",
+        "paper": "https://smpl.is.tue.mpg.de/"
+      }
+    },
+    "virtual_try_on": {
+      "idm_vton": {
+        "huggingface": "https://huggingface.co/yisol/IDM-VTON",
+        "paper": "https://arxiv.org/abs/2403.05139",
+        "github": "https://github.com/yisol/IDM-VTON"
+      }
+    },
+    "3d_garment_simulation": {
+      "clo3d": {
+        "source": "https://www.clo3d.com/",
+        "documentation": "https://support.clo3d.com/"
+      },
+      "browzwear": {
+        "source": "https://browzwear.com/",
+        "products": "https://browzwear.com/products"
+      }
+    },
+    "ar_frameworks": {
+      "usdz": {
+        "apple_ar": "https://developer.apple.com/augmented-reality/quick-look/",
+        "specification": "https://openusd.org/release/spec_usdz.html"
+      },
+      "webxr": {
+        "w3c_spec": "https://www.w3.org/TR/webxr/",
+        "immersive_web": "https://immersiveweb.dev/"
+      }
+    }
+  }
+}
