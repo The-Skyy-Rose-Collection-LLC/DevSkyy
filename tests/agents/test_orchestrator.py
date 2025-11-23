@@ -63,19 +63,19 @@ class TestAgentRegistration:
     async def test_register_agent_success(self, orchestrator, mock_agent):
         """Should successfully register a new agent."""
         if hasattr(orchestrator, "register_agent"):
-            result = await orchestrator.register_agent(mock_agent)
+            result = await orchestrator.register_agent(mock_agent, capabilities=["test"])
             assert result is True or mock_agent.id in orchestrator.agents
 
     @pytest.mark.asyncio
     async def test_register_duplicate_agent_fails(self, orchestrator, mock_agent):
         """Should reject duplicate agent registration."""
         if hasattr(orchestrator, "register_agent"):
-            await orchestrator.register_agent(mock_agent)
+            await orchestrator.register_agent(mock_agent, capabilities=["test"])
 
             # Try to register again - should return False or raise exception
             # Testing both possibilities for robustness
             try:
-                result = await orchestrator.register_agent(mock_agent)
+                result = await orchestrator.register_agent(mock_agent, capabilities=["test"])
                 # If no exception, expect False return value
                 assert result is False, "Duplicate registration should return False"
             except (ValueError, KeyError, Exception) as e:
@@ -86,7 +86,7 @@ class TestAgentRegistration:
     async def test_unregister_agent_success(self, orchestrator, mock_agent):
         """Should successfully unregister an existing agent."""
         if hasattr(orchestrator, "register_agent") and hasattr(orchestrator, "unregister_agent"):
-            await orchestrator.register_agent(mock_agent)
+            await orchestrator.register_agent(mock_agent, capabilities=["test"])
             result = await orchestrator.unregister_agent(mock_agent.id)
             assert result is True or mock_agent.id not in orchestrator.agents
 
@@ -98,12 +98,14 @@ class TestAgentExecution:
     async def test_execute_single_agent_task(self, orchestrator, mock_agent):
         """Should execute a task with a single agent."""
         if hasattr(orchestrator, "execute_task"):
+            # Register agent first so it can be found
+            await orchestrator.register_agent(mock_agent, capabilities=["test"])
             task = {"id": "task-001", "type": "test_task", "agent_id": mock_agent.id, "params": {"test": "data"}}
 
-            with patch.object(orchestrator, "get_agent", return_value=mock_agent):
-                result = await orchestrator.execute_task(task)
-                assert result is not None
-                assert result.get("status") in ["success", "completed", "done"]
+            # Agent should be in orchestrator.agents now
+            result = await orchestrator.execute_task(task)
+            assert result is not None
+            assert result.get("status") in ["success", "completed", "done"]
 
     @pytest.mark.asyncio
     async def test_execute_multiple_concurrent_tasks(self, orchestrator):
