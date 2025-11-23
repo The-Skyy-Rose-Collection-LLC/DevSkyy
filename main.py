@@ -518,6 +518,7 @@ try:
 
     # DevSkyy Automation Routers (n8n replacements)
     from api.v1.ecommerce import router as ecommerce_router
+    from api.v1.finetuning import router as finetuning_router
     from api.v1.gdpr import router as gdpr_router
     from api.v1.mcp import router as mcp_router
     from api.v1.ml import router as ml_router
@@ -553,7 +554,8 @@ if API_ROUTERS_AVAILABLE:
         app.include_router(ecommerce_router, prefix="/api/v1", tags=["automation-ecommerce"])
         app.include_router(content_router, prefix="/api/v1", tags=["automation-content"])
         app.include_router(consensus_router, prefix="/api/v1", tags=["automation-consensus"])
-        logger.info("✅ DevSkyy automation routers registered (ecommerce, content, consensus)")
+        app.include_router(finetuning_router, tags=["v1-finetuning"])
+        logger.info("✅ DevSkyy automation routers registered (ecommerce, content, consensus, finetuning)")
 
         # Luxury Fashion Brand Automation Router
         try:
