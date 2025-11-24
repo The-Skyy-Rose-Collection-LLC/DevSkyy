@@ -1,6 +1,7 @@
 from collections import defaultdict, deque
 from datetime import datetime, timedelta
 import logging
+import os
 import re
 import time
 import uuid
@@ -9,6 +10,7 @@ from fastapi import Request, Response, status
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from api.validation_models import SecurityViolationResponse, ValidationErrorResponse
 
@@ -16,9 +18,23 @@ from api.validation_models import SecurityViolationResponse, ValidationErrorResp
 """
 Security Middleware for DevSkyy Enterprise Platform
 Comprehensive security enforcement, rate limiting, and threat detection
+
+2025 Enhancements (per FastAPI Security Best Practices):
+- TrustedHostMiddleware for Host header injection prevention
+- Enhanced security headers (COEP, COOP, Permissions-Policy)
+- Configurable trusted hosts via environment variable
+
+References:
+- OWASP Host Header Injection Prevention
+- FastAPI 2025 Security Best Practices
+- Per Truth Protocol Rule #13: Security Baseline
 """
 
 logger = logging.getLogger(__name__)
+
+# Configuration from environment (per Truth Protocol Rule #15 - no hardcoded values)
+TRUSTED_HOSTS = os.getenv("FASTAPI_TRUSTED_HOSTS", "localhost,127.0.0.1").split(",")
+ENABLE_TRUSTED_HOST_CHECK = os.getenv("FASTAPI_ENABLE_TRUSTED_HOST", "true").lower() == "true"
 
 # ============================================================================
 # RATE LIMITING
@@ -249,14 +265,66 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             return "default"
 
     def _add_security_headers(self, response: Response, request_id: str) -> Response:
-        """Add security headers to response"""
+        """
+        Add comprehensive security headers to response.
+
+        2025 Best Practices:
+        - Standard headers (X-Content-Type-Options, X-Frame-Options, etc.)
+        - COEP/COOP for process isolation (cross-origin security)
+        - Permissions-Policy for feature restrictions
+        - Enhanced CSP with reporting
+
+        References:
+        - OWASP Secure Headers Project
+        - web.dev Security Headers Guide
+        """
+        # Request tracking
         response.headers["X-Request-ID"] = request_id
+
+        # Standard security headers
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        response.headers["Content-Security-Policy"] = "default-src 'self'"
+
+        # HSTS with preload (per OWASP recommendations)
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains; preload"
+        )
+
+        # Content Security Policy (enhanced)
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: https:; "
+            "font-src 'self'; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'; "
+            "base-uri 'self'; "
+            "form-action 'self'"
+        )
+
+        # Cross-Origin headers (2025 best practice for process isolation)
+        response.headers["Cross-Origin-Embedder-Policy"] = "require-corp"
+        response.headers["Cross-Origin-Opener-Policy"] = "same-origin"
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+
+        # Permissions-Policy (restricts browser features)
+        response.headers["Permissions-Policy"] = (
+            "accelerometer=(), "
+            "camera=(), "
+            "geolocation=(), "
+            "gyroscope=(), "
+            "magnetometer=(), "
+            "microphone=(), "
+            "payment=(), "
+            "usb=()"
+        )
+
+        # Cache control for sensitive endpoints
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, private"
+        response.headers["Pragma"] = "no-cache"
 
         return response
 
@@ -337,3 +405,80 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             f"{response.status_code} - {log_entry['processing_time_ms']}ms - "
             f"{client_ip} - {request_id}"
         )
+
+
+# ============================================================================
+# TRUSTED HOST MIDDLEWARE FACTORY (2025 Best Practice)
+# ============================================================================
+
+
+def create_trusted_host_middleware(app, allowed_hosts: list[str] | None = None):
+    """
+    Create TrustedHostMiddleware for Host header injection prevention.
+
+    Per OWASP and FastAPI 2025 Security Best Practices:
+    - Prevents Host header injection attacks
+    - Configurable via FASTAPI_TRUSTED_HOSTS environment variable
+    - Essential for production deployments behind reverse proxies
+
+    Args:
+        app: FastAPI application instance
+        allowed_hosts: List of allowed hosts (uses env var if None)
+
+    Returns:
+        Wrapped application with TrustedHostMiddleware
+
+    Usage:
+        from api.security_middleware import create_trusted_host_middleware
+        app = create_trusted_host_middleware(app, ["example.com", "*.example.com"])
+    """
+    if not ENABLE_TRUSTED_HOST_CHECK:
+        logger.warning("TrustedHostMiddleware is disabled - not recommended for production")
+        return app
+
+    hosts = allowed_hosts or TRUSTED_HOSTS
+
+    # Add wildcard support for subdomains
+    if "*" not in hosts and "localhost" in hosts:
+        # Development mode: allow common development hosts
+        hosts = list(hosts) + ["testserver", "127.0.0.1"]
+
+    logger.info(f"Configuring TrustedHostMiddleware with hosts: {hosts}")
+
+    return TrustedHostMiddleware(app, allowed_hosts=hosts)
+
+
+def get_security_headers_info() -> dict:
+    """
+    Get information about configured security headers.
+
+    Returns:
+        Dictionary with security header documentation
+    """
+    return {
+        "headers": {
+            "X-Content-Type-Options": "Prevents MIME type sniffing",
+            "X-Frame-Options": "Prevents clickjacking",
+            "X-XSS-Protection": "XSS filter (legacy browsers)",
+            "Strict-Transport-Security": "Enforces HTTPS",
+            "Content-Security-Policy": "Controls allowed content sources",
+            "Cross-Origin-Embedder-Policy": "Process isolation (2025)",
+            "Cross-Origin-Opener-Policy": "Window isolation (2025)",
+            "Cross-Origin-Resource-Policy": "Resource sharing control",
+            "Permissions-Policy": "Browser feature restrictions",
+            "Referrer-Policy": "Controls referrer information",
+        },
+        "trusted_hosts": TRUSTED_HOSTS,
+        "trusted_host_check_enabled": ENABLE_TRUSTED_HOST_CHECK,
+    }
+
+
+__all__ = [
+    "RateLimiter",
+    "ThreatDetector",
+    "SecurityMiddleware",
+    "create_trusted_host_middleware",
+    "get_security_headers_info",
+    "TRUSTED_HOSTS",
+    "ENABLE_TRUSTED_HOST_CHECK",
+]
