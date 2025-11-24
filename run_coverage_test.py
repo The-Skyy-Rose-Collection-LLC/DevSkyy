@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 """Wrapper to run tests with proper coverage measurement"""
 
-import sys
-import subprocess
 from pathlib import Path
+import subprocess
+import sys
+
 
 # Change to project directory
 project_dir = Path(__file__).parent
@@ -19,7 +20,7 @@ result = subprocess.run(
         "-v",
         "--tb=short",
     ],
-    cwd=str(project_dir),
+    check=False, cwd=str(project_dir),
 )
 
 sys.exit(result.returncode)

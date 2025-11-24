@@ -4,30 +4,27 @@ Tests DashboardService class methods and endpoint handlers directly
 Achieves ≥80% coverage per Truth Protocol Rule #8
 """
 
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, Mock, MagicMock, patch
-from typing import Any
+from datetime import datetime
+from unittest.mock import AsyncMock, Mock, patch
 
-import pytest
 from fastapi import HTTPException, Request
 from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
+import pytest
 
 # Import dashboard components
 from api.v1.dashboard import (
-    AgentStatusModel,
-    SystemMetricsModel,
     ActivityLogModel,
+    AgentStatusModel,
     DashboardDataModel,
     DashboardService,
+    SystemMetricsModel,
     dashboard_service,
-    get_dashboard_page,
-    get_dashboard_data,
-    get_system_metrics,
     get_agent_status,
-    get_recent_activities,
+    get_dashboard_data,
+    get_dashboard_page,
     get_performance_history,
+    get_recent_activities,
+    get_system_metrics,
 )
 
 

@@ -18,7 +18,7 @@ Features:
 from datetime import datetime
 import logging
 import os
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 
 try:
@@ -121,7 +121,7 @@ class CodexIntegration:
         model: Literal["gpt-4", "gpt-3.5"] = "gpt-4",
         max_tokens: int | None = None,
         temperature: float | None = None,
-        context: Optional[list[str]] = None,
+        context: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Generate code based on natural language description
@@ -421,7 +421,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code optimization failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    def _build_system_message(self, language: str, context: Optional[list[str]] = None) -> str:
+    def _build_system_message(self, language: str, context: list[str] | None = None) -> str:
         """Build system message with language-specific context"""
         lang_config = self.language_configs.get(language, {})
         frameworks = lang_config.get("framework_hints", [])
@@ -437,7 +437,7 @@ Provide specific, actionable feedback."""
 
         return message
 
-    def _build_code_generation_prompt(self, prompt: str, language: str, context: Optional[list[str]] = None) -> str:
+    def _build_code_generation_prompt(self, prompt: str, language: str, context: list[str] | None = None) -> str:
         """Build user prompt for code generation"""
         message = f"Generate {language} code for: {prompt}\n\n"
         message += "Requirements:\n"

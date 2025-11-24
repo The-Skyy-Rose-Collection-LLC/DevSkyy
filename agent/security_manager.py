@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 
 """
@@ -131,7 +131,7 @@ class SecurityManager:
 
         return f"{key_id}.{api_key}"
 
-    def validate_api_key(self, api_key: str) -> Optional[dict[str, Any]]:
+    def validate_api_key(self, api_key: str) -> dict[str, Any] | None:
         """
         Validate an API key.
 

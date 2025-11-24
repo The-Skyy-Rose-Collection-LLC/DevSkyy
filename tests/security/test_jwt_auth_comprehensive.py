@@ -13,64 +13,64 @@ Version: 2.0.0
 Python: >=3.11.0
 """
 
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 import os
-from unittest.mock import Mock, patch, AsyncMock
-import pytest
+
 from fastapi import HTTPException
 import jwt as jwt_lib
+import pytest
+
 
 # Set test JWT secret before importing jwt_auth
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-for-comprehensive-testing-min-32-chars"
 
 from security.jwt_auth import (
-    # Password utilities
-    hash_password,
-    verify_password,
-    # Security functions
-    is_account_locked,
-    record_failed_login,
-    clear_failed_login_attempts,
+    ACCESS_TOKEN_EXPIRE_MINUTES,
+    JWT_ALGORITHM,
+    # Constants
+    JWT_SECRET_KEY,
+    LOCKOUT_DURATION_MINUTES,
+    MAX_LOGIN_ATTEMPTS,
+    REFRESH_TOKEN_EXPIRE_DAYS,
+    APIKeyAuth,
+    JWTManager,
+    # RBAC
+    RoleChecker,
+    TokenData,
+    TokenResponse,
+    # Models
+    User,
+    # Classes
+    UserManager,
+    UserRole,
     blacklist_token,
-    is_token_blacklisted,
-    validate_token_security,
+    blacklisted_tokens,
+    clear_failed_login_attempts,
     # JWT utilities
     create_access_token,
     create_refresh_token,
-    get_token_payload,
-    verify_token,
-    # Authentication dependencies
-    get_current_user,
-    get_current_active_user,
-    # RBAC
-    RoleChecker,
-    UserRole,
-    require_super_admin,
-    require_admin,
-    require_developer,
-    require_authenticated,
     # Helper functions
     create_user_tokens,
-    # Models
-    User,
-    TokenData,
-    TokenResponse,
-    # Classes
-    UserManager,
-    JWTManager,
-    APIKeyAuth,
-    # Constants
-    JWT_SECRET_KEY,
-    JWT_ALGORITHM,
-    ACCESS_TOKEN_EXPIRE_MINUTES,
-    REFRESH_TOKEN_EXPIRE_DAYS,
-    MAX_LOGIN_ATTEMPTS,
-    LOCKOUT_DURATION_MINUTES,
     # Globals
     failed_login_attempts,
+    get_current_active_user,
+    # Authentication dependencies
+    get_current_user,
+    get_token_payload,
+    # Password utilities
+    hash_password,
+    # Security functions
+    is_account_locked,
+    is_token_blacklisted,
     locked_accounts,
-    blacklisted_tokens,
-    user_manager,
+    record_failed_login,
+    require_admin,
+    require_authenticated,
+    require_developer,
+    require_super_admin,
+    validate_token_security,
+    verify_password,
+    verify_token,
 )
 
 

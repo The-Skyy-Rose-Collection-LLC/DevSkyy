@@ -6,10 +6,10 @@ This test file temporarily renames the config/ package to allow
 direct import of config.py for proper coverage tracking.
 """
 
-import os
-import sys
-import shutil
 from pathlib import Path
+import shutil
+import sys
+
 import pytest
 
 
@@ -89,14 +89,14 @@ class TestConfigModule:
         monkeypatch.delenv("SECRET_KEY", raising=False)
 
         with pytest.raises(ValueError, match="SECRET_KEY environment variable must be set"):
-            import config
+            pass
 
     def test_empty_secret_key_raises_error(self, monkeypatch, clean_import):
         """Test empty SECRET_KEY raises ValueError"""
         monkeypatch.setenv("SECRET_KEY", "")
 
         with pytest.raises(ValueError, match="SECRET_KEY environment variable must be set"):
-            import config
+            pass
 
     def test_debug_false(self, set_secret_key, clean_import):
         """Test DEBUG defaults to False"""

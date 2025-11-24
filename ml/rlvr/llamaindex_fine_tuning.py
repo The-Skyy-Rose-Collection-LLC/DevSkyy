@@ -5,26 +5,20 @@ Standalone implementation using LlamaIndex for training data retrieval
 instead of database queries. Works without MCP infrastructure.
 """
 
-import os
 import asyncio
-import tempfile
 import json
 import logging
-from typing import Dict, Any, Optional, List
-from datetime import datetime
+import os
 from pathlib import Path
+import tempfile
+from typing import Any
 
-from llama_index.core import (
-    VectorStoreIndex,
-    Document,
-    Settings,
-    StorageContext,
-    load_index_from_storage
-)
+from anthropic import Anthropic
+from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex, load_index_from_storage
 from llama_index.embeddings.openai import OpenAIEmbedding
 from llama_index.llms.openai import OpenAI as LlamaOpenAI
 import openai
-from anthropic import Anthropic
+
 
 logger = logging.getLogger(__name__)
 
@@ -82,12 +76,12 @@ class LlamaIndexFineTuningOrchestrator:
             Settings.embed_model = OpenAIEmbedding(api_key=self.openai_key)
 
         # Training example indexes (one per agent)
-        self.indexes: Dict[str, VectorStoreIndex] = {}
+        self.indexes: dict[str, VectorStoreIndex] = {}
 
     def index_training_examples(
         self,
         agent_id: str,
-        examples: List[Dict[str, Any]],
+        examples: list[dict[str, Any]],
         force_rebuild: bool = False
     ) -> VectorStoreIndex:
         """
@@ -149,7 +143,7 @@ class LlamaIndexFineTuningOrchestrator:
         agent_id: str,
         query: str | None = None,
         top_k: int = 10
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Retrieve best training examples using vector similarity search.
 
@@ -202,7 +196,7 @@ class LlamaIndexFineTuningOrchestrator:
         agent_id: str,
         current_prompt: str,
         top_k_examples: int = 10
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Optimize agent prompt using Claude with best examples from LlamaIndex.
 
@@ -301,8 +295,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
         agent_id: str,
         base_model: str = "gpt-3.5-turbo",
         top_k_examples: int = 50,
-        hyperparameters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        hyperparameters: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Fine-tune OpenAI model using examples from LlamaIndex.
 
@@ -382,7 +376,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 os.unlink(training_file_path)
                 logger.info(f"Cleaned up temporary file: {training_file_path}")
 
-    def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
+    def _format_examples_xml(self, examples: list[dict[str, Any]]) -> str:
         """Format examples with XML tags for Claude optimization."""
         formatted = []
         for i, ex in enumerate(examples, 1):

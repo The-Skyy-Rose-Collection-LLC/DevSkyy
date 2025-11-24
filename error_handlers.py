@@ -4,7 +4,7 @@ Enterprise-grade error handling with proper logging and user feedback
 """
 
 import traceback
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
@@ -23,7 +23,7 @@ class DevSkyyException(Exception):
         self,
         message: str,
         status_code: int = 500,
-        details: Optional[dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         self.message = message
         self.status_code = status_code
@@ -34,7 +34,7 @@ class DevSkyyException(Exception):
 class DatabaseException(DevSkyyException):
     """Database-related exceptions."""
 
-    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(message, status_code=500, details=details)
 
 
@@ -44,7 +44,7 @@ class AuthenticationException(DevSkyyException):
     def __init__(
         self,
         message: str = "Authentication failed",
-        details: Optional[dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ):
         super().__init__(message, status_code=401, details=details)
 
@@ -52,14 +52,14 @@ class AuthenticationException(DevSkyyException):
 class AuthorizationException(DevSkyyException):
     """Authorization-related exceptions."""
 
-    def __init__(self, message: str = "Access denied", details: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str = "Access denied", details: dict[str, Any] | None = None):
         super().__init__(message, status_code=403, details=details)
 
 
 class ValidationException(DevSkyyException):
     """Validation-related exceptions."""
 
-    def __init__(self, message: str, details: Optional[dict[str, Any]] = None):
+    def __init__(self, message: str, details: dict[str, Any] | None = None):
         super().__init__(message, status_code=422, details=details)
 
 
@@ -82,7 +82,7 @@ class RateLimitException(DevSkyyException):
 class ExternalServiceException(DevSkyyException):
     """External service integration exceptions."""
 
-    def __init__(self, service: str, message: str, details: Optional[dict[str, Any]] = None):
+    def __init__(self, service: str, message: str, details: dict[str, Any] | None = None):
         full_message = f"External service error ({service}): {message}"
         super().__init__(full_message, status_code=502, details=details)
 

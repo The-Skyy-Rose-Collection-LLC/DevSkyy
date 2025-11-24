@@ -5,7 +5,7 @@ from enum import Enum
 import logging
 import secrets
 import time
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlencode
 
 import aiohttp

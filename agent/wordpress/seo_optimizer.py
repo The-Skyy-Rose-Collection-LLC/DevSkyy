@@ -14,7 +14,7 @@ Reference: Based on AGENTS.md Line 921-961
 from datetime import datetime
 import json  # noqa: F401 - Reserved for future JSON schema processing
 import logging
-from typing import Any, Optional
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
@@ -482,7 +482,7 @@ class WordPressSEOOptimizer:
     def generate_robots_txt(
         self,
         allow_all: bool = True,
-        disallow_paths: Optional[list[str]] = None,
+        disallow_paths: list[str] | None = None,
         sitemap_url: str | None = None,
     ) -> str:
         """

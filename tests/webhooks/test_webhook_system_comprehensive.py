@@ -9,11 +9,8 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol - RFC 2104 HMAC compliance
 """
 
-import asyncio
-from datetime import UTC, datetime, timedelta
-import hashlib
-import hmac
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, Mock, patch
 
 import httpx
 import pytest

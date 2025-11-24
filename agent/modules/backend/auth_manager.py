@@ -3,7 +3,7 @@ import logging
 import os
 import re
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -310,7 +310,7 @@ class AuthManager:
         finally:
             db.close()
 
-    def verify_token(self, token: str) -> Optional[dict[str, Any]]:
+    def verify_token(self, token: str) -> dict[str, Any] | None:
         """Verify JWT token and return user data."""
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])

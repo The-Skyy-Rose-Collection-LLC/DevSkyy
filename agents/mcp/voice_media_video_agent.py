@@ -8,7 +8,7 @@ import asyncio
 from dataclasses import dataclass
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 
 # Configure logging

@@ -18,12 +18,10 @@ Tests cover:
 Truth Protocol: Rules #1, #8, #15 enforced.
 """
 
-import uuid
 from datetime import datetime, timedelta
 from decimal import Decimal
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
-import numpy as np
 import pytest
 
 from agent.modules.backend.financial_agent import (

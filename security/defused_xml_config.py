@@ -19,7 +19,7 @@ from defusedxml import minidom as defused_minidom
 from defusedxml import pulldom as defused_pulldom
 from defusedxml import sax as defused_sax
 from defusedxml import xmlrpc as defused_xmlrpc
-from defusedxml.ElementTree import DefusedXMLParser
+
 
 logger = logging.getLogger(__name__)
 

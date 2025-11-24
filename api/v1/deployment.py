@@ -21,23 +21,24 @@ Endpoints:
 - GET /api/v1/deployment/statistics - Get system statistics
 """
 
-import logging
 from datetime import datetime
-from typing import Any, Optional
+import logging
+from typing import Any
 
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from core.dependencies import get_current_user, require_role
 from ml.agent_deployment_system import (
     JobDefinition,
-    ToolRequirement,
     ResourceRequirement,
     ResourceType,
+    ToolRequirement,
     get_deployment_orchestrator,
 )
 from ml.agent_finetuning_system import AgentCategory
 from security.rbac import Role
+
 
 logger = logging.getLogger(__name__)
 
@@ -72,9 +73,9 @@ class JobStatusResponse(BaseModel):
     job_name: str
     category: str
     status: str
-    validation_status: Optional[dict[str, Any]] = None
-    approval_status: Optional[dict[str, Any]] = None
-    deployment_status: Optional[dict[str, Any]] = None
+    validation_status: dict[str, Any] | None = None
+    approval_status: dict[str, Any] | None = None
+    deployment_status: dict[str, Any] | None = None
     estimated_tokens: int
     estimated_cost_usd: float
     actual_tokens_used: int = 0
@@ -179,7 +180,7 @@ async def submit_job(
         logger.error(f"Failed to submit job: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to submit job: {str(e)}"
+            detail=f"Failed to submit job: {e!s}"
         )
 
 
@@ -306,7 +307,7 @@ async def validate_job(
         logger.error(f"Failed to validate job: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to validate job: {str(e)}"
+            detail=f"Failed to validate job: {e!s}"
         )
 
 

@@ -9,8 +9,9 @@ Usage: python scripts/neon_manager.py [command]
 """
 
 import os
-import sys
 from pathlib import Path
+import sys
+
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -98,7 +99,7 @@ class NeonManager:
         try:
             branches = self.client.branches.list(project_id=self.project_id)
 
-            print(f"\n🔗 Connection Strings:")
+            print("\n🔗 Connection Strings:")
             print("=" * 80)
 
             for branch in branches:
@@ -146,7 +147,7 @@ class NeonManager:
         try:
             project = self.client.projects.get(project_id=self.project_id)
 
-            print(f"\n📊 Project Information:")
+            print("\n📊 Project Information:")
             print("=" * 80)
             print(f"Project ID: {project.id}")
             print(f"Name: {project.name}")

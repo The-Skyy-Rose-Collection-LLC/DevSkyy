@@ -5,12 +5,12 @@ Achieves ≥90% coverage per Truth Protocol Rule #8
 """
 
 import logging
-import os
-import sys
 from pathlib import Path
+import sys
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 import pytest
+
 
 # Add project root to path
 project_root = Path(__file__).parent.parent

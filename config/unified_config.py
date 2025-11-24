@@ -17,7 +17,7 @@ import logging
 import os
 from pathlib import Path
 import secrets
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv

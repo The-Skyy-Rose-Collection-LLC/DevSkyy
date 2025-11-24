@@ -5,7 +5,7 @@ import json
 import logging
 import pickle
 import time
-from typing import Any, Optional
+from typing import Any
 
 import redis.asyncio as redis
 from redis.asyncio import ConnectionPool

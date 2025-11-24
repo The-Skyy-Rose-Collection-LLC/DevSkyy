@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from pydantic import BaseModel
@@ -26,7 +26,7 @@ class DomainEvent(BaseModel):
     timestamp: datetime
     data: dict[str, Any]
     version: int
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
     def __init__(self, **data):
         if "event_id" not in data:
@@ -138,7 +138,7 @@ class EventStore:
             "timestamp": datetime.now(UTC),
         }
 
-    async def get_snapshot(self, aggregate_id: str) -> Optional[dict[str, Any]]:
+    async def get_snapshot(self, aggregate_id: str) -> dict[str, Any] | None:
         """
         Get latest snapshot for an aggregate
 

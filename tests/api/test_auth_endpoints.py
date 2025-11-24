@@ -9,16 +9,14 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol requirements
 """
 
-import logging
-from unittest.mock import MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 from fastapi import HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from fastapi.testclient import TestClient
 import pytest
 
 from api.validation_models import EnhancedRegisterRequest
-from security.jwt_auth import TokenData, TokenResponse, User, UserRole, user_manager
+from security.jwt_auth import TokenData, TokenResponse, User, UserRole
 
 
 # ============================================================================

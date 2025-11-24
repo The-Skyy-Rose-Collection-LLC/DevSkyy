@@ -3,7 +3,6 @@ from datetime import datetime, timedelta
 import logging
 import re
 import time
-from typing import Optional
 import uuid
 
 from fastapi import Request, Response, status

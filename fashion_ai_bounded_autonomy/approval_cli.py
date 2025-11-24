@@ -15,7 +15,6 @@ import argparse
 import asyncio
 from pathlib import Path
 import sys
-from typing import Optional
 
 
 # Add parent directory to path

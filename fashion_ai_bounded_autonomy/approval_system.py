@@ -9,7 +9,7 @@ import json
 import logging
 from pathlib import Path
 import sqlite3
-from typing import Any, Optional
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
@@ -350,7 +350,7 @@ class ApprovalSystem:
         conn.close()
         return actions
 
-    async def get_action_details(self, action_id: str) -> Optional[dict[str, Any]]:
+    async def get_action_details(self, action_id: str) -> dict[str, Any] | None:
         """Get detailed information about an action"""
         conn = sqlite3.connect(self.db_path)
         cursor = conn.cursor()

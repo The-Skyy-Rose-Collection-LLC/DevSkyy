@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from datetime import datetime
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from elasticsearch import AsyncElasticsearch
-from elasticsearch.exceptions import ElasticsearchException, NotFoundError, RequestError
+from elasticsearch.exceptions import ApiError as ElasticsearchException, NotFoundError, RequestError
 
 
 """
@@ -61,23 +61,20 @@ class ElasticsearchManager:
         max_retries: int = 3,
         retry_on_timeout: bool = True,
     ):
-        self.hosts = hosts or ["localhost:9200"]
+        self.hosts = hosts or ["http://localhost:9200"]
         self.username = username
         self.password = password
 
         # Initialize Elasticsearch client
         client_config = {
             "hosts": self.hosts,
-            "timeout": timeout,
-            "max_retries": max_retries,
-            "retry_on_timeout": retry_on_timeout,
+            "request_timeout": timeout,
         }
 
         if username and password:
-            client_config["http_auth"] = (username, password)
+            client_config["basic_auth"] = (username, password)
 
         if use_ssl:
-            client_config["use_ssl"] = True
             client_config["verify_certs"] = verify_certs
 
         self.client = AsyncElasticsearch(**client_config)

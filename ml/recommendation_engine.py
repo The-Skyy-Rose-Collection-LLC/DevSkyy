@@ -4,7 +4,7 @@ import json
 import logging
 import random
 import time
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 

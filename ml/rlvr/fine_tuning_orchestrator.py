@@ -4,22 +4,22 @@ Fine-Tuning Orchestration System
 Manages the end-to-end fine-tuning process for agents across different model providers.
 """
 
-import uuid
+import asyncio
+from datetime import datetime
+import html
+import logging
 import os
 import tempfile
-import html
-from typing import Dict, Any, Optional, List
-from datetime import datetime
-from decimal import Decimal
-import asyncio
-import logging
+from typing import Any
+import uuid
 
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
-import openai
 from anthropic import Anthropic
+import openai
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from .training_collector import TrainingDataCollector
+
 
 logger = logging.getLogger(__name__)
 
@@ -55,8 +55,8 @@ class FineTuningOrchestrator:
         agent_id: uuid.UUID,
         provider: str = "openai",
         base_model: str | None = None,
-        hyperparameters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        hyperparameters: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Start a fine-tuning run for an agent.
 
@@ -119,8 +119,8 @@ class FineTuningOrchestrator:
         run_id: uuid.UUID,
         agent_id: uuid.UUID,
         base_model: str | None = None,
-        hyperparameters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        hyperparameters: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Fine-tune using OpenAI's fine-tuning API.
 
@@ -225,7 +225,7 @@ class FineTuningOrchestrator:
         self,
         run_id: uuid.UUID,
         agent_id: uuid.UUID
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Optimize Anthropic Claude agent through prompt refinement.
 
@@ -354,8 +354,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
         run_id: uuid.UUID,
         agent_id: uuid.UUID,
         base_model: str | None = None,
-        hyperparameters: Optional[Dict[str, Any]] = None
-    ) -> Dict[str, Any]:
+        hyperparameters: dict[str, Any] | None = None
+    ) -> dict[str, Any]:
         """
         Fine-tune a local open-source model using LoRA.
 
@@ -385,7 +385,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "documentation": "See CLAUDE.md for implementation roadmap"
         }
 
-    def _format_examples(self, examples: List[Dict[str, Any]]) -> str:
+    def _format_examples(self, examples: list[dict[str, Any]]) -> str:
         """Format examples for prompt optimization (legacy format)."""
         formatted = []
         for i, ex in enumerate(examples, 1):
@@ -396,7 +396,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             )
         return "\n".join(formatted)
 
-    def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
+    def _format_examples_xml(self, examples: list[dict[str, Any]]) -> str:
         """
         Format examples using XML tags for Claude 4.x optimization.
 
@@ -458,7 +458,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         self,
         run_id: uuid.UUID,
         status: str,
-        result: Dict[str, Any]
+        result: dict[str, Any]
     ):
         """Update fine-tuning run status."""
         query = text("""
@@ -513,7 +513,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         self,
         run_id: uuid.UUID,
         deploy_to_production: bool = False
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Deploy a fine-tuned model to production.
 

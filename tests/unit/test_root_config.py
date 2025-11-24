@@ -12,12 +12,10 @@ Tests configuration classes:
 Coverage target: ≥90% (28+ out of 31 executable lines)
 """
 
+import importlib.util
 import os
-import sys
-from unittest.mock import patch
 
 import pytest
-import importlib.util
 
 
 # =============================================================================

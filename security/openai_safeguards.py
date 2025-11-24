@@ -28,7 +28,7 @@ from functools import wraps
 import logging
 from pathlib import Path
 import time
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, validator
 
@@ -389,7 +389,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: str | None = None,
-        params: Optional[dict[str, Any]] = None
+        params: dict[str, Any] | None = None
     ) -> tuple[bool, str | None]:
         """
         Validate request before sending to OpenAI API
@@ -448,7 +448,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: str | None = None,
-        params: Optional[dict[str, Any]] = None,
+        params: dict[str, Any] | None = None,
         *args,
         **kwargs,
     ) -> Any:

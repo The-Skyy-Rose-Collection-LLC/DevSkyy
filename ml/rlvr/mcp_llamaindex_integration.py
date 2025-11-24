@@ -8,30 +8,24 @@ Combines LlamaIndex RAG with MCP infrastructure for enterprise-grade fine-tuning
 - Distributed training data management
 """
 
-import os
-import uuid
 import asyncio
+from datetime import datetime
 import html
 import logging
-from typing import Dict, Any, Optional, List
-from datetime import datetime
+import os
 from pathlib import Path
+from typing import Any
+import uuid
 
-from llama_index.core import (
-    VectorStoreIndex,
-    Document,
-    Settings,
-    StorageContext,
-    load_index_from_storage
-)
-from llama_index.core.vector_stores import SimpleVectorStore
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI as LlamaOpenAI
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
-import openai
 from anthropic import Anthropic
 import httpx
+from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex, load_index_from_storage
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI as LlamaOpenAI
+import openai
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 logger = logging.getLogger(__name__)
 
@@ -111,7 +105,7 @@ class MCPLlamaIndexOrchestrator:
             Settings.llm = LlamaOpenAI(model="gpt-4", api_key=self.openai_key)
             Settings.embed_model = OpenAIEmbedding(api_key=self.openai_key)
 
-        self.indexes: Dict[str, VectorStoreIndex] = {}
+        self.indexes: dict[str, VectorStoreIndex] = {}
 
     async def sync_training_data_to_vector_store(
         self,
@@ -202,7 +196,7 @@ class MCPLlamaIndexOrchestrator:
         min_score: float = 0.7,
         top_k: int = 10,
         example_type: str | None = "positive"
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Hybrid retrieval: SQL filtering + vector semantic search.
 
@@ -267,7 +261,7 @@ class MCPLlamaIndexOrchestrator:
         self,
         agent_id: uuid.UUID,
         top_k_examples: int = 10
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Optimize agent prompt using MCP + LlamaIndex hybrid retrieval.
 
@@ -400,7 +394,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "retrieval_strategy": "sql_filter + vector_similarity"
         }
 
-    def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
+    def _format_examples_xml(self, examples: list[dict[str, Any]]) -> str:
         """Format examples with XML for Claude."""
         formatted = []
         for i, ex in enumerate(examples, 1):
@@ -436,7 +430,7 @@ async def demo_mcp_llamaindex():
     - Neon PostgreSQL with training_examples table
     - LlamaIndex vector storage
     """
-    from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+    from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
     from sqlalchemy.orm import sessionmaker
 
     # Database connection via MCP/Neon

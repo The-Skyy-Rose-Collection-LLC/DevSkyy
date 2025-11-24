@@ -2,7 +2,7 @@ from datetime import timedelta
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from authlib.common.security import generate_token
 from fastapi import APIRouter, HTTPException, Query, Request, status

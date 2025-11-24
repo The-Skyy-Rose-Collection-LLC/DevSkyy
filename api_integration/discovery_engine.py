@@ -5,7 +5,7 @@ import hashlib
 import logging
 import os
 import time
-from typing import Any, Optional
+from typing import Any
 
 import aiohttp
 
@@ -831,7 +831,7 @@ class APIDiscoveryEngine:
 
     async def _get_cached_discovery_results(
         self, categories: list[APICategory]
-    ) -> Optional[dict[str, list[APIEndpoint]]]:
+    ) -> dict[str, list[APIEndpoint]] | None:
         """Get cached API discovery results"""
 
         cache_key = f"api_discovery:{':'.join(sorted(c.value for c in categories))}"

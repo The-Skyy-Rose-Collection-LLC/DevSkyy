@@ -3,7 +3,7 @@ import json
 import logging
 import sys
 import traceback
-from typing import Any, Optional
+from typing import Any
 
 
 """
@@ -82,7 +82,7 @@ class StructuredLogger:
         file_handler.setFormatter(JSONFormatter())
         self.logger.addHandler(file_handler)
 
-    def _log(self, level: int, message: str, extra: Optional[dict[str, Any]] = None, **kwargs):
+    def _log(self, level: int, message: str, extra: dict[str, Any] | None = None, **kwargs):
         """
         Internal log method with extra fields
 

@@ -19,7 +19,7 @@ import os
 from pathlib import Path
 import re
 import time
-from typing import Any, Optional
+from typing import Any
 
 import requests
 

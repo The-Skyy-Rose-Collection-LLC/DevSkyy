@@ -21,7 +21,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field

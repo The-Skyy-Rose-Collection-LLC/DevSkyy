@@ -37,7 +37,7 @@ from datetime import datetime, timedelta
 from decimal import Decimal
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 
@@ -130,7 +130,7 @@ class InventoryItem:
     color: str | None = None
     material: str | None = None
     weight: float | None = None
-    dimensions: Optional[dict[str, float]] = None
+    dimensions: dict[str, float] | None = None
 
     # Timestamps
     created_at: datetime = field(default_factory=datetime.now)

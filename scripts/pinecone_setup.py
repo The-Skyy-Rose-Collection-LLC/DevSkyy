@@ -19,8 +19,9 @@ Usage:
 
 import os
 import sys
-from typing import Optional
+
 from dotenv import load_dotenv
+
 
 # Load environment variables
 load_dotenv()
@@ -156,12 +157,12 @@ class PineconeManager:
                 print("✅ Index deleted.")
 
             # Create index
-            print(f"\n📝 Creating index with configuration:")
+            print("\n📝 Creating index with configuration:")
             print(f"   Name: {index_name}")
             print(f"   Dimension: {dimension}")
             print(f"   Metric: {metric}")
-            print(f"   Cloud: GCP")
-            print(f"   Region: us-central1")
+            print("   Cloud: GCP")
+            print("   Region: us-central1")
 
             self.pc.create_index(
                 name=index_name,
@@ -175,8 +176,8 @@ class PineconeManager:
 
             print("\n✅ Index created successfully!")
             print(f"📁 Index Name: {index_name}")
-            print(f"🌍 Access via: Pinecone dashboard")
-            print(f"🔗 URL: https://app.pinecone.io/")
+            print("🌍 Access via: Pinecone dashboard")
+            print("🔗 URL: https://app.pinecone.io/")
 
             return True
 

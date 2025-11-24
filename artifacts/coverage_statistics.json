@@ -1,0 +1,352 @@
+{
+  "generated_at": "2025-11-23T21:19:34.745559",
+  "overall_coverage": 10.35,
+  "target_coverage": 90.0,
+  "baseline_coverage": 10.35,
+  "gap": 79.65,
+  "improvement": -0.0,
+  "total_lines": 38983,
+  "covered_lines": 4251,
+  "missing_lines": 34732,
+  "lines_needed_for_target": 30833,
+  "modules": {
+    "agent": {
+      "coverage": 0.92,
+      "files": 103,
+      "lines_covered": 154,
+      "total_lines": 16654,
+      "missing_lines": 16500
+    },
+    "agents": {
+      "coverage": 0.0,
+      "files": 3,
+      "lines_covered": 0,
+      "total_lines": 323,
+      "missing_lines": 323
+    },
+    "ai": {
+      "coverage": 0.0,
+      "files": 2,
+      "lines_covered": 0,
+      "total_lines": 251,
+      "missing_lines": 251
+    },
+    "ai_orchestration": {
+      "coverage": 0.0,
+      "files": 4,
+      "lines_covered": 0,
+      "total_lines": 492,
+      "missing_lines": 492
+    },
+    "api": {
+      "coverage": 3.93,
+      "files": 32,
+      "lines_covered": 190,
+      "total_lines": 4834,
+      "missing_lines": 4644
+    },
+    "api_integration": {
+      "coverage": 1.13,
+      "files": 7,
+      "lines_covered": 19,
+      "total_lines": 1676,
+      "missing_lines": 1657
+    },
+    "architecture": {
+      "coverage": 0.0,
+      "files": 3,
+      "lines_covered": 0,
+      "total_lines": 174,
+      "missing_lines": 174
+    },
+    "backend": {
+      "coverage": 0.0,
+      "files": 3,
+      "lines_covered": 0,
+      "total_lines": 331,
+      "missing_lines": 331
+    },
+    "root": {
+      "coverage": 40.69,
+      "files": 12,
+      "lines_covered": 826,
+      "total_lines": 2030,
+      "missing_lines": 1204
+    },
+    "config": {
+      "coverage": 58.33,
+      "files": 3,
+      "lines_covered": 189,
+      "total_lines": 324,
+      "missing_lines": 135
+    },
+    "core": {
+      "coverage": 34.29,
+      "files": 7,
+      "lines_covered": 250,
+      "total_lines": 729,
+      "missing_lines": 479
+    },
+    "database": {
+      "coverage": 0.0,
+      "files": 2,
+      "lines_covered": 0,
+      "total_lines": 165,
+      "missing_lines": 165
+    },
+    "fashion": {
+      "coverage": 18.58,
+      "files": 3,
+      "lines_covered": 84,
+      "total_lines": 452,
+      "missing_lines": 368
+    },
+    "fashion_ai_bounded_autonomy": {
+      "coverage": 0.0,
+      "files": 9,
+      "lines_covered": 0,
+      "total_lines": 1033,
+      "missing_lines": 1033
+    },
+    "infrastructure": {
+      "coverage": 21.92,
+      "files": 8,
+      "lines_covered": 373,
+      "total_lines": 1702,
+      "missing_lines": 1329
+    },
+    "intelligence": {
+      "coverage": 5.13,
+      "files": 2,
+      "lines_covered": 8,
+      "total_lines": 156,
+      "missing_lines": 148
+    },
+    "mcp_optimization": {
+      "coverage": 0.0,
+      "files": 2,
+      "lines_covered": 0,
+      "total_lines": 263,
+      "missing_lines": 263
+    },
+    "middleware": {
+      "coverage": 88.11,
+      "files": 2,
+      "lines_covered": 126,
+      "total_lines": 143,
+      "missing_lines": 17
+    },
+    "ml": {
+      "coverage": 0.0,
+      "files": 21,
+      "lines_covered": 0,
+      "total_lines": 2745,
+      "missing_lines": 2745
+    },
+    "monitoring": {
+      "coverage": 48.06,
+      "files": 6,
+      "lines_covered": 421,
+      "total_lines": 876,
+      "missing_lines": 455
+    },
+    "security": {
+      "coverage": 37.37,
+      "files": 16,
+      "lines_covered": 802,
+      "total_lines": 2146,
+      "missing_lines": 1344
+    },
+    "services": {
+      "coverage": 49.06,
+      "files": 9,
+      "lines_covered": 650,
+      "total_lines": 1325,
+      "missing_lines": 675
+    },
+    "templates": {
+      "coverage": 0.0,
+      "files": 1,
+      "lines_covered": 0,
+      "total_lines": 0,
+      "missing_lines": 0
+    },
+    "webhooks": {
+      "coverage": 100.0,
+      "files": 2,
+      "lines_covered": 159,
+      "total_lines": 159,
+      "missing_lines": 0
+    }
+  },
+  "tests": {
+    "total_files": 117,
+    "by_type": {
+      "unit": 18,
+      "integration": 15,
+      "ml": 8,
+      "api": 15,
+      "security": 14,
+      "other": 47
+    }
+  },
+  "top_covered_files": [
+    {
+      "file": "__init__.py",
+      "full_path": "agent/__init__.py",
+      "coverage": 100.0,
+      "covered": 6,
+      "total": 6
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "agent/config/__init__.py",
+      "coverage": 100.0,
+      "covered": 3,
+      "total": 3
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "agent/modules/__init__.py",
+      "coverage": 100.0,
+      "covered": 1,
+      "total": 1
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "agent/modules/backend/__init__.py",
+      "coverage": 100.0,
+      "covered": 1,
+      "total": 1
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "api/v1/__init__.py",
+      "coverage": 100.0,
+      "covered": 1,
+      "total": 1
+    },
+    {
+      "file": "content.py",
+      "full_path": "api/v1/content.py",
+      "coverage": 100.0,
+      "covered": 123,
+      "total": 123
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "api_integration/__init__.py",
+      "coverage": 100.0,
+      "covered": 1,
+      "total": 1
+    },
+    {
+      "file": "enums.py",
+      "full_path": "api_integration/enums.py",
+      "coverage": 100.0,
+      "covered": 18,
+      "total": 18
+    },
+    {
+      "file": "config.py",
+      "full_path": "config.py",
+      "coverage": 100.0,
+      "covered": 43,
+      "total": 43
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "config/__init__.py",
+      "coverage": 100.0,
+      "covered": 3,
+      "total": 3
+    }
+  ],
+  "bottom_covered_files": [
+    {
+      "file": "exceptions.py",
+      "full_path": "core/exceptions.py",
+      "coverage": 88.89,
+      "covered": 80,
+      "total": 90,
+      "lines_needed": 1
+    },
+    {
+      "file": "enterprise_middleware.py",
+      "full_path": "middleware/enterprise_middleware.py",
+      "coverage": 87.94,
+      "covered": 124,
+      "total": 141,
+      "lines_needed": 2
+    },
+    {
+      "file": "__init__.py",
+      "full_path": "api/__init__.py",
+      "coverage": 71.43,
+      "covered": 5,
+      "total": 7,
+      "lines_needed": 1
+    },
+    {
+      "file": "tool_calling_safeguards.py",
+      "full_path": "security/tool_calling_safeguards.py",
+      "coverage": 71.37,
+      "covered": 177,
+      "total": 248,
+      "lines_needed": 46
+    },
+    {
+      "file": "openai_safeguards.py",
+      "full_path": "security/openai_safeguards.py",
+      "coverage": 69.14,
+      "covered": 177,
+      "total": 256,
+      "lines_needed": 53
+    },
+    {
+      "file": "gdpr_compliance.py",
+      "full_path": "security/gdpr_compliance.py",
+      "coverage": 68.91,
+      "covered": 82,
+      "total": 119,
+      "lines_needed": 25
+    },
+    {
+      "file": "wordpress_credentials.py",
+      "full_path": "config/wordpress_credentials.py",
+      "coverage": 62.04,
+      "covered": 67,
+      "total": 108,
+      "lines_needed": 30
+    },
+    {
+      "file": "main.py",
+      "full_path": "main.py",
+      "coverage": 62.0,
+      "covered": 390,
+      "total": 629,
+      "lines_needed": 176
+    },
+    {
+      "file": "unified_config.py",
+      "full_path": "config/unified_config.py",
+      "coverage": 55.87,
+      "covered": 119,
+      "total": 213,
+      "lines_needed": 72
+    },
+    {
+      "file": "logging.py",
+      "full_path": "core/logging.py",
+      "coverage": 55.49,
+      "covered": 96,
+      "total": 173,
+      "lines_needed": 59
+    }
+  ],
+  "truth_protocol_compliance": {
+    "rule_8_status": "NON-COMPLIANT",
+    "coverage_requirement_met": false,
+    "gap_percentage": 79.65
+  }
+}

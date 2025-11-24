@@ -4,21 +4,18 @@ Comprehensive tests for monitoring/enterprise_metrics.py
 Target: ≥80% coverage (162/203 lines minimum)
 """
 
-import time
 from datetime import datetime
 from unittest.mock import MagicMock, Mock, patch
 
 import pytest
 
-from core.logging import LogCategory
 from monitoring.enterprise_metrics import (
     Alert,
     AlertRule,
     AlertSeverity,
     MetricDefinition,
-    MetricType,
     MetricsCollector,
-    PROMETHEUS_AVAILABLE,
+    MetricType,
     increment_counter,
     observe_histogram,
     set_gauge,

@@ -11,7 +11,7 @@ Truth Protocol: All operations validated, errors logged, no placeholders
 import asyncio
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build

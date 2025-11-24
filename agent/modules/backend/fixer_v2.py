@@ -18,7 +18,7 @@ from pathlib import Path
 import re
 import shutil
 import time
-from typing import Any, Optional
+from typing import Any
 
 import autopep8
 
@@ -157,8 +157,8 @@ class FixerAgentV2(BaseAgent):
 
     async def _auto_fix(
         self,
-        scan_results: Optional[dict[str, Any]],
-        target_files: Optional[list[str]],
+        scan_results: dict[str, Any] | None,
+        target_files: list[str] | None,
         dry_run: bool,
     ) -> dict[str, Any]:
         """Automatically fix issues based on scan results"""
@@ -196,7 +196,7 @@ class FixerAgentV2(BaseAgent):
 
         return results
 
-    async def _security_fix(self, scan_results: Optional[dict[str, Any]], dry_run: bool) -> dict[str, Any]:
+    async def _security_fix(self, scan_results: dict[str, Any] | None, dry_run: bool) -> dict[str, Any]:
         """Fix security vulnerabilities"""
         results = {"fixes_applied": [], "vulnerabilities_fixed": 0}
 
@@ -222,7 +222,7 @@ class FixerAgentV2(BaseAgent):
         results["vulnerabilities_fixed"] = len(results["fixes_applied"])
         return results
 
-    async def _performance_fix(self, scan_results: Optional[dict[str, Any]], dry_run: bool) -> dict[str, Any]:
+    async def _performance_fix(self, scan_results: dict[str, Any] | None, dry_run: bool) -> dict[str, Any]:
         """Apply performance optimizations"""
         results = {"fixes_applied": [], "optimizations": 0}
 
@@ -237,7 +237,7 @@ class FixerAgentV2(BaseAgent):
         results["optimizations"] = len(results["fixes_applied"])
         return results
 
-    async def _format_fix(self, target_files: Optional[list[str]], dry_run: bool) -> dict[str, Any]:
+    async def _format_fix(self, target_files: list[str] | None, dry_run: bool) -> dict[str, Any]:
         """Format code according to standards"""
         results = {"fixes_applied": [], "files_formatted": 0}
 
@@ -252,7 +252,7 @@ class FixerAgentV2(BaseAgent):
         results["files_formatted"] = len(results["fixes_applied"])
         return results
 
-    async def _fix_python_files(self, target_files: Optional[list[str]], dry_run: bool) -> list[dict[str, Any]]:
+    async def _fix_python_files(self, target_files: list[str] | None, dry_run: bool) -> list[dict[str, Any]]:
         """Fix Python-specific issues"""
         fixes = []
 
@@ -293,7 +293,7 @@ class FixerAgentV2(BaseAgent):
 
         return fixes
 
-    async def _fix_javascript_files(self, target_files: Optional[list[str]], dry_run: bool) -> list[dict[str, Any]]:
+    async def _fix_javascript_files(self, target_files: list[str] | None, dry_run: bool) -> list[dict[str, Any]]:
         """Fix JavaScript/TypeScript issues"""
         fixes = []
 
@@ -330,7 +330,7 @@ class FixerAgentV2(BaseAgent):
 
         return fixes
 
-    async def _fix_common_issues(self, target_files: Optional[list[str]], dry_run: bool) -> list[dict[str, Any]]:
+    async def _fix_common_issues(self, target_files: list[str] | None, dry_run: bool) -> list[dict[str, Any]]:
         """Fix common issues across all file types"""
         fixes = []
 
@@ -371,7 +371,7 @@ class FixerAgentV2(BaseAgent):
 
         return fixes
 
-    async def _fix_hardcoded_secret(self, file_path: str, dry_run: bool) -> Optional[dict[str, Any]]:
+    async def _fix_hardcoded_secret(self, file_path: str, dry_run: bool) -> dict[str, Any] | None:
         """Fix hardcoded secrets by replacing with environment variables"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:
@@ -399,7 +399,7 @@ class FixerAgentV2(BaseAgent):
 
         return None
 
-    async def _fix_sql_injection(self, file_path: str, dry_run: bool) -> Optional[dict[str, Any]]:
+    async def _fix_sql_injection(self, file_path: str, dry_run: bool) -> dict[str, Any] | None:
         """
         Add SQL injection prevention.
 
@@ -436,7 +436,7 @@ class FixerAgentV2(BaseAgent):
         """
         return []
 
-    async def _format_python_file(self, file_path: str, dry_run: bool) -> Optional[dict[str, Any]]:
+    async def _format_python_file(self, file_path: str, dry_run: bool) -> dict[str, Any] | None:
         """Format a Python file"""
         try:
             with open(file_path, "r", encoding="utf-8") as f:

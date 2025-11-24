@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 import time
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import asyncpg
 from clickhouse_driver import Client as ClickHouseClient

@@ -11,7 +11,7 @@ from datetime import datetime
 from enum import Enum
 import threading
 import time
-from typing import Any, Optional
+from typing import Any
 
 
 # Prometheus imports (optional)
@@ -289,7 +289,7 @@ class MetricsCollector:
                 metric_def.name, metric_def.description, metric_def.labels, registry=self.registry
             )
 
-    def increment_counter(self, metric_name: str, value: float = 1, labels: Optional[dict[str, str]] = None):
+    def increment_counter(self, metric_name: str, value: float = 1, labels: dict[str, str] | None = None):
         """Increment a counter metric."""
         if metric_name not in self.metrics:
             enterprise_logger.warning(f"Unknown metric: {metric_name}", category=LogCategory.SYSTEM)
@@ -307,7 +307,7 @@ class MetricsCollector:
             else:
                 self.prometheus_metrics[metric_name].inc(value)
 
-    def set_gauge(self, metric_name: str, value: float, labels: Optional[dict[str, str]] = None):
+    def set_gauge(self, metric_name: str, value: float, labels: dict[str, str] | None = None):
         """Set a gauge metric value."""
         if metric_name not in self.metrics:
             enterprise_logger.warning(f"Unknown metric: {metric_name}", category=LogCategory.SYSTEM)
@@ -328,7 +328,7 @@ class MetricsCollector:
         # Check alert rules
         self._check_alert_rules(metric_name, value, labels or {})
 
-    def observe_histogram(self, metric_name: str, value: float, labels: Optional[dict[str, str]] = None):
+    def observe_histogram(self, metric_name: str, value: float, labels: dict[str, str] | None = None):
         """Observe a histogram metric."""
         if metric_name not in self.metrics:
             enterprise_logger.warning(f"Unknown metric: {metric_name}", category=LogCategory.SYSTEM)

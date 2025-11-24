@@ -10,14 +10,15 @@ Per CLAUDE.md Truth Protocol requirements
 """
 
 from datetime import datetime
-from unittest.mock import AsyncMock, Mock, patch, MagicMock
-from uuid import uuid4
-
-import pytest
-from fastapi import HTTPException
 
 # Patch the problematic imports before loading the deployment module
 import sys
+from unittest.mock import AsyncMock, Mock, patch
+
+from fastapi import HTTPException
+import pytest
+
+
 mock_shap = Mock()
 mock_joblib = Mock()
 mock_torch = Mock()
@@ -84,7 +85,7 @@ class TestSubmitJob:
             )
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import submit_job, SubmitJobRequest
+            from api.v1.deployment import SubmitJobRequest, submit_job
 
             request = Mock(spec=SubmitJobRequest)
             request.job_name = "Test Job"
@@ -116,7 +117,7 @@ class TestSubmitJob:
             mock_orch.submit_job = AsyncMock(side_effect=Exception("Orchestrator error"))
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import submit_job, SubmitJobRequest
+            from api.v1.deployment import SubmitJobRequest, submit_job
 
             request = Mock(spec=SubmitJobRequest)
             request.job_name = "Failing Job"
@@ -345,7 +346,7 @@ class TestValidateJob:
             mock_orch.validator.validate_job = AsyncMock(return_value=validation_result)
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import validate_job, ValidateJobRequest
+            from api.v1.deployment import ValidateJobRequest, validate_job
 
             request = Mock(spec=ValidateJobRequest)
             request.job_definition = Mock()
@@ -375,7 +376,7 @@ class TestValidateJob:
             mock_orch.validator.validate_job = AsyncMock(return_value=validation_result)
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import validate_job, ValidateJobRequest
+            from api.v1.deployment import ValidateJobRequest, validate_job
 
             request = Mock(spec=ValidateJobRequest)
             request.job_definition = Mock()
@@ -394,7 +395,7 @@ class TestValidateJob:
             mock_orch.cost_estimator.estimate_job_cost.side_effect = Exception("Cost error")
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import validate_job, ValidateJobRequest
+            from api.v1.deployment import ValidateJobRequest, validate_job
 
             request = Mock(spec=ValidateJobRequest)
             request.job_definition = Mock()
@@ -480,7 +481,7 @@ class TestRegisterTool:
             mock_orch.validator.register_tool = Mock()
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import register_tool, RegisterToolRequest
+            from api.v1.deployment import RegisterToolRequest, register_tool
 
             request = Mock(spec=RegisterToolRequest)
             request.tool_name = "jira_api"
@@ -511,7 +512,7 @@ class TestRegisterResource:
             mock_orch.validator.register_resource = Mock()
             mock_get_orch.return_value = mock_orch
 
-            from api.v1.deployment import register_resource, RegisterResourceRequest
+            from api.v1.deployment import RegisterResourceRequest, register_resource
 
             request = Mock(spec=RegisterResourceRequest)
             request.resource_type = Mock(value="compute")

@@ -7,7 +7,7 @@ import hmac
 import json
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException, Request, status
 from httpx import AsyncClient

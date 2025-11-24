@@ -10,7 +10,7 @@ Per Truth Protocol:
 
 from collections.abc import Callable
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from config.unified_config import get_config
 from security.openai_safeguards import (
@@ -80,8 +80,7 @@ def validate_openai_request(
     operation_type: OperationType,
     is_consequential: bool,
     prompt: str | None = None,
-    params: Optional[dict[str, Any]] = None
-    params: Optional[dict[str, Any]] = None,
+    params: dict[str, Any] | None = None,
 ) -> tuple[bool, str | None]:
     """
     Validate OpenAI API request before execution
@@ -123,7 +122,7 @@ def execute_with_safeguards(
     operation_type: OperationType,
     is_consequential: bool,
     prompt: str | None = None,
-    params: Optional[dict[str, Any]] = None,
+    params: dict[str, Any] | None = None,
     *args,
     **kwargs,
 ) -> Any:

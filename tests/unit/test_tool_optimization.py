@@ -7,18 +7,15 @@ Per Truth Protocol:
 - Rule #12: Performance SLOs - Verify token optimization
 """
 
+
 import pytest
-import asyncio
-from datetime import datetime
 
 from ml.tool_optimization import (
-    CompressedToolSchema,
-    ToolUsagePattern,
-    ToolSelectionContext,
     DynamicToolSelector,
     ParallelFunctionCaller,
     StructuredOutputValidator,
     TokenOptimizationManager,
+    ToolSelectionContext,
     get_optimization_manager,
 )
 from security.tool_calling_safeguards import (

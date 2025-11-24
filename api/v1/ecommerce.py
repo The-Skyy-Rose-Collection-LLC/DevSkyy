@@ -10,7 +10,6 @@ Truth Protocol: Input validation, error handling, logging, no placeholders
 
 from datetime import datetime
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field

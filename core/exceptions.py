@@ -9,7 +9,7 @@ This module provides a comprehensive exception hierarchy for the DevSkyy Platfor
 enabling precise error handling and better debugging.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 # ============================================================================
@@ -24,7 +24,7 @@ class DevSkyyError(Exception):
         self,
         message: str,
         error_code: str | None = None,
-        details: Optional[dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
         original_error: Exception | None = None,
     ):
         """

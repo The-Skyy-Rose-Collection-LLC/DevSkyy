@@ -7,7 +7,7 @@ This is a simplified status checker that doesn't require full DevSkyy dependenci
 """
 
 import os
-from pathlib import Path
+
 
 # Load .env if it exists
 try:
@@ -43,9 +43,8 @@ for key, value in oauth_vars.items():
             display_value = value
 
         print(f"   ✅ {key}: {display_value}")
-    else:
-        if "SECRET" not in key and "PASSWORD" not in key:
-            print(f"   ❌ {key}: Not configured")
+    elif "SECRET" not in key and "PASSWORD" not in key:
+        print(f"   ❌ {key}: Not configured")
 
 # Check Basic Auth credentials
 print("\n📊 WordPress Basic Auth Credentials (Skyy Rose Collection):")
@@ -67,9 +66,8 @@ for key, value in basic_vars.items():
             display_value = value
 
         print(f"   ✅ {key}: {display_value}")
-    else:
-        if "PASSWORD" not in key:
-            print(f"   ❌ {key}: Not configured")
+    elif "PASSWORD" not in key:
+        print(f"   ❌ {key}: Not configured")
 
 # Summary
 print("\n" + "=" * 80)

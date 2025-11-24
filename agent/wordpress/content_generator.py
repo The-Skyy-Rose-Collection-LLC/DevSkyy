@@ -13,7 +13,7 @@ Reference: Based on AGENTS.md specifications
 
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import anthropic
 import nltk  # noqa: F401 - Reserved for Phase 3 NLP enhancements
@@ -40,7 +40,7 @@ class ContentGenerator:
     async def generate_blog_post(
         self,
         topic: str,
-        keywords: Optional[list[str]] = None,
+        keywords: list[str] | None = None,
         tone: str = "professional",
         length: int = 800,
     ) -> dict[str, Any]:

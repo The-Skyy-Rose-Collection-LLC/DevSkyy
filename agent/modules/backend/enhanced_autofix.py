@@ -11,7 +11,7 @@ import os
 from pathlib import Path
 import re
 import subprocess
-from typing import Any, Optional
+from typing import Any
 
 
 # Get the current directory to import other modules
@@ -181,7 +181,7 @@ class EnhancedAutoFix:
             return False
 
     def _run_enhanced_fixes(
-        self, scan_results: dict[str, Any], fix_types: Optional[list[str]] = None
+        self, scan_results: dict[str, Any], fix_types: list[str] | None = None
     ) -> dict[str, Any]:
         """Run enhanced version of the fixer with additional capabilities"""
         # Use existing fixer as base

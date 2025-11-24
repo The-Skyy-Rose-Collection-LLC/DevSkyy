@@ -12,7 +12,7 @@ Features:
 
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import AgentOrchestrator, AgentTask, ExecutionPriority, TaskStatus

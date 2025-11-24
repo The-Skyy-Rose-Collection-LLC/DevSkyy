@@ -49,6 +49,7 @@ class TestModelRegistry:
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.95, "f1": 0.92},
             parameters={"n_estimators": 100},
             dataset_info={"samples": 1000},
@@ -67,7 +68,10 @@ class TestModelRegistry:
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.95},
+            parameters={},
+            dataset_info={},
         )
 
         loaded_model = temp_registry.load_model("test_model", version="1.0.0")
@@ -86,7 +90,10 @@ class TestModelRegistry:
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.95},
+            parameters={},
+            dataset_info={},
         )
 
         # Promote to staging
@@ -110,13 +117,17 @@ class TestModelRegistry:
                 model_name="test_model",
                 version=version,
                 model_type="classifier",
+                framework="sklearn",
                 metrics={"accuracy": 0.95},
+                parameters={},
+                dataset_info={},
             )
 
         versions = temp_registry.list_versions("test_model")
         assert len(versions) == 3
-        assert "1.0.0" in versions
-        assert "2.0.0" in versions
+        version_strings = [v["version"] for v in versions]
+        assert "1.0.0" in version_strings
+        assert "2.0.0" in version_strings
 
     def test_compare_models(self, temp_registry):
         """Test model comparison"""
@@ -127,7 +138,10 @@ class TestModelRegistry:
             model_name="test_model",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.90, "f1": 0.88},
+            parameters={},
+            dataset_info={},
         )
 
         temp_registry.register_model(
@@ -135,7 +149,10 @@ class TestModelRegistry:
             model_name="test_model",
             version="2.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.95, "f1": 0.93},
+            parameters={},
+            dataset_info={},
         )
 
         comparison = temp_registry.compare_models("test_model", "1.0.0", "2.0.0")
@@ -156,7 +173,10 @@ class TestModelRegistry:
             model_name="model1",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.95},
+            parameters={},
+            dataset_info={},
         )
 
         temp_registry.register_model(
@@ -164,7 +184,10 @@ class TestModelRegistry:
             model_name="model2",
             version="1.0.0",
             model_type="regressor",
+            framework="sklearn",
             metrics={"mse": 0.05},
+            parameters={},
+            dataset_info={},
         )
 
         stats = temp_registry.get_registry_stats()
@@ -301,8 +324,10 @@ class TestMLIntegration:
             model_name="workflow_model",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.95},
             parameters={"trained": True},
+            dataset_info={},
         )
 
         assert metadata.model_name == "workflow_model"
@@ -335,7 +360,10 @@ class TestMLIntegration:
             model_name="versioned_model",
             version="1.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.85, "f1": 0.82},
+            parameters={},
+            dataset_info={},
         )
 
         # Register v2 with better metrics
@@ -344,7 +372,10 @@ class TestMLIntegration:
             model_name="versioned_model",
             version="2.0.0",
             model_type="classifier",
+            framework="sklearn",
             metrics={"accuracy": 0.92, "f1": 0.90},
+            parameters={},
+            dataset_info={},
         )
 
         # Compare versions

@@ -13,7 +13,7 @@ import json
 import logging
 import os
 import subprocess
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import FastAPI
 import httpx
@@ -92,7 +92,7 @@ class MCPRequest(BaseModel):
     jsonrpc: str = Field(default="2.0", description="JSON-RPC version")
     method: str = Field(..., description="MCP method to call")
     params: dict[str, Any] = Field(default_factory=dict, description="Method parameters")
-    id: Optional[str | int] = Field(default=None, description="Request ID")
+    id: str | int | None = Field(default=None, description="Request ID")
 
 
 class MCPResponse(BaseModel):
@@ -100,8 +100,8 @@ class MCPResponse(BaseModel):
 
     jsonrpc: str = Field(default="2.0", description="JSON-RPC version")
     result: Any | None = Field(default=None, description="Method result")
-    error: Optional[dict[str, Any]] = Field(default=None, description="Error object")
-    id: Optional[str | int] = Field(default=None, description="Request ID")
+    error: dict[str, Any] | None = Field(default=None, description="Error object")
+    id: str | int | None = Field(default=None, description="Request ID")
 
 
 # =============================================================================

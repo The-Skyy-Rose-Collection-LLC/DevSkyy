@@ -14,7 +14,7 @@ import hashlib
 import os
 from pathlib import Path
 import tempfile
-from typing import Any, Optional
+from typing import Any
 import zipfile
 
 import paramiko

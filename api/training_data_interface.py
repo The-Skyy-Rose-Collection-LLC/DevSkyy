@@ -6,7 +6,7 @@ import logging
 from pathlib import Path
 import shutil
 import tempfile
-from typing import Any, Optional
+from typing import Any
 import zipfile
 
 from fastapi import BackgroundTasks, Body, FastAPI, File, Form, HTTPException, UploadFile

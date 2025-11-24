@@ -2,7 +2,7 @@ from datetime import datetime
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
@@ -57,7 +57,7 @@ class ClaudeSonnetIntelligenceService:
     async def advanced_reasoning(
         self,
         task: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         max_tokens: int = 4096,
     ) -> dict[str, Any]:
         """
@@ -505,7 +505,7 @@ claude_service = create_claude_service()
 
 
 # Convenience functions for easy access
-async def advanced_ai_reasoning(task: str, context: Optional[dict[str, Any]] = None) -> dict[str, Any]:
+async def advanced_ai_reasoning(task: str, context: dict[str, Any] | None = None) -> dict[str, Any]:
     """Use Claude's advanced reasoning for complex tasks."""
     return await claude_service.advanced_reasoning(task, context)
 

@@ -10,13 +10,14 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol requirements
 """
 
+from datetime import datetime
 import os
 import sys
-from datetime import datetime
-from unittest.mock import AsyncMock, Mock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
-import pytest
 from fastapi import HTTPException
+import pytest
+
 
 # Mock external dependencies before importing the content module
 sys.modules["google"] = MagicMock()
@@ -166,8 +167,9 @@ class TestPublishContent:
     @pytest.mark.asyncio
     async def test_publish_content_success(self, mock_orchestrator, successful_workflow_result):
         """Should publish content successfully"""
-        from api.v1.content import PublishContentRequest, publish_content
         from fastapi import BackgroundTasks
+
+        from api.v1.content import PublishContentRequest, publish_content
 
         # Setup mock
         mock_orchestrator.execute_workflow.return_value = successful_workflow_result
@@ -217,8 +219,9 @@ class TestPublishContent:
     @pytest.mark.asyncio
     async def test_publish_content_failure(self, mock_orchestrator, failed_workflow_result):
         """Should raise HTTPException on workflow failure"""
-        from api.v1.content import PublishContentRequest, publish_content
         from fastapi import BackgroundTasks
+
+        from api.v1.content import PublishContentRequest, publish_content
 
         # Setup mock
         mock_orchestrator.execute_workflow.return_value = failed_workflow_result
@@ -240,8 +243,9 @@ class TestPublishContent:
     @pytest.mark.asyncio
     async def test_publish_content_exception(self, mock_orchestrator):
         """Should handle unexpected exceptions"""
-        from api.v1.content import PublishContentRequest, publish_content
         from fastapi import BackgroundTasks
+
+        from api.v1.content import PublishContentRequest, publish_content
 
         # Setup mock to raise exception
         mock_orchestrator.execute_workflow.side_effect = Exception("Unexpected error")
@@ -263,8 +267,9 @@ class TestPublishContent:
     @pytest.mark.asyncio
     async def test_publish_content_no_image(self, mock_orchestrator):
         """Should handle workflow result without image"""
-        from api.v1.content import PublishContentRequest, publish_content
         from fastapi import BackgroundTasks
+
+        from api.v1.content import PublishContentRequest, publish_content
 
         # Setup mock result without image
         result = {
@@ -891,8 +896,9 @@ class TestRequestResponseModels:
 
     def test_publish_content_request_validation(self):
         """Should validate request fields"""
-        from api.v1.content import PublishContentRequest
         from pydantic import ValidationError
+
+        from api.v1.content import PublishContentRequest
 
         # Test min_length validation
         with pytest.raises(ValidationError):
@@ -946,8 +952,9 @@ class TestRequestResponseModels:
 
     def test_scheduled_publish_request_validation(self):
         """Should validate scheduled publish request"""
-        from api.v1.content import ScheduledPublishRequest
         from pydantic import ValidationError
+
+        from api.v1.content import ScheduledPublishRequest
 
         # Test min_items validation
         with pytest.raises(ValidationError):

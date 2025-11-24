@@ -4,7 +4,7 @@ import contextlib
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import psutil
 

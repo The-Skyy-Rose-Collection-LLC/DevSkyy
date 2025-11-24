@@ -22,7 +22,7 @@ from enum import Enum
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional, Union
+from typing import Any, Union
 from uuid import uuid4
 
 
@@ -113,14 +113,14 @@ class Task:
     required_agents: list[str] = field(default_factory=list)
     priority: ExecutionPriority = ExecutionPriority.MEDIUM
     status: TaskStatus = TaskStatus.PENDING
-    output: Optional[dict[str, Any]] = None
-    result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    output: dict[str, Any] | None = None
+    result: dict[str, Any] | None = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.utcnow)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
-    def duration_seconds(self) -> Optional[float]:
+    def duration_seconds(self) -> float | None:
         """Calculate task duration"""
         if self.started_at and self.completed_at:
             return (self.completed_at - self.started_at).total_seconds()
@@ -360,12 +360,12 @@ class UnifiedMCPOrchestrator:
     async def create_task(
         self,
         name: str,
-        agent_role: Optional[AgentRole] = None,
-        tool_name: Optional[str] = None,
-        task_type: Optional[str] = None,
-        input_data: Optional[dict[str, Any]] = None,
-        parameters: Optional[dict[str, Any]] = None,
-        required_capabilities: Optional[list[str]] = None,
+        agent_role: AgentRole | None = None,
+        tool_name: str | None = None,
+        task_type: str | None = None,
+        input_data: dict[str, Any] | None = None,
+        parameters: dict[str, Any] | None = None,
+        required_capabilities: list[str] | None = None,
         priority: ExecutionPriority = ExecutionPriority.MEDIUM,
     ) -> Task:
         """Create a new orchestrated task"""
@@ -724,7 +724,7 @@ class UnifiedMCPOrchestrator:
             "token_reduction_ratio": 0.98,  # 98% reduction through on-demand loading
         }
 
-    def get_agent_metrics(self, agent_name: Optional[str] = None) -> dict[str, Any]:
+    def get_agent_metrics(self, agent_name: str | None = None) -> dict[str, Any]:
         """Get performance metrics for agent(s)"""
         if agent_name:
             return self.agent_metrics.get(agent_name, {})
@@ -755,7 +755,7 @@ class UnifiedMCPOrchestrator:
     # INTER-AGENT COMMUNICATION
     # ========================================================================
 
-    def share_data(self, key: str, value: Any, ttl: Optional[int] = None):
+    def share_data(self, key: str, value: Any, ttl: int | None = None):
         """Share data between agents"""
         self.shared_context[key] = {
             "value": value,
@@ -763,7 +763,7 @@ class UnifiedMCPOrchestrator:
             "ttl": ttl,
         }
 
-    def get_shared_data(self, key: str) -> Optional[Any]:
+    def get_shared_data(self, key: str) -> Any | None:
         """Get shared data"""
         data = self.shared_context.get(key)
         if not data:

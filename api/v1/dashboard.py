@@ -11,7 +11,7 @@ except ImportError:
     SECURITY_AVAILABLE = False
 import asyncio
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse

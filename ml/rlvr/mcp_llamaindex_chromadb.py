@@ -10,30 +10,26 @@ Architecture:
 - Hybrid queries combine both for optimal results
 """
 
-import os
-import uuid
 import asyncio
+from datetime import datetime
 import html
 import logging
-from typing import Dict, Any, Optional, List
-from datetime import datetime
+import os
 from pathlib import Path
+from typing import Any
+import uuid
 
-from llama_index.core import (
-    VectorStoreIndex,
-    Document,
-    Settings,
-    StorageContext
-)
-from llama_index.core.vector_stores import ChromaVectorStore
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.openai import OpenAI as LlamaOpenAI
-from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import text
-import openai
 from anthropic import Anthropic
 import chromadb
 from chromadb.config import Settings as ChromaSettings
+from llama_index.core import Document, Settings, StorageContext, VectorStoreIndex
+from llama_index.core.vector_stores import ChromaVectorStore
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.openai import OpenAI as LlamaOpenAI
+import openai
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import AsyncSession
+
 
 logger = logging.getLogger(__name__)
 
@@ -126,8 +122,8 @@ class ProductionMCPLlamaIndexOrchestrator:
             )
 
         # Agent-specific ChromaDB collections
-        self.collections: Dict[str, chromadb.Collection] = {}
-        self.indexes: Dict[str, VectorStoreIndex] = {}
+        self.collections: dict[str, chromadb.Collection] = {}
+        self.indexes: dict[str, VectorStoreIndex] = {}
 
     def get_collection_name(self, agent_id: uuid.UUID) -> str:
         """Generate ChromaDB collection name for agent."""
@@ -237,7 +233,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         min_score: float = 0.7,
         top_k: int = 10,
         example_type: str | None = "positive"
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """
         Hybrid retrieval using ChromaDB vector search + SQL filters.
 
@@ -309,7 +305,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         self,
         agent_id: uuid.UUID,
         top_k_examples: int = 10
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Production-grade prompt optimization with MCP + ChromaDB + Claude.
 
@@ -454,7 +450,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "persistence": "durable"
         }
 
-    def _format_examples_xml(self, examples: List[Dict[str, Any]]) -> str:
+    def _format_examples_xml(self, examples: list[dict[str, Any]]) -> str:
         """Format examples with XML for Claude."""
         formatted = []
         for i, ex in enumerate(examples, 1):
@@ -475,7 +471,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
 </example>""")
         return "\n".join(formatted)
 
-    def get_collection_stats(self, agent_id: uuid.UUID) -> Dict[str, Any]:
+    def get_collection_stats(self, agent_id: uuid.UUID) -> dict[str, Any]:
         """Get ChromaDB collection statistics."""
         agent_id_str = str(agent_id)
         collection_name = self.get_collection_name(agent_id)
@@ -510,7 +506,7 @@ async def production_demo():
     - OpenAI API key
     - Anthropic API key
     """
-    from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
+    from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
     from sqlalchemy.orm import sessionmaker
 
     DATABASE_URL = os.getenv("DATABASE_URL")
@@ -559,7 +555,7 @@ async def production_demo():
             top_k_examples=10
         )
 
-        print(f"\nOptimization Complete:")
+        print("\nOptimization Complete:")
         print(f"Agent: {result['agent_name']}")
         print(f"Version: {result['version_before']} → {result['version_after']}")
         print(f"Method: {result['method']}")

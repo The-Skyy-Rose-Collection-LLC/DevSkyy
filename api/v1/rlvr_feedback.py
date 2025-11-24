@@ -4,19 +4,19 @@ RLVR Feedback API Endpoints
 Allows users to provide feedback on agent executions for reward verification.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
-from typing import Optional
 import uuid
-from datetime import datetime
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from models.user import User
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from infrastructure.database import get_db_session
-from security.jwt_auth import get_current_user
+from ml.rlvr.fine_tuning_orchestrator import FineTuningOrchestrator
 from ml.rlvr.reward_verifier import RewardVerifier, VerificationMethod
 from ml.rlvr.training_collector import TrainingDataCollector
-from ml.rlvr.fine_tuning_orchestrator import FineTuningOrchestrator
-from models.user import User
+from security.jwt_auth import get_current_user
+
 
 router = APIRouter(prefix="/api/v1/rlvr", tags=["rlvr", "feedback"])
 
@@ -101,7 +101,7 @@ async def submit_user_feedback(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process feedback: {str(e)}"
+            detail=f"Failed to process feedback: {e!s}"
         )
 
 
@@ -138,7 +138,7 @@ async def submit_test_results(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process test results: {str(e)}"
+            detail=f"Failed to process test results: {e!s}"
         )
 
 
@@ -177,7 +177,7 @@ async def submit_code_analysis(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process code analysis: {str(e)}"
+            detail=f"Failed to process code analysis: {e!s}"
         )
 
 
@@ -213,7 +213,7 @@ async def collect_training_data(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to collect training data: {str(e)}"
+            detail=f"Failed to collect training data: {e!s}"
         )
 
 
@@ -235,7 +235,7 @@ async def get_training_stats(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get training stats: {str(e)}"
+            detail=f"Failed to get training stats: {e!s}"
         )
 
 
@@ -285,7 +285,7 @@ async def start_fine_tuning(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to start fine-tuning: {str(e)}"
+            detail=f"Failed to start fine-tuning: {e!s}"
         )
 
 
@@ -335,7 +335,7 @@ async def get_fine_tuning_status(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get status: {str(e)}"
+            detail=f"Failed to get status: {e!s}"
         )
 
 
@@ -373,7 +373,7 @@ async def deploy_fine_tuned_agent(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to deploy agent: {str(e)}"
+            detail=f"Failed to deploy agent: {e!s}"
         )
 
 
@@ -454,5 +454,5 @@ async def get_agent_analytics(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get analytics: {str(e)}"
+            detail=f"Failed to get analytics: {e!s}"
         )

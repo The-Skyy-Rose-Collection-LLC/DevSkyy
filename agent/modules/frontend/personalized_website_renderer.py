@@ -2,7 +2,7 @@ import asyncio
 from datetime import datetime
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 
 from geopy.geocoders import Nominatim
 
@@ -798,7 +798,7 @@ class PersonalizedWebsiteRenderer:
         }
 
     def _apply_behavioral_targeting(
-        self, behavior: Optional[dict[str, Any]], content: dict[str, Any]
+        self, behavior: dict[str, Any] | None, content: dict[str, Any]
     ) -> dict[str, Any]:
         """Apply behavioral targeting overlays to content."""
         if not behavior:
@@ -824,7 +824,7 @@ class PersonalizedWebsiteRenderer:
 
         return content
 
-    def _optimize_for_device(self, device: Optional[dict[str, Any]], content: dict[str, Any]) -> dict[str, Any]:
+    def _optimize_for_device(self, device: dict[str, Any] | None, content: dict[str, Any]) -> dict[str, Any]:
         """Optimize content for specific device type."""
         if not device:
             return content

@@ -3,7 +3,7 @@ import importlib
 import inspect
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import ExecutionPriority, orchestrator
@@ -163,7 +163,7 @@ class AgentRegistry:
 
         return agents
 
-    async def _analyze_agent_file(self, file_path: Path, module_prefix: str) -> Optional[dict[str, Any]]:
+    async def _analyze_agent_file(self, file_path: Path, module_prefix: str) -> dict[str, Any] | None:
         """Analyze an agent file to extract information"""
         try:
             # Get module name
@@ -267,7 +267,7 @@ class AgentRegistry:
 
         return list(self.registered_agents.keys())
 
-    def get_agent_info(self, agent_name: str) -> Optional[dict[str, Any]]:
+    def get_agent_info(self, agent_name: str) -> dict[str, Any] | None:
         """Get detailed information about an agent"""
         if agent_name not in self.registered_agents:
             return None

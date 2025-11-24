@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import logging
 import os
 import sys
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer

@@ -9,14 +9,11 @@ Truth Protocol: Rules #1, #8, #15
 Coverage Target: ≥80%
 """
 
-import json
-import pickle
-import time
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
-import pytest
 import fakeredis.aioredis
+import pytest
 from redis.exceptions import ConnectionError, RedisError, TimeoutError
 
 from infrastructure.redis_manager import CacheMetrics, RedisManager, SessionData

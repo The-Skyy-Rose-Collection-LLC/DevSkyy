@@ -1,0 +1,181 @@
+{
+  "report_date": "2025-11-23",
+  "coverage_summary": {
+    "overall_coverage": 10.35,
+    "target_coverage": 90.0,
+    "gap": 79.65,
+    "status": "CRITICAL_FAILURE",
+    "total_lines": 38983,
+    "covered_lines": 4251,
+    "missing_lines": 34732,
+    "branch_coverage": 7.77,
+    "branches_covered": 654,
+    "branches_missing": 7762
+  },
+  "test_statistics": {
+    "total_test_files": 89,
+    "tests_collected": 1810,
+    "collection_errors": 33,
+    "test_failures": 76,
+    "tests_passed": 98
+  },
+  "files_by_coverage": {
+    "zero_percent": 201,
+    "low_1_20_percent": 14,
+    "moderate_21_50_percent": 4,
+    "good_51_80_percent": 6,
+    "excellent_81_90_percent": 3,
+    "outstanding_91_100_percent": 34,
+    "total_files": 262
+  },
+  "module_coverage": [
+    {"module": "templates", "files": 1, "avg_coverage": 100.0, "status": "EXCELLENT"},
+    {"module": "webhooks", "files": 2, "avg_coverage": 100.0, "status": "EXCELLENT"},
+    {"module": "middleware", "files": 2, "avg_coverage": 93.97, "status": "EXCELLENT"},
+    {"module": "config", "files": 3, "avg_coverage": 72.64, "status": "GOOD"},
+    {"module": "intelligence", "files": 2, "avg_coverage": 52.26, "status": "MODERATE"},
+    {"module": "fashion", "files": 3, "avg_coverage": 50.10, "status": "MODERATE"},
+    {"module": "monitoring", "files": 6, "avg_coverage": 48.92, "status": "MODERATE"},
+    {"module": "security", "files": 16, "avg_coverage": 45.29, "status": "MODERATE"},
+    {"module": "services", "files": 9, "avg_coverage": 43.26, "status": "MODERATE"},
+    {"module": "core", "files": 7, "avg_coverage": 40.91, "status": "LOW"},
+    {"module": "root", "files": 12, "avg_coverage": 38.50, "status": "LOW"},
+    {"module": "backend", "files": 3, "avg_coverage": 33.33, "status": "LOW"},
+    {"module": "api_integration", "files": 7, "avg_coverage": 28.57, "status": "CRITICAL"},
+    {"module": "infrastructure", "files": 8, "avg_coverage": 24.90, "status": "CRITICAL"},
+    {"module": "api", "files": 32, "avg_coverage": 9.42, "status": "CRITICAL"},
+    {"module": "agent", "files": 103, "avg_coverage": 4.38, "status": "CRITICAL"},
+    {"module": "agents", "files": 3, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "ai", "files": 2, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "ai_orchestration", "files": 4, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "architecture", "files": 3, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "database", "files": 2, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "fashion_ai_bounded_autonomy", "files": 9, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "mcp_optimization", "files": 2, "avg_coverage": 0.0, "status": "CRITICAL"},
+    {"module": "ml", "files": 21, "avg_coverage": 0.0, "status": "CRITICAL"}
+  ],
+  "critical_gaps": {
+    "modules_with_zero_coverage": [
+      "agent",
+      "ml",
+      "agents",
+      "ai",
+      "ai_orchestration",
+      "architecture",
+      "database",
+      "fashion_ai_bounded_autonomy",
+      "mcp_optimization"
+    ],
+    "files_with_zero_coverage_count": 202,
+    "high_priority_files": [
+      {"file": "agent/orchestrator.py", "coverage": 1.9, "priority": "CRITICAL"},
+      {"file": "agent/modules/base_agent.py", "coverage": 4.6, "priority": "CRITICAL"},
+      {"file": "agent/modules/backend/financial_agent.py", "coverage": 1.9, "priority": "CRITICAL"},
+      {"file": "api/v1/agents.py", "coverage": 2.0, "priority": "HIGH"},
+      {"file": "api/training_data_interface.py", "coverage": 1.4, "priority": "HIGH"},
+      {"file": "security/jwt_auth.py", "coverage": 15.2, "priority": "HIGH"}
+    ]
+  },
+  "test_quality": {
+    "unit_test_performance": {
+      "target_ms": 100,
+      "status": "PASSING",
+      "note": "Most tests < 50ms"
+    },
+    "integration_test_performance": {
+      "target_ms": 1000,
+      "status": "UNKNOWN",
+      "note": "Insufficient data due to test failures"
+    },
+    "api_test_performance": {
+      "target_ms": 500,
+      "status": "UNKNOWN",
+      "note": "Many tests failing, cannot measure"
+    }
+  },
+  "recommendations": {
+    "phase_1": {
+      "name": "Fix Test Infrastructure",
+      "duration_weeks": 1,
+      "priority": "CRITICAL",
+      "actions": [
+        "Resolve 33 test collection errors",
+        "Fix 76+ failing tests",
+        "Install missing dependencies",
+        "Set up test configuration files",
+        "Create common test fixtures"
+      ],
+      "expected_coverage_gain": 5,
+      "expected_coverage_after": 15
+    },
+    "phase_2": {
+      "name": "Cover Critical Modules",
+      "duration_weeks": 3,
+      "priority": "HIGH",
+      "sub_phases": [
+        {
+          "name": "Agent Module Coverage",
+          "tests_to_add": "400-500",
+          "coverage_gain": 35,
+          "target_coverage": 80
+        },
+        {
+          "name": "ML Module Coverage",
+          "tests_to_add": "200-300",
+          "coverage_gain": 15,
+          "target_coverage": 70
+        },
+        {
+          "name": "API Module Coverage",
+          "tests_to_add": "300-400",
+          "coverage_gain": 12,
+          "target_coverage": 80
+        },
+        {
+          "name": "Security Module Coverage",
+          "tests_to_add": "150-200",
+          "coverage_gain": 8,
+          "target_coverage": 90
+        },
+        {
+          "name": "Infrastructure Module Coverage",
+          "tests_to_add": "100-150",
+          "coverage_gain": 5,
+          "target_coverage": 75
+        }
+      ],
+      "expected_coverage_after": 90
+    },
+    "phase_3": {
+      "name": "Reach 95% Coverage",
+      "duration_weeks": 1,
+      "priority": "MEDIUM",
+      "tests_to_add": "330-420",
+      "expected_coverage_gain": 5,
+      "expected_coverage_after": 95
+    },
+    "total_effort": {
+      "duration_weeks": 6,
+      "total_tests_to_add": "1500-2000",
+      "total_coverage_gain": 85,
+      "final_coverage": 95
+    }
+  },
+  "immediate_actions": [
+    "Install all dependencies: pip install -e '.[dev,test]'",
+    "Fix cryptography version for encryption tests",
+    "Set up test database (SQLite or PostgreSQL test instance)",
+    "Create .env.test with test environment variables",
+    "Mock external services (OpenAI, Anthropic, Auth0)",
+    "Fix import errors in config.unified_config",
+    "Create root-level conftest.py with common fixtures",
+    "Run tests in isolated environment to verify fixes"
+  ],
+  "compliance_status": {
+    "rule_8_coverage_requirement": "≥90%",
+    "current_coverage": "10.35%",
+    "compliance": false,
+    "gap": "79.65%",
+    "estimated_time_to_compliance": "6 weeks"
+  }
+}

@@ -11,15 +11,16 @@ This module provides enterprise-grade error handling with:
 - OpenTelemetry tracing
 """
 
+from datetime import UTC, datetime
 import json
 import logging
 import logging.handlers
 import sys
 import traceback
-from datetime import datetime, timezone
-from typing import Any, Dict, Optional, Type
+from typing import Any
 
 from pydantic import BaseModel, Field
+
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ class ErrorRecord(BaseModel):
     """Enterprise error record per Truth Protocol Rule #14"""
 
     timestamp: str = Field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
+        default_factory=lambda: datetime.now(UTC).isoformat()
     )
     error_id: str
     error_type: str
@@ -85,7 +86,7 @@ class EnterpriseErrorHandler:
         class JsonFormatter(logging.Formatter):
             def format(self, record: logging.LogRecord) -> str:
                 log_obj = {
-                    "timestamp": datetime.now(timezone.utc).isoformat(),
+                    "timestamp": datetime.now(UTC).isoformat(),
                     "level": record.levelname,
                     "logger": record.name,
                     "message": record.getMessage(),
@@ -123,7 +124,7 @@ class EnterpriseErrorHandler:
         error_type: str,
         message: str,
         severity: str = "MEDIUM",
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         exception: Exception | None = None,
         user_id: str | None = None,
         request_id: str | None = None,
@@ -149,7 +150,7 @@ class EnterpriseErrorHandler:
         """
         import os
 
-        error_id = f"err_{datetime.now(timezone.utc).timestamp():.0f}"
+        error_id = f"err_{datetime.now(UTC).timestamp():.0f}"
         context = context or {}
 
         # Sanitize PII from context
@@ -235,7 +236,7 @@ class EnterpriseErrorHandler:
             os.makedirs(os.path.dirname(self.ledger_path) or ".", exist_ok=True)
 
             ledger_data = {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
                 "total_errors": len(self.errors),
                 "errors": [error.model_dump() for error in self.errors],
                 "summary": self._get_summary(),
@@ -269,7 +270,7 @@ class EnterpriseErrorHandler:
     def export_ledger(self) -> dict[str, Any]:
         """Export error ledger"""
         return {
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
             "total_errors": len(self.errors),
             "errors": [error.model_dump() for error in self.errors],
             "summary": self._get_summary(),
@@ -292,7 +293,7 @@ def record_error(
     error_type: str,
     message: str,
     severity: str = "MEDIUM",
-    context: Optional[dict[str, Any]] = None,
+    context: dict[str, Any] | None = None,
     exception: Exception | None = None,
     **kwargs: Any,
 ) -> ErrorRecord:

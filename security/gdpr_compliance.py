@@ -12,7 +12,7 @@ Citation: GDPR Articles 15, 17, 5; Recital 83
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter

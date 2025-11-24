@@ -6,7 +6,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from api_integration.core_engine import api_gateway
@@ -97,7 +97,7 @@ class WorkflowStep:
     retry_count: int = 0
     max_retries: int = 3
     timeout: int = 300
-    rollback_config: Optional[dict[str, Any]] = None
+    rollback_config: dict[str, Any] | None = None
     status: StepStatus = StepStatus.PENDING
     started_at: datetime | None = None
     completed_at: datetime | None = None

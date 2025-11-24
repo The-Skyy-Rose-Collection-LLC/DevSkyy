@@ -25,12 +25,11 @@ Run: pytest tests/services/test_consensus_orchestrator_comprehensive.py --cov=se
 """
 
 import asyncio
-import sys
 from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
+from urllib.parse import urlparse
 
 import pytest
-from urllib.parse import urlparse
 
 from services.consensus_orchestrator import (
     AgentReview,

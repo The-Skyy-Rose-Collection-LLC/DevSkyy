@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 import secrets
 import time
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from fastapi import HTTPException, Request, Response, status

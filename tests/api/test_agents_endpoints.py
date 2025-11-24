@@ -4,7 +4,7 @@ Testing all agent execution endpoints with various scenarios to achieve ≥80% c
 """
 
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 from fastapi import FastAPI, status
 from fastapi.testclient import TestClient

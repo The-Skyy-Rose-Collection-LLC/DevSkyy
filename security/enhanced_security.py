@@ -8,7 +8,7 @@ import logging
 import re
 import secrets
 import time
-from typing import Any, Optional
+from typing import Any
 
 from cryptography.fernet import Fernet
 from cryptography.hazmat.primitives import hashes

@@ -6,12 +6,14 @@ Each upgrade is verified through multiple sources using the RLVR system.
 """
 
 import asyncio
+from datetime import datetime
 import logging
-from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
+from typing import Any
+
 import numpy as np
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingRegressor
+from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.preprocessing import StandardScaler
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,7 +43,7 @@ class RealTimeCodeQualityScorer:
         self.scaler = StandardScaler()
         self.trained = False
 
-    async def score_code_realtime(self, code_snippet: str) -> Dict[str, Any]:
+    async def score_code_realtime(self, code_snippet: str) -> dict[str, Any]:
         """
         Score code quality in real-time.
 
@@ -69,7 +71,7 @@ class RealTimeCodeQualityScorer:
             "estimated_fix_time": self._estimate_fix_time(recommendations)
         }
 
-    def _extract_code_features(self, code: str) -> Dict[str, float]:
+    def _extract_code_features(self, code: str) -> dict[str, float]:
         """Extract numerical features from code."""
         lines = code.split('\n')
 
@@ -89,7 +91,7 @@ class RealTimeCodeQualityScorer:
         complexity_keywords = ['if ', 'elif ', 'else:', 'for ', 'while ', 'and ', 'or ', 'try:', 'except:']
         return sum(code.count(keyword) for keyword in complexity_keywords)
 
-    def _rule_based_score(self, features: Dict[str, float]) -> float:
+    def _rule_based_score(self, features: dict[str, float]) -> float:
         """Rule-based quality scoring."""
         score = 100.0
 
@@ -110,7 +112,7 @@ class RealTimeCodeQualityScorer:
 
         return max(0, score)
 
-    def _generate_recommendations(self, features: Dict[str, float], score: float) -> List[Dict[str, Any]]:
+    def _generate_recommendations(self, features: dict[str, float], score: float) -> list[dict[str, Any]]:
         """Generate prioritized recommendations."""
         recommendations = []
 
@@ -140,7 +142,7 @@ class RealTimeCodeQualityScorer:
 
         return recommendations
 
-    def _estimate_fix_time(self, recommendations: List[Dict[str, Any]]) -> str:
+    def _estimate_fix_time(self, recommendations: list[dict[str, Any]]) -> str:
         """Estimate time to fix all issues."""
         high_priority_count = sum(1 for r in recommendations if r["priority"] == "high")
         medium_priority_count = sum(1 for r in recommendations if r["priority"] == "medium")
@@ -184,7 +186,7 @@ class AutomatedModelComparison:
         self,
         prompt: str,
         task_type: str = "general"
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Compare all available models for a given task.
 
@@ -222,7 +224,7 @@ class AutomatedModelComparison:
         model_name: str,
         prompt: str,
         task_type: str
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Test a specific model's performance."""
         start_time = datetime.now()
 
@@ -254,7 +256,7 @@ class AutomatedModelComparison:
 
     def _select_best_model(
         self,
-        results: Dict[str, Dict[str, Any]],
+        results: dict[str, dict[str, Any]],
         task_type: str
     ) -> str:
         """Select best model based on multi-criteria optimization."""
@@ -286,7 +288,7 @@ class AutomatedModelComparison:
 
         return max(scores, key=scores.get)
 
-    def _update_fallback_order(self, results: Dict[str, Dict[str, Any]]):
+    def _update_fallback_order(self, results: dict[str, dict[str, Any]]):
         """Update fallback order based on recent performance."""
         successful_models = [
             (model, result["quality_score"])
@@ -302,7 +304,7 @@ class AutomatedModelComparison:
     def _explain_selection(
         self,
         best_model: str,
-        results: Dict[str, Dict[str, Any]]
+        results: dict[str, dict[str, Any]]
     ) -> str:
         """Explain why this model was selected."""
         best_result = results[best_model]
@@ -338,8 +340,8 @@ class CompetitorPriceMonitor:
     async def monitor_competitors(
         self,
         product_id: str,
-        competitor_urls: List[str]
-    ) -> Dict[str, Any]:
+        competitor_urls: list[str]
+    ) -> dict[str, Any]:
         """
         Monitor competitor prices for a product.
 
@@ -378,8 +380,8 @@ class CompetitorPriceMonitor:
 
     async def _scrape_competitor_prices(
         self,
-        urls: List[str]
-    ) -> List[Dict[str, Any]]:
+        urls: list[str]
+    ) -> list[dict[str, Any]]:
         """Scrape competitor prices from URLs."""
         prices = []
 
@@ -404,8 +406,8 @@ class CompetitorPriceMonitor:
     def _analyze_pricing_position(
         self,
         product_id: str,
-        competitor_prices: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        competitor_prices: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Analyze current pricing position vs competitors."""
         if not competitor_prices:
             return {"position": "unknown", "message": "No competitor data available"}
@@ -447,9 +449,9 @@ class CompetitorPriceMonitor:
     def _generate_pricing_recommendations(
         self,
         product_id: str,
-        competitor_prices: List[Dict[str, Any]],
-        analysis: Dict[str, Any]
-    ) -> List[Dict[str, Any]]:
+        competitor_prices: list[dict[str, Any]],
+        analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Generate pricing adjustment recommendations."""
         recommendations = []
 
@@ -507,9 +509,9 @@ class ContentGapAnalyzer:
     async def analyze_content_gaps(
         self,
         domain: str,
-        competitors: List[str],
-        target_keywords: List[str]
-    ) -> Dict[str, Any]:
+        competitors: list[str],
+        target_keywords: list[str]
+    ) -> dict[str, Any]:
         """
         Analyze content gaps vs competitors.
 
@@ -540,9 +542,9 @@ class ContentGapAnalyzer:
 
     async def _analyze_competitors(
         self,
-        competitors: List[str],
-        keywords: List[str]
-    ) -> Dict[str, Any]:
+        competitors: list[str],
+        keywords: list[str]
+    ) -> dict[str, Any]:
         """Analyze competitor content coverage."""
         competitor_coverage = {}
 
@@ -564,8 +566,8 @@ class ContentGapAnalyzer:
     async def _analyze_own_content(
         self,
         domain: str,
-        keywords: List[str]
-    ) -> Dict[str, Any]:
+        keywords: list[str]
+    ) -> dict[str, Any]:
         """Analyze own content coverage."""
         own_coverage = {}
 
@@ -582,10 +584,10 @@ class ContentGapAnalyzer:
 
     def _identify_gaps(
         self,
-        own_content: Dict[str, Any],
-        competitor_content: Dict[str, Any],
-        keywords: List[str]
-    ) -> List[Dict[str, Any]]:
+        own_content: dict[str, Any],
+        competitor_content: dict[str, Any],
+        keywords: list[str]
+    ) -> list[dict[str, Any]]:
         """Identify content gaps."""
         gaps = []
 
@@ -630,7 +632,7 @@ class ContentGapAnalyzer:
     def _avg_competitor_quality(
         self,
         keyword: str,
-        competitor_content: Dict[str, Any]
+        competitor_content: dict[str, Any]
     ) -> float:
         """Calculate average competitor content quality."""
         qualities = [
@@ -643,8 +645,8 @@ class ContentGapAnalyzer:
 
     def _prioritize_opportunities(
         self,
-        gaps: List[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        gaps: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         """Prioritize content opportunities."""
         for gap in gaps:
             # Calculate opportunity score
@@ -664,8 +666,8 @@ class ContentGapAnalyzer:
 
     def _estimate_traffic_potential(
         self,
-        opportunities: List[Dict[str, Any]]
-    ) -> Dict[str, Any]:
+        opportunities: list[dict[str, Any]]
+    ) -> dict[str, Any]:
         """Estimate traffic potential from filling content gaps."""
         total_search_volume = sum(o.get("search_volume", 0) for o in opportunities)
 

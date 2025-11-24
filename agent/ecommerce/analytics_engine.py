@@ -2,7 +2,7 @@ from collections import defaultdict
 from datetime import datetime
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import pandas as pd  # noqa: F401 - Reserved for Phase 3 data analysis enhancements
@@ -133,7 +133,7 @@ class EcommerceAnalytics:
         return behavior
 
     async def analyze_product_performance(
-        self, product_ids: Optional[list[str]] = None, metric: str = "revenue"
+        self, product_ids: list[str] | None = None, metric: str = "revenue"
     ) -> dict[str, Any]:
         """
         Analyze product performance metrics
@@ -177,7 +177,7 @@ class EcommerceAnalytics:
 
         return performance
 
-    async def analyze_conversion_funnel(self, funnel_stages: Optional[list[str]] = None) -> dict[str, Any]:
+    async def analyze_conversion_funnel(self, funnel_stages: list[str] | None = None) -> dict[str, Any]:
         """
         Analyze conversion funnel and drop-off points
 
@@ -285,7 +285,7 @@ class EcommerceAnalytics:
         return roi_data
 
     async def get_predictive_insights(
-        self, forecast_days: int = 30, metrics: Optional[list[str]] = None
+        self, forecast_days: int = 30, metrics: list[str] | None = None
     ) -> dict[str, Any]:
         """
         Generate predictive insights and forecasts

@@ -9,9 +9,9 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol requirements
 """
 
-import pytest
 from datetime import datetime, timedelta
-from typing import Any, Dict, List
+
+import pytest
 
 
 # ============================================================================

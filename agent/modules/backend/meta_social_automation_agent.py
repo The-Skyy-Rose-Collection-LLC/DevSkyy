@@ -25,7 +25,7 @@ import json
 import logging
 import os
 import random
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import AsyncAnthropic
 import httpx
@@ -115,10 +115,10 @@ class MetaSocialAutomationAgent:
     async def publish_content(
         self,
         content_text: str,
-        media_urls: Optional[list[str]] = None,
+        media_urls: list[str] | None = None,
         platforms: list[str] | None = None,
         schedule_time: datetime | None = None,
-        shopping_tags: Optional[list[dict]] = None,
+        shopping_tags: list[dict] | None = None,
     ) -> dict[str, Any]:
         """
         Publish content across Meta platforms with advanced features.
@@ -282,10 +282,10 @@ Return as JSON array of hashtags."""
     async def _publish_to_instagram(
         self,
         content: str,
-        media_urls: Optional[list[str]],
+        media_urls: list[str] | None,
         hashtags: list[str],
         schedule_time: datetime | None,
-        shopping_tags: Optional[list[dict]],
+        shopping_tags: list[dict] | None,
     ) -> dict[str, Any]:
         """
         Publish content to Instagram Business account.
@@ -322,7 +322,7 @@ Return as JSON array of hashtags."""
             return {"error": str(e)}
 
     async def _create_ig_media_container(
-        self, media_url: str, caption: str, shopping_tags: Optional[list[dict]]
+        self, media_url: str, caption: str, shopping_tags: list[dict] | None
     ) -> str:
         """
         Create Instagram media container for single post.
@@ -354,7 +354,7 @@ Return as JSON array of hashtags."""
             raise
 
     async def _create_ig_carousel_container(
-        self, media_urls: list[str], caption: str, shopping_tags: Optional[list[dict]]
+        self, media_urls: list[str], caption: str, shopping_tags: list[dict] | None
     ) -> str:
         """
         Create Instagram carousel container for multiple images.
@@ -445,7 +445,7 @@ Return as JSON array of hashtags."""
     async def _publish_to_facebook(
         self,
         content: str,
-        media_urls: Optional[list[str]],
+        media_urls: list[str] | None,
         schedule_time: datetime | None,
     ) -> dict[str, Any]:
         """
@@ -524,8 +524,8 @@ Return as JSON array of hashtags."""
     async def find_potential_customers(
         self,
         target_interests: list[str],
-        demographics: Optional[dict[str, Any]] = None,
-        behavior: Optional[list[str]] = None,
+        demographics: dict[str, Any] | None = None,
+        behavior: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Find potential customers using Meta's targeting capabilities.
@@ -792,7 +792,7 @@ Return detailed content plan."""
         # Would implement actual tracking using Insights API
         logger.info(f"📊 Tracking performance for {len(posts)} posts")
 
-    async def automate_engagement(self, response_templates: Optional[dict[str, str]] = None) -> dict[str, Any]:
+    async def automate_engagement(self, response_templates: dict[str, str] | None = None) -> dict[str, Any]:
         """
         Automate engagement responses and interactions.
 

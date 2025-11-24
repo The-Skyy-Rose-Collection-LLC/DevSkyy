@@ -52,7 +52,7 @@ import json
 import os
 from pathlib import Path
 import sys
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 
 try:
@@ -117,7 +117,7 @@ class ExecuteRequest(BaseModel):
     intent: AgentIntent = Field(description="Agent category for routing")
     action: str = Field(description="Specific action (scan, fix, predict, etc)")
     parameters: dict[str, Any] = Field(description="Agent-specific parameters")
-    options: Optional[dict[str, Any]] = Field(default=None, description="Execution options")
+    options: dict[str, Any] | None = Field(default=None, description="Execution options")
 
 
 class ExecuteResult(BaseModel):
@@ -127,7 +127,7 @@ class ExecuteResult(BaseModel):
     agent_used: str = Field(description="Agent that handled the request")
     execution_time_ms: float
     result: dict[str, Any] = Field(description="Agent output data")
-    next_actions: Optional[list[str]] = Field(default=None, description="Suggested next steps")
+    next_actions: list[str] | None = Field(default=None, description="Suggested next steps")
 
 
 # Tool 2: Batch Execute
@@ -154,7 +154,7 @@ class QueryRequest(BaseModel):
     """Query request for cached data."""
 
     query_type: Literal["agents", "health", "metrics", "capabilities"]
-    filters: Optional[dict[str, Any]] = None
+    filters: dict[str, Any] | None = None
     cache_ttl: int = Field(default=300, description="Cache TTL in seconds")
 
 

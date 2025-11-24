@@ -16,16 +16,13 @@ Author: DevSkyy Team
 Per Truth Protocol Rule #8: Test coverage ≥90% required (≥85% acceptable for complex files)
 """
 
-import asyncio
-import os
 from datetime import datetime
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch, mock_open
+from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
-from fastapi import HTTPException, status
+from fastapi import HTTPException
 from fastapi.exceptions import RequestValidationError
 from fastapi.testclient import TestClient
+import pytest
 
 
 # ============================================================================

@@ -15,7 +15,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from difflib import SequenceMatcher
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 from agents.loader import AgentConfig, AgentConfigLoader, LoaderError
 from core.agentlightning_integration import trace_agent
@@ -387,7 +387,7 @@ class AgentRouter:
         description_lower = task.description.lower()
 
         # Calculate similarity scores for each task type
-        best_match: Optional[tuple[TaskType, float]] = None
+        best_match: tuple[TaskType, float] | None = None
 
         for task_type, keywords in self._task_keywords.items():
             # Count keyword matches

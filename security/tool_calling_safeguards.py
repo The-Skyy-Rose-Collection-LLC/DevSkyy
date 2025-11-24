@@ -25,7 +25,7 @@ from enum import Enum
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from pydantic import BaseModel, Field
@@ -108,7 +108,7 @@ class ToolCallResponse(BaseModel):
     request_id: str
     tool_name: str
     success: bool
-    result: Optional[dict[str, Any]] = None
+    result: dict[str, Any] | None = None
     error: str | None = None
     execution_time_ms: float
     tokens_used: int = 0

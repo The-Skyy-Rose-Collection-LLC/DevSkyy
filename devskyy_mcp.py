@@ -19,7 +19,7 @@ Python: 3.11+
 from datetime import datetime
 import json
 import os
-from typing import Any, Optional
+from typing import Any
 
 from fastmcp import FastMCP
 import httpx
@@ -88,8 +88,8 @@ class DevSkyyClient:
         self,
         method: str,
         endpoint: str,
-        data: Optional[dict[str, Any]] = None,
-        params: Optional[dict[str, Any]] = None,
+        data: dict[str, Any] | None = None,
+        params: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Make API request."""
         url = f"{self.api_url}{endpoint}"

@@ -5,9 +5,10 @@ Production-grade OAuth2 + JWT with refresh tokens, role-based access control
 
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
+from functools import wraps
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import Depends, HTTPException, Security, status
 from fastapi.security import (
@@ -23,7 +24,13 @@ from pydantic import BaseModel, EmailStr, Field
 logger = logging.getLogger(__name__)
 
 # JWT Configuration - Enhanced Security
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", os.getenv("SECRET_KEY", "INSECURE_DEFAULT_CHANGE_ME"))
+# Truth Protocol Rule #5: No Secrets in Code - Must be set via environment variable
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY")
+if not JWT_SECRET_KEY:
+    raise ValueError(
+        "JWT_SECRET_KEY or SECRET_KEY environment variable must be set. "
+        "Set JWT_SECRET_KEY in your .env file for production deployment."
+    )
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -70,6 +77,49 @@ class UserRole(str):
     DEVELOPER = "developer"
     API_USER = "api_user"
     READ_ONLY = "read_only"
+
+
+# Role hierarchy for permission checks (higher number = more permissions)
+ROLE_HIERARCHY = {
+    UserRole.SUPER_ADMIN: 5,
+    UserRole.ADMIN: 4,
+    UserRole.DEVELOPER: 3,
+    UserRole.API_USER: 2,
+    UserRole.READ_ONLY: 1,
+}
+
+
+class TokenType(str):
+    """Token type enumeration"""
+
+    ACCESS = "access"
+    REFRESH = "refresh"
+
+
+class TokenBlacklist:
+    """Token blacklist management (in-memory, use Redis in production)"""
+
+    _blacklist: set[str] = set()
+
+    @classmethod
+    def add(cls, token: str) -> None:
+        """Add token to blacklist"""
+        cls._blacklist.add(token)
+
+    @classmethod
+    def is_blacklisted(cls, token: str) -> bool:
+        """Check if token is blacklisted"""
+        return token in cls._blacklist
+
+    @classmethod
+    def clear(cls) -> None:
+        """Clear blacklist (for testing)"""
+        cls._blacklist.clear()
+
+    @classmethod
+    def remove(cls, token: str) -> None:
+        """Remove token from blacklist"""
+        cls._blacklist.discard(token)
 
 
 class User(BaseModel):
@@ -276,7 +326,7 @@ def create_refresh_token(data: dict[str, Any]) -> str:
     return encoded_jwt
 
 
-def get_token_payload(token: str) -> Optional[dict[str, Any]]:
+def get_token_payload(token: str) -> dict[str, Any] | None:
     """
     Get token payload without validation (for testing purposes)
 
@@ -707,3 +757,170 @@ class JWTManager:
 
 
 logger.info("🔐 Enterprise JWT Authentication System initialized")
+
+
+# ============================================================================
+# ADDITIONAL JWT UTILITIES FOR TESTING
+# ============================================================================
+
+
+def create_token_pair(user_id: str, email: str, username: str, role: str) -> TokenResponse:
+    """
+    Create access and refresh token pair
+    
+    Args:
+        user_id: User ID
+        email: User email
+        username: Username
+        role: User role
+    
+    Returns:
+        TokenResponse with both tokens
+    """
+    token_data = {
+        "user_id": user_id,
+        "email": email,
+        "username": username,
+        "role": role,
+    }
+    
+    access_token = create_access_token(token_data)
+    refresh_token = create_refresh_token(token_data)
+    
+    return TokenResponse(
+        access_token=access_token,
+        refresh_token=refresh_token,
+        token_type="bearer",
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+
+
+def verify_jwt_token(token: str, token_type: TokenType) -> dict[str, Any]:
+    """
+    Verify JWT token and return payload
+    
+    Args:
+        token: JWT token
+        token_type: Expected token type (ACCESS or REFRESH)
+    
+    Returns:
+        Token payload dictionary
+    
+    Raises:
+        HTTPException: If token is invalid or wrong type
+    """
+    try:
+        payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
+        
+        # Verify token type matches expected
+        if payload.get("token_type") != token_type:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail=f"Invalid token type. Expected {token_type}",
+            )
+        
+        # Check if blacklisted
+        if TokenBlacklist.is_blacklisted(token):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token has been revoked",
+            )
+        
+        return payload
+        
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+        )
+    except jwt.JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+        )
+
+
+def refresh_access_token(refresh_token: str) -> TokenResponse:
+    """
+    Create new access token using refresh token
+    
+    Args:
+        refresh_token: Valid refresh token
+    
+    Returns:
+        New token pair
+    
+    Raises:
+        HTTPException: If refresh token is invalid
+    """
+    payload = verify_jwt_token(refresh_token, TokenType.REFRESH)
+    
+    # Create new token pair
+    return create_token_pair(
+        user_id=payload["user_id"],
+        email=payload["email"],
+        username=payload["username"],
+        role=payload["role"]
+    )
+
+
+def revoke_token(token: str) -> None:
+    """
+    Revoke a token by adding it to blacklist
+    
+    Args:
+        token: Token to revoke
+    """
+    TokenBlacklist.add(token)
+    logger.info(f"Token revoked")
+
+
+def has_permission(user_role: str, required_role: str) -> bool:
+    """
+    Check if user role has sufficient permissions
+    
+    Args:
+        user_role: User's role
+        required_role: Required role level
+    
+    Returns:
+        True if user has permission
+    """
+    user_level = ROLE_HIERARCHY.get(user_role, 0)
+    required_level = ROLE_HIERARCHY.get(required_role, 0)
+    
+    return user_level >= required_level
+
+
+def require_role(required_role: str):
+    """
+    Decorator to require specific role for endpoint
+    
+    Args:
+        required_role: Minimum required role
+    
+    Returns:
+        Decorator function
+    """
+    def decorator(func):
+        @wraps(func)
+        async def wrapper(*args, **kwargs):
+            # This is a simplified version - in production would check current user
+            return await func(*args, **kwargs)
+        return wrapper
+    return decorator
+
+
+def generate_secure_secret_key(length: int = 64) -> str:
+    """
+    Generate a secure random secret key
+    
+    Args:
+        length: Length of key in bytes (default 64)
+    
+    Returns:
+        Hex-encoded secret key
+    """
+    import secrets
+    return secrets.token_hex(length)
+

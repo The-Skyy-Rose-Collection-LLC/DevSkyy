@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.base_agent import AgentStatus, BaseAgent
 
@@ -67,7 +67,7 @@ class AgentTask:
     required_agents: list[str]
     priority: ExecutionPriority
     status: TaskStatus = TaskStatus.PENDING
-    result: Optional[dict[str, Any]] = None
+    result: dict[str, Any] | None = None
     error: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
     started_at: datetime | None = None
@@ -528,7 +528,7 @@ class AgentOrchestrator:
 
         return data.get("value")
 
-    async def broadcast_to_agents(self, message: dict[str, Any], agent_names: Optional[list[str]] = None):
+    async def broadcast_to_agents(self, message: dict[str, Any], agent_names: list[str] | None = None):
         """Broadcast a message to multiple agents"""
         target_agents = agent_names if agent_names else list(self.agents.keys())
 
@@ -818,11 +818,11 @@ async def run_orchestrator_demonstration():
         priority=ExecutionPriority.HIGH,
     )
 
-    print(f"\n📊 Task Execution Results:")
+    print("\n📊 Task Execution Results:")
     print(f"  Task ID: {task_result.get('task_id')}")
     print(f"  Status: {task_result.get('status')}")
     print(f"  Execution Time: {task_result.get('execution_time', 0):.3f}s")
-    print(f"\n  Agent Results:")
+    print("\n  Agent Results:")
 
     for agent_name, result in task_result.get("results", {}).items():
         status_icon = "✅" if result.get("status") == "success" else "❌"

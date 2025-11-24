@@ -12,7 +12,7 @@ import asyncio
 from datetime import datetime, timedelta
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 
 from google.oauth2.credentials import Credentials
 from googleapiclient.discovery import build
@@ -65,7 +65,7 @@ class PexelsImageService:
         orientation: str = "landscape",
         size: str = "large",
         per_page: int = 1,
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Search for images on Pexels
 
@@ -356,7 +356,7 @@ class ContentPublishingOrchestrator:
 
     async def fetch_featured_image(
         self, keywords: list[str], orientation: str = "landscape"
-    ) -> Optional[dict[str, Any]]:
+    ) -> dict[str, Any] | None:
         """
         Fetch featured image from Pexels
 

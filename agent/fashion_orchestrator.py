@@ -16,26 +16,20 @@ Features:
 """
 
 import asyncio
-import json
-import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
+import json
+import logging
 from pathlib import Path
-from typing import Any, Optional, Union
-from uuid import uuid4
 
 # Import base orchestrator
 import sys
+from typing import Any
+
+
 sys.path.insert(0, '/home/user/DevSkyy')
-from agent.unified_orchestrator import (
-    UnifiedMCPOrchestrator,
-    Task,
-    TaskStatus,
-    ExecutionPriority,
-    AgentRole,
-    ToolCategory
-)
+from agent.unified_orchestrator import ExecutionPriority, Task, UnifiedMCPOrchestrator
 
 
 # Configure logging
@@ -89,7 +83,7 @@ class AIModelConfig:
     verified_source: str
     capabilities: list[str] = field(default_factory=list)
     features: list[str] = field(default_factory=list)
-    cost_per_request: Optional[float] = None
+    cost_per_request: float | None = None
 
 
 @dataclass
@@ -251,9 +245,9 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
     def select_ai_model(
         self,
         task_type: str,
-        required_capabilities: Optional[list[str]] = None,
-        prefer_provider: Optional[AIModelProvider] = None,
-    ) -> Optional[AIModelConfig]:
+        required_capabilities: list[str] | None = None,
+        prefer_provider: AIModelProvider | None = None,
+    ) -> AIModelConfig | None:
         """
         Select the best AI model for a given task.
 
@@ -319,7 +313,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         materials: list[str],
         colors: list[str],
         price_point: str = "luxury",
-        unique_features: Optional[list[str]] = None,
+        unique_features: list[str] | None = None,
         tone: str = "elegant",
         length: str = "medium",
     ) -> Task:
@@ -362,7 +356,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         self,
         asset_type: FashionAssetType,
         style_reference: str,
-        dimensions: Optional[dict[str, float]] = None,
+        dimensions: dict[str, float] | None = None,
         output_format: str = "glb",
         polycount: str = "high",
         texture_resolution: int = 2048,
@@ -403,7 +397,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         gender: str,
         body_measurements: dict[str, float],
         avatar_type: str = "realistic",
-        customization: Optional[dict[str, Any]] = None,
+        customization: dict[str, Any] | None = None,
         output_format: str = "glb",
         rigging: bool = True,
     ) -> Task:
@@ -480,8 +474,8 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         self,
         garment_3d_model: str,
         avatar_3d_model: str,
-        fabric_properties: Optional[dict[str, Any]] = None,
-        animation: Optional[dict[str, Any]] = None,
+        fabric_properties: dict[str, Any] | None = None,
+        animation: dict[str, Any] | None = None,
     ) -> Task:
         """Create a 3D garment simulation task"""
 
@@ -586,7 +580,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         self,
         customer_photo: str,
         product_image: str,
-        product_3d_model: Optional[str] = None,
+        product_3d_model: str | None = None,
     ) -> dict[str, Any]:
         """
         Execute virtual try-on workflow:

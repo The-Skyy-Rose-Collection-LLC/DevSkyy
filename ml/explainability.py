@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import numpy as np
 import shap
@@ -48,7 +48,7 @@ class ModelExplainer:
             return None
 
     def explain_prediction(
-        self, model_name: str, X: np.ndarray, feature_names: Optional[list[str]] = None
+        self, model_name: str, X: np.ndarray, feature_names: list[str] | None = None
     ) -> dict[str, Any]:
         """
         Explain single prediction using SHAP values

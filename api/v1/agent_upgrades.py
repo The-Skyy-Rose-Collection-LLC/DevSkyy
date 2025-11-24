@@ -4,18 +4,18 @@ Agent Upgrades API Endpoints
 Provides REST API for deploying and tracking agent upgrades with RLVR verification.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel, Field
-from typing import Optional, List
 import uuid
-from datetime import datetime
 
+from fastapi import APIRouter, Depends, HTTPException, status
+from models.user import User
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
+
 from infrastructure.database import get_db_session
-from security.jwt_auth import get_current_user
 from ml.rlvr.agent_upgrade_system import AgentUpgradeSystem
 from ml.rlvr.reward_verifier import VerificationMethod
-from models.user import User
+from security.jwt_auth import get_current_user
+
 
 router = APIRouter(prefix="/api/v1/upgrades", tags=["upgrades", "rlvr"])
 
@@ -105,7 +105,7 @@ async def deploy_upgrade(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to deploy upgrade: {str(e)}"
+            detail=f"Failed to deploy upgrade: {e!s}"
         )
 
 
@@ -145,7 +145,7 @@ async def deploy_all_upgrades(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to deploy upgrades: {str(e)}"
+            detail=f"Failed to deploy upgrades: {e!s}"
         )
 
 
@@ -243,7 +243,7 @@ async def verify_upgrade(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to verify upgrade: {str(e)}"
+            detail=f"Failed to verify upgrade: {e!s}"
         )
 
 
@@ -284,7 +284,7 @@ async def get_upgrade_status(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get upgrade status: {str(e)}"
+            detail=f"Failed to get upgrade status: {e!s}"
         )
 
 
@@ -311,7 +311,7 @@ async def get_all_upgrades_status(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get upgrades status: {str(e)}"
+            detail=f"Failed to get upgrades status: {e!s}"
         )
 
 
@@ -356,7 +356,7 @@ async def record_ab_test_result(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to record A/B test result: {str(e)}"
+            detail=f"Failed to record A/B test result: {e!s}"
         )
 
 
@@ -435,7 +435,7 @@ async def get_ab_test_status(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get A/B test status: {str(e)}"
+            detail=f"Failed to get A/B test status: {e!s}"
         )
 
 
@@ -517,7 +517,7 @@ async def get_upgrade_analytics(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get upgrade analytics: {str(e)}"
+            detail=f"Failed to get upgrade analytics: {e!s}"
         )
 
 
