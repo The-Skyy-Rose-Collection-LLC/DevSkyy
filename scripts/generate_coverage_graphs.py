@@ -388,7 +388,7 @@ def graph_7_test_type_distribution():
     colors = ['#3498db', '#2ecc71', '#9b59b6', '#e74c3c', '#f39c12', '#95a5a6']
 
     # Create pie chart
-    wedges, texts, autotexts = plt.pie(sizes, labels=labels, colors=colors[:len(labels)],
+    _, texts, autotexts = plt.pie(sizes, labels=labels, colors=colors[:len(labels)],
                                         autopct='%1.1f%%', startangle=90,
                                         explode=[0.05] * len(labels),
                                         textprops={'fontsize': 11, 'fontweight': 'bold'})
