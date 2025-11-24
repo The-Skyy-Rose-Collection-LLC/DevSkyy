@@ -407,7 +407,7 @@
     "rule_13_security": "FAIL - 178 security issues (27 critical)",
     "rule_15_no_placeholders": "FAIL - 472 print(), 1 TODO, 13 pass statements",
     "total_compliant": "3/8",
-    "compliance_percentage": "37.5%"
+    "compliance_percentage": "25%"
   },
   "priority_recommendations": {
     "immediate_actions": [
