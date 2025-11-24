@@ -3,6 +3,7 @@ from datetime import datetime
 from enum import Enum
 import json
 import logging
+import os
 import time
 from typing import Any
 
@@ -11,6 +12,10 @@ import openai
 from pydantic import BaseModel, Field
 
 from config.unified_config import get_config
+
+# Configuration constants (per Truth Protocol Rule #15 - no TODO placeholders)
+HEALTH_CHECK_INTERVAL_SECONDS = int(os.getenv("AI_HEALTH_CHECK_INTERVAL", "60"))
+HEALTH_ERROR_WAIT_SECONDS = int(os.getenv("AI_HEALTH_ERROR_WAIT", "60"))
 
 
 """
@@ -507,10 +512,10 @@ class EnhancedAIOrchestrator:
         while True:
             try:
                 await self._check_model_health()
-                await asyncio.sleep(60)  # TODO: Move to config  # Check every minute
+                await asyncio.sleep(HEALTH_CHECK_INTERVAL_SECONDS)  # Configurable via env
             except Exception as e:
                 logger.error(f"Health monitor error: {e}")
-                await asyncio.sleep(60)  # TODO: Move to config
+                await asyncio.sleep(HEALTH_ERROR_WAIT_SECONDS)  # Configurable via env
 
     async def _check_model_health(self):
         """Check health status of all models."""

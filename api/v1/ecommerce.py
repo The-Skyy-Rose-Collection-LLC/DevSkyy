@@ -81,17 +81,25 @@ class WorkflowResponse(BaseModel):
     duration_seconds: float | None = None
 
 
-# Dependency injection for services
+# Service instances (lazy initialization per Truth Protocol Rule #15)
+_importer_service: WooCommerceImporterService | None = None
+_seo_service: SEOOptimizerService | None = None
+
+
 def get_importer_service() -> WooCommerceImporterService:
-    """Get WooCommerce importer service instance"""
-    # TODO: Load from config/environment
-    raise NotImplementedError("Configure WooCommerce importer service")
+    """Get WooCommerce importer service instance (lazy initialization)."""
+    global _importer_service
+    if _importer_service is None:
+        _importer_service = WooCommerceImporterService()
+    return _importer_service
 
 
 def get_seo_service() -> SEOOptimizerService:
-    """Get SEO optimizer service instance"""
-    # TODO: Load from config/environment
-    raise NotImplementedError("Configure SEO optimizer service")
+    """Get SEO optimizer service instance (lazy initialization)."""
+    global _seo_service
+    if _seo_service is None:
+        _seo_service = SEOOptimizerService()
+    return _seo_service
 
 
 @router.post("/import-products", response_model=ImportProductsResponse)

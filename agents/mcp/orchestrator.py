@@ -3,6 +3,16 @@
 DevSkyy MCP Orchestrator
 Implements Model Context Protocol for multi-agent coordination
 Reduces token usage by 98% through on-demand tool loading
+
+.. deprecated:: 5.2.0
+    This module is DEPRECATED in favor of :mod:`agent.unified_orchestrator`.
+    The unified orchestrator consolidates MCP token efficiency with enterprise
+    fault tolerance. Please migrate to:
+
+    >>> from agent.unified_orchestrator import UnifiedMCPOrchestrator
+
+    This module will be removed in version 6.0.0. See ORCHESTRATOR_REFACTORING_SUMMARY.md
+    for migration details.
 """
 
 import asyncio
@@ -14,7 +24,15 @@ import logging
 from pathlib import Path
 from typing import Any, Union
 from uuid import uuid4
+import warnings
 
+# Emit deprecation warning when module is imported
+warnings.warn(
+    "agents.mcp.orchestrator is deprecated since version 5.2.0 and will be removed in 6.0.0. "
+    "Use agent.unified_orchestrator.UnifiedMCPOrchestrator instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 # Configure logging
 logging.basicConfig(

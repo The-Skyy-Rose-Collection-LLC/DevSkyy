@@ -4,6 +4,7 @@ import contextlib
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 import logging
+import os
 from typing import Any
 
 import psutil
@@ -15,6 +16,11 @@ Comprehensive system health monitoring with metrics collection and alerting
 """
 
 logger = logging.getLogger(__name__)
+
+# Configuration constants (per Truth Protocol Rule #15 - no TODO placeholders)
+# These can be overridden via environment variables
+ALERT_CHECK_INTERVAL_SECONDS = int(os.getenv("ALERT_CHECK_INTERVAL", "10"))
+ALERT_ERROR_WAIT_SECONDS = int(os.getenv("ALERT_ERROR_WAIT", "10"))
 
 
 @dataclass
@@ -369,11 +375,11 @@ class SystemMonitor:
                 if latest_metrics:
                     self.alert_manager.check_alerts(latest_metrics)
 
-                await asyncio.sleep(10)  # TODO: Move to config  # Check alerts every 10 seconds
+                await asyncio.sleep(ALERT_CHECK_INTERVAL_SECONDS)  # Configurable via env
 
             except Exception as e:
                 logger.error(f"Error in monitoring loop: {e}")
-                await asyncio.sleep(10)  # TODO: Move to config
+                await asyncio.sleep(ALERT_ERROR_WAIT_SECONDS)  # Configurable via env
 
     def get_system_status(self) -> dict[str, Any]:
         """Get comprehensive system status"""

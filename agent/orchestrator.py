@@ -1,19 +1,18 @@
-import asyncio
-from collections import defaultdict, deque
-from dataclasses import dataclass, field
-from datetime import datetime
-from enum import Enum
-import logging
-from typing import Any
-
-from agent.modules.base_agent import AgentStatus, BaseAgent
-
-
 """
 Enterprise Multi-Agent Orchestration System
 Manages agent lifecycle, dependencies, coordination, and load balancing
 
-Features:
+.. deprecated:: 5.2.0
+    This module is DEPRECATED in favor of :mod:`agent.unified_orchestrator`.
+    The unified orchestrator provides 98% token efficiency reduction and
+    consolidated fault tolerance features. Please migrate to:
+
+    >>> from agent.unified_orchestrator import UnifiedMCPOrchestrator
+
+    This module will be removed in version 6.0.0. See ORCHESTRATOR_REFACTORING_SUMMARY.md
+    for migration details.
+
+Features (maintained for backward compatibility):
 - Agent dependency resolution and execution ordering
 - Load balancing and resource management
 - Circuit breaker patterns for fault tolerance
@@ -22,6 +21,26 @@ Features:
 - Security and access control
 - Performance optimization and caching
 """
+
+import asyncio
+from collections import defaultdict, deque
+from dataclasses import dataclass, field
+from datetime import datetime
+from enum import Enum
+import logging
+import warnings
+from typing import Any
+
+from agent.modules.base_agent import AgentStatus, BaseAgent
+
+
+# Emit deprecation warning when module is imported
+warnings.warn(
+    "agent.orchestrator is deprecated since version 5.2.0 and will be removed in 6.0.0. "
+    "Use agent.unified_orchestrator.UnifiedMCPOrchestrator instead.",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 logger = logging.getLogger(__name__)
 

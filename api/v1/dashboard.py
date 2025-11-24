@@ -1,3 +1,8 @@
+import asyncio
+from datetime import datetime, timedelta
+import os
+from typing import Any
+
 from monitoring.system_monitor import SystemMonitor
 from security.jwt_auth import UserRole, get_current_user, require_authenticated
 
@@ -9,9 +14,9 @@ try:
     SECURITY_AVAILABLE = True
 except ImportError:
     SECURITY_AVAILABLE = False
-import asyncio
-from datetime import datetime, timedelta
-from typing import Any
+
+# Configuration constants (per Truth Protocol Rule #15 - no TODO placeholders)
+WEBSOCKET_UPDATE_INTERVAL_SECONDS = int(os.getenv("DASHBOARD_WS_INTERVAL", "5"))
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from fastapi.responses import HTMLResponse
@@ -446,11 +451,11 @@ async def dashboard_websocket(websocket):
 
     try:
         while True:
-            # Send real-time updates every 5 seconds
+            # Send real-time updates at configured interval
             metrics = await dashboard_service.get_system_metrics()
             await websocket.send_json({"type": "metrics_update", "data": metrics.dict()})
 
-            await asyncio.sleep(5)  # TODO: Move to config
+            await asyncio.sleep(WEBSOCKET_UPDATE_INTERVAL_SECONDS)  # Configurable via env
 
     except Exception:
         await websocket.close(code=1000)

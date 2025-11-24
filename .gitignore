@@ -39,8 +39,11 @@ logs/
 
 # Testing
 .coverage
+coverage.xml
+coverage.json
 .pytest_cache/
 htmlcov/
+cov_annotated/
 
 # Security
 *.key

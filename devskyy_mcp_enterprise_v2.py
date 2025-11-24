@@ -55,6 +55,11 @@ import sys
 from typing import Any, Literal
 
 
+import logging
+
+# Configure module logger per Truth Protocol Rule #15 (no print statements)
+logger = logging.getLogger(__name__)
+
 try:
     import httpx
     from mcp.server.fastmcp import Context, FastMCP
@@ -63,8 +68,8 @@ try:
     from mcp.types import CallToolResult, TextContent
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
-    print(f"❌ Missing required packages: {e}")
-    print('Install: pip install "mcp[cli]" httpx pydantic python-jose[cryptography]')
+    logger.critical(f"Missing required packages: {e}")
+    logger.critical('Install: pip install "mcp[cli]" httpx pydantic python-jose[cryptography]')
     sys.exit(1)
 
 # Optional Redis for caching
@@ -74,7 +79,7 @@ try:
     REDIS_AVAILABLE = True
 except ImportError:
     REDIS_AVAILABLE = False
-    print("⚠️  Redis not available - caching disabled")
+    logger.warning("Redis not available - caching disabled")
 
 # ===========================
 # Configuration
@@ -237,7 +242,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
     - Close HTTP connections
     - Close Redis connections
     """
-    print("🚀 DevSkyy MCP Server v2.0 initializing...")
+    logger.info("DevSkyy MCP Server v2.0 initializing...")
 
     # Initialize HTTP client
     http_client = httpx.AsyncClient(
@@ -253,26 +258,26 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
         try:
             redis_client = redis.from_url(REDIS_URL, decode_responses=True)
             await redis_client.ping()
-            print("✅ Redis connected")
+            logger.info("Redis connected successfully")
         except Exception as e:
-            print(f"⚠️  Redis unavailable: {e}")
+            logger.warning(f"Redis unavailable: {e}")
             redis_client = None
 
     # Load AGENTS_PROMPT.md
     agents_prompt_path = Path(__file__).parent / "AGENTS_PROMPT.md"
     if agents_prompt_path.exists():
         agents_prompt = agents_prompt_path.read_text()
-        print("✅ Loaded AGENTS_PROMPT.md")
+        logger.info("Loaded AGENTS_PROMPT.md successfully")
     else:
         agents_prompt = "# Agents directory not found"
-        print("⚠️  AGENTS_PROMPT.md not found")
+        logger.warning("AGENTS_PROMPT.md not found")
 
     # Warmup API connection
     try:
         response = await http_client.get("/health", timeout=5.0)
-        print(f"✅ Connected to DevSkyy API: {API_BASE_URL}")
+        logger.info(f"Connected to DevSkyy API: {API_BASE_URL}")
     except Exception as e:
-        print(f"⚠️  API warmup failed: {e}")
+        logger.warning(f"API warmup failed: {e}")
 
     start_time = datetime.utcnow()
 
@@ -292,7 +297,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[DevSkyyAppContext]:
             await redis_client.aclose()
 
         uptime = datetime.utcnow() - start_time
-        print(f"👋 Server shutdown. Uptime: {uptime}")
+        logger.info(f"Server shutdown. Uptime: {uptime}")
 
 
 # ===========================
@@ -922,46 +927,25 @@ def main():
 
     args = parser.parse_args()
 
+    # Configure logging format for startup
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+
     # Validation
     if not API_KEY:
-        print("⚠️  DEVSKYY_API_KEY not set - using empty key for testing")
+        logger.warning("DEVSKYY_API_KEY not set - using empty key for testing")
 
-    print(
-        f"""
-╔══════════════════════════════════════════════════════════════╗
-║                                                              ║
-║   DevSkyy Enterprise MCP Server v2.0                         ║
-║   Production-Ready Multi-Agent Platform                      ║
-║                                                              ║
-║   🚀 5 Optimized Tools • 54 AI Agents • Enterprise Security  ║
-║                                                              ║
-╚══════════════════════════════════════════════════════════════╝
-
-✅ Configuration:
-   API URL: {API_BASE_URL}
-   API Key: {'Set ✓' if API_KEY else 'Not Set ⚠️'}
-   Redis: {'Enabled ✓' if REDIS_AVAILABLE else 'Disabled'}
-   Transport: {args.transport}
-
-🔧 Tools Available:
-   • devskyy_execute - Unified agent orchestrator
-   • devskyy_batch_execute - Multi-agent workflows
-   • devskyy_query - Cached intelligence
-   • devskyy_analyze - ML-powered insights
-   • devskyy_status - Real-time monitoring
-
-📚 Resources:
-   • devskyy://agents/directory - Full agent catalog
-   • devskyy://agents/quick-ref - Quick routing reference
-   • devskyy://health/status - Real-time health
-
-🎯 Prompts:
-   • Product Launch Workflow
-   • Code Quality Improvement
-
-Starting server on {args.transport}...
-"""
-    )
+    # Log startup configuration
+    logger.info("DevSkyy Enterprise MCP Server v2.0 Starting")
+    logger.info(f"API URL: {API_BASE_URL}")
+    logger.info(f"API Key: {'Set' if API_KEY else 'Not Set'}")
+    logger.info(f"Redis: {'Enabled' if REDIS_AVAILABLE else 'Disabled'}")
+    logger.info(f"Transport: {args.transport}")
+    logger.info("Tools: devskyy_execute, devskyy_batch_execute, devskyy_query, devskyy_analyze, devskyy_status")
+    logger.info("Resources: devskyy://agents/directory, devskyy://agents/quick-ref, devskyy://health/status")
+    logger.info(f"Starting server on {args.transport}...")
 
     # Run server
     if args.transport == "streamable-http":

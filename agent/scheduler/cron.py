@@ -1,3 +1,4 @@
+import os
 from collections.abc import Callable
 from datetime import datetime
 import logging
@@ -13,6 +14,11 @@ from ..modules.scanner import scan_site
 
 
 logger = logging.getLogger(__name__)
+
+# Configuration constants (per Truth Protocol Rule #15 - no TODO placeholders)
+# These can be overridden via environment variables
+SCHEDULER_CHECK_INTERVAL_SECONDS = int(os.getenv("SCHEDULER_CHECK_INTERVAL", "30"))
+SCHEDULER_ERROR_WAIT_SECONDS = int(os.getenv("SCHEDULER_ERROR_WAIT", "60"))
 
 
 class CronScheduler:
@@ -80,10 +86,10 @@ class CronScheduler:
         while self.running:
             try:
                 schedule.run_pending()
-                time.sleep(30)  # TODO: Move to config  # Check every 30 seconds
+                time.sleep(SCHEDULER_CHECK_INTERVAL_SECONDS)  # Check interval (configurable via env)
             except Exception as e:
-                logger.error(f"❌ Scheduler error: {e!s}")
-                time.sleep(60)  # TODO: Move to config  # Wait longer on error
+                logger.error(f"Scheduler error: {e!s}")
+                time.sleep(SCHEDULER_ERROR_WAIT_SECONDS)  # Wait longer on error (configurable via env)
 
     def stop_scheduler(self):
         """Stop the scheduler."""
