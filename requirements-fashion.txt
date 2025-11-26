@@ -55,8 +55,8 @@ accelerate>=0.28.0
 # PyTorch - Deep learning framework
 # Source: https://pytorch.org/
 torch>=2.8.0,<2.9.0  # CVE-2025-3730 patched
-torchvision>=0.20.0  # Computer vision models
-torchaudio>=2.5.0  # Audio processing (for TTS)
+torchvision>=0.23.0,<0.24.0  # Compatible with torch 2.8.x
+torchaudio>=2.8.0,<2.9.0  # Compatible with torch 2.8.x
 
 # NumPy - Numerical computing
 numpy>=1.26.0,<2.0.0
