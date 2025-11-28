@@ -2,7 +2,7 @@
 
 **Claude Code** operates under the **Truth Protocol** for DevSkyy's enterprise multi-agent platform.
 
-**Version**: 5.2.0-enterprise | **Status**: Production-Ready ✅ | **Last Updated**: 2025-11-17
+**Version**: 5.3.0-enterprise | **Status**: Production-Ready ✅ | **Last Updated**: 2025-11-28
 
 ## Stack (Verified & Pinned)
 
@@ -32,7 +32,7 @@
 - Docker (containerization)
 - Redis 7+ (caching)
 
-## Truth Protocol (15 Rules - 100% Enforced)
+## Truth Protocol (16 Rules - 100% Enforced)
 
 ### Rule #1: Never Guess
 - Verify all syntax, APIs, security from **official docs**
@@ -177,6 +177,116 @@ Implemented in: `security/jwt_auth.py`, `security/input_validation.py`
 - ❌ No unused imports (Ruff auto-fixes)
 - ❌ No dead code (Vulture detection)
 - ✅ Every line executes or is verified (via tests)
+
+### Rule #16: Web Search Verification Before Implementation
+**MANDATORY**: All implementations must be verified via web search before code generation.
+
+**Verification Requirements**:
+- ✅ Search official documentation for API/library usage
+- ✅ Verify syntax and method signatures are current
+- ✅ Confirm implementation patterns are proven to work
+- ✅ Check for known issues, deprecations, or breaking changes
+- ✅ Validate security considerations from official sources
+
+**Verification Process**:
+1. **SEARCH** - Query official docs, GitHub, Stack Overflow for implementation
+2. **VALIDATE** - Cross-reference multiple sources for accuracy
+3. **CONFIRM** - Ensure implementation is proven and production-tested
+4. **CITE** - Document sources used for verification
+
+**Minimum Verification Threshold**: 92%
+- Must reach 92%+ confidence before generating code
+- If threshold not met, state uncertainty per Rule #4
+- Document what additional verification is needed
+
+**Sources Priority** (in order):
+1. Official documentation (highest trust)
+2. Official GitHub repositories
+3. RFC/Standard specifications
+4. Verified Stack Overflow answers (high votes, accepted)
+5. Reputable tech blogs with working examples
+
+**Prohibited Actions**:
+- ❌ Never implement without searching first
+- ❌ Never guess API signatures or parameters
+- ❌ Never assume library behavior without verification
+- ❌ Never use deprecated methods without explicit approval
+
+---
+
+## Dual-AI Collaborative Orchestrator
+
+**GPT-5.1-codex-max + Claude Opus 4.5** working in tandem for verified code generation.
+
+### Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    DUAL-AI COLLABORATION                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                               │
+│   ┌─────────────┐           ┌─────────────┐                 │
+│   │   CODEX     │           │   CLAUDE    │                 │
+│   │ gpt-5.1-max │           │  Opus 4.5   │                 │
+│   └──────┬──────┘           └──────┬──────┘                 │
+│          │                         │                         │
+│          ▼                         ▼                         │
+│   ┌─────────────────────────────────────────┐               │
+│   │         PHASE 1: RESEARCH               │               │
+│   │   Both AIs analyze task independently   │               │
+│   └─────────────────────────────────────────┘               │
+│                        │                                     │
+│                        ▼                                     │
+│   ┌─────────────────────────────────────────┐               │
+│   │          PHASE 2: PLAN                  │               │
+│   │   Both propose solutions with reasoning │               │
+│   └─────────────────────────────────────────┘               │
+│                        │                                     │
+│                        ▼                                     │
+│   ┌─────────────────────────────────────────┐               │
+│   │        PHASE 3: CONSENSUS               │               │
+│   │   Cross-validate until 92%+ agreement   │               │
+│   └─────────────────────────────────────────┘               │
+│                        │                                     │
+│                        ▼                                     │
+│   ┌─────────────────────────────────────────┐               │
+│   │          PHASE 4: BUILD                 │               │
+│   │   Generate verified production code     │               │
+│   └─────────────────────────────────────────┘               │
+│                                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### Verification Threshold: 92%
+
+Code is **only generated** when both AIs reach 92%+ consensus:
+- Research findings aligned
+- Solution approach agreed
+- Security considerations verified
+- Implementation patterns confirmed
+- Edge cases identified
+
+**Implementation**: `ml/dual_ai_collaborative_orchestrator.py`
+
+### Usage
+
+```python
+from ml.dual_ai_collaborative_orchestrator import collaborative_generate, quick_code
+
+# Full collaboration pipeline
+result = await collaborative_generate(
+    task="Implement JWT authentication with refresh tokens",
+    language="python"
+)
+
+if result.verification.meets_threshold:
+    print(result.code)  # Verified code
+else:
+    print(f"Verification failed: {result.verification.disputed_points}")
+
+# Quick verified code generation
+code = await quick_code("Create a rate limiter middleware")
+```
 
 ---
 
