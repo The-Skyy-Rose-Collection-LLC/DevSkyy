@@ -15,8 +15,8 @@ import pytest
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from agents.loader import AgentConfigLoader
-from agents.router import AgentRouter, TaskRequest, TaskType
+from agent.loader import AgentConfigLoader
+from agent.router import AgentRouter, TaskRequest, TaskType
 
 
 @pytest.fixture
