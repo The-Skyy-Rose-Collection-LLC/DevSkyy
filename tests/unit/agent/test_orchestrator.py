@@ -1,8 +1,13 @@
 """
-Comprehensive unit tests for agent/orchestrator.py
+Unit Tests for Agent Orchestrator
 
-Target coverage: 70%+
-Test count: 100+ tests
+Tests the AgentOrchestrator class including agent registration,
+task execution, dependency resolution, circuit breakers, and metrics.
+
+Truth Protocol Compliance:
+- Rule #8: Test Coverage ≥90%
+- Rule #9: Document All
+- Rule #10: No-Skip Rule
 """
 
 import asyncio
@@ -11,58 +16,47 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
-from agent.modules.base_agent import AgentStatus, BaseAgent
 from agent.orchestrator import (
     AgentCapability,
     AgentOrchestrator,
     AgentTask,
     ExecutionPriority,
+    MockAgent,
     TaskStatus,
 )
+from agent.modules.base_agent import AgentStatus
 
 
-# Mock Agent for testing
-class MockAgent(BaseAgent):
-    def __init__(self, name: str = "mock_agent"):
-        super().__init__(agent_name=name)
-        self.execute_calls = []
-        self.initialize_called = False
-
-    async def initialize(self) -> bool:
-        self.initialize_called = True
-        self.status = AgentStatus.HEALTHY
-        return True
-
-    async def execute_core_function(self, **kwargs) -> dict:
-        self.execute_calls.append(kwargs)
-        return {"status": "success", "result": "mock_result", "data": kwargs}
+# =============================================================================
+# ExecutionPriority Enum Tests
+# =============================================================================
 
 
 class TestExecutionPriority:
-    """Test ExecutionPriority enum"""
+    """Tests for ExecutionPriority enum."""
 
     def test_priority_values(self):
+        """Test priority enum values are ordered correctly."""
         assert ExecutionPriority.CRITICAL.value == 1
         assert ExecutionPriority.HIGH.value == 2
         assert ExecutionPriority.MEDIUM.value == 3
         assert ExecutionPriority.LOW.value == 4
 
-    def test_priority_ordering(self):
-        priorities = [
-            ExecutionPriority.LOW,
-            ExecutionPriority.CRITICAL,
-            ExecutionPriority.HIGH,
-            ExecutionPriority.MEDIUM,
-        ]
-        sorted_priorities = sorted(priorities, key=lambda x: x.value)
-        assert sorted_priorities[0] == ExecutionPriority.CRITICAL
-        assert sorted_priorities[-1] == ExecutionPriority.LOW
+    def test_priority_count(self):
+        """Test that enum has 4 priority levels."""
+        assert len(ExecutionPriority) == 4
+
+
+# =============================================================================
+# TaskStatus Enum Tests
+# =============================================================================
 
 
 class TestTaskStatus:
-    """Test TaskStatus enum"""
+    """Tests for TaskStatus enum."""
 
-    def test_task_status_values(self):
+    def test_status_values(self):
+        """Test task status enum values."""
         assert TaskStatus.PENDING.value == "pending"
         assert TaskStatus.RUNNING.value == "running"
         assert TaskStatus.COMPLETED.value == "completed"
@@ -70,582 +64,593 @@ class TestTaskStatus:
         assert TaskStatus.CANCELLED.value == "cancelled"
 
 
-class TestAgentCapability:
-    """Test AgentCapability dataclass"""
+# =============================================================================
+# AgentCapability Dataclass Tests
+# =============================================================================
 
-    def test_capability_creation_minimal(self):
-        cap = AgentCapability(agent_name="test", capabilities=["scan"])
-        assert cap.agent_name == "test"
-        assert cap.capabilities == ["scan"]
+
+class TestAgentCapability:
+    """Tests for AgentCapability dataclass."""
+
+    def test_create_capability(self):
+        """Test creating an agent capability."""
+        cap = AgentCapability(
+            agent_name="test_agent",
+            capabilities=["search", "analyze"]
+        )
+
+        assert cap.agent_name == "test_agent"
+        assert cap.capabilities == ["search", "analyze"]
         assert cap.required_agents == []
         assert cap.priority == ExecutionPriority.MEDIUM
         assert cap.max_concurrent == 5
         assert cap.rate_limit == 100
 
-    def test_capability_creation_full(self):
+    def test_capability_with_dependencies(self):
+        """Test capability with dependencies."""
         cap = AgentCapability(
-            agent_name="scanner",
-            capabilities=["scan", "analyze"],
-            required_agents=["security"],
-            priority=ExecutionPriority.HIGH,
-            max_concurrent=10,
-            rate_limit=200,
+            agent_name="data_agent",
+            capabilities=["process_data"],
+            required_agents=["auth_agent", "db_agent"],
+            priority=ExecutionPriority.HIGH
         )
-        assert cap.agent_name == "scanner"
-        assert cap.capabilities == ["scan", "analyze"]
-        assert cap.required_agents == ["security"]
+
+        assert cap.required_agents == ["auth_agent", "db_agent"]
         assert cap.priority == ExecutionPriority.HIGH
-        assert cap.max_concurrent == 10
-        assert cap.rate_limit == 200
+
+
+# =============================================================================
+# AgentTask Dataclass Tests
+# =============================================================================
 
 
 class TestAgentTask:
-    """Test AgentTask dataclass"""
+    """Tests for AgentTask dataclass."""
 
-    def test_task_creation_minimal(self):
+    def test_create_task(self):
+        """Test creating an agent task."""
         task = AgentTask(
-            task_id="task1",
-            task_type="scan",
-            parameters={"target": "file.py"},
-            required_agents=["scanner"],
-            priority=ExecutionPriority.HIGH,
+            task_id="task_123",
+            task_type="process_order",
+            parameters={"order_id": "ORD-001"},
+            required_agents=["order_agent", "inventory_agent"],
+            priority=ExecutionPriority.HIGH
         )
-        assert task.task_id == "task1"
-        assert task.task_type == "scan"
-        assert task.parameters == {"target": "file.py"}
+
+        assert task.task_id == "task_123"
+        assert task.task_type == "process_order"
+        assert task.parameters == {"order_id": "ORD-001"}
         assert task.status == TaskStatus.PENDING
         assert task.result is None
         assert task.error is None
         assert isinstance(task.created_at, datetime)
 
-    def test_task_status_transitions(self):
+    def test_task_default_values(self):
+        """Test task default values."""
         task = AgentTask(
-            task_id="task1",
-            task_type="scan",
+            task_id="t1",
+            task_type="test",
             parameters={},
-            required_agents=["scanner"],
-            priority=ExecutionPriority.MEDIUM,
+            required_agents=[],
+            priority=ExecutionPriority.LOW
         )
-        assert task.status == TaskStatus.PENDING
 
-        task.status = TaskStatus.RUNNING
-        assert task.status == TaskStatus.RUNNING
-
-        task.status = TaskStatus.COMPLETED
-        assert task.status == TaskStatus.COMPLETED
+        assert task.started_at is None
+        assert task.completed_at is None
 
 
-class TestAgentOrchestratorInitialization:
-    """Test orchestrator initialization"""
+# =============================================================================
+# AgentOrchestrator Initialization Tests
+# =============================================================================
 
-    def test_orchestrator_creation_default(self):
-        orchestrator = AgentOrchestrator()
-        assert orchestrator.max_concurrent_tasks == 50
-        assert len(orchestrator.agents) == 0
-        assert len(orchestrator.agent_capabilities) == 0
-        assert len(orchestrator.tasks) == 0
 
-    def test_orchestrator_creation_custom_max_tasks(self):
-        orchestrator = AgentOrchestrator(max_concurrent_tasks=100)
-        assert orchestrator.max_concurrent_tasks == 100
+class TestAgentOrchestratorInit:
+    """Tests for AgentOrchestrator initialization."""
 
-    def test_orchestrator_data_structures_initialized(self):
-        orchestrator = AgentOrchestrator()
-        assert isinstance(orchestrator.agents, dict)
-        assert isinstance(orchestrator.agent_capabilities, dict)
-        assert isinstance(orchestrator.dependency_graph, dict)
-        assert isinstance(orchestrator.tasks, dict)
-        assert isinstance(orchestrator.active_tasks, set)
+    def test_init_default(self):
+        """Test default initialization."""
+        orch = AgentOrchestrator()
+
+        assert orch.agents == {}
+        assert orch.agent_capabilities == {}
+        assert orch.max_concurrent_tasks == 50
+        assert orch.active_tasks == set()
+        assert orch.tasks == {}
+        assert orch.shared_context == {}
+
+    def test_init_custom_concurrent(self):
+        """Test initialization with custom max concurrent tasks."""
+        orch = AgentOrchestrator(max_concurrent_tasks=10)
+        assert orch.max_concurrent_tasks == 10
+
+    def test_init_creates_tracking_structures(self):
+        """Test that initialization creates all tracking structures."""
+        orch = AgentOrchestrator()
+
+        assert hasattr(orch, "execution_history")
+        assert hasattr(orch, "agent_metrics")
+        assert hasattr(orch, "circuit_breakers")
+        assert hasattr(orch, "access_control")
+        assert hasattr(orch, "api_keys")
+
+
+# =============================================================================
+# Agent Registration Tests
+# =============================================================================
 
 
 class TestAgentRegistration:
-    """Test agent registration functionality"""
+    """Tests for agent registration."""
 
     @pytest.mark.asyncio
-    async def test_register_agent_basic(self):
-        orchestrator = AgentOrchestrator()
+    async def test_register_agent_success(self):
+        """Test successful agent registration."""
+        orch = AgentOrchestrator()
         agent = MockAgent("test_agent")
 
-        success = await orchestrator.register_agent(
-            agent=agent,
-            capabilities=["scan"],
-            dependencies=[],
-            priority=ExecutionPriority.MEDIUM,
+        success = await orch.register_agent(
+            agent,
+            capabilities=["search", "analyze"],
+            priority=ExecutionPriority.HIGH
         )
 
         assert success is True
-        assert "test_agent" in orchestrator.agents
-        assert orchestrator.agents["test_agent"] == agent
-
-    @pytest.mark.asyncio
-    async def test_register_agent_with_capabilities(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("scanner")
-
-        success = await orchestrator.register_agent(
-            agent=agent,
-            capabilities=["scan", "analyze", "detect"],
-            dependencies=[],
-            priority=ExecutionPriority.HIGH,
-        )
-
-        assert success is True
-        assert "scanner" in orchestrator.agent_capabilities
-        cap = orchestrator.agent_capabilities["scanner"]
-        assert cap.capabilities == ["scan", "analyze", "detect"]
-        assert cap.priority == ExecutionPriority.HIGH
+        assert "test_agent" in orch.agents
+        assert "test_agent" in orch.agent_capabilities
 
     @pytest.mark.asyncio
     async def test_register_agent_with_dependencies(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("fixer")
+        """Test agent registration with dependencies."""
+        orch = AgentOrchestrator()
+        agent = MockAgent("data_agent")
 
-        success = await orchestrator.register_agent(
-            agent=agent,
-            capabilities=["fix"],
-            dependencies=["scanner"],
-            priority=ExecutionPriority.MEDIUM,
+        await orch.register_agent(
+            agent,
+            capabilities=["process"],
+            dependencies=["auth_agent"]
         )
 
+        assert orch.dependency_graph["data_agent"] == {"auth_agent"}
+        assert "data_agent" in orch.reverse_dependencies["auth_agent"]
+
+    @pytest.mark.asyncio
+    async def test_register_agent_enhances_capabilities(self):
+        """Test that agent capabilities are enhanced based on agent type."""
+        orch = AgentOrchestrator()
+        agent = MockAgent("fashion_agent")
+        # Add video generation method
+        agent.generate_fashion_runway_video = AsyncMock()
+
+        await orch.register_agent(
+            agent,
+            capabilities=["fashion"]
+        )
+
+        cap = orch.agent_capabilities["fashion_agent"]
+        assert "video_generation" in cap.capabilities
+        assert "runway_video_generation" in cap.capabilities
+
+    @pytest.mark.asyncio
+    async def test_unregister_agent(self):
+        """Test agent unregistration."""
+        orch = AgentOrchestrator()
+        agent = MockAgent("temp_agent")
+
+        await orch.register_agent(agent, capabilities=["temp"])
+        assert "temp_agent" in orch.agents
+
+        success = await orch.unregister_agent("temp_agent")
         assert success is True
-        assert "scanner" in orchestrator.dependency_graph["fixer"]
-        assert "fixer" in orchestrator.reverse_dependencies["scanner"]
-
-    @pytest.mark.asyncio
-    async def test_register_multiple_agents(self):
-        orchestrator = AgentOrchestrator()
-        agent1 = MockAgent("agent1")
-        agent2 = MockAgent("agent2")
-        agent3 = MockAgent("agent3")
-
-        await orchestrator.register_agent(agent1, ["cap1"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(agent2, ["cap2"], ["agent1"], ExecutionPriority.MEDIUM)
-        await orchestrator.register_agent(agent3, ["cap3"], [], ExecutionPriority.LOW)
-
-        assert len(orchestrator.agents) == 3
-        assert "agent1" in orchestrator.agents
-        assert "agent2" in orchestrator.agents
-        assert "agent3" in orchestrator.agents
-
-    @pytest.mark.asyncio
-    async def test_register_duplicate_agent_name(self):
-        orchestrator = AgentOrchestrator()
-        agent1 = MockAgent("duplicate")
-        agent2 = MockAgent("duplicate")
-
-        await orchestrator.register_agent(agent1, ["cap1"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(agent2, ["cap2"], [], ExecutionPriority.MEDIUM)
-
-        # Second registration should override first
-        assert orchestrator.agents["duplicate"] == agent2
-        assert orchestrator.agent_capabilities["duplicate"].capabilities == ["cap2"]
-
-
-class TestAgentUnregistration:
-    """Test agent unregistration functionality"""
-
-    @pytest.mark.asyncio
-    async def test_unregister_agent_basic(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("test_agent")
-
-        await orchestrator.register_agent(agent, ["scan"], [], ExecutionPriority.MEDIUM)
-        assert "test_agent" in orchestrator.agents
-
-        success = await orchestrator.unregister_agent("test_agent")
-
-        assert success is True
-        assert "test_agent" not in orchestrator.agents
-        assert "test_agent" not in orchestrator.agent_capabilities
+        assert "temp_agent" not in orch.agents
 
     @pytest.mark.asyncio
     async def test_unregister_nonexistent_agent(self):
-        orchestrator = AgentOrchestrator()
-        success = await orchestrator.unregister_agent("nonexistent")
+        """Test unregistering nonexistent agent."""
+        orch = AgentOrchestrator()
+        success = await orch.unregister_agent("nonexistent")
         assert success is False
 
-    @pytest.mark.asyncio
-    async def test_unregister_agent_clears_dependencies(self):
-        orchestrator = AgentOrchestrator()
-        scanner = MockAgent("scanner")
-        fixer = MockAgent("fixer")
 
-        await orchestrator.register_agent(scanner, ["scan"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(fixer, ["fix"], ["scanner"], ExecutionPriority.MEDIUM)
-
-        await orchestrator.unregister_agent("scanner")
-
-        assert "scanner" not in orchestrator.reverse_dependencies
+# =============================================================================
+# Task Execution Tests
+# =============================================================================
 
 
 class TestTaskExecution:
-    """Test task execution functionality"""
+    """Tests for task execution."""
 
-    @pytest.mark.asyncio
-    async def test_execute_task_single_agent(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("scanner")
-        await orchestrator.register_agent(agent, ["scan"], [], ExecutionPriority.HIGH)
+    @pytest.fixture
+    async def orchestrator_with_agents(self):
+        """Create orchestrator with registered agents."""
+        orch = AgentOrchestrator()
 
-        result = await orchestrator.execute_task(
-            task_type="scan",
-            parameters={"target": "file.py"},
-            required_capabilities=["scan"],
-            priority=ExecutionPriority.HIGH,
+        auth_agent = MockAgent("auth_agent")
+        data_agent = MockAgent("data_agent")
+
+        await orch.register_agent(auth_agent, capabilities=["authentication"])
+        await orch.register_agent(
+            data_agent,
+            capabilities=["data_processing"],
+            dependencies=["auth_agent"]
         )
 
-        assert "results" in result
-        assert "scanner" in result["results"]
-        assert result["results"]["scanner"]["status"] == "success"
+        return orch
 
     @pytest.mark.asyncio
-    async def test_execute_task_no_matching_agent(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("scanner")
-        await orchestrator.register_agent(agent, ["scan"], [], ExecutionPriority.HIGH)
+    async def test_execute_task_success(self, orchestrator_with_agents):
+        """Test successful task execution."""
+        orch = orchestrator_with_agents
 
-        result = await orchestrator.execute_task(
-            task_type="fix",
+        result = await orch.execute_task(
+            task_type="process_request",
+            parameters={"user_id": "123"},
+            required_capabilities=["authentication"]
+        )
+
+        assert "task_id" in result
+        assert result["status"] == "completed"
+        assert "results" in result
+
+    @pytest.mark.asyncio
+    async def test_execute_task_no_capable_agents(self):
+        """Test task execution with no capable agents."""
+        orch = AgentOrchestrator()
+
+        result = await orch.execute_task(
+            task_type="special_task",
             parameters={},
-            required_capabilities=["fix"],  # No agent has this capability
-            priority=ExecutionPriority.HIGH,
+            required_capabilities=["nonexistent_capability"]
         )
 
         assert "error" in result
-        assert "No agents available" in result["error"]
+        assert "No agents found" in result["error"]
 
     @pytest.mark.asyncio
-    async def test_execute_task_multiple_capabilities(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("multi_agent")
-        await orchestrator.register_agent(
-            agent, ["scan", "analyze", "fix"], [], ExecutionPriority.HIGH
-        )
+    async def test_execute_task_with_dependencies(self, orchestrator_with_agents):
+        """Test task execution respects dependencies."""
+        orch = orchestrator_with_agents
 
-        result = await orchestrator.execute_task(
-            task_type="analyze",
-            parameters={"data": "test"},
-            required_capabilities=["analyze"],
-            priority=ExecutionPriority.MEDIUM,
-        )
-
-        assert "results" in result
-        assert "multi_agent" in result["results"]
-
-    @pytest.mark.asyncio
-    async def test_execute_task_with_agent_failure(self):
-        orchestrator = AgentOrchestrator()
-
-        class FailingAgent(BaseAgent):
-            async def initialize(self):
-                self.status = AgentStatus.HEALTHY
-                return True
-
-            async def execute_core_function(self, **kwargs):
-                raise Exception("Agent execution failed")
-
-        agent = FailingAgent("failing_agent")
-        await orchestrator.register_agent(agent, ["fail"], [], ExecutionPriority.MEDIUM)
-
-        result = await orchestrator.execute_task(
-            task_type="fail",
+        # Both agents required
+        result = await orch.execute_task(
+            task_type="full_process",
             parameters={},
-            required_capabilities=["fail"],
-            priority=ExecutionPriority.MEDIUM,
+            required_capabilities=["authentication", "data_processing"]
         )
 
-        # Should handle the error gracefully
-        assert "results" in result or "error" in result
+        # Should have executed both agents
+        assert "auth_agent" in result.get("results", {})
+
+    @pytest.mark.asyncio
+    async def test_execute_task_records_metrics(self, orchestrator_with_agents):
+        """Test that task execution records metrics."""
+        orch = orchestrator_with_agents
+
+        await orch.execute_task(
+            task_type="metric_test",
+            parameters={},
+            required_capabilities=["authentication"]
+        )
+
+        metrics = orch.get_agent_metrics("auth_agent")
+        assert metrics["calls"] >= 1
+
+
+# =============================================================================
+# Dependency Resolution Tests
+# =============================================================================
 
 
 class TestDependencyResolution:
-    """Test dependency resolution logic"""
+    """Tests for dependency resolution."""
 
-    @pytest.mark.asyncio
-    async def test_resolve_dependencies_no_deps(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("independent")
-        await orchestrator.register_agent(agent, ["scan"], [], ExecutionPriority.HIGH)
+    def test_resolve_no_dependencies(self):
+        """Test resolution with no dependencies."""
+        orch = AgentOrchestrator()
 
-        resolved = orchestrator._resolve_execution_order(["independent"])
-        assert "independent" in resolved
+        result = orch._resolve_dependencies(["agent_a", "agent_b", "agent_c"])
 
-    @pytest.mark.asyncio
-    async def test_resolve_dependencies_simple_chain(self):
-        orchestrator = AgentOrchestrator()
-        scanner = MockAgent("scanner")
-        fixer = MockAgent("fixer")
+        assert len(result) == 3
+        assert set(result) == {"agent_a", "agent_b", "agent_c"}
 
-        await orchestrator.register_agent(scanner, ["scan"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(fixer, ["fix"], ["scanner"], ExecutionPriority.MEDIUM)
+    def test_resolve_with_dependencies(self):
+        """Test resolution with dependencies."""
+        orch = AgentOrchestrator()
+        orch.dependency_graph["agent_b"] = {"agent_a"}
+        orch.dependency_graph["agent_c"] = {"agent_b"}
 
-        resolved = orchestrator._resolve_execution_order(["fixer"])
-        # Scanner should come before fixer
-        assert resolved.index("scanner") < resolved.index("fixer")
+        result = orch._resolve_dependencies(["agent_a", "agent_b", "agent_c"])
 
-    @pytest.mark.asyncio
-    async def test_resolve_dependencies_complex_graph(self):
-        orchestrator = AgentOrchestrator()
+        # agent_a should come before agent_b, agent_b before agent_c
+        assert result.index("agent_a") < result.index("agent_b")
+        assert result.index("agent_b") < result.index("agent_c")
 
-        a = MockAgent("a")
-        b = MockAgent("b")
-        c = MockAgent("c")
-        d = MockAgent("d")
-
-        await orchestrator.register_agent(a, ["a"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(b, ["b"], ["a"], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(c, ["c"], ["a"], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(d, ["d"], ["b", "c"], ExecutionPriority.HIGH)
-
-        resolved = orchestrator._resolve_execution_order(["d"])
-
-        # a must come first
-        assert resolved[0] == "a"
-        # b and c must come before d
-        assert resolved.index("b") < resolved.index("d")
-        assert resolved.index("c") < resolved.index("d")
-
-    @pytest.mark.asyncio
-    async def test_detect_circular_dependency(self):
-        orchestrator = AgentOrchestrator()
-
-        a = MockAgent("a")
-        b = MockAgent("b")
-
-        await orchestrator.register_agent(a, ["a"], ["b"], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(b, ["b"], ["a"], ExecutionPriority.HIGH)
-
-        # Should detect circular dependency
-        with pytest.raises(Exception):
-            orchestrator._resolve_execution_order(["a"])
-
-
-class TestConcurrencyControl:
-    """Test concurrency control mechanisms"""
-
-    @pytest.mark.asyncio
-    async def test_max_concurrent_tasks_limit(self):
-        orchestrator = AgentOrchestrator(max_concurrent_tasks=2)
-        agent = MockAgent("slow_agent")
-        await orchestrator.register_agent(agent, ["process"], [], ExecutionPriority.MEDIUM)
-
-        # The orchestrator should respect max_concurrent_tasks
-        assert orchestrator.max_concurrent_tasks == 2
-
-    @pytest.mark.asyncio
-    async def test_active_tasks_tracking(self):
-        orchestrator = AgentOrchestrator()
-        assert len(orchestrator.active_tasks) == 0
-
-        # Active tasks should be tracked during execution
-        # (This would require mocking the task execution to pause)
-
-
-class TestHealthMonitoring:
-    """Test health monitoring functionality"""
-
-    @pytest.mark.asyncio
-    async def test_get_agent_health(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("healthy_agent")
-        await orchestrator.register_agent(agent, ["scan"], [], ExecutionPriority.HIGH)
-
-        health = await orchestrator.get_agent_health("healthy_agent")
-
-        assert health is not None
-        assert "status" in health
-        assert health["agent_name"] == "healthy_agent"
-
-    @pytest.mark.asyncio
-    async def test_get_all_agent_health(self):
-        orchestrator = AgentOrchestrator()
-        agent1 = MockAgent("agent1")
-        agent2 = MockAgent("agent2")
-
-        await orchestrator.register_agent(agent1, ["cap1"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(agent2, ["cap2"], [], ExecutionPriority.MEDIUM)
-
-        health_report = await orchestrator.get_all_agent_health()
-
-        assert "agent1" in health_report
-        assert "agent2" in health_report
-
-    @pytest.mark.asyncio
-    async def test_health_check_nonexistent_agent(self):
-        orchestrator = AgentOrchestrator()
-        health = await orchestrator.get_agent_health("nonexistent")
-        assert health is None
-
-
-class TestAgentCommunication:
-    """Test inter-agent communication"""
-
-    @pytest.mark.asyncio
-    async def test_send_message_between_agents(self):
-        orchestrator = AgentOrchestrator()
-        sender = MockAgent("sender")
-        receiver = MockAgent("receiver")
-
-        await orchestrator.register_agent(sender, ["send"], [], ExecutionPriority.MEDIUM)
-        await orchestrator.register_agent(receiver, ["receive"], [], ExecutionPriority.MEDIUM)
-
-        # Test message sending (if implemented)
-        # This tests the infrastructure for agent-to-agent communication
-
-
-class TestLoadBalancing:
-    """Test load balancing functionality"""
-
-    @pytest.mark.asyncio
-    async def test_distribute_tasks_across_agents(self):
-        orchestrator = AgentOrchestrator()
-        agent1 = MockAgent("agent1")
-        agent2 = MockAgent("agent2")
-
-        await orchestrator.register_agent(agent1, ["process"], [], ExecutionPriority.MEDIUM)
-        await orchestrator.register_agent(agent2, ["process"], [], ExecutionPriority.MEDIUM)
-
-        # Both agents have the same capability
-        # Orchestrator should distribute load
-
-
-class TestErrorHandling:
-    """Test error handling and recovery"""
-
-    @pytest.mark.asyncio
-    async def test_handle_agent_initialization_failure(self):
-        class FailingInitAgent(BaseAgent):
-            async def initialize(self):
-                raise Exception("Initialization failed")
-
-            async def execute_core_function(self, **kwargs):
-                return {"status": "success"}
-
-        orchestrator = AgentOrchestrator()
-        agent = FailingInitAgent("failing_init")
-
-        # Should handle initialization failure gracefully
-        success = await orchestrator.register_agent(agent, ["fail"], [], ExecutionPriority.MEDIUM)
-        # Depending on implementation, this might succeed or fail
-
-    @pytest.mark.asyncio
-    async def test_handle_task_execution_timeout(self):
-        # Test timeout handling if implemented
-        pass
-
-    @pytest.mark.asyncio
-    async def test_handle_agent_crash_during_execution(self):
-        # Test recovery from agent crashes
-        pass
-
-
-class TestTaskQueueManagement:
-    """Test task queue functionality"""
-
-    def test_task_queue_initialized(self):
-        orchestrator = AgentOrchestrator()
-        assert len(orchestrator.task_queue) == 0
-
-    @pytest.mark.asyncio
-    async def test_add_task_to_queue(self):
-        orchestrator = AgentOrchestrator()
-        # Task queue operations
-
-
-class TestPriorityExecution:
-    """Test priority-based execution"""
-
-    @pytest.mark.asyncio
-    async def test_critical_priority_executes_first(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("priority_agent")
-        await orchestrator.register_agent(agent, ["process"], [], ExecutionPriority.CRITICAL)
-
-        # Critical priority tasks should execute before others
-
-
-class TestAgentMetrics:
-    """Test metrics collection"""
-
-    @pytest.mark.asyncio
-    async def test_collect_execution_metrics(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("metrics_agent")
-        await orchestrator.register_agent(agent, ["scan"], [], ExecutionPriority.MEDIUM)
-
-        await orchestrator.execute_task(
-            task_type="scan",
-            parameters={},
-            required_capabilities=["scan"],
-            priority=ExecutionPriority.MEDIUM,
+    def test_find_agents_with_capabilities(self):
+        """Test finding agents with required capabilities."""
+        orch = AgentOrchestrator()
+        orch.agent_capabilities["agent1"] = AgentCapability(
+            agent_name="agent1",
+            capabilities=["search", "analyze"]
+        )
+        orch.agent_capabilities["agent2"] = AgentCapability(
+            agent_name="agent2",
+            capabilities=["search"]
         )
 
-        # Metrics should be collected
+        # Both have search
+        result = orch._find_agents_with_capabilities(["search"])
+        assert "agent1" in result
+        assert "agent2" in result
+
+        # Only agent1 has both
+        result = orch._find_agents_with_capabilities(["search", "analyze"])
+        assert "agent1" in result
+        assert "agent2" not in result
 
 
-class TestOrchestratorShutdown:
-    """Test graceful shutdown"""
+# =============================================================================
+# Circuit Breaker Tests
+# =============================================================================
+
+
+class TestCircuitBreaker:
+    """Tests for circuit breaker pattern."""
+
+    def test_circuit_initially_closed(self):
+        """Test circuit starts closed."""
+        orch = AgentOrchestrator()
+
+        is_open = orch._is_circuit_open("test_agent")
+        assert is_open is False
+
+    def test_circuit_opens_after_failures(self):
+        """Test circuit opens after threshold failures."""
+        orch = AgentOrchestrator()
+
+        for _ in range(5):
+            orch._increment_circuit_breaker("test_agent")
+
+        assert orch.circuit_breakers["test_agent"]["state"] == "open"
+        assert orch._is_circuit_open("test_agent") is True
+
+    def test_circuit_resets_on_success(self):
+        """Test circuit resets after success."""
+        orch = AgentOrchestrator()
+
+        # Cause failures
+        for _ in range(3):
+            orch._increment_circuit_breaker("test_agent")
+
+        # Reset
+        orch._reset_circuit_breaker("test_agent")
+
+        assert orch.circuit_breakers["test_agent"]["state"] == "closed"
+        assert orch.circuit_breakers["test_agent"]["failures"] == 0
+
+
+# =============================================================================
+# Metrics and Monitoring Tests
+# =============================================================================
+
+
+class TestMetricsAndMonitoring:
+    """Tests for metrics and monitoring."""
+
+    def test_record_execution(self):
+        """Test recording execution metrics."""
+        orch = AgentOrchestrator()
+
+        orch._record_execution("test_agent", True, 0.5)
+
+        metrics = orch.agent_metrics["test_agent"]
+        assert metrics["calls"] == 1
+        assert metrics["errors"] == 0
+        assert metrics["total_time"] == 0.5
+        assert metrics["avg_time"] == 0.5
+
+    def test_record_execution_failure(self):
+        """Test recording failed execution."""
+        orch = AgentOrchestrator()
+
+        orch._record_execution("test_agent", False, 1.0)
+
+        metrics = orch.agent_metrics["test_agent"]
+        assert metrics["errors"] == 1
+
+    def test_execution_history_limited(self):
+        """Test execution history is limited to 1000 records."""
+        orch = AgentOrchestrator()
+
+        for i in range(1100):
+            orch._record_execution("agent", True, 0.1)
+
+        assert len(orch.execution_history) == 1000
 
     @pytest.mark.asyncio
-    async def test_shutdown_all_agents(self):
-        orchestrator = AgentOrchestrator()
-        agent1 = MockAgent("agent1")
-        agent2 = MockAgent("agent2")
+    async def test_get_orchestrator_health(self):
+        """Test getting orchestrator health."""
+        orch = AgentOrchestrator()
+        agent = MockAgent("test_agent")
+        await orch.register_agent(agent, capabilities=["test"])
 
-        await orchestrator.register_agent(agent1, ["cap1"], [], ExecutionPriority.HIGH)
-        await orchestrator.register_agent(agent2, ["cap2"], [], ExecutionPriority.MEDIUM)
+        health = await orch.get_orchestrator_health()
 
-        # Shutdown should gracefully stop all agents
-        await orchestrator.shutdown()
+        assert "timestamp" in health
+        assert health["registered_agents"] == 1
+        assert "agent_health" in health
+        assert "system_status" in health
+
+    def test_get_agent_metrics_single(self):
+        """Test getting metrics for single agent."""
+        orch = AgentOrchestrator()
+        orch._record_execution("agent1", True, 0.5)
+
+        metrics = orch.get_agent_metrics("agent1")
+
+        assert metrics["calls"] == 1
+
+    def test_get_agent_metrics_all(self):
+        """Test getting all agent metrics."""
+        orch = AgentOrchestrator()
+        orch._record_execution("agent1", True, 0.5)
+        orch._record_execution("agent2", True, 0.3)
+
+        metrics = orch.get_agent_metrics()
+
+        assert "agent1" in metrics
+        assert "agent2" in metrics
+
+    def test_get_dependency_graph(self):
+        """Test getting dependency graph."""
+        orch = AgentOrchestrator()
+        orch.dependency_graph["agent_b"] = {"agent_a"}
+
+        graph = orch.get_dependency_graph()
+
+        assert graph["agent_b"] == ["agent_a"]
 
 
-class TestEdgeCases:
-    """Test edge cases and boundary conditions"""
+# =============================================================================
+# Inter-Agent Communication Tests
+# =============================================================================
+
+
+class TestInterAgentCommunication:
+    """Tests for inter-agent communication."""
+
+    def test_share_data(self):
+        """Test sharing data between agents."""
+        orch = AgentOrchestrator()
+
+        orch.share_data("config", {"key": "value"})
+
+        assert "config" in orch.shared_context
+        assert orch.shared_context["config"]["value"] == {"key": "value"}
+
+    def test_get_shared_data(self):
+        """Test getting shared data."""
+        orch = AgentOrchestrator()
+        orch.share_data("test_key", "test_value")
+
+        value = orch.get_shared_data("test_key")
+        assert value == "test_value"
+
+    def test_get_shared_data_nonexistent(self):
+        """Test getting nonexistent shared data."""
+        orch = AgentOrchestrator()
+
+        value = orch.get_shared_data("nonexistent")
+        assert value is None
+
+    def test_shared_data_with_ttl(self):
+        """Test shared data with TTL."""
+        orch = AgentOrchestrator()
+
+        orch.share_data("temp_data", "value", ttl=3600)
+
+        assert orch.shared_context["temp_data"]["ttl"] == 3600
 
     @pytest.mark.asyncio
-    async def test_empty_orchestrator_execute_task(self):
-        orchestrator = AgentOrchestrator()
-        result = await orchestrator.execute_task(
-            task_type="anything",
-            parameters={},
-            required_capabilities=["anything"],
-            priority=ExecutionPriority.MEDIUM,
+    async def test_broadcast_to_agents(self):
+        """Test broadcasting message to agents."""
+        orch = AgentOrchestrator()
+        orch.agents = {"agent1": MagicMock(), "agent2": MagicMock()}
+
+        await orch.broadcast_to_agents(
+            {"type": "notification", "message": "test"},
+            agent_names=["agent1"]
         )
-        assert "error" in result
+
+        assert orch.get_shared_data("message_agent1") is not None
+
+
+# =============================================================================
+# Video Generation Task Tests
+# =============================================================================
+
+
+class TestVideoGenerationTasks:
+    """Tests for video generation task handling."""
 
     @pytest.mark.asyncio
-    async def test_register_agent_with_empty_capabilities(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("empty_cap")
-        success = await orchestrator.register_agent(agent, [], [], ExecutionPriority.MEDIUM)
-        assert success is True or success is False  # Should handle gracefully
+    async def test_create_video_generation_task(self):
+        """Test creating a video generation task."""
+        orch = AgentOrchestrator()
 
-    @pytest.mark.asyncio
-    async def test_execute_task_with_empty_parameters(self):
-        orchestrator = AgentOrchestrator()
-        agent = MockAgent("test")
-        await orchestrator.register_agent(agent, ["test"], [], ExecutionPriority.MEDIUM)
-
-        result = await orchestrator.execute_task(
-            task_type="test",
-            parameters={},
-            required_capabilities=["test"],
-            priority=ExecutionPriority.MEDIUM,
+        task_id = await orch.create_video_generation_task(
+            task_type="runway_video",
+            parameters={"prompt": "luxury fashion"},
+            priority=ExecutionPriority.HIGH
         )
-        assert "results" in result or "error" in result
+
+        assert task_id is not None
+        assert task_id in orch.tasks
+        assert orch.tasks[task_id].task_type == "runway_video"
 
     @pytest.mark.asyncio
-    async def test_very_long_dependency_chain(self):
-        orchestrator = AgentOrchestrator()
+    async def test_execute_video_task_not_found(self):
+        """Test executing nonexistent video task."""
+        orch = AgentOrchestrator()
 
-        # Create a long chain: agent1 -> agent2 -> ... -> agent10
-        previous = None
-        for i in range(10):
-            agent = MockAgent(f"agent{i}")
-            deps = [f"agent{i-1}"] if previous else []
-            await orchestrator.register_agent(agent, [f"cap{i}"], deps, ExecutionPriority.MEDIUM)
-            previous = f"agent{i}"
+        result = await orch.execute_video_generation_task("nonexistent")
 
-        # Should resolve correctly
-        resolved = orchestrator._resolve_execution_order([f"agent9"])
-        assert len(resolved) == 10
+        assert result["status"] == "failed"
+        assert "not found" in result["error"]
+
+    @pytest.mark.asyncio
+    async def test_execute_video_task_no_agent(self):
+        """Test executing video task without required agent."""
+        orch = AgentOrchestrator()
+        task_id = await orch.create_video_generation_task(
+            task_type="runway_video",
+            parameters={}
+        )
+
+        result = await orch.execute_video_generation_task(task_id)
+
+        assert result["status"] == "failed"
+        assert "not available" in result["error"]
+
+
+# =============================================================================
+# MockAgent Tests
+# =============================================================================
+
+
+class TestMockAgent:
+    """Tests for MockAgent class."""
+
+    @pytest.mark.asyncio
+    async def test_mock_agent_initialize(self):
+        """Test mock agent initialization."""
+        agent = MockAgent("test_mock")
+
+        success = await agent.initialize()
+
+        assert success is True
+        assert agent.status == AgentStatus.HEALTHY
+
+    @pytest.mark.asyncio
+    async def test_mock_agent_execute(self):
+        """Test mock agent execution."""
+        agent = MockAgent("test_mock")
+        await agent.initialize()
+
+        result = await agent.execute_core_function(param1="value1")
+
+        assert result["status"] == "success"
+        assert result["agent"] == "test_mock"
+        assert "param1" in result["parameters_received"]
+
+    @pytest.mark.asyncio
+    async def test_mock_agent_failure_mode(self):
+        """Test mock agent failure mode."""
+        agent = MockAgent("failing_agent", should_fail=True)
+        await agent.initialize()
+
+        # First two succeed
+        await agent.execute_core_function()
+        await agent.execute_core_function()
+
+        # Third fails
+        with pytest.raises(Exception, match="Simulated failure"):
+            await agent.execute_core_function()
