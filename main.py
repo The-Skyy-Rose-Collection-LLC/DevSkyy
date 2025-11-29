@@ -507,6 +507,7 @@ try:
     from api.v1.consensus import router as consensus_router
     from api.v1.content import router as content_router
     from api.v1.dashboard import router as dashboard_router
+    from api.v1.health import router as health_router
 
     # DevSkyy Automation Routers (n8n replacements)
     from api.v1.ecommerce import router as ecommerce_router
@@ -529,6 +530,9 @@ except ImportError as e:
 # Register API routers
 if API_ROUTERS_AVAILABLE:
     try:
+        # Health check routes (Kubernetes-ready liveness/readiness probes)
+        app.include_router(health_router, prefix="/api/v1", tags=["health"])
+
         # Core API routes
         app.include_router(agents_router, prefix="/api/v1/agents", tags=["v1-agents"])
         app.include_router(auth_router, prefix="/api/v1/auth", tags=["v1-auth"])
