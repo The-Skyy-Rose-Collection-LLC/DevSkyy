@@ -9,17 +9,17 @@ from __future__ import annotations
 
 import json
 import os
-import subprocess
 import sys
 import tempfile
 from pathlib import Path
-from typing import Any
-from unittest.mock import MagicMock
 from unittest.mock import patch
 
 import pytest
 
-# Add parent directory to path for imports
+# Add parent directory to path for imports when running tests directly.
+# This is required because mcp_health_check.py is in the project root,
+# not in an installable package. For proper package structure, consider
+# moving to src/ layout with pyproject.toml.
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from mcp_health_check import (
