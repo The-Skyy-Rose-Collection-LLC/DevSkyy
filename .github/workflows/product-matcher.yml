@@ -1,0 +1,29 @@
+name: product-matcher
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  product-matcher:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      - name: Install dependencies
+        run: npm install
+      - name: Run tests
+        run: npm test
+      - name: Build product matcher
+        if: ${{ github.ref == 'refs/heads/main' }}
+        run: |
+          echo "Building product matcher..."
+          echo "Placeholder build steps"
+      - name: Deploy notify
+        if: ${{ success() && github.ref == 'refs/heads/main' }}
+        run: echo "Deployment successful"
