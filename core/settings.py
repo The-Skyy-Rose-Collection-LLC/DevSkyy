@@ -246,6 +246,20 @@ class Settings(BaseSettings):
     )
 
     # ==========================================================================
+    # 3D Clothing Asset Automation (SkyyRose)
+    # ==========================================================================
+
+    tripo_api_key: str = Field(
+        default="",
+        description="Tripo3D API key for 3D model generation",
+    )
+
+    fashn_api_key: str = Field(
+        default="",
+        description="FASHN API key for virtual try-on",
+    )
+
+    # ==========================================================================
     # Validators
     # ==========================================================================
 
