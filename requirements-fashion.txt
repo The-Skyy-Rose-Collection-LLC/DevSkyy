@@ -133,6 +133,10 @@ aiohttp>=3.9.0
 # AVATAR AND VIRTUAL TRY-ON SPECIFIC
 # ==============================================================================
 
+# FASHN - AI virtual try-on API
+# Source: https://pypi.org/project/fashn/
+fashn~=0.5.1
+
 # ControlNet - Pose guidance for virtual try-on
 # Source: https://github.com/lllyasviel/ControlNet
 controlnet-aux>=0.0.7
