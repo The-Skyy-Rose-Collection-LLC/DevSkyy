@@ -36,7 +36,7 @@ class TestCheckStatus:
 
     def test_status_values(self) -> None:
         """Verify all status values are defined."""
-        assert CheckStatus.PASS.value == "pass"
+        assert CheckStatus.OK.value == "pass"
         assert CheckStatus.WARN.value == "warn"
         assert CheckStatus.FAIL.value == "fail"
         assert CheckStatus.SKIP.value == "skip"
@@ -49,11 +49,11 @@ class TestCheckResult:
         """Test basic result creation."""
         result = CheckResult(
             name="Test Check",
-            status=CheckStatus.PASS,
+            status=CheckStatus.OK,
             message="Test passed",
         )
         assert result.name == "Test Check"
-        assert result.status == CheckStatus.PASS
+        assert result.status == CheckStatus.OK
         assert result.message == "Test passed"
         assert result.details is None
         assert result.fix_suggestion is None
@@ -74,7 +74,7 @@ class TestCheckResult:
         """Test conversion to dictionary."""
         result = CheckResult(
             name="Test",
-            status=CheckStatus.PASS,
+            status=CheckStatus.OK,
             message="OK",
         )
         d = result.to_dict()
@@ -114,7 +114,7 @@ class TestHealthCheckReport:
     def test_add_pass(self) -> None:
         """Test adding passed check."""
         report = HealthCheckReport()
-        report.add(CheckResult("Test", CheckStatus.PASS, "OK"))
+        report.add(CheckResult("Test", CheckStatus.OK, "OK"))
         assert report.passed == 1
         assert report.success is True
 
@@ -142,7 +142,7 @@ class TestHealthCheckReport:
     def test_multiple_checks(self) -> None:
         """Test adding multiple checks."""
         report = HealthCheckReport()
-        report.add(CheckResult("Test1", CheckStatus.PASS, "OK"))
+        report.add(CheckResult("Test1", CheckStatus.OK, "OK"))
         report.add(CheckResult("Test2", CheckStatus.WARN, "Warning"))
         report.add(CheckResult("Test3", CheckStatus.FAIL, "Failed"))
         report.add(CheckResult("Test4", CheckStatus.SKIP, "Skipped"))
@@ -157,7 +157,7 @@ class TestHealthCheckReport:
     def test_to_dict(self) -> None:
         """Test report conversion to dictionary."""
         report = HealthCheckReport()
-        report.add(CheckResult("Test1", CheckStatus.PASS, "OK"))
+        report.add(CheckResult("Test1", CheckStatus.OK, "OK"))
         report.add(CheckResult("Test2", CheckStatus.FAIL, "Failed"))
 
         d = report.to_dict()
@@ -234,7 +234,7 @@ class TestMCPHealthChecker:
             "echo",
             [["echo", "v1.0.0"]],
         )
-        assert result.status == CheckStatus.PASS
+        assert result.status == CheckStatus.OK
 
     def test_check_system_dependency_not_found(self) -> None:
         """Test checking missing dependency."""
@@ -265,7 +265,7 @@ class TestMCPHealthChecker:
         try:
             checker = MCPHealthChecker(config_path=config_path)
             result = checker.check_config_exists()
-            assert result.status == CheckStatus.PASS
+            assert result.status == CheckStatus.OK
         finally:
             os.unlink(config_path)
 
@@ -286,7 +286,7 @@ class TestMCPHealthChecker:
         try:
             checker = MCPHealthChecker(config_path=config_path)
             result = checker.check_config_syntax()
-            assert result.status == CheckStatus.PASS
+            assert result.status == CheckStatus.OK
             assert checker.config == {"mcpServers": {}}
         finally:
             os.unlink(config_path)
@@ -328,7 +328,7 @@ class TestMCPHealthChecker:
             checker = MCPHealthChecker(config_path=config_path)
             checker.check_config_syntax()
             result = checker.check_config_structure()
-            assert result.status == CheckStatus.PASS
+            assert result.status == CheckStatus.OK
         finally:
             os.unlink(config_path)
 
@@ -405,7 +405,7 @@ class TestMCPHealthChecker:
             checker = MCPHealthChecker(config_path=config_path)
             checker.check_config_syntax()
             result = checker.check_unset_env_references()
-            assert result.status == CheckStatus.PASS
+            assert result.status == CheckStatus.OK
         finally:
             os.unlink(config_path)
 
@@ -446,7 +446,7 @@ class TestMCPHealthChecker:
             {"command": "python3", "args": []},
         )
         # python3 should exist in most environments
-        assert result.status in (CheckStatus.PASS, CheckStatus.FAIL)
+        assert result.status in (CheckStatus.OK, CheckStatus.FAIL)
 
     def test_check_server_command_not_found(self) -> None:
         """Test server command check when command missing."""
@@ -477,7 +477,7 @@ class TestMCPHealthChecker:
                 "env": {"PYTHONUNBUFFERED": "1"},
             },
         )
-        assert result.status == CheckStatus.PASS
+        assert result.status == CheckStatus.OK
 
     def test_check_python_server_env_not_set(self) -> None:
         """Test PYTHONUNBUFFERED check when not set."""
@@ -493,7 +493,7 @@ class TestMCPHealthChecker:
         checker = MCPHealthChecker(config_path="/tmp/test.json")
         # Use a high port that's unlikely to be in use
         result = checker.check_port_available(59999)
-        assert result.status == CheckStatus.PASS
+        assert result.status == CheckStatus.OK
 
     def test_run_all_checks(self) -> None:
         """Test running all checks."""
@@ -588,7 +588,7 @@ class TestVersionComparison:
                 [["python", "--version"]],
                 min_version="3.11.0",
             )
-            assert result.status == CheckStatus.PASS
+            assert result.status == CheckStatus.OK
 
     def test_version_comparison_higher(self) -> None:
         """Test version comparison with higher version."""
@@ -600,7 +600,7 @@ class TestVersionComparison:
                 [["node", "--version"]],
                 min_version="18.0.0",
             )
-            assert result.status == CheckStatus.PASS
+            assert result.status == CheckStatus.OK
 
     def test_version_comparison_lower(self) -> None:
         """Test version comparison with lower version."""
@@ -677,7 +677,7 @@ class TestWordPressChecks:
                 None,
             )
             assert wp_check is not None
-            assert wp_check.status == CheckStatus.PASS
+            assert wp_check.status == CheckStatus.OK
         finally:
             # Cleanup
             os.environ.pop("WORDPRESS_CLIENT_ID", None)

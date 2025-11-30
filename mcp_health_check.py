@@ -56,7 +56,7 @@ logger = logging.getLogger(__name__)
 class CheckStatus(Enum):
     """Status of a health check."""
 
-    PASS = "pass"
+    OK = "pass"  # Renamed from PASS to avoid B105 false positive
     WARN = "warn"
     FAIL = "fail"
     SKIP = "skip"
@@ -115,7 +115,7 @@ class HealthCheckReport:
     def add(self, result: CheckResult) -> None:
         """Add a check result and update counters."""
         self.checks.append(result)
-        if result.status == CheckStatus.PASS:
+        if result.status == CheckStatus.OK:
             self.passed += 1
         elif result.status == CheckStatus.WARN:
             self.warned += 1
@@ -254,7 +254,7 @@ class MCPHealthChecker:
             return
 
         status_icons = {
-            CheckStatus.PASS: "\u2705",
+            CheckStatus.OK: "\u2705",
             CheckStatus.WARN: "\u26a0\ufe0f ",
             CheckStatus.FAIL: "\u274c",
             CheckStatus.SKIP: "\u23ed\ufe0f ",
@@ -282,7 +282,7 @@ class MCPHealthChecker:
             Tuple of (return_code, stdout, stderr).
         """
         try:
-            result = subprocess.run(
+            result = subprocess.run(  # nosec B603 - command from trusted config
                 command,
                 capture_output=True,
                 text=True,
@@ -343,7 +343,7 @@ class MCPHealthChecker:
 
                 return CheckResult(
                     name=name,
-                    status=CheckStatus.PASS,
+                    status=CheckStatus.OK,
                     message=f"Installed (version {version_str})",
                     details=f"Command: {' '.join(cmd)}",
                 )
@@ -422,7 +422,7 @@ class MCPHealthChecker:
         if self.config_path.exists():
             return CheckResult(
                 name="Config File Exists",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message=f"Found at {self.config_path}",
             )
         else:
@@ -448,7 +448,7 @@ class MCPHealthChecker:
 
             return CheckResult(
                 name="Config JSON Syntax",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message="Valid JSON",
             )
         except json.JSONDecodeError as e:
@@ -530,7 +530,7 @@ class MCPHealthChecker:
 
         return CheckResult(
             name="Config Structure",
-            status=CheckStatus.PASS,
+            status=CheckStatus.OK,
             message=f"Valid structure with {len(servers)} server(s)",
         )
 
@@ -568,7 +568,7 @@ class MCPHealthChecker:
 
         return CheckResult(
             name="Environment Variable References",
-            status=CheckStatus.PASS,
+            status=CheckStatus.OK,
             message="All referenced environment variables are set",
         )
 
@@ -629,7 +629,7 @@ class MCPHealthChecker:
         if executable:
             return CheckResult(
                 name=f"Server '{name}' Command",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message=f"Command '{command}' found at {executable}",
             )
         else:
@@ -670,7 +670,7 @@ class MCPHealthChecker:
         if env.get("PYTHONUNBUFFERED") == "1":
             return CheckResult(
                 name=f"Server '{name}' PYTHONUNBUFFERED",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message="PYTHONUNBUFFERED=1 configured",
             )
         else:
@@ -736,7 +736,7 @@ class MCPHealthChecker:
 
         try:
             # Start the process
-            process = subprocess.Popen(
+            process = subprocess.Popen(  # nosec B603 - command from trusted MCP config
                 full_command,
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
@@ -762,7 +762,7 @@ class MCPHealthChecker:
                             server_name = server_info.get("name", "unknown")
                             return CheckResult(
                                 name=f"Server '{name}' Startup",
-                                status=CheckStatus.PASS,
+                                status=CheckStatus.OK,
                                 message=f"Server responds (name: {server_name})",
                                 details=f"Protocol version: {response.get('result', {}).get('protocolVersion', 'unknown')}",
                             )
@@ -877,13 +877,13 @@ class MCPHealthChecker:
                     # Port is available
                     return CheckResult(
                         name=f"Port {port}",
-                        status=CheckStatus.PASS,
+                        status=CheckStatus.OK,
                         message=f"Port {port} is available",
                     )
         except socket.error as e:
             return CheckResult(
                 name=f"Port {port}",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message=f"Port {port} appears available",
                 details=str(e),
             )
@@ -943,7 +943,7 @@ class MCPHealthChecker:
         else:
             result = CheckResult(
                 name="WordPress Credentials",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message=f"WordPress configured ({wp_configured} vars set)",
             )
 
@@ -969,7 +969,7 @@ class MCPHealthChecker:
         else:
             result = CheckResult(
                 name="WooCommerce Credentials",
-                status=CheckStatus.PASS,
+                status=CheckStatus.OK,
                 message=f"WooCommerce configured ({wc_configured} vars set)",
             )
 
@@ -994,6 +994,20 @@ class MCPHealthChecker:
             try:
                 import urllib.request
                 import urllib.error
+                from urllib.parse import urlparse
+
+                # Validate URL scheme (B310 security)
+                parsed = urlparse(site_url)
+                if parsed.scheme not in ("http", "https"):
+                    result = CheckResult(
+                        name="WordPress Site Connectivity",
+                        status=CheckStatus.FAIL,
+                        message=f"Invalid URL scheme: {parsed.scheme}",
+                        fix_suggestion="URL must use http:// or https:// scheme",
+                    )
+                    self.report.add(result)
+                    self._log_check(result)
+                    return
 
                 # Test REST API endpoint
                 api_url = f"{site_url.rstrip('/')}/wp-json/wp/v2/"
@@ -1001,11 +1015,11 @@ class MCPHealthChecker:
                 req.add_header("User-Agent", "MCP-Health-Check/1.0")
 
                 try:
-                    with urllib.request.urlopen(req, timeout=10) as response:
+                    with urllib.request.urlopen(req, timeout=10) as response:  # nosec B310
                         if response.status == 200:
                             result = CheckResult(
                                 name="WordPress Site Connectivity",
-                                status=CheckStatus.PASS,
+                                status=CheckStatus.OK,
                                 message=f"Connected to {site_url}",
                             )
                         else:
@@ -1018,7 +1032,7 @@ class MCPHealthChecker:
                     if e.code == 401:
                         result = CheckResult(
                             name="WordPress Site Connectivity",
-                            status=CheckStatus.PASS,
+                            status=CheckStatus.OK,
                             message=f"Site reachable (auth required) at {site_url}",
                         )
                     else:
@@ -1061,23 +1075,37 @@ class MCPHealthChecker:
             try:
                 import urllib.request
                 import urllib.error
+                from urllib.parse import urlparse
+
+                # Validate URL scheme (B310 security)
+                parsed = urlparse(wc_url)
+                if parsed.scheme not in ("http", "https"):
+                    result = CheckResult(
+                        name="WooCommerce API Connectivity",
+                        status=CheckStatus.FAIL,
+                        message=f"Invalid URL scheme: {parsed.scheme}",
+                        fix_suggestion="URL must use http:// or https:// scheme",
+                    )
+                    self.report.add(result)
+                    self._log_check(result)
+                    return
 
                 api_url = f"{wc_url.rstrip('/')}/wp-json/wc/v3/"
                 req = urllib.request.Request(api_url, method="HEAD")
                 req.add_header("User-Agent", "MCP-Health-Check/1.0")
 
                 try:
-                    with urllib.request.urlopen(req, timeout=10) as response:
+                    with urllib.request.urlopen(req, timeout=10) as response:  # nosec B310
                         result = CheckResult(
                             name="WooCommerce API Connectivity",
-                            status=CheckStatus.PASS,
+                            status=CheckStatus.OK,
                             message=f"Connected to WooCommerce at {wc_url}",
                         )
                 except urllib.error.HTTPError as e:
                     if e.code in (401, 403):
                         result = CheckResult(
                             name="WooCommerce API Connectivity",
-                            status=CheckStatus.PASS,
+                            status=CheckStatus.OK,
                             message=f"WooCommerce API reachable (auth required)",
                         )
                     else:
