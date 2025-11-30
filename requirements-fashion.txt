@@ -71,6 +71,10 @@ scikit-learn>=1.4.0
 # 3D PROCESSING AND GENERATION
 # ==============================================================================
 
+# Tripo3D - AI-powered 3D model generation
+# Source: https://pypi.org/project/tripo3d/
+tripo3d~=0.3.7
+
 # Trimesh - 3D mesh processing
 # Source: https://github.com/mikedh/trimesh
 trimesh>=4.4.0
