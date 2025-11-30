@@ -1,9 +1,10 @@
 # DevSkyy - Enterprise AI Platform
 
-[![Version](https://img.shields.io/badge/version-5.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Version](https://img.shields.io/badge/version-5.2.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org)
 [![AI Models](https://img.shields.io/badge/AI-Claude%20Sonnet%204.5-purple.svg)](https://www.anthropic.com)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Coverage](https://img.shields.io/badge/coverage-90%25+-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![Status](https://img.shields.io/badge/status-production--ready-green.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
@@ -13,22 +14,228 @@
 
 ✅ **ZERO vulnerabilities** | 🎨 **Automated Theme Builder** | 🛍️ **Full Ecommerce Automation** | 🤖 **ML-Powered Agents** | 🛡️ SOC2/GDPR/PCI-DSS Ready
 
+---
+
+## Table of Contents
+
+- [Quick Start](#-quick-start)
+- [System Architecture](#-system-architecture)
+- [Core Features](#-core-features)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [API Reference](#-api-reference)
+- [Development Workflow](#-development-workflow)
+- [Testing](#-testing)
+- [Deployment](#-deployment)
+- [Security](#-security---grade-a)
+- [Contributing](#-contributing)
+- [Troubleshooting](#-troubleshooting)
+- [Support](#-support)
+
+---
+
 ## 🚀 Quick Start
 
+### Prerequisites
+
+Before you begin, ensure you have the following installed:
+
+| Requirement | Version | Purpose |
+|-------------|---------|---------|
+| Python | 3.11+ | Core runtime |
+| pip | 25.3+ | Package management |
+| Git | 2.x+ | Version control |
+| Docker | 24.x+ | Containerization (optional) |
+| Node.js | 18+ | Frontend development (optional) |
+| Redis | 7+ | Caching (recommended for production) |
+
+### One-Line Setup (Development)
+
 ```bash
-# Clone repository
+# Clone, setup, and run in one command
+git clone https://github.com/SkyyRoseLLC/DevSkyy.git && cd DevSkyy && \
+python -m venv venv && source venv/bin/activate && \
+pip install -r requirements.txt && cp .env.example .env && python main.py
+```
+
+### Step-by-Step Setup
+
+```bash
+# 1. Clone repository
 git clone https://github.com/SkyyRoseLLC/DevSkyy.git
 cd DevSkyy
 
-# Install dependencies
+# 2. Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+# venv\Scripts\activate   # Windows
+
+# 3. Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Configure environment
+# 4. Configure environment
 cp .env.example .env
-# Edit .env with your API keys
+# Edit .env with your API keys (see Configuration section)
 
-# Run application
+# 5. Run database migrations (if using PostgreSQL)
+alembic upgrade head
+
+# 6. Start the application
 python main.py
+# or with uvicorn for development
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+The API will be available at `http://localhost:8000` with interactive docs at `http://localhost:8000/docs`.
+
+---
+
+## 🏗️ System Architecture
+
+### High-Level Overview
+
+```mermaid
+flowchart TB
+    subgraph Client["Client Layer"]
+        WEB[Web Browser]
+        API_CLIENT[API Clients]
+        MOBILE[Mobile Apps]
+    end
+
+    subgraph Gateway["API Gateway"]
+        FASTAPI[FastAPI Application]
+        RATE_LIMIT[Rate Limiter]
+        AUTH[JWT Authentication]
+    end
+
+    subgraph Agents["AI Agent Layer"]
+        ORCHESTRATOR[Agent Orchestrator]
+        FASHION_AGENT[Fashion AI Agent]
+        ECOMMERCE_AGENT[E-commerce Agent]
+        WORDPRESS_AGENT[WordPress Agent]
+        ML_AGENT[ML Pipeline Agent]
+    end
+
+    subgraph ML["Machine Learning"]
+        MODEL_REGISTRY[Model Registry]
+        CLAUDE[Claude Sonnet 4.5]
+        GPT[GPT-4]
+        TRANSFORMERS[Transformers]
+    end
+
+    subgraph Data["Data Layer"]
+        POSTGRES[(PostgreSQL)]
+        REDIS[(Redis Cache)]
+        CHROMADB[(ChromaDB Vector)]
+    end
+
+    Client --> Gateway
+    Gateway --> Agents
+    Agents --> ML
+    Agents --> Data
+    ML --> Data
+```
+
+### Request Flow Architecture
+
+```mermaid
+sequenceDiagram
+    participant C as Client
+    participant G as API Gateway
+    participant A as Auth Service
+    participant O as Orchestrator
+    participant AI as AI Agents
+    participant DB as Database
+
+    C->>G: HTTP Request
+    G->>G: Rate Limiting Check
+    G->>A: Validate JWT Token
+    A-->>G: Token Valid
+    G->>O: Route to Orchestrator
+    O->>AI: Dispatch to Agent
+    AI->>DB: Query/Store Data
+    DB-->>AI: Data Response
+    AI-->>O: Agent Result
+    O-->>G: Processed Response
+    G-->>C: HTTP Response
+```
+
+### Agent Orchestration Flow
+
+```mermaid
+flowchart LR
+    subgraph Input["Request Input"]
+        REQ[User Request]
+        CONTEXT[Context Data]
+    end
+
+    subgraph Orchestration["Orchestration Layer"]
+        ROUTER[Task Router]
+        QUEUE[Task Queue]
+        SCHEDULER[Scheduler]
+    end
+
+    subgraph Agents["Specialized Agents"]
+        direction TB
+        A1[Fashion Vision]
+        A2[Content Generator]
+        A3[Price Optimizer]
+        A4[Inventory Manager]
+        A5[WordPress Builder]
+    end
+
+    subgraph Output["Response Output"]
+        AGGREGATE[Result Aggregator]
+        RESPONSE[Final Response]
+    end
+
+    Input --> ROUTER
+    ROUTER --> QUEUE
+    QUEUE --> SCHEDULER
+    SCHEDULER --> Agents
+    Agents --> AGGREGATE
+    AGGREGATE --> RESPONSE
+```
+
+### CI/CD Pipeline
+
+```mermaid
+flowchart LR
+    subgraph Stage1["Stage 1"]
+        LINT[Ruff Linting]
+        FORMAT[Black Format]
+        IMPORT[isort]
+    end
+
+    subgraph Stage2["Stage 2"]
+        MYPY[MyPy Type Check]
+    end
+
+    subgraph Stage3["Stage 3"]
+        BANDIT[Bandit Security]
+        SAFETY[Safety Check]
+        AUDIT[pip-audit]
+    end
+
+    subgraph Stage4["Stage 4"]
+        UNIT[Unit Tests]
+        INT[Integration Tests]
+        COV[Coverage 90%+]
+    end
+
+    subgraph Stage5["Stage 5"]
+        DOCKER[Docker Build]
+        TRIVY[Trivy Scan]
+        SIGN[Cosign]
+    end
+
+    subgraph Stage6["Stage 6"]
+        TRUTH[Truth Protocol]
+        LEDGER[Error Ledger]
+    end
+
+    Stage1 --> Stage2 --> Stage3 --> Stage4 --> Stage5 --> Stage6
 ```
 
 ## 🎯 Core Features
@@ -299,16 +506,153 @@ DevSkyy/
 
 ## 🧪 Testing
 
+DevSkyy maintains **90%+ test coverage** with comprehensive test suites organized by category.
+
+### Test Categories
+
+| Category | Command | Purpose |
+|----------|---------|---------|
+| **All Tests** | `pytest tests/` | Complete test suite |
+| **Unit Tests** | `pytest tests/unit/ -m unit` | Individual component tests |
+| **Integration** | `pytest tests/ -m integration` | Component interaction tests |
+| **API Tests** | `pytest tests/api/ -m api` | Endpoint validation |
+| **Security** | `pytest tests/security/ -m security` | Security compliance |
+| **E2E** | `pytest tests/e2e/` | End-to-end workflows |
+
+### Running Tests
+
 ```bash
-# Run all tests
-pytest tests/
+# Run all tests with coverage
+pytest tests/ --cov=. --cov-report=html --cov-fail-under=90
 
-# Run safety check
-python production_safety_check.py
+# Run fast tests only (excludes slow markers)
+pytest tests/ -m "not slow" --timeout=10
 
-# Check specific module
-pytest tests/test_agents.py -v
+# Run specific test categories
+pytest tests/unit/ -v                    # Unit tests
+pytest tests/api/ -v                     # API endpoint tests
+pytest tests/security/ -v                # Security tests
+
+# Run with parallel execution
+pytest tests/ -n auto                    # Auto-detect CPU cores
+
+# Generate coverage report
+pytest tests/ --cov=. --cov-report=html
+open htmlcov/index.html                  # View coverage report
 ```
+
+### Test Configuration
+
+Tests are configured in `pyproject.toml` with these settings:
+- **Minimum Coverage**: 90%
+- **Test Timeout**: 30 seconds default
+- **Async Mode**: auto (for async tests)
+- **Markers**: unit, integration, api, security, slow, performance
+
+### Writing Tests
+
+```python
+import pytest
+from httpx import AsyncClient
+
+@pytest.mark.unit
+async def test_product_creation():
+    """Test product creation with ML enhancements."""
+    product = await create_product({"name": "Test", "cost": 100})
+    assert product.id is not None
+    assert product.description  # ML-generated
+
+@pytest.mark.api
+async def test_health_endpoint(client: AsyncClient):
+    """Verify health check endpoint returns 200."""
+    response = await client.get("/api/v1/health")
+    assert response.status_code == 200
+```
+
+---
+
+## 🔧 Development Workflow
+
+### Daily Development Cycle
+
+```mermaid
+flowchart LR
+    A[Pull Latest] --> B[Create Branch]
+    B --> C[Implement]
+    C --> D[Test Locally]
+    D --> E[Pre-commit]
+    E --> F[Push]
+    F --> G[CI/CD]
+    G --> H[Review]
+    H --> I[Merge]
+```
+
+### Branch Naming Convention
+
+| Prefix | Purpose | Example |
+|--------|---------|---------|
+| `feature/` | New features | `feature/add-payment-gateway` |
+| `fix/` | Bug fixes | `fix/login-validation` |
+| `refactor/` | Code improvements | `refactor/optimize-ml-pipeline` |
+| `docs/` | Documentation | `docs/update-api-guide` |
+| `security/` | Security updates | `security/patch-cve-2025-xxxx` |
+
+### Code Quality Commands
+
+```bash
+# Format code
+make format                    # or: ruff format . && black .
+
+# Lint and auto-fix
+make lint                      # or: ruff check . --fix
+
+# Type checking
+make typecheck                 # or: mypy .
+
+# Security scan
+make security                  # or: bandit -r . && pip-audit
+
+# Run all checks (recommended before commit)
+make check                     # Runs all quality checks
+
+# Pre-commit hooks
+pre-commit install             # Install hooks
+pre-commit run --all-files     # Run all hooks manually
+```
+
+### Make Targets
+
+```bash
+make help           # Show all available targets
+make dev-install    # Install dev dependencies
+make run            # Start development server
+make test           # Run all tests
+make test-coverage  # Run tests with coverage
+make format         # Format all code
+make lint           # Run linters
+make typecheck      # Run type checker
+make security       # Run security scans
+make check          # Run all quality checks
+make docker-build   # Build Docker image
+make clean          # Clean build artifacts
+```
+
+### Environment Variables for Development
+
+```bash
+# Development mode settings
+export ENVIRONMENT=development
+export LOG_LEVEL=DEBUG
+export DEBUG=true
+
+# Database (uses SQLite by default)
+export DATABASE_URL=sqlite+aiosqlite:///./dev.db
+
+# Optional: Enable hot reload
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+---
 
 ## 🚀 Deployment
 
@@ -563,6 +907,199 @@ DevSkyy has undergone **comprehensive security hardening** achieving:
 6. Achieved production-ready security status
 
 See `ZERO_VULNERABILITIES_ACHIEVED.md` for complete details.
+
+---
+
+## 🔍 Troubleshooting
+
+### Common Issues and Solutions
+
+<details>
+<summary><strong>Installation Issues</strong></summary>
+
+#### `pip install` fails with dependency conflicts
+
+```bash
+# Solution: Use a fresh virtual environment
+python -m venv venv --clear
+source venv/bin/activate
+pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
+```
+
+#### PyTorch installation fails (CUDA issues)
+
+```bash
+# Install CPU-only version if no GPU
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cpu
+
+# For CUDA 12.1
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+```
+
+#### `ModuleNotFoundError` on startup
+
+```bash
+# Ensure you're in the correct virtual environment
+which python  # Should point to venv/bin/python
+pip list | grep fastapi  # Verify dependencies installed
+```
+
+</details>
+
+<details>
+<summary><strong>Runtime Errors</strong></summary>
+
+#### `SECRET_KEY environment variable must be set`
+
+```bash
+# Generate a secure key
+python -c 'import secrets; print(secrets.token_urlsafe(32))'
+
+# Add to .env file
+echo 'SECRET_KEY=your_generated_key_here' >> .env
+```
+
+#### Database connection errors
+
+```bash
+# Check DATABASE_URL format
+# SQLite (default):
+DATABASE_URL=sqlite+aiosqlite:///./devskyy.db
+
+# PostgreSQL:
+DATABASE_URL=postgresql+asyncpg://user:pass@localhost:5432/devskyy
+
+# Run migrations
+alembic upgrade head
+```
+
+#### Redis connection refused
+
+```bash
+# Start Redis locally
+docker run -d -p 6379:6379 redis:7-alpine
+
+# Or set REDIS_URL to skip Redis
+unset REDIS_URL  # Uses in-memory fallback
+```
+
+</details>
+
+<details>
+<summary><strong>API Issues</strong></summary>
+
+#### 401 Unauthorized errors
+
+```bash
+# Check JWT token is valid
+curl -H "Authorization: Bearer YOUR_TOKEN" http://localhost:8000/api/v1/health
+
+# Verify token expiration
+python -c "import jwt; print(jwt.decode('YOUR_TOKEN', options={'verify_signature': False}))"
+```
+
+#### 422 Validation errors
+
+```bash
+# Check request body matches Pydantic schema
+# API docs show expected format: http://localhost:8000/docs
+```
+
+#### Rate limit exceeded (429)
+
+```bash
+# Default: 100 requests/minute per IP
+# Wait 60 seconds or configure RATE_LIMIT_PER_MINUTE in .env
+```
+
+</details>
+
+<details>
+<summary><strong>Testing Issues</strong></summary>
+
+#### Tests fail with import errors
+
+```bash
+# Install test dependencies
+pip install -r requirements-dev.txt
+
+# Run from project root
+cd /path/to/DevSkyy
+pytest tests/
+```
+
+#### Async tests hanging
+
+```bash
+# Add timeout to pytest
+pytest tests/ --timeout=30
+
+# Check for unclosed async resources
+pytest tests/ -W error::ResourceWarning
+```
+
+#### Coverage below 90%
+
+```bash
+# Identify uncovered lines
+pytest tests/ --cov=. --cov-report=html
+open htmlcov/index.html
+
+# Focus on specific modules
+pytest tests/ --cov=agent --cov-report=term-missing
+```
+
+</details>
+
+<details>
+<summary><strong>Docker Issues</strong></summary>
+
+#### Docker build fails
+
+```bash
+# Clear Docker cache
+docker system prune -f
+docker build --no-cache -t devskyy .
+
+# Check Dockerfile syntax
+docker build --progress=plain -t devskyy .
+```
+
+#### Container exits immediately
+
+```bash
+# Check logs
+docker logs <container_id>
+
+# Run interactively
+docker run -it --env-file .env devskyy /bin/bash
+```
+
+</details>
+
+### Getting Help
+
+If you're still experiencing issues:
+
+1. **Check the logs**: `LOG_LEVEL=DEBUG python main.py`
+2. **Search existing issues**: [GitHub Issues](https://github.com/SkyyRoseLLC/DevSkyy/issues)
+3. **Review documentation**: `/docs` directory
+4. **Contact support**: support@skyyrose.com
+
+---
+
+## 📚 Additional Documentation
+
+| Document | Description |
+|----------|-------------|
+| [CLAUDE.md](CLAUDE.md) | Truth Protocol & Development Guidelines |
+| [CONTRIBUTING.md](CONTRIBUTING.md) | Contribution Guidelines |
+| [SECURITY.md](SECURITY.md) | Security Policy & Reporting |
+| [ENTERPRISE_DEPLOYMENT.md](ENTERPRISE_DEPLOYMENT.md) | Production Deployment Guide |
+| [docs/API_AUTHENTICATION_DOCUMENTATION.md](docs/API_AUTHENTICATION_DOCUMENTATION.md) | Auth Implementation |
+| [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) | Docker Configuration |
+| [docs/MCP_IMPLEMENTATION_GUIDE.md](docs/MCP_IMPLEMENTATION_GUIDE.md) | MCP Server Setup |
 
 ---
 
