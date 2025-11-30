@@ -9,8 +9,13 @@ Per Truth Protocol:
 - Rule #7: Input validation - Schema enforcement on all inputs
 - Rule #13: Security baseline - AES-256-GCM for document encryption
 
+Features:
+- Iterative retrieval for multi-hop questions
+- Query reformulation for better results
+- Sufficiency checking to know when to stop
+
 Author: DevSkyy Platform Team
-Version: 1.0.0
+Version: 1.1.0
 Python: 3.11+
 """
 
@@ -556,6 +561,223 @@ class RAGService:
         except Exception as e:
             logger.error(f"Error processing RAG query: {e}")
             raise
+
+    async def iterative_query(
+        self,
+        question: str,
+        max_iterations: int = 3,
+        min_results: int = 3,
+        sufficiency_threshold: float = 0.75,
+        model: str = RAGConfig.DEFAULT_MODEL,
+        system_prompt: str | None = None,
+    ) -> dict[str, Any]:
+        """
+        Iterative RAG query with multi-hop retrieval.
+
+        Implements iterative retrieval loop:
+        1. Initial retrieval based on question
+        2. Evaluate if results are sufficient
+        3. If not, reformulate query and retrieve again
+        4. Repeat until sufficient context or max iterations
+        5. Generate final answer with all context
+
+        Perfect for:
+        - Complex multi-hop questions
+        - Questions requiring synthesis from multiple sources
+        - Exploratory information gathering
+
+        Args:
+            question: User question (may require multiple retrievals)
+            max_iterations: Maximum retrieval iterations (default 3)
+            min_results: Minimum results needed before answering
+            sufficiency_threshold: Similarity threshold for "sufficient" results
+            model: LLM model to use
+            system_prompt: Custom system prompt
+
+        Returns:
+            Answer with sources, iteration trace, and metadata
+        """
+        try:
+            logger.info(f"🔄 Starting iterative RAG query: {question[:50]}...")
+
+            all_results = []
+            queries_used = [question]
+            current_query = question
+            iteration_trace = []
+
+            for iteration in range(max_iterations):
+                # Retrieve with current query
+                results = await self.search(
+                    query=current_query,
+                    top_k=RAGConfig.TOP_K_RESULTS,
+                    min_similarity=0.5  # Lower threshold for iteration
+                )
+
+                # Track iteration
+                iteration_info = {
+                    "iteration": iteration + 1,
+                    "query": current_query,
+                    "results_found": len(results),
+                    "avg_similarity": sum(r["similarity"] for r in results) / max(len(results), 1)
+                }
+                iteration_trace.append(iteration_info)
+
+                # Add unique results
+                for result in results:
+                    content = result.get("content", "")
+                    if not any(r.get("content") == content for r in all_results):
+                        result["iteration"] = iteration + 1
+                        result["query"] = current_query
+                        all_results.append(result)
+
+                logger.info(
+                    f"  Iteration {iteration + 1}: {len(results)} results, "
+                    f"total unique: {len(all_results)}"
+                )
+
+                # Check sufficiency
+                if len(all_results) >= min_results:
+                    avg_similarity = sum(r["similarity"] for r in all_results) / len(all_results)
+                    if avg_similarity >= sufficiency_threshold:
+                        logger.info(f"  Sufficient results found (avg similarity: {avg_similarity:.2f})")
+                        break
+
+                # Reformulate query for next iteration
+                if iteration < max_iterations - 1:
+                    current_query = await self._reformulate_query(
+                        original_question=question,
+                        current_results=all_results,
+                        iteration=iteration
+                    )
+                    queries_used.append(current_query)
+
+            # Generate answer with all collected context
+            if not all_results:
+                return {
+                    "answer": "I couldn't find any relevant information after multiple search attempts.",
+                    "sources": [],
+                    "context_used": 0,
+                    "iterations": len(iteration_trace),
+                    "queries_used": queries_used,
+                    "iteration_trace": iteration_trace,
+                }
+
+            # Build combined context from all iterations
+            context_str = "\n\n".join([
+                f"[Source {idx + 1} (iter {r.get('iteration', 1)})] {r['content']}"
+                for idx, r in enumerate(all_results[:10])  # Limit to top 10
+            ])
+
+            # Build enhanced system prompt for multi-source synthesis
+            if not system_prompt:
+                system_prompt = (
+                    "You are DevSkyy, an AI assistant with access to a knowledge base. "
+                    "You have retrieved information from multiple search queries to answer this question. "
+                    "Synthesize information from all sources to provide a comprehensive answer. "
+                    "Cite sources by their numbers when using specific information. "
+                    "If sources conflict, note the discrepancy."
+                )
+
+            # Generate answer
+            if not self.anthropic:
+                return {
+                    "answer": "LLM not configured. Here are the relevant excerpts:\n\n" + context_str,
+                    "sources": all_results,
+                    "context_used": len(all_results),
+                    "iterations": len(iteration_trace),
+                    "queries_used": queries_used,
+                    "iteration_trace": iteration_trace,
+                }
+
+            message = self.anthropic.messages.create(
+                model=model,
+                max_tokens=RAGConfig.MAX_TOKENS,
+                system=system_prompt,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": f"Context from {len(all_results)} sources:\n{context_str}\n\nQuestion: {question}",
+                    }
+                ],
+            )
+
+            answer = message.content[0].text
+
+            logger.info(f"✅ Iterative RAG complete: {len(iteration_trace)} iterations, {len(all_results)} sources")
+
+            return {
+                "answer": answer,
+                "sources": all_results,
+                "context_used": len(all_results),
+                "iterations": len(iteration_trace),
+                "queries_used": queries_used,
+                "iteration_trace": iteration_trace,
+                "model": model,
+                "tokens_used": {
+                    "input": message.usage.input_tokens,
+                    "output": message.usage.output_tokens,
+                },
+            }
+
+        except Exception as e:
+            logger.error(f"Error in iterative RAG query: {e}")
+            raise
+
+    async def _reformulate_query(
+        self,
+        original_question: str,
+        current_results: list[dict],
+        iteration: int
+    ) -> str:
+        """
+        Reformulate query based on current results to find missing information.
+
+        Strategies by iteration:
+        1. Add specificity (e.g., "detailed", "explanation")
+        2. Try related terms/synonyms
+        3. Break into sub-questions
+        4. Focus on gaps in current results
+        """
+        # If we have an LLM, use it for smart reformulation
+        if self.anthropic and iteration > 0:
+            try:
+                # Summarize what we found
+                found_summary = "\n".join([
+                    f"- {r['content'][:100]}..." for r in current_results[:3]
+                ])
+
+                prompt = f"""Given the original question and what we've found so far, suggest a reformulated search query to find additional relevant information.
+
+Original question: {original_question}
+
+Information found so far:
+{found_summary}
+
+Suggest a single search query that would help find information we're still missing. Return ONLY the query, nothing else."""
+
+                response = self.anthropic.messages.create(
+                    model="claude-sonnet-4-5-20250929",
+                    max_tokens=100,
+                    messages=[{"role": "user", "content": prompt}]
+                )
+
+                reformulated = response.content[0].text.strip()
+                logger.debug(f"Reformulated query: {reformulated}")
+                return reformulated
+
+            except Exception as e:
+                logger.warning(f"LLM reformulation failed, using fallback: {e}")
+
+        # Fallback: rule-based reformulation
+        reformulation_templates = [
+            f"{original_question} detailed explanation",
+            f"how does {original_question} work",
+            f"{original_question} examples",
+            f"{original_question} best practices",
+            f"what is {original_question}",
+        ]
+
+        return reformulation_templates[iteration % len(reformulation_templates)]
 
     def get_stats(self) -> dict[str, Any]:
         """Get RAG system statistics"""

@@ -16,7 +16,7 @@ import database as db_module
 AsyncSessionLocal = db_module.AsyncSessionLocal
 db_manager = db_module.db_manager
 init_db = db_module.init_db
-from database_config import DATABASE_URL
+DATABASE_URL = db_module.DATABASE_URL
 from models_sqlalchemy import AgentLog, BrandAsset, Product, User
 
 

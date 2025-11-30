@@ -26,8 +26,8 @@ textblob==0.18.0.post0  # Updated from 0.17.1
 spacy==3.8.3  # Updated from 3.6.1
 
 # Computer Vision (updated to match main requirements)
-torch==2.9.0  # Updated from 2.0.1
-torchvision==0.20.0  # Updated from 0.15.2
+torch>=2.8.0,<2.9.0  # CVE-2025-3730 security fix
+torchvision>=0.23.0,<0.24.0  # Compatible with torch 2.8.x
 
 # API and Data Processing (updated to match main requirements)
 requests==2.32.4  # Updated from 2.31.0

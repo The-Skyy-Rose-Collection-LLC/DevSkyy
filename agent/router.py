@@ -17,7 +17,7 @@ from difflib import SequenceMatcher
 from enum import Enum
 from typing import Any
 
-from agents.loader import AgentConfig, AgentConfigLoader, LoaderError
+from agent.loader import AgentConfig, AgentConfigLoader, LoaderError
 from core.agentlightning_integration import trace_agent
 
 

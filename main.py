@@ -111,10 +111,9 @@ except ImportError:
 
 # AI Intelligence Services
 try:
-    from intelligence.claude_sonnet import ClaudeSonnetIntelligenceService
-    from intelligence.claude_sonnet_v2 import ClaudeSonnetIntelligenceServiceV2
-    from intelligence.multi_model_orchestrator import MultiModelOrchestrator
-    from intelligence.openai_service import OpenAIIntelligenceService
+    from agent.modules.backend.claude_sonnet_intelligence_service import ClaudeSonnetIntelligenceService
+    from agent.modules.backend.claude_sonnet_intelligence_service_v2 import ClaudeSonnetIntelligenceServiceV2
+    from agent.modules.backend.multi_model_ai_orchestrator import MultiModelAIOrchestrator as MultiModelOrchestrator
 
     AI_SERVICES_AVAILABLE = True
 except ImportError:
@@ -386,8 +385,6 @@ def get_agent(agent_type: str, agent_name: str):
                 _agent_cache[cache_key] = ClaudeSonnetIntelligenceService()
             elif agent_name == "claude_sonnet_v2":
                 _agent_cache[cache_key] = ClaudeSonnetIntelligenceServiceV2()
-            elif agent_name == "openai":
-                _agent_cache[cache_key] = OpenAIIntelligenceService()
             elif agent_name == "multi_model":
                 _agent_cache[cache_key] = MultiModelOrchestrator()
             else:
@@ -505,16 +502,12 @@ async def shutdown_event():
 # Import API routers with error handling
 try:
     from api.v1.agents import router as agents_router
-
-    # DevSkyy v5.1 Enterprise Security Routers
-    from api.v1.api_v1_auth_router import router as enterprise_auth_router
-    from api.v1.api_v1_monitoring_router import router as enterprise_monitoring_router
-    from api.v1.api_v1_webhooks_router import router as enterprise_webhooks_router
     from api.v1.auth import router as auth_router
     from api.v1.codex import router as codex_router
     from api.v1.consensus import router as consensus_router
     from api.v1.content import router as content_router
     from api.v1.dashboard import router as dashboard_router
+    from api.v1.health import router as health_router
 
     # DevSkyy Automation Routers (n8n replacements)
     from api.v1.ecommerce import router as ecommerce_router
@@ -537,6 +530,9 @@ except ImportError as e:
 # Register API routers
 if API_ROUTERS_AVAILABLE:
     try:
+        # Health check routes (Kubernetes-ready liveness/readiness probes)
+        app.include_router(health_router, prefix="/api/v1", tags=["health"])
+
         # Core API routes
         app.include_router(agents_router, prefix="/api/v1/agents", tags=["v1-agents"])
         app.include_router(auth_router, prefix="/api/v1/auth", tags=["v1-auth"])
@@ -567,19 +563,6 @@ if API_ROUTERS_AVAILABLE:
             logger.info("✅ Luxury Fashion Automation router registered")
         except ImportError as e:
             logger.warning(f"⚠️ Luxury Fashion Automation router not available: {e}")
-
-        # DevSkyy v5.1 Enterprise Security Routers
-        try:
-            app.include_router(enterprise_auth_router, prefix="/api/v1/enterprise/auth", tags=["v1-enterprise-auth"])
-            app.include_router(
-                enterprise_webhooks_router, prefix="/api/v1/enterprise/webhooks", tags=["v1-enterprise-webhooks"]
-            )
-            app.include_router(
-                enterprise_monitoring_router, prefix="/api/v1/enterprise/monitoring", tags=["v1-enterprise-monitoring"]
-            )
-            logger.info("✅ DevSkyy v5.1 Enterprise Security routers registered")
-        except NameError:
-            logger.info("ℹ️ Enterprise security routers not available")
 
         logger.info("✅ All available API routers registered")
 
@@ -764,9 +747,7 @@ except ImportError as e:
 # Import and initialize advanced features
 try:
     from fashion.skyy_rose_3d_pipeline import skyy_rose_3d_pipeline
-    from intelligence.multi_agent_orchestrator import multi_agent_orchestrator
 
-    app.state.multi_agent_orchestrator = multi_agent_orchestrator
     app.state.skyy_rose_3d_pipeline = skyy_rose_3d_pipeline
 
     logger.info("✅ Advanced features initialized")
@@ -888,36 +869,11 @@ async def execute_agent_task(agent_type: str, agent_name: str, task_data: dict[s
 @app.post("/api/v1/orchestration/multi-agent")
 async def execute_multi_agent_task(task_data: dict[str, Any]):
     """Execute task using multi-agent orchestration."""
-    try:
-        if not hasattr(app.state, "multi_agent_orchestrator"):
-            raise HTTPException(status_code=503, detail="Multi-agent orchestrator not available")
-
-        from intelligence.multi_agent_orchestrator import TaskRequest, TaskType
-
-        # Create task request
-        task = TaskRequest(
-            task_id=f"multi_{datetime.now().strftime('%Y%m%d_%H%M%S')}",
-            task_type=TaskType(task_data.get("task_type", "security_analysis")),
-            content=task_data.get("content", ""),
-            metadata=task_data.get("metadata", {}),
-            priority=task_data.get("priority", 1),
-        )
-
-        # Process task
-        result = await app.state.multi_agent_orchestrator.process_task(task)
-
-        return {
-            "task_id": result.task_id,
-            "provider": result.provider.value,
-            "result": result.result,
-            "processing_time": result.processing_time,
-            "success": result.success,
-            "timestamp": datetime.now().isoformat(),
-        }
-
-    except Exception as e:
-        logger.error(f"Multi-agent orchestration error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+    # Use the unified orchestrator instead
+    raise HTTPException(
+        status_code=503,
+        detail="Multi-agent orchestrator endpoint deprecated. Use /api/v1/orchestration endpoints instead."
+    )
 
 
 @app.post("/api/v1/3d/models/upload")
@@ -985,15 +941,9 @@ async def get_advanced_system_status():
     try:
         status = {
             "timestamp": datetime.now().isoformat(),
-            "multi_agent_orchestrator": None,
             "3d_pipeline": None,
             "advanced_features_available": False,
         }
-
-        # Multi-agent orchestrator status
-        if hasattr(app.state, "multi_agent_orchestrator"):
-            status["multi_agent_orchestrator"] = app.state.multi_agent_orchestrator.get_system_status()
-            status["advanced_features_available"] = True
 
         # 3D pipeline status
         if hasattr(app.state, "skyy_rose_3d_pipeline"):

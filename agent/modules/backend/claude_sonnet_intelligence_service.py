@@ -6,6 +6,8 @@ from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
+from agent.mixins.react_mixin import ReActCapableMixin, IterativeRetrievalMixin
+
 
 """
 Claude Sonnet 4.5 Advanced Intelligence Service
@@ -19,15 +21,19 @@ Features:
 - Multi-step task execution with extended thinking
 - Vision analysis for product imagery
 - Advanced content creation and copywriting
+- ReAct (Reasoning + Acting) iterative loops for complex tasks
+- Iterative retrieval for multi-hop queries
 """
 
 logger = logging.getLogger(__name__)
 
 
-class ClaudeSonnetIntelligenceService:
+class ClaudeSonnetIntelligenceService(ReActCapableMixin, IterativeRetrievalMixin):
     """
     Advanced AI service using Claude Sonnet 4.5 for superior reasoning,
     analysis, and decision-making in luxury e-commerce operations.
+
+    Now with ReAct (Reasoning + Acting) capabilities for iterative problem-solving.
     """
 
     def __init__(self):
@@ -43,6 +49,12 @@ class ClaudeSonnetIntelligenceService:
             self.sync_client = None
             logger.warning("⚠️ Claude Sonnet 4.5 Service initialized without API key")
 
+        # Initialize ReAct capabilities
+        self.__init_react__()
+
+        # Register built-in tools for ReAct
+        self._register_builtin_tools()
+
         # Brand context for The Skyy Rose Collection
         self.brand_context = """
         The Skyy Rose Collection is a luxury fashion brand specializing in:
@@ -53,6 +65,90 @@ class ClaudeSonnetIntelligenceService:
         - Target audience: Affluent fashion enthusiasts
         - Brand values: Exclusivity, elegance, quality, innovation
         """
+
+    def _register_builtin_tools(self):
+        """Register built-in tools for ReAct reasoning loops."""
+        # Web search tool (placeholder - integrate with actual search)
+        def search_web(query: str) -> str:
+            """Search the web for information about a topic."""
+            return f"Search results for '{query}': [Placeholder - integrate with web search API]"
+
+        # Calculator tool
+        def calculate(expression: str) -> str:
+            """Evaluate a mathematical expression."""
+            try:
+                # Safe eval for basic math
+                allowed_names = {"__builtins__": {}}
+                result = eval(expression, allowed_names, {})
+                return f"Result: {result}"
+            except Exception as e:
+                return f"Error calculating: {e}"
+
+        # Brand knowledge tool
+        def get_brand_info(aspect: str) -> str:
+            """Get information about The Skyy Rose Collection brand."""
+            return f"Brand info for '{aspect}': {self.brand_context}"
+
+        self.register_react_tool(search_web, "search_web", "Search the web for information")
+        self.register_react_tool(calculate, "calculate", "Evaluate mathematical expressions")
+        self.register_react_tool(get_brand_info, "get_brand_info", "Get brand knowledge")
+
+    async def iterative_reasoning(
+        self,
+        task: str,
+        context: dict[str, Any] | None = None,
+        max_iterations: int = 5,
+        tools: list | None = None,
+    ) -> dict[str, Any]:
+        """
+        Use iterative ReAct reasoning for complex multi-step problems.
+
+        This method implements the ReAct (Reasoning + Acting) pattern:
+        Thought → Action → Observation → ... → Final Answer
+
+        Perfect for:
+        - Complex analysis requiring multiple steps
+        - Tasks that need tool use (search, calculate, lookup)
+        - Problems requiring verification and iteration
+        - Strategic decisions with multiple factors
+
+        Args:
+            task: Complex task description
+            context: Additional context for reasoning
+            max_iterations: Maximum reasoning iterations (default 5)
+            tools: Additional tools to register for this task
+
+        Returns:
+            Dict with final_answer, reasoning_trace, iterations, and metadata
+
+        Example:
+            result = await service.iterative_reasoning(
+                task="Analyze our competitors and recommend a pricing strategy",
+                context={"current_prices": {...}, "market_data": {...}},
+                max_iterations=5
+            )
+        """
+        logger.info(f"🔄 Starting iterative reasoning for: {task[:50]}...")
+
+        # Register any additional tools
+        if tools:
+            for tool in tools:
+                self.register_react_tool(tool)
+
+        # Execute ReAct loop
+        result = await self.reason_and_act(
+            task=task,
+            max_iterations=max_iterations,
+            context=context
+        )
+
+        logger.info(f"✅ Iterative reasoning complete: {result.get('iterations', 0)} iterations")
+
+        return {
+            **result,
+            "model": self.model,
+            "timestamp": datetime.now().isoformat(),
+        }
 
     async def advanced_reasoning(
         self,

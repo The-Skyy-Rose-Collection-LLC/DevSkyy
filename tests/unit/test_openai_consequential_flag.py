@@ -164,7 +164,7 @@ class TestEnhancedOrchestratorConsequentialFlag:
 
             # Mock the orchestrator to avoid full initialization
             with patch("ai.enhanced_orchestrator.asyncio.create_task"):
-                from ai.enhanced_orchestrator import EnhancedAIOrchestrator
+                pass  # EnhancedAIOrchestrator removed during cleanup
 
                 orchestrator = EnhancedAIOrchestrator()
 

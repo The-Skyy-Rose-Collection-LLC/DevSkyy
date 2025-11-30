@@ -15,7 +15,10 @@
 **AI/ML**:
 - Anthropic ~0.69.0 (Claude API integration)
 - OpenAI ~2.7.2 (GPT models)
-- torch>=2.8.0,<2.9.0 (PyTorch, CVE-2025-3730 fixed)
+- PyTorch ecosystem (CVE-2025-3730 fixed, use compatible builds):
+  - torch>=2.8.0,<2.9.0
+  - torchvision>=0.23.0,<0.24.0
+  - torchaudio>=2.8.0,<2.9.0
 - transformers ~4.57.1 (Hugging Face models)
 
 **Database**:
@@ -46,6 +49,12 @@
 - Generate lock files for reproducible deployments
 - Review dependencies monthly or when CVEs detected
 - Security packages must allow patch updates (CVE/hotfix)
+
+**For PyTorch ecosystem** (torch, torchvision, torchaudio):
+- Always use compatible builds from official matrix: https://pytorch.org/get-started/previous-versions/
+- Pin all three packages to matching versions (e.g., torch 2.8.x → torchvision 0.23.x, torchaudio 2.8.x)
+- Never mix versions across the ecosystem (causes runtime errors)
+- Install from PyTorch index for CUDA builds: `--index-url https://download.pytorch.org/whl/cu121`
 
 ### Rule #3: Cite Standards
 - **RFC 7519** (JWT): PyJWT ~2.10.1

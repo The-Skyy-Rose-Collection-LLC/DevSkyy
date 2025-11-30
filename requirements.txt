@@ -1,12 +1,14 @@
 # DevSkyy Enterprise Platform - Security-Hardened Production Dependencies
 # Core production dependencies only - NO dev/test tools
-# Last security audit: 2025-11-16
+# Last security audit: 2025-11-29
 # Version Strategy: ~= for compatible releases, >=,< for security-critical packages
 # Per CLAUDE.md Truth Protocol - Enterprise-Grade Security & Performance
 
 # ============================================================================
 # BUILD DEPENDENCIES (Security-Critical)
 # ============================================================================
+# WHY: pip has path traversal vulnerability (CVE-2025-8869)
+pip>=25.3  # SECURITY: Fix tarfile path traversal during sdist extraction
 # WHY: setuptools has RCE vulnerabilities (CVE-2025-47273, CVE-2024-6345)
 setuptools>=78.1.1,<79.0.0  # SECURITY: Fix path traversal → RCE, package_index RCE
 
