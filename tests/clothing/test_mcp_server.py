@@ -129,7 +129,8 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_tripo_client", return_value=mock_tripo_client
         ):
-            result = await generate_3d_from_text(
+            # FastMCP tools are FunctionTool objects, call .fn for the underlying function
+            result = await generate_3d_from_text.fn(
                 product_name="Black Rose Hoodie",
                 description="Luxury black hoodie with embroidered rose pattern",
                 collection="black_rose",
@@ -154,7 +155,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_tripo_client", return_value=mock_tripo_client
         ):
-            result = await generate_3d_from_image(
+            result = await generate_3d_from_image.fn(
                 image_url="https://example.com/hoodie.png",
                 product_name="Test Hoodie",
             )
@@ -174,7 +175,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_tripo_client", return_value=mock_tripo_client
         ):
-            result = await get_3d_task_status("task_123")
+            result = await get_3d_task_status.fn("task_123")
 
         data = json.loads(result)
         assert data["task_id"] == "task_123"
@@ -188,7 +189,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_fashn_client", return_value=mock_fashn_client
         ):
-            result = await virtual_tryon(
+            result = await virtual_tryon.fn(
                 garment_image_url="https://example.com/hoodie.png",
                 model_type="female",
             )
@@ -209,7 +210,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_fashn_client", return_value=mock_fashn_client
         ):
-            result = await batch_virtual_tryon(
+            result = await batch_virtual_tryon.fn(
                 garment_image_url="https://example.com/hoodie.png",
                 model_types="female,male",
             )
@@ -232,7 +233,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_wordpress_client", return_value=mock_wordpress_client
         ):
-            result = await upload_to_wordpress(
+            result = await upload_to_wordpress.fn(
                 file_path="/tmp/model.glb",
                 title="Test Model",
                 alt_text="A test 3D model",
@@ -256,7 +257,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_wordpress_client", return_value=mock_wordpress_client
         ):
-            result = await upload_from_url_to_wordpress(
+            result = await upload_from_url_to_wordpress.fn(
                 url="https://api.tripo3d.ai/models/123.glb",
                 title="Test Model",
             )
@@ -270,7 +271,7 @@ class TestMCPTools:
         """Test collections listing tool."""
         from agent.modules.clothing.mcp_server import list_skyyrose_collections
 
-        result = await list_skyyrose_collections()
+        result = await list_skyyrose_collections.fn()
         data = json.loads(result)
 
         assert "black_rose" in data
@@ -283,7 +284,7 @@ class TestMCPTools:
         """Test categories listing tool."""
         from agent.modules.clothing.mcp_server import list_clothing_categories
 
-        result = await list_clothing_categories()
+        result = await list_clothing_categories.fn()
         data = json.loads(result)
 
         assert "hoodie" in data
@@ -297,7 +298,7 @@ class TestMCPTools:
         """Test API status check tool."""
         from agent.modules.clothing.mcp_server import get_api_status
 
-        result = await get_api_status()
+        result = await get_api_status.fn()
         data = json.loads(result)
 
         assert "timestamp" in data
@@ -358,7 +359,7 @@ class TestMCPTools:
         with patch.object(
             ClientManager, "get_pipeline", return_value=mock_pipeline
         ):
-            result = await process_clothing_item(
+            result = await process_clothing_item.fn(
                 item_id="hoodie-001",
                 name="Black Rose Hoodie",
                 description="Luxury hoodie with rose pattern",

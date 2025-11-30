@@ -67,7 +67,7 @@ class Settings(BaseSettings):
     # Core Application Settings
     # ==========================================================================
 
-    environment: Literal["development", "staging", "production"] = Field(
+    environment: Literal["development", "staging", "production", "testing"] = Field(
         default="development",
         description="Deployment environment",
     )
