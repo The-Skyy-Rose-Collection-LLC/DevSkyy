@@ -546,8 +546,8 @@ class TestMain:
                 ["mcp_health_check.py", "--config", config_path, "--json"],
             ):
                 exit_code = main()
-                # Should succeed (0) since config is valid, even if servers are empty
-                assert exit_code in (0, 1)
+                # Config is valid with empty servers, should succeed with exit code 0
+                assert exit_code == 0
         finally:
             os.unlink(config_path)
 
@@ -642,11 +642,13 @@ class TestServerStartup:
 class TestWordPressChecks:
     """Tests for WordPress/WooCommerce checks."""
 
-    def test_check_wordpress_env_not_configured(self) -> None:
+    def test_check_wordpress_env_not_configured(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test WordPress env check when not configured."""
-        # Clear any existing vars
+        # Use monkeypatch to clear vars without affecting other tests
         for var in MCPHealthChecker.WORDPRESS_ENV_VARS:
-            os.environ.pop(var, None)
+            monkeypatch.delenv(var, raising=False)
 
         checker = MCPHealthChecker(config_path="/tmp/test.json")
         checker.report = HealthCheckReport()
@@ -660,29 +662,25 @@ class TestWordPressChecks:
         assert wp_check is not None
         assert wp_check.status == CheckStatus.WARN
 
-    def test_check_wordpress_env_configured(self) -> None:
+    def test_check_wordpress_env_configured(
+        self, monkeypatch: pytest.MonkeyPatch
+    ) -> None:
         """Test WordPress env check when configured."""
-        # Set required vars
-        os.environ["WORDPRESS_CLIENT_ID"] = "test_id"
-        os.environ["WORDPRESS_CLIENT_SECRET"] = "test_secret"
-        os.environ["SKYY_ROSE_SITE_URL"] = "https://example.com"
+        # Use monkeypatch to set vars - automatically restored after test
+        monkeypatch.setenv("WORDPRESS_CLIENT_ID", "test_id")
+        monkeypatch.setenv("WORDPRESS_CLIENT_SECRET", "test_secret")
+        monkeypatch.setenv("SKYY_ROSE_SITE_URL", "https://example.com")
 
-        try:
-            checker = MCPHealthChecker(config_path="/tmp/test.json")
-            checker.report = HealthCheckReport()
-            checker.check_wordpress_env()
+        checker = MCPHealthChecker(config_path="/tmp/test.json")
+        checker.report = HealthCheckReport()
+        checker.check_wordpress_env()
 
-            wp_check = next(
-                (c for c in checker.report.checks if "WordPress" in c.name),
-                None,
-            )
-            assert wp_check is not None
-            assert wp_check.status == CheckStatus.OK
-        finally:
-            # Cleanup
-            os.environ.pop("WORDPRESS_CLIENT_ID", None)
-            os.environ.pop("WORDPRESS_CLIENT_SECRET", None)
-            os.environ.pop("SKYY_ROSE_SITE_URL", None)
+        wp_check = next(
+            (c for c in checker.report.checks if "WordPress" in c.name),
+            None,
+        )
+        assert wp_check is not None
+        assert wp_check.status == CheckStatus.OK
 
 
 if __name__ == "__main__":
