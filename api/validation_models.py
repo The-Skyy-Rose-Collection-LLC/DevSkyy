@@ -2,7 +2,7 @@ from datetime import datetime
 from enum import Enum
 import re
 import sys
-from typing import Annotated, Any
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field, validator
 from pydantic.types import confloat, conint, constr
