@@ -1101,6 +1101,12 @@ If you're still experiencing issues:
 | [docs/DOCKER_SETUP.md](docs/DOCKER_SETUP.md) | Docker Configuration |
 | [docs/MCP_IMPLEMENTATION_GUIDE.md](docs/MCP_IMPLEMENTATION_GUIDE.md) | MCP Server Setup |
 
+### Notebooks
+
+| Notebook | Description |
+|----------|-------------|
+| [notebooks/prompt-templates-variables-jinja2.ipynb](notebooks/prompt-templates-variables-jinja2.ipynb) | Prompt engineering with Jinja2 templates for AI agents |
+
 ---
 
 **DevSkyy** - Enterprise AI for Luxury E-Commerce | Zero Vulnerabilities ✅
