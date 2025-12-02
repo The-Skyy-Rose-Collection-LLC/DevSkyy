@@ -158,7 +158,7 @@ SQL_INJECTION_PATTERNS = [
 
 # XSS patterns
 XSS_PATTERNS = [
-    re.compile(r"<script\b[^>]*>.*?</script>", re.IGNORECASE | re.DOTALL),
+    re.compile(r"<script\b[^>]*>.*?</script\b[^>]*>", re.IGNORECASE | re.DOTALL),
     re.compile(r"javascript:", re.IGNORECASE),
     re.compile(r"on\w+\s*=", re.IGNORECASE),
     re.compile(r"<\s*iframe", re.IGNORECASE),
