@@ -19,7 +19,7 @@
     },
     "devskyy-optimization": {
       "command": "python",
-      "args": ["-m", "mcp.optimization_server"],
+      "args": ["-m", "devskyy_mcp.optimization_server"],
       "env": {
         "REDIS_HOST": "${REDIS_HOST:-localhost}",
         "REDIS_PORT": "${REDIS_PORT:-6379}"
