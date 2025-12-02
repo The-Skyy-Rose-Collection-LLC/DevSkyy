@@ -24,6 +24,10 @@
         "REDIS_HOST": "${REDIS_HOST:-localhost}",
         "REDIS_PORT": "${REDIS_PORT:-6379}"
       }
+    },
+    "critical-fuchsia-ape": {
+      "transport": "http",
+      "url": "https://critical-fuchsia-ape.fastmcp.app/mcp"
     }
   }
 }
