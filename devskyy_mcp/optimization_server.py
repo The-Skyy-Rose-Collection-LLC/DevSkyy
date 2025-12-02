@@ -6,7 +6,17 @@ WHY: Expose DevSkyy optimization tools via MCP protocol for Claude Desktop/IDE i
 HOW: Uses FastMCP with CallToolResult for advanced control and structured output
 IMPACT: Enables AI assistants to optimize code, performance, and resources
 
-This module is referenced by .mcp.json configuration:
+FastMCP Entry Points:
+    fastmcp run devskyy_mcp/optimization_server.py           # Inferred (finds mcp/server/app)
+    fastmcp run devskyy_mcp/optimization_server.py:mcp       # Explicit mcp object
+    fastmcp run devskyy_mcp/optimization_server.py:server    # server alias
+    fastmcp run devskyy_mcp/optimization_server.py:app       # app alias
+
+Module Entry Points:
+    python -m devskyy_mcp.optimization_server                # Direct module
+    python -m devskyy_mcp                                    # Package __main__.py
+
+Config (.mcp.json):
     "args": ["-m", "devskyy_mcp.optimization_server"]
 
 Features:
@@ -15,6 +25,7 @@ Features:
 - Hidden metadata (_meta) for client applications
 - Pydantic validation on all structured outputs
 - MCP Prompts for guided workflows
+- MCP Resources for data exposure
 - Image handling for visual reports
 
 Truth Protocol: Standard MCP compliance, structured output, secure access
@@ -41,6 +52,11 @@ logger = logging.getLogger(__name__)
 
 # Initialize FastMCP server
 mcp = FastMCP("devskyy-optimization")
+
+# FastMCP auto-discovery aliases
+# FastMCP looks for objects named: mcp, server, or app
+server = mcp
+app = mcp
 
 
 # =============================================================================
