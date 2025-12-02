@@ -35,7 +35,8 @@ desktop.ini
 
 # Logs
 *.log
-logs/
+logs/*
+!logs/.gitkeep
 
 # Testing
 .coverage
