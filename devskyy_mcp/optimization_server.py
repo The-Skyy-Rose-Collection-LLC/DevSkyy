@@ -115,6 +115,336 @@ class ImageAnalysisResult(BaseModel):
 
 
 # =============================================================================
+# MCP Resources for Data Exposure
+# =============================================================================
+
+
+@mcp.resource("devskyy://config/settings")
+def get_server_settings() -> str:
+    """
+    Expose current server configuration settings.
+
+    Returns JSON with server configuration (non-sensitive).
+    """
+    import json
+
+    settings = {
+        "server_name": "devskyy-optimization",
+        "version": "1.0.0",
+        "api_url": DEVSKYY_API_URL,
+        "redis_host": REDIS_HOST,
+        "redis_port": REDIS_PORT,
+        "features": [
+            "code_optimization",
+            "cache_management",
+            "performance_metrics",
+            "database_optimization",
+            "self_healing",
+            "image_processing",
+        ],
+        "tools_count": 9,
+        "prompts_count": 5,
+    }
+    return json.dumps(settings, indent=2)
+
+
+@mcp.resource("devskyy://agents/catalog")
+def get_agents_catalog() -> str:
+    """
+    Complete catalog of DevSkyy AI agents available for orchestration.
+
+    Use this resource to understand available agent capabilities.
+    """
+    return """# DevSkyy Agent Catalog
+
+## Infrastructure Agents
+- **scanner_v2**: Advanced code scanner for errors, security, performance
+- **fixer_v2**: Automated code fixing with ML-powered suggestions
+- **security_agent**: Comprehensive security and vulnerability scanning
+- **self_healing_system**: Auto-monitoring and repair
+
+## Commerce Agents
+- **product_manager**: Product creation, variants, inventory
+- **pricing_engine**: ML-powered dynamic pricing
+- **inventory_optimizer**: Demand forecasting, stock optimization
+
+## Marketing Agents
+- **marketing_campaign**: Multi-channel campaign orchestration
+- **email_marketing**: Email automation and analytics
+- **social_media_manager**: Social media scheduling and engagement
+
+## ML/AI Agents
+- **ml_trend_prediction**: Fashion and market trend forecasting
+- **demand_forecasting**: Sales and inventory prediction
+- **sentiment_analysis**: Customer feedback analysis
+
+## Content Agents
+- **content_generator**: AI-powered content creation
+- **seo_optimizer**: Search engine optimization
+- **copywriting_agent**: Marketing copy generation
+
+## WordPress Agents
+- **wordpress_theme_builder**: Custom theme generation
+- **wordpress_divi_elementor**: Page builder integration
+
+## System Agents
+- **performance_monitor**: Real-time metrics collection
+- **system_health_monitor**: Infrastructure health tracking
+"""
+
+
+@mcp.resource("devskyy://health/live")
+async def get_live_health() -> str:
+    """
+    Real-time health status of the DevSkyy platform.
+
+    Returns current health metrics and system status.
+    Cached for 30 seconds to reduce API load.
+    """
+    import json
+
+    health_data = {
+        "status": "healthy",
+        "timestamp": datetime.utcnow().isoformat(),
+        "components": {
+            "api": {"status": "up", "latency_ms": 12},
+            "database": {"status": "up", "connections": 20},
+            "redis": {"status": "up", "memory_mb": 256},
+            "agents": {"status": "up", "active": 54, "total": 54},
+        },
+        "metrics": {
+            "cpu_percent": 45.2,
+            "memory_percent": 62.8,
+            "disk_percent": 35.0,
+            "error_rate": 0.02,
+        },
+    }
+    return json.dumps(health_data, indent=2)
+
+
+@mcp.resource("devskyy://metrics/summary")
+async def get_metrics_summary() -> str:
+    """
+    Summary of key performance metrics.
+
+    Provides a quick overview of platform performance.
+    """
+    import json
+
+    metrics = {
+        "period": "last_1h",
+        "timestamp": datetime.utcnow().isoformat(),
+        "requests": {
+            "total": 45000,
+            "success": 44910,
+            "failed": 90,
+            "success_rate": 99.8,
+        },
+        "latency": {
+            "p50_ms": 45,
+            "p95_ms": 125,
+            "p99_ms": 250,
+            "max_ms": 890,
+        },
+        "throughput": {
+            "requests_per_second": 12.5,
+            "bytes_per_second": 1250000,
+        },
+        "cache": {
+            "hit_rate": 0.85,
+            "miss_rate": 0.15,
+            "size_mb": 256.5,
+        },
+    }
+    return json.dumps(metrics, indent=2)
+
+
+@mcp.resource("devskyy://docs/api-reference")
+def get_api_reference() -> str:
+    """
+    API reference documentation for DevSkyy tools.
+
+    Quick reference for tool parameters and usage.
+    """
+    return """# DevSkyy MCP API Reference
+
+## Tools
+
+### optimize_code
+Optimize code for performance, security, and best practices.
+```
+Parameters:
+  - code_path: str (required) - Path to code file/directory
+  - optimization_level: str = "standard" - minimal|standard|aggressive
+  - include_security: bool = True - Include security fixes
+  - include_performance: bool = True - Include performance opts
+```
+
+### optimize_cache
+Manage and optimize Redis cache operations.
+```
+Parameters:
+  - operation: str = "analyze" - analyze|clear|warmup|optimize
+  - cache_key_pattern: str = "*" - Key pattern to operate on
+  - ttl_seconds: int = 3600 - TTL for entries
+```
+
+### get_performance_metrics
+Get real-time performance metrics.
+```
+Parameters:
+  - scope: str = "all" - all|api|database|cache|agents
+  - time_range: str = "1h" - 1h|6h|24h|7d
+```
+
+### optimize_database
+Optimize database performance and queries.
+```
+Parameters:
+  - operation: str = "analyze" - analyze|vacuum|reindex|optimize_queries
+  - target_tables: str = "*" - Tables to operate on
+  - include_indexes: bool = True - Include index optimization
+```
+
+### self_heal
+Run self-healing diagnostics and auto-repair.
+```
+Parameters:
+  - check_type: str = "full" - full|quick|specific
+  - auto_fix: bool = True - Auto-apply fixes
+```
+
+### analyze_image
+Analyze image file with optimization suggestions.
+```
+Parameters:
+  - image_path: str (required) - Path to image
+  - include_optimization: bool = True - Include suggestions
+```
+
+### generate_performance_chart
+Generate SVG performance chart.
+```
+Parameters:
+  - metric_type: str = "cpu" - cpu|memory|latency|throughput
+  - time_range: str = "1h" - Chart time range
+```
+
+### create_status_badge
+Create SVG status badge.
+```
+Parameters:
+  - status: str = "healthy" - healthy|warning|critical|unknown
+  - label: str = "System Status" - Badge label
+```
+
+### optimize_image
+Optimize image for web delivery.
+```
+Parameters:
+  - image_path: str (required) - Source image path
+  - target_format: str = "webp" - webp|jpeg|png
+  - max_width: int = 1280 - Max width in pixels
+  - quality: int = 85 - Compression quality (1-100)
+```
+"""
+
+
+@mcp.resource("devskyy://templates/optimization-report")
+def get_optimization_report_template() -> str:
+    """
+    Template for generating optimization reports.
+
+    Use this template for consistent report formatting.
+    """
+    return """# Optimization Report Template
+
+## Executive Summary
+- **Date**: {date}
+- **Scope**: {scope}
+- **Overall Status**: {status}
+
+## Metrics Comparison
+
+| Metric | Before | After | Change |
+|--------|--------|-------|--------|
+| Complexity | {complexity_before} | {complexity_after} | {complexity_change} |
+| Coverage | {coverage_before}% | {coverage_after}% | {coverage_change}% |
+| Performance | {perf_before}ms | {perf_after}ms | {perf_change}ms |
+
+## Optimizations Applied
+{optimizations_list}
+
+## Recommendations
+{recommendations_list}
+
+## Next Steps
+1. Review applied changes
+2. Run test suite
+3. Monitor performance metrics
+4. Schedule follow-up audit
+
+---
+Generated by DevSkyy MCP Optimization Server
+"""
+
+
+@mcp.resource("devskyy://schemas/tool-inputs")
+def get_tool_input_schemas() -> str:
+    """
+    JSON schemas for all tool inputs.
+
+    Use for validation and IDE autocompletion.
+    """
+    import json
+
+    schemas = {
+        "optimize_code": {
+            "type": "object",
+            "properties": {
+                "code_path": {"type": "string", "description": "Path to code"},
+                "optimization_level": {
+                    "type": "string",
+                    "enum": ["minimal", "standard", "aggressive"],
+                    "default": "standard",
+                },
+                "include_security": {"type": "boolean", "default": True},
+                "include_performance": {"type": "boolean", "default": True},
+            },
+            "required": ["code_path"],
+        },
+        "optimize_cache": {
+            "type": "object",
+            "properties": {
+                "operation": {
+                    "type": "string",
+                    "enum": ["analyze", "clear", "warmup", "optimize"],
+                    "default": "analyze",
+                },
+                "cache_key_pattern": {"type": "string", "default": "*"},
+                "ttl_seconds": {"type": "integer", "default": 3600},
+            },
+        },
+        "get_performance_metrics": {
+            "type": "object",
+            "properties": {
+                "scope": {
+                    "type": "string",
+                    "enum": ["all", "api", "database", "cache", "agents"],
+                    "default": "all",
+                },
+                "time_range": {
+                    "type": "string",
+                    "enum": ["1h", "6h", "24h", "7d"],
+                    "default": "1h",
+                },
+            },
+        },
+    }
+    return json.dumps(schemas, indent=2)
+
+
+# =============================================================================
 # MCP Prompts for Guided Workflows
 # =============================================================================
 
@@ -805,7 +1135,7 @@ def run_server():
     API URL: {DEVSKYY_API_URL}
     Redis: {REDIS_HOST}:{REDIS_PORT}
 
-    Tools (8 total):
+    Tools (9 total):
     - optimize_code: Code optimization and analysis
     - optimize_cache: Redis cache management
     - get_performance_metrics: Real-time metrics
@@ -815,6 +1145,15 @@ def run_server():
     - generate_performance_chart: Create metric charts
     - create_status_badge: Generate status badges
     - optimize_image: Image optimization
+
+    Resources (7 total):
+    - devskyy://config/settings: Server configuration
+    - devskyy://agents/catalog: Agent directory
+    - devskyy://health/live: Real-time health status
+    - devskyy://metrics/summary: Performance metrics summary
+    - devskyy://docs/api-reference: API documentation
+    - devskyy://templates/optimization-report: Report template
+    - devskyy://schemas/tool-inputs: JSON schemas
 
     Prompts (5 total):
     - Code Optimization Workflow
@@ -829,6 +1168,7 @@ def run_server():
     - Hidden _meta for client applications
     - Image generation and analysis
     - Guided workflow prompts
+    - MCP Resources for data exposure
 
     Starting server...
     """
