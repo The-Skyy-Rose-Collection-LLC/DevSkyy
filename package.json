@@ -49,5 +49,8 @@
     "buildCommand": "pip install -r requirements.txt",
     "outputDirectory": ".",
     "installCommand": "pip install --upgrade pip && pip install -r requirements.txt"
+  },
+  "dependencies": {
+    "@vercel/sdk": "^1.18.0"
   }
 }
