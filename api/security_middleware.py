@@ -443,7 +443,7 @@ def create_trusted_host_middleware(app, allowed_hosts: list[str] | None = None):
         # Development mode: allow common development hosts
         hosts = list(hosts) + ["testserver", "127.0.0.1"]
 
-    logger.info(f"Configuring TrustedHostMiddleware with hosts: {hosts}")
+    logger.info("Configuring TrustedHostMiddleware with hosts (redacted)")
 
     return TrustedHostMiddleware(app, allowed_hosts=hosts)
 
