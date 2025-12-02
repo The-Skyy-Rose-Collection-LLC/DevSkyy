@@ -2,15 +2,65 @@
 
 **Claude Code** operates under the **Truth Protocol** for DevSkyy's enterprise multi-agent platform.
 
-**Version**: 5.2.0-enterprise | **Status**: Production-Ready ✅ | **Last Updated**: 2025-11-17
+**Version**: 5.3.0-enterprise | **Status**: Production-Ready ✅ | **Last Updated**: 2025-12-02
+
+---
+
+## SkyyRose AI Orchestration
+
+### Quick Commands
+```bash
+pytest tests/ -v          # Run tests
+mypy src/                  # Type check
+ruff check src/            # Lint
+./deploy.sh staging        # Deploy to staging
+./deploy.sh production     # Deploy to production
+```
+
+### Project Knowledge
+- **Stack**: Python orchestration + WordPress/WooCommerce/Elementor + Tripo3D + FASHN APIs
+- **Site**: skyyrose.co (NOT .com)
+- **Brand**: Luxury streetwear, Oakland authenticity, boutique-ready presentation
+
+### Agent Documentation (Read When Relevant)
+| File | Read Before |
+|------|-------------|
+| `agent_docs/brand_voice.md` | Customer-facing content, product descriptions |
+| `agent_docs/wordpress_ops.md` | Site edits, Elementor templates |
+| `agent_docs/woocommerce_catalog.md` | Inventory, pricing, product CRUD |
+| `agent_docs/3d_pipeline.md` | 3D model generation, virtual try-on |
+| `agent_docs/conflict_resolution.md` | Multi-agent task overlap |
+| `agent_docs/escalation_protocol.md` | Decisions requiring CEO approval |
+
+### Operational Boundaries
+| Level | Action | Examples |
+|-------|--------|----------|
+| ✅ **Always** | Execute autonomously | Log actions to `/logs/`, use "SkyyRose" (one word), follow luxury tone |
+| ⚠️ **Ask First** | Require CEO approval | Price changes >20%, customer refunds, inventory deletions |
+| 🚫 **Never** | Prohibited actions | Use "Skyy Rose" (two words), hyphy slang, discount language, .com URLs |
+
+### Brand Enforcement Rules
+- **Correct**: "SkyyRose" (one word, capital S and R)
+- **Incorrect**: "Skyy Rose", "skyy rose", "SKYYROSE", "SkyRose"
+- **Domain**: Always use `skyyrose.co` (never .com)
+- **Tone**: Luxury, elevated, boutique-ready (never discount/clearance language)
+
+---
 
 ## Stack (Verified & Pinned)
 
 **Backend**:
-- Python 3.11.9+ (FastAPI 0.120.0+ per CVE-2025-62727)
-- FastAPI ~0.119.0 (ASGI web framework)
+- Python 3.11.9+ (FastAPI 0.121.0+ per CVE-2025-62727)
+- FastAPI >=0.121.0,<0.122.0 (ASGI web framework, Starlette 0.49+ support)
+- Starlette >=0.49.1,<0.50.0 (SECURITY: GHSA-7f5h-v6xp-fcq8 Range header ReDoS)
 - SQLAlchemy ~2.0.36 (ORM: SQLite, PostgreSQL, MySQL)
 - Pydantic >=2.9.0,<3.0.0 (Schema validation)
+
+**Agent Framework & MCP**:
+- claude-agent-sdk ~0.1.9 (Official Anthropic Agent SDK)
+- mcp ~1.22.0 (Model Context Protocol - official implementation)
+- fastmcp >=2.13.0,<3.0.0 (SECURITY: XSS & Command Injection fixes)
+- logfire[fastapi] ~4.14.2 (OpenTelemetry-based observability)
 
 **AI/ML**:
 - Anthropic ~0.69.0 (Claude API integration)
@@ -20,6 +70,7 @@
   - torchvision>=0.23.0,<0.24.0
   - torchaudio>=2.8.0,<2.9.0
 - transformers ~4.57.1 (Hugging Face models)
+- langchain ~1.0.7 (LLM orchestration - stable 1.0 release)
 
 **Database**:
 - PostgreSQL 15+ (production recommended)
@@ -43,12 +94,16 @@
 - Example: PyJWT per RFC 7519, cryptography per NIST SP 800-38D
 
 ### Rule #2: Version Strategy
-**For compatible releases**: Use `~=` (e.g., `fastapi~=0.119.0`)
+**For compatible releases**: Use `~=` (e.g., `fastapi~=0.121.0`)
 **For security-critical packages**: Use `>=,<` (e.g., `cryptography>=46.0.3,<47.0.0`)
-- Packages: cryptography, PyJWT, defusedxml, bcrypt, argon2-cffi
+- Packages: cryptography, PyJWT, defusedxml, bcrypt, argon2-cffi, pip, setuptools
 - Generate lock files for reproducible deployments
 - Review dependencies monthly or when CVEs detected
 - Security packages must allow patch updates (CVE/hotfix)
+
+**Build Dependencies** (Security-Critical):
+- pip>=25.3 (SECURITY: CVE-2025-8869 tarfile path traversal)
+- setuptools>=78.1.1,<79.0.0 (SECURITY: CVE-2025-47273, CVE-2024-6345 RCE)
 
 **For PyTorch ecosystem** (torch, torchvision, torchaudio):
 - Always use compatible builds from official matrix: https://pytorch.org/get-started/previous-versions/
@@ -154,7 +209,7 @@ Implemented in: `security/jwt_auth.py`, `security/input_validation.py`
 **Generated automatically** on every CI run and deployment:
 ```json
 {
-  "timestamp": "2025-11-17T19:00:00Z",
+  "timestamp": "2025-12-02T19:00:00Z",
   "run_id": "abc123def456",
   "errors": [
     {
@@ -208,6 +263,32 @@ Ingress
     ↓
 [Observability] - Structured logging, error ledger, metrics
 ```
+
+---
+
+## Enterprise Features (v5.3.0)
+
+### Model Context Protocol (MCP) Integration
+- **MCP Server**: Dynamic toolsets support via `mcp ~1.22.0`
+- **FastMCP**: Production-grade MCP implementation with security hardening
+- **Agent SDK**: Official Anthropic `claude-agent-sdk ~0.1.9`
+- **GitHub MCP Server**: Repository automation and toolset management
+
+### ReAct Iterative Reasoning
+- Implemented reasoning-action loops for complex agent tasks
+- Supports multi-step planning with observation feedback
+- Integrated with error ledger for debugging reasoning chains
+
+### Kubernetes Health Probes
+- **Liveness**: `/health/live` - Container restart trigger
+- **Readiness**: `/health/ready` - Traffic routing control
+- **Startup**: `/health/startup` - Slow-start container support
+- Pydantic Settings for configuration management
+
+### Dynamic Toolsets
+- Runtime tool registration and deregistration
+- Per-request tool scoping for multi-tenant environments
+- Security boundaries per toolset execution
 
 ---
 
@@ -617,7 +698,7 @@ except:
 **Log Format** (JSON per line):
 ```json
 {
-  "timestamp": "2025-11-17T19:00:00Z",
+  "timestamp": "2025-12-02T19:00:00Z",
   "level": "ERROR",
   "logger": "api.v1.agents",
   "message": "Failed to process agent request",
@@ -940,4 +1021,4 @@ FastAPI 0.120.0+ per CVE-2025-62727 requirements.
 
 **Claude enforces the Truth Protocol rigorously and ensures DevSkyy remains verifiable, secure, and enterprise-grade.** ✅
 
-**Status**: Production-Ready | **Compliance**: 15/15 Rules | **Last Updated**: 2025-11-17
+**Status**: Production-Ready | **Compliance**: 15/15 Rules | **Last Updated**: 2025-12-02
