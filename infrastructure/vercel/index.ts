@@ -7,6 +7,7 @@
  * - Environment variable management
  * - Build monitoring
  * - Project settings
+ * - Access group management
  *
  * Per CLAUDE.md Truth Protocol:
  * - Rule #5: All API keys in env variables
@@ -79,6 +80,33 @@ export interface EnvironmentVariable {
   value: string;
   target: ("production" | "preview" | "development")[];
   type?: "plain" | "encrypted" | "secret";
+}
+
+export type TeamPermission =
+  | "IntegrationManager"
+  | "CreateProject"
+  | "FullProductionDeployment"
+  | "UsageViewer"
+  | "EnvVariableManager"
+  | "EnvironmentManager"
+  | "V0Builder"
+  | "V0Chatter"
+  | "V0Viewer";
+
+export type AccessGroupEntitlement = "v0";
+
+export interface AccessGroup {
+  accessGroupId: string;
+  name: string;
+  teamId: string;
+  createdAt: string;
+  updatedAt: string;
+  membersCount: number;
+  projectsCount: number;
+  isDsyncManaged: boolean;
+  teamPermissions?: TeamPermission[];
+  entitlements?: AccessGroupEntitlement[];
+  teamRoles?: string[];
 }
 
 /**
@@ -401,6 +429,158 @@ export class VercelConnection {
     } catch (error) {
       console.error("Failed to list domains:", error);
       throw error;
+    }
+  }
+
+  // === Access Group Management ===
+
+  /**
+   * Read an access group by ID or name
+   * Per Vercel API: GET /v1/access-groups/{idOrName}
+   */
+  async readAccessGroup(idOrName: string): Promise<AccessGroup> {
+    try {
+      const response = await this.client.accessGroups.readAccessGroup({
+        idOrName,
+        teamId: this.teamId,
+      });
+
+      return {
+        accessGroupId: response.accessGroupId,
+        name: response.name,
+        teamId: response.teamId,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+        membersCount: response.membersCount,
+        projectsCount: response.projectsCount,
+        isDsyncManaged: response.isDsyncManaged,
+        teamPermissions: response.teamPermissions as TeamPermission[] | undefined,
+        entitlements: response.entitlements as AccessGroupEntitlement[] | undefined,
+        teamRoles: response.teamRoles,
+      };
+    } catch (error) {
+      console.error("Failed to read access group:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * List all access groups for the team
+   */
+  async listAccessGroups(): Promise<AccessGroup[]> {
+    try {
+      const response = await this.client.accessGroups.listAccessGroups({
+        teamId: this.teamId,
+      });
+
+      return (response.accessGroups || []).map((ag) => ({
+        accessGroupId: ag.accessGroupId,
+        name: ag.name,
+        teamId: ag.teamId,
+        createdAt: ag.createdAt,
+        updatedAt: ag.updatedAt,
+        membersCount: ag.membersCount,
+        projectsCount: ag.projectsCount,
+        isDsyncManaged: ag.isDsyncManaged,
+        teamPermissions: ag.teamPermissions as TeamPermission[] | undefined,
+        entitlements: ag.entitlements as AccessGroupEntitlement[] | undefined,
+        teamRoles: ag.teamRoles,
+      }));
+    } catch (error) {
+      console.error("Failed to list access groups:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Create a new access group
+   */
+  async createAccessGroup(
+    name: string,
+    options?: {
+      teamPermissions?: TeamPermission[];
+      teamRoles?: string[];
+    }
+  ): Promise<AccessGroup> {
+    try {
+      const response = await this.client.accessGroups.createAccessGroup({
+        teamId: this.teamId,
+        requestBody: {
+          name,
+          teamPermissions: options?.teamPermissions,
+          teamRoles: options?.teamRoles,
+        },
+      });
+
+      return {
+        accessGroupId: response.accessGroupId,
+        name: response.name,
+        teamId: response.teamId,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+        membersCount: response.membersCount,
+        projectsCount: response.projectsCount,
+        isDsyncManaged: response.isDsyncManaged,
+        teamPermissions: response.teamPermissions as TeamPermission[] | undefined,
+        entitlements: response.entitlements as AccessGroupEntitlement[] | undefined,
+        teamRoles: response.teamRoles,
+      };
+    } catch (error) {
+      console.error("Failed to create access group:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Update an access group
+   */
+  async updateAccessGroup(
+    idOrName: string,
+    updates: {
+      name?: string;
+      teamPermissions?: TeamPermission[];
+      teamRoles?: string[];
+    }
+  ): Promise<AccessGroup> {
+    try {
+      const response = await this.client.accessGroups.updateAccessGroup({
+        idOrName,
+        teamId: this.teamId,
+        requestBody: updates,
+      });
+
+      return {
+        accessGroupId: response.accessGroupId,
+        name: response.name,
+        teamId: response.teamId,
+        createdAt: response.createdAt,
+        updatedAt: response.updatedAt,
+        membersCount: response.membersCount,
+        projectsCount: response.projectsCount,
+        isDsyncManaged: response.isDsyncManaged,
+        teamPermissions: response.teamPermissions as TeamPermission[] | undefined,
+        entitlements: response.entitlements as AccessGroupEntitlement[] | undefined,
+        teamRoles: response.teamRoles,
+      };
+    } catch (error) {
+      console.error("Failed to update access group:", error);
+      throw error;
+    }
+  }
+
+  /**
+   * Delete an access group
+   */
+  async deleteAccessGroup(idOrName: string): Promise<boolean> {
+    try {
+      await this.client.accessGroups.deleteAccessGroup({
+        idOrName,
+        teamId: this.teamId,
+      });
+      return true;
+    } catch (error) {
+      console.error("Failed to delete access group:", error);
+      return false;
     }
   }
 
