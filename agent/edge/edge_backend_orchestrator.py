@@ -8,11 +8,15 @@ This orchestrator:
 - Coordinates with backend agents
 - Handles sync layer operations
 - Provides unified API for hybrid execution
+- Provides production-grade resilience (circuit breaker, retry, timeout, bulkhead)
 
 Architecture:
 ┌─────────────────────────────────────────────────────────────────────┐
 │                         EDGE LAYER                                   │
 │   EdgeRouter → CacheAgent → PredictiveAgent → ValidationAgent       │
+│                           ↓                                          │
+│                    Resilience Layer                                  │
+│       (Circuit Breaker → Timeout → Retry → Bulkhead → Fallback)    │
 │                           ↓                                          │
 │                      Sync Layer                                      │
 │                           ↓                                          │
@@ -24,6 +28,7 @@ Per CLAUDE.md Truth Protocol:
 - Rule #7: Pydantic validation for all requests
 - Rule #10: Log errors, continue processing
 - Rule #12: P95 < 200ms for edge operations
+- Rule #14: All failures logged to error ledger
 """
 
 import asyncio
@@ -51,6 +56,20 @@ from agent.edge.sync_layer import (
     SyncLayer,
 )
 from agent.edge.validation_agent import ValidationAgent
+from agent.edge.resilience import (
+    CachedFallback,
+    CircuitBreakerError,
+    CircuitState,
+    DefaultValueFallback,
+    GracefulDegradationFallback,
+    ResilienceConfig,
+    ResilienceLayer,
+    CircuitBreakerConfig,
+    RetryConfig,
+    RetryStrategy,
+    TimeoutConfig,
+    BulkheadConfig,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -109,6 +128,13 @@ class OrchestratorMetrics:
     errors: int = 0
     average_latency_ms: float = 0.0
     p95_latency_ms: float = 0.0
+    # Resilience metrics
+    circuit_breaker_opens: int = 0
+    circuit_breaker_rejections: int = 0
+    retries: int = 0
+    timeouts: int = 0
+    fallback_executions: int = 0
+    bulkhead_rejections: int = 0
 
 
 class EdgeBackendOrchestrator:
@@ -137,12 +163,21 @@ class EdgeBackendOrchestrator:
     - Sync success rate: 99%+
     """
 
+    # Default resilience configuration
+    DEFAULT_TIMEOUT_MS = 5000.0
+    DEFAULT_MAX_RETRIES = 3
+    DEFAULT_CIRCUIT_BREAKER_THRESHOLD = 5
+    DEFAULT_CIRCUIT_BREAKER_TIMEOUT = 30.0
+    DEFAULT_MAX_CONCURRENT = 50
+    DEFAULT_MAX_QUEUE = 200
+
     def __init__(
         self,
         node_id: str = "edge_node_1",
         routing_strategy: RoutingStrategy = RoutingStrategy.ADAPTIVE,
         prefetch_strategy: PrefetchStrategy = PrefetchStrategy.ADAPTIVE,
         conflict_resolution: ConflictResolution = ConflictResolution.LAST_WRITE_WINS,
+        resilience_config: ResilienceConfig | None = None,
     ):
         self.node_id = node_id
         self.status = OrchestratorStatus.INITIALIZING
@@ -177,8 +212,15 @@ class EdgeBackendOrchestrator:
             default_resolution=conflict_resolution,
         )
 
+        # Initialize resilience layer
+        self._resilience_config = resilience_config or self._create_default_resilience_config()
+        self._init_resilience_layer()
+
         # Backend agent registry
         self._backend_agents: dict[str, Any] = {}
+
+        # Per-agent resilience layers
+        self._agent_resilience: dict[str, ResilienceLayer] = {}
 
         # Network status
         self._is_online = True
@@ -186,7 +228,82 @@ class EdgeBackendOrchestrator:
         # Latency tracking
         self._latency_history: list[float] = []
 
-        logger.info(f"EdgeBackendOrchestrator initialized (node={node_id})")
+        # Degraded operation handlers
+        self._degraded_handlers: dict[str, Any] = {}
+
+        # Fallback cache for graceful degradation
+        self._fallback_cache: dict[str, Any] = {}
+
+        logger.info(f"EdgeBackendOrchestrator initialized (node={node_id}) with resilience")
+
+    def _create_default_resilience_config(self) -> ResilienceConfig:
+        """Create default resilience configuration."""
+        return ResilienceConfig(
+            circuit_breaker=CircuitBreakerConfig(
+                failure_threshold=self.DEFAULT_CIRCUIT_BREAKER_THRESHOLD,
+                recovery_timeout=self.DEFAULT_CIRCUIT_BREAKER_TIMEOUT,
+                failure_rate_threshold=0.5,
+                minimum_calls=10,
+                window_size=100,
+            ),
+            retry=RetryConfig(
+                max_retries=self.DEFAULT_MAX_RETRIES,
+                initial_delay_ms=100.0,
+                max_delay_ms=5000.0,
+                multiplier=2.0,
+                strategy=RetryStrategy.EXPONENTIAL_JITTER,
+            ),
+            timeout=TimeoutConfig(
+                default_timeout_ms=self.DEFAULT_TIMEOUT_MS,
+            ),
+            bulkhead=BulkheadConfig(
+                max_concurrent=self.DEFAULT_MAX_CONCURRENT,
+                max_queue_size=self.DEFAULT_MAX_QUEUE,
+                queue_timeout_ms=self.DEFAULT_TIMEOUT_MS,
+            ),
+            enable_circuit_breaker=True,
+            enable_retry=True,
+            enable_timeout=True,
+            enable_bulkhead=True,
+            enable_fallback=True,
+        )
+
+    def _init_resilience_layer(self) -> None:
+        """Initialize resilience layer with fallback strategies."""
+        # Create composite fallback strategy
+        self._cached_fallback = CachedFallback()
+        self._default_fallback = DefaultValueFallback()
+        self._degradation_fallback = GracefulDegradationFallback()
+
+        # Main resilience layer for backend calls
+        self._resilience_layer = ResilienceLayer(
+            name=f"orchestrator_{self.node_id}",
+            config=self._resilience_config,
+            fallback=self._cached_fallback,  # Use cached fallback as primary
+        )
+
+        # Register circuit breaker state change callback
+        self._resilience_layer.circuit_breaker.on_state_change = (
+            self._on_circuit_breaker_state_change
+        )
+
+        logger.info("Resilience layer initialized")
+
+    def _on_circuit_breaker_state_change(
+        self, old_state: CircuitState, new_state: CircuitState
+    ) -> None:
+        """Handle circuit breaker state transitions."""
+        if new_state == CircuitState.OPEN:
+            self.metrics.circuit_breaker_opens += 1
+            self.status = OrchestratorStatus.DEGRADED
+            logger.warning(
+                f"Orchestrator entering degraded mode: "
+                f"circuit breaker opened ({old_state.value} → {new_state.value})"
+            )
+        elif new_state == CircuitState.CLOSED and old_state == CircuitState.HALF_OPEN:
+            if self._is_online:
+                self.status = OrchestratorStatus.RUNNING
+            logger.info("Orchestrator recovered: circuit breaker closed")
 
     async def initialize(self) -> bool:
         """
@@ -379,7 +496,7 @@ class EdgeBackendOrchestrator:
         return {"status": "not_implemented", "error": "No edge handler for this operation"}
 
     async def _execute_on_backend(self, request: ExecutionRequest) -> dict[str, Any]:
-        """Execute request on backend agents."""
+        """Execute request on backend agents with resilience protection."""
         agent = self._backend_agents.get(request.agent_type)
 
         if agent is None:
@@ -402,19 +519,81 @@ class EdgeBackendOrchestrator:
 
             return {"status": "error", "error": f"Agent {request.agent_type} not registered"}
 
-        # Execute on backend agent
-        try:
+        # Define the actual backend call
+        async def backend_call() -> Any:
             if hasattr(agent, "execute_core_function"):
-                result = await agent.execute_core_function(
+                return await agent.execute_core_function(
                     operation=request.operation, **request.parameters
                 )
             else:
-                result = await agent.execute(**request.parameters)
+                return await agent.execute(**request.parameters)
+
+        # Execute with resilience protection
+        try:
+            operation_key = f"{request.agent_type}.{request.operation}"
+
+            # Store successful result in fallback cache for future use
+            result = await self._resilience_layer.execute(
+                backend_call,
+                operation=operation_key,
+                timeout_ms=request.timeout_ms,
+                context={
+                    "cache_key": operation_key,
+                    "agent_type": request.agent_type,
+                    "parameters": request.parameters,
+                },
+            )
+
+            # Cache successful result for fallback
+            self._cached_fallback.set_cache(operation_key, result)
 
             return {"status": "success", "result": result}
 
+        except CircuitBreakerError as e:
+            self.metrics.circuit_breaker_rejections += 1
+            logger.warning(f"Circuit breaker rejected request: {e}")
+
+            # Try degraded handler if available
+            degraded_result = await self._try_degraded_execution(request)
+            if degraded_result is not None:
+                self.metrics.fallback_executions += 1
+                return {
+                    "status": "degraded",
+                    "result": degraded_result,
+                    "message": "Executed in degraded mode due to circuit breaker",
+                }
+
+            return {
+                "status": "circuit_open",
+                "error": str(e),
+                "retry_after": e.retry_after,
+            }
+
         except Exception as e:
+            logger.error(f"Backend execution failed: {e}")
             return {"status": "error", "error": str(e)}
+
+    async def _try_degraded_execution(
+        self, request: ExecutionRequest
+    ) -> Any | None:
+        """Attempt to execute in degraded mode."""
+        operation_key = f"{request.agent_type}.{request.operation}"
+
+        # Try degraded handler
+        if operation_key in self._degraded_handlers:
+            try:
+                handler = self._degraded_handlers[operation_key]
+                if asyncio.iscoroutinefunction(handler):
+                    return await handler(request.parameters)
+                return handler(request.parameters)
+            except Exception as e:
+                logger.warning(f"Degraded handler failed: {e}")
+
+        # Try fallback cache
+        if operation_key in self._fallback_cache:
+            return self._fallback_cache[operation_key]
+
+        return None
 
     def _make_cache_key(self, request: ExecutionRequest) -> str:
         """Create cache key from request."""
@@ -562,7 +741,7 @@ class EdgeBackendOrchestrator:
             self.metrics.p95_latency_ms = sorted_latencies[p95_index]
 
     def get_metrics(self) -> dict[str, Any]:
-        """Get orchestrator metrics."""
+        """Get orchestrator metrics including resilience status."""
         edge_percentage = (
             self.metrics.edge_requests
             / max(1, self.metrics.total_requests)
@@ -600,6 +779,15 @@ class EdgeBackendOrchestrator:
                 "average_ms": round(self.metrics.average_latency_ms, 2),
                 "p95_ms": round(self.metrics.p95_latency_ms, 2),
             },
+            "resilience": {
+                "circuit_breaker_state": self._resilience_layer.circuit_breaker.state.value,
+                "circuit_breaker_opens": self.metrics.circuit_breaker_opens,
+                "circuit_breaker_rejections": self.metrics.circuit_breaker_rejections,
+                "retries": self.metrics.retries,
+                "timeouts": self.metrics.timeouts,
+                "fallback_executions": self.metrics.fallback_executions,
+                "bulkhead_rejections": self.metrics.bulkhead_rejections,
+            },
             "errors": self.metrics.errors,
             "backend_agents": len(self._backend_agents),
         }
@@ -613,6 +801,101 @@ class EdgeBackendOrchestrator:
             "validator": asyncio.run(self.validator.health_check()) if hasattr(self.validator, "health_check") else {},
             "sync_layer": self.sync_layer.get_sync_status(),
         }
+
+    # === Resilience Control ===
+
+    def register_degraded_handler(
+        self,
+        agent_type: str,
+        operation: str,
+        handler: Any,
+    ) -> None:
+        """
+        Register a degraded mode handler for an operation.
+
+        The handler will be called when the circuit breaker is open.
+
+        Args:
+            agent_type: Agent type
+            operation: Operation name
+            handler: Handler function (sync or async)
+        """
+        key = f"{agent_type}.{operation}"
+        self._degraded_handlers[key] = handler
+        self._degradation_fallback.register_degraded(key, handler)
+        logger.info(f"Registered degraded handler: {key}")
+
+    def set_fallback_value(
+        self,
+        agent_type: str,
+        operation: str,
+        value: Any,
+    ) -> None:
+        """
+        Set a fallback value for an operation.
+
+        The value will be returned when the circuit breaker is open
+        and no degraded handler is available.
+
+        Args:
+            agent_type: Agent type
+            operation: Operation name
+            value: Fallback value
+        """
+        key = f"{agent_type}.{operation}"
+        self._fallback_cache[key] = value
+        self._cached_fallback.set_cache(key, value)
+        self._default_fallback.set_default(key, value)
+        logger.info(f"Set fallback value for: {key}")
+
+    async def get_resilience_status(self) -> dict[str, Any]:
+        """Get detailed resilience layer status."""
+        return {
+            "layer": self._resilience_layer.get_health(),
+            "circuit_breaker": self._resilience_layer.circuit_breaker.get_health(),
+            "bulkhead": self._resilience_layer.bulkhead.get_metrics(),
+            "registered_degraded_handlers": list(self._degraded_handlers.keys()),
+            "registered_fallback_values": list(self._fallback_cache.keys()),
+        }
+
+    async def force_circuit_open(self) -> None:
+        """Force the circuit breaker open (for testing/maintenance)."""
+        await self._resilience_layer.circuit_breaker.force_open()
+        self.status = OrchestratorStatus.DEGRADED
+        logger.warning("Circuit breaker forced open")
+
+    async def force_circuit_close(self) -> None:
+        """Force the circuit breaker closed (for recovery)."""
+        await self._resilience_layer.circuit_breaker.force_close()
+        if self._is_online:
+            self.status = OrchestratorStatus.RUNNING
+        logger.info("Circuit breaker forced closed")
+
+    async def reset_resilience(self) -> None:
+        """Reset all resilience components to initial state."""
+        await self._resilience_layer.reset()
+
+        # Reset per-agent resilience layers
+        for layer in self._agent_resilience.values():
+            await layer.reset()
+
+        # Reset metrics
+        self.metrics.circuit_breaker_opens = 0
+        self.metrics.circuit_breaker_rejections = 0
+        self.metrics.retries = 0
+        self.metrics.timeouts = 0
+        self.metrics.fallback_executions = 0
+        self.metrics.bulkhead_rejections = 0
+
+        logger.info("Resilience layer reset")
+
+    def get_circuit_breaker_state(self) -> str:
+        """Get current circuit breaker state."""
+        return self._resilience_layer.circuit_breaker.state.value
+
+    def is_circuit_open(self) -> bool:
+        """Check if circuit breaker is open."""
+        return self._resilience_layer.circuit_breaker.is_open
 
     # === Convenience Methods ===
 

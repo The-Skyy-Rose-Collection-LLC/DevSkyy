@@ -58,6 +58,7 @@ Components:
 - SyncLayer: Delta synchronization with conflict resolution
 - HybridAwareMixin: Add edge awareness to backend agents
 - EdgeBackendOrchestrator: Unified edge-backend management
+- ResilienceLayer: Circuit breaker, timeout, retry, bulkhead patterns
 """
 
 # Base classes and types
@@ -85,7 +86,6 @@ from agent.edge.cache_agent import (
 from agent.edge.edge_router import (
     AgentCapabilityProfile,
     EdgeRouter,
-    Prediction,
     RoutingDecision,
     RoutingMetrics,
     RoutingRequest,
@@ -93,6 +93,7 @@ from agent.edge.edge_router import (
 )
 from agent.edge.predictive_agent import (
     PatternMatcher,
+    Prediction,
     PredictiveAgent,
     PredictiveMetrics,
     PredictionRequest,
@@ -143,6 +144,32 @@ from agent.edge.edge_backend_orchestrator import (
     ExecutionResponse,
     OrchestratorMetrics,
     OrchestratorStatus,
+)
+
+# Resilience Layer
+from agent.edge.resilience import (
+    Bulkhead,
+    BulkheadConfig,
+    BulkheadFullError,
+    CachedFallback,
+    CircuitBreaker,
+    CircuitBreakerConfig,
+    CircuitBreakerError,
+    CircuitBreakerMetrics,
+    CircuitState,
+    DefaultValueFallback,
+    FallbackStrategy,
+    GracefulDegradationFallback,
+    ResilienceConfig,
+    ResilienceLayer,
+    ResilienceRegistry,
+    RetryConfig,
+    RetryHandler,
+    RetryStrategy,
+    TimeoutConfig,
+    TimeoutError,
+    TimeoutHandler,
+    resilience_registry,
 )
 
 __all__ = [
@@ -213,4 +240,27 @@ __all__ = [
     "ExecutionResponse",
     "OrchestratorStatus",
     "OrchestratorMetrics",
+    # Resilience
+    "CircuitBreaker",
+    "CircuitBreakerConfig",
+    "CircuitBreakerError",
+    "CircuitBreakerMetrics",
+    "CircuitState",
+    "RetryHandler",
+    "RetryConfig",
+    "RetryStrategy",
+    "TimeoutHandler",
+    "TimeoutConfig",
+    "TimeoutError",
+    "Bulkhead",
+    "BulkheadConfig",
+    "BulkheadFullError",
+    "FallbackStrategy",
+    "CachedFallback",
+    "DefaultValueFallback",
+    "GracefulDegradationFallback",
+    "ResilienceLayer",
+    "ResilienceConfig",
+    "ResilienceRegistry",
+    "resilience_registry",
 ]

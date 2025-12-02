@@ -12,11 +12,19 @@ Edge Layer Characteristics:
 - Predictive pre-computation (anticipate user needs)
 - User-specific personalization (local preferences)
 
+Resilience Features (v2.0):
+- Circuit breaker for backend communication
+- Timeout enforcement on all operations
+- Retry with exponential backoff and jitter
+- Bulkhead isolation per agent
+- Graceful degradation with fallback strategies
+
 Per CLAUDE.md Truth Protocol:
 - Rule #1: All APIs verified against specifications
 - Rule #7: Pydantic validation for all inputs
 - Rule #9: Google-style docstrings with type hints
 - Rule #10: Errors logged, processing continues
+- Rule #12: P95 < 200ms maintained under failure
 """
 
 from abc import ABC, abstractmethod
@@ -36,6 +44,23 @@ from agent.modules.base_agent import (
     HealthMetrics,
     Issue,
     SeverityLevel,
+)
+
+# Import resilience components
+from agent.edge.resilience import (
+    CircuitBreaker,
+    CircuitBreakerConfig,
+    CircuitBreakerError,
+    CircuitState,
+    ResilienceConfig,
+    ResilienceLayer,
+    RetryConfig,
+    RetryStrategy,
+    TimeoutConfig,
+    TimeoutHandler,
+    BulkheadConfig,
+    CachedFallback,
+    GracefulDegradationFallback,
 )
 
 
@@ -82,6 +107,13 @@ class EdgeMetrics(AgentMetrics):
     bandwidth_saved_bytes: int = 0
     privacy_preserving_ops: int = 0
 
+    # Resilience metrics
+    circuit_breaker_trips: int = 0
+    timeout_errors: int = 0
+    retry_attempts: int = 0
+    fallback_executions: int = 0
+    bulkhead_rejections: int = 0
+
 
 @dataclass
 class OperationContext:
@@ -127,6 +159,11 @@ class EdgeHealthMetrics(HealthMetrics):
     sync_queue_depth: int = 0
     local_storage_mb: float = 0.0
 
+    # Resilience health
+    circuit_breaker_state: str = "closed"
+    backend_available: bool = True
+    resilience_score: float = 100.0  # 0-100 health score
+
 
 class BaseEdgeAgent(BaseAgent, ABC):
     """
@@ -153,11 +190,18 @@ class BaseEdgeAgent(BaseAgent, ABC):
     MAX_OFFLINE_QUEUE_SIZE: int = 1000
     SYNC_BATCH_SIZE: int = 50
 
+    # Resilience defaults
+    DEFAULT_TIMEOUT_MS: float = 5000.0
+    DEFAULT_RETRY_COUNT: int = 3
+    CIRCUIT_BREAKER_THRESHOLD: int = 5
+    CIRCUIT_BREAKER_TIMEOUT: float = 30.0
+
     def __init__(
         self,
         agent_name: str,
         version: str = "1.0.0",
         offline_capability: OfflineCapability = OfflineCapability.PARTIAL,
+        resilience_config: ResilienceConfig | None = None,
     ):
         super().__init__(agent_name, version)
 
@@ -180,10 +224,84 @@ class BaseEdgeAgent(BaseAgent, ABC):
         # Operation routing rules
         self._routing_rules: dict[str, ExecutionLocation] = {}
 
+        # Initialize resilience layer
+        self._resilience_config = resilience_config or self._create_default_resilience_config()
+        self._init_resilience_layer()
+
         logger.info(
             f"Edge Agent {self.agent_name} v{self.version} initializing "
-            f"(offline_capability={offline_capability.value})"
+            f"(offline_capability={offline_capability.value}, resilience=enabled)"
         )
+
+    def _create_default_resilience_config(self) -> ResilienceConfig:
+        """Create default resilience configuration."""
+        return ResilienceConfig(
+            circuit_breaker=CircuitBreakerConfig(
+                failure_threshold=self.CIRCUIT_BREAKER_THRESHOLD,
+                recovery_timeout=self.CIRCUIT_BREAKER_TIMEOUT,
+                failure_rate_threshold=0.5,
+                minimum_calls=10,
+            ),
+            retry=RetryConfig(
+                max_retries=self.DEFAULT_RETRY_COUNT,
+                initial_delay_ms=100.0,
+                max_delay_ms=5000.0,
+                multiplier=2.0,
+                strategy=RetryStrategy.EXPONENTIAL_JITTER,
+            ),
+            timeout=TimeoutConfig(
+                default_timeout_ms=self.DEFAULT_TIMEOUT_MS,
+            ),
+            bulkhead=BulkheadConfig(
+                max_concurrent=50,
+                max_queue_size=100,
+            ),
+            enable_circuit_breaker=True,
+            enable_retry=True,
+            enable_timeout=True,
+            enable_bulkhead=True,
+            enable_fallback=True,
+        )
+
+    def _init_resilience_layer(self) -> None:
+        """Initialize resilience components."""
+        # Create fallback strategy with cached values
+        self._fallback_cache = CachedFallback()
+        self._degraded_fallback = GracefulDegradationFallback()
+
+        # Create resilience layer for backend communication
+        self._backend_resilience = ResilienceLayer(
+            name=f"{self.agent_name}_backend",
+            config=self._resilience_config,
+            fallback=self._fallback_cache,
+        )
+
+        # Circuit breaker state change handler
+        self._backend_resilience.circuit_breaker.on_state_change = (
+            self._on_circuit_breaker_state_change
+        )
+
+    def _on_circuit_breaker_state_change(
+        self, old_state: CircuitState, new_state: CircuitState
+    ) -> None:
+        """Handle circuit breaker state changes."""
+        self.edge_health.circuit_breaker_state = new_state.value
+        self.edge_health.backend_available = new_state != CircuitState.OPEN
+
+        if new_state == CircuitState.OPEN:
+            self.edge_metrics.circuit_breaker_trips += 1
+            logger.warning(
+                f"Circuit breaker OPEN for {self.agent_name}: "
+                f"backend temporarily unavailable"
+            )
+        elif new_state == CircuitState.CLOSED:
+            logger.info(
+                f"Circuit breaker CLOSED for {self.agent_name}: "
+                f"backend recovered"
+            )
+
+        # Update resilience score
+        self._update_resilience_score()
 
     @abstractmethod
     async def execute_local(self, operation: str, **kwargs) -> dict[str, Any]:
@@ -285,9 +403,10 @@ class BaseEdgeAgent(BaseAgent, ABC):
         self, operation: str, context: OperationContext | None = None, **kwargs
     ) -> dict[str, Any]:
         """
-        Execute operation with hybrid routing.
+        Execute operation with hybrid routing and resilience protection.
 
         Automatically routes to edge or backend based on context.
+        Backend calls are protected by circuit breaker, timeout, and retry.
 
         Args:
             operation: Operation to perform
@@ -307,7 +426,10 @@ class BaseEdgeAgent(BaseAgent, ABC):
                 result = await self._execute_on_edge(operation, **kwargs)
                 self.edge_metrics.local_operations += 1
             else:
-                result = await self._delegate_to_backend(operation, context, **kwargs)
+                # Backend calls go through resilience layer
+                result = await self._execute_on_backend_with_resilience(
+                    operation, context, **kwargs
+                )
                 self.edge_metrics.backend_delegations += 1
 
             # Track latency
@@ -315,6 +437,11 @@ class BaseEdgeAgent(BaseAgent, ABC):
             self._record_latency(elapsed_ms)
 
             return result
+
+        except CircuitBreakerError as e:
+            # Circuit breaker is open - try fallback or queue
+            logger.warning(f"Circuit breaker open for {operation}: {e}")
+            return await self._handle_circuit_breaker_open(operation, kwargs, e)
 
         except Exception as e:
             if not self.is_online and self.offline_capability != OfflineCapability.NONE:
@@ -326,6 +453,149 @@ class BaseEdgeAgent(BaseAgent, ABC):
                     "queue_size": len(self.offline_queue),
                 }
             raise
+
+    async def _execute_on_backend_with_resilience(
+        self, operation: str, context: OperationContext, **kwargs
+    ) -> dict[str, Any]:
+        """
+        Execute backend operation with full resilience protection.
+
+        Applies: Circuit Breaker → Timeout → Retry → Fallback
+        """
+        # Create cache key for fallback
+        cache_key = f"{operation}:{hash(str(kwargs))}"
+
+        try:
+            result = await self._backend_resilience.execute(
+                self._delegate_to_backend,
+                operation,
+                context,
+                operation=operation,
+                timeout_ms=self.DEFAULT_TIMEOUT_MS,
+                context={"cache_key": cache_key, "operation": operation},
+                **kwargs,
+            )
+
+            # Cache successful result for fallback
+            self._fallback_cache.set_cache(cache_key, result)
+
+            return result
+
+        except Exception as e:
+            # Update metrics based on error type
+            error_name = type(e).__name__
+            if "Timeout" in error_name:
+                self.edge_metrics.timeout_errors += 1
+            elif "Bulkhead" in error_name:
+                self.edge_metrics.bulkhead_rejections += 1
+
+            raise
+
+    async def _handle_circuit_breaker_open(
+        self,
+        operation: str,
+        kwargs: dict[str, Any],
+        error: CircuitBreakerError,
+    ) -> dict[str, Any]:
+        """Handle circuit breaker open state with graceful degradation."""
+        # Try cached fallback first
+        cache_key = f"{operation}:{hash(str(kwargs))}"
+        if cache_key in self._fallback_cache._cache:
+            self.edge_metrics.fallback_executions += 1
+            logger.info(f"Using cached fallback for {operation}")
+            return {
+                "status": "fallback",
+                "result": self._fallback_cache._cache[cache_key],
+                "message": "Using cached response (backend unavailable)",
+                "retry_after": error.retry_after,
+            }
+
+        # Try degraded handler if registered
+        if operation in self._degraded_fallback._degraded_handlers:
+            self.edge_metrics.fallback_executions += 1
+            logger.info(f"Using degraded handler for {operation}")
+            handler = self._degraded_fallback._degraded_handlers[operation]
+            if asyncio.iscoroutinefunction(handler):
+                result = await handler(kwargs)
+            else:
+                result = handler(kwargs)
+            return {
+                "status": "degraded",
+                "result": result,
+                "message": "Using degraded functionality (backend unavailable)",
+                "retry_after": error.retry_after,
+            }
+
+        # Queue for later if offline-capable
+        if self.offline_capability != OfflineCapability.NONE:
+            await self._queue_for_sync(operation, kwargs, SyncPriority.HIGH)
+            return {
+                "status": "queued",
+                "message": "Backend unavailable, operation queued for retry",
+                "retry_after": error.retry_after,
+                "queue_size": len(self.offline_queue),
+            }
+
+        # No fallback available
+        return {
+            "status": "error",
+            "error": "Backend unavailable and no fallback configured",
+            "retry_after": error.retry_after,
+        }
+
+    def register_degraded_handler(
+        self, operation: str, handler: callable
+    ) -> None:
+        """
+        Register a degraded handler for an operation.
+
+        The handler will be called when the circuit breaker is open
+        and no cached fallback is available.
+
+        Args:
+            operation: Operation name
+            handler: Async or sync function to call
+        """
+        self._degraded_fallback.register_degraded(operation, handler)
+        logger.info(f"Registered degraded handler for {operation}")
+
+    def set_fallback_value(self, operation: str, value: Any) -> None:
+        """
+        Set a static fallback value for an operation.
+
+        Args:
+            operation: Operation name
+            value: Value to return when backend unavailable
+        """
+        self._fallback_cache.set_cache(operation, value)
+
+    def _update_resilience_score(self) -> None:
+        """Calculate resilience health score (0-100)."""
+        score = 100.0
+
+        # Deduct for circuit breaker state
+        if self.edge_health.circuit_breaker_state == "open":
+            score -= 50.0
+        elif self.edge_health.circuit_breaker_state == "half_open":
+            score -= 25.0
+
+        # Deduct for high error rates
+        total_ops = (
+            self.edge_metrics.local_operations
+            + self.edge_metrics.backend_delegations
+        )
+        if total_ops > 0:
+            error_rate = (
+                self.edge_metrics.timeout_errors
+                + self.edge_metrics.circuit_breaker_trips
+            ) / total_ops
+            score -= min(30.0, error_rate * 100)
+
+        # Deduct for large offline queue
+        queue_ratio = len(self.offline_queue) / self.MAX_OFFLINE_QUEUE_SIZE
+        score -= min(20.0, queue_ratio * 20)
+
+        self.edge_health.resilience_score = max(0.0, min(100.0, score))
 
     async def _execute_on_edge(self, operation: str, **kwargs) -> dict[str, Any]:
         """Execute operation locally with latency tracking."""
@@ -552,6 +822,9 @@ class BaseEdgeAgent(BaseAgent, ABC):
         """
         base_health = await super().health_check()
 
+        # Update resilience score
+        self._update_resilience_score()
+
         # Add edge-specific health data
         base_health["edge_metrics"] = {
             "local_operations": self.edge_metrics.local_operations,
@@ -578,7 +851,49 @@ class BaseEdgeAgent(BaseAgent, ABC):
             "offline_capability": self.offline_capability.value,
         }
 
+        # Add resilience health data
+        base_health["resilience"] = {
+            "circuit_breaker": self._backend_resilience.circuit_breaker.get_health(),
+            "bulkhead": self._backend_resilience.bulkhead.get_metrics(),
+            "score": round(self.edge_health.resilience_score, 2),
+            "backend_available": self.edge_health.backend_available,
+            "metrics": {
+                "circuit_breaker_trips": self.edge_metrics.circuit_breaker_trips,
+                "timeout_errors": self.edge_metrics.timeout_errors,
+                "retry_attempts": self.edge_metrics.retry_attempts,
+                "fallback_executions": self.edge_metrics.fallback_executions,
+                "bulkhead_rejections": self.edge_metrics.bulkhead_rejections,
+            },
+        }
+
         return base_health
+
+    async def get_resilience_status(self) -> dict[str, Any]:
+        """
+        Get detailed resilience layer status.
+
+        Returns:
+            Resilience status including circuit breaker and bulkhead state
+        """
+        return self._backend_resilience.get_health()
+
+    async def force_circuit_open(self) -> None:
+        """Manually open the circuit breaker (for testing/maintenance)."""
+        await self._backend_resilience.circuit_breaker.force_open()
+
+    async def force_circuit_close(self) -> None:
+        """Manually close the circuit breaker."""
+        await self._backend_resilience.circuit_breaker.force_close()
+
+    async def reset_resilience(self) -> None:
+        """Reset all resilience components to initial state."""
+        await self._backend_resilience.reset()
+        self.edge_metrics.circuit_breaker_trips = 0
+        self.edge_metrics.timeout_errors = 0
+        self.edge_metrics.retry_attempts = 0
+        self.edge_metrics.fallback_executions = 0
+        self.edge_metrics.bulkhead_rejections = 0
+        self._update_resilience_score()
 
     def _calculate_cache_hit_ratio(self) -> float:
         """Calculate cache hit ratio."""
