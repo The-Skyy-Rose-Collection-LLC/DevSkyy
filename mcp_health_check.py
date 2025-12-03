@@ -776,8 +776,8 @@ class MCPHealthChecker:
                                 message=f"Server error: {error_msg}",
                                 details=stderr if stderr else None,
                             )
-                    except json.JSONDecodeError:
-                        pass
+                    except json.JSONDecodeError as e:
+                        logging.warning(f"Failed to parse JSON-RPC response from server '{name}': {e}. Raw output: {stdout[:200] if stdout else '<no stdout>'}")
 
                 # Non-JSON response
                 return CheckResult(
