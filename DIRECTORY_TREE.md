@@ -59,7 +59,6 @@ DevSkyy/
 │   ├── database.py                      # Database connection & session
 │   ├── database_config.py               # Database configuration
 │   ├── models_sqlalchemy.py             # SQLAlchemy models
-│   ├── startup_sqlalchemy.py            # SQLAlchemy startup
 │   ├── init_database.py                 # Database initialization
 │   ├── create_user.py                   # User creation utility
 │   └── devskyy_mcp.py                   # MCP server implementation
