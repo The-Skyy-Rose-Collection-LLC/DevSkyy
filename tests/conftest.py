@@ -25,7 +25,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Set test environment variables BEFORE any imports
-os.environ["ENVIRONMENT"] = "testing"  # UnifiedConfig expects "testing" not "test"
+os.environ["ENVIRONMENT"] = "development"  # Use development for tests (Settings only allows dev/staging/prod)
 os.environ["TESTING"] = "true"
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-32-characters-long!!"
 os.environ["SECRET_KEY"] = "test-secret-key-32-characters-long!!"
