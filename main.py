@@ -15,6 +15,12 @@ from pathlib import Path
 import sys
 from typing import Any
 
+# Load environment variables from .env file before accessing any env vars
+# Per Truth Protocol Rule #5: No secrets in code - load from environment
+from dotenv import load_dotenv
+
+load_dotenv()
+
 # Core FastAPI imports
 from fastapi import FastAPI, HTTPException, Request, Response, status
 from fastapi.exceptions import RequestValidationError
