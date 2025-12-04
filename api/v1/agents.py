@@ -635,7 +635,7 @@ async def execute_performance(
 # ============================================================================
 
 
-@router.post("/batch", response_model=dict[str, Any])
+@router.post("/batch")
 async def batch_execute(request: BatchRequest, current_user: TokenData = Depends(get_current_active_user)):
     """
     Execute multiple agent operations in batch
@@ -670,7 +670,7 @@ async def batch_execute(request: BatchRequest, current_user: TokenData = Depends
 # ============================================================================
 
 
-@router.get("/list", response_model=dict[str, Any])
+@router.get("/list")
 async def list_all_agents(current_user: TokenData = Depends(get_current_active_user)):
     """List all available agents with their capabilities"""
     agents = {

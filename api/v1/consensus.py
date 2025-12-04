@@ -195,11 +195,10 @@ async def send_approval_email(email: str, workflow_id: str, approval_urls: dict,
         logger.exception(f"Failed to send approval email to {email}")
 
 
-@router.post("/workflow", response_model=dict)
+@router.post("/workflow")
 async def start_consensus_workflow(
     request: StartWorkflowRequest,
     background_tasks: BackgroundTasks,
-    orchestrator: ConsensusOrchestrator = None,
 ):
     """
     Start a consensus-based content review workflow
@@ -226,8 +225,7 @@ async def start_consensus_workflow(
     ```
     """
     try:
-        if orchestrator is None:
-            orchestrator = get_orchestrator()
+        orchestrator = get_orchestrator()
 
         logger.info(
             f"Starting consensus workflow: {request.topic}",
@@ -293,15 +291,14 @@ async def start_consensus_workflow(
 
 
 @router.get("/workflow/{workflow_id}", response_model=WorkflowStatusResponse)
-async def get_workflow_status(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
+async def get_workflow_status(workflow_id: str):
     """
     Get consensus workflow status
 
     Returns current state, all review iterations, and human decision status
     """
     try:
-        if orchestrator is None:
-            orchestrator = get_orchestrator()
+        orchestrator = get_orchestrator()
 
         workflow = orchestrator.get_workflow(workflow_id)
         if not workflow:
@@ -368,7 +365,6 @@ async def approve_content(
     workflow_id: str,
     token: str = Query(..., description="Approval token"),
     feedback: str | None = Query(None, description="Optional feedback"),
-    orchestrator: ConsensusOrchestrator = None,
 ):
     """
     Human approval webhook endpoint
@@ -376,8 +372,7 @@ async def approve_content(
     Called when human clicks "Approve" link in email
     """
     try:
-        if orchestrator is None:
-            orchestrator = get_orchestrator()
+        orchestrator = get_orchestrator()
 
         logger.info(f"Approval received for workflow: {workflow_id}")
 
@@ -431,7 +426,6 @@ async def reject_content(
     workflow_id: str,
     token: str = Query(..., description="Rejection token"),
     feedback: str | None = Query(None, description="Rejection reason"),
-    orchestrator: ConsensusOrchestrator = None,
 ):
     """
     Human rejection webhook endpoint
@@ -439,8 +433,7 @@ async def reject_content(
     Called when human clicks "Reject" link in email
     """
     try:
-        if orchestrator is None:
-            orchestrator = get_orchestrator()
+        orchestrator = get_orchestrator()
 
         logger.info(f"Rejection received for workflow: {workflow_id}")
 
@@ -490,16 +483,15 @@ async def reject_content(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/publish/{workflow_id}", response_model=dict)
-async def publish_approved_content(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
+@router.post("/publish/{workflow_id}")
+async def publish_approved_content(workflow_id: str):
     """
     Publish approved content to WordPress
 
     Can only publish if human has approved the content
     """
     try:
-        if orchestrator is None:
-            orchestrator = get_orchestrator()
+        orchestrator = get_orchestrator()
 
         workflow = orchestrator.get_workflow(workflow_id)
         if not workflow:

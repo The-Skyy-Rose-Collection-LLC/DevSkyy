@@ -185,7 +185,7 @@ async def publish_content(
         raise HTTPException(status_code=500, detail=f"Publishing failed: {e!s}")
 
 
-@router.post("/publish-batch", response_model=dict)
+@router.post("/publish-batch")
 async def publish_content_batch(
     topics: list[str],
     keywords: list[str] | None = None,
@@ -325,7 +325,7 @@ async def schedule_content_publishing(
         raise HTTPException(status_code=500, detail=f"Scheduling failed: {e!s}")
 
 
-@router.post("/categorize", response_model=dict)
+@router.post("/categorize")
 async def categorize_wordpress_posts(
     post_ids: list[int] | None = None,
     wordpress_site_url: str | None = None,
@@ -412,7 +412,7 @@ async def categorize_wordpress_posts(
         raise HTTPException(status_code=500, detail=f"Categorization failed: {e!s}")
 
 
-@router.get("/categories", response_model=dict)
+@router.get("/categories")
 async def get_available_categories():
     """
     Get available WordPress categories

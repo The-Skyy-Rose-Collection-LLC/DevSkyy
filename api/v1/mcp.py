@@ -410,7 +410,7 @@ API Reference: https://devskyy.com/api/docs
         raise HTTPException(status_code=500, detail=f"Failed to generate MCP configuration: {e!s}")
 
 
-@router.get("/config", response_model=dict[str, Any])
+@router.get("/config")
 async def get_mcp_config(
     api_key: str = Query(..., description="DevSkyy API key for authentication"),
     api_url: str | None = Query(default=None, description="Custom API URL (defaults to production)"),

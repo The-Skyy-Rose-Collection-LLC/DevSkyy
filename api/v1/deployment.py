@@ -118,7 +118,6 @@ class InfrastructureStatusResponse(BaseModel):
 
 @router.post(
     "/jobs",
-    response_model=dict,
     status_code=status.HTTP_201_CREATED,
     summary="Submit Deployment Job",
     description="Submit a new automated agent deployment job"

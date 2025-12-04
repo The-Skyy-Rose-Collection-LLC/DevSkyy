@@ -250,7 +250,7 @@ async def logout(current_user: TokenData = Depends(get_current_active_user)):
 # ============================================================================
 
 
-@router.get("/users", response_model=dict[str, list])
+@router.get("/users")
 async def list_users(current_user: TokenData = Depends(get_current_active_user)):
     """
     List all users (admin only in production)

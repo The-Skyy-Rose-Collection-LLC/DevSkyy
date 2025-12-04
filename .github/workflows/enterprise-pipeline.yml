@@ -328,7 +328,7 @@ jobs:
 
       - name: Run Trivy vulnerability scanner
         if: steps.docker-verify.outputs.exists == 'true'
-        uses: aquasecurity/trivy-action@master
+        uses: aquasecurity/trivy-action@0.28.0
         continue-on-error: true
         with:
           image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
