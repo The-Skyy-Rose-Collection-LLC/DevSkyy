@@ -129,3 +129,4 @@ service-account.json
 .eggs/
 pip-wheel-metadata/
 sklearn-env/
+coverage.xml
