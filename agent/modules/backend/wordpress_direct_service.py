@@ -249,6 +249,7 @@ class WordPressDirectService:
                 f"{self.api_base}/posts",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
+                timeout=30,  # Per Bandit B113: requests without timeout
             )
             response.raise_for_status()
 
@@ -274,6 +275,7 @@ class WordPressDirectService:
                 f"{self.api_base}/pages",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
+                timeout=30,  # Per Bandit B113: requests without timeout
             )
             response.raise_for_status()
 
@@ -296,7 +298,12 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             # Create the page
-            response = requests.post(f"{self.api_base}/pages", auth=self.auth, json=page_data)
+            response = requests.post(
+                f"{self.api_base}/pages",
+                auth=self.auth,
+                json=page_data,
+                timeout=30,  # Per Bandit B113: requests without timeout
+            )
             response.raise_for_status()
 
             created_page = response.json()
@@ -320,7 +327,12 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = requests.post(f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates)
+            response = requests.post(
+                f"{self.api_base}/posts/{post_id}",
+                auth=self.auth,
+                json=updates,
+                timeout=30,  # Per Bandit B113: requests without timeout
+            )
             response.raise_for_status()
 
             updated_post = response.json()

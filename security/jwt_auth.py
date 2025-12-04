@@ -1,10 +1,13 @@
 """
 Enterprise JWT Authentication System
 Production-grade OAuth2 + JWT with refresh tokens, role-based access control
+
+Per RFC 7519 (JWT) and OWASP security best practices.
 """
 
 from collections import defaultdict
 from datetime import UTC, datetime, timedelta
+from enum import Enum
 from functools import wraps
 import logging
 import os
@@ -69,8 +72,8 @@ blacklisted_tokens = set()  # In production, use Redis or database
 # ============================================================================
 
 
-class UserRole(str):
-    """User role enumeration"""
+class UserRole(str, Enum):
+    """User role enumeration - RFC 7519 compliant role-based access control"""
 
     SUPER_ADMIN = "super_admin"
     ADMIN = "admin"
@@ -89,8 +92,8 @@ ROLE_HIERARCHY = {
 }
 
 
-class TokenType(str):
-    """Token type enumeration"""
+class TokenType(str, Enum):
+    """Token type enumeration - access and refresh token types"""
 
     ACCESS = "access"
     REFRESH = "refresh"

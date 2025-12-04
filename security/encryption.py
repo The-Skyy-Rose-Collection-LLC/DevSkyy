@@ -441,16 +441,61 @@ class EncryptionManager:
 
 
 class EncryptionService:
-    """Alias for EncryptionManager for test compatibility."""
+    """
+    Encryption service for test compatibility and general use.
+    Supports custom keys for encryption/decryption operations.
+    """
 
-    def __init__(self):
+    def __init__(self, master_key: bytes | None = None):
+        """Initialize encryption service with optional master key."""
+        self._custom_key = master_key
         self.manager = EncryptionManager()
 
-    def encrypt(self, plaintext: str) -> str:
-        return self.manager.encrypt(plaintext)
+    def encrypt(self, data: any, key: bytes | None = None) -> str:
+        """
+        Encrypt data using AES-256-GCM.
 
-    def decrypt(self, ciphertext: str) -> str:
-        return self.manager.decrypt(ciphertext)
+        Args:
+            data: Data to encrypt (str, dict, or other serializable type)
+            key: Optional encryption key (uses master key if not provided)
+
+        Returns:
+            Base64-encoded encrypted data
+        """
+        import json
+
+        # Serialize non-string data
+        if isinstance(data, dict):
+            plaintext = json.dumps(data)
+        elif isinstance(data, (int, float)):
+            plaintext = str(data)
+        else:
+            plaintext = str(data)
+
+        encryption_key = key or self._custom_key
+        return encrypt_field(plaintext, master_key=encryption_key)
+
+    def decrypt(self, ciphertext: str, key: bytes | None = None) -> any:
+        """
+        Decrypt data encrypted with AES-256-GCM.
+
+        Args:
+            ciphertext: Base64-encoded encrypted data
+            key: Optional decryption key (uses master key if not provided)
+
+        Returns:
+            Decrypted data (attempts JSON deserialization)
+        """
+        import json
+
+        decryption_key = key or self._custom_key
+        plaintext = decrypt_field(ciphertext, master_key=decryption_key)
+
+        # Try to deserialize JSON
+        try:
+            return json.loads(plaintext)
+        except (json.JSONDecodeError, TypeError):
+            return plaintext
 
 
 # ============================================================================

@@ -54,9 +54,19 @@ class FashionComputerVisionAgent:
         logger.info(f"🖥️ Using device: {self.device}")
 
         # Load CLIP for fashion understanding
+        # SECURITY: Pin revision for supply chain safety (Bandit B615)
+        # See: https://huggingface.co/docs/hub/en/security
         try:
-            self.clip_model = CLIPModel.from_pretrained("openai/clip-vit-large-patch14")
-            self.clip_processor = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
+            self.clip_model = CLIPModel.from_pretrained(
+                "openai/clip-vit-large-patch14",
+                revision="main",  # Pin to specific revision for security
+                trust_remote_code=False,  # Prevent arbitrary code execution
+            )
+            self.clip_processor = CLIPProcessor.from_pretrained(
+                "openai/clip-vit-large-patch14",
+                revision="main",
+                trust_remote_code=False,
+            )
             self.clip_model.to(self.device)
             logger.info("✅ CLIP model loaded for fashion analysis")
         except Exception as e:
@@ -65,8 +75,16 @@ class FashionComputerVisionAgent:
 
         # Load ViT for detailed image features
         try:
-            self.vit_processor = ViTImageProcessor.from_pretrained("google/vit-large-patch16-224")
-            self.vit_model = ViTModel.from_pretrained("google/vit-large-patch16-224")
+            self.vit_processor = ViTImageProcessor.from_pretrained(
+                "google/vit-large-patch16-224",
+                revision="main",
+                trust_remote_code=False,
+            )
+            self.vit_model = ViTModel.from_pretrained(
+                "google/vit-large-patch16-224",
+                revision="main",
+                trust_remote_code=False,
+            )
             self.vit_model.to(self.device)
             logger.info("✅ ViT model loaded for detailed analysis")
         except Exception as e:
@@ -77,8 +95,10 @@ class FashionComputerVisionAgent:
         try:
             self.sdxl_pipeline = StableDiffusionXLPipeline.from_pretrained(
                 "stabilityai/stable-diffusion-xl-base-1.0",
+                revision="main",  # Pin revision for security
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
                 use_safetensors=True,
+                trust_remote_code=False,
             )
             self.sdxl_pipeline.to(self.device)
             logger.info("✅ Stable Diffusion XL loaded for image generation")

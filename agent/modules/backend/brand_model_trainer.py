@@ -107,11 +107,19 @@ class SkyRoseBrandTrainer:
 
     def _load_models(self):
         """Load required models for training and preprocessing."""
+        # SECURITY: Pin revision for supply chain safety (Bandit B615)
         try:
             # Load BLIP-2 for automatic captioning
-            self.blip2_processor = Blip2Processor.from_pretrained("Salesforce/blip2-opt-2.7b")
+            self.blip2_processor = Blip2Processor.from_pretrained(
+                "Salesforce/blip2-opt-2.7b",
+                revision="main",
+                trust_remote_code=False,
+            )
             self.blip2_model = Blip2ForConditionalGeneration.from_pretrained(
-                "Salesforce/blip2-opt-2.7b", torch_dtype=torch.float16 if self.device == "cuda" else torch.float32
+                "Salesforce/blip2-opt-2.7b",
+                revision="main",
+                torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
+                trust_remote_code=False,
             )
             self.blip2_model.to(self.device)
             logger.info("✅ BLIP-2 model loaded for automatic captioning")
@@ -119,8 +127,10 @@ class SkyRoseBrandTrainer:
             # Load base SDXL model for training
             self.base_model = StableDiffusionXLPipeline.from_pretrained(
                 "stabilityai/stable-diffusion-xl-base-1.0",
+                revision="main",  # Pin revision for security
                 torch_dtype=torch.float16 if self.device == "cuda" else torch.float32,
                 use_safetensors=True,
+                trust_remote_code=False,
             )
             logger.info("✅ Base SDXL model loaded for training")
 

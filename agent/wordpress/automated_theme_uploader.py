@@ -2,6 +2,9 @@
 """
 Automated WordPress Theme Uploader & Deployment System
 Enterprise-grade theme deployment with multiple upload methods and validation
+
+SECURITY NOTE: FTP is deprecated. Use SFTP or WordPress REST API instead.
+Per CWE-319: Cleartext Transmission of Sensitive Information
 """
 
 import base64
@@ -9,16 +12,29 @@ import contextlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import ftplib
 import hashlib
+import logging
 import os
 from pathlib import Path
 import tempfile
 from typing import Any
+import warnings
 import zipfile
 
 import paramiko
 import requests
+
+# SECURITY: FTP is insecure - import with deprecation warning
+# Per Bandit B402: FTP-related module is considered insecure
+# Use SFTP instead for production deployments
+with warnings.catch_warnings():
+    warnings.filterwarnings("default", category=DeprecationWarning)
+    import ftplib  # nosec B402 - Legacy support only, SFTP is preferred
+
+    logging.getLogger(__name__).warning(
+        "FTP module imported for legacy support. "
+        "Use SFTP (UploadMethod.SFTP) for secure file transfers in production."
+    )
 
 from core.logging import LogCategory, enterprise_logger
 
