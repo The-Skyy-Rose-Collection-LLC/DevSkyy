@@ -62,6 +62,7 @@ help:
 install: ## Install production dependencies
 	@echo "$(BLUE)Installing DevSkyy in production mode...$(RESET)"
 	pip install --upgrade pip
+	pip install -c constraints.txt -r requirements.txt
 	pip install -e .
 
 dev-install: install ## Install development dependencies

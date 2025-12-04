@@ -21,18 +21,19 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy requirements (lightweight production version)
-COPY requirements-production.txt .
+COPY requirements-production.txt constraints.txt ./
 
 # Install Python dependencies (excludes heavy ML libs to reduce size)
 # SECURITY: Fixes CRITICAL CVEs per SECURITY_SCAN_REPORT_20251118.md
 # - pip>=25.3: Fixes CVE-2025-8869 (path traversal)
 # - cryptography>=46.0.3: Fixes CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27
 # - setuptools>=78.1.1: Fixes CVE-2025-47273, CVE-2024-6345
+# The constraints file pins setuptools<81 in build isolation to avoid pkg_resources deprecation
 RUN pip install --no-cache-dir --user --upgrade \
     "pip>=25.3" \
     "cryptography>=46.0.3,<47.0.0" \
     "setuptools>=78.1.1,<79.0.0" && \
-    pip install --no-cache-dir --user -r requirements-production.txt
+    pip install --no-cache-dir --user -c constraints.txt -r requirements-production.txt
 
 # ============================================================================
 # Stage 2: Production Runtime

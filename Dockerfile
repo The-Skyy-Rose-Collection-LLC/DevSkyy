@@ -63,7 +63,7 @@ WORKDIR /app
 FROM base AS dependencies
 
 # Copy requirements files first (Docker layer caching optimization)
-COPY requirements.txt requirements-production.txt ./
+COPY requirements.txt requirements-production.txt constraints.txt ./
 
 # SECURITY: Install critical security updates per Truth Protocol Rule #13
 # - pip>=25.3: Fixes CVE-2025-8869 (path traversal)
@@ -74,8 +74,9 @@ RUN pip install --no-cache-dir --upgrade \
     "cryptography>=46.0.3,<47.0.0" \
     "setuptools>=78.1.1,<79.0.0"
 
-# Install production dependencies
-RUN pip install --no-cache-dir --user -r requirements-production.txt
+# Install production dependencies with constraints to avoid pkg_resources deprecation
+# The constraints file pins setuptools<81 in build isolation environments
+RUN pip install --no-cache-dir --user -c constraints.txt -r requirements-production.txt
 
 # ============================================================================
 # Stage 3: Development Environment (Optional Target)

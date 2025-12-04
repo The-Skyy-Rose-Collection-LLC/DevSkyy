@@ -1,0 +1,25 @@
+# ============================================================================
+# PIP CONSTRAINTS FILE
+# ============================================================================
+# This file constrains package versions during pip installation to prevent
+# build isolation from using incompatible versions.
+#
+# Usage:
+#   pip install -r requirements.txt -c constraints.txt
+#
+# Why this exists:
+#   - Some packages (like openai-whisper) use pkg_resources in their setup.py
+#   - setuptools>=81 deprecated pkg_resources (slated for removal 2025-11-30)
+#   - Constraining setuptools in build isolation prevents deprecation warnings
+#     and potential build failures
+#
+# Reference: https://setuptools.pypa.io/en/latest/pkg_resources.html
+# ============================================================================
+
+# Constrain setuptools for build isolation environments
+# This prevents the pkg_resources deprecation warning when building packages
+# like openai-whisper that haven't migrated away from pkg_resources
+setuptools<81
+
+# Wheel is required for building packages
+wheel>=0.44.0

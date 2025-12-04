@@ -3,7 +3,10 @@
 # Stable, security-hardened production-only dependencies
 # Version: 1.0.0
 # ============================================================================
-# INSTALL: pip install -r requirements-production.txt
+# INSTALL: pip install -c constraints.txt -r requirements-production.txt
+#
+# Use constraints.txt to prevent pkg_resources deprecation warnings from
+# packages like openai-whisper that haven't migrated away from pkg_resources.
 #
 # This is a condensed version of requirements.txt optimized for production
 # deployments. It excludes development and optional tools.

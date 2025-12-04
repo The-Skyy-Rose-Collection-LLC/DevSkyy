@@ -1,8 +1,14 @@
 # DevSkyy Enterprise Platform - Security-Hardened Production Dependencies
 # Core production dependencies only - NO dev/test tools
-# Last security audit: 2025-11-29
+# Last security audit: 2025-12-04
 # Version Strategy: ~= for compatible releases, >=,< for security-critical packages
 # Per CLAUDE.md Truth Protocol - Enterprise-Grade Security & Performance
+#
+# INSTALLATION: Use constraints.txt to avoid pkg_resources deprecation warnings
+#   pip install -c constraints.txt -r requirements.txt
+#
+# This prevents setuptools>=81 from being used in build isolation, which
+# deprecated pkg_resources (used by packages like openai-whisper).
 
 # ============================================================================
 # BUILD DEPENDENCIES (Security-Critical)
