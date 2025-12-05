@@ -1,0 +1,390 @@
+/**
+ * SkyyRose Custom Styles for Shoptimizer Theme
+ * Domain: skyyrose.co
+ *
+ * Add this CSS via:
+ * - Elementor > Custom CSS
+ * - Appearance > Customize > Additional CSS
+ * - Child theme style.css
+ */
+
+/* ==========================================================================
+   CSS Custom Properties (Brand Tokens)
+   ========================================================================== */
+
+:root {
+  /* Primary Colors */
+  --sr-rosewood: #8B4557;
+  --sr-onyx: #1A1A1A;
+  --sr-ivory: #F5F5F0;
+
+  /* Secondary Colors */
+  --sr-gold: #C9A962;
+  --sr-heather: #9B9B9B;
+  --sr-cream: #FFF8F0;
+
+  /* UI Colors */
+  --sr-bg: #FFFFFF;
+  --sr-surface: #FAFAFA;
+  --sr-border: #E5E5E5;
+  --sr-text: #1A1A1A;
+  --sr-text-muted: #6B6B6B;
+
+  /* Typography */
+  --sr-font-heading: 'Playfair Display', serif;
+  --sr-font-body: 'Inter', sans-serif;
+  --sr-font-accent: 'Cormorant Garamond', serif;
+
+  /* Spacing */
+  --sr-space-xs: 0.25rem;
+  --sr-space-sm: 0.5rem;
+  --sr-space-md: 1rem;
+  --sr-space-lg: 2rem;
+  --sr-space-xl: 4rem;
+  --sr-space-section: 6rem;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+body {
+  font-family: var(--sr-font-body);
+  color: var(--sr-text);
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6,
+.woocommerce div.product .product_title,
+.elementor-heading-title {
+  font-family: var(--sr-font-heading);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--sr-onyx);
+}
+
+/* Accent text for quotes, taglines */
+.sr-accent-text,
+blockquote {
+  font-family: var(--sr-font-accent);
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Header & Navigation
+   ========================================================================== */
+
+.site-header,
+.flavor-header {
+  background: var(--sr-bg);
+  border-bottom: 1px solid var(--sr-border);
+}
+
+.site-header .site-title,
+.flavor-header .site-title {
+  font-family: var(--sr-font-heading);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  color: var(--sr-onyx);
+}
+
+/* Navigation Links */
+.main-navigation a,
+.flavor-nav a {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sr-text);
+  transition: color 0.2s ease;
+}
+
+.main-navigation a:hover,
+.flavor-nav a:hover {
+  color: var(--sr-rosewood);
+}
+
+/* ==========================================================================
+   Buttons & CTAs
+   ========================================================================== */
+
+/* Primary Button */
+.button,
+.btn,
+button[type="submit"],
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.elementor-button {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 0.8125rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: var(--sr-onyx);
+  color: var(--sr-ivory);
+  border: none;
+  border-radius: 2px;
+  padding: 1rem 2rem;
+  transition: all 0.3s ease;
+}
+
+.button:hover,
+.btn:hover,
+button[type="submit"]:hover,
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover,
+.elementor-button:hover {
+  background: var(--sr-rosewood);
+  color: var(--sr-ivory);
+}
+
+/* Secondary/Outline Button */
+.button.alt,
+.btn-outline,
+.woocommerce a.button.alt {
+  background: transparent;
+  border: 1px solid var(--sr-onyx);
+  color: var(--sr-onyx);
+}
+
+.button.alt:hover,
+.btn-outline:hover,
+.woocommerce a.button.alt:hover {
+  background: var(--sr-onyx);
+  color: var(--sr-ivory);
+}
+
+/* ==========================================================================
+   WooCommerce Product Grid
+   ========================================================================== */
+
+.woocommerce ul.products li.product {
+  text-align: center;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+  font-family: var(--sr-font-heading);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--sr-onyx);
+  margin-top: var(--sr-space-md);
+}
+
+.woocommerce ul.products li.product .price {
+  font-family: var(--sr-font-body);
+  font-size: 0.875rem;
+  color: var(--sr-text-muted);
+}
+
+/* Product Image Hover Effect */
+.woocommerce ul.products li.product a img {
+  transition: opacity 0.3s ease;
+}
+
+.woocommerce ul.products li.product a:hover img {
+  opacity: 0.9;
+}
+
+/* ==========================================================================
+   Single Product Page
+   ========================================================================== */
+
+.woocommerce div.product .product_title {
+  font-size: 1.75rem;
+  margin-bottom: var(--sr-space-sm);
+}
+
+.woocommerce div.product p.price {
+  font-family: var(--sr-font-body);
+  font-size: 1.25rem;
+  color: var(--sr-text);
+  font-weight: 400;
+}
+
+.woocommerce div.product .woocommerce-product-details__short-description {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--sr-text-muted);
+}
+
+/* Quantity Input */
+.woocommerce .quantity .qty {
+  border: 1px solid var(--sr-border);
+  border-radius: 2px;
+}
+
+/* Add to Cart Button (Single Product) */
+.woocommerce div.product form.cart .single_add_to_cart_button {
+  background: var(--sr-onyx);
+  padding: 1rem 3rem;
+}
+
+.woocommerce div.product form.cart .single_add_to_cart_button:hover {
+  background: var(--sr-rosewood);
+}
+
+/* ==========================================================================
+   Cart & Checkout
+   ========================================================================== */
+
+.woocommerce-cart table.cart,
+.woocommerce-checkout .woocommerce-checkout-review-order-table {
+  border: 1px solid var(--sr-border);
+}
+
+.woocommerce-cart table.cart th,
+.woocommerce-checkout .woocommerce-checkout-review-order-table th {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--sr-text-muted);
+}
+
+/* Checkout Form */
+.woocommerce form .form-row input.input-text,
+.woocommerce form .form-row textarea,
+.woocommerce form .form-row select {
+  border: 1px solid var(--sr-border);
+  border-radius: 2px;
+  padding: 0.75rem 1rem;
+  font-family: var(--sr-font-body);
+}
+
+.woocommerce form .form-row input.input-text:focus,
+.woocommerce form .form-row textarea:focus {
+  border-color: var(--sr-onyx);
+  outline: none;
+}
+
+/* ==========================================================================
+   Sale Badge
+   ========================================================================== */
+
+.woocommerce span.onsale {
+  background: var(--sr-rosewood);
+  color: var(--sr-ivory);
+  font-family: var(--sr-font-body);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  border-radius: 0;
+  padding: 0.5rem 0.75rem;
+}
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+.site-footer,
+.flavor-footer {
+  background: var(--sr-onyx);
+  color: var(--sr-ivory);
+  padding: var(--sr-space-section) 0;
+}
+
+.site-footer a,
+.flavor-footer a {
+  color: var(--sr-ivory);
+  opacity: 0.8;
+  transition: opacity 0.2s ease;
+}
+
+.site-footer a:hover,
+.flavor-footer a:hover {
+  opacity: 1;
+  color: var(--sr-ivory);
+}
+
+.site-footer h4,
+.flavor-footer h4 {
+  font-family: var(--sr-font-body);
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--sr-ivory);
+  margin-bottom: var(--sr-space-md);
+}
+
+/* ==========================================================================
+   Elementor Overrides
+   ========================================================================== */
+
+/* Section Spacing */
+.elementor-section {
+  padding: var(--sr-space-xl) 0;
+}
+
+.elementor-section.sr-hero {
+  padding: var(--sr-space-section) 0;
+}
+
+/* Elementor Headings */
+.elementor-widget-heading .elementor-heading-title {
+  font-family: var(--sr-font-heading);
+}
+
+/* Elementor Text */
+.elementor-widget-text-editor {
+  font-family: var(--sr-font-body);
+  line-height: 1.7;
+}
+
+/* Image Hover */
+.elementor-widget-image img {
+  transition: transform 0.4s ease;
+}
+
+.elementor-widget-image:hover img {
+  transform: scale(1.02);
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.sr-text-rosewood { color: var(--sr-rosewood); }
+.sr-text-onyx { color: var(--sr-onyx); }
+.sr-text-gold { color: var(--sr-gold); }
+.sr-text-muted { color: var(--sr-text-muted); }
+
+.sr-bg-ivory { background-color: var(--sr-ivory); }
+.sr-bg-cream { background-color: var(--sr-cream); }
+.sr-bg-onyx { background-color: var(--sr-onyx); }
+.sr-bg-surface { background-color: var(--sr-surface); }
+
+.sr-font-heading { font-family: var(--sr-font-heading); }
+.sr-font-body { font-family: var(--sr-font-body); }
+.sr-font-accent { font-family: var(--sr-font-accent); }
+
+.sr-uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  :root {
+    --sr-space-section: 4rem;
+  }
+
+  .woocommerce div.product .product_title {
+    font-size: 1.5rem;
+  }
+
+  .button,
+  .woocommerce a.button,
+  .woocommerce button.button {
+    padding: 0.875rem 1.5rem;
+  }
+}
