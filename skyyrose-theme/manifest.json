@@ -1,0 +1,96 @@
+{
+  "name": "SkyyRose Theme Customizations",
+  "version": "1.0.0",
+  "description": "SkyyRose brand customizations for Shoptimizer theme",
+  "base_theme": "flavor",
+  "domain": "skyyrose.co",
+  "brand": {
+    "name": "SkyyRose",
+    "tagline": "Luxury Streetwear. Oakland Authenticity.",
+    "incorrect_spellings": ["Skyy Rose", "skyy rose", "SKYYROSE", "SkyRose"]
+  },
+  "tokens": {
+    "colors": {
+      "primary": {
+        "rosewood": "#8B4557",
+        "onyx": "#1A1A1A",
+        "ivory": "#F5F5F0"
+      },
+      "secondary": {
+        "gold": "#C9A962",
+        "heather": "#9B9B9B",
+        "cream": "#FFF8F0"
+      },
+      "ui": {
+        "background": "#FFFFFF",
+        "surface": "#FAFAFA",
+        "border": "#E5E5E5",
+        "text-primary": "#1A1A1A",
+        "text-secondary": "#6B6B6B",
+        "accent": "#8B4557"
+      }
+    },
+    "typography": {
+      "heading": {
+        "family": "'Playfair Display', serif",
+        "weight": "500",
+        "letter-spacing": "0.02em"
+      },
+      "body": {
+        "family": "'Inter', sans-serif",
+        "weight": "400",
+        "line-height": "1.6"
+      },
+      "accent": {
+        "family": "'Cormorant Garamond', serif",
+        "weight": "500",
+        "style": "italic"
+      }
+    },
+    "spacing": {
+      "xs": "0.25rem",
+      "sm": "0.5rem",
+      "md": "1rem",
+      "lg": "2rem",
+      "xl": "4rem",
+      "section": "6rem"
+    },
+    "borders": {
+      "radius-sm": "2px",
+      "radius-md": "4px",
+      "radius-lg": "8px"
+    }
+  },
+  "collections": {
+    "love-hurts": {
+      "name": "Love Hurts",
+      "description": "Bold statements on heartbreak and resilience",
+      "season": "SS25"
+    },
+    "signature": {
+      "name": "Signature Collection",
+      "description": "Essential pieces with refined details",
+      "season": "Core"
+    }
+  },
+  "assets": {
+    "images": {
+      "products": {
+        "love-hurts": [
+          "the-heart-arose-track-pant-onyx.jpg",
+          "the-heart-arose-track-pant-ivory.jpg",
+          "the-heart-arose-bomber.jpg",
+          "devoted-short-front.jpg",
+          "devoted-short-back.jpg"
+        ],
+        "signature": [
+          "the-standard-tee-rosewood.jpg",
+          "the-standard-tee-ivory.jpg",
+          "the-crest-beanie-heather.jpg",
+          "the-crest-beanie-onyx.jpg",
+          "the-piedmont-jacket.jpg"
+        ]
+      }
+    }
+  }
+}
