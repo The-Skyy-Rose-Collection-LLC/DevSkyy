@@ -4,7 +4,6 @@ from typing import Any
 from fastapi import APIRouter, Depends, HTTPException
 import numpy as np
 from pydantic import BaseModel, Field
-import torch  # noqa: F401 - Reserved for Phase 3 PyTorch models
 
 from ml import ModelStage, explainer, model_registry, redis_cache
 from security.jwt_auth import TokenData, get_current_active_user, require_developer
@@ -14,6 +13,14 @@ from security.jwt_auth import TokenData, get_current_active_user, require_develo
 ML Infrastructure API Endpoints
 Model registry, caching, and explainability services
 """
+
+# Optional torch import - reserved for Phase 3 PyTorch models
+TORCH_AVAILABLE = False
+try:
+    import torch  # noqa: F401
+    TORCH_AVAILABLE = True
+except ImportError:
+    pass
 
 # MLModelRequest imported when needed
 

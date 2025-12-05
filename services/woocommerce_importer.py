@@ -11,12 +11,23 @@ Truth Protocol: All operations validated, errors logged, no placeholders
 import asyncio
 from datetime import datetime
 import logging
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
 from pydantic import BaseModel, Field, validator
 from woocommerce import API as WooCommerceAPI
+
+# Optional Google dependencies - only required for Sheets import
+GOOGLE_AVAILABLE = False
+try:
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    GOOGLE_AVAILABLE = True
+except ImportError:
+    Credentials = None  # type: ignore[misc, assignment]
+    build = None  # type: ignore[assignment]
+
+if TYPE_CHECKING:
+    from google.oauth2.credentials import Credentials
 
 
 logger = logging.getLogger(__name__)
@@ -92,7 +103,7 @@ class WooCommerceImporterService:
         woo_url: str,
         woo_consumer_key: str,
         woo_consumer_secret: str,
-        google_credentials: Credentials,
+        google_credentials: "Credentials",
         telegram_bot_token: str | None = None,
         telegram_chat_id: str | None = None,
         batch_size: int = 10,
@@ -110,7 +121,15 @@ class WooCommerceImporterService:
             telegram_chat_id: Optional Telegram chat ID
             batch_size: Number of products to process in each batch
             max_retries: Maximum retry attempts for failed operations
+
+        Raises:
+            ImportError: If google-api-python-client is not installed
         """
+        if not GOOGLE_AVAILABLE:
+            raise ImportError(
+                "Google API dependencies not installed. "
+                "Install with: pip install google-api-python-client google-auth"
+            )
         self.woo_client = WooCommerceAPI(
             url=woo_url,
             consumer_key=woo_consumer_key,

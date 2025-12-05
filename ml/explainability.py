@@ -2,7 +2,6 @@ import logging
 from typing import Any
 
 import numpy as np
-import shap
 
 
 """
@@ -12,11 +11,14 @@ References: SHAP (https://github.com/slundberg/shap), Lundberg & Lee, NIPS 2017
 
 logger = logging.getLogger(__name__)
 
-try:
+# Lazy import for optional heavy dependency
+shap = None
+SHAP_AVAILABLE = False
 
+try:
+    import shap
     SHAP_AVAILABLE = True
 except ImportError:
-    SHAP_AVAILABLE = False
     logger.warning("SHAP not installed - explainability features disabled")
 
 
