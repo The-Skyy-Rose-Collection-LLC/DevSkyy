@@ -196,9 +196,19 @@ class DashboardService:
                         )
                     )
 
-        except Exception:
-            # Return empty list on error
-            pass
+        except Exception as e:
+            # Log error and return empty list (Rule #10: No-Skip Rule)
+            logger.error(f"Failed to fetch active agents: {e}", exc_info=True)
+            # Record to error ledger
+            from core.error_ledger import record_error
+
+            record_error(
+                error_type="AgentFetchError",
+                message=f"Failed to fetch active agents: {str(e)}",
+                severity="MEDIUM",
+                component="api.v1.dashboard",
+                exception=e,
+            )
 
         return agents
 
@@ -300,9 +310,7 @@ async def get_dashboard_page(request: Request):
 @router.get("/dashboard/data", response_model=DashboardDataModel)
 async def get_dashboard_data(
     request: Request,
-    current_user: dict[str, Any] = Depends(
-        require_authenticated if SECURITY_AVAILABLE else get_current_user
-    ),
+    current_user: dict[str, Any] = Depends(require_authenticated if SECURITY_AVAILABLE else get_current_user),
 ):
     """
     Return the full dashboard payload containing system metrics, agent statuses, recent activity logs, and performance history.
@@ -343,9 +351,7 @@ async def get_dashboard_data(
 @router.get("/dashboard/metrics", response_model=SystemMetricsModel)
 async def get_system_metrics(
     request: Request,
-    current_user: dict[str, Any] = Depends(
-        require_authenticated if SECURITY_AVAILABLE else get_current_user
-    ),
+    current_user: dict[str, Any] = Depends(require_authenticated if SECURITY_AVAILABLE else get_current_user),
 ):
     """
     Retrieve current system performance metrics for the dashboard.
@@ -364,9 +370,7 @@ async def get_system_metrics(
 @router.get("/dashboard/agents", response_model=list[AgentStatusModel])
 async def get_agent_status(
     request: Request,
-    current_user: dict[str, Any] = Depends(
-        require_authenticated if SECURITY_AVAILABLE else get_current_user
-    ),
+    current_user: dict[str, Any] = Depends(require_authenticated if SECURITY_AVAILABLE else get_current_user),
 ):
     """
     Return statuses for all registered agents.
@@ -386,9 +390,7 @@ async def get_agent_status(
 async def get_recent_activities(
     request: Request,
     limit: int = 10,
-    current_user: dict[str, Any] = Depends(
-        require_authenticated if SECURITY_AVAILABLE else get_current_user
-    ),
+    current_user: dict[str, Any] = Depends(require_authenticated if SECURITY_AVAILABLE else get_current_user),
 ):
     """
     Return recent system activity log entries for the dashboard.
@@ -411,9 +413,7 @@ async def get_recent_activities(
 async def get_performance_history(
     request: Request,
     hours: int = 24,
-    current_user: dict[str, Any] = Depends(
-        require_authenticated if SECURITY_AVAILABLE else get_current_user
-    ),
+    current_user: dict[str, Any] = Depends(require_authenticated if SECURITY_AVAILABLE else get_current_user),
 ):
     """
     Return performance history datapoints for the specified past number of hours.

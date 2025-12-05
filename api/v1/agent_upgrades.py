@@ -24,16 +24,21 @@ router = APIRouter(prefix="/api/v1/upgrades", tags=["upgrades", "rlvr"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class UpgradeDeployRequest(BaseModel):
     """Request to deploy an upgrade to an agent."""
+
     agent_type: str = Field(..., description="Agent type (scanner, product_manager, etc.)")
     enable_ab_test: bool = Field(True, description="Enable A/B testing before full deployment")
 
 
 class UpgradeVerificationRequest(BaseModel):
     """Submit verification data for an upgrade."""
+
     upgrade_id: uuid.UUID
-    verification_method: str = Field(..., pattern="^(user_feedback|test_execution|code_analysis|business_metrics|automated_check)$")
+    verification_method: str = Field(
+        ..., pattern="^(user_feedback|test_execution|code_analysis|business_metrics|automated_check)$"
+    )
 
     # Optional verification data fields
     thumbs_up: bool | None = None
@@ -56,6 +61,7 @@ class UpgradeVerificationRequest(BaseModel):
 
 class ABTestResultRequest(BaseModel):
     """Submit A/B test result."""
+
     ab_test_id: uuid.UUID
     variant: str = Field(..., pattern="^(variant_a|variant_b)$")
     score: float = Field(..., ge=0.0, le=1.0)
@@ -65,11 +71,12 @@ class ABTestResultRequest(BaseModel):
 # DEPLOYMENT ENDPOINTS
 # ============================================================================
 
+
 @router.post("/deploy", status_code=status.HTTP_201_CREATED)
 async def deploy_upgrade(
     request: UpgradeDeployRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Deploy an upgrade to a specific agent.
@@ -86,33 +93,22 @@ async def deploy_upgrade(
 
     try:
         result = await upgrade_system.deploy_upgrade(
-            agent_type=request.agent_type,
-            user_id=current_user.id,
-            enable_ab_test=request.enable_ab_test
+            agent_type=request.agent_type, user_id=current_user.id, enable_ab_test=request.enable_ab_test
         )
 
-        return {
-            "success": True,
-            "message": f"Upgrade deployed to {request.agent_type}",
-            **result
-        }
+        return {"success": True, "message": f"Upgrade deployed to {request.agent_type}", **result}
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to deploy upgrade: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to deploy upgrade: {e!s}"
         )
 
 
 @router.post("/deploy-all", status_code=status.HTTP_201_CREATED)
 async def deploy_all_upgrades(
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    current_user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db_session)
 ):
     """
     Deploy upgrades to ALL agent categories.
@@ -132,20 +128,17 @@ async def deploy_all_upgrades(
     upgrade_system = AgentUpgradeSystem(session)
 
     try:
-        result = await upgrade_system.deploy_all_upgrades(
-            user_id=current_user.id
-        )
+        result = await upgrade_system.deploy_all_upgrades(user_id=current_user.id)
 
         return {
             "success": True,
             "message": f"Deployed upgrades to {result['successful_deployments']} agents",
-            **result
+            **result,
         }
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to deploy upgrades: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to deploy upgrades: {e!s}"
         )
 
 
@@ -153,11 +146,12 @@ async def deploy_all_upgrades(
 # VERIFICATION ENDPOINTS
 # ============================================================================
 
+
 @router.post("/verify", status_code=status.HTTP_200_OK)
 async def verify_upgrade(
     request: UpgradeVerificationRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Submit verification data for an upgrade.
@@ -182,68 +176,62 @@ async def verify_upgrade(
         verification_data = {}
 
         if method == VerificationMethod.USER_FEEDBACK:
-            verification_data.update({
-                "thumbs_up": request.thumbs_up,
-                "user_rating": request.user_rating,
-                "user_feedback": request.user_feedback,
-                "user_id": current_user.id
-            })
+            verification_data.update(
+                {
+                    "thumbs_up": request.thumbs_up,
+                    "user_rating": request.user_rating,
+                    "user_feedback": request.user_feedback,
+                    "user_id": current_user.id,
+                }
+            )
 
         elif method == VerificationMethod.TEST_EXECUTION:
             if request.tests_passed is None or request.tests_total is None:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="tests_passed and tests_total are required for test_execution"
+                    detail="tests_passed and tests_total are required for test_execution",
                 )
-            verification_data.update({
-                "tests_passed": request.tests_passed,
-                "tests_total": request.tests_total,
-                "test_output": request.test_output
-            })
+            verification_data.update(
+                {
+                    "tests_passed": request.tests_passed,
+                    "tests_total": request.tests_total,
+                    "test_output": request.test_output,
+                }
+            )
 
         elif method == VerificationMethod.CODE_ANALYSIS:
-            verification_data.update({
-                "lint_score": request.lint_score,
-                "complexity_score": request.complexity_score,
-                "security_score": request.security_score
-            })
+            verification_data.update(
+                {
+                    "lint_score": request.lint_score,
+                    "complexity_score": request.complexity_score,
+                    "security_score": request.security_score,
+                }
+            )
 
         elif method == VerificationMethod.BUSINESS_METRICS:
-            verification_data.update({
-                "revenue_impact_usd": request.revenue_impact_usd,
-                "conversion_impact": request.conversion_impact
-            })
+            verification_data.update(
+                {"revenue_impact_usd": request.revenue_impact_usd, "conversion_impact": request.conversion_impact}
+            )
 
         elif method == VerificationMethod.AUTOMATED_CHECK:
             if request.passed is None:
                 raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="passed is required for automated_check"
+                    status_code=status.HTTP_400_BAD_REQUEST, detail="passed is required for automated_check"
                 )
             verification_data["passed"] = request.passed
 
         # Submit verification
         result = await upgrade_system.verify_upgrade(
-            upgrade_id=request.upgrade_id,
-            verification_method=method,
-            **verification_data
+            upgrade_id=request.upgrade_id, verification_method=method, **verification_data
         )
 
-        return {
-            "success": True,
-            "message": "Verification submitted successfully",
-            **result
-        }
+        return {"success": True, "message": "Verification submitted successfully", **result}
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to verify upgrade: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to verify upgrade: {e!s}"
         )
 
 
@@ -251,11 +239,12 @@ async def verify_upgrade(
 # STATUS ENDPOINTS
 # ============================================================================
 
+
 @router.get("/{upgrade_id}/status")
 async def get_upgrade_status(
     upgrade_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Get the current status of an upgrade deployment.
@@ -271,27 +260,19 @@ async def get_upgrade_status(
     try:
         status_data = await upgrade_system.get_upgrade_status(upgrade_id)
 
-        return {
-            "success": True,
-            **status_data
-        }
+        return {"success": True, **status_data}
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get upgrade status: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get upgrade status: {e!s}"
         )
 
 
 @router.get("/status/all")
 async def get_all_upgrades_status(
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    current_user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db_session)
 ):
     """
     Get status of all active upgrades.
@@ -303,15 +284,11 @@ async def get_all_upgrades_status(
     try:
         status_data = await upgrade_system.get_all_upgrades_status()
 
-        return {
-            "success": True,
-            **status_data
-        }
+        return {"success": True, **status_data}
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get upgrades status: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get upgrades status: {e!s}"
         )
 
 
@@ -319,11 +296,12 @@ async def get_all_upgrades_status(
 # A/B TESTING ENDPOINTS
 # ============================================================================
 
+
 @router.post("/ab-test/record", status_code=status.HTTP_200_OK)
 async def record_ab_test_result(
     request: ABTestResultRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Record A/B test result for a specific variant.
@@ -341,22 +319,16 @@ async def record_ab_test_result(
             WHERE ab_test_id = :ab_test_id AND status = 'running'
         """
 
-        await session.execute(query, {
-            "ab_test_id": request.ab_test_id,
-            "variant": request.variant,
-            "score": request.score
-        })
+        await session.execute(
+            query, {"ab_test_id": request.ab_test_id, "variant": request.variant, "score": request.score}
+        )
         await session.commit()
 
-        return {
-            "success": True,
-            "message": "A/B test result recorded"
-        }
+        return {"success": True, "message": "A/B test result recorded"}
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to record A/B test result: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to record A/B test result: {e!s}"
         )
 
 
@@ -364,7 +336,7 @@ async def record_ab_test_result(
 async def get_ab_test_status(
     ab_test_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Get A/B test status and results.
@@ -401,10 +373,7 @@ async def get_ab_test_status(
         row = result.fetchone()
 
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"A/B test {ab_test_id} not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"A/B test {ab_test_id} not found")
 
         return {
             "success": True,
@@ -412,30 +381,21 @@ async def get_ab_test_status(
             "upgrade_id": str(row[1]),
             "agent_type": row[2],
             "variants": {
-                "a": {
-                    "name": row[3],
-                    "score": float(row[5]) if row[5] else None,
-                    "count": row[7]
-                },
-                "b": {
-                    "name": row[4],
-                    "score": float(row[6]) if row[6] else None,
-                    "count": row[8]
-                }
+                "a": {"name": row[3], "score": float(row[5]) if row[5] else None, "count": row[7]},
+                "b": {"name": row[4], "score": float(row[6]) if row[6] else None, "count": row[8]},
             },
             "winner": row[9],
             "confidence_level": float(row[10]) if row[10] else None,
             "status": row[11],
             "started_at": row[12].isoformat() if row[12] else None,
-            "completed_at": row[13].isoformat() if row[13] else None
+            "completed_at": row[13].isoformat() if row[13] else None,
         }
 
     except HTTPException:
         raise
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get A/B test status: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get A/B test status: {e!s}"
         )
 
 
@@ -443,11 +403,10 @@ async def get_ab_test_status(
 # ANALYTICS ENDPOINTS
 # ============================================================================
 
+
 @router.get("/analytics/summary")
 async def get_upgrade_analytics(
-    days: int = 30,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    days: int = 30, current_user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db_session)
 ):
     """
     Get analytics summary for all upgrades.
@@ -495,7 +454,7 @@ async def get_upgrade_analytics(
                 "total": row[1],
                 "successful": row[2],
                 "success_rate": f"{(row[2] / row[1] * 100):.1f}%" if row[1] > 0 else "0%",
-                "avg_score": float(row[3]) if row[3] else None
+                "avg_score": float(row[3]) if row[3] else None,
             }
             for row in breakdown_result.fetchall()
         ]
@@ -509,22 +468,20 @@ async def get_upgrade_analytics(
                 "rolled_back": overall_row[2],
                 "success_rate": f"{(overall_row[1] / overall_row[0] * 100):.1f}%" if overall_row[0] > 0 else "0%",
                 "avg_score": float(overall_row[3]) if overall_row[3] else None,
-                "avg_expected_improvement": float(overall_row[4]) if overall_row[4] else None
+                "avg_expected_improvement": float(overall_row[4]) if overall_row[4] else None,
             },
-            "by_agent_type": breakdown
+            "by_agent_type": breakdown,
         }
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get upgrade analytics: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get upgrade analytics: {e!s}"
         )
 
 
 @router.get("/catalog")
 async def get_upgrade_catalog(
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    current_user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db_session)
 ):
     """
     Get catalog of available upgrades for all agent types.
@@ -537,7 +494,4 @@ async def get_upgrade_catalog(
     """
     upgrade_system = AgentUpgradeSystem(session)
 
-    return {
-        "success": True,
-        "upgrades": upgrade_system.upgrade_catalog
-    }
+    return {"success": True, "upgrades": upgrade_system.upgrade_catalog}

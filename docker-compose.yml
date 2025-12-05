@@ -11,10 +11,15 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: production
       args:
         PYTHON_VERSION: 3.11
         BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
         VCS_REF: ${VCS_REF:-$(git rev-parse HEAD)}
+        BUILDKIT_INLINE_CACHE: 1
+      cache_from:
+        - devskyy:latest
+    image: devskyy:latest
     container_name: devskyy-api
     restart: unless-stopped
     ports:
@@ -35,11 +40,11 @@ services:
     networks:
       - devskyy-network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/monitoring/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 40s
+      start_period: 60s
     deploy:
       resources:
         limits:

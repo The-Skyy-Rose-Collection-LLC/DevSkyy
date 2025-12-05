@@ -730,9 +730,7 @@ class TestFinancialMetrics:
 
             # Create chargebacks for 2 of them
             if i < 2 and result["status"] == "captured":
-                agent.create_chargeback(
-                    transaction_id=result["transaction_id"], reason=ChargebackReason.FRAUDULENT
-                )
+                agent.create_chargeback(transaction_id=result["transaction_id"], reason=ChargebackReason.FRAUDULENT)
 
         chargeback_rate = agent._calculate_chargeback_rate()
 
@@ -1456,9 +1454,7 @@ class TestDecimalPrecision:
             "status": "captured",
         }
 
-        result = agent.create_chargeback(
-            transaction_id="tx_test", reason=ChargebackReason.FRAUDULENT, amount=99.99
-        )
+        result = agent.create_chargeback(transaction_id="tx_test", reason=ChargebackReason.FRAUDULENT, amount=99.99)
 
         if result["status"] == "received":
             chargeback = agent.chargebacks[result["chargeback_id"]]
@@ -1513,9 +1509,7 @@ class TestErrorHandling:
 
         # Trigger exception
         with patch.object(agent, "_generate_auto_response", side_effect=Exception("Test error")):
-            result = agent.create_chargeback(
-                transaction_id="tx_test", reason=ChargebackReason.FRAUDULENT
-            )
+            result = agent.create_chargeback(transaction_id="tx_test", reason=ChargebackReason.FRAUDULENT)
 
             assert result["status"] == "failed"
             assert "error" in result

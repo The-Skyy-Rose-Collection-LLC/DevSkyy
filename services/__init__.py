@@ -48,8 +48,10 @@ def __getattr__(name: str):
     """
     if name == "ConsensusOrchestrator":
         from services.consensus_orchestrator import ConsensusOrchestrator
+
         return ConsensusOrchestrator
     elif name == "RAGService":
         from services.rag_service import RAGService
+
         return RAGService
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

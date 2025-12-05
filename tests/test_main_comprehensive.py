@@ -144,6 +144,7 @@ class TestApplicationInitialization:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         assert main_module.app.docs_url is None
@@ -706,7 +707,7 @@ class TestAgentEndpoints:
 
         main._agent_cache.clear()
 
-        with patch("main.PROMETHEUS_AVAILABLE", True), patch("main.AI_PREDICTIONS") as mock_metric:
+        with patch("main.PROMETHEUS_AVAILABLE", True), patch("main.AI_PREDICTIONS"):
             with patch("main.AGENT_MODULES_AVAILABLE", True):
                 with patch("main.SecurityAgent") as mock_agent:
                     mock_agent.return_value = MagicMock()
@@ -782,10 +783,7 @@ class TestAdvancedFeatureEndpoints:
         if hasattr(main.app.state, "skyy_rose_3d_pipeline"):
             delattr(main.app.state, "skyy_rose_3d_pipeline")
 
-        response = client.post(
-            "/api/v1/3d/models/upload",
-            json={"file_path": "/test/file.glb", "model_format": "glb"}
-        )
+        response = client.post("/api/v1/3d/models/upload", json={"file_path": "/test/file.glb", "model_format": "glb"})
         assert response.status_code == 503
 
     def test_create_avatar_endpoint_not_available(self, client):
@@ -879,6 +877,7 @@ class TestDevelopmentEndpoints:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         client_dev = TestClient(main_module.app)
@@ -897,6 +896,7 @@ class TestDevelopmentEndpoints:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         main_module._agent_cache["test"] = MagicMock()
@@ -929,6 +929,7 @@ class TestStaticFilesMounting:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         # Verify app was created successfully
@@ -952,6 +953,7 @@ class TestSecretKeyValidation:
             import importlib
 
             import main as main_module
+
             importlib.reload(main_module)
 
     def test_secret_key_default_in_development(self, monkeypatch):
@@ -962,6 +964,7 @@ class TestSecretKeyValidation:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         assert main_module.SECRET_KEY is not None
@@ -983,6 +986,7 @@ class TestCORSAndMiddleware:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         # Verify app was created successfully with CORS
@@ -995,6 +999,7 @@ class TestCORSAndMiddleware:
         import importlib
 
         import main as main_module
+
         importlib.reload(main_module)
 
         # Verify app was created successfully with trusted hosts

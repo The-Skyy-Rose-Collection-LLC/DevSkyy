@@ -9,16 +9,18 @@ This conftest provides:
 """
 
 import asyncio
+from collections.abc import Generator
+import contextlib
 import os
-import sys
 from pathlib import Path
-from typing import AsyncGenerator, Generator
-from unittest.mock import AsyncMock, MagicMock, patch
+import sys
+from unittest.mock import MagicMock, patch
 
-import pytest
 from fastapi.testclient import TestClient
+import pytest
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
+
 
 # Add project root to path
 project_root = Path(__file__).parent.parent
@@ -140,9 +142,7 @@ def auth_headers() -> dict[str, str]:
     """Generate valid JWT auth headers for testing."""
     from security.jwt_auth import create_access_token
 
-    token = create_access_token(
-        data={"sub": "test-user", "role": "Admin"}
-    )
+    token = create_access_token(data={"sub": "test-user", "role": "Admin"})
     return {"Authorization": f"Bearer {token}"}
 
 
@@ -177,10 +177,8 @@ def reset_environment():
     yield
     # Cleanup after test
     if os.path.exists("./test_devskyy.db"):
-        try:
+        with contextlib.suppress(Exception):
             os.remove("./test_devskyy.db")
-        except Exception:
-            pass
 
 
 @pytest.fixture
@@ -202,18 +200,10 @@ def mock_all_external_services(
 # Pytest configuration
 def pytest_configure(config):
     """Configure pytest with custom markers."""
-    config.addinivalue_line(
-        "markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')"
-    )
-    config.addinivalue_line(
-        "markers", "integration: marks tests as integration tests"
-    )
-    config.addinivalue_line(
-        "markers", "unit: marks tests as unit tests"
-    )
-    config.addinivalue_line(
-        "markers", "e2e: marks tests as end-to-end tests"
-    )
+    config.addinivalue_line("markers", "slow: marks tests as slow (deselect with '-m \"not slow\"')")
+    config.addinivalue_line("markers", "integration: marks tests as integration tests")
+    config.addinivalue_line("markers", "unit: marks tests as unit tests")
+    config.addinivalue_line("markers", "e2e: marks tests as end-to-end tests")
 
 
 def pytest_collection_modifyitems(config, items):

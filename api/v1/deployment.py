@@ -49,8 +49,10 @@ router = APIRouter(prefix="/api/v1/deployment", tags=["deployment"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class SubmitJobRequest(BaseModel):
     """Request to submit a deployment job"""
+
     job_name: str
     job_description: str
     category: AgentCategory
@@ -69,6 +71,7 @@ class SubmitJobRequest(BaseModel):
 
 class JobStatusResponse(BaseModel):
     """Response with complete job status"""
+
     job_id: str
     job_name: str
     category: str
@@ -84,11 +87,13 @@ class JobStatusResponse(BaseModel):
 
 class ValidateJobRequest(BaseModel):
     """Request to validate job without deploying"""
+
     job_definition: JobDefinition
 
 
 class RegisterToolRequest(BaseModel):
     """Request to register an available tool"""
+
     tool_name: str
     tool_type: str  # "function", "api", "service"
     rate_limit: int = Field(gt=0, description="Requests per minute")
@@ -97,6 +102,7 @@ class RegisterToolRequest(BaseModel):
 
 class RegisterResourceRequest(BaseModel):
     """Request to register available resource"""
+
     resource_type: ResourceType
     amount: float = Field(gt=0)
     unit: str
@@ -104,6 +110,7 @@ class RegisterResourceRequest(BaseModel):
 
 class InfrastructureStatusResponse(BaseModel):
     """Response with infrastructure status"""
+
     available_tools: dict[str, Any]
     available_resources: dict[str, Any]
     api_keys_configured: dict[str, bool]
@@ -116,17 +123,15 @@ class InfrastructureStatusResponse(BaseModel):
 # JOB MANAGEMENT ENDPOINTS
 # ============================================================================
 
+
 @router.post(
     "/jobs",
     response_model=dict,
     status_code=status.HTTP_201_CREATED,
     summary="Submit Deployment Job",
-    description="Submit a new automated agent deployment job"
+    description="Submit a new automated agent deployment job",
 )
-async def submit_job(
-    request: SubmitJobRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def submit_job(request: SubmitJobRequest, current_user: dict = Depends(get_current_user)):
     """
     Submit a new deployment job.
 
@@ -158,7 +163,7 @@ async def submit_job(
             input_schema=request.input_schema,
             output_schema=request.output_schema,
             created_by=current_user.get("sub", "unknown"),
-            tags=request.tags
+            tags=request.tags,
         )
 
         # Submit job
@@ -173,36 +178,27 @@ async def submit_job(
             "validation": result.get("validation"),
             "approval": result.get("approval"),
             "estimated_tokens": job.estimated_tokens,
-            "estimated_cost_usd": job.estimated_cost_usd
+            "estimated_cost_usd": job.estimated_cost_usd,
         }
 
     except Exception as e:
         logger.error(f"Failed to submit job: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to submit job: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to submit job: {e!s}")
 
 
 @router.get(
     "/jobs/{job_id}",
     response_model=JobStatusResponse,
     summary="Get Job Status",
-    description="Get complete status of a deployment job"
+    description="Get complete status of a deployment job",
 )
-async def get_job_status(
-    job_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_job_status(job_id: str, current_user: dict = Depends(get_current_user)):
     """Get complete status of a deployment job."""
     orchestrator = get_deployment_orchestrator()
 
     job_status = orchestrator.get_job_status(job_id)
     if not job_status:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Job not found: {job_id}"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job not found: {job_id}")
 
     job = job_status["job"]
     deployment = job_status.get("deployment")
@@ -218,57 +214,43 @@ async def get_job_status(
         estimated_tokens=job["estimated_tokens"],
         estimated_cost_usd=job["estimated_cost_usd"],
         actual_tokens_used=deployment["actual_tokens_used"] if deployment else 0,
-        actual_cost_usd=deployment["actual_cost_usd"] if deployment else 0.0
+        actual_cost_usd=deployment["actual_cost_usd"] if deployment else 0.0,
     )
 
 
-@router.get(
-    "/jobs",
-    summary="List Jobs",
-    description="List all deployment jobs"
-)
-async def list_jobs(
-    category: AgentCategory | None = None,
-    current_user: dict = Depends(get_current_user)
-):
+@router.get("/jobs", summary="List Jobs", description="List all deployment jobs")
+async def list_jobs(category: AgentCategory | None = None, current_user: dict = Depends(get_current_user)):
     """List all deployment jobs, optionally filtered by category."""
     orchestrator = get_deployment_orchestrator()
 
     jobs = []
-    for job_id, job in orchestrator.jobs.items():
+    for job in orchestrator.jobs.values():
         if category and job.category != category:
             continue
 
-        jobs.append({
-            "job_id": job.job_id,
-            "job_name": job.job_name,
-            "category": job.category.value,
-            "primary_agent": job.primary_agent,
-            "estimated_tokens": job.estimated_tokens,
-            "estimated_cost_usd": job.estimated_cost_usd,
-            "created_at": job.created_at.isoformat(),
-            "created_by": job.created_by
-        })
+        jobs.append(
+            {
+                "job_id": job.job_id,
+                "job_name": job.job_name,
+                "category": job.category.value,
+                "primary_agent": job.primary_agent,
+                "estimated_tokens": job.estimated_tokens,
+                "estimated_cost_usd": job.estimated_cost_usd,
+                "created_at": job.created_at.isoformat(),
+                "created_by": job.created_by,
+            }
+        )
 
-    return {
-        "total": len(jobs),
-        "jobs": jobs
-    }
+    return {"total": len(jobs), "jobs": jobs}
 
 
 # ============================================================================
 # VALIDATION ENDPOINTS
 # ============================================================================
 
-@router.post(
-    "/validate",
-    summary="Validate Job",
-    description="Validate job without deploying"
-)
-async def validate_job(
-    request: ValidateJobRequest,
-    current_user: dict = Depends(get_current_user)
-):
+
+@router.post("/validate", summary="Validate Job", description="Validate job without deploying")
+async def validate_job(request: ValidateJobRequest, current_user: dict = Depends(get_current_user)):
     """
     Validate a job without deploying.
 
@@ -284,9 +266,7 @@ async def validate_job(
         orchestrator = get_deployment_orchestrator()
 
         # Estimate costs
-        estimated_tokens, estimated_cost = orchestrator.cost_estimator.estimate_job_cost(
-            request.job_definition
-        )
+        estimated_tokens, estimated_cost = orchestrator.cost_estimator.estimate_job_cost(request.job_definition)
 
         # Validate infrastructure
         validation = await orchestrator.validator.validate_job(request.job_definition)
@@ -300,34 +280,23 @@ async def validate_job(
             "warnings": validation.warnings,
             "estimated_tokens": estimated_tokens,
             "estimated_cost_usd": estimated_cost,
-            "detailed_results": validation.detailed_results
+            "detailed_results": validation.detailed_results,
         }
 
     except Exception as e:
         logger.error(f"Failed to validate job: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to validate job: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to validate job: {e!s}")
 
 
 @router.get(
-    "/approvals/{job_id}",
-    summary="Get Approval Status",
-    description="Get multi-agent approval status for a job"
+    "/approvals/{job_id}", summary="Get Approval Status", description="Get multi-agent approval status for a job"
 )
-async def get_approval_status(
-    job_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_approval_status(job_id: str, current_user: dict = Depends(get_current_user)):
     """Get multi-agent approval status for a job."""
     orchestrator = get_deployment_orchestrator()
 
     if job_id not in orchestrator.approvals:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"No approval found for job: {job_id}"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"No approval found for job: {job_id}")
 
     approval = orchestrator.approvals[job_id]
 
@@ -346,11 +315,11 @@ async def get_approval_status(
                 "reasoning": a.reasoning,
                 "concerns": a.concerns,
                 "recommendations": a.recommendations,
-                "timestamp": a.timestamp.isoformat()
+                "timestamp": a.timestamp.isoformat(),
             }
             for a in approval.approvals
         ],
-        "timestamp": approval.timestamp.isoformat()
+        "timestamp": approval.timestamp.isoformat(),
     }
 
 
@@ -358,17 +327,15 @@ async def get_approval_status(
 # INFRASTRUCTURE MANAGEMENT ENDPOINTS
 # ============================================================================
 
+
 @router.post(
     "/tools/register",
     status_code=status.HTTP_201_CREATED,
     summary="Register Tool",
     description="Register an available tool",
-    dependencies=[Depends(require_role(Role.ADMIN))]
+    dependencies=[Depends(require_role(Role.ADMIN))],
 )
-async def register_tool(
-    request: RegisterToolRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def register_tool(request: RegisterToolRequest, current_user: dict = Depends(get_current_user)):
     """
     Register an available tool for deployment.
 
@@ -380,14 +347,14 @@ async def register_tool(
         tool_name=request.tool_name,
         tool_type=request.tool_type,
         rate_limit=request.rate_limit,
-        metadata=request.metadata
+        metadata=request.metadata,
     )
 
     return {
         "status": "success",
         "message": f"Tool registered: {request.tool_name}",
         "tool_name": request.tool_name,
-        "rate_limit": request.rate_limit
+        "rate_limit": request.rate_limit,
     }
 
 
@@ -396,12 +363,9 @@ async def register_tool(
     status_code=status.HTTP_201_CREATED,
     summary="Register Resource",
     description="Register available resource",
-    dependencies=[Depends(require_role(Role.ADMIN))]
+    dependencies=[Depends(require_role(Role.ADMIN))],
 )
-async def register_resource(
-    request: RegisterResourceRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def register_resource(request: RegisterResourceRequest, current_user: dict = Depends(get_current_user)):
     """
     Register available resource for deployment.
 
@@ -409,17 +373,14 @@ async def register_resource(
     """
     orchestrator = get_deployment_orchestrator()
 
-    orchestrator.validator.register_resource(
-        resource_type=request.resource_type,
-        amount=request.amount
-    )
+    orchestrator.validator.register_resource(resource_type=request.resource_type, amount=request.amount)
 
     return {
         "status": "success",
         "message": f"Resource registered: {request.resource_type.value}",
         "resource_type": request.resource_type.value,
         "amount": request.amount,
-        "unit": request.unit
+        "unit": request.unit,
     }
 
 
@@ -427,11 +388,9 @@ async def register_resource(
     "/infrastructure",
     response_model=InfrastructureStatusResponse,
     summary="Get Infrastructure Status",
-    description="Get current infrastructure status and readiness"
+    description="Get current infrastructure status and readiness",
 )
-async def get_infrastructure_status(
-    current_user: dict = Depends(get_current_user)
-):
+async def get_infrastructure_status(current_user: dict = Depends(get_current_user)):
     """Get comprehensive infrastructure status."""
     orchestrator = get_deployment_orchestrator()
 
@@ -442,23 +401,20 @@ async def get_infrastructure_status(
     # Calculate readiness score
     total_checks = len(available_tools) + len(available_resources) + len(api_keys)
     passed_checks = (
-        sum(1 for t in available_tools.values() if t.get("available")) +
-        len(available_resources) +
-        sum(1 for configured in api_keys.values() if configured)
+        sum(1 for t in available_tools.values() if t.get("available"))
+        + len(available_resources)
+        + sum(1 for configured in api_keys.values() if configured)
     )
 
     readiness_score = passed_checks / max(total_checks, 1)
 
     return InfrastructureStatusResponse(
         available_tools=available_tools,
-        available_resources={
-            rt.value: amount
-            for rt, amount in available_resources.items()
-        },
+        available_resources={rt.value: amount for rt, amount in available_resources.items()},
         api_keys_configured=api_keys,
         total_tools=len(available_tools),
         total_resources=len(available_resources),
-        readiness_score=readiness_score
+        readiness_score=readiness_score,
     )
 
 
@@ -466,14 +422,11 @@ async def get_infrastructure_status(
 # STATISTICS ENDPOINTS
 # ============================================================================
 
+
 @router.get(
-    "/statistics",
-    summary="Get System Statistics",
-    description="Get comprehensive deployment system statistics"
+    "/statistics", summary="Get System Statistics", description="Get comprehensive deployment system statistics"
 )
-async def get_statistics(
-    current_user: dict = Depends(get_current_user)
-):
+async def get_statistics(current_user: dict = Depends(get_current_user)):
     """Get comprehensive deployment system statistics."""
     orchestrator = get_deployment_orchestrator()
     return orchestrator.get_statistics()
@@ -483,15 +436,8 @@ async def get_statistics(
 # HEALTH CHECK
 # ============================================================================
 
-@router.get(
-    "/health",
-    summary="Health Check",
-    description="Check deployment system health"
-)
+
+@router.get("/health", summary="Health Check", description="Check deployment system health")
 async def health_check():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "agent_deployment",
-        "timestamp": datetime.now().isoformat()
-    }
+    return {"status": "healthy", "service": "agent_deployment", "timestamp": datetime.now().isoformat()}

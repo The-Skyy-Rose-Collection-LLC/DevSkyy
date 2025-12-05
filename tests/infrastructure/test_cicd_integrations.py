@@ -9,13 +9,12 @@ Truth Protocol: Rules #1, #8, #15
 Coverage Target: ≥65%
 """
 
-import json
-import time
 from datetime import datetime
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import HTTPException
+import pytest
 
 from infrastructure.cicd_integrations import (
     CICDConnection,
@@ -36,7 +35,13 @@ from infrastructure.cicd_integrations import (
 def mock_http_client():
     """Mock HTTP client for testing."""
     client = MagicMock()
-    client.post = AsyncMock(return_value=MagicMock(status_code=200, headers={"Location": "http://queue"}, json=lambda: {"id": 123, "web_url": "http://example.com"}))
+    client.post = AsyncMock(
+        return_value=MagicMock(
+            status_code=200,
+            headers={"Location": "http://queue"},
+            json=lambda: {"id": 123, "web_url": "http://example.com"},
+        )
+    )
     client.get = AsyncMock(return_value=MagicMock(status_code=200))
     client.aclose = AsyncMock()
     return client

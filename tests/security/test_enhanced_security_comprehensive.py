@@ -12,11 +12,8 @@ Version: 2.0.0
 Python: >=3.11.0
 """
 
-import asyncio
-import base64
-from datetime import datetime, timedelta
-import json
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from datetime import datetime
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -345,7 +342,7 @@ class TestPatternMatching:
         """Test XSS tag detection"""
         request_data = {
             "url": "/api/comment",
-            "body": '<script>evil()</script>',
+            "body": "<script>evil()</script>",
             "headers": {},
         }
 
@@ -868,9 +865,7 @@ class TestSecurityIntegration:
         stored_data = {"encrypted_api_key": encrypted}
 
         # 3. Retrieve and decrypt
-        decrypted = security_mgr.decrypt_sensitive_data(
-            stored_data["encrypted_api_key"]
-        )
+        decrypted = security_mgr.decrypt_sensitive_data(stored_data["encrypted_api_key"])
 
         # 4. Verify
         assert decrypted == api_key
@@ -911,10 +906,12 @@ class TestSecurityEdgeCases:
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--cov=security.enhanced_security",
-        "--cov-report=term-missing",
-        "--cov-report=html",
-    ])
+    pytest.main(
+        [
+            __file__,
+            "-v",
+            "--cov=security.enhanced_security",
+            "--cov-report=term-missing",
+            "--cov-report=html",
+        ]
+    )

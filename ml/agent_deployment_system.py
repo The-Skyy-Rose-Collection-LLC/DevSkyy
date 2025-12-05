@@ -48,8 +48,10 @@ logger = logging.getLogger(__name__)
 # ENUMS AND STATUS
 # ============================================================================
 
+
 class JobStatus(str, Enum):
     """Job execution status"""
+
     DRAFT = "draft"  # Job being defined
     PENDING_VALIDATION = "pending_validation"  # Waiting for validation
     PENDING_APPROVAL = "pending_approval"  # Waiting for category-head approval
@@ -63,6 +65,7 @@ class JobStatus(str, Enum):
 
 class ResourceType(str, Enum):
     """Types of resources required"""
+
     API_KEY = "api_key"  # API credentials
     DATABASE = "database"  # Database connection
     COMPUTE = "compute"  # CPU/GPU resources
@@ -74,6 +77,7 @@ class ResourceType(str, Enum):
 
 class ApprovalStatus(str, Enum):
     """Approval decision status"""
+
     PENDING = "pending"
     APPROVED = "approved"
     REJECTED = "rejected"
@@ -84,8 +88,10 @@ class ApprovalStatus(str, Enum):
 # DATA MODELS
 # ============================================================================
 
+
 class ToolRequirement(BaseModel):
     """Definition of a required tool"""
+
     tool_name: str
     tool_type: str  # "function", "api", "service"
     required: bool = True
@@ -97,6 +103,7 @@ class ToolRequirement(BaseModel):
 
 class ResourceRequirement(BaseModel):
     """Resource requirement specification"""
+
     resource_type: ResourceType
     amount: float  # e.g., 2.0 for 2 CPU cores, 4096 for 4GB RAM
     unit: str  # "cores", "MB", "GB", "requests/min"
@@ -111,6 +118,7 @@ class JobDefinition(BaseModel):
     Defines WHAT needs to be done, what tools are needed,
     and what resources are required.
     """
+
     job_id: str = Field(default_factory=lambda: f"job_{uuid4().hex[:12]}")
     job_name: str
     job_description: str
@@ -148,6 +156,7 @@ class JobDefinition(BaseModel):
 
 class InfrastructureValidationResult(BaseModel):
     """Result of infrastructure validation"""
+
     is_ready: bool
     validation_timestamp: datetime
     checks_passed: int
@@ -160,6 +169,7 @@ class InfrastructureValidationResult(BaseModel):
 
 class CategoryHeadApproval(BaseModel):
     """Approval from a category head agent"""
+
     agent_id: str
     agent_name: str
     approval_status: ApprovalStatus
@@ -172,6 +182,7 @@ class CategoryHeadApproval(BaseModel):
 
 class ApprovalWorkflowResult(BaseModel):
     """Result of multi-agent approval workflow"""
+
     workflow_id: str
     required_approvals: int = 2  # Need 2 category heads
     approvals: list[CategoryHeadApproval] = Field(default_factory=list)
@@ -185,6 +196,7 @@ class ApprovalWorkflowResult(BaseModel):
 @dataclass
 class DeploymentExecution:
     """Tracking for a deployed job"""
+
     job_id: str
     deployment_id: str = field(default_factory=lambda: f"deploy_{uuid4().hex[:12]}")
     status: JobStatus = JobStatus.DEPLOYING
@@ -211,6 +223,7 @@ class DeploymentExecution:
 # INFRASTRUCTURE VALIDATOR
 # ============================================================================
 
+
 class InfrastructureValidator:
     """
     Validates infrastructure readiness for job execution.
@@ -230,19 +243,13 @@ class InfrastructureValidator:
 
         logger.info("✅ Infrastructure Validator initialized")
 
-    def register_tool(
-        self,
-        tool_name: str,
-        tool_type: str,
-        rate_limit: int,
-        metadata: dict[str, Any] | None = None
-    ):
+    def register_tool(self, tool_name: str, tool_type: str, rate_limit: int, metadata: dict[str, Any] | None = None):
         """Register an available tool"""
         self.available_tools[tool_name] = {
             "type": tool_type,
             "rate_limit": rate_limit,
             "available": True,
-            "metadata": metadata or {}
+            "metadata": metadata or {},
         }
 
     def register_resource(self, resource_type: ResourceType, amount: float):
@@ -278,7 +285,7 @@ class InfrastructureValidator:
                     detailed_results[f"tool_{tool_req.tool_name}"] = {
                         "status": "missing",
                         "required": True,
-                        "alternatives": tool_req.alternatives
+                        "alternatives": tool_req.alternatives,
                     }
                 else:
                     warnings.append(f"Optional tool '{tool_req.tool_name}' not available")
@@ -298,7 +305,7 @@ class InfrastructureValidator:
                 detailed_results[f"tool_{tool_req.tool_name}"] = {
                     "status": "available",
                     "rate_limit": tool_info["rate_limit"],
-                    "type": tool_info["type"]
+                    "type": tool_info["type"],
                 }
 
         # Check resources
@@ -317,7 +324,7 @@ class InfrastructureValidator:
                         "status": "insufficient",
                         "required": resource_req.amount,
                         "available": available,
-                        "unit": resource_req.unit
+                        "unit": resource_req.unit,
                     }
                 else:
                     warnings.append(
@@ -331,7 +338,7 @@ class InfrastructureValidator:
                     "status": "available",
                     "required": resource_req.amount,
                     "available": available,
-                    "unit": resource_req.unit
+                    "unit": resource_req.unit,
                 }
 
         # Check API keys for tools
@@ -355,13 +362,14 @@ class InfrastructureValidator:
             missing_tools=missing_tools,
             missing_resources=missing_resources,
             warnings=warnings,
-            detailed_results=detailed_results
+            detailed_results=detailed_results,
         )
 
 
 # ============================================================================
 # CATEGORY-HEAD APPROVAL SYSTEM
 # ============================================================================
+
 
 class CategoryHeadApprovalSystem:
     """
@@ -391,9 +399,7 @@ class CategoryHeadApprovalSystem:
         logger.info("✅ Category-Head Approval System initialized")
 
     async def request_approval(
-        self,
-        job: JobDefinition,
-        validation_result: InfrastructureValidationResult
+        self, job: JobDefinition, validation_result: InfrastructureValidationResult
     ) -> ApprovalWorkflowResult:
         """
         Request approval from 2 category-head agents.
@@ -417,9 +423,7 @@ class CategoryHeadApprovalSystem:
 
         for agent_name in category_heads[:2]:  # Take first 2 heads
             approval = await self._get_agent_approval(
-                agent_name=agent_name,
-                job=job,
-                validation_result=validation_result
+                agent_name=agent_name, job=job, validation_result=validation_result
             )
             approvals.append(approval)
 
@@ -430,13 +434,10 @@ class CategoryHeadApprovalSystem:
         # Determine final decision
         if approved_count >= 2:
             final_decision = ApprovalStatus.APPROVED
-            consensus = "Both category heads approved the deployment."
         elif rejected_count >= 1:
             final_decision = ApprovalStatus.REJECTED
-            consensus = "One or more category heads rejected the deployment."
         else:
             final_decision = ApprovalStatus.PENDING
-            consensus = "Insufficient approvals. Need 2 approvals to proceed."
 
         # Generate detailed consensus reasoning
         consensus_reasoning = self._generate_consensus_reasoning(approvals, final_decision)
@@ -448,7 +449,7 @@ class CategoryHeadApprovalSystem:
             approved_count=approved_count,
             rejected_count=rejected_count,
             final_decision=final_decision,
-            consensus_reasoning=consensus_reasoning
+            consensus_reasoning=consensus_reasoning,
         )
 
         self.approval_history.append(result)
@@ -462,10 +463,7 @@ class CategoryHeadApprovalSystem:
         return result
 
     async def _get_agent_approval(
-        self,
-        agent_name: str,
-        job: JobDefinition,
-        validation_result: InfrastructureValidationResult
+        self, agent_name: str, job: JobDefinition, validation_result: InfrastructureValidationResult
     ) -> CategoryHeadApproval:
         """
         Get approval decision from a single agent.
@@ -486,8 +484,7 @@ class CategoryHeadApprovalSystem:
         # Check cost
         if job.estimated_cost_usd > job.max_budget_usd:
             concerns.append(
-                f"Estimated cost ${job.estimated_cost_usd:.2f} exceeds "
-                f"budget ${job.max_budget_usd:.2f}"
+                f"Estimated cost ${job.estimated_cost_usd:.2f} exceeds " f"budget ${job.max_budget_usd:.2f}"
             )
 
         # Check execution time
@@ -520,13 +517,11 @@ class CategoryHeadApprovalSystem:
             confidence=confidence,
             reasoning=reasoning,
             concerns=concerns,
-            recommendations=recommendations
+            recommendations=recommendations,
         )
 
     def _generate_consensus_reasoning(
-        self,
-        approvals: list[CategoryHeadApproval],
-        final_decision: ApprovalStatus
+        self, approvals: list[CategoryHeadApproval], final_decision: ApprovalStatus
     ) -> str:
         """Generate detailed consensus reasoning"""
         parts = [f"Final Decision: {final_decision.value.upper()}\n"]
@@ -560,6 +555,7 @@ class CategoryHeadApprovalSystem:
 # ============================================================================
 # TOKEN COST ESTIMATOR
 # ============================================================================
+
 
 class TokenCostEstimator:
     """
@@ -613,10 +609,7 @@ class TokenCostEstimator:
         input_tokens = int(estimated_tokens * 0.3)  # 30% input
         output_tokens = int(estimated_tokens * 0.7)  # 70% output
 
-        estimated_cost = (
-            (input_tokens / 1_000_000) * 4.0 +
-            (output_tokens / 1_000_000) * 10.0
-        )
+        estimated_cost = (input_tokens / 1_000_000) * 4.0 + (output_tokens / 1_000_000) * 10.0
 
         return estimated_tokens, estimated_cost
 
@@ -624,6 +617,7 @@ class TokenCostEstimator:
 # ============================================================================
 # AUTOMATED DEPLOYMENT ORCHESTRATOR
 # ============================================================================
+
 
 class AutomatedDeploymentOrchestrator:
     """
@@ -674,6 +668,7 @@ class AutomatedDeploymentOrchestrator:
 
         # Register API keys
         import os
+
         self.validator.register_api_key("openai", bool(os.getenv("OPENAI_API_KEY")))
         self.validator.register_api_key("anthropic", bool(os.getenv("ANTHROPIC_API_KEY")))
 
@@ -714,34 +709,27 @@ class AutomatedDeploymentOrchestrator:
         self.validations[job.job_id] = validation
 
         if not validation.is_ready:
-            logger.error(
-                f"❌ Infrastructure validation failed: "
-                f"{validation.checks_failed} checks failed"
-            )
+            logger.error(f"❌ Infrastructure validation failed: " f"{validation.checks_failed} checks failed")
             return {
                 "status": "validation_failed",
                 "job_id": job.job_id,
                 "validation": validation.dict(),
-                "can_proceed": False
+                "can_proceed": False,
             }
 
-        logger.info(
-            f"✅ Infrastructure validated: {validation.checks_passed} checks passed"
-        )
+        logger.info(f"✅ Infrastructure validated: {validation.checks_passed} checks passed")
 
         # Step 3: Request category-head approval
         approval = await self.approval_system.request_approval(job, validation)
         self.approvals[job.job_id] = approval
 
         if approval.final_decision != ApprovalStatus.APPROVED:
-            logger.warning(
-                f"⏸️  Job not approved: {approval.approved_count}/2 approvals"
-            )
+            logger.warning(f"⏸️  Job not approved: {approval.approved_count}/2 approvals")
             return {
                 "status": "approval_pending",
                 "job_id": job.job_id,
                 "approval": approval.dict(),
-                "can_proceed": False
+                "can_proceed": False,
             }
 
         logger.info(f"✅ Job approved by {approval.approved_count} category heads")
@@ -755,15 +743,12 @@ class AutomatedDeploymentOrchestrator:
             "deployment_id": deployment.deployment_id,
             "validation": validation.dict(),
             "approval": approval.dict(),
-            "can_proceed": True
+            "can_proceed": True,
         }
 
     async def _execute_deployment(self, job: JobDefinition) -> DeploymentExecution:
         """Execute the actual deployment"""
-        deployment = DeploymentExecution(
-            job_id=job.job_id,
-            status=JobStatus.DEPLOYING
-        )
+        deployment = DeploymentExecution(job_id=job.job_id, status=JobStatus.DEPLOYING)
 
         self.deployments[deployment.deployment_id] = deployment
 
@@ -778,9 +763,7 @@ class AutomatedDeploymentOrchestrator:
         # Simulate completion
         deployment.status = JobStatus.COMPLETED
         deployment.end_time = datetime.now()
-        deployment.execution_time_ms = (
-            (deployment.end_time - deployment.start_time).total_seconds() * 1000
-        )
+        deployment.execution_time_ms = (deployment.end_time - deployment.start_time).total_seconds() * 1000
         deployment.actual_tokens_used = int(job.estimated_tokens * 0.95)  # 95% of estimate
         deployment.actual_cost_usd = job.estimated_cost_usd * 0.95
         deployment.performance_score = 0.92
@@ -796,7 +779,7 @@ class AutomatedDeploymentOrchestrator:
             success=(deployment.status == JobStatus.COMPLETED),
             performance_score=deployment.performance_score,
             execution_time_ms=deployment.execution_time_ms,
-            tokens_used=deployment.actual_tokens_used
+            tokens_used=deployment.actual_tokens_used,
         )
 
         logger.info(
@@ -827,14 +810,18 @@ class AutomatedDeploymentOrchestrator:
             "job": job.dict(),
             "validation": validation.dict() if validation else None,
             "approval": approval.dict() if approval else None,
-            "deployment": {
-                "deployment_id": deployment.deployment_id,
-                "status": deployment.status.value,
-                "execution_time_ms": deployment.execution_time_ms,
-                "actual_tokens_used": deployment.actual_tokens_used,
-                "actual_cost_usd": deployment.actual_cost_usd,
-                "performance_score": deployment.performance_score
-            } if deployment else None
+            "deployment": (
+                {
+                    "deployment_id": deployment.deployment_id,
+                    "status": deployment.status.value,
+                    "execution_time_ms": deployment.execution_time_ms,
+                    "actual_tokens_used": deployment.actual_tokens_used,
+                    "actual_cost_usd": deployment.actual_cost_usd,
+                    "performance_score": deployment.performance_score,
+                }
+                if deployment
+                else None
+            ),
         }
 
     def get_statistics(self) -> dict[str, Any]:
@@ -845,26 +832,22 @@ class AutomatedDeploymentOrchestrator:
             "infrastructure_checks": {
                 "available_tools": len(self.validator.available_tools),
                 "available_resources": len(self.validator.available_resources),
-                "configured_api_keys": sum(1 for v in self.validator.api_keys.values() if v)
+                "configured_api_keys": sum(1 for v in self.validator.api_keys.values() if v),
             },
             "approval_stats": {
                 "total_approvals": len(self.approval_system.approval_history),
                 "approved": sum(
-                    1 for a in self.approval_system.approval_history
-                    if a.final_decision == ApprovalStatus.APPROVED
+                    1 for a in self.approval_system.approval_history if a.final_decision == ApprovalStatus.APPROVED
                 ),
                 "rejected": sum(
-                    1 for a in self.approval_system.approval_history
-                    if a.final_decision == ApprovalStatus.REJECTED
-                )
+                    1 for a in self.approval_system.approval_history if a.final_decision == ApprovalStatus.REJECTED
+                ),
             },
             "cost_stats": {
                 "total_estimated_tokens": sum(j.estimated_tokens for j in self.jobs.values()),
                 "total_estimated_cost_usd": sum(j.estimated_cost_usd for j in self.jobs.values()),
-                "total_actual_cost_usd": sum(
-                    d.actual_cost_usd for d in self.deployments.values()
-                )
-            }
+                "total_actual_cost_usd": sum(d.actual_cost_usd for d in self.deployments.values()),
+            },
         }
 
 

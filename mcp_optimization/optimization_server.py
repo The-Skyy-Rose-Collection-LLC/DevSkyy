@@ -11,6 +11,7 @@ Install: pip install redis sentence-transformers numpy
 
 import asyncio
 from collections.abc import Callable
+import contextlib
 from dataclasses import asdict, dataclass
 from datetime import datetime
 from enum import Enum
@@ -72,14 +73,12 @@ class ExactMatchCache:
             if cached:
                 self.hits += 1
                 data = json.loads(cached)
-                print(f"✓ Cache HIT (exact match): {tool} | Hits: {self.hits}")
                 return data.get("response")
 
             self.misses += 1
             return None
 
-        except Exception as e:
-            print(f"⚠ Cache retrieval error: {e}")
+        except Exception:
             return None
 
     async def set(
@@ -103,12 +102,9 @@ class ExactMatchCache:
             "cached_at": datetime.utcnow().isoformat(),
         }
 
-        try:
+        with contextlib.suppress(Exception):
             self.redis.setex(key, self.ttl_seconds, json.dumps(entry, default=str))
-            print(f"✓ Cache SET: {tool} (TTL: {self.ttl_seconds}s)")
 
-        except Exception as e:
-            print(f"⚠ Cache set error: {e}")
 
     def metrics(self) -> dict[str, Any]:
         """Return cache performance metrics."""
@@ -129,7 +125,6 @@ class ExactMatchCache:
         keys = self.redis.keys(pattern)
         if keys:
             self.redis.delete(*keys)
-            print(f"✓ Flushed {len(keys)} exact cache entries")
 
 
 # ===========================
@@ -210,14 +205,12 @@ class SemanticCache:
 
             if best_match:
                 self.hits += 1
-                print(f"✓ Semantic match: {best_similarity:.3f} confidence (query: {tool})")
                 return best_match
 
             self.misses += 1
             return None
 
-        except Exception as e:
-            print(f"⚠ Semantic cache retrieval error: {e}")
+        except Exception:
             return None
 
     async def set(self, query: str, tool: str, response: dict[str, Any], ttl_seconds: int = 3600) -> None:
@@ -243,10 +236,9 @@ class SemanticCache:
             }
 
             self.redis.setex(key, ttl_seconds, json.dumps(entry, default=str))
-            print(f"✓ Semantic cache SET: {tool}")
 
-        except Exception as e:
-            print(f"⚠ Semantic cache set error: {e}")
+        except Exception:
+            pass
 
     def metrics(self) -> dict[str, Any]:
         """Return semantic cache metrics."""
@@ -332,11 +324,9 @@ class BatchProcessor:
 
         try:
             self.redis.lpush(self.batch_queue, json.dumps(request.to_dict(), default=str))
-            print(f"✓ Request queued: {request_id} ({tool})")
             return request_id
 
-        except Exception as e:
-            print(f"⚠ Queue error: {e}")
+        except Exception:
             return ""
 
     async def execute_batch(
@@ -372,7 +362,6 @@ class BatchProcessor:
                 break
 
             batch_num += 1
-            print(f"\n🔄 Processing batch #{batch_num} ({len(batch)} requests)...")
             start_time = datetime.utcnow()
 
             # Execute all requests concurrently
@@ -403,18 +392,15 @@ class BatchProcessor:
 
                     for result in batch_results:
                         if isinstance(result, Exception):
-                            print(f"✗ Task error: {result}")
                             self.failed += 1
                         else:
                             results[result["request_id"]] = result
                             self.processed += 1
 
                 except TimeoutError:
-                    print(f"⚠ Batch timeout after {timeout_seconds}s")
                     self.failed += len(tasks)
 
-            elapsed = (datetime.utcnow() - start_time).total_seconds()
-            print(f"✓ Batch #{batch_num} completed in {elapsed:.2f}s")
+            (datetime.utcnow() - start_time).total_seconds()
 
         return results
 
@@ -483,10 +469,6 @@ class OptimizedMCPServer:
         self.semantic_cache = SemanticCache(self.redis, similarity_threshold=0.92)
         self.batch_processor = BatchProcessor(self.redis, max_batch_size=50)
 
-        print("✓ Optimized MCP Server initialized")
-        print("  - Exact cache: TTL 60 minutes")
-        print("  - Semantic cache: threshold 0.92")
-        print("  - Batch processor: max 50/batch")
 
     async def execute_tool(self, tool_name: str, params: dict[str, Any]) -> str:
         """
@@ -496,7 +478,6 @@ class OptimizedMCPServer:
         """
 
         # Step 1: Exact-match cache
-        print(f"\n📋 Executing: {tool_name}")
         cache_result = await self.exact_cache.get(tool_name, params)
         if cache_result:
             return json.dumps(cache_result, separators=(",", ":"))
@@ -565,35 +546,22 @@ async def demo():
     server = OptimizedMCPServer(redis_host="localhost")
 
     # Simulate tool calls
-    print("\n" + "=" * 60)
-    print("EXACT CACHE DEMONSTRATION")
-    print("=" * 60)
 
     params1 = {"action": "search", "query": "blue blazers"}
 
     # First call - cache miss
-    result1 = await server.execute_tool("devskyy_manage_products", params1)
-    print(f"Response 1: {result1[:50]}...")
+    await server.execute_tool("devskyy_manage_products", params1)
 
     # Second call - cache hit (same params)
-    result2 = await server.execute_tool("devskyy_manage_products", params1)
-    print(f"Response 2: {result2[:50]}...")
+    await server.execute_tool("devskyy_manage_products", params1)
 
-    print("\n" + "=" * 60)
-    print("SEMANTIC CACHE DEMONSTRATION")
-    print("=" * 60)
 
     # Similar query - should match semantically
     params2 = {"action": "search", "query": "navy jacket for men"}
-    result3 = await server.execute_tool("devskyy_manage_products", params2)
-    print(f"Response 3 (semantic match): {result3[:50]}...")
+    await server.execute_tool("devskyy_manage_products", params2)
 
-    print("\n" + "=" * 60)
-    print("OPTIMIZATION METRICS")
-    print("=" * 60)
 
-    report = server.get_optimization_report()
-    print(json.dumps(report, indent=2))
+    server.get_optimization_report()
 
 
 if __name__ == "__main__":

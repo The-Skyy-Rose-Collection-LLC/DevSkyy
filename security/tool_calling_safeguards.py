@@ -239,7 +239,7 @@ class ToolAuthorizationManager:
         config = self.tool_configs[request.tool_name]
 
         # Check provider compatibility
-        if config.provider != ToolProvider.BOTH and config.provider != request.provider:
+        if config.provider not in (ToolProvider.BOTH, request.provider):
             return False, (
                 f"Tool '{request.tool_name}' does not support provider "
                 f"'{request.provider.value}' (requires {config.provider.value})"
@@ -258,9 +258,8 @@ class ToolAuthorizationManager:
             elif required_level == ToolPermissionLevel.PRIVILEGED:
                 if ToolPermissionLevel.PRIVILEGED not in user_perms and ToolPermissionLevel.ADMIN not in user_perms:
                     return False, f"Tool '{request.tool_name}' requires PRIVILEGED permissions"
-            elif required_level == ToolPermissionLevel.AUTHENTICATED:
-                if not user_perms:
-                    return False, f"Tool '{request.tool_name}' requires authentication"
+            elif required_level == ToolPermissionLevel.AUTHENTICATED and not user_perms:
+                return False, f"Tool '{request.tool_name}' requires authentication"
         # No user_id provided
         elif config.permission_level != ToolPermissionLevel.PUBLIC:
             return False, f"Tool '{request.tool_name}' requires authentication"

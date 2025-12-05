@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 import re
 import subprocess
+import sys
 from typing import Any
 
 
@@ -33,26 +34,22 @@ def parse_requirements(requirements_file: Path) -> list[dict[str, Any]]:
             match = re.match(r"^([a-zA-Z0-9_\-\.]+)([><=~!]+)?(.+)?$", line)
             if match:
                 name = match.group(1)
-                operator = match.group(2) or "=="
+                match.group(2) or "=="
                 version = match.group(3) or "latest"
 
                 # Try to get actual installed version
                 try:
                     result = subprocess.run(
-                        ["pip", "show", name],
-                        check=False,
-                        capture_output=True,
-                        text=True,
-                        timeout=5
+                        ["pip", "show", name], check=False, capture_output=True, text=True, timeout=5
                     )
                     if result.returncode == 0:
                         for show_line in result.stdout.split("\n"):
                             if show_line.startswith("Version:"):
                                 version = show_line.split(":", 1)[1].strip()
                             elif show_line.startswith("License:"):
-                                license_text = show_line.split(":", 1)[1].strip()
+                                show_line.split(":", 1)[1].strip()
                 except Exception:
-                    license_text = "Unknown"
+                    pass
 
                 components.append(
                     {
@@ -141,4 +138,4 @@ if __name__ == "__main__":
         generate_sbom()
     except Exception as e:
         print(f"❌ Error generating SBOM: {e}")
-        exit(1)
+        sys.exit(1)

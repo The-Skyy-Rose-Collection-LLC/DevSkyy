@@ -44,7 +44,7 @@ class LlamaIndexFineTuningOrchestrator:
         self,
         index_dir: str = "./llamaindex_storage",
         openai_api_key: str | None = None,
-        anthropic_api_key: str | None = None
+        anthropic_api_key: str | None = None,
     ):
         """
         Initialize the LlamaIndex-powered fine-tuning orchestrator.
@@ -79,10 +79,7 @@ class LlamaIndexFineTuningOrchestrator:
         self.indexes: dict[str, VectorStoreIndex] = {}
 
     def index_training_examples(
-        self,
-        agent_id: str,
-        examples: list[dict[str, Any]],
-        force_rebuild: bool = False
+        self, agent_id: str, examples: list[dict[str, Any]], force_rebuild: bool = False
     ) -> VectorStoreIndex:
         """
         Index training examples using LlamaIndex vector store.
@@ -100,9 +97,7 @@ class LlamaIndexFineTuningOrchestrator:
         # Try to load existing index
         if not force_rebuild and agent_index_dir.exists():
             try:
-                storage_context = StorageContext.from_defaults(
-                    persist_dir=str(agent_index_dir)
-                )
+                storage_context = StorageContext.from_defaults(persist_dir=str(agent_index_dir))
                 index = load_index_from_storage(storage_context)
                 self.indexes[agent_id] = index
                 logger.info(f"Loaded existing index for agent {agent_id}")
@@ -121,8 +116,8 @@ class LlamaIndexFineTuningOrchestrator:
                     "score": example.get("score", 0.0),
                     "input": example["input"],
                     "output": example["output"],
-                    "agent_id": agent_id
-                }
+                    "agent_id": agent_id,
+                },
             )
             documents.append(doc)
 
@@ -138,12 +133,7 @@ class LlamaIndexFineTuningOrchestrator:
 
         return index
 
-    def retrieve_best_examples(
-        self,
-        agent_id: str,
-        query: str | None = None,
-        top_k: int = 10
-    ) -> list[dict[str, Any]]:
+    def retrieve_best_examples(self, agent_id: str, query: str | None = None, top_k: int = 10) -> list[dict[str, Any]]:
         """
         Retrieve best training examples using vector similarity search.
 
@@ -161,9 +151,7 @@ class LlamaIndexFineTuningOrchestrator:
                 raise ValueError(f"No index found for agent {agent_id}")
 
             # Load index
-            storage_context = StorageContext.from_defaults(
-                persist_dir=str(agent_index_dir)
-            )
+            storage_context = StorageContext.from_defaults(persist_dir=str(agent_index_dir))
             self.indexes[agent_id] = load_index_from_storage(storage_context)
 
         index = self.indexes[agent_id]
@@ -179,12 +167,14 @@ class LlamaIndexFineTuningOrchestrator:
         examples = []
         for node in nodes:
             metadata = node.node.metadata
-            examples.append({
-                "input": metadata.get("input", ""),
-                "output": metadata.get("output", ""),
-                "score": float(metadata.get("score", 0.0)),
-                "similarity": node.score  # Vector similarity score
-            })
+            examples.append(
+                {
+                    "input": metadata.get("input", ""),
+                    "output": metadata.get("output", ""),
+                    "score": float(metadata.get("score", 0.0)),
+                    "similarity": node.score,  # Vector similarity score
+                }
+            )
 
         # Sort by score (descending)
         examples.sort(key=lambda x: x["score"], reverse=True)
@@ -192,10 +182,7 @@ class LlamaIndexFineTuningOrchestrator:
         return examples
 
     async def optimize_prompt_with_claude(
-        self,
-        agent_id: str,
-        current_prompt: str,
-        top_k_examples: int = 10
+        self, agent_id: str, current_prompt: str, top_k_examples: int = 10
     ) -> dict[str, Any]:
         """
         Optimize agent prompt using Claude with best examples from LlamaIndex.
@@ -274,7 +261,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             model="claude-3-5-sonnet-20241022",
             max_tokens=8000,
             temperature=0.3,
-            messages=[{"role": "user", "content": optimization_prompt}]
+            messages=[{"role": "user", "content": optimization_prompt}],
         )
 
         optimized_prompt = response.content[0].text
@@ -287,7 +274,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "examples_used": len(best_examples),
             "optimized_prompt": optimized_prompt,
             "original_prompt": current_prompt,
-            "optimization_technique": "xml_structured_rag_few_shot_cot"
+            "optimization_technique": "xml_structured_rag_few_shot_cot",
         }
 
     async def fine_tune_openai(
@@ -295,7 +282,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         agent_id: str,
         base_model: str = "gpt-3.5-turbo",
         top_k_examples: int = 50,
-        hyperparameters: dict[str, Any] | None = None
+        hyperparameters: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Fine-tune OpenAI model using examples from LlamaIndex.
@@ -322,10 +309,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
 
         # Export to OpenAI fine-tuning format (JSONL)
         with tempfile.NamedTemporaryFile(
-            mode='w',
-            suffix='.jsonl',
-            prefix=f'openai_ft_{agent_id}_',
-            delete=False
+            mode="w", suffix=".jsonl", prefix=f"openai_ft_{agent_id}_", delete=False
         ) as temp_file:
             training_file_path = temp_file.name
 
@@ -334,7 +318,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 training_example = {
                     "messages": [
                         {"role": "user", "content": example["input"]},
-                        {"role": "assistant", "content": example["output"]}
+                        {"role": "assistant", "content": example["output"]},
                     ]
                 }
                 # Write valid JSON (not Python dict repr)
@@ -343,10 +327,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         try:
             # Upload training file
             with open(training_file_path, "rb") as f:
-                training_file = self.openai_client.files.create(
-                    file=f,
-                    purpose="fine-tune"
-                )
+                training_file = self.openai_client.files.create(file=f, purpose="fine-tune")
 
             # Create fine-tuning job
             fine_tuning_job = self.openai_client.fine_tuning.jobs.create(
@@ -355,7 +336,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 hyperparameters={
                     "n_epochs": hyperparameters.get("epochs", 3),
                     "learning_rate_multiplier": hyperparameters.get("learning_rate", "auto"),
-                }
+                },
             )
 
             logger.info(f"OpenAI fine-tuning job created: {fine_tuning_job.id}")
@@ -367,7 +348,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 "base_model": base_model,
                 "training_examples": len(best_examples),
                 "status": fine_tuning_job.status,
-                "method": "llamaindex_rag_selection"
+                "method": "llamaindex_rag_selection",
             }
 
         finally:
@@ -380,7 +361,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
         """Format examples with XML tags for Claude optimization."""
         formatted = []
         for i, ex in enumerate(examples, 1):
-            formatted.append(f"""
+            formatted.append(
+                f"""
 <example id="{i}" score="{ex['score']:.2f}" similarity="{ex.get('similarity', 0):.2f}">
   <input>
 {ex['input'][:500]}
@@ -388,7 +370,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
   <output>
 {ex['output'][:500]}
   </output>
-</example>""")
+</example>"""
+            )
         return "\n".join(formatted)
 
 
@@ -397,21 +380,19 @@ async def main():
     """Example usage of LlamaIndex fine-tuning orchestrator."""
 
     # Initialize orchestrator (no database needed!)
-    orchestrator = LlamaIndexFineTuningOrchestrator(
-        index_dir="./training_indexes"
-    )
+    orchestrator = LlamaIndexFineTuningOrchestrator(index_dir="./training_indexes")
 
     # Example training data
     training_examples = [
         {
             "input": "What is Python?",
             "output": "Python is a high-level, interpreted programming language known for its simplicity and readability.",
-            "score": 0.95
+            "score": 0.95,
         },
         {
             "input": "Explain machine learning",
             "output": "Machine learning is a subset of AI where systems learn from data to improve performance on tasks without explicit programming.",
-            "score": 0.92
+            "score": 0.92,
         },
         # Add more examples...
     ]
@@ -423,14 +404,8 @@ async def main():
 
     # Step 2: Optimize prompt with Claude
     current_prompt = "You are a helpful AI assistant."
-    result = await orchestrator.optimize_prompt_with_claude(
-        agent_id,
-        current_prompt,
-        top_k_examples=5
-    )
+    await orchestrator.optimize_prompt_with_claude(agent_id, current_prompt, top_k_examples=5)
 
-    print("Optimized Prompt:")
-    print(result["optimized_prompt"])
 
     # Step 3: Fine-tune OpenAI model (optional)
     # ft_result = await orchestrator.fine_tune_openai(agent_id, top_k_examples=20)

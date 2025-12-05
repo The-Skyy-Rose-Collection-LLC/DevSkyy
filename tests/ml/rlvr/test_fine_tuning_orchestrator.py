@@ -11,8 +11,8 @@ Tests cover:
 """
 
 import os
-import uuid
 from unittest.mock import Mock, patch
+import uuid
 
 import pytest
 

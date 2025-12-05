@@ -13,8 +13,6 @@ Truth Protocol Compliance:
 import json
 import os
 import tempfile
-from datetime import datetime
-from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -87,7 +85,7 @@ class TestErrorEntry:
             severity=ErrorSeverity.HIGH,
             category=ErrorCategory.DATABASE,
             error_type="ConnectionError",
-            error_message="Failed to connect to database"
+            error_message="Failed to connect to database",
         )
 
         assert entry.error_id == "err-123"
@@ -107,7 +105,7 @@ class TestErrorEntry:
             error_message="Invalid input",
             context={"field": "email", "value": "invalid"},
             correlation_id="req-123",
-            user_id="user-001"
+            user_id="user-001",
         )
 
         assert entry.context == {"field": "email", "value": "invalid"}
@@ -122,7 +120,7 @@ class TestErrorEntry:
             severity=ErrorSeverity.LOW,
             category=ErrorCategory.AGENT,
             error_type="AgentError",
-            error_message="Agent failed"
+            error_message="Agent failed",
         )
 
         result = entry.to_dict()
@@ -225,11 +223,7 @@ class TestErrorLogging:
         """Test logging error with custom severity."""
         error = ConnectionError("Connection failed")
 
-        ledger.log_error(
-            error,
-            severity=ErrorSeverity.CRITICAL,
-            category=ErrorCategory.NETWORK
-        )
+        ledger.log_error(error, severity=ErrorSeverity.CRITICAL, category=ErrorCategory.NETWORK)
 
         assert ledger.errors[0].severity == ErrorSeverity.CRITICAL
         assert ledger.errors[0].category == ErrorCategory.NETWORK
@@ -244,7 +238,7 @@ class TestErrorLogging:
             correlation_id="req-123",
             user_id="user-001",
             endpoint="/api/users",
-            method="POST"
+            method="POST",
         )
 
         entry = ledger.errors[0]
@@ -560,17 +554,16 @@ class TestGlobalFunctions:
 
     def test_log_error_global_function(self):
         """Test global log_error function."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            with patch("core.error_ledger._error_ledger", None):
-                with patch("core.error_ledger.ErrorLedger") as MockLedger:
-                    mock_instance = MagicMock()
-                    mock_instance.log_error.return_value = "error-123"
-                    MockLedger.return_value = mock_instance
+        with tempfile.TemporaryDirectory(), patch("core.error_ledger._error_ledger", None):
+            with patch("core.error_ledger.ErrorLedger") as MockLedger:
+                mock_instance = MagicMock()
+                mock_instance.log_error.return_value = "error-123"
+                MockLedger.return_value = mock_instance
 
-                    error = ValueError("Global test")
-                    result = log_error(error, severity=ErrorSeverity.HIGH)
+                error = ValueError("Global test")
+                log_error(error, severity=ErrorSeverity.HIGH)
 
-                    mock_instance.log_error.assert_called()
+                mock_instance.log_error.assert_called()
 
 
 # =============================================================================

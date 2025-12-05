@@ -26,5 +26,3 @@ def create_app() -> FastAPI:
 
 
 """DevSkyy API Package"""
-
-__VERSION__ = "1.0.0"

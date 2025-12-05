@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "devskyy"
-version = "5.2.0"
+version = "5.3.0"
 description = "Enterprise AI-Powered Fashion E-commerce Automation Platform"
 readme = "README.md"
 license = {file = "LICENSE"}
@@ -33,8 +33,9 @@ classifiers = [
 ]
 requires-python = ">=3.11"
 dependencies = [
-    "fastapi>=0.119.0",
-    "uvicorn[standard]>=0.34.0",
+    "fastapi>=0.121.0,<0.122.0",  # SECURITY FIX: CVE-2025-62727
+    "starlette>=0.49.1,<0.50.0",  # SECURITY FIX: GHSA-7f5h-v6xp-fcq8
+    "uvicorn[standard]>=0.38.0",
     "pydantic>=2.9.0,<3.0.0",  # SECURITY: Schema validation
     "pydantic-settings>=2.7.0",
     "sqlalchemy>=2.0.36",
@@ -43,14 +44,17 @@ dependencies = [
     "redis>=5.2.1",
     "elasticsearch>=8.17.0",
     "anthropic>=0.69.0",
-    "openai>=2.3.0",
+    "openai>=2.7.2",
     "httpx>=0.28.1",
     "aiofiles>=24.1.0",
-    "python-multipart>=0.0.17",
+    "python-multipart>=0.0.18",
     "python-jose[cryptography]>=3.3.0",
     "passlib[bcrypt]>=1.7.4,<2.0.0",  # SECURITY: Password hashing
-    "cryptography>=46.0.3,<47.0.0",  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727
+    "cryptography>=46.0.3,<48.0.0",  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727
     "bcrypt>=4.2.1,<5.0.0",  # SECURITY: bcrypt password hashing
+    "PyJWT>=2.10.1,<3.0.0",  # SECURITY: JWT authentication per RFC 7519
+    "argon2-cffi>=23.1.0,<24.0.0",  # SECURITY: Argon2 password hashing
+    "defusedxml>=0.7.1,<1.0.0",  # SECURITY: XML attack protection
     "celery>=5.4.0",
     "motor>=3.7.0",
     "clickhouse-driver>=0.2.9",
@@ -58,11 +62,13 @@ dependencies = [
     "structlog>=24.4.0",
     "sentry-sdk[fastapi]>=2.19.0",
     "requests>=2.32.4,<3.0.0",  # SECURITY: Fix GHSA-9hjg-9r4m-mvj7
+    "urllib3>=2.6.0,<3.0.0",  # SECURITY: Fix CVE-2025-66418, CVE-2025-66471
     "certifi>=2024.12.14,<2025.0.0",  # SECURITY: SSL certificates
     "dnspython>=2.7.0",
     "paramiko>=3.5.0,<4.0.0",  # SECURITY: SSH protocol
     "mcp>=1.22.0,<2.0.0",  # Model Context Protocol - official implementation
-    "fastmcp>=2.13.0,<3.0.0",  # FastMCP server framework
+    "fastmcp>=2.13.0,<3.0.0",  # SECURITY FIX: GHSA-mxxr-jv3v-6pgc, GHSA-rj5c-58rq-j5g5
+    "claude-agent-sdk>=0.1.9,<0.2.0",  # Official Anthropic Agent SDK
 ]
 
 [project.optional-dependencies]

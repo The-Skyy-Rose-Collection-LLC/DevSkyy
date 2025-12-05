@@ -321,9 +321,7 @@ Return as JSON array of hashtags."""
             logger.error(f"Instagram publishing failed: {e}")
             return {"error": str(e)}
 
-    async def _create_ig_media_container(
-        self, media_url: str, caption: str, shopping_tags: list[dict] | None
-    ) -> str:
+    async def _create_ig_media_container(self, media_url: str, caption: str, shopping_tags: list[dict] | None) -> str:
         """
         Create Instagram media container for single post.
         """

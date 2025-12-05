@@ -48,6 +48,7 @@ def setup_environment(monkeypatch):
 def client():
     """Create FastAPI test client."""
     import main
+
     return TestClient(main.app)
 
 
@@ -55,6 +56,7 @@ def client():
 def main_module():
     """Import main module for testing."""
     import main
+
     return main
 
 
@@ -147,7 +149,7 @@ class TestLoggingSetup:
     def test_setup_logging_creates_logs_directory(self, main_module, tmp_path, monkeypatch):
         """Test setup_logging creates logs directory."""
         monkeypatch.chdir(tmp_path)
-        logger = main_module.setup_logging()
+        main_module.setup_logging()
         assert (tmp_path / "logs").exists()
 
     def test_setup_logging_handles_exception(self, main_module):
@@ -331,7 +333,7 @@ class TestStartupShutdown:
         await main_module.shutdown_event()
 
         # Cache close should have been called
-        assert mock_cache.close.called or True  # Gracefully handle if not called
+        assert True  # Gracefully handle if not called
 
     @pytest.mark.asyncio
     async def test_shutdown_event_handles_exceptions(self, main_module):
@@ -425,8 +427,7 @@ class TestAgentEndpoints:
     def test_execute_agent_task_invalid_type(self, client):
         """Test POST /api/v1/agents execute with invalid type."""
         response = client.post(
-            "/api/v1/agents/invalid_type/test_name/execute",
-            json={"task": "test_task", "data": {"key": "value"}}
+            "/api/v1/agents/invalid_type/test_name/execute", json={"task": "test_task", "data": {"key": "value"}}
         )
         # Should return error
         assert response.status_code in [404, 500]
@@ -448,10 +449,7 @@ class TestAgentEndpoints:
 
     def test_execute_agent_task_unknown_agent(self, client):
         """Test execute task with unknown agent."""
-        response = client.post(
-            "/api/v1/agents/backend/unknown_xyz/execute",
-            json={"task": "test"}
-        )
+        response = client.post("/api/v1/agents/backend/unknown_xyz/execute", json={"task": "test"})
         assert response.status_code in [404, 500]
 
 
@@ -507,11 +505,7 @@ class TestAdvancedFeatureEndpoints:
         """Test /api/v1/orchestration/multi-agent endpoint."""
         response = client.post(
             "/api/v1/orchestration/multi-agent",
-            json={
-                "task_type": "test_task",
-                "content": "test content",
-                "metadata": {}
-            }
+            json={"task_type": "test_task", "content": "test content", "metadata": {}},
         )
         # May return 503 if not available, or 500 for other errors
         assert response.status_code in [200, 422, 500, 503]
@@ -520,11 +514,7 @@ class TestAdvancedFeatureEndpoints:
         """Test /api/v1/3d/models/upload endpoint."""
         response = client.post(
             "/api/v1/3d/models/upload",
-            json={
-                "file_path": "/test/model.glb",
-                "model_format": "glb",
-                "brand_context": "test brand"
-            }
+            json={"file_path": "/test/model.glb", "model_format": "glb", "brand_context": "test brand"},
         )
         # May return 422 for validation errors, 503 if not available
         assert response.status_code in [200, 422, 500, 503]
@@ -532,11 +522,7 @@ class TestAdvancedFeatureEndpoints:
     def test_create_avatar_endpoint(self, client):
         """Test /api/v1/avatars/create endpoint."""
         response = client.post(
-            "/api/v1/avatars/create",
-            json={
-                "avatar_type": "ready_player_me",
-                "customization_options": {}
-            }
+            "/api/v1/avatars/create", json={"avatar_type": "ready_player_me", "customization_options": {}}
         )
         # May return 500/503 if not available
         assert response.status_code in [200, 422, 500, 503]
@@ -558,10 +544,7 @@ class TestThemeBuilderEndpoints:
 
     def test_build_and_deploy_theme_missing_fields(self, client):
         """Test /api/v1/themes/build-and-deploy with missing fields."""
-        response = client.post(
-            "/api/v1/themes/build-and-deploy",
-            json={}
-        )
+        response = client.post("/api/v1/themes/build-and-deploy", json={})
         # Should return 422 or 500 for missing required fields
         assert response.status_code in [400, 422, 500]
 
@@ -573,8 +556,8 @@ class TestThemeBuilderEndpoints:
                 "theme_name": "test-theme",
                 "site_url": "https://test.com",
                 "username": "testuser",
-                "password": "testpass"
-            }
+                "password": "testpass",
+            },
         )
         # Will fail but should not crash
         assert response.status_code in [200, 400, 422, 500]
@@ -594,18 +577,15 @@ class TestThemeBuilderEndpoints:
                 "theme_name": "test-theme",
                 "site_url": "https://test.com",
                 "username": "test",
-                "password": "test"
-            }
+                "password": "test",
+            },
         )
         # Will fail but should not crash
         assert response.status_code in [200, 400, 422, 500]
 
     def test_skyy_rose_theme_build(self, client):
         """Test /api/v1/themes/skyy-rose/build endpoint."""
-        response = client.post(
-            "/api/v1/themes/skyy-rose/build",
-            json={"theme_name": "test-skyy-theme"}
-        )
+        response = client.post("/api/v1/themes/skyy-rose/build", json={"theme_name": "test-skyy-theme"})
         # Will fail but should not crash
         assert response.status_code in [200, 400, 422, 500]
 
@@ -617,10 +597,7 @@ class TestThemeBuilderEndpoints:
 
     def test_wordpress_connection_test(self, client):
         """Test /api/v1/themes/credentials/test endpoint."""
-        response = client.post(
-            "/api/v1/themes/credentials/test",
-            json={"site_key": "test_site"}
-        )
+        response = client.post("/api/v1/themes/credentials/test", json={"site_key": "test_site"})
         # Will fail for non-existent site but should not crash
         assert response.status_code in [200, 400, 422, 500]
 
@@ -636,9 +613,7 @@ class TestErrorHandling:
     def test_invalid_json_request(self, client):
         """Test endpoint with invalid JSON."""
         response = client.post(
-            "/api/v1/orchestration/multi-agent",
-            data="invalid json {{{",
-            headers={"Content-Type": "application/json"}
+            "/api/v1/orchestration/multi-agent", data="invalid json {{{", headers={"Content-Type": "application/json"}
         )
         # Should return 400 or 422
         assert response.status_code in [400, 422]
@@ -678,10 +653,7 @@ class TestCORSAndMiddleware:
 
     def test_cors_headers_on_options_request(self, client):
         """Test CORS headers are present on OPTIONS request."""
-        response = client.options(
-            "/health",
-            headers={"Origin": "http://localhost:3000"}
-        )
+        response = client.options("/health", headers={"Origin": "http://localhost:3000"})
         # CORS middleware should handle OPTIONS
         assert response.status_code in [200, 204]
 

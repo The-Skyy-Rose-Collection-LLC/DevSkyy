@@ -20,6 +20,7 @@ Mixins:
 import os
 import sys
 
+
 __version__ = "2.0.0"
 __author__ = "DevSkyy Enhanced Platform"
 
@@ -28,10 +29,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 # Public API exports
 __all__ = [
+    "AgentConfigLoader",
     "AgentOrchestrator",
     "AgentRegistry",
     "AgentRouter",
-    "AgentConfigLoader",
 ]
 
 
@@ -50,14 +51,18 @@ def __getattr__(name: str):
     """
     if name == "AgentOrchestrator":
         from agent.orchestrator import AgentOrchestrator
+
         return AgentOrchestrator
     elif name == "AgentRegistry":
         from agent.registry import AgentRegistry
+
         return AgentRegistry
     elif name == "AgentRouter":
         from agent.router import AgentRouter
+
         return AgentRouter
     elif name == "AgentConfigLoader":
         from agent.loader import AgentConfigLoader
+
         return AgentConfigLoader
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

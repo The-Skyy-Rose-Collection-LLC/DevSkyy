@@ -34,6 +34,7 @@ def test_client():
     # Mock problematic imports before loading main
     with patch("main.RedisCache"), patch("main.ModelRegistry"):
         import main
+
         client = TestClient(main.app)
         yield client
 
@@ -49,28 +50,33 @@ class TestModuleVariables:
     def test_version_constant_set(self):
         """Test VERSION constant is set correctly."""
         import main
+
         assert main.VERSION == "5.1.0-enterprise"
         assert isinstance(main.VERSION, str)
 
     def test_environment_variable_loaded(self):
         """Test ENVIRONMENT variable is loaded."""
         import main
+
         assert main.ENVIRONMENT in ["development", "test", "production"]
 
     def test_log_level_variable_set(self):
         """Test LOG_LEVEL variable is set."""
         import main
+
         assert main.LOG_LEVEL in ["DEBUG", "INFO", "WARNING", "ERROR"]
 
     def test_secret_key_loaded(self):
         """Test SECRET_KEY is loaded from environment."""
         import main
+
         assert main.SECRET_KEY is not None
         assert len(main.SECRET_KEY) > 0
 
     def test_redis_url_configuration(self):
         """Test REDIS_URL is configured."""
         import main
+
         assert main.REDIS_URL is not None
         assert "redis://" in main.REDIS_URL
 
@@ -80,6 +86,7 @@ class TestModuleVariables:
             import importlib
 
             import main as main_module
+
             importlib.reload(main_module)
             # Verify module reloaded
             assert main_module.VERSION is not None
@@ -90,6 +97,7 @@ class TestModuleVariables:
             import importlib
 
             import main as main_module
+
             importlib.reload(main_module)
             # Verify module reloaded
             assert main_module.VERSION is not None
@@ -106,6 +114,7 @@ class TestLoggingSetup:
     def test_setup_logging_returns_logger(self):
         """Test setup_logging returns a logger instance."""
         import main
+
         logger = main.setup_logging()
         assert logger is not None
         assert hasattr(logger, "info")
@@ -115,6 +124,7 @@ class TestLoggingSetup:
     def test_logger_module_variable_set(self):
         """Test logger module variable is set."""
         import main
+
         assert main.logger is not None
 
 
@@ -129,46 +139,54 @@ class TestApplicationCreation:
     def test_app_instance_exists(self, test_client):
         """Test FastAPI app instance exists."""
         import main
+
         assert main.app is not None
 
     def test_app_title_set(self, test_client):
         """Test app title is set correctly."""
         import main
+
         assert "DevSkyy" in main.app.title
         assert "Luxury" in main.app.title or "Fashion" in main.app.title
 
     def test_app_version_matches_constant(self, test_client):
         """Test app version matches VERSION constant."""
         import main
+
         assert main.app.version == main.VERSION
 
     def test_app_description_set(self, test_client):
         """Test app description is set."""
         import main
+
         assert main.app.description is not None
         assert len(main.app.description) > 0
 
     def test_app_state_version_initialized(self, test_client):
         """Test app.state.version is initialized."""
         import main
+
         assert hasattr(main.app.state, "version")
         assert main.app.state.version == main.VERSION
 
     def test_app_state_environment_initialized(self, test_client):
         """Test app.state.environment is initialized."""
         import main
+
         assert hasattr(main.app.state, "environment")
         assert main.app.state.environment in ["development", "test", "production"]
 
     def test_app_state_startup_time_initialized(self, test_client):
         """Test app.state.startup_time is initialized."""
         import main
+
         assert hasattr(main.app.state, "startup_time")
         assert isinstance(main.app.state.startup_time, datetime)
 
     def test_agent_cache_initialized(self, test_client):
         """Test _agent_cache dictionary is initialized."""
         import main
+
         assert hasattr(main, "_agent_cache")
         assert isinstance(main._agent_cache, dict)
 
@@ -195,6 +213,7 @@ class TestExceptionHandlers:
         assert response.status_code == 404
         # JSONResponse body is bytes, decode it
         import json
+
         body = json.loads(response.body.decode())
         assert body["error"] is True
         assert "Not found" in body["message"]
@@ -237,6 +256,7 @@ class TestGetAgentFactory:
     def test_get_agent_returns_none_for_unknown_type(self):
         """Test get_agent returns None for unknown agent type."""
         import main
+
         main._agent_cache.clear()
 
         agent = main.get_agent("unknown_type", "test_agent")
@@ -245,6 +265,7 @@ class TestGetAgentFactory:
     def test_get_agent_returns_none_for_unknown_backend_agent(self):
         """Test get_agent returns None for unknown backend agent."""
         import main
+
         main._agent_cache.clear()
 
         with patch("main.AGENT_MODULES_AVAILABLE", True):
@@ -254,6 +275,7 @@ class TestGetAgentFactory:
     def test_get_agent_returns_none_for_unknown_frontend_agent(self):
         """Test get_agent returns None for unknown frontend agent."""
         import main
+
         main._agent_cache.clear()
 
         with patch("main.AGENT_MODULES_AVAILABLE", True):
@@ -263,6 +285,7 @@ class TestGetAgentFactory:
     def test_get_agent_returns_none_for_unknown_intelligence_agent(self):
         """Test get_agent returns None for unknown intelligence agent."""
         import main
+
         main._agent_cache.clear()
 
         with patch("main.AI_SERVICES_AVAILABLE", True):
@@ -272,6 +295,7 @@ class TestGetAgentFactory:
     def test_get_agent_returns_none_when_modules_unavailable(self):
         """Test get_agent returns None when modules are unavailable."""
         import main
+
         main._agent_cache.clear()
 
         with patch("main.AGENT_MODULES_AVAILABLE", False):
@@ -281,6 +305,7 @@ class TestGetAgentFactory:
     def test_get_agent_handles_exception_gracefully(self):
         """Test get_agent handles exceptions and returns None."""
         import main
+
         main._agent_cache.clear()
 
         # Test with exception during agent creation
@@ -416,10 +441,7 @@ class TestAgentEndpoints:
 
     def test_execute_agent_task_endpoint_returns_error_for_invalid_agent(self, test_client):
         """Test POST /api/v1/agents/{type}/{name}/execute returns error for invalid agent."""
-        response = test_client.post(
-            "/api/v1/agents/invalid_type/invalid_name/execute",
-            json={"task": "test"}
-        )
+        response = test_client.post("/api/v1/agents/invalid_type/invalid_name/execute", json={"task": "test"})
         # Should return either 404 or 500
         assert response.status_code in [404, 500]
 
@@ -471,10 +493,7 @@ class TestAdvancedFeatureEndpoints:
     def test_multi_agent_orchestration_endpoint_structure(self, test_client):
         """Test multi-agent orchestration endpoint exists."""
         # Just test that the endpoint exists and returns some response
-        response = test_client.post(
-            "/api/v1/orchestration/multi-agent",
-            json={"task_type": "test", "content": "test"}
-        )
+        response = test_client.post("/api/v1/orchestration/multi-agent", json={"task_type": "test", "content": "test"})
         # Should return either 503 (not available) or 500 (error) or 200 (success)
         assert response.status_code in [200, 500, 503]
 
@@ -524,41 +543,49 @@ class TestAvailabilityFlags:
     def test_logfire_available_flag_is_boolean(self):
         """Test LOGFIRE_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.LOGFIRE_AVAILABLE, bool)
 
     def test_prometheus_available_flag_is_boolean(self):
         """Test PROMETHEUS_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.PROMETHEUS_AVAILABLE, bool)
 
     def test_core_modules_available_flag_is_boolean(self):
         """Test CORE_MODULES_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.CORE_MODULES_AVAILABLE, bool)
 
     def test_security_modules_available_flag_is_boolean(self):
         """Test SECURITY_MODULES_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.SECURITY_MODULES_AVAILABLE, bool)
 
     def test_webhook_system_available_flag_is_boolean(self):
         """Test WEBHOOK_SYSTEM_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.WEBHOOK_SYSTEM_AVAILABLE, bool)
 
     def test_agent_modules_available_flag_is_boolean(self):
         """Test AGENT_MODULES_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.AGENT_MODULES_AVAILABLE, bool)
 
     def test_ai_services_available_flag_is_boolean(self):
         """Test AI_SERVICES_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.AI_SERVICES_AVAILABLE, bool)
 
     def test_api_routers_available_flag_is_boolean(self):
         """Test API_ROUTERS_AVAILABLE is boolean."""
         import main
+
         assert isinstance(main.API_ROUTERS_AVAILABLE, bool)
 
 
@@ -577,6 +604,7 @@ class TestConfigurationValidation:
                 import importlib
 
                 import main as main_module
+
                 importlib.reload(main_module)
                 # Verify reload happened
                 assert main_module.VERSION is not None
@@ -612,6 +640,7 @@ class TestStaticFiles:
     def test_static_directories_list_defined(self):
         """Test static_dirs list is defined."""
         import main
+
         # The code defines static_dirs at module level
         # Just verify main module loaded
         assert main.app is not None

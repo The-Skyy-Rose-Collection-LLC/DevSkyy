@@ -1081,7 +1081,7 @@ class TestIntegrationScenarios:
             patch.object(SecurityComplianceReviewer, "review_content", new=mock_review_with_tracking("Security")),
         ):
 
-            consensus = await orchestrator.review_draft(sample_draft)
+            await orchestrator.review_draft(sample_draft)
 
             # All should start before any ends (parallel execution)
             start_calls = [item for item in call_order if item.endswith("_start")]
@@ -1120,7 +1120,7 @@ class TestIntegrationScenarios:
 
     def test_webhook_expiry_timestamp(self, mock_content_generator, brand_config):
         """Test webhook expiry is set correctly (1 hour from now)"""
-        orchestrator = ConsensusOrchestrator(mock_content_generator, brand_config)
+        ConsensusOrchestrator(mock_content_generator, brand_config)
 
         draft = ContentDraft(title="Test", content="Test", meta_description="Test", word_count=100)
         workflow = WorkflowState(topic="Test", current_draft=draft)

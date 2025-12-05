@@ -31,17 +31,16 @@ Features:
 Truth Protocol: Standard MCP compliance, structured output, secure access
 """
 
-import base64
-import io
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP, Image
 from mcp.server.fastmcp.prompts import base
 from mcp.types import CallToolResult, TextContent
 from pydantic import BaseModel, Field
+
 
 # Configuration
 DEVSKYY_API_URL = os.getenv("DEVSKYY_API_URL", "http://localhost:8000")
@@ -513,9 +512,7 @@ def performance_investigation(symptom: str) -> list[base.Message]:
     """
     return [
         base.UserMessage(f"I'm experiencing this performance issue: {symptom}"),
-        base.AssistantMessage(
-            "I'll help investigate this performance issue. Let me start by gathering metrics."
-        ),
+        base.AssistantMessage("I'll help investigate this performance issue. Let me start by gathering metrics."),
         base.UserMessage(
             "Please run `get_performance_metrics` first to get current system state, "
             "then use `optimize_database` with operation='analyze' to check for slow queries."
@@ -581,9 +578,7 @@ def debug_error(error_message: str, stack_trace: str = "") -> list[base.Message]
 
     messages.extend(
         [
-            base.AssistantMessage(
-                "I'll help debug this error. Let me analyze the issue and check system health."
-            ),
+            base.AssistantMessage("I'll help debug this error. Let me analyze the issue and check system health."),
             base.UserMessage(
                 "First, run `self_heal` with auto_fix=False to diagnose without making changes. "
                 "Then run `get_performance_metrics` to check if this correlates with system load."
@@ -734,10 +729,7 @@ async def optimize_cache(
 
     logger.info(f"Cache {operation} completed: {keys_affected} keys affected")
 
-    summary = (
-        f"Cache {operation} completed: {keys_affected} keys affected. "
-        f"Cache size: 256.5 MB, Hit rate: 85%"
-    )
+    summary = f"Cache {operation} completed: {keys_affected} keys affected. " f"Cache size: 256.5 MB, Hit rate: 85%"
 
     return CallToolResult(
         content=[TextContent(type="text", text=summary)],
@@ -966,14 +958,16 @@ async def analyze_image(
         width=1920,
         height=1080,
         file_size_kb=2450.5,
-        optimization_suggestions=[
-            "Convert to WebP for 30% size reduction",
-            "Resize to 1280x720 for web use",
-            "Enable progressive loading",
-            "Strip EXIF metadata to reduce size",
-        ]
-        if include_optimization
-        else [],
+        optimization_suggestions=(
+            [
+                "Convert to WebP for 30% size reduction",
+                "Resize to 1280x720 for web use",
+                "Enable progressive loading",
+                "Strip EXIF metadata to reduce size",
+            ]
+            if include_optimization
+            else []
+        ),
     )
 
     logger.info(f"Image analysis completed for {image_path}")
@@ -1144,51 +1138,6 @@ async def optimize_image(
 
 def run_server():
     """Run the MCP server."""
-    print(
-        f"""
-    DevSkyy MCP Optimization Server (Full Featured)
-
-    API URL: {DEVSKYY_API_URL}
-    Redis: {REDIS_HOST}:{REDIS_PORT}
-
-    Tools (9 total):
-    - optimize_code: Code optimization and analysis
-    - optimize_cache: Redis cache management
-    - get_performance_metrics: Real-time metrics
-    - optimize_database: Database optimization
-    - self_heal: Self-healing diagnostics
-    - analyze_image: Image analysis
-    - generate_performance_chart: Create metric charts
-    - create_status_badge: Generate status badges
-    - optimize_image: Image optimization
-
-    Resources (7 total):
-    - devskyy://config/settings: Server configuration
-    - devskyy://agents/catalog: Agent directory
-    - devskyy://health/live: Real-time health status
-    - devskyy://metrics/summary: Performance metrics summary
-    - devskyy://docs/api-reference: API documentation
-    - devskyy://templates/optimization-report: Report template
-    - devskyy://schemas/tool-inputs: JSON schemas
-
-    Prompts (5 total):
-    - Code Optimization Workflow
-    - Performance Investigation
-    - System Health Audit
-    - Debug Error
-    - Cache Optimization Strategy
-
-    Features:
-    - CallToolResult for full response control
-    - Annotated types for Pydantic validation
-    - Hidden _meta for client applications
-    - Image generation and analysis
-    - Guided workflow prompts
-    - MCP Resources for data exposure
-
-    Starting server...
-    """
-    )
     mcp.run()
 
 

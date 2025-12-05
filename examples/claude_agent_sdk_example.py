@@ -16,13 +16,9 @@ async def example_default_settings():
     In v0.1.0+, settings are NOT loaded automatically by default.
     This gives you full control over what gets loaded.
     """
-    print("=" * 60)
-    print("Example 1: Default (no settings loaded)")
-    print("=" * 60)
 
-    async for message in query(prompt="What is the capital of France?"):
-        print(f"Response: {message}")
-    print()
+    async for _message in query(prompt="What is the capital of France?"):
+        pass
 
 
 async def example_with_all_settings():
@@ -32,20 +28,11 @@ async def example_with_all_settings():
     To get the old v0.0.x behavior where all settings were loaded
     automatically, specify all setting sources.
     """
-    print("=" * 60)
-    print("Example 2: Load all settings (user, project, local)")
-    print("=" * 60)
 
-    options = ClaudeAgentOptions(
-        setting_sources=["user", "project", "local"]
-    )
+    options = ClaudeAgentOptions(setting_sources=["user", "project", "local"])
 
-    async for message in query(
-        prompt="Explain quantum computing in simple terms",
-        options=options
-    ):
-        print(f"Response: {message}")
-    print()
+    async for _message in query(prompt="Explain quantum computing in simple terms", options=options):
+        pass
 
 
 async def example_with_project_only():
@@ -55,20 +42,11 @@ async def example_with_project_only():
     For team collaboration, you might want only project-level
     settings without user-specific customizations.
     """
-    print("=" * 60)
-    print("Example 3: Load only project settings")
-    print("=" * 60)
 
-    options = ClaudeAgentOptions(
-        setting_sources=["project"]  # Only .claude/settings.json
-    )
+    options = ClaudeAgentOptions(setting_sources=["project"])  # Only .claude/settings.json
 
-    async for message in query(
-        prompt="Write a Python function to calculate fibonacci numbers",
-        options=options
-    ):
-        print(f"Response: {message}")
-    print()
+    async for _message in query(prompt="Write a Python function to calculate fibonacci numbers", options=options):
+        pass
 
 
 async def example_with_custom_model():
@@ -77,21 +55,11 @@ async def example_with_custom_model():
 
     Combine settings sources with custom model selection.
     """
-    print("=" * 60)
-    print("Example 4: Custom model with project settings")
-    print("=" * 60)
 
-    options = ClaudeAgentOptions(
-        setting_sources=["project"],
-        model="claude-sonnet-4-5-20250929"  # Latest Sonnet 4.5
-    )
+    options = ClaudeAgentOptions(setting_sources=["project"], model="claude-sonnet-4-5-20250929")  # Latest Sonnet 4.5
 
-    async for message in query(
-        prompt="Explain the Observer pattern in software design",
-        options=options
-    ):
-        print(f"Response: {message}")
-    print()
+    async for _message in query(prompt="Explain the Observer pattern in software design", options=options):
+        pass
 
 
 async def example_streaming():
@@ -100,34 +68,15 @@ async def example_streaming():
 
     The query() function returns an async generator for streaming.
     """
-    print("=" * 60)
-    print("Example 5: Streaming with project settings")
-    print("=" * 60)
 
-    options = ClaudeAgentOptions(
-        setting_sources=["project", "local"]
-    )
+    options = ClaudeAgentOptions(setting_sources=["project", "local"])
 
-    print("Streaming response: ", end="", flush=True)
-    async for chunk in query(
-        prompt="Count from 1 to 5",
-        options=options
-    ):
-        print(chunk, end="", flush=True)
-    print("\n")
+    async for _chunk in query(prompt="Count from 1 to 5", options=options):
+        pass
 
 
 async def main():
     """Run all examples"""
-    print("\n" + "=" * 60)
-    print("Claude Agent SDK v0.1.9 - Breaking Changes Demo")
-    print("=" * 60)
-    print()
-    print("Breaking changes in v0.1.0:")
-    print("- Settings are NO LONGER loaded automatically by default")
-    print("- Use ClaudeAgentOptions(setting_sources=[...]) to load settings")
-    print("- This gives you explicit control over configuration")
-    print()
 
     try:
         # Run examples
@@ -137,9 +86,9 @@ async def main():
         await example_with_custom_model()
         await example_streaming()
 
-    except Exception as e:
-        print(f"Error: {e}")
+    except Exception:
         import traceback
+
         traceback.print_exc()
 
 

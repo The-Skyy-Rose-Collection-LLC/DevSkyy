@@ -39,8 +39,10 @@ logger = logging.getLogger(__name__)
 # AGENT CATEGORIES AND FINETUNING CONFIGURATION
 # ============================================================================
 
+
 class AgentCategory(str, Enum):
     """DevSkyy agent categories for specialized finetuning"""
+
     CORE_SECURITY = "core_security"  # Scanner, Fixer, Security agents
     AI_INTELLIGENCE = "ai_intelligence"  # Claude, OpenAI, Multi-model orchestration
     ECOMMERCE = "ecommerce"  # E-commerce, Inventory, Financial
@@ -52,6 +54,7 @@ class AgentCategory(str, Enum):
 
 class FinetuningProvider(str, Enum):
     """Supported finetuning providers"""
+
     OPENAI = "openai"  # OpenAI GPT-4/3.5 finetuning
     ANTHROPIC = "anthropic"  # Claude model finetuning (when available)
     CUSTOM = "custom"  # Custom model training
@@ -60,6 +63,7 @@ class FinetuningProvider(str, Enum):
 
 class FinetuningStatus(str, Enum):
     """Finetuning job status"""
+
     PENDING = "pending"
     COLLECTING_DATA = "collecting_data"
     PREPARING_DATASET = "preparing_dataset"
@@ -74,9 +78,11 @@ class FinetuningStatus(str, Enum):
 # DATA MODELS
 # ============================================================================
 
+
 @dataclass
 class AgentPerformanceSnapshot:
     """Snapshot of agent performance for training data"""
+
     agent_id: str
     agent_name: str
     category: AgentCategory
@@ -95,6 +101,7 @@ class AgentPerformanceSnapshot:
 @dataclass
 class FinetuningDataset:
     """Training dataset for agent category"""
+
     dataset_id: str
     category: AgentCategory
     created_at: datetime
@@ -107,6 +114,7 @@ class FinetuningDataset:
 
 class FinetuningConfig(BaseModel):
     """Configuration for finetuning job"""
+
     category: AgentCategory
     provider: FinetuningProvider
     base_model: str  # e.g., "gpt-4o-mini", "claude-sonnet-4"
@@ -134,6 +142,7 @@ class FinetuningConfig(BaseModel):
 
 class FinetuningJob(BaseModel):
     """Finetuning job tracking"""
+
     job_id: str
     category: AgentCategory
     config: FinetuningConfig
@@ -162,6 +171,7 @@ class FinetuningJob(BaseModel):
 # ============================================================================
 # FINETUNING SYSTEM
 # ============================================================================
+
 
 class AgentFinetuningSystem:
     """
@@ -206,7 +216,7 @@ class AgentFinetuningSystem:
         execution_time_ms: float,
         tokens_used: int = 0,
         user_feedback: float | None = None,
-        metadata: dict[str, Any] | None = None
+        metadata: dict[str, Any] | None = None,
     ):
         """
         Collect a performance snapshot from an agent for training data.
@@ -226,7 +236,7 @@ class AgentFinetuningSystem:
             execution_time_ms=execution_time_ms,
             tokens_used=tokens_used,
             user_feedback=user_feedback,
-            metadata=metadata or {}
+            metadata=metadata or {},
         )
 
         self.performance_snapshots.append(snapshot)
@@ -247,21 +257,26 @@ class AgentFinetuningSystem:
 
         with open(file_path, "w") as f:
             for snapshot in self.performance_snapshots:
-                f.write(json.dumps({
-                    "agent_id": snapshot.agent_id,
-                    "agent_name": snapshot.agent_name,
-                    "category": snapshot.category.value,
-                    "timestamp": snapshot.timestamp.isoformat(),
-                    "task_type": snapshot.task_type,
-                    "input_data": snapshot.input_data,
-                    "output_data": snapshot.output_data,
-                    "success": snapshot.success,
-                    "performance_score": snapshot.performance_score,
-                    "execution_time_ms": snapshot.execution_time_ms,
-                    "tokens_used": snapshot.tokens_used,
-                    "user_feedback": snapshot.user_feedback,
-                    "metadata": snapshot.metadata
-                }) + "\n")
+                f.write(
+                    json.dumps(
+                        {
+                            "agent_id": snapshot.agent_id,
+                            "agent_name": snapshot.agent_name,
+                            "category": snapshot.category.value,
+                            "timestamp": snapshot.timestamp.isoformat(),
+                            "task_type": snapshot.task_type,
+                            "input_data": snapshot.input_data,
+                            "output_data": snapshot.output_data,
+                            "success": snapshot.success,
+                            "performance_score": snapshot.performance_score,
+                            "execution_time_ms": snapshot.execution_time_ms,
+                            "tokens_used": snapshot.tokens_used,
+                            "user_feedback": snapshot.user_feedback,
+                            "metadata": snapshot.metadata,
+                        }
+                    )
+                    + "\n"
+                )
 
         logger.info(f"Flushed {len(self.performance_snapshots)} snapshots to {file_path}")
         self.performance_snapshots = []
@@ -272,7 +287,7 @@ class AgentFinetuningSystem:
         min_samples: int = 100,
         max_samples: int = 10000,
         quality_threshold: float = 0.7,
-        time_range_days: int = 30
+        time_range_days: int = 30,
     ) -> FinetuningDataset:
         """
         Prepare a training dataset for a specific agent category.
@@ -287,42 +302,28 @@ class AgentFinetuningSystem:
         all_snapshots = await self._load_snapshots_for_category(category, time_range_days)
 
         # Filter for quality
-        quality_snapshots = [
-            s for s in all_snapshots
-            if s.performance_score >= quality_threshold and s.success
-        ]
+        quality_snapshots = [s for s in all_snapshots if s.performance_score >= quality_threshold and s.success]
 
         # Add some failure examples for robustness (10% of dataset)
-        failure_snapshots = [
-            s for s in all_snapshots
-            if not s.success
-        ][:max(10, len(quality_snapshots) // 10)]
+        failure_snapshots = [s for s in all_snapshots if not s.success][: max(10, len(quality_snapshots) // 10)]
 
         combined_snapshots = quality_snapshots + failure_snapshots
 
         # Limit to max_samples
         if len(combined_snapshots) > max_samples:
             # Randomly sample while maintaining distribution
-            indices = np.random.choice(
-                len(combined_snapshots),
-                size=max_samples,
-                replace=False
-            )
+            indices = np.random.choice(len(combined_snapshots), size=max_samples, replace=False)
             combined_snapshots = [combined_snapshots[i] for i in indices]
 
         if len(combined_snapshots) < min_samples:
             raise ValueError(
-                f"Insufficient data for {category.value}: "
-                f"found {len(combined_snapshots)}, need {min_samples}"
+                f"Insufficient data for {category.value}: " f"found {len(combined_snapshots)}, need {min_samples}"
             )
 
         # Create dataset with train/val/test splits
         dataset_id = f"{category.value}_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
         dataset = FinetuningDataset(
-            dataset_id=dataset_id,
-            category=category,
-            created_at=datetime.now(),
-            snapshots=combined_snapshots
+            dataset_id=dataset_id, category=category, created_at=datetime.now(), snapshots=combined_snapshots
         )
 
         # Split: 80% train, 10% val, 10% test
@@ -352,18 +353,13 @@ class AgentFinetuningSystem:
         return dataset
 
     async def _load_snapshots_for_category(
-        self,
-        category: AgentCategory,
-        time_range_days: int
+        self, category: AgentCategory, time_range_days: int
     ) -> list[AgentPerformanceSnapshot]:
         """Load all snapshots for a category within time range"""
         cutoff = datetime.now() - timedelta(days=time_range_days)
 
         # Start with in-memory snapshots
-        snapshots = [
-            s for s in self.performance_snapshots
-            if s.category == category and s.timestamp > cutoff
-        ]
+        snapshots = [s for s in self.performance_snapshots if s.category == category and s.timestamp > cutoff]
 
         # Load from disk files
         for file_path in self.data_dir.glob("snapshots_*.jsonl"):
@@ -373,21 +369,23 @@ class AgentFinetuningSystem:
                     if data["category"] == category.value:
                         timestamp = datetime.fromisoformat(data["timestamp"])
                         if timestamp > cutoff:
-                            snapshots.append(AgentPerformanceSnapshot(
-                                agent_id=data["agent_id"],
-                                agent_name=data["agent_name"],
-                                category=AgentCategory(data["category"]),
-                                timestamp=timestamp,
-                                task_type=data["task_type"],
-                                input_data=data["input_data"],
-                                output_data=data["output_data"],
-                                success=data["success"],
-                                performance_score=data["performance_score"],
-                                execution_time_ms=data["execution_time_ms"],
-                                tokens_used=data.get("tokens_used", 0),
-                                user_feedback=data.get("user_feedback"),
-                                metadata=data.get("metadata", {})
-                            ))
+                            snapshots.append(
+                                AgentPerformanceSnapshot(
+                                    agent_id=data["agent_id"],
+                                    agent_name=data["agent_name"],
+                                    category=AgentCategory(data["category"]),
+                                    timestamp=timestamp,
+                                    task_type=data["task_type"],
+                                    input_data=data["input_data"],
+                                    output_data=data["output_data"],
+                                    success=data["success"],
+                                    performance_score=data["performance_score"],
+                                    execution_time_ms=data["execution_time_ms"],
+                                    tokens_used=data.get("tokens_used", 0),
+                                    user_feedback=data.get("user_feedback"),
+                                    metadata=data.get("metadata", {}),
+                                )
+                            )
 
         return snapshots
 
@@ -407,8 +405,8 @@ class AgentFinetuningSystem:
             "task_type_distribution": self._get_task_distribution(all_snapshots),
             "date_range": {
                 "start": min(s.timestamp for s in all_snapshots).isoformat(),
-                "end": max(s.timestamp for s in all_snapshots).isoformat()
-            }
+                "end": max(s.timestamp for s in all_snapshots).isoformat(),
+            },
         }
 
     def _get_task_distribution(self, snapshots: list[AgentPerformanceSnapshot]) -> dict[str, int]:
@@ -430,7 +428,7 @@ class AgentFinetuningSystem:
             "statistics": dataset.statistics,
             "train_samples": len(dataset.train_split),
             "val_samples": len(dataset.val_split),
-            "test_samples": len(dataset.test_split)
+            "test_samples": len(dataset.test_split),
         }
 
         with open(file_path, "w") as f:
@@ -438,11 +436,7 @@ class AgentFinetuningSystem:
 
         logger.info(f"Saved dataset to {file_path}")
 
-    async def create_finetuning_job(
-        self,
-        category: AgentCategory,
-        config: FinetuningConfig
-    ) -> FinetuningJob:
+    async def create_finetuning_job(self, category: AgentCategory, config: FinetuningConfig) -> FinetuningJob:
         """
         Create a new finetuning job for an agent category.
 
@@ -467,7 +461,7 @@ class AgentFinetuningSystem:
             status=FinetuningStatus.PENDING,
             created_at=datetime.now(),
             training_samples=len(dataset.train_split),
-            validation_samples=len(dataset.val_split)
+            validation_samples=len(dataset.val_split),
         )
 
         self.jobs[job_id] = job
@@ -478,11 +472,7 @@ class AgentFinetuningSystem:
         logger.info(f"✅ Created finetuning job: {job_id}")
         return job
 
-    async def _execute_finetuning_job(
-        self,
-        job: FinetuningJob,
-        dataset: FinetuningDataset
-    ):
+    async def _execute_finetuning_job(self, job: FinetuningJob, dataset: FinetuningDataset):
         """Execute finetuning job (background task)"""
         try:
             job.status = FinetuningStatus.PREPARING_DATASET
@@ -527,16 +517,10 @@ class AgentFinetuningSystem:
                     "messages": [
                         {
                             "role": "system",
-                            "content": f"You are a specialized AI agent for {snapshot.category.value} tasks."
+                            "content": f"You are a specialized AI agent for {snapshot.category.value} tasks.",
                         },
-                        {
-                            "role": "user",
-                            "content": json.dumps(snapshot.input_data)
-                        },
-                        {
-                            "role": "assistant",
-                            "content": json.dumps(snapshot.output_data)
-                        }
+                        {"role": "user", "content": json.dumps(snapshot.input_data)},
+                        {"role": "assistant", "content": json.dumps(snapshot.output_data)},
                     ]
                 }
                 f.write(json.dumps(training_example) + "\n")
@@ -569,10 +553,7 @@ class AgentFinetuningSystem:
 
     def get_category_jobs(self, category: AgentCategory) -> list[FinetuningJob]:
         """Get all jobs for a category"""
-        return [
-            job for job in self.jobs.values()
-            if job.category == category
-        ]
+        return [job for job in self.jobs.values() if job.category == category]
 
     def get_system_statistics(self) -> dict[str, Any]:
         """Get comprehensive system statistics"""
@@ -580,25 +561,21 @@ class AgentFinetuningSystem:
             "total_snapshots": len(self.performance_snapshots),
             "datasets_prepared": len(self.datasets),
             "active_jobs": sum(
-                1 for job in self.jobs.values()
-                if job.status in [
+                1
+                for job in self.jobs.values()
+                if job.status
+                in [
                     FinetuningStatus.PENDING,
                     FinetuningStatus.COLLECTING_DATA,
                     FinetuningStatus.PREPARING_DATASET,
                     FinetuningStatus.TRAINING,
-                    FinetuningStatus.VALIDATING
+                    FinetuningStatus.VALIDATING,
                 ]
             ),
-            "completed_jobs": sum(
-                1 for job in self.jobs.values()
-                if job.status == FinetuningStatus.COMPLETED
-            ),
-            "failed_jobs": sum(
-                1 for job in self.jobs.values()
-                if job.status == FinetuningStatus.FAILED
-            ),
-            "categories_with_data": [cat.value for cat in self.datasets.keys()],
-            "total_cost_usd": sum(job.cost_usd for job in self.jobs.values())
+            "completed_jobs": sum(1 for job in self.jobs.values() if job.status == FinetuningStatus.COMPLETED),
+            "failed_jobs": sum(1 for job in self.jobs.values() if job.status == FinetuningStatus.FAILED),
+            "categories_with_data": [cat.value for cat in self.datasets],
+            "total_cost_usd": sum(job.cost_usd for job in self.jobs.values()),
         }
 
 

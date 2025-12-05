@@ -220,13 +220,17 @@ class WordPressIntegrationService:
 
             headers = {"Authorization": f"Bearer {self.access_token}"}
 
-            response = requests.get(f"{self.api_base}/sites/{self.site_id}/themes/mine", headers=headers, timeout=HTTP_TIMEOUT)
+            response = requests.get(
+                f"{self.api_base}/sites/{self.site_id}/themes/mine", headers=headers, timeout=HTTP_TIMEOUT
+            )
             response.raise_for_status()
 
             theme_data = response.json()
 
             # Also get site customization options
-            customizer_response = requests.get(f"{self.api_base}/sites/{self.site_id}/customizer", headers=headers, timeout=HTTP_TIMEOUT)
+            customizer_response = requests.get(
+                f"{self.api_base}/sites/{self.site_id}/customizer", headers=headers, timeout=HTTP_TIMEOUT
+            )
 
             customizer_data = {}
             if customizer_response.status_code == 200:

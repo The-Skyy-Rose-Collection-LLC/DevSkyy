@@ -124,7 +124,7 @@ class StdioMCPClient:
         env.update(self.env)
 
         self.process = subprocess.Popen(
-            [self.command] + self.args,
+            [self.command, *self.args],
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
@@ -333,7 +333,7 @@ async def list_servers():
                 "type": MCP_SERVERS[name]["type"],
                 "status": "active",
             }
-            for name in gateway.clients.keys()
+            for name in gateway.clients
         }
     }
 

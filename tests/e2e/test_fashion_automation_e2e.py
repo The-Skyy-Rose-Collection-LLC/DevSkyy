@@ -21,21 +21,18 @@ Per Truth Protocol:
 """
 
 import asyncio
-from datetime import datetime
-import json
+import contextlib
 import logging
 from pathlib import Path
 import tempfile
 import time
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
 from agent.fashion_orchestrator import (
     FashionAssetType,
-    AIModelProvider,
-    ProductDescription,
     FashionOrchestrator,
 )
 
@@ -81,6 +78,7 @@ def complete_product_data() -> dict[str, Any]:
 @pytest.fixture
 def mock_3d_processor():
     """Mock 3D model processor."""
+
     async def process_3d(images: list[str]) -> dict[str, Any]:
         await asyncio.sleep(0.5)  # Simulate processing time
         return {
@@ -97,6 +95,7 @@ def mock_3d_processor():
 @pytest.fixture
 def mock_virtual_tryon_engine():
     """Mock virtual try-on engine."""
+
     async def generate_tryon(model_url: str, avatar_id: str) -> dict[str, Any]:
         await asyncio.sleep(0.3)
         return {
@@ -110,6 +109,7 @@ def mock_virtual_tryon_engine():
 @pytest.fixture
 def mock_ai_content_generator():
     """Mock AI content generator (Claude)."""
+
     async def generate_content(prompt: str, **kwargs: Any) -> dict[str, Any]:
         await asyncio.sleep(0.2)
         return {
@@ -145,8 +145,12 @@ def mock_ai_content_generator():
 def mock_wordpress_api():
     """Mock WordPress REST API."""
     client = MagicMock()
-    client.create_post = AsyncMock(return_value={"id": 10001, "link": "https://example.com/product/elegant-evening-handbag"})
-    client.upload_media = AsyncMock(return_value={"id": 20001, "source_url": "https://example.com/wp-content/uploads/handbag.jpg"})
+    client.create_post = AsyncMock(
+        return_value={"id": 10001, "link": "https://example.com/product/elegant-evening-handbag"}
+    )
+    client.upload_media = AsyncMock(
+        return_value={"id": 20001, "source_url": "https://example.com/wp-content/uploads/handbag.jpg"}
+    )
     client.create_category = AsyncMock(return_value={"id": 5, "name": "Handbags"})
     return client
 
@@ -623,18 +627,22 @@ class TestCompleteE2EWorkflow:
         assert "title_tag" in seo_metadata
 
         # Stage 6: WordPress Publishing
-        post_result = await orchestrator.publish_to_wordpress({
-            "title": content["title"],
-            "content": content["long_description"],
-        })
+        post_result = await orchestrator.publish_to_wordpress(
+            {
+                "title": content["title"],
+                "content": content["long_description"],
+            }
+        )
         assert post_result["id"] > 0
 
         # Stage 7: WooCommerce Product Creation
-        product_result = await orchestrator.create_woocommerce_product({
-            "name": content["title"],
-            "regular_price": str(complete_product_data["price"]),
-            "sku": complete_product_data["sku"],
-        })
+        product_result = await orchestrator.create_woocommerce_product(
+            {
+                "name": content["title"],
+                "regular_price": str(complete_product_data["price"]),
+                "sku": complete_product_data["sku"],
+            }
+        )
         assert product_result["id"] > 0
 
         total_time = time.time() - start_time
@@ -653,19 +661,17 @@ class TestCompleteE2EWorkflow:
         orchestrator.wordpress_client = mock_wordpress_api
 
         # Simulate WordPress error
-        mock_wordpress_api.create_post = AsyncMock(
-            side_effect=Exception("WordPress API timeout")
-        )
+        mock_wordpress_api.create_post = AsyncMock(side_effect=Exception("WordPress API timeout"))
 
         orchestrator.enable_error_ledger()
 
-        try:
-            await orchestrator.publish_to_wordpress({
-                "title": "Test Product",
-                "content": "Test content",
-            })
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            await orchestrator.publish_to_wordpress(
+                {
+                    "title": "Test Product",
+                    "content": "Test content",
+                }
+            )
 
         error_ledger = orchestrator.get_error_ledger()
 
@@ -685,22 +691,24 @@ class TestCompleteE2EWorkflow:
         orchestrator.woocommerce_client = mock_woocommerce_api
 
         # WordPress succeeds
-        post_result = await orchestrator.publish_to_wordpress({
-            "title": "Test Product",
-            "content": "Test content",
-        })
+        post_result = await orchestrator.publish_to_wordpress(
+            {
+                "title": "Test Product",
+                "content": "Test content",
+            }
+        )
         assert post_result["id"] == 10001
 
         # WooCommerce fails
-        mock_woocommerce_api.create_product = AsyncMock(
-            side_effect=Exception("WooCommerce product creation failed")
-        )
+        mock_woocommerce_api.create_product = AsyncMock(side_effect=Exception("WooCommerce product creation failed"))
 
         try:
-            await orchestrator.create_woocommerce_product({
-                "name": "Test Product",
-                "price": "99.99",
-            })
+            await orchestrator.create_woocommerce_product(
+                {
+                    "name": "Test Product",
+                    "price": "99.99",
+                }
+            )
         except Exception:
             # Rollback: delete WordPress post
             await orchestrator.rollback_wordpress_post(post_result["id"])

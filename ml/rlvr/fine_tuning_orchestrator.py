@@ -55,7 +55,7 @@ class FineTuningOrchestrator:
         agent_id: uuid.UUID,
         provider: str = "openai",
         base_model: str | None = None,
-        hyperparameters: dict[str, Any] | None = None
+        hyperparameters: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Start a fine-tuning run for an agent.
@@ -71,7 +71,7 @@ class FineTuningOrchestrator:
         """
         # Check if enough training data
         stats = await self.collector.get_collection_stats(agent_id)
-        if not stats['ready_for_training']:
+        if not stats["ready_for_training"]:
             raise ValueError(
                 f"Not enough training data. "
                 f"Need {self.collector.min_examples_per_agent}, "
@@ -79,39 +79,27 @@ class FineTuningOrchestrator:
             )
 
         # Create fine-tuning run record
-        run_id = await self._create_fine_tuning_run(
-            agent_id, provider, base_model, stats['total_examples']
-        )
+        run_id = await self._create_fine_tuning_run(agent_id, provider, base_model, stats["total_examples"])
 
         # Start fine-tuning based on provider
         try:
             if provider == "openai":
-                result = await self._fine_tune_openai(
-                    run_id, agent_id, base_model, hyperparameters
-                )
+                result = await self._fine_tune_openai(run_id, agent_id, base_model, hyperparameters)
             elif provider == "anthropic":
-                result = await self._optimize_anthropic_prompt(
-                    run_id, agent_id
-                )
+                result = await self._optimize_anthropic_prompt(run_id, agent_id)
             elif provider == "local":
-                result = await self._fine_tune_local(
-                    run_id, agent_id, base_model, hyperparameters
-                )
+                result = await self._fine_tune_local(run_id, agent_id, base_model, hyperparameters)
             else:
                 raise ValueError(f"Unsupported provider: {provider}")
 
             # Update run with results
-            await self._update_run_status(
-                run_id, "completed", result
-            )
+            await self._update_run_status(run_id, "completed", result)
 
             return result
 
         except Exception as e:
             logger.error(f"Fine-tuning failed: {e}")
-            await self._update_run_status(
-                run_id, "failed", {"error": str(e)}
-            )
+            await self._update_run_status(run_id, "failed", {"error": str(e)})
             raise
 
     async def _fine_tune_openai(
@@ -119,7 +107,7 @@ class FineTuningOrchestrator:
         run_id: uuid.UUID,
         agent_id: uuid.UUID,
         base_model: str | None = None,
-        hyperparameters: dict[str, Any] | None = None
+        hyperparameters: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Fine-tune using OpenAI's fine-tuning API.
@@ -144,24 +132,16 @@ class FineTuningOrchestrator:
 
         # Export training data to temporary file
         with tempfile.NamedTemporaryFile(
-            mode='w',
-            suffix='.jsonl',
-            prefix=f'training_{safe_agent_id}_',
-            delete=False
+            mode="w", suffix=".jsonl", prefix=f"training_{safe_agent_id}_", delete=False
         ) as temp_file:
             training_file_path = temp_file.name
 
         try:
-            await self.collector.export_for_openai_finetuning(
-                agent_id, training_file_path
-            )
+            await self.collector.export_for_openai_finetuning(agent_id, training_file_path)
 
             # Upload training file
             with open(training_file_path, "rb") as f:
-                training_file = self.openai_client.files.create(
-                    file=f,
-                    purpose="fine-tune"
-                )
+                training_file = self.openai_client.files.create(file=f, purpose="fine-tune")
         finally:
             # Clean up local temporary file
             if os.path.exists(training_file_path):
@@ -175,7 +155,7 @@ class FineTuningOrchestrator:
             hyperparameters={
                 "n_epochs": hyperparameters.get("epochs", 3),
                 "learning_rate_multiplier": hyperparameters.get("learning_rate", "auto"),
-            }
+            },
         )
 
         # Update run with job ID
@@ -217,15 +197,11 @@ class FineTuningOrchestrator:
             "running": 50,
             "succeeded": 100,
             "failed": 0,
-            "cancelled": 0
+            "cancelled": 0,
         }
         return status_to_progress.get(status, 0)
 
-    async def _optimize_anthropic_prompt(
-        self,
-        run_id: uuid.UUID,
-        agent_id: uuid.UUID
-    ) -> dict[str, Any]:
+    async def _optimize_anthropic_prompt(self, run_id: uuid.UUID, agent_id: uuid.UUID) -> dict[str, Any]:
         """
         Optimize Anthropic Claude agent through prompt refinement.
 
@@ -245,20 +221,19 @@ class FineTuningOrchestrator:
             raise ValueError("Anthropic client not initialized - check ANTHROPIC_API_KEY")
 
         # Get best examples with SQL text wrapper (Truth Protocol Rule #7)
-        query = text("""
+        query = text(
+            """
             SELECT prompt, completion, reward_score
             FROM training_examples
             WHERE agent_id = :agent_id
                 AND example_type = 'positive'
             ORDER BY reward_score DESC
             LIMIT 10
-        """)
+        """
+        )
 
         result = await self.session.execute(query, {"agent_id": agent_id})
-        best_examples = [
-            {"input": row[0], "output": row[1], "score": float(row[2])}
-            for row in result.fetchall()
-        ]
+        best_examples = [{"input": row[0], "output": row[1], "score": float(row[2])} for row in result.fetchall()]
 
         # Get agent's current prompt
         agent_query = text("SELECT base_prompt FROM agents WHERE id = :agent_id")
@@ -319,25 +294,25 @@ Think through your analysis step by step, then provide the optimized prompt."""
             model="claude-3-5-sonnet-20241022",  # Latest Claude 3.5 Sonnet (2025)
             max_tokens=8000,
             temperature=0.3,  # Lower temperature for consistent optimization
-            messages=[{"role": "user", "content": optimization_prompt}]
+            messages=[{"role": "user", "content": optimization_prompt}],
         )
 
         optimized_prompt = response.content[0].text
 
         # Update agent prompt with SQL text wrapper
-        update_query = text("""
+        update_query = text(
+            """
             UPDATE agents
             SET base_prompt = :optimized_prompt,
                 version = version + 1,
                 updated_at = :updated_at
             WHERE id = :agent_id
-        """)
+        """
+        )
 
-        await self.session.execute(update_query, {
-            "optimized_prompt": optimized_prompt,
-            "updated_at": datetime.utcnow(),
-            "agent_id": agent_id
-        })
+        await self.session.execute(
+            update_query, {"optimized_prompt": optimized_prompt, "updated_at": datetime.utcnow(), "agent_id": agent_id}
+        )
         await self.session.commit()
 
         return {
@@ -346,7 +321,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "model": "claude-3-5-sonnet-20241022",
             "examples_used": len(best_examples),
             "optimized_prompt": optimized_prompt,
-            "optimization_technique": "xml_structured_few_shot_cot"
+            "optimization_technique": "xml_structured_few_shot_cot",
         }
 
     async def _fine_tune_local(
@@ -354,7 +329,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
         run_id: uuid.UUID,
         agent_id: uuid.UUID,
         base_model: str | None = None,
-        hyperparameters: dict[str, Any] | None = None
+        hyperparameters: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Fine-tune a local open-source model using LoRA.
@@ -382,7 +357,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "message": "Local fine-tuning requires additional infrastructure setup",
             "alternatives": ["openai", "anthropic"],
             "required_packages": ["transformers", "peft", "trl", "accelerate"],
-            "documentation": "See CLAUDE.md for implementation roadmap"
+            "documentation": "See CLAUDE.md for implementation roadmap",
         }
 
     def _format_examples(self, examples: list[dict[str, Any]]) -> str:
@@ -406,9 +381,10 @@ Think through your analysis step by step, then provide the optimized prompt."""
         formatted = []
         for i, ex in enumerate(examples, 1):
             # Escape XML special characters to prevent injection
-            escaped_input = html.escape(ex['input'][:500])
-            escaped_output = html.escape(ex['output'][:500])
-            formatted.append(f"""
+            escaped_input = html.escape(ex["input"][:500])
+            escaped_output = html.escape(ex["output"][:500])
+            formatted.append(
+                f"""
 <example id="{i}" score="{ex['score']:.2f}">
   <input>
 {escaped_input}
@@ -416,20 +392,18 @@ Think through your analysis step by step, then provide the optimized prompt."""
   <output>
 {escaped_output}
   </output>
-</example>""")
+</example>"""
+            )
         return "\n".join(formatted)
 
     async def _create_fine_tuning_run(
-        self,
-        agent_id: uuid.UUID,
-        provider: str,
-        base_model: str | None,
-        training_count: int
+        self, agent_id: uuid.UUID, provider: str, base_model: str | None, training_count: int
     ) -> uuid.UUID:
         """Create a fine-tuning run record."""
         run_id = uuid.uuid4()
 
-        query = text("""
+        query = text(
+            """
             INSERT INTO fine_tuning_runs (
                 id, agent_id, base_model, training_examples_count,
                 provider, status, progress_percentage, started_at, created_at
@@ -437,31 +411,31 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 :id, :agent_id, :base_model, :training_count,
                 :provider, :status, :progress, :started_at, :created_at
             )
-        """)
+        """
+        )
 
-        await self.session.execute(query, {
-            "id": run_id,
-            "agent_id": agent_id,
-            "base_model": base_model or "default",
-            "training_count": training_count,
-            "provider": provider,
-            "status": "running",
-            "progress": 0,
-            "started_at": datetime.utcnow(),
-            "created_at": datetime.utcnow()
-        })
+        await self.session.execute(
+            query,
+            {
+                "id": run_id,
+                "agent_id": agent_id,
+                "base_model": base_model or "default",
+                "training_count": training_count,
+                "provider": provider,
+                "status": "running",
+                "progress": 0,
+                "started_at": datetime.utcnow(),
+                "created_at": datetime.utcnow(),
+            },
+        )
         await self.session.commit()
 
         return run_id
 
-    async def _update_run_status(
-        self,
-        run_id: uuid.UUID,
-        status: str,
-        result: dict[str, Any]
-    ):
+    async def _update_run_status(self, run_id: uuid.UUID, status: str, result: dict[str, Any]):
         """Update fine-tuning run status."""
-        query = text("""
+        query = text(
+            """
             UPDATE fine_tuning_runs
             SET status = :status,
                 trained_model_id = :model_id,
@@ -469,51 +443,49 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 error_message = :error_message,
                 progress_percentage = :progress
             WHERE id = :run_id
-        """)
+        """
+        )
 
-        await self.session.execute(query, {
-            "run_id": run_id,
-            "status": status,
-            "model_id": result.get("fine_tuned_model") or result.get("trained_model_id"),
-            "completed_at": datetime.utcnow() if status in ["completed", "failed"] else None,
-            "error_message": result.get("error"),
-            "progress": 100 if status == "completed" else 0
-        })
+        await self.session.execute(
+            query,
+            {
+                "run_id": run_id,
+                "status": status,
+                "model_id": result.get("fine_tuned_model") or result.get("trained_model_id"),
+                "completed_at": datetime.utcnow() if status in ["completed", "failed"] else None,
+                "error_message": result.get("error"),
+                "progress": 100 if status == "completed" else 0,
+            },
+        )
         await self.session.commit()
 
     async def _update_run_provider_id(self, run_id: uuid.UUID, provider_job_id: str):
         """Update provider job ID."""
-        query = text("""
+        query = text(
+            """
             UPDATE fine_tuning_runs
             SET provider_job_id = :provider_job_id
             WHERE id = :run_id
-        """)
+        """
+        )
 
-        await self.session.execute(query, {
-            "run_id": run_id,
-            "provider_job_id": provider_job_id
-        })
+        await self.session.execute(query, {"run_id": run_id, "provider_job_id": provider_job_id})
         await self.session.commit()
 
     async def _update_run_progress(self, run_id: uuid.UUID, progress: int):
         """Update fine-tuning progress."""
-        query = text("""
+        query = text(
+            """
             UPDATE fine_tuning_runs
             SET progress_percentage = :progress
             WHERE id = :run_id
-        """)
+        """
+        )
 
-        await self.session.execute(query, {
-            "run_id": run_id,
-            "progress": progress
-        })
+        await self.session.execute(query, {"run_id": run_id, "progress": progress})
         await self.session.commit()
 
-    async def deploy_fine_tuned_agent(
-        self,
-        run_id: uuid.UUID,
-        deploy_to_production: bool = False
-    ) -> dict[str, Any]:
+    async def deploy_fine_tuned_agent(self, run_id: uuid.UUID, deploy_to_production: bool = False) -> dict[str, Any]:
         """
         Deploy a fine-tuned model to production.
 
@@ -525,11 +497,13 @@ Think through your analysis step by step, then provide the optimized prompt."""
             Deployment details
         """
         # Get run details
-        query = text("""
+        query = text(
+            """
             SELECT agent_id, trained_model_id, provider
             FROM fine_tuning_runs
             WHERE id = :run_id AND status = 'completed'
-        """)
+        """
+        )
 
         result = await self.session.execute(query, {"run_id": run_id})
         row = result.fetchone()
@@ -540,33 +514,33 @@ Think through your analysis step by step, then provide the optimized prompt."""
         agent_id, model_id, provider = row
 
         # Update agent with new model
-        update_query = text("""
+        update_query = text(
+            """
             UPDATE agents
             SET model_name = :model_id,
                 version = version + 1,
                 updated_at = :updated_at
             WHERE id = :agent_id
-        """)
+        """
+        )
 
-        await self.session.execute(update_query, {
-            "model_id": model_id,
-            "updated_at": datetime.utcnow(),
-            "agent_id": agent_id
-        })
+        await self.session.execute(
+            update_query, {"model_id": model_id, "updated_at": datetime.utcnow(), "agent_id": agent_id}
+        )
 
         # Update fine-tuning run deployment status
-        deployment_query = text("""
+        deployment_query = text(
+            """
             UPDATE fine_tuning_runs
             SET deployed_at = :deployed_at,
                 deployed_version = (SELECT version FROM agents WHERE id = :agent_id)
             WHERE id = :run_id
-        """)
+        """
+        )
 
-        await self.session.execute(deployment_query, {
-            "deployed_at": datetime.utcnow(),
-            "agent_id": agent_id,
-            "run_id": run_id
-        })
+        await self.session.execute(
+            deployment_query, {"deployed_at": datetime.utcnow(), "agent_id": agent_id, "run_id": run_id}
+        )
 
         await self.session.commit()
 
@@ -575,5 +549,5 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "model_id": model_id,
             "provider": provider,
             "deployed_at": datetime.utcnow().isoformat(),
-            "status": "deployed"
+            "status": "deployed",
         }

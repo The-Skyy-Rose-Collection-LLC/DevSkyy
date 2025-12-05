@@ -25,8 +25,10 @@ router = APIRouter(prefix="/api/v1/rlvr", tags=["rlvr", "feedback"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class FeedbackRequest(BaseModel):
     """User feedback on an agent execution."""
+
     execution_id: uuid.UUID
     thumbs_up: bool | None = None
     rating: int | None = Field(None, ge=1, le=5)
@@ -35,6 +37,7 @@ class FeedbackRequest(BaseModel):
 
 class TestResultRequest(BaseModel):
     """Automated test execution results."""
+
     execution_id: uuid.UUID
     tests_passed: int = Field(ge=0)
     tests_total: int = Field(gt=0)
@@ -43,6 +46,7 @@ class TestResultRequest(BaseModel):
 
 class CodeAnalysisRequest(BaseModel):
     """Code quality analysis results."""
+
     execution_id: uuid.UUID
     lint_score: float | None = Field(None, ge=0.0, le=1.0)
     complexity_score: float | None = Field(None, ge=0.0, le=1.0)
@@ -51,6 +55,7 @@ class CodeAnalysisRequest(BaseModel):
 
 class TrainingDataCollectionRequest(BaseModel):
     """Request to collect training data for an agent."""
+
     agent_id: uuid.UUID
     max_examples: int = Field(1000, gt=0, le=10000)
     days_lookback: int = Field(30, gt=0, le=365)
@@ -58,6 +63,7 @@ class TrainingDataCollectionRequest(BaseModel):
 
 class FineTuningRequest(BaseModel):
     """Request to start fine-tuning an agent."""
+
     agent_id: uuid.UUID
     provider: str = Field("openai", pattern="^(openai|anthropic|local)$")
     base_model: str | None = None
@@ -69,11 +75,12 @@ class FineTuningRequest(BaseModel):
 # FEEDBACK ENDPOINTS
 # ============================================================================
 
+
 @router.post("/feedback/user", status_code=status.HTTP_201_CREATED)
 async def submit_user_feedback(
     request: FeedbackRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Submit user feedback on an agent execution.
@@ -89,19 +96,18 @@ async def submit_user_feedback(
             thumbs_up=request.thumbs_up,
             user_rating=request.rating,
             user_feedback=request.feedback_text,
-            user_id=current_user.id
+            user_id=current_user.id,
         )
 
         return {
             "success": True,
-            "reward_score": float(reward_score['reward_score']),
-            "message": "Thank you for your feedback! This helps improve the agent."
+            "reward_score": float(reward_score["reward_score"]),
+            "message": "Thank you for your feedback! This helps improve the agent.",
         }
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process feedback: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to process feedback: {e!s}"
         )
 
 
@@ -109,7 +115,7 @@ async def submit_user_feedback(
 async def submit_test_results(
     request: TestResultRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Submit automated test results for an agent execution.
@@ -124,21 +130,20 @@ async def submit_test_results(
             verification_method=VerificationMethod.TEST_EXECUTION,
             tests_passed=request.tests_passed,
             tests_total=request.tests_total,
-            test_output=request.test_output
+            test_output=request.test_output,
         )
 
         return {
             "success": True,
-            "reward_score": float(reward_score['reward_score']),
+            "reward_score": float(reward_score["reward_score"]),
             "tests_passed": request.tests_passed,
             "tests_total": request.tests_total,
-            "pass_rate": f"{(request.tests_passed / request.tests_total * 100):.1f}%"
+            "pass_rate": f"{(request.tests_passed / request.tests_total * 100):.1f}%",
         }
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process test results: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to process test results: {e!s}"
         )
 
 
@@ -146,7 +151,7 @@ async def submit_test_results(
 async def submit_code_analysis(
     request: CodeAnalysisRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Submit code quality analysis results for an agent execution.
@@ -161,23 +166,22 @@ async def submit_code_analysis(
             verification_method=VerificationMethod.CODE_ANALYSIS,
             lint_score=request.lint_score,
             complexity_score=request.complexity_score,
-            security_score=request.security_score
+            security_score=request.security_score,
         )
 
         return {
             "success": True,
-            "reward_score": float(reward_score['reward_score']),
+            "reward_score": float(reward_score["reward_score"]),
             "code_quality": {
                 "lint": request.lint_score,
                 "complexity": request.complexity_score,
-                "security": request.security_score
-            }
+                "security": request.security_score,
+            },
         }
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to process code analysis: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to process code analysis: {e!s}"
         )
 
 
@@ -185,11 +189,12 @@ async def submit_code_analysis(
 # TRAINING DATA COLLECTION
 # ============================================================================
 
+
 @router.post("/training/collect", status_code=status.HTTP_200_OK)
 async def collect_training_data(
     request: TrainingDataCollectionRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Collect training examples from verified agent executions.
@@ -200,20 +205,14 @@ async def collect_training_data(
 
     try:
         result = await collector.collect_training_data(
-            agent_id=request.agent_id,
-            max_examples=request.max_examples,
-            days_lookback=request.days_lookback
+            agent_id=request.agent_id, max_examples=request.max_examples, days_lookback=request.days_lookback
         )
 
-        return {
-            "success": True,
-            **result
-        }
+        return {"success": True, **result}
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to collect training data: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to collect training data: {e!s}"
         )
 
 
@@ -221,7 +220,7 @@ async def collect_training_data(
 async def get_training_stats(
     agent_id: uuid.UUID,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Get statistics about collected training data for an agent.
@@ -234,8 +233,7 @@ async def get_training_stats(
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get training stats: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get training stats: {e!s}"
         )
 
 
@@ -243,11 +241,12 @@ async def get_training_stats(
 # FINE-TUNING
 # ============================================================================
 
+
 @router.post("/fine-tune/start", status_code=status.HTTP_202_ACCEPTED)
 async def start_fine_tuning(
     request: FineTuningRequest,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Start a fine-tuning run for an agent.
@@ -260,40 +259,30 @@ async def start_fine_tuning(
         # Prepare hyperparameters
         hyperparameters = {}
         if request.epochs:
-            hyperparameters['epochs'] = request.epochs
+            hyperparameters["epochs"] = request.epochs
         if request.learning_rate:
-            hyperparameters['learning_rate'] = request.learning_rate
+            hyperparameters["learning_rate"] = request.learning_rate
 
         result = await orchestrator.start_fine_tuning(
             agent_id=request.agent_id,
             provider=request.provider,
             base_model=request.base_model,
-            hyperparameters=hyperparameters if hyperparameters else None
+            hyperparameters=hyperparameters if hyperparameters else None,
         )
 
-        return {
-            "success": True,
-            "message": "Fine-tuning started successfully",
-            **result
-        }
+        return {"success": True, "message": "Fine-tuning started successfully", **result}
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to start fine-tuning: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to start fine-tuning: {e!s}"
         )
 
 
 @router.get("/fine-tune/status/{run_id}")
 async def get_fine_tuning_status(
-    run_id: uuid.UUID,
-    current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    run_id: uuid.UUID, current_user: User = Depends(get_current_user), session: AsyncSession = Depends(get_db_session)
 ):
     """
     Get the status of a fine-tuning run.
@@ -312,10 +301,7 @@ async def get_fine_tuning_status(
         row = result.fetchone()
 
         if not row:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Fine-tuning run {run_id} not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Fine-tuning run {run_id} not found")
 
         return {
             "run_id": str(row[0]),
@@ -327,16 +313,13 @@ async def get_fine_tuning_status(
             "started_at": row[6].isoformat() if row[6] else None,
             "completed_at": row[7].isoformat() if row[7] else None,
             "trained_model_id": row[8],
-            "error_message": row[9]
+            "error_message": row[9],
         }
 
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get status: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get status: {e!s}")
 
 
 @router.post("/fine-tune/deploy/{run_id}", status_code=status.HTTP_200_OK)
@@ -344,7 +327,7 @@ async def deploy_fine_tuned_agent(
     run_id: uuid.UUID,
     deploy_to_production: bool = False,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Deploy a fine-tuned agent to production.
@@ -354,39 +337,27 @@ async def deploy_fine_tuned_agent(
     orchestrator = FineTuningOrchestrator(session)
 
     try:
-        result = await orchestrator.deploy_fine_tuned_agent(
-            run_id=run_id,
-            deploy_to_production=deploy_to_production
-        )
+        result = await orchestrator.deploy_fine_tuned_agent(run_id=run_id, deploy_to_production=deploy_to_production)
 
-        return {
-            "success": True,
-            "message": "Agent deployed successfully",
-            **result
-        }
+        return {"success": True, "message": "Agent deployed successfully", **result}
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to deploy agent: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to deploy agent: {e!s}")
 
 
 # ============================================================================
 # ANALYTICS
 # ============================================================================
 
+
 @router.get("/analytics/agent/{agent_id}")
 async def get_agent_analytics(
     agent_id: uuid.UUID,
     days: int = 30,
     current_user: User = Depends(get_current_user),
-    session: AsyncSession = Depends(get_db_session)
+    session: AsyncSession = Depends(get_db_session),
 ):
     """
     Get RLVR analytics for an agent.
@@ -416,7 +387,7 @@ async def get_agent_analytics(
                 "avg_reward": float(row[1]),
                 "executions": row[2],
                 "high_reward_count": row[3],
-                "high_reward_rate": f"{(row[3] / row[2] * 100):.1f}%"
+                "high_reward_rate": f"{(row[3] / row[2] * 100):.1f}%",
             }
             for row in result.fetchall()
         ]
@@ -434,9 +405,7 @@ async def get_agent_analytics(
                 AND e.created_at >= NOW() - INTERVAL ':days days'
         """
 
-        overall_result = await session.execute(
-            overall_query, {"agent_id": agent_id, "days": days}
-        )
+        overall_result = await session.execute(overall_query, {"agent_id": agent_id, "days": days})
         overall_row = overall_result.fetchone()
 
         return {
@@ -446,13 +415,12 @@ async def get_agent_analytics(
                 "total_executions": overall_row[0],
                 "avg_reward": float(overall_row[1]) if overall_row[1] else 0.0,
                 "max_reward": float(overall_row[2]) if overall_row[2] else 0.0,
-                "min_reward": float(overall_row[3]) if overall_row[3] else 0.0
+                "min_reward": float(overall_row[3]) if overall_row[3] else 0.0,
             },
-            "daily_stats": daily_stats
+            "daily_stats": daily_stats,
         }
 
     except Exception as e:
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get analytics: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to get analytics: {e!s}"
         )

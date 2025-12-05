@@ -111,9 +111,9 @@ class PineconeManager:
                     print(f"   Namespaces: {len(stats.get('namespaces', {}))}")
 
                     # Show namespaces
-                    if stats.get('namespaces'):
+                    if stats.get("namespaces"):
                         print("   Namespaces:")
-                        for ns, ns_stats in stats['namespaces'].items():
+                        for ns, ns_stats in stats["namespaces"].items():
                             print(f"      • {ns}: {ns_stats.get('vector_count', 0):,} vectors")
 
                 except Exception as e:
@@ -126,7 +126,7 @@ class PineconeManager:
         self,
         index_name: str | None = None,
         dimension: int = 1536,  # OpenAI ada-002 embedding size
-        metric: str = "cosine"
+        metric: str = "cosine",
     ):
         """
         Create a new Pinecone index.
@@ -148,7 +148,7 @@ class PineconeManager:
             if index_name in existing_indexes:
                 print(f"⚠️  Index '{index_name}' already exists!")
                 response = input("\nDo you want to delete and recreate it? (yes/no): ")
-                if response.lower() != 'yes':
+                if response.lower() != "yes":
                     print("❌ Index creation cancelled.")
                     return False
 
@@ -168,10 +168,7 @@ class PineconeManager:
                 name=index_name,
                 dimension=dimension,
                 metric=metric,
-                spec=ServerlessSpec(
-                    cloud='gcp',
-                    region='us-central1'
-                )
+                spec=ServerlessSpec(cloud="gcp", region="us-central1"),
             )
 
             print("\n✅ Index created successfully!")
@@ -207,13 +204,13 @@ class PineconeManager:
                 {
                     "id": "test-vector-1",
                     "values": [0.1] * 1536,
-                    "metadata": {"text": "Test document 1", "source": "test"}
+                    "metadata": {"text": "Test document 1", "source": "test"},
                 },
                 {
                     "id": "test-vector-2",
                     "values": [0.2] * 1536,
-                    "metadata": {"text": "Test document 2", "source": "test"}
-                }
+                    "metadata": {"text": "Test document 2", "source": "test"},
+                },
             ]
 
             print("1️⃣  Upserting test vectors...")
@@ -221,15 +218,10 @@ class PineconeManager:
             print("✅ Vectors upserted successfully!")
 
             print("\n2️⃣  Querying vectors...")
-            query_response = index.query(
-                vector=[0.1] * 1536,
-                top_k=2,
-                namespace="test",
-                include_metadata=True
-            )
+            query_response = index.query(vector=[0.1] * 1536, top_k=2, namespace="test", include_metadata=True)
             print(f"✅ Query successful! Found {len(query_response['matches'])} matches")
 
-            for i, match in enumerate(query_response['matches']):
+            for i, match in enumerate(query_response["matches"]):
                 print(f"\n   Match {i+1}:")
                 print(f"      ID: {match['id']}")
                 print(f"      Score: {match['score']:.4f}")
@@ -252,6 +244,7 @@ class PineconeManager:
         except Exception as e:
             print(f"❌ Test failed: {e}")
             import traceback
+
             traceback.print_exc()
             return False
 
@@ -276,8 +269,8 @@ class PineconeManager:
                     index = self.pc.Index(idx_name)
                     stats = index.describe_index_stats()
 
-                    vectors = stats.get('total_vector_count', 0)
-                    dimension = stats.get('dimension', 0)
+                    vectors = stats.get("total_vector_count", 0)
+                    dimension = stats.get("dimension", 0)
 
                     total_vectors += vectors
                     total_dimensions += dimension
@@ -335,6 +328,7 @@ def main():
     except Exception as e:
         print(f"\n❌ Error: {e}\n")
         import traceback
+
         traceback.print_exc()
         sys.exit(1)
 

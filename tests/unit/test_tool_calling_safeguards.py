@@ -93,7 +93,7 @@ class TestToolRateLimiter:
         limiter = ToolRateLimiter()
         config = ToolCallConfig(tool_name="test_tool", description="Test", max_calls_per_minute=5)
 
-        for i in range(5):
+        for _i in range(5):
             allowed, reason = await limiter.check_rate_limit("test_tool", config)
             assert allowed is True
             assert reason is None
@@ -106,7 +106,7 @@ class TestToolRateLimiter:
         config = ToolCallConfig(tool_name="test_tool", description="Test", max_calls_per_minute=3)
 
         # Use up the limit
-        for i in range(3):
+        for _i in range(3):
             allowed, _ = await limiter.check_rate_limit("test_tool", config)
             assert allowed is True
 
@@ -126,7 +126,7 @@ class TestToolRateLimiter:
         config2 = ToolCallConfig(tool_name="tool_b", description="Tool B", max_calls_per_minute=2)
 
         # Use up limit for tool_a
-        for i in range(2):
+        for _i in range(2):
             allowed, _ = await limiter.check_rate_limit("tool_a", config1)
             assert allowed is True
 
@@ -197,7 +197,7 @@ class TestToolAuthorizationManager:
 
         request = ToolCallRequest(tool_name="admin_tool", provider=ToolProvider.OPENAI, user_id="user_123")
 
-        authorized, reason = await manager.authorize_tool_call(request)
+        authorized, _reason = await manager.authorize_tool_call(request)
         assert authorized is True
 
     @pytest.mark.unit
@@ -477,7 +477,7 @@ class TestToolCallingSafeguardManager:
         # Try to call unregistered tool
         request = ToolCallRequest(tool_name="nonexistent_tool", provider=ToolProvider.OPENAI)
 
-        allowed, reason = await manager.validate_tool_call(request)
+        allowed, _reason = await manager.validate_tool_call(request)
 
         assert allowed is False
         assert len(manager.violations) > 0
@@ -546,7 +546,7 @@ class TestToolCallingSecurity:
         )
 
         # This should fail validation
-        allowed, reason = await manager.validate_tool_call(request)
+        allowed, _reason = await manager.validate_tool_call(request)
         assert allowed is False
 
     @pytest.mark.unit
@@ -568,7 +568,7 @@ class TestToolCallingSecurity:
         request = ToolCallRequest(tool_name="dangerous_tool", provider=ToolProvider.OPENAI)
 
         # Should validate but log warning
-        allowed, reason = await manager.validate_tool_call(request)
+        allowed, _reason = await manager.validate_tool_call(request)
         assert allowed is True  # Public tool
 
 

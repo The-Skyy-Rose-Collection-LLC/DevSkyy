@@ -71,7 +71,7 @@ class TestConfiguration:
         for env_value, expected in test_cases.items():
             # Simulate parsing
             parsed = env_value.lower() in ("true", "1")
-            assert parsed == expected or parsed == (not expected)
+            assert parsed in (expected, not expected)
 
     def test_integer_environment_variables(self):
         """Test integer environment variable parsing"""
@@ -417,7 +417,6 @@ class TestEdgeCases:
     def test_division_by_zero(self):
         """Test division by zero handling"""
         try:
-            result = 1 / 0
             pytest.fail("Should raise ZeroDivisionError")
         except ZeroDivisionError:
             # Expected
@@ -428,7 +427,7 @@ class TestEdgeCases:
         lst = [1, 2, 3]
 
         try:
-            value = lst[10]
+            lst[10]
             pytest.fail("Should raise IndexError")
         except IndexError:
             # Expected
@@ -439,7 +438,7 @@ class TestEdgeCases:
         dct = {"key": "value"}
 
         try:
-            value = dct["nonexistent"]
+            dct["nonexistent"]
             pytest.fail("Should raise KeyError")
         except KeyError:
             # Expected

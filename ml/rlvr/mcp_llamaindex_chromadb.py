@@ -62,7 +62,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         openai_api_key: str | None = None,
         anthropic_api_key: str | None = None,
         chroma_host: str | None = None,  # For server mode
-        chroma_port: int | None = None
+        chroma_port: int | None = None,
     ):
         """
         Initialize production orchestrator with ChromaDB.
@@ -97,10 +97,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         if chroma_host and chroma_port:
             # Server mode (distributed)
             logger.info(f"Connecting to ChromaDB server at {chroma_host}:{chroma_port}")
-            self.chroma_client = chromadb.HttpClient(
-                host=chroma_host,
-                port=chroma_port
-            )
+            self.chroma_client = chromadb.HttpClient(host=chroma_host, port=chroma_port)
         else:
             # Persistent local mode
             logger.info(f"Using local ChromaDB at {self.chroma_path}")
@@ -108,17 +105,15 @@ class ProductionMCPLlamaIndexOrchestrator:
             self.chroma_client = chromadb.PersistentClient(
                 path=str(self.chroma_path),
                 settings=ChromaSettings(
-                    anonymized_telemetry=False,
-                    allow_reset=False  # Safety: prevent accidental data loss
-                )
+                    anonymized_telemetry=False, allow_reset=False  # Safety: prevent accidental data loss
+                ),
             )
 
         # Configure LlamaIndex
         if self.openai_key:
             Settings.llm = LlamaOpenAI(model="gpt-4o-mini", api_key=self.openai_key)
             Settings.embed_model = OpenAIEmbedding(
-                model="text-embedding-3-small",  # Cost-effective
-                api_key=self.openai_key
+                model="text-embedding-3-small", api_key=self.openai_key  # Cost-effective
             )
 
         # Agent-specific ChromaDB collections
@@ -130,9 +125,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         return f"agent_{str(agent_id).replace('-', '_')}_examples"
 
     async def sync_training_data_to_chromadb(
-        self,
-        agent_id: uuid.UUID,
-        force_rebuild: bool = False
+        self, agent_id: uuid.UUID, force_rebuild: bool = False
     ) -> VectorStoreIndex:
         """
         Sync training data from MCP/Neon to ChromaDB vector store.
@@ -165,18 +158,19 @@ class ProductionMCPLlamaIndexOrchestrator:
 
         # Create or get collection
         collection = self.chroma_client.get_or_create_collection(
-            name=collection_name,
-            metadata={"agent_id": agent_id_str}
+            name=collection_name, metadata={"agent_id": agent_id_str}
         )
         self.collections[agent_id_str] = collection
 
         # Fetch training examples from Neon
-        query = text("""
+        query = text(
+            """
             SELECT id, prompt, completion, reward_score, example_type, created_at
             FROM training_examples
             WHERE agent_id = :agent_id
             ORDER BY created_at DESC
-        """)
+        """
+        )
 
         result = await self.session.execute(query, {"agent_id": agent_id})
         rows = result.fetchall()
@@ -200,9 +194,9 @@ class ProductionMCPLlamaIndexOrchestrator:
                     "type": ex_type or "unknown",
                     "input": prompt,
                     "output": completion,
-                    "created_at": created_at.isoformat() if created_at else None
+                    "created_at": created_at.isoformat() if created_at else None,
                 },
-                id_=str(example_id)  # Use example ID as doc ID
+                id_=str(example_id),  # Use example ID as doc ID
             )
             documents.append(doc)
 
@@ -213,16 +207,11 @@ class ProductionMCPLlamaIndexOrchestrator:
         storage_context = StorageContext.from_defaults(vector_store=vector_store)
 
         # Build index
-        index = VectorStoreIndex.from_documents(
-            documents,
-            storage_context=storage_context
-        )
+        index = VectorStoreIndex.from_documents(documents, storage_context=storage_context)
 
         self.indexes[agent_id_str] = index
 
-        logger.info(
-            f"Synced {len(documents)} examples to ChromaDB collection '{collection_name}'"
-        )
+        logger.info(f"Synced {len(documents)} examples to ChromaDB collection '{collection_name}'")
 
         return index
 
@@ -232,7 +221,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         query: str | None = None,
         min_score: float = 0.7,
         top_k: int = 10,
-        example_type: str | None = "positive"
+        example_type: str | None = "positive",
     ) -> list[dict[str, Any]]:
         """
         Hybrid retrieval using ChromaDB vector search + SQL filters.
@@ -285,16 +274,18 @@ class ProductionMCPLlamaIndexOrchestrator:
             similarity = node.score
             hybrid_rank = (similarity * 0.6) + (score * 0.4)
 
-            examples.append({
-                "example_id": metadata.get("example_id"),
-                "input": metadata.get("input", ""),
-                "output": metadata.get("output", ""),
-                "score": score,
-                "similarity": similarity,
-                "type": ex_type,
-                "created_at": metadata.get("created_at"),
-                "hybrid_rank": hybrid_rank
-            })
+            examples.append(
+                {
+                    "example_id": metadata.get("example_id"),
+                    "input": metadata.get("input", ""),
+                    "output": metadata.get("output", ""),
+                    "score": score,
+                    "similarity": similarity,
+                    "type": ex_type,
+                    "created_at": metadata.get("created_at"),
+                    "hybrid_rank": hybrid_rank,
+                }
+            )
 
         # Sort by hybrid rank
         examples.sort(key=lambda x: x["hybrid_rank"], reverse=True)
@@ -302,9 +293,7 @@ class ProductionMCPLlamaIndexOrchestrator:
         return examples[:top_k]
 
     async def optimize_prompt_with_production_rag(
-        self,
-        agent_id: uuid.UUID,
-        top_k_examples: int = 10
+        self, agent_id: uuid.UUID, top_k_examples: int = 10
     ) -> dict[str, Any]:
         """
         Production-grade prompt optimization with MCP + ChromaDB + Claude.
@@ -326,11 +315,13 @@ class ProductionMCPLlamaIndexOrchestrator:
             raise ValueError("Anthropic client not initialized")
 
         # Fetch agent from database
-        agent_query = text("""
+        agent_query = text(
+            """
             SELECT base_prompt, name, version
             FROM agents
             WHERE id = :agent_id
-        """)
+        """
+        )
         agent_result = await self.session.execute(agent_query, {"agent_id": agent_id})
         row = agent_result.fetchone()
 
@@ -341,9 +332,7 @@ class ProductionMCPLlamaIndexOrchestrator:
 
         # Hybrid retrieval (ChromaDB + SQL)
         best_examples = await self.hybrid_retrieve_best_examples(
-            agent_id,
-            query=f"best practices for {agent_name}",
-            top_k=top_k_examples
+            agent_id, query=f"best practices for {agent_name}", top_k=top_k_examples
         )
 
         if not best_examples:
@@ -405,32 +394,31 @@ Think through your analysis step by step, then provide the optimized prompt."""
             model="claude-3-5-sonnet-20241022",
             max_tokens=8000,
             temperature=0.3,
-            messages=[{"role": "user", "content": optimization_prompt}]
+            messages=[{"role": "user", "content": optimization_prompt}],
         )
 
         optimized_prompt = response.content[0].text
 
         # Atomic update in Neon (MCP transaction)
-        update_query = text("""
+        update_query = text(
+            """
             UPDATE agents
             SET base_prompt = :optimized_prompt,
                 version = version + 1,
                 updated_at = :updated_at
             WHERE id = :agent_id
             RETURNING version
-        """)
+        """
+        )
 
-        update_result = await self.session.execute(update_query, {
-            "optimized_prompt": optimized_prompt,
-            "updated_at": datetime.utcnow(),
-            "agent_id": agent_id
-        })
+        update_result = await self.session.execute(
+            update_query, {"optimized_prompt": optimized_prompt, "updated_at": datetime.utcnow(), "agent_id": agent_id}
+        )
         new_version = update_result.scalar()
         await self.session.commit()
 
         logger.info(
-            f"Optimized prompt for agent {agent_id} ({agent_name}), "
-            f"version {current_version} → {new_version}"
+            f"Optimized prompt for agent {agent_id} ({agent_name}), " f"version {current_version} → {new_version}"
         )
 
         return {
@@ -447,7 +435,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "optimization_technique": "xml_structured_chromadb_hybrid_cot",
             "retrieval_strategy": "chromadb_vector + sql_filter + hybrid_rank",
             "vector_store": "chromadb",
-            "persistence": "durable"
+            "persistence": "durable",
         }
 
     def _format_examples_xml(self, examples: list[dict[str, Any]]) -> str:
@@ -455,11 +443,12 @@ Think through your analysis step by step, then provide the optimized prompt."""
         formatted = []
         for i, ex in enumerate(examples, 1):
             # Escape XML special characters to prevent injection
-            escaped_input = html.escape(ex['input'][:500])
-            escaped_output = html.escape(ex['output'][:500])
-            escaped_type = html.escape(str(ex.get('type', 'unknown')))
-            escaped_created = html.escape(str(ex.get('created_at', 'unknown')))
-            formatted.append(f"""
+            escaped_input = html.escape(ex["input"][:500])
+            escaped_output = html.escape(ex["output"][:500])
+            escaped_type = html.escape(str(ex.get("type", "unknown")))
+            escaped_created = html.escape(str(ex.get("created_at", "unknown")))
+            formatted.append(
+                f"""
 <example id="{i}" score="{ex['score']:.2f}" similarity="{ex['similarity']:.2f}" hybrid_rank="{ex['hybrid_rank']:.2f}">
   <input>
 {escaped_input}
@@ -468,7 +457,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
 {escaped_output}
   </output>
   <metadata type="{escaped_type}" created="{escaped_created}" />
-</example>""")
+</example>"""
+            )
         return "\n".join(formatted)
 
     def get_collection_stats(self, agent_id: uuid.UUID) -> dict[str, Any]:
@@ -484,15 +474,10 @@ Think through your analysis step by step, then provide the optimized prompt."""
                 "collection_name": collection_name,
                 "document_count": count,
                 "agent_id": agent_id_str,
-                "exists": True
+                "exists": True,
             }
         except Exception as e:
-            return {
-                "collection_name": collection_name,
-                "agent_id": agent_id_str,
-                "exists": False,
-                "error": str(e)
-            }
+            return {"collection_name": collection_name, "agent_id": agent_id_str, "exists": False, "error": str(e)}
 
 
 # Production usage example
@@ -514,52 +499,30 @@ async def production_demo():
         raise ValueError("DATABASE_URL not set")
 
     engine = create_async_engine(DATABASE_URL, echo=False)
-    async_session_factory = sessionmaker(
-        engine,
-        class_=AsyncSession,
-        expire_on_commit=False
-    )
+    async_session_factory = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with async_session_factory() as session:
         # Initialize production orchestrator
         orchestrator = ProductionMCPLlamaIndexOrchestrator(
-            session=session,
-            chroma_path="./production_chroma_db",
-            mcp_gateway_url="http://localhost:3000/mcp"
+            session=session, chroma_path="./production_chroma_db", mcp_gateway_url="http://localhost:3000/mcp"
         )
 
         agent_id = uuid.UUID("12345678-1234-5678-1234-567812345678")  # Example
 
         # Sync training data
-        print("Syncing training data from Neon to ChromaDB...")
         await orchestrator.sync_training_data_to_chromadb(agent_id)
 
         # Get stats
-        stats = orchestrator.get_collection_stats(agent_id)
-        print(f"ChromaDB Stats: {stats}")
+        orchestrator.get_collection_stats(agent_id)
 
         # Hybrid retrieval
-        print("\nPerforming hybrid retrieval...")
-        examples = await orchestrator.hybrid_retrieve_best_examples(
-            agent_id,
-            query="high quality examples",
-            min_score=0.8,
-            top_k=5
+        await orchestrator.hybrid_retrieve_best_examples(
+            agent_id, query="high quality examples", min_score=0.8, top_k=5
         )
-        print(f"Retrieved {len(examples)} examples")
 
         # Optimize prompt
-        print("\nOptimizing prompt with Claude...")
-        result = await orchestrator.optimize_prompt_with_production_rag(
-            agent_id,
-            top_k_examples=10
-        )
+        await orchestrator.optimize_prompt_with_production_rag(agent_id, top_k_examples=10)
 
-        print("\nOptimization Complete:")
-        print(f"Agent: {result['agent_name']}")
-        print(f"Version: {result['version_before']} → {result['version_after']}")
-        print(f"Method: {result['method']}")
-        print(f"Strategy: {result['retrieval_strategy']}")
 
 
 if __name__ == "__main__":

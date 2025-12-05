@@ -176,9 +176,7 @@ class OpenAIFunctionCallingClient:
         # Registered functions
         self.functions: dict[str, tuple[Callable, dict, ToolCallConfig]] = {}
 
-    def register_function(
-        self, func: Callable, tool_config: ToolCallConfig | None = None, schema: dict | None = None
-    ):
+    def register_function(self, func: Callable, tool_config: ToolCallConfig | None = None, schema: dict | None = None):
         """
         Register a function for calling
 
@@ -319,7 +317,7 @@ class OpenAIFunctionCallingClient:
         if function_name not in self.functions:
             raise ValueError(f"Function not registered: {function_name}")
 
-        func, schema, tool_config = self.functions[function_name]
+        func, _schema, _tool_config = self.functions[function_name]
 
         # Create tool call request
         request = ToolCallRequest(

@@ -27,13 +27,17 @@ app = FastAPI(
     version="5.1.0",
 )
 
-# Add CORS middleware
+# SECURITY: CORS configuration for development only
+# WARNING: allow_origins=["*"] with allow_credentials=True is a security risk
+# For production, specify exact origins via CORS_ALLOWED_ORIGINS env var
+cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_origins,  # SECURITY: Use specific origins, not "*"
+    allow_credentials=True,  # Can only be True when origins are specific
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-API-Key"],
 )
 
 # Add WordPress credentials to app state

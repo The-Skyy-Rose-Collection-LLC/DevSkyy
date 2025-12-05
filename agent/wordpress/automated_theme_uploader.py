@@ -393,8 +393,7 @@ class AutomatedThemeUploader:
         Per CWE-319: Cleartext Transmission of Sensitive Information.
         """
         enterprise_logger.warning(
-            "FTP is insecure (cleartext transmission). Use SFTP instead.",
-            category=LogCategory.SECURITY
+            "FTP is insecure (cleartext transmission). Use SFTP instead.", category=LogCategory.SECURITY
         )
         try:
             if not credentials.ftp_host:
@@ -480,12 +479,14 @@ class AutomatedThemeUploader:
             strict_checking = os.getenv("SSH_STRICT_HOST_KEY_CHECKING", "false").lower() == "true"
             if strict_checking:
                 ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
-                enterprise_logger.info("SSH strict host key checking enabled (RejectPolicy)", category=LogCategory.SECURITY)
+                enterprise_logger.info(
+                    "SSH strict host key checking enabled (RejectPolicy)", category=LogCategory.SECURITY
+                )
             else:
                 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
                 enterprise_logger.warning(
                     "SSH using AutoAddPolicy - set SSH_STRICT_HOST_KEY_CHECKING=true for production",
-                    category=LogCategory.SECURITY
+                    category=LogCategory.SECURITY,
                 )
 
             # Connect
