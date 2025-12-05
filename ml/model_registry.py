@@ -30,6 +30,91 @@ class ModelStage(str, Enum):
     ARCHIVED = "archived"
 
 
+class ModelVersion:
+    """
+    Model version tracking and management.
+
+    Follows Semantic Versioning 2.0.0 (https://semver.org/)
+    """
+
+    def __init__(
+        self,
+        version: str,
+        model_name: str,
+        stage: ModelStage = ModelStage.DEVELOPMENT,
+        created_at: datetime | None = None,
+        description: str = "",
+        metrics: dict[str, float] | None = None,
+        source: str = "",
+    ):
+        self.version = version
+        self.model_name = model_name
+        self.stage = stage
+        self.created_at = created_at or datetime.now()
+        self.description = description
+        self.metrics = metrics or {}
+        self.source = source
+
+    @property
+    def major(self) -> int:
+        """Get major version number"""
+        parts = self.version.split(".")
+        return int(parts[0]) if parts else 0
+
+    @property
+    def minor(self) -> int:
+        """Get minor version number"""
+        parts = self.version.split(".")
+        return int(parts[1]) if len(parts) > 1 else 0
+
+    @property
+    def patch(self) -> int:
+        """Get patch version number"""
+        parts = self.version.split(".")
+        return int(parts[2]) if len(parts) > 2 else 0
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary"""
+        return {
+            "version": self.version,
+            "model_name": self.model_name,
+            "stage": self.stage.value if isinstance(self.stage, ModelStage) else self.stage,
+            "created_at": self.created_at.isoformat() if self.created_at else None,
+            "description": self.description,
+            "metrics": self.metrics,
+            "source": self.source,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ModelVersion":
+        """Create from dictionary"""
+        stage = data.get("stage", "development")
+        if isinstance(stage, str):
+            stage = ModelStage(stage)
+
+        created_at = data.get("created_at")
+        if isinstance(created_at, str):
+            created_at = datetime.fromisoformat(created_at)
+
+        return cls(
+            version=data["version"],
+            model_name=data["model_name"],
+            stage=stage,
+            created_at=created_at,
+            description=data.get("description", ""),
+            metrics=data.get("metrics", {}),
+            source=data.get("source", ""),
+        )
+
+    def __repr__(self) -> str:
+        return f"ModelVersion({self.model_name}@{self.version}, stage={self.stage.value})"
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, ModelVersion):
+            return False
+        return self.version == other.version and self.model_name == other.model_name
+
+
 class ModelMetadata:
     """Model metadata container"""
 

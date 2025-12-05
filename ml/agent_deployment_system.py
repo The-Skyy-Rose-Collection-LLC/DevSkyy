@@ -80,6 +80,55 @@ class ApprovalStatus(str, Enum):
     ABSTAIN = "abstain"
 
 
+class DeploymentEnvironment(str, Enum):
+    """Deployment environment types"""
+    DEVELOPMENT = "development"
+    STAGING = "staging"
+    PRODUCTION = "production"
+    TESTING = "testing"
+
+
+class DeploymentStrategy(str, Enum):
+    """Deployment strategies for model rollout"""
+    BLUE_GREEN = "blue_green"
+    CANARY = "canary"
+    ROLLING = "rolling"
+    SHADOW = "shadow"
+    INSTANT = "instant"
+
+
+class ModelDeployment(BaseModel):
+    """Model deployment configuration and tracking"""
+    deployment_id: str = Field(default_factory=lambda: f"mdeploy_{uuid4().hex[:12]}")
+    model_name: str
+    model_version: str
+    environment: DeploymentEnvironment
+    strategy: DeploymentStrategy = DeploymentStrategy.ROLLING
+    
+    # Deployment parameters
+    replicas: int = Field(default=1, ge=1)
+    traffic_percentage: float = Field(default=100.0, ge=0.0, le=100.0)
+    
+    # Status tracking
+    status: JobStatus = JobStatus.PENDING_VALIDATION
+    deployed_at: datetime | None = None
+    updated_at: datetime = Field(default_factory=datetime.now)
+    
+    # Performance thresholds
+    min_success_rate: float = Field(default=0.95, ge=0.0, le=1.0)
+    max_latency_ms: float = Field(default=1000.0, ge=0.0)
+    
+    # Rollback configuration
+    auto_rollback: bool = True
+    rollback_threshold: float = Field(default=0.9, description="Success rate threshold for rollback")
+    previous_version: str | None = None
+    
+    # Metadata
+    created_by: str = ""
+    tags: list[str] = Field(default_factory=list)
+    notes: str = ""
+
+
 # ============================================================================
 # DATA MODELS
 # ============================================================================

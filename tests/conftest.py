@@ -29,7 +29,7 @@ os.environ["ENVIRONMENT"] = "development"  # Use development for tests (Settings
 os.environ["TESTING"] = "true"
 os.environ["JWT_SECRET_KEY"] = "test-secret-key-32-characters-long!!"
 os.environ["SECRET_KEY"] = "test-secret-key-32-characters-long!!"
-os.environ["DATABASE_URL"] = "sqlite:///./test_devskyy.db"
+os.environ["DATABASE_URL"] = "sqlite+aiosqlite:///./test_devskyy.db"
 os.environ["REDIS_URL"] = "redis://localhost:6379/15"  # Test DB
 os.environ["ANTHROPIC_API_KEY"] = "test-anthropic-key"
 os.environ["OPENAI_API_KEY"] = "test-openai-key"
@@ -49,7 +49,7 @@ def event_loop():
 
 @pytest.fixture(scope="session")
 def test_db_engine():
-    """Create test database engine."""
+    """Create test database engine (sync version for compatibility)."""
     engine = create_engine(
         "sqlite:///./test_devskyy.db",
         connect_args={"check_same_thread": False},
@@ -57,6 +57,17 @@ def test_db_engine():
     )
     yield engine
     engine.dispose()
+
+
+@pytest.fixture(scope="session")
+def test_async_db_engine():
+    """Create async test database engine."""
+    from sqlalchemy.ext.asyncio import create_async_engine
+    engine = create_async_engine(
+        "sqlite+aiosqlite:///./test_devskyy.db",
+        echo=False,
+    )
+    yield engine
 
 
 @pytest.fixture(scope="function")

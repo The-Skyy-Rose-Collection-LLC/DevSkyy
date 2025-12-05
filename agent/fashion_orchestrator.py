@@ -21,6 +21,7 @@ from datetime import datetime
 from enum import Enum
 import json
 import logging
+import os
 from pathlib import Path
 
 # Import base orchestrator
@@ -28,7 +29,11 @@ import sys
 from typing import Any
 
 
-sys.path.insert(0, '/home/user/DevSkyy')
+# Use workspace root or fallback to parent directory of agent module
+WORKSPACE_ROOT = Path(__file__).parent.parent.resolve()
+if str(WORKSPACE_ROOT) not in sys.path:
+    sys.path.insert(0, str(WORKSPACE_ROOT))
+
 from agent.unified_orchestrator import ExecutionPriority, Task, UnifiedMCPOrchestrator
 
 
@@ -142,10 +147,16 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
 
     def __init__(
         self,
-        config_path: str = "/home/user/DevSkyy/config/mcp/fashion_mcp_enhanced.json",
+        config_path: str | None = None,
         max_concurrent_tasks: int = 50,
     ):
         """Initialize fashion orchestrator"""
+        # Use provided path, environment variable, or default to workspace config
+        if config_path is None:
+            config_path = os.getenv(
+                "FASHION_CONFIG_PATH",
+                str(WORKSPACE_ROOT / "config" / "mcp" / "fashion_mcp_enhanced.json")
+            )
         self.fashion_config_path = Path(config_path)
         self.fashion_config: dict[str, Any] = {}
         self.ai_models: dict[str, AIModelConfig] = {}

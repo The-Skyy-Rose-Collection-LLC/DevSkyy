@@ -1,0 +1,347 @@
+[
+  {
+    "action_id": "test_agent_20251205_184530_35f30170",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123",
+      "data": {
+        "field": "value"
+      }
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.187827",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_ec63cc0a",
+    "agent_name": "test_agent",
+    "function_name": "delete_resource",
+    "parameters": {
+      "resource_id": "important_resource"
+    },
+    "risk_level": "critical",
+    "created_at": "2025-12-05T18:45:30.190225",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_c8cc9a6b",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.192631",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_d2403a8d",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.202057",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_f749fd89",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.208860",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_88982f76",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.212365",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_fe9f05f8",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "1"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.224590",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_5055fca6",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "2"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:45:30.225291",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_184530_88883716",
+    "agent_name": "test_agent",
+    "function_name": "process_data",
+    "parameters": {
+      "nested": {
+        "level1": {
+          "level2": "value"
+        }
+      },
+      "array": [
+        1,
+        2,
+        3
+      ],
+      "mixed": {
+        "key": "value",
+        "number": 42
+      }
+    },
+    "risk_level": "medium",
+    "created_at": "2025-12-05T18:45:30.235179",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_34150080",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123",
+      "data": {
+        "field": "value"
+      }
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.809803",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_d6fbaf0f",
+    "agent_name": "test_agent",
+    "function_name": "delete_resource",
+    "parameters": {
+      "resource_id": "important_resource"
+    },
+    "risk_level": "critical",
+    "created_at": "2025-12-05T18:58:08.811393",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_0047822e",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.812833",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_7f5cc6e2",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.818172",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_5dcc2cb1",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.821411",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_b8247f52",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.823570",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_8cdb6c96",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "1"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.830547",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_d5e6cd88",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "2"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T18:58:08.830934",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_185808_c731f236",
+    "agent_name": "test_agent",
+    "function_name": "process_data",
+    "parameters": {
+      "nested": {
+        "level1": {
+          "level2": "value"
+        }
+      },
+      "array": [
+        1,
+        2,
+        3
+      ],
+      "mixed": {
+        "key": "value",
+        "number": 42
+      }
+    },
+    "risk_level": "medium",
+    "created_at": "2025-12-05T18:58:08.836815",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_c7902454",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123",
+      "data": {
+        "field": "value"
+      }
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.128756",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_7b2c52ba",
+    "agent_name": "test_agent",
+    "function_name": "delete_resource",
+    "parameters": {
+      "resource_id": "important_resource"
+    },
+    "risk_level": "critical",
+    "created_at": "2025-12-05T19:10:27.130460",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_5d5a42c0",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.132096",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_55b5ac39",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.137486",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_e45ab455",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.140768",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_810d56ea",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "123"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.142970",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_eb8ce118",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "1"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.149951",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_414f1ce4",
+    "agent_name": "test_agent",
+    "function_name": "update_data",
+    "parameters": {
+      "id": "2"
+    },
+    "risk_level": "high",
+    "created_at": "2025-12-05T19:10:27.150407",
+    "status": "pending"
+  },
+  {
+    "action_id": "test_agent_20251205_191027_b8dd13cc",
+    "agent_name": "test_agent",
+    "function_name": "process_data",
+    "parameters": {
+      "nested": {
+        "level1": {
+          "level2": "value"
+        }
+      },
+      "array": [
+        1,
+        2,
+        3
+      ],
+      "mixed": {
+        "key": "value",
+        "number": 42
+      }
+    },
+    "risk_level": "medium",
+    "created_at": "2025-12-05T19:10:27.156527",
+    "status": "pending"
+  }
+]

@@ -384,3 +384,7 @@ class DatabaseSecurityManager:
                 "timestamp": datetime.now().isoformat(),
                 "threat_level": "HIGH",  # Elevated due to connectivity issues
             }
+
+
+# Alias for backwards compatibility
+DatabaseSecurity = DatabaseSecurityManager
