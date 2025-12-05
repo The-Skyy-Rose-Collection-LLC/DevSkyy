@@ -17,21 +17,30 @@ Truth Protocol: Standard MCP compliance, full observability, secure access
 import logging
 from typing import Any
 
-from mcp.server import Server
-from mcp.types import TextContent, Tool
+
+logger = logging.getLogger(__name__)
+
+# Optional MCP server dependencies
+MCP_AVAILABLE = False
+Server = None  # type: ignore[assignment]
+TextContent = None  # type: ignore[assignment]
+Tool = None  # type: ignore[assignment]
+try:
+    from mcp.server import Server
+    from mcp.types import TextContent, Tool
+    MCP_AVAILABLE = True
+except ImportError:
+    logger.info("mcp package not installed - MCP server unavailable")
 
 from services.mcp_client import MCPToolClient, get_mcp_client
 
-
 # Logfire for observability
+LOGFIRE_AVAILABLE = False
 try:
     import logfire
-
     LOGFIRE_AVAILABLE = True
 except ImportError:
-    LOGFIRE_AVAILABLE = False
-
-logger = logging.getLogger(__name__)
+    pass
 
 
 class DevSkyyMCPServer:
@@ -50,7 +59,15 @@ class DevSkyyMCPServer:
 
         Args:
             mcp_client: Optional custom MCP client (uses singleton if not provided)
+
+        Raises:
+            ImportError: If MCP package is not installed
         """
+        if not MCP_AVAILABLE:
+            raise ImportError(
+                "MCP package not installed. Install with: pip install mcp"
+            )
+
         self.mcp_client = mcp_client or get_mcp_client()
         self.server = Server("devskyy-mcp-server")
         self._register_handlers()

@@ -100,6 +100,46 @@ This ensures dev/test environments use the exact same versions of production dep
 - Security-critical packages use `>=,<` version ranges per CLAUDE.md
 - Run `make upgrade` monthly to get security patches
 
+## Optional Dependencies
+
+DevSkyy uses graceful degradation for heavy optional dependencies. The application can start without these packages - features will be disabled but the app won't crash.
+
+### Heavy Optional Dependencies
+
+| Package | Feature | Install |
+|---------|---------|---------|
+| `psutil` | System monitoring dashboard | `pip install psutil` |
+| `anthropic` | Claude AI integration | `pip install anthropic` |
+| `openai` | OpenAI integration | `pip install openai` |
+| `chromadb` | RAG vector database | `pip install chromadb` |
+| `sentence-transformers` | RAG embeddings | `pip install sentence-transformers` |
+| `langchain` | RAG text chunking | `pip install langchain` |
+| `pypdf` | PDF ingestion for RAG | `pip install pypdf` |
+| `tiktoken` | Token counting | `pip install tiktoken` |
+| `torch` | PyTorch ML models | `pip install torch` |
+| `shap` | ML explainability | `pip install shap` |
+| `google-api-python-client` | Google Sheets integration | `pip install google-api-python-client` |
+| `mcp` | Model Context Protocol | `pip install mcp` |
+| `logfire` | Observability | `pip install logfire` |
+
+### Install All Optional Dependencies
+
+```bash
+pip install psutil anthropic openai chromadb sentence-transformers langchain pypdf tiktoken shap google-api-python-client mcp logfire
+```
+
+### Graceful Degradation Pattern
+
+All optional imports follow this pattern:
+```python
+PACKAGE_AVAILABLE = False
+try:
+    import package
+    PACKAGE_AVAILABLE = True
+except ImportError:
+    logger.info("package not installed - feature X unavailable")
+```
+
 ## Reference
 
 - [pip-tools Documentation](https://pip-tools.readthedocs.io/en/latest/)

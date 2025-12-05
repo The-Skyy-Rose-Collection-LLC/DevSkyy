@@ -20,18 +20,25 @@ import os
 from pathlib import Path
 from typing import Any
 
-from anthropic import Anthropic
-
-
-# Logfire for observability
-try:
-    import logfire
-
-    LOGFIRE_AVAILABLE = True
-except ImportError:
-    LOGFIRE_AVAILABLE = False
 
 logger = logging.getLogger(__name__)
+
+# Optional Anthropic dependency
+ANTHROPIC_AVAILABLE = False
+Anthropic = None  # type: ignore[assignment]
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    logger.info("anthropic not installed - MCP Claude tools unavailable")
+
+# Logfire for observability
+LOGFIRE_AVAILABLE = False
+try:
+    import logfire
+    LOGFIRE_AVAILABLE = True
+except ImportError:
+    pass
 
 
 class MCPToolError(Exception):

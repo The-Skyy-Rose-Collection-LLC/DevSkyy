@@ -6,8 +6,6 @@ from datetime import datetime, timedelta
 import logging
 from typing import Any
 
-import psutil
-
 
 """
 Advanced System Monitoring - Enterprise Grade
@@ -15,6 +13,15 @@ Comprehensive system health monitoring with metrics collection and alerting
 """
 
 logger = logging.getLogger(__name__)
+
+# Optional psutil dependency - required for system metrics
+PSUTIL_AVAILABLE = False
+psutil = None  # type: ignore[assignment]
+try:
+    import psutil
+    PSUTIL_AVAILABLE = True
+except ImportError:
+    logger.warning("psutil not installed - system monitoring features disabled")
 
 
 @dataclass
@@ -99,6 +106,21 @@ class MetricsCollector:
 
     def _get_current_metrics(self) -> SystemMetrics:
         """Get current system metrics"""
+        if not PSUTIL_AVAILABLE:
+            # Return default metrics when psutil is not available
+            return SystemMetrics(
+                timestamp=datetime.now(),
+                cpu_percent=0.0,
+                memory_percent=0.0,
+                memory_available_gb=0.0,
+                disk_usage_percent=0.0,
+                disk_free_gb=0.0,
+                network_bytes_sent=0,
+                network_bytes_recv=0,
+                active_connections=0,
+                process_count=0,
+                load_average=[0.0, 0.0, 0.0],
+            )
         # CPU metrics
         cpu_percent = psutil.cpu_percent(interval=1)
 

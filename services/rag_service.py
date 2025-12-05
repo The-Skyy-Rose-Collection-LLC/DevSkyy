@@ -28,16 +28,74 @@ from pathlib import Path
 from typing import Any
 import uuid
 
-from anthropic import Anthropic
-import chromadb
-from chromadb.config import Settings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
-from pypdf import PdfReader
-from sentence_transformers import SentenceTransformer
-import tiktoken
-
 
 logger = logging.getLogger(__name__)
+
+# Optional heavy dependencies for RAG functionality
+RAG_AVAILABLE = False
+ANTHROPIC_AVAILABLE = False
+CHROMADB_AVAILABLE = False
+LANGCHAIN_AVAILABLE = False
+PYPDF_AVAILABLE = False
+SENTENCE_TRANSFORMERS_AVAILABLE = False
+TIKTOKEN_AVAILABLE = False
+
+# Anthropic client
+Anthropic = None  # type: ignore[assignment]
+try:
+    from anthropic import Anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    logger.info("anthropic not installed - Claude RAG queries unavailable")
+
+# ChromaDB vector database
+chromadb = None  # type: ignore[assignment]
+Settings = None  # type: ignore[assignment]
+try:
+    import chromadb
+    from chromadb.config import Settings
+    CHROMADB_AVAILABLE = True
+except ImportError:
+    logger.info("chromadb not installed - vector storage unavailable")
+
+# LangChain text splitter
+RecursiveCharacterTextSplitter = None  # type: ignore[assignment]
+try:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+    LANGCHAIN_AVAILABLE = True
+except ImportError:
+    logger.info("langchain not installed - text chunking unavailable")
+
+# PDF reader
+PdfReader = None  # type: ignore[assignment]
+try:
+    from pypdf import PdfReader
+    PYPDF_AVAILABLE = True
+except ImportError:
+    logger.info("pypdf not installed - PDF ingestion unavailable")
+
+# Sentence transformers for embeddings
+SentenceTransformer = None  # type: ignore[assignment]
+try:
+    from sentence_transformers import SentenceTransformer
+    SENTENCE_TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    logger.info("sentence-transformers not installed - embeddings unavailable")
+
+# Tiktoken for token counting
+tiktoken = None  # type: ignore[assignment]
+try:
+    import tiktoken
+    TIKTOKEN_AVAILABLE = True
+except ImportError:
+    logger.info("tiktoken not installed - token counting unavailable")
+
+# All core RAG dependencies available?
+RAG_AVAILABLE = all([
+    CHROMADB_AVAILABLE,
+    LANGCHAIN_AVAILABLE,
+    SENTENCE_TRANSFORMERS_AVAILABLE,
+])
 
 
 # =============================================================================
@@ -188,6 +246,12 @@ class VectorDatabase:
         collection_name: str = RAGConfig.CHROMA_COLLECTION_NAME,
         embedding_model: str = RAGConfig.EMBEDDING_MODEL,
     ):
+        if not RAG_AVAILABLE:
+            raise ImportError(
+                "RAG dependencies not installed. Install with: "
+                "pip install chromadb langchain sentence-transformers"
+            )
+
         self.persist_directory = persist_directory
         self.collection_name = collection_name
 
