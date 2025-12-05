@@ -1,0 +1,87 @@
+[
+  {
+    "type": "critical_failure",
+    "agent_name": "test_agent",
+    "notification_sent_at": "2025-12-05T19:48:52.473009"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T19:48:52.485374",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:52.485595"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T19:48:52.488993",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:52.489228"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 3,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T19:48:54.509473",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:54.509652"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 4,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T19:48:54.509972",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:54.510165"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 5,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T19:48:54.510656",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:54.510850"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T19:48:54.520533",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:54.520772"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T19:48:54.524485",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:54.524666"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T19:48:54.525117",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:48:54.525412"
+  }
+]

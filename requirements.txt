@@ -46,6 +46,8 @@ aiosqlite~=0.20.0  # Async SQLite driver
 asyncpg~=0.30.0  # Async PostgreSQL driver
 psycopg2-binary~=2.9.9  # PostgreSQL driver for Neon integration
 neon-api~=0.3.0  # Neon serverless Postgres API client
+motor~=3.7.0  # Async MongoDB driver for infrastructure.database_ecosystem
+clickhouse-driver~=0.2.9  # ClickHouse client for analytics workflows
 
 # ============================================================================
 # HTTP & API
@@ -66,12 +68,18 @@ PyJWT~=2.10.1  # JWT authentication per RFC 7519
 bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
 argon2-cffi>=23.1.0,<24.0.0  # SECURITY: Argon2 password hashing
 defusedxml>=0.7.1,<1.0.0  # SECURITY: P0 CRITICAL - Protect against XML attacks (XXE, billion laughs)
+python-jose[cryptography]~=3.3.0  # JWT signing/verification for auth workflows
 
 # ============================================================================
 # SECURITY MIDDLEWARE
 # ============================================================================
 slowapi~=0.1.9  # Rate limiting middleware
 secure~=0.3.0  # Security headers middleware
+
+# ============================================================================
+# SEARCH & ANALYTICS
+# ============================================================================
+elasticsearch[async]~=8.17.0  # Async Elasticsearch client for observability/search
 
 # ============================================================================
 # AI & ML (Latest Stable)
@@ -196,7 +204,7 @@ python-magic~=0.4.27  # File type detection
 faiss-cpu~=1.9.0.post1  # Facebook AI Similarity Search (CPU version)
 
 # Blockchain & Web3 (Security Verified)
-web3~=7.7.0  # Updated
+web3~=7.14.0  # Updated to resolve websockets>=15 compatibility with fastmcp
 eth-account~=0.13.4
 eth-typing~=5.0.1
 eth-utils~=5.1.0

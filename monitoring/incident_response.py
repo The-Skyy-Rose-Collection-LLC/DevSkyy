@@ -5,6 +5,8 @@ Enterprise-grade incident detection, response, and recovery automation
 """
 
 import asyncio
+import threading
+from collections.abc import Coroutine
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -99,8 +101,14 @@ class IncidentResponseSystem:
         self.response_history = []
         self.active_responses = {}
 
+        # Background event loop management
+        self._background_loop: asyncio.AbstractEventLoop | None = None
+        self._loop_thread: threading.Thread | None = None
+        self._loop_lock = threading.Lock()
+
         # Initialize default response plans
         self._initialize_default_plans()
+        self._ensure_background_loop()
 
         # Register with metrics collector for alerts
         metrics_collector.add_alert_callback(self.handle_alert)
@@ -242,7 +250,7 @@ class IncidentResponseSystem:
 
             # Execute response plans
             for plan in triggered_plans:
-                asyncio.create_task(self._execute_response_plan(incident, plan))
+                self._schedule_async(self._execute_response_plan(incident, plan))
 
         except Exception as e:
             enterprise_logger.error(f"Error handling alert: {e}", category=LogCategory.SYSTEM, error=e)
@@ -330,11 +338,11 @@ class IncidentResponseSystem:
 
             # Schedule escalation if needed
             if plan.escalation_time > 0:
-                asyncio.create_task(self._schedule_escalation(incident, plan.escalation_time))
+                self._schedule_async(self._schedule_escalation(incident, plan.escalation_time))
 
             # Auto-resolve if configured
             if plan.auto_resolve:
-                asyncio.create_task(self._schedule_auto_resolve(incident, 300))  # 5 minutes
+                self._schedule_async(self._schedule_auto_resolve(incident, 300))  # 5 minutes
 
         except Exception as e:
             enterprise_logger.error(
@@ -515,6 +523,37 @@ class IncidentResponseSystem:
         # Check if incident conditions are resolved
         if self._check_incident_resolved(incident):
             self.resolve_incident(incident.id, "Auto-resolved - conditions normalized")
+
+    def _ensure_background_loop(self):
+        """Ensure dedicated asyncio loop exists for background tasks."""
+        with self._loop_lock:
+            if self._background_loop and self._background_loop.is_running():
+                return
+
+            self._background_loop = asyncio.new_event_loop()
+
+            def _run_loop(loop: asyncio.AbstractEventLoop):
+                asyncio.set_event_loop(loop)
+                loop.run_forever()
+
+            self._loop_thread = threading.Thread(
+                target=_run_loop,
+                args=(self._background_loop,),
+                name="incident-response-loop",
+                daemon=True,
+            )
+            self._loop_thread.start()
+
+    def _schedule_async(self, coro: Coroutine[Any, Any, Any]):
+        """Schedule coroutine on running loop or dedicated loop."""
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(coro)
+        except RuntimeError:
+            self._ensure_background_loop()
+            if not self._background_loop:
+                raise RuntimeError("Background event loop failed to initialize")
+            asyncio.run_coroutine_threadsafe(coro, self._background_loop)
 
     def _check_incident_resolved(self, incident: Incident) -> bool:
         """Check if incident conditions are resolved."""

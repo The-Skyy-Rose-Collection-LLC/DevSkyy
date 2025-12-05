@@ -72,7 +72,7 @@ pytest-factoryboy~=2.7.0  # Factory Boy integration with pytest
 # HTTP & API TESTING
 # ============================================================================
 responses~=0.25.3  # Mock HTTP requests
-pytest-httpx~=0.32.0  # Mock httpx
+pytest-httpx~=0.35.0  # Mock httpx (httpx>=0.28 support)
 requests-mock~=1.12.1  # Mock requests library
 httpretty~=1.1.4  # HTTP client mock
 fastapi-testclient~=0.1.0  # FastAPI test client

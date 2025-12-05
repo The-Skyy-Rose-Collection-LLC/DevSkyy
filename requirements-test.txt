@@ -27,7 +27,7 @@ pytest-sugar~=1.0.0
 # HTTP & API TESTING
 # ============================================================================
 responses~=0.25.3
-pytest-httpx~=0.32.0
+pytest-httpx~=0.35.0  # Aligns with httpx>=0.28 required by fastmcp
 requests-mock~=1.12.1
 httpretty~=1.1.4
 
@@ -36,6 +36,7 @@ httpretty~=1.1.4
 # ============================================================================
 pytest-postgresql~=6.1.1
 sqlalchemy-utils~=0.41.2
+fakeredis~=2.23.0
 
 # ============================================================================
 # MOCKING & TIME MANIPULATION

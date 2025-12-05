@@ -521,7 +521,7 @@ Proprietary - All Rights Reserved
 - **OWASP Tools**: python-owasp
 
 ### Blockchain & Web3
-- **Web3**: web3.py 7.7.0
+- **Web3**: web3.py 7.14.0
 - **Ethereum**: eth-account 0.13.4, eth-typing, eth-utils
 
 ### Developer Tools

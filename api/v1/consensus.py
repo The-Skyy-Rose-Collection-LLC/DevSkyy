@@ -12,7 +12,7 @@ from datetime import datetime
 import logging
 import os
 
-from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query
 from fastapi.responses import HTMLResponse
 from pydantic import BaseModel, Field
 
@@ -199,7 +199,7 @@ async def send_approval_email(email: str, workflow_id: str, approval_urls: dict,
 async def start_consensus_workflow(
     request: StartWorkflowRequest,
     background_tasks: BackgroundTasks,
-    orchestrator: ConsensusOrchestrator = None,
+    orchestrator: ConsensusOrchestrator = Depends(get_orchestrator),
 ):
     """
     Start a consensus-based content review workflow
@@ -293,7 +293,9 @@ async def start_consensus_workflow(
 
 
 @router.get("/workflow/{workflow_id}", response_model=WorkflowStatusResponse)
-async def get_workflow_status(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
+async def get_workflow_status(
+    workflow_id: str, orchestrator: ConsensusOrchestrator = Depends(get_orchestrator)
+):
     """
     Get consensus workflow status
 
@@ -368,7 +370,7 @@ async def approve_content(
     workflow_id: str,
     token: str = Query(..., description="Approval token"),
     feedback: str | None = Query(None, description="Optional feedback"),
-    orchestrator: ConsensusOrchestrator = None,
+    orchestrator: ConsensusOrchestrator = Depends(get_orchestrator),
 ):
     """
     Human approval webhook endpoint
@@ -431,7 +433,7 @@ async def reject_content(
     workflow_id: str,
     token: str = Query(..., description="Rejection token"),
     feedback: str | None = Query(None, description="Rejection reason"),
-    orchestrator: ConsensusOrchestrator = None,
+    orchestrator: ConsensusOrchestrator = Depends(get_orchestrator),
 ):
     """
     Human rejection webhook endpoint
@@ -491,7 +493,9 @@ async def reject_content(
 
 
 @router.post("/publish/{workflow_id}", response_model=dict)
-async def publish_approved_content(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
+async def publish_approved_content(
+    workflow_id: str, orchestrator: ConsensusOrchestrator = Depends(get_orchestrator)
+):
     """
     Publish approved content to WordPress
 

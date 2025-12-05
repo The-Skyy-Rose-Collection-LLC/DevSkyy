@@ -27,8 +27,11 @@ from pathlib import Path
 import sys
 from typing import Any
 
+REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
-sys.path.insert(0, '/home/user/DevSkyy')
+DEFAULT_FASHION_CONFIG = REPO_ROOT / "config" / "mcp" / "fashion_mcp_enhanced.json"
 from agent.unified_orchestrator import ExecutionPriority, Task, UnifiedMCPOrchestrator
 
 
@@ -142,7 +145,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
 
     def __init__(
         self,
-        config_path: str = "/home/user/DevSkyy/config/mcp/fashion_mcp_enhanced.json",
+        config_path: str | Path = DEFAULT_FASHION_CONFIG,
         max_concurrent_tasks: int = 50,
     ):
         """Initialize fashion orchestrator"""

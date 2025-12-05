@@ -10,6 +10,7 @@ from datetime import datetime, timedelta
 import logging
 import os
 import time
+from typing import Any
 
 from cryptography.fernet import Fernet
 from sqlalchemy import event, text
@@ -384,3 +385,64 @@ class DatabaseSecurityManager:
                 "timestamp": datetime.now().isoformat(),
                 "threat_level": "HIGH",  # Elevated due to connectivity issues
             }
+
+
+class DatabaseSecurity:
+    """
+    Backwards-compatible facade around DatabaseSecurityManager.
+
+    Older tests import `DatabaseSecurity` directly, so we expose a thin wrapper
+    that wires up the shared engine/session factory from `database.__init__`.
+    """
+
+    def __init__(self, engine: AsyncEngine | None = None, session_factory=None):
+        from database import AsyncSessionLocal, engine as default_engine
+
+        self._manager = DatabaseSecurityManager(
+            engine or default_engine,
+            session_factory or AsyncSessionLocal,
+        )
+
+    async def get_secure_session(self, user_id: str | None = None) -> AsyncGenerator[AsyncSession, None]:
+        async with self._manager.get_secure_session(user_id) as session:
+            yield session
+
+    def record_security_event(self, event_type: str, details: dict) -> None:
+        self._manager.record_security_event(event_type, details)
+
+    def get_security_report(self) -> dict:
+        return self._manager.get_security_report()
+
+    async def health_check(self) -> dict:
+        return await self._manager.health_check()
+
+    def _create_safe_query(self, query_template: str, params: dict[str, Any]) -> tuple[str, dict[str, Any]]:
+        """
+        Lightweight helper used in legacy tests to verify parameterized queries.
+
+        Args:
+            query_template: SQL query with named parameters (e.g., ":user_id").
+            params: Parameter dictionary.
+
+        Returns:
+            Tuple of sanitized query template and parameters.
+        """
+        if ":" not in query_template:
+            raise ValueError("Query template must use named parameters (e.g., :param)")
+
+        sanitized_params: dict[str, Any] = {}
+        for key, value in params.items():
+            if not key.replace("_", "").isalnum():
+                raise ValueError(f"Unsafe parameter name: {key}")
+            sanitized_params[key] = value
+
+        return query_template, sanitized_params
+
+
+__all__ = [
+    "CredentialManager",
+    "SecureConnectionPool",
+    "SecureSessionManager",
+    "DatabaseSecurityManager",
+    "DatabaseSecurity",
+]
