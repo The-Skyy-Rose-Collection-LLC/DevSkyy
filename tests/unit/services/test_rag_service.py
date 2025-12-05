@@ -15,23 +15,20 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import asyncio
-from datetime import datetime
-from pathlib import Path
 import sys
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
 
+
 # Mock external dependencies before importing the module
-sys.modules['chromadb'] = MagicMock()
-sys.modules['chromadb.config'] = MagicMock()
-sys.modules['sentence_transformers'] = MagicMock()
-sys.modules['pypdf'] = MagicMock()
-sys.modules['langchain'] = MagicMock()
-sys.modules['langchain.text_splitter'] = MagicMock()
-sys.modules['tiktoken'] = MagicMock()
+sys.modules["chromadb"] = MagicMock()
+sys.modules["chromadb.config"] = MagicMock()
+sys.modules["sentence_transformers"] = MagicMock()
+sys.modules["pypdf"] = MagicMock()
+sys.modules["langchain"] = MagicMock()
+sys.modules["langchain.text_splitter"] = MagicMock()
+sys.modules["tiktoken"] = MagicMock()
 
 from services.rag_service import (
     DocumentProcessor,
@@ -201,7 +198,7 @@ class TestRAGServiceInit:
         with patch.object(RAGConfig, "ANTHROPIC_API_KEY", None):
             with patch("services.rag_service.VectorDatabase") as mock_vdb_class:
                 with patch("services.rag_service.DocumentProcessor") as mock_dp_class:
-                    service = RAGService()
+                    RAGService()
 
                     # Assert
                     mock_vdb_class.assert_called_once()
@@ -246,15 +243,10 @@ class TestRAGServiceIngestText:
         custom_metadata = {"author": "Test Author", "category": "Testing"}
 
         # Act
-        result = await rag_service_with_mocks.ingest_text(
-            text,
-            source=source,
-            metadata=custom_metadata
-        )
+        await rag_service_with_mocks.ingest_text(text, source=source, metadata=custom_metadata)
 
         # Assert
         # Verify custom metadata was added to chunks
-        call_args = mock_doc_processor.process_text.return_value
         rag_service_with_mocks.vector_db.add_documents.assert_called_once()
 
         # Check that metadata was updated in the chunks passed to add_documents
@@ -336,10 +328,7 @@ class TestRAGServiceIngestDocument:
             result = await rag_service_with_mocks.ingest_document(file_path, file_type="txt")
 
             # Assert
-            mock_doc_processor.process_text.assert_called_once_with(
-                file_content,
-                source=file_path
-            )
+            mock_doc_processor.process_text.assert_called_once_with(file_content, source=file_path)
             assert result["file_type"] == "txt"
 
     @pytest.mark.asyncio
@@ -381,9 +370,7 @@ class TestRAGServiceIngestDocument:
                 await rag_service_with_mocks.ingest_document(file_path, file_type="txt")
 
     @pytest.mark.asyncio
-    async def test_ingest_document_handles_pdf_processing_error(
-        self, rag_service_with_mocks, mock_doc_processor
-    ):
+    async def test_ingest_document_handles_pdf_processing_error(self, rag_service_with_mocks, mock_doc_processor):
         """Test error handling when PDF processing fails."""
         # Arrange
         file_path = "/tmp/corrupt.pdf"
@@ -412,11 +399,7 @@ class TestRAGServiceSearch:
         results = await rag_service_with_mocks.search(query)
 
         # Assert
-        mock_vector_db.search.assert_called_once_with(
-            query,
-            top_k=RAGConfig.TOP_K_RESULTS,
-            filters=None
-        )
+        mock_vector_db.search.assert_called_once_with(query, top_k=RAGConfig.TOP_K_RESULTS, filters=None)
         assert len(results) == 2
         assert results[0]["content"] == "DevSkyy is an enterprise AI platform."
         assert results[0]["similarity"] == 0.8
@@ -429,14 +412,10 @@ class TestRAGServiceSearch:
         top_k = 10
 
         # Act
-        results = await rag_service_with_mocks.search(query, top_k=top_k)
+        await rag_service_with_mocks.search(query, top_k=top_k)
 
         # Assert
-        mock_vector_db.search.assert_called_once_with(
-            query,
-            top_k=top_k,
-            filters=None
-        )
+        mock_vector_db.search.assert_called_once_with(query, top_k=top_k, filters=None)
 
     @pytest.mark.asyncio
     async def test_search_with_filters(self, rag_service_with_mocks, mock_vector_db):
@@ -446,14 +425,10 @@ class TestRAGServiceSearch:
         filters = {"source": "test.txt"}
 
         # Act
-        results = await rag_service_with_mocks.search(query, filters=filters)
+        await rag_service_with_mocks.search(query, filters=filters)
 
         # Assert
-        mock_vector_db.search.assert_called_once_with(
-            query,
-            top_k=RAGConfig.TOP_K_RESULTS,
-            filters=filters
-        )
+        mock_vector_db.search.assert_called_once_with(query, top_k=RAGConfig.TOP_K_RESULTS, filters=filters)
 
     @pytest.mark.asyncio
     async def test_search_filters_by_similarity_threshold(self, rag_service_with_mocks, mock_vector_db):
@@ -473,9 +448,7 @@ class TestRAGServiceSearch:
         assert results[0]["similarity"] >= min_similarity
 
     @pytest.mark.asyncio
-    async def test_search_returns_empty_when_no_results_above_threshold(
-        self, rag_service_with_mocks, mock_vector_db
-    ):
+    async def test_search_returns_empty_when_no_results_above_threshold(self, rag_service_with_mocks, mock_vector_db):
         """Test search returns empty list when no results meet threshold."""
         # Arrange
         query = "irrelevant query"
@@ -589,7 +562,7 @@ class TestRAGServiceQuery:
         custom_prompt = "You are a helpful assistant specialized in enterprise AI."
 
         # Act
-        result = await rag_service_with_llm.query(question, system_prompt=custom_prompt)
+        await rag_service_with_llm.query(question, system_prompt=custom_prompt)
 
         # Assert
         call_args = mock_anthropic_client.messages.create.call_args
@@ -603,7 +576,7 @@ class TestRAGServiceQuery:
         top_k = 3
 
         # Act
-        result = await rag_service_with_llm.query(question, top_k=top_k)
+        await rag_service_with_llm.query(question, top_k=top_k)
 
         # Assert
         # Check search was called with correct top_k
@@ -648,10 +621,7 @@ class TestRAGServiceIterativeQuery:
 
         # Act
         result = await rag_service_with_llm.iterative_query(
-            question,
-            max_iterations=3,
-            min_results=3,
-            sufficiency_threshold=0.75
+            question, max_iterations=3, min_results=3, sufficiency_threshold=0.75
         )
 
         # Assert
@@ -699,18 +669,12 @@ class TestRAGServiceIterativeQuery:
         # First calls for reformulation, last call for final answer
         mock_anthropic_client.messages.create.side_effect = [
             *reformulated_responses,
-            MagicMock(
-                content=[MagicMock(text="Final answer")],
-                usage=MagicMock(input_tokens=200, output_tokens=100)
-            ),
+            MagicMock(content=[MagicMock(text="Final answer")], usage=MagicMock(input_tokens=200, output_tokens=100)),
         ]
 
         # Act
         result = await rag_service_with_llm.iterative_query(
-            question,
-            max_iterations=3,
-            min_results=3,
-            sufficiency_threshold=0.75
+            question, max_iterations=3, min_results=3, sufficiency_threshold=0.75
         )
 
         # Assert
@@ -740,10 +704,7 @@ class TestRAGServiceIterativeQuery:
         # Mock reformulation
         mock_anthropic_client.messages.create.side_effect = [
             MagicMock(content=[MagicMock(text="reformulated")]),
-            MagicMock(
-                content=[MagicMock(text="answer")],
-                usage=MagicMock(input_tokens=100, output_tokens=50)
-            ),
+            MagicMock(content=[MagicMock(text="answer")], usage=MagicMock(input_tokens=100, output_tokens=50)),
         ]
 
         # Act
@@ -771,9 +732,7 @@ class TestRAGServiceIterativeQuery:
         assert "iteration_trace" in result
 
     @pytest.mark.asyncio
-    async def test_iterative_query_no_results_found(
-        self, rag_service_with_llm, mock_vector_db
-    ):
+    async def test_iterative_query_no_results_found(self, rag_service_with_llm, mock_vector_db):
         """Test iterative query when no results are found."""
         # Arrange
         question = "irrelevant question"
@@ -798,24 +757,17 @@ class TestRAGServiceIterativeQuery:
         max_iterations = 2
 
         # Always return insufficient results
-        mock_vector_db.search.return_value = [
-            {"content": "Low quality", "similarity": 0.5, "metadata": {}, "id": "1"}
-        ]
+        mock_vector_db.search.return_value = [{"content": "Low quality", "similarity": 0.5, "metadata": {}, "id": "1"}]
 
         # Mock reformulation
         mock_anthropic_client.messages.create.side_effect = [
             MagicMock(content=[MagicMock(text="reformulated")]),
-            MagicMock(
-                content=[MagicMock(text="answer")],
-                usage=MagicMock(input_tokens=100, output_tokens=50)
-            ),
+            MagicMock(content=[MagicMock(text="answer")], usage=MagicMock(input_tokens=100, output_tokens=50)),
         ]
 
         # Act
         result = await rag_service_with_llm.iterative_query(
-            question,
-            max_iterations=max_iterations,
-            sufficiency_threshold=0.9  # Very high threshold
+            question, max_iterations=max_iterations, sufficiency_threshold=0.9  # Very high threshold
         )
 
         # Assert
@@ -830,14 +782,11 @@ class TestRAGServiceIterativeQuery:
         question = "test"
 
         # Return many results
-        many_results = [
-            {"content": f"Result {i}", "similarity": 0.8, "metadata": {}, "id": f"{i}"}
-            for i in range(15)
-        ]
+        many_results = [{"content": f"Result {i}", "similarity": 0.8, "metadata": {}, "id": f"{i}"} for i in range(15)]
         mock_vector_db.search.return_value = many_results
 
         # Act
-        result = await rag_service_with_llm.iterative_query(question)
+        await rag_service_with_llm.iterative_query(question)
 
         # Assert
         # Check that the context string passed to LLM only contains 10 sources
@@ -862,9 +811,7 @@ class TestRAGServiceReformulateQuery:
         """Test query reformulation using LLM."""
         # Arrange
         original_question = "What is DevSkyy?"
-        current_results = [
-            {"content": "DevSkyy is a platform", "similarity": 0.7}
-        ]
+        current_results = [{"content": "DevSkyy is a platform", "similarity": 0.7}]
         iteration = 1
 
         mock_anthropic_client.messages.create.return_value = MagicMock(
@@ -872,11 +819,7 @@ class TestRAGServiceReformulateQuery:
         )
 
         # Act
-        reformulated = await rag_service_with_llm._reformulate_query(
-            original_question,
-            current_results,
-            iteration
-        )
+        reformulated = await rag_service_with_llm._reformulate_query(original_question, current_results, iteration)
 
         # Assert
         assert reformulated == "DevSkyy architecture and components"
@@ -891,11 +834,7 @@ class TestRAGServiceReformulateQuery:
         iteration = 0
 
         # Act
-        reformulated = await rag_service_with_mocks._reformulate_query(
-            original_question,
-            current_results,
-            iteration
-        )
+        reformulated = await rag_service_with_mocks._reformulate_query(original_question, current_results, iteration)
 
         # Assert
         # Should use template-based reformulation
@@ -903,9 +842,7 @@ class TestRAGServiceReformulateQuery:
         assert len(reformulated) > len(original_question)
 
     @pytest.mark.asyncio
-    async def test_reformulate_query_fallback_on_llm_error(
-        self, rag_service_with_llm, mock_anthropic_client
-    ):
+    async def test_reformulate_query_fallback_on_llm_error(self, rag_service_with_llm, mock_anthropic_client):
         """Test fallback to rule-based when LLM reformulation fails."""
         # Arrange
         original_question = "test question"
@@ -915,11 +852,7 @@ class TestRAGServiceReformulateQuery:
         mock_anthropic_client.messages.create.side_effect = Exception("API error")
 
         # Act
-        reformulated = await rag_service_with_llm._reformulate_query(
-            original_question,
-            current_results,
-            iteration
-        )
+        reformulated = await rag_service_with_llm._reformulate_query(original_question, current_results, iteration)
 
         # Assert
         # Should fall back to template-based reformulation
@@ -934,15 +867,9 @@ class TestRAGServiceReformulateQuery:
         current_results = []
 
         # Act - Get reformulations for different iterations
-        reformulation_0 = await rag_service_with_mocks._reformulate_query(
-            original_question, current_results, 0
-        )
-        reformulation_1 = await rag_service_with_mocks._reformulate_query(
-            original_question, current_results, 1
-        )
-        reformulation_2 = await rag_service_with_mocks._reformulate_query(
-            original_question, current_results, 2
-        )
+        reformulation_0 = await rag_service_with_mocks._reformulate_query(original_question, current_results, 0)
+        reformulation_1 = await rag_service_with_mocks._reformulate_query(original_question, current_results, 1)
+        reformulation_2 = await rag_service_with_mocks._reformulate_query(original_question, current_results, 2)
 
         # Assert - All should be different (different templates)
         assert reformulation_0 != reformulation_1
@@ -950,9 +877,7 @@ class TestRAGServiceReformulateQuery:
         assert reformulation_0 != reformulation_2
 
     @pytest.mark.asyncio
-    async def test_reformulate_query_at_iteration_zero_uses_fallback(
-        self, rag_service_with_llm
-    ):
+    async def test_reformulate_query_at_iteration_zero_uses_fallback(self, rag_service_with_llm):
         """Test that iteration 0 uses rule-based reformulation even with LLM."""
         # Arrange
         original_question = "test"
@@ -960,11 +885,7 @@ class TestRAGServiceReformulateQuery:
         iteration = 0
 
         # Act
-        reformulated = await rag_service_with_llm._reformulate_query(
-            original_question,
-            current_results,
-            iteration
-        )
+        reformulated = await rag_service_with_llm._reformulate_query(original_question, current_results, iteration)
 
         # Assert
         # Should use template without calling LLM (iteration == 0)
@@ -1011,32 +932,30 @@ class TestGetRAGService:
         """Test that get_rag_service creates a RAGService instance."""
         # Arrange
         import services.rag_service as rag_module
+
         rag_module._rag_service = None  # Reset singleton
 
-        with patch.object(RAGConfig, "ANTHROPIC_API_KEY", None):
-            with patch("services.rag_service.VectorDatabase"):
-                with patch("services.rag_service.DocumentProcessor"):
-                    # Act
-                    service = get_rag_service()
+        with patch.object(RAGConfig, "ANTHROPIC_API_KEY", None), patch("services.rag_service.VectorDatabase"):
+            with patch("services.rag_service.DocumentProcessor"):
+                # Act
+                service = get_rag_service()
 
-                    # Assert
-                    assert isinstance(service, RAGService)
-                    assert rag_module._rag_service is service
+                # Assert
+                assert isinstance(service, RAGService)
+                assert rag_module._rag_service is service
 
     def test_get_rag_service_returns_same_instance(self):
         """Test that get_rag_service returns the same instance (singleton)."""
         # Arrange
-        import services.rag_service as rag_module
 
-        with patch.object(RAGConfig, "ANTHROPIC_API_KEY", None):
-            with patch("services.rag_service.VectorDatabase"):
-                with patch("services.rag_service.DocumentProcessor"):
-                    # Act
-                    service1 = get_rag_service()
-                    service2 = get_rag_service()
+        with patch.object(RAGConfig, "ANTHROPIC_API_KEY", None), patch("services.rag_service.VectorDatabase"):
+            with patch("services.rag_service.DocumentProcessor"):
+                # Act
+                service1 = get_rag_service()
+                service2 = get_rag_service()
 
-                    # Assert
-                    assert service1 is service2
+                # Assert
+                assert service1 is service2
 
 
 # =============================================================================
@@ -1074,9 +993,7 @@ class TestRAGServiceEdgeCases:
         assert isinstance(results, list)
 
     @pytest.mark.asyncio
-    async def test_query_builds_context_string_correctly(
-        self, rag_service_with_llm, mock_anthropic_client
-    ):
+    async def test_query_builds_context_string_correctly(self, rag_service_with_llm, mock_anthropic_client):
         """Test that query builds context string with proper formatting."""
         # Arrange
         question = "test question"
@@ -1101,9 +1018,7 @@ class TestRAGServiceEdgeCases:
         """Test that iterative query properly tracks iteration metadata."""
         # Arrange
         question = "test"
-        mock_vector_db.search.return_value = [
-            {"content": "result", "similarity": 0.8, "metadata": {}, "id": "1"}
-        ]
+        mock_vector_db.search.return_value = [{"content": "result", "similarity": 0.8, "metadata": {}, "id": "1"}]
 
         # Act
         result = await rag_service_with_llm.iterative_query(question, max_iterations=2)
@@ -1124,9 +1039,7 @@ class TestRAGServiceEdgeCases:
             assert "query" in result["sources"][0]
 
     @pytest.mark.asyncio
-    async def test_query_handles_missing_usage_info(
-        self, rag_service_with_llm, mock_anthropic_client
-    ):
+    async def test_query_handles_missing_usage_info(self, rag_service_with_llm, mock_anthropic_client):
         """Test query handling when LLM response doesn't have usage info."""
         # Arrange
         question = "test"
@@ -1154,8 +1067,7 @@ class TestRAGServiceIntegration:
         """Test complete RAG workflow: ingest, search, query (without LLM)."""
         # Act - Ingest
         ingest_result = await rag_service_with_mocks.ingest_text(
-            "DevSkyy is an enterprise AI platform with comprehensive security.",
-            source="test_doc"
+            "DevSkyy is an enterprise AI platform with comprehensive security.", source="test_doc"
         )
 
         # Act - Search
@@ -1175,14 +1087,11 @@ class TestRAGServiceIntegration:
         """Test complete RAG workflow with LLM."""
         # Act - Ingest
         ingest_result = await rag_service_with_llm.ingest_text(
-            "DevSkyy provides RBAC, encryption, and monitoring.",
-            source="security_doc"
+            "DevSkyy provides RBAC, encryption, and monitoring.", source="security_doc"
         )
 
         # Act - Iterative Query
-        query_result = await rag_service_with_llm.iterative_query(
-            "What are DevSkyy's security features?"
-        )
+        query_result = await rag_service_with_llm.iterative_query("What are DevSkyy's security features?")
 
         # Assert
         assert ingest_result["added"] > 0
@@ -1209,7 +1118,7 @@ class TestRAGServicePerformance:
         many_chunks = [
             {
                 "content": f"Chunk {i}",
-                "metadata": {"source": "test", "chunk_index": i, "file_type": "text", "tokens": 2}
+                "metadata": {"source": "test", "chunk_index": i, "file_type": "text", "tokens": 2},
             }
             for i in range(100)
         ]
@@ -1236,15 +1145,11 @@ class TestRAGServicePerformance:
         assert results == []
 
     @pytest.mark.asyncio
-    async def test_iterative_query_with_max_iterations_one(
-        self, rag_service_with_llm, mock_vector_db
-    ):
+    async def test_iterative_query_with_max_iterations_one(self, rag_service_with_llm, mock_vector_db):
         """Test iterative query with max_iterations=1 (should behave like regular query)."""
         # Arrange
         question = "test"
-        mock_vector_db.search.return_value = [
-            {"content": "result", "similarity": 0.8, "metadata": {}, "id": "1"}
-        ]
+        mock_vector_db.search.return_value = [{"content": "result", "similarity": 0.8, "metadata": {}, "id": "1"}]
 
         # Act
         result = await rag_service_with_llm.iterative_query(question, max_iterations=1)

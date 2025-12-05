@@ -344,11 +344,7 @@ class TestSecurityHeadersOWASPCompliance:
         api_headers = SecurityHeaders.get_api_headers()
 
         # All headers should have some referrer policy
-        assert all_headers["Referrer-Policy"] in [
-            "strict-origin-when-cross-origin",
-            "no-referrer",
-            "same-origin"
-        ]
+        assert all_headers["Referrer-Policy"] in ["strict-origin-when-cross-origin", "no-referrer", "same-origin"]
 
         # API should be most restrictive
         assert api_headers["Referrer-Policy"] == "no-referrer"

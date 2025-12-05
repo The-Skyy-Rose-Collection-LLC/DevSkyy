@@ -79,7 +79,7 @@ def check_version_pinning(file_path: str) -> tuple[bool, list[str]]:
 
     with open(file_path, "r") as f:
         for line_num, line in enumerate(f, 1):
-            package, operator, version = parse_requirement(line.strip())
+            package, operator, _version = parse_requirement(line.strip())
 
             if package and operator:
                 # Allow >= for setuptools (build tool exception)
@@ -105,7 +105,7 @@ def check_duplicates(file_path: str) -> tuple[bool, list[str]]:
 
     with open(file_path, "r") as f:
         for line_num, line in enumerate(f, 1):
-            package, operator, version = parse_requirement(line.strip())
+            package, _operator, _version = parse_requirement(line.strip())
 
             if package:
                 if package in packages:

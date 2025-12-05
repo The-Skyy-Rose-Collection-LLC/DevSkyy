@@ -9,11 +9,12 @@ Truth Protocol: Rules #1, #8, #15
 Coverage Target: ≥70%
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from elasticsearch.exceptions import ApiError, NotFoundError, RequestError
+import pytest
+
 
 # Alias for compatibility
 ElasticsearchException = ApiError
@@ -687,9 +688,7 @@ class TestAnalyticsData:
     @pytest.mark.asyncio
     async def test_get_analytics_data_custom_aggregation(self, es_manager, mock_es_client):
         """Test analytics with custom aggregation."""
-        mock_es_client.search = AsyncMock(
-            return_value={"aggregations": {"time_series": {"buckets": []}}}
-        )
+        mock_es_client.search = AsyncMock(return_value={"aggregations": {"time_series": {"buckets": []}}})
 
         start_date = datetime(2025, 11, 23, 0, 0, 0)
         end_date = datetime(2025, 11, 23, 23, 59, 59)
@@ -700,14 +699,12 @@ class TestAnalyticsData:
         search_body = call_kwargs["body"]
         aggs = search_body["aggs"]["time_series"]["aggs"]
 
-        assert "sum" in list(aggs["metric_value"].keys())[0]
+        assert "sum" in next(iter(aggs["metric_value"].keys()))
 
     @pytest.mark.asyncio
     async def test_get_analytics_data_custom_interval(self, es_manager, mock_es_client):
         """Test analytics with custom time interval."""
-        mock_es_client.search = AsyncMock(
-            return_value={"aggregations": {"time_series": {"buckets": []}}}
-        )
+        mock_es_client.search = AsyncMock(return_value={"aggregations": {"time_series": {"buckets": []}}})
 
         start_date = datetime(2025, 11, 23, 0, 0, 0)
         end_date = datetime(2025, 11, 23, 23, 59, 59)

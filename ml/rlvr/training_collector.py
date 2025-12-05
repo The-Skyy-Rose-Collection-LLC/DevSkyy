@@ -38,10 +38,7 @@ class TrainingDataCollector:
         self.min_examples_per_agent = 100  # Minimum for fine-tuning
 
     async def collect_training_data(
-        self,
-        agent_id: uuid.UUID,
-        max_examples: int = 1000,
-        days_lookback: int = 30
+        self, agent_id: uuid.UUID, max_examples: int = 1000, days_lookback: int = 30
     ) -> dict[str, Any]:
         """
         Collect training examples for a specific agent.
@@ -57,19 +54,13 @@ class TrainingDataCollector:
         since_date = datetime.utcnow() - timedelta(days=days_lookback)
 
         # Get high-quality positive examples
-        positive_examples = await self._get_positive_examples(
-            agent_id, since_date, max_examples // 2
-        )
+        positive_examples = await self._get_positive_examples(agent_id, since_date, max_examples // 2)
 
         # Get informative negative examples
-        negative_examples = await self._get_negative_examples(
-            agent_id, since_date, max_examples // 4
-        )
+        negative_examples = await self._get_negative_examples(agent_id, since_date, max_examples // 4)
 
         # Get neutral examples (for calibration)
-        neutral_examples = await self._get_neutral_examples(
-            agent_id, since_date, max_examples // 4
-        )
+        neutral_examples = await self._get_neutral_examples(agent_id, since_date, max_examples // 4)
 
         all_examples = positive_examples + negative_examples + neutral_examples
 
@@ -83,14 +74,11 @@ class TrainingDataCollector:
             "negative_examples": len(negative_examples),
             "neutral_examples": len(neutral_examples),
             "saved_count": saved_count,
-            "ready_for_training": len(all_examples) >= self.min_examples_per_agent
+            "ready_for_training": len(all_examples) >= self.min_examples_per_agent,
         }
 
     async def _get_positive_examples(
-        self,
-        agent_id: uuid.UUID,
-        since_date: datetime,
-        limit: int
+        self, agent_id: uuid.UUID, since_date: datetime, limit: int
     ) -> list[dict[str, Any]]:
         """Get high-quality positive examples (high reward scores)."""
         query = """
@@ -114,13 +102,16 @@ class TrainingDataCollector:
             LIMIT :limit
         """
 
-        result = await self.session.execute(query, {
-            "agent_id": agent_id,
-            "reward_threshold": self.positive_threshold,
-            "confidence_threshold": self.confidence_threshold,
-            "since_date": since_date,
-            "limit": limit
-        })
+        result = await self.session.execute(
+            query,
+            {
+                "agent_id": agent_id,
+                "reward_threshold": self.positive_threshold,
+                "confidence_threshold": self.confidence_threshold,
+                "since_date": since_date,
+                "limit": limit,
+            },
+        )
 
         return [
             {
@@ -131,16 +122,13 @@ class TrainingDataCollector:
                 "verification_method": row[4],
                 "verification_confidence": float(row[5]),
                 "example_type": "positive",
-                "created_at": row[6]
+                "created_at": row[6],
             }
             for row in result.fetchall()
         ]
 
     async def _get_negative_examples(
-        self,
-        agent_id: uuid.UUID,
-        since_date: datetime,
-        limit: int
+        self, agent_id: uuid.UUID, since_date: datetime, limit: int
     ) -> list[dict[str, Any]]:
         """Get informative negative examples (low reward scores with corrections)."""
         query = """
@@ -165,13 +153,16 @@ class TrainingDataCollector:
             LIMIT :limit
         """
 
-        result = await self.session.execute(query, {
-            "agent_id": agent_id,
-            "reward_threshold": self.negative_threshold,
-            "confidence_threshold": self.confidence_threshold,
-            "since_date": since_date,
-            "limit": limit
-        })
+        result = await self.session.execute(
+            query,
+            {
+                "agent_id": agent_id,
+                "reward_threshold": self.negative_threshold,
+                "confidence_threshold": self.confidence_threshold,
+                "since_date": since_date,
+                "limit": limit,
+            },
+        )
 
         return [
             {
@@ -183,16 +174,13 @@ class TrainingDataCollector:
                 "verification_confidence": float(row[5]),
                 "user_feedback": row[6],
                 "example_type": "negative",
-                "created_at": row[7]
+                "created_at": row[7],
             }
             for row in result.fetchall()
         ]
 
     async def _get_neutral_examples(
-        self,
-        agent_id: uuid.UUID,
-        since_date: datetime,
-        limit: int
+        self, agent_id: uuid.UUID, since_date: datetime, limit: int
     ) -> list[dict[str, Any]]:
         """Get neutral examples for calibration."""
         query = """
@@ -217,14 +205,17 @@ class TrainingDataCollector:
             LIMIT :limit
         """
 
-        result = await self.session.execute(query, {
-            "agent_id": agent_id,
-            "negative_threshold": self.negative_threshold,
-            "positive_threshold": self.positive_threshold,
-            "confidence_threshold": self.confidence_threshold,
-            "since_date": since_date,
-            "limit": limit
-        })
+        result = await self.session.execute(
+            query,
+            {
+                "agent_id": agent_id,
+                "negative_threshold": self.negative_threshold,
+                "positive_threshold": self.positive_threshold,
+                "confidence_threshold": self.confidence_threshold,
+                "since_date": since_date,
+                "limit": limit,
+            },
+        )
 
         return [
             {
@@ -235,16 +226,12 @@ class TrainingDataCollector:
                 "verification_method": row[4],
                 "verification_confidence": float(row[5]),
                 "example_type": "neutral",
-                "created_at": row[6]
+                "created_at": row[6],
             }
             for row in result.fetchall()
         ]
 
-    async def _save_training_examples(
-        self,
-        agent_id: uuid.UUID,
-        examples: list[dict[str, Any]]
-    ) -> int:
+    async def _save_training_examples(self, agent_id: uuid.UUID, examples: list[dict[str, Any]]) -> int:
         """Save collected examples to training_examples table."""
         saved_count = 0
 
@@ -265,18 +252,21 @@ class TrainingDataCollector:
                     ON CONFLICT (execution_id) DO NOTHING
                 """
 
-                await self.session.execute(query, {
-                    "id": example_id,
-                    "agent_id": agent_id,
-                    "execution_id": example['execution_id'],
-                    "prompt": example['prompt'],
-                    "completion": example['completion'],
-                    "reward_score": Decimal(str(example['reward_score'])),
-                    "example_type": example['example_type'],
-                    "is_synthetic": False,
-                    "is_validated": True,  # Already verified
-                    "created_at": datetime.utcnow()
-                })
+                await self.session.execute(
+                    query,
+                    {
+                        "id": example_id,
+                        "agent_id": agent_id,
+                        "execution_id": example["execution_id"],
+                        "prompt": example["prompt"],
+                        "completion": example["completion"],
+                        "reward_score": Decimal(str(example["reward_score"])),
+                        "example_type": example["example_type"],
+                        "is_synthetic": False,
+                        "is_validated": True,  # Already verified
+                        "created_at": datetime.utcnow(),
+                    },
+                )
 
                 saved_count += 1
 
@@ -287,11 +277,7 @@ class TrainingDataCollector:
         await self.session.commit()
         return saved_count
 
-    async def export_for_openai_finetuning(
-        self,
-        agent_id: uuid.UUID,
-        output_file: str
-    ) -> dict[str, Any]:
+    async def export_for_openai_finetuning(self, agent_id: uuid.UUID, output_file: str) -> dict[str, Any]:
         """
         Export training data in OpenAI fine-tuning format (JSONL).
 
@@ -311,29 +297,22 @@ class TrainingDataCollector:
         examples = result.fetchall()
 
         # Convert to OpenAI format
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             for row in examples:
                 prompt, completion, reward_score, example_type = row
 
                 # Create message format
                 message = {
-                    "messages": [
-                        {"role": "user", "content": prompt},
-                        {"role": "assistant", "content": completion}
-                    ]
+                    "messages": [{"role": "user", "content": prompt}, {"role": "assistant", "content": completion}]
                 }
 
                 # Add weight based on reward score (for positive examples)
                 if example_type == "positive":
                     message["weight"] = float(reward_score)
 
-                f.write(json.dumps(message) + '\n')
+                f.write(json.dumps(message) + "\n")
 
-        return {
-            "total_examples": len(examples),
-            "output_file": output_file,
-            "format": "openai_jsonl"
-        }
+        return {"total_examples": len(examples), "output_file": output_file, "format": "openai_jsonl"}
 
     async def get_collection_stats(self, agent_id: uuid.UUID) -> dict[str, Any]:
         """Get statistics about collected training data."""
@@ -355,7 +334,7 @@ class TrainingDataCollector:
                 "count": row[1],
                 "avg_reward": float(row[2]),
                 "min_reward": float(row[3]),
-                "max_reward": float(row[4])
+                "max_reward": float(row[4]),
             }
             for row in result.fetchall()
         }
@@ -371,5 +350,5 @@ class TrainingDataCollector:
             "agent_id": str(agent_id),
             "total_examples": total_count,
             "by_type": stats,
-            "ready_for_training": total_count >= self.min_examples_per_agent
+            "ready_for_training": total_count >= self.min_examples_per_agent,
         }

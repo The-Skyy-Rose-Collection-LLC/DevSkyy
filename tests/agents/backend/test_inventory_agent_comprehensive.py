@@ -66,13 +66,16 @@ class TestAssetScanning:
         """Test successful asset scanning."""
         agent = InventoryAgent()
 
-        with patch("os.path.exists", return_value=True), patch(
-            "os.walk",
-            return_value=[
-                (".", [], ["test.jpg", "doc.pdf", "video.mp4"]),
-            ],
-        ), patch("os.path.getsize", return_value=1024), patch(
-            "os.path.getmtime", return_value=datetime.now().timestamp()
+        with (
+            patch("os.path.exists", return_value=True),
+            patch(
+                "os.walk",
+                return_value=[
+                    (".", [], ["test.jpg", "doc.pdf", "video.mp4"]),
+                ],
+            ),
+            patch("os.path.getsize", return_value=1024),
+            patch("os.path.getmtime", return_value=datetime.now().timestamp()),
         ):
             result = await agent.scan_assets()
 
@@ -103,13 +106,16 @@ class TestAssetScanning:
         """Test digital asset scanning across directories."""
         agent = InventoryAgent()
 
-        with patch("os.path.exists", return_value=True), patch(
-            "os.walk",
-            return_value=[
-                (".", [], ["image.jpg", "doc.pdf", "video.mp4", "unknown.xyz"]),
-            ],
-        ), patch("os.path.getsize", return_value=2048), patch(
-            "os.path.getmtime", return_value=datetime.now().timestamp()
+        with (
+            patch("os.path.exists", return_value=True),
+            patch(
+                "os.walk",
+                return_value=[
+                    (".", [], ["image.jpg", "doc.pdf", "video.mp4", "unknown.xyz"]),
+                ],
+            ),
+            patch("os.path.getsize", return_value=2048),
+            patch("os.path.getmtime", return_value=datetime.now().timestamp()),
         ):
             result = await agent._scan_digital_assets()
 
@@ -129,22 +135,25 @@ class TestAssetScanning:
         def mock_exists(path):
             return path == "."
 
-        with patch("os.path.exists", side_effect=mock_exists), patch(
-            "os.walk",
-            return_value=[
-                (
-                    ".",
-                    [],
-                    [
-                        "photo.png",
-                        "report.docx",
-                        "clip.webm",
-                        "sound.mp3",
-                    ],
-                ),
-            ],
-        ), patch("os.path.getsize", return_value=1024), patch(
-            "os.path.getmtime", return_value=datetime.now().timestamp()
+        with (
+            patch("os.path.exists", side_effect=mock_exists),
+            patch(
+                "os.walk",
+                return_value=[
+                    (
+                        ".",
+                        [],
+                        [
+                            "photo.png",
+                            "report.docx",
+                            "clip.webm",
+                            "sound.mp3",
+                        ],
+                    ),
+                ],
+            ),
+            patch("os.path.getsize", return_value=1024),
+            patch("os.path.getmtime", return_value=datetime.now().timestamp()),
         ):
             result = await agent._scan_digital_assets()
 
@@ -282,10 +291,7 @@ class TestDuplicateDetection:
         agent = InventoryAgent()
 
         # Create image assets
-        image_assets = [
-            {"id": str(i), "name": f"image{i}.jpg", "type": "image", "size": 1024}
-            for i in range(15)
-        ]
+        image_assets = [{"id": str(i), "name": f"image{i}.jpg", "type": "image", "size": 1024} for i in range(15)]
 
         duplicates = await agent._find_perceptual_duplicates(image_assets)
 
@@ -300,10 +306,7 @@ class TestDuplicateDetection:
         agent = InventoryAgent()
 
         # Create document assets
-        doc_assets = [
-            {"id": str(i), "name": f"doc{i}.pdf", "type": "documents", "size": 2048}
-            for i in range(10)
-        ]
+        doc_assets = [{"id": str(i), "name": f"doc{i}.pdf", "type": "documents", "size": 2048} for i in range(10)]
 
         duplicates = await agent._find_content_duplicates(doc_assets)
 
@@ -315,9 +318,7 @@ class TestDuplicateDetection:
         agent = InventoryAgent()
 
         # Create assets with similar sizes
-        assets = [
-            {"id": str(i), "name": f"file{i}", "size": 5000 + i} for i in range(10)
-        ]
+        assets = [{"id": str(i), "name": f"file{i}", "size": 5000 + i} for i in range(10)]
 
         duplicates = await agent._find_metadata_duplicates(assets)
 
@@ -614,9 +615,7 @@ class TestReportGeneration:
         """Test report generation with error handling."""
         agent = InventoryAgent()
 
-        with patch.object(
-            agent, "_calculate_storage_efficiency", side_effect=Exception("Calc failed")
-        ):
+        with patch.object(agent, "_calculate_storage_efficiency", side_effect=Exception("Calc failed")):
             report = agent.generate_report()
 
             assert "error" in report
@@ -898,7 +897,7 @@ class TestQuantumOptimization:
         agent = InventoryAgent()
 
         # Patch logger to simulate error
-        with patch("agent.modules.backend.inventory_agent.logger") as mock_logger:
+        with patch("agent.modules.backend.inventory_agent.logger"):
             # Simulate error by patching uuid
             with patch("uuid.uuid4", side_effect=Exception("Quantum error")):
                 result = await agent.quantum_asset_optimization()
@@ -927,13 +926,16 @@ class TestIntegrationScenarios:
         """Test full workflow: scan -> find duplicates -> remove."""
         agent = InventoryAgent()
 
-        with patch("os.path.exists", return_value=True), patch(
-            "os.walk",
-            return_value=[
-                (".", [], ["test1.jpg", "test2.jpg"]),
-            ],
-        ), patch("os.path.getsize", return_value=1024), patch(
-            "os.path.getmtime", return_value=datetime.now().timestamp()
+        with (
+            patch("os.path.exists", return_value=True),
+            patch(
+                "os.walk",
+                return_value=[
+                    (".", [], ["test1.jpg", "test2.jpg"]),
+                ],
+            ),
+            patch("os.path.getsize", return_value=1024),
+            patch("os.path.getmtime", return_value=datetime.now().timestamp()),
         ):
             # Step 1: Scan assets
             scan_result = await agent.scan_assets()
@@ -974,10 +976,11 @@ class TestIntegrationScenarios:
         assert initial_metrics["performance_metrics"]["scans_completed"] == 0
 
         # Perform a scan
-        with patch("os.path.exists", return_value=True), patch(
-            "os.walk", return_value=[(".", [], ["test.jpg"])]
-        ), patch("os.path.getsize", return_value=1024), patch(
-            "os.path.getmtime", return_value=datetime.now().timestamp()
+        with (
+            patch("os.path.exists", return_value=True),
+            patch("os.walk", return_value=[(".", [], ["test.jpg"])]),
+            patch("os.path.getsize", return_value=1024),
+            patch("os.path.getmtime", return_value=datetime.now().timestamp()),
         ):
             await agent.scan_assets()
 

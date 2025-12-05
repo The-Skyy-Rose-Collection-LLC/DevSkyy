@@ -91,7 +91,7 @@ class TestOpenAIIntelligenceServiceConsequentialFlag:
                 OpenAIIntelligenceService,
             )
 
-            service = OpenAIIntelligenceService()
+            OpenAIIntelligenceService()
 
             # Verify OpenAI client was initialized with default_headers
             mock_openai.assert_called_once()
@@ -115,7 +115,7 @@ class TestOpenAIIntelligenceServiceConsequentialFlag:
                 OpenAIIntelligenceService,
             )
 
-            service = OpenAIIntelligenceService()
+            OpenAIIntelligenceService()
 
             call_args = mock_openai.call_args
             assert call_args.kwargs["default_headers"] == {"x-openai-isConsequential": "false"}
@@ -137,7 +137,7 @@ class TestCodexIntegrationConsequentialFlag:
 
             from ml.codex_integration import CodexIntegration
 
-            codex = CodexIntegration()
+            CodexIntegration()
 
             # Verify AsyncOpenAI client was initialized with default_headers
             mock_async_openai.assert_called_once()
@@ -166,7 +166,7 @@ class TestEnhancedOrchestratorConsequentialFlag:
             with patch("ai.enhanced_orchestrator.asyncio.create_task"):
                 pass  # EnhancedAIOrchestrator removed during cleanup
 
-                orchestrator = EnhancedAIOrchestrator()
+                EnhancedAIOrchestrator()
 
                 # Verify AsyncOpenAI was called with headers
                 call_args = mock_async_openai.call_args
@@ -192,7 +192,7 @@ class TestMultiModelOrchestratorConsequentialFlag:
                 MultiModelAIOrchestrator,
             )
 
-            orchestrator = MultiModelAIOrchestrator()
+            MultiModelAIOrchestrator()
 
             # Verify header is set to false
             call_args = mock_async_openai.call_args
@@ -229,7 +229,7 @@ class TestConsequentialFlagSecurityImplications:
                 OpenAIIntelligenceService,
             )
 
-            service = OpenAIIntelligenceService()
+            OpenAIIntelligenceService()
 
             call_args = mock_openai.call_args
             header_value = call_args.kwargs["default_headers"]["x-openai-isConsequential"]
@@ -331,10 +331,7 @@ class TestConsequentialFlagIntegration:
                 module = __import__(module_path, fromlist=[class_name])
                 service_class = getattr(module, class_name)
 
-                if class_name == "CodexIntegration":
-                    service = service_class()
-                else:
-                    service = service_class()
+                service_class() if class_name == "CodexIntegration" else service_class()
 
                 # Verify header was set
                 if mock_client.called:
@@ -368,7 +365,7 @@ class TestConsequentialFlagPerformance:
                     OpenAIIntelligenceService,
                 )
 
-                service = OpenAIIntelligenceService()
+                OpenAIIntelligenceService()
                 end = time.time()
 
                 times.append(end - start)
@@ -390,7 +387,7 @@ class TestConsequentialFlagCompliance:
                 OpenAIIntelligenceService,
             )
 
-            service = OpenAIIntelligenceService()
+            OpenAIIntelligenceService()
 
             call_args = mock_openai.call_args
             headers = call_args.kwargs["default_headers"]
@@ -416,7 +413,7 @@ class TestConsequentialFlagCompliance:
                 OpenAIIntelligenceService,
             )
 
-            service = OpenAIIntelligenceService()
+            OpenAIIntelligenceService()
 
             call_args = mock_openai.call_args
             header_value = call_args.kwargs["default_headers"]["x-openai-isConsequential"]

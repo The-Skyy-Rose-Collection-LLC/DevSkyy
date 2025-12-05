@@ -65,10 +65,7 @@ class TestReasoningStep:
 
     def test_create_thought_step(self):
         """Test creating a THOUGHT step."""
-        step = ReasoningStep(
-            step_type=ReasoningStepType.THOUGHT,
-            content="I need to search for products"
-        )
+        step = ReasoningStep(step_type=ReasoningStepType.THOUGHT, content="I need to search for products")
 
         assert step.step_type == ReasoningStepType.THOUGHT
         assert step.content == "I need to search for products"
@@ -84,7 +81,7 @@ class TestReasoningStep:
             step_type=ReasoningStepType.ACTION,
             content="Calling search_products",
             tool_name="search_products",
-            tool_args={"query": "shoes", "max_price": 100}
+            tool_args={"query": "shoes", "max_price": 100},
         )
 
         assert step.step_type == ReasoningStepType.ACTION
@@ -97,7 +94,7 @@ class TestReasoningStep:
             step_type=ReasoningStepType.OBSERVATION,
             content="Found 5 products",
             tool_name="search_products",
-            tool_result=[{"name": "Shoe A", "price": 50}]
+            tool_result=[{"name": "Shoe A", "price": 50}],
         )
 
         assert step.step_type == ReasoningStepType.OBSERVATION
@@ -106,9 +103,7 @@ class TestReasoningStep:
     def test_create_final_answer_step_with_confidence(self):
         """Test creating a FINAL_ANSWER step with confidence."""
         step = ReasoningStep(
-            step_type=ReasoningStepType.FINAL_ANSWER,
-            content="The best product is Shoe A at $50",
-            confidence=0.95
+            step_type=ReasoningStepType.FINAL_ANSWER, content="The best product is Shoe A at $50", confidence=0.95
         )
 
         assert step.step_type == ReasoningStepType.FINAL_ANSWER
@@ -117,10 +112,7 @@ class TestReasoningStep:
     def test_timestamp_auto_generated(self):
         """Test that timestamp is auto-generated."""
         before = datetime.now()
-        step = ReasoningStep(
-            step_type=ReasoningStepType.THOUGHT,
-            content="Test"
-        )
+        step = ReasoningStep(step_type=ReasoningStepType.THOUGHT, content="Test")
         after = datetime.now()
 
         assert before <= step.timestamp <= after
@@ -149,19 +141,9 @@ class TestReasoningTrace:
     def test_trace_with_steps(self):
         """Test trace with multiple steps."""
         steps = [
-            ReasoningStep(
-                step_type=ReasoningStepType.THOUGHT,
-                content="Thinking..."
-            ),
-            ReasoningStep(
-                step_type=ReasoningStepType.ACTION,
-                content="Acting...",
-                tool_name="search"
-            ),
-            ReasoningStep(
-                step_type=ReasoningStepType.OBSERVATION,
-                content="Observing..."
-            ),
+            ReasoningStep(step_type=ReasoningStepType.THOUGHT, content="Thinking..."),
+            ReasoningStep(step_type=ReasoningStepType.ACTION, content="Acting...", tool_name="search"),
+            ReasoningStep(step_type=ReasoningStepType.OBSERVATION, content="Observing..."),
         ]
 
         trace = ReasoningTrace(
@@ -171,7 +153,7 @@ class TestReasoningTrace:
             success=True,
             iterations=1,
             total_time_ms=150.5,
-            tools_used=["search"]
+            tools_used=["search"],
         )
 
         assert len(trace.steps) == 3
@@ -366,10 +348,7 @@ class TestReActCapableMixinReasonAndAct:
         """Test that reason_and_act returns a result dict."""
         agent = MockAgent()
 
-        result = await agent.reason_and_act(
-            task="Simple task",
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task="Simple task", max_iterations=1)
 
         assert isinstance(result, dict)
         assert "reasoning_trace" in result
@@ -386,11 +365,7 @@ class TestReActCapableMixinReasonAndAct:
             """Process x."""
             return x * 2
 
-        result = await agent.reason_and_act(
-            task="Process data",
-            tools=[my_tool],
-            max_iterations=1
-        )
+        await agent.reason_and_act(task="Process data", tools=[my_tool], max_iterations=1)
 
         # Tool should be registered
         assert "my_tool" in agent._react_tools
@@ -401,10 +376,7 @@ class TestReActCapableMixinReasonAndAct:
         agent = MockAgent()
         initial_traces = len(agent._react_traces)
 
-        await agent.reason_and_act(
-            task="Test task",
-            max_iterations=1
-        )
+        await agent.reason_and_act(task="Test task", max_iterations=1)
 
         assert len(agent._react_traces) == initial_traces + 1
 
@@ -413,11 +385,7 @@ class TestReActCapableMixinReasonAndAct:
         """Test reason_and_act with context dict."""
         agent = MockAgent()
 
-        result = await agent.reason_and_act(
-            task="Use context",
-            context={"key": "value"},
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task="Use context", context={"key": "value"}, max_iterations=1)
 
         assert "reasoning_trace" in result
 
@@ -426,10 +394,7 @@ class TestReActCapableMixinReasonAndAct:
         """Test that reason_and_act calculates elapsed time."""
         agent = MockAgent()
 
-        result = await agent.reason_and_act(
-            task="Timed task",
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task="Timed task", max_iterations=1)
 
         assert result["time_ms"] >= 0
 
@@ -443,12 +408,7 @@ class TestReActCapableMixinFallbackLoop:
         agent = MockAgent()
         trace = ReasoningTrace(task="Test")
 
-        result = await agent._fallback_react_loop(
-            task="Simple task",
-            max_iterations=2,
-            context=None,
-            trace=trace
-        )
+        result = await agent._fallback_react_loop(task="Simple task", max_iterations=2, context=None, trace=trace)
 
         assert "status" in result
         assert "method" in result
@@ -461,10 +421,7 @@ class TestReActCapableMixinFallbackLoop:
         trace = ReasoningTrace(task="Test")
 
         result = await agent._fallback_react_loop(
-            task="Task with context",
-            max_iterations=1,
-            context={"info": "extra data"},
-            trace=trace
+            task="Task with context", max_iterations=1, context={"info": "extra data"}, trace=trace
         )
 
         assert "status" in result
@@ -475,18 +432,10 @@ class TestReActCapableMixinFallbackLoop:
         agent = MockAgent()
         trace = ReasoningTrace(task="Test")
 
-        await agent._fallback_react_loop(
-            task="Multi-step task",
-            max_iterations=2,
-            context=None,
-            trace=trace
-        )
+        await agent._fallback_react_loop(task="Multi-step task", max_iterations=2, context=None, trace=trace)
 
         # Should have at least one THOUGHT step
-        thought_steps = [
-            s for s in trace.steps
-            if s.step_type == ReasoningStepType.THOUGHT
-        ]
+        thought_steps = [s for s in trace.steps if s.step_type == ReasoningStepType.THOUGHT]
         assert len(thought_steps) >= 1
 
 
@@ -498,12 +447,7 @@ class TestReActCapableMixinGenerateThought:
         """Test thought generation without Claude client."""
         agent = MockAgent()
 
-        result = await agent._generate_thought(
-            task="Test task",
-            observations=[],
-            context_str="",
-            iteration=0
-        )
+        result = await agent._generate_thought(task="Test task", observations=[], context_str="", iteration=0)
 
         assert "reasoning" in result
         assert "ready_to_answer" in result
@@ -513,15 +457,10 @@ class TestReActCapableMixinGenerateThought:
     async def test_generate_thought_with_observations(self):
         """Test thought generation with prior observations."""
         agent = MockAgent()
-        observations = [
-            {"tool": "search", "args": {}, "result": "Found 3 items"}
-        ]
+        observations = [{"tool": "search", "args": {}, "result": "Found 3 items"}]
 
         result = await agent._generate_thought(
-            task="Process results",
-            observations=observations,
-            context_str="",
-            iteration=1
+            task="Process results", observations=observations, context_str="", iteration=1
         )
 
         assert "reasoning" in result
@@ -532,10 +471,7 @@ class TestReActCapableMixinGenerateThought:
         agent = MockAgent()
 
         result = await agent._generate_thought(
-            task="Contextualized task",
-            observations=[],
-            context_str="\nContext: User prefers blue items",
-            iteration=0
+            task="Contextualized task", observations=[], context_str="\nContext: User prefers blue items", iteration=0
         )
 
         assert "reasoning" in result
@@ -549,7 +485,7 @@ class TestReActCapableMixinGenerateThought:
             task="Eventually ready",
             observations=[],
             context_str="",
-            iteration=3  # After 2 iterations, should be ready
+            iteration=3,  # After 2 iterations, should be ready
         )
 
         # Fallback logic: ready_to_answer should be True after iteration >= 2
@@ -560,7 +496,9 @@ class TestReActCapableMixinGenerateThought:
         """Test thought generation with mock Claude client."""
         mock_response = MagicMock()
         mock_response.content = [MagicMock()]
-        mock_response.content[0].text = """{
+        mock_response.content[
+            0
+        ].text = """{
             "reasoning": "I should search for products",
             "ready_to_answer": false,
             "next_action": {"tool_name": "search", "args": {"q": "test"}},
@@ -574,10 +512,7 @@ class TestReActCapableMixinGenerateThought:
         agent = MockAgentWithClient(mock_client)
 
         result = await agent._generate_thought(
-            task="Search for products",
-            observations=[],
-            context_str="",
-            iteration=0
+            task="Search for products", observations=[], context_str="", iteration=0
         )
 
         assert result["reasoning"] == "I should search for products"
@@ -637,7 +572,7 @@ class TestReActCapableMixinConfigureDSPy:
         agent = MockAgent()
         mock_lm = MagicMock()
 
-        with patch("agent.mixins.react_mixin.dspy") as mock_dspy:
+        with patch("agent.mixins.react_mixin.dspy"):
             result = agent.configure_dspy(lm=mock_lm)
 
         assert result is True
@@ -671,11 +606,7 @@ class TestIterativeRetrievalMixin:
             ]
 
         result = await agent.iterative_retrieve(
-            query="test query",
-            retriever=mock_retriever,
-            max_iterations=1,
-            min_results=3,
-            sufficiency_threshold=0.8
+            query="test query", retriever=mock_retriever, max_iterations=1, min_results=3, sufficiency_threshold=0.8
         )
 
         assert "results" in result
@@ -699,11 +630,7 @@ class TestIterativeRetrievalMixin:
             return [{"content": f"Result {call_count}", "similarity": 0.9}]
 
         result = await agent.iterative_retrieve(
-            query="test query",
-            retriever=mock_retriever,
-            max_iterations=3,
-            min_results=2,
-            sufficiency_threshold=0.7
+            query="test query", retriever=mock_retriever, max_iterations=3, min_results=2, sufficiency_threshold=0.7
         )
 
         assert len(result["queries_used"]) >= 1
@@ -718,15 +645,11 @@ class TestIterativeRetrievalMixin:
             return [{"content": "Duplicate", "similarity": 0.6}]
 
         result = await agent.iterative_retrieve(
-            query="test",
-            retriever=mock_retriever,
-            max_iterations=3,
-            min_results=1,
-            sufficiency_threshold=0.5
+            query="test", retriever=mock_retriever, max_iterations=3, min_results=1, sufficiency_threshold=0.5
         )
 
         # Should only have one unique result despite multiple iterations
-        unique_contents = set(r["content"] for r in result["results"])
+        unique_contents = {r["content"] for r in result["results"]}
         assert len(unique_contents) == 1
 
     @pytest.mark.asyncio
@@ -742,7 +665,7 @@ class TestIterativeRetrievalMixin:
             retriever=mock_retriever,
             max_iterations=1,
             min_results=1,
-            sufficiency_threshold=0.8
+            sufficiency_threshold=0.8,
         )
 
         first_result = result["results"][0]
@@ -763,11 +686,7 @@ class TestIterativeRetrievalMixin:
             ]
 
         result = await agent.iterative_retrieve(
-            query="test",
-            retriever=mock_retriever,
-            max_iterations=1,
-            min_results=2,
-            sufficiency_threshold=0.6
+            query="test", retriever=mock_retriever, max_iterations=1, min_results=2, sufficiency_threshold=0.6
         )
 
         assert "avg_similarity" in result
@@ -782,11 +701,7 @@ class TestIterativeRetrievalMixinReformulateQuery:
         """Test query reformulation at iteration 0."""
         agent = MockRetrieverAgent()
 
-        new_query = await agent._reformulate_query(
-            original_query="test query",
-            current_results=[],
-            iteration=0
-        )
+        new_query = await agent._reformulate_query(original_query="test query", current_results=[], iteration=0)
 
         assert "test query" in new_query
         assert new_query != "test query"  # Should be reformulated
@@ -798,11 +713,7 @@ class TestIterativeRetrievalMixinReformulateQuery:
         queries = []
 
         for i in range(4):
-            q = await agent._reformulate_query(
-                original_query="base",
-                current_results=[],
-                iteration=i
-            )
+            q = await agent._reformulate_query(original_query="base", current_results=[], iteration=i)
             queries.append(q)
 
         # Should have different reformulations
@@ -846,10 +757,7 @@ class TestMixinIntegration:
 
         agent.register_react_tool(search_tool)
 
-        result = await agent.reason_and_act(
-            task="Find relevant items",
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task="Find relevant items", max_iterations=1)
 
         assert "reasoning_trace" in result
 
@@ -860,10 +768,7 @@ class TestMixinIntegration:
 
         # Run multiple sessions
         for i in range(3):
-            await agent.reason_and_act(
-                task=f"Task {i}",
-                max_iterations=1
-            )
+            await agent.reason_and_act(task=f"Task {i}", max_iterations=1)
 
         # All traces should be stored
         traces = agent.get_reasoning_traces()
@@ -883,10 +788,7 @@ class TestEdgeCases:
         """Test handling of empty task string."""
         agent = MockAgent()
 
-        result = await agent.reason_and_act(
-            task="",
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task="", max_iterations=1)
 
         assert "reasoning_trace" in result
 
@@ -895,10 +797,7 @@ class TestEdgeCases:
         """Test with zero max iterations."""
         agent = MockAgent()
 
-        result = await agent.reason_and_act(
-            task="Quick task",
-            max_iterations=0
-        )
+        result = await agent.reason_and_act(task="Quick task", max_iterations=0)
 
         # Should complete without error
         assert "reasoning_trace" in result
@@ -923,10 +822,7 @@ class TestEdgeCases:
         agent = MockAgent()
         long_task = "Find products " * 100
 
-        result = await agent.reason_and_act(
-            task=long_task,
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task=long_task, max_iterations=1)
 
         assert "reasoning_trace" in result
 
@@ -935,10 +831,7 @@ class TestEdgeCases:
         """Test handling of special characters in task."""
         agent = MockAgent()
 
-        result = await agent.reason_and_act(
-            task="Find items with $price < 100 && rating >= 4.5",
-            max_iterations=1
-        )
+        result = await agent.reason_and_act(task="Find items with $price < 100 && rating >= 4.5", max_iterations=1)
 
         assert "reasoning_trace" in result
 
@@ -955,7 +848,7 @@ class TestEdgeCases:
             retriever=empty_retriever,
             max_iterations=2,
             min_results=1,
-            sufficiency_threshold=0.5
+            sufficiency_threshold=0.5,
         )
 
         assert result["total_results"] == 0
@@ -970,11 +863,7 @@ class TestEdgeCases:
 
         with pytest.raises(ConnectionError):
             await agent.iterative_retrieve(
-                query="test",
-                retriever=failing_retriever,
-                max_iterations=1,
-                min_results=1,
-                sufficiency_threshold=0.5
+                query="test", retriever=failing_retriever, max_iterations=1, min_results=1, sufficiency_threshold=0.5
             )
 
 
@@ -992,15 +881,10 @@ class TestConcurrency:
         agent = MockAgent()
 
         async def run_session(task_id: int):
-            return await agent.reason_and_act(
-                task=f"Concurrent task {task_id}",
-                max_iterations=1
-            )
+            return await agent.reason_and_act(task=f"Concurrent task {task_id}", max_iterations=1)
 
         # Run 5 sessions concurrently
-        results = await asyncio.gather(
-            *[run_session(i) for i in range(5)]
-        )
+        results = await asyncio.gather(*[run_session(i) for i in range(5)])
 
         assert len(results) == 5
         assert all("reasoning_trace" in r for r in results)
@@ -1020,9 +904,7 @@ class TestConcurrency:
         agent.register_react_tool(counting_tool)
 
         # Execute tool multiple times concurrently
-        results = await asyncio.gather(
-            *[agent._execute_tool("counting_tool", {"x": i}) for i in range(10)]
-        )
+        results = await asyncio.gather(*[agent._execute_tool("counting_tool", {"x": i}) for i in range(10)])
 
         assert len(results) == 10
         assert call_count == 10

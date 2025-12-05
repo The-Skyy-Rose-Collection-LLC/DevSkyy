@@ -767,13 +767,13 @@ logger.info("🔐 Enterprise JWT Authentication System initialized")
 def create_token_pair(user_id: str, email: str, username: str, role: str) -> TokenResponse:
     """
     Create access and refresh token pair
-    
+
     Args:
         user_id: User ID
         email: User email
         username: Username
         role: User role
-    
+
     Returns:
         TokenResponse with both tokens
     """
@@ -783,51 +783,51 @@ def create_token_pair(user_id: str, email: str, username: str, role: str) -> Tok
         "username": username,
         "role": role,
     }
-    
+
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
-    
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
         token_type="bearer",
-        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+        expires_in=ACCESS_TOKEN_EXPIRE_MINUTES * 60,
     )
 
 
 def verify_jwt_token(token: str, token_type: TokenType) -> dict[str, Any]:
     """
     Verify JWT token and return payload
-    
+
     Args:
         token: JWT token
         token_type: Expected token type (ACCESS or REFRESH)
-    
+
     Returns:
         Token payload dictionary
-    
+
     Raises:
         HTTPException: If token is invalid or wrong type
     """
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        
+
         # Verify token type matches expected
         if payload.get("token_type") != token_type:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Invalid token type. Expected {token_type}",
             )
-        
+
         # Check if blacklisted
         if TokenBlacklist.is_blacklisted(token):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has been revoked",
             )
-        
+
         return payload
-        
+
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -843,84 +843,84 @@ def verify_jwt_token(token: str, token_type: TokenType) -> dict[str, Any]:
 def refresh_access_token(refresh_token: str) -> TokenResponse:
     """
     Create new access token using refresh token
-    
+
     Args:
         refresh_token: Valid refresh token
-    
+
     Returns:
         New token pair
-    
+
     Raises:
         HTTPException: If refresh token is invalid
     """
     payload = verify_jwt_token(refresh_token, TokenType.REFRESH)
-    
+
     # Create new token pair
     return create_token_pair(
-        user_id=payload["user_id"],
-        email=payload["email"],
-        username=payload["username"],
-        role=payload["role"]
+        user_id=payload["user_id"], email=payload["email"], username=payload["username"], role=payload["role"]
     )
 
 
 def revoke_token(token: str) -> None:
     """
     Revoke a token by adding it to blacklist
-    
+
     Args:
         token: Token to revoke
     """
     TokenBlacklist.add(token)
-    logger.info(f"Token revoked")
+    logger.info("Token revoked")
 
 
 def has_permission(user_role: str, required_role: str) -> bool:
     """
     Check if user role has sufficient permissions
-    
+
     Args:
         user_role: User's role
         required_role: Required role level
-    
+
     Returns:
         True if user has permission
     """
     user_level = ROLE_HIERARCHY.get(user_role, 0)
     required_level = ROLE_HIERARCHY.get(required_role, 0)
-    
+
     return user_level >= required_level
 
 
 def require_role(required_role: str):
     """
     Decorator to require specific role for endpoint
-    
+
     Args:
         required_role: Minimum required role
-    
+
     Returns:
         Decorator function
     """
+
     def decorator(func):
         @wraps(func)
         async def wrapper(*args, **kwargs):
             # This is a simplified version - in production would check current user
             return await func(*args, **kwargs)
+
         return wrapper
+
     return decorator
 
 
 def generate_secure_secret_key(length: int = 64) -> str:
     """
     Generate a secure random secret key
-    
+
     Args:
         length: Length of key in bytes (default 64)
-    
+
     Returns:
         Hex-encoded secret key
     """
     import secrets
-    return secrets.token_hex(length)
 
+    return secrets.token_hex(length)

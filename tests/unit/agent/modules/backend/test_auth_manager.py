@@ -4,14 +4,12 @@ Comprehensive unit tests for agent/modules/backend/auth_manager.py
 Target coverage: 75%+
 """
 
-import os
+import contextlib
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock, patch
+import os
+from unittest.mock import patch
 
-import bcrypt
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from agent.modules.backend.auth_manager import (
     AuthManager,
@@ -50,9 +48,8 @@ class TestAuthManagerInitialization:
         assert auth_manager.SessionLocal is not None
 
     def test_init_without_database_url(self):
-        with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError, match="DATABASE_URL"):
-                AuthManager()
+        with patch.dict(os.environ, {}, clear=True), pytest.raises(ValueError, match="DATABASE_URL"):
+            AuthManager()
 
     def test_init_database(self, auth_manager):
         # Database should be initialized
@@ -333,16 +330,11 @@ class TestDatabaseOperations:
         assert session is not None
 
         # Cleanup
-        try:
+        with contextlib.suppress(StopIteration):
             next(gen)
-        except StopIteration:
-            pass
 
     def test_multiple_users(self, db_session):
-        users = [
-            User(email=f"user{i}@example.com", username=f"user{i}", password_hash=f"hash{i}")
-            for i in range(5)
-        ]
+        users = [User(email=f"user{i}@example.com", username=f"user{i}", password_hash=f"hash{i}") for i in range(5)]
 
         for user in users:
             db_session.add(user)
@@ -474,7 +466,7 @@ class TestEdgeCases:
         assert "valid" in result
 
     def test_unicode_in_email(self, auth_manager):
-        result = auth_manager.validate_email("user@例え.com")
+        auth_manager.validate_email("user@例え.com")
         # Depends on regex - might be invalid
 
     def test_special_characters_in_password(self, auth_manager):

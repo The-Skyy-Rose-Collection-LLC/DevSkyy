@@ -354,9 +354,7 @@ class ContentPublishingOrchestrator:
             logger.exception("Content generation failed")
             raise
 
-    async def fetch_featured_image(
-        self, keywords: list[str], orientation: str = "landscape"
-    ) -> dict[str, Any] | None:
+    async def fetch_featured_image(self, keywords: list[str], orientation: str = "landscape") -> dict[str, Any] | None:
         """
         Fetch featured image from Pexels
 

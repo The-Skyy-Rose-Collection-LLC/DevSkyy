@@ -51,6 +51,7 @@ neon-api~=0.3.0  # Neon serverless Postgres API client
 # HTTP & API
 # ============================================================================
 requests>=2.32.4,<3.0.0  # SECURITY: Fix GHSA-9hjg-9r4m-mvj7
+urllib3>=2.6.0,<3.0.0  # SECURITY: Fix CVE-2025-66418, CVE-2025-66471 (DoS via decompression chain/bomb)
 python-multipart~=0.0.18  # File upload support
 aiofiles~=24.1.0  # Async file operations
 httpx~=0.28.1  # Modern async HTTP client
@@ -61,7 +62,7 @@ httpx~=0.28.1  # Modern async HTTP client
 passlib[bcrypt]>=1.7.4,<2.0.0  # SECURITY: Password hashing
 paramiko>=3.5.0,<4.0.0  # SECURITY: SSH protocol
 certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
-cryptography>=46.0.3,<47.0.0  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
+cryptography>=46.0.3,<48.0.0  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns (need >=43.0.1)
 PyJWT~=2.10.1  # JWT authentication per RFC 7519
 bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
 argon2-cffi>=23.1.0,<24.0.0  # SECURITY: Argon2 password hashing

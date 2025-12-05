@@ -20,14 +20,10 @@ Per Truth Protocol:
 """
 
 import asyncio
-from datetime import datetime
-import json
 import logging
-from pathlib import Path
-import tempfile
 import time
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import numpy as np
 import pytest
@@ -85,6 +81,7 @@ def mock_vector_embeddings() -> dict[str, list[float]]:
 @pytest.fixture
 def mock_embedding_model():
     """Mock embedding model for generating vectors."""
+
     async def embed(text: str) -> list[float]:
         return np.random.rand(384).tolist()
 
@@ -94,6 +91,7 @@ def mock_embedding_model():
 @pytest.fixture
 def mock_llm_client():
     """Mock LLM client for generating responses."""
+
     async def generate(prompt: str, context: str) -> dict[str, Any]:
         return {
             "response": f"Based on the context: {context[:50]}... The answer is: Premium handbags use Italian leather.",
@@ -489,10 +487,7 @@ class TestRAGQuery:
             metadata_filter={"category": "fashion"},
         )
 
-        assert all(
-            r["metadata"]["category"] == "fashion"
-            for r in results.get("retrieved_documents", [])
-        )
+        assert all(r["metadata"]["category"] == "fashion" for r in results.get("retrieved_documents", []))
 
 
 # ============================================================================

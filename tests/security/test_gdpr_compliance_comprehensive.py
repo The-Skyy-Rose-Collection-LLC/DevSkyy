@@ -13,7 +13,6 @@ Python: >=3.11.0
 """
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -209,7 +208,7 @@ class TestRetentionPolicies:
 
     def test_all_retention_policies_have_legal_basis(self):
         """Test all retention policies have legal basis"""
-        for category, policy in RETENTION_POLICIES.items():
+        for policy in RETENTION_POLICIES.values():
             assert policy.legal_basis is not None
             assert len(policy.legal_basis) > 0
 
@@ -694,7 +693,7 @@ class TestAuditLogging:
     async def test_get_audit_logs_limit(self, gdpr_mgr, sample_user_id):
         """Test audit log limit parameter"""
         # Create multiple audit logs
-        for i in range(10):
+        for _i in range(10):
             await gdpr_mgr.request_data_export(sample_user_id)
 
         logs = await gdpr_mgr.get_audit_logs(limit=5)
@@ -837,10 +836,12 @@ class TestGDPREdgeCases:
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--cov=security.gdpr_compliance",
-        "--cov-report=term-missing",
-        "--cov-report=html",
-    ])
+    pytest.main(
+        [
+            __file__,
+            "-v",
+            "--cov=security.gdpr_compliance",
+            "--cov-report=term-missing",
+            "--cov-report=html",
+        ]
+    )

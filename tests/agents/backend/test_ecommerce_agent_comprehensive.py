@@ -1173,7 +1173,7 @@ class TestProductRecommendations:
         customer_id = customer_result["customer_id"]
 
         # Create active product
-        product_result = agent.add_product(
+        agent.add_product(
             name="Active Product",
             category=ProductCategory.NECKLACES,
             price=100.0,
@@ -1225,7 +1225,7 @@ class TestAnalytics:
             description="Beautiful product with premium craftsmanship",
         )
 
-        customer_result = agent.create_customer(
+        agent.create_customer(
             email="customer@example.com",
             first_name="Jane",
             last_name="Smith",
@@ -1638,7 +1638,7 @@ class TestEdgeCases:
         product_id = product_result["product_id"]
 
         # Create first order
-        result1 = agent.create_order(
+        agent.create_order(
             customer_id=customer_id,
             items=[
                 {
@@ -1656,7 +1656,7 @@ class TestEdgeCases:
         )
 
         # Create second order
-        result2 = agent.create_order(
+        agent.create_order(
             customer_id=customer_id,
             items=[
                 {

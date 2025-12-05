@@ -7,7 +7,6 @@ Per Truth Protocol:
 - Rule #12: Performance SLOs - Verify token optimization
 """
 
-
 import pytest
 
 from ml.tool_optimization import (
@@ -30,6 +29,7 @@ from security.tool_calling_safeguards import (
 # FIXTURES
 # ============================================================================
 
+
 @pytest.fixture
 def tool_selector():
     """Create dynamic tool selector"""
@@ -45,17 +45,11 @@ def sample_tool_schema():
         "parameters": {
             "type": "object",
             "properties": {
-                "location": {
-                    "type": "string",
-                    "description": "City name or coordinates"
-                },
-                "units": {
-                    "type": "string",
-                    "description": "Temperature units (celsius or fahrenheit)"
-                }
+                "location": {"type": "string", "description": "City name or coordinates"},
+                "units": {"type": "string", "description": "Temperature units (celsius or fahrenheit)"},
             },
-            "required": ["location"]
-        }
+            "required": ["location"],
+        },
     }
 
 
@@ -68,13 +62,14 @@ def sample_tool_config():
         permission_level=ToolPermissionLevel.PUBLIC,
         risk_level=ToolRiskLevel.LOW,
         provider=ToolProvider.BOTH,
-        max_calls_per_minute=100
+        max_calls_per_minute=100,
     )
 
 
 # ============================================================================
 # COMPRESSED SCHEMA TESTS
 # ============================================================================
+
 
 def test_compress_tool_schema(tool_selector, sample_tool_schema):
     """Test tool schema compression"""
@@ -105,12 +100,11 @@ def test_compressed_schema_size_reduction(tool_selector, sample_tool_schema):
 # DYNAMIC TOOL SELECTOR TESTS
 # ============================================================================
 
+
 def test_register_tool(tool_selector, sample_tool_schema, sample_tool_config):
     """Test registering a tool"""
     tool_selector.register_tool(
-        tool_name="get_weather",
-        tool_config=sample_tool_config,
-        full_schema=sample_tool_schema
+        tool_name="get_weather", tool_config=sample_tool_config, full_schema=sample_tool_schema
     )
 
     assert "get_weather" in tool_selector.compressed_schemas
@@ -125,21 +119,18 @@ def test_select_tools_basic(tool_selector):
         schema = {
             "name": f"tool_{i}",
             "description": f"Tool {i} for testing with keywords: data processing analysis",
-            "parameters": {"type": "object", "properties": {}, "required": []}
+            "parameters": {"type": "object", "properties": {}, "required": []},
         }
         config = ToolCallConfig(
             tool_name=f"tool_{i}",
             description=f"Tool {i}",
             permission_level=ToolPermissionLevel.PUBLIC,
             risk_level=ToolRiskLevel.LOW,
-            provider=ToolProvider.BOTH
+            provider=ToolProvider.BOTH,
         )
         tool_selector.register_tool(f"tool_{i}", config, schema)
 
-    context = ToolSelectionContext(
-        task_description="I need to process and analyze data",
-        max_tools=5
-    )
+    context = ToolSelectionContext(task_description="I need to process and analyze data", max_tools=5)
 
     selected = tool_selector.select_tools(context)
 
@@ -154,12 +145,12 @@ def test_select_tools_with_keyword_matching(tool_selector):
     weather_schema = {
         "name": "get_weather",
         "description": "Get weather forecast and temperature information",
-        "parameters": {"type": "object", "properties": {}, "required": []}
+        "parameters": {"type": "object", "properties": {}, "required": []},
     }
     database_schema = {
         "name": "query_database",
         "description": "Query database records and retrieve data",
-        "parameters": {"type": "object", "properties": {}, "required": []}
+        "parameters": {"type": "object", "properties": {}, "required": []},
     }
 
     weather_config = ToolCallConfig(
@@ -167,32 +158,25 @@ def test_select_tools_with_keyword_matching(tool_selector):
         description="Weather tool",
         permission_level=ToolPermissionLevel.PUBLIC,
         risk_level=ToolRiskLevel.LOW,
-        provider=ToolProvider.BOTH
+        provider=ToolProvider.BOTH,
     )
     database_config = ToolCallConfig(
         tool_name="query_database",
         description="Database tool",
         permission_level=ToolPermissionLevel.PUBLIC,
         risk_level=ToolRiskLevel.LOW,
-        provider=ToolProvider.BOTH
+        provider=ToolProvider.BOTH,
     )
 
     tool_selector.register_tool("get_weather", weather_config, weather_schema)
     tool_selector.register_tool("query_database", database_config, database_schema)
 
     # Update patterns with keywords
-    tool_selector.tool_patterns["get_weather"].context_keywords = {
-        "weather", "temperature", "forecast"
-    }
-    tool_selector.tool_patterns["query_database"].context_keywords = {
-        "database", "query", "data"
-    }
+    tool_selector.tool_patterns["get_weather"].context_keywords = {"weather", "temperature", "forecast"}
+    tool_selector.tool_patterns["query_database"].context_keywords = {"database", "query", "data"}
 
     # Task about weather should prefer weather tool
-    context = ToolSelectionContext(
-        task_description="What is the weather and temperature today?",
-        max_tools=1
-    )
+    context = ToolSelectionContext(task_description="What is the weather and temperature today?", max_tools=1)
 
     selected = tool_selector.select_tools(context, ["get_weather", "query_database"])
     assert len(selected) == 1
@@ -210,7 +194,7 @@ def test_update_tool_performance(tool_selector, sample_tool_schema, sample_tool_
             success=True,
             execution_time_ms=100.0 + i,
             tokens_used=50 + i,
-            context_keywords={"test", "example"}
+            context_keywords={"test", "example"},
         )
 
     pattern = tool_selector.tool_patterns["test_tool"]
@@ -230,10 +214,7 @@ def test_tool_performance_with_failures(tool_selector, sample_tool_schema, sampl
     for i in range(10):
         success = i % 2 == 0  # 50% success rate
         tool_selector.update_tool_performance(
-            tool_name="flaky_tool",
-            success=success,
-            execution_time_ms=100.0,
-            tokens_used=50
+            tool_name="flaky_tool", success=success, execution_time_ms=100.0, tokens_used=50
         )
 
     pattern = tool_selector.tool_patterns["flaky_tool"]
@@ -262,6 +243,7 @@ def test_extract_keywords(tool_selector):
 # PARALLEL FUNCTION CALLER TESTS
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_parallel_caller_initialization():
     """Test parallel function caller initializes correctly"""
@@ -274,11 +256,7 @@ async def test_call_functions_parallel_empty():
     """Test parallel calling with empty function list"""
     caller = ParallelFunctionCaller()
 
-    results = await caller.call_functions_parallel(
-        function_calls=[],
-        available_functions={},
-        user_id="test_user"
-    )
+    results = await caller.call_functions_parallel(function_calls=[], available_functions={}, user_id="test_user")
 
     assert len(results) == 0
 
@@ -287,17 +265,15 @@ async def test_call_functions_parallel_empty():
 # STRUCTURED OUTPUT VALIDATOR TESTS
 # ============================================================================
 
+
 def test_register_output_schema():
     """Test registering output schema"""
     validator = StructuredOutputValidator()
 
     schema = {
         "type": "object",
-        "properties": {
-            "name": {"type": "string"},
-            "age": {"type": "number"}
-        },
-        "required": ["name"]
+        "properties": {"name": {"type": "string"}, "age": {"type": "number"}},
+        "required": ["name"],
     }
 
     validator.register_output_schema("person", schema)
@@ -310,13 +286,7 @@ def test_validate_output_success():
     """Test successful output validation"""
     validator = StructuredOutputValidator()
 
-    schema = {
-        "type": "object",
-        "properties": {
-            "result": {"type": "string"}
-        },
-        "required": ["result"]
-    }
+    schema = {"type": "object", "properties": {"result": {"type": "string"}}, "required": ["result"]}
 
     validator.register_output_schema("test_schema", schema)
 
@@ -331,13 +301,7 @@ def test_validate_output_missing_required():
     """Test validation fails for missing required field"""
     validator = StructuredOutputValidator()
 
-    schema = {
-        "type": "object",
-        "properties": {
-            "required_field": {"type": "string"}
-        },
-        "required": ["required_field"]
-    }
+    schema = {"type": "object", "properties": {"required_field": {"type": "string"}}, "required": ["required_field"]}
 
     validator.register_output_schema("test_schema", schema)
 
@@ -352,9 +316,7 @@ def test_validate_output_wrong_type():
     """Test validation fails for wrong type"""
     validator = StructuredOutputValidator()
 
-    schema = {
-        "type": "string"
-    }
+    schema = {"type": "string"}
 
     validator.register_output_schema("string_schema", schema)
 
@@ -380,12 +342,7 @@ def test_create_output_constraint():
     """Test creating output constraint for AI models"""
     validator = StructuredOutputValidator()
 
-    schema = {
-        "type": "object",
-        "properties": {
-            "answer": {"type": "string"}
-        }
-    }
+    schema = {"type": "object", "properties": {"answer": {"type": "string"}}}
 
     validator.register_output_schema("qa_schema", schema)
 
@@ -400,6 +357,7 @@ def test_create_output_constraint():
 # ============================================================================
 # TOKEN OPTIMIZATION MANAGER TESTS
 # ============================================================================
+
 
 def test_optimization_manager_initialization():
     """Test token optimization manager initializes correctly"""
@@ -419,7 +377,7 @@ def test_register_tool_with_manager():
     schema = {
         "name": "test_tool",
         "description": "Test tool",
-        "parameters": {"type": "object", "properties": {}, "required": []}
+        "parameters": {"type": "object", "properties": {}, "required": []},
     }
 
     config = ToolCallConfig(
@@ -427,7 +385,7 @@ def test_register_tool_with_manager():
         description="Test tool",
         permission_level=ToolPermissionLevel.PUBLIC,
         risk_level=ToolRiskLevel.LOW,
-        provider=ToolProvider.BOTH
+        provider=ToolProvider.BOTH,
     )
 
     manager.register_tool("test_tool", config, schema)
@@ -445,26 +403,20 @@ async def test_optimize_and_execute():
         schema = {
             "name": f"tool_{i}",
             "description": f"Tool {i} for data processing",
-            "parameters": {"type": "object", "properties": {}, "required": []}
+            "parameters": {"type": "object", "properties": {}, "required": []},
         }
         config = ToolCallConfig(
             tool_name=f"tool_{i}",
             description=f"Tool {i}",
             permission_level=ToolPermissionLevel.PUBLIC,
             risk_level=ToolRiskLevel.LOW,
-            provider=ToolProvider.BOTH
+            provider=ToolProvider.BOTH,
         )
         manager.register_tool(f"tool_{i}", config, schema)
 
-    context = ToolSelectionContext(
-        task_description="Process data efficiently",
-        max_tools=3
-    )
+    context = ToolSelectionContext(task_description="Process data efficiently", max_tools=3)
 
-    result = await manager.optimize_and_execute(
-        context=context,
-        available_tools=[f"tool_{i}" for i in range(5)]
-    )
+    result = await manager.optimize_and_execute(context=context, available_tools=[f"tool_{i}" for i in range(5)])
 
     assert "selected_tools" in result
     assert "compressed_schemas" in result
@@ -500,30 +452,24 @@ async def test_token_savings_accumulation():
                 "type": "object",
                 "properties": {
                     "param1": {"type": "string", "description": "Long parameter description"},
-                    "param2": {"type": "number", "description": "Another long description"}
+                    "param2": {"type": "number", "description": "Another long description"},
                 },
-                "required": []
-            }
+                "required": [],
+            },
         }
         config = ToolCallConfig(
             tool_name=f"tool_{i}",
             description=f"Tool {i}",
             permission_level=ToolPermissionLevel.PUBLIC,
             risk_level=ToolRiskLevel.LOW,
-            provider=ToolProvider.BOTH
+            provider=ToolProvider.BOTH,
         )
         manager.register_tool(f"tool_{i}", config, schema)
 
     # Execute multiple optimizations
     for _ in range(3):
-        context = ToolSelectionContext(
-            task_description="Execute various tasks",
-            max_tools=5
-        )
-        await manager.optimize_and_execute(
-            context=context,
-            available_tools=[f"tool_{i}" for i in range(10)]
-        )
+        context = ToolSelectionContext(task_description="Execute various tasks", max_tools=5)
+        await manager.optimize_and_execute(context=context, available_tools=[f"tool_{i}" for i in range(10)])
 
     assert manager.total_executions == 3
     assert manager.total_tokens_saved > 0
@@ -532,6 +478,7 @@ async def test_token_savings_accumulation():
 # ============================================================================
 # GLOBAL INSTANCE TEST
 # ============================================================================
+
 
 def test_get_global_optimization_manager():
     """Test getting global optimization manager instance"""
@@ -546,6 +493,7 @@ def test_get_global_optimization_manager():
 # INTEGRATION TESTS
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_full_optimization_workflow():
     """Test complete token optimization workflow"""
@@ -557,7 +505,7 @@ async def test_full_optimization_workflow():
         ("query_database", "Query database with complex SQL statements"),
         ("analyze_data", "Perform statistical analysis on datasets"),
         ("generate_report", "Generate comprehensive PDF reports"),
-        ("send_email", "Send email notifications to users")
+        ("send_email", "Send email notifications to users"),
     ]
 
     for tool_name, description in tools:
@@ -568,17 +516,17 @@ async def test_full_optimization_workflow():
                 "type": "object",
                 "properties": {
                     "input": {"type": "string", "description": "Input parameter"},
-                    "options": {"type": "object", "description": "Configuration options"}
+                    "options": {"type": "object", "description": "Configuration options"},
                 },
-                "required": ["input"]
-            }
+                "required": ["input"],
+            },
         }
         config = ToolCallConfig(
             tool_name=tool_name,
             description=description,
             permission_level=ToolPermissionLevel.AUTHENTICATED,
             risk_level=ToolRiskLevel.MEDIUM,
-            provider=ToolProvider.BOTH
+            provider=ToolProvider.BOTH,
         )
         manager.register_tool(tool_name, config, schema)
 
@@ -588,7 +536,7 @@ async def test_full_optimization_workflow():
         success=True,
         execution_time_ms=50.0,
         tokens_used=20,
-        context_keywords={"weather", "forecast", "temperature"}
+        context_keywords={"weather", "forecast", "temperature"},
     )
 
     manager.tool_selector.update_tool_performance(
@@ -596,20 +544,15 @@ async def test_full_optimization_workflow():
         success=True,
         execution_time_ms=200.0,
         tokens_used=100,
-        context_keywords={"database", "query", "data"}
+        context_keywords={"database", "query", "data"},
     )
 
     # Step 3: Optimize tool selection for a task
     context = ToolSelectionContext(
-        task_description="Get weather forecast and temperature data",
-        max_tools=2,
-        prefer_fast=True
+        task_description="Get weather forecast and temperature data", max_tools=2, prefer_fast=True
     )
 
-    result = await manager.optimize_and_execute(
-        context=context,
-        available_tools=[name for name, _ in tools]
-    )
+    result = await manager.optimize_and_execute(context=context, available_tools=[name for name, _ in tools])
 
     # Verify results
     assert len(result["selected_tools"]) <= 2

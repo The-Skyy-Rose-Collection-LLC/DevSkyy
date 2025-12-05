@@ -145,9 +145,7 @@ def encrypt_field(plaintext: str, master_key: bytes | None = None) -> str:
         raise RuntimeError(f"Encryption error: {e!s}")
 
 
-def decrypt_field(
-    encrypted_base64: str, master_key: bytes | None = None, legacy_key_id: str | None = None
-) -> str:
+def decrypt_field(encrypted_base64: str, master_key: bytes | None = None, legacy_key_id: str | None = None) -> str:
     """
     Decrypt a field encrypted with AES-256-GCM
 

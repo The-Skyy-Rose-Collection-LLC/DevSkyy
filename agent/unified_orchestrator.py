@@ -285,7 +285,7 @@ class UnifiedMCPOrchestrator:
             "voice_media_video_elite": AgentRole.VOICE_MEDIA_VIDEO,
         }
 
-        for config_key, agent_role in role_mapping.items():
+        for config_key in role_mapping:
             if config_key in workers_config:
                 worker_config = workers_config[config_key]
                 agent_name = worker_config.get("name", config_key)
@@ -469,7 +469,9 @@ class UnifiedMCPOrchestrator:
         if not tool and task.tool_name:
             raise ValueError(f"Tool not found: {task.tool_name}")
 
-        logger.debug(f"Executing tool: {task.tool_name} with agent: {task.agent_role.value if task.agent_role else 'none'}")
+        logger.debug(
+            f"Executing tool: {task.tool_name} with agent: {task.agent_role.value if task.agent_role else 'none'}"
+        )
 
         # Simulate tool execution delay
         await asyncio.sleep(0.1)
@@ -785,7 +787,7 @@ class UnifiedMCPOrchestrator:
     def get_agent_capabilities(self, agent_role: AgentRole) -> list[str]:
         """Get capabilities for a specific agent"""
         for agent_name, capability in self.agent_capabilities.items():
-            if agent_name == agent_role.value or capability.agent_name == agent_role.value:
+            if agent_role.value in (agent_name, capability.agent_name):
                 return capability.capabilities
         return []
 
@@ -814,28 +816,14 @@ async def main():
     # Initialize orchestrator
     orchestrator = UnifiedMCPOrchestrator()
 
-    print("\n" + "=" * 80)
-    print("🎭 UNIFIED MCP ORCHESTRATOR - DEMONSTRATION")
-    print("=" * 80 + "\n")
 
     # Show configuration
-    print("📋 Configuration:")
-    print(f"  - Tools loaded: {len(orchestrator.tools)}")
-    print(f"  - Agents configured: {len(orchestrator.agent_capabilities)}")
-    print(f"  - Workflows available: {len(orchestrator.list_available_workflows())}")
-    print()
 
     # Show agent capabilities
-    print("👥 Agent Capabilities:")
-    for agent_name, capability in orchestrator.agent_capabilities.items():
-        print(f"  - {agent_name}:")
-        print(f"    Capabilities: {', '.join(capability.capabilities[:3])}...")
-        print(f"    Priority: {capability.priority.name}")
-    print()
+    for _capability in orchestrator.agent_capabilities.values():
+        pass
 
     # Create and execute sample tasks
-    print("📋 Executing Sample Tasks:")
-    print("-" * 80)
 
     # Task 1: Code analysis
     task1 = await orchestrator.create_task(
@@ -850,10 +838,7 @@ async def main():
         priority=ExecutionPriority.HIGH,
     )
 
-    result1 = await orchestrator.execute_task(task1)
-    print(f"✅ Task 1 completed: {task1.name}")
-    print(f"   Status: {result1.get('success')}")
-    print()
+    await orchestrator.execute_task(task1)
 
     # Task 2: Document processing (RAG)
     task2 = await orchestrator.create_task(
@@ -868,36 +853,15 @@ async def main():
         priority=ExecutionPriority.MEDIUM,
     )
 
-    result2 = await orchestrator.execute_task(task2)
-    print(f"✅ Task 2 completed: {task2.name}")
-    print(f"   Status: {result2.get('success')}")
-    print()
+    await orchestrator.execute_task(task2)
 
     # Show metrics
-    print("\n" + "=" * 80)
-    print("📊 Performance Metrics:")
-    print("-" * 80)
 
-    metrics = orchestrator.get_metrics()
-    print(f"  - Total tasks: {metrics['total_tasks']}")
-    print(f"  - Completed: {metrics['completed_tasks']}")
-    print(f"  - Failed: {metrics['failed_tasks']}")
-    print(f"  - Success rate: {metrics['success_rate'] * 100:.1f}%")
-    print(f"  - Tokens saved: {metrics['total_tokens_saved']:,}")
-    print(f"  - Token reduction: {metrics['token_reduction_ratio'] * 100:.0f}%")
-    print()
+    orchestrator.get_metrics()
 
     # Show health status
-    health = await orchestrator.get_orchestrator_health()
-    print("🏥 System Health:")
-    print(f"  - System status: {health['system_status'].upper()}")
-    print(f"  - Registered agents: {health['registered_agents']}")
-    print(f"  - Active tasks: {health['active_tasks']}")
-    print()
+    await orchestrator.get_orchestrator_health()
 
-    print("=" * 80)
-    print("✨ DEMONSTRATION COMPLETE")
-    print("=" * 80 + "\n")
 
 
 # Global orchestrator instance
@@ -907,17 +871,6 @@ orchestrator = UnifiedMCPOrchestrator()
 if __name__ == "__main__":
     import sys
 
-    print(
-        """
-    ╔════════════════════════════════════════════════════════════════════════════╗
-    ║                                                                            ║
-    ║        🎭 DevSkyy Unified MCP Orchestrator v2.0.0                         ║
-    ║                                                                            ║
-    ║        Token Efficiency + Enterprise Fault Tolerance                      ║
-    ║                                                                            ║
-    ╚════════════════════════════════════════════════════════════════════════════╝
-    """
-    )
 
     logging.basicConfig(
         level=logging.INFO,
@@ -927,12 +880,9 @@ if __name__ == "__main__":
 
     try:
         asyncio.run(main())
-        print("\n✅ Demonstration completed successfully!\n")
         sys.exit(0)
     except KeyboardInterrupt:
-        print("\n\n⚠️  Demonstration interrupted by user\n")
         sys.exit(1)
     except Exception as e:
-        print(f"\n\n❌ Demonstration failed: {e}\n")
         logger.error(f"Demonstration error: {e}", exc_info=True)
         sys.exit(1)

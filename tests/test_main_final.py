@@ -106,10 +106,7 @@ class TestAgentEndpoints:
 
     def test_execute_agent_invalid_type(self, client):
         """Test POST /api/v1/agents execute with invalid type."""
-        response = client.post(
-            "/api/v1/agents/invalid/test/execute",
-            json={"task": "test"}
-        )
+        response = client.post("/api/v1/agents/invalid/test/execute", json={"task": "test"})
         # Should return error status
         assert response.status_code in [404, 500]
 
@@ -145,8 +142,7 @@ class TestAdvancedEndpoints:
     def test_multi_agent_orchestration(self, client):
         """Test /api/v1/orchestration/multi-agent."""
         response = client.post(
-            "/api/v1/orchestration/multi-agent",
-            json={"task_type": "test", "content": "test content"}
+            "/api/v1/orchestration/multi-agent", json={"task_type": "test", "content": "test content"}
         )
         # May return 503 if not available
         assert response.status_code in [200, 500, 503]
@@ -154,18 +150,14 @@ class TestAdvancedEndpoints:
     def test_upload_3d_model(self, client):
         """Test /api/v1/3d/models/upload."""
         response = client.post(
-            "/api/v1/3d/models/upload",
-            json={"file_path": "/test/model.glb", "model_format": "glb"}
+            "/api/v1/3d/models/upload", json={"file_path": "/test/model.glb", "model_format": "glb"}
         )
         # May return 503 if not available
         assert response.status_code in [200, 422, 500, 503]
 
     def test_create_avatar(self, client):
         """Test /api/v1/avatars/create."""
-        response = client.post(
-            "/api/v1/avatars/create",
-            json={"avatar_type": "ready_player_me"}
-        )
+        response = client.post("/api/v1/avatars/create", json={"avatar_type": "ready_player_me"})
         # May return 503 if not available
         assert response.status_code in [200, 500, 503]
 
@@ -183,12 +175,7 @@ class TestThemeEndpoints:
         """Test /api/v1/themes/build-and-deploy."""
         response = client.post(
             "/api/v1/themes/build-and-deploy",
-            json={
-                "theme_name": "test-theme",
-                "site_url": "https://test.com",
-                "username": "test",
-                "password": "test"
-            }
+            json={"theme_name": "test-theme", "site_url": "https://test.com", "username": "test", "password": "test"},
         )
         # May return various error codes
         assert response.status_code in [200, 400, 422, 500]
@@ -208,18 +195,15 @@ class TestThemeEndpoints:
                 "theme_name": "test-theme",
                 "site_url": "https://test.com",
                 "username": "test",
-                "password": "test"
-            }
+                "password": "test",
+            },
         )
         # May return various error codes
         assert response.status_code in [200, 400, 422, 500]
 
     def test_skyy_rose_theme_build(self, client):
         """Test /api/v1/themes/skyy-rose/build."""
-        response = client.post(
-            "/api/v1/themes/skyy-rose/build",
-            json={"theme_name": "test-skyy-theme"}
-        )
+        response = client.post("/api/v1/themes/skyy-rose/build", json={"theme_name": "test-skyy-theme"})
         # May return various error codes
         assert response.status_code in [200, 400, 422, 500]
 
@@ -231,10 +215,7 @@ class TestThemeEndpoints:
 
     def test_wordpress_connection_test(self, client):
         """Test /api/v1/themes/credentials/test."""
-        response = client.post(
-            "/api/v1/themes/credentials/test",
-            json={"site_key": "test_site"}
-        )
+        response = client.post("/api/v1/themes/credentials/test", json={"site_key": "test_site"})
         # May return various error codes
         assert response.status_code in [200, 400, 422, 500]
 
@@ -433,19 +414,14 @@ class TestErrorHandling:
     def test_invalid_json_body(self, client):
         """Test endpoint with invalid JSON body."""
         response = client.post(
-            "/api/v1/orchestration/multi-agent",
-            data="invalid json{{{",
-            headers={"Content-Type": "application/json"}
+            "/api/v1/orchestration/multi-agent", data="invalid json{{{", headers={"Content-Type": "application/json"}
         )
         # Should return 422 or 400
         assert response.status_code in [400, 422]
 
     def test_missing_required_fields(self, client):
         """Test endpoint with missing required fields."""
-        response = client.post(
-            "/api/v1/themes/build-and-deploy",
-            json={}  # Missing required fields
-        )
+        response = client.post("/api/v1/themes/build-and-deploy", json={})  # Missing required fields
         # Should return 422 (validation error)
         assert response.status_code == 422
 

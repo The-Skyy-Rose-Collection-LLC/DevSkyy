@@ -180,9 +180,7 @@ class EnhancedAutoFix:
             logger.error(f"Error checking out branch {branch_name}: {e}")
             return False
 
-    def _run_enhanced_fixes(
-        self, scan_results: dict[str, Any], fix_types: list[str] | None = None
-    ) -> dict[str, Any]:
+    def _run_enhanced_fixes(self, scan_results: dict[str, Any], fix_types: list[str] | None = None) -> dict[str, Any]:
         """Run enhanced version of the fixer with additional capabilities"""
         # Use existing fixer as base
         fix_results = fixer_module.fix_code(scan_results)

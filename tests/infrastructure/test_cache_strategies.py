@@ -10,8 +10,9 @@ Coverage Target: ≥80%
 """
 
 import asyncio
+import contextlib
 from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
@@ -451,10 +452,8 @@ class TestInvalidationStrategies:
         await asyncio.sleep(0.05)
         task.cancel()
 
-        try:
+        with contextlib.suppress(asyncio.CancelledError):
             await task
-        except asyncio.CancelledError:
-            pass
 
     @pytest.mark.asyncio
     async def test_pattern_invalidation(self, cache_manager, mock_redis_manager):

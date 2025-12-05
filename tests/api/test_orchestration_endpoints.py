@@ -11,7 +11,6 @@ Author: DevSkyy Test Automation
 Version: 1.0.0
 """
 
-from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi import status
@@ -211,7 +210,7 @@ class TestHealthEndpoint:
 
         # Should have health metrics
         if partnerships and "error" not in partnerships:
-            for partnership_id, health_data in partnerships.items():
+            for health_data in partnerships.values():
                 assert "health" in health_data
                 assert "score" in health_data
                 assert health_data["health"] in ["excellent", "good", "fair", "poor"]

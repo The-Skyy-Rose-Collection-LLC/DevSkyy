@@ -9,7 +9,6 @@ Python: >=3.11.0
 Per CLAUDE.md Truth Protocol requirements
 """
 
-
 from fastapi import HTTPException
 import pytest
 

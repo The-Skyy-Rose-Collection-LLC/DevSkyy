@@ -12,21 +12,10 @@ from sqlalchemy.ext.declarative import declarative_base
 
 
 # Database Configuration
-DATABASE_URL = os.getenv(
-    "DATABASE_URL",
-    "sqlite+aiosqlite:///./devskyy.db"
-)
+DATABASE_URL = os.getenv("DATABASE_URL", "sqlite+aiosqlite:///./devskyy.db")
 
 # Connection arguments based on database type
-if DATABASE_URL.startswith("postgresql"):
-    CONNECTION_ARGS = {
-        "pool_size": int(os.getenv("DB_POOL_SIZE", "5")),
-        "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "10")),
-        "pool_timeout": int(os.getenv("DB_POOL_TIMEOUT", "30")),
-        "pool_recycle": int(os.getenv("DB_POOL_RECYCLE", "1800")),
-        "pool_pre_ping": True,
-    }
-elif DATABASE_URL.startswith("mysql"):
+if DATABASE_URL.startswith("postgresql") or DATABASE_URL.startswith("mysql"):
     CONNECTION_ARGS = {
         "pool_size": int(os.getenv("DB_POOL_SIZE", "5")),
         "max_overflow": int(os.getenv("DB_MAX_OVERFLOW", "10")),

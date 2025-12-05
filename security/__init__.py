@@ -40,9 +40,9 @@ Example:
 __version__ = "1.0.0"
 
 __all__ = [
-    "JWTManager",
     "EncryptionManager",
     "GDPRManager",
+    "JWTManager",
     "validation_middleware",
 ]
 
@@ -62,14 +62,18 @@ def __getattr__(name: str):
     """
     if name == "JWTManager":
         from security.jwt_auth import JWTManager
+
         return JWTManager
     elif name == "EncryptionManager":
         from security.encryption import EncryptionManager
+
         return EncryptionManager
     elif name == "GDPRManager":
         from security.gdpr_compliance import GDPRManager
+
         return GDPRManager
     elif name == "validation_middleware":
         from security.input_validation import validation_middleware
+
         return validation_middleware
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

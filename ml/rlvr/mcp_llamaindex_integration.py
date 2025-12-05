@@ -69,7 +69,7 @@ class MCPLlamaIndexOrchestrator:
         mcp_gateway_url: str = "http://localhost:3000/mcp",
         index_dir: str = "./mcp_llamaindex_storage",
         openai_api_key: str | None = None,
-        anthropic_api_key: str | None = None
+        anthropic_api_key: str | None = None,
     ):
         """
         Initialize MCP + LlamaIndex orchestrator.
@@ -108,9 +108,7 @@ class MCPLlamaIndexOrchestrator:
         self.indexes: dict[str, VectorStoreIndex] = {}
 
     async def sync_training_data_to_vector_store(
-        self,
-        agent_id: uuid.UUID,
-        force_rebuild: bool = False
+        self, agent_id: uuid.UUID, force_rebuild: bool = False
     ) -> VectorStoreIndex:
         """
         Sync training data from MCP/Neon to LlamaIndex vector store.
@@ -134,9 +132,7 @@ class MCPLlamaIndexOrchestrator:
         # Try loading existing index
         if not force_rebuild and agent_index_dir.exists():
             try:
-                storage_context = StorageContext.from_defaults(
-                    persist_dir=str(agent_index_dir)
-                )
+                storage_context = StorageContext.from_defaults(persist_dir=str(agent_index_dir))
                 index = load_index_from_storage(storage_context)
                 self.indexes[agent_id_str] = index
                 logger.info(f"Loaded existing vector index for agent {agent_id}")
@@ -145,12 +141,14 @@ class MCPLlamaIndexOrchestrator:
                 logger.warning(f"Failed to load index, rebuilding: {e}")
 
         # Fetch training examples from database (via MCP or direct SQL)
-        query = text("""
+        query = text(
+            """
             SELECT id, prompt, completion, reward_score, example_type, created_at
             FROM training_examples
             WHERE agent_id = :agent_id
             ORDER BY reward_score DESC
-        """)
+        """
+        )
 
         result = await self.session.execute(query, {"agent_id": agent_id})
         rows = result.fetchall()
@@ -172,8 +170,8 @@ class MCPLlamaIndexOrchestrator:
                     "type": ex_type,
                     "input": prompt,
                     "output": completion,
-                    "created_at": created_at.isoformat() if created_at else None
-                }
+                    "created_at": created_at.isoformat() if created_at else None,
+                },
             )
             documents.append(doc)
 
@@ -195,7 +193,7 @@ class MCPLlamaIndexOrchestrator:
         query: str | None = None,
         min_score: float = 0.7,
         top_k: int = 10,
-        example_type: str | None = "positive"
+        example_type: str | None = "positive",
     ) -> list[dict[str, Any]]:
         """
         Hybrid retrieval: SQL filtering + vector semantic search.
@@ -240,28 +238,26 @@ class MCPLlamaIndexOrchestrator:
             if example_type and metadata.get("type") != example_type:
                 continue
 
-            examples.append({
-                "example_id": metadata.get("example_id"),
-                "input": metadata.get("input", ""),
-                "output": metadata.get("output", ""),
-                "score": float(metadata.get("score", 0.0)),
-                "similarity": node.score,
-                "type": metadata.get("type"),
-                "created_at": metadata.get("created_at"),
-                # Hybrid rank: combine reward score + semantic similarity
-                "hybrid_rank": (node.score * 0.6) + (metadata.get("score", 0) * 0.4)
-            })
+            examples.append(
+                {
+                    "example_id": metadata.get("example_id"),
+                    "input": metadata.get("input", ""),
+                    "output": metadata.get("output", ""),
+                    "score": float(metadata.get("score", 0.0)),
+                    "similarity": node.score,
+                    "type": metadata.get("type"),
+                    "created_at": metadata.get("created_at"),
+                    # Hybrid rank: combine reward score + semantic similarity
+                    "hybrid_rank": (node.score * 0.6) + (metadata.get("score", 0) * 0.4),
+                }
+            )
 
         # Sort by hybrid rank
         examples.sort(key=lambda x: x["hybrid_rank"], reverse=True)
 
         return examples[:top_k]
 
-    async def optimize_prompt_with_mcp_rag(
-        self,
-        agent_id: uuid.UUID,
-        top_k_examples: int = 10
-    ) -> dict[str, Any]:
+    async def optimize_prompt_with_mcp_rag(self, agent_id: uuid.UUID, top_k_examples: int = 10) -> dict[str, Any]:
         """
         Optimize agent prompt using MCP + LlamaIndex hybrid retrieval.
 
@@ -293,9 +289,7 @@ class MCPLlamaIndexOrchestrator:
 
         # Retrieve best examples using hybrid search
         best_examples = await self.hybrid_retrieve_best_examples(
-            agent_id,
-            query=f"best examples for {agent_name}",
-            top_k=top_k_examples
+            agent_id, query=f"best examples for {agent_name}", top_k=top_k_examples
         )
 
         if not best_examples:
@@ -358,25 +352,25 @@ Think through your analysis step by step, then provide the optimized prompt."""
             model="claude-3-5-sonnet-20241022",
             max_tokens=8000,
             temperature=0.3,
-            messages=[{"role": "user", "content": optimization_prompt}]
+            messages=[{"role": "user", "content": optimization_prompt}],
         )
 
         optimized_prompt = response.content[0].text
 
         # Update agent in database (MCP transaction)
-        update_query = text("""
+        update_query = text(
+            """
             UPDATE agents
             SET base_prompt = :optimized_prompt,
                 version = version + 1,
                 updated_at = :updated_at
             WHERE id = :agent_id
-        """)
+        """
+        )
 
-        await self.session.execute(update_query, {
-            "optimized_prompt": optimized_prompt,
-            "updated_at": datetime.utcnow(),
-            "agent_id": agent_id
-        })
+        await self.session.execute(
+            update_query, {"optimized_prompt": optimized_prompt, "updated_at": datetime.utcnow(), "agent_id": agent_id}
+        )
         await self.session.commit()
 
         logger.info(f"Optimized prompt for agent {agent_id} using MCP+LlamaIndex hybrid")
@@ -391,7 +385,7 @@ Think through your analysis step by step, then provide the optimized prompt."""
             "optimized_prompt": optimized_prompt,
             "original_prompt": current_prompt,
             "optimization_technique": "xml_structured_hybrid_rag_cot",
-            "retrieval_strategy": "sql_filter + vector_similarity"
+            "retrieval_strategy": "sql_filter + vector_similarity",
         }
 
     def _format_examples_xml(self, examples: list[dict[str, Any]]) -> str:
@@ -399,11 +393,12 @@ Think through your analysis step by step, then provide the optimized prompt."""
         formatted = []
         for i, ex in enumerate(examples, 1):
             # Escape XML special characters to prevent injection
-            escaped_input = html.escape(ex['input'][:500])
-            escaped_output = html.escape(ex['output'][:500])
-            escaped_type = html.escape(str(ex.get('type', 'unknown')))
-            escaped_created = html.escape(str(ex.get('created_at', 'unknown')))
-            formatted.append(f"""
+            escaped_input = html.escape(ex["input"][:500])
+            escaped_output = html.escape(ex["output"][:500])
+            escaped_type = html.escape(str(ex.get("type", "unknown")))
+            escaped_created = html.escape(str(ex.get("created_at", "unknown")))
+            formatted.append(
+                f"""
 <example id="{i}" score="{ex['score']:.2f}" similarity="{ex.get('similarity', 0):.2f}" hybrid_rank="{ex.get('hybrid_rank', 0):.2f}">
   <input>
 {escaped_input}
@@ -412,7 +407,8 @@ Think through your analysis step by step, then provide the optimized prompt."""
 {escaped_output}
   </output>
   <metadata type="{escaped_type}" created="{escaped_created}" />
-</example>""")
+</example>"""
+            )
         return "\n".join(formatted)
 
     async def close(self):
@@ -439,10 +435,7 @@ async def demo_mcp_llamaindex():
     async_session = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
     async with async_session() as session:
-        orchestrator = MCPLlamaIndexOrchestrator(
-            session=session,
-            mcp_gateway_url="http://localhost:3000/mcp"
-        )
+        orchestrator = MCPLlamaIndexOrchestrator(session=session, mcp_gateway_url="http://localhost:3000/mcp")
 
         agent_id = uuid.UUID("12345678-1234-5678-1234-567812345678")  # Example
 
@@ -450,21 +443,14 @@ async def demo_mcp_llamaindex():
         await orchestrator.sync_training_data_to_vector_store(agent_id)
 
         # Hybrid retrieval: SQL + Vector search
-        examples = await orchestrator.hybrid_retrieve_best_examples(
-            agent_id,
-            query="high quality coding examples",
-            min_score=0.8,
-            top_k=10
+        await orchestrator.hybrid_retrieve_best_examples(
+            agent_id, query="high quality coding examples", min_score=0.8, top_k=10
         )
 
-        print(f"Retrieved {len(examples)} examples via hybrid search")
 
         # Optimize prompt with Claude
-        result = await orchestrator.optimize_prompt_with_mcp_rag(agent_id, top_k_examples=5)
+        await orchestrator.optimize_prompt_with_mcp_rag(agent_id, top_k_examples=5)
 
-        print(f"Optimized prompt for agent {result['agent_name']}")
-        print(f"Method: {result['method']}")
-        print(f"New prompt: {result['optimized_prompt'][:200]}...")
 
         await orchestrator.close()
 

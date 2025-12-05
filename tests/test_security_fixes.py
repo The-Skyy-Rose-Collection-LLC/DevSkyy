@@ -348,10 +348,7 @@ class TestSecurityErrorPaths:
             try:
                 parts = version.split(".")
                 # Attempt to validate
-                if parts and all(p.isdigit() for p in parts):
-                    valid = True
-                else:
-                    valid = False
+                valid = bool(parts and all(p.isdigit() for p in parts))
             except Exception:
                 valid = False
 

@@ -19,6 +19,7 @@ from functools import wraps
 import os
 from typing import Any
 
+
 try:
     from agentlightning import (
         AgentOpsTracer,
@@ -27,6 +28,7 @@ try:
         OtelTracer,
         emit_reward,
     )
+
     AGENTLIGHTNING_AVAILABLE = True
 except ImportError:
     # AgentLightning not available - use mock implementations
@@ -34,29 +36,35 @@ except ImportError:
 
     class AgentOpsTracer:
         """Mock AgentOpsTracer for when agentlightning is not available"""
+
         pass
 
     class LitAgent:
         """Mock LitAgent for when agentlightning is not available"""
+
         pass
 
     class LLMProxy:
         """Mock LLMProxy for when agentlightning is not available"""
+
         pass
 
     class OtelTracer:
         """Mock OtelTracer for when agentlightning is not available"""
+
         pass
 
     def emit_reward(*args, **kwargs):
         """Mock emit_reward for when agentlightning is not available"""
         pass
 
+
 try:
     from opentelemetry import trace
     from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
     from opentelemetry.sdk.trace import TracerProvider
     from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+
     OPENTELEMETRY_AVAILABLE = True
 except ImportError:
     # OpenTelemetry not available - use mock implementations
@@ -64,6 +72,7 @@ except ImportError:
 
     class trace:
         """Mock trace for when opentelemetry is not available"""
+
         @staticmethod
         def get_tracer(name):
             return None
@@ -74,21 +83,25 @@ except ImportError:
 
     class OTLPSpanExporter:
         """Mock OTLPSpanExporter"""
+
         def __init__(self, *args, **kwargs):
             pass
 
     class TracerProvider:
         """Mock TracerProvider"""
+
         def add_span_processor(self, processor):
             pass
 
     class BatchSpanProcessor:
         """Mock BatchSpanProcessor"""
+
         def __init__(self, *args, **kwargs):
             pass
 
     class ConsoleSpanExporter:
         """Mock ConsoleSpanExporter"""
+
         pass
 
 

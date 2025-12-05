@@ -9,97 +9,97 @@ Per Truth Protocol Rule #9: Document All (Google-style docstrings)
 import pytest
 
 from core.exceptions import (
-    # Base
-    DevSkyyError,
+    DATABASE_ERROR_MAPPING,
+    HTTP_STATUS_TO_EXCEPTION,
+    AgentCircuitBreakerError,
+    # Agent
+    AgentError,
+    AgentExecutionError,
+    AgentNotAvailableError,
+    AgentNotFoundError,
+    AgentTimeoutError,
+    APIKeyInvalidError,
+    APIKeyMissingError,
+    APIRateLimitError,
+    APIResponseError,
     # Authentication & Authorization
     AuthenticationError,
-    InvalidCredentialsError,
-    TokenExpiredError,
-    TokenInvalidError,
-    TokenMissingError,
     AuthorizationError,
-    InsufficientPermissionsError,
-    RoleRequiredError,
-    # Database
-    DatabaseError,
-    ConnectionError,
-    QueryError,
-    TransactionError,
-    RecordNotFoundError,
-    DuplicateRecordError,
-    IntegrityError,
-    # Validation
-    ValidationError,
-    InvalidInputError,
-    MissingFieldError,
-    InvalidFormatError,
-    SchemaValidationError,
-    # Network
-    NetworkError,
-    RequestTimeoutError,
-    RequestFailedError,
-    ConnectionTimeoutError,
-    ServiceUnavailableError,
     # Business Logic
     BusinessLogicError,
-    InvalidStateError,
-    OperationNotAllowedError,
-    QuotaExceededError,
-    ResourceConflictError,
+    # Compliance
+    ComplianceError,
     # Configuration
     ConfigurationError,
-    MissingConfigurationError,
-    InvalidConfigurationError,
+    ConnectionError,
+    ConnectionTimeoutError,
+    ConsentError,
+    CPUError,
+    # Database
+    DatabaseError,
+    DataRetentionError,
+    DecryptionError,
+    # Base
+    DevSkyyError,
+    DiskSpaceError,
+    DuplicateRecordError,
+    EncryptionError,
     EnvironmentError,
     # External API
     ExternalAPIError,
-    APIKeyMissingError,
-    APIKeyInvalidError,
-    APIRateLimitError,
-    APIResponseError,
-    # File System
-    FileSystemError,
+    FileCorruptedError,
     FileNotFoundError,
     FilePermissionError,
-    DiskSpaceError,
-    FileCorruptedError,
-    # Agent
-    AgentError,
-    AgentNotFoundError,
-    AgentNotAvailableError,
-    AgentExecutionError,
-    AgentTimeoutError,
-    AgentCircuitBreakerError,
+    # File System
+    FileSystemError,
+    GDPRViolationError,
+    HashingError,
+    InsufficientPermissionsError,
+    IntegrityError,
+    InvalidConfigurationError,
+    InvalidCredentialsError,
+    InvalidFormatError,
+    InvalidInputError,
+    InvalidModelError,
+    InvalidStateError,
+    MemoryError,
+    MissingConfigurationError,
+    MissingFieldError,
     # ML/AI
     MLError,
-    ModelNotFoundError,
     ModelLoadError,
-    PredictionError,
-    TrainingError,
-    InvalidModelError,
-    # Security
-    SecurityError,
-    EncryptionError,
-    DecryptionError,
-    HashingError,
-    SignatureError,
-    SQLInjectionAttemptError,
-    XSSAttemptError,
+    ModelNotFoundError,
+    # Network
+    NetworkError,
+    OperationNotAllowedError,
     # Performance
     PerformanceError,
     PerformanceThresholdError,
-    MemoryError,
-    CPUError,
-    # Compliance
-    ComplianceError,
-    GDPRViolationError,
-    DataRetentionError,
-    ConsentError,
+    PredictionError,
+    QueryError,
+    QuotaExceededError,
+    RecordNotFoundError,
+    RequestFailedError,
+    RequestTimeoutError,
+    ResourceConflictError,
+    RoleRequiredError,
+    SchemaValidationError,
+    # Security
+    SecurityError,
+    ServiceUnavailableError,
+    SignatureError,
+    SQLInjectionAttemptError,
+    TokenExpiredError,
+    TokenInvalidError,
+    TokenMissingError,
+    TrainingError,
+    TransactionError,
+    # Validation
+    ValidationError,
+    XSSAttemptError,
     # Utilities
     exception_from_status_code,
     map_database_error,
-    HTTP_STATUS_TO_EXCEPTION,
-    DATABASE_ERROR_MAPPING,
 )
 
 
@@ -180,9 +180,7 @@ class TestDevSkyyError:
         original = RuntimeError("Root cause")
 
         # Act
-        error = DevSkyyError(
-            message, error_code=error_code, details=details, original_error=original
-        )
+        error = DevSkyyError(message, error_code=error_code, details=details, original_error=original)
 
         # Assert
         assert error.message == message
@@ -1500,6 +1498,7 @@ class TestExceptionIntegration:
 
     def test_exception_hierarchy_allows_granular_error_handling(self):
         """Test exception hierarchy enables specific error handling"""
+
         # Arrange
         def risky_operation(error_type: str):
             if error_type == "connection":

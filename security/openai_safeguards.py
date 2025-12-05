@@ -190,9 +190,8 @@ class RateLimiter:
                 return False, f"Rate limit exceeded: {self.max_per_minute} requests per minute"
 
             # Check consequential rate if applicable
-            if is_consequential:
-                if len(self.consequential_requests) >= self.max_consequential_per_hour:
-                    return False, f"Consequential operation limit exceeded: {self.max_consequential_per_hour} per hour"
+            if is_consequential and len(self.consequential_requests) >= self.max_consequential_per_hour:
+                return False, f"Consequential operation limit exceeded: {self.max_consequential_per_hour} per hour"
 
             # Record request
             self.requests.append(now)
@@ -389,7 +388,7 @@ class OpenAISafeguardManager:
         operation_type: OperationType,
         is_consequential: bool,
         prompt: str | None = None,
-        params: dict[str, Any] | None = None
+        params: dict[str, Any] | None = None,
     ) -> tuple[bool, str | None]:
         """
         Validate request before sending to OpenAI API
@@ -513,7 +512,7 @@ class OpenAISafeguardManager:
         severity: str,
         operation_type: OperationType,
         is_consequential: bool,
-        details: dict[str, Any]
+        details: dict[str, Any],
     ):
         """Record safeguard violation"""
         violation = SafeguardViolation(

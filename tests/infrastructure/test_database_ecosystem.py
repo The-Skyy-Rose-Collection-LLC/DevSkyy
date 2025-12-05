@@ -144,7 +144,9 @@ class TestPostgreSQLManager:
         mock_pool.acquire.return_value = mock_acquire_context
         mock_conn.execute = AsyncMock(return_value=None)
 
-        with patch("infrastructure.database_ecosystem.asyncpg.create_pool", new_callable=AsyncMock, return_value=mock_pool):
+        with patch(
+            "infrastructure.database_ecosystem.asyncpg.create_pool", new_callable=AsyncMock, return_value=mock_pool
+        ):
             result = await manager.connect()
 
         assert result is True
@@ -229,9 +231,11 @@ class TestPostgreSQLManager:
         mock_conn = AsyncMock()
         mock_acquire_context = AsyncMock()
         mock_acquire_context.__aenter__.return_value = mock_conn
+
         # __aexit__ must return None/False to not suppress exceptions
         async def mock_aexit(*args):
             return None
+
         mock_acquire_context.__aexit__ = mock_aexit
         mock_pool.acquire.return_value = mock_acquire_context
         mock_conn.fetch = AsyncMock(side_effect=Exception("Query failed"))
@@ -280,9 +284,11 @@ class TestPostgreSQLManager:
         mock_conn = AsyncMock()
         mock_acquire_context = AsyncMock()
         mock_acquire_context.__aenter__.return_value = mock_conn
+
         # __aexit__ must return None/False to not suppress exceptions
         async def mock_aexit(*args):
             return None
+
         mock_acquire_context.__aexit__ = mock_aexit
         mock_pool.acquire.return_value = mock_acquire_context
         mock_conn.execute = AsyncMock(side_effect=Exception("Command failed"))
@@ -428,7 +434,9 @@ class TestMongoDBManager:
         mock_client = AsyncMock()
         mock_client.admin.command = AsyncMock(return_value={"ok": 1})
 
-        with patch("infrastructure.database_ecosystem.motor.motor_asyncio.AsyncIOMotorClient", return_value=mock_client):
+        with patch(
+            "infrastructure.database_ecosystem.motor.motor_asyncio.AsyncIOMotorClient", return_value=mock_client
+        ):
             result = await manager.connect()
 
         assert result is True
@@ -866,7 +874,9 @@ class TestDatabaseEcosystem:
         mock_pool.acquire.return_value = mock_acquire_context
         mock_conn.execute = AsyncMock(return_value=None)
 
-        with patch("infrastructure.database_ecosystem.asyncpg.create_pool", new_callable=AsyncMock, return_value=mock_pool):
+        with patch(
+            "infrastructure.database_ecosystem.asyncpg.create_pool", new_callable=AsyncMock, return_value=mock_pool
+        ):
             result = await ecosystem.add_database("primary", config)
 
         assert result is True
@@ -890,7 +900,9 @@ class TestDatabaseEcosystem:
         mock_client = AsyncMock()
         mock_client.admin.command = AsyncMock(return_value={"ok": 1})
 
-        with patch("infrastructure.database_ecosystem.motor.motor_asyncio.AsyncIOMotorClient", return_value=mock_client):
+        with patch(
+            "infrastructure.database_ecosystem.motor.motor_asyncio.AsyncIOMotorClient", return_value=mock_client
+        ):
             result = await ecosystem.add_database("mongo", config)
 
         assert result is True
@@ -1168,7 +1180,7 @@ class TestDatabaseEcosystem:
 
         # Mock the pool to simulate connection failure
         mock_pool = MagicMock()
-        mock_conn = AsyncMock()
+        AsyncMock()
         mock_acquire_context = AsyncMock()
         mock_acquire_context.__aenter__.side_effect = Exception("Connection timeout")
         mock_pool.acquire.return_value = mock_acquire_context

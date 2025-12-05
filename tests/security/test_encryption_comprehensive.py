@@ -353,8 +353,8 @@ class TestEncryptDecryptDict:
 
         # Should be encrypted (different from original)
         assert encrypted["number"] != 12345
-        assert encrypted["boolean"] != True
-        assert encrypted["none"] != None
+        assert not encrypted["boolean"]
+        assert encrypted["none"] is not None
 
 
 # ============================================================================
@@ -411,7 +411,7 @@ class TestKeyGenerationAndRotation:
         """Should handle multiple rotations"""
         settings.LEGACY_KEYS.clear()
 
-        for i in range(3):
+        for _i in range(3):
             rotate_keys()
 
         # Should have 3 legacy keys
@@ -931,7 +931,7 @@ class TestAdditionalEdgeCasesForCoverage:
     def test_encryption_manager_init_with_bytes_key(self):
         """Should initialize EncryptionManager with bytes key"""
         key_bytes = secrets.token_bytes(32)
-        em = EncryptionManager(master_key=key_bytes)
+        EncryptionManager(master_key=key_bytes)
 
         # Should convert bytes to settings
         assert settings.MASTER_KEY == key_bytes

@@ -158,7 +158,7 @@ class TestAdvancedXSS:
         """Test mutation XSS (mXSS) vectors"""
         sanitizer = InputSanitizer()
         mxss_vectors = [
-            "<noscript><p title=\"</noscript><img src=x onerror=alert(1)>\">",
+            '<noscript><p title="</noscript><img src=x onerror=alert(1)>">',
             "<listing>&lt;img src=x onerror=alert(1)&gt;</listing>",
             "<svg><style><img src=x onerror=alert(1)></style></svg>",
         ]
@@ -202,13 +202,13 @@ class TestAdvancedXSS:
         sanitizer = InputSanitizer()
         event_handlers = [
             '<body onpageshow="alert(1)">',
-            '<img src=x onabort=alert(1)>',
-            '<input onfocus=alert(1) autofocus>',
-            '<select onfocus=alert(1) autofocus>',
-            '<textarea onfocus=alert(1) autofocus>',
-            '<keygen onfocus=alert(1) autofocus>',
+            "<img src=x onabort=alert(1)>",
+            "<input onfocus=alert(1) autofocus>",
+            "<select onfocus=alert(1) autofocus>",
+            "<textarea onfocus=alert(1) autofocus>",
+            "<keygen onfocus=alert(1) autofocus>",
             '<video><source onerror="alert(1)">',
-            '<audio src=x onerror=alert(1)>',
+            "<audio src=x onerror=alert(1)>",
         ]
 
         for handler in event_handlers:
@@ -220,10 +220,10 @@ class TestAdvancedXSS:
         """Test HTML5-specific XSS vectors"""
         sanitizer = InputSanitizer()
         html5_vectors = [
-            '<svg><animate onbegin=alert(1) attributeName=x dur=1s>',
-            '<marquee onstart=alert(1)>',
-            '<details open ontoggle=alert(1)>',
-            '<form><button formaction=javascript:alert(1)>X</button>',
+            "<svg><animate onbegin=alert(1) attributeName=x dur=1s>",
+            "<marquee onstart=alert(1)>",
+            "<details open ontoggle=alert(1)>",
+            "<form><button formaction=javascript:alert(1)>X</button>",
         ]
 
         for vector in html5_vectors:
@@ -282,7 +282,7 @@ class TestAdvancedCommandInjection:
         # IFS variable substitution without command separator may not be caught
         # This is a limitation - the pattern requires ; | & before the command
         # Application should validate environment variable usage separately
-        result = sanitizer.sanitize_command("${IFS}cat${IFS}/etc/passwd")
+        sanitizer.sanitize_command("${IFS}cat${IFS}/etc/passwd")
         # Even if not caught, app should validate
 
         # Plain environment variables without command execution pass through
@@ -516,17 +516,7 @@ class TestMiddlewareAdvanced:
         """Test middleware with deeply nested data structures"""
         middleware = InputValidationMiddleware(strict_mode=True)
 
-        deep_data = {
-            "level1": {
-                "level2": {
-                    "level3": {
-                        "level4": {
-                            "level5": "safe_value"
-                        }
-                    }
-                }
-            }
-        }
+        deep_data = {"level1": {"level2": {"level3": {"level4": {"level5": "safe_value"}}}}}
 
         result = await middleware.validate_request_data(deep_data)
         assert result["level1"]["level2"]["level3"]["level4"]["level5"] == "safe_value"
@@ -641,10 +631,10 @@ class TestRateLimitValidatorEdgeCases:
     def test_rate_limit_typical_values(self):
         """Test typical production values"""
         typical_configs = [
-            (100, 60),      # 100 requests per minute
-            (1000, 3600),   # 1000 requests per hour
-            (10, 1),        # 10 requests per second
-            (5000, 300),    # 5000 requests per 5 minutes
+            (100, 60),  # 100 requests per minute
+            (1000, 3600),  # 1000 requests per hour
+            (10, 1),  # 10 requests per second
+            (5000, 300),  # 5000 requests per 5 minutes
         ]
 
         for limit, window in typical_configs:
@@ -664,7 +654,7 @@ class TestSecureStringAdvanced:
         mixed_inputs = [
             "Normal text with <b>bold</b>",
             "Text with & ampersand",
-            "Text with \"quotes\"",
+            'Text with "quotes"',
         ]
 
         for input_str in mixed_inputs:
@@ -837,11 +827,7 @@ class TestRealWorldAttackPayloads:
             # Should be heavily sanitized
             assert result != payload
             # Should not contain unescaped script/alert
-            assert (
-                "script" not in result.lower()
-                or "&lt;" in result
-                or "&#" in result
-            )
+            assert "script" not in result.lower() or "&lt;" in result or "&#" in result
 
     def test_owasp_command_injection_payloads(self):
         """Test OWASP command injection payloads"""
@@ -902,10 +888,7 @@ class TestPerformanceAndStress:
         middleware = InputValidationMiddleware(strict_mode=True)
 
         # Create large but valid payload
-        large_data = {
-            f"key_{i}": f"value_{i}"
-            for i in range(1000)
-        }
+        large_data = {f"key_{i}": f"value_{i}" for i in range(1000)}
 
         result = await middleware.validate_request_data(large_data)
         assert len(result) == 1000
@@ -933,9 +916,12 @@ class TestPerformanceAndStress:
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--no-cov",
-        "-m", "not slow",
-    ])
+    pytest.main(
+        [
+            __file__,
+            "-v",
+            "--no-cov",
+            "-m",
+            "not slow",
+        ]
+    )
