@@ -1,0 +1,16 @@
+{
+  "metadata": {
+    "run_id": "20251205_191900_eb0d90b4",
+    "started_at": "2025-12-05T19:19:00.001030Z",
+    "platform": "linux",
+    "python_version": "3.12.3 (main, Aug 14 2025, 17:47:21) [GCC 13.3.0]",
+    "environment": "development"
+  },
+  "errors": [],
+  "statistics": {
+    "total_errors": 0,
+    "by_severity": {},
+    "by_category": {},
+    "resolved_count": 0
+  }
+}

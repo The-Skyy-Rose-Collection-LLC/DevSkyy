@@ -1,0 +1,257 @@
+[
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 3,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T18:45:32.883747",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.883924"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 4,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T18:45:32.884130",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.884304"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 5,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T18:45:32.884566",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.884735"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T18:45:32.892109",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.892296"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T18:45:32.892615",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.892791"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T18:45:32.897041",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.897276"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T18:45:32.900821",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.901064"
+  },
+  {
+    "type": "critical_failure",
+    "agent_name": "test_agent",
+    "notification_sent_at": "2025-12-05T18:45:32.910421"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T18:45:32.919947",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:45:32.920180"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 3,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T18:58:11.287581",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.287716"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 4,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T18:58:11.287897",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.288006"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 5,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T18:58:11.288693",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.288867"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T18:58:11.292910",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.293029"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T18:58:11.293189",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.293390"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T18:58:11.295392",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.295544"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T18:58:11.297375",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.297523"
+  },
+  {
+    "type": "critical_failure",
+    "agent_name": "test_agent",
+    "notification_sent_at": "2025-12-05T18:58:11.302409"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T18:58:11.307281",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T18:58:11.307435"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 3,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T19:10:29.576466",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.576632"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 4,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T19:10:29.576864",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.577944"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "repeated_failures",
+    "error_count": 5,
+    "restart_attempts": 2,
+    "timestamp": "2025-12-05T19:10:29.578197",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.578370"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T19:10:29.582457",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.582586"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "max_restarts_exceeded",
+    "error_count": 0,
+    "restart_attempts": 3,
+    "timestamp": "2025-12-05T19:10:29.582797",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.582914"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T19:10:29.585114",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.585284"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test reason",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T19:10:29.587217",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.587381"
+  },
+  {
+    "type": "critical_failure",
+    "agent_name": "test_agent",
+    "notification_sent_at": "2025-12-05T19:10:29.592393"
+  },
+  {
+    "type": "agent_halted",
+    "agent_name": "test_agent",
+    "reason": "test",
+    "error_count": 0,
+    "restart_attempts": 0,
+    "timestamp": "2025-12-05T19:10:29.597436",
+    "requires_operator_intervention": true,
+    "notification_sent_at": "2025-12-05T19:10:29.597611"
+  }
+]
