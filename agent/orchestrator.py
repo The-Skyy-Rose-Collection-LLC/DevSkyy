@@ -757,14 +757,9 @@ async def run_orchestrator_demonstration():
     - Circuit breaker behavior
     - Inter-agent communication
     """
-    print("\n" + "=" * 80)
-    print("🎭 ENTERPRISE MULTI-AGENT ORCHESTRATOR DEMONSTRATION")
-    print("=" * 80 + "\n")
 
     demo_orchestrator = AgentOrchestrator(max_concurrent_tasks=10)
 
-    print("📋 Step 1: Creating and Registering Agents")
-    print("-" * 80)
 
     # Create mock agents with different capabilities
     auth_agent = MockAgent("auth_agent", "1.0.0")
@@ -789,27 +784,18 @@ async def run_orchestrator_demonstration():
         success = await demo_orchestrator.register_agent(
             agent, capabilities=capabilities, dependencies=dependencies, priority=priority
         )
-        if success:
-            print(f"  ✅ {agent.agent_name}: {', '.join(capabilities)}")
-            if dependencies:
-                print(f"     Dependencies: {', '.join(dependencies)}")
+        if success and dependencies:
+            pass
 
-    print(f"\n📊 Total agents registered: {len(demo_orchestrator.agents)}")
 
-    print("\n" + "=" * 80)
-    print("📋 Step 2: Dependency Graph Visualization")
-    print("-" * 80)
 
     dep_graph = demo_orchestrator.get_dependency_graph()
     if dep_graph:
-        for agent, deps in dep_graph.items():
-            print(f"  {agent} → depends on → {deps if deps else '(no dependencies)'}")
+        for agent in dep_graph:
+            pass
     else:
-        print("  (No dependencies configured)")
+        pass
 
-    print("\n" + "=" * 80)
-    print("📋 Step 3: Executing Multi-Agent Task with Dependency Resolution")
-    print("-" * 80)
 
     task_result = await demo_orchestrator.execute_task(
         task_type="process_user_request",
@@ -818,72 +804,33 @@ async def run_orchestrator_demonstration():
         priority=ExecutionPriority.HIGH,
     )
 
-    print("\n📊 Task Execution Results:")
-    print(f"  Task ID: {task_result.get('task_id')}")
-    print(f"  Status: {task_result.get('status')}")
-    print(f"  Execution Time: {task_result.get('execution_time', 0):.3f}s")
-    print("\n  Agent Results:")
 
-    for agent_name, result in task_result.get("results", {}).items():
-        status_icon = "✅" if result.get("status") == "success" else "❌"
-        print(f"    {status_icon} {agent_name}: {result.get('message', 'N/A')}")
+    for result in task_result.get("results", {}).values():
+        "✅" if result.get("status") == "success" else "❌"
 
-    print("\n" + "=" * 80)
-    print("📋 Step 4: Inter-Agent Data Sharing")
-    print("-" * 80)
 
     demo_orchestrator.share_data("global_config", {"theme": "dark", "language": "en"}, ttl=300)
     demo_orchestrator.share_data("user_session", {"user_id": "user_123", "role": "admin"})
 
-    print("  ✅ Shared data stored:")
-    print(f"    - global_config: {demo_orchestrator.get_shared_data('global_config')}")
-    print(f"    - user_session: {demo_orchestrator.get_shared_data('user_session')}")
 
     await demo_orchestrator.broadcast_to_agents(
         {"type": "system_announcement", "message": "Maintenance window scheduled"},
         agent_names=["auth_agent", "notification_agent"],
     )
-    print("\n  ✅ Broadcast message sent to: auth_agent, notification_agent")
 
-    print("\n" + "=" * 80)
-    print("📋 Step 5: Health Monitoring and Metrics")
-    print("-" * 80)
 
     health = await demo_orchestrator.get_orchestrator_health()
-    print(f"\n  System Status: {health['system_status'].upper()}")
-    print(f"  Registered Agents: {health['registered_agents']}")
-    print(f"  Active Tasks: {health['active_tasks']}")
-    print(f"  Total Tasks Completed: {health['total_tasks']}")
 
-    print("\n  Agent Health Status:")
-    for agent_name, agent_health in health["agent_health"].items():
-        status = agent_health["status"]
-        status_icon = "✅" if status == "healthy" else "⚠️" if status == "degraded" else "❌"
-        metrics = agent_health["metrics"]
-        print(f"    {status_icon} {agent_name}:")
-        print(f"       - Status: {status}")
-        print(f"       - Calls: {metrics['calls']}")
-        print(f"       - Errors: {metrics['errors']}")
-        print(f"       - Avg Time: {metrics['avg_time']:.3f}s")
-        print(f"       - Circuit Breaker: {agent_health['circuit_breaker']}")
+    for agent_health in health["agent_health"].values():
+        agent_health["status"]
+        agent_health["metrics"]
 
-    print("\n" + "=" * 80)
-    print("📋 Step 6: Agent Performance Metrics")
-    print("-" * 80)
 
     all_metrics = demo_orchestrator.get_agent_metrics()
-    print("\n  Individual Agent Metrics:")
-    for agent_name, metrics in all_metrics.items():
-        print(f"    {agent_name}:")
-        print(f"      - Total Calls: {metrics['calls']}")
-        print(f"      - Success Rate: {(metrics['calls'] - metrics['errors']) / max(metrics['calls'], 1) * 100:.1f}%")
-        print(f"      - Average Execution Time: {metrics['avg_time']:.3f}s")
+    for _metrics in all_metrics.values():
+        pass
 
-    print("\n" + "=" * 80)
-    print("📋 Step 7: Priority-Based Execution")
-    print("-" * 80)
 
-    print("\n  Executing tasks with different priorities:")
 
     priority_tasks = [
         ("CRITICAL: Security scan", ExecutionPriority.CRITICAL, ["authentication"]),
@@ -896,20 +843,11 @@ async def run_orchestrator_demonstration():
         result = await demo_orchestrator.execute_task(
             task_type=task_name, parameters={"task": task_name}, required_capabilities=capabilities, priority=priority
         )
-        status_icon = "✅" if result.get("status") == "completed" else "❌"
-        print(f"    {status_icon} {priority.name}: {task_name} - {result.get('status')}")
+        "✅" if result.get("status") == "completed" else "❌"
 
-    print("\n" + "=" * 80)
-    print("✨ DEMONSTRATION COMPLETE")
-    print("=" * 80)
 
-    print("\n📈 Final Statistics:")
-    final_health = await demo_orchestrator.get_orchestrator_health()
-    print(f"  - Total Tasks Executed: {final_health['total_tasks']}")
-    print(f"  - System Status: {final_health['system_status'].upper()}")
-    print(f"  - All Agents Operational: {final_health['registered_agents']}")
+    await demo_orchestrator.get_orchestrator_health()
 
-    print("\n" + "=" * 80 + "\n")
 
 
 # Global orchestrator instance with video generation capabilities
@@ -923,17 +861,6 @@ orchestrator = AgentOrchestrator()
 if __name__ == "__main__":
     import sys
 
-    print(
-        """
-    ╔════════════════════════════════════════════════════════════════════════════╗
-    ║                                                                            ║
-    ║        🎭 DevSkyy Enterprise Multi-Agent Orchestrator v1.0.0              ║
-    ║                                                                            ║
-    ║        Enterprise-grade multi-agent coordination and management           ║
-    ║                                                                            ║
-    ╚════════════════════════════════════════════════════════════════════════════╝
-    """
-    )
 
     logging.basicConfig(
         level=logging.INFO,
@@ -943,12 +870,9 @@ if __name__ == "__main__":
 
     try:
         asyncio.run(run_orchestrator_demonstration())
-        print("\n✅ Demonstration completed successfully!\n")
         sys.exit(0)
     except KeyboardInterrupt:
-        print("\n\n⚠️  Demonstration interrupted by user\n")
         sys.exit(1)
     except Exception as e:
-        print(f"\n\n❌ Demonstration failed: {e}\n")
         logger.error(f"Demonstration error: {e}", exc_info=True)
         sys.exit(1)

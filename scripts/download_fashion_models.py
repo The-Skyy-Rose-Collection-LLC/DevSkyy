@@ -16,10 +16,7 @@ import sys
 
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
 
@@ -51,7 +48,7 @@ class FashionModelDownloader:
                 from diffusers import DiffusionPipeline
 
                 # Download diffusion model
-                pipeline = DiffusionPipeline.from_pretrained(
+                DiffusionPipeline.from_pretrained(
                     model_id,
                     cache_dir=self.cache_dir,
                     torch_dtype="auto",
@@ -64,12 +61,12 @@ class FashionModelDownloader:
                 from transformers import AutoModel, AutoTokenizer
 
                 # Download transformer model
-                model = AutoModel.from_pretrained(
+                AutoModel.from_pretrained(
                     model_id,
                     cache_dir=self.cache_dir,
                 )
 
-                tokenizer = AutoTokenizer.from_pretrained(
+                AutoTokenizer.from_pretrained(
                     model_id,
                     cache_dir=self.cache_dir,
                 )
@@ -111,10 +108,7 @@ class FashionModelDownloader:
         logger.info("Source: https://huggingface.co/stabilityai/stable-diffusion-xl-base-1.0")
         logger.info("=" * 70)
 
-        return self.download_huggingface_model(
-            "stabilityai/stable-diffusion-xl-base-1.0",
-            "diffusion"
-        )
+        return self.download_huggingface_model("stabilityai/stable-diffusion-xl-base-1.0", "diffusion")
 
     def download_controlnet(self) -> bool:
         """
@@ -127,10 +121,7 @@ class FashionModelDownloader:
         logger.info("Source: https://huggingface.co/lllyasviel/control_v11p_sd15_openpose")
         logger.info("=" * 70)
 
-        return self.download_huggingface_model(
-            "lllyasviel/control_v11p_sd15_openpose",
-            "diffusion"
-        )
+        return self.download_huggingface_model("lllyasviel/control_v11p_sd15_openpose", "diffusion")
 
     def verify_pytorch(self) -> bool:
         """Verify PyTorch installation"""
@@ -214,7 +205,7 @@ class FashionModelDownloader:
         for model_name, download_func in models:
             logger.info(f"\n{'=' * 70}")
             logger.info(f"Downloading {model_name}...")
-            logger.info('=' * 70)
+            logger.info("=" * 70)
 
             try:
                 success = download_func()
@@ -260,30 +251,19 @@ class FashionModelDownloader:
 
 def main():
     """Main entry point"""
-    parser = argparse.ArgumentParser(
-        description="Download AI models for DevSkyy Fashion Orchestrator"
-    )
+    parser = argparse.ArgumentParser(description="Download AI models for DevSkyy Fashion Orchestrator")
 
-    parser.add_argument(
-        "--cache-dir",
-        type=str,
-        help="Custom cache directory for models",
-        default=None
-    )
+    parser.add_argument("--cache-dir", type=str, help="Custom cache directory for models", default=None)
 
     parser.add_argument(
         "--model",
         type=str,
         choices=["idm-vton", "sdxl", "controlnet", "all"],
         default="all",
-        help="Specific model to download (default: all)"
+        help="Specific model to download (default: all)",
     )
 
-    parser.add_argument(
-        "--verify-only",
-        action="store_true",
-        help="Only verify installations without downloading"
-    )
+    parser.add_argument("--verify-only", action="store_true", help="Only verify installations without downloading")
 
     args = parser.parse_args()
 

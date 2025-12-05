@@ -797,9 +797,7 @@ class PersonalizedWebsiteRenderer:
             "display": "standard",
         }
 
-    def _apply_behavioral_targeting(
-        self, behavior: dict[str, Any] | None, content: dict[str, Any]
-    ) -> dict[str, Any]:
+    def _apply_behavioral_targeting(self, behavior: dict[str, Any] | None, content: dict[str, Any]) -> dict[str, Any]:
         """Apply behavioral targeting overlays to content."""
         if not behavior:
             return content

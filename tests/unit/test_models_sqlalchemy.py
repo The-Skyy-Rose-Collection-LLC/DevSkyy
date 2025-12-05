@@ -78,11 +78,7 @@ class TestUserModel:
 
     def test_user_creation_with_required_fields(self, in_memory_db):
         """Test User model creation with all required fields"""
-        user = User(
-            email="test@example.com",
-            username="testuser",
-            hashed_password="hashed_password_123"
-        )
+        user = User(email="test@example.com", username="testuser", hashed_password="hashed_password_123")
         in_memory_db.add(user)
         in_memory_db.commit()
 
@@ -93,11 +89,7 @@ class TestUserModel:
 
     def test_user_default_values(self, in_memory_db):
         """Test User model default values for is_active, is_superuser"""
-        user = User(
-            email="default@example.com",
-            username="defaultuser",
-            hashed_password="hashed123"
-        )
+        user = User(email="default@example.com", username="defaultuser", hashed_password="hashed123")
         in_memory_db.add(user)
         in_memory_db.commit()
 
@@ -108,19 +100,11 @@ class TestUserModel:
 
     def test_user_unique_email_constraint(self, in_memory_db):
         """Test User email uniqueness constraint"""
-        user1 = User(
-            email="duplicate@example.com",
-            username="user1",
-            hashed_password="hash1"
-        )
+        user1 = User(email="duplicate@example.com", username="user1", hashed_password="hash1")
         in_memory_db.add(user1)
         in_memory_db.commit()
 
-        user2 = User(
-            email="duplicate@example.com",
-            username="user2",
-            hashed_password="hash2"
-        )
+        user2 = User(email="duplicate@example.com", username="user2", hashed_password="hash2")
         in_memory_db.add(user2)
 
         with pytest.raises(Exception):  # IntegrityError
@@ -128,19 +112,11 @@ class TestUserModel:
 
     def test_user_unique_username_constraint(self, in_memory_db):
         """Test User username uniqueness constraint"""
-        user1 = User(
-            email="user1@example.com",
-            username="duplicate_username",
-            hashed_password="hash1"
-        )
+        user1 = User(email="user1@example.com", username="duplicate_username", hashed_password="hash1")
         in_memory_db.add(user1)
         in_memory_db.commit()
 
-        user2 = User(
-            email="user2@example.com",
-            username="duplicate_username",
-            hashed_password="hash2"
-        )
+        user2 = User(email="user2@example.com", username="duplicate_username", hashed_password="hash2")
         in_memory_db.add(user2)
 
         with pytest.raises(Exception):  # IntegrityError
@@ -149,10 +125,7 @@ class TestUserModel:
     def test_user_optional_full_name(self, in_memory_db):
         """Test User with optional full_name field"""
         user = User(
-            email="optional@example.com",
-            username="optionaluser",
-            full_name="John Doe",
-            hashed_password="hash123"
+            email="optional@example.com", username="optionaluser", full_name="John Doe", hashed_password="hash123"
         )
         in_memory_db.add(user)
         in_memory_db.commit()
@@ -169,11 +142,7 @@ class TestProductModel:
 
     def test_product_creation_with_required_fields(self, in_memory_db):
         """Test Product model creation with required fields"""
-        product = Product(
-            name="Test Product",
-            sku="TEST-SKU-001",
-            price=99.99
-        )
+        product = Product(name="Test Product", sku="TEST-SKU-001", price=99.99)
         in_memory_db.add(product)
         in_memory_db.commit()
 
@@ -184,11 +153,7 @@ class TestProductModel:
 
     def test_product_default_values(self, in_memory_db):
         """Test Product model default values"""
-        product = Product(
-            name="Default Product",
-            sku="DEFAULT-001",
-            price=50.0
-        )
+        product = Product(name="Default Product", sku="DEFAULT-001", price=50.0)
         in_memory_db.add(product)
         in_memory_db.commit()
 
@@ -208,7 +173,7 @@ class TestProductModel:
             images=["image1.jpg", "image2.jpg"],
             tags=["new", "sale", "featured"],
             seo_data={"title": "Product Title", "description": "SEO description"},
-            variants=[{"size": "M", "color": "red", "sku": "JSON-001-M-R"}]
+            variants=[{"size": "M", "color": "red", "sku": "JSON-001-M-R"}],
         )
         in_memory_db.add(product)
         in_memory_db.commit()
@@ -240,7 +205,7 @@ class TestProductModel:
             price=150.0,
             description="Full product description",
             category="Electronics",
-            cost=75.0
+            cost=75.0,
         )
         in_memory_db.add(product)
         in_memory_db.commit()
@@ -285,7 +250,7 @@ class TestCustomerModel:
             last_name="Doe",
             phone="+1-555-1234",
             address={"street": "123 Main St", "city": "Seattle", "zip": "98101"},
-            preferences={"newsletter": True, "sms": False}
+            preferences={"newsletter": True, "sms": False},
         )
         in_memory_db.add(customer)
         in_memory_db.commit()
@@ -322,7 +287,7 @@ class TestOrderModel:
             order_number="ORD-001",
             items=[{"product_id": 1, "quantity": 2, "price": 50.0}],
             subtotal=100.0,
-            total=110.0
+            total=110.0,
         )
         in_memory_db.add(order)
         in_memory_db.commit()
@@ -335,12 +300,7 @@ class TestOrderModel:
 
     def test_order_default_values(self, in_memory_db):
         """Test Order model default values"""
-        order = Order(
-            order_number="ORD-002",
-            items=[{"product_id": 1, "quantity": 1}],
-            subtotal=50.0,
-            total=50.0
-        )
+        order = Order(order_number="ORD-002", items=[{"product_id": 1, "quantity": 1}], subtotal=50.0, total=50.0)
         in_memory_db.add(order)
         in_memory_db.commit()
 
@@ -368,7 +328,7 @@ class TestOrderModel:
             payment_method="credit_card",
             payment_status="paid",
             tracking_number="TRACK-123",
-            notes="Gift wrap requested"
+            notes="Gift wrap requested",
         )
         in_memory_db.add(order)
         in_memory_db.commit()
@@ -384,21 +344,11 @@ class TestOrderModel:
 
     def test_order_unique_order_number_constraint(self, in_memory_db):
         """Test Order order_number uniqueness constraint"""
-        order1 = Order(
-            order_number="DUP-ORDER",
-            items=[{"item": 1}],
-            subtotal=10.0,
-            total=10.0
-        )
+        order1 = Order(order_number="DUP-ORDER", items=[{"item": 1}], subtotal=10.0, total=10.0)
         in_memory_db.add(order1)
         in_memory_db.commit()
 
-        order2 = Order(
-            order_number="DUP-ORDER",
-            items=[{"item": 2}],
-            subtotal=20.0,
-            total=20.0
-        )
+        order2 = Order(order_number="DUP-ORDER", items=[{"item": 2}], subtotal=20.0, total=20.0)
         in_memory_db.add(order2)
 
         with pytest.raises(Exception):  # IntegrityError
@@ -414,10 +364,7 @@ class TestAgentLogModel:
 
     def test_agent_log_creation_with_required_fields(self, in_memory_db):
         """Test AgentLog model creation with required fields"""
-        log = AgentLog(
-            agent_name="TestAgent",
-            action="process_request"
-        )
+        log = AgentLog(agent_name="TestAgent", action="process_request")
         in_memory_db.add(log)
         in_memory_db.commit()
 
@@ -427,10 +374,7 @@ class TestAgentLogModel:
 
     def test_agent_log_default_status(self, in_memory_db):
         """Test AgentLog model default status value"""
-        log = AgentLog(
-            agent_name="DefaultAgent",
-            action="test_action"
-        )
+        log = AgentLog(agent_name="DefaultAgent", action="test_action")
         in_memory_db.add(log)
         in_memory_db.commit()
 
@@ -446,7 +390,7 @@ class TestAgentLogModel:
             input_data={"param1": "value1", "param2": 42},
             output_data={"result": "failed", "code": 500},
             error_message="Connection timeout",
-            execution_time_ms=1234.56
+            execution_time_ms=1234.56,
         )
         in_memory_db.add(log)
         in_memory_db.commit()
@@ -467,11 +411,7 @@ class TestBrandAssetModel:
 
     def test_brand_asset_creation_with_required_fields(self, in_memory_db):
         """Test BrandAsset model creation with required fields"""
-        asset = BrandAsset(
-            asset_type="logo",
-            name="Primary Logo",
-            data={"url": "logo.png", "format": "PNG"}
-        )
+        asset = BrandAsset(asset_type="logo", name="Primary Logo", data={"url": "logo.png", "format": "PNG"})
         in_memory_db.add(asset)
         in_memory_db.commit()
 
@@ -483,9 +423,7 @@ class TestBrandAssetModel:
     def test_brand_asset_default_values(self, in_memory_db):
         """Test BrandAsset model default values"""
         asset = BrandAsset(
-            asset_type="color_palette",
-            name="Brand Colors",
-            data={"primary": "#FF0000", "secondary": "#0000FF"}
+            asset_type="color_palette", name="Brand Colors", data={"primary": "#FF0000", "secondary": "#0000FF"}
         )
         in_memory_db.add(asset)
         in_memory_db.commit()
@@ -502,7 +440,7 @@ class TestBrandAssetModel:
             name="Brand Voice Guidelines",
             data={"tone": "professional", "style": "friendly"},
             asset_metadata={"author": "Marketing Team", "approved": True},
-            version=2
+            version=2,
         )
         in_memory_db.add(asset)
         in_memory_db.commit()
@@ -560,7 +498,7 @@ class TestCampaignModel:
             targeting={"age_range": "25-45", "interests": ["fashion"]},
             metrics={"ctr": 5.0, "conversion_rate": 5.0},
             start_date=start_date,
-            end_date=end_date
+            end_date=end_date,
         )
         in_memory_db.add(campaign)
         in_memory_db.commit()
@@ -636,11 +574,7 @@ class TestInMemoryStorage:
         storage = InMemoryStorage()
 
         # Add product
-        storage.products["test_product"] = {
-            "name": "Test Product",
-            "price": 99.99,
-            "sku": "TEST-001"
-        }
+        storage.products["test_product"] = {"name": "Test Product", "price": 99.99, "sku": "TEST-001"}
 
         # Retrieve and verify
         product = storage.products["test_product"]
@@ -654,10 +588,7 @@ class TestPydanticProductRequest:
 
     def test_product_request_with_required_fields(self):
         """Test ProductRequest with required fields (name, base_price)"""
-        request = ProductRequest(
-            name="Valid Product",
-            base_price=49.99
-        )
+        request = ProductRequest(name="Valid Product", base_price=49.99)
 
         assert request.name == "Valid Product"
         assert request.base_price == 49.99
@@ -673,7 +604,7 @@ class TestPydanticProductRequest:
             sku="COMP-001",
             stock_quantity=100,
             tags=["new", "featured"],
-            images=["image1.jpg", "image2.jpg"]
+            images=["image1.jpg", "image2.jpg"],
         )
 
         assert request.description == "Full description"
@@ -686,10 +617,7 @@ class TestPydanticProductRequest:
 
     def test_product_request_default_values(self):
         """Test ProductRequest default values for optional fields"""
-        request = ProductRequest(
-            name="Minimal Product",
-            base_price=25.0
-        )
+        request = ProductRequest(name="Minimal Product", base_price=25.0)
 
         assert request.description is None
         assert request.cost is None
@@ -729,10 +657,7 @@ class TestPydanticPaymentRequest:
 
     def test_payment_request_with_required_fields(self):
         """Test PaymentRequest with required fields (amount, payment_method)"""
-        request = PaymentRequest(
-            amount=100.0,
-            payment_method="credit_card"
-        )
+        request = PaymentRequest(amount=100.0, payment_method="credit_card")
 
         assert request.amount == 100.0
         assert request.payment_method == "credit_card"
@@ -747,7 +672,7 @@ class TestPydanticPaymentRequest:
             customer_id="cust_123",
             order_id="order_456",
             description="Payment for order 456",
-            metadata={"invoice_id": "INV-789", "department": "sales"}
+            metadata={"invoice_id": "INV-789", "department": "sales"},
         )
 
         assert request.amount == 250.50
@@ -759,10 +684,7 @@ class TestPydanticPaymentRequest:
 
     def test_payment_request_default_values(self):
         """Test PaymentRequest default values"""
-        request = PaymentRequest(
-            amount=50.0,
-            payment_method="bank_transfer"
-        )
+        request = PaymentRequest(amount=50.0, payment_method="bank_transfer")
 
         assert request.currency == "USD"
         assert request.customer_id is None
@@ -809,8 +731,15 @@ class TestModelInspection:
         columns = [col["name"] for col in inspector.get_columns("users")]
 
         expected_columns = [
-            "id", "email", "username", "full_name", "hashed_password",
-            "is_active", "is_superuser", "created_at", "updated_at"
+            "id",
+            "email",
+            "username",
+            "full_name",
+            "hashed_password",
+            "is_active",
+            "is_superuser",
+            "created_at",
+            "updated_at",
         ]
 
         for col in expected_columns:
@@ -822,9 +751,23 @@ class TestModelInspection:
         columns = [col["name"] for col in inspector.get_columns("products")]
 
         expected_columns = [
-            "id", "name", "description", "sku", "category", "price", "cost",
-            "stock_quantity", "sizes", "colors", "images", "tags", "seo_data",
-            "variants", "is_active", "created_at", "updated_at"
+            "id",
+            "name",
+            "description",
+            "sku",
+            "category",
+            "price",
+            "cost",
+            "stock_quantity",
+            "sizes",
+            "colors",
+            "images",
+            "tags",
+            "seo_data",
+            "variants",
+            "is_active",
+            "created_at",
+            "updated_at",
         ]
 
         for col in expected_columns:
@@ -836,8 +779,17 @@ class TestModelInspection:
         columns = [col["name"] for col in inspector.get_columns("customers")]
 
         expected_columns = [
-            "id", "email", "first_name", "last_name", "phone", "address",
-            "preferences", "lifetime_value", "total_orders", "created_at", "updated_at"
+            "id",
+            "email",
+            "first_name",
+            "last_name",
+            "phone",
+            "address",
+            "preferences",
+            "lifetime_value",
+            "total_orders",
+            "created_at",
+            "updated_at",
         ]
 
         for col in expected_columns:

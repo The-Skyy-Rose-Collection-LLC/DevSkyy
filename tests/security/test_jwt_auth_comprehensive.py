@@ -217,7 +217,7 @@ class TestAccountSecurity:
         """Test recording multiple failed login attempts"""
         email = "test@example.com"
 
-        for i in range(MAX_LOGIN_ATTEMPTS - 1):
+        for _i in range(MAX_LOGIN_ATTEMPTS - 1):
             is_locked = record_failed_login(email)
             assert is_locked is False
 
@@ -228,7 +228,7 @@ class TestAccountSecurity:
         email = "test@example.com"
 
         # Record MAX_LOGIN_ATTEMPTS failed attempts
-        for i in range(MAX_LOGIN_ATTEMPTS):
+        for _i in range(MAX_LOGIN_ATTEMPTS):
             record_failed_login(email)
 
         assert is_account_locked(email) is True
@@ -239,7 +239,7 @@ class TestAccountSecurity:
         email = "test@example.com"
 
         # Record some failed attempts
-        for i in range(3):
+        for _i in range(3):
             record_failed_login(email)
 
         # Clear attempts
@@ -554,8 +554,10 @@ class TestJWTTokenVerification:
 
         assert exc_info.value.status_code == 401
         # May raise either security validation error or general validation error
-        assert ("security validation failed" in exc_info.value.detail.lower() or
-                "could not validate" in exc_info.value.detail.lower())
+        assert (
+            "security validation failed" in exc_info.value.detail.lower()
+            or "could not validate" in exc_info.value.detail.lower()
+        )
 
 
 # ============================================================================
@@ -719,7 +721,7 @@ class TestRBAC:
 
     def test_all_five_roles_token_creation(self, sample_users_all_roles):
         """Test token creation for all 5 RBAC roles"""
-        for role_name, user in sample_users_all_roles.items():
+        for user in sample_users_all_roles.values():
             tokens = create_user_tokens(user)
 
             assert isinstance(tokens, TokenResponse)
@@ -732,7 +734,7 @@ class TestRBAC:
 
     def test_all_five_roles_token_verification(self, sample_users_all_roles):
         """Test token verification for all 5 RBAC roles"""
-        for role_name, user in sample_users_all_roles.items():
+        for user in sample_users_all_roles.values():
             data = {
                 "user_id": user.user_id,
                 "email": user.email,
@@ -1121,7 +1123,7 @@ class TestIntegration:
         )
 
         # Attempt multiple failed logins
-        for i in range(MAX_LOGIN_ATTEMPTS):
+        for _i in range(MAX_LOGIN_ATTEMPTS):
             authenticated = manager.authenticate_user(email, "WrongPass!")
             assert authenticated is None
             record_failed_login(email)
@@ -1210,7 +1212,7 @@ class TestEdgeCases:
         email = "concurrent@example.com"
 
         # Simulate concurrent attempts
-        for i in range(MAX_LOGIN_ATTEMPTS + 2):
+        for _i in range(MAX_LOGIN_ATTEMPTS + 2):
             record_failed_login(email)
 
         assert is_account_locked(email) is True
@@ -1218,10 +1220,12 @@ class TestEdgeCases:
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--cov=security.jwt_auth",
-        "--cov-report=term-missing",
-        "--cov-report=html",
-    ])
+    pytest.main(
+        [
+            __file__,
+            "-v",
+            "--cov=security.jwt_auth",
+            "--cov-report=term-missing",
+            "--cov-report=html",
+        ]
+    )

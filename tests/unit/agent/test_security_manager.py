@@ -20,9 +20,7 @@ Tests the SecurityManager class including:
 - Secrets management with HMAC comparison
 """
 
-import hashlib
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import pytest
 
@@ -210,10 +208,7 @@ class TestAPIKeyGeneration:
     def test_generate_api_key_unique(self, security_manager):
         """Verify each generated key is unique."""
         # Arrange & Act
-        keys = [
-            security_manager.generate_api_key(f"agent_{i}", SecurityRole.SERVICE)
-            for i in range(10)
-        ]
+        keys = [security_manager.generate_api_key(f"agent_{i}", SecurityRole.SERVICE) for i in range(10)]
 
         # Assert - all keys should be unique
         assert len(set(keys)) == 10
@@ -282,14 +277,10 @@ class TestAPIKeyValidation:
     def test_validate_expired_key(self, security_manager):
         """Verify expired key is rejected."""
         # Arrange
-        api_key = security_manager.generate_api_key(
-            "expired_agent", SecurityRole.SERVICE, expires_days=0
-        )
+        api_key = security_manager.generate_api_key("expired_agent", SecurityRole.SERVICE, expires_days=0)
         key_id = api_key.split(".")[0]
         # Manually expire the key
-        security_manager.api_keys[key_id]["expires_at"] = datetime.now() - timedelta(
-            days=1
-        )
+        security_manager.api_keys[key_id]["expires_at"] = datetime.now() - timedelta(days=1)
 
         # Act
         result = security_manager.validate_api_key(api_key)
@@ -421,12 +412,8 @@ class TestRBACAuthorization:
 
         # Act & Assert
         assert security_manager.check_permission("analyst", "resource", "read") is True
-        assert (
-            security_manager.check_permission("analyst", "resource", "write") is False
-        )
-        assert (
-            security_manager.check_permission("analyst", "resource", "execute") is False
-        )
+        assert security_manager.check_permission("analyst", "resource", "write") is False
+        assert security_manager.check_permission("analyst", "resource", "execute") is False
 
     def test_guest_read_only(self, security_manager):
         """Verify GUEST role has read-only access."""
@@ -497,14 +484,8 @@ class TestResourceACL:
         security_manager.resource_acl["protected"] = {"allowed_agent"}
 
         # Act & Assert
-        assert (
-            security_manager.check_permission("allowed_agent", "protected", "read")
-            is True
-        )
-        assert (
-            security_manager.check_permission("denied_agent", "protected", "read")
-            is False
-        )
+        assert security_manager.check_permission("allowed_agent", "protected", "read") is True
+        assert security_manager.check_permission("denied_agent", "protected", "read") is False
 
 
 # =============================================================================
@@ -518,10 +499,7 @@ class TestRateLimiting:
     def test_rate_limit_under_limit(self, security_manager):
         """Verify requests under limit are allowed."""
         # Arrange & Act
-        results = [
-            security_manager.check_rate_limit("agent", limit=10, window_seconds=60)
-            for _ in range(5)
-        ]
+        results = [security_manager.check_rate_limit("agent", limit=10, window_seconds=60) for _ in range(5)]
 
         # Assert
         assert all(results)
@@ -761,9 +739,7 @@ class TestEdgeCases:
     def test_special_characters_in_agent_name(self, security_manager):
         """Verify handling of special characters in agent name."""
         # Arrange & Act
-        api_key = security_manager.generate_api_key(
-            "agent-with-special_chars.v1", SecurityRole.SERVICE
-        )
+        api_key = security_manager.generate_api_key("agent-with-special_chars.v1", SecurityRole.SERVICE)
 
         # Assert
         result = security_manager.validate_api_key(api_key)
@@ -775,9 +751,7 @@ class TestEdgeCases:
         # Arrange & Act
         results = []
         for _ in range(100):
-            results.append(
-                security_manager.check_rate_limit("concurrent_agent", limit=50)
-            )
+            results.append(security_manager.check_rate_limit("concurrent_agent", limit=50))
 
         # Assert
         allowed = sum(results)

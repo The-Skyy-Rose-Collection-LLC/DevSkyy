@@ -292,7 +292,7 @@ auth0_client = Auth0Client()
 def get_auth0_public_key():
     """Get Auth0 public key for JWT verification."""
     try:
-        response = httpx.get(f"https://{AUTH0_DOMAIN}/.well-known/jwks.json")
+        response = httpx.get(f"https://{AUTH0_DOMAIN}/.well-known/jwks.json", timeout=10.0)
         response.raise_for_status()
         return response.json()
     except Exception as e:

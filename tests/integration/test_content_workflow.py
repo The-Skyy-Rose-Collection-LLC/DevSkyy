@@ -19,9 +19,8 @@ Per Truth Protocol:
 - Rule #10: No-skip rule - all errors logged
 """
 
-import asyncio
+import contextlib
 from datetime import datetime
-import json
 import logging
 from pathlib import Path
 import tempfile
@@ -33,8 +32,6 @@ import pytest
 
 from agent.fashion_orchestrator import (
     FashionAssetType,
-    AIModelProvider,
-    ProductDescription,
     FashionOrchestrator,
 )
 
@@ -69,6 +66,7 @@ def fashion_product_context() -> dict[str, Any]:
 @pytest.fixture
 def mock_claude_content_generator():
     """Mock Claude API for content generation."""
+
     async def generate_content(prompt: str, **kwargs: Any) -> dict[str, Any]:
         return {
             "content": f"Elegant handbag from The Skyy Rose Collection. {prompt}",
@@ -278,7 +276,7 @@ class TestMultiLanguageContent:
             "de_DE": "279,99 €",
         }
 
-        for locale, expected_format_pattern in locales.items():
+        for locale in locales:
             formatted_price = orchestrator.format_price(
                 price=fashion_product_context["price"],
                 locale=locale,
@@ -437,7 +435,7 @@ class TestImageProcessing:
             )
 
             assert len(variants) == len(sizes)
-            assert all(size_name in variants for size_name in sizes.keys())
+            assert all(size_name in variants for size_name in sizes)
 
     @pytest.mark.asyncio
     async def test_generate_alt_text(self, fashion_product_context: dict[str, Any]):
@@ -541,9 +539,7 @@ class TestWordPressIntegration:
         orchestrator = FashionOrchestrator()
         orchestrator.wordpress_client = mock_wordpress_client
 
-        mock_wordpress_client.update_post = AsyncMock(
-            return_value={"id": 12345, "status": "publish"}
-        )
+        mock_wordpress_client.update_post = AsyncMock(return_value={"id": 12345, "status": "publish"})
 
         result = await orchestrator.publish_wordpress_post(post_id=12345)
 
@@ -561,9 +557,7 @@ class TestWordPressIntegration:
             slug="accessories",
         )
 
-        mock_wordpress_client.create_category = AsyncMock(
-            return_value={"id": 6, "name": "Handbags", "parent": 5}
-        )
+        mock_wordpress_client.create_category = AsyncMock(return_value={"id": 6, "name": "Handbags", "parent": 5})
 
         child_category = await orchestrator.create_wordpress_category(
             name="Handbags",
@@ -624,9 +618,7 @@ class TestWooCommerceIntegration:
                 "id": 10000,
                 "name": "Leather Handbag",
                 "type": "variable",
-                "attributes": [
-                    {"id": 1, "name": "Color", "options": ["Black", "Brown", "Red"]}
-                ],
+                "attributes": [{"id": 1, "name": "Color", "options": ["Black", "Brown", "Red"]}],
             }
         )
 
@@ -681,16 +673,10 @@ class TestWooCommerceIntegration:
         orchestrator = FashionOrchestrator()
         orchestrator.woocommerce_client = mock_woocommerce_client
 
-        products = [
-            {**fashion_product_context, "product_id": f"prod_{i}"}
-            for i in range(10)
-        ]
+        products = [{**fashion_product_context, "product_id": f"prod_{i}"} for i in range(10)]
 
         mock_woocommerce_client.create_product = AsyncMock(
-            side_effect=[
-                {"id": 9999 + i, "name": f"Product {i}"}
-                for i in range(10)
-            ]
+            side_effect=[{"id": 9999 + i, "name": f"Product {i}"} for i in range(10)]
         )
 
         results = await orchestrator.bulk_import_products(products)
@@ -882,19 +868,23 @@ class TestEndToEndContentWorkflow:
         assert "meta_description" in seo_metadata
 
         # Step 3: Create WordPress post
-        post_result = await orchestrator.create_wordpress_post({
-            "title": seo_metadata["title"],
-            "content": content["content"],
-            "status": "draft",
-        })
+        post_result = await orchestrator.create_wordpress_post(
+            {
+                "title": seo_metadata["title"],
+                "content": content["content"],
+                "status": "draft",
+            }
+        )
         assert post_result["id"] > 0
 
         # Step 4: Create WooCommerce product
-        product_result = await orchestrator.create_woocommerce_product({
-            "name": seo_metadata["title"],
-            "regular_price": str(fashion_product_context["price"]),
-            "description": content["content"],
-        })
+        product_result = await orchestrator.create_woocommerce_product(
+            {
+                "name": seo_metadata["title"],
+                "regular_price": str(fashion_product_context["price"]),
+                "description": content["content"],
+            }
+        )
         assert product_result["id"] > 0
 
         # Step 5: Publish
@@ -911,19 +901,17 @@ class TestEndToEndContentWorkflow:
         orchestrator = FashionOrchestrator()
         orchestrator.wordpress_client = mock_wordpress_client
 
-        mock_wordpress_client.create_post = AsyncMock(
-            side_effect=Exception("WordPress API error")
-        )
+        mock_wordpress_client.create_post = AsyncMock(side_effect=Exception("WordPress API error"))
 
         orchestrator.enable_error_ledger()
 
-        try:
-            await orchestrator.create_wordpress_post({
-                "title": "Test Post",
-                "content": "Test content",
-            })
-        except Exception:
-            pass
+        with contextlib.suppress(Exception):
+            await orchestrator.create_wordpress_post(
+                {
+                    "title": "Test Post",
+                    "content": "Test content",
+                }
+            )
 
         error_ledger = orchestrator.get_error_ledger()
         assert len(error_ledger) > 0

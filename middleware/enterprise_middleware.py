@@ -35,9 +35,9 @@ PII_PATTERNS = {
     "token": re.compile(r'"token"\s*:\s*"[^"]*"', re.IGNORECASE),
     "secret": re.compile(r'"secret"\s*:\s*"[^"]*"', re.IGNORECASE),
     "authorization": re.compile(r'"authorization"\s*:\s*"[^"]*"', re.IGNORECASE),
-    "email": re.compile(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'),
-    "credit_card": re.compile(r'\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b'),
-    "ssn": re.compile(r'\b\d{3}-\d{2}-\d{4}\b'),
+    "email": re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"),
+    "credit_card": re.compile(r"\b\d{4}[- ]?\d{4}[- ]?\d{4}[- ]?\d{4}\b"),
+    "ssn": re.compile(r"\b\d{3}-\d{2}-\d{4}\b"),
 }
 
 
@@ -148,9 +148,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return
 
         cutoff_time = current_time - self.window_seconds
-        self.requests[ip] = [
-            (timestamp, count) for timestamp, count in self.requests[ip] if timestamp > cutoff_time
-        ]
+        self.requests[ip] = [(timestamp, count) for timestamp, count in self.requests[ip] if timestamp > cutoff_time]
 
     def _get_request_count(self, ip: str, current_time: float) -> int:
         """Get total request count for IP in current window."""
@@ -387,9 +385,7 @@ def add_enterprise_middleware(app, **kwargs):
         - log_file: Request log file path (optional)
     """
     # Performance monitoring
-    perf_middleware = PerformanceMonitoringMiddleware(
-        app, p95_threshold_ms=kwargs.get("p95_threshold", 200.0)
-    )
+    perf_middleware = PerformanceMonitoringMiddleware(app, p95_threshold_ms=kwargs.get("p95_threshold", 200.0))
     app.add_middleware(BaseHTTPMiddleware, dispatch=perf_middleware.dispatch)
     app.state.performance_monitor = perf_middleware
 

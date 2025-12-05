@@ -4,6 +4,7 @@ Comprehensive tests for monitoring/enterprise_metrics.py
 Target: ≥80% coverage (162/203 lines minimum)
 """
 
+import contextlib
 from datetime import datetime
 from unittest.mock import MagicMock, Mock, patch
 
@@ -25,7 +26,7 @@ from monitoring.enterprise_metrics import (
 @pytest.fixture
 def metrics_collector():
     """Create a fresh MetricsCollector instance for testing."""
-    with patch("monitoring.enterprise_metrics.metrics_collector") as mock_collector:
+    with patch("monitoring.enterprise_metrics.metrics_collector"):
         collector = MetricsCollector()
         # Stop background monitoring to avoid interference
         collector.stop_monitoring()
@@ -68,9 +69,7 @@ class TestMetricDefinition:
 
     def test_metric_definition_defaults(self):
         """Test metric definition with default values."""
-        metric = MetricDefinition(
-            name="simple_metric", metric_type=MetricType.COUNTER, description="Simple metric"
-        )
+        metric = MetricDefinition(name="simple_metric", metric_type=MetricType.COUNTER, description="Simple metric")
 
         assert metric.labels == []
         assert metric.unit == ""
@@ -193,7 +192,7 @@ class TestMetricsCollectorInitialization:
     @patch("monitoring.enterprise_metrics.PROMETHEUS_AVAILABLE", True)
     def test_prometheus_registry_created_when_available(self):
         """Test Prometheus registry is created when available."""
-        with patch("monitoring.enterprise_metrics.CollectorRegistry") as mock_registry:
+        with patch("monitoring.enterprise_metrics.CollectorRegistry"):
             collector = MetricsCollector()
             collector.stop_monitoring()
             assert hasattr(collector, "registry")
@@ -234,7 +233,9 @@ class TestMetricRegistration:
         )
 
         metrics_collector._create_prometheus_metric(metric)
-        mock_counter.assert_called_once_with("test_counter", "Test counter", ["label1"], registry=metrics_collector.registry)
+        mock_counter.assert_called_once_with(
+            "test_counter", "Test counter", ["label1"], registry=metrics_collector.registry
+        )
 
     @patch("monitoring.enterprise_metrics.PROMETHEUS_AVAILABLE", True)
     @patch("monitoring.enterprise_metrics.Gauge")
@@ -243,9 +244,7 @@ class TestMetricRegistration:
         metrics_collector.registry = MagicMock()
         metrics_collector.prometheus_metrics = {}
 
-        metric = MetricDefinition(
-            name="test_gauge", metric_type=MetricType.GAUGE, description="Test gauge", labels=[]
-        )
+        metric = MetricDefinition(name="test_gauge", metric_type=MetricType.GAUGE, description="Test gauge", labels=[])
 
         metrics_collector._create_prometheus_metric(metric)
         mock_gauge.assert_called_once_with("test_gauge", "Test gauge", [], registry=metrics_collector.registry)
@@ -289,7 +288,9 @@ class TestCounterMetrics:
 
     def test_increment_counter(self, metrics_collector):
         """Test incrementing a counter metric."""
-        metrics_collector.increment_counter("http_requests_total", 1, {"method": "GET", "endpoint": "/api", "status_code": "200"})
+        metrics_collector.increment_counter(
+            "http_requests_total", 1, {"method": "GET", "endpoint": "/api", "status_code": "200"}
+        )
 
         # Check metric history
         assert "http_requests_total" in metrics_collector.metric_history
@@ -380,7 +381,9 @@ class TestHistogramMetrics:
 
     def test_observe_histogram(self, metrics_collector):
         """Test observing a histogram metric."""
-        metrics_collector.observe_histogram("http_request_duration_seconds", 0.123, {"method": "GET", "endpoint": "/api"})
+        metrics_collector.observe_histogram(
+            "http_request_duration_seconds", 0.123, {"method": "GET", "endpoint": "/api"}
+        )
 
         # Check metric history
         assert "http_request_duration_seconds" in metrics_collector.metric_history
@@ -738,10 +741,8 @@ class TestBackgroundMonitoring:
                 # Enable monitoring for the loop
                 metrics_collector._monitoring_active = True
 
-                try:
+                with contextlib.suppress(Exception):
                     metrics_collector._monitoring_loop()
-                except Exception:
-                    pass
 
                 # Should have called collect once before exception
                 assert mock_collect.call_count >= 1
@@ -758,10 +759,8 @@ class TestBackgroundMonitoring:
                 # Enable monitoring for the loop
                 metrics_collector._monitoring_active = True
 
-                try:
+                with contextlib.suppress(Exception):
                     metrics_collector._monitoring_loop()
-                except Exception:
-                    pass
 
                 # Should have attempted collection at least once
                 assert mock_collect.call_count >= 1
@@ -912,8 +911,12 @@ class TestAlertWithLabels:
         metrics_collector.add_alert_rule(rule)
 
         # Trigger alerts with proper label names (method and endpoint)
-        metrics_collector.observe_histogram("http_request_duration_seconds", 1.5, {"method": "GET", "endpoint": "/api/v1"})
-        metrics_collector.observe_histogram("http_request_duration_seconds", 1.8, {"method": "POST", "endpoint": "/api/v2"})
+        metrics_collector.observe_histogram(
+            "http_request_duration_seconds", 1.5, {"method": "GET", "endpoint": "/api/v1"}
+        )
+        metrics_collector.observe_histogram(
+            "http_request_duration_seconds", 1.8, {"method": "POST", "endpoint": "/api/v2"}
+        )
 
         # Should have 2 separate alerts
         test_alerts = [a for a in metrics_collector.active_alerts.values() if a.rule_name == "test_label_alert"]
@@ -934,8 +937,12 @@ class TestAlertWithLabels:
         metrics_collector.add_alert_rule(rule)
 
         # Trigger alert twice with same labels (use proper label names)
-        metrics_collector.observe_histogram("http_request_duration_seconds", 1.5, {"method": "GET", "endpoint": "/api/v1"})
-        metrics_collector.observe_histogram("http_request_duration_seconds", 1.8, {"method": "GET", "endpoint": "/api/v1"})
+        metrics_collector.observe_histogram(
+            "http_request_duration_seconds", 1.5, {"method": "GET", "endpoint": "/api/v1"}
+        )
+        metrics_collector.observe_histogram(
+            "http_request_duration_seconds", 1.8, {"method": "GET", "endpoint": "/api/v1"}
+        )
 
         # Should only have 1 alert for our test
         test_alerts = [a for a in metrics_collector.active_alerts.values() if a.rule_name == "test_no_dup_alert"]

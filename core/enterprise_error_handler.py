@@ -28,9 +28,7 @@ logger = logging.getLogger(__name__)
 class ErrorRecord(BaseModel):
     """Enterprise error record per Truth Protocol Rule #14"""
 
-    timestamp: str = Field(
-        default_factory=lambda: datetime.now(UTC).isoformat()
-    )
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
     error_id: str
     error_type: str
     severity: str  # CRITICAL, HIGH, MEDIUM, LOW
@@ -82,6 +80,7 @@ class EnterpriseErrorHandler:
 
     def configure_logging(self) -> None:
         """Configure enterprise-grade structured logging"""
+
         # JSON formatter for structured logs
         class JsonFormatter(logging.Formatter):
             def format(self, record: logging.LogRecord) -> str:

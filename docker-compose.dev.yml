@@ -72,7 +72,7 @@ services:
           --log-level debug
       "
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/api/v1/monitoring/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3

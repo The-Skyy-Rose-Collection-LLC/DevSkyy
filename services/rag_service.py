@@ -610,7 +610,7 @@ class RAGService:
                 results = await self.search(
                     query=current_query,
                     top_k=RAGConfig.TOP_K_RESULTS,
-                    min_similarity=0.5  # Lower threshold for iteration
+                    min_similarity=0.5,  # Lower threshold for iteration
                 )
 
                 # Track iteration
@@ -618,7 +618,7 @@ class RAGService:
                     "iteration": iteration + 1,
                     "query": current_query,
                     "results_found": len(results),
-                    "avg_similarity": sum(r["similarity"] for r in results) / max(len(results), 1)
+                    "avg_similarity": sum(r["similarity"] for r in results) / max(len(results), 1),
                 }
                 iteration_trace.append(iteration_info)
 
@@ -631,8 +631,7 @@ class RAGService:
                         all_results.append(result)
 
                 logger.info(
-                    f"  Iteration {iteration + 1}: {len(results)} results, "
-                    f"total unique: {len(all_results)}"
+                    f"  Iteration {iteration + 1}: {len(results)} results, " f"total unique: {len(all_results)}"
                 )
 
                 # Check sufficiency
@@ -645,9 +644,7 @@ class RAGService:
                 # Reformulate query for next iteration
                 if iteration < max_iterations - 1:
                     current_query = await self._reformulate_query(
-                        original_question=question,
-                        current_results=all_results,
-                        iteration=iteration
+                        original_question=question, current_results=all_results, iteration=iteration
                     )
                     queries_used.append(current_query)
 
@@ -663,10 +660,12 @@ class RAGService:
                 }
 
             # Build combined context from all iterations
-            context_str = "\n\n".join([
-                f"[Source {idx + 1} (iter {r.get('iteration', 1)})] {r['content']}"
-                for idx, r in enumerate(all_results[:10])  # Limit to top 10
-            ])
+            context_str = "\n\n".join(
+                [
+                    f"[Source {idx + 1} (iter {r.get('iteration', 1)})] {r['content']}"
+                    for idx, r in enumerate(all_results[:10])  # Limit to top 10
+                ]
+            )
 
             # Build enhanced system prompt for multi-source synthesis
             if not system_prompt:
@@ -723,12 +722,7 @@ class RAGService:
             logger.error(f"Error in iterative RAG query: {e}")
             raise
 
-    async def _reformulate_query(
-        self,
-        original_question: str,
-        current_results: list[dict],
-        iteration: int
-    ) -> str:
+    async def _reformulate_query(self, original_question: str, current_results: list[dict], iteration: int) -> str:
         """
         Reformulate query based on current results to find missing information.
 
@@ -742,9 +736,7 @@ class RAGService:
         if self.anthropic and iteration > 0:
             try:
                 # Summarize what we found
-                found_summary = "\n".join([
-                    f"- {r['content'][:100]}..." for r in current_results[:3]
-                ])
+                found_summary = "\n".join([f"- {r['content'][:100]}..." for r in current_results[:3]])
 
                 prompt = f"""Given the original question and what we've found so far, suggest a reformulated search query to find additional relevant information.
 
@@ -756,9 +748,7 @@ Information found so far:
 Suggest a single search query that would help find information we're still missing. Return ONLY the query, nothing else."""
 
                 response = self.anthropic.messages.create(
-                    model="claude-sonnet-4-5-20250929",
-                    max_tokens=100,
-                    messages=[{"role": "user", "content": prompt}]
+                    model="claude-sonnet-4-5-20250929", max_tokens=100, messages=[{"role": "user", "content": prompt}]
                 )
 
                 reformulated = response.content[0].text.strip()
@@ -829,18 +819,14 @@ if __name__ == "__main__":
         for verifiable, secure, and production-ready AI systems.
         """
 
-        stats = await rag.ingest_text(sample_text, source="example")
-        print(f"Ingested: {stats}")
+        await rag.ingest_text(sample_text, source="example")
 
         # Search
         results = await rag.search("What is DevSkyy?")
-        print(f"\nSearch results: {len(results)}")
-        for result in results:
-            print(f"  - {result['content'][:100]}... (similarity: {result['similarity']:.2f})")
+        for _result in results:
+            pass
 
         # RAG query
-        answer = await rag.query("What security features does DevSkyy have?")
-        print(f"\nAnswer: {answer['answer']}")
-        print(f"Sources used: {answer['context_used']}")
+        await rag.query("What security features does DevSkyy have?")
 
     asyncio.run(main())

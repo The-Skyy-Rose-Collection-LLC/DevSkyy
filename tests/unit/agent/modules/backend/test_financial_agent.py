@@ -4,9 +4,6 @@ Comprehensive unit tests for agent/modules/backend/financial_agent.py
 Target coverage: 75%+
 """
 
-from decimal import Decimal
-from unittest.mock import MagicMock, patch
-
 import pytest
 
 from agent.modules.backend.financial_agent import (
@@ -196,7 +193,7 @@ class TestFraudDetection:
         customer_id = "velocity_test"
 
         # Process multiple transactions quickly
-        for i in range(10):
+        for _i in range(10):
             financial_agent.process_payment(
                 amount=10.00,
                 currency="USD",
@@ -251,7 +248,7 @@ class TestChargebacks:
     def test_chargeback_rate_monitoring(self, financial_agent):
         # Process multiple payments and chargebacks
         for i in range(10):
-            payment = financial_agent.process_payment(
+            financial_agent.process_payment(
                 amount=100.00,
                 currency="USD",
                 customer_id=f"cust_{i}",
@@ -433,7 +430,7 @@ class TestEdgeCases:
         customer_id = "concurrent_user"
 
         results = []
-        for i in range(5):
+        for _i in range(5):
             result = financial_agent.process_payment(
                 amount=50.00,
                 currency="USD",

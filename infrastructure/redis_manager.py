@@ -197,8 +197,22 @@ class RedisManager:
 
         self.metrics.last_updated = datetime.now()
 
-    async def set(self, key: str, value: Any, ttl: int | None = None, prefix: str = "api_cache") -> bool:
-        """Set cache value with optional TTL"""
+    async def set(
+        self, key: str, value: Any, ttl: int | None = None, prefix: str = "api_cache", allow_pickle: bool = False
+    ) -> bool:
+        """
+        Set cache value with optional TTL
+
+        Args:
+            key: Cache key
+            value: Value to cache
+            ttl: Time to live in seconds
+            prefix: Key prefix
+            allow_pickle: SECURITY WARNING - Allow pickle serialization (unsafe for untrusted data)
+
+        WARNING: Pickle serialization can execute arbitrary code. Only use with trusted data.
+        For untrusted data, use JSON-serializable objects only.
+        """
         start_time = time.time()
 
         try:
@@ -211,6 +225,17 @@ class RedisManager:
             elif isinstance(value, str):
                 serialized_value = value
             else:
+                if not allow_pickle:
+                    logger.error(
+                        f"SECURITY: Attempted to cache non-JSON-serializable object without allow_pickle=True. "
+                        f"Key: {cache_key}, Type: {type(value).__name__}"
+                    )
+                    return False
+                # SECURITY WARNING: Pickle can execute arbitrary code during deserialization
+                logger.warning(
+                    f"SECURITY: Using pickle serialization for key {cache_key}. "
+                    f"Type: {type(value).__name__}. Ensure data is trusted."
+                )
                 serialized_value = pickle.dumps(value)
 
             await self.redis_client.setex(cache_key, ttl, serialized_value)
@@ -225,8 +250,20 @@ class RedisManager:
             logger.error(f"Redis SET error for key {key}: {e}")
             return False
 
-    async def get(self, key: str, prefix: str = "api_cache", deserialize_json: bool = True) -> Any | None:
-        """Get cache value"""
+    async def get(
+        self, key: str, prefix: str = "api_cache", deserialize_json: bool = True, allow_pickle: bool = False
+    ) -> Any | None:
+        """
+        Get cache value
+
+        Args:
+            key: Cache key
+            prefix: Key prefix
+            deserialize_json: Attempt JSON deserialization
+            allow_pickle: SECURITY WARNING - Allow pickle deserialization (unsafe for untrusted data)
+
+        WARNING: Pickle deserialization can execute arbitrary code. Only use with trusted data sources.
+        """
         start_time = time.time()
 
         try:
@@ -249,11 +286,21 @@ class RedisManager:
                 else:
                     return value.decode("utf-8")
             except (json.JSONDecodeError, UnicodeDecodeError):
-                # Try pickle deserialization
-                try:
-                    return pickle.loads(value)
-                except (pickle.PickleError, TypeError, ValueError) as e:
-                    logger.debug(f"Pickle deserialization failed for key {key}: {e}")
+                # Try pickle deserialization only if explicitly allowed
+                if allow_pickle:
+                    try:
+                        logger.warning(
+                            f"SECURITY: Using pickle deserialization for key {cache_key}. Ensure data is trusted."
+                        )
+                        return pickle.loads(value)
+                    except (pickle.PickleError, TypeError, ValueError) as e:
+                        logger.error(f"Pickle deserialization failed for key {key}: {e}")
+                        return value.decode("utf-8")
+                else:
+                    logger.warning(
+                        f"SECURITY: Skipping pickle deserialization for key {cache_key}. "
+                        f"Use allow_pickle=True only for trusted data."
+                    )
                     return value.decode("utf-8")
 
         except RedisError as e:

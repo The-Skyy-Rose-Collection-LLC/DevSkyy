@@ -20,9 +20,22 @@ services:
         PYTHON_VERSION: 3.11
         BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
         VCS_REF: ${VCS_REF:-$(git rev-parse --short HEAD)}
+      cache_from:
+        - devskyy:prod
     image: devskyy:prod
     container_name: devskyy-api-prod
     restart: always
+    # Production security hardening
+    security_opt:
+      - no-new-privileges:true
+      - seccomp:unconfined
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    read_only: false  # Set to true after verifying app doesn't write to filesystem
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
     environment:
       # Production Settings
       - ENVIRONMENT=production
@@ -94,6 +107,21 @@ services:
     image: postgres:15-alpine
     container_name: devskyy-postgres-prod
     restart: always
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=100m
+      - /var/run/postgresql:noexec,nosuid,size=10m
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-devskyy}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -129,6 +157,17 @@ services:
     image: redis:7-alpine
     container_name: devskyy-redis-prod
     restart: always
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - SETGID
+      - SETUID
+    read_only: false
+    tmpfs:
+      - /tmp:noexec,nosuid,size=50m
     command: >
       redis-server
         --maxmemory 1gb
@@ -159,6 +198,21 @@ services:
     image: nginx:alpine
     container_name: devskyy-nginx-prod
     restart: always
+    # Security hardening
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+      - CHOWN
+      - SETGID
+      - SETUID
+    read_only: true
+    tmpfs:
+      - /var/cache/nginx:noexec,nosuid,size=100m
+      - /var/run:noexec,nosuid,size=10m
+      - /tmp:noexec,nosuid,size=50m
     ports:
       - "80:80"
       - "443:443"

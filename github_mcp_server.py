@@ -30,7 +30,6 @@ Per Truth Protocol:
 """
 
 import argparse
-import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -42,14 +41,13 @@ import os
 import sys
 from typing import Any, Literal
 
+
 try:
     import httpx
     from mcp.server.fastmcp import Context, FastMCP
     from mcp.server.session import ServerSession
     from pydantic import BaseModel, Field
-except ImportError as e:
-    print(f"Missing required packages: {e}")
-    print('Install: pip install "mcp[cli]" httpx pydantic')
+except ImportError:
     sys.exit(1)
 
 # Optional imports for dynamic toolsets
@@ -59,6 +57,7 @@ try:
         ToolSelectionContext,
         get_optimization_manager,
     )
+
     DYNAMIC_TOOLSETS_AVAILABLE = True
 except ImportError:
     DYNAMIC_TOOLSETS_AVAILABLE = False
@@ -74,6 +73,7 @@ REQUEST_TIMEOUT = 30.0
 
 class GitHubToolStatus(str, Enum):
     """Tool execution status."""
+
     SUCCESS = "success"
     ERROR = "error"
     RATE_LIMITED = "rate_limited"
@@ -81,8 +81,10 @@ class GitHubToolStatus(str, Enum):
 
 # Pydantic Models for GitHub Tools
 
+
 class GetFileContentsRequest(BaseModel):
     """Request to get file contents from a repository."""
+
     owner: str = Field(description="Repository owner (username or organization)")
     repo: str = Field(description="Repository name")
     path: str = Field(description="Path to the file in the repository")
@@ -91,6 +93,7 @@ class GetFileContentsRequest(BaseModel):
 
 class FileContentsResult(BaseModel):
     """Result of getting file contents."""
+
     status: GitHubToolStatus
     path: str
     content: str | None = None
@@ -102,6 +105,7 @@ class FileContentsResult(BaseModel):
 
 class SearchCodeRequest(BaseModel):
     """Request to search code on GitHub."""
+
     query: str = Field(description="Search query (GitHub code search syntax)")
     repo: str | None = Field(default=None, description="Limit to specific repo (owner/repo format)")
     language: str | None = Field(default=None, description="Filter by programming language")
@@ -111,6 +115,7 @@ class SearchCodeRequest(BaseModel):
 
 class CodeSearchResult(BaseModel):
     """Result of code search."""
+
     status: GitHubToolStatus
     total_count: int = 0
     items: list[dict[str, Any]] = Field(default_factory=list)
@@ -119,6 +124,7 @@ class CodeSearchResult(BaseModel):
 
 class GetIssuesRequest(BaseModel):
     """Request to get issues from a repository."""
+
     owner: str = Field(description="Repository owner")
     repo: str = Field(description="Repository name")
     state: Literal["open", "closed", "all"] = Field(default="open")
@@ -128,6 +134,7 @@ class GetIssuesRequest(BaseModel):
 
 class IssuesResult(BaseModel):
     """Result of getting issues."""
+
     status: GitHubToolStatus
     count: int = 0
     issues: list[dict[str, Any]] = Field(default_factory=list)
@@ -136,6 +143,7 @@ class IssuesResult(BaseModel):
 
 class CreateIssueRequest(BaseModel):
     """Request to create an issue."""
+
     owner: str = Field(description="Repository owner")
     repo: str = Field(description="Repository name")
     title: str = Field(description="Issue title")
@@ -146,6 +154,7 @@ class CreateIssueRequest(BaseModel):
 
 class CreateIssueResult(BaseModel):
     """Result of creating an issue."""
+
     status: GitHubToolStatus
     issue_number: int | None = None
     html_url: str | None = None
@@ -154,6 +163,7 @@ class CreateIssueResult(BaseModel):
 
 class GetPullRequestsRequest(BaseModel):
     """Request to get pull requests."""
+
     owner: str = Field(description="Repository owner")
     repo: str = Field(description="Repository name")
     state: Literal["open", "closed", "all"] = Field(default="open")
@@ -162,6 +172,7 @@ class GetPullRequestsRequest(BaseModel):
 
 class PullRequestsResult(BaseModel):
     """Result of getting pull requests."""
+
     status: GitHubToolStatus
     count: int = 0
     pull_requests: list[dict[str, Any]] = Field(default_factory=list)
@@ -170,12 +181,14 @@ class PullRequestsResult(BaseModel):
 
 class GetRepoInfoRequest(BaseModel):
     """Request to get repository information."""
+
     owner: str = Field(description="Repository owner")
     repo: str = Field(description="Repository name")
 
 
 class RepoInfoResult(BaseModel):
     """Result of getting repository info."""
+
     status: GitHubToolStatus
     name: str | None = None
     full_name: str | None = None
@@ -190,6 +203,7 @@ class RepoInfoResult(BaseModel):
 
 class ListBranchesRequest(BaseModel):
     """Request to list repository branches."""
+
     owner: str = Field(description="Repository owner")
     repo: str = Field(description="Repository name")
     per_page: int = Field(default=30, ge=1, le=100)
@@ -197,6 +211,7 @@ class ListBranchesRequest(BaseModel):
 
 class BranchesResult(BaseModel):
     """Result of listing branches."""
+
     status: GitHubToolStatus
     count: int = 0
     branches: list[dict[str, Any]] = Field(default_factory=list)
@@ -205,6 +220,7 @@ class BranchesResult(BaseModel):
 
 class GetCommitsRequest(BaseModel):
     """Request to get commits from a repository."""
+
     owner: str = Field(description="Repository owner")
     repo: str = Field(description="Repository name")
     sha: str | None = Field(default=None, description="Branch, tag, or commit SHA")
@@ -214,6 +230,7 @@ class GetCommitsRequest(BaseModel):
 
 class CommitsResult(BaseModel):
     """Result of getting commits."""
+
     status: GitHubToolStatus
     count: int = 0
     commits: list[dict[str, Any]] = Field(default_factory=list)
@@ -222,9 +239,11 @@ class CommitsResult(BaseModel):
 
 # Lifespan Context
 
+
 @dataclass
 class GitHubMCPContext:
     """Application context for GitHub MCP server."""
+
     http_client: httpx.AsyncClient
     github_token: str
     start_time: datetime
@@ -243,7 +262,6 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[GitHubMCPContext]:
     - GitHub authentication headers
     - Dynamic tool selector (if enabled)
     """
-    print("Initializing GitHub MCP Server...")
 
     # Parse CLI args from environment (set by main())
     enabled_tools = set(os.getenv("_GITHUB_MCP_TOOLS", "").split(","))
@@ -266,11 +284,7 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[GitHubMCPContext]:
     tool_selector = None
     if dynamic_enabled and DYNAMIC_TOOLSETS_AVAILABLE:
         tool_selector = get_optimization_manager().tool_selector
-        print("Dynamic toolsets enabled")
 
-    print(f"GitHub API: {GITHUB_API_URL}")
-    print(f"Token: {'Set' if GITHUB_TOKEN else 'Not Set (rate limited)'}")
-    print(f"Enabled tools: {enabled_tools or 'all'}")
 
     start_time = datetime.utcnow()
 
@@ -285,16 +299,11 @@ async def app_lifespan(server: FastMCP) -> AsyncIterator[GitHubMCPContext]:
         )
     finally:
         await http_client.aclose()
-        uptime = datetime.utcnow() - start_time
-        print(f"Server shutdown. Uptime: {uptime}")
+        datetime.utcnow() - start_time
 
 
 # Initialize MCP Server
-mcp = FastMCP(
-    "github_mcp_server",
-    lifespan=app_lifespan,
-    dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"]
-)
+mcp = FastMCP("github_mcp_server", lifespan=app_lifespan, dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"])
 
 
 # Tool Registry for Dynamic Selection
@@ -303,6 +312,7 @@ TOOL_REGISTRY: dict[str, dict[str, Any]] = {}
 
 def register_github_tool(name: str, description: str, keywords: list[str]):
     """Decorator to register a tool for dynamic selection."""
+
     def decorator(func):
         TOOL_REGISTRY[name] = {
             "func": func,
@@ -310,20 +320,21 @@ def register_github_tool(name: str, description: str, keywords: list[str]):
             "keywords": set(keywords),
         }
         return func
+
     return decorator
 
 
 # GitHub Tools Implementation
 
+
 @mcp.tool()
 @register_github_tool(
     "get_file_contents",
     "Get file contents from a GitHub repository",
-    ["file", "content", "read", "source", "code", "path"]
+    ["file", "content", "read", "source", "code", "path"],
 )
 async def get_file_contents(
-    request: GetFileContentsRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
+    request: GetFileContentsRequest, ctx: Context[ServerSession, GitHubMCPContext]
 ) -> FileContentsResult:
     """
     Get the contents of a file from a GitHub repository.
@@ -346,9 +357,7 @@ async def get_file_contents(
     if ctx.request_context.lifespan_context.enabled_tools:
         if "get_file_contents" not in ctx.request_context.lifespan_context.enabled_tools:
             return FileContentsResult(
-                status=GitHubToolStatus.ERROR,
-                path=request.path,
-                error="Tool not enabled. Use --tools flag to enable."
+                status=GitHubToolStatus.ERROR, path=request.path, error="Tool not enabled. Use --tools flag to enable."
             )
 
     await ctx.info(f"Fetching: {request.owner}/{request.repo}/{request.path}")
@@ -360,16 +369,11 @@ async def get_file_contents(
         if request.ref:
             params["ref"] = request.ref
 
-        response = await client.get(
-            f"/repos/{request.owner}/{request.repo}/contents/{request.path}",
-            params=params
-        )
+        response = await client.get(f"/repos/{request.owner}/{request.repo}/contents/{request.path}", params=params)
 
         if response.status_code == 403:
             return FileContentsResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                path=request.path,
-                error="GitHub API rate limit exceeded"
+                status=GitHubToolStatus.RATE_LIMITED, path=request.path, error="GitHub API rate limit exceeded"
             )
 
         response.raise_for_status()
@@ -378,6 +382,7 @@ async def get_file_contents(
         # Handle file content
         if data.get("type") == "file":
             import base64
+
             content = base64.b64decode(data.get("content", "")).decode("utf-8")
 
             return FileContentsResult(
@@ -390,35 +395,24 @@ async def get_file_contents(
             )
         else:
             return FileContentsResult(
-                status=GitHubToolStatus.ERROR,
-                path=request.path,
-                error=f"Path is a {data.get('type')}, not a file"
+                status=GitHubToolStatus.ERROR, path=request.path, error=f"Path is a {data.get('type')}, not a file"
             )
 
     except httpx.HTTPStatusError as e:
         return FileContentsResult(
             status=GitHubToolStatus.ERROR,
             path=request.path,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}",
         )
     except Exception as e:
-        return FileContentsResult(
-            status=GitHubToolStatus.ERROR,
-            path=request.path,
-            error=str(e)
-        )
+        return FileContentsResult(status=GitHubToolStatus.ERROR, path=request.path, error=str(e))
 
 
 @mcp.tool()
 @register_github_tool(
-    "search_code",
-    "Search for code across GitHub repositories",
-    ["search", "find", "query", "code", "grep", "pattern"]
+    "search_code", "Search for code across GitHub repositories", ["search", "find", "query", "code", "grep", "pattern"]
 )
-async def search_code(
-    request: SearchCodeRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
-) -> CodeSearchResult:
+async def search_code(request: SearchCodeRequest, ctx: Context[ServerSession, GitHubMCPContext]) -> CodeSearchResult:
     """
     Search for code across GitHub repositories.
 
@@ -439,8 +433,7 @@ async def search_code(
     if ctx.request_context.lifespan_context.enabled_tools:
         if "search_code" not in ctx.request_context.lifespan_context.enabled_tools:
             return CodeSearchResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
+                status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable."
             )
 
     await ctx.info(f"Searching code: {request.query}")
@@ -457,16 +450,10 @@ async def search_code(
         if request.path:
             query += f" path:{request.path}"
 
-        response = await client.get(
-            "/search/code",
-            params={"q": query, "per_page": request.per_page}
-        )
+        response = await client.get("/search/code", params={"q": query, "per_page": request.per_page})
 
         if response.status_code == 403:
-            return CodeSearchResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded"
-            )
+            return CodeSearchResult(status=GitHubToolStatus.RATE_LIMITED, error="GitHub API rate limit exceeded")
 
         response.raise_for_status()
         data = response.json()
@@ -490,26 +477,17 @@ async def search_code(
 
     except httpx.HTTPStatusError as e:
         return CodeSearchResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return CodeSearchResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return CodeSearchResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 @mcp.tool()
 @register_github_tool(
-    "get_issues",
-    "Get issues from a GitHub repository",
-    ["issues", "bugs", "tickets", "problems", "tasks"]
+    "get_issues", "Get issues from a GitHub repository", ["issues", "bugs", "tickets", "problems", "tasks"]
 )
-async def get_issues(
-    request: GetIssuesRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
-) -> IssuesResult:
+async def get_issues(request: GetIssuesRequest, ctx: Context[ServerSession, GitHubMCPContext]) -> IssuesResult:
     """
     Get issues from a GitHub repository.
 
@@ -529,10 +507,7 @@ async def get_issues(
     """
     if ctx.request_context.lifespan_context.enabled_tools:
         if "get_issues" not in ctx.request_context.lifespan_context.enabled_tools:
-            return IssuesResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
-            )
+            return IssuesResult(status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable.")
 
     await ctx.info(f"Fetching issues: {request.owner}/{request.repo}")
 
@@ -543,16 +518,10 @@ async def get_issues(
         if request.labels:
             params["labels"] = request.labels
 
-        response = await client.get(
-            f"/repos/{request.owner}/{request.repo}/issues",
-            params=params
-        )
+        response = await client.get(f"/repos/{request.owner}/{request.repo}/issues", params=params)
 
         if response.status_code == 403:
-            return IssuesResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded"
-            )
+            return IssuesResult(status=GitHubToolStatus.RATE_LIMITED, error="GitHub API rate limit exceeded")
 
         response.raise_for_status()
         data = response.json()
@@ -579,25 +548,18 @@ async def get_issues(
 
     except httpx.HTTPStatusError as e:
         return IssuesResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return IssuesResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return IssuesResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 @mcp.tool()
 @register_github_tool(
-    "create_issue",
-    "Create a new issue in a GitHub repository",
-    ["create", "new", "issue", "bug", "report", "ticket"]
+    "create_issue", "Create a new issue in a GitHub repository", ["create", "new", "issue", "bug", "report", "ticket"]
 )
 async def create_issue(
-    request: CreateIssueRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
+    request: CreateIssueRequest, ctx: Context[ServerSession, GitHubMCPContext]
 ) -> CreateIssueResult:
     """
     Create a new issue in a GitHub repository.
@@ -620,15 +582,11 @@ async def create_issue(
     if ctx.request_context.lifespan_context.enabled_tools:
         if "create_issue" not in ctx.request_context.lifespan_context.enabled_tools:
             return CreateIssueResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
+                status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable."
             )
 
     if not ctx.request_context.lifespan_context.github_token:
-        return CreateIssueResult(
-            status=GitHubToolStatus.ERROR,
-            error="GITHUB_TOKEN required to create issues"
-        )
+        return CreateIssueResult(status=GitHubToolStatus.ERROR, error="GITHUB_TOKEN required to create issues")
 
     await ctx.info(f"Creating issue in: {request.owner}/{request.repo}")
 
@@ -643,15 +601,12 @@ async def create_issue(
         if request.assignees:
             payload["assignees"] = request.assignees
 
-        response = await client.post(
-            f"/repos/{request.owner}/{request.repo}/issues",
-            json=payload
-        )
+        response = await client.post(f"/repos/{request.owner}/{request.repo}/issues", json=payload)
 
         if response.status_code == 403:
             return CreateIssueResult(
                 status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded or insufficient permissions"
+                error="GitHub API rate limit exceeded or insufficient permissions",
             )
 
         response.raise_for_status()
@@ -667,25 +622,18 @@ async def create_issue(
 
     except httpx.HTTPStatusError as e:
         return CreateIssueResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return CreateIssueResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return CreateIssueResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 @mcp.tool()
 @register_github_tool(
-    "get_pull_requests",
-    "Get pull requests from a GitHub repository",
-    ["pull", "pr", "merge", "review", "changes"]
+    "get_pull_requests", "Get pull requests from a GitHub repository", ["pull", "pr", "merge", "review", "changes"]
 )
 async def get_pull_requests(
-    request: GetPullRequestsRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
+    request: GetPullRequestsRequest, ctx: Context[ServerSession, GitHubMCPContext]
 ) -> PullRequestsResult:
     """
     Get pull requests from a GitHub repository.
@@ -704,8 +652,7 @@ async def get_pull_requests(
     if ctx.request_context.lifespan_context.enabled_tools:
         if "get_pull_requests" not in ctx.request_context.lifespan_context.enabled_tools:
             return PullRequestsResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
+                status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable."
             )
 
     await ctx.info(f"Fetching PRs: {request.owner}/{request.repo}")
@@ -715,14 +662,11 @@ async def get_pull_requests(
     try:
         response = await client.get(
             f"/repos/{request.owner}/{request.repo}/pulls",
-            params={"state": request.state, "per_page": request.per_page}
+            params={"state": request.state, "per_page": request.per_page},
         )
 
         if response.status_code == 403:
-            return PullRequestsResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded"
-            )
+            return PullRequestsResult(status=GitHubToolStatus.RATE_LIMITED, error="GitHub API rate limit exceeded")
 
         response.raise_for_status()
         data = response.json()
@@ -748,26 +692,17 @@ async def get_pull_requests(
 
     except httpx.HTTPStatusError as e:
         return PullRequestsResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return PullRequestsResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return PullRequestsResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 @mcp.tool()
 @register_github_tool(
-    "get_repo_info",
-    "Get information about a GitHub repository",
-    ["repo", "repository", "info", "details", "metadata"]
+    "get_repo_info", "Get information about a GitHub repository", ["repo", "repository", "info", "details", "metadata"]
 )
-async def get_repo_info(
-    request: GetRepoInfoRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
-) -> RepoInfoResult:
+async def get_repo_info(request: GetRepoInfoRequest, ctx: Context[ServerSession, GitHubMCPContext]) -> RepoInfoResult:
     """
     Get information about a GitHub repository.
 
@@ -783,10 +718,7 @@ async def get_repo_info(
     """
     if ctx.request_context.lifespan_context.enabled_tools:
         if "get_repo_info" not in ctx.request_context.lifespan_context.enabled_tools:
-            return RepoInfoResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
-            )
+            return RepoInfoResult(status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable.")
 
     await ctx.info(f"Fetching repo info: {request.owner}/{request.repo}")
 
@@ -796,10 +728,7 @@ async def get_repo_info(
         response = await client.get(f"/repos/{request.owner}/{request.repo}")
 
         if response.status_code == 403:
-            return RepoInfoResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded"
-            )
+            return RepoInfoResult(status=GitHubToolStatus.RATE_LIMITED, error="GitHub API rate limit exceeded")
 
         response.raise_for_status()
         data = response.json()
@@ -818,26 +747,15 @@ async def get_repo_info(
 
     except httpx.HTTPStatusError as e:
         return RepoInfoResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return RepoInfoResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return RepoInfoResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 @mcp.tool()
-@register_github_tool(
-    "list_branches",
-    "List branches in a GitHub repository",
-    ["branches", "branch", "list", "git"]
-)
-async def list_branches(
-    request: ListBranchesRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
-) -> BranchesResult:
+@register_github_tool("list_branches", "List branches in a GitHub repository", ["branches", "branch", "list", "git"])
+async def list_branches(request: ListBranchesRequest, ctx: Context[ServerSession, GitHubMCPContext]) -> BranchesResult:
     """
     List branches in a GitHub repository.
 
@@ -853,10 +771,7 @@ async def list_branches(
     """
     if ctx.request_context.lifespan_context.enabled_tools:
         if "list_branches" not in ctx.request_context.lifespan_context.enabled_tools:
-            return BranchesResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
-            )
+            return BranchesResult(status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable.")
 
     await ctx.info(f"Listing branches: {request.owner}/{request.repo}")
 
@@ -864,15 +779,11 @@ async def list_branches(
 
     try:
         response = await client.get(
-            f"/repos/{request.owner}/{request.repo}/branches",
-            params={"per_page": request.per_page}
+            f"/repos/{request.owner}/{request.repo}/branches", params={"per_page": request.per_page}
         )
 
         if response.status_code == 403:
-            return BranchesResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded"
-            )
+            return BranchesResult(status=GitHubToolStatus.RATE_LIMITED, error="GitHub API rate limit exceeded")
 
         response.raise_for_status()
         data = response.json()
@@ -894,26 +805,17 @@ async def list_branches(
 
     except httpx.HTTPStatusError as e:
         return BranchesResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return BranchesResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return BranchesResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 @mcp.tool()
 @register_github_tool(
-    "get_commits",
-    "Get commits from a GitHub repository",
-    ["commits", "history", "log", "changes", "git"]
+    "get_commits", "Get commits from a GitHub repository", ["commits", "history", "log", "changes", "git"]
 )
-async def get_commits(
-    request: GetCommitsRequest,
-    ctx: Context[ServerSession, GitHubMCPContext]
-) -> CommitsResult:
+async def get_commits(request: GetCommitsRequest, ctx: Context[ServerSession, GitHubMCPContext]) -> CommitsResult:
     """
     Get commits from a GitHub repository.
 
@@ -930,10 +832,7 @@ async def get_commits(
     """
     if ctx.request_context.lifespan_context.enabled_tools:
         if "get_commits" not in ctx.request_context.lifespan_context.enabled_tools:
-            return CommitsResult(
-                status=GitHubToolStatus.ERROR,
-                error="Tool not enabled. Use --tools flag to enable."
-            )
+            return CommitsResult(status=GitHubToolStatus.ERROR, error="Tool not enabled. Use --tools flag to enable.")
 
     await ctx.info(f"Fetching commits: {request.owner}/{request.repo}")
 
@@ -946,16 +845,10 @@ async def get_commits(
         if request.path:
             params["path"] = request.path
 
-        response = await client.get(
-            f"/repos/{request.owner}/{request.repo}/commits",
-            params=params
-        )
+        response = await client.get(f"/repos/{request.owner}/{request.repo}/commits", params=params)
 
         if response.status_code == 403:
-            return CommitsResult(
-                status=GitHubToolStatus.RATE_LIMITED,
-                error="GitHub API rate limit exceeded"
-            )
+            return CommitsResult(status=GitHubToolStatus.RATE_LIMITED, error="GitHub API rate limit exceeded")
 
         response.raise_for_status()
         data = response.json()
@@ -978,17 +871,14 @@ async def get_commits(
 
     except httpx.HTTPStatusError as e:
         return CommitsResult(
-            status=GitHubToolStatus.ERROR,
-            error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
+            status=GitHubToolStatus.ERROR, error=f"HTTP {e.response.status_code}: {e.response.text[:200]}"
         )
     except Exception as e:
-        return CommitsResult(
-            status=GitHubToolStatus.ERROR,
-            error=str(e)
-        )
+        return CommitsResult(status=GitHubToolStatus.ERROR, error=str(e))
 
 
 # Dynamic Toolset Selection
+
 
 class DynamicToolsetManager:
     """
@@ -1003,11 +893,7 @@ class DynamicToolsetManager:
     def __init__(self):
         self.tool_definitions = TOOL_REGISTRY
 
-    def select_tools(
-        self,
-        task_description: str,
-        max_tools: int = 5
-    ) -> list[str]:
+    def select_tools(self, task_description: str, max_tools: int = 5) -> list[str]:
         """
         Select the most relevant tools for a given task.
 
@@ -1049,14 +935,17 @@ class DynamicToolsetManager:
         schemas = []
         for name in tool_names:
             if name in self.tool_definitions:
-                schemas.append({
-                    "name": name,
-                    "description": self.tool_definitions[name]["description"],
-                })
+                schemas.append(
+                    {
+                        "name": name,
+                        "description": self.tool_definitions[name]["description"],
+                    }
+                )
         return schemas
 
 
 # MCP Resource for Dynamic Toolsets
+
 
 @mcp.resource("github://tools/available")
 def get_available_tools() -> str:
@@ -1066,11 +955,7 @@ def get_available_tools() -> str:
     Returns a JSON list of tool names and descriptions.
     """
     return json.dumps(
-        [
-            {"name": name, "description": info["description"]}
-            for name, info in TOOL_REGISTRY.items()
-        ],
-        indent=2
+        [{"name": name, "description": info["description"]} for name, info in TOOL_REGISTRY.items()], indent=2
     )
 
 
@@ -1084,15 +969,18 @@ async def dynamic_tool_selection(ctx: Context[ServerSession, GitHubMCPContext]) 
     if not ctx.request_context.lifespan_context.dynamic_toolsets_enabled:
         return json.dumps({"error": "Dynamic toolsets not enabled. Use --dynamic-toolsets flag."})
 
-    manager = DynamicToolsetManager()
-    return json.dumps({
-        "enabled": True,
-        "available_tools": list(TOOL_REGISTRY.keys()),
-        "selection_method": "keyword_matching",
-    })
+    DynamicToolsetManager()
+    return json.dumps(
+        {
+            "enabled": True,
+            "available_tools": list(TOOL_REGISTRY.keys()),
+            "selection_method": "keyword_matching",
+        }
+    )
 
 
 # Main Entry Point
+
 
 def main():
     """Main entry point with argument parsing."""
@@ -1122,41 +1010,25 @@ Available tools:
   - get_repo_info       Get repository information
   - list_branches       List repository branches
   - get_commits         Get commits from a repository
-        """
+        """,
     )
 
     parser.add_argument(
-        "--tools",
-        nargs="+",
-        help="Space-separated list of tools to expose (default: all)",
-        metavar="TOOL"
+        "--tools", nargs="+", help="Space-separated list of tools to expose (default: all)", metavar="TOOL"
     )
 
-    parser.add_argument(
-        "--dynamic-toolsets",
-        action="store_true",
-        help="Enable ML-based dynamic tool selection"
-    )
+    parser.add_argument("--dynamic-toolsets", action="store_true", help="Enable ML-based dynamic tool selection")
 
     parser.add_argument(
         "--transport",
         choices=["stdio", "streamable-http"],
         default="stdio",
-        help="Transport protocol (default: stdio)"
+        help="Transport protocol (default: stdio)",
     )
 
-    parser.add_argument(
-        "--port",
-        type=int,
-        default=8000,
-        help="Port for HTTP transport (default: 8000)"
-    )
+    parser.add_argument("--port", type=int, default=8000, help="Port for HTTP transport (default: 8000)")
 
-    parser.add_argument(
-        "--host",
-        default="0.0.0.0",
-        help="Host for HTTP transport (default: 0.0.0.0)"
-    )
+    parser.add_argument("--host", default="0.0.0.0", help="Host for HTTP transport (default: 0.0.0.0)")
 
     args = parser.parse_args()
 
@@ -1165,8 +1037,7 @@ Available tools:
         valid_tools = set(TOOL_REGISTRY.keys())
         for tool in args.tools:
             if tool not in valid_tools:
-                print(f"Warning: Unknown tool '{tool}'")
-                print(f"Available: {', '.join(valid_tools)}")
+                pass
         os.environ["_GITHUB_MCP_TOOLS"] = ",".join(args.tools)
     else:
         os.environ["_GITHUB_MCP_TOOLS"] = ""
@@ -1174,24 +1045,8 @@ Available tools:
     os.environ["_GITHUB_MCP_DYNAMIC"] = "true" if args.dynamic_toolsets else "false"
 
     # Print banner
-    all_tools = list(TOOL_REGISTRY.keys())
-    enabled = args.tools if args.tools else all_tools
+    list(TOOL_REGISTRY.keys())
 
-    print(f"""
-====================================================
-       GitHub MCP Server - Dynamic Toolsets
-====================================================
-
-Configuration:
-  Transport: {args.transport}
-  Dynamic Toolsets: {'Enabled' if args.dynamic_toolsets else 'Disabled'}
-  GitHub Token: {'Set' if GITHUB_TOKEN else 'Not Set (rate limited)'}
-
-Enabled Tools ({len(enabled)}/{len(all_tools)}):
-  {chr(10).join(f'  - {t}' for t in enabled)}
-
-Starting server...
-""")
 
     # Run server
     if args.transport == "streamable-http":

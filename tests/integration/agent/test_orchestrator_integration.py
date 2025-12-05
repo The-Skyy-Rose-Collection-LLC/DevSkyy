@@ -255,10 +255,7 @@ class TestRegistryWorkflows:
             ]
         )
 
-        result = await registry.execute_workflow(
-            "scan_and_fix",
-            {"target": "test.py"}
-        )
+        result = await registry.execute_workflow("scan_and_fix", {"target": "test.py"})
 
         assert result["workflow"] == "scan_and_fix"
         assert "scan" in result
@@ -276,10 +273,7 @@ class TestRegistryWorkflows:
             ]
         )
 
-        result = await registry.execute_workflow(
-            "content_pipeline",
-            {"topic": "AI Testing"}
-        )
+        result = await registry.execute_workflow("content_pipeline", {"topic": "AI Testing"})
 
         assert result["workflow"] == "content_pipeline"
         assert "results" in result
@@ -297,10 +291,7 @@ class TestRegistryWorkflows:
             ]
         )
 
-        result = await registry.execute_workflow(
-            "ecommerce_order",
-            {"order_id": "order_123"}
-        )
+        result = await registry.execute_workflow("ecommerce_order", {"order_id": "order_123"})
 
         assert result["workflow"] == "ecommerce_order"
         assert "results" in result

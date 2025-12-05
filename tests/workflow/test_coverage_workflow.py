@@ -123,7 +123,7 @@ with open('coverage.json', 'r') as f:
     data = json.load(f)
     coverage = float(data['totals']['percent_covered_display'])
     threshold = 90.0
-    
+
     if coverage >= threshold:
         print(f"PASS: {coverage}% >= {threshold}%")
         sys.exit(0)
@@ -159,7 +159,7 @@ with open('coverage.json', 'r') as f:
     data = json.load(f)
     coverage = float(data['totals']['percent_covered_display'])
     threshold = 90.0
-    
+
     if coverage >= threshold:
         print(f"PASS: {coverage}% >= {threshold}%")
         sys.exit(0)

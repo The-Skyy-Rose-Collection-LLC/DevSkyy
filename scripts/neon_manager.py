@@ -43,13 +43,11 @@ class NeonManager:
 
         if not self.api_key:
             raise ValueError(
-                "NEON_API_KEY not set in environment. "
-                "Get it from: https://console.neon.tech/app/settings/api-keys"
+                "NEON_API_KEY not set in environment. " "Get it from: https://console.neon.tech/app/settings/api-keys"
             )
         if not self.project_id:
             raise ValueError(
-                "NEON_PROJECT_ID not set in environment. "
-                "Find it in your Neon dashboard URL or project settings"
+                "NEON_PROJECT_ID not set in environment. " "Find it in your Neon dashboard URL or project settings"
             )
 
         self.client = NeonAPI(api_key=self.api_key)
@@ -236,7 +234,7 @@ def main():
 
     command = sys.argv[1]
 
-    if command == "help" or command == "--help" or command == "-h":
+    if command in {"help", "--help", "-h"}:
         print_help()
         return
 

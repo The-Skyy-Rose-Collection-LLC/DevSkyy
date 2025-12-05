@@ -35,7 +35,7 @@ class TestAgentUpgradeSystem:
         """Test upgrade catalog has correct structure"""
         system = AgentUpgradeSystem(mock_session)
 
-        for agent_type, upgrade in system.upgrade_catalog.items():
+        for upgrade in system.upgrade_catalog.values():
             assert "name" in upgrade
             assert "description" in upgrade
             assert "verification_methods" in upgrade
@@ -161,7 +161,7 @@ class TestAgentUpgradeSystem:
         """Test all upgrades have expected improvement values"""
         system = AgentUpgradeSystem(mock_session)
 
-        for agent_type, upgrade in system.upgrade_catalog.items():
+        for upgrade in system.upgrade_catalog.values():
             improvement = upgrade["expected_improvement"]
 
             # Should be between 0 and 1 (0% to 100%)

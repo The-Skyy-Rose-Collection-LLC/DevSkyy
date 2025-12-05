@@ -243,21 +243,23 @@ connections:
     enabled_clients:
       - "DevSkyy Mobile Application"
 
-  # GitHub Social Connection (for developers)
+  # GitHub Social Connection (for developers and Arcade integration)
   - name: "github"
     strategy: "github"
-    
+
     options:
       client_id: "@@GITHUB_CLIENT_ID@@"
       client_secret: "@@GITHUB_CLIENT_SECRET@@"
-      
+
       # Scopes
       scope:
         - "user:email"
         - "read:user"
-    
+        - "repo"  # For Arcade integration
+
     enabled_clients:
       - "DevSkyy Admin Dashboard"
+      - "Arcade GitHub Integration"
 
   # LinkedIn Social Connection (for business users)
   - name: "linkedin"

@@ -28,7 +28,7 @@ import sys
 from typing import Any
 
 
-sys.path.insert(0, '/home/user/DevSkyy')
+sys.path.insert(0, "/home/user/DevSkyy")
 from agent.unified_orchestrator import ExecutionPriority, Task, UnifiedMCPOrchestrator
 
 
@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 
 class FashionAssetType(str, Enum):
     """Types of fashion assets"""
+
     HANDBAG = "handbag"
     SHOES = "shoes"
     JEWELRY = "jewelry"
@@ -58,6 +59,7 @@ class FashionAssetType(str, Enum):
 
 class AIModelProvider(str, Enum):
     """AI model providers"""
+
     ANTHROPIC = "anthropic"
     OPENAI = "openai"
     STABILITY = "stability"
@@ -77,6 +79,7 @@ class AIModelProvider(str, Enum):
 @dataclass
 class AIModelConfig:
     """Configuration for an AI model"""
+
     provider: AIModelProvider
     model_name: str
     reason: str
@@ -89,6 +92,7 @@ class AIModelConfig:
 @dataclass
 class ProductDescription:
     """Product description output"""
+
     title: str
     short_description: str
     long_description: str
@@ -102,6 +106,7 @@ class ProductDescription:
 @dataclass
 class Asset3D:
     """3D asset output"""
+
     model_url: str
     format: str
     polycount: int
@@ -113,6 +118,7 @@ class Asset3D:
 @dataclass
 class AvatarModel:
     """Avatar model output"""
+
     avatar_url: str
     avatar_id: str
     format: str
@@ -155,10 +161,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         self._load_fashion_config()
 
         # Initialize base orchestrator
-        super().__init__(
-            config_path=str(self.fashion_config_path),
-            max_concurrent_tasks=max_concurrent_tasks
-        )
+        super().__init__(config_path=str(self.fashion_config_path), max_concurrent_tasks=max_concurrent_tasks)
 
         # Initialize AI models
         self._initialize_ai_models()
@@ -168,7 +171,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
             extra={
                 "ai_models": len(self.ai_models),
                 "brand": self.brand_config.get("brand_name"),
-            }
+            },
         )
 
     # ========================================================================
@@ -264,7 +267,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
         task_rules = selection_rules.get(task_type, {})
 
         # Get preferred models from rules
-        preferred_models = task_rules.get("preferred_models", [])
+        task_rules.get("preferred_models", [])
 
         # Try primary model first
         primary_key = f"{task_type}_primary"
@@ -279,7 +282,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
                         "provider": model.provider.value,
                         "model": model.model_name,
                         "reason": model.reason,
-                    }
+                    },
                 )
                 return model
 
@@ -295,7 +298,7 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
                         extra={
                             "provider": model.provider.value,
                             "model": model.model_name,
-                        }
+                        },
                     )
                     return model
 
@@ -486,7 +489,8 @@ class FashionOrchestrator(UnifiedMCPOrchestrator):
             input_data={
                 "garment_3d_model": garment_3d_model,
                 "avatar_3d_model": avatar_3d_model,
-                "fabric_properties": fabric_properties or {
+                "fabric_properties": fabric_properties
+                or {
                     "material_type": "silk",
                     "weight_gsm": 100,
                     "stretch_percentage": 5,
@@ -667,30 +671,17 @@ async def main():
     # Initialize orchestrator
     orchestrator = FashionOrchestrator()
 
-    print("\n" + "=" * 80)
-    print("👗 THE SKYY ROSE COLLECTION - FASHION ORCHESTRATOR")
-    print("=" * 80 + "\n")
 
     # Show brand info
-    brand_info = orchestrator.get_brand_info()
-    print(f"📋 Brand: {brand_info.get('brand_name')}")
-    print(f"   Categories: {', '.join(brand_info.get('product_categories', []))}")
-    print()
+    orchestrator.get_brand_info()
 
     # Show AI models
-    print("🤖 Available AI Models:")
-    for task_type, model in orchestrator.get_available_ai_models().items():
-        print(f"   - {task_type}:")
-        print(f"     Provider: {model.provider.value}")
-        print(f"     Model: {model.model_name}")
-        print(f"     Source: {model.verified_source[:50]}..." if len(model.verified_source) > 50 else f"     Source: {model.verified_source}")
-    print()
+    for _model in orchestrator.get_available_ai_models().values():
+        pass
 
     # Example 1: Generate product description
-    print("📝 Example 1: Generating Product Description")
-    print("-" * 80)
 
-    desc_task = await orchestrator.create_product_description_task(
+    await orchestrator.create_product_description_task(
         product_name="Midnight Rose Handbag",
         product_type="handbag",
         materials=["Italian leather", "gold-plated hardware"],
@@ -700,16 +691,10 @@ async def main():
         tone="elegant",
     )
 
-    print(f"✅ Task created: {desc_task.name}")
-    print(f"   AI Model: {desc_task.parameters.get('ai_model')}")
-    print(f"   Provider: {desc_task.parameters.get('provider')}")
-    print()
 
     # Example 2: Generate 3D asset
-    print("🎨 Example 2: Generating 3D Fashion Asset")
-    print("-" * 80)
 
-    asset_task = await orchestrator.create_3d_asset_task(
+    await orchestrator.create_3d_asset_task(
         asset_type=FashionAssetType.HANDBAG,
         style_reference="Luxury designer handbag with structured silhouette",
         dimensions={"width_cm": 30, "height_cm": 20, "depth_cm": 10},
@@ -717,16 +702,10 @@ async def main():
         polycount="high",
     )
 
-    print(f"✅ Task created: {asset_task.name}")
-    print(f"   AI Model: {asset_task.parameters.get('ai_model')}")
-    print(f"   Source: {asset_task.parameters.get('verified_source')}")
-    print()
 
     # Example 3: Generate avatar
-    print("👤 Example 3: Generating Avatar")
-    print("-" * 80)
 
-    avatar_task = await orchestrator.create_avatar_task(
+    await orchestrator.create_avatar_task(
         gender="female",
         body_measurements={
             "height_cm": 175,
@@ -739,28 +718,16 @@ async def main():
         rigging=True,
     )
 
-    print(f"✅ Task created: {avatar_task.name}")
-    print(f"   AI Model: {avatar_task.parameters.get('ai_model')}")
-    print(f"   Provider: {avatar_task.parameters.get('provider')}")
-    print()
 
     # Show verifiable sources
-    print("\n" + "=" * 80)
-    print("📚 Verifiable Sources (Truth Protocol Compliance)")
-    print("-" * 80)
 
     sources = orchestrator.get_verifiable_sources()
-    for category, tools in sources.items():
-        print(f"\n{category.replace('_', ' ').title()}:")
-        for tool_name, tool_sources in tools.items():
-            print(f"  • {tool_name}:")
-            for source_type, url in tool_sources.items():
+    for tools in sources.values():
+        for tool_sources in tools.values():
+            for source_type in tool_sources:
                 if source_type != "technology":
-                    print(f"    - {source_type}: {url}")
+                    pass
 
-    print("\n" + "=" * 80)
-    print("✨ DEMONSTRATION COMPLETE")
-    print("=" * 80 + "\n")
 
 
 # Global orchestrator instance
@@ -770,17 +737,6 @@ fashion_orchestrator = FashionOrchestrator()
 if __name__ == "__main__":
     import sys
 
-    print(
-        """
-    ╔════════════════════════════════════════════════════════════════════════════╗
-    ║                                                                            ║
-    ║        👗 The Skyy Rose Collection - Fashion Orchestrator v3.0.0          ║
-    ║                                                                            ║
-    ║        AI Agent Selection + 3D Fashion + Virtual Try-On                   ║
-    ║                                                                            ║
-    ╚════════════════════════════════════════════════════════════════════════════╝
-    """
-    )
 
     logging.basicConfig(
         level=logging.INFO,
@@ -790,12 +746,9 @@ if __name__ == "__main__":
 
     try:
         asyncio.run(main())
-        print("\n✅ Demonstration completed successfully!\n")
         sys.exit(0)
     except KeyboardInterrupt:
-        print("\n\n⚠️  Demonstration interrupted by user\n")
         sys.exit(1)
     except Exception as e:
-        print(f"\n\n❌ Demonstration failed: {e}\n")
         logger.error(f"Demonstration error: {e}", exc_info=True)
         sys.exit(1)

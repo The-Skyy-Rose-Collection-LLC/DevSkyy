@@ -26,13 +26,16 @@ import json
 import logging
 from pathlib import Path
 import tempfile
-import time
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import numpy as np
 import pytest
 
+from ml.agent_deployment_system import (
+    DeploymentEnvironment,
+    DeploymentStrategy,
+)
 from ml.agent_finetuning_system import (
     AgentCategory,
     AgentPerformanceSnapshot,
@@ -41,12 +44,7 @@ from ml.agent_finetuning_system import (
     FinetuningProvider,
     FinetuningStatus,
 )
-from ml.model_registry import ModelRegistry, ModelVersion, ModelMetadata
-from ml.agent_deployment_system import (
-    DeploymentEnvironment,
-    DeploymentStrategy,
-    ModelDeployment,
-)
+from ml.model_registry import ModelMetadata, ModelRegistry
 
 
 logger = logging.getLogger(__name__)
@@ -131,7 +129,9 @@ class TestDataCollectionAndPreparation:
         test_size = int(total_samples * finetuning_dataset.test_split)
 
         assert train_size + val_size + test_size <= total_samples
-        assert finetuning_dataset.train_split + finetuning_dataset.validation_split + finetuning_dataset.test_split == 1.0
+        assert (
+            finetuning_dataset.train_split + finetuning_dataset.validation_split + finetuning_dataset.test_split == 1.0
+        )
 
     def test_dataset_format_validation(self, finetuning_dataset: FinetuningDataset):
         """Test dataset format is valid for training."""
@@ -142,8 +142,7 @@ class TestDataCollectionAndPreparation:
         """Test filtering out low-quality training samples."""
         quality_threshold = 0.7
         high_quality_samples = [
-            s for s in sample_training_data
-            if s.success and s.performance_score >= quality_threshold
+            s for s in sample_training_data if s.success and s.performance_score >= quality_threshold
         ]
 
         assert len(high_quality_samples) < len(sample_training_data)
@@ -156,7 +155,7 @@ class TestDataCollectionAndPreparation:
         category_counts = Counter(s.category for s in sample_training_data)
 
         assert len(category_counts) >= 1
-        for category, count in category_counts.items():
+        for count in category_counts.values():
             assert count > 0
 
     def test_augment_training_data(self, sample_training_data: list[AgentPerformanceSnapshot]):
@@ -247,7 +246,7 @@ class TestModelTraining:
 
         with patch.object(finetuning_system, "get_job_status", side_effect=mock_get_job_status):
             for _ in range(4):
-                status = await finetuning_system.get_job_status(job.job_id)
+                await finetuning_system.get_job_status(job.job_id)
                 await asyncio.sleep(0.1)
 
         assert len(progress_updates) == 4
@@ -325,7 +324,7 @@ class TestModelTraining:
         """Test hyperparameter tuning for optimal performance."""
         from ml.agent_finetuning_system import AgentFinetuningSystem
 
-        finetuning_system = AgentFinetuningSystem()
+        AgentFinetuningSystem()
 
         hyperparameter_configs = [
             {"n_epochs": 2, "learning_rate_multiplier": 0.05},
@@ -589,8 +588,12 @@ class TestModelDeployment:
             metrics={"accuracy": 0.95},
         )
 
-        await deployment_system.deploy_model(old_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN)
-        deployment = await deployment_system.deploy_model(new_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN)
+        await deployment_system.deploy_model(
+            old_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN
+        )
+        deployment = await deployment_system.deploy_model(
+            new_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN
+        )
 
         assert deployment.model_id == "model_green"
         assert deployment.previous_model_id == "model_blue"
@@ -773,8 +776,12 @@ class TestRollbackAndRecovery:
             metrics={"accuracy": 0.95},
         )
 
-        await deployment_system.deploy_model(stable_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN)
-        deployment = await deployment_system.deploy_model(degraded_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN)
+        await deployment_system.deploy_model(
+            stable_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN
+        )
+        deployment = await deployment_system.deploy_model(
+            degraded_model, DeploymentEnvironment.PRODUCTION, DeploymentStrategy.BLUE_GREEN
+        )
 
         deployment_system.enable_auto_rollback(
             deployment_id=deployment.deployment_id,

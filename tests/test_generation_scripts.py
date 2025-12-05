@@ -37,16 +37,15 @@ class TestOpenAPIGeneration:
             },
         }
 
-        with patch.dict(sys.modules, {"main": MagicMock(app=mock_app)}):
-            with patch("builtins.open", mock_open()) as mock_file:
-                with patch("pathlib.Path.parent", new_callable=lambda: tmp_path):
-                    # Import and execute the script logic
-                    openapi_schema = mock_app.openapi()
+        with patch.dict(sys.modules, {"main": MagicMock(app=mock_app)}), patch("builtins.open", mock_open()):
+            with patch("pathlib.Path.parent", new_callable=lambda: tmp_path):
+                # Import and execute the script logic
+                openapi_schema = mock_app.openapi()
 
-                    # Verify structure
-                    assert openapi_schema["openapi"] == "3.1.0"
-                    assert openapi_schema["info"]["version"] == "5.2.1"
-                    assert len(openapi_schema["paths"]) >= 2
+                # Verify structure
+                assert openapi_schema["openapi"] == "3.1.0"
+                assert openapi_schema["info"]["version"] == "5.2.1"
+                assert len(openapi_schema["paths"]) >= 2
 
     def test_openapi_generation_fallback(self, tmp_path):
         """Test OpenAPI generation fallback when FastAPI not available"""
@@ -257,7 +256,7 @@ class TestScriptErrorHandling:
 
     def test_openapi_import_error_handling(self):
         """Test graceful handling of import errors"""
-        with patch.dict(sys.modules, {"main": None}), patch("builtins.print") as mock_print:
+        with patch.dict(sys.modules, {"main": None}), patch("builtins.print"):
             try:
                 # This would normally raise ImportError
                 raise ImportError("No module named 'fastapi'")
@@ -290,10 +289,7 @@ class TestScriptErrorHandling:
         assert not req_file.exists()
 
         # Reading should fail gracefully
-        if req_file.exists():
-            content = req_file.read_text()
-        else:
-            content = ""
+        content = req_file.read_text() if req_file.exists() else ""
 
         assert content == ""
 

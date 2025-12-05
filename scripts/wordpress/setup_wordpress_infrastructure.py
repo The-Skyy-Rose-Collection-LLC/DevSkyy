@@ -52,7 +52,7 @@ class WordPressInfrastructureSetup:
             "WORDPRESS_CLIENT_SECRET",
             "WORDPRESS_REDIRECT_URI",
             "WORDPRESS_TOKEN_URL",
-            "WORDPRESS_API_BASE"
+            "WORDPRESS_API_BASE",
         ]
 
         all_configured = all(os.getenv(var) for var in required_oauth)
@@ -60,7 +60,7 @@ class WordPressInfrastructureSetup:
         if all_configured:
             logger.info("✅ WordPress OAuth 2.0 credentials configured")
         else:
-            missing = [var for var in required_oauth if not os.getenv(var)]
+            [var for var in required_oauth if not os.getenv(var)]
             logger.warning("⚠️  Missing one or more required WordPress OAuth credentials.")
 
         return all_configured
@@ -94,8 +94,8 @@ class WordPressInfrastructureSetup:
                     "description": "Create WordPress blog posts",
                     "auth_type": "oauth2",
                     "scope": "posts",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
             {
                 "tool_name": "wordpress_update_post",
@@ -105,8 +105,8 @@ class WordPressInfrastructureSetup:
                     "description": "Update existing WordPress posts",
                     "auth_type": "oauth2",
                     "scope": "posts",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
             {
                 "tool_name": "wordpress_create_page",
@@ -116,8 +116,8 @@ class WordPressInfrastructureSetup:
                     "description": "Create WordPress pages",
                     "auth_type": "oauth2",
                     "scope": "posts",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
             {
                 "tool_name": "wordpress_get_posts",
@@ -127,10 +127,9 @@ class WordPressInfrastructureSetup:
                     "description": "Retrieve WordPress posts",
                     "auth_type": "oauth2",
                     "scope": "posts",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
-
             # Media Management
             {
                 "tool_name": "wordpress_upload_media",
@@ -140,8 +139,8 @@ class WordPressInfrastructureSetup:
                     "description": "Upload media to WordPress",
                     "auth_type": "oauth2",
                     "scope": "media",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
             {
                 "tool_name": "wordpress_get_media",
@@ -151,10 +150,9 @@ class WordPressInfrastructureSetup:
                     "description": "Retrieve WordPress media",
                     "auth_type": "oauth2",
                     "scope": "media",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
-
             # Theme & Customization
             {
                 "tool_name": "wordpress_get_theme_info",
@@ -164,8 +162,8 @@ class WordPressInfrastructureSetup:
                     "description": "Get WordPress theme information",
                     "auth_type": "oauth2",
                     "scope": "sites",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
             {
                 "tool_name": "wordpress_customize_theme",
@@ -175,10 +173,9 @@ class WordPressInfrastructureSetup:
                     "description": "Customize WordPress theme",
                     "auth_type": "oauth2",
                     "scope": "sites",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
-
             # Site Management
             {
                 "tool_name": "wordpress_get_site_info",
@@ -188,8 +185,8 @@ class WordPressInfrastructureSetup:
                     "description": "Get WordPress site information",
                     "auth_type": "oauth2",
                     "scope": "sites",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
             {
                 "tool_name": "wordpress_get_site_stats",
@@ -199,10 +196,9 @@ class WordPressInfrastructureSetup:
                     "description": "Get WordPress site statistics",
                     "auth_type": "oauth2",
                     "scope": "stats",
-                    "category": "WORDPRESS_CMS"
-                }
+                    "category": "WORDPRESS_CMS",
+                },
             },
-
             # WooCommerce Integration
             {
                 "tool_name": "wordpress_woocommerce_products",
@@ -212,8 +208,8 @@ class WordPressInfrastructureSetup:
                     "description": "Manage WooCommerce products",
                     "auth_type": "application_password",
                     "scope": "woocommerce",
-                    "category": "ECOMMERCE"
-                }
+                    "category": "ECOMMERCE",
+                },
             },
             {
                 "tool_name": "wordpress_woocommerce_orders",
@@ -223,10 +219,9 @@ class WordPressInfrastructureSetup:
                     "description": "Manage WooCommerce orders",
                     "auth_type": "application_password",
                     "scope": "woocommerce",
-                    "category": "ECOMMERCE"
-                }
+                    "category": "ECOMMERCE",
+                },
             },
-
             # SEO & Optimization
             {
                 "tool_name": "wordpress_yoast_seo",
@@ -236,10 +231,9 @@ class WordPressInfrastructureSetup:
                     "description": "Manage Yoast SEO settings",
                     "auth_type": "application_password",
                     "scope": "seo",
-                    "category": "MARKETING_BRAND"
-                }
+                    "category": "MARKETING_BRAND",
+                },
             },
-
             # Divi Builder
             {
                 "tool_name": "wordpress_divi_builder",
@@ -249,9 +243,9 @@ class WordPressInfrastructureSetup:
                     "description": "Manage Divi Builder layouts",
                     "auth_type": "application_password",
                     "scope": "divi",
-                    "category": "WORDPRESS_CMS"
-                }
-            }
+                    "category": "WORDPRESS_CMS",
+                },
+            },
         ]
 
         # Register each tool
@@ -260,7 +254,7 @@ class WordPressInfrastructureSetup:
                 tool_name=tool["tool_name"],
                 tool_type=tool["tool_type"],
                 rate_limit=tool["rate_limit"],
-                metadata=tool["metadata"]
+                metadata=tool["metadata"],
             )
             logger.info(f"   ✓ Registered: {tool['tool_name']}")
 
@@ -276,26 +270,17 @@ class WordPressInfrastructureSetup:
             {
                 "resource_type": ResourceType.API_QUOTA,
                 "amount": 10000.0,  # 10k requests per hour
-                "unit": "requests/hour"
+                "unit": "requests/hour",
             },
-            {
-                "resource_type": ResourceType.STORAGE,
-                "amount": 50.0,  # 50 GB media storage
-                "unit": "GB"
-            },
-            {
-                "resource_type": ResourceType.MEMORY,
-                "amount": 2.0,  # 2 GB for WordPress operations
-                "unit": "GB"
-            }
+            {"resource_type": ResourceType.STORAGE, "amount": 50.0, "unit": "GB"},  # 50 GB media storage
+            {"resource_type": ResourceType.MEMORY, "amount": 2.0, "unit": "GB"},  # 2 GB for WordPress operations
         ]
 
         for resource in resources:
-            self.validator.register_resource(
-                resource_type=resource["resource_type"],
-                amount=resource["amount"]
+            self.validator.register_resource(resource_type=resource["resource_type"], amount=resource["amount"])
+            logger.info(
+                f"   ✓ Registered: {resource['resource_type'].value} ({resource['amount']} {resource['unit']})"
             )
-            logger.info(f"   ✓ Registered: {resource['resource_type'].value} ({resource['amount']} {resource['unit']})")
 
         logger.info(f"✅ Registered {len(resources)} WordPress resources")
 
@@ -337,18 +322,27 @@ class WordPressInfrastructureSetup:
                 "supporting_agents": ["brand_intelligence", "seo_optimizer"],
                 "required_tools": [
                     {"tool_name": "wordpress_create_page", "tool_type": "api", "estimated_calls": 1, "required": True},
-                    {"tool_name": "wordpress_divi_builder", "tool_type": "api", "estimated_calls": 3, "required": True},
-                    {"tool_name": "wordpress_upload_media", "tool_type": "api", "estimated_calls": 5, "required": False},
-                    {"tool_name": "wordpress_yoast_seo", "tool_type": "api", "estimated_calls": 1, "required": True}
+                    {
+                        "tool_name": "wordpress_divi_builder",
+                        "tool_type": "api",
+                        "estimated_calls": 3,
+                        "required": True,
+                    },
+                    {
+                        "tool_name": "wordpress_upload_media",
+                        "tool_type": "api",
+                        "estimated_calls": 5,
+                        "required": False,
+                    },
+                    {"tool_name": "wordpress_yoast_seo", "tool_type": "api", "estimated_calls": 1, "required": True},
                 ],
                 "required_resources": [
                     {"resource_type": "API_QUOTA", "amount": 20.0, "unit": "requests"},
-                    {"resource_type": "STORAGE", "amount": 0.5, "unit": "GB"}
+                    {"resource_type": "STORAGE", "amount": 0.5, "unit": "GB"},
                 ],
                 "max_budget_usd": 2.0,
-                "estimated_tokens": 15000
+                "estimated_tokens": 15000,
             },
-
             "optimize_woocommerce_products": {
                 "job_name": "Optimize WooCommerce Products",
                 "job_description": "Audit and optimize all WooCommerce products for SEO, descriptions, images, and conversion",
@@ -356,18 +350,22 @@ class WordPressInfrastructureSetup:
                 "primary_agent": "ecommerce_agent",
                 "supporting_agents": ["seo_optimizer", "brand_intelligence"],
                 "required_tools": [
-                    {"tool_name": "wordpress_woocommerce_products", "tool_type": "api", "estimated_calls": 50, "required": True},
+                    {
+                        "tool_name": "wordpress_woocommerce_products",
+                        "tool_type": "api",
+                        "estimated_calls": 50,
+                        "required": True,
+                    },
                     {"tool_name": "wordpress_get_media", "tool_type": "api", "estimated_calls": 100, "required": True},
-                    {"tool_name": "wordpress_yoast_seo", "tool_type": "api", "estimated_calls": 50, "required": True}
+                    {"tool_name": "wordpress_yoast_seo", "tool_type": "api", "estimated_calls": 50, "required": True},
                 ],
                 "required_resources": [
                     {"resource_type": "API_QUOTA", "amount": 300.0, "unit": "requests"},
-                    {"resource_type": "MEMORY", "amount": 1.0, "unit": "GB"}
+                    {"resource_type": "MEMORY", "amount": 1.0, "unit": "GB"},
                 ],
                 "max_budget_usd": 5.0,
-                "estimated_tokens": 50000
+                "estimated_tokens": 50000,
             },
-
             "update_blog_content": {
                 "job_name": "Update Blog Content for SEO",
                 "job_description": "Audit and update existing blog posts for SEO optimization, readability, and brand consistency",
@@ -376,16 +374,18 @@ class WordPressInfrastructureSetup:
                 "supporting_agents": ["brand_intelligence", "content_writer"],
                 "required_tools": [
                     {"tool_name": "wordpress_get_posts", "tool_type": "api", "estimated_calls": 1, "required": True},
-                    {"tool_name": "wordpress_update_post", "tool_type": "api", "estimated_calls": 20, "required": True},
-                    {"tool_name": "wordpress_yoast_seo", "tool_type": "api", "estimated_calls": 20, "required": True}
+                    {
+                        "tool_name": "wordpress_update_post",
+                        "tool_type": "api",
+                        "estimated_calls": 20,
+                        "required": True,
+                    },
+                    {"tool_name": "wordpress_yoast_seo", "tool_type": "api", "estimated_calls": 20, "required": True},
                 ],
-                "required_resources": [
-                    {"resource_type": "API_QUOTA", "amount": 100.0, "unit": "requests"}
-                ],
+                "required_resources": [{"resource_type": "API_QUOTA", "amount": 100.0, "unit": "requests"}],
                 "max_budget_usd": 3.0,
-                "estimated_tokens": 35000
+                "estimated_tokens": 35000,
             },
-
             "monitor_site_performance": {
                 "job_name": "WordPress Site Performance Monitoring",
                 "job_description": "Monitor WordPress site performance, analyze metrics, and generate optimization recommendations",
@@ -393,18 +393,26 @@ class WordPressInfrastructureSetup:
                 "primary_agent": "performance_monitor",
                 "supporting_agents": ["security_compliance", "wordpress_specialist"],
                 "required_tools": [
-                    {"tool_name": "wordpress_get_site_stats", "tool_type": "api", "estimated_calls": 1, "required": True},
-                    {"tool_name": "wordpress_get_site_info", "tool_type": "api", "estimated_calls": 1, "required": True}
+                    {
+                        "tool_name": "wordpress_get_site_stats",
+                        "tool_type": "api",
+                        "estimated_calls": 1,
+                        "required": True,
+                    },
+                    {
+                        "tool_name": "wordpress_get_site_info",
+                        "tool_type": "api",
+                        "estimated_calls": 1,
+                        "required": True,
+                    },
                 ],
-                "required_resources": [
-                    {"resource_type": "API_QUOTA", "amount": 10.0, "unit": "requests"}
-                ],
+                "required_resources": [{"resource_type": "API_QUOTA", "amount": 10.0, "unit": "requests"}],
                 "max_budget_usd": 1.0,
-                "estimated_tokens": 8000
-            }
+                "estimated_tokens": 8000,
+            },
         }
 
-        for job_key, job_data in examples.items():
+        for job_data in examples.values():
             logger.info(f"\n   📌 {job_data['job_name']}")
             logger.info(f"      Category: {job_data['category']}")
             logger.info(f"      Tools: {len(job_data['required_tools'])}")
@@ -413,6 +421,7 @@ class WordPressInfrastructureSetup:
 
         # Save examples to file
         import json
+
         examples_file = project_root / "docs" / "wordpress_deployment_examples.json"
         with open(examples_file, "w") as f:
             json.dump(examples, f, indent=2)
@@ -506,7 +515,7 @@ class WordPressInfrastructureSetup:
             "has_credentials": has_credentials,
             "readiness_score": readiness,
             "total_tools_registered": len([t for t in self.validator.available_tools if t.startswith("wordpress_")]),
-            "example_jobs_created": len(examples)
+            "example_jobs_created": len(examples),
         }
 
 

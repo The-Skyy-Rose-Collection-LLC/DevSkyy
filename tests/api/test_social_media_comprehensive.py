@@ -96,7 +96,7 @@ class TestSocialPostCreation:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"]
         assert "post_id" in data
         assert data["status"] in ["published", "scheduled", "draft"]
         assert len(data["platform_results"]) == 2
@@ -132,7 +132,7 @@ class TestSocialPostCreation:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"]
 
     @pytest.mark.asyncio
     async def test_create_scheduled_post(self, client: AsyncClient, auth_token: str):
@@ -447,7 +447,7 @@ class TestPlatformConnection:
 
         assert response.status_code == 200
         data = response.json()
-        assert data["success"] == True
+        assert data["success"]
         assert data["platform"] == "twitter"
         assert "connection_id" in data
 

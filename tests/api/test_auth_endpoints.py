@@ -220,9 +220,7 @@ class TestLoginEndpoint:
 
             # Assertions
             assert result == mock_tokens
-            mock_user_manager.authenticate_user.assert_called_once_with(
-                "test@example.com", "TestPassword123!"
-            )
+            mock_user_manager.authenticate_user.assert_called_once_with("test@example.com", "TestPassword123!")
 
     @pytest.mark.asyncio
     async def test_login_invalid_credentials(self, mock_user_manager):

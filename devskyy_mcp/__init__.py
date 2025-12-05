@@ -12,6 +12,7 @@ FastMCP Discovery:
 
 from devskyy_mcp.optimization_server import mcp, run_server
 
+
 # FastMCP auto-discovery aliases
 # FastMCP looks for objects named: mcp, server, or app
 server = mcp
@@ -28,4 +29,4 @@ def create_server():
     return mcp
 
 
-__all__ = ["mcp", "server", "app", "run_server", "create_server"]
+__all__ = ["app", "create_server", "mcp", "run_server", "server"]

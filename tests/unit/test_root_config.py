@@ -31,10 +31,7 @@ def root_config_module():
     This avoids conflicts with the config/ package by using importlib.util
     to load the file directly.
     """
-    spec = importlib.util.spec_from_file_location(
-        "root_config",
-        "/home/user/DevSkyy/config.py"
-    )
+    spec = importlib.util.spec_from_file_location("root_config", "/home/user/DevSkyy/config.py")
     module = importlib.util.module_from_spec(spec)
 
     # Set required SECRET_KEY before loading to avoid ValueError
@@ -92,10 +89,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SECRET_KEY", test_key)
 
         # Reload module to pick up new env var
-        spec = importlib.util.spec_from_file_location(
-            "root_config_test",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_test", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -106,10 +100,7 @@ class TestConfigBaseClass:
         monkeypatch.delenv("SECRET_KEY", raising=False)
 
         with pytest.raises(ValueError, match="SECRET_KEY environment variable must be set"):
-            spec = importlib.util.spec_from_file_location(
-                "root_config_error",
-                "/home/user/DevSkyy/config.py"
-            )
+            spec = importlib.util.spec_from_file_location("root_config_error", "/home/user/DevSkyy/config.py")
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
@@ -127,10 +118,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SECRET_KEY", "test-key")
         monkeypatch.setenv("DATABASE_URL", test_url)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_db",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_db", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -139,10 +127,7 @@ class TestConfigBaseClass:
     def test_database_url_default_value(self, root_config_module, clean_env):
         """Test DATABASE_URL defaults to SQLite"""
         # Reload without DATABASE_URL set
-        spec = importlib.util.spec_from_file_location(
-            "root_config_default_db",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_default_db", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -154,10 +139,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SECRET_KEY", "test-key")
         monkeypatch.setenv("OPENAI_API_KEY", test_key)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_openai",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_openai", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -165,10 +147,7 @@ class TestConfigBaseClass:
 
     def test_openai_api_key_optional(self, root_config_module, clean_env):
         """Test OPENAI_API_KEY is optional (can be None)"""
-        spec = importlib.util.spec_from_file_location(
-            "root_config_no_openai",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_no_openai", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -180,10 +159,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SECRET_KEY", "test-key")
         monkeypatch.setenv("STRIPE_API_KEY", test_key)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_stripe",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_stripe", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -197,10 +173,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SKYY_ROSE_PASSWORD", "pass123")
         monkeypatch.setenv("SKYY_ROSE_APP_PASSWORD", "app-pass-456")
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_wp",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_wp", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -216,10 +189,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SKYY_ROSE_FTP_USERNAME", "ftpuser")
         monkeypatch.setenv("SKYY_ROSE_FTP_PASSWORD", "ftppass")
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_ftp",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_ftp", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -235,10 +205,7 @@ class TestConfigBaseClass:
         monkeypatch.setenv("SKYY_ROSE_SFTP_PASSWORD", "sftppass")
         monkeypatch.setenv("SKYY_ROSE_SFTP_PRIVATE_KEY", "/path/to/key")
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_sftp",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_sftp", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -372,10 +339,7 @@ class TestTestingConfig:
         monkeypatch.delenv("SECRET_KEY", raising=False)
         monkeypatch.delenv("TEST_SECRET_KEY", raising=False)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_testing_default",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_testing_default", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
 
         # Should not raise ValueError for TestingConfig
@@ -392,10 +356,7 @@ class TestTestingConfig:
         monkeypatch.setenv("SECRET_KEY", "base-key")
         monkeypatch.setenv("TEST_SECRET_KEY", custom_test_key)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_testing_custom",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_testing_custom", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -454,10 +415,7 @@ class TestConfigEdgeCases:
         monkeypatch.setenv("SECRET_KEY", "")
 
         with pytest.raises(ValueError, match="SECRET_KEY environment variable must be set"):
-            spec = importlib.util.spec_from_file_location(
-                "root_config_empty_key",
-                "/home/user/DevSkyy/config.py"
-            )
+            spec = importlib.util.spec_from_file_location("root_config_empty_key", "/home/user/DevSkyy/config.py")
             module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(module)
 
@@ -467,10 +425,7 @@ class TestConfigEdgeCases:
         monkeypatch.setenv("SECRET_KEY", whitespace_key)
 
         # Whitespace string is truthy in Python, so it should be accepted
-        spec = importlib.util.spec_from_file_location(
-            "root_config_whitespace",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_whitespace", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -483,10 +438,7 @@ class TestConfigEdgeCases:
         monkeypatch.setenv("SECRET_KEY", "test-key")
         monkeypatch.setenv("DATABASE_URL", db_url)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_special_db",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_special_db", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -497,10 +449,7 @@ class TestConfigEdgeCases:
         long_key = "a" * 10000
         monkeypatch.setenv("SECRET_KEY", long_key)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_long_key",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_long_key", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -511,10 +460,7 @@ class TestConfigEdgeCases:
         unicode_key = "test-secret-🔐-键"
         monkeypatch.setenv("SECRET_KEY", unicode_key)
 
-        spec = importlib.util.spec_from_file_location(
-            "root_config_unicode",
-            "/home/user/DevSkyy/config.py"
-        )
+        spec = importlib.util.spec_from_file_location("root_config_unicode", "/home/user/DevSkyy/config.py")
         module = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(module)
 
@@ -532,8 +478,13 @@ class TestConfigInheritance:
     def test_development_inherits_all_base_attributes(self, root_config_module):
         """Test DevelopmentConfig inherits all attributes from Config"""
         base_attrs = [
-            "SECRET_KEY", "DATABASE_URL", "OPENAI_API_KEY", "STRIPE_API_KEY",
-            "BRAND_NAME", "BRAND_DOMAIN", "MAX_CONTENT_LENGTH"
+            "SECRET_KEY",
+            "DATABASE_URL",
+            "OPENAI_API_KEY",
+            "STRIPE_API_KEY",
+            "BRAND_NAME",
+            "BRAND_DOMAIN",
+            "MAX_CONTENT_LENGTH",
         ]
 
         for attr in base_attrs:
@@ -542,8 +493,13 @@ class TestConfigInheritance:
     def test_production_inherits_all_base_attributes(self, root_config_module):
         """Test ProductionConfig inherits all attributes from Config"""
         base_attrs = [
-            "SECRET_KEY", "DATABASE_URL", "OPENAI_API_KEY", "STRIPE_API_KEY",
-            "BRAND_NAME", "BRAND_DOMAIN", "MAX_CONTENT_LENGTH"
+            "SECRET_KEY",
+            "DATABASE_URL",
+            "OPENAI_API_KEY",
+            "STRIPE_API_KEY",
+            "BRAND_NAME",
+            "BRAND_DOMAIN",
+            "MAX_CONTENT_LENGTH",
         ]
 
         for attr in base_attrs:
@@ -552,8 +508,12 @@ class TestConfigInheritance:
     def test_testing_inherits_all_base_attributes(self, root_config_module):
         """Test TestingConfig inherits all attributes from Config"""
         base_attrs = [
-            "DATABASE_URL", "OPENAI_API_KEY", "STRIPE_API_KEY",
-            "BRAND_NAME", "BRAND_DOMAIN", "MAX_CONTENT_LENGTH"
+            "DATABASE_URL",
+            "OPENAI_API_KEY",
+            "STRIPE_API_KEY",
+            "BRAND_NAME",
+            "BRAND_DOMAIN",
+            "MAX_CONTENT_LENGTH",
         ]
 
         for attr in base_attrs:
@@ -589,8 +549,8 @@ class TestConfigSecurity:
         dangerous_patterns = [
             "sk-",  # OpenAI API key prefix
             "sk_live",  # Stripe live key prefix
-            "password = \"",
-            "api_key = \"sk",
+            'password = "',
+            'api_key = "sk',
         ]
 
         for pattern in dangerous_patterns:

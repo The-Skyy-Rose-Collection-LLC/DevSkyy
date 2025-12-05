@@ -12,8 +12,8 @@ Coverage Target: ≥80%
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import HTTPException
+import pytest
 from starlette.responses import JSONResponse
 
 from infrastructure.redis_manager import SessionData
@@ -159,7 +159,9 @@ class TestSessionLoading:
         assert mock_request.state.session_data is None
 
     @pytest.mark.asyncio
-    async def test_dispatch_with_valid_session(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_dispatch_with_valid_session(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test dispatch with valid session cookie."""
         mock_request.cookies = {"test_session": "sess123"}
         mock_redis_manager.get_session = AsyncMock(return_value=sample_session_data)
@@ -191,7 +193,9 @@ class TestSessionLoading:
         assert mock_request.state.session_data is None
 
     @pytest.mark.asyncio
-    async def test_dispatch_updates_session_access(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_dispatch_updates_session_access(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test dispatch updates session access time."""
         mock_request.cookies = {"test_session": "sess123"}
         mock_redis_manager.get_session = AsyncMock(return_value=sample_session_data)
@@ -206,7 +210,9 @@ class TestSessionLoading:
         mock_redis_manager.update_session_access.assert_called_once_with("sess123")
 
     @pytest.mark.asyncio
-    async def test_dispatch_loads_fashion_preferences(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_dispatch_loads_fashion_preferences(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test dispatch loads fashion preferences."""
         mock_request.cookies = {"test_session": "sess123"}
         mock_redis_manager.get_session = AsyncMock(return_value=sample_session_data)
@@ -245,7 +251,9 @@ class TestProtectedPathAuthentication:
         assert response.status_code == 401
 
     @pytest.mark.asyncio
-    async def test_dispatch_protected_path_with_session(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_dispatch_protected_path_with_session(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test protected path allows requests with valid session."""
         mock_request.url.path = "/api/v1/agents/list"
         mock_request.cookies = {"test_session": "sess123"}
@@ -303,7 +311,9 @@ class TestSessionCreation:
         mock_redis_manager.create_session.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_create_session_with_fashion_preferences(self, session_middleware, mock_response, mock_redis_manager):
+    async def test_create_session_with_fashion_preferences(
+        self, session_middleware, mock_response, mock_redis_manager
+    ):
         """Test session creation with fashion preferences."""
         fashion_prefs = {"style": "casual", "colors": ["blue", "green"]}
 
@@ -386,7 +396,9 @@ class TestSessionDestruction:
         mock_response.delete_cookie.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_destroy_session_no_session(self, session_middleware, mock_request, mock_response, mock_redis_manager):
+    async def test_destroy_session_no_session(
+        self, session_middleware, mock_request, mock_response, mock_redis_manager
+    ):
         """Test destroying session when no session exists."""
         mock_request.state.session_id = None
 
@@ -396,7 +408,9 @@ class TestSessionDestruction:
         mock_redis_manager.delete_session.assert_not_called()
 
     @pytest.mark.asyncio
-    async def test_destroy_session_clears_cookie(self, session_middleware, mock_request, mock_response, mock_redis_manager):
+    async def test_destroy_session_clears_cookie(
+        self, session_middleware, mock_request, mock_response, mock_redis_manager
+    ):
         """Test session destruction clears cookie."""
         mock_request.state.session_id = "sess123"
 
@@ -418,7 +432,9 @@ class TestFashionPreferencesUpdate:
     """Test updating fashion preferences."""
 
     @pytest.mark.asyncio
-    async def test_update_fashion_preferences_success(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_update_fashion_preferences_success(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test successful fashion preferences update."""
         mock_request.state.session_id = "sess123"
         mock_request.state.session_data = sample_session_data
@@ -441,7 +457,9 @@ class TestFashionPreferencesUpdate:
         assert result is False
 
     @pytest.mark.asyncio
-    async def test_update_fashion_preferences_updates_request_state(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_update_fashion_preferences_updates_request_state(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test preferences update modifies request state."""
         mock_request.state.session_id = "sess123"
         mock_request.state.session_data = sample_session_data
@@ -658,6 +676,7 @@ class TestResponseHeaders:
     @pytest.mark.asyncio
     async def test_dispatch_adds_performance_header(self, session_middleware, mock_request, mock_redis_manager):
         """Test dispatch adds processing time header."""
+
         # Mock call_next
         async def call_next(request):
             response = MagicMock()
@@ -669,7 +688,9 @@ class TestResponseHeaders:
         assert "X-Session-Processing-Time" in response.headers
 
     @pytest.mark.asyncio
-    async def test_dispatch_adds_user_headers(self, session_middleware, mock_request, mock_redis_manager, sample_session_data):
+    async def test_dispatch_adds_user_headers(
+        self, session_middleware, mock_request, mock_redis_manager, sample_session_data
+    ):
         """Test dispatch adds user info headers."""
         mock_request.cookies = {"test_session": "sess123"}
         mock_redis_manager.get_session = AsyncMock(return_value=sample_session_data)

@@ -17,19 +17,19 @@ import re
 def fix_unused_imports(content: str) -> tuple[str, list[str]]:
     """Remove common unused imports."""
     changes = []
-    lines = content.split('\n')
+    lines = content.split("\n")
     fixed_lines = []
 
     # Track which imports are actually used
     for line in lines:
         # Skip removing imports if they appear to be used elsewhere
-        if line.strip().startswith('import ') or line.strip().startswith('from '):
+        if line.strip().startswith("import ") or line.strip().startswith("from "):
             # Keep the import for now - let Ruff handle this with actual usage analysis
             fixed_lines.append(line)
         else:
             fixed_lines.append(line)
 
-    return '\n'.join(fixed_lines), changes
+    return "\n".join(fixed_lines), changes
 
 
 def fix_type_hints(content: str) -> tuple[str, list[str]]:
@@ -37,41 +37,43 @@ def fix_type_hints(content: str) -> tuple[str, list[str]]:
     changes = []
 
     # Replace dict[...] with dict[...]
-    if 'dict[' in content:
-        content = re.sub(r'\bDict\[', 'dict[', content)
+    if "dict[" in content:
+        content = re.sub(r"\bDict\[", "dict[", content)
         changes.append("Replaced Dict with dict")
 
     # Replace list[...] with list[...]
-    if 'list[' in content:
-        content = re.sub(r'\bList\[', 'list[', content)
+    if "list[" in content:
+        content = re.sub(r"\bList\[", "list[", content)
         changes.append("Replaced List with list")
 
     # Replace Optional[...] with ... | None (Python 3.10+ syntax)
     # Only do this for simple cases
-    optional_pattern = r'Optional\[([A-Za-z_][A-Za-z0-9_\.]*)\]'
-    if 'Optional[' in content:
-        content = re.sub(optional_pattern, r'\1 | None', content)
+    optional_pattern = r"Optional\[([A-Za-z_][A-Za-z0-9_\.]*)\]"
+    if "Optional[" in content:
+        content = re.sub(optional_pattern, r"\1 | None", content)
         changes.append("Replaced Optional with | None syntax")
 
     # Remove typing imports if they're no longer needed
     if changes:
         # Check if Dict, List, Optional are still used
         typing_imports = []
-        if 'Dict' not in content:
-            typing_imports.append('Dict')
-        if 'List' not in content:
-            typing_imports.append('List')
-        if 'Optional' not in content:
-            typing_imports.append('Optional')
+        if "Dict" not in content:
+            typing_imports.append("Dict")
+        if "List" not in content:
+            typing_imports.append("List")
+        if "Optional" not in content:
+            typing_imports.append("Optional")
 
         if typing_imports:
             # Remove from typing imports
             for to_remove in typing_imports:
                 # Pattern: from typing import ..., Dict, ...
                 content = re.sub(
-                    rf'from typing import ([^,\n]+,\s*)?{to_remove}(,\s*[^,\n]+)?',
-                    lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(', ,', ',').strip().rstrip(','),
-                    content
+                    rf"from typing import ([^,\n]+,\s*)?{to_remove}(,\s*[^,\n]+)?",
+                    lambda m: f"from typing import {m.group(1) or ''}{m.group(2) or ''}".replace(", ,", ",")
+                    .strip()
+                    .rstrip(","),
+                    content,
                 )
 
     return content, changes
@@ -83,7 +85,7 @@ def fix_equality_checks(content: str) -> tuple[str, list[str]]:
 
     # Pattern: if x in (a, b): -> if x in (a, b):
     # Simple pattern for same variable
-    pattern = r'if\s+(\w+)\s*==\s*([^\s]+)\s+or\s+\1\s*==\s*([^\s:]+):'
+    pattern = r"if\s+(\w+)\s*==\s*([^\s]+)\s+or\s+\1\s*==\s*([^\s:]+):"
     matches = re.findall(pattern, content)
 
     if matches:
@@ -119,7 +121,7 @@ def fix_ternary_operators(content: str) -> tuple[str, list[str]]:
 def process_file(filepath: Path) -> tuple[bool, list[str]]:
     """Process a single Python file."""
     try:
-        content = filepath.read_text(encoding='utf-8')
+        content = filepath.read_text(encoding="utf-8")
         original_content = content
         all_changes = []
 
@@ -132,7 +134,7 @@ def process_file(filepath: Path) -> tuple[bool, list[str]]:
 
         # Write back if changed
         if content != original_content:
-            filepath.write_text(content, encoding='utf-8')
+            filepath.write_text(content, encoding="utf-8")
             return True, all_changes
 
         return False, []
@@ -144,19 +146,26 @@ def process_file(filepath: Path) -> tuple[bool, list[str]]:
 
 def main():
     """Process all Python files in the repository."""
-    base_dir = Path('.')
+    base_dir = Path(".")
 
     # Files to process
-    python_files = list(base_dir.rglob('*.py'))
+    python_files = list(base_dir.rglob("*.py"))
 
     # Exclude certain directories
-    exclude_dirs = {'.git', '.venv', 'venv', '__pycache__', '.mypy_cache',
-                   '.pytest_cache', 'htmlcov', 'build', 'dist', '.eggs'}
+    exclude_dirs = {
+        ".git",
+        ".venv",
+        "venv",
+        "__pycache__",
+        ".mypy_cache",
+        ".pytest_cache",
+        "htmlcov",
+        "build",
+        "dist",
+        ".eggs",
+    }
 
-    python_files = [
-        f for f in python_files
-        if not any(exc in str(f) for exc in exclude_dirs)
-    ]
+    python_files = [f for f in python_files if not any(exc in str(f) for exc in exclude_dirs)]
 
     print(f"Processing {len(python_files)} Python files...")
 
@@ -180,5 +189,5 @@ def main():
             print(f"  - {f}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

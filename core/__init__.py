@@ -31,11 +31,11 @@ __all__ = [
     "ErrorEntry",
     "ErrorLedger",
     "ErrorSeverity",
-    "get_error_ledger",
-    "log_error",
     # Settings
     "Settings",
+    "get_error_ledger",
     "get_settings",
+    "log_error",
     "settings",
 ]
 

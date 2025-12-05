@@ -10,9 +10,8 @@ Truth Protocol Compliance:
 - Rule #10: No-Skip Rule
 """
 
-import asyncio
-from datetime import datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import datetime
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
@@ -75,7 +74,7 @@ class TestAgentReview:
             agent_name="Brand Agent",
             decision=ReviewDecision.APPROVED,
             confidence=0.95,
-            feedback="Content looks great!"
+            feedback="Content looks great!",
         )
 
         assert review.agent_name == "Brand Agent"
@@ -92,7 +91,7 @@ class TestAgentReview:
             confidence=0.8,
             feedback="Some SEO issues found",
             issues_found=["Missing meta keywords", "Title too long"],
-            suggestions=["Add target keywords", "Shorten title"]
+            suggestions=["Add target keywords", "Shorten title"],
         )
 
         assert len(review.issues_found) == 2
@@ -100,12 +99,7 @@ class TestAgentReview:
 
     def test_review_has_timestamp(self):
         """Test that review has timestamp."""
-        review = AgentReview(
-            agent_name="Test",
-            decision=ReviewDecision.APPROVED,
-            confidence=0.9,
-            feedback="OK"
-        )
+        review = AgentReview(agent_name="Test", decision=ReviewDecision.APPROVED, confidence=0.9, feedback="OK")
 
         assert isinstance(review.review_timestamp, datetime)
 
@@ -126,7 +120,7 @@ class TestConsensusVote:
             minor_issue_count=1,
             major_issue_count=0,
             requires_redraft=False,
-            consensus_feedback="Content approved by majority"
+            consensus_feedback="Content approved by majority",
         )
 
         assert vote.total_reviewers == 3
@@ -141,7 +135,7 @@ class TestConsensusVote:
             minor_issue_count=1,
             major_issue_count=2,
             requires_redraft=True,
-            consensus_feedback="Multiple major issues found"
+            consensus_feedback="Multiple major issues found",
         )
 
         assert vote.requires_redraft is True
@@ -162,7 +156,7 @@ class TestContentDraft:
             content="This is the content",
             meta_description="Description here",
             word_count=500,
-            keywords=["test", "article"]
+            keywords=["test", "article"],
         )
 
         assert draft.title == "Test Article"
@@ -172,12 +166,7 @@ class TestContentDraft:
 
     def test_draft_versioning(self):
         """Test draft version defaults and updates."""
-        draft = ContentDraft(
-            title="V1",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="V1", content="Content", meta_description="Meta", word_count=100)
 
         assert draft.version == 1
         assert draft.feedback_applied is None
@@ -193,17 +182,9 @@ class TestWorkflowState:
 
     def test_create_workflow(self):
         """Test creating a workflow state."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
-        workflow = WorkflowState(
-            topic="Test Topic",
-            current_draft=draft
-        )
+        workflow = WorkflowState(topic="Test Topic", current_draft=draft)
 
         assert workflow.workflow_id is not None
         assert workflow.topic == "Test Topic"
@@ -214,12 +195,7 @@ class TestWorkflowState:
 
     def test_workflow_tokens_different(self):
         """Test that approval and rejection tokens are different."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
         workflow = WorkflowState(topic="Test", current_draft=draft)
 
@@ -240,7 +216,7 @@ class TestBrandIntelligenceReviewer:
         return {
             "brand_keywords": ["luxury", "exclusive", "premium"],
             "values": ["luxury", "quality"],
-            "min_word_count": 600
+            "min_word_count": 600,
         }
 
     @pytest.fixture
@@ -257,7 +233,7 @@ class TestBrandIntelligenceReviewer:
             content="Discover our exclusive luxury collection featuring premium materials.",
             meta_description="Exclusive collection",
             word_count=700,
-            keywords=["luxury"]
+            keywords=["luxury"],
         )
 
         review = reviewer._fallback_review(draft)
@@ -273,7 +249,7 @@ class TestBrandIntelligenceReviewer:
             content="This is a regular product announcement.",
             meta_description="Product info",
             word_count=700,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -289,7 +265,7 @@ class TestBrandIntelligenceReviewer:
             content="Get our cheap discount items at basic prices.",
             meta_description="Discount sale",
             word_count=700,
-            keywords=["luxury"]
+            keywords=["luxury"],
         )
 
         review = reviewer._fallback_review(draft)
@@ -305,7 +281,7 @@ class TestBrandIntelligenceReviewer:
             content="This is luxury content but too short.",
             meta_description="Short",
             word_count=100,
-            keywords=["luxury"]
+            keywords=["luxury"],
         )
 
         review = reviewer._fallback_review(draft)
@@ -335,7 +311,7 @@ class TestSEOMarketingReviewer:
             content="Learn more about our products and discover the best options.",
             meta_description="This is a well-crafted meta description of appropriate length for SEO.",
             word_count=500,
-            keywords=["products", "options"]
+            keywords=["products", "options"],
         )
 
         review = reviewer._fallback_review(draft)
@@ -346,11 +322,7 @@ class TestSEOMarketingReviewer:
     async def test_fallback_review_meta_too_short(self, reviewer):
         """Test fallback review detects short meta description."""
         draft = ContentDraft(
-            title="Test Title",
-            content="Some content here",
-            meta_description="Too short",
-            word_count=500,
-            keywords=[]
+            title="Test Title", content="Some content here", meta_description="Too short", word_count=500, keywords=[]
         )
 
         review = reviewer._fallback_review(draft)
@@ -365,7 +337,7 @@ class TestSEOMarketingReviewer:
             content="Some content here",
             meta_description="x" * 200,  # Too long
             word_count=500,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -381,7 +353,7 @@ class TestSEOMarketingReviewer:
             content="Some generic content",
             meta_description="This is a meta description of proper length for testing purposes.",
             word_count=500,
-            keywords=["specific", "keyword"]
+            keywords=["specific", "keyword"],
         )
 
         review = reviewer._fallback_review(draft)
@@ -396,7 +368,7 @@ class TestSEOMarketingReviewer:
             content="Some content here",
             meta_description="This is a meta description of proper length for testing purposes.",
             word_count=500,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -412,7 +384,7 @@ class TestSEOMarketingReviewer:
             content="This content has no call to action whatsoever.",
             meta_description="This is a meta description of proper length for testing purposes.",
             word_count=500,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -442,7 +414,7 @@ class TestSecurityComplianceReviewer:
             content="This is perfectly safe content with no issues.",
             meta_description="Safe meta",
             word_count=500,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -457,7 +429,7 @@ class TestSecurityComplianceReviewer:
             content="Use password: admin123 and api key ABC123",
             meta_description="Test meta",
             word_count=100,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -473,7 +445,7 @@ class TestSecurityComplianceReviewer:
             content="This product is 100% guaranteed to work and is scientifically proven.",
             meta_description="Amazing product",
             word_count=100,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -488,7 +460,7 @@ class TestSecurityComplianceReviewer:
             content="This product can help with medical diagnosis of conditions.",
             meta_description="Health tips",
             word_count=100,
-            keywords=[]
+            keywords=[],
         )
 
         review = reviewer._fallback_review(draft)
@@ -509,32 +481,27 @@ class TestConsensusOrchestrator:
     def mock_content_generator(self):
         """Create mock content generator."""
         generator = MagicMock()
-        generator.generate_blog_post = AsyncMock(return_value={
-            "title": "Test Blog Post",
-            "content": "This is the test content for the blog post.",
-            "meta_description": "Test description",
-            "word_count": 500
-        })
+        generator.generate_blog_post = AsyncMock(
+            return_value={
+                "title": "Test Blog Post",
+                "content": "This is the test content for the blog post.",
+                "meta_description": "Test description",
+                "word_count": 500,
+            }
+        )
         return generator
 
     @pytest.fixture
     def orchestrator(self, mock_content_generator):
         """Create orchestrator instance."""
-        brand_config = {
-            "brand_keywords": ["luxury", "premium"],
-            "values": ["quality"],
-            "min_word_count": 500
-        }
+        brand_config = {"brand_keywords": ["luxury", "premium"], "values": ["quality"], "min_word_count": 500}
         return ConsensusOrchestrator(mock_content_generator, brand_config)
 
     @pytest.mark.asyncio
     async def test_generate_initial_draft(self, orchestrator):
         """Test generating initial draft."""
         draft = await orchestrator.generate_initial_draft(
-            topic="Test Topic",
-            keywords=["test", "keyword"],
-            tone="professional",
-            length=800
+            topic="Test Topic", keywords=["test", "keyword"], tone="professional", length=800
         )
 
         assert draft.title == "Test Blog Post"
@@ -549,7 +516,7 @@ class TestConsensusOrchestrator:
             content="This is luxury content with premium quality. Learn more about our products.",
             meta_description="This is a meta description of appropriate length for SEO purposes.",
             word_count=600,
-            keywords=["luxury"]
+            keywords=["luxury"],
         )
 
         vote = await orchestrator.review_draft(draft)
@@ -565,7 +532,7 @@ class TestConsensusOrchestrator:
             content="Content",
             meta_description="Meta" * 20,  # Appropriate length
             word_count=600,
-            keywords=[]
+            keywords=[],
         )
 
         vote = await orchestrator.review_draft(draft)
@@ -582,13 +549,10 @@ class TestConsensusOrchestrator:
             content="Original content",
             meta_description="Original meta description for testing",
             word_count=500,
-            keywords=[]
+            keywords=[],
         )
 
-        new_draft = await orchestrator.redraft_content(
-            original,
-            "Please improve SEO and add keywords"
-        )
+        new_draft = await orchestrator.redraft_content(original, "Please improve SEO and add keywords")
 
         assert new_draft.version == 2
         assert new_draft.feedback_applied is not None
@@ -596,20 +560,13 @@ class TestConsensusOrchestrator:
     @pytest.mark.asyncio
     async def test_submit_human_decision_approve(self, orchestrator):
         """Test submitting human approval."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
         workflow = WorkflowState(topic="Test", current_draft=draft)
         orchestrator.workflows[workflow.workflow_id] = workflow
 
         updated = await orchestrator.submit_human_decision(
-            workflow.workflow_id,
-            workflow.approval_token,
-            feedback="Looks good!"
+            workflow.workflow_id, workflow.approval_token, feedback="Looks good!"
         )
 
         assert updated.human_decision == HumanDecision.APPROVED
@@ -618,59 +575,35 @@ class TestConsensusOrchestrator:
     @pytest.mark.asyncio
     async def test_submit_human_decision_reject(self, orchestrator):
         """Test submitting human rejection."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
         workflow = WorkflowState(topic="Test", current_draft=draft)
         orchestrator.workflows[workflow.workflow_id] = workflow
 
-        updated = await orchestrator.submit_human_decision(
-            workflow.workflow_id,
-            workflow.rejection_token
-        )
+        updated = await orchestrator.submit_human_decision(workflow.workflow_id, workflow.rejection_token)
 
         assert updated.human_decision == HumanDecision.REJECTED
 
     @pytest.mark.asyncio
     async def test_submit_human_decision_invalid_token(self, orchestrator):
         """Test submitting with invalid token."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
         workflow = WorkflowState(topic="Test", current_draft=draft)
         orchestrator.workflows[workflow.workflow_id] = workflow
 
         with pytest.raises(ValueError, match="Invalid decision token"):
-            await orchestrator.submit_human_decision(
-                workflow.workflow_id,
-                "invalid-token"
-            )
+            await orchestrator.submit_human_decision(workflow.workflow_id, "invalid-token")
 
     @pytest.mark.asyncio
     async def test_submit_human_decision_workflow_not_found(self, orchestrator):
         """Test submitting decision for nonexistent workflow."""
         with pytest.raises(ValueError, match="Workflow not found"):
-            await orchestrator.submit_human_decision(
-                "nonexistent-id",
-                "some-token"
-            )
+            await orchestrator.submit_human_decision("nonexistent-id", "some-token")
 
     def test_get_workflow(self, orchestrator):
         """Test getting a workflow."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
         workflow = WorkflowState(topic="Test", current_draft=draft)
         orchestrator.workflows[workflow.workflow_id] = workflow
@@ -687,12 +620,7 @@ class TestConsensusOrchestrator:
 
     def test_get_approval_urls(self, orchestrator):
         """Test getting approval URLs."""
-        draft = ContentDraft(
-            title="Test",
-            content="Content",
-            meta_description="Meta",
-            word_count=100
-        )
+        draft = ContentDraft(title="Test", content="Content", meta_description="Meta", word_count=100)
 
         workflow = WorkflowState(topic="Test", current_draft=draft)
         orchestrator.workflows[workflow.workflow_id] = workflow
@@ -712,18 +640,8 @@ class TestConsensusOrchestrator:
     def test_combine_feedback_approved(self, orchestrator):
         """Test combining feedback when approved."""
         reviews = [
-            AgentReview(
-                agent_name="Agent1",
-                decision=ReviewDecision.APPROVED,
-                confidence=0.9,
-                feedback="Looks good"
-            ),
-            AgentReview(
-                agent_name="Agent2",
-                decision=ReviewDecision.APPROVED,
-                confidence=0.95,
-                feedback="Perfect"
-            )
+            AgentReview(agent_name="Agent1", decision=ReviewDecision.APPROVED, confidence=0.9, feedback="Looks good"),
+            AgentReview(agent_name="Agent2", decision=ReviewDecision.APPROVED, confidence=0.95, feedback="Perfect"),
         ]
 
         feedback = orchestrator._combine_feedback(reviews, requires_redraft=False)
@@ -737,14 +655,14 @@ class TestConsensusOrchestrator:
                 agent_name="Agent1",
                 decision=ReviewDecision.MAJOR_ISSUE,
                 confidence=0.8,
-                feedback="Major problems found"
+                feedback="Major problems found",
             ),
             AgentReview(
                 agent_name="Agent2",
                 decision=ReviewDecision.MAJOR_ISSUE,
                 confidence=0.85,
-                feedback="Needs significant changes"
-            )
+                feedback="Needs significant changes",
+            ),
         ]
 
         feedback = orchestrator._combine_feedback(reviews, requires_redraft=True)

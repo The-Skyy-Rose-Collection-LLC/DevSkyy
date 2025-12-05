@@ -8,10 +8,9 @@ Per Truth Protocol:
 - Rule #12: Performance SLOs - P95 < 500ms for search operations
 """
 
-import asyncio
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -400,7 +399,9 @@ class TestRAGService:
     @patch("services.rag_service.VectorDatabase")
     @patch("services.rag_service.DocumentProcessor")
     @patch("services.rag_service.Anthropic")
-    async def test_query_generates_answer_with_context(self, mock_anthropic_class, mock_processor, mock_vector_db_class):
+    async def test_query_generates_answer_with_context(
+        self, mock_anthropic_class, mock_processor, mock_vector_db_class
+    ):
         """Test RAG query generates answer with retrieved context"""
         from services.rag_service import RAGService
 
@@ -496,9 +497,7 @@ class TestRAGServicePerformance:
         from services.rag_service import RAGService
 
         mock_db = MagicMock()
-        mock_db.search.return_value = [
-            {"content": "Result", "similarity_score": 0.9, "metadata": {}}
-        ]
+        mock_db.search.return_value = [{"content": "Result", "similarity_score": 0.9, "metadata": {}}]
         mock_vector_db_class.return_value = mock_db
 
         service = RAGService()

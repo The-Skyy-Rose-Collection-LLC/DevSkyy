@@ -6,8 +6,8 @@ Test count: 60+ tests
 """
 
 import asyncio
+import contextlib
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import numpy as np
 import pytest
@@ -76,11 +76,7 @@ class TestHealthMetrics:
         assert metrics.uptime_seconds == 0.0
 
     def test_custom_values(self):
-        metrics = HealthMetrics(
-            success_rate=95.5,
-            error_count=10,
-            total_operations=200
-        )
+        metrics = HealthMetrics(success_rate=95.5, error_count=10, total_operations=200)
         assert metrics.success_rate == 95.5
         assert metrics.error_count == 10
         assert metrics.total_operations == 200
@@ -97,11 +93,7 @@ class TestAgentMetrics:
         assert metrics.performance_score == 100.0
 
     def test_custom_values(self):
-        metrics = AgentMetrics(
-            success_count=50,
-            failure_count=5,
-            ml_predictions_made=100
-        )
+        metrics = AgentMetrics(success_count=50, failure_count=5, ml_predictions_made=100)
         assert metrics.success_count == 50
         assert metrics.failure_count == 5
         assert metrics.ml_predictions_made == 100
@@ -111,10 +103,7 @@ class TestIssue:
     """Test Issue dataclass"""
 
     def test_issue_creation(self):
-        issue = Issue(
-            severity=SeverityLevel.HIGH,
-            description="Test issue"
-        )
+        issue = Issue(severity=SeverityLevel.HIGH, description="Test issue")
         assert issue.severity == SeverityLevel.HIGH
         assert issue.description == "Test issue"
         assert issue.resolved is False
@@ -122,10 +111,7 @@ class TestIssue:
 
     def test_issue_with_resolution(self):
         issue = Issue(
-            severity=SeverityLevel.MEDIUM,
-            description="Resolved issue",
-            resolved=True,
-            resolution_strategy="restart"
+            severity=SeverityLevel.MEDIUM, description="Resolved issue", resolved=True, resolution_strategy="restart"
         )
         assert issue.resolved is True
         assert issue.resolution_strategy == "restart"
@@ -177,10 +163,8 @@ class TestCircuitBreaker:
 
         # Fail 3 times
         for _ in range(3):
-            try:
+            with contextlib.suppress(Exception):
                 cb.call(failing_func)
-            except Exception:
-                pass
 
         assert cb.state == "open"
         assert cb.failure_count == 3
@@ -193,10 +177,8 @@ class TestCircuitBreaker:
 
         # Open the circuit
         for _ in range(2):
-            try:
+            with contextlib.suppress(Exception):
                 cb.call(failing_func)
-            except Exception:
-                pass
 
         # Now it should block
         with pytest.raises(Exception, match="Circuit breaker is OPEN"):
@@ -211,10 +193,8 @@ class TestCircuitBreaker:
         def success_func():
             return "success"
 
-        try:
+        with contextlib.suppress(Exception):
             cb.call(failing_func)
-        except Exception:
-            pass
 
         assert cb.failure_count == 1
 
@@ -378,14 +358,14 @@ class TestAnomalyDetection:
     def test_detect_anomalies_insufficient_data(self):
         agent = ConcreteAgent()
         # Less than 10 samples - should return False
-        for i in range(5):
+        for _i in range(5):
             is_anomaly = agent.detect_anomalies("response_time", 1.0)
             assert is_anomaly is False
 
     def test_detect_anomalies_normal_values(self):
         agent = ConcreteAgent()
         # Add 20 normal values
-        for i in range(20):
+        for _i in range(20):
             is_anomaly = agent.detect_anomalies("response_time", 1.0 + np.random.normal(0, 0.1))
             # First few might be anomalies until baseline is established
 
@@ -396,7 +376,7 @@ class TestAnomalyDetection:
     def test_detect_anomalies_outlier(self):
         agent = ConcreteAgent()
         # Establish baseline
-        for i in range(20):
+        for _i in range(20):
             agent.detect_anomalies("response_time", 1.0)
 
         # Add a clear outlier
@@ -407,7 +387,7 @@ class TestAnomalyDetection:
     def test_detect_anomalies_zero_std(self):
         agent = ConcreteAgent()
         # All same values = zero std dev
-        for i in range(15):
+        for _i in range(15):
             agent.detect_anomalies("constant", 5.0)
 
         # Should handle zero std dev gracefully
@@ -417,7 +397,7 @@ class TestAnomalyDetection:
     def test_anomaly_baseline_window(self):
         agent = ConcreteAgent()
         # Add more than 100 values
-        for i in range(150):
+        for _i in range(150):
             agent.detect_anomalies("metric", 1.0)
 
         # Should keep only last 100
@@ -457,7 +437,7 @@ class TestPerformancePrediction:
     def test_predict_performance_stable(self):
         agent = ConcreteAgent()
         # Stable performance
-        for i in range(50):
+        for _i in range(50):
             agent.performance_history.append(1.0)
 
         prediction = agent.predict_performance()
@@ -561,9 +541,7 @@ class TestDiagnostics:
         await agent.initialize()
 
         # Add some issues
-        agent.detected_issues.append(
-            Issue(severity=SeverityLevel.HIGH, description="Test issue")
-        )
+        agent.detected_issues.append(Issue(severity=SeverityLevel.HIGH, description="Test issue"))
 
         diagnostics = await agent.diagnose_issues()
 
