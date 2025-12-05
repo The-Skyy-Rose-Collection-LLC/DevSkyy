@@ -223,9 +223,14 @@ jobs:
 
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pytest==8.3.4 pytest-cov==6.0.0 pytest-asyncio==0.24.0
-          if [ -f requirements.txt ]; then pip install -r requirements.txt || true; fi
+          python -m pip install --upgrade pip pip-tools
+          # Use pip-tools lock files if available, fallback to requirements.txt
+          if [ -f requirements/base.txt ] && [ -f requirements/test.txt ]; then
+            pip-sync requirements/base.txt requirements/test.txt
+          elif [ -f requirements.txt ]; then
+            pip install -r requirements.txt
+            pip install pytest pytest-cov pytest-asyncio pytest-xdist
+          fi
 
       - name: Run ${{ matrix.test-type }} tests
         env:

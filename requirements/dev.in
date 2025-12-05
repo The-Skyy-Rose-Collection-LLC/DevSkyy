@@ -1,0 +1,47 @@
+# =============================================================================
+# DEVSKYY ENTERPRISE PLATFORM - DEVELOPMENT DEPENDENCIES
+# Source file for pip-compile: pip-compile dev.in -o dev.txt
+# Reference: https://pip-tools.readthedocs.io/en/latest/cli/pip-compile/
+# =============================================================================
+# IMPORTANT: This file uses constraints from base.txt to ensure compatibility
+# Install: pip-sync base.txt dev.txt
+# =============================================================================
+
+# Constrain to base production dependencies
+-c base.txt
+
+# Code Quality & Formatting
+black~=24.10.0
+isort~=5.13.2
+ruff~=0.8.4
+
+# Static Analysis
+mypy~=1.13.0
+pylint~=3.3.2
+
+# Security Scanning
+bandit~=1.8.0
+safety~=3.2.11
+pip-audit~=2.7.3
+
+# Pre-commit Hooks
+pre-commit~=3.8.0
+
+# Type Stubs
+types-requests~=2.32.0
+types-redis~=4.6.0
+types-PyYAML~=6.0.12
+
+# Documentation
+sphinx~=8.1.3
+sphinx-rtd-theme~=3.0.2
+mkdocs~=1.6.1
+mkdocs-material~=9.5.47
+
+# Development Tools
+ipython~=8.31.0
+rich~=13.9.4
+
+# Dependency Management
+pip-tools~=7.4.1
+pipdeptree~=2.23.4
