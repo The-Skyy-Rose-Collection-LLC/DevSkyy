@@ -147,33 +147,6 @@ class TestCodexIntegrationConsequentialFlag:
             assert call_args.kwargs["default_headers"] == {"x-openai-isConsequential": "true"}
 
 
-class TestEnhancedOrchestratorConsequentialFlag:
-    """Test Enhanced AI Orchestrator consequential flag implementation"""
-
-    @pytest.mark.unit
-    def test_orchestrator_openai_client_has_header(self, monkeypatch):
-        """Test orchestrator initializes OpenAI client with consequential header"""
-        monkeypatch.setenv("OPENAI_API_KEY", "test-key-12345")
-        monkeypatch.setenv("ANTHROPIC_API_KEY", "test-anthropic-key")
-        monkeypatch.setenv("OPENAI_IS_CONSEQUENTIAL", "true")
-
-        with patch("openai.AsyncOpenAI") as mock_async_openai:
-            from config.unified_config import reload_config
-
-            reload_config()
-
-            # Mock the orchestrator to avoid full initialization
-            with patch("ai.enhanced_orchestrator.asyncio.create_task"):
-                pass  # EnhancedAIOrchestrator removed during cleanup
-
-                orchestrator = EnhancedAIOrchestrator()
-
-                # Verify AsyncOpenAI was called with headers
-                call_args = mock_async_openai.call_args
-                assert "default_headers" in call_args.kwargs
-                assert call_args.kwargs["default_headers"]["x-openai-isConsequential"] == "true"
-
-
 class TestMultiModelOrchestratorConsequentialFlag:
     """Test Multi-Model AI Orchestrator consequential flag implementation"""
 

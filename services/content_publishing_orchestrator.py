@@ -12,11 +12,22 @@ import asyncio
 from datetime import datetime, timedelta
 import logging
 import random
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from google.oauth2.credentials import Credentials
-from googleapiclient.discovery import build
 import httpx
+
+# Optional Google dependencies - only required for Sheets logging
+GOOGLE_AVAILABLE = False
+try:
+    from google.oauth2.credentials import Credentials
+    from googleapiclient.discovery import build
+    GOOGLE_AVAILABLE = True
+except ImportError:
+    Credentials = None  # type: ignore[misc, assignment]
+    build = None  # type: ignore[assignment]
+
+if TYPE_CHECKING:
+    from google.oauth2.credentials import Credentials
 
 from agent.modules.backend.wordpress_integration_service import (
     WordPressIntegrationService,
@@ -144,14 +155,22 @@ class GoogleSheetsLogger:
     IMPACT: Audit trail of all published content
     """
 
-    def __init__(self, credentials: Credentials, spreadsheet_id: str):
+    def __init__(self, credentials: "Credentials", spreadsheet_id: str):
         """
         Initialize Google Sheets logger
 
         Args:
             credentials: Google OAuth credentials
             spreadsheet_id: Target spreadsheet ID
+
+        Raises:
+            ImportError: If google-api-python-client is not installed
         """
+        if not GOOGLE_AVAILABLE:
+            raise ImportError(
+                "Google API dependencies not installed. "
+                "Install with: pip install google-api-python-client google-auth"
+            )
         self.credentials = credentials
         self.spreadsheet_id = spreadsheet_id
         self.service = build("sheets", "v4", credentials=credentials)

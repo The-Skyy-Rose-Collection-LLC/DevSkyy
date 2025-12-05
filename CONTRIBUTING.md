@@ -32,18 +32,27 @@ DevSkyy is an enterprise-grade AI-powered platform with multi-agent orchestratio
    ```
 
 2. **Install development dependencies**
+
+   Using pip-tools (recommended):
    ```bash
-   make dev-install
+   pip install pip-tools
+   cd requirements/
+   make sync-dev
+   ```
+
+   Or traditional install:
+   ```bash
+   pip install -r requirements.txt -r requirements-dev.txt
    ```
 
 3. **Run tests to verify setup**
    ```bash
-   make test
+   pytest tests/ -v
    ```
 
 4. **Start the development server**
    ```bash
-   make run
+   uvicorn main:app --reload --port 8000
    ```
 
 ## 📋 Development Workflow
@@ -198,19 +207,54 @@ Follow the established structure:
 
 ```
 DevSkyy/
-├── agent/                 # AI agent modules
+├── agent/                 # AI agents and orchestrators
+│   ├── modules/           # Backend/frontend agent modules
+│   ├── mixins/            # Shared agent behaviors (ReAct)
+│   ├── orchestrator.py    # Main orchestration logic
+│   └── unified_orchestrator.py
 ├── api/                   # API endpoints and routers
+│   └── v1/                # Versioned API endpoints
 ├── security/              # Authentication and security
-├── infrastructure/        # Infrastructure components
+│   ├── jwt_auth.py        # JWT handling
+│   ├── encryption.py      # AES-256-GCM encryption
+│   └── rbac.py            # Role-based access control
+├── core/                  # Core utilities and error handling
+├── services/              # Business logic services
 ├── ml/                    # Machine learning modules
-├── ai_orchestration/      # Orchestration system
-├── database/              # Database utilities
-├── monitoring/            # Monitoring and metrics
-├── architecture/          # Architecture patterns
+├── infrastructure/        # Database, cache, messaging
+├── monitoring/            # Logging and observability
+├── devskyy_mcp/           # MCP server implementation
+├── requirements/          # pip-tools dependency management
+│   ├── base.in            # Production deps (source)
+│   ├── dev.in             # Development deps (source)
+│   ├── test.in            # Test deps (source)
+│   └── Makefile           # Compile commands
 ├── tests/                 # Test suite
-├── docs/                  # Documentation
-└── scripts/               # Utility scripts
+│   ├── unit/              # Unit tests
+│   ├── integration/       # Integration tests
+│   └── e2e/               # End-to-end tests
+└── .github/workflows/     # CI/CD pipelines
 ```
+
+### Dependency Management
+
+We use [pip-tools](https://pip-tools.readthedocs.io/) for deterministic dependency management:
+
+```bash
+# Add a new dependency
+# 1. Edit requirements/base.in (or dev.in/test.in)
+# 2. Recompile lock files
+cd requirements/
+make compile
+
+# Upgrade all dependencies
+make upgrade
+
+# Install development environment
+make sync-dev
+```
+
+See `requirements/README.md` for detailed documentation.
 
 ### Coding Standards
 

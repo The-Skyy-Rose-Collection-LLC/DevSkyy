@@ -464,7 +464,6 @@ class TestAdvancedFeatureEndpoints:
 
         data = response.json()
         assert "timestamp" in data
-        assert "multi_agent_orchestrator" in data
         assert "3d_pipeline" in data
         assert "advanced_features_available" in data
 

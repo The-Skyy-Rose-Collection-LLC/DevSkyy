@@ -12,12 +12,27 @@ from enum import Enum
 import json
 import logging
 
-import anthropic
-from openai import OpenAI
 from pydantic import BaseModel, Field, validator
 
 
 logger = logging.getLogger(__name__)
+
+# Optional AI provider dependencies
+ANTHROPIC_AVAILABLE = False
+anthropic = None  # type: ignore[assignment]
+try:
+    import anthropic
+    ANTHROPIC_AVAILABLE = True
+except ImportError:
+    logger.info("anthropic not installed - Claude SEO generation unavailable")
+
+OPENAI_AVAILABLE = False
+OpenAI = None  # type: ignore[assignment]
+try:
+    from openai import OpenAI
+    OPENAI_AVAILABLE = True
+except ImportError:
+    logger.info("openai not installed - OpenAI SEO generation unavailable")
 
 
 class AIProvider(str, Enum):
@@ -164,12 +179,18 @@ Output ONLY valid JSON with this exact structure:
         self.max_tokens = max_tokens
 
         if anthropic_api_key:
-            self.anthropic_client = anthropic.Anthropic(api_key=anthropic_api_key)
-            logger.info("Anthropic client initialized")
+            if not ANTHROPIC_AVAILABLE:
+                logger.warning("anthropic package not installed - Claude unavailable")
+            else:
+                self.anthropic_client = anthropic.Anthropic(api_key=anthropic_api_key)
+                logger.info("Anthropic client initialized")
 
         if openai_api_key:
-            self.openai_client = OpenAI(api_key=openai_api_key)
-            logger.info("OpenAI client initialized")
+            if not OPENAI_AVAILABLE:
+                logger.warning("openai package not installed - OpenAI unavailable")
+            else:
+                self.openai_client = OpenAI(api_key=openai_api_key)
+                logger.info("OpenAI client initialized")
 
         if not self.anthropic_client and not self.openai_client:
             raise SEOOptimizerError("At least one AI provider API key must be provided")
