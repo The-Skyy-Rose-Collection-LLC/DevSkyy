@@ -299,12 +299,14 @@ def reset_environment():
         try:
             os.remove("./test_devskyy.db")
         except Exception:
+            # Ignore errors if test DB doesn't exist or can't be deleted
             pass
     # Cleanup async test database
     if os.path.exists("./test_devskyy_async.db"):
         try:
             os.remove("./test_devskyy_async.db")
         except Exception:
+            # Ignore errors if async test DB doesn't exist or can't be deleted
             pass
 
 
