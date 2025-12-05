@@ -8,10 +8,9 @@ Per Truth Protocol:
 - Rule #12: Performance SLOs - P95 < 500ms for search operations
 """
 
-import asyncio
 from pathlib import Path
 from tempfile import TemporaryDirectory
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import MagicMock, patch
 
 import pytest
 

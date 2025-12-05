@@ -1330,12 +1330,12 @@ async def get_workflow_status(workflow_id: str):
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail="Workflow engine not available")
 
     try:
-        status = workflow_engine.get_workflow_status(workflow_id)
+        workflow_status = workflow_engine.get_workflow_status(workflow_id)
 
-        if "error" in status:
-            raise HTTPException(status_code=404, detail=status["error"])
+        if "error" in workflow_status:
+            raise HTTPException(status_code=404, detail=workflow_status["error"])
 
-        return status
+        return workflow_status
 
     except HTTPException:
         raise

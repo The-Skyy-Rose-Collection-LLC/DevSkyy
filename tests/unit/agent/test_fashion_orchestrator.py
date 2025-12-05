@@ -10,11 +10,8 @@ Truth Protocol Compliance:
 - Rule #10: No-Skip Rule (all errors logged and handled)
 """
 
-import asyncio
 import json
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, mock_open, patch
+from unittest.mock import AsyncMock, mock_open, patch
 
 import pytest
 
@@ -27,7 +24,7 @@ from agent.fashion_orchestrator import (
     FashionOrchestrator,
     ProductDescription,
 )
-from agent.unified_orchestrator import ExecutionPriority, Task, TaskStatus
+from agent.unified_orchestrator import ExecutionPriority, Task
 
 
 # =============================================================================

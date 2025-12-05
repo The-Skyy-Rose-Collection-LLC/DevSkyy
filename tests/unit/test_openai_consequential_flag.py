@@ -151,6 +151,7 @@ class TestEnhancedOrchestratorConsequentialFlag:
     """Test Enhanced AI Orchestrator consequential flag implementation"""
 
     @pytest.mark.unit
+    @pytest.mark.skip(reason="EnhancedAIOrchestrator was removed during cleanup")
     def test_orchestrator_openai_client_has_header(self, monkeypatch):
         """Test orchestrator initializes OpenAI client with consequential header"""
         monkeypatch.setenv("OPENAI_API_KEY", "test-key-12345")
@@ -165,13 +166,7 @@ class TestEnhancedOrchestratorConsequentialFlag:
             # Mock the orchestrator to avoid full initialization
             with patch("ai.enhanced_orchestrator.asyncio.create_task"):
                 pass  # EnhancedAIOrchestrator removed during cleanup
-
-                orchestrator = EnhancedAIOrchestrator()
-
-                # Verify AsyncOpenAI was called with headers
-                call_args = mock_async_openai.call_args
-                assert "default_headers" in call_args.kwargs
-                assert call_args.kwargs["default_headers"]["x-openai-isConsequential"] == "true"
+                # Skipped: This test relied on EnhancedAIOrchestrator which was removed
 
 
 class TestMultiModelOrchestratorConsequentialFlag:

@@ -3,11 +3,10 @@
 Generate comprehensive coverage analysis report.
 Part of the Truth Protocol (Rule #8: Test Coverage ≥90%).
 """
-import json
-from pathlib import Path
-from typing import Dict, List, Tuple
 from collections import defaultdict
 from datetime import datetime
+import json
+from pathlib import Path
 
 
 ARTIFACTS_DIR = Path("/home/user/DevSkyy/artifacts")
@@ -18,13 +17,13 @@ TARGET_COVERAGE = 90.0
 BASELINE_COVERAGE = 10.35
 
 
-def load_coverage_data() -> Dict:
+def load_coverage_data() -> dict:
     """Load coverage data from JSON file."""
     with open(COVERAGE_FILE, 'r') as f:
         return json.load(f)
 
 
-def calculate_module_coverage(data: Dict) -> Dict[str, Dict]:
+def calculate_module_coverage(data: dict) -> dict[str, dict]:
     """Calculate coverage statistics by module."""
     module_stats = defaultdict(lambda: {
         'lines_covered': 0,
@@ -73,7 +72,7 @@ def calculate_module_coverage(data: Dict) -> Dict[str, Dict]:
     return dict(module_stats)
 
 
-def get_file_coverage_list(data: Dict) -> List[Tuple[str, float, int, int]]:
+def get_file_coverage_list(data: dict) -> list[tuple[str, float, int, int]]:
     """Get sorted list of files with coverage stats."""
     file_list = []
     files = data.get('files', {})
@@ -93,7 +92,7 @@ def get_file_coverage_list(data: Dict) -> List[Tuple[str, float, int, int]]:
     return sorted(file_list, key=lambda x: x[1], reverse=True)
 
 
-def count_tests() -> Dict:
+def count_tests() -> dict:
     """Count test files by type."""
     test_counts = {
         'unit': 0,
@@ -127,7 +126,7 @@ def count_tests() -> Dict:
     return test_counts
 
 
-def generate_markdown_report(data: Dict, module_stats: Dict, file_list: List, test_counts: Dict):
+def generate_markdown_report(data: dict, module_stats: dict, file_list: list, test_counts: dict):
     """Generate comprehensive markdown report."""
     current_coverage = data.get('totals', {}).get('percent_covered', 0)
     total_lines = data.get('totals', {}).get('num_statements', 0)
@@ -277,7 +276,7 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
 """
 
     # Add top and bottom files
-    report += f"""
+    report += """
 
 ---
 
@@ -291,7 +290,7 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
         file_name = Path(file_path).name
         report += f"| {i} | `{file_name}` | {coverage:.1f}% | {covered} | {total} |\n"
 
-    report += f"""
+    report += """
 
 ---
 
@@ -425,7 +424,7 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
     print(f"✅ Generated: {REPORT_FILE}")
 
 
-def generate_statistics_json(data: Dict, module_stats: Dict, file_list: List, test_counts: Dict):
+def generate_statistics_json(data: dict, module_stats: dict, file_list: list, test_counts: dict):
     """Generate JSON statistics file."""
     current_coverage = data.get('totals', {}).get('percent_covered', 0)
     total_lines = data.get('totals', {}).get('num_statements', 0)

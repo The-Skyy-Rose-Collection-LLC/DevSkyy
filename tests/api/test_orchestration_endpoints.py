@@ -11,7 +11,6 @@ Author: DevSkyy Test Automation
 Version: 1.0.0
 """
 
-from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 from fastapi import status

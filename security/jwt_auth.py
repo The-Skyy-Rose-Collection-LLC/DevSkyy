@@ -783,10 +783,10 @@ def create_token_pair(user_id: str, email: str, username: str, role: str) -> Tok
         "username": username,
         "role": role,
     }
-    
+
     access_token = create_access_token(token_data)
     refresh_token = create_refresh_token(token_data)
-    
+
     return TokenResponse(
         access_token=access_token,
         refresh_token=refresh_token,
@@ -811,23 +811,23 @@ def verify_jwt_token(token: str, token_type: TokenType) -> dict[str, Any]:
     """
     try:
         payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-        
+
         # Verify token type matches expected
         if payload.get("token_type") != token_type:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=f"Invalid token type. Expected {token_type}",
             )
-        
+
         # Check if blacklisted
         if TokenBlacklist.is_blacklisted(token):
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Token has been revoked",
             )
-        
+
         return payload
-        
+
     except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -854,7 +854,7 @@ def refresh_access_token(refresh_token: str) -> TokenResponse:
         HTTPException: If refresh token is invalid
     """
     payload = verify_jwt_token(refresh_token, TokenType.REFRESH)
-    
+
     # Create new token pair
     return create_token_pair(
         user_id=payload["user_id"],
@@ -872,7 +872,7 @@ def revoke_token(token: str) -> None:
         token: Token to revoke
     """
     TokenBlacklist.add(token)
-    logger.info(f"Token revoked")
+    logger.info("Token revoked")
 
 
 def has_permission(user_role: str, required_role: str) -> bool:
@@ -888,7 +888,7 @@ def has_permission(user_role: str, required_role: str) -> bool:
     """
     user_level = ROLE_HIERARCHY.get(user_role, 0)
     required_level = ROLE_HIERARCHY.get(required_role, 0)
-    
+
     return user_level >= required_level
 
 

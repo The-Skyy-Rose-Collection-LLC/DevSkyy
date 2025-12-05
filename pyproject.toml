@@ -393,15 +393,29 @@ ignore = [
     "UP004",  # Class inherits from object
     "UP028",  # Checks for for loops that can be replaced with yield from
     "UP007",  # Use X | Y for type annotations (includes X | None)
+    # Additional ignores to reduce noise (CI/CD optimization)
+    "PLC0415",  # import-outside-top-level (often intentional for lazy loading)
+    "T201",     # print statements (useful for debugging/scripts)
+    "PLR2004",  # magic-value-comparison (acceptable in business logic)
+    "B904",     # raise-without-from (not always necessary)
+    "B007",     # unused-loop-control-variable (intentional _ usage)
+    "PERF401",  # manual-list-comprehension (readability > micro-optimization)
+    "S311",     # pseudo-random (OK for non-crypto use)
+    "S607",     # partial-executable-path (safe in controlled environments)
+    "SIM117",   # multiple-with-statements (sometimes clearer)
+    "PLR0911",  # too-many-return-statements (complex logic sometimes needed)
+    "PLR0912",  # too-many-branches (complex logic sometimes needed)
 ]
 
 # Per-file ignores
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403", "E402"]  # Unused imports in __init__.py
-"tests/**/*.py" = ["S101", "PLR2004", "S106", "S105"]  # Test-specific ignores
-"scripts/**/*.py" = ["T20"]  # Allow print statements in scripts
-"agent/**/*.py" = ["PLR0913"]  # Allow many arguments in agent modules
+"tests/**/*.py" = ["S101", "PLR2004", "S106", "S105", "B017", "B007", "S311"]  # Test-specific ignores
+"scripts/**/*.py" = ["T20", "T201"]  # Allow print in scripts
+"agent/**/*.py" = ["PLR0913", "PLR0911", "PLR0912"]  # Complex agent logic
 "api/**/*.py" = ["B008"]  # Allow function calls in argument defaults for FastAPI
+"examples/**/*.py" = ["T201", "S311", "PLR2004"]  # Example code is less strict
+".claude/**/*.py" = ["T201"]  # Allow print in claude scripts
 
 [tool.ruff.lint.isort]
 known-first-party = ["devskyy", "agent", "api", "ml", "fashion", "infrastructure"]

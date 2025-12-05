@@ -10,12 +10,12 @@ Truth Protocol Compliance:
 - Rule #10: No-Skip Rule
 """
 
-import asyncio
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from agent.modules.base_agent import AgentStatus
 from agent.orchestrator import (
     AgentCapability,
     AgentOrchestrator,
@@ -24,7 +24,6 @@ from agent.orchestrator import (
     MockAgent,
     TaskStatus,
 )
-from agent.modules.base_agent import AgentStatus
 
 
 # =============================================================================

@@ -4,8 +4,6 @@ Comprehensive unit tests for agent/modules/backend/financial_agent.py
 Target coverage: 75%+
 """
 
-from decimal import Decimal
-from unittest.mock import MagicMock, patch
 
 import pytest
 

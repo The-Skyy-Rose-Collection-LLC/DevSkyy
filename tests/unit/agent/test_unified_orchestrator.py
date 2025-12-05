@@ -21,12 +21,10 @@ Tests the UnifiedMCPOrchestrator class including:
 - Error handling and recovery mechanisms
 """
 
-import asyncio
-import json
 from datetime import datetime, timedelta
-from pathlib import Path
+import json
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, mock_open, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest

@@ -31,6 +31,7 @@ from enum import Enum
 import logging
 from typing import Any
 
+
 try:
     import dspy
     DSPY_AVAILABLE = True

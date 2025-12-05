@@ -10,7 +10,7 @@ Python: 3.11+
 
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from fastapi import status
+from fastapi import HTTPException, status
 from fastapi.testclient import TestClient
 import pytest
 
