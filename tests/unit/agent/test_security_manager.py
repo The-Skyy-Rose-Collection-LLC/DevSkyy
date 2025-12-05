@@ -20,9 +20,7 @@ Tests the SecurityManager class including:
 - Secrets management with HMAC comparison
 """
 
-import hashlib
 from datetime import datetime, timedelta
-from unittest.mock import patch
 
 import pytest
 

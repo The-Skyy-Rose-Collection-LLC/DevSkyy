@@ -4,14 +4,11 @@ Comprehensive unit tests for agent/modules/backend/auth_manager.py
 Target coverage: 75%+
 """
 
-import os
 from datetime import datetime, timedelta
-from unittest.mock import MagicMock, patch
+import os
+from unittest.mock import patch
 
-import bcrypt
 import pytest
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
 
 from agent.modules.backend.auth_manager import (
     AuthManager,

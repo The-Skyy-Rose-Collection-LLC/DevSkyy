@@ -19,10 +19,11 @@ from agent.mixins.react_mixin import (
     ReasoningTrace,
 )
 
+
 __all__ = [
-    "ReActCapableMixin",
     "IterativeRetrievalMixin",
-    "ReasoningTrace",
+    "ReActCapableMixin",
     "ReasoningStep",
     "ReasoningStepType",
+    "ReasoningTrace",
 ]

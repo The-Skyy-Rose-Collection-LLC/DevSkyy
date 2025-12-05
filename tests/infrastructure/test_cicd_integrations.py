@@ -9,13 +9,12 @@ Truth Protocol: Rules #1, #8, #15
 Coverage Target: ≥65%
 """
 
-import json
-import time
 from datetime import datetime
+import json
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import HTTPException
+import pytest
 
 from infrastructure.cicd_integrations import (
     CICDConnection,

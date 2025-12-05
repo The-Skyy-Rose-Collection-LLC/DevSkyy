@@ -13,10 +13,9 @@ Python: >=3.11.0
 """
 
 import asyncio
-from datetime import datetime, timedelta
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import datetime
 import time
+from unittest.mock import patch
 
 import pytest
 

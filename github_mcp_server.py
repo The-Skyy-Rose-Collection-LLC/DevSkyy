@@ -30,7 +30,6 @@ Per Truth Protocol:
 """
 
 import argparse
-import asyncio
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -41,6 +40,7 @@ import logging
 import os
 import sys
 from typing import Any, Literal
+
 
 try:
     import httpx

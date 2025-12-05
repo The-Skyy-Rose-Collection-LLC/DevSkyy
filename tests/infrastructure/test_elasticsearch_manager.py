@@ -9,11 +9,12 @@ Truth Protocol: Rules #1, #8, #15
 Coverage Target: ≥70%
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from elasticsearch.exceptions import ApiError, NotFoundError, RequestError
+import pytest
+
 
 # Alias for compatibility
 ElasticsearchException = ApiError

@@ -12,11 +12,8 @@ Version: 2.0.0
 Python: >=3.11.0
 """
 
-import asyncio
-import base64
-from datetime import datetime, timedelta
-import json
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from datetime import datetime
+from unittest.mock import AsyncMock
 
 import pytest
 

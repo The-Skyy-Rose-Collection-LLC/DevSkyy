@@ -20,6 +20,7 @@ from typing import Any
 
 from fastapi import APIRouter, Response, status
 
+
 router = APIRouter(prefix="/health", tags=["health"])
 
 
@@ -105,7 +106,7 @@ async def _check_redis() -> dict[str, Any]:
         latency = (datetime.now() - start).total_seconds() * 1000
         return _check_result("redis", True, "Connected", latency)
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         latency = (datetime.now() - start).total_seconds() * 1000
         return _check_result("redis", False, "Connection timeout", latency)
     except Exception as e:

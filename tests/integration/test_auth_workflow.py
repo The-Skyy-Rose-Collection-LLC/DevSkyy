@@ -20,35 +20,28 @@ Per Truth Protocol:
 - Rule #14: Error ledger required
 """
 
-import asyncio
 from datetime import datetime, timedelta
 import json
 import logging
 import time
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import patch
 
 import jwt as pyjwt
 import pytest
 
 from security.jwt_auth import (
+    TokenData,
     User,
     UserRole,
-    TokenData,
     create_access_token,
     create_refresh_token,
-    verify_token,
     hash_password,
     verify_password,
-    get_current_user,
+    verify_token,
 )
 from security.rbac import (
-    Permission,
-    Role,
     RBACManager,
-    check_permission,
 )
-from security.auth0_integration import Auth0Client
 
 
 logger = logging.getLogger(__name__)
@@ -237,8 +230,8 @@ class TestJWTTokens:
 
     def test_verify_expired_token(self, developer_user: User):
         """Test verifying expired token raises exception."""
-        import os
         from datetime import UTC
+        import os
 
         token_data = TokenData(
             user_id=developer_user.user_id,
@@ -294,7 +287,7 @@ class TestAuthenticationFlow:
     @pytest.mark.asyncio
     async def test_registration_to_login_flow(self, test_user_credentials: dict[str, str]):
         """Test complete registration → login flow."""
-        from security.jwt_auth import register_user, authenticate_user
+        from security.jwt_auth import authenticate_user, register_user
 
         user = await register_user(
             email=test_user_credentials["email"],
@@ -356,7 +349,7 @@ class TestAuthenticationFlow:
     @pytest.mark.asyncio
     async def test_account_lockout_after_max_attempts(self, test_user_credentials: dict[str, str]):
         """Test account lockout after exceeding max failed login attempts."""
-        from security.jwt_auth import authenticate_user, MAX_LOGIN_ATTEMPTS
+        from security.jwt_auth import MAX_LOGIN_ATTEMPTS, authenticate_user
 
         for _ in range(MAX_LOGIN_ATTEMPTS + 1):
             try:
@@ -376,7 +369,7 @@ class TestAuthenticationFlow:
     @pytest.mark.asyncio
     async def test_logout_invalidates_token(self, developer_user: User):
         """Test logout adds token to blacklist."""
-        from security.jwt_auth import logout_user, is_token_blacklisted
+        from security.jwt_auth import is_token_blacklisted, logout_user
 
         token_data = TokenData(
             user_id=developer_user.user_id,
@@ -503,7 +496,7 @@ class TestSessionManagement:
     @pytest.mark.asyncio
     async def test_terminate_session(self, developer_user: User):
         """Test terminating specific session."""
-        from security.jwt_auth import create_session, terminate_session, get_active_sessions
+        from security.jwt_auth import create_session, get_active_sessions, terminate_session
 
         session = await create_session(developer_user.user_id, "192.168.1.100", "Browser 1")
 
@@ -516,7 +509,7 @@ class TestSessionManagement:
     @pytest.mark.asyncio
     async def test_terminate_all_sessions(self, developer_user: User):
         """Test terminating all user sessions."""
-        from security.jwt_auth import create_session, terminate_all_sessions, get_active_sessions
+        from security.jwt_auth import create_session, get_active_sessions, terminate_all_sessions
 
         await create_session(developer_user.user_id, "192.168.1.100", "Browser 1")
         await create_session(developer_user.user_id, "192.168.1.101", "Browser 2")
@@ -539,7 +532,7 @@ class TestSecurityAuditLog:
     @pytest.mark.asyncio
     async def test_log_successful_login(self, developer_user: User):
         """Test logging successful login event."""
-        from security.jwt_auth import log_security_event, get_security_events
+        from security.jwt_auth import get_security_events, log_security_event
 
         await log_security_event(
             event_type="login_success",
@@ -556,7 +549,7 @@ class TestSecurityAuditLog:
     @pytest.mark.asyncio
     async def test_log_failed_login(self):
         """Test logging failed login attempt."""
-        from security.jwt_auth import log_security_event, get_security_events
+        from security.jwt_auth import get_security_events, log_security_event
 
         await log_security_event(
             event_type="login_failed",
@@ -573,7 +566,7 @@ class TestSecurityAuditLog:
     @pytest.mark.asyncio
     async def test_log_permission_denied(self, read_only_user: User):
         """Test logging permission denied events."""
-        from security.jwt_auth import log_security_event
+        from security.jwt_auth import get_security_events, log_security_event
 
         await log_security_event(
             event_type="permission_denied",
@@ -593,7 +586,7 @@ class TestSecurityAuditLog:
     @pytest.mark.asyncio
     async def test_gdpr_compliant_audit_log(self, developer_user: User):
         """Test audit log masks PII per GDPR requirements."""
-        from security.jwt_auth import log_security_event, get_security_events
+        from security.jwt_auth import get_security_events, log_security_event
 
         await log_security_event(
             event_type="profile_update",
@@ -646,7 +639,7 @@ class TestPasswordResetWorkflow:
     @pytest.mark.asyncio
     async def test_reset_password_with_token(self, developer_user: User):
         """Test resetting password using reset token."""
-        from security.jwt_auth import request_password_reset, reset_password_with_token, authenticate_user
+        from security.jwt_auth import authenticate_user, request_password_reset, reset_password_with_token
 
         reset_token = await request_password_reset(email=developer_user.email)
 
@@ -669,8 +662,9 @@ class TestPasswordResetWorkflow:
     @pytest.mark.asyncio
     async def test_reset_token_expires(self, developer_user: User):
         """Test password reset token expires after timeout."""
-        from security.jwt_auth import request_password_reset, verify_reset_token
         from datetime import UTC
+
+        from security.jwt_auth import request_password_reset, verify_reset_token
 
         reset_token = await request_password_reset(email=developer_user.email)
 
@@ -721,7 +715,7 @@ class TestMultiFactorAuthentication:
     @pytest.mark.asyncio
     async def test_mfa_required_login_flow(self, developer_user: User):
         """Test login flow with MFA requirement."""
-        from security.jwt_auth import enable_mfa, authenticate_user, verify_mfa_and_complete_login
+        from security.jwt_auth import authenticate_user, enable_mfa, verify_mfa_and_complete_login
 
         await enable_mfa(user_id=developer_user.user_id)
 

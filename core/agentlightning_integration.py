@@ -19,6 +19,7 @@ from functools import wraps
 import os
 from typing import Any
 
+
 try:
     from agentlightning import (
         AgentOpsTracer,

@@ -12,8 +12,8 @@ Coverage Target: ≥80%
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import HTTPException
+import pytest
 from starlette.responses import JSONResponse
 
 from infrastructure.redis_manager import SessionData

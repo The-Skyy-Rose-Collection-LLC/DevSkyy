@@ -13,24 +13,22 @@ from pathlib import Path
 import shutil
 import tempfile
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock
-import uuid
+from unittest.mock import Mock
 
 import numpy as np
 import pytest
 
+from ml.agent_deployment_system import (
+    AutomatedDeploymentOrchestrator,
+    JobDefinition,
+    ToolRequirement,
+)
 from ml.agent_finetuning_system import (
     AgentCategory,
     AgentFinetuningSystem,
     AgentPerformanceSnapshot,
     FinetuningConfig,
     FinetuningProvider,
-)
-from ml.agent_deployment_system import (
-    AutomatedDeploymentOrchestrator,
-    JobDefinition,
-    ResourceType,
-    ToolRequirement,
 )
 from ml.model_registry import ModelMetadata, ModelRegistry, ModelStage
 from ml.recommendation_engine import (

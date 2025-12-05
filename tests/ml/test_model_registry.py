@@ -14,10 +14,7 @@ Tests cover:
 """
 
 from datetime import datetime
-import json
-from pathlib import Path
 
-import joblib
 import pytest
 
 from ml.model_registry import (

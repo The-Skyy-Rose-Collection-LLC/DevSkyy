@@ -13,12 +13,10 @@ Tests cover:
 - Error handling
 """
 
-import asyncio
 from datetime import datetime, timedelta
 import json
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from ml.agent_finetuning_system import (

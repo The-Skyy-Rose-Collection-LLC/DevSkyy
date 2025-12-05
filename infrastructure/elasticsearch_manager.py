@@ -5,7 +5,8 @@ import time
 from typing import Any
 
 from elasticsearch import AsyncElasticsearch
-from elasticsearch.exceptions import ApiError as ElasticsearchException, NotFoundError, RequestError
+from elasticsearch.exceptions import ApiError as ElasticsearchException
+from elasticsearch.exceptions import NotFoundError, RequestError
 
 
 """

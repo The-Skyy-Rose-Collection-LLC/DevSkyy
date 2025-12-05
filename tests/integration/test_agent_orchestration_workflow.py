@@ -20,16 +20,15 @@ Per Truth Protocol:
 """
 
 import asyncio
-from datetime import datetime, timedelta
-import json
+from datetime import datetime
 import logging
-from pathlib import Path
 import time
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from agent.modules.base_agent import AgentStatus, BaseAgent
 from agent.orchestrator import (
     AgentCapability,
     AgentOrchestrator,
@@ -37,7 +36,6 @@ from agent.orchestrator import (
     ExecutionPriority,
     TaskStatus,
 )
-from agent.modules.base_agent import AgentStatus, BaseAgent
 
 
 logger = logging.getLogger(__name__)

@@ -4,8 +4,9 @@ Script to fix register_model() calls in ML test files
 Adds missing framework, parameters, and dataset_info parameters
 """
 
-import re
 from pathlib import Path
+import re
+
 
 def fix_register_model_calls(filepath: Path) -> bool:
     """Fix register_model calls in a file"""

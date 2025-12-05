@@ -6,7 +6,7 @@ from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
-from agent.mixins.react_mixin import ReActCapableMixin, IterativeRetrievalMixin
+from agent.mixins.react_mixin import IterativeRetrievalMixin, ReActCapableMixin
 
 
 """

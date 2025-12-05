@@ -10,7 +10,6 @@ Coverage Target: ≥75%
 """
 
 import asyncio
-import time
 from datetime import datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 

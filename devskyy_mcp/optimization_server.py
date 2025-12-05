@@ -31,17 +31,16 @@ Features:
 Truth Protocol: Standard MCP compliance, structured output, secure access
 """
 
-import base64
-import io
+from datetime import datetime
 import logging
 import os
-from datetime import datetime
 from typing import Annotated, Any
 
 from mcp.server.fastmcp import FastMCP, Image
 from mcp.server.fastmcp.prompts import base
 from mcp.types import CallToolResult, TextContent
 from pydantic import BaseModel, Field
+
 
 # Configuration
 DEVSKYY_API_URL = os.getenv("DEVSKYY_API_URL", "http://localhost:8000")

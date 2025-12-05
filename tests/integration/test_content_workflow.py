@@ -19,9 +19,7 @@ Per Truth Protocol:
 - Rule #10: No-skip rule - all errors logged
 """
 
-import asyncio
 from datetime import datetime
-import json
 import logging
 from pathlib import Path
 import tempfile
@@ -33,8 +31,6 @@ import pytest
 
 from agent.fashion_orchestrator import (
     FashionAssetType,
-    AIModelProvider,
-    ProductDescription,
     FashionOrchestrator,
 )
 
@@ -437,7 +433,7 @@ class TestImageProcessing:
             )
 
             assert len(variants) == len(sizes)
-            assert all(size_name in variants for size_name in sizes.keys())
+            assert all(size_name in variants for size_name in sizes)
 
     @pytest.mark.asyncio
     async def test_generate_alt_text(self, fashion_product_context: dict[str, Any]):

@@ -16,7 +16,6 @@ Example:
     print(settings.database_url)
 """
 
-import os
 from functools import lru_cache
 from typing import Literal
 
@@ -300,15 +299,7 @@ class Settings(BaseSettings):
     @property
     def database_connection_args(self) -> dict:
         """Get database connection arguments based on URL type."""
-        if self.database_url.startswith("postgresql"):
-            return {
-                "pool_size": self.db_pool_size,
-                "max_overflow": self.db_max_overflow,
-                "pool_timeout": self.db_pool_timeout,
-                "pool_recycle": self.db_pool_recycle,
-                "pool_pre_ping": True,
-            }
-        elif self.database_url.startswith("mysql"):
+        if self.database_url.startswith("postgresql") or self.database_url.startswith("mysql"):
             return {
                 "pool_size": self.db_pool_size,
                 "max_overflow": self.db_max_overflow,

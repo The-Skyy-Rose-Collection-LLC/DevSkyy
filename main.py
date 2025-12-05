@@ -19,6 +19,7 @@ from typing import Any
 # Per Truth Protocol Rule #5: No secrets in code - load from environment
 from dotenv import load_dotenv
 
+
 load_dotenv()
 
 # Core FastAPI imports
@@ -513,12 +514,12 @@ try:
     from api.v1.consensus import router as consensus_router
     from api.v1.content import router as content_router
     from api.v1.dashboard import router as dashboard_router
-    from api.v1.health import router as health_router
 
     # DevSkyy Automation Routers (n8n replacements)
     from api.v1.ecommerce import router as ecommerce_router
     from api.v1.finetuning import router as finetuning_router
     from api.v1.gdpr import router as gdpr_router
+    from api.v1.health import router as health_router
     from api.v1.mcp import router as mcp_router
     from api.v1.ml import router as ml_router
     from api.v1.monitoring import router as monitoring_router

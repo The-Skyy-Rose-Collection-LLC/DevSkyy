@@ -4,13 +4,17 @@ Generate comprehensive coverage visualization graphs.
 Part of the Truth Protocol (Rule #8: Test Coverage ≥90%).
 """
 import json
-import matplotlib.pyplot as plt
+
 import matplotlib
+import matplotlib.pyplot as plt
+
+
 matplotlib.use('Agg')  # Non-interactive backend
-import numpy as np
-from pathlib import Path
-from typing import Dict, List, Tuple
 from collections import defaultdict
+from pathlib import Path
+
+import numpy as np
+
 
 # Configuration
 ARTIFACTS_DIR = Path("/home/user/DevSkyy/artifacts")
@@ -22,13 +26,13 @@ BASELINE_COVERAGE = 10.35  # Before adding tests
 ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def load_coverage_data() -> Dict:
+def load_coverage_data() -> dict:
     """Load coverage data from JSON file."""
     with open(COVERAGE_FILE, 'r') as f:
         return json.load(f)
 
 
-def calculate_module_coverage(data: Dict) -> Dict[str, Dict]:
+def calculate_module_coverage(data: dict) -> dict[str, dict]:
     """Calculate coverage statistics by module."""
     module_stats = defaultdict(lambda: {
         'lines_covered': 0,
@@ -71,7 +75,7 @@ def calculate_module_coverage(data: Dict) -> Dict[str, Dict]:
     return dict(module_stats)
 
 
-def get_file_coverage_list(data: Dict) -> List[Tuple[str, float, int, int]]:
+def get_file_coverage_list(data: dict) -> list[tuple[str, float, int, int]]:
     """Get sorted list of files with coverage stats."""
     file_list = []
     files = data.get('files', {})
@@ -92,7 +96,7 @@ def get_file_coverage_list(data: Dict) -> List[Tuple[str, float, int, int]]:
     return sorted(file_list, key=lambda x: x[1], reverse=True)
 
 
-def graph_1_module_coverage_bar(module_stats: Dict):
+def graph_1_module_coverage_bar(module_stats: dict):
     """Graph 1: Coverage by Module (Bar Chart)."""
     plt.figure(figsize=(14, 8))
 
@@ -167,7 +171,7 @@ def graph_2_before_after_comparison(current_coverage: float):
     print("✅ Generated: coverage_before_after.png")
 
 
-def graph_3_file_distribution(file_list: List[Tuple[str, float, int, int]]):
+def graph_3_file_distribution(file_list: list[tuple[str, float, int, int]]):
     """Graph 3: File Coverage Distribution (Histogram)."""
     plt.figure(figsize=(12, 6))
 
@@ -202,7 +206,7 @@ def graph_3_file_distribution(file_list: List[Tuple[str, float, int, int]]):
     print("✅ Generated: coverage_distribution.png")
 
 
-def graph_4_top_performers(file_list: List[Tuple[str, float, int, int]]):
+def graph_4_top_performers(file_list: list[tuple[str, float, int, int]]):
     """Graph 4: Top 10 Files with Best Coverage."""
     plt.figure(figsize=(14, 8))
 
@@ -240,7 +244,7 @@ def graph_4_top_performers(file_list: List[Tuple[str, float, int, int]]):
     print("✅ Generated: top_covered_files.png")
 
 
-def graph_5_coverage_gaps(file_list: List[Tuple[str, float, int, int]]):
+def graph_5_coverage_gaps(file_list: list[tuple[str, float, int, int]]):
     """Graph 5: Top 10 Files Needing Most Improvement."""
     plt.figure(figsize=(14, 8))
 
@@ -283,7 +287,7 @@ def graph_5_coverage_gaps(file_list: List[Tuple[str, float, int, int]]):
     print("✅ Generated: coverage_gaps.png")
 
 
-def graph_6_module_heatmap(module_stats: Dict):
+def graph_6_module_heatmap(module_stats: dict):
     """Graph 6: Module Coverage Heatmap."""
     plt.figure(figsize=(14, 8))
 

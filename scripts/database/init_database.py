@@ -22,7 +22,7 @@ async def init_database():
     """Initialize the database with all tables"""
     try:
         # Import database modules
-        from database import db_manager, init_db, DATABASE_URL
+        from database import DATABASE_URL, db_manager, init_db
         import models_sqlalchemy  # noqa: F401 - Import for side effects (model registration)
 
         db_provider = "postgresql" if "postgresql" in DATABASE_URL else "sqlite"

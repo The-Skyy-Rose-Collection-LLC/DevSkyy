@@ -15,14 +15,11 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import asyncio
-from datetime import datetime
-from pathlib import Path
 import sys
-from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, patch, mock_open
+from unittest.mock import MagicMock, mock_open, patch
 
 import pytest
+
 
 # Mock external dependencies before importing the module
 sys.modules['chromadb'] = MagicMock()
@@ -1026,7 +1023,6 @@ class TestGetRAGService:
     def test_get_rag_service_returns_same_instance(self):
         """Test that get_rag_service returns the same instance (singleton)."""
         # Arrange
-        import services.rag_service as rag_module
 
         with patch.object(RAGConfig, "ANTHROPIC_API_KEY", None):
             with patch("services.rag_service.VectorDatabase"):

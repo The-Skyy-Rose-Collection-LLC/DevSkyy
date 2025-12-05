@@ -13,19 +13,14 @@ Python: >=3.11.0
 """
 
 from datetime import datetime, timedelta
-import json
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import Mock, patch
 
 from fastapi import HTTPException
-import httpx
-from jose import JWTError, jwt
 import pytest
 
 from security.auth0_integration import (
-    AUTH0_ALGORITHMS,
     AUTH0_AUDIENCE,
     AUTH0_DOMAIN,
-    DEVSKYY_JWT_ALGORITHM,
     HTTP_TIMEOUT,
     Auth0Client,
     Auth0OAuth2Client,
@@ -37,14 +32,11 @@ from security.auth0_integration import (
     create_devskyy_jwt_token,
     create_devskyy_refresh_token,
     get_auth0_login_url,
-    get_current_admin_user,
-    get_current_user,
     log_auth_event,
     require_permissions,
     require_scope,
     security,
     verify_devskyy_jwt_token,
-    verify_jwt_token,
 )
 
 

@@ -7,12 +7,13 @@ import time
 from dotenv import load_dotenv
 from sqlalchemy import select, text
 
+
 # Import from database.py module (not database package)
-import sys
-from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 import database as db_module
+
+
 AsyncSessionLocal = db_module.AsyncSessionLocal
 db_manager = db_module.db_manager
 init_db = db_module.init_db

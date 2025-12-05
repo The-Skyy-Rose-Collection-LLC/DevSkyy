@@ -13,7 +13,6 @@ Python: >=3.11.0
 """
 
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 

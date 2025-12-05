@@ -20,6 +20,7 @@ Mixins:
 import os
 import sys
 
+
 __version__ = "2.0.0"
 __author__ = "DevSkyy Enhanced Platform"
 
@@ -28,10 +29,10 @@ sys.path.insert(0, os.path.dirname(__file__))
 
 # Public API exports
 __all__ = [
+    "AgentConfigLoader",
     "AgentOrchestrator",
     "AgentRegistry",
     "AgentRouter",
-    "AgentConfigLoader",
 ]
 
 

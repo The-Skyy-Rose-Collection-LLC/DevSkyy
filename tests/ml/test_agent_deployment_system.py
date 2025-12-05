@@ -17,9 +17,7 @@ import pytest
 
 from ml.agent_deployment_system import (
     ApprovalStatus,
-    ApprovalWorkflowResult,
     AutomatedDeploymentOrchestrator,
-    CategoryHeadApproval,
     CategoryHeadApprovalSystem,
     DeploymentExecution,
     InfrastructureValidationResult,

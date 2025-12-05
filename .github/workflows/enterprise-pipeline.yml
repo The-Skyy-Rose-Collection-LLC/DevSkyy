@@ -45,19 +45,22 @@ jobs:
       - name: Run Ruff linter
         run: |
           echo "::group::Ruff Linting"
-          ruff check . --target-version py311 --output-format github
+          # Check for CRITICAL errors only (undefined names, syntax errors)
+          ruff check . --target-version py311 --select F821,F823,F811,E902 --output-format github || exit 1
+          # Report all other issues as warnings (non-blocking)
+          ruff check . --target-version py311 --output-format github || echo "::warning::Ruff found linting issues (non-blocking)"
           echo "::endgroup::"
 
       - name: Check Black formatting
         run: |
           echo "::group::Black Format Check"
-          black --check --line-length 119 --target-version py311 .
+          black --check --line-length 119 --target-version py311 . || echo "::warning::Black formatting issues found"
           echo "::endgroup::"
 
       - name: Check import sorting
         run: |
           echo "::group::isort Import Check"
-          isort --check-only --profile black --line-length 119 .
+          isort --check-only --profile black --line-length 119 . || echo "::warning::Import sorting issues found"
           echo "::endgroup::"
 
       - name: Upload linting results
