@@ -103,7 +103,7 @@ ELITE MEDIA DOMINATION: E-COMMERCE | FASHION | PHOTOGRAPHY | VIDEO
 │  • Google Merchant Center compliance                                        │
 │  • Facebook/Instagram Shopping compatibility                                │
 │  • Pinterest Rich Pins structured data                                      │
-│  • Shopify/WooCommerce/Magento optimization                                 │
+│  • WooCommerce/WooCommerce/Magento optimization                                 │
 │  • Core Web Vitals: LCP <2.5s, FID <100ms, CLS <0.1                        │
 │                                                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
@@ -159,7 +159,7 @@ ELITE MEDIA DOMINATION: E-COMMERCE | FASHION | PHOTOGRAPHY | VIDEO
 │  Website Audit Capabilities:                                                 │
 │  • Scan all image/video URLs on site                                        │
 │  • Identify: blurry, low-res, wrong format, missing alt text                │
-│  • Auto-enhance and replace via CMS API (WordPress/Shopify)                 │
+│  • Auto-enhance and replace via CMS API (WordPress/WooCommerce)                 │
 │  • Generate: multiple sizes, WebP/AVIF, lazy load config                    │
 │  • Report: before/after, file size savings, PageSpeed improvement           │
 │                                                                              │
@@ -203,7 +203,7 @@ ELITE MEDIA DOMINATION: E-COMMERCE | FASHION | PHOTOGRAPHY | VIDEO
 │  │ facebook/sam-vit-huge         → Segment Anything (precise)     │        │
 │  │ briaai/RMBG-1.4               → Background removal (fast)      │        │
 │  │ ECCV2022/MAT                  → Inpainting & object removal    │        │
-│  │ Shopify/background-removal    → E-commerce optimized           │        │
+│  │ WooCommerce/background-removal    → E-commerce optimized           │        │
 │  └────────────────────────────────────────────────────────────────┘        │
 │                                                                              │
 │  FASHION-SPECIFIC MODELS:                                                    │
@@ -249,7 +249,7 @@ ELITE MEDIA DOMINATION: E-COMMERCE | FASHION | PHOTOGRAPHY | VIDEO
 │                                                                              │
 │  Deep Research Capabilities (Gemini + Claude):                               │
 │  ┌────────────────────────────────────────────────────────────────┐        │
-│  │ • Shopify/Magento/WooCommerce best practices (real-time scrape) │        │
+│  │ • WooCommerce/Magento/WooCommerce best practices (real-time scrape) │        │
 │  │ • Fashion photography industry standards (Vogue, Harper's, GQ)  │        │
 │  │ • Luxury brand visual guidelines (Gucci, LV, Chanel analysis)   │        │
 │  │ • Google Shopping/Merchant Center requirements                  │        │

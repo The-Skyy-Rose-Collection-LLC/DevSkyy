@@ -113,7 +113,7 @@ response = await client.post("/api/v1/luxury-automation/visual-content/generate"
 **Purpose:** Real-time inventory tracking and financial management
 
 **Capabilities:**
-- Multi-channel inventory synchronization (WooCommerce, Shopify, Amazon, eBay)
+- Multi-channel inventory synchronization (WooCommerce, WooCommerce, Amazon, eBay)
 - Real-time financial transaction processing
 - Predictive demand forecasting with ML
 - Automated reordering and stock alerts
@@ -331,7 +331,7 @@ workflow_request = {
         },
         "inventory_params": {
             "initial_products": 50,
-            "channels": ["woocommerce", "shopify"]
+            "channels": ["woocommerce", "woocommerce"]
         },
         "marketing_params": {
             "budget": 10000.00,
@@ -580,7 +580,7 @@ integrations:
     enabled: true
     url: "https://your-site.com"
 
-  shopify:
+  woocommerce:
     enabled: false
 ```
 

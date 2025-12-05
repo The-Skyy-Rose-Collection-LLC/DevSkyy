@@ -216,10 +216,10 @@ class DevSkyyClient:
                 capabilities=["theme_generation", "elementor_integration", "responsive_design", "seo_ready"],
             ),
             AgentInfo(
-                name="shopify_connector",
+                name="woocommerce_connector",
                 category="Integration",
-                description="Shopify platform integration and synchronization",
-                capabilities=["product_sync", "order_management", "inventory_sync"],
+                description="WooCommerce platform integration and synchronization",
+                capabilities=["product_sync", "order_management", "inventory_sync", "customer_data"],
             ),
             # Advanced Agents (4)
             AgentInfo(
@@ -311,7 +311,7 @@ async def devskyy_list_agents() -> str:
     - E-Commerce (10): Products, Pricing, Inventory, Orders
     - Marketing (8): Email, SMS, Social Media, Campaigns
     - Content (6): SEO, Copywriting, Images, Video
-    - Integration (4): WordPress, Shopify, WooCommerce
+    - Integration (4): WordPress, WooCommerce, Magento
     - Advanced (4): ML Training, Analytics, Blockchain
     - Frontend (2): UI Components, Themes
     """

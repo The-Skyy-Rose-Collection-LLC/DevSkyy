@@ -8,7 +8,7 @@ Features:
 - Predictive analytics for demand forecasting
 - Financial reporting and reconciliation
 - Multi-currency support
-- Integration with major e-commerce platforms (Shopify, WooCommerce, Magento)
+- Integration with major e-commerce platforms (WooCommerce, Magento)
 - Automated reordering and stock alerts
 - Revenue analytics and profitability tracking
 - Tax calculation and compliance
@@ -321,7 +321,6 @@ class FinanceInventoryPipelineAgent:
         # Circuit breaker states for external integrations
         self.circuit_breakers = {
             "woocommerce": {"state": "closed", "failures": 0, "last_failure": None},
-            "shopify": {"state": "closed", "failures": 0, "last_failure": None},
             "stripe": {"state": "closed", "failures": 0, "last_failure": None},
         }
 

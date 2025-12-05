@@ -751,7 +751,7 @@ async def sync_inventory(request: InventorySyncRequest):
     Synchronize inventory from an external sales channel specified in the request.
 
     Parameters:
-        request (InventorySyncRequest): Sync request containing `channel` (the external platform name) and `items` to be synchronized. Supported channels include WooCommerce, Shopify, Magento, Amazon, and eBay.
+        request (InventorySyncRequest): Sync request containing `channel` (the external platform name) and `items` to be synchronized. Supported channels include WooCommerce, Magento, Amazon, and eBay.
 
     Returns:
         dict: Result object describing the synchronization outcome, for example keys such as `success` (bool), `processed_count` (int), and `errors` (list) when applicable.

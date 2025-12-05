@@ -166,7 +166,6 @@ class APIDiscoveryEngine:
             },
             "fashion_specific": {
                 "sources": [
-                    "https://api.shopify.com",
                     "https://api.woocommerce.com",
                     "https://api.magento.com",
                     "https://developers.pinterest.com",
@@ -379,22 +378,6 @@ class APIDiscoveryEngine:
 
         # Predefined fashion and ecommerce APIs
         fashion_apis = [
-            {
-                "name": "Shopify Admin API",
-                "description": "Complete ecommerce platform API for fashion retailers",
-                "base_url": "https://your-shop.myshopify.com/admin/api/2023-10",
-                "category": APICategory.PRODUCT_CATALOG,
-                "provider": "Shopify",
-                "authentication": AuthenticationType.API_KEY,
-                "features": [
-                    "products",
-                    "inventory",
-                    "orders",
-                    "customers",
-                    "analytics",
-                ],
-                "fashion_relevance": 0.95,
-            },
             {
                 "name": "WooCommerce REST API",
                 "description": "WordPress ecommerce API for fashion stores",
@@ -684,14 +667,13 @@ class APIDiscoveryEngine:
 
         # Base score from provider reputation
         provider_scores = {
-            "shopify": 0.95,
             "stripe": 0.95,
             "amazon web services": 0.90,
             "google": 0.90,
+            "woocommerce": 0.90,
             "microsoft": 0.85,
             "meta": 0.80,
             "pinterest": 0.75,
-            "woocommerce": 0.70,
         }
 
         base_score = provider_scores.get(api.provider.lower(), 0.60)

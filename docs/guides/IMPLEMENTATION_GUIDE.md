@@ -213,7 +213,7 @@ python -c "from diffusers import StableDiffusionXLPipeline; StableDiffusionXLPip
 **Production Enhancements (Optional):**
 - Connect to PostgreSQL for persistence
 - Integrate with WooCommerce REST API
-- Integrate with Shopify API
+- Integrate with WooCommerce API
 - Add Stripe/PayPal for payment processing
 
 **To Enable E-commerce Integration:**
@@ -469,9 +469,9 @@ WOOCOMMERCE_URL=https://yourstore.com
 WOOCOMMERCE_KEY=ck_...
 WOOCOMMERCE_SECRET=cs_...
 
-SHOPIFY_SHOP_NAME=yourstore
-SHOPIFY_API_KEY=...
-SHOPIFY_PASSWORD=...
+WOOCOMMERCE_SHOP_NAME=yourstore
+WOOCOMMERCE_API_KEY=...
+WOOCOMMERCE_PASSWORD=...
 
 # ============================================================================
 # Database (Optional - uses in-memory by default)

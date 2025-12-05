@@ -196,7 +196,7 @@ The system automatically selects the best HuggingFace model for each task:
 #### Background Removal & Segmentation
 - facebook/sam-vit-huge (Segment Anything)
 - briaai/RMBG-1.4 (fast background removal)
-- Shopify/background-removal (e-commerce optimized)
+- WooCommerce/background-removal (e-commerce optimized)
 
 #### Fashion-Specific Models
 - yisol/IDM-VTON (virtual try-on)
@@ -215,7 +215,7 @@ The system automatically selects the best HuggingFace model for each task:
 - Google Merchant Center compliance
 - Facebook/Instagram Shopping compatibility
 - Pinterest Rich Pins structured data
-- Shopify/WooCommerce/Magento optimization
+- WooCommerce/WooCommerce/Magento optimization
 - Core Web Vitals: LCP <2.5s, FID <100ms, CLS <0.1
 
 #### Platform Optimization
