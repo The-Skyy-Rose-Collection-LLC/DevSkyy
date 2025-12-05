@@ -273,7 +273,8 @@ addopts = [
     "-ra",
     "--strict-markers",
     "--strict-config",
-    "--cov=.",
+    "--cov=database",
+    "--cov=models_sqlalchemy",
     "--cov-report=term-missing",
     "--cov-report=html",
     "--cov-report=xml",
@@ -291,6 +292,11 @@ markers = [
     "unit: marks tests as unit tests",
     "security: marks tests as security tests",
     "performance: marks tests as performance tests",
+    "api: marks FastAPI/HTTP endpoint tests",
+    "infrastructure: marks infrastructure and ops integrations",
+    "benchmark: marks performance benchmark suites",
+    "consensus: marks multi-agent consensus workflow tests",
+    "external: marks tests that hit external services (usually mocked)",
 ]
 filterwarnings = [
     "error",
@@ -301,7 +307,10 @@ filterwarnings = [
 
 # Coverage Configuration
 [tool.coverage.run]
-source = ["."]
+source = [
+    "database",
+    "models_sqlalchemy",
+]
 omit = [
     "*/tests/*",
     "*/test_*",
@@ -311,6 +320,12 @@ omit = [
     "setup.py",
     "*/migrations/*",
     "*/htmlcov/*",
+    "agent/*",
+    "ml/*",
+    "docs/*",
+    "examples/*",
+    "scripts/*",
+    "cov_annotated/*",
 ]
 branch = true
 

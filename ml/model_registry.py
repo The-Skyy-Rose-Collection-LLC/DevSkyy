@@ -1,4 +1,5 @@
 from datetime import datetime
+from dataclasses import dataclass, field
 from enum import Enum
 import json
 import logging
@@ -84,6 +85,44 @@ class ModelMetadata:
             parameters=data["parameters"],
             dataset_info=data["dataset_info"],
             stage=data.get("stage", ModelStage.DEVELOPMENT),
+        )
+
+
+@dataclass(slots=True)
+class ModelVersion:
+    """Represents a concrete stored version of a model artifact."""
+
+    model_name: str
+    version: str
+    stage: ModelStage
+    artifact_path: Path
+    metadata: ModelMetadata
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    description: str | None = None
+
+    def to_dict(self) -> dict[str, Any]:
+        """Serialize version info for persistence."""
+        return {
+            "model_name": self.model_name,
+            "version": self.version,
+            "stage": self.stage.value,
+            "artifact_path": str(self.artifact_path),
+            "metadata": self.metadata.to_dict(),
+            "created_at": self.created_at.isoformat(),
+            "description": self.description,
+        }
+
+    @classmethod
+    def from_dict(cls, data: dict[str, Any]) -> "ModelVersion":
+        """Deserialize from stored metadata."""
+        return cls(
+            model_name=data["model_name"],
+            version=data["version"],
+            stage=ModelStage(data["stage"]),
+            artifact_path=Path(data["artifact_path"]),
+            metadata=ModelMetadata.from_dict(data["metadata"]),
+            created_at=datetime.fromisoformat(data["created_at"]),
+            description=data.get("description"),
         )
 
 

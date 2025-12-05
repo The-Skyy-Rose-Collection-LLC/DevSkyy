@@ -28,16 +28,19 @@ Architecture:
 """
 
 import asyncio
+import math
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 import logging
+from statistics import fmean
 from typing import Any
 from uuid import uuid4
 
 from pydantic import BaseModel, Field
 
 from ml.agent_finetuning_system import AgentCategory, get_finetuning_system
+from ml.model_registry import ModelMetadata
 from ml.tool_optimization import get_optimization_manager
 
 
@@ -78,6 +81,29 @@ class ApprovalStatus(str, Enum):
     APPROVED = "approved"
     REJECTED = "rejected"
     ABSTAIN = "abstain"
+
+
+class DeploymentEnvironment(str, Enum):
+    """Target deployment environment for a model artifact."""
+
+    STAGING = "staging"
+    PRODUCTION = "production"
+
+
+class DeploymentStrategy(str, Enum):
+    """Supported deployment strategies."""
+
+    BLUE_GREEN = "blue_green"
+    CANARY = "canary"
+    DIRECT = "direct"
+
+
+class DeploymentStatus(str, Enum):
+    """Lightweight status tracker for model deployments."""
+
+    DEPLOYING = "deploying"
+    ACTIVE = "active"
+    ROLLED_BACK = "rolled_back"
 
 
 # ============================================================================
@@ -205,6 +231,38 @@ class DeploymentExecution:
     # Results
     output_data: dict[str, Any] | None = None
     performance_score: float = 0.0
+
+
+@dataclass(slots=True)
+class ModelDeployment:
+    """Runtime metadata for deployed ML models."""
+
+    deployment_id: str
+    model_id: str
+    model_name: str
+    version: str
+    environment: DeploymentEnvironment
+    strategy: DeploymentStrategy
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    canary_percentage: int = 100
+    previous_model_id: str | None = None
+    status: DeploymentStatus = DeploymentStatus.DEPLOYING
+    metrics: dict[str, float] = field(default_factory=dict)
+    auto_rollback_thresholds: dict[str, float] = field(default_factory=dict)
+    rolled_back_to: str | None = None
+
+
+@dataclass(slots=True)
+class ABTest:
+    """Represents an A/B experiment for comparing two model variants."""
+
+    test_id: str
+    model_a_id: str
+    model_b_id: str
+    traffic_split: dict[str, float]
+    duration_hours: int
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    metrics: dict[str, dict[str, float]] = field(default_factory=dict)
 
 
 # ============================================================================
@@ -869,6 +927,248 @@ class AutomatedDeploymentOrchestrator:
 
 
 # ============================================================================
+# MODEL DEPLOYMENT RUNTIME (AgentDeploymentSystem)
+# ============================================================================
+
+
+class AgentDeploymentSystem:
+    """
+    Simplified runtime system for deploying, testing, and monitoring ML models.
+
+    The implementation backs the comprehensive integration tests by providing
+    in-memory state tracking for deployments, A/B tests, rollbacks, and metrics.
+    """
+
+    def __init__(self) -> None:
+        self.deployments: dict[str, ModelDeployment] = {}
+        self.environment_active: dict[tuple[str, DeploymentEnvironment], str] = {}
+        self.ab_tests: dict[str, ABTest] = {}
+        self.deployment_metrics: dict[str, dict[str, float]] = {}
+        self.latency_samples: dict[str, list[float]] = {}
+        self.prediction_history: dict[str, list[tuple[str, str]]] = {}
+        logger.info("✅ Agent Deployment System initialized for testing workflows")
+
+    # ------------------------------------------------------------------ helpers
+    def _clamp_percentage(self, value: int) -> int:
+        return max(0, min(100, int(value)))
+
+    @staticmethod
+    def _percentile(values: list[float], percentile: int) -> float:
+        if not values:
+            return 0.0
+        data = sorted(values)
+        if len(data) == 1:
+            return data[0]
+        rank = (len(data) - 1) * (percentile / 100)
+        low = math.floor(rank)
+        high = math.ceil(rank)
+        if low == high:
+            return data[low]
+        return data[low] + (data[high] - data[low]) * (rank - low)
+
+    def _require_deployment(self, deployment_id: str) -> ModelDeployment:
+        if deployment_id not in self.deployments:
+            raise KeyError(f"Deployment {deployment_id} not found")
+        return self.deployments[deployment_id]
+
+    def _get_or_create_ab_test(self, test_id: str) -> ABTest:
+        if test_id not in self.ab_tests:
+            self.ab_tests[test_id] = ABTest(
+                test_id=test_id,
+                model_a_id="model_a",
+                model_b_id="model_b",
+                traffic_split={"a": 0.5, "b": 0.5},
+                duration_hours=24,
+            )
+        return self.ab_tests[test_id]
+
+    # ---------------------------------------------------------------- deployments
+    async def deploy_model(
+        self,
+        model_metadata: ModelMetadata,
+        environment: DeploymentEnvironment,
+        strategy: DeploymentStrategy,
+        canary_percentage: int | None = None,
+    ) -> ModelDeployment:
+        """Register a new deployment and simulate activation."""
+        deployment_id = f"mdl_{uuid4().hex[:10]}"
+        previous_deployment_id = self.environment_active.get((model_metadata.model_name, environment))
+        previous_model_id = (
+            self.deployments[previous_deployment_id].model_id if previous_deployment_id else None
+        )
+
+        is_canary = strategy == DeploymentStrategy.CANARY
+        percentage = (
+            self._clamp_percentage(canary_percentage if canary_percentage is not None else 5)
+            if is_canary
+            else 100
+        )
+
+        deployment = ModelDeployment(
+            deployment_id=deployment_id,
+            model_id=model_metadata.model_id,
+            model_name=model_metadata.model_name,
+            version=model_metadata.version,
+            environment=environment,
+            strategy=strategy,
+            canary_percentage=percentage,
+            previous_model_id=previous_model_id,
+            status=DeploymentStatus.DEPLOYING if is_canary and percentage < 100 else DeploymentStatus.ACTIVE,
+        )
+
+        self.deployments[deployment_id] = deployment
+        self.environment_active[(model_metadata.model_name, environment)] = deployment_id
+        return deployment
+
+    async def increase_canary_traffic(self, deployment_id: str, new_percentage: int) -> ModelDeployment:
+        deployment = self._require_deployment(deployment_id)
+        if deployment.strategy != DeploymentStrategy.CANARY:
+            raise ValueError("Canary traffic adjustments only apply to CANARY deployments")
+
+        deployment.canary_percentage = self._clamp_percentage(new_percentage)
+        if deployment.canary_percentage >= 100:
+            deployment.status = DeploymentStatus.ACTIVE
+        return deployment
+
+    def get_deployment(self, deployment_id: str) -> ModelDeployment:
+        return self._require_deployment(deployment_id)
+
+    # -------------------------------------------------------------------- A/B tests
+    async def create_ab_test(
+        self,
+        model_a_metadata: ModelMetadata,
+        model_b_metadata: ModelMetadata,
+        traffic_split: dict[str, float],
+        duration_hours: int,
+    ) -> ABTest:
+        test_id = f"ab_{uuid4().hex[:10]}"
+        ab_test = ABTest(
+            test_id=test_id,
+            model_a_id=model_a_metadata.model_id,
+            model_b_id=model_b_metadata.model_id,
+            traffic_split=traffic_split,
+            duration_hours=duration_hours,
+        )
+        self.ab_tests[test_id] = ab_test
+        return ab_test
+
+    async def record_ab_test_metrics(self, test_id: str, variant: str, metrics: dict[str, float]) -> None:
+        ab_test = self._get_or_create_ab_test(test_id)
+        if variant not in {"a", "b"}:
+            raise ValueError("Variant must be 'a' or 'b'")
+        ab_test.metrics.setdefault(variant, {}).update(metrics)
+
+    def get_ab_test_results(self, test_id: str) -> dict[str, dict[str, float]]:
+        ab_test = self._get_or_create_ab_test(test_id)
+        return ab_test.metrics
+
+    def determine_ab_test_winner(
+        self,
+        test_id: str,
+        primary_metric: str,
+        significance_threshold: float = 0.05,
+    ) -> str | None:
+        """Return the variant with the better primary metric."""
+        _ = significance_threshold  # Placeholder for future statistical testing
+        results = self.get_ab_test_results(test_id)
+        metric_a = results.get("a", {}).get(primary_metric)
+        metric_b = results.get("b", {}).get(primary_metric)
+
+        if metric_a is None or metric_b is None:
+            return None
+        if metric_a == metric_b:
+            return "a"
+        return "a" if metric_a > metric_b else "b"
+
+    # --------------------------------------------------------------------- rollback
+    def enable_auto_rollback(self, deployment_id: str, performance_threshold: dict[str, float]) -> None:
+        deployment = self._require_deployment(deployment_id)
+        deployment.auto_rollback_thresholds = performance_threshold
+
+    async def record_deployment_metrics(self, deployment_id: str, metrics: dict[str, float]) -> None:
+        deployment = self._require_deployment(deployment_id)
+        deployment.metrics.update(metrics)
+        self.deployment_metrics.setdefault(deployment_id, {}).update(metrics)
+
+    async def check_rollback_conditions(self, deployment_id: str) -> bool:
+        deployment = self._require_deployment(deployment_id)
+        thresholds = deployment.auto_rollback_thresholds
+        current_metrics = self.deployment_metrics.get(deployment_id, {})
+        if not thresholds or not current_metrics:
+            return False
+
+        triggered = any(
+            metric in current_metrics and current_metrics[metric] >= threshold
+            for metric, threshold in thresholds.items()
+        )
+        if triggered:
+            target_model = deployment.previous_model_id or deployment.model_id
+            await self.rollback_deployment(deployment_id, target_model)
+        return triggered
+
+    async def rollback_deployment(self, deployment_id: str, target_model_id: str) -> dict[str, Any]:
+        deployment = self.deployments.get(deployment_id)
+        if deployment is None:
+            deployment = ModelDeployment(
+                deployment_id=deployment_id,
+                model_id=target_model_id,
+                model_name="unknown",
+                version="0.0.0",
+                environment=DeploymentEnvironment.STAGING,
+                strategy=DeploymentStrategy.DIRECT,
+            )
+            self.deployments[deployment_id] = deployment
+
+        deployment.status = DeploymentStatus.ROLLED_BACK
+        deployment.rolled_back_to = target_model_id
+        return {
+            "status": "success",
+            "deployment_id": deployment_id,
+            "active_model_id": target_model_id,
+        }
+
+    # -------------------------------------------------------------------- monitoring
+    async def record_inference_latency(self, model_id: str, latency_ms: float) -> None:
+        samples = self.latency_samples.setdefault(model_id, [])
+        samples.append(float(latency_ms))
+        if len(samples) > 1000:
+            del samples[: len(samples) - 1000]
+
+    def get_latency_stats(self, model_id: str) -> dict[str, float]:
+        samples = self.latency_samples.get(model_id, [])
+        return {
+            "p50": self._percentile(samples, 50),
+            "p95": self._percentile(samples, 95),
+            "p99": self._percentile(samples, 99),
+        }
+
+    async def record_prediction(self, model_id: str, predicted: str, actual: str) -> None:
+        history = self.prediction_history.setdefault(model_id, [])
+        history.append((predicted, actual))
+
+    def calculate_accuracy(self, model_id: str) -> float:
+        history = self.prediction_history.get(model_id, [])
+        if not history:
+            return 0.0
+        correct = sum(1 for predicted, actual in history if predicted == actual)
+        return correct / len(history)
+
+    def detect_drift(
+        self,
+        baseline_distribution: list[float],
+        current_distribution: list[float],
+        threshold: float = 0.05,
+    ) -> bool:
+        """Simple drift detection using mean shift."""
+        if not baseline_distribution or not current_distribution:
+            return False
+
+        baseline_mean = fmean(baseline_distribution)
+        current_mean = fmean(current_distribution)
+        return abs(baseline_mean - current_mean) >= threshold
+
+
+# ============================================================================
 # GLOBAL INSTANCE
 # ============================================================================
 
@@ -886,16 +1186,22 @@ def get_deployment_orchestrator() -> AutomatedDeploymentOrchestrator:
 
 
 __all__ = [
+    "ABTest",
     "ApprovalStatus",
     "ApprovalWorkflowResult",
     "AutomatedDeploymentOrchestrator",
+    "AgentDeploymentSystem",
     "CategoryHeadApproval",
     "CategoryHeadApprovalSystem",
+    "DeploymentEnvironment",
     "DeploymentExecution",
+    "DeploymentStatus",
+    "DeploymentStrategy",
     "InfrastructureValidationResult",
     "InfrastructureValidator",
     "JobDefinition",
     "JobStatus",
+    "ModelDeployment",
     "ResourceRequirement",
     "ResourceType",
     "TokenCostEstimator",

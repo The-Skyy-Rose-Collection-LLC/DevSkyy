@@ -24,6 +24,7 @@ mock_joblib = Mock()
 mock_torch = Mock()
 mock_torch.nn = Mock()
 mock_torch.optim = Mock()
+mock_torch.__version__ = "0.0.0"
 mock_transformers = Mock()
 
 sys.modules['shap'] = mock_shap

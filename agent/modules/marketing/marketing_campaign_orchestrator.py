@@ -76,6 +76,7 @@ class Channel(Enum):
     SMS = "sms"
     FACEBOOK = "facebook"
     INSTAGRAM = "instagram"
+    SOCIAL_MEDIA = "social_media"
     TIKTOK = "tiktok"
     GOOGLE_ADS = "google_ads"
     PINTEREST = "pinterest"

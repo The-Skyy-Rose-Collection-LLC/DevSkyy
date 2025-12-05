@@ -15,6 +15,9 @@ from pathlib import Path
 import sys
 from typing import Any
 
+# Ensure internal configuration package is loaded before other modules import it
+import config as _config_package  # noqa: F401
+
 # Load environment variables from .env file before accessing any env vars
 # Per Truth Protocol Rule #5: No secrets in code - load from environment
 from dotenv import load_dotenv

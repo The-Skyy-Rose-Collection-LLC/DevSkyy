@@ -1,0 +1,78 @@
+[
+  {
+    "id": "proposal_1",
+    "type": "performance_optimization",
+    "agent": "agent1",
+    "issue": "slow_execution",
+    "current_value": 10.0,
+    "threshold": 5.0,
+    "recommendation": "Agent agent1 average execution time (10.00s) exceeds threshold. Consider optimizing processing logic or increasing resource allocation.",
+    "priority": "medium",
+    "requires_testing": true,
+    "created_at": "2025-12-05T19:49:16.684840",
+    "status": "approved",
+    "reviewed_by": "test_operator",
+    "reviewed_at": "2025-12-05T19:49:16.836608",
+    "review_notes": "Looks good"
+  },
+  {
+    "id": "proposal_1",
+    "type": "performance_optimization",
+    "agent": "slow_agent",
+    "issue": "slow_execution",
+    "current_value": 10.0,
+    "threshold": 5.0,
+    "recommendation": "Agent slow_agent average execution time (10.00s) exceeds threshold. Consider optimizing processing logic or increasing resource allocation.",
+    "priority": "medium",
+    "requires_testing": true,
+    "created_at": "2025-12-05T19:49:16.697733"
+  },
+  {
+    "id": "proposal_1",
+    "type": "resource_optimization",
+    "scope": "system",
+    "issue": "high_cpu_usage",
+    "current_value": 85.0,
+    "threshold": 80,
+    "recommendation": "System CPU usage is high. Consider implementing request throttling or increasing hardware resources.",
+    "priority": "medium",
+    "requires_testing": false,
+    "created_at": "2025-12-05T19:49:16.711375"
+  },
+  {
+    "id": "proposal_1",
+    "type": "reliability_improvement",
+    "agent": "error_agent",
+    "issue": "high_error_rate",
+    "current_value": 0.1,
+    "threshold": 0.05,
+    "recommendation": "Agent error_agent error rate (10.00%) exceeds acceptable threshold. Review error logs and add additional error handling.",
+    "priority": "high",
+    "requires_testing": true,
+    "created_at": "2025-12-05T19:49:16.725478"
+  },
+  {
+    "id": "proposal_1",
+    "type": "performance_optimization",
+    "agent": "agent1",
+    "issue": "slow_execution",
+    "current_value": 10.0,
+    "threshold": 5.0,
+    "recommendation": "Agent agent1 average execution time (10.00s) exceeds threshold. Consider optimizing processing logic or increasing resource allocation.",
+    "priority": "medium",
+    "requires_testing": true,
+    "created_at": "2025-12-05T19:49:16.836129"
+  },
+  {
+    "id": "proposal_1",
+    "type": "performance_optimization",
+    "agent": "agent1",
+    "issue": "slow_execution",
+    "current_value": 10.0,
+    "threshold": 5.0,
+    "recommendation": "Agent agent1 average execution time (10.00s) exceeds threshold. Consider optimizing processing logic or increasing resource allocation.",
+    "priority": "medium",
+    "requires_testing": true,
+    "created_at": "2025-12-05T19:49:16.921369"
+  }
+]

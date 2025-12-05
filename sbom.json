@@ -905,10 +905,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:pypi/web3@7.7.0  # Updated",
+      "bom-ref": "pkg:pypi/web3@7.14.0  # Updated",
       "name": "web3",
-      "version": "7.7.0  # Updated",
-      "purl": "pkg:pypi/web3@7.7.0  # Updated",
+      "version": "7.14.0  # Updated",
+      "purl": "pkg:pypi/web3@7.14.0  # Updated",
       "description": "Python package: web3"
     },
     {
@@ -1489,10 +1489,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:pypi/pytest-httpx@0.32.0",
+      "bom-ref": "pkg:pypi/pytest-httpx@0.35.0",
       "name": "pytest-httpx",
-      "version": "0.32.0",
-      "purl": "pkg:pypi/pytest-httpx@0.32.0",
+      "version": "0.35.0",
+      "purl": "pkg:pypi/pytest-httpx@0.35.0",
       "description": "Python package: pytest-httpx"
     },
     {
@@ -2745,10 +2745,10 @@
     },
     {
       "type": "library",
-      "bom-ref": "pkg:pypi/web3@7.7.0",
+      "bom-ref": "pkg:pypi/web3@7.14.0",
       "name": "web3",
-      "version": "7.7.0",
-      "purl": "pkg:pypi/web3@7.7.0",
+      "version": "7.14.0",
+      "purl": "pkg:pypi/web3@7.14.0",
       "description": "Python package: web3"
     },
     {

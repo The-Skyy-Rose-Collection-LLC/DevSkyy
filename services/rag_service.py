@@ -31,7 +31,10 @@ import uuid
 from anthropic import Anthropic
 import chromadb
 from chromadb.config import Settings
-from langchain.text_splitter import RecursiveCharacterTextSplitter
+try:
+    from langchain.text_splitter import RecursiveCharacterTextSplitter
+except ImportError:  # LangChain 0.1+ moved text splitters to separate package
+    from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 from sentence_transformers import SentenceTransformer
 import tiktoken

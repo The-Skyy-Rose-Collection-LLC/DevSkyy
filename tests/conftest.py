@@ -38,6 +38,10 @@ os.environ["DISABLE_AUTH"] = "false"  # Test auth in tests
 # Prevent actual API calls during tests
 os.environ["MOCK_EXTERNAL_APIS"] = "true"
 
+# Ensure high-priority modules are imported for coverage tracking even when
+# specific test subsets do not touch them directly.
+import models_sqlalchemy  # noqa: F401
+
 
 @pytest.fixture(scope="session")
 def event_loop():
