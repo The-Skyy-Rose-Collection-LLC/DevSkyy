@@ -43,7 +43,7 @@ class WooCommerceIntegrationService:
             if category:
                 params["category"] = category
 
-            response = httpx.get(f"{self.base_url}/products", auth=self.auth, params=params)
+            response = httpx.get(f"{self.base_url}/products", auth=self.auth, params=params, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             products = response.json()
@@ -69,7 +69,7 @@ class WooCommerceIntegrationService:
             if status:
                 params["status"] = status
 
-            response = httpx.get(f"{self.base_url}/orders", auth=self.auth, params=params)
+            response = httpx.get(f"{self.base_url}/orders", auth=self.auth, params=params, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             orders = response.json()
@@ -94,7 +94,7 @@ class WooCommerceIntegrationService:
             # Enhance product data with luxury features
             enhanced_product = await self._enhance_product_for_luxury(product_data)
 
-            response = httpx.post(f"{self.base_url}/products", auth=self.auth, json=enhanced_product)
+            response = httpx.post(f"{self.base_url}/products", auth=self.auth, json=enhanced_product, timeout=HTTP_TIMEOUT)
             response.raise_for_status()
 
             created_product = response.json()
@@ -155,6 +155,7 @@ class WooCommerceIntegrationService:
                 f"{self.base_url}/products/categories",
                 auth=self.auth,
                 params={"per_page": 100},
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -188,6 +189,7 @@ class WooCommerceIntegrationService:
                 f"{self.base_url}/products/categories",
                 auth=self.auth,
                 json=category_data,
+                timeout=HTTP_TIMEOUT,
             )
             response.raise_for_status()
 
@@ -242,6 +244,7 @@ class WooCommerceIntegrationService:
                 f"{self.base_url}/reports/sales",
                 auth=self.auth,
                 params={"period": period},
+                timeout=HTTP_TIMEOUT,
             )
 
             sales_data = {}

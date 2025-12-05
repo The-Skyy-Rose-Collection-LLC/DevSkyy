@@ -98,7 +98,7 @@ class MCPLlamaIndexOrchestrator:
         # API clients
         self.openai_client = openai.OpenAI(api_key=self.openai_key) if self.openai_key else None
         self.anthropic_client = Anthropic(api_key=self.anthropic_key) if self.anthropic_key else None
-        self.http_client = httpx.AsyncClient()
+        self.http_client = httpx.AsyncClient(timeout=30.0)
 
         # LlamaIndex configuration
         if self.openai_key:
