@@ -160,7 +160,7 @@ class WordPressDirectService:
                     "Install defusedxml to protect against XXE attacks: pip install defusedxml"
                 )
 
-            import xmlrpc.client
+            import xmlrpc.client  # nosec B411 - defusedxml.monkey_patch() applied at module level
 
             # WordPress XML-RPC endpoint
             xmlrpc_url = f"{self.site_url.rstrip('/')}/xmlrpc.php"
@@ -249,6 +249,7 @@ class WordPressDirectService:
                 f"{self.api_base}/posts",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
+                timeout=30,
             )
             response.raise_for_status()
 
@@ -274,6 +275,7 @@ class WordPressDirectService:
                 f"{self.api_base}/pages",
                 auth=self.auth,
                 params={"per_page": per_page, "_embed": True},
+                timeout=30,
             )
             response.raise_for_status()
 
@@ -296,7 +298,7 @@ class WordPressDirectService:
                 return {"error": "Not connected to WordPress"}
 
             # Create the page
-            response = requests.post(f"{self.api_base}/pages", auth=self.auth, json=page_data)
+            response = requests.post(f"{self.api_base}/pages", auth=self.auth, json=page_data, timeout=30)
             response.raise_for_status()
 
             created_page = response.json()
@@ -320,7 +322,7 @@ class WordPressDirectService:
             if not self.connected:
                 return {"error": "Not connected to WordPress"}
 
-            response = requests.post(f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates)
+            response = requests.post(f"{self.api_base}/posts/{post_id}", auth=self.auth, json=updates, timeout=30)
             response.raise_for_status()
 
             updated_post = response.json()

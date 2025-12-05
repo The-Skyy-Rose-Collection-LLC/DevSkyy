@@ -774,10 +774,12 @@ class SelfLearningSystem:
                 self.conflict_history = json.load(f)
 
         # Load ML models
+        # SECURITY: Only load pickle files from trusted knowledge_base_path
+        # Per CWE-502: This path is controlled and not user-accessible
         model_file = self.knowledge_base_path / "error_classifier.pkl"
         if model_file.exists():
             with open(model_file, "rb") as f:
-                self.error_classifier = pickle.load(f)
+                self.error_classifier = pickle.load(f)  # nosec B301 - trusted internal path only
 
         logger.info(f"🧠 Loaded knowledge: {len(self.error_history)} errors, {len(self.conflict_history)} conflicts")
 

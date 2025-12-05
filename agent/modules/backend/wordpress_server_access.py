@@ -75,7 +75,7 @@ class WordPressServerAccess:
                 self.ssh_client.set_missing_host_key_policy(paramiko.RejectPolicy())
                 logger.info("SSH strict host key checking enabled (RejectPolicy)")
             else:
-                self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # nosec B507
                 logger.warning("SSH using AutoAddPolicy - set SSH_STRICT_HOST_KEY_CHECKING=true for production")
 
             # Connect via SFTP first

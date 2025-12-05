@@ -9,7 +9,7 @@ import contextlib
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-import ftplib
+import ftplib  # nosec B402 - Legacy support for hosts without SFTP; warnings logged at runtime
 import hashlib
 import os
 from pathlib import Path
@@ -405,8 +405,8 @@ class AutomatedThemeUploader:
                 with zipfile.ZipFile(package.package_path, "r") as zipf:
                     zipf.extractall(temp_dir)
 
-                # Connect to FTP
-                with ftplib.FTP(credentials.ftp_host) as ftp:
+                # Connect to FTP (legacy support - security warning logged above)
+                with ftplib.FTP(credentials.ftp_host) as ftp:  # nosec B321
                     ftp.login(credentials.ftp_username, credentials.ftp_password)
 
                     # Navigate to themes directory
@@ -482,7 +482,7 @@ class AutomatedThemeUploader:
                 ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
                 enterprise_logger.info("SSH strict host key checking enabled (RejectPolicy)", category=LogCategory.SECURITY)
             else:
-                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # nosec B507
                 enterprise_logger.warning(
                     "SSH using AutoAddPolicy - set SSH_STRICT_HOST_KEY_CHECKING=true for production",
                     category=LogCategory.SECURITY

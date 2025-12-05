@@ -1,12 +1,14 @@
+import ast
 from datetime import datetime
 import json
 import logging
+import operator
 import os
 from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
-from agent.mixins.react_mixin import ReActCapableMixin, IterativeRetrievalMixin
+from agent.mixins.react_mixin import IterativeRetrievalMixin, ReActCapableMixin
 
 
 """
@@ -26,6 +28,48 @@ Features:
 """
 
 logger = logging.getLogger(__name__)
+
+
+# Safe math operators for AST-based evaluation (no eval() needed)
+_SAFE_OPERATORS = {
+    ast.Add: operator.add,
+    ast.Sub: operator.sub,
+    ast.Mult: operator.mul,
+    ast.Div: operator.truediv,
+    ast.FloorDiv: operator.floordiv,
+    ast.Mod: operator.mod,
+    ast.Pow: operator.pow,
+    ast.USub: operator.neg,
+    ast.UAdd: operator.pos,
+}
+
+
+def _safe_math_eval(expression: str) -> float | int:
+    """Safely evaluate a mathematical expression using AST parsing.
+
+    Supports: +, -, *, /, //, %, ** and parentheses with numbers only.
+    Per CWE-78: Avoids eval() to prevent command injection.
+    """
+    def _eval_node(node: ast.expr) -> float | int:
+        if isinstance(node, ast.Constant):
+            if isinstance(node.value, (int, float)):
+                return node.value
+            raise ValueError(f"Unsupported constant type: {type(node.value)}")
+        elif isinstance(node, ast.BinOp):
+            op_func = _SAFE_OPERATORS.get(type(node.op))
+            if op_func is None:
+                raise ValueError(f"Unsupported operator: {type(node.op).__name__}")
+            return op_func(_eval_node(node.left), _eval_node(node.right))
+        elif isinstance(node, ast.UnaryOp):
+            op_func = _SAFE_OPERATORS.get(type(node.op))
+            if op_func is None:
+                raise ValueError(f"Unsupported unary operator: {type(node.op).__name__}")
+            return op_func(_eval_node(node.operand))
+        else:
+            raise ValueError(f"Unsupported expression: {type(node).__name__}")
+
+    tree = ast.parse(expression, mode="eval")
+    return _eval_node(tree.body)
 
 
 class ClaudeSonnetIntelligenceService(ReActCapableMixin, IterativeRetrievalMixin):
@@ -73,13 +117,11 @@ class ClaudeSonnetIntelligenceService(ReActCapableMixin, IterativeRetrievalMixin
             """Search the web for information about a topic."""
             return f"Search results for '{query}': [Placeholder - integrate with web search API]"
 
-        # Calculator tool
+        # Calculator tool - uses safe AST-based evaluation (no eval())
         def calculate(expression: str) -> str:
-            """Evaluate a mathematical expression."""
+            """Evaluate a mathematical expression safely using AST parsing."""
             try:
-                # Safe eval for basic math
-                allowed_names = {"__builtins__": {}}
-                result = eval(expression, allowed_names, {})
+                result = _safe_math_eval(expression)
                 return f"Result: {result}"
             except Exception as e:
                 return f"Error calculating: {e}"
