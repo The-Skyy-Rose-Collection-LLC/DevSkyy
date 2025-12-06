@@ -2,7 +2,7 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
   "name": "devskyy-enterprise-platform",
-  "framework": "other",
+  "framework": "fastapi",
   "buildCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.vercel.txt && pip install email-validator==2.1.0",
   "outputDirectory": ".",
   "installCommand": "pip install --upgrade pip setuptools wheel && pip install --no-cache-dir -r requirements.vercel.txt",
