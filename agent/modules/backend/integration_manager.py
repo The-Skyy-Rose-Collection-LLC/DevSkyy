@@ -56,11 +56,11 @@ class IntegrationManager:
                         "analytics",
                     ],
                 },
-                "shopify": {
-                    "name": "Shopify",
-                    "icon": "🛍️",
+                "woocommerce": {
+                    "name": "WooCommerce",
+                    "icon": "🛒",
                     "auth_type": "oauth",
-                    "required_fields": ["shop_domain", "access_token"],
+                    "required_fields": ["site_url", "consumer_key", "consumer_secret"],
                     "capabilities": [
                         "product_management",
                         "order_processing",

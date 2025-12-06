@@ -397,7 +397,7 @@ SYSTEM:
 **Input:** `service`, `action`, `credentials`
 **Output:** Integration status, data sync results
 **API:** `POST /api/v1/agents/integration/execute`
-**Use When:** "connect Shopify", "Stripe integration"
+**Use When:** "connect WooCommerce", "Stripe integration"
 
 #### 48. Webhook Manager (`webhook_manager`)
 **Capabilities:** Webhook subscription, event delivery, retry logic

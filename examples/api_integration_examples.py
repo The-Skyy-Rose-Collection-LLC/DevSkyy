@@ -160,14 +160,14 @@ class FashionAPIExamples:
 
         inventory_steps = [
             WorkflowStep(
-                step_id="fetch_shopify_products",
-                name="Fetch Shopify Products",
+                step_id="fetch_woocommerce_products",
+                name="Fetch WooCommerce Products",
                 action_type=ActionType.API_CALL,
                 config={
-                    "api_id": "shopify_api",
-                    "endpoint": "/products.json",
+                    "api_id": "woocommerce_api",
+                    "endpoint": "/products",
                     "method": "GET",
-                    "params": {"limit": 50, "status": "active"},
+                    "params": {"per_page": 50, "status": "publish"},
                 },
             ),
             WorkflowStep(
@@ -176,9 +176,9 @@ class FashionAPIExamples:
                 action_type=ActionType.FASHION_ANALYSIS,
                 config={
                     "analysis_type": "context",
-                    "text": "${fetch_shopify_products_result.data}",
+                    "text": "${fetch_woocommerce_products_result.data}",
                 },
-                depends_on=["fetch_shopify_products"],
+                depends_on=["fetch_woocommerce_products"],
             ),
             WorkflowStep(
                 step_id="update_product_cache",

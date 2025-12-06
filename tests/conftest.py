@@ -4,6 +4,7 @@ Global pytest configuration and fixtures for DevSkyy test suite.
 This conftest provides:
 - Test environment setup
 - Common fixtures (db, client, auth)
+- Async fixtures for async tests
 - Mock configurations for external services
 - Test utilities
 """
@@ -19,6 +20,7 @@ from unittest.mock import MagicMock, patch
 from fastapi.testclient import TestClient
 import pytest
 from sqlalchemy import create_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
 
 
@@ -49,6 +51,10 @@ def event_loop():
     loop.close()
 
 
+# =============================================================================
+# Synchronous Database Fixtures
+# =============================================================================
+
 @pytest.fixture(scope="session")
 def test_db_engine():
     """Create test database engine."""
@@ -78,6 +84,43 @@ def db_session(test_db_engine) -> Generator[Session, None, None]:
         session.close()
 
 
+# =============================================================================
+# Asynchronous Database Fixtures
+# =============================================================================
+
+@pytest_asyncio.fixture(scope="session")
+async def async_db_engine():
+    """Create async test database engine."""
+    engine = create_async_engine(
+        "sqlite+aiosqlite:///./test_devskyy_async.db",
+        echo=False,
+    )
+    yield engine
+    await engine.dispose()
+
+
+@pytest_asyncio.fixture(scope="function")
+async def async_db_session(async_db_engine) -> AsyncGenerator[AsyncSession, None]:
+    """Create fresh async database session for each test."""
+    async_session_factory = async_sessionmaker(
+        async_db_engine,
+        class_=AsyncSession,
+        expire_on_commit=False,
+        autocommit=False,
+        autoflush=False,
+    )
+    async with async_session_factory() as session:
+        try:
+            yield session
+        finally:
+            await session.rollback()
+            await session.close()
+
+
+# =============================================================================
+# HTTP Client Fixtures
+# =============================================================================
+
 @pytest.fixture(scope="module")
 def client() -> Generator[TestClient, None, None]:
     """Create FastAPI test client."""
@@ -86,6 +129,19 @@ def client() -> Generator[TestClient, None, None]:
 
     with TestClient(app) as test_client:
         yield test_client
+
+
+@pytest_asyncio.fixture(scope="function")
+async def async_client() -> AsyncGenerator[AsyncClient, None]:
+    """Create async HTTP client for testing async endpoints."""
+    from main import app
+
+    async with AsyncClient(
+        transport=ASGITransport(app=app),
+        base_url="http://test",
+        timeout=30.0,
+    ) as client:
+        yield client
 
 
 @pytest.fixture
@@ -137,6 +193,67 @@ def mock_elasticsearch():
         yield mock_client
 
 
+# =============================================================================
+# Async Mock Fixtures
+# =============================================================================
+
+@pytest_asyncio.fixture
+async def mock_async_anthropic():
+    """Mock async Anthropic API calls."""
+    with patch("anthropic.AsyncAnthropic") as mock:
+        mock_client = AsyncMock()
+        mock_response = MagicMock()
+        mock_response.content = [MagicMock(text="Mocked Claude async response")]
+        mock_client.messages.create = AsyncMock(return_value=mock_response)
+        mock.return_value = mock_client
+        yield mock_client
+
+
+@pytest_asyncio.fixture
+async def mock_async_openai():
+    """Mock async OpenAI API calls."""
+    with patch("openai.AsyncOpenAI") as mock:
+        mock_client = AsyncMock()
+        mock_response = MagicMock()
+        mock_response.choices = [MagicMock(message=MagicMock(content="Mocked GPT async response"))]
+        mock_client.chat.completions.create = AsyncMock(return_value=mock_response)
+        mock.return_value = mock_client
+        yield mock_client
+
+
+@pytest_asyncio.fixture
+async def mock_async_redis():
+    """Mock async Redis connections."""
+    with patch("redis.asyncio.Redis") as mock:
+        mock_client = AsyncMock()
+        mock_client.get = AsyncMock(return_value=None)
+        mock_client.set = AsyncMock(return_value=True)
+        mock_client.delete = AsyncMock(return_value=True)
+        mock_client.ping = AsyncMock(return_value=True)
+        mock_client.close = AsyncMock()
+        mock.return_value = mock_client
+        yield mock_client
+
+
+@pytest_asyncio.fixture
+async def mock_async_httpx():
+    """Mock async httpx client for external API calls."""
+    with patch("httpx.AsyncClient") as mock:
+        mock_client = AsyncMock()
+        mock_response = MagicMock()
+        mock_response.status_code = 200
+        mock_response.json.return_value = {"status": "ok"}
+        mock_response.text = '{"status": "ok"}'
+        mock_client.get = AsyncMock(return_value=mock_response)
+        mock_client.post = AsyncMock(return_value=mock_response)
+        mock_client.put = AsyncMock(return_value=mock_response)
+        mock_client.delete = AsyncMock(return_value=mock_response)
+        mock_client.__aenter__ = AsyncMock(return_value=mock_client)
+        mock_client.__aexit__ = AsyncMock(return_value=None)
+        mock.return_value = mock_client
+        yield mock_client
+
+
 @pytest.fixture
 def auth_headers() -> dict[str, str]:
     """Generate valid JWT auth headers for testing."""
@@ -175,7 +292,7 @@ def test_agent_config():
 def reset_environment():
     """Reset environment after each test."""
     yield
-    # Cleanup after test
+    # Cleanup after test - remove sync test database
     if os.path.exists("./test_devskyy.db"):
         with contextlib.suppress(Exception):
             os.remove("./test_devskyy.db")
@@ -194,6 +311,22 @@ def mock_all_external_services(
         "openai": mock_openai,
         "redis": mock_redis,
         "elasticsearch": mock_elasticsearch,
+    }
+
+
+@pytest_asyncio.fixture
+async def mock_all_async_services(
+    mock_async_anthropic,
+    mock_async_openai,
+    mock_async_redis,
+    mock_async_httpx,
+):
+    """Convenience fixture to mock all async external services at once."""
+    return {
+        "anthropic": mock_async_anthropic,
+        "openai": mock_async_openai,
+        "redis": mock_async_redis,
+        "httpx": mock_async_httpx,
     }
 
 
