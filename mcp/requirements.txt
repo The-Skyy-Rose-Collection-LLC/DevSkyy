@@ -8,7 +8,7 @@ setuptools>=78.1.1
 
 # MCP Framework
 fastmcp>=0.1.0  # FastMCP framework for building MCP servers
-mcp==1.21.0  # Model Context Protocol core
+mcp==1.23.0  # Model Context Protocol core
 claude-agent-sdk==0.1.6  # Official Anthropic Agent SDK with MCP 1.21.0
 
 # Core Framework
