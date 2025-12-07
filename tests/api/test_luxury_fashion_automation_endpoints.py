@@ -13,9 +13,6 @@ Author: DevSkyy Test Automation
 Version: 1.0.0
 """
 
-from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
-
 from fastapi import status
 from fastapi.testclient import TestClient
 import pytest
@@ -410,7 +407,7 @@ class TestFinanceInventoryEndpoints:
     async def test_sync_inventory_success(self, client, admin_headers):
         """Test successful inventory sync"""
         sync_request = {
-            "channel": "shopify",
+            "channel": "woocommerce",
             "items": [
                 {
                     "sku": "LUX-BAG-001",
@@ -444,7 +441,7 @@ class TestFinanceInventoryEndpoints:
     def test_sync_inventory_empty_items(self, client, admin_headers):
         """Test inventory sync with empty items list"""
         sync_request = {
-            "channel": "shopify",
+            "channel": "woocommerce",
             "items": [],  # Empty items
         }
 
@@ -476,7 +473,7 @@ class TestFinanceInventoryEndpoints:
                 }
             ],
             "payment_method": "credit_card",
-            "channel": "shopify",
+            "channel": "woocommerce",
         }
 
         response = client.post(

@@ -26,12 +26,12 @@ mock_torch.nn = Mock()
 mock_torch.optim = Mock()
 mock_transformers = Mock()
 
-sys.modules['shap'] = mock_shap
-sys.modules['joblib'] = mock_joblib
-sys.modules['torch'] = mock_torch
-sys.modules['torch.nn'] = mock_torch.nn
-sys.modules['torch.optim'] = mock_torch.optim
-sys.modules['transformers'] = mock_transformers
+sys.modules["shap"] = mock_shap
+sys.modules["joblib"] = mock_joblib
+sys.modules["torch"] = mock_torch
+sys.modules["torch.nn"] = mock_torch.nn
+sys.modules["torch.optim"] = mock_torch.optim
+sys.modules["transformers"] = mock_transformers
 
 
 # ============================================================================
@@ -61,8 +61,10 @@ class TestSubmitJob:
     @pytest.mark.asyncio
     async def test_submit_job_success(self, mock_current_user):
         """Should successfully submit a deployment job"""
-        with patch("api.v1.deployment.get_deployment_orchestrator") as mock_get_orch, \
-             patch("api.v1.deployment.JobDefinition") as mock_job_def:
+        with (
+            patch("api.v1.deployment.get_deployment_orchestrator") as mock_get_orch,
+            patch("api.v1.deployment.JobDefinition") as mock_job_def,
+        ):
 
             # Mock job definition instance
             job_instance = Mock()

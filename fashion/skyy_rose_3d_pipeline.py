@@ -325,7 +325,9 @@ class SkyRose3DPipeline:
 
     def _generate_avatar_id(self, customization_options: dict[str, Any]) -> str:
         """Generate unique ID for an avatar."""
-        options_hash = hashlib.md5(json.dumps(customization_options, sort_keys=True).encode(), usedforsecurity=False).hexdigest()
+        options_hash = hashlib.md5(
+            json.dumps(customization_options, sort_keys=True).encode(), usedforsecurity=False
+        ).hexdigest()
         return f"avatar_{options_hash[:12]}"
 
     async def _create_ready_player_me_avatar(

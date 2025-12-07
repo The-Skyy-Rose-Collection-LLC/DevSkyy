@@ -10,11 +10,8 @@ Truth Protocol Compliance:
 - Rule #10: No-Skip Rule (all errors logged and handled)
 """
 
-import asyncio
 import json
-from datetime import datetime
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, mock_open, patch
+from unittest.mock import AsyncMock, mock_open, patch
 
 import pytest
 
@@ -27,7 +24,7 @@ from agent.fashion_orchestrator import (
     FashionOrchestrator,
     ProductDescription,
 )
-from agent.unified_orchestrator import ExecutionPriority, Task, TaskStatus
+from agent.unified_orchestrator import ExecutionPriority, Task
 
 
 # =============================================================================
@@ -313,9 +310,7 @@ class TestFashionOrchestratorInit:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_init_with_valid_config(
-        self, mock_file, mock_super_init, mock_fashion_config, mock_config_file
-    ):
+    def test_init_with_valid_config(self, mock_file, mock_super_init, mock_fashion_config, mock_config_file):
         """Test initialization with valid configuration."""
         # Arrange
         mock_file.return_value.read.return_value = json.dumps(mock_fashion_config)
@@ -323,9 +318,7 @@ class TestFashionOrchestratorInit:
 
         # Act
         with patch("json.load", return_value=mock_fashion_config):
-            orchestrator = FashionOrchestrator(
-                config_path=mock_config_file, max_concurrent_tasks=50
-            )
+            orchestrator = FashionOrchestrator(config_path=mock_config_file, max_concurrent_tasks=50)
 
         # Assert
         assert orchestrator.fashion_config == mock_fashion_config
@@ -359,9 +352,7 @@ class TestConfigurationLoading:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_load_fashion_config_success(
-        self, mock_file, mock_super_init, mock_fashion_config, mock_config_file
-    ):
+    def test_load_fashion_config_success(self, mock_file, mock_super_init, mock_fashion_config, mock_config_file):
         """Test successful fashion configuration loading."""
         # Arrange
         mock_super_init.return_value = None
@@ -376,9 +367,7 @@ class TestConfigurationLoading:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_initialize_ai_models(
-        self, mock_file, mock_super_init, mock_fashion_config, mock_config_file
-    ):
+    def test_initialize_ai_models(self, mock_file, mock_super_init, mock_fashion_config, mock_config_file):
         """Test AI model initialization from configuration."""
         # Arrange
         mock_super_init.return_value = None
@@ -394,9 +383,7 @@ class TestConfigurationLoading:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_initialize_ai_models_with_unknown_provider(
-        self, mock_file, mock_super_init, mock_config_file
-    ):
+    def test_initialize_ai_models_with_unknown_provider(self, mock_file, mock_super_init, mock_config_file):
         """Test AI model initialization skips unknown providers."""
         # Arrange
         mock_super_init.return_value = None
@@ -434,9 +421,7 @@ class TestAIModelSelection:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_select_primary_model(
-        self, mock_file, mock_super_init, mock_fashion_config, mock_config_file
-    ):
+    def test_select_primary_model(self, mock_file, mock_super_init, mock_fashion_config, mock_config_file):
         """Test selecting primary AI model for a task."""
         # Arrange
         mock_super_init.return_value = None
@@ -465,9 +450,7 @@ class TestAIModelSelection:
             orchestrator = FashionOrchestrator(config_path=mock_config_file)
 
         # Act
-        model = orchestrator.select_ai_model(
-            "product_description", prefer_provider=AIModelProvider.ANTHROPIC
-        )
+        model = orchestrator.select_ai_model("product_description", prefer_provider=AIModelProvider.ANTHROPIC)
 
         # Assert
         assert model is not None
@@ -475,9 +458,7 @@ class TestAIModelSelection:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_select_alternative_model(
-        self, mock_file, mock_super_init, mock_fashion_config, mock_config_file
-    ):
+    def test_select_alternative_model(self, mock_file, mock_super_init, mock_fashion_config, mock_config_file):
         """Test selecting alternative AI model when primary doesn't match preference."""
         # Arrange
         mock_super_init.return_value = None
@@ -494,9 +475,7 @@ class TestAIModelSelection:
 
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    def test_select_model_not_found(
-        self, mock_file, mock_super_init, mock_fashion_config, mock_config_file
-    ):
+    def test_select_model_not_found(self, mock_file, mock_super_init, mock_fashion_config, mock_config_file):
         """Test selecting AI model returns None when not found."""
         # Arrange
         mock_super_init.return_value = None
@@ -654,9 +633,7 @@ class TestTaskCreation:
 
         # Act & Assert
         with pytest.raises(ValueError, match="No AI model available for avatar generation"):
-            await orchestrator.create_avatar_task(
-                gender="female", body_measurements={"height_cm": 175}
-            )
+            await orchestrator.create_avatar_task(gender="female", body_measurements={"height_cm": 175})
 
     @pytest.mark.asyncio
     async def test_create_virtual_try_on_task(self, orchestrator):
@@ -730,7 +707,7 @@ class TestTaskCreation:
         orchestrator.create_task = AsyncMock(return_value=Task())
 
         # Act
-        task = await orchestrator.create_3d_garment_simulation_task(
+        await orchestrator.create_3d_garment_simulation_task(
             garment_3d_model="garment.glb",
             avatar_3d_model="avatar.glb",
         )
@@ -829,9 +806,7 @@ class TestWorkflowExecution:
     async def test_execute_virtual_try_on_workflow(self, orchestrator):
         """Test executing virtual try-on workflow."""
         # Arrange
-        orchestrator.execute_workflow = AsyncMock(
-            return_value={"try_on_image": "https://example.com/result.jpg"}
-        )
+        orchestrator.execute_workflow = AsyncMock(return_value={"try_on_image": "https://example.com/result.jpg"})
 
         # Act
         result = await orchestrator.execute_virtual_try_on_workflow(
@@ -949,7 +924,7 @@ class TestEdgeCases:
         orchestrator.create_task = AsyncMock(return_value=Task())
 
         # Act
-        task = await orchestrator.create_product_description_task(
+        await orchestrator.create_product_description_task(
             product_name="Test",
             product_type="handbag",
             materials=["leather"],
@@ -968,7 +943,7 @@ class TestEdgeCases:
         orchestrator.create_task = AsyncMock(return_value=Task())
 
         # Act
-        task = await orchestrator.create_3d_asset_task(
+        await orchestrator.create_3d_asset_task(
             asset_type=FashionAssetType.SHOES,
             style_reference="Athletic shoes",
             dimensions=None,
@@ -985,7 +960,7 @@ class TestEdgeCases:
         orchestrator.create_task = AsyncMock(return_value=Task())
 
         # Act
-        task = await orchestrator.create_avatar_task(
+        await orchestrator.create_avatar_task(
             gender="male",
             body_measurements={"height_cm": 180},
             customization=None,
@@ -1051,9 +1026,7 @@ class TestIntegration:
     @pytest.mark.asyncio
     @patch("agent.fashion_orchestrator.UnifiedMCPOrchestrator.__init__")
     @patch("builtins.open", new_callable=mock_open)
-    async def test_full_task_creation_flow(
-        self, mock_file, mock_super_init, mock_fashion_config
-    ):
+    async def test_full_task_creation_flow(self, mock_file, mock_super_init, mock_fashion_config):
         """Test full flow of creating multiple tasks."""
         # Arrange
         mock_super_init.return_value = None

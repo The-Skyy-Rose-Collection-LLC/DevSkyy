@@ -20,6 +20,7 @@ def app():
 
     # Import and register agents router
     from api.v1.agents import router as agents_router
+
     test_app.include_router(agents_router, prefix="/api/v1/agents", tags=["agents"])
 
     return test_app

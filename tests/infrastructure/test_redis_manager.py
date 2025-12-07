@@ -960,10 +960,7 @@ class TestEdgeCasesAndErrorHandling:
         import asyncio
 
         # Set multiple values concurrently
-        tasks = [
-            redis_manager.set(f"key{i}", {"value": i})
-            for i in range(10)
-        ]
+        tasks = [redis_manager.set(f"key{i}", {"value": i}) for i in range(10)]
 
         results = await asyncio.gather(*tasks)
 

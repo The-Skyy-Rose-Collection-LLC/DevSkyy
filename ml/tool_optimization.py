@@ -50,8 +50,10 @@ logger = logging.getLogger(__name__)
 # OPTIMIZED TOOL SCHEMA FORMAT
 # ============================================================================
 
+
 class CompressedToolSchema(BaseModel):
     """Minimalist tool schema format for token efficiency"""
+
     n: str  # name (abbreviated)
     d: str  # description
     p: dict[str, dict[str, str]]  # parameters (compressed)
@@ -61,6 +63,7 @@ class CompressedToolSchema(BaseModel):
 @dataclass
 class ToolUsagePattern:
     """Historical tool usage pattern for ML-based selection"""
+
     tool_name: str
     usage_count: int = 0
     success_count: int = 0
@@ -74,6 +77,7 @@ class ToolUsagePattern:
 @dataclass
 class ToolSelectionContext:
     """Context for intelligent tool selection"""
+
     task_description: str
     task_type: str | None = None
     required_capabilities: list[str] = field(default_factory=list)
@@ -86,6 +90,7 @@ class ToolSelectionContext:
 # ============================================================================
 # DYNAMIC TOOL SELECTOR
 # ============================================================================
+
 
 class DynamicToolSelector:
     """
@@ -108,12 +113,7 @@ class DynamicToolSelector:
 
         logger.info("✅ Dynamic Tool Selector initialized")
 
-    def register_tool(
-        self,
-        tool_name: str,
-        tool_config: ToolCallConfig,
-        full_schema: dict[str, Any]
-    ):
+    def register_tool(self, tool_name: str, tool_config: ToolCallConfig, full_schema: dict[str, Any]):
         """Register a tool with compressed schema"""
         # Create compressed schema
         compressed = self._compress_schema(full_schema)
@@ -142,21 +142,17 @@ class DynamicToolSelector:
         for param_name, param_def in params.items():
             compressed_params[param_name] = {
                 "t": param_def.get("type", "string"),  # type
-                "d": param_def.get("description", "")[:50]  # truncated description
+                "d": param_def.get("description", "")[:50],  # truncated description
             }
 
         return CompressedToolSchema(
             n=schema.get("name", ""),
             d=schema.get("description", "")[:100],  # Truncate long descriptions
             p=compressed_params,
-            r=schema.get("parameters", {}).get("required", [])
+            r=schema.get("parameters", {}).get("required", []),
         )
 
-    def select_tools(
-        self,
-        context: ToolSelectionContext,
-        available_tools: list[str] | None = None
-    ) -> list[str]:
+    def select_tools(self, context: ToolSelectionContext, available_tools: list[str] | None = None) -> list[str]:
         """
         Dynamically select most relevant tools based on context.
 
@@ -184,15 +180,12 @@ class DynamicToolSelector:
         tool_scores.sort(key=lambda x: x[1], reverse=True)
 
         # Select top tools up to max_tools
-        selected = [tool_name for tool_name, score in tool_scores[:context.max_tools]]
+        selected = [tool_name for tool_name, score in tool_scores[: context.max_tools]]
 
         # Track selection for learning
         self._record_selection(context, selected, tool_scores)
 
-        logger.info(
-            f"Selected {len(selected)}/{len(available_tools)} tools "
-            f"(max={context.max_tools})"
-        )
+        logger.info(f"Selected {len(selected)}/{len(available_tools)} tools " f"(max={context.max_tools})")
 
         return selected
 
@@ -202,17 +195,29 @@ class DynamicToolSelector:
         words = text.lower().split()
         # Filter out common words
         stop_words = {
-            "the", "a", "an", "and", "or", "but", "in", "on", "at",
-            "to", "for", "of", "with", "by", "from", "as", "is", "was", "are"
+            "the",
+            "a",
+            "an",
+            "and",
+            "or",
+            "but",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "of",
+            "with",
+            "by",
+            "from",
+            "as",
+            "is",
+            "was",
+            "are",
         }
         return {word.strip(".,!?;:") for word in words if word not in stop_words}
 
-    def _score_tool(
-        self,
-        tool_name: str,
-        keywords: set[str],
-        context: ToolSelectionContext
-    ) -> float:
+    def _score_tool(self, tool_name: str, keywords: set[str], context: ToolSelectionContext) -> float:
         """
         Score a tool's relevance to the context.
 
@@ -259,19 +264,18 @@ class DynamicToolSelector:
         return min(1.0, score)
 
     def _record_selection(
-        self,
-        context: ToolSelectionContext,
-        selected: list[str],
-        all_scores: list[tuple[str, float]]
+        self, context: ToolSelectionContext, selected: list[str], all_scores: list[tuple[str, float]]
     ):
         """Record tool selection for learning"""
-        self.selection_history.append({
-            "timestamp": datetime.now(),
-            "task_type": context.task_type,
-            "selected_tools": selected,
-            "all_scores": all_scores,
-            "max_tools": context.max_tools
-        })
+        self.selection_history.append(
+            {
+                "timestamp": datetime.now(),
+                "task_type": context.task_type,
+                "selected_tools": selected,
+                "all_scores": all_scores,
+                "max_tools": context.max_tools,
+            }
+        )
 
         # Keep last 1000 selections
         if len(self.selection_history) > 1000:
@@ -283,7 +287,7 @@ class DynamicToolSelector:
         success: bool,
         execution_time_ms: float,
         tokens_used: int,
-        context_keywords: set[str] | None = None
+        context_keywords: set[str] | None = None,
     ):
         """Update tool performance metrics for learning"""
         if tool_name not in self.tool_patterns:
@@ -298,14 +302,8 @@ class DynamicToolSelector:
 
         # Update averages (running average)
         alpha = 0.1  # Learning rate
-        pattern.avg_execution_time_ms = (
-            (1 - alpha) * pattern.avg_execution_time_ms +
-            alpha * execution_time_ms
-        )
-        pattern.avg_tokens_used = int(
-            (1 - alpha) * pattern.avg_tokens_used +
-            alpha * tokens_used
-        )
+        pattern.avg_execution_time_ms = (1 - alpha) * pattern.avg_execution_time_ms + alpha * execution_time_ms
+        pattern.avg_tokens_used = int((1 - alpha) * pattern.avg_tokens_used + alpha * tokens_used)
 
         # Update success rate
         pattern.success_rate = pattern.success_count / pattern.usage_count
@@ -322,16 +320,13 @@ class DynamicToolSelector:
 
     def get_compressed_schemas(self, tool_names: list[str]) -> list[CompressedToolSchema]:
         """Get compressed schemas for selected tools"""
-        return [
-            self.compressed_schemas[name]
-            for name in tool_names
-            if name in self.compressed_schemas
-        ]
+        return [self.compressed_schemas[name] for name in tool_names if name in self.compressed_schemas]
 
 
 # ============================================================================
 # PARALLEL FUNCTION CALLER
 # ============================================================================
+
 
 class ParallelFunctionCaller:
     """
@@ -353,7 +348,7 @@ class ParallelFunctionCaller:
         function_calls: list[dict[str, Any]],
         available_functions: dict[str, tuple[Callable, dict, ToolCallConfig]],
         user_id: str | None = None,
-        permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED
+        permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED,
     ) -> list[ToolCallResponse]:
         """
         Execute multiple function calls in parallel.
@@ -383,7 +378,7 @@ class ParallelFunctionCaller:
                 arguments=arguments,
                 available_functions=available_functions,
                 user_id=user_id,
-                permission_level=permission_level
+                permission_level=permission_level,
             )
             tasks.append(task)
 
@@ -394,13 +389,15 @@ class ParallelFunctionCaller:
         responses = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                responses.append(ToolCallResponse(
-                    request_id=f"parallel_{i}",
-                    tool_name=function_calls[i].get("function", "unknown"),
-                    success=False,
-                    error=str(result),
-                    execution_time_ms=0.0
-                ))
+                responses.append(
+                    ToolCallResponse(
+                        request_id=f"parallel_{i}",
+                        tool_name=function_calls[i].get("function", "unknown"),
+                        success=False,
+                        error=str(result),
+                        execution_time_ms=0.0,
+                    )
+                )
             else:
                 responses.append(result)
 
@@ -417,15 +414,15 @@ class ParallelFunctionCaller:
         arguments: dict[str, Any],
         available_functions: dict[str, tuple[Callable, dict, ToolCallConfig]],
         user_id: str | None,
-        permission_level: ToolPermissionLevel
+        permission_level: ToolPermissionLevel,
     ) -> ToolCallResponse:
         """Execute a single function with safeguards"""
         import inspect
         import time
 
-        start_time = time.time()
+        time.time()
 
-        func, schema, tool_config = available_functions[func_name]
+        func, _schema, tool_config = available_functions[func_name]
 
         # Create request
         request = ToolCallRequest(
@@ -433,7 +430,7 @@ class ParallelFunctionCaller:
             provider=tool_config.provider,
             user_id=user_id,
             permission_level=permission_level,
-            parameters=arguments
+            parameters=arguments,
         )
 
         # Wrap function for execution
@@ -444,10 +441,7 @@ class ParallelFunctionCaller:
                 return func(**arguments)
 
         # Execute with safeguards
-        response = await self.safeguard_manager.execute_tool_call(
-            request=request,
-            func=execute_func
-        )
+        response = await self.safeguard_manager.execute_tool_call(request=request, func=execute_func)
 
         return response
 
@@ -455,6 +449,7 @@ class ParallelFunctionCaller:
 # ============================================================================
 # STRUCTURED OUTPUT VALIDATOR
 # ============================================================================
+
 
 class StructuredOutputValidator:
     """
@@ -467,20 +462,12 @@ class StructuredOutputValidator:
         self.schemas: dict[str, dict[str, Any]] = {}
         logger.info("✅ Structured Output Validator initialized")
 
-    def register_output_schema(
-        self,
-        schema_name: str,
-        schema: dict[str, Any]
-    ):
+    def register_output_schema(self, schema_name: str, schema: dict[str, Any]):
         """Register a JSON schema for output validation"""
         self.schemas[schema_name] = schema
         logger.info(f"Registered output schema: {schema_name}")
 
-    def validate_output(
-        self,
-        output: Any,
-        schema_name: str
-    ) -> tuple[bool, str | None]:
+    def validate_output(self, output: Any, schema_name: str) -> tuple[bool, str | None]:
         """
         Validate output against registered schema.
 
@@ -518,10 +505,7 @@ class StructuredOutputValidator:
         except Exception as e:
             return False, f"Validation error: {e!s}"
 
-    def create_output_constraint(
-        self,
-        schema_name: str
-    ) -> dict[str, Any]:
+    def create_output_constraint(self, schema_name: str) -> dict[str, Any]:
         """Create output constraint for AI models"""
         if schema_name not in self.schemas:
             raise ValueError(f"Schema not registered: {schema_name}")
@@ -529,19 +513,13 @@ class StructuredOutputValidator:
         schema = self.schemas[schema_name]
 
         # Format for OpenAI/Anthropic structured outputs
-        return {
-            "type": "json_schema",
-            "json_schema": {
-                "name": schema_name,
-                "schema": schema,
-                "strict": True
-            }
-        }
+        return {"type": "json_schema", "json_schema": {"name": schema_name, "schema": schema, "strict": True}}
 
 
 # ============================================================================
 # TOKEN OPTIMIZATION MANAGER
 # ============================================================================
+
 
 class TokenOptimizationManager:
     """
@@ -565,12 +543,7 @@ class TokenOptimizationManager:
 
         logger.info("✅ Token Optimization Manager initialized")
 
-    def register_tool(
-        self,
-        tool_name: str,
-        tool_config: ToolCallConfig,
-        full_schema: dict[str, Any]
-    ):
+    def register_tool(self, tool_name: str, tool_config: ToolCallConfig, full_schema: dict[str, Any]):
         """Register a tool with all components"""
         self.tool_selector.register_tool(tool_name, tool_config, full_schema)
 
@@ -580,7 +553,7 @@ class TokenOptimizationManager:
         available_tools: list[str],
         function_calls: list[dict[str, Any]] | None = None,
         available_functions: dict | None = None,
-        user_id: str | None = None
+        user_id: str | None = None,
     ) -> dict[str, Any]:
         """
         Execute optimized tool calling workflow.
@@ -610,15 +583,13 @@ class TokenOptimizationManager:
             "selected_tools": selected_tools,
             "compressed_schemas": [s.dict() for s in compressed_schemas],
             "tokens_saved": tokens_saved,
-            "optimization_ratio": f"{((estimated_original_size - original_size) / estimated_original_size * 100):.1f}%"
+            "optimization_ratio": f"{((estimated_original_size - original_size) / estimated_original_size * 100):.1f}%",
         }
 
         # Step 3: Execute function calls if provided
         if function_calls and available_functions:
             responses = await self.parallel_caller.call_functions_parallel(
-                function_calls=function_calls,
-                available_functions=available_functions,
-                user_id=user_id
+                function_calls=function_calls, available_functions=available_functions, user_id=user_id
             )
             result["execution_results"] = [r.dict() for r in responses]
 
@@ -629,18 +600,16 @@ class TokenOptimizationManager:
         return {
             "total_executions": self.total_executions,
             "total_tokens_saved": self.total_tokens_saved,
-            "avg_tokens_saved_per_execution": (
-                self.total_tokens_saved / max(1, self.total_executions)
-            ),
+            "avg_tokens_saved_per_execution": (self.total_tokens_saved / max(1, self.total_executions)),
             "registered_tools": len(self.tool_selector.tool_configs),
             "tool_usage_patterns": {
                 name: {
                     "usage_count": pattern.usage_count,
                     "success_rate": pattern.success_rate,
-                    "avg_execution_time_ms": pattern.avg_execution_time_ms
+                    "avg_execution_time_ms": pattern.avg_execution_time_ms,
                 }
                 for name, pattern in self.tool_selector.tool_patterns.items()
-            }
+            },
         }
 
 

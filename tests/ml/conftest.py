@@ -13,24 +13,22 @@ from pathlib import Path
 import shutil
 import tempfile
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock
-import uuid
+from unittest.mock import Mock
 
 import numpy as np
 import pytest
 
+from ml.agent_deployment_system import (
+    AutomatedDeploymentOrchestrator,
+    JobDefinition,
+    ToolRequirement,
+)
 from ml.agent_finetuning_system import (
     AgentCategory,
     AgentFinetuningSystem,
     AgentPerformanceSnapshot,
     FinetuningConfig,
     FinetuningProvider,
-)
-from ml.agent_deployment_system import (
-    AutomatedDeploymentOrchestrator,
-    JobDefinition,
-    ResourceType,
-    ToolRequirement,
 )
 from ml.model_registry import ModelMetadata, ModelRegistry, ModelStage
 from ml.recommendation_engine import (
@@ -77,7 +75,7 @@ class MockRedisClient:
         """Mock get"""
         return self.data.get(key)
 
-    async def set(self, key: str, value: Any, ex: int = None):
+    async def set(self, key: str, value: Any, ex: int | None = None):
         """Mock set"""
         self.data[key] = value
         return True
@@ -423,9 +421,7 @@ def model_stage(request):
     return request.param
 
 
-@pytest.fixture(
-    params=[RecommendationType.COLLABORATIVE, RecommendationType.CONTENT_BASED, RecommendationType.HYBRID]
-)
+@pytest.fixture(params=[RecommendationType.COLLABORATIVE, RecommendationType.CONTENT_BASED, RecommendationType.HYBRID])
 def recommendation_type(request):
     """Parametrized recommendation type"""
     return request.param

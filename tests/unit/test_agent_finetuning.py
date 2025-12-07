@@ -57,13 +57,14 @@ def sample_snapshot():
         execution_time_ms=120.5,
         tokens_used=150,
         user_feedback=0.9,
-        metadata={"version": "1.0.0"}
+        metadata={"version": "1.0.0"},
     )
 
 
 # ============================================================================
 # PERFORMANCE SNAPSHOT COLLECTION TESTS
 # ============================================================================
+
 
 @pytest.mark.asyncio
 async def test_collect_performance_snapshot(finetuning_system):
@@ -78,7 +79,7 @@ async def test_collect_performance_snapshot(finetuning_system):
         success=True,
         performance_score=0.92,
         execution_time_ms=100.0,
-        tokens_used=50
+        tokens_used=50,
     )
 
     assert len(finetuning_system.performance_snapshots) == 1
@@ -102,7 +103,7 @@ async def test_collect_multiple_snapshots(finetuning_system):
             success=True,
             performance_score=0.8 + (i * 0.01),
             execution_time_ms=100.0 + i,
-            tokens_used=50 + i
+            tokens_used=50 + i,
         )
 
     assert len(finetuning_system.performance_snapshots) == 10
@@ -126,7 +127,7 @@ async def test_snapshot_memory_management(finetuning_system, temp_data_dir):
             success=True,
             performance_score=0.9,
             execution_time_ms=200.0,
-            tokens_used=100
+            tokens_used=100,
         )
 
     # Should have flushed once
@@ -138,6 +139,7 @@ async def test_snapshot_memory_management(finetuning_system, temp_data_dir):
 # ============================================================================
 # DATASET PREPARATION TESTS
 # ============================================================================
+
 
 @pytest.mark.asyncio
 async def test_prepare_dataset_success(finetuning_system):
@@ -154,7 +156,7 @@ async def test_prepare_dataset_success(finetuning_system):
             success=True,
             performance_score=0.85 + (i % 10) * 0.01,
             execution_time_ms=100.0,
-            tokens_used=50
+            tokens_used=50,
         )
 
     dataset = await finetuning_system.prepare_dataset(
@@ -162,7 +164,7 @@ async def test_prepare_dataset_success(finetuning_system):
         min_samples=100,
         max_samples=200,
         quality_threshold=0.7,
-        time_range_days=30
+        time_range_days=30,
     )
 
     assert dataset.category == AgentCategory.CORE_SECURITY
@@ -187,14 +189,12 @@ async def test_prepare_dataset_insufficient_data(finetuning_system):
             success=True,
             performance_score=0.8,
             execution_time_ms=150.0,
-            tokens_used=75
+            tokens_used=75,
         )
 
     with pytest.raises(ValueError, match="Insufficient data"):
         await finetuning_system.prepare_dataset(
-            category=AgentCategory.MARKETING_BRAND,
-            min_samples=100,
-            quality_threshold=0.7
+            category=AgentCategory.MARKETING_BRAND, min_samples=100, quality_threshold=0.7
         )
 
 
@@ -214,13 +214,11 @@ async def test_prepare_dataset_quality_filtering(finetuning_system):
             success=True,
             performance_score=quality,
             execution_time_ms=100.0,
-            tokens_used=50
+            tokens_used=50,
         )
 
     dataset = await finetuning_system.prepare_dataset(
-        category=AgentCategory.WORDPRESS_CMS,
-        min_samples=30,
-        quality_threshold=0.8  # Should filter out low quality
+        category=AgentCategory.WORDPRESS_CMS, min_samples=30, quality_threshold=0.8  # Should filter out low quality
     )
 
     # All samples should be high quality
@@ -242,13 +240,10 @@ async def test_dataset_splits(finetuning_system):
             success=True,
             performance_score=0.9,
             execution_time_ms=100.0,
-            tokens_used=50
+            tokens_used=50,
         )
 
-    dataset = await finetuning_system.prepare_dataset(
-        category=AgentCategory.CUSTOMER_SERVICE,
-        min_samples=100
-    )
+    dataset = await finetuning_system.prepare_dataset(category=AgentCategory.CUSTOMER_SERVICE, min_samples=100)
 
     total = len(dataset.train_split) + len(dataset.val_split) + len(dataset.test_split)
 
@@ -261,6 +256,7 @@ async def test_dataset_splits(finetuning_system):
 # ============================================================================
 # FINETUNING JOB TESTS
 # ============================================================================
+
 
 @pytest.mark.asyncio
 async def test_create_finetuning_job(finetuning_system):
@@ -277,26 +273,17 @@ async def test_create_finetuning_job(finetuning_system):
             success=True,
             performance_score=0.9,
             execution_time_ms=100.0,
-            tokens_used=50
+            tokens_used=50,
         )
 
-    await finetuning_system.prepare_dataset(
-        category=AgentCategory.SPECIALIZED,
-        min_samples=100
-    )
+    await finetuning_system.prepare_dataset(category=AgentCategory.SPECIALIZED, min_samples=100)
 
     # Create job
     config = FinetuningConfig(
-        category=AgentCategory.SPECIALIZED,
-        provider=FinetuningProvider.OPENAI,
-        base_model="gpt-4o-mini",
-        n_epochs=3
+        category=AgentCategory.SPECIALIZED, provider=FinetuningProvider.OPENAI, base_model="gpt-4o-mini", n_epochs=3
     )
 
-    job = await finetuning_system.create_finetuning_job(
-        category=AgentCategory.SPECIALIZED,
-        config=config
-    )
+    job = await finetuning_system.create_finetuning_job(category=AgentCategory.SPECIALIZED, config=config)
 
     assert job.category == AgentCategory.SPECIALIZED
     assert job.status == FinetuningStatus.PENDING
@@ -307,16 +294,11 @@ async def test_create_finetuning_job(finetuning_system):
 async def test_create_job_without_dataset(finetuning_system):
     """Test that creating job without dataset fails"""
     config = FinetuningConfig(
-        category=AgentCategory.ECOMMERCE,
-        provider=FinetuningProvider.OPENAI,
-        base_model="gpt-4o-mini"
+        category=AgentCategory.ECOMMERCE, provider=FinetuningProvider.OPENAI, base_model="gpt-4o-mini"
     )
 
     with pytest.raises(ValueError, match="No dataset prepared"):
-        await finetuning_system.create_finetuning_job(
-            category=AgentCategory.ECOMMERCE,
-            config=config
-        )
+        await finetuning_system.create_finetuning_job(category=AgentCategory.ECOMMERCE, config=config)
 
 
 @pytest.mark.asyncio
@@ -334,24 +316,16 @@ async def test_get_job_status(finetuning_system):
             success=True,
             performance_score=0.9,
             execution_time_ms=100.0,
-            tokens_used=50
+            tokens_used=50,
         )
 
-    await finetuning_system.prepare_dataset(
-        category=AgentCategory.AI_INTELLIGENCE,
-        min_samples=100
-    )
+    await finetuning_system.prepare_dataset(category=AgentCategory.AI_INTELLIGENCE, min_samples=100)
 
     config = FinetuningConfig(
-        category=AgentCategory.AI_INTELLIGENCE,
-        provider=FinetuningProvider.OPENAI,
-        base_model="gpt-4o"
+        category=AgentCategory.AI_INTELLIGENCE, provider=FinetuningProvider.OPENAI, base_model="gpt-4o"
     )
 
-    job = await finetuning_system.create_finetuning_job(
-        category=AgentCategory.AI_INTELLIGENCE,
-        config=config
-    )
+    job = await finetuning_system.create_finetuning_job(category=AgentCategory.AI_INTELLIGENCE, config=config)
 
     # Get status
     retrieved_job = finetuning_system.get_job_status(job.job_id)
@@ -363,6 +337,7 @@ async def test_get_job_status(finetuning_system):
 # ============================================================================
 # STATISTICS TESTS
 # ============================================================================
+
 
 def test_get_system_statistics(finetuning_system):
     """Test getting system statistics"""
@@ -380,6 +355,7 @@ def test_get_system_statistics(finetuning_system):
 # INTEGRATION TESTS
 # ============================================================================
 
+
 @pytest.mark.asyncio
 async def test_full_finetuning_workflow(finetuning_system):
     """Test complete finetuning workflow from data collection to job creation"""
@@ -395,24 +371,20 @@ async def test_full_finetuning_workflow(finetuning_system):
             input_data={"file": f"file_{i}.py", "scan_depth": "full"},
             output_data={
                 "vulnerabilities": [{"severity": "low", "line": i % 100}] if i % 10 == 0 else [],
-                "scan_time_ms": 100 + i
+                "scan_time_ms": 100 + i,
             },
             success=True,
             performance_score=0.85 + ((i % 15) * 0.01),
             execution_time_ms=100.0 + i,
             tokens_used=50 + (i % 20),
-            user_feedback=0.9 if i % 5 == 0 else None
+            user_feedback=0.9 if i % 5 == 0 else None,
         )
 
     assert len(finetuning_system.performance_snapshots) == 200
 
     # Step 2: Prepare dataset
     dataset = await finetuning_system.prepare_dataset(
-        category=category,
-        min_samples=100,
-        max_samples=200,
-        quality_threshold=0.7,
-        time_range_days=30
+        category=category, min_samples=100, max_samples=200, quality_threshold=0.7, time_range_days=30
     )
 
     assert dataset.category == category
@@ -427,13 +399,10 @@ async def test_full_finetuning_workflow(finetuning_system):
         n_epochs=3,
         batch_size=32,
         learning_rate=0.0001,
-        description="Test finetuning for core security agents"
+        description="Test finetuning for core security agents",
     )
 
-    job = await finetuning_system.create_finetuning_job(
-        category=category,
-        config=config
-    )
+    job = await finetuning_system.create_finetuning_job(category=category, config=config)
 
     assert job.job_id.startswith("finetune_")
     assert job.training_samples >= 80
@@ -464,7 +433,7 @@ async def test_concurrent_snapshot_collection(finetuning_system):
             success=True,
             performance_score=0.9,
             execution_time_ms=100.0,
-            tokens_used=50
+            tokens_used=50,
         )
         tasks.append(task)
 
@@ -477,6 +446,7 @@ async def test_concurrent_snapshot_collection(finetuning_system):
 # ERROR HANDLING TESTS
 # ============================================================================
 
+
 def test_get_nonexistent_job(finetuning_system):
     """Test getting status of non-existent job"""
     job = finetuning_system.get_job_status("nonexistent_job_id")
@@ -487,15 +457,13 @@ def test_get_nonexistent_job(finetuning_system):
 async def test_prepare_dataset_empty_category(finetuning_system):
     """Test preparing dataset for category with no data"""
     with pytest.raises(ValueError, match="Insufficient data"):
-        await finetuning_system.prepare_dataset(
-            category=AgentCategory.SPECIALIZED,
-            min_samples=100
-        )
+        await finetuning_system.prepare_dataset(category=AgentCategory.SPECIALIZED, min_samples=100)
 
 
 # ============================================================================
 # GLOBAL INSTANCE TEST
 # ============================================================================
+
 
 def test_get_global_finetuning_system():
     """Test getting global finetuning system instance"""

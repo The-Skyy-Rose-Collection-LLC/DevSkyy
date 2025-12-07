@@ -154,7 +154,7 @@ DevSkyy is a **breakthrough AI platform** that automates the entire fashion e-co
 - **Price Anchor:** $0.01-$0.10 per agent execution
 
 ### Competitive Pricing
-- Shopify Plus: $2K/month → DevSkyy offers 5-10x more automation
+- WooCommerce Plus: $2K/month → DevSkyy offers 5-10x more automation
 - Custom AI dev agencies: $50K-$200K per project → DevSkyy is 10% of cost
 - OpenAI API: $0.003-$0.06 per request → DevSkyy includes orchestration
 
@@ -326,7 +326,7 @@ Backup & DR                     (+8 pts)
 
 ## Competitive Advantages Summary
 
-| Feature | DevSkyy | OpenAI | Shopify | Custom Dev |
+| Feature | DevSkyy | OpenAI | WooCommerce | Custom Dev |
 |---------|---------|--------|--------|------------|
 | Pre-built agents | 54 | 0 | 3 | 0-5 |
 | Theme builder | ✅ Yes | ❌ No | ⚠️ Limited | ✅ Yes |

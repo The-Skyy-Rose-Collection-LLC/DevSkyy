@@ -271,7 +271,7 @@ async def schedule_social_posts(
                 task={
                     "action": "optimize_schedule",
                     "posts_count": len(request.posts),
-                    "platforms": list(set(p for post in request.posts for p in post.platforms)),
+                    "platforms": list({p for post in request.posts for p in post.platforms}),
                     "date_range_start": request.date_range_start,
                     "date_range_end": request.date_range_end,
                     "frequency": request.frequency,
@@ -285,7 +285,7 @@ async def schedule_social_posts(
 
         # Create scheduled posts
         scheduled_posts = []
-        for i, (post_data, scheduled_time) in enumerate(zip(request.posts, optimal_times)):
+        for i, (post_data, scheduled_time) in enumerate(zip(request.posts, optimal_times, strict=False)):
             post_data.scheduled_for = scheduled_time
             # Create post (will be scheduled)
             # This would call create_social_post internally

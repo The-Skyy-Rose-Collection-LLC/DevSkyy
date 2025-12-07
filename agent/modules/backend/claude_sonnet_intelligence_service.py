@@ -6,7 +6,7 @@ from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
-from agent.mixins.react_mixin import ReActCapableMixin, IterativeRetrievalMixin
+from agent.mixins.react_mixin import IterativeRetrievalMixin, ReActCapableMixin
 
 
 """
@@ -68,6 +68,7 @@ class ClaudeSonnetIntelligenceService(ReActCapableMixin, IterativeRetrievalMixin
 
     def _register_builtin_tools(self):
         """Register built-in tools for ReAct reasoning loops."""
+
         # Web search tool (placeholder - integrate with actual search)
         def search_web(query: str) -> str:
             """Search the web for information about a topic."""
@@ -75,13 +76,48 @@ class ClaudeSonnetIntelligenceService(ReActCapableMixin, IterativeRetrievalMixin
 
         # Calculator tool
         def calculate(expression: str) -> str:
-            """Evaluate a mathematical expression."""
+            """Evaluate a mathematical expression safely using ast.literal_eval."""
+            import ast
+            import operator
+
+            # Safe operators for math expressions
+            safe_operators = {
+                ast.Add: operator.add,
+                ast.Sub: operator.sub,
+                ast.Mult: operator.mul,
+                ast.Div: operator.truediv,
+                ast.Mod: operator.mod,
+                ast.Pow: operator.pow,
+                ast.USub: operator.neg,
+                ast.UAdd: operator.pos,
+            }
+
+            def safe_eval(node):
+                """Safely evaluate AST node for basic math operations."""
+                if isinstance(node, ast.Constant):  # Python 3.8+
+                    return node.value
+                elif isinstance(node, ast.BinOp):
+                    op_type = type(node.op)
+                    if op_type not in safe_operators:
+                        raise ValueError(f"Unsupported operation: {op_type.__name__}")
+                    left = safe_eval(node.left)
+                    right = safe_eval(node.right)
+                    return safe_operators[op_type](left, right)
+                elif isinstance(node, ast.UnaryOp):
+                    op_type = type(node.op)
+                    if op_type not in safe_operators:
+                        raise ValueError(f"Unsupported operation: {op_type.__name__}")
+                    operand = safe_eval(node.operand)
+                    return safe_operators[op_type](operand)
+                else:
+                    raise ValueError(f"Unsupported expression type: {type(node).__name__}")
+
             try:
-                # Safe eval for basic math
-                allowed_names = {"__builtins__": {}}
-                result = eval(expression, allowed_names, {})
+                # Parse and evaluate the expression safely
+                tree = ast.parse(expression, mode='eval')
+                result = safe_eval(tree.body)
                 return f"Result: {result}"
-            except Exception as e:
+            except (SyntaxError, ValueError, ZeroDivisionError) as e:
                 return f"Error calculating: {e}"
 
         # Brand knowledge tool
@@ -136,11 +172,7 @@ class ClaudeSonnetIntelligenceService(ReActCapableMixin, IterativeRetrievalMixin
                 self.register_react_tool(tool)
 
         # Execute ReAct loop
-        result = await self.reason_and_act(
-            task=task,
-            max_iterations=max_iterations,
-            context=context
-        )
+        result = await self.reason_and_act(task=task, max_iterations=max_iterations, context=context)
 
         logger.info(f"✅ Iterative reasoning complete: {result.get('iterations', 0)} iterations")
 

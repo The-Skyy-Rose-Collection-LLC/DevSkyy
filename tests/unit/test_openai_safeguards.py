@@ -104,7 +104,7 @@ class TestRateLimiter:
         """Test requests are allowed within rate limit"""
         limiter = RateLimiter(max_per_minute=5, max_consequential_per_hour=3)
 
-        for i in range(5):
+        for _i in range(5):
             allowed, reason = await limiter.check_rate_limit(is_consequential=False)
             assert allowed is True
             assert reason is None
@@ -116,7 +116,7 @@ class TestRateLimiter:
         limiter = RateLimiter(max_per_minute=3, max_consequential_per_hour=10)
 
         # Use up the limit
-        for i in range(3):
+        for _i in range(3):
             allowed, _ = await limiter.check_rate_limit()
             assert allowed is True
 
@@ -132,7 +132,7 @@ class TestRateLimiter:
         limiter = RateLimiter(max_per_minute=10, max_consequential_per_hour=2)
 
         # Use up consequential limit
-        for i in range(2):
+        for _i in range(2):
             allowed, _ = await limiter.check_rate_limit(is_consequential=True)
             assert allowed is True
 
@@ -177,7 +177,7 @@ class TestCircuitBreaker:
             raise Exception("API Error")
 
         # Trigger failures
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await breaker.call(failure_func)
 
@@ -194,7 +194,7 @@ class TestCircuitBreaker:
             raise Exception("API Error")
 
         # Open the circuit
-        for i in range(2):
+        for _i in range(2):
             with pytest.raises(Exception):
                 await breaker.call(failure_func)
 
@@ -535,7 +535,7 @@ class TestSafeguardPerformance:
 
         start = time.time()
 
-        for i in range(50):
+        for _i in range(50):
             await manager.validate_request(
                 operation_type=OperationType.CONTENT_GENERATION, is_consequential=True, prompt="Test prompt"
             )

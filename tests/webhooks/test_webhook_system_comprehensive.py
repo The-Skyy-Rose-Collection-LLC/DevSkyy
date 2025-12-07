@@ -747,7 +747,6 @@ class TestWebhookIntegration:
         result = await mgr.unsubscribe(subscription.subscription_id)
         assert result is True
 
-
     @pytest.mark.asyncio
     async def test_emit_no_subscribers(self):
         """Test emitting event with no subscribers"""
@@ -1003,7 +1002,7 @@ class TestWebhookDelivery:
         mock_client.__aexit__ = AsyncMock(return_value=None)
 
         with patch("webhooks.webhook_system.httpx.AsyncClient", return_value=mock_client):
-            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock) as mock_sleep:
+            with patch("webhooks.webhook_system.asyncio.sleep", new_callable=AsyncMock):
                 await mgr._deliver_webhook(subscription, payload)
 
                 # Should have multiple retries with exponential backoff

@@ -428,7 +428,7 @@ class TestPublishContentBatch:
 
         # Call endpoint
         topics = ["Topic 1", "Topic 2"]
-        result = await publish_content_batch(
+        await publish_content_batch(
             topics=topics,
             orchestrator=mock_orchestrator,
         )
@@ -476,9 +476,7 @@ class TestPublishContentBatch:
             "content": {"title": "Test", "word_count": 800},
             "wordpress_post": {"url": "https://example.com/test", "id": 1},
         }
-        mock_orchestrator.telegram_service.send_notification = AsyncMock(
-            side_effect=Exception("Telegram error")
-        )
+        mock_orchestrator.telegram_service.send_notification = AsyncMock(side_effect=Exception("Telegram error"))
 
         # Call endpoint and expect exception
         with pytest.raises(HTTPException) as exc_info:

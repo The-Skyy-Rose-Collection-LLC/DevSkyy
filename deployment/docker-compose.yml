@@ -73,7 +73,9 @@ services:
       - FASHION_INTELLIGENCE_URL=http://fashion-intelligence:8003
       - PINTEREST_API_KEY=${PINTEREST_API_KEY}
       - INSTAGRAM_API_KEY=${INSTAGRAM_API_KEY}
-      - SHOPIFY_API_KEY=${SHOPIFY_API_KEY}
+      - WOOCOMMERCE_URL=${WOOCOMMERCE_URL}
+      - WOOCOMMERCE_CONSUMER_KEY=${WOOCOMMERCE_CONSUMER_KEY}
+      - WOOCOMMERCE_CONSUMER_SECRET=${WOOCOMMERCE_CONSUMER_SECRET}
     depends_on:
       - redis
       - elasticsearch
@@ -336,7 +338,9 @@ volumes:
 # Create a .env file with the following variables:
 # PINTEREST_API_KEY=your_pinterest_api_key
 # INSTAGRAM_API_KEY=your_instagram_api_key
-# SHOPIFY_API_KEY=your_shopify_api_key
+# WOOCOMMERCE_URL=your_woocommerce_url
+# WOOCOMMERCE_CONSUMER_KEY=your_woocommerce_consumer_key
+# WOOCOMMERCE_CONSUMER_SECRET=your_woocommerce_consumer_secret
 # OPENAI_API_KEY=your_openai_api_key
 # BACKUP_S3_BUCKET=your_backup_bucket
 # AWS_ACCESS_KEY_ID=your_aws_access_key

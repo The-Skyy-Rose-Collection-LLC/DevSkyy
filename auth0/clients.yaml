@@ -200,3 +200,49 @@ clients:
     # Organization Usage
     organization_usage: "require"
     organization_require_behavior: "pre_login_prompt"
+
+  # Arcade.dev GitHub Integration
+  - name: "Arcade GitHub Integration"
+    description: "Arcade.dev AI platform GitHub OAuth integration for DevSkyy"
+    app_type: "regular_web"
+
+    # URLs
+    callbacks:
+      - "https://cloud.arcade.dev/api/v1/oauth/f4c6b_aps_arcade-github/callback"
+
+    allowed_logout_urls:
+      - "https://cloud.arcade.dev"
+
+    web_origins:
+      - "https://cloud.arcade.dev"
+
+    allowed_origins:
+      - "https://cloud.arcade.dev"
+
+    # Token Settings
+    token_endpoint_auth_method: "client_secret_post"
+    grant_types:
+      - "authorization_code"
+      - "refresh_token"
+
+    # JWT Configuration
+    jwt_configuration:
+      alg: "RS256"
+      lifetime_in_seconds: 36000  # 10 hours
+      secret_encoded: false
+
+    # Refresh Token
+    refresh_token:
+      rotation_type: "rotating"
+      expiration_type: "expiring"
+      token_lifetime: 2592000  # 30 days
+      idle_token_lifetime: 1296000  # 15 days
+      infinite_token_lifetime: false
+      infinite_idle_token_lifetime: false
+      leeway: 0
+
+    # Client Metadata
+    client_metadata:
+      environment: "production"
+      integration: "arcade-github"
+      version: "5.3.0"

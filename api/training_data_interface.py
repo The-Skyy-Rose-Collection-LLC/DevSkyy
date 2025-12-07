@@ -31,7 +31,7 @@ except ImportError:
     logger.error("PIL/Pillow not available - image processing will be limited")
     PIL_AVAILABLE = False
     # Create dummy Image class for type hints
-    Image = type('Image', (), {'Image': Any})
+    Image = type("Image", (), {"Image": Any})
 
 try:
     import cv2
@@ -57,12 +57,17 @@ app = FastAPI(title="Skyy Rose Training Data Interface", version="1.0.0")
 from fastapi.middleware.cors import CORSMiddleware
 
 
+# SECURITY: CORS configuration for development only
+# WARNING: allow_origins=["*"] with allow_credentials=True is a security risk
+# For production, specify exact origins via CORS_ALLOWED_ORIGINS env var
+cors_origins = os.getenv("CORS_ALLOWED_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=cors_origins,  # SECURITY: Use specific origins, not "*"
+    allow_credentials=True,  # Can only be True when origins are specific
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allow_headers=["Content-Type", "Authorization", "X-Requested-With", "X-API-Key"],
 )
 
 # Configuration

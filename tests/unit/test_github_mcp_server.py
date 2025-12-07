@@ -13,30 +13,24 @@ Per Truth Protocol:
 """
 
 import os
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 # Import the module
 from github_mcp_server import (
-    GetFileContentsRequest,
-    FileContentsResult,
-    SearchCodeRequest,
-    CodeSearchResult,
-    GetIssuesRequest,
-    IssuesResult,
-    CreateIssueRequest,
-    CreateIssueResult,
-    GetPullRequestsRequest,
-    PullRequestsResult,
-    GetRepoInfoRequest,
-    RepoInfoResult,
-    ListBranchesRequest,
-    BranchesResult,
-    GetCommitsRequest,
-    CommitsResult,
-    GitHubToolStatus,
-    DynamicToolsetManager,
     TOOL_REGISTRY,
+    CreateIssueRequest,
+    DynamicToolsetManager,
+    FileContentsResult,
+    GetCommitsRequest,
+    GetFileContentsRequest,
+    GetIssuesRequest,
+    GetPullRequestsRequest,
+    GetRepoInfoRequest,
+    GitHubToolStatus,
+    ListBranchesRequest,
+    RepoInfoResult,
+    SearchCodeRequest,
 )
 
 
@@ -45,11 +39,7 @@ class TestPydanticModels:
 
     def test_get_file_contents_request_valid(self):
         """Test valid GetFileContentsRequest."""
-        request = GetFileContentsRequest(
-            owner="anthropics",
-            repo="claude-code",
-            path="README.md"
-        )
+        request = GetFileContentsRequest(owner="anthropics", repo="claude-code", path="README.md")
         assert request.owner == "anthropics"
         assert request.repo == "claude-code"
         assert request.path == "README.md"
@@ -57,12 +47,7 @@ class TestPydanticModels:
 
     def test_get_file_contents_request_with_ref(self):
         """Test GetFileContentsRequest with branch reference."""
-        request = GetFileContentsRequest(
-            owner="anthropics",
-            repo="claude-code",
-            path="src/main.py",
-            ref="develop"
-        )
+        request = GetFileContentsRequest(owner="anthropics", repo="claude-code", path="src/main.py", ref="develop")
         assert request.ref == "develop"
 
     def test_file_contents_result_success(self):
@@ -73,7 +58,7 @@ class TestPydanticModels:
             content="# Hello World",
             encoding="base64",
             size=12,
-            sha="abc123"
+            sha="abc123",
         )
         assert result.status == GitHubToolStatus.SUCCESS
         assert result.content == "# Hello World"
@@ -81,22 +66,14 @@ class TestPydanticModels:
 
     def test_file_contents_result_error(self):
         """Test FileContentsResult for error."""
-        result = FileContentsResult(
-            status=GitHubToolStatus.ERROR,
-            path="missing.md",
-            error="File not found"
-        )
+        result = FileContentsResult(status=GitHubToolStatus.ERROR, path="missing.md", error="File not found")
         assert result.status == GitHubToolStatus.ERROR
         assert result.content is None
         assert result.error == "File not found"
 
     def test_search_code_request_valid(self):
         """Test valid SearchCodeRequest."""
-        request = SearchCodeRequest(
-            query="import asyncio",
-            repo="anthropics/claude-code",
-            language="python"
-        )
+        request = SearchCodeRequest(query="import asyncio", repo="anthropics/claude-code", language="python")
         assert request.query == "import asyncio"
         assert request.repo == "anthropics/claude-code"
         assert request.language == "python"
@@ -120,32 +97,19 @@ class TestPydanticModels:
 
     def test_get_issues_request_valid(self):
         """Test valid GetIssuesRequest."""
-        request = GetIssuesRequest(
-            owner="anthropics",
-            repo="claude-code",
-            state="open",
-            labels="bug,enhancement"
-        )
+        request = GetIssuesRequest(owner="anthropics", repo="claude-code", state="open", labels="bug,enhancement")
         assert request.state == "open"
         assert request.labels == "bug,enhancement"
 
     def test_get_issues_request_state_options(self):
         """Test GetIssuesRequest state options."""
         for state in ["open", "closed", "all"]:
-            request = GetIssuesRequest(
-                owner="test",
-                repo="test",
-                state=state
-            )
+            request = GetIssuesRequest(owner="test", repo="test", state=state)
             assert request.state == state
 
     def test_create_issue_request_minimal(self):
         """Test CreateIssueRequest with minimal fields."""
-        request = CreateIssueRequest(
-            owner="test",
-            repo="test",
-            title="Bug Report"
-        )
+        request = CreateIssueRequest(owner="test", repo="test", title="Bug Report")
         assert request.title == "Bug Report"
         assert request.body is None
         assert request.labels is None
@@ -159,7 +123,7 @@ class TestPydanticModels:
             title="Bug Report",
             body="## Description\n\nDetails here",
             labels=["bug", "priority-high"],
-            assignees=["user1", "user2"]
+            assignees=["user1", "user2"],
         )
         assert request.body == "## Description\n\nDetails here"
         assert len(request.labels) == 2
@@ -167,19 +131,13 @@ class TestPydanticModels:
 
     def test_get_pull_requests_request_defaults(self):
         """Test GetPullRequestsRequest defaults."""
-        request = GetPullRequestsRequest(
-            owner="test",
-            repo="test"
-        )
+        request = GetPullRequestsRequest(owner="test", repo="test")
         assert request.state == "open"
         assert request.per_page == 10
 
     def test_get_repo_info_request(self):
         """Test GetRepoInfoRequest."""
-        request = GetRepoInfoRequest(
-            owner="anthropics",
-            repo="claude-code"
-        )
+        request = GetRepoInfoRequest(owner="anthropics", repo="claude-code")
         assert request.owner == "anthropics"
         assert request.repo == "claude-code"
 
@@ -194,29 +152,19 @@ class TestPydanticModels:
             forks=100,
             language="Python",
             default_branch="main",
-            topics=["cli", "ai", "claude"]
+            topics=["cli", "ai", "claude"],
         )
         assert result.stars == 1000
         assert len(result.topics) == 3
 
     def test_list_branches_request(self):
         """Test ListBranchesRequest."""
-        request = ListBranchesRequest(
-            owner="test",
-            repo="test",
-            per_page=50
-        )
+        request = ListBranchesRequest(owner="test", repo="test", per_page=50)
         assert request.per_page == 50
 
     def test_get_commits_request_with_filters(self):
         """Test GetCommitsRequest with filters."""
-        request = GetCommitsRequest(
-            owner="test",
-            repo="test",
-            sha="develop",
-            path="src/main.py",
-            per_page=20
-        )
+        request = GetCommitsRequest(owner="test", repo="test", sha="develop", path="src/main.py", per_page=20)
         assert request.sha == "develop"
         assert request.path == "src/main.py"
 
@@ -232,7 +180,7 @@ class TestToolRegistry:
 
     def test_tool_registry_structure(self):
         """Test tool registry entry structure."""
-        for name, definition in TOOL_REGISTRY.items():
+        for definition in TOOL_REGISTRY.values():
             assert "func" in definition
             assert "description" in definition
             assert "keywords" in definition

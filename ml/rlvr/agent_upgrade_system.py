@@ -59,9 +59,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.CODE_ANALYSIS,
                     VerificationMethod.TEST_EXECUTION,
-                    VerificationMethod.USER_FEEDBACK
+                    VerificationMethod.USER_FEEDBACK,
                 ],
-                "expected_improvement": 0.25  # 25% improvement
+                "expected_improvement": 0.25,  # 25% improvement
             },
             "multi_model_orchestrator": {
                 "name": "Automated Model Performance Comparison",
@@ -69,9 +69,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.TEST_EXECUTION,
                     VerificationMethod.BUSINESS_METRICS,
-                    VerificationMethod.AUTOMATED_CHECK
+                    VerificationMethod.AUTOMATED_CHECK,
                 ],
-                "expected_improvement": 0.20
+                "expected_improvement": 0.20,
             },
             "product_manager": {
                 "name": "Competitor Price Monitoring",
@@ -79,9 +79,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.BUSINESS_METRICS,
                     VerificationMethod.USER_FEEDBACK,
-                    VerificationMethod.AUTOMATED_CHECK
+                    VerificationMethod.AUTOMATED_CHECK,
                 ],
-                "expected_improvement": 0.30
+                "expected_improvement": 0.30,
             },
             "seo_marketing": {
                 "name": "Content Gap Analysis",
@@ -89,9 +89,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.BUSINESS_METRICS,
                     VerificationMethod.USER_FEEDBACK,
-                    VerificationMethod.AUTOMATED_CHECK
+                    VerificationMethod.AUTOMATED_CHECK,
                 ],
-                "expected_improvement": 0.35
+                "expected_improvement": 0.35,
             },
             "customer_service": {
                 "name": "Sentiment-Aware Responses",
@@ -99,9 +99,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.USER_FEEDBACK,
                     VerificationMethod.BUSINESS_METRICS,
-                    VerificationMethod.AUTOMATED_CHECK
+                    VerificationMethod.AUTOMATED_CHECK,
                 ],
-                "expected_improvement": 0.40
+                "expected_improvement": 0.40,
             },
             "wordpress_theme_builder": {
                 "name": "Real-Time Preview Generation",
@@ -109,9 +109,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.USER_FEEDBACK,
                     VerificationMethod.CODE_ANALYSIS,
-                    VerificationMethod.AUTOMATED_CHECK
+                    VerificationMethod.AUTOMATED_CHECK,
                 ],
-                "expected_improvement": 0.30
+                "expected_improvement": 0.30,
             },
             "predictive_automation": {
                 "name": "Proactive Issue Detection",
@@ -119,9 +119,9 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.AUTOMATED_CHECK,
                     VerificationMethod.TEST_EXECUTION,
-                    VerificationMethod.BUSINESS_METRICS
+                    VerificationMethod.BUSINESS_METRICS,
                 ],
-                "expected_improvement": 0.45
+                "expected_improvement": 0.45,
             },
             "design_automation": {
                 "name": "Accessibility Compliance Checker",
@@ -129,18 +129,13 @@ class AgentUpgradeSystem:
                 "verification_methods": [
                     VerificationMethod.CODE_ANALYSIS,
                     VerificationMethod.AUTOMATED_CHECK,
-                    VerificationMethod.USER_FEEDBACK
+                    VerificationMethod.USER_FEEDBACK,
                 ],
-                "expected_improvement": 0.50
-            }
+                "expected_improvement": 0.50,
+            },
         }
 
-    async def deploy_upgrade(
-        self,
-        agent_type: str,
-        user_id: uuid.UUID,
-        enable_ab_test: bool = True
-    ) -> dict[str, Any]:
+    async def deploy_upgrade(self, agent_type: str, user_id: uuid.UUID, enable_ab_test: bool = True) -> dict[str, Any]:
         """
         Deploy an upgrade to a specific agent with RLVR tracking.
 
@@ -169,7 +164,7 @@ class AgentUpgradeSystem:
             "deployed_at": datetime.utcnow(),
             "status": "ab_testing" if enable_ab_test else "deployed",
             "verification_methods": [method.value for method in upgrade["verification_methods"]],
-            "expected_improvement": upgrade["expected_improvement"]
+            "expected_improvement": upgrade["expected_improvement"],
         }
 
         # Store deployment record
@@ -187,7 +182,7 @@ class AgentUpgradeSystem:
             "agent_id": agent_id,
             "agent_type": agent_type,
             "deployment_record": deployment_record,
-            "verification_pending": upgrade["verification_methods"]
+            "verification_pending": upgrade["verification_methods"],
         }
 
         return {
@@ -199,14 +194,11 @@ class AgentUpgradeSystem:
             "expected_improvement": f"+{upgrade['expected_improvement']*100:.0f}%",
             "ab_test_enabled": enable_ab_test,
             "status": "deployed",
-            "tracking_url": f"/api/v1/rlvr/upgrades/{upgrade_id}/status"
+            "tracking_url": f"/api/v1/rlvr/upgrades/{upgrade_id}/status",
         }
 
     async def verify_upgrade(
-        self,
-        upgrade_id: uuid.UUID,
-        verification_method: VerificationMethod,
-        **verification_data
+        self, upgrade_id: uuid.UUID, verification_method: VerificationMethod, **verification_data
     ) -> dict[str, Any]:
         """
         Submit verification data for an upgrade.
@@ -232,21 +224,16 @@ class AgentUpgradeSystem:
         if not execution_id:
             # Create synthetic execution record for upgrade
             execution_id = await self._create_upgrade_execution(
-                upgrade_info["agent_id"],
-                upgrade_id,
-                verification_data
+                upgrade_info["agent_id"], upgrade_id, verification_data
             )
 
         # Verify execution with RLVR
         reward = await self.verifier.verify_execution(
-            execution_id=execution_id,
-            verification_method=verification_method,
-            **verification_data
+            execution_id=execution_id, verification_method=verification_method, **verification_data
         )
 
         logger.info(
-            f"✅ Upgrade {upgrade_id} verified via {verification_method.value}: "
-            f"score {reward['reward_score']}"
+            f"✅ Upgrade {upgrade_id} verified via {verification_method.value}: " f"score {reward['reward_score']}"
         )
 
         # Check if all verification methods complete
@@ -257,9 +244,7 @@ class AgentUpgradeSystem:
             composite_score = await self.verifier.compute_composite_reward(execution_id)
 
             # Check if upgrade meets expectations
-            improvement_threshold = Decimal(
-                str(upgrade_info["deployment_record"]["expected_improvement"])
-            )
+            improvement_threshold = Decimal(str(upgrade_info["deployment_record"]["expected_improvement"]))
 
             if composite_score >= Decimal("0.7") + improvement_threshold:
                 await self._promote_upgrade(upgrade_id, composite_score)
@@ -273,15 +258,15 @@ class AgentUpgradeSystem:
                 "status": status,
                 "composite_score": float(composite_score),
                 "threshold": float(Decimal("0.7") + improvement_threshold),
-                "all_verifications_complete": True
+                "all_verifications_complete": True,
             }
 
         return {
             "upgrade_id": str(upgrade_id),
             "verification_method": verification_method.value,
-            "reward_score": float(reward['reward_score']),
+            "reward_score": float(reward["reward_score"]),
             "verifications_pending": len(upgrade_info["verification_pending"]),
-            "all_verifications_complete": False
+            "all_verifications_complete": False,
         }
 
     async def get_upgrade_status(self, upgrade_id: uuid.UUID) -> dict[str, Any]:
@@ -311,10 +296,8 @@ class AgentUpgradeSystem:
             "status": deployment["status"],
             "expected_improvement": f"+{deployment['expected_improvement']*100:.0f}%",
             "verification_scores": verification_scores,
-            "verifications_pending": [
-                method.value for method in upgrade_info["verification_pending"]
-            ],
-            "progress": self._calculate_progress(upgrade_info)
+            "verifications_pending": [method.value for method in upgrade_info["verification_pending"]],
+            "progress": self._calculate_progress(upgrade_info),
         }
 
     async def deploy_all_upgrades(self, user_id: uuid.UUID) -> dict[str, Any]:
@@ -330,36 +313,24 @@ class AgentUpgradeSystem:
             "total_agents": len(self.upgrade_catalog),
             "successful_deployments": 0,
             "failed_deployments": 0,
-            "deployments": []
+            "deployments": [],
         }
 
-        for agent_type in self.upgrade_catalog.keys():
+        for agent_type in self.upgrade_catalog:
             try:
                 deployment = await self.deploy_upgrade(
-                    agent_type=agent_type,
-                    user_id=user_id,
-                    enable_ab_test=True  # Enable A/B testing for all
+                    agent_type=agent_type, user_id=user_id, enable_ab_test=True  # Enable A/B testing for all
                 )
 
                 results["successful_deployments"] += 1
-                results["deployments"].append({
-                    "agent_type": agent_type,
-                    "status": "success",
-                    **deployment
-                })
+                results["deployments"].append({"agent_type": agent_type, "status": "success", **deployment})
 
             except Exception as e:
                 logger.error(f"Failed to deploy upgrade to {agent_type}: {e}")
                 results["failed_deployments"] += 1
-                results["deployments"].append({
-                    "agent_type": agent_type,
-                    "status": "failed",
-                    "error": str(e)
-                })
+                results["deployments"].append({"agent_type": agent_type, "status": "failed", "error": str(e)})
 
-        logger.info(
-            f"✅ Deployment complete: {results['successful_deployments']}/{results['total_agents']} succeeded"
-        )
+        logger.info(f"✅ Deployment complete: {results['successful_deployments']}/{results['total_agents']} succeeded")
 
         return results
 
@@ -367,16 +338,13 @@ class AgentUpgradeSystem:
         """Get status of all active upgrades."""
         statuses = []
 
-        for upgrade_id in self.active_upgrades.keys():
+        for upgrade_id in self.active_upgrades:
             status = await self.get_upgrade_status(uuid.UUID(upgrade_id))
             statuses.append(status)
 
         # Calculate overall metrics
         total_upgrades = len(statuses)
-        completed_verifications = sum(
-            1 for s in statuses
-            if len(s["verifications_pending"]) == 0
-        )
+        completed_verifications = sum(1 for s in statuses if len(s["verifications_pending"]) == 0)
 
         avg_progress = sum(s["progress"] for s in statuses) / total_upgrades if total_upgrades > 0 else 0
 
@@ -385,7 +353,7 @@ class AgentUpgradeSystem:
             "completed_verifications": completed_verifications,
             "in_progress": total_upgrades - completed_verifications,
             "average_progress": f"{avg_progress:.1f}%",
-            "upgrades": statuses
+            "upgrades": statuses,
         }
 
     # Private helper methods
@@ -402,16 +370,19 @@ class AgentUpgradeSystem:
             )
         """
 
-        await self.session.execute(query, {
-            "upgrade_id": deployment_record["upgrade_id"],
-            "agent_type": deployment_record["agent_type"],
-            "upgrade_name": deployment_record["upgrade_name"],
-            "deployed_by": deployment_record["deployed_by"],
-            "deployed_at": deployment_record["deployed_at"],
-            "status": deployment_record["status"],
-            "verification_methods": ",".join(deployment_record["verification_methods"]),
-            "expected_improvement": deployment_record["expected_improvement"]
-        })
+        await self.session.execute(
+            query,
+            {
+                "upgrade_id": deployment_record["upgrade_id"],
+                "agent_type": deployment_record["agent_type"],
+                "upgrade_name": deployment_record["upgrade_name"],
+                "deployed_by": deployment_record["deployed_by"],
+                "deployed_at": deployment_record["deployed_at"],
+                "status": deployment_record["status"],
+                "verification_methods": ",".join(deployment_record["verification_methods"]),
+                "expected_improvement": deployment_record["expected_improvement"],
+            },
+        )
         await self.session.commit()
 
     async def _start_ab_test(self, upgrade_id: uuid.UUID, agent_type: str) -> uuid.UUID:
@@ -428,15 +399,18 @@ class AgentUpgradeSystem:
             )
         """
 
-        await self.session.execute(query, {
-            "ab_test_id": ab_test_id,
-            "upgrade_id": upgrade_id,
-            "agent_type": agent_type,
-            "variant_a": "baseline",
-            "variant_b": "upgraded",
-            "started_at": datetime.utcnow(),
-            "status": "running"
-        })
+        await self.session.execute(
+            query,
+            {
+                "ab_test_id": ab_test_id,
+                "upgrade_id": upgrade_id,
+                "agent_type": agent_type,
+                "variant_a": "baseline",
+                "variant_b": "upgraded",
+                "started_at": datetime.utcnow(),
+                "status": "running",
+            },
+        )
         await self.session.commit()
 
         return ab_test_id
@@ -457,14 +431,17 @@ class AgentUpgradeSystem:
             VALUES (:id, :name, :type, :version, :is_active, :created_at)
         """
 
-        await self.session.execute(insert_query, {
-            "id": agent_id,
-            "name": f"{agent_type.replace('_', ' ').title()} Agent",
-            "type": agent_type,
-            "version": 1,
-            "is_active": True,
-            "created_at": datetime.utcnow()
-        })
+        await self.session.execute(
+            insert_query,
+            {
+                "id": agent_id,
+                "name": f"{agent_type.replace('_', ' ').title()} Agent",
+                "type": agent_type,
+                "version": 1,
+                "is_active": True,
+                "created_at": datetime.utcnow(),
+            },
+        )
         await self.session.commit()
 
         return agent_id
@@ -484,10 +461,7 @@ class AgentUpgradeSystem:
         return row[0] if row else None
 
     async def _create_upgrade_execution(
-        self,
-        agent_id: uuid.UUID,
-        upgrade_id: uuid.UUID,
-        verification_data: dict[str, Any]
+        self, agent_id: uuid.UUID, upgrade_id: uuid.UUID, verification_data: dict[str, Any]
     ) -> uuid.UUID:
         """Create synthetic execution record for upgrade."""
         execution_id = uuid.uuid4()
@@ -502,18 +476,21 @@ class AgentUpgradeSystem:
             )
         """
 
-        await self.session.execute(query, {
-            "id": execution_id,
-            "agent_id": agent_id,
-            "version": 2,  # Upgraded version
-            "prompt": f"Upgrade deployment: {upgrade_id}",
-            "completion": f"Upgrade verification data: {verification_data}",
-            "time_ms": 0,
-            "tokens": 0,
-            "cost": Decimal("0.0"),
-            "status": "success",
-            "created_at": datetime.utcnow()
-        })
+        await self.session.execute(
+            query,
+            {
+                "id": execution_id,
+                "agent_id": agent_id,
+                "version": 2,  # Upgraded version
+                "prompt": f"Upgrade deployment: {upgrade_id}",
+                "completion": f"Upgrade verification data: {verification_data}",
+                "time_ms": 0,
+                "tokens": 0,
+                "cost": Decimal("0.0"),
+                "status": "success",
+                "created_at": datetime.utcnow(),
+            },
+        )
         await self.session.commit()
 
         return execution_id
@@ -531,19 +508,14 @@ class AgentUpgradeSystem:
 
     def _calculate_progress(self, upgrade_info: dict[str, Any]) -> float:
         """Calculate deployment progress percentage."""
-        total_verifications = len(
-            self.upgrade_catalog[upgrade_info["agent_type"]]["verification_methods"]
-        )
+        total_verifications = len(self.upgrade_catalog[upgrade_info["agent_type"]]["verification_methods"])
         completed = total_verifications - len(upgrade_info["verification_pending"])
 
         return (completed / total_verifications) * 100
 
     async def _promote_upgrade(self, upgrade_id: uuid.UUID, composite_score: Decimal):
         """Promote upgrade to production."""
-        logger.info(
-            f"🎉 Upgrade {upgrade_id} promoted to production "
-            f"(score: {composite_score})"
-        )
+        logger.info(f"🎉 Upgrade {upgrade_id} promoted to production " f"(score: {composite_score})")
 
         query = """
             UPDATE agent_upgrades
@@ -551,19 +523,14 @@ class AgentUpgradeSystem:
             WHERE upgrade_id = :upgrade_id
         """
 
-        await self.session.execute(query, {
-            "upgrade_id": upgrade_id,
-            "promoted_at": datetime.utcnow(),
-            "score": composite_score
-        })
+        await self.session.execute(
+            query, {"upgrade_id": upgrade_id, "promoted_at": datetime.utcnow(), "score": composite_score}
+        )
         await self.session.commit()
 
     async def _rollback_upgrade(self, upgrade_id: uuid.UUID, composite_score: Decimal):
         """Rollback upgrade due to insufficient performance."""
-        logger.warning(
-            f"⚠️  Upgrade {upgrade_id} rolled back "
-            f"(insufficient score: {composite_score})"
-        )
+        logger.warning(f"⚠️  Upgrade {upgrade_id} rolled back " f"(insufficient score: {composite_score})")
 
         query = """
             UPDATE agent_upgrades
@@ -571,11 +538,9 @@ class AgentUpgradeSystem:
             WHERE upgrade_id = :upgrade_id
         """
 
-        await self.session.execute(query, {
-            "upgrade_id": upgrade_id,
-            "rolled_back_at": datetime.utcnow(),
-            "score": composite_score
-        })
+        await self.session.execute(
+            query, {"upgrade_id": upgrade_id, "rolled_back_at": datetime.utcnow(), "score": composite_score}
+        )
         await self.session.commit()
 
     async def _get_upgrade_from_db(self, upgrade_id: uuid.UUID) -> dict[str, Any]:
@@ -598,5 +563,5 @@ class AgentUpgradeSystem:
             "upgrade_name": row[2],
             "deployed_at": row[3].isoformat(),
             "status": row[4],
-            "final_score": float(row[5]) if row[5] else None
+            "final_score": float(row[5]) if row[5] else None,
         }

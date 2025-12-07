@@ -10,12 +10,12 @@ Truth Protocol Compliance:
 - Rule #10: No-Skip Rule
 """
 
-import asyncio
 from datetime import datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, MagicMock
 
 import pytest
 
+from agent.modules.base_agent import AgentStatus
 from agent.orchestrator import (
     AgentCapability,
     AgentOrchestrator,
@@ -24,7 +24,6 @@ from agent.orchestrator import (
     MockAgent,
     TaskStatus,
 )
-from agent.modules.base_agent import AgentStatus
 
 
 # =============================================================================
@@ -74,10 +73,7 @@ class TestAgentCapability:
 
     def test_create_capability(self):
         """Test creating an agent capability."""
-        cap = AgentCapability(
-            agent_name="test_agent",
-            capabilities=["search", "analyze"]
-        )
+        cap = AgentCapability(agent_name="test_agent", capabilities=["search", "analyze"])
 
         assert cap.agent_name == "test_agent"
         assert cap.capabilities == ["search", "analyze"]
@@ -92,7 +88,7 @@ class TestAgentCapability:
             agent_name="data_agent",
             capabilities=["process_data"],
             required_agents=["auth_agent", "db_agent"],
-            priority=ExecutionPriority.HIGH
+            priority=ExecutionPriority.HIGH,
         )
 
         assert cap.required_agents == ["auth_agent", "db_agent"]
@@ -114,7 +110,7 @@ class TestAgentTask:
             task_type="process_order",
             parameters={"order_id": "ORD-001"},
             required_agents=["order_agent", "inventory_agent"],
-            priority=ExecutionPriority.HIGH
+            priority=ExecutionPriority.HIGH,
         )
 
         assert task.task_id == "task_123"
@@ -128,11 +124,7 @@ class TestAgentTask:
     def test_task_default_values(self):
         """Test task default values."""
         task = AgentTask(
-            task_id="t1",
-            task_type="test",
-            parameters={},
-            required_agents=[],
-            priority=ExecutionPriority.LOW
+            task_id="t1", task_type="test", parameters={}, required_agents=[], priority=ExecutionPriority.LOW
         )
 
         assert task.started_at is None
@@ -188,11 +180,7 @@ class TestAgentRegistration:
         orch = AgentOrchestrator()
         agent = MockAgent("test_agent")
 
-        success = await orch.register_agent(
-            agent,
-            capabilities=["search", "analyze"],
-            priority=ExecutionPriority.HIGH
-        )
+        success = await orch.register_agent(agent, capabilities=["search", "analyze"], priority=ExecutionPriority.HIGH)
 
         assert success is True
         assert "test_agent" in orch.agents
@@ -204,11 +192,7 @@ class TestAgentRegistration:
         orch = AgentOrchestrator()
         agent = MockAgent("data_agent")
 
-        await orch.register_agent(
-            agent,
-            capabilities=["process"],
-            dependencies=["auth_agent"]
-        )
+        await orch.register_agent(agent, capabilities=["process"], dependencies=["auth_agent"])
 
         assert orch.dependency_graph["data_agent"] == {"auth_agent"}
         assert "data_agent" in orch.reverse_dependencies["auth_agent"]
@@ -221,10 +205,7 @@ class TestAgentRegistration:
         # Add video generation method
         agent.generate_fashion_runway_video = AsyncMock()
 
-        await orch.register_agent(
-            agent,
-            capabilities=["fashion"]
-        )
+        await orch.register_agent(agent, capabilities=["fashion"])
 
         cap = orch.agent_capabilities["fashion_agent"]
         assert "video_generation" in cap.capabilities
@@ -268,11 +249,7 @@ class TestTaskExecution:
         data_agent = MockAgent("data_agent")
 
         await orch.register_agent(auth_agent, capabilities=["authentication"])
-        await orch.register_agent(
-            data_agent,
-            capabilities=["data_processing"],
-            dependencies=["auth_agent"]
-        )
+        await orch.register_agent(data_agent, capabilities=["data_processing"], dependencies=["auth_agent"])
 
         return orch
 
@@ -282,9 +259,7 @@ class TestTaskExecution:
         orch = orchestrator_with_agents
 
         result = await orch.execute_task(
-            task_type="process_request",
-            parameters={"user_id": "123"},
-            required_capabilities=["authentication"]
+            task_type="process_request", parameters={"user_id": "123"}, required_capabilities=["authentication"]
         )
 
         assert "task_id" in result
@@ -297,9 +272,7 @@ class TestTaskExecution:
         orch = AgentOrchestrator()
 
         result = await orch.execute_task(
-            task_type="special_task",
-            parameters={},
-            required_capabilities=["nonexistent_capability"]
+            task_type="special_task", parameters={}, required_capabilities=["nonexistent_capability"]
         )
 
         assert "error" in result
@@ -312,9 +285,7 @@ class TestTaskExecution:
 
         # Both agents required
         result = await orch.execute_task(
-            task_type="full_process",
-            parameters={},
-            required_capabilities=["authentication", "data_processing"]
+            task_type="full_process", parameters={}, required_capabilities=["authentication", "data_processing"]
         )
 
         # Should have executed both agents
@@ -325,11 +296,7 @@ class TestTaskExecution:
         """Test that task execution records metrics."""
         orch = orchestrator_with_agents
 
-        await orch.execute_task(
-            task_type="metric_test",
-            parameters={},
-            required_capabilities=["authentication"]
-        )
+        await orch.execute_task(task_type="metric_test", parameters={}, required_capabilities=["authentication"])
 
         metrics = orch.get_agent_metrics("auth_agent")
         assert metrics["calls"] >= 1
@@ -367,14 +334,8 @@ class TestDependencyResolution:
     def test_find_agents_with_capabilities(self):
         """Test finding agents with required capabilities."""
         orch = AgentOrchestrator()
-        orch.agent_capabilities["agent1"] = AgentCapability(
-            agent_name="agent1",
-            capabilities=["search", "analyze"]
-        )
-        orch.agent_capabilities["agent2"] = AgentCapability(
-            agent_name="agent2",
-            capabilities=["search"]
-        )
+        orch.agent_capabilities["agent1"] = AgentCapability(agent_name="agent1", capabilities=["search", "analyze"])
+        orch.agent_capabilities["agent2"] = AgentCapability(agent_name="agent2", capabilities=["search"])
 
         # Both have search
         result = orch._find_agents_with_capabilities(["search"])
@@ -460,7 +421,7 @@ class TestMetricsAndMonitoring:
         """Test execution history is limited to 1000 records."""
         orch = AgentOrchestrator()
 
-        for i in range(1100):
+        for _i in range(1100):
             orch._record_execution("agent", True, 0.1)
 
         assert len(orch.execution_history) == 1000
@@ -555,10 +516,7 @@ class TestInterAgentCommunication:
         orch = AgentOrchestrator()
         orch.agents = {"agent1": MagicMock(), "agent2": MagicMock()}
 
-        await orch.broadcast_to_agents(
-            {"type": "notification", "message": "test"},
-            agent_names=["agent1"]
-        )
+        await orch.broadcast_to_agents({"type": "notification", "message": "test"}, agent_names=["agent1"])
 
         assert orch.get_shared_data("message_agent1") is not None
 
@@ -577,9 +535,7 @@ class TestVideoGenerationTasks:
         orch = AgentOrchestrator()
 
         task_id = await orch.create_video_generation_task(
-            task_type="runway_video",
-            parameters={"prompt": "luxury fashion"},
-            priority=ExecutionPriority.HIGH
+            task_type="runway_video", parameters={"prompt": "luxury fashion"}, priority=ExecutionPriority.HIGH
         )
 
         assert task_id is not None
@@ -600,10 +556,7 @@ class TestVideoGenerationTasks:
     async def test_execute_video_task_no_agent(self):
         """Test executing video task without required agent."""
         orch = AgentOrchestrator()
-        task_id = await orch.create_video_generation_task(
-            task_type="runway_video",
-            parameters={}
-        )
+        task_id = await orch.create_video_generation_task(task_type="runway_video", parameters={})
 
         result = await orch.execute_video_generation_task(task_id)
 

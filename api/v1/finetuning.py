@@ -51,8 +51,10 @@ router = APIRouter(prefix="/api/v1/finetuning", tags=["finetuning"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class PerformanceSnapshotRequest(BaseModel):
     """Request to collect performance snapshot"""
+
     agent_id: str
     agent_name: str
     category: AgentCategory
@@ -69,6 +71,7 @@ class PerformanceSnapshotRequest(BaseModel):
 
 class PrepareDatasetRequest(BaseModel):
     """Request to prepare training dataset"""
+
     category: AgentCategory
     min_samples: int = Field(default=100, ge=10)
     max_samples: int = Field(default=10000, ge=100)
@@ -78,6 +81,7 @@ class PrepareDatasetRequest(BaseModel):
 
 class DatasetResponse(BaseModel):
     """Response with dataset information"""
+
     dataset_id: str
     category: AgentCategory
     created_at: datetime
@@ -89,6 +93,7 @@ class DatasetResponse(BaseModel):
 
 class CreateFinetuningJobRequest(BaseModel):
     """Request to create finetuning job"""
+
     category: AgentCategory
     provider: FinetuningProvider
     base_model: str
@@ -106,6 +111,7 @@ class CreateFinetuningJobRequest(BaseModel):
 
 class FinetuningJobResponse(BaseModel):
     """Response with job information"""
+
     job_id: str
     category: AgentCategory
     status: str
@@ -124,6 +130,7 @@ class FinetuningJobResponse(BaseModel):
 
 class ToolSelectionRequest(BaseModel):
     """Request for optimized tool selection"""
+
     task_description: str
     task_type: str | None = None
     required_capabilities: list[str] = Field(default_factory=list)
@@ -135,6 +142,7 @@ class ToolSelectionRequest(BaseModel):
 
 class ToolSelectionResponse(BaseModel):
     """Response with selected tools"""
+
     selected_tools: list[str]
     compressed_schemas: list[dict[str, Any]]
     tokens_saved: int
@@ -143,12 +151,14 @@ class ToolSelectionResponse(BaseModel):
 
 class ParallelExecutionRequest(BaseModel):
     """Request for parallel function execution"""
+
     function_calls: list[dict[str, Any]]
     user_id: str | None = None
 
 
 class ParallelExecutionResponse(BaseModel):
     """Response from parallel execution"""
+
     results: list[dict[str, Any]]
     total_calls: int
     successful_calls: int
@@ -160,15 +170,15 @@ class ParallelExecutionResponse(BaseModel):
 # FINETUNING ENDPOINTS
 # ============================================================================
 
+
 @router.post(
     "/collect",
     status_code=status.HTTP_201_CREATED,
     summary="Collect Performance Snapshot",
-    description="Collect agent performance data for training datasets"
+    description="Collect agent performance data for training datasets",
 )
 async def collect_performance_snapshot(
-    request: PerformanceSnapshotRequest,
-    current_user: dict = Depends(get_current_user)
+    request: PerformanceSnapshotRequest, current_user: dict = Depends(get_current_user)
 ):
     """
     Collect a performance snapshot from an agent operation.
@@ -190,21 +200,20 @@ async def collect_performance_snapshot(
             execution_time_ms=request.execution_time_ms,
             tokens_used=request.tokens_used,
             user_feedback=request.user_feedback,
-            metadata=request.metadata
+            metadata=request.metadata,
         )
 
         return {
             "status": "success",
             "message": "Performance snapshot collected",
             "agent_name": request.agent_name,
-            "category": request.category.value
+            "category": request.category.value,
         }
 
     except Exception as e:
         logger.error(f"Failed to collect snapshot: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to collect snapshot: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to collect snapshot: {e!s}"
         )
 
 
@@ -213,12 +222,10 @@ async def collect_performance_snapshot(
     response_model=DatasetResponse,
     summary="Prepare Training Dataset",
     description="Prepare a training dataset for an agent category",
-    dependencies=[Depends(require_role(Role.ADMIN))]
+    dependencies=[Depends(require_role(Role.ADMIN))],
 )
 async def prepare_dataset(
-    category: AgentCategory,
-    request: PrepareDatasetRequest,
-    current_user: dict = Depends(get_current_user)
+    category: AgentCategory, request: PrepareDatasetRequest, current_user: dict = Depends(get_current_user)
 ):
     """
     Prepare a training dataset for finetuning.
@@ -233,7 +240,7 @@ async def prepare_dataset(
             min_samples=request.min_samples,
             max_samples=request.max_samples,
             quality_threshold=request.quality_threshold,
-            time_range_days=request.time_range_days
+            time_range_days=request.time_range_days,
         )
 
         return DatasetResponse(
@@ -243,19 +250,15 @@ async def prepare_dataset(
             train_samples=len(dataset.train_split),
             val_samples=len(dataset.val_split),
             test_samples=len(dataset.test_split),
-            statistics=dataset.statistics
+            statistics=dataset.statistics,
         )
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"Failed to prepare dataset: {e}")
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to prepare dataset: {e!s}"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to prepare dataset: {e!s}"
         )
 
 
@@ -265,12 +268,9 @@ async def prepare_dataset(
     status_code=status.HTTP_201_CREATED,
     summary="Create Finetuning Job",
     description="Create a new finetuning job for an agent category",
-    dependencies=[Depends(require_role(Role.ADMIN))]
+    dependencies=[Depends(require_role(Role.ADMIN))],
 )
-async def create_finetuning_job(
-    request: CreateFinetuningJobRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def create_finetuning_job(request: CreateFinetuningJobRequest, current_user: dict = Depends(get_current_user)):
     """
     Create a new finetuning job.
 
@@ -293,14 +293,11 @@ async def create_finetuning_job(
             max_training_hours=request.max_training_hours,
             model_version=request.model_version,
             description=request.description,
-            tags=request.tags
+            tags=request.tags,
         )
 
         # Create job
-        job = await system.create_finetuning_job(
-            category=request.category,
-            config=config
-        )
+        job = await system.create_finetuning_job(category=request.category, config=config)
 
         return FinetuningJobResponse(
             job_id=job.job_id,
@@ -316,41 +313,29 @@ async def create_finetuning_job(
             validation_accuracy=job.validation_accuracy,
             finetuned_model_id=job.finetuned_model_id,
             cost_usd=job.cost_usd,
-            error_message=job.error_message
+            error_message=job.error_message,
         )
 
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=str(e)
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
     except Exception as e:
         logger.error(f"Failed to create finetuning job: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to create job: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to create job: {e!s}")
 
 
 @router.get(
     "/jobs/{job_id}",
     response_model=FinetuningJobResponse,
     summary="Get Job Status",
-    description="Get status of a finetuning job"
+    description="Get status of a finetuning job",
 )
-async def get_job_status(
-    job_id: str,
-    current_user: dict = Depends(get_current_user)
-):
+async def get_job_status(job_id: str, current_user: dict = Depends(get_current_user)):
     """Get status of a finetuning job."""
     system = get_finetuning_system()
 
     job = system.get_job_status(job_id)
     if not job:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Job not found: {job_id}"
-        )
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Job not found: {job_id}")
 
     return FinetuningJobResponse(
         job_id=job.job_id,
@@ -366,7 +351,7 @@ async def get_job_status(
         validation_accuracy=job.validation_accuracy,
         finetuned_model_id=job.finetuned_model_id,
         cost_usd=job.cost_usd,
-        error_message=job.error_message
+        error_message=job.error_message,
     )
 
 
@@ -374,12 +359,9 @@ async def get_job_status(
     "/categories/{category}/jobs",
     response_model=list[FinetuningJobResponse],
     summary="List Category Jobs",
-    description="Get all finetuning jobs for a category"
+    description="Get all finetuning jobs for a category",
 )
-async def list_category_jobs(
-    category: AgentCategory,
-    current_user: dict = Depends(get_current_user)
-):
+async def list_category_jobs(category: AgentCategory, current_user: dict = Depends(get_current_user)):
     """Get all finetuning jobs for a specific category."""
     system = get_finetuning_system()
 
@@ -400,20 +382,16 @@ async def list_category_jobs(
             validation_accuracy=job.validation_accuracy,
             finetuned_model_id=job.finetuned_model_id,
             cost_usd=job.cost_usd,
-            error_message=job.error_message
+            error_message=job.error_message,
         )
         for job in jobs
     ]
 
 
 @router.get(
-    "/statistics",
-    summary="Get System Statistics",
-    description="Get comprehensive finetuning system statistics"
+    "/statistics", summary="Get System Statistics", description="Get comprehensive finetuning system statistics"
 )
-async def get_statistics(
-    current_user: dict = Depends(get_current_user)
-):
+async def get_statistics(current_user: dict = Depends(get_current_user)):
     """Get comprehensive system statistics."""
     system = get_finetuning_system()
     return system.get_system_statistics()
@@ -423,16 +401,14 @@ async def get_statistics(
 # TOOL OPTIMIZATION ENDPOINTS
 # ============================================================================
 
+
 @router.post(
     "/tools/select",
     response_model=ToolSelectionResponse,
     summary="Optimize Tool Selection",
-    description="Dynamically select optimal tools for a task"
+    description="Dynamically select optimal tools for a task",
 )
-async def optimize_tool_selection(
-    request: ToolSelectionRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def optimize_tool_selection(request: ToolSelectionRequest, current_user: dict = Depends(get_current_user)):
     """
     Use ML-based dynamic tool selection to optimize token usage.
 
@@ -448,57 +424,43 @@ async def optimize_tool_selection(
             max_tools=request.max_tools,
             prefer_fast=request.prefer_fast,
             prefer_cheap=request.prefer_cheap,
-            user_id=current_user.get("sub")
+            user_id=current_user.get("sub"),
         )
 
-        result = await manager.optimize_and_execute(
-            context=context,
-            available_tools=request.available_tools or []
-        )
+        result = await manager.optimize_and_execute(context=context, available_tools=request.available_tools or [])
 
         return ToolSelectionResponse(
             selected_tools=result["selected_tools"],
             compressed_schemas=result["compressed_schemas"],
             tokens_saved=result["tokens_saved"],
-            optimization_ratio=result["optimization_ratio"]
+            optimization_ratio=result["optimization_ratio"],
         )
 
     except Exception as e:
         logger.error(f"Failed to optimize tool selection: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to optimize: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to optimize: {e!s}")
 
 
 @router.post(
     "/tools/execute-parallel",
     response_model=ParallelExecutionResponse,
     summary="Execute Parallel Function Calls",
-    description="Execute multiple function calls in parallel"
+    description="Execute multiple function calls in parallel",
 )
-async def execute_parallel_calls(
-    request: ParallelExecutionRequest,
-    current_user: dict = Depends(get_current_user)
-):
+async def execute_parallel_calls(request: ParallelExecutionRequest, current_user: dict = Depends(get_current_user)):
     """
     Execute multiple function calls in parallel for efficiency.
 
     Supports concurrent execution with error handling.
     """
     try:
-        manager = get_optimization_manager()
+        get_optimization_manager()
 
         # This would integrate with actual function registry
         # For now, return structure
         results = []
         for call in request.function_calls:
-            results.append({
-                "function": call.get("function"),
-                "success": True,
-                "result": {},
-                "tokens_used": 0
-            })
+            results.append({"function": call.get("function"), "success": True, "result": {}, "tokens_used": 0})
 
         successful = sum(1 for r in results if r.get("success"))
         total_tokens = sum(r.get("tokens_used", 0) for r in results)
@@ -508,25 +470,18 @@ async def execute_parallel_calls(
             total_calls=len(results),
             successful_calls=successful,
             failed_calls=len(results) - successful,
-            total_tokens_used=total_tokens
+            total_tokens_used=total_tokens,
         )
 
     except Exception as e:
         logger.error(f"Failed to execute parallel calls: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to execute: {e!s}"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Failed to execute: {e!s}")
 
 
 @router.get(
-    "/tools/statistics",
-    summary="Get Optimization Statistics",
-    description="Get token optimization statistics"
+    "/tools/statistics", summary="Get Optimization Statistics", description="Get token optimization statistics"
 )
-async def get_optimization_statistics(
-    current_user: dict = Depends(get_current_user)
-):
+async def get_optimization_statistics(current_user: dict = Depends(get_current_user)):
     """Get comprehensive token optimization statistics."""
     manager = get_optimization_manager()
     return manager.get_optimization_statistics()
@@ -536,15 +491,8 @@ async def get_optimization_statistics(
 # HEALTH CHECK
 # ============================================================================
 
-@router.get(
-    "/health",
-    summary="Health Check",
-    description="Check finetuning system health"
-)
+
+@router.get("/health", summary="Health Check", description="Check finetuning system health")
 async def health_check():
     """Health check endpoint."""
-    return {
-        "status": "healthy",
-        "service": "agent_finetuning",
-        "timestamp": datetime.now().isoformat()
-    }
+    return {"status": "healthy", "service": "agent_finetuning", "timestamp": datetime.now().isoformat()}

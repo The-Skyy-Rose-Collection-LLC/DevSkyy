@@ -7,11 +7,13 @@ This is a simplified status checker that doesn't require full DevSkyy dependenci
 """
 
 import os
+import sys
 
 
 # Load .env if it exists
 try:
     from dotenv import load_dotenv
+
     load_dotenv()
 except ImportError:
     print("⚠️  python-dotenv not installed, checking environment variables directly")
@@ -25,9 +27,11 @@ print("\n📊 WordPress OAuth 2.0 Credentials:")
 oauth_vars = {
     "WORDPRESS_CLIENT_ID": os.getenv("WORDPRESS_CLIENT_ID"),
     "WORDPRESS_CLIENT_SECRET": os.getenv("WORDPRESS_CLIENT_SECRET"),
-    "WORDPRESS_REDIRECT_URI": os.getenv("WORDPRESS_REDIRECT_URI", "http://localhost:8000/api/v1/wordpress/oauth/callback"),
+    "WORDPRESS_REDIRECT_URI": os.getenv(
+        "WORDPRESS_REDIRECT_URI", "http://localhost:8000/api/v1/wordpress/oauth/callback"
+    ),
     "WORDPRESS_TOKEN_URL": os.getenv("WORDPRESS_TOKEN_URL", "https://public-api.wordpress.com/oauth2/token"),
-    "WORDPRESS_API_BASE": os.getenv("WORDPRESS_API_BASE", "https://public-api.wordpress.com/rest/v1.1")
+    "WORDPRESS_API_BASE": os.getenv("WORDPRESS_API_BASE", "https://public-api.wordpress.com/rest/v1.1"),
 }
 
 oauth_configured = bool(oauth_vars["WORDPRESS_CLIENT_ID"] and oauth_vars["WORDPRESS_CLIENT_SECRET"])
@@ -52,7 +56,7 @@ basic_vars = {
     "SKYY_ROSE_SITE_URL": os.getenv("SKYY_ROSE_SITE_URL"),
     "SKYY_ROSE_USERNAME": os.getenv("SKYY_ROSE_USERNAME"),
     "SKYY_ROSE_PASSWORD": os.getenv("SKYY_ROSE_PASSWORD"),
-    "SKYY_ROSE_APP_PASSWORD": os.getenv("SKYY_ROSE_APP_PASSWORD")
+    "SKYY_ROSE_APP_PASSWORD": os.getenv("SKYY_ROSE_APP_PASSWORD"),
 }
 
 basic_configured = bool(basic_vars["SKYY_ROSE_SITE_URL"] and basic_vars["SKYY_ROSE_USERNAME"])
@@ -60,10 +64,7 @@ basic_configured = bool(basic_vars["SKYY_ROSE_SITE_URL"] and basic_vars["SKYY_RO
 for key, value in basic_vars.items():
     if value:
         # Mask sensitive values - never log passwords
-        if "PASSWORD" in key:
-            display_value = "***REDACTED***"
-        else:
-            display_value = value
+        display_value = "***REDACTED***" if "PASSWORD" in key else value
 
         print(f"   ✅ {key}: {display_value}")
     elif "PASSWORD" not in key:
@@ -110,7 +111,7 @@ wordpress_tools = [
     "wordpress_woocommerce_products",
     "wordpress_woocommerce_orders",
     "wordpress_yoast_seo",
-    "wordpress_divi_builder"
+    "wordpress_divi_builder",
 ]
 
 for i, tool in enumerate(wordpress_tools, 1):
@@ -132,29 +133,29 @@ example_jobs = [
         "category": "WORDPRESS_CMS",
         "tools": 4,
         "tokens": "~15,000",
-        "cost": "$0.15"
+        "cost": "$0.15",
     },
     {
         "name": "Optimize WooCommerce Products",
         "category": "ECOMMERCE",
         "tools": 3,
         "tokens": "~50,000",
-        "cost": "$0.50"
+        "cost": "$0.50",
     },
     {
         "name": "Update Blog Content for SEO",
         "category": "MARKETING_BRAND",
         "tools": 3,
         "tokens": "~35,000",
-        "cost": "$0.35"
+        "cost": "$0.35",
     },
     {
         "name": "WordPress Site Performance Monitoring",
         "category": "CORE_SECURITY",
         "tools": 2,
         "tokens": "~8,000",
-        "cost": "$0.08"
-    }
+        "cost": "$0.08",
+    },
 ]
 
 for i, job in enumerate(example_jobs, 1):
@@ -207,6 +208,6 @@ print("=" * 80)
 
 # Exit code
 if oauth_configured or basic_configured:
-    exit(0)
+    sys.exit(0)
 else:
-    exit(1)
+    sys.exit(1)

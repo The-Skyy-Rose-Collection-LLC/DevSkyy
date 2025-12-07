@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 class VerificationMethod(Enum):
     """Types of reward verification."""
+
     USER_FEEDBACK = "user_feedback"
     TEST_EXECUTION = "test_execution"
     CODE_ANALYSIS = "code_analysis"
@@ -36,10 +37,7 @@ class RewardVerifier:
         self.session = session
 
     async def verify_execution(
-        self,
-        execution_id: uuid.UUID,
-        verification_method: VerificationMethod,
-        **kwargs
+        self, execution_id: uuid.UUID, verification_method: VerificationMethod, **kwargs
     ) -> dict[str, Any]:
         """
         Verify an agent execution and compute reward score.
@@ -68,7 +66,7 @@ class RewardVerifier:
 
         # Save to database
         reward_score_id = await self._save_reward_score(execution_id, reward_data)
-        reward_data['id'] = reward_score_id
+        reward_data["id"] = reward_score_id
 
         return reward_data
 
@@ -78,7 +76,7 @@ class RewardVerifier:
         user_rating: int | None = None,
         user_feedback: str | None = None,
         thumbs_up: bool | None = None,
-        user_id: uuid.UUID | None = None
+        user_id: uuid.UUID | None = None,
     ) -> dict[str, Any]:
         """Verify based on explicit user feedback."""
 
@@ -100,15 +98,11 @@ class RewardVerifier:
             "user_feedback": user_feedback,
             "user_rating": user_rating,
             "verified_by_user_id": user_id,
-            "verified_at": datetime.utcnow()
+            "verified_at": datetime.utcnow(),
         }
 
     async def _verify_test_execution(
-        self,
-        execution_id: uuid.UUID,
-        tests_passed: int,
-        tests_total: int,
-        test_output: str | None = None
+        self, execution_id: uuid.UUID, tests_passed: int, tests_total: int, test_output: str | None = None
     ) -> dict[str, Any]:
         """Verify based on automated test execution."""
 
@@ -122,7 +116,7 @@ class RewardVerifier:
             "verification_method": VerificationMethod.TEST_EXECUTION.value,
             "verification_confidence": Decimal("0.95"),
             "user_feedback": f"Tests: {tests_passed}/{tests_total} passed. {test_output or ''}",
-            "verified_at": datetime.utcnow()
+            "verified_at": datetime.utcnow(),
         }
 
     async def _verify_code_analysis(
@@ -130,7 +124,7 @@ class RewardVerifier:
         execution_id: uuid.UUID,
         lint_score: float | None = None,
         complexity_score: float | None = None,
-        security_score: float | None = None
+        security_score: float | None = None,
     ) -> dict[str, Any]:
         """Verify based on static code analysis."""
 
@@ -145,7 +139,7 @@ class RewardVerifier:
             "verification_method": VerificationMethod.CODE_ANALYSIS.value,
             "verification_confidence": Decimal("0.85"),
             "user_feedback": f"Code quality: {score:.2%}",
-            "verified_at": datetime.utcnow()
+            "verified_at": datetime.utcnow(),
         }
 
     async def _verify_business_metrics(
@@ -153,7 +147,7 @@ class RewardVerifier:
         execution_id: uuid.UUID,
         revenue_impact_usd: float | None = None,
         conversion_rate: float | None = None,
-        retention_impact: float | None = None
+        retention_impact: float | None = None,
     ) -> dict[str, Any]:
         """Verify based on business impact metrics."""
 
@@ -177,14 +171,10 @@ class RewardVerifier:
             "verification_confidence": Decimal("0.75"),
             "revenue_impact_usd": revenue_impact_usd,
             "conversion_impact": Decimal(str(conversion_rate)) if conversion_rate else None,
-            "verified_at": datetime.utcnow()
+            "verified_at": datetime.utcnow(),
         }
 
-    async def _verify_automated_check(
-        self,
-        execution_id: uuid.UUID,
-        check_results: dict[str, bool]
-    ) -> dict[str, Any]:
+    async def _verify_automated_check(self, execution_id: uuid.UUID, check_results: dict[str, bool]) -> dict[str, Any]:
         """Verify based on automated checks (e.g., formatting, compilation)."""
 
         # Pass rate of all checks
@@ -199,13 +189,10 @@ class RewardVerifier:
             "verification_method": VerificationMethod.AUTOMATED_CHECK.value,
             "verification_confidence": Decimal("0.9"),
             "user_feedback": f"Checks: {passed}/{total} passed",
-            "verified_at": datetime.utcnow()
+            "verified_at": datetime.utcnow(),
         }
 
-    async def compute_composite_reward(
-        self,
-        execution_id: uuid.UUID
-    ) -> Decimal:
+    async def compute_composite_reward(self, execution_id: uuid.UUID) -> Decimal:
         """
         Compute a composite reward score from all verification methods.
 
@@ -225,21 +212,14 @@ class RewardVerifier:
             return Decimal("0.5")  # Default neutral
 
         # Weight by confidence
-        weighted_sum = sum(
-            Decimal(str(score[0])) * Decimal(str(score[1]))
-            for score in scores
-        )
+        weighted_sum = sum(Decimal(str(score[0])) * Decimal(str(score[1])) for score in scores)
         confidence_sum = sum(Decimal(str(score[1])) for score in scores)
 
         composite_reward = weighted_sum / confidence_sum if confidence_sum > 0 else Decimal("0.5")
 
         return composite_reward
 
-    async def _save_reward_score(
-        self,
-        execution_id: uuid.UUID,
-        reward_data: dict[str, Any]
-    ) -> uuid.UUID:
+    async def _save_reward_score(self, execution_id: uuid.UUID, reward_data: dict[str, Any]) -> uuid.UUID:
         """Save reward score to database."""
         reward_id = uuid.uuid4()
 
@@ -259,10 +239,7 @@ class RewardVerifier:
             )
         """
 
-        await self.session.execute(query, {
-            "id": reward_id,
-            **reward_data
-        })
+        await self.session.execute(query, {"id": reward_id, **reward_data})
         await self.session.commit()
 
         return reward_id

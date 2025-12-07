@@ -932,7 +932,7 @@ def render_safe_template(template_string: str, **context) -> str:
     from jinja2 import Environment, select_autoescape
 
     # Create environment with autoescape enabled for security
-    env = Environment(autoescape=select_autoescape(enabled_extensions=('html', 'xml'), default_for_string=True))
+    env = Environment(autoescape=select_autoescape(enabled_extensions=("html", "xml"), default_for_string=True))
 
     template = env.from_string(template_string)
     return template.render(**context)

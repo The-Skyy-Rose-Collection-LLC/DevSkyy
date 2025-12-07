@@ -13,10 +13,9 @@ Python: >=3.11.0
 """
 
 import asyncio
-from datetime import datetime, timedelta
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import datetime
 import time
+from unittest.mock import patch
 
 import pytest
 
@@ -238,7 +237,7 @@ class TestRateLimiter:
     @pytest.mark.asyncio
     async def test_rate_limiter_tracks_requests(self, rate_limiter):
         """Test rate limiter tracks request count"""
-        for i in range(5):
+        for _i in range(5):
             await rate_limiter.check_rate_limit()
 
         assert len(rate_limiter.requests) == 5
@@ -247,7 +246,7 @@ class TestRateLimiter:
     async def test_rate_limiter_blocks_after_limit(self, rate_limiter):
         """Test rate limiter blocks after reaching limit"""
         # Make requests up to limit
-        for i in range(10):
+        for _i in range(10):
             await rate_limiter.check_rate_limit()
 
         # Next request should be blocked
@@ -258,7 +257,7 @@ class TestRateLimiter:
     @pytest.mark.asyncio
     async def test_rate_limiter_consequential_tracking(self, rate_limiter):
         """Test rate limiter tracks consequential requests separately"""
-        for i in range(3):
+        for _i in range(3):
             await rate_limiter.check_rate_limit(is_consequential=True)
 
         assert len(rate_limiter.consequential_requests) == 3
@@ -268,7 +267,7 @@ class TestRateLimiter:
     async def test_rate_limiter_blocks_consequential_after_limit(self, rate_limiter):
         """Test rate limiter blocks consequential requests after limit"""
         # Make consequential requests up to limit
-        for i in range(5):
+        for _i in range(5):
             await rate_limiter.check_rate_limit(is_consequential=True)
 
         # Next consequential request should be blocked
@@ -319,6 +318,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_allows_successful_calls(self, circuit_breaker):
         """Test circuit breaker allows successful function calls"""
+
         async def successful_func():
             return "success"
 
@@ -329,6 +329,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_tracks_failures(self, circuit_breaker):
         """Test circuit breaker tracks failures"""
+
         async def failing_func():
             raise Exception("Test failure")
 
@@ -340,11 +341,12 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_opens_after_threshold(self, circuit_breaker):
         """Test circuit breaker opens after failure threshold"""
+
         async def failing_func():
             raise Exception("Test failure")
 
         # Fail 3 times (threshold)
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await circuit_breaker.call(failing_func)
 
@@ -354,11 +356,12 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_blocks_when_open(self, circuit_breaker):
         """Test circuit breaker blocks requests when OPEN"""
+
         async def failing_func():
             raise Exception("Test failure")
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await circuit_breaker.call(failing_func)
 
@@ -371,6 +374,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_recovery(self, circuit_breaker):
         """Test circuit breaker recovery after timeout"""
+
         async def failing_func():
             raise Exception("Test failure")
 
@@ -378,7 +382,7 @@ class TestCircuitBreaker:
             return "success"
 
         # Open the circuit
-        for i in range(3):
+        for _i in range(3):
             with pytest.raises(Exception):
                 await circuit_breaker.call(failing_func)
 
@@ -393,6 +397,7 @@ class TestCircuitBreaker:
     @pytest.mark.asyncio
     async def test_circuit_breaker_resets_on_success(self, circuit_breaker):
         """Test circuit breaker resets failure count on success"""
+
         async def failing_func():
             raise Exception("Test failure")
 
@@ -654,7 +659,7 @@ class TestOpenAISafeguardManager:
     async def test_validate_request_rate_limit_exceeded(self, safeguard_manager):
         """Test request validation blocks on rate limit"""
         # Fill up rate limit
-        for i in range(60):
+        for _i in range(60):
             await safeguard_manager.validate_request(
                 operation_type=OperationType.CONTENT_GENERATION,
                 is_consequential=False,
@@ -690,6 +695,7 @@ class TestOpenAISafeguardManager:
     @pytest.mark.asyncio
     async def test_execute_with_safeguards_success(self, safeguard_manager):
         """Test executing function with safeguards - success case"""
+
         async def test_func():
             return "success"
 
@@ -705,6 +711,7 @@ class TestOpenAISafeguardManager:
     @pytest.mark.asyncio
     async def test_execute_with_safeguards_blocked_request(self, safeguard_manager):
         """Test executing function with safeguards - blocked request"""
+
         async def test_func():
             return "should not execute"
 
@@ -721,6 +728,7 @@ class TestOpenAISafeguardManager:
     @pytest.mark.asyncio
     async def test_execute_with_safeguards_logs_success(self, safeguard_manager):
         """Test successful execution is logged"""
+
         async def test_func():
             return "success"
 
@@ -784,6 +792,7 @@ class TestWithSafeguardsDecorator:
     @pytest.mark.asyncio
     async def test_decorator_on_async_function(self):
         """Test decorator works on async functions"""
+
         @with_safeguards(
             operation_type=OperationType.CONTENT_GENERATION,
             is_consequential=True,
@@ -836,6 +845,7 @@ class TestSafeguardsIntegration:
     @pytest.mark.asyncio
     async def test_complete_safeguard_workflow(self, safeguard_manager):
         """Test complete safeguard workflow from validation to execution"""
+
         async def api_call():
             await asyncio.sleep(0.01)  # Simulate API latency
             return "API response"
@@ -860,6 +870,7 @@ class TestSafeguardsIntegration:
     @pytest.mark.asyncio
     async def test_safeguard_prevents_malicious_request(self, safeguard_manager):
         """Test safeguards prevent malicious requests"""
+
         async def api_call():
             return "should not execute"
 
@@ -886,6 +897,7 @@ class TestSafeguardsEdgeCases:
     @pytest.mark.asyncio
     async def test_execute_sync_function_with_safeguards(self, safeguard_manager):
         """Test executing synchronous function with safeguards"""
+
         def sync_func():
             return "sync result"
 
@@ -901,6 +913,7 @@ class TestSafeguardsEdgeCases:
     @pytest.mark.asyncio
     async def test_circuit_breaker_with_sync_function(self, circuit_breaker):
         """Test circuit breaker with synchronous function"""
+
         def sync_func():
             return "sync"
 
@@ -909,10 +922,12 @@ class TestSafeguardsEdgeCases:
 
 
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--cov=security.openai_safeguards",
-        "--cov-report=term-missing",
-        "--cov-report=html",
-    ])
+    pytest.main(
+        [
+            __file__,
+            "-v",
+            "--cov=security.openai_safeguards",
+            "--cov-report=term-missing",
+            "--cov-report=html",
+        ]
+    )

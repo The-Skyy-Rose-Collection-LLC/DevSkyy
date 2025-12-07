@@ -3,11 +3,10 @@
 Generate comprehensive coverage analysis report.
 Part of the Truth Protocol (Rule #8: Test Coverage ≥90%).
 """
-import json
-from pathlib import Path
-from typing import Dict, List, Tuple
 from collections import defaultdict
 from datetime import datetime
+import json
+from pathlib import Path
 
 
 ARTIFACTS_DIR = Path("/home/user/DevSkyy/artifacts")
@@ -18,73 +17,69 @@ TARGET_COVERAGE = 90.0
 BASELINE_COVERAGE = 10.35
 
 
-def load_coverage_data() -> Dict:
+def load_coverage_data() -> dict:
     """Load coverage data from JSON file."""
-    with open(COVERAGE_FILE, 'r') as f:
+    with open(COVERAGE_FILE, "r") as f:
         return json.load(f)
 
 
-def calculate_module_coverage(data: Dict) -> Dict[str, Dict]:
+def calculate_module_coverage(data: dict) -> dict[str, dict]:
     """Calculate coverage statistics by module."""
-    module_stats = defaultdict(lambda: {
-        'lines_covered': 0,
-        'total_lines': 0,
-        'files': 0,
-        'coverage': 0.0,
-        'missing_lines': 0
-    })
+    module_stats = defaultdict(
+        lambda: {"lines_covered": 0, "total_lines": 0, "files": 0, "coverage": 0.0, "missing_lines": 0}
+    )
 
-    files = data.get('files', {})
+    files = data.get("files", {})
 
     for file_path, file_data in files.items():
         path_parts = Path(file_path).parts
 
         # Skip test files
-        if 'tests' in path_parts or 'test_' in file_path:
+        if "tests" in path_parts or "test_" in file_path:
             continue
 
         # Extract module name
         if len(path_parts) > 1:
             # Try to get the first meaningful directory
             for part in path_parts:
-                if part not in ['home', 'user', 'DevSkyy', '__pycache__']:
+                if part not in ["home", "user", "DevSkyy", "__pycache__"]:
                     module = part
                     break
             else:
-                module = 'root'
+                module = "root"
         else:
-            module = 'root'
+            module = "root"
 
-        summary = file_data.get('summary', {})
-        lines_covered = summary.get('covered_lines', 0)
-        total_lines = summary.get('num_statements', 0)
+        summary = file_data.get("summary", {})
+        lines_covered = summary.get("covered_lines", 0)
+        total_lines = summary.get("num_statements", 0)
         missing_lines = total_lines - lines_covered
 
-        module_stats[module]['lines_covered'] += lines_covered
-        module_stats[module]['total_lines'] += total_lines
-        module_stats[module]['files'] += 1
-        module_stats[module]['missing_lines'] += missing_lines
+        module_stats[module]["lines_covered"] += lines_covered
+        module_stats[module]["total_lines"] += total_lines
+        module_stats[module]["files"] += 1
+        module_stats[module]["missing_lines"] += missing_lines
 
     # Calculate coverage percentages
     for module, stats in module_stats.items():
-        if stats['total_lines'] > 0:
-            stats['coverage'] = (stats['lines_covered'] / stats['total_lines']) * 100
+        if stats["total_lines"] > 0:
+            stats["coverage"] = (stats["lines_covered"] / stats["total_lines"]) * 100
 
     return dict(module_stats)
 
 
-def get_file_coverage_list(data: Dict) -> List[Tuple[str, float, int, int]]:
+def get_file_coverage_list(data: dict) -> list[tuple[str, float, int, int]]:
     """Get sorted list of files with coverage stats."""
     file_list = []
-    files = data.get('files', {})
+    files = data.get("files", {})
 
     for file_path, file_data in files.items():
-        if 'tests' in file_path or 'test_' in file_path:
+        if "tests" in file_path or "test_" in file_path:
             continue
 
-        summary = file_data.get('summary', {})
-        covered = summary.get('covered_lines', 0)
-        total = summary.get('num_statements', 0)
+        summary = file_data.get("summary", {})
+        covered = summary.get("covered_lines", 0)
+        total = summary.get("num_statements", 0)
 
         if total > 0:
             coverage = (covered / total) * 100
@@ -93,45 +88,37 @@ def get_file_coverage_list(data: Dict) -> List[Tuple[str, float, int, int]]:
     return sorted(file_list, key=lambda x: x[1], reverse=True)
 
 
-def count_tests() -> Dict:
+def count_tests() -> dict:
     """Count test files by type."""
-    test_counts = {
-        'unit': 0,
-        'integration': 0,
-        'ml': 0,
-        'api': 0,
-        'security': 0,
-        'other': 0,
-        'total': 0
-    }
+    test_counts = {"unit": 0, "integration": 0, "ml": 0, "api": 0, "security": 0, "other": 0, "total": 0}
 
     test_dir = Path("/home/user/DevSkyy/tests")
     if test_dir.exists():
         for test_file in test_dir.rglob("test_*.py"):
-            test_counts['total'] += 1
+            test_counts["total"] += 1
             file_path_str = str(test_file)
 
-            if 'unit' in file_path_str:
-                test_counts['unit'] += 1
-            elif 'integration' in file_path_str:
-                test_counts['integration'] += 1
-            elif 'ml' in file_path_str or 'rlvr' in file_path_str:
-                test_counts['ml'] += 1
-            elif 'api' in file_path_str:
-                test_counts['api'] += 1
-            elif 'security' in file_path_str:
-                test_counts['security'] += 1
+            if "unit" in file_path_str:
+                test_counts["unit"] += 1
+            elif "integration" in file_path_str:
+                test_counts["integration"] += 1
+            elif "ml" in file_path_str or "rlvr" in file_path_str:
+                test_counts["ml"] += 1
+            elif "api" in file_path_str:
+                test_counts["api"] += 1
+            elif "security" in file_path_str:
+                test_counts["security"] += 1
             else:
-                test_counts['other'] += 1
+                test_counts["other"] += 1
 
     return test_counts
 
 
-def generate_markdown_report(data: Dict, module_stats: Dict, file_list: List, test_counts: Dict):
+def generate_markdown_report(data: dict, module_stats: dict, file_list: list, test_counts: dict):
     """Generate comprehensive markdown report."""
-    current_coverage = data.get('totals', {}).get('percent_covered', 0)
-    total_lines = data.get('totals', {}).get('num_statements', 0)
-    covered_lines = data.get('totals', {}).get('covered_lines', 0)
+    current_coverage = data.get("totals", {}).get("percent_covered", 0)
+    total_lines = data.get("totals", {}).get("num_statements", 0)
+    covered_lines = data.get("totals", {}).get("covered_lines", 0)
     missing_lines = total_lines - covered_lines
 
     improvement = current_coverage - BASELINE_COVERAGE
@@ -259,10 +246,10 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
 """
 
     # Add module details
-    sorted_modules = sorted(module_stats.items(), key=lambda x: x[1]['coverage'], reverse=True)
+    sorted_modules = sorted(module_stats.items(), key=lambda x: x[1]["coverage"], reverse=True)
 
     for module, stats in sorted_modules:
-        status_emoji = '✅' if stats['coverage'] >= 80 else '⚠️' if stats['coverage'] >= 60 else '❌'
+        status_emoji = "✅" if stats["coverage"] >= 80 else "⚠️" if stats["coverage"] >= 60 else "❌"
         report += f"""
 ### {status_emoji} {module}
 
@@ -277,7 +264,7 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
 """
 
     # Add top and bottom files
-    report += f"""
+    report += """
 
 ---
 
@@ -291,7 +278,7 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
         file_name = Path(file_path).name
         report += f"| {i} | `{file_name}` | {coverage:.1f}% | {covered} | {total} |\n"
 
-    report += f"""
+    report += """
 
 ---
 
@@ -419,17 +406,17 @@ Target:   {TARGET_COVERAGE:.2f}% {'█' * int(TARGET_COVERAGE/5)}
 """
 
     # Write report
-    with open(REPORT_FILE, 'w') as f:
+    with open(REPORT_FILE, "w") as f:
         f.write(report)
 
     print(f"✅ Generated: {REPORT_FILE}")
 
 
-def generate_statistics_json(data: Dict, module_stats: Dict, file_list: List, test_counts: Dict):
+def generate_statistics_json(data: dict, module_stats: dict, file_list: list, test_counts: dict):
     """Generate JSON statistics file."""
-    current_coverage = data.get('totals', {}).get('percent_covered', 0)
-    total_lines = data.get('totals', {}).get('num_statements', 0)
-    covered_lines = data.get('totals', {}).get('covered_lines', 0)
+    current_coverage = data.get("totals", {}).get("percent_covered", 0)
+    total_lines = data.get("totals", {}).get("num_statements", 0)
+    covered_lines = data.get("totals", {}).get("covered_lines", 0)
 
     stats = {
         "generated_at": datetime.now().isoformat(),
@@ -444,24 +431,24 @@ def generate_statistics_json(data: Dict, module_stats: Dict, file_list: List, te
         "lines_needed_for_target": int(total_lines * 0.9 - covered_lines),
         "modules": {
             module: {
-                "coverage": round(stats['coverage'], 2),
-                "files": stats['files'],
-                "lines_covered": stats['lines_covered'],
-                "total_lines": stats['total_lines'],
-                "missing_lines": stats['missing_lines']
+                "coverage": round(stats["coverage"], 2),
+                "files": stats["files"],
+                "lines_covered": stats["lines_covered"],
+                "total_lines": stats["total_lines"],
+                "missing_lines": stats["missing_lines"],
             }
             for module, stats in module_stats.items()
         },
         "tests": {
-            "total_files": test_counts['total'],
+            "total_files": test_counts["total"],
             "by_type": {
-                "unit": test_counts['unit'],
-                "integration": test_counts['integration'],
-                "ml": test_counts['ml'],
-                "api": test_counts['api'],
-                "security": test_counts['security'],
-                "other": test_counts['other']
-            }
+                "unit": test_counts["unit"],
+                "integration": test_counts["integration"],
+                "ml": test_counts["ml"],
+                "api": test_counts["api"],
+                "security": test_counts["security"],
+                "other": test_counts["other"],
+            },
         },
         "top_covered_files": [
             {
@@ -469,7 +456,7 @@ def generate_statistics_json(data: Dict, module_stats: Dict, file_list: List, te
                 "full_path": f[0],
                 "coverage": round(f[1], 2),
                 "covered": f[2],
-                "total": f[3]
+                "total": f[3],
             }
             for f in file_list[:10]
         ],
@@ -480,18 +467,19 @@ def generate_statistics_json(data: Dict, module_stats: Dict, file_list: List, te
                 "coverage": round(f[1], 2),
                 "covered": f[2],
                 "total": f[3],
-                "lines_needed": int(f[3] * 0.9) - f[2]
+                "lines_needed": int(f[3] * 0.9) - f[2],
             }
-            for f in file_list if f[1] < TARGET_COVERAGE
+            for f in file_list
+            if f[1] < TARGET_COVERAGE
         ][:10],
         "truth_protocol_compliance": {
             "rule_8_status": "COMPLIANT" if current_coverage >= TARGET_COVERAGE else "NON-COMPLIANT",
             "coverage_requirement_met": current_coverage >= TARGET_COVERAGE,
-            "gap_percentage": round(TARGET_COVERAGE - current_coverage, 2)
-        }
+            "gap_percentage": round(TARGET_COVERAGE - current_coverage, 2),
+        },
     }
 
-    with open(STATS_FILE, 'w') as f:
+    with open(STATS_FILE, "w") as f:
         json.dump(stats, f, indent=2)
 
     print(f"✅ Generated: {STATS_FILE}")
@@ -499,9 +487,9 @@ def generate_statistics_json(data: Dict, module_stats: Dict, file_list: List, te
 
 def main():
     """Main execution function."""
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("📊 Generating Comprehensive Coverage Report")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     # Load data
     print("📁 Loading coverage data...")
@@ -520,12 +508,12 @@ def main():
     print("📄 Generating JSON statistics...")
     generate_statistics_json(data, module_stats, file_list, test_counts)
 
-    print("\n" + "="*60)
+    print("\n" + "=" * 60)
     print("✅ Coverage analysis complete!")
-    print("="*60 + "\n")
+    print("=" * 60 + "\n")
 
     # Print summary
-    current_coverage = data.get('totals', {}).get('percent_covered', 0)
+    current_coverage = data.get("totals", {}).get("percent_covered", 0)
     print(f"📊 Current Coverage: {current_coverage:.2f}%")
     print(f"🎯 Target Coverage: {TARGET_COVERAGE}%")
     print(f"📈 Gap: {TARGET_COVERAGE - current_coverage:.2f}%")
@@ -534,5 +522,5 @@ def main():
     print(f"📄 Files: {len(file_list)}\n")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

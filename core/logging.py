@@ -192,7 +192,7 @@ class ColoredFormatter(logging.Formatter):
 # =============================================================================
 
 
-def setup_logging(environment: str = None, log_level: str = None):
+def setup_logging(environment: str | None = None, log_level: str | None = None):
     """
     Setup unified enterprise logging.
 
@@ -285,7 +285,7 @@ def setup_logging(environment: str = None, log_level: str = None):
     logger.info("Logging initialized", log_level=log_level, environment=environment)
 
 
-def get_logger(name: str = None):
+def get_logger(name: str | None = None):
     """Get a logger instance (uses structlog)."""
     return structlog.get_logger(name) if name else structlog.get_logger()
 
@@ -345,7 +345,7 @@ class SecurityLogger:
             },
         )
 
-    def log_data_access(self, user_id: str, table: str, operation: str, record_count: int = None, **kwargs):
+    def log_data_access(self, user_id: str, table: str, operation: str, record_count: int | None = None, **kwargs):
         """Log data access events."""
         self.logger.info(
             f"Data access: {operation} on {table}",
@@ -367,7 +367,7 @@ class ErrorLogger:
     def __init__(self):
         self.logger = logging.getLogger("devskyy.error")
 
-    def log_app_error(self, error: Exception, context: dict = None):
+    def log_app_error(self, error: Exception, context: dict | None = None):
         """Log application errors with context."""
         self.logger.error(
             f"Application error: {error}",
@@ -380,11 +380,11 @@ class ErrorLogger:
             },
         )
 
-    def log_application_error(self, error: Exception, context: dict = None):
+    def log_application_error(self, error: Exception, context: dict | None = None):
         """Alias for log_app_error for backward compatibility."""
         return self.log_app_error(error, context)
 
-    def log_api_error(self, endpoint: str, method: str, status_code: int, error: Exception, user_id: str = None):
+    def log_api_error(self, endpoint: str, method: str, status_code: int, error: Exception, user_id: str | None = None):
         """Log API errors."""
         self.logger.error(
             f"API error: {method} {endpoint} - {status_code}",
@@ -399,7 +399,7 @@ class ErrorLogger:
             },
         )
 
-    def log_db_error(self, operation: str, error: Exception, query: str = None, user_id: str = None):
+    def log_db_error(self, operation: str, error: Exception, query: str | None = None, user_id: str | None = None):
         """Log database errors."""
         self.logger.error(
             f"Database error: {operation}",
@@ -463,7 +463,7 @@ class PerformanceLogger:
 # =============================================================================
 
 
-def log_to_error_ledger(error_type: str, error_message: str, context: dict = None, ledger_file: str = None):
+def log_to_error_ledger(error_type: str, error_message: str, context: dict | None = None, ledger_file: str | None = None):
     """
     Log errors to Truth Protocol error ledger.
     Required by "No-skip rule" - all errors must be recorded.
@@ -522,7 +522,7 @@ class EnterpriseLogger:
     def __init__(self):
         self.logger = get_logger("enterprise")
 
-    def debug(self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None):
+    def debug(self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict | None = None):
         """Log debug message."""
         self.logger.debug(message, category=category.value, **(metadata or {}))
 
@@ -530,8 +530,8 @@ class EnterpriseLogger:
         self,
         message: str,
         category: LogCategory = LogCategory.SYSTEM,
-        metadata: dict = None,
-        performance_metrics: dict = None,
+        metadata: dict | None = None,
+        performance_metrics: dict | None = None,
     ):
         """Log info message."""
         extra = {**(metadata or {})}
@@ -539,12 +539,12 @@ class EnterpriseLogger:
             extra["performance_metrics"] = performance_metrics
         self.logger.info(message, category=category.value, **extra)
 
-    def warning(self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None):
+    def warning(self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict | None = None):
         """Log warning message."""
         self.logger.warning(message, category=category.value, **(metadata or {}))
 
     def error(
-        self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None, error: Exception = None
+        self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict | None = None, error: Exception | None = None
     ):
         """Log error message."""
         extra = {**(metadata or {})}
@@ -554,7 +554,7 @@ class EnterpriseLogger:
         self.logger.error(message, category=category.value, exc_info=error, **extra)
 
     def critical(
-        self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None, error: Exception = None
+        self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict | None = None, error: Exception | None = None
     ):
         """Log critical message."""
         extra = {**(metadata or {})}

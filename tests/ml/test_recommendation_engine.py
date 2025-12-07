@@ -338,7 +338,7 @@ class TestRecommendationEngine:
         assert len(similar_users) >= 0
 
         # Similarities should be between 0 and 1
-        for user_id, similarity in similar_users:
+        for _user_id, similarity in similar_users:
             assert 0 <= similarity <= 1.0
 
     def test_calculate_user_similarity(self, recommendation_engine):

@@ -71,9 +71,7 @@ class MultiServerConfigRequest(BaseModel):
 
     servers: list[AddServerRequest] = Field(..., description="List of MCP servers to configure")
     include_devskyy: bool = Field(default=True, description="Include DevSkyy MCP server in configuration")
-    devskyy_api_key: str | None = Field(
-        default=None, description="DevSkyy API key (required if include_devskyy=True)"
-    )
+    devskyy_api_key: str | None = Field(default=None, description="DevSkyy API key (required if include_devskyy=True)")
 
 
 class MCPConfigResponse(BaseModel):
@@ -601,10 +599,7 @@ async def add_mcp_server(
         logger.info(f"Adding MCP server: {server.server_name} with transport: {server.transport}")
 
         # Start with base config or empty config
-        if devskyy_api_key:
-            config = generate_mcp_config(api_key=devskyy_api_key)
-        else:
-            config = {"mcpServers": {}}
+        config = generate_mcp_config(api_key=devskyy_api_key) if devskyy_api_key else {"mcpServers": {}}
 
         # Add the new server
         config = merge_server_configs(config, [server])
@@ -844,10 +839,7 @@ async def get_huggingface_config(
         hf_server = create_huggingface_server(hf_token=hf_token, server_name=server_name)
 
         # Use the add_mcp_server logic
-        if devskyy_api_key:
-            config = generate_mcp_config(api_key=devskyy_api_key)
-        else:
-            config = {"mcpServers": {}}
+        config = generate_mcp_config(api_key=devskyy_api_key) if devskyy_api_key else {"mcpServers": {}}
 
         # Add HuggingFace server
         config = merge_server_configs(config, [hf_server])

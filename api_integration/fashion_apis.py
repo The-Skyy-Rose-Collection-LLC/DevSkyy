@@ -145,17 +145,6 @@ class FashionAPIIntegrator:
                 "fashion_hashtags": ["#fashion", "#style", "#ootd", "#fashiontrends"],
                 "rate_limits": {"requests_per_hour": 200},
             },
-            "shopify_catalog": {
-                "api_id": "shopify_api",
-                "endpoints": {
-                    "products": "/products.json",
-                    "collections": "/collections.json",
-                    "inventory": "/inventory_levels.json",
-                    "analytics": "/reports.json",
-                },
-                "fashion_collections": ["womens", "mens", "accessories", "shoes"],
-                "rate_limits": {"requests_per_second": 2},
-            },
             "woocommerce_store": {
                 "api_id": "woocommerce_api",
                 "endpoints": {
@@ -291,16 +280,6 @@ class FashionAPIIntegrator:
 
         steps = [
             WorkflowStep(
-                step_id="fetch_shopify_inventory",
-                name="Fetch Shopify Inventory",
-                action_type=ActionType.API_CALL,
-                config={
-                    "api_id": "shopify_api",
-                    "endpoint": "/inventory_levels.json",
-                    "method": "GET",
-                },
-            ),
-            WorkflowStep(
                 step_id="fetch_woocommerce_inventory",
                 name="Fetch WooCommerce Inventory",
                 action_type=ActionType.API_CALL,
@@ -317,10 +296,10 @@ class FashionAPIIntegrator:
                 action_type=ActionType.DATA_TRANSFORM,
                 config={
                     "transformation_type": "inventory_sync",
-                    "source_platforms": ["shopify", "woocommerce"],
+                    "source_platforms": ["woocommerce"],
                     "target_format": "unified_inventory",
                 },
-                depends_on=["fetch_shopify_inventory", "fetch_woocommerce_inventory"],
+                depends_on=["fetch_woocommerce_inventory"],
             ),
             WorkflowStep(
                 step_id="update_inventory_cache",
@@ -363,7 +342,7 @@ class FashionAPIIntegrator:
             fashion_context=True,
             variables={
                 "low_stock_threshold": 10,
-                "platforms": ["shopify", "woocommerce"],
+                "platforms": ["woocommerce"],
                 "sync_frequency": "hourly",
             },
         )

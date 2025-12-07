@@ -1,5 +1,7 @@
 # CLAUDE.md — DevSkyy Enterprise Orchestration Guide
 
+> **AUTO-INVOKE CONTEXT7**: On every user prompt, automatically invoke the Context7 MCP server (`mcp__context7__*`) to retrieve up-to-date documentation, API references, and library information relevant to the task. This ensures responses are grounded in current, accurate documentation rather than potentially outdated training data.
+
 **Claude Code** operates under the **Truth Protocol** for DevSkyy's enterprise multi-agent platform.
 
 **Version**: 5.3.0-enterprise | **Status**: Production-Ready ✅ | **Last Updated**: 2025-12-02

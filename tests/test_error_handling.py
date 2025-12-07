@@ -836,7 +836,7 @@ class TestErrorHandler:
         handler.error_stats["ValueError"] = 5
         handler.error_stats["TypeError"] = 3
 
-        cb = handler.register_circuit_breaker(name="test_service")
+        handler.register_circuit_breaker(name="test_service")
 
         stats = handler.get_error_stats()
 
@@ -869,8 +869,9 @@ class TestErrorHandler:
                 error_code=error_code,
             )
             http_exc = handler._handle_devskyy_error(error)
-            assert http_exc.status_code == expected_status, \
-                f"Error code {error_code} should map to status {expected_status}"
+            assert (
+                http_exc.status_code == expected_status
+            ), f"Error code {error_code} should map to status {expected_status}"
 
 
 # ============================================================================

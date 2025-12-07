@@ -106,7 +106,7 @@ The DevSkyy Enterprise Fashion Platform API Integration System is a comprehensiv
 │                              EXTERNAL APIs LAYER                                │
 ├─────────────────────────────────────────────────────────────────────────────────┤
 │  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐│
-│  │ Shopify API     │ │ Pinterest API   │ │ OpenAI API      │ │ Stripe API      ││
+│  │ WooCommerce API     │ │ Pinterest API   │ │ OpenAI API      │ │ Stripe API      ││
 │  │ WooCommerce API │ │ Instagram API   │ │ Stability AI    │ │ Square API      ││
 │  │ Magento API     │ │ TikTok API      │ │ Midjourney API  │ │ PayPal API      ││
 │  └─────────────────┘ └─────────────────┘ └─────────────────┘ └─────────────────┘│
@@ -163,23 +163,23 @@ recommendations = await api_discovery_engine.get_recommended_apis(
 ```python
 # Store API credentials securely
 await auth_manager.store_credentials(
-    api_id="shopify_api",
+    api_id="woocommerce_api",
     auth_type=AuthenticationType.API_KEY,
     credentials={"api_key": "encrypted_key"},
     scopes=["read_products", "write_inventory"]
 )
 
 # Intelligent rate limiting
-can_request, rate_info = await rate_limit_manager.can_make_request("shopify_api")
+can_request, rate_info = await rate_limit_manager.can_make_request("woocommerce_api")
 if can_request:
-    await rate_limit_manager.record_request("shopify_api")
+    await rate_limit_manager.record_request("woocommerce_api")
 ```
 
 ### **3. Core API Gateway**
 ```python
 # Make API request with full integration features
 result = await api_gateway.make_request(
-    api_id="shopify_api",
+    api_id="woocommerce_api",
     endpoint="/products.json",
     method="GET",
     params={"limit": 50, "category": "fashion"},

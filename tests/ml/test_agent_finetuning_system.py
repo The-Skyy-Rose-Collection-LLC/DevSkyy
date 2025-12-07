@@ -13,12 +13,10 @@ Tests cover:
 - Error handling
 """
 
-import asyncio
 from datetime import datetime, timedelta
 import json
 from pathlib import Path
 
-import numpy as np
 import pytest
 
 from ml.agent_finetuning_system import (
@@ -348,7 +346,7 @@ class TestAgentFinetuningSystem:
     async def test_prepare_dataset_insufficient_data(self, finetuning_system):
         """Test dataset preparation with insufficient data"""
         # Collect few snapshots
-        for i in range(10):
+        for _i in range(10):
             await finetuning_system.collect_performance_snapshot(
                 agent_id="agent_1",
                 agent_name="test_agent",
@@ -399,7 +397,7 @@ class TestAgentFinetuningSystem:
     async def test_dataset_train_val_test_split(self, finetuning_system):
         """Test dataset split ratios"""
         # Collect snapshots
-        for i in range(200):
+        for _i in range(200):
             await finetuning_system.collect_performance_snapshot(
                 agent_id="agent_1",
                 agent_name="test_agent",
@@ -463,7 +461,7 @@ class TestAgentFinetuningSystem:
     async def test_create_finetuning_job(self, finetuning_system, sample_finetuning_config):
         """Test creating finetuning job"""
         # Prepare dataset first
-        for i in range(150):
+        for _i in range(150):
             await finetuning_system.collect_performance_snapshot(
                 agent_id="agent_1",
                 agent_name="test_agent",
@@ -548,7 +546,7 @@ class TestAgentFinetuningSystem:
     async def test_get_job_status(self, finetuning_system, sample_finetuning_config):
         """Test getting job status"""
         # Prepare dataset
-        for i in range(150):
+        for _i in range(150):
             await finetuning_system.collect_performance_snapshot(
                 agent_id="agent_1",
                 agent_name="test_agent",
@@ -586,7 +584,7 @@ class TestAgentFinetuningSystem:
         """Test getting jobs by category"""
         # Prepare datasets for multiple categories
         for category in [AgentCategory.CORE_SECURITY, AgentCategory.ECOMMERCE]:
-            for i in range(150):
+            for _i in range(150):
                 await finetuning_system.collect_performance_snapshot(
                     agent_id="agent_1",
                     agent_name="test_agent",
@@ -619,7 +617,7 @@ class TestAgentFinetuningSystem:
     async def test_get_system_statistics(self, finetuning_system):
         """Test getting system statistics"""
         # Collect some snapshots
-        for i in range(50):
+        for _i in range(50):
             await finetuning_system.collect_performance_snapshot(
                 agent_id="agent_1",
                 agent_name="test_agent",

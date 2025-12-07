@@ -21,12 +21,10 @@ Tests the UnifiedMCPOrchestrator class including:
 - Error handling and recovery mechanisms
 """
 
-import asyncio
-import json
 from datetime import datetime, timedelta
-from pathlib import Path
+import json
 from typing import Any
-from unittest.mock import AsyncMock, MagicMock, Mock, mock_open, patch
+from unittest.mock import patch
 from uuid import uuid4
 
 import pytest
@@ -914,9 +912,7 @@ class TestWorkflowExecution:
     async def test_execute_workflow_sequential(self, orchestrator):
         """Verify execute_workflow runs sequential workflow."""
         # Arrange
-        context = {
-            "code": {"source": {"code": "test"}, "tests": {"test_path": "tests/"}}
-        }
+        context = {"code": {"source": {"code": "test"}, "tests": {"test_path": "tests/"}}}
 
         # Act
         results = await orchestrator.execute_workflow("test_workflow", context)
@@ -977,9 +973,7 @@ class TestWorkflowExecution:
                     }
                 },
             },
-            "enterprise_configuration": {
-                "fault_tolerance": {"circuit_breaker": {"failure_threshold": 5}}
-            },
+            "enterprise_configuration": {"fault_tolerance": {"circuit_breaker": {"failure_threshold": 5}}},
         }
         config_file = tmp_path / "unknown_agent.json"
         config_file.write_text(json.dumps(config_data))
@@ -1091,9 +1085,7 @@ class TestDependencyResolution:
     def test_find_agents_with_capabilities_multiple_required(self, orchestrator):
         """Verify _find_agents_with_capabilities requires all capabilities."""
         # Act
-        agents = orchestrator._find_agents_with_capabilities(
-            ["code_analysis", "test_generation"]
-        )
+        agents = orchestrator._find_agents_with_capabilities(["code_analysis", "test_generation"])
 
         # Assert
         assert len(agents) > 0
@@ -1232,9 +1224,9 @@ class TestCircuitBreaker:
         """Verify _increment_circuit_breaker opens circuit at threshold."""
         # Arrange
         agent_name = "test_agent"
-        threshold = orchestrator.config["enterprise_configuration"]["fault_tolerance"][
-            "circuit_breaker"
-        ]["failure_threshold"]
+        threshold = orchestrator.config["enterprise_configuration"]["fault_tolerance"]["circuit_breaker"][
+            "failure_threshold"
+        ]
 
         # Act
         for _ in range(threshold):
@@ -1443,7 +1435,7 @@ class TestMonitoringMetrics:
         health = await orchestrator.get_orchestrator_health()
 
         # Assert
-        for agent_name, agent_health in health["agent_health"].items():
+        for agent_health in health["agent_health"].values():
             assert "capabilities" in agent_health
             assert "metrics" in agent_health
             assert "circuit_breaker" in agent_health
@@ -1679,9 +1671,7 @@ class TestEdgeCases:
     def test_circuit_breaker_with_zero_threshold(self, orchestrator):
         """Verify circuit breaker handles zero threshold edge case."""
         # Arrange
-        orchestrator.config["enterprise_configuration"]["fault_tolerance"][
-            "circuit_breaker"
-        ]["failure_threshold"] = 0
+        orchestrator.config["enterprise_configuration"]["fault_tolerance"]["circuit_breaker"]["failure_threshold"] = 0
         agent_name = "test_agent"
 
         # Act

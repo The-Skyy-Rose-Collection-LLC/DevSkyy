@@ -70,17 +70,14 @@ class TestAgentDiscovery:
         backend_path = Path(__file__).parent.parent.parent.parent / "agent" / "modules" / "backend"
 
         if backend_path.exists():
-            agents = await registry._discover_agents_in_directory(
-                backend_path, "agent.modules.backend"
-            )
+            agents = await registry._discover_agents_in_directory(backend_path, "agent.modules.backend")
             # Should discover some agents
             assert isinstance(agents, list)
 
     @pytest.mark.asyncio
     async def test_analyze_agent_file_v2_priority(self):
-        registry = AgentRegistry()
+        AgentRegistry()
         # V2 agents should be prioritized over V1
-
 
     @pytest.mark.asyncio
     async def test_discover_nonexistent_directory(self):
@@ -96,11 +93,15 @@ class TestAgentDiscovery:
 
         # Mock module with BaseAgent subclass
         mock_module = MagicMock()
-        mock_agent_class = type("TestAgent", (BaseAgent,), {
-            "__init__": lambda self: BaseAgent.__init__(self, "test"),
-            "initialize": lambda self: True,
-            "execute_core_function": lambda self, **kwargs: {}
-        })
+        mock_agent_class = type(
+            "TestAgent",
+            (BaseAgent,),
+            {
+                "__init__": lambda self: BaseAgent.__init__(self, "test"),
+                "initialize": lambda self: True,
+                "execute_core_function": lambda self, **kwargs: {},
+            },
+        )
         mock_import.return_value = mock_module
         mock_module.__dict__ = {"TestAgent": mock_agent_class}
 
@@ -156,9 +157,7 @@ class TestAgentRegistration:
     @pytest.mark.asyncio
     @patch("agent.registry.orchestrator")
     @patch("agent.registry.security_manager")
-    async def test_register_discovered_agent_orchestrator_failure(
-        self, mock_security, mock_orchestrator
-    ):
+    async def test_register_discovered_agent_orchestrator_failure(self, mock_security, mock_orchestrator):
         registry = AgentRegistry()
 
         mock_orchestrator.register_agent = AsyncMock(return_value=False)
@@ -471,7 +470,7 @@ class TestAgentReload:
                 with patch.object(registry, "_register_discovered_agent") as mock_register:
                     mock_register.return_value = True
 
-                    success = await registry.reload_agent("test_agent")
+                    await registry.reload_agent("test_agent")
                     # Depends on implementation - might succeed or need actual file
 
     @pytest.mark.asyncio
@@ -489,15 +488,11 @@ class TestWorkflows:
     async def test_workflow_scan_and_fix(self, mock_orchestrator):
         registry = AgentRegistry()
 
-        mock_orchestrator.execute_task = AsyncMock(return_value={
-            "results": {"scanner": {"issues": []}},
-            "status": "completed"
-        })
-
-        result = await registry.execute_workflow(
-            "scan_and_fix",
-            {"target": "test.py"}
+        mock_orchestrator.execute_task = AsyncMock(
+            return_value={"results": {"scanner": {"issues": []}}, "status": "completed"}
         )
+
+        result = await registry.execute_workflow("scan_and_fix", {"target": "test.py"})
 
         assert "workflow" in result
         assert result["workflow"] == "scan_and_fix"
@@ -509,15 +504,11 @@ class TestWorkflows:
     async def test_workflow_content_pipeline(self, mock_orchestrator):
         registry = AgentRegistry()
 
-        mock_orchestrator.execute_task = AsyncMock(return_value={
-            "results": {"content": "generated"},
-            "status": "completed"
-        })
-
-        result = await registry.execute_workflow(
-            "content_pipeline",
-            {"topic": "test"}
+        mock_orchestrator.execute_task = AsyncMock(
+            return_value={"results": {"content": "generated"}, "status": "completed"}
         )
+
+        result = await registry.execute_workflow("content_pipeline", {"topic": "test"})
 
         assert "workflow" in result
         assert result["workflow"] == "content_pipeline"
@@ -527,15 +518,9 @@ class TestWorkflows:
     async def test_workflow_ecommerce_order(self, mock_orchestrator):
         registry = AgentRegistry()
 
-        mock_orchestrator.execute_task = AsyncMock(return_value={
-            "status": "completed",
-            "available": True
-        })
+        mock_orchestrator.execute_task = AsyncMock(return_value={"status": "completed", "available": True})
 
-        result = await registry.execute_workflow(
-            "ecommerce_order",
-            {"order_id": "123"}
-        )
+        result = await registry.execute_workflow("ecommerce_order", {"order_id": "123"})
 
         assert "workflow" in result
         assert result["workflow"] == "ecommerce_order"
@@ -544,10 +529,7 @@ class TestWorkflows:
     async def test_workflow_unknown(self):
         registry = AgentRegistry()
 
-        result = await registry.execute_workflow(
-            "unknown_workflow",
-            {}
-        )
+        result = await registry.execute_workflow("unknown_workflow", {})
 
         assert "error" in result
         assert "Unknown workflow" in result["error"]
@@ -557,14 +539,9 @@ class TestWorkflows:
     async def test_workflow_scan_and_fix_with_scan_errors(self, mock_orchestrator):
         registry = AgentRegistry()
 
-        mock_orchestrator.execute_task = AsyncMock(return_value={
-            "error": "Scan failed"
-        })
+        mock_orchestrator.execute_task = AsyncMock(return_value={"error": "Scan failed"})
 
-        result = await registry.execute_workflow(
-            "scan_and_fix",
-            {"target": "test.py"}
-        )
+        result = await registry.execute_workflow("scan_and_fix", {"target": "test.py"})
 
         # Should return early if scan fails
         assert "scan" in result
@@ -576,6 +553,7 @@ class TestEdgeCases:
     def test_registry_singleton_behavior(self):
         # Test that the global registry instance exists
         from agent.registry import registry
+
         assert registry is not None
 
     @pytest.mark.asyncio

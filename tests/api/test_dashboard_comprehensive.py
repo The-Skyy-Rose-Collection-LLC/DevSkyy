@@ -160,9 +160,7 @@ class TestDashboardService:
         mock_orchestrator = AsyncMock()
         mock_health_status = Mock()
         mock_health_status.value = "healthy"
-        mock_orchestrator.health_check_all.return_value = {
-            "test_agent_1": mock_health_status
-        }
+        mock_orchestrator.health_check_all.return_value = {"test_agent_1": mock_health_status}
 
         service.agent_registry = mock_registry
         service.agent_orchestrator = mock_orchestrator
@@ -350,10 +348,10 @@ class TestDashboardEndpoints:
         """Test get_dashboard_page endpoint"""
         mock_request = Mock(spec=Request)
 
-        with patch('api.v1.dashboard.templates') as mock_templates:
+        with patch("api.v1.dashboard.templates") as mock_templates:
             mock_templates.TemplateResponse.return_value = HTMLResponse(content="<html>Dashboard</html>")
 
-            response = await get_dashboard_page(mock_request)
+            await get_dashboard_page(mock_request)
 
             mock_templates.TemplateResponse.assert_called_once()
             assert "request" in str(mock_templates.TemplateResponse.call_args)
@@ -368,17 +366,19 @@ class TestDashboardEndpoints:
 
         mock_user = {"user_id": "test_user", "role": "API_USER"}
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_service.initialize = AsyncMock()
-            mock_service.get_system_metrics = AsyncMock(return_value=SystemMetricsModel(
-                active_agents=10,
-                api_requests_per_minute=100,
-                average_response_time=50.0,
-                system_health_score=0.99,
-                cpu_usage=30.0,
-                memory_usage=50.0,
-                error_rate=0.001
-            ))
+            mock_service.get_system_metrics = AsyncMock(
+                return_value=SystemMetricsModel(
+                    active_agents=10,
+                    api_requests_per_minute=100,
+                    average_response_time=50.0,
+                    system_health_score=0.99,
+                    cpu_usage=30.0,
+                    memory_usage=50.0,
+                    error_rate=0.001,
+                )
+            )
             mock_service.get_agent_status = AsyncMock(return_value=[])
             mock_service.get_recent_activities = AsyncMock(return_value=[])
             mock_service.get_performance_history = AsyncMock(return_value=[])
@@ -397,17 +397,19 @@ class TestDashboardEndpoints:
         mock_request.app = None
         mock_user = {"user_id": "test_user", "role": "API_USER"}
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_service.initialize = AsyncMock()
-            mock_service.get_system_metrics = AsyncMock(return_value=SystemMetricsModel(
-                active_agents=5,
-                api_requests_per_minute=50,
-                average_response_time=100.0,
-                system_health_score=0.95,
-                cpu_usage=40.0,
-                memory_usage=60.0,
-                error_rate=0.01
-            ))
+            mock_service.get_system_metrics = AsyncMock(
+                return_value=SystemMetricsModel(
+                    active_agents=5,
+                    api_requests_per_minute=50,
+                    average_response_time=100.0,
+                    system_health_score=0.95,
+                    cpu_usage=40.0,
+                    memory_usage=60.0,
+                    error_rate=0.01,
+                )
+            )
             mock_service.get_agent_status = AsyncMock(return_value=[])
             mock_service.get_recent_activities = AsyncMock(return_value=[])
             mock_service.get_performance_history = AsyncMock(return_value=[])
@@ -425,7 +427,7 @@ class TestDashboardEndpoints:
         mock_request = Mock(spec=Request)
         mock_user = {"user_id": "test_user", "role": "API_USER"}
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_service.get_system_metrics = AsyncMock(side_effect=Exception("Service error"))
 
             with pytest.raises(HTTPException) as exc_info:
@@ -443,7 +445,7 @@ class TestDashboardEndpoints:
         mock_request.app.state = Mock()
         mock_user = {"user_id": "test_user", "role": "API_USER"}
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             expected_metrics = SystemMetricsModel(
                 active_agents=25,
                 api_requests_per_minute=500,
@@ -451,7 +453,7 @@ class TestDashboardEndpoints:
                 system_health_score=0.97,
                 cpu_usage=45.0,
                 memory_usage=65.0,
-                error_rate=0.005
+                error_rate=0.005,
             )
             mock_service.initialize = AsyncMock()
             mock_service.get_system_metrics = AsyncMock(return_value=expected_metrics)
@@ -479,11 +481,11 @@ class TestDashboardEndpoints:
                 tasks_completed=50,
                 tasks_pending=3,
                 performance_score=0.95,
-                capabilities=["test"]
+                capabilities=["test"],
             )
         ]
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_service.initialize = AsyncMock()
             mock_service.get_agent_status = AsyncMock(return_value=expected_agents)
 
@@ -507,11 +509,11 @@ class TestDashboardEndpoints:
                 event_type="test_event",
                 title="Test Event",
                 description="Test description",
-                severity="info"
+                severity="info",
             )
         ]
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_service.initialize = AsyncMock()
             mock_service.get_recent_activities = AsyncMock(return_value=expected_activities)
 
@@ -535,11 +537,11 @@ class TestDashboardEndpoints:
                 "response_time": 100.0,
                 "cpu_usage": 40.0,
                 "memory_usage": 60.0,
-                "requests_per_minute": 1000
+                "requests_per_minute": 1000,
             }
         ]
 
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_service.initialize = AsyncMock()
             mock_service.get_performance_history = AsyncMock(return_value=expected_history)
 
@@ -563,7 +565,7 @@ class TestPydanticModels:
             tasks_completed=100,
             tasks_pending=5,
             performance_score=0.95,
-            capabilities=["testing"]
+            capabilities=["testing"],
         )
 
         assert agent.agent_id == "test_agent"
@@ -580,7 +582,7 @@ class TestPydanticModels:
             system_health_score=0.99,
             cpu_usage=30.0,
             memory_usage=50.0,
-            error_rate=0.001
+            error_rate=0.001,
         )
 
         assert metrics.active_agents == 10
@@ -594,7 +596,7 @@ class TestPydanticModels:
             title="Agent Deployed",
             description="New agent deployed successfully",
             severity="info",
-            agent_id="test_agent"
+            agent_id="test_agent",
         )
 
         assert activity.event_type == "deployment"
@@ -610,15 +612,10 @@ class TestPydanticModels:
             system_health_score=0.99,
             cpu_usage=30.0,
             memory_usage=50.0,
-            error_rate=0.001
+            error_rate=0.001,
         )
 
-        data = DashboardDataModel(
-            metrics=metrics,
-            agents=[],
-            recent_activities=[],
-            performance_history=[]
-        )
+        data = DashboardDataModel(metrics=metrics, agents=[], recent_activities=[], performance_history=[])
 
         assert isinstance(data.metrics, SystemMetricsModel)
         assert isinstance(data.agents, list)
@@ -659,7 +656,7 @@ class TestWebSocketEndpoint:
         mock_websocket.close = AsyncMock()
 
         # Mock dashboard service to return quickly
-        with patch('api.v1.dashboard.dashboard_service') as mock_service:
+        with patch("api.v1.dashboard.dashboard_service") as mock_service:
             mock_metrics = SystemMetricsModel(
                 active_agents=10,
                 api_requests_per_minute=100,
@@ -667,7 +664,7 @@ class TestWebSocketEndpoint:
                 system_health_score=0.99,
                 cpu_usage=30.0,
                 memory_usage=50.0,
-                error_rate=0.001
+                error_rate=0.001,
             )
             mock_service.get_system_metrics = AsyncMock(return_value=mock_metrics)
 
@@ -831,30 +828,18 @@ class TestPydanticModelsValidation:
         """Test AgentStatusModel performance_score validation"""
         # Valid score
         agent = AgentStatusModel(
-            agent_id="test",
-            name="Test",
-            status="healthy",
-            last_active=datetime.now(),
-            performance_score=0.5
+            agent_id="test", name="Test", status="healthy", last_active=datetime.now(), performance_score=0.5
         )
         assert agent.performance_score == 0.5
 
         # Boundary values
         agent_min = AgentStatusModel(
-            agent_id="test",
-            name="Test",
-            status="healthy",
-            last_active=datetime.now(),
-            performance_score=0.0
+            agent_id="test", name="Test", status="healthy", last_active=datetime.now(), performance_score=0.0
         )
         assert agent_min.performance_score == 0.0
 
         agent_max = AgentStatusModel(
-            agent_id="test",
-            name="Test",
-            status="healthy",
-            last_active=datetime.now(),
-            performance_score=1.0
+            agent_id="test", name="Test", status="healthy", last_active=datetime.now(), performance_score=1.0
         )
         assert agent_max.performance_score == 1.0
 
@@ -868,7 +853,7 @@ class TestPydanticModelsValidation:
             system_health_score=0.5,
             cpu_usage=50.0,
             memory_usage=50.0,
-            error_rate=0.1
+            error_rate=0.1,
         )
         assert 0.0 <= metrics.system_health_score <= 1.0
         assert 0.0 <= metrics.cpu_usage <= 100.0
@@ -878,11 +863,7 @@ class TestPydanticModelsValidation:
     @pytest.mark.unit
     def test_activity_log_model_defaults(self):
         """Test ActivityLogModel default values"""
-        activity = ActivityLogModel(
-            event_type="test",
-            title="Test Event",
-            description="Test description"
-        )
+        activity = ActivityLogModel(event_type="test", title="Test Event", description="Test description")
 
         # Check defaults
         assert activity.severity == "info"
@@ -895,10 +876,7 @@ class TestPydanticModelsValidation:
         """Test ActivityLogModel with custom metadata"""
         metadata = {"key1": "value1", "key2": 123}
         activity = ActivityLogModel(
-            event_type="test",
-            title="Test Event",
-            description="Test description",
-            metadata=metadata
+            event_type="test", title="Test Event", description="Test description", metadata=metadata
         )
 
         assert activity.metadata == metadata

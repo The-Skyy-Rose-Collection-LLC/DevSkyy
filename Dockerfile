@@ -1,6 +1,7 @@
+# syntax=docker/dockerfile:1.4
 # ============================================================================
 # DevSkyy Enterprise Platform - Unified Multi-Stage Dockerfile
-# Version: 5.2.0 | Truth Protocol Compliant
+# Version: 5.3.0 | Truth Protocol Compliant
 # ============================================================================
 # This Dockerfile supports multiple environments through build targets:
 #   - development: Full dev tools, hot reload, debugging
@@ -17,13 +18,15 @@ ARG VCS_REF="unknown"
 # ============================================================================
 FROM python:${PYTHON_VERSION}-slim AS base
 
-# Metadata for tracking
+# Metadata for tracking (OCI compliant)
 LABEL maintainer="DevSkyy Enterprise Team <enterprise@devskyy.com>"
 LABEL org.opencontainers.image.title="DevSkyy Enterprise Platform"
-LABEL org.opencontainers.image.version="5.2.0"
+LABEL org.opencontainers.image.version="5.3.0"
 LABEL org.opencontainers.image.created="${BUILD_DATE}"
 LABEL org.opencontainers.image.revision="${VCS_REF}"
 LABEL org.opencontainers.image.description="Enterprise AI Platform with Multi-Agent Orchestration"
+LABEL org.opencontainers.image.authors="Skyy Rose LLC"
+LABEL org.opencontainers.image.source="https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy"
 
 # Python environment variables (best practices)
 ENV PYTHONUNBUFFERED=1 \
@@ -69,24 +72,30 @@ COPY requirements.txt requirements-production.txt docker/requirements.txt ./
 # - pip>=25.3: Fixes CVE-2025-8869 (path traversal)
 # - cryptography>=46.0.3: Fixes CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27
 # - setuptools>=78.1.1: Fixes CVE-2025-47273, CVE-2024-6345
-RUN pip install --no-cache-dir --upgrade \
+# BuildKit cache mount for faster rebuilds
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --upgrade \
     "pip>=25.3" \
     "cryptography>=46.0.3,<47.0.0" \
     "setuptools>=78.1.1,<79.0.0"
 
-# Install production dependencies (Docker-specific first to ensure pinned runtime set)
-RUN pip install --no-cache-dir --user -r docker/requirements.txt && \
-    pip install --no-cache-dir --user -r requirements-production.txt
+# Copy Docker-specific isolated requirements for subproject support
+COPY docker/requirements.txt ./docker-requirements.txt
+
+# Install production dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --user -r requirements-production.txt
 
 # ============================================================================
 # Stage 3: Development Environment (Optional Target)
 # ============================================================================
 FROM dependencies AS development
 
-# Install additional development dependencies
+# Install additional development dependencies with cache mount
 COPY requirements-dev.txt requirements-test.txt ./
-RUN pip install --no-cache-dir --user -r requirements-dev.txt && \
-    pip install --no-cache-dir --user -r requirements-test.txt
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --user -r requirements-dev.txt && \
+    pip install --user -r requirements-test.txt
 
 # Copy application code with proper ownership
 COPY --chown=devskyy:devskyy . .
@@ -98,8 +107,8 @@ RUN mkdir -p /app/logs /app/data /app/artifacts /app/.pytest_cache && \
 # Switch to non-root user
 USER devskyy
 
-# Add Python user packages to PATH
-ENV PATH=/root/.local/bin:$PATH
+# Add Python user packages to PATH (fixed for non-root user)
+ENV PATH=/home/devskyy/.local/bin:$PATH
 
 # Development environment variables
 ENV ENVIRONMENT=development \
@@ -121,19 +130,30 @@ CMD ["python", "-m", "uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000
 # ============================================================================
 FROM base AS production
 
+# Security labels
+LABEL security.hardened="true"
+LABEL security.non-root="true"
+LABEL security.minimal-attack-surface="true"
+
 # Copy Python packages from dependencies stage (minimal footprint)
 COPY --from=dependencies --chown=devskyy:devskyy /root/.local /home/devskyy/.local
 
 # Copy application code with proper ownership (Truth Protocol Rule #13)
 COPY --chown=devskyy:devskyy . .
 
-# Create production directories with proper permissions
+# Create production directories with proper permissions and optimize image size
 RUN mkdir -p /app/logs /app/data /app/artifacts && \
     chown -R devskyy:devskyy /app && \
     # Remove unnecessary files to reduce image size
     find /app -type f -name "*.pyc" -delete && \
     find /app -type d -name "__pycache__" -delete && \
-    find /app -type d -name ".pytest_cache" -delete
+    find /app -type d -name ".pytest_cache" -delete && \
+    find /app -type d -name ".git" -exec rm -rf {} + 2>/dev/null || true && \
+    # Remove unnecessary system files
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* && \
+    # Set secure permissions
+    chmod 755 /app && \
+    chmod -R 755 /app/logs /app/data /app/artifacts
 
 # Switch to non-root user (Truth Protocol Rule #13 - Security Baseline)
 USER devskyy

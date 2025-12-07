@@ -115,11 +115,7 @@ def has_permission(user_role: Role, required_permission: str) -> bool:
     accessible_roles = ROLE_HIERARCHY.get(user_role, {user_role})
 
     # Check if any accessible role has the required permission
-    for role in accessible_roles:
-        if required_permission in ROLE_PERMISSIONS.get(role, set()):
-            return True
-
-    return False
+    return any(required_permission in ROLE_PERMISSIONS.get(role, set()) for role in accessible_roles)
 
 
 def is_role_higher_or_equal(user_role: Role, required_role: Role) -> bool:
