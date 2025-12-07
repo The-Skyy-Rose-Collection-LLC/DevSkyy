@@ -64,6 +64,7 @@ paramiko>=3.5.0,<4.0.0  # SECURITY: SSH protocol
 certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
 cryptography>=46.0.3,<48.0.0  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns (need >=43.0.1)
 PyJWT~=2.10.1  # JWT authentication per RFC 7519
+authlib>=1.3.0,<2.0.0  # SECURITY: OAuth2/OIDC for Auth0 integration
 bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
 argon2-cffi>=23.1.0,<24.0.0  # SECURITY: Argon2 password hashing
 defusedxml>=0.7.1,<1.0.0  # SECURITY: P0 CRITICAL - Protect against XML attacks (XXE, billion laughs)

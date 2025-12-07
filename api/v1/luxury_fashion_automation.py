@@ -12,16 +12,7 @@ SECURITY STATUS (Per CLAUDE.md Truth Protocol):
 ✅ RBAC System: 5-role hierarchy (SUPER_ADMIN, ADMIN, DEVELOPER, API_USER, READ_ONLY)
 ✅ Input Validation: security/input_validation.py (OWASP compliant)
 ✅ Security imports present in this file
-
-⚠️  AUTHENTICATION ENFORCEMENT STATUS:
-- 2/27 endpoints have authentication enforced (assets/upload, assets/{asset_id})
-- Remaining 25 endpoints require Depends(require_role(UserRole.XXX)) parameter
-- Pattern established - see existing endpoints for implementation example
-
-TO COMPLETE AUTHENTICATION (For each remaining endpoint):
-1. Add parameter: current_user: dict[str, Any] = Depends(require_role(UserRole.XXX) if SECURITY_AVAILABLE else get_current_user)
-2. Update docstring with: **Authentication Required:** XXX role or higher
-3. Update docstring with: **RBAC:** [list of allowed roles]
+✅ ALL 27 ENDPOINTS HAVE AUTHENTICATION ENFORCED (Updated 2025-12-07)
 
 Role Requirements by Endpoint Type:
 - Assets (create): DEVELOPER
@@ -432,9 +423,15 @@ async def get_asset_info(
 
 
 @router.get("/assets", tags=["Assets"])
-async def list_assets():
+async def list_assets(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Retrieve aggregated metrics about preprocessed assets.
+
+    **Authentication Required:** API_USER role or higher
 
     Returns:
         dict: Aggregated asset metrics with keys:
@@ -464,9 +461,17 @@ async def list_assets():
 
 
 @router.post("/tryon/generate", tags=["Virtual Try-On"])
-async def generate_virtual_tryon(request: VirtualTryOnRequestModel, background_tasks: BackgroundTasks):
+async def generate_virtual_tryon(
+    request: VirtualTryOnRequestModel,
+    background_tasks: BackgroundTasks,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Generate virtual try-on assets (images, optional videos and 3D previews) for a product using the provided model specification.
+
+    **Authentication Required:** DEVELOPER role or higher
 
     Parameters:
         request (VirtualTryOnRequestModel): Specifies the product asset ID, target model demographics (gender, ethnicity, age_range, body_type), pose, number of variations, and flags for video, multiple angles, and 3D preview generation.
@@ -543,9 +548,15 @@ async def generate_virtual_tryon(request: VirtualTryOnRequestModel, background_t
 
 
 @router.get("/tryon/models", tags=["Virtual Try-On"])
-async def get_available_models():
+async def get_available_models(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Return available HuggingFace models and their high-level capabilities for the virtual try-on subsystem.
+
+    **Authentication Required:** API_USER role or higher
 
     Returns:
         dict: {
@@ -583,9 +594,15 @@ async def get_available_models():
 
 
 @router.get("/tryon/status", tags=["Virtual Try-On"])
-async def get_tryon_status():
+async def get_tryon_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Get virtual try-on system status.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: Status payload containing:
@@ -608,9 +625,17 @@ async def get_tryon_status():
 
 
 @router.post("/visual-content/generate", tags=["Visual Content"])
-async def generate_visual_content(request: VisualContentRequest, background_tasks: BackgroundTasks):
+async def generate_visual_content(
+    request: VisualContentRequest,
+    background_tasks: BackgroundTasks,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Generate visual content for the brand based on the provided VisualContentRequest.
+
+    **Authentication Required:** DEVELOPER role or higher
 
     Returns:
         dict: Result payload with keys:
@@ -665,9 +690,16 @@ async def generate_visual_content(request: VisualContentRequest, background_task
 
 
 @router.post("/visual-content/batch-generate", tags=["Visual Content"])
-async def batch_generate_visual_content(requests: list[VisualContentRequest]):
+async def batch_generate_visual_content(
+    requests: list[VisualContentRequest],
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Generate visual content for a batch of VisualContentRequest objects.
+
+    **Authentication Required:** DEVELOPER role or higher
 
     Parameters:
         requests (list[VisualContentRequest]): List of visual content requests to process in bulk.
@@ -724,9 +756,15 @@ async def batch_generate_visual_content(requests: list[VisualContentRequest]):
 
 
 @router.get("/visual-content/status", tags=["Visual Content"])
-async def get_visual_content_status():
+async def get_visual_content_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Report availability and system status of the visual content agent.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: If the agent is available, returns {"available": True, "status": <status>} where <status> is the agent's system status. If unavailable, returns {"available": False, "error": "<message>"}.
@@ -746,9 +784,16 @@ async def get_visual_content_status():
 
 
 @router.post("/finance/inventory/sync", tags=["Finance & Inventory"])
-async def sync_inventory(request: InventorySyncRequest):
+async def sync_inventory(
+    request: InventorySyncRequest,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Synchronize inventory from an external sales channel specified in the request.
+
+    **Authentication Required:** ADMIN role or higher
 
     Parameters:
         request (InventorySyncRequest): Sync request containing `channel` (the external platform name) and `items` to be synchronized. Supported channels include WooCommerce, Magento, Amazon, and eBay.
@@ -826,9 +871,17 @@ async def record_transaction(
 
 
 @router.get("/finance/forecast/{item_id}", tags=["Finance & Inventory"])
-async def get_demand_forecast(item_id: str, forecast_period_days: int = 30):
+async def get_demand_forecast(
+    item_id: str,
+    forecast_period_days: int = 30,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Produce a demand forecast for a given inventory item.
+
+    **Authentication Required:** API_USER role or higher
 
     Parameters:
         item_id (str): Identifier of the inventory item (SKU or internal ID).
@@ -878,9 +931,17 @@ async def get_demand_forecast(item_id: str, forecast_period_days: int = 30):
 
 
 @router.get("/finance/reports/financial", tags=["Finance & Inventory"])
-async def generate_financial_report(start_date: datetime, end_date: datetime):
+async def generate_financial_report(
+    start_date: datetime,
+    end_date: datetime,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Generate a financial report for the specified date range.
+
+    **Authentication Required:** API_USER role or higher
 
     Parameters:
         start_date (datetime): Start of the reporting period (inclusive).
@@ -913,9 +974,15 @@ async def generate_financial_report(start_date: datetime, end_date: datetime):
 
 
 @router.get("/finance/status", tags=["Finance & Inventory"])
-async def get_finance_inventory_status():
+async def get_finance_inventory_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Return availability and operational status for the finance and inventory agent.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: A status payload with either:
@@ -937,9 +1004,16 @@ async def get_finance_inventory_status():
 
 
 @router.post("/marketing/campaigns/create", tags=["Marketing"])
-async def create_campaign(request: CampaignRequest):
+async def create_campaign(
+    request: CampaignRequest,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Create a new marketing campaign.
+
+    **Authentication Required:** ADMIN role or higher
 
     Parameters:
         request (CampaignRequest): Campaign definition including name, description, campaign_type, channels, target segments, variants, budget, and scheduling.
@@ -983,9 +1057,16 @@ async def create_campaign(request: CampaignRequest):
 
 
 @router.post("/marketing/campaigns/{campaign_id}/launch", tags=["Marketing"])
-async def launch_campaign(campaign_id: str):
+async def launch_campaign(
+    campaign_id: str,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Launches a marketing campaign across configured channels and starts A/B testing when enabled.
+
+    **Authentication Required:** ADMIN role or higher
 
     @param campaign_id: Identifier of the campaign to launch.
     @returns: A dictionary with launch metadata (e.g., `campaign_id`, `status`, `launch_time`, and any provider-specific details or errors).
@@ -1006,9 +1087,16 @@ async def launch_campaign(campaign_id: str):
 
 
 @router.post("/marketing/campaigns/{campaign_id}/complete", tags=["Marketing"])
-async def complete_campaign(campaign_id: str):
+async def complete_campaign(
+    campaign_id: str,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Finalize a marketing campaign and produce its final performance report.
+
+    **Authentication Required:** ADMIN role or higher
 
     Parameters:
         campaign_id (str): Identifier of the campaign to complete.
@@ -1034,9 +1122,16 @@ async def complete_campaign(campaign_id: str):
 
 
 @router.post("/marketing/segments/create", tags=["Marketing"])
-async def create_segment(segment_data: dict[str, Any]):
+async def create_segment(
+    segment_data: dict[str, Any],
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Create a customer segment for targeted marketing.
+
+    **Authentication Required:** ADMIN role or higher
 
     Parameters:
         segment_data (dict[str, Any]): Criteria and metadata for the segment (for example: "name", "demographics", "behavior", "purchase_history", "engagement", "filters"). Keys and value shapes depend on the marketing orchestrator's schema.
@@ -1075,9 +1170,15 @@ async def create_segment(segment_data: dict[str, Any]):
 
 
 @router.get("/marketing/status", tags=["Marketing"])
-async def get_marketing_status():
+async def get_marketing_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Return the availability and system status of the marketing orchestrator.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: `{"available": True, "status": <status_payload>}` when the orchestrator is available; `{"available": False, "error": "<message>"}` when it is not.
@@ -1097,9 +1198,16 @@ async def get_marketing_status():
 
 
 @router.post("/code/generate", tags=["Code Development"])
-async def generate_code(request: CodeGenerationRequest):
+async def generate_code(
+    request: CodeGenerationRequest,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Generate source code and accompanying metadata from a high-level code specification.
+
+    **Authentication Required:** DEVELOPER role or higher
 
     Parameters:
         request (CodeGenerationRequest): Generation parameters including a textual description, target language and framework, dependency requirements, whether to include tests and documentation, and the preferred model.
@@ -1162,9 +1270,16 @@ async def generate_code(request: CodeGenerationRequest):
 
 
 @router.post("/code/recover", tags=["Code Development"])
-async def recover_code(request: CodeRecoveryRequestModel):
+async def recover_code(
+    request: CodeRecoveryRequestModel,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.DEVELOPER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Recover source code from a repository or backups using the code recovery agent.
+
+    **Authentication Required:** DEVELOPER role or higher
 
     Parameters:
         request (CodeRecoveryRequestModel): Recovery parameters including recovery_type (strategy), repository_url, file_path, branch, and commit_hash.
@@ -1217,9 +1332,15 @@ async def recover_code(request: CodeRecoveryRequestModel):
 
 
 @router.get("/code/status", tags=["Code Development"])
-async def get_code_agent_status():
+async def get_code_agent_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Report the availability and system status of the code recovery agent.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: If the agent is available, returns {"available": True, "status": <status dict>}.
@@ -1240,9 +1361,16 @@ async def get_code_agent_status():
 
 
 @router.post("/workflows/create", tags=["Workflows"])
-async def create_workflow(request: WorkflowExecutionRequest):
+async def create_workflow(
+    request: WorkflowExecutionRequest,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Create a multi-agent workflow.
+
+    **Authentication Required:** ADMIN role or higher
 
     Supported workflow types:
     - fashion_brand_launch: Complete brand launch automation
@@ -1286,9 +1414,17 @@ async def create_workflow(request: WorkflowExecutionRequest):
 
 
 @router.post("/workflows/{workflow_id}/execute", tags=["Workflows"])
-async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
+async def execute_workflow(
+    workflow_id: str,
+    background_tasks: BackgroundTasks,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.ADMIN) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Start execution of the specified workflow and schedule it to run in the background.
+
+    **Authentication Required:** ADMIN role or higher
 
     Schedules the workflow engine to execute the workflow identified by `workflow_id`. If the workflow engine is unavailable an HTTP 503 is raised.
 
@@ -1314,9 +1450,16 @@ async def execute_workflow(workflow_id: str, background_tasks: BackgroundTasks):
 
 
 @router.get("/workflows/{workflow_id}/status", tags=["Workflows"])
-async def get_workflow_status(workflow_id: str):
+async def get_workflow_status(
+    workflow_id: str,
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.API_USER) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Fetch the current execution status and progress for a workflow.
+
+    **Authentication Required:** API_USER role or higher
 
     Returns:
         A dict with workflow runtime state and metadata, typically including keys such as `status`, `progress` (percentage), and `tasks` (per-task results).
@@ -1345,9 +1488,15 @@ async def get_workflow_status(workflow_id: str):
 
 
 @router.get("/workflows/status", tags=["Workflows"])
-async def get_workflow_engine_status():
+async def get_workflow_engine_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Get the workflow engine's availability and current system status.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: A status payload with:
@@ -1370,9 +1519,15 @@ async def get_workflow_engine_status():
 
 
 @router.get("/system/status", tags=["System"])
-async def get_system_status():
+async def get_system_status(
+    current_user: dict[str, Any] = Depends(
+        require_role(UserRole.READ_ONLY) if SECURITY_AVAILABLE else get_current_user
+    ),
+):
     """
     Get the overall runtime status of the system and its optional agents.
+
+    **Authentication Required:** READ_ONLY role or higher
 
     Returns:
         dict: A dictionary with keys:
