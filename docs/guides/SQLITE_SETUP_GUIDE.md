@@ -10,7 +10,7 @@ DevSkyy uses SQLite as the default database for development and Vercel deploymen
 
 **Database Features:**
 - ✅ SQLAlchemy ORM with async support
-- ✅ Automatic table creation and migrations
+- ✅ Automatic table creation and migrations (when init is run)
 - ✅ Production-ready models for e-commerce
 - ✅ Health checks and connection management
 - ✅ Backward compatibility with existing code
@@ -87,15 +87,42 @@ NEON_DATABASE_URL=postgresql://user:pass@host.neon.tech/dbname
 
 ### **Step 1: Database Initialization**
 
-The database is automatically initialized when the application starts:
+Important: the current main application (main.py) in this repository does not automatically call a database initialization helper at startup. If you depend on automatic initialization, run the initialization script manually or add an explicit startup hook in main.py to call init_db().
+
+Option A — Manual initialization (recommended for clarity):
+
+```bash
+# From repository root
+python init_database.py
+```
+
+This script will typically import your database manager and run the necessary create/migrate logic.
+
+Option B — Initialize from Python (one-off):
+
+```bash
+python -c "import asyncio; from database import init_db; asyncio.run(init_db())"
+```
+
+Option C — Enable automatic initialization on app startup (modify main.py):
+
+If you prefer the app to initialize the DB during startup, add the following to the startup event in `main.py` (inside the existing startup_event handler) so initialization happens when the FastAPI app starts:
 
 ```python
-# Automatic initialization in main.py
-from database import init_db, db_manager
+# in main.py (inside startup_event)
+from database import init_db
 
-# Tables are created automatically on startup
-await init_db()
+try:
+    await init_db()
+    logger.info("✅ Database initialized on startup")
+except Exception as e:
+    logger.warning(f"⚠️ Database initialization failed on startup: {e}")
 ```
+
+Notes:
+- Only enable automatic startup initialization if you are comfortable doing migrations at app start (suitable for development and some staging setups). For production, prefer explicit migration steps (Alembic) as part of your deploy pipeline.
+- Ensure `DATABASE_URL` is set appropriately before running any initialization code.
+
 
 ### **Step 2: Manual Database Setup (Optional)**
 
@@ -106,6 +133,8 @@ cd DevSkyy
 python init_database.py
 ```
 
+(Keep using the manual script if you want explicit control over when migrations run.)
+
 ### **Step 3: Verify Database Setup**
 
 ```bash
@@ -113,16 +142,13 @@ python init_database.py
 ls -la devskyy.db
 
 # Test database connection
-python -c "
-import asyncio
-from database import db_manager
+python -c "import asyncio; from database import db_manager
 
 async def test():
     health = await db_manager.health_check()
     print(f'Database Status: {health}')
 
-asyncio.run(test())
-"
+asyncio.run(test())"
 ```
 
 ---
@@ -263,41 +289,39 @@ engine = create_async_engine(
 
 ## 🔄 **Migration Path**
 
-### **SQLite → PostgreSQL Migration**
-
 When ready to scale, migrate to PostgreSQL:
 
 1. **Set PostgreSQL URL**
-   ```bash
-   DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname
-   ```
+```bash
+DATABASE_URL=postgresql+asyncpg://user:pass@host:5432/dbname
+```
 
 2. **Export SQLite Data**
-   ```bash
-   python -c "
-   import asyncio
-   from database import db_manager
-   from sqlalchemy import select
-   from models_sqlalchemy import User, Product, Customer
-   
-   async def export_data():
-       async with db_manager.get_session() as db:
-           # Export logic here
-           pass
-   
-   asyncio.run(export_data())
-   "
-   ```
+```bash
+python -c "
+import asyncio
+from database import db_manager
+from sqlalchemy import select
+from models_sqlalchemy import User, Product, Customer
+
+async def export_data():
+    async with db_manager.get_session() as db:
+        # Export logic here
+        pass
+
+asyncio.run(export_data())
+"
+```
 
 3. **Import to PostgreSQL**
-   - Tables are automatically created
-   - Data can be imported using standard SQL tools
+- Tables are automatically created if you run migrations
+- Data can be imported using standard SQL tools
 
 ---
 
 ## 🛠️ **Troubleshooting**
 
-### **Common Issues:**
+### Common Issues:
 
 #### **Issue: Database file not found**
 ```bash
@@ -365,17 +389,15 @@ asyncio.run(init_db())
 4. Regular performance analysis
 
 ### **Vercel Deployment:**
-1. SQLite works perfectly for serverless
-2. Database file persists across deployments
-3. Automatic initialization on cold starts
-4. No additional configuration needed
+1. SQLite works for some serverless workflows but consider using a managed Postgres for persistent production storage
+2. Database file persistence varies by provider — prefer remote databases for production
+3. Automatic initialization can be configured, but it's safer to run migrations as part of your deployment pipeline
 
 ---
 
-**🎉 SQLite setup is complete and production-ready!**
+**🎉 SQLite setup is complete and production-ready (with proper migration planning)!**
 
-*The database automatically initializes on application startup.*
-*No manual setup required for basic usage.*
+*The database will initialize if you run the provided initialization script or enable init_db() in your startup event.*
 
 **Last Updated:** 2024-10-24  
 **Version:** 2.0.0  

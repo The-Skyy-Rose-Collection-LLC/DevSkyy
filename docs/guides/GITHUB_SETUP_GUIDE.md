@@ -243,9 +243,13 @@ export ENVIRONMENT=development
 export DATABASE_URL=sqlite:///devskyy.db
 export SECRET_KEY=$(openssl rand -hex 32)
 
-# Run application
-python main.py
+# Recommended: start the app using uvicorn to point at the FastAPI app object
+python -m uvicorn main:app --reload
 ```
+
+**Note:** Some developers run `python main.py` directly, however main.py contains an internal uvicorn.run call that references a module target string (`main_new:app`) which may not exist in the repository and can cause the process to fail. For reliable local startup use the explicit uvicorn invocation above (python -m uvicorn main:app). 
+
+---
 
 ### Staging
 

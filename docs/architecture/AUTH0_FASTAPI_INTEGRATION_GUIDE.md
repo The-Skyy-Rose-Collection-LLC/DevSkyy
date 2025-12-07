@@ -233,42 +233,24 @@ async def get_user_profile(current_user = Depends(get_current_auth0_user)):
 ## 🔧 **CONFIGURATION**
 
 ### **Environment Variables**
+
+> IMPORTANT: Never commit real secrets into source files or version control. Use environment variables, a secrets manager, or CI/CD secret storage. Generate strong secrets (e.g. python -c "import secrets; print(secrets.token_urlsafe(32))").
+
 ```bash
 # Auth0 Configuration (Required)
 AUTH0_DOMAIN=devskyy.us.auth0.com
-AUTH0_CLIENT_ID=DQRnklWEQkk6F1D5fhJK4Fjz5bVWXrVv
-AUTH0_CLIENT_SECRET=ltEkfUE1jZhlZqwzivRfmZnmKXe1zQDNRsoz60b_tG1C_VqXGxHXzxttYouFkMMe
+AUTH0_CLIENT_ID=YOUR_AUTH0_CLIENT_ID
+AUTH0_CLIENT_SECRET=YOUR_AUTH0_CLIENT_SECRET  # set via environment or secret manager
 AUTH0_AUDIENCE=https://api.devskyy.com
 
 # DevSkyy JWT Configuration (Already configured)
-SECRET_KEY=61ea33869516bd6dbf4fd68ed512a2431efbee31fab9af03fd72dbf2ac306cbc
+# Do NOT paste production secrets here. Use placeholders in docs and set real values in your deployment environment.
+SECRET_KEY=YOUR_DEVSKYY_SECRET_KEY  # generate securely, do not commit
 JWT_ALGORITHM=HS256
 
 # Frontend/API URLs
 FRONTEND_URL=http://localhost:3000
 API_BASE_URL=http://localhost:8000
-```
-
-### **Auth0 Dashboard Configuration**
-```json
-{
-  "name": "DevSkyy Web Application",
-  "app_type": "spa",
-  "callbacks": [
-    "http://localhost:8000/api/v1/auth/auth0/callback",
-    "http://localhost:3000/auth/callback",
-    "https://devskyy.com/auth/callback"
-  ],
-  "allowed_logout_urls": [
-    "http://localhost:3000",
-    "https://devskyy.com"
-  ],
-  "web_origins": [
-    "http://localhost:3000",
-    "http://localhost:8000",
-    "https://devskyy.com"
-  ]
-}
 ```
 
 ---
@@ -312,7 +294,7 @@ curl -X GET "http://localhost:8000/api/v1/auth/auth0/me" \
 
 ### **2. Token Security**
 - **Hybrid Tokens**: Auth0 authentication with DevSkyy JWT format
-- **Secure Signing**: Uses DevSkyy's 256-bit secret key
+- **Secure Signing**: Uses DevSkyy's 256-bit secret key (configure via env)
 - **Expiration Control**: Configurable token lifetimes
 - **Refresh Tokens**: Secure token renewal mechanism
 
@@ -328,7 +310,7 @@ curl -X GET "http://localhost:8000/api/v1/auth/auth0/me" \
 
 ### **1. Complete Auth0 Setup**
 1. **Create Auth0 Application**: Configure in Auth0 dashboard
-2. **Update Environment Variables**: Add real Auth0 credentials
+2. **Update Environment Variables**: Add real Auth0 credentials via your deployment system or secret manager
 3. **Test Authentication Flow**: Verify complete login/logout cycle
 4. **Configure Social Providers**: Add Google, GitHub, etc.
 

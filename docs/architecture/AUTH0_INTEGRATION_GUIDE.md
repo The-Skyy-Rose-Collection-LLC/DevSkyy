@@ -1,13 +1,10 @@
-# 🔐 **AUTH0 ENTERPRISE INTEGRATION GUIDE**
+# 🔐 **AUTH0 ENTERPRISE INTEGRATION GUIDE (Optional Integration)**
+
+> NOTE: Auth0 integration is optional. The repository's main application (main.py) includes hooks for JWT-based auth via a JWTManager, but it does not ship a fully-configured Auth0 integration by default. Many referenced modules in docs are conditionally imported in main.py and may be missing in this repository. Follow the steps below to add Auth0 support to your running DevSkyy instance.
 
 ## 🎯 **OVERVIEW**
 
-DevSkyy now includes a complete Auth0 enterprise authentication setup with:
-- **Multi-application support** (Web, Mobile, Admin, API)
-- **Social login integrations** (Google, Apple, GitHub, LinkedIn)
-- **Custom database connections** with PostgreSQL
-- **Comprehensive API scopes** for all DevSkyy features
-- **Enterprise security features** (MFA, brute force protection, etc.)
+DevSkyy can be integrated with Auth0 for enterprise authentication. Auth0 integration is not enabled by default in the codebase; the platform uses an internal JWTManager when available and falls back to environment-driven settings. The guide below shows how to add Auth0 safely and how to wire it into the FastAPI app.
 
 ---
 
@@ -15,332 +12,133 @@ DevSkyy now includes a complete Auth0 enterprise authentication setup with:
 
 ### **1. Prerequisites**
 ```bash
-# Ensure Auth0 Deploy CLI is installed
+# Ensure Auth0 Deploy CLI is installed (optional for large tenant configuration)
 npm install -g auth0-deploy-cli
 
 # Verify installation
 a0deploy --version
-# Should show: 8.18.0 or higher
+# (optional) Should show a recent version
 ```
 
-### **2. Auth0 Account Setup**
-1. **Create Auth0 Account**: https://auth0.com/signup
-2. **Create Tenant**: Choose `devskyy` as tenant name
-3. **Create Management API Application**:
-   - Go to Applications → Create Application
-   - Choose "Machine to Machine"
-   - Name: "DevSkyy Management API"
-   - Authorize for Auth0 Management API
-   - Grant all scopes for initial setup
+### **2. Auth0 Account Setup (Manual Steps)**
+1. Create an Auth0 account at https://auth0.com/signup
+2. Create a tenant and required Applications / APIs for your environment (Web SPA, API, M2M)
+3. Create a Machine-to-Machine application for backend-to-backend access if needed
+
+> Note: DevSkyy does not bundle an Auth0 tenant configuration. Use the Auth0 Management API or auth0-deploy-cli to apply tenant configuration.
 
 ### **3. Configure Environment**
-```bash
-cd DevSkyy/auth0
-cp .env.example .env
-# Edit .env with your actual credentials
-```
 
-**Required Environment Variables:**
+Create or update your .env with Auth0 variables (used by the integration you add):
+
 ```bash
 # Auth0 Configuration
 AUTH0_DOMAIN=devskyy.auth0.com
-AUTH0_CLIENT_ID=your-management-api-client-id
-AUTH0_CLIENT_SECRET=your-management-api-client-secret
-AUTH0_AUDIENCE=https://devskyy.auth0.com/api/v2/
+AUTH0_AUDIENCE=https://api.devskyy.com
+AUTH0_CLIENT_ID=your-client-id
+AUTH0_CLIENT_SECRET=your-client-secret
 
-# Database Configuration
-DATABASE_URL=postgresql://user:password@host:5432/devskyy
-
-# Social Provider Configuration (Optional)
-GOOGLE_CLIENT_ID=your-google-client-id
-GOOGLE_CLIENT_SECRET=your-google-client-secret
-# ... other social providers
+# Optional: management API M2M client
+AUTH0_M2M_CLIENT_ID=your-m2m-client-id
+AUTH0_M2M_CLIENT_SECRET=your-m2m-client-secret
 ```
 
-### **4. Deploy Configuration**
-```bash
-# Deploy to Auth0
-./deploy.sh
-
-# Or with backup
-./deploy.sh --backup
-```
+> Important: per Truth Protocol Rule #5, never commit secrets to source. Use environment variables or a secrets store.
 
 ---
 
-## 🏗️ **ARCHITECTURE OVERVIEW**
+## 🔧 **MINIMAL INTEGRATION (FastAPI)**
 
-### **Applications Configured**
+Below is a minimal approach to add Auth0 JWT verification as an optional dependency alongside the existing JWTManager in the repository.
 
-#### **1. DevSkyy Web Application (SPA)**
-- **Type**: Single Page Application
-- **Framework**: React/Next.js
-- **Authentication**: PKCE flow
-- **URLs**: 
-  - Production: `https://devskyy.com`
-  - Staging: `https://devskyy.vercel.app`
-  - Development: `http://localhost:3000`
-
-#### **2. DevSkyy Mobile Application (Native)**
-- **Type**: Native Mobile App
-- **Platforms**: iOS, Android
-- **Authentication**: PKCE flow
-- **Deep Links**: `com.devskyy.app://`, `devskyy://`
-
-#### **3. DevSkyy Admin Dashboard (Web)**
-- **Type**: Regular Web Application
-- **Authentication**: Authorization Code flow
-- **Enhanced Security**: Shorter token lifetimes, organization requirements
-- **URLs**: `https://admin.devskyy.com`
-
-#### **4. DevSkyy API Service (M2M)**
-- **Type**: Machine-to-Machine
-- **Authentication**: Client Credentials flow
-- **Purpose**: Backend service authentication
-
-### **APIs Configured**
-
-#### **1. DevSkyy Enterprise API**
-- **Identifier**: `https://api.devskyy.com`
-- **Scopes**: 30+ granular permissions
-- **Categories**:
-  - User Management (`read:profile`, `write:profile`, etc.)
-  - Product Management (`read:products`, `manage:inventory`, etc.)
-  - Order Processing (`process:orders`, `refund:orders`, etc.)
-  - AI Agents (`execute:agents`, `orchestrate:agents`, etc.)
-  - Analytics (`read:analytics`, `create:reports`, etc.)
-  - Admin Functions (`admin:users`, `admin:system`, etc.)
-
-#### **2. DevSkyy Management API**
-- **Identifier**: `https://management.devskyy.com`
-- **Purpose**: Internal management operations
-- **Shorter Token Lifetimes**: Enhanced security
-
-#### **3. DevSkyy Webhook API**
-- **Identifier**: `https://webhooks.devskyy.com`
-- **Purpose**: Webhook processing
-- **Very Short Tokens**: 5-minute lifetime
-
----
-
-## 🔧 **INTEGRATION WITH DEVSKYY API**
-
-### **1. Update FastAPI Authentication**
-
-Replace the current JWT authentication with Auth0:
+1. Create a small helper module (e.g. `security/auth0_auth.py`) and implement token verification using JWKs from your Auth0 tenant.
 
 ```python
 # security/auth0_auth.py
+from functools import lru_cache
 from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPBearer
-from jose import jwt, JWTError
 import httpx
-from functools import lru_cache
+from jose import jwt, JWTError
+import os
 
 security = HTTPBearer()
+AUTH0_DOMAIN = os.getenv("AUTH0_DOMAIN")
+AUTH0_AUDIENCE = os.getenv("AUTH0_AUDIENCE")
 
 @lru_cache()
-def get_auth0_public_key():
-    """Get Auth0 public key for JWT verification."""
-    response = httpx.get(f"https://{AUTH0_DOMAIN}/.well-known/jwks.json")
-    return response.json()
+def get_jwks():
+    if not AUTH0_DOMAIN:
+        raise RuntimeError("AUTH0_DOMAIN not configured")
+    r = httpx.get(f"https://{AUTH0_DOMAIN}/.well-known/jwks.json", timeout=10)
+    r.raise_for_status()
+    return r.json()
 
 async def verify_auth0_token(token: str = Depends(security)):
-    """Verify Auth0 JWT token."""
     try:
-        # Get public key
-        jwks = get_auth0_public_key()
-        
-        # Decode and verify token
+        jwks = get_jwks()
         payload = jwt.decode(
             token.credentials,
             jwks,
             algorithms=["RS256"],
             audience=AUTH0_AUDIENCE,
-            issuer=f"https://{AUTH0_DOMAIN}/"
+            issuer=f"https://{AUTH0_DOMAIN}/",
         )
-        
         return payload
-        
     except JWTError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
-# Usage in endpoints
-@app.get("/api/v1/protected")
-async def protected_endpoint(token_payload = Depends(verify_auth0_token)):
-    user_id = token_payload.get("sub")
-    scopes = token_payload.get("scope", "").split()
-    
-    if "read:profile" not in scopes:
-        raise HTTPException(status_code=403, detail="Insufficient permissions")
-    
-    return {"user_id": user_id, "message": "Access granted"}
 ```
 
-### **2. Environment Variables for DevSkyy**
-```bash
-# Add to .env
-AUTH0_DOMAIN=devskyy.auth0.com
-AUTH0_AUDIENCE=https://api.devskyy.com
-AUTH0_ALGORITHMS=["RS256"]
+2. Use the dependency in FastAPI endpoints in place of (or alongside) the existing JWTManager-based dependency. Example usage:
 
-# Client credentials for M2M
-AUTH0_CLIENT_ID=your-m2m-client-id
-AUTH0_CLIENT_SECRET=your-m2m-client-secret
-```
-
-### **3. Frontend Integration**
-
-#### **React/Next.js Setup**
-```bash
-npm install @auth0/auth0-react
-```
-
-```javascript
-// pages/_app.js
-import { Auth0Provider } from '@auth0/auth0-react';
-
-function MyApp({ Component, pageProps }) {
-  return (
-    <Auth0Provider
-      domain="devskyy.auth0.com"
-      clientId="your-spa-client-id"
-      authorizationParams={{
-        redirect_uri: window.location.origin,
-        audience: "https://api.devskyy.com",
-        scope: "openid profile email read:profile write:profile read:products"
-      }}
-    >
-      <Component {...pageProps} />
-    </Auth0Provider>
-  );
-}
-```
-
-#### **API Calls with Auth0 Token**
-```javascript
-// utils/api.js
-import { useAuth0 } from '@auth0/auth0-react';
-
-export const useApiCall = () => {
-  const { getAccessTokenSilently } = useAuth0();
-  
-  const apiCall = async (endpoint, options = {}) => {
-    const token = await getAccessTokenSilently();
-    
-    return fetch(`https://api.devskyy.com${endpoint}`, {
-      ...options,
-      headers: {
-        ...options.headers,
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-  };
-  
-  return { apiCall };
-};
-```
-
----
-
-## 🔒 **SECURITY FEATURES**
-
-### **1. Multi-Factor Authentication**
-- **TOTP Support**: Google Authenticator, Authy
-- **SMS Support**: Available for enterprise plans
-- **Custom MFA Page**: Branded DevSkyy experience
-
-### **2. Brute Force Protection**
-- **Automatic Lockout**: After failed attempts
-- **IP-based Blocking**: Suspicious activity detection
-- **Progressive Delays**: Increasing delays between attempts
-
-### **3. Password Policy**
-- **Minimum Length**: 8 characters
-- **Complexity**: Good policy enforced
-- **History**: Prevents reuse of last 5 passwords
-- **Dictionary Check**: Prevents common passwords
-
-### **4. Session Management**
-- **Web Sessions**: 7 days with 3-day idle timeout
-- **Mobile Sessions**: 90 days with 30-day idle timeout
-- **Admin Sessions**: 24 hours with 8-hour idle timeout
-- **Token Rotation**: Automatic refresh token rotation
-
----
-
-## 📊 **MONITORING & ANALYTICS**
-
-### **1. Auth0 Dashboard**
-- **User Analytics**: Login patterns, geographic distribution
-- **Security Events**: Failed logins, anomaly detection
-- **Application Usage**: Per-application metrics
-
-### **2. Custom Monitoring**
 ```python
-# monitoring/auth_metrics.py
-from prometheus_client import Counter, Histogram
+# In an endpoint module
+from fastapi import Depends
+from security.auth0_auth import verify_auth0_token
 
-auth_requests_total = Counter('auth_requests_total', 'Total auth requests', ['method', 'status'])
-auth_duration = Histogram('auth_request_duration_seconds', 'Auth request duration')
-
-# Usage in Auth0 webhook handler
-@app.post("/webhooks/auth0")
-async def auth0_webhook(payload: dict):
-    event_type = payload.get("type")
-    
-    if event_type == "s":  # Success login
-        auth_requests_total.labels(method='login', status='success').inc()
-    elif event_type == "f":  # Failed login
-        auth_requests_total.labels(method='login', status='failure').inc()
-    
-    return {"status": "ok"}
+@app.get("/api/v1/protected")
+async def protected_endpoint(token_payload=Depends(verify_auth0_token)):
+    user_id = token_payload.get("sub")
+    return {"user_id": user_id, "message": "Access granted via Auth0"}
 ```
+
+3. If you want to prefer Auth0 only when configured, guard the import/usage with environment checks just like main.py does for optional modules.
 
 ---
 
-## 🚀 **DEPLOYMENT CHECKLIST**
+## 🔒 **SECURITY & DEPLOYMENT NOTES**
 
-### **Pre-Deployment**
-- [ ] Auth0 tenant created and configured
-- [ ] Management API application created
-- [ ] Environment variables configured
-- [ ] Social provider credentials obtained (optional)
-- [ ] Database connection string ready
+- Do not store Auth0 secrets in code or commit them. Use environment variables or a secrets manager.
+- Validate audience and issuer claims on incoming tokens.
+- Pair Auth0 with existing RBAC in DevSkyy (roles/scopes) rather than bypassing server-side checks.
+- Consider token introspection or management API checks for revoked tokens if you need immediate revocation semantics.
 
-### **Deployment**
-- [ ] Run `./deploy.sh` successfully
-- [ ] Verify applications created in Auth0 dashboard
-- [ ] Test authentication flows
-- [ ] Configure custom domain (optional)
+---
 
-### **Post-Deployment**
-- [ ] Update DevSkyy API authentication
-- [ ] Update frontend applications
-- [ ] Set up monitoring and alerting
-- [ ] Configure webhooks for user events
-- [ ] Test all authentication flows
+## 📦 **FRONTEND INTEGRATION (React / Next.js)**
 
-### **Production Readiness**
-- [ ] Enable MFA for admin users
-- [ ] Configure brute force protection
-- [ ] Set up custom email templates
-- [ ] Configure anomaly detection
-- [ ] Set up backup and disaster recovery
+Frontend integration steps are the same as standard Auth0 SPA integration. Use the Auth0 SDK for React and configure `audience` to match the API where tokens are validated.
+
+---
+
+## 🚀 **CHECKLIST**
+
+- [ ] Create Auth0 tenant & applications
+- [ ] Add Auth0 env vars to deployment
+- [ ] Add `security/auth0_auth.py` (or similar) to verify tokens
+- [ ] Replace or augment JWT-based dependencies in endpoints
+- [ ] Test authenticated flows end-to-end
 
 ---
 
 ## 🎯 **NEXT STEPS**
+1. Implement the small helper module (security/auth0_auth.py) shown above
+2. Integrate endpoints by using verify_auth0_token as a dependency
+3. Optionally replace or wrap existing JWTManager with Auth0 verification
 
-1. **Complete Auth0 Setup**: Follow the deployment checklist
-2. **Integrate with DevSkyy API**: Update authentication middleware
-3. **Update Frontend Applications**: Implement Auth0 SDK
-4. **Test Authentication Flows**: Verify all use cases
-5. **Monitor and Optimize**: Set up analytics and monitoring
 
-**🦄 With Auth0 integration, DevSkyy now has enterprise-grade authentication ready for unicorn-scale growth!**
+**Short summary**: Auth0 integration is supported as an optional add-on. The repository's main application performs conditional imports and will continue to function without Auth0. Carefully add verification code and environment variables as shown above.
