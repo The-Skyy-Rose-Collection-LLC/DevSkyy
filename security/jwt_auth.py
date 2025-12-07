@@ -26,11 +26,21 @@ logger = logging.getLogger(__name__)
 # JWT Configuration - Enhanced Security
 # Truth Protocol Rule #5: No Secrets in Code - Must be set via environment variable
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY") or os.getenv("SECRET_KEY")
+ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
+
 if not JWT_SECRET_KEY:
-    raise ValueError(
-        "JWT_SECRET_KEY or SECRET_KEY environment variable must be set. "
-        "Set JWT_SECRET_KEY in your .env file for production deployment."
-    )
+    if ENVIRONMENT == "production":
+        raise ValueError(
+            "JWT_SECRET_KEY or SECRET_KEY environment variable must be set in production. "
+            "Set JWT_SECRET_KEY in your .env file for production deployment."
+        )
+    else:
+        # Development/testing only - use insecure default
+        JWT_SECRET_KEY = "dev-insecure-jwt-key-DO-NOT-USE-IN-PRODUCTION"
+        logger.warning(
+            "⚠️ Using default JWT_SECRET_KEY for development. "
+            "Set JWT_SECRET_KEY environment variable before deploying to production!"
+        )
 JWT_ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 15  # Reduced for security
 REFRESH_TOKEN_EXPIRE_DAYS = 7

@@ -674,6 +674,16 @@ async def get_classic_interface():
         return HTMLResponse(content="<h1>Classic interface not found</h1>")
 
 
+@app.get("/dashboard", response_class=HTMLResponse)
+async def get_modern_dashboard():
+    """Serve the modern enterprise dashboard."""
+    try:
+        with open("templates/modern_dashboard.html", "r") as f:
+            return HTMLResponse(content=f.read())
+    except FileNotFoundError:
+        return HTMLResponse(content="<h1>Dashboard not found</h1>")
+
+
 @app.get("/health")
 async def health_check():
     """Health check endpoint."""

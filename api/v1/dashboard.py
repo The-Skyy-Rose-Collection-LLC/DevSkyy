@@ -1,24 +1,3 @@
-from monitoring.system_monitor import SystemMonitor
-from security.jwt_auth import UserRole, get_current_user, require_authenticated
-
-
-# Security availability check
-try:
-    from security.jwt_auth import UserRole, require_authenticated
-
-    SECURITY_AVAILABLE = True
-except ImportError:
-    SECURITY_AVAILABLE = False
-import asyncio
-from datetime import datetime, timedelta
-from typing import Any
-
-from fastapi import APIRouter, Depends, HTTPException, Request, status
-from fastapi.responses import HTMLResponse
-from fastapi.templating import Jinja2Templates
-from pydantic import BaseModel, Field
-
-
 """
 DevSkyy Enterprise Dashboard API v1.0.0
 
@@ -30,11 +9,35 @@ Version: 1.0.0
 Python: >=3.11
 """
 
+import asyncio
+import logging
+from datetime import datetime, timedelta
+from typing import Any
+
+from fastapi import APIRouter, Depends, HTTPException, Request, status
+from fastapi.responses import HTMLResponse
+from fastapi.templating import Jinja2Templates
+from pydantic import BaseModel, Field
+
+logger = logging.getLogger(__name__)
+
 # Import enterprise modules with graceful degradation
 try:
+    from monitoring.system_monitor import SystemMonitor
     ENTERPRISE_MODULES_AVAILABLE = True
 except ImportError:
+    SystemMonitor = None
     ENTERPRISE_MODULES_AVAILABLE = False
+
+# Security availability check
+try:
+    from security.jwt_auth import UserRole, require_authenticated, get_current_user
+    SECURITY_AVAILABLE = True
+except ImportError:
+    UserRole = None
+    require_authenticated = None
+    get_current_user = None
+    SECURITY_AVAILABLE = False
 
 router = APIRouter()
 templates = Jinja2Templates(directory="templates")
