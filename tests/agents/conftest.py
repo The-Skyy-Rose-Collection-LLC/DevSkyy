@@ -15,8 +15,8 @@ import pytest
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from agents.loader import AgentConfigLoader
-from agents.router import AgentRouter, TaskRequest, TaskType
+from agent.loader import AgentConfigLoader
+from agent.router import AgentRouter, TaskRequest, TaskType
 
 
 @pytest.fixture
@@ -40,35 +40,23 @@ def temp_config_dir(tmp_path):
             "agent_name": "Python Code Generator",
             "agent_type": "code_generator",
             "capabilities": [
-                {
-                    "name": "python_generation",
-                    "confidence": 0.95,
-                    "keywords": ["python", "code", "generate"]
-                }
+                {"name": "python_generation", "confidence": 0.95, "keywords": ["python", "code", "generate"]}
             ],
             "priority": 80,
             "max_concurrent_tasks": 10,
-            "enabled": True
+            "enabled": True,
         },
         {
             "agent_id": "content_writer_01",
             "agent_name": "Marketing Content Writer",
             "agent_type": "content_writer",
             "capabilities": [
-                {
-                    "name": "blog_writing",
-                    "confidence": 0.90,
-                    "keywords": ["blog", "article", "content"]
-                },
-                {
-                    "name": "copywriting",
-                    "confidence": 0.85,
-                    "keywords": ["copy", "marketing", "ad"]
-                }
+                {"name": "blog_writing", "confidence": 0.90, "keywords": ["blog", "article", "content"]},
+                {"name": "copywriting", "confidence": 0.85, "keywords": ["copy", "marketing", "ad"]},
             ],
             "priority": 70,
             "max_concurrent_tasks": 5,
-            "enabled": True
+            "enabled": True,
         },
         {
             "agent_id": "general_agent_01",
@@ -77,7 +65,7 @@ def temp_config_dir(tmp_path):
             "capabilities": [],
             "priority": 30,
             "max_concurrent_tasks": 50,
-            "enabled": True
+            "enabled": True,
         },
         {
             "agent_id": "disabled_agent",
@@ -86,13 +74,13 @@ def temp_config_dir(tmp_path):
             "capabilities": [],
             "priority": 50,
             "max_concurrent_tasks": 10,
-            "enabled": False
-        }
+            "enabled": False,
+        },
     ]
 
     for agent in sample_agents:
         config_file = config_dir / f"{agent['agent_id']}.json"
-        with open(config_file, 'w') as f:
+        with open(config_file, "w") as f:
             json.dump(agent, f, indent=2)
 
     return config_dir
@@ -137,7 +125,7 @@ def sample_task():
     return TaskRequest(
         task_type=TaskType.CODE_GENERATION,
         description="Generate a Python function to calculate fibonacci numbers",
-        priority=75
+        priority=75,
     )
 
 
@@ -150,26 +138,10 @@ def batch_tasks():
         List of TaskRequest instances
     """
     return [
-        TaskRequest(
-            task_type=TaskType.CODE_GENERATION,
-            description="Generate Python code",
-            priority=80
-        ),
-        TaskRequest(
-            task_type=TaskType.CONTENT_GENERATION,
-            description="Write a blog article",
-            priority=70
-        ),
-        TaskRequest(
-            task_type=TaskType.CODE_REVIEW,
-            description="Review pull request",
-            priority=60
-        ),
-        TaskRequest(
-            task_type=TaskType.GENERAL,
-            description="Generic task",
-            priority=50
-        )
+        TaskRequest(task_type=TaskType.CODE_GENERATION, description="Generate Python code", priority=80),
+        TaskRequest(task_type=TaskType.CONTENT_GENERATION, description="Write a blog article", priority=70),
+        TaskRequest(task_type=TaskType.CODE_REVIEW, description="Review pull request", priority=60),
+        TaskRequest(task_type=TaskType.GENERAL, description="Generic task", priority=50),
     ]
 
 
@@ -202,16 +174,10 @@ def valid_config_data():
         "agent_id": "test_agent_01",
         "agent_name": "Test Agent",
         "agent_type": "test_type",
-        "capabilities": [
-            {
-                "name": "test_capability",
-                "confidence": 0.85,
-                "keywords": ["test", "example"]
-            }
-        ],
+        "capabilities": [{"name": "test_capability", "confidence": 0.85, "keywords": ["test", "example"]}],
         "priority": 75,
         "max_concurrent_tasks": 10,
         "timeout_seconds": 300,
         "retry_count": 3,
-        "enabled": True
+        "enabled": True,
     }

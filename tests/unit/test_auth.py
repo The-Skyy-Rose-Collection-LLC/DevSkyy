@@ -194,9 +194,7 @@ class TestJWTTokens:
     @pytest.fixture
     def mock_user(self):
         """Mock user for testing"""
-        return Mock(
-            id="user123", email="test@example.com", username="testuser", role="api_user"
-        )
+        return Mock(id="user123", email="test@example.com", username="testuser", role="api_user")
 
     def test_token_creation(self, mock_user):
         """Test JWT token creation"""
@@ -303,9 +301,7 @@ class TestAsyncAuthentication:
     async def test_async_token_verification(self):
         """Test async token verification"""
         # Create a mock user
-        mock_user = Mock(
-            id="user123", email="test@example.com", username="testuser", role="api_user"
-        )
+        mock_user = Mock(id="user123", email="test@example.com", username="testuser", role="api_user")
 
         # Create tokens
         tokens = create_user_tokens(mock_user)
@@ -323,9 +319,7 @@ class TestSecurityLogging:
 
     def test_security_event_logging(self):
         """Test that security events are logged"""
-        with patch(
-            "logging_config.security_logger.log_authentication_event"
-        ):
+        with patch("logging_config.security_logger.log_authentication_event"):
             # Simulate a failed login
             record_failed_login("test@example.com")
 

@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from pydantic import BaseModel
@@ -15,6 +15,7 @@ Stores state changes as a sequence of events for audit and replay
 # EVENT BASE CLASSES
 # ============================================================================
 
+
 class DomainEvent(BaseModel):
     """Base class for all domain events"""
 
@@ -25,7 +26,7 @@ class DomainEvent(BaseModel):
     timestamp: datetime
     data: dict[str, Any]
     version: int
-    metadata: Optional[dict[str, Any]] = None
+    metadata: dict[str, Any] | None = None
 
     def __init__(self, **data):
         if "event_id" not in data:
@@ -36,9 +37,11 @@ class DomainEvent(BaseModel):
             data["event_type"] = self.__class__.__name__
         super().__init__(**data)
 
+
 # ============================================================================
 # EVENT STORE
 # ============================================================================
+
 
 class EventStore:
     """
@@ -83,7 +86,7 @@ class EventStore:
         return True
 
     async def get_events(
-        self, aggregate_id: str, from_version: int = 0, to_version: Optional[int] = None
+        self, aggregate_id: str, from_version: int = 0, to_version: int | None = None
     ) -> list[DomainEvent]:
         """
         Get events for an aggregate
@@ -120,9 +123,7 @@ class EventStore:
             all_events.extend(events)
         return sorted(all_events, key=lambda e: e.timestamp)
 
-    async def save_snapshot(
-        self, aggregate_id: str, state: dict[str, Any], version: int
-    ):
+    async def save_snapshot(self, aggregate_id: str, state: dict[str, Any], version: int):
         """
         Save snapshot of aggregate state for faster reconstruction
 
@@ -137,7 +138,7 @@ class EventStore:
             "timestamp": datetime.now(UTC),
         }
 
-    async def get_snapshot(self, aggregate_id: str) -> Optional[dict[str, Any]]:
+    async def get_snapshot(self, aggregate_id: str) -> dict[str, Any] | None:
         """
         Get latest snapshot for an aggregate
 
@@ -149,9 +150,11 @@ class EventStore:
         """
         return self._snapshots.get(aggregate_id)
 
+
 # ============================================================================
 # AGGREGATE ROOT
 # ============================================================================
+
 
 class AggregateRoot(ABC):
     """
@@ -209,22 +212,28 @@ class AggregateRoot(ABC):
         """Mark all uncommitted events as committed"""
         self.uncommitted_events.clear()
 
+
 # ============================================================================
 # EXAMPLE DOMAIN EVENTS
 # ============================================================================
 
+
 class AgentCreatedEvent(DomainEvent):
     """Event raised when an agent is created"""
+
 
 class AgentUpdatedEvent(DomainEvent):
     """Event raised when an agent is updated"""
 
+
 class AgentDeletedEvent(DomainEvent):
     """Event raised when an agent is deleted"""
+
 
 # ============================================================================
 # EXAMPLE AGGREGATE
 # ============================================================================
+
 
 class AgentAggregate(AggregateRoot):
     """
@@ -233,8 +242,8 @@ class AgentAggregate(AggregateRoot):
 
     def __init__(self, aggregate_id: str):
         super().__init__(aggregate_id)
-        self.name: Optional[str] = None
-        self.agent_type: Optional[str] = None
+        self.name: str | None = None
+        self.agent_type: str | None = None
         self.status: str = "inactive"
         self.capabilities: dict[str, Any] = {}
 
@@ -284,6 +293,7 @@ class AgentAggregate(AggregateRoot):
             data={"deleted_at": datetime.now(UTC).isoformat()},
         )
         self.raise_event(event)
+
 
 # ============================================================================
 # GLOBAL EVENT STORE INSTANCE

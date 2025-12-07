@@ -28,7 +28,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 
@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 try:
     import numpy as np
     from PIL import Image
+
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
@@ -51,6 +52,7 @@ except ImportError:
 
 class ProcessingStage(Enum):
     """Asset processing stages."""
+
     UPLOADED = "uploaded"
     UPSCALING = "upscaling"
     ENHANCING = "enhancing"
@@ -64,6 +66,7 @@ class ProcessingStage(Enum):
 
 class AssetType(Enum):
     """Types of fashion assets."""
+
     CLOTHING = "clothing"
     ACCESSORY = "accessory"
     FOOTWEAR = "footwear"
@@ -76,6 +79,7 @@ class AssetType(Enum):
 
 class UpscaleQuality(Enum):
     """Target quality levels."""
+
     HD = "hd"  # 1080p
     QHD = "qhd"  # 1440p
     UHD_4K = "uhd_4k"  # 2160p
@@ -86,6 +90,7 @@ class UpscaleQuality(Enum):
 @dataclass
 class AssetMetadata:
     """Metadata for fashion asset."""
+
     asset_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     asset_type: AssetType = AssetType.CLOTHING
 
@@ -94,18 +99,18 @@ class AssetMetadata:
     brand: str = ""
     collection: str = ""
     season: str = ""
-    sku: Optional[str] = None
+    sku: str | None = None
 
     # Visual properties
     dominant_colors: list[str] = field(default_factory=list)
-    material_type: Optional[str] = None
-    pattern_type: Optional[str] = None
+    material_type: str | None = None
+    pattern_type: str | None = None
     style_tags: list[str] = field(default_factory=list)
 
     # 3D properties
     has_3d_model: bool = False
-    mesh_complexity: Optional[str] = None
-    texture_resolution: Optional[str] = None
+    mesh_complexity: str | None = None
+    texture_resolution: str | None = None
 
     # Processing info
     original_resolution: tuple[int, int] = (0, 0)
@@ -114,13 +119,13 @@ class AssetMetadata:
 
     # Timestamps
     uploaded_at: datetime = field(default_factory=datetime.now)
-    processed_at: Optional[datetime] = None
+    processed_at: datetime | None = None
 
     # Storage paths
-    original_path: Optional[str] = None
-    processed_path: Optional[str] = None
-    thumbnail_path: Optional[str] = None
-    model_3d_path: Optional[str] = None
+    original_path: str | None = None
+    processed_path: str | None = None
+    thumbnail_path: str | None = None
+    model_3d_path: str | None = None
 
     # Custom metadata
     custom_metadata: dict[str, Any] = field(default_factory=dict)
@@ -129,6 +134,7 @@ class AssetMetadata:
 @dataclass
 class ProcessingRequest:
     """Request for asset preprocessing."""
+
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     asset_path: str = ""
 
@@ -141,7 +147,7 @@ class ProcessingRequest:
 
     # Asset information
     asset_type: AssetType = AssetType.CLOTHING
-    metadata: Optional[AssetMetadata] = None
+    metadata: AssetMetadata | None = None
 
     # Advanced options
     preserve_alpha: bool = True
@@ -161,6 +167,7 @@ class ProcessingRequest:
 @dataclass
 class ProcessingResult:
     """Result from asset preprocessing."""
+
     request_id: str
     asset_id: str
     success: bool
@@ -170,10 +177,10 @@ class ProcessingResult:
     current_stage: ProcessingStage = ProcessingStage.UPLOADED
 
     # Output files
-    original_file: Optional[str] = None
-    processed_file: Optional[str] = None
-    thumbnail_file: Optional[str] = None
-    model_3d_file: Optional[str] = None
+    original_file: str | None = None
+    processed_file: str | None = None
+    thumbnail_file: str | None = None
+    model_3d_file: str | None = None
     texture_files: dict[str, str] = field(default_factory=dict)
 
     # Quality metrics
@@ -183,18 +190,18 @@ class ProcessingResult:
     sharpness_score: float = 0.0
 
     # 3D metrics
-    vertex_count: Optional[int] = None
-    face_count: Optional[int] = None
+    vertex_count: int | None = None
+    face_count: int | None = None
 
     # Processing info
     processing_time: float = 0.0
     stages_time: dict[str, float] = field(default_factory=dict)
 
     # Asset metadata
-    metadata: Optional[AssetMetadata] = None
+    metadata: AssetMetadata | None = None
 
     # Errors
-    error: Optional[str] = None
+    error: str | None = None
     warnings: list[str] = field(default_factory=list)
 
     # Timestamps
@@ -275,9 +282,7 @@ class AssetPreprocessingPipeline:
         logger.info(f"✅ {self.pipeline_name} v{self.version} initialized")
         logger.info(f"📁 Storage root: {self.storage_root}")
 
-    async def process_asset(
-        self, request: ProcessingRequest
-    ) -> ProcessingResult:
+    async def process_asset(self, request: ProcessingRequest) -> ProcessingResult:
         """
         Run the full preprocessing pipeline for a single fashion asset request.
 
@@ -315,9 +320,7 @@ class AssetPreprocessingPipeline:
             if request.target_quality != UpscaleQuality.HD or original_res[0] < 1920:
                 stage_start = datetime.now()
                 result.current_stage = ProcessingStage.UPSCALING
-                image, upscale_factor = await self._upscale_image(
-                    image, request.target_quality
-                )
+                image, upscale_factor = await self._upscale_image(image, request.target_quality)
                 result.stages_completed.append(ProcessingStage.UPSCALING)
                 stages_time["upscale"] = (datetime.now() - stage_start).total_seconds()
                 logger.info(f"✅ Upscaled: {upscale_factor}x → {image.size[0]}x{image.size[1]}")
@@ -355,9 +358,7 @@ class AssetPreprocessingPipeline:
             if request.generate_3d:
                 stage_start = datetime.now()
                 result.current_stage = ProcessingStage.CONVERTING_3D
-                model_3d_path, mesh_stats = await self._generate_3d_model(
-                    image, asset_id, request
-                )
+                model_3d_path, mesh_stats = await self._generate_3d_model(image, asset_id, request)
                 result.model_3d_file = str(model_3d_path)
                 result.vertex_count = mesh_stats.get("vertices")
                 result.face_count = mesh_stats.get("faces")
@@ -369,9 +370,7 @@ class AssetPreprocessingPipeline:
             if request.extract_textures and request.generate_3d:
                 stage_start = datetime.now()
                 result.current_stage = ProcessingStage.TEXTURE_EXTRACTION
-                texture_files = await self._extract_textures(
-                    image, asset_id, request
-                )
+                texture_files = await self._extract_textures(image, asset_id, request)
                 result.texture_files = texture_files
                 result.stages_completed.append(ProcessingStage.TEXTURE_EXTRACTION)
                 stages_time["textures"] = (datetime.now() - stage_start).total_seconds()
@@ -421,7 +420,7 @@ class AssetPreprocessingPipeline:
             logger.error(f"❌ Asset processing failed: {e}", exc_info=True)
             result = ProcessingResult(
                 request_id=request.request_id,
-                asset_id=asset_id if 'asset_id' in locals() else "unknown",
+                asset_id=asset_id if "asset_id" in locals() else "unknown",
                 success=False,
                 current_stage=ProcessingStage.FAILED,
                 error=str(e),
@@ -429,9 +428,7 @@ class AssetPreprocessingPipeline:
             )
             return result
 
-    async def _load_and_validate(
-        self, asset_path: str
-    ) -> tuple[Image.Image, tuple[int, int]]:
+    async def _load_and_validate(self, asset_path: str) -> tuple[Image.Image, tuple[int, int]]:
         """
         Load an image file from disk, validate its existence and supported format, and return the image (converted to RGB or RGBA) with its original resolution.
 
@@ -465,9 +462,7 @@ class AssetPreprocessingPipeline:
         original_res = image.size
         return image, original_res
 
-    async def _upscale_image(
-        self, image: Image.Image, target_quality: UpscaleQuality
-    ) -> tuple[Image.Image, float]:
+    async def _upscale_image(self, image: Image.Image, target_quality: UpscaleQuality) -> tuple[Image.Image, float]:
         """
         Upscales an image to the specified quality level and returns the resulting image and the applied scale factor.
 
@@ -522,9 +517,7 @@ class AssetPreprocessingPipeline:
 
         return upscaled, upscale_factor
 
-    async def _enhance_image(
-        self, image: Image.Image, request: ProcessingRequest
-    ) -> Image.Image:
+    async def _enhance_image(self, image: Image.Image, request: ProcessingRequest) -> Image.Image:
         """
         Apply configurable image enhancements (denoise, sharpen, and color/contrast adjustments) based on the processing request.
 
@@ -547,17 +540,20 @@ class AssetPreprocessingPipeline:
             # Use PIL's median filter for basic noise reduction
             # For AI-powered denoising, integrate Real-ESRGAN or similar
             from PIL import ImageFilter
+
             logger.info("Applying basic denoising (median filter)")
             enhanced = enhanced.filter(ImageFilter.MedianFilter(size=3))
 
         # Sharpen
         if request.sharpen:
             from PIL import ImageFilter
+
             enhanced = enhanced.filter(ImageFilter.SHARPEN)
 
         # Color correction
         if request.color_correction:
             from PIL import ImageEnhance
+
             enhancer = ImageEnhance.Color(enhanced)
             enhanced = enhancer.enhance(1.2)
 
@@ -593,7 +589,7 @@ class AssetPreprocessingPipeline:
         This function is a placeholder and requires integration with external 3D reconstruction models (for example TripoSR, Wonder3D, or OpenLRM) to produce a mesh and export it to disk.
 
         Returns:
-            Tuple[Path, Dict[str, Any]]: Path to the generated OBJ file and a dictionary of mesh statistics (for example `vertex_count`, `face_count`, and other metadata).
+            Tuple[Path, dict[str, Any]]: Path to the generated OBJ file and a dictionary of mesh statistics (for example `vertex_count`, `face_count`, and other metadata).
 
         Raises:
             NotImplementedError: 3D model generation is not implemented and requires external model integration.
@@ -605,9 +601,7 @@ class AssetPreprocessingPipeline:
             "These are AI models that convert 2D images to 3D meshes."
         )
 
-    async def _extract_textures(
-        self, image: Image.Image, asset_id: str, request: ProcessingRequest
-    ) -> dict[str, str]:
+    async def _extract_textures(self, image: Image.Image, asset_id: str, request: ProcessingRequest) -> dict[str, str]:
         """
         Generate PBR texture maps for an asset and save them to the pipeline's textures directory.
 
@@ -619,7 +613,7 @@ class AssetPreprocessingPipeline:
             request (ProcessingRequest): Processing options that may affect texture extraction (e.g., requested texture sizes or PBR generation flags).
 
         Returns:
-            Dict[str, str]: Mapping of texture type to saved file path (e.g., {"albedo": "/path/to/asset_albedo.png"}). Only entries for actually generated textures are included.
+            dict[str, str]: Mapping of texture type to saved file path (e.g., {"albedo": "/path/to/asset_albedo.png"}). Only entries for actually generated textures are included.
         """
         texture_files = {}
 
@@ -651,9 +645,7 @@ class AssetPreprocessingPipeline:
 
         return texture_files
 
-    async def _generate_thumbnail(
-        self, image: Image.Image, asset_id: str, size: tuple[int, int] = (512, 512)
-    ) -> Path:
+    async def _generate_thumbnail(self, image: Image.Image, asset_id: str, size: tuple[int, int] = (512, 512)) -> Path:
         """
         Create and save a PNG thumbnail for an image using Lanczos resampling.
 
@@ -711,11 +703,12 @@ class AssetPreprocessingPipeline:
             return 0.0
 
         # Convert to grayscale
-        gray = image.convert('L')
+        gray = image.convert("L")
         gray_array = np.array(gray)
 
         # Calculate Laplacian variance
         from scipy import ndimage
+
         laplacian = ndimage.laplace(gray_array)
         variance = laplacian.var()
 
@@ -724,34 +717,31 @@ class AssetPreprocessingPipeline:
 
         return sharpness
 
-    async def batch_process(
-        self, requests: list[ProcessingRequest]
-    ) -> list[ProcessingResult]:
+    async def batch_process(self, requests: list[ProcessingRequest]) -> list[ProcessingResult]:
         """
         Process a batch of processing requests concurrently.
 
         Parameters:
-            requests (List[ProcessingRequest]): List of processing requests to run.
+            requests (list[ProcessingRequest]): List of processing requests to run.
 
         Returns:
-            List[ProcessingResult]: A list of results corresponding to the input requests. If an individual request raises an exception, its entry will be a failed ProcessingResult with `error` set to the exception message.
+            list[ProcessingResult]: A list of results corresponding to the input requests. If an individual request raises an exception, its entry will be a failed ProcessingResult with `error` set to the exception message.
         """
         logger.info(f"🎨 Batch processing {len(requests)} assets")
 
-        results = await asyncio.gather(
-            *[self.process_asset(req) for req in requests],
-            return_exceptions=True
-        )
+        results = await asyncio.gather(*[self.process_asset(req) for req in requests], return_exceptions=True)
 
         processed_results = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                processed_results.append(ProcessingResult(
-                    request_id=requests[i].request_id,
-                    asset_id="error",
-                    success=False,
-                    error=str(result),
-                ))
+                processed_results.append(
+                    ProcessingResult(
+                        request_id=requests[i].request_id,
+                        asset_id="error",
+                        success=False,
+                        error=str(result),
+                    )
+                )
             else:
                 processed_results.append(result)
 
@@ -760,7 +750,7 @@ class AssetPreprocessingPipeline:
 
         return processed_results
 
-    def get_asset(self, asset_id: str) -> Optional[AssetMetadata]:
+    def get_asset(self, asset_id: str) -> AssetMetadata | None:
         """
         Retrieve metadata for a stored asset.
 
@@ -774,7 +764,7 @@ class AssetPreprocessingPipeline:
         Return the current pipeline status including performance metrics, storage paths, asset counts, and supported formats.
 
         Returns:
-            status (Dict[str, Any]): Dictionary with keys:
+            status (dict[str, Any]): Dictionary with keys:
                 - pipeline_name (str): Pipeline name.
                 - version (str): Pipeline version.
                 - performance (dict): Contains `assets_processed` (int), `total_processing_time` (float), and `avg_processing_time` (float).
@@ -789,8 +779,7 @@ class AssetPreprocessingPipeline:
                 "assets_processed": self.assets_processed,
                 "total_processing_time": self.total_processing_time,
                 "avg_processing_time": (
-                    self.total_processing_time / self.assets_processed
-                    if self.assets_processed > 0 else 0.0
+                    self.total_processing_time / self.assets_processed if self.assets_processed > 0 else 0.0
                 ),
             },
             "storage": {

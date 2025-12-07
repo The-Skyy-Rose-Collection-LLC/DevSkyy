@@ -1,0 +1,497 @@
+  #!/usr/bin/env python3
+> """
+> DevSkyy RAG API Endpoints
+> Provides HTTP API for Retrieval-Augmented Generation functionality
+  
+> Per Truth Protocol:
+> - Rule #1: Never guess - All operations type-checked and validated
+> - Rule #5: No secrets in code - API keys via headers
+> - Rule #6: RBAC roles - Endpoint authorization
+> - Rule #7: Input validation - Pydantic schema enforcement
+> - Rule #13: Security baseline - JWT authentication required
+  
+> Author: DevSkyy Platform Team
+> Version: 1.0.0
+> Python: 3.11+
+> """
+  
+! from datetime import datetime
+! import logging
+! from pathlib import Path
+! import tempfile
+! from typing import Any, Optional
+  
+! from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+! from fastapi.responses import JSONResponse
+! from pydantic import BaseModel, Field, validator
+  
+! from security.jwt_auth import get_current_user_with_role
+! from services.rag_service import get_rag_service
+  
+  
+! logger = logging.getLogger(__name__)
+  
+  # =============================================================================
+  # ROUTER
+  # =============================================================================
+  
+! router = APIRouter()
+  
+  
+  # =============================================================================
+  # REQUEST/RESPONSE MODELS
+  # =============================================================================
+  
+  
+! class IngestTextRequest(BaseModel):
+!     """Request model for text ingestion"""
+  
+!     text: str = Field(..., description="Text content to ingest", min_length=10)
+!     source: str = Field(default="api_input", description="Source identifier")
+!     metadata: Optional[dict[str, Any]] = Field(
+!         default=None,
+!         description="Additional metadata",
+!     )
+  
+!     @validator("text")
+!     def validate_text(cls, v: str) -> str:
+!         """Validate text content"""
+!         if not v.strip():
+!             raise ValueError("Text content cannot be empty")
+!         if len(v) > 1_000_000:  # 1MB text limit
+!             raise ValueError("Text content too large (max 1MB)")
+!         return v
+  
+  
+! class SearchRequest(BaseModel):
+!     """Request model for semantic search"""
+  
+!     query: str = Field(..., description="Search query", min_length=1)
+!     top_k: int = Field(default=5, description="Number of results", ge=1, le=20)
+!     filters: Optional[dict[str, Any]] = Field(
+!         default=None,
+!         description="Metadata filters",
+!     )
+!     min_similarity: float = Field(
+!         default=0.7,
+!         description="Minimum similarity threshold",
+!         ge=0.0,
+!         le=1.0,
+!     )
+  
+  
+! class QueryRequest(BaseModel):
+!     """Request model for RAG query"""
+  
+!     question: str = Field(..., description="Question to answer", min_length=1)
+!     top_k: int = Field(default=5, description="Number of context chunks", ge=1, le=20)
+!     model: str = Field(
+!         default="claude-sonnet-4-5-20250929",
+!         description="LLM model to use",
+!     )
+!     system_prompt: Optional[str] = Field(
+!         default=None,
+!         description="Custom system prompt",
+!     )
+  
+  
+! class IngestResponse(BaseModel):
+!     """Response model for document ingestion"""
+  
+!     success: bool = Field(..., description="Ingestion success")
+!     total_documents: int = Field(..., description="Total documents in collection")
+!     added: int = Field(..., description="Documents added in this operation")
+!     chunks_created: int = Field(..., description="Number of chunks created")
+!     file_path: Optional[str] = Field(None, description="Source file path")
+!     source: Optional[str] = Field(None, description="Source identifier")
+!     ingested_at: str = Field(..., description="Ingestion timestamp")
+  
+  
+! class SearchResult(BaseModel):
+!     """Individual search result"""
+  
+!     content: str = Field(..., description="Document content")
+!     metadata: dict[str, Any] = Field(..., description="Document metadata")
+!     similarity: float = Field(..., description="Similarity score")
+!     distance: float = Field(..., description="Vector distance")
+  
+  
+! class SearchResponse(BaseModel):
+!     """Response model for semantic search"""
+  
+!     results: list[SearchResult] = Field(..., description="Search results")
+!     count: int = Field(..., description="Number of results")
+!     query: str = Field(..., description="Original query")
+  
+  
+! class QueryResponse(BaseModel):
+!     """Response model for RAG query"""
+  
+!     answer: str = Field(..., description="Generated answer")
+!     sources: list[SearchResult] = Field(..., description="Source documents")
+!     context_used: int = Field(..., description="Number of context chunks used")
+!     model: Optional[str] = Field(None, description="LLM model used")
+!     tokens_used: Optional[dict[str, int]] = Field(None, description="Token usage")
+  
+  
+! class StatsResponse(BaseModel):
+!     """Response model for RAG statistics"""
+  
+!     vector_db: dict[str, Any] = Field(..., description="Vector database stats")
+!     config: dict[str, Any] = Field(..., description="RAG configuration")
+  
+  
+  # =============================================================================
+  # ENDPOINTS
+  # =============================================================================
+  
+  
+! @router.post(
+!     "/rag/ingest/text",
+!     response_model=IngestResponse,
+!     status_code=status.HTTP_201_CREATED,
+!     summary="Ingest text content",
+!     description="Ingest text content into the RAG knowledge base",
+! )
+! async def ingest_text(
+!     request: IngestTextRequest,
+!     current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])),
+! ):
+!     """
+!     Ingest text content into RAG system
+  
+!     Requires: SuperAdmin, Admin, or Developer role
+  
+!     **Process:**
+!     1. Validate text content
+!     2. Chunk text into smaller segments
+!     3. Generate embeddings
+!     4. Store in vector database
+  
+!     **Returns:**
+!     - Ingestion statistics
+!     - Chunk count
+!     - Timestamp
+!     """
+!     try:
+!         rag_service = get_rag_service()
+  
+!         stats = await rag_service.ingest_text(
+!             text=request.text,
+!             source=request.source,
+!             metadata=request.metadata,
+!         )
+  
+!         return IngestResponse(
+!             success=True,
+!             **stats,
+!         )
+  
+!     except Exception as e:
+!         logger.error(f"Error ingesting text: {e}")
+!         raise HTTPException(
+!             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+!             detail=f"Failed to ingest text: {e!s}",
+!         )
+  
+  
+! @router.post(
+!     "/rag/ingest/file",
+!     response_model=IngestResponse,
+!     status_code=status.HTTP_201_CREATED,
+!     summary="Ingest document file",
+!     description="Ingest a document file (PDF, TXT, etc.) into the RAG knowledge base",
+! )
+! async def ingest_file(
+!     file: UploadFile = File(..., description="Document file to ingest"),
+!     current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])),
+! ):
+!     """
+!     Ingest a document file into RAG system
+  
+!     Requires: SuperAdmin, Admin, or Developer role
+  
+!     **Supported formats:**
+!     - PDF (.pdf)
+!     - Text (.txt, .md)
+  
+!     **Process:**
+!     1. Upload file
+!     2. Extract text content
+!     3. Chunk document
+!     4. Generate embeddings
+!     5. Store in vector database
+  
+!     **Returns:**
+!     - Ingestion statistics
+!     - Chunk count
+!     - Timestamp
+!     """
+!     try:
+          # Validate file type
+!         allowed_extensions = {".pdf", ".txt", ".md"}
+!         file_ext = Path(file.filename).suffix.lower()
+  
+!         if file_ext not in allowed_extensions:
+!             raise HTTPException(
+!                 status_code=status.HTTP_400_BAD_REQUEST,
+!                 detail=f"Unsupported file type: {file_ext}. Allowed: {allowed_extensions}",
+!             )
+  
+          # Save uploaded file to temporary location
+!         with tempfile.NamedTemporaryFile(
+!             delete=False,
+!             suffix=file_ext,
+!         ) as temp_file:
+!             content = await file.read()
+!             temp_file.write(content)
+!             temp_path = temp_file.name
+  
+!         try:
+              # Ingest document
+!             rag_service = get_rag_service()
+!             stats = await rag_service.ingest_document(
+!                 file_path=temp_path,
+!                 file_type=file_ext.lstrip("."),
+!             )
+  
+!             return IngestResponse(
+!                 success=True,
+!                 **stats,
+!             )
+  
+!         finally:
+              # Clean up temporary file
+!             Path(temp_path).unlink(missing_ok=True)
+  
+!     except HTTPException:
+!         raise
+!     except Exception as e:
+!         logger.error(f"Error ingesting file: {e}")
+!         raise HTTPException(
+!             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+!             detail=f"Failed to ingest file: {e!s}",
+!         )
+  
+  
+! @router.post(
+!     "/rag/search",
+!     response_model=SearchResponse,
+!     summary="Semantic search",
+!     description="Perform semantic search in the RAG knowledge base",
+! )
+! async def search(
+!     request: SearchRequest,
+!     current_user: dict[str, Any] = Depends(
+!         get_current_user_with_role(["SuperAdmin", "Admin", "Developer", "APIUser"])
+!     ),
+! ):
+!     """
+!     Semantic search in RAG knowledge base
+  
+!     Requires: SuperAdmin, Admin, Developer, or APIUser role
+  
+!     **Process:**
+!     1. Generate query embedding
+!     2. Search vector database
+!     3. Return top-k most similar documents
+  
+!     **Returns:**
+!     - Ranked search results
+!     - Similarity scores
+!     - Source metadata
+!     """
+!     try:
+!         rag_service = get_rag_service()
+  
+!         results = await rag_service.search(
+!             query=request.query,
+!             top_k=request.top_k,
+!             filters=request.filters,
+!             min_similarity=request.min_similarity,
+!         )
+  
+!         return SearchResponse(
+!             results=[SearchResult(**r) for r in results],
+!             count=len(results),
+!             query=request.query,
+!         )
+  
+!     except Exception as e:
+!         logger.error(f"Error searching: {e}")
+!         raise HTTPException(
+!             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+!             detail=f"Search failed: {e!s}",
+!         )
+  
+  
+! @router.post(
+!     "/rag/query",
+!     response_model=QueryResponse,
+!     summary="RAG query",
+!     description="Ask a question and get an AI-generated answer with sources",
+! )
+! async def query(
+!     request: QueryRequest,
+!     current_user: dict[str, Any] = Depends(
+!         get_current_user_with_role(["SuperAdmin", "Admin", "Developer", "APIUser"])
+!     ),
+! ):
+!     """
+!     RAG query - Retrieve context and generate answer
+  
+!     Requires: SuperAdmin, Admin, Developer, or APIUser role
+  
+!     **Process:**
+!     1. Retrieve relevant context from knowledge base
+!     2. Build prompt with context
+!     3. Generate answer with Claude
+!     4. Return answer with sources
+  
+!     **Returns:**
+!     - AI-generated answer
+!     - Source documents
+!     - Token usage
+!     """
+!     try:
+!         rag_service = get_rag_service()
+  
+!         result = await rag_service.query(
+!             question=request.question,
+!             top_k=request.top_k,
+!             model=request.model,
+!             system_prompt=request.system_prompt,
+!         )
+  
+!         return QueryResponse(
+!             answer=result["answer"],
+!             sources=[SearchResult(**s) for s in result["sources"]],
+!             context_used=result["context_used"],
+!             model=result.get("model"),
+!             tokens_used=result.get("tokens_used"),
+!         )
+  
+!     except Exception as e:
+!         logger.error(f"Error processing query: {e}")
+!         raise HTTPException(
+!             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+!             detail=f"Query failed: {e!s}",
+!         )
+  
+  
+! @router.get(
+!     "/rag/stats",
+!     response_model=StatsResponse,
+!     summary="RAG statistics",
+!     description="Get RAG system statistics and configuration",
+! )
+! async def get_stats(
+!     current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])),
+! ):
+!     """
+!     Get RAG system statistics
+  
+!     Requires: SuperAdmin, Admin, or Developer role
+  
+!     **Returns:**
+!     - Vector database stats
+!     - Configuration
+!     - Document count
+!     """
+!     try:
+!         rag_service = get_rag_service()
+!         stats = rag_service.get_stats()
+  
+!         return StatsResponse(**stats)
+  
+!     except Exception as e:
+!         logger.error(f"Error getting stats: {e}")
+!         raise HTTPException(
+!             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+!             detail=f"Failed to get stats: {e!s}",
+!         )
+  
+  
+! @router.delete(
+!     "/rag/reset",
+!     summary="Reset RAG database",
+!     description="Delete all documents from the RAG knowledge base",
+! )
+! async def reset_database(
+!     current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin"])),
+! ):
+!     """
+!     Reset RAG database (delete all documents)
+  
+!     Requires: SuperAdmin role only
+  
+!     **WARNING:** This action is irreversible!
+  
+!     **Returns:**
+!     - Success message
+!     """
+!     try:
+!         rag_service = get_rag_service()
+!         rag_service.vector_db.delete_collection()
+  
+          # Reinitialize collection
+!         from services.rag_service import VectorDatabase
+  
+!         rag_service.vector_db = VectorDatabase()
+  
+!         return JSONResponse(
+!             content={
+!                 "success": True,
+!                 "message": "RAG database reset successfully",
+!                 "timestamp": datetime.utcnow().isoformat(),
+!             }
+!         )
+  
+!     except Exception as e:
+!         logger.error(f"Error resetting database: {e}")
+!         raise HTTPException(
+!             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+!             detail=f"Failed to reset database: {e!s}",
+!         )
+  
+  
+! @router.get(
+!     "/rag/health",
+!     summary="RAG health check",
+!     description="Check RAG system health",
+! )
+! async def health_check():
+!     """
+!     RAG system health check
+  
+!     **Returns:**
+!     - System status
+!     - Configuration
+!     - Document count
+!     """
+!     try:
+!         rag_service = get_rag_service()
+!         stats = rag_service.get_stats()
+  
+!         return JSONResponse(
+!             content={
+!                 "status": "healthy",
+!                 "service": "rag",
+!                 "version": "1.0.0",
+!                 "document_count": stats["vector_db"]["document_count"],
+!                 "embedding_model": stats["vector_db"]["embedding_model"],
+!                 "timestamp": datetime.utcnow().isoformat(),
+!             }
+!         )
+  
+!     except Exception as e:
+!         logger.error(f"RAG health check failed: {e}")
+!         return JSONResponse(
+!             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+!             content={
+!                 "status": "unhealthy",
+!                 "service": "rag",
+!                 "error": str(e),
+!                 "timestamp": datetime.utcnow().isoformat(),
+!             },
+!         )

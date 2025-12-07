@@ -79,9 +79,7 @@ class MarketingContentGenerationAgent:
             "luxury_lifestyle",
         ]
 
-    async def create_viral_social_campaign(
-        self, campaign_spec: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_viral_social_campaign(self, campaign_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Create a viral social media campaign with multi-platform content.
 
@@ -95,52 +93,36 @@ class MarketingContentGenerationAgent:
 
         try:
             campaign_type = campaign_spec.get("type", "product_launch")
-            platforms = campaign_spec.get(
-                "platforms", ["instagram", "tiktok", "twitter"]
-            )
+            platforms = campaign_spec.get("platforms", ["instagram", "tiktok", "twitter"])
             duration = campaign_spec.get("duration_days", 30)
 
             campaign_strategy = {
                 "campaign_id": f"viral_{campaign_type}_{int(datetime.now().timestamp())}",
                 "strategy": await self._develop_viral_strategy(campaign_spec),
-                "content_calendar": await self._create_content_calendar(
-                    platforms, duration
-                ),
+                "content_calendar": await self._create_content_calendar(platforms, duration),
                 "platform_content": {},
-                "influencer_strategy": await self._create_influencer_strategy(
-                    campaign_spec
-                ),
+                "influencer_strategy": await self._create_influencer_strategy(campaign_spec),
                 "hashtag_strategy": await self._create_hashtag_strategy(campaign_spec),
-                "engagement_tactics": await self._create_engagement_tactics(
-                    campaign_spec
-                ),
+                "engagement_tactics": await self._create_engagement_tactics(campaign_spec),
                 "success_metrics": await self._define_success_metrics(campaign_spec),
             }
 
             # Generate platform-specific content
             for platform in platforms:
-                campaign_strategy["platform_content"][platform] = (
-                    await self._generate_platform_content(
-                        platform, campaign_spec, duration
-                    )
+                campaign_strategy["platform_content"][platform] = await self._generate_platform_content(
+                    platform, campaign_spec, duration
                 )
 
             # Generate crisis management plan
-            campaign_strategy["crisis_management"] = (
-                await self._create_crisis_management_plan()
-            )
+            campaign_strategy["crisis_management"] = await self._create_crisis_management_plan()
 
             # Generate budget allocation
-            campaign_strategy["budget_allocation"] = (
-                await self._create_budget_allocation(campaign_spec)
-            )
+            campaign_strategy["budget_allocation"] = await self._create_budget_allocation(campaign_spec)
 
             return {
                 "status": "success",
                 "campaign": campaign_strategy,
-                "implementation_timeline": await self._create_implementation_timeline(
-                    duration
-                ),
+                "implementation_timeline": await self._create_implementation_timeline(duration),
                 "optimization_recommendations": await self._generate_optimization_recommendations(),
             }
 
@@ -148,9 +130,7 @@ class MarketingContentGenerationAgent:
             logger.error(f"Viral campaign creation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_luxury_email_sequence(
-        self, sequence_spec: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def generate_luxury_email_sequence(self, sequence_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Generate sophisticated email marketing sequences for luxury brand engagement.
 
@@ -171,51 +151,35 @@ class MarketingContentGenerationAgent:
                 "sequence_id": f"luxury_{sequence_type}_{int(datetime.now().timestamp())}",
                 "sequence_strategy": await self._develop_email_strategy(sequence_spec),
                 "emails": [],
-                "automation_triggers": await self._create_automation_triggers(
-                    sequence_spec
-                ),
-                "personalization_rules": await self._create_personalization_rules(
-                    sequence_spec
-                ),
-                "a_b_test_variations": await self._create_ab_test_variations(
-                    sequence_spec
-                ),
+                "automation_triggers": await self._create_automation_triggers(sequence_spec),
+                "personalization_rules": await self._create_personalization_rules(sequence_spec),
+                "a_b_test_variations": await self._create_ab_test_variations(sequence_spec),
                 "performance_tracking": await self._setup_email_tracking(sequence_spec),
             }
 
             # Generate individual emails
             for i in range(email_count):
-                email_data = await self._generate_luxury_email(
-                    sequence_type, i + 1, email_count, customer_segment
-                )
+                email_data = await self._generate_luxury_email(sequence_type, i + 1, email_count, customer_segment)
                 email_sequence["emails"].append(email_data)
 
             # Generate follow-up strategies
-            email_sequence["follow_up_strategies"] = (
-                await self._create_follow_up_strategies(sequence_spec)
-            )
+            email_sequence["follow_up_strategies"] = await self._create_follow_up_strategies(sequence_spec)
 
             # Generate conversion optimization
-            email_sequence["conversion_optimization"] = (
-                await self._create_conversion_optimization(sequence_spec)
-            )
+            email_sequence["conversion_optimization"] = await self._create_conversion_optimization(sequence_spec)
 
             return {
                 "status": "success",
                 "email_sequence": email_sequence,
                 "implementation_guide": await self._create_email_implementation_guide(),
-                "expected_performance": await self._estimate_email_performance(
-                    sequence_spec
-                ),
+                "expected_performance": await self._estimate_email_performance(sequence_spec),
             }
 
         except Exception as e:
             logger.error(f"Email sequence generation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
-    async def create_influencer_campaign(
-        self, campaign_spec: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_influencer_campaign(self, campaign_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Create comprehensive influencer marketing campaign strategy.
 
@@ -234,45 +198,29 @@ class MarketingContentGenerationAgent:
 
             influencer_campaign = {
                 "campaign_id": f"influencer_{campaign_objective}_{int(datetime.now().timestamp())}",
-                "strategy_overview": await self._develop_influencer_strategy(
-                    campaign_spec
-                ),
+                "strategy_overview": await self._develop_influencer_strategy(campaign_spec),
                 "influencer_tiers": await self._define_influencer_tiers(budget_range),
-                "content_guidelines": await self._create_content_guidelines(
-                    campaign_spec
-                ),
-                "collaboration_terms": await self._create_collaboration_terms(
-                    campaign_spec
-                ),
+                "content_guidelines": await self._create_content_guidelines(campaign_spec),
+                "collaboration_terms": await self._create_collaboration_terms(campaign_spec),
                 "performance_kpis": await self._define_influencer_kpis(campaign_spec),
-                "content_calendar": await self._create_influencer_content_calendar(
-                    campaign_spec
-                ),
+                "content_calendar": await self._create_influencer_content_calendar(campaign_spec),
                 "approval_workflow": await self._create_approval_workflow(),
                 "legal_considerations": await self._create_legal_guidelines(),
             }
 
             # Generate influencer outreach templates
-            influencer_campaign["outreach_templates"] = (
-                await self._create_outreach_templates(campaign_spec)
-            )
+            influencer_campaign["outreach_templates"] = await self._create_outreach_templates(campaign_spec)
 
             # Generate content briefs
-            influencer_campaign["content_briefs"] = await self._create_content_briefs(
-                campaign_spec
-            )
+            influencer_campaign["content_briefs"] = await self._create_content_briefs(campaign_spec)
 
             # Generate tracking and reporting
-            influencer_campaign["tracking_setup"] = (
-                await self._setup_influencer_tracking(campaign_spec)
-            )
+            influencer_campaign["tracking_setup"] = await self._setup_influencer_tracking(campaign_spec)
 
             return {
                 "status": "success",
                 "influencer_campaign": influencer_campaign,
-                "recommended_influencers": await self._recommend_influencers(
-                    campaign_spec
-                ),
+                "recommended_influencers": await self._recommend_influencers(campaign_spec),
                 "budget_breakdown": await self._create_budget_breakdown(campaign_spec),
             }
 
@@ -280,9 +228,7 @@ class MarketingContentGenerationAgent:
             logger.error(f"Influencer campaign creation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_seo_content_strategy(
-        self, content_spec: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def generate_seo_content_strategy(self, content_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Generate SEO-optimized content strategy for luxury brand visibility.
 
@@ -303,30 +249,20 @@ class MarketingContentGenerationAgent:
                 "strategy_id": f"seo_{content_type}_{int(datetime.now().timestamp())}",
                 "keyword_strategy": await self._develop_keyword_strategy(content_spec),
                 "content_pillars": await self._create_content_pillars(content_spec),
-                "editorial_calendar": await self._create_editorial_calendar(
-                    content_volume
-                ),
-                "content_templates": await self._create_seo_content_templates(
-                    content_spec
-                ),
+                "editorial_calendar": await self._create_editorial_calendar(content_volume),
+                "content_templates": await self._create_seo_content_templates(content_spec),
                 "internal_linking": await self._create_linking_strategy(content_spec),
                 "performance_tracking": await self._setup_seo_tracking(content_spec),
             }
 
             # Generate content ideas
-            seo_strategy["content_ideas"] = await self._generate_content_ideas(
-                content_spec, content_volume * 3
-            )
+            seo_strategy["content_ideas"] = await self._generate_content_ideas(content_spec, content_volume * 3)
 
             # Generate optimization guidelines
-            seo_strategy["optimization_guidelines"] = (
-                await self._create_optimization_guidelines()
-            )
+            seo_strategy["optimization_guidelines"] = await self._create_optimization_guidelines()
 
             # Generate technical SEO recommendations
-            seo_strategy["technical_seo"] = (
-                await self._create_technical_seo_recommendations()
-            )
+            seo_strategy["technical_seo"] = await self._create_technical_seo_recommendations()
 
             return {
                 "status": "success",
@@ -339,9 +275,7 @@ class MarketingContentGenerationAgent:
             logger.error(f"SEO content strategy generation failed: {e!s}")
             return {"status": "error", "error": str(e)}
 
-    async def create_product_launch_campaign(
-        self, launch_spec: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_product_launch_campaign(self, launch_spec: dict[str, Any]) -> dict[str, Any]:
         """
         Create comprehensive product launch campaign across all channels.
 
@@ -355,30 +289,16 @@ class MarketingContentGenerationAgent:
 
         try:
             product_name = launch_spec.get("product_name", "New Collection")
-            launch_date = launch_spec.get(
-                "launch_date", datetime.now() + timedelta(days=30)
-            )
-            channels = launch_spec.get(
-                "channels", ["social", "email", "pr", "advertising"]
-            )
+            launch_date = launch_spec.get("launch_date", datetime.now() + timedelta(days=30))
+            channels = launch_spec.get("channels", ["social", "email", "pr", "advertising"])
 
             launch_campaign = {
                 "campaign_id": f"launch_{product_name.lower().replace(' ', '_')}_{int(datetime.now().timestamp())}",
                 "product_name": product_name,
-                "launch_date": (
-                    launch_date.isoformat()
-                    if hasattr(launch_date, "isoformat")
-                    else str(launch_date)
-                ),
-                "pre_launch_strategy": await self._create_pre_launch_strategy(
-                    launch_spec
-                ),
-                "launch_day_strategy": await self._create_launch_day_strategy(
-                    launch_spec
-                ),
-                "post_launch_strategy": await self._create_post_launch_strategy(
-                    launch_spec
-                ),
+                "launch_date": (launch_date.isoformat() if hasattr(launch_date, "isoformat") else str(launch_date)),
+                "pre_launch_strategy": await self._create_pre_launch_strategy(launch_spec),
+                "launch_day_strategy": await self._create_launch_day_strategy(launch_spec),
+                "post_launch_strategy": await self._create_post_launch_strategy(launch_spec),
                 "channel_strategies": {},
                 "timeline": await self._create_launch_timeline(launch_spec),
                 "crisis_management": await self._create_launch_crisis_plan(),
@@ -387,14 +307,12 @@ class MarketingContentGenerationAgent:
 
             # Generate channel-specific strategies
             for channel in channels:
-                launch_campaign["channel_strategies"][channel] = (
-                    await self._create_channel_strategy(channel, launch_spec)
+                launch_campaign["channel_strategies"][channel] = await self._create_channel_strategy(
+                    channel, launch_spec
                 )
 
             # Generate content assets
-            launch_campaign["content_assets"] = (
-                await self._create_launch_content_assets(launch_spec)
-            )
+            launch_campaign["content_assets"] = await self._create_launch_content_assets(launch_spec)
 
             # Generate media kit
             launch_campaign["media_kit"] = await self._create_media_kit(launch_spec)
@@ -403,9 +321,7 @@ class MarketingContentGenerationAgent:
                 "status": "success",
                 "launch_campaign": launch_campaign,
                 "execution_checklist": await self._create_launch_checklist(launch_spec),
-                "roi_projections": await self._calculate_launch_roi_projections(
-                    launch_spec
-                ),
+                "roi_projections": await self._calculate_launch_roi_projections(launch_spec),
             }
 
         except Exception as e:
@@ -504,9 +420,7 @@ Visual Requirements: {visual_requirements}
 
     # Implementation methods (condensed for brevity)
 
-    async def _develop_viral_strategy(
-        self, campaign_spec: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _develop_viral_strategy(self, campaign_spec: dict[str, Any]) -> dict[str, Any]:
         """Develop viral content strategy."""
         return {
             "core_message": f"Luxury meets innovation in the new {campaign_spec.get('product_name', 'collection')}",
@@ -530,9 +444,7 @@ Visual Requirements: {visual_requirements}
             ],
         }
 
-    async def _create_content_calendar(
-        self, platforms: list[str], duration: int
-    ) -> dict[str, Any]:
+    async def _create_content_calendar(self, platforms: list[str], duration: int) -> dict[str, Any]:
         """Create content calendar for campaign."""
         calendar = {}
         for i in range(duration):
@@ -571,9 +483,7 @@ Visual Requirements: {visual_requirements}
                 {
                     "day": i + 1,
                     "type": self._get_daily_content_type(platform, i),
-                    "content": self._generate_sample_content(
-                        platform, campaign_spec, i
-                    ),
+                    "content": self._generate_sample_content(platform, campaign_spec, i),
                     "optimal_timing": self._get_optimal_post_time(platform),
                 }
             )
@@ -596,9 +506,7 @@ Visual Requirements: {visual_requirements}
 
         return {
             "email_number": email_number,
-            "subject_line": email_subjects.get(sequence_type, ["Luxury Awaits"])[
-                email_number - 1
-            ],
+            "subject_line": email_subjects.get(sequence_type, ["Luxury Awaits"])[email_number - 1],
             "preview_text": "Discover what makes Skyy Rose exceptional...",
             "send_delay": f"{(email_number - 1) * 3} days after trigger",
             "content_structure": {
@@ -698,9 +606,7 @@ Visual Requirements: {visual_requirements}
 
         return tactics.get(platform, ["General engagement tactics"])
 
-    def _generate_sample_content(
-        self, platform: str, campaign_spec: dict[str, Any], day: int
-    ) -> str:
+    def _generate_sample_content(self, platform: str, campaign_spec: dict[str, Any], day: int) -> str:
         """Generate sample content for platform."""
         content_samples = {
             "instagram": f"Day {day + 1}: Luxury meets innovation in every detail ✨ #SkyyRose #LuxuryFashion",
@@ -708,9 +614,7 @@ Visual Requirements: {visual_requirements}
             "twitter": f"Day {day + 1}: Innovation in luxury fashion is about more than trends—it's about timeless excellence.",
         }
 
-        return content_samples.get(
-            platform, f"Day {day + 1}: Luxury content for {platform}"
-        )
+        return content_samples.get(platform, f"Day {day + 1}: Luxury content for {platform}")
 
 
 # Example usage

@@ -1,7 +1,7 @@
 from datetime import datetime
 import logging
 import re
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -34,12 +34,14 @@ router = APIRouter(prefix="/gdpr", tags=["gdpr-compliance"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class GDPRExportRequest(BaseModel):
     """GDPR data export request"""
 
     format: str = "json"  # json, csv, xml
     include_audit_logs: bool = True
     include_activity_history: bool = True
+
 
 class GDPRExportResponse(BaseModel):
     """GDPR data export response"""
@@ -51,12 +53,14 @@ class GDPRExportResponse(BaseModel):
     data: dict[str, Any]
     metadata: dict[str, Any]
 
+
 class GDPRDeleteRequest(BaseModel):
     """GDPR data deletion request"""
 
     confirmation_code: str  # Require explicit confirmation
     delete_activity_logs: bool = True
     anonymize_instead_of_delete: bool = False  # For legal/audit retention
+
 
 class GDPRDeleteResponse(BaseModel):
     """GDPR data deletion response"""
@@ -67,7 +71,8 @@ class GDPRDeleteResponse(BaseModel):
     deletion_timestamp: datetime
     status: str
     deleted_records: dict[str, int]
-    retained_records: Optional[dict[str, int]] = None  # For audit purposes
+    retained_records: dict[str, int] | None = None  # For audit purposes
+
 
 class DataRetentionPolicyResponse(BaseModel):
     """Data retention policy information"""
@@ -77,9 +82,11 @@ class DataRetentionPolicyResponse(BaseModel):
     retention_periods: dict[str, str]
     legal_basis: list[str]
 
+
 # ============================================================================
 # GDPR DATA EXPORT (Article 15)
 # ============================================================================
+
 
 @router.get("/export", response_model=GDPRExportResponse)
 async def export_user_data(
@@ -109,9 +116,7 @@ async def export_user_data(
         # Get user details
         user = user_manager.get_user_by_email(current_user.email)
         if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         # Collect all user data
         user_data = {
@@ -126,9 +131,7 @@ async def export_user_data(
                 "permissions": user.permissions,
             },
             "account_data": {
-                "registration_date": (
-                    user.created_at.isoformat() if user.created_at else None
-                ),
+                "registration_date": (user.created_at.isoformat() if user.created_at else None),
                 "account_status": "active" if user.is_active else "inactive",
             },
         }
@@ -140,9 +143,7 @@ async def export_user_data(
                 "api_calls": [],
                 "data_access_logs": [],
             }
-            logger.info(
-                "   ✓ Including audit logs in export"
-            )
+            logger.info("   ✓ Including audit logs in export")
 
         # Include activity history if requested
         if request.include_activity_history:
@@ -151,9 +152,7 @@ async def export_user_data(
                 "webhook_subscriptions": [],
                 "api_usage_statistics": {},
             }
-            logger.info(
-                "   ✓ Including activity history in export"
-            )
+            logger.info("   ✓ Including activity history in export")
 
         # Generate export metadata
 
@@ -181,15 +180,19 @@ async def export_user_data(
         )
 
     except Exception as e:
-        logger.error(f"❌ GDPR export failed for user {sanitize_user_identifier(current_user.email)}: {sanitize_for_log(str(e))}")
+        logger.error(
+            f"❌ GDPR export failed for user {sanitize_user_identifier(current_user.email)}: {sanitize_for_log(str(e))}"
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to export user data",
         )
 
+
 # ============================================================================
 # GDPR DATA DELETION (Article 17)
 # ============================================================================
+
 
 @router.delete("/delete", response_model=GDPRDeleteResponse)
 async def delete_user_data(
@@ -227,9 +230,7 @@ async def delete_user_data(
         # Get user details before deletion
         user = user_manager.get_user_by_email(current_user.email)
         if not user:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
-            )
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
         request_id = str(uuid.uuid4())
         deletion_timestamp = datetime.now()
@@ -239,9 +240,7 @@ async def delete_user_data(
 
         if request.anonymize_instead_of_delete:
             # Anonymization approach - retain data for legal/audit purposes
-            logger.info(
-                "   → Anonymizing user data instead of deletion"
-            )
+            logger.info("   → Anonymizing user data instead of deletion")
 
             # Anonymize personal information
             anonymized_user_data = {
@@ -276,17 +275,13 @@ async def delete_user_data(
 
             # Note: In production, this would actually delete records from the database
             # For now, we're documenting what would be deleted
-            logger.warning(
-                f"   ⚠️  User account marked for deletion: {current_user.email}"
-            )
+            logger.warning(f"   ⚠️  User account marked for deletion: {current_user.email}")
 
         logger.info("   ✓ Data deletion/anonymization completed")
         logger.info(f"   ✓ Request ID: {request_id}")
         logger.info(f"   ✓ Records deleted: {sum(deleted_records.values())}")
         if retained_records:
-            logger.info(
-                f"   ℹ️  Records retained for legal compliance: {sum(retained_records.values())}"
-            )
+            logger.info(f"   ℹ️  Records retained for legal compliance: {sum(retained_records.values())}")
 
         return GDPRDeleteResponse(
             request_id=request_id,
@@ -305,9 +300,11 @@ async def delete_user_data(
             detail="Failed to delete user data",
         )
 
+
 # ============================================================================
 # DATA RETENTION POLICY
 # ============================================================================
+
 
 @router.get("/retention-policy", response_model=DataRetentionPolicyResponse)
 async def get_retention_policy():
@@ -338,9 +335,11 @@ async def get_retention_policy():
         ],
     )
 
+
 # ============================================================================
 # ADMIN: DATA SUBJECT REQUESTS
 # ============================================================================
+
 
 @router.get("/requests", dependencies=[Depends(require_admin)])
 async def list_data_subject_requests(
@@ -376,14 +375,15 @@ async def list_data_subject_requests(
             detail="Failed to retrieve data subject requests",
         )
 
+
 def _sanitize_log_input(self, user_input):
     """Sanitize user input for safe logging."""
     if not isinstance(user_input, str):
         user_input = str(user_input)
 
     # Remove control characters and potential log injection
-    sanitized = re.sub(r'[\r\n\t]', ' ', user_input)
-    sanitized = re.sub(r'[\x00-\x1f\x7f-\x9f]', '', sanitized)
+    sanitized = re.sub(r"[\r\n\t]", " ", user_input)
+    sanitized = re.sub(r"[\x00-\x1f\x7f-\x9f]", "", sanitized)
 
     # Limit length to prevent log flooding
     return sanitized[:500] + "..." if len(sanitized) > 500 else sanitized

@@ -4,18 +4,30 @@
       "command": "npx",
       "args": ["-y", "@instawp/mcp-wp"],
       "env": {
-        "WORDPRESS_API_URL": "https://skyyrose.co",
-        "WORDPRESS_USERNAME": "skyyroseco",
-        "WORDPRESS_PASSWORD": "0xnUAno1cDs8kli4Iy4cvP2M"
+        "WORDPRESS_API_URL": "${WORDPRESS_API_URL}",
+        "WORDPRESS_USERNAME": "${WORDPRESS_USERNAME}",
+        "WORDPRESS_PASSWORD": "${WORDPRESS_PASSWORD}"
       }
     },
     "wordpress-files": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/coreyfoster/DevSkyy/wordpress-plugin"]
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "${WORDPRESS_PLUGIN_PATH}"]
     },
     "fetch": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-fetch"]
+    },
+    "devskyy-optimization": {
+      "command": "python",
+      "args": ["-m", "devskyy_mcp.optimization_server"],
+      "env": {
+        "REDIS_HOST": "${REDIS_HOST:-localhost}",
+        "REDIS_PORT": "${REDIS_PORT:-6379}"
+      }
+    },
+    "critical-fuchsia-ape": {
+      "transport": "http",
+      "url": "https://critical-fuchsia-ape.fastmcp.app/mcp"
     }
   }
 }

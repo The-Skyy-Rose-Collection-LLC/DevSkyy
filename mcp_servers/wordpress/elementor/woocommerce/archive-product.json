@@ -1,0 +1,237 @@
+{
+  "title": "Shop Archive Template - SkyyRose",
+  "type": "wc-archive-product",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_header_footer",
+    "post_status": "publish"
+  },
+  "content": [
+    {
+      "id": "shop-hero",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "height": "min-height",
+        "custom_height": {"size": 40, "unit": "vh"},
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "0", "bottom": "0", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "content_position": "center",
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "shop-title",
+              "elType": "widget",
+              "widgetType": "woocommerce-archive-title",
+              "settings": {
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 52, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 4, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "shop-description",
+              "elType": "widget",
+              "widgetType": "woocommerce-archive-description",
+              "settings": {
+                "description_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shop-filters",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#F5F5F0",
+        "padding": {"top": "20", "bottom": "20", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "filters-left",
+          "elType": "column",
+          "settings": {"_column_size": 50},
+          "elements": [
+            {
+              "id": "result-count",
+              "elType": "widget",
+              "widgetType": "woocommerce-archive-products-result-count",
+              "settings": {
+                "text_color": "#4A4A4A",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"}
+              }
+            }
+          ]
+        },
+        {
+          "id": "filters-right",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "align": "flex-end"
+          },
+          "elements": [
+            {
+              "id": "catalog-ordering",
+              "elType": "widget",
+              "widgetType": "woocommerce-archive-products-ordering",
+              "settings": {
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shop-products",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#FFFFFF",
+        "padding": {"top": "40", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "sidebar-column",
+          "elType": "column",
+          "settings": {
+            "_column_size": 25,
+            "padding": {"right": "30", "unit": "px"}
+          },
+          "elements": [
+            {
+              "id": "filter-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "FILTER",
+                "header_size": "h4",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"}
+              }
+            },
+            {
+              "id": "category-filter",
+              "elType": "widget",
+              "widgetType": "woocommerce-categories",
+              "settings": {
+                "orderby": "name",
+                "show_product_count": "yes",
+                "hide_empty": "yes",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              }
+            },
+            {
+              "id": "price-filter",
+              "elType": "widget",
+              "widgetType": "woocommerce-price-filter",
+              "settings": {
+                "button_text_color": "#F5F5F0",
+                "button_background_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              }
+            },
+            {
+              "id": "attribute-filter-color",
+              "elType": "widget",
+              "widgetType": "woocommerce-attribute-filter",
+              "settings": {
+                "attribute": "pa_color",
+                "query_type": "or",
+                "display_type": "dropdown",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              }
+            },
+            {
+              "id": "attribute-filter-size",
+              "elType": "widget",
+              "widgetType": "woocommerce-attribute-filter",
+              "settings": {
+                "attribute": "pa_size",
+                "query_type": "or",
+                "display_type": "dropdown",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              }
+            }
+          ]
+        },
+        {
+          "id": "products-column",
+          "elType": "column",
+          "settings": {"_column_size": 75},
+          "elements": [
+            {
+              "id": "archive-products",
+              "elType": "widget",
+              "widgetType": "woocommerce-archive-products",
+              "settings": {
+                "columns": 3,
+                "rows": 4,
+                "paginate": "yes",
+                "show_result_count": "no",
+                "show_catalog_ordering": "no",
+                "products_class": "sr-product-card",
+                "image_hover_animation": "grow"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "template_type": "woocommerce-archive",
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "woocommerce_settings": {
+      "categories": ["Love Hurts", "Black Rose", "Signature"],
+      "attributes": ["Color", "Size"],
+      "image_sizes": {
+        "thumbnail": [300, 300]
+      }
+    },
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79",
+      "slate": "#4A4A4A"
+    },
+    "css_classes_used": ["sr-product-card", "sr-collection-header"]
+  }
+}

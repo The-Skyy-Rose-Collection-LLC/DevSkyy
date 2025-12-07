@@ -5,17 +5,17 @@ from typing import Any
 
 logger = logging.getLogger(__name__)
 
+
 class Telemetry:
     def __init__(self, component: str):
         self.component = component
 
     def event(self, name: str, **properties: Any) -> None:
-        logger.info(
-            f"telemetry:event component={self.component} name={name} props={properties}"
-        )
+        logger.info(f"telemetry:event component={self.component} name={name} props={properties}")
 
     def span(self, name: str):
         return _Span(self.component, name)
+
 
 class _Span:
     def __init__(self, component: str, name: str):

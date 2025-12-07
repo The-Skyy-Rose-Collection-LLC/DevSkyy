@@ -1,7 +1,7 @@
 from datetime import datetime
 import json
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic
 
@@ -13,6 +13,7 @@ Industry-leading automated WordPress/Elementor theme generation with ML
 
 logger = logging.getLogger(__name__)
 
+
 class ElementorThemeBuilder:
     """
     Advanced WordPress/Elementor theme builder with ML-powered design
@@ -20,6 +21,7 @@ class ElementorThemeBuilder:
     Features:
     - Automated theme generation from brand guidelines
     - Elementor widget creation and customization
+    - Elementor Pro features (18+ professional widgets and features)
     - Responsive design optimization (mobile, tablet, desktop)
     - Color palette generation using ML
     - Typography optimization
@@ -28,9 +30,17 @@ class ElementorThemeBuilder:
     - Performance optimization
     - SEO-optimized structure
     - WooCommerce integration for fashion brands
+
+    Elementor Pro Features:
+    - Pro Widgets: Posts, Portfolio, Form Builder, Slides, Animated Headlines,
+                   Price Tables, Countdown, Share Buttons, Lottie animations
+    - Pro Features: Theme Builder, Popup Builder, WooCommerce Builder,
+                    Loop Builder, Mega Menu, Global Widgets, Custom CSS/Fonts,
+                    Role Manager
+    - Advanced gallery options with pro lightbox and filters
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         self.anthropic = Anthropic(api_key=api_key) if api_key else None
         self.theme_templates = self._load_theme_templates()
         self.widget_library = self._initialize_widget_library()
@@ -75,7 +85,7 @@ class ElementorThemeBuilder:
         }
 
     def _initialize_widget_library(self) -> dict[str, dict]:
-        """Initialize Elementor widget configurations"""
+        """Initialize Elementor widget configurations including Elementor Pro features"""
         return {
             "hero": {
                 "type": "section",
@@ -96,11 +106,305 @@ class ElementorThemeBuilder:
                 "type": "masonry",
                 "widgets": ["image", "lightbox"],
                 "lazy_load": True,
+                # Elementor Pro gallery features
+                "pro_features": {
+                    "gallery_type": ["grid", "masonry", "justified"],
+                    "lightbox_type": "pro",
+                    "title_overlay": True,
+                    "caption_overlay": True,
+                    "link_type": ["lightbox", "media_file", "custom_url"],
+                    "filters": True,
+                    "image_ratio": "custom",
+                },
             },
             "cta": {
                 "type": "section",
                 "widgets": ["heading", "button", "form"],
                 "conversion_optimized": True,
+            },
+            # Elementor Pro Widgets
+            "posts": {
+                "type": "pro_widget",
+                "widget_type": "posts",
+                "query_options": {
+                    "post_type": ["post", "product", "page", "custom"],
+                    "query_type": ["recent", "manual", "related", "query_id"],
+                    "taxonomy": True,
+                    "advanced_filters": True,
+                },
+                "layout": {
+                    "skin": ["classic", "cards", "full_content"],
+                    "columns": {"desktop": 3, "tablet": 2, "mobile": 1},
+                    "masonry": True,
+                },
+                "pagination": {
+                    "type": ["numbers", "prev_next", "load_more", "infinite_scroll"],
+                    "ajax": True,
+                },
+            },
+            "portfolio": {
+                "type": "pro_widget",
+                "widget_type": "portfolio",
+                "features": {
+                    "filterable": True,
+                    "multiple_categories": True,
+                    "hover_effects": ["zoom", "slide", "fade"],
+                    "lightbox_gallery": True,
+                },
+                "layout": ["grid", "masonry", "metro"],
+            },
+            "form": {
+                "type": "pro_widget",
+                "widget_type": "form",
+                "features": {
+                    "multi_step": True,
+                    "conditional_logic": True,
+                    "file_upload": True,
+                    "calculated_fields": True,
+                    "payment_integration": ["stripe", "paypal"],
+                    "crm_integration": ["mailchimp", "activecampaign"],
+                },
+                "field_types": [
+                    "text",
+                    "email",
+                    "textarea",
+                    "number",
+                    "tel",
+                    "url",
+                    "select",
+                    "radio",
+                    "checkbox",
+                    "date",
+                    "time",
+                    "file_upload",
+                    "acceptance",
+                    "password",
+                    "html",
+                    "hidden",
+                ],
+                "validation": {
+                    "real_time": True,
+                    "custom_messages": True,
+                },
+            },
+            "slides": {
+                "type": "pro_widget",
+                "widget_type": "slides",
+                "features": {
+                    "ken_burns_effect": True,
+                    "multiple_slides": True,
+                    "autoplay": True,
+                    "infinite_loop": True,
+                    "transition_effects": ["slide", "fade", "cube", "coverflow"],
+                },
+                "content": {
+                    "heading": True,
+                    "description": True,
+                    "button": True,
+                    "background": ["image", "video", "gradient"],
+                },
+            },
+            "animated_headline": {
+                "type": "pro_widget",
+                "widget_type": "animated_headline",
+                "animation_types": [
+                    "rotating",
+                    "highlighted",
+                    "typing",
+                    "clip",
+                    "flip",
+                    "swirl",
+                    "blinds",
+                    "drop-in",
+                    "wave",
+                    "slide",
+                ],
+                "features": {
+                    "loop": True,
+                    "shape": ["circle", "curly", "underline", "double", "strikethrough"],
+                },
+            },
+            "price_table": {
+                "type": "pro_widget",
+                "widget_type": "price_table",
+                "features": {
+                    "ribbons": True,
+                    "feature_icons": True,
+                    "tooltip": True,
+                    "hover_animation": True,
+                },
+                "layout": ["vertical", "horizontal"],
+            },
+            "countdown": {
+                "type": "pro_widget",
+                "widget_type": "countdown",
+                "features": {
+                    "evergreen_timer": True,
+                    "actions_on_expire": ["hide", "message", "redirect"],
+                    "display_options": ["days", "hours", "minutes", "seconds"],
+                },
+            },
+            "share_buttons": {
+                "type": "pro_widget",
+                "widget_type": "share_buttons",
+                "platforms": [
+                    "facebook",
+                    "twitter",
+                    "linkedin",
+                    "pinterest",
+                    "reddit",
+                    "vk",
+                    "tumblr",
+                    "digg",
+                    "skype",
+                    "whatsapp",
+                    "telegram",
+                    "email",
+                    "print",
+                ],
+                "display": {
+                    "view": ["icon", "text", "icon_text"],
+                    "layout": ["floating", "inline"],
+                    "style": "custom",
+                },
+            },
+            "lottie": {
+                "type": "pro_widget",
+                "widget_type": "lottie",
+                "features": {
+                    "trigger": ["none", "viewport", "hover", "click", "scroll"],
+                    "reverse": True,
+                    "loop": True,
+                    "link_external_url": True,
+                },
+            },
+            "theme_builder": {
+                "type": "pro_feature",
+                "templates": {
+                    "header": {
+                        "type": "header",
+                        "conditions": ["entire_site", "singular", "archive"],
+                        "sticky": True,
+                        "transparent": True,
+                    },
+                    "footer": {
+                        "type": "footer",
+                        "conditions": ["entire_site", "singular", "archive"],
+                        "sticky": True,
+                    },
+                    "single": {
+                        "type": "single",
+                        "post_types": ["post", "page", "product", "custom_post_type"],
+                        "conditions": "advanced",
+                    },
+                    "archive": {
+                        "type": "archive",
+                        "archive_types": ["category", "tag", "author", "date", "search"],
+                        "conditions": "advanced",
+                    },
+                    "404": {
+                        "type": "error_404",
+                        "custom_design": True,
+                    },
+                },
+            },
+            "popup": {
+                "type": "pro_feature",
+                "widget_type": "popup",
+                "triggers": {
+                    "page_load": {"delay": True, "timing": "custom"},
+                    "exit_intent": True,
+                    "scroll": {"direction": ["up", "down"], "percentage": True},
+                    "scroll_to_element": True,
+                    "click": True,
+                    "after_inactivity": True,
+                },
+                "display_conditions": {
+                    "entire_site": True,
+                    "specific_pages": True,
+                    "exclude_pages": True,
+                    "user_status": ["logged_in", "logged_out"],
+                    "devices": ["desktop", "tablet", "mobile"],
+                },
+                "advanced": {
+                    "prevent_scroll": True,
+                    "avoid_multiple_popups": True,
+                    "close_button": True,
+                    "overlay": True,
+                },
+            },
+            "woocommerce": {
+                "type": "pro_feature",
+                "widgets": {
+                    "products": {
+                        "query": "advanced",
+                        "query_types": ["recent", "sale", "featured", "best_selling", "top_rated", "custom"],
+                        "pagination": ["numbers", "load_more", "infinite_scroll"],
+                    },
+                    "product_categories": {
+                        "layout": ["grid", "list"],
+                        "display": ["image", "name", "count"],
+                    },
+                    "breadcrumbs": {"separator_custom": True},
+                    "add_to_cart": {"custom_design": True, "ajax": True},
+                    "product_images": {
+                        "gallery_type": ["horizontal", "vertical", "grid"],
+                        "zoom": True,
+                        "lightbox": True,
+                    },
+                    "product_price": {"display_sale_badge": True},
+                    "product_meta": {"display_options": "custom"},
+                    "product_rating": {"custom_icons": True},
+                    "product_stock": {"custom_messages": True},
+                    "product_tabs": {"custom_tabs": True},
+                    "related_products": {"custom_query": True},
+                    "upsell": {"custom_display": True},
+                },
+            },
+            "loop_builder": {
+                "type": "pro_feature",
+                "features": {
+                    "dynamic_content": True,
+                    "custom_skin": True,
+                    "query_builder": "advanced",
+                    "template_library": True,
+                },
+                "widgets": ["loop_grid", "loop_carousel"],
+            },
+            "mega_menu": {
+                "type": "pro_feature",
+                "features": {
+                    "vertical_menu": True,
+                    "content_width": "custom",
+                    "positioning": "custom",
+                    "animations": True,
+                },
+            },
+            "global_widgets": {
+                "type": "pro_feature",
+                "features": {
+                    "save_as_global": True,
+                    "sync_across_pages": True,
+                    "unlink": True,
+                },
+            },
+            "custom_css": {
+                "type": "pro_feature",
+                "scope": ["widget", "section", "page"],
+                "preprocessor": "support",
+            },
+            "custom_fonts": {
+                "type": "pro_feature",
+                "formats": ["woff", "woff2", "ttf", "svg", "eot"],
+                "upload_limit": "unlimited",
+            },
+            "role_manager": {
+                "type": "pro_feature",
+                "capabilities": {
+                    "access_control": True,
+                    "custom_roles": True,
+                    "feature_restrictions": True,
+                },
             },
         }
 
@@ -108,7 +412,7 @@ class ElementorThemeBuilder:
         self,
         brand_info: dict[str, Any],
         theme_type: str = "luxury_fashion",
-        pages: Optional[list[str]] = None,
+        pages: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Generate complete WordPress/Elementor theme
@@ -122,9 +426,7 @@ class ElementorThemeBuilder:
             Complete theme configuration
         """
         try:
-            logger.info(
-                f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}"
-            )
+            logger.info(f"🎨 Generating {theme_type} theme for {brand_info.get('name', 'Brand')}")
 
             # Default pages for fashion ecommerce
             if pages is None:
@@ -149,9 +451,7 @@ class ElementorThemeBuilder:
                 page_layouts[page] = layout
 
             # Generate global settings
-            global_settings = await self._generate_global_settings(
-                brand_info, theme_type, colors, typography
-            )
+            global_settings = await self._generate_global_settings(brand_info, theme_type, colors, typography)
 
             # Create theme package
             theme = {
@@ -168,9 +468,7 @@ class ElementorThemeBuilder:
                 "typography": typography,
                 "pages": page_layouts,
                 "widgets": self._get_required_widgets(page_layouts),
-                "woocommerce_settings": await self._generate_woocommerce_config(
-                    brand_info
-                ),
+                "woocommerce_settings": await self._generate_woocommerce_config(brand_info),
                 "seo_settings": await self._generate_seo_config(brand_info),
                 "performance_optimizations": self._get_performance_config(),
             }
@@ -191,9 +489,7 @@ class ElementorThemeBuilder:
             logger.error(f"Theme generation failed: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_color_palette(
-        self, brand_info: dict[str, Any], theme_type: str
-    ) -> dict[str, str]:
+    async def _generate_color_palette(self, brand_info: dict[str, Any], theme_type: str) -> dict[str, str]:
         """Generate ML-optimized color palette"""
         try:
             # Base colors from brand or theme template
@@ -265,9 +561,7 @@ class ElementorThemeBuilder:
             logger.error(f"Color palette generation failed: {e}")
             return {}
 
-    async def _generate_typography(
-        self, brand_info: dict[str, Any], theme_type: str
-    ) -> dict[str, Any]:
+    async def _generate_typography(self, brand_info: dict[str, Any], theme_type: str) -> dict[str, Any]:
         """Generate optimized typography settings"""
         template = self.theme_templates.get(theme_type, {})
         style = template.get("style", "modern")
@@ -336,9 +630,7 @@ class ElementorThemeBuilder:
         """Generate page layout with Elementor sections"""
         try:
             if page_type == "home":
-                return await self._generate_homepage(
-                    brand_info, theme_type, colors, typography
-                )
+                return await self._generate_homepage(brand_info, theme_type, colors, typography)
             elif page_type == "shop":
                 return await self._generate_shop_page(brand_info, colors, typography)
             elif page_type == "product":
@@ -372,9 +664,7 @@ class ElementorThemeBuilder:
                     "background_type": "image",
                     "content": {
                         "heading": f"Welcome to {brand_info.get('name', 'Our Store')}",
-                        "subheading": brand_info.get(
-                            "tagline", "Discover Luxury Fashion"
-                        ),
+                        "subheading": brand_info.get("tagline", "Discover Luxury Fashion"),
                         "cta_button": {
                             "text": "Shop Now",
                             "link": "/shop",
@@ -408,9 +698,7 @@ class ElementorThemeBuilder:
                     "layout": "two-column",
                     "content": {
                         "heading": "Our Story",
-                        "text": brand_info.get(
-                            "description", "Crafting excellence since inception"
-                        ),
+                        "text": brand_info.get("description", "Crafting excellence since inception"),
                         "image_position": "right",
                     },
                     "styling": {
@@ -460,9 +748,7 @@ class ElementorThemeBuilder:
             },
         }
 
-    async def _generate_shop_page(
-        self, brand_info: dict, colors: dict, typography: dict
-    ) -> dict[str, Any]:
+    async def _generate_shop_page(self, brand_info: dict, colors: dict, typography: dict) -> dict[str, Any]:
         """Generate shop page layout"""
         return {
             "sections": [
@@ -496,9 +782,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_product_page(
-        self, brand_info: dict, colors: dict, typography: dict
-    ) -> dict[str, Any]:
+    async def _generate_product_page(self, brand_info: dict, colors: dict, typography: dict) -> dict[str, Any]:
         """Generate product detail page layout"""
         return {
             "sections": [
@@ -545,9 +829,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_about_page(
-        self, brand_info: dict, colors: dict, typography: dict
-    ) -> dict[str, Any]:
+    async def _generate_about_page(self, brand_info: dict, colors: dict, typography: dict) -> dict[str, Any]:
         """Generate about page layout"""
         return {
             "sections": [
@@ -576,9 +858,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_contact_page(
-        self, brand_info: dict, colors: dict, typography: dict
-    ) -> dict[str, Any]:
+    async def _generate_contact_page(self, brand_info: dict, colors: dict, typography: dict) -> dict[str, Any]:
         """Generate contact page layout"""
         return {
             "sections": [
@@ -602,9 +882,7 @@ class ElementorThemeBuilder:
             ]
         }
 
-    async def _generate_blog_page(
-        self, brand_info: dict, colors: dict, typography: dict
-    ) -> dict[str, Any]:
+    async def _generate_blog_page(self, brand_info: dict, colors: dict, typography: dict) -> dict[str, Any]:
         """Generate blog page layout"""
         return {
             "sections": [
@@ -779,17 +1057,13 @@ class ElementorThemeBuilder:
             hex_color = hex_color.lstrip("#")
             rgb = tuple(int(hex_color[i : i + 2], 16) for i in (0, 2, 4))
 
-            adjusted = tuple(
-                max(0, min(255, int(c + (c * percent / 100)))) for c in rgb
-            )
+            adjusted = tuple(max(0, min(255, int(c + (c * percent / 100)))) for c in rgb)
 
             return "#{:02x}{:02x}{:02x}".format(*adjusted)
         except Exception:
             return hex_color
 
-    async def export_theme(
-        self, theme: dict[str, Any], format: str = "json"
-    ) -> dict[str, Any]:
+    async def export_theme(self, theme: dict[str, Any], format: str = "json") -> dict[str, Any]:
         """
         Export theme in various formats
 

@@ -240,7 +240,9 @@ class TestGitignoreEffectiveness:
         with open(gitignore_path, "r") as f:
             content = f.read()
         # .gitignore should not contain a pattern that would ignore itself
-        assert ".gitignore" not in [line.strip() for line in content.split("\n") if line.strip() and not line.startswith("#")]
+        assert ".gitignore" not in [
+            line.strip() for line in content.split("\n") if line.strip() and not line.startswith("#")
+        ]
 
     def test_cursor_ide_files_ignored(self):
         """Test that .cursor/ directory is properly ignored"""

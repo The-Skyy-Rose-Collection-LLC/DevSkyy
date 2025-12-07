@@ -8,6 +8,7 @@ import openai
 
 logger = logging.getLogger(__name__)
 
+
 class WordPressAgent:
     """AI-POWERED WORDPRESS & DIVI SPECIALIST WITH OPENAI GOD MODE."""
 
@@ -29,19 +30,21 @@ class WordPressAgent:
         # OpenAI GOD MODE Integration
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key:
-            self.openai_client = openai.OpenAI(api_key=api_key)
+            from config.unified_config import get_config
+
+            config = get_config()
+            is_consequential = config.ai.openai_is_consequential
+            default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
+
+            self.openai_client = openai.OpenAI(api_key=api_key, default_headers=default_headers)
             self.god_mode_active = True
-            logger.info("🌐 WordPress Agent initialized with OpenAI GOD MODE")
+            logger.info(f"🌐 WordPress Agent initialized with OpenAI GOD MODE (consequential={is_consequential})")
         else:
             self.openai_client = None
             self.god_mode_active = False
-            logger.warning(
-                "🌐 WordPress Agent initialized without OpenAI GOD MODE (API key missing)"
-            )
+            logger.warning("🌐 WordPress Agent initialized without OpenAI GOD MODE (API key missing)")
 
-    async def optimize_wordpress_god_mode(
-        self, site_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def optimize_wordpress_god_mode(self, site_data: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED WORDPRESS OPTIMIZATION WITH GOD MODE INTELLIGENCE."""
         try:
             prompt = f"""
@@ -104,9 +107,7 @@ class WordPressAgent:
             logger.error(f"GOD MODE WordPress optimization failed: {e!s}")
             return {"error": str(e), "fallback": "standard_optimization_available"}
 
-    async def create_divi_luxury_components_god_mode(
-        self, component_request: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_divi_luxury_components_god_mode(self, component_request: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED DIVI COMPONENT CREATION WITH LUXURY MASTERY."""
         try:
             prompt = f"""
@@ -162,9 +163,7 @@ class WordPressAgent:
             logger.error(f"Divi component creation failed: {e!s}")
             return {"error": str(e)}
 
-    async def wordpress_security_god_mode(
-        self, security_audit: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def wordpress_security_god_mode(self, security_audit: dict[str, Any]) -> dict[str, Any]:
         """AI-POWERED WORDPRESS SECURITY WITH MILITARY-GRADE PROTECTION."""
         try:
             prompt = f"""
@@ -220,7 +219,9 @@ class WordPressAgent:
             logger.error(f"Security implementation failed: {e!s}")
             return {"error": str(e)}
 
+
 # Factory function
+
 
 def create_wordpress_agent() -> WordPressAgent:
     """Create WordPress Agent with OpenAI GOD MODE."""

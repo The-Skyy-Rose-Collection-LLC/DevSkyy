@@ -1,0 +1,76 @@
+---
+# DevSkyy Platform - Kubernetes Services
+# Main application service
+apiVersion: v1
+kind: Service
+metadata:
+  name: devskyy-service
+  namespace: devskyy
+  labels:
+    app: devskyy
+    component: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "9091"
+spec:
+  type: ClusterIP
+  sessionAffinity: ClientIP
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+  selector:
+    app: devskyy
+    component: api
+  ports:
+  - name: http
+    port: 8000
+    targetPort: http
+    protocol: TCP
+  - name: metrics
+    port: 9091
+    targetPort: metrics
+    protocol: TCP
+---
+# Headless service for StatefulSet (if needed)
+apiVersion: v1
+kind: Service
+metadata:
+  name: devskyy-headless
+  namespace: devskyy
+  labels:
+    app: devskyy
+spec:
+  clusterIP: None
+  selector:
+    app: devskyy
+  ports:
+  - name: http
+    port: 8000
+    targetPort: http
+---
+# External LoadBalancer service (optional, for direct access)
+apiVersion: v1
+kind: Service
+metadata:
+  name: devskyy-lb
+  namespace: devskyy
+  labels:
+    app: devskyy
+  annotations:
+    service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    service.beta.kubernetes.io/aws-load-balancer-cross-zone-load-balancing-enabled: "true"
+    service.beta.kubernetes.io/aws-load-balancer-backend-protocol: "http"
+spec:
+  type: LoadBalancer
+  selector:
+    app: devskyy
+    component: api
+  ports:
+  - name: https
+    port: 443
+    targetPort: http
+    protocol: TCP
+  - name: http
+    port: 80
+    targetPort: http
+    protocol: TCP

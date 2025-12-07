@@ -207,9 +207,7 @@ class EnhancedLearningScheduler:
         metrics = {
             "timestamp": current_time,
             "learning_score": results.get("learning_cycle_status") == "completed",
-            "brand_intelligence_score": results.get("brand_learning", {}).get(
-                "confidence", 0
-            ),
+            "brand_intelligence_score": results.get("brand_learning", {}).get("confidence", 0),
             "system_health": 0.95,  # Would be calculated from actual metrics
             "response_time": 1.2,  # Would be measured
             "accuracy_improvement": 0.02,  # Would be calculated
@@ -219,9 +217,7 @@ class EnhancedLearningScheduler:
 
         # Keep only last 30 entries per cycle type
         if len(self.performance_metrics[cycle_type]) > 30:
-            self.performance_metrics[cycle_type] = self.performance_metrics[cycle_type][
-                -30:
-            ]
+            self.performance_metrics[cycle_type] = self.performance_metrics[cycle_type][-30:]
 
     def _calculate_improvement(self) -> float:
         """Calculate performance improvement percentage."""
@@ -230,9 +226,7 @@ class EnhancedLearningScheduler:
 
         # Simple improvement calculation based on recent learning cycles
         recent_cycles = self.learning_history[-5:]  # Last 5 cycles
-        improvement_sum = sum(
-            cycle.get("performance_improvement", 0) for cycle in recent_cycles
-        )
+        improvement_sum = sum(cycle.get("performance_improvement", 0) for cycle in recent_cycles)
 
         return round(improvement_sum / len(recent_cycles), 2)
 
@@ -248,18 +242,13 @@ class EnhancedLearningScheduler:
 
         # Analyze success rates
         successful_cycles = sum(
-            1
-            for cycle in recent_cycles
-            if cycle.get("brand_updates", {}).get("learning_cycle_status")
-            == "completed"
+            1 for cycle in recent_cycles if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed"
         )
 
         success_rate = successful_cycles / len(recent_cycles)
 
         # Identify improvement trends
-        improvements = [
-            cycle.get("performance_improvement", 0) for cycle in recent_cycles
-        ]
+        improvements = [cycle.get("performance_improvement", 0) for cycle in recent_cycles]
         avg_improvement = sum(improvements) / len(improvements)
 
         return {
@@ -292,9 +281,7 @@ class EnhancedLearningScheduler:
             # Simulate optimization
             performance_gain = 0.05  # 5% improvement
             optimization_results["performance_gains"][agent] = performance_gain
-            optimization_results["optimizations_applied"].append(
-                f"Optimized {agent} agent algorithms"
-            )
+            optimization_results["optimizations_applied"].append(f"Optimized {agent} agent algorithms")
             optimization_results["agents_optimized"] += 1
 
         return optimization_results
@@ -312,8 +299,7 @@ class EnhancedLearningScheduler:
             recent_success = sum(
                 1
                 for cycle in self.learning_history[-5:]
-                if cycle.get("brand_updates", {}).get("learning_cycle_status")
-                == "completed"
+                if cycle.get("brand_updates", {}).get("learning_cycle_status") == "completed"
             )
             success_factor = recent_success / min(5, len(self.learning_history))
             base_score += success_factor * 0.2
@@ -443,19 +429,13 @@ class EnhancedLearningScheduler:
 
         # Compare recent performance with earlier performance
         recent_cycles = self.learning_history[-7:]
-        earlier_cycles = (
-            self.learning_history[-14:-7] if len(self.learning_history) >= 14 else []
-        )
+        earlier_cycles = self.learning_history[-14:-7] if len(self.learning_history) >= 14 else []
 
         if not earlier_cycles:
             return 0.05
 
-        recent_avg = sum(
-            cycle.get("performance_improvement", 0) for cycle in recent_cycles
-        ) / len(recent_cycles)
-        earlier_avg = sum(
-            cycle.get("performance_improvement", 0) for cycle in earlier_cycles
-        ) / len(earlier_cycles)
+        recent_avg = sum(cycle.get("performance_improvement", 0) for cycle in recent_cycles) / len(recent_cycles)
+        earlier_avg = sum(cycle.get("performance_improvement", 0) for cycle in earlier_cycles) / len(earlier_cycles)
 
         return round(recent_avg - earlier_avg, 3)
 
@@ -464,19 +444,13 @@ class EnhancedLearningScheduler:
         now = datetime.now()
 
         if cycle_type == "hourly":
-            next_run = now.replace(minute=0, second=0, microsecond=0) + timedelta(
-                hours=1
-            )
+            next_run = now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=1)
         elif cycle_type == "deep":
-            next_run = now.replace(
-                hour=(now.hour // 6 + 1) * 6, minute=0, second=0, microsecond=0
-            )
+            next_run = now.replace(hour=(now.hour // 6 + 1) * 6, minute=0, second=0, microsecond=0)
             if next_run <= now:
                 next_run += timedelta(hours=6)
         else:
-            next_run = now.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            ) + timedelta(days=1)
+            next_run = now.replace(hour=0, minute=0, second=0, microsecond=0) + timedelta(days=1)
 
         return next_run.isoformat()
 

@@ -44,7 +44,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 
@@ -52,12 +52,14 @@ logger = logging.getLogger(__name__)
 
 try:
     from PIL import Image
+
     PIL_AVAILABLE = True
 except ImportError:
     PIL_AVAILABLE = False
 
 try:
     import torch
+
     DIFFUSERS_AVAILABLE = True
 except ImportError:
     DIFFUSERS_AVAILABLE = False
@@ -66,6 +68,7 @@ except ImportError:
 
 class ModelType(Enum):
     """Types of AI models available."""
+
     VIRTUAL_TRYON = "virtual_tryon"
     AI_MODEL_GENERATION = "ai_model_generation"
     STYLE_TRANSFER = "style_transfer"
@@ -79,6 +82,7 @@ class ModelType(Enum):
 
 class PoseType(Enum):
     """Model poses."""
+
     STANDING_FRONT = "standing_front"
     STANDING_SIDE = "standing_side"
     WALKING = "walking"
@@ -92,6 +96,7 @@ class PoseType(Enum):
 
 class ModelEthnicity(Enum):
     """Model ethnicities for diversity."""
+
     AFRICAN = "african"
     ASIAN = "asian"
     CAUCASIAN = "caucasian"
@@ -102,6 +107,7 @@ class ModelEthnicity(Enum):
 
 class BodyType(Enum):
     """Body types."""
+
     ATHLETIC = "athletic"
     SLIM = "slim"
     CURVY = "curvy"
@@ -113,6 +119,7 @@ class BodyType(Enum):
 @dataclass
 class ModelSpecification:
     """Specification for AI model generation."""
+
     # Demographics
     gender: str = "female"  # female, male, non-binary
     ethnicity: ModelEthnicity = ModelEthnicity.MIXED
@@ -140,21 +147,22 @@ class ModelSpecification:
 @dataclass
 class TryOnRequest:
     """Request for virtual try-on generation."""
+
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     # Product asset
     product_asset_id: str = ""  # From preprocessed assets
-    product_image_path: Optional[str] = None  # Direct path
+    product_image_path: str | None = None  # Direct path
 
     # Model specification
     model_spec: ModelSpecification = field(default_factory=ModelSpecification)
     use_custom_model: bool = False
-    custom_model_image: Optional[str] = None
+    custom_model_image: str | None = None
 
     # Generation settings
     model_type: ModelType = ModelType.VIRTUAL_TRYON
     num_variations: int = 4
-    seed: Optional[int] = None
+    seed: int | None = None
 
     # Advanced options
     maintain_product_details: bool = True
@@ -169,7 +177,7 @@ class TryOnRequest:
     generate_3d_preview: bool = False
 
     # Style options
-    style_prompt: Optional[str] = None
+    style_prompt: str | None = None
     negative_prompt: str = "low quality, blurry, distorted"
 
     # Metadata
@@ -179,17 +187,18 @@ class TryOnRequest:
 @dataclass
 class TryOnResult:
     """Result from virtual try-on generation."""
+
     request_id: str
     success: bool
 
     # Generated outputs
     images: list[str] = field(default_factory=list)  # Paths to generated images
     videos: list[str] = field(default_factory=list)  # Paths to generated videos
-    model_3d: Optional[str] = None  # Path to 3D model with product
+    model_3d: str | None = None  # Path to 3D model with product
 
     # Generation details
     model_used: str = ""
-    seed_used: Optional[int] = None
+    seed_used: int | None = None
     variations_generated: int = 0
 
     # Quality metrics
@@ -202,7 +211,7 @@ class TryOnResult:
     cost: float = 0.0
 
     # Metadata
-    error: Optional[str] = None
+    error: str | None = None
     warnings: list[str] = field(default_factory=list)
     created_at: datetime = field(default_factory=datetime.now)
 
@@ -274,7 +283,7 @@ class VirtualTryOnHuggingFaceAgent:
         Create and return a registry of HuggingFace models with metadata used by the agent.
 
         Returns:
-            registry (Dict[str, Dict[str, Any]]): Mapping from internal model keys to metadata objects. Each metadata object contains:
+            registry (dict[str, dict[str, Any]]): Mapping from internal model keys to metadata objects. Each metadata object contains:
                 - name: human-readable model name
                 - model_id: HuggingFace model identifier
                 - task: high-level task or capability
@@ -300,7 +309,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.0,
                 "speed": "fast",
             },
-
             # Image Generation Models
             "sdxl_base": {
                 "name": "Stable Diffusion XL",
@@ -318,7 +326,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.0,
                 "speed": "very_fast",
             },
-
             # ControlNet Models
             "controlnet_pose": {
                 "name": "ControlNet OpenPose",
@@ -336,7 +343,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.0,
                 "speed": "medium",
             },
-
             # Face Models
             "instantid": {
                 "name": "InstantID",
@@ -354,7 +360,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.0,
                 "speed": "medium",
             },
-
             # Video Generation Models
             "animatediff": {
                 "name": "AnimateDiff",
@@ -380,7 +385,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 8.5,
                 "speed": "very_slow",
             },
-
             # 3D Generation Models
             "triposr": {
                 "name": "TripoSR",
@@ -398,7 +402,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.5,
                 "speed": "medium",
             },
-
             # Enhancement Models
             "gfpgan": {
                 "name": "GFPGAN",
@@ -416,7 +419,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.0,
                 "speed": "fast",
             },
-
             # Segmentation Models
             "sam": {
                 "name": "Segment Anything",
@@ -434,7 +436,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 8.5,
                 "speed": "fast",
             },
-
             # Detection Models
             "grounding_dino": {
                 "name": "Grounding DINO",
@@ -452,7 +453,6 @@ class VirtualTryOnHuggingFaceAgent:
                 "quality": 9.5,
                 "speed": "fast",
             },
-
             # Fashion-Specific Models
             "deep_fashion": {
                 "name": "DeepFashion",
@@ -464,9 +464,7 @@ class VirtualTryOnHuggingFaceAgent:
             },
         }
 
-    async def generate_tryon(
-        self, request: TryOnRequest
-    ) -> TryOnResult:
+    async def generate_tryon(self, request: TryOnRequest) -> TryOnResult:
         """
         Orchestrates a full virtual try-on generation workflow for a given TryOnRequest.
 
@@ -499,13 +497,9 @@ class VirtualTryOnHuggingFaceAgent:
 
             # Step 3: Apply virtual try-on
             if request.model_type == ModelType.VIRTUAL_TRYON:
-                tryon_images = await self._apply_virtual_tryon(
-                    product_image, model_image, request
-                )
+                tryon_images = await self._apply_virtual_tryon(product_image, model_image, request)
             else:
-                tryon_images = await self._generate_with_product(
-                    product_image, request
-                )
+                tryon_images = await self._generate_with_product(product_image, request)
 
             # Save generated images
             saved_paths = []
@@ -520,16 +514,12 @@ class VirtualTryOnHuggingFaceAgent:
 
             # Step 4: Generate video if requested
             if request.generate_video:
-                video_path = await self._generate_tryon_video(
-                    tryon_images[0], request
-                )
+                video_path = await self._generate_tryon_video(tryon_images[0], request)
                 result.videos = [str(video_path)]
 
             # Step 5: Generate 3D if requested
             if request.generate_3d_preview:
-                model_3d_path = await self._generate_3d_tryon(
-                    tryon_images[0], product_image, request
-                )
+                model_3d_path = await self._generate_3d_tryon(tryon_images[0], product_image, request)
                 result.model_3d = str(model_3d_path)
 
             # Calculate quality metrics
@@ -560,9 +550,7 @@ class VirtualTryOnHuggingFaceAgent:
                 generation_time=(datetime.now() - start_time).total_seconds(),
             )
 
-    async def _load_product_image(
-        self, request: TryOnRequest
-    ) -> Image.Image:
+    async def _load_product_image(self, request: TryOnRequest) -> Image.Image:
         """
         Load the request's product image, preferring an explicit product image path and falling back to the asset pipeline.
 
@@ -599,9 +587,7 @@ class VirtualTryOnHuggingFaceAgent:
         """
         return Image.open(model_path)
 
-    async def _generate_ai_model(
-        self, spec: ModelSpecification
-    ) -> Image.Image:
+    async def _generate_ai_model(self, spec: ModelSpecification) -> Image.Image:
         """
         Generate a photorealistic fashion model image that matches the provided ModelSpecification.
 
@@ -647,7 +633,7 @@ class VirtualTryOnHuggingFaceAgent:
             request (TryOnRequest): Controls generation options (e.g., number of variations, realistic_shadows, fabric_physics, pose settings).
 
         Returns:
-            List[PIL.Image.Image]: A list of composited try-on images (one per variation) showing the product fitted to the model.
+            list[PIL.Image.Image]: A list of composited try-on images (one per variation) showing the product fitted to the model.
 
         Raises:
             NotImplementedError: If no virtual-tryon integration (e.g., IDM-VTON or OOTDiffusion) is configured or available.
@@ -677,9 +663,7 @@ class VirtualTryOnHuggingFaceAgent:
             "Download model weights from HuggingFace: yisol/IDM-VTON."
         )
 
-    async def _generate_with_product(
-        self, product_image: Image.Image, request: TryOnRequest
-    ) -> list[Image.Image]:
+    async def _generate_with_product(self, product_image: Image.Image, request: TryOnRequest) -> list[Image.Image]:
         """
         Generate synthetic model images influenced by the provided product image using a style-transfer approach.
 
@@ -690,7 +674,7 @@ class VirtualTryOnHuggingFaceAgent:
             request (TryOnRequest): Request object containing generation options and model specification that influence outputs (variations count, prompts, realism controls, etc.).
 
         Returns:
-            List[PIL.Image.Image]: A list of generated model images styled to incorporate the product's appearance.
+            list[PIL.Image.Image]: A list of generated model images styled to incorporate the product's appearance.
 
         Raises:
             NotImplementedError: If no style-transfer or conditioning pipeline (e.g., IP-Adapter, ControlNet) has been integrated and configured.
@@ -705,9 +689,7 @@ class VirtualTryOnHuggingFaceAgent:
             "Generates new models wearing similar styles to the product."
         )
 
-    async def _generate_tryon_video(
-        self, image: Image.Image, request: TryOnRequest
-    ) -> Path:
+    async def _generate_tryon_video(self, image: Image.Image, request: TryOnRequest) -> Path:
         """
         Generate an animated video from a completed try-on image and save it to the agent's videos directory.
 
@@ -795,33 +777,30 @@ class VirtualTryOnHuggingFaceAgent:
         # Placeholder
         return 0.92
 
-    async def batch_generate(
-        self, requests: list[TryOnRequest]
-    ) -> list[TryOnResult]:
+    async def batch_generate(self, requests: list[TryOnRequest]) -> list[TryOnResult]:
         """
         Run multiple try-on generations concurrently.
 
         Parameters:
-            requests (List[TryOnRequest]): Sequence of try-on requests to process.
+            requests (list[TryOnRequest]): Sequence of try-on requests to process.
 
         Returns:
-            results (List[TryOnResult]): A list of TryOnResult objects in the same order as `requests`. For requests that raised exceptions, the corresponding TryOnResult will have `success=False` and `error` set to the exception message; successful generations return their normal TryOnResult.
+            results (list[TryOnResult]): A list of TryOnResult objects in the same order as `requests`. For requests that raised exceptions, the corresponding TryOnResult will have `success=False` and `error` set to the exception message; successful generations return their normal TryOnResult.
         """
         logger.info(f"👗 Batch generating {len(requests)} try-ons")
 
-        results = await asyncio.gather(
-            *[self.generate_tryon(req) for req in requests],
-            return_exceptions=True
-        )
+        results = await asyncio.gather(*[self.generate_tryon(req) for req in requests], return_exceptions=True)
 
         processed_results = []
         for i, result in enumerate(results):
             if isinstance(result, Exception):
-                processed_results.append(TryOnResult(
-                    request_id=requests[i].request_id,
-                    success=False,
-                    error=str(result),
-                ))
+                processed_results.append(
+                    TryOnResult(
+                        request_id=requests[i].request_id,
+                        success=False,
+                        error=str(result),
+                    )
+                )
             else:
                 processed_results.append(result)
 
@@ -858,7 +837,7 @@ class VirtualTryOnHuggingFaceAgent:
         Return a snapshot of the agent's current system and performance status.
 
         Returns:
-            status (Dict[str, Any]): A dictionary containing:
+            status (dict[str, Any]): A dictionary containing:
                 - agent_name (str): The agent's configured name.
                 - version (str): Agent version string.
                 - device (str): Execution device identifier (e.g., "cuda" or "cpu").
@@ -869,7 +848,7 @@ class VirtualTryOnHuggingFaceAgent:
                 - available_models (int): Count of registered HuggingFace models.
                 - loaded_models (int): Count of currently loaded model instances.
                 - output_directory (str): Path to the directory where outputs are written.
-                - capabilities (List[str]): Human-readable list of supported capabilities.
+                - capabilities (list[str]): Human-readable list of supported capabilities.
         """
         return {
             "agent_name": self.agent_name,
@@ -879,8 +858,7 @@ class VirtualTryOnHuggingFaceAgent:
                 "generations_count": self.generations_count,
                 "total_generation_time": self.total_generation_time,
                 "avg_generation_time": (
-                    self.total_generation_time / self.generations_count
-                    if self.generations_count > 0 else 0.0
+                    self.total_generation_time / self.generations_count if self.generations_count > 0 else 0.0
                 ),
             },
             "available_models": len(self.hf_models),

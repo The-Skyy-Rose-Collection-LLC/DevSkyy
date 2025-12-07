@@ -4,7 +4,7 @@ Organized by category with consistent interface
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -15,7 +15,7 @@ from security.jwt_auth import TokenData, get_current_active_user, require_develo
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/agents", tags=["agents"])
+router = APIRouter(tags=["agents"])
 
 
 # ============================================================================
@@ -29,10 +29,8 @@ class LegacyAgentExecutionRequest(BaseModel):
     """Legacy agent execution request - use AgentExecutionRequest instead"""
 
     parameters: dict[str, Any] = Field(default_factory=dict)
-    timeout: Optional[int] = Field(
-        default=300, description="Execution timeout in seconds"
-    )
-    priority: Optional[str] = Field(default="medium", description="Execution priority")
+    timeout: int | None = Field(default=300, description="Execution timeout in seconds")
+    priority: str | None = Field(default="medium", description="Execution priority")
 
 
 class AgentExecuteResponse(BaseModel):
@@ -48,9 +46,7 @@ class AgentExecuteResponse(BaseModel):
 class BatchRequest(BaseModel):
     """Batch execution request"""
 
-    operations: list[dict[str, Any]] = Field(
-        ..., description="List of operations to execute"
-    )
+    operations: list[dict[str, Any]] = Field(..., description="List of operations to execute")
     parallel: bool = Field(default=True, description="Execute operations in parallel")
 
 
@@ -122,9 +118,7 @@ async def execute_scanner_v2(
 
 
 @router.post("/fixer/execute", response_model=AgentExecuteResponse)
-async def execute_fixer(
-    request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
-):
+async def execute_fixer(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """
     Run the Fixer V1 agent to apply automated code fixes based on scan results.
 
@@ -154,9 +148,7 @@ async def execute_fixer(
 
 
 @router.post("/fixer-v2/execute", response_model=AgentExecuteResponse)
-async def execute_fixer_v2(
-    request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
-):
+async def execute_fixer_v2(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Fixer Agent V2 - Enhanced auto-fixing with AI"""
     try:
         from agent.modules.backend.fixer_v2 import fixer_agent
@@ -187,9 +179,7 @@ async def execute_claude_sonnet(
 ):
     """Execute Claude Sonnet Intelligence Service"""
     try:
-        from agent.modules.backend.claude_sonnet_intelligence_service import (
-            agent as claude_agent,
-        )
+        from agent.modules.backend.claude_sonnet_intelligence_service import agent as claude_agent
 
         result = await claude_agent.execute_core_function(**request.parameters)
 
@@ -212,9 +202,7 @@ async def execute_openai(
 ):
     """Execute OpenAI Intelligence Service"""
     try:
-        from agent.modules.backend.openai_intelligence_service import (
-            agent as openai_agent,
-        )
+        from agent.modules.backend.openai_intelligence_service import agent as openai_agent
 
         result = await openai_agent.execute_core_function(**request.parameters)
 
@@ -385,9 +373,7 @@ async def execute_social_media(
 ):
     """Execute Social Media Automation Agent"""
     try:
-        from agent.modules.backend.social_media_automation_agent import (
-            agent as social_agent,
-        )
+        from agent.modules.backend.social_media_automation_agent import agent as social_agent
 
         result = await social_agent.execute_core_function(**request.parameters)
 
@@ -410,9 +396,7 @@ async def execute_email_sms(
 ):
     """Execute Email/SMS Automation Agent"""
     try:
-        from agent.modules.backend.email_sms_automation_agent import (
-            agent as email_agent,
-        )
+        from agent.modules.backend.email_sms_automation_agent import agent as email_agent
 
         result = await email_agent.execute_core_function(**request.parameters)
 
@@ -435,9 +419,7 @@ async def execute_marketing_content(
 ):
     """Execute Marketing Content Generation Agent"""
     try:
-        from agent.modules.marketing_content_generation_agent import (
-            agent as content_agent,
-        )
+        from agent.modules.marketing_content_generation_agent import agent as content_agent
 
         result = await content_agent.execute_core_function(**request.parameters)
 
@@ -567,9 +549,7 @@ async def execute_blockchain_nft(
 ):
     """Execute Blockchain/NFT Agent - NFT and blockchain operations"""
     try:
-        from agent.modules.backend.blockchain_nft_luxury_assets import (
-            agent as nft_agent,
-        )
+        from agent.modules.backend.blockchain_nft_luxury_assets import agent as nft_agent
 
         result = await nft_agent.execute_core_function(**request.parameters)
 
@@ -591,9 +571,7 @@ async def execute_code_generation(
 ):
     """Execute Advanced Code Generation Agent - AI code generation"""
     try:
-        from agent.modules.backend.advanced_code_generation_agent import (
-            agent as codegen_agent,
-        )
+        from agent.modules.backend.advanced_code_generation_agent import agent as codegen_agent
 
         result = await codegen_agent.execute_core_function(**request.parameters)
 
@@ -610,9 +588,7 @@ async def execute_code_generation(
 
 
 @router.post("/security/execute", response_model=AgentExecuteResponse)
-async def execute_security(
-    request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)
-):
+async def execute_security(request: AgentExecutionRequest, current_user: TokenData = Depends(require_developer)):
     """Execute Security Agent - Security scanning and threat detection"""
     try:
         from agent.modules.backend.security_agent import agent as security_agent
@@ -660,9 +636,7 @@ async def execute_performance(
 
 
 @router.post("/batch", response_model=dict[str, Any])
-async def batch_execute(
-    request: BatchRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def batch_execute(request: BatchRequest, current_user: TokenData = Depends(get_current_active_user)):
     """
     Execute multiple agent operations in batch
 

@@ -15,7 +15,8 @@ import pytest
 
 # Import encryption module
 try:
-    from security.encryption_v2 import EncryptionService, decrypt_data, encrypt_data, generate_encryption_key
+    from security.encryption import EncryptionService, decrypt_data, encrypt_data, generate_encryption_key
+
     ENCRYPTION_AVAILABLE = True
 except ImportError:
     ENCRYPTION_AVAILABLE = False
@@ -44,10 +45,7 @@ def sample_data():
     return {
         "user_id": "user-12345",
         "email": "test@example.com",
-        "payment_info": {
-            "card_last_4": "4242",
-            "expiry": "12/25"
-        }
+        "payment_info": {"card_last_4": "4242", "expiry": "12/25"},
     }
 
 
@@ -176,7 +174,7 @@ class TestKeyManagement:
 
     def test_key_derivation_from_password(self, encryption_service):
         """Should derive keys from passwords using PBKDF2."""
-        if not ENCRYPTION_AVAILABLE or not hasattr(encryption_service, 'derive_key_from_password'):
+        if not ENCRYPTION_AVAILABLE or not hasattr(encryption_service, "derive_key_from_password"):
             pytest.skip("Key derivation not available")
 
         password = "strong-password-123"
@@ -343,7 +341,6 @@ class TestPerformance:
             encryption_service.encrypt(record, test_key)
         elapsed = time.time() - start
 
-
         # Should complete in reasonable time
         assert elapsed < 5.0  # 5 seconds for 1000 records
 
@@ -357,10 +354,11 @@ class TestTruthProtocolCompliance:
             pytest.skip("Encryption not available")
 
         # Read the encryption module source
-        import security.encryption_v2 as enc_module
+        import security.encryption as enc_module
+
         source = enc_module.__file__
 
-        with open(source, 'r') as f:
+        with open(source, "r") as f:
             content = f.read()
 
         # Should not contain suspicious hardcoded keys
@@ -373,9 +371,9 @@ class TestTruthProtocolCompliance:
             pytest.skip("Encryption not available")
 
         # Verify uses AES-256-GCM (check cipher name or algorithm)
-        if hasattr(encryption_service, 'algorithm'):
-            assert 'AES' in str(encryption_service.algorithm).upper()
-            assert '256' in str(encryption_service.algorithm) or 'GCM' in str(encryption_service.algorithm)
+        if hasattr(encryption_service, "algorithm"):
+            assert "AES" in str(encryption_service.algorithm).upper()
+            assert "256" in str(encryption_service.algorithm) or "GCM" in str(encryption_service.algorithm)
 
     def test_logging_does_not_leak_keys(self, encryption_service, test_key, sample_data, caplog):
         """Logging should never expose encryption keys."""
@@ -391,14 +389,12 @@ class TestTruthProtocolCompliance:
             # Check logs don't contain key material at ANY level
             key_hex = test_key.hex() if isinstance(test_key, bytes) else str(test_key)
             for record in caplog.records:
-                assert key_hex not in record.message, \
-                    f"Key leaked in {record.levelname} log: {record.message}"
-                assert test_key not in str(record.args), \
-                    f"Key leaked in {record.levelname} log args: {record.args}"
+                assert key_hex not in record.message, f"Key leaked in {record.levelname} log: {record.message}"
+                assert test_key not in str(record.args), f"Key leaked in {record.levelname} log args: {record.args}"
 
 
 if __name__ == "__main__":
-    pytest.main([__file__, "-v", "--cov=security.encryption_v2", "--cov-report=term"])
+    pytest.main([__file__, "-v", "--cov=security.encryption", "--cov-report=term"])
 
 
 # ============================================================================
@@ -450,11 +446,14 @@ class TestEncryptionAdvancedScenarios:
             pytest.skip("Encryption not available")
 
         import json
-        json_data = json.dumps({
-            "user": "test@example.com",
-            "payment": {"card": "4242-4242-4242-4242"},
-            "nested": {"deep": {"value": "secret"}}
-        })
+
+        json_data = json.dumps(
+            {
+                "user": "test@example.com",
+                "payment": {"card": "4242-4242-4242-4242"},
+                "nested": {"deep": {"value": "secret"}},
+            }
+        )
 
         encrypted = encryption_service.encrypt(json_data, test_key)
         decrypted = encryption_service.decrypt(encrypted, test_key)
@@ -510,7 +509,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_dict, encrypt_dict
+        from security.encryption import decrypt_dict, encrypt_dict
 
         fields_to_encrypt = ["user_id", "email"]
         encrypted = encrypt_dict(sample_data, fields_to_encrypt)
@@ -531,13 +530,9 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_dict
+        from security.encryption import encrypt_dict
 
-        nested_data = {
-            "public": "visible",
-            "secret": "hidden",
-            "nested": {"inner": "value"}
-        }
+        nested_data = {"public": "visible", "secret": "hidden", "nested": {"inner": "value"}}
 
         encrypted = encrypt_dict(nested_data, ["secret"])
         assert encrypted["secret"] != nested_data["secret"]
@@ -548,7 +543,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_dict
+        from security.encryption import encrypt_dict
 
         encrypted = encrypt_dict(sample_data, ["nonexistent_field"])
         # Should not raise error, just skip the field
@@ -559,7 +554,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_dict
+        from security.encryption import encrypt_dict
 
         encrypted = encrypt_dict(sample_data, [])
         # Nothing should be encrypted
@@ -570,7 +565,7 @@ class TestEncryptionDictOperations:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_dict, encrypt_dict
+        from security.encryption import decrypt_dict, encrypt_dict
 
         # Encrypt multiple fields
         encrypted = encrypt_dict(sample_data, ["user_id", "email"])
@@ -590,7 +585,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         key1, salt1 = derive_key("password123")
         key2, salt2 = derive_key("password123")
@@ -606,7 +601,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         salt = os.urandom(16)
         key1, _ = derive_key("password123", salt)
@@ -619,7 +614,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         salt = os.urandom(16)
         key1, _ = derive_key("password1", salt)
@@ -632,7 +627,7 @@ class TestKeyDerivation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import derive_key
+        from security.encryption import derive_key
 
         weak_passwords = ["123", "a", "password"]
 
@@ -650,7 +645,7 @@ class TestKeyRotation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import rotate_keys, settings
+        from security.encryption import rotate_keys, settings
 
         old_key = settings.MASTER_KEY
         new_key_b64 = rotate_keys()
@@ -664,7 +659,7 @@ class TestKeyRotation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import rotate_keys, settings
+        from security.encryption import rotate_keys, settings
 
         initial_legacy_count = len(settings.LEGACY_KEYS)
 
@@ -678,7 +673,7 @@ class TestKeyRotation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import settings
+        from security.encryption import settings
 
         original = "data before rotation"
         encrypted = encryption_service.encrypt(original, test_key)
@@ -703,7 +698,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_pii
+        from security.encryption import mask_pii
 
         masked = mask_pii("sensitive_data", show_chars=3)
         assert masked.startswith("sen")
@@ -715,7 +710,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_pii
+        from security.encryption import mask_pii
 
         masked = mask_pii("ab", show_chars=5)
         assert masked == "**"
@@ -725,7 +720,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_email
+        from security.encryption import mask_email
 
         masked = mask_email("user@example.com")
         assert "@" in masked
@@ -737,7 +732,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_phone
+        from security.encryption import mask_phone
 
         masked = mask_phone("555-123-4567")
         assert masked.endswith("4567")
@@ -748,7 +743,7 @@ class TestPIIMasking:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import mask_phone
+        from security.encryption import mask_phone
 
         masked = mask_phone("123")
         assert "*" in masked or len(masked) <= 4
@@ -762,7 +757,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, encrypt_field, generate_encryption_key
+        from security.encryption import decrypt_field, encrypt_field, generate_encryption_key
 
         key = generate_encryption_key()
         key_bytes = base64.b64decode(key)
@@ -779,7 +774,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, encrypt_field
+        from security.encryption import decrypt_field, encrypt_field
 
         plaintext = "default key test"
         encrypted = encrypt_field(plaintext)
@@ -792,7 +787,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import encrypt_field, settings
+        from security.encryption import encrypt_field, settings
 
         # Temporarily remove master key
         old_key = settings.MASTER_KEY
@@ -809,7 +804,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, generate_encryption_key
+        from security.encryption import decrypt_field, generate_encryption_key
 
         key_bytes = base64.b64decode(generate_encryption_key())
 
@@ -822,7 +817,7 @@ class TestEncryptionFieldFunctions:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_field, generate_encryption_key
+        from security.encryption import decrypt_field, generate_encryption_key
 
         key_bytes = base64.b64decode(generate_encryption_key())
 
@@ -838,7 +833,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import settings
+        from security.encryption import settings
 
         assert settings.MASTER_KEY is not None
         assert len(settings.MASTER_KEY) == 32
@@ -851,11 +846,11 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import settings
+        from security.encryption import settings
 
         # NIST SP 800-38D recommendations
         assert settings.GCM_NONCE_LENGTH == 12  # 96 bits (recommended)
-        assert settings.GCM_TAG_LENGTH == 16    # 128 bits (full tag)
+        assert settings.GCM_TAG_LENGTH == 16  # 128 bits (full tag)
         assert settings.PBKDF2_ITERATIONS >= 100000  # NIST SP 800-132
 
     def test_generate_master_key_format(self):
@@ -863,7 +858,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import generate_master_key
+        from security.encryption import generate_master_key
 
         key = generate_master_key()
 
@@ -878,7 +873,7 @@ class TestEncryptionSettings:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import generate_master_key
+        from security.encryption import generate_master_key
 
         keys = [generate_master_key() for _ in range(10)]
 
@@ -899,10 +894,7 @@ class TestEncryptionConcurrency:
         data_items = [f"data_{i}" for i in range(100)]
 
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            encrypted = list(executor.map(
-                lambda d: encryption_service.encrypt(d, test_key),
-                data_items
-            ))
+            encrypted = list(executor.map(lambda d: encryption_service.encrypt(d, test_key), data_items))
 
         # All should be encrypted and unique (due to nonces)
         assert len(encrypted) == 100
@@ -921,10 +913,7 @@ class TestEncryptionConcurrency:
 
         # Decrypt concurrently
         with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
-            decrypted = list(executor.map(
-                lambda e: encryption_service.decrypt(e, test_key),
-                encrypted
-            ))
+            decrypted = list(executor.map(lambda e: encryption_service.decrypt(e, test_key), encrypted))
 
         # All should match original
         assert decrypted == data_items
@@ -969,7 +958,7 @@ class TestEncryptionGDPRCompliance:
             "phone": "+1-555-0123",
             "address": "123 Main St",
             "ip_address": "192.168.1.1",
-            "cookie_id": "abc123xyz"
+            "cookie_id": "abc123xyz",
         }
 
         for value in gdpr_data.values():
@@ -1004,7 +993,7 @@ class TestEncryptionDocumentation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        import security.encryption_v2 as enc_module
+        import security.encryption as enc_module
 
         assert enc_module.__doc__ is not None
         assert "AES-256-GCM" in enc_module.__doc__
@@ -1015,7 +1004,7 @@ class TestEncryptionDocumentation:
         if not ENCRYPTION_AVAILABLE:
             pytest.skip("Encryption not available")
 
-        from security.encryption_v2 import decrypt_dict, decrypt_field, derive_key, encrypt_dict, encrypt_field
+        from security.encryption import decrypt_dict, decrypt_field, derive_key, encrypt_dict, encrypt_field
 
         assert encrypt_field.__doc__ is not None
         assert decrypt_field.__doc__ is not None
@@ -1026,10 +1015,4 @@ class TestEncryptionDocumentation:
 
 # Run all tests
 if __name__ == "__main__":
-    pytest.main([
-        __file__,
-        "-v",
-        "--cov=security.encryption_v2",
-        "--cov-report=term",
-        "--cov-report=html"
-    ])
+    pytest.main([__file__, "-v", "--cov=security.encryption", "--cov-report=term", "--cov-report=html"])

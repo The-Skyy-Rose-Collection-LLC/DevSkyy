@@ -1,4 +1,4 @@
-from typing import Generic, Optional, TypeVar
+from typing import Generic, TypeVar
 
 from pydantic import BaseModel, Field
 
@@ -9,7 +9,6 @@ Implements cursor-based and offset-based pagination
 """
 
 
-
 T = TypeVar("T")
 
 
@@ -17,9 +16,7 @@ class PaginationParams(BaseModel):
     """Standard pagination parameters"""
 
     page: int = Field(default=1, ge=1, description="Page number (1-indexed)")
-    page_size: int = Field(
-        default=20, ge=1, le=100, description="Items per page (max 100)"
-    )
+    page_size: int = Field(default=20, ge=1, le=100, description="Items per page (max 100)")
 
     @property
     def offset(self) -> int:
@@ -57,9 +54,7 @@ class PaginatedResponse(BaseModel, Generic[T]):
         }
 
 
-def create_paginated_response(
-    items: list[T], total: int, page: int, page_size: int
-) -> PaginatedResponse[T]:
+def create_paginated_response(items: list[T], total: int, page: int, page_size: int) -> PaginatedResponse[T]:
     """
     Create paginated response from items and metadata
 
@@ -88,7 +83,7 @@ def create_paginated_response(
 class CursorPaginationParams(BaseModel):
     """Cursor-based pagination parameters (better for large datasets)"""
 
-    cursor: Optional[str] = Field(default=None, description="Cursor for next page")
+    cursor: str | None = Field(default=None, description="Cursor for next page")
     limit: int = Field(default=20, ge=1, le=100, description="Items per page (max 100)")
 
 
@@ -96,7 +91,7 @@ class CursorPaginatedResponse(BaseModel, Generic[T]):
     """Cursor-based paginated response"""
 
     items: list[T] = Field(description="List of items for current page")
-    next_cursor: Optional[str] = Field(default=None, description="Cursor for next page")
+    next_cursor: str | None = Field(default=None, description="Cursor for next page")
     has_more: bool = Field(description="Whether there are more items")
 
     class Config:

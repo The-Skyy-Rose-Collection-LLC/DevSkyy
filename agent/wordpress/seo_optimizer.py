@@ -14,7 +14,7 @@ Reference: Based on AGENTS.md Line 921-961
 from datetime import datetime
 import json  # noqa: F401 - Reserved for future JSON schema processing
 import logging
-from typing import Any, Optional
+from typing import Any
 
 
 logger = logging.getLogger(__name__)
@@ -44,9 +44,7 @@ class WordPressSEOOptimizer:
             "mobile_friendly": {"required": True, "weight": 10},
         }
 
-    async def optimize_page(
-        self, url: str, target_keywords: list[str], content_type: str = "page"
-    ) -> dict[str, Any]:
+    async def optimize_page(self, url: str, target_keywords: list[str], content_type: str = "page") -> dict[str, Any]:
         """
         Perform comprehensive SEO optimization on a page
 
@@ -67,9 +65,7 @@ class WordPressSEOOptimizer:
         recommendations = self._generate_recommendations(analysis)
 
         # Generate schema markup
-        schema = self.generate_schema_markup(
-            content_type, analysis.get("page_data", {})
-        )
+        schema = self.generate_schema_markup(content_type, analysis.get("page_data", {}))
 
         # Calculate SEO score
         seo_score = self._calculate_seo_score(analysis)
@@ -134,9 +130,7 @@ class WordPressSEOOptimizer:
 
         return analysis
 
-    def _generate_recommendations(
-        self, analysis: dict[str, Any]
-    ) -> list[dict[str, str]]:
+    def _generate_recommendations(self, analysis: dict[str, Any]) -> list[dict[str, str]]:
         """Generate SEO recommendations based on analysis"""
         recommendations = []
 
@@ -268,9 +262,7 @@ class WordPressSEOOptimizer:
     def _calculate_seo_score(self, analysis: dict[str, Any]) -> int:
         """Calculate overall SEO score (0-100)"""
         score = 0
-        max_score = sum(
-            bp["weight"] for bp in self.seo_best_practices.values() if "weight" in bp
-        )
+        max_score = sum(bp["weight"] for bp in self.seo_best_practices.values() if "weight" in bp)
 
         # Title score
         title_len = analysis["title"]["length"]
@@ -299,24 +291,15 @@ class WordPressSEOOptimizer:
             score += self.seo_best_practices["image_alt_text"]["weight"]
 
         # Internal links score
-        if (
-            analysis["links"]["internal"]
-            >= self.seo_best_practices["internal_links"]["min"]
-        ):
+        if analysis["links"]["internal"] >= self.seo_best_practices["internal_links"]["min"]:
             score += self.seo_best_practices["internal_links"]["weight"]
 
         # External links score
-        if (
-            analysis["links"]["external"]
-            >= self.seo_best_practices["external_links"]["min"]
-        ):
+        if analysis["links"]["external"] >= self.seo_best_practices["external_links"]["min"]:
             score += self.seo_best_practices["external_links"]["weight"]
 
         # Content length score
-        if (
-            analysis["content"]["word_count"]
-            >= self.seo_best_practices["content_length"]["min"]
-        ):
+        if analysis["content"]["word_count"] >= self.seo_best_practices["content_length"]["min"]:
             score += self.seo_best_practices["content_length"]["weight"]
 
         # HTTPS score
@@ -329,9 +312,7 @@ class WordPressSEOOptimizer:
 
         return int((score / max_score) * 100)
 
-    def generate_schema_markup(
-        self, content_type: str, page_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    def generate_schema_markup(self, content_type: str, page_data: dict[str, Any]) -> dict[str, Any]:
         """
         Generate schema.org markup
 
@@ -463,9 +444,7 @@ class WordPressSEOOptimizer:
 
         return sitemap
 
-    def analyze_keywords(
-        self, content: str, target_keywords: list[str]
-    ) -> dict[str, Any]:
+    def analyze_keywords(self, content: str, target_keywords: list[str]) -> dict[str, Any]:
         """
         Analyze keyword usage in content
 
@@ -487,20 +466,14 @@ class WordPressSEOOptimizer:
             analysis[keyword] = {
                 "count": count,
                 "density": round(density, 2),
-                "status": (
-                    "optimal"
-                    if 1.0 <= density <= 3.0
-                    else "low" if density < 1.0 else "high"
-                ),
+                "status": ("optimal" if 1.0 <= density <= 3.0 else "low" if density < 1.0 else "high"),
             }
 
         return {
             "keywords": analysis,
             "total_words": word_count,
             "overall_score": (
-                sum(1 for k in analysis.values() if k["status"] == "optimal")
-                / len(target_keywords)
-                * 100
+                sum(1 for k in analysis.values() if k["status"] == "optimal") / len(target_keywords) * 100
                 if target_keywords
                 else 0
             ),
@@ -509,8 +482,8 @@ class WordPressSEOOptimizer:
     def generate_robots_txt(
         self,
         allow_all: bool = True,
-        disallow_paths: Optional[list[str]] = None,
-        sitemap_url: Optional[str] = None,
+        disallow_paths: list[str] | None = None,
+        sitemap_url: str | None = None,
     ) -> str:
         """
         Generate robots.txt file

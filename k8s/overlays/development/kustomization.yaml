@@ -1,0 +1,179 @@
+---
+# DevSkyy Platform - Development Environment Overlay
+# Optimized for local development and testing
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: devskyy-dev
+
+# Reference base configuration
+resources:
+- ../../base
+
+# Environment-specific labels
+commonLabels:
+  environment: development
+  app.kubernetes.io/instance: devskyy-dev
+
+# Namespace suffix for development
+nameSuffix: -dev
+
+# Image overrides for development
+images:
+- name: devskyy
+  newName: devskyy
+  newTag: latest
+
+# Development-specific patches
+patches:
+# Reduce replicas for development
+- target:
+    kind: Deployment
+    name: devskyy
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 1
+
+# Lower resource limits for development
+- target:
+    kind: Deployment
+    name: devskyy
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "100m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "256Mi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "500m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "1Gi"
+
+# Disable HPA for development
+- target:
+    kind: HorizontalPodAutoscaler
+    name: devskyy-hpa
+  patch: |-
+    - op: replace
+      path: /spec/minReplicas
+      value: 1
+    - op: replace
+      path: /spec/maxReplicas
+      value: 2
+
+# Reduce PostgreSQL resources
+- target:
+    kind: StatefulSet
+    name: postgres
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "100m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "512Mi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "500m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "1Gi"
+
+# Reduce PostgreSQL storage
+- target:
+    kind: PersistentVolumeClaim
+    name: postgres-data
+  patch: |-
+    - op: replace
+      path: /spec/resources/requests/storage
+      value: "20Gi"
+
+# Reduce Redis resources
+- target:
+    kind: StatefulSet
+    name: redis
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "50m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "128Mi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "200m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "512Mi"
+
+# Reduce Redis storage
+- target:
+    kind: PersistentVolumeClaim
+    name: redis-data
+  patch: |-
+    - op: replace
+      path: /spec/resources/requests/storage
+      value: "5Gi"
+
+# Reduce application storage
+- target:
+    kind: PersistentVolumeClaim
+    name: devskyy-data
+  patch: |-
+    - op: replace
+      path: /spec/resources/requests/storage
+      value: "10Gi"
+
+# Development ingress configuration
+- target:
+    kind: Ingress
+    name: devskyy-ingress
+  patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: dev.devskyy.local
+    - op: replace
+      path: /spec/tls/0/hosts/0
+      value: dev.devskyy.local
+
+# Adjust ResourceQuota for development
+- target:
+    kind: ResourceQuota
+    name: devskyy-quota
+  patch: |-
+    - op: replace
+      path: /spec/hard/requests.cpu
+      value: "4"
+    - op: replace
+      path: /spec/hard/requests.memory
+      value: "8Gi"
+    - op: replace
+      path: /spec/hard/limits.cpu
+      value: "8"
+    - op: replace
+      path: /spec/hard/limits.memory
+      value: "16Gi"
+
+# ConfigMap customization for development
+configMapGenerator:
+- name: build-info
+  behavior: merge
+  literals:
+  - ENVIRONMENT=development
+  - LOG_LEVEL=DEBUG
+  - DEBUG=true
+
+# Development secrets (should be replaced with actual values)
+secretGenerator:
+- name: devskyy-secrets
+  behavior: replace
+  literals:
+  - DATABASE_URL=postgresql://devuser:devpass@postgres:5432/devskyy_dev
+  - REDIS_URL=redis://redis:6379/0
+  - SECRET_KEY=dev-secret-key-replace-in-production
+  - JWT_SECRET_KEY=dev-jwt-secret-replace-in-production
+  - ENCRYPTION_MASTER_KEY=dev-encryption-key-replace-in-production

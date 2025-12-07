@@ -3,7 +3,7 @@ import logging
 import os
 import re
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 import bcrypt
 from fastapi import Depends, HTTPException, status
@@ -88,9 +88,7 @@ class AuthManager:
         self.secret_key = os.getenv("JWT_SECRET_KEY", secrets.token_urlsafe(64))
         self.database_url = os.getenv("DATABASE_URL")
         if not self.database_url:
-            raise ValueError(
-                "DATABASE_URL environment variable must be set for security"
-            )
+            raise ValueError("DATABASE_URL environment variable must be set for security")
         self.security = HTTPBearer()
         self.engine = None
         self.SessionLocal = None
@@ -98,9 +96,7 @@ class AuthManager:
         try:
             self.init_database()
         except Exception as e:
-            logger.warning(
-                f"Database initialization failed, will retry when needed: {e!s}"
-            )
+            logger.warning(f"Database initialization failed, will retry when needed: {e!s}")
             self._db_initialized = False
 
     def init_database(self):
@@ -108,9 +104,7 @@ class AuthManager:
         try:
             if not self.engine:
                 self.engine = create_engine(self.database_url)
-                self.SessionLocal = sessionmaker(
-                    autocommit=False, autoflush=False, bind=self.engine
-                )
+                self.SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=self.engine)
             Base.metadata.create_all(bind=self.engine)
             logger.info("Database tables created successfully")
             self._db_initialized = True
@@ -186,11 +180,7 @@ class AuthManager:
 
         try:
             # Check if user already exists
-            existing_user = (
-                db.query(User)
-                .filter((User.email == email) | (User.username == username))
-                .first()
-            )
+            existing_user = db.query(User).filter((User.email == email) | (User.username == username)).first()
 
             if existing_user:
                 return {
@@ -320,7 +310,7 @@ class AuthManager:
         finally:
             db.close()
 
-    def verify_token(self, token: str) -> Optional[dict[str, Any]]:
+    def verify_token(self, token: str) -> dict[str, Any] | None:
         """Verify JWT token and return user data."""
         try:
             payload = jwt.decode(token, self.secret_key, algorithms=["HS256"])
@@ -352,9 +342,7 @@ class AuthManager:
         except jwt.InvalidTokenError:
             return None
 
-    def get_current_user(
-        self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())
-    ):
+    def get_current_user(self, credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
         """Dependency to get current authenticated user."""
         token = credentials.credentials
         payload = self.verify_token(token)
@@ -434,9 +422,9 @@ class AuthManager:
 
         try:
             # Deactivate all sessions for this user
-            db.query(UserSession).filter(
-                UserSession.user_id == payload["user_id"], UserSession.is_active
-            ).update({"is_active": False})
+            db.query(UserSession).filter(UserSession.user_id == payload["user_id"], UserSession.is_active).update(
+                {"is_active": False}
+            )
 
             db.commit()
             return {"success": True, "message": "Logged out successfully"}

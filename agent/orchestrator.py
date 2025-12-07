@@ -1,9 +1,10 @@
+import asyncio
 from collections import defaultdict, deque
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.base_agent import AgentStatus, BaseAgent
 
@@ -24,6 +25,7 @@ Features:
 
 logger = logging.getLogger(__name__)
 
+
 class ExecutionPriority(Enum):
     """Agent execution priority levels"""
 
@@ -31,6 +33,7 @@ class ExecutionPriority(Enum):
     HIGH = 2  # Core business logic (payments, orders)
     MEDIUM = 3  # Standard operations (content, analytics)
     LOW = 4  # Background tasks (learning, optimization)
+
 
 class TaskStatus(Enum):
     """Multi-agent task status"""
@@ -40,6 +43,7 @@ class TaskStatus(Enum):
     COMPLETED = "completed"
     FAILED = "failed"
     CANCELLED = "cancelled"
+
 
 @dataclass
 class AgentCapability:
@@ -52,6 +56,7 @@ class AgentCapability:
     max_concurrent: int = 5  # Max concurrent executions
     rate_limit: int = 100  # Requests per minute
 
+
 @dataclass
 class AgentTask:
     """Represents a task to be executed by one or more agents"""
@@ -62,11 +67,12 @@ class AgentTask:
     required_agents: list[str]
     priority: ExecutionPriority
     status: TaskStatus = TaskStatus.PENDING
-    result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
+    result: dict[str, Any] | None = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+
 
 class AgentOrchestrator:
     """
@@ -153,24 +159,28 @@ class AgentOrchestrator:
             enhanced_capabilities = capabilities.copy()
 
             # Add video generation capabilities if this is a fashion vision agent
-            if hasattr(agent, 'generate_fashion_runway_video'):
-                enhanced_capabilities.extend([
-                    "video_generation",
-                    "runway_video_generation",
-                    "product_360_video_generation",
-                    "video_upscaling",
-                    "fashion_image_generation"
-                ])
+            if hasattr(agent, "generate_fashion_runway_video"):
+                enhanced_capabilities.extend(
+                    [
+                        "video_generation",
+                        "runway_video_generation",
+                        "product_360_video_generation",
+                        "video_upscaling",
+                        "fashion_image_generation",
+                    ]
+                )
 
             # Add brand training capabilities if this is a brand trainer
-            if hasattr(agent, 'train_lora_model'):
-                enhanced_capabilities.extend([
-                    "brand_model_training",
-                    "dataset_preparation",
-                    "lora_fine_tuning",
-                    "brand_consistency_validation",
-                    "custom_model_generation"
-                ])
+            if hasattr(agent, "train_lora_model"):
+                enhanced_capabilities.extend(
+                    [
+                        "brand_model_training",
+                        "dataset_preparation",
+                        "lora_fine_tuning",
+                        "brand_consistency_validation",
+                        "custom_model_generation",
+                    ]
+                )
 
             # Register capabilities
             self.agent_capabilities[agent_name] = AgentCapability(
@@ -186,9 +196,7 @@ class AgentOrchestrator:
                 for dep in dependencies:
                     self.reverse_dependencies[dep].add(agent_name)
 
-            logger.info(
-                f"✅ Registered agent: {agent_name} with capabilities: {capabilities}"
-            )
+            logger.info(f"✅ Registered agent: {agent_name} with capabilities: {capabilities}")
             return True
 
         except Exception as e:
@@ -249,9 +257,7 @@ class AgentOrchestrator:
         # Find agents with required capabilities
         capable_agents = self._find_agents_with_capabilities(required_capabilities)
         if not capable_agents:
-            return {
-                "error": f"No agents found with capabilities: {required_capabilities}"
-            }
+            return {"error": f"No agents found with capabilities: {required_capabilities}"}
 
         # Resolve execution order based on dependencies
         execution_order = self._resolve_dependencies(capable_agents)
@@ -344,9 +350,7 @@ class AgentOrchestrator:
             task.error = str(e)
             return {"error": str(e), "task_id": task_id}
 
-    def _find_agents_with_capabilities(
-        self, required_capabilities: list[str]
-    ) -> list[str]:
+    def _find_agents_with_capabilities(self, required_capabilities: list[str]) -> list[str]:
         """Find all agents that have the required capabilities"""
         capable_agents = []
 
@@ -356,9 +360,7 @@ class AgentOrchestrator:
                 capable_agents.append(agent_name)
 
         # Sort by priority
-        capable_agents.sort(
-            key=lambda name: self.agent_capabilities[name].priority.value
-        )
+        capable_agents.sort(key=lambda name: self.agent_capabilities[name].priority.value)
 
         return capable_agents
 
@@ -404,9 +406,7 @@ class AgentOrchestrator:
     # CIRCUIT BREAKER PATTERN
     # ============================================================================
 
-    def _is_circuit_open(
-        self, agent_name: str, threshold: int = 5, timeout: int = 60
-    ) -> bool:
+    def _is_circuit_open(self, agent_name: str, threshold: int = 5, timeout: int = 60) -> bool:
         """Check if circuit breaker is open for an agent"""
         breaker = self.circuit_breakers[agent_name]
 
@@ -414,10 +414,7 @@ class AgentOrchestrator:
             return False
 
         # Check if timeout has passed
-        if (
-            breaker["opened_at"]
-            and (datetime.now() - breaker["opened_at"]).seconds > timeout
-        ):
+        if breaker["opened_at"] and (datetime.now() - breaker["opened_at"]).seconds > timeout:
             # Try to close circuit (half-open state)
             breaker["state"] = "half-open"
             return False
@@ -490,13 +487,11 @@ class AgentOrchestrator:
             "total_tasks": len(self.tasks),
             "agent_health": agent_health,
             "system_status": (
-                "healthy"
-                if all(a.status != AgentStatus.FAILED for a in self.agents.values())
-                else "degraded"
+                "healthy" if all(a.status != AgentStatus.FAILED for a in self.agents.values()) else "degraded"
             ),
         }
 
-    def get_agent_metrics(self, agent_name: Optional[str] = None) -> dict[str, Any]:
+    def get_agent_metrics(self, agent_name: str | None = None) -> dict[str, Any]:
         """Get performance metrics for agent(s)"""
         if agent_name:
             return self.agent_metrics.get(agent_name, {})
@@ -510,7 +505,7 @@ class AgentOrchestrator:
     # INTER-AGENT COMMUNICATION
     # ============================================================================
 
-    def share_data(self, key: str, value: Any, ttl: Optional[int] = None):
+    def share_data(self, key: str, value: Any, ttl: int | None = None):
         """Share data between agents"""
         self.shared_context[key] = {
             "value": value,
@@ -518,7 +513,7 @@ class AgentOrchestrator:
             "ttl": ttl,
         }
 
-    def get_shared_data(self, key: str) -> Optional[Any]:
+    def get_shared_data(self, key: str) -> Any | None:
         """Get shared data"""
         data = self.shared_context.get(key)
         if not data:
@@ -533,9 +528,7 @@ class AgentOrchestrator:
 
         return data.get("value")
 
-    async def broadcast_to_agents(
-        self, message: dict[str, Any], agent_names: Optional[list[str]] = None
-    ):
+    async def broadcast_to_agents(self, message: dict[str, Any], agent_names: list[str] | None = None):
         """Broadcast a message to multiple agents"""
         target_agents = agent_names if agent_names else list(self.agents.keys())
 
@@ -549,10 +542,7 @@ class AgentOrchestrator:
     # ============================================================================
 
     async def create_video_generation_task(
-        self,
-        task_type: str,
-        parameters: dict[str, Any],
-        priority: ExecutionPriority = ExecutionPriority.MEDIUM
+        self, task_type: str, parameters: dict[str, Any], priority: ExecutionPriority = ExecutionPriority.MEDIUM
     ) -> str:
         """
         Create a video generation task.
@@ -566,6 +556,7 @@ class AgentOrchestrator:
             Task ID
         """
         import uuid
+
         task_id = str(uuid.uuid4())
 
         # Determine required agents based on task type
@@ -582,7 +573,7 @@ class AgentOrchestrator:
             task_type=task_type,
             parameters=parameters,
             required_agents=required_agents,
-            priority=priority
+            priority=priority,
         )
 
         self.tasks[task_id] = task
@@ -658,7 +649,7 @@ class AgentOrchestrator:
             width=task.parameters.get("width", 1024),
             height=task.parameters.get("height", 576),
             style=task.parameters.get("style", "luxury fashion runway"),
-            upscale=task.parameters.get("upscale", True)
+            upscale=task.parameters.get("upscale", True),
         )
 
     async def _execute_product_360_task(self, task: AgentTask) -> dict[str, Any]:
@@ -672,7 +663,7 @@ class AgentOrchestrator:
             product_image_path=task.parameters.get("product_image_path"),
             rotation_steps=task.parameters.get("rotation_steps", 24),
             duration=task.parameters.get("duration", 3),
-            upscale=task.parameters.get("upscale", True)
+            upscale=task.parameters.get("upscale", True),
         )
 
     async def _execute_brand_training_task(self, task: AgentTask) -> dict[str, Any]:
@@ -685,7 +676,7 @@ class AgentOrchestrator:
         return await agent.train_lora_model(
             dataset_path=task.parameters.get("dataset_path"),
             model_name=task.parameters.get("model_name", "skyy_rose_v1"),
-            resume_from_checkpoint=task.parameters.get("resume_from_checkpoint")
+            resume_from_checkpoint=task.parameters.get("resume_from_checkpoint"),
         )
 
     async def _execute_custom_model_generation_task(self, task: AgentTask) -> dict[str, Any]:
@@ -700,7 +691,7 @@ class AgentOrchestrator:
             model_name=task.parameters.get("model_name", "skyy_rose_v1"),
             trigger_word=task.parameters.get("trigger_word", "skyrose_collection"),
             width=task.parameters.get("width", 1024),
-            height=task.parameters.get("height", 1024)
+            height=task.parameters.get("height", 1024),
         )
 
     async def _execute_video_upscaling_task(self, task: AgentTask) -> dict[str, Any]:
@@ -712,8 +703,252 @@ class AgentOrchestrator:
 
         return await agent.upscale_video(
             video_path=task.parameters.get("video_path"),
-            target_resolution=task.parameters.get("target_resolution", (2048, 1152))
+            target_resolution=task.parameters.get("target_resolution", (2048, 1152)),
         )
+
+
+# ============================================================================
+# DEMONSTRATION MODE - Mock Agents for Testing
+# ============================================================================
+
+
+class MockAgent(BaseAgent):
+    """Mock agent for demonstration purposes"""
+
+    def __init__(self, agent_name: str, version: str = "1.0.0", should_fail: bool = False):
+        super().__init__(agent_name, version)
+        self.should_fail = should_fail
+        self.execution_count = 0
+
+    async def initialize(self) -> bool:
+        """Initialize the mock agent"""
+        logger.info(f"🚀 Initializing {self.agent_name}...")
+        await asyncio.sleep(0.1)
+        self.status = AgentStatus.HEALTHY
+        return True
+
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
+        """Execute mock functionality"""
+        self.execution_count += 1
+
+        if self.should_fail and self.execution_count % 3 == 0:
+            raise Exception(f"Simulated failure in {self.agent_name}")
+
+        await asyncio.sleep(0.2)
+
+        return {
+            "agent": self.agent_name,
+            "execution_number": self.execution_count,
+            "status": "success",
+            "message": f"{self.agent_name} executed successfully",
+            "parameters_received": kwargs,
+        }
+
+
+async def run_orchestrator_demonstration():
+    """
+    Comprehensive demonstration of the AgentOrchestrator capabilities.
+
+    Showcases:
+    - Agent registration with capabilities and dependencies
+    - Dependency resolution and execution ordering
+    - Priority-based task execution
+    - Health monitoring and metrics
+    - Circuit breaker behavior
+    - Inter-agent communication
+    """
+    print("\n" + "=" * 80)
+    print("🎭 ENTERPRISE MULTI-AGENT ORCHESTRATOR DEMONSTRATION")
+    print("=" * 80 + "\n")
+
+    demo_orchestrator = AgentOrchestrator(max_concurrent_tasks=10)
+
+    print("📋 Step 1: Creating and Registering Agents")
+    print("-" * 80)
+
+    # Create mock agents with different capabilities
+    auth_agent = MockAgent("auth_agent", "1.0.0")
+    data_agent = MockAgent("data_processor", "1.0.0")
+    analytics_agent = MockAgent("analytics_agent", "1.0.0")
+    notification_agent = MockAgent("notification_agent", "1.0.0")
+
+    # Register agents with capabilities and dependencies
+    agents_config = [
+        (auth_agent, ["authentication", "authorization"], [], ExecutionPriority.CRITICAL),
+        (data_agent, ["data_processing", "validation"], ["auth_agent"], ExecutionPriority.HIGH),
+        (
+            analytics_agent,
+            ["analytics", "reporting"],
+            ["data_processor"],
+            ExecutionPriority.MEDIUM,
+        ),
+        (notification_agent, ["notifications", "alerts"], [], ExecutionPriority.LOW),
+    ]
+
+    for agent, capabilities, dependencies, priority in agents_config:
+        success = await demo_orchestrator.register_agent(
+            agent, capabilities=capabilities, dependencies=dependencies, priority=priority
+        )
+        if success:
+            print(f"  ✅ {agent.agent_name}: {', '.join(capabilities)}")
+            if dependencies:
+                print(f"     Dependencies: {', '.join(dependencies)}")
+
+    print(f"\n📊 Total agents registered: {len(demo_orchestrator.agents)}")
+
+    print("\n" + "=" * 80)
+    print("📋 Step 2: Dependency Graph Visualization")
+    print("-" * 80)
+
+    dep_graph = demo_orchestrator.get_dependency_graph()
+    if dep_graph:
+        for agent, deps in dep_graph.items():
+            print(f"  {agent} → depends on → {deps if deps else '(no dependencies)'}")
+    else:
+        print("  (No dependencies configured)")
+
+    print("\n" + "=" * 80)
+    print("📋 Step 3: Executing Multi-Agent Task with Dependency Resolution")
+    print("-" * 80)
+
+    task_result = await demo_orchestrator.execute_task(
+        task_type="process_user_request",
+        parameters={"user_id": "user_123", "action": "analyze_data", "priority": "high"},
+        required_capabilities=["authentication", "data_processing", "analytics"],
+        priority=ExecutionPriority.HIGH,
+    )
+
+    print("\n📊 Task Execution Results:")
+    print(f"  Task ID: {task_result.get('task_id')}")
+    print(f"  Status: {task_result.get('status')}")
+    print(f"  Execution Time: {task_result.get('execution_time', 0):.3f}s")
+    print("\n  Agent Results:")
+
+    for agent_name, result in task_result.get("results", {}).items():
+        status_icon = "✅" if result.get("status") == "success" else "❌"
+        print(f"    {status_icon} {agent_name}: {result.get('message', 'N/A')}")
+
+    print("\n" + "=" * 80)
+    print("📋 Step 4: Inter-Agent Data Sharing")
+    print("-" * 80)
+
+    demo_orchestrator.share_data("global_config", {"theme": "dark", "language": "en"}, ttl=300)
+    demo_orchestrator.share_data("user_session", {"user_id": "user_123", "role": "admin"})
+
+    print("  ✅ Shared data stored:")
+    print(f"    - global_config: {demo_orchestrator.get_shared_data('global_config')}")
+    print(f"    - user_session: {demo_orchestrator.get_shared_data('user_session')}")
+
+    await demo_orchestrator.broadcast_to_agents(
+        {"type": "system_announcement", "message": "Maintenance window scheduled"},
+        agent_names=["auth_agent", "notification_agent"],
+    )
+    print("\n  ✅ Broadcast message sent to: auth_agent, notification_agent")
+
+    print("\n" + "=" * 80)
+    print("📋 Step 5: Health Monitoring and Metrics")
+    print("-" * 80)
+
+    health = await demo_orchestrator.get_orchestrator_health()
+    print(f"\n  System Status: {health['system_status'].upper()}")
+    print(f"  Registered Agents: {health['registered_agents']}")
+    print(f"  Active Tasks: {health['active_tasks']}")
+    print(f"  Total Tasks Completed: {health['total_tasks']}")
+
+    print("\n  Agent Health Status:")
+    for agent_name, agent_health in health["agent_health"].items():
+        status = agent_health["status"]
+        status_icon = "✅" if status == "healthy" else "⚠️" if status == "degraded" else "❌"
+        metrics = agent_health["metrics"]
+        print(f"    {status_icon} {agent_name}:")
+        print(f"       - Status: {status}")
+        print(f"       - Calls: {metrics['calls']}")
+        print(f"       - Errors: {metrics['errors']}")
+        print(f"       - Avg Time: {metrics['avg_time']:.3f}s")
+        print(f"       - Circuit Breaker: {agent_health['circuit_breaker']}")
+
+    print("\n" + "=" * 80)
+    print("📋 Step 6: Agent Performance Metrics")
+    print("-" * 80)
+
+    all_metrics = demo_orchestrator.get_agent_metrics()
+    print("\n  Individual Agent Metrics:")
+    for agent_name, metrics in all_metrics.items():
+        print(f"    {agent_name}:")
+        print(f"      - Total Calls: {metrics['calls']}")
+        print(f"      - Success Rate: {(metrics['calls'] - metrics['errors']) / max(metrics['calls'], 1) * 100:.1f}%")
+        print(f"      - Average Execution Time: {metrics['avg_time']:.3f}s")
+
+    print("\n" + "=" * 80)
+    print("📋 Step 7: Priority-Based Execution")
+    print("-" * 80)
+
+    print("\n  Executing tasks with different priorities:")
+
+    priority_tasks = [
+        ("CRITICAL: Security scan", ExecutionPriority.CRITICAL, ["authentication"]),
+        ("HIGH: Data backup", ExecutionPriority.HIGH, ["data_processing"]),
+        ("MEDIUM: Generate report", ExecutionPriority.MEDIUM, ["analytics"]),
+        ("LOW: Send notifications", ExecutionPriority.LOW, ["notifications"]),
+    ]
+
+    for task_name, priority, capabilities in priority_tasks:
+        result = await demo_orchestrator.execute_task(
+            task_type=task_name, parameters={"task": task_name}, required_capabilities=capabilities, priority=priority
+        )
+        status_icon = "✅" if result.get("status") == "completed" else "❌"
+        print(f"    {status_icon} {priority.name}: {task_name} - {result.get('status')}")
+
+    print("\n" + "=" * 80)
+    print("✨ DEMONSTRATION COMPLETE")
+    print("=" * 80)
+
+    print("\n📈 Final Statistics:")
+    final_health = await demo_orchestrator.get_orchestrator_health()
+    print(f"  - Total Tasks Executed: {final_health['total_tasks']}")
+    print(f"  - System Status: {final_health['system_status'].upper()}")
+    print(f"  - All Agents Operational: {final_health['registered_agents']}")
+
+    print("\n" + "=" * 80 + "\n")
+
 
 # Global orchestrator instance with video generation capabilities
 orchestrator = AgentOrchestrator()
+
+
+# ============================================================================
+# MAIN - Run demonstration when executed directly
+# ============================================================================
+
+if __name__ == "__main__":
+    import sys
+
+    print(
+        """
+    ╔════════════════════════════════════════════════════════════════════════════╗
+    ║                                                                            ║
+    ║        🎭 DevSkyy Enterprise Multi-Agent Orchestrator v1.0.0              ║
+    ║                                                                            ║
+    ║        Enterprise-grade multi-agent coordination and management           ║
+    ║                                                                            ║
+    ╚════════════════════════════════════════════════════════════════════════════╝
+    """
+    )
+
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+        datefmt="%Y-%m-%d %H:%M:%S",
+    )
+
+    try:
+        asyncio.run(run_orchestrator_demonstration())
+        print("\n✅ Demonstration completed successfully!\n")
+        sys.exit(0)
+    except KeyboardInterrupt:
+        print("\n\n⚠️  Demonstration interrupted by user\n")
+        sys.exit(1)
+    except Exception as e:
+        print(f"\n\n❌ Demonstration failed: {e}\n")
+        logger.error(f"Demonstration error: {e}", exc_info=True)
+        sys.exit(1)

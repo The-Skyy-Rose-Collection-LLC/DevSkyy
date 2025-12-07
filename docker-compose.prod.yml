@@ -1,0 +1,377 @@
+# ============================================================================
+# DevSkyy Enterprise Platform - Production Docker Compose
+# Version: 5.2.0 | Production-Ready with Full Monitoring & Security
+# ============================================================================
+# Usage: docker-compose -f docker-compose.prod.yml up -d
+# ============================================================================
+
+version: '3.8'
+
+services:
+  # ============================================================================
+  # DevSkyy API (Production Mode)
+  # ============================================================================
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+      args:
+        PYTHON_VERSION: 3.11
+        BUILD_DATE: ${BUILD_DATE:-$(date -u +'%Y-%m-%dT%H:%M:%SZ')}
+        VCS_REF: ${VCS_REF:-$(git rev-parse --short HEAD)}
+    image: devskyy:prod
+    container_name: devskyy-api-prod
+    restart: always
+    environment:
+      # Production Settings
+      - ENVIRONMENT=production
+      - DEBUG=false
+      - LOG_LEVEL=INFO
+      - WORKERS=4
+
+      # Secrets (MUST be set in .env)
+      - SECRET_KEY=${SECRET_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+
+      # Database (Production)
+      - DATABASE_URL=${DATABASE_URL}
+
+      # Cache
+      - REDIS_URL=redis://redis:6379/0
+
+      # Performance
+      - PYTHONOPTIMIZE=2
+      - PYTHONHASHSEED=random
+    volumes:
+      # Persistent data only (NO source code)
+      - prod-data:/app/data
+      - prod-logs:/app/logs
+      - prod-artifacts:/app/artifacts
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    networks:
+      - devskyy-prod-network
+    command: >
+      sh -c "
+        python -m uvicorn main:app
+          --host 0.0.0.0
+          --port 8000
+          --workers 4
+          --log-level info
+          --no-access-log
+          --proxy-headers
+          --forwarded-allow-ips='*'
+      "
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/monitoring/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 4G
+        reservations:
+          cpus: '1.0'
+          memory: 2G
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+
+  # ============================================================================
+  # PostgreSQL Database (Production)
+  # ============================================================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: devskyy-postgres-prod
+    restart: always
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-devskyy}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+      # Production security
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+    volumes:
+      - postgres-prod-data:/var/lib/postgresql/data
+      - ./docker/init-db:/docker-entrypoint-initdb.d:ro
+      - postgres-backups:/backups
+    networks:
+      - devskyy-prod-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 2G
+        reservations:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================================================
+  # Redis Cache (Production)
+  # ============================================================================
+  redis:
+    image: redis:7-alpine
+    container_name: devskyy-redis-prod
+    restart: always
+    command: >
+      redis-server
+        --maxmemory 1gb
+        --maxmemory-policy allkeys-lru
+        --appendonly yes
+        --appendfsync everysec
+        --protected-mode yes
+        --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis-prod-data:/data
+    networks:
+      - devskyy-prod-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--pass", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================================================
+  # Nginx Reverse Proxy (Production)
+  # ============================================================================
+  nginx:
+    image: nginx:alpine
+    container_name: devskyy-nginx-prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./docker/nginx/ssl:/etc/nginx/ssl:ro
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - api
+    networks:
+      - devskyy-prod-network
+    healthcheck:
+      test: ["CMD", "nginx", "-t"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ============================================================================
+  # Prometheus (Monitoring)
+  # ============================================================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: devskyy-prometheus-prod
+    restart: always
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=30d'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus-prod-data:/prometheus
+    networks:
+      - devskyy-prod-network
+    depends_on:
+      - api
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 1G
+
+  # ============================================================================
+  # Grafana (Dashboards)
+  # ============================================================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: devskyy-grafana-prod
+    restart: always
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_ROOT_URL=https://${DOMAIN}/grafana/
+      - GF_SECURITY_COOKIE_SECURE=true
+      - GF_SECURITY_STRICT_TRANSPORT_SECURITY=true
+    volumes:
+      - grafana-prod-data:/var/lib/grafana
+      - ./docker/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./docker/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - devskyy-prod-network
+    depends_on:
+      - prometheus
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+  # ============================================================================
+  # Backup Service (Automated Database Backups)
+  # ============================================================================
+  backup:
+    image: prodrigestivill/postgres-backup-local:15-alpine
+    container_name: devskyy-backup
+    restart: always
+    environment:
+      - POSTGRES_HOST=postgres
+      - POSTGRES_DB=${POSTGRES_DB:-devskyy}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SCHEDULE=@daily
+      - BACKUP_KEEP_DAYS=7
+      - BACKUP_KEEP_WEEKS=4
+      - BACKUP_KEEP_MONTHS=6
+      - HEALTHCHECK_PORT=8080
+    volumes:
+      - postgres-backups:/backups
+    networks:
+      - devskyy-prod-network
+    depends_on:
+      - postgres
+
+  # ============================================================================
+  # Node Exporter (System Metrics)
+  # ============================================================================
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: devskyy-node-exporter
+    restart: always
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.rootfs=/rootfs'
+      - '--path.sysfs=/host/sys'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    networks:
+      - devskyy-prod-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 128M
+
+  # ============================================================================
+  # cAdvisor (Container Metrics)
+  # ============================================================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: devskyy-cadvisor
+    restart: always
+    privileged: true
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker:/var/lib/docker:ro
+      - /dev/disk:/dev/disk:ro
+    networks:
+      - devskyy-prod-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 256M
+
+# ============================================================================
+# VOLUMES (Production)
+# ============================================================================
+volumes:
+  postgres-prod-data:
+    driver: local
+  postgres-backups:
+    driver: local
+  redis-prod-data:
+    driver: local
+  prod-data:
+    driver: local
+  prod-logs:
+    driver: local
+  prod-artifacts:
+    driver: local
+  prometheus-prod-data:
+    driver: local
+  grafana-prod-data:
+    driver: local
+  nginx-logs:
+    driver: local
+
+# ============================================================================
+# NETWORKS (Production)
+# ============================================================================
+networks:
+  devskyy-prod-network:
+    driver: bridge
+    name: devskyy-prod
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
+
+# ============================================================================
+# PRODUCTION USAGE INSTRUCTIONS
+# ============================================================================
+# Prerequisites:
+#   1. Set all required environment variables in .env file
+#   2. Generate SSL certificates (docker/nginx/ssl/)
+#   3. Configure domain DNS pointing to server
+#
+# Deploy:
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# View logs:
+#   docker-compose -f docker-compose.prod.yml logs -f api
+#
+# Access services:
+#   - API: https://your-domain.com
+#   - API Docs: https://your-domain.com/docs (disabled in production)
+#   - Grafana: https://your-domain.com/grafana
+#   - Prometheus: https://your-domain.com/prometheus (internal only)
+#
+# Database backup (manual):
+#   docker-compose -f docker-compose.prod.yml exec backup backup
+#
+# Database restore:
+#   docker-compose -f docker-compose.prod.yml exec postgres \
+#     pg_restore -U ${POSTGRES_USER} -d ${POSTGRES_DB} /backups/latest.dump
+#
+# Update deployment:
+#   docker-compose -f docker-compose.prod.yml pull
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# Stop and cleanup:
+#   docker-compose -f docker-compose.prod.yml down
+# ============================================================================

@@ -4,7 +4,7 @@ import hashlib
 import hmac
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 
 """
@@ -23,6 +23,7 @@ Features:
 
 logger = logging.getLogger(__name__)
 
+
 class SecurityRole(Enum):
     """Security roles for agents"""
 
@@ -32,6 +33,7 @@ class SecurityRole(Enum):
     SERVICE = "service"  # Service-to-service communication
     GUEST = "guest"  # Limited access
 
+
 class PermissionLevel(Enum):
     """Permission levels"""
 
@@ -39,6 +41,7 @@ class PermissionLevel(Enum):
     WRITE = "write"
     EXECUTE = "execute"
     ADMIN = "admin"
+
 
 class SecurityManager:
     """
@@ -90,9 +93,7 @@ class SecurityManager:
     # AUTHENTICATION
     # ============================================================================
 
-    def generate_api_key(
-        self, agent_name: str, role: SecurityRole, expires_days: int = 365
-    ) -> str:
+    def generate_api_key(self, agent_name: str, role: SecurityRole, expires_days: int = 365) -> str:
         """
         Generate a secure API key for an agent.
 
@@ -126,13 +127,11 @@ class SecurityManager:
         self.agent_credentials[agent_name] = key_id
         self.agent_roles[agent_name] = role
 
-        self._audit_log(
-            "api_key_created", agent_name, {"key_id": key_id, "role": role.value}
-        )
+        self._audit_log("api_key_created", agent_name, {"key_id": key_id, "role": role.value})
 
         return f"{key_id}.{api_key}"
 
-    def validate_api_key(self, api_key: str) -> Optional[dict[str, Any]]:
+    def validate_api_key(self, api_key: str) -> dict[str, Any] | None:
         """
         Validate an API key.
 
@@ -161,9 +160,7 @@ class SecurityManager:
 
             # Check expiration
             if datetime.now() > key_info["expires_at"]:
-                self._audit_log(
-                    "expired_api_key", key_info["agent_name"], {"key_id": key_id}
-                )
+                self._audit_log("expired_api_key", key_info["agent_name"], {"key_id": key_id})
                 return None
 
             # Update usage
@@ -185,7 +182,7 @@ class SecurityManager:
             return True
         return False
 
-    def rotate_api_key(self, agent_name: str) -> Optional[str]:
+    def rotate_api_key(self, agent_name: str) -> str | None:
         """Rotate an agent's API key"""
         if agent_name not in self.agent_credentials:
             return None
@@ -219,9 +216,7 @@ class SecurityManager:
         """
         # Check if agent is blocked
         if agent_name in self.blocked_agents:
-            self._audit_log(
-                "blocked_agent_access_attempt", agent_name, {"resource": resource}
-            )
+            self._audit_log("blocked_agent_access_attempt", agent_name, {"resource": resource})
             return False
 
         # Get agent role
@@ -275,39 +270,20 @@ class SecurityManager:
     # ============================================================================
     # ENCRYPTION & SECRETS
     # ============================================================================
-
-    def encrypt_data(self, data: str, key: Optional[str] = None) -> str:
-        """
-        Encrypt sensitive data.
-
-        Args:
-            data: Data to encrypt
-            key: Encryption key (generated if not provided)
-
-        Returns:
-            Encrypted data as hex string
-        """
-        if not key:
-            key = secrets.token_bytes(32)
-
-        # Simple XOR encryption (in production, use proper encryption like AES)
-        encrypted = bytearray()
-        data_bytes = data.encode()
-
-        for i, byte in enumerate(data_bytes):
-            encrypted.append(byte ^ key[i % len(key)])
-
-        return encrypted.hex()
-
-    def decrypt_data(self, encrypted_hex: str, key: str) -> str:
-        """Decrypt data"""
-        encrypted = bytes.fromhex(encrypted_hex)
-        decrypted = bytearray()
-
-        for i, byte in enumerate(encrypted):
-            decrypted.append(byte ^ key[i % len(key)])
-
-        return decrypted.decode()
+    # NOTE: For data encryption, use the security.encryption module which provides
+    # AES-256-GCM encryption (NIST SP 800-38D compliant).
+    #
+    # Example usage:
+    #   from security.encryption import encrypt_field, decrypt_field
+    #   encrypted = encrypt_field("sensitive_data")
+    #   decrypted = decrypt_field(encrypted)
+    #
+    # The security.encryption module provides:
+    # - AES-256-GCM authenticated encryption
+    # - PBKDF2 key derivation (NIST SP 800-132)
+    # - Automatic nonce generation
+    # - Key rotation support
+    # - Field-level and dictionary encryption
 
     def store_secret(self, secret_name: str, secret_value: str):
         """Store a secret securely"""
@@ -328,9 +304,7 @@ class SecurityManager:
     # RATE LIMITING
     # ============================================================================
 
-    def check_rate_limit(
-        self, agent_name: str, limit: int = 100, window_seconds: int = 60
-    ) -> bool:
+    def check_rate_limit(self, agent_name: str, limit: int = 100, window_seconds: int = 60) -> bool:
         """
         Check if an agent has exceeded rate limits.
 
@@ -350,9 +324,7 @@ class SecurityManager:
             self.rate_limits[agent_name] = []
 
         # Clean old entries
-        self.rate_limits[agent_name] = [
-            ts for ts in self.rate_limits[agent_name] if ts > window_start
-        ]
+        self.rate_limits[agent_name] = [ts for ts in self.rate_limits[agent_name] if ts > window_start]
 
         # Check limit
         if len(self.rate_limits[agent_name]) >= limit:
@@ -424,8 +396,8 @@ class SecurityManager:
 
     def get_audit_log(
         self,
-        agent_name: Optional[str] = None,
-        event_type: Optional[str] = None,
+        agent_name: str | None = None,
+        event_type: str | None = None,
         limit: int = 100,
     ) -> list[dict[str, Any]]:
         """
@@ -442,14 +414,10 @@ class SecurityManager:
         filtered_logs = self.audit_log
 
         if agent_name:
-            filtered_logs = [
-                log for log in filtered_logs if log["agent_name"] == agent_name
-            ]
+            filtered_logs = [log for log in filtered_logs if log["agent_name"] == agent_name]
 
         if event_type:
-            filtered_logs = [
-                log for log in filtered_logs if log["event_type"] == event_type
-            ]
+            filtered_logs = [log for log in filtered_logs if log["event_type"] == event_type]
 
         return filtered_logs[-limit:]
 
@@ -463,6 +431,7 @@ class SecurityManager:
             "audit_log_entries": len(self.audit_log),
             "resources_protected": len(self.resource_acl),
         }
+
 
 # Global security manager instance
 security_manager = SecurityManager()

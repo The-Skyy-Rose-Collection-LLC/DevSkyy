@@ -1,0 +1,574 @@
+"""
+DevSkyy Enterprise Logging - Truth Protocol Aligned
+Unified logging with structlog, correlation IDs, security, and performance tracking
+"""
+
+from contextlib import contextmanager
+from contextvars import ContextVar
+from datetime import datetime
+from enum import Enum
+import json
+import logging
+import logging.config
+import logging.handlers
+import os
+from pathlib import Path
+import re
+import sys
+import traceback
+from typing import Any
+import uuid
+
+import structlog
+from structlog.stdlib import LoggerFactory
+
+
+# =============================================================================
+# CORRELATION ID MANAGEMENT (Thread-safe)
+# =============================================================================
+
+correlation_id: ContextVar[str | None] = ContextVar("correlation_id", default=None)
+
+
+def get_correlation_id() -> str:
+    """Get current correlation ID or generate new one."""
+    current_id = correlation_id.get()
+    if not current_id:
+        current_id = str(uuid.uuid4())
+        correlation_id.set(current_id)
+    return current_id
+
+
+def set_correlation_id(request_id: str):
+    """Set correlation ID for current context."""
+    correlation_id.set(request_id)
+
+
+def clear_correlation_id():
+    """Clear correlation ID from current context."""
+    correlation_id.set(None)
+
+
+# =============================================================================
+# SECURITY: SENSITIVE DATA REDACTION
+# =============================================================================
+
+SENSITIVE_PATTERNS = [
+    (re.compile(r'api[_-]?key["\']?\s*[:=]\s*["\']?([a-zA-Z0-9_\-]{20,})', re.IGNORECASE), "***API_KEY***"),
+    (re.compile(r'password["\']?\s*[:=]\s*["\']?([^\s"\']+)', re.IGNORECASE), "***PASSWORD***"),
+    (re.compile(r'token["\']?\s*[:=]\s*["\']?([a-zA-Z0-9_\-\.]{20,})', re.IGNORECASE), "***TOKEN***"),
+    (re.compile(r"([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})"), r"\1***@\2"),
+    (re.compile(r"\b\d{4}[\s-]?\d{4}[\s-]?\d{4}[\s-]?\d{4}\b"), "****-****-****-****"),
+    (re.compile(r"\b\d{3}-\d{2}-\d{4}\b"), "***-**-****"),
+]
+
+SENSITIVE_FIELDS = ["password", "token", "secret", "key", "authorization", "api_key", "access_token"]
+
+
+def redact_sensitive_data(data: Any) -> Any:
+    """Redact sensitive data from strings, dicts, or lists."""
+    if isinstance(data, str):
+        for pattern, replacement in SENSITIVE_PATTERNS:
+            data = pattern.sub(replacement, data)
+        return data
+    elif isinstance(data, dict):
+        return {
+            k: (
+                "***REDACTED***" if any(field in k.lower() for field in SENSITIVE_FIELDS) else redact_sensitive_data(v)
+            )
+            for k, v in data.items()
+        }
+    elif isinstance(data, list):
+        return [redact_sensitive_data(item) for item in data]
+    return data
+
+
+# =============================================================================
+# STRUCTLOG PROCESSORS
+# =============================================================================
+
+
+def add_correlation_id(logger, method_name, event_dict):
+    """Add correlation ID to log entries."""
+    event_dict["correlation_id"] = get_correlation_id()
+    return event_dict
+
+
+def add_timestamp(logger, method_name, event_dict):
+    """Add ISO timestamp to log entries."""
+    event_dict["timestamp"] = datetime.utcnow().isoformat() + "Z"
+    return event_dict
+
+
+def add_service_info(logger, method_name, event_dict):
+    """Add service information to log entries."""
+    event_dict["service"] = "devskyy"
+    event_dict["version"] = os.getenv("APP_VERSION", "5.1.0")
+    event_dict["environment"] = os.getenv("ENVIRONMENT", "development")
+    return event_dict
+
+
+def sanitize_processor(logger, method_name, event_dict):
+    """Sanitize sensitive data from log entries."""
+    for key, value in list(event_dict.items()):
+        event_dict[key] = redact_sensitive_data(value)
+    return event_dict
+
+
+# =============================================================================
+# CUSTOM FORMATTERS
+# =============================================================================
+
+
+class JSONFormatter(logging.Formatter):
+    """JSON formatter for structured logging."""
+
+    def format(self, record):
+        log_entry = {
+            "timestamp": datetime.utcnow().isoformat() + "Z",
+            "level": record.levelname,
+            "logger": record.name,
+            "message": record.getMessage(),
+            "correlation_id": get_correlation_id(),
+            "service": "devskyy",
+            "version": os.getenv("APP_VERSION", "5.1.0"),
+            "environment": os.getenv("ENVIRONMENT", "development"),
+        }
+
+        if record.exc_info:
+            log_entry["exception"] = self.formatException(record.exc_info)
+
+        # Add extra fields from record
+        for key, value in record.__dict__.items():
+            if key not in [
+                "name",
+                "msg",
+                "args",
+                "levelname",
+                "levelno",
+                "pathname",
+                "filename",
+                "module",
+                "lineno",
+                "funcName",
+                "created",
+                "msecs",
+                "relativeCreated",
+                "thread",
+                "threadName",
+                "processName",
+                "process",
+                "getMessage",
+                "exc_info",
+                "exc_text",
+                "stack_info",
+            ]:
+                log_entry[key] = value
+
+        return json.dumps(redact_sensitive_data(log_entry), default=str)
+
+
+class ColoredFormatter(logging.Formatter):
+    """Console formatter with color support."""
+
+    COLORS = {
+        "DEBUG": "\033[36m",
+        "INFO": "\033[32m",
+        "WARNING": "\033[33m",
+        "ERROR": "\033[31m",
+        "CRITICAL": "\033[35m",
+        "RESET": "\033[0m",
+    }
+
+    def format(self, record):
+        color = self.COLORS.get(record.levelname, "")
+        reset = self.COLORS["RESET"]
+        record.levelname = f"{color}{record.levelname}{reset}"
+        return super().format(record)
+
+
+# =============================================================================
+# LOGGING SETUP
+# =============================================================================
+
+
+def setup_logging(environment: str = None, log_level: str = None):
+    """
+    Setup unified enterprise logging.
+
+    Args:
+        environment: "production", "development", or "test" (defaults to ENVIRONMENT env var)
+        log_level: "DEBUG", "INFO", "WARNING", "ERROR" (defaults to LOG_LEVEL env var)
+    """
+    environment = environment or os.getenv("ENVIRONMENT", "development")
+    log_level = (log_level or os.getenv("LOG_LEVEL", "INFO")).upper()
+
+    # Configure structlog
+    structlog.configure(
+        processors=[
+            structlog.stdlib.filter_by_level,
+            structlog.stdlib.add_logger_name,
+            structlog.stdlib.add_log_level,
+            structlog.stdlib.PositionalArgumentsFormatter(),
+            add_correlation_id,
+            add_timestamp,
+            add_service_info,
+            sanitize_processor,
+            structlog.processors.StackInfoRenderer(),
+            structlog.processors.format_exc_info,
+            structlog.processors.UnicodeDecoder(),
+            structlog.processors.JSONRenderer(),
+        ],
+        context_class=dict,
+        logger_factory=LoggerFactory(),
+        wrapper_class=structlog.stdlib.BoundLogger,
+        cache_logger_on_first_use=True,
+    )
+
+    # Create logs directory
+    Path("logs").mkdir(exist_ok=True)
+
+    # Standard logging configuration
+    logging_config = {
+        "version": 1,
+        "disable_existing_loggers": False,
+        "formatters": {
+            "json": {"()": JSONFormatter},
+            "console": {
+                "()": ColoredFormatter if environment == "development" else JSONFormatter,
+                "format": "%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                "datefmt": "%Y-%m-%d %H:%M:%S",
+            },
+        },
+        "handlers": {
+            "console": {
+                "class": "logging.StreamHandler",
+                "formatter": "console",
+                "stream": sys.stdout,
+            },
+            "file": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": "logs/devskyy.log",
+                "maxBytes": 10485760,  # 10MB
+                "backupCount": 5,
+                "formatter": "json",
+            },
+            "security": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": "logs/security.log",
+                "maxBytes": 10485760,
+                "backupCount": 10,
+                "formatter": "json",
+            },
+            "error": {
+                "class": "logging.handlers.RotatingFileHandler",
+                "filename": "logs/error.log",
+                "maxBytes": 10485760,
+                "backupCount": 5,
+                "formatter": "json",
+                "level": "ERROR",
+            },
+        },
+        "loggers": {
+            "": {"handlers": ["console", "file"], "level": log_level, "propagate": False},
+            "devskyy.security": {"handlers": ["security", "console"], "level": "INFO", "propagate": False},
+            "devskyy.error": {"handlers": ["error", "console"], "level": "ERROR", "propagate": False},
+            "uvicorn": {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+            "fastapi": {"handlers": ["console", "file"], "level": "INFO", "propagate": False},
+            "sqlalchemy": {"handlers": ["file"], "level": "WARNING", "propagate": False},
+        },
+    }
+
+    logging.config.dictConfig(logging_config)
+
+    logger = structlog.get_logger()
+    logger.info("Logging initialized", log_level=log_level, environment=environment)
+
+
+def get_logger(name: str = None):
+    """Get a logger instance (uses structlog)."""
+    return structlog.get_logger(name) if name else structlog.get_logger()
+
+
+# =============================================================================
+# SPECIALIZED LOGGERS
+# =============================================================================
+
+
+class SecurityLogger:
+    """Specialized logger for security events."""
+
+    def __init__(self):
+        self.logger = logging.getLogger("devskyy.security")
+
+    def log_auth_event(self, event_type: str, user_id: str, client_ip: str, success: bool, **kwargs):
+        """Log authentication events."""
+        self.logger.info(
+            f"Auth {event_type}: {'SUCCESS' if success else 'FAILED'}",
+            extra={
+                "security_category": "authentication",
+                "event_type": event_type,
+                "user_id": user_id,
+                "client_ip": client_ip,
+                "success": success,
+                "threat_level": "low" if success else "medium",
+                **kwargs,
+            },
+        )
+
+    def log_authz_event(self, user_id: str, resource: str, action: str, allowed: bool, **kwargs):
+        """Log authorization events."""
+        self.logger.info(
+            f"Authz: {action} on {resource} {'ALLOWED' if allowed else 'DENIED'}",
+            extra={
+                "security_category": "authorization",
+                "user_id": user_id,
+                "resource": resource,
+                "action": action,
+                "allowed": allowed,
+                "threat_level": "low" if allowed else "medium",
+                **kwargs,
+            },
+        )
+
+    def log_violation(self, violation_type: str, client_ip: str, details: str, threat_level: str = "high", **kwargs):
+        """Log security violations."""
+        self.logger.warning(
+            f"Security violation: {violation_type}",
+            extra={
+                "security_category": "violation",
+                "violation_type": violation_type,
+                "client_ip": client_ip,
+                "details": details,
+                "threat_level": threat_level,
+                **kwargs,
+            },
+        )
+
+    def log_data_access(self, user_id: str, table: str, operation: str, record_count: int = None, **kwargs):
+        """Log data access events."""
+        self.logger.info(
+            f"Data access: {operation} on {table}",
+            extra={
+                "security_category": "data_access",
+                "user_id": user_id,
+                "table": table,
+                "operation": operation,
+                "record_count": record_count,
+                "threat_level": "low",
+                **kwargs,
+            },
+        )
+
+
+class ErrorLogger:
+    """Specialized logger for error tracking."""
+
+    def __init__(self):
+        self.logger = logging.getLogger("devskyy.error")
+
+    def log_app_error(self, error: Exception, context: dict = None):
+        """Log application errors with context."""
+        self.logger.error(
+            f"Application error: {error}",
+            exc_info=error,
+            extra={
+                "error_type": type(error).__name__,
+                "error_message": str(error),
+                "context": context or {},
+                "correlation_id": get_correlation_id(),
+            },
+        )
+
+    def log_application_error(self, error: Exception, context: dict = None):
+        """Alias for log_app_error for backward compatibility."""
+        return self.log_app_error(error, context)
+
+    def log_api_error(self, endpoint: str, method: str, status_code: int, error: Exception, user_id: str = None):
+        """Log API errors."""
+        self.logger.error(
+            f"API error: {method} {endpoint} - {status_code}",
+            exc_info=error,
+            extra={
+                "error_category": "api",
+                "endpoint": endpoint,
+                "method": method,
+                "status_code": status_code,
+                "user_id": user_id,
+                "error_type": type(error).__name__,
+            },
+        )
+
+    def log_db_error(self, operation: str, error: Exception, query: str = None, user_id: str = None):
+        """Log database errors."""
+        self.logger.error(
+            f"Database error: {operation}",
+            exc_info=error,
+            extra={
+                "error_category": "database",
+                "operation": operation,
+                "query": query[:200] if query else None,
+                "user_id": user_id,
+                "error_type": type(error).__name__,
+            },
+        )
+
+
+class PerformanceLogger:
+    """Logger with performance tracking (P95 < 200ms requirement)."""
+
+    def __init__(self, name: str):
+        self.logger = get_logger(name)
+        self.latencies: dict[str, list] = {}
+
+    @contextmanager
+    def track(self, operation: str):
+        """Context manager to track operation duration."""
+        import time
+
+        start = time.time()
+        try:
+            yield
+        finally:
+            elapsed_ms = (time.time() - start) * 1000
+
+            if operation not in self.latencies:
+                self.latencies[operation] = []
+            self.latencies[operation].append(elapsed_ms)
+
+            self.logger.info(
+                f"{operation}_completed", operation=operation, duration_ms=round(elapsed_ms, 2), status="success"
+            )
+
+            if elapsed_ms > 200:
+                self.logger.warning(
+                    f"{operation}_slow",
+                    operation=operation,
+                    duration_ms=round(elapsed_ms, 2),
+                    threshold_ms=200,
+                    exceeded_by_ms=round(elapsed_ms - 200, 2),
+                )
+
+    def get_p95(self, operation: str) -> float | None:
+        """Calculate P95 latency for an operation."""
+        if operation not in self.latencies or not self.latencies[operation]:
+            return None
+        sorted_latencies = sorted(self.latencies[operation])
+        p95_index = int(len(sorted_latencies) * 0.95)
+        return sorted_latencies[p95_index]
+
+
+# =============================================================================
+# ERROR LEDGER (Truth Protocol requirement)
+# =============================================================================
+
+
+def log_to_error_ledger(error_type: str, error_message: str, context: dict = None, ledger_file: str = None):
+    """
+    Log errors to Truth Protocol error ledger.
+    Required by "No-skip rule" - all errors must be recorded.
+    """
+    ledger_file = ledger_file or f"artifacts/error-ledger-{os.getenv('RUN_ID', 'manual')}.json"
+    Path(ledger_file).parent.mkdir(exist_ok=True)
+
+    error_entry = {
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "error_type": error_type,
+        "error_message": error_message,
+        "context": context or {},
+        "correlation_id": get_correlation_id(),
+        "traceback": traceback.format_exc(),
+    }
+
+    with open(ledger_file, "a") as f:
+        f.write(json.dumps(error_entry) + "\n")
+
+    get_logger("error_ledger").error(
+        "error_recorded", error_type=error_type, error_message=error_message, **context or {}
+    )
+
+
+# =============================================================================
+# LOG CATEGORIES
+# =============================================================================
+
+
+class LogCategory(Enum):
+    """Log categories for better organization."""
+
+    SECURITY = "security"
+    PERFORMANCE = "performance"
+    BUSINESS = "business"
+    SYSTEM = "system"
+    API = "api"
+    DATABASE = "database"
+    CACHE = "cache"
+    EXTERNAL = "external"
+    USER = "user"
+    AUDIT = "audit"
+
+
+# =============================================================================
+# ENTERPRISE LOGGER (Compatibility layer)
+# =============================================================================
+
+
+class EnterpriseLogger:
+    """
+    Enterprise logger wrapper that provides the same interface as the old
+    monitoring.enterprise_logging module but uses the unified logging system.
+    """
+
+    def __init__(self):
+        self.logger = get_logger("enterprise")
+
+    def debug(self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None):
+        """Log debug message."""
+        self.logger.debug(message, category=category.value, **(metadata or {}))
+
+    def info(
+        self,
+        message: str,
+        category: LogCategory = LogCategory.SYSTEM,
+        metadata: dict = None,
+        performance_metrics: dict = None,
+    ):
+        """Log info message."""
+        extra = {**(metadata or {})}
+        if performance_metrics:
+            extra["performance_metrics"] = performance_metrics
+        self.logger.info(message, category=category.value, **extra)
+
+    def warning(self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None):
+        """Log warning message."""
+        self.logger.warning(message, category=category.value, **(metadata or {}))
+
+    def error(
+        self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None, error: Exception = None
+    ):
+        """Log error message."""
+        extra = {**(metadata or {})}
+        if error:
+            extra["error"] = str(error)
+            extra["error_type"] = type(error).__name__
+        self.logger.error(message, category=category.value, exc_info=error, **extra)
+
+    def critical(
+        self, message: str, category: LogCategory = LogCategory.SYSTEM, metadata: dict = None, error: Exception = None
+    ):
+        """Log critical message."""
+        extra = {**(metadata or {})}
+        if error:
+            extra["error"] = str(error)
+            extra["error_type"] = type(error).__name__
+        self.logger.critical(message, category=category.value, exc_info=error, **extra)
+
+
+# =============================================================================
+# GLOBAL INSTANCES
+# =============================================================================
+
+security_logger = SecurityLogger()
+error_logger = ErrorLogger()
+structured_logger = get_logger()
+enterprise_logger = EnterpriseLogger()

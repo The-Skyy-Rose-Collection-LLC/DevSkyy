@@ -1,0 +1,266 @@
+{
+  "title": "Single Product Template - SkyyRose",
+  "type": "wc-single-product",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_header_footer",
+    "post_status": "publish"
+  },
+  "content": [
+    {
+      "id": "product-breadcrumb",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#F5F5F0",
+        "padding": {"top": "20", "bottom": "20", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "breadcrumb-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "breadcrumb",
+              "elType": "widget",
+              "widgetType": "woocommerce-breadcrumb",
+              "settings": {
+                "text_color": "#4A4A4A",
+                "link_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_letter_spacing": {"size": 1, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-main",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#FFFFFF",
+        "padding": {"top": "40", "bottom": "60", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "gallery-column",
+          "elType": "column",
+          "settings": {"_column_size": 50},
+          "elements": [
+            {
+              "id": "product-images",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-images",
+              "settings": {
+                "sale_flash": "yes",
+                "lightbox": "yes",
+                "image_border_radius": {"size": 0, "unit": "px"}
+              }
+            }
+          ]
+        },
+        {
+          "id": "details-column",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "padding": {"left": "40", "unit": "px"}
+          },
+          "elements": [
+            {
+              "id": "product-title",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-title",
+              "settings": {
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 1, "unit": "px"}
+              }
+            },
+            {
+              "id": "product-price",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-price",
+              "settings": {
+                "price_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 28, "unit": "px"},
+                "typography_font_weight": "600"
+              }
+            },
+            {
+              "id": "product-rating",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-rating",
+              "settings": {
+                "star_color": "#B76E79",
+                "star_size": {"size": 18, "unit": "px"}
+              }
+            },
+            {
+              "id": "product-description",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-short-description",
+              "settings": {
+                "text_color": "#4A4A4A",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 15, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"}
+              }
+            },
+            {
+              "id": "product-add-to-cart",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-add-to-cart",
+              "settings": {
+                "button_text_color": "#F5F5F0",
+                "button_background_color": "#0D0D0D",
+                "button_hover_color": "#F5F5F0",
+                "button_hover_background_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "button_border_radius": {"size": 0, "unit": "px"},
+                "button_padding": {"top": "18", "right": "40", "bottom": "18", "left": "40", "unit": "px"}
+              }
+            },
+            {
+              "id": "product-meta",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-meta",
+              "settings": {
+                "text_color": "#4A4A4A",
+                "link_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 13, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "product-tabs",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#F5F5F0",
+        "padding": {"top": "40", "bottom": "60", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "tabs-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "product-data-tabs",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-data-tabs",
+              "settings": {
+                "tab_text_color": "#4A4A4A",
+                "tab_active_color": "#0D0D0D",
+                "tab_border_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "content_typography_font_family": "Montserrat"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "related-products",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#FFFFFF",
+        "padding": {"top": "60", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "related-header",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "related-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "YOU MAY ALSO LIKE",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 28, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "related-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "related-products-widget",
+              "elType": "widget",
+              "widgetType": "woocommerce-product-related",
+              "settings": {
+                "columns": 4,
+                "posts_per_page": 4,
+                "products_class": "sr-product-card"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "template_type": "woocommerce-single-product",
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "woocommerce_settings": {
+      "image_sizes": {
+        "single": [800, 800],
+        "thumbnail": [300, 300],
+        "gallery": [100, 100]
+      },
+      "attributes": ["Color", "Size"]
+    },
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79",
+      "slate": "#4A4A4A"
+    },
+    "typography": {
+      "product_title": "Playfair Display, 700, 36px",
+      "product_price": "Montserrat, 600, 28px",
+      "product_description": "Montserrat, 400, 15px"
+    },
+    "css_classes_used": ["sr-product-card", "sr-button"]
+  }
+}

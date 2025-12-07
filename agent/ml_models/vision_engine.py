@@ -12,6 +12,7 @@ Reference: AGENTS.md Line 1565-1569
 
 logger = logging.getLogger(__name__)
 
+
 class VisionEngine:
     """Computer vision capabilities for fashion images"""
 

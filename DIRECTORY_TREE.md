@@ -69,8 +69,7 @@ DevSkyy/
 │   │   ├── __init__.py
 │   │   ├── auth0_integration.py         # Auth0 integration
 │   │   ├── jwt_auth.py                  # JWT authentication
-│   │   ├── encryption.py                # AES-256-GCM encryption
-│   │   ├── encryption_v2.py             # Enhanced encryption
+│   │   ├── encryption.py                # AES-256-GCM encryption (enhanced)
 │   │   ├── enhanced_security.py         # Security utilities
 │   │   ├── compliance_monitor.py        # Compliance monitoring
 │   │   ├── gdpr_compliance.py           # GDPR compliance

@@ -1,0 +1,46 @@
+---
+# DevSkyy Platform - Pod Disruption Budget
+# Ensures high availability during voluntary disruptions
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: devskyy-pdb
+  namespace: devskyy
+  labels:
+    app: devskyy
+    environment: production
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app: devskyy
+---
+# PostgreSQL PDB
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: postgres-pdb
+  namespace: devskyy
+  labels:
+    app: postgres
+    environment: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: postgres
+---
+# Redis PDB
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: redis-pdb
+  namespace: devskyy
+  labels:
+    app: redis
+    environment: production
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: redis

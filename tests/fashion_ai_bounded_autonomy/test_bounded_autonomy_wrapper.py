@@ -58,10 +58,7 @@ def mock_agent():
 def wrapper(mock_agent, temp_audit_path):
     """Create BoundedAutonomyWrapper instance"""
     return BoundedAutonomyWrapper(
-        wrapped_agent=mock_agent,
-        auto_approve_low_risk=True,
-        local_only=True,
-        audit_log_path=temp_audit_path
+        wrapped_agent=mock_agent, auto_approve_low_risk=True, local_only=True, audit_log_path=temp_audit_path
     )
 
 
@@ -71,10 +68,7 @@ class TestBoundedAutonomyWrapperInitialization:
     def test_init_creates_audit_directory(self, mock_agent, temp_audit_path):
         """Test that initialization creates audit log directory"""
         audit_path = Path(temp_audit_path) / "custom_audit"
-        BoundedAutonomyWrapper(
-            wrapped_agent=mock_agent,
-            audit_log_path=str(audit_path)
-        )
+        BoundedAutonomyWrapper(wrapped_agent=mock_agent, audit_log_path=str(audit_path))
         assert audit_path.exists()
 
     def test_init_sets_default_values(self, wrapper):
@@ -173,7 +167,7 @@ class TestNetworkCallDetection:
             function_name="call_api_endpoint",
             parameters={},
             risk_level=ActionRiskLevel.HIGH,
-            requires_approval=True
+            requires_approval=True,
         )
         assert wrapper._involves_network_call(action) is True
 
@@ -188,7 +182,7 @@ class TestNetworkCallDetection:
                 function_name=func,
                 parameters={},
                 risk_level=ActionRiskLevel.MEDIUM,
-                requires_approval=True
+                requires_approval=True,
             )
             assert wrapper._involves_network_call(action) is True
 
@@ -203,7 +197,7 @@ class TestNetworkCallDetection:
                 function_name=func,
                 parameters={},
                 risk_level=ActionRiskLevel.LOW,
-                requires_approval=False
+                requires_approval=False,
             )
             assert wrapper._involves_network_call(action) is False
 
@@ -214,10 +208,7 @@ class TestExecuteLowRisk:
     @pytest.mark.asyncio
     async def test_execute_low_risk_auto_approved(self, wrapper):
         """Test that low-risk actions execute immediately"""
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
+        result = await wrapper.execute(function_name="read_data", parameters={"source": "test.csv"})
 
         assert result["status"] == "completed"
         assert "result" in result
@@ -226,10 +217,7 @@ class TestExecuteLowRisk:
     @pytest.mark.asyncio
     async def test_execute_records_audit_log(self, wrapper, temp_audit_path):
         """Test that execution is audited"""
-        await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
+        await wrapper.execute(function_name="read_data", parameters={"source": "test.csv"})
 
         # Check audit log file was created
         audit_files = list(Path(temp_audit_path).glob("audit_*.jsonl"))
@@ -238,10 +226,7 @@ class TestExecuteLowRisk:
     @pytest.mark.asyncio
     async def test_execute_tracks_execution_time(self, wrapper):
         """Test that execution time is tracked"""
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
+        result = await wrapper.execute(function_name="read_data", parameters={"source": "test.csv"})
 
         assert "execution_time_seconds" in result
         assert result["execution_time_seconds"] >= 0
@@ -254,8 +239,7 @@ class TestExecuteHighRisk:
     async def test_execute_high_risk_requires_approval(self, wrapper):
         """Test that high-risk actions require approval"""
         result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123", "data": {"field": "value"}}
+            function_name="update_data", parameters={"id": "123", "data": {"field": "value"}}
         )
 
         assert result["status"] == "pending_approval"
@@ -266,8 +250,7 @@ class TestExecuteHighRisk:
     async def test_execute_critical_requires_approval(self, wrapper):
         """Test that critical actions require approval"""
         result = await wrapper.execute(
-            function_name="delete_resource",
-            parameters={"resource_id": "important_resource"}
+            function_name="delete_resource", parameters={"resource_id": "important_resource"}
         )
 
         assert result["status"] == "pending_approval"
@@ -277,10 +260,7 @@ class TestExecuteHighRisk:
         """Test that pending actions are added to queue"""
         initial_count = len(wrapper.pending_actions)
 
-        await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
+        await wrapper.execute(function_name="update_data", parameters={"id": "123"})
 
         assert len(wrapper.pending_actions) == initial_count + 1
 
@@ -293,10 +273,7 @@ class TestEmergencyControls:
         """Test that emergency stop blocks all execution"""
         wrapper.emergency_shutdown("Test emergency")
 
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
+        result = await wrapper.execute(function_name="read_data", parameters={"source": "test.csv"})
 
         assert result["status"] == "blocked"
         assert "emergency" in result["error"].lower()
@@ -306,10 +283,7 @@ class TestEmergencyControls:
         """Test that pause queues execution"""
         wrapper.pause()
 
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={"source": "test.csv"}
-        )
+        result = await wrapper.execute(function_name="read_data", parameters={"source": "test.csv"})
 
         assert result["status"] == "queued"
         assert "paused" in result["error"].lower()
@@ -331,7 +305,7 @@ class TestEmergencyControls:
             function_name="update_data",
             parameters={},
             risk_level=ActionRiskLevel.HIGH,
-            requires_approval=True
+            requires_approval=True,
         )
         wrapper.pending_actions["test_action"] = action
 
@@ -349,10 +323,7 @@ class TestApproveAction:
     async def test_approve_action_executes(self, wrapper):
         """Test that approving action executes it"""
         # Create pending action
-        result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
+        result = await wrapper.execute(function_name="update_data", parameters={"id": "123"})
         action_id = result["action_id"]
 
         # Approve and execute
@@ -372,10 +343,7 @@ class TestApproveAction:
     @pytest.mark.asyncio
     async def test_approve_updates_audit_trail(self, wrapper):
         """Test that approval updates audit trail"""
-        result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
+        result = await wrapper.execute(function_name="update_data", parameters={"id": "123"})
         action_id = result["action_id"]
 
         await wrapper.approve_action(action_id, "test_operator")
@@ -390,10 +358,7 @@ class TestRejectAction:
     @pytest.mark.asyncio
     async def test_reject_action_removes_from_queue(self, wrapper):
         """Test that rejecting action removes it from queue"""
-        result = await wrapper.execute(
-            function_name="update_data",
-            parameters={"id": "123"}
-        )
+        result = await wrapper.execute(function_name="update_data", parameters={"id": "123"})
         action_id = result["action_id"]
 
         reject_result = await wrapper.reject_action(action_id, "operator", "Not authorized")
@@ -415,10 +380,7 @@ class TestLocalOnlyMode:
     @pytest.mark.asyncio
     async def test_local_only_blocks_network_calls(self, wrapper):
         """Test that local-only mode blocks network calls"""
-        result = await wrapper.execute(
-            function_name="api_call",
-            parameters={"endpoint": "https://example.com"}
-        )
+        result = await wrapper.execute(function_name="api_call", parameters={"endpoint": "https://example.com"})
 
         # Action requires approval first
         action_id = result["action_id"]
@@ -435,10 +397,7 @@ class TestLocalOnlyMode:
         """Test that blocked network calls are tracked"""
         initial_count = wrapper.network_calls_blocked
 
-        result = await wrapper.execute(
-            function_name="api_call",
-            parameters={"endpoint": "https://example.com"}
-        )
+        result = await wrapper.execute(function_name="api_call", parameters={"endpoint": "https://example.com"})
         action_id = result["action_id"]
         await wrapper.approve_action(action_id, "operator")
 
@@ -494,10 +453,7 @@ class TestEdgeCases:
     @pytest.mark.asyncio
     async def test_execute_nonexistent_function(self, wrapper):
         """Test executing non-existent function"""
-        result = await wrapper.execute(
-            function_name="nonexistent_function",
-            parameters={}
-        )
+        result = await wrapper.execute(function_name="nonexistent_function", parameters={})
 
         # Should still create action and try to execute
         assert result["status"] in ["pending_approval", "error"]
@@ -505,10 +461,7 @@ class TestEdgeCases:
     @pytest.mark.asyncio
     async def test_execute_with_empty_parameters(self, wrapper):
         """Test executing with empty parameters"""
-        result = await wrapper.execute(
-            function_name="read_data",
-            parameters={}
-        )
+        result = await wrapper.execute(function_name="read_data", parameters={})
 
         assert "status" in result
 
@@ -518,12 +471,9 @@ class TestEdgeCases:
         complex_params = {
             "nested": {"level1": {"level2": "value"}},
             "array": [1, 2, 3],
-            "mixed": {"key": "value", "number": 42}
+            "mixed": {"key": "value", "number": 42},
         }
 
-        result = await wrapper.execute(
-            function_name="process_data",
-            parameters=complex_params
-        )
+        result = await wrapper.execute(function_name="process_data", parameters=complex_params)
 
         assert "status" in result

@@ -3,7 +3,7 @@ import importlib
 import inspect
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from agent.modules.base_agent import BaseAgent
 from agent.orchestrator import ExecutionPriority, orchestrator
@@ -24,6 +24,7 @@ Features:
 """
 
 logger = logging.getLogger(__name__)
+
 
 class AgentRegistry:
     """
@@ -114,9 +115,7 @@ class AgentRegistry:
         # Discover backend agents
         backend_path = Path(__file__).parent / "modules" / "backend"
         if backend_path.exists():
-            backend_agents = await self._discover_agents_in_directory(
-                backend_path, "agent.modules.backend"
-            )
+            backend_agents = await self._discover_agents_in_directory(backend_path, "agent.modules.backend")
             summary["discovered"] += len(backend_agents)
 
             for agent_info in backend_agents:
@@ -126,16 +125,12 @@ class AgentRegistry:
                     summary["agents"].append(agent_info["name"])
                 else:
                     summary["failed"] += 1
-                    summary["errors"].append(
-                        f"Failed to register: {agent_info['name']}"
-                    )
+                    summary["errors"].append(f"Failed to register: {agent_info['name']}")
 
         # Discover frontend agents
         frontend_path = Path(__file__).parent / "modules" / "frontend"
         if frontend_path.exists():
-            frontend_agents = await self._discover_agents_in_directory(
-                frontend_path, "agent.modules.frontend"
-            )
+            frontend_agents = await self._discover_agents_in_directory(frontend_path, "agent.modules.frontend")
             summary["discovered"] += len(frontend_agents)
 
             for agent_info in frontend_agents:
@@ -145,18 +140,12 @@ class AgentRegistry:
                     summary["agents"].append(agent_info["name"])
                 else:
                     summary["failed"] += 1
-                    summary["errors"].append(
-                        f"Failed to register: {agent_info['name']}"
-                    )
+                    summary["errors"].append(f"Failed to register: {agent_info['name']}")
 
-        logger.info(
-            f"✅ Discovery complete: {summary['registered']}/{summary['discovered']} agents registered"
-        )
+        logger.info(f"✅ Discovery complete: {summary['registered']}/{summary['discovered']} agents registered")
         return summary
 
-    async def _discover_agents_in_directory(
-        self, directory: Path, module_prefix: str
-    ) -> list[dict[str, Any]]:
+    async def _discover_agents_in_directory(self, directory: Path, module_prefix: str) -> list[dict[str, Any]]:
         """Discover all agent files in a directory"""
         agents = []
 
@@ -174,9 +163,7 @@ class AgentRegistry:
 
         return agents
 
-    async def _analyze_agent_file(
-        self, file_path: Path, module_prefix: str
-    ) -> Optional[dict[str, Any]]:
+    async def _analyze_agent_file(self, file_path: Path, module_prefix: str) -> dict[str, Any] | None:
         """Analyze an agent file to extract information"""
         try:
             # Get module name
@@ -233,9 +220,7 @@ class AgentRegistry:
 
             if success:
                 # Generate API key for agent
-                api_key = security_manager.generate_api_key(
-                    agent_name, SecurityRole.SERVICE
-                )
+                api_key = security_manager.generate_api_key(agent_name, SecurityRole.SERVICE)
 
                 # Store metadata
                 self.registered_agents[agent_name] = {
@@ -254,9 +239,7 @@ class AgentRegistry:
                     "status": "active",
                 }
 
-                logger.info(
-                    f"✅ Registered agent: {agent_name} v{agent_info['version']}"
-                )
+                logger.info(f"✅ Registered agent: {agent_name} v{agent_info['version']}")
                 return True
 
         except Exception as e:
@@ -264,12 +247,12 @@ class AgentRegistry:
 
         return False
 
-    def get_agent(self, agent_name: str) -> Optional[BaseAgent]:
+    def get_agent(self, agent_name: str) -> BaseAgent | None:
         """Get a registered agent by name"""
         agent_info = self.registered_agents.get(agent_name)
         return agent_info["instance"] if agent_info else None
 
-    def list_agents(self, capability: Optional[str] = None) -> list[str]:
+    def list_agents(self, capability: str | None = None) -> list[str]:
         """
         List all registered agents.
 
@@ -280,15 +263,11 @@ class AgentRegistry:
             List of agent names
         """
         if capability:
-            return [
-                name
-                for name, caps in self.agent_capabilities.items()
-                if capability in caps
-            ]
+            return [name for name, caps in self.agent_capabilities.items() if capability in caps]
 
         return list(self.registered_agents.keys())
 
-    def get_agent_info(self, agent_name: str) -> Optional[dict[str, Any]]:
+    def get_agent_info(self, agent_name: str) -> dict[str, Any] | None:
         """Get detailed information about an agent"""
         if agent_name not in self.registered_agents:
             return None
@@ -346,9 +325,7 @@ class AgentRegistry:
 
             # Re-register (discovery will handle it)
             file_path = Path(agent_info["module"].replace(".", "/") + ".py")
-            new_agent_info = await self._analyze_agent_file(
-                file_path, agent_info["module"].rsplit(".", 1)[0]
-            )
+            new_agent_info = await self._analyze_agent_file(file_path, agent_info["module"].rsplit(".", 1)[0])
 
             if new_agent_info:
                 success = await self._register_discovered_agent(new_agent_info)
@@ -360,9 +337,7 @@ class AgentRegistry:
 
         return False
 
-    async def execute_workflow(
-        self, workflow_name: str, parameters: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def execute_workflow(self, workflow_name: str, parameters: dict[str, Any]) -> dict[str, Any]:
         """
         Execute a predefined multi-agent workflow.
 
@@ -380,9 +355,7 @@ class AgentRegistry:
         else:
             return {"error": f"Unknown workflow: {workflow_name}"}
 
-    async def _workflow_scan_and_fix(
-        self, parameters: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _workflow_scan_and_fix(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """Workflow: Scan codebase then apply fixes"""
         # Execute scan
         scan_result = await orchestrator.execute_task(
@@ -398,9 +371,7 @@ class AgentRegistry:
         # Execute fix with scan results
         fix_result = await orchestrator.execute_task(
             task_type="fix",
-            parameters={
-                "scan_results": scan_result.get("results", {}).get("scanner", {})
-            },
+            parameters={"scan_results": scan_result.get("results", {}).get("scanner", {})},
             required_capabilities=["fix"],
             priority=ExecutionPriority.HIGH,
         )
@@ -412,9 +383,7 @@ class AgentRegistry:
             "status": "completed" if "error" not in fix_result else "partial",
         }
 
-    async def _workflow_content_pipeline(
-        self, parameters: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _workflow_content_pipeline(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """Workflow: Content generation → SEO optimization → Publishing"""
         results = {}
 
@@ -439,9 +408,7 @@ class AgentRegistry:
 
         return {"workflow": "content_pipeline", "results": results}
 
-    async def _workflow_ecommerce_order(
-        self, parameters: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _workflow_ecommerce_order(self, parameters: dict[str, Any]) -> dict[str, Any]:
         """Workflow: Order processing through multiple agents"""
         results = {}
 
@@ -475,6 +442,7 @@ class AgentRegistry:
             results["payment"] = payment
 
         return {"workflow": "ecommerce_order", "results": results}
+
 
 # Global registry instance
 registry = AgentRegistry()

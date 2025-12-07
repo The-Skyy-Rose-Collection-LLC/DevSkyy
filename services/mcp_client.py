@@ -18,7 +18,7 @@ import json
 import logging
 import os
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic
 
@@ -26,6 +26,7 @@ from anthropic import Anthropic
 # Logfire for observability
 try:
     import logfire
+
     LOGFIRE_AVAILABLE = True
 except ImportError:
     LOGFIRE_AVAILABLE = False
@@ -74,7 +75,7 @@ class MCPToolClient:
     def __init__(
         self,
         schema_path: str = "config/mcp/mcp_tool_calling_schema.json",
-        anthropic_api_key: Optional[str] = None,
+        anthropic_api_key: str | None = None,
     ):
         """
         Initialize MCP client
@@ -94,9 +95,7 @@ class MCPToolClient:
             self.anthropic_client = Anthropic(api_key=api_key)
         else:
             self.anthropic_client = None
-            logger.warning(
-                "No Anthropic API key provided. Tool invocations will fail."
-            )
+            logger.warning("No Anthropic API key provided. Tool invocations will fail.")
 
     def _load_schema(self) -> dict[str, Any]:
         """
@@ -222,13 +221,11 @@ class MCPToolClient:
         model: str,
         max_tokens: int,
         invocation_id: int,
-        tool_def: Optional[dict] = None,
+        tool_def: dict | None = None,
     ) -> dict[str, Any]:
         """Internal method for executing tool invocation with instrumentation"""
 
-        logger.info(
-            f"🔧 [Invocation #{invocation_id}] Invoking tool: {category}.{tool_name}"
-        )
+        logger.info(f"🔧 [Invocation #{invocation_id}] Invoking tool: {category}.{tool_name}")
 
         # Load tool definition if not provided
         if tool_def is None:
@@ -301,9 +298,7 @@ class MCPToolClient:
             # Validate outputs
             self._validate_outputs(result, tool_def.get("output_schema", {}))
 
-            logger.info(
-                f"✅ [Invocation #{invocation_id}] Tool executed successfully"
-            )
+            logger.info(f"✅ [Invocation #{invocation_id}] Tool executed successfully")
 
             # Log successful completion with result metadata
             if LOGFIRE_AVAILABLE:
@@ -348,34 +343,22 @@ class MCPToolClient:
         # Check required fields
         for field in required_fields:
             if field not in inputs:
-                raise MCPToolValidationError(
-                    f"Missing required field: '{field}'. Required fields: {required_fields}"
-                )
+                raise MCPToolValidationError(f"Missing required field: '{field}'. Required fields: {required_fields}")
 
         # Type checking for provided fields
         for field, value in inputs.items():
             if field in properties:
                 expected_type = properties[field].get("type")
                 if expected_type == "string" and not isinstance(value, str):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be a string, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be a string, got {type(value).__name__}")
                 elif expected_type == "integer" and not isinstance(value, int):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be an integer, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be an integer, got {type(value).__name__}")
                 elif expected_type == "number" and not isinstance(value, (int, float)):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be a number, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be a number, got {type(value).__name__}")
                 elif expected_type == "array" and not isinstance(value, list):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be an array, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be an array, got {type(value).__name__}")
                 elif expected_type == "object" and not isinstance(value, dict):
-                    raise MCPToolValidationError(
-                        f"Field '{field}' must be an object, got {type(value).__name__}"
-                    )
+                    raise MCPToolValidationError(f"Field '{field}' must be an object, got {type(value).__name__}")
 
     def _validate_outputs(self, outputs: dict, schema: dict):
         """
@@ -393,9 +376,7 @@ class MCPToolClient:
         # Check required fields
         for field in required_fields:
             if field not in outputs:
-                logger.warning(
-                    f"⚠️  Missing required output field: '{field}' (will continue anyway)"
-                )
+                logger.warning(f"⚠️  Missing required output field: '{field}' (will continue anyway)")
 
     def _create_tool_prompt(self, tool_def: dict, inputs: dict) -> str:
         """
@@ -430,7 +411,7 @@ Provide ONLY the JSON response below:
 """
         return prompt
 
-    def _get_nested(self, data: dict, path: str) -> Optional[Any]:
+    def _get_nested(self, data: dict, path: str) -> Any | None:
         """
         Get nested dictionary value by dot-notation path
 
@@ -461,7 +442,7 @@ Provide ONLY the JSON response below:
         """
         return list(self.loaded_tools.keys())
 
-    def get_available_tools(self, category: Optional[str] = None) -> list[str]:
+    def get_available_tools(self, category: str | None = None) -> list[str]:
         """
         Get list of available tools from schema
 
@@ -485,7 +466,7 @@ Provide ONLY the JSON response below:
 
 
 # Singleton instance for easy import
-_default_client: Optional[MCPToolClient] = None
+_default_client: MCPToolClient | None = None
 
 
 def get_mcp_client() -> MCPToolClient:

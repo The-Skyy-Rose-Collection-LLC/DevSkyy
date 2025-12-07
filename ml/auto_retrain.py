@@ -46,9 +46,7 @@ class AutoRetrainer:
             "last_run": None,
             "next_run": datetime.now() + timedelta(hours=interval_hours),
         }
-        logger.info(
-            f"📅 Scheduled auto-retrain for {model_name} every {interval_hours}h"
-        )
+        logger.info(f"📅 Scheduled auto-retrain for {model_name} every {interval_hours}h")
 
     async def run_scheduler(self):
         """Run the retraining scheduler"""
@@ -62,9 +60,7 @@ class AutoRetrainer:
                     try:
                         await job["function"]()
                         job["last_run"] = datetime.now()
-                        job["next_run"] = datetime.now() + timedelta(
-                            hours=job["interval"]
-                        )
+                        job["next_run"] = datetime.now() + timedelta(hours=job["interval"])
                         logger.info(f"✅ {model_name} retrained successfully")
                     except Exception as e:
                         logger.error(f"❌ Retrain failed for {model_name}: {e}")

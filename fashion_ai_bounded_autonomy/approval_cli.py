@@ -15,7 +15,6 @@ import argparse
 import asyncio
 from pathlib import Path
 import sys
-from typing import Optional
 
 
 # Add parent directory to path
@@ -37,7 +36,7 @@ class ApprovalCLI:
             "MAGENTA": "\033[95m",
             "CYAN": "\033[96m",
             "BOLD": "\033[1m",
-            "END": "\033[0m"
+            "END": "\033[0m",
         }
 
     def colorize(self, text: str, color: str) -> str:
@@ -53,14 +52,9 @@ class ApprovalCLI:
             return
 
         for _idx, action in enumerate(actions, 1):
-            {
-                "low": "GREEN",
-                "medium": "YELLOW",
-                "high": "MAGENTA",
-                "critical": "RED"
-            }.get(action["risk_level"], "CYAN")
-
-
+            {"low": "GREEN", "medium": "YELLOW", "high": "MAGENTA", "critical": "RED"}.get(
+                action["risk_level"], "CYAN"
+            )
 
     async def review_action(self, action_id: str):
         """Show detailed information about an action"""
@@ -69,62 +63,50 @@ class ApprovalCLI:
         if not details:
             return
 
-
         # Basic info
 
         # Risk assessment
-        {
-            "low": "GREEN",
-            "medium": "YELLOW",
-            "high": "MAGENTA",
-            "critical": "RED"
-        }.get(details['risk_level'], "CYAN")
+        {"low": "GREEN", "medium": "YELLOW", "high": "MAGENTA", "critical": "RED"}.get(details["risk_level"], "CYAN")
 
         # Parameters
-        for value in details['parameters'].values():
+        for value in details["parameters"].values():
             if isinstance(value, (dict, list)):
                 pass
             else:
                 pass
 
         # Status
-        {
-            "pending": "YELLOW",
-            "approved": "GREEN",
-            "rejected": "RED",
-            "expired": "MAGENTA",
-            "executed": "CYAN"
-        }.get(details['status'], "CYAN")
+        {"pending": "YELLOW", "approved": "GREEN", "rejected": "RED", "expired": "MAGENTA", "executed": "CYAN"}.get(
+            details["status"], "CYAN"
+        )
 
-        if details['approved_at']:
+        if details["approved_at"]:
             pass
-        if details['rejection_reason']:
+        if details["rejection_reason"]:
             pass
 
         # History
-        if details['history']:
-            for event in details['history']:
-                event['timestamp']
-                event['event']
-                event.get('operator', 'system')
+        if details["history"]:
+            for event in details["history"]:
+                event["timestamp"]
+                event["event"]
+                event.get("operator", "system")
 
         # Execution result
-        if details['execution_result']:
+        if details["execution_result"]:
             pass
-
 
         # Actions
-        if details['status'] == 'pending':
+        if details["status"] == "pending":
             pass
 
-    async def approve_action(self, action_id: str, operator: str, notes: Optional[str] = None):
+    async def approve_action(self, action_id: str, operator: str, notes: str | None = None):
         """Approve an action"""
 
         result = await self.approval_system.approve(action_id, operator, notes)
 
         if result.get("error"):
             return
-
 
     async def reject_action(self, action_id: str, operator: str, reason: str):
         """Reject an action"""
@@ -134,8 +116,7 @@ class ApprovalCLI:
         if result.get("error"):
             return
 
-
-    async def show_statistics(self, operator: Optional[str] = None):
+    async def show_statistics(self, operator: str | None = None):
         """Show approval statistics"""
 
         stats = await self.approval_system.get_operator_statistics(operator)
@@ -155,8 +136,7 @@ class ApprovalCLI:
 
 async def main():
     parser = argparse.ArgumentParser(
-        description="Bounded Autonomy Approval CLI",
-        formatter_class=argparse.RawDescriptionHelpFormatter
+        description="Bounded Autonomy Approval CLI", formatter_class=argparse.RawDescriptionHelpFormatter
     )
 
     subparsers = parser.add_subparsers(dest="command", help="Commands")
@@ -210,6 +190,7 @@ async def main():
             await cli.cleanup_expired()
     except Exception:
         import traceback
+
         traceback.print_exc()
 
 

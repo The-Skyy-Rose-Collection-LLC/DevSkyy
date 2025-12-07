@@ -7,28 +7,35 @@ import openai
 import requests  # noqa: F401 - Reserved for Phase 3 API automation
 from selenium import webdriver  # noqa: F401 - Reserved for Phase 3 web automation
 
+from config.unified_config import get_config
+
 
 logger = logging.getLogger(__name__)
+
 
 class OpenAIIntelligenceService:
     """OpenAI integration service for enhanced agent intelligence and decision making."""
 
     def __init__(self):
-        self.api_key = os.getenv("OPENAI_API_KEY")
+        config = get_config()
+        self.api_key = config.ai.openai_api_key or os.getenv("OPENAI_API_KEY")
+        self.is_consequential = config.ai.openai_is_consequential
 
         if self.api_key:
             openai.api_key = self.api_key
-            self.client = openai.OpenAI(api_key=self.api_key)
+            # Set x-openai-isConsequential header for high-stakes operations
+            # Per OpenAI safety features: marks requests that could have significant real-world consequences
+            default_headers = {"x-openai-isConsequential": str(self.is_consequential).lower()}
+            self.client = openai.OpenAI(api_key=self.api_key, default_headers=default_headers)
             logger.info(
-                "🧠 OpenAI Intelligence Service initialized for luxury agent enhancement"
+                f"🧠 OpenAI Intelligence Service initialized for luxury agent enhancement "
+                f"(consequential={self.is_consequential})"
             )
         else:
             self.client = None
             logger.warning("🧠 OpenAI Intelligence Service initialized without API key")
 
-    async def enhance_product_description(
-        self, product_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def enhance_product_description(self, product_data: dict[str, Any]) -> dict[str, Any]:
         """Use OpenAI to create luxury product descriptions."""
         try:
             prompt = """
@@ -80,9 +87,7 @@ class OpenAIIntelligenceService:
             logger.error(f"OpenAI product description enhancement failed: {e!s}")
             return {"error": str(e)}
 
-    async def generate_luxury_content_strategy(
-        self, site_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def generate_luxury_content_strategy(self, site_data: dict[str, Any]) -> dict[str, Any]:
         """Generate AI-powered luxury content strategy."""
         try:
             prompt = """
@@ -136,9 +141,7 @@ class OpenAIIntelligenceService:
             logger.error(f"Content strategy generation failed: {e!s}")
             return {"error": str(e)}
 
-    async def optimize_page_content_for_seo(
-        self, page_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def optimize_page_content_for_seo(self, page_data: dict[str, Any]) -> dict[str, Any]:
         """Use OpenAI to optimize page content for luxury SEO."""
         try:
             prompt = """
@@ -191,9 +194,7 @@ class OpenAIIntelligenceService:
             logger.error(f"SEO optimization failed: {e!s}")
             return {"error": str(e)}
 
-    async def analyze_competitor_strategy(
-        self, competitor_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def analyze_competitor_strategy(self, competitor_data: dict[str, Any]) -> dict[str, Any]:
         """Analyze competitor strategies using OpenAI."""
         try:
             prompt = """
@@ -245,9 +246,7 @@ class OpenAIIntelligenceService:
             logger.error(f"Competitive analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def generate_luxury_email_campaign(
-        self, campaign_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def generate_luxury_email_campaign(self, campaign_data: dict[str, Any]) -> dict[str, Any]:
         """Generate luxury email campaign content."""
         try:
             prompt = """
@@ -300,9 +299,7 @@ class OpenAIIntelligenceService:
             logger.error(f"Email campaign generation failed: {e!s}")
             return {"error": str(e)}
 
-    async def create_luxury_social_media_content(
-        self, content_request: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def create_luxury_social_media_content(self, content_request: dict[str, Any]) -> dict[str, Any]:
         """Generate luxury social media content."""
         try:
             prompt = """
@@ -355,9 +352,7 @@ class OpenAIIntelligenceService:
             logger.error(f"Social media content generation failed: {e!s}")
             return {"error": str(e)}
 
-    async def make_executive_business_decision(
-        self, decision_context: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def make_executive_business_decision(self, decision_context: dict[str, Any]) -> dict[str, Any]:
         """Use OpenAI for executive-level business decision making."""
         try:
             prompt = """
@@ -411,9 +406,7 @@ class OpenAIIntelligenceService:
             logger.error(f"Executive decision making failed: {e!s}")
             return {"error": str(e)}
 
-    async def optimize_conversion_funnel(
-        self, funnel_data: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def optimize_conversion_funnel(self, funnel_data: dict[str, Any]) -> dict[str, Any]:
         """Use OpenAI to optimize luxury conversion funnels."""
         try:
             prompt = """
@@ -467,7 +460,9 @@ class OpenAIIntelligenceService:
             logger.error(f"Conversion funnel optimization failed: {e!s}")
             return {"error": str(e)}
 
+
 # Factory function
+
 
 def create_openai_intelligence_service() -> OpenAIIntelligenceService:
     """Create OpenAI intelligence service instance."""

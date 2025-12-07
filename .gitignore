@@ -15,6 +15,10 @@ build/
 .env
 .env.local
 .env.*.local
+.env.production
+.env.staging
+.env.*.production
+.env.*.staging
 
 # IDE
 .vscode/
@@ -31,7 +35,8 @@ desktop.ini
 
 # Logs
 *.log
-logs/
+logs/*
+!logs/.gitkeep
 
 # Testing
 .coverage
@@ -123,3 +128,4 @@ service-account.json
 *.whl
 .eggs/
 pip-wheel-metadata/
+sklearn-env/

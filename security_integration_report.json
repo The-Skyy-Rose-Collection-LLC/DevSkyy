@@ -25,8 +25,8 @@
     },
     {
       "action": "integrate",
-      "module": "encryption_v2.py",
-      "target_path": "/Users/coreyfoster/DevSkyy/security/encryption_v2.py",
+      "module": "encryption.py",
+      "target_path": "/Users/coreyfoster/DevSkyy/security/encryption.py",
       "description": "NIST SP 800-38D AES-256-GCM encryption",
       "timestamp": "2025-10-26T17:54:34.774302"
     },

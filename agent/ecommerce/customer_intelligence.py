@@ -13,7 +13,7 @@ Features:
 
 from datetime import datetime, timedelta
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import cv2  # noqa: F401 - Reserved for Phase 3 computer vision features
 import numpy as np
@@ -40,7 +40,7 @@ class CustomerIntelligence:
         self.ltv_model = None
 
     async def segment_customers(
-        self, customer_data: Optional[list[dict]] = None, n_segments: int = 5
+        self, customer_data: list[dict] | None = None, n_segments: int = 5
     ) -> dict[str, Any]:
         """
         Segment customers using ML clustering
@@ -145,9 +145,7 @@ class CustomerIntelligence:
 
         return segments
 
-    async def predict_customer_ltv(
-        self, customer_id: str, time_horizon_months: int = 12
-    ) -> dict[str, Any]:
+    async def predict_customer_ltv(self, customer_id: str, time_horizon_months: int = 12) -> dict[str, Any]:
         """
         Predict customer lifetime value
 
@@ -158,9 +156,7 @@ class CustomerIntelligence:
         Returns:
             LTV prediction with confidence intervals
         """
-        logger.info(
-            f"Predicting LTV for customer {customer_id} over {time_horizon_months} months"
-        )
+        logger.info(f"Predicting LTV for customer {customer_id} over {time_horizon_months} months")
 
         # Simulate LTV prediction
         base_ltv = np.random.uniform(200, 5000)
@@ -190,9 +186,7 @@ class CustomerIntelligence:
 
         return prediction
 
-    async def predict_churn_risk(
-        self, customer_id: str, prediction_window_days: int = 90
-    ) -> dict[str, Any]:
+    async def predict_churn_risk(self, customer_id: str, prediction_window_days: int = 90) -> dict[str, Any]:
         """
         Predict customer churn risk
 
@@ -269,9 +263,7 @@ class CustomerIntelligence:
 
         return assessment
 
-    async def analyze_purchase_behavior(
-        self, customer_id: str, lookback_days: int = 180
-    ) -> dict[str, Any]:
+    async def analyze_purchase_behavior(self, customer_id: str, lookback_days: int = 180) -> dict[str, Any]:
         """
         Analyze customer purchase behavior patterns
 
@@ -301,18 +293,10 @@ class CustomerIntelligence:
                 "outerwear": np.random.uniform(0.1, 0.6),
             },
             "shopping_preferences": {
-                "preferred_day": ["Monday", "Wednesday", "Saturday"][
-                    int(np.random.uniform(0, 3))
-                ],
-                "preferred_time": ["morning", "afternoon", "evening"][
-                    int(np.random.uniform(0, 3))
-                ],
-                "device_preference": ["mobile", "desktop", "tablet"][
-                    int(np.random.uniform(0, 3))
-                ],
-                "price_sensitivity": ["low", "medium", "high"][
-                    int(np.random.uniform(0, 3))
-                ],
+                "preferred_day": ["Monday", "Wednesday", "Saturday"][int(np.random.uniform(0, 3))],
+                "preferred_time": ["morning", "afternoon", "evening"][int(np.random.uniform(0, 3))],
+                "device_preference": ["mobile", "desktop", "tablet"][int(np.random.uniform(0, 3))],
+                "price_sensitivity": ["low", "medium", "high"][int(np.random.uniform(0, 3))],
             },
             "next_purchase_prediction": {
                 "days_until_next_purchase": int(np.random.uniform(7, 60)),
@@ -322,9 +306,9 @@ class CustomerIntelligence:
         }
 
         # Calculate average order value
-        behavior["purchase_patterns"]["avg_order_value"] = behavior[
-            "purchase_patterns"
-        ]["total_spent"] / max(behavior["purchase_patterns"]["total_orders"], 1)
+        behavior["purchase_patterns"]["avg_order_value"] = behavior["purchase_patterns"]["total_spent"] / max(
+            behavior["purchase_patterns"]["total_orders"], 1
+        )
 
         return behavior
 
@@ -332,7 +316,7 @@ class CustomerIntelligence:
         self,
         customer_id: str,
         n_recommendations: int = 10,
-        context: Optional[dict] = None,
+        context: dict | None = None,
     ) -> dict[str, Any]:
         """
         Generate personalized product recommendations
@@ -345,9 +329,7 @@ class CustomerIntelligence:
         Returns:
             Personalized product recommendations
         """
-        logger.info(
-            f"Generating {n_recommendations} recommendations for customer {customer_id}"
-        )
+        logger.info(f"Generating {n_recommendations} recommendations for customer {customer_id}")
 
         recommendations = {
             "customer_id": customer_id,
@@ -379,15 +361,11 @@ class CustomerIntelligence:
         }
 
         # Sort by relevance score
-        recommendations["products"].sort(
-            key=lambda x: x["relevance_score"], reverse=True
-        )
+        recommendations["products"].sort(key=lambda x: x["relevance_score"], reverse=True)
 
         return recommendations
 
-    async def map_customer_journey(
-        self, customer_id: str, session_id: Optional[str] = None
-    ) -> dict[str, Any]:
+    async def map_customer_journey(self, customer_id: str, session_id: str | None = None) -> dict[str, Any]:
         """
         Map customer journey and touchpoints
 

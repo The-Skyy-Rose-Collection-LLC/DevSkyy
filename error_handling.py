@@ -6,11 +6,11 @@ from enum import Enum
 from functools import wraps
 import logging
 import secrets
-from typing import Any, Optional
+from typing import Any
 
 from fastapi import HTTPException, status
 
-from logging_config import error_logger, get_correlation_id
+from core.logging import error_logger, get_correlation_id
 
 
 """
@@ -21,6 +21,7 @@ Circuit breakers, exponential backoff, retry mechanisms, and centralized error m
 # ============================================================================
 # ERROR TYPES AND CODES
 # ============================================================================
+
 
 class ErrorCode(str, Enum):
     """Standardized error codes"""
@@ -68,6 +69,7 @@ class ErrorCode(str, Enum):
     RATE_LIMIT_EXCEEDED = "SEC_003"
     BLOCKED_REQUEST = "SEC_004"
 
+
 class ErrorSeverity(str, Enum):
     """Error severity levels"""
 
@@ -75,6 +77,7 @@ class ErrorSeverity(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
 
 class DevSkyError(Exception):
     """Base exception class for DevSkyy platform"""
@@ -84,8 +87,8 @@ class DevSkyError(Exception):
         message: str,
         error_code: ErrorCode,
         severity: ErrorSeverity = ErrorSeverity.MEDIUM,
-        details: Optional[dict[str, Any]] = None,
-        correlation_id: Optional[str] = None,
+        details: dict[str, Any] | None = None,
+        correlation_id: str | None = None,
     ):
         super().__init__(message)
         self.message = message
@@ -95,9 +98,11 @@ class DevSkyError(Exception):
         self.correlation_id = correlation_id or get_correlation_id()
         self.timestamp = datetime.utcnow()
 
+
 # ============================================================================
 # CIRCUIT BREAKER
 # ============================================================================
+
 
 class CircuitBreakerState(str, Enum):
     """Circuit breaker states"""
@@ -105,6 +110,7 @@ class CircuitBreakerState(str, Enum):
     CLOSED = "closed"  # Normal operation
     OPEN = "open"  # Failing, blocking requests
     HALF_OPEN = "half_open"  # Testing if service recovered
+
 
 class CircuitBreaker:
     """Circuit breaker implementation for external service calls"""
@@ -151,9 +157,7 @@ class CircuitBreaker:
         if self.state == CircuitBreakerState.OPEN:
             if self._should_attempt_reset():
                 self.state = CircuitBreakerState.HALF_OPEN
-                self.logger.info(
-                    f"🔄 Circuit breaker {self.name} transitioning to HALF_OPEN"
-                )
+                self.logger.info(f"🔄 Circuit breaker {self.name} transitioning to HALF_OPEN")
             else:
                 raise DevSkyError(
                     f"Circuit breaker {self.name} is OPEN",
@@ -183,9 +187,7 @@ class CircuitBreaker:
         if self.last_failure_time is None:
             return True
 
-        return (
-            datetime.utcnow() - self.last_failure_time
-        ).total_seconds() >= self.recovery_timeout
+        return (datetime.utcnow() - self.last_failure_time).total_seconds() >= self.recovery_timeout
 
     def _on_success(self):
         """Handle successful call"""
@@ -197,9 +199,7 @@ class CircuitBreaker:
                 self.state = CircuitBreakerState.CLOSED
                 self.failure_count = 0
                 self.success_count = 0
-                self.logger.info(
-                    f"✅ Circuit breaker {self.name} CLOSED - service recovered"
-                )
+                self.logger.info(f"✅ Circuit breaker {self.name} CLOSED - service recovered")
         else:
             self.failure_count = 0
 
@@ -211,9 +211,7 @@ class CircuitBreaker:
 
         if self.failure_count >= self.failure_threshold:
             self.state = CircuitBreakerState.OPEN
-            self.logger.warning(
-                f"🚨 Circuit breaker {self.name} OPENED - service failing"
-            )
+            self.logger.warning(f"🚨 Circuit breaker {self.name} OPENED - service failing")
 
     def get_stats(self) -> dict[str, Any]:
         """Get circuit breaker statistics"""
@@ -225,14 +223,14 @@ class CircuitBreaker:
             "total_failures": self.total_failures,
             "total_successes": self.total_successes,
             "failure_rate": self.total_failures / max(self.total_requests, 1),
-            "last_failure_time": (
-                self.last_failure_time.isoformat() if self.last_failure_time else None
-            ),
+            "last_failure_time": (self.last_failure_time.isoformat() if self.last_failure_time else None),
         }
+
 
 # ============================================================================
 # RETRY MECHANISM WITH EXPONENTIAL BACKOFF
 # ============================================================================
+
 
 class RetryConfig:
     """Configuration for retry mechanism"""
@@ -253,9 +251,8 @@ class RetryConfig:
         self.jitter = jitter
         self.retryable_exceptions = retryable_exceptions or [Exception]
 
-async def retry_with_backoff(
-    func: Callable, config: RetryConfig, *args, **kwargs
-) -> Any:
+
+async def retry_with_backoff(func: Callable, config: RetryConfig, *args, **kwargs) -> Any:
     """Execute function with exponential backoff retry"""
     last_exception = None
 
@@ -270,9 +267,7 @@ async def retry_with_backoff(
             last_exception = e
 
             # Check if exception is retryable
-            if not any(
-                isinstance(e, exc_type) for exc_type in config.retryable_exceptions
-            ):
+            if not any(isinstance(e, exc_type) for exc_type in config.retryable_exceptions):
                 raise e
 
             # Don't retry on last attempt
@@ -280,9 +275,7 @@ async def retry_with_backoff(
                 break
 
             # Calculate delay with exponential backoff
-            delay = min(
-                config.base_delay * (config.exponential_base**attempt), config.max_delay
-            )
+            delay = min(config.base_delay * (config.exponential_base**attempt), config.max_delay)
 
             # Add jitter to prevent thundering herd
             if config.jitter:
@@ -304,6 +297,7 @@ async def retry_with_backoff(
     # All attempts failed
     raise last_exception
 
+
 def retry(config: RetryConfig = None):
     """Decorator for retry with exponential backoff"""
     if config is None:
@@ -318,9 +312,11 @@ def retry(config: RetryConfig = None):
 
     return decorator
 
+
 # ============================================================================
 # CENTRALIZED ERROR HANDLER
 # ============================================================================
+
 
 class ErrorHandler:
     """Centralized error handling and recovery system"""
@@ -337,7 +333,7 @@ class ErrorHandler:
         self.circuit_breakers[name] = circuit_breaker
         return circuit_breaker
 
-    def get_circuit_breaker(self, name: str) -> Optional[CircuitBreaker]:
+    def get_circuit_breaker(self, name: str) -> CircuitBreaker | None:
         """Get circuit breaker by name"""
         return self.circuit_breakers.get(name)
 
@@ -436,9 +432,7 @@ class ErrorHandler:
             ErrorCode.BLOCKED_REQUEST: status.HTTP_403_FORBIDDEN,
         }
 
-        http_status = status_code_map.get(
-            error.error_code, status.HTTP_500_INTERNAL_SERVER_ERROR
-        )
+        http_status = status_code_map.get(error.error_code, status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         return HTTPException(
             status_code=http_status,
@@ -458,10 +452,9 @@ class ErrorHandler:
             "total_errors": sum(self.error_stats.values()),
             "error_types": dict(self.error_stats),
             "recent_error_count": len(self.recent_errors),
-            "circuit_breaker_stats": {
-                name: cb.get_stats() for name, cb in self.circuit_breakers.items()
-            },
+            "circuit_breaker_stats": {name: cb.get_stats() for name, cb in self.circuit_breakers.items()},
         }
+
 
 # ============================================================================
 # GLOBAL ERROR HANDLER INSTANCE

@@ -18,13 +18,16 @@ Features:
 from datetime import datetime
 import logging
 import os
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 
 
 try:
     from openai import AsyncOpenAI
 except ImportError:
     AsyncOpenAI = None
+
+from config.unified_config import get_config
+
 
 logger = logging.getLogger(__name__)
 
@@ -35,26 +38,31 @@ class CodexIntegration:
     Provides Codex-style functionality with improved capabilities.
     """
 
-    def __init__(self, api_key: Optional[str] = None):
+    def __init__(self, api_key: str | None = None):
         """
         Initialize Codex integration
 
         Args:
             api_key: OpenAI API key (uses environment variable if not provided)
         """
-        self.api_key = api_key or os.getenv("OPENAI_API_KEY")
+        config = get_config()
+        self.api_key = api_key or config.ai.openai_api_key or os.getenv("OPENAI_API_KEY")
+        self.is_consequential = config.ai.openai_is_consequential
         self.client = None
 
         if self.api_key and AsyncOpenAI:
-            self.client = AsyncOpenAI(api_key=self.api_key)
-            logger.info("🤖 OpenAI Codex Integration initialized (using GPT-4)")
+            # Set x-openai-isConsequential header for high-stakes operations
+            # Per OpenAI safety features: marks requests that could have significant real-world consequences
+            default_headers = {"x-openai-isConsequential": str(self.is_consequential).lower()}
+            self.client = AsyncOpenAI(api_key=self.api_key, default_headers=default_headers)
+            logger.info(
+                f"🤖 OpenAI Codex Integration initialized (using GPT-4, consequential={self.is_consequential})"
+            )
         else:
             if not self.api_key:
                 logger.warning("⚠️  OpenAI API key not configured")
             if not AsyncOpenAI:
-                logger.warning(
-                    "⚠️  OpenAI library not installed - run: pip install openai"
-                )
+                logger.warning("⚠️  OpenAI library not installed - run: pip install openai")
 
         # Model configurations
         self.models = {
@@ -111,9 +119,9 @@ class CodexIntegration:
         prompt: str,
         language: str = "python",
         model: Literal["gpt-4", "gpt-3.5"] = "gpt-4",
-        max_tokens: Optional[int] = None,
-        temperature: Optional[float] = None,
-        context: Optional[list[str]] = None,
+        max_tokens: int | None = None,
+        temperature: float | None = None,
+        context: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Generate code based on natural language description
@@ -199,7 +207,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            system_message = (
+                f"You are an expert {language} programmer. Complete the following code naturally and correctly."
+            )
 
             user_message = f"```{language}\n{code_prefix}\n```\n\nComplete this code:"
 
@@ -219,9 +229,7 @@ class CodexIntegration:
             completions = []
             for choice in response.choices:
                 code = self._extract_code_block(choice.message.content, language)
-                completions.append(
-                    {"code": code, "finish_reason": choice.finish_reason}
-                )
+                completions.append({"code": code, "finish_reason": choice.finish_reason})
 
             return {
                 "status": "success",
@@ -250,13 +258,9 @@ class CodexIntegration:
             return {"status": "error", "error": "OpenAI client not initialized"}
 
         try:
-            system_message = (
-                "You are an expert programmer who explains code clearly and thoroughly."
-            )
+            system_message = "You are an expert programmer who explains code clearly and thoroughly."
 
-            user_message = (
-                f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
-            )
+            user_message = f"Explain this {language} code in detail:\n\n```{language}\n{code}\n```"
 
             response = await self.client.chat.completions.create(
                 model="gpt-4-turbo-preview",
@@ -330,9 +334,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code review failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def generate_documentation(
-        self, code: str, language: str = "python"
-    ) -> dict[str, Any]:
+    async def generate_documentation(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Generate documentation for code
 
@@ -374,9 +376,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Documentation generation failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    async def optimize_code(
-        self, code: str, language: str = "python"
-    ) -> dict[str, Any]:
+    async def optimize_code(self, code: str, language: str = "python") -> dict[str, Any]:
         """
         Optimize code for performance and readability
 
@@ -421,9 +421,7 @@ Provide specific, actionable feedback."""
             logger.error(f"Code optimization failed: {e}")
             return {"status": "error", "error": str(e)}
 
-    def _build_system_message(
-        self, language: str, context: Optional[list[str]] = None
-    ) -> str:
+    def _build_system_message(self, language: str, context: list[str] | None = None) -> str:
         """Build system message with language-specific context"""
         lang_config = self.language_configs.get(language, {})
         frameworks = lang_config.get("framework_hints", [])
@@ -432,18 +430,14 @@ Provide specific, actionable feedback."""
         message += "Generate clean, well-documented, production-ready code. "
 
         if frameworks:
-            message += (
-                f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
-            )
+            message += f"Prefer using popular frameworks like {', '.join(frameworks[:2])}. "
 
         if context:
             message += "\n\nAdditional context:\n" + "\n".join(context)
 
         return message
 
-    def _build_code_generation_prompt(
-        self, prompt: str, language: str, context: Optional[list[str]] = None
-    ) -> str:
+    def _build_code_generation_prompt(self, prompt: str, language: str, context: list[str] | None = None) -> str:
         """Build user prompt for code generation"""
         message = f"Generate {language} code for: {prompt}\n\n"
         message += "Requirements:\n"

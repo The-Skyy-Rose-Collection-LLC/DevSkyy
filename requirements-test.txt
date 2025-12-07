@@ -1,337 +1,57 @@
 # ============================================================================
 # DEVSKYY ENTERPRISE PLATFORM - TESTING DEPENDENCIES
-# Comprehensive Testing Framework for Enterprise-Grade Quality Assurance
-# Version: 5.2.0
+# Testing-specific packages for CI/CD pipelines
+# Version: 1.0.0
 # ============================================================================
-
-# Include production dependencies
--r requirements.txt
+# INSTALL: pip install -r requirements.txt -r requirements-test.txt
+#
+# This file is referenced by GitHub Actions workflows and should remain synchronized
+# with requirements-dev.txt for testing-related dependencies.
+# ============================================================================
 
 # ============================================================================
 # CORE TESTING FRAMEWORK
 # ============================================================================
-
-# Primary Testing Framework
-pytest>=8.4.2
-pytest-asyncio>=0.24.0
-pytest-cov>=6.0.0
-pytest-mock>=3.14.0
-pytest-xdist>=3.6.0
-pytest-timeout>=2.3.1
-pytest-env>=1.1.5
-pytest-html>=4.1.1
-pytest-json-report>=1.5.0
-pytest-sugar>=1.0.0
-
-# Test Fixtures & Data
-factory-boy>=3.3.1
-faker>=33.1.0
-hypothesis>=6.122.1
-pytest-factoryboy>=2.7.0
+pytest~=8.4.2
+pytest-asyncio~=0.24.0
+pytest-cov~=6.0.0
+pytest-mock~=3.14.0
+pytest-xdist~=3.6.0
+pytest-timeout~=2.3.1
+pytest-env~=1.1.5
+pytest-html~=4.1.1
+pytest-json-report~=1.5.0
+pytest-sugar~=1.0.0
 
 # ============================================================================
 # HTTP & API TESTING
 # ============================================================================
-
-# HTTP Testing
-httpx>=0.28.1
-responses>=0.25.3
-pytest-httpx>=0.32.0
-requests-mock>=1.12.1
-
-# API Testing
-tavern>=2.12.1
-schemathesis>=3.34.1
-fastapi-testclient>=0.1.0
+responses~=0.25.3
+pytest-httpx~=0.32.0
+requests-mock~=1.12.1
+httpretty~=1.1.4
 
 # ============================================================================
 # DATABASE TESTING
 # ============================================================================
-
-# Database Test Fixtures
-pytest-postgresql>=6.1.1
-pytest-redis>=3.1.2
-pytest-mongodb>=2.4.3
-pytest-elasticsearch>=2.1.1
-
-# Database Testing Utilities
-sqlalchemy-utils>=0.41.2
-testing.postgresql>=1.3.0
-testing.redis>=1.1.2
+pytest-postgresql~=6.1.1
+sqlalchemy-utils~=0.41.2
 
 # ============================================================================
-# PERFORMANCE & LOAD TESTING
+# MOCKING & TIME MANIPULATION
 # ============================================================================
-
-# Performance Testing
-pytest-benchmark>=4.0.0
-locust>=2.32.4
-py-spy>=0.3.14
-memory-profiler>=0.61.0
-
-# Load Testing
-artillery>=1.0.0
-pytest-stress>=1.0.1
+freezegun~=1.5.1
+aioresponses~=0.7.6
 
 # ============================================================================
-# SECURITY TESTING
+# COVERAGE & REPORTING
 # ============================================================================
-
-# Security Testing
-bandit>=1.8.0
-safety>=3.2.11
-semgrep>=1.95.0
-pytest-security>=0.1.0
-
-# Vulnerability Testing
-pip-audit>=2.7.3
-cyclonedx-bom>=4.6.1
+coverage~=7.6.9
+coverage-badge~=1.1.2
 
 # ============================================================================
-# WEB & UI TESTING
+# CODE QUALITY (For tests)
 # ============================================================================
-
-# Browser Testing
-selenium>=4.27.1
-playwright>=1.49.1
-pytest-playwright>=0.6.2
-pytest-selenium>=4.1.0
-
-# Web Testing Utilities
-webdriver-manager>=4.0.2
-pytest-html>=4.1.1
-
-# ============================================================================
-# INTEGRATION TESTING
-# ============================================================================
-
-# Container Testing
-testcontainers>=4.8.2
-docker>=7.1.0
-
-# Service Testing
-pytest-services>=2.2.1
-pytest-docker>=3.1.1
-
-# ============================================================================
-# MOCKING & STUBBING
-# ============================================================================
-
-# Mocking Framework
-pytest-mock>=3.14.0
-responses>=0.25.3
-httpretty>=1.1.4
-freezegun>=1.5.1
-time-machine>=2.16.0
-
-# Service Mocking
-wiremock>=2.6.1
-mockserver-client>=5.15.0
-
-# ============================================================================
-# DATA TESTING
-# ============================================================================
-
-# Data Validation Testing
-great-expectations>=1.2.3
-pandera>=0.22.0
-pytest-datadir>=1.5.0
-
-# CSV/Excel Testing
-pytest-csv>=3.0.0
-openpyxl>=3.1.5
-
-# ============================================================================
-# AI/ML TESTING
-# ============================================================================
-
-# ML Model Testing
-pytest-ml>=0.1.0
-deepdiff>=8.0.1
-numpy-testing>=1.26.4
-
-# Data Science Testing
-pandas-testing>=2.2.3
-scikit-learn>=1.6.0
-
-# ============================================================================
-# FASHION INDUSTRY SPECIFIC TESTING
-# ============================================================================
-
-# Image Testing
-opencv-python>=4.11.0.86
-pillow>=11.1.0
-imagehash>=4.3.2
-pytest-image-diff>=0.0.11
-
-# Web Scraping Testing
-beautifulsoup4>=4.12.3
-lxml>=5.3.0
-scrapy>=2.12.0
-
-# ============================================================================
-# REPORTING & COVERAGE
-# ============================================================================
-
-# Coverage Reporting
-coverage>=7.6.9
-pytest-cov>=6.0.0
-coverage-badge>=1.1.2
-
-# Test Reporting
-pytest-html>=4.1.1
-pytest-json-report>=1.5.0
-allure-pytest>=2.13.5
-pytest-reportlog>=1.2.0
-
-# ============================================================================
-# PARALLEL & DISTRIBUTED TESTING
-# ============================================================================
-
-# Parallel Testing
-pytest-xdist>=3.6.0
-pytest-parallel>=0.1.1
-
-# Distributed Testing
-pytest-remote>=0.1.2
-
-# ============================================================================
-# CONFIGURATION & ENVIRONMENT TESTING
-# ============================================================================
-
-# Environment Testing
-pytest-env>=1.1.5
-python-dotenv>=1.0.1
-environs>=11.2.1
-
-# Configuration Testing
-dynaconf>=3.2.8
-pytest-config>=0.1.0
-
-# ============================================================================
-# LOGGING & DEBUGGING TESTING
-# ============================================================================
-
-# Test Debugging
-pytest-pdb>=0.2.0
-pytest-pudb>=0.7.0
-ipdb>=0.13.13
-
-# Logging Testing
-structlog>=24.4.0
-loguru>=0.7.3
-pytest-logging>=2016.11.4
-
-# ============================================================================
-# NETWORK & SOCKET TESTING
-# ============================================================================
-
-# Network Testing
-pytest-socket>=0.7.0
-pytest-httpserver>=1.1.0
-
-# Socket Testing
-pytest-asyncio>=0.24.0
-aioresponses>=0.7.6
-
-# ============================================================================
-# FILE & FILESYSTEM TESTING
-# ============================================================================
-
-# File System Testing
-pytest-datadir>=1.5.0
-pytest-tmpdir>=0.1.0
-pyfakefs>=5.7.1
-
-# File Testing
-pytest-datafiles>=3.0.0
-
-# ============================================================================
-# ENTERPRISE TESTING TOOLS
-# ============================================================================
-
-# Enterprise Monitoring Testing
-prometheus-client>=0.22.0
-grafana-api>=1.0.3
-
-# Enterprise Security Testing
-cryptography>=46.0.3  # Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
-pycryptodome>=3.21.0
-
-# ============================================================================
-# QUALITY ASSURANCE
-# ============================================================================
-
-# Code Quality Testing
-flake8>=7.1.1
-mypy>=1.13.0
-black>=24.10.0
-isort>=5.13.2
-
-# Complexity Testing
-radon>=6.0.1
-xenon>=0.9.1
-
-# ============================================================================
-# CONTINUOUS INTEGRATION TESTING
-# ============================================================================
-
-# CI/CD Testing
-tox>=4.23.2
-nox>=2024.10.9
-
-# GitHub Actions Testing
-github3.py>=4.0.1
-pygithub>=2.5.0
-
-# ============================================================================
-# SPECIALIZED TESTING UTILITIES
-# ============================================================================
-
-# Time Testing
-freezegun>=1.5.1
-time-machine>=2.16.0
-
-# Random Testing
-pytest-randomly>=3.15.0
-pytest-repeat>=0.9.3
-
-# Retry Testing
-pytest-rerunfailures>=14.0
-tenacity>=9.0.0
-
-# ============================================================================
-# DOCUMENTATION TESTING
-# ============================================================================
-
-# Documentation Testing
-pytest-doctest>=0.1.0
-doctest>=1.0.0
-
-# API Documentation Testing
-openapi-spec-validator>=0.7.1
-swagger-spec-validator>=3.0.4
-
-# ============================================================================
-# COMPATIBILITY TESTING
-# ============================================================================
-
-# Python Version Testing
-tox>=4.23.2
-pytest-pythonpath>=0.7.4
-
-# Dependency Testing
-pip-check>=2.8.1
-pipdeptree>=2.23.4
-
-# ============================================================================
-# CUSTOM TESTING EXTENSIONS
-# ============================================================================
-
-# Custom Markers
-pytest-custom-exit-code>=0.3.0
-pytest-metadata>=3.1.1
-
-# Test Organization
-pytest-testmon>=2.1.3
-pytest-picked>=0.5.0
+pytest-randomly~=3.15.0
+pytest-rerunfailures~=14.0
+tenacity~=9.0.0

@@ -1,10 +1,7 @@
-
-
 """
 Enhanced Security Headers for Grade A+ Security
 Implements comprehensive security headers for production deployment
 """
-
 
 
 class SecurityHeaders:

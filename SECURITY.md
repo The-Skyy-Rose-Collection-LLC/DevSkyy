@@ -106,7 +106,7 @@ Higher roles automatically inherit permissions from lower roles.
 
 ```python
 # Example: Secure encryption
-from security.encryption_v2 import encrypt_data, decrypt_data
+from security.encryption import encrypt_data, decrypt_data
 
 encrypted = encrypt_data("sensitive_data")
 # Returns: {"ciphertext": "...", "nonce": "...", "tag": "..."}

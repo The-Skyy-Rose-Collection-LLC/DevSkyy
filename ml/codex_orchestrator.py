@@ -19,7 +19,7 @@ Architecture:
 
 from datetime import datetime
 import logging
-from typing import Any, Optional
+from typing import Any
 
 from ml.codex_integration import codex
 
@@ -100,7 +100,7 @@ class CodexOrchestrator:
         self,
         code: str,
         language: str = "python",
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         auto_apply: bool = False,
     ) -> dict[str, Any]:
         """
@@ -130,9 +130,7 @@ class CodexOrchestrator:
                 }
 
             # Phase 2: AI Analysis - Use GPT-4 to analyze issues and generate strategy
-            strategy = await self._generate_healing_strategy(
-                code, scan_result["issues"], language, context
-            )
+            strategy = await self._generate_healing_strategy(code, scan_result["issues"], language, context)
 
             # Phase 3: Generate fixes using Codex
             fixes = await self._generate_fixes(code, strategy, language)
@@ -166,9 +164,7 @@ class CodexOrchestrator:
             logger.error(f"Code healing failed: {e}")
             return {"status": "error", "error": str(e), "original_code": code}
 
-    async def _scan_code(
-        self, code: str, language: str, context: Optional[dict] = None
-    ) -> dict[str, Any]:
+    async def _scan_code(self, code: str, language: str, context: dict | None = None) -> dict[str, Any]:
         """Scan code for issues using scanner agent"""
         logger.info("📊 Scanning code for issues...")
 
@@ -194,7 +190,7 @@ class CodexOrchestrator:
         code: str,
         issues: list[dict],
         language: str,
-        context: Optional[dict] = None,
+        context: dict | None = None,
     ) -> dict[str, Any]:
         """Use GPT-4 to analyze issues and generate optimal healing strategy"""
         logger.info("🧠 Generating AI-powered healing strategy...")
@@ -202,10 +198,7 @@ class CodexOrchestrator:
         try:
             # Build strategy prompt
             issues_summary = "\n".join(
-                [
-                    f"- {i.get('type', 'issue')}: {i.get('description', 'Unknown')}"
-                    for i in issues
-                ]
+                [f"- {i.get('type', 'issue')}: {i.get('description', 'Unknown')}" for i in issues]
             )
 
             prompt = f"""Analyze the following code issues and create an optimal healing strategy:
@@ -242,9 +235,7 @@ Respond with a structured healing strategy."""
 
             return {
                 "strategy": strategy_text,
-                "priority_issues": [
-                    i for i in issues if i.get("severity") in ["high", "critical"]
-                ],
+                "priority_issues": [i for i in issues if i.get("severity") in ["high", "critical"]],
                 "issue_groups": self._group_related_issues(issues),
                 "estimated_fix_time": len(issues) * 30,  # seconds
             }
@@ -257,9 +248,7 @@ Respond with a structured healing strategy."""
                 "issue_groups": [issues],
             }
 
-    async def _generate_fixes(
-        self, code: str, strategy: dict, language: str
-    ) -> list[dict[str, Any]]:
+    async def _generate_fixes(self, code: str, strategy: dict, language: str) -> list[dict[str, Any]]:
         """Generate fixes for each issue using Codex"""
         logger.info("🔧 Generating AI-powered fixes...")
 
@@ -293,11 +282,7 @@ Generate a corrected version that fixes this specific issue while maintaining fu
                             "issue": issue,
                             "fixed_code": fix_response["code"],
                             "explanation": fix_response.get("raw_response", ""),
-                            "confidence": (
-                                "high"
-                                if fix_response.get("finish_reason") == "stop"
-                                else "medium"
-                            ),
+                            "confidence": ("high" if fix_response.get("finish_reason") == "stop" else "medium"),
                         }
                     )
 
@@ -307,9 +292,7 @@ Generate a corrected version that fixes this specific issue while maintaining fu
             logger.error(f"Fix generation failed: {e}")
             return []
 
-    async def _validate_fixes(
-        self, original_code: str, fixes: list[dict], language: str
-    ) -> dict[str, Any]:
+    async def _validate_fixes(self, original_code: str, fixes: list[dict], language: str) -> dict[str, Any]:
         """Validate fixes before applying"""
         logger.info("✅ Validating fixes...")
 
@@ -349,10 +332,7 @@ Respond with validation analysis."""
             validation_text = validation_response.choices[0].message.content
 
             # Simple heuristic: safe if no breaking changes mentioned
-            is_safe = (
-                "breaking" not in validation_text.lower()
-                and "unsafe" not in validation_text.lower()
-            )
+            is_safe = "breaking" not in validation_text.lower() and "unsafe" not in validation_text.lower()
 
             return {
                 "safe": is_safe,
@@ -377,9 +357,7 @@ Respond with validation analysis."""
 
         return best_fix.get("fixed_code", code)
 
-    async def _learn_from_healing(
-        self, strategy: dict, fixes: list[dict], validation: dict
-    ):
+    async def _learn_from_healing(self, strategy: dict, fixes: list[dict], validation: dict):
         """Learn from successful healing to improve future operations"""
         if validation.get("safe"):
             pattern = {
@@ -468,12 +446,8 @@ Respond with validation analysis."""
         return {
             "total_healings": total_healings,
             "successful": successful,
-            "success_rate": (
-                (successful / total_healings * 100) if total_healings > 0 else 0
-            ),
-            "recent_healings": (
-                self.healing_history[-10:] if self.healing_history else []
-            ),
+            "success_rate": ((successful / total_healings * 100) if total_healings > 0 else 0),
+            "recent_healings": (self.healing_history[-10:] if self.healing_history else []),
         }
 
 

@@ -1,0 +1,374 @@
+> """
+> Training Data Collection System
+  
+> Collects high-quality training examples from agent executions with verified rewards.
+> """
+  
+! import uuid
+! from typing import List, Dict, Any, Optional
+! from datetime import datetime, timedelta
+! from decimal import Decimal
+! import json
+  
+! from sqlalchemy.ext.asyncio import AsyncSession
+! import logging
+  
+! logger = logging.getLogger(__name__)
+  
+  
+! class TrainingDataCollector:
+!     """
+!     Collects and prepares training data from verified agent executions.
+  
+!     Selection Criteria:
+!     - High reward scores (>= 0.7) for positive examples
+!     - Low reward scores (<= 0.3) for negative examples
+!     - High verification confidence (>= 0.8)
+!     - Diverse inputs (avoid overfitting)
+!     """
+  
+!     def __init__(self, session: AsyncSession):
+!         self.session = session
+  
+          # Thresholds
+!         self.positive_threshold = Decimal("0.7")  # High reward
+!         self.negative_threshold = Decimal("0.3")  # Low reward
+!         self.confidence_threshold = Decimal("0.8")  # High confidence
+!         self.min_examples_per_agent = 100  # Minimum for fine-tuning
+  
+!     async def collect_training_data(
+!         self,
+!         agent_id: uuid.UUID,
+!         max_examples: int = 1000,
+!         days_lookback: int = 30
+!     ) -> Dict[str, Any]:
+!         """
+!         Collect training examples for a specific agent.
+  
+!         Args:
+!             agent_id: Agent to collect data for
+!             max_examples: Maximum number of examples to collect
+!             days_lookback: How many days back to look
+  
+!         Returns:
+!             Dictionary with training data statistics and examples
+!         """
+!         since_date = datetime.utcnow() - timedelta(days=days_lookback)
+  
+          # Get high-quality positive examples
+!         positive_examples = await self._get_positive_examples(
+!             agent_id, since_date, max_examples // 2
+!         )
+  
+          # Get informative negative examples
+!         negative_examples = await self._get_negative_examples(
+!             agent_id, since_date, max_examples // 4
+!         )
+  
+          # Get neutral examples (for calibration)
+!         neutral_examples = await self._get_neutral_examples(
+!             agent_id, since_date, max_examples // 4
+!         )
+  
+!         all_examples = positive_examples + negative_examples + neutral_examples
+  
+          # Save to training_examples table
+!         saved_count = await self._save_training_examples(agent_id, all_examples)
+  
+!         return {
+!             "agent_id": str(agent_id),
+!             "total_examples": len(all_examples),
+!             "positive_examples": len(positive_examples),
+!             "negative_examples": len(negative_examples),
+!             "neutral_examples": len(neutral_examples),
+!             "saved_count": saved_count,
+!             "ready_for_training": len(all_examples) >= self.min_examples_per_agent
+!         }
+  
+!     async def _get_positive_examples(
+!         self,
+!         agent_id: uuid.UUID,
+!         since_date: datetime,
+!         limit: int
+!     ) -> List[Dict[str, Any]]:
+!         """Get high-quality positive examples (high reward scores)."""
+!         query = """
+!             SELECT
+!                 e.id as execution_id,
+!                 e.input_prompt,
+!                 e.output_completion,
+!                 r.reward_score,
+!                 r.verification_method,
+!                 r.verification_confidence,
+!                 e.created_at
+!             FROM agent_executions e
+!             INNER JOIN reward_scores r ON e.id = r.execution_id
+!             WHERE e.agent_id = :agent_id
+!                 AND e.status = 'success'
+!                 AND e.output_completion IS NOT NULL
+!                 AND r.reward_score >= :reward_threshold
+!                 AND r.verification_confidence >= :confidence_threshold
+!                 AND e.created_at >= :since_date
+!             ORDER BY r.reward_score DESC, r.verification_confidence DESC
+!             LIMIT :limit
+!         """
+  
+!         result = await self.session.execute(query, {
+!             "agent_id": agent_id,
+!             "reward_threshold": self.positive_threshold,
+!             "confidence_threshold": self.confidence_threshold,
+!             "since_date": since_date,
+!             "limit": limit
+!         })
+  
+!         return [
+!             {
+!                 "execution_id": row[0],
+!                 "prompt": row[1],
+!                 "completion": row[2],
+!                 "reward_score": float(row[3]),
+!                 "verification_method": row[4],
+!                 "verification_confidence": float(row[5]),
+!                 "example_type": "positive",
+!                 "created_at": row[6]
+!             }
+!             for row in result.fetchall()
+!         ]
+  
+!     async def _get_negative_examples(
+!         self,
+!         agent_id: uuid.UUID,
+!         since_date: datetime,
+!         limit: int
+!     ) -> List[Dict[str, Any]]:
+!         """Get informative negative examples (low reward scores with corrections)."""
+!         query = """
+!             SELECT
+!                 e.id as execution_id,
+!                 e.input_prompt,
+!                 e.output_completion,
+!                 r.reward_score,
+!                 r.verification_method,
+!                 r.verification_confidence,
+!                 r.user_feedback,
+!                 e.created_at
+!             FROM agent_executions e
+!             INNER JOIN reward_scores r ON e.id = r.execution_id
+!             WHERE e.agent_id = :agent_id
+!                 AND e.status = 'success'
+!                 AND e.output_completion IS NOT NULL
+!                 AND r.reward_score <= :reward_threshold
+!                 AND r.verification_confidence >= :confidence_threshold
+!                 AND e.created_at >= :since_date
+!             ORDER BY r.reward_score ASC, r.verification_confidence DESC
+!             LIMIT :limit
+!         """
+  
+!         result = await self.session.execute(query, {
+!             "agent_id": agent_id,
+!             "reward_threshold": self.negative_threshold,
+!             "confidence_threshold": self.confidence_threshold,
+!             "since_date": since_date,
+!             "limit": limit
+!         })
+  
+!         return [
+!             {
+!                 "execution_id": row[0],
+!                 "prompt": row[1],
+!                 "completion": row[2],
+!                 "reward_score": float(row[3]),
+!                 "verification_method": row[4],
+!                 "verification_confidence": float(row[5]),
+!                 "user_feedback": row[6],
+!                 "example_type": "negative",
+!                 "created_at": row[7]
+!             }
+!             for row in result.fetchall()
+!         ]
+  
+!     async def _get_neutral_examples(
+!         self,
+!         agent_id: uuid.UUID,
+!         since_date: datetime,
+!         limit: int
+!     ) -> List[Dict[str, Any]]:
+!         """Get neutral examples for calibration."""
+!         query = """
+!             SELECT
+!                 e.id as execution_id,
+!                 e.input_prompt,
+!                 e.output_completion,
+!                 r.reward_score,
+!                 r.verification_method,
+!                 r.verification_confidence,
+!                 e.created_at
+!             FROM agent_executions e
+!             INNER JOIN reward_scores r ON e.id = r.execution_id
+!             WHERE e.agent_id = :agent_id
+!                 AND e.status = 'success'
+!                 AND e.output_completion IS NOT NULL
+!                 AND r.reward_score > :negative_threshold
+!                 AND r.reward_score < :positive_threshold
+!                 AND r.verification_confidence >= :confidence_threshold
+!                 AND e.created_at >= :since_date
+!             ORDER BY RANDOM()
+!             LIMIT :limit
+!         """
+  
+!         result = await self.session.execute(query, {
+!             "agent_id": agent_id,
+!             "negative_threshold": self.negative_threshold,
+!             "positive_threshold": self.positive_threshold,
+!             "confidence_threshold": self.confidence_threshold,
+!             "since_date": since_date,
+!             "limit": limit
+!         })
+  
+!         return [
+!             {
+!                 "execution_id": row[0],
+!                 "prompt": row[1],
+!                 "completion": row[2],
+!                 "reward_score": float(row[3]),
+!                 "verification_method": row[4],
+!                 "verification_confidence": float(row[5]),
+!                 "example_type": "neutral",
+!                 "created_at": row[6]
+!             }
+!             for row in result.fetchall()
+!         ]
+  
+!     async def _save_training_examples(
+!         self,
+!         agent_id: uuid.UUID,
+!         examples: List[Dict[str, Any]]
+!     ) -> int:
+!         """Save collected examples to training_examples table."""
+!         saved_count = 0
+  
+!         for example in examples:
+!             try:
+!                 example_id = uuid.uuid4()
+  
+!                 query = """
+!                     INSERT INTO training_examples (
+!                         id, agent_id, execution_id, prompt, completion,
+!                         reward_score, example_type, is_synthetic,
+!                         is_validated, created_at
+!                     ) VALUES (
+!                         :id, :agent_id, :execution_id, :prompt, :completion,
+!                         :reward_score, :example_type, :is_synthetic,
+!                         :is_validated, :created_at
+!                     )
+!                     ON CONFLICT (execution_id) DO NOTHING
+!                 """
+  
+!                 await self.session.execute(query, {
+!                     "id": example_id,
+!                     "agent_id": agent_id,
+!                     "execution_id": example['execution_id'],
+!                     "prompt": example['prompt'],
+!                     "completion": example['completion'],
+!                     "reward_score": Decimal(str(example['reward_score'])),
+!                     "example_type": example['example_type'],
+!                     "is_synthetic": False,
+!                     "is_validated": True,  # Already verified
+!                     "created_at": datetime.utcnow()
+!                 })
+  
+!                 saved_count += 1
+  
+!             except Exception as e:
+!                 logger.warning(f"Failed to save training example: {e}")
+!                 continue
+  
+!         await self.session.commit()
+!         return saved_count
+  
+!     async def export_for_openai_finetuning(
+!         self,
+!         agent_id: uuid.UUID,
+!         output_file: str
+!     ) -> Dict[str, Any]:
+!         """
+!         Export training data in OpenAI fine-tuning format (JSONL).
+  
+!         Format:
+!         {"messages": [{"role": "system", "content": "..."}, {"role": "user", "content": "..."}, {"role": "assistant", "content": "..."}]}
+!         """
+!         query = """
+!             SELECT prompt, completion, reward_score, example_type
+!             FROM training_examples
+!             WHERE agent_id = :agent_id
+!                 AND used_in_training = FALSE
+!                 AND is_validated = TRUE
+!             ORDER BY reward_score DESC
+!         """
+  
+!         result = await self.session.execute(query, {"agent_id": agent_id})
+!         examples = result.fetchall()
+  
+          # Convert to OpenAI format
+!         with open(output_file, 'w') as f:
+!             for row in examples:
+!                 prompt, completion, reward_score, example_type = row
+  
+                  # Create message format
+!                 message = {
+!                     "messages": [
+!                         {"role": "user", "content": prompt},
+!                         {"role": "assistant", "content": completion}
+!                     ]
+!                 }
+  
+                  # Add weight based on reward score (for positive examples)
+!                 if example_type == "positive":
+!                     message["weight"] = float(reward_score)
+  
+!                 f.write(json.dumps(message) + '\n')
+  
+!         return {
+!             "total_examples": len(examples),
+!             "output_file": output_file,
+!             "format": "openai_jsonl"
+!         }
+  
+!     async def get_collection_stats(self, agent_id: uuid.UUID) -> Dict[str, Any]:
+!         """Get statistics about collected training data."""
+!         query = """
+!             SELECT
+!                 example_type,
+!                 COUNT(*) as count,
+!                 AVG(reward_score) as avg_reward,
+!                 MIN(reward_score) as min_reward,
+!                 MAX(reward_score) as max_reward
+!             FROM training_examples
+!             WHERE agent_id = :agent_id
+!             GROUP BY example_type
+!         """
+  
+!         result = await self.session.execute(query, {"agent_id": agent_id})
+!         stats = {
+!             row[0]: {
+!                 "count": row[1],
+!                 "avg_reward": float(row[2]),
+!                 "min_reward": float(row[3]),
+!                 "max_reward": float(row[4])
+!             }
+!             for row in result.fetchall()
+!         }
+  
+          # Get total
+!         total_query = """
+!             SELECT COUNT(*) FROM training_examples WHERE agent_id = :agent_id
+!         """
+!         total_result = await self.session.execute(total_query, {"agent_id": agent_id})
+!         total_count = total_result.scalar()
+  
+!         return {
+!             "agent_id": str(agent_id),
+!             "total_examples": total_count,
+!             "by_type": stats,
+!             "ready_for_training": total_count >= self.min_examples_per_agent
+!         }

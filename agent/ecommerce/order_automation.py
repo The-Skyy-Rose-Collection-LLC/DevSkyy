@@ -70,9 +70,7 @@ class OrderAutomation:
             "risk_threshold": 0.7,
         }
 
-    async def process_order(
-        self, order_data: dict[str, Any], auto_process: bool = True
-    ) -> dict[str, Any]:
+    async def process_order(self, order_data: dict[str, Any], auto_process: bool = True) -> dict[str, Any]:
         """
         Process incoming order with automation
 
@@ -175,9 +173,7 @@ class OrderAutomation:
             for item in order_data.get("items", []):
                 if "quantity" in item and item["quantity"] <= 0:
                     validation["valid"] = False
-                    validation["errors"].append(
-                        f"Invalid quantity for item {item.get('product_id')}"
-                    )
+                    validation["errors"].append(f"Invalid quantity for item {item.get('product_id')}")
 
         # Validate shipping address
         if "shipping_address" in order_data:
@@ -185,9 +181,7 @@ class OrderAutomation:
             address_fields = ["street", "city", "country", "postal_code"]
             for field in address_fields:
                 if field not in address or not address[field]:
-                    validation["warnings"].append(
-                        f"Incomplete shipping address: {field}"
-                    )
+                    validation["warnings"].append(f"Incomplete shipping address: {field}")
 
         return validation
 
@@ -237,9 +231,7 @@ class OrderAutomation:
             "risk_score": min(risk_score, 1.0),
             "risk_level": risk_level,
             "risk_factors": risk_factors,
-            "recommended_action": (
-                "manual_review" if risk_level == "high" else "proceed"
-            ),
+            "recommended_action": ("manual_review" if risk_level == "high" else "proceed"),
         }
 
     async def allocate_inventory(self, order_data: dict[str, Any]) -> dict[str, Any]:
@@ -280,9 +272,7 @@ class OrderAutomation:
                         "requested": quantity,
                         "allocated": available_quantity,
                         "backorder": quantity - available_quantity,
-                        "estimated_restock": (
-                            datetime.now() + timedelta(days=7)
-                        ).isoformat(),
+                        "estimated_restock": (datetime.now() + timedelta(days=7)).isoformat(),
                     }
                 )
 
@@ -290,10 +280,7 @@ class OrderAutomation:
             "success": all_available,
             "allocations": allocations,
             "fully_allocated": all_available,
-            "partial_shipment_available": len(
-                [a for a in allocations if a.get("allocated", 0) > 0]
-            )
-            > 0,
+            "partial_shipment_available": len([a for a in allocations if a.get("allocated", 0) > 0]) > 0,
         }
 
     async def process_payment(self, order_data: dict[str, Any]) -> dict[str, Any]:
@@ -437,9 +424,7 @@ class OrderAutomation:
 
         return tracking
 
-    async def process_return(
-        self, order_id: str, return_items: list[dict[str, Any]], reason: str
-    ) -> dict[str, Any]:
+    async def process_return(self, order_id: str, return_items: list[dict[str, Any]], reason: str) -> dict[str, Any]:
         """
         Process order return request
 
@@ -485,9 +470,7 @@ class OrderAutomation:
                 "alternative": "Contact customer service for exceptions",
             }
 
-    async def process_refund(
-        self, order_id: str, refund_amount: float, reason: str
-    ) -> dict[str, Any]:
+    async def process_refund(self, order_id: str, refund_amount: float, reason: str) -> dict[str, Any]:
         """
         Process refund for order
 
@@ -515,9 +498,7 @@ class OrderAutomation:
             "transaction_id": f"TXN-{np.random.randint(100000, 999999)}",
         }
 
-    def get_order_statistics(
-        self, start_date: datetime, end_date: datetime
-    ) -> dict[str, Any]:
+    def get_order_statistics(self, start_date: datetime, end_date: datetime) -> dict[str, Any]:
         """
         Get order processing statistics
 

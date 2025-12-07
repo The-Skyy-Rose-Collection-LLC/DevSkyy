@@ -108,9 +108,7 @@ class TestJWTTokenVerification:
         """Test that expired tokens are rejected"""
         # Create token that expired 1 minute ago
         expires_delta = timedelta(minutes=-1)
-        expired_token = create_access_token(
-            data=test_user_data, expires_delta=expires_delta
-        )
+        expired_token = create_access_token(data=test_user_data, expires_delta=expires_delta)
 
         result = verify_token(expired_token)
         assert result is None  # Expired token should be rejected
@@ -133,9 +131,7 @@ class TestJWTTokenVerification:
     def test_verify_token_with_wrong_secret(self, test_user_data):
         """Test that token signed with different secret is rejected"""
         # Create token with different secret
-        wrong_secret_token = jwt.encode(
-            test_user_data, "wrong_secret_key", algorithm=JWT_ALGORITHM
-        )
+        wrong_secret_token = jwt.encode(test_user_data, "wrong_secret_key", algorithm=JWT_ALGORITHM)
 
         result = verify_token(wrong_secret_token)
         assert result is None
@@ -163,9 +159,7 @@ class TestJWTTokenPayload:
     def test_get_token_payload_expired_token(self, test_user_data):
         """Test payload extraction from expired token (should still work)"""
         # Create expired token
-        expired_token = create_access_token(
-            data=test_user_data, expires_delta=timedelta(minutes=-1)
-        )
+        expired_token = create_access_token(data=test_user_data, expires_delta=timedelta(minutes=-1))
 
         # Payload extraction should work even for expired tokens
         payload = get_token_payload(expired_token)

@@ -15,11 +15,11 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import logging
-import tempfile
 from datetime import datetime
+import logging
 from pathlib import Path
-from typing import Any, Optional
+import tempfile
+from typing import Any
 
 from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from fastapi.responses import JSONResponse
@@ -27,6 +27,7 @@ from pydantic import BaseModel, Field, validator
 
 from security.jwt_auth import get_current_user_with_role
 from services.rag_service import get_rag_service
+
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +42,13 @@ router = APIRouter()
 # REQUEST/RESPONSE MODELS
 # =============================================================================
 
+
 class IngestTextRequest(BaseModel):
     """Request model for text ingestion"""
 
     text: str = Field(..., description="Text content to ingest", min_length=10)
     source: str = Field(default="api_input", description="Source identifier")
-    metadata: Optional[dict[str, Any]] = Field(
+    metadata: dict[str, Any] | None = Field(
         default=None,
         description="Additional metadata",
     )
@@ -66,7 +68,7 @@ class SearchRequest(BaseModel):
 
     query: str = Field(..., description="Search query", min_length=1)
     top_k: int = Field(default=5, description="Number of results", ge=1, le=20)
-    filters: Optional[dict[str, Any]] = Field(
+    filters: dict[str, Any] | None = Field(
         default=None,
         description="Metadata filters",
     )
@@ -87,7 +89,7 @@ class QueryRequest(BaseModel):
         default="claude-sonnet-4-5-20250929",
         description="LLM model to use",
     )
-    system_prompt: Optional[str] = Field(
+    system_prompt: str | None = Field(
         default=None,
         description="Custom system prompt",
     )
@@ -100,8 +102,8 @@ class IngestResponse(BaseModel):
     total_documents: int = Field(..., description="Total documents in collection")
     added: int = Field(..., description="Documents added in this operation")
     chunks_created: int = Field(..., description="Number of chunks created")
-    file_path: Optional[str] = Field(None, description="Source file path")
-    source: Optional[str] = Field(None, description="Source identifier")
+    file_path: str | None = Field(None, description="Source file path")
+    source: str | None = Field(None, description="Source identifier")
     ingested_at: str = Field(..., description="Ingestion timestamp")
 
 
@@ -128,8 +130,8 @@ class QueryResponse(BaseModel):
     answer: str = Field(..., description="Generated answer")
     sources: list[SearchResult] = Field(..., description="Source documents")
     context_used: int = Field(..., description="Number of context chunks used")
-    model: Optional[str] = Field(None, description="LLM model used")
-    tokens_used: Optional[dict[str, int]] = Field(None, description="Token usage")
+    model: str | None = Field(None, description="LLM model used")
+    tokens_used: dict[str, int] | None = Field(None, description="Token usage")
 
 
 class StatsResponse(BaseModel):
@@ -143,6 +145,7 @@ class StatsResponse(BaseModel):
 # ENDPOINTS
 # =============================================================================
 
+
 @router.post(
     "/rag/ingest/text",
     response_model=IngestResponse,
@@ -152,9 +155,7 @@ class StatsResponse(BaseModel):
 )
 async def ingest_text(
     request: IngestTextRequest,
-    current_user: dict[str, Any] = Depends(
-        get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])
-    ),
+    current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])),
 ):
     """
     Ingest text content into RAG system
@@ -190,7 +191,7 @@ async def ingest_text(
         logger.error(f"Error ingesting text: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to ingest text: {str(e)}",
+            detail=f"Failed to ingest text: {e!s}",
         )
 
 
@@ -203,9 +204,7 @@ async def ingest_text(
 )
 async def ingest_file(
     file: UploadFile = File(..., description="Document file to ingest"),
-    current_user: dict[str, Any] = Depends(
-        get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])
-    ),
+    current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])),
 ):
     """
     Ingest a document file into RAG system
@@ -271,7 +270,7 @@ async def ingest_file(
         logger.error(f"Error ingesting file: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to ingest file: {str(e)}",
+            detail=f"Failed to ingest file: {e!s}",
         )
 
 
@@ -322,7 +321,7 @@ async def search(
         logger.error(f"Error searching: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Search failed: {str(e)}",
+            detail=f"Search failed: {e!s}",
         )
 
 
@@ -376,7 +375,7 @@ async def query(
         logger.error(f"Error processing query: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Query failed: {str(e)}",
+            detail=f"Query failed: {e!s}",
         )
 
 
@@ -387,9 +386,7 @@ async def query(
     description="Get RAG system statistics and configuration",
 )
 async def get_stats(
-    current_user: dict[str, Any] = Depends(
-        get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])
-    ),
+    current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin", "Admin", "Developer"])),
 ):
     """
     Get RAG system statistics
@@ -411,7 +408,7 @@ async def get_stats(
         logger.error(f"Error getting stats: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to get stats: {str(e)}",
+            detail=f"Failed to get stats: {e!s}",
         )
 
 
@@ -421,9 +418,7 @@ async def get_stats(
     description="Delete all documents from the RAG knowledge base",
 )
 async def reset_database(
-    current_user: dict[str, Any] = Depends(
-        get_current_user_with_role(["SuperAdmin"])
-    ),
+    current_user: dict[str, Any] = Depends(get_current_user_with_role(["SuperAdmin"])),
 ):
     """
     Reset RAG database (delete all documents)
@@ -456,7 +451,7 @@ async def reset_database(
         logger.error(f"Error resetting database: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to reset database: {str(e)}",
+            detail=f"Failed to reset database: {e!s}",
         )
 
 

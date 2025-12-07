@@ -10,6 +10,7 @@ import openai
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class CustomerServiceAgent:
     """Luxury customer service specialist with fashion industry expertise."""
 
@@ -31,15 +32,21 @@ class CustomerServiceAgent:
         # OpenAI GOD MODE Integration
         api_key = os.getenv("OPENAI_API_KEY")
         if api_key:
-            self.openai_client = openai.OpenAI(api_key=api_key)
+            from config.unified_config import get_config
+
+            config = get_config()
+            is_consequential = config.ai.openai_is_consequential
+            default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
+
+            self.openai_client = openai.OpenAI(api_key=api_key, default_headers=default_headers)
             self.god_mode_active = True
-            logger.info("💎 Customer Service Agent initialized with OpenAI GOD MODE")
+            logger.info(
+                f"💎 Customer Service Agent initialized with OpenAI GOD MODE (consequential={is_consequential})"
+            )
         else:
             self.openai_client = None
             self.god_mode_active = False
-            logger.warning(
-                "💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)"
-            )
+            logger.warning("💎 Customer Service Agent initialized without OpenAI GOD MODE (API key missing)")
 
     async def analyze_customer_satisfaction(self) -> dict[str, Any]:
         """Comprehensive customer satisfaction analysis for luxury fashion."""
@@ -76,9 +83,7 @@ class CustomerServiceAgent:
                 "analysis_id": str(uuid.uuid4()),
                 "timestamp": datetime.now().isoformat(),
                 "satisfaction_analysis": analysis,
-                "improvement_recommendations": self._generate_service_recommendations(
-                    analysis
-                ),
+                "improvement_recommendations": self._generate_service_recommendations(analysis),
                 "risk_assessment": self._assess_service_risks(analysis),
             }
 
@@ -126,6 +131,7 @@ class CustomerServiceAgent:
                 "impact_score": 85,
             }
         }
+
 
 def optimize_customer_service() -> dict[str, Any]:
     """Main function to optimize customer service operations."""

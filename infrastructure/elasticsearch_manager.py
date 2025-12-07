@@ -2,10 +2,10 @@ from dataclasses import dataclass
 from datetime import datetime
 import logging
 import time
-from typing import Any, Optional
+from typing import Any
 
 from elasticsearch import AsyncElasticsearch
-from elasticsearch.exceptions import ElasticsearchException, NotFoundError, RequestError
+from elasticsearch.exceptions import ApiError as ElasticsearchException, NotFoundError, RequestError
 
 
 """
@@ -15,6 +15,7 @@ Target: <2-second query response times with relevance scoring
 """
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class SearchMetrics:
@@ -42,10 +43,9 @@ class SearchMetrics:
             "failed_queries": self.failed_queries,
             "success_rate": self.success_rate,
             "avg_response_time": self.avg_response_time,
-            "last_updated": (
-                self.last_updated.isoformat() if self.last_updated else None
-            ),
+            "last_updated": (self.last_updated.isoformat() if self.last_updated else None),
         }
+
 
 class ElasticsearchManager:
     """Enterprise Elasticsearch manager with fashion industry optimization"""
@@ -61,23 +61,20 @@ class ElasticsearchManager:
         max_retries: int = 3,
         retry_on_timeout: bool = True,
     ):
-        self.hosts = hosts or ["localhost:9200"]
+        self.hosts = hosts or ["http://localhost:9200"]
         self.username = username
         self.password = password
 
         # Initialize Elasticsearch client
         client_config = {
             "hosts": self.hosts,
-            "timeout": timeout,
-            "max_retries": max_retries,
-            "retry_on_timeout": retry_on_timeout,
+            "request_timeout": timeout,
         }
 
         if username and password:
-            client_config["http_auth"] = (username, password)
+            client_config["basic_auth"] = (username, password)
 
         if use_ssl:
-            client_config["use_ssl"] = True
             client_config["verify_certs"] = verify_certs
 
         self.client = AsyncElasticsearch(**client_config)
@@ -258,11 +255,7 @@ class ElasticsearchManager:
             "analytics_policy": {
                 "policy": {
                     "phases": {
-                        "hot": {
-                            "actions": {
-                                "rollover": {"max_size": "5GB", "max_age": "1d"}
-                            }
-                        },
+                        "hot": {"actions": {"rollover": {"max_size": "5GB", "max_age": "1d"}}},
                         "warm": {
                             "min_age": "1d",
                             "actions": {"forcemerge": {"max_num_segments": 1}},
@@ -278,11 +271,7 @@ class ElasticsearchManager:
             "fashion_trends_policy": {
                 "policy": {
                     "phases": {
-                        "hot": {
-                            "actions": {
-                                "rollover": {"max_size": "2GB", "max_age": "30d"}
-                            }
-                        },
+                        "hot": {"actions": {"rollover": {"max_size": "2GB", "max_age": "30d"}}},
                         "warm": {
                             "min_age": "30d",
                             "actions": {"forcemerge": {"max_num_segments": 1}},
@@ -333,9 +322,7 @@ class ElasticsearchManager:
 
                 if not exists:
                     # Create index with mapping
-                    await self.client.indices.create(
-                        index=full_index_name, body=index_config
-                    )
+                    await self.client.indices.create(index=full_index_name, body=index_config)
                     logger.info(f"Created index: {full_index_name}")
                 else:
                     logger.debug(f"Index already exists: {full_index_name}")
@@ -353,9 +340,7 @@ class ElasticsearchManager:
                     logger.debug(f"ILM policy already exists: {policy_name}")
                 except NotFoundError:
                     # Create policy
-                    await self.client.ilm.put_lifecycle(
-                        policy=policy_name, body=policy_config
-                    )
+                    await self.client.ilm.put_lifecycle(policy=policy_name, body=policy_config)
                     logger.info(f"Created ILM policy: {policy_name}")
 
             except RequestError as e:
@@ -371,14 +356,10 @@ class ElasticsearchManager:
         else:
             self.metrics.failed_queries += 1
 
-        self.metrics.avg_response_time = (
-            self.metrics.total_response_time / self.metrics.total_queries
-        )
+        self.metrics.avg_response_time = self.metrics.total_response_time / self.metrics.total_queries
         self.metrics.last_updated = datetime.now()
 
-    async def index_document(
-        self, index_type: str, document: dict[str, Any], doc_id: Optional[str] = None
-    ) -> bool:
+    async def index_document(self, index_type: str, document: dict[str, Any], doc_id: str | None = None) -> bool:
         """Index a document"""
         start_time = time.time()
 
@@ -392,9 +373,7 @@ class ElasticsearchManager:
                 document["timestamp"] = datetime.now().isoformat()
 
             # Index document
-            response = await self.client.index(
-                index=index_name, body=document, id=doc_id
-            )
+            response = await self.client.index(index=index_name, body=document, id=doc_id)
 
             response_time = (time.time() - start_time) * 1000
             await self._record_metrics(response_time, True)
@@ -436,9 +415,7 @@ class ElasticsearchManager:
 
             # Check if response time meets target (<2 seconds)
             if response_time > 2000:
-                logger.warning(
-                    f"Search query exceeded target response time: {response_time:.2f}ms"
-                )
+                logger.warning(f"Search query exceeded target response time: {response_time:.2f}ms")
 
             return {
                 "hits": response["hits"]["hits"],
@@ -490,11 +467,7 @@ class ElasticsearchManager:
                             "fuzziness": "AUTO",
                         }
                     },
-                    {
-                        "match_phrase": {
-                            "description": {"query": search_text, "boost": 2}
-                        }
-                    },
+                    {"match_phrase": {"description": {"query": search_text, "boost": 2}}},
                 ],
                 "minimum_should_match": 1,
             }
@@ -514,9 +487,9 @@ class ElasticsearchManager:
     async def fashion_trend_search(
         self,
         search_text: str,
-        season: Optional[str] = None,
-        category: Optional[str] = None,
-        year: Optional[int] = None,
+        season: str | None = None,
+        category: str | None = None,
+        year: int | None = None,
         min_popularity: float = 0.0,
     ) -> dict[str, Any]:
         """Fashion-specific trend search"""
@@ -547,9 +520,7 @@ class ElasticsearchManager:
             query["bool"]["filter"].append({"term": {"year": year}})
 
         if min_popularity > 0:
-            query["bool"]["filter"].append(
-                {"range": {"popularity_score": {"gte": min_popularity}}}
-            )
+            query["bool"]["filter"].append({"range": {"popularity_score": {"gte": min_popularity}}})
 
         return await self.search(
             index_type="fashion_trends",
@@ -670,6 +641,7 @@ class ElasticsearchManager:
                 "error": str(e),
                 "response_time_ms": (time.time() - start_time) * 1000,
             }
+
 
 # Global Elasticsearch manager instance
 elasticsearch_manager = ElasticsearchManager()

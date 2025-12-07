@@ -1,0 +1,261 @@
+"""
+FastAPI Dependency Injection for DevSkyy Platform
+
+Provides reusable dependencies for authentication, authorization, and role-based access control.
+
+Per Truth Protocol:
+- Rule #6: RBAC roles enforced via dependency injection
+- Rule #7: Input validation at the dependency level
+- Rule #13: Secure authentication and authorization
+
+Usage:
+    from core.dependencies import get_current_user, require_role
+    from security.rbac import Role
+
+    @app.get("/admin/users")
+    async def list_users(
+        current_user: TokenData = Depends(require_role(Role.ADMIN))
+    ):
+        # Only ADMIN and SUPER_ADMIN can access this endpoint
+        ...
+"""
+
+from collections.abc import Callable
+import logging
+
+from fastapi import Depends, HTTPException, status
+
+from security.jwt_auth import TokenData
+from security.jwt_auth import get_current_user as jwt_get_current_user
+from security.rbac import Role, has_permission, is_role_higher_or_equal
+
+
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# AUTHENTICATION DEPENDENCIES
+# ============================================================================
+
+
+async def get_current_user(
+    current_user: TokenData = Depends(jwt_get_current_user),
+) -> TokenData:
+    """
+    Get currently authenticated user from JWT token.
+
+    This is a wrapper around security.jwt_auth.get_current_user that can be
+    extended with additional checks (e.g., user active status, email verification).
+
+    Args:
+        current_user: Token data from JWT verification
+
+    Returns:
+        TokenData with user information
+
+    Raises:
+        HTTPException: 401 if token is invalid or expired
+
+    Example:
+        ```python
+        @app.get("/me")
+        async def get_profile(user: TokenData = Depends(get_current_user)):
+            return {"user_id": user.user_id, "email": user.email}
+        ```
+    """
+    # Future: Add additional checks here
+    # - Check if user is active in database
+    # - Check if email is verified
+    # - Check if account is not locked
+    # - Check if user has not been deleted
+
+    return current_user
+
+
+# ============================================================================
+# AUTHORIZATION DEPENDENCIES
+# ============================================================================
+
+
+def require_role(minimum_role: Role) -> Callable:
+    """
+    Dependency factory for role-based access control.
+
+    Creates a dependency that checks if the current user has the required role
+    or a higher role in the hierarchy.
+
+    Args:
+        minimum_role: The minimum role required to access the endpoint
+
+    Returns:
+        Dependency function that can be used with Depends()
+
+    Raises:
+        HTTPException: 403 if user doesn't have required role
+
+    Example:
+        ```python
+        from security.rbac import Role
+
+        # Only ADMIN and SUPER_ADMIN can access
+        @app.post("/agents/deploy")
+        async def deploy_agent(
+            job_data: JobDefinition,
+            user: TokenData = Depends(require_role(Role.ADMIN))
+        ):
+            # Deploy agent...
+            return {"status": "deployed"}
+
+        # Only SUPER_ADMIN can access
+        @app.delete("/users/{user_id}")
+        async def delete_user(
+            user_id: str,
+            user: TokenData = Depends(require_role(Role.SUPER_ADMIN))
+        ):
+            # Delete user...
+            return {"status": "deleted"}
+        ```
+    """
+
+    async def role_checker(
+        current_user: TokenData = Depends(get_current_user),
+    ) -> TokenData:
+        """
+        Check if current user has the required role.
+
+        Args:
+            current_user: Current authenticated user
+
+        Returns:
+            TokenData if user has required role
+
+        Raises:
+            HTTPException: 403 if user doesn't have required role
+        """
+        try:
+            # Parse user's role from token
+            user_role = Role(current_user.role)
+        except ValueError:
+            # Invalid role in token
+            logger.error(
+                f"Invalid role in token: {current_user.role} for user {current_user.user_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Invalid role: {current_user.role}",
+            )
+
+        # Check if user's role is high enough
+        if not is_role_higher_or_equal(user_role, minimum_role):
+            logger.warning(
+                f"Access denied: User {current_user.user_id} "
+                f"(role: {user_role.value}) tried to access endpoint "
+                f"requiring {minimum_role.value}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Insufficient permissions. Required role: {minimum_role.value}",
+            )
+
+        logger.info(
+            f"Access granted: User {current_user.user_id} "
+            f"(role: {user_role.value}) accessing endpoint "
+            f"requiring {minimum_role.value}"
+        )
+
+        return current_user
+
+    return role_checker
+
+
+def require_permission(required_permission: str) -> Callable:
+    """
+    Dependency factory for permission-based access control.
+
+    Creates a dependency that checks if the current user has a specific permission.
+
+    Args:
+        required_permission: The permission required (e.g., "deploy:agents")
+
+    Returns:
+        Dependency function that can be used with Depends()
+
+    Raises:
+        HTTPException: 403 if user doesn't have required permission
+
+    Example:
+        ```python
+        @app.post("/agents/finetune")
+        async def finetune_agent(
+            config: FinetuningConfig,
+            user: TokenData = Depends(require_permission("finetune:agents"))
+        ):
+            # Finetune agent...
+            return {"status": "finetuning"}
+        ```
+    """
+
+    async def permission_checker(
+        current_user: TokenData = Depends(get_current_user),
+    ) -> TokenData:
+        """
+        Check if current user has the required permission.
+
+        Args:
+            current_user: Current authenticated user
+
+        Returns:
+            TokenData if user has required permission
+
+        Raises:
+            HTTPException: 403 if user doesn't have required permission
+        """
+        try:
+            # Parse user's role from token
+            user_role = Role(current_user.role)
+        except ValueError:
+            # Invalid role in token
+            logger.error(
+                f"Invalid role in token: {current_user.role} for user {current_user.user_id}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Invalid role: {current_user.role}",
+            )
+
+        # Check if user's role has the required permission
+        if not has_permission(user_role, required_permission):
+            logger.warning(
+                f"Permission denied: User {current_user.user_id} "
+                f"(role: {user_role.value}) lacks permission '{required_permission}'"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"Insufficient permissions. Required permission: {required_permission}",
+            )
+
+        logger.info(
+            f"Permission granted: User {current_user.user_id} "
+            f"(role: {user_role.value}) has permission '{required_permission}'"
+        )
+
+        return current_user
+
+    return permission_checker
+
+
+# ============================================================================
+# CONVENIENCE DEPENDENCIES
+# ============================================================================
+
+
+# Pre-configured role dependencies for common use cases
+require_super_admin = require_role(Role.SUPER_ADMIN)
+require_admin = require_role(Role.ADMIN)
+require_developer = require_role(Role.DEVELOPER)
+require_api_user = require_role(Role.API_USER)
+
+# Pre-configured permission dependencies
+require_agent_deployment = require_permission("deploy:agents")
+require_agent_finetuning = require_permission("finetune:agents")
+require_wordpress_management = require_permission("manage:wordpress")

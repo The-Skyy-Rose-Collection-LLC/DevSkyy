@@ -16,6 +16,7 @@ ML Model Validation Tests
 Tests for machine learning models, performance benchmarks, and validation
 """
 
+
 class TestModelPerformance:
     """Test ML model performance and benchmarks"""
 
@@ -27,11 +28,7 @@ class TestModelPerformance:
         self.n_features = 10
 
         self.X = np.random.randn(self.n_samples, self.n_features)
-        self.y = (
-            2 * self.X[:, 0]
-            + 1.5 * self.X[:, 1]
-            + 0.5 * np.random.randn(self.n_samples)
-        )
+        self.y = 2 * self.X[:, 0] + 1.5 * self.X[:, 1] + 0.5 * np.random.randn(self.n_samples)
 
         self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
             self.X, self.y, test_size=0.2, random_state=42
@@ -107,6 +104,7 @@ class TestModelPerformance:
         # Assert prediction time is reasonable
         assert prediction_time < 1.0, f"Prediction took too long: {prediction_time}s"
 
+
 class TestForecastingEngine:
     """Test the forecasting engine"""
 
@@ -176,6 +174,7 @@ class TestForecastingEngine:
         # Assert reasonable accuracy
         assert mse < 100, f"Forecast MSE too high: {mse}"
 
+
 class TestModelRegistry:
     """Test the model registry functionality"""
 
@@ -210,9 +209,7 @@ class TestModelRegistry:
         y = np.random.randn(100)
         model.fit(X, y)
 
-        model_id = self.registry.register_model(
-            model=model, name="test_retrieval_model", version="1.0.0"
-        )
+        model_id = self.registry.register_model(model=model, name="test_retrieval_model", version="1.0.0")
 
         # Retrieve the model
         retrieved_model = self.registry.get_model(model_id)
@@ -229,16 +226,12 @@ class TestModelRegistry:
             y = np.random.randn(100)
             model.fit(X, y)
 
-            model_id = self.registry.register_model(
-                model=model, name="versioned_model", version=version
-            )
+            model_id = self.registry.register_model(model=model, name="versioned_model", version=version)
 
             assert model_id is not None
 
         # Test getting latest version
-        latest_model = self.registry.get_model_by_name(
-            "versioned_model", version="latest"
-        )
+        latest_model = self.registry.get_model_by_name("versioned_model", version="latest")
         assert latest_model is not None
 
     def test_model_metadata(self):
@@ -266,6 +259,7 @@ class TestModelRegistry:
         assert retrieved_metadata["type"] == "regression"
         assert retrieved_metadata["features"] == 5
         assert retrieved_metadata["accuracy"] == 0.95
+
 
 class TestModelValidation:
     """Test model validation and quality checks"""
@@ -335,6 +329,7 @@ class TestModelValidation:
         # Should be identical
         np.testing.assert_array_equal(predictions1, predictions2)
 
+
 class TestModelMonitoring:
     """Test model monitoring and drift detection"""
 
@@ -373,6 +368,7 @@ class TestModelMonitoring:
         assert isinstance(r2, float)
         assert not np.isnan(mse)
         assert not np.isnan(r2)
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v", "--benchmark-only"])

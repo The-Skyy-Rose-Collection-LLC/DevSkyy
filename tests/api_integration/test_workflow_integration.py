@@ -2,10 +2,11 @@
 Integration test for WorkflowStatus enum refactoring
 Verifies that workflow_engine.py works correctly with the new enums module
 """
+
 import sys
 
 
-sys.path.insert(0, '.')
+sys.path.insert(0, ".")
 
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -17,6 +18,7 @@ from api_integration.enums import WorkflowStatus
 @dataclass
 class MockWorkflowTrigger:
     """Mock trigger for testing"""
+
     trigger_id: str
     trigger_type: str = "manual"
 
@@ -27,6 +29,7 @@ class MockWorkflowTrigger:
 @dataclass
 class MockWorkflowStep:
     """Mock step for testing"""
+
     step_id: str
 
     def to_dict(self):
@@ -36,6 +39,7 @@ class MockWorkflowStep:
 @dataclass
 class MockWorkflow:
     """Mock workflow class that mimics the real Workflow class"""
+
     workflow_id: str
     name: str
     description: str
@@ -70,7 +74,7 @@ def test_workflow_status_enum_integration():
         description="Testing enum refactoring",
         trigger=trigger,
         steps=[step],
-        status=WorkflowStatus.PENDING
+        status=WorkflowStatus.PENDING,
     )
 
     # Test serialization
@@ -79,7 +83,6 @@ def test_workflow_status_enum_integration():
     # Verify status is correctly serialized
     assert data["status"] == "pending", f"Expected 'pending', got {data['status']}"
     assert isinstance(data["status"], str), "Status should be a string"
-
 
     # Test status transitions
     workflow.status = WorkflowStatus.RUNNING
@@ -108,9 +111,7 @@ def test_workflow_status_enum_integration():
     for status_enum, expected_json in all_statuses:
         workflow.status = status_enum
         data = workflow.to_dict()
-        assert data["status"] == expected_json, \
-            f"Expected {expected_json}, got {data['status']}"
-
+        assert data["status"] == expected_json, f"Expected {expected_json}, got {data['status']}"
 
     # Test that we can't use string directly (should use enum)
     try:
@@ -120,7 +121,6 @@ def test_workflow_status_enum_integration():
         # but the enum should only accept enum values
     except (TypeError, ValueError):
         pass
-
 
 
 if __name__ == "__main__":

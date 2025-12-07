@@ -9,6 +9,7 @@ Production Configuration for The Skyy Rose Collection Platform
 
 load_dotenv()
 
+
 class Config:
     """Base configuration."""
 
@@ -51,12 +52,14 @@ class Config:
     CORS_ORIGINS = ["https://theskyy-rose-collection.com"]
     TRUSTED_HOSTS = ["theskyy-rose-collection.com"]
 
+
 class DevelopmentConfig(Config):
     """Development configuration."""
 
     DEBUG = True
     CORS_ORIGINS = ["http://localhost:3000", "http://127.0.0.1:3000"]
     TRUSTED_HOSTS = ["localhost", "127.0.0.1"]
+
 
 class ProductionConfig(Config):
     """Production configuration."""
@@ -67,6 +70,7 @@ class ProductionConfig(Config):
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
     SESSION_COOKIE_HTTPONLY = True
+
 
 class TestingConfig(Config):
     """Testing configuration.
@@ -79,6 +83,7 @@ class TestingConfig(Config):
     DATABASE_URL = "sqlite:///:memory:"
     # Override base SECRET_KEY validation for testing only
     SECRET_KEY = os.environ.get("TEST_SECRET_KEY", "test-secret-key-for-automated-tests-only")
+
 
 # Configuration mapping
 config = {

@@ -27,13 +27,15 @@ from services.consensus_orchestrator import (
 def mock_content_generator():
     """Mock content generator"""
     generator = MagicMock()
-    generator.generate_blog_post = AsyncMock(return_value={
-        "title": "Test Article Title",
-        "content": "This is test content with luxury keywords and premium quality.",
-        "meta_description": "Test meta description about luxury products.",
-        "word_count": 850,
-        "keywords": ["luxury", "premium"],
-    })
+    generator.generate_blog_post = AsyncMock(
+        return_value={
+            "title": "Test Article Title",
+            "content": "This is test content with luxury keywords and premium quality.",
+            "meta_description": "Test meta description about luxury products.",
+            "word_count": 850,
+            "keywords": ["luxury", "premium"],
+        }
+    )
     return generator
 
 
@@ -50,10 +52,7 @@ def brand_config():
 @pytest.fixture
 def orchestrator(mock_content_generator, brand_config):
     """Create orchestrator instance"""
-    return ConsensusOrchestrator(
-        content_generator=mock_content_generator,
-        brand_config=brand_config
-    )
+    return ConsensusOrchestrator(content_generator=mock_content_generator, brand_config=brand_config)
 
 
 @pytest.mark.consensus
@@ -61,10 +60,7 @@ def orchestrator(mock_content_generator, brand_config):
 async def test_generate_initial_draft(orchestrator):
     """Test initial draft generation"""
     draft = await orchestrator.generate_initial_draft(
-        topic="Luxury Fashion Trends",
-        keywords=["luxury", "fashion"],
-        tone="luxury",
-        length=800
+        topic="Luxury Fashion Trends", keywords=["luxury", "fashion"], tone="luxury", length=800
     )
 
     assert draft.version == 1
@@ -88,7 +84,7 @@ async def test_brand_intelligence_reviewer_approval():
         content="This luxury article discusses premium fashion with exclusive designs." * 50,
         meta_description="Luxury fashion guide",
         word_count=850,
-        keywords=["luxury", "premium"]
+        keywords=["luxury", "premium"],
     )
 
     review = await reviewer.review_content(draft)
@@ -109,11 +105,7 @@ async def test_brand_intelligence_reviewer_rejects_short_content():
     reviewer = BrandIntelligenceReviewer(brand_config)
 
     draft = ContentDraft(
-        title="Test",
-        content="Short content without keywords.",
-        meta_description="Test",
-        word_count=400,
-        keywords=[]
+        title="Test", content="Short content without keywords.", meta_description="Test", word_count=400, keywords=[]
     )
 
     review = await reviewer.review_content(draft)
@@ -134,7 +126,7 @@ async def test_seo_marketing_reviewer_validates_meta():
         content="Content with proper keywords and call-to-action. Shop now!",
         meta_description="This is a very long meta description that exceeds the recommended 160 character limit for search engine results pages and will be truncated in SERPs.",
         word_count=800,
-        keywords=["keyword"]
+        keywords=["keyword"],
     )
 
     review = await reviewer.review_content(draft)
@@ -155,7 +147,7 @@ async def test_seo_marketing_reviewer_checks_cta():
         content="Article content without any call to action.",
         meta_description="Good meta description length",
         word_count=800,
-        keywords=[]
+        keywords=[],
     )
 
     review = await reviewer.review_content(draft)
@@ -174,7 +166,7 @@ async def test_security_reviewer_flags_sensitive_data():
         content="Here is my password and API key information.",
         meta_description="Test",
         word_count=800,
-        keywords=[]
+        keywords=[],
     )
 
     review = await reviewer.review_content(draft)
@@ -195,7 +187,7 @@ async def test_security_reviewer_flags_missing_disclaimers():
         content="This medical diagnosis information is guaranteed to cure your condition.",
         meta_description="Medical advice",
         word_count=800,
-        keywords=[]
+        keywords=[],
     )
 
     review = await reviewer.review_content(draft)
@@ -213,32 +205,30 @@ async def test_consensus_vote_approval():
         content="Good content" * 100,
         meta_description="Good description",
         word_count=800,
-        keywords=["test"]
+        keywords=["test"],
     )
 
     orchestrator = ConsensusOrchestrator(
-        content_generator=MagicMock(),
-        brand_config={"brand_keywords": ["test"], "values": ["quality"]}
+        content_generator=MagicMock(), brand_config={"brand_keywords": ["test"], "values": ["quality"]}
     )
 
     # All reviewers approve
-    with patch.object(BrandIntelligenceReviewer, 'review_content', new_callable=AsyncMock) as mock_brand, \
-         patch.object(SEOMarketingReviewer, 'review_content', new_callable=AsyncMock) as mock_seo, \
-         patch.object(SecurityComplianceReviewer, 'review_content', new_callable=AsyncMock) as mock_security:
+    with (
+        patch.object(BrandIntelligenceReviewer, "review_content", new_callable=AsyncMock) as mock_brand,
+        patch.object(SEOMarketingReviewer, "review_content", new_callable=AsyncMock) as mock_seo,
+        patch.object(SecurityComplianceReviewer, "review_content", new_callable=AsyncMock) as mock_security,
+    ):
 
         from services.consensus_orchestrator import AgentReview
 
         mock_brand.return_value = AgentReview(
-            agent_name="Brand", decision=ReviewDecision.APPROVED,
-            confidence=0.9, feedback="Good"
+            agent_name="Brand", decision=ReviewDecision.APPROVED, confidence=0.9, feedback="Good"
         )
         mock_seo.return_value = AgentReview(
-            agent_name="SEO", decision=ReviewDecision.APPROVED,
-            confidence=0.9, feedback="Good"
+            agent_name="SEO", decision=ReviewDecision.APPROVED, confidence=0.9, feedback="Good"
         )
         mock_security.return_value = AgentReview(
-            agent_name="Security", decision=ReviewDecision.APPROVED,
-            confidence=0.9, feedback="Good"
+            agent_name="Security", decision=ReviewDecision.APPROVED, confidence=0.9, feedback="Good"
         )
 
         consensus = await orchestrator.review_draft(draft)
@@ -253,36 +243,36 @@ async def test_consensus_vote_approval():
 @pytest.mark.asyncio
 async def test_consensus_vote_requires_redraft():
     """Test consensus calculation requiring redraft (2+ major issues)"""
-    draft = ContentDraft(
-        title="Test",
-        content="Bad content",
-        meta_description="Bad",
-        word_count=100,
-        keywords=[]
-    )
+    draft = ContentDraft(title="Test", content="Bad content", meta_description="Bad", word_count=100, keywords=[])
 
     orchestrator = ConsensusOrchestrator(
-        content_generator=MagicMock(),
-        brand_config={"brand_keywords": [], "values": []}
+        content_generator=MagicMock(), brand_config={"brand_keywords": [], "values": []}
     )
 
-    with patch.object(BrandIntelligenceReviewer, 'review_content', new_callable=AsyncMock) as mock_brand, \
-         patch.object(SEOMarketingReviewer, 'review_content', new_callable=AsyncMock) as mock_seo, \
-         patch.object(SecurityComplianceReviewer, 'review_content', new_callable=AsyncMock) as mock_security:
+    with (
+        patch.object(BrandIntelligenceReviewer, "review_content", new_callable=AsyncMock) as mock_brand,
+        patch.object(SEOMarketingReviewer, "review_content", new_callable=AsyncMock) as mock_seo,
+        patch.object(SecurityComplianceReviewer, "review_content", new_callable=AsyncMock) as mock_security,
+    ):
 
         from services.consensus_orchestrator import AgentReview
 
         mock_brand.return_value = AgentReview(
-            agent_name="Brand", decision=ReviewDecision.MAJOR_ISSUE,
-            confidence=0.9, feedback="Major issues", issues_found=["Issue 1"]
+            agent_name="Brand",
+            decision=ReviewDecision.MAJOR_ISSUE,
+            confidence=0.9,
+            feedback="Major issues",
+            issues_found=["Issue 1"],
         )
         mock_seo.return_value = AgentReview(
-            agent_name="SEO", decision=ReviewDecision.MAJOR_ISSUE,
-            confidence=0.9, feedback="Major issues", issues_found=["Issue 2"]
+            agent_name="SEO",
+            decision=ReviewDecision.MAJOR_ISSUE,
+            confidence=0.9,
+            feedback="Major issues",
+            issues_found=["Issue 2"],
         )
         mock_security.return_value = AgentReview(
-            agent_name="Security", decision=ReviewDecision.APPROVED,
-            confidence=0.9, feedback="OK"
+            agent_name="Security", decision=ReviewDecision.APPROVED, confidence=0.9, feedback="OK"
         )
 
         consensus = await orchestrator.review_draft(draft)
@@ -296,10 +286,7 @@ async def test_consensus_vote_requires_redraft():
 async def test_complete_workflow_with_approval(orchestrator):
     """Test complete consensus workflow ending in human approval"""
     workflow = await orchestrator.execute_consensus_workflow(
-        topic="Test Article",
-        keywords=["test"],
-        tone="professional",
-        length=800
+        topic="Test Article", keywords=["test"], tone="professional", length=800
     )
 
     assert workflow.workflow_id is not None
@@ -318,17 +305,12 @@ async def test_complete_workflow_with_approval(orchestrator):
 async def test_human_approval_decision(orchestrator):
     """Test submitting human approval decision"""
     workflow = await orchestrator.execute_consensus_workflow(
-        topic="Test",
-        keywords=[],
-        tone="professional",
-        length=800
+        topic="Test", keywords=[], tone="professional", length=800
     )
 
     # Approve workflow
     updated_workflow = await orchestrator.submit_human_decision(
-        workflow_id=workflow.workflow_id,
-        decision_token=workflow.approval_token,
-        feedback="Looks good!"
+        workflow_id=workflow.workflow_id, decision_token=workflow.approval_token, feedback="Looks good!"
     )
 
     assert updated_workflow.human_decision == HumanDecision.APPROVED
@@ -340,17 +322,12 @@ async def test_human_approval_decision(orchestrator):
 async def test_human_rejection_decision(orchestrator):
     """Test submitting human rejection decision"""
     workflow = await orchestrator.execute_consensus_workflow(
-        topic="Test",
-        keywords=[],
-        tone="professional",
-        length=800
+        topic="Test", keywords=[], tone="professional", length=800
     )
 
     # Reject workflow
     updated_workflow = await orchestrator.submit_human_decision(
-        workflow_id=workflow.workflow_id,
-        decision_token=workflow.rejection_token,
-        feedback="Needs more work"
+        workflow_id=workflow.workflow_id, decision_token=workflow.rejection_token, feedback="Needs more work"
     )
 
     assert updated_workflow.human_decision == HumanDecision.REJECTED
@@ -362,17 +339,12 @@ async def test_human_rejection_decision(orchestrator):
 async def test_invalid_decision_token(orchestrator):
     """Test invalid decision token raises error"""
     workflow = await orchestrator.execute_consensus_workflow(
-        topic="Test",
-        keywords=[],
-        tone="professional",
-        length=800
+        topic="Test", keywords=[], tone="professional", length=800
     )
 
     with pytest.raises(ValueError, match="Invalid decision token"):
         await orchestrator.submit_human_decision(
-            workflow_id=workflow.workflow_id,
-            decision_token="invalid-token",
-            feedback=None
+            workflow_id=workflow.workflow_id, decision_token="invalid-token", feedback=None
         )
 
 
@@ -380,13 +352,10 @@ async def test_invalid_decision_token(orchestrator):
 @pytest.mark.asyncio
 async def test_max_redraft_iterations(mock_content_generator, brand_config):
     """Test workflow stops after max redraft iterations"""
-    orchestrator = ConsensusOrchestrator(
-        content_generator=mock_content_generator,
-        brand_config=brand_config
-    )
+    orchestrator = ConsensusOrchestrator(content_generator=mock_content_generator, brand_config=brand_config)
 
     # Force all reviews to require redraft
-    with patch.object(orchestrator, 'review_draft', new_callable=AsyncMock) as mock_review:
+    with patch.object(orchestrator, "review_draft", new_callable=AsyncMock) as mock_review:
         from services.consensus_orchestrator import AgentReview, ConsensusVote
 
         mock_review.return_value = ConsensusVote(
@@ -397,18 +366,12 @@ async def test_max_redraft_iterations(mock_content_generator, brand_config):
             requires_redraft=True,
             consensus_feedback="Needs redraft",
             reviews=[
-                AgentReview(
-                    agent_name="Agent1", decision=ReviewDecision.MAJOR_ISSUE,
-                    confidence=0.9, feedback="Issue"
-                )
-            ]
+                AgentReview(agent_name="Agent1", decision=ReviewDecision.MAJOR_ISSUE, confidence=0.9, feedback="Issue")
+            ],
         )
 
         workflow = await orchestrator.execute_consensus_workflow(
-            topic="Test",
-            keywords=[],
-            tone="professional",
-            length=800
+            topic="Test", keywords=[], tone="professional", length=800
         )
 
         assert workflow.iteration_count == orchestrator.MAX_REDRAFT_ITERATIONS
@@ -420,18 +383,9 @@ def test_approval_urls_generation(orchestrator):
     # Create a workflow
     from services.consensus_orchestrator import ContentDraft, WorkflowState
 
-    draft = ContentDraft(
-        title="Test",
-        content="Test",
-        meta_description="Test",
-        word_count=100,
-        keywords=[]
-    )
+    draft = ContentDraft(title="Test", content="Test", meta_description="Test", word_count=100, keywords=[])
 
-    workflow = WorkflowState(
-        topic="Test",
-        current_draft=draft
-    )
+    workflow = WorkflowState(topic="Test", current_draft=draft)
 
     orchestrator.workflows[workflow.workflow_id] = workflow
 
@@ -461,7 +415,7 @@ async def test_redraft_incorporates_feedback(orchestrator):
         content="Original content",
         meta_description="Original meta",
         word_count=500,
-        keywords=["test"]
+        keywords=["test"],
     )
 
     feedback = "Please add more details and improve SEO."

@@ -10,10 +10,12 @@ Tests for GDPR Compliance API Endpoints
 Tests data export, deletion, and retention policy endpoints per GDPR requirements
 """
 
+
 @pytest.fixture
 def client():
     """Create test client"""
     return TestClient(app)
+
 
 @pytest.fixture
 def auth_headers():
@@ -41,6 +43,7 @@ def auth_headers():
     access_token = create_access_token(token_data)
     return {"Authorization": f"Bearer {access_token}"}
 
+
 @pytest.fixture
 def admin_headers():
     """Create admin authentication headers"""
@@ -52,6 +55,7 @@ def admin_headers():
     }
     access_token = create_access_token(token_data)
     return {"Authorization": f"Bearer {access_token}"}
+
 
 class TestGDPRExportEndpoint:
     """Test GDPR data export endpoint (Article 15)"""
@@ -135,6 +139,7 @@ class TestGDPRExportEndpoint:
             data = response.json()
             assert data["metadata"]["export_format"] == format_type
 
+
 class TestGDPRDeleteEndpoint:
     """Test GDPR data deletion endpoint (Article 17)"""
 
@@ -146,9 +151,7 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = client.request(
-            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
-        )
+        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
 
         assert response.status_code == 200
         data = response.json()
@@ -173,9 +176,7 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": True,
         }
 
-        response = client.request(
-            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
-        )
+        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
 
         assert response.status_code == 200
         data = response.json()
@@ -193,9 +194,7 @@ class TestGDPRDeleteEndpoint:
             "anonymize_instead_of_delete": False,
         }
 
-        response = client.request(
-            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
-        )
+        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
 
         assert response.status_code == 400  # Bad request
 
@@ -210,6 +209,7 @@ class TestGDPRDeleteEndpoint:
         response = client.request("DELETE", "/api/v1/gdpr/delete", json=delete_request)
 
         assert response.status_code == 401  # Unauthorized
+
 
 class TestDataRetentionPolicy:
     """Test data retention policy endpoint"""
@@ -245,6 +245,7 @@ class TestDataRetentionPolicy:
         response = client.get("/api/v1/gdpr/retention-policy")
         assert response.status_code == 200
 
+
 class TestDataSubjectRequests:
     """Test admin endpoint for listing GDPR requests"""
 
@@ -267,6 +268,7 @@ class TestDataSubjectRequests:
         assert "export_requests" in data
         assert "deletion_requests" in data
         assert "total_requests" in data
+
 
 class TestGDPRCompliance:
     """Test overall GDPR compliance requirements"""
@@ -306,9 +308,7 @@ class TestGDPRCompliance:
             "anonymize_instead_of_delete": False,
         }
 
-        response = client.request(
-            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
-        )
+        response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
 
         assert response.status_code == 200
         data = response.json()
@@ -317,6 +317,7 @@ class TestGDPRCompliance:
         if data.get("retained_records"):
             # Some records should be retained for legal compliance
             assert "deletion_audit_log" in data["retained_records"]
+
 
 @pytest.mark.integration
 class TestGDPRIntegration:
@@ -339,15 +340,14 @@ class TestGDPRIntegration:
             "anonymize_instead_of_delete": False,
         }
 
-        delete_response = client.request(
-            "DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request
-        )
+        delete_response = client.request("DELETE", "/api/v1/gdpr/delete", headers=auth_headers, json=delete_request)
         assert delete_response.status_code == 200
         delete_data = delete_response.json()
 
         # Verify deletion occurred
         assert delete_data["status"] == "deleted"
         assert len(delete_data["deleted_records"]) > 0
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

@@ -10,7 +10,6 @@ Truth Protocol: Input validation, error handling, logging, no placeholders
 
 from datetime import datetime
 import logging
-from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from pydantic import BaseModel, Field
@@ -36,11 +35,11 @@ class ImportProductsResponse(BaseModel):
 
     success: bool
     message: str
-    job_id: Optional[str] = None
+    job_id: str | None = None
     total: int = 0
     succeeded: int = 0
     failed: int = 0
-    duration_seconds: Optional[float] = None
+    duration_seconds: float | None = None
 
 
 class GenerateSEORequest(BaseModel):
@@ -50,16 +49,16 @@ class GenerateSEORequest(BaseModel):
     category: str = Field(default="")
     short_description: str = Field(default="")
     description: str = Field(default="")
-    keywords: Optional[str] = None
+    keywords: str | None = None
 
 
 class GenerateSEOResponse(BaseModel):
     """Response with generated SEO tags"""
 
     success: bool
-    metatitle: Optional[str] = None
-    metadescription: Optional[str] = None
-    error: Optional[str] = None
+    metatitle: str | None = None
+    metadescription: str | None = None
+    error: str | None = None
 
 
 class WorkflowRequest(BaseModel):
@@ -79,7 +78,7 @@ class WorkflowResponse(BaseModel):
     message: str
     products_imported: int = 0
     products_with_seo: int = 0
-    duration_seconds: Optional[float] = None
+    duration_seconds: float | None = None
 
 
 # Dependency injection for services
@@ -99,7 +98,7 @@ def get_seo_service() -> SEOOptimizerService:
 async def import_products(
     request: ImportProductsRequest,
     background_tasks: BackgroundTasks,
-    importer: WooCommerceImporterService = Depends(get_importer_service)
+    importer: WooCommerceImporterService = Depends(get_importer_service),
 ):
     """
     Import products from Google Sheets to WooCommerce
@@ -114,16 +113,11 @@ async def import_products(
     Returns immediately with job ID for async processing.
     """
     try:
-        logger.info(
-            "Product import requested",
-            extra={"spreadsheet_id": request.spreadsheet_id}
-        )
+        logger.info("Product import requested", extra={"spreadsheet_id": request.spreadsheet_id})
 
         # Execute workflow in background
         result = await importer.import_products_workflow(
-            spreadsheet_id=request.spreadsheet_id,
-            sheet_name=request.sheet_name,
-            notify=request.notify_telegram
+            spreadsheet_id=request.spreadsheet_id, sheet_name=request.sheet_name, notify=request.notify_telegram
         )
 
         return ImportProductsResponse(
@@ -132,22 +126,16 @@ async def import_products(
             total=result["total"],
             succeeded=result["succeeded"],
             failed=result["failed"],
-            duration_seconds=result.get("duration_seconds")
+            duration_seconds=result.get("duration_seconds"),
         )
 
     except Exception as e:
         logger.exception("Product import failed")
-        raise HTTPException(
-            status_code=500,
-            detail=f"Import failed: {e!s}"
-        )
+        raise HTTPException(status_code=500, detail=f"Import failed: {e!s}")
 
 
 @router.post("/generate-seo", response_model=GenerateSEOResponse)
-async def generate_seo_tags(
-    request: GenerateSEORequest,
-    seo_service: SEOOptimizerService = Depends(get_seo_service)
-):
+async def generate_seo_tags(request: GenerateSEORequest, seo_service: SEOOptimizerService = Depends(get_seo_service)):
     """
     Generate AI-powered SEO meta tags for a product
 
@@ -160,36 +148,25 @@ async def generate_seo_tags(
     Uses Claude Sonnet 4 (primary) with GPT-4 fallback.
     """
     try:
-        logger.info(
-            "SEO generation requested",
-            extra={"product": request.title}
-        )
+        logger.info("SEO generation requested", extra={"product": request.title})
 
         product_info = ProductInfo(
             title=request.title,
             category=request.category,
             short_description=request.short_description,
             description=request.description,
-            keywords=request.keywords
+            keywords=request.keywords,
         )
 
-        seo_tags = await seo_service.generate_seo_tags(
-            product=product_info,
-            fallback=True
-        )
+        seo_tags = await seo_service.generate_seo_tags(product=product_info, fallback=True)
 
         return GenerateSEOResponse(
-            success=True,
-            metatitle=seo_tags.metatitle,
-            metadescription=seo_tags.metadescription
+            success=True, metatitle=seo_tags.metatitle, metadescription=seo_tags.metadescription
         )
 
     except Exception as e:
         logger.exception("SEO generation failed")
-        return GenerateSEOResponse(
-            success=False,
-            error=str(e)
-        )
+        return GenerateSEOResponse(success=False, error=str(e))
 
 
 @router.post("/workflow/complete", response_model=WorkflowResponse)
@@ -197,7 +174,7 @@ async def execute_complete_workflow(
     request: WorkflowRequest,
     background_tasks: BackgroundTasks,
     importer: WooCommerceImporterService = Depends(get_importer_service),
-    seo_service: SEOOptimizerService = Depends(get_seo_service)
+    seo_service: SEOOptimizerService = Depends(get_seo_service),
 ):
     """
     Execute complete e-commerce automation workflow
@@ -217,17 +194,12 @@ async def execute_complete_workflow(
     try:
         logger.info(
             "Complete workflow requested",
-            extra={
-                "spreadsheet_id": request.spreadsheet_id,
-                "generate_seo": request.generate_seo
-            }
+            extra={"spreadsheet_id": request.spreadsheet_id, "generate_seo": request.generate_seo},
         )
 
         # Step 1 & 2: Import products
         import_result = await importer.import_products_workflow(
-            spreadsheet_id=request.spreadsheet_id,
-            sheet_name=request.sheet_name,
-            notify=False  # Don't notify yet
+            spreadsheet_id=request.spreadsheet_id, sheet_name=request.sheet_name, notify=False  # Don't notify yet
         )
 
         if not import_result["success"]:
@@ -261,28 +233,19 @@ async def execute_complete_workflow(
             message="Workflow completed successfully",
             products_imported=products_imported,
             products_with_seo=products_with_seo,
-            duration_seconds=duration
+            duration_seconds=duration,
         )
 
     except Exception as e:
         logger.exception("Workflow execution failed")
 
         if request.notify_telegram:
-            await importer.send_telegram_notification(
-                f"❌ Workflow Failed\n\nError: {e!s}"
-            )
+            await importer.send_telegram_notification(f"❌ Workflow Failed\n\nError: {e!s}")
 
-        raise HTTPException(
-            status_code=500,
-            detail=f"Workflow failed: {e!s}"
-        )
+        raise HTTPException(status_code=500, detail=f"Workflow failed: {e!s}")
 
 
 @router.get("/health")
 async def health_check():
     """Health check endpoint"""
-    return {
-        "status": "healthy",
-        "service": "E-Commerce Automation",
-        "timestamp": datetime.utcnow().isoformat()
-    }
+    return {"status": "healthy", "service": "E-Commerce Automation", "timestamp": datetime.utcnow().isoformat()}

@@ -1,0 +1,228 @@
+{
+  "title": "Signature Collection - SkyyRose",
+  "type": "page",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_header_footer",
+    "post_title": "Signature Collection",
+    "post_status": "publish"
+  },
+  "content": [
+    {
+      "id": "collection-hero",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "height": "min-height",
+        "custom_height": {"size": 60, "unit": "vh"},
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "0", "bottom": "0", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "content_position": "center",
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "collection-badge",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "COLLECTION",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 6, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "collection-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "SIGNATURE",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 64, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 4, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "collection-description",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #F5F5F0; font-family: 'Montserrat', sans-serif; font-size: 18px; line-height: 1.8; max-width: 600px; margin: 0 auto;\">The Standard, The Crest, The Piedmont, The Marina - Bay Area landmarks woven into everyday luxury.</p>",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "collection-intro",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#F5F5F0",
+        "padding": {"top": "60", "bottom": "40", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "intro-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "anchor-names",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "The Standard | The Crest | The Piedmont | The Marina",
+                "header_size": "h3",
+                "title_color": "#4A4A4A",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 4, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "color-variants",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Available in Rosewood, Heather & Slate",
+                "header_size": "h4",
+                "title_color": "#4A4A4A",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "400",
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "products-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#FFFFFF",
+        "padding": {"top": "40", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "products-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "woocommerce-products",
+              "elType": "widget",
+              "widgetType": "woocommerce-products",
+              "settings": {
+                "rows": 3,
+                "columns": 3,
+                "posts_per_page": 9,
+                "query_filter": "by_category",
+                "category_filter": "signature",
+                "show_result_count": "yes",
+                "show_catalog_ordering": "yes",
+                "image_hover_animation": "grow",
+                "products_class": "sr-product-card"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "landmarks-section",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "landmarks-column",
+          "elType": "column",
+          "settings": {
+            "_column_size": 60,
+            "content_position": "center"
+          },
+          "elements": [
+            {
+              "id": "landmarks-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "BAY AREA LANDMARKS",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 28, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "landmarks-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #F5F5F0; font-family: 'Montserrat', sans-serif; font-size: 16px; line-height: 1.8;\">Our Signature collection celebrates the neighborhoods that define Oakland's character. Piedmont's elegance, Marina's waterfront charm, and the understated sophistication of Rockridge and Montclair.</p><p style=\"text-align: center; color: #F5F5F0; font-family: 'Montserrat', sans-serif; font-size: 16px; line-height: 1.8; margin-top: 16px;\">Each piece is designed for versatility - from boardroom to boulevard, embodying the elevated streetwear aesthetic that SkyyRose represents.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "collection": "signature",
+    "collection_description": "Foundation wardrobe essentials",
+    "anchor_products": ["The Standard", "The Crest", "The Piedmont", "The Marina"],
+    "color_variants": ["Rosewood", "Heather", "Slate"],
+    "products": [
+      {"name": "The Standard Tee", "sku_prefix": "STD", "price": 45.00},
+      {"name": "The Crest Beanie", "sku_prefix": "CRSTBN", "price": 35.00},
+      {"name": "The Piedmont Jacket", "sku_prefix": "PIED", "price": 130.00},
+      {"name": "The Marina Crewneck", "sku_prefix": "MRN-CRW", "price": 65.00},
+      {"name": "The Marina Dress", "sku_prefix": "MRN-DRS", "price": 80.00},
+      {"name": "The Marina Jogger", "sku_prefix": "MRN-JGR", "price": 45.00}
+    ],
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79"
+    },
+    "css_classes_used": ["sr-product-card", "sr-collection-header", "sr-body"]
+  }
+}

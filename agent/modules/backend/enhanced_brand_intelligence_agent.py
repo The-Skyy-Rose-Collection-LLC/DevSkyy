@@ -45,9 +45,7 @@ class EnhancedBrandIntelligenceAgent:
         self.insights_discovered = 0
         self.last_learning_cycle = None
 
-        logger.info(
-            "🧠 Enhanced Brand Intelligence Agent initialized - GOD MODE Level 2"
-        )
+        logger.info("🧠 Enhanced Brand Intelligence Agent initialized - GOD MODE Level 2")
 
     async def initialize_server_learning(self) -> dict[str, Any]:
         """Initialize server access for deep brand learning."""
@@ -109,29 +107,19 @@ class EnhancedBrandIntelligenceAgent:
                 brand_intel = self.server_access.brand_intelligence
 
                 # Analyze brand DNA
-                analysis_results["brand_dna"] = await self._analyze_brand_dna(
-                    brand_intel
-                )
+                analysis_results["brand_dna"] = await self._analyze_brand_dna(brand_intel)
 
                 # Analyze visual identity
-                analysis_results["visual_identity"] = (
-                    await self._analyze_visual_identity(brand_intel)
-                )
+                analysis_results["visual_identity"] = await self._analyze_visual_identity(brand_intel)
 
                 # Analyze content strategy
-                analysis_results["content_strategy"] = (
-                    await self._analyze_content_strategy(brand_intel)
-                )
+                analysis_results["content_strategy"] = await self._analyze_content_strategy(brand_intel)
 
                 # Analyze technical excellence
-                analysis_results["technical_excellence"] = (
-                    await self._analyze_technical_excellence(brand_intel)
-                )
+                analysis_results["technical_excellence"] = await self._analyze_technical_excellence(brand_intel)
 
                 # Generate insights
-                analysis_results["insights"] = await self._generate_brand_insights(
-                    analysis_results
-                )
+                analysis_results["insights"] = await self._generate_brand_insights(analysis_results)
 
             return analysis_results
 
@@ -176,9 +164,7 @@ class EnhancedBrandIntelligenceAgent:
                         "trendy",
                     ]
 
-                brand_dna["unique_positioning"] = (
-                    "Premium streetwear with luxury sensibilities"
-                )
+                brand_dna["unique_positioning"] = "Premium streetwear with luxury sensibilities"
                 brand_dna["core_values"] = [
                     "Quality",
                     "Innovation",
@@ -192,9 +178,7 @@ class EnhancedBrandIntelligenceAgent:
             logger.error(f"Brand DNA analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_visual_identity(
-        self, brand_intel: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _analyze_visual_identity(self, brand_intel: dict[str, Any]) -> dict[str, Any]:
         """Analyze visual brand identity from server assets."""
         try:
             visual_identity = {
@@ -223,10 +207,7 @@ class EnhancedBrandIntelligenceAgent:
                 # Determine design style based on file analysis
                 if any("signature" in logo.lower() for logo in logos_found):
                     visual_identity["design_style"] = "luxury_signature"
-                if any(
-                    "love" in logo.lower() or "hurts" in logo.lower()
-                    for logo in logos_found
-                ):
+                if any("love" in logo.lower() or "hurts" in logo.lower() for logo in logos_found):
                     visual_identity["collections"] = [
                         "Love Hurts Collection",
                         "Signature Series",
@@ -238,9 +219,7 @@ class EnhancedBrandIntelligenceAgent:
             logger.error(f"Visual identity analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_content_strategy(
-        self, brand_intel: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _analyze_content_strategy(self, brand_intel: dict[str, Any]) -> dict[str, Any]:
         """Analyze content strategy from server content."""
         try:
             content_strategy = {
@@ -283,9 +262,7 @@ class EnhancedBrandIntelligenceAgent:
             logger.error(f"Content strategy analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _analyze_technical_excellence(
-        self, brand_intel: dict[str, Any]
-    ) -> dict[str, Any]:
+    async def _analyze_technical_excellence(self, brand_intel: dict[str, Any]) -> dict[str, Any]:
         """Analyze technical brand excellence from server performance."""
         try:
             technical_excellence = {
@@ -312,15 +289,11 @@ class EnhancedBrandIntelligenceAgent:
                     technical_excellence["site_performance"] = "needs_improvement"
 
                 # Check for optimization opportunities
-                optimization_ops = performance_metrics.get(
-                    "optimization_opportunities", []
-                )
+                optimization_ops = performance_metrics.get("optimization_opportunities", [])
                 if len(optimization_ops) == 0:
                     technical_excellence["optimization_status"] = "fully_optimized"
                 else:
-                    technical_excellence["optimization_opportunities"] = (
-                        optimization_ops
-                    )
+                    technical_excellence["optimization_opportunities"] = optimization_ops
 
             return technical_excellence
 
@@ -328,9 +301,7 @@ class EnhancedBrandIntelligenceAgent:
             logger.error(f"Technical excellence analysis failed: {e!s}")
             return {"error": str(e)}
 
-    async def _generate_brand_insights(
-        self, analysis_results: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _generate_brand_insights(self, analysis_results: dict[str, Any]) -> list[dict[str, Any]]:
         """Generate actionable brand insights from analysis."""
         try:
             insights = []
@@ -414,11 +385,7 @@ class EnhancedBrandIntelligenceAgent:
                 "monitoring_active": True,
                 "intelligence_level": "GOD_MODE_LEVEL_2",
                 "learning_confidence": self.learning_confidence,
-                "last_update": (
-                    self.last_learning_cycle.isoformat()
-                    if self.last_learning_cycle
-                    else None
-                ),
+                "last_update": (self.last_learning_cycle.isoformat() if self.last_learning_cycle else None),
                 "brand_evolution": learning_results.get("brand_evolution", {}),
                 "next_learning_cycle": "in_1_hour",
             }

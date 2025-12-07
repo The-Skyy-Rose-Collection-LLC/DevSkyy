@@ -1,0 +1,22 @@
+! from .cqrs import Command, CommandHandler, Query, QueryHandler, command_bus, query_bus
+! from .event_sourcing import AggregateRoot, DomainEvent, EventStore, event_store
+  
+  
+! """
+! Architecture module for Grade A+ implementation
+! Contains CQRS and Event Sourcing patterns
+! """
+  
+  
+! __all__ = [
+!     "AggregateRoot",
+!     "Command",
+!     "CommandHandler",
+!     "DomainEvent",
+!     "EventStore",
+!     "Query",
+!     "QueryHandler",
+!     "command_bus",
+!     "event_store",
+!     "query_bus",
+! ]

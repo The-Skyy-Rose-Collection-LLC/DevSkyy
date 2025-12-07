@@ -25,11 +25,13 @@ import json
 import logging
 import os
 import random
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import AsyncAnthropic
 import httpx
 from openai import AsyncOpenAI
+
+from config.unified_config import get_config
 
 
 logger = logging.getLogger(__name__)
@@ -43,8 +45,12 @@ class MetaSocialAutomationAgent:
 
     def __init__(self):
         # AI Services
+        config = get_config()
+        is_consequential = config.ai.openai_is_consequential
+        default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
+
         self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), default_headers=default_headers)
 
         # Meta API Configuration
         self.meta_app_id = os.getenv("META_APP_ID")
@@ -109,10 +115,10 @@ class MetaSocialAutomationAgent:
     async def publish_content(
         self,
         content_text: str,
-        media_urls: Optional[list[str]] = None,
+        media_urls: list[str] | None = None,
         platforms: list[str] | None = None,
-        schedule_time: Optional[datetime] = None,
-        shopping_tags: Optional[list[dict]] = None,
+        schedule_time: datetime | None = None,
+        shopping_tags: list[dict] | None = None,
     ) -> dict[str, Any]:
         """
         Publish content across Meta platforms with advanced features.
@@ -135,9 +141,7 @@ class MetaSocialAutomationAgent:
             results = {}
 
             # Optimize content for each platform
-            optimized_content = await self._optimize_content_for_platform(
-                content_text, platforms
-            )
+            optimized_content = await self._optimize_content_for_platform(content_text, platforms)
 
             # Generate hashtags
             hashtags = await self._generate_hashtags(content_text)
@@ -177,9 +181,7 @@ class MetaSocialAutomationAgent:
             logger.error(f"❌ Content publishing failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _optimize_content_for_platform(
-        self, content: str, platforms: list[str]
-    ) -> dict[str, str]:
+    async def _optimize_content_for_platform(self, content: str, platforms: list[str]) -> dict[str, str]:
         """
         Optimize content for each platform's best practices.
         """
@@ -280,10 +282,10 @@ Return as JSON array of hashtags."""
     async def _publish_to_instagram(
         self,
         content: str,
-        media_urls: Optional[list[str]],
+        media_urls: list[str] | None,
         hashtags: list[str],
-        schedule_time: Optional[datetime],
-        shopping_tags: Optional[list[dict]],
+        schedule_time: datetime | None,
+        shopping_tags: list[dict] | None,
     ) -> dict[str, Any]:
         """
         Publish content to Instagram Business account.
@@ -299,14 +301,10 @@ Return as JSON array of hashtags."""
             if media_urls and len(media_urls) > 0:
                 if len(media_urls) == 1:
                     # Single image/video post
-                    container_id = await self._create_ig_media_container(
-                        media_urls[0], full_content, shopping_tags
-                    )
+                    container_id = await self._create_ig_media_container(media_urls[0], full_content, shopping_tags)
                 else:
                     # Carousel post
-                    container_id = await self._create_ig_carousel_container(
-                        media_urls, full_content, shopping_tags
-                    )
+                    container_id = await self._create_ig_carousel_container(media_urls, full_content, shopping_tags)
             else:
                 # Text-only post (not supported on IG, need at least one image)
                 return {"error": "Instagram requires at least one image"}
@@ -324,7 +322,7 @@ Return as JSON array of hashtags."""
             return {"error": str(e)}
 
     async def _create_ig_media_container(
-        self, media_url: str, caption: str, shopping_tags: Optional[list[dict]]
+        self, media_url: str, caption: str, shopping_tags: list[dict] | None
     ) -> str:
         """
         Create Instagram media container for single post.
@@ -356,7 +354,7 @@ Return as JSON array of hashtags."""
             raise
 
     async def _create_ig_carousel_container(
-        self, media_urls: list[str], caption: str, shopping_tags: Optional[list[dict]]
+        self, media_urls: list[str], caption: str, shopping_tags: list[dict] | None
     ) -> str:
         """
         Create Instagram carousel container for multiple images.
@@ -431,9 +429,7 @@ Return as JSON array of hashtags."""
             logger.error(f"Instagram publishing failed: {e}")
             return {"error": str(e)}
 
-    async def _schedule_ig_post(
-        self, container_id: str, schedule_time: datetime
-    ) -> dict[str, Any]:
+    async def _schedule_ig_post(self, container_id: str, schedule_time: datetime) -> dict[str, Any]:
         """
         Schedule Instagram post for future publishing.
         """
@@ -449,8 +445,8 @@ Return as JSON array of hashtags."""
     async def _publish_to_facebook(
         self,
         content: str,
-        media_urls: Optional[list[str]],
-        schedule_time: Optional[datetime],
+        media_urls: list[str] | None,
+        schedule_time: datetime | None,
     ) -> dict[str, Any]:
         """
         Publish content to Facebook Page.
@@ -474,9 +470,7 @@ Return as JSON array of hashtags."""
                 else:
                     # Multiple photos (need to upload first)
                     photo_ids = await self._upload_fb_photos(media_urls)
-                    params["attached_media"] = json.dumps(
-                        [{"media_fbid": pid} for pid in photo_ids]
-                    )
+                    params["attached_media"] = json.dumps([{"media_fbid": pid} for pid in photo_ids])
 
             # Schedule if requested
             if schedule_time:
@@ -530,8 +524,8 @@ Return as JSON array of hashtags."""
     async def find_potential_customers(
         self,
         target_interests: list[str],
-        demographics: Optional[dict[str, Any]] = None,
-        behavior: Optional[list[str]] = None,
+        demographics: dict[str, Any] | None = None,
+        behavior: list[str] | None = None,
     ) -> dict[str, Any]:
         """
         Find potential customers using Meta's targeting capabilities.
@@ -600,10 +594,7 @@ Return as JSON array of hashtags."""
             "designer": {"id": "6003020882136", "name": "Designer clothing"},
         }
 
-        return [
-            interest_map.get(interest.lower(), {"name": interest})
-            for interest in interests
-        ]
+        return [interest_map.get(interest.lower(), {"name": interest}) for interest in interests]
 
     async def _get_behavior_ids(self, behaviors: list[str]) -> list[dict]:
         """
@@ -618,10 +609,7 @@ Return as JSON array of hashtags."""
             "high_income": {"id": "6003966984621", "name": "High income"},
         }
 
-        return [
-            behavior_map.get(behavior.lower(), {"name": behavior})
-            for behavior in behaviors
-        ]
+        return [behavior_map.get(behavior.lower(), {"name": behavior}) for behavior in behaviors]
 
     async def _get_audience_insights(self, targeting_spec: dict) -> dict[str, Any]:
         """
@@ -635,9 +623,7 @@ Return as JSON array of hashtags."""
             "peak_times": ["10:00", "14:00", "20:00"],
         }
 
-    async def _generate_customer_personas(
-        self, insights: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _generate_customer_personas(self, insights: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Generate detailed customer personas using AI.
         """
@@ -705,7 +691,7 @@ Return as JSON array."""
         ]
 
     async def generate_viral_content(
-        self, product_info: dict[str, Any], trend_data: Optional[dict] = None
+        self, product_info: dict[str, Any], trend_data: dict | None = None
     ) -> dict[str, Any]:
         """
         Generate viral content optimized for Meta platforms.
@@ -769,9 +755,7 @@ Return detailed content plan."""
             logger.error(f"❌ Viral content generation failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _generate_visual_concepts(
-        self, product_info: dict[str, Any]
-    ) -> list[dict[str, Any]]:
+    async def _generate_visual_concepts(self, product_info: dict[str, Any]) -> list[dict[str, Any]]:
         """
         Generate visual concepts for content.
         """
@@ -808,9 +792,7 @@ Return detailed content plan."""
         # Would implement actual tracking using Insights API
         logger.info(f"📊 Tracking performance for {len(posts)} posts")
 
-    async def automate_engagement(
-        self, response_templates: Optional[dict[str, str]] = None
-    ) -> dict[str, Any]:
+    async def automate_engagement(self, response_templates: dict[str, str] | None = None) -> dict[str, Any]:
         """
         Automate engagement responses and interactions.
 
@@ -915,9 +897,7 @@ meta_agent = create_meta_automation_agent()
 
 
 # Convenience functions
-async def publish_to_meta(
-    content: str, platforms: list[str] | None = None
-) -> dict[str, Any]:
+async def publish_to_meta(content: str, platforms: list[str] | None = None) -> dict[str, Any]:
     """Publish content to Meta platforms."""
     if platforms is None:
         platforms = ["instagram", "facebook"]

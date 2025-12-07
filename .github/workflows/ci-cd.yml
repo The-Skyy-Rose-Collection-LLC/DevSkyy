@@ -33,6 +33,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check for unresolved merge conflicts
+        run: |
+          echo "Scanning for merge conflict markers..."
+          if git --no-pager grep -n '^[<=>]\{7\}' -- .; then
+            echo "::error::Unresolved merge conflict markers detected. Please resolve before merging."
+            exit 1
+          fi
+
       - name: Set up Python ${{ env.PYTHON_VERSION }}
         uses: actions/setup-python@v5
         with:

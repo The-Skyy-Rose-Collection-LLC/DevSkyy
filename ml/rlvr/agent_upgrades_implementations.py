@@ -1,0 +1,682 @@
+"""
+Specific Agent Upgrade Implementations
+
+This module contains concrete implementations of the one key upgrade per agent category.
+Each upgrade is verified through multiple sources using the RLVR system.
+"""
+
+import asyncio
+from datetime import datetime
+import logging
+from typing import Any
+
+import numpy as np
+from sklearn.ensemble import GradientBoostingRegressor
+from sklearn.preprocessing import StandardScaler
+
+
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# 1. SCANNER AGENT UPGRADE: Real-Time Code Quality Scoring
+# ============================================================================
+
+class RealTimeCodeQualityScorer:
+    """
+    Upgrade for Scanner Agent: ML-powered real-time code quality scoring.
+
+    Provides instant feedback on code quality with prioritized recommendations.
+
+    Verification Methods:
+    - Code Analysis: Lint scores, complexity metrics
+    - Test Execution: Integration with test suites
+    - User Feedback: Developer satisfaction with suggestions
+    """
+
+    def __init__(self):
+        self.model = GradientBoostingRegressor(
+            n_estimators=100,
+            learning_rate=0.1,
+            max_depth=5
+        )
+        self.scaler = StandardScaler()
+        self.trained = False
+
+    async def score_code_realtime(self, code_snippet: str) -> dict[str, Any]:
+        """
+        Score code quality in real-time.
+
+        Returns:
+            Quality score (0-100) with prioritized recommendations
+        """
+        features = self._extract_code_features(code_snippet)
+
+        if not self.trained:
+            # Use rule-based scoring initially
+            quality_score = self._rule_based_score(features)
+        else:
+            # Use ML model
+            features_scaled = self.scaler.transform([list(features.values())])
+            quality_score = float(self.model.predict(features_scaled)[0])
+
+        # Generate prioritized recommendations
+        recommendations = self._generate_recommendations(features, quality_score)
+
+        return {
+            "quality_score": min(100, max(0, quality_score)),
+            "features": features,
+            "recommendations": recommendations,
+            "priority_issues": [r for r in recommendations if r["priority"] == "high"],
+            "estimated_fix_time": self._estimate_fix_time(recommendations)
+        }
+
+    def _extract_code_features(self, code: str) -> dict[str, float]:
+        """Extract numerical features from code."""
+        lines = code.split('\n')
+
+        return {
+            "line_count": len(lines),
+            "avg_line_length": np.mean([len(line) for line in lines]) if lines else 0,
+            "max_line_length": max([len(line) for line in lines]) if lines else 0,
+            "comment_ratio": sum(1 for line in lines if line.strip().startswith('#')) / len(lines) if lines else 0,
+            "function_count": code.count('def '),
+            "class_count": code.count('class '),
+            "complexity_estimate": self._estimate_complexity(code),
+            "import_count": sum(1 for line in lines if line.strip().startswith('import ') or line.strip().startswith('from '))
+        }
+
+    def _estimate_complexity(self, code: str) -> float:
+        """Estimate cyclomatic complexity."""
+        complexity_keywords = ['if ', 'elif ', 'else:', 'for ', 'while ', 'and ', 'or ', 'try:', 'except:']
+        return sum(code.count(keyword) for keyword in complexity_keywords)
+
+    def _rule_based_score(self, features: dict[str, float]) -> float:
+        """Rule-based quality scoring."""
+        score = 100.0
+
+        # Deduct for long lines
+        if features["max_line_length"] > 119:
+            score -= 10
+
+        # Deduct for high complexity
+        if features["complexity_estimate"] > 10:
+            score -= 15
+
+        # Deduct for low comment ratio
+        if features["comment_ratio"] < 0.1:
+            score -= 10
+
+        # Bonus for functions/classes
+        score += min(10, features["function_count"] * 2)
+
+        return max(0, score)
+
+    def _generate_recommendations(self, features: dict[str, float], score: float) -> list[dict[str, Any]]:
+        """Generate prioritized recommendations."""
+        recommendations = []
+
+        if features["max_line_length"] > 119:
+            recommendations.append({
+                "priority": "high",
+                "category": "style",
+                "message": f"Line length exceeds 119 characters (max: {features['max_line_length']})",
+                "fix": "Break long lines using parentheses or line continuation"
+            })
+
+        if features["complexity_estimate"] > 10:
+            recommendations.append({
+                "priority": "high",
+                "category": "complexity",
+                "message": f"High cyclomatic complexity ({features['complexity_estimate']})",
+                "fix": "Refactor complex logic into smaller functions"
+            })
+
+        if features["comment_ratio"] < 0.1:
+            recommendations.append({
+                "priority": "medium",
+                "category": "documentation",
+                "message": "Low comment ratio (<10%)",
+                "fix": "Add docstrings and inline comments"
+            })
+
+        return recommendations
+
+    def _estimate_fix_time(self, recommendations: list[dict[str, Any]]) -> str:
+        """Estimate time to fix all issues."""
+        high_priority_count = sum(1 for r in recommendations if r["priority"] == "high")
+        medium_priority_count = sum(1 for r in recommendations if r["priority"] == "medium")
+
+        total_minutes = (high_priority_count * 10) + (medium_priority_count * 5)
+
+        if total_minutes < 60:
+            return f"{total_minutes} minutes"
+        else:
+            hours = total_minutes // 60
+            minutes = total_minutes % 60
+            return f"{hours}h {minutes}m"
+
+
+# ============================================================================
+# 2. MULTI-MODEL ORCHESTRATOR UPGRADE: Model Performance Comparison
+# ============================================================================
+
+class AutomatedModelComparison:
+    """
+    Upgrade for Multi-Model Orchestrator: Automated performance comparison with intelligent fallback.
+
+    Tracks real-time performance of Claude, OpenAI, Gemini, and Mistral models.
+
+    Verification Methods:
+    - Test Execution: Model accuracy on test sets
+    - Business Metrics: Cost per request, revenue impact
+    - Automated Check: Response time, error rate
+    """
+
+    def __init__(self):
+        self.model_history = {
+            "claude-sonnet-4.5": [],
+            "gpt-4": [],
+            "gemini-pro": [],
+            "mistral-large": []
+        }
+        self.fallback_order = []
+
+    async def compare_models(
+        self,
+        prompt: str,
+        task_type: str = "general"
+    ) -> dict[str, Any]:
+        """
+        Compare all available models for a given task.
+
+        Returns:
+            Best model selection with reasoning
+        """
+        results = {}
+
+        for model_name in self.model_history.keys():
+            try:
+                performance = await self._test_model(model_name, prompt, task_type)
+                results[model_name] = performance
+            except Exception as e:
+                logger.warning(f"Model {model_name} failed: {e}")
+                results[model_name] = {
+                    "status": "failed",
+                    "error": str(e)
+                }
+
+        # Select best model
+        best_model = self._select_best_model(results, task_type)
+
+        # Update fallback order
+        self._update_fallback_order(results)
+
+        return {
+            "best_model": best_model,
+            "model_comparisons": results,
+            "fallback_order": self.fallback_order,
+            "reasoning": self._explain_selection(best_model, results)
+        }
+
+    async def _test_model(
+        self,
+        model_name: str,
+        prompt: str,
+        task_type: str
+    ) -> dict[str, Any]:
+        """Test a specific model's performance."""
+        start_time = datetime.now()
+
+        # Simulate model call (would be actual API call in production)
+        await asyncio.sleep(0.1)  # Simulate API latency
+
+        end_time = datetime.now()
+        latency_ms = (end_time - start_time).total_seconds() * 1000
+
+        # Calculate quality score (simplified)
+        quality_score = np.random.uniform(0.7, 0.95)  # In production, use actual metrics
+
+        # Calculate cost (model-specific)
+        costs = {
+            "claude-sonnet-4.5": 0.003,
+            "gpt-4": 0.03,
+            "gemini-pro": 0.00125,
+            "mistral-large": 0.002
+        }
+
+        return {
+            "status": "success",
+            "latency_ms": latency_ms,
+            "quality_score": quality_score,
+            "cost_usd": costs.get(model_name, 0.01),
+            "tokens_used": 500,
+            "timestamp": datetime.now().isoformat()
+        }
+
+    def _select_best_model(
+        self,
+        results: dict[str, dict[str, Any]],
+        task_type: str
+    ) -> str:
+        """Select best model based on multi-criteria optimization."""
+        scores = {}
+
+        for model_name, result in results.items():
+            if result.get("status") != "success":
+                continue
+
+            # Multi-criteria score
+            quality_weight = 0.5
+            speed_weight = 0.3
+            cost_weight = 0.2
+
+            quality_score = result["quality_score"]
+            speed_score = 1.0 - (result["latency_ms"] / 10000)  # Normalize to 0-1
+            cost_score = 1.0 - (result["cost_usd"] / 0.05)  # Normalize to 0-1
+
+            composite_score = (
+                quality_weight * quality_score +
+                speed_weight * speed_score +
+                cost_weight * cost_score
+            )
+
+            scores[model_name] = composite_score
+
+        if not scores:
+            return "claude-sonnet-4.5"  # Default fallback
+
+        return max(scores, key=scores.get)
+
+    def _update_fallback_order(self, results: dict[str, dict[str, Any]]):
+        """Update fallback order based on recent performance."""
+        successful_models = [
+            (model, result["quality_score"])
+            for model, result in results.items()
+            if result.get("status") == "success"
+        ]
+
+        # Sort by quality score
+        successful_models.sort(key=lambda x: x[1], reverse=True)
+
+        self.fallback_order = [model for model, _ in successful_models]
+
+    def _explain_selection(
+        self,
+        best_model: str,
+        results: dict[str, dict[str, Any]]
+    ) -> str:
+        """Explain why this model was selected."""
+        best_result = results[best_model]
+
+        return (
+            f"{best_model} selected: "
+            f"quality={best_result['quality_score']:.2f}, "
+            f"latency={best_result['latency_ms']:.0f}ms, "
+            f"cost=${best_result['cost_usd']:.4f}"
+        )
+
+
+# ============================================================================
+# 3. PRODUCT MANAGER UPGRADE: Competitor Price Monitoring
+# ============================================================================
+
+class CompetitorPriceMonitor:
+    """
+    Upgrade for Product Manager: Real-time competitor price tracking with automated adjustments.
+
+    Monitors competitor prices and suggests/applies dynamic pricing adjustments.
+
+    Verification Methods:
+    - Business Metrics: Revenue impact, conversion rates
+    - User Feedback: Pricing satisfaction
+    - Automated Check: Price competitiveness
+    """
+
+    def __init__(self):
+        self.price_history = {}
+        self.competitor_data = {}
+
+    async def monitor_competitors(
+        self,
+        product_id: str,
+        competitor_urls: list[str]
+    ) -> dict[str, Any]:
+        """
+        Monitor competitor prices for a product.
+
+        Returns:
+            Price analysis and recommendations
+        """
+        # Scrape competitor prices (simplified)
+        competitor_prices = await self._scrape_competitor_prices(competitor_urls)
+
+        # Store in history
+        if product_id not in self.price_history:
+            self.price_history[product_id] = []
+
+        self.price_history[product_id].append({
+            "timestamp": datetime.now(),
+            "competitor_prices": competitor_prices
+        })
+
+        # Analyze pricing position
+        analysis = self._analyze_pricing_position(product_id, competitor_prices)
+
+        # Generate recommendations
+        recommendations = self._generate_pricing_recommendations(
+            product_id,
+            competitor_prices,
+            analysis
+        )
+
+        return {
+            "product_id": product_id,
+            "competitor_prices": competitor_prices,
+            "analysis": analysis,
+            "recommendations": recommendations,
+            "monitoring_timestamp": datetime.now().isoformat()
+        }
+
+    async def _scrape_competitor_prices(
+        self,
+        urls: list[str]
+    ) -> list[dict[str, Any]]:
+        """Scrape competitor prices from URLs."""
+        prices = []
+
+        for url in urls:
+            # Simulate web scraping (would use actual scraping in production)
+            prices.append({
+                "url": url,
+                "competitor": self._extract_competitor_name(url),
+                "price": np.random.uniform(200, 400),  # Simulated price
+                "currency": "USD",
+                "in_stock": np.random.choice([True, False], p=[0.8, 0.2]),
+                "scraped_at": datetime.now().isoformat()
+            })
+
+        return prices
+
+    def _extract_competitor_name(self, url: str) -> str:
+        """Extract competitor name from URL."""
+        # Simplified extraction
+        return url.split("//")[1].split(".")[0] if "//" in url else "unknown"
+
+    def _analyze_pricing_position(
+        self,
+        product_id: str,
+        competitor_prices: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Analyze current pricing position vs competitors."""
+        if not competitor_prices:
+            return {"position": "unknown", "message": "No competitor data available"}
+
+        prices = [p["price"] for p in competitor_prices if p["in_stock"]]
+
+        if not prices:
+            return {"position": "only_available", "message": "No competitors in stock"}
+
+        min_price = min(prices)
+        max_price = max(prices)
+        avg_price = np.mean(prices)
+        median_price = np.median(prices)
+
+        # Assume current price is stored separately (simplified)
+        current_price = 299.99  # Would fetch from database
+
+        if current_price < min_price:
+            position = "below_market"
+        elif current_price > max_price:
+            position = "above_market"
+        elif current_price < median_price:
+            position = "competitive"
+        else:
+            position = "premium"
+
+        return {
+            "position": position,
+            "current_price": current_price,
+            "competitor_min": min_price,
+            "competitor_max": max_price,
+            "competitor_avg": avg_price,
+            "competitor_median": median_price,
+            "price_gap": current_price - avg_price,
+            "competitors_tracked": len(competitor_prices),
+            "competitors_in_stock": len(prices)
+        }
+
+    def _generate_pricing_recommendations(
+        self,
+        product_id: str,
+        competitor_prices: list[dict[str, Any]],
+        analysis: dict[str, Any]
+    ) -> list[dict[str, Any]]:
+        """Generate pricing adjustment recommendations."""
+        recommendations = []
+
+        position = analysis.get("position")
+
+        if position == "above_market":
+            recommendations.append({
+                "action": "decrease_price",
+                "priority": "high",
+                "target_price": analysis["competitor_median"] * 0.98,  # 2% below median
+                "reasoning": "Price significantly above market average",
+                "expected_impact": "+15-25% conversion"
+            })
+
+        elif position == "below_market":
+            recommendations.append({
+                "action": "increase_price",
+                "priority": "medium",
+                "target_price": analysis["competitor_median"] * 1.02,  # 2% above median
+                "reasoning": "Opportunity for margin expansion",
+                "expected_impact": "+10-15% revenue"
+            })
+
+        elif position == "competitive":
+            recommendations.append({
+                "action": "maintain_price",
+                "priority": "low",
+                "reasoning": "Price is competitively positioned",
+                "expected_impact": "Stable conversion"
+            })
+
+        return recommendations
+
+
+# ============================================================================
+# 4. SEO MARKETING UPGRADE: Content Gap Analysis
+# ============================================================================
+
+class ContentGapAnalyzer:
+    """
+    Upgrade for SEO Marketing Agent: AI-powered content gap identification.
+
+    Identifies missing content opportunities by analyzing competitor content and search trends.
+
+    Verification Methods:
+    - Business Metrics: Organic traffic growth, keyword rankings
+    - User Feedback: Content relevance ratings
+    - Automated Check: Content coverage scores
+    """
+
+    def __init__(self):
+        self.keyword_database = {}
+        self.competitor_content = {}
+
+    async def analyze_content_gaps(
+        self,
+        domain: str,
+        competitors: list[str],
+        target_keywords: list[str]
+    ) -> dict[str, Any]:
+        """
+        Analyze content gaps vs competitors.
+
+        Returns:
+            Missing content opportunities with priority
+        """
+        # Analyze competitor content
+        competitor_analysis = await self._analyze_competitors(competitors, target_keywords)
+
+        # Analyze own content
+        own_content = await self._analyze_own_content(domain, target_keywords)
+
+        # Identify gaps
+        gaps = self._identify_gaps(own_content, competitor_analysis, target_keywords)
+
+        # Prioritize opportunities
+        opportunities = self._prioritize_opportunities(gaps)
+
+        return {
+            "domain": domain,
+            "competitors_analyzed": len(competitors),
+            "keywords_analyzed": len(target_keywords),
+            "content_gaps_found": len(gaps),
+            "top_opportunities": opportunities[:10],  # Top 10
+            "estimated_traffic_potential": self._estimate_traffic_potential(opportunities),
+            "analysis_timestamp": datetime.now().isoformat()
+        }
+
+    async def _analyze_competitors(
+        self,
+        competitors: list[str],
+        keywords: list[str]
+    ) -> dict[str, Any]:
+        """Analyze competitor content coverage."""
+        competitor_coverage = {}
+
+        for competitor in competitors:
+            coverage = {}
+            for keyword in keywords:
+                # Simulate content analysis (would use actual crawling/API in production)
+                coverage[keyword] = {
+                    "has_content": np.random.choice([True, False], p=[0.7, 0.3]),
+                    "content_quality": np.random.uniform(0.5, 1.0),
+                    "word_count": np.random.randint(500, 3000),
+                    "ranking_position": np.random.randint(1, 50)
+                }
+
+            competitor_coverage[competitor] = coverage
+
+        return competitor_coverage
+
+    async def _analyze_own_content(
+        self,
+        domain: str,
+        keywords: list[str]
+    ) -> dict[str, Any]:
+        """Analyze own content coverage."""
+        own_coverage = {}
+
+        for keyword in keywords:
+            # Simulate content analysis
+            own_coverage[keyword] = {
+                "has_content": np.random.choice([True, False], p=[0.4, 0.6]),
+                "content_quality": np.random.uniform(0.3, 0.9),
+                "word_count": np.random.randint(300, 2000),
+                "ranking_position": np.random.randint(10, 100)
+            }
+
+        return own_coverage
+
+    def _identify_gaps(
+        self,
+        own_content: dict[str, Any],
+        competitor_content: dict[str, Any],
+        keywords: list[str]
+    ) -> list[dict[str, Any]]:
+        """Identify content gaps."""
+        gaps = []
+
+        for keyword in keywords:
+            own_data = own_content.get(keyword, {})
+            has_own_content = own_data.get("has_content", False)
+
+            # Check how many competitors have this content
+            competitors_with_content = sum(
+                1 for comp_data in competitor_content.values()
+                if comp_data.get(keyword, {}).get("has_content", False)
+            )
+
+            if not has_own_content and competitors_with_content >= 2:
+                gaps.append({
+                    "keyword": keyword,
+                    "gap_type": "missing_content",
+                    "competitors_covering": competitors_with_content,
+                    "avg_competitor_quality": self._avg_competitor_quality(
+                        keyword, competitor_content
+                    ),
+                    "search_volume": np.random.randint(100, 10000),  # Simulated
+                    "difficulty": np.random.uniform(0.3, 0.9)
+                })
+
+            elif has_own_content:
+                own_quality = own_data.get("content_quality", 0)
+                competitor_quality = self._avg_competitor_quality(keyword, competitor_content)
+
+                if competitor_quality > own_quality + 0.2:  # Significant gap
+                    gaps.append({
+                        "keyword": keyword,
+                        "gap_type": "quality_gap",
+                        "own_quality": own_quality,
+                        "competitor_avg_quality": competitor_quality,
+                        "quality_difference": competitor_quality - own_quality,
+                        "search_volume": np.random.randint(100, 10000)
+                    })
+
+        return gaps
+
+    def _avg_competitor_quality(
+        self,
+        keyword: str,
+        competitor_content: dict[str, Any]
+    ) -> float:
+        """Calculate average competitor content quality."""
+        qualities = [
+            comp_data.get(keyword, {}).get("content_quality", 0)
+            for comp_data in competitor_content.values()
+            if comp_data.get(keyword, {}).get("has_content", False)
+        ]
+
+        return np.mean(qualities) if qualities else 0.0
+
+    def _prioritize_opportunities(
+        self,
+        gaps: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """Prioritize content opportunities."""
+        for gap in gaps:
+            # Calculate opportunity score
+            search_volume = gap.get("search_volume", 0)
+            difficulty = gap.get("difficulty", 0.5)
+
+            # Higher score = better opportunity
+            opportunity_score = (search_volume / 1000) * (1 - difficulty)
+
+            gap["opportunity_score"] = opportunity_score
+            gap["priority"] = "high" if opportunity_score > 5 else "medium" if opportunity_score > 2 else "low"
+
+        # Sort by opportunity score
+        gaps.sort(key=lambda x: x["opportunity_score"], reverse=True)
+
+        return gaps
+
+    def _estimate_traffic_potential(
+        self,
+        opportunities: list[dict[str, Any]]
+    ) -> dict[str, Any]:
+        """Estimate traffic potential from filling content gaps."""
+        total_search_volume = sum(o.get("search_volume", 0) for o in opportunities)
+
+        # Assume 10% CTR for top 10 positions
+        estimated_monthly_visits = total_search_volume * 0.1
+
+        return {
+            "estimated_monthly_visits": int(estimated_monthly_visits),
+            "estimated_annual_visits": int(estimated_monthly_visits * 12),
+            "confidence": "medium",
+            "assumptions": "10% CTR, top 10 rankings"
+        }

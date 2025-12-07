@@ -28,15 +28,11 @@ except Exception as e:
             "name": "DevSkyy Platform",
             "status": "fallback_mode",
             "error": fallback_error,
-            "message": "Main application failed to load, running in fallback mode"
+            "message": "Main application failed to load, running in fallback mode",
         }
 
     @fallback_app.get("/health")
     async def fallback_health():
-        return {
-            "status": "degraded",
-            "mode": "fallback",
-            "error": fallback_error
-        }
+        return {"status": "degraded", "mode": "fallback", "error": fallback_error}
 
     handler = fallback_app

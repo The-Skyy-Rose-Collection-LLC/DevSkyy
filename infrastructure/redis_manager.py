@@ -5,7 +5,7 @@ import json
 import logging
 import pickle
 import time
-from typing import Any, Optional
+from typing import Any
 
 import redis.asyncio as redis
 from redis.asyncio import ConnectionPool
@@ -19,6 +19,7 @@ Target: <50ms response times, 99.9% cache hit ratio
 """
 
 logger = logging.getLogger(__name__)
+
 
 @dataclass
 class CacheMetrics:
@@ -45,10 +46,9 @@ class CacheMetrics:
             "total_requests": self.total_requests,
             "hit_ratio": self.hit_ratio,
             "avg_response_time": self.avg_response_time,
-            "last_updated": (
-                self.last_updated.isoformat() if self.last_updated else None
-            ),
+            "last_updated": (self.last_updated.isoformat() if self.last_updated else None),
         }
+
 
 @dataclass
 class SessionData:
@@ -79,6 +79,7 @@ class SessionData:
         data["last_accessed"] = datetime.fromisoformat(data["last_accessed"])
         return cls(**data)
 
+
 class RedisManager:
     """Enterprise Redis Manager with connection pooling and advanced features"""
 
@@ -86,7 +87,7 @@ class RedisManager:
         self,
         host: str = "localhost",
         port: int = 6379,
-        password: Optional[str] = None,
+        password: str | None = None,
         db: int = 0,
         max_connections: int = 20,
         min_connections: int = 10,
@@ -137,9 +138,7 @@ class RedisManager:
             "notifications": "notif:",
         }
 
-        logger.info(
-            f"Redis Manager initialized - Pool: {min_connections}-{max_connections} connections"
-        )
+        logger.info(f"Redis Manager initialized - Pool: {min_connections}-{max_connections} connections")
 
     async def connect(self) -> bool:
         """Establish Redis connection and verify connectivity"""
@@ -193,15 +192,12 @@ class RedisManager:
             self.metrics.avg_response_time = operation_time
         else:
             self.metrics.avg_response_time = (
-                self.metrics.avg_response_time * (self.metrics.total_requests - 1)
-                + operation_time
+                self.metrics.avg_response_time * (self.metrics.total_requests - 1) + operation_time
             ) / self.metrics.total_requests
 
         self.metrics.last_updated = datetime.now()
 
-    async def set(
-        self, key: str, value: Any, ttl: Optional[int] = None, prefix: str = "api_cache"
-    ) -> bool:
+    async def set(self, key: str, value: Any, ttl: int | None = None, prefix: str = "api_cache") -> bool:
         """Set cache value with optional TTL"""
         start_time = time.time()
 
@@ -222,18 +218,14 @@ class RedisManager:
             operation_time = (time.time() - start_time) * 1000  # Convert to ms
             await self._record_metrics(operation_time, False)  # Set is not a hit
 
-            logger.debug(
-                f"Cache SET: {cache_key} (TTL: {ttl}s, Time: {operation_time:.2f}ms)"
-            )
+            logger.debug(f"Cache SET: {cache_key} (TTL: {ttl}s, Time: {operation_time:.2f}ms)")
             return True
 
         except RedisError as e:
             logger.error(f"Redis SET error for key {key}: {e}")
             return False
 
-    async def get(
-        self, key: str, prefix: str = "api_cache", deserialize_json: bool = True
-    ) -> Optional[Any]:
+    async def get(self, key: str, prefix: str = "api_cache", deserialize_json: bool = True) -> Any | None:
         """Get cache value"""
         start_time = time.time()
 
@@ -306,9 +298,7 @@ class RedisManager:
 
             if keys:
                 deleted = await self.redis_client.delete(*keys)
-                logger.info(
-                    f"Cache invalidation: {deleted} keys deleted for pattern {cache_pattern}"
-                )
+                logger.info(f"Cache invalidation: {deleted} keys deleted for pattern {cache_pattern}")
                 return deleted
 
             return 0
@@ -327,23 +317,17 @@ class RedisManager:
             await self.redis_client.setex(session_key, self.session_ttl, session_json)
 
             # Also store user-to-session mapping
-            user_session_key = self._generate_key(
-                "user", f"{session_data.user_id}:session"
-            )
-            await self.redis_client.setex(
-                user_session_key, self.session_ttl, session_id
-            )
+            user_session_key = self._generate_key("user", f"{session_data.user_id}:session")
+            await self.redis_client.setex(user_session_key, self.session_ttl, session_id)
 
-            logger.info(
-                f"Session created: {session_id} for user {session_data.user_id}"
-            )
+            logger.info(f"Session created: {session_id} for user {session_data.user_id}")
             return True
 
         except RedisError as e:
             logger.error(f"Session creation error: {e}")
             return False
 
-    async def get_session(self, session_id: str) -> Optional[SessionData]:
+    async def get_session(self, session_id: str) -> SessionData | None:
         """Get session data"""
         try:
             session_key = self._generate_key("session", session_id)
@@ -377,9 +361,7 @@ class RedisManager:
                 await self.redis_client.delete(session_key)
 
                 # Delete user-to-session mapping
-                user_session_key = self._generate_key(
-                    "user", f"{session.user_id}:session"
-                )
+                user_session_key = self._generate_key("user", f"{session.user_id}:session")
                 await self.redis_client.delete(user_session_key)
 
                 logger.info(f"Session deleted: {session_id}")
@@ -454,6 +436,7 @@ class RedisManager:
                 "connectivity": False,
                 "response_time_ms": (time.time() - start_time) * 1000,
             }
+
 
 # Global Redis manager instance
 redis_manager = RedisManager()

@@ -25,6 +25,7 @@ router = APIRouter(prefix="/ml", tags=["ml-infrastructure"])
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class ModelRegistrationRequest(BaseModel):
     """Request to register a model"""
 
@@ -37,10 +38,12 @@ class ModelRegistrationRequest(BaseModel):
     dataset_info: dict[str, Any] = Field(default_factory=dict)
     stage: str = ModelStage.DEVELOPMENT
 
+
 class ModelPromotionRequest(BaseModel):
     """Request to promote a model"""
 
     target_stage: str
+
 
 class ExplainRequest(BaseModel):
     """Request for model explanation"""
@@ -49,9 +52,11 @@ class ExplainRequest(BaseModel):
     input_data: list[list[float]]
     feature_names: list[str] = Field(default_factory=list)
 
+
 # ============================================================================
 # MODEL REGISTRY ENDPOINTS
 # ============================================================================
+
 
 @router.get("/registry/models")
 async def list_models(current_user: TokenData = Depends(get_current_active_user)):
@@ -63,18 +68,16 @@ async def list_models(current_user: TokenData = Depends(get_current_active_user)
         logger.error(f"Failed to list models: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/registry/models/{model_name}/versions")
-async def list_model_versions(
-    model_name: str, current_user: TokenData = Depends(get_current_active_user)
-):
+async def list_model_versions(model_name: str, current_user: TokenData = Depends(get_current_active_user)):
     """List all versions of a model"""
     try:
         versions = model_registry.list_versions(model_name)
         return {"model_name": model_name, "versions": versions}
     except Exception as e:
-        raise HTTPException(
-            status_code=404, detail=f"Model not found: {model_name}. Error: {e!s}"
-        )
+        raise HTTPException(status_code=404, detail=f"Model not found: {model_name}. Error: {e!s}")
+
 
 @router.get("/registry/models/{model_name}/{version}")
 async def get_model_metadata(
@@ -87,11 +90,10 @@ async def get_model_metadata(
         metadata = model_registry.get_metadata(model_name, version)
         return metadata.to_dict()
     except FileNotFoundError:
-        raise HTTPException(
-            status_code=404, detail=f"Metadata not found for {model_name} v{version}"
-        )
+        raise HTTPException(status_code=404, detail=f"Metadata not found for {model_name} v{version}")
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/registry/models/{model_name}/{version}/promote")
 async def promote_model(
@@ -113,6 +115,7 @@ async def promote_model(
         logger.error(f"Failed to promote model: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/registry/stats")
 async def get_registry_stats(
     current_user: TokenData = Depends(get_current_active_user),
@@ -123,6 +126,7 @@ async def get_registry_stats(
         return stats
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/registry/models/{model_name}/compare")
 async def compare_models(
@@ -138,9 +142,11 @@ async def compare_models(
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # CACHE ENDPOINTS
 # ============================================================================
+
 
 @router.get("/cache/stats")
 async def get_cache_stats(current_user: TokenData = Depends(require_developer)):
@@ -151,6 +157,7 @@ async def get_cache_stats(current_user: TokenData = Depends(require_developer)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.delete("/cache/clear")
 async def clear_cache(current_user: TokenData = Depends(require_developer)):
     """Clear all cache (admin only)"""
@@ -160,14 +167,14 @@ async def clear_cache(current_user: TokenData = Depends(require_developer)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
+
 # ============================================================================
 # EXPLAINABILITY ENDPOINTS
 # ============================================================================
 
+
 @router.post("/explain/prediction")
-async def explain_prediction(
-    request: ExplainRequest, current_user: TokenData = Depends(get_current_active_user)
-):
+async def explain_prediction(request: ExplainRequest, current_user: TokenData = Depends(get_current_active_user)):
     """
     Explain model prediction using SHAP values
 
@@ -182,14 +189,13 @@ async def explain_prediction(
         )
         return explanation
     except ImportError:
-        raise HTTPException(
-            status_code=501, detail="SHAP not installed. Install with: pip install shap"
-        )
+        raise HTTPException(status_code=501, detail="SHAP not installed. Install with: pip install shap")
     except ValueError as e:
         raise HTTPException(status_code=404, detail=str(e))
     except Exception as e:
         logger.error(f"Explanation failed: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/health")
 async def ml_health_check():

@@ -29,6 +29,7 @@ with real-world use cases and implementation patterns
 
 logger = logging.getLogger(__name__)
 
+
 class FashionAPIExamples:
     """Comprehensive examples for fashion API integrations"""
 
@@ -52,9 +53,7 @@ class FashionAPIExamples:
             ]
         )
 
-        logger.info(
-            f"✅ Discovered {sum(len(apis) for apis in discovered_apis.values())} APIs"
-        )
+        logger.info(f"✅ Discovered {sum(len(apis) for apis in discovered_apis.values())} APIs")
 
         # Step 2: Get recommendations for fashion trends
         logger.info("\nStep 2: Getting API recommendations...")
@@ -105,17 +104,11 @@ class FashionAPIExamples:
         Consumers are increasingly focused on eco-friendly fashion choices.
         """
 
-        context_analysis = await fashion_intelligence.analyze_fashion_context(
-            fashion_text
-        )
+        context_analysis = await fashion_intelligence.analyze_fashion_context(fashion_text)
 
-        logger.info(
-            f"  Fashion Relevance Score: {context_analysis['fashion_relevance_score']:.2f}"
-        )
+        logger.info(f"  Fashion Relevance Score: {context_analysis['fashion_relevance_score']:.2f}")
         logger.info(f"  Identified Categories: {context_analysis['identified_categories']}")
-        logger.info(
-            f"  Sustainability Mentions: {context_analysis['sustainability_mentions']}"
-        )
+        logger.info(f"  Sustainability Mentions: {context_analysis['sustainability_mentions']}")
         logger.info(f"  Seasonal Context: {context_analysis['seasonal_context']}")
 
         # Step 2: Get trend recommendations
@@ -143,9 +136,7 @@ class FashionAPIExamples:
             categories=[FashionCategory.WOMENS_WEAR, FashionCategory.ACCESSORIES],
         )
 
-        logger.info(
-            f"✅ Synced {sync_result['trends_synced']} trends from {len(sync_result['sources'])} sources"
-        )
+        logger.info(f"✅ Synced {sync_result['trends_synced']} trends from {len(sync_result['sources'])} sources")
 
         self.examples_run.append("fashion_trend_analysis")
         return context_analysis, recommendations
@@ -315,9 +306,7 @@ class FashionAPIExamples:
         logger.info(
             f"  Success Rate: {metrics['gateway_metrics']['successful_requests'] / max(metrics['gateway_metrics']['total_requests'], 1) * 100:.1f}%"
         )
-        logger.info(
-            f"  Average Response Time: {metrics['gateway_metrics']['average_response_time']:.3f}s"
-        )
+        logger.info(f"  Average Response Time: {metrics['gateway_metrics']['average_response_time']:.3f}s")
 
         self.examples_run.append("api_gateway_usage")
         return result
@@ -331,7 +320,6 @@ class FashionAPIExamples:
         # Step 1: Analyze customer fashion preferences
         logger.info("Step 1: Analyzing customer preferences...")
 
-
         # Analyze fashion context for customer
         customer_text = """
         Customer prefers bohemian and minimalist styles with earth tones and neutral colors.
@@ -339,16 +327,10 @@ class FashionAPIExamples:
         Frequently browses dresses and accessories in mid-range price category.
         """
 
-        customer_analysis = await fashion_intelligence.analyze_fashion_context(
-            customer_text
-        )
+        customer_analysis = await fashion_intelligence.analyze_fashion_context(customer_text)
 
-        logger.info(
-            f"  Fashion Relevance: {customer_analysis['fashion_relevance_score']:.2f}"
-        )
-        logger.info(
-            f"  Sustainability Focus: {len(customer_analysis['sustainability_mentions'])} mentions"
-        )
+        logger.info(f"  Fashion Relevance: {customer_analysis['fashion_relevance_score']:.2f}")
+        logger.info(f"  Sustainability Focus: {len(customer_analysis['sustainability_mentions'])} mentions")
         logger.info(
             f"  Style Categories: {[cat['category'] for cat in customer_analysis['identified_categories'][:3]]}"
         )
@@ -366,22 +348,15 @@ class FashionAPIExamples:
         personalized_recs = []
         for rec in recommendations:
             # Simple personalization logic
-            if any(
-                color in ["earth", "neutral", "brown"]
-                for color in rec["key_elements"]["colors"]
-            ):
-                rec["personalization_score"] = (
-                    rec["popularity_score"] * 1.2
-                )  # Boost for preferred colors
+            if any(color in ["earth", "neutral", "brown"] for color in rec["key_elements"]["colors"]):
+                rec["personalization_score"] = rec["popularity_score"] * 1.2  # Boost for preferred colors
                 personalized_recs.append(rec)
 
         logger.info(f"✅ Generated {len(personalized_recs)} personalized recommendations")
 
         for rec in personalized_recs[:2]:  # Show top 2
             logger.info(f"  🌟 {rec['trend_name']}")
-            logger.info(
-                f"     Personalization Score: {rec.get('personalization_score', 0):.2f}"
-            )
+            logger.info(f"     Personalization Score: {rec.get('personalization_score', 0):.2f}")
             logger.info(f"     Matching Colors: {rec['key_elements']['colors']}")
 
         # Step 3: Create personalization workflow
@@ -481,18 +456,14 @@ class FashionAPIExamples:
         health_results["api_gateway"] = gateway_health
         logger.info(f"  Status: {gateway_health['status']}")
         logger.info(f"  Success Rate: {gateway_health.get('success_rate', 0) * 100:.1f}%")
-        logger.info(
-            f"  Average Response Time: {gateway_health.get('average_response_time', 0):.3f}s"
-        )
+        logger.info(f"  Average Response Time: {gateway_health.get('average_response_time', 0):.3f}s")
 
         # Workflow Engine
         logger.info("\nChecking Workflow Engine...")
         workflow_health = await workflow_engine.health_check()
         health_results["workflow_engine"] = workflow_health
         logger.info(f"  Status: {workflow_health['status']}")
-        logger.info(
-            f"  Registered Workflows: {workflow_health.get('registered_workflows', 0)}"
-        )
+        logger.info(f"  Registered Workflows: {workflow_health.get('registered_workflows', 0)}")
         logger.info(f"  Running Workflows: {workflow_health.get('running_workflows', 0)}")
 
         # Fashion API Integrator
@@ -500,18 +471,14 @@ class FashionAPIExamples:
         fashion_health = await fashion_api_integrator.health_check()
         health_results["fashion_apis"] = fashion_health
         logger.info(f"  Status: {fashion_health['status']}")
-        logger.info(
-            f"  Fashion APIs Health: {fashion_health.get('fashion_apis_healthy', 'N/A')}"
-        )
+        logger.info(f"  Fashion APIs Health: {fashion_health.get('fashion_apis_healthy', 'N/A')}")
 
         # Fashion Intelligence Engine
         logger.info("\nChecking Fashion Intelligence Engine...")
         intelligence_health = await fashion_intelligence.get_fashion_health_check()
         health_results["fashion_intelligence"] = intelligence_health
         logger.info(f"  Status: {intelligence_health['status']}")
-        logger.info(
-            f"  Trends Count: {intelligence_health['knowledge_base_stats']['trends_count']}"
-        )
+        logger.info(f"  Trends Count: {intelligence_health['knowledge_base_stats']['trends_count']}")
         logger.info(
             f"  Market Intelligence: {intelligence_health['knowledge_base_stats']['market_intelligence_count']}"
         )
@@ -520,14 +487,10 @@ class FashionAPIExamples:
         logger.info("\n📊 OVERALL SYSTEM HEALTH:")
         logger.info("=" * 30)
 
-        healthy_components = sum([
-            1 for health in health_results.values() if health.get("status") == "healthy"
-        ])
+        healthy_components = sum([1 for health in health_results.values() if health.get("status") == "healthy"])
         total_components = len(health_results)
 
-        overall_health = (
-            "healthy" if healthy_components == total_components else "degraded"
-        )
+        overall_health = "healthy" if healthy_components == total_components else "degraded"
 
         logger.info(f"Overall Status: {overall_health.upper()}")
         logger.info(f"Healthy Components: {healthy_components}/{total_components}")
@@ -571,6 +534,7 @@ class FashionAPIExamples:
             logger.info(f"\n❌ Error running examples: {e}")
             logger.error(f"Example execution failed: {e}")
 
+
 # Example usage and demonstration
 async def main():
     """Main function to run API integration examples"""
@@ -580,6 +544,7 @@ async def main():
 
     # Run all examples
     await examples.run_all_examples()
+
 
 if __name__ == "__main__":
     # Run the examples

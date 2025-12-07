@@ -87,11 +87,7 @@ class TestTokenGeneration:
 
     def test_create_access_token_with_email(self):
         """Test access token with email."""
-        token = create_access_token(
-            "user123",
-            UserRole.ADMIN,
-            email="admin@example.com"
-        )
+        token = create_access_token("user123", UserRole.ADMIN, email="admin@example.com")
 
         payload = verify_jwt_token(token, TokenType.ACCESS)
         assert payload["sub"] == "user123"
@@ -101,11 +97,7 @@ class TestTokenGeneration:
     def test_create_access_token_with_permissions(self):
         """Test access token with custom permissions."""
         permissions = ["create:products", "delete:campaigns"]
-        token = create_access_token(
-            "user123",
-            UserRole.DEVELOPER,
-            permissions=permissions
-        )
+        token = create_access_token("user123", UserRole.DEVELOPER, permissions=permissions)
 
         payload = verify_jwt_token(token, TokenType.ACCESS)
         assert payload["permissions"] == permissions
@@ -171,7 +163,7 @@ class TestTokenVerification:
     def test_verify_expired_token(self):
         """Test that expired token raises error."""
         # Create token with past expiry
-        with patch('security.jwt_auth.datetime') as mock_datetime:
+        with patch("security.jwt_auth.datetime") as mock_datetime:
             # Set time to past
             past_time = datetime.utcnow() - timedelta(hours=2)
             mock_datetime.utcnow.return_value = past_time
@@ -308,6 +300,7 @@ class TestSecretKeyGeneration:
 
         # Keys should be URL-safe base64
         import string
+
         allowed_chars = string.ascii_letters + string.digits + "-_"
         assert all(c in allowed_chars for c in key1)
 
@@ -344,7 +337,7 @@ class TestRBACEnforcement:
         require_role(UserRole.ADMIN)
 
         # Simulate the dependency execution
-        with patch('security.jwt_auth.get_current_user', return_value=mock_user):
+        with patch("security.jwt_auth.get_current_user", return_value=mock_user):
             # The actual check happens inside the returned function
             # This tests the has_permission logic
             assert has_permission(UserRole.API_USER, UserRole.ADMIN) is False

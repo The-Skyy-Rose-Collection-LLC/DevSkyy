@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 AGENT_MODULES_DIR = Path(__file__).parent / "modules"
 
+
 def find_agents_to_upgrade() -> list[Path]:
     """Find all agent files that need upgrading"""
     agent_files = []
@@ -34,6 +35,7 @@ def find_agents_to_upgrade() -> list[Path]:
 
     return sorted(agent_files)
 
+
 def check_if_uses_base_agent(file_path: Path) -> bool:
     """Check if agent already inherits from BaseAgent"""
     try:
@@ -41,6 +43,7 @@ def check_if_uses_base_agent(file_path: Path) -> bool:
         return "from .base_agent import BaseAgent" in content or "BaseAgent" in content
     except Exception:
         return False
+
 
 def analyze_agent_structure(file_path: Path) -> dict:
     """Analyze agent structure and identify key components"""
@@ -75,6 +78,7 @@ def analyze_agent_structure(file_path: Path) -> dict:
         }
     except Exception as e:
         return {"file": file_path.name, "error": str(e)}
+
 
 def generate_upgrade_template(agent_name: str, original_class_name: str) -> str:
     """Generate a template for upgrading an agent"""
@@ -122,7 +126,7 @@ class {original_class_name}V2(BaseAgent):
             self.status = BaseAgent.AgentStatus.FAILED
             return False
 
-    async def execute_core_function(self, **kwargs) -> Dict[str, Any]:
+    async def execute_core_function(self, **kwargs) -> dict[str, Any]:
         """
         Core agent functionality with self-healing.
         Implement your main agent logic here.
@@ -131,7 +135,7 @@ class {original_class_name}V2(BaseAgent):
         return await self.health_check()
 
     @BaseAgent.with_healing
-    async def your_main_method(self, param1: str, param2: Optional[Dict] = None) -> Dict[str, Any]:
+    async def your_main_method(self, param1: str, param2: Dict | None = None) -> dict[str, Any]:
         """
         Main agent method with automatic self-healing.
 
@@ -154,7 +158,7 @@ class {original_class_name}V2(BaseAgent):
             logger.error(f"Method failed: {{e}}")
             raise  # Let BaseAgent.with_healing handle retry
 
-    async def _optimize_resources(self) -> Dict[str, any]:
+    async def _optimize_resources(self) -> dict[str, any]:
         """
         Implement comprehensive agent-specific resource optimization.
 
@@ -162,7 +166,7 @@ class {original_class_name}V2(BaseAgent):
         cache management, and resource monitoring for optimal performance.
 
         Returns:
-            Dict[str, any]: Resource optimization results and metrics
+            dict[str, any]: Resource optimization results and metrics
         """
         optimization_results = {
             "timestamp": asyncio.get_event_loop().time(),
@@ -253,6 +257,7 @@ def create_{agent_name.lower().replace(" ", "_")}_v2() -> {original_class_name}V
 
     return template
 
+
 def main():
     """Main upgrade process"""
     logger.info("🔧 DevSkyy Agent Upgrade Script")
@@ -268,11 +273,7 @@ def main():
         analysis = analyze_agent_structure(agent_file)
         results.append(analysis)
 
-        status = (
-            "✅ Uses BaseAgent"
-            if analysis.get("uses_base_agent")
-            else "⚠️  Needs Upgrade"
-        )
+        status = "✅ Uses BaseAgent" if analysis.get("uses_base_agent") else "⚠️  Needs Upgrade"
         logger.info(f"{status}: {analysis['file']}")
         logger.info(f"   Classes: {', '.join(analysis.get('classes', []))}")
         logger.info(f"   Lines: {analysis.get('lines', 0)}")
@@ -306,6 +307,7 @@ def main():
     logger.info("5. Add ML features and optimization")
     logger.info("6. Test thoroughly")
     logger.info("7. Update imports in main.py")
+
 
 if __name__ == "__main__":
     main()

@@ -3,13 +3,14 @@ import json
 import logging
 import sys
 import traceback
-from typing import Any, Optional
+from typing import Any
 
 
 """
 Structured Logging for Grade A+ Infrastructure Score
 JSON-formatted logs for easy parsing and analysis
 """
+
 
 class JSONFormatter(logging.Formatter):
     """
@@ -42,11 +43,7 @@ class JSONFormatter(logging.Formatter):
             log_data["exception"] = {
                 "type": record.exc_info[0].__name__ if record.exc_info[0] else None,
                 "message": str(record.exc_info[1]) if record.exc_info[1] else None,
-                "traceback": (
-                    traceback.format_exception(*record.exc_info)
-                    if record.exc_info
-                    else None
-                ),
+                "traceback": (traceback.format_exception(*record.exc_info) if record.exc_info else None),
             }
 
         # Add extra fields
@@ -54,6 +51,7 @@ class JSONFormatter(logging.Formatter):
             log_data.update(record.extra_fields)
 
         return json.dumps(log_data)
+
 
 class StructuredLogger:
     """
@@ -84,9 +82,7 @@ class StructuredLogger:
         file_handler.setFormatter(JSONFormatter())
         self.logger.addHandler(file_handler)
 
-    def _log(
-        self, level: int, message: str, extra: Optional[dict[str, Any]] = None, **kwargs
-    ):
+    def _log(self, level: int, message: str, extra: dict[str, Any] | None = None, **kwargs):
         """
         Internal log method with extra fields
 
@@ -136,6 +132,7 @@ class StructuredLogger:
         """Log exception with traceback"""
         self.logger.exception(message, extra=extra)
 
+
 def setup_structured_logging(level: int = logging.INFO):
     """
     Setup structured logging for the entire application
@@ -159,6 +156,7 @@ def setup_structured_logging(level: int = logging.INFO):
     file_handler = logging.FileHandler("logs/application.jsonl", mode="a")
     file_handler.setFormatter(JSONFormatter())
     root_logger.addHandler(file_handler)
+
 
 # Global structured logger instance
 structured_logger = StructuredLogger("devskyy")

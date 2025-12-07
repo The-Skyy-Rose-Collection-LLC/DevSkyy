@@ -4,7 +4,7 @@ Database models using SQLAlchemy ORM
 """
 
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String, Text
@@ -190,14 +190,14 @@ class ProductRequest(BaseModel):
     """Request model for creating/updating products"""
 
     name: str = Field(..., min_length=1, max_length=200)
-    description: Optional[str] = None
+    description: str | None = None
     base_price: float = Field(..., gt=0)
-    cost: Optional[float] = None
-    category: Optional[str] = None
-    sku: Optional[str] = None
-    stock_quantity: Optional[int] = 0
-    tags: Optional[list[str]] = []
-    images: Optional[list[str]] = []
+    cost: float | None = None
+    category: str | None = None
+    sku: str | None = None
+    stock_quantity: int | None = 0
+    tags: list[str] | None = []
+    images: list[str] | None = []
 
 
 class PaymentRequest(BaseModel):
@@ -206,7 +206,7 @@ class PaymentRequest(BaseModel):
     amount: float = Field(..., gt=0)
     currency: str = Field(default="USD", max_length=3)
     payment_method: str = Field(..., max_length=50)
-    customer_id: Optional[str] = None
-    order_id: Optional[str] = None
-    description: Optional[str] = None
-    metadata: Optional[dict[str, Any]] = {}
+    customer_id: str | None = None
+    order_id: str | None = None
+    description: str | None = None
+    metadata: dict[str, Any] | None = {}

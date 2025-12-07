@@ -42,7 +42,7 @@ import logging
 import os
 from pathlib import Path
 import re
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 from fastapi import HTTPException
@@ -53,6 +53,7 @@ logger = logging.getLogger(__name__)
 
 class CodeLanguage(Enum):
     """Supported programming languages."""
+
     PYTHON = "python"
     JAVASCRIPT = "javascript"
     TYPESCRIPT = "typescript"
@@ -68,6 +69,7 @@ class CodeLanguage(Enum):
 
 class RecoveryStrategy(Enum):
     """Code recovery strategies."""
+
     GIT_HISTORY = "git_history"
     BACKUP_RESTORE = "backup_restore"
     VERSION_CONTROL = "version_control"
@@ -77,6 +79,7 @@ class RecoveryStrategy(Enum):
 
 class QualityMetric(Enum):
     """Code quality metrics."""
+
     COMPLEXITY = "complexity"
     MAINTAINABILITY = "maintainability"
     SECURITY = "security"
@@ -88,14 +91,15 @@ class QualityMetric(Enum):
 @dataclass
 class CodeGenerationRequest:
     """Request for code generation."""
+
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     description: str = ""
     language: CodeLanguage = CodeLanguage.PYTHON
 
     # Context
-    existing_code: Optional[str] = None
-    file_path: Optional[str] = None
-    framework: Optional[str] = None
+    existing_code: str | None = None
+    file_path: str | None = None
+    framework: str | None = None
     libraries: list[str] = field(default_factory=list)
 
     # Requirements
@@ -104,8 +108,8 @@ class CodeGenerationRequest:
     documentation_required: bool = True
 
     # Style preferences
-    style_guide: Optional[str] = None  # "pep8", "airbnb", "google", etc.
-    formatting: Optional[str] = None  # "black", "prettier", etc.
+    style_guide: str | None = None  # "pep8", "airbnb", "google", etc.
+    formatting: str | None = None  # "black", "prettier", etc.
 
     # AI model preferences
     model: str = "cursor"  # "cursor", "codex", "claude", "copilot"
@@ -120,18 +124,19 @@ class CodeGenerationRequest:
 @dataclass
 class CodeGenerationResult:
     """Result from code generation."""
+
     request_id: str
     success: bool
 
     # Generated code
     code: str = ""
-    file_path: Optional[str] = None
+    file_path: str | None = None
     language: CodeLanguage = CodeLanguage.PYTHON
 
     # Quality metrics
-    complexity_score: Optional[float] = None
-    quality_score: Optional[float] = None
-    test_coverage: Optional[float] = None
+    complexity_score: float | None = None
+    quality_score: float | None = None
+    test_coverage: float | None = None
 
     # Analysis
     issues_found: list[dict[str, Any]] = field(default_factory=list)
@@ -147,22 +152,23 @@ class CodeGenerationResult:
     # Metadata
     model_used: str = ""
     tokens_used: int = 0
-    error: Optional[str] = None
+    error: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
 
 
 @dataclass
 class CodeRecoveryRequest:
     """Request for code recovery."""
+
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     recovery_type: RecoveryStrategy = RecoveryStrategy.GIT_HISTORY
 
     # Target information
-    repository_url: Optional[str] = None
-    file_path: Optional[str] = None
+    repository_url: str | None = None
+    file_path: str | None = None
     branch: str = "main"
-    commit_hash: Optional[str] = None
-    timestamp: Optional[datetime] = None
+    commit_hash: str | None = None
+    timestamp: datetime | None = None
 
     # Recovery options
     prefer_latest: bool = True
@@ -176,6 +182,7 @@ class CodeRecoveryRequest:
 @dataclass
 class CodeRecoveryResult:
     """Result from code recovery."""
+
     request_id: str
     success: bool
 
@@ -186,16 +193,16 @@ class CodeRecoveryResult:
 
     # Recovery details
     strategy_used: RecoveryStrategy = RecoveryStrategy.GIT_HISTORY
-    commit_hash: Optional[str] = None
+    commit_hash: str | None = None
     recovery_time: float = 0.0
 
     # Verification
     integrity_verified: bool = False
-    tests_passed: Optional[bool] = None
+    tests_passed: bool | None = None
 
     # Issues
     issues_found: list[str] = field(default_factory=list)
-    error: Optional[str] = None
+    error: str | None = None
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.now)
@@ -204,6 +211,7 @@ class CodeRecoveryResult:
 @dataclass
 class WebScrapingRequest:
     """Request for web scraping."""
+
     request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     target_url: str = ""
     scraping_type: str = "competitor_analysis"  # "competitor_analysis", "trend_research", "pricing_data"
@@ -221,7 +229,7 @@ class WebScrapingRequest:
 
     # Authentication
     requires_auth: bool = False
-    auth_token: Optional[str] = None
+    auth_token: str | None = None
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.now)
@@ -230,6 +238,7 @@ class WebScrapingRequest:
 @dataclass
 class WebScrapingResult:
     """Result from web scraping."""
+
     request_id: str
     success: bool
 
@@ -246,7 +255,7 @@ class WebScrapingResult:
     scraping_time: float = 0.0
 
     # Issues
-    error: Optional[str] = None
+    error: str | None = None
     warnings: list[str] = field(default_factory=list)
 
     # Metadata
@@ -312,7 +321,7 @@ class CodeRecoveryCursorAgent:
         Build and return a mapping of available AI model clients detected from environment variables.
 
         Returns:
-            clients (Dict[str, Any]): A dictionary keyed by provider name ("cursor", "codex", "claude") for each detected client. Each entry contains provider-specific connection info and an `available` boolean, for example:
+            clients (dict[str, Any]): A dictionary keyed by provider name ("cursor", "codex", "claude") for each detected client. Each entry contains provider-specific connection info and an `available` boolean, for example:
                 - "cursor": {"api_key": str, "endpoint": str, "available": True}
                 - "codex": {"client": <openai.OpenAI>, "available": True}
                 - "claude": {"client": <anthropic.Anthropic>, "available": True}
@@ -332,6 +341,7 @@ class CodeRecoveryCursorAgent:
         if os.getenv("OPENAI_API_KEY"):
             try:
                 import openai
+
                 clients["codex"] = {
                     "client": openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY")),
                     "available": True,
@@ -344,6 +354,7 @@ class CodeRecoveryCursorAgent:
         if os.getenv("ANTHROPIC_API_KEY"):
             try:
                 import anthropic
+
                 clients["claude"] = {
                     "client": anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY")),
                     "available": True,
@@ -354,9 +365,7 @@ class CodeRecoveryCursorAgent:
 
         return clients
 
-    async def generate_code(
-        self, request: CodeGenerationRequest
-    ) -> CodeGenerationResult:
+    async def generate_code(self, request: CodeGenerationRequest) -> CodeGenerationResult:
         """
         Generate source code for a CodeGenerationRequest using available AI backends and return a CodeGenerationResult.
 
@@ -368,9 +377,7 @@ class CodeRecoveryCursorAgent:
         start_time = datetime.now()
 
         try:
-            logger.info(
-                f"💻 Generating {request.language.value} code: {request.description[:50]}..."
-            )
+            logger.info(f"💻 Generating {request.language.value} code: {request.description[:50]}...")
 
             # Select AI model
             if request.model == "cursor" and "cursor" in self.ai_clients:
@@ -400,7 +407,7 @@ class CodeRecoveryCursorAgent:
             if request.file_path:
                 file_path = self.workspace_dir / request.file_path
                 file_path.parent.mkdir(exist_ok=True, parents=True)
-                with open(file_path, 'w') as f:
+                with open(file_path, "w") as f:
                     f.write(formatted_code)
 
             generation_time = (datetime.now() - start_time).total_seconds()
@@ -421,10 +428,7 @@ class CodeRecoveryCursorAgent:
                 model_used=request.model,
             )
 
-            logger.info(
-                f"✅ Code generated successfully "
-                f"(Quality: {quality_analysis.get('quality', 0):.1f}/100)"
-            )
+            logger.info(f"✅ Code generated successfully " f"(Quality: {quality_analysis.get('quality', 0):.1f}/100)")
 
             return result
 
@@ -483,8 +487,11 @@ class CodeRecoveryCursorAgent:
                 client.chat.completions.create,
                 model="gpt-4",
                 messages=[
-                    {"role": "system", "content": "You are an expert programmer. Generate clean, production-ready code."},
-                    {"role": "user", "content": prompt}
+                    {
+                        "role": "system",
+                        "content": "You are an expert programmer. Generate clean, production-ready code.",
+                    },
+                    {"role": "user", "content": prompt},
                 ],
                 temperature=request.temperature,
                 max_tokens=request.max_tokens,
@@ -497,7 +504,7 @@ class CodeRecoveryCursorAgent:
             logger.error(f"Codex generation failed: {e}")
             raise HTTPException(
                 status_code=503,
-                detail=f"Code generation with Codex failed: {e!s}. Check OPENAI_API_KEY environment variable."
+                detail=f"Code generation with Codex failed: {e!s}. Check OPENAI_API_KEY environment variable.",
             )
 
     async def _generate_with_claude(self, request: CodeGenerationRequest) -> str:
@@ -522,9 +529,7 @@ class CodeRecoveryCursorAgent:
                 client.messages.create,
                 model="claude-3-5-sonnet-20241022",
                 max_tokens=request.max_tokens,
-                messages=[
-                    {"role": "user", "content": prompt}
-                ],
+                messages=[{"role": "user", "content": prompt}],
                 temperature=request.temperature,
             )
 
@@ -535,7 +540,7 @@ class CodeRecoveryCursorAgent:
             logger.error(f"Claude generation failed: {e}")
             raise HTTPException(
                 status_code=503,
-                detail=f"Code generation with Claude failed: {e!s}. Check ANTHROPIC_API_KEY environment variable."
+                detail=f"Code generation with Claude failed: {e!s}. Check ANTHROPIC_API_KEY environment variable.",
             )
 
     async def _generate_with_template(self, request: CodeGenerationRequest) -> str:
@@ -630,10 +635,11 @@ Please generate clean, production-ready code with:
             str: Placeholder source code tailored to the requested language.
         """
         import warnings
+
         warnings.warn(
             "_generate_placeholder_code violates Truth Protocol. Use real AI providers.",
             DeprecationWarning,
-            stacklevel=2
+            stacklevel=2,
         )
         logger.error("Placeholder code generation called - this violates Truth Protocol")
         if request.language == CodeLanguage.PYTHON:
@@ -651,7 +657,7 @@ if __name__ == "__main__":
     main()
 '''
         elif request.language == CodeLanguage.JAVASCRIPT:
-            return f'''/**
+            return f"""/**
  * {request.description}
  *
  * Auto-generated by DevSkyy Code Generator
@@ -662,20 +668,18 @@ function main() {{
 }}
 
 module.exports = {{ main }};
-'''
+"""
         else:
             return f"// {request.description}\n// Auto-generated placeholder code\n"
 
-    async def _format_code(
-        self, code: str, language: CodeLanguage, formatter: Optional[str]
-    ) -> str:
+    async def _format_code(self, code: str, language: CodeLanguage, formatter: str | None) -> str:
         """
         Format source code using the specified formatter when available.
 
         Parameters:
             code (str): The source code to format.
             language (CodeLanguage): The programming language of the source code.
-            formatter (Optional[str]): Name of the formatter to apply (e.g., "black" for Python, "prettier" for JavaScript/TypeScript). If None or unsupported, the original code is returned unchanged.
+            formatter (str | None): Name of the formatter to apply (e.g., "black" for Python, "prettier" for JavaScript/TypeScript). If None or unsupported, the original code is returned unchanged.
 
         Returns:
             str: The formatted source code if formatting succeeded and a supported formatter was specified; otherwise, the original input `code`.
@@ -687,7 +691,8 @@ module.exports = {{ main }};
             if formatter == "black" and language == CodeLanguage.PYTHON:
                 # Use black for Python formatting
                 process = await asyncio.create_subprocess_exec(
-                    "black", "-",
+                    "black",
+                    "-",
                     stdin=asyncio.subprocess.PIPE,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
@@ -709,9 +714,7 @@ module.exports = {{ main }};
 
         return code
 
-    async def _analyze_code_quality(
-        self, code: str, language: CodeLanguage
-    ) -> dict[str, Any]:
+    async def _analyze_code_quality(self, code: str, language: CodeLanguage) -> dict[str, Any]:
         """
         Perform a lightweight static assessment of the provided source code and produce basic quality metrics and findings.
 
@@ -737,16 +740,18 @@ module.exports = {{ main }};
         }
 
         # Basic analysis (in production, use tools like pylint, sonar, etc.)
-        lines = code.split('\n')
+        lines = code.split("\n")
         analysis["lines_of_code"] = len([l for l in lines if l.strip()])
 
         # Check for basic issues
         if language == CodeLanguage.PYTHON and "except:" in code:
-            analysis["issues"].append({
-                "type": "bare_except",
-                "message": "Bare except clause found",
-                "severity": "medium",
-            })
+            analysis["issues"].append(
+                {
+                    "type": "bare_except",
+                    "message": "Bare except clause found",
+                    "severity": "medium",
+                }
+            )
             analysis["quality"] -= 5
 
         return analysis
@@ -767,9 +772,7 @@ module.exports = {{ main }};
         # Placeholder - would use AI to generate meaningful docstrings
         return code
 
-    async def recover_code(
-        self, request: CodeRecoveryRequest
-    ) -> CodeRecoveryResult:
+    async def recover_code(self, request: CodeRecoveryRequest) -> CodeRecoveryResult:
         """
         Orchestrates recovery of source files using the requested recovery strategy.
 
@@ -782,9 +785,7 @@ module.exports = {{ main }};
         start_time = datetime.now()
 
         try:
-            logger.info(
-                f"🔄 Recovering code using {request.recovery_type.value} strategy"
-            )
+            logger.info(f"🔄 Recovering code using {request.recovery_type.value} strategy")
 
             if request.recovery_type == RecoveryStrategy.GIT_HISTORY:
                 result = await self._recover_from_git(request)
@@ -800,9 +801,7 @@ module.exports = {{ main }};
             result.recovery_time = (datetime.now() - start_time).total_seconds()
             self.recovery_count += 1
 
-            logger.info(
-                f"✅ Code recovery completed: {result.total_files} files recovered"
-            )
+            logger.info(f"✅ Code recovery completed: {result.total_files} files recovered")
 
             return result
 
@@ -816,9 +815,7 @@ module.exports = {{ main }};
                 recovery_time=(datetime.now() - start_time).total_seconds(),
             )
 
-    async def _recover_from_git(
-        self, request: CodeRecoveryRequest
-    ) -> CodeRecoveryResult:
+    async def _recover_from_git(self, request: CodeRecoveryRequest) -> CodeRecoveryResult:
         """
         Recover repository files from a Git repository URL into the agent's recovery directory.
 
@@ -848,14 +845,17 @@ module.exports = {{ main }};
                 raise ValueError("Repository URL required for Git recovery")
 
             # Create recovery directory
-            repo_name = request.repository_url.split('/')[-1].replace('.git', '')
+            repo_name = request.repository_url.split("/")[-1].replace(".git", "")
             repo_dir = self.recovery_dir / repo_name
 
             # Clone or pull repository
             if not repo_dir.exists():
                 logger.info(f"Cloning repository: {request.repository_url}")
                 process = await asyncio.create_subprocess_exec(
-                    "git", "clone", request.repository_url, str(repo_dir),
+                    "git",
+                    "clone",
+                    request.repository_url,
+                    str(repo_dir),
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
@@ -863,7 +863,10 @@ module.exports = {{ main }};
             else:
                 logger.info(f"Pulling latest changes: {repo_dir}")
                 process = await asyncio.create_subprocess_exec(
-                    "git", "-C", str(repo_dir), "pull",
+                    "git",
+                    "-C",
+                    str(repo_dir),
+                    "pull",
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
@@ -872,7 +875,11 @@ module.exports = {{ main }};
             # Checkout specific commit if requested
             if request.commit_hash:
                 process = await asyncio.create_subprocess_exec(
-                    "git", "-C", str(repo_dir), "checkout", request.commit_hash,
+                    "git",
+                    "-C",
+                    str(repo_dir),
+                    "checkout",
+                    request.commit_hash,
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
@@ -886,16 +893,18 @@ module.exports = {{ main }};
                 if ".git" in str(file_path):
                     continue
 
-                with open(file_path, 'r') as f:
+                with open(file_path, "r") as f:
                     content = f.read()
-                    lines = len(content.split('\n'))
+                    lines = len(content.split("\n"))
                     total_lines += lines
 
-                    files_recovered.append({
-                        "path": str(file_path.relative_to(repo_dir)),
-                        "content": content,
-                        "lines": lines,
-                    })
+                    files_recovered.append(
+                        {
+                            "path": str(file_path.relative_to(repo_dir)),
+                            "content": content,
+                            "lines": lines,
+                        }
+                    )
 
             return CodeRecoveryResult(
                 request_id=request.request_id,
@@ -911,9 +920,7 @@ module.exports = {{ main }};
             logger.error(f"Git recovery failed: {e}")
             raise
 
-    async def _recover_from_backup(
-        self, request: CodeRecoveryRequest
-    ) -> CodeRecoveryResult:
+    async def _recover_from_backup(self, request: CodeRecoveryRequest) -> CodeRecoveryResult:
         """
         Attempt to recover repository files from a backup source.
 
@@ -930,9 +937,7 @@ module.exports = {{ main }};
             error="Backup recovery not yet implemented",
         )
 
-    async def scrape_website(
-        self, request: WebScrapingRequest
-    ) -> WebScrapingResult:
+    async def scrape_website(self, request: WebScrapingRequest) -> WebScrapingResult:
         """
         Scrapes a website according to the provided WebScrapingRequest and returns structured extraction, metrics, and insights.
 
@@ -1008,15 +1013,11 @@ module.exports = {{ main }};
                 "scraping_count": self.scraping_count,
             },
             "ai_clients": {
-                model: {"available": config.get("available", False)}
-                for model, config in self.ai_clients.items()
+                model: {"available": config.get("available", False)} for model, config in self.ai_clients.items()
             },
             "workspace_directory": str(self.workspace_dir),
             "recovery_directory": str(self.recovery_dir),
-            "quality_thresholds": {
-                metric.value: threshold
-                for metric, threshold in self.quality_thresholds.items()
-            },
+            "quality_thresholds": {metric.value: threshold for metric, threshold in self.quality_thresholds.items()},
         }
 
 

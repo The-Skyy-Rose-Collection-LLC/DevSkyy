@@ -9,7 +9,7 @@ Truth Protocol: Validated category IDs, explicit error handling, no placeholders
 """
 
 import logging
-from typing import Any, Optional
+from typing import Any
 
 import anthropic
 from openai import OpenAI
@@ -38,8 +38,8 @@ class CategorizationResult(BaseModel):
     assigned_category_id: int
     assigned_category_name: str
     confidence: float = Field(ge=0.0, le=1.0)
-    reasoning: Optional[str] = None
-    error: Optional[str] = None
+    reasoning: str | None = None
+    error: str | None = None
 
 
 class WordPressCategorizationService:
@@ -131,12 +131,12 @@ class WordPressCategorizationService:
 
     def __init__(
         self,
-        anthropic_api_key: Optional[str] = None,
-        openai_api_key: Optional[str] = None,
-        categories: Optional[list[CategoryMapping]] = None,
+        anthropic_api_key: str | None = None,
+        openai_api_key: str | None = None,
+        categories: list[CategoryMapping] | None = None,
         default_category_id: int = 13,
         use_mcp: bool = True,
-        mcp_client: Optional[MCPToolClient] = None,
+        mcp_client: MCPToolClient | None = None,
     ):
         """
         Initialize categorization service
@@ -174,9 +174,7 @@ class WordPressCategorizationService:
         self.categories = categories or self.DEFAULT_CATEGORIES
         self.default_category_id = default_category_id
 
-        logger.info(
-            f"WordPressCategorizationService initialized with {len(self.categories)} categories"
-        )
+        logger.info(f"WordPressCategorizationService initialized with {len(self.categories)} categories")
 
     def _build_categorization_prompt(self, post_title: str) -> str:
         """
@@ -190,9 +188,7 @@ class WordPressCategorizationService:
         """
         category_list = []
         for cat in self.categories:
-            category_list.append(
-                f"{cat.category_id} = {cat.category_name} - {cat.description}"
-            )
+            category_list.append(f"{cat.category_id} = {cat.category_name} - {cat.description}")
 
         prompt = f"""You are an expert content strategist and taxonomy specialist with extensive experience in blog categorization and content organization.
 
@@ -215,9 +211,7 @@ Output only valid JSON."""
 
         return prompt
 
-    async def categorize_with_anthropic(
-        self, post_title: str
-    ) -> dict[str, Any]:
+    async def categorize_with_anthropic(self, post_title: str) -> dict[str, Any]:
         """
         Categorize post using Anthropic Claude
 
@@ -258,9 +252,7 @@ Output only valid JSON."""
             # Validate category_id
             category_id = result.get("category_id")
             if category_id not in [c.category_id for c in self.categories]:
-                logger.warning(
-                    f"Invalid category ID {category_id} returned, using default"
-                )
+                logger.warning(f"Invalid category ID {category_id} returned, using default")
                 category_id = self.default_category_id
                 result["category_id"] = category_id
                 result["confidence"] = 0.5
@@ -307,9 +299,7 @@ Output only valid JSON."""
             # Validate category_id
             category_id = result.get("category_id")
             if category_id not in [c.category_id for c in self.categories]:
-                logger.warning(
-                    f"Invalid category ID {category_id} returned, using default"
-                )
+                logger.warning(f"Invalid category ID {category_id} returned, using default")
                 category_id = self.default_category_id
                 result["category_id"] = category_id
                 result["confidence"] = 0.5
@@ -341,9 +331,7 @@ Output only valid JSON."""
         best_score = 0
 
         for category in self.categories:
-            score = sum(
-                1 for keyword in category.keywords if keyword.lower() in title_lower
-            )
+            score = sum(1 for keyword in category.keywords if keyword.lower() in title_lower)
 
             if score > best_score:
                 best_score = score
@@ -412,9 +400,7 @@ Output only valid JSON."""
             logger.error(f"❌ MCP categorization failed: {e}")
             raise
 
-    async def categorize_post(
-        self, post_id: int, post_title: str, use_ai: bool = True
-    ) -> CategorizationResult:
+    async def categorize_post(self, post_id: int, post_title: str, use_ai: bool = True) -> CategorizationResult:
         """
         Categorize a single WordPress post
 
@@ -512,13 +498,11 @@ Output only valid JSON."""
             results.append(result)
 
         success_count = len([r for r in results if not r.error])
-        logger.info(
-            f"Batch categorization complete: {success_count}/{len(results)} successful"
-        )
+        logger.info(f"Batch categorization complete: {success_count}/{len(results)} successful")
 
         return results
 
-    def get_category_by_id(self, category_id: int) -> Optional[CategoryMapping]:
+    def get_category_by_id(self, category_id: int) -> CategoryMapping | None:
         """Get category mapping by ID"""
         return next((c for c in self.categories if c.category_id == category_id), None)
 

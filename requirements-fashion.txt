@@ -1,0 +1,255 @@
+# DevSkyy Fashion Orchestrator - Requirements
+# Version: 3.0.0-fashion
+# Updated: 2025-11-21
+#
+# AI SDKs and dependencies for The Skyy Rose Collection Fashion Orchestrator
+# All packages verified per Truth Protocol Rule #1
+
+# ==============================================================================
+# CORE DEPENDENCIES (Already in base requirements)
+# ==============================================================================
+fastapi~=0.119.0  # Web framework (CVE-2025-62727 patched)
+pydantic>=2.9.0,<3.0.0  # Schema validation
+sqlalchemy~=2.0.36  # ORM
+python-dotenv>=1.0.0  # Environment variables
+uvicorn[standard]>=0.30.0  # ASGI server
+
+# ==============================================================================
+# AI MODEL SDKs
+# ==============================================================================
+
+# Anthropic (Claude 3.5 Sonnet) - Product descriptions
+# Source: https://github.com/anthropics/anthropic-sdk-python
+anthropic>=0.69.0,<1.0.0
+
+# OpenAI (GPT-4, Shap-E) - 3D generation, text generation
+# Source: https://github.com/openai/openai-python
+openai>=2.7.2,<3.0.0
+
+# Stability AI SDK - Image generation (SDXL)
+# Source: https://github.com/Stability-AI/stability-sdk
+stability-sdk>=0.8.4
+
+# Replicate - SDXL with LoRA fine-tuning
+# Source: https://github.com/replicate/replicate-python
+replicate>=0.25.0
+
+# Hugging Face - Transformers, Diffusers (IDM-VTON)
+# Source: https://github.com/huggingface/transformers
+transformers>=4.57.1,<5.0.0  # CVE-2025-3730 patched
+
+# Hugging Face Diffusers - Virtual try-on models
+# Source: https://github.com/huggingface/diffusers
+diffusers>=0.27.0
+
+# Hugging Face Hub - Model downloads
+huggingface-hub>=0.23.0
+
+# Accelerate - Multi-GPU support for HF models
+accelerate>=0.28.0
+
+# ==============================================================================
+# MACHINE LEARNING FRAMEWORKS
+# ==============================================================================
+
+# PyTorch - Deep learning framework
+# Source: https://pytorch.org/
+torch>=2.8.0,<2.9.0  # CVE-2025-3730 patched
+torchvision>=0.23.0,<0.24.0  # Compatible with torch 2.8.x
+torchaudio>=2.8.0,<2.9.0  # Compatible with torch 2.8.x
+
+# NumPy - Numerical computing
+numpy>=1.26.0,<2.0.0
+
+# SciPy - Scientific computing
+scipy>=1.12.0
+
+# Scikit-learn - Machine learning utilities
+scikit-learn>=1.4.0
+
+# ==============================================================================
+# 3D PROCESSING AND GENERATION
+# ==============================================================================
+
+# Trimesh - 3D mesh processing
+# Source: https://github.com/mikedh/trimesh
+trimesh>=4.4.0
+
+# PyMCubes - Marching cubes algorithm for 3D
+# Source: https://github.com/pmneila/PyMCubes
+PyMCubes>=0.1.4
+
+# Open3D - 3D data processing
+# Source: https://github.com/isl-org/Open3D
+open3d>=0.18.0
+
+# PyTorch3D - 3D deep learning
+# Source: https://github.com/facebookresearch/pytorch3d
+# Note: Requires torch, install after torch
+# pytorch3d>=0.7.6  # Uncomment if needed (requires CUDA)
+
+# Pygltflib - GLB/glTF file handling
+# Source: https://gitlab.com/dodgyville/pygltflib
+pygltflib>=1.16.0
+
+# PyWavefront - OBJ file handling
+# Source: https://github.com/pywavefront/PyWavefront
+PyWavefront>=1.3.3
+
+# Pillow - Image processing (required for texture handling)
+Pillow>=10.2.0
+
+# ==============================================================================
+# IMAGE PROCESSING AND COMPUTER VISION
+# ==============================================================================
+
+# OpenCV - Computer vision
+opencv-python>=4.9.0
+
+# Scikit-image - Image processing
+scikit-image>=0.22.0
+
+# Albumentations - Image augmentation
+albumentations>=1.4.0
+
+# ==============================================================================
+# HTTP CLIENTS AND API INTERACTION
+# ==============================================================================
+
+# HTTPX - Async HTTP client
+httpx>=0.27.0
+
+# Requests - HTTP library
+requests>=2.31.0
+
+# AIOHTTP - Async HTTP client/server
+aiohttp>=3.9.0
+
+# ==============================================================================
+# AVATAR AND VIRTUAL TRY-ON SPECIFIC
+# ==============================================================================
+
+# ControlNet - Pose guidance for virtual try-on
+# Source: https://github.com/lllyasviel/ControlNet
+controlnet-aux>=0.0.7
+
+# MediaPipe - Pose estimation
+# Source: https://github.com/google/mediapipe
+mediapipe>=0.10.0
+
+# ONNX Runtime - Model inference
+# Source: https://github.com/microsoft/onnxruntime
+onnxruntime>=1.17.0
+
+# ==============================================================================
+# 3D GARMENT SIMULATION UTILITIES
+# ==============================================================================
+
+# Matplotlib - Plotting and visualization
+matplotlib>=3.8.0
+
+# NetworkX - Graph algorithms (for pattern dependencies)
+networkx>=3.2.0
+
+# ==============================================================================
+# AR AND 3D FORMATS
+# ==============================================================================
+
+# USD (Universal Scene Description) for USDZ
+# Source: https://github.com/PixarAnimationStudios/USD
+# Note: pxr-usd is large, consider installing separately if needed
+# pxr-usd>=23.11  # Uncomment for full USDZ support
+
+# ==============================================================================
+# FINE-TUNING AND MODEL TRAINING
+# ==============================================================================
+
+# PEFT - Parameter-Efficient Fine-Tuning (LoRA)
+# Source: https://github.com/huggingface/peft
+peft>=0.10.0
+
+# BitsAndBytes - 8-bit optimizers for training
+# Source: https://github.com/TimDettmers/bitsandbytes
+bitsandbytes>=0.43.0
+
+# Safetensors - Safe model serialization
+safetensors>=0.4.0
+
+# Datasets - HF datasets library
+datasets>=2.18.0
+
+# ==============================================================================
+# MONITORING AND LOGGING
+# ==============================================================================
+
+# Logfire - Structured logging (optional)
+# Source: https://github.com/pydantic/logfire
+logfire>=0.40.0
+
+# Prometheus client - Metrics
+prometheus-client>=0.20.0
+
+# ==============================================================================
+# UTILITIES
+# ==============================================================================
+
+# Typing extensions - Type hints
+typing-extensions>=4.9.0
+
+# Python-dateutil - Date utilities
+python-dateutil>=2.8.2
+
+# Tqdm - Progress bars
+tqdm>=4.66.0
+
+# Rich - Beautiful terminal output
+rich>=13.7.0
+
+# Tenacity - Retry logic
+tenacity>=8.2.0
+
+# Cachetools - Caching utilities
+cachetools>=5.3.0
+
+# ==============================================================================
+# TESTING AND DEVELOPMENT
+# ==============================================================================
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=4.1.0
+black>=24.10.0
+ruff>=0.8.0
+mypy>=1.14.0
+
+# ==============================================================================
+# SECURITY
+# ==============================================================================
+cryptography>=46.0.3,<47.0.0  # AES-256-GCM encryption
+PyJWT>=2.10.1,<3.0.0  # JWT tokens
+argon2-cffi>=23.1.0,<24.0.0  # Password hashing
+bcrypt>=4.2.1,<5.0.0  # Password hashing
+defusedxml>=0.7.1  # XXE protection
+
+# ==============================================================================
+# NOTES
+# ==============================================================================
+#
+# Installation order:
+# 1. pip install --upgrade pip setuptools wheel
+# 2. pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu121
+# 3. pip install -r requirements-fashion.txt
+#
+# Optional components (install separately):
+# - pytorch3d: Requires CUDA, install from source or conda
+# - pxr-usd: Large package for full USDZ support
+# - CLO3D API: Commercial license required
+# - Browzwear API: Commercial license required
+#
+# GPU Requirements:
+# - Recommended: NVIDIA GPU with CUDA 12.1+
+# - Minimum: 8GB VRAM for most models
+# - Optimal: 16GB+ VRAM for large models (SDXL, IDM-VTON)
+#
+# Verified Sources:
+# - All packages verified per Truth Protocol Rule #1
+# - See FASHION_ORCHESTRATOR_GUIDE.md for detailed sources

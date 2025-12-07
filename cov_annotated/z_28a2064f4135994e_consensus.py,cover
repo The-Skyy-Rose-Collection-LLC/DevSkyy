@@ -1,0 +1,545 @@
+> """
+> Consensus Workflow API Endpoints
+  
+> WHY: Provide REST API for Pyragory-style multi-agent consensus workflows
+> HOW: Orchestrate reviewer agents, consensus voting, and human approval webhooks
+> IMPACT: Higher quality content through AI peer review and human oversight
+  
+> Truth Protocol: Input validation, error handling, audit trails, webhook security
+> """
+  
+! from datetime import datetime
+! import logging
+! import os
+! from typing import Optional
+  
+! from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
+! from fastapi.responses import HTMLResponse
+! from pydantic import BaseModel, Field
+  
+! from agent.wordpress.content_generator import ContentGenerator
+! from services.consensus_orchestrator import (
+!     ConsensusOrchestrator,
+!     HumanDecision,
+! )
+  
+  
+! logger = logging.getLogger(__name__)
+! router = APIRouter(prefix="/consensus", tags=["Consensus Workflow"])
+  
+  
+! class StartWorkflowRequest(BaseModel):
+!     """Request to start consensus workflow"""
+  
+!     topic: str = Field(..., min_length=1, max_length=200, description="Content topic")
+!     keywords: list[str] = Field(default_factory=list, description="SEO keywords")
+!     tone: str = Field(default="professional", description="Writing tone")
+!     length: int = Field(default=800, ge=200, le=3000, description="Target word count")
+!     human_reviewer_email: str = Field(..., description="Email for human approval notification")
+  
+  
+! class WorkflowStatusResponse(BaseModel):
+!     """Workflow status response"""
+  
+!     workflow_id: str
+!     topic: str
+!     iteration_count: int
+!     current_version: int
+!     total_reviews: int
+!     human_decision: str
+!     ready_for_approval: bool
+!     approval_urls: Optional[dict] = None
+!     current_draft: dict
+!     review_summary: dict
+  
+  
+! class HumanDecisionResponse(BaseModel):
+!     """Human decision response"""
+  
+!     success: bool
+!     message: str
+!     workflow_id: str
+!     decision: str
+!     next_action: Optional[str] = None
+  
+  
+  # Global orchestrator instance (in production, use dependency injection)
+! _orchestrator_instance = None
+  
+  
+! def get_orchestrator() -> ConsensusOrchestrator:
+!     """Get or create consensus orchestrator instance"""
+!     global _orchestrator_instance
+  
+!     if _orchestrator_instance is None:
+!         anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+!         if not anthropic_api_key:
+!             raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY not configured")
+  
+!         content_generator = ContentGenerator(api_key=anthropic_api_key)
+  
+!         brand_config = {
+!             "name": os.getenv("BRAND_NAME", "Skyy Rose"),
+!             "brand_keywords": ["luxury", "premium", "exclusive", "elegance"],
+!             "values": ["luxury", "quality", "innovation", "exclusivity"],
+!         }
+  
+!         _orchestrator_instance = ConsensusOrchestrator(content_generator=content_generator, brand_config=brand_config)
+  
+!     return _orchestrator_instance
+  
+  
+! async def send_approval_email(email: str, workflow_id: str, approval_urls: dict, draft_preview: dict):
+!     """
+!     Send human approval email with webhook links
+  
+!     Args:
+!         email: Reviewer email address
+!         workflow_id: Workflow ID
+!         approval_urls: Approval/rejection URLs
+!         draft_preview: Draft preview data
+!     """
+!     try:
+          # In production, use SendGrid, AWS SES, or similar
+          # For now, log the email content
+  
+!         email_subject = f"Content Review Required: {draft_preview.get('title', 'Untitled')}"
+  
+!         f"""
+! <html>
+! <head>
+!     <style>
+!         body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+!         .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+!         .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+!                    color: white; padding: 30px; text-align: center; border-radius: 10px; }}
+!         .content {{ background: #f9f9f9; padding: 30px; margin-top: 20px; border-radius: 10px; }}
+!         .draft-preview {{ background: white; padding: 20px; margin: 20px 0;
+!                          border-left: 4px solid #667eea; }}
+!         .review-summary {{ background: #fff3cd; padding: 15px; margin: 20px 0;
+!                           border-radius: 5px; border: 1px solid #ffc107; }}
+!         .button {{ display: inline-block; padding: 15px 30px; margin: 10px 5px;
+!                   text-decoration: none; border-radius: 5px; font-weight: bold; }}
+!         .approve {{ background: #28a745; color: white; }}
+!         .reject {{ background: #dc3545; color: white; }}
+!         .approve:hover {{ background: #218838; }}
+!         .reject:hover {{ background: #c82333; }}
+!         .actions {{ text-align: center; margin: 30px 0; }}
+!         .footer {{ text-align: center; color: #666; font-size: 12px; margin-top: 30px; }}
+!     </style>
+! </head>
+! <body>
+!     <div class="container">
+!         <div class="header">
+!             <h1>🤖 Content Review Required</h1>
+!             <p>AI agents have completed their consensus review</p>
+!         </div>
+  
+!         <div class="content">
+!             <h2>Content Ready for Your Approval</h2>
+!             <p>The AI review process has completed. Your approval is needed to publish this content.</p>
+  
+!             <div class="draft-preview">
+!                 <h3>{draft_preview.get('title', 'Untitled')}</h3>
+!                 <p><strong>Word Count:</strong> {draft_preview.get('word_count', 0)}</p>
+!                 <p><strong>Meta Description:</strong> {draft_preview.get('meta_description', 'N/A')}</p>
+!                 <p><strong>Version:</strong> {draft_preview.get('version', 1)}</p>
+!             </div>
+  
+!             <div class="review-summary">
+!                 <h4>📊 AI Review Summary</h4>
+!                 <p><strong>Total Iterations:</strong> {draft_preview.get('iterations', 1)}</p>
+!                 <p><strong>Reviewer Consensus:</strong> Content meets quality standards</p>
+!                 <p><em>All AI agents have approved this content for publication</em></p>
+!             </div>
+  
+!             <div class="actions">
+!                 <p><strong>Please review and make your decision:</strong></p>
+!                 <a href="{approval_urls['approve_url']}" class="button approve">
+!                     ✅ Approve & Publish
+!                 </a>
+!                 <a href="{approval_urls['reject_url']}" class="button reject">
+!                     ❌ Reject
+!                 </a>
+!             </div>
+  
+!             <p><small><strong>⏰ This approval request expires in 1 hour</strong></small></p>
+!         </div>
+  
+!         <div class="footer">
+!             <p>Workflow ID: {workflow_id}</p>
+!             <p>Powered by DevSkyy Consensus Orchestrator</p>
+!         </div>
+!     </div>
+! </body>
+! </html>
+!         """
+  
+!         logger.info(
+!             f"Approval email prepared for {email} (workflow: {workflow_id})",
+!             extra={
+!                 "email": email,
+!                 "workflow_id": workflow_id,
+!                 "subject": email_subject,
+!             },
+!         )
+  
+          # In production, actually send the email:
+          # await email_service.send_email(to=email, subject=email_subject, html=email_body)
+  
+          # For now, log the approval URLs
+!         logger.info(
+!             f"Approval URLs:\n  Approve: {approval_urls['approve_url']}\n  Reject: {approval_urls['reject_url']}"
+!         )
+  
+!     except Exception:
+!         logger.exception(f"Failed to send approval email to {email}")
+  
+  
+! @router.post("/workflow", response_model=dict)
+! async def start_consensus_workflow(
+!     request: StartWorkflowRequest,
+!     background_tasks: BackgroundTasks,
+!     orchestrator: ConsensusOrchestrator = None,
+! ):
+!     """
+!     Start a consensus-based content review workflow
+  
+!     This endpoint implements the complete Pyragory-style workflow:
+!     1. Generate initial content draft
+!     2. Three AI agents review independently:
+!        - Brand Intelligence Agent (brand consistency)
+!        - SEO Marketing Agent (SEO & marketing)
+!        - Security & Compliance Agent (safety & compliance)
+!     3. Consensus vote: 2+ major issues = automatic redraft (max 2 iterations)
+!     4. Human approval via email webhook (1 hour timeout)
+!     5. Publish or reject based on human decision
+  
+!     Example request:
+!     ```json
+!     {
+!       "topic": "Luxury Fashion Trends 2025",
+!       "keywords": ["luxury fashion", "trends", "2025"],
+!       "tone": "luxury",
+!       "length": 1000,
+!       "human_reviewer_email": "editor@skyy-rose.com"
+!     }
+!     ```
+!     """
+!     try:
+!         if orchestrator is None:
+!             orchestrator = get_orchestrator()
+  
+!         logger.info(
+!             f"Starting consensus workflow: {request.topic}",
+!             extra={"topic": request.topic, "reviewer": request.human_reviewer_email},
+!         )
+  
+          # Execute consensus workflow
+!         workflow = await orchestrator.execute_consensus_workflow(
+!             topic=request.topic,
+!             keywords=request.keywords,
+!             tone=request.tone,
+!             length=request.length,
+!         )
+  
+          # Get approval URLs
+!         base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
+!         approval_urls = orchestrator.get_approval_urls(workflow.workflow_id, base_url)
+  
+          # Send approval email in background
+!         draft_preview = {
+!             "title": workflow.current_draft.title,
+!             "word_count": workflow.current_draft.word_count,
+!             "meta_description": workflow.current_draft.meta_description,
+!             "version": workflow.current_draft.version,
+!             "iterations": workflow.iteration_count,
+!         }
+  
+!         background_tasks.add_task(
+!             send_approval_email,
+!             request.human_reviewer_email,
+!             workflow.workflow_id,
+!             approval_urls,
+!             draft_preview,
+!         )
+  
+          # Get latest review summary
+!         latest_review = workflow.review_history[-1] if workflow.review_history else None
+!         review_summary = {}
+!         if latest_review:
+!             review_summary = {
+!                 "total_reviewers": latest_review.total_reviewers,
+!                 "approved": latest_review.approved_count,
+!                 "minor_issues": latest_review.minor_issue_count,
+!                 "major_issues": latest_review.major_issue_count,
+!                 "required_redraft": latest_review.requires_redraft,
+!             }
+  
+!         return {
+!             "success": True,
+!             "message": "Consensus workflow started - approval email sent",
+!             "workflow_id": workflow.workflow_id,
+!             "topic": workflow.topic,
+!             "iterations": workflow.iteration_count,
+!             "current_version": workflow.current_draft.version,
+!             "approval_urls": approval_urls,
+!             "review_summary": review_summary,
+!             "expires_at": workflow.webhook_expires_at.isoformat(),
+!         }
+  
+!     except Exception as e:
+!         logger.exception("Failed to start consensus workflow")
+!         raise HTTPException(status_code=500, detail=f"Workflow failed: {e!s}")
+  
+  
+! @router.get("/workflow/{workflow_id}", response_model=WorkflowStatusResponse)
+! async def get_workflow_status(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
+!     """
+!     Get consensus workflow status
+  
+!     Returns current state, all review iterations, and human decision status
+!     """
+!     try:
+!         if orchestrator is None:
+!             orchestrator = get_orchestrator()
+  
+!         workflow = orchestrator.get_workflow(workflow_id)
+!         if not workflow:
+!             raise HTTPException(status_code=404, detail="Workflow not found")
+  
+          # Prepare review summary
+!         review_summary = {}
+!         if workflow.review_history:
+!             latest_review = workflow.review_history[-1]
+!             review_summary = {
+!                 "total_reviewers": latest_review.total_reviewers,
+!                 "approved": latest_review.approved_count,
+!                 "minor_issues": latest_review.minor_issue_count,
+!                 "major_issues": latest_review.major_issue_count,
+!                 "consensus_feedback": latest_review.consensus_feedback,
+!                 "individual_reviews": [
+!                     {
+!                         "agent": r.agent_name,
+!                         "decision": r.decision.value,
+!                         "confidence": r.confidence,
+!                         "feedback": r.feedback,
+!                         "issues": r.issues_found,
+!                         "suggestions": r.suggestions,
+!                     }
+!                     for r in latest_review.reviews
+!                 ],
+!             }
+  
+          # Get approval URLs if still pending
+!         approval_urls = None
+!         if workflow.human_decision == HumanDecision.PENDING:
+!             base_url = os.getenv("API_BASE_URL", "http://localhost:8000")
+!             approval_urls = orchestrator.get_approval_urls(workflow.workflow_id, base_url)
+  
+!         return WorkflowStatusResponse(
+!             workflow_id=workflow.workflow_id,
+!             topic=workflow.topic,
+!             iteration_count=workflow.iteration_count,
+!             current_version=workflow.current_draft.version,
+!             total_reviews=len(workflow.review_history),
+!             human_decision=workflow.human_decision.value,
+!             ready_for_approval=workflow.human_decision == HumanDecision.PENDING,
+!             approval_urls=approval_urls,
+!             current_draft={
+!                 "title": workflow.current_draft.title,
+!                 "content": workflow.current_draft.content,
+!                 "meta_description": workflow.current_draft.meta_description,
+!                 "word_count": workflow.current_draft.word_count,
+!                 "keywords": workflow.current_draft.keywords,
+!                 "version": workflow.current_draft.version,
+!             },
+!             review_summary=review_summary,
+!         )
+  
+!     except HTTPException:
+!         raise
+!     except Exception as e:
+!         logger.exception(f"Failed to get workflow status: {workflow_id}")
+!         raise HTTPException(status_code=500, detail=str(e))
+  
+  
+! @router.get("/approve/{workflow_id}", response_class=HTMLResponse)
+! async def approve_content(
+!     workflow_id: str,
+!     token: str = Query(..., description="Approval token"),
+!     feedback: Optional[str] = Query(None, description="Optional feedback"),
+!     orchestrator: ConsensusOrchestrator = None,
+! ):
+!     """
+!     Human approval webhook endpoint
+  
+!     Called when human clicks "Approve" link in email
+!     """
+!     try:
+!         if orchestrator is None:
+!             orchestrator = get_orchestrator()
+  
+!         logger.info(f"Approval received for workflow: {workflow_id}")
+  
+!         workflow = await orchestrator.submit_human_decision(
+!             workflow_id=workflow_id, decision_token=token, feedback=feedback
+!         )
+  
+          # Return success HTML page
+!         return f"""
+!         <html>
+!         <head>
+!             <title>Content Approved</title>
+!             <style>
+!                 body {{ font-family: Arial, sans-serif; display: flex; justify-content: center;
+!                        align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }}
+!                 .container {{ background: white; padding: 50px; border-radius: 20px; text-align: center;
+!                              box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; }}
+!                 .icon {{ font-size: 80px; margin-bottom: 20px; }}
+!                 h1 {{ color: #28a745; margin-bottom: 10px; }}
+!                 p {{ color: #666; line-height: 1.6; }}
+!                 .workflow-id {{ background: #f0f0f0; padding: 10px; border-radius: 5px;
+!                                font-family: monospace; margin-top: 20px; }}
+!             </style>
+!         </head>
+!         <body>
+!             <div class="container">
+!                 <div class="icon">✅</div>
+!                 <h1>Content Approved!</h1>
+!                 <p>Thank you for your review. The content has been approved for publication.</p>
+!                 <p><strong>Topic:</strong> {workflow.topic}</p>
+!                 <p><strong>Final Version:</strong> {workflow.current_draft.version}</p>
+!                 <div class="workflow-id">
+!                     <small>Workflow ID: {workflow_id}</small>
+!                 </div>
+!                 <p><small>This window can be closed.</small></p>
+!             </div>
+!         </body>
+!         </html>
+!         """
+  
+!     except ValueError:
+!         logger.error(f"Invalid approval token for workflow {workflow_id}")
+!         raise HTTPException(status_code=403, detail="Invalid approval token")
+!     except Exception as e:
+!         logger.exception(f"Failed to process approval: {workflow_id}")
+!         raise HTTPException(status_code=500, detail=str(e))
+  
+  
+! @router.get("/reject/{workflow_id}", response_class=HTMLResponse)
+! async def reject_content(
+!     workflow_id: str,
+!     token: str = Query(..., description="Rejection token"),
+!     feedback: Optional[str] = Query(None, description="Rejection reason"),
+!     orchestrator: ConsensusOrchestrator = None,
+! ):
+!     """
+!     Human rejection webhook endpoint
+  
+!     Called when human clicks "Reject" link in email
+!     """
+!     try:
+!         if orchestrator is None:
+!             orchestrator = get_orchestrator()
+  
+!         logger.info(f"Rejection received for workflow: {workflow_id}")
+  
+!         workflow = await orchestrator.submit_human_decision(
+!             workflow_id=workflow_id, decision_token=token, feedback=feedback
+!         )
+  
+          # Return rejection HTML page
+!         return f"""
+!         <html>
+!         <head>
+!             <title>Content Rejected</title>
+!             <style>
+!                 body {{ font-family: Arial, sans-serif; display: flex; justify-content: center;
+!                        align-items: center; height: 100vh; margin: 0; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }}
+!                 .container {{ background: white; padding: 50px; border-radius: 20px; text-align: center;
+!                              box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 500px; }}
+!                 .icon {{ font-size: 80px; margin-bottom: 20px; }}
+!                 h1 {{ color: #dc3545; margin-bottom: 10px; }}
+!                 p {{ color: #666; line-height: 1.6; }}
+!                 .workflow-id {{ background: #f0f0f0; padding: 10px; border-radius: 5px;
+!                                font-family: monospace; margin-top: 20px; }}
+!             </style>
+!         </head>
+!         <body>
+!             <div class="container">
+!                 <div class="icon">❌</div>
+!                 <h1>Content Rejected</h1>
+!                 <p>The content has been rejected and will not be published.</p>
+!                 <p><strong>Topic:</strong> {workflow.topic}</p>
+!                 <p><strong>Version:</strong> {workflow.current_draft.version}</p>
+!                 {f'<p><strong>Reason:</strong> {feedback}</p>' if feedback else ''}
+!                 <div class="workflow-id">
+!                     <small>Workflow ID: {workflow_id}</small>
+!                 </div>
+!                 <p><small>This window can be closed.</small></p>
+!             </div>
+!         </body>
+!         </html>
+!         """
+  
+!     except ValueError:
+!         logger.error(f"Invalid rejection token for workflow {workflow_id}")
+!         raise HTTPException(status_code=403, detail="Invalid rejection token")
+!     except Exception as e:
+!         logger.exception(f"Failed to process rejection: {workflow_id}")
+!         raise HTTPException(status_code=500, detail=str(e))
+  
+  
+! @router.post("/publish/{workflow_id}", response_model=dict)
+! async def publish_approved_content(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
+!     """
+!     Publish approved content to WordPress
+  
+!     Can only publish if human has approved the content
+!     """
+!     try:
+!         if orchestrator is None:
+!             orchestrator = get_orchestrator()
+  
+!         workflow = orchestrator.get_workflow(workflow_id)
+!         if not workflow:
+!             raise HTTPException(status_code=404, detail="Workflow not found")
+  
+!         if workflow.human_decision != HumanDecision.APPROVED:
+!             raise HTTPException(
+!                 status_code=400,
+!                 detail=f"Content not approved for publication (status: {workflow.human_decision.value})",
+!             )
+  
+!         logger.info(f"Publishing approved content: {workflow_id}")
+  
+          # TODO: Integrate with WordPress publishing service
+          # For now, return success with content data
+  
+!         return {
+!             "success": True,
+!             "message": "Content published successfully",
+!             "workflow_id": workflow_id,
+!             "title": workflow.current_draft.title,
+!             "word_count": workflow.current_draft.word_count,
+!             "final_version": workflow.current_draft.version,
+!             "iterations": workflow.iteration_count,
+!             "wordpress_url": f"https://skyy-rose.com/blog/{workflow.current_draft.title.lower().replace(' ', '-')}",
+!         }
+  
+!     except HTTPException:
+!         raise
+!     except Exception as e:
+!         logger.exception(f"Failed to publish content: {workflow_id}")
+!         raise HTTPException(status_code=500, detail=str(e))
+  
+  
+! @router.get("/health")
+! async def health_check():
+!     """Health check endpoint"""
+!     return {
+!         "status": "healthy",
+!         "service": "Consensus Workflow",
+!         "timestamp": datetime.utcnow().isoformat(),
+!     }

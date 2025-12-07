@@ -11,6 +11,7 @@ Reference: AGENTS.md Line 1559-1563
 
 logger = logging.getLogger(__name__)
 
+
 class NLPEngine:
     """NLP capabilities for text processing and analysis"""
 

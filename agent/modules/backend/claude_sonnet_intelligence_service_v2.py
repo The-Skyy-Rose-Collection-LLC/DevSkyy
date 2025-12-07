@@ -20,7 +20,7 @@ import hashlib
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import Anthropic, AsyncAnthropic
 
@@ -120,7 +120,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
     async def advanced_reasoning(
         self,
         task: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
         max_tokens: int = 4096,
         use_cache: bool = True,
     ) -> dict[str, Any]:
@@ -183,9 +183,7 @@ class ClaudeSonnetIntelligenceServiceV2(BaseAgent):
             # Track token usage and costs
             tokens_used = response.usage.input_tokens + response.usage.output_tokens
             self.total_tokens_used += tokens_used
-            cost = self._calculate_cost(
-                response.usage.input_tokens, response.usage.output_tokens
-            )
+            cost = self._calculate_cost(response.usage.input_tokens, response.usage.output_tokens)
             self.total_api_cost += cost
 
             # Assess response quality
@@ -279,9 +277,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             # Track usage
             tokens_used = response.usage.input_tokens + response.usage.output_tokens
             self.total_tokens_used += tokens_used
-            cost = self._calculate_cost(
-                response.usage.input_tokens, response.usage.output_tokens
-            )
+            cost = self._calculate_cost(response.usage.input_tokens, response.usage.output_tokens)
             self.total_api_cost += cost
 
             # Assess quality
@@ -316,9 +312,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
     # === Helper Methods ===
 
-    def _check_cache(
-        self, key: str, context: Optional[dict] = None
-    ) -> Optional[dict[str, Any]]:
+    def _check_cache(self, key: str, context: dict | None = None) -> dict[str, Any] | None:
         """Check if we have a cached response"""
         cache_key = self._generate_cache_key(key, context)
 
@@ -334,9 +328,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
 
         return None
 
-    def _cache_response(
-        self, key: str, context: Optional[dict], response: dict[str, Any]
-    ):
+    def _cache_response(self, key: str, context: dict | None, response: dict[str, Any]):
         """Cache a response for future use"""
         cache_key = self._generate_cache_key(key, context)
 
@@ -353,12 +345,12 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "cached_at": datetime.now(),
         }
 
-    def _generate_cache_key(self, key: str, context: Optional[dict]) -> str:
+    def _generate_cache_key(self, key: str, context: dict | None) -> str:
         """Generate a unique cache key"""
         if context:
             context_str = json.dumps(context, sort_keys=True)
-            return hashlib.md5(f"{key}:{context_str}".encode()).hexdigest()
-        return hashlib.md5(key.encode()).hexdigest()
+            return hashlib.md5(f"{key}:{context_str}".encode(), usedforsecurity=False).hexdigest()
+        return hashlib.md5(key.encode(), usedforsecurity=False).hexdigest()
 
     async def _rate_limit_check(self):
         """Check and enforce rate limiting"""
@@ -419,11 +411,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "therefore",
             "consequently",
         ]
-        quality_score = sum(
-            1
-            for indicator in quality_indicators
-            if indicator.lower() in response.lower()
-        )
+        quality_score = sum(1 for indicator in quality_indicators if indicator.lower() in response.lower())
         score += min(0.2, quality_score * 0.05)
 
         # Ensure score is between 0 and 1
@@ -448,8 +436,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
             "total_api_cost_usd": round(self.total_api_cost, 2),
             "average_quality_score": (
                 round(
-                    sum(self.response_quality_scores)
-                    / len(self.response_quality_scores),
+                    sum(self.response_quality_scores) / len(self.response_quality_scores),
                     2,
                 )
                 if self.response_quality_scores
@@ -465,9 +452,7 @@ Brand Voice: Sophisticated, aspirational, confident, exclusive, refined."""
         """Override to clear caches"""
         logger.info("Optimizing Claude service resources...")
         self.response_cache.clear()
-        self.response_quality_scores = self.response_quality_scores[
-            -100:
-        ]  # Keep recent scores
+        self.response_quality_scores = self.response_quality_scores[-100:]  # Keep recent scores
 
 
 # Factory function

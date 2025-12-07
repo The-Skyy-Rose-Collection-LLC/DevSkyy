@@ -12,7 +12,7 @@ Citation: GDPR Articles 15, 17, 5; Recital 83
 from datetime import UTC, datetime, timedelta
 from enum import Enum
 import logging
-from typing import Any, Optional
+from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter
@@ -27,16 +27,20 @@ router = APIRouter(prefix="/api/v1/gdpr", tags=["gdpr"])
 # ENUMS
 # ============================================================================
 
+
 class ConsentType(str, Enum):
     """Types of user consent"""
+
     MARKETING = "marketing"
     ANALYTICS = "analytics"
     PROFILING = "profiling"
     COOKIES = "cookies"
     DATA_PROCESSING = "data_processing"
 
+
 class DataCategory(str, Enum):
     """Categories of personal data"""
+
     PROFILE = "profile"  # Name, email, phone
     ACCOUNT = "account"  # Username, password hash, auth tokens
     BEHAVIORAL = "behavioral"  # Browsing history, interactions
@@ -44,30 +48,37 @@ class DataCategory(str, Enum):
     PREFERENCES = "preferences"  # Settings, language, theme
     GENERATED = "generated"  # ML insights, recommendations
 
+
 # ============================================================================
 # MODELS
 # ============================================================================
 
+
 class ConsentRecord(BaseModel):
     """GDPR consent record (Recital 83)"""
+
     consent_id: str
     user_id: str
     consent_type: ConsentType
     given: bool
     timestamp: datetime
-    expires_at: Optional[datetime] = None
+    expires_at: datetime | None = None
     ip_address: str
     user_agent: str
     metadata: dict[str, Any] = {}
 
+
 class DataExportRequest(BaseModel):
     """GDPR Article 15 - Right of Access"""
+
     user_id: str
     format: str = "json"  # json, csv, xml
     include_related: bool = True  # Include data from 3rd parties
 
+
 class DataExportResponse(BaseModel):
     """GDPR Data Export Response"""
+
     export_id: str
     user_id: str
     created_at: datetime
@@ -75,14 +86,18 @@ class DataExportResponse(BaseModel):
     download_url: str
     data: dict[str, Any]
 
+
 class DataDeletionRequest(BaseModel):
     """GDPR Article 17 - Right to Erasure"""
+
     user_id: str
     reason: str  # Reason for deletion
     include_backups: bool = False  # Delete from backups too
 
+
 class DataDeletionResponse(BaseModel):
     """GDPR Data Deletion Response"""
+
     deletion_id: str
     user_id: str
     status: str
@@ -90,22 +105,27 @@ class DataDeletionResponse(BaseModel):
     items_deleted: int
     note: str
 
+
 class RetentionPolicy(BaseModel):
     """Data retention policy"""
+
     data_category: DataCategory
     retention_days: int
     description: str
     legal_basis: str
 
+
 class AuditLog(BaseModel):
     """GDPR audit log entry"""
+
     log_id: str
     user_id: str
     action: str  # "export", "delete", "consent_update", "data_access"
     timestamp: datetime
-    actor_id: Optional[str] = None  # Admin who performed action
+    actor_id: str | None = None  # Admin who performed action
     ip_address: str
     details: dict[str, Any] = {}
+
 
 # ============================================================================
 # DATA RETENTION POLICIES (GDPR Article 5.1(e))
@@ -116,43 +136,44 @@ RETENTION_POLICIES = {
         data_category=DataCategory.PROFILE,
         retention_days=2555,  # Until account deletion
         description="User profile data (name, email, phone)",
-        legal_basis="Necessary for contract performance"
+        legal_basis="Necessary for contract performance",
     ),
     DataCategory.ACCOUNT: RetentionPolicy(
         data_category=DataCategory.ACCOUNT,
         retention_days=2555,  # Until account deletion
         description="Account credentials and auth tokens",
-        legal_basis="Necessary for account security"
+        legal_basis="Necessary for account security",
     ),
     DataCategory.BEHAVIORAL: RetentionPolicy(
         data_category=DataCategory.BEHAVIORAL,
         retention_days=365,  # 1 year
         description="User behavior and interaction logs",
-        legal_basis="Legitimate interest in product improvement"
+        legal_basis="Legitimate interest in product improvement",
     ),
     DataCategory.TRANSACTIONAL: RetentionPolicy(
         data_category=DataCategory.TRANSACTIONAL,
         retention_days=2555,  # Until account deletion
         description="Orders, payments, invoices",
-        legal_basis="Legal obligation (tax, accounting)"
+        legal_basis="Legal obligation (tax, accounting)",
     ),
     DataCategory.PREFERENCES: RetentionPolicy(
         data_category=DataCategory.PREFERENCES,
         retention_days=2555,  # Until account deletion
         description="User settings and preferences",
-        legal_basis="Necessary for service functionality"
+        legal_basis="Necessary for service functionality",
     ),
     DataCategory.GENERATED: RetentionPolicy(
         data_category=DataCategory.GENERATED,
         retention_days=90,  # 90 days
         description="ML-generated insights and recommendations",
-        legal_basis="Legitimate interest in service improvement"
-    )
+        legal_basis="Legitimate interest in service improvement",
+    ),
 }
 
 # ============================================================================
 # GDPR MANAGER
 # ============================================================================
+
 
 class GDPRManager:
     """
@@ -170,10 +191,7 @@ class GDPRManager:
         self.data_deletions: dict[str, DataDeletionResponse] = {}
 
     async def request_data_export(
-        self,
-        user_id: str,
-        format: str = "json",
-        include_related: bool = True
+        self, user_id: str, format: str = "json", include_related: bool = True
     ) -> DataExportResponse:
         """
         GDPR Article 15 - Right of Access
@@ -194,14 +212,10 @@ class GDPRManager:
 
         # TODO: Query all user data from database
         user_data = {
-            "profile": {
-                "user_id": user_id,
-                "created_at": datetime.now(UTC),
-                "email": "user@example.com"
-            },
+            "profile": {"user_id": user_id, "created_at": datetime.now(UTC), "email": "user@example.com"},
             "orders": [],
             "preferences": {},
-            "interactions": []
+            "interactions": [],
         }
 
         if format == "csv":
@@ -217,7 +231,7 @@ class GDPRManager:
             created_at=datetime.now(UTC),
             expires_at=datetime.now(UTC) + timedelta(days=30),
             download_url=f"/api/v1/gdpr/exports/{export_id}/download",
-            data=user_data
+            data=user_data,
         )
 
         self.data_exports[export_id] = export_response
@@ -226,11 +240,7 @@ class GDPRManager:
         await self._log_audit(
             user_id=user_id,
             action="data_export",
-            details={
-                "export_id": export_id,
-                "format": format,
-                "include_related": include_related
-            }
+            details={"export_id": export_id, "format": format, "include_related": include_related},
         )
 
         logger.info(f"Data export requested: {export_id} for user {user_id}")
@@ -238,10 +248,7 @@ class GDPRManager:
         return export_response
 
     async def request_data_deletion(
-        self,
-        user_id: str,
-        reason: str,
-        include_backups: bool = False
+        self, user_id: str, reason: str, include_backups: bool = False
     ) -> DataDeletionResponse:
         """
         GDPR Article 17 - Right to Erasure
@@ -265,10 +272,7 @@ class GDPRManager:
         deletion_id = str(uuid4())
 
         # Check for legal retention obligations
-        exceptions = [
-            "Transactional data (legal obligation)",
-            "Account security logs (3-year retention)"
-        ]
+        exceptions = ["Transactional data (legal obligation)", "Account security logs (3-year retention)"]
 
         # TODO: Query and delete all user data
         items_deleted = 0
@@ -279,7 +283,7 @@ class GDPRManager:
             status="completed",
             deleted_at=datetime.now(UTC),
             items_deleted=items_deleted,
-            note=f"Deletion requested with reason: {reason}. Exceptions: {', '.join(exceptions)}"
+            note=f"Deletion requested with reason: {reason}. Exceptions: {', '.join(exceptions)}",
         )
 
         self.data_deletions[deletion_id] = deletion_response
@@ -292,8 +296,8 @@ class GDPRManager:
                 "deletion_id": deletion_id,
                 "reason": reason,
                 "include_backups": include_backups,
-                "items_deleted": items_deleted
-            }
+                "items_deleted": items_deleted,
+            },
         )
 
         logger.info(f"Data deletion requested: {deletion_id} for user {user_id}")
@@ -301,12 +305,7 @@ class GDPRManager:
         return deletion_response
 
     async def update_consent(
-        self,
-        user_id: str,
-        consent_type: ConsentType,
-        given: bool,
-        ip_address: str,
-        user_agent: str
+        self, user_id: str, consent_type: ConsentType, given: bool, ip_address: str, user_agent: str
     ) -> ConsentRecord:
         """
         Update user consent (GDPR Recital 83)
@@ -331,7 +330,7 @@ class GDPRManager:
             timestamp=datetime.now(UTC),
             expires_at=datetime.now(UTC) + timedelta(days=730),  # 2 years
             ip_address=ip_address,
-            user_agent=user_agent
+            user_agent=user_agent,
         )
 
         if user_id not in self.consent_records:
@@ -343,11 +342,7 @@ class GDPRManager:
         await self._log_audit(
             user_id=user_id,
             action="consent_update",
-            details={
-                "consent_type": consent_type,
-                "given": given,
-                "consent_id": consent_record.consent_id
-            }
+            details={"consent_type": consent_type, "given": given, "consent_id": consent_record.consent_id},
         )
 
         logger.info(f"Consent updated: {consent_type} = {given} for user {user_id}")
@@ -363,10 +358,7 @@ class GDPRManager:
         return RETENTION_POLICIES
 
     async def get_audit_logs(
-        self,
-        user_id: Optional[str] = None,
-        action: Optional[str] = None,
-        limit: int = 100
+        self, user_id: str | None = None, action: str | None = None, limit: int = 100
     ) -> list[AuditLog]:
         """Get GDPR audit logs"""
         logs = self.audit_logs
@@ -384,8 +376,8 @@ class GDPRManager:
         user_id: str,
         action: str,
         details: dict[str, Any],
-        actor_id: Optional[str] = None,
-        ip_address: str = "0.0.0.0"
+        actor_id: str | None = None,
+        ip_address: str = "0.0.0.0",
     ) -> AuditLog:
         """Create audit log entry"""
         audit_log = AuditLog(
@@ -395,11 +387,12 @@ class GDPRManager:
             timestamp=datetime.now(UTC),
             actor_id=actor_id,
             ip_address=ip_address,
-            details=details
+            details=details,
         )
 
         self.audit_logs.append(audit_log)
         return audit_log
+
 
 # ============================================================================
 # SINGLETON INSTANCE
@@ -432,7 +425,7 @@ if __name__ == "__main__":
             consent_type=ConsentType.MARKETING,
             given=True,
             ip_address="192.168.1.1",
-            user_agent="Mozilla/5.0..."
+            user_agent="Mozilla/5.0...",
         )
 
         # Test retention policies

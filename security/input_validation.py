@@ -63,6 +63,7 @@ PATH_TRAVERSAL_PATTERNS = [
 # SANITIZATION FUNCTIONS
 # ============================================================================
 
+
 class InputSanitizer:
     """Input sanitization utilities"""
 
@@ -180,28 +181,34 @@ class InputSanitizer:
 
         return sanitized
 
+
 # ============================================================================
 # VALIDATION MODELS
 # ============================================================================
+
 
 class EmailValidator(BaseModel):
     """Email validation model"""
 
     email: str = Field(..., pattern=r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$")
 
+
 class URLValidator(BaseModel):
     """URL validation model"""
 
     url: str = Field(..., pattern=r"^https?://[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(/.*)?$")
+
 
 class AlphanumericValidator(BaseModel):
     """Alphanumeric validation model"""
 
     value: str = Field(..., pattern=r"^[a-zA-Z0-9_-]+$")
 
+
 # ============================================================================
 # INPUT VALIDATION MIDDLEWARE
 # ============================================================================
+
 
 class InputValidationMiddleware:
     """
@@ -218,9 +225,7 @@ class InputValidationMiddleware:
         self.strict_mode = strict_mode
         self.sanitizer = InputSanitizer()
 
-    async def validate_request_data(
-        self, data: Union[dict, list, str]
-    ) -> Union[dict, list, str]:
+    async def validate_request_data(self, data: Union[dict, list, str]) -> Union[dict, list, str]:
         """
         Recursively validate and sanitize request data
 
@@ -231,10 +236,7 @@ class InputValidationMiddleware:
             Sanitized data
         """
         if isinstance(data, dict):
-            return {
-                key: await self.validate_request_data(value)
-                for key, value in data.items()
-            }
+            return {key: await self.validate_request_data(value) for key, value in data.items()}
 
         elif isinstance(data, list):
             return [await self.validate_request_data(item) for item in data]
@@ -285,9 +287,11 @@ class InputValidationMiddleware:
         response = await call_next(request)
         return response
 
+
 # ============================================================================
 # FIELD VALIDATORS
 # ============================================================================
+
 
 class SecureString(str):
     """String type with automatic sanitization"""
@@ -305,9 +309,11 @@ class SecureString(str):
         sanitizer = InputSanitizer()
         return sanitizer.sanitize_html(v)
 
+
 # ============================================================================
 # RATE LIMITING VALIDATORS
 # ============================================================================
+
 
 class RateLimitValidator:
     """Validate rate limiting parameters"""
@@ -335,9 +341,11 @@ class RateLimitValidator:
 
         return True
 
+
 # ============================================================================
 # CONTENT SECURITY
 # ============================================================================
+
 
 class ContentSecurityPolicy:
     """Content Security Policy headers"""
@@ -366,6 +374,7 @@ class ContentSecurityPolicy:
             "X-XSS-Protection": "1; mode=block",
             "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
         }
+
 
 # ============================================================================
 # GLOBAL INSTANCES

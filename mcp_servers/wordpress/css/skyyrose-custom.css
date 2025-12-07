@@ -1,0 +1,351 @@
+/**
+ * SkyyRose Custom Styles
+ * For use with Elementor Pro + WooCommerce
+ * skyyrose.co
+ */
+
+/* ==========================================================================
+   CSS Variables (Brand Tokens)
+   ========================================================================== */
+
+:root {
+  /* Colors */
+  --sr-obsidian: #0D0D0D;
+  --sr-ivory: #F5F5F0;
+  --sr-rose-gold: #B76E79;
+  --sr-ember: #E85D04;
+  --sr-slate: #4A4A4A;
+  --sr-fog: #E8E8E8;
+
+  /* Typography */
+  --sr-font-headline: 'Playfair Display', Georgia, serif;
+  --sr-font-body: 'Montserrat', Arial, sans-serif;
+
+  /* Spacing */
+  --sr-space-xs: 8px;
+  --sr-space-sm: 16px;
+  --sr-space-md: 24px;
+  --sr-space-lg: 48px;
+  --sr-space-xl: 80px;
+
+  /* Transitions */
+  --sr-transition: all 0.3s ease;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+.sr-headline {
+  font-family: var(--sr-font-headline);
+  font-weight: 700;
+  color: var(--sr-obsidian);
+  letter-spacing: 1px;
+}
+
+.sr-subheadline {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  color: var(--sr-slate);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.sr-body {
+  font-family: var(--sr-font-body);
+  font-weight: 400;
+  color: var(--sr-slate);
+  line-height: 1.8;
+}
+
+/* ==========================================================================
+   Buttons
+   ========================================================================== */
+
+.sr-button {
+  background: var(--sr-obsidian);
+  color: var(--sr-ivory);
+  padding: 16px 32px;
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border: 2px solid var(--sr-obsidian);
+  cursor: pointer;
+  transition: var(--sr-transition);
+}
+
+.sr-button:hover {
+  background: transparent;
+  color: var(--sr-obsidian);
+}
+
+.sr-button--outline {
+  background: transparent;
+  color: var(--sr-obsidian);
+  border: 2px solid var(--sr-obsidian);
+}
+
+.sr-button--outline:hover {
+  background: var(--sr-obsidian);
+  color: var(--sr-ivory);
+}
+
+.sr-button--rose {
+  background: var(--sr-rose-gold);
+  border-color: var(--sr-rose-gold);
+  color: var(--sr-ivory);
+}
+
+.sr-button--rose:hover {
+  background: transparent;
+  color: var(--sr-rose-gold);
+}
+
+/* ==========================================================================
+   Product Cards
+   ========================================================================== */
+
+.sr-product-card {
+  background: #FFFFFF;
+  padding: 0;
+  border: none;
+  box-shadow: none;
+  transition: var(--sr-transition);
+}
+
+.sr-product-card:hover {
+  transform: translateY(-4px);
+}
+
+.sr-product-card__image {
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background: var(--sr-ivory);
+}
+
+.sr-product-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: var(--sr-transition);
+}
+
+.sr-product-card:hover .sr-product-card__image img {
+  transform: scale(1.05);
+}
+
+.sr-product-card__title {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 1px;
+  color: var(--sr-obsidian);
+  margin-top: var(--sr-space-sm);
+  text-transform: uppercase;
+}
+
+.sr-product-card__price {
+  font-family: var(--sr-font-body);
+  font-weight: 400;
+  font-size: 14px;
+  color: var(--sr-slate);
+  margin-top: var(--sr-space-xs);
+}
+
+/* ==========================================================================
+   Collection Headers
+   ========================================================================== */
+
+.sr-collection-header {
+  text-align: center;
+  padding: var(--sr-space-xl) 0;
+}
+
+.sr-collection-header__subtitle {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--sr-rose-gold);
+  margin-bottom: var(--sr-space-sm);
+}
+
+.sr-collection-header__title {
+  font-family: var(--sr-font-headline);
+  font-weight: 700;
+  font-size: 48px;
+  color: var(--sr-obsidian);
+  margin-bottom: var(--sr-space-md);
+}
+
+.sr-collection-header__description {
+  font-family: var(--sr-font-body);
+  font-weight: 400;
+  font-size: 16px;
+  color: var(--sr-slate);
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.8;
+}
+
+/* ==========================================================================
+   Hero Sections
+   ========================================================================== */
+
+.sr-hero {
+  position: relative;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
+
+.sr-hero__overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.sr-hero__content {
+  position: relative;
+  z-index: 2;
+  color: var(--sr-ivory);
+  max-width: 800px;
+  padding: var(--sr-space-lg);
+}
+
+.sr-hero__title {
+  font-family: var(--sr-font-headline);
+  font-weight: 700;
+  font-size: 64px;
+  margin-bottom: var(--sr-space-md);
+}
+
+.sr-hero__subtitle {
+  font-family: var(--sr-font-body);
+  font-weight: 400;
+  font-size: 18px;
+  letter-spacing: 2px;
+  margin-bottom: var(--sr-space-lg);
+}
+
+/* ==========================================================================
+   WooCommerce Overrides
+   ========================================================================== */
+
+/* Product Page */
+.woocommerce div.product .product_title {
+  font-family: var(--sr-font-headline);
+  font-weight: 700;
+  font-size: 32px;
+  color: var(--sr-obsidian);
+}
+
+.woocommerce div.product p.price {
+  font-family: var(--sr-font-body);
+  font-weight: 400;
+  font-size: 24px;
+  color: var(--sr-obsidian);
+}
+
+.woocommerce div.product .woocommerce-product-details__short-description {
+  font-family: var(--sr-font-body);
+  color: var(--sr-slate);
+  line-height: 1.8;
+}
+
+/* Add to Cart Button */
+.woocommerce div.product form.cart .button,
+.woocommerce #respond input#submit,
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button {
+  background: var(--sr-obsidian) !important;
+  color: var(--sr-ivory) !important;
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 16px 32px;
+  border-radius: 0;
+  border: 2px solid var(--sr-obsidian);
+  transition: var(--sr-transition);
+}
+
+.woocommerce div.product form.cart .button:hover,
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover {
+  background: transparent !important;
+  color: var(--sr-obsidian) !important;
+}
+
+/* Variation Swatches */
+.woocommerce div.product .variations select {
+  font-family: var(--sr-font-body);
+  padding: 12px 16px;
+  border: 1px solid var(--sr-fog);
+}
+
+/* Shop Grid */
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+  font-family: var(--sr-font-body);
+  font-weight: 500;
+  font-size: 14px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--sr-obsidian);
+}
+
+.woocommerce ul.products li.product .price {
+  font-family: var(--sr-font-body);
+  color: var(--sr-slate);
+}
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .sr-hero__title {
+    font-size: 36px;
+  }
+
+  .sr-collection-header__title {
+    font-size: 32px;
+  }
+
+  .sr-button {
+    padding: 14px 24px;
+    font-size: 11px;
+  }
+}
+
+/* ==========================================================================
+   Utility Classes
+   ========================================================================== */
+
+.sr-text-center { text-align: center; }
+.sr-text-left { text-align: left; }
+.sr-text-right { text-align: right; }
+
+.sr-mt-sm { margin-top: var(--sr-space-sm); }
+.sr-mt-md { margin-top: var(--sr-space-md); }
+.sr-mt-lg { margin-top: var(--sr-space-lg); }
+
+.sr-mb-sm { margin-bottom: var(--sr-space-sm); }
+.sr-mb-md { margin-bottom: var(--sr-space-md); }
+.sr-mb-lg { margin-bottom: var(--sr-space-lg); }
+
+.sr-py-lg { padding-top: var(--sr-space-lg); padding-bottom: var(--sr-space-lg); }
+.sr-py-xl { padding-top: var(--sr-space-xl); padding-bottom: var(--sr-space-xl); }

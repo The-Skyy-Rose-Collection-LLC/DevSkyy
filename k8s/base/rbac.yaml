@@ -1,0 +1,129 @@
+---
+# DevSkyy Platform - RBAC Configuration
+# Service Account
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: devskyy
+  namespace: devskyy
+  labels:
+    app: devskyy
+automountServiceAccountToken: true
+---
+# Role for application permissions
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: devskyy-role
+  namespace: devskyy
+  labels:
+    app: devskyy
+rules:
+# Allow reading config maps
+- apiGroups: [""]
+  resources: ["configmaps"]
+  verbs: ["get", "list", "watch"]
+
+# Allow reading secrets (minimal access)
+- apiGroups: [""]
+  resources: ["secrets"]
+  verbs: ["get"]
+  resourceNames: ["devskyy-secrets"]
+
+# Allow reading pods (for health checks)
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list"]
+
+# Allow reading services
+- apiGroups: [""]
+  resources: ["services"]
+  verbs: ["get", "list"]
+---
+# RoleBinding to attach role to service account
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: devskyy-rolebinding
+  namespace: devskyy
+  labels:
+    app: devskyy
+subjects:
+- kind: ServiceAccount
+  name: devskyy
+  namespace: devskyy
+roleRef:
+  kind: Role
+  name: devskyy-role
+  apiGroup: rbac.authorization.k8s.io
+---
+# Network Policy for pod-to-pod communication
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: devskyy-netpol
+  namespace: devskyy
+  labels:
+    app: devskyy
+spec:
+  podSelector:
+    matchLabels:
+      app: devskyy
+  policyTypes:
+  - Ingress
+  - Egress
+
+  ingress:
+  # Allow traffic from nginx ingress
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: ingress-nginx
+    ports:
+    - protocol: TCP
+      port: 8000
+
+  # Allow traffic from prometheus
+  - from:
+    - namespaceSelector:
+        matchLabels:
+          name: monitoring
+    ports:
+    - protocol: TCP
+      port: 9091
+
+  egress:
+  # Allow DNS
+  - to:
+    - namespaceSelector: {}
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+
+  # Allow PostgreSQL
+  - to:
+    - podSelector:
+        matchLabels:
+          app: postgres
+    ports:
+    - protocol: TCP
+      port: 5432
+
+  # Allow Redis
+  - to:
+    - podSelector:
+        matchLabels:
+          app: redis
+    ports:
+    - protocol: TCP
+      port: 6379
+
+  # Allow HTTPS to external APIs
+  - to:
+    - namespaceSelector: {}
+    ports:
+    - protocol: TCP
+      port: 443

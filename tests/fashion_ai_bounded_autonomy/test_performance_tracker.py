@@ -152,16 +152,8 @@ class TestProposalGeneration:
     async def test_generate_proposal_slow_execution(self, tracker):
         """Test proposal for slow execution time"""
         report = {
-            "agent_performance": {
-                "slow_agent": {
-                    "execution_time": {
-                        "average": 10.0,
-                        "min": 8.0,
-                        "max": 12.0
-                    }
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"slow_agent": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
 
         proposals = await tracker.generate_proposals(report)
@@ -174,15 +166,9 @@ class TestProposalGeneration:
         """Test proposal for high error rate"""
         report = {
             "agent_performance": {
-                "error_agent": {
-                    "error_rate": {
-                        "average": 0.10,  # 10% error rate
-                        "min": 0.05,
-                        "max": 0.15
-                    }
-                }
+                "error_agent": {"error_rate": {"average": 0.10, "min": 0.05, "max": 0.15}}  # 10% error rate
             },
-            "system_performance": {}
+            "system_performance": {},
         }
 
         proposals = await tracker.generate_proposals(report)
@@ -193,12 +179,7 @@ class TestProposalGeneration:
     @pytest.mark.asyncio
     async def test_generate_proposal_high_cpu(self, tracker):
         """Test proposal for high CPU usage"""
-        report = {
-            "agent_performance": {},
-            "system_performance": {
-                "cpu_usage": 85.0
-            }
-        }
+        report = {"agent_performance": {}, "system_performance": {"cpu_usage": 85.0}}
 
         proposals = await tracker.generate_proposals(report)
 
@@ -209,12 +190,8 @@ class TestProposalGeneration:
     async def test_proposals_saved_to_file(self, tracker):
         """Test that proposals are saved to file"""
         report = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"agent1": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
 
         await tracker.generate_proposals(report)
@@ -237,12 +214,8 @@ class TestGetProposals:
         """Test getting all proposals"""
         # Generate some proposals
         report = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"agent1": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
         await tracker.generate_proposals(report)
 
@@ -270,21 +243,14 @@ class TestUpdateProposalStatus:
         """Test updating proposal status"""
         # Create proposal
         report = {
-            "agent_performance": {
-                "agent1": {
-                    "execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}
-                }
-            },
-            "system_performance": {}
+            "agent_performance": {"agent1": {"execution_time": {"average": 10.0, "min": 8.0, "max": 12.0}}},
+            "system_performance": {},
         }
         proposals = await tracker.generate_proposals(report)
         proposal_id = proposals[0]["id"]
 
         result = await tracker.update_proposal_status(
-            proposal_id=proposal_id,
-            status="approved",
-            operator="test_operator",
-            notes="Looks good"
+            proposal_id=proposal_id, status="approved", operator="test_operator", notes="Looks good"
         )
 
         assert result["status"] == "updated"
@@ -295,9 +261,7 @@ class TestUpdateProposalStatus:
     async def test_update_nonexistent_proposal(self, tracker):
         """Test updating non-existent proposal"""
         result = await tracker.update_proposal_status(
-            proposal_id="nonexistent",
-            status="approved",
-            operator="operator"
+            proposal_id="nonexistent", status="approved", operator="operator"
         )
 
         assert "error" in result
@@ -353,10 +317,7 @@ class TestEdgeCases:
     @pytest.mark.asyncio
     async def test_generate_proposals_with_none_values(self, tracker):
         """Test generating proposals with None values in report"""
-        report = {
-            "agent_performance": None,
-            "system_performance": None
-        }
+        report = {"agent_performance": None, "system_performance": None}
 
         # Should handle gracefully
         with pytest.raises((TypeError, AttributeError)):

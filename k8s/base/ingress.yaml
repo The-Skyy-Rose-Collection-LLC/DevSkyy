@@ -1,0 +1,86 @@
+---
+# DevSkyy Platform - Ingress Configuration
+# NGINX Ingress Controller with TLS
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: devskyy-ingress
+  namespace: devskyy
+  labels:
+    app: devskyy
+  annotations:
+    # NGINX Ingress Controller
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+
+    # Security headers
+    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/ssl-protocols: "TLSv1.2 TLSv1.3"
+    nginx.ingress.kubernetes.io/ssl-ciphers: "HIGH:!aNULL:!MD5"
+
+    # Rate limiting
+    nginx.ingress.kubernetes.io/limit-rps: "100"
+    nginx.ingress.kubernetes.io/limit-connections: "10"
+
+    # Timeouts
+    nginx.ingress.kubernetes.io/proxy-connect-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+
+    # Body size
+    nginx.ingress.kubernetes.io/proxy-body-size: "100m"
+
+    # CORS (if needed)
+    nginx.ingress.kubernetes.io/enable-cors: "true"
+    nginx.ingress.kubernetes.io/cors-allow-origin: "https://devskyy.com,https://www.devskyy.com"
+    nginx.ingress.kubernetes.io/cors-allow-methods: "GET, POST, PUT, PATCH, DELETE, OPTIONS"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+
+    # Custom headers
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      more_set_headers "X-Frame-Options: SAMEORIGIN";
+      more_set_headers "X-Content-Type-Options: nosniff";
+      more_set_headers "X-XSS-Protection: 1; mode=block";
+      more_set_headers "Referrer-Policy: strict-origin-when-cross-origin";
+      more_set_headers "Permissions-Policy: geolocation=(), microphone=(), camera=()";
+spec:
+  tls:
+  - hosts:
+    - api.devskyy.com
+    - www.devskyy.com
+    - devskyy.com
+    secretName: devskyy-tls
+
+  rules:
+  - host: api.devskyy.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: devskyy-service
+            port:
+              number: 8000
+
+  - host: devskyy.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: devskyy-service
+            port:
+              number: 8000
+
+  - host: www.devskyy.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: devskyy-service
+            port:
+              number: 8000

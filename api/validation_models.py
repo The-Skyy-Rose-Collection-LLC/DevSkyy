@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import Enum
 import re
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, EmailStr, Field, validator
 from pydantic.types import confloat, conint, constr
@@ -16,6 +16,7 @@ Comprehensive input validation, sanitization, and security enforcement
 # SECURITY VALIDATORS
 # ============================================================================
 
+
 class SecurityLevel(str, Enum):
     """Security level enumeration"""
 
@@ -23,6 +24,7 @@ class SecurityLevel(str, Enum):
     MEDIUM = "medium"
     HIGH = "high"
     CRITICAL = "critical"
+
 
 def validate_no_sql_injection(value: str) -> str:
     """Validate against SQL injection patterns"""
@@ -43,6 +45,7 @@ def validate_no_sql_injection(value: str) -> str:
             raise ValueError(f"Potential SQL injection detected: {pattern}")
 
     return value
+
 
 def validate_no_xss(value: str) -> str:
     """Validate against XSS patterns"""
@@ -65,6 +68,7 @@ def validate_no_xss(value: str) -> str:
 
     return value
 
+
 def sanitize_html_input(value: str) -> str:
     """Sanitize HTML input by removing dangerous tags"""
     if not isinstance(value, str):
@@ -84,27 +88,21 @@ def sanitize_html_input(value: str) -> str:
 
     return value.strip()
 
+
 # ============================================================================
 # ENHANCED USER MODELS
 # ============================================================================
+
 
 class EnhancedRegisterRequest(BaseModel):
     """Enhanced registration request with comprehensive validation"""
 
     email: EmailStr = Field(..., description="Valid email address")
-    username: constr(min_length=3, max_length=50) = Field(
-        ..., description="Username (3-50 chars, alphanumeric, _, -)"
-    )
-    password: constr(min_length=8, max_length=128) = Field(
-        ..., description="Password (8-128 chars)"
-    )
+    username: constr(min_length=3, max_length=50) = Field(..., description="Username (3-50 chars, alphanumeric, _, -)")
+    password: constr(min_length=8, max_length=128) = Field(..., description="Password (8-128 chars)")
     role: str = Field(default="api_user", description="User role")
-    full_name: Optional[constr(max_length=100)] = Field(
-        None, description="Full name (max 100 chars)"
-    )
-    company: Optional[constr(max_length=100)] = Field(
-        None, description="Company name (max 100 chars)"
-    )
+    full_name: constr(max_length=100) | None = Field(None, description="Full name (max 100 chars)")
+    company: constr(max_length=100) | None = Field(None, description="Company name (max 100 chars)")
 
     @validator("password")
     def validate_password_strength(cls, v):
@@ -140,6 +138,7 @@ class EnhancedRegisterRequest(BaseModel):
             v = sanitize_html_input(v)
         return v
 
+
 class EnhancedLoginRequest(BaseModel):
     """Enhanced login request with validation"""
 
@@ -153,30 +152,26 @@ class EnhancedLoginRequest(BaseModel):
         v = validate_no_sql_injection(v)
         return v
 
+
 # ============================================================================
 # API REQUEST MODELS
 # ============================================================================
 
+
 class AgentExecutionRequest(BaseModel):
     """Enhanced agent execution request"""
 
-    agent_type: constr(min_length=1, max_length=50) = Field(
-        ..., description="Agent type identifier"
-    )
+    agent_type: constr(min_length=1, max_length=50) = Field(..., description="Agent type identifier")
 
     task_description: constr(min_length=1, max_length=5000) = Field(
         ..., description="Task description (max 5000 chars)"
     )
 
-    parameters: dict[str, Any] = Field(
-        default_factory=dict, description="Task parameters"
-    )
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Task parameters")
 
     priority: conint(ge=1, le=10) = Field(default=5, description="Task priority (1-10)")
 
-    timeout_seconds: conint(ge=1, le=3600) = Field(
-        default=300, description="Timeout in seconds (1-3600)"
-    )
+    timeout_seconds: conint(ge=1, le=3600) = Field(default=300, description="Timeout in seconds (1-3600)")
 
     security_level: SecurityLevel = Field(
         default=SecurityLevel.MEDIUM, description="Security level for task execution"
@@ -186,9 +181,7 @@ class AgentExecutionRequest(BaseModel):
     def validate_agent_type(cls, v):
         """Validate agent type format"""
         if not re.match(r"^[a-zA-Z0-9_-]+$", v):
-            raise ValueError(
-                "Agent type can only contain letters, numbers, underscores, and hyphens"
-            )
+            raise ValueError("Agent type can only contain letters, numbers, underscores, and hyphens")
         return v
 
     @validator("task_description")
@@ -213,43 +206,32 @@ class AgentExecutionRequest(BaseModel):
 
         return v
 
+
 class MLModelRequest(BaseModel):
     """Enhanced ML model request"""
 
-    model_name: constr(min_length=1, max_length=100) = Field(
-        ..., description="Model name"
-    )
+    model_name: constr(min_length=1, max_length=100) = Field(..., description="Model name")
 
-    version: constr(min_length=1, max_length=20) = Field(
-        default="latest", description="Model version"
-    )
+    version: constr(min_length=1, max_length=20) = Field(default="latest", description="Model version")
 
     input_data: dict[str, Any] = Field(..., description="Input data for model")
 
-    confidence_threshold: confloat(ge=0.0, le=1.0) = Field(
-        default=0.5, description="Confidence threshold (0.0-1.0)"
-    )
+    confidence_threshold: confloat(ge=0.0, le=1.0) = Field(default=0.5, description="Confidence threshold (0.0-1.0)")
 
-    max_results: conint(ge=1, le=100) = Field(
-        default=10, description="Maximum results to return (1-100)"
-    )
+    max_results: conint(ge=1, le=100) = Field(default=10, description="Maximum results to return (1-100)")
 
     @validator("model_name")
     def validate_model_name(cls, v):
         """Validate model name format"""
         if not re.match(r"^[a-zA-Z0-9_-]+$", v):
-            raise ValueError(
-                "Model name can only contain letters, numbers, underscores, and hyphens"
-            )
+            raise ValueError("Model name can only contain letters, numbers, underscores, and hyphens")
         return v
 
     @validator("version")
     def validate_version(cls, v):
         """Validate version format"""
         if not re.match(r"^[a-zA-Z0-9._-]+$", v):
-            raise ValueError(
-                "Version can only contain letters, numbers, dots, underscores, and hyphens"
-            )
+            raise ValueError("Version can only contain letters, numbers, dots, underscores, and hyphens")
         return v
 
     @validator("input_data")
@@ -266,38 +248,27 @@ class MLModelRequest(BaseModel):
 
         return v
 
+
 class ContentGenerationRequest(BaseModel):
     """Enhanced content generation request"""
 
-    content_type: constr(min_length=1, max_length=50) = Field(
-        ..., description="Content type"
-    )
+    content_type: constr(min_length=1, max_length=50) = Field(..., description="Content type")
 
-    prompt: constr(min_length=1, max_length=10000) = Field(
-        ..., description="Content generation prompt"
-    )
+    prompt: constr(min_length=1, max_length=10000) = Field(..., description="Content generation prompt")
 
-    target_audience: Optional[constr(max_length=200)] = Field(
-        None, description="Target audience description"
-    )
+    target_audience: constr(max_length=200) | None = Field(None, description="Target audience description")
 
-    tone: Optional[constr(max_length=50)] = Field(None, description="Content tone")
+    tone: constr(max_length=50) | None = Field(None, description="Content tone")
 
-    max_length: conint(ge=1, le=50000) = Field(
-        default=1000, description="Maximum content length"
-    )
+    max_length: conint(ge=1, le=50000) = Field(default=1000, description="Maximum content length")
 
-    include_metadata: bool = Field(
-        default=True, description="Include generation metadata"
-    )
+    include_metadata: bool = Field(default=True, description="Include generation metadata")
 
     @validator("content_type")
     def validate_content_type(cls, v):
         """Validate content type format"""
         if not re.match(r"^[a-zA-Z0-9_-]+$", v):
-            raise ValueError(
-                "Content type can only contain letters, numbers, underscores, and hyphens"
-            )
+            raise ValueError("Content type can only contain letters, numbers, underscores, and hyphens")
         return v
 
     @validator("prompt", "target_audience", "tone")
@@ -309,9 +280,11 @@ class ContentGenerationRequest(BaseModel):
             v = sanitize_html_input(v)
         return v
 
+
 # ============================================================================
 # RESPONSE MODELS
 # ============================================================================
+
 
 class ValidationErrorResponse(BaseModel):
     """Validation error response"""
@@ -320,7 +293,8 @@ class ValidationErrorResponse(BaseModel):
     message: str
     details: list[dict[str, Any]] = Field(default_factory=list)
     timestamp: datetime = Field(default_factory=datetime.now)
-    request_id: Optional[str] = None
+    request_id: str | None = None
+
 
 class SecurityViolationResponse(BaseModel):
     """Security violation response"""
@@ -329,46 +303,39 @@ class SecurityViolationResponse(BaseModel):
     message: str = "Request blocked due to security policy violation"
     violation_type: str
     timestamp: datetime = Field(default_factory=datetime.now)
-    request_id: Optional[str] = None
+    request_id: str | None = None
+
 
 class EnhancedSuccessResponse(BaseModel):
     """Enhanced success response"""
 
     success: bool = True
     message: str
-    data: Optional[dict[str, Any]] = None
-    metadata: Optional[dict[str, Any]] = None
+    data: dict[str, Any] | None = None
+    metadata: dict[str, Any] | None = None
     timestamp: datetime = Field(default_factory=datetime.now)
-    request_id: Optional[str] = None
+    request_id: str | None = None
+
 
 # ============================================================================
 # GDPR COMPLIANCE MODELS
 # ============================================================================
 
+
 class GDPRDataRequest(BaseModel):
     """Enhanced GDPR data request"""
 
-    request_type: str = Field(
-        ..., description="Request type: export, delete, or anonymize"
-    )
+    request_type: str = Field(..., description="Request type: export, delete, or anonymize")
 
     user_email: EmailStr = Field(..., description="User email address")
 
-    include_audit_logs: bool = Field(
-        default=False, description="Include audit logs in export"
-    )
+    include_audit_logs: bool = Field(default=False, description="Include audit logs in export")
 
-    include_activity_history: bool = Field(
-        default=False, description="Include activity history"
-    )
+    include_activity_history: bool = Field(default=False, description="Include activity history")
 
-    anonymize_instead_of_delete: bool = Field(
-        default=False, description="Anonymize data instead of deletion"
-    )
+    anonymize_instead_of_delete: bool = Field(default=False, description="Anonymize data instead of deletion")
 
-    reason: Optional[constr(max_length=500)] = Field(
-        None, description="Reason for request (max 500 chars)"
-    )
+    reason: constr(max_length=500) | None = Field(None, description="Reason for request (max 500 chars)")
 
     @validator("request_type")
     def validate_request_type(cls, v):

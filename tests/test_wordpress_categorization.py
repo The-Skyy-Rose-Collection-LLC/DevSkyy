@@ -37,9 +37,7 @@ def mock_anthropic_client():
 @pytest.mark.asyncio
 async def test_keyword_matching_categorization(categorization_service):
     """Test keyword-based categorization fallback"""
-    result = categorization_service.categorize_with_keywords(
-        "How to Use AI Tools for Content Marketing"
-    )
+    result = categorization_service.categorize_with_keywords("How to Use AI Tools for Content Marketing")
 
     assert result["category_id"] in [13, 14, 15, 17, 18, 19]
     assert result["confidence"] > 0
@@ -49,9 +47,7 @@ async def test_keyword_matching_categorization(categorization_service):
 @pytest.mark.asyncio
 async def test_categorize_ai_tools_post(categorization_service):
     """Test categorization of AI tools post"""
-    result = categorization_service.categorize_with_keywords(
-        "Best AI Tools for Automating Your Workflow"
-    )
+    result = categorization_service.categorize_with_keywords("Best AI Tools for Automating Your Workflow")
 
     # Should match AI Tools (15) or Automation (17)
     assert result["category_id"] in [15, 17]
@@ -61,9 +57,7 @@ async def test_categorize_ai_tools_post(categorization_service):
 @pytest.mark.asyncio
 async def test_categorize_content_creation_post(categorization_service):
     """Test categorization of content creation post"""
-    result = categorization_service.categorize_with_keywords(
-        "How to Write Engaging Blog Posts"
-    )
+    result = categorization_service.categorize_with_keywords("How to Write Engaging Blog Posts")
 
     # Should match Content Creation (13)
     assert result["category_id"] == 13
@@ -73,9 +67,7 @@ async def test_categorize_content_creation_post(categorization_service):
 @pytest.mark.asyncio
 async def test_categorize_marketing_post(categorization_service):
     """Test categorization of marketing post"""
-    result = categorization_service.categorize_with_keywords(
-        "SEO Strategies for Growing Your Business"
-    )
+    result = categorization_service.categorize_with_keywords("SEO Strategies for Growing Your Business")
 
     # Should match Digital Marketing (14)
     assert result["category_id"] == 14
@@ -84,9 +76,7 @@ async def test_categorize_marketing_post(categorization_service):
 @pytest.mark.asyncio
 async def test_categorize_no_keywords_match(categorization_service):
     """Test categorization when no keywords match (uses default)"""
-    result = categorization_service.categorize_with_keywords(
-        "Random Article About Nothing Specific"
-    )
+    result = categorization_service.categorize_with_keywords("Random Article About Nothing Specific")
 
     # Should use default category
     assert result["category_id"] == categorization_service.default_category_id
@@ -97,9 +87,7 @@ async def test_categorize_no_keywords_match(categorization_service):
 async def test_categorize_single_post(categorization_service):
     """Test categorizing a single post"""
     result = await categorization_service.categorize_post(
-        post_id=123,
-        post_title="AI-Powered Marketing Automation Guide",
-        use_ai=False  # Use keyword matching
+        post_id=123, post_title="AI-Powered Marketing Automation Guide", use_ai=False  # Use keyword matching
     )
 
     assert isinstance(result, CategorizationResult)
@@ -119,9 +107,7 @@ async def test_categorize_batch_posts(categorization_service):
         {"id": 3, "title": "Productivity Apps Review"},
     ]
 
-    results = await categorization_service.categorize_posts_batch(
-        posts, use_ai=False
-    )
+    results = await categorization_service.categorize_posts_batch(posts, use_ai=False)
 
     assert len(results) == 3
     assert all(isinstance(r, CategorizationResult) for r in results)
@@ -139,9 +125,7 @@ async def test_categorize_batch_with_missing_data(categorization_service):
         {"title": "Missing ID"},  # Should skip
     ]
 
-    results = await categorization_service.categorize_posts_batch(
-        posts, use_ai=False
-    )
+    results = await categorization_service.categorize_posts_batch(posts, use_ai=False)
 
     # Only first post should be processed
     assert len(results) == 1
@@ -180,7 +164,9 @@ async def test_categorize_with_anthropic_mock():
     """Test AI categorization with mocked Anthropic response"""
     mock_client = MagicMock()
     mock_response = MagicMock()
-    mock_response.content = [MagicMock(text='{"category_id": 15, "confidence": 0.95, "reasoning": "AI tools mentioned"}')]
+    mock_response.content = [
+        MagicMock(text='{"category_id": 15, "confidence": 0.95, "reasoning": "AI tools mentioned"}')
+    ]
     mock_client.messages.create.return_value = mock_response
 
     service = WordPressCategorizationService()
@@ -236,14 +222,11 @@ async def test_custom_categories():
             category_id=100,
             category_name="Custom Category",
             description="Custom category for testing",
-            keywords=["custom", "test"]
+            keywords=["custom", "test"],
         )
     ]
 
-    service = WordPressCategorizationService(
-        categories=custom_categories,
-        default_category_id=100
-    )
+    service = WordPressCategorizationService(categories=custom_categories, default_category_id=100)
 
     result = service.categorize_with_keywords("Custom test post")
 
@@ -257,9 +240,7 @@ async def test_categorize_post_with_rendered_title():
     service = WordPressCategorizationService()
 
     result = await service.categorize_post(
-        post_id=456,
-        post_title="How to Automate Your Workflow with n8n",
-        use_ai=False
+        post_id=456, post_title="How to Automate Your Workflow with n8n", use_ai=False
     )
 
     assert result.post_id == 456
@@ -273,9 +254,7 @@ async def test_multiple_keyword_matches():
     service = WordPressCategorizationService()
 
     # Title has both "AI" and "marketing" keywords
-    result = service.categorize_with_keywords(
-        "AI-Powered Digital Marketing Strategies"
-    )
+    result = service.categorize_with_keywords("AI-Powered Digital Marketing Strategies")
 
     # Should pick the category with more keyword matches
     assert result["category_id"] in [14, 15]  # Marketing or AI Tools

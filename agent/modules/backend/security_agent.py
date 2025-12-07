@@ -7,6 +7,7 @@ import uuid
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+
 class SecurityAgent:
     """Cybersecurity specialist for luxury e-commerce protection."""
 
@@ -87,9 +88,7 @@ class SecurityAgent:
             logger.error(f"❌ Security assessment failed: {e!s}")
             return {"error": str(e), "status": "failed"}
 
-    def _generate_security_recommendations(
-        self, assessment: dict
-    ) -> list[dict[str, Any]]:
+    def _generate_security_recommendations(self, assessment: dict) -> list[dict[str, Any]]:
         """Generate prioritized security recommendations."""
         recommendations = [
             {
@@ -138,6 +137,7 @@ class SecurityAgent:
             )
 
         return sorted(risks, key=lambda x: x["score"], reverse=True)
+
 
 def secure_luxury_platform() -> dict[str, Any]:
     """Main function to secure luxury e-commerce platform."""

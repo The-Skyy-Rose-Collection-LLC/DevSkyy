@@ -9,17 +9,15 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import asyncio
 import json
 import logging
 import os
 import subprocess
-from typing import Any, Optional
+from typing import Any
 
-from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse, StreamingResponse
-from pydantic import BaseModel, Field
+from fastapi import FastAPI
 import httpx
+from pydantic import BaseModel, Field
 
 
 # =============================================================================
@@ -40,12 +38,26 @@ MCP_SERVERS = {
             "DEVSKYY_API_URL": os.getenv("DEVSKYY_API_URL", "http://localhost:8000"),
         },
     },
+    "neon": {
+        "type": "http",
+        "url": os.getenv("NEON_MCP_URL", "https://mcp.neon.tech/mcp"),
+        "headers": (
+            {
+                "Authorization": f"Bearer {os.getenv('NEON_API_KEY', '')}",
+                "X-Neon-Project-Id": os.getenv("NEON_PROJECT_ID", ""),
+            }
+            if os.getenv("NEON_API_KEY")
+            else {}
+        ),
+    },
     "huggingface": {
         "type": "http",
         "url": "https://huggingface.co/mcp",
-        "headers": {
-            "Authorization": f"Bearer {os.getenv('HUGGING_FACE_TOKEN', '')}"
-        } if os.getenv("HUGGING_FACE_TOKEN") else {},
+        "headers": (
+            {"Authorization": f"Bearer {os.getenv('HUGGING_FACE_TOKEN', '')}"}
+            if os.getenv("HUGGING_FACE_TOKEN")
+            else {}
+        ),
     },
 }
 
@@ -80,16 +92,16 @@ class MCPRequest(BaseModel):
     jsonrpc: str = Field(default="2.0", description="JSON-RPC version")
     method: str = Field(..., description="MCP method to call")
     params: dict[str, Any] = Field(default_factory=dict, description="Method parameters")
-    id: Optional[str | int] = Field(default=None, description="Request ID")
+    id: str | int | None = Field(default=None, description="Request ID")
 
 
 class MCPResponse(BaseModel):
     """MCP protocol response"""
 
     jsonrpc: str = Field(default="2.0", description="JSON-RPC version")
-    result: Optional[Any] = Field(default=None, description="Method result")
-    error: Optional[dict[str, Any]] = Field(default=None, description="Error object")
-    id: Optional[str | int] = Field(default=None, description="Request ID")
+    result: Any | None = Field(default=None, description="Method result")
+    error: dict[str, Any] | None = Field(default=None, description="Error object")
+    id: str | int | None = Field(default=None, description="Request ID")
 
 
 # =============================================================================
@@ -104,7 +116,7 @@ class StdioMCPClient:
         self.command = server_config["command"]
         self.args = server_config.get("args", [])
         self.env = server_config.get("env", {})
-        self.process: Optional[subprocess.Popen] = None
+        self.process: subprocess.Popen | None = None
 
     async def start(self):
         """Start the stdio process"""
@@ -206,9 +218,7 @@ class MCPGateway:
             except Exception as e:
                 logger.error(f"❌ Failed to initialize {server_name}: {e}")
 
-    async def route_request(
-        self, server_name: str, request: MCPRequest
-    ) -> MCPResponse:
+    async def route_request(self, server_name: str, request: MCPRequest) -> MCPResponse:
         """Route request to specific MCP server"""
         client = self.clients.get(server_name)
 
@@ -226,7 +236,7 @@ class MCPGateway:
         except Exception as e:
             logger.error(f"MCP request failed: {e}")
             return MCPResponse(
-                error={"code": -32603, "message": f"Internal error: {str(e)}"},
+                error={"code": -32603, "message": f"Internal error: {e!s}"},
                 id=request.id,
             )
 
@@ -292,9 +302,7 @@ async def health():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "servers": {
-            name: "active" for name in gateway.clients.keys()
-        },
+        "servers": dict.fromkeys(gateway.clients.keys(), "active"),
     }
 
 

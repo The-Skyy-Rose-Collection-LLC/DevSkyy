@@ -50,38 +50,38 @@ except Exception as e:
     logger.error(f"❌ Failed to initialize AI services: {e!s}")
     raise
 
-@app.route('/health', methods=['GET'])
+
+@app.route("/health", methods=["GET"])
 def health_check():
     """Health check endpoint for Docker container monitoring"""
     try:
         # Check service health
         services_status = {
-            'product_analyzer': product_analyzer.is_healthy(),
-            'recommendation_engine': recommendation_engine.is_healthy(),
-            'customer_segmentation': customer_segmentation.is_healthy(),
-            'dynamic_pricing': dynamic_pricing.is_healthy(),
-            'media_optimizer': media_optimizer.is_healthy(),
-            'cache': cache_manager.is_healthy()
+            "product_analyzer": product_analyzer.is_healthy(),
+            "recommendation_engine": recommendation_engine.is_healthy(),
+            "customer_segmentation": customer_segmentation.is_healthy(),
+            "dynamic_pricing": dynamic_pricing.is_healthy(),
+            "media_optimizer": media_optimizer.is_healthy(),
+            "cache": cache_manager.is_healthy(),
         }
 
         all_healthy = all(services_status.values())
 
-        return jsonify({
-            'status': 'healthy' if all_healthy else 'degraded',
-            'timestamp': datetime.utcnow().isoformat(),
-            'services': services_status,
-            'version': '1.0.0'
-        }), 200 if all_healthy else 503
+        return jsonify(
+            {
+                "status": "healthy" if all_healthy else "degraded",
+                "timestamp": datetime.utcnow().isoformat(),
+                "services": services_status,
+                "version": "1.0.0",
+            }
+        ), (200 if all_healthy else 503)
 
     except Exception as e:
         logger.error(f"Health check failed: {e!s}")
-        return jsonify({
-            'status': 'unhealthy',
-            'error': str(e),
-            'timestamp': datetime.utcnow().isoformat()
-        }), 503
+        return jsonify({"status": "unhealthy", "error": str(e), "timestamp": datetime.utcnow().isoformat()}), 503
 
-@app.route('/api/v1/analyze_product', methods=['POST'])
+
+@app.route("/api/v1/analyze_product", methods=["POST"])
 @verify_api_key
 @validate_request
 def analyze_product():
@@ -101,7 +101,7 @@ def analyze_product():
     """
     try:
         data = request.get_json()
-        product_id = data.get('product_id')
+        product_id = data.get("product_id")
 
         # Check cache first
         cache_key = f"product_analysis_{product_id}"
@@ -115,9 +115,9 @@ def analyze_product():
         # Perform AI analysis
         analysis_result = product_analyzer.analyze_product(
             product_id=product_id,
-            images=data.get('product_images', {}),
-            description=data.get('product_description', ''),
-            attributes=data.get('product_attributes', {})
+            images=data.get("product_images", {}),
+            description=data.get("product_description", ""),
+            attributes=data.get("product_attributes", {}),
         )
 
         # Cache the result
@@ -128,12 +128,10 @@ def analyze_product():
 
     except Exception as e:
         logger.error(f"❌ Product analysis failed: {e!s}")
-        return jsonify({
-            'error': 'Product analysis failed',
-            'message': str(e)
-        }), 500
+        return jsonify({"error": "Product analysis failed", "message": str(e)}), 500
 
-@app.route('/api/v1/get_recommendations', methods=['POST'])
+
+@app.route("/api/v1/get_recommendations", methods=["POST"])
 @verify_api_key
 @validate_request
 def get_recommendations():
@@ -150,9 +148,9 @@ def get_recommendations():
     """
     try:
         data = request.get_json()
-        product_id = data.get('product_id')
-        customer_segment = data.get('customer_segment', 'general')
-        recommendation_type = data.get('recommendation_type', 'related')
+        product_id = data.get("product_id")
+        customer_segment = data.get("customer_segment", "general")
+        recommendation_type = data.get("recommendation_type", "related")
 
         cache_key = f"recommendations_{product_id}_{customer_segment}_{recommendation_type}"
         cached_result = cache_manager.get(cache_key)
@@ -166,7 +164,7 @@ def get_recommendations():
             product_id=product_id,
             customer_segment=customer_segment,
             recommendation_type=recommendation_type,
-            customer_history=data.get('customer_history', [])
+            customer_history=data.get("customer_history", []),
         )
 
         # Cache the result
@@ -177,12 +175,10 @@ def get_recommendations():
 
     except Exception as e:
         logger.error(f"❌ Recommendation generation failed: {e!s}")
-        return jsonify({
-            'error': 'Recommendation generation failed',
-            'message': str(e)
-        }), 500
+        return jsonify({"error": "Recommendation generation failed", "message": str(e)}), 500
 
-@app.route('/api/v1/update_customer_segment', methods=['POST'])
+
+@app.route("/api/v1/update_customer_segment", methods=["POST"])
 @verify_api_key
 @validate_request
 def update_customer_segment():
@@ -203,22 +199,20 @@ def update_customer_segment():
     """
     try:
         data = request.get_json()
-        customer_id = data.get('customer_id')
-        behavior_data = data.get('behavior_data', {})
-        current_segment = data.get('current_segment', 'new_visitor')
+        customer_id = data.get("customer_id")
+        behavior_data = data.get("behavior_data", {})
+        current_segment = data.get("current_segment", "new_visitor")
 
         logger.info(f"👤 Updating customer segment for customer {customer_id}")
 
         new_segment = customer_segmentation.update_segment(
-            customer_id=customer_id,
-            behavior_data=behavior_data,
-            current_segment=current_segment
+            customer_id=customer_id, behavior_data=behavior_data, current_segment=current_segment
         )
 
         result = {
-            'segment': new_segment,
-            'confidence': customer_segmentation.get_segment_confidence(new_segment),
-            'characteristics': customer_segmentation.get_segment_characteristics(new_segment)
+            "segment": new_segment,
+            "confidence": customer_segmentation.get_segment_confidence(new_segment),
+            "characteristics": customer_segmentation.get_segment_characteristics(new_segment),
         }
 
         logger.info(f"✅ Customer {customer_id} updated to segment: {new_segment}")
@@ -226,12 +220,10 @@ def update_customer_segment():
 
     except Exception as e:
         logger.error(f"❌ Customer segmentation failed: {e!s}")
-        return jsonify({
-            'error': 'Customer segmentation failed',
-            'message': str(e)
-        }), 500
+        return jsonify({"error": "Customer segmentation failed", "message": str(e)}), 500
 
-@app.route('/api/v1/get_dynamic_pricing', methods=['POST'])
+
+@app.route("/api/v1/get_dynamic_pricing", methods=["POST"])
 @verify_api_key
 @validate_request
 def get_dynamic_pricing():
@@ -248,8 +240,8 @@ def get_dynamic_pricing():
     """
     try:
         data = request.get_json()
-        product_id = data.get('product_id')
-        customer_segment = data.get('customer_segment', 'general')
+        product_id = data.get("product_id")
+        customer_segment = data.get("customer_segment", "general")
 
         cache_key = f"dynamic_pricing_{product_id}_{customer_segment}"
         cached_result = cache_manager.get(cache_key)
@@ -262,8 +254,8 @@ def get_dynamic_pricing():
         pricing_data = dynamic_pricing.calculate_pricing(
             product_id=product_id,
             customer_segment=customer_segment,
-            inventory_level=data.get('inventory_level', {}),
-            demand_metrics=data.get('demand_metrics', {})
+            inventory_level=data.get("inventory_level", {}),
+            demand_metrics=data.get("demand_metrics", {}),
         )
 
         # Cache the result for shorter time due to dynamic nature
@@ -274,12 +266,10 @@ def get_dynamic_pricing():
 
     except Exception as e:
         logger.error(f"❌ Dynamic pricing calculation failed: {e!s}")
-        return jsonify({
-            'error': 'Dynamic pricing calculation failed',
-            'message': str(e)
-        }), 500
+        return jsonify({"error": "Dynamic pricing calculation failed", "message": str(e)}), 500
 
-@app.route('/api/v1/optimize_media', methods=['POST'])
+
+@app.route("/api/v1/optimize_media", methods=["POST"])
 @verify_api_key
 @validate_request
 def optimize_media():
@@ -295,16 +285,14 @@ def optimize_media():
     """
     try:
         data = request.get_json()
-        image_url = data.get('image_url')
-        target_resolutions = data.get('target_resolutions', ['300x300', '600x600', '1200x1200'])
-        optimization_level = data.get('optimization_level', 'high')
+        image_url = data.get("image_url")
+        target_resolutions = data.get("target_resolutions", ["300x300", "600x600", "1200x1200"])
+        optimization_level = data.get("optimization_level", "high")
 
         logger.info(f"🖼️ Optimizing media: {image_url}")
 
         optimized_media = media_optimizer.optimize_image(
-            image_url=image_url,
-            target_resolutions=target_resolutions,
-            optimization_level=optimization_level
+            image_url=image_url, target_resolutions=target_resolutions, optimization_level=optimization_level
         )
 
         logger.info("✅ Media optimization completed")
@@ -312,29 +300,23 @@ def optimize_media():
 
     except Exception as e:
         logger.error(f"❌ Media optimization failed: {e!s}")
-        return jsonify({
-            'error': 'Media optimization failed',
-            'message': str(e)
-        }), 500
+        return jsonify({"error": "Media optimization failed", "message": str(e)}), 500
+
 
 @app.errorhandler(404)
 def not_found(error):
-    return jsonify({
-        'error': 'Endpoint not found',
-        'message': 'The requested API endpoint does not exist'
-    }), 404
+    return jsonify({"error": "Endpoint not found", "message": "The requested API endpoint does not exist"}), 404
+
 
 @app.errorhandler(500)
 def internal_error(error):
     logger.error(f"Internal server error: {error!s}")
-    return jsonify({
-        'error': 'Internal server error',
-        'message': 'An unexpected error occurred'
-    }), 500
+    return jsonify({"error": "Internal server error", "message": "An unexpected error occurred"}), 500
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Development server
-    app.run(host='0.0.0.0', port=8080, debug=False)
+    app.run(host="0.0.0.0", port=8080, debug=False)
 else:
     # Production server (gunicorn)
     logger.info("🚀 Luxury AI Services API started in production mode")

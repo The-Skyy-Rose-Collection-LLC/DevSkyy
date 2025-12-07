@@ -1,376 +1,474 @@
+"""
+AES-256-GCM Encryption Module (NIST SP 800-38D)
+Field-level encryption with PBKDF2 key derivation and key rotation support
+Author: DevSkyy Enterprise Team
+Date: October 26, 2025
+
+Citation: NIST SP 800-38D (Recommendation for Block Cipher Modes of Operation:
+Galois/Counter Mode), published Dec 2007, reaffirmed 2024
+"""
+
 import base64
-import hashlib
+from datetime import datetime
 import logging
 import os
 import secrets
-from typing import Any, Optional, Union
 
-from cryptography.fernet import Fernet
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-
-"""
-Enterprise-Grade Encryption System
-AES-256-GCM encryption replacing XOR cipher
-Includes key derivation, secure random generation, and encryption helpers
-"""
 
 logger = logging.getLogger(__name__)
 
 # ============================================================================
-# KEY MANAGEMENT
+# CONFIGURATION
 # ============================================================================
 
-class KeyManager:
-    """Secure key management with key rotation support"""
 
-    def __init__(self, master_key: Optional[str] = None):
-        """
-        Initialize key manager
+class EncryptionSettings:
+    """
+    AES-256-GCM Configuration (NIST SP 800-38D Section 5.2.1.1)
+    """
 
-        Args:
-            master_key: Master encryption key (from environment or generated)
-        """
-        self.master_key = master_key or os.getenv(
-            "ENCRYPTION_MASTER_KEY", self._generate_master_key()
-        )
-        self.active_keys: dict[str, bytes] = {}
-        self.key_versions: dict[str, int] = {}
+    # Master encryption key (must be 32 bytes for AES-256)
+    MASTER_KEY: bytes | None = None
 
-    @staticmethod
-    def _generate_master_key() -> str:
-        """Generate a new master key"""
-        key = Fernet.generate_key()
-        logger.warning("⚠️  Generated new master key - SAVE THIS IN YOUR .env FILE!")
-        logger.warning(f"ENCRYPTION_MASTER_KEY={key.decode()}")
-        return key.decode()
+    # PBKDF2 Key Derivation (NIST SP 800-132)
+    PBKDF2_ITERATIONS: int = 100_000  # NIST recommendation: 100k+ iterations
+    PBKDF2_HASH: str = "sha256"
+    PBKDF2_SALT_LENGTH: int = 16  # 128 bits
 
-    def derive_key(
-        self, password: str, salt: Optional[bytes] = None, key_size: int = 32
-    ) -> tuple[bytes, bytes]:
-        """
-        Derive an encryption key from a password using PBKDF2
+    # GCM Parameters (NIST SP 800-38D Section 5.2.1.1)
+    GCM_NONCE_LENGTH: int = 12  # 96 bits (recommended for performance)
+    GCM_TAG_LENGTH: int = 16  # 128 bits (full authentication tag)
 
-        Args:
-            password: Password to derive key from
-            salt: Salt for key derivation (generated if not provided)
-            key_size: Size of derived key in bytes
+    # Key Rotation
+    KEY_ROTATION_INTERVAL_DAYS: int = 90
+    LEGACY_KEYS: dict = {}  # Store old keys for decryption of legacy data
 
-        Returns:
-            Tuple of (derived_key, salt)
-        """
-        if salt is None:
-            salt = secrets.token_bytes(16)
+    def __init__(self):
+        """Initialize encryption settings from environment"""
+        master_key_b64 = os.getenv("ENCRYPTION_MASTER_KEY")
+        if not master_key_b64:
+            # Generate new master key if not provided (development only)
+            logger.warning(
+                "ENCRYPTION_MASTER_KEY not set. Generating ephemeral key. " "Set ENCRYPTION_MASTER_KEY for production."
+            )
+            self.MASTER_KEY = secrets.token_bytes(32)  # 256 bits
+        else:
+            try:
+                self.MASTER_KEY = base64.b64decode(master_key_b64)
+                if len(self.MASTER_KEY) != 32:
+                    raise ValueError("Master key must be 256 bits (32 bytes)")
+            except Exception as e:
+                raise ValueError(f"Invalid ENCRYPTION_MASTER_KEY: {e!s}")
 
-        kdf = PBKDF2HMAC(
-            algorithm=hashes.SHA256(),
-            length=key_size,
-            salt=salt,
-            iterations=100000,
-            backend=default_backend(),
-        )
 
-        key = kdf.derive(password.encode())
-        return key, salt
-
-    def get_key(self, key_id: str = "default") -> bytes:
-        """Get or create an encryption key"""
-        if key_id not in self.active_keys:
-            # Derive key from master key
-            key, _ = self.derive_key(self.master_key)
-            self.active_keys[key_id] = key
-            self.key_versions[key_id] = 1
-
-        return self.active_keys[key_id]
+settings = EncryptionSettings()
 
 # ============================================================================
-# AES-256-GCM ENCRYPTION
+# ENCRYPTION & DECRYPTION
 # ============================================================================
 
-class AESEncryption:
-    """AES-256-GCM encryption (Authenticated Encryption with Associated Data)"""
 
-    def __init__(self, key_manager: Optional[KeyManager] = None):
-        """
-        Initialize AES encryption
+def derive_key(password: str, salt: bytes | None = None) -> tuple[bytes, bytes]:
+    """
+    Derive encryption key from password using PBKDF2 (NIST SP 800-132)
 
-        Args:
-            key_manager: Key manager instance (created if not provided)
-        """
-        self.key_manager = key_manager or KeyManager()
+    Args:
+        password: Master password or passphrase
+        salt: Optional salt (generated if not provided)
 
-    def encrypt(self, plaintext: Union[str, bytes], key_id: str = "default") -> str:
-        """
-        Encrypt data using AES-256-GCM
+    Returns:
+        Tuple of (key, salt) where key is 32 bytes (AES-256)
 
-        Args:
-            plaintext: Data to encrypt
-            key_id: Key identifier to use
+    Citation: NIST SP 800-132 (Password-Based Key Derivation Function)
+    """
+    if salt is None:
+        salt = secrets.token_bytes(settings.PBKDF2_SALT_LENGTH)
 
-        Returns:
-            Base64-encoded encrypted data with IV and tag
-        """
-        # Convert to bytes if string
-        if isinstance(plaintext, str):
-            plaintext = plaintext.encode()
+    kdf = PBKDF2HMAC(
+        algorithm=hashes.SHA256(),
+        length=32,  # 256 bits for AES-256
+        salt=salt,
+        iterations=settings.PBKDF2_ITERATIONS,
+        backend=default_backend(),
+    )
 
-        # Get encryption key
-        key = self.key_manager.get_key(key_id)
+    key = kdf.derive(password.encode())
+    return key, salt
 
-        # Generate a random IV (12 bytes for GCM)
-        iv = secrets.token_bytes(12)
+
+def encrypt_field(plaintext: str, master_key: bytes | None = None) -> str:
+    """
+    Encrypt a single field using AES-256-GCM
+
+    Args:
+        plaintext: Data to encrypt
+        master_key: Encryption key (defaults to MASTER_KEY from settings)
+
+    Returns:
+        Base64-encoded ciphertext (format: nonce + tag + ciphertext)
+
+    Citation: NIST SP 800-38D Section 5.2 (Encryption)
+    """
+    if master_key is None:
+        master_key = settings.MASTER_KEY
+
+    if master_key is None:
+        raise ValueError("No encryption key available")
+
+    try:
+        # Generate random nonce (96 bits for GCM - NIST recommends for performance)
+        nonce = secrets.token_bytes(settings.GCM_NONCE_LENGTH)
 
         # Create cipher
-        cipher = Cipher(algorithms.AES(key), modes.GCM(iv), backend=default_backend())
-        encryptor = cipher.encryptor()
+        cipher = AESGCM(master_key)
 
-        # Encrypt and get tag
-        ciphertext = encryptor.update(plaintext) + encryptor.finalize()
-        tag = encryptor.tag
+        # Encrypt (authentication tag is automatically appended)
+        # associated_data=None means no AAD (Associated Authenticated Data)
+        ciphertext = cipher.encrypt(nonce, plaintext.encode("utf-8"), None)  # No associated authenticated data
 
-        # Combine IV + tag + ciphertext
-        encrypted_data = iv + tag + ciphertext
+        # Package: nonce + ciphertext (tag is appended by encrypt())
+        encrypted_package = nonce + ciphertext
 
-        # Return base64 encoded
-        return base64.b64encode(encrypted_data).decode()
+        # Encode to base64 for storage (avoids binary data in databases)
+        encoded = base64.b64encode(encrypted_package).decode("utf-8")
+
+        logger.debug(f"Field encrypted successfully (plaintext length: {len(plaintext)})")
+        return encoded
+
+    except Exception as e:
+        logger.error(f"Encryption failed: {e!s}")
+        raise RuntimeError(f"Encryption error: {e!s}")
+
+
+def decrypt_field(
+    encrypted_base64: str, master_key: bytes | None = None, legacy_key_id: str | None = None
+) -> str:
+    """
+    Decrypt a field encrypted with AES-256-GCM
+
+    Args:
+        encrypted_base64: Base64-encoded encrypted data
+        master_key: Encryption key (defaults to MASTER_KEY)
+        legacy_key_id: Optional key ID for decrypting data with rotated keys
+
+    Returns:
+        Decrypted plaintext
+
+    Raises:
+        ValueError: If decryption fails (tampering detected)
+
+    Citation: NIST SP 800-38D Section 5.3 (Decryption)
+    """
+    if master_key is None:
+        master_key = settings.MASTER_KEY
+
+    if master_key is None:
+        raise ValueError("No encryption key available")
+
+    try:
+        # Decode from base64
+        encrypted_package = base64.b64decode(encrypted_base64)
+
+        # Extract nonce and ciphertext
+        nonce = encrypted_package[: settings.GCM_NONCE_LENGTH]
+        ciphertext = encrypted_package[settings.GCM_NONCE_LENGTH :]
+
+        # Create cipher and decrypt
+        cipher = AESGCM(master_key)
+        plaintext = cipher.decrypt(nonce, ciphertext, None)
+
+        logger.debug("Field decrypted successfully")
+        return plaintext.decode("utf-8")
+
+    except Exception as e:
+        logger.error(f"Decryption failed: {e!s}")
+        raise ValueError("Decryption failed - data may be corrupted or tampered with")
+
+
+def encrypt_dict(data: dict, fields: list) -> dict:
+    """
+    Encrypt specific fields in a dictionary
+
+    Args:
+        data: Dictionary to encrypt
+        fields: List of field names to encrypt
+
+    Returns:
+        Dictionary with specified fields encrypted
+    """
+    encrypted = data.copy()
+    for field in fields:
+        if field in encrypted:
+            encrypted[field] = encrypt_field(str(encrypted[field]))
+    return encrypted
+
+
+def decrypt_dict(data: dict, fields: list) -> dict:
+    """
+    Decrypt specific fields in a dictionary
+
+    Args:
+        data: Dictionary to decrypt
+        fields: List of field names to decrypt
+
+    Returns:
+        Dictionary with specified fields decrypted
+    """
+    decrypted = data.copy()
+    for field in fields:
+        if field in decrypted:
+            decrypted[field] = decrypt_field(decrypted[field])
+    return decrypted
+
+
+# ============================================================================
+# KEY ROTATION
+# ============================================================================
+
+
+def rotate_keys() -> str:
+    """
+    Rotate master encryption key
+
+    Moves current key to legacy_keys and generates new master key.
+    Old data can still be decrypted using legacy keys.
+
+    Returns:
+        New master key (base64 encoded)
+    """
+    timestamp = datetime.utcnow().isoformat()
+
+    # Archive current key
+    if settings.MASTER_KEY:
+        settings.LEGACY_KEYS[timestamp] = settings.MASTER_KEY
+        logger.info(f"Archived master key for rotation (timestamp: {timestamp})")
+
+    # Generate new master key
+    new_key = secrets.token_bytes(32)
+    settings.MASTER_KEY = new_key
+
+    new_key_b64 = base64.b64encode(new_key).decode("utf-8")
+    logger.warning(f"Master key rotated. New key (base64): {new_key_b64}")
+
+    return new_key_b64
+
+
+# ============================================================================
+# PII MASKING FOR LOGS
+# ============================================================================
+
+
+def mask_pii(data: str, mask_char: str = "*", show_chars: int = 3) -> str:
+    """
+    Mask personally identifiable information in logs
+
+    Args:
+        data: PII to mask (e.g., email, phone)
+        mask_char: Character to use for masking (default: "*")
+        show_chars: Number of characters to show (default: 3)
+
+    Returns:
+        Masked string (e.g., "abc***@g***l.com")
+    """
+    if len(data) <= show_chars:
+        return mask_char * len(data)
+
+    visible = data[:show_chars]
+    masked = mask_char * (len(data) - show_chars)
+    return visible + masked
+
+
+def mask_email(email: str) -> str:
+    """Mask email address in logs"""
+    if "@" not in email:
+        return mask_pii(email)
+
+    local, domain = email.split("@", 1)
+    masked_local = mask_pii(local, show_chars=1)
+    masked_domain = mask_pii(domain.split(".")[0], show_chars=1) + ".*"
+    return f"{masked_local}@{masked_domain}"
+
+
+def mask_phone(phone: str) -> str:
+    """Mask phone number in logs"""
+    # Show only last 4 digits
+    if len(phone) <= 4:
+        return mask_pii(phone)
+    return mask_pii(phone, show_chars=0) + phone[-4:]
+
+
+# ============================================================================
+# INITIALIZATION
+# ============================================================================
+
+
+def generate_master_key() -> str:
+    """
+    Generate a new master encryption key
+
+    Returns:
+        Base64-encoded key (safe to store in .env)
+    """
+    key = secrets.token_bytes(32)  # 256 bits
+    return base64.b64encode(key).decode("utf-8")
+
+
+# ============================================================================
+# BACKWARD COMPATIBILITY LAYER (for encryption.py v1)
+# ============================================================================
+
+
+class KeyManager:
+    """Backward compatible KeyManager (delegates to v2 functions)."""
+
+    def __init__(self, master_key: str | None = None):
+        self.master_key = master_key or os.getenv("ENCRYPTION_MASTER_KEY")
+        if self.master_key and not isinstance(self.master_key, bytes):
+            self.master_key = base64.b64decode(self.master_key)
+
+    def derive_key(self, password: str, salt: bytes | None = None, key_size: int = 32) -> tuple[bytes, bytes]:
+        """Derive key from password (delegates to module function)."""
+        return derive_key(password, salt)
+
+    def get_key(self, key_id: str = "default") -> bytes:
+        """Get encryption key."""
+        return self.master_key or settings.MASTER_KEY
+
+
+class AESEncryption:
+    """Backward compatible AES encryption (delegates to v2 functions)."""
+
+    def __init__(self, key_manager: KeyManager | None = None):
+        self.key_manager = key_manager or KeyManager()
+
+    def encrypt(self, plaintext: str, key_id: str = "default") -> str:
+        """Encrypt data (delegates to encrypt_field)."""
+        key = self.key_manager.get_key(key_id)
+        return encrypt_field(plaintext, master_key=key)
 
     def decrypt(self, encrypted_data: str, key_id: str = "default") -> str:
-        """
-        Decrypt data using AES-256-GCM
+        """Decrypt data (delegates to decrypt_field)."""
+        key = self.key_manager.get_key(key_id)
+        return decrypt_field(encrypted_data, master_key=key)
 
-        Args:
-            encrypted_data: Base64-encoded encrypted data
-            key_id: Key identifier to use
-
-        Returns:
-            Decrypted plaintext
-
-        Raises:
-            Exception: If decryption fails or authentication tag is invalid
-        """
-        try:
-            # Decode from base64
-            encrypted_bytes = base64.b64decode(encrypted_data)
-
-            # Extract IV, tag, and ciphertext
-            iv = encrypted_bytes[:12]
-            tag = encrypted_bytes[12:28]
-            ciphertext = encrypted_bytes[28:]
-
-            # Get decryption key
-            key = self.key_manager.get_key(key_id)
-
-            # Create cipher
-            cipher = Cipher(
-                algorithms.AES(key), modes.GCM(iv, tag), backend=default_backend()
-            )
-            decryptor = cipher.decryptor()
-
-            # Decrypt
-            plaintext = decryptor.update(ciphertext) + decryptor.finalize()
-
-            return plaintext.decode()
-
-        except Exception as e:
-            logger.error(f"Decryption failed: {e}")
-            raise ValueError(
-                "Decryption failed - data may be corrupted or key is incorrect"
-            )
-
-# ============================================================================
-# FERNET ENCRYPTION (Simpler alternative)
-# ============================================================================
-
-class FernetEncryption:
-    """Fernet encryption (simpler, built-in authentication)"""
-
-    def __init__(self, key: Optional[bytes] = None):
-        """
-        Initialize Fernet encryption
-
-        Args:
-            key: Encryption key (generated if not provided)
-        """
-        if key is None:
-            key = Fernet.generate_key()
-            logger.warning(f"Generated new Fernet key: {key.decode()}")
-
-        self.cipher = Fernet(key)
-
-    def encrypt(self, plaintext: Union[str, bytes]) -> str:
-        """Encrypt data using Fernet"""
-        if isinstance(plaintext, str):
-            plaintext = plaintext.encode()
-
-        encrypted = self.cipher.encrypt(plaintext)
-        return encrypted.decode()
-
-    def decrypt(self, encrypted_data: str) -> str:
-        """Decrypt data using Fernet"""
-        decrypted = self.cipher.decrypt(encrypted_data.encode())
-        return decrypted.decode()
-
-# ============================================================================
-# FIELD-LEVEL ENCRYPTION
-# ============================================================================
 
 class FieldEncryption:
-    """Field-level encryption for sensitive database fields"""
+    """Backward compatible field-level encryption."""
 
-    def __init__(self, encryption_engine: Optional[AESEncryption] = None):
-        """
-        Initialize field encryption
-
-        Args:
-            encryption_engine: AES encryption instance
-        """
+    def __init__(self, encryption_engine: AESEncryption | None = None):
         self.engine = encryption_engine or AESEncryption()
 
-    def encrypt_field(self, value: Any, field_name: str) -> dict[str, Any]:
-        """
-        Encrypt a field value
-
-        Args:
-            value: Value to encrypt
-            field_name: Name of the field (used for key derivation)
-
-        Returns:
-            Dictionary with encrypted value and metadata
-        """
+    def encrypt_field(self, value: any, field_name: str = "default") -> dict:
+        """Encrypt a field value."""
         if value is None:
             return {"encrypted": False, "value": None}
+        encrypted = self.engine.encrypt(str(value))
+        return {"encrypted": True, "value": encrypted, "field": field_name}
 
-        # Convert value to string
-        str_value = str(value)
-
-        # Encrypt
-        encrypted = self.engine.encrypt(str_value, key_id=f"field_{field_name}")
-
-        return {
-            "encrypted": True,
-            "value": encrypted,
-            "field": field_name,
-            "encrypted_at": str(hash(field_name)),
-        }
-
-    def decrypt_field(self, encrypted_data: dict[str, Any]) -> Any:
-        """
-        Decrypt a field value
-
-        Args:
-            encrypted_data: Dictionary with encrypted value and metadata
-
-        Returns:
-            Decrypted value
-        """
+    def decrypt_field(self, encrypted_data: dict) -> any:
+        """Decrypt a field value."""
         if not encrypted_data.get("encrypted"):
             return encrypted_data.get("value")
+        return self.engine.decrypt(encrypted_data["value"])
 
-        field_name = encrypted_data.get("field")
-        encrypted_value = encrypted_data.get("value")
-
-        # Decrypt
-        decrypted = self.engine.decrypt(encrypted_value, key_id=f"field_{field_name}")
-
-        return decrypted
 
 # ============================================================================
-# PASSWORD HASHING (One-way)
+# CONVENIENCE ALIASES
 # ============================================================================
 
-class PasswordHasher:
-    """Secure password hashing using bcrypt or argon2"""
+# Function aliases for common operations
+encrypt_data = encrypt_field
+decrypt_data = decrypt_field
+generate_encryption_key = generate_master_key
 
-    @staticmethod
-    def hash_password(password: str, salt_rounds: int = 12) -> str:
-        """
-        Hash a password using SHA-256 with salt
-
-        Args:
-            password: Password to hash
-            salt_rounds: Number of salt rounds (complexity)
-
-        Returns:
-            Hashed password
-        """
-        # Generate salt
-        salt = secrets.token_bytes(32)
-
-        # Hash password
-        key = hashlib.pbkdf2_hmac(
-            "sha256", password.encode(), salt, 100000 + salt_rounds * 10000
-        )
-
-        # Combine salt and hash
-        storage = salt + key
-
-        return base64.b64encode(storage).decode()
-
-    @staticmethod
-    def verify_password(password: str, hashed: str) -> bool:
-        """
-        Verify a password against its hash
-
-        Args:
-            password: Password to verify
-            hashed: Hashed password
-
-        Returns:
-            True if password matches
-        """
-        try:
-            # Decode stored hash
-            storage = base64.b64decode(hashed)
-
-            # Extract salt and hash
-            salt = storage[:32]
-            stored_key = storage[32:]
-
-            # Hash provided password
-            key = hashlib.pbkdf2_hmac("sha256", password.encode(), salt, 100000)
-
-            # Constant-time comparison
-            return secrets.compare_digest(key, stored_key)
-
-        except Exception:
-            return False
 
 # ============================================================================
-# SECURE RANDOM GENERATION
+# ENCRYPTION MANAGER (for main.py compatibility)
 # ============================================================================
 
-class SecureRandom:
-    """Cryptographically secure random generation"""
 
-    @staticmethod
-    def generate_token(length: int = 32) -> str:
-        """Generate a secure random token"""
-        return secrets.token_urlsafe(length)
+class EncryptionManager:
+    """
+    Unified encryption manager for the DevSkyy platform.
+    Provides high-level API for all encryption operations.
+    """
 
-    @staticmethod
-    def generate_api_key() -> str:
-        """Generate a secure API key"""
-        prefix = "sk_live_"
-        random_part = secrets.token_urlsafe(32)
-        return f"{prefix}{random_part}"
+    def __init__(self, master_key: str | None = None):
+        """Initialize encryption manager."""
+        if master_key:
+            if isinstance(master_key, str):
+                settings.MASTER_KEY = base64.b64decode(master_key)
+            else:
+                settings.MASTER_KEY = master_key
 
-    @staticmethod
-    def generate_secret_key(length: int = 64) -> str:
-        """Generate a secret key"""
-        return secrets.token_hex(length)
+        self.key_manager = KeyManager(master_key)
+        self.aes = AESEncryption(self.key_manager)
+        self.field_encryption = FieldEncryption(self.aes)
+
+    def encrypt(self, plaintext: str) -> str:
+        """Encrypt plaintext."""
+        return encrypt_field(plaintext)
+
+    def decrypt(self, ciphertext: str) -> str:
+        """Decrypt ciphertext."""
+        return decrypt_field(ciphertext)
+
+    def encrypt_dict_fields(self, data: dict, fields: list) -> dict:
+        """Encrypt specific fields in a dictionary."""
+        return encrypt_dict(data, fields)
+
+    def decrypt_dict_fields(self, data: dict, fields: list) -> dict:
+        """Decrypt specific fields in a dictionary."""
+        return decrypt_dict(data, fields)
+
+    def generate_key(self) -> str:
+        """Generate new master key."""
+        return generate_master_key()
+
+    def rotate_master_key(self) -> str:
+        """Rotate the master encryption key."""
+        return rotate_keys()
+
 
 # ============================================================================
-# GLOBAL INSTANCES
+# SERVICE ALIAS (for test compatibility)
 # ============================================================================
 
-# Global encryption instances
+
+class EncryptionService:
+    """Alias for EncryptionManager for test compatibility."""
+
+    def __init__(self):
+        self.manager = EncryptionManager()
+
+    def encrypt(self, plaintext: str) -> str:
+        return self.manager.encrypt(plaintext)
+
+    def decrypt(self, ciphertext: str) -> str:
+        return self.manager.decrypt(ciphertext)
+
+
+# ============================================================================
+# GLOBAL INSTANCES (for backward compatibility)
+# ============================================================================
+
 key_manager = KeyManager()
 aes_encryption = AESEncryption(key_manager)
 field_encryption = FieldEncryption(aes_encryption)
-password_hasher = PasswordHasher()
-secure_random = SecureRandom()
 
-logger.info("🔐 Enterprise AES-256 Encryption System initialized")
+logger.info("AES-256-GCM Encryption System initialized (NIST SP 800-38D)")
+
+
+if __name__ == "__main__":
+    # Demo: Generate key and encrypt data
+    key = generate_master_key()
+
+    # Encrypt and decrypt example
+    plaintext = "sensitive_data_123"
+    encrypted = encrypt_field(plaintext)
+    decrypted = decrypt_field(encrypted)

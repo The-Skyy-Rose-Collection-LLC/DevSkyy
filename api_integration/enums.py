@@ -2,6 +2,7 @@
 API Integration Enums Module
 Centralized enum definitions with serialization support for improved code clarity and maintenance
 """
+
 from enum import Enum
 
 

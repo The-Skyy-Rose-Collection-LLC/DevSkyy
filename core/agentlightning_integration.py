@@ -17,19 +17,79 @@ from collections.abc import Callable
 from datetime import datetime
 from functools import wraps
 import os
-from typing import Any, Optional
+from typing import Any
 
-from agentlightning import (
-    AgentOpsTracer,
-    LitAgent,
-    LLMProxy,
-    OtelTracer,
-    emit_reward,
-)
-from opentelemetry import trace
-from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
-from opentelemetry.sdk.trace import TracerProvider
-from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+try:
+    from agentlightning import (
+        AgentOpsTracer,
+        LitAgent,
+        LLMProxy,
+        OtelTracer,
+        emit_reward,
+    )
+    AGENTLIGHTNING_AVAILABLE = True
+except ImportError:
+    # AgentLightning not available - use mock implementations
+    AGENTLIGHTNING_AVAILABLE = False
+
+    class AgentOpsTracer:
+        """Mock AgentOpsTracer for when agentlightning is not available"""
+        pass
+
+    class LitAgent:
+        """Mock LitAgent for when agentlightning is not available"""
+        pass
+
+    class LLMProxy:
+        """Mock LLMProxy for when agentlightning is not available"""
+        pass
+
+    class OtelTracer:
+        """Mock OtelTracer for when agentlightning is not available"""
+        pass
+
+    def emit_reward(*args, **kwargs):
+        """Mock emit_reward for when agentlightning is not available"""
+        pass
+
+try:
+    from opentelemetry import trace
+    from opentelemetry.exporter.otlp.proto.http.trace_exporter import OTLPSpanExporter
+    from opentelemetry.sdk.trace import TracerProvider
+    from opentelemetry.sdk.trace.export import BatchSpanProcessor, ConsoleSpanExporter
+    OPENTELEMETRY_AVAILABLE = True
+except ImportError:
+    # OpenTelemetry not available - use mock implementations
+    OPENTELEMETRY_AVAILABLE = False
+
+    class trace:
+        """Mock trace for when opentelemetry is not available"""
+        @staticmethod
+        def get_tracer(name):
+            return None
+
+        @staticmethod
+        def set_tracer_provider(provider):
+            pass
+
+    class OTLPSpanExporter:
+        """Mock OTLPSpanExporter"""
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class TracerProvider:
+        """Mock TracerProvider"""
+        def add_span_processor(self, processor):
+            pass
+
+    class BatchSpanProcessor:
+        """Mock BatchSpanProcessor"""
+        def __init__(self, *args, **kwargs):
+            pass
+
+    class ConsoleSpanExporter:
+        """Mock ConsoleSpanExporter"""
+        pass
 
 
 class DevSkyyLightning:
@@ -44,10 +104,7 @@ class DevSkyyLightning:
     """
 
     def __init__(
-        self,
-        service_name: str = "devskyy-agents",
-        otlp_endpoint: Optional[str] = None,
-        enable_console: bool = False
+        self, service_name: str = "devskyy-agents", otlp_endpoint: str | None = None, enable_console: bool = False
     ):
         """
         Initialize AgentLightning integration
@@ -73,7 +130,7 @@ class DevSkyyLightning:
             "successful_operations": 0,
             "failed_operations": 0,
             "total_latency_ms": 0.0,
-            "agent_calls": {}
+            "agent_calls": {},
         }
 
     def _setup_tracer(self) -> None:
@@ -95,10 +152,7 @@ class DevSkyyLightning:
         self.otel_tracer = OtelTracer()
 
     def trace_agent_operation(
-        self,
-        operation_name: str,
-        agent_id: Optional[str] = None,
-        metadata: Optional[dict[str, Any]] = None
+        self, operation_name: str, agent_id: str | None = None, metadata: dict[str, Any] | None = None
     ):
         """
         Decorator to trace agent operations
@@ -116,6 +170,7 @@ class DevSkyyLightning:
             def route_task(task):
                 return result
         """
+
         def decorator(func: Callable) -> Callable:
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -172,14 +227,10 @@ class DevSkyyLightning:
                             self.metrics["agent_calls"][agent_id] += 1
 
             return wrapper
+
         return decorator
 
-    def trace_llm_call(
-        self,
-        model: str,
-        provider: Optional[str] = None,
-        metadata: Optional[dict[str, Any]] = None
-    ):
+    def trace_llm_call(self, model: str, provider: str | None = None, metadata: dict[str, Any] | None = None):
         """
         Decorator to trace LLM API calls
 
@@ -191,6 +242,7 @@ class DevSkyyLightning:
         Returns:
             Decorated function with LLM tracing
         """
+
         def decorator(func: Callable) -> Callable:
             @wraps(func)
             def wrapper(*args, **kwargs):
@@ -222,14 +274,10 @@ class DevSkyyLightning:
                         raise
 
             return wrapper
+
         return decorator
 
-    def create_lit_agent(
-        self,
-        agent_id: str,
-        agent_func: Callable,
-        description: Optional[str] = None
-    ) -> LitAgent:
+    def create_lit_agent(self, agent_id: str, agent_func: Callable, description: str | None = None) -> LitAgent:
         """
         Create a LitAgent wrapped with observability
 
@@ -245,14 +293,10 @@ class DevSkyyLightning:
         traced_func = self.trace_agent_operation(
             operation_name=f"agent_{agent_id}",
             agent_id=agent_id,
-            metadata={"description": description} if description else None
+            metadata={"description": description} if description else None,
         )(agent_func)
 
-        return LitAgent(
-            agent_id=agent_id,
-            agent_func=traced_func,
-            description=description
-        )
+        return LitAgent(agent_id=agent_id, agent_func=traced_func, description=description)
 
     def get_metrics(self) -> dict[str, Any]:
         """
@@ -262,16 +306,8 @@ class DevSkyyLightning:
             Dictionary with metrics
         """
         total_ops = self.metrics["total_operations"]
-        avg_latency = (
-            self.metrics["total_latency_ms"] / total_ops
-            if total_ops > 0
-            else 0.0
-        )
-        success_rate = (
-            (self.metrics["successful_operations"] / total_ops * 100)
-            if total_ops > 0
-            else 0.0
-        )
+        avg_latency = self.metrics["total_latency_ms"] / total_ops if total_ops > 0 else 0.0
+        success_rate = (self.metrics["successful_operations"] / total_ops * 100) if total_ops > 0 else 0.0
 
         return {
             "total_operations": total_ops,
@@ -281,7 +317,7 @@ class DevSkyyLightning:
             "average_latency_ms": round(avg_latency, 2),
             "total_latency_ms": round(self.metrics["total_latency_ms"], 2),
             "agent_calls": self.metrics["agent_calls"],
-            "agents_tracked": len(self.metrics["agent_calls"])
+            "agents_tracked": len(self.metrics["agent_calls"]),
         }
 
     def reset_metrics(self) -> None:
@@ -291,14 +327,11 @@ class DevSkyyLightning:
             "successful_operations": 0,
             "failed_operations": 0,
             "total_latency_ms": 0.0,
-            "agent_calls": {}
+            "agent_calls": {},
         }
 
     def create_llm_proxy(
-        self,
-        model: str = "gpt-4",
-        api_key: Optional[str] = None,
-        base_url: Optional[str] = None
+        self, model: str = "gpt-4", api_key: str | None = None, base_url: str | None = None
     ) -> LLMProxy:
         """
         Create LLM proxy with observability
@@ -311,15 +344,11 @@ class DevSkyyLightning:
         Returns:
             LLMProxy instance with tracing
         """
-        return LLMProxy(
-            model=model,
-            api_key=api_key or os.getenv("OPENAI_API_KEY"),
-            base_url=base_url
-        )
+        return LLMProxy(model=model, api_key=api_key or os.getenv("OPENAI_API_KEY"), base_url=base_url)
 
 
 # Global instance for easy access
-_lightning_instance: Optional[DevSkyyLightning] = None
+_lightning_instance: DevSkyyLightning | None = None
 
 
 def get_lightning() -> DevSkyyLightning:
@@ -332,16 +361,13 @@ def get_lightning() -> DevSkyyLightning:
     global _lightning_instance
     if _lightning_instance is None:
         _lightning_instance = DevSkyyLightning(
-            service_name="devskyy-agents",
-            enable_console=os.getenv("DEVSKYY_DEBUG", "false").lower() == "true"
+            service_name="devskyy-agents", enable_console=os.getenv("DEVSKYY_DEBUG", "false").lower() == "true"
         )
     return _lightning_instance
 
 
 def init_lightning(
-    service_name: str = "devskyy-agents",
-    otlp_endpoint: Optional[str] = None,
-    enable_console: bool = False
+    service_name: str = "devskyy-agents", otlp_endpoint: str | None = None, enable_console: bool = False
 ) -> DevSkyyLightning:
     """
     Initialize global DevSkyyLightning instance
@@ -356,15 +382,13 @@ def init_lightning(
     """
     global _lightning_instance
     _lightning_instance = DevSkyyLightning(
-        service_name=service_name,
-        otlp_endpoint=otlp_endpoint,
-        enable_console=enable_console
+        service_name=service_name, otlp_endpoint=otlp_endpoint, enable_console=enable_console
     )
     return _lightning_instance
 
 
 # Convenience decorators using global instance
-def trace_agent(operation_name: str, agent_id: Optional[str] = None, **metadata):
+def trace_agent(operation_name: str, agent_id: str | None = None, **metadata):
     """
     Convenience decorator for tracing agent operations
 
@@ -377,7 +401,7 @@ def trace_agent(operation_name: str, agent_id: Optional[str] = None, **metadata)
     return lightning.trace_agent_operation(operation_name, agent_id, metadata)
 
 
-def trace_llm(model: str, provider: Optional[str] = None, **metadata):
+def trace_llm(model: str, provider: str | None = None, **metadata):
     """
     Convenience decorator for tracing LLM calls
 

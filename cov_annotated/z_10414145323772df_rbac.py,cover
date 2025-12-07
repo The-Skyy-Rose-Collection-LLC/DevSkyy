@@ -1,0 +1,157 @@
+> """
+> Role-Based Access Control (RBAC) for DevSkyy Platform
+  
+> Defines roles and permissions for the multi-agent platform per Truth Protocol Rule #6.
+  
+> Per CLAUDE.md Truth Protocol:
+> - Rule #6: RBAC roles – SuperAdmin, Admin, Developer, APIUser, ReadOnly
+> - Rule #7: Input validation – Schema enforcement and permission checking
+  
+> Roles Hierarchy (highest to lowest):
+> 1. SuperAdmin - Full platform access, can manage all agents and settings
+> 2. Admin - Agent deployment, configuration, user management
+> 3. Developer - Code deployment, testing, monitoring
+> 4. APIUser - API access for external integrations
+> 5. ReadOnly - View-only access to dashboards and logs
+> """
+  
+! from enum import Enum
+! from typing import Set
+  
+  
+! class Role(str, Enum):
+!     """
+!     RBAC roles for DevSkyy platform.
+  
+!     Per Truth Protocol Rule #6, these roles enforce access control across:
+!     - Agent deployment and management
+!     - Finetuning operations
+!     - WordPress integration
+!     - Security settings
+!     - User management
+!     """
+  
+!     SUPER_ADMIN = "SuperAdmin"
+!     ADMIN = "Admin"
+!     DEVELOPER = "Developer"
+!     API_USER = "APIUser"
+!     READ_ONLY = "ReadOnly"
+  
+  
+  # Role hierarchy for permission inheritance
+! ROLE_HIERARCHY: dict[Role, Set[Role]] = {
+!     Role.SUPER_ADMIN: {Role.SUPER_ADMIN, Role.ADMIN, Role.DEVELOPER, Role.API_USER, Role.READ_ONLY},
+!     Role.ADMIN: {Role.ADMIN, Role.DEVELOPER, Role.API_USER, Role.READ_ONLY},
+!     Role.DEVELOPER: {Role.DEVELOPER, Role.API_USER, Role.READ_ONLY},
+!     Role.API_USER: {Role.API_USER, Role.READ_ONLY},
+!     Role.READ_ONLY: {Role.READ_ONLY},
+! }
+  
+  
+  # Permission definitions per role
+! ROLE_PERMISSIONS: dict[Role, Set[str]] = {
+!     Role.SUPER_ADMIN: {
+          # Full access
+!         "manage:users",
+!         "manage:agents",
+!         "manage:settings",
+!         "deploy:agents",
+!         "finetune:agents",
+!         "manage:wordpress",
+!         "manage:security",
+!         "view:all",
+!         "delete:all",
+!     },
+!     Role.ADMIN: {
+          # Agent and deployment management
+!         "manage:agents",
+!         "deploy:agents",
+!         "finetune:agents",
+!         "manage:wordpress",
+!         "view:all",
+!         "manage:users",
+!     },
+!     Role.DEVELOPER: {
+          # Development and testing
+!         "deploy:code",
+!         "test:agents",
+!         "view:logs",
+!         "view:metrics",
+!         "deploy:agents",
+!     },
+!     Role.API_USER: {
+          # API access
+!         "api:read",
+!         "api:write",
+!         "view:metrics",
+!     },
+!     Role.READ_ONLY: {
+          # View-only access
+!         "view:dashboard",
+!         "view:logs",
+!     },
+! }
+  
+  
+! def has_permission(user_role: Role, required_permission: str) -> bool:
+!     """
+!     Check if a role has a specific permission.
+  
+!     Uses role hierarchy to allow higher roles to inherit lower role permissions.
+  
+!     Args:
+!         user_role: The user's role
+!         required_permission: The permission to check (e.g., "deploy:agents")
+  
+!     Returns:
+!         True if the role has the permission, False otherwise
+  
+!     Example:
+!         >>> has_permission(Role.ADMIN, "deploy:agents")
+!         True
+!         >>> has_permission(Role.READ_ONLY, "deploy:agents")
+!         False
+!     """
+      # Get all roles this user has access to (including inherited)
+!     accessible_roles = ROLE_HIERARCHY.get(user_role, {user_role})
+  
+      # Check if any accessible role has the required permission
+!     for role in accessible_roles:
+!         if required_permission in ROLE_PERMISSIONS.get(role, set()):
+!             return True
+  
+!     return False
+  
+  
+! def is_role_higher_or_equal(user_role: Role, required_role: Role) -> bool:
+!     """
+!     Check if user's role is higher than or equal to required role.
+  
+!     Args:
+!         user_role: The user's current role
+!         required_role: The minimum required role
+  
+!     Returns:
+!         True if user_role >= required_role in hierarchy
+  
+!     Example:
+!         >>> is_role_higher_or_equal(Role.ADMIN, Role.DEVELOPER)
+!         True
+!         >>> is_role_higher_or_equal(Role.DEVELOPER, Role.ADMIN)
+!         False
+!     """
+!     accessible_roles = ROLE_HIERARCHY.get(user_role, {user_role})
+!     return required_role in accessible_roles
+  
+  
+  # Default role for new users
+! DEFAULT_ROLE = Role.READ_ONLY
+  
+  # Roles that can deploy agents
+! DEPLOYMENT_ROLES = {Role.SUPER_ADMIN, Role.ADMIN, Role.DEVELOPER}
+  
+  # Roles that can finetune agents
+! FINETUNING_ROLES = {Role.SUPER_ADMIN, Role.ADMIN}
+  
+  # Roles that can manage WordPress integration
+! WORDPRESS_ROLES = {Role.SUPER_ADMIN, Role.ADMIN}

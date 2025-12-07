@@ -1,0 +1,50 @@
+---
+# DevSkyy Platform - Kubernetes Namespace
+# Truth Protocol compliant namespace with resource quotas and limits
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: devskyy
+  labels:
+    name: devskyy
+    environment: production
+    managed-by: kubectl
+    app.kubernetes.io/name: devskyy
+    app.kubernetes.io/version: "5.1.0"
+---
+# Resource Quota for namespace
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: devskyy-quota
+  namespace: devskyy
+spec:
+  hard:
+    requests.cpu: "20"
+    requests.memory: 40Gi
+    limits.cpu: "40"
+    limits.memory: 80Gi
+    persistentvolumeclaims: "10"
+    services.loadbalancers: "2"
+---
+# Limit Range for containers
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: devskyy-limits
+  namespace: devskyy
+spec:
+  limits:
+  - max:
+      cpu: "4"
+      memory: 8Gi
+    min:
+      cpu: 100m
+      memory: 128Mi
+    default:
+      cpu: "2"
+      memory: 4Gi
+    defaultRequest:
+      cpu: 500m
+      memory: 1Gi
+    type: Container

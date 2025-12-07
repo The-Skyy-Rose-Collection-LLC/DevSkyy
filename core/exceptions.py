@@ -9,7 +9,7 @@ This module provides a comprehensive exception hierarchy for the DevSkyy Platfor
 enabling precise error handling and better debugging.
 """
 
-from typing import Any, Optional
+from typing import Any
 
 
 # ============================================================================
@@ -23,18 +23,18 @@ class DevSkyyError(Exception):
     def __init__(
         self,
         message: str,
-        error_code: Optional[str] = None,
-        details: Optional[dict[str, Any]] = None,
-        original_error: Optional[Exception] = None
+        error_code: str | None = None,
+        details: dict[str, Any] | None = None,
+        original_error: Exception | None = None,
     ):
         """
         Initialize the exception with a human-readable message and optional metadata.
 
         Parameters:
             message (str): Human-readable description of the error.
-            error_code (Optional[str]): Unique machine-friendly error code; defaults to the exception class name when omitted.
-            details (Optional[Dict[str, Any]]): Additional structured metadata about the error; defaults to an empty dict when omitted.
-            original_error (Optional[Exception]): An underlying exception instance that caused this error, if any.
+            error_code (str | None): Unique machine-friendly error code; defaults to the exception class name when omitted.
+            details (Optional[dict[str, Any]]): Additional structured metadata about the error; defaults to an empty dict when omitted.
+            original_error (Exception | None): An underlying exception instance that caused this error, if any.
         """
         self.message = message
         self.error_code = error_code or self.__class__.__name__
@@ -53,13 +53,13 @@ class DevSkyyError(Exception):
         - `details`: additional context or metadata.
 
         Returns:
-            mapping (Dict[str, Any]): A dictionary with keys `error_type`, `error_code`, `message`, and `details`.
+            mapping (dict[str, Any]): A dictionary with keys `error_type`, `error_code`, `message`, and `details`.
         """
         return {
             "error_type": self.__class__.__name__,
             "error_code": self.error_code,
             "message": self.message,
-            "details": self.details
+            "details": self.details,
         }
 
 
@@ -432,11 +432,7 @@ HTTP_STATUS_TO_EXCEPTION = {
 }
 
 
-def exception_from_status_code(
-    status_code: int,
-    message: str,
-    **kwargs
-) -> DevSkyyError:
+def exception_from_status_code(status_code: int, message: str, **kwargs) -> DevSkyyError:
     """
     Map an HTTP status code to a corresponding DevSkyyError subclass and instantiate it.
 
@@ -465,18 +461,14 @@ DATABASE_ERROR_MAPPING = {
 }
 
 
-def map_database_error(
-    error_type: str,
-    message: str,
-    original_error: Optional[Exception] = None
-) -> DatabaseError:
+def map_database_error(error_type: str, message: str, original_error: Exception | None = None) -> DatabaseError:
     """
     Create an exception instance that represents a database error for a given error type.
 
     Parameters:
         error_type (str): Key identifying the database error category (used to select a specific DatabaseError subclass).
         message (str): Human-readable error message for the created exception.
-        original_error (Optional[Exception]): Original low-level exception to attach as context on the returned exception.
+        original_error (Exception | None): Original low-level exception to attach as context on the returned exception.
 
     Returns:
         DatabaseError: An instance of the DatabaseError subclass mapped from `error_type`, initialized with `message` and `original_error`.

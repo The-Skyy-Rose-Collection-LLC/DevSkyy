@@ -1,0 +1,328 @@
+{
+  "title": "Global Footer - SkyyRose",
+  "type": "footer",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_theme_builder",
+    "post_status": "publish",
+    "conditions": ["include/general"]
+  },
+  "content": [
+    {
+      "id": "footer-main",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "60", "bottom": "40", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "footer-brand",
+          "elType": "column",
+          "settings": {"_column_size": 30},
+          "elements": [
+            {
+              "id": "footer-logo",
+              "elType": "widget",
+              "widgetType": "site-logo",
+              "settings": {
+                "width": {"size": 140, "unit": "px"},
+                "align": "left"
+              }
+            },
+            {
+              "id": "tagline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Where Love Meets Luxury",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_font_style": "italic"
+              }
+            },
+            {
+              "id": "brand-description",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"color: #F5F5F0; font-family: 'Montserrat', sans-serif; font-size: 13px; line-height: 1.6;\">Oakland's premier luxury streetwear brand. Born in the Bay, designed for the world.</p>"
+              }
+            },
+            {
+              "id": "social-icons",
+              "elType": "widget",
+              "widgetType": "social-icons",
+              "settings": {
+                "social_icon_list": [
+                  {
+                    "social_icon": {"value": "fab fa-instagram", "library": "fa-brands"},
+                    "link": {"url": "https://instagram.com/skyyrose.co"}
+                  },
+                  {
+                    "social_icon": {"value": "fab fa-tiktok", "library": "fa-brands"},
+                    "link": {"url": "https://tiktok.com/@skyyrose.co"}
+                  },
+                  {
+                    "social_icon": {"value": "fab fa-pinterest", "library": "fa-brands"},
+                    "link": {"url": "https://pinterest.com/skyyrose"}
+                  }
+                ],
+                "icon_color": "custom",
+                "icon_primary_color": "#F5F5F0",
+                "icon_secondary_color": "#0D0D0D",
+                "icon_size": {"size": 18, "unit": "px"},
+                "icon_spacing": {"size": 15, "unit": "px"}
+              }
+            }
+          ]
+        },
+        {
+          "id": "footer-shop",
+          "elType": "column",
+          "settings": {"_column_size": 17},
+          "elements": [
+            {
+              "id": "shop-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "SHOP",
+                "header_size": "h5",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 2, "unit": "px"}
+              }
+            },
+            {
+              "id": "shop-links",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "menu": "footer-shop",
+                "layout": "vertical",
+                "text_color": "#F5F5F0",
+                "text_color_hover": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 13, "unit": "px"},
+                "typography_font_weight": "400"
+              }
+            }
+          ]
+        },
+        {
+          "id": "footer-about",
+          "elType": "column",
+          "settings": {"_column_size": 17},
+          "elements": [
+            {
+              "id": "about-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "ABOUT",
+                "header_size": "h5",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 2, "unit": "px"}
+              }
+            },
+            {
+              "id": "about-links",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "menu": "footer-about",
+                "layout": "vertical",
+                "text_color": "#F5F5F0",
+                "text_color_hover": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 13, "unit": "px"},
+                "typography_font_weight": "400"
+              }
+            }
+          ]
+        },
+        {
+          "id": "footer-support",
+          "elType": "column",
+          "settings": {"_column_size": 17},
+          "elements": [
+            {
+              "id": "support-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "SUPPORT",
+                "header_size": "h5",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 2, "unit": "px"}
+              }
+            },
+            {
+              "id": "support-links",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "menu": "footer-support",
+                "layout": "vertical",
+                "text_color": "#F5F5F0",
+                "text_color_hover": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 13, "unit": "px"},
+                "typography_font_weight": "400"
+              }
+            }
+          ]
+        },
+        {
+          "id": "footer-newsletter",
+          "elType": "column",
+          "settings": {"_column_size": 19},
+          "elements": [
+            {
+              "id": "newsletter-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "STAY CONNECTED",
+                "header_size": "h5",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 2, "unit": "px"}
+              }
+            },
+            {
+              "id": "newsletter-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"color: #F5F5F0; font-family: 'Montserrat', sans-serif; font-size: 13px;\">Join the Rose Garden for exclusive drops and early access.</p>"
+              }
+            },
+            {
+              "id": "newsletter-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_fields": [
+                  {
+                    "field_type": "email",
+                    "field_label": "",
+                    "placeholder": "Enter your email",
+                    "required": "yes"
+                  }
+                ],
+                "button_text": "SUBSCRIBE",
+                "button_background_color": "#B76E79",
+                "button_text_color": "#0D0D0D",
+                "button_hover_background_color": "#F5F5F0",
+                "button_hover_color": "#0D0D0D",
+                "button_typography_typography": "custom",
+                "button_typography_font_family": "Montserrat",
+                "button_typography_font_size": {"size": 11, "unit": "px"},
+                "button_typography_font_weight": "600",
+                "button_typography_letter_spacing": {"size": 2, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "footer-bottom",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#0D0D0D",
+        "border_border": "solid",
+        "border_width": {"top": "1", "right": "0", "bottom": "0", "left": "0", "unit": "px"},
+        "border_color": "#333333",
+        "padding": {"top": "20", "bottom": "20", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "copyright",
+          "elType": "column",
+          "settings": {"_column_size": 50},
+          "elements": [
+            {
+              "id": "copyright-text",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "2025 SkyyRose. All rights reserved.",
+                "header_size": "h6",
+                "title_color": "#4A4A4A",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 11, "unit": "px"},
+                "typography_font_weight": "400"
+              }
+            }
+          ]
+        },
+        {
+          "id": "payment-icons",
+          "elType": "column",
+          "settings": {
+            "_column_size": 50,
+            "align": "flex-end"
+          },
+          "elements": [
+            {
+              "id": "payment-methods",
+              "elType": "widget",
+              "widgetType": "image",
+              "settings": {
+                "image": {"url": "/wp-content/themes/skyyrose/assets/images/payment-methods.png"},
+                "align": "right",
+                "width": {"size": 200, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "template_type": "footer",
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "elementor_conditions": ["include/general"],
+    "social_links": {
+      "instagram": "https://instagram.com/skyyrose.co",
+      "tiktok": "https://tiktok.com/@skyyrose.co",
+      "pinterest": "https://pinterest.com/skyyrose"
+    },
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79"
+    }
+  }
+}

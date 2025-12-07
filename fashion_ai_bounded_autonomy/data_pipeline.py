@@ -102,7 +102,7 @@ class DataPipeline:
                 "file_hash": file_hash,
                 "size_mb": file_size_mb,
                 "ingestion_time_seconds": ingestion_time,
-                "data": data
+                "data": data,
             }
 
             self._log_operation("ingest", result)
@@ -134,17 +134,25 @@ class DataPipeline:
             # Quarantine invalid data
             quarantine_file = self.quarantine_path / f"quarantine_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             with open(quarantine_file, "w") as f:
-                json.dump({
-                    "data": data if isinstance(data, dict) else data.to_dict() if hasattr(data, "to_dict") else str(data),
-                    "validation_errors": validation_result["errors"],
-                    "timestamp": datetime.now().isoformat()
-                }, f, indent=2)
+                json.dump(
+                    {
+                        "data": (
+                            data
+                            if isinstance(data, dict)
+                            else data.to_dict() if hasattr(data, "to_dict") else str(data)
+                        ),
+                        "validation_errors": validation_result["errors"],
+                        "timestamp": datetime.now().isoformat(),
+                    },
+                    f,
+                    indent=2,
+                )
 
             logger.warning(f"⚠️  Data quarantined: {validation_result['errors']}")
             return {
                 "status": "quarantined",
                 "errors": validation_result["errors"],
-                "quarantine_file": str(quarantine_file)
+                "quarantine_file": str(quarantine_file),
             }
 
         # Clean and normalize data
@@ -167,7 +175,7 @@ class DataPipeline:
             "schema": schema_name,
             "validated_file": str(validated_file),
             "processing_time_seconds": processing_time,
-            "data": cleaned_data
+            "data": cleaned_data,
         }
 
         self._log_operation("preprocess", result)
@@ -198,12 +206,7 @@ class DataPipeline:
         logger.info(f"🔮 Running inference with {model_name}")
 
         # Simulate inference
-        predictions = {
-            "model": model_name,
-            "predictions": [],
-            "confidence_scores": [],
-            "metadata": model_config
-        }
+        predictions = {"model": model_name, "predictions": [], "confidence_scores": [], "metadata": model_config}
 
         inference_time = (datetime.now() - start_time).total_seconds()
 
@@ -211,7 +214,7 @@ class DataPipeline:
             "status": "completed",
             "model": model_name,
             "predictions": predictions,
-            "inference_time_seconds": inference_time
+            "inference_time_seconds": inference_time,
         }
 
         self._log_operation("inference", result)
@@ -274,7 +277,7 @@ class DataPipeline:
             "timestamp": datetime.now().isoformat(),
             "operation": operation,
             "status": result.get("status"),
-            "details": {k: v for k, v in result.items() if k not in ["data", "predictions"]}
+            "details": {k: v for k, v in result.items() if k not in ["data", "predictions"]},
         }
         self.processing_log.append(log_entry)
 

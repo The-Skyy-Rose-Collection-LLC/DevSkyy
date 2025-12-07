@@ -1,0 +1,530 @@
+{
+  "metadata": {
+    "timestamp": "2025-11-23T00:00:00Z",
+    "report_version": "1.0.0",
+    "python_version": "3.11.14",
+    "total_python_files": 410,
+    "truth_protocol_version": "5.2.0-enterprise",
+    "analysis_tools": {
+      "ruff": "0.8.4",
+      "mypy": "1.13.0",
+      "black": "24.10.0",
+      "pyproject_target": "py311"
+    }
+  },
+  "executive_summary": {
+    "overall_status": "NEEDS_IMPROVEMENT",
+    "total_issues": 3312,
+    "critical_issues": 29,
+    "high_severity_issues": 1430,
+    "medium_severity_issues": 1605,
+    "low_severity_issues": 248,
+    "auto_fixable_issues": 774,
+    "truth_protocol_violations": {
+      "rule_11": "PASS - Python 3.11.14 enforced",
+      "rule_15": "FAIL - 472 print() statements, 1 TODO comment",
+      "rule_9": "PARTIAL - Type hints incomplete",
+      "rule_13": "FAIL - 27 critical security issues",
+      "rule_8": "UNKNOWN - Coverage not verified in this report"
+    },
+    "compliance_score": "65/100"
+  },
+  "critical_issues": {
+    "syntax_errors": {
+      "count": 2,
+      "severity": "CRITICAL",
+      "files": [
+        {
+          "file": "scripts/generate_sbom.py",
+          "line": 47,
+          "error": "Invalid syntax - duplicate line",
+          "message": "Line 47 contains duplicate subprocess.run call"
+        },
+        {
+          "file": "security/openai_safeguard_integration.py",
+          "line": 84,
+          "error": "Invalid syntax - duplicate parameter",
+          "message": "Parameter 'params' defined twice in function signature"
+        }
+      ],
+      "action_required": "IMMEDIATE - Code will not run with syntax errors",
+      "recommendation": "Fix syntax errors before any other fixes"
+    },
+    "security_critical": {
+      "count": 27,
+      "severity": "CRITICAL",
+      "categories": {
+        "hardcoded_passwords": {
+          "count": 9,
+          "codes": ["S105", "S106", "S107"],
+          "risk": "HIGH - Credentials may be exposed in version control"
+        },
+        "hardcoded_temp_files": {
+          "count": 11,
+          "codes": ["S108"],
+          "risk": "MEDIUM - Potential race conditions and security issues"
+        },
+        "ssh_no_host_verification": {
+          "count": 1,
+          "codes": ["S507"],
+          "risk": "HIGH - Man-in-the-middle attack vulnerability"
+        },
+        "hardcoded_sql": {
+          "count": 1,
+          "codes": ["S608"],
+          "risk": "HIGH - SQL injection potential"
+        },
+        "ftp_usage": {
+          "count": 1,
+          "codes": ["S321"],
+          "risk": "HIGH - Unencrypted credential transmission"
+        },
+        "insecure_hash": {
+          "count": 1,
+          "codes": ["S324"],
+          "risk": "MEDIUM - Weak cryptographic hash function"
+        },
+        "bad_file_permissions": {
+          "count": 1,
+          "codes": ["S103"],
+          "risk": "MEDIUM - Insecure file permissions"
+        },
+        "partial_path_subprocess": {
+          "count": 31,
+          "codes": ["S607"],
+          "risk": "LOW - Potential command injection"
+        }
+      },
+      "action_required": "URGENT - Review and fix all critical security issues",
+      "recommendation": "Move secrets to environment variables per Truth Protocol Rule #5"
+    }
+  },
+  "high_severity_issues": {
+    "print_statements": {
+      "count": 472,
+      "severity": "HIGH",
+      "code": "T201",
+      "truth_protocol_violation": "Rule #15 - No print() statements",
+      "files_affected": 20,
+      "sample_files": [
+        ".claude/scripts/convert_requirements.py",
+        "agent/fashion_orchestrator.py",
+        "agent/unified_orchestrator.py",
+        "scripts/download_fashion_models.py",
+        "scripts/fix_ruff_issues.py"
+      ],
+      "action_required": "HIGH - Replace with logging module",
+      "recommendation": "Use structured logging (structlog) per enterprise standards"
+    },
+    "imports_outside_top_level": {
+      "count": 684,
+      "severity": "HIGH",
+      "code": "PLC0415",
+      "impact": "Performance degradation, harder code analysis",
+      "action_required": "HIGH - Move imports to module top",
+      "recommendation": "Refactor to place imports at top of file per PEP 8"
+    },
+    "magic_values": {
+      "count": 475,
+      "severity": "HIGH",
+      "code": "PLR2004",
+      "impact": "Code maintainability, unclear business logic",
+      "files_most_affected": [
+        "agent/ecommerce/pricing_engine.py - 17 occurrences",
+        "agent/ecommerce/inventory_optimizer.py - 4 occurrences",
+        "agent/ecommerce/order_automation.py - 5 occurrences",
+        "agent/ecommerce/customer_intelligence.py - 2 occurrences"
+      ],
+      "action_required": "HIGH - Replace with named constants",
+      "recommendation": "Define constants at module level with descriptive names"
+    },
+    "unused_imports": {
+      "count": 234,
+      "severity": "HIGH",
+      "code": "F401",
+      "impact": "Code bloat, slower imports",
+      "auto_fixable": true,
+      "action_required": "MEDIUM - Remove unused imports",
+      "recommendation": "Run 'ruff check --fix' to auto-remove"
+    },
+    "exception_handling_issues": {
+      "count": 224,
+      "severity": "HIGH",
+      "code": "B904",
+      "impact": "Lost error context in exception chains",
+      "action_required": "HIGH - Add 'from err' or 'from None' to raise statements",
+      "recommendation": "Use 'raise ... from err' per PEP 409"
+    }
+  },
+  "medium_severity_issues": {
+    "type_annotations_legacy": {
+      "count": 228,
+      "severity": "MEDIUM",
+      "code": "UP045",
+      "issue": "Using Optional[X] instead of X | None",
+      "auto_fixable": true,
+      "action_required": "MEDIUM - Modernize type hints",
+      "recommendation": "Run 'ruff check --fix' to convert to PEP 604 syntax"
+    },
+    "non_pep585_annotations": {
+      "count": 126,
+      "severity": "MEDIUM",
+      "code": "UP006",
+      "issue": "Using typing.List instead of list",
+      "auto_fixable": true,
+      "action_required": "MEDIUM - Modernize type hints",
+      "recommendation": "Use built-in generics (list, dict, set) per PEP 585"
+    },
+    "unsorted_imports": {
+      "count": 102,
+      "severity": "MEDIUM",
+      "code": "I001",
+      "auto_fixable": true,
+      "action_required": "MEDIUM - Sort imports",
+      "recommendation": "Run 'ruff check --fix' to auto-sort"
+    },
+    "unused_variables": {
+      "count": 60,
+      "severity": "MEDIUM",
+      "code": "F841",
+      "impact": "Dead code, potential bugs",
+      "action_required": "MEDIUM - Remove or use variables",
+      "recommendation": "Review and remove unused assignments"
+    },
+    "manual_list_comprehension": {
+      "count": 58,
+      "severity": "MEDIUM",
+      "code": "PERF401",
+      "impact": "Performance - slower than list comprehensions",
+      "action_required": "MEDIUM - Refactor to list comprehensions",
+      "recommendation": "Use list comprehensions for better performance"
+    },
+    "complex_functions": {
+      "count": 42,
+      "severity": "MEDIUM",
+      "codes": ["PLR0912", "PLR0911", "PLR0915"],
+      "breakdown": {
+        "too_many_branches": 14,
+        "too_many_returns": 17,
+        "too_many_statements": 11
+      },
+      "files_most_affected": [
+        {
+          "file": "agent/ecommerce/pricing_engine.py",
+          "line": 38,
+          "issue": "Too many branches (18 > 12)",
+          "complexity": 18
+        },
+        {
+          "file": "agent/orchestrator.py",
+          "line": 748,
+          "issue": "Too many statements (91 > 50)",
+          "statements": 91
+        },
+        {
+          "file": "agent/modules/content/asset_preprocessing_pipeline.py",
+          "line": 285,
+          "issue": "Too many statements (75 > 50)",
+          "statements": 75
+        },
+        {
+          "file": "agent/wordpress/automated_theme_uploader.py",
+          "line": 190,
+          "issue": "Too many branches (13 > 12)",
+          "complexity": 13
+        },
+        {
+          "file": "agent/wordpress/theme_builder.py",
+          "line": 622,
+          "issue": "Too many return statements (8 > 6)",
+          "returns": 8
+        }
+      ],
+      "action_required": "MEDIUM - Refactor complex functions",
+      "recommendation": "Break down complex functions into smaller, testable units"
+    },
+    "security_non_cryptographic_random": {
+      "count": 45,
+      "severity": "MEDIUM",
+      "code": "S311",
+      "impact": "Weak randomness for security purposes",
+      "action_required": "MEDIUM - Use secrets module for security",
+      "recommendation": "Replace random.random() with secrets.SystemRandom() for security"
+    },
+    "multiple_with_statements": {
+      "count": 41,
+      "severity": "MEDIUM",
+      "code": "SIM117",
+      "impact": "Code readability",
+      "auto_fixable": false,
+      "action_required": "LOW - Combine with statements",
+      "recommendation": "Use 'with a, b:' instead of nested 'with' statements"
+    },
+    "f_string_missing_placeholders": {
+      "count": 33,
+      "severity": "MEDIUM",
+      "code": "F541",
+      "auto_fixable": true,
+      "action_required": "LOW - Convert to regular strings",
+      "recommendation": "Remove f-string prefix if no placeholders"
+    }
+  },
+  "low_severity_issues": {
+    "assert_raises_exception": {
+      "count": 30,
+      "severity": "LOW",
+      "code": "B017",
+      "context": "Test files",
+      "action_required": "LOW - Use pytest.raises context manager"
+    },
+    "unused_loop_variable": {
+      "count": 29,
+      "severity": "LOW",
+      "code": "B007",
+      "action_required": "LOW - Use underscore for unused variables"
+    },
+    "global_statement": {
+      "count": 28,
+      "severity": "LOW",
+      "code": "PLW0603",
+      "impact": "Code maintainability",
+      "action_required": "LOW - Avoid global variables"
+    },
+    "deprecated_imports": {
+      "count": 27,
+      "severity": "LOW",
+      "code": "UP035",
+      "action_required": "LOW - Update to modern imports"
+    },
+    "ambiguous_unicode": {
+      "count": 11,
+      "severity": "LOW",
+      "codes": ["RUF001", "RUF002", "RUF003"],
+      "files": [
+        "agent/config/ssh_config.py:70 - ℹ (INFORMATION SOURCE)",
+        "agent/ecommerce/pricing_engine.py:183 - × (MULTIPLICATION SIGN)"
+      ],
+      "action_required": "LOW - Replace with ASCII equivalents"
+    }
+  },
+  "code_formatting_issues": {
+    "black_formatting": {
+      "files_need_reformatting": 70,
+      "files_unchanged": 338,
+      "files_with_syntax_errors": 2,
+      "severity": "MEDIUM",
+      "auto_fixable": true,
+      "action_required": "MEDIUM - Run Black formatter",
+      "command": "black --line-length=119 .",
+      "sample_files": [
+        "agent/fashion_orchestrator.py",
+        "agent/modules/backend/wordpress_integration_service.py",
+        "api/v1/api_v1_auth_router.py",
+        "ai_orchestration/partnership_grok_brand.py",
+        "api/v1/agent_upgrades.py"
+      ]
+    }
+  },
+  "code_smells": {
+    "todo_comments": {
+      "count": 1,
+      "severity": "HIGH",
+      "truth_protocol_violation": "Rule #15 - No TODO comments",
+      "occurrences": [
+        {
+          "file": "api/v1/dashboard.py",
+          "line": 453,
+          "comment": "await asyncio.sleep(5)  # TODO: Move to config",
+          "action_required": "HIGH - Create GitHub issue and remove TODO"
+        }
+      ],
+      "action_required": "HIGH - Remove TODO and create tracking issue"
+    },
+    "pass_statements": {
+      "count": 13,
+      "severity": "LOW",
+      "code": "S110",
+      "context": "try-except-pass blocks",
+      "truth_protocol_violation": "Rule #10 - No-Skip Rule",
+      "action_required": "MEDIUM - Add error logging or remove",
+      "recommendation": "Log errors and continue per Rule #10"
+    }
+  },
+  "file_size_analysis": {
+    "files_over_500_lines": 20,
+    "largest_files": [
+      {
+        "file": "api/training_data_interface.py",
+        "lines": 2161,
+        "severity": "MEDIUM",
+        "recommendation": "Consider splitting into multiple modules"
+      },
+      {
+        "file": "scripts/server/fixed_luxury_theme_server.py",
+        "lines": 1502,
+        "severity": "MEDIUM",
+        "recommendation": "Refactor into smaller components"
+      },
+      {
+        "file": "api/v1/luxury_fashion_automation.py",
+        "lines": 1410,
+        "severity": "MEDIUM",
+        "recommendation": "Break into service layer modules"
+      },
+      {
+        "file": "devskyy_mcp_enterprise_v2.py",
+        "lines": 974,
+        "severity": "LOW",
+        "recommendation": "Consider module separation"
+      },
+      {
+        "file": "api/v1/mcp.py",
+        "lines": 912,
+        "severity": "LOW",
+        "recommendation": "Split router into multiple files"
+      }
+    ],
+    "action_required": "LOW - Consider refactoring large files",
+    "recommendation": "Files over 1000 lines should be split for maintainability"
+  },
+  "mypy_type_checking": {
+    "status": "BLOCKED",
+    "severity": "CRITICAL",
+    "syntax_errors_preventing_check": 1,
+    "files_with_errors": [
+      "scripts/generate_sbom.py"
+    ],
+    "action_required": "CRITICAL - Fix syntax errors before type checking",
+    "recommendation": "After syntax fixes, run: mypy . --strict --show-error-codes"
+  },
+  "truth_protocol_compliance": {
+    "rule_1_never_guess": "PASS - All analysis based on verified tools",
+    "rule_5_no_secrets": "FAIL - 9 hardcoded passwords/credentials found",
+    "rule_6_rbac": "NOT_TESTED - Manual verification required",
+    "rule_9_document_all": "PARTIAL - Type hints incomplete",
+    "rule_10_no_skip": "FAIL - 13 try-except-pass blocks found",
+    "rule_11_python_311": "PASS - Python 3.11.14 enforced in pyproject.toml",
+    "rule_13_security": "FAIL - 178 security issues (27 critical)",
+    "rule_15_no_placeholders": "FAIL - 472 print(), 1 TODO, 13 pass statements",
+    "total_compliant": "3/8",
+    "compliance_percentage": "25%"
+  },
+  "priority_recommendations": {
+    "immediate_actions": [
+      {
+        "priority": "P0",
+        "action": "Fix 2 syntax errors",
+        "files": [
+          "scripts/generate_sbom.py",
+          "security/openai_safeguard_integration.py"
+        ],
+        "impact": "Code will not run",
+        "command": "Manual fix required"
+      },
+      {
+        "priority": "P0",
+        "action": "Fix 27 critical security issues",
+        "impact": "Security vulnerabilities",
+        "command": "Review and fix hardcoded credentials, FTP usage, insecure SSH"
+      }
+    ],
+    "high_priority_actions": [
+      {
+        "priority": "P1",
+        "action": "Replace 472 print() statements with logging",
+        "truth_protocol_rule": "Rule #15",
+        "auto_fixable": false,
+        "estimated_effort": "4-8 hours"
+      },
+      {
+        "priority": "P1",
+        "action": "Remove TODO comment and create GitHub issue",
+        "truth_protocol_rule": "Rule #15",
+        "files": ["api/v1/dashboard.py:453"],
+        "estimated_effort": "15 minutes"
+      },
+      {
+        "priority": "P1",
+        "action": "Fix 224 exception handling issues",
+        "code": "B904",
+        "command": "Add 'from err' or 'from None' to raise statements",
+        "estimated_effort": "2-4 hours"
+      }
+    ],
+    "medium_priority_actions": [
+      {
+        "priority": "P2",
+        "action": "Run Black formatter on 70 files",
+        "auto_fixable": true,
+        "command": "black --line-length=119 .",
+        "estimated_effort": "5 minutes"
+      },
+      {
+        "priority": "P2",
+        "action": "Auto-fix 774 Ruff issues",
+        "auto_fixable": true,
+        "command": "ruff check --fix .",
+        "estimated_effort": "5 minutes"
+      },
+      {
+        "priority": "P2",
+        "action": "Refactor 42 complex functions",
+        "impact": "Code maintainability and testability",
+        "estimated_effort": "8-16 hours"
+      },
+      {
+        "priority": "P2",
+        "action": "Replace 475 magic values with constants",
+        "impact": "Code readability and maintainability",
+        "estimated_effort": "6-12 hours"
+      }
+    ],
+    "low_priority_actions": [
+      {
+        "priority": "P3",
+        "action": "Refactor 5 files over 1000 lines",
+        "impact": "Code organization",
+        "estimated_effort": "16-32 hours"
+      },
+      {
+        "priority": "P3",
+        "action": "Fix 45 non-cryptographic random usage",
+        "code": "S311",
+        "estimated_effort": "2-4 hours"
+      }
+    ]
+  },
+  "quick_fixes": {
+    "auto_fixable_count": 774,
+    "commands": [
+      {
+        "step": 1,
+        "command": "ruff check --fix .",
+        "description": "Auto-fix 774 issues (imports, type hints, formatting)",
+        "estimated_time": "5 minutes"
+      },
+      {
+        "step": 2,
+        "command": "black --line-length=119 .",
+        "description": "Format 70 files",
+        "estimated_time": "5 minutes"
+      },
+      {
+        "step": 3,
+        "command": "ruff check . --statistics",
+        "description": "Verify remaining issues",
+        "estimated_time": "2 minutes"
+      }
+    ],
+    "estimated_reduction": "774 issues (23.4% of total)",
+    "remaining_after_auto_fix": 2538
+  },
+  "estimated_effort": {
+    "auto_fixes": "15 minutes",
+    "critical_fixes": "8-16 hours",
+    "high_priority": "12-24 hours",
+    "medium_priority": "20-40 hours",
+    "low_priority": "20-40 hours",
+    "total_estimated": "60-120 hours (1.5-3 weeks for 1 developer)"
+  }
+}

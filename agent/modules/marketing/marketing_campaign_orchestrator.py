@@ -38,7 +38,7 @@ from datetime import datetime
 from enum import Enum
 import logging
 import random
-from typing import Any, Optional
+from typing import Any
 import uuid
 
 
@@ -47,6 +47,7 @@ logger = logging.getLogger(__name__)
 
 class CampaignStatus(Enum):
     """Campaign lifecycle states."""
+
     DRAFT = "draft"
     SCHEDULED = "scheduled"
     ACTIVE = "active"
@@ -57,6 +58,7 @@ class CampaignStatus(Enum):
 
 class CampaignType(Enum):
     """Types of marketing campaigns."""
+
     EMAIL = "email"
     SMS = "sms"
     SOCIAL_MEDIA = "social_media"
@@ -69,6 +71,7 @@ class CampaignType(Enum):
 
 class Channel(Enum):
     """Marketing channels."""
+
     EMAIL = "email"
     SMS = "sms"
     FACEBOOK = "facebook"
@@ -82,6 +85,7 @@ class Channel(Enum):
 
 class SegmentCriteria(Enum):
     """Customer segmentation criteria."""
+
     DEMOGRAPHICS = "demographics"
     BEHAVIOR = "behavior"
     PURCHASE_HISTORY = "purchase_history"
@@ -92,6 +96,7 @@ class SegmentCriteria(Enum):
 
 class TestType(Enum):
     """A/B testing types."""
+
     AB_TEST = "ab_test"  # 2 variants
     MULTIVARIATE = "multivariate"  # Multiple variants
     SPLIT_URL = "split_url"  # Different landing pages
@@ -100,6 +105,7 @@ class TestType(Enum):
 @dataclass
 class CustomerSegment:
     """Customer segment definition."""
+
     segment_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = ""
     description: str = ""
@@ -126,13 +132,14 @@ class CustomerSegment:
 @dataclass
 class CampaignVariant:
     """Campaign variant for A/B testing."""
+
     variant_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = ""
     is_control: bool = False
 
     # Content
-    subject_line: Optional[str] = None
-    headline: Optional[str] = None
+    subject_line: str | None = None
+    headline: str | None = None
     body_content: str = ""
     call_to_action: str = ""
     creative_assets: list[str] = field(default_factory=list)
@@ -165,6 +172,7 @@ class CampaignVariant:
 @dataclass
 class Campaign:
     """Marketing campaign definition."""
+
     campaign_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     name: str = ""
     description: str = ""
@@ -176,13 +184,13 @@ class Campaign:
     status: CampaignStatus = CampaignStatus.DRAFT
 
     # Scheduling
-    scheduled_start: Optional[datetime] = None
-    scheduled_end: Optional[datetime] = None
+    scheduled_start: datetime | None = None
+    scheduled_end: datetime | None = None
     timezone: str = "UTC"
 
     # A/B Testing
     enable_testing: bool = False
-    test_type: Optional[TestType] = None
+    test_type: TestType | None = None
     variants: list[CampaignVariant] = field(default_factory=list)
     test_duration_hours: int = 24
     winning_metric: str = "conversion_rate"
@@ -194,9 +202,9 @@ class Campaign:
     # Budget and goals
     budget: float = 0.0
     budget_currency: str = "USD"
-    target_reach: Optional[int] = None
-    target_conversions: Optional[int] = None
-    target_revenue: Optional[float] = None
+    target_reach: int | None = None
+    target_conversions: int | None = None
+    target_revenue: float | None = None
 
     # Performance tracking
     total_sent: int = 0
@@ -215,11 +223,11 @@ class Campaign:
     # Timestamps
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
-    started_at: Optional[datetime] = None
-    completed_at: Optional[datetime] = None
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
 
     # Metadata
-    created_by: Optional[str] = None
+    created_by: str | None = None
     tags: list[str] = field(default_factory=list)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -227,6 +235,7 @@ class Campaign:
 @dataclass
 class CampaignAnalytics:
     """Detailed campaign analytics."""
+
     analytics_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     campaign_id: str = ""
 
@@ -253,7 +262,7 @@ class CampaignAnalytics:
 
     # Recommendations
     optimization_suggestions: list[str] = field(default_factory=list)
-    predicted_performance: Optional[dict[str, float]] = None
+    predicted_performance: dict[str, float] | None = None
 
     # Timestamps
     generated_at: datetime = field(default_factory=datetime.now)
@@ -288,15 +297,15 @@ class MarketingCampaignOrchestrator:
             agent_name (str): Human-friendly orchestrator name.
             agent_type (str): Internal agent classification.
             version (str): Agent version string.
-            campaigns (Dict[str, Campaign]): In-memory store of campaigns by ID.
-            segments (Dict[str, CustomerSegment]): In-memory store of customer segments by ID.
-            analytics (Dict[str, CampaignAnalytics]): In-memory store of campaign analytics by ID.
+            campaigns (dict[str, Campaign]): In-memory store of campaigns by ID.
+            segments (dict[str, CustomerSegment]): In-memory store of customer segments by ID.
+            analytics (dict[str, CampaignAnalytics]): In-memory store of campaign analytics by ID.
             active_campaigns (Set[str]): IDs of currently active campaigns.
             campaign_count (int): Total number of created campaigns.
             total_sent (int): Cumulative total messages sent across campaigns.
             total_conversions (int): Cumulative total conversions recorded.
-            channel_integrations (Dict[Channel, Dict[str, Any]]): Default channel provider configurations and enabled flags.
-            optimal_send_times (Dict[Channel, List[int]]): Recommended send-hour windows (24h) per channel.
+            channel_integrations (dict[Channel, dict[str, Any]]): Default channel provider configurations and enabled flags.
+            optimal_send_times (dict[Channel, list[int]]): Recommended send-hour windows (24h) per channel.
         """
         self.agent_name = "Marketing Campaign Orchestrator"
         self.agent_type = "marketing_orchestration"
@@ -333,24 +342,22 @@ class MarketingCampaignOrchestrator:
 
         logger.info(f"✅ {self.agent_name} v{self.version} initialized")
 
-    async def create_campaign(
-        self, campaign_data: dict[str, Any]
-    ) -> Campaign:
+    async def create_campaign(self, campaign_data: dict[str, Any]) -> Campaign:
         """
         Create and store a Campaign from the provided configuration.
 
         Builds a Campaign object using keys from campaign_data, optionally constructs A/B or multivariate variants when testing is enabled and at least two variants are provided, persists the campaign in the orchestrator's store, and updates internal counters.
 
         Parameters:
-            campaign_data (Dict[str, Any]): Configuration mapping for the campaign. Expected keys:
+            campaign_data (dict[str, Any]): Configuration mapping for the campaign. Expected keys:
                 - name (str): Required display name for the campaign.
                 - description (str): Optional human-readable description.
                 - type (str|CampaignType): Campaign type identifier (e.g., "email").
-                - channels (List[str|Channel]): List of channels to use.
-                - target_segments (List[str]): List of segment IDs or identifiers.
+                - channels (list[str|Channel]): List of channels to use.
+                - target_segments (list[str]): List of segment IDs or identifiers.
                 - scheduled_start, scheduled_end: Optional scheduling timestamps.
                 - enable_testing (bool): Whether to enable A/B or multivariate testing.
-                - variants (List[Dict]): Variant definitions when testing is enabled.
+                - variants (list[Dict]): Variant definitions when testing is enabled.
                 - budget (float): Campaign budget.
                 - target_conversions (int): Optional conversion target.
                 - personalization_enabled (bool): Whether personalization is enabled.
@@ -401,9 +408,7 @@ class MarketingCampaignOrchestrator:
             self.campaigns[campaign.campaign_id] = campaign
             self.campaign_count += 1
 
-            logger.info(
-                f"✅ Campaign created: {campaign.name} ({campaign.campaign_id})"
-            )
+            logger.info(f"✅ Campaign created: {campaign.name} ({campaign.campaign_id})")
 
             return campaign
 
@@ -421,11 +426,11 @@ class MarketingCampaignOrchestrator:
                 - campaign_id (str): ID of the launched campaign (present on success).
                 - status (str): Final campaign status value (present on success).
                 - estimated_reach (int): Estimated total reach calculated from target segments (present on success).
-                - channels (List[str]): List of channel names used for distribution (present on success).
+                - channels (list[str]): List of channel names used for distribution (present on success).
                 - distribution_results (dict): Per-channel distribution/send results (present on success).
                 - launched_at (str): ISO 8601 timestamp when campaign was started (present on success).
                 - error (str): Error message describing failure (present on failure).
-                - validation_errors (List[str]): Validation error messages when validation fails.
+                - validation_errors (list[str]): Validation error messages when validation fails.
         """
         try:
             if campaign_id not in self.campaigns:
@@ -461,8 +466,7 @@ class MarketingCampaignOrchestrator:
             asyncio.create_task(self._monitor_campaign_performance(campaign_id))
 
             logger.info(
-                f"🚀 Campaign launched: {campaign.name} "
-                f"(Reach: {total_reach}, Channels: {len(campaign.channels)})"
+                f"🚀 Campaign launched: {campaign.name} " f"(Reach: {total_reach}, Channels: {len(campaign.channels)})"
             )
 
             return {
@@ -495,7 +499,7 @@ class MarketingCampaignOrchestrator:
         Returns:
             dict: A validation result with keys:
                 - "valid" (bool): `True` if no validation errors were found, `False` otherwise.
-                - "errors" (List[str]): A list of human-readable error messages describing failed checks.
+                - "errors" (list[str]): A list of human-readable error messages describing failed checks.
         """
         errors = []
 
@@ -540,9 +544,7 @@ class MarketingCampaignOrchestrator:
 
         return total_reach
 
-    async def _distribute_to_channels(
-        self, campaign: Campaign
-    ) -> dict[str, Any]:
+    async def _distribute_to_channels(self, campaign: Campaign) -> dict[str, Any]:
         """
         Distribute a Campaign across its configured channels and collect per-channel results.
 
@@ -552,7 +554,7 @@ class MarketingCampaignOrchestrator:
             campaign (Campaign): The campaign to distribute; its `channels` list determines which channel handlers are invoked.
 
         Returns:
-            Dict[str, Any]: A mapping from channel name (string) to the channel's result dictionary. Each result contains channel-specific keys (e.g., sent/delivered counts) or an `error` entry when distribution failed for that channel.
+            dict[str, Any]: A mapping from channel name (string) to the channel's result dictionary. Each result contains channel-specific keys (e.g., sent/delivered counts) or an `error` entry when distribution failed for that channel.
         """
         results = {}
 
@@ -635,9 +637,7 @@ class MarketingCampaignOrchestrator:
             "delivered": int(reach * 0.99),  # 99% delivery rate for SMS
         }
 
-    async def _launch_social_campaign(
-        self, campaign: Campaign, channel: Channel
-    ) -> dict[str, Any]:
+    async def _launch_social_campaign(self, campaign: Campaign, channel: Channel) -> dict[str, Any]:
         """
         Launches a campaign on a social media channel and returns the channel-specific launch results.
 
@@ -688,9 +688,15 @@ class MarketingCampaignOrchestrator:
                         variant.converted_count = int(variant.clicked_count * random.uniform(0.05, 0.15))
 
                         # Calculate rates
-                        variant.open_rate = variant.opened_count / variant.delivered_count if variant.delivered_count > 0 else 0
-                        variant.click_rate = variant.clicked_count / variant.opened_count if variant.opened_count > 0 else 0
-                        variant.conversion_rate = variant.converted_count / variant.clicked_count if variant.clicked_count > 0 else 0
+                        variant.open_rate = (
+                            variant.opened_count / variant.delivered_count if variant.delivered_count > 0 else 0
+                        )
+                        variant.click_rate = (
+                            variant.clicked_count / variant.opened_count if variant.opened_count > 0 else 0
+                        )
+                        variant.conversion_rate = (
+                            variant.converted_count / variant.clicked_count if variant.clicked_count > 0 else 0
+                        )
 
                     # Check for statistical significance
                     await self._check_ab_test_significance(campaign)
@@ -752,7 +758,7 @@ class MarketingCampaignOrchestrator:
             campaign_id (str): Identifier of the campaign to finalize.
 
         Returns:
-            Dict[str, Any]: Result object with:
+            dict[str, Any]: Result object with:
                 - "success" (bool): `true` if completion succeeded, `false` otherwise.
                 - On success:
                     - "campaign_id" (str): The finalized campaign id.
@@ -794,12 +800,10 @@ class MarketingCampaignOrchestrator:
                 avg_order_value = 150.0  # Example
                 campaign.total_revenue = campaign.total_conversions * avg_order_value
                 campaign.roi_percentage = (
-                    (campaign.total_revenue - campaign.budget) / campaign.budget * 100
-                    if campaign.budget > 0 else 0
+                    (campaign.total_revenue - campaign.budget) / campaign.budget * 100 if campaign.budget > 0 else 0
                 )
                 campaign.cost_per_acquisition = (
-                    campaign.budget / campaign.total_conversions
-                    if campaign.total_conversions > 0 else 0
+                    campaign.budget / campaign.total_conversions if campaign.total_conversions > 0 else 0
                 )
 
             # Generate final analytics report
@@ -858,24 +862,15 @@ class MarketingCampaignOrchestrator:
             "campaign_type": campaign.campaign_type.value,
             "duration": (
                 (campaign.completed_at - campaign.started_at).total_seconds() / 3600
-                if campaign.started_at and campaign.completed_at else 0
+                if campaign.started_at and campaign.completed_at
+                else 0
             ),
             "performance_summary": {
-                "delivery_rate": (
-                    campaign.total_delivered / campaign.total_sent
-                    if campaign.total_sent > 0 else 0
-                ),
-                "open_rate": (
-                    campaign.total_opens / campaign.total_delivered
-                    if campaign.total_delivered > 0 else 0
-                ),
-                "click_rate": (
-                    campaign.total_clicks / campaign.total_opens
-                    if campaign.total_opens > 0 else 0
-                ),
+                "delivery_rate": (campaign.total_delivered / campaign.total_sent if campaign.total_sent > 0 else 0),
+                "open_rate": (campaign.total_opens / campaign.total_delivered if campaign.total_delivered > 0 else 0),
+                "click_rate": (campaign.total_clicks / campaign.total_opens if campaign.total_opens > 0 else 0),
                 "conversion_rate": (
-                    campaign.total_conversions / campaign.total_clicks
-                    if campaign.total_clicks > 0 else 0
+                    campaign.total_conversions / campaign.total_clicks if campaign.total_clicks > 0 else 0
                 ),
             },
             "financial_summary": {
@@ -891,29 +886,29 @@ class MarketingCampaignOrchestrator:
         if campaign.enable_testing and campaign.variants:
             report["ab_test_results"] = []
             for variant in campaign.variants:
-                report["ab_test_results"].append({
-                    "variant_name": variant.name,
-                    "is_control": variant.is_control,
-                    "is_winner": variant.is_winner,
-                    "confidence_level": variant.confidence_level,
-                    "conversion_rate": variant.conversion_rate,
-                    "revenue_generated": variant.revenue_generated,
-                })
+                report["ab_test_results"].append(
+                    {
+                        "variant_name": variant.name,
+                        "is_control": variant.is_control,
+                        "is_winner": variant.is_winner,
+                        "confidence_level": variant.confidence_level,
+                        "conversion_rate": variant.conversion_rate,
+                        "revenue_generated": variant.revenue_generated,
+                    }
+                )
 
         return report
 
-    async def create_segment(
-        self, segment_data: dict[str, Any]
-    ) -> CustomerSegment:
+    async def create_segment(self, segment_data: dict[str, Any]) -> CustomerSegment:
         """
         Create a CustomerSegment from provided input data and store it in the orchestrator's segment registry.
 
         Parameters:
-            segment_data (Dict[str, Any]): Input mapping with keys:
+            segment_data (dict[str, Any]): Input mapping with keys:
                 - name (str): Required segment name.
                 - description (str, optional): Human-readable description.
-                - criteria (Dict[str, Any], optional): Mapping of criteria keys (matching SegmentCriteria names) to their values.
-                - filters (Dict[str, Any], optional): Additional filter definitions for the segment.
+                - criteria (dict[str, Any], optional): Mapping of criteria keys (matching SegmentCriteria names) to their values.
+                - filters (dict[str, Any], optional): Additional filter definitions for the segment.
                 - customer_count (int, optional): Number of customers in the segment.
 
         Returns:
@@ -922,19 +917,14 @@ class MarketingCampaignOrchestrator:
         segment = CustomerSegment(
             name=segment_data["name"],
             description=segment_data.get("description", ""),
-            criteria={
-                SegmentCriteria(k): v
-                for k, v in segment_data.get("criteria", {}).items()
-            },
+            criteria={SegmentCriteria(k): v for k, v in segment_data.get("criteria", {}).items()},
             filters=segment_data.get("filters", {}),
             customer_count=segment_data.get("customer_count", 0),
         )
 
         self.segments[segment.segment_id] = segment
 
-        logger.info(
-            f"✅ Segment created: {segment.name} ({segment.customer_count} customers)"
-        )
+        logger.info(f"✅ Segment created: {segment.name} ({segment.customer_count} customers)")
 
         return segment
 
@@ -943,7 +933,7 @@ class MarketingCampaignOrchestrator:
         Return a snapshot of the orchestrator's current system status.
 
         Returns:
-            status (Dict[str, Any]): A dictionary with the following top-level keys:
+            status (dict[str, Any]): A dictionary with the following top-level keys:
                 - agent_name: Orchestrator agent name.
                 - version: Orchestrator version string.
                 - campaigns: Summary of campaigns including:
@@ -968,9 +958,7 @@ class MarketingCampaignOrchestrator:
                 "active_campaigns": len(self.active_campaigns),
                 "campaign_count": self.campaign_count,
                 "status_breakdown": {
-                    status.value: sum(
-                        1 for c in self.campaigns.values() if c.status == status
-                    )
+                    status.value: sum(1 for c in self.campaigns.values() if c.status == status)
                     for status in CampaignStatus
                 },
             },
@@ -981,15 +969,9 @@ class MarketingCampaignOrchestrator:
             "performance": {
                 "total_sent": self.total_sent,
                 "total_conversions": self.total_conversions,
-                "avg_conversion_rate": (
-                    self.total_conversions / self.total_sent
-                    if self.total_sent > 0 else 0
-                ),
+                "avg_conversion_rate": (self.total_conversions / self.total_sent if self.total_sent > 0 else 0),
             },
-            "channel_integrations": {
-                channel.value: config
-                for channel, config in self.channel_integrations.items()
-            },
+            "channel_integrations": {channel.value: config for channel, config in self.channel_integrations.items()},
         }
 
 

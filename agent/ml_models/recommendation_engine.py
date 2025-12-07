@@ -12,6 +12,7 @@ Reference: AGENTS.md Line 1577-1581
 
 logger = logging.getLogger(__name__)
 
+
 class RecommendationEngine:
     """Product recommendation system"""
 

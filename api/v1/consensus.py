@@ -11,7 +11,6 @@ Truth Protocol: Input validation, error handling, audit trails, webhook security
 from datetime import datetime
 import logging
 import os
-from typing import Optional
 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from fastapi.responses import HTMLResponse
@@ -35,9 +34,7 @@ class StartWorkflowRequest(BaseModel):
     keywords: list[str] = Field(default_factory=list, description="SEO keywords")
     tone: str = Field(default="professional", description="Writing tone")
     length: int = Field(default=800, ge=200, le=3000, description="Target word count")
-    human_reviewer_email: str = Field(
-        ..., description="Email for human approval notification"
-    )
+    human_reviewer_email: str = Field(..., description="Email for human approval notification")
 
 
 class WorkflowStatusResponse(BaseModel):
@@ -50,7 +47,7 @@ class WorkflowStatusResponse(BaseModel):
     total_reviews: int
     human_decision: str
     ready_for_approval: bool
-    approval_urls: Optional[dict] = None
+    approval_urls: dict | None = None
     current_draft: dict
     review_summary: dict
 
@@ -62,7 +59,7 @@ class HumanDecisionResponse(BaseModel):
     message: str
     workflow_id: str
     decision: str
-    next_action: Optional[str] = None
+    next_action: str | None = None
 
 
 # Global orchestrator instance (in production, use dependency injection)
@@ -76,9 +73,7 @@ def get_orchestrator() -> ConsensusOrchestrator:
     if _orchestrator_instance is None:
         anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
         if not anthropic_api_key:
-            raise HTTPException(
-                status_code=500, detail="ANTHROPIC_API_KEY not configured"
-            )
+            raise HTTPException(status_code=500, detail="ANTHROPIC_API_KEY not configured")
 
         content_generator = ContentGenerator(api_key=anthropic_api_key)
 
@@ -88,16 +83,12 @@ def get_orchestrator() -> ConsensusOrchestrator:
             "values": ["luxury", "quality", "innovation", "exclusivity"],
         }
 
-        _orchestrator_instance = ConsensusOrchestrator(
-            content_generator=content_generator, brand_config=brand_config
-        )
+        _orchestrator_instance = ConsensusOrchestrator(content_generator=content_generator, brand_config=brand_config)
 
     return _orchestrator_instance
 
 
-async def send_approval_email(
-    email: str, workflow_id: str, approval_urls: dict, draft_preview: dict
-):
+async def send_approval_email(email: str, workflow_id: str, approval_urls: dict, draft_preview: dict):
     """
     Send human approval email with webhook links
 
@@ -196,7 +187,9 @@ async def send_approval_email(
         # await email_service.send_email(to=email, subject=email_subject, html=email_body)
 
         # For now, log the approval URLs
-        logger.info(f"Approval URLs:\n  Approve: {approval_urls['approve_url']}\n  Reject: {approval_urls['reject_url']}")
+        logger.info(
+            f"Approval URLs:\n  Approve: {approval_urls['approve_url']}\n  Reject: {approval_urls['reject_url']}"
+        )
 
     except Exception:
         logger.exception(f"Failed to send approval email to {email}")
@@ -271,9 +264,7 @@ async def start_consensus_workflow(
         )
 
         # Get latest review summary
-        latest_review = (
-            workflow.review_history[-1] if workflow.review_history else None
-        )
+        latest_review = workflow.review_history[-1] if workflow.review_history else None
         review_summary = {}
         if latest_review:
             review_summary = {
@@ -298,15 +289,11 @@ async def start_consensus_workflow(
 
     except Exception as e:
         logger.exception("Failed to start consensus workflow")
-        raise HTTPException(
-            status_code=500, detail=f"Workflow failed: {e!s}"
-        )
+        raise HTTPException(status_code=500, detail=f"Workflow failed: {e!s}")
 
 
 @router.get("/workflow/{workflow_id}", response_model=WorkflowStatusResponse)
-async def get_workflow_status(
-    workflow_id: str, orchestrator: ConsensusOrchestrator = None
-):
+async def get_workflow_status(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
     """
     Get consensus workflow status
 
@@ -380,7 +367,7 @@ async def get_workflow_status(
 async def approve_content(
     workflow_id: str,
     token: str = Query(..., description="Approval token"),
-    feedback: Optional[str] = Query(None, description="Optional feedback"),
+    feedback: str | None = Query(None, description="Optional feedback"),
     orchestrator: ConsensusOrchestrator = None,
 ):
     """
@@ -443,7 +430,7 @@ async def approve_content(
 async def reject_content(
     workflow_id: str,
     token: str = Query(..., description="Rejection token"),
-    feedback: Optional[str] = Query(None, description="Rejection reason"),
+    feedback: str | None = Query(None, description="Rejection reason"),
     orchestrator: ConsensusOrchestrator = None,
 ):
     """
@@ -504,9 +491,7 @@ async def reject_content(
 
 
 @router.post("/publish/{workflow_id}", response_model=dict)
-async def publish_approved_content(
-    workflow_id: str, orchestrator: ConsensusOrchestrator = None
-):
+async def publish_approved_content(workflow_id: str, orchestrator: ConsensusOrchestrator = None):
     """
     Publish approved content to WordPress
 

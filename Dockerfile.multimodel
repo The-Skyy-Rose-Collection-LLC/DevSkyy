@@ -1,0 +1,49 @@
+# DevSkyy - Multi-Model AI Orchestration
+# Clean Python environment with all AI models
+
+FROM python:3.11-slim
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    git \
+    libffi-dev \
+    libssl-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements first for better caching
+COPY requirements.txt .
+
+# Install Python packages with secure versions
+# SECURITY: Fixes CRITICAL CVEs per SECURITY_SCAN_REPORT_20251118.md
+# - pip>=25.3: Fixes CVE-2025-8869 (path traversal)
+# - cryptography>=46.0.3: Fixes CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27
+# - setuptools>=78.1.1: Fixes CVE-2025-47273, CVE-2024-6345
+RUN pip install --no-cache-dir --upgrade \
+    "pip>=25.3" \
+    "cryptography>=46.0.3,<47.0.0" \
+    "setuptools>=78.1.1,<79.0.0" && \
+    pip install --no-cache-dir \
+    anthropic \
+    openai \
+    google-generativeai \
+    python-dotenv \
+    transformers \
+    torch \
+    -r requirements.txt
+
+# Copy application code
+COPY . .
+
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+ENV ENVIRONMENT=production
+
+# Expose port
+EXPOSE 8000
+
+# Default command
+CMD ["python", "main.py"]

@@ -14,6 +14,7 @@ from ..modules.scanner import scan_site
 
 logger = logging.getLogger(__name__)
 
+
 class CronScheduler:
     """
     Production-level cron scheduler for automated tasks.
@@ -69,9 +70,7 @@ class CronScheduler:
             return
 
         self.running = True
-        self.scheduler_thread = threading.Thread(
-            target=self._run_scheduler, daemon=True
-        )
+        self.scheduler_thread = threading.Thread(target=self._run_scheduler, daemon=True)
         self.scheduler_thread.start()
 
         logger.info("🚀 Cron scheduler started")
@@ -109,9 +108,7 @@ class CronScheduler:
             "last_run": job_info["last_run"],
             "run_count": job_info["run_count"],
             "errors": job_info["errors"],
-            "next_run": (
-                str(job_info["job"].next_run) if job_info["job"].next_run else None
-            ),
+            "next_run": (str(job_info["job"].next_run) if job_info["job"].next_run else None),
         }
 
     def list_all_jobs(self) -> dict[str, Any]:
@@ -122,8 +119,10 @@ class CronScheduler:
             "jobs": {job_id: self.get_job_status(job_id) for job_id in self.jobs},
         }
 
+
 # Global scheduler instance
 _global_scheduler = CronScheduler()
+
 
 def schedule_hourly_job() -> dict[str, Any]:
     """
@@ -142,16 +141,12 @@ def schedule_hourly_job() -> dict[str, Any]:
 
                 # Step 1: Scan the site
                 scan_results = scan_site()
-                logger.info(
-                    f"📊 Scan completed: {scan_results.get('files_scanned', 0)} files scanned"
-                )
+                logger.info(f"📊 Scan completed: {scan_results.get('files_scanned', 0)} files scanned")
 
                 # Step 2: Fix any issues found
                 if scan_results.get("errors_found") or scan_results.get("warnings"):
                     fix_results = fix_code(scan_results)
-                    logger.info(
-                        f"🔧 Fixes applied: {fix_results.get('files_fixed', 0)} files fixed"
-                    )
+                    logger.info(f"🔧 Fixes applied: {fix_results.get('files_fixed', 0)} files fixed")
 
                     # Step 3: Commit fixes if any were made
                     if fix_results.get("files_fixed", 0) > 0:
@@ -163,9 +158,7 @@ def schedule_hourly_job() -> dict[str, Any]:
                 # Update job statistics
                 job_id = getattr(automated_workflow, "job_id", None)
                 if job_id and job_id in _global_scheduler.jobs:
-                    _global_scheduler.jobs[job_id][
-                        "last_run"
-                    ] = datetime.now().isoformat()
+                    _global_scheduler.jobs[job_id]["last_run"] = datetime.now().isoformat()
                     _global_scheduler.jobs[job_id]["run_count"] += 1
 
                 logger.info("✅ Automated workflow completed successfully")
@@ -190,9 +183,7 @@ def schedule_hourly_job() -> dict[str, Any]:
             "status": "scheduled",
             "job_id": job_id,
             "interval": "hourly",
-            "next_run": (
-                str(schedule.jobs[0].next_run) if schedule.jobs else "within 1 hour"
-            ),
+            "next_run": (str(schedule.jobs[0].next_run) if schedule.jobs else "within 1 hour"),
             "scheduler_running": _global_scheduler.running,
             "message": "DevSkyy agent workflow scheduled successfully",
         }
@@ -200,6 +191,7 @@ def schedule_hourly_job() -> dict[str, Any]:
     except Exception as e:
         logger.error(f"❌ Failed to schedule hourly job: {e!s}")
         return {"status": "failed", "error": str(e)}
+
 
 def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> dict[str, Any]:
     """Schedule a custom job with specified interval."""
@@ -214,9 +206,11 @@ def schedule_custom_job(job_func: Callable, interval: str, **kwargs) -> dict[str
     except Exception as e:
         return {"status": "failed", "error": str(e)}
 
+
 def get_scheduler_status() -> dict[str, Any]:
     """Get comprehensive scheduler status."""
     return _global_scheduler.list_all_jobs()
+
 
 def stop_scheduler() -> dict[str, Any]:
     """Stop the scheduler."""

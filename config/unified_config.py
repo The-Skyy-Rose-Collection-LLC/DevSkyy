@@ -17,7 +17,7 @@ import logging
 import os
 from pathlib import Path
 import secrets
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
@@ -145,12 +145,23 @@ class PerformanceConfig(BaseModel):
 class AIConfig(BaseModel):
     """AI services configuration"""
 
-    openai_api_key: Optional[str] = None
-    anthropic_api_key: Optional[str] = None
+    openai_api_key: str | None = None
+    anthropic_api_key: str | None = None
     default_model: str = Field(default="claude-sonnet-4-5")
     max_tokens: int = Field(default=4096, ge=256, le=200000)
     temperature: float = Field(default=0.7, ge=0.0, le=2.0)
     timeout_seconds: int = Field(default=120, ge=10, le=300)
+    openai_is_consequential: bool = Field(default=True)
+
+    # Safeguard configuration
+    enable_safeguards: bool = Field(default=True)
+    safeguard_level: str = Field(default="strict")  # strict, moderate, permissive
+    enable_rate_limiting: bool = Field(default=True)
+    max_requests_per_minute: int = Field(default=60, ge=1, le=1000)
+    max_consequential_per_hour: int = Field(default=100, ge=1, le=10000)
+    enable_circuit_breaker: bool = Field(default=True)
+    enable_audit_logging: bool = Field(default=True)
+    enforce_production_safeguards: bool = Field(default=True)
 
     class Config:
         frozen = True
@@ -177,12 +188,12 @@ class UnifiedConfig:
         secret = config.security.secret_key
     """
 
-    def __init__(self, environment: Optional[str] = None):
+    def __init__(self, environment: str | None = None):
         """
         Initialize the unified configuration for the application.
 
         Parameters:
-            environment (Optional[str]): Optional override for the runtime environment. If omitted,
+            environment (str | None): Optional override for the runtime environment. If omitted,
                 the ENVIRONMENT environment variable is used; defaults to "development". Accepted
                 values are "development", "production", and "testing".
 
@@ -211,10 +222,7 @@ class UnifiedConfig:
         self._load_ai_config()
 
         # Log configuration loaded
-        logger.info(
-            f"✅ Unified configuration loaded - Environment: {self.environment}, "
-            f"Version: {self.version}"
-        )
+        logger.info(f"✅ Unified configuration loaded - Environment: {self.environment}, " f"Version: {self.version}")
 
     def _load_database_config(self):
         """
@@ -232,7 +240,7 @@ class UnifiedConfig:
             pool_timeout=int(os.getenv("DB_POOL_TIMEOUT", 30)),
             pool_recycle=int(os.getenv("DB_POOL_RECYCLE", 3600)),
             pool_pre_ping=os.getenv("DB_POOL_PRE_PING", "true").lower() == "true",
-            echo=os.getenv("DB_ECHO", "false").lower() == "true"
+            echo=os.getenv("DB_ECHO", "false").lower() == "true",
         )
 
     def _get_database_url(self) -> str:
@@ -267,12 +275,7 @@ class UnifiedConfig:
             return self._normalize_database_url(planetscale_url)
 
         # Check for individual PostgreSQL credentials
-        if all([
-            os.getenv("DB_HOST"),
-            os.getenv("DB_USER"),
-            os.getenv("DB_PASSWORD"),
-            os.getenv("DB_NAME")
-        ]):
+        if all([os.getenv("DB_HOST"), os.getenv("DB_USER"), os.getenv("DB_PASSWORD"), os.getenv("DB_NAME")]):
             return self._build_postgres_url()
 
         # Default: SQLite (development/testing)
@@ -363,7 +366,7 @@ class UnifiedConfig:
             min_password_length=int(os.getenv("MIN_PASSWORD_LENGTH", 12)),
             require_special_chars=os.getenv("REQUIRE_SPECIAL_CHARS", "true").lower() == "true",
             max_login_attempts=int(os.getenv("MAX_LOGIN_ATTEMPTS", 5)),
-            lockout_duration_minutes=int(os.getenv("LOCKOUT_DURATION_MINUTES", 30))
+            lockout_duration_minutes=int(os.getenv("LOCKOUT_DURATION_MINUTES", 30)),
         )
 
     def _load_logging_config(self):
@@ -381,7 +384,7 @@ class UnifiedConfig:
             max_file_size_mb=int(os.getenv("LOG_MAX_FILE_SIZE_MB", 10)),
             backup_count=int(os.getenv("LOG_BACKUP_COUNT", 5)),
             enable_correlation_id=os.getenv("LOG_ENABLE_CORRELATION_ID", "true").lower() == "true",
-            sanitize_sensitive_data=os.getenv("LOG_SANITIZE_SENSITIVE", "true").lower() == "true"
+            sanitize_sensitive_data=os.getenv("LOG_SANITIZE_SENSITIVE", "true").lower() == "true",
         )
 
     def _load_redis_config(self):
@@ -396,7 +399,7 @@ class UnifiedConfig:
             socket_timeout=int(os.getenv("REDIS_SOCKET_TIMEOUT", 5)),
             socket_connect_timeout=int(os.getenv("REDIS_SOCKET_CONNECT_TIMEOUT", 5)),
             retry_on_timeout=os.getenv("REDIS_RETRY_ON_TIMEOUT", "true").lower() == "true",
-            default_ttl=int(os.getenv("REDIS_DEFAULT_TTL", 3600))
+            default_ttl=int(os.getenv("REDIS_DEFAULT_TTL", 3600)),
         )
 
     def _load_cors_config(self):
@@ -424,7 +427,7 @@ class UnifiedConfig:
             allow_credentials=os.getenv("CORS_ALLOW_CREDENTIALS", "true").lower() == "true",
             allow_methods=methods,
             allow_headers=headers,
-            max_age=int(os.getenv("CORS_MAX_AGE", 600))
+            max_age=int(os.getenv("CORS_MAX_AGE", 600)),
         )
 
     def _load_performance_config(self):
@@ -443,7 +446,7 @@ class UnifiedConfig:
             request_timeout_seconds=int(os.getenv("REQUEST_TIMEOUT_SECONDS", 300)),
             worker_count=int(os.getenv("WORKER_COUNT", 4)),
             enable_gzip=os.getenv("ENABLE_GZIP", "true").lower() == "true",
-            gzip_minimum_size=int(os.getenv("GZIP_MINIMUM_SIZE", 1000))
+            gzip_minimum_size=int(os.getenv("GZIP_MINIMUM_SIZE", 1000)),
         )
 
     def _load_ai_config(self):
@@ -457,6 +460,15 @@ class UnifiedConfig:
         - AI_MAX_TOKENS: 4096
         - AI_TEMPERATURE: 0.7
         - AI_TIMEOUT_SECONDS: 120
+        - OPENAI_IS_CONSEQUENTIAL: "true" (marks OpenAI requests as having real-world consequences per OpenAI safety features)
+        - OPENAI_ENABLE_SAFEGUARDS: "true" (enable comprehensive safeguards)
+        - OPENAI_SAFEGUARD_LEVEL: "strict" (strict, moderate, permissive)
+        - OPENAI_ENABLE_RATE_LIMITING: "true"
+        - OPENAI_MAX_REQUESTS_PER_MINUTE: 60
+        - OPENAI_MAX_CONSEQUENTIAL_PER_HOUR: 100
+        - OPENAI_ENABLE_CIRCUIT_BREAKER: "true"
+        - OPENAI_ENABLE_AUDIT_LOGGING: "true"
+        - OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS: "true"
         """
         self.ai = AIConfig(
             openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -464,7 +476,16 @@ class UnifiedConfig:
             default_model=os.getenv("AI_DEFAULT_MODEL", "claude-sonnet-4-5"),
             max_tokens=int(os.getenv("AI_MAX_TOKENS", 4096)),
             temperature=float(os.getenv("AI_TEMPERATURE", 0.7)),
-            timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120))
+            timeout_seconds=int(os.getenv("AI_TIMEOUT_SECONDS", 120)),
+            openai_is_consequential=os.getenv("OPENAI_IS_CONSEQUENTIAL", "true").lower() == "true",
+            enable_safeguards=os.getenv("OPENAI_ENABLE_SAFEGUARDS", "true").lower() == "true",
+            safeguard_level=os.getenv("OPENAI_SAFEGUARD_LEVEL", "strict").lower(),
+            enable_rate_limiting=os.getenv("OPENAI_ENABLE_RATE_LIMITING", "true").lower() == "true",
+            max_requests_per_minute=int(os.getenv("OPENAI_MAX_REQUESTS_PER_MINUTE", 60)),
+            max_consequential_per_hour=int(os.getenv("OPENAI_MAX_CONSEQUENTIAL_PER_HOUR", 100)),
+            enable_circuit_breaker=os.getenv("OPENAI_ENABLE_CIRCUIT_BREAKER", "true").lower() == "true",
+            enable_audit_logging=os.getenv("OPENAI_ENABLE_AUDIT_LOGGING", "true").lower() == "true",
+            enforce_production_safeguards=os.getenv("OPENAI_ENFORCE_PRODUCTION_SAFEGUARDS", "true").lower() == "true",
         )
 
     def is_production(self) -> bool:
@@ -496,7 +517,7 @@ class UnifiedConfig:
         Reads the `TRUSTED_HOSTS` environment variable and parses it into a list of hostnames; when not set, a production default and a non-production default are used.
 
         Returns:
-            List[str]: A list of hostnames from `TRUSTED_HOSTS`, each trimmed of surrounding whitespace.
+            list[str]: A list of hostnames from `TRUSTED_HOSTS`, each trimmed of surrounding whitespace.
         """
         if self.is_production():
             hosts_str = os.getenv("TRUSTED_HOSTS", "theskyy-rose-collection.com")
@@ -520,26 +541,23 @@ class UnifiedConfig:
             "database": {
                 "provider": self._detect_database_provider(),
                 "pool_size": self.database.pool_size,
-                "echo": self.database.echo
+                "echo": self.database.echo,
             },
             "security": {
                 "algorithm": self.security.algorithm,
                 "access_token_expire_minutes": self.security.access_token_expire_minutes,
-                "password_hash_algorithm": self.security.password_hash_algorithm
+                "password_hash_algorithm": self.security.password_hash_algorithm,
             },
             "logging": {
                 "level": self.logging.level,
                 "format": self.logging.format,
-                "enable_correlation_id": self.logging.enable_correlation_id
+                "enable_correlation_id": self.logging.enable_correlation_id,
             },
-            "redis": {
-                "max_connections": self.redis.max_connections,
-                "default_ttl": self.redis.default_ttl
-            },
+            "redis": {"max_connections": self.redis.max_connections, "default_ttl": self.redis.default_ttl},
             "performance": {
                 "worker_count": self.performance.worker_count,
-                "enable_gzip": self.performance.enable_gzip
-            }
+                "enable_gzip": self.performance.enable_gzip,
+            },
         }
 
     def _detect_database_provider(self) -> str:
@@ -572,10 +590,10 @@ class UnifiedConfig:
 # ============================================================================
 
 # Singleton configuration instance
-_config: Optional[UnifiedConfig] = None
+_config: UnifiedConfig | None = None
 
 
-def get_config(environment: Optional[str] = None) -> UnifiedConfig:
+def get_config(environment: str | None = None) -> UnifiedConfig:
     """
     Return the module-level singleton UnifiedConfig, creating it if necessary.
 
@@ -583,7 +601,7 @@ def get_config(environment: Optional[str] = None) -> UnifiedConfig:
     environment name.
 
     Parameters:
-        environment (Optional[str]): Optional environment name to initialize the configuration
+        environment (str | None): Optional environment name to initialize the configuration
             (for example "development", "production", or "testing"). If omitted, the
             UnifiedConfig will determine the environment from environment variables or defaults.
 
@@ -598,12 +616,12 @@ def get_config(environment: Optional[str] = None) -> UnifiedConfig:
     return _config
 
 
-def reload_config(environment: Optional[str] = None) -> UnifiedConfig:
+def reload_config(environment: str | None = None) -> UnifiedConfig:
     """
     Reinitialize the module-level UnifiedConfig singleton and return the new instance for the specified environment.
 
     Parameters:
-        environment (Optional[str]): Optional environment name to force configuration initialization for (e.g., "production", "development", "testing"). If omitted, the environment detection in UnifiedConfig is used.
+        environment (str | None): Optional environment name to force configuration initialization for (e.g., "production", "development", "testing"). If omitted, the environment detection in UnifiedConfig is used.
 
     Returns:
         UnifiedConfig: The newly created UnifiedConfig singleton.
@@ -626,7 +644,7 @@ def validate_production_config(config: UnifiedConfig) -> list[str]:
         config (UnifiedConfig): The configuration to validate.
 
     Returns:
-        errors (List[str]): A list of validation error messages; empty if the configuration passes all production checks.
+        errors (list[str]): A list of validation error messages; empty if the configuration passes all production checks.
     """
     errors = []
 
@@ -664,5 +682,5 @@ __all__ = [
     "UnifiedConfig",
     "get_config",
     "reload_config",
-    "validate_production_config"
+    "validate_production_config",
 ]

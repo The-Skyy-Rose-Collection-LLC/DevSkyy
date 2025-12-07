@@ -43,15 +43,9 @@ def test_run_endpoint_calls_functions_in_sequence():
         call_order.append("schedule")
 
     with (
-        patch(
-            "agent.modules.scanner.scan_site", side_effect=scan_side_effect, create=True
-        ) as mock_scan,
-        patch(
-            "agent.modules.fixer.fix_code", side_effect=fix_side_effect, create=True
-        ) as mock_fix,
-        patch(
-            "agent.git_commit.commit_fixes", side_effect=commit_side_effect, create=True
-        ) as mock_commit,
+        patch("agent.modules.scanner.scan_site", side_effect=scan_side_effect, create=True) as mock_scan,
+        patch("agent.modules.fixer.fix_code", side_effect=fix_side_effect, create=True) as mock_fix,
+        patch("agent.git_commit.commit_fixes", side_effect=commit_side_effect, create=True) as mock_commit,
         patch(
             "agent.scheduler.cron.schedule_hourly_job",
             side_effect=schedule_side_effect,

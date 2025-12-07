@@ -10,7 +10,6 @@ from datetime import datetime, timedelta
 import logging
 import os
 import time
-from typing import Optional
 
 from cryptography.fernet import Fernet
 from sqlalchemy import event, text
@@ -46,9 +45,7 @@ class CredentialManager:
 
         # Generate new key (in production, store this securely)
         key = Fernet.generate_key()
-        logger.warning(
-            "🔑 Generated new encryption key - store securely in production!"
-        )
+        logger.warning("🔑 Generated new encryption key - store securely in production!")
         return key
 
     def encrypt_credential(self, credential: str) -> str:
@@ -139,14 +136,10 @@ class SecureConnectionPool:
             logger.debug(f"🔌 Database connection closed: {id(dbapi_connection)}")
 
         @event.listens_for(self.engine.sync_engine, "before_cursor_execute")
-        def on_before_execute(
-            conn, cursor, statement, parameters, context, executemany
-        ):
+        def on_before_execute(conn, cursor, statement, parameters, context, executemany):
             """Monitor SQL queries for security threats"""
             # Record query pattern
-            query_type = (
-                statement.strip().split()[0].upper() if statement.strip() else "UNKNOWN"
-            )
+            query_type = statement.strip().split()[0].upper() if statement.strip() else "UNKNOWN"
             self.query_patterns[query_type] += 1
 
             # Check for suspicious patterns
@@ -208,11 +201,7 @@ class SecureConnectionPool:
             **self.connection_stats,
             "query_patterns": dict(self.query_patterns),
             "recent_connections": len(
-                [
-                    conn
-                    for conn in self.connection_history
-                    if conn["timestamp"] > datetime.now() - timedelta(minutes=5)
-                ]
+                [conn for conn in self.connection_history if conn["timestamp"] > datetime.now() - timedelta(minutes=5)]
             ),
             "suspicious_ips": list(self.suspicious_ips),
         }
@@ -233,9 +222,7 @@ class SecureSessionManager:
         self.session_stats = defaultdict(int)
 
     @asynccontextmanager
-    async def get_secure_session(
-        self, user_id: Optional[str] = None
-    ) -> AsyncGenerator[AsyncSession, None]:
+    async def get_secure_session(self, user_id: str | None = None) -> AsyncGenerator[AsyncSession, None]:
         """Get a secure database session with monitoring"""
         session_id = f"session_{int(time.time() * 1000)}"
 
@@ -253,9 +240,7 @@ class SecureSessionManager:
                 # Set up session-level security
                 await self._setup_session_security(session, user_id)
 
-                logger.debug(
-                    f"🔐 Secure session created: {session_id} for user: {user_id}"
-                )
+                logger.debug(f"🔐 Secure session created: {session_id} for user: {user_id}")
 
                 yield session
 
@@ -277,9 +262,7 @@ class SecureSessionManager:
             self.session_stats["active_sessions"] -= 1
             logger.debug(f"🧹 Session cleaned up: {session_id}")
 
-    async def _setup_session_security(
-        self, session: AsyncSession, user_id: Optional[str]
-    ):
+    async def _setup_session_security(self, session: AsyncSession, user_id: str | None):
         """Set up session-level security configurations"""
         try:
             # Set session timeout (PostgreSQL)
@@ -305,9 +288,7 @@ class SecureSessionManager:
                 {
                     "session_id": sid,
                     "user_id": info["user_id"],
-                    "duration_seconds": (
-                        datetime.now() - info["created_at"]
-                    ).total_seconds(),
+                    "duration_seconds": (datetime.now() - info["created_at"]).total_seconds(),
                     "queries_executed": info["queries_executed"],
                 }
                 for sid, info in self.active_sessions.items()
@@ -328,17 +309,13 @@ class DatabaseSecurityManager:
         self.session_factory = session_factory
         self.credential_manager = CredentialManager()
         self.connection_pool = SecureConnectionPool(engine)
-        self.session_manager = SecureSessionManager(
-            session_factory, self.credential_manager
-        )
+        self.session_manager = SecureSessionManager(session_factory, self.credential_manager)
 
         # Security monitoring
         self.security_events = deque(maxlen=1000)
         self.threat_level = "LOW"  # LOW, MEDIUM, HIGH, CRITICAL
 
-    async def get_secure_session(
-        self, user_id: Optional[str] = None
-    ) -> AsyncGenerator[AsyncSession, None]:
+    async def get_secure_session(self, user_id: str | None = None) -> AsyncGenerator[AsyncSession, None]:
         """Get a secure database session"""
         async with self.session_manager.get_secure_session(user_id) as session:
             yield session
@@ -360,9 +337,7 @@ class DatabaseSecurityManager:
     def _update_threat_level(self):
         """Update threat level based on recent security events"""
         recent_events = [
-            event
-            for event in self.security_events
-            if event["timestamp"] > datetime.now() - timedelta(minutes=10)
+            event for event in self.security_events if event["timestamp"] > datetime.now() - timedelta(minutes=10)
         ]
 
         if len(recent_events) > 50:
@@ -381,11 +356,7 @@ class DatabaseSecurityManager:
             "connection_stats": self.connection_pool.get_security_stats(),
             "session_stats": self.session_manager.get_session_stats(),
             "recent_security_events": len(
-                [
-                    event
-                    for event in self.security_events
-                    if event["timestamp"] > datetime.now() - timedelta(hours=1)
-                ]
+                [event for event in self.security_events if event["timestamp"] > datetime.now() - timedelta(hours=1)]
             ),
             "credential_cache_size": len(self.credential_manager._credential_cache),
         }
@@ -402,9 +373,7 @@ class DatabaseSecurityManager:
                     "status": "healthy",
                     "timestamp": datetime.now().isoformat(),
                     "threat_level": self.threat_level,
-                    "connection_pool_size": self.connection_pool.connection_stats[
-                        "active_connections"
-                    ],
+                    "connection_pool_size": self.connection_pool.connection_stats["active_connections"],
                 }
 
         except Exception as e:

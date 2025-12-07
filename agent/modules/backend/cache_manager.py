@@ -4,13 +4,14 @@ from functools import wraps
 import hashlib
 import json
 import logging
-from typing import Any, Optional, Union
+from typing import Any, Union
 
 import redis.asyncio as redis
 
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class CacheManager:
     """High-performance caching system with TTL and memory management."""
@@ -38,9 +39,7 @@ class CacheManager:
         """Evict least recently used items when cache is full."""
         if len(self.cache) >= self.max_size:
             # Remove oldest accessed item
-            oldest_key = min(
-                self.access_times.keys(), key=lambda k: self.access_times[k]
-            )
+            oldest_key = min(self.access_times.keys(), key=lambda k: self.access_times[k])
             del self.cache[oldest_key]
             del self.access_times[oldest_key]
             logger.info(f"Evicted LRU cache entry: {oldest_key}")
@@ -66,7 +65,7 @@ class CacheManager:
         logger.debug(f"Cache miss for key: {cache_key}")
         return default
 
-    def set(self, key: Union[str, dict], value: Any, ttl: Optional[int] = None) -> None:
+    def set(self, key: Union[str, dict], value: Any, ttl: int | None = None) -> None:
         """Set value in cache with TTL."""
         cache_key = self._generate_key(key)
         ttl = ttl or self.default_ttl
@@ -132,8 +131,10 @@ class CacheManager:
 
         return len(expired_keys)
 
+
 # Global cache instance
 cache_manager = CacheManager(max_size=2000, default_ttl=600)  # 10 minutes default TTL
+
 
 def cached(ttl: int = 300, key_prefix: str = ""):
     """Decorator for caching function results."""
@@ -186,6 +187,7 @@ def cached(ttl: int = 300, key_prefix: str = ""):
         return async_wrapper if asyncio.iscoroutinefunction(func) else sync_wrapper
 
     return decorator
+
 
 class ConnectionPool:
     """Connection pooling for database and external services."""
@@ -270,6 +272,7 @@ class ConnectionPool:
             "stats": self.connection_stats,
         }
 
+
 # Background task for cache cleanup
 async def cache_cleanup_task():
     """Background task to clean up expired cache entries."""
@@ -282,6 +285,7 @@ async def cache_cleanup_task():
         except Exception as e:
             logger.error(f"Cache cleanup error: {e}")
 
+
 # Start background cleanup task
 def start_cache_cleanup():
     """Start the background cache cleanup task."""
@@ -290,8 +294,6 @@ def start_cache_cleanup():
         logger.info("Started cache cleanup background task")
     except RuntimeError as e:
         if "no running event loop" in str(e):
-            logger.info(
-                "No event loop available, cache cleanup will start when server starts"
-            )
+            logger.info("No event loop available, cache cleanup will start when server starts")
         else:
             raise

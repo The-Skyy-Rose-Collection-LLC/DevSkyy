@@ -127,8 +127,9 @@ class TestCodeBlocks:
     def test_code_blocks_have_comments(self, python_code_blocks):
         """Test that code blocks have explanatory comments"""
         codes_with_comments = [code for code in python_code_blocks if "#" in code]
-        assert len(codes_with_comments) > len(python_code_blocks) * 0.5, \
-            "Most code blocks should have explanatory comments"
+        assert (
+            len(codes_with_comments) > len(python_code_blocks) * 0.5
+        ), "Most code blocks should have explanatory comments"
 
     def test_optimization_techniques_shown(self, python_code_blocks):
         """Test that code blocks show optimization techniques"""
@@ -154,8 +155,9 @@ class TestRequirements:
 
     def test_has_requirements_section(self, doc_content):
         """Test that documentation has requirements section"""
-        assert "### Requirements" in doc_content or "## Requirements" in doc_content, \
-            "Should have requirements section"
+        assert (
+            "### Requirements" in doc_content or "## Requirements" in doc_content
+        ), "Should have requirements section"
 
     def test_lists_core_dependencies(self, doc_content):
         """Test that core dependencies are listed"""

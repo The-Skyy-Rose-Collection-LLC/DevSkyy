@@ -1,0 +1,647 @@
+"""
+Advanced Tool Calling Safeguards for DevSkyy
+Enterprise-grade protection for AI tool/function calling operations
+
+Per Truth Protocol:
+- Rule #1: Never guess - Verify all tool calls
+- Rule #5: No secrets in tool parameters
+- Rule #7: Validate all tool inputs/outputs
+- Rule #8: Test coverage ≥90%
+- Rule #13: Security baseline enforcement
+
+Features:
+- Tool-specific rate limiting
+- Authorization and permissions
+- Input/output validation
+- Audit logging for compliance
+- Circuit breaker for reliability
+- Support for OpenAI and Anthropic
+"""
+
+import asyncio
+from collections.abc import Callable
+from datetime import datetime, timedelta
+from enum import Enum
+import json
+import logging
+from pathlib import Path
+from typing import Any
+import uuid
+
+from pydantic import BaseModel, Field
+
+from security.openai_safeguards import (
+    CircuitBreaker,
+    SafeguardConfig,
+    SafeguardViolation,
+)
+
+
+logger = logging.getLogger(__name__)
+
+
+# ============================================================================
+# TOOL CALLING ENUMS AND MODELS
+# ============================================================================
+
+
+class ToolPermissionLevel(str, Enum):
+    """Tool permission levels for authorization"""
+
+    PUBLIC = "public"  # Anyone can call
+    AUTHENTICATED = "authenticated"  # Requires authentication
+    PRIVILEGED = "privileged"  # Requires elevated permissions
+    ADMIN = "admin"  # Requires admin permissions
+
+
+class ToolRiskLevel(str, Enum):
+    """Risk level for tool operations"""
+
+    LOW = "low"  # Read-only, no side effects
+    MEDIUM = "medium"  # Limited side effects
+    HIGH = "high"  # Significant side effects
+    CRITICAL = "critical"  # Destructive or financial operations
+
+
+class ToolProvider(str, Enum):
+    """AI provider for tool calling"""
+
+    OPENAI = "openai"
+    ANTHROPIC = "anthropic"
+    BOTH = "both"
+
+
+class ToolCallConfig(BaseModel):
+    """Configuration for a specific tool"""
+
+    tool_name: str
+    description: str
+    permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED
+    risk_level: ToolRiskLevel = ToolRiskLevel.MEDIUM
+    provider: ToolProvider = ToolProvider.BOTH
+    max_calls_per_minute: int = Field(default=10, ge=1, le=100)
+    max_calls_per_hour: int = Field(default=100, ge=1, le=10000)
+    require_approval: bool = False  # Requires human approval
+    is_consequential: bool = True  # Has real-world consequences
+    timeout_seconds: int = Field(default=30, ge=1, le=300)
+
+    class Config:
+        frozen = True
+
+
+class ToolCallRequest(BaseModel):
+    """Request to call a tool/function"""
+
+    request_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    tool_name: str
+    provider: ToolProvider
+    user_id: str | None = None
+    permission_level: ToolPermissionLevel = ToolPermissionLevel.AUTHENTICATED
+    parameters: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class ToolCallResponse(BaseModel):
+    """Response from a tool call"""
+
+    request_id: str
+    tool_name: str
+    success: bool
+    result: dict[str, Any] | None = None
+    error: str | None = None
+    execution_time_ms: float
+    tokens_used: int = 0
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+
+class ToolCallAuditEntry(BaseModel):
+    """Audit log entry for tool calls"""
+
+    audit_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    request_id: str
+    tool_name: str
+    provider: ToolProvider
+    user_id: str | None
+    permission_level: ToolPermissionLevel
+    risk_level: ToolRiskLevel
+    parameters: dict[str, Any]  # Sanitized
+    success: bool
+    error: str | None = None
+    execution_time_ms: float
+    tokens_used: int
+    violation: bool = False
+    violation_reason: str | None = None
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+
+    def to_json(self) -> str:
+        """Convert to JSON string for logging"""
+        data = self.dict()
+        data["timestamp"] = data["timestamp"].isoformat()
+        return json.dumps(data)
+
+
+# ============================================================================
+# TOOL RATE LIMITER
+# ============================================================================
+
+
+class ToolRateLimiter:
+    """Rate limiter for tool calls with per-tool limits"""
+
+    def __init__(self):
+        self.tool_calls: dict[str, list[datetime]] = {}
+        self.lock = asyncio.Lock()
+
+    async def check_rate_limit(self, tool_name: str, config: ToolCallConfig) -> tuple[bool, str | None]:
+        """
+        Check if tool call is within rate limits
+
+        Args:
+            tool_name: Name of tool
+            config: Tool configuration with rate limits
+
+        Returns:
+            (allowed, reason) - True if allowed, False with reason if denied
+        """
+        async with self.lock:
+            now = datetime.utcnow()
+
+            # Initialize tracking for this tool
+            if tool_name not in self.tool_calls:
+                self.tool_calls[tool_name] = []
+
+            # Clean up old records
+            one_hour_ago = now - timedelta(hours=1)
+            one_minute_ago = now - timedelta(minutes=1)
+
+            self.tool_calls[tool_name] = [ts for ts in self.tool_calls[tool_name] if ts > one_hour_ago]
+
+            # Check per-minute limit
+            calls_last_minute = sum(1 for ts in self.tool_calls[tool_name] if ts > one_minute_ago)
+
+            if calls_last_minute >= config.max_calls_per_minute:
+                return False, (
+                    f"Tool '{tool_name}' rate limit exceeded: "
+                    f"{calls_last_minute}/{config.max_calls_per_minute} calls per minute"
+                )
+
+            # Check per-hour limit
+            calls_last_hour = len(self.tool_calls[tool_name])
+
+            if calls_last_hour >= config.max_calls_per_hour:
+                return False, (
+                    f"Tool '{tool_name}' rate limit exceeded: "
+                    f"{calls_last_hour}/{config.max_calls_per_hour} calls per hour"
+                )
+
+            # Record this call
+            self.tool_calls[tool_name].append(now)
+
+            return True, None
+
+
+# ============================================================================
+# TOOL AUTHORIZATION MANAGER
+# ============================================================================
+
+
+class ToolAuthorizationManager:
+    """Manages tool permissions and authorization"""
+
+    def __init__(self):
+        self.tool_configs: dict[str, ToolCallConfig] = {}
+        self.user_permissions: dict[str, set[ToolPermissionLevel]] = {}
+
+    def register_tool(self, config: ToolCallConfig):
+        """Register a tool with its configuration"""
+        self.tool_configs[config.tool_name] = config
+        logger.info(f"✅ Registered tool: {config.tool_name} (risk={config.risk_level.value})")
+
+    def set_user_permissions(self, user_id: str, permissions: set[ToolPermissionLevel]):
+        """Set user permission levels"""
+        self.user_permissions[user_id] = permissions
+
+    async def authorize_tool_call(self, request: ToolCallRequest) -> tuple[bool, str | None]:
+        """
+        Authorize a tool call request
+
+        Args:
+            request: Tool call request
+
+        Returns:
+            (authorized, reason) - True if authorized, False with reason if denied
+        """
+        # Check if tool is registered
+        if request.tool_name not in self.tool_configs:
+            return False, f"Tool '{request.tool_name}' is not registered"
+
+        config = self.tool_configs[request.tool_name]
+
+        # Check provider compatibility
+        if config.provider != ToolProvider.BOTH and config.provider != request.provider:
+            return False, (
+                f"Tool '{request.tool_name}' does not support provider "
+                f"'{request.provider.value}' (requires {config.provider.value})"
+            )
+
+        # Check permission level
+        if request.user_id:
+            user_perms = self.user_permissions.get(request.user_id, set())
+
+            # Check if user has required permission level
+            required_level = config.permission_level
+
+            if required_level == ToolPermissionLevel.ADMIN:
+                if ToolPermissionLevel.ADMIN not in user_perms:
+                    return False, f"Tool '{request.tool_name}' requires ADMIN permissions"
+            elif required_level == ToolPermissionLevel.PRIVILEGED:
+                if ToolPermissionLevel.PRIVILEGED not in user_perms and ToolPermissionLevel.ADMIN not in user_perms:
+                    return False, f"Tool '{request.tool_name}' requires PRIVILEGED permissions"
+            elif required_level == ToolPermissionLevel.AUTHENTICATED:
+                if not user_perms:
+                    return False, f"Tool '{request.tool_name}' requires authentication"
+        # No user_id provided
+        elif config.permission_level != ToolPermissionLevel.PUBLIC:
+            return False, f"Tool '{request.tool_name}' requires authentication"
+
+        return True, None
+
+    def get_tool_config(self, tool_name: str) -> ToolCallConfig | None:
+        """Get configuration for a tool"""
+        return self.tool_configs.get(tool_name)
+
+
+# ============================================================================
+# TOOL CALL VALIDATOR
+# ============================================================================
+
+
+class ToolCallValidator:
+    """Validates tool call parameters and responses"""
+
+    def __init__(self, config: SafeguardConfig):
+        self.config = config
+
+    def validate_parameters(self, tool_name: str, parameters: dict[str, Any]) -> tuple[bool, str | None]:
+        """
+        Validate tool call parameters
+
+        Args:
+            tool_name: Name of tool
+            parameters: Tool parameters
+
+        Returns:
+            (valid, reason) - True if valid, False with reason if invalid
+        """
+        # Check for sensitive data in parameters
+        sensitive_keys = ["password", "api_key", "secret", "token", "private_key", "access_token", "refresh_token"]
+
+        for key in parameters:
+            if any(sensitive in key.lower() for sensitive in sensitive_keys):
+                return False, (
+                    f"Tool '{tool_name}' parameters contain sensitive key: '{key}'. "
+                    "Sensitive data should not be passed directly in tool parameters."
+                )
+
+        # Check parameter size
+        param_str = json.dumps(parameters)
+        if len(param_str) > 100000:  # 100KB limit
+            return False, (f"Tool '{tool_name}' parameters exceed size limit: " f"{len(param_str)} bytes (max 100000)")
+
+        return True, None
+
+    def sanitize_parameters(self, parameters: dict[str, Any]) -> dict[str, Any]:
+        """
+        Sanitize parameters for logging (redact sensitive data)
+
+        Args:
+            parameters: Original parameters
+
+        Returns:
+            Sanitized parameters dictionary
+        """
+        sanitized = {}
+        sensitive_keys = [
+            "password",
+            "api_key",
+            "secret",
+            "token",
+            "private_key",
+            "access_token",
+            "refresh_token",
+            "credentials",
+            "auth",
+        ]
+
+        for key, value in parameters.items():
+            if any(sensitive in key.lower() for sensitive in sensitive_keys):
+                sanitized[key] = "[REDACTED]"
+            else:
+                sanitized[key] = value
+
+        return sanitized
+
+
+# ============================================================================
+# TOOL CALL AUDIT LOGGER
+# ============================================================================
+
+
+class ToolCallAuditLogger:
+    """Audit logger for tool calls"""
+
+    def __init__(self, log_path: Path = Path("logs/tool_calls_audit.jsonl")):
+        self.log_path = log_path
+        self.log_path.parent.mkdir(parents=True, exist_ok=True)
+        self.audit_history: list[ToolCallAuditEntry] = []
+
+    async def log(self, entry: ToolCallAuditEntry):
+        """
+        Write audit entry to log file
+
+        Args:
+            entry: Audit entry to log
+        """
+        try:
+            with open(self.log_path, "a") as f:
+                f.write(entry.to_json() + "\n")
+
+            self.audit_history.append(entry)
+
+            # Keep last 10000 entries in memory
+            if len(self.audit_history) > 10000:
+                self.audit_history = self.audit_history[-10000:]
+
+        except Exception as e:
+            logger.error(f"Failed to write tool call audit log: {e}")
+
+    def get_recent_logs(self, hours: int = 24) -> list[ToolCallAuditEntry]:
+        """Get audit logs from last N hours"""
+        cutoff = datetime.utcnow() - timedelta(hours=hours)
+        return [entry for entry in self.audit_history if entry.timestamp > cutoff]
+
+
+# ============================================================================
+# TOOL CALLING SAFEGUARD MANAGER
+# ============================================================================
+
+
+class ToolCallingSafeguardManager:
+    """
+    Central manager for tool calling safeguards
+
+    Provides:
+    - Rate limiting per tool
+    - Authorization and permissions
+    - Parameter validation
+    - Audit logging
+    - Circuit breaker for reliability
+    - Violation tracking
+    """
+
+    def __init__(self, config: SafeguardConfig):
+        self.config = config
+        self.rate_limiter = ToolRateLimiter()
+        self.auth_manager = ToolAuthorizationManager()
+        self.validator = ToolCallValidator(config)
+        self.audit_logger = ToolCallAuditLogger()
+        self.circuit_breaker = CircuitBreaker(
+            failure_threshold=config.failure_threshold, recovery_timeout=config.recovery_timeout
+        )
+        self.violations: list[SafeguardViolation] = []
+
+        logger.info("✅ Tool Calling Safeguard Manager initialized")
+
+    def register_tool(self, config: ToolCallConfig):
+        """Register a tool with the safeguard manager"""
+        self.auth_manager.register_tool(config)
+
+    async def validate_tool_call(self, request: ToolCallRequest) -> tuple[bool, str | None]:
+        """
+        Validate a tool call request through all safeguard layers
+
+        Args:
+            request: Tool call request
+
+        Returns:
+            (allowed, reason) - True if allowed, False with reason if denied
+        """
+        # Layer 1: Authorization
+        authorized, reason = await self.auth_manager.authorize_tool_call(request)
+        if not authorized:
+            await self._record_violation("authorization_failed", "high", request.tool_name, reason)
+            return False, reason
+
+        # Get tool configuration
+        tool_config = self.auth_manager.get_tool_config(request.tool_name)
+        if not tool_config:
+            return False, f"Tool '{request.tool_name}' not configured"
+
+        # Layer 2: Rate limiting
+        if self.config.enable_rate_limiting:
+            allowed, reason = await self.rate_limiter.check_rate_limit(request.tool_name, tool_config)
+            if not allowed:
+                await self._record_violation("rate_limit_exceeded", "medium", request.tool_name, reason)
+                return False, reason
+
+        # Layer 3: Parameter validation
+        if self.config.enable_request_validation:
+            valid, reason = self.validator.validate_parameters(request.tool_name, request.parameters)
+            if not valid:
+                await self._record_violation("invalid_parameters", "high", request.tool_name, reason)
+                return False, reason
+
+        # Layer 4: High-risk approval requirement
+        if tool_config.risk_level in [ToolRiskLevel.HIGH, ToolRiskLevel.CRITICAL]:
+            if tool_config.require_approval:
+                # In production, this would integrate with approval workflow
+                logger.warning(
+                    f"⚠️  High-risk tool '{request.tool_name}' called " f"(risk={tool_config.risk_level.value})"
+                )
+
+        return True, None
+
+    async def execute_tool_call(self, request: ToolCallRequest, func: Callable, *args, **kwargs) -> ToolCallResponse:
+        """
+        Execute a tool call with full safeguard protection
+
+        Args:
+            request: Tool call request
+            func: Function to execute
+            *args: Positional arguments for func
+            **kwargs: Keyword arguments for func
+
+        Returns:
+            Tool call response
+
+        Raises:
+            Exception: If safeguards block the call or execution fails
+        """
+        import time
+
+        start_time = time.time()
+
+        # Validate the request
+        allowed, reason = await self.validate_tool_call(request)
+        if not allowed:
+            raise ValueError(f"Tool call blocked: {reason}")
+
+        tool_config = self.auth_manager.get_tool_config(request.tool_name)
+
+        try:
+            # Execute with circuit breaker
+            if self.config.enable_circuit_breaker:
+                result = await self.circuit_breaker.call(func, *args, **kwargs)
+            else:
+                result = await func(*args, **kwargs)
+
+            execution_time = (time.time() - start_time) * 1000
+
+            response = ToolCallResponse(
+                request_id=request.request_id,
+                tool_name=request.tool_name,
+                success=True,
+                result=result,
+                execution_time_ms=execution_time,
+                tokens_used=result.get("tokens_used", 0) if isinstance(result, dict) else 0,
+            )
+
+            # Audit log
+            await self._log_tool_call(request, tool_config, response)
+
+            return response
+
+        except Exception as e:
+            execution_time = (time.time() - start_time) * 1000
+
+            response = ToolCallResponse(
+                request_id=request.request_id,
+                tool_name=request.tool_name,
+                success=False,
+                error=str(e),
+                execution_time_ms=execution_time,
+            )
+
+            # Audit log failure
+            await self._log_tool_call(request, tool_config, response)
+
+            raise
+
+    async def _log_tool_call(self, request: ToolCallRequest, config: ToolCallConfig, response: ToolCallResponse):
+        """Log tool call to audit log"""
+        if not self.config.require_audit_logging:
+            return
+
+        sanitized_params = self.validator.sanitize_parameters(request.parameters)
+
+        entry = ToolCallAuditEntry(
+            request_id=request.request_id,
+            tool_name=request.tool_name,
+            provider=request.provider,
+            user_id=request.user_id,
+            permission_level=request.permission_level,
+            risk_level=config.risk_level,
+            parameters=sanitized_params,
+            success=response.success,
+            error=response.error,
+            execution_time_ms=response.execution_time_ms,
+            tokens_used=response.tokens_used,
+            timestamp=request.timestamp,
+        )
+
+        await self.audit_logger.log(entry)
+
+    async def _record_violation(self, violation_type: str, severity: str, tool_name: str, reason: str):
+        """Record a safeguard violation"""
+        violation = SafeguardViolation(
+            violation_type=violation_type,
+            severity=severity,
+            timestamp=datetime.utcnow(),
+            details={"tool_name": tool_name, "reason": reason},
+        )
+
+        self.violations.append(violation)
+
+        # Alert on critical violations
+        if self.config.alert_on_violations and severity in ["critical", "high"]:
+            logger.error(
+                f"🚨 TOOL CALL VIOLATION ({severity.upper()}): {violation_type} " f"- Tool: {tool_name} - {reason}"
+            )
+
+    def get_statistics(self) -> dict[str, Any]:
+        """Get safeguard statistics"""
+        recent_violations = [v for v in self.violations if v.timestamp > datetime.utcnow() - timedelta(hours=1)]
+
+        violations_by_severity = {}
+        for v in self.violations:
+            violations_by_severity[v.severity] = violations_by_severity.get(v.severity, 0) + 1
+
+        return {
+            "total_violations": len(self.violations),
+            "recent_violations_1h": len(recent_violations),
+            "violations_by_severity": violations_by_severity,
+            "circuit_breaker_state": self.circuit_breaker.state.value,
+            "config_level": self.config.level.value,
+            "registered_tools": len(self.auth_manager.tool_configs),
+        }
+
+
+# ============================================================================
+# GLOBAL MANAGER
+# ============================================================================
+
+_global_manager: ToolCallingSafeguardManager | None = None
+
+
+def get_tool_safeguard_manager(config: SafeguardConfig | None = None) -> ToolCallingSafeguardManager:
+    """
+    Get global tool calling safeguard manager instance
+
+    Args:
+        config: Optional safeguard configuration
+
+    Returns:
+        Shared ToolCallingSafeguardManager instance
+    """
+    global _global_manager
+
+    if _global_manager is None:
+        if config is None:
+            config = SafeguardConfig()
+        _global_manager = ToolCallingSafeguardManager(config)
+
+    return _global_manager
+
+
+def reload_tool_safeguard_manager(config: SafeguardConfig) -> ToolCallingSafeguardManager:
+    """
+    Reload global manager with new configuration
+
+    Args:
+        config: New safeguard configuration
+
+    Returns:
+        New ToolCallingSafeguardManager instance
+    """
+    global _global_manager
+    _global_manager = ToolCallingSafeguardManager(config)
+    return _global_manager
+
+
+__all__ = [
+    "ToolAuthorizationManager",
+    "ToolCallAuditEntry",
+    "ToolCallAuditLogger",
+    "ToolCallConfig",
+    "ToolCallRequest",
+    "ToolCallResponse",
+    "ToolCallValidator",
+    "ToolCallingSafeguardManager",
+    "ToolPermissionLevel",
+    "ToolProvider",
+    "ToolRateLimiter",
+    "ToolRiskLevel",
+    "get_tool_safeguard_manager",
+    "reload_tool_safeguard_manager",
+]

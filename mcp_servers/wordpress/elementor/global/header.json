@@ -1,0 +1,178 @@
+{
+  "title": "Global Header - SkyyRose",
+  "type": "header",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_theme_builder",
+    "post_status": "publish",
+    "conditions": ["include/general"]
+  },
+  "content": [
+    {
+      "id": "announcement-bar",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "8", "bottom": "8", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "announcement-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "announcement-text",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "FREE SHIPPING ON ORDERS OVER $100",
+                "header_size": "h6",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 11, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "main-header",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#F5F5F0",
+        "padding": {"top": "20", "bottom": "20", "unit": "px"},
+        "sticky": "yes",
+        "sticky_on": ["desktop", "tablet", "mobile"],
+        "sticky_offset": 0
+      },
+      "elements": [
+        {
+          "id": "nav-left",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33,
+            "content_position": "center"
+          },
+          "elements": [
+            {
+              "id": "main-menu",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "menu": "main-menu",
+                "layout": "horizontal",
+                "text_color": "#0D0D0D",
+                "text_color_hover": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "dropdown_background_color": "#FFFFFF",
+                "dropdown_typography_font_family": "Montserrat"
+              }
+            }
+          ]
+        },
+        {
+          "id": "logo-center",
+          "elType": "column",
+          "settings": {
+            "_column_size": 34,
+            "content_position": "center",
+            "align": "center"
+          },
+          "elements": [
+            {
+              "id": "site-logo",
+              "elType": "widget",
+              "widgetType": "site-logo",
+              "settings": {
+                "width": {"size": 160, "unit": "px"},
+                "align": "center",
+                "link": {"url": "/"}
+              }
+            }
+          ]
+        },
+        {
+          "id": "nav-right",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33,
+            "content_position": "center",
+            "align": "flex-end"
+          },
+          "elements": [
+            {
+              "id": "header-icons",
+              "elType": "widget",
+              "widgetType": "icon-list",
+              "settings": {
+                "icon_list": [
+                  {
+                    "text": "",
+                    "selected_icon": {"value": "fas fa-search", "library": "fa-solid"},
+                    "link": {"url": "#"}
+                  },
+                  {
+                    "text": "",
+                    "selected_icon": {"value": "fas fa-user", "library": "fa-solid"},
+                    "link": {"url": "/my-account"}
+                  },
+                  {
+                    "text": "",
+                    "selected_icon": {"value": "fas fa-shopping-bag", "library": "fa-solid"},
+                    "link": {"url": "/cart"}
+                  }
+                ],
+                "view": "inline",
+                "icon_color": "#0D0D0D",
+                "icon_color_hover": "#B76E79",
+                "icon_size": {"size": 18, "unit": "px"}
+              }
+            },
+            {
+              "id": "mini-cart",
+              "elType": "widget",
+              "widgetType": "woocommerce-menu-cart",
+              "settings": {
+                "icon": {"value": "fas fa-shopping-bag", "library": "fa-solid"},
+                "icon_color": "#0D0D0D",
+                "icon_hover_color": "#B76E79",
+                "icon_size": {"size": 18, "unit": "px"},
+                "cart_type": "side-cart"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "template_type": "header",
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "elementor_conditions": ["include/general"],
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79"
+    },
+    "typography": {
+      "nav": "Montserrat, 500, 12px, 2px letter-spacing"
+    }
+  }
+}

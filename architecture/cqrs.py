@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from datetime import UTC, datetime
-from typing import Any, Generic, Optional, TypeVar
+from typing import Any, Generic, TypeVar
 import uuid
 
 from pydantic import BaseModel
@@ -15,6 +15,7 @@ Separates read and write operations for better scalability and maintainability
 # BASE TYPES
 # ============================================================================
 
+
 class Command(BaseModel):
     """Base class for all commands (write operations)"""
 
@@ -27,6 +28,7 @@ class Command(BaseModel):
         if "timestamp" not in data or data["timestamp"] is None:
             data["timestamp"] = datetime.now(UTC)
         super().__init__(**data)
+
 
 class Query(BaseModel):
     """Base class for all queries (read operations)"""
@@ -41,6 +43,7 @@ class Query(BaseModel):
             data["timestamp"] = datetime.now(UTC)
         super().__init__(**data)
 
+
 TCommand = TypeVar("TCommand", bound=Command)
 TQuery = TypeVar("TQuery", bound=Query)
 TResult = TypeVar("TResult")
@@ -48,6 +51,7 @@ TResult = TypeVar("TResult")
 # ============================================================================
 # HANDLERS
 # ============================================================================
+
 
 class CommandHandler(ABC, Generic[TCommand, TResult]):
     """Abstract base class for command handlers"""
@@ -64,6 +68,7 @@ class CommandHandler(ABC, Generic[TCommand, TResult]):
             Result of command execution
         """
 
+
 class QueryHandler(ABC, Generic[TQuery, TResult]):
     """Abstract base class for query handlers"""
 
@@ -79,9 +84,11 @@ class QueryHandler(ABC, Generic[TQuery, TResult]):
             Result of query execution
         """
 
+
 # ============================================================================
 # BUS / MEDIATOR
 # ============================================================================
+
 
 class CommandBus:
     """
@@ -117,12 +124,11 @@ class CommandBus:
         """
         command_type = type(command)
         if command_type not in self._handlers:
-            raise ValueError(
-                f"No handler registered for command type: {command_type.__name__}"
-            )
+            raise ValueError(f"No handler registered for command type: {command_type.__name__}")
 
         handler = self._handlers[command_type]
         return await handler.handle(command)
+
 
 class QueryBus:
     """
@@ -158,12 +164,11 @@ class QueryBus:
         """
         query_type = type(query)
         if query_type not in self._handlers:
-            raise ValueError(
-                f"No handler registered for query type: {query_type.__name__}"
-            )
+            raise ValueError(f"No handler registered for query type: {query_type.__name__}")
 
         handler = self._handlers[query_type]
         return await handler.handle(query)
+
 
 # ============================================================================
 # GLOBAL INSTANCES
@@ -176,6 +181,7 @@ query_bus = QueryBus()
 # EXAMPLE USAGE
 # ============================================================================
 
+
 # Example Command
 class CreateAgentCommand(Command):
     """Command to create a new agent"""
@@ -183,6 +189,7 @@ class CreateAgentCommand(Command):
     name: str
     agent_type: str
     capabilities: dict[str, Any]
+
 
 # Example Command Handler
 class CreateAgentHandler(CommandHandler[CreateAgentCommand, dict]):
@@ -207,17 +214,19 @@ class CreateAgentHandler(CommandHandler[CreateAgentCommand, dict]):
             "created_at": command.timestamp,
         }
 
+
 # Example Query
 class GetAgentQuery(Query):
     """Query to get agent by ID"""
 
     agent_id: str
 
+
 # Example Query Handler
-class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[dict]]):
+class GetAgentHandler(QueryHandler[GetAgentQuery, dict | None]):
     """Handler for GetAgentQuery"""
 
-    async def handle(self, query: GetAgentQuery) -> Optional[dict]:
+    async def handle(self, query: GetAgentQuery) -> dict | None:
         """
         Handle agent retrieval query
 
@@ -234,6 +243,7 @@ class GetAgentHandler(QueryHandler[GetAgentQuery, Optional[dict]]):
             "type": "backend",
             "status": "active",
         }
+
 
 # Register handlers (would be done at startup)
 # command_bus.register(CreateAgentCommand, CreateAgentHandler())

@@ -1,0 +1,254 @@
+{
+  "name": "skyyrose-theme",
+  "version": "1.0.0",
+  "description": "SkyyRose Luxury Streetwear Theme Assets",
+  "brand": {
+    "name": "SkyyRose",
+    "tagline": "Where Love Meets Luxury",
+    "website": "skyyrose.co",
+    "location": "Oakland, California"
+  },
+  "collections": {
+    "love-hurts": {
+      "name": "Love Hurts",
+      "description": "Emotional expression pieces where 'Hurts' is the founder's family name",
+      "anchor_products": ["Heart aRose", "Devoted", "Tender"]
+    },
+    "black-rose": {
+      "name": "Black Rose",
+      "description": "Limited edition dark elegance",
+      "anchor_products": ["Heritage", "The Lake", "Grand"]
+    },
+    "signature": {
+      "name": "Signature",
+      "description": "Foundation wardrobe essentials",
+      "anchor_products": ["The Standard", "The Crest", "The Piedmont", "The Marina"]
+    }
+  },
+  "colors": {
+    "obsidian": "#0D0D0D",
+    "ivory": "#F5F5F0",
+    "rose-gold": "#B76E79",
+    "ember": "#E85D04",
+    "slate": "#4A4A4A",
+    "fog": "#E8E8E8"
+  },
+  "variants": {
+    "color": ["Onyx", "Ivory", "Ember", "Oak", "Rosewood", "Heather", "Slate"],
+    "size": ["Small", "Medium", "Large", "X-Large", "XX-Large", "XXX-Large"]
+  },
+  "typography": {
+    "headline": {
+      "family": "Playfair Display",
+      "weight": 700,
+      "fallback": "Georgia, serif"
+    },
+    "body": {
+      "family": "Montserrat",
+      "weight": [400, 500],
+      "fallback": "Arial, sans-serif"
+    }
+  },
+  "images": {
+    "product": {
+      "dimensions": "1200x1200",
+      "format": "jpg",
+      "background": "white",
+      "quality": 90
+    },
+    "hero": {
+      "dimensions": "1920x1080",
+      "format": "jpg",
+      "quality": 85
+    },
+    "collection_banner": {
+      "dimensions": "1600x600",
+      "format": "jpg",
+      "quality": 85
+    }
+  },
+  "products": {
+    "love-hurts": [
+      {
+        "name": "The Heart aRose Track Pant",
+        "slug": "the-heart-arose-track-pant",
+        "sku_prefix": "HARP",
+        "variants": ["Onyx", "Ivory"],
+        "price": 75.00,
+        "image": "the-heart-arose-track-pant"
+      },
+      {
+        "name": "The Heart aRose Bomber",
+        "slug": "the-heart-arose-bomber",
+        "sku_prefix": "HARB",
+        "variants": ["Regular"],
+        "price": 120.00,
+        "image": "the-devotion-jacket"
+      },
+      {
+        "name": "Devoted Short",
+        "slug": "devoted-short",
+        "sku_prefix": "DEV",
+        "variants": ["Regular"],
+        "price": 60.00,
+        "image": "devoted-short"
+      }
+    ],
+    "signature": [
+      {
+        "name": "The Standard Tee",
+        "slug": "the-standard-tee",
+        "sku_prefix": "STD",
+        "variants": ["Rosewood", "Ivory"],
+        "price": 45.00,
+        "image": "the-standard-tee"
+      },
+      {
+        "name": "The Crest Beanie",
+        "slug": "the-crest-beanie",
+        "sku_prefix": "CRSTBN",
+        "variants": ["Heather", "Onyx"],
+        "price": 35.00,
+        "image": "the-crest-beanie"
+      },
+      {
+        "name": "The Piedmont Jacket",
+        "slug": "the-piedmont-jacket",
+        "sku_prefix": "PIED",
+        "variants": ["Black"],
+        "price": 130.00,
+        "image": "the-piedmont-jacket"
+      },
+      {
+        "name": "The Marina Crewneck",
+        "slug": "the-marina-crewneck",
+        "sku_prefix": "MRN-CRW",
+        "variants": ["Lavender/Mint"],
+        "price": 65.00,
+        "image": "the-marina-crewneck"
+      },
+      {
+        "name": "The Marina Dress",
+        "slug": "the-marina-dress",
+        "sku_prefix": "MRN-DRS",
+        "variants": ["Lavender/Mint"],
+        "price": 80.00,
+        "image": "the-marina-dress"
+      },
+      {
+        "name": "The Marina Jogger",
+        "slug": "the-marina-jogger",
+        "sku_prefix": "MRN-JGR",
+        "variants": ["Lavender/Mint"],
+        "price": 45.00,
+        "image": "the-marina-jogger"
+      }
+    ],
+    "black-rose": [
+      {
+        "name": "Heritage Jersey",
+        "slug": "heritage-jersey",
+        "sku_prefix": "HRTY",
+        "variants": ["Onyx", "Ivory", "Ember", "Oak"],
+        "price": {"Onyx": 100.00, "Ivory": 100.00, "Ember": 115.00, "Oak": 115.00},
+        "image": "heritage-jersey"
+      },
+      {
+        "name": "The Piedmont (Bomber)",
+        "slug": "the-piedmont-bomber",
+        "sku_prefix": "PIED-BMB",
+        "variants": ["Black"],
+        "price": 120.00,
+        "image": "the-piedmont-bomber"
+      },
+      {
+        "name": "The Lake Crop",
+        "slug": "the-lake-crop",
+        "sku_prefix": "LAKE",
+        "variants": ["Black", "White"],
+        "price": 65.00,
+        "image": "the-lake-crop"
+      },
+      {
+        "name": "Grand Hooded Dress",
+        "slug": "grand-hooded-dress",
+        "sku_prefix": "GRND",
+        "variants": ["Black"],
+        "price": 65.00,
+        "image": "grand-hooded-dress"
+      },
+      {
+        "name": "Obsidian Legging",
+        "slug": "obsidian-legging",
+        "sku_prefix": "OBS",
+        "variants": ["Black"],
+        "price": 40.00,
+        "image": "obsidian-legging"
+      },
+      {
+        "name": "Sunstone Crop",
+        "slug": "sunstone-crop",
+        "sku_prefix": "SUN",
+        "variants": ["Peach"],
+        "price": 70.00,
+        "image": "sunstone-crop"
+      },
+      {
+        "name": "The Mist Crewneck",
+        "slug": "the-mist-crewneck",
+        "sku_prefix": "MIST",
+        "variants": ["Pink"],
+        "price": 60.00,
+        "image": "the-mist-crewneck"
+      }
+    ]
+  },
+  "assets": {
+    "images": {
+      "products": {
+        "love-hurts": [
+          "the-heart-arose-track-pant-onyx.jpg",
+          "the-heart-arose-track-pant-ivory.jpg",
+          "the-devotion-jacket.jpg",
+          "devoted-short-front.jpg",
+          "devoted-short-back.jpg"
+        ],
+        "signature": [
+          "the-standard-tee-rosewood.jpg",
+          "the-standard-tee-ivory.jpg",
+          "the-crest-beanie-heather.jpg",
+          "the-crest-beanie-onyx.jpg",
+          "the-piedmont-jacket.jpg"
+        ],
+        "black-rose": []
+      }
+    }
+  },
+  "elementor": {
+    "global_colors": {
+      "primary": "#0D0D0D",
+      "secondary": "#B76E79",
+      "text": "#4A4A4A",
+      "accent": "#E85D04"
+    },
+    "global_fonts": {
+      "primary": "Playfair Display",
+      "secondary": "Montserrat"
+    },
+    "container_width": "1200px"
+  },
+  "woocommerce": {
+    "image_sizes": {
+      "single": [800, 800],
+      "thumbnail": [300, 300],
+      "gallery": [100, 100]
+    },
+    "categories": ["Love Hurts", "Black Rose", "Signature"],
+    "attributes": ["Color", "Size"]
+  },
+  "meta": {
+    "created": "2024-12-04",
+    "updated": "2024-12-04",
+    "author": "DevSkyy"
+  }
+}

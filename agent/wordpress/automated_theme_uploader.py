@@ -11,27 +11,31 @@ from datetime import datetime
 from enum import Enum
 import ftplib
 import hashlib
+import os
 from pathlib import Path
 import tempfile
-from typing import Any, Optional
+from typing import Any
 import zipfile
 
 import paramiko
 import requests
 
-from monitoring.enterprise_logging import LogCategory, enterprise_logger
+from core.logging import LogCategory, enterprise_logger
 
 
 class UploadMethod(Enum):
     """Supported upload methods."""
+
     FTP = "ftp"
     SFTP = "sftp"
     WORDPRESS_REST_API = "wordpress_rest_api"
     DIRECT_FILE_SYSTEM = "direct_file_system"
     STAGING_AREA = "staging_area"
 
+
 class DeploymentStatus(Enum):
     """Deployment status levels."""
+
     PENDING = "pending"
     UPLOADING = "uploading"
     VALIDATING = "validating"
@@ -40,23 +44,27 @@ class DeploymentStatus(Enum):
     FAILED = "failed"
     ROLLED_BACK = "rolled_back"
 
+
 @dataclass
 class WordPressCredentials:
     """WordPress site credentials."""
+
     site_url: str
     username: str
     password: str
-    application_password: Optional[str] = None
-    ftp_host: Optional[str] = None
-    ftp_username: Optional[str] = None
-    ftp_password: Optional[str] = None
-    sftp_host: Optional[str] = None
-    sftp_username: Optional[str] = None
-    sftp_private_key: Optional[str] = None
+    application_password: str | None = None
+    ftp_host: str | None = None
+    ftp_username: str | None = None
+    ftp_password: str | None = None
+    sftp_host: str | None = None
+    sftp_username: str | None = None
+    sftp_private_key: str | None = None
+
 
 @dataclass
 class ThemePackage:
     """Theme package information."""
+
     name: str
     version: str
     description: str
@@ -67,18 +75,21 @@ class ThemePackage:
     checksum: str = ""
     created_at: datetime = field(default_factory=datetime.now)
 
+
 @dataclass
 class DeploymentResult:
     """Deployment result information."""
+
     success: bool
     deployment_id: str
     status: DeploymentStatus
     theme_package: ThemePackage
     upload_method: UploadMethod
-    deployed_at: Optional[datetime] = None
-    error_message: Optional[str] = None
+    deployed_at: datetime | None = None
+    error_message: str | None = None
     rollback_available: bool = False
     validation_results: dict[str, Any] = field(default_factory=dict)
+
 
 class AutomatedThemeUploader:
     """
@@ -94,32 +105,28 @@ class AutomatedThemeUploader:
 
         # Theme validation rules
         self.validation_rules = {
-            "required_files": [
-                "style.css",
-                "index.php",
-                "functions.php"
-            ],
-            "recommended_files": [
-                "screenshot.png",
-                "readme.txt"
-            ],
+            "required_files": ["style.css", "index.php", "functions.php"],
+            "recommended_files": ["screenshot.png", "readme.txt"],
             "max_size_mb": 50,
             "allowed_extensions": [
-                ".php", ".css", ".js", ".png", ".jpg", ".jpeg",
-                ".gif", ".svg", ".woff", ".woff2", ".ttf", ".eot"
-            ]
+                ".php",
+                ".css",
+                ".js",
+                ".png",
+                ".jpg",
+                ".jpeg",
+                ".gif",
+                ".svg",
+                ".woff",
+                ".woff2",
+                ".ttf",
+                ".eot",
+            ],
         }
 
-        enterprise_logger.info(
-            "Automated theme uploader initialized",
-            category=LogCategory.SYSTEM
-        )
+        enterprise_logger.info("Automated theme uploader initialized", category=LogCategory.SYSTEM)
 
-    async def create_theme_package(
-        self,
-        theme_path: str,
-        theme_info: dict[str, Any]
-    ) -> ThemePackage:
+    async def create_theme_package(self, theme_path: str, theme_info: dict[str, Any]) -> ThemePackage:
         """Create a deployable theme package."""
         try:
             theme_path_obj = Path(theme_path)
@@ -133,18 +140,18 @@ class AutomatedThemeUploader:
                 version=theme_info.get("version", "1.0.0"),
                 description=theme_info.get("description", ""),
                 author=theme_info.get("author", "DevSkyy Platform"),
-                package_path=""
+                package_path="",
             )
 
             # Create ZIP package
             package_filename = f"{package.name}-{package.version}.zip"
             package_path = self.staging_area / package_filename
 
-            with zipfile.ZipFile(package_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
-                for file_path in theme_path_obj.rglob('*'):
+            with zipfile.ZipFile(package_path, "w", zipfile.ZIP_DEFLATED) as zipf:
+                for file_path in theme_path_obj.rglob("*"):
                     if file_path.is_file():
                         # Skip hidden files and cache
-                        if file_path.name.startswith('.') or '__pycache__' in str(file_path):
+                        if file_path.name.startswith(".") or "__pycache__" in str(file_path):
                             continue
 
                         arcname = file_path.relative_to(theme_path_obj)
@@ -162,18 +169,14 @@ class AutomatedThemeUploader:
                 metadata={
                     "version": package.version,
                     "size_mb": round(package.size_bytes / 1024 / 1024, 2),
-                    "files_count": len(package.files)
-                }
+                    "files_count": len(package.files),
+                },
             )
 
             return package
 
         except Exception as e:
-            enterprise_logger.error(
-                f"Failed to create theme package: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"Failed to create theme package: {e}", category=LogCategory.SYSTEM, error=e)
             raise
 
     def _calculate_checksum(self, file_path: Path) -> str:
@@ -186,12 +189,7 @@ class AutomatedThemeUploader:
 
     async def validate_theme_package(self, package: ThemePackage) -> dict[str, Any]:
         """Validate theme package before deployment."""
-        validation_results = {
-            "valid": True,
-            "errors": [],
-            "warnings": [],
-            "info": []
-        }
+        validation_results = {"valid": True, "errors": [], "warnings": [], "info": []}
 
         try:
             # Check package exists
@@ -210,7 +208,7 @@ class AutomatedThemeUploader:
 
             # Extract and validate contents
             with tempfile.TemporaryDirectory() as temp_dir:
-                with zipfile.ZipFile(package.package_path, 'r') as zipf:
+                with zipfile.ZipFile(package.package_path, "r") as zipf:
                     zipf.extractall(temp_dir)
 
                 temp_path = Path(temp_dir)
@@ -229,7 +227,7 @@ class AutomatedThemeUploader:
                 # Validate style.css header
                 style_css = temp_path / "style.css"
                 if style_css.exists():
-                    with open(style_css, 'r', encoding='utf-8') as f:
+                    with open(style_css, "r", encoding="utf-8") as f:
                         content = f.read(1000)  # Read first 1000 chars
                         if "Theme Name:" not in content:
                             validation_results["warnings"].append("style.css missing Theme Name header")
@@ -237,7 +235,7 @@ class AutomatedThemeUploader:
                             validation_results["warnings"].append("style.css missing Version header")
 
                 # Check file extensions
-                for file_path in temp_path.rglob('*'):
+                for file_path in temp_path.rglob("*"):
                     if file_path.is_file():
                         if file_path.suffix not in self.validation_rules["allowed_extensions"]:
                             validation_results["warnings"].append(
@@ -253,8 +251,8 @@ class AutomatedThemeUploader:
                 metadata={
                     "valid": validation_results["valid"],
                     "errors": len(validation_results["errors"]),
-                    "warnings": len(validation_results["warnings"])
-                }
+                    "warnings": len(validation_results["warnings"]),
+                },
             )
 
             return validation_results
@@ -263,11 +261,7 @@ class AutomatedThemeUploader:
             validation_results["errors"].append(f"Validation error: {e!s}")
             validation_results["valid"] = False
 
-            enterprise_logger.error(
-                f"Theme validation failed: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"Theme validation failed: {e}", category=LogCategory.SYSTEM, error=e)
 
             return validation_results
 
@@ -276,7 +270,7 @@ class AutomatedThemeUploader:
         package: ThemePackage,
         credentials: WordPressCredentials,
         upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
-        activate_theme: bool = False
+        activate_theme: bool = False,
     ) -> DeploymentResult:
         """Deploy theme package to WordPress site."""
         deployment_id = f"deploy_{datetime.now().strftime('%Y%m%d_%H%M%S')}_{package.name}"
@@ -286,7 +280,7 @@ class AutomatedThemeUploader:
             deployment_id=deployment_id,
             status=DeploymentStatus.PENDING,
             theme_package=package,
-            upload_method=upload_method
+            upload_method=upload_method,
         )
 
         try:
@@ -296,11 +290,7 @@ class AutomatedThemeUploader:
             enterprise_logger.info(
                 f"Starting theme deployment: {package.name}",
                 category=LogCategory.SYSTEM,
-                metadata={
-                    "deployment_id": deployment_id,
-                    "method": upload_method.value,
-                    "site": credentials.site_url
-                }
+                metadata={"deployment_id": deployment_id, "method": upload_method.value, "site": credentials.site_url},
             )
 
             # Validate package first
@@ -335,7 +325,7 @@ class AutomatedThemeUploader:
                 enterprise_logger.info(
                     f"Theme deployment successful: {package.name}",
                     category=LogCategory.SYSTEM,
-                    metadata={"deployment_id": deployment_id}
+                    metadata={"deployment_id": deployment_id},
                 )
             else:
                 result.status = DeploymentStatus.FAILED
@@ -349,7 +339,7 @@ class AutomatedThemeUploader:
                 f"Theme deployment failed: {e}",
                 category=LogCategory.SYSTEM,
                 error=e,
-                metadata={"deployment_id": deployment_id}
+                metadata={"deployment_id": deployment_id},
             )
 
         finally:
@@ -360,10 +350,7 @@ class AutomatedThemeUploader:
         return result
 
     async def _deploy_via_rest_api(
-        self,
-        package: ThemePackage,
-        credentials: WordPressCredentials,
-        activate_theme: bool = False
+        self, package: ThemePackage, credentials: WordPressCredentials, activate_theme: bool = False
     ) -> bool:
         """Deploy theme via WordPress REST API."""
         try:
@@ -372,27 +359,16 @@ class AutomatedThemeUploader:
                 f"{credentials.username}:{credentials.application_password or credentials.password}".encode()
             ).decode()
 
-            headers = {
-                "Authorization": f"Basic {auth_header}",
-                "Content-Type": "application/zip"
-            }
+            headers = {"Authorization": f"Basic {auth_header}", "Content-Type": "application/zip"}
 
             # Upload theme
             upload_url = f"{credentials.site_url.rstrip('/')}/wp-json/wp/v2/themes"
 
-            with open(package.package_path, 'rb') as f:
-                response = requests.post(
-                    upload_url,
-                    headers=headers,
-                    data=f.read(),
-                    timeout=300
-                )
+            with open(package.package_path, "rb") as f:
+                response = requests.post(upload_url, headers=headers, data=f.read(), timeout=300)
 
             if response.status_code in [200, 201]:
-                enterprise_logger.info(
-                    f"Theme uploaded via REST API: {package.name}",
-                    category=LogCategory.SYSTEM
-                )
+                enterprise_logger.info(f"Theme uploaded via REST API: {package.name}", category=LogCategory.SYSTEM)
 
                 # Activate theme if requested
                 if activate_theme:
@@ -401,28 +377,32 @@ class AutomatedThemeUploader:
                 return True
             else:
                 enterprise_logger.error(
-                    f"REST API upload failed: {response.status_code} - {response.text}",
-                    category=LogCategory.SYSTEM
+                    f"REST API upload failed: {response.status_code} - {response.text}", category=LogCategory.SYSTEM
                 )
                 return False
 
         except Exception as e:
-            enterprise_logger.error(
-                f"REST API deployment error: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"REST API deployment error: {e}", category=LogCategory.SYSTEM, error=e)
             return False
 
     async def _deploy_via_ftp(self, package: ThemePackage, credentials: WordPressCredentials) -> bool:
-        """Deploy theme via FTP."""
+        """Deploy theme via FTP.
+
+        SECURITY WARNING: FTP transmits credentials and data in plaintext.
+        Use SFTP (UploadMethod.SFTP) instead for encrypted connections.
+        Per CWE-319: Cleartext Transmission of Sensitive Information.
+        """
+        enterprise_logger.warning(
+            "FTP is insecure (cleartext transmission). Use SFTP instead.",
+            category=LogCategory.SECURITY
+        )
         try:
             if not credentials.ftp_host:
                 raise ValueError("FTP credentials not provided")
 
             # Extract theme to temporary directory
             with tempfile.TemporaryDirectory() as temp_dir:
-                with zipfile.ZipFile(package.package_path, 'r') as zipf:
+                with zipfile.ZipFile(package.package_path, "r") as zipf:
                     zipf.extractall(temp_dir)
 
                 # Connect to FTP
@@ -430,7 +410,7 @@ class AutomatedThemeUploader:
                     ftp.login(credentials.ftp_username, credentials.ftp_password)
 
                     # Navigate to themes directory
-                    ftp.cwd('/wp-content/themes/')
+                    ftp.cwd("/wp-content/themes/")
 
                     # Create theme directory
                     try:
@@ -442,35 +422,28 @@ class AutomatedThemeUploader:
 
                     # Upload files
                     temp_path = Path(temp_dir)
-                    for file_path in temp_path.rglob('*'):
+                    for file_path in temp_path.rglob("*"):
                         if file_path.is_file():
                             relative_path = file_path.relative_to(temp_path)
 
                             # Create directories if needed
-                            if relative_path.parent != Path('.'):
+                            if relative_path.parent != Path("."):
                                 self._create_ftp_directories(ftp, str(relative_path.parent))
 
                             # Upload file
-                            with open(file_path, 'rb') as f:
-                                ftp.storbinary(f'STOR {relative_path}', f)
+                            with open(file_path, "rb") as f:
+                                ftp.storbinary(f"STOR {relative_path}", f)
 
-            enterprise_logger.info(
-                f"Theme uploaded via FTP: {package.name}",
-                category=LogCategory.SYSTEM
-            )
+            enterprise_logger.info(f"Theme uploaded via FTP: {package.name}", category=LogCategory.SYSTEM)
             return True
 
         except Exception as e:
-            enterprise_logger.error(
-                f"FTP deployment error: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"FTP deployment error: {e}", category=LogCategory.SYSTEM, error=e)
             return False
 
     def _create_ftp_directories(self, ftp: ftplib.FTP, path: str):
         """Create FTP directories recursively."""
-        parts = path.split('/')
+        parts = path.split("/")
         current_path = ""
 
         for part in parts:
@@ -488,24 +461,51 @@ class AutomatedThemeUploader:
 
             # Setup SSH client
             ssh = paramiko.SSHClient()
-            ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
+            # SECURITY: Enable SSH host key verification to prevent MITM attacks
+            # Per SECURITY_VERIFICATION_REPORT.md - P0 CRITICAL fix
+            try:
+                known_hosts_path = os.path.expanduser("~/.ssh/known_hosts")
+                if os.path.exists(known_hosts_path):
+                    ssh.load_host_keys(known_hosts_path)
+                    enterprise_logger.info(
+                        f"✅ Loaded SSH known hosts from {known_hosts_path}", category=LogCategory.SECURITY
+                    )
+            except Exception as e:
+                enterprise_logger.warning(f"Could not load known_hosts: {e}", category=LogCategory.SECURITY)
+
+            # SECURITY: Use AutoAddPolicy for development, RejectPolicy for production
+            # Per CWE-295: Improper Certificate Validation
+            # Set SSH_STRICT_HOST_KEY_CHECKING=true for production environments
+            strict_checking = os.getenv("SSH_STRICT_HOST_KEY_CHECKING", "false").lower() == "true"
+            if strict_checking:
+                ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
+                enterprise_logger.info("SSH strict host key checking enabled (RejectPolicy)", category=LogCategory.SECURITY)
+            else:
+                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+                enterprise_logger.warning(
+                    "SSH using AutoAddPolicy - set SSH_STRICT_HOST_KEY_CHECKING=true for production",
+                    category=LogCategory.SECURITY
+                )
 
             # Connect
             if credentials.sftp_private_key:
                 key = paramiko.RSAKey.from_private_key_file(credentials.sftp_private_key)
                 ssh.connect(credentials.sftp_host, username=credentials.sftp_username, pkey=key)
             else:
-                ssh.connect(credentials.sftp_host, username=credentials.sftp_username, password=credentials.ftp_password)
+                ssh.connect(
+                    credentials.sftp_host, username=credentials.sftp_username, password=credentials.ftp_password
+                )
 
             # Extract and upload theme
             with tempfile.TemporaryDirectory() as temp_dir:
-                with zipfile.ZipFile(package.package_path, 'r') as zipf:
+                with zipfile.ZipFile(package.package_path, "r") as zipf:
                     zipf.extractall(temp_dir)
 
                 sftp = ssh.open_sftp()
 
                 # Create theme directory
-                theme_path = f'/wp-content/themes/{package.name}'
+                theme_path = f"/wp-content/themes/{package.name}"
                 try:
                     sftp.mkdir(theme_path)
                 except OSError:
@@ -513,7 +513,7 @@ class AutomatedThemeUploader:
 
                 # Upload files
                 temp_path = Path(temp_dir)
-                for file_path in temp_path.rglob('*'):
+                for file_path in temp_path.rglob("*"):
                     if file_path.is_file():
                         relative_path = file_path.relative_to(temp_path)
                         remote_path = f"{theme_path}/{relative_path}"
@@ -529,18 +529,11 @@ class AutomatedThemeUploader:
 
             ssh.close()
 
-            enterprise_logger.info(
-                f"Theme uploaded via SFTP: {package.name}",
-                category=LogCategory.SYSTEM
-            )
+            enterprise_logger.info(f"Theme uploaded via SFTP: {package.name}", category=LogCategory.SYSTEM)
             return True
 
         except Exception as e:
-            enterprise_logger.error(
-                f"SFTP deployment error: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"SFTP deployment error: {e}", category=LogCategory.SYSTEM, error=e)
             return False
 
     async def _deploy_to_staging(self, package: ThemePackage, credentials: WordPressCredentials) -> bool:
@@ -550,22 +543,18 @@ class AutomatedThemeUploader:
             staging_path.mkdir(parents=True, exist_ok=True)
 
             # Extract theme to staging
-            with zipfile.ZipFile(package.package_path, 'r') as zipf:
+            with zipfile.ZipFile(package.package_path, "r") as zipf:
                 zipf.extractall(staging_path)
 
             enterprise_logger.info(
                 f"Theme deployed to staging: {package.name}",
                 category=LogCategory.SYSTEM,
-                metadata={"staging_path": str(staging_path)}
+                metadata={"staging_path": str(staging_path)},
             )
             return True
 
         except Exception as e:
-            enterprise_logger.error(
-                f"Staging deployment error: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"Staging deployment error: {e}", category=LogCategory.SYSTEM, error=e)
             return False
 
     async def _activate_theme_via_api(self, theme_name: str, credentials: WordPressCredentials) -> bool:
@@ -575,37 +564,26 @@ class AutomatedThemeUploader:
                 f"{credentials.username}:{credentials.application_password or credentials.password}".encode()
             ).decode()
 
-            headers = {
-                "Authorization": f"Basic {auth_header}",
-                "Content-Type": "application/json"
-            }
+            headers = {"Authorization": f"Basic {auth_header}", "Content-Type": "application/json"}
 
             activate_url = f"{credentials.site_url.rstrip('/')}/wp-json/wp/v2/themes/{theme_name}/activate"
 
             response = requests.post(activate_url, headers=headers, timeout=60)
 
             if response.status_code == 200:
-                enterprise_logger.info(
-                    f"Theme activated: {theme_name}",
-                    category=LogCategory.SYSTEM
-                )
+                enterprise_logger.info(f"Theme activated: {theme_name}", category=LogCategory.SYSTEM)
                 return True
             else:
                 enterprise_logger.error(
-                    f"Theme activation failed: {response.status_code} - {response.text}",
-                    category=LogCategory.SYSTEM
+                    f"Theme activation failed: {response.status_code} - {response.text}", category=LogCategory.SYSTEM
                 )
                 return False
 
         except Exception as e:
-            enterprise_logger.error(
-                f"Theme activation error: {e}",
-                category=LogCategory.SYSTEM,
-                error=e
-            )
+            enterprise_logger.error(f"Theme activation error: {e}", category=LogCategory.SYSTEM, error=e)
             return False
 
-    def get_deployment_status(self, deployment_id: str) -> Optional[DeploymentResult]:
+    def get_deployment_status(self, deployment_id: str) -> DeploymentResult | None:
         """Get deployment status by ID."""
         # Check active deployments
         if deployment_id in self.active_deployments:
@@ -625,11 +603,13 @@ class AutomatedThemeUploader:
             "total_deployments": len(self.deployment_history),
             "successful_deployments": len([r for r in self.deployment_history if r.success]),
             "staging_area": str(self.staging_area),
-            "supported_methods": [method.value for method in UploadMethod]
+            "supported_methods": [method.value for method in UploadMethod],
         }
+
 
 # Global theme uploader instance
 automated_theme_uploader = AutomatedThemeUploader()
+
 
 # Convenience functions
 async def deploy_theme_package(
@@ -637,33 +617,26 @@ async def deploy_theme_package(
     theme_info: dict[str, Any],
     credentials: WordPressCredentials,
     upload_method: UploadMethod = UploadMethod.WORDPRESS_REST_API,
-    activate_theme: bool = False
+    activate_theme: bool = False,
 ) -> DeploymentResult:
     """Deploy theme with automatic package creation."""
     package = await automated_theme_uploader.create_theme_package(theme_path, theme_info)
     return await automated_theme_uploader.deploy_theme(package, credentials, upload_method, activate_theme)
 
+
 async def quick_deploy_theme(
-    theme_path: str,
-    site_url: str,
-    username: str,
-    password: str,
-    theme_name: str | None = None,
-    activate: bool = False
+    theme_path: str, site_url: str, username: str, password: str, theme_name: str | None = None, activate: bool = False
 ) -> DeploymentResult:
     """Quick theme deployment with minimal configuration."""
     credentials = WordPressCredentials(
-        site_url=site_url,
-        username=username,
-        password=password,
-        application_password=password
+        site_url=site_url, username=username, password=password, application_password=password
     )
 
     theme_info = {
         "name": theme_name or Path(theme_path).name,
         "version": "1.0.0",
         "description": f"Auto-generated theme for {site_url}",
-        "author": "DevSkyy Platform"
+        "author": "DevSkyy Platform",
     }
 
     return await deploy_theme_package(theme_path, theme_info, credentials, activate_theme=activate)

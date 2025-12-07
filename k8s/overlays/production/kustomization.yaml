@@ -1,0 +1,201 @@
+---
+# DevSkyy Platform - Production Environment Overlay
+# Full production configuration with high availability
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: devskyy
+
+# Reference base configuration
+resources:
+- ../../base
+- pdb.yaml  # Pod Disruption Budgets for high availability
+
+# Environment-specific labels
+commonLabels:
+  environment: production
+  app.kubernetes.io/instance: devskyy-production
+
+# Image overrides for production
+images:
+- name: devskyy
+  newName: devskyy
+  newTag: production
+
+# Production-specific patches
+patches:
+# Production replica count (uses base: 3)
+- target:
+    kind: Deployment
+    name: devskyy
+  patch: |-
+    - op: replace
+      path: /spec/replicas
+      value: 3
+
+# Production resource limits (uses base values, but explicitly set)
+- target:
+    kind: Deployment
+    name: devskyy
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "500m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "1Gi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "2"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "4Gi"
+
+# Production HPA settings (base values are good)
+- target:
+    kind: HorizontalPodAutoscaler
+    name: devskyy-hpa
+  patch: |-
+    - op: replace
+      path: /spec/minReplicas
+      value: 3
+    - op: replace
+      path: /spec/maxReplicas
+      value: 20
+
+# Production PostgreSQL resources (base values)
+- target:
+    kind: StatefulSet
+    name: postgres
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "500m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "2Gi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "2"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "4Gi"
+
+# Production PostgreSQL storage
+- target:
+    kind: PersistentVolumeClaim
+    name: postgres-data
+  patch: |-
+    - op: replace
+      path: /spec/resources/requests/storage
+      value: "500Gi"
+
+# Production Redis resources
+- target:
+    kind: StatefulSet
+    name: redis
+  patch: |-
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/cpu
+      value: "200m"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/requests/memory
+      value: "512Mi"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/cpu
+      value: "1"
+    - op: replace
+      path: /spec/template/spec/containers/0/resources/limits/memory
+      value: "2Gi"
+
+# Production Redis storage
+- target:
+    kind: PersistentVolumeClaim
+    name: redis-data
+  patch: |-
+    - op: replace
+      path: /spec/resources/requests/storage
+      value: "50Gi"
+
+# Production application storage
+- target:
+    kind: PersistentVolumeClaim
+    name: devskyy-data
+  patch: |-
+    - op: replace
+      path: /spec/resources/requests/storage
+      value: "100Gi"
+
+# Production ingress configuration
+- target:
+    kind: Ingress
+    name: devskyy-ingress
+  patch: |-
+    - op: replace
+      path: /spec/rules/0/host
+      value: api.devskyy.com
+    - op: replace
+      path: /spec/tls/0/hosts/0
+      value: api.devskyy.com
+
+# Production ResourceQuota (base values)
+- target:
+    kind: ResourceQuota
+    name: devskyy-quota
+  patch: |-
+    - op: replace
+      path: /spec/hard/requests.cpu
+      value: "20"
+    - op: replace
+      path: /spec/hard/requests.memory
+      value: "40Gi"
+    - op: replace
+      path: /spec/hard/limits.cpu
+      value: "40"
+    - op: replace
+      path: /spec/hard/limits.memory
+      value: "80Gi"
+
+# Enable PodDisruptionBudget for high availability
+- target:
+    kind: Deployment
+    name: devskyy
+  patch: |-
+    - op: add
+      path: /spec/template/metadata/annotations
+      value:
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "true"
+
+# ConfigMap customization for production
+configMapGenerator:
+- name: build-info
+  behavior: merge
+  literals:
+  - ENVIRONMENT=production
+  - LOG_LEVEL=WARNING
+  - DEBUG=false
+  - SENTRY_ENABLED=true
+
+# Production secrets (MUST be replaced with sealed-secrets or external secrets)
+# CRITICAL: Never commit actual secrets to git
+secretGenerator:
+- name: devskyy-secrets
+  behavior: replace
+  literals:
+  - DATABASE_URL=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - REDIS_URL=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - SECRET_KEY=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - JWT_SECRET_KEY=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - ENCRYPTION_MASTER_KEY=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - ANTHROPIC_API_KEY=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - OPENAI_API_KEY=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - SENTRY_DSN=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - SMTP_PASSWORD=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+  - AWS_SECRET_ACCESS_KEY=REPLACE_WITH_SEALED_SECRET_OR_VAULT
+
+# Add production-specific annotations
+commonAnnotations:
+  deployment.kubernetes.io/revision: "production"
+  prometheus.io/scrape: "true"
+  prometheus.io/port: "9091"
+  backup.velero.io/backup-volumes: "devskyy-data"

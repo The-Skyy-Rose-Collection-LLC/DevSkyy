@@ -23,11 +23,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
-from typing import Any, Optional
+from typing import Any
 
 from anthropic import AsyncAnthropic
 import astroid
 from openai import AsyncOpenAI
+
+from config.unified_config import get_config
 
 
 logger = logging.getLogger(__name__)
@@ -41,8 +43,12 @@ class UniversalSelfHealingAgent:
 
     def __init__(self):
         # AI Services
+        config = get_config()
+        is_consequential = config.ai.openai_is_consequential
+        default_headers = {"x-openai-isConsequential": str(is_consequential).lower()}
+
         self.claude = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
-        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        self.openai = AsyncOpenAI(api_key=os.getenv("OPENAI_API_KEY"), default_headers=default_headers)
 
         # Learning database
         self.healing_history: list[dict[str, Any]] = []
@@ -121,7 +127,7 @@ class UniversalSelfHealingAgent:
     async def scan_and_heal(
         self,
         codebase_path: str,
-        languages: Optional[list[str]] = None,
+        languages: list[str] | None = None,
         auto_fix: bool = True,
     ) -> dict[str, Any]:
         """
@@ -157,18 +163,14 @@ class UniversalSelfHealingAgent:
 
                             if auto_fix:
                                 # Auto-heal the file
-                                heal_result = await self._heal_file(
-                                    file_path, file_issues, lang
-                                )
+                                heal_result = await self._heal_file(file_path, file_issues, lang)
 
                                 if heal_result["success"]:
                                     files_healed += 1
                                     total_fixes += len(heal_result["fixes_applied"])
 
                                     # Learn from this healing
-                                    await self._learn_from_healing(
-                                        file_path, file_issues, heal_result
-                                    )
+                                    await self._learn_from_healing(file_path, file_issues, heal_result)
 
             # Generate comprehensive report
             report = {
@@ -179,16 +181,12 @@ class UniversalSelfHealingAgent:
                 "total_fixes_applied": total_fixes,
                 "issues_by_severity": self._categorize_issues(issues_found),
                 "issues_by_language": self._group_by_language(issues_found),
-                "healing_success_rate": (
-                    (files_healed / len(issues_found) * 100) if issues_found else 100
-                ),
+                "healing_success_rate": ((files_healed / len(issues_found) * 100) if issues_found else 100),
                 "learned_patterns": len(self.learned_solutions),
                 "timestamp": datetime.now().isoformat(),
             }
 
-            logger.info(
-                f"✅ Healing complete: {files_healed} files healed, {total_fixes} fixes applied"
-            )
+            logger.info(f"✅ Healing complete: {files_healed} files healed, {total_fixes} fixes applied")
 
             return report
 
@@ -196,9 +194,7 @@ class UniversalSelfHealingAgent:
             logger.error(f"❌ Scan and heal failed: {e}")
             return {"error": str(e), "status": "failed"}
 
-    async def _detect_issues(
-        self, file_path: Path, language: str
-    ) -> list[dict[str, Any]]:
+    async def _detect_issues(self, file_path: Path, language: str) -> list[dict[str, Any]]:
         """
         Detect code issues using multiple methods:
         1. Static analysis
@@ -232,9 +228,7 @@ class UniversalSelfHealingAgent:
             logger.error(f"❌ Issue detection failed for {file_path}: {e}")
             return []
 
-    async def _python_static_analysis(
-        self, content: str, file_path: Path
-    ) -> list[dict[str, Any]]:
+    async def _python_static_analysis(self, content: str, file_path: Path) -> list[dict[str, Any]]:
         """
         Perform Python-specific static analysis.
         """
@@ -283,9 +277,7 @@ class UniversalSelfHealingAgent:
 
         return issues
 
-    async def _run_linters(
-        self, file_path: Path, language: str
-    ) -> list[dict[str, Any]]:
+    async def _run_linters(self, file_path: Path, language: str) -> list[dict[str, Any]]:
         """
         Run language-specific linters and parse output.
         """
@@ -298,16 +290,15 @@ class UniversalSelfHealingAgent:
                 # Run linter
                 result = subprocess.run(
                     [linter, str(file_path)],
-                    check=False, capture_output=True,
+                    check=False,
+                    capture_output=True,
                     text=True,
                     timeout=30,
                 )
 
                 # Parse linter output
                 if result.stdout or result.stderr:
-                    linter_issues = self._parse_linter_output(
-                        result.stdout + result.stderr, linter, file_path
-                    )
+                    linter_issues = self._parse_linter_output(result.stdout + result.stderr, linter, file_path)
                     issues.extend(linter_issues)
 
             except subprocess.TimeoutExpired:
@@ -319,9 +310,7 @@ class UniversalSelfHealingAgent:
 
         return issues
 
-    def _parse_linter_output(
-        self, output: str, linter: str, file_path: Path
-    ) -> list[dict[str, Any]]:
+    def _parse_linter_output(self, output: str, linter: str, file_path: Path) -> list[dict[str, Any]]:
         """
         Parse linter output into standardized issue format.
         """
@@ -337,10 +326,7 @@ class UniversalSelfHealingAgent:
 
             # Determine severity from message
             severity = "medium"
-            if any(
-                word in message.lower()
-                for word in ["error", "critical", "security", "vulnerability"]
-            ):
+            if any(word in message.lower() for word in ["error", "critical", "security", "vulnerability"]):
                 severity = "critical"
             elif any(word in message.lower() for word in ["warning", "warn"]):
                 severity = "medium"
@@ -360,9 +346,7 @@ class UniversalSelfHealingAgent:
 
         return issues
 
-    async def _ai_detect_issues(
-        self, content: str, language: str, file_path: Path
-    ) -> list[dict[str, Any]]:
+    async def _ai_detect_issues(self, content: str, language: str, file_path: Path) -> list[dict[str, Any]]:
         """
         Use AI to detect subtle issues that linters might miss.
         """
@@ -409,9 +393,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
         return []
 
-    async def _check_learned_patterns(
-        self, content: str, language: str
-    ) -> list[dict[str, Any]]:
+    async def _check_learned_patterns(self, content: str, language: str) -> list[dict[str, Any]]:
         """
         Check code against previously learned error patterns.
         """
@@ -436,9 +418,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
         return issues
 
-    async def _heal_file(
-        self, file_path: Path, issues: list[dict[str, Any]], language: str
-    ) -> dict[str, Any]:
+    async def _heal_file(self, file_path: Path, issues: list[dict[str, Any]], language: str) -> dict[str, Any]:
         """
         Automatically heal file by fixing all detected issues.
         """
@@ -456,19 +436,13 @@ Return JSON array of issues with: line, type, severity, message"""
 
             # Sort issues by severity (critical first)
             severity_order = {"critical": 0, "high": 1, "medium": 2, "low": 3}
-            sorted_issues = sorted(
-                issues, key=lambda x: severity_order.get(x.get("severity", "medium"), 2)
-            )
+            sorted_issues = sorted(issues, key=lambda x: severity_order.get(x.get("severity", "medium"), 2))
 
             # Apply fixes
             for issue in sorted_issues:
                 fix_result = await self._generate_fix(content, issue, language)
 
-                if (
-                    fix_result["success"]
-                    and fix_result["confidence"]
-                    >= self.healing_config["confidence_threshold"]
-                ):
+                if fix_result["success"] and fix_result["confidence"] >= self.healing_config["confidence_threshold"]:
                     content = fix_result["fixed_code"]
                     fixes_applied.append(
                         {
@@ -487,9 +461,7 @@ Return JSON array of issues with: line, type, severity, message"""
 
                 if not validation["valid"]:
                     # Rollback if validation fails
-                    logger.warning(
-                        f"⚠️ Healing validation failed, rolling back {file_path.name}"
-                    )
+                    logger.warning(f"⚠️ Healing validation failed, rolling back {file_path.name}")
                     file_path.write_text(original_content)
                     return {
                         "success": False,
@@ -510,9 +482,7 @@ Return JSON array of issues with: line, type, severity, message"""
             logger.error(f"❌ Healing failed for {file_path}: {e}")
             return {"success": False, "error": str(e)}
 
-    async def _generate_fix(
-        self, content: str, issue: dict[str, Any], language: str
-    ) -> dict[str, Any]:
+    async def _generate_fix(self, content: str, issue: dict[str, Any], language: str) -> dict[str, Any]:
         """
         Generate code fix using AI reasoning.
         """
@@ -555,9 +525,7 @@ Provide the complete fixed code. Ensure:
             fixed_code_text = response.content[0].text
 
             # Extract code from response
-            code_match = re.search(
-                rf"```{language}\n(.*?)```", fixed_code_text, re.DOTALL
-            )
+            code_match = re.search(rf"```{language}\n(.*?)```", fixed_code_text, re.DOTALL)
             if code_match:
                 fixed_code = code_match.group(1).strip()
 
@@ -625,7 +593,8 @@ Provide the complete fixed code. Ensure:
             # Run tests
             result = subprocess.run(
                 [test_framework, str(file_path)],
-                check=False, capture_output=True,
+                check=False,
+                capture_output=True,
                 timeout=60,
             )
 
@@ -657,19 +626,14 @@ Provide the complete fixed code. Ensure:
                     "description": issue.get("message"),
                     "fix": fix["fix"],
                     "confidence": fix["confidence"],
-                    "success_count": self.learned_solutions.get(pattern_key, {}).get(
-                        "success_count", 0
-                    )
-                    + 1,
+                    "success_count": self.learned_solutions.get(pattern_key, {}).get("success_count", 0) + 1,
                     "last_used": datetime.now().isoformat(),
                 }
 
             # Update success rates
             self._update_success_rates(heal_result)
 
-            logger.info(
-                f"🧠 Learned from healing: {len(heal_result.get('fixes_applied', []))} patterns stored"
-            )
+            logger.info(f"🧠 Learned from healing: {len(heal_result.get('fixes_applied', []))} patterns stored")
 
         except Exception as e:
             logger.error(f"❌ Learning failed: {e}")
@@ -723,8 +687,6 @@ self_healing_agent = create_self_healing_agent()
 
 
 # Convenience functions
-async def auto_heal_codebase(
-    path: str, languages: Optional[list[str]] = None
-) -> dict[str, Any]:
+async def auto_heal_codebase(path: str, languages: list[str] | None = None) -> dict[str, Any]:
     """Automatically scan and heal codebase."""
     return await self_healing_agent.scan_and_heal(path, languages)

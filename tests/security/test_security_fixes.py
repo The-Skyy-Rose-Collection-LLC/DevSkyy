@@ -25,9 +25,9 @@ class TestLogInjectionFixes:
         malicious_input = "user@example.com\n[FAKE LOG ENTRY] Admin access granted"
         sanitized = sanitize_for_log(malicious_input)
 
-        assert '\n' not in sanitized
-        assert '\r' not in sanitized
-        assert '[FAKE LOG ENTRY]' in sanitized  # Content preserved but safe
+        assert "\n" not in sanitized
+        assert "\r" not in sanitized
+        assert "[FAKE LOG ENTRY]" in sanitized  # Content preserved but safe
 
     def test_log_sanitizer_limits_length(self):
         """Test that log sanitizer limits string length"""
@@ -35,41 +35,30 @@ class TestLogInjectionFixes:
         sanitized = sanitize_for_log(long_input, max_length=100)
 
         assert len(sanitized) <= 103  # 100 + "..."
-        assert sanitized.endswith('...')
+        assert sanitized.endswith("...")
 
     def test_user_identifier_sanitization(self):
         """Test user identifier sanitization"""
         malicious_email = "user@example.com\nADMIN_ACCESS=true"
         sanitized = sanitize_user_identifier(malicious_email)
 
-        assert '\n' not in sanitized
+        assert "\n" not in sanitized
         assert len(sanitized) <= 100
 
 
 class TestJWTSignatureVerification:
     """Test JWT signature verification fixes"""
 
-    @patch('security.auth0_integration.get_auth0_public_key')
-    @patch('security.auth0_integration.jwt')
+    @patch("security.auth0_integration.get_auth0_public_key")
+    @patch("security.auth0_integration.jwt")
     def test_jwt_verification_uses_proper_key_conversion(self, mock_jwt, mock_get_key):
         """Test that JWT verification properly converts JWK to RSA key"""
         # Mock JWKS response
-        mock_get_key.return_value = {
-            "keys": [{
-                "kid": "test-key-id",
-                "kty": "RSA",
-                "n": "test-n",
-                "e": "AQAB"
-            }]
-        }
+        mock_get_key.return_value = {"keys": [{"kid": "test-key-id", "kty": "RSA", "n": "test-n", "e": "AQAB"}]}
 
         # Mock JWT methods
         mock_jwt.get_unverified_header.return_value = {"kid": "test-key-id"}
-        mock_jwt.decode.return_value = {
-            "sub": "test-user",
-            "email": "test@example.com",
-            "exp": 1234567890
-        }
+        mock_jwt.decode.return_value = {"sub": "test-user", "email": "test@example.com", "exp": 1234567890}
 
         # This should not raise an exception
         try:
@@ -87,11 +76,7 @@ class TestXSSProtection:
         template_string = "<h1>{{ title }}</h1><p>{{ content }}</p>"
         malicious_content = "<script>alert('XSS')</script>"
 
-        result = render_safe_template(
-            template_string,
-            title="Safe Title",
-            content=malicious_content
-        )
+        result = render_safe_template(template_string, title="Safe Title", content=malicious_content)
 
         # Script tags should be escaped
         assert "<script>" not in result
@@ -121,7 +106,7 @@ class TestSQLInjectionProtection:
         with pytest.raises(ValueError, match="Invalid user_id format"):
             # This should be called in a context where it would validate
             # For now, we test the validation logic directly
-            if not malicious_user_id.replace('-', '').replace('_', '').isalnum():
+            if not malicious_user_id.replace("-", "").replace("_", "").isalnum():
                 raise ValueError("Invalid user_id format")
 
     def test_safe_query_creation(self):
@@ -147,15 +132,15 @@ class TestConditionalPatternFixes:
             "security/auth0_integration.py",
             "api/v1/auth.py",
             "api/v1/webhooks.py",
-            "api/v1/gdpr.py"
+            "api/v1/gdpr.py",
         ]
 
-        pattern = re.compile(r'\([^)]*if[^)]*else None\)')
+        pattern = re.compile(r"\([^)]*if[^)]*else None\)")
 
         for file_path in critical_files:
             full_path = Path(__file__).parent.parent.parent / file_path
             if full_path.exists():
-                with open(full_path, 'r', encoding='utf-8') as f:
+                with open(full_path, "r", encoding="utf-8") as f:
                     content = f.read()
 
                 matches = pattern.findall(content)

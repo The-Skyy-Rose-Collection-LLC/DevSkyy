@@ -22,6 +22,7 @@ class TestSecretKeyConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.SECRET_KEY == test_key_value
@@ -35,6 +36,7 @@ class TestSecretKeyConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # Should have default development value
@@ -60,6 +62,7 @@ class TestSecretKeyConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # In development, should use default without critical warnings
@@ -88,6 +91,7 @@ class TestEnvironmentConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.ENVIRONMENT == test_env
@@ -100,6 +104,7 @@ class TestEnvironmentConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # Should default to development
@@ -114,6 +119,7 @@ class TestEnvironmentConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.LOG_LEVEL == test_level
@@ -126,6 +132,7 @@ class TestEnvironmentConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.LOG_LEVEL == "INFO"
@@ -143,6 +150,7 @@ class TestRedisConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.REDIS_URL == test_redis_url
@@ -155,6 +163,7 @@ class TestRedisConfiguration:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # Should default to localhost
@@ -172,6 +181,7 @@ class TestApplicationInitialization:
 
         assert app is not None
         from fastapi import FastAPI
+
         assert isinstance(app, FastAPI)
 
     @pytest.mark.unit
@@ -179,7 +189,7 @@ class TestApplicationInitialization:
         """Test app has proper title"""
         from main import app
 
-        assert hasattr(app, 'title')
+        assert hasattr(app, "title")
         assert app.title is not None
         assert len(app.title) > 0
 
@@ -188,7 +198,7 @@ class TestApplicationInitialization:
         """Test app has version information"""
         from main import app
 
-        assert hasattr(app, 'version')
+        assert hasattr(app, "version")
         assert app.version is not None
 
     @pytest.mark.unit
@@ -197,7 +207,7 @@ class TestApplicationInitialization:
         from main import app
 
         # Check middleware is configured
-        assert hasattr(app, 'middleware_stack')
+        assert hasattr(app, "middleware_stack")
         # CORS should be part of middleware
 
 
@@ -231,12 +241,12 @@ class TestConfigurationValidation:
         # These should only appear in env var loading, not as hardcoded values
         for pattern in dangerous_patterns:
             # Should not find hardcoded values like password="actualpassword"
-            lines = [line for line in source.split('\n') if pattern in line.lower()]
+            lines = [line for line in source.split("\n") if pattern in line.lower()]
             for line in lines:
                 # Skip lines that are just loading from environment
-                if 'os.getenv' not in line and 'os.environ' not in line:
+                if "os.getenv" not in line and "os.environ" not in line:
                     # Should not have hardcoded values
-                    assert '"' not in line or "'" not in line or '=' in line
+                    assert '"' not in line or "'" not in line or "=" in line
 
     @pytest.mark.unit
     def test_environment_variables_used(self):
@@ -265,12 +275,12 @@ class TestSecurityBestPractices:
         source = inspect.getsource(main)
 
         # SECRET_KEY assignment should use os.getenv
-        secret_key_lines = [line for line in source.split('\n') if 'SECRET_KEY' in line and '=' in line]
+        secret_key_lines = [line for line in source.split("\n") if "SECRET_KEY" in line and "=" in line]
 
         for line in secret_key_lines:
             # Should use environment variable loading
-            if 'SECRET_KEY =' in line or 'SECRET_KEY=' in line:
-                assert 'os.getenv' in line or 'os.environ' in line
+            if "SECRET_KEY =" in line or "SECRET_KEY=" in line:
+                assert "os.getenv" in line or "os.environ" in line
 
     @pytest.mark.unit
     @pytest.mark.security
@@ -290,6 +300,7 @@ class TestSecurityBestPractices:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # In production, should not use development defaults
@@ -307,6 +318,7 @@ class TestConfigurationEdgeCases:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # Should fall back to default
@@ -321,6 +333,7 @@ class TestConfigurationEdgeCases:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # Should handle gracefully
@@ -335,6 +348,7 @@ class TestConfigurationEdgeCases:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         # Should accept long keys
@@ -349,6 +363,7 @@ class TestConfigurationEdgeCases:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.SECRET_KEY == special_key
@@ -362,6 +377,7 @@ class TestConfigurationEdgeCases:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.SECRET_KEY == unicode_key
@@ -375,6 +391,7 @@ class TestApplicationStartup:
         """Test main module can be imported without errors"""
         try:
             from main import app
+
             assert app is not None
         except ImportError as e:
             pytest.fail(f"Failed to import main app: {e}")
@@ -405,7 +422,7 @@ class TestApplicationStartup:
 
         # Should have event handlers configured
         # This is framework-dependent but indicates proper setup
-        assert hasattr(app, 'router')
+        assert hasattr(app, "router")
 
 
 class TestConfigurationDocumentation:
@@ -421,7 +438,7 @@ class TestConfigurationDocumentation:
         source = inspect.getsource(main)
 
         # Should have comments explaining configuration
-        assert '#' in source or '"""' in source
+        assert "#" in source or '"""' in source
 
 
 class TestConfigurationReloading:
@@ -476,6 +493,7 @@ class TestIntegrationWithApplication:
         import importlib
 
         import main
+
         importlib.reload(main)
 
         assert main.ENVIRONMENT == "test"
@@ -487,9 +505,8 @@ class TestConfigurationConsistency:
     @pytest.mark.unit
     def test_secret_key_consistency(self):
         """Test SECRET_KEY is consistent within application"""
-        from main import SECRET_KEY
-
         # Import again
+        from main import SECRET_KEY
         from main import SECRET_KEY as SECRET_KEY_2
 
         # Should be the same

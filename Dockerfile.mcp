@@ -30,8 +30,16 @@ ENV PATH="/opt/venv/bin:$PATH"
 COPY mcp/requirements.txt /tmp/requirements_mcp.txt
 COPY requirements.txt /tmp/requirements.txt
 
-# Install Python dependencies
-RUN pip install --upgrade pip setuptools wheel && \
+# Install Python dependencies with secure versions
+# SECURITY: Fixes CRITICAL CVEs per SECURITY_SCAN_REPORT_20251118.md
+# - pip>=25.3: Fixes CVE-2025-8869 (path traversal)
+# - cryptography>=46.0.3: Fixes CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, GHSA-h4gh-qq45-vh27
+# - setuptools>=78.1.1: Fixes CVE-2025-47273, CVE-2024-6345
+RUN pip install --upgrade \
+    "pip>=25.3" \
+    "cryptography>=46.0.3,<47.0.0" \
+    "setuptools>=78.1.1,<79.0.0" \
+    wheel && \
     pip install -r /tmp/requirements_mcp.txt && \
     pip install -r /tmp/requirements.txt
 

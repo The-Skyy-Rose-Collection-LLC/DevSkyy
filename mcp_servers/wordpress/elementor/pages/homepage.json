@@ -1,0 +1,722 @@
+{
+  "title": "Homepage - SkyyRose",
+  "type": "page",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_header_footer",
+    "post_title": "Homepage",
+    "post_status": "publish"
+  },
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "height": "min-height",
+        "custom_height": {"size": 80, "unit": "vh"},
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "background_image": {"url": "", "id": ""},
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(0, 0, 0, 0.4)",
+        "padding": {"top": "0", "bottom": "0", "unit": "px"},
+        "css_classes": "sr-hero"
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "content_position": "center",
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "hero-subtitle",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "OAKLAND'S LUXURY STREETWEAR",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "typography_text_transform": "uppercase",
+                "align": "center",
+                "css_classes": "sr-subheadline"
+              }
+            },
+            {
+              "id": "hero-heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Where Love Meets Luxury",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 64, "unit": "px"},
+                "typography_font_size_tablet": {"size": 48, "unit": "px"},
+                "typography_font_size_mobile": {"size": 36, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "align": "center",
+                "_margin": {"top": "16", "bottom": "24", "unit": "px"},
+                "css_classes": "sr-headline"
+              }
+            },
+            {
+              "id": "hero-tagline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Gender-neutral luxury pieces crafted with emotional depth",
+                "header_size": "h3",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 18, "unit": "px"},
+                "typography_font_weight": "400",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center",
+                "_margin": {"bottom": "48", "unit": "px"},
+                "css_classes": "sr-body"
+              }
+            },
+            {
+              "id": "hero-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "SHOP COLLECTION",
+                "link": {"url": "/shop"},
+                "align": "center",
+                "background_color": "#0D0D0D",
+                "button_text_color": "#F5F5F0",
+                "border_border": "solid",
+                "border_width": {"top": "2", "right": "2", "bottom": "2", "left": "2", "unit": "px"},
+                "border_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "border_radius": {"size": 0, "unit": "px"},
+                "button_padding": {"top": "16", "right": "32", "bottom": "16", "left": "32", "unit": "px"},
+                "hover_background_color": "#F5F5F0",
+                "button_hover_color": "#0D0D0D",
+                "css_classes": "sr-button sr-button--outline"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "collections-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {"size": 1200, "unit": "px"},
+        "background_color": "#F5F5F0",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"},
+        "css_classes": "sr-py-xl"
+      },
+      "elements": [
+        {
+          "id": "collections-header-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "collections-subtitle",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "THE COLLECTIONS",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "typography_text_transform": "uppercase",
+                "align": "center",
+                "_margin": {"bottom": "16", "unit": "px"},
+                "css_classes": "sr-collection-header__subtitle"
+              }
+            },
+            {
+              "id": "collections-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Three Distinct Expressions",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 48, "unit": "px"},
+                "typography_font_size_tablet": {"size": 36, "unit": "px"},
+                "typography_font_size_mobile": {"size": 32, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "align": "center",
+                "_margin": {"bottom": "48", "unit": "px"},
+                "css_classes": "sr-collection-header__title"
+              }
+            }
+          ]
+        },
+        {
+          "id": "collections-grid",
+          "elType": "section",
+          "isInner": true,
+          "settings": {
+            "structure": "30",
+            "gap": "extended"
+          },
+          "elements": [
+            {
+              "id": "collection-love-hurts",
+              "elType": "column",
+              "settings": {"_column_size": 33},
+              "elements": [
+                {
+                  "id": "love-hurts-image",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {"url": "/wp-content/uploads/love-hurts-collection.jpg"},
+                    "image_size": "full",
+                    "link": {"url": "/collections/love-hurts"},
+                    "hover_animation": "grow",
+                    "css_classes": "sr-product-card__image"
+                  }
+                },
+                {
+                  "id": "love-hurts-title",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "LOVE HURTS",
+                    "header_size": "h3",
+                    "title_color": "#0D0D0D",
+                    "typography_typography": "custom",
+                    "typography_font_family": "Playfair Display",
+                    "typography_font_size": {"size": 28, "unit": "px"},
+                    "typography_font_weight": "700",
+                    "align": "center",
+                    "_margin": {"top": "24", "bottom": "8", "unit": "px"}
+                  }
+                },
+                {
+                  "id": "love-hurts-desc",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style=\"text-align: center; font-family: 'Montserrat', sans-serif; font-size: 14px; color: #4A4A4A; line-height: 1.8;\">Heart aRose, Devoted, Tender — Emotional expression where 'Hurts' is the founder's family name</p>",
+                    "css_classes": "sr-body"
+                  }
+                },
+                {
+                  "id": "love-hurts-link",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "EXPLORE",
+                    "link": {"url": "/collections/love-hurts"},
+                    "align": "center",
+                    "background_color": "transparent",
+                    "button_text_color": "#0D0D0D",
+                    "border_border": "solid",
+                    "border_width": {"top": "2", "right": "2", "bottom": "2", "left": "2", "unit": "px"},
+                    "border_color": "#0D0D0D",
+                    "typography_typography": "custom",
+                    "typography_font_family": "Montserrat",
+                    "typography_font_size": {"size": 11, "unit": "px"},
+                    "typography_font_weight": "500",
+                    "typography_letter_spacing": {"size": 2, "unit": "px"},
+                    "border_radius": {"size": 0, "unit": "px"},
+                    "button_padding": {"top": "12", "right": "24", "bottom": "12", "left": "24", "unit": "px"},
+                    "_margin": {"top": "16", "unit": "px"},
+                    "css_classes": "sr-button sr-button--outline"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "collection-black-rose",
+              "elType": "column",
+              "settings": {"_column_size": 33},
+              "elements": [
+                {
+                  "id": "black-rose-image",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {"url": "/wp-content/uploads/black-rose-collection.jpg"},
+                    "image_size": "full",
+                    "link": {"url": "/collections/black-rose"},
+                    "hover_animation": "grow",
+                    "css_classes": "sr-product-card__image"
+                  }
+                },
+                {
+                  "id": "black-rose-title",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "BLACK ROSE",
+                    "header_size": "h3",
+                    "title_color": "#0D0D0D",
+                    "typography_typography": "custom",
+                    "typography_font_family": "Playfair Display",
+                    "typography_font_size": {"size": 28, "unit": "px"},
+                    "typography_font_weight": "700",
+                    "align": "center",
+                    "_margin": {"top": "24", "bottom": "8", "unit": "px"}
+                  }
+                },
+                {
+                  "id": "black-rose-desc",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style=\"text-align: center; font-family: 'Montserrat', sans-serif; font-size: 14px; color: #4A4A4A; line-height: 1.8;\">Heritage, The Lake, Grand — Limited edition dark elegance</p>",
+                    "css_classes": "sr-body"
+                  }
+                },
+                {
+                  "id": "black-rose-link",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "EXPLORE",
+                    "link": {"url": "/collections/black-rose"},
+                    "align": "center",
+                    "background_color": "transparent",
+                    "button_text_color": "#0D0D0D",
+                    "border_border": "solid",
+                    "border_width": {"top": "2", "right": "2", "bottom": "2", "left": "2", "unit": "px"},
+                    "border_color": "#0D0D0D",
+                    "typography_typography": "custom",
+                    "typography_font_family": "Montserrat",
+                    "typography_font_size": {"size": 11, "unit": "px"},
+                    "typography_font_weight": "500",
+                    "typography_letter_spacing": {"size": 2, "unit": "px"},
+                    "border_radius": {"size": 0, "unit": "px"},
+                    "button_padding": {"top": "12", "right": "24", "bottom": "12", "left": "24", "unit": "px"},
+                    "_margin": {"top": "16", "unit": "px"},
+                    "css_classes": "sr-button sr-button--outline"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "collection-signature",
+              "elType": "column",
+              "settings": {"_column_size": 33},
+              "elements": [
+                {
+                  "id": "signature-image",
+                  "elType": "widget",
+                  "widgetType": "image",
+                  "settings": {
+                    "image": {"url": "/wp-content/uploads/signature-collection.jpg"},
+                    "image_size": "full",
+                    "link": {"url": "/collections/signature"},
+                    "hover_animation": "grow",
+                    "css_classes": "sr-product-card__image"
+                  }
+                },
+                {
+                  "id": "signature-title",
+                  "elType": "widget",
+                  "widgetType": "heading",
+                  "settings": {
+                    "title": "SIGNATURE",
+                    "header_size": "h3",
+                    "title_color": "#0D0D0D",
+                    "typography_typography": "custom",
+                    "typography_font_family": "Playfair Display",
+                    "typography_font_size": {"size": 28, "unit": "px"},
+                    "typography_font_weight": "700",
+                    "align": "center",
+                    "_margin": {"top": "24", "bottom": "8", "unit": "px"}
+                  }
+                },
+                {
+                  "id": "signature-desc",
+                  "elType": "widget",
+                  "widgetType": "text-editor",
+                  "settings": {
+                    "editor": "<p style=\"text-align: center; font-family: 'Montserrat', sans-serif; font-size: 14px; color: #4A4A4A; line-height: 1.8;\">The Standard, The Crest, The Piedmont, The Marina — Foundation wardrobe essentials</p>",
+                    "css_classes": "sr-body"
+                  }
+                },
+                {
+                  "id": "signature-link",
+                  "elType": "widget",
+                  "widgetType": "button",
+                  "settings": {
+                    "text": "EXPLORE",
+                    "link": {"url": "/collections/signature"},
+                    "align": "center",
+                    "background_color": "transparent",
+                    "button_text_color": "#0D0D0D",
+                    "border_border": "solid",
+                    "border_width": {"top": "2", "right": "2", "bottom": "2", "left": "2", "unit": "px"},
+                    "border_color": "#0D0D0D",
+                    "typography_typography": "custom",
+                    "typography_font_family": "Montserrat",
+                    "typography_font_size": {"size": 11, "unit": "px"},
+                    "typography_font_weight": "500",
+                    "typography_letter_spacing": {"size": 2, "unit": "px"},
+                    "border_radius": {"size": 0, "unit": "px"},
+                    "button_padding": {"top": "12", "right": "24", "bottom": "12", "left": "24", "unit": "px"},
+                    "_margin": {"top": "16", "unit": "px"},
+                    "css_classes": "sr-button sr-button--outline"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "featured-products-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {"size": 1200, "unit": "px"},
+        "background_color": "#FFFFFF",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "featured-header",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "featured-subtitle",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "FEATURED",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "typography_text_transform": "uppercase",
+                "align": "center",
+                "_margin": {"bottom": "16", "unit": "px"},
+                "css_classes": "sr-collection-header__subtitle"
+              }
+            },
+            {
+              "id": "featured-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "New Arrivals",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 48, "unit": "px"},
+                "typography_font_size_tablet": {"size": 36, "unit": "px"},
+                "typography_font_size_mobile": {"size": 32, "unit": "px"},
+                "typography_font_weight": "700",
+                "align": "center",
+                "_margin": {"bottom": "48", "unit": "px"},
+                "css_classes": "sr-collection-header__title"
+              }
+            }
+          ]
+        },
+        {
+          "id": "products-grid",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "woocommerce-products",
+              "elType": "widget",
+              "widgetType": "wc-products",
+              "settings": {
+                "rows": 1,
+                "columns": 4,
+                "columns_tablet": 2,
+                "columns_mobile": 1,
+                "posts_per_page": 4,
+                "query_filter": "featured",
+                "show_result_count": "no",
+                "show_catalog_ordering": "no",
+                "image_hover_animation": "grow",
+                "css_classes": "sr-product-card"
+              }
+            }
+          ]
+        },
+        {
+          "id": "view-all-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "view-all-button",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "VIEW ALL PRODUCTS",
+                "link": {"url": "/shop"},
+                "align": "center",
+                "background_color": "#0D0D0D",
+                "button_text_color": "#F5F5F0",
+                "border_border": "solid",
+                "border_width": {"top": "2", "right": "2", "bottom": "2", "left": "2", "unit": "px"},
+                "border_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "border_radius": {"size": 0, "unit": "px"},
+                "button_padding": {"top": "16", "right": "32", "bottom": "16", "left": "32", "unit": "px"},
+                "_margin": {"top": "48", "unit": "px"},
+                "hover_background_color": "transparent",
+                "button_hover_color": "#0D0D0D",
+                "css_classes": "sr-button"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "about-section",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "100", "bottom": "100", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "about-content",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100,
+            "content_position": "center"
+          },
+          "elements": [
+            {
+              "id": "about-subtitle",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "OAKLAND, CALIFORNIA",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "typography_text_transform": "uppercase",
+                "align": "center",
+                "_margin": {"bottom": "16", "unit": "px"}
+              }
+            },
+            {
+              "id": "about-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "The SkyyRose Story",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 48, "unit": "px"},
+                "typography_font_size_tablet": {"size": 36, "unit": "px"},
+                "typography_font_size_mobile": {"size": 32, "unit": "px"},
+                "typography_font_weight": "700",
+                "align": "center",
+                "_margin": {"bottom": "24", "unit": "px"}
+              }
+            },
+            {
+              "id": "about-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #F5F5F0; font-family: 'Montserrat', sans-serif; font-size: 16px; line-height: 1.8; max-width: 700px; margin: 0 auto;\">Luxury, not loud. Bay Area pride without the slang. Every piece carries emotional depth — 'Love Hurts' isn't just a collection name, it's a tribute to the Hurts family legacy woven into every stitch. Gender-neutral pieces designed for those who appreciate understated elegance.</p>",
+                "_margin": {"bottom": "32", "unit": "px"}
+              }
+            },
+            {
+              "id": "about-cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "OUR STORY",
+                "link": {"url": "/about"},
+                "align": "center",
+                "background_color": "transparent",
+                "button_text_color": "#F5F5F0",
+                "border_border": "solid",
+                "border_width": {"top": "2", "right": "2", "bottom": "2", "left": "2", "unit": "px"},
+                "border_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "border_radius": {"size": 0, "unit": "px"},
+                "button_padding": {"top": "16", "right": "32", "bottom": "16", "left": "32", "unit": "px"},
+                "hover_background_color": "#F5F5F0",
+                "button_hover_color": "#0D0D0D",
+                "css_classes": "sr-button sr-button--outline"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "newsletter-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {"size": 1200, "unit": "px"},
+        "background_color": "#F5F5F0",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "newsletter-content",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "newsletter-subtitle",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "STAY CONNECTED",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "500",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "typography_text_transform": "uppercase",
+                "align": "center",
+                "_margin": {"bottom": "16", "unit": "px"}
+              }
+            },
+            {
+              "id": "newsletter-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Join the Rose Garden",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "typography_font_size_mobile": {"size": 28, "unit": "px"},
+                "typography_font_weight": "700",
+                "align": "center",
+                "_margin": {"bottom": "16", "unit": "px"}
+              }
+            },
+            {
+              "id": "newsletter-desc",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; font-family: 'Montserrat', sans-serif; font-size: 14px; color: #4A4A4A; max-width: 500px; margin: 0 auto 32px auto;\">Be first to know about new collections and exclusive offers.</p>"
+              }
+            },
+            {
+              "id": "newsletter-form",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_name": "Newsletter",
+                "form_fields": [
+                  {
+                    "field_type": "email",
+                    "field_label": "Email",
+                    "placeholder": "Enter your email",
+                    "required": "true",
+                    "width": "75"
+                  },
+                  {
+                    "field_type": "submit",
+                    "button_text": "SUBSCRIBE",
+                    "width": "25"
+                  }
+                ],
+                "button_background_color": "#0D0D0D",
+                "button_text_color": "#F5F5F0",
+                "button_typography_typography": "custom",
+                "button_typography_font_family": "Montserrat",
+                "button_typography_font_size": {"size": 12, "unit": "px"},
+                "button_typography_font_weight": "500",
+                "button_typography_letter_spacing": {"size": 2, "unit": "px"},
+                "button_border_radius": {"size": 0, "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "tagline": "Where Love Meets Luxury",
+    "location": "Oakland, California",
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79",
+      "ember": "#E85D04",
+      "slate": "#4A4A4A",
+      "fog": "#E8E8E8"
+    },
+    "typography": {
+      "headline": "Playfair Display, 700",
+      "body": "Montserrat, 400/500"
+    },
+    "css_classes_used": [
+      "sr-hero",
+      "sr-headline",
+      "sr-subheadline",
+      "sr-body",
+      "sr-button",
+      "sr-button--outline",
+      "sr-collection-header__subtitle",
+      "sr-collection-header__title",
+      "sr-product-card",
+      "sr-product-card__image",
+      "sr-py-xl"
+    ]
+  }
+}

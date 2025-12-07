@@ -1,0 +1,47 @@
+# DevSkyy Platform - Kustomize Base Configuration
+# This ties all base resources together
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: devskyy
+
+# Common labels applied to all resources
+commonLabels:
+  app.kubernetes.io/name: devskyy
+  app.kubernetes.io/version: "5.1.0"
+  app.kubernetes.io/managed-by: kustomize
+
+# Resources
+resources:
+- namespace.yaml
+- secrets.yaml
+- configmap.yaml
+- rbac.yaml
+- pvc.yaml
+- deployment.yaml
+- service.yaml
+- ingress.yaml
+- hpa.yaml
+- postgres.yaml
+- redis.yaml
+
+# Images (can be overridden in overlays)
+images:
+- name: devskyy
+  newName: devskyy
+  newTag: production
+
+# ConfigMap generator (optional)
+configMapGenerator:
+- name: build-info
+  literals:
+  - BUILD_DATE=2025-11-18
+  - GIT_COMMIT=8a65461
+  - VERSION=5.1.0
+  - BRANCH=claude/auth-encryption-endpoints-0125XTLJHsndPVRVLVANDnHu
+
+# Secret generator (for sealed secrets)
+# secretGenerator:
+# - name: devskyy-secrets
+#   envs:
+#   - secrets.env

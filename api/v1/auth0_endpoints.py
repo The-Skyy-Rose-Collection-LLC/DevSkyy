@@ -2,7 +2,7 @@ from datetime import timedelta
 import json
 import logging
 import os
-from typing import Any, Optional
+from typing import Any
 
 from authlib.common.security import generate_token
 from fastapi import APIRouter, HTTPException, Query, Request, status
@@ -37,32 +37,39 @@ API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 # REQUEST/RESPONSE MODELS
 # ============================================================================
 
+
 class Auth0LoginResponse(BaseModel):
     """Auth0 login response model."""
+
     authorization_url: str
     state: str
 
+
 class Auth0TokenResponse(BaseModel):
     """Auth0 token response model."""
+
     access_token: str
     refresh_token: str
     token_type: str = "bearer"
     expires_in: int
     user_info: dict[str, Any]
 
+
 class Auth0LogoutResponse(BaseModel):
     """Auth0 logout response model."""
+
     logout_url: str
     message: str
+
 
 # ============================================================================
 # AUTH0 AUTHENTICATION ENDPOINTS
 # ============================================================================
 
+
 @router.get("/login", response_model=Auth0LoginResponse)
 async def auth0_login(
-    request: Request,
-    redirect_uri: Optional[str] = Query(None, description="Custom redirect URI after login")
+    request: Request, redirect_uri: str | None = Query(None, description="Custom redirect URI after login")
 ):
     """
     Initiate Auth0 login flow.
@@ -79,43 +86,33 @@ async def auth0_login(
             redirect_uri = f"{API_BASE_URL}/api/v1/auth0/callback"
 
         # Generate authorization URL
-        authorization_url = auth0_oauth_client.get_authorization_url(
-            redirect_uri=redirect_uri,
-            state=state
-        )
+        authorization_url = auth0_oauth_client.get_authorization_url(redirect_uri=redirect_uri, state=state)
 
         # Log authentication attempt
         await log_auth_event(
-            event_type="auth0_login_initiated",
-            request=request,
-            details={"redirect_uri": redirect_uri, "state": state}
+            event_type="auth0_login_initiated", request=request, details={"redirect_uri": redirect_uri, "state": state}
         )
 
         # For API usage, return the URL
         if request.headers.get("accept") == "application/json":
-            return Auth0LoginResponse(
-                authorization_url=authorization_url,
-                state=state
-            )
+            return Auth0LoginResponse(authorization_url=authorization_url, state=state)
 
         # For browser usage, redirect directly
         return RedirectResponse(url=authorization_url, status_code=302)
 
     except Exception as e:
         logger.error(f"Auth0 login initiation failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to initiate Auth0 login"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to initiate Auth0 login")
+
 
 @router.get("/callback", response_model=Auth0TokenResponse)
 @router.post("/callback", response_model=Auth0TokenResponse)
 async def auth0_callback(
     request: Request,
-    code: Optional[str] = Query(None, description="Authorization code from Auth0"),
-    state: Optional[str] = Query(None, description="State parameter for CSRF protection"),
-    error: Optional[str] = Query(None, description="Error from Auth0"),
-    error_description: Optional[str] = Query(None, description="Error description from Auth0")
+    code: str | None = Query(None, description="Authorization code from Auth0"),
+    state: str | None = Query(None, description="State parameter for CSRF protection"),
+    error: str | None = Query(None, description="Error from Auth0"),
+    error_description: str | None = Query(None, description="Error description from Auth0"),
 ):
     """
     Handle Auth0 callback and exchange code for tokens.
@@ -129,35 +126,26 @@ async def auth0_callback(
             await log_auth_event(
                 event_type="auth0_callback_error",
                 request=request,
-                details={"error": error, "error_description": error_description}
+                details={"error": error, "error_description": error_description},
             )
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"Auth0 authentication failed: {error_description or error}"
+                detail=f"Auth0 authentication failed: {error_description or error}",
             )
 
         # Validate required parameters
         if not code:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Authorization code is required"
-            )
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Authorization code is required")
 
         # Exchange code for tokens
         redirect_uri = f"{API_BASE_URL}/api/v1/auth0/callback"
-        token_data = await auth0_oauth_client.exchange_code_for_token(
-            code=code,
-            redirect_uri=redirect_uri
-        )
+        token_data = await auth0_oauth_client.exchange_code_for_token(code=code, redirect_uri=redirect_uri)
 
         # Get user information from Auth0
         user_info = await auth0_oauth_client.get_user_info(token_data["access_token"])
 
         # Create DevSkyy JWT tokens for compatibility
-        access_token = create_devskyy_jwt_token(
-            user_data=user_info,
-            expires_delta=timedelta(minutes=30)
-        )
+        access_token = create_devskyy_jwt_token(user_data=user_info, expires_delta=timedelta(minutes=30))
 
         refresh_token = create_devskyy_refresh_token(user_data=user_info)
 
@@ -166,15 +154,12 @@ async def auth0_callback(
             event_type="auth0_login_success",
             user_id=user_info.get("sub"),
             request=request,
-            details={"email": user_info.get("email"), "name": user_info.get("name")}
+            details={"email": user_info.get("email"), "name": user_info.get("name")},
         )
 
         # Prepare response
         response_data = Auth0TokenResponse(
-            access_token=access_token,
-            refresh_token=refresh_token,
-            expires_in=1800,  # 30 minutes
-            user_info=user_info
+            access_token=access_token, refresh_token=refresh_token, expires_in=1800, user_info=user_info  # 30 minutes
         )
 
         # For browser usage, redirect to frontend with tokens
@@ -189,21 +174,16 @@ async def auth0_callback(
         raise
     except Exception as e:
         logger.error(f"Auth0 callback processing failed: {e}")
-        await log_auth_event(
-            event_type="auth0_callback_error",
-            request=request,
-            details={"error": str(e)}
-        )
+        await log_auth_event(event_type="auth0_callback_error", request=request, details={"error": str(e)})
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process Auth0 callback"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to process Auth0 callback"
         )
+
 
 @router.post("/logout", response_model=Auth0LogoutResponse)
 @router.get("/logout", response_model=Auth0LogoutResponse)
 async def auth0_logout(
-    request: Request,
-    return_to: Optional[str] = Query(None, description="URL to return to after logout")
+    request: Request, return_to: str | None = Query(None, description="URL to return to after logout")
 ):
     """
     Handle Auth0 logout.
@@ -220,17 +200,13 @@ async def auth0_logout(
         logout_url = auth0_oauth_client.get_logout_url(return_to=return_to)
 
         # Log logout event
-        await log_auth_event(
-            event_type="auth0_logout",
-            request=request,
-            details={"return_to": return_to}
-        )
+        await log_auth_event(event_type="auth0_logout", request=request, details={"return_to": return_to})
 
         # For API usage, return the logout URL
         if request.headers.get("accept") == "application/json":
             return Auth0LogoutResponse(
                 logout_url=logout_url,
-                message="Logout successful. Please visit the logout_url to complete Auth0 logout."
+                message="Logout successful. Please visit the logout_url to complete Auth0 logout.",
             )
 
         # For browser usage, redirect to Auth0 logout
@@ -238,14 +214,13 @@ async def auth0_logout(
 
     except Exception as e:
         logger.error(f"Auth0 logout failed: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to process logout"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to process logout")
+
 
 # ============================================================================
 # USER INFO ENDPOINT
 # ============================================================================
+
 
 @router.get("/me")
 async def get_current_auth0_user(request: Request):
@@ -259,10 +234,7 @@ async def get_current_auth0_user(request: Request):
         # Extract token from Authorization header
         auth_header = request.headers.get("authorization", "")
         if not auth_header.startswith("Bearer "):
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Authentication token required"
-            )
+            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Authentication token required")
 
         token = auth_header.replace("Bearer ", "")
 
@@ -277,21 +249,20 @@ async def get_current_auth0_user(request: Request):
             "picture": payload.get("picture"),
             "email_verified": payload.get("email_verified"),
             "auth_provider": payload.get("auth_provider"),
-            "token_type": payload.get("token_type")
+            "token_type": payload.get("token_type"),
         }
 
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Failed to get user info: {e}")
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Failed to get user information"
-        )
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to get user information")
+
 
 # ============================================================================
 # DEMO HOME PAGE (Optional - for testing)
 # ============================================================================
+
 
 @router.get("/demo", response_class=HTMLResponse)
 async def auth0_demo_home(request: Request):
@@ -311,7 +282,7 @@ async def auth0_demo_home(request: Request):
                 "name": payload.get("name", "Unknown User"),
                 "email": payload.get("email"),
                 "picture": payload.get("picture"),
-                "userinfo": payload  # For compatibility with original template
+                "userinfo": payload,  # For compatibility with original template
             }
         except Exception as e:
             logger.warning(f"Handled exception: {e}")

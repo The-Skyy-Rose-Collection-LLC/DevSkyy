@@ -1,0 +1,961 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "2.0.0",
+  "metadata": {
+    "name": "DevSkyy Unified MCP/RAG Configuration",
+    "description": "Platform-agnostic configuration for multi-agent orchestration with RAG capabilities",
+    "created": "2025-11-21",
+    "author": "DevSkyy Enterprise",
+    "platform_compatibility": ["anthropic", "openai", "azure", "google", "custom"]
+  },
+
+  "mcp_configuration": {
+    "protocol_version": "1.0.0",
+    "token_optimization": {
+      "enabled": true,
+      "strategy": "on_demand_loading",
+      "baseline_tokens": 150000,
+      "optimized_tokens": 2000,
+      "reduction_ratio": 0.98
+    },
+
+    "tool_definitions": {
+      "code_execution": {
+        "code_analyzer": {
+          "description": "Analyze code for syntax, security, style violations",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "code": {"type": "string", "description": "Source code to analyze"},
+              "language": {"type": "string", "enum": ["python", "javascript", "typescript", "go", "rust"]},
+              "checks": {"type": "array", "items": {"type": "string", "enum": ["syntax", "security", "style", "complexity"]}}
+            },
+            "required": ["code", "language"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "issues": {"type": "array", "items": {"type": "object"}},
+              "severity": {"type": "string", "enum": ["critical", "high", "medium", "low"]},
+              "suggestions": {"type": "array", "items": {"type": "string"}}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "rate_limit": 100
+          }
+        },
+        "code_executor": {
+          "description": "Execute code in sandboxed environment",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "code": {"type": "string"},
+              "language": {"type": "string"},
+              "timeout": {"type": "integer", "default": 30},
+              "memory_limit_mb": {"type": "integer", "default": 512}
+            },
+            "required": ["code", "language"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "stdout": {"type": "string"},
+              "stderr": {"type": "string"},
+              "exit_code": {"type": "integer"},
+              "execution_time": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "sandbox": true,
+            "rate_limit": 50
+          }
+        },
+        "test_runner": {
+          "description": "Run unit tests and generate coverage reports",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "test_path": {"type": "string"},
+              "coverage_threshold": {"type": "number", "default": 90},
+              "framework": {"type": "string", "enum": ["pytest", "jest", "go test", "cargo test"]}
+            },
+            "required": ["test_path", "framework"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "passed": {"type": "integer"},
+              "failed": {"type": "integer"},
+              "coverage_percent": {"type": "number"},
+              "report_path": {"type": "string"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"]
+          }
+        }
+      },
+
+      "file_operations": {
+        "file_reader": {
+          "description": "Read file contents with encoding detection",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "file_path": {"type": "string"},
+              "encoding": {"type": "string", "default": "utf-8"},
+              "max_size_mb": {"type": "integer", "default": 10}
+            },
+            "required": ["file_path"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "content": {"type": "string"},
+              "encoding": {"type": "string"},
+              "size_bytes": {"type": "integer"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer", "ReadOnly"],
+            "path_validation": true
+          }
+        },
+        "file_writer": {
+          "description": "Write content to file with atomic operations",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "file_path": {"type": "string"},
+              "content": {"type": "string"},
+              "encoding": {"type": "string", "default": "utf-8"},
+              "create_dirs": {"type": "boolean", "default": true}
+            },
+            "required": ["file_path", "content"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "success": {"type": "boolean"},
+              "bytes_written": {"type": "integer"},
+              "file_path": {"type": "string"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "path_validation": true,
+            "backup_before_write": true
+          }
+        }
+      },
+
+      "api_interactions": {
+        "http_client": {
+          "description": "Make HTTP requests with retry and circuit breaker",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "url": {"type": "string", "format": "uri"},
+              "method": {"type": "string", "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"]},
+              "headers": {"type": "object"},
+              "body": {"type": ["object", "string"]},
+              "timeout": {"type": "integer", "default": 30},
+              "retry_count": {"type": "integer", "default": 3}
+            },
+            "required": ["url", "method"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "status_code": {"type": "integer"},
+              "headers": {"type": "object"},
+              "body": {"type": ["object", "string"]},
+              "response_time_ms": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer", "APIUser"],
+            "rate_limit": 1000
+          }
+        },
+        "graphql_client": {
+          "description": "Execute GraphQL queries and mutations",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "endpoint": {"type": "string", "format": "uri"},
+              "query": {"type": "string"},
+              "variables": {"type": "object"},
+              "operation_name": {"type": "string"}
+            },
+            "required": ["endpoint", "query"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "data": {"type": "object"},
+              "errors": {"type": "array"},
+              "extensions": {"type": "object"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer", "APIUser"]
+          }
+        }
+      },
+
+      "data_processing": {
+        "document_processor": {
+          "description": "Process documents for RAG (chunking, embedding)",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "text": {"type": "string"},
+              "chunk_size": {"type": "integer", "default": 512},
+              "chunk_overlap": {"type": "integer", "default": 50},
+              "metadata": {"type": "object"}
+            },
+            "required": ["text"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "chunks": {"type": "array", "items": {"type": "string"}},
+              "chunk_count": {"type": "integer"},
+              "metadata": {"type": "array", "items": {"type": "object"}}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"]
+          }
+        },
+        "embedding_generator": {
+          "description": "Generate embeddings for text using specified model",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "text": {"type": ["string", "array"]},
+              "model": {"type": "string", "enum": ["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]},
+              "dimensions": {"type": "integer"}
+            },
+            "required": ["text", "model"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "embeddings": {"type": "array", "items": {"type": "array", "items": {"type": "number"}}},
+              "model": {"type": "string"},
+              "dimensions": {"type": "integer"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "rate_limit": 500
+          }
+        },
+        "vector_search": {
+          "description": "Search vector database for similar documents",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "query_embedding": {"type": "array", "items": {"type": "number"}},
+              "top_k": {"type": "integer", "default": 5},
+              "filters": {"type": "object"},
+              "namespace": {"type": "string"}
+            },
+            "required": ["query_embedding"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "results": {"type": "array", "items": {
+                "type": "object",
+                "properties": {
+                  "id": {"type": "string"},
+                  "score": {"type": "number"},
+                  "metadata": {"type": "object"},
+                  "text": {"type": "string"}
+                }
+              }},
+              "search_time_ms": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer", "APIUser"]
+          }
+        }
+      },
+
+      "media_generation": {
+        "stable_diffusion": {
+          "description": "Generate images using Stable Diffusion",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "prompt": {"type": "string"},
+              "negative_prompt": {"type": "string"},
+              "width": {"type": "integer", "default": 1024},
+              "height": {"type": "integer", "default": 1024},
+              "steps": {"type": "integer", "default": 30},
+              "guidance_scale": {"type": "number", "default": 7.5},
+              "seed": {"type": "integer"}
+            },
+            "required": ["prompt"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "image_url": {"type": "string"},
+              "seed": {"type": "integer"},
+              "generation_time_ms": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "rate_limit": 50,
+            "cost_tracking": true
+          }
+        },
+        "image_upscaler": {
+          "description": "Upscale images using AI",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "image_path": {"type": "string"},
+              "scale_factor": {"type": "integer", "enum": [2, 4], "default": 2},
+              "model": {"type": "string", "enum": ["esrgan", "real-esrgan"], "default": "real-esrgan"}
+            },
+            "required": ["image_path"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "upscaled_image_url": {"type": "string"},
+              "original_size": {"type": "object"},
+              "upscaled_size": {"type": "object"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"]
+          }
+        }
+      },
+
+      "voice_synthesis": {
+        "tts_synthesizer": {
+          "description": "Convert text to speech using neural TTS",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "text": {"type": "string"},
+              "voice": {"type": "string", "enum": ["alloy", "echo", "fable", "onyx", "nova", "shimmer"]},
+              "model": {"type": "string", "enum": ["tts-1", "tts-1-hd"], "default": "tts-1"},
+              "speed": {"type": "number", "default": 1.0, "minimum": 0.25, "maximum": 4.0}
+            },
+            "required": ["text", "voice"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "audio_url": {"type": "string"},
+              "format": {"type": "string"},
+              "duration_seconds": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "rate_limit": 100
+          }
+        },
+        "voice_cloning": {
+          "description": "Clone voice from sample audio",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "sample_audio_path": {"type": "string"},
+              "text": {"type": "string"},
+              "language": {"type": "string", "default": "en"}
+            },
+            "required": ["sample_audio_path", "text"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "cloned_audio_url": {"type": "string"},
+              "similarity_score": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin"],
+            "consent_required": true
+          }
+        }
+      },
+
+      "video_processing": {
+        "runway_video_generator": {
+          "description": "Generate videos using Runway Gen-3",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "prompt": {"type": "string"},
+              "duration": {"type": "integer", "default": 4},
+              "fps": {"type": "integer", "default": 8},
+              "width": {"type": "integer", "default": 1024},
+              "height": {"type": "integer", "default": 576},
+              "style": {"type": "string"}
+            },
+            "required": ["prompt"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "video_url": {"type": "string"},
+              "duration": {"type": "number"},
+              "generation_time_ms": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"],
+            "cost_tracking": true
+          }
+        },
+        "video_upscaler": {
+          "description": "Upscale video resolution",
+          "input_schema": {
+            "type": "object",
+            "properties": {
+              "video_path": {"type": "string"},
+              "target_resolution": {"type": "array", "items": {"type": "integer"}},
+              "model": {"type": "string", "default": "real-esrgan-video"}
+            },
+            "required": ["video_path", "target_resolution"]
+          },
+          "output_schema": {
+            "type": "object",
+            "properties": {
+              "upscaled_video_url": {"type": "string"},
+              "processing_time_ms": {"type": "number"}
+            }
+          },
+          "security": {
+            "requires_auth": true,
+            "allowed_roles": ["SuperAdmin", "Admin", "Developer"]
+          }
+        }
+      }
+    },
+
+    "agents": {
+      "orchestrator": {
+        "name": "MCP Orchestrator",
+        "version": "2.0.0",
+        "description": "Central orchestrator with token optimization and fault tolerance",
+        "capabilities": [
+          "task_coordination",
+          "dependency_resolution",
+          "load_balancing",
+          "circuit_breaking",
+          "health_monitoring",
+          "on_demand_tool_loading"
+        ],
+        "config": {
+          "max_concurrent_tasks": 50,
+          "circuit_breaker": {
+            "failure_threshold": 5,
+            "timeout_seconds": 60,
+            "half_open_timeout": 30
+          },
+          "load_balancing": {
+            "strategy": "round_robin",
+            "max_queue_size": 1000
+          }
+        }
+      },
+
+      "workers": {
+        "professors_of_code": {
+          "name": "Professors of Code",
+          "version": "1.5.0",
+          "description": "Expert code analysis and generation agents",
+          "capabilities": [
+            "code_analysis",
+            "code_generation",
+            "refactoring",
+            "security_scanning",
+            "test_generation",
+            "documentation_generation"
+          ],
+          "tools": [
+            "code_analyzer",
+            "code_executor",
+            "test_runner"
+          ],
+          "priority": "HIGH",
+          "max_concurrent": 10
+        },
+
+        "growth_stack": {
+          "name": "Growth Stack",
+          "version": "1.3.0",
+          "description": "Marketing, analytics, and growth optimization",
+          "capabilities": [
+            "analytics",
+            "seo_optimization",
+            "content_generation",
+            "campaign_management",
+            "ab_testing"
+          ],
+          "tools": [
+            "http_client",
+            "graphql_client",
+            "data_processor"
+          ],
+          "priority": "MEDIUM",
+          "max_concurrent": 5
+        },
+
+        "data_reasoning": {
+          "name": "Data Reasoning Engine",
+          "version": "1.4.0",
+          "description": "Advanced data processing and RAG capabilities",
+          "capabilities": [
+            "document_processing",
+            "embedding_generation",
+            "vector_search",
+            "data_analysis",
+            "rag_retrieval"
+          ],
+          "tools": [
+            "document_processor",
+            "embedding_generator",
+            "vector_search"
+          ],
+          "priority": "HIGH",
+          "max_concurrent": 15
+        },
+
+        "visual_foundry": {
+          "name": "Visual Foundry",
+          "version": "1.6.0",
+          "description": "Image and visual content generation",
+          "capabilities": [
+            "image_generation",
+            "image_upscaling",
+            "style_transfer",
+            "brand_consistency",
+            "fashion_design"
+          ],
+          "tools": [
+            "stable_diffusion",
+            "image_upscaler"
+          ],
+          "priority": "MEDIUM",
+          "max_concurrent": 8
+        },
+
+        "voice_media_video_elite": {
+          "name": "Voice Media Video Elite",
+          "version": "1.7.0",
+          "description": "Audio and video generation and processing",
+          "capabilities": [
+            "text_to_speech",
+            "voice_cloning",
+            "video_generation",
+            "video_upscaling",
+            "audio_processing"
+          ],
+          "tools": [
+            "tts_synthesizer",
+            "voice_cloning",
+            "runway_video_generator",
+            "video_upscaler"
+          ],
+          "priority": "MEDIUM",
+          "max_concurrent": 6
+        }
+      }
+    },
+
+    "orchestration_workflows": {
+      "code_review_workflow": {
+        "description": "Comprehensive code review with analysis and testing",
+        "parallel": false,
+        "steps": [
+          {
+            "step": 1,
+            "agent": "professors_of_code",
+            "tool": "code_analyzer",
+            "input": "${code_review.changed_files}",
+            "output": "analysis_results"
+          },
+          {
+            "step": 2,
+            "agent": "professors_of_code",
+            "tool": "test_runner",
+            "input": "${code_review.test_path}",
+            "output": "test_results"
+          }
+        ]
+      },
+
+      "rag_pipeline": {
+        "description": "Complete RAG pipeline from document to retrieval",
+        "parallel": false,
+        "steps": [
+          {
+            "step": 1,
+            "agent": "data_reasoning",
+            "tool": "document_processor",
+            "input": "${document.text}",
+            "output": "processed_chunks"
+          },
+          {
+            "step": 2,
+            "agent": "data_reasoning",
+            "tool": "embedding_generator",
+            "input": "${processed_chunks.chunks}",
+            "output": "embeddings"
+          },
+          {
+            "step": 3,
+            "agent": "data_reasoning",
+            "tool": "vector_search",
+            "input": "${query.embedding}",
+            "output": "search_results"
+          }
+        ]
+      },
+
+      "content_generation_workflow": {
+        "description": "Generate multimedia content (text, image, video)",
+        "parallel": true,
+        "steps": [
+          {
+            "step": 1,
+            "agent": "growth_stack",
+            "tool": "http_client",
+            "input": "${content.api_request}",
+            "output": "text_content"
+          },
+          {
+            "step": 2,
+            "agent": "visual_foundry",
+            "tool": "stable_diffusion",
+            "input": "${content.image_prompt}",
+            "output": "generated_image"
+          },
+          {
+            "step": 3,
+            "agent": "voice_media_video_elite",
+            "tool": "runway_video_generator",
+            "input": "${content.video_prompt}",
+            "output": "generated_video"
+          }
+        ]
+      },
+
+      "brand_video_pipeline": {
+        "description": "Complete brand video generation pipeline",
+        "parallel": false,
+        "steps": [
+          {
+            "step": 1,
+            "agent": "visual_foundry",
+            "tool": "stable_diffusion",
+            "input": "${brand.image_prompt}",
+            "output": "brand_images"
+          },
+          {
+            "step": 2,
+            "agent": "voice_media_video_elite",
+            "tool": "runway_video_generator",
+            "input": "${brand.video_prompt}",
+            "output": "base_video"
+          },
+          {
+            "step": 3,
+            "agent": "voice_media_video_elite",
+            "tool": "video_upscaler",
+            "input": "${base_video.video_url}",
+            "output": "upscaled_video"
+          },
+          {
+            "step": 4,
+            "agent": "voice_media_video_elite",
+            "tool": "tts_synthesizer",
+            "input": "${brand.voiceover_text}",
+            "output": "voiceover_audio"
+          }
+        ]
+      }
+    }
+  },
+
+  "rag_configuration": {
+    "version": "1.0.0",
+    "embedding": {
+      "model": "text-embedding-3-small",
+      "dimensions": 1536,
+      "batch_size": 100,
+      "cache_embeddings": true
+    },
+
+    "chunking": {
+      "strategy": "recursive",
+      "chunk_size": 512,
+      "chunk_overlap": 50,
+      "separators": ["\n\n", "\n", ". ", " ", ""],
+      "preserve_code_blocks": true
+    },
+
+    "vector_store": {
+      "provider": "pinecone",
+      "index_name": "devskyy-knowledge",
+      "namespace": "default",
+      "metric": "cosine",
+      "dimensions": 1536,
+      "replicas": 2,
+      "shards": 1
+    },
+
+    "retrieval": {
+      "top_k": 5,
+      "min_similarity": 0.7,
+      "reranking": {
+        "enabled": true,
+        "model": "cross-encoder/ms-marco-MiniLM-L-12-v2"
+      },
+      "hybrid_search": {
+        "enabled": true,
+        "keyword_weight": 0.3,
+        "semantic_weight": 0.7
+      }
+    },
+
+    "document_processing": {
+      "supported_formats": ["txt", "md", "pdf", "docx", "html", "json"],
+      "max_file_size_mb": 50,
+      "ocr_enabled": true,
+      "metadata_extraction": true
+    },
+
+    "caching": {
+      "enabled": true,
+      "ttl_seconds": 3600,
+      "max_cache_size_mb": 1000,
+      "eviction_policy": "lru"
+    }
+  },
+
+  "enterprise_configuration": {
+    "security": {
+      "encryption": {
+        "algorithm": "AES-256-GCM",
+        "key_rotation_days": 90,
+        "key_derivation": "PBKDF2",
+        "iterations": 100000
+      },
+
+      "authentication": {
+        "method": "oauth2_jwt",
+        "token_expiry_hours": 1,
+        "refresh_token_expiry_days": 7,
+        "jwt_algorithm": "HS256"
+      },
+
+      "rbac": {
+        "enabled": true,
+        "roles": [
+          {
+            "name": "SuperAdmin",
+            "permissions": ["*"],
+            "description": "Full system access"
+          },
+          {
+            "name": "Admin",
+            "permissions": ["read", "write", "execute", "configure"],
+            "description": "Configuration and user management"
+          },
+          {
+            "name": "Developer",
+            "permissions": ["read", "write", "execute"],
+            "description": "Code access and agent management"
+          },
+          {
+            "name": "APIUser",
+            "permissions": ["read", "execute"],
+            "description": "API access only"
+          },
+          {
+            "name": "ReadOnly",
+            "permissions": ["read"],
+            "description": "Read-only monitoring"
+          }
+        ]
+      },
+
+      "input_validation": {
+        "enabled": true,
+        "schema_validation": "pydantic",
+        "sql_injection_prevention": true,
+        "xss_prevention": true,
+        "path_traversal_prevention": true
+      }
+    },
+
+    "fault_tolerance": {
+      "circuit_breaker": {
+        "enabled": true,
+        "failure_threshold": 5,
+        "timeout_seconds": 60,
+        "half_open_timeout": 30,
+        "monitoring_window": 300
+      },
+
+      "retry_policy": {
+        "enabled": true,
+        "max_retries": 3,
+        "backoff_strategy": "exponential",
+        "initial_delay_ms": 100,
+        "max_delay_ms": 10000,
+        "jitter": true
+      },
+
+      "health_checks": {
+        "enabled": true,
+        "interval_seconds": 30,
+        "timeout_seconds": 10,
+        "unhealthy_threshold": 3,
+        "healthy_threshold": 2
+      }
+    },
+
+    "performance": {
+      "slos": {
+        "p95_latency_ms": 200,
+        "error_rate_percent": 0.5,
+        "uptime_percent": 99.5
+      },
+
+      "load_balancing": {
+        "enabled": true,
+        "strategy": "least_connections",
+        "max_concurrent_per_agent": 10,
+        "queue_timeout_seconds": 30
+      },
+
+      "caching": {
+        "enabled": true,
+        "provider": "redis",
+        "ttl_seconds": 3600,
+        "max_memory_mb": 2048
+      }
+    },
+
+    "monitoring": {
+      "metrics": {
+        "enabled": true,
+        "provider": "prometheus",
+        "export_interval_seconds": 15,
+        "retention_days": 30
+      },
+
+      "logging": {
+        "level": "INFO",
+        "format": "json",
+        "pii_redaction": true,
+        "retention_days": 365
+      },
+
+      "error_ledger": {
+        "enabled": true,
+        "path": "/artifacts/error-ledger-{run_id}.json",
+        "retention_days": 365,
+        "severity_levels": ["CRITICAL", "HIGH", "MEDIUM", "LOW"]
+      },
+
+      "alerts": {
+        "enabled": true,
+        "channels": ["slack", "email", "pagerduty"],
+        "thresholds": {
+          "error_rate": 1.0,
+          "p95_latency_ms": 500,
+          "circuit_breaker_open": 1
+        }
+      }
+    },
+
+    "deployment": {
+      "strategy": "rolling",
+      "max_unavailable": 1,
+      "health_check_grace_period": 30,
+      "rollback_on_failure": true,
+
+      "ci_cd": {
+        "gates": [
+          "code_quality",
+          "type_checking",
+          "security_scan",
+          "test_coverage",
+          "docker_build",
+          "truth_protocol_compliance"
+        ],
+        "coverage_threshold": 90,
+        "pipeline_timeout_minutes": 60
+      }
+    }
+  },
+
+  "platform_mappings": {
+    "anthropic": {
+      "api_version": "2023-06-01",
+      "model_mapping": {
+        "embedding": "voyage-2",
+        "chat": "claude-3-5-sonnet-20241022"
+      },
+      "tool_calling": "native"
+    },
+
+    "openai": {
+      "api_version": "v1",
+      "model_mapping": {
+        "embedding": "text-embedding-3-small",
+        "chat": "gpt-4-turbo-preview"
+      },
+      "tool_calling": "function_calling"
+    },
+
+    "azure": {
+      "api_version": "2024-02-15-preview",
+      "deployment_name": "gpt-4-turbo",
+      "tool_calling": "function_calling"
+    },
+
+    "google": {
+      "api_version": "v1",
+      "model_mapping": {
+        "embedding": "textembedding-gecko@003",
+        "chat": "gemini-pro"
+      },
+      "tool_calling": "function_declarations"
+    }
+  }
+}

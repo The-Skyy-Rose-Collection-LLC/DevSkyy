@@ -49,17 +49,11 @@ def temp_config_path():
     temp_dir = tempfile.mkdtemp()
     config_path = Path(temp_dir) / "monitor.yaml"
 
-    config = {
-        "monitoring": {
-            "watchdog": {
-                "check_interval_seconds": 1,
-                "error_threshold": 3
-            }
-        }
-    }
+    config = {"monitoring": {"watchdog": {"check_interval_seconds": 1, "error_threshold": 3}}}
 
     import yaml
-    with open(config_path, 'w') as f:
+
+    with open(config_path, "w") as f:
         yaml.dump(config, f)
 
     yield str(config_path)
@@ -236,11 +230,7 @@ class TestIncidentLogging:
 
     def test_log_incident(self, watchdog):
         """Test logging incident"""
-        incident = {
-            "type": "test_incident",
-            "agent_name": "test_agent",
-            "timestamp": "2024-01-01T00:00:00"
-        }
+        incident = {"type": "test_incident", "agent_name": "test_agent", "timestamp": "2024-01-01T00:00:00"}
 
         watchdog._log_incident(incident)
 
@@ -254,10 +244,7 @@ class TestOperatorNotification:
     @pytest.mark.asyncio
     async def test_notify_operator_creates_notification_file(self, watchdog):
         """Test that notification creates file"""
-        incident = {
-            "type": "critical_failure",
-            "agent_name": "test_agent"
-        }
+        incident = {"type": "critical_failure", "agent_name": "test_agent"}
 
         await watchdog._notify_operator(incident)
 

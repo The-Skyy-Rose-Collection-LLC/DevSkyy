@@ -10,8 +10,6 @@ Per Truth Protocol:
 
 import base64
 import json
-from datetime import datetime
-from unittest.mock import AsyncMock, patch
 
 from fastapi import status
 from fastapi.testclient import TestClient
@@ -73,10 +71,7 @@ class TestMCPInstallEndpoint:
 
         Per Truth Protocol Rule #1: Verify all functionality
         """
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": sample_api_key}
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -117,13 +112,7 @@ class TestMCPInstallEndpoint:
         """Test MCP install deeplink with custom API URL"""
         custom_url = "https://api.devskyy.com"
 
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={
-                "api_key": sample_api_key,
-                "api_url": custom_url
-            }
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key, "api_url": custom_url})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -136,13 +125,7 @@ class TestMCPInstallEndpoint:
         """Test MCP install deeplink with custom server name"""
         custom_name = "my-devskyy-server"
 
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={
-                "api_key": sample_api_key,
-                "server_name": custom_name
-            }
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key, "server_name": custom_name})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -162,10 +145,7 @@ class TestMCPInstallEndpoint:
 
         Per Truth Protocol Rule #3: Cite standards - RFC 4648 (base64)
         """
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": sample_api_key}
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -188,10 +168,7 @@ class TestMCPInstallEndpoint:
 
     def test_generate_install_deeplink_metadata(self, client, sample_api_key):
         """Test MCP configuration includes proper metadata"""
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": sample_api_key}
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -215,10 +192,7 @@ class TestMCPConfigEndpoint:
 
     def test_get_mcp_config_success(self, client, sample_api_key):
         """Test successful MCP configuration retrieval"""
-        response = client.get(
-            "/api/v1/mcp/config",
-            params={"api_key": sample_api_key}
-        )
+        response = client.get("/api/v1/mcp/config", params={"api_key": sample_api_key})
 
         assert response.status_code == status.HTTP_200_OK
         config = response.json()
@@ -238,12 +212,7 @@ class TestMCPConfigEndpoint:
         custom_name = "devskyy-staging"
 
         response = client.get(
-            "/api/v1/mcp/config",
-            params={
-                "api_key": sample_api_key,
-                "api_url": custom_url,
-                "server_name": custom_name
-            }
+            "/api/v1/mcp/config", params={"api_key": sample_api_key, "api_url": custom_url, "server_name": custom_name}
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -305,11 +274,7 @@ class TestMCPValidateEndpoint:
 
     def test_validate_api_key_success(self, client, auth_headers, sample_api_key):
         """Test successful API key validation"""
-        response = client.post(
-            "/api/v1/mcp/validate",
-            params={"api_key": sample_api_key},
-            headers=auth_headers
-        )
+        response = client.post("/api/v1/mcp/validate", params={"api_key": sample_api_key}, headers=auth_headers)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -344,11 +309,7 @@ class TestMCPValidateEndpoint:
         access_token = create_access_token(data=token_data)
         headers = {"Authorization": f"Bearer {access_token}"}
 
-        response = client.post(
-            "/api/v1/mcp/validate",
-            params={"api_key": sample_api_key},
-            headers=headers
-        )
+        response = client.post("/api/v1/mcp/validate", params={"api_key": sample_api_key}, headers=headers)
 
         # Per Truth Protocol Rule #6: RBAC roles enforced
         assert response.status_code == status.HTTP_403_FORBIDDEN
@@ -357,11 +318,7 @@ class TestMCPValidateEndpoint:
         """Test API key validation with invalid format"""
         short_key = "too_short"
 
-        response = client.post(
-            "/api/v1/mcp/validate",
-            params={"api_key": short_key},
-            headers=auth_headers
-        )
+        response = client.post("/api/v1/mcp/validate", params={"api_key": short_key}, headers=auth_headers)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         data = response.json()
@@ -369,19 +326,13 @@ class TestMCPValidateEndpoint:
 
     def test_validate_api_key_no_auth(self, client, sample_api_key):
         """Test API key validation requires authentication"""
-        response = client.post(
-            "/api/v1/mcp/validate",
-            params={"api_key": sample_api_key}
-        )
+        response = client.post("/api/v1/mcp/validate", params={"api_key": sample_api_key})
 
         assert response.status_code == status.HTTP_401_UNAUTHORIZED
 
     def test_validate_api_key_missing_key(self, client, auth_headers):
         """Test API key validation fails without key parameter"""
-        response = client.post(
-            "/api/v1/mcp/validate",
-            headers=auth_headers
-        )
+        response = client.post("/api/v1/mcp/validate", headers=auth_headers)
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -409,10 +360,7 @@ class TestMCPIntegration:
         assert status_response.json()["status"] == "active"
 
         # Step 2: Generate install deeplink
-        install_response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": sample_api_key}
-        )
+        install_response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key})
         assert install_response.status_code == status.HTTP_200_OK
         install_data = install_response.json()
 
@@ -422,9 +370,7 @@ class TestMCPIntegration:
 
         # Step 3: Validate API key
         validate_response = client.post(
-            "/api/v1/mcp/validate",
-            params={"api_key": sample_api_key},
-            headers=auth_headers
+            "/api/v1/mcp/validate", params={"api_key": sample_api_key}, headers=auth_headers
         )
         assert validate_response.status_code == status.HTTP_200_OK
         assert validate_response.json()["valid"] is True
@@ -432,17 +378,11 @@ class TestMCPIntegration:
     def test_config_consistency(self, client, sample_api_key):
         """Test that /install and /config return consistent configurations"""
         # Get config from /install
-        install_response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": sample_api_key}
-        )
+        install_response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key})
         install_config = install_response.json()["config"]
 
         # Get config from /config
-        config_response = client.get(
-            "/api/v1/mcp/config",
-            params={"api_key": sample_api_key}
-        )
+        config_response = client.get("/api/v1/mcp/config", params={"api_key": sample_api_key})
         config_config = config_response.json()
 
         # Configs should be identical
@@ -463,10 +403,7 @@ class TestMCPSecurity:
 
         Per Truth Protocol Rule #5: No secrets in code
         """
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": sample_api_key}
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key})
 
         # API key should only be in the config, not in logs
         # This is a reminder for manual verification
@@ -507,11 +444,7 @@ class TestMCPSecurity:
             access_token = create_access_token(data=token_data)
             headers = {"Authorization": f"Bearer {access_token}"}
 
-            response = client.post(
-                "/api/v1/mcp/validate",
-                params={"api_key": sample_api_key},
-                headers=headers
-            )
+            response = client.post("/api/v1/mcp/validate", params={"api_key": sample_api_key}, headers=headers)
 
             if should_succeed:
                 assert response.status_code == status.HTTP_200_OK, f"Role {role} should have access"
@@ -529,10 +462,7 @@ class TestMCPEdgeCases:
 
     def test_empty_api_key(self, client):
         """Test with empty API key"""
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": ""}
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": ""})
 
         assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -540,13 +470,7 @@ class TestMCPEdgeCases:
         """Test server name with special characters"""
         special_name = "devskyy-test-123"
 
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={
-                "api_key": sample_api_key,
-                "server_name": special_name
-            }
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key, "server_name": special_name})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -556,10 +480,7 @@ class TestMCPEdgeCases:
         """Test with unusually long API key"""
         long_key = "a" * 1000
 
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={"api_key": long_key}
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": long_key})
 
         # Should still work, just process it
         assert response.status_code == status.HTTP_200_OK
@@ -568,13 +489,7 @@ class TestMCPEdgeCases:
         """Test with invalid URL format"""
         invalid_url = "not-a-valid-url"
 
-        response = client.get(
-            "/api/v1/mcp/install",
-            params={
-                "api_key": sample_api_key,
-                "api_url": invalid_url
-            }
-        )
+        response = client.get("/api/v1/mcp/install", params={"api_key": sample_api_key, "api_url": invalid_url})
 
         # Should still generate config (validation is client-side)
         assert response.status_code == status.HTTP_200_OK
@@ -594,10 +509,7 @@ class TestMultiServerEndpoints:
         """Test adding HuggingFace MCP server"""
         hf_token = "hf_test_token_1234567890abcdef"
 
-        response = client.get(
-            "/api/v1/mcp/servers/huggingface",
-            params={"hf_token": hf_token}
-        )
+        response = client.get("/api/v1/mcp/servers/huggingface", params={"hf_token": hf_token})
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -633,11 +545,7 @@ class TestMultiServerEndpoints:
     def test_add_huggingface_with_devskyy(self, client, sample_api_key):
         """Test adding HuggingFace + DevSkyy together"""
         response = client.get(
-            "/api/v1/mcp/servers/huggingface",
-            params={
-                "hf_token": "hf_test_token",
-                "devskyy_api_key": sample_api_key
-            }
+            "/api/v1/mcp/servers/huggingface", params={"hf_token": "hf_test_token", "devskyy_api_key": sample_api_key}
         )
 
         assert response.status_code == status.HTTP_200_OK
@@ -654,15 +562,10 @@ class TestMultiServerEndpoints:
             "server_name": "custom-http-server",
             "transport": "http",
             "url": "https://example.com/mcp",
-            "headers": {
-                "Authorization": "Bearer custom_token"
-            }
+            "headers": {"Authorization": "Bearer custom_token"},
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/add",
-            json=server_data
-        )
+        response = client.post("/api/v1/mcp/servers/add", json=server_data)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -681,15 +584,10 @@ class TestMultiServerEndpoints:
             "transport": "stdio",
             "command": "node",
             "args": ["./custom-server.js"],
-            "env": {
-                "API_KEY": "test_key"
-            }
+            "env": {"API_KEY": "test_key"},
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/add",
-            json=server_data
-        )
+        response = client.post("/api/v1/mcp/servers/add", json=server_data)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -710,10 +608,7 @@ class TestMultiServerEndpoints:
             # Missing URL
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/add",
-            json=server_data
-        )
+        response = client.post("/api/v1/mcp/servers/add", json=server_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -725,10 +620,7 @@ class TestMultiServerEndpoints:
             # Missing command
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/add",
-            json=server_data
-        )
+        response = client.post("/api/v1/mcp/servers/add", json=server_data)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -742,21 +634,13 @@ class TestMultiServerEndpoints:
                     "server_name": "huggingface",
                     "transport": "http",
                     "url": "https://huggingface.co/mcp",
-                    "headers": {"Authorization": "Bearer hf_token"}
+                    "headers": {"Authorization": "Bearer hf_token"},
                 },
-                {
-                    "server_name": "custom-server",
-                    "transport": "stdio",
-                    "command": "python",
-                    "args": ["server.py"]
-                }
-            ]
+                {"server_name": "custom-server", "transport": "stdio", "command": "python", "args": ["server.py"]},
+            ],
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/multi",
-            json=multi_config
-        )
+        response = client.post("/api/v1/mcp/servers/multi", json=multi_config)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -773,23 +657,12 @@ class TestMultiServerEndpoints:
         multi_config = {
             "include_devskyy": False,
             "servers": [
-                {
-                    "server_name": "server1",
-                    "transport": "http",
-                    "url": "https://server1.com/mcp"
-                },
-                {
-                    "server_name": "server2",
-                    "transport": "http",
-                    "url": "https://server2.com/mcp"
-                }
-            ]
+                {"server_name": "server1", "transport": "http", "url": "https://server1.com/mcp"},
+                {"server_name": "server2", "transport": "http", "url": "https://server2.com/mcp"},
+            ],
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/multi",
-            json=multi_config
-        )
+        response = client.post("/api/v1/mcp/servers/multi", json=multi_config)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -806,13 +679,10 @@ class TestMultiServerEndpoints:
         multi_config = {
             "include_devskyy": True,
             # Missing devskyy_api_key
-            "servers": []
+            "servers": [],
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/multi",
-            json=multi_config
-        )
+        response = client.post("/api/v1/mcp/servers/multi", json=multi_config)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
 
@@ -821,23 +691,12 @@ class TestMultiServerEndpoints:
         multi_config = {
             "include_devskyy": False,
             "servers": [
-                {
-                    "server_name": "duplicate",
-                    "transport": "http",
-                    "url": "https://server1.com/mcp"
-                },
-                {
-                    "server_name": "duplicate",  # Duplicate name
-                    "transport": "http",
-                    "url": "https://server2.com/mcp"
-                }
-            ]
+                {"server_name": "duplicate", "transport": "http", "url": "https://server1.com/mcp"},
+                {"server_name": "duplicate", "transport": "http", "url": "https://server2.com/mcp"},  # Duplicate name
+            ],
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/multi",
-            json=multi_config
-        )
+        response = client.post("/api/v1/mcp/servers/multi", json=multi_config)
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
         assert "Duplicate" in response.json()["detail"]
@@ -856,13 +715,10 @@ class TestTransportTypes:
         server_data = {
             "server_name": "streaming-server",
             "transport": "streamingHttp",
-            "url": "https://streaming.example.com/mcp"
+            "url": "https://streaming.example.com/mcp",
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/add",
-            json=server_data
-        )
+        response = client.post("/api/v1/mcp/servers/add", json=server_data)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
@@ -875,13 +731,10 @@ class TestTransportTypes:
         server_data = {
             "server_name": "json-streaming-server",
             "transport": "streamingHttpJson",
-            "url": "https://json-streaming.example.com/mcp"
+            "url": "https://json-streaming.example.com/mcp",
         }
 
-        response = client.post(
-            "/api/v1/mcp/servers/add",
-            json=server_data
-        )
+        response = client.post("/api/v1/mcp/servers/add", json=server_data)
 
         assert response.status_code == status.HTTP_200_OK
         data = response.json()

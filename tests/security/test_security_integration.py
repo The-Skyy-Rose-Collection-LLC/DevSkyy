@@ -144,9 +144,7 @@ class TestRBAC:
     def test_protected_endpoint_requires_auth(self, client):
         """Test that protected endpoints require authentication"""
         # Try to access agents endpoint without authentication
-        response = client.post(
-            "/api/v1/agents/scanner/execute", json={"parameters": {}}
-        )
+        response = client.post("/api/v1/agents/scanner/execute", json={"parameters": {}})
 
         assert response.status_code == 401  # Unauthorized
 

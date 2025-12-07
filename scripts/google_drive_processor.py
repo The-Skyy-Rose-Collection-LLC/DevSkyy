@@ -10,7 +10,7 @@ import json
 import logging
 from pathlib import Path
 import re
-from typing import Any, Optional
+from typing import Any
 
 from PIL import Image, ImageOps
 import requests
@@ -19,6 +19,7 @@ import requests
 # Setup logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 class SkyRoseGoogleDriveProcessor:
     """
@@ -32,49 +33,99 @@ class SkyRoseGoogleDriveProcessor:
         # Category mapping based on filename patterns
         self.category_patterns = {
             "dresses": [
-                r"dress", r"gown", r"evening", r"cocktail", r"maxi", r"midi", r"mini",
-                r"sundress", r"bodycon", r"a-line", r"wrap", r"shift", r"slip"
+                r"dress",
+                r"gown",
+                r"evening",
+                r"cocktail",
+                r"maxi",
+                r"midi",
+                r"mini",
+                r"sundress",
+                r"bodycon",
+                r"a-line",
+                r"wrap",
+                r"shift",
+                r"slip",
             ],
             "tops": [
-                r"top", r"blouse", r"shirt", r"tee", r"tank", r"camisole", r"crop",
-                r"tunic", r"sweater", r"cardigan", r"blazer", r"jacket"
+                r"top",
+                r"blouse",
+                r"shirt",
+                r"tee",
+                r"tank",
+                r"camisole",
+                r"crop",
+                r"tunic",
+                r"sweater",
+                r"cardigan",
+                r"blazer",
+                r"jacket",
             ],
             "bottoms": [
-                r"pants", r"jeans", r"trousers", r"leggings", r"shorts", r"skirt",
-                r"palazzo", r"wide.leg", r"skinny", r"straight", r"bootcut"
+                r"pants",
+                r"jeans",
+                r"trousers",
+                r"leggings",
+                r"shorts",
+                r"skirt",
+                r"palazzo",
+                r"wide.leg",
+                r"skinny",
+                r"straight",
+                r"bootcut",
             ],
             "accessories": [
-                r"bag", r"purse", r"clutch", r"belt", r"scarf", r"hat", r"jewelry",
-                r"necklace", r"earrings", r"bracelet", r"ring", r"watch", r"sunglasses"
+                r"bag",
+                r"purse",
+                r"clutch",
+                r"belt",
+                r"scarf",
+                r"hat",
+                r"jewelry",
+                r"necklace",
+                r"earrings",
+                r"bracelet",
+                r"ring",
+                r"watch",
+                r"sunglasses",
             ],
             "shoes": [
-                r"shoes", r"heels", r"boots", r"sandals", r"flats", r"sneakers",
-                r"pumps", r"stiletto", r"wedge", r"ankle.boot", r"knee.boot"
+                r"shoes",
+                r"heels",
+                r"boots",
+                r"sandals",
+                r"flats",
+                r"sneakers",
+                r"pumps",
+                r"stiletto",
+                r"wedge",
+                r"ankle.boot",
+                r"knee.boot",
             ],
             "outerwear": [
-                r"coat", r"jacket", r"blazer", r"cardigan", r"vest", r"poncho",
-                r"cape", r"trench", r"puffer", r"bomber", r"denim.jacket"
-            ]
+                r"coat",
+                r"jacket",
+                r"blazer",
+                r"cardigan",
+                r"vest",
+                r"poncho",
+                r"cape",
+                r"trench",
+                r"puffer",
+                r"bomber",
+                r"denim.jacket",
+            ],
         }
 
         # Supported image formats
-        self.supported_formats = {'.jpg', '.jpeg', '.png', '.webp', '.heic', '.bmp', '.tiff'}
+        self.supported_formats = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".bmp", ".tiff"}
 
         # Processing stats
-        self.stats = {
-            "total_downloaded": 0,
-            "total_processed": 0,
-            "categories": {},
-            "errors": []
-        }
+        self.stats = {"total_downloaded": 0, "total_processed": 0, "categories": {}, "errors": []}
 
-    def extract_folder_id(self, drive_url: str) -> Optional[str]:
+    def extract_folder_id(self, drive_url: str) -> str | None:
         """Extract folder ID from Google Drive URL."""
-        patterns = [
-            r'/folders/([a-zA-Z0-9-_]+)',
-            r'id=([a-zA-Z0-9-_]+)',
-            r'folders/([a-zA-Z0-9-_]+)'
-        ]
+        patterns = [r"/folders/([a-zA-Z0-9-_]+)", r"id=([a-zA-Z0-9-_]+)", r"folders/([a-zA-Z0-9-_]+)"]
 
         for pattern in patterns:
             match = re.search(pattern, drive_url)
@@ -130,7 +181,7 @@ class SkyRoseGoogleDriveProcessor:
                 "success": True,
                 "folder_id": folder_id,
                 "instructions": instructions,
-                "message": "Manual download required - see instructions"
+                "message": "Manual download required - see instructions",
             }
 
         except Exception as e:
@@ -148,8 +199,8 @@ class SkyRoseGoogleDriveProcessor:
                     "3. Right-click and select 'Download'",
                     "4. Google Drive will create a ZIP file for download",
                     "5. Save the ZIP file to your computer",
-                    "6. Extract the ZIP file to get individual images"
-                ]
+                    "6. Extract the ZIP file to get individual images",
+                ],
             },
             "method_2_google_drive_api": {
                 "title": "Download via Google Drive API (Advanced)",
@@ -157,8 +208,8 @@ class SkyRoseGoogleDriveProcessor:
                     "1. Enable Google Drive API in Google Cloud Console",
                     "2. Create service account credentials",
                     "3. Share the folder with the service account email",
-                    "4. Use the credentials to download programmatically"
-                ]
+                    "4. Use the credentials to download programmatically",
+                ],
             },
             "method_3_rclone": {
                 "title": "Download via rclone (Command Line)",
@@ -166,10 +217,10 @@ class SkyRoseGoogleDriveProcessor:
                     "1. Install rclone: https://rclone.org/downloads/",
                     "2. Configure Google Drive: rclone config",
                     "3. Download folder: rclone copy 'gdrive:folder_name' ./local_folder",
-                    "4. Replace 'folder_name' with the actual folder name"
-                ]
+                    "4. Replace 'folder_name' with the actual folder name",
+                ],
             },
-            "recommended_approach": "method_1_web_interface"
+            "recommended_approach": "method_1_web_interface",
         }
 
     async def process_local_images(self, source_directory: str) -> dict[str, Any]:
@@ -229,7 +280,7 @@ class SkyRoseGoogleDriveProcessor:
                 "processed_images": processed_images,
                 "stats": self.stats,
                 "summary": summary,
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -249,8 +300,8 @@ class SkyRoseGoogleDriveProcessor:
             # Load and process image
             with Image.open(image_path) as img:
                 # Convert to RGB if necessary
-                if img.mode != 'RGB':
-                    img = img.convert('RGB')
+                if img.mode != "RGB":
+                    img = img.convert("RGB")
 
                 # Resize to 1024x1024 for training
                 img_resized = img.resize((1024, 1024), Image.Resampling.LANCZOS)
@@ -277,12 +328,12 @@ class SkyRoseGoogleDriveProcessor:
                     "file_size": output_path.stat().st_size,
                     "processing_timestamp": datetime.now().isoformat(),
                     "trigger_word": f"skyrose_{category}",
-                    "caption": f"skyrose_{category}, luxury fashion item, high-end design"
+                    "caption": f"skyrose_{category}, luxury fashion item, high-end design",
                 }
 
                 # Save metadata
                 metadata_file = category_dir / f"{output_filename}.json"
-                with open(metadata_file, 'w') as f:
+                with open(metadata_file, "w") as f:
                     json.dump(metadata, f, indent=2)
 
                 return {
@@ -290,15 +341,11 @@ class SkyRoseGoogleDriveProcessor:
                     "original_path": str(image_path),
                     "processed_path": str(output_path),
                     "category": category,
-                    "metadata": metadata
+                    "metadata": metadata,
                 }
 
         except Exception as e:
-            return {
-                "success": False,
-                "error": str(e),
-                "original_path": str(image_path)
-            }
+            return {"success": False, "error": str(e), "original_path": str(image_path)}
 
     def _generate_processing_summary(self, processed_images: list[dict]) -> dict[str, Any]:
         """Generate processing summary."""
@@ -320,7 +367,7 @@ class SkyRoseGoogleDriveProcessor:
             "total_size_mb": round(total_size / (1024 * 1024), 2),
             "categories": categories,
             "processing_date": datetime.now().isoformat(),
-            "ready_for_training": True
+            "ready_for_training": True,
         }
 
     async def upload_to_training_interface(self, processed_data_dir: str) -> dict[str, Any]:
@@ -355,22 +402,19 @@ class SkyRoseGoogleDriveProcessor:
                 # Upload images in batches
                 batch_size = 10
                 for i in range(0, len(image_files), batch_size):
-                    batch = image_files[i:i + batch_size]
+                    batch = image_files[i : i + batch_size]
 
                     # Prepare files for upload
                     files = []
                     for img_file in batch:
-                        files.append(('files', (img_file.name, open(img_file, 'rb'), 'image/jpeg')))
+                        files.append(("files", (img_file.name, open(img_file, "rb"), "image/jpeg")))
 
                     # Upload batch
                     try:
                         response = requests.post(
-                            'http://localhost:8001/upload/batch-images',
+                            "http://localhost:8001/upload/batch-images",
                             files=files,
-                            data={
-                                'category': category_name,
-                                'auto_process': 'true'
-                            }
+                            data={"category": category_name, "auto_process": "true"},
                         )
 
                         # Close file handles
@@ -379,12 +423,14 @@ class SkyRoseGoogleDriveProcessor:
 
                         if response.status_code == 200:
                             result = response.json()
-                            upload_results.append({
-                                "category": category_name,
-                                "batch": i // batch_size + 1,
-                                "uploaded": result.get("uploaded_count", 0),
-                                "failed": result.get("failed_count", 0)
-                            })
+                            upload_results.append(
+                                {
+                                    "category": category_name,
+                                    "batch": i // batch_size + 1,
+                                    "uploaded": result.get("uploaded_count", 0),
+                                    "failed": result.get("failed_count", 0),
+                                }
+                            )
                         else:
                             logger.warning(f"Upload failed for {category_name} batch {i // batch_size + 1}")
 
@@ -395,7 +441,7 @@ class SkyRoseGoogleDriveProcessor:
                 "success": True,
                 "upload_results": upload_results,
                 "total_batches": len(upload_results),
-                "timestamp": datetime.now().isoformat()
+                "timestamp": datetime.now().isoformat(),
             }
 
         except Exception as e:
@@ -406,7 +452,7 @@ class SkyRoseGoogleDriveProcessor:
         """Generate a download script for the user."""
         folder_id = self.extract_folder_id(drive_url)
 
-        script = f'''#!/bin/bash
+        script = f"""#!/bin/bash
 # Skyy Rose Collection Download Script
 # Generated on {datetime.now().isoformat()}
 
@@ -434,7 +480,7 @@ echo "   2. Configure: rclone config"
 echo "   3. Download: rclone copy 'gdrive:Skyy Rose Collection' ./"
 echo ""
 echo "🚀 After download, run: python ../scripts/google_drive_processor.py --process-local ./extracted_images"
-'''
+"""
 
         return script
 

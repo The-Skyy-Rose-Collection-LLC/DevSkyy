@@ -8,14 +8,11 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import os
-import tempfile
-from pathlib import Path
 from unittest.mock import AsyncMock, MagicMock, patch
 
-import pytest
 from fastapi import status
 from fastapi.testclient import TestClient
+import pytest
 
 from main import app
 
@@ -23,6 +20,7 @@ from main import app
 # =============================================================================
 # FIXTURES
 # =============================================================================
+
 
 @pytest.fixture
 def client():
@@ -49,71 +47,81 @@ def mock_rag_service():
         service = MagicMock()
 
         # Mock ingest_text
-        service.ingest_text = AsyncMock(return_value={
-            "total_documents": 10,
-            "added": 5,
-            "chunks_created": 5,
-            "source": "test_source",
-            "ingested_at": "2025-01-12T00:00:00",
-        })
+        service.ingest_text = AsyncMock(
+            return_value={
+                "total_documents": 10,
+                "added": 5,
+                "chunks_created": 5,
+                "source": "test_source",
+                "ingested_at": "2025-01-12T00:00:00",
+            }
+        )
 
         # Mock ingest_document
-        service.ingest_document = AsyncMock(return_value={
-            "total_documents": 15,
-            "added": 5,
-            "chunks_created": 5,
-            "file_path": "/tmp/test.pdf",
-            "file_type": "pdf",
-            "ingested_at": "2025-01-12T00:00:00",
-        })
+        service.ingest_document = AsyncMock(
+            return_value={
+                "total_documents": 15,
+                "added": 5,
+                "chunks_created": 5,
+                "file_path": "/tmp/test.pdf",
+                "file_type": "pdf",
+                "ingested_at": "2025-01-12T00:00:00",
+            }
+        )
 
         # Mock search
-        service.search = AsyncMock(return_value=[
-            {
-                "content": "DevSkyy is a multi-agent AI platform",
-                "metadata": {"source": "test", "page": 1},
-                "similarity": 0.95,
-                "distance": 0.05,
-            },
-            {
-                "content": "It provides 54 specialized agents",
-                "metadata": {"source": "test", "page": 2},
-                "similarity": 0.90,
-                "distance": 0.10,
-            },
-        ])
-
-        # Mock query
-        service.query = AsyncMock(return_value={
-            "answer": "DevSkyy is a multi-agent AI platform with 54 specialized agents.",
-            "sources": [
+        service.search = AsyncMock(
+            return_value=[
                 {
                     "content": "DevSkyy is a multi-agent AI platform",
                     "metadata": {"source": "test", "page": 1},
                     "similarity": 0.95,
                     "distance": 0.05,
                 },
-            ],
-            "context_used": 1,
-            "model": "claude-sonnet-4-5-20250929",
-            "tokens_used": {"input": 100, "output": 50},
-        })
+                {
+                    "content": "It provides 54 specialized agents",
+                    "metadata": {"source": "test", "page": 2},
+                    "similarity": 0.90,
+                    "distance": 0.10,
+                },
+            ]
+        )
+
+        # Mock query
+        service.query = AsyncMock(
+            return_value={
+                "answer": "DevSkyy is a multi-agent AI platform with 54 specialized agents.",
+                "sources": [
+                    {
+                        "content": "DevSkyy is a multi-agent AI platform",
+                        "metadata": {"source": "test", "page": 1},
+                        "similarity": 0.95,
+                        "distance": 0.05,
+                    },
+                ],
+                "context_used": 1,
+                "model": "claude-sonnet-4-5-20250929",
+                "tokens_used": {"input": 100, "output": 50},
+            }
+        )
 
         # Mock get_stats
-        service.get_stats = MagicMock(return_value={
-            "vector_db": {
-                "collection_name": "devskyy_docs",
-                "document_count": 100,
-                "persist_directory": "./data/chroma",
-                "embedding_model": "all-MiniLM-L6-v2",
-            },
-            "config": {
-                "chunk_size": 1000,
-                "chunk_overlap": 200,
-                "top_k": 5,
-                "similarity_threshold": 0.7,
-            },
-        })
+        service.get_stats = MagicMock(
+            return_value={
+                "vector_db": {
+                    "collection_name": "devskyy_docs",
+                    "document_count": 100,
+                    "persist_directory": "./data/chroma",
+                    "embedding_model": "all-MiniLM-L6-v2",
+                },
+                "config": {
+                    "chunk_size": 1000,
+                    "chunk_overlap": 200,
+                    "top_k": 5,
+                    "similarity_threshold": 0.7,
+                },
+            }
+        )
 
         # Mock vector_db
         service.vector_db = MagicMock()
@@ -127,6 +135,7 @@ def mock_rag_service():
 def mock_auth():
     """Mock authentication for testing"""
     with patch("api.v1.rag.get_current_user_with_role") as mock:
+
         def auth_factory(roles):
             def auth_dependency():
                 return {
@@ -134,6 +143,7 @@ def mock_auth():
                     "email": "test@example.com",
                     "role": "SuperAdmin",
                 }
+
             return auth_dependency
 
         mock.side_effect = auth_factory
@@ -143,6 +153,7 @@ def mock_auth():
 # =============================================================================
 # TEST INGEST TEXT ENDPOINT
 # =============================================================================
+
 
 class TestIngestTextEndpoint:
     """Test suite for POST /api/v1/rag/ingest/text"""
@@ -225,6 +236,7 @@ class TestIngestTextEndpoint:
 # TEST INGEST FILE ENDPOINT
 # =============================================================================
 
+
 class TestIngestFileEndpoint:
     """Test suite for POST /api/v1/rag/ingest/file"""
 
@@ -273,6 +285,7 @@ class TestIngestFileEndpoint:
 # =============================================================================
 # TEST SEARCH ENDPOINT
 # =============================================================================
+
 
 class TestSearchEndpoint:
     """Test suite for POST /api/v1/rag/search"""
@@ -348,6 +361,7 @@ class TestSearchEndpoint:
 # TEST QUERY ENDPOINT
 # =============================================================================
 
+
 class TestQueryEndpoint:
     """Test suite for POST /api/v1/rag/query"""
 
@@ -411,6 +425,7 @@ class TestQueryEndpoint:
 # TEST STATS ENDPOINT
 # =============================================================================
 
+
 class TestStatsEndpoint:
     """Test suite for GET /api/v1/rag/stats"""
 
@@ -438,6 +453,7 @@ class TestStatsEndpoint:
 # =============================================================================
 # TEST HEALTH CHECK ENDPOINT
 # =============================================================================
+
 
 class TestHealthCheckEndpoint:
     """Test suite for GET /api/v1/rag/health"""
@@ -473,6 +489,7 @@ class TestHealthCheckEndpoint:
 # TEST RESET ENDPOINT
 # =============================================================================
 
+
 class TestResetEndpoint:
     """Test suite for DELETE /api/v1/rag/reset"""
 
@@ -495,6 +512,7 @@ class TestResetEndpoint:
 # TEST RBAC AUTHORIZATION
 # =============================================================================
 
+
 class TestRBACAuthorization:
     """Test role-based access control for RAG endpoints"""
 
@@ -505,6 +523,7 @@ class TestRBACAuthorization:
             def auth_factory(roles):
                 def auth_dependency():
                     raise HTTPException(status_code=403, detail="Insufficient permissions")
+
                 return auth_dependency
 
             mock_auth.side_effect = auth_factory
@@ -520,10 +539,13 @@ class TestRBACAuthorization:
     def test_search_allows_api_user(self, client, mock_rag_service):
         """Test that search allows APIUser role"""
         with patch("api.v1.rag.get_current_user_with_role") as mock_auth:
+
             def auth_factory(roles):
                 if "APIUser" in roles:
+
                     def auth_dependency():
                         return {"user_id": "api_user", "role": "APIUser"}
+
                     return auth_dependency
                 return None
 
@@ -542,6 +564,7 @@ class TestRBACAuthorization:
 # =============================================================================
 # TEST ERROR HANDLING
 # =============================================================================
+
 
 class TestErrorHandling:
     """Test error handling and edge cases"""
@@ -581,6 +604,7 @@ class TestErrorHandling:
 # =============================================================================
 # TEST INTEGRATION
 # =============================================================================
+
 
 class TestRAGIntegration:
     """Integration tests for RAG workflow"""

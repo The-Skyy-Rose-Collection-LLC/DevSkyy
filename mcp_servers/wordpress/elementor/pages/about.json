@@ -1,0 +1,329 @@
+{
+  "title": "About SkyyRose",
+  "type": "page",
+  "version": "3.33.0",
+  "settings": {
+    "template": "elementor_header_footer",
+    "post_title": "About",
+    "post_status": "publish"
+  },
+  "content": [
+    {
+      "id": "hero-section",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "height": "min-height",
+        "custom_height": {"size": 70, "unit": "vh"},
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "0", "bottom": "0", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "hero-column",
+          "elType": "column",
+          "settings": {
+            "content_position": "center",
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "page-badge",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "OUR STORY",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 6, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "page-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Where Love Meets Luxury",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 56, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "page-subtitle",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Oakland, California",
+                "header_size": "h3",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 18, "unit": "px"},
+                "typography_font_weight": "400",
+                "typography_letter_spacing": {"size": 4, "unit": "px"},
+                "align": "center"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "story-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#F5F5F0",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "story-column",
+          "elType": "column",
+          "settings": {
+            "_column_size": 70,
+            "content_position": "center"
+          },
+          "elements": [
+            {
+              "id": "story-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "THE SKYY ROSE JOURNEY",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 32, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "story-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #4A4A4A; font-family: 'Montserrat', sans-serif; font-size: 17px; line-height: 1.9;\">SkyyRose was born from a vision: to create luxury streetwear that honors its Oakland roots while reaching for global excellence. Every piece in our collection carries the spirit of the Bay Area - bold, authentic, and unapologetically elevated.</p><p style=\"text-align: center; color: #4A4A4A; font-family: 'Montserrat', sans-serif; font-size: 17px; line-height: 1.9; margin-top: 24px;\">Our name is deeply personal. \"Love Hurts\" isn't just a collection - Hurts is our founder's family name. This heritage runs through every stitch, every design decision, and every piece we create. It's fashion with soul, streetwear with substance.</p><p style=\"text-align: center; color: #4A4A4A; font-family: 'Montserrat', sans-serif; font-size: 17px; line-height: 1.9; margin-top: 24px;\">We believe luxury shouldn't be loud. Our pieces speak through quality, craftsmanship, and understated elegance. From Lake Merritt to Grand Avenue, from Piedmont to the Marina - Oakland's landmarks inspire our designs, and its spirit fuels our ambition.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "values-section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#FFFFFF",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "values-header",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "values-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "OUR VALUES",
+                "title_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 32, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center"
+              }
+            }
+          ]
+        },
+        {
+          "id": "value-1",
+          "elType": "column",
+          "settings": {"_column_size": 33},
+          "elements": [
+            {
+              "id": "value-1-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "AUTHENTICITY",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "value-1-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #4A4A4A; font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.8;\">Every design reflects our Oakland heritage. We don't follow trends - we create them with intention and integrity.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "value-2",
+          "elType": "column",
+          "settings": {"_column_size": 33},
+          "elements": [
+            {
+              "id": "value-2-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "QUALITY",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "value-2-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #4A4A4A; font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.8;\">Premium materials, meticulous craftsmanship. Every piece is designed to last and to make a statement.</p>"
+              }
+            }
+          ]
+        },
+        {
+          "id": "value-3",
+          "elType": "column",
+          "settings": {"_column_size": 33},
+          "elements": [
+            {
+              "id": "value-3-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "INCLUSIVITY",
+                "header_size": "h4",
+                "title_color": "#B76E79",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "value-3-text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style=\"text-align: center; color: #4A4A4A; font-family: 'Montserrat', sans-serif; font-size: 14px; line-height: 1.8;\">All pieces are unisex and gender-neutral. Luxury streetwear for everyone who shares our vision.</p>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cta-section",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "background_color": "#0D0D0D",
+        "padding": {"top": "80", "bottom": "80", "unit": "px"}
+      },
+      "elements": [
+        {
+          "id": "cta-column",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "cta-title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "JOIN THE ROSE GARDEN",
+                "title_color": "#F5F5F0",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "typography_font_weight": "700",
+                "typography_letter_spacing": {"size": 2, "unit": "px"},
+                "align": "center"
+              }
+            },
+            {
+              "id": "cta-button",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "EXPLORE COLLECTIONS",
+                "link": {"url": "/shop"},
+                "align": "center",
+                "background_color": "#B76E79",
+                "button_text_color": "#0D0D0D",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "typography_font_size": {"size": 14, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"},
+                "border_radius": {"size": 0, "unit": "px"},
+                "button_padding": {"top": "18", "right": "48", "bottom": "18", "left": "48", "unit": "px"}
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "metadata": {
+    "brand": "SkyyRose",
+    "domain": "skyyrose.co",
+    "page_type": "about",
+    "generated_by": "DevSkyy MCP Frontend",
+    "version": "2.1.0",
+    "generated_at": "2025-12-05",
+    "spec_source": "WORDPRESS_GUIDE.md + manifest.json + skyyrose-custom.css",
+    "brand_colors": {
+      "obsidian": "#0D0D0D",
+      "ivory": "#F5F5F0",
+      "rose_gold": "#B76E79",
+      "ember": "#E85D04",
+      "slate": "#4A4A4A"
+    },
+    "typography": {
+      "headline": "Playfair Display, 700",
+      "body": "Montserrat, 400/500"
+    },
+    "brand_voice": {
+      "tone": "Luxury, not loud",
+      "positioning": "Bay Area pride without slang",
+      "audience": "Gender-neutral, unisex"
+    }
+  }
+}
