@@ -33,22 +33,16 @@ Author: DevSkyy Enterprise Team
 License: Proprietary
 """
 
-import os
-import json
-import asyncio
 import hashlib
+import json
 import logging
-from abc import ABC, abstractmethod
+import os
+import uuid
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import (
-    Any, Callable, Dict, List, Optional, 
-    Tuple, TypeVar, Union, AsyncGenerator
-)
-from functools import lru_cache
-import uuid
+from typing import Any, Dict, List, Optional
 
 # =============================================================================
 # CONFIGURATION
@@ -320,6 +314,7 @@ class EmbeddingEngine:
         class FallbackModel:
             def encode(self, texts, **kwargs):
                 import hashlib
+
                 import numpy as np
                 embeddings = []
                 for text in texts if isinstance(texts, list) else [texts]:
@@ -1293,3 +1288,4 @@ For FastAPI integration:
                 print(f"   {key}: {value}")
         
         print("\n✅ RAG/MCP Hybrid System ready!")
+

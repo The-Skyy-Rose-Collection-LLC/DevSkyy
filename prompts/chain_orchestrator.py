@@ -12,13 +12,12 @@ Workflow Types:
 - Loop: A → B → (repeat if condition) → C
 """
 
-import asyncio
 import json
 import logging
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional
 
 from .base_system_prompt import BaseAgentSystemPrompt
 from .technique_engine import PromptTechniqueEngine
@@ -476,22 +475,22 @@ Your output will be passed to subsequent steps in the chain. Ensure:
 
 ### Output Schema
 ```json
-{
+{{
     "step_id": "{step_id}",
     "agent": "{agent_name}",
     "status": "success" | "error",
-    "output": {
+    "output": {{
         // Your step-specific output
-    },
-    "metadata": {
+    }},
+    "metadata": {{
         "timestamp": "ISO 8601",
         "execution_time_ms": number,
         "confidence": number | null
-    },
-    "for_next_step": {
+    }},
+    "for_next_step": {{
         // Data specifically prepared for the next step
-    }
-}
+    }}
+}}
 ```
 
 ---
@@ -789,3 +788,4 @@ __all__ = [
     "create_chain_orchestrator",
     "create_sequential_workflow",
 ]
+

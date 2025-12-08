@@ -14,7 +14,7 @@ Based on: Anthropic COSTARD Framework + OpenAI Six-Strategy + Constitutional AI
 """
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional
@@ -675,3 +675,4 @@ __all__ = [
     "create_base_prompt_generator",
     "generate_agent_system_prompt",
 ]
+

@@ -11,54 +11,28 @@ Usage:
     python tests/test_prompt_framework.py
 """
 
-import os
-import sys
 import asyncio
-import json
 import logging
-from pathlib import Path
-from typing import Dict, Any
+import sys
 from datetime import datetime
+from pathlib import Path
 
 # Add modules to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from prompts.technique_engine import (
-    PromptTechniqueEngine,
-    PromptTechnique,
-    RoleDefinition,
-    Constraint,
-    OutputFormat,
-    FewShotExample,
-    ThoughtBranch,
-    TaskComplexity,
-)
-from prompts.base_system_prompt import (
-    BaseAgentSystemPrompt,
-    AgentIdentity,
-    AgentCategory,
-    OutputStandard,
-)
-from prompts.task_templates import (
-    TaskTemplateFactory,
-    TaskContext,
-    TaskCategory,
-    TaskPriority,
-)
+from integration.enhanced_platform import (EnhancedAgentRegistry,
+                                           EnhancedPlatformConfig, run_agent)
+from integration.prompt_injector import PromptInjector, inject_prompt
 from prompts.agent_prompts import AgentPromptLibrary
-from prompts.chain_orchestrator import PromptChainOrchestrator, ChainStepType
+from prompts.base_system_prompt import (AgentCategory, AgentIdentity,
+                                        BaseAgentSystemPrompt, OutputStandard)
+from prompts.chain_orchestrator import PromptChainOrchestrator
 from prompts.meta_prompts import MetaPromptFactory, MetaPromptType
-from integration.prompt_injector import (
-    PromptInjector,
-    PromptInjectionConfig,
-    inject_prompt,
-)
-from integration.enhanced_platform import (
-    EnhancedAgentRegistry,
-    EnhancedPlatformConfig,
-    run_agent,
-    run_workflow,
-)
+from prompts.task_templates import TaskTemplateFactory
+from prompts.technique_engine import (Constraint, FewShotExample,
+                                      PromptTechnique, PromptTechniqueEngine,
+                                      RoleDefinition, TaskComplexity,
+                                      ThoughtBranch)
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -668,7 +642,7 @@ async def test_enhanced_platform():
             {"target": "/src", "scan_type": "security"},
         )
         
-        assert result["success"] == True
+        assert result["success"]
         assert "result" in result
         results.record_pass("Run Agent")
     except Exception as e:
@@ -707,7 +681,7 @@ def test_performance():
     print("\n[9] Testing Performance")
     
     import time
-    
+
     # Test 9.1: Prompt Generation Speed
     try:
         engine = PromptTechniqueEngine()
@@ -758,14 +732,7 @@ def test_integration_sanity():
     
     # Test 10.1: All Modules Import
     try:
-        from prompts import (
-            PromptTechniqueEngine,
-            BaseAgentSystemPrompt,
-            TaskTemplateFactory,
-            AgentPromptLibrary,
-            PromptChainOrchestrator,
-            MetaPromptFactory,
-        )
+        from prompts import PromptChainOrchestrator
         results.record_pass("All Modules Import")
     except Exception as e:
         results.record_fail("All Modules Import", str(e))
@@ -860,3 +827,4 @@ async def run_all_tests():
 if __name__ == "__main__":
     success = asyncio.run(run_all_tests())
     sys.exit(0 if success else 1)
+

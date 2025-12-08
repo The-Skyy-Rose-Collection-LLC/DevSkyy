@@ -4,27 +4,23 @@ Professional implementation with proper security practices
 Save this file as: sqlite_auth_system.py
 """
 
-import sqlite3
-import hashlib
-import secrets
-import json
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any, List, Tuple
-from dataclasses import dataclass
-import re
-import os
-
 # For async support
 import asyncio
-import aiosqlite
+import json
+import os
+import re
+import secrets
+import sqlite3
+from dataclasses import dataclass
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional, Tuple
 
 # For password hashing (install: pip install bcrypt argon2-cffi)
 import bcrypt
-from argon2 import PasswordHasher
-from argon2.exceptions import VerifyMismatchError
-
 # For JWT tokens (install: pip install pyjwt)
 import jwt
+from argon2 import PasswordHasher
+from argon2.exceptions import VerifyMismatchError
 
 # ===========================
 # Configuration
@@ -1088,3 +1084,4 @@ if __name__ == "__main__":
     print("\n" + "="*50)
     print("Running async example...")
     asyncio.run(async_example())
+
