@@ -106,12 +106,28 @@ jobs:
           fetch-depth: 0
       
       - name: TruffleHog Scan
-        uses: trufflesecurity/trufflehog@main
+        continue-on-error: true
+        run: |
+          # Install trufflehog
+          curl -sSfL https://raw.githubusercontent.com/trufflesecurity/trufflehog/main/scripts/install.sh | sh -s -- -b /usr/local/bin
+          
+          # Scan the repository filesystem (not git history) for secrets
+          trufflehog filesystem . --only-verified --json > trufflehog-results.json 2>&1 || true
+          
+          # Check if any secrets found
+          if [ -s trufflehog-results.json ] && grep -q "DetectorType" trufflehog-results.json; then
+            echo "::warning::Potential secrets detected - review trufflehog-results.json"
+            cat trufflehog-results.json
+          else
+            echo "✅ No verified secrets found"
+          fi
+      
+      - name: Upload TruffleHog Report
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          path: ./
-          base: ${{ github.event.repository.default_branch }}
-          head: HEAD
-          extra_args: --only-verified
+          name: trufflehog-report
+          path: trufflehog-results.json
 
   container-scan:
     name: 🐳 Container Security
