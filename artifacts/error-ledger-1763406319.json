@@ -1,7 +1,0 @@
-{
-  "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
-  "phase": "initialization",
-  "errors": [],
-  "warnings": [],
-  "metrics": {}
-}
