@@ -21,7 +21,7 @@ jobs:
     name: 📦 Dependency Audit
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - uses: actions/setup-python@v5
         with:
@@ -52,7 +52,7 @@ jobs:
     name: 🐍 Python SAST (Bandit)
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - uses: actions/setup-python@v5
         with:
@@ -81,7 +81,7 @@ jobs:
     container:
       image: returntocorp/semgrep-agent:v1
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Run Semgrep
         run: |
@@ -101,7 +101,7 @@ jobs:
     name: 🔑 Secrets Detection
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           fetch-depth: 0
       
@@ -118,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name != 'pull_request'
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       
       - name: Build test image
         run: |
