@@ -27,70 +27,26 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import os
-import sys
 import asyncio
 import json
-import hashlib
 import logging
+import sys
 from abc import ABC, abstractmethod
-from datetime import datetime, timedelta
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union, Type
-from dataclasses import dataclass, field
-from enum import Enum
-from functools import lru_cache, wraps
+from dataclasses import dataclass
+from datetime import datetime
 from pathlib import Path
+from typing import Any, Dict, List, Optional, Type
 
 # Add parent modules to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from integration.prompt_injector import (PromptCacheStrategy,
+                                         PromptInjectionConfig,
+                                         PromptInjectionMode, PromptInjector)
 # Import prompt engineering modules
-from prompts.technique_engine import (
-    PromptTechniqueEngine,
-    PromptTechnique,
-    RoleDefinition,
-    Constraint,
-    OutputFormat,
-    FewShotExample,
-    ThoughtBranch,
-    ReActStep,
-)
-from prompts.base_system_prompt import (
-    BaseAgentSystemPrompt,
-    AgentIdentity,
-    AgentCategory,
-    OutputStandard,
-    BehavioralDirective,
-)
-from prompts.task_templates import (
-    TaskTemplateFactory,
-    TaskContext,
-    TaskCategory,
-    TaskPriority,
-)
-from prompts.agent_prompts import (
-    AgentPromptLibrary,
-    AgentPromptConfig,
-)
-from prompts.chain_orchestrator import (
-    PromptChainOrchestrator,
-    WorkflowDefinition,
-    ChainStep,
-    ChainStepType,
-    ChainResult,
-)
-from prompts.meta_prompts import (
-    MetaPromptFactory,
-    MetaPromptType,
-)
-from integration.prompt_injector import (
-    PromptInjector,
-    PromptInjectionConfig,
-    PromptInjectionMode,
-    PromptCacheStrategy,
-    inject_prompt,
-    with_prompt_injection,
-)
+from prompts.base_system_prompt import AgentCategory
+from prompts.chain_orchestrator import PromptChainOrchestrator
+from prompts.task_templates import TaskPriority
 
 logger = logging.getLogger(__name__)
 
@@ -393,7 +349,7 @@ class FixerAgent(EnhancedBaseAgent):
     
     async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute bug fix with multiple approach exploration."""
-        context = task.get("context", {})
+        task.get("context", {})
         
         return {
             "issue_analyzed": True,
@@ -454,7 +410,7 @@ class ClaudeAIAgent(EnhancedBaseAgent):
     
     async def execute(self, task: Dict[str, Any]) -> Dict[str, Any]:
         """Execute Claude API call with safety constraints."""
-        context = task.get("context", {})
+        task.get("context", {})
         
         return {
             "model_used": "claude-sonnet-4-20250514",
@@ -1003,3 +959,4 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
+

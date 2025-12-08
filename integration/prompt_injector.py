@@ -30,59 +30,29 @@ Version: 1.0.0
 Python: 3.11+
 """
 
-import os
-import sys
-import json
-import asyncio
 import hashlib
+import json
 import logging
-from typing import Any, Callable, Dict, List, Optional, Set, Tuple, Union
-from dataclasses import dataclass, field
+import sys
+from dataclasses import dataclass
 from datetime import datetime
 from enum import Enum
-from functools import lru_cache, wraps
+from functools import wraps
 from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional
 
 # Add prompts module to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from prompts.technique_engine import (
-    PromptTechniqueEngine,
-    PromptTechnique,
-    RoleDefinition,
-    Constraint,
-    OutputFormat,
-    FewShotExample,
-    ThoughtBranch,
-    ReActStep,
-)
-from prompts.base_system_prompt import (
-    BaseAgentSystemPrompt,
-    AgentIdentity,
-    AgentCategory,
-    OutputStandard,
-    BehavioralDirective,
-)
-from prompts.task_templates import (
-    TaskTemplateFactory,
-    TaskContext,
-    TaskCategory,
-    TaskPriority,
-)
-from prompts.agent_prompts import (
-    AgentPromptLibrary,
-    AgentPromptConfig,
-)
-from prompts.chain_orchestrator import (
-    PromptChainOrchestrator,
-    WorkflowDefinition,
-    ChainStep,
-    ChainStepType,
-)
-from prompts.meta_prompts import (
-    MetaPromptFactory,
-    MetaPromptType,
-)
+from prompts.agent_prompts import AgentPromptLibrary
+from prompts.base_system_prompt import AgentCategory, OutputStandard
+from prompts.chain_orchestrator import PromptChainOrchestrator
+from prompts.meta_prompts import MetaPromptFactory, MetaPromptType
+from prompts.task_templates import (TaskCategory, TaskContext, TaskPriority,
+                                    TaskTemplateFactory)
+from prompts.technique_engine import (Constraint, OutputFormat,
+                                      PromptTechnique, PromptTechniqueEngine,
+                                      RoleDefinition)
 
 logger = logging.getLogger(__name__)
 
@@ -1163,3 +1133,4 @@ if __name__ == "__main__":
     print("METRICS")
     print("=" * 80)
     print(json.dumps(injector.get_metrics(), indent=2))
+

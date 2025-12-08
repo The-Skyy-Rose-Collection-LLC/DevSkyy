@@ -14,15 +14,13 @@ from __future__ import annotations
 import os
 import sys
 from datetime import datetime, timezone
-from typing import Any
-
-# Serverless adapter
-from mangum import Mangum
 
 # FastAPI
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, RedirectResponse
+# Serverless adapter
+from mangum import Mangum
 from pydantic import BaseModel
 
 # =============================================================================
@@ -450,3 +448,4 @@ handler = Mangum(app, lifespan="off")
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
+

@@ -4,40 +4,33 @@ This is a consolidated, runnable version that you can copy and use immediately
 Save this file as: devskyy_platform.py
 """
 
-import os
-import sys
 import asyncio
-import time
+import os
 import secrets
-import json
-import hashlib
-import hmac
-from datetime import datetime, timedelta, timezone
-from typing import Optional, Dict, Any, List, Union, Tuple
-from dataclasses import dataclass, field
-from enum import Enum
-from pathlib import Path
+from datetime import datetime, timedelta
+from typing import Any, Dict, List, Optional
+
+import jwt
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.ciphers.aead import AESGCM
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
+from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.context import CryptContext
+from pydantic import BaseModel, EmailStr, Field
+from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String
+from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
+                                    create_async_engine)
+from sqlalchemy.orm import declarative_base
 
 # =======================
 # INSTALL REQUIREMENTS:
 # pip install fastapi uvicorn sqlalchemy aiosqlite pydantic python-jose[cryptography] passlib[bcrypt] python-multipart email-validator cryptography prometheus-client structlog aiofiles jinja2 pillow
 # =======================
 
-from fastapi import FastAPI, HTTPException, Depends, Request, Response, status, BackgroundTasks, File, UploadFile
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import JSONResponse, FileResponse
-from pydantic import BaseModel, Field, EmailStr, validator
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker
-from sqlalchemy.orm import declarative_base
-from sqlalchemy import Column, String, Integer, Float, Boolean, DateTime, Text, JSON, select
-from passlib.context import CryptContext
-import jwt
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.backends import default_backend
 
 # ===========================
 # Configuration
@@ -795,7 +788,7 @@ async def get_metrics(current_user: Dict = Depends(get_current_user)):
 # ===========================
 
 if __name__ == "__main__":
-    print(f"""
+    print("""
     â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
     â•‘           DevSkyy Enterprise Platform v5.1               â•‘
     â•‘                                                          â•‘
@@ -812,3 +805,4 @@ if __name__ == "__main__":
     
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
+
