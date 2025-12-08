@@ -1,0 +1,49 @@
+# DevSkyy PR Labeler Configuration
+# Labels PRs based on files changed
+
+'type: api':
+  - changed-files:
+      - any-glob-to-any-file: 'api/**/*'
+
+'type: security':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/auth*.py'
+          - '**/security*.py'
+          - '**/jwt*.py'
+
+'type: docs':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.md'
+          - 'docs/**/*'
+
+'type: tests':
+  - changed-files:
+      - any-glob-to-any-file: 'tests/**/*'
+
+'type: ci':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '.github/**/*'
+          - 'Dockerfile*'
+
+'type: mcp':
+  - changed-files:
+      - any-glob-to-any-file: '**/mcp*.py'
+
+'type: frontend':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '**/*.jsx'
+          - '**/*.tsx'
+          - '**/*.css'
+
+'type: config':
+  - changed-files:
+      - any-glob-to-any-file:
+          - '*.json'
+          - '*.yml'
+          - '*.yaml'
+          - '*.toml'
+          - 'requirements*.txt'

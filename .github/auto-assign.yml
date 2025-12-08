@@ -1,0 +1,18 @@
+# DevSkyy Auto-Assign Configuration
+# Automatically assign reviewers to PRs
+
+addReviewers: true
+addAssignees: author
+
+reviewers:
+  - SkyyRoseLLC
+
+numberOfReviewers: 1
+reviewGroups:
+  security-team:
+    - SkyyRoseLLC
+  
+filterLabels:
+  include:
+    - security
+  exclude: []

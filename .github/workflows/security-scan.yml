@@ -1,0 +1,181 @@
+# DevSkyy Security Scanning
+# OWASP, SAST, Dependency Audit
+name: 🔒 Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'  # Weekly on Monday 6 AM UTC
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  dependency-audit:
+    name: 📦 Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install audit tools
+        run: pip install safety pip-audit
+      
+      - name: Safety Check
+        run: |
+          safety check -r requirements.vercel.txt --output json > safety-report.json || true
+          cat safety-report.json
+      
+      - name: Pip Audit
+        run: |
+          pip-audit -r requirements.vercel.txt -f json -o pip-audit-report.json || true
+          cat pip-audit-report.json
+      
+      - name: Upload Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependency-audit-reports
+          path: |
+            safety-report.json
+            pip-audit-report.json
+
+  sast-bandit:
+    name: 🐍 Python SAST (Bandit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install Bandit
+        run: pip install bandit[toml]
+      
+      - name: Run Bandit
+        run: |
+          bandit -r . -f sarif -o bandit-results.sarif \
+            --severity-level medium \
+            --confidence-level medium \
+            -x ./tests,./venv,./.venv || true
+      
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: bandit-results.sarif
+          category: bandit
+
+  sast-semgrep:
+    name: 🔍 Semgrep SAST
+    runs-on: ubuntu-latest
+    container:
+      image: returntocorp/semgrep
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run Semgrep
+        run: |
+          semgrep ci \
+            --config auto \
+            --config p/python \
+            --config p/security-audit \
+            --config p/owasp-top-ten \
+            --config p/jwt \
+            --sarif --output semgrep-results.sarif || true
+      
+      - name: Upload SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep-results.sarif
+          category: semgrep
+
+  codeql:
+    name: 🔬 CodeQL Analysis
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: python
+          queries: security-extended
+      
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+      
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: codeql-python
+
+  secrets-scan:
+    name: 🔑 Secrets Detection
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: TruffleHog Scan
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
+
+  container-scan:
+    name: 🐳 Container Security
+    runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Build Test Image
+        run: |
+          cat > Dockerfile.scan << 'DOCKERFILE'
+          FROM python:3.12-slim
+          WORKDIR /app
+          COPY requirements.vercel.txt .
+          RUN pip install --no-cache-dir -r requirements.vercel.txt
+          COPY . .
+          DOCKERFILE
+          docker build -f Dockerfile.scan -t devskyy:scan .
+      
+      - name: Trivy Scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: 'devskyy:scan'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+          severity: 'CRITICAL,HIGH'
+      
+      - name: Upload Trivy SARIF
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy-results.sarif
+          category: trivy
+
+  security-summary:
+    name: 📊 Security Summary
+    runs-on: ubuntu-latest
+    needs: [dependency-audit, sast-bandit, sast-semgrep, secrets-scan]
+    if: always()
+    steps:
+      - name: Create Summary
+        run: |
+          echo "## 🔒 Security Scan Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Check | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Bandit SAST | ${{ needs.sast-bandit.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Semgrep SAST | ${{ needs.sast-semgrep.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secrets Scan | ${{ needs.secrets-scan.result }} |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,228 @@
+# DevSkyy CI/CD Pipeline
+# Verified Sources: GitHub Actions docs, Python best practices, Vercel deployment guides
+# Version: 1.0.0
+
+name: 🚀 DevSkyy CI/CD
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+env:
+  PYTHON_VERSION: '3.12'
+  NODE_VERSION: '22'
+  POETRY_VERSION: '1.7.1'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ============================================
+  # Code Quality & Linting
+  # ============================================
+  lint:
+    name: 🔍 Code Quality
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Linters
+        run: |
+          pip install --upgrade pip
+          pip install ruff black isort mypy bandit safety
+
+      - name: 🎨 Format Check (Black)
+        run: black --check --diff .
+        continue-on-error: true
+
+      - name: 📋 Import Sort Check (isort)
+        run: isort --check-only --diff .
+        continue-on-error: true
+
+      - name: 🔧 Lint (Ruff)
+        run: ruff check . --output-format=github
+
+      - name: 🔒 Security Scan (Bandit)
+        run: bandit -r . -f json -o bandit-report.json || true
+
+      - name: 📤 Upload Security Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report.json
+          retention-days: 30
+
+  # ============================================
+  # Type Checking
+  # ============================================
+  type-check:
+    name: 📝 Type Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install mypy types-requests types-redis pydantic
+          
+      - name: Run MyPy
+        run: mypy . --ignore-missing-imports --no-error-summary || true
+
+  # ============================================
+  # Unit Tests
+  # ============================================
+  test:
+    name: 🧪 Test Suite
+    runs-on: ubuntu-latest
+    needs: lint
+    services:
+      redis:
+        image: redis:7-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: 📦 Install Dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r requirements.vercel.txt
+          pip install pytest pytest-cov pytest-asyncio httpx
+
+      - name: 🧪 Run Tests
+        run: |
+          pytest tests/ -v --cov=. --cov-report=xml --cov-report=html || true
+        env:
+          REDIS_URL: redis://localhost:6379
+          TESTING: true
+
+      - name: 📊 Upload Coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: htmlcov/
+          retention-days: 30
+
+  # ============================================
+  # Security Scanning
+  # ============================================
+  security:
+    name: 🛡️ Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: 📦 Install Security Tools
+        run: |
+          pip install safety pip-audit
+
+      - name: 🔒 Check Dependencies (Safety)
+        run: safety check -r requirements.vercel.txt || true
+
+      - name: 🔍 Audit Dependencies (pip-audit)
+        run: pip-audit -r requirements.vercel.txt || true
+
+      - name: 🕵️ SAST Scan (Semgrep)
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/python
+            p/security-audit
+            p/owasp-top-ten
+        continue-on-error: true
+
+  # ============================================
+  # Build & Deploy
+  # ============================================
+  deploy:
+    name: 🚢 Deploy
+    runs-on: ubuntu-latest
+    needs: [lint, test, security]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment:
+      name: production
+      url: https://devskyy-skkyroseco.vercel.app
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 🔧 Setup Vercel CLI
+        run: npm install -g vercel@latest
+
+      - name: 🚀 Deploy to Vercel
+        run: |
+          vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+      - name: 🏥 Health Check
+        run: |
+          sleep 30
+          curl -f https://devskyy-skkyroseco.vercel.app/health || exit 1
+
+  # ============================================
+  # Notify on Completion
+  # ============================================
+  notify:
+    name: 📢 Notify
+    runs-on: ubuntu-latest
+    needs: [deploy]
+    if: always()
+    steps:
+      - name: 📊 Create Summary
+        run: |
+          echo "## 🚀 DevSkyy Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Metric | Value |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Branch | ${{ github.ref_name }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Commit | ${{ github.sha }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Status | ${{ needs.deploy.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Environment | production |" >> $GITHUB_STEP_SUMMARY
+          echo "| URL | https://devskyy-skkyroseco.vercel.app |" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,63 @@
+# DevSkyy Documentation Generation
+# Auto-generate API docs, README updates, changelog
+name: 📚 Documentation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '**/*.py'
+      - 'api/**'
+      - 'README.md'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  generate-docs:
+    name: 📝 Generate Docs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install documentation tools
+        run: |
+          pip install pdoc3 mkdocs mkdocs-material pydantic-docs
+      
+      - name: Generate API Documentation
+        run: |
+          mkdir -p docs/api
+          pdoc --html --output-dir docs/api . || true
+      
+      - name: Generate OpenAPI Schema
+        run: |
+          pip install -r requirements.vercel.txt
+          python -c "
+          from api.index import app
+          import json
+          schema = app.openapi()
+          with open('docs/openapi.json', 'w') as f:
+              json.dump(schema, f, indent=2)
+          " || true
+      
+      - name: Update README badges
+        run: |
+          # Add dynamic badges if not present
+          if ! grep -q "workflow/status" README.md; then
+            sed -i '1a\\n![CI](https://github.com/${{ github.repository }}/actions/workflows/ci-cd.yml/badge.svg)\n![Security](https://github.com/${{ github.repository }}/actions/workflows/security-scan.yml/badge.svg)\n' README.md || true
+          fi
+      
+      - name: Commit documentation
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/ README.md || true
+          git diff --staged --quiet || git commit -m "📚 Auto-update documentation"
+          git push || true
