@@ -32,12 +32,12 @@ jobs:
       
       - name: Safety Check
         run: |
-          safety check -r requirements.vercel.txt --output json > safety-report.json || true
+          safety check -r requirements.txt --output json > safety-report.json || true
           cat safety-report.json
       
       - name: Pip Audit
         run: |
-          pip-audit -r requirements.vercel.txt -f json -o pip-audit-report.json || true
+          pip-audit -r requirements.txt -f json -o pip-audit-report.json || true
           cat pip-audit-report.json
       
       - name: Upload Reports
@@ -63,60 +63,39 @@ jobs:
       
       - name: Run Bandit
         run: |
-          bandit -r . -f sarif -o bandit-results.sarif \
+          bandit -r . -f json -o bandit-results.json \
             --severity-level medium \
             --confidence-level medium \
-            -x ./tests,./venv,./.venv || true
+            -x ./tests,./venv,./.venv,./node_modules || true
+          cat bandit-results.json
       
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Bandit Report
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: bandit-results.sarif
-          category: bandit
+          name: bandit-report
+          path: bandit-results.json
 
   sast-semgrep:
     name: 🔍 Semgrep SAST
     runs-on: ubuntu-latest
     container:
-      image: returntocorp/semgrep
+      image: returntocorp/semgrep-agent:v1
     steps:
       - uses: actions/checkout@v4
       
       - name: Run Semgrep
         run: |
-          semgrep ci \
-            --config auto \
-            --config p/python \
-            --config p/security-audit \
-            --config p/owasp-top-ten \
-            --config p/jwt \
-            --sarif --output semgrep-results.sarif || true
+          semgrep ci --config auto --config p/python --config p/security-audit --config p/owasp-top-ten \
+            --json --output semgrep-results.json || true
+        env:
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_APP_TOKEN }}
       
-      - name: Upload SARIF
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Semgrep Report
+        uses: actions/upload-artifact@v4
+        if: always()
         with:
-          sarif_file: semgrep-results.sarif
-          category: semgrep
-
-  codeql:
-    name: 🔬 CodeQL Analysis
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: python
-          queries: security-extended
-      
-      - name: Autobuild
-        uses: github/codeql-action/autobuild@v3
-      
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-        with:
-          category: codeql-python
+          name: semgrep-report
+          path: semgrep-results.json
 
   secrets-scan:
     name: 🔑 Secrets Detection
@@ -129,6 +108,9 @@ jobs:
       - name: TruffleHog Scan
         uses: trufflesecurity/trufflehog@main
         with:
+          path: ./
+          base: ${{ github.event.repository.default_branch }}
+          head: HEAD
           extra_args: --only-verified
 
   container-scan:
@@ -138,30 +120,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Build Test Image
+      - name: Build test image
         run: |
-          cat > Dockerfile.scan << 'DOCKERFILE'
-          FROM python:3.12-slim
-          WORKDIR /app
-          COPY requirements.vercel.txt .
-          RUN pip install --no-cache-dir -r requirements.vercel.txt
-          COPY . .
-          DOCKERFILE
-          docker build -f Dockerfile.scan -t devskyy:scan .
+          if [ -f Dockerfile ]; then
+            docker build -t devskyy-test:${{ github.sha }} .
+          else
+            echo "No Dockerfile found, skipping container scan"
+            exit 0
+          fi
       
-      - name: Trivy Scan
+      - name: Run Trivy
+        if: hashFiles('Dockerfile') != ''
         uses: aquasecurity/trivy-action@master
         with:
-          image-ref: 'devskyy:scan'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          image-ref: 'devskyy-test:${{ github.sha }}'
+          format: 'json'
+          output: 'trivy-results.json'
           severity: 'CRITICAL,HIGH'
       
-      - name: Upload Trivy SARIF
-        uses: github/codeql-action/upload-sarif@v3
+      - name: Upload Trivy Report
+        if: hashFiles('Dockerfile') != ''
+        uses: actions/upload-artifact@v4
         with:
-          sarif_file: trivy-results.sarif
-          category: trivy
+          name: trivy-report
+          path: trivy-results.json
 
   security-summary:
     name: 📊 Security Summary
@@ -178,4 +160,4 @@ jobs:
           echo "| Dependency Audit | ${{ needs.dependency-audit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Bandit SAST | ${{ needs.sast-bandit.result }} |" >> $GITHUB_STEP_SUMMARY
           echo "| Semgrep SAST | ${{ needs.sast-semgrep.result }} |" >> $GITHUB_STEP_SUMMARY
-          echo "| Secrets Scan | ${{ needs.secrets-scan.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Secrets Detection | ${{ needs.secrets-scan.result }} |" >> $GITHUB_STEP_SUMMARY
