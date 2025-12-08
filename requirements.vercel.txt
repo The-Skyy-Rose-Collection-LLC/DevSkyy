@@ -1,0 +1,31 @@
+# DevSkyy Vercel Serverless Dependencies
+# Minimal production requirements for Vercel Python runtime
+# Last updated: 2025-12-08
+
+# Core Framework
+fastapi>=0.115.0,<1.0.0
+uvicorn>=0.32.0,<1.0.0
+starlette>=0.41.0,<1.0.0
+
+# ASGI/Mangum for serverless
+mangum>=0.19.0,<1.0.0
+
+# Request handling
+httpx>=0.28.0,<1.0.0
+python-multipart>=0.0.17,<1.0.0
+
+# Data validation
+pydantic>=2.10.0,<3.0.0
+pydantic-settings>=2.6.0,<3.0.0
+
+# Security
+python-jose[cryptography]>=3.3.0,<4.0.0
+passlib[bcrypt]>=1.7.4,<2.0.0
+bcrypt>=4.2.0,<5.0.0
+
+# Database (SQLite for serverless)
+aiosqlite>=0.20.0,<1.0.0
+
+# Utilities
+python-dotenv>=1.0.0,<2.0.0
+orjson>=3.10.0,<4.0.0
