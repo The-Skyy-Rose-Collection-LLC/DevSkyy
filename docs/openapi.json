@@ -1,0 +1,457 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "DevSkyy Enterprise Platform",
+    "description": "Enterprise AI-Powered Fashion E-Commerce Automation Platform\n\n## Features\n- 54 Specialized AI Agents (45 backend + 9 frontend)\n- 3D Integration Hub (Tripo, FASHN, HuggingFace)\n- Browser Automation (Playwright/Crawlee)\n- WooCommerce/WordPress Integration\n- MCP Protocol Support\n- GDPR Compliant\n\n## Documentation\n- [GitHub Repository](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy)\n- [API Documentation](/docs)\n",
+    "version": "6.0.0"
+  },
+  "paths": {
+    "/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Health Check",
+        "description": "Health check endpoint for monitoring and load balancers.\n\nReturns:\n    HealthResponse: Current system health status",
+        "operationId": "health_check_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Api Health Check",
+        "description": "API-prefixed health check endpoint.",
+        "operationId": "api_health_check_api_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/health": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Api V1 Health Check",
+        "description": "Versioned API health check endpoint.",
+        "operationId": "api_v1_health_check_api_v1_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/metrics": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Get Metrics",
+        "description": "Get system metrics for monitoring dashboards.\n\nReturns:\n    MetricsResponse: Current system metrics",
+        "operationId": "get_metrics_api_v1_metrics_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MetricsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents": {
+      "get": {
+        "tags": [
+          "Agents"
+        ],
+        "summary": "List Agents",
+        "description": "List all available AI agents.\n\nArgs:\n    category: Filter by agent category\n    status: Filter by agent status\n    limit: Maximum number of agents to return\n    offset: Pagination offset\n\nReturns:\n    List of agents with metadata",
+        "operationId": "list_agents_api_v1_agents_get",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Category"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 20,
+              "title": "Limit"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 0,
+              "title": "Offset"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/agents/{agent_id}": {
+      "get": {
+        "tags": [
+          "Agents"
+        ],
+        "summary": "Get Agent",
+        "description": "Get details for a specific agent.\n\nArgs:\n    agent_id: The agent's unique identifier\n\nReturns:\n    AgentInfo: Detailed agent information\n\nRaises:\n    HTTPException: If agent not found",
+        "operationId": "get_agent_api_v1_agents__agent_id__get",
+        "parameters": [
+          {
+            "name": "agent_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "title": "Agent Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AgentInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/3d/status": {
+      "get": {
+        "tags": [
+          "3D Hub"
+        ],
+        "summary": "Get 3D Hub Status",
+        "description": "Get status of 3D integration services.\n\nReturns:\n    Status of Tripo, FASHN, and HuggingFace integrations",
+        "operationId": "get_3d_hub_status_api_v1_3d_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/ecommerce/status": {
+      "get": {
+        "tags": [
+          "E-Commerce"
+        ],
+        "summary": "Get Ecommerce Status",
+        "description": "Get WooCommerce/WordPress integration status.\n\nReturns:\n    Connection status and sync information",
+        "operationId": "get_ecommerce_status_api_v1_ecommerce_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/automation/status": {
+      "get": {
+        "tags": [
+          "Automation"
+        ],
+        "summary": "Get Automation Status",
+        "description": "Get browser automation status.\n\nReturns:\n    Status of automation services",
+        "operationId": "get_automation_status_api_v1_automation_status_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/info": {
+      "get": {
+        "tags": [
+          "System"
+        ],
+        "summary": "Get Api Info",
+        "description": "Get comprehensive API information.\n\nReturns:\n    API version, features, and documentation links",
+        "operationId": "get_api_info_api_v1_info_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AgentInfo": {
+        "properties": {
+          "id": {
+            "type": "integer",
+            "title": "Id"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "category": {
+            "type": "string",
+            "title": "Category"
+          },
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "category",
+          "status",
+          "description"
+        ],
+        "title": "AgentInfo",
+        "description": "Agent information model."
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "HealthResponse": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "title": "Status"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          },
+          "version": {
+            "type": "string",
+            "title": "Version"
+          },
+          "environment": {
+            "type": "string",
+            "title": "Environment"
+          },
+          "platform": {
+            "type": "string",
+            "title": "Platform",
+            "default": "vercel"
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "timestamp",
+          "version",
+          "environment"
+        ],
+        "title": "HealthResponse",
+        "description": "Health check response model."
+      },
+      "MetricsResponse": {
+        "properties": {
+          "uptime": {
+            "type": "string",
+            "title": "Uptime"
+          },
+          "requests_total": {
+            "type": "integer",
+            "title": "Requests Total"
+          },
+          "agents_active": {
+            "type": "integer",
+            "title": "Agents Active"
+          },
+          "cache_hit_rate": {
+            "type": "number",
+            "title": "Cache Hit Rate"
+          },
+          "timestamp": {
+            "type": "string",
+            "title": "Timestamp"
+          }
+        },
+        "type": "object",
+        "required": [
+          "uptime",
+          "requests_total",
+          "agents_active",
+          "cache_hit_rate",
+          "timestamp"
+        ],
+        "title": "MetricsResponse",
+        "description": "System metrics response model."
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      }
+    }
+  }
+}
