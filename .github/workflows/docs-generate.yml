@@ -29,35 +29,49 @@ jobs:
       
       - name: Install documentation tools
         run: |
-          pip install pdoc3 mkdocs mkdocs-material pydantic-docs
+          pip install pdoc3 mkdocs mkdocs-material
       
       - name: Generate API Documentation
+        continue-on-error: true
         run: |
           mkdir -p docs/api
-          pdoc --html --output-dir docs/api . || true
+          # Generate docs for main modules
+          pdoc --html --output-dir docs/api \
+            --config show_source_code=True \
+            --config git_link_template='https://github.com/${{ github.repository }}/blob/{commit}/{path}#L{start_line}-L{end_line}' \
+            main.py devskyy_mcp.py sqlite_auth_system.py 2>/dev/null || echo "Some modules skipped"
       
       - name: Generate OpenAPI Schema
+        continue-on-error: true
         run: |
-          pip install -r requirements.vercel.txt
+          pip install -r requirements.txt
+          mkdir -p docs
           python -c "
-          from api.index import app
-          import json
-          schema = app.openapi()
-          with open('docs/openapi.json', 'w') as f:
-              json.dump(schema, f, indent=2)
-          " || true
+          try:
+              from api.index import app
+              import json
+              schema = app.openapi()
+              with open('docs/openapi.json', 'w') as f:
+                  json.dump(schema, f, indent=2)
+              print('OpenAPI schema generated successfully')
+          except Exception as e:
+              print(f'Could not generate OpenAPI schema: {e}')
+          "
       
-      - name: Update README badges
+      - name: Check for changes
+        id: changes
         run: |
-          # Add dynamic badges if not present
-          if ! grep -q "workflow/status" README.md; then
-            sed -i '1a\\n![CI](https://github.com/${{ github.repository }}/actions/workflows/ci-cd.yml/badge.svg)\n![Security](https://github.com/${{ github.repository }}/actions/workflows/security-scan.yml/badge.svg)\n' README.md || true
+          git add docs/ README.md 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
           fi
       
       - name: Commit documentation
+        if: steps.changes.outputs.has_changes == 'true'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/ README.md || true
-          git diff --staged --quiet || git commit -m "📚 Auto-update documentation"
-          git push || true
+          git commit -m "📚 Auto-update documentation [skip ci]"
+          git push
