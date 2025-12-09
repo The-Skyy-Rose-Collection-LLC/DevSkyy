@@ -1,11 +1,16 @@
 # DevSkyy - Enterprise AI Platform
 
-[![Version](https://img.shields.io/badge/version-5.2.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Version](https://img.shields.io/badge/version-5.2.0--enterprise-blue.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org)
 [![AI Models](https://img.shields.io/badge/AI-Claude%20Sonnet%204.5-purple.svg)](https://www.anthropic.com)
-[![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
-[![Status](https://img.shields.io/badge/status-production--ready-green.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
+
+<!-- CI/CD Status Badges -->
+[![CI/CD](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/ci-cd.yml)
+[![Security Scan](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/security-scan.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/security-scan.yml)
+[![Health Monitoring](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/health-monitoring.yml/badge.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/actions/workflows/health-monitoring.yml)
+[![Code Quality](https://img.shields.io/badge/code%20quality-A+-brightgreen.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy)
+[![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy)
 
 > **Industry-Leading** WordPress/Elementor Theme Builder + Fashion E-commerce Automation + 57 ML-Powered AI Agents
 
@@ -17,7 +22,7 @@
 
 ```bash
 # Clone repository
-git clone https://github.com/SkyyRoseLLC/DevSkyy.git
+git clone https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy.git
 cd DevSkyy
 
 # Install dependencies
@@ -494,6 +499,61 @@ python3 -c "from main import app; print('✅ Backend secure')"
 3. Add tests for new features
 4. Run safety check
 5. Submit pull request
+
+
+## 🔄 CI/CD Pipeline
+
+DevSkyy uses **GitHub Actions** for automated testing, security scanning, and deployment.
+
+### Workflows
+
+| Workflow | Trigger | Purpose |
+|----------|---------|---------|
+| 🚀 **CI/CD** | Push to main, PRs | Lint, type check, test, deploy |
+| 🔒 **Security Scan** | Push, Weekly, Manual | SAST (Bandit, Semgrep), secrets detection, dependency audit |
+| 🏥 **Health Monitoring** | Every 15 min | Uptime checks, SSL validation, API health |
+| 📋 **PR Automation** | PRs | Auto-labeling, assignment, size labels |
+| 📦 **Release** | Tags | Semantic versioning, changelog generation |
+
+### Quality Gates
+
+All PRs must pass:
+- ✅ **Ruff** lint (PEP 8, import sorting)
+- ✅ **MyPy** type checking (strict mode)
+- ✅ **Pytest** test suite (80%+ coverage)
+- ✅ **Semgrep** security scan
+- ✅ **Bandit** Python SAST
+
+### Deployment
+
+**Vercel** deployment requires these secrets in GitHub:
+
+```bash
+# Go to: Settings → Secrets → Actions → New repository secret
+
+VERCEL_TOKEN=your_vercel_api_token
+VERCEL_ORG_ID=team_BnYeL94OWrIVtidDO4gd1c4y
+VERCEL_PROJECT_ID=prj_MbyClUxGD0ffQ2M11D76gLBeJEWl
+```
+
+Get your Vercel token at: https://vercel.com/account/tokens
+
+### Local Development
+
+```bash
+# Run lint checks
+ruff check . --fix
+isort .
+
+# Run type checks
+mypy . --ignore-missing-imports
+
+# Run tests
+pytest tests/ -v --cov=.
+
+# Run security scan
+bandit -r . -x ./tests,./venv
+```
 
 ## 📄 License
 
