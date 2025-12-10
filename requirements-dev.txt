@@ -1,0 +1,12 @@
+# Development Dependencies
+# Install with: pip install -r requirements-dev.txt
+#
+# Or better: pip install -e ".[dev]"
+
+-e .[dev]
+
+# Additional dev tools not in pyproject.toml
+pip-tools>=7.3       # For generating lock files
+pre-commit>=3.6      # Git hooks
+ipython>=8.18        # Better REPL
+watchfiles>=0.21     # File watching for reload

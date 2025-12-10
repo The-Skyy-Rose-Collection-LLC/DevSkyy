@@ -1,99 +1,67 @@
-# DevSkyy Platform - Production Dependencies
-# All versions verified from PyPI as of December 2024
+# DevSkyy Platform Dependencies
 # 
-# Verification Sources:
-# - PyPI: https://pypi.org
-# - RFC 7519 (JWT), RFC 6749 (OAuth2), RFC 2104 (HMAC)
-# - NIST SP 800-38D (AES-GCM), NIST SP 800-132 (PBKDF2)
+# This file is for backward compatibility with pip-only environments.
+# The canonical dependency source is pyproject.toml
+#
+# Recommended installation:
+#   pip install -e ".[dev]"           # Development (includes test tools)
+#   pip install -e ".[all]"           # Everything
+#   pip install -e .                  # Core only
+#
+# Or with uv (faster):
+#   uv pip install -e ".[dev]"
+#
+# For reproducible production builds, use:
+#   pip-compile pyproject.toml -o requirements-lock.txt
+#   pip install -r requirements-lock.txt
 
-# =============================================================================
 # Core Framework
-# =============================================================================
-fastapi==0.104.1          # High-performance async web framework
-uvicorn[standard]==0.24.0  # ASGI server with HTTP/2 support
-python-multipart==0.0.6    # Form data parsing
-pydantic==2.5.2           # Data validation using Python type hints
-pydantic-settings==2.1.0  # Settings management with Pydantic
+fastapi>=0.104
+uvicorn[standard]>=0.24
+python-multipart>=0.0.6
+pydantic>=2.5
+pydantic-settings>=2.1
 
-# =============================================================================
 # Database
-# =============================================================================
-sqlalchemy==2.0.23        # SQL toolkit and ORM
-alembic==1.13.0           # Database migrations
-asyncpg==0.29.0           # PostgreSQL async driver
-aiosqlite==0.19.0         # SQLite async driver
+sqlalchemy>=2.0
+alembic>=1.13
+asyncpg>=0.29
+aiosqlite>=0.19
 
-# =============================================================================
-# Authentication & Security (RFC 7519, NIST SP 800-38D)
-# =============================================================================
-PyJWT==2.10.1             # JWT implementation (RFC 7519)
-python-jose[cryptography]==3.3.0  # JOSE implementation
-passlib[bcrypt]==1.7.4    # Password hashing library
-argon2-cffi==23.1.0       # Argon2id password hashing (OWASP recommended)
-cryptography==41.0.7      # Cryptographic recipes (AES-256-GCM, HMAC)
-bcrypt==4.1.2             # BCrypt hashing
+# Security
+PyJWT>=2.8
+python-jose[cryptography]>=3.3
+passlib[bcrypt]>=1.7
+argon2-cffi>=23.1
+cryptography>=41
+bcrypt>=4.1
 
-# =============================================================================
-# HTTP Clients
-# =============================================================================
-httpx==0.25.2             # Async HTTP client (for webhooks)
-aiohttp==3.9.1            # Async HTTP client/server
-requests==2.31.0          # Sync HTTP client
+# HTTP
+httpx>=0.25
+aiohttp>=3.9
+requests>=2.31
 
-# =============================================================================
-# AI/ML Integrations
-# =============================================================================
-openai==1.6.1             # OpenAI API client (GPT-4)
-anthropic==0.8.1          # Anthropic API client (Claude)
-google-generativeai==0.3.2 # Google Gemini API
+# AI/ML (optional - uncomment if needed)
+# openai>=1.6
+# anthropic>=0.8
+# google-generativeai>=0.3
 
-# =============================================================================
-# Caching & Message Queues
-# =============================================================================
-redis==5.0.1              # Redis client
-celery==5.3.4             # Distributed task queue
+# Caching (optional)
+# redis>=5.0
+# celery>=5.3
 
-# =============================================================================
-# Monitoring & Observability
-# =============================================================================
-prometheus-client==0.19.0 # Prometheus metrics
-structlog==23.2.0         # Structured logging
-python-json-logger==2.0.7 # JSON log formatter
+# Monitoring (optional)
+# prometheus-client>=0.19
+# structlog>=23.2
 
-# =============================================================================
-# Testing
-# =============================================================================
-pytest==7.4.3             # Testing framework
-pytest-asyncio==0.23.2    # Async test support
-pytest-cov==4.1.0         # Coverage reporting
+# WordPress (optional)
+# wordpress-xmlrpc>=2.3
+# woocommerce>=3.0
 
-# =============================================================================
-# Code Quality
-# =============================================================================
-ruff==0.1.8               # Fast Python linter
-black==23.12.1            # Code formatter
-mypy==1.7.1               # Static type checker
-isort==5.13.2             # Import sorter
-
-# =============================================================================
-# WordPress/WooCommerce Integration
-# =============================================================================
-wordpress-xmlrpc==2.3     # WordPress XML-RPC client
-woocommerce==3.0.0        # WooCommerce REST API client
-
-# =============================================================================
 # Utilities
-# =============================================================================
-python-dotenv==1.0.0      # Environment variable management
-tenacity==8.2.3           # Retry library with exponential backoff
-pyyaml==6.0.1             # YAML parser
-orjson==3.9.10            # Fast JSON library
-python-dateutil==2.8.2    # Date/time utilities
-email-validator==2.1.0    # Email validation (for Pydantic)
-
-# =============================================================================
-# Production Extras (Optional)
-# =============================================================================
-# gunicorn==21.2.0        # Production WSGI server
-# sentry-sdk==1.38.0      # Error tracking
-# ddtrace==2.4.0          # Datadog APM
+python-dotenv>=1.0
+tenacity>=8.2
+pyyaml>=6.0
+orjson>=3.9
+python-dateutil>=2.8
+email-validator>=2.1
