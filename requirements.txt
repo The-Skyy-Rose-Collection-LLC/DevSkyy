@@ -1,0 +1,62 @@
+# DevSkyy Platform - Production Dependencies
+# All versions verified from PyPI as of December 2024
+
+# Core Framework
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-multipart==0.0.6
+pydantic==2.5.2
+pydantic-settings==2.1.0
+
+# Database
+sqlalchemy==2.0.23
+alembic==1.13.0
+asyncpg==0.29.0
+aiosqlite==0.19.0
+
+# Authentication & Security
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+argon2-cffi==23.1.0
+cryptography==41.0.7
+
+# HTTP Clients
+httpx==0.25.2
+aiohttp==3.9.1
+requests==2.31.0
+
+# AI/ML Integrations
+openai==1.6.1
+anthropic==0.8.1
+google-generativeai==0.3.2
+
+# Caching & Queues
+redis==5.0.1
+celery==5.3.4
+
+# Monitoring & Logging
+prometheus-client==0.19.0
+structlog==23.2.0
+python-json-logger==2.0.7
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.23.2
+pytest-cov==4.1.0
+httpx==0.25.2
+
+# Code Quality
+ruff==0.1.8
+black==23.12.1
+mypy==1.7.1
+
+# WordPress Integration
+wordpress-xmlrpc==2.3
+woocommerce==3.0.0
+
+# Utilities
+python-dotenv==1.0.0
+tenacity==8.2.3
+pyyaml==6.0.1
+orjson==3.9.10
+python-dateutil==2.8.2
