@@ -1,0 +1,42 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "command": "node ~/.claude-mem/hooks/session-start.js",
+        "timeout": 180000,
+        "type": "command"
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "command": "node ~/.claude-mem/hooks/user-prompt-submit.js",
+        "timeout": 180000,
+        "type": "command"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "command": "node ~/.claude-mem/hooks/post-tool-use.js",
+        "timeout": 180000,
+        "type": "command"
+      }
+    ],
+    "Stop": [
+      {
+        "command": "node ~/.claude-mem/hooks/stop.js",
+        "timeout": 180000,
+        "type": "command"
+      }
+    ]
+  },
+  "mcpServers": {
+    "claude-mem": {
+      "command": "claude-mem",
+      "args": ["mcp-server"],
+      "env": {
+        "CLAUDE_MEM_DATA_DIR": "~/.claude-mem",
+        "CLAUDE_MEM_LOG_LEVEL": "INFO"
+      }
+    }
+  }
+}

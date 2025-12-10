@@ -1,0 +1,46 @@
+{
+  "name": "devskyy",
+  "version": "1.0.0",
+  "description": "DevSkyy AI-Powered Development Platform with Claude-Mem Memory System",
+  "main": "index.js",
+  "type": "module",
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "pytest tests/ -v",
+    "test:python": "pytest tests/ -v --tb=short",
+    "lint": "ruff check . --fix",
+    "lint:python": "ruff check . --fix",
+    "type-check": "mypy main.py devskyy_mcp.py",
+    "format": "ruff format .",
+    "mem:status": "claude-mem status",
+    "mem:logs": "claude-mem logs",
+    "mem:load": "claude-mem load-context",
+    "mem:save": "claude-mem compress",
+    "mem:doctor": "claude-mem doctor",
+    "check": "npm run lint && npm run type-check && npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy"
+  },
+  "keywords": [
+    "ai",
+    "claude",
+    "mcp",
+    "devops",
+    "automation",
+    "memory",
+    "agent-sdk"
+  ],
+  "author": "The Skyy Rose Collection LLC",
+  "license": "Proprietary",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "claude-mem": "^3.9.16"
+  }
+}
