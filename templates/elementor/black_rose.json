@@ -1,0 +1,275 @@
+{
+  "title": "SkyyRose - Black Rose Collection",
+  "type": "page",
+  "version": "0.4",
+  "metadata": {
+    "title": "SkyyRose - Black Rose Collection",
+    "type": "page",
+    "created_at": "2025-12-10T20:58:53.718230",
+    "generator": "DevSkyy ElementorTemplateGenerator",
+    "brand": "SkyyRose"
+  },
+  "content": [
+    {
+      "id": "b134da2",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#1A1A1A",
+        "padding": {
+          "unit": "px",
+          "top": 120,
+          "bottom": 120,
+          "left": 0,
+          "right": 0
+        },
+        "min_height": {
+          "unit": "vh",
+          "size": 60
+        }
+      },
+      "elements": [
+        {
+          "id": "5e8740d",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "adb2796",
+              "elType": "widget",
+              "settings": {
+                "title": "Black Rose",
+                "header_size": "h1",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "title_color": "#D4AF37",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 64
+                }
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "8542cb0",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style='font-size: 20px;'>Limited Edition Dark Elegance</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "text_color": "#F5F5F0"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "3438acc",
+              "elType": "widget",
+              "settings": {
+                "style": "solid",
+                "color": "#D4AF37"
+              },
+              "elements": [],
+              "widgetType": "divider"
+            },
+            {
+              "id": "b8dd361",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Numbered limited editions crafted for those who appreciate exclusivity and refined darkness.</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "text_color": "#666666"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "df24b54",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "bottom": 80,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "6a065e2",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "fc134be",
+              "elType": "widget",
+              "settings": {
+                "title": "The Collection",
+                "header_size": "h2",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "0630033",
+              "elType": "widget",
+              "settings": {
+                "space": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [],
+              "widgetType": "spacer"
+            },
+            {
+              "id": "7c6760a",
+              "elType": "widget",
+              "settings": {
+                "columns": 3,
+                "rows": 4,
+                "orderby": "date",
+                "paginate": "yes"
+              },
+              "elements": [],
+              "widgetType": "woocommerce-products"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "aebca06",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#F5F5F0",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "bottom": 80,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "274fc0f",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "f35f1aa",
+              "elType": "widget",
+              "settings": {
+                "title": "The Vision",
+                "header_size": "h3",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "93cc74e",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Numbered limited editions crafted for those who appreciate exclusivity and refined darkness.</p><p>Each piece in this collection represents our commitment to excellence and our Oakland heritage.</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "b655e5b",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "bottom": 60,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "10fd778",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "f619340",
+              "elType": "widget",
+              "settings": {
+                "title": "Explore More",
+                "header_size": "h3",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "a8e2b04",
+              "elType": "widget",
+              "settings": {
+                "text": "View All Collections",
+                "link": {
+                  "url": "/collections",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "button_type": "default",
+                "size": "md",
+                "align": "center",
+                "background_color": "#D4AF37"
+              },
+              "elements": [],
+              "widgetType": "button"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
