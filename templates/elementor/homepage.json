@@ -1,0 +1,655 @@
+{
+  "title": "SkyyRose Homepage",
+  "type": "page",
+  "version": "0.4",
+  "metadata": {
+    "title": "SkyyRose Homepage",
+    "type": "page",
+    "created_at": "2025-12-10T20:58:53.718035",
+    "generator": "DevSkyy ElementorTemplateGenerator",
+    "brand": "SkyyRose"
+  },
+  "content": [
+    {
+      "id": "bf0affe",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "padding": {
+          "unit": "px",
+          "top": 150,
+          "bottom": 150,
+          "left": 0,
+          "right": 0
+        },
+        "min_height": {
+          "unit": "vh",
+          "size": 100
+        }
+      },
+      "elements": [
+        {
+          "id": "3fb7f0a",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "dc0ac34",
+              "elType": "widget",
+              "settings": {
+                "title": "SkyyRose",
+                "header_size": "h1",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "title_color": "#D4AF37",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 72
+                }
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "0ffdf34",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p style='font-size: 24px;'>Where Love Meets Luxury</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "text_color": "#F5F5F0"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "eb43dee",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Oakland, California</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat",
+                "text_color": "#666666"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "de29fbc",
+              "elType": "widget",
+              "settings": {
+                "space": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [],
+              "widgetType": "spacer"
+            },
+            {
+              "id": "8198a08",
+              "elType": "widget",
+              "settings": {
+                "text": "Shop Collections",
+                "link": {
+                  "url": "/collections",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "button_type": "default",
+                "size": "lg",
+                "align": "center",
+                "background_color": "#D4AF37",
+                "button_text_color": "#0D0D0D"
+              },
+              "elements": [],
+              "widgetType": "button"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c6902e3",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "bottom": 20,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "7ff9bb1",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "5ea8e11",
+              "elType": "widget",
+              "settings": {
+                "title": "Our Collections",
+                "header_size": "h2",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "30658d7",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Three distinct expressions of luxury streetwear</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "4a81ef9",
+              "elType": "widget",
+              "settings": {
+                "space": {
+                  "unit": "px",
+                  "size": 30
+                }
+              },
+              "elements": [],
+              "widgetType": "spacer"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "22c2334",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "padding": {
+          "unit": "px",
+          "top": 20,
+          "bottom": 80,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "dc304ce",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33
+          },
+          "elements": [
+            {
+              "id": "14fb430",
+              "elType": "widget",
+              "settings": {
+                "title": "Black Rose",
+                "header_size": "h3",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 28
+                }
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "7685b11",
+              "elType": "widget",
+              "settings": {
+                "title": "Love Hurts",
+                "header_size": "h3",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 28
+                }
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "f3cdb15",
+              "elType": "widget",
+              "settings": {
+                "title": "Signature",
+                "header_size": "h3",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": {
+                  "unit": "px",
+                  "size": 28
+                }
+              },
+              "elements": [],
+              "widgetType": "heading"
+            }
+          ]
+        },
+        {
+          "id": "7b433ac",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33
+          },
+          "elements": [
+            {
+              "id": "8b11123",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Limited Edition Dark Elegance</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "a5a6422",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Emotional Expression Pieces</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "684544b",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Foundation Wardrobe Essentials</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            }
+          ]
+        },
+        {
+          "id": "f420497",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33
+          },
+          "elements": [
+            {
+              "id": "29167cc",
+              "elType": "widget",
+              "settings": {
+                "text": "Explore",
+                "link": {
+                  "url": "/collections/black-rose",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "button_type": "default",
+                "size": "sm",
+                "align": "center"
+              },
+              "elements": [],
+              "widgetType": "button"
+            },
+            {
+              "id": "85f4bcf",
+              "elType": "widget",
+              "settings": {
+                "text": "Explore",
+                "link": {
+                  "url": "/collections/love-hurts",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "button_type": "default",
+                "size": "sm",
+                "align": "center"
+              },
+              "elements": [],
+              "widgetType": "button"
+            },
+            {
+              "id": "c2c1f9b",
+              "elType": "widget",
+              "settings": {
+                "text": "Explore",
+                "link": {
+                  "url": "/collections/signature",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "button_type": "default",
+                "size": "sm",
+                "align": "center"
+              },
+              "elements": [],
+              "widgetType": "button"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "9b87951",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#F5F5F0",
+        "padding": {
+          "unit": "px",
+          "top": 80,
+          "bottom": 80,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "77b5e17",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "0f07ad5",
+              "elType": "widget",
+              "settings": {
+                "title": "Featured Pieces",
+                "header_size": "h2",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "6aeb9e2",
+              "elType": "widget",
+              "settings": {
+                "space": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [],
+              "widgetType": "spacer"
+            },
+            {
+              "id": "083f334",
+              "elType": "widget",
+              "settings": {
+                "columns": 4,
+                "rows": 1,
+                "orderby": "popularity",
+                "paginate": "yes"
+              },
+              "elements": [],
+              "widgetType": "woocommerce-products"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c1ad66a",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "padding": {
+          "unit": "px",
+          "top": 100,
+          "bottom": 100,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "fe1449f",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "4d33b5c",
+              "elType": "widget",
+              "settings": {
+                "title": "The Story",
+                "header_size": "h2",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "ffdbad6",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Born in Oakland, SkyyRose emerges from a vision of luxury that speaks to the soul. Every piece is crafted with intention, designed for those who understand that true style transcends trends.</p><p>Where Love Meets Luxury isn't just a tagline\u2014it's our promise.</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "8c5fd56",
+              "elType": "widget",
+              "settings": {
+                "text": "About Us",
+                "link": {
+                  "url": "/about",
+                  "is_external": false,
+                  "nofollow": false
+                },
+                "button_type": "default",
+                "size": "md",
+                "align": "center"
+              },
+              "elements": [],
+              "widgetType": "button"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "eb822db",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "bottom": 60,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "72eb31b",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33
+          },
+          "elements": [
+            {
+              "id": "2da474c",
+              "elType": "widget",
+              "settings": {
+                "title_text": "Craftsmanship",
+                "description_text": "Every stitch tells a story of dedication",
+                "selected_icon": {
+                  "value": "fas fa-gem",
+                  "library": "fa-solid"
+                },
+                "position": "top"
+              },
+              "elements": [],
+              "widgetType": "icon-box"
+            }
+          ]
+        },
+        {
+          "id": "53c8678",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33
+          },
+          "elements": [
+            {
+              "id": "e5b5e4d",
+              "elType": "widget",
+              "settings": {
+                "title_text": "Exclusivity",
+                "description_text": "Limited editions for the discerning few",
+                "selected_icon": {
+                  "value": "fas fa-crown",
+                  "library": "fa-solid"
+                },
+                "position": "top"
+              },
+              "elements": [],
+              "widgetType": "icon-box"
+            }
+          ]
+        },
+        {
+          "id": "c4451c3",
+          "elType": "column",
+          "settings": {
+            "_column_size": 33
+          },
+          "elements": [
+            {
+              "id": "fe25527",
+              "elType": "widget",
+              "settings": {
+                "title_text": "Oakland Roots",
+                "description_text": "Bay Area heritage in every design",
+                "selected_icon": {
+                  "value": "fas fa-city",
+                  "library": "fa-solid"
+                },
+                "position": "top"
+              },
+              "elements": [],
+              "widgetType": "icon-box"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "c432d9d",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_position": "middle",
+        "background_background": "classic",
+        "background_color": "#F5F5F0",
+        "padding": {
+          "unit": "px",
+          "top": 60,
+          "bottom": 60,
+          "left": 0,
+          "right": 0
+        }
+      },
+      "elements": [
+        {
+          "id": "6c2de3c",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "bab8529",
+              "elType": "widget",
+              "settings": {
+                "title": "Join the Rose Garden",
+                "header_size": "h3",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Playfair Display"
+              },
+              "elements": [],
+              "widgetType": "heading"
+            },
+            {
+              "id": "017fd34",
+              "elType": "widget",
+              "settings": {
+                "editor": "<p>Be the first to know about new drops and exclusive offers</p>",
+                "align": "center",
+                "typography_typography": "custom",
+                "typography_font_family": "Montserrat"
+              },
+              "elements": [],
+              "widgetType": "text-editor"
+            },
+            {
+              "id": "8d6b790",
+              "elType": "widget",
+              "settings": {
+                "space": {
+                  "unit": "px",
+                  "size": 20
+                }
+              },
+              "elements": [],
+              "widgetType": "spacer"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
