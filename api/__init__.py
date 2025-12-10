@@ -5,6 +5,8 @@ DevSkyy API Module
 Enterprise API components:
 - API versioning
 - Webhook system
+- GDPR compliance
+- AI agents
 - Rate limiting
 - Request validation
 """
@@ -63,6 +65,35 @@ from .webhooks import (
     webhook_router,
 )
 
+from .gdpr import (
+    # Enums
+    DataCategory,
+    LegalBasis,
+    RequestType,
+    RequestStatus,
+    
+    # Service
+    GDPRService,
+    gdpr_service,
+    
+    # Router
+    gdpr_router,
+)
+
+from .agents import (
+    # Enums
+    AgentCategory,
+    TaskStatus,
+    Priority,
+    
+    # Service
+    AgentService,
+    agent_service,
+    
+    # Router
+    agents_router,
+)
+
 __all__ = [
     # Versioning
     "VersionConfig",
@@ -93,4 +124,21 @@ __all__ = [
     "WebhookReceiver",
     "webhook_manager",
     "webhook_router",
+    
+    # GDPR
+    "DataCategory",
+    "LegalBasis",
+    "RequestType",
+    "RequestStatus",
+    "GDPRService",
+    "gdpr_service",
+    "gdpr_router",
+    
+    # Agents
+    "AgentCategory",
+    "TaskStatus",
+    "Priority",
+    "AgentService",
+    "agent_service",
+    "agents_router",
 ]
