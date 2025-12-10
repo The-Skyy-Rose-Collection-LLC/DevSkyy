@@ -43,12 +43,14 @@ cd DevSkyy
 python3.11 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 
-# Install dependencies
+# Install dependencies (choose one)
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install -e .                  # Core only
+pip install -e ".[dev]"           # Development (includes testing)
+pip install -e ".[all]"           # All optional dependencies
 
-# Install development dependencies
-pip install -r requirements-dev.txt
+# Or with uv (faster alternative)
+uv pip install -e ".[dev]"
 ```
 
 ### Environment Setup
@@ -64,14 +66,11 @@ nano .env  # or use your preferred editor
 ### Run Application
 
 ```bash
-# Development mode
-python main.py
+# Development mode with auto-reload
+uvicorn main_enterprise:app --reload --host 127.0.0.1 --port 8000
 
 # Production mode with Uvicorn
-uvicorn main:app --host 0.0.0.0 --port 8000 --workers 4
-
-# With auto-reload (development)
-uvicorn main:app --reload --host 127.0.0.1 --port 8000
+uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 Access the application:
@@ -1782,8 +1781,8 @@ from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from main import app
-from agent.database import Base, get_db
+from main_enterprise import app
+from database.db import Base, get_db
 
 
 # Test database
@@ -2266,12 +2265,12 @@ RUN apt-get update && apt-get install -y \
     libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements
-COPY requirements.txt .
+# Copy dependency files
+COPY pyproject.toml .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir .
 
 # Production stage
 FROM python:3.11-slim
@@ -2559,20 +2558,18 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        pip install -r requirements-dev.txt
+        pip install -e ".[dev]"
     
     - name: Run linters
       run: |
-        black --check agent/
-        isort --check agent/
-        flake8 agent/
-        mypy agent/
+        ruff check .
+        black --check .
+        mypy .
     
     - name: Run security checks
       run: |
-        bandit -r agent/ -ll
-        safety check
+        bandit -r . -ll
+        pip-audit
     
     - name: Run tests
       env:

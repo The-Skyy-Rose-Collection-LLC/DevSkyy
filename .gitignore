@@ -52,8 +52,9 @@ coverage.xml
 
 # Secrets & Environment
 .env
-.env.*
-*.local
+.env.local
+.env.*.local
+!.env.example
 secrets/
 credentials/
 *.pem

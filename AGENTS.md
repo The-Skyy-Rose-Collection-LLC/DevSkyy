@@ -2009,17 +2009,16 @@ jobs:
       
       - name: Install dependencies
         run: |
-          pip install -r requirements.txt
-          pip install pytest pytest-cov pytest-asyncio
+          pip install -e ".[dev]"
       
       - name: Run tests
-        run: pytest tests/ -v --cov=agent
+        run: pytest tests/ -v --cov=.
       
       - name: Security scan
         run: |
-          pip install bandit safety
-          bandit -r agent/
-          safety check
+          pip install bandit pip-audit
+          bandit -r . -ll
+          pip-audit
       
       - name: Lint
         run: |

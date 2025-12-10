@@ -1,6 +1,6 @@
 # DevSkyy - Enterprise AI Platform
 
-[![Version](https://img.shields.io/badge/version-5.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Version](https://img.shields.io/badge/version-2.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org)
 [![AI Models](https://img.shields.io/badge/AI-Claude%20Sonnet%204.5-purple.svg)](https://www.anthropic.com)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
@@ -20,15 +20,23 @@
 git clone https://github.com/SkyyRoseLLC/DevSkyy.git
 cd DevSkyy
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (choose one)
+pip install -e ".[dev]"        # Development (includes testing)
+pip install -e ".[all]"        # Everything
+pip install -e .               # Core only
+
+# Or with uv (faster)
+uv pip install -e ".[dev]"
 
 # Configure environment
 cp .env.example .env
 # Edit .env with your API keys
 
 # Run application
-python main.py
+uvicorn main_enterprise:app --reload --port 8000
+
+# Run tests
+pytest tests/ -v
 ```
 
 ## 🎯 Core Features
@@ -418,7 +426,7 @@ cd frontend && npm audit
 # Result: 0 vulnerabilities ✅
 
 # Backend verification
-python3 -c "from main import app; print('✅ Backend secure')"
+python3 -c "from main_enterprise import app; print('✅ Backend secure')"
 ```
 
 ## 🤝 Contributing

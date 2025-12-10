@@ -24,27 +24,42 @@ Lint Command:  ruff check . && black --check .
 ```
 devskyy-platform/
 ├── main_enterprise.py      # ← START HERE: FastAPI app entry
+├── pyproject.toml          # Dependencies & tool configs (PEP 621)
 ├── security/               # Auth, encryption, RBAC
 │   ├── jwt_oauth2_auth.py  # JWT/OAuth2 (modify for auth changes)
 │   └── aes256_gcm_encryption.py
 ├── api/                    # API layer
 │   ├── versioning.py       # /api/v1/, /api/v2/ routing
-│   └── webhooks.py         # Event publishing
-├── complete_working_platform.py  # Legacy: 47 endpoints (being migrated)
+│   ├── webhooks.py         # Event publishing (HMAC signed)
+│   ├── gdpr.py             # GDPR compliance (Articles 15-30)
+│   └── agents.py           # 23 AI agents across 7 categories
+├── database/               # Database layer
+│   └── db.py               # Async SQLAlchemy + connection pooling
+├── tests/                  # Test suite
+│   ├── conftest.py         # Fixtures
+│   ├── test_security.py    # Auth, encryption tests
+│   ├── test_gdpr.py        # GDPR compliance tests
+│   └── test_agents.py      # Agent API tests
 ├── devskyy_mcp.py          # MCP server: exposes agents to external AI
-├── prompt_system.py        # Agent prompt templates
-├── sqlite_auth_system.py   # Database auth (SQLite/PostgreSQL)
-└── autonomous_commerce_engine.py  # E-commerce automation
+└── legacy/                 # Deprecated (reference only)
+    ├── complete_working_platform.py
+    ├── sqlite_auth_system.py
+    ├── autonomous_commerce_engine.py
+    └── prompt_system.py
 ```
 
 ### File Modification Guide
 | Task | Start File | Related Files |
 |------|------------|---------------|
 | Add API endpoint | `main_enterprise.py` | `api/versioning.py` |
-| Change auth logic | `security/jwt_oauth2_auth.py` | `sqlite_auth_system.py` |
+| Change auth logic | `security/jwt_oauth2_auth.py` | `database/db.py` |
 | Add webhook event | `api/webhooks.py` | `main_enterprise.py` |
-| Expose agent via MCP | `devskyy_mcp.py` | `prompt_system.py` |
+| Add GDPR feature | `api/gdpr.py` | `database/db.py` |
+| Add/modify agent | `api/agents.py` | `devskyy_mcp.py` |
+| Expose agent via MCP | `devskyy_mcp.py` | `api/agents.py` |
 | Add encryption | `security/aes256_gcm_encryption.py` | — |
+| Add database model | `database/db.py` | `api/*.py` |
+| Add test | `tests/test_*.py` | `tests/conftest.py` |
 
 ---
 
