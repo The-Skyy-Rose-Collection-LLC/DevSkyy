@@ -61,6 +61,8 @@ from api.webhooks import (
     webhook_manager,
     WebhookEventType,
 )
+from api.gdpr import gdpr_router
+from api.agents import agents_router
 
 # Configure logging
 logging.basicConfig(
@@ -182,6 +184,12 @@ app.include_router(auth_router)
 
 # Webhook routes
 app.include_router(webhook_router)
+
+# GDPR compliance routes
+app.include_router(gdpr_router)
+
+# AI agent routes
+app.include_router(agents_router)
 
 
 # =============================================================================
