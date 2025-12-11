@@ -307,7 +307,7 @@ class VersionedAPIRouter(APIRouter):
             kwargs["operation_id"] = f"{endpoint.__name__}_{self.api_version}"
 
         # Add version tag
-        tags = kwargs.get("tags", [])
+        tags = kwargs.get("tags") or []
         if self.api_version not in tags:
             tags.append(self.api_version)
         kwargs["tags"] = tags
