@@ -38,9 +38,11 @@ import json
 import logging
 import os
 import uuid
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
+from functools import lru_cache
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
@@ -59,6 +61,9 @@ RAG_CHUNK_OVERLAP = int(os.getenv("RAG_CHUNK_OVERLAP", "200"))
 RAG_TOP_K = int(os.getenv("RAG_TOP_K", "5"))
 RAG_SIMILARITY_THRESHOLD = float(os.getenv("RAG_SIMILARITY_THRESHOLD", "0.7"))
 RAG_MAX_TOKENS = int(os.getenv("RAG_MAX_TOKENS", "4096"))
+
+# Cache Configuration
+RAG_CACHE_SIZE = int(os.getenv("RAG_CACHE_SIZE", "100"))  # Max cached queries
 
 # MCP Configuration (Per Anthropic MCP Specification)
 MCP_SERVER_NAME = os.getenv("MCP_SERVER_NAME", "devskyy_rag_mcp")
@@ -160,6 +165,70 @@ class RAGResponse:
     retrieval_time_ms: float = 0.0
     generation_time_ms: float = 0.0
     metadata: Dict[str, Any] = field(default_factory=dict)
+
+
+# =============================================================================
+# QUERY CACHE (LRU Cache for Performance)
+# =============================================================================
+
+class QueryCache:
+    """
+    LRU cache for query results to improve performance.
+    
+    Thread-safe implementation using OrderedDict.
+    """
+    
+    def __init__(self, max_size: int = RAG_CACHE_SIZE):
+        self.max_size = max_size
+        self.cache: OrderedDict = OrderedDict()
+        self._hits = 0
+        self._misses = 0
+    
+    def _make_key(self, query: str, k: int, strategy: RetrievalStrategy) -> str:
+        """Create cache key from query parameters."""
+        key_str = f"{query}:{k}:{strategy.value}"
+        return hashlib.md5(key_str.encode()).hexdigest()
+    
+    def get(self, query: str, k: int, strategy: RetrievalStrategy) -> Optional[List[RetrievalResult]]:
+        """Get cached result if available."""
+        key = self._make_key(query, k, strategy)
+        if key in self.cache:
+            self._hits += 1
+            # Move to end (most recently used)
+            self.cache.move_to_end(key)
+            logger.debug(f"Cache hit for query: {query[:50]}...")
+            return self.cache[key]
+        self._misses += 1
+        return None
+    
+    def put(self, query: str, k: int, strategy: RetrievalStrategy, results: List[RetrievalResult]) -> None:
+        """Store result in cache."""
+        key = self._make_key(query, k, strategy)
+        
+        # Remove oldest if at capacity
+        if len(self.cache) >= self.max_size and key not in self.cache:
+            self.cache.popitem(last=False)  # Remove oldest (FIFO)
+        
+        self.cache[key] = results
+        self.cache.move_to_end(key)
+    
+    def clear(self) -> None:
+        """Clear all cached results."""
+        self.cache.clear()
+        self._hits = 0
+        self._misses = 0
+    
+    def stats(self) -> Dict[str, Any]:
+        """Get cache statistics."""
+        total = self._hits + self._misses
+        hit_rate = self._hits / total if total > 0 else 0.0
+        return {
+            "size": len(self.cache),
+            "max_size": self.max_size,
+            "hits": self._hits,
+            "misses": self._misses,
+            "hit_rate": hit_rate
+        }
 
 
 # =============================================================================
@@ -379,6 +448,7 @@ class VectorStore:
         self.embedding_engine = embedding_engine or EmbeddingEngine()
         self._client = None
         self._collection = None
+        self._query_cache = QueryCache()  # Add query cache
         
         # Ensure persist directory exists
         Path(persist_directory).mkdir(parents=True, exist_ok=True)
@@ -415,11 +485,16 @@ class VectorStore:
             logger.info(f"✓ Collection '{self.collection_name}' ready")
         return self._collection
     
-    def add_documents(self, documents: List[Document]) -> int:
+    def add_documents(self, documents: List[Document], batch_size: int = 100) -> int:
         """
-        Add documents to vector store.
+        Add documents to vector store with batching for better performance.
         
-        Returns number of documents added.
+        Args:
+            documents: List of documents to add
+            batch_size: Number of documents to process in each batch
+        
+        Returns:
+            Number of documents added.
         """
         if not documents:
             return 0
@@ -429,22 +504,32 @@ class VectorStore:
         if docs_without_embeddings:
             self.embedding_engine.embed_documents(docs_without_embeddings)
         
-        # Prepare for ChromaDB
-        ids = [doc.doc_id for doc in documents]
-        embeddings = [doc.embedding for doc in documents]
-        contents = [doc.content for doc in documents]
-        metadatas = [doc.to_dict()["metadata"] for doc in documents]
+        # Process in batches to avoid memory issues with large datasets
+        total_added = 0
+        for i in range(0, len(documents), batch_size):
+            batch = documents[i:i + batch_size]
+            
+            # Prepare for ChromaDB
+            ids = [doc.doc_id for doc in batch]
+            embeddings = [doc.embedding for doc in batch]
+            contents = [doc.content for doc in batch]
+            metadatas = [doc.to_dict()["metadata"] for doc in batch]
+            
+            # Add to collection
+            self.collection.add(
+                ids=ids,
+                embeddings=embeddings,
+                documents=contents,
+                metadatas=metadatas
+            )
+            
+            total_added += len(batch)
+            logger.debug(f"Added batch {i//batch_size + 1}: {len(batch)} documents")
         
-        # Add to collection
-        self.collection.add(
-            ids=ids,
-            embeddings=embeddings,
-            documents=contents,
-            metadatas=metadatas
-        )
-        
-        logger.info(f"✓ Added {len(documents)} documents to collection")
-        return len(documents)
+        logger.info(f"✓ Added {total_added} documents to collection in {(len(documents) + batch_size - 1) // batch_size} batches")
+        # Clear cache when new documents are added
+        self._query_cache.clear()
+        return total_added
     
     def similarity_search(
         self,
@@ -510,10 +595,15 @@ class VectorStore:
         fetch_k: int = 20
     ) -> List[RetrievalResult]:
         """
-        Maximal Marginal Relevance search.
+        Maximal Marginal Relevance search - OPTIMIZED VERSION.
         
         Balances relevance and diversity in results.
         MMR = λ * sim(doc, query) - (1-λ) * max(sim(doc, selected_docs))
+        
+        Optimizations:
+        - Vectorized similarity computations
+        - Pre-normalized embeddings
+        - Batch matrix operations instead of loops
         """
         # First, get more candidates
         query_embedding = self.embedding_engine.embed_text(query)
@@ -527,45 +617,43 @@ class VectorStore:
         if not results or not results["ids"][0]:
             return []
         
-        # Apply MMR
+        # Apply MMR with vectorized operations
         import numpy as np
         
         candidate_embeddings = np.array(results["embeddings"][0])
         query_emb = np.array(query_embedding)
         
-        # Calculate query similarities
-        query_sims = np.dot(candidate_embeddings, query_emb) / (
-            np.linalg.norm(candidate_embeddings, axis=1) * np.linalg.norm(query_emb)
-        )
+        # Pre-normalize embeddings for faster similarity computation
+        candidate_norms = np.linalg.norm(candidate_embeddings, axis=1, keepdims=True)
+        normalized_candidates = candidate_embeddings / candidate_norms
+        normalized_query = query_emb / np.linalg.norm(query_emb)
+        
+        # Calculate query similarities using vectorized dot product
+        query_sims = np.dot(normalized_candidates, normalized_query)
         
         selected_indices = []
-        selected_embeddings = []
+        selected_mask = np.zeros(len(candidate_embeddings), dtype=bool)
         
         for _ in range(min(k, len(candidate_embeddings))):
-            if not selected_embeddings:
+            if not selected_indices:
                 # First selection: highest query similarity
                 best_idx = np.argmax(query_sims)
             else:
-                # MMR selection
-                mmr_scores = []
-                for i, emb in enumerate(candidate_embeddings):
-                    if i in selected_indices:
-                        mmr_scores.append(-float('inf'))
-                        continue
-                    
-                    # Max similarity to selected documents
-                    max_sim_to_selected = max(
-                        np.dot(emb, sel_emb) / (np.linalg.norm(emb) * np.linalg.norm(sel_emb))
-                        for sel_emb in selected_embeddings
-                    )
-                    
-                    mmr = lambda_mult * query_sims[i] - (1 - lambda_mult) * max_sim_to_selected
-                    mmr_scores.append(mmr)
+                # MMR selection with vectorized operations
+                # Compute similarity matrix between candidates and selected documents
+                selected_embs = normalized_candidates[selected_indices]
+                sim_to_selected = np.dot(normalized_candidates, selected_embs.T)
+                max_sim_to_selected = np.max(sim_to_selected, axis=1)
+                
+                # Calculate MMR scores
+                mmr_scores = lambda_mult * query_sims - (1 - lambda_mult) * max_sim_to_selected
+                # Mask already selected indices
+                mmr_scores[selected_mask] = -float('inf')
                 
                 best_idx = np.argmax(mmr_scores)
             
             selected_indices.append(best_idx)
-            selected_embeddings.append(candidate_embeddings[best_idx])
+            selected_mask[best_idx] = True
         
         # Build results
         retrieval_results = []

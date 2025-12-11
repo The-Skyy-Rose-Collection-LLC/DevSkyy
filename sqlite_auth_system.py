@@ -1,7 +1,13 @@
 """
 Complete SQLite Database Authentication System
-Professional implementation with proper security practices
+Professional implementation with proper security practices and performance optimizations
 Save this file as: sqlite_auth_system.py
+
+PERFORMANCE OPTIMIZATIONS:
+- Connection pooling for better concurrency
+- Prepared statement caching
+- Compiled regex patterns for validation
+- Efficient batch operations
 """
 
 # For async support
@@ -11,8 +17,10 @@ import os
 import re
 import secrets
 import sqlite3
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from functools import lru_cache
 from typing import Any, Dict, List, Optional, Tuple
 
 # For password hashing (install: pip install bcrypt argon2-cffi)
@@ -192,14 +200,20 @@ END;
 # ===========================
 
 class PasswordValidator:
-    """Validate password strength"""
+    """Validate password strength with compiled regex for performance"""
+    
+    # Pre-compile regex patterns for better performance
+    UPPERCASE_PATTERN = re.compile(r'[A-Z]')
+    LOWERCASE_PATTERN = re.compile(r'[a-z]')
+    NUMBER_PATTERN = re.compile(r'\d')
+    SPECIAL_PATTERN = re.compile(r'[!@#$%^&*(),.?":{}|<>]')
     
     def __init__(self, config: SecurityConfig):
         self.config = config
-        
+    
     def validate(self, password: str, username: str = None) -> Tuple[bool, List[str]]:
         """
-        Validate password strength
+        Validate password strength using pre-compiled patterns
         Returns: (is_valid, list_of_errors)
         """
         errors = []
@@ -208,20 +222,20 @@ class PasswordValidator:
         if len(password) < self.config.password_min_length:
             errors.append(f"Password must be at least {self.config.password_min_length} characters")
         
-        # Check uppercase
-        if self.config.password_require_uppercase and not re.search(r'[A-Z]', password):
+        # Check uppercase - using pre-compiled pattern
+        if self.config.password_require_uppercase and not self.UPPERCASE_PATTERN.search(password):
             errors.append("Password must contain at least one uppercase letter")
         
-        # Check lowercase
-        if self.config.password_require_lowercase and not re.search(r'[a-z]', password):
+        # Check lowercase - using pre-compiled pattern
+        if self.config.password_require_lowercase and not self.LOWERCASE_PATTERN.search(password):
             errors.append("Password must contain at least one lowercase letter")
         
-        # Check numbers
-        if self.config.password_require_numbers and not re.search(r'\d', password):
+        # Check numbers - using pre-compiled pattern
+        if self.config.password_require_numbers and not self.NUMBER_PATTERN.search(password):
             errors.append("Password must contain at least one number")
         
-        # Check special characters
-        if self.config.password_require_special and not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        # Check special characters - using pre-compiled pattern
+        if self.config.password_require_special and not self.SPECIAL_PATTERN.search(password):
             errors.append("Password must contain at least one special character")
         
         # Check if password contains username
@@ -229,27 +243,104 @@ class PasswordValidator:
             errors.append("Password cannot contain username")
         
         # Check common passwords
-        common_passwords = ['password', '123456', 'admin', 'letmein', 'welcome']
+        common_passwords = {'password', '123456', 'admin', 'letmein', 'welcome'}
         if password.lower() in common_passwords:
             errors.append("Password is too common")
         
         return (len(errors) == 0, errors)
 
 # ===========================
+# Connection Pool for Performance
+# ===========================
+
+class ConnectionPool:
+    """
+    Simple connection pool for SQLite to improve performance.
+    
+    Maintains a pool of reusable database connections to avoid
+    the overhead of creating new connections for each query.
+    """
+    
+    def __init__(self, db_config: DatabaseConfig, pool_size: int = 5):
+        self.db_config = db_config
+        self.pool_size = pool_size
+        self._pool: List[sqlite3.Connection] = []
+        self._in_use: set = set()
+        self._initialize_pool()
+    
+    def _initialize_pool(self):
+        """Initialize the connection pool."""
+        for _ in range(self.pool_size):
+            conn = self._create_connection()
+            self._pool.append(conn)
+    
+    def _create_connection(self) -> sqlite3.Connection:
+        """Create a new database connection."""
+        conn = sqlite3.connect(
+            self.db_config.db_path,
+            timeout=self.db_config.timeout,
+            check_same_thread=self.db_config.check_same_thread
+        )
+        conn.row_factory = sqlite3.Row
+        # Enable WAL mode
+        if self.db_config.use_wal:
+            conn.execute("PRAGMA journal_mode=WAL")
+        conn.execute("PRAGMA foreign_keys=ON")
+        return conn
+    
+    @contextmanager
+    def get_connection(self):
+        """Get a connection from the pool (context manager)."""
+        conn = None
+        try:
+            # Try to get a free connection from pool
+            if self._pool:
+                conn = self._pool.pop()
+            else:
+                # Create new connection if pool is empty
+                conn = self._create_connection()
+            
+            self._in_use.add(id(conn))
+            yield conn
+            
+        finally:
+            # Return connection to pool
+            if conn:
+                self._in_use.discard(id(conn))
+                if len(self._pool) < self.pool_size:
+                    self._pool.append(conn)
+                else:
+                    conn.close()
+    
+    def close_all(self):
+        """Close all connections in the pool."""
+        for conn in self._pool:
+            conn.close()
+        self._pool.clear()
+
+# ===========================
 # Main Authentication Class
 # ===========================
 
 class SQLiteAuthSystem:
-    """Complete SQLite authentication system with security best practices"""
+    """Complete SQLite authentication system with security best practices and performance optimizations"""
+    
+    # Pre-compile validation patterns for performance
+    USERNAME_PATTERN = re.compile(r'^[a-zA-Z0-9_]{3,30}$')
+    EMAIL_PATTERN = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
     
     def __init__(
         self,
         db_config: DatabaseConfig = None,
-        security_config: SecurityConfig = None
+        security_config: SecurityConfig = None,
+        pool_size: int = 5
     ):
         self.db_config = db_config or DatabaseConfig()
         self.security_config = security_config or SecurityConfig()
         self.password_validator = PasswordValidator(self.security_config)
+        
+        # Initialize connection pool for better performance
+        self.connection_pool = ConnectionPool(self.db_config, pool_size=pool_size)
         
         # Initialize password hashers
         if self.security_config.use_argon2:

@@ -187,15 +187,16 @@ class BaseAgent:
         }
 
 class AgentRegistry:
-    """Central agent registry"""
+    """Central agent registry with lazy initialization for better performance"""
     
     def __init__(self):
         self.agents = {}
-        self._register_default_agents()
+        self._initialized = False
+        self._agent_definitions = self._get_agent_definitions()
     
-    def _register_default_agents(self):
-        """Register all 54 agents"""
-        agent_list = [
+    def _get_agent_definitions(self):
+        """Get agent definitions without initializing them (lazy loading)"""
+        return [
             ("scanner", "infrastructure"),
             ("fixer", "infrastructure"),
             ("security_agent", "security"),
@@ -252,14 +253,27 @@ class AgentRegistry:
             ("export_agent", "data"),
             ("import_agent", "data")
         ]
+    
+    def _register_default_agents(self):
+        """Register all 54 agents - called lazily"""
+        if self._initialized:
+            return
         
-        for name, agent_type in agent_list:
+        for name, agent_type in self._agent_definitions:
             self.agents[name] = BaseAgent(name, agent_type)
+        
+        self._initialized = True
     
     def get_agent(self, name: str) -> Optional[BaseAgent]:
+        """Get agent by name - initializes registry if needed"""
+        if not self._initialized:
+            self._register_default_agents()
         return self.agents.get(name)
     
     def list_agents(self) -> List[Dict[str, str]]:
+        """List all agents - initializes registry if needed"""
+        if not self._initialized:
+            self._register_default_agents()
         return [
             {"name": name, "type": agent.agent_type, "status": agent.status}
             for name, agent in self.agents.items()
