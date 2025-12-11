@@ -150,6 +150,9 @@ include = ["api*", "security*", "database*", "wordpress*", "agents*", "orchestra
 [tool.ruff]
 target-version = "py311"
 line-length = 100
+exclude = ["legacy/"]
+
+[tool.ruff.lint]
 select = [
     "E",      # pycodestyle errors
     "W",      # pycodestyle warnings
@@ -165,10 +168,13 @@ ignore = [
     "E501",   # line too long (handled by black)
     "B008",   # do not perform function calls in argument defaults
     "B904",   # raise without from inside except
+    "ARG001", # unused function argument (common with FastAPI dependencies)
+    "ARG002", # unused method argument (common with API handlers)
 ]
 
-[tool.ruff.per-file-ignores]
-"tests/*" = ["ARG001"]  # Unused function argument in tests
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["ARG001", "ARG002"]
+"legacy/*" = ["ALL"]  # Legacy files - don't enforce strict linting
 
 [tool.black]
 target-version = ["py311"]

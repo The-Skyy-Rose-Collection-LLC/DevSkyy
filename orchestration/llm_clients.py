@@ -20,17 +20,16 @@ Features:
 - Token counting
 """
 
-import os
-import asyncio
 import logging
+import os
 from abc import ABC, abstractmethod
+from collections.abc import AsyncIterator
 from datetime import datetime
-from typing import Optional, Dict, Any, List, AsyncIterator, Union
-from dataclasses import dataclass, field
 from enum import Enum
+from typing import Any
 
 import httpx
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 
 logger = logging.getLogger(__name__)
@@ -40,8 +39,10 @@ logger = logging.getLogger(__name__)
 # Common Models
 # =============================================================================
 
+
 class MessageRole(str, Enum):
     """Message roles"""
+
     SYSTEM = "system"
     USER = "user"
     ASSISTANT = "assistant"
@@ -50,60 +51,65 @@ class MessageRole(str, Enum):
 
 class Message(BaseModel):
     """Chat message"""
+
     role: MessageRole
     content: str
-    name: Optional[str] = None
-    tool_calls: Optional[List[Dict]] = None
-    tool_call_id: Optional[str] = None
+    name: str | None = None
+    tool_calls: list[dict] | None = None
+    tool_call_id: str | None = None
 
 
 class ToolCall(BaseModel):
     """Tool call request"""
+
     id: str
     type: str = "function"
-    function: Dict[str, Any]
+    function: dict[str, Any]
 
 
 class CompletionResponse(BaseModel):
     """Unified completion response"""
+
     content: str
     model: str
     provider: str
-    
+
     # Usage
     input_tokens: int = 0
     output_tokens: int = 0
     total_tokens: int = 0
-    
+
     # Metadata
     finish_reason: str = ""
-    tool_calls: List[ToolCall] = []
+    tool_calls: list[ToolCall] = []
     latency_ms: float = 0
-    
+
     # Raw response
-    raw: Dict[str, Any] = {}
+    raw: dict[str, Any] = {}
 
 
 class StreamChunk(BaseModel):
     """Streaming chunk"""
+
     content: str = ""
-    finish_reason: Optional[str] = None
-    tool_calls: List[Dict] = []
+    finish_reason: str | None = None
+    tool_calls: list[dict] = []
 
 
 # =============================================================================
 # Base Client
 # =============================================================================
 
+
 class BaseLLMClient(ABC):
     """
     Base LLM Client
-    
+
     Abstract base class for all provider clients.
     """
-    
+
     provider: str = "base"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -115,15 +121,15 @@ class BaseLLMClient(ABC):
         self.base_url = base_url
         self.timeout = timeout
         self.max_retries = max_retries
-        self._client: Optional[httpx.AsyncClient] = None
-    
+        self._client: httpx.AsyncClient | None = None
+
     async def __aenter__(self):
         await self.connect()
         return self
-    
+
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         await self.close()
-    
+
     async def connect(self):
         """Initialize HTTP client"""
         if self._client is None:
@@ -131,35 +137,35 @@ class BaseLLMClient(ABC):
                 timeout=self.timeout,
                 headers=self._get_headers(),
             )
-    
+
     async def close(self):
         """Close HTTP client"""
         if self._client:
             await self._client.aclose()
             self._client = None
-    
+
     @abstractmethod
-    def _get_headers(self) -> Dict[str, str]:
+    def _get_headers(self) -> dict[str, str]:
         """Get authentication headers"""
         pass
-    
+
     @abstractmethod
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str,
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
+        tools: list[dict] = None,
         **kwargs,
     ) -> CompletionResponse:
         """Generate completion"""
         pass
-    
+
     @abstractmethod
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str,
         temperature: float = 0.7,
         max_tokens: int = 1024,
@@ -167,25 +173,23 @@ class BaseLLMClient(ABC):
     ) -> AsyncIterator[StreamChunk]:
         """Stream completion"""
         pass
-    
-    def _messages_to_list(self, messages: List[Message]) -> List[Dict]:
+
+    def _messages_to_list(self, messages: list[Message]) -> list[dict]:
         """Convert Message objects to dict list"""
-        return [
-            {"role": m.role.value, "content": m.content}
-            for m in messages
-        ]
+        return [{"role": m.role.value, "content": m.content} for m in messages]
 
 
 # =============================================================================
 # OpenAI Client
 # =============================================================================
 
+
 class OpenAIClient(BaseLLMClient):
     """
     OpenAI API Client
-    
+
     Supports: GPT-4o, GPT-4o-mini, o1-preview, o1-mini
-    
+
     Usage:
         client = OpenAIClient()
         response = await client.complete(
@@ -193,9 +197,9 @@ class OpenAIClient(BaseLLMClient):
             model="gpt-4o-mini"
         )
     """
-    
+
     provider = "openai"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -207,65 +211,67 @@ class OpenAIClient(BaseLLMClient):
             base_url=base_url,
             **kwargs,
         )
-    
-    def _get_headers(self) -> Dict[str, str]:
+
+    def _get_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
-    
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "gpt-4o-mini",
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
-        response_format: Dict = None,
+        tools: list[dict] = None,
+        response_format: dict = None,
         **kwargs,
     ) -> CompletionResponse:
         await self.connect()
-        
+
         data = {
             "model": model,
             "messages": self._messages_to_list(messages),
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
-        
+
         if tools:
             data["tools"] = tools
         if response_format:
             data["response_format"] = response_format
-        
+
         start_time = datetime.now()
-        
+
         response = await self._client.post(
             f"{self.base_url}/chat/completions",
             json=data,
         )
-        
+
         latency = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         if response.status_code >= 400:
             error = response.json()
             raise Exception(f"OpenAI error: {error}")
-        
+
         result = response.json()
         choice = result["choices"][0]
         usage = result.get("usage", {})
-        
+
         # Extract tool calls
         tool_calls = []
         if choice.get("message", {}).get("tool_calls"):
             for tc in choice["message"]["tool_calls"]:
-                tool_calls.append(ToolCall(
-                    id=tc["id"],
-                    type=tc["type"],
-                    function=tc["function"],
-                ))
-        
+                tool_calls.append(
+                    ToolCall(
+                        id=tc["id"],
+                        type=tc["type"],
+                        function=tc["function"],
+                    )
+                )
+
         return CompletionResponse(
             content=choice.get("message", {}).get("content", ""),
             model=model,
@@ -278,17 +284,17 @@ class OpenAIClient(BaseLLMClient):
             latency_ms=latency,
             raw=result,
         )
-    
+
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "gpt-4o-mini",
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
     ) -> AsyncIterator[StreamChunk]:
         await self.connect()
-        
+
         data = {
             "model": model,
             "messages": self._messages_to_list(messages),
@@ -296,7 +302,7 @@ class OpenAIClient(BaseLLMClient):
             "max_tokens": max_tokens,
             "stream": True,
         }
-        
+
         async with self._client.stream(
             "POST",
             f"{self.base_url}/chat/completions",
@@ -307,11 +313,12 @@ class OpenAIClient(BaseLLMClient):
                     data_str = line[6:]
                     if data_str == "[DONE]":
                         break
-                    
+
                     import json
+
                     chunk_data = json.loads(data_str)
                     delta = chunk_data["choices"][0].get("delta", {})
-                    
+
                     yield StreamChunk(
                         content=delta.get("content", ""),
                         finish_reason=chunk_data["choices"][0].get("finish_reason"),
@@ -322,12 +329,13 @@ class OpenAIClient(BaseLLMClient):
 # Anthropic Client
 # =============================================================================
 
+
 class AnthropicClient(BaseLLMClient):
     """
     Anthropic API Client
-    
+
     Supports: Claude 3.5 Sonnet, Claude 3 Opus, Claude 3 Haiku
-    
+
     Usage:
         client = AnthropicClient()
         response = await client.complete(
@@ -335,9 +343,9 @@ class AnthropicClient(BaseLLMClient):
             model="claude-3-5-sonnet-20241022"
         )
     """
-    
+
     provider = "anthropic"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -349,90 +357,94 @@ class AnthropicClient(BaseLLMClient):
             base_url=base_url,
             **kwargs,
         )
-    
-    def _get_headers(self) -> Dict[str, str]:
+
+    def _get_headers(self) -> dict[str, str]:
         return {
             "x-api-key": self.api_key,
             "Content-Type": "application/json",
             "anthropic-version": "2023-06-01",
         }
-    
-    def _messages_to_anthropic(self, messages: List[Message]) -> tuple:
+
+    def _messages_to_anthropic(self, messages: list[Message]) -> tuple:
         """Convert to Anthropic format (separate system)"""
         system = ""
         msgs = []
-        
+
         for m in messages:
             if m.role == MessageRole.SYSTEM:
                 system = m.content
             else:
-                msgs.append({
-                    "role": "user" if m.role == MessageRole.USER else "assistant",
-                    "content": m.content,
-                })
-        
+                msgs.append(
+                    {
+                        "role": "user" if m.role == MessageRole.USER else "assistant",
+                        "content": m.content,
+                    }
+                )
+
         return system, msgs
-    
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "claude-3-5-sonnet-20241022",
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
+        tools: list[dict] = None,
         **kwargs,
     ) -> CompletionResponse:
         await self.connect()
-        
+
         system, msgs = self._messages_to_anthropic(messages)
-        
+
         data = {
             "model": model,
             "messages": msgs,
             "max_tokens": max_tokens,
             "temperature": temperature,
         }
-        
+
         if system:
             data["system"] = system
-        
+
         if tools:
             data["tools"] = tools
-        
+
         start_time = datetime.now()
-        
+
         response = await self._client.post(
             f"{self.base_url}/v1/messages",
             json=data,
         )
-        
+
         latency = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         if response.status_code >= 400:
             error = response.json()
             raise Exception(f"Anthropic error: {error}")
-        
+
         result = response.json()
         usage = result.get("usage", {})
-        
+
         # Extract content
         content = ""
         tool_calls = []
-        
+
         for block in result.get("content", []):
             if block["type"] == "text":
                 content += block["text"]
             elif block["type"] == "tool_use":
-                tool_calls.append(ToolCall(
-                    id=block["id"],
-                    type="function",
-                    function={
-                        "name": block["name"],
-                        "arguments": block["input"],
-                    },
-                ))
-        
+                tool_calls.append(
+                    ToolCall(
+                        id=block["id"],
+                        type="function",
+                        function={
+                            "name": block["name"],
+                            "arguments": block["input"],
+                        },
+                    )
+                )
+
         return CompletionResponse(
             content=content,
             model=model,
@@ -445,19 +457,19 @@ class AnthropicClient(BaseLLMClient):
             latency_ms=latency,
             raw=result,
         )
-    
+
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "claude-3-5-sonnet-20241022",
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
     ) -> AsyncIterator[StreamChunk]:
         await self.connect()
-        
+
         system, msgs = self._messages_to_anthropic(messages)
-        
+
         data = {
             "model": model,
             "messages": msgs,
@@ -465,10 +477,10 @@ class AnthropicClient(BaseLLMClient):
             "temperature": temperature,
             "stream": True,
         }
-        
+
         if system:
             data["system"] = system
-        
+
         async with self._client.stream(
             "POST",
             f"{self.base_url}/v1/messages",
@@ -477,8 +489,9 @@ class AnthropicClient(BaseLLMClient):
             async for line in response.aiter_lines():
                 if line.startswith("data: "):
                     import json
+
                     chunk_data = json.loads(line[6:])
-                    
+
                     if chunk_data["type"] == "content_block_delta":
                         delta = chunk_data.get("delta", {})
                         yield StreamChunk(
@@ -492,12 +505,13 @@ class AnthropicClient(BaseLLMClient):
 # Google Client
 # =============================================================================
 
+
 class GoogleClient(BaseLLMClient):
     """
     Google Gemini API Client
-    
+
     Supports: Gemini 1.5 Pro, Gemini 1.5 Flash, Gemini 2.0 Flash
-    
+
     Usage:
         client = GoogleClient()
         response = await client.complete(
@@ -505,9 +519,9 @@ class GoogleClient(BaseLLMClient):
             model="gemini-1.5-flash"
         )
     """
-    
+
     provider = "google"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -519,42 +533,44 @@ class GoogleClient(BaseLLMClient):
             base_url=base_url,
             **kwargs,
         )
-    
-    def _get_headers(self) -> Dict[str, str]:
+
+    def _get_headers(self) -> dict[str, str]:
         return {
             "Content-Type": "application/json",
         }
-    
-    def _messages_to_gemini(self, messages: List[Message]) -> tuple:
+
+    def _messages_to_gemini(self, messages: list[Message]) -> tuple:
         """Convert to Gemini format"""
         system = ""
         contents = []
-        
+
         for m in messages:
             if m.role == MessageRole.SYSTEM:
                 system = m.content
             else:
-                contents.append({
-                    "role": "user" if m.role == MessageRole.USER else "model",
-                    "parts": [{"text": m.content}],
-                })
-        
+                contents.append(
+                    {
+                        "role": "user" if m.role == MessageRole.USER else "model",
+                        "parts": [{"text": m.content}],
+                    }
+                )
+
         return system, contents
-    
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "gemini-1.5-flash",
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
+        tools: list[dict] = None,
         **kwargs,
     ) -> CompletionResponse:
         await self.connect()
-        
+
         system, contents = self._messages_to_gemini(messages)
-        
+
         data = {
             "contents": contents,
             "generationConfig": {
@@ -562,46 +578,48 @@ class GoogleClient(BaseLLMClient):
                 "maxOutputTokens": max_tokens,
             },
         }
-        
+
         if system:
             data["systemInstruction"] = {"parts": [{"text": system}]}
-        
+
         if tools:
             data["tools"] = [{"functionDeclarations": tools}]
-        
+
         start_time = datetime.now()
-        
+
         url = f"{self.base_url}/models/{model}:generateContent?key={self.api_key}"
         response = await self._client.post(url, json=data)
-        
+
         latency = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         if response.status_code >= 400:
             error = response.json()
             raise Exception(f"Google error: {error}")
-        
+
         result = response.json()
         candidate = result.get("candidates", [{}])[0]
         usage = result.get("usageMetadata", {})
-        
+
         # Extract content
         content = ""
         tool_calls = []
-        
+
         for part in candidate.get("content", {}).get("parts", []):
             if "text" in part:
                 content += part["text"]
             elif "functionCall" in part:
                 fc = part["functionCall"]
-                tool_calls.append(ToolCall(
-                    id=f"call_{len(tool_calls)}",
-                    type="function",
-                    function={
-                        "name": fc["name"],
-                        "arguments": fc.get("args", {}),
-                    },
-                ))
-        
+                tool_calls.append(
+                    ToolCall(
+                        id=f"call_{len(tool_calls)}",
+                        type="function",
+                        function={
+                            "name": fc["name"],
+                            "arguments": fc.get("args", {}),
+                        },
+                    )
+                )
+
         return CompletionResponse(
             content=content,
             model=model,
@@ -614,19 +632,19 @@ class GoogleClient(BaseLLMClient):
             latency_ms=latency,
             raw=result,
         )
-    
+
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "gemini-1.5-flash",
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
     ) -> AsyncIterator[StreamChunk]:
         await self.connect()
-        
+
         system, contents = self._messages_to_gemini(messages)
-        
+
         data = {
             "contents": contents,
             "generationConfig": {
@@ -634,18 +652,19 @@ class GoogleClient(BaseLLMClient):
                 "maxOutputTokens": max_tokens,
             },
         }
-        
+
         if system:
             data["systemInstruction"] = {"parts": [{"text": system}]}
-        
+
         url = f"{self.base_url}/models/{model}:streamGenerateContent?key={self.api_key}"
-        
+
         async with self._client.stream("POST", url, json=data) as response:
             async for line in response.aiter_lines():
                 if line:
                     import json
+
                     chunk_data = json.loads(line)
-                    
+
                     for candidate in chunk_data.get("candidates", []):
                         for part in candidate.get("content", {}).get("parts", []):
                             if "text" in part:
@@ -656,15 +675,16 @@ class GoogleClient(BaseLLMClient):
 # Mistral Client
 # =============================================================================
 
+
 class MistralClient(BaseLLMClient):
     """
     Mistral API Client
-    
+
     Supports: Mistral Large, Mistral Medium, Mistral Small, Codestral
     """
-    
+
     provider = "mistral"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -676,52 +696,52 @@ class MistralClient(BaseLLMClient):
             base_url=base_url,
             **kwargs,
         )
-    
-    def _get_headers(self) -> Dict[str, str]:
+
+    def _get_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
-    
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "mistral-small-latest",
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
+        tools: list[dict] = None,
         **kwargs,
     ) -> CompletionResponse:
         await self.connect()
-        
+
         data = {
             "model": model,
             "messages": self._messages_to_list(messages),
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
-        
+
         if tools:
             data["tools"] = tools
-        
+
         start_time = datetime.now()
-        
+
         response = await self._client.post(
             f"{self.base_url}/chat/completions",
             json=data,
         )
-        
+
         latency = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         if response.status_code >= 400:
             error = response.json()
             raise Exception(f"Mistral error: {error}")
-        
+
         result = response.json()
         choice = result["choices"][0]
         usage = result.get("usage", {})
-        
+
         return CompletionResponse(
             content=choice.get("message", {}).get("content", ""),
             model=model,
@@ -733,17 +753,17 @@ class MistralClient(BaseLLMClient):
             latency_ms=latency,
             raw=result,
         )
-    
+
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "mistral-small-latest",
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
     ) -> AsyncIterator[StreamChunk]:
         await self.connect()
-        
+
         data = {
             "model": model,
             "messages": self._messages_to_list(messages),
@@ -751,7 +771,7 @@ class MistralClient(BaseLLMClient):
             "max_tokens": max_tokens,
             "stream": True,
         }
-        
+
         async with self._client.stream(
             "POST",
             f"{self.base_url}/chat/completions",
@@ -762,11 +782,12 @@ class MistralClient(BaseLLMClient):
                     data_str = line[6:]
                     if data_str == "[DONE]":
                         break
-                    
+
                     import json
+
                     chunk_data = json.loads(data_str)
                     delta = chunk_data["choices"][0].get("delta", {})
-                    
+
                     yield StreamChunk(
                         content=delta.get("content", ""),
                         finish_reason=chunk_data["choices"][0].get("finish_reason"),
@@ -777,15 +798,16 @@ class MistralClient(BaseLLMClient):
 # Cohere Client
 # =============================================================================
 
+
 class CohereClient(BaseLLMClient):
     """
     Cohere API Client
-    
+
     Supports: Command R+, Command R
     """
-    
+
     provider = "cohere"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -797,19 +819,19 @@ class CohereClient(BaseLLMClient):
             base_url=base_url,
             **kwargs,
         )
-    
-    def _get_headers(self) -> Dict[str, str]:
+
+    def _get_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
-    
-    def _messages_to_cohere(self, messages: List[Message]) -> tuple:
+
+    def _messages_to_cohere(self, messages: list[Message]) -> tuple:
         """Convert to Cohere format"""
         preamble = ""
         chat_history = []
         message = ""
-        
+
         for m in messages:
             if m.role == MessageRole.SYSTEM:
                 preamble = m.content
@@ -819,54 +841,54 @@ class CohereClient(BaseLLMClient):
                 message = m.content
             else:
                 chat_history.append({"role": "CHATBOT", "message": m.content})
-        
+
         return preamble, chat_history, message
-    
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "command-r",
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
+        tools: list[dict] = None,
         **kwargs,
     ) -> CompletionResponse:
         await self.connect()
-        
+
         preamble, chat_history, message = self._messages_to_cohere(messages)
-        
+
         data = {
             "model": model,
             "message": message,
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
-        
+
         if preamble:
             data["preamble"] = preamble
         if chat_history:
             data["chat_history"] = chat_history
         if tools:
             data["tools"] = tools
-        
+
         start_time = datetime.now()
-        
+
         response = await self._client.post(
             f"{self.base_url}/chat",
             json=data,
         )
-        
+
         latency = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         if response.status_code >= 400:
             error = response.json()
             raise Exception(f"Cohere error: {error}")
-        
+
         result = response.json()
         meta = result.get("meta", {})
         tokens = meta.get("tokens", {})
-        
+
         return CompletionResponse(
             content=result.get("text", ""),
             model=model,
@@ -878,19 +900,19 @@ class CohereClient(BaseLLMClient):
             latency_ms=latency,
             raw=result,
         )
-    
+
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "command-r",
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
     ) -> AsyncIterator[StreamChunk]:
         await self.connect()
-        
+
         preamble, chat_history, message = self._messages_to_cohere(messages)
-        
+
         data = {
             "model": model,
             "message": message,
@@ -898,12 +920,12 @@ class CohereClient(BaseLLMClient):
             "max_tokens": max_tokens,
             "stream": True,
         }
-        
+
         if preamble:
             data["preamble"] = preamble
         if chat_history:
             data["chat_history"] = chat_history
-        
+
         async with self._client.stream(
             "POST",
             f"{self.base_url}/chat",
@@ -912,31 +934,31 @@ class CohereClient(BaseLLMClient):
             async for line in response.aiter_lines():
                 if line:
                     import json
+
                     chunk_data = json.loads(line)
-                    
+
                     if chunk_data.get("event_type") == "text-generation":
                         yield StreamChunk(content=chunk_data.get("text", ""))
                     elif chunk_data.get("event_type") == "stream-end":
-                        yield StreamChunk(
-                            finish_reason=chunk_data.get("finish_reason", "")
-                        )
+                        yield StreamChunk(finish_reason=chunk_data.get("finish_reason", ""))
 
 
 # =============================================================================
 # Groq Client
 # =============================================================================
 
+
 class GroqClient(BaseLLMClient):
     """
     Groq API Client (Fast Inference)
-    
+
     Supports: Llama 3.1 70B, Llama 3.1 8B, Mixtral 8x7B
-    
+
     Note: Groq uses OpenAI-compatible API
     """
-    
+
     provider = "groq"
-    
+
     def __init__(
         self,
         api_key: str = None,
@@ -948,55 +970,55 @@ class GroqClient(BaseLLMClient):
             base_url=base_url,
             **kwargs,
         )
-    
-    def _get_headers(self) -> Dict[str, str]:
+
+    def _get_headers(self) -> dict[str, str]:
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
         }
-    
+
     @retry(stop=stop_after_attempt(3), wait=wait_exponential(min=1, max=10))
     async def complete(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "llama-3.1-70b-versatile",
         temperature: float = 0.7,
         max_tokens: int = 1024,
-        tools: List[Dict] = None,
+        tools: list[dict] = None,
         **kwargs,
     ) -> CompletionResponse:
         await self.connect()
-        
+
         data = {
             "model": model,
             "messages": self._messages_to_list(messages),
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
-        
+
         if tools:
             data["tools"] = tools
-        
+
         start_time = datetime.now()
-        
+
         response = await self._client.post(
             f"{self.base_url}/chat/completions",
             json=data,
         )
-        
+
         latency = (datetime.now() - start_time).total_seconds() * 1000
-        
+
         if response.status_code >= 400:
             error = response.json()
             raise Exception(f"Groq error: {error}")
-        
+
         result = response.json()
         choice = result["choices"][0]
         usage = result.get("usage", {})
-        
+
         # Groq reports speed metrics
         x_groq = result.get("x_groq", {})
-        
+
         return CompletionResponse(
             content=choice.get("message", {}).get("content", ""),
             model=model,
@@ -1008,17 +1030,17 @@ class GroqClient(BaseLLMClient):
             latency_ms=latency,
             raw={**result, "speed_metrics": x_groq},
         )
-    
+
     async def stream(
         self,
-        messages: List[Message],
+        messages: list[Message],
         model: str = "llama-3.1-70b-versatile",
         temperature: float = 0.7,
         max_tokens: int = 1024,
         **kwargs,
     ) -> AsyncIterator[StreamChunk]:
         await self.connect()
-        
+
         data = {
             "model": model,
             "messages": self._messages_to_list(messages),
@@ -1026,7 +1048,7 @@ class GroqClient(BaseLLMClient):
             "max_tokens": max_tokens,
             "stream": True,
         }
-        
+
         async with self._client.stream(
             "POST",
             f"{self.base_url}/chat/completions",
@@ -1037,11 +1059,12 @@ class GroqClient(BaseLLMClient):
                     data_str = line[6:]
                     if data_str == "[DONE]":
                         break
-                    
+
                     import json
+
                     chunk_data = json.loads(data_str)
                     delta = chunk_data["choices"][0].get("delta", {})
-                    
+
                     yield StreamChunk(
                         content=delta.get("content", ""),
                         finish_reason=chunk_data["choices"][0].get("finish_reason"),

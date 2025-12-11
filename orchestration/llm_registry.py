@@ -19,14 +19,11 @@ References:
 - Groq: https://console.groq.com/docs/models
 """
 
-import os
 import logging
-from datetime import datetime
-from typing import Optional, Dict, Any, List, Set
-from dataclasses import dataclass, field
+import os
 from enum import Enum
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -35,8 +32,10 @@ logger = logging.getLogger(__name__)
 # Enums
 # =============================================================================
 
+
 class ModelProvider(str, Enum):
     """LLM providers"""
+
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     GOOGLE = "google"
@@ -47,41 +46,43 @@ class ModelProvider(str, Enum):
 
 class ModelTier(str, Enum):
     """Model performance tiers"""
-    FLAGSHIP = "flagship"      # Best quality, highest cost
-    STANDARD = "standard"      # Good balance
-    EFFICIENT = "efficient"    # Fast and cheap
+
+    FLAGSHIP = "flagship"  # Best quality, highest cost
+    STANDARD = "standard"  # Good balance
+    EFFICIENT = "efficient"  # Fast and cheap
     SPECIALIZED = "specialized"  # Task-specific
 
 
 class ModelCapability(str, Enum):
     """Model capabilities"""
+
     # Core capabilities
     TEXT_GENERATION = "text_generation"
     CHAT = "chat"
     COMPLETION = "completion"
-    
+
     # Advanced capabilities
     CODE_GENERATION = "code_generation"
     CODE_ANALYSIS = "code_analysis"
     REASONING = "reasoning"
     MATH = "math"
-    
+
     # Multimodal
     VISION = "vision"
     IMAGE_UNDERSTANDING = "image_understanding"
     DOCUMENT_ANALYSIS = "document_analysis"
-    
+
     # Specialized
     FUNCTION_CALLING = "function_calling"
     TOOL_USE = "tool_use"
     JSON_MODE = "json_mode"
     STRUCTURED_OUTPUT = "structured_output"
-    
+
     # Performance
     LONG_CONTEXT = "long_context"
     FAST_INFERENCE = "fast_inference"
     LOW_LATENCY = "low_latency"
-    
+
     # Safety
     SAFETY_FILTERS = "safety_filters"
     CONTENT_MODERATION = "content_moderation"
@@ -91,49 +92,52 @@ class ModelCapability(str, Enum):
 # Models
 # =============================================================================
 
+
 class ModelDefinition(BaseModel):
     """LLM model definition"""
-    id: str                           # Model identifier
-    name: str                         # Display name
+
+    id: str  # Model identifier
+    name: str  # Display name
     provider: ModelProvider
     tier: ModelTier
-    
+
     # Token limits
-    context_window: int               # Max input tokens
-    max_output_tokens: int            # Max output tokens
-    
+    context_window: int  # Max input tokens
+    max_output_tokens: int  # Max output tokens
+
     # Capabilities
-    capabilities: Set[ModelCapability] = set()
-    
+    capabilities: set[ModelCapability] = set()
+
     # Pricing (per 1M tokens, USD)
     input_price: float = 0.0
     output_price: float = 0.0
-    
+
     # Performance
-    tokens_per_second: Optional[float] = None  # Approximate TPS
-    latency_ms: Optional[float] = None         # First token latency
-    
+    tokens_per_second: float | None = None  # Approximate TPS
+    latency_ms: float | None = None  # First token latency
+
     # Metadata
-    release_date: Optional[str] = None
+    release_date: str | None = None
     deprecated: bool = False
     description: str = ""
-    
+
     # Routing hints
-    best_for: List[str] = []          # Task types this excels at
-    avoid_for: List[str] = []         # Task types to avoid
-    
+    best_for: list[str] = []  # Task types this excels at
+    avoid_for: list[str] = []  # Task types to avoid
+
     class Config:
         use_enum_values = True
 
 
 class ProviderConfig(BaseModel):
     """Provider configuration"""
+
     provider: ModelProvider
-    api_key_env: str                  # Environment variable for API key
-    base_url: Optional[str] = None    # Custom base URL
-    default_model: str                # Default model ID
-    rate_limit_rpm: int = 60          # Requests per minute
-    rate_limit_tpm: int = 100000      # Tokens per minute
+    api_key_env: str  # Environment variable for API key
+    base_url: str | None = None  # Custom base URL
+    default_model: str  # Default model ID
+    rate_limit_rpm: int = 60  # Requests per minute
+    rate_limit_tpm: int = 100000  # Tokens per minute
 
 
 # =============================================================================
@@ -579,63 +583,59 @@ MIXTRAL_8X7B = ModelDefinition(
 # Registry
 # =============================================================================
 
+
 class LLMRegistry:
     """
     LLM Model Registry
-    
+
     Manages model definitions and provides intelligent selection.
-    
+
     Usage:
         registry = LLMRegistry()
-        
+
         # Get model by ID
         model = registry.get_model("gpt-4o")
-        
+
         # Find models by capability
         vision_models = registry.find_by_capability(ModelCapability.VISION)
-        
+
         # Get cheapest model for task
         cheap_model = registry.get_cheapest(capabilities={ModelCapability.CODE_GENERATION})
-        
+
         # Get fastest model
         fast_model = registry.get_fastest(min_context=50000)
     """
-    
+
     # All registered models
-    _models: Dict[str, ModelDefinition] = {
+    _models: dict[str, ModelDefinition] = {
         # OpenAI
         "gpt-4o": GPT4O,
         "gpt-4o-mini": GPT4O_MINI,
         "o1-preview": O1_PREVIEW,
-        
         # Anthropic
         "claude-3-5-sonnet-20241022": CLAUDE_35_SONNET,
         "claude-3-opus-20240229": CLAUDE_3_OPUS,
         "claude-3-haiku-20240307": CLAUDE_3_HAIKU,
-        
         # Google
         "gemini-1.5-pro": GEMINI_15_PRO,
         "gemini-1.5-flash": GEMINI_15_FLASH,
         "gemini-2.0-flash-exp": GEMINI_20_FLASH,
-        
         # Mistral
         "mistral-large-latest": MISTRAL_LARGE,
         "mistral-medium-latest": MISTRAL_MEDIUM,
         "mistral-small-latest": MISTRAL_SMALL,
         "codestral-latest": CODESTRAL,
-        
         # Cohere
         "command-r-plus": COMMAND_R_PLUS,
         "command-r": COMMAND_R,
-        
         # Groq
         "llama-3.1-70b-versatile": LLAMA_31_70B,
         "llama-3.1-8b-instant": LLAMA_31_8B,
         "mixtral-8x7b-32768": MIXTRAL_8X7B,
     }
-    
+
     # Provider configurations
-    _providers: Dict[ModelProvider, ProviderConfig] = {
+    _providers: dict[ModelProvider, ProviderConfig] = {
         ModelProvider.OPENAI: ProviderConfig(
             provider=ModelProvider.OPENAI,
             api_key_env="OPENAI_API_KEY",
@@ -684,58 +684,55 @@ class LLMRegistry:
             rate_limit_tpm=50000,
         ),
     }
-    
+
     def __init__(self):
         self.models = self._models.copy()
         self.providers = self._providers.copy()
-    
+
     # -------------------------------------------------------------------------
     # Basic Operations
     # -------------------------------------------------------------------------
-    
-    def get_model(self, model_id: str) -> Optional[ModelDefinition]:
+
+    def get_model(self, model_id: str) -> ModelDefinition | None:
         """Get model by ID"""
         return self.models.get(model_id)
-    
-    def get_provider(self, provider: ModelProvider) -> Optional[ProviderConfig]:
+
+    def get_provider(self, provider: ModelProvider) -> ProviderConfig | None:
         """Get provider configuration"""
         return self.providers.get(provider)
-    
-    def list_models(self) -> List[ModelDefinition]:
+
+    def list_models(self) -> list[ModelDefinition]:
         """List all models"""
         return list(self.models.values())
-    
-    def list_providers(self) -> List[ModelProvider]:
+
+    def list_providers(self) -> list[ModelProvider]:
         """List available providers"""
         return list(self.providers.keys())
-    
+
     # -------------------------------------------------------------------------
     # Filtering
     # -------------------------------------------------------------------------
-    
-    def find_by_provider(self, provider: ModelProvider) -> List[ModelDefinition]:
+
+    def find_by_provider(self, provider: ModelProvider) -> list[ModelDefinition]:
         """Find models by provider"""
         return [m for m in self.models.values() if m.provider == provider]
-    
-    def find_by_tier(self, tier: ModelTier) -> List[ModelDefinition]:
+
+    def find_by_tier(self, tier: ModelTier) -> list[ModelDefinition]:
         """Find models by tier"""
         return [m for m in self.models.values() if m.tier == tier]
-    
+
     def find_by_capability(
         self,
         capability: ModelCapability,
-    ) -> List[ModelDefinition]:
+    ) -> list[ModelDefinition]:
         """Find models with specific capability"""
-        return [
-            m for m in self.models.values()
-            if capability in m.capabilities
-        ]
-    
+        return [m for m in self.models.values() if capability in m.capabilities]
+
     def find_by_capabilities(
         self,
-        capabilities: Set[ModelCapability],
+        capabilities: set[ModelCapability],
         require_all: bool = True,
-    ) -> List[ModelDefinition]:
+    ) -> list[ModelDefinition]:
         """Find models with multiple capabilities"""
         results = []
         for model in self.models.values():
@@ -746,143 +743,113 @@ class LLMRegistry:
                 if capabilities.intersection(model.capabilities):
                     results.append(model)
         return results
-    
-    def find_by_context(self, min_context: int) -> List[ModelDefinition]:
+
+    def find_by_context(self, min_context: int) -> list[ModelDefinition]:
         """Find models with minimum context window"""
-        return [
-            m for m in self.models.values()
-            if m.context_window >= min_context
-        ]
-    
+        return [m for m in self.models.values() if m.context_window >= min_context]
+
     # -------------------------------------------------------------------------
     # Optimization Queries
     # -------------------------------------------------------------------------
-    
+
     def get_cheapest(
         self,
-        capabilities: Set[ModelCapability] = None,
+        capabilities: set[ModelCapability] = None,
         min_context: int = None,
-    ) -> Optional[ModelDefinition]:
+    ) -> ModelDefinition | None:
         """Get cheapest model matching requirements"""
         candidates = list(self.models.values())
-        
+
         if capabilities:
-            candidates = [
-                m for m in candidates
-                if capabilities.issubset(m.capabilities)
-            ]
-        
+            candidates = [m for m in candidates if capabilities.issubset(m.capabilities)]
+
         if min_context:
-            candidates = [
-                m for m in candidates
-                if m.context_window >= min_context
-            ]
-        
+            candidates = [m for m in candidates if m.context_window >= min_context]
+
         if not candidates:
             return None
-        
+
         # Sort by total cost (input + output)
         return min(candidates, key=lambda m: m.input_price + m.output_price)
-    
+
     def get_fastest(
         self,
-        capabilities: Set[ModelCapability] = None,
+        capabilities: set[ModelCapability] = None,
         min_context: int = None,
-    ) -> Optional[ModelDefinition]:
+    ) -> ModelDefinition | None:
         """Get fastest model matching requirements"""
         candidates = list(self.models.values())
-        
+
         if capabilities:
-            candidates = [
-                m for m in candidates
-                if capabilities.issubset(m.capabilities)
-            ]
-        
+            candidates = [m for m in candidates if capabilities.issubset(m.capabilities)]
+
         if min_context:
-            candidates = [
-                m for m in candidates
-                if m.context_window >= min_context
-            ]
-        
+            candidates = [m for m in candidates if m.context_window >= min_context]
+
         # Filter to models with TPS data
         candidates = [m for m in candidates if m.tokens_per_second]
-        
+
         if not candidates:
             return None
-        
+
         return max(candidates, key=lambda m: m.tokens_per_second or 0)
-    
+
     def get_best_quality(
         self,
-        capabilities: Set[ModelCapability] = None,
+        capabilities: set[ModelCapability] = None,
         min_context: int = None,
-    ) -> Optional[ModelDefinition]:
+    ) -> ModelDefinition | None:
         """Get highest quality model matching requirements"""
         candidates = list(self.models.values())
-        
+
         if capabilities:
-            candidates = [
-                m for m in candidates
-                if capabilities.issubset(m.capabilities)
-            ]
-        
+            candidates = [m for m in candidates if capabilities.issubset(m.capabilities)]
+
         if min_context:
-            candidates = [
-                m for m in candidates
-                if m.context_window >= min_context
-            ]
-        
+            candidates = [m for m in candidates if m.context_window >= min_context]
+
         # Filter to flagship tier first
         flagship = [m for m in candidates if m.tier == ModelTier.FLAGSHIP]
         if flagship:
             candidates = flagship
-        
+
         if not candidates:
             return None
-        
+
         # Sort by price as proxy for quality
         return max(candidates, key=lambda m: m.input_price + m.output_price)
-    
+
     def get_balanced(
         self,
-        capabilities: Set[ModelCapability] = None,
+        capabilities: set[ModelCapability] = None,
         min_context: int = None,
-    ) -> Optional[ModelDefinition]:
+    ) -> ModelDefinition | None:
         """Get balanced model (good quality, reasonable cost)"""
         candidates = list(self.models.values())
-        
+
         if capabilities:
-            candidates = [
-                m for m in candidates
-                if capabilities.issubset(m.capabilities)
-            ]
-        
+            candidates = [m for m in candidates if capabilities.issubset(m.capabilities)]
+
         if min_context:
-            candidates = [
-                m for m in candidates
-                if m.context_window >= min_context
-            ]
-        
+            candidates = [m for m in candidates if m.context_window >= min_context]
+
         # Prefer standard tier
         standard = [m for m in candidates if m.tier == ModelTier.STANDARD]
         if standard:
             candidates = standard
-        
+
         if not candidates:
             return None
-        
+
         # Return middle-priced option
-        sorted_candidates = sorted(
-            candidates,
-            key=lambda m: m.input_price + m.output_price
-        )
+        sorted_candidates = sorted(candidates, key=lambda m: m.input_price + m.output_price)
         return sorted_candidates[len(sorted_candidates) // 2]
-    
+
     # -------------------------------------------------------------------------
     # Task-Based Selection
     # -------------------------------------------------------------------------
-    
-    def get_for_task(self, task_type: str) -> Optional[ModelDefinition]:
+
+    def get_for_task(self, task_type: str) -> ModelDefinition | None:
         """Get recommended model for task type"""
         task_mappings = {
             "code": "claude-3-5-sonnet-20241022",
@@ -902,42 +869,39 @@ class LLMRegistry:
             "creative": "claude-3-5-sonnet-20241022",
             "writing": "claude-3-5-sonnet-20241022",
         }
-        
+
         model_id = task_mappings.get(task_type.lower())
         if model_id:
             return self.get_model(model_id)
-        
+
         # Default to balanced option
         return self.get_balanced()
-    
+
     # -------------------------------------------------------------------------
     # Provider Availability
     # -------------------------------------------------------------------------
-    
-    def get_available_providers(self) -> List[ModelProvider]:
+
+    def get_available_providers(self) -> list[ModelProvider]:
         """Get providers with API keys configured"""
         available = []
         for provider, config in self.providers.items():
             if os.getenv(config.api_key_env):
                 available.append(provider)
         return available
-    
-    def get_available_models(self) -> List[ModelDefinition]:
+
+    def get_available_models(self) -> list[ModelDefinition]:
         """Get models from providers with API keys"""
         available_providers = self.get_available_providers()
-        return [
-            m for m in self.models.values()
-            if m.provider in available_providers
-        ]
-    
+        return [m for m in self.models.values() if m.provider in available_providers]
+
     def is_available(self, model_id: str) -> bool:
         """Check if model is available (provider has API key)"""
         model = self.get_model(model_id)
         if not model:
             return False
-        
+
         config = self.get_provider(model.provider)
         if not config:
             return False
-        
+
         return bool(os.getenv(config.api_key_env))
