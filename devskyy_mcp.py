@@ -74,10 +74,7 @@ mcp = FastMCP(
 # Enums & Models
 # ===========================
 
-class ResponseFormat(str, Enum):
-    """Output format for tool responses."""
-    MARKDOWN = "markdown"
-    JSON = "json"
+# Note: ResponseFormat is now imported from utils.api_client
 
 class AgentCategory(str, Enum):
     """DevSkyy agent categories."""

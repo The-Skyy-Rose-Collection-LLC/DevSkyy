@@ -10,21 +10,19 @@ import secrets
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 
-import jwt
-from cryptography.hazmat.backends import default_backend
-from cryptography.hazmat.primitives import hashes
-from cryptography.hazmat.primitives.ciphers.aead import AESGCM
-from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2
 from fastapi import BackgroundTasks, Depends, FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field
 from sqlalchemy import JSON, Boolean, Column, DateTime, Float, Integer, String
 from sqlalchemy.ext.asyncio import (AsyncSession, async_sessionmaker,
                                     create_async_engine)
 from sqlalchemy.orm import declarative_base
+
+# Import shared utilities
+from utils.security import SecurityManager, get_security_manager
+from config.settings import PlatformConfig, get_config
 
 # =======================
 # INSTALL REQUIREMENTS:
@@ -36,23 +34,9 @@ from sqlalchemy.orm import declarative_base
 # Configuration
 # ===========================
 
-class Settings:
-    app_name: str = "DevSkyy Enterprise Platform"
-    app_version: str = "5.1.0"
-    debug: bool = True
-    
-    # Security
-    secret_key: str = os.getenv("SECRET_KEY", secrets.token_urlsafe(32))
-    algorithm: str = "HS256"
-    access_token_expire_minutes: int = 30
-    
-    # Database
-    database_url: str = "sqlite+aiosqlite:///./devskyy.db"
-    
-    # API
-    api_v1_str: str = "/api/v1"
-
-settings = Settings()
+# Use shared configuration
+config = get_config()
+settings = config  # Backwards compatibility alias
 
 # ===========================
 # Database Models
@@ -106,63 +90,14 @@ class WordPressTheme(Base):
 # Security Components
 # ===========================
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.api_v1_str}/auth/token")
+# Use shared security manager
+security_manager = get_security_manager(
+    secret_key=config.security.secret_key,
+    algorithm=config.security.algorithm,
+    access_token_expire_minutes=config.security.access_token_expire_minutes
+)
 
-class SecurityManager:
-    """Enterprise security manager"""
-    
-    def __init__(self):
-        self.pwd_context = pwd_context
-        self.encryption_key = self._derive_key()
-        
-    def _derive_key(self) -> bytes:
-        """Derive encryption key using PBKDF2"""
-        kdf = PBKDF2(
-            algorithm=hashes.SHA256(),
-            length=32,
-            salt=b'devskyy-salt',
-            iterations=100000,
-            backend=default_backend()
-        )
-        return kdf.derive(settings.secret_key.encode())
-    
-    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
-        return self.pwd_context.verify(plain_password, hashed_password)
-    
-    def get_password_hash(self, password: str) -> str:
-        return self.pwd_context.hash(password)
-    
-    def create_access_token(self, data: dict) -> str:
-        to_encode = data.copy()
-        expire = datetime.utcnow() + timedelta(minutes=settings.access_token_expire_minutes)
-        to_encode.update({"exp": expire})
-        return jwt.encode(to_encode, settings.secret_key, algorithm=settings.algorithm)
-    
-    def verify_token(self, token: str) -> Optional[Dict]:
-        try:
-            payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
-            return payload
-        except jwt.PyJWTError:
-            return None
-    
-    def encrypt_data(self, data: str) -> str:
-        """Encrypt sensitive data using AES-256-GCM"""
-        aesgcm = AESGCM(self.encryption_key)
-        nonce = os.urandom(12)
-        ciphertext = aesgcm.encrypt(nonce, data.encode(), None)
-        return (nonce + ciphertext).hex()
-    
-    def decrypt_data(self, encrypted: str) -> str:
-        """Decrypt data encrypted with AES-256-GCM"""
-        data = bytes.fromhex(encrypted)
-        nonce = data[:12]
-        ciphertext = data[12:]
-        aesgcm = AESGCM(self.encryption_key)
-        plaintext = aesgcm.decrypt(nonce, ciphertext, None)
-        return plaintext.decode()
-
-security_manager = SecurityManager()
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{config.api.api_v1_str}/auth/token")
 
 # ===========================
 # Agent System
@@ -504,7 +439,7 @@ class WebhookSubscription(BaseModel):
 
 async def get_db():
     """Get database session"""
-    engine = create_async_engine(settings.database_url, echo=settings.debug)
+    engine = create_async_engine(config.database.async_database_url, echo=config.debug)
     async_session = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
     
     # Create tables
@@ -534,8 +469,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
 # ===========================
 
 app = FastAPI(
-    title=settings.app_name,
-    version=settings.app_version,
+    title=config.app_name,
+    version=config.app_version,
     description="Enterprise AI Platform with 54 Agents, WordPress Builder, and ML Models"
 )
 
