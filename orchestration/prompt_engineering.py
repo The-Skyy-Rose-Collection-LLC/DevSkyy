@@ -31,17 +31,14 @@ References:
 - Constitutional AI: Bai et al., 2022 (https://arxiv.org/abs/2212.08073)
 """
 
-import os
-import logging
 import json
-from datetime import datetime
-from typing import Optional, Dict, Any, List, Callable, Union
-from dataclasses import dataclass, field
-from enum import Enum
-from abc import ABC, abstractmethod
+import logging
 import re
+from collections.abc import Callable
+from enum import Enum
+from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +47,10 @@ logger = logging.getLogger(__name__)
 # Enums
 # =============================================================================
 
+
 class PromptTechnique(str, Enum):
     """Prompting techniques"""
+
     ROLE_BASED = "role_based"
     CHAIN_OF_THOUGHT = "chain_of_thought"
     FEW_SHOT = "few_shot"
@@ -73,6 +72,7 @@ class PromptTechnique(str, Enum):
 
 class OutputFormat(str, Enum):
     """Output format types"""
+
     TEXT = "text"
     JSON = "json"
     XML = "xml"
@@ -84,24 +84,26 @@ class OutputFormat(str, Enum):
 # Models
 # =============================================================================
 
+
 class PromptTemplate(BaseModel):
     """Prompt template definition"""
+
     name: str
     description: str
     template: str
     technique: PromptTechnique
-    variables: List[str] = []
-    examples: List[Dict[str, Any]] = []
+    variables: list[str] = []
+    examples: list[dict[str, Any]] = []
     output_format: OutputFormat = OutputFormat.TEXT
-    
+
     def render(self, **kwargs) -> str:
         """Render template with variables"""
         prompt = self.template
         for key, value in kwargs.items():
             prompt = prompt.replace(f"{{{key}}}", str(value))
         return prompt
-    
-    def validate_variables(self, provided: Dict[str, Any]) -> tuple[bool, List[str]]:
+
+    def validate_variables(self, provided: dict[str, Any]) -> tuple[bool, list[str]]:
         """Validate all required variables are provided"""
         missing = [v for v in self.variables if v not in provided]
         return len(missing) == 0, missing
@@ -109,12 +111,13 @@ class PromptTemplate(BaseModel):
 
 class PromptChain(BaseModel):
     """Chain of prompts for multi-step reasoning"""
+
     name: str
     description: str
-    steps: List[PromptTemplate]
+    steps: list[PromptTemplate]
     aggregate_results: bool = True
-    
-    def get_step(self, index: int) -> Optional[PromptTemplate]:
+
+    def get_step(self, index: int) -> PromptTemplate | None:
         """Get step by index"""
         if 0 <= index < len(self.steps):
             return self.steps[index]
@@ -125,14 +128,15 @@ class PromptChain(BaseModel):
 # Technique Implementations
 # =============================================================================
 
+
 class ChainOfThought:
     """
     Chain-of-Thought Prompting
-    
+
     Encourages step-by-step reasoning before arriving at final answer.
-    
+
     Reference: Wei et al., 2022 - "Chain-of-Thought Prompting Elicits Reasoning"
-    
+
     Usage:
         cot = ChainOfThought()
         prompt = cot.create_prompt(
@@ -140,7 +144,7 @@ class ChainOfThought:
             context="Solve step by step"
         )
     """
-    
+
     TEMPLATE = """
 {context}
 
@@ -156,7 +160,7 @@ Step-by-step reasoning:
 """
 
     COT_SUFFIX = "\n\nTherefore, the answer is:"
-    
+
     @classmethod
     def create_prompt(
         cls,
@@ -165,10 +169,9 @@ Step-by-step reasoning:
     ) -> str:
         """Create CoT prompt"""
         return cls.TEMPLATE.format(
-            context=context or "Please solve the following problem.",
-            question=question
+            context=context or "Please solve the following problem.", question=question
         )
-    
+
     @classmethod
     def extract_answer(cls, response: str) -> str:
         """Extract final answer from CoT response"""
@@ -178,12 +181,12 @@ Step-by-step reasoning:
             r"(?:Final answer|Answer)[:\s]*(.+?)(?:\.|$)",
             r"(?:In conclusion|Thus)[,:\s]*(.+?)(?:\.|$)",
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, response, re.IGNORECASE)
             if match:
                 return match.group(1).strip()
-        
+
         # Return last line as fallback
         lines = response.strip().split("\n")
         return lines[-1].strip() if lines else response
@@ -192,11 +195,11 @@ Step-by-step reasoning:
 class FewShotLearning:
     """
     Few-Shot Learning
-    
+
     Provides examples to guide model behavior.
-    
+
     Reference: Brown et al., 2020 - "Language Models are Few-Shot Learners"
-    
+
     Usage:
         fs = FewShotLearning()
         prompt = fs.create_prompt(
@@ -208,46 +211,49 @@ class FewShotLearning:
             query="Love this!"
         )
     """
-    
+
     @classmethod
     def create_prompt(
         cls,
         task: str,
-        examples: List[Dict[str, str]],
+        examples: list[dict[str, str]],
         query: str,
         input_label: str = "Input",
         output_label: str = "Output",
     ) -> str:
         """Create few-shot prompt"""
         prompt_parts = [f"Task: {task}\n"]
-        
+
         # Add examples
         for i, example in enumerate(examples, 1):
             prompt_parts.append(f"Example {i}:")
             prompt_parts.append(f"{input_label}: {example.get('input', '')}")
             prompt_parts.append(f"{output_label}: {example.get('output', '')}")
             prompt_parts.append("")
-        
+
         # Add query
         prompt_parts.append("Now respond to:")
         prompt_parts.append(f"{input_label}: {query}")
         prompt_parts.append(f"{output_label}:")
-        
+
         return "\n".join(prompt_parts)
-    
+
     @classmethod
-    def create_examples_for_domain(cls, domain: str) -> List[Dict[str, str]]:
+    def create_examples_for_domain(cls, domain: str) -> list[dict[str, str]]:
         """Get domain-specific examples"""
         examples = {
             "sentiment": [
-                {"input": "This product exceeded my expectations!", "output": "positive"},
+                {
+                    "input": "This product exceeded my expectations!",
+                    "output": "positive",
+                },
                 {"input": "Waste of money, don't buy.", "output": "negative"},
                 {"input": "It's okay, nothing special.", "output": "neutral"},
             ],
             "product_description": [
                 {
                     "input": "Bomber jacket, black, premium fabric",
-                    "output": "Crafted from premium heavyweight fabric, this bomber jacket embodies sophisticated street elegance. Features rose gold hardware and meticulous stitching throughout."
+                    "output": "Crafted from premium heavyweight fabric, this bomber jacket embodies sophisticated street elegance. Features rose gold hardware and meticulous stitching throughout.",
                 },
             ],
             "categorization": [
@@ -262,11 +268,11 @@ class FewShotLearning:
 class SelfConsistency:
     """
     Self-Consistency Prompting
-    
+
     Sample multiple reasoning paths and take majority vote.
-    
+
     Reference: Wang et al., 2022 - "Self-Consistency Improves Chain of Thought Reasoning"
-    
+
     Usage:
         sc = SelfConsistency()
         answer = sc.aggregate_responses([
@@ -275,51 +281,51 @@ class SelfConsistency:
             "Result: 41"
         ])  # Returns "42" (majority)
     """
-    
+
     @classmethod
     def create_variants(
         cls,
         base_prompt: str,
         n_variants: int = 5,
-    ) -> List[str]:
+    ) -> list[str]:
         """Create prompt variants for sampling"""
         variants = [base_prompt]
-        
+
         prefixes = [
             "Let's approach this differently.",
             "Consider an alternative method.",
             "From another perspective,",
             "Using a different strategy,",
         ]
-        
+
         for i in range(min(n_variants - 1, len(prefixes))):
             variants.append(f"{prefixes[i]}\n\n{base_prompt}")
-        
+
         return variants[:n_variants]
-    
+
     @classmethod
     def aggregate_responses(
         cls,
-        responses: List[str],
+        responses: list[str],
         extract_answer: Callable[[str], str] = None,
     ) -> str:
         """Aggregate multiple responses via majority voting"""
         if not responses:
             return ""
-        
+
         # Extract answers
         extractor = extract_answer or ChainOfThought.extract_answer
         answers = [extractor(r) for r in responses]
-        
+
         # Count occurrences (normalized)
         normalized = [a.lower().strip() for a in answers]
         counts = {}
-        for ans, orig in zip(normalized, answers):
+        for ans, orig in zip(normalized, answers, strict=False):
             if ans in counts:
                 counts[ans]["count"] += 1
             else:
                 counts[ans] = {"count": 1, "original": orig}
-        
+
         # Return most common
         best = max(counts.items(), key=lambda x: x[1]["count"])
         return best[1]["original"]
@@ -328,11 +334,11 @@ class SelfConsistency:
 class TreeOfThoughts:
     """
     Tree of Thoughts (ToT)
-    
+
     Explores multiple reasoning paths as a tree structure.
-    
+
     Reference: Yao et al., 2023 - "Tree of Thoughts: Deliberate Problem Solving"
-    
+
     Usage:
         tot = TreeOfThoughts()
         prompt = tot.create_prompt(
@@ -340,7 +346,7 @@ class TreeOfThoughts:
             n_branches=3
         )
     """
-    
+
     TEMPLATE = """
 Problem: {problem}
 
@@ -371,11 +377,8 @@ After evaluating all approaches, the best path forward is:
         n_branches: int = 3,
     ) -> str:
         """Create ToT prompt"""
-        return cls.TEMPLATE.format(
-            problem=problem,
-            n_branches=n_branches
-        )
-    
+        return cls.TEMPLATE.format(problem=problem, n_branches=n_branches)
+
     @classmethod
     def create_evaluation_prompt(cls, approach: str) -> str:
         """Create prompt to evaluate an approach"""
@@ -399,11 +402,11 @@ Reasoning:
 class ReActPrompting:
     """
     ReAct: Reasoning + Acting
-    
+
     Interleaves reasoning traces with actions.
-    
+
     Reference: Yao et al., 2022 - "ReAct: Synergizing Reasoning and Acting"
-    
+
     Usage:
         react = ReActPrompting()
         prompt = react.create_prompt(
@@ -411,7 +414,7 @@ class ReActPrompting:
             tools=["web_search", "analyze_image"]
         )
     """
-    
+
     TEMPLATE = """
 Task: {task}
 
@@ -431,26 +434,20 @@ Thought 1: I need to understand the current task and plan my approach.
     def create_prompt(
         cls,
         task: str,
-        tools: List[str],
+        tools: list[str],
     ) -> str:
         """Create ReAct prompt"""
-        return cls.TEMPLATE.format(
-            task=task,
-            tools=", ".join(tools)
-        )
-    
+        return cls.TEMPLATE.format(task=task, tools=", ".join(tools))
+
     @classmethod
-    def parse_action(cls, response: str) -> Optional[Dict[str, str]]:
+    def parse_action(cls, response: str) -> dict[str, str] | None:
         """Parse action from response"""
         # Look for Action: tool_name[input]
         match = re.search(r"Action[:\s]+(\w+)\[(.+?)\]", response)
         if match:
-            return {
-                "tool": match.group(1),
-                "input": match.group(2)
-            }
+            return {"tool": match.group(1), "input": match.group(2)}
         return None
-    
+
     @classmethod
     def format_observation(cls, result: Any) -> str:
         """Format observation for next step"""
@@ -462,11 +459,11 @@ Thought 1: I need to understand the current task and plan my approach.
 class RAGPrompting:
     """
     Retrieval-Augmented Generation
-    
+
     Grounds responses in retrieved context.
-    
+
     Reference: Lewis et al., 2020 - "Retrieval-Augmented Generation"
-    
+
     Usage:
         rag = RAGPrompting()
         prompt = rag.create_prompt(
@@ -476,7 +473,7 @@ class RAGPrompting:
             ]
         )
     """
-    
+
     TEMPLATE = """
 Use the following context to answer the question. If the context doesn't contain relevant information, say so.
 
@@ -492,33 +489,30 @@ Answer based on the context above:
     def create_prompt(
         cls,
         question: str,
-        context: List[Dict[str, str]],
+        context: list[dict[str, str]],
         max_context_length: int = 3000,
     ) -> str:
         """Create RAG prompt"""
         # Format context
         context_parts = []
         total_length = 0
-        
+
         for item in context:
             text = item.get("text", "")
             source = item.get("source", "unknown")
-            
+
             formatted = f"[Source: {source}]\n{text}\n"
-            
+
             if total_length + len(formatted) > max_context_length:
                 break
-            
+
             context_parts.append(formatted)
             total_length += len(formatted)
-        
-        return cls.TEMPLATE.format(
-            context="\n".join(context_parts),
-            question=question
-        )
-    
+
+        return cls.TEMPLATE.format(context="\n".join(context_parts), question=question)
+
     @classmethod
-    def create_with_citations(cls, question: str, context: List[Dict]) -> str:
+    def create_with_citations(cls, question: str, context: list[dict]) -> str:
         """Create prompt that encourages citation"""
         template = """
 Answer the question using ONLY the provided sources. Cite sources using [1], [2], etc.
@@ -533,19 +527,16 @@ Answer with citations:
         sources = []
         for i, item in enumerate(context, 1):
             sources.append(f"[{i}] {item.get('text', '')}")
-        
-        return template.format(
-            sources="\n\n".join(sources),
-            question=question
-        )
+
+        return template.format(sources="\n\n".join(sources), question=question)
 
 
 class StructuredOutput:
     """
     Structured Output Prompting
-    
+
     Guides model to produce specific output formats.
-    
+
     Usage:
         so = StructuredOutput()
         prompt = so.create_json_prompt(
@@ -553,7 +544,7 @@ class StructuredOutput:
             schema={"name": "string", "price": "number"}
         )
     """
-    
+
     JSON_TEMPLATE = """
 {task}
 
@@ -580,14 +571,11 @@ Your response must be valid XML only.
     def create_json_prompt(
         cls,
         task: str,
-        schema: Dict[str, Any],
+        schema: dict[str, Any],
     ) -> str:
         """Create JSON output prompt"""
-        return cls.JSON_TEMPLATE.format(
-            task=task,
-            schema=json.dumps(schema, indent=2)
-        )
-    
+        return cls.JSON_TEMPLATE.format(task=task, schema=json.dumps(schema, indent=2))
+
     @classmethod
     def create_xml_prompt(
         cls,
@@ -595,13 +583,10 @@ Your response must be valid XML only.
         schema: str,
     ) -> str:
         """Create XML output prompt"""
-        return cls.XML_TEMPLATE.format(
-            task=task,
-            schema=schema
-        )
-    
+        return cls.XML_TEMPLATE.format(task=task, schema=schema)
+
     @classmethod
-    def parse_json_response(cls, response: str) -> Optional[dict]:
+    def parse_json_response(cls, response: str) -> dict | None:
         """Parse JSON from response"""
         # Try to find JSON in response
         patterns = [
@@ -609,7 +594,7 @@ Your response must be valid XML only.
             r"```\s*([\s\S]*?)\s*```",
             r"\{[\s\S]*\}",
         ]
-        
+
         for pattern in patterns:
             match = re.search(pattern, response)
             if match:
@@ -618,7 +603,7 @@ Your response must be valid XML only.
                     return json.loads(json_str)
                 except json.JSONDecodeError:
                     continue
-        
+
         # Try parsing entire response
         try:
             return json.loads(response)
@@ -629,11 +614,11 @@ Your response must be valid XML only.
 class ConstitutionalAI:
     """
     Constitutional AI Prompting
-    
+
     Self-critique and revision based on principles.
-    
+
     Reference: Bai et al., 2022 - "Constitutional AI"
-    
+
     Usage:
         cai = ConstitutionalAI()
         prompt = cai.create_critique_prompt(
@@ -641,7 +626,7 @@ class ConstitutionalAI:
             principles=["Be helpful", "Be honest"]
         )
     """
-    
+
     CRITIQUE_TEMPLATE = """
 Original response:
 {response}
@@ -666,15 +651,12 @@ Revise the response to address the critique while maintaining helpfulness:
     def create_critique_prompt(
         cls,
         response: str,
-        principles: List[str],
+        principles: list[str],
     ) -> str:
         """Create critique prompt"""
         principles_text = "\n".join(f"- {p}" for p in principles)
-        return cls.CRITIQUE_TEMPLATE.format(
-            response=response,
-            principles=principles_text
-        )
-    
+        return cls.CRITIQUE_TEMPLATE.format(response=response, principles=principles_text)
+
     @classmethod
     def create_revision_prompt(
         cls,
@@ -682,13 +664,10 @@ Revise the response to address the critique while maintaining helpfulness:
         critique: str,
     ) -> str:
         """Create revision prompt"""
-        return cls.REVISION_TEMPLATE.format(
-            response=response,
-            critique=critique
-        )
-    
+        return cls.REVISION_TEMPLATE.format(response=response, critique=critique)
+
     @classmethod
-    def get_default_principles(cls) -> List[str]:
+    def get_default_principles(cls) -> list[str]:
         """Get default constitutional principles"""
         return [
             "Be helpful and informative",
@@ -703,9 +682,9 @@ Revise the response to address the critique while maintaining helpfulness:
 class NegativePrompting:
     """
     Negative Prompting
-    
+
     Specifies what NOT to include in output.
-    
+
     Usage:
         np = NegativePrompting()
         prompt = np.create_prompt(
@@ -713,7 +692,7 @@ class NegativePrompting:
             negative=["Don't use superlatives", "Avoid clichés"]
         )
     """
-    
+
     TEMPLATE = """
 {task}
 
@@ -727,22 +706,19 @@ Now complete the task while avoiding the above:
     def create_prompt(
         cls,
         task: str,
-        negative: List[str],
+        negative: list[str],
     ) -> str:
         """Create negative prompt"""
         constraints = "\n".join(f"- {c}" for c in negative)
-        return cls.TEMPLATE.format(
-            task=task,
-            constraints=constraints
-        )
+        return cls.TEMPLATE.format(task=task, constraints=constraints)
 
 
 class RoleBasedPrompting:
     """
     Role-Based Constraint Prompting
-    
+
     Establishes persona and expertise.
-    
+
     Usage:
         rbp = RoleBasedPrompting()
         prompt = rbp.create_prompt(
@@ -750,7 +726,7 @@ class RoleBasedPrompting:
             task="Describe this jacket"
         )
     """
-    
+
     TEMPLATE = """
 You are {role}.
 
@@ -769,13 +745,9 @@ You are {role}.
         """Create role-based prompt"""
         if not background:
             background = f"With your expertise as {role}, complete the following task."
-        
-        return cls.TEMPLATE.format(
-            role=role,
-            background=background,
-            task=task
-        )
-    
+
+        return cls.TEMPLATE.format(role=role, background=background, task=task)
+
     @classmethod
     def get_skyyrose_expert(cls) -> tuple[str, str]:
         """Get SkyyRose brand expert role"""
@@ -796,30 +768,31 @@ Target: Discerning customers who appreciate elevated street style
 # Main Prompt Engineer Class
 # =============================================================================
 
+
 class PromptEngineer:
     """
     Central prompt engineering utility.
-    
+
     Usage:
         engineer = PromptEngineer()
-        
+
         # Use specific technique
         prompt = engineer.create(
             technique=PromptTechnique.CHAIN_OF_THOUGHT,
             question="How should we price this product?"
         )
-        
+
         # Auto-select technique
         prompt = engineer.auto_create(
             task="Generate product description",
             context={"product_name": "Heart aRose Bomber"}
         )
     """
-    
+
     def __init__(self):
-        self.templates: Dict[str, PromptTemplate] = {}
+        self.templates: dict[str, PromptTemplate] = {}
         self._load_builtin_templates()
-    
+
     def _load_builtin_templates(self):
         """Load built-in templates"""
         self.templates["skyyrose_product"] = PromptTemplate(
@@ -843,7 +816,7 @@ Description:
             technique=PromptTechnique.ROLE_BASED,
             variables=["product_name", "collection", "features"],
         )
-    
+
     def create(
         self,
         technique: PromptTechnique,
@@ -855,60 +828,60 @@ Description:
                 question=kwargs.get("question", ""),
                 context=kwargs.get("context", ""),
             )
-        
+
         elif technique == PromptTechnique.FEW_SHOT:
             return FewShotLearning.create_prompt(
                 task=kwargs.get("task", ""),
                 examples=kwargs.get("examples", []),
                 query=kwargs.get("query", ""),
             )
-        
+
         elif technique == PromptTechnique.TREE_OF_THOUGHTS:
             return TreeOfThoughts.create_prompt(
                 problem=kwargs.get("problem", ""),
                 n_branches=kwargs.get("n_branches", 3),
             )
-        
+
         elif technique == PromptTechnique.REACT:
             return ReActPrompting.create_prompt(
                 task=kwargs.get("task", ""),
                 tools=kwargs.get("tools", []),
             )
-        
+
         elif technique == PromptTechnique.RAG:
             return RAGPrompting.create_prompt(
                 question=kwargs.get("question", ""),
                 context=kwargs.get("context", []),
             )
-        
+
         elif technique == PromptTechnique.STRUCTURED_OUTPUT:
             return StructuredOutput.create_json_prompt(
                 task=kwargs.get("task", ""),
                 schema=kwargs.get("schema", {}),
             )
-        
+
         elif technique == PromptTechnique.CONSTITUTIONAL:
             return ConstitutionalAI.create_critique_prompt(
                 response=kwargs.get("response", ""),
                 principles=kwargs.get("principles", ConstitutionalAI.get_default_principles()),
             )
-        
+
         elif technique == PromptTechnique.NEGATIVE_PROMPTING:
             return NegativePrompting.create_prompt(
                 task=kwargs.get("task", ""),
                 negative=kwargs.get("negative", []),
             )
-        
+
         elif technique == PromptTechnique.ROLE_BASED:
             return RoleBasedPrompting.create_prompt(
                 role=kwargs.get("role", "an expert assistant"),
                 task=kwargs.get("task", ""),
                 background=kwargs.get("background", ""),
             )
-        
+
         else:
             raise ValueError(f"Unsupported technique: {technique}")
-    
+
     def auto_select_technique(self, task_type: str) -> PromptTechnique:
         """Auto-select best technique for task type"""
         mappings = {
@@ -922,22 +895,19 @@ Description:
             "generation": PromptTechnique.ROLE_BASED,
         }
         return mappings.get(task_type, PromptTechnique.ROLE_BASED)
-    
+
     def use_template(self, template_name: str, **kwargs) -> str:
         """Use a saved template"""
         template = self.templates.get(template_name)
         if not template:
             raise ValueError(f"Unknown template: {template_name}")
-        
+
         return template.render(**kwargs)
-    
+
     def register_template(self, template: PromptTemplate):
         """Register custom template"""
         self.templates[template.name] = template
-    
-    def list_techniques(self) -> List[Dict[str, str]]:
+
+    def list_techniques(self) -> list[dict[str, str]]:
         """List all available techniques with descriptions"""
-        return [
-            {"name": t.value, "technique": t}
-            for t in PromptTechnique
-        ]
+        return [{"name": t.value, "technique": t} for t in PromptTechnique]

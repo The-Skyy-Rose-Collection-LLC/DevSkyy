@@ -1,9 +1,10 @@
 # DevSkyy - Enterprise AI Platform
 
-[![Version](https://img.shields.io/badge/version-2.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Version](https://img.shields.io/badge/version-3.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org)
 [![AI Models](https://img.shields.io/badge/AI-Claude%20Sonnet%204.5-purple.svg)](https://www.anthropic.com)
 [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
+[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Status](https://img.shields.io/badge/status-production--ready-green.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 

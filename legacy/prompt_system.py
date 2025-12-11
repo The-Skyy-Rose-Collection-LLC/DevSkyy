@@ -12,22 +12,18 @@
 ╚══════════════════════════════════════════════════════════════════════════════╝
 """
 
-import os
-import json
-from typing import Dict, List, Optional, Any
-from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
 
-from pydantic import BaseModel, Field, ConfigDict
-
+from pydantic import BaseModel, ConfigDict, Field
 
 # =============================================================================
 # ENUMS
 # =============================================================================
 
+
 class PromptCategory(str, Enum):
     """Prompt category types."""
+
     SYSTEM = "system"
     AGENT = "agent"
     TASK = "task"
@@ -36,6 +32,7 @@ class PromptCategory(str, Enum):
 
 class AgentType(str, Enum):
     """All 50+ agent types."""
+
     # Infrastructure Agents (1-8)
     SCANNER = "scanner"
     FIXER = "fixer"
@@ -45,21 +42,21 @@ class AgentType(str, Enum):
     DATABASE_OPTIMIZER = "database_optimizer"
     PERFORMANCE_MONITOR = "performance_monitor"
     TELEMETRY = "telemetry"
-    
+
     # AI Agents (9-13)
     CLAUDE_AI = "claude_ai"
     OPENAI = "openai"
     MULTI_MODEL_ORCHESTRATOR = "multi_model_orchestrator"
     SELF_LEARNING = "self_learning"
     ADVANCED_ML = "advanced_ml"
-    
+
     # E-Commerce Agents (14-18)
     ECOMMERCE = "ecommerce"
     PRODUCT_MANAGER = "product_manager"
     PRICING_ENGINE = "pricing_engine"
     INVENTORY_OPTIMIZER = "inventory_optimizer"
     FINANCIAL = "financial"
-    
+
     # Marketing Agents (19-25)
     BRAND_INTELLIGENCE = "brand_intelligence"
     ENHANCED_BRAND = "enhanced_brand"
@@ -68,13 +65,13 @@ class AgentType(str, Enum):
     EMAIL_SMS = "email_sms"
     META_SOCIAL = "meta_social"
     MARKETING_CONTENT = "marketing_content"
-    
+
     # Content Agents (26-29)
     CUSTOMER_SERVICE = "customer_service"
     VOICE_AUDIO = "voice_audio"
     SITE_COMMUNICATION = "site_communication"
     CONTINUOUS_LEARNING = "continuous_learning"
-    
+
     # Integration Agents (30-37)
     WORDPRESS = "wordpress"
     WORDPRESS_INTEGRATION = "wordpress_integration"
@@ -84,7 +81,7 @@ class AgentType(str, Enum):
     THEME_BUILDER = "theme_builder"
     DIVI_ELEMENTOR = "divi_elementor"
     INTEGRATION_MANAGER = "integration_manager"
-    
+
     # Advanced Agents (38-45)
     BLOCKCHAIN_NFT = "blockchain_nft"
     CODE_GENERATION = "code_generation"
@@ -94,7 +91,7 @@ class AgentType(str, Enum):
     REVOLUTIONARY_INTEGRATION = "revolutionary_integration"
     ORCHESTRATOR = "orchestrator"
     REGISTRY = "registry"
-    
+
     # Frontend Agents (46-54)
     DESIGN_AUTOMATION = "design_automation"
     FASHION_VISION = "fashion_vision"
@@ -105,7 +102,7 @@ class AgentType(str, Enum):
     VIDEO_CREATOR = "video_creator"
     GRAPHICS_FACTORY = "graphics_factory"
     DASHBOARD = "dashboard"
-    
+
     # RAG/MCP Agents (55-58)
     RAG_ENGINE = "rag_engine"
     MCP_RAG_SERVER = "mcp_rag_server"
@@ -117,28 +114,31 @@ class AgentType(str, Enum):
 # PYDANTIC MODELS
 # =============================================================================
 
+
 class PromptTemplate(BaseModel):
     """Individual prompt template."""
+
     model_config = ConfigDict(strict=True)
-    
+
     name: str
     category: PromptCategory
     template: str
-    variables: List[str] = Field(default_factory=list)
+    variables: list[str] = Field(default_factory=list)
     description: str = ""
     version: str = "1.0.0"
-    examples: List[Dict[str, str]] = Field(default_factory=list)
+    examples: list[dict[str, str]] = Field(default_factory=list)
 
 
 class AgentPromptConfig(BaseModel):
     """Complete prompt configuration for an agent."""
+
     model_config = ConfigDict(strict=True)
-    
+
     agent_type: str
     system_prompt: str
     agent_prompt: str
-    task_prompts: Dict[str, str] = Field(default_factory=dict)
-    job_prompts: Dict[str, str] = Field(default_factory=dict)
+    task_prompts: dict[str, str] = Field(default_factory=dict)
+    job_prompts: dict[str, str] = Field(default_factory=dict)
 
 
 # =============================================================================
@@ -198,7 +198,7 @@ Platform Stack:
 
 Integration Points:
 - WordPress REST API for content management
-- WooCommerce v3 for product/order management  
+- WooCommerce v3 for product/order management
 - Elementor Pro for page building
 - Shoptimizer theme hooks for customization
 
@@ -220,12 +220,10 @@ All responses should:
 # AGENT-SPECIFIC PROMPTS
 # =============================================================================
 
-AGENT_PROMPTS: Dict[str, AgentPromptConfig] = {
-    
+AGENT_PROMPTS: dict[str, AgentPromptConfig] = {
     # =========================================================================
     # INFRASTRUCTURE AGENTS
     # =========================================================================
-    
     AgentType.SCANNER.value: AgentPromptConfig(
         agent_type=AgentType.SCANNER.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -262,15 +260,14 @@ OUTPUT FORMAT:
             "scan_file": "Scan the provided file for issues. Report all errors, warnings, and optimization opportunities.",
             "scan_project": "Perform comprehensive project scan. Include dependency analysis and cross-file issues.",
             "security_scan": "Focus exclusively on security vulnerabilities. Reference OWASP Top 10 and CWE.",
-            "quick_scan": "Perform fast scan for critical issues only. Skip style and optimization checks."
+            "quick_scan": "Perform fast scan for critical issues only. Skip style and optimization checks.",
         },
         job_prompts={
             "ci_pipeline": "Run scan for CI/CD pipeline. Exit code 1 if any errors found.",
             "pre_commit": "Quick pre-commit check. Focus on syntax errors and critical security issues.",
-            "full_audit": "Complete code audit for enterprise deployment readiness."
-        }
+            "full_audit": "Complete code audit for enterprise deployment readiness.",
+        },
     ),
-    
     AgentType.FIXER.value: AgentPromptConfig(
         agent_type=AgentType.FIXER.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -311,14 +308,13 @@ OUTPUT FORMAT:
             "fix_syntax": "Fix syntax errors only. Do not modify logic or style.",
             "fix_security": "Apply security patches. Reference CVE or CWE when applicable.",
             "fix_style": "Apply formatting fixes (Black, isort). No logic changes.",
-            "fix_all": "Apply all fixes in priority order. Create comprehensive backup."
+            "fix_all": "Apply all fixes in priority order. Create comprehensive backup.",
         },
         job_prompts={
             "auto_fix_pr": "Fix issues and prepare for pull request.",
-            "emergency_patch": "Apply critical security patches immediately."
-        }
+            "emergency_patch": "Apply critical security patches immediately.",
+        },
     ),
-    
     AgentType.SECURITY_MANAGER.value: AgentPromptConfig(
         agent_type=AgentType.SECURITY_MANAGER.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -355,18 +351,16 @@ OUTPUT FORMAT:
             "authorize": "Check permissions for requested resource/action.",
             "generate_api_key": "Generate new API key with specified permissions.",
             "audit_check": "Retrieve audit log for specified user/time period.",
-            "rotate_keys": "Rotate JWT secrets and invalidate old tokens."
+            "rotate_keys": "Rotate JWT secrets and invalidate old tokens.",
         },
         job_prompts={
             "security_audit": "Perform complete security audit of platform.",
-            "compliance_check": "Verify GDPR/PCI-DSS compliance status."
-        }
+            "compliance_check": "Verify GDPR/PCI-DSS compliance status.",
+        },
     ),
-    
     # =========================================================================
     # AI AGENTS
     # =========================================================================
-    
     AgentType.CLAUDE_AI.value: AgentPromptConfig(
         agent_type=AgentType.CLAUDE_AI.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -399,15 +393,14 @@ API REFERENCE:
             "analyze_code": "Analyze code for quality, bugs, and improvements.",
             "generate_code": "Generate production-ready code from description.",
             "analyze_image": "Analyze image and provide structured description.",
-            "reason": "Perform complex reasoning task with step-by-step explanation."
+            "reason": "Perform complex reasoning task with step-by-step explanation.",
         },
         job_prompts={
             "content_generation": "Generate marketing/product content.",
             "code_review": "Review code changes for PR.",
-            "strategic_analysis": "Analyze business data and provide recommendations."
-        }
+            "strategic_analysis": "Analyze business data and provide recommendations.",
+        },
     ),
-    
     AgentType.MULTI_MODEL_ORCHESTRATOR.value: AgentPromptConfig(
         agent_type=AgentType.MULTI_MODEL_ORCHESTRATOR.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -444,18 +437,16 @@ Agreement threshold: ≥90% similarity for auto-approval.
             "route": "Route task to optimal model based on type and requirements.",
             "compare": "Run task on multiple models and compare outputs.",
             "failover": "Handle model failure and route to fallback.",
-            "validate_2llm": "Validate output with secondary model for agreement."
+            "validate_2llm": "Validate output with secondary model for agreement.",
         },
         job_prompts={
             "optimize_routing": "Analyze usage patterns and optimize routing rules.",
-            "cost_report": "Generate cost analysis across all models."
-        }
+            "cost_report": "Generate cost analysis across all models.",
+        },
     ),
-    
     # =========================================================================
     # E-COMMERCE AGENTS
     # =========================================================================
-    
     AgentType.PRODUCT_MANAGER.value: AgentPromptConfig(
         agent_type=AgentType.PRODUCT_MANAGER.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -500,14 +491,13 @@ OUTPUT FORMAT:
             "enhance_description": "Enhance existing product description with AI.",
             "generate_variants": "Generate size/color variants for product.",
             "optimize_seo": "Generate SEO metadata for product.",
-            "bulk_import": "Import multiple products with AI enhancement."
+            "bulk_import": "Import multiple products with AI enhancement.",
         },
         job_prompts={
             "catalog_optimization": "Optimize entire product catalog.",
-            "seasonal_update": "Update products for seasonal campaigns."
-        }
+            "seasonal_update": "Update products for seasonal campaigns.",
+        },
     ),
-    
     AgentType.PRICING_ENGINE.value: AgentPromptConfig(
         agent_type=AgentType.PRICING_ENGINE.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -554,18 +544,16 @@ OUTPUT FORMAT:
             "batch_optimize": "Optimize prices for multiple products.",
             "competitor_analysis": "Analyze competitor pricing for product category.",
             "ab_test": "Set up A/B price test for product.",
-            "psychological_price": "Apply psychological pricing (e.g., $99.99)."
+            "psychological_price": "Apply psychological pricing (e.g., $99.99).",
         },
         job_prompts={
             "daily_optimization": "Run daily price optimization for all products.",
-            "seasonal_adjustment": "Apply seasonal pricing adjustments."
-        }
+            "seasonal_adjustment": "Apply seasonal pricing adjustments.",
+        },
     ),
-    
     # =========================================================================
     # INTEGRATION AGENTS
     # =========================================================================
-    
     AgentType.WORDPRESS.value: AgentPromptConfig(
         agent_type=AgentType.WORDPRESS.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -605,14 +593,13 @@ Functions:
             "update_page": "Update existing page content.",
             "upload_media": "Upload media file and return attachment ID.",
             "manage_users": "Create/update/delete WordPress users.",
-            "get_content": "Retrieve posts/pages with filtering."
+            "get_content": "Retrieve posts/pages with filtering.",
         },
         job_prompts={
             "content_sync": "Sync content from external source to WordPress.",
-            "site_backup": "Trigger site backup via WordPress API."
-        }
+            "site_backup": "Trigger site backup via WordPress API.",
+        },
     ),
-    
     AgentType.WOOCOMMERCE.value: AgentPromptConfig(
         agent_type=AgentType.WOOCOMMERCE.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -662,14 +649,13 @@ PRODUCT SCHEMA:
             "update_product": "Update existing product by ID.",
             "sync_inventory": "Sync inventory levels from source.",
             "process_order": "Process order status updates.",
-            "manage_customers": "Create/update customer records."
+            "manage_customers": "Create/update customer records.",
         },
         job_prompts={
             "daily_sync": "Daily sync of products and inventory.",
-            "order_processing": "Process pending orders in batch."
-        }
+            "order_processing": "Process pending orders in batch.",
+        },
     ),
-    
     AgentType.THEME_BUILDER.value: AgentPromptConfig(
         agent_type=AgentType.THEME_BUILDER.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -720,18 +706,16 @@ THEME TYPES:
             "generate_product_page": "Generate WooCommerce product template.",
             "generate_shop_page": "Generate shop/category page template.",
             "generate_about": "Generate about us page template.",
-            "export_theme": "Export complete theme package."
+            "export_theme": "Export complete theme package.",
         },
         job_prompts={
             "full_theme": "Generate complete theme with all pages.",
-            "theme_update": "Update existing theme with new components."
-        }
+            "theme_update": "Update existing theme with new components.",
+        },
     ),
-    
     # =========================================================================
     # VISUAL/CONTENT AGENTS
     # =========================================================================
-    
     AgentType.VISUAL_FACTORY.value: AgentPromptConfig(
         agent_type=AgentType.VISUAL_FACTORY.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -765,14 +749,13 @@ OUTPUT REQUIREMENTS:
             "remove_background": "Remove background and add transparent/custom.",
             "generate_lifestyle": "Generate lifestyle scene with product.",
             "generate_model_shot": "Generate AI fashion model wearing product.",
-            "create_social_graphic": "Create social media graphic."
+            "create_social_graphic": "Create social media graphic.",
         },
         job_prompts={
             "product_photoshoot": "Generate complete product photoshoot.",
-            "campaign_visuals": "Generate all visuals for marketing campaign."
-        }
+            "campaign_visuals": "Generate all visuals for marketing campaign.",
+        },
     ),
-    
     AgentType.AI_MODEL_GENERATOR.value: AgentPromptConfig(
         agent_type=AgentType.AI_MODEL_GENERATOR.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -812,18 +795,16 @@ OUTPUT FORMAT:
             "generate_model": "Generate AI fashion model wearing specified product.",
             "batch_generate": "Generate multiple model shots with variations.",
             "style_transfer": "Apply brand style to existing model image.",
-            "video_model": "Generate short video of model showcasing product."
+            "video_model": "Generate short video of model showcasing product.",
         },
         job_prompts={
             "lookbook": "Generate complete lookbook with multiple models.",
-            "campaign_models": "Generate models for marketing campaign."
-        }
+            "campaign_models": "Generate models for marketing campaign.",
+        },
     ),
-    
     # =========================================================================
     # MARKETING AGENTS
     # =========================================================================
-    
     AgentType.SEO_MARKETING.value: AgentPromptConfig(
         agent_type=AgentType.SEO_MARKETING.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -859,14 +840,13 @@ SCHEMA TYPES:
             "generate_schema": "Generate JSON-LD schema markup.",
             "keyword_research": "Research keywords for topic/product.",
             "content_optimization": "Optimize content for SEO.",
-            "technical_audit": "Perform technical SEO audit."
+            "technical_audit": "Perform technical SEO audit.",
         },
         job_prompts={
             "site_audit": "Complete site SEO audit.",
-            "monthly_optimization": "Monthly SEO optimization tasks."
-        }
+            "monthly_optimization": "Monthly SEO optimization tasks.",
+        },
     ),
-    
     AgentType.SOCIAL_MEDIA.value: AgentPromptConfig(
         agent_type=AgentType.SOCIAL_MEDIA.value,
         system_prompt=MASTER_SYSTEM_PROMPT,
@@ -899,12 +879,12 @@ POSTING SCHEDULE:
             "schedule_post": "Schedule post for optimal time.",
             "generate_hashtags": "Generate optimized hashtags for content.",
             "analyze_engagement": "Analyze engagement metrics.",
-            "respond_comments": "Generate responses to comments."
+            "respond_comments": "Generate responses to comments.",
         },
         job_prompts={
             "content_calendar": "Generate weekly content calendar.",
-            "campaign_launch": "Launch coordinated social campaign."
-        }
+            "campaign_launch": "Launch coordinated social campaign.",
+        },
     ),
 }
 
@@ -913,117 +893,118 @@ POSTING SCHEDULE:
 # PROMPT MANAGER CLASS
 # =============================================================================
 
+
 class PromptManager:
     """
     Centralized prompt management for all agents.
-    
+
     Handles:
     - Loading and caching prompts
     - Variable substitution
     - Prompt versioning
     - Prompt validation
     """
-    
+
     _instance = None
-    
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
             cls._instance._prompts = AGENT_PROMPTS.copy()
-            cls._instance._custom_prompts: Dict[str, str] = {}
+            cls._instance._custom_prompts: dict[str, str] = {}
         return cls._instance
-    
+
     def get_system_prompt(self) -> str:
         """Get master system prompt."""
         return MASTER_SYSTEM_PROMPT
-    
-    def get_agent_prompt(self, agent_type: str) -> Optional[AgentPromptConfig]:
+
+    def get_agent_prompt(self, agent_type: str) -> AgentPromptConfig | None:
         """Get complete prompt config for agent type."""
         return self._prompts.get(agent_type)
-    
-    def get_task_prompt(self, agent_type: str, task: str) -> Optional[str]:
+
+    def get_task_prompt(self, agent_type: str, task: str) -> str | None:
         """Get task-specific prompt for agent."""
         config = self._prompts.get(agent_type)
         if config:
             return config.task_prompts.get(task)
         return None
-    
-    def get_job_prompt(self, agent_type: str, job: str) -> Optional[str]:
+
+    def get_job_prompt(self, agent_type: str, job: str) -> str | None:
         """Get job-specific prompt for agent."""
         config = self._prompts.get(agent_type)
         if config:
             return config.job_prompts.get(job)
         return None
-    
+
     def assemble_full_prompt(
         self,
         agent_type: str,
-        task: Optional[str] = None,
-        job: Optional[str] = None,
-        variables: Optional[Dict[str, str]] = None
+        task: str | None = None,
+        job: str | None = None,
+        variables: dict[str, str] | None = None,
     ) -> str:
         """
         Assemble complete prompt from all layers.
-        
+
         Args:
             agent_type: Type of agent
             task: Optional task name
             job: Optional job name
             variables: Optional variables for substitution
-            
+
         Returns:
             Complete assembled prompt
         """
         parts = []
-        
+
         # System prompt
         parts.append(MASTER_SYSTEM_PROMPT)
-        
+
         # Agent prompt
         config = self._prompts.get(agent_type)
         if config:
             parts.append(f"\n{'='*80}\nAGENT CONTEXT\n{'='*80}\n")
             parts.append(config.agent_prompt)
-            
+
             # Task prompt
             if task and task in config.task_prompts:
                 parts.append(f"\n{'='*80}\nTASK: {task.upper()}\n{'='*80}\n")
                 parts.append(config.task_prompts[task])
-            
+
             # Job prompt
             if job and job in config.job_prompts:
                 parts.append(f"\n{'='*80}\nJOB: {job.upper()}\n{'='*80}\n")
                 parts.append(config.job_prompts[job])
-        
+
         full_prompt = "\n".join(parts)
-        
+
         # Variable substitution
         if variables:
             for key, value in variables.items():
                 full_prompt = full_prompt.replace(f"{{{key}}}", value)
-        
+
         return full_prompt
-    
+
     def register_custom_prompt(self, name: str, prompt: str):
         """Register custom prompt template."""
         self._custom_prompts[name] = prompt
-    
-    def get_custom_prompt(self, name: str) -> Optional[str]:
+
+    def get_custom_prompt(self, name: str) -> str | None:
         """Get custom prompt by name."""
         return self._custom_prompts.get(name)
-    
-    def list_agents(self) -> List[str]:
+
+    def list_agents(self) -> list[str]:
         """List all registered agent types."""
         return list(self._prompts.keys())
-    
-    def list_tasks(self, agent_type: str) -> List[str]:
+
+    def list_tasks(self, agent_type: str) -> list[str]:
         """List all tasks for agent type."""
         config = self._prompts.get(agent_type)
         if config:
             return list(config.task_prompts.keys())
         return []
-    
-    def list_jobs(self, agent_type: str) -> List[str]:
+
+    def list_jobs(self, agent_type: str) -> list[str]:
         """List all jobs for agent type."""
         config = self._prompts.get(agent_type)
         if config:
@@ -1036,11 +1017,11 @@ class PromptManager:
 # =============================================================================
 
 __all__ = [
-    'PromptCategory',
-    'AgentType',
-    'PromptTemplate',
-    'AgentPromptConfig',
-    'MASTER_SYSTEM_PROMPT',
-    'AGENT_PROMPTS',
-    'PromptManager',
+    "PromptCategory",
+    "AgentType",
+    "PromptTemplate",
+    "AgentPromptConfig",
+    "MASTER_SYSTEM_PROMPT",
+    "AGENT_PROMPTS",
+    "PromptManager",
 ]

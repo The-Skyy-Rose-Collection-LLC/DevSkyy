@@ -10,16 +10,16 @@ Dependencies:
 - httpx==0.25.2 (PyPI verified)
 """
 
+import asyncio
 import os
 import sys
-import asyncio
-from typing import AsyncGenerator, Generator
-from datetime import datetime, timezone
+from collections.abc import AsyncGenerator, Generator
+from datetime import datetime
 
 import pytest
 import pytest_asyncio
-from httpx import AsyncClient, ASGITransport
 from fastapi import FastAPI
+from httpx import ASGITransport, AsyncClient
 
 # Ensure project root is in path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -28,6 +28,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # =============================================================================
 # Pytest Configuration
 # =============================================================================
+
 
 def pytest_configure(config):
     """Configure pytest"""
@@ -42,6 +43,7 @@ def pytest_configure(config):
 # Event Loop
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def event_loop() -> Generator:
     """Create event loop for async tests"""
@@ -54,10 +56,12 @@ def event_loop() -> Generator:
 # Application Fixtures
 # =============================================================================
 
+
 @pytest.fixture(scope="session")
 def app() -> FastAPI:
     """Create test application"""
     from main_enterprise import app
+
     return app
 
 
@@ -73,6 +77,7 @@ async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
 # Authentication Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def test_user_data() -> dict:
     """Test user data"""
@@ -80,7 +85,7 @@ def test_user_data() -> dict:
         "username": "testuser",
         "email": "test@example.com",
         "password": "SecureP@ssw0rd123!",
-        "role": "developer"
+        "role": "developer",
     }
 
 
@@ -91,7 +96,7 @@ def admin_user_data() -> dict:
         "username": "admin",
         "email": "admin@example.com",
         "password": "AdminP@ssw0rd123!",
-        "role": "admin"
+        "role": "admin",
     }
 
 
@@ -99,12 +104,12 @@ def admin_user_data() -> dict:
 async def auth_token(client: AsyncClient, test_user_data: dict) -> str:
     """Get authentication token"""
     from security.jwt_oauth2_auth import auth_manager
-    
+
     # Create token directly for testing
     token = auth_manager.create_access_token(
         user_id="test_user_001",
         username=test_user_data["username"],
-        role=test_user_data["role"]
+        role=test_user_data["role"],
     )
     return token.access_token
 
@@ -113,11 +118,9 @@ async def auth_token(client: AsyncClient, test_user_data: dict) -> str:
 async def admin_token(client: AsyncClient, admin_user_data: dict) -> str:
     """Get admin authentication token"""
     from security.jwt_oauth2_auth import auth_manager
-    
+
     token = auth_manager.create_access_token(
-        user_id="admin_001",
-        username=admin_user_data["username"],
-        role="admin"
+        user_id="admin_001", username=admin_user_data["username"], role="admin"
     )
     return token.access_token
 
@@ -138,24 +141,26 @@ def admin_headers(admin_token: str) -> dict:
 # Database Fixtures
 # =============================================================================
 
+
 @pytest_asyncio.fixture
 async def db_session():
     """Create test database session"""
-    from database import db_manager, DatabaseConfig
-    
+    from database import DatabaseConfig, db_manager
+
     # Use in-memory SQLite for tests
     config = DatabaseConfig(url="sqlite+aiosqlite:///:memory:")
     await db_manager.initialize(config)
-    
+
     async with db_manager.session() as session:
         yield session
-    
+
     await db_manager.close()
 
 
 # =============================================================================
 # Sample Data Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 def sample_product() -> dict:
@@ -167,7 +172,7 @@ def sample_product() -> dict:
         "price": 189.99,
         "quantity": 50,
         "category": "hoodies",
-        "collection": "BLACK ROSE"
+        "collection": "BLACK ROSE",
     }
 
 
@@ -182,13 +187,14 @@ def sample_order() -> dict:
         "tax": 15.20,
         "shipping": 10.00,
         "total": 215.19,
-        "currency": "USD"
+        "currency": "USD",
     }
 
 
 # =============================================================================
 # Encryption Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 def encryption_key() -> str:
@@ -204,7 +210,7 @@ def sample_pii_data() -> dict:
         "ssn": "123-45-6789",
         "credit_card": "4111111111111111",
         "phone": "555-123-4567",
-        "address": "123 Test St, Oakland, CA 94610"
+        "address": "123 Test St, Oakland, CA 94610",
     }
 
 
@@ -212,13 +218,14 @@ def sample_pii_data() -> dict:
 # Webhook Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def webhook_endpoint() -> dict:
     """Test webhook endpoint"""
     return {
         "url": "https://webhook.test/callback",
         "events": ["order.created", "order.updated"],
-        "secret": "whsec_test_secret_key"
+        "secret": "whsec_test_secret_key",
     }
 
 
@@ -226,17 +233,15 @@ def webhook_endpoint() -> dict:
 # Agent Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def agent_task() -> dict:
     """Sample agent task"""
     return {
         "agent_name": "instagram_agent",
         "action": "post",
-        "parameters": {
-            "content": "Test post content",
-            "hashtags": ["test", "devskyy"]
-        },
-        "priority": "normal"
+        "parameters": {"content": "Test post content", "hashtags": ["test", "devskyy"]},
+        "priority": "normal",
     }
 
 
@@ -244,12 +249,14 @@ def agent_task() -> dict:
 # Utility Functions
 # =============================================================================
 
+
 def assert_valid_uuid(value: str) -> None:
     """Assert value is valid UUID format"""
     import re
+
     uuid_pattern = re.compile(
-        r'^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$',
-        re.IGNORECASE
+        r"^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$",
+        re.IGNORECASE,
     )
     assert uuid_pattern.match(value), f"Invalid UUID: {value}"
 
@@ -257,6 +264,6 @@ def assert_valid_uuid(value: str) -> None:
 def assert_valid_timestamp(value: str) -> None:
     """Assert value is valid ISO timestamp"""
     try:
-        datetime.fromisoformat(value.replace('Z', '+00:00'))
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
     except ValueError:
         pytest.fail(f"Invalid timestamp: {value}")

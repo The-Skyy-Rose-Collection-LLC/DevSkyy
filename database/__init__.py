@@ -6,10 +6,10 @@ Async SQLAlchemy with connection pooling.
 
 Usage:
     from database import db_manager, get_db, UserRepository
-    
+
     # Initialize on startup
     await db_manager.initialize()
-    
+
     # Use in FastAPI
     @router.get("/users")
     async def get_users(db: AsyncSession = Depends(get_db)):
@@ -17,28 +17,23 @@ Usage:
         return await repo.get_all()
 """
 
-from database.db import (
-    # Manager
-    db_manager,
-    DatabaseManager,
-    DatabaseConfig,
-    get_db,
-    
-    # Models
+from database.db import (  # Manager; Models; Repositories
+    AgentTask,
+    AuditLog,
+    AuditLogRepository,
     Base,
-    User,
-    Product,
+    BaseRepository,
+    DatabaseConfig,
+    DatabaseManager,
     Order,
     OrderItem,
-    AuditLog,
-    AgentTask,
-    
-    # Repositories
-    BaseRepository,
-    UserRepository,
-    ProductRepository,
     OrderRepository,
-    AuditLogRepository,
+    Product,
+    ProductRepository,
+    User,
+    UserRepository,
+    db_manager,
+    get_db,
 )
 
 __all__ = [

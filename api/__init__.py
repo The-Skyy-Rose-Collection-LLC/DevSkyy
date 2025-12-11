@@ -11,87 +11,52 @@ Enterprise API components:
 - Request validation
 """
 
-from .versioning import (
-    # Config
-    VersionConfig,
-    VersionStatus,
-    
-    # Models
-    APIVersion,
-    VersionInfo,
-    
-    # Classes
-    VersionExtractor,
-    VersionMiddleware,
-    VersionedAPIRouter,
-    RequireVersion,
-    APIVersionFactory,
-    
-    # Dependencies
-    get_api_version,
-    
-    # Decorators
-    versioned,
-    
-    # Router
-    version_router,
-    
-    # Setup
-    setup_api_versioning,
+from .agents import (  # Enums; Service; Router
+    AgentCategory,
+    AgentService,
+    Priority,
+    TaskStatus,
+    agent_service,
+    agents_router,
 )
-
-from .webhooks import (
-    # Config
-    WebhookConfig,
-    WebhookEventType,
+from .gdpr import (  # Enums; Service; Router
+    DataCategory,
+    GDPRService,
+    LegalBasis,
+    RequestStatus,
+    RequestType,
+    gdpr_router,
+    gdpr_service,
+)
+from .versioning import (  # Config; Models; Classes; Dependencies; Decorators; Router; Setup
+    APIVersion,
+    APIVersionFactory,
+    RequireVersion,
+    VersionConfig,
+    VersionedAPIRouter,
+    VersionExtractor,
+    VersionInfo,
+    VersionMiddleware,
+    VersionStatus,
+    get_api_version,
+    setup_api_versioning,
+    version_router,
+    versioned,
+)
+from .webhooks import (  # Config; Models; Classes; Instances; Router
     DeliveryStatus,
-    
-    # Models
-    WebhookEndpoint,
-    WebhookEvent,
+    WebhookConfig,
     WebhookDelivery,
+    WebhookEndpoint,
     WebhookEndpointCreate,
     WebhookEndpointResponse,
-    
-    # Classes
-    WebhookSigner,
+    WebhookEvent,
+    WebhookEventType,
     WebhookManager,
     WebhookReceiver,
-    
-    # Instances
+    WebhookSigner,
     webhook_manager,
-    
-    # Router
     webhook_router,
-)
-
-from .gdpr import (
-    # Enums
-    DataCategory,
-    LegalBasis,
-    RequestType,
-    RequestStatus,
-    
-    # Service
-    GDPRService,
-    gdpr_service,
-    
-    # Router
-    gdpr_router,
-)
-
-from .agents import (
-    # Enums
-    AgentCategory,
-    TaskStatus,
-    Priority,
-    
-    # Service
-    AgentService,
-    agent_service,
-    
-    # Router
-    agents_router,
 )
 
 __all__ = [
@@ -109,7 +74,6 @@ __all__ = [
     "versioned",
     "version_router",
     "setup_api_versioning",
-    
     # Webhooks
     "WebhookConfig",
     "WebhookEventType",
@@ -124,7 +88,6 @@ __all__ = [
     "WebhookReceiver",
     "webhook_manager",
     "webhook_router",
-    
     # GDPR
     "DataCategory",
     "LegalBasis",
@@ -133,7 +96,6 @@ __all__ = [
     "GDPRService",
     "gdpr_service",
     "gdpr_router",
-    
     # Agents
     "AgentCategory",
     "TaskStatus",

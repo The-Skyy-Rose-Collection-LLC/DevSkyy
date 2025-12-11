@@ -24,50 +24,48 @@ Dependencies (verified from PyPI December 2024):
 - pydantic==2.5.2
 """
 
-import os
 import logging
-from datetime import datetime, timezone
-from typing import Dict, Any, List, Optional
+import os
 from contextlib import asynccontextmanager
+from datetime import UTC, datetime
+from typing import Any
 
-from fastapi import FastAPI, Request, Response, Depends, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
 
-# Security modules
-from security.jwt_oauth2_auth import (
-    auth_router,
-    get_current_user,
-    RoleChecker,
-    UserRole,
-    TokenPayload,
-)
-from security.aes256_gcm_encryption import (
-    encryption,
-    field_encryption,
-    data_masker,
-)
+from api.agents import agents_router
+from api.gdpr import gdpr_router
 
 # API modules
 from api.versioning import (
-    setup_api_versioning,
     VersionConfig,
     VersionedAPIRouter,
-    get_api_version,
+    setup_api_versioning,
 )
 from api.webhooks import (
-    webhook_router,
-    webhook_manager,
     WebhookEventType,
+    webhook_manager,
+    webhook_router,
 )
-from api.gdpr import gdpr_router
-from api.agents import agents_router
+from security.aes256_gcm_encryption import (
+    data_masker,
+    field_encryption,
+)
+
+# Security modules
+from security.jwt_oauth2_auth import (
+    RoleChecker,
+    TokenPayload,
+    UserRole,
+    auth_router,
+    get_current_user,
+)
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
 
@@ -76,21 +74,22 @@ logger = logging.getLogger(__name__)
 # Application Lifecycle
 # =============================================================================
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """Application lifecycle management"""
     # Startup
     logger.info("🚀 DevSkyy Enterprise Platform starting...")
     logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
-    
+
     # Verify security configuration
     if not os.getenv("JWT_SECRET_KEY"):
         logger.warning("⚠️ JWT_SECRET_KEY not set - using ephemeral key (NOT for production)")
     if not os.getenv("ENCRYPTION_MASTER_KEY"):
         logger.warning("⚠️ ENCRYPTION_MASTER_KEY not set - using ephemeral key (NOT for production)")
-    
+
     yield
-    
+
     # Shutdown
     logger.info("DevSkyy Enterprise Platform shutting down...")
     await webhook_manager.close()
@@ -104,22 +103,22 @@ app = FastAPI(
     title="DevSkyy Enterprise Platform",
     description="""
     ## AI-Driven Multi-Agent Orchestration Platform
-    
+
     DevSkyy provides enterprise-grade automation for:
     - **WordPress/WooCommerce** operations
     - **AI Agent** orchestration (69 specialized agents)
     - **ML-driven** fashion analytics and dynamic pricing
     - **MCP Integration** for external AI systems
-    
+
     ### Security Features
     - JWT/OAuth2 authentication with refresh token rotation
     - AES-256-GCM encryption for sensitive data
     - RBAC authorization with role hierarchy
     - Webhook signatures with HMAC-SHA256
-    
+
     ### API Versioning
     Current version: **v1**
-    
+
     ### Authentication
     Use the `/api/v1/auth/token` endpoint to obtain access tokens.
     """,
@@ -127,7 +126,7 @@ app = FastAPI(
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
-    lifespan=lifespan
+    lifespan=lifespan,
 )
 
 
@@ -160,18 +159,17 @@ setup_api_versioning(app, version_config)
 async def log_requests(request: Request, call_next):
     """Log all requests with timing"""
     import time
+
     start = time.time()
-    
+
     response = await call_next(request)
-    
+
     duration = (time.time() - start) * 1000
-    logger.info(
-        f"{request.method} {request.url.path} - {response.status_code} - {duration:.2f}ms"
-    )
-    
+    logger.info(f"{request.method} {request.url.path} - {response.status_code} - {duration:.2f}ms")
+
     # Add timing header
     response.headers["X-Response-Time"] = f"{duration:.2f}ms"
-    
+
     return response
 
 
@@ -196,13 +194,15 @@ app.include_router(agents_router)
 # Health & Status Endpoints
 # =============================================================================
 
+
 class HealthResponse(BaseModel):
     """Health check response"""
+
     status: str
     timestamp: str
     version: str
     environment: str
-    services: Dict[str, str]
+    services: dict[str, str]
 
 
 @app.get("/", tags=["Root"])
@@ -213,7 +213,7 @@ async def root():
         "version": "1.0.0",
         "status": "operational",
         "docs": "/docs",
-        "health": "/health"
+        "health": "/health",
     }
 
 
@@ -222,15 +222,15 @@ async def health_check():
     """Comprehensive health check"""
     return HealthResponse(
         status="healthy",
-        timestamp=datetime.now(timezone.utc).isoformat(),
+        timestamp=datetime.now(UTC).isoformat(),
         version="1.0.0",
         environment=os.getenv("ENVIRONMENT", "development"),
         services={
             "api": "operational",
             "auth": "operational",
             "encryption": "operational",
-            "webhooks": "operational"
-        }
+            "webhooks": "operational",
+        },
     )
 
 
@@ -255,9 +255,10 @@ v1_router = VersionedAPIRouter(version="v1", tags=["API v1"])
 
 # ---- Products ----
 
+
 class ProductCreate(BaseModel):
     name: str
-    description: Optional[str] = None
+    description: str | None = None
     price: float
     sku: str
     inventory: int = 0
@@ -266,7 +267,7 @@ class ProductCreate(BaseModel):
 class ProductResponse(BaseModel):
     id: str
     name: str
-    description: Optional[str]
+    description: str | None
     price: float
     sku: str
     inventory: int
@@ -274,13 +275,10 @@ class ProductResponse(BaseModel):
 
 
 @v1_router.post("/products", response_model=ProductResponse)
-async def create_product(
-    product: ProductCreate,
-    user: TokenPayload = Depends(get_current_user)
-):
+async def create_product(product: ProductCreate, user: TokenPayload = Depends(get_current_user)):
     """Create a new product (authenticated)"""
     product_id = f"prod_{os.urandom(8).hex()}"
-    
+
     # Publish webhook event
     await webhook_manager.publish(
         event_type=WebhookEventType.PRODUCT_CREATED.value,
@@ -288,10 +286,10 @@ async def create_product(
             "product_id": product_id,
             "name": product.name,
             "sku": product.sku,
-            "created_by": user.sub
-        }
+            "created_by": user.sub,
+        },
     )
-    
+
     return ProductResponse(
         id=product_id,
         name=product.name,
@@ -299,15 +297,13 @@ async def create_product(
         price=product.price,
         sku=product.sku,
         inventory=product.inventory,
-        created_at=datetime.now(timezone.utc).isoformat()
+        created_at=datetime.now(UTC).isoformat(),
     )
 
 
-@v1_router.get("/products", response_model=List[ProductResponse])
+@v1_router.get("/products", response_model=list[ProductResponse])
 async def list_products(
-    user: TokenPayload = Depends(get_current_user),
-    limit: int = 10,
-    offset: int = 0
+    user: TokenPayload = Depends(get_current_user), limit: int = 10, offset: int = 0
 ):
     """List products (authenticated)"""
     # Demo data
@@ -319,17 +315,18 @@ async def list_products(
             price=189.99,
             sku="BR-HOOD-001",
             inventory=50,
-            created_at=datetime.now(timezone.utc).isoformat()
+            created_at=datetime.now(UTC).isoformat(),
         )
     ]
 
 
 # ---- Orders ----
 
+
 class OrderCreate(BaseModel):
     customer_id: str
-    items: List[Dict[str, Any]]
-    shipping_address: Dict[str, str]
+    items: list[dict[str, Any]]
+    shipping_address: dict[str, str]
 
 
 class OrderResponse(BaseModel):
@@ -341,83 +338,72 @@ class OrderResponse(BaseModel):
 
 
 @v1_router.post("/orders", response_model=OrderResponse)
-async def create_order(
-    order: OrderCreate,
-    user: TokenPayload = Depends(get_current_user)
-):
+async def create_order(order: OrderCreate, user: TokenPayload = Depends(get_current_user)):
     """Create a new order (authenticated)"""
     order_id = f"ord_{os.urandom(8).hex()}"
-    
+
     # Encrypt sensitive shipping data
-    encrypted_address = field_encryption.encrypt_dict(
-        order.shipping_address,
-        context=order_id
-    )
-    
+    field_encryption.encrypt_dict(order.shipping_address, context=order_id)
+
     # Publish webhook
     await webhook_manager.publish(
         event_type=WebhookEventType.ORDER_CREATED.value,
         data={
             "order_id": order_id,
             "customer_id": order.customer_id,
-            "item_count": len(order.items)
-        }
+            "item_count": len(order.items),
+        },
     )
-    
+
     return OrderResponse(
         id=order_id,
         customer_id=order.customer_id,
         status="pending",
         total=sum(item.get("price", 0) * item.get("quantity", 1) for item in order.items),
-        created_at=datetime.now(timezone.utc).isoformat()
+        created_at=datetime.now(UTC).isoformat(),
     )
 
 
 # ---- Agents ----
 
+
 class AgentExecuteRequest(BaseModel):
     agent_name: str
     task: str
-    parameters: Dict[str, Any] = {}
+    parameters: dict[str, Any] = {}
 
 
 class AgentResponse(BaseModel):
     agent_name: str
     task_id: str
     status: str
-    result: Optional[Dict[str, Any]] = None
+    result: dict[str, Any] | None = None
 
 
 @v1_router.post("/agents/execute", response_model=AgentResponse)
 async def execute_agent(
-    request: AgentExecuteRequest,
-    user: TokenPayload = Depends(get_current_user)
+    request: AgentExecuteRequest, user: TokenPayload = Depends(get_current_user)
 ):
     """Execute an AI agent task (authenticated)"""
     task_id = f"task_{os.urandom(8).hex()}"
-    
+
     # Publish webhook
     await webhook_manager.publish(
         event_type=WebhookEventType.AGENT_TASK_STARTED.value,
         data={
             "task_id": task_id,
             "agent_name": request.agent_name,
-            "initiated_by": user.sub
-        }
+            "initiated_by": user.sub,
+        },
     )
-    
+
     return AgentResponse(
-        agent_name=request.agent_name,
-        task_id=task_id,
-        status="started",
-        result=None
+        agent_name=request.agent_name, task_id=task_id, status="started", result=None
     )
 
 
-@v1_router.get("/agents", response_model=List[Dict[str, Any]])
-async def list_agents(
-    user: TokenPayload = Depends(get_current_user)
-):
+@v1_router.get("/agents", response_model=list[dict[str, Any]])
+async def list_agents(user: TokenPayload = Depends(get_current_user)):
     """List available AI agents"""
     return [
         {"name": "wordpress_agent", "status": "active", "category": "backend"},
@@ -430,9 +416,10 @@ async def list_agents(
 
 # ---- Admin Routes (RBAC Protected) ----
 
+
 @v1_router.get(
     "/admin/stats",
-    dependencies=[Depends(RoleChecker([UserRole.ADMIN, UserRole.SUPER_ADMIN]))]
+    dependencies=[Depends(RoleChecker([UserRole.ADMIN, UserRole.SUPER_ADMIN]))],
 )
 async def get_admin_stats():
     """Get platform statistics (admin only)"""
@@ -442,24 +429,21 @@ async def get_admin_stats():
         "total_revenue": 125000.00,
         "active_agents": 69,
         "webhook_endpoints": len(webhook_manager.list_endpoints()),
-        "api_version": "v1"
+        "api_version": "v1",
     }
 
 
-@v1_router.get(
-    "/admin/security-audit",
-    dependencies=[Depends(RoleChecker([UserRole.SUPER_ADMIN]))]
-)
+@v1_router.get("/admin/security-audit", dependencies=[Depends(RoleChecker([UserRole.SUPER_ADMIN]))])
 async def get_security_audit():
     """Get security audit log (super admin only)"""
     return {
         "audit_log": [
             {
-                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "timestamp": datetime.now(UTC).isoformat(),
                 "action": "login",
                 "user": "admin",
                 "ip": "127.0.0.1",
-                "status": "success"
+                "status": "success",
             }
         ],
         "security_score": 95,
@@ -467,32 +451,27 @@ async def get_security_audit():
             "jwt_auth": True,
             "aes_encryption": True,
             "rbac": True,
-            "webhooks_signed": True
-        }
+            "webhooks_signed": True,
+        },
     }
 
 
 # ---- Encryption Demo ----
 
+
 @v1_router.post("/demo/encrypt")
-async def demo_encrypt(
-    data: Dict[str, Any],
-    user: TokenPayload = Depends(get_current_user)
-):
+async def demo_encrypt(data: dict[str, Any], user: TokenPayload = Depends(get_current_user)):
     """Demo: Encrypt sensitive fields in data"""
     encrypted = field_encryption.encrypt_dict(data, context=user.sub)
     return {
         "original_keys": list(data.keys()),
         "encrypted_data": encrypted,
-        "note": "Sensitive fields automatically encrypted"
+        "note": "Sensitive fields automatically encrypted",
     }
 
 
 @v1_router.post("/demo/mask")
-async def demo_mask(
-    data: Dict[str, str],
-    user: TokenPayload = Depends(get_current_user)
-):
+async def demo_mask(data: dict[str, str], user: TokenPayload = Depends(get_current_user)):
     """Demo: Mask sensitive data for display"""
     masked = {}
     for key, value in data.items():
@@ -517,6 +496,7 @@ app.include_router(v1_router)
 # Error Handlers
 # =============================================================================
 
+
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
     """Custom HTTP exception handler"""
@@ -527,8 +507,8 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "status_code": exc.status_code,
             "message": exc.detail,
             "path": str(request.url.path),
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
+            "timestamp": datetime.now(UTC).isoformat(),
+        },
     )
 
 
@@ -543,8 +523,8 @@ async def general_exception_handler(request: Request, exc: Exception):
             "status_code": 500,
             "message": "Internal server error",
             "path": str(request.url.path),
-            "timestamp": datetime.now(timezone.utc).isoformat()
-        }
+            "timestamp": datetime.now(UTC).isoformat(),
+        },
     )
 
 
@@ -554,11 +534,5 @@ async def general_exception_handler(request: Request, exc: Exception):
 
 if __name__ == "__main__":
     import uvicorn
-    
-    uvicorn.run(
-        "main_enterprise:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+
+    uvicorn.run("main_enterprise:app", host="0.0.0.0", port=8000, reload=True, log_level="info")

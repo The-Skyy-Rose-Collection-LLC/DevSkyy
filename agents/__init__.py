@@ -9,7 +9,7 @@ Specialized AI agents for SkyyRose operations:
 
 Usage:
     from agents import TripoAssetAgent, FashnTryOnAgent
-    
+
     # Generate 3D model
     tripo = TripoAssetAgent()
     model = await tripo.generate_from_description(
@@ -17,7 +17,7 @@ Usage:
         collection="BLACK_ROSE",
         garment_type="jacket"
     )
-    
+
     # Virtual try-on
     fashn = FashnTryOnAgent()
     result = await fashn.virtual_tryon(
@@ -26,23 +26,21 @@ Usage:
     )
 """
 
-from .tripo_agent import (
-    TripoAssetAgent,
-    TripoTask,
-    TripoTaskStatus,
-    ModelFormat,
-)
-
 from .fashn_agent import (
-    FashnTryOnAgent,
     FashnTask,
+    FashnTryOnAgent,
     GarmentCategory,
     TryOnMode,
 )
-
+from .tripo_agent import (
+    ModelFormat,
+    TripoAssetAgent,
+    TripoTask,
+    TripoTaskStatus,
+)
 from .wordpress_asset_agent import (
-    WordPressAssetAgent,
     AssetUploadResult,
+    WordPressAssetAgent,
 )
 
 __all__ = [
@@ -51,13 +49,11 @@ __all__ = [
     "TripoTask",
     "TripoTaskStatus",
     "ModelFormat",
-    
     # FASHN
     "FashnTryOnAgent",
     "FashnTask",
     "GarmentCategory",
     "TryOnMode",
-    
     # WordPress
     "WordPressAssetAgent",
     "AssetUploadResult",
