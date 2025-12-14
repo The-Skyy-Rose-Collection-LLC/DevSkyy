@@ -21,6 +21,10 @@
 git clone https://github.com/SkyyRoseLLC/DevSkyy.git
 cd DevSkyy
 
+# Setup compliance agents (recommended for contributors)
+./setup_compliance.sh
+
+# Or manual setup:
 # Install dependencies (choose one)
 pip install -e ".[dev]"        # Development (includes testing)
 pip install -e ".[all]"        # Everything
@@ -39,6 +43,21 @@ uvicorn main_enterprise:app --reload --port 8000
 # Run tests
 pytest tests/ -v
 ```
+
+## 🧹 Code Quality & Compliance
+
+DevSkyy uses automated compliance agents to maintain clean coding standards:
+
+- **Pre-commit hooks** - Automatic code formatting, linting, and security checks before every commit
+- **GitHub Actions CI/CD** - Comprehensive testing and quality checks on every push
+- **Dependabot** - Automated security updates for dependencies
+- **CodeQL Analysis** - Advanced security scanning
+
+For contributors, see:
+- **[Developer Quick Reference](DEVELOPER_QUICKREF.md)** - Fast command reference
+- **[Clean Coding Agents Guide](CLEAN_CODING_AGENTS.md)** - Complete compliance documentation
+- **[Repository File Inventory](REPOSITORY_FILES.md)** - Full file listing and structure
+
 
 ## 🎯 Core Features
 
