@@ -109,8 +109,19 @@ dmypy.json
 # Ruff
 .ruff_cache/
 
+# Pre-commit
+.pre-commit-cache/
+
 # Documentation builds
 docs/_build/
 
 # Redis
 dump.rdb
+
+# Code quality reports
+htmlcov/
+.coverage
+coverage.xml
+bandit-report.json
+.pytest_cache/
+.tox/

@@ -21,6 +21,10 @@
 git clone https://github.com/SkyyRoseLLC/DevSkyy.git
 cd DevSkyy
 
+# Setup compliance agents (recommended for contributors)
+./setup_compliance.sh
+
+# Or manual setup:
 # Install dependencies (choose one)
 pip install -e ".[dev]"        # Development (includes testing)
 pip install -e ".[all]"        # Everything
@@ -29,9 +33,11 @@ pip install -e .               # Core only
 # Or with uv (faster)
 uv pip install -e ".[dev]"
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your API keys
+# Configure environment (automated setup included!)
+# A .env file with secure keys is already created
+# See ENV_SETUP_GUIDE.md for details
+# To regenerate keys: python scripts/generate_secrets.py
+# Edit .env to add your API keys (optional)
 
 # Run application
 uvicorn main_enterprise:app --reload --port 8000
@@ -40,70 +46,20 @@ uvicorn main_enterprise:app --reload --port 8000
 pytest tests/ -v
 ```
 
-## 🔌 MCP Server Integration
+## 🧹 Code Quality & Compliance
 
-**Model Context Protocol (MCP) servers** enable AI assistants like Claude to use DevSkyy's capabilities.
+DevSkyy uses automated compliance agents to maintain clean coding standards:
 
-### OpenAI MCP Server (`server.py`)
+- **Pre-commit hooks** - Automatic code formatting, linting, and security checks before every commit
+- **GitHub Actions CI/CD** - Comprehensive testing and quality checks on every push
+- **Dependabot** - Automated security updates for dependencies
+- **CodeQL Analysis** - Advanced security scanning
 
-Enterprise MCP server optimized for OpenAI models (GPT-4o, GPT-4o-mini, o1-preview).
+For contributors, see:
+- **[Developer Quick Reference](DEVELOPER_QUICKREF.md)** - Fast command reference
+- **[Clean Coding Agents Guide](CLEAN_CODING_AGENTS.md)** - Complete compliance documentation
+- **[Repository File Inventory](REPOSITORY_FILES.md)** - Full file listing and structure
 
-**Quick Setup:**
-```bash
-# Install dependencies
-pip install fastmcp httpx pydantic openai
-
-# Set environment variables
-export OPENAI_API_KEY="sk-your-key-here"
-export DEVSKYY_API_KEY="your-key-here"
-
-# Run server
-python server.py
-```
-
-**7 Available Tools:**
-- `openai_completion` - Text generation with OpenAI models
-- `openai_code_generation` - Generate code with tests/docs
-- `openai_vision_analysis` - Analyze images (GPT-4o/4o-mini)
-- `openai_function_calling` - Structured function invocation
-- `openai_model_selector` - Intelligent model selection
-- `devskyy_agent_openai` - Access 54 DevSkyy agents
-- `openai_capabilities_info` - Model capabilities reference
-
-**Claude Desktop Integration:**
-```json
-{
-  "mcpServers": {
-    "devskyy-openai": {
-      "command": "python",
-      "args": ["/path/to/DevSkyy/server.py"],
-      "env": {
-        "OPENAI_API_KEY": "sk-your-key-here"
-      }
-    }
-  }
-}
-```
-
-📚 **Documentation:**
-- [Quick Start Guide](QUICKSTART.md)
-- [Full Documentation](SERVER_README.md)
-- [Example Config](claude_desktop_config.example.json)
-
-### Main MCP Server (`devskyy_mcp.py`)
-
-Multi-model MCP server supporting Claude, OpenAI, Gemini, and Mistral.
-
-**Features:**
-- 11+ MCP tools across all DevSkyy capabilities
-- Multi-model AI orchestration
-- WordPress theme generation
-- E-commerce automation
-- ML predictions
-- Marketing campaigns
-- System monitoring
-
-See `devskyy_mcp.py` for full documentation.
 
 ## 🎯 Core Features
 
