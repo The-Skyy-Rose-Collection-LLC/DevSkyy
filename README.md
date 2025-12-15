@@ -40,6 +40,71 @@ uvicorn main_enterprise:app --reload --port 8000
 pytest tests/ -v
 ```
 
+## 🔌 MCP Server Integration
+
+**Model Context Protocol (MCP) servers** enable AI assistants like Claude to use DevSkyy's capabilities.
+
+### OpenAI MCP Server (`server.py`)
+
+Enterprise MCP server optimized for OpenAI models (GPT-4o, GPT-4o-mini, o1-preview).
+
+**Quick Setup:**
+```bash
+# Install dependencies
+pip install fastmcp httpx pydantic openai
+
+# Set environment variables
+export OPENAI_API_KEY="sk-your-key-here"
+export DEVSKYY_API_KEY="your-key-here"
+
+# Run server
+python server.py
+```
+
+**7 Available Tools:**
+- `openai_completion` - Text generation with OpenAI models
+- `openai_code_generation` - Generate code with tests/docs
+- `openai_vision_analysis` - Analyze images (GPT-4o/4o-mini)
+- `openai_function_calling` - Structured function invocation
+- `openai_model_selector` - Intelligent model selection
+- `devskyy_agent_openai` - Access 54 DevSkyy agents
+- `openai_capabilities_info` - Model capabilities reference
+
+**Claude Desktop Integration:**
+```json
+{
+  "mcpServers": {
+    "devskyy-openai": {
+      "command": "python",
+      "args": ["/path/to/DevSkyy/server.py"],
+      "env": {
+        "OPENAI_API_KEY": "sk-your-key-here"
+      }
+    }
+  }
+}
+```
+
+📚 **Documentation:**
+- [Quick Start Guide](QUICKSTART.md)
+- [Full Documentation](SERVER_README.md)
+- [Example Config](claude_desktop_config.example.json)
+
+### Main MCP Server (`devskyy_mcp.py`)
+
+Multi-model MCP server supporting Claude, OpenAI, Gemini, and Mistral.
+
+**Features:**
+- 11+ MCP tools across all DevSkyy capabilities
+- Multi-model AI orchestration
+- WordPress theme generation
+- E-commerce automation
+- ML predictions
+- Marketing campaigns
+- System monitoring
+
+See `devskyy_mcp.py` for full documentation.
+
 ## 🎯 Core Features
 
 ### 🎨 Industry-Leading WordPress/Elementor Theme Builder
