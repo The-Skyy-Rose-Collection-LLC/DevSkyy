@@ -4,6 +4,25 @@ Utility scripts for DevSkyy platform management.
 
 ## Available Scripts
 
+### `verify_env.py` - Environment Variables Verification
+
+Verifies that environment variables are properly configured before running the application.
+
+**Usage:**
+
+```bash
+# Verify environment setup
+python scripts/verify_env.py
+```
+
+**Checks:**
+- ✅ Verifies `.env` file exists
+- ✅ Confirms required variables are set (JWT_SECRET_KEY, ENCRYPTION_MASTER_KEY, ENVIRONMENT)
+- ✅ Lists optional variables and their status
+- ✅ Provides helpful error messages if configuration is incomplete
+
+**Recommended:** Run this script before starting the application to ensure proper configuration.
+
 ### `generate_secrets.py` - Secure Key Generator
 
 Generates cryptographically secure keys for JWT authentication and AES-256-GCM encryption.
@@ -36,7 +55,7 @@ python scripts/generate_secrets.py --env-file /path/to/.env
 
 1. **Initial setup:**
    ```bash
-   # Create .env from template
+   # Create .env from template (if needed)
    cp .env.example .env
    
    # Generate secure keys
@@ -45,10 +64,8 @@ python scripts/generate_secrets.py --env-file /path/to/.env
 
 2. **Verify setup:**
    ```bash
-   # Check that .env exists and has secure keys
-   grep -E "JWT_SECRET_KEY|ENCRYPTION_MASTER_KEY" .env
-   
-   # Should show non-default values
+   # Verify all environment variables are configured
+   python scripts/verify_env.py
    ```
 
 3. **Run application:**
