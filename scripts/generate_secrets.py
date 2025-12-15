@@ -147,13 +147,14 @@ def main():
     jwt_key = generate_jwt_secret(512)  # 512-bit for HS512
     encryption_key = generate_encryption_key(256)  # 256-bit for AES-256-GCM
     
-    # Display keys
-    print("=" * 80)
-    print("Generated Keys (keep these secure!):")
-    print("=" * 80)
-    print(f"\nJWT_SECRET_KEY={jwt_key}")
-    print(f"\nENCRYPTION_MASTER_KEY={encryption_key}")
-    print("\n" + "=" * 80)
+    # Display keys (only if --show-only is set)
+    if args.show_only:
+        print("=" * 80)
+        print("Generated Keys (keep these secure!):")
+        print("=" * 80)
+        print(f"\nJWT_SECRET_KEY={jwt_key}")
+        print(f"\nENCRYPTION_MASTER_KEY={encryption_key}")
+        print("\n" + "=" * 80)
     
     # Security warnings
     print("\n⚠️  SECURITY WARNINGS:")
