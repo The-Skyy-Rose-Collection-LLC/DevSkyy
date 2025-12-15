@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "devskyy-openai": {
+      "command": "python",
+      "args": ["/absolute/path/to/DevSkyy/server.py"],
+      "env": {
+        "OPENAI_API_KEY": "sk-your-openai-api-key-here",
+        "DEVSKYY_API_URL": "https://api.devskyy.com",
+        "DEVSKYY_API_KEY": "your-devskyy-api-key-here"
+      }
+    }
+  }
+}
