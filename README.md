@@ -29,9 +29,11 @@ pip install -e .               # Core only
 # Or with uv (faster)
 uv pip install -e ".[dev]"
 
-# Configure environment
-cp .env.example .env
-# Edit .env with your API keys
+# Configure environment (automated setup included!)
+# A .env file with secure keys is already created
+# See ENV_SETUP_GUIDE.md for details
+# To regenerate keys: python scripts/generate_secrets.py
+# Edit .env to add your API keys (optional)
 
 # Run application
 uvicorn main_enterprise:app --reload --port 8000
