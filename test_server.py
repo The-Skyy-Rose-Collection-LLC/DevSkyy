@@ -36,12 +36,7 @@ def validate_server_file():
         return False
     
     # Check for required components
-    required_imports = [
-        'httpx',
-        'FastMCP',
-        'BaseModel',
-        'Field',
-    ]
+
     
     # Check for tool names in content (decorated functions may have different internal names)
     required_tools = [
