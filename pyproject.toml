@@ -223,3 +223,7 @@ exclude_lines = [
     "if __name__ == .__main__.:",
 ]
 fail_under = 80
+
+[tool.bandit]
+exclude_dirs = ["tests", "legacy", "build", "dist"]
+skips = ["B101"]  # Skip assert_used (common in tests)
