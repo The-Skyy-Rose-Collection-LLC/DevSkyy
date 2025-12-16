@@ -1,171 +1,297 @@
-# DevSkyy OpenAI MCP Server - Quick Start Guide
+# Quick Start Guide: OpenAI MCP Server
 
-Get up and running with the DevSkyy OpenAI MCP Server in 5 minutes.
+Get started with the DevSkyy OpenAI MCP Server in 5 minutes.
 
 ## Prerequisites
 
-- Python 3.11+
-- OpenAI API key
-- DevSkyy platform access (optional)
+- Python 3.11 or higher
+- OpenAI API key ([get one here](https://platform.openai.com/api-keys))
+- DevSkyy API key (optional, for agent integration)
 
-## 1. Environment Setup
+## Step 1: Clone Repository
 
-### Get OpenAI API Key
-1. Visit [OpenAI Platform](https://platform.openai.com/api-keys)
-2. Create new API key
-3. Copy the key (starts with `sk-`)
-
-### Set Environment Variables
-
-**macOS/Linux:**
 ```bash
-export OPENAI_API_KEY="sk-your-key-here"
-export DEVSKYY_API_KEY="your-devskyy-key"  # Optional
+git clone https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy.git
+cd DevSkyy
 ```
 
-**Windows:**
+## Step 2: Install Dependencies
+
+### Option A: Using pip (recommended)
+```bash
+pip install fastmcp httpx pydantic openai python-jose[cryptography]
+```
+
+### Option B: Using project dependencies
+```bash
+pip install -e ".[all]"
+```
+
+### Option C: Using uv (fastest)
+```bash
+uv pip install fastmcp httpx pydantic openai python-jose[cryptography]
+```
+
+## Step 3: Set Environment Variables
+
+### Linux/macOS
+```bash
+export OPENAI_API_KEY="sk-your-openai-api-key-here"
+export DEVSKYY_API_KEY="your-devskyy-key-here"  # Optional
+```
+
+### Windows (PowerShell)
+```powershell
+$env:OPENAI_API_KEY="sk-your-openai-api-key-here"
+$env:DEVSKYY_API_KEY="your-devskyy-key-here"  # Optional
+```
+
+### Windows (Command Prompt)
 ```cmd
-set OPENAI_API_KEY=sk-your-key-here
-set DEVSKYY_API_KEY=your-devskyy-key
+set OPENAI_API_KEY=sk-your-openai-api-key-here
+set DEVSKYY_API_KEY=your-devskyy-key-here
 ```
 
-**Or create `.env` file:**
-```env
-OPENAI_API_KEY=sk-your-key-here
-DEVSKYY_API_KEY=your-devskyy-key
-```
+## Step 4: Test the Server
 
-## 2. Install Dependencies
-
+### Validate installation
 ```bash
-pip install openai mcp pydantic python-dotenv
+python test_server.py
 ```
 
-## 3. Test the Server
+You should see:
+```
+✅ All validation checks passed!
+```
 
+### Run the server
 ```bash
 python server.py
 ```
 
 You should see:
 ```
-INFO:__main__:Starting DevSkyy OpenAI MCP Server...
+╔══════════════════════════════════════════════════════════════╗
+║                                                              ║
+║   DevSkyy OpenAI MCP Server v1.0.0                          ║
+║   Model Context Protocol for OpenAI Integration             ║
+║                                                              ║
+╚══════════════════════════════════════════════════════════════╝
+
+✅ Configuration:
+   DevSkyy API: http://localhost:8000
+   DevSkyy Key: Not Set ⚠️
+   OpenAI Key: Set ✓
+
+🔧 Available Tools: 7 tools ready
+📚 Supported Models: GPT-4o, GPT-4o-mini, o1-preview
+
+Starting OpenAI MCP server on stdio...
 ```
 
-## 4. Claude Desktop Integration
+## Step 5: Configure Claude Desktop
 
-### Find Config File
+### macOS
+1. Locate config file:
+   ```bash
+   ~/Library/Application Support/Claude/claude_desktop_config.json
+   ```
 
-**macOS:**
+2. Edit or create the file:
+   ```bash
+   code ~/Library/Application\ Support/Claude/claude_desktop_config.json
+   ```
+
+3. Add server configuration:
+   ```json
+   {
+     "mcpServers": {
+       "devskyy-openai": {
+         "command": "python",
+         "args": ["/absolute/path/to/DevSkyy/server.py"],
+         "env": {
+           "OPENAI_API_KEY": "sk-your-key-here",
+           "DEVSKYY_API_KEY": "your-key-here"
+         }
+       }
+     }
+   }
+   ```
+
+### Windows
+1. Locate config file:
+   ```
+   %APPDATA%\Claude\claude_desktop_config.json
+   ```
+
+2. Edit or create the file with the same configuration as macOS.
+
+### Linux
+1. Locate config file:
+   ```bash
+   ~/.config/Claude/claude_desktop_config.json
+   ```
+
+2. Edit or create the file with the same configuration as macOS.
+
+## Step 6: Restart Claude Desktop
+
+1. Quit Claude Desktop completely
+2. Reopen Claude Desktop
+3. Look for the 🔨 (hammer) icon in the bottom right
+4. You should see "devskyy-openai" in the list of servers
+
+## Step 7: Test in Claude
+
+Try these example prompts:
+
+### Text Generation
+```
+Use openai_completion to explain quantum computing
+```
+
+### Code Generation
+```
+Use openai_code_generation to create a FastAPI endpoint for user authentication in Python
+```
+
+### Vision Analysis
+```
+Use openai_vision_analysis to analyze this image: [paste image URL]
+```
+
+### Model Selection
+```
+Use openai_model_selector to recommend the best model for complex mathematical proofs
+```
+
+### DevSkyy Agent
+```
+Use devskyy_agent_openai to scan code in the ./src directory
+```
+
+## Common Issues
+
+### "Module not found: httpx"
+**Solution:** Install dependencies
 ```bash
-~/Library/Application Support/Claude/claude_desktop_config.json
+pip install fastmcp httpx pydantic openai python-jose[cryptography]
 ```
 
-**Windows:**
-```
-%APPDATA%\Claude\claude_desktop_config.json
+### "Authentication failed"
+**Solution:** Check your API key
+```bash
+echo $OPENAI_API_KEY
 ```
 
-### Add Server Configuration
+### "Server not showing in Claude"
+**Solution:** 
+1. Check the config file path is correct
+2. Verify the absolute path to server.py
+3. Restart Claude Desktop completely
+4. Check Claude Desktop logs for errors
 
+### "Permission denied"
+**Solution:** Make server.py executable (Linux/macOS)
+```bash
+chmod +x server.py
+```
+
+## Advanced Configuration
+
+### Custom API URL
 ```json
 {
   "mcpServers": {
     "devskyy-openai": {
-      "command": "python",
-      "args": ["/full/path/to/server.py"],
       "env": {
-        "OPENAI_API_KEY": "sk-your-key-here",
-        "DEVSKYY_API_KEY": "your-devskyy-key"
+        "DEVSKYY_API_URL": "https://your-custom-api.com"
       }
     }
   }
 }
 ```
 
-### Restart Claude Desktop
-
-Close and reopen Claude Desktop to load the new server.
-
-## 5. Test Integration
-
-In Claude Desktop, try:
-
+### Multiple Servers
+```json
+{
+  "mcpServers": {
+    "devskyy-openai": {
+      "command": "python",
+      "args": ["/path/to/server.py"],
+      "env": {"OPENAI_API_KEY": "sk-key1"}
+    },
+    "devskyy-main": {
+      "command": "python",
+      "args": ["/path/to/devskyy_mcp.py"],
+      "env": {"DEVSKYY_API_KEY": "key2"}
+    }
+  }
+}
 ```
-Use the openai_completion tool to explain quantum computing in simple terms using GPT-4o.
-```
-
-## 6. Available Tools
-
-| Tool | Description | Best For |
-|------|-------------|----------|
-| `openai_completion` | Text generation | General tasks, explanations |
-| `openai_code_generation` | Code with tests/docs | Development tasks |
-| `openai_vision_analysis` | Image analysis | Visual content analysis |
-| `openai_function_calling` | Structured outputs | API integrations |
-| `openai_model_selector` | Choose optimal model | Task optimization |
-| `devskyy_agent_openai` | DevSkyy integration | Platform-specific tasks |
-| `openai_capabilities_info` | Model information | Learning about capabilities |
-
-## 7. Example Workflows
-
-### Code Generation
-```
-Use openai_code_generation to create a Python FastAPI endpoint for user registration with email validation, password hashing, and database storage. Include tests and documentation.
-```
-
-### Image Analysis
-```
-Use openai_vision_analysis to analyze this product image: https://example.com/product.jpg and provide a detailed description for an e-commerce listing.
-```
-
-### Smart Model Selection
-```
-Use openai_model_selector to recommend the best model for "solving complex mathematical word problems involving calculus" with quality priority.
-```
-
-## Troubleshooting
-
-### Server Won't Start
-- Check `OPENAI_API_KEY` is set correctly
-- Verify Python version is 3.11+
-- Install missing dependencies: `pip install -r requirements.txt`
-
-### Claude Can't Find Server
-- Use absolute path in `claude_desktop_config.json`
-- Check file permissions on `server.py`
-- Restart Claude Desktop after config changes
-
-### API Errors
-- Verify OpenAI API key has credits
-- Check internet connection
-- Review OpenAI usage limits
-
-### Performance Issues
-- Use `gpt-4o-mini` for faster responses
-- Reduce `max_tokens` for shorter outputs
-- Check OpenAI service status
 
 ## Next Steps
 
-1. **Explore Tools**: Try each of the 7 available tools
-2. **DevSkyy Integration**: Connect with your DevSkyy agents
-3. **Custom Workflows**: Build complex multi-tool workflows
-4. **Production Setup**: Configure logging and monitoring
+- Read the [full documentation](SERVER_README.md)
+- Explore [available tools](#available-tools)
+- Check out [example use cases](#examples)
+- Join our [community](#community)
+
+## Available Tools
+
+1. **openai_completion** - Text generation with OpenAI models
+2. **openai_code_generation** - Generate code with tests and docs
+3. **openai_vision_analysis** - Analyze images
+4. **openai_function_calling** - Structured function calls
+5. **openai_model_selector** - Intelligent model selection
+6. **devskyy_agent_openai** - Access 54 DevSkyy agents
+7. **openai_capabilities_info** - Get server capabilities
+
+## Examples
+
+### Generate Production Code
+```json
+{
+  "description": "Create a REST API endpoint for user registration with email validation",
+  "language": "python",
+  "include_tests": true,
+  "include_docs": true
+}
+```
+
+### Analyze Product Images
+```json
+{
+  "image_url": "https://example.com/product.jpg",
+  "prompt": "Describe this product, suggest categories, and identify the brand",
+  "detail_level": "high"
+}
+```
+
+### Smart Model Selection
+```json
+{
+  "task_description": "Review and optimize a complex algorithm",
+  "task_type": "code_analysis",
+  "optimize_for": "quality"
+}
+```
+
+## Community
+
+- GitHub: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy
+- Issues: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
+- Docs: https://docs.devskyy.com
 
 ## Support
 
-- **Documentation**: See `SERVER_README.md` for detailed API reference
-- **Issues**: Report bugs in the DevSkyy repository
-- **DevSkyy Platform**: Contact support for agent integration help
-
-## Security Notes
-
-- Never commit API keys to version control
-- Use environment variables or secure key management
-- Regularly rotate API keys
-- Monitor OpenAI usage and billing
+Having trouble? Check:
+1. [Common Issues](#common-issues) above
+2. [Full documentation](SERVER_README.md)
+3. [GitHub Issues](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues)
 
 ---
 
-**Ready to build with AI?** Start with simple completions and work your way up to complex multi-agent workflows!
+**Last Updated:** December 2024  
+**Version:** 1.0.0  
+**License:** Copyright © 2025 The Skyy Rose Collection LLC
