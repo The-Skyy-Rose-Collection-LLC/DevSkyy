@@ -7,10 +7,7 @@ Continuous Integration workflow for code quality, testing, and security.
 
 import asyncio
 import logging
-import subprocess
 from typing import Any
-
-from pydantic import BaseModel
 
 from orchestration.langgraph_integration import WorkflowState, WorkflowStatus
 
