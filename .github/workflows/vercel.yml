@@ -193,7 +193,7 @@ jobs:
         "
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: vercel-security-reports
         path: |
