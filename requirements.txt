@@ -43,7 +43,7 @@ requests>=2.31
 
 # AI/ML & MCP Server
 openai>=1.6
-mcp>=0.9.0
+mcp>=1.23.0  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
 
 # LLM Provider SDKs (Official)
 anthropic>=0.75.0

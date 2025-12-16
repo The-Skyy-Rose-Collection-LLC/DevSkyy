@@ -2,25 +2,25 @@
 # Isolated requirements for MCP server and AI integrations
 
 # Core MCP framework
-mcp==1.1.0
+mcp>=1.23.0  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416 (DoS and DNS rebinding)
 
 # AI service integrations
-openai==1.57.2
-anthropic==0.40.0
-google-generativeai==0.8.3
+openai>=1.57.2
+anthropic>=0.40.0
+google-generativeai>=0.8.3
 
 # Core Python web framework
-fastapi==0.119.0
-uvicorn==0.32.1
-starlette==0.48.0
+fastapi>=0.119.0
+uvicorn>=0.32.1
+starlette>=0.49.1  # Fixed: CVE-2025-62727 (DoS via Range header)
 
 # Data validation and serialization
 pydantic==2.10.3
 pydantic-settings==2.7.0
 
 # HTTP client for API calls
-httpx==0.28.1
-aiohttp==3.11.10
+httpx>=0.28.1
+aiohttp>=3.12.14  # Fixed: CVE-2025-53643 (HTTP request smuggling)
 
 # Async support
 asyncio==3.4.3
@@ -66,8 +66,8 @@ typing-extensions==4.12.2
 python-dateutil==2.9.0.post0
 
 # Text processing
-tiktoken==0.8.0  # OpenAI tokenizer
-transformers==4.47.1  # For local tokenization
+tiktoken>=0.8.0  # OpenAI tokenizer
+transformers>=4.53.0  # Fixed: CVE-2024-11392, CVE-2024-11393, CVE-2024-11394 (RCE vulnerabilities)
 
 # Model utilities
 sentence-transformers==3.3.1  # For embeddings
@@ -84,9 +84,9 @@ beautifulsoup4==4.12.3
 requests==2.32.5
 
 # File processing
-pypdf==5.1.0
-python-docx==1.1.2
-python-pptx==1.0.2
+pypdf>=6.4.0  # Fixed: CVE-2025-66019, CVE-2025-62707 (DoS vulnerabilities)
+python-docx>=1.1.2
+python-pptx>=1.0.2
 
 # Image processing (for vision models)
 pillow==11.0.0

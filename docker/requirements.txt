@@ -2,9 +2,9 @@
 # Isolated requirements for containerized deployment
 
 # Core FastAPI stack
-fastapi==0.119.0
-uvicorn[standard]==0.32.1
-starlette==0.48.0
+fastapi>=0.119.0
+uvicorn[standard]>=0.32.1
+starlette>=0.49.1  # Fixed: CVE-2025-62727 (DoS via Range header)
 
 # Database
 sqlalchemy==2.0.36
