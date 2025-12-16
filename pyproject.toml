@@ -80,7 +80,7 @@ dependencies = [
     "woocommerce>=3.0",
     
     # MCP Server
-    "mcp>=1.0.0",
+    "mcp>=1.23.0",  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
 ]
 
 [project.optional-dependencies]
