@@ -1,11 +1,5 @@
-# DevSkyy Enterprise Platform
-# Modern Python project configuration (PEP 621)
-#
-# Install: pip install -e ".[dev]"
-# Or with uv: uv pip install -e ".[dev]"
-
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=68.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -16,19 +10,24 @@ readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.11"
 authors = [
-    { name = "DevSkyy Team", email = "dev@skyyrose.co" }
+    { name = "DevSkyy Platform Team", email = "dev@devskyy.com" }
 ]
 keywords = [
-    "ai-agents",
-    "fastapi",
-    "automation",
+    "ai",
+    "agents",
+    "multi-agent",
+    "orchestration",
     "wordpress",
     "woocommerce",
+    "elementor",
+    "e-commerce",
+    "automation",
+    "llm",
     "mcp",
-    "enterprise"
 ]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Environment :: Web Environment",
     "Framework :: FastAPI",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
@@ -37,15 +36,15 @@ classifiers = [
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Topic :: Internet :: WWW/HTTP :: HTTP Servers",
-    "Topic :: Software Development :: Libraries :: Application Frameworks",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed",
 ]
 
-# Core dependencies - flexible versions for library compatibility
 dependencies = [
-    # Web Framework
-    "fastapi>=0.104",
-    "uvicorn[standard]>=0.24",
-    "python-multipart>=0.0.6",
+    # Core Framework
+    "fastapi>=0.109",
+    "uvicorn[standard]>=0.27",
     "pydantic>=2.5",
     "pydantic-settings>=2.1",
     
@@ -55,12 +54,9 @@ dependencies = [
     "asyncpg>=0.29",
     "aiosqlite>=0.19",
     
-    # Security (RFC 7519 JWT, NIST SP 800-38D AES-GCM)
-    "PyJWT>=2.8",
-    "passlib[bcrypt]>=1.7",
-    "argon2-cffi>=23.1",
-    "cryptography>=41",
-    "bcrypt>=4.1",
+    # Caching & Queue
+    "redis>=5.0",
+    "celery>=5.3",
     
     # HTTP Clients
     "httpx>=0.25",
@@ -70,86 +66,88 @@ dependencies = [
     
     # Utilities
     "python-dotenv>=1.0",
+    "python-multipart>=0.0.6",
+    "structlog>=24.1",
     "tenacity>=8.2",
-    "pyyaml>=6.0",
-    "orjson>=3.9",
-    "python-dateutil>=2.8",
-    "email-validator>=2.1",
+    
+    # Security
+    "cryptography>=42.0",
+    "python-jose[cryptography]>=3.3",
+    "passlib[argon2]>=1.7",
+    "argon2-cffi>=23.1",
+    
+    # WooCommerce
+    "woocommerce>=3.0",
+    
+    # MCP Server
+    "mcp>=1.0.0",
 ]
 
 [project.optional-dependencies]
-# AI/ML integrations
-ai = [
-    "openai>=1.6",
-    "anthropic>=0.8",
-    "google-generativeai>=0.3",
-]
-
-# Caching & queues
-cache = [
-    "redis>=5.0",
-    "celery>=5.3",
-]
-
-# Monitoring & observability
-monitoring = [
-    "prometheus-client>=0.19",
-    "structlog>=23.2",
-    "python-json-logger>=2.0",
-]
-
-# WordPress/WooCommerce
-wordpress = [
-    "wordpress-xmlrpc>=2.3",
-    "woocommerce>=3.0",
-]
-
-# Development dependencies
 dev = [
-    # Testing
     "pytest>=7.4",
     "pytest-asyncio>=0.23",
     "pytest-cov>=4.1",
-    "httpx>=0.25",  # For TestClient
-    
-    # Code quality
+    "pytest-mock>=3.12",
+    "mypy>=1.8",
     "ruff>=0.1",
-    "black>=23.12",
-    "mypy>=1.7",
+    "black>=24.1",
     "isort>=5.13",
-    
-    # Type stubs
-    "types-requests>=2.31",
-    "types-python-dateutil>=2.8",
-    "types-PyYAML>=6.0",
+    "pre-commit>=3.6",
+    "httpx>=0.25",  # For test client
 ]
 
-# All optional dependencies combined
+ml = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scikit-learn>=1.4",
+]
+
+langgraph = [
+    "langgraph>=0.0.40",
+    "langchain>=0.1",
+    "langchain-openai>=0.0.5",
+    "langchain-anthropic>=0.1",
+]
+
 all = [
-    "devskyy[ai,cache,monitoring,wordpress,dev]",
+    "devskyy[dev,ml,langgraph]",
 ]
 
 [project.urls]
-Homepage = "https://github.com/skyyrose/devskyy-platform"
+Homepage = "https://github.com/devskyy/devskyy"
 Documentation = "https://docs.devskyy.com"
-Repository = "https://github.com/skyyrose/devskyy-platform"
-Changelog = "https://github.com/skyyrose/devskyy-platform/blob/main/CHANGELOG.md"
+Repository = "https://github.com/devskyy/devskyy"
+Changelog = "https://github.com/devskyy/devskyy/blob/main/CHANGELOG.md"
 
 [project.scripts]
 devskyy = "main_enterprise:main"
 
-# =============================================================================
-# Tool Configurations
-# =============================================================================
-
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["api*", "security*", "database*", "wordpress*", "agents*", "orchestration*"]
+include = [
+    "api*",
+    "security*",
+    "database*",
+    "wordpress*",
+    "agents*",
+    "orchestration*",
+    "runtime*",
+    "llm*",
+]
+exclude = ["tests*", "docs*", "legacy*"]
+
+[tool.setuptools.package-data]
+"*" = ["py.typed", "*.json", "*.yaml"]
+
+# =============================================================================
+# Ruff Configuration
+# =============================================================================
 
 [tool.ruff]
 target-version = "py311"
 line-length = 100
-exclude = ["legacy/"]
+exclude = ["legacy/", "*.pyi", "__pycache__"]
 
 [tool.ruff.lint]
 select = [
@@ -169,60 +167,122 @@ ignore = [
     "B904",   # raise without from inside except
     "ARG001", # unused function argument (common with FastAPI dependencies)
     "ARG002", # unused method argument (common with API handlers)
+    "SIM102", # nested if statements (sometimes more readable)
 ]
+
+[tool.ruff.lint.isort]
+known-first-party = ["api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ARG001", "ARG002"]
-"legacy/*" = ["ALL"]  # Legacy files - don't enforce strict linting
+"**/conftest.py" = ["ARG001"]
+
+# =============================================================================
+# Black Configuration
+# =============================================================================
 
 [tool.black]
-target-version = ["py311"]
 line-length = 100
+target-version = ["py311"]
+include = '\.pyi?$'
+exclude = '''
+/(
+    \.git
+    | \.hg
+    | \.mypy_cache
+    | \.tox
+    | \.venv
+    | _build
+    | buck-out
+    | build
+    | dist
+    | legacy
+)/
+'''
+
+# =============================================================================
+# isort Configuration
+# =============================================================================
 
 [tool.isort]
 profile = "black"
 line_length = 100
-known_first_party = ["api", "security", "database"]
+known_first_party = ["api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
+skip = ["legacy/", ".venv/"]
+
+# =============================================================================
+# MyPy Configuration
+# =============================================================================
 
 [tool.mypy]
 python_version = "3.11"
+strict = true
 warn_return_any = true
-warn_unused_ignores = true
+warn_unused_configs = true
 disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+follow_imports = "silent"
 ignore_missing_imports = true
-exclude = ["tests/", "build/", "dist/"]
+
+[[tool.mypy.overrides]]
+module = [
+    "celery.*",
+    "redis.*",
+    "woocommerce.*",
+    "mcp.*",
+]
+ignore_missing_imports = true
+
+# =============================================================================
+# Pytest Configuration
+# =============================================================================
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+minversion = "7.0"
 asyncio_mode = "auto"
-addopts = "-v --tb=short -ra"
-markers = [
-    "unit: Unit tests",
-    "integration: Integration tests",
-    "e2e: End-to-end tests",
-    "security: Security tests",
-    "slow: Slow tests (>5s)",
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_functions = ["test_*"]
+addopts = [
+    "-ra",
+    "-q",
+    "--strict-markers",
+    "--strict-config",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
     "ignore::PendingDeprecationWarning",
 ]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "unit: marks tests as unit tests",
+]
+
+# =============================================================================
+# Coverage Configuration
+# =============================================================================
 
 [tool.coverage.run]
-source = ["api", "security", "database", "wordpress", "agents", "orchestration"]
+source = ["api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
 branch = true
-omit = ["tests/*", "*/__init__.py"]
+omit = ["tests/*", "*/__init__.py", "legacy/*"]
 
 [tool.coverage.report]
 exclude_lines = [
     "pragma: no cover",
     "def __repr__",
+    "raise AssertionError",
     "raise NotImplementedError",
-    "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
+    "if TYPE_CHECKING:",
+    "@abstractmethod",
 ]
-fail_under = 80
-
-[tool.bandit]
-exclude_dirs = ["tests", "legacy", "build", "dist"]
-skips = ["B101"]  # Skip assert_used (common in tests)
+show_missing = true
+precision = 2

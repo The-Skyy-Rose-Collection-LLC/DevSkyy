@@ -2,12 +2,71 @@
   "mcpServers": {
     "devskyy-openai": {
       "command": "python",
-      "args": ["/absolute/path/to/DevSkyy/server.py"],
+      "args": ["/Users/coreyfoster/DevSkyy/mcp/openai_server.py"],
       "env": {
-        "OPENAI_API_KEY": "sk-your-openai-api-key-here",
-        "DEVSKYY_API_URL": "https://api.devskyy.com",
-        "DEVSKYY_API_KEY": "your-devskyy-api-key-here"
-      }
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "DEVSKYY_API_URL": "http://localhost:8000",
+        "DEVSKYY_API_KEY": "${DEVSKYY_API_KEY}",
+        "ENVIRONMENT": "development"
+      },
+      "description": "DevSkyy OpenAI MCP Server - GPT-4o, vision, code generation, agent orchestration"
+    },
+    "devskyy-main": {
+      "command": "python",
+      "args": ["/Users/coreyfoster/DevSkyy/devskyy_mcp.py"],
+      "env": {
+        "DEVSKYY_API_URL": "http://localhost:8000",
+        "DEVSKYY_API_KEY": "${DEVSKYY_API_KEY}"
+      },
+      "description": "DevSkyy Main MCP Server - 54-agent ecosystem, WordPress, WooCommerce, ML"
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/Users/coreyfoster/DevSkyy"],
+      "description": "Filesystem operations for DevSkyy repository - read, write, search files"
+    },
+    "git": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-git", "--repository", "/Users/coreyfoster/DevSkyy"],
+      "description": "Git operations - status, diff, log, commit, branch management"
+    },
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "description": "GitHub API - issues, PRs, repositories, workflows"
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://localhost/devskyy"],
+      "description": "PostgreSQL database operations for DevSkyy"
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "description": "Extended chain-of-thought reasoning for complex problem solving"
+    },
+    "brave-search": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
+      "env": {
+        "BRAVE_API_KEY": "${BRAVE_API_KEY}"
+      },
+      "description": "Web search capabilities via Brave Search API"
+    },
+    "fetch": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-fetch"],
+      "description": "Fetch and process web content, APIs, documentation"
+    },
+    "memory": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "description": "Persistent memory across conversations for context retention"
     }
-  }
+  },
+  "globalShortcut": "Cmd+Shift+Space"
 }

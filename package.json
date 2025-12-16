@@ -51,7 +51,7 @@
     "build:watch": "tsc --project config/typescript/tsconfig.json --watch",
     "dev": "nodemon --exec \"node --loader ts-node/esm src/index.ts\"",
     "start": "node dist/index.js",
-    "test": "jest --config config/testing/jest.config.js",
+    "test": "jest --config config/testing/jest.config.cjs",
     "test:watch": "jest --config config/testing/jest.config.js --watch",
     "test:coverage": "jest --config config/testing/jest.config.js --coverage",
     "test:ci": "jest --config config/testing/jest.config.js --ci --coverage --watchAll=false",
@@ -66,7 +66,14 @@
     "security:audit": "npm audit",
     "security:fix": "npm audit fix",
     "deps:update": "npm update",
-    "deps:check": "npm outdated"
+    "deps:check": "npm outdated",
+    "demo:collections": "echo '🌹 SkyyRose Collection 3D Experiences Demo' && echo 'Available collections: black_rose, signature, love_hurts, showroom, runway' && echo 'Run: npm run demo:black-rose | demo:signature | demo:love-hurts | demo:showroom | demo:runway'",
+    "demo:black-rose": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=black_rose",
+    "demo:signature": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=signature",
+    "demo:love-hurts": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=love_hurts",
+    "demo:showroom": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=showroom",
+    "demo:runway": "npx vite serve --open --config config/vite/demo.config.ts -- --collection=runway",
+    "test:collections": "jest --config config/testing/jest.config.cjs --testPathPatterns=collections --no-coverage"
   },
   "repository": {
     "type": "git",
@@ -88,6 +95,7 @@
     "@typescript-eslint/parser": "^8.49.0",
     "eslint": "^9.39.2",
     "jest": "^30.2.0",
+    "jest-environment-jsdom": "^30.2.0",
     "nodemon": "^3.1.11",
     "prettier": "^3.7.4",
     "ts-jest": "^29.4.6",
