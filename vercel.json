@@ -4,7 +4,7 @@
   "description": "DevSkyy AI Agent Platform - 6 Core Specialized Agents",
   "builds": [
     {
-      "src": "main_enterprise.py",
+      "src": "api/index.py",
       "use": "@vercel/python",
       "config": {
         "maxLambdaSize": "50mb",
@@ -15,11 +15,11 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "/main_enterprise.py"
+      "dest": "/api/index.py"
     },
     {
       "src": "/(.*)",
-      "dest": "/main_enterprise.py"
+      "dest": "/api/index.py"
     }
   ],
   "env": {
@@ -32,7 +32,7 @@
     "DATABASE_URL": "@database_url"
   },
   "functions": {
-    "main_enterprise.py": {
+    "api/index.py": {
       "maxDuration": 30,
       "memory": 1024,
       "runtime": "python3.11"
