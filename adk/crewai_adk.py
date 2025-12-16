@@ -307,7 +307,7 @@ class CrewAICrew(BaseDevSkyyAgent):
     async def initialize(self) -> None:
         """Initialize crew with all agents"""
         try:
-            from crewai import LLM, Agent, Crew, Process, Task
+            from crewai import LLM, Agent
 
             # Create LLM
             llm = LLM(
