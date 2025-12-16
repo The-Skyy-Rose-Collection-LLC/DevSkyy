@@ -92,7 +92,8 @@ class QualityWorkflow:
         results = {"ruff": None, "eslint": None, "passed": False}
 
         try:
-            # Ruff linting for Python
+            # Install ruff if not available
+            # Note: In production, these tools should be pre-installed in the environment
             proc = await asyncio.create_subprocess_exec(
                 "pip", "install", "ruff",
                 stdout=asyncio.subprocess.PIPE,
@@ -182,7 +183,8 @@ class QualityWorkflow:
         results = {"mypy": None, "typescript": None, "passed": False}
 
         try:
-            # MyPy for Python
+            # Install mypy if not available
+            # Note: In production, these tools should be pre-installed in the environment
             proc = await asyncio.create_subprocess_exec(
                 "pip", "install", "mypy",
                 stdout=asyncio.subprocess.PIPE,
@@ -232,7 +234,8 @@ class QualityWorkflow:
         results = {"radon": None}
 
         try:
-            # Radon complexity analysis
+            # Install radon if not available
+            # Note: In production, these tools should be pre-installed in the environment
             proc = await asyncio.create_subprocess_exec(
                 "pip", "install", "radon",
                 stdout=asyncio.subprocess.PIPE,

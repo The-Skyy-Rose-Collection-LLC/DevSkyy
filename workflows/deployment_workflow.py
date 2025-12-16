@@ -156,7 +156,9 @@ class DeploymentWorkflow:
             # Determine image tag
             import uuid
 
-            image_tag = f"ghcr.io/devskyy/devskyy:{state.environment}-{uuid.uuid4().hex[:8]}"
+            # Use registry from state inputs or default to ghcr.io
+            registry = state.inputs.get("registry", "ghcr.io/devskyy/devskyy")
+            image_tag = f"{registry}:{state.environment}-{uuid.uuid4().hex[:8]}"
             results["image_tag"] = image_tag
 
             # Build Docker image

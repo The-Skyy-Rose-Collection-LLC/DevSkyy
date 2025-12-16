@@ -212,10 +212,6 @@ class MCPWorkflow:
 
         try:
             # Test tool loading performance
-            import time
-
-            start_time = time.time()
-
             proc = await asyncio.create_subprocess_exec(
                 "python",
                 "-c",
