@@ -122,17 +122,11 @@ class SSRFProtection:
             return ip_obj.is_private or ip_obj.is_loopback or ip_obj.is_link_local
         except ValueError:
             # If not a valid IP, check with regex patterns
-            for pattern in self._private_ip_patterns:
-                if pattern.match(ip):
-                    return True
-            return False
+            return any(pattern.match(ip) for pattern in self._private_ip_patterns)
 
     def _is_metadata_service(self, host: str) -> bool:
         """Check if host is a cloud metadata service"""
-        for pattern in self._metadata_service_patterns:
-            if pattern.search(host):
-                return True
-        return False
+        return any(pattern.search(host) for pattern in self._metadata_service_patterns)
 
     def _resolve_hostname(self, hostname: str) -> list[str]:
         """Resolve hostname to IP addresses"""

@@ -22,7 +22,7 @@ def check_file_exists(filepath: str) -> bool:
 def check_env_var(var_name: str, required: bool = True) -> tuple[bool, str]:
     """
     Check if an environment variable is set.
-    
+
     Returns:
         Tuple of (is_set, value_or_message)
     """
@@ -39,15 +39,15 @@ def main():
     print("DevSkyy Environment Variables Verification")
     print("=" * 80)
     print()
-    
+
     # Check if .env file exists
     print("📁 File Check:")
     env_exists = check_file_exists(".env")
     env_example_exists = check_file_exists(".env.example")
-    
+
     print(f"   .env file: {'✓ Found' if env_exists else '✗ Missing'}")
     print(f"   .env.example file: {'✓ Found' if env_example_exists else '✗ Missing'}")
-    
+
     if not env_exists:
         print()
         print("❌ ERROR: .env file not found!")
@@ -60,13 +60,14 @@ def main():
         print("   2. Or the .env file exists but you're in wrong directory")
         print("      Make sure you're in the project root directory")
         sys.exit(1)
-    
+
     print()
-    
+
     # Load .env file
     try:
         from dotenv import load_dotenv
-        load_dotenv('.env')
+
+        load_dotenv(".env")
         print("✅ .env file loaded successfully")
     except ImportError:
         print("⚠️  python-dotenv not installed")
@@ -74,18 +75,18 @@ def main():
         print("   Continuing with system environment variables...")
     except Exception as e:
         print(f"⚠️  Warning loading .env: {e}")
-    
+
     print()
     print("=" * 80)
     print("Required Variables:")
     print("=" * 80)
-    
+
     required_vars = [
         ("JWT_SECRET_KEY", True, "JWT token signing (should be 512-bit)"),
         ("ENCRYPTION_MASTER_KEY", True, "AES-256-GCM encryption (should be 256-bit)"),
         ("ENVIRONMENT", True, "Runtime environment (development/staging/production)"),
     ]
-    
+
     all_required_set = True
     for var_name, required, description in required_vars:
         is_set, message = check_env_var(var_name, required)
@@ -94,12 +95,12 @@ def main():
         print(f"       → {description}")
         if required and not is_set:
             all_required_set = False
-    
+
     print()
     print("=" * 80)
     print("Optional Variables:")
     print("=" * 80)
-    
+
     optional_vars = [
         ("OPENAI_API_KEY", "OpenAI GPT-4 API"),
         ("ANTHROPIC_API_KEY", "Anthropic Claude API"),
@@ -109,16 +110,16 @@ def main():
         ("REDIS_URL", "Redis cache connection"),
         ("DATABASE_URL", "Database connection (defaults to SQLite)"),
     ]
-    
+
     for var_name, description in optional_vars:
         is_set, message = check_env_var(var_name, required=False)
         status = "✓" if is_set else "-"
         print(f"   [{status}] {var_name}: {message}")
         print(f"       → {description}")
-    
+
     print()
     print("=" * 80)
-    
+
     if all_required_set:
         print("✅ All required environment variables are configured!")
         print()
