@@ -1,8 +1,10 @@
+"use strict";
 /**
  * Jest Global Teardown
  * Runs once after all test suites
  */
-export default async () => {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = async () => {
     console.log('🧹 Cleaning up after tests...');
     // Clean up test database if needed
     // await cleanupTestDatabase();
@@ -10,4 +12,3 @@ export default async () => {
     // await closeConnections();
     console.log('✅ Global test teardown completed');
 };
-//# sourceMappingURL=globalTeardown.js.map

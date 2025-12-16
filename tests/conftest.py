@@ -1,268 +1,125 @@
 """
-Test Configuration
-==================
+Pytest Configuration
+====================
 
-Pytest fixtures and configuration for DevSkyy test suite.
-
-Dependencies:
-- pytest==7.4.3 (PyPI verified)
-- pytest-asyncio==0.21.1 (PyPI verified)
-- httpx==0.25.2 (PyPI verified)
+Shared fixtures and configuration.
 """
 
-import asyncio
 import os
 import sys
-from collections.abc import AsyncGenerator, Generator
-from datetime import datetime
 
 import pytest
-import pytest_asyncio
-from fastapi import FastAPI
-from httpx import ASGITransport, AsyncClient
 
 # Ensure project root is in path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # =============================================================================
-# Pytest Configuration
+# Async HTTP Client Fixtures (for GDPR and API tests)
 # =============================================================================
 
 
-def pytest_configure(config):
-    """Configure pytest"""
-    config.addinivalue_line("markers", "unit: Unit tests")
-    config.addinivalue_line("markers", "integration: Integration tests")
-    config.addinivalue_line("markers", "e2e: End-to-end tests")
-    config.addinivalue_line("markers", "security: Security tests")
-    config.addinivalue_line("markers", "slow: Slow tests")
+@pytest.fixture
+async def client():
+    """
+    Async HTTP client for testing FastAPI endpoints.
 
+    Uses httpx.AsyncClient with ASGITransport for the main FastAPI app.
+    """
+    import httpx
 
-# =============================================================================
-# Event Loop
-# =============================================================================
-
-
-@pytest.fixture(scope="session")
-def event_loop() -> Generator:
-    """Create event loop for async tests"""
-    loop = asyncio.get_event_loop_policy().new_event_loop()
-    yield loop
-    loop.close()
-
-
-# =============================================================================
-# Application Fixtures
-# =============================================================================
-
-
-@pytest.fixture(scope="session")
-def app() -> FastAPI:
-    """Create test application"""
     from main_enterprise import app
 
-    return app
-
-
-@pytest_asyncio.fixture
-async def client(app: FastAPI) -> AsyncGenerator[AsyncClient, None]:
-    """Create async test client"""
-    transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+    # Use ASGITransport for httpx >= 0.27
+    transport = httpx.ASGITransport(app=app)
+    async with httpx.AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
 
 
-# =============================================================================
-# Authentication Fixtures
-# =============================================================================
-
-
 @pytest.fixture
-def test_user_data() -> dict:
-    """Test user data"""
-    return {
-        "username": "testuser",
-        "email": "test@example.com",
-        "password": "SecureP@ssw0rd123!",
-        "role": "developer",
-    }
+def auth_headers(jwt_manager):
+    """
+    Authorization headers with a valid JWT token for a regular user.
 
-
-@pytest.fixture
-def admin_user_data() -> dict:
-    """Admin user data"""
-    return {
-        "username": "admin",
-        "email": "admin@example.com",
-        "password": "AdminP@ssw0rd123!",
-        "role": "admin",
-    }
-
-
-@pytest_asyncio.fixture
-async def auth_token(client: AsyncClient, test_user_data: dict) -> str:
-    """Get authentication token"""
-    from security.jwt_oauth2_auth import token_manager
-
-    # Create token directly for testing
-    token, jti = token_manager.create_access_token(
-        user_id="test_user_001",
-        roles=[test_user_data["role"]],
+    Returns headers dict with Bearer token for user "test-user-123".
+    """
+    tokens = jwt_manager.create_token_pair(
+        user_id="test-user-123",
+        roles=["api_user"],
     )
-    return token
+    return {"Authorization": f"Bearer {tokens.access_token}"}
 
 
-@pytest_asyncio.fixture
-async def admin_token(client: AsyncClient, admin_user_data: dict) -> str:
-    """Get admin authentication token"""
-    from security.jwt_oauth2_auth import token_manager
+@pytest.fixture
+def admin_headers(jwt_manager):
+    """
+    Authorization headers with a valid JWT token for an admin user.
 
-    token, jti = token_manager.create_access_token(
-        user_id="admin_001", roles=["admin"]
+    Returns headers dict with Bearer token for user "admin-user-456"
+    with admin privileges.
+    """
+    tokens = jwt_manager.create_token_pair(
+        user_id="admin-user-456",
+        roles=["admin", "api_user"],
     )
-    return token
+    return {"Authorization": f"Bearer {tokens.access_token}"}
 
 
 @pytest.fixture
-def auth_headers(auth_token: str) -> dict:
-    """Get auth headers"""
-    return {"Authorization": f"Bearer {auth_token}"}
+def tool_registry():
+    """Fresh tool registry for each test."""
+    from runtime.tools import ToolRegistry
+
+    return ToolRegistry()
 
 
 @pytest.fixture
-def admin_headers(admin_token: str) -> dict:
-    """Get admin auth headers"""
-    return {"Authorization": f"Bearer {admin_token}"}
+def tool_context():
+    """Default tool call context."""
+    from runtime.tools import ToolCallContext
 
-
-# =============================================================================
-# Database Fixtures
-# =============================================================================
-
-
-@pytest_asyncio.fixture
-async def db_session():
-    """Create test database session"""
-    from database import DatabaseConfig, db_manager
-
-    # Use in-memory SQLite for tests
-    config = DatabaseConfig(url="sqlite+aiosqlite:///:memory:")
-    await db_manager.initialize(config)
-
-    async with db_manager.session() as session:
-        yield session
-
-    await db_manager.close()
-
-
-# =============================================================================
-# Sample Data Fixtures
-# =============================================================================
-
-
-@pytest.fixture
-def sample_product() -> dict:
-    """Sample product data"""
-    return {
-        "sku": "SR-TEST-001",
-        "name": "Test Rose Gold Hoodie",
-        "description": "Premium test product",
-        "price": 189.99,
-        "quantity": 50,
-        "category": "hoodies",
-        "collection": "BLACK ROSE",
-    }
-
-
-@pytest.fixture
-def sample_order() -> dict:
-    """Sample order data"""
-    return {
-        "order_number": "ORD-TEST-001",
-        "user_id": "test_user_001",
-        "status": "pending",
-        "subtotal": 189.99,
-        "tax": 15.20,
-        "shipping": 10.00,
-        "total": 215.19,
-        "currency": "USD",
-    }
-
-
-# =============================================================================
-# Encryption Fixtures
-# =============================================================================
-
-
-@pytest.fixture
-def encryption_key() -> str:
-    """Test encryption key"""
-    return "test_encryption_key_32bytes!!"
-
-
-@pytest.fixture
-def sample_pii_data() -> dict:
-    """Sample PII data for encryption tests"""
-    return {
-        "email": "customer@example.com",
-        "ssn": "123-45-6789",
-        "credit_card": "4111111111111111",
-        "phone": "555-123-4567",
-        "address": "123 Test St, Oakland, CA 94610",
-    }
-
-
-# =============================================================================
-# Webhook Fixtures
-# =============================================================================
-
-
-@pytest.fixture
-def webhook_endpoint() -> dict:
-    """Test webhook endpoint"""
-    return {
-        "url": "https://webhook.test/callback",
-        "events": ["order.created", "order.updated"],
-        "secret": "whsec_test_secret_key",
-    }
-
-
-# =============================================================================
-# Agent Fixtures
-# =============================================================================
-
-
-@pytest.fixture
-def agent_task() -> dict:
-    """Sample agent task"""
-    return {
-        "agent_name": "instagram_agent",
-        "action": "post",
-        "parameters": {"content": "Test post content", "hashtags": ["test", "devskyy"]},
-        "priority": "normal",
-    }
-
-
-# =============================================================================
-# Utility Functions
-# =============================================================================
-
-
-def assert_valid_uuid(value: str) -> None:
-    """Assert value is valid UUID format"""
-    import re
-
-    uuid_pattern = re.compile(
-        r"^[a-f0-9]{8}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{4}-?[a-f0-9]{12}$",
-        re.IGNORECASE,
+    return ToolCallContext(
+        request_id="test-request",
+        user_id="test-user",
     )
-    assert uuid_pattern.match(value), f"Invalid UUID: {value}"
 
 
-def assert_valid_timestamp(value: str) -> None:
-    """Assert value is valid ISO timestamp"""
-    try:
-        datetime.fromisoformat(value.replace("Z", "+00:00"))
-    except ValueError:
-        pytest.fail(f"Invalid timestamp: {value}")
+@pytest.fixture
+def encryption():
+    """AES-256-GCM encryption instance."""
+    from security.aes256_gcm_encryption import AESGCMEncryption
+
+    return AESGCMEncryption()
+
+
+@pytest.fixture
+def jwt_manager():
+    """JWT manager instance - uses the same instance as the app."""
+    from security.jwt_oauth2_auth import jwt_manager as _jwt_manager
+
+    return _jwt_manager
+
+
+@pytest.fixture
+def brand_kit():
+    """Default SkyyRose brand kit."""
+    from wordpress.elementor import SKYYROSE_BRAND_KIT
+
+    return SKYYROSE_BRAND_KIT
+
+
+@pytest.fixture
+def elementor_builder():
+    """Elementor builder instance."""
+    from wordpress.elementor import ElementorBuilder
+
+    return ElementorBuilder()
+
+
+# Markers
+def pytest_configure(config):
+    """Configure custom markers."""
+    config.addinivalue_line(
+        "markers", "integration: marks tests as integration tests (may require external services)"
+    )
+    config.addinivalue_line("markers", "slow: marks tests as slow running")

@@ -110,7 +110,8 @@ class TestGDPRDelete:
     @pytest.mark.asyncio
     async def test_delete_with_valid_confirmation(self, client, auth_headers):
         """Test deletion with valid confirmation code"""
-        response = await client.delete(
+        response = await client.request(
+            "DELETE",
             "/api/v1/gdpr/delete",
             headers=auth_headers,
             json={
@@ -131,19 +132,24 @@ class TestGDPRDelete:
     @pytest.mark.asyncio
     async def test_delete_with_invalid_confirmation(self, client, auth_headers):
         """Test deletion with invalid confirmation code"""
-        response = await client.delete(
+        response = await client.request(
+            "DELETE",
             "/api/v1/gdpr/delete",
             headers=auth_headers,
             json={"confirmation_code": "WRONG_CODE", "anonymize_instead": False},
         )
 
         assert response.status_code == 400
-        assert "Invalid confirmation" in response.json()["detail"]
+        response_json = response.json()
+        # Check for error message in either 'detail' or 'message' field
+        error_message = response_json.get("detail") or response_json.get("message", "")
+        assert "Invalid confirmation" in error_message
 
     @pytest.mark.asyncio
     async def test_anonymize_instead_of_delete(self, client, auth_headers):
         """Test anonymization option"""
-        response = await client.delete(
+        response = await client.request(
+            "DELETE",
             "/api/v1/gdpr/delete",
             headers=auth_headers,
             json={
@@ -161,7 +167,8 @@ class TestGDPRDelete:
     @pytest.mark.asyncio
     async def test_delete_retains_financial_data(self, client, auth_headers):
         """Test that financial data is retained for legal compliance"""
-        response = await client.delete(
+        response = await client.request(
+            "DELETE",
             "/api/v1/gdpr/delete",
             headers=auth_headers,
             json={"confirmation_code": "CONFIRM_DELETE", "anonymize_instead": False},
@@ -321,7 +328,8 @@ class TestGDPRIntegration:
         assert "data" in export_response.json()
 
         # 3. Request deletion
-        delete_response = await client.delete(
+        delete_response = await client.request(
+            "DELETE",
             "/api/v1/gdpr/delete",
             headers=auth_headers,
             json={
@@ -345,7 +353,8 @@ class TestGDPRIntegration:
         assert export1.status_code == 200
 
         # Delete
-        delete = await client.delete(
+        delete = await client.request(
+            "DELETE",
             "/api/v1/gdpr/delete",
             headers=auth_headers,
             json={"confirmation_code": "CONFIRM_DELETE", "anonymize_instead": False},
