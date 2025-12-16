@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SkyyRose Collection 3D Experience Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Playfair Display', Georgia, serif;
+      background: #0d0d0d;
+      color: #f5f5f0;
+      min-height: 100vh;
+    }
+    .header {
+      padding: 20px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(212,175,55,0.1) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(212,175,55,0.3);
+    }
+    .header h1 {
+      font-size: 2.5rem;
+      color: #d4af37;
+      margin-bottom: 10px;
+    }
+    .header p {
+      color: #c0c0c0;
+      font-size: 1.1rem;
+    }
+    .collection-nav {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 20px;
+      flex-wrap: wrap;
+    }
+    .collection-btn {
+      padding: 12px 24px;
+      background: transparent;
+      border: 2px solid #d4af37;
+      color: #d4af37;
+      font-family: inherit;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .collection-btn:hover, .collection-btn.active {
+      background: #d4af37;
+      color: #0d0d0d;
+    }
+    #experience-container {
+      width: 100%;
+      height: calc(100vh - 200px);
+      min-height: 600px;
+      position: relative;
+    }
+    .loading {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+    }
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(212,175,55,0.3);
+      border-top-color: #d4af37;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .info-panel {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: rgba(13,13,13,0.9);
+      border: 1px solid rgba(212,175,55,0.3);
+      padding: 15px;
+      max-width: 300px;
+      font-size: 0.9rem;
+    }
+    .info-panel h3 {
+      color: #d4af37;
+      margin-bottom: 10px;
+    }
+    .info-panel ul {
+      list-style: none;
+      color: #c0c0c0;
+    }
+    .info-panel li {
+      margin-bottom: 5px;
+    }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <h1>🌹 SkyyRose Collection</h1>
+    <p>Immersive 3D Fashion Experiences</p>
+  </header>
+
+  <nav class="collection-nav">
+    <button class="collection-btn active" data-collection="black_rose">Black Rose</button>
+    <button class="collection-btn" data-collection="signature">Signature</button>
+    <button class="collection-btn" data-collection="love_hurts">Love Hurts</button>
+    <button class="collection-btn" data-collection="showroom">Showroom</button>
+    <button class="collection-btn" data-collection="runway">Runway</button>
+  </nav>
+
+  <div id="experience-container">
+    <div class="loading">
+      <div class="loading-spinner"></div>
+      <p>Loading 3D Experience...</p>
+    </div>
+  </div>
+
+  <div class="info-panel">
+    <h3>Controls</h3>
+    <ul>
+      <li>🖱️ Left-click + drag: Rotate</li>
+      <li>🖱️ Right-click + drag: Pan</li>
+      <li>🖱️ Scroll: Zoom</li>
+      <li>👆 Click objects: Interact</li>
+    </ul>
+  </div>
+
+  <script type="module" src="./main.ts"></script>
+</body>
+</html>
+

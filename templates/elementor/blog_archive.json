@@ -1,0 +1,256 @@
+{
+  "title": "Blog Archive - SkyyRose",
+  "type": "archive",
+  "version": "0.4",
+  "metadata": {
+    "title": "Blog",
+    "created_at": "2025-12-16",
+    "generator": "DevSkyy ElementorTemplateGenerator",
+    "brand": "SkyyRose",
+    "elementor_version": "3.32+",
+    "theme_compatibility": "Shoptimizer 2.9.0"
+  },
+  "settings": {
+    "template": "elementor_header_footer",
+    "hide_title": "no"
+  },
+  "content": [
+    {
+      "id": "featured_hero",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "min_height": { "unit": "vh", "size": 50 },
+        "background_background": "classic",
+        "background_image": { "url": "{{featured_image}}" },
+        "background_position": "center center",
+        "background_size": "cover",
+        "background_overlay_color": "rgba(13,13,13,0.6)",
+        "padding": { "unit": "px", "top": 100, "bottom": 100 }
+      },
+      "elements": [
+        {
+          "id": "featured_col",
+          "elType": "column",
+          "settings": { "_column_size": 100 },
+          "elements": [
+            {
+              "id": "featured_category",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p class=\"featured-category\">FEATURED</p>",
+                "align": "center",
+                "text_color": "#D4AF37",
+                "typography_font_family": "Montserrat",
+                "typography_text_transform": "uppercase",
+                "typography_letter_spacing": { "unit": "px", "size": 3 }
+              }
+            },
+            {
+              "id": "featured_title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "{{featured_post_title}}",
+                "header_size": "h1",
+                "align": "center",
+                "title_color": "#FFFFFF",
+                "typography_font_family": "Playfair Display",
+                "typography_font_size": { "unit": "px", "size": 48 }
+              }
+            },
+            {
+              "id": "featured_excerpt",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "{{featured_excerpt}}",
+                "align": "center",
+                "text_color": "#F5F5F0",
+                "typography_font_size": { "unit": "px", "size": 18 }
+              }
+            },
+            {
+              "id": "featured_cta",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Read More",
+                "link": { "url": "{{featured_permalink}}" },
+                "align": "center",
+                "background_color": "#D4AF37",
+                "text_color": "#0D0D0D",
+                "border_radius": { "unit": "px", "size": 0 }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "filters_section",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "background_color": "#0D0D0D",
+        "padding": { "unit": "px", "top": 40, "bottom": 40 }
+      },
+      "elements": [
+        {
+          "id": "filters_col",
+          "elType": "column",
+          "settings": { "_column_size": 100 },
+          "elements": [
+            {
+              "id": "category_filters",
+              "elType": "widget",
+              "widgetType": "nav-menu",
+              "settings": {
+                "menu": "blog-categories",
+                "layout": "horizontal",
+                "align": "center",
+                "text_color": "#666666",
+                "text_color_hover": "#D4AF37",
+                "active_color": "#D4AF37",
+                "typography_font_family": "Montserrat",
+                "typography_text_transform": "uppercase",
+                "typography_letter_spacing": { "unit": "px", "size": 2 }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "blog_main",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "structure": "30_70",
+        "background_color": "#0D0D0D",
+        "padding": { "unit": "px", "top": 60, "bottom": 60 }
+      },
+      "elements": [
+        {
+          "id": "posts_col",
+          "elType": "column",
+          "settings": { "_column_size": 70 },
+          "elements": [
+            {
+              "id": "posts_grid",
+              "elType": "widget",
+              "widgetType": "posts",
+              "settings": {
+                "posts_per_page": "9",
+                "columns": "2",
+                "masonry": "yes",
+                "thumbnail": "yes",
+                "thumbnail_size": "medium_large",
+                "show_title": "yes",
+                "show_excerpt": "yes",
+                "excerpt_length": "20",
+                "show_meta": "yes",
+                "meta_data": ["date", "author"],
+                "show_read_more": "yes",
+                "read_more_text": "Continue Reading",
+                "title_color": "#F5F5F0",
+                "title_hover_color": "#D4AF37",
+                "excerpt_color": "#CCCCCC",
+                "meta_color": "#666666",
+                "read_more_color": "#D4AF37",
+                "card_background": "#1A1A1A",
+                "card_border_radius": { "unit": "px", "size": 8 }
+              }
+            },
+            {
+              "id": "pagination",
+              "elType": "widget",
+              "widgetType": "archive-posts",
+              "settings": {
+                "pagination_type": "numbers_and_prev_next",
+                "pagination_color": "#666666",
+                "pagination_active_color": "#D4AF37"
+              }
+            }
+          ]
+        },
+        {
+          "id": "sidebar_col",
+          "elType": "column",
+          "settings": { "_column_size": 30 },
+          "elements": [
+            {
+              "id": "search_widget",
+              "elType": "widget",
+              "widgetType": "search-form",
+              "settings": {
+                "placeholder": "Search articles...",
+                "input_background": "#1A1A1A",
+                "input_color": "#F5F5F0",
+                "button_background": "#D4AF37",
+                "button_color": "#0D0D0D"
+              }
+            },
+            {
+              "id": "categories_widget",
+              "elType": "widget",
+              "widgetType": "wp-widget-categories",
+              "settings": {
+                "title": "Categories",
+                "title_color": "#D4AF37",
+                "link_color": "#CCCCCC",
+                "link_hover_color": "#D4AF37"
+              }
+            },
+            {
+              "id": "recent_posts_widget",
+              "elType": "widget",
+              "widgetType": "wp-widget-recent-posts",
+              "settings": {
+                "title": "Recent Posts",
+                "number": "5",
+                "title_color": "#D4AF37",
+                "link_color": "#CCCCCC",
+                "link_hover_color": "#D4AF37"
+              }
+            },
+            {
+              "id": "newsletter_sidebar",
+              "elType": "widget",
+              "widgetType": "call-to-action",
+              "settings": {
+                "skin": "classic",
+                "title": "Stay In The Loop",
+                "description": "Subscribe for style tips and exclusive offers",
+                "button_text": "Subscribe",
+                "link": { "url": "#newsletter" },
+                "background_color": "#1A1A1A",
+                "title_color": "#D4AF37",
+                "description_color": "#F5F5F0",
+                "button_background_color": "#D4AF37",
+                "button_text_color": "#0D0D0D"
+              }
+            },
+            {
+              "id": "tags_widget",
+              "elType": "widget",
+              "widgetType": "wp-widget-tag_cloud",
+              "settings": {
+                "title": "Popular Tags",
+                "title_color": "#D4AF37",
+                "tag_color": "#666666",
+                "tag_hover_color": "#D4AF37"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "responsive": {
+    "tablet": { "blog_main": { "structure": "10" } },
+    "mobile": { "blog_main": { "structure": "10" }, "posts_grid": { "columns": "1" } }
+  }
+}
+
