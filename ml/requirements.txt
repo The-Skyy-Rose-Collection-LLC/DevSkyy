@@ -43,7 +43,7 @@ seaborn==0.13.2
 plotly==5.24.1
 
 # Feature engineering
-feature-engine==1.8.1
+feature-engine==1.9.3
 category-encoders==2.6.4
 
 # Model optimization
