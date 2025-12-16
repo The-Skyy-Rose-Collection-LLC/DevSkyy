@@ -95,7 +95,7 @@ app = FastAPI(
 
     DevSkyy provides enterprise-grade automation for:
     - **WordPress/WooCommerce** operations
-    - **AI Agent** orchestration (69 specialized agents)
+    - **AI Agent** orchestration (6 core specialized agents)
     - **ML-driven** fashion analytics and dynamic pricing
     - **MCP Integration** for external AI systems
 

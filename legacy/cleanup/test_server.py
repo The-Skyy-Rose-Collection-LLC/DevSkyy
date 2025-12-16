@@ -14,19 +14,19 @@ from pathlib import Path
 def validate_server_file():
     """Validate server.py structure and syntax."""
     print("🔍 Validating OpenAI MCP Server...")
-    
+
     server_path = Path(__file__).parent / "server.py"
-    
+
     if not server_path.exists():
         print("❌ server.py not found!")
         return False
-    
+
     print("✅ server.py exists")
-    
+
     # Read the file
-    with open(server_path, 'r') as f:
+    with open(server_path, "r") as f:
         content = f.read()
-    
+
     # Check syntax
     try:
         tree = ast.parse(content)
@@ -34,46 +34,45 @@ def validate_server_file():
     except SyntaxError as e:
         print(f"❌ Syntax error: {e}")
         return False
-    
+
     # Check for required components
 
-    
     # Check for tool names in content (decorated functions may have different internal names)
     required_tools = [
-        'openai_completion',
-        'openai_code_generation',
-        'openai_vision_analysis',
-        'openai_function_calling',
-        'openai_model_selector',
-        'devskyy_agent_openai',
-        'openai_capabilities_info',
+        "openai_completion",
+        "openai_code_generation",
+        "openai_vision_analysis",
+        "openai_function_calling",
+        "openai_model_selector",
+        "devskyy_agent_openai",
+        "openai_capabilities_info",
     ]
-    
+
     required_models = [
-        'OpenAICompletionInput',
-        'CodeGenerationInput',
-        'VisionAnalysisInput',
-        'FunctionCallingInput',
-        'ModelSelectionInput',
-        'DevSkyyAgentInput',
+        "OpenAICompletionInput",
+        "CodeGenerationInput",
+        "VisionAnalysisInput",
+        "FunctionCallingInput",
+        "ModelSelectionInput",
+        "DevSkyyAgentInput",
     ]
-    
+
     required_enums = [
-        'ResponseFormat',
-        'OpenAIModel',
-        'TaskType',
+        "ResponseFormat",
+        "OpenAIModel",
+        "TaskType",
     ]
-    
+
     # Extract function and class names
     functions = []
     classes = []
-    
+
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             functions.append(node.name)
         elif isinstance(node, ast.ClassDef):
             classes.append(node.name)
-    
+
     # Validate required tools (check in file content)
     print("\n📋 Checking required MCP tools...")
     for tool in required_tools:
@@ -82,7 +81,7 @@ def validate_server_file():
         else:
             print(f"  ❌ Missing tool: {tool}")
             return False
-    
+
     # Validate required models
     print("\n📋 Checking required Pydantic models...")
     for model in required_models:
@@ -91,7 +90,7 @@ def validate_server_file():
         else:
             print(f"  ❌ Missing model: {model}")
             return False
-    
+
     # Validate required enums
     print("\n📋 Checking required enums...")
     for enum in required_enums:
@@ -100,22 +99,22 @@ def validate_server_file():
         else:
             print(f"  ❌ Missing enum: {enum}")
             return False
-    
+
     # Check for main entry point
     has_main = any(
-        isinstance(node, ast.If) and 
-        isinstance(node.test, ast.Compare) and
-        isinstance(node.test.left, ast.Name) and
-        node.test.left.id == '__name__'
+        isinstance(node, ast.If)
+        and isinstance(node.test, ast.Compare)
+        and isinstance(node.test.left, ast.Name)
+        and node.test.left.id == "__name__"
         for node in ast.walk(tree)
     )
-    
+
     if has_main:
         print("\n✅ Main entry point found")
     else:
         print("\n❌ Missing main entry point")
         return False
-    
+
     # Check docstrings
     print("\n📋 Checking documentation...")
     module_docstring = ast.get_docstring(tree)
@@ -123,23 +122,29 @@ def validate_server_file():
         print("  ✅ Module docstring present")
     else:
         print("  ⚠️  Module docstring missing or too short")
-    
+
     # Count documented functions
     documented = 0
     for node in ast.walk(tree):
         if isinstance(node, ast.FunctionDef):
             if ast.get_docstring(node):
                 documented += 1
-    
+
     if documented >= len(required_tools):
         print(f"  ✅ All functions documented ({documented})")
     else:
         print(f"  ⚠️  Some functions missing docstrings ({documented}/{len(required_tools)})")
-    
+
     # Check configuration
     print("\n📋 Checking configuration...")
-    config_vars = ['API_BASE_URL', 'API_KEY', 'OPENAI_API_KEY', 'CHARACTER_LIMIT', 'REQUEST_TIMEOUT']
-    
+    config_vars = [
+        "API_BASE_URL",
+        "API_KEY",
+        "OPENAI_API_KEY",
+        "CHARACTER_LIMIT",
+        "REQUEST_TIMEOUT",
+    ]
+
     # Simple string search for config variables
     for var in config_vars:
         if var in content:
@@ -147,18 +152,18 @@ def validate_server_file():
         else:
             print(f"  ❌ Missing config: {var}")
             return False
-    
+
     # Check for OpenAI models definition
-    if 'OPENAI_MODELS' in content:
+    if "OPENAI_MODELS" in content:
         print("  ✅ OPENAI_MODELS defined")
     else:
         print("  ❌ OPENAI_MODELS not found")
         return False
-    
-    print("\n" + "="*60)
+
+    print("\n" + "=" * 60)
     print("✅ All validation checks passed!")
-    print("="*60)
-    
+    print("=" * 60)
+
     return True
 
 
@@ -191,10 +196,10 @@ def print_server_info():
 
 
 if __name__ == "__main__":
-    print("="*60)
+    print("=" * 60)
     print("OpenAI MCP Server Validation")
-    print("="*60)
-    
+    print("=" * 60)
+
     if validate_server_file():
         print_server_info()
         print("\n✅ Server is ready to use!")

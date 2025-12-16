@@ -81,22 +81,22 @@ OPENAI_MODELS = {
         "supports_vision": True,
         "supports_function_calling": True,
         "supports_json_mode": True,
-        "best_for": ["complex_reasoning", "multimodal", "code", "analysis"]
+        "best_for": ["complex_reasoning", "multimodal", "code", "analysis"],
     },
     "gpt-4o-mini": {
         "context_window": 128000,
         "supports_vision": True,
         "supports_function_calling": True,
         "supports_json_mode": True,
-        "best_for": ["simple_tasks", "high_volume", "quick_responses"]
+        "best_for": ["simple_tasks", "high_volume", "quick_responses"],
     },
     "o1-preview": {
         "context_window": 128000,
         "supports_vision": False,
         "supports_function_calling": False,
         "supports_json_mode": False,
-        "best_for": ["complex_reasoning", "math", "science", "code_review"]
-    }
+        "best_for": ["complex_reasoning", "math", "science", "code_review"],
+    },
 }
 
 DEFAULT_MODEL = "gpt-4o-mini"
@@ -106,8 +106,7 @@ DEFAULT_MODEL = "gpt-4o-mini"
 # =============================================================================
 
 mcp = FastMCP(
-    "devskyy_openai_mcp",
-    dependencies=["httpx>=0.24.0", "pydantic>=2.5.0", "openai>=1.6.0"]
+    "devskyy_openai_mcp", dependencies=["httpx>=0.24.0", "pydantic>=2.5.0", "openai>=1.6.0"]
 )
 
 # =============================================================================
@@ -117,12 +116,14 @@ mcp = FastMCP(
 
 class ResponseFormat(str, Enum):
     """Output format for tool responses."""
+
     MARKDOWN = "markdown"
     JSON = "json"
 
 
 class OpenAIModel(str, Enum):
     """Supported OpenAI models."""
+
     GPT4O = "gpt-4o"
     GPT4O_MINI = "gpt-4o-mini"
     O1_PREVIEW = "o1-preview"
@@ -130,6 +131,7 @@ class OpenAIModel(str, Enum):
 
 class TaskType(str, Enum):
     """Task categories for optimal model selection."""
+
     CODE_GENERATION = "code_generation"
     CODE_ANALYSIS = "code_analysis"
     REASONING = "reasoning"
@@ -147,147 +149,89 @@ class TaskType(str, Enum):
 
 class BaseInput(BaseModel):
     """Base input model for all tools."""
+
     model_config = ConfigDict(str_strip_whitespace=True, validate_assignment=True, extra="forbid")
 
     response_format: ResponseFormat = Field(
-        default=ResponseFormat.MARKDOWN,
-        description="Output format: 'markdown' or 'json'"
+        default=ResponseFormat.MARKDOWN, description="Output format: 'markdown' or 'json'"
     )
 
 
 class OpenAICompletionInput(BaseInput):
     """Input for OpenAI completion requests."""
+
     prompt: str = Field(
-        ...,
-        description="The prompt to send to OpenAI",
-        min_length=1,
-        max_length=50000
+        ..., description="The prompt to send to OpenAI", min_length=1, max_length=50000
     )
-    model: OpenAIModel = Field(
-        default=OpenAIModel.GPT4O_MINI,
-        description="OpenAI model to use"
-    )
+    model: OpenAIModel = Field(default=OpenAIModel.GPT4O_MINI, description="OpenAI model to use")
     temperature: float = Field(
-        default=0.7,
-        ge=0.0,
-        le=2.0,
-        description="Sampling temperature (0.0-2.0)"
+        default=0.7, ge=0.0, le=2.0, description="Sampling temperature (0.0-2.0)"
     )
-    max_tokens: int = Field(
-        default=4096,
-        ge=1,
-        le=16384,
-        description="Maximum tokens to generate"
-    )
+    max_tokens: int = Field(default=4096, ge=1, le=16384, description="Maximum tokens to generate")
     system_prompt: str | None = Field(
-        default=None,
-        description="System prompt for the model",
-        max_length=10000
+        default=None, description="System prompt for the model", max_length=10000
     )
 
 
 class CodeGenerationInput(BaseInput):
     """Input for code generation tasks."""
+
     description: str = Field(
-        ...,
-        description="Description of code to generate",
-        min_length=1,
-        max_length=5000
+        ..., description="Description of code to generate", min_length=1, max_length=5000
     )
     language: str = Field(
-        default="python",
-        description="Programming language (python, javascript, typescript, etc.)"
+        default="python", description="Programming language (python, javascript, typescript, etc.)"
     )
     context: str | None = Field(
-        default=None,
-        description="Additional context or requirements",
-        max_length=5000
+        default=None, description="Additional context or requirements", max_length=5000
     )
-    include_tests: bool = Field(
-        default=False,
-        description="Include unit tests"
-    )
-    include_docs: bool = Field(
-        default=True,
-        description="Include documentation/comments"
-    )
+    include_tests: bool = Field(default=False, description="Include unit tests")
+    include_docs: bool = Field(default=True, description="Include documentation/comments")
 
 
 class VisionAnalysisInput(BaseInput):
     """Input for vision/image analysis."""
-    image_url: str = Field(
-        ...,
-        description="URL of image to analyze",
-        max_length=2000
-    )
-    prompt: str = Field(
-        ...,
-        description="Analysis instructions",
-        min_length=1,
-        max_length=2000
-    )
+
+    image_url: str = Field(..., description="URL of image to analyze", max_length=2000)
+    prompt: str = Field(..., description="Analysis instructions", min_length=1, max_length=2000)
     detail_level: Literal["low", "high", "auto"] = Field(
-        default="auto",
-        description="Image detail level"
+        default="auto", description="Image detail level"
     )
 
 
 class FunctionCallingInput(BaseInput):
     """Input for function calling with OpenAI."""
-    prompt: str = Field(
-        ...,
-        description="User request",
-        min_length=1,
-        max_length=5000
-    )
+
+    prompt: str = Field(..., description="User request", min_length=1, max_length=5000)
     available_functions: list[dict[str, Any]] = Field(
-        ...,
-        description="Functions the model can call",
-        min_items=1,
-        max_items=50
+        ..., description="Functions the model can call", min_items=1, max_items=50
     )
-    auto_execute: bool = Field(
-        default=False,
-        description="Automatically execute function calls"
-    )
+    auto_execute: bool = Field(default=False, description="Automatically execute function calls")
 
 
 class ModelSelectionInput(BaseInput):
     """Input for intelligent model selection."""
+
     task_description: str = Field(
-        ...,
-        description="Description of the task",
-        min_length=1,
-        max_length=1000
+        ..., description="Description of the task", min_length=1, max_length=1000
     )
-    task_type: TaskType | None = Field(
-        default=None,
-        description="Optional task type hint"
-    )
+    task_type: TaskType | None = Field(default=None, description="Optional task type hint")
     optimize_for: Literal["quality", "speed", "cost"] = Field(
-        default="quality",
-        description="Optimization priority"
+        default="quality", description="Optimization priority"
     )
 
 
 class DevSkyyAgentInput(BaseInput):
     """Input for DevSkyy agent orchestration."""
+
     agent_name: str = Field(
         ...,
         description="Agent to invoke (scanner, fixer, theme_builder, etc.)",
         min_length=1,
-        max_length=100
+        max_length=100,
     )
-    action: str = Field(
-        ...,
-        description="Action to perform",
-        min_length=1,
-        max_length=100
-    )
-    parameters: dict[str, Any] = Field(
-        default_factory=dict,
-        description="Action parameters"
-    )
+    action: str = Field(..., description="Action to perform", min_length=1, max_length=100)
+    parameters: dict[str, Any] = Field(default_factory=dict, description="Action parameters")
 
 
 # =============================================================================
@@ -302,21 +246,14 @@ async def _make_api_request(
     params: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Make authenticated request to DevSkyy API."""
-    headers = {
-        "Authorization": f"Bearer {API_KEY}",
-        "Content-Type": "application/json"
-    }
+    headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
 
     url = f"{API_BASE_URL}/api/v1/{endpoint}"
 
     try:
         async with httpx.AsyncClient(timeout=REQUEST_TIMEOUT) as client:
             response = await client.request(
-                method=method,
-                url=url,
-                headers=headers,
-                json=data,
-                params=params
+                method=method, url=url, headers=headers, json=data, params=params
             )
             response.raise_for_status()
             return response.json()
@@ -394,19 +331,19 @@ def _select_optimal_model(task_type: TaskType | None, optimize_for: str) -> str:
     """Select optimal OpenAI model for task."""
     if task_type == TaskType.REASONING or task_type == TaskType.MATH:
         return "o1-preview"
-    
+
     if task_type == TaskType.VISION or task_type == TaskType.MULTIMODAL:
         return "gpt-4o"
-    
+
     if task_type == TaskType.COMPLEX_ANALYSIS or task_type == TaskType.CODE_ANALYSIS:
         return "gpt-4o"
-    
+
     if optimize_for == "cost" or optimize_for == "speed":
         return "gpt-4o-mini"
-    
+
     if optimize_for == "quality":
         return "gpt-4o"
-    
+
     return DEFAULT_MODEL
 
 
@@ -649,7 +586,7 @@ async def model_selector(params: ModelSelectionInput) -> str:
         "model_capabilities": model_info,
         "optimization_priority": params.optimize_for,
         "task_type": params.task_type.value if params.task_type else "general",
-        "rationale": f"Selected {optimal_model} for {params.optimize_for} optimization"
+        "rationale": f"Selected {optimal_model} for {params.optimize_for} optimization",
     }
 
     return _format_response(result, params.response_format, "Model Selection")
@@ -749,15 +686,15 @@ async def capabilities_info(response_format: ResponseFormat = ResponseFormat.MAR
             "JSON mode",
             "Structured outputs",
             "Long context (128K tokens)",
-            "Advanced reasoning (o1-preview)"
+            "Advanced reasoning (o1-preview)",
         ],
         "integrations": [
             "DevSkyy 54 AI agents",
             "WordPress automation",
             "E-commerce tools",
             "Marketing automation",
-            "Code scanning and fixing"
-        ]
+            "Code scanning and fixing",
+        ],
     }
     return _format_response(capabilities, response_format, "OpenAI MCP Server Capabilities")
 
@@ -771,12 +708,13 @@ if __name__ == "__main__":
     if not OPENAI_API_KEY:
         print("⚠️  Warning: OPENAI_API_KEY not set.")
         print("   Set it with: export OPENAI_API_KEY='your-key-here'")
-    
+
     if not API_KEY:
         print("⚠️  Warning: DEVSKYY_API_KEY not set (DevSkyy integration disabled).")
         print("   Set it with: export DEVSKYY_API_KEY='your-key-here'")
 
-    print(f"""
+    print(
+        f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
 ║   DevSkyy OpenAI MCP Server v1.0.0                          ║
@@ -809,7 +747,8 @@ if __name__ == "__main__":
 📖 OpenAI Docs: https://platform.openai.com/docs
 
 Starting OpenAI MCP server on stdio...
-""")
+"""
+    )
 
     # Run the server
     mcp.run()
