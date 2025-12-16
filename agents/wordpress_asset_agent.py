@@ -2,41 +2,93 @@
 WordPress Asset Agent
 =====================
 
-Orchestrates asset upload and product attachment for SkyyRose.
+Manage media uploads and product attachments in WordPress/WooCommerce.
 
 Features:
-- Upload 3D models (GLB) to WordPress
-- Upload images to media library
-- Attach assets to WooCommerce products
-- Manage product galleries
-- Generate model-viewer shortcodes
+- Media upload to WordPress
+- Image optimization before upload
+- Product image attachment
+- Gallery management
+- 3D model attachment for product pages
 
-Dependencies:
-- wordpress.client
-- wordpress.media
-- wordpress.products
+Author: DevSkyy Platform Team
+Version: 1.0.0
 """
 
-import asyncio
-import logging
-import os
+from __future__ import annotations
 
-# Import WordPress modules
-import sys
+import logging
+import mimetypes
+import os
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
-from enum import Enum
 from pathlib import Path
 from typing import Any
 
-from pydantic import BaseModel
+import aiofiles
+import aiohttp
+from pydantic import BaseModel, Field
 
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from wordpress.client import WordPressClient
-from wordpress.media import MediaManager
-from wordpress.products import WooCommerceProducts
+from base import (
+    AgentCapability,
+    AgentConfig,
+    ExecutionResult,
+    LLMCategory,
+    PlanStep,
+    RetrievalContext,
+    SuperAgent,
+    ValidationResult,
+)
+from runtime.tools import (
+    ToolCallContext,
+    ToolCategory,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+    get_tool_registry,
+)
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Configuration
+# =============================================================================
+
+
+@dataclass
+class WordPressAssetConfig:
+    """WordPress asset management configuration."""
+
+    # WordPress REST API
+    site_url: str = field(default_factory=lambda: os.getenv("WP_SITE_URL", ""))
+    username: str = field(default_factory=lambda: os.getenv("WP_USERNAME", ""))
+    app_password: str = field(default_factory=lambda: os.getenv("WP_APP_PASSWORD", ""))
+
+    # WooCommerce REST API
+    wc_consumer_key: str = field(default_factory=lambda: os.getenv("WC_CONSUMER_KEY", ""))
+    wc_consumer_secret: str = field(default_factory=lambda: os.getenv("WC_CONSUMER_SECRET", ""))
+
+    # Settings
+    timeout: float = 60.0
+    max_retries: int = 3
+    max_file_size_mb: float = 10.0
+
+    # Image optimization
+    optimize_images: bool = True
+    max_image_dimension: int = 2048
+    jpeg_quality: int = 85
+
+    @classmethod
+    def from_env(cls) -> WordPressAssetConfig:
+        """Create config from environment variables."""
+        return cls(
+            site_url=os.getenv("WP_SITE_URL", ""),
+            username=os.getenv("WP_USERNAME", ""),
+            app_password=os.getenv("WP_APP_PASSWORD", ""),
+            wc_consumer_key=os.getenv("WC_CONSUMER_KEY", ""),
+            wc_consumer_secret=os.getenv("WC_CONSUMER_SECRET", ""),
+        )
 
 
 # =============================================================================
@@ -44,34 +96,38 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class AssetType(str, Enum):
-    """Asset types"""
+class MediaUploadResult(BaseModel):
+    """WordPress media upload result."""
 
-    IMAGE = "image"
-    MODEL_3D = "model_3d"
-    VIDEO = "video"
-    DOCUMENT = "document"
-
-
-class AssetUploadResult(BaseModel):
-    """Asset upload result"""
-
-    asset_id: int
-    asset_url: str
-    asset_type: AssetType
-    filename: str
-    product_id: int | None = None
-    metadata: dict[str, Any] = {}
+    id: int
+    url: str
+    title: str
+    mime_type: str
+    file_size: int = 0
+    width: int | None = None
+    height: int | None = None
+    alt_text: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
 
 
-class ProductAssetConfig(BaseModel):
-    """Configuration for product assets"""
+class ProductAssetResult(BaseModel):
+    """Product asset attachment result."""
 
     product_id: int
-    images: list[str] = []  # Image file paths
-    model_3d: str | None = None  # GLB file path
-    featured_image: str | None = None
-    gallery_images: list[str] = []
+    media_id: int
+    media_url: str
+    position: int = 0
+    is_featured: bool = False
+    asset_type: str = "image"  # image, 3d_model, video
+
+
+class GalleryResult(BaseModel):
+    """Product gallery update result."""
+
+    product_id: int
+    featured_image_id: int | None = None
+    gallery_image_ids: list[int] = Field(default_factory=list)
+    total_images: int = 0
 
 
 # =============================================================================
@@ -79,614 +135,563 @@ class ProductAssetConfig(BaseModel):
 # =============================================================================
 
 
-class WordPressAssetAgent:
+class WordPressAssetAgent(SuperAgent):
     """
-    WordPress Asset Management Agent
+    WordPress Asset Management Agent.
 
-    Handles all asset operations for SkyyRose products.
+    Handles media uploads and product asset attachment.
 
     Usage:
         agent = WordPressAssetAgent()
 
-        # Upload image
-        result = await agent.upload_image(
-            file_path="/path/to/image.jpg",
-            title="Product Image",
-            product_id=123
-        )
+        # Upload media
+        result = await agent.run({
+            "action": "upload_media",
+            "file_path": "/path/to/image.jpg",
+            "title": "Product Image",
+            "alt_text": "SkyyRose Black Rose Hoodie",
+        })
 
-        # Upload 3D model
-        result = await agent.upload_3d_model(
-            file_path="/path/to/model.glb",
-            product_id=123,
-            title="Product 3D Model"
-        )
+        # Attach to product
+        result = await agent.run({
+            "action": "attach_to_product",
+            "product_id": 123,
+            "media_id": 456,
+            "is_featured": True,
+        })
 
-        # Attach all assets to product
-        await agent.attach_assets_to_product(
-            product_id=123,
-            images=["/path/to/img1.jpg", "/path/to/img2.jpg"],
-            model_3d="/path/to/model.glb"
-        )
+        # Upload and attach
+        result = await agent.run({
+            "action": "upload_and_attach",
+            "file_path": "/path/to/image.jpg",
+            "product_id": 123,
+            "title": "Product Image",
+            "is_featured": True,
+        })
     """
 
     def __init__(
         self,
-        url: str = None,
-        username: str = None,
-        app_password: str = None,
-        wc_key: str = None,
-        wc_secret: str = None,
-    ):
-        # WordPress credentials
-        self.url = url or os.getenv("WORDPRESS_URL", "https://skyyrose.co")
-        self.username = username or os.getenv("WORDPRESS_USERNAME", "")
-        self.app_password = app_password or os.getenv("WORDPRESS_APP_PASSWORD", "")
-
-        # WooCommerce credentials
-        self.wc_key = wc_key or os.getenv("WOOCOMMERCE_KEY", "")
-        self.wc_secret = wc_secret or os.getenv("WOOCOMMERCE_SECRET", "")
-
-        # Initialize clients
-        self._media: MediaManager | None = None
-        self._products: WooCommerceProducts | None = None
-        self._wp: WordPressClient | None = None
-
-    async def __aenter__(self):
-        await self.connect()
-        return self
-
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        await self.close()
-
-    async def connect(self):
-        """Initialize all clients"""
-        self._media = MediaManager(
-            url=self.url,
-            username=self.username,
-            app_password=self.app_password,
-        )
-        await self._media.connect()
-
-        self._products = WooCommerceProducts(
-            url=self.url,
-            consumer_key=self.wc_key,
-            consumer_secret=self.wc_secret,
-        )
-        await self._products.connect()
-
-        self._wp = WordPressClient(
-            url=self.url,
-            username=self.username,
-            app_password=self.app_password,
-        )
-        await self._wp.connect()
-
-        logger.info(f"WordPress Asset Agent connected to: {self.url}")
-
-    async def close(self):
-        """Close all clients"""
-        if self._media:
-            await self._media.close()
-        if self._products:
-            await self._products.close()
-        if self._wp:
-            await self._wp.close()
-
-    # -------------------------------------------------------------------------
-    # Image Upload
-    # -------------------------------------------------------------------------
-
-    async def upload_image(
-        self,
-        file_path: str,
-        title: str = None,
-        alt_text: str = None,
-        caption: str = None,
-        product_id: int = None,
-    ) -> AssetUploadResult:
-        """
-        Upload image to WordPress media library
-
-        Args:
-            file_path: Path to image file
-            title: Image title
-            alt_text: Alt text for accessibility
-            caption: Image caption
-            product_id: Optional product to attach to
-
-        Returns:
-            AssetUploadResult with upload details
-        """
-        filename = Path(file_path).name
-
-        if not title:
-            title = Path(file_path).stem.replace("-", " ").replace("_", " ").title()
-
-        logger.info(f"Uploading image: {filename}")
-
-        # Upload to media library
-        item = await self._media.upload_file(
-            file_path=file_path,
-            title=title,
-            alt_text=alt_text or title,
-            caption=caption,
-            post_id=product_id,
-        )
-
-        result = AssetUploadResult(
-            asset_id=item.id,
-            asset_url=item.source_url,
-            asset_type=AssetType.IMAGE,
-            filename=filename,
-            product_id=product_id,
-            metadata={
-                "title": title,
-                "alt_text": alt_text or title,
-                "uploaded_at": datetime.now(UTC).isoformat(),
+        config: WordPressAssetConfig | None = None,
+        registry: ToolRegistry | None = None,
+    ) -> None:
+        agent_config = AgentConfig(
+            name="wordpress_asset",
+            description="WordPress/WooCommerce asset management agent",
+            version="1.0.0",
+            capabilities={
+                AgentCapability.WORDPRESS_MANAGEMENT,
+                AgentCapability.PRODUCT_MANAGEMENT,
+                AgentCapability.IMAGE_EDITING,
             },
+            llm_category=LLMCategory.CATEGORY_B,
+            tool_category=ToolCategory.CONTENT,
+            default_timeout=60.0,
         )
 
-        # Attach to product if specified
-        if product_id and self._products:
-            await self._add_image_to_product(product_id, item.source_url, item.id)
+        super().__init__(agent_config, registry or get_tool_registry())
 
-        return result
+        self.wp_config = config or WordPressAssetConfig.from_env()
+        self._session: aiohttp.ClientSession | None = None
 
-    async def _add_image_to_product(
+    def _register_tools(self) -> None:
+        """Register WordPress asset tools."""
+        self.registry.register(
+            ToolSpec(
+                name="wp_upload_media",
+                description="Upload media file to WordPress",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.MEDIUM,
+                timeout_seconds=60.0,
+            ),
+            self._tool_upload_media,
+        )
+
+        self.registry.register(
+            ToolSpec(
+                name="wp_attach_to_product",
+                description="Attach media to WooCommerce product",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+            ),
+            self._tool_attach_to_product,
+        )
+
+        self.registry.register(
+            ToolSpec(
+                name="wp_update_product_gallery",
+                description="Update product image gallery",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+            ),
+            self._tool_update_gallery,
+        )
+
+        self.registry.register(
+            ToolSpec(
+                name="wp_get_media",
+                description="Get media details from WordPress",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.READ_ONLY,
+            ),
+            self._tool_get_media,
+        )
+
+    # -------------------------------------------------------------------------
+    # SuperAgent Implementation
+    # -------------------------------------------------------------------------
+
+    async def _plan(
         self,
-        product_id: int,
-        image_url: str,
-        image_id: int,
-    ):
-        """Add image to product gallery"""
-        try:
-            product = await self._products.get(product_id)
+        request: dict[str, Any],
+        context: ToolCallContext,
+    ) -> list[PlanStep]:
+        """Create execution plan based on request action."""
+        action = request.get("action", "upload_media")
 
-            # Get existing images
-            existing_images = [
-                {"id": img.get("id"), "src": img.get("src")} for img in product.images
+        if action == "upload_media":
+            return [
+                PlanStep(
+                    step_id="upload",
+                    tool_name="wp_upload_media",
+                    description="Upload media to WordPress",
+                    inputs={
+                        "file_path": request.get("file_path"),
+                        "title": request.get("title", ""),
+                        "alt_text": request.get("alt_text", ""),
+                        "caption": request.get("caption", ""),
+                    },
+                    priority=0,
+                ),
             ]
+        elif action == "attach_to_product":
+            return [
+                PlanStep(
+                    step_id="attach",
+                    tool_name="wp_attach_to_product",
+                    description="Attach media to product",
+                    inputs={
+                        "product_id": request.get("product_id"),
+                        "media_id": request.get("media_id"),
+                        "is_featured": request.get("is_featured", False),
+                        "position": request.get("position", 0),
+                    },
+                    priority=0,
+                ),
+            ]
+        elif action == "upload_and_attach":
+            return [
+                PlanStep(
+                    step_id="upload",
+                    tool_name="wp_upload_media",
+                    description="Upload media to WordPress",
+                    inputs={
+                        "file_path": request.get("file_path"),
+                        "title": request.get("title", ""),
+                        "alt_text": request.get("alt_text", ""),
+                    },
+                    priority=0,
+                ),
+                PlanStep(
+                    step_id="attach",
+                    tool_name="wp_attach_to_product",
+                    description="Attach uploaded media to product",
+                    inputs={
+                        "product_id": request.get("product_id"),
+                        "media_id": "{upload.id}",
+                        "is_featured": request.get("is_featured", False),
+                    },
+                    depends_on=["upload"],
+                    priority=1,
+                ),
+            ]
+        elif action == "update_gallery":
+            return [
+                PlanStep(
+                    step_id="gallery",
+                    tool_name="wp_update_product_gallery",
+                    description="Update product gallery",
+                    inputs={
+                        "product_id": request.get("product_id"),
+                        "featured_image_id": request.get("featured_image_id"),
+                        "gallery_image_ids": request.get("gallery_image_ids", []),
+                    },
+                    priority=0,
+                ),
+            ]
+        else:
+            raise ValueError(f"Unknown action: {action}")
 
-            # Add new image
-            existing_images.append({"id": image_id, "src": image_url})
-
-            # Update product
-            await self._products.update(product_id, images=existing_images)
-            logger.info(f"Added image to product {product_id}")
-
-        except Exception as e:
-            logger.error(f"Failed to add image to product: {e}")
-
-    # -------------------------------------------------------------------------
-    # 3D Model Upload
-    # -------------------------------------------------------------------------
-
-    async def upload_3d_model(
+    async def _retrieve(
         self,
-        file_path: str,
-        product_id: int = None,
-        title: str = None,
-        meta_key: str = "_3d_model_url",
-    ) -> AssetUploadResult:
-        """
-        Upload 3D model (GLB/GLTF) to WordPress
-
-        Args:
-            file_path: Path to 3D model file
-            product_id: WooCommerce product ID to attach
-            title: Model title
-            meta_key: Product meta key for 3D model URL
-
-        Returns:
-            AssetUploadResult with upload details
-        """
-        filename = Path(file_path).name
-
-        if not title:
-            title = f"3D Model - {Path(file_path).stem}"
-
-        logger.info(f"Uploading 3D model: {filename}")
-
-        # Upload to media library
-        item = await self._media.upload_3d_model(
-            file_path=file_path,
-            title=title,
-            product_id=product_id,
+        request: dict[str, Any],
+        plan: list[PlanStep],
+        context: ToolCallContext,
+    ) -> RetrievalContext:
+        """Retrieve context (no RAG needed for WordPress operations)."""
+        return RetrievalContext(
+            query=f"WordPress asset {request.get('action', 'upload')}",
+            documents=[],
         )
 
-        result = AssetUploadResult(
-            asset_id=item.id,
-            asset_url=item.source_url,
-            asset_type=AssetType.MODEL_3D,
-            filename=filename,
-            product_id=product_id,
-            metadata={
-                "title": title,
-                "format": Path(file_path).suffix.lower(),
-                "uploaded_at": datetime.now(UTC).isoformat(),
-            },
-        )
-
-        # Update product meta with 3D model URL
-        if product_id and item.source_url:
-            await self._set_product_3d_model(product_id, item.source_url, meta_key)
-
-        return result
-
-    async def _set_product_3d_model(
+    async def _execute_step(
         self,
-        product_id: int,
-        model_url: str,
-        meta_key: str,
-    ):
-        """Set 3D model URL on product"""
+        step: PlanStep,
+        retrieval_context: RetrievalContext,
+        context: ToolCallContext,
+    ) -> ExecutionResult:
+        """Execute a single step."""
+        started_at = datetime.now(UTC)
+
         try:
-            # Update product meta
-            await self._products.update(
-                product_id,
-                meta_data=[
-                    {"key": meta_key, "value": model_url},
-                    {"key": "_3d_model_enabled", "value": "yes"},
-                ],
+            result = await self.registry.execute(
+                step.tool_name,
+                step.inputs,
+                context,
             )
-            logger.info(f"Set 3D model URL on product {product_id}")
 
+            return ExecutionResult(
+                tool_name=step.tool_name,
+                step_id=step.step_id,
+                success=result.success,
+                result=result.result,
+                error=result.error,
+                duration_seconds=result.duration_seconds,
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+            )
         except Exception as e:
-            logger.error(f"Failed to set 3D model on product: {e}")
+            return ExecutionResult(
+                tool_name=step.tool_name,
+                step_id=step.step_id,
+                success=False,
+                error=str(e),
+                error_type=type(e).__name__,
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+            )
 
-    # -------------------------------------------------------------------------
-    # Bulk Operations
-    # -------------------------------------------------------------------------
-
-    async def attach_assets_to_product(
+    async def _validate(
         self,
-        product_id: int,
-        images: list[str] = None,
-        model_3d: str = None,
-        featured_image: str = None,
-        concurrency: int = 3,
+        results: list[ExecutionResult],
+        context: ToolCallContext,
+    ) -> ValidationResult:
+        """Validate execution results."""
+        validation = ValidationResult(is_valid=True)
+
+        for result in results:
+            if not result.success:
+                validation.add_error(f"{result.tool_name} failed: {result.error}")
+
+        if not validation.errors:
+            validation.quality_score = 1.0
+            validation.confidence_score = 0.95
+
+        return validation
+
+    async def _emit(
+        self,
+        results: list[ExecutionResult],
+        validation: ValidationResult,
+        context: ToolCallContext,
     ) -> dict[str, Any]:
-        """
-        Attach multiple assets to a product
-
-        Args:
-            product_id: WooCommerce product ID
-            images: List of image file paths for gallery
-            model_3d: 3D model file path
-            featured_image: Featured image file path
-            concurrency: Max concurrent uploads
-
-        Returns:
-            Dictionary with upload results
-        """
-        results = {
-            "product_id": product_id,
-            "images": [],
-            "model_3d": None,
-            "featured_image": None,
-            "errors": [],
+        """Emit final structured output."""
+        output = {
+            "status": "success" if validation.is_valid else "error",
+            "agent": self.name,
+            "request_id": context.request_id,
+            "validation": validation.to_dict(),
         }
 
-        semaphore = asyncio.Semaphore(concurrency)
+        # Collect all results
+        data = {}
+        for result in results:
+            if result.success and result.result:
+                data[result.step_id] = result.result
 
-        async def upload_with_limit(coro):
-            async with semaphore:
-                return await coro
+        output["data"] = data
+        output["results"] = [r.to_dict() for r in results]
 
-        tasks = []
+        return output
 
-        # Upload featured image first
-        if featured_image:
-            tasks.append(
-                (
-                    "featured",
-                    upload_with_limit(
-                        self.upload_image(
-                            featured_image,
-                            title="Featured Image",
-                            product_id=product_id,
-                        )
-                    ),
-                )
+    # -------------------------------------------------------------------------
+    # Tool Implementations
+    # -------------------------------------------------------------------------
+
+    async def _tool_upload_media(
+        self,
+        file_path: str,
+        title: str = "",
+        alt_text: str = "",
+        caption: str = "",
+    ) -> dict[str, Any]:
+        """Upload media file to WordPress."""
+        await self._ensure_session()
+
+        path = Path(file_path)
+        if not path.exists():
+            raise FileNotFoundError(f"File not found: {file_path}")
+
+        # Check file size
+        file_size = path.stat().st_size
+        max_size = self.wp_config.max_file_size_mb * 1024 * 1024
+        if file_size > max_size:
+            raise ValueError(
+                f"File too large: {file_size / (1024*1024):.1f}MB > {self.wp_config.max_file_size_mb}MB"
             )
 
-        # Upload gallery images
-        if images:
-            for i, img_path in enumerate(images):
-                tasks.append(
-                    (
-                        f"image_{i}",
-                        upload_with_limit(
-                            self.upload_image(
-                                img_path,
-                                title=f"Product Image {i + 1}",
-                                product_id=product_id,
-                            )
-                        ),
-                    )
-                )
+        # Determine content type
+        content_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
 
-        # Upload 3D model
-        if model_3d:
-            tasks.append(
-                (
-                    "model_3d",
-                    upload_with_limit(
-                        self.upload_3d_model(
-                            model_3d,
-                            product_id=product_id,
-                        )
-                    ),
-                )
+        # Read file
+        async with aiofiles.open(file_path, "rb") as f:
+            file_data = await f.read()
+
+        # Upload to WordPress
+        url = f"{self.wp_config.site_url}/wp-json/wp/v2/media"
+
+        headers = {
+            "Content-Disposition": f'attachment; filename="{path.name}"',
+            "Content-Type": content_type,
+        }
+
+        async with self._session.post(
+            url,
+            data=file_data,
+            headers=headers,
+            auth=aiohttp.BasicAuth(self.wp_config.username, self.wp_config.app_password),
+        ) as response:
+            if response.status >= 400:
+                error_text = await response.text()
+                raise Exception(f"Upload failed ({response.status}): {error_text}")
+
+            result = await response.json()
+
+        media_id = result.get("id")
+
+        # Update metadata if provided
+        if title or alt_text or caption:
+            await self._update_media_metadata(media_id, title, alt_text, caption)
+
+        return MediaUploadResult(
+            id=media_id,
+            url=result.get("source_url", ""),
+            title=result.get("title", {}).get("rendered", title),
+            mime_type=result.get("mime_type", content_type),
+            file_size=file_size,
+            width=result.get("media_details", {}).get("width"),
+            height=result.get("media_details", {}).get("height"),
+            alt_text=alt_text,
+            metadata=result.get("media_details", {}),
+        ).model_dump()
+
+    async def _update_media_metadata(
+        self,
+        media_id: int,
+        title: str = "",
+        alt_text: str = "",
+        caption: str = "",
+    ) -> None:
+        """Update media metadata."""
+        url = f"{self.wp_config.site_url}/wp-json/wp/v2/media/{media_id}"
+
+        data = {}
+        if title:
+            data["title"] = title
+        if alt_text:
+            data["alt_text"] = alt_text
+        if caption:
+            data["caption"] = caption
+
+        if data:
+            async with self._session.post(
+                url,
+                json=data,
+                auth=aiohttp.BasicAuth(self.wp_config.username, self.wp_config.app_password),
+            ) as response:
+                if response.status >= 400:
+                    logger.warning(f"Failed to update media metadata: {response.status}")
+
+    async def _tool_attach_to_product(
+        self,
+        product_id: int,
+        media_id: int,
+        is_featured: bool = False,
+        position: int = 0,
+    ) -> dict[str, Any]:
+        """Attach media to WooCommerce product."""
+        await self._ensure_session()
+
+        # Get current product data
+        product = await self._get_product(product_id)
+
+        # Prepare update
+        images = product.get("images", [])
+
+        # Get media URL
+        media = await self._tool_get_media(media_id)
+        media_url = media.get("url", "")
+
+        new_image = {
+            "id": media_id,
+            "src": media_url,
+            "position": position,
+        }
+
+        if is_featured:
+            # Insert at beginning
+            images.insert(0, new_image)
+        else:
+            # Append to gallery
+            images.append(new_image)
+
+        # Update product
+        url = f"{self.wp_config.site_url}/wp-json/wc/v3/products/{product_id}"
+
+        async with self._session.put(
+            url,
+            json={"images": images},
+            auth=aiohttp.BasicAuth(
+                self.wp_config.wc_consumer_key, self.wp_config.wc_consumer_secret
+            ),
+        ) as response:
+            if response.status >= 400:
+                error_text = await response.text()
+                raise Exception(f"Product update failed ({response.status}): {error_text}")
+
+            await response.json()
+
+        return ProductAssetResult(
+            product_id=product_id,
+            media_id=media_id,
+            media_url=media_url,
+            position=position,
+            is_featured=is_featured,
+            asset_type="image",
+        ).model_dump()
+
+    async def _tool_update_gallery(
+        self,
+        product_id: int,
+        featured_image_id: int | None = None,
+        gallery_image_ids: list[int] | None = None,
+    ) -> dict[str, Any]:
+        """Update product image gallery."""
+        await self._ensure_session()
+
+        images = []
+
+        # Add featured image first
+        if featured_image_id:
+            media = await self._tool_get_media(featured_image_id)
+            images.append(
+                {
+                    "id": featured_image_id,
+                    "src": media.get("url", ""),
+                    "position": 0,
+                }
             )
 
-        # Execute all uploads
-        for task_name, task_coro in tasks:
-            try:
-                result = await task_coro
-
-                if task_name == "featured":
-                    results["featured_image"] = result.dict()
-                    # Set as featured
-                    await self._products.update(
-                        product_id, images=[{"id": result.asset_id, "position": 0}]
-                    )
-                elif task_name == "model_3d":
-                    results["model_3d"] = result.dict()
-                else:
-                    results["images"].append(result.dict())
-
-            except Exception as e:
-                logger.error(f"Upload failed ({task_name}): {e}")
-                results["errors"].append(
+        # Add gallery images
+        if gallery_image_ids:
+            for i, media_id in enumerate(gallery_image_ids):
+                media = await self._tool_get_media(media_id)
+                images.append(
                     {
-                        "task": task_name,
-                        "error": str(e),
+                        "id": media_id,
+                        "src": media.get("url", ""),
+                        "position": i + 1,
                     }
                 )
 
-        return results
+        # Update product
+        url = f"{self.wp_config.site_url}/wp-json/wc/v3/products/{product_id}"
 
-    async def bulk_upload_images(
-        self,
-        file_paths: list[str],
-        product_id: int = None,
-        title_prefix: str = "",
-        concurrency: int = 5,
-    ) -> list[AssetUploadResult]:
-        """
-        Bulk upload images
+        async with self._session.put(
+            url,
+            json={"images": images},
+            auth=aiohttp.BasicAuth(
+                self.wp_config.wc_consumer_key, self.wp_config.wc_consumer_secret
+            ),
+        ) as response:
+            if response.status >= 400:
+                error_text = await response.text()
+                raise Exception(f"Gallery update failed ({response.status}): {error_text}")
 
-        Args:
-            file_paths: List of image file paths
-            product_id: Optional product to attach all to
-            title_prefix: Prefix for image titles
-            concurrency: Max concurrent uploads
+            await response.json()
 
-        Returns:
-            List of AssetUploadResult
-        """
-        semaphore = asyncio.Semaphore(concurrency)
+        return GalleryResult(
+            product_id=product_id,
+            featured_image_id=featured_image_id,
+            gallery_image_ids=gallery_image_ids or [],
+            total_images=len(images),
+        ).model_dump()
 
-        async def upload(path: str, index: int) -> AssetUploadResult:
-            async with semaphore:
-                title = f"{title_prefix} {Path(path).stem}".strip()
-                return await self.upload_image(
-                    file_path=path,
-                    title=title,
-                    alt_text=f"{title} - Image {index + 1}",
-                    product_id=product_id,
-                )
+    async def _tool_get_media(self, media_id: int) -> dict[str, Any]:
+        """Get media details from WordPress."""
+        await self._ensure_session()
 
-        tasks = [upload(p, i) for i, p in enumerate(file_paths)]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        url = f"{self.wp_config.site_url}/wp-json/wp/v2/media/{media_id}"
 
-        # Filter out exceptions
-        successful = []
-        for i, result in enumerate(results):
-            if isinstance(result, Exception):
-                logger.error(f"Failed to upload {file_paths[i]}: {result}")
-            else:
-                successful.append(result)
+        async with self._session.get(
+            url,
+            auth=aiohttp.BasicAuth(self.wp_config.username, self.wp_config.app_password),
+        ) as response:
+            if response.status >= 400:
+                raise Exception(f"Failed to get media ({response.status})")
 
-        return successful
+            result = await response.json()
 
-    # -------------------------------------------------------------------------
-    # Product Gallery Management
-    # -------------------------------------------------------------------------
+        return MediaUploadResult(
+            id=result.get("id"),
+            url=result.get("source_url", ""),
+            title=result.get("title", {}).get("rendered", ""),
+            mime_type=result.get("mime_type", ""),
+            width=result.get("media_details", {}).get("width"),
+            height=result.get("media_details", {}).get("height"),
+            alt_text=result.get("alt_text", ""),
+        ).model_dump()
 
-    async def set_product_gallery(
-        self,
-        product_id: int,
-        image_ids: list[int],
-        featured_id: int = None,
-    ):
-        """
-        Set product image gallery
+    async def _get_product(self, product_id: int) -> dict[str, Any]:
+        """Get WooCommerce product."""
+        url = f"{self.wp_config.site_url}/wp-json/wc/v3/products/{product_id}"
 
-        Args:
-            product_id: WooCommerce product ID
-            image_ids: List of media library image IDs
-            featured_id: Optional featured image ID
-        """
-        images = [{"id": img_id} for img_id in image_ids]
+        async with self._session.get(
+            url,
+            auth=aiohttp.BasicAuth(
+                self.wp_config.wc_consumer_key, self.wp_config.wc_consumer_secret
+            ),
+        ) as response:
+            if response.status >= 400:
+                raise Exception(f"Failed to get product ({response.status})")
 
-        if featured_id:
-            # Move featured to first position
-            images = [{"id": featured_id}] + [img for img in images if img["id"] != featured_id]
-
-        await self._products.update(product_id, images=images)
-        logger.info(f"Updated gallery for product {product_id}: {len(images)} images")
-
-    async def clear_product_gallery(self, product_id: int):
-        """Remove all images from product"""
-        await self._products.update(product_id, images=[])
-        logger.info(f"Cleared gallery for product {product_id}")
+            return await response.json()
 
     # -------------------------------------------------------------------------
-    # Model Viewer Integration
+    # HTTP Client Methods
     # -------------------------------------------------------------------------
 
-    def generate_model_viewer_shortcode(
-        self,
-        model_url: str,
-        poster_url: str = None,
-        alt: str = "3D Model",
-        ar: bool = True,
-        auto_rotate: bool = True,
-        camera_controls: bool = True,
-        width: str = "100%",
-        height: str = "500px",
-    ) -> str:
-        """
-        Generate model-viewer shortcode for 3D model display
-
-        This generates HTML for Google's <model-viewer> component.
-
-        Args:
-            model_url: URL to GLB model
-            poster_url: Optional poster image URL
-            alt: Alt text
-            ar: Enable AR on supported devices
-            auto_rotate: Auto-rotate model
-            camera_controls: Enable camera controls
-            width: Viewer width
-            height: Viewer height
-
-        Returns:
-            HTML shortcode for embedding
-        """
-        attrs = [
-            f'src="{model_url}"',
-            f'alt="{alt}"',
-            f'style="width: {width}; height: {height};"',
-        ]
-
-        if poster_url:
-            attrs.append(f'poster="{poster_url}"')
-
-        if ar:
-            attrs.append("ar")
-            attrs.append('ar-modes="webxr scene-viewer quick-look"')
-
-        if auto_rotate:
-            attrs.append("auto-rotate")
-
-        if camera_controls:
-            attrs.append("camera-controls")
-
-        # Additional recommended attributes
-        attrs.extend(
-            [
-                'shadow-intensity="1"',
-                'exposure="0.75"',
-                'environment-image="neutral"',
-            ]
-        )
-
-        shortcode = f'<model-viewer {" ".join(attrs)}></model-viewer>'
-
-        # Wrap with script include if needed
-        full_html = f"""
-<!-- Model Viewer Component -->
-<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
-{shortcode}
-"""
-
-        return full_html.strip()
-
-    async def add_3d_viewer_to_product(
-        self,
-        product_id: int,
-        model_url: str,
-        poster_url: str = None,
-        position: str = "after_images",  # or "before_images", "tab"
-    ):
-        """
-        Add 3D viewer to product page
-
-        This updates product description/short_description with model-viewer code.
-
-        Args:
-            product_id: WooCommerce product ID
-            model_url: URL to GLB model
-            poster_url: Optional poster image
-            position: Where to add viewer
-        """
-        viewer_html = self.generate_model_viewer_shortcode(
-            model_url=model_url,
-            poster_url=poster_url,
-            alt="View in 3D",
-        )
-
-        product = await self._products.get(product_id)
-
-        if position == "before_images":
-            new_description = viewer_html + "\n\n" + product.description
-        elif position == "after_images":
-            new_description = product.description + "\n\n" + viewer_html
-        else:
-            # Add as tab content via meta
-            await self._products.update(
-                product_id,
-                meta_data=[
-                    {"key": "_3d_viewer_html", "value": viewer_html},
-                    {"key": "_3d_viewer_enabled", "value": "yes"},
-                ],
+    async def _ensure_session(self) -> None:
+        """Ensure aiohttp session exists."""
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=self.wp_config.timeout),
             )
-            return
 
-        await self._products.update(product_id, description=new_description)
-        logger.info(f"Added 3D viewer to product {product_id}")
+    async def close(self) -> None:
+        """Close HTTP session."""
+        if self._session and not self._session.closed:
+            await self._session.close()
 
-    # -------------------------------------------------------------------------
-    # Utility Methods
-    # -------------------------------------------------------------------------
 
-    async def get_product_assets(self, product_id: int) -> dict[str, Any]:
-        """Get all assets attached to a product"""
-        product = await self._products.get(product_id)
+# =============================================================================
+# Exports
+# =============================================================================
 
-        # Get 3D model from meta
-        model_3d = None
-        for meta in product.meta_data:
-            if meta.get("key") == "_3d_model_url":
-                model_3d = meta.get("value")
-                break
-
-        return {
-            "product_id": product_id,
-            "product_name": product.name,
-            "images": [{"id": img.get("id"), "src": img.get("src")} for img in product.images],
-            "model_3d": model_3d,
-            "featured_image": product.images[0].get("src") if product.images else None,
-        }
-
-    async def test_connection(self) -> dict[str, bool]:
-        """Test all connections"""
-        results = {
-            "wordpress": False,
-            "woocommerce": False,
-            "media": False,
-        }
-
-        try:
-            await self._wp.test_connection()
-            results["wordpress"] = True
-        except Exception as e:
-            logger.error(f"WordPress connection failed: {e}")
-
-        try:
-            await self._products.list(per_page=1)
-            results["woocommerce"] = True
-        except Exception as e:
-            logger.error(f"WooCommerce connection failed: {e}")
-
-        try:
-            await self._media.list(per_page=1)
-            results["media"] = True
-        except Exception as e:
-            logger.error(f"Media connection failed: {e}")
-
-        return results
+__all__ = [
+    "WordPressAssetAgent",
+    "WordPressAssetConfig",
+    "MediaUploadResult",
+    "ProductAssetResult",
+    "GalleryResult",
+]

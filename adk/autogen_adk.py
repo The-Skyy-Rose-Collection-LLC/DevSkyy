@@ -105,7 +105,6 @@ class AutoGenAgent(BaseDevSkyyAgent):
         """Initialize AutoGen agent"""
         try:
             from autogen_agentchat.agents import AssistantAgent
-            from autogen_core.models import ChatCompletionClient
 
             # Create model client
             self._model_client = self._create_model_client()

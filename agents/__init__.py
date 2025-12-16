@@ -1,60 +1,69 @@
 """
-DevSkyy AI Agents Module
-========================
+DevSkyy Agents Module
+=====================
 
-Specialized AI agents for SkyyRose operations:
-- TripoAssetAgent: 3D model generation via Tripo3D API
-- FashnTryOnAgent: Virtual try-on via FASHN API
-- WordPressAssetAgent: Asset upload and management
+Specialized AI agents for fashion e-commerce automation.
 
-Usage:
-    from agents import TripoAssetAgent, FashnTryOnAgent
+Agents:
+- FashnTryOnAgent: Virtual try-on using FASHN API
+- TripoAssetAgent: 3D model generation using Tripo3D API
+- WordPressAssetAgent: WordPress media upload and management
 
-    # Generate 3D model
-    tripo = TripoAssetAgent()
-    model = await tripo.generate_from_description(
-        product_name="Heart aRose Bomber",
-        collection="BLACK_ROSE",
-        garment_type="jacket"
-    )
-
-    # Virtual try-on
-    fashn = FashnTryOnAgent()
-    result = await fashn.virtual_tryon(
-        model_image="path/to/model.jpg",
-        garment_image="path/to/garment.jpg"
-    )
+All agents extend the SuperAgent base class and follow the
+Plan → Retrieve → Execute → Validate → Emit workflow.
 """
 
 from .fashn_agent import (
+    FashnConfig,
     FashnTask,
+    FashnTaskStatus,
     FashnTryOnAgent,
     GarmentCategory,
     TryOnMode,
+    TryOnResult,
 )
 from .tripo_agent import (
+    COLLECTION_PROMPTS,
+    GARMENT_TEMPLATES,
+    SKYYROSE_BRAND_DNA,
+    GenerationResult,
     ModelFormat,
+    ModelStyle,
     TripoAssetAgent,
+    TripoConfig,
     TripoTask,
     TripoTaskStatus,
 )
 from .wordpress_asset_agent import (
-    AssetUploadResult,
+    MediaUploadResult,
+    ProductAssetResult,
     WordPressAssetAgent,
+    WordPressAssetConfig,
 )
 
 __all__ = [
-    # Tripo3D
-    "TripoAssetAgent",
-    "TripoTask",
-    "TripoTaskStatus",
-    "ModelFormat",
-    # FASHN
+    # FASHN Agent
     "FashnTryOnAgent",
+    "FashnConfig",
     "FashnTask",
+    "TryOnResult",
     "GarmentCategory",
     "TryOnMode",
-    # WordPress
+    "FashnTaskStatus",
+    # Tripo Agent
+    "TripoAssetAgent",
+    "TripoConfig",
+    "TripoTask",
+    "GenerationResult",
+    "ModelFormat",
+    "ModelStyle",
+    "TripoTaskStatus",
+    "SKYYROSE_BRAND_DNA",
+    "COLLECTION_PROMPTS",
+    "GARMENT_TEMPLATES",
+    # WordPress Asset Agent
     "WordPressAssetAgent",
-    "AssetUploadResult",
+    "WordPressAssetConfig",
+    "MediaUploadResult",
+    "ProductAssetResult",
 ]
