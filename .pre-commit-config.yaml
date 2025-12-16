@@ -109,6 +109,34 @@ repos:
         args: [--fix]
         exclude: ^legacy/
 
+  # ==========================================================================
+  # TypeScript/JavaScript
+  # ==========================================================================
+  - repo: local
+    hooks:
+      - id: typescript-typecheck
+        name: TypeScript Type Check
+        entry: npm run type-check
+        language: system
+        files: \.(ts|tsx)$
+        pass_filenames: false
+        stages: [commit]
+
+      - id: jest-collections
+        name: Jest Collection Tests
+        entry: npm run test:collections
+        language: system
+        files: ^src/collections/.*\.(ts|tsx)$
+        pass_filenames: false
+        stages: [commit]
+
+  # Commit message linting
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.13.0
+    hooks:
+      - id: commitizen
+        stages: [commit-msg]
+
 # CI: pre-commit.ci configuration
 ci:
   autofix_commit_msg: |
@@ -117,5 +145,5 @@ ci:
   autoupdate_branch: ''
   autoupdate_commit_msg: '[pre-commit.ci] pre-commit autoupdate'
   autoupdate_schedule: weekly
-  skip: []
+  skip: [typescript-typecheck, jest-collections]  # Skip npm hooks in CI (handled by GitHub Actions)
   submodules: false
