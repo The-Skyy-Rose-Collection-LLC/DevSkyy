@@ -699,6 +699,72 @@ async def capabilities_info(response_format: ResponseFormat = ResponseFormat.MAR
     return _format_response(capabilities, response_format, "OpenAI MCP Server Capabilities")
 
 
+@mcp.tool(
+    name="devskyy_tool_registry",
+    annotations={
+        "title": "DevSkyy Tool Registry",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": False,
+    },
+)
+async def tool_registry_info(
+    category: str | None = None,
+    response_format: ResponseFormat = ResponseFormat.MARKDOWN,
+) -> str:
+    """List all available tools from DevSkyy's Tool Runtime.
+
+    Returns the complete tool registry with specifications, categories,
+    and severity levels. This enables deterministic tool discovery.
+
+    Args:
+        category: Optional filter by category (content, commerce, media, etc.)
+        response_format: Output format (markdown or json)
+
+    Returns:
+        str: Tool registry listing with specifications
+    """
+    try:
+        # Import Tool Runtime
+        import sys
+        sys.path.insert(0, str(__file__).replace("/mcp/openai_server.py", ""))
+        from runtime.tools import get_tool_registry
+
+        registry = get_tool_registry()
+        tools = registry.list_enabled()
+
+        # Filter by category if specified
+        if category:
+            tools = [t for t in tools if t.category.value == category]
+
+        # Format tool list
+        tool_list = []
+        for tool in tools:
+            tool_list.append({
+                "name": tool.name,
+                "description": tool.description,
+                "category": tool.category.value,
+                "severity": tool.severity.value,
+                "timeout_seconds": tool.timeout_seconds,
+                "idempotent": tool.idempotent,
+                "cacheable": tool.cacheable,
+            })
+
+        result = {
+            "total_tools": len(tool_list),
+            "category_filter": category,
+            "tools": tool_list,
+        }
+        return _format_response(result, response_format, "DevSkyy Tool Registry")
+    except ImportError as e:
+        return _format_response(
+            {"error": f"Tool Runtime not available: {e}"},
+            response_format,
+            "DevSkyy Tool Registry",
+        )
+
+
 # =============================================================================
 # Main Entry Point
 # =============================================================================
@@ -736,6 +802,7 @@ if __name__ == "__main__":
    • openai_function_calling - Structured function invocation
    • openai_model_selector - Intelligent model selection
    • devskyy_agent_openai - DevSkyy agents with OpenAI backend
+   • devskyy_tool_registry - Tool Runtime discovery
    • openai_capabilities_info - Model capabilities reference
 
 📚 Supported Models:
