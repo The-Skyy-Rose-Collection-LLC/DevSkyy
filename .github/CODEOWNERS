@@ -1,0 +1,65 @@
+# DevSkyy Code Owners
+# ====================
+# These owners will be the default owners for everything in the repo.
+# Unless a later match takes precedence, these will be requested for review.
+
+# Default owners for everything
+* @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# Core Platform
+# =============================================================================
+
+# Tool Runtime (critical path)
+/runtime/ @The-Skyy-Rose-Collection-LLC
+
+# Base agent architecture
+/base.py @The-Skyy-Rose-Collection-LLC
+
+# LLM orchestration
+/llm/ @The-Skyy-Rose-Collection-LLC
+/orchestration/ @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# Security (requires careful review)
+# =============================================================================
+
+/security/ @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# Agents
+# =============================================================================
+
+/agents/ @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# WordPress Integration
+# =============================================================================
+
+/wordpress/ @The-Skyy-Rose-Collection-LLC
+/templates/elementor/ @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# TypeScript / 3D Experiences
+# =============================================================================
+
+/src/ @The-Skyy-Rose-Collection-LLC
+/src/collections/ @The-Skyy-Rose-Collection-LLC
+/demo/ @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# Configuration & CI/CD
+# =============================================================================
+
+/.github/ @The-Skyy-Rose-Collection-LLC
+/config/ @The-Skyy-Rose-Collection-LLC
+Makefile @The-Skyy-Rose-Collection-LLC
+pyproject.toml @The-Skyy-Rose-Collection-LLC
+package.json @The-Skyy-Rose-Collection-LLC
+
+# =============================================================================
+# Tests
+# =============================================================================
+
+/tests/ @The-Skyy-Rose-Collection-LLC
+
