@@ -170,7 +170,7 @@ class TemplateParams(BaseModel):
 @mcp.tool()
 async def create_elementor_template(params: TemplateParams, ctx: Context) -> dict:
     """Create an Elementor theme builder template.
-    
+
     Returns template ID and deployment status.
     """
     try:
@@ -256,24 +256,24 @@ function deploy_woocommerce_template($config) {
         'post_title' => $config['name'],
         'post_status' => 'publish'
     ]);
-    
+
     // Set taxonomy term
     wp_set_object_terms($template_id, $config['type'], 'elementor_library_type');
-    
+
     // Core meta
     update_post_meta($template_id, '_elementor_edit_mode', 'builder');
     update_post_meta($template_id, '_elementor_template_type', $config['type']);
     update_post_meta($template_id, '_elementor_version', ELEMENTOR_VERSION);
     update_post_meta($template_id, '_elementor_pro_version', ELEMENTOR_PRO_VERSION);
-    
+
     // Content and conditions
     update_post_meta($template_id, '_elementor_data', wp_slash(json_encode($config['content'])));
     update_post_meta($template_id, '_elementor_conditions', $config['conditions']);
-    
+
     // Clear caches
     delete_option('elementor_pro_theme_builder_conditions');
     \Elementor\Plugin::$instance->files_manager->clear_cache();
-    
+
     return $template_id;
 }
 ```

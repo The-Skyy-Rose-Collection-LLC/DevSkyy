@@ -5,9 +5,10 @@ ADK Test Suite
 Comprehensive tests for DevSkyy Agent Development Kit.
 """
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 import sys
+
+import pytest
+
 sys.path.insert(0, "/home/claude/devskyy-platform")
 
 
@@ -172,7 +173,7 @@ class TestSuperAgents:
 
     def test_support_agent_creation(self):
         """Test SupportAgent instantiation"""
-        from adk.super_agents import SupportAgent, SuperAgentType
+        from adk.super_agents import SuperAgentType, SupportAgent
 
         agent = SupportAgent()
 
@@ -224,7 +225,10 @@ class TestSuperAgents:
         assert orchestrator._classify_intent("Create virtual try-on") == SuperAgentType.CREATIVE
 
         # Marketing keywords
-        assert orchestrator._classify_intent("Create social media campaign") == SuperAgentType.MARKETING
+        assert (
+            orchestrator._classify_intent("Create social media campaign")
+            == SuperAgentType.MARKETING
+        )
 
         # Support keywords
         assert orchestrator._classify_intent("Customer needs help") == SuperAgentType.SUPPORT
@@ -256,12 +260,7 @@ class TestPydanticAI:
 
     def test_output_models(self):
         """Test Pydantic output models"""
-        from adk.pydantic_adk import (
-            ContentPlan,
-            CustomerIntent,
-            InventoryForecast,
-            ProductAnalysis,
-        )
+        from adk.pydantic_adk import CustomerIntent, ProductAnalysis
 
         # Test ProductAnalysis
         analysis = ProductAnalysis(
@@ -330,13 +329,7 @@ class TestModuleImports:
 
     def test_base_exports(self):
         """Test base module exports"""
-        from adk import (
-            ADKProvider,
-            AgentCapability,
-            AgentConfig,
-            AgentResult,
-            BaseDevSkyyAgent,
-        )
+        from adk import ADKProvider, AgentCapability, AgentConfig
 
         assert ADKProvider is not None
         assert AgentCapability is not None
@@ -344,15 +337,7 @@ class TestModuleImports:
 
     def test_super_agent_exports(self):
         """Test super agent exports"""
-        from adk import (
-            AnalyticsAgent,
-            CommerceAgent,
-            CreativeAgent,
-            MarketingAgent,
-            OperationsAgent,
-            SuperAgentOrchestrator,
-            SupportAgent,
-        )
+        from adk import CommerceAgent, SuperAgentOrchestrator
 
         assert CommerceAgent is not None
         assert SuperAgentOrchestrator is not None
@@ -366,19 +351,19 @@ class TestModuleImports:
 
     def test_crewai_exports(self):
         """Test CrewAI exports"""
-        from adk import CrewAIAgent, create_crew
+        from adk import CrewAIAgent
 
         assert CrewAIAgent is not None
 
     def test_autogen_exports(self):
         """Test AutoGen exports"""
-        from adk import AutoGenAgent, create_autogen_team
+        from adk import AutoGenAgent
 
         assert AutoGenAgent is not None
 
     def test_agno_exports(self):
         """Test Agno exports"""
-        from adk import AgnoAgent, create_agno_agent
+        from adk import AgnoAgent
 
         assert AgnoAgent is not None
 

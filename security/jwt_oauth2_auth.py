@@ -41,11 +41,7 @@ from argon2.exceptions import VerifyMismatchError
 
 # FastAPI integration
 from fastapi import Depends, HTTPException, status
-from fastapi.security import (
-    HTTPBearer,
-    OAuth2PasswordBearer,
-    OAuth2PasswordRequestForm,
-)
+from fastapi.security import HTTPBearer, OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field, validator
@@ -67,7 +63,8 @@ class JWTConfig:
     # SECRET KEYS - Must be set via environment variables
     secret_key: str = field(
         default_factory=lambda: os.getenv(
-            "JWT_SECRET_KEY", secrets.token_urlsafe(64)  # 512-bit key for HS512
+            "JWT_SECRET_KEY",
+            secrets.token_urlsafe(64),  # 512-bit key for HS512
         )
     )
     refresh_secret_key: str = field(

@@ -48,13 +48,13 @@ dependencies = [
     "python-multipart>=0.0.6",
     "pydantic>=2.5",
     "pydantic-settings>=2.1",
-    
+
     # Database
     "sqlalchemy>=2.0",
     "alembic>=1.13",
     "asyncpg>=0.29",
     "aiosqlite>=0.19",
-    
+
     # Security (RFC 7519 JWT, NIST SP 800-38D AES-GCM)
     "PyJWT>=2.8",
     "python-jose[cryptography]>=3.3",
@@ -62,13 +62,13 @@ dependencies = [
     "argon2-cffi>=23.1",
     "cryptography>=41",
     "bcrypt>=4.1",
-    
+
     # HTTP Clients
     "httpx>=0.25",
     "aiohttp>=3.9",
     "requests>=2.31",
     "aiofiles>=23.2",
-    
+
     # Utilities
     "python-dotenv>=1.0",
     "tenacity>=8.2",
@@ -112,13 +112,13 @@ dev = [
     "pytest-asyncio>=0.23",
     "pytest-cov>=4.1",
     "httpx>=0.25",  # For TestClient
-    
+
     # Code quality
     "ruff>=0.1",
     "black>=23.12",
     "mypy>=1.7",
     "isort>=5.13",
-    
+
     # Type stubs
     "types-requests>=2.31",
     "types-python-dateutil>=2.8",
@@ -223,3 +223,10 @@ exclude_lines = [
     "if __name__ == .__main__.:",
 ]
 fail_under = 80
+
+[tool.bandit]
+exclude_dirs = ["tests", "legacy", "venv", ".venv", "node_modules"]
+skips = ["B101", "B601"]  # Skip assert_used and shell_injection for tests
+
+[tool.bandit.assert_used]
+skips = ["*_test.py", "test_*.py"]

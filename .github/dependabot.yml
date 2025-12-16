@@ -1,0 +1,76 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "SkyyRoseLLC"
+    assignees:
+      - "SkyyRoseLLC"
+    commit-message:
+      prefix: "deps"
+      prefix-development: "deps-dev"
+      include: "scope"
+    groups:
+      security-updates:
+        patterns:
+          - "cryptography"
+          - "urllib3"
+          - "requests"
+          - "pyjwt"
+          - "fastapi"
+          - "starlette"
+          - "uvicorn"
+        update-types:
+          - "security"
+      minor-updates:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # Node.js dependencies
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "SkyyRoseLLC"
+    assignees:
+      - "SkyyRoseLLC"
+    commit-message:
+      prefix: "deps"
+      include: "scope"
+    groups:
+      three-js:
+        patterns:
+          - "three*"
+          - "@types/three"
+        update-types:
+          - "minor"
+          - "patch"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "SkyyRoseLLC"
+    assignees:
+      - "SkyyRoseLLC"
+    commit-message:
+      prefix: "ci"
+      include: "scope"

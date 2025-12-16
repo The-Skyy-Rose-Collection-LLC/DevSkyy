@@ -8,11 +8,14 @@
 [![Status](https://img.shields.io/badge/status-production--ready-green.svg)](https://github.com/SkyyRoseLLC/DevSkyy)
 [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)
 
-> **Industry-Leading** WordPress/Elementor Theme Builder + Fashion E-commerce Automation + 57 ML-Powered AI Agents
+> **Industry-Leading** WordPress/Elementor Theme Builder + Fashion E-commerce
+> Automation + 57 ML-Powered AI Agents
 
-**Enterprise-grade AI platform** combining advanced machine learning, automated WordPress theme generation, and full-stack fashion e-commerce automation.
+**Enterprise-grade AI platform** combining advanced machine learning, automated
+WordPress theme generation, and full-stack fashion e-commerce automation.
 
-✅ **ZERO vulnerabilities** | 🎨 **Automated Theme Builder** | 🛍️ **Full Ecommerce Automation** | 🤖 **ML-Powered Agents** | 🛡️ SOC2/GDPR/PCI-DSS Ready
+✅ **ZERO vulnerabilities** | 🎨 **Automated Theme Builder** | 🛍️ **Full
+Ecommerce Automation** | 🤖 **ML-Powered Agents** | 🛡️ SOC2/GDPR/PCI-DSS Ready
 
 ## 🚀 Quick Start
 
@@ -45,6 +48,7 @@ pytest tests/ -v
 ### 🎨 Industry-Leading WordPress/Elementor Theme Builder
 
 **Automated Theme Generation:**
+
 - Generate complete themes from brand guidelines in seconds
 - Multiple templates: luxury, streetwear, minimalist, vintage, sustainable
 - ML-powered color palette and typography optimization
@@ -53,6 +57,7 @@ pytest tests/ -v
 - SEO-optimized structure out of the box
 
 **Pre-Built Page Templates:**
+
 - Homepage with hero, featured products, testimonials, Instagram feed
 - Shop page with advanced filters and product grid
 - Product detail with gallery, reviews, size guide
@@ -60,6 +65,7 @@ pytest tests/ -v
 - All optimized for conversions
 
 **Example Usage:**
+
 ```python
 from agent.wordpress.theme_builder import ElementorThemeBuilder
 
@@ -79,6 +85,7 @@ export = await builder.export_theme(theme["theme"], format="elementor_json")
 ### 🛍️ Full-Stack Fashion E-commerce Automation
 
 **Product Management:**
+
 - ML-powered product descriptions and SEO
 - Automated categorization and tagging
 - Size/color variant generation
@@ -86,6 +93,7 @@ export = await builder.export_theme(theme["theme"], format="elementor_json")
 - Bulk import with AI enhancements
 
 **Dynamic Pricing:**
+
 - Demand-based price optimization
 - Competitor price monitoring
 - Seasonal adjustments
@@ -93,6 +101,7 @@ export = await builder.export_theme(theme["theme"], format="elementor_json")
 - Profit maximization algorithms
 
 **Inventory Optimization:**
+
 - ML demand forecasting (30-90 day predictions)
 - Automated reorder point calculation
 - Dead stock identification
@@ -100,6 +109,7 @@ export = await builder.export_theme(theme["theme"], format="elementor_json")
 - Stock level recommendations
 
 **Customer Intelligence:**
+
 - ML-powered customer segmentation
 - Purchase behavior analysis
 - Personalized recommendations
@@ -107,6 +117,7 @@ export = await builder.export_theme(theme["theme"], format="elementor_json")
 - Lifetime value forecasting
 
 **Example Usage:**
+
 ```python
 from agent.ecommerce.product_manager import ProductManager
 from agent.ecommerce.pricing_engine import DynamicPricingEngine
@@ -137,6 +148,7 @@ forecast = await inventory.forecast_demand(
 ### 🤖 Machine Learning Framework
 
 **Base ML Engine:**
+
 - Domain-specific ML for every agent
 - Continuous learning and model updates
 - Self-healing and anomaly detection
@@ -144,6 +156,7 @@ forecast = await inventory.forecast_demand(
 - A/B testing support
 
 **Fashion ML Engine:**
+
 - Trend prediction and forecasting
 - Style classification
 - Price optimization
@@ -152,19 +165,26 @@ forecast = await inventory.forecast_demand(
 - Color palette generation
 
 **Pre-Trained Models:**
+
 - Fashion trend analysis
 - Customer behavior prediction
 - Inventory demand forecasting
 - Dynamic pricing optimization
 
 **ML Infrastructure:**
-- **Model Registry**: Version control for ML models with stage management (development/staging/production)
-- **Distributed Caching**: Redis-based caching with in-memory fallback for high-performance predictions
-- **Model Explainability**: SHAP-based interpretability for understanding predictions
-- **Automated Retraining**: Scheduled background retraining for continuous improvement
+
+- **Model Registry**: Version control for ML models with stage management
+  (development/staging/production)
+- **Distributed Caching**: Redis-based caching with in-memory fallback for
+  high-performance predictions
+- **Model Explainability**: SHAP-based interpretability for understanding
+  predictions
+- **Automated Retraining**: Scheduled background retraining for continuous
+  improvement
 - **Model Comparison**: Side-by-side metric comparison for A/B testing
 
 **Example Usage:**
+
 ```python
 from ml.model_registry import model_registry, ModelStage
 from ml.redis_cache import redis_cache
@@ -199,9 +219,11 @@ explanation = explainer.explain_prediction(
 )
 print(f"Top features: {explanation['top_features']}")
 ```
+
 - Product recommendation
 
 ### AI Capabilities
+
 - **Claude Sonnet 4.5** - Advanced reasoning and content generation
 - **Multi-Model Orchestration** - GPT-4, Gemini, Mistral, Llama integration
 - **Computer Vision** - Fashion analysis (fabrics, stitching, design)
@@ -209,6 +231,7 @@ print(f"Top features: {explanation['top_features']}")
 - **NLP & Sentiment** - Customer insights and content optimization
 
 ### Automation Systems
+
 - **Self-Healing Code** - Auto-fixes across Python, JavaScript, PHP, and more
 - **Continuous Learning** - 24/7 background improvement and updates
 - **Social Media Automation** - Meta Graph API for Facebook/Instagram
@@ -216,6 +239,7 @@ print(f"Top features: {explanation['top_features']}")
 - **Personalized Rendering** - Dynamic content based on user context
 
 ### E-Commerce Features
+
 - **Product Intelligence** - Automated descriptions and SEO
 - **Customer Analytics** - Behavior tracking and segmentation
 - **Inventory Management** - Smart stock predictions
@@ -225,6 +249,7 @@ print(f"Top features: {explanation['top_features']}")
 ## 📦 Installation
 
 ### Prerequisites
+
 - Python 3.11+
 - Database: SQLite (auto-created) or PostgreSQL/MySQL (optional for production)
 - Redis (optional, recommended for production)
@@ -233,6 +258,7 @@ print(f"Top features: {explanation['top_features']}")
 ### Environment Setup
 
 Create `.env` file with:
+
 ```env
 # Required
 ANTHROPIC_API_KEY=your_key_here
@@ -268,18 +294,21 @@ DevSkyy/
 ### API Endpoints
 
 **Core Services:**
+
 - `/api/v1/agents` - Agent management and execution
 - `/api/v1/auth` - JWT authentication and user management
 - `/api/v1/webhooks` - Webhook subscription and management
 - `/api/v1/monitoring` - Health checks, metrics, and observability
 
 **GDPR Compliance:**
+
 - `/api/v1/gdpr/export` - Export user data (Article 15)
 - `/api/v1/gdpr/delete` - Delete/anonymize user data (Article 17)
 - `/api/v1/gdpr/retention-policy` - Data retention information
 - `/api/v1/gdpr/requests` - Admin view of data subject requests
 
 **ML Infrastructure:**
+
 - `/api/v1/ml/registry/models` - List all registered models
 - `/api/v1/ml/registry/models/{name}/versions` - List model versions
 - `/api/v1/ml/registry/models/{name}/{version}` - Get model metadata
@@ -293,12 +322,14 @@ DevSkyy/
 ### Agent Modules
 
 #### Essential Agents
+
 - `claude_sonnet_intelligence_service.py` - Core AI reasoning
 - `multi_model_ai_orchestrator.py` - Model coordination
 - `universal_self_healing_agent.py` - Code auto-repair
 - `continuous_learning_background_agent.py` - 24/7 learning
 
 #### Specialized Agents
+
 - `fashion_computer_vision_agent.py` - Visual analysis
 - `meta_social_automation_agent.py` - Social media
 - `autonomous_landing_page_generator.py` - Page creation
@@ -322,6 +353,7 @@ pytest tests/test_agents.py -v
 ## 🚀 Deployment
 
 ### Production Checklist
+
 1. Run `python production_safety_check.py`
 2. Review `PRODUCTION_SAFETY_REPORT.md`
 3. Set all required environment variables
@@ -331,12 +363,14 @@ pytest tests/test_agents.py -v
 7. Enable monitoring (logs, metrics)
 
 ### Docker Deployment
+
 ```bash
 docker build -t devSkyy .
 docker run -p 8000:8000 --env-file .env devSkyy
 ```
 
 ### Cloud Deployment
+
 - **AWS**: Use Elastic Beanstalk or ECS
 - **Google Cloud**: Use App Engine or Cloud Run
 - **Azure**: Use App Service or Container Instances
@@ -352,19 +386,21 @@ docker run -p 8000:8000 --env-file .env devSkyy
 
 ### Zero Vulnerabilities Achievement ✅
 
-**DevSkyy has achieved ZERO application vulnerabilities** through comprehensive security hardening:
+**DevSkyy has achieved ZERO application vulnerabilities** through comprehensive
+security hardening:
 
-| Metric | Status | Details |
-|--------|--------|---------|
-| **Application Vulnerabilities** | ✅ **0** | 100% elimination from initial 55 |
-| **Frontend Security** | ✅ **0 vulns** | All packages security-patched |
-| **Backend Security** | ✅ **0 vulns** | All dependencies updated |
-| **Security Grade** | ✅ **A+** | Production-ready posture |
-| **Last Audit** | ✅ **2025-10-12** | Comprehensive scan completed |
+| Metric                          | Status            | Details                          |
+| ------------------------------- | ----------------- | -------------------------------- |
+| **Application Vulnerabilities** | ✅ **0**          | 100% elimination from initial 55 |
+| **Frontend Security**           | ✅ **0 vulns**    | All packages security-patched    |
+| **Backend Security**            | ✅ **0 vulns**    | All dependencies updated         |
+| **Security Grade**              | ✅ **A+**         | Production-ready posture         |
+| **Last Audit**                  | ✅ **2025-10-12** | Comprehensive scan completed     |
 
 ### Security Features
 
 **Enterprise Security Controls:**
+
 - ✅ Environment-based configuration (never commit secrets)
 - ✅ API key encryption and secure storage
 - ✅ Rate limiting via SlowAPI middleware
@@ -376,6 +412,7 @@ docker run -p 8000:8000 --env-file .env devSkyy
 - ✅ Automated vulnerability scanning
 
 **Automated Security Monitoring:**
+
 - **Dependabot**: Weekly automated dependency scanning
 - **GitHub Actions**: Continuous security audits (pip-audit, safety, bandit)
 - **CodeQL Analysis**: Deep code security scanning
@@ -385,6 +422,7 @@ docker run -p 8000:8000 --env-file .env devSkyy
 ### Compliance Ready
 
 **SOC2 Type II:**
+
 - ✅ Zero vulnerabilities in production systems
 - ✅ Comprehensive vulnerability management
 - ✅ Automated patch management
@@ -392,9 +430,13 @@ docker run -p 8000:8000 --env-file .env devSkyy
 - ✅ Complete audit trail
 
 **GDPR (Full Compliance):**
-- ✅ **Article 15 - Right of Access**: `/api/v1/gdpr/export` endpoint for complete data export
-- ✅ **Article 17 - Right to Erasure**: `/api/v1/gdpr/delete` endpoint for data deletion
-- ✅ **Article 13 - Right to Information**: `/api/v1/gdpr/retention-policy` endpoint
+
+- ✅ **Article 15 - Right of Access**: `/api/v1/gdpr/export` endpoint for
+  complete data export
+- ✅ **Article 17 - Right to Erasure**: `/api/v1/gdpr/delete` endpoint for data
+  deletion
+- ✅ **Article 13 - Right to Information**: `/api/v1/gdpr/retention-policy`
+  endpoint
 - ✅ Data protection libraries secured
 - ✅ Encryption packages fully patched (AES-256-GCM)
 - ✅ Zero data leakage vulnerabilities
@@ -402,6 +444,7 @@ docker run -p 8000:8000 --env-file .env devSkyy
 - ✅ Anonymization option for legal/audit retention
 
 **PCI-DSS:**
+
 - ✅ Payment processing libraries secured
 - ✅ Cryptographic controls updated
 - ✅ Network security hardened
@@ -440,18 +483,35 @@ python3 -c "from main_enterprise import app; print('✅ Backend secure')"
 
 ## 📄 License
 
-Proprietary - All Rights Reserved
-© 2024 The Skyy Rose Collection
+Proprietary - All Rights Reserved © 2024 The Skyy Rose Collection
+
+## 📚 Documentation
+
+Comprehensive documentation is organized in the `docs/` directory:
+
+- **[Quick Start Guide](docs/guides/QUICKSTART.md)** - 5-minute setup guide
+- **[Developer Reference](docs/guides/DEVELOPER_QUICKREF.md)** - Daily workflow
+  commands
+- **[Deployment Guide](docs/deployment/DEPLOYMENT_GUIDE.md)** - Production
+  deployment
+- **[Architecture Overview](docs/architecture/DEVSKYY_MASTER_PLAN.md)** - System
+  design
+- **[AI Agents](docs/agents/AGENTS.md)** - Complete agent specifications
+- **[Security & Compliance](docs/security/CLEAN_CODING_AGENTS.md)** - Security
+  documentation
+
+**[📖 Browse All Documentation →](docs/README.md)**
 
 ## 📞 Support
 
 - **Issues**: GitHub Issues
 - **Email**: support@skyyrose.com
-- **Documentation**: `/docs`
+- **Documentation**: [docs/](docs/README.md)
 
 ## 🏆 Tech Stack
 
 ### Backend
+
 - **Framework**: FastAPI 0.119.0, Starlette 0.48.0, Uvicorn
 - **Database**: SQLAlchemy 2.0.36 (SQLite, PostgreSQL, MySQL support)
 - **Caching**: Redis 5.2.1, aioredis
@@ -459,6 +519,7 @@ Proprietary - All Rights Reserved
 - **Authentication**: Passlib, Paramiko
 
 ### AI & Machine Learning
+
 - **Primary AI**: Anthropic Claude Sonnet 4.5 (anthropic 0.69.0)
 - **Multi-Model**: OpenAI GPT-4 (openai 2.3.0)
 - **Transformers**: Hugging Face Transformers 4.47.1
@@ -468,6 +529,7 @@ Proprietary - All Rights Reserved
 - **ML Libraries**: scikit-learn, XGBoost, LightGBM, Stable-Baselines3
 
 ### Frontend
+
 - **Framework**: React 18 + TypeScript
 - **Build Tool**: Vite (fast HMR and optimized builds)
 - **Styling**: Tailwind CSS
@@ -478,6 +540,7 @@ Proprietary - All Rights Reserved
 - **Charts**: Recharts
 
 ### Infrastructure & DevOps
+
 - **Containerization**: Docker 7.1.0, Kubernetes 31.0.0
 - **Orchestration**: Ansible 10.6.0, Terraform 1.10.3
 - **Monitoring**: Prometheus, Grafana, Sentry SDK
@@ -485,6 +548,7 @@ Proprietary - All Rights Reserved
 - **Queue/Messaging**: Celery 5.4.0, RabbitMQ (pika), Kafka
 
 ### Security & Compliance
+
 - **Vulnerability Scanning**: pip-audit, safety, bandit
 - **Secret Management**: python-secrets
 - **Encryption**: PyCryptodome 3.21.0
@@ -492,10 +556,12 @@ Proprietary - All Rights Reserved
 - **OWASP Tools**: python-owasp
 
 ### Blockchain & Web3
+
 - **Web3**: web3.py 7.7.0
 - **Ethereum**: eth-account 0.13.4, eth-typing, eth-utils
 
 ### Developer Tools
+
 - **Code Quality**: Black 24.10.0, isort 5.13.2, Flake8 7.1.1
 - **Type Checking**: mypy 1.13.0
 - **Testing**: pytest 8.4.2, pytest-asyncio, pytest-cov
@@ -508,17 +574,20 @@ Proprietary - All Rights Reserved
 DevSkyy has undergone **comprehensive security hardening** achieving:
 
 **Phase 1 Results:**
+
 - ✅ Frontend: 3 → 0 vulnerabilities (100% elimination)
 - ✅ Backend: 52 → 29 vulnerabilities (44% reduction)
 - ✅ Attack surface reduced by 70%
 
 **Phase 2 Results:**
+
 - ✅ Backend: 29 → 0 vulnerabilities (100% elimination)
 - ✅ Removed 20 orphaned Jupyter packages
 - ✅ Updated 12 critical security packages
 - ✅ Removed unused security-risk packages
 
 **Final Status:**
+
 - 🎯 **Zero application vulnerabilities**
 - 🛡️ **Grade A+ security posture**
 - ✅ **100% compliance ready** (SOC2, GDPR, PCI-DSS)
@@ -526,6 +595,7 @@ DevSkyy has undergone **comprehensive security hardening** achieving:
 - 📅 **Last audit:** October 12, 2025
 
 **Key Achievements:**
+
 1. Eliminated all 55 initial vulnerabilities
 2. Updated critical packages (FastAPI, Starlette, Cryptography, Jinja2)
 3. Removed vulnerable dependencies (python-jose, ecdsa)

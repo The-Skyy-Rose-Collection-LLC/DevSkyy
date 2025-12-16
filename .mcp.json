@@ -1,0 +1,267 @@
+{
+  "name": "DevSkyy Enterprise Platform",
+  "version": "1.0.0",
+  "description": "Model Context Protocol configuration for DevSkyy's 54-agent ecosystem with OpenAI integration",
+  "author": "The Skyy Rose Collection LLC",
+  "license": "MIT",
+  "homepage": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy",
+
+  "servers": {
+    "devskyy-openai": {
+      "command": "python",
+      "args": ["server.py"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "ENVIRONMENT": "production"
+      },
+      "description": "DevSkyy OpenAI MCP Server with 7 integrated tools",
+      "capabilities": [
+        "completion",
+        "code_generation",
+        "vision_analysis",
+        "function_calling",
+        "model_selection",
+        "agent_integration",
+        "capabilities_info"
+      ]
+    }
+  },
+
+  "tools": {
+    "completion": {
+      "description": "Generate text completions using OpenAI models (GPT-4o, GPT-4o-mini, o1-preview)",
+      "parameters": {
+        "prompt": {
+          "type": "string",
+          "description": "The prompt to complete",
+          "required": true
+        },
+        "model": {
+          "type": "string",
+          "description": "Model to use (gpt-4o, gpt-4o-mini, o1-preview)",
+          "default": "gpt-4o",
+          "enum": ["gpt-4o", "gpt-4o-mini", "o1-preview"]
+        },
+        "max_tokens": {
+          "type": "integer",
+          "description": "Maximum tokens to generate",
+          "default": 1000,
+          "minimum": 1,
+          "maximum": 4000
+        },
+        "temperature": {
+          "type": "number",
+          "description": "Sampling temperature (0.0-2.0)",
+          "default": 0.7,
+          "minimum": 0.0,
+          "maximum": 2.0
+        }
+      }
+    },
+
+    "code_generation": {
+      "description": "Generate code in various programming languages with DevSkyy best practices",
+      "parameters": {
+        "task": {
+          "type": "string",
+          "description": "Description of the code to generate",
+          "required": true
+        },
+        "language": {
+          "type": "string",
+          "description": "Programming language",
+          "default": "python",
+          "enum": [
+            "python",
+            "javascript",
+            "typescript",
+            "html",
+            "css",
+            "sql",
+            "bash"
+          ]
+        },
+        "style": {
+          "type": "string",
+          "description": "Code style/framework",
+          "default": "standard",
+          "enum": ["standard", "fastapi", "react", "vue", "django", "flask"]
+        }
+      }
+    },
+
+    "vision_analysis": {
+      "description": "Analyze images using GPT-4o vision capabilities",
+      "parameters": {
+        "image_url": {
+          "type": "string",
+          "description": "URL or base64 data URI of the image",
+          "required": true
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Analysis prompt or question about the image",
+          "default": "Describe this image in detail"
+        }
+      }
+    },
+
+    "function_calling": {
+      "description": "Execute function calls with structured outputs",
+      "parameters": {
+        "functions": {
+          "type": "array",
+          "description": "Array of function definitions",
+          "required": true
+        },
+        "prompt": {
+          "type": "string",
+          "description": "Prompt that may trigger function calls",
+          "required": true
+        }
+      }
+    },
+
+    "model_selection": {
+      "description": "Get recommendations for optimal model selection based on task requirements",
+      "parameters": {
+        "task_type": {
+          "type": "string",
+          "description": "Type of task",
+          "required": true,
+          "enum": [
+            "completion",
+            "reasoning",
+            "coding",
+            "analysis",
+            "creative",
+            "conversation"
+          ]
+        },
+        "complexity": {
+          "type": "string",
+          "description": "Task complexity level",
+          "default": "medium",
+          "enum": ["low", "medium", "high"]
+        },
+        "speed_priority": {
+          "type": "boolean",
+          "description": "Whether speed is prioritized over quality",
+          "default": false
+        }
+      }
+    },
+
+    "agent_integration": {
+      "description": "Integrate with DevSkyy's 54-agent ecosystem for specialized tasks",
+      "parameters": {
+        "agent_type": {
+          "type": "string",
+          "description": "Type of agent to invoke",
+          "required": true,
+          "enum": [
+            "wordpress_agent",
+            "seo_agent",
+            "content_agent",
+            "social_media_agent",
+            "analytics_agent",
+            "security_agent",
+            "database_agent",
+            "api_agent",
+            "ml_agent",
+            "data_agent",
+            "monitoring_agent",
+            "deployment_agent"
+          ]
+        },
+        "task": {
+          "type": "string",
+          "description": "Task for the agent to perform",
+          "required": true
+        },
+        "context": {
+          "type": "object",
+          "description": "Additional context for the agent",
+          "default": {}
+        }
+      }
+    },
+
+    "capabilities_info": {
+      "description": "Get information about available capabilities and usage examples",
+      "parameters": {
+        "category": {
+          "type": "string",
+          "description": "Category of capabilities to describe",
+          "default": "all",
+          "enum": [
+            "all",
+            "completion",
+            "vision",
+            "functions",
+            "agents",
+            "models"
+          ]
+        }
+      }
+    }
+  },
+
+  "context": {
+    "retrieval": {
+      "enabled": true,
+      "max_results": 10,
+      "similarity_threshold": 0.7,
+      "sources": [
+        "docs/",
+        "README.md",
+        "AGENTS.md",
+        "server.py",
+        "main_enterprise.py"
+      ]
+    },
+    "auto_invoke": {
+      "enabled": true,
+      "triggers": [
+        "documentation",
+        "code examples",
+        "agent capabilities",
+        "API reference",
+        "setup instructions"
+      ]
+    }
+  },
+
+  "security": {
+    "api_key_required": true,
+    "rate_limiting": {
+      "requests_per_minute": 60,
+      "requests_per_hour": 1000
+    },
+    "allowed_origins": [
+      "https://claude.ai",
+      "https://console.anthropic.com",
+      "localhost"
+    ]
+  },
+
+  "logging": {
+    "level": "INFO",
+    "format": "json",
+    "destinations": ["console", "file"],
+    "file_path": "logs/mcp_server.log"
+  },
+
+  "monitoring": {
+    "health_check": {
+      "enabled": true,
+      "endpoint": "/health",
+      "interval": 30
+    },
+    "metrics": {
+      "enabled": true,
+      "endpoint": "/metrics"
+    }
+  }
+}
