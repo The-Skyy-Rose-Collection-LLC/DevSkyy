@@ -1,0 +1,96 @@
+# Vercel Serverless Environment Dependencies
+# Isolated requirements for Vercel deployment
+
+# Core FastAPI for serverless
+fastapi==0.119.0
+mangum==0.18.0  # ASGI adapter for AWS Lambda/Vercel
+starlette==0.48.0
+
+# Data validation
+pydantic==2.10.3
+pydantic-settings==2.7.0
+
+# HTTP client (lightweight)
+httpx==0.28.1
+
+# JSON handling (fast)
+orjson==3.10.12
+
+# Environment management
+python-dotenv==1.0.1
+
+# Database (serverless-friendly)
+sqlalchemy==2.0.36
+aiosqlite==0.20.0  # Lightweight SQLite for serverless
+asyncpg==0.30.0    # PostgreSQL async for production
+
+# Caching (serverless-compatible)
+redis==5.2.1
+
+# Security (minimal)
+cryptography==46.0.2
+pyjwt==2.10.1
+passlib[bcrypt]==1.7.4
+
+# Async support
+asyncio==3.4.3
+aiofiles==24.1.0
+
+# Logging (serverless-optimized)
+structlog==24.4.0
+
+# Date/time handling
+python-dateutil==2.9.0.post0
+
+# Type checking
+typing-extensions==4.12.2
+
+# WordPress integration (lightweight)
+requests==2.32.3
+beautifulsoup4==4.12.3
+
+# AI integrations (core only)
+openai==1.57.2
+
+# File processing (minimal)
+pillow==11.0.0
+
+# Configuration
+pyyaml==6.0.2
+
+# Error handling
+tenacity==9.0.0
+
+# Rate limiting
+slowapi==0.1.9
+
+# CORS
+fastapi-cors==0.0.6
+
+# Health checks
+healthcheck==1.3.3
+
+# Memory optimization
+psutil==6.1.0
+
+# Serverless utilities
+python-lambda==4.1.0
+
+# Cold start optimization
+uvloop==0.21.0  # Faster event loop
+
+# Minimal dependencies for faster cold starts
+# Avoid heavy ML libraries in serverless environment
+# Use external APIs instead of local models
+
+# Development utilities (lightweight)
+click==8.1.7
+
+# Testing (minimal)
+pytest==8.4.2
+
+# Monitoring (serverless-friendly)
+sentry-sdk[fastapi]==2.19.2
+
+# Performance monitoring
+prometheus-client==0.21.1
