@@ -16,10 +16,10 @@ redis==5.2.1
 aioredis==2.0.1
 
 # Security
-cryptography==46.0.2
+cryptography==46.0.3
 pyjwt==2.10.1
 passlib[bcrypt]==1.7.4
-argon2-cffi==23.1.0
+argon2-cffi==25.1.0
 
 # HTTP client
 httpx>=0.28.1
