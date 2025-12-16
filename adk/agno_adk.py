@@ -415,10 +415,7 @@ class AgnoTeam(BaseDevSkyyAgent):
 
             # Extract content
             content = ""
-            if hasattr(response, "content"):
-                content = response.content
-            else:
-                content = str(response)
+            content = response.content if hasattr(response, "content") else str(response)
 
             input_tokens = int(len(prompt.split()) * 1.3)
             output_tokens = int(len(content.split()) * 1.3)
@@ -499,7 +496,7 @@ class AgnoSpeedAgent(AgnoAgent):
                 provider=ADKProvider.AGNO,
                 model="groq/llama-3.1-70b-versatile",
                 system_prompt="""You are a high-speed assistant for SkyyRose.
-                
+
 Prioritize:
 - Speed and efficiency
 - Concise responses
