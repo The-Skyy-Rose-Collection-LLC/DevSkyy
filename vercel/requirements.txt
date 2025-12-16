@@ -48,7 +48,7 @@ openai==1.57.2
 pyyaml==6.0.2
 
 # Error handling
-tenacity==9.0.0
+tenacity==9.1.2
 
 # CORS
 fastapi-cors==0.0.6
