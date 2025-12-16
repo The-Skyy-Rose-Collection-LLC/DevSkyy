@@ -1,6 +1,8 @@
 version: 2
 updates:
-  # Python dependencies
+  # ==========================================================================
+  # Python Dependencies
+  # ==========================================================================
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
@@ -12,9 +14,9 @@ updates:
       - "The-Skyy-Rose-Collection-LLC"
     labels:
       - "dependencies"
-      - "security"
+      - "python"
     commit-message:
-      prefix: "deps"
+      prefix: "deps(python)"
       include: "scope"
     ignore:
       # Ignore major version updates for stable dependencies
@@ -29,17 +31,87 @@ updates:
           - "PyJWT"
           - "passlib"
           - "argon2-cffi"
+          - "bcrypt"
+      llm-providers:
+        patterns:
+          - "openai"
+          - "anthropic"
+          - "google-genai"
+          - "mistralai"
+          - "cohere"
+          - "groq"
       testing:
         patterns:
           - "pytest*"
+          - "coverage*"
+      linting:
+        patterns:
+          - "ruff"
+          - "black"
+          - "isort"
+          - "mypy"
       dev-dependencies:
         dependency-type: "development"
 
+  # ==========================================================================
+  # NPM Dependencies (TypeScript/Three.js)
+  # ==========================================================================
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "tuesday"
+      time: "09:00"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "The-Skyy-Rose-Collection-LLC"
+    labels:
+      - "dependencies"
+      - "typescript"
+    commit-message:
+      prefix: "deps(npm)"
+      include: "scope"
+    ignore:
+      # Ignore major version updates for core dependencies
+      - dependency-name: "three"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
+    groups:
+      three-js:
+        patterns:
+          - "three"
+          - "@types/three"
+      testing:
+        patterns:
+          - "jest*"
+          - "@types/jest"
+          - "ts-jest"
+          - "jest-environment-jsdom"
+      typescript:
+        patterns:
+          - "typescript"
+          - "ts-node"
+          - "@types/*"
+      build:
+        patterns:
+          - "vite"
+          - "esbuild"
+      linting:
+        patterns:
+          - "eslint*"
+          - "prettier"
+
+  # ==========================================================================
   # GitHub Actions
+  # ==========================================================================
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "wednesday"
     labels:
       - "dependencies"
       - "github-actions"
+    commit-message:
+      prefix: "deps(actions)"
