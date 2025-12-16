@@ -1,51 +1,47 @@
 """
-DevSkyy WordPress/WooCommerce Integration Module
-=================================================
+DevSkyy WordPress Module
+========================
 
-Complete integration with WordPress REST API and WooCommerce.
+WordPress/WooCommerce/Elementor integration.
 
 Components:
-- client.py: Base WordPress REST API client
-- products.py: WooCommerce product management
-- media.py: Media library operations
-- elementor.py: Elementor template generation
+- WordPressClient: Core WordPress REST API client
+- ElementorBuilder: Elementor template generation
+- MediaManager: Media upload and management
+- WooCommerceProducts: Product CRUD operations
 
-Usage:
-    from wordpress import WordPressClient, WooCommerceProducts
-
-    client = WordPressClient(
-        url="https://skyyrose.co",
-        username="admin",
-        app_password="xxxx-xxxx-xxxx-xxxx"
-    )
+Integration:
+- WordPress REST API v2
+- WooCommerce REST API v3
+- Elementor Kit/Template format
 """
 
 from .client import (
     AuthenticationError,
     NotFoundError,
-    RateLimitError,
     WordPressClient,
     WordPressConfig,
     WordPressError,
 )
 from .elementor import (
-    ElementorSection,
-    ElementorTemplateGenerator,
-    ElementorWidget,
-    TemplateType,
+    BrandKit,
+    ElementorBuilder,
+    ElementorConfig,
+    ElementorTemplate,
+    PageSpec,
+    SectionLayout,
+    WidgetType,
+    generate_template,
 )
 from .media import (
-    MediaItem,
+    ImageOptimizer,
     MediaManager,
-    MediaType,
+    MediaUpload,
 )
 from .products import (
-    Product,
-    ProductCategory,
-    ProductStatus,
-    ProductType,
+    ProductCreate,
+    ProductUpdate,
     ProductVariation,
-    StockStatus,
     WooCommerceProducts,
 )
 
@@ -56,22 +52,22 @@ __all__ = [
     "WordPressError",
     "AuthenticationError",
     "NotFoundError",
-    "RateLimitError",
-    # Products
-    "WooCommerceProducts",
-    "Product",
-    "ProductVariation",
-    "ProductCategory",
-    "ProductStatus",
-    "ProductType",
-    "StockStatus",
+    # Elementor
+    "ElementorBuilder",
+    "ElementorConfig",
+    "BrandKit",
+    "PageSpec",
+    "WidgetType",
+    "SectionLayout",
+    "ElementorTemplate",
+    "generate_template",
     # Media
     "MediaManager",
-    "MediaItem",
-    "MediaType",
-    # Elementor
-    "ElementorTemplateGenerator",
-    "TemplateType",
-    "ElementorWidget",
-    "ElementorSection",
+    "MediaUpload",
+    "ImageOptimizer",
+    # Products
+    "WooCommerceProducts",
+    "ProductCreate",
+    "ProductUpdate",
+    "ProductVariation",
 ]

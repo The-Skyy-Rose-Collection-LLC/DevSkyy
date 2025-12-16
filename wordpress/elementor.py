@@ -1,28 +1,33 @@
 """
-Elementor Template Generator
-============================
+Elementor Template Builder
+==========================
 
-Generate Elementor Pro JSON templates for SkyyRose brand.
+Generate Elementor-compatible templates programmatically.
 
-Templates:
-- Homepage with hero, collections, testimonials
-- Collection landing pages (BLACK ROSE, LOVE HURTS, SIGNATURE)
-- Product page components
-- About page
-- Blog/Journal page
+Features:
+- BrandKit: Design tokens (colors, typography, spacing)
+- PageSpec: Page type definitions
+- Template generation for various page types
+- JSON export in Elementor Kit format
 
-References:
-- Elementor JSON Structure: https://developers.elementor.com/
-- SkyyRose Brand: Oakland luxury streetwear, "Where Love Meets Luxury"
+Compatible with:
+- Elementor Pro 3.32+
+- Shoptimizer 2.9.0 theme
+
+Author: DevSkyy Platform Team
+Version: 1.0.0
 """
+
+from __future__ import annotations
 
 import json
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
 from typing import Any
+
+from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
 
@@ -32,918 +37,675 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-class TemplateType(str, Enum):
-    """Elementor template types"""
-
-    PAGE = "page"
-    SECTION = "section"
-    HEADER = "header"
-    FOOTER = "footer"
-    SINGLE = "single"
-    ARCHIVE = "archive"
-    POPUP = "popup"
-    LOOP_ITEM = "loop-item"
-
-
 class WidgetType(str, Enum):
-    """Common Elementor widget types"""
+    """Elementor widget types."""
 
     HEADING = "heading"
     TEXT_EDITOR = "text-editor"
     IMAGE = "image"
-    VIDEO = "video"
+    IMAGE_BOX = "image-box"
     BUTTON = "button"
     ICON = "icon"
-    DIVIDER = "divider"
-    SPACER = "spacer"
-    IMAGE_BOX = "image-box"
     ICON_BOX = "icon-box"
-    GALLERY = "gallery"
-    CAROUSEL = "media-carousel"
-    TESTIMONIAL = "testimonial"
-    TABS = "tabs"
-    ACCORDION = "accordion"
-    FORM = "form"
-    POSTS = "posts"
+    SPACER = "spacer"
+    DIVIDER = "divider"
+    VIDEO = "video"
+
+    # WooCommerce
     PRODUCTS = "woocommerce-products"
-    PRODUCT_IMAGES = "wc-product-images"
-    ADD_TO_CART = "wc-add-to-cart"
-    MENU = "nav-menu"
-    SOCIAL = "social-icons"
-    COUNTDOWN = "countdown"
-    PROGRESS = "progress"
-    ANIMATED_HEADLINE = "animated-headline"
-    CALL_TO_ACTION = "call-to-action"
-    FLIP_BOX = "flip-box"
+    PRODUCT_IMAGES = "woocommerce-product-images"
+    PRODUCT_TITLE = "woocommerce-product-title"
+    PRODUCT_PRICE = "woocommerce-product-price"
+    ADD_TO_CART = "woocommerce-product-add-to-cart"
+
+    # Pro
+    LOOP_GRID = "loop-grid"
+    POSTS = "posts"
+    GALLERY = "gallery"
+    FORM = "form"
+    SLIDES = "slides"
+    NAV_MENU = "nav-menu"
+
+
+class SectionLayout(str, Enum):
+    """Section layout types."""
+
+    BOXED = "boxed"
+    FULL_WIDTH = "full_width"
+    FULL_SCREEN = "full_screen"
+
+
+class PageType(str, Enum):
+    """Page types for template generation."""
+
+    HOME = "home"
+    COLLECTION = "collection"
+    PRODUCT = "product"
+    ABOUT = "about"
+    CONTACT = "contact"
+    LOOKBOOK = "lookbook"
 
 
 # =============================================================================
-# SkyyRose Brand Constants
-# =============================================================================
-
-SKYYROSE_BRAND = {
-    "name": "SkyyRose",
-    "tagline": "Where Love Meets Luxury",
-    "location": "Oakland, California",
-    "colors": {
-        "primary": "#D4AF37",  # Rose Gold
-        "secondary": "#0D0D0D",  # Obsidian Black
-        "accent": "#8B7355",  # Warm Bronze
-        "light": "#F5F5F0",  # Ivory
-        "text": "#1A1A1A",
-        "text_light": "#666666",
-    },
-    "fonts": {
-        "heading": "Playfair Display",
-        "body": "Montserrat",
-    },
-    "collections": {
-        "BLACK_ROSE": {
-            "name": "Black Rose",
-            "tagline": "Limited Edition Dark Elegance",
-            "description": "Numbered limited editions crafted for those who appreciate exclusivity and refined darkness.",
-            "color": "#1A1A1A",
-        },
-        "LOVE_HURTS": {
-            "name": "Love Hurts",
-            "tagline": "Emotional Expression Pieces",
-            "description": "Honoring the founder's family name, each piece tells a story of love, loss, and resilience.",
-            "color": "#8B0000",
-        },
-        "SIGNATURE": {
-            "name": "Signature",
-            "tagline": "Foundation Wardrobe Essentials",
-            "description": "Timeless pieces that form the foundation of elevated everyday style.",
-            "color": "#D4AF37",
-        },
-    },
-}
-
-
-# =============================================================================
-# Element Builders
+# BrandKit
 # =============================================================================
 
 
 @dataclass
-class ElementorElement:
-    """Base Elementor element"""
+class BrandColors:
+    """Brand color palette."""
 
-    id: str = field(default_factory=lambda: uuid.uuid4().hex[:7])
-    elType: str = "widget"
-    widgetType: str = ""
-    settings: dict[str, Any] = field(default_factory=dict)
-    elements: list["ElementorElement"] = field(default_factory=list)
+    primary: str = "#D4AF37"  # Rose gold
+    secondary: str = "#0D0D0D"  # Obsidian black
+    accent: str = "#F5F5F0"  # Ivory
+    text: str = "#1A1A1A"
+    text_light: str = "#666666"
+    background: str = "#FFFFFF"
+    background_alt: str = "#F9F9F9"
 
-    def to_dict(self) -> dict:
-        result = {
-            "id": self.id,
-            "elType": self.elType,
-            "settings": self.settings,
-            "elements": [e.to_dict() for e in self.elements],
+
+@dataclass
+class BrandTypography:
+    """Brand typography settings."""
+
+    heading_font: str = "Playfair Display"
+    body_font: str = "Inter"
+    heading_weight: int = 700
+    body_weight: int = 400
+    base_size: int = 16
+    line_height: float = 1.6
+    letter_spacing: str = "0.02em"
+
+
+@dataclass
+class BrandSpacing:
+    """Brand spacing system."""
+
+    unit: int = 8  # Base unit in pixels
+    xs: int = 8
+    sm: int = 16
+    md: int = 24
+    lg: int = 48
+    xl: int = 80
+    xxl: int = 120
+
+
+@dataclass
+class BrandImagery:
+    """Brand imagery guidelines."""
+
+    aspect_ratio_product: str = "3:4"
+    aspect_ratio_hero: str = "16:9"
+    aspect_ratio_square: str = "1:1"
+    default_placeholder: str = ""
+    logo_url: str = ""
+    favicon_url: str = ""
+
+
+@dataclass
+class BrandVoice:
+    """Brand voice and copy guidelines."""
+
+    tagline: str = "Where Love Meets Luxury"
+    tone: str = "sophisticated, elevated, authentic"
+    cta_primary: str = "Shop Now"
+    cta_secondary: str = "Discover More"
+
+
+@dataclass
+class BrandKit:
+    """
+    Complete brand design system.
+
+    Contains all design tokens needed for consistent template generation.
+    """
+
+    name: str = "SkyyRose"
+    colors: BrandColors = field(default_factory=BrandColors)
+    typography: BrandTypography = field(default_factory=BrandTypography)
+    spacing: BrandSpacing = field(default_factory=BrandSpacing)
+    imagery: BrandImagery = field(default_factory=BrandImagery)
+    voice: BrandVoice = field(default_factory=BrandVoice)
+
+    def to_css_vars(self) -> dict[str, str]:
+        """Export as CSS custom properties."""
+        return {
+            "--color-primary": self.colors.primary,
+            "--color-secondary": self.colors.secondary,
+            "--color-accent": self.colors.accent,
+            "--color-text": self.colors.text,
+            "--color-text-light": self.colors.text_light,
+            "--color-bg": self.colors.background,
+            "--color-bg-alt": self.colors.background_alt,
+            "--font-heading": self.typography.heading_font,
+            "--font-body": self.typography.body_font,
+            "--spacing-unit": f"{self.spacing.unit}px",
         }
-        if self.widgetType:
-            result["widgetType"] = self.widgetType
-        return result
+
+    def to_elementor_globals(self) -> dict[str, Any]:
+        """Export as Elementor global settings."""
+        return {
+            "colors": [
+                {"_id": "primary", "title": "Primary", "color": self.colors.primary},
+                {"_id": "secondary", "title": "Secondary", "color": self.colors.secondary},
+                {"_id": "accent", "title": "Accent", "color": self.colors.accent},
+                {"_id": "text", "title": "Text", "color": self.colors.text},
+            ],
+            "typography": [
+                {
+                    "_id": "heading",
+                    "title": "Heading",
+                    "typography_font_family": self.typography.heading_font,
+                    "typography_font_weight": str(self.typography.heading_weight),
+                },
+                {
+                    "_id": "body",
+                    "title": "Body",
+                    "typography_font_family": self.typography.body_font,
+                    "typography_font_weight": str(self.typography.body_weight),
+                },
+            ],
+        }
+
+
+# Default SkyyRose brand kit
+SKYYROSE_BRAND_KIT = BrandKit()
+
+
+# =============================================================================
+# PageSpec
+# =============================================================================
 
 
 @dataclass
-class ElementorWidget(ElementorElement):
-    """Elementor widget"""
+class PageSpec:
+    """
+    Page specification for template generation.
 
-    elType: str = "widget"
+    Defines the structure and content requirements for a page type.
+    """
 
-    @classmethod
+    page_type: PageType
+    title: str
+    slug: str
+    description: str = ""
+
+    # Layout
+    sections: list[str] = field(default_factory=list)
+    layout: SectionLayout = SectionLayout.FULL_WIDTH
+
+    # Content
+    hero_enabled: bool = True
+    hero_title: str = ""
+    hero_subtitle: str = ""
+    hero_cta: str = ""
+    hero_image: str = ""
+
+    # SEO
+    meta_title: str = ""
+    meta_description: str = ""
+
+    # Template settings
+    template: str = "elementor_canvas"
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary."""
+        return {
+            "page_type": self.page_type.value,
+            "title": self.title,
+            "slug": self.slug,
+            "description": self.description,
+            "sections": self.sections,
+            "layout": self.layout.value,
+            "hero": {
+                "enabled": self.hero_enabled,
+                "title": self.hero_title,
+                "subtitle": self.hero_subtitle,
+                "cta": self.hero_cta,
+                "image": self.hero_image,
+            },
+            "seo": {
+                "meta_title": self.meta_title,
+                "meta_description": self.meta_description,
+            },
+        }
+
+
+# =============================================================================
+# Elementor Template
+# =============================================================================
+
+
+class ElementorTemplate(BaseModel):
+    """Elementor template data structure."""
+
+    version: str = "0.4"
+    title: str = ""
+    type: str = "page"
+    content: list[dict[str, Any]] = Field(default_factory=list)
+    page_settings: dict[str, Any] = Field(default_factory=dict)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    def add_section(
+        self,
+        widgets: list[dict[str, Any]],
+        layout: SectionLayout = SectionLayout.BOXED,
+        settings: dict[str, Any] | None = None,
+    ) -> str:
+        """Add a section with widgets."""
+        section_id = f"s{uuid.uuid4().hex[:7]}"
+
+        section = {
+            "id": section_id,
+            "elType": "section",
+            "settings": {
+                "layout": layout.value,
+                "content_width": (
+                    {"size": 1200, "unit": "px"} if layout == SectionLayout.BOXED else {}
+                ),
+                **(settings or {}),
+            },
+            "elements": [
+                {
+                    "id": f"c{uuid.uuid4().hex[:7]}",
+                    "elType": "column",
+                    "settings": {"_column_size": 100},
+                    "elements": widgets,
+                }
+            ],
+        }
+
+        self.content.append(section)
+        return section_id
+
+    def to_json(self) -> str:
+        """Export as JSON string."""
+        return json.dumps(self.model_dump(), indent=2)
+
+    def to_file(self, filepath: str) -> None:
+        """Export to file."""
+        with open(filepath, "w") as f:
+            f.write(self.to_json())
+
+
+# =============================================================================
+# ElementorConfig
+# =============================================================================
+
+
+@dataclass
+class ElementorConfig:
+    """Elementor generation configuration."""
+
+    brand_kit: BrandKit = field(default_factory=lambda: SKYYROSE_BRAND_KIT)
+    elementor_version: str = "3.32.0"
+    shoptimizer_version: str = "2.9.0"
+    output_dir: str = "./templates/elementor"
+
+
+# =============================================================================
+# Elementor Builder
+# =============================================================================
+
+
+class ElementorBuilder:
+    """
+    Elementor template generator.
+
+    Usage:
+        builder = ElementorBuilder()
+
+        # Generate home page
+        template = builder.generate_home_page(
+            hero_title="SkyyRose",
+            hero_subtitle="Where Love Meets Luxury",
+            collections=["BLACK_ROSE", "LOVE_HURTS", "SIGNATURE"],
+        )
+
+        # Generate PDP template
+        template = builder.generate_product_page()
+
+        # Export
+        template.to_file("home.json")
+    """
+
+    def __init__(self, config: ElementorConfig | None = None) -> None:
+        self.config = config or ElementorConfig()
+        self.brand = self.config.brand_kit
+
+    # -------------------------------------------------------------------------
+    # Widget Builders
+    # -------------------------------------------------------------------------
+
+    def _widget(
+        self,
+        widget_type: WidgetType,
+        settings: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Create a widget element."""
+        return {
+            "id": f"w{uuid.uuid4().hex[:7]}",
+            "elType": "widget",
+            "widgetType": widget_type.value,
+            "settings": settings,
+        }
+
     def heading(
-        cls,
-        title: str,
+        self,
+        text: str,
+        size: str = "xl",
         tag: str = "h2",
         align: str = "center",
-        color: str = None,
-        size: str = None,
-    ) -> "ElementorWidget":
-        """Create heading widget"""
-        settings = {
-            "title": title,
-            "header_size": tag,
-            "align": align,
-            "typography_typography": "custom",
-            "typography_font_family": SKYYROSE_BRAND["fonts"]["heading"],
-        }
-        if color:
-            settings["title_color"] = color
-        if size:
-            settings["typography_font_size"] = {"unit": "px", "size": int(size)}
+    ) -> dict[str, Any]:
+        """Create heading widget."""
+        size_map = {"sm": "small", "md": "medium", "lg": "large", "xl": "xl", "xxl": "xxl"}
+        return self._widget(
+            WidgetType.HEADING,
+            {
+                "title": text,
+                "size": size_map.get(size, "large"),
+                "header_size": tag,
+                "align": align,
+                "title_color": self.brand.colors.text,
+                "typography_font_family": self.brand.typography.heading_font,
+                "typography_font_weight": str(self.brand.typography.heading_weight),
+            },
+        )
 
-        return cls(widgetType="heading", settings=settings)
+    def text(self, content: str, align: str = "center") -> dict[str, Any]:
+        """Create text editor widget."""
+        return self._widget(
+            WidgetType.TEXT_EDITOR,
+            {
+                "editor": content,
+                "align": align,
+                "text_color": self.brand.colors.text_light,
+                "typography_font_family": self.brand.typography.body_font,
+            },
+        )
 
-    @classmethod
-    def text(
-        cls,
-        content: str,
-        align: str = "center",
-        color: str = None,
-    ) -> "ElementorWidget":
-        """Create text editor widget"""
-        settings = {
-            "editor": content,
-            "align": align,
-            "typography_typography": "custom",
-            "typography_font_family": SKYYROSE_BRAND["fonts"]["body"],
-        }
-        if color:
-            settings["text_color"] = color
-
-        return cls(widgetType="text-editor", settings=settings)
-
-    @classmethod
     def button(
-        cls,
+        self,
         text: str,
         link: str = "#",
-        style: str = "default",
+        style: str = "primary",
         size: str = "md",
-        align: str = "center",
-        bg_color: str = None,
-        text_color: str = None,
-    ) -> "ElementorWidget":
-        """Create button widget"""
-        settings = {
-            "text": text,
-            "link": {"url": link, "is_external": False, "nofollow": False},
-            "button_type": style,
-            "size": size,
-            "align": align,
-        }
-        if bg_color:
-            settings["background_color"] = bg_color
-        if text_color:
-            settings["button_text_color"] = text_color
+    ) -> dict[str, Any]:
+        """Create button widget."""
+        bg_color = self.brand.colors.primary if style == "primary" else "transparent"
+        text_color = "#FFFFFF" if style == "primary" else self.brand.colors.primary
 
-        return cls(widgetType="button", settings=settings)
+        return self._widget(
+            WidgetType.BUTTON,
+            {
+                "text": text,
+                "link": {"url": link, "is_external": False},
+                "size": size,
+                "button_background_color": bg_color,
+                "button_text_color": text_color,
+                "button_border_border": "solid" if style != "primary" else "",
+                "button_border_width": (
+                    {"top": "1", "right": "1", "bottom": "1", "left": "1"}
+                    if style != "primary"
+                    else {}
+                ),
+                "button_border_color": self.brand.colors.primary if style != "primary" else "",
+                "typography_font_family": self.brand.typography.body_font,
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+            },
+        )
 
-    @classmethod
     def image(
-        cls,
+        self,
         url: str,
         alt: str = "",
         size: str = "full",
         align: str = "center",
-        link: str = None,
-    ) -> "ElementorWidget":
-        """Create image widget"""
-        settings = {
-            "image": {"url": url, "alt": alt},
-            "image_size": size,
-            "align": align,
-        }
-        if link:
-            settings["link"] = {"url": link}
+    ) -> dict[str, Any]:
+        """Create image widget."""
+        return self._widget(
+            WidgetType.IMAGE,
+            {
+                "image": {"url": url, "alt": alt},
+                "image_size": size,
+                "align": align,
+            },
+        )
 
-        return cls(widgetType="image", settings=settings)
+    def spacer(self, size: int = 48) -> dict[str, Any]:
+        """Create spacer widget."""
+        return self._widget(
+            WidgetType.SPACER,
+            {"space": {"size": size, "unit": "px"}},
+        )
 
-    @classmethod
-    def spacer(cls, height: int = 50) -> "ElementorWidget":
-        """Create spacer widget"""
-        return cls(widgetType="spacer", settings={"space": {"unit": "px", "size": height}})
-
-    @classmethod
-    def divider(cls, style: str = "solid", color: str = None) -> "ElementorWidget":
-        """Create divider widget"""
-        settings = {"style": style}
-        if color:
-            settings["color"] = color
-        return cls(widgetType="divider", settings=settings)
-
-    @classmethod
-    def products(
-        cls,
+    def products_grid(
+        self,
         columns: int = 4,
         rows: int = 2,
-        category: list[int] = None,
-        orderby: str = "date",
-    ) -> "ElementorWidget":
-        """Create WooCommerce products widget"""
-        settings = {
-            "columns": columns,
-            "rows": rows,
-            "orderby": orderby,
-            "paginate": "yes",
-        }
-        if category:
-            settings["query_include"] = "terms"
-            settings["query_include_term_ids"] = category
-
-        return cls(widgetType="woocommerce-products", settings=settings)
-
-    @classmethod
-    def icon_box(
-        cls,
-        title: str,
-        description: str,
-        icon: str = "fas fa-star",
-        position: str = "top",
-    ) -> "ElementorWidget":
-        """Create icon box widget"""
-        return cls(
-            widgetType="icon-box",
-            settings={
-                "title_text": title,
-                "description_text": description,
-                "selected_icon": {"value": icon, "library": "fa-solid"},
-                "position": position,
+        category: str = "",
+    ) -> dict[str, Any]:
+        """Create WooCommerce products grid."""
+        return self._widget(
+            WidgetType.PRODUCTS,
+            {
+                "columns": str(columns),
+                "rows": str(rows),
+                "query_post_type": "product",
+                "query_product_cat_ids": [category] if category else [],
+                "paginate": "yes",
             },
         )
 
-    @classmethod
-    def testimonial(
-        cls,
-        content: str,
-        name: str,
-        title: str = "",
-        image_url: str = None,
-    ) -> "ElementorWidget":
-        """Create testimonial widget"""
-        settings = {
-            "testimonial_content": content,
-            "testimonial_name": name,
-            "testimonial_job": title,
-        }
-        if image_url:
-            settings["testimonial_image"] = {"url": image_url}
+    # -------------------------------------------------------------------------
+    # Section Builders
+    # -------------------------------------------------------------------------
 
-        return cls(widgetType="testimonial", settings=settings)
-
-    @classmethod
-    def social_icons(
-        cls,
-        icons: list[dict[str, str]] = None,
-    ) -> "ElementorWidget":
-        """Create social icons widget"""
-        default_icons = [
-            {
-                "social_icon": {"value": "fab fa-instagram"},
-                "link": {"url": "https://instagram.com/skyyrose"},
-            },
-            {
-                "social_icon": {"value": "fab fa-tiktok"},
-                "link": {"url": "https://tiktok.com/@skyyrose"},
-            },
-            {
-                "social_icon": {"value": "fab fa-twitter"},
-                "link": {"url": "https://twitter.com/skyyrose"},
-            },
-        ]
-
-        return cls(
-            widgetType="social-icons",
-            settings={"social_icon_list": icons or default_icons},
-        )
-
-
-@dataclass
-class ElementorColumn(ElementorElement):
-    """Elementor column"""
-
-    elType: str = "column"
-    _column_size: int = 100
-
-    def to_dict(self) -> dict:
-        result = super().to_dict()
-        result["settings"]["_column_size"] = self._column_size
-        return result
-
-
-@dataclass
-class ElementorSection(ElementorElement):
-    """Elementor section"""
-
-    elType: str = "section"
-
-    @classmethod
-    def create(
-        cls,
-        widgets: list[ElementorWidget],
-        columns: int = 1,
-        layout: str = "boxed",
-        bg_color: str = None,
-        bg_image: str = None,
-        padding: dict[str, int] = None,
-        min_height: int = None,
-        content_position: str = "middle",
-    ) -> "ElementorSection":
-        """Create section with widgets distributed across columns"""
-        settings = {
-            "layout": layout,
-            "content_position": content_position,
-        }
-
-        if bg_color:
-            settings["background_background"] = "classic"
-            settings["background_color"] = bg_color
-
-        if bg_image:
-            settings["background_background"] = "classic"
-            settings["background_image"] = {"url": bg_image}
-            settings["background_position"] = "center center"
-            settings["background_size"] = "cover"
-
-        if padding:
-            settings["padding"] = {
-                "unit": "px",
-                "top": padding.get("top", 50),
-                "bottom": padding.get("bottom", 50),
-                "left": padding.get("left", 0),
-                "right": padding.get("right", 0),
-            }
-
-        if min_height:
-            settings["min_height"] = {"unit": "vh", "size": min_height}
-
-        # Create columns
-        column_size = 100 // columns
-        column_elements = []
-
-        for i in range(columns):
-            col = ElementorColumn(_column_size=column_size)
-            # Distribute widgets to columns
-            widgets_for_col = widgets[i::columns] if widgets else []
-            col.elements = widgets_for_col
-            column_elements.append(col)
-
-        section = cls(settings=settings)
-        section.elements = column_elements
-        return section
-
-
-# =============================================================================
-# Template Generator
-# =============================================================================
-
-
-class ElementorTemplateGenerator:
-    """
-    Generate Elementor Pro templates for SkyyRose
-
-    Usage:
-        generator = ElementorTemplateGenerator()
-
-        # Generate homepage
-        homepage = generator.homepage()
-
-        # Generate collection page
-        black_rose = generator.collection_page("BLACK_ROSE")
-
-        # Export to JSON
-        json_data = generator.export(homepage)
-    """
-
-    def __init__(self, brand: dict = None):
-        self.brand = brand or SKYYROSE_BRAND
-
-    def _create_template(
+    def hero_section(
         self,
         title: str,
-        template_type: TemplateType,
-        elements: list[ElementorSection],
-    ) -> dict:
-        """Create template structure"""
-        return {
-            "title": title,
-            "type": template_type.value,
-            "version": "0.4",
-            "metadata": {
-                "title": title,
-                "type": template_type.value,
-                "created_at": datetime.utcnow().isoformat(),
-                "generator": "DevSkyy ElementorTemplateGenerator",
-                "brand": "SkyyRose",
+        subtitle: str = "",
+        cta_text: str = "",
+        cta_link: str = "",
+        background_image: str = "",
+    ) -> list[dict[str, Any]]:
+        """Build hero section widgets."""
+        widgets = []
+
+        widgets.append(self.spacer(80))
+        widgets.append(self.heading(title, size="xxl", tag="h1"))
+
+        if subtitle:
+            widgets.append(self.text(f"<p>{subtitle}</p>"))
+
+        if cta_text:
+            widgets.append(self.spacer(24))
+            widgets.append(self.button(cta_text, cta_link))
+
+        widgets.append(self.spacer(80))
+
+        return widgets
+
+    def collection_section(
+        self,
+        title: str,
+        subtitle: str = "",
+        category_slug: str = "",
+        columns: int = 4,
+    ) -> list[dict[str, Any]]:
+        """Build collection section widgets."""
+        widgets = []
+
+        widgets.append(self.spacer(60))
+        widgets.append(self.heading(title, size="xl"))
+
+        if subtitle:
+            widgets.append(self.text(f"<p>{subtitle}</p>"))
+
+        widgets.append(self.spacer(32))
+        widgets.append(self.products_grid(columns=columns, category=category_slug))
+        widgets.append(self.spacer(60))
+
+        return widgets
+
+    # -------------------------------------------------------------------------
+    # Template Generators
+    # -------------------------------------------------------------------------
+
+    def generate_home_page(
+        self,
+        hero_title: str = "",
+        hero_subtitle: str = "",
+        hero_cta: str = "",
+        hero_link: str = "/shop",
+        hero_image: str = "",
+        collections: list[dict[str, str]] | None = None,
+    ) -> ElementorTemplate:
+        """Generate home page template."""
+        template = ElementorTemplate(
+            title="Home",
+            page_settings={
+                "hide_title": "yes",
+                "template": "elementor_canvas",
             },
-            "content": [section.to_dict() for section in elements],
-        }
-
-    # -------------------------------------------------------------------------
-    # Homepage
-    # -------------------------------------------------------------------------
-
-    def homepage(self) -> dict:
-        """Generate SkyyRose homepage template"""
-        sections = []
-
-        # Hero Section
-        hero = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading(
-                    "SkyyRose",
-                    tag="h1",
-                    color=self.brand["colors"]["primary"],
-                    size="72",
-                ),
-                ElementorWidget.text(
-                    f"<p style='font-size: 24px;'>{self.brand['tagline']}</p>",
-                    color=self.brand["colors"]["light"],
-                ),
-                ElementorWidget.text(
-                    "<p>Oakland, California</p>",
-                    color=self.brand["colors"]["text_light"],
-                ),
-                ElementorWidget.spacer(30),
-                ElementorWidget.button(
-                    "Shop Collections",
-                    link="/collections",
-                    size="lg",
-                    bg_color=self.brand["colors"]["primary"],
-                    text_color=self.brand["colors"]["secondary"],
-                ),
-            ],
-            bg_color=self.brand["colors"]["secondary"],
-            min_height=100,
-            padding={"top": 150, "bottom": 150},
-        )
-        sections.append(hero)
-
-        # Collections Grid
-        collections_intro = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Our Collections", tag="h2"),
-                ElementorWidget.text("<p>Three distinct expressions of luxury streetwear</p>"),
-                ElementorWidget.spacer(30),
-            ],
-            padding={"top": 80, "bottom": 20},
-        )
-        sections.append(collections_intro)
-
-        # Collection Cards
-        collection_widgets = []
-        for _key, collection in self.brand["collections"].items():
-            collection_widgets.extend(
-                [
-                    ElementorWidget.heading(collection["name"], tag="h3", size="28"),
-                    ElementorWidget.text(f"<p>{collection['tagline']}</p>"),
-                    ElementorWidget.button(
-                        "Explore",
-                        link=f"/collections/{collection['name'].lower().replace(' ', '-')}",
-                        size="sm",
-                    ),
-                ]
-            )
-
-        collections_section = ElementorSection.create(
-            widgets=collection_widgets,
-            columns=3,
-            padding={"top": 20, "bottom": 80},
-        )
-        sections.append(collections_section)
-
-        # Featured Products
-        featured = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Featured Pieces", tag="h2"),
-                ElementorWidget.spacer(20),
-                ElementorWidget.products(columns=4, rows=1, orderby="popularity"),
-            ],
-            bg_color=self.brand["colors"]["light"],
-            padding={"top": 80, "bottom": 80},
-        )
-        sections.append(featured)
-
-        # Brand Story
-        story = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("The Story", tag="h2"),
-                ElementorWidget.text(
-                    "<p>Born in Oakland, SkyyRose emerges from a vision of luxury "
-                    "that speaks to the soul. Every piece is crafted with intention, "
-                    "designed for those who understand that true style transcends trends.</p>"
-                    "<p>Where Love Meets Luxury isn't just a tagline—it's our promise.</p>"
-                ),
-                ElementorWidget.button("About Us", link="/about", size="md"),
-            ],
-            padding={"top": 100, "bottom": 100},
-        )
-        sections.append(story)
-
-        # Values
-        values = ElementorSection.create(
-            widgets=[
-                ElementorWidget.icon_box(
-                    "Craftsmanship",
-                    "Every stitch tells a story of dedication",
-                    "fas fa-gem",
-                ),
-                ElementorWidget.icon_box(
-                    "Exclusivity",
-                    "Limited editions for the discerning few",
-                    "fas fa-crown",
-                ),
-                ElementorWidget.icon_box(
-                    "Oakland Roots",
-                    "Bay Area heritage in every design",
-                    "fas fa-city",
-                ),
-            ],
-            columns=3,
-            bg_color=self.brand["colors"]["secondary"],
-            padding={"top": 60, "bottom": 60},
-        )
-        sections.append(values)
-
-        # Newsletter
-        newsletter = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Join the Rose Garden", tag="h3"),
-                ElementorWidget.text(
-                    "<p>Be the first to know about new drops and exclusive offers</p>"
-                ),
-                ElementorWidget.spacer(20),
-            ],
-            bg_color=self.brand["colors"]["light"],
-            padding={"top": 60, "bottom": 60},
-        )
-        sections.append(newsletter)
-
-        return self._create_template(
-            title="SkyyRose Homepage",
-            template_type=TemplateType.PAGE,
-            elements=sections,
         )
 
-    # -------------------------------------------------------------------------
-    # Collection Pages
-    # -------------------------------------------------------------------------
-
-    def collection_page(self, collection_key: str) -> dict:
-        """Generate collection landing page"""
-        collection = self.brand["collections"].get(collection_key.upper())
-
-        if not collection:
-            raise ValueError(f"Unknown collection: {collection_key}")
-
-        sections = []
-
-        # Hero
-        hero = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading(
-                    collection["name"],
-                    tag="h1",
-                    color=self.brand["colors"]["primary"],
-                    size="64",
-                ),
-                ElementorWidget.text(
-                    f"<p style='font-size: 20px;'>{collection['tagline']}</p>",
-                    color=self.brand["colors"]["light"],
-                ),
-                ElementorWidget.divider(color=self.brand["colors"]["primary"]),
-                ElementorWidget.text(
-                    f"<p>{collection['description']}</p>",
-                    color=self.brand["colors"]["text_light"],
-                ),
-            ],
-            bg_color=collection["color"],
-            min_height=60,
-            padding={"top": 120, "bottom": 120},
+        # Hero section
+        hero_widgets = self.hero_section(
+            title=hero_title or self.brand.name,
+            subtitle=hero_subtitle or self.brand.voice.tagline,
+            cta_text=hero_cta or self.brand.voice.cta_primary,
+            cta_link=hero_link,
+            background_image=hero_image,
         )
-        sections.append(hero)
+        template.add_section(hero_widgets, layout=SectionLayout.FULL_WIDTH)
+
+        # Collection sections
+        if collections:
+            for col in collections:
+                col_widgets = self.collection_section(
+                    title=col.get("title", "Collection"),
+                    subtitle=col.get("subtitle", ""),
+                    category_slug=col.get("slug", ""),
+                )
+                template.add_section(col_widgets)
+
+        return template
+
+    def generate_collection_page(
+        self,
+        title: str,
+        description: str = "",
+        category_slug: str = "",
+    ) -> ElementorTemplate:
+        """Generate collection/archive page template."""
+        template = ElementorTemplate(
+            title=title,
+            page_settings={"template": "elementor_header_footer"},
+        )
+
+        # Header
+        header_widgets = [
+            self.spacer(48),
+            self.heading(title, size="xl", tag="h1"),
+        ]
+        if description:
+            header_widgets.append(self.text(f"<p>{description}</p>"))
+        header_widgets.append(self.spacer(32))
+
+        template.add_section(header_widgets)
 
         # Products
-        products = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("The Collection", tag="h2"),
-                ElementorWidget.spacer(30),
-                ElementorWidget.products(columns=3, rows=4),
-            ],
-            padding={"top": 60, "bottom": 80},
-        )
-        sections.append(products)
+        products_widgets = [
+            self.products_grid(columns=4, rows=4, category=category_slug),
+            self.spacer(48),
+        ]
+        template.add_section(products_widgets)
 
-        # Story
-        story = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("The Vision", tag="h3"),
-                ElementorWidget.text(
-                    f"<p>{collection['description']}</p>"
-                    "<p>Each piece in this collection represents our commitment "
-                    "to excellence and our Oakland heritage.</p>"
-                ),
-            ],
-            bg_color=self.brand["colors"]["light"],
-            padding={"top": 80, "bottom": 80},
-        )
-        sections.append(story)
+        return template
 
-        # CTA
-        cta = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Explore More", tag="h3"),
-                ElementorWidget.button(
-                    "View All Collections",
-                    link="/collections",
-                    bg_color=self.brand["colors"]["primary"],
-                ),
-            ],
-            bg_color=self.brand["colors"]["secondary"],
-            padding={"top": 60, "bottom": 60},
-        )
-        sections.append(cta)
-
-        return self._create_template(
-            title=f"SkyyRose - {collection['name']} Collection",
-            template_type=TemplateType.PAGE,
-            elements=sections,
+    def generate_product_page(self) -> ElementorTemplate:
+        """Generate single product page template."""
+        template = ElementorTemplate(
+            title="Single Product",
+            type="single",
+            page_settings={"template": "elementor_header_footer"},
         )
 
-    def black_rose_page(self) -> dict:
-        """Generate BLACK ROSE collection page"""
-        return self.collection_page("BLACK_ROSE")
+        # Product images (left column would be handled differently)
+        product_widgets = [
+            self._widget(WidgetType.PRODUCT_IMAGES, {}),
+            self._widget(WidgetType.PRODUCT_TITLE, {}),
+            self._widget(WidgetType.PRODUCT_PRICE, {}),
+            self._widget(WidgetType.ADD_TO_CART, {}),
+        ]
 
-    def love_hurts_page(self) -> dict:
-        """Generate LOVE HURTS collection page"""
-        return self.collection_page("LOVE_HURTS")
+        template.add_section(product_widgets)
 
-    def signature_page(self) -> dict:
-        """Generate SIGNATURE collection page"""
-        return self.collection_page("SIGNATURE")
+        return template
 
-    # -------------------------------------------------------------------------
-    # About Page
-    # -------------------------------------------------------------------------
 
-    def about_page(self) -> dict:
-        """Generate About page template"""
-        sections = []
+# =============================================================================
+# Convenience Function
+# =============================================================================
 
-        # Hero
-        hero = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading(
-                    "About SkyyRose",
-                    tag="h1",
-                    size="56",
-                ),
-                ElementorWidget.text(
-                    "<p>The story behind the brand</p>",
-                ),
-            ],
-            bg_color=self.brand["colors"]["secondary"],
-            padding={"top": 100, "bottom": 100},
+
+def generate_template(
+    page_spec: PageSpec,
+    brand_kit: BrandKit | None = None,
+) -> ElementorTemplate:
+    """
+    Generate template from page specification.
+
+    Args:
+        page_spec: Page specification
+        brand_kit: Brand design tokens
+
+    Returns:
+        ElementorTemplate ready for export
+    """
+    config = ElementorConfig(brand_kit=brand_kit or SKYYROSE_BRAND_KIT)
+    builder = ElementorBuilder(config)
+
+    if page_spec.page_type == PageType.HOME:
+        return builder.generate_home_page(
+            hero_title=page_spec.hero_title,
+            hero_subtitle=page_spec.hero_subtitle,
+            hero_cta=page_spec.hero_cta,
+            hero_image=page_spec.hero_image,
         )
-        sections.append(hero)
-
-        # Story
-        story = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Our Story", tag="h2"),
-                ElementorWidget.text(
-                    "<p>SkyyRose was born from a vision of creating luxury streetwear "
-                    "that speaks to the soul. Founded in Oakland, California, our brand "
-                    "represents the intersection of street culture and high fashion.</p>"
-                    "<p>The name 'SkyyRose' embodies our philosophy: reaching for the sky "
-                    "while staying grounded in beauty and elegance. Each piece we create "
-                    "is a testament to our commitment to quality, exclusivity, and authentic expression.</p>"
-                ),
-            ],
-            padding={"top": 80, "bottom": 40},
+    elif page_spec.page_type == PageType.COLLECTION:
+        return builder.generate_collection_page(
+            title=page_spec.title,
+            description=page_spec.description,
         )
-        sections.append(story)
+    elif page_spec.page_type == PageType.PRODUCT:
+        return builder.generate_product_page()
+    else:
+        # Default to basic page
+        template = ElementorTemplate(title=page_spec.title)
+        return template
 
-        # Values
-        values = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Our Values", tag="h2"),
-                ElementorWidget.icon_box(
-                    "Quality First",
-                    "Premium materials and expert craftsmanship in every piece",
-                    "fas fa-star",
-                ),
-                ElementorWidget.icon_box(
-                    "Limited Production",
-                    "Small batches ensure exclusivity and attention to detail",
-                    "fas fa-gem",
-                ),
-                ElementorWidget.icon_box(
-                    "Oakland Pride",
-                    "Rooted in the Bay Area, inspired by its culture and energy",
-                    "fas fa-heart",
-                ),
-            ],
-            columns=3,
-            bg_color=self.brand["colors"]["light"],
-            padding={"top": 60, "bottom": 60},
-        )
-        sections.append(values)
 
-        # Mission
-        mission = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Our Mission", tag="h2"),
-                ElementorWidget.text(
-                    "<p style='font-size: 24px; font-style: italic;'>"
-                    '"Where Love Meets Luxury"</p>'
-                    "<p>We create clothing that makes you feel powerful, beautiful, "
-                    "and authentically yourself. Every design tells a story, every "
-                    "piece is meant to be treasured.</p>"
-                ),
-                ElementorWidget.button("Shop Now", link="/shop", size="lg"),
-            ],
-            padding={"top": 80, "bottom": 100},
-        )
-        sections.append(mission)
+# =============================================================================
+# Exports
+# =============================================================================
 
-        return self._create_template(
-            title="About SkyyRose",
-            template_type=TemplateType.PAGE,
-            elements=sections,
-        )
-
-    # -------------------------------------------------------------------------
-    # Blog Page
-    # -------------------------------------------------------------------------
-
-    def blog_page(self) -> dict:
-        """Generate Blog/Journal page template"""
-        sections = []
-
-        # Hero
-        hero = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading(
-                    "The Journal",
-                    tag="h1",
-                    size="56",
-                ),
-                ElementorWidget.text(
-                    "<p>Stories, style guides, and behind-the-scenes</p>",
-                ),
-            ],
-            bg_color=self.brand["colors"]["secondary"],
-            padding={"top": 80, "bottom": 80},
-        )
-        sections.append(hero)
-
-        # Posts grid
-        # Note: This would use Elementor's posts widget in practice
-        posts = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Latest Posts", tag="h2"),
-                ElementorWidget.spacer(30),
-            ],
-            padding={"top": 60, "bottom": 80},
-        )
-        sections.append(posts)
-
-        # Newsletter
-        newsletter = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading("Stay Connected", tag="h3"),
-                ElementorWidget.text("<p>Subscribe for style updates and exclusive content</p>"),
-            ],
-            bg_color=self.brand["colors"]["light"],
-            padding={"top": 60, "bottom": 60},
-        )
-        sections.append(newsletter)
-
-        return self._create_template(
-            title="SkyyRose Journal",
-            template_type=TemplateType.PAGE,
-            elements=sections,
-        )
-
-    # -------------------------------------------------------------------------
-    # Header & Footer
-    # -------------------------------------------------------------------------
-
-    def header(self) -> dict:
-        """Generate header template"""
-        sections = []
-
-        header = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading(
-                    "SkyyRose",
-                    tag="h1",
-                    size="28",
-                    color=self.brand["colors"]["primary"],
-                ),
-            ],
-            bg_color=self.brand["colors"]["secondary"],
-            padding={"top": 15, "bottom": 15},
-        )
-        sections.append(header)
-
-        return self._create_template(
-            title="SkyyRose Header",
-            template_type=TemplateType.HEADER,
-            elements=sections,
-        )
-
-    def footer(self) -> dict:
-        """Generate footer template"""
-        sections = []
-
-        footer = ElementorSection.create(
-            widgets=[
-                ElementorWidget.heading(
-                    "SkyyRose",
-                    tag="h4",
-                    color=self.brand["colors"]["primary"],
-                ),
-                ElementorWidget.text(
-                    f"<p>{self.brand['tagline']}</p>" f"<p>{self.brand['location']}</p>",
-                    color=self.brand["colors"]["text_light"],
-                ),
-                ElementorWidget.social_icons(),
-                ElementorWidget.text(
-                    f"<p>© {datetime.now().year} SkyyRose. All rights reserved.</p>",
-                    color=self.brand["colors"]["text_light"],
-                ),
-            ],
-            bg_color=self.brand["colors"]["secondary"],
-            padding={"top": 60, "bottom": 40},
-        )
-        sections.append(footer)
-
-        return self._create_template(
-            title="SkyyRose Footer",
-            template_type=TemplateType.FOOTER,
-            elements=sections,
-        )
-
-    # -------------------------------------------------------------------------
-    # Export
-    # -------------------------------------------------------------------------
-
-    def export(self, template: dict, pretty: bool = True) -> str:
-        """Export template to JSON string"""
-        if pretty:
-            return json.dumps(template, indent=2)
-        return json.dumps(template)
-
-    def export_all(self) -> dict[str, dict]:
-        """Generate all templates"""
-        return {
-            "homepage": self.homepage(),
-            "black_rose": self.black_rose_page(),
-            "love_hurts": self.love_hurts_page(),
-            "signature": self.signature_page(),
-            "about": self.about_page(),
-            "blog": self.blog_page(),
-            "header": self.header(),
-            "footer": self.footer(),
-        }
-
-    def save_all(self, output_dir: str = "./templates/elementor"):
-        """Save all templates to files"""
-        import os
-
-        os.makedirs(output_dir, exist_ok=True)
-
-        templates = self.export_all()
-
-        for name, template in templates.items():
-            filepath = os.path.join(output_dir, f"{name}.json")
-            with open(filepath, "w") as f:
-                f.write(self.export(template))
-            logger.info(f"Saved template: {filepath}")
-
-        return list(templates.keys())
+__all__ = [
+    "ElementorBuilder",
+    "ElementorConfig",
+    "ElementorTemplate",
+    "BrandKit",
+    "BrandColors",
+    "BrandTypography",
+    "BrandSpacing",
+    "BrandImagery",
+    "BrandVoice",
+    "PageSpec",
+    "PageType",
+    "WidgetType",
+    "SectionLayout",
+    "SKYYROSE_BRAND_KIT",
+    "generate_template",
+]

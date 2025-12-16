@@ -512,13 +512,7 @@ async def list_agents(
     return agent_service.list_agents(category)
 
 
-@agents_router.get("/{agent_name}", response_model=AgentInfo)
-async def get_agent(agent_name: str, user: TokenPayload = Depends(get_current_user)):
-    """Get agent details"""
-    agent = agent_service.get_agent(agent_name)
-    if not agent:
-        raise HTTPException(404, f"Agent not found: {agent_name}")
-    return agent
+# NOTE: /{agent_name} moved to end of file to avoid catching specific routes like /trends
 
 
 # ---- Task Execution ----
@@ -651,17 +645,19 @@ async def chatbot_interaction(
 async def generate_content(request: ContentRequest, user: TokenPayload = Depends(get_current_user)):
     """Generate content using AI"""
     agent_map = {
-        ContentType.BLOG_POST: "blog_writer_agent",
-        ContentType.PRODUCT_DESCRIPTION: "product_description_agent",
-        ContentType.AD_COPY: "copywriting_agent",
-        ContentType.EMAIL: "copywriting_agent",
-        ContentType.SOCIAL_POST: "copywriting_agent",
-        ContentType.SEO_META: "seo_content_agent",
+        ContentType.BLOG_POST: ("blog_writer_agent", "generate"),
+        ContentType.PRODUCT_DESCRIPTION: ("product_description_agent", "generate"),
+        ContentType.AD_COPY: ("copywriting_agent", "generate_ad"),
+        ContentType.EMAIL: ("copywriting_agent", "generate_email"),
+        ContentType.SOCIAL_POST: ("copywriting_agent", "generate_social"),
+        ContentType.SEO_META: ("seo_content_agent", "generate"),
     }
 
+    agent_name, action = agent_map.get(request.type, ("copywriting_agent", "generate_ad"))
+
     return await agent_service.execute_task(
-        agent_name=agent_map.get(request.type, "copywriting_agent"),
-        action="generate",
+        agent_name=agent_name,
+        action=action,
         parameters=request.model_dump(),
         user_id=user.sub,
     )
@@ -719,6 +715,18 @@ async def get_market_trends(
         parameters={"category": category},
         user_id=user.sub,
     )
+
+
+# ---- Agent by Name (catch-all - must be last) ----
+
+
+@agents_router.get("/{agent_name}", response_model=AgentInfo)
+async def get_agent(agent_name: str, user: TokenPayload = Depends(get_current_user)):
+    """Get agent details"""
+    agent = agent_service.get_agent(agent_name)
+    if not agent:
+        raise HTTPException(404, f"Agent not found: {agent_name}")
+    return agent
 
 
 # =============================================================================
