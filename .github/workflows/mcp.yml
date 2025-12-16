@@ -133,7 +133,7 @@ jobs:
         grep -r "anthropic" . --exclude-dir=.git --exclude="*.json" | grep -v "ANTHROPIC_API_KEY" || echo "✅ No hardcoded Anthropic keys"
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: mcp-security-reports
         path: |
