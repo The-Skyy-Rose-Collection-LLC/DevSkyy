@@ -103,26 +103,25 @@ def admin_user_data() -> dict:
 @pytest_asyncio.fixture
 async def auth_token(client: AsyncClient, test_user_data: dict) -> str:
     """Get authentication token"""
-    from security.jwt_oauth2_auth import auth_manager
+    from security.jwt_oauth2_auth import token_manager
 
     # Create token directly for testing
-    token = auth_manager.create_access_token(
+    token, jti = token_manager.create_access_token(
         user_id="test_user_001",
-        username=test_user_data["username"],
-        role=test_user_data["role"],
+        roles=[test_user_data["role"]],
     )
-    return token.access_token
+    return token
 
 
 @pytest_asyncio.fixture
 async def admin_token(client: AsyncClient, admin_user_data: dict) -> str:
     """Get admin authentication token"""
-    from security.jwt_oauth2_auth import auth_manager
+    from security.jwt_oauth2_auth import token_manager
 
-    token = auth_manager.create_access_token(
-        user_id="admin_001", username=admin_user_data["username"], role="admin"
+    token, jti = token_manager.create_access_token(
+        user_id="admin_001", roles=["admin"]
     )
-    return token.access_token
+    return token
 
 
 @pytest.fixture

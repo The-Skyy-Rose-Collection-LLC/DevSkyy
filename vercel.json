@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "name": "devskyy-platform",
+  "description": "DevSkyy AI Agent Platform - 6 Core Specialized Agents",
+  "builds": [
+    {
+      "src": "main_enterprise.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.11"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/main_enterprise.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/main_enterprise.py"
+    }
+  ],
+  "env": {
+    "ENVIRONMENT": "production",
+    "LOG_LEVEL": "INFO",
+    "CORS_ORIGINS": "*",
+    "JWT_SECRET_KEY": "@jwt_secret_key",
+    "ENCRYPTION_MASTER_KEY": "@encryption_master_key",
+    "OPENAI_API_KEY": "@openai_api_key",
+    "DATABASE_URL": "@database_url"
+  },
+  "functions": {
+    "main_enterprise.py": {
+      "maxDuration": 30,
+      "memory": 1024,
+      "runtime": "python3.11"
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization, X-Requested-With"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=31536000; includeSubDomains"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/docs",
+      "destination": "/api/docs"
+    },
+    {
+      "source": "/redoc",
+      "destination": "/api/redoc"
+    }
+  ]
+}

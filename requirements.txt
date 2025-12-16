@@ -18,6 +18,7 @@
 # Core Framework
 fastapi>=0.104
 uvicorn[standard]>=0.24
+mangum>=0.18.0  # ASGI adapter for serverless deployment
 python-multipart>=0.0.6
 pydantic>=2.5
 pydantic-settings>=2.1
