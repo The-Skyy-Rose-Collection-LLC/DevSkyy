@@ -5,8 +5,8 @@
 mcp==1.1.0
 
 # AI service integrations
-openai==1.57.2
-anthropic==0.40.0
+openai==2.13.0
+anthropic==0.75.0
 google-generativeai==0.8.3
 
 # Core Python web framework
