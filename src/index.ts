@@ -1,6 +1,6 @@
 /**
  * DevSkyy Enterprise Platform - Main Entry Point
- * TypeScript/JavaScript SDK for the 54-agent ecosystem
+ * TypeScript/JavaScript SDK for the 6-agent ecosystem
  */
 
 import { config, validateConfig } from './config/index.js';

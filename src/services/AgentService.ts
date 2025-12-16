@@ -1,6 +1,6 @@
 /**
  * DevSkyy Agent Service
- * Core service for managing the 54-agent ecosystem
+ * Core service for managing the 6-agent ecosystem
  */
 
 import type { Agent, AgentTask, AgentType, TaskResult, TaskError } from '../types/index.js';
@@ -21,7 +21,7 @@ export class AgentService extends EventEmitter {
   }
 
   /**
-   * Initialize all 54 agents in the ecosystem
+   * Initialize the 6 core agents in the ecosystem
    */
   private initializeAgents(): void {
     const agentTypes: AgentType[] = [
@@ -31,12 +31,6 @@ export class AgentService extends EventEmitter {
       'social_media_agent',
       'analytics_agent',
       'security_agent',
-      'database_agent',
-      'api_agent',
-      'ml_agent',
-      'data_agent',
-      'monitoring_agent',
-      'deployment_agent',
     ];
 
     agentTypes.forEach(type => {
@@ -69,12 +63,6 @@ export class AgentService extends EventEmitter {
       social_media_agent: 'Social Media Management Agent',
       analytics_agent: 'Analytics & Reporting Agent',
       security_agent: 'Security Monitoring Agent',
-      database_agent: 'Database Management Agent',
-      api_agent: 'API Integration Agent',
-      ml_agent: 'Machine Learning Agent',
-      data_agent: 'Data Processing Agent',
-      monitoring_agent: 'System Monitoring Agent',
-      deployment_agent: 'Deployment Automation Agent',
       custom_agent: 'Custom Agent',
     };
 
@@ -92,12 +80,6 @@ export class AgentService extends EventEmitter {
       social_media_agent: ['post_scheduling', 'engagement_tracking', 'hashtag_optimization', 'analytics'],
       analytics_agent: ['data_collection', 'report_generation', 'trend_analysis', 'visualization'],
       security_agent: ['vulnerability_scanning', 'threat_detection', 'access_control', 'audit_logging'],
-      database_agent: ['query_optimization', 'backup_management', 'migration_support', 'monitoring'],
-      api_agent: ['endpoint_management', 'rate_limiting', 'authentication', 'documentation'],
-      ml_agent: ['model_training', 'prediction', 'classification', 'recommendation'],
-      data_agent: ['data_extraction', 'transformation', 'validation', 'enrichment'],
-      monitoring_agent: ['health_checks', 'performance_monitoring', 'alerting', 'logging'],
-      deployment_agent: ['ci_cd', 'container_management', 'scaling', 'rollback'],
       custom_agent: ['custom_functionality'],
     };
 
