@@ -5,11 +5,13 @@ ADK Test Suite
 Comprehensive tests for DevSkyy Agent Development Kit.
 """
 
+import os
 import sys
 
 import pytest
 
-sys.path.insert(0, "/home/claude/devskyy-platform")
+# Add project root to path for imports
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # =============================================================================
