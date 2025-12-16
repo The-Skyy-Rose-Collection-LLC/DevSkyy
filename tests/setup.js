@@ -1,8 +1,11 @@
+"use strict";
 /**
  * Jest Test Setup for DevSkyy Enterprise Platform
  * Global test configuration and utilities
  */
-import 'jest';
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.expectToThrowAsync = exports.createMockApiResponse = exports.waitForCondition = exports.waitFor = exports.seedTestDatabase = exports.clearTestDatabase = exports.createMockUser = exports.createMockTask = exports.createMockAgent = void 0;
+require("jest");
 // Mock environment variables for testing
 process.env.NODE_ENV = 'testing';
 process.env.JWT_SECRET = 'test-jwt-secret-key-for-testing-only';
@@ -94,7 +97,7 @@ afterAll(() => {
     Object.assign(console, originalConsole);
 });
 // Global test helpers
-export const createMockAgent = (overrides = {}) => ({
+const createMockAgent = (overrides = {}) => ({
     id: 'test-agent-id',
     name: 'Test Agent',
     type: 'custom_agent',
@@ -105,7 +108,8 @@ export const createMockAgent = (overrides = {}) => ({
     metadata: {},
     ...overrides,
 });
-export const createMockTask = (overrides = {}) => ({
+exports.createMockAgent = createMockAgent;
+const createMockTask = (overrides = {}) => ({
     id: 'test-task-id',
     agentId: 'test-agent-id',
     type: 'test_task',
@@ -116,7 +120,8 @@ export const createMockTask = (overrides = {}) => ({
     updatedAt: new Date(),
     ...overrides,
 });
-export const createMockUser = (overrides = {}) => ({
+exports.createMockTask = createMockTask;
+const createMockUser = (overrides = {}) => ({
     id: 'test-user-id',
     username: 'testuser',
     email: 'test@example.com',
@@ -127,31 +132,36 @@ export const createMockUser = (overrides = {}) => ({
     updatedAt: new Date(),
     ...overrides,
 });
+exports.createMockUser = createMockUser;
 // Test database helpers
-export const clearTestDatabase = async () => {
+const clearTestDatabase = async () => {
     // In a real implementation, this would clear test database tables
     // For now, it's a placeholder
 };
-export const seedTestDatabase = async () => {
+exports.clearTestDatabase = clearTestDatabase;
+const seedTestDatabase = async () => {
     // In a real implementation, this would seed test data
     // For now, it's a placeholder
 };
+exports.seedTestDatabase = seedTestDatabase;
 // Async test helpers
-export const waitFor = (ms) => {
+const waitFor = (ms) => {
     return new Promise(resolve => setTimeout(resolve, ms));
 };
-export const waitForCondition = async (condition, timeout = 5000, interval = 100) => {
+exports.waitFor = waitFor;
+const waitForCondition = async (condition, timeout = 5000, interval = 100) => {
     const start = Date.now();
     while (Date.now() - start < timeout) {
         if (await condition()) {
             return;
         }
-        await waitFor(interval);
+        await (0, exports.waitFor)(interval);
     }
     throw new Error(`Condition not met within ${timeout}ms`);
 };
+exports.waitForCondition = waitForCondition;
 // Mock API responses
-export const createMockApiResponse = (data, overrides = {}) => ({
+const createMockApiResponse = (data, overrides = {}) => ({
     success: true,
     data,
     metadata: {
@@ -162,8 +172,9 @@ export const createMockApiResponse = (data, overrides = {}) => ({
     },
     ...overrides,
 });
+exports.createMockApiResponse = createMockApiResponse;
 // Error testing helpers
-export const expectToThrowAsync = async (fn, expectedError) => {
+const expectToThrowAsync = async (fn, expectedError) => {
     try {
         await fn();
         throw new Error('Expected function to throw, but it did not');
@@ -180,4 +191,4 @@ export const expectToThrowAsync = async (fn, expectedError) => {
         }
     }
 };
-//# sourceMappingURL=setup.js.map
+exports.expectToThrowAsync = expectToThrowAsync;
