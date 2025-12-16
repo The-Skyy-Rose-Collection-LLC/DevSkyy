@@ -1,8 +1,8 @@
 # DevSkyy Platform - Deployment Implementation Guide
 
-**Version:** 5.0 Enterprise  
-**Target:** Production-Ready A-Grade Platform  
-**Timeline:** 4 Weeks  
+**Version:** 5.0 Enterprise
+**Target:** Production-Ready A-Grade Platform
+**Timeline:** 4 Weeks
 **Current Status:** B+ (52/100) â†’ Target: A+ (90+/100)
 
 ---
@@ -148,19 +148,19 @@ class RefreshTokenData(BaseModel):
 
 class JWTAuthManager:
     """JWT Authentication Manager with refresh token rotation"""
-    
+
     def __init__(self):
         self.active_refresh_tokens = {}  # In production, use Redis or database
         self.token_families = {}  # Track token families for reuse detection
-    
+
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         """Verify password against hash"""
         return pwd_context.verify(plain_password, hashed_password)
-    
+
     def get_password_hash(self, password: str) -> str:
         """Hash password using bcrypt"""
         return pwd_context.hash(password)
-    
+
     def create_access_token(
         self,
         user_id: str,
@@ -170,13 +170,13 @@ class JWTAuthManager:
     ) -> str:
         """
         Create JWT access token
-        
+
         Args:
             user_id: User identifier
             roles: List of user roles
             email: User email (optional)
             expires_delta: Custom expiration time
-        
+
         Returns:
             Encoded JWT token
         """
@@ -184,7 +184,7 @@ class JWTAuthManager:
             expire = datetime.utcnow() + expires_delta
         else:
             expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-        
+
         to_encode = {
             "sub": user_id,
             "roles": roles,
@@ -193,10 +193,10 @@ class JWTAuthManager:
             "iat": datetime.utcnow(),
             "type": "access"
         }
-        
+
         encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
         return encoded_jwt
-    
+
     def create_refresh_token(
         self,
         user_id: str,
@@ -204,20 +204,20 @@ class JWTAuthManager:
     ) -> Dict[str, str]:
         """
         Create refresh token with rotation support
-        
+
         Args:
             user_id: User identifier
             family_id: Token family ID (for rotation)
-        
+
         Returns:
             Dictionary with token and metadata
         """
         jti = str(uuid.uuid4())
         if not family_id:
             family_id = str(uuid.uuid4())
-        
+
         expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-        
+
         to_encode = {
             "sub": user_id,
             "jti": jti,
@@ -226,9 +226,9 @@ class JWTAuthManager:
             "iat": datetime.utcnow(),
             "type": "refresh"
         }
-        
+
         encoded_jwt = jwt.encode(to_encode, REFRESH_SECRET_KEY, algorithm=ALGORITHM)
-        
+
         # Store active token
         self.active_refresh_tokens[jti] = {
             "user_id": user_id,
@@ -236,29 +236,29 @@ class JWTAuthManager:
             "created_at": datetime.utcnow(),
             "used": False
         }
-        
+
         # Track family
         if family_id not in self.token_families:
             self.token_families[family_id] = []
         self.token_families[family_id].append(jti)
-        
+
         return {
             "token": encoded_jwt,
             "jti": jti,
             "family_id": family_id
         }
-    
+
     def verify_token(self, token: str, token_type: str = "access") -> TokenData:
         """
         Verify and decode JWT token
-        
+
         Args:
             token: JWT token string
             token_type: "access" or "refresh"
-        
+
         Returns:
             TokenData object
-        
+
         Raises:
             HTTPException: If token is invalid
         """
@@ -267,57 +267,57 @@ class JWTAuthManager:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        
+
         try:
             secret = SECRET_KEY if token_type == "access" else REFRESH_SECRET_KEY
             payload = jwt.decode(token, secret, algorithms=[ALGORITHM])
-            
+
             # Verify token type
             if payload.get("type") != token_type:
                 raise credentials_exception
-            
+
             user_id: str = payload.get("sub")
             if user_id is None:
                 raise credentials_exception
-            
+
             roles: List[str] = payload.get("roles", [])
             email: Optional[str] = payload.get("email")
-            
+
             return TokenData(user_id=user_id, roles=roles, email=email)
-        
+
         except JWTError:
             raise credentials_exception
-    
+
     def refresh_access_token(self, refresh_token: str) -> Dict[str, str]:
         """
         Refresh access token using refresh token
         Implements token rotation and reuse detection
-        
+
         Args:
             refresh_token: Current refresh token
-        
+
         Returns:
             New access and refresh tokens
-        
+
         Raises:
             HTTPException: If refresh token is invalid or reused
         """
         try:
             payload = jwt.decode(refresh_token, REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
-            
+
             jti = payload.get("jti")
             user_id = payload.get("sub")
             family_id = payload.get("family_id")
-            
+
             # Check if token exists and hasn't been used
             if jti not in self.active_refresh_tokens:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Invalid refresh token"
                 )
-            
+
             token_info = self.active_refresh_tokens[jti]
-            
+
             # Reuse detection - if token already used, invalidate entire family
             if token_info["used"]:
                 # Token reuse detected - security breach!
@@ -326,29 +326,29 @@ class JWTAuthManager:
                     status_code=status.HTTP_401_UNAUTHORIZED,
                     detail="Token reuse detected. Please login again."
                 )
-            
+
             # Mark token as used
             token_info["used"] = True
-            
+
             # Create new tokens
             # TODO: Get user roles from database
             roles = ["user"]  # Fetch from database in production
-            
+
             new_access_token = self.create_access_token(user_id, roles)
             new_refresh_data = self.create_refresh_token(user_id, family_id)
-            
+
             return {
                 "access_token": new_access_token,
                 "refresh_token": new_refresh_data["token"],
                 "token_type": "bearer"
             }
-        
+
         except JWTError:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Invalid refresh token"
             )
-    
+
     def _invalidate_token_family(self, family_id: str):
         """Invalidate entire token family (reuse detection)"""
         if family_id in self.token_families:
@@ -356,13 +356,13 @@ class JWTAuthManager:
                 if jti in self.active_refresh_tokens:
                     del self.active_refresh_tokens[jti]
             del self.token_families[family_id]
-    
+
     def revoke_refresh_token(self, refresh_token: str):
         """Manually revoke a refresh token"""
         try:
             payload = jwt.decode(refresh_token, REFRESH_SECRET_KEY, algorithms=[ALGORITHM])
             jti = payload.get("jti")
-            
+
             if jti in self.active_refresh_tokens:
                 del self.active_refresh_tokens[jti]
         except JWTError:
@@ -386,16 +386,16 @@ async def get_current_user(token: str = Depends(oauth2_scheme)) -> TokenData:
 class RoleChecker:
     """
     Dependency for role-based access control
-    
+
     Usage:
         @app.get("/admin/users")
         async def get_users(user: TokenData = Depends(RoleChecker(["admin"]))):
             ...
     """
-    
+
     def __init__(self, allowed_roles: List[str]):
         self.allowed_roles = allowed_roles
-    
+
     def __call__(self, user: TokenData = Depends(get_current_user)) -> TokenData:
         if not any(role in self.allowed_roles for role in user.roles):
             raise HTTPException(
@@ -425,30 +425,30 @@ from agent.security.jwt_auth import (
 async def login(form_data: OAuth2PasswordRequestForm = Depends()):
     """
     OAuth2 compatible token login
-    
+
     - **username**: User email or username
     - **password**: User password
     """
     # TODO: Implement user authentication with database
     # This is a placeholder - replace with actual user verification
     user = await verify_user_credentials(form_data.username, form_data.password)
-    
+
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Create tokens
     access_token = jwt_manager.create_access_token(
         user_id=user["id"],
         roles=user["roles"],
         email=user["email"]
     )
-    
+
     refresh_data = jwt_manager.create_refresh_token(user_id=user["id"])
-    
+
     return {
         "access_token": access_token,
         "refresh_token": refresh_data["token"],
@@ -498,7 +498,7 @@ async def get_all_users(admin_user: TokenData = Depends(RoleChecker(["admin"])))
 async def verify_user_credentials(username: str, password: str):
     """
     Verify user credentials against database
-    
+
     Returns:
         User dict if valid, None otherwise
     """
@@ -562,28 +562,28 @@ logger = logging.getLogger(__name__)
 class AESGCMEncryption:
     """
     AES-256-GCM encryption implementation
-    
+
     Features:
     - 256-bit AES encryption
     - GCM mode for authenticated encryption
     - Unique nonce per message (CRITICAL for GCM)
     - PBKDF2 key derivation
     """
-    
+
     def __init__(self, master_key: str = None):
         """
         Initialize encryption with master key
-        
+
         Args:
             master_key: Base64 encoded 32-byte key (256 bits)
                        If None, reads from environment variable
         """
         if master_key is None:
             master_key = os.getenv("ENCRYPTION_MASTER_KEY")
-        
+
         if not master_key:
             raise ValueError("Encryption master key not provided")
-        
+
         # Decode master key
         try:
             self.master_key = base64.b64decode(master_key)
@@ -591,15 +591,15 @@ class AESGCMEncryption:
                 raise ValueError("Master key must be 32 bytes (256 bits)")
         except Exception as e:
             raise ValueError(f"Invalid master key format: {e}")
-    
+
     def derive_key(self, salt: bytes, iterations: int = 100000) -> bytes:
         """
         Derive encryption key using PBKDF2
-        
+
         Args:
             salt: Random salt (minimum 16 bytes recommended)
             iterations: Number of PBKDF2 iterations
-        
+
         Returns:
             Derived 32-byte key
         """
@@ -611,30 +611,30 @@ class AESGCMEncryption:
             backend=default_backend()
         )
         return kdf.derive(self.master_key)
-    
+
     def encrypt(self, plaintext: str, associated_data: bytes = None) -> Dict[str, str]:
         """
         Encrypt plaintext using AES-256-GCM
-        
+
         Args:
             plaintext: String to encrypt
             associated_data: Optional additional authenticated data
-        
+
         Returns:
             Dictionary with ciphertext, nonce, tag, and salt (all base64 encoded)
-        
+
         CRITICAL: Each message MUST use a unique nonce
         """
         try:
             # Generate unique nonce (12 bytes is standard for GCM)
             nonce = os.urandom(12)
-            
+
             # Generate salt for key derivation
             salt = os.urandom(16)
-            
+
             # Derive encryption key
             key = self.derive_key(salt)
-            
+
             # Create cipher
             cipher = Cipher(
                 algorithms.AES(key),
@@ -642,28 +642,28 @@ class AESGCMEncryption:
                 backend=default_backend()
             )
             encryptor = cipher.encryptor()
-            
+
             # Add associated data if provided
             if associated_data:
                 encryptor.authenticate_additional_data(associated_data)
-            
+
             # Encrypt
             ciphertext = encryptor.update(plaintext.encode('utf-8')) + encryptor.finalize()
-            
+
             # Get authentication tag
             tag = encryptor.tag
-            
+
             return {
                 "ciphertext": base64.b64encode(ciphertext).decode('utf-8'),
                 "nonce": base64.b64encode(nonce).decode('utf-8'),
                 "tag": base64.b64encode(tag).decode('utf-8'),
                 "salt": base64.b64encode(salt).decode('utf-8')
             }
-        
+
         except Exception as e:
             logger.error(f"Encryption failed: {e}")
             raise
-    
+
     def decrypt(
         self,
         ciphertext: str,
@@ -674,17 +674,17 @@ class AESGCMEncryption:
     ) -> str:
         """
         Decrypt ciphertext using AES-256-GCM
-        
+
         Args:
             ciphertext: Base64 encoded ciphertext
             nonce: Base64 encoded nonce
             tag: Base64 encoded authentication tag
             salt: Base64 encoded salt
             associated_data: Optional additional authenticated data
-        
+
         Returns:
             Decrypted plaintext string
-        
+
         Raises:
             Exception: If decryption or authentication fails
         """
@@ -694,10 +694,10 @@ class AESGCMEncryption:
             nonce_bytes = base64.b64decode(nonce)
             tag_bytes = base64.b64decode(tag)
             salt_bytes = base64.b64decode(salt)
-            
+
             # Derive decryption key
             key = self.derive_key(salt_bytes)
-            
+
             # Create cipher
             cipher = Cipher(
                 algorithms.AES(key),
@@ -705,41 +705,41 @@ class AESGCMEncryption:
                 backend=default_backend()
             )
             decryptor = cipher.decryptor()
-            
+
             # Add associated data if provided
             if associated_data:
                 decryptor.authenticate_additional_data(associated_data)
-            
+
             # Decrypt and verify
             plaintext = decryptor.update(ciphertext_bytes) + decryptor.finalize()
-            
+
             return plaintext.decode('utf-8')
-        
+
         except Exception as e:
             logger.error(f"Decryption failed: {e}")
             raise ValueError("Decryption or authentication failed")
-    
+
     def encrypt_dict(self, data: dict) -> Dict[str, str]:
         """
         Encrypt a dictionary by serializing to JSON
-        
+
         Args:
             data: Dictionary to encrypt
-        
+
         Returns:
             Encrypted data dictionary
         """
         import json
         plaintext = json.dumps(data)
         return self.encrypt(plaintext)
-    
+
     def decrypt_dict(self, encrypted_data: Dict[str, str]) -> dict:
         """
         Decrypt and deserialize to dictionary
-        
+
         Args:
             encrypted_data: Encrypted data from encrypt_dict
-        
+
         Returns:
             Original dictionary
         """
@@ -757,10 +757,10 @@ class AESGCMEncryption:
 def generate_master_key() -> str:
     """
     Generate a new 256-bit master key
-    
+
     Returns:
         Base64 encoded master key
-    
+
     Usage:
         key = generate_master_key()
         # Store in environment variable or secrets manager
@@ -828,7 +828,7 @@ import html
 
 class ProductCreate(BaseModel):
     """Product creation schema with validation"""
-    
+
     name: constr(min_length=1, max_length=200) = Field(..., description="Product name")
     description: Optional[str] = Field(None, max_length=10000)
     price: float = Field(..., gt=0, lt=1000000, description="Product price")
@@ -837,7 +837,7 @@ class ProductCreate(BaseModel):
     sku: Optional[str] = Field(None, max_length=100)
     category: Optional[str] = Field(None, max_length=100)
     tags: Optional[List[str]] = Field(None, max_items=20)
-    
+
     @validator('name', 'description', 'category')
     def sanitize_html(cls, v):
         """Sanitize HTML to prevent XSS"""
@@ -848,7 +848,7 @@ class ProductCreate(BaseModel):
         # Remove script tags
         v = re.sub(r'<script[^>]*>.*?</script>', '', v, flags=re.DOTALL | re.IGNORECASE)
         return v.strip()
-    
+
     @validator('sku')
     def validate_sku(cls, v):
         """Validate SKU format"""
@@ -858,7 +858,7 @@ class ProductCreate(BaseModel):
         if not re.match(r'^[A-Z0-9\-]+$', v):
             raise ValueError('SKU must be uppercase alphanumeric with hyphens')
         return v
-    
+
     @validator('tags')
     def validate_tags(cls, v):
         """Validate tags"""
@@ -869,7 +869,7 @@ class ProductCreate(BaseModel):
             if len(tag) > 50:
                 raise ValueError('Tags must be less than 50 characters')
         return v
-    
+
     class Config:
         json_schema_extra = {
             "example": {
@@ -887,13 +887,13 @@ class ProductCreate(BaseModel):
 
 class UserCreate(BaseModel):
     """User creation schema"""
-    
+
     email: EmailStr = Field(..., description="User email")
     password: constr(min_length=8, max_length=100) = Field(..., description="Password")
     first_name: constr(min_length=1, max_length=50)
     last_name: constr(min_length=1, max_length=50)
     phone: Optional[str] = Field(None, max_length=20)
-    
+
     @validator('password')
     def validate_password(cls, v):
         """Enforce strong password policy"""
@@ -906,7 +906,7 @@ class UserCreate(BaseModel):
         if not re.search(r'[!@#$%^&*(),.?":{}|<>]', v):
             raise ValueError('Password must contain at least one special character')
         return v
-    
+
     @validator('phone')
     def validate_phone(cls, v):
         """Validate phone number format"""
@@ -921,11 +921,11 @@ class UserCreate(BaseModel):
 
 class SearchQuery(BaseModel):
     """Search query validation"""
-    
+
     query: constr(min_length=1, max_length=200)
     limit: int = Field(10, ge=1, le=100)
     offset: int = Field(0, ge=0)
-    
+
     @validator('query')
     def sanitize_query(cls, v):
         """Prevent SQL injection in search"""
@@ -963,22 +963,22 @@ from starlette.responses import Response
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     """Add security headers to all responses"""
-    
+
     async def dispatch(self, request, call_next):
         response = await call_next(request)
-        
+
         # HSTS - Force HTTPS
         response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
-        
+
         # Prevent clickjacking
         response.headers["X-Frame-Options"] = "DENY"
-        
+
         # Prevent MIME type sniffing
         response.headers["X-Content-Type-Options"] = "nosniff"
-        
+
         # XSS Protection
         response.headers["X-XSS-Protection"] = "1; mode=block"
-        
+
         # Content Security Policy
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
@@ -988,13 +988,13 @@ class SecurityHeadersMiddleware(BaseHTTPMiddleware):
             "font-src 'self' data:; "
             "connect-src 'self'"
         )
-        
+
         # Referrer Policy
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-        
+
         # Permissions Policy
         response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
-        
+
         return response
 
 # Add middleware
@@ -1105,7 +1105,7 @@ logger = logging.getLogger(__name__)
 class WebhookManager:
     """
     Enterprise webhook management
-    
+
     Features:
     - HMAC-SHA256 signatures
     - Exponential backoff retry
@@ -1113,12 +1113,12 @@ class WebhookManager:
     - Delivery tracking
     - Idempotency
     """
-    
+
     def __init__(self):
         self.subscriptions = {}  # In production: use database
         self.delivery_history = []
         self.failed_deliveries = {}
-    
+
     async def subscribe(
         self,
         url: str,
@@ -1128,18 +1128,18 @@ class WebhookManager:
     ) -> str:
         """
         Subscribe to webhook events
-        
+
         Args:
             url: Webhook destination URL
             events: List of event types to subscribe to
             secret: Secret for HMAC signature generation
             metadata: Optional metadata
-        
+
         Returns:
             Subscription ID
         """
         subscription_id = str(uuid.uuid4())
-        
+
         self.subscriptions[subscription_id] = {
             "id": subscription_id,
             "url": url,
@@ -1151,24 +1151,24 @@ class WebhookManager:
             "delivery_count": 0,
             "last_delivery": None
         }
-        
+
         logger.info(f"Webhook subscription created: {subscription_id} for {url}")
         return subscription_id
-    
+
     async def unsubscribe(self, subscription_id: str):
         """Unsubscribe webhook"""
         if subscription_id in self.subscriptions:
             self.subscriptions[subscription_id]["active"] = False
             logger.info(f"Webhook unsubscribed: {subscription_id}")
-    
+
     def generate_signature(self, payload: dict, secret: str) -> str:
         """
         Generate HMAC-SHA256 signature (RFC 2104)
-        
+
         Args:
             payload: Webhook payload
             secret: Shared secret
-        
+
         Returns:
             Hex-encoded signature
         """
@@ -1179,7 +1179,7 @@ class WebhookManager:
             hashlib.sha256
         ).hexdigest()
         return signature
-    
+
     @retry(
         stop=stop_after_attempt(25),
         wait=wait_exponential(multiplier=1, min=60, max=86400),
@@ -1194,7 +1194,7 @@ class WebhookManager:
     ):
         """
         Deliver webhook with retry logic
-        
+
         Retry schedule: 25 attempts over ~7 hours
         - Starts at 60 seconds
         - Exponential backoff (doubles each time)
@@ -1207,16 +1207,16 @@ class WebhookManager:
             "X-Webhook-Timestamp": str(int(datetime.utcnow().timestamp())),
             "User-Agent": "DevSkyy-Webhooks/1.0"
         }
-        
+
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(url, json=payload, headers=headers)
             response.raise_for_status()
-            
+
             return {
                 "status_code": response.status_code,
                 "response": response.text[:1000]  # Limit response size
             }
-    
+
     async def deliver_event(
         self,
         event_type: str,
@@ -1225,28 +1225,28 @@ class WebhookManager:
     ):
         """
         Deliver event to all subscribed webhooks
-        
+
         Args:
             event_type: Type of event (e.g., "product.created")
             payload: Event payload
             idempotency_key: Optional idempotency key
         """
         webhook_id = idempotency_key or str(uuid.uuid4())
-        
+
         # Find matching subscriptions
         matching_subs = [
             sub for sub in self.subscriptions.values()
             if sub["active"] and event_type in sub["events"]
         ]
-        
+
         logger.info(f"Delivering event {event_type} to {len(matching_subs)} webhooks")
-        
+
         delivery_tasks = []
-        
+
         for subscription in matching_subs:
             # Generate signature
             signature = self.generate_signature(payload, subscription["secret"])
-            
+
             # Create delivery task
             task = self._deliver_with_tracking(
                 subscription_id=subscription["id"],
@@ -1257,11 +1257,11 @@ class WebhookManager:
                 event_type=event_type
             )
             delivery_tasks.append(task)
-        
+
         # Deliver asynchronously
         if delivery_tasks:
             await asyncio.gather(*delivery_tasks, return_exceptions=True)
-    
+
     async def _deliver_with_tracking(
         self,
         subscription_id: str,
@@ -1281,34 +1281,34 @@ class WebhookManager:
             "started_at": datetime.utcnow().isoformat(),
             "status": "pending"
         }
-        
+
         try:
             result = await self._deliver_webhook(url, payload, signature, webhook_id)
-            
+
             delivery_record.update({
                 "status": "success",
                 "status_code": result["status_code"],
                 "completed_at": datetime.utcnow().isoformat()
             })
-            
+
             # Update subscription stats
             self.subscriptions[subscription_id]["delivery_count"] += 1
             self.subscriptions[subscription_id]["last_delivery"] = datetime.utcnow().isoformat()
-            
+
             logger.info(f"Webhook delivered successfully: {subscription_id}")
-        
+
         except Exception as e:
             delivery_record.update({
                 "status": "failed",
                 "error": str(e),
                 "completed_at": datetime.utcnow().isoformat()
             })
-            
+
             logger.error(f"Webhook delivery failed: {subscription_id} - {e}")
-        
+
         finally:
             self.delivery_history.append(delivery_record)
-    
+
     async def get_delivery_history(
         self,
         subscription_id: Optional[str] = None,
@@ -1316,25 +1316,25 @@ class WebhookManager:
     ) -> List[Dict]:
         """Get webhook delivery history"""
         history = self.delivery_history
-        
+
         if subscription_id:
             history = [h for h in history if h["subscription_id"] == subscription_id]
-        
+
         return history[-limit:]
-    
+
     async def test_webhook(self, subscription_id: str) -> Dict[str, Any]:
         """Send test webhook"""
         if subscription_id not in self.subscriptions:
             raise ValueError("Subscription not found")
-        
+
         test_payload = {
             "event": "test",
             "timestamp": datetime.utcnow().isoformat(),
             "data": {"message": "This is a test webhook"}
         }
-        
+
         await self.deliver_event("test", test_payload)
-        
+
         return {"status": "test_sent", "subscription_id": subscription_id}
 
 
@@ -1819,12 +1819,12 @@ def client(test_db):
             yield db
         finally:
             db.close()
-    
+
     app.dependency_overrides[get_db] = override_get_db
-    
+
     with TestClient(app) as test_client:
         yield test_client
-    
+
     app.dependency_overrides.clear()
 
 
@@ -1865,13 +1865,13 @@ from agent.security.encryption import AESGCMEncryption
 def test_create_access_token():
     """Test JWT access token creation"""
     jwt_manager = JWTAuthManager()
-    
+
     token = jwt_manager.create_access_token(
         user_id="user123",
         roles=["user", "admin"],
         email="test@example.com"
     )
-    
+
     assert isinstance(token, str)
     assert len(token) > 0
 
@@ -1879,15 +1879,15 @@ def test_create_access_token():
 def test_verify_access_token():
     """Test JWT access token verification"""
     jwt_manager = JWTAuthManager()
-    
+
     token = jwt_manager.create_access_token(
         user_id="user123",
         roles=["user"],
         email="test@example.com"
     )
-    
+
     token_data = jwt_manager.verify_token(token, token_type="access")
-    
+
     assert token_data.user_id == "user123"
     assert "user" in token_data.roles
     assert token_data.email == "test@example.com"
@@ -1896,14 +1896,14 @@ def test_verify_access_token():
 def test_refresh_token_rotation():
     """Test refresh token rotation"""
     jwt_manager = JWTAuthManager()
-    
+
     # Create initial refresh token
     refresh_data = jwt_manager.create_refresh_token("user123")
     refresh_token = refresh_data["token"]
-    
+
     # Refresh the token
     new_tokens = jwt_manager.refresh_access_token(refresh_token)
-    
+
     assert "access_token" in new_tokens
     assert "refresh_token" in new_tokens
     assert new_tokens["refresh_token"] != refresh_token
@@ -1912,13 +1912,13 @@ def test_refresh_token_rotation():
 def test_token_reuse_detection():
     """Test refresh token reuse detection"""
     jwt_manager = JWTAuthManager()
-    
+
     refresh_data = jwt_manager.create_refresh_token("user123")
     refresh_token = refresh_data["token"]
-    
+
     # Use token once
     jwt_manager.refresh_access_token(refresh_token)
-    
+
     # Try to reuse - should raise exception
     with pytest.raises(HTTPException):
         jwt_manager.refresh_access_token(refresh_token)
@@ -1929,19 +1929,19 @@ def test_aes_encryption_decryption():
     # Generate test master key
     import base64, os
     master_key = base64.b64encode(os.urandom(32)).decode()
-    
+
     encryption = AESGCMEncryption(master_key)
-    
+
     plaintext = "Sensitive data to encrypt"
-    
+
     # Encrypt
     encrypted = encryption.encrypt(plaintext)
-    
+
     assert "ciphertext" in encrypted
     assert "nonce" in encrypted
     assert "tag" in encrypted
     assert "salt" in encrypted
-    
+
     # Decrypt
     decrypted = encryption.decrypt(
         encrypted["ciphertext"],
@@ -1949,7 +1949,7 @@ def test_aes_encryption_decryption():
         encrypted["tag"],
         encrypted["salt"]
     )
-    
+
     assert decrypted == plaintext
 
 
@@ -1957,15 +1957,15 @@ def test_unique_nonces():
     """Test that each encryption uses unique nonce (CRITICAL for GCM)"""
     import base64, os
     master_key = base64.b64encode(os.urandom(32)).decode()
-    
+
     encryption = AESGCMEncryption(master_key)
-    
+
     plaintext = "Test message"
-    
+
     # Encrypt same message multiple times
     encrypted1 = encryption.encrypt(plaintext)
     encrypted2 = encryption.encrypt(plaintext)
-    
+
     # Nonces must be different
     assert encrypted1["nonce"] != encrypted2["nonce"]
     assert encrypted1["ciphertext"] != encrypted2["ciphertext"]
@@ -2003,17 +2003,17 @@ def test_authentication_flow(client):
     data = response.json()
     assert "access_token" in data
     assert "refresh_token" in data
-    
+
     access_token = data["access_token"]
     refresh_token = data["refresh_token"]
-    
+
     # Access protected endpoint
     response = client.get(
         "/api/v1/auth/me",
         headers={"Authorization": f"Bearer {access_token}"}
     )
     assert response.status_code == 200
-    
+
     # Refresh token
     response = client.post(
         "/api/v1/auth/refresh",
@@ -2025,7 +2025,7 @@ def test_authentication_flow(client):
 def test_product_crud(client, test_user_token):
     """Test product CRUD operations"""
     headers = {"Authorization": f"Bearer {test_user_token}"}
-    
+
     # Create product
     product_data = {
         "name": "Test Product",
@@ -2035,7 +2035,7 @@ def test_product_crud(client, test_user_token):
         "quantity": 100,
         "sku": "TEST-001"
     }
-    
+
     response = client.post(
         "/api/v1/ecommerce/products",
         json=product_data,
@@ -2043,7 +2043,7 @@ def test_product_crud(client, test_user_token):
     )
     assert response.status_code == 200
     product_id = response.json()["product_id"]
-    
+
     # Get product
     response = client.get(
         f"/api/v1/ecommerce/products/{product_id}",
@@ -2056,7 +2056,7 @@ def test_product_crud(client, test_user_token):
 def test_webhook_subscription(client, test_user_token):
     """Test webhook subscription flow"""
     headers = {"Authorization": f"Bearer {test_user_token}"}
-    
+
     # Subscribe
     response = client.post(
         "/api/v1/webhooks/subscribe",
@@ -2069,7 +2069,7 @@ def test_webhook_subscription(client, test_user_token):
     )
     assert response.status_code == 200
     subscription_id = response.json()["subscription_id"]
-    
+
     # Test webhook
     response = client.post(
         f"/api/v1/webhooks/{subscription_id}/test",
@@ -2082,11 +2082,11 @@ def test_rbac_authorization(client, test_user_token, admin_token):
     """Test role-based access control"""
     user_headers = {"Authorization": f"Bearer {test_user_token}"}
     admin_headers = {"Authorization": f"Bearer {admin_token}"}
-    
+
     # User should not access admin endpoint
     response = client.get("/api/v1/admin/users", headers=user_headers)
     assert response.status_code == 403
-    
+
     # Admin should access admin endpoint
     response = client.get("/api/v1/admin/users", headers=admin_headers)
     assert response.status_code == 200
@@ -2222,13 +2222,13 @@ def main():
     print("DevSkyy Production Secrets Generator")
     print("=" * 60)
     print()
-    
+
     print("JWT_SECRET_KEY=", generate_secret(512))
     print("JWT_REFRESH_SECRET_KEY=", generate_secret(512))
     print("ENCRYPTION_MASTER_KEY=", generate_encryption_key())
     print("API_KEY_SALT=", generate_secret(256))
     print()
-    
+
     print("=" * 60)
     print("IMPORTANT: Store these secrets securely!")
     print("- Use environment variables or secrets manager")
@@ -2527,7 +2527,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    
+
     services:
       postgres:
         image: postgres:15
@@ -2538,7 +2538,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-      
+
       redis:
         image: redis:7
         options: >-
@@ -2546,60 +2546,60 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Python 3.11
       uses: actions/setup-python@v4
       with:
         python-version: '3.11'
-    
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -e ".[dev]"
-    
+
     - name: Run linters
       run: |
         ruff check .
         black --check .
         mypy .
-    
+
     - name: Run security checks
       run: |
         bandit -r . -ll
         pip-audit
-    
+
     - name: Run tests
       env:
         DATABASE_URL: postgresql://postgres:postgres@localhost:5432/test
         REDIS_URL: redis://localhost:6379/0
       run: |
         pytest tests/ -v --cov=agent --cov-report=xml --cov-report=term
-    
+
     - name: Upload coverage
       uses: codecov/codecov-action@v3
       with:
         file: ./coverage.xml
-  
+
   build:
     needs: test
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
-    
+
     - name: Login to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
-    
+
     - name: Build and push
       uses: docker/build-push-action@v4
       with:
@@ -2608,15 +2608,15 @@ jobs:
         tags: devskyy/api:latest,devskyy/api:${{ github.sha }}
         cache-from: type=registry,ref=devskyy/api:latest
         cache-to: type=inline
-  
+
   deploy:
     needs: build
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
-    
+
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Deploy to Kubernetes
       uses: azure/k8s-deploy@v4
       with:
@@ -2670,7 +2670,7 @@ groups:
         annotations:
           summary: "High error rate detected"
           description: "Error rate is {{ $value }} (threshold: 5%)"
-      
+
       - alert: SlowAPIResponse
         expr: histogram_quantile(0.95, http_request_duration_seconds) > 1
         for: 5m
@@ -2679,7 +2679,7 @@ groups:
         annotations:
           summary: "Slow API responses"
           description: "95th percentile response time: {{ $value }}s"
-      
+
       - alert: LowModelAccuracy
         expr: ml_model_accuracy < 0.7
         for: 10m
@@ -2688,7 +2688,7 @@ groups:
         annotations:
           summary: "ML model accuracy dropped"
           description: "Model accuracy: {{ $value }}"
-      
+
       - alert: HighMemoryUsage
         expr: process_resident_memory_bytes / 1024 / 1024 > 512
         for: 5m
@@ -2751,6 +2751,6 @@ groups:
 
 ---
 
-**Deployment Guide Version:** 1.0.0  
-**Last Updated:** October 17, 2025  
+**Deployment Guide Version:** 1.0.0
+**Last Updated:** October 17, 2025
 **Status:** Production Ready

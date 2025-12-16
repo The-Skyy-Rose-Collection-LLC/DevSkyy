@@ -18,7 +18,7 @@ class Custom_Widget extends \Elementor\Widget_Base {
     public function get_title(): string { return 'DevSky Widget'; }
     public function get_icon(): string { return 'eicon-code'; }
     public function get_categories(): array { return ['general']; }
-    
+
     protected function register_controls(): void {
         $this->start_controls_section('content_section', [
             'label' => esc_html__('Content', 'devsky'),
@@ -30,7 +30,7 @@ class Custom_Widget extends \Elementor\Widget_Base {
         ]);
         $this->end_controls_section();
     }
-    
+
     protected function render(): void {
         $settings = $this->get_settings_for_display();
         echo '<div class="devsky-widget">' . esc_html($settings['title']) . '</div>';
@@ -160,7 +160,7 @@ Configuration file location: `~/Library/Application Support/Claude/claude_deskto
 MCP responses consume context tokens. Three strategies minimize overhead:
 
 1. **Pagination**: Return `page_size` items with `has_more` flag instead of full datasets
-2. **Field selection**: Accept `fields` parameter to return only requested attributes  
+2. **Field selection**: Accept `fields` parameter to return only requested attributes
 3. **Structured output**: Use `ToolResult` with `structured_content` for machine-readable data
 
 ```python
@@ -420,14 +420,14 @@ from fastapi import Request, HTTPException
 async def handle_webhook(request: Request):
     signature = request.headers.get("X-WC-Webhook-Signature")
     payload = await request.body()
-    
+
     expected = base64.b64encode(
         hmac.new(b"webhook-secret-key", payload, hashlib.sha256).digest()
     ).decode()
-    
+
     if not hmac.compare_digest(expected, signature):
         raise HTTPException(status_code=401)
-    
+
     data = await request.json()
     # Process order.created event
     return {"status": "received"}
@@ -464,7 +464,7 @@ class FashionTrendForecaster(nn.Module):
         self.attention = nn.MultiheadAttention(hidden_dim, num_heads=8)
         self.external_fc = nn.Linear(external_dim, hidden_dim)
         self.output = nn.Linear(hidden_dim * 2, 1)
-        
+
     def forward(self, sales_sequence, external_signals):
         # sales_sequence: [batch, seq_len, features]
         # external_signals: Google Trends, social media metrics
@@ -490,7 +490,7 @@ class FashionSearchIndex:
     def __init__(self, embedding_dim=512):
         self.index = faiss.IndexFlatIP(embedding_dim)
         self.metadata = []
-    
+
     def add_products(self, images, product_ids):
         inputs = processor(images=images, return_tensors="pt", padding=True)
         with torch.no_grad():
@@ -498,7 +498,7 @@ class FashionSearchIndex:
             embeddings = embeddings / embeddings.norm(dim=-1, keepdim=True)
         self.index.add(embeddings.numpy().astype('float32'))
         self.metadata.extend(product_ids)
-    
+
     def search(self, query_image, k=10):
         inputs = processor(images=query_image, return_tensors="pt")
         with torch.no_grad():
@@ -519,12 +519,12 @@ mlflow.set_experiment("fashion-classification")
 
 with mlflow.start_run():
     mlflow.log_params({"lr": 0.001, "batch_size": 32, "model": "resnet50"})
-    
+
     for epoch in range(epochs):
         train_loss = train_epoch(model, train_loader)
         val_acc = evaluate(model, val_loader)
         mlflow.log_metrics({"train_loss": train_loss, "val_acc": val_acc}, step=epoch)
-    
+
     mlflow.pytorch.log_model(model, "model", registered_model_name="FashionClassifier")
 ```
 
@@ -588,7 +588,7 @@ export const productsQuery = {
 // Optimistic mutation
 const useUpdateProduct = () => {
   const queryClient = useQueryClient()
-  
+
   return useMutation({
     mutationFn: ({ id, data }) => apiClient.patch(`/api/products/${id}`, data),
     onMutate: async (newData) => {
@@ -613,10 +613,10 @@ apiClient.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config
-    
+
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true
-      
+
       try {
         const refreshToken = localStorage.getItem('refreshToken')
         const { accessToken } = await authApi.refresh(refreshToken)
