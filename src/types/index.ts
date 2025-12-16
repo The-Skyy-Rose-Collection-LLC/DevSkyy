@@ -33,12 +33,6 @@ export type AgentType =
   | 'social_media_agent'
   | 'analytics_agent'
   | 'security_agent'
-  | 'database_agent'
-  | 'api_agent'
-  | 'ml_agent'
-  | 'data_agent'
-  | 'monitoring_agent'
-  | 'deployment_agent'
   | 'custom_agent';
 
 export type AgentStatus = 'active' | 'inactive' | 'error' | 'maintenance';
