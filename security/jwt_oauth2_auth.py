@@ -18,7 +18,6 @@ Features:
 
 Dependencies (verified from PyPI December 2024):
 - PyJWT==2.10.1
-- python-jose[cryptography]==3.3.0
 - passlib[bcrypt]==1.7.4
 - argon2-cffi==23.1.0
 - cryptography==41.0.7
