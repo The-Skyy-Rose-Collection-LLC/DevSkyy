@@ -166,7 +166,7 @@ jobs:
         safety check --json --output ml-safety-report.json || true
 
     - name: Upload security reports
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ml-security-reports
         path: |
