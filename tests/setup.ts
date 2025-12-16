@@ -115,7 +115,7 @@ afterAll(() => {
 });
 
 // Global test helpers
-export const createMockAgent = (overrides: Partial<import('@/types').Agent> = {}) => ({
+export const createMockAgent = (overrides: Record<string, unknown> = {}) => ({
   id: 'test-agent-id',
   name: 'Test Agent',
   type: 'custom_agent' as const,
@@ -127,7 +127,7 @@ export const createMockAgent = (overrides: Partial<import('@/types').Agent> = {}
   ...overrides,
 });
 
-export const createMockTask = (overrides: Partial<import('@/types').AgentTask> = {}) => ({
+export const createMockTask = (overrides: Record<string, unknown> = {}) => ({
   id: 'test-task-id',
   agentId: 'test-agent-id',
   type: 'test_task',
@@ -139,7 +139,7 @@ export const createMockTask = (overrides: Partial<import('@/types').AgentTask> =
   ...overrides,
 });
 
-export const createMockUser = (overrides: Partial<import('@/types').User> = {}) => ({
+export const createMockUser = (overrides: Record<string, unknown> = {}) => ({
   id: 'test-user-id',
   username: 'testuser',
   email: 'test@example.com',
@@ -185,7 +185,7 @@ export const waitForCondition = async (
 };
 
 // Mock API responses
-export const createMockApiResponse = <T>(data: T, overrides: Partial<import('@/types').ApiResponse<T>> = {}) => ({
+export const createMockApiResponse = <T>(data: T, overrides: Record<string, unknown> = {}) => ({
   success: true,
   data,
   metadata: {

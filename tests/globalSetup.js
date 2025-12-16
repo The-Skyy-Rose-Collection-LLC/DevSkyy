@@ -1,8 +1,10 @@
+"use strict";
 /**
  * Jest Global Setup
  * Runs once before all test suites
  */
-export default async () => {
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = async () => {
     console.log('🚀 Starting DevSkyy test suite...');
     // Set test environment variables
     process.env.NODE_ENV = 'testing';
@@ -11,4 +13,3 @@ export default async () => {
     // await initializeTestDatabase();
     console.log('✅ Global test setup completed');
 };
-//# sourceMappingURL=globalSetup.js.map
