@@ -101,8 +101,7 @@ class AgnoAgent(BaseDevSkyyAgent):
     async def initialize(self) -> None:
         """Initialize Agno agent"""
         try:
-            from agno.agent import Agent
-            from agno.models.openai import OpenAIChat
+            from agno.agent import Agent  # noqa: F401
 
             # Create model
             self._model = self._create_model()
