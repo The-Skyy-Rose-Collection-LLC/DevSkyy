@@ -151,25 +151,15 @@ threeJSService.startAnimation(() => {
 
 ## 🤖 Agent Types
 
-The SDK supports all 54 DevSkyy agents:
+The SDK supports the 6 core DevSkyy agents:
 
-### Content & Media Agents
-- `wordpress_agent` - WordPress management
-- `content_agent` - Content generation
-- `seo_agent` - SEO optimization
-- `social_media_agent` - Social media management
-
-### Technical Agents
-- `api_agent` - API integration
-- `database_agent` - Database management
-- `security_agent` - Security monitoring
-- `deployment_agent` - Deployment automation
-
-### AI & Analytics Agents
-- `ml_agent` - Machine learning
-- `data_agent` - Data processing
-- `analytics_agent` - Analytics & reporting
-- `monitoring_agent` - System monitoring
+### Core Business Agents
+- `wordpress_agent` - WordPress management and automation
+- `seo_agent` - SEO optimization and content analysis
+- `content_agent` - AI-powered content generation
+- `social_media_agent` - Social media management and automation
+- `analytics_agent` - Analytics, reporting, and business intelligence
+- `security_agent` - Security monitoring and threat detection
 
 ## 📋 Configuration
 
