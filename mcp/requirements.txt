@@ -52,7 +52,7 @@ sqlalchemy==2.0.36
 aiosqlite==0.20.0
 
 # Caching
-redis==5.2.1
+redis==7.1.0
 aioredis==2.0.1
 
 # Configuration management
