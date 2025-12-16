@@ -4,10 +4,10 @@
 # Core MCP framework
 mcp>=1.23.0  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416 (DoS and DNS rebinding)
 
-# AI service integrations
+# AI service integrations (Updated to latest SDKs)
 openai>=1.57.2
-anthropic>=0.40.0
-google-generativeai>=0.8.3
+anthropic>=0.75.0
+google-genai>=1.50.0  # Updated: New unified Google AI SDK (replaces google-generativeai)
 
 # Core Python web framework
 fastapi>=0.119.0
