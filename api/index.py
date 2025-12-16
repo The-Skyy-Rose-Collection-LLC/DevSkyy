@@ -20,37 +20,41 @@ os.environ.setdefault("LOG_LEVEL", "INFO")
 
 try:
     # Import the main FastAPI application
-    from main_enterprise import app
-    
     # Import Mangum for ASGI-to-WSGI adapter
     from mangum import Mangum
-    
+
+    from main_enterprise import app
+
     # Create the Vercel-compatible handler
     handler = Mangum(app, lifespan="off")
-    
+
     # Export for Vercel
     def handler_func(event, context):
         """Vercel serverless function handler"""
         return handler(event, context)
-    
+
     # Also export the app directly for compatibility
     __all__ = ["app", "handler", "handler_func"]
-    
+
 except ImportError as e:
     # Fallback for missing dependencies
     import json
-    
+
+    _import_error = str(e)
+
     def handler_func(event, context):
         """Fallback handler when dependencies are missing"""
         return {
             "statusCode": 500,
             "headers": {"Content-Type": "application/json"},
-            "body": json.dumps({
-                "error": "Import Error",
-                "message": f"Failed to import required modules: {str(e)}",
-                "details": "Please check that all dependencies are installed"
-            })
+            "body": json.dumps(
+                {
+                    "error": "Import Error",
+                    "message": f"Failed to import required modules: {_import_error}",
+                    "details": "Please check that all dependencies are installed",
+                }
+            ),
         }
-    
+
     app = None
     handler = None

@@ -2,635 +2,185 @@
 WordPress REST API Client
 =========================
 
-Enterprise-grade WordPress REST API client with:
-- Basic auth with application passwords
-- Rate limiting with exponential backoff
-- Comprehensive error handling
-- Async support
-- Connection pooling
+Core client for WordPress REST API v2.
 
-References:
-- WordPress REST API: https://developer.wordpress.org/rest-api/
-- Authentication: https://developer.wordpress.org/rest-api/using-the-rest-api/authentication/
-- Application Passwords: https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/
+Author: DevSkyy Platform Team
+Version: 1.0.0
 """
 
-import base64
-import json
+from __future__ import annotations
+
+import asyncio
 import logging
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Any
 
-import httpx
-from pydantic import BaseModel
-from tenacity import (
-    retry,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
+import aiohttp
 
 logger = logging.getLogger(__name__)
 
 
-# =============================================================================
-# Exceptions
-# =============================================================================
-
-
 class WordPressError(Exception):
-    """Base WordPress API error"""
+    """Base WordPress error."""
 
-    def __init__(self, message: str, status_code: int = None, response: dict = None):
-        self.message = message
+    def __init__(self, message: str, status_code: int | None = None) -> None:
+        super().__init__(message)
         self.status_code = status_code
-        self.response = response or {}
-        super().__init__(self.message)
 
 
 class AuthenticationError(WordPressError):
-    """Authentication failed"""
+    """Authentication failed."""
 
     pass
 
 
 class NotFoundError(WordPressError):
-    """Resource not found"""
+    """Resource not found."""
 
     pass
-
-
-class RateLimitError(WordPressError):
-    """Rate limit exceeded"""
-
-    pass
-
-
-class ValidationError(WordPressError):
-    """Validation error"""
-
-    pass
-
-
-# =============================================================================
-# Configuration
-# =============================================================================
 
 
 @dataclass
 class WordPressConfig:
-    """WordPress configuration"""
+    """WordPress API configuration."""
 
-    url: str
-    username: str
-    app_password: str
+    site_url: str = field(default_factory=lambda: os.getenv("WP_SITE_URL", ""))
+    username: str = field(default_factory=lambda: os.getenv("WP_USERNAME", ""))
+    app_password: str = field(default_factory=lambda: os.getenv("WP_APP_PASSWORD", ""))
+    api_version: str = "wp/v2"
     timeout: float = 30.0
     max_retries: int = 3
-    verify_ssl: bool = True
-    user_agent: str = "DevSkyy/2.0 WordPress-Client"
-
-    # Rate limiting
-    requests_per_minute: int = 60
 
     @classmethod
-    def from_env(cls) -> "WordPressConfig":
-        """Load configuration from environment variables"""
-        return cls(
-            url=os.getenv("WORDPRESS_URL", "https://skyyrose.co"),
-            username=os.getenv("WORDPRESS_USERNAME", ""),
-            app_password=os.getenv("WORDPRESS_APP_PASSWORD", ""),
-            verify_ssl=os.getenv("WORDPRESS_VERIFY_SSL", "true").lower() == "true",
-        )
-
-    @property
-    def auth_header(self) -> str:
-        """Generate Basic auth header"""
-        credentials = f"{self.username}:{self.app_password}"
-        encoded = base64.b64encode(credentials.encode()).decode()
-        return f"Basic {encoded}"
+    def from_env(cls) -> WordPressConfig:
+        return cls()
 
     @property
     def base_url(self) -> str:
-        """Get base REST API URL"""
-        url = self.url.rstrip("/")
-        return f"{url}/wp-json"
-
-
-# =============================================================================
-# Response Models
-# =============================================================================
-
-
-class WPUser(BaseModel):
-    """WordPress user"""
-
-    id: int
-    username: str
-    name: str
-    email: str | None = None
-    roles: list[str] = []
-    avatar_urls: dict[str, str] = {}
-
-
-class WPPost(BaseModel):
-    """WordPress post"""
-
-    id: int
-    date: str
-    date_gmt: str
-    modified: str
-    modified_gmt: str
-    slug: str
-    status: str
-    type: str
-    link: str
-    title: dict[str, str]
-    content: dict[str, str]
-    excerpt: dict[str, str]
-    author: int
-    featured_media: int = 0
-    categories: list[int] = []
-    tags: list[int] = []
-
-
-class WPPage(BaseModel):
-    """WordPress page"""
-
-    id: int
-    date: str
-    slug: str
-    status: str
-    type: str
-    link: str
-    title: dict[str, str]
-    content: dict[str, str]
-    author: int
-    parent: int = 0
-    menu_order: int = 0
-    template: str = ""
-
-
-# =============================================================================
-# WordPress Client
-# =============================================================================
+        return f"{self.site_url}/wp-json/{self.api_version}"
 
 
 class WordPressClient:
-    """
-    Enterprise WordPress REST API Client
+    """WordPress REST API Client."""
 
-    Usage:
-        client = WordPressClient(
-            url="https://skyyrose.co",
-            username="admin",
-            app_password="xxxx-xxxx-xxxx-xxxx"
-        )
+    def __init__(self, config: WordPressConfig | None = None) -> None:
+        self.config = config or WordPressConfig.from_env()
+        self._session: aiohttp.ClientSession | None = None
 
-        # Get posts
-        posts = await client.get_posts(per_page=10)
-
-        # Create post
-        post = await client.create_post(
-            title="New Post",
-            content="Content here",
-            status="publish"
-        )
-    """
-
-    def __init__(
-        self,
-        url: str = None,
-        username: str = None,
-        app_password: str = None,
-        config: WordPressConfig = None,
-    ):
-        if config:
-            self.config = config
-        else:
-            self.config = WordPressConfig(
-                url=url or os.getenv("WORDPRESS_URL", "https://skyyrose.co"),
-                username=username or os.getenv("WORDPRESS_USERNAME", ""),
-                app_password=app_password or os.getenv("WORDPRESS_APP_PASSWORD", ""),
-            )
-
-        self._client: httpx.AsyncClient | None = None
-        self._request_count = 0
-        self._last_request_time = None
-
-    async def __aenter__(self):
-        """Async context manager entry"""
+    async def __aenter__(self) -> WordPressClient:
         await self.connect()
         return self
 
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit"""
+    async def __aexit__(self, *args: Any) -> None:
         await self.close()
 
-    async def connect(self):
-        """Initialize HTTP client"""
-        if self._client is None:
-            self._client = httpx.AsyncClient(
-                timeout=self.config.timeout,
-                verify=self.config.verify_ssl,
-                headers={
-                    "Authorization": self.config.auth_header,
-                    "User-Agent": self.config.user_agent,
-                    "Content-Type": "application/json",
-                    "Accept": "application/json",
-                },
-            )
-            logger.info(f"Connected to WordPress: {self.config.url}")
-
-    async def close(self):
-        """Close HTTP client"""
-        if self._client:
-            await self._client.aclose()
-            self._client = None
-            logger.info("WordPress client closed")
-
-    def _handle_error(self, response: httpx.Response):
-        """Handle API errors"""
-        status = response.status_code
-
-        try:
-            data = response.json()
-            message = data.get("message", response.text)
-            code = data.get("code", "unknown")
-        except json.JSONDecodeError:
-            message = response.text
-            code = "unknown"
-
-        if status == 401:
-            raise AuthenticationError(
-                f"Authentication failed: {message}",
-                status_code=status,
-                response={"code": code},
-            )
-        elif status == 403:
-            raise AuthenticationError(
-                f"Permission denied: {message}",
-                status_code=status,
-                response={"code": code},
-            )
-        elif status == 404:
-            raise NotFoundError(
-                f"Resource not found: {message}",
-                status_code=status,
-                response={"code": code},
-            )
-        elif status == 429:
-            raise RateLimitError(
-                f"Rate limit exceeded: {message}",
-                status_code=status,
-                response={"code": code},
-            )
-        elif status == 400:
-            raise ValidationError(
-                f"Validation error: {message}",
-                status_code=status,
-                response={"code": code},
-            )
-        else:
-            raise WordPressError(
-                f"API error ({status}): {message}",
-                status_code=status,
-                response={"code": code},
+    async def connect(self) -> None:
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession(
+                timeout=aiohttp.ClientTimeout(total=self.config.timeout),
+                auth=aiohttp.BasicAuth(self.config.username, self.config.app_password),
             )
 
-    @retry(
-        stop=stop_after_attempt(3),
-        wait=wait_exponential(multiplier=1, min=1, max=10),
-        retry=retry_if_exception_type((RateLimitError, httpx.TimeoutException)),
-    )
+    async def close(self) -> None:
+        if self._session and not self._session.closed:
+            await self._session.close()
+
     async def _request(
         self,
         method: str,
         endpoint: str,
-        data: dict = None,
-        params: dict = None,
-        files: dict = None,
-    ) -> dict | list:
-        """Make API request with retry logic"""
-        if self._client is None:
-            await self.connect()
-
+        params: dict[str, Any] | None = None,
+        json: dict[str, Any] | None = None,
+        data: Any | None = None,
+        headers: dict[str, str] | None = None,
+    ) -> Any:
+        await self.connect()
         url = f"{self.config.base_url}/{endpoint.lstrip('/')}"
 
-        # Build request kwargs
-        kwargs = {"params": params}
+        for attempt in range(self.config.max_retries):
+            try:
+                async with self._session.request(
+                    method, url, params=params, json=json, data=data, headers=headers
+                ) as response:
+                    if response.status == 401:
+                        raise AuthenticationError("Authentication failed", 401)
+                    if response.status == 404:
+                        raise NotFoundError("Resource not found", 404)
+                    if response.status >= 400:
+                        text = await response.text()
+                        raise WordPressError(text, response.status)
+                    if response.status == 204:
+                        return {}
+                    return await response.json()
+            except aiohttp.ClientError as e:
+                if attempt == self.config.max_retries - 1:
+                    raise WordPressError(str(e))
+                await asyncio.sleep(1)
 
-        if files:
-            # File upload - use form data
-            kwargs["files"] = files
-            kwargs["data"] = data
-        elif data:
-            kwargs["json"] = data
-
-        logger.debug(f"WordPress API: {method} {url}")
-
-        response = await self._client.request(method, url, **kwargs)
-
-        if response.status_code >= 400:
-            self._handle_error(response)
-
-        # Handle empty responses
-        if response.status_code == 204:
-            return {}
-
-        return response.json()
-
-    # -------------------------------------------------------------------------
-    # Core Endpoints
-    # -------------------------------------------------------------------------
-
-    async def get_site_info(self) -> dict:
-        """Get WordPress site information"""
-        return await self._request("GET", "/")
-
-    async def get_current_user(self) -> WPUser:
-        """Get current authenticated user"""
-        data = await self._request("GET", "/wp/v2/users/me")
-        return WPUser(**data)
-
-    async def test_connection(self) -> bool:
-        """Test API connection"""
-        try:
-            await self.get_current_user()
-            return True
-        except WordPressError:
-            return False
-
-    # -------------------------------------------------------------------------
     # Posts
-    # -------------------------------------------------------------------------
-
-    async def get_posts(
-        self,
-        per_page: int = 10,
-        page: int = 1,
-        status: str = "publish",
-        categories: list[int] = None,
-        tags: list[int] = None,
-        search: str = None,
-        orderby: str = "date",
-        order: str = "desc",
-    ) -> list[WPPost]:
-        """Get posts with filtering"""
-        params = {
-            "per_page": per_page,
-            "page": page,
-            "status": status,
-            "orderby": orderby,
-            "order": order,
-        }
-
-        if categories:
-            params["categories"] = ",".join(map(str, categories))
-        if tags:
-            params["tags"] = ",".join(map(str, tags))
-        if search:
-            params["search"] = search
-
-        data = await self._request("GET", "/wp/v2/posts", params=params)
-        return [WPPost(**post) for post in data]
-
-    async def get_post(self, post_id: int) -> WPPost:
-        """Get single post by ID"""
-        data = await self._request("GET", f"/wp/v2/posts/{post_id}")
-        return WPPost(**data)
+    async def get_posts(self, per_page: int = 10, **kwargs: Any) -> list[dict[str, Any]]:
+        return await self._request("GET", "/posts", params={"per_page": per_page, **kwargs})
 
     async def create_post(
-        self,
-        title: str,
-        content: str,
-        status: str = "draft",
-        excerpt: str = None,
-        categories: list[int] = None,
-        tags: list[int] = None,
-        featured_media: int = None,
-        meta: dict = None,
-    ) -> WPPost:
-        """Create new post"""
-        data = {
-            "title": title,
-            "content": content,
-            "status": status,
-        }
+        self, title: str, content: str = "", status: str = "draft", **kwargs: Any
+    ) -> dict[str, Any]:
+        return await self._request(
+            "POST", "/posts", json={"title": title, "content": content, "status": status, **kwargs}
+        )
 
-        if excerpt:
-            data["excerpt"] = excerpt
-        if categories:
-            data["categories"] = categories
-        if tags:
-            data["tags"] = tags
-        if featured_media:
-            data["featured_media"] = featured_media
-        if meta:
-            data["meta"] = meta
+    async def update_post(self, post_id: int, **kwargs: Any) -> dict[str, Any]:
+        return await self._request("POST", f"/posts/{post_id}", json=kwargs)
 
-        result = await self._request("POST", "/wp/v2/posts", data=data)
-        return WPPost(**result)
+    async def delete_post(self, post_id: int, force: bool = False) -> dict[str, Any]:
+        return await self._request("DELETE", f"/posts/{post_id}", params={"force": force})
 
-    async def update_post(self, post_id: int, **kwargs) -> WPPost:
-        """Update existing post"""
-        result = await self._request("POST", f"/wp/v2/posts/{post_id}", data=kwargs)
-        return WPPost(**result)
-
-    async def delete_post(self, post_id: int, force: bool = False) -> dict:
-        """Delete post"""
-        params = {"force": force}
-        return await self._request("DELETE", f"/wp/v2/posts/{post_id}", params=params)
-
-    # -------------------------------------------------------------------------
     # Pages
-    # -------------------------------------------------------------------------
-
-    async def get_pages(
-        self,
-        per_page: int = 10,
-        page: int = 1,
-        status: str = "publish",
-        parent: int = None,
-        search: str = None,
-    ) -> list[WPPage]:
-        """Get pages"""
-        params = {
-            "per_page": per_page,
-            "page": page,
-            "status": status,
-        }
-
-        if parent is not None:
-            params["parent"] = parent
-        if search:
-            params["search"] = search
-
-        data = await self._request("GET", "/wp/v2/pages", params=params)
-        return [WPPage(**p) for p in data]
-
-    async def get_page(self, page_id: int) -> WPPage:
-        """Get single page"""
-        data = await self._request("GET", f"/wp/v2/pages/{page_id}")
-        return WPPage(**data)
+    async def get_pages(self, per_page: int = 10, **kwargs: Any) -> list[dict[str, Any]]:
+        return await self._request("GET", "/pages", params={"per_page": per_page, **kwargs})
 
     async def create_page(
-        self,
-        title: str,
-        content: str,
-        status: str = "draft",
-        parent: int = None,
-        template: str = None,
-        meta: dict = None,
-    ) -> WPPage:
-        """Create new page"""
-        data = {
-            "title": title,
-            "content": content,
-            "status": status,
+        self, title: str, content: str = "", status: str = "draft", **kwargs: Any
+    ) -> dict[str, Any]:
+        return await self._request(
+            "POST", "/pages", json={"title": title, "content": content, "status": status, **kwargs}
+        )
+
+    async def update_page(self, page_id: int, **kwargs: Any) -> dict[str, Any]:
+        return await self._request("POST", f"/pages/{page_id}", json=kwargs)
+
+    # Media
+    async def get_media(self, per_page: int = 10, **kwargs: Any) -> list[dict[str, Any]]:
+        return await self._request("GET", "/media", params={"per_page": per_page, **kwargs})
+
+    async def upload_media(self, file_path: str, title: str = "") -> dict[str, Any]:
+        import mimetypes
+        from pathlib import Path
+
+        import aiofiles
+
+        path = Path(file_path)
+        content_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
+
+        async with aiofiles.open(file_path, "rb") as f:
+            file_data = await f.read()
+
+        headers = {
+            "Content-Disposition": f'attachment; filename="{path.name}"',
+            "Content-Type": content_type,
         }
+        result = await self._request("POST", "/media", data=file_data, headers=headers)
 
-        if parent:
-            data["parent"] = parent
-        if template:
-            data["template"] = template
-        if meta:
-            data["meta"] = meta
+        if title:
+            result = await self._request("POST", f"/media/{result['id']}", json={"title": title})
 
-        result = await self._request("POST", "/wp/v2/pages", data=data)
-        return WPPage(**result)
+        return result
 
-    async def update_page(self, page_id: int, **kwargs) -> WPPage:
-        """Update existing page"""
-        result = await self._request("POST", f"/wp/v2/pages/{page_id}", data=kwargs)
-        return WPPage(**result)
 
-    # -------------------------------------------------------------------------
-    # Categories & Tags
-    # -------------------------------------------------------------------------
-
-    async def get_categories(self, per_page: int = 100) -> list[dict]:
-        """Get post categories"""
-        return await self._request("GET", "/wp/v2/categories", params={"per_page": per_page})
-
-    async def create_category(
-        self,
-        name: str,
-        slug: str = None,
-        description: str = None,
-        parent: int = None,
-    ) -> dict:
-        """Create category"""
-        data = {"name": name}
-        if slug:
-            data["slug"] = slug
-        if description:
-            data["description"] = description
-        if parent:
-            data["parent"] = parent
-
-        return await self._request("POST", "/wp/v2/categories", data=data)
-
-    async def get_tags(self, per_page: int = 100) -> list[dict]:
-        """Get post tags"""
-        return await self._request("GET", "/wp/v2/tags", params={"per_page": per_page})
-
-    async def create_tag(self, name: str, slug: str = None, description: str = None) -> dict:
-        """Create tag"""
-        data = {"name": name}
-        if slug:
-            data["slug"] = slug
-        if description:
-            data["description"] = description
-
-        return await self._request("POST", "/wp/v2/tags", data=data)
-
-    # -------------------------------------------------------------------------
-    # Custom Post Types (Elementor Templates)
-    # -------------------------------------------------------------------------
-
-    async def get_elementor_templates(self, per_page: int = 100) -> list[dict]:
-        """Get Elementor templates"""
-        try:
-            return await self._request(
-                "GET", "/wp/v2/elementor_library", params={"per_page": per_page}
-            )
-        except NotFoundError:
-            logger.warning("Elementor templates endpoint not available")
-            return []
-
-    async def create_elementor_template(
-        self,
-        title: str,
-        template_type: str,
-        content: str,
-        status: str = "publish",
-    ) -> dict:
-        """Create Elementor template"""
-        data = {
-            "title": title,
-            "status": status,
-            "content": content,
-            "meta": {
-                "_elementor_template_type": template_type,
-            },
-        }
-
-        return await self._request("POST", "/wp/v2/elementor_library", data=data)
-
-    # -------------------------------------------------------------------------
-    # Settings & Options
-    # -------------------------------------------------------------------------
-
-    async def get_settings(self) -> dict:
-        """Get site settings"""
-        return await self._request("GET", "/wp/v2/settings")
-
-    async def update_settings(self, **kwargs) -> dict:
-        """Update site settings"""
-        return await self._request("POST", "/wp/v2/settings", data=kwargs)
-
-    # -------------------------------------------------------------------------
-    # Search
-    # -------------------------------------------------------------------------
-
-    async def search(
-        self,
-        query: str,
-        type: str = "post",
-        per_page: int = 10,
-    ) -> list[dict]:
-        """Search site content"""
-        params = {
-            "search": query,
-            "type": type,
-            "per_page": per_page,
-        }
-        return await self._request("GET", "/wp/v2/search", params=params)
-
-    # -------------------------------------------------------------------------
-    # Plugin Status
-    # -------------------------------------------------------------------------
-
-    async def get_plugins(self) -> list[dict]:
-        """Get installed plugins (requires admin)"""
-        try:
-            return await self._request("GET", "/wp/v2/plugins")
-        except (AuthenticationError, NotFoundError):
-            logger.warning("Cannot access plugins endpoint")
-            return []
-
-    async def check_woocommerce(self) -> bool:
-        """Check if WooCommerce is active"""
-        try:
-            await self._request("GET", "/wc/v3/system_status")
-            return True
-        except (NotFoundError, AuthenticationError):
-            return False
-
-    async def check_elementor(self) -> bool:
-        """Check if Elementor is active"""
-        try:
-            await self.get_elementor_templates(per_page=1)
-            return True
-        except (NotFoundError, AuthenticationError):
-            return False
+__all__ = [
+    "WordPressClient",
+    "WordPressConfig",
+    "WordPressError",
+    "AuthenticationError",
+    "NotFoundError",
+]
