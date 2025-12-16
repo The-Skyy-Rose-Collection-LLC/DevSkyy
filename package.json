@@ -16,6 +16,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.182.0",
     "@types/vue": "^1.0.31",
+    "@vercel/speed-insights": "^1.0.0",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitejs/plugin-vue": "^6.0.3",
     "ajv": "^8.17.1",

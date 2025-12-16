@@ -39,6 +39,11 @@ from api.agents import agents_router
 from api.gdpr import gdpr_router
 
 # API modules
+from api.speed_insights import (
+    create_speed_insights_middleware,
+    speed_insights_metrics,
+    speed_insights_router,
+)
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
 from api.webhooks import WebhookEventType, webhook_manager, webhook_router
 from security.aes256_gcm_encryption import data_masker, field_encryption
@@ -142,16 +147,22 @@ version_config = VersionConfig(
 )
 setup_api_versioning(app, version_config)
 
+# Speed Insights middleware for performance monitoring
+speed_insights_middleware = create_speed_insights_middleware(
+    enabled=True, verbose=os.getenv("ENVIRONMENT") == "development"
+)
 
-# Request logging middleware
+
+# Request logging middleware with Speed Insights integration
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing"""
+    """Log all requests with timing and Speed Insights metrics"""
     import time
 
     start = time.time()
 
-    response = await call_next(request)
+    # Process through Speed Insights middleware
+    response = await speed_insights_middleware(request, call_next)
 
     duration = (time.time() - start) * 1000
     logger.info(f"{request.method} {request.url.path} - {response.status_code} - {duration:.2f}ms")
@@ -174,6 +185,9 @@ app.include_router(webhook_router)
 
 # GDPR compliance routes
 app.include_router(gdpr_router)
+
+# Speed Insights routes for performance monitoring
+app.include_router(speed_insights_router)
 
 # AI agent routes
 app.include_router(agents_router)

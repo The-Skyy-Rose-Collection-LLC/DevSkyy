@@ -82,5 +82,8 @@
       "source": "/redoc",
       "destination": "/api/redoc"
     }
-  ]
+  ],
+  "notes": {
+    "speedInsights": "Speed Insights monitoring is enabled. Routes are available at /_vercel/speed-insights/"
+  }
 }

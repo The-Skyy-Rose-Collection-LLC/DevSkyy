@@ -28,6 +28,13 @@ from .gdpr import (  # Enums; Service; Router
     gdpr_router,
     gdpr_service,
 )
+from .speed_insights import (  # Classes; Instances; Router; Factory
+    SpeedInsightsMetrics,
+    SpeedInsightsMiddleware,
+    create_speed_insights_middleware,
+    speed_insights_metrics,
+    speed_insights_router,
+)
 from .versioning import (  # Config; Models; Classes; Dependencies; Decorators; Router; Setup
     APIVersion,
     APIVersionFactory,
@@ -88,6 +95,12 @@ __all__ = [
     "WebhookReceiver",
     "webhook_manager",
     "webhook_router",
+    # Speed Insights
+    "SpeedInsightsMetrics",
+    "SpeedInsightsMiddleware",
+    "create_speed_insights_middleware",
+    "speed_insights_metrics",
+    "speed_insights_router",
     # GDPR
     "DataCategory",
     "LegalBasis",

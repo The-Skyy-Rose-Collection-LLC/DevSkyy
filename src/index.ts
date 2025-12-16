@@ -12,6 +12,7 @@ export * from './types/index.js';
 export * from './config/index.js';
 export * from './utils/Logger.js';
 export * from './services/AgentService.js';
+export * from './speed-insights.js';
 
 // Main DevSkyy SDK class
 export class DevSkyy {
