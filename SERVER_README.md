@@ -12,7 +12,7 @@ This server exposes DevSkyy's AI capabilities as MCP tools that can be used by O
 - ✅ **Function Calling**: Structured outputs and tool use
 - ✅ **Vision Capabilities**: Image analysis with GPT-4o/4o-mini
 - ✅ **Code Generation**: Language-specific code with docs and tests
-- ✅ **DevSkyy Agents**: Access to 54 specialized AI agents
+- ✅ **DevSkyy Agents**: Access to 6 core specialized AI agents
 - ✅ **WordPress Automation**: Theme generation and management
 - ✅ **E-commerce Tools**: Product management and pricing
 

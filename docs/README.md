@@ -77,17 +77,17 @@ pytest --cov
 
 ```
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
-│   React         │    │   FastAPI        │    │   AI Agents     │
-│   Dashboard     │───►│   Backend        │───►│   (54 agents)   │
-│   (Frontend)    │    │   (API Layer)    │    │   Orchestration │
+│   TypeScript    │    │   FastAPI        │    │   6 Core        │
+│   SDK           │───►│   Backend        │───►│   AI Agents     │
+│   (Frontend)    │    │   (API Layer)    │    │   Ecosystem     │
 └─────────────────┘    └──────────────────┘    └─────────────────┘
          │                       │                       │
          │                       │                       │
          ▼                       ▼                       ▼
 ┌─────────────────┐    ┌──────────────────┐    ┌─────────────────┐
 │   WordPress     │    │   PostgreSQL     │    │   External      │
-│   WooCommerce   │    │   Database       │    │   APIs          │
-│   (E-commerce)  │    │   (Data Layer)   │    │   (Integrations)│
+│   Management    │    │   Database       │    │   APIs          │
+│   (Automation)  │    │   (Data Layer)   │    │   (Integrations)│
 └─────────────────┘    └──────────────────┘    └─────────────────┘
 ```
 

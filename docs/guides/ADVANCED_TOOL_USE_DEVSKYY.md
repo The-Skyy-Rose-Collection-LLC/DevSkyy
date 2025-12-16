@@ -2,7 +2,7 @@
 
 ## Executive Summary
 
-Based on Anthropic's November 2025 engineering blog post, this guide integrates three new beta features with DevSkyy's 54-agent architecture to achieve:
+Based on Anthropic's November 2025 engineering blog post, this guide integrates three new beta features with DevSkyy's 6-agent architecture to achieve:
 
 - **85% token reduction** via Tool Search Tool
 - **37% latency improvement** via Programmatic Tool Calling

@@ -1,6 +1,6 @@
 # DevSkyy OpenAI MCP Server
 
-A Model Context Protocol (MCP) server that integrates OpenAI's GPT-4o, GPT-4o-mini, and o1-preview models with DevSkyy's 54-agent platform.
+A Model Context Protocol (MCP) server that integrates OpenAI's GPT-4o, GPT-4o-mini, and o1-preview models with DevSkyy's 6-agent platform.
 
 ## Features
 
