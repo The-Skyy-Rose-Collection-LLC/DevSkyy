@@ -39,20 +39,9 @@ from api.agents import agents_router
 from api.gdpr import gdpr_router
 
 # API modules
-from api.versioning import (
-    VersionConfig,
-    VersionedAPIRouter,
-    setup_api_versioning,
-)
-from api.webhooks import (
-    WebhookEventType,
-    webhook_manager,
-    webhook_router,
-)
-from security.aes256_gcm_encryption import (
-    data_masker,
-    field_encryption,
-)
+from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
+from api.webhooks import WebhookEventType, webhook_manager, webhook_router
+from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
 from security.jwt_oauth2_auth import (

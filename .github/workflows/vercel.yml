@@ -1,0 +1,263 @@
+name: Vercel Environment CI/CD
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'vercel/**'
+      - 'api/**'
+      - 'main_enterprise.py'
+      - 'vercel.json'
+      - '.github/workflows/vercel.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'vercel/**'
+      - 'api/**'
+      - 'main_enterprise.py'
+      - 'vercel.json'
+
+env:
+  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+
+jobs:
+  vercel-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install Vercel CLI
+      run: npm install -g vercel@latest
+
+    - name: Cache Vercel dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-vercel-pip-${{ hashFiles('vercel/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-vercel-pip-
+
+    - name: Install Vercel dependencies
+      run: |
+        cd vercel
+        pip install -r requirements.txt
+
+    - name: Test serverless compatibility
+      run: |
+        python -c "
+        try:
+            import mangum
+            from fastapi import FastAPI
+            print('✅ Serverless dependencies loaded successfully')
+        except ImportError as e:
+            print(f'❌ Serverless dependency error: {e}')
+            exit(1)
+        "
+
+    - name: Run Vercel-specific tests
+      run: |
+        pytest tests/ -k "vercel or serverless" -v --tb=short
+
+    - name: Test cold start performance
+      run: |
+        python -c "
+        import time
+        start_time = time.time()
+
+        # Simulate cold start
+        from fastapi import FastAPI
+        from mangum import Mangum
+
+        app = FastAPI()
+        handler = Mangum(app)
+
+        end_time = time.time()
+        cold_start_time = end_time - start_time
+
+        print(f'✅ Cold start time: {cold_start_time:.3f}s')
+
+        if cold_start_time > 2.0:
+            print('⚠️ Warning: Cold start time exceeds 2 seconds')
+        "
+
+  vercel-build:
+    runs-on: ubuntu-latest
+    needs: vercel-test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install Vercel CLI
+      run: npm install -g vercel@latest
+
+    - name: Create Vercel configuration
+      run: |
+        cat > vercel.json << EOF
+        {
+          "version": 2,
+          "builds": [
+            {
+              "src": "main_enterprise.py",
+              "use": "@vercel/python",
+              "config": {
+                "maxLambdaSize": "50mb",
+                "runtime": "python3.11"
+              }
+            }
+          ],
+          "routes": [
+            {
+              "src": "/(.*)",
+              "dest": "main_enterprise.py"
+            }
+          ],
+          "env": {
+            "PYTHONPATH": ".",
+            "ENVIRONMENT": "production"
+          },
+          "functions": {
+            "main_enterprise.py": {
+              "maxDuration": 30
+            }
+          }
+        }
+        EOF
+
+    - name: Create Vercel adapter
+      run: |
+        cat > api/index.py << EOF
+        from mangum import Mangum
+        from main_enterprise import app
+
+        handler = Mangum(app, lifespan="off")
+        EOF
+
+    - name: Test Vercel build locally
+      run: |
+        vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+  vercel-security:
+    runs-on: ubuntu-latest
+    needs: vercel-test
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Python 3.11
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: Install security tools
+      run: |
+        pip install bandit safety
+
+    - name: Run Vercel security scan
+      run: |
+        bandit -r api/ -f json -o vercel-security-report.json || true
+        safety check --json --output vercel-safety-report.json || true
+
+    - name: Check serverless security
+      run: |
+        python -c "
+        # Check for serverless-specific security issues
+        import os
+
+        # Verify no sensitive data in environment
+        sensitive_vars = ['API_KEY', 'SECRET', 'PASSWORD', 'TOKEN']
+        for var in os.environ:
+            for sensitive in sensitive_vars:
+                if sensitive in var.upper() and var.upper() != 'GITHUB_TOKEN':
+                    print(f'⚠️ Potential sensitive variable: {var}')
+
+        print('✅ Serverless security check completed')
+        "
+
+    - name: Upload security reports
+      uses: actions/upload-artifact@v4
+      with:
+        name: vercel-security-reports
+        path: |
+          vercel-security-report.json
+          vercel-safety-report.json
+
+  vercel-deploy-preview:
+    runs-on: ubuntu-latest
+    needs: [vercel-build, vercel-security]
+    if: github.event_name == 'pull_request'
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install Vercel CLI
+      run: npm install -g vercel@latest
+
+    - name: Deploy to Vercel Preview
+      run: |
+        vercel deploy --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
+        echo "DEPLOYMENT_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
+
+    - name: Comment deployment URL
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `🚀 Preview deployment ready!\n\n**URL:** ${process.env.DEPLOYMENT_URL}\n\nThis preview will be automatically deleted when the PR is closed.`
+          })
+
+  vercel-deploy-production:
+    runs-on: ubuntu-latest
+    needs: [vercel-build, vercel-security]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: Install Vercel CLI
+      run: npm install -g vercel@latest
+
+    - name: Deploy to Vercel Production
+      run: |
+        vercel deploy --prod --token=${{ secrets.VERCEL_TOKEN }} > deployment-url.txt
+        echo "PRODUCTION_URL=$(cat deployment-url.txt)" >> $GITHUB_ENV
+
+    - name: Run post-deployment tests
+      run: |
+        sleep 30  # Wait for deployment to be ready
+        curl -f ${{ env.PRODUCTION_URL }}/health || exit 1
+        echo "✅ Production deployment health check passed"
