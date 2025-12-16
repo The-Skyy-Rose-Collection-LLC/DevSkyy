@@ -5,39 +5,45 @@ This directory contains documentation for all AI agents in the DevSkyy ecosystem
 ## 📋 Available Documentation
 
 ### Core Agent Documentation
-- **[AGENTS.md](./AGENTS.md)** - Complete overview of all 54 AI agents in the DevSkyy platform
+- **[AGENTS.md](./AGENTS.md)** - Complete overview of the 6 core AI agents in the DevSkyy platform
 
-## 🤖 Agent Categories
+## 🤖 Core Agent Categories
 
-### Business Intelligence Agents
-- Market analysis and trend prediction
-- Customer behavior analytics
-- Competitive intelligence
-- Revenue optimization
+### WordPress Management
+- Site management and configuration
+- Plugin and theme management
+- Content publishing automation
+- WordPress optimization
 
-### Content Creation Agents
-- Product description generation
-- Marketing copy creation
-- Social media content
-- SEO optimization
+### SEO & Content Optimization
+- Keyword analysis and optimization
+- Meta tag generation and management
+- Content optimization for search engines
+- Sitemap generation and maintenance
 
-### E-commerce Automation Agents
-- Inventory management
-- Order processing
-- Customer service
-- Price optimization
+### Content Creation
+- Text generation and copywriting
+- Image generation and processing
+- Content optimization and translation
+- Multi-format content creation
 
-### Technical Agents
-- Code generation and review
-- System monitoring
-- Security scanning
-- Performance optimization
+### Social Media Management
+- Post scheduling and automation
+- Engagement tracking and analytics
+- Hashtag optimization strategies
+- Social media campaign management
 
-### Creative Agents
-- 3D asset generation (Tripo AI)
-- Image processing
-- Design automation
-- Brand consistency
+### Analytics & Reporting
+- Data collection and analysis
+- Report generation and visualization
+- Trend analysis and insights
+- Performance monitoring
+
+### Security Monitoring
+- Vulnerability scanning and detection
+- Threat monitoring and response
+- Access control management
+- Security audit logging
 
 ## 🔧 Agent Development Kit (ADK)
 
