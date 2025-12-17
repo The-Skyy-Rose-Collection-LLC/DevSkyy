@@ -532,7 +532,7 @@ export class SignatureExperience {
         this.fountain.children.forEach((child) => {
           const speed = child.userData['speed'] as number;
           const initialY = child.userData['initialY'] as number;
-          if (speed && initialY) {
+          if (speed !== undefined && initialY !== undefined) {
             const t = (elapsed * speed) % 1;
             child.position.y = initialY - t * 1.5;
           }

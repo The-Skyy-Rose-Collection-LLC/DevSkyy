@@ -173,7 +173,7 @@ export class ShowroomExperience {
 
   private addSpotlight(product: ShowroomProduct): void {
     const spotlight = new THREE.SpotLight(
-      product.spotlightColor || 0xd4af37,
+      product.spotlightColor ?? 0xd4af37,
       1.5,
       15,
       Math.PI / 6,
