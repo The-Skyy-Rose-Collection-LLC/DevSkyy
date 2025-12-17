@@ -263,7 +263,34 @@ describe('AgentService', () => {
       // Check that stats reflect the limit
       await new Promise(resolve => setTimeout(resolve, 100));
       const stats = service.getAgentStats();
-      expect(stats.runningTasks).toBeLessThanOrEqual(2);
+      expect(stats['runningTasks']).toBeLessThanOrEqual(2);
+    });
+
+    it('should throw error when executing task with non-existent taskId', async () => {
+      await expect(service.executeTask('non-existent-task-id')).rejects.toThrow(
+        'Task not found: non-existent-task-id'
+      );
+    });
+
+    it('should handle task execution errors in catch block', async () => {
+      // Mock executeTask to throw an error to test the catch block on line 142-143
+      const errorSpy = jest.spyOn((service as any).logger, 'error');
+      
+      // Spy on executeTask and make it throw
+      jest.spyOn(service, 'executeTask').mockRejectedValueOnce(
+        new Error('Task execution failed')
+      );
+
+      await service.createTask('wordpress_agent', 'test', {});
+
+      // Wait for async catch block to execute
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verify error was logged (this covers the catch block on line 142-143)
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/Task execution failed:/),
+        expect.any(Error)
+      );
     });
   });
 });
