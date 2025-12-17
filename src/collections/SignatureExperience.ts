@@ -558,14 +558,78 @@ export class SignatureExperience {
   public dispose(): void {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
-    this.pedestals.forEach((p) => this.scene.remove(p));
-    this.pathways.forEach((p) => this.scene.remove(p));
-    this.roses.forEach((r) => this.scene.remove(r));
-    if (this.fountain) this.scene.remove(this.fountain);
-    if (this.brandLogo) this.scene.remove(this.brandLogo);
-    this.renderer.dispose();
+
+    // Helper to dispose mesh resources
+    const disposeMesh = (obj: THREE.Object3D): void => {
+      if (obj instanceof THREE.Mesh) {
+        obj.geometry?.dispose();
+        if (obj.material instanceof THREE.Material) {
+          obj.material.dispose();
+        } else if (Array.isArray(obj.material)) {
+          obj.material.forEach((mat) => mat.dispose());
+        }
+      }
+    };
+
+    // Dispose pedestals (Map)
+    this.pedestals.forEach((p) => {
+      p.traverse(disposeMesh);
+      this.scene.remove(p);
+    });
+    this.pedestals.clear();
+
+    // Dispose pathways
+    this.pathways.forEach((p) => {
+      disposeMesh(p);
+      this.scene.remove(p);
+    });
+    this.pathways = [];
+
+    // Dispose roses
+    this.roses.forEach((r) => {
+      r.traverse(disposeMesh);
+      this.scene.remove(r);
+    });
+    this.roses = [];
+
+    // Dispose fountain
+    if (this.fountain) {
+      this.fountain.traverse(disposeMesh);
+      this.scene.remove(this.fountain);
+    }
+
+    // Dispose brand logo
+    if (this.brandLogo) {
+      this.brandLogo.traverse(disposeMesh);
+      this.scene.remove(this.brandLogo);
+    }
+
+    // Dispose all remaining scene objects
+    this.scene.traverse(disposeMesh);
+
+    // Dispose controls, composer, and renderer
+    this.controls.dispose();
     if (this.composer) this.composer.dispose();
+    this.renderer.dispose();
+    this.renderer.forceContextLoss();
+
     this.logger.info('SIGNATURE experience disposed');
+  }
+
+  /**
+   * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
+   */
+  public handleContextLoss(): void {
+    this.logger.warn('WebGL context lost - attempting recovery');
+    this.stop();
+  }
+
+  /**
+   * Handle WebGL context restoration
+   */
+  public handleContextRestored(): void {
+    this.logger.info('WebGL context restored');
+    this.start();
   }
 
   public getScene(): THREE.Scene { return this.scene; }

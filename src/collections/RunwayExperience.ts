@@ -235,9 +235,55 @@ export class RunwayExperience {
 
   public dispose(): void {
     this.stop();
-    this.models.forEach((model) => this.scene.remove(model));
+
+    // Properly dispose of all models and their resources
+    this.models.forEach((model) => {
+      this.scene.remove(model);
+      if (model instanceof THREE.Mesh) {
+        model.geometry?.dispose();
+        if (model.material instanceof THREE.Material) {
+          model.material.dispose();
+        } else if (Array.isArray(model.material)) {
+          model.material.forEach((mat) => mat.dispose());
+        }
+      }
+    });
+    this.models = [];
+
+    // Dispose of scene objects
+    this.scene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.geometry?.dispose();
+        if (object.material instanceof THREE.Material) {
+          object.material.dispose();
+        } else if (Array.isArray(object.material)) {
+          object.material.forEach((mat) => mat.dispose());
+        }
+      }
+    });
+
+    // Dispose controls and renderer
+    this.controls.dispose();
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
+
     this.logger.info('Runway experience disposed');
+  }
+
+  /**
+   * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
+   */
+  public handleContextLoss(): void {
+    this.logger.warn('WebGL context lost - attempting recovery');
+    this.stop();
+  }
+
+  /**
+   * Handle WebGL context restoration
+   */
+  public handleContextRestored(): void {
+    this.logger.info('WebGL context restored');
+    this.start();
   }
 }
 
