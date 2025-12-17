@@ -34,7 +34,7 @@
     "next.js": "^1.0.3",
     "node-fetch": "^3.3.2",
     "nuxt": "^4.2.2",
-    "potpack": "^1.0.2",
+    "potpack": "^2.1.0",
     "prisma": "^7.1.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
