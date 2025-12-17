@@ -9,8 +9,6 @@ import asyncio
 import logging
 from typing import Any, Literal
 
-from pydantic import BaseModel
-
 from orchestration.langgraph_integration import WorkflowState, WorkflowStatus
 
 logger = logging.getLogger(__name__)
