@@ -44,7 +44,7 @@ export interface Collection3DExperienceSpec {
   config: ShowroomConfig;
 }
 
-const DEFAULT_CONFIG: ShowroomConfig = {
+const DEFAULT_CONFIG: Required<ShowroomConfig> = {
   backgroundColor: 0x0d0d0d,  // Obsidian black
   ambientLightIntensity: 0.3,
   floorColor: 0x1a1a1a,
@@ -62,7 +62,7 @@ export class ShowroomExperience {
   private controls: OrbitControls;
   private products: Map<string, THREE.Object3D> = new Map();
   private spotlights: Map<string, THREE.SpotLight> = new Map();
-  private config: ShowroomConfig;
+  private config: Required<ShowroomConfig>;
   private animationId: number | null = null;
 
   constructor(container: HTMLElement, config: ShowroomConfig = {}) {
@@ -73,8 +73,8 @@ export class ShowroomExperience {
 
     // Initialize scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(this.config.backgroundColor!);
-    this.scene.fog = new THREE.Fog(this.config.backgroundColor!, 15, 40);
+    this.scene.background = new THREE.Color(this.config.backgroundColor);
+    this.scene.fog = new THREE.Fog(this.config.backgroundColor, 15, 40);
 
     // Initialize renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -112,9 +112,9 @@ export class ShowroomExperience {
     const { roomWidth, roomDepth, roomHeight, floorColor, wallColor } = this.config;
 
     // Floor
-    const floorGeometry = new THREE.PlaneGeometry(roomWidth ?? 20, roomDepth ?? 20);
+    const floorGeometry = new THREE.PlaneGeometry(roomWidth, roomDepth);
     const floorMaterial = new THREE.MeshStandardMaterial({
-      color: floorColor ?? 0x1a1a1a,
+      color: floorColor,
       roughness: 0.8,
       metalness: 0.2,
     });
@@ -124,13 +124,13 @@ export class ShowroomExperience {
     this.scene.add(floor);
 
     // Back wall
-    const wallGeometry = new THREE.PlaneGeometry(roomWidth ?? 20, roomHeight ?? 8);
+    const wallGeometry = new THREE.PlaneGeometry(roomWidth, roomHeight);
     const wallMaterial = new THREE.MeshStandardMaterial({
-      color: wallColor ?? 0x0d0d0d,
+      color: wallColor,
       roughness: 0.9,
     });
     const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
-    backWall.position.set(0, (roomHeight ?? 8) / 2, -(roomDepth ?? 20) / 2);
+    backWall.position.set(0, roomHeight / 2, -roomDepth / 2);
     this.scene.add(backWall);
   }
 

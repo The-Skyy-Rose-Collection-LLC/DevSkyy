@@ -32,7 +32,7 @@ export interface RunwayConfig {
   walkSpeed?: number;
 }
 
-const DEFAULT_CONFIG: RunwayConfig = {
+const DEFAULT_CONFIG: Required<RunwayConfig> = {
   backgroundColor: 0x0a0a0a,
   runwayLength: 30,
   runwayWidth: 4,
@@ -47,7 +47,7 @@ export class RunwayExperience {
   private renderer: THREE.WebGLRenderer;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
-  private config: RunwayConfig;
+  private config: Required<RunwayConfig>;
   private animationId: number | null = null;
   private models: THREE.Object3D[] = [];
   private currentModelIndex: number = 0;
@@ -60,8 +60,8 @@ export class RunwayExperience {
 
     // Initialize scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(this.config.backgroundColor!);
-    this.scene.fog = new THREE.FogExp2(this.config.backgroundColor!, 0.02);
+    this.scene.background = new THREE.Color(this.config.backgroundColor);
+    this.scene.fog = new THREE.FogExp2(this.config.backgroundColor, 0.02);
 
     // Initialize renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -79,7 +79,7 @@ export class RunwayExperience {
       0.1,
       100
     );
-    this.camera.position.set(0, 2, this.config.runwayLength! / 2 - 5);
+    this.camera.position.set(0, 2, this.config.runwayLength / 2 - 5);
     this.camera.lookAt(0, 1.5, 0);
 
     // Initialize controls
@@ -96,7 +96,7 @@ export class RunwayExperience {
     const { runwayLength, runwayWidth } = this.config;
 
     // Runway floor
-    const runwayGeometry = new THREE.PlaneGeometry(runwayWidth!, runwayLength!);
+    const runwayGeometry = new THREE.PlaneGeometry(runwayWidth, runwayLength);
     const runwayMaterial = new THREE.MeshStandardMaterial({
       color: 0x1a1a1a,
       roughness: 0.2,
@@ -108,21 +108,21 @@ export class RunwayExperience {
     this.scene.add(runway);
 
     // Runway edge lights
-    const edgeLightGeometry = new THREE.BoxGeometry(0.1, 0.05, runwayLength!);
+    const edgeLightGeometry = new THREE.BoxGeometry(0.1, 0.05, runwayLength);
     const edgeLightMaterial = new THREE.MeshBasicMaterial({ color: 0xd4af37 });
     
     const leftEdge = new THREE.Mesh(edgeLightGeometry, edgeLightMaterial);
-    leftEdge.position.set(-runwayWidth! / 2, 0.025, 0);
+    leftEdge.position.set(-runwayWidth / 2, 0.025, 0);
     this.scene.add(leftEdge);
 
     const rightEdge = new THREE.Mesh(edgeLightGeometry, edgeLightMaterial);
-    rightEdge.position.set(runwayWidth! / 2, 0.025, 0);
+    rightEdge.position.set(runwayWidth / 2, 0.025, 0);
     this.scene.add(rightEdge);
   }
 
   private setupLighting(): void {
     // Ambient light
-    const ambient = new THREE.AmbientLight(this.config.ambientColor!, 0.3);
+    const ambient = new THREE.AmbientLight(this.config.ambientColor, 0.3);
     this.scene.add(ambient);
 
     // Main spotlight following the runway
@@ -136,7 +136,7 @@ export class RunwayExperience {
     // Rose gold accent lights
     const accentPositions: [number, number, number][] = [[-3, 5, -10], [3, 5, -10], [-3, 5, 10], [3, 5, 10]];
     accentPositions.forEach(([x, y, z]) => {
-      const accent = new THREE.SpotLight(this.config.spotlightColor ?? 0xd4af37, 1, 20, Math.PI / 6, 0.5);
+      const accent = new THREE.SpotLight(this.config.spotlightColor, 1, 20, Math.PI / 6, 0.5);
       accent.position.set(x, y, z);
       accent.target.position.set(0, 0, z);
       this.scene.add(accent);
@@ -157,7 +157,7 @@ export class RunwayExperience {
         metalness: 0.6,
       });
       const model = new THREE.Mesh(geometry, material);
-      const runwayLen = this.config.runwayLength ?? 20;
+      const runwayLen = this.config.runwayLength;
       model.position.set(0, 0.9, -runwayLen / 2);
       model.castShadow = true;
       model.userData['productId'] = product.id;
@@ -183,8 +183,8 @@ export class RunwayExperience {
     const currentModel = this.models[this.currentModelIndex];
     if (!currentModel) return;
 
-    const runwayLength = this.config.runwayLength ?? 20;
-    const walkSpeed = this.config.walkSpeed ?? 0.005;
+    const runwayLength = this.config.runwayLength;
+    const walkSpeed = this.config.walkSpeed;
 
     // Update position along runway
     this.walkProgress += walkSpeed;
