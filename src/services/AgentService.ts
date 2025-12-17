@@ -123,9 +123,6 @@ export class AgentService extends EventEmitter {
 
     // Select the first available agent (could be enhanced with load balancing)
     const agent = agents[0];
-    if (!agent) {
-      throw new Error(`No available agents found for type: ${agentType}`);
-    }
 
     const task: AgentTask = {
       id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -152,7 +149,7 @@ export class AgentService extends EventEmitter {
   /**
    * Execute a task
    */
-  private async executeTask(taskId: string): Promise<void> {
+  public async executeTask(taskId: string): Promise<void> {
     const task = this.tasks.get(taskId);
     if (!task) {
       throw new Error(`Task not found: ${taskId}`);
