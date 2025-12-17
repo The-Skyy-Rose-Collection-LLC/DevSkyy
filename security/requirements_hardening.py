@@ -263,7 +263,6 @@ class RequirementsHardener:
         # Files to harden
         files_to_harden = [
             self.project_root / "requirements.txt",
-            self.project_root / "vercel" / "requirements.txt",
             self.project_root / "pyproject.toml",
         ]
 

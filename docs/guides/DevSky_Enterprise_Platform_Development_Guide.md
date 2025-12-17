@@ -258,9 +258,7 @@ result = crew.kickoff(inputs={"category": "fashion", "region": "US"})
 
 ---
 
-## Vercel Deployment Setup
-
-Vercel provides **native FastAPI support** since late 2024—no Mangum adapter required. The platform automatically wraps ASGI applications.
+## Production Deployment Setup
 
 ### Step-by-step FastAPI deployment
 
@@ -270,7 +268,6 @@ project/
 ├── api/
 │   └── main.py
 ├── requirements.txt
-├── vercel.json
 └── .env.local
 ```
 
@@ -298,51 +295,35 @@ def get_product(product_id: int):
     return {"id": product_id, "name": f"Product {product_id}"}
 ```
 
-**3. Vercel configuration (vercel.json):**
-```json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "version": 2,
-  "builds": [{"src": "api/main.py", "use": "@vercel/python"}],
-  "routes": [{"src": "/api/(.*)", "dest": "api/main.py"}],
-  "functions": {
-    "api/**/*.py": {
-      "memory": 1024,
-      "maxDuration": 30,
-      "runtime": "python3.12"
-    }
-  }
-}
-```
-
-**4. Deploy:**
+**3. Environment configuration:**
+Create a `.env.local` file with your configuration:
 ```bash
-npm i -g vercel
-vercel login
-vercel link
-vercel env add DATABASE_URL  # Add secrets via CLI
-vercel --prod
+DATABASE_URL=your-database-url
+CORS_ORIGINS=https://yourdomain.com,http://localhost:5173
 ```
 
 ### GitHub Actions CI/CD
 
 ```yaml
-name: Deploy to Vercel
+name: Deploy Application
 on:
   push:
     branches: [main]
-env:
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - run: npm i -g vercel@latest
-      - run: vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
-      - run: vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
-      - run: vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          pytest tests/
 ```
 
 ---
@@ -632,18 +613,9 @@ apiClient.interceptors.response.use(
 )
 ```
 
-### Vercel SPA deployment
+### SPA deployment configuration
 
-```json
-// vercel.json for React Router
-{
-  "rewrites": [{"source": "/(.*)", "destination": "/index.html"}],
-  "headers": [{
-    "source": "/assets/(.*)",
-    "headers": [{"key": "Cache-Control", "value": "public, max-age=31536000, immutable"}]
-  }]
-}
-```
+For deploying Single Page Applications with client-side routing, ensure your web server is configured to serve `index.html` for all routes. Most deployment platforms support this through configuration files or dashboard settings.
 
 ---
 
@@ -662,10 +634,10 @@ Following OWASP and NIST guidelines, implement these security controls across al
 ## Production Deployment Checklist
 
 - [ ] Enable HTTPS everywhere with valid certificates
-- [ ] Configure environment variables via Vercel dashboard (never hardcode)
+- [ ] Configure environment variables securely (never hardcode)
 - [ ] Set up error tracking (Sentry) and performance monitoring
 - [ ] Implement rate limiting on authentication endpoints
-- [ ] Enable Vercel deployment protection for preview environments
+- [ ] Enable deployment protection for preview environments
 - [ ] Configure webhook retry policies and failure alerts
 - [ ] Set up MLflow model registry with staging/production stages
 - [ ] Implement health check endpoints (`/api/health`) for all services
@@ -674,4 +646,4 @@ Following OWASP and NIST guidelines, implement these security controls across al
 
 ## Conclusion
 
-This implementation guide provides battle-tested patterns for building a modern enterprise platform combining WordPress e-commerce, AI agents, and React dashboards. The key architectural decisions—**FastMCP for tool exposure**, **LangGraph for agent orchestration**, **WooCommerce REST API for e-commerce**, and **Vercel for serverless deployment**—create a scalable foundation that can evolve with business requirements. Start with the core WooCommerce integration, layer in MCP tools for AI capabilities, and expand agent specialization as automation needs grow.
+This implementation guide provides battle-tested patterns for building a modern enterprise platform combining WordPress e-commerce, AI agents, and React dashboards. The key architectural decisions—**FastMCP for tool exposure**, **LangGraph for agent orchestration**, and **WooCommerce REST API for e-commerce**—create a scalable foundation that can evolve with business requirements. Start with the core WooCommerce integration, layer in MCP tools for AI capabilities, and expand agent specialization as automation needs grow.
