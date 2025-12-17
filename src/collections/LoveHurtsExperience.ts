@@ -244,12 +244,12 @@ export class LoveHurtsExperience {
     ];
     candlePositions.forEach(([x, y, z]) => {
       const candle = new THREE.PointLight(
-        this.config.candlelightColor ?? BRAND_COLORS.candlelight,
-        this.config.candlelightIntensity ?? 0.8,
+        this.config.candlelightColor,
+        this.config.candlelightIntensity,
         15,
         2
       );
-      candle.position.set(x ?? 0, y ?? 0, z ?? 0);
+      candle.position.set(x, y, z);
       candle.castShadow = true;
       this.scene.add(candle);
     });
@@ -286,8 +286,8 @@ export class LoveHurtsExperience {
 
       // Glass panels
       const glassGeometry = new THREE.CircleGeometry(1.5, 6);
-      const glassColors = this.config.stainedGlassColors ?? [BRAND_COLORS.crimson, BRAND_COLORS.roseGold, BRAND_COLORS.magicPurple, BRAND_COLORS.candlelight];
-      const glassColor = glassColors[i % glassColors.length] ?? BRAND_COLORS.crimson;
+      const glassColors = this.config.stainedGlassColors;
+      const glassColor = glassColors[i % glassColors.length];
       const glassMaterial = new THREE.MeshStandardMaterial({
         color: glassColor,
         transparent: true,
@@ -487,16 +487,13 @@ export class LoveHurtsExperience {
     const mirrorObjects = Array.from(this.mirrors.values());
     const mirrorIntersects = this.raycaster.intersectObjects(mirrorObjects, true);
     if (mirrorIntersects.length > 0 && this.onMirrorClick) {
-      const firstHit = mirrorIntersects[0];
-      if (firstHit && firstHit.object) {
-        let obj: THREE.Object3D | null = firstHit.object;
-        while (obj && !obj.userData['productId']) obj = obj.parent;
-        if (obj) {
-          const productId = obj.userData['productId'] as string | undefined;
-          if (productId) {
-            const lookbookImages = (obj.userData['lookbookImages'] as string[]) || [];
-            this.onMirrorClick(productId, lookbookImages);
-          }
+      let obj: THREE.Object3D | null = mirrorIntersects[0].object;
+      while (obj && !obj.userData['productId']) obj = obj.parent;
+      if (obj) {
+        const productId = obj.userData['productId'] as string | undefined;
+        if (productId) {
+          const lookbookImages = (obj.userData['lookbookImages'] as string[]) || [];
+          this.onMirrorClick(productId, lookbookImages);
         }
       }
     }
@@ -505,15 +502,12 @@ export class LoveHurtsExperience {
     const floorObjects = Array.from(this.floorSpotlights.values());
     const floorIntersects = this.raycaster.intersectObjects(floorObjects, true);
     if (floorIntersects.length > 0 && this.onFloorSpotlight) {
-      const firstHit = floorIntersects[0];
-      if (firstHit && firstHit.object) {
-        let obj: THREE.Object3D | null = firstHit.object;
-        while (obj && !obj.userData['productId']) obj = obj.parent;
-        if (obj) {
-          const productId = obj.userData['productId'] as string | undefined;
-          if (productId) {
-            this.onFloorSpotlight(productId);
-          }
+      let obj: THREE.Object3D | null = floorIntersects[0].object;
+      while (obj && !obj.userData['productId']) obj = obj.parent;
+      if (obj) {
+        const productId = obj.userData['productId'] as string | undefined;
+        if (productId) {
+          this.onFloorSpotlight(productId);
         }
       }
     }
@@ -525,7 +519,7 @@ export class LoveHurtsExperience {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
-    if (this.composer) this.composer.setSize(w, h);
+    this.composer?.setSize(w, h);
   }
 
   // ===========================================================================
@@ -572,9 +566,7 @@ export class LoveHurtsExperience {
     surface.position.set(0, 2, 0.11);
     mirror.add(surface);
 
-    if (product.position) {
-      mirror.position.set(...product.position);
-    }
+    mirror.position.set(...(product.position || [0, 0, 0]));
     this.scene.add(mirror);
     this.mirrors.set(product.id, mirror);
   }
@@ -607,9 +599,7 @@ export class LoveHurtsExperience {
     productMesh.castShadow = true;
     spotlight.add(productMesh);
 
-    if (product.position) {
-      spotlight.position.set(...product.position);
-    }
+    spotlight.position.set(...(product.position || [0, 0, 0]));
     this.scene.add(spotlight);
     this.floorSpotlights.set(product.id, spotlight);
   }
@@ -639,8 +629,8 @@ export class LoveHurtsExperience {
       // Animate candle flames
       this.candelabras.forEach((c) => {
         c.children.forEach((child) => {
-          const flameIndex = child.userData['flameIndex'] as number | undefined;
-          const baseY = child.userData['baseY'] as number | undefined;
+          const flameIndex = child.userData['flameIndex'] as number;
+          const baseY = child.userData['baseY'] as number;
           if (flameIndex !== undefined && baseY !== undefined) {
             child.position.y = baseY + Math.sin(elapsed * 5 + flameIndex) * 0.02;
             child.scale.setScalar(0.9 + Math.sin(elapsed * 8 + flameIndex) * 0.1);
@@ -651,27 +641,20 @@ export class LoveHurtsExperience {
       // Animate particles
       if (this.particles) {
         const positionAttr = this.particles.geometry.attributes['position'];
-        if (positionAttr && positionAttr.array) {
+        if (positionAttr?.array) {
           const positions = positionAttr.array as Float32Array;
           const len = positions.length;
           for (let i = 0; i < len / 3; i++) {
             const idx = i * 3 + 1;
-            const currentY = positions[idx];
-            if (currentY !== undefined) {
-              positions[idx] = currentY + 0.01;
-              if (positions[idx]! > 12) positions[idx] = 0;
-            }
+            positions[idx] = positions[idx] + 0.01;
+            if (positions[idx] > 12) positions[idx] = 0;
           }
           positionAttr.needsUpdate = true;
         }
       }
 
       this.controls.update();
-      if (this.composer) {
-        this.composer.render();
-      } else {
-        this.renderer.render(this.scene, this.camera);
-      }
+      this.composer ? this.composer.render() : this.renderer.render(this.scene, this.camera);
     };
     animate();
     this.logger.info('Animation started');
