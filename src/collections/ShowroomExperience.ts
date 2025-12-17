@@ -44,7 +44,7 @@ export interface Collection3DExperienceSpec {
   config: ShowroomConfig;
 }
 
-const DEFAULT_CONFIG: ShowroomConfig = {
+const DEFAULT_CONFIG: Required<ShowroomConfig> = {
   backgroundColor: 0x0d0d0d,  // Obsidian black
   ambientLightIntensity: 0.3,
   floorColor: 0x1a1a1a,
@@ -62,7 +62,7 @@ export class ShowroomExperience {
   private controls: OrbitControls;
   private products: Map<string, THREE.Object3D> = new Map();
   private spotlights: Map<string, THREE.SpotLight> = new Map();
-  private config: ShowroomConfig;
+  private config: Required<ShowroomConfig>;
   private animationId: number | null = null;
 
   constructor(container: HTMLElement, config: ShowroomConfig = {}) {
