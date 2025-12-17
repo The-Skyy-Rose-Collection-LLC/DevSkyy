@@ -430,24 +430,18 @@ export class SignatureExperience {
     const pedestalObjects = Array.from(this.pedestals.values());
     const intersects = this.raycaster.intersectObjects(pedestalObjects, true);
     if (intersects.length > 0 && this.onProductSelect) {
-      const firstHit = intersects[0];
-      if (firstHit && firstHit.object) {
-        const product = this.findProductInAncestors(firstHit.object);
-        if (product) this.onProductSelect(product);
-      }
+      const product = this.findProductInAncestors(intersects[0].object);
+      if (product) this.onProductSelect(product);
     }
 
     // Check pathways
     const pathwayIntersects = this.raycaster.intersectObjects(this.pathways, true);
     if (pathwayIntersects.length > 0 && this.onCategorySelect) {
-      const firstHit = pathwayIntersects[0];
-      if (firstHit && firstHit.object) {
-        let obj: THREE.Object3D | null = firstHit.object;
-        while (obj && !obj.userData['category']) obj = obj.parent;
-        if (obj) {
-          const category = obj.userData['category'] as string | undefined;
-          if (category) this.onCategorySelect(category);
-        }
+      let obj: THREE.Object3D | null = pathwayIntersects[0].object;
+      while (obj && !obj.userData['category']) obj = obj.parent;
+      if (obj) {
+        const category = obj.userData['category'] as string | undefined;
+        if (category) this.onCategorySelect(category);
       }
     }
   }
@@ -468,7 +462,7 @@ export class SignatureExperience {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(w, h);
-    if (this.composer) this.composer.setSize(w, h);
+    this.composer?.setSize(w, h);
   }
 
   // ===========================================================================
@@ -536,8 +530,8 @@ export class SignatureExperience {
       // Animate fountain water
       if (this.fountain) {
         this.fountain.children.forEach((child) => {
-          const speed = child.userData['speed'] as number | undefined;
-          const initialY = child.userData['initialY'] as number | undefined;
+          const speed = child.userData['speed'] as number;
+          const initialY = child.userData['initialY'] as number;
           if (speed !== undefined && initialY !== undefined) {
             const t = (elapsed * speed) % 1;
             child.position.y = initialY - t * 1.5;
@@ -546,11 +540,7 @@ export class SignatureExperience {
       }
 
       this.controls.update();
-      if (this.composer) {
-        this.composer.render();
-      } else {
-        this.renderer.render(this.scene, this.camera);
-      }
+      this.composer ? this.composer.render() : this.renderer.render(this.scene, this.camera);
     };
     animate();
     this.logger.info('Animation started');
