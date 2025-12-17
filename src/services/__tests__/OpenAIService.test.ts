@@ -50,6 +50,38 @@ describe('OpenAIService', () => {
       expect(service).toBeDefined();
       // The constructor would have thrown if API key was missing
     });
+
+    it('should throw error when API key is missing', () => {
+      // Reset modules to allow re-mocking
+      jest.resetModules();
+
+      // Mock config with empty API key
+      jest.doMock('../../config/index', () => ({
+        openaiConfig: {
+          apiKey: '', // Empty API key
+          baseURL: 'https://api.openai.com/v1',
+          defaultModel: 'gpt-4o',
+          maxTokens: 4000,
+          temperature: 0.7,
+          timeout: 60000,
+        },
+      }));
+
+      // Mock Logger again since modules were reset
+      jest.doMock('../../utils/Logger', () => ({
+        Logger: jest.fn().mockImplementation(() => ({
+          info: jest.fn(),
+          warn: jest.fn(),
+          error: jest.fn(),
+          debug: jest.fn(),
+        })),
+      }));
+
+      // The module exports a singleton, so importing will throw
+      expect(() => {
+        require('../OpenAIService');
+      }).toThrow('OpenAI API key is required');
+    });
   });
 
   describe('createCompletion', () => {
@@ -109,6 +141,17 @@ describe('OpenAIService', () => {
       });
 
       await expect(service.createCompletion({ prompt: 'Test' })).rejects.toThrow('Invalid API key');
+    });
+
+    it('should handle API errors without error message', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        json: () => Promise.resolve({}),
+        headers: new Map(),
+      });
+
+      await expect(service.createCompletion({ prompt: 'Test' })).rejects.toThrow('HTTP 500');
     });
   });
 

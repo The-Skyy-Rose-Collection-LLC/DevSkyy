@@ -154,6 +154,19 @@ describe('ThreeJSService', () => {
       service.initializeScene(container, {}, {}, { position: [1, 2, 3] });
       expect(mockCamera.position.set).toHaveBeenCalledWith(1, 2, 3);
     });
+
+    it('should handle initialization errors', () => {
+      const THREE = require('three');
+      const originalScene = THREE.Scene;
+      THREE.Scene = jest.fn(() => {
+        throw new Error('Scene initialization failed');
+      });
+
+      const errorService = new ThreeJSService();
+      expect(() => errorService.initializeScene(container)).toThrow('Scene initialization failed');
+
+      THREE.Scene = originalScene;
+    });
   });
 
   describe('createCube', () => {
