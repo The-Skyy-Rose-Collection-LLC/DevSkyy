@@ -73,8 +73,8 @@ export class ShowroomExperience {
 
     // Initialize scene
     this.scene = new THREE.Scene();
-    this.scene.background = new THREE.Color(this.config.backgroundColor!);
-    this.scene.fog = new THREE.Fog(this.config.backgroundColor!, 15, 40);
+    this.scene.background = new THREE.Color(this.config.backgroundColor);
+    this.scene.fog = new THREE.Fog(this.config.backgroundColor, 15, 40);
 
     // Initialize renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -112,9 +112,9 @@ export class ShowroomExperience {
     const { roomWidth, roomDepth, roomHeight, floorColor, wallColor } = this.config;
 
     // Floor
-    const floorGeometry = new THREE.PlaneGeometry(roomWidth ?? 20, roomDepth ?? 20);
+    const floorGeometry = new THREE.PlaneGeometry(roomWidth, roomDepth);
     const floorMaterial = new THREE.MeshStandardMaterial({
-      color: floorColor ?? 0x1a1a1a,
+      color: floorColor,
       roughness: 0.8,
       metalness: 0.2,
     });
@@ -124,13 +124,13 @@ export class ShowroomExperience {
     this.scene.add(floor);
 
     // Back wall
-    const wallGeometry = new THREE.PlaneGeometry(roomWidth ?? 20, roomHeight ?? 8);
+    const wallGeometry = new THREE.PlaneGeometry(roomWidth, roomHeight);
     const wallMaterial = new THREE.MeshStandardMaterial({
-      color: wallColor ?? 0x0d0d0d,
+      color: wallColor,
       roughness: 0.9,
     });
     const backWall = new THREE.Mesh(wallGeometry, wallMaterial);
-    backWall.position.set(0, (roomHeight ?? 8) / 2, -(roomDepth ?? 20) / 2);
+    backWall.position.set(0, roomHeight / 2, -roomDepth / 2);
     this.scene.add(backWall);
   }
 
@@ -173,7 +173,7 @@ export class ShowroomExperience {
 
   private addSpotlight(product: ShowroomProduct): void {
     const spotlight = new THREE.SpotLight(
-      product.spotlightColor ?? 0xd4af37,
+      product.spotlightColor || 0xd4af37,
       1.5,
       15,
       Math.PI / 6,

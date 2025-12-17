@@ -296,13 +296,10 @@ export class BlackRoseExperience {
     const intersects = this.raycaster.intersectObjects(objects, true);
 
     if (intersects.length > 0) {
-      const firstHit = intersects[0];
-      if (firstHit && firstHit.object) {
-        const productId = this.findProductId(firstHit.object);
-        if (productId && this.onProductClick) {
-          const product = this.getProductById(productId);
-          if (product) this.onProductClick(product);
-        }
+      const productId = this.findProductId(intersects[0].object);
+      if (productId && this.onProductClick) {
+        const product = this.getProductById(productId);
+        if (product) this.onProductClick(product);
       }
     }
 
@@ -310,11 +307,8 @@ export class BlackRoseExperience {
     const easterEggObjects = Array.from(this.easterEggs.values());
     const eggIntersects = this.raycaster.intersectObjects(easterEggObjects, true);
     if (eggIntersects.length > 0 && this.onEasterEgg) {
-      const firstHit = eggIntersects[0];
-      if (firstHit && firstHit.object) {
-        const url = firstHit.object.userData['exclusiveDropUrl'] as string | undefined;
-        if (url) this.onEasterEgg(url);
-      }
+      const url = eggIntersects[0].object.userData['exclusiveDropUrl'] as string | undefined;
+      if (url) this.onEasterEgg(url);
     }
   }
 
@@ -324,13 +318,10 @@ export class BlackRoseExperience {
     const intersects = this.raycaster.intersectObjects(objects, true);
 
     if (intersects.length > 0) {
-      const firstHit = intersects[0];
-      if (firstHit && firstHit.object) {
-        const productId = this.findProductId(firstHit.object);
-        if (productId !== this.hoveredProduct) {
-          this.hoveredProduct = productId;
-          this.container.style.cursor = 'pointer';
-        }
+      const productId = this.findProductId(intersects[0].object);
+      if (productId !== this.hoveredProduct) {
+        this.hoveredProduct = productId;
+        this.container.style.cursor = 'pointer';
       }
     } else {
       if (this.hoveredProduct) {
@@ -364,9 +355,7 @@ export class BlackRoseExperience {
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height);
-    if (this.composer) {
-      this.composer.setSize(width, height);
-    }
+    this.composer?.setSize(width, height);
   }
 
   // ===========================================================================
@@ -504,7 +493,9 @@ export class BlackRoseExperience {
 
   private animatePetals(elapsed: number): void {
     for (const petal of this.petals) {
-      const { initialY, speed, rotationSpeed } = petal.userData;
+      const initialY = petal.userData['initialY'] as number;
+      const speed = petal.userData['speed'] as number;
+      const rotationSpeed = petal.userData['rotationSpeed'] as number;
       petal.position.y = initialY + Math.sin(elapsed * speed) * 0.5;
       petal.rotation.x += rotationSpeed;
       petal.rotation.z += rotationSpeed * 0.5;
@@ -518,11 +509,8 @@ export class BlackRoseExperience {
       this.animatePetals(elapsed);
       this.controls.update();
 
-      if (this.composer) {
-        this.composer.render();
-      } else {
-        this.renderer.render(this.scene, this.camera);
-      }
+      // Composer is always initialized when enableBloom is true (set in constructor)
+      this.composer ? this.composer.render() : this.renderer.render(this.scene, this.camera);
     };
     animate();
     this.logger.info('Animation started');
