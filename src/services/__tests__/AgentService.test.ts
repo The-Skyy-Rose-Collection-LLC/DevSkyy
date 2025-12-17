@@ -263,7 +263,57 @@ describe('AgentService', () => {
       // Check that stats reflect the limit
       await new Promise(resolve => setTimeout(resolve, 100));
       const stats = service.getAgentStats();
-      expect(stats.runningTasks).toBeLessThanOrEqual(2);
+      expect(stats['runningTasks']).toBeLessThanOrEqual(2);
+    });
+
+    it('should throw error when executing task with non-existent taskId', async () => {
+      await expect(service.executeTask('non-existent-task-id')).rejects.toThrow(
+        'Task not found: non-existent-task-id'
+      );
+    });
+
+    it('should handle task execution errors in catch block', async () => {
+      // Mock executeTask to throw an error to test the catch block on line 142-143
+      const errorSpy = jest.spyOn((service as any).logger, 'error');
+      
+      // Spy on executeTask and make it throw
+      jest.spyOn(service, 'executeTask').mockRejectedValueOnce(
+        new Error('Task execution failed')
+      );
+
+      await service.createTask('wordpress_agent', 'test', {});
+
+      // Wait for async catch block to execute
+      await new Promise(resolve => setTimeout(resolve, 100));
+
+      // Verify error was logged (this covers the catch block on line 142-143)
+      expect(errorSpy).toHaveBeenCalledWith(
+        expect.stringMatching(/Task execution failed:/),
+        expect.any(Error)
+      );
+    });
+
+    it('should handle errors during task execution and mark task as failed', async () => {
+      // Test the internal catch block within executeTask (lines 182-195)
+      const failedHandler = jest.fn();
+      service.on('taskFailed', failedHandler);
+      
+      // Mock simulateTaskExecution to throw an error
+      jest.spyOn(service as any, 'simulateTaskExecution').mockRejectedValueOnce(
+        new Error('Simulated execution error')
+      );
+
+      const taskId = await service.createTask('wordpress_agent', 'test', {});
+
+      // Wait for task execution to complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const task = service.getTask(taskId);
+      expect(task?.status).toBe('failed');
+      expect(task?.error).toBeDefined();
+      expect(task?.error?.code).toBe('EXECUTION_ERROR');
+      expect(task?.error?.message).toBe('Simulated execution error');
+      expect(failedHandler).toHaveBeenCalled();
     });
   });
 });
