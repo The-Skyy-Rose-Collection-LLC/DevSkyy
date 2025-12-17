@@ -15,6 +15,7 @@ Enterprise-grade API security for DevSkyy Platform:
 import hashlib
 import hmac
 import logging
+import os
 import secrets
 import time
 from collections.abc import Callable
@@ -27,6 +28,12 @@ from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 
 logger = logging.getLogger(__name__)
+
+
+def _get_cors_origins() -> list[str]:
+    """Get CORS origins from environment variable or use secure default."""
+    origins = os.environ.get("CORS_ORIGINS", "http://localhost:3000,http://localhost:5173")
+    return [origin.strip() for origin in origins.split(",") if origin.strip()]
 
 
 class APISecurityLevel(str, Enum):
@@ -42,7 +49,7 @@ class APISecurityLevel(str, Enum):
 class CORSConfig(BaseModel):
     """CORS configuration"""
 
-    allow_origins: list[str] = Field(default_factory=lambda: ["*"])
+    allow_origins: list[str] = Field(default_factory=_get_cors_origins)
     allow_methods: list[str] = Field(
         default_factory=lambda: ["GET", "POST", "PUT", "DELETE", "PATCH"]
     )
