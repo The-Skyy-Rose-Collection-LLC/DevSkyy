@@ -292,5 +292,28 @@ describe('AgentService', () => {
         expect.any(Error)
       );
     });
+
+    it('should handle errors during task execution and mark task as failed', async () => {
+      // Test the internal catch block within executeTask (lines 182-195)
+      const failedHandler = jest.fn();
+      service.on('taskFailed', failedHandler);
+      
+      // Mock simulateTaskExecution to throw an error
+      jest.spyOn(service as any, 'simulateTaskExecution').mockRejectedValueOnce(
+        new Error('Simulated execution error')
+      );
+
+      const taskId = await service.createTask('wordpress_agent', 'test', {});
+
+      // Wait for task execution to complete
+      await new Promise(resolve => setTimeout(resolve, 200));
+
+      const task = service.getTask(taskId);
+      expect(task?.status).toBe('failed');
+      expect(task?.error).toBeDefined();
+      expect(task?.error?.code).toBe('EXECUTION_ERROR');
+      expect(task?.error?.message).toBe('Simulated execution error');
+      expect(failedHandler).toHaveBeenCalled();
+    });
   });
 });
