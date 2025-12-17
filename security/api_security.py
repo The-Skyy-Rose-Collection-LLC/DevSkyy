@@ -42,7 +42,7 @@ class APISecurityLevel(str, Enum):
 class CORSConfig(BaseModel):
     """CORS configuration"""
 
-    allow_origins: list[str] = Field(default_factory=lambda: ["https://devskyy.vercel.app"])
+    allow_origins: list[str] = Field(default_factory=lambda: ["*"])
     allow_methods: list[str] = Field(
         default_factory=lambda: ["GET", "POST", "PUT", "DELETE", "PATCH"]
     )
