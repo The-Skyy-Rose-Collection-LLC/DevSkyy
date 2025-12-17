@@ -242,14 +242,14 @@ export class LoveHurtsExperience {
       [-6, 3, -6], [6, 3, -6], [-6, 3, 6], [6, 3, 6],
       [-8, 4, 0], [8, 4, 0], [0, 4, -8],
     ];
-    candlePositions.forEach(([x, y, z]) => {
+    candlePositions.forEach((pos) => {
       const candle = new THREE.PointLight(
-        this.config.candlelightColor,
-        this.config.candlelightIntensity,
+        this.config.candlelightColor ?? DEFAULT_CONFIG.candlelightColor,
+        this.config.candlelightIntensity ?? DEFAULT_CONFIG.candlelightIntensity,
         15,
         2
       );
-      candle.position.set(x, y, z);
+      candle.position.set(pos[0] ?? 0, pos[1] ?? 0, pos[2] ?? 0);
       candle.castShadow = true;
       this.scene.add(candle);
     });
@@ -286,8 +286,8 @@ export class LoveHurtsExperience {
 
       // Glass panels
       const glassGeometry = new THREE.CircleGeometry(1.5, 6);
-      const glassColors = this.config.stainedGlassColors;
-      const glassColor = glassColors[i % glassColors.length];
+      const glassColors = this.config.stainedGlassColors ?? DEFAULT_CONFIG.stainedGlassColors;
+      const glassColor = glassColors[i % glassColors.length] ?? 0x9b59b6;
       const glassMaterial = new THREE.MeshStandardMaterial({
         color: glassColor,
         transparent: true,
@@ -486,8 +486,9 @@ export class LoveHurtsExperience {
     // Check mirrors
     const mirrorObjects = Array.from(this.mirrors.values());
     const mirrorIntersects = this.raycaster.intersectObjects(mirrorObjects, true);
-    if (mirrorIntersects.length > 0 && this.onMirrorClick) {
-      let obj: THREE.Object3D | null = mirrorIntersects[0].object;
+    const firstMirrorIntersect = mirrorIntersects[0];
+    if (firstMirrorIntersect && this.onMirrorClick) {
+      let obj: THREE.Object3D | null = firstMirrorIntersect.object;
       while (obj && !obj.userData['productId']) obj = obj.parent;
       if (obj) {
         const productId = obj.userData['productId'] as string | undefined;
@@ -501,8 +502,9 @@ export class LoveHurtsExperience {
     // Check floor spotlights
     const floorObjects = Array.from(this.floorSpotlights.values());
     const floorIntersects = this.raycaster.intersectObjects(floorObjects, true);
-    if (floorIntersects.length > 0 && this.onFloorSpotlight) {
-      let obj: THREE.Object3D | null = floorIntersects[0].object;
+    const firstFloorIntersect = floorIntersects[0];
+    if (firstFloorIntersect && this.onFloorSpotlight) {
+      let obj: THREE.Object3D | null = firstFloorIntersect.object;
       while (obj && !obj.userData['productId']) obj = obj.parent;
       if (obj) {
         const productId = obj.userData['productId'] as string | undefined;
@@ -646,8 +648,11 @@ export class LoveHurtsExperience {
           const len = positions.length;
           for (let i = 0; i < len / 3; i++) {
             const idx = i * 3 + 1;
-            positions[idx] = positions[idx] + 0.01;
-            if (positions[idx] > 12) positions[idx] = 0;
+            const currentY = positions[idx];
+            if (currentY !== undefined) {
+              positions[idx] = currentY + 0.01;
+              if (positions[idx]! > 12) positions[idx] = 0;
+            }
           }
           positionAttr.needsUpdate = true;
         }

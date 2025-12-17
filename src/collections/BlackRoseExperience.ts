@@ -295,8 +295,9 @@ export class BlackRoseExperience {
     const objects = Array.from(this.roseBushes.values());
     const intersects = this.raycaster.intersectObjects(objects, true);
 
-    if (intersects.length > 0) {
-      const productId = this.findProductId(intersects[0].object);
+    const firstIntersect = intersects[0];
+    if (firstIntersect) {
+      const productId = this.findProductId(firstIntersect.object);
       if (productId && this.onProductClick) {
         const product = this.getProductById(productId);
         if (product) this.onProductClick(product);
@@ -306,8 +307,9 @@ export class BlackRoseExperience {
     // Check easter eggs
     const easterEggObjects = Array.from(this.easterEggs.values());
     const eggIntersects = this.raycaster.intersectObjects(easterEggObjects, true);
-    if (eggIntersects.length > 0 && this.onEasterEgg) {
-      const url = eggIntersects[0].object.userData['exclusiveDropUrl'] as string | undefined;
+    const firstEggIntersect = eggIntersects[0];
+    if (firstEggIntersect && this.onEasterEgg) {
+      const url = firstEggIntersect.object.userData['exclusiveDropUrl'] as string | undefined;
       if (url) this.onEasterEgg(url);
     }
   }
@@ -317,8 +319,9 @@ export class BlackRoseExperience {
     const objects = Array.from(this.roseBushes.values());
     const intersects = this.raycaster.intersectObjects(objects, true);
 
-    if (intersects.length > 0) {
-      const productId = this.findProductId(intersects[0].object);
+    const firstIntersect = intersects[0];
+    if (firstIntersect) {
+      const productId = this.findProductId(firstIntersect.object);
       if (productId !== this.hoveredProduct) {
         this.hoveredProduct = productId;
         this.container.style.cursor = 'pointer';

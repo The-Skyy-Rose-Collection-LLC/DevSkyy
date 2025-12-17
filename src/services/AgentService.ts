@@ -117,12 +117,10 @@ export class AgentService extends EventEmitter {
     priority: AgentTask['priority'] = 'medium'
   ): Promise<string> {
     const agents = this.getAgentsByType(agentType);
-    if (agents.length === 0) {
+    const agent = agents[0];
+    if (!agent) {
       throw new Error(`No agents found for type: ${agentType}`);
     }
-
-    // Select the first available agent (could be enhanced with load balancing)
-    const agent = agents[0];
 
     const task: AgentTask = {
       id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,

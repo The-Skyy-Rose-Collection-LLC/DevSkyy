@@ -67,9 +67,10 @@ describe('AgentService', () => {
     it('should return agent by ID', () => {
       const agents = service.getAgents();
       const firstAgent = agents[0];
-      const found = service.getAgent(firstAgent.id);
+      expect(firstAgent).toBeDefined();
+      const found = service.getAgent(firstAgent!.id);
       expect(found).toBeDefined();
-      expect(found?.id).toBe(firstAgent.id);
+      expect(found?.id).toBe(firstAgent!.id);
     });
 
     it('should return undefined for non-existent ID', () => {
@@ -82,7 +83,7 @@ describe('AgentService', () => {
     it('should return agents filtered by type', () => {
       const wpAgents = service.getAgentsByType('wordpress_agent');
       expect(wpAgents).toHaveLength(1);
-      expect(wpAgents[0].type).toBe('wordpress_agent');
+      expect(wpAgents[0]?.type).toBe('wordpress_agent');
     });
 
     it('should return empty array for non-existent type', () => {
@@ -183,57 +184,57 @@ describe('AgentService', () => {
   describe('getAgentStats', () => {
     it('should return agent statistics', () => {
       const stats = service.getAgentStats();
-      expect(stats.totalAgents).toBe(6);
-      expect(stats.activeAgents).toBe(6);
-      expect(stats.totalTasks).toBeDefined();
-      expect(stats.runningTasks).toBeDefined();
-      expect(stats.completedTasks).toBeDefined();
-      expect(stats.failedTasks).toBeDefined();
-      expect(stats.agentTypes).toBeDefined();
+      expect(stats['totalAgents']).toBe(6);
+      expect(stats['activeAgents']).toBe(6);
+      expect(stats['totalTasks']).toBeDefined();
+      expect(stats['runningTasks']).toBeDefined();
+      expect(stats['completedTasks']).toBeDefined();
+      expect(stats['failedTasks']).toBeDefined();
+      expect(stats['agentTypes']).toBeDefined();
     });
 
     it('should track task counts correctly', async () => {
       await service.createTask('wordpress_agent', 'test', {});
       const stats = service.getAgentStats();
-      expect(stats.totalTasks).toBeGreaterThanOrEqual(1);
+      expect(stats['totalTasks']).toBeGreaterThanOrEqual(1);
     });
   });
 
   describe('agent capabilities', () => {
     it('should assign correct capabilities to wordpress_agent', () => {
       const agents = service.getAgentsByType('wordpress_agent');
-      expect(agents[0].capabilities).toContain('post_creation');
-      expect(agents[0].capabilities).toContain('theme_management');
+      expect(agents[0]?.capabilities).toContain('post_creation');
+      expect(agents[0]?.capabilities).toContain('theme_management');
     });
 
     it('should assign correct capabilities to seo_agent', () => {
       const agents = service.getAgentsByType('seo_agent');
-      expect(agents[0].capabilities).toContain('keyword_analysis');
-      expect(agents[0].capabilities).toContain('meta_tag_generation');
+      expect(agents[0]?.capabilities).toContain('keyword_analysis');
+      expect(agents[0]?.capabilities).toContain('meta_tag_generation');
     });
 
     it('should assign correct capabilities to content_agent', () => {
       const agents = service.getAgentsByType('content_agent');
-      expect(agents[0].capabilities).toContain('text_generation');
-      expect(agents[0].capabilities).toContain('image_generation');
+      expect(agents[0]?.capabilities).toContain('text_generation');
+      expect(agents[0]?.capabilities).toContain('image_generation');
     });
 
     it('should assign correct capabilities to social_media_agent', () => {
       const agents = service.getAgentsByType('social_media_agent');
-      expect(agents[0].capabilities).toContain('post_scheduling');
-      expect(agents[0].capabilities).toContain('engagement_tracking');
+      expect(agents[0]?.capabilities).toContain('post_scheduling');
+      expect(agents[0]?.capabilities).toContain('engagement_tracking');
     });
 
     it('should assign correct capabilities to analytics_agent', () => {
       const agents = service.getAgentsByType('analytics_agent');
-      expect(agents[0].capabilities).toContain('data_collection');
-      expect(agents[0].capabilities).toContain('report_generation');
+      expect(agents[0]?.capabilities).toContain('data_collection');
+      expect(agents[0]?.capabilities).toContain('report_generation');
     });
 
     it('should assign correct capabilities to security_agent', () => {
       const agents = service.getAgentsByType('security_agent');
-      expect(agents[0].capabilities).toContain('vulnerability_scanning');
-      expect(agents[0].capabilities).toContain('threat_detection');
+      expect(agents[0]?.capabilities).toContain('vulnerability_scanning');
+      expect(agents[0]?.capabilities).toContain('threat_detection');
     });
   });
 

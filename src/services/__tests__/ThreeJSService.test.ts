@@ -82,8 +82,8 @@ jest.mock('three', () => ({
 }));
 
 // Mock requestAnimationFrame
-let animationCallback: (() => void) | null = null;
-global.requestAnimationFrame = jest.fn((cb) => {
+let animationCallback: FrameRequestCallback | null = null;
+global.requestAnimationFrame = jest.fn((cb: FrameRequestCallback) => {
   animationCallback = cb;
   return 1;
 });
@@ -252,7 +252,7 @@ describe('ThreeJSService', () => {
 
       // Simulate animation frame
       if (animationCallback) {
-        animationCallback();
+        animationCallback(performance.now());
       }
 
       expect(callback).toHaveBeenCalled();
@@ -291,15 +291,15 @@ describe('ThreeJSService', () => {
       service.initializeScene(container);
       const stats = service.getSceneStats();
 
-      expect(stats.objects).toBeDefined();
-      expect(stats.triangles).toBe(100);
-      expect(stats.geometries).toBe(5);
-      expect(stats.textures).toBe(3);
+      expect(stats['objects']).toBeDefined();
+      expect(stats['triangles']).toBe(100);
+      expect(stats['geometries']).toBe(5);
+      expect(stats['textures']).toBe(3);
     });
 
     it('should return error if scene not initialized', () => {
       const stats = service.getSceneStats();
-      expect(stats.error).toBe('Scene not initialized');
+      expect(stats['error']).toBe('Scene not initialized');
     });
   });
 
