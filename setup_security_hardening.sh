@@ -76,7 +76,6 @@ set_file_permissions() {
         "docker/.env"
         "ml/.env"
         "mcp/.env"
-        "vercel/.env"
         "pyproject.toml"
         "claude_desktop_config.example.json"
     )

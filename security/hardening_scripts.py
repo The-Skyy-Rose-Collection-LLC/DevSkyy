@@ -66,7 +66,6 @@ class SecurityHardening:
                 "docker/.env",
                 "ml/.env",
                 "mcp/.env",
-                "vercel/.env",
                 "pyproject.toml",
             ]
 

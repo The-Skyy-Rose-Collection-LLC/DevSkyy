@@ -31,7 +31,7 @@ class DependencyScanner:
 
     def __init__(self, project_root: Path = None):
         self.project_root = project_root or Path.cwd()
-        self.requirements_files = ["requirements.txt", "vercel/requirements.txt", "pyproject.toml"]
+        self.requirements_files = ["requirements.txt", "pyproject.toml"]
         self.security_report = {
             "scan_timestamp": datetime.utcnow().isoformat(),
             "vulnerabilities": [],
