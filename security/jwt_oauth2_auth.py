@@ -861,7 +861,7 @@ token_blacklist = TokenBlacklist()
 
 def _create_auth_router():
     """Create authentication router with endpoints."""
-    from fastapi import APIRouter, Depends, HTTPException, status
+    from fastapi import APIRouter, Depends, HTTPException, Request, status
     from fastapi.security import OAuth2PasswordRequestForm as _OAuth2Form
     from pydantic import BaseModel
 
@@ -891,7 +891,6 @@ def _create_auth_router():
         """
         try:
             from database import UserRepository, get_db
-            from sqlalchemy.ext.asyncio import AsyncSession
 
             # Get database session
             async for db in get_db():
@@ -929,20 +928,41 @@ def _create_auth_router():
             logger.error(f"Error verifying user: {e}")
             return None
 
+    # Rate limiter for login attempts (brute force protection)
+    login_rate_limiter = RateLimiter(max_attempts=5, window_seconds=300)
+
     @router.post("/token", response_model=TokenResponse)
-    async def login_for_access_token(form_data=Depends(_OAuth2Form)):
+    async def login_for_access_token(request: Request, form_data=Depends(_OAuth2Form)):
         """
-        OAuth2 compatible token login.
+        OAuth2 compatible token login with brute force protection.
 
         - **username**: User email or username
         - **password**: User password
 
         Returns access and refresh tokens.
+
+        Rate Limit: 5 attempts per 5 minutes per IP/username
         """
+        # Get client identifier for rate limiting
+        client_ip = request.client.host if request.client else "unknown"
+        rate_limit_key = f"login:{client_ip}:{form_data.username}"
+
+        # Check rate limit before attempting authentication
+        if not login_rate_limiter.is_allowed(rate_limit_key):
+            logger.warning(f"Rate limit exceeded for login: {form_data.username} from {client_ip}")
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many login attempts. Please try again later.",
+                headers={"Retry-After": "300"},
+            )
+
         # Verify user credentials against database
         user_info = await verify_user_credentials(form_data.username, form_data.password)
 
         if not user_info:
+            # Record failed attempt for rate limiting
+            login_rate_limiter.record_attempt(rate_limit_key)
+
             # Check if we're in development mode (allow any credentials)
             if os.environ.get("DEVSKYY_DEV_MODE", "").lower() == "true":
                 logger.warning("DEV MODE: Accepting any credentials")
