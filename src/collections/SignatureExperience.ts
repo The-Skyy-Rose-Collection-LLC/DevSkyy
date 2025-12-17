@@ -429,15 +429,17 @@ export class SignatureExperience {
     // Check pedestals
     const pedestalObjects = Array.from(this.pedestals.values());
     const intersects = this.raycaster.intersectObjects(pedestalObjects, true);
-    if (intersects.length > 0 && this.onProductSelect) {
-      const product = this.findProductInAncestors(intersects[0].object);
+    const firstIntersect = intersects[0];
+    if (firstIntersect && this.onProductSelect) {
+      const product = this.findProductInAncestors(firstIntersect.object);
       if (product) this.onProductSelect(product);
     }
 
     // Check pathways
     const pathwayIntersects = this.raycaster.intersectObjects(this.pathways, true);
-    if (pathwayIntersects.length > 0 && this.onCategorySelect) {
-      let obj: THREE.Object3D | null = pathwayIntersects[0].object;
+    const firstPathwayIntersect = pathwayIntersects[0];
+    if (firstPathwayIntersect && this.onCategorySelect) {
+      let obj: THREE.Object3D | null = firstPathwayIntersect.object;
       while (obj && !obj.userData['category']) obj = obj.parent;
       if (obj) {
         const category = obj.userData['category'] as string | undefined;

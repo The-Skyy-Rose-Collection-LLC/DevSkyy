@@ -373,7 +373,7 @@ describe('Logger', () => {
       log.info('Test message', { key: 'value' });
 
       expect(eventDetail).toBeDefined();
-      expect((eventDetail as Record<string, unknown>).message).toBe('Test message');
+      expect((eventDetail as Record<string, unknown>)['message']).toBe('Test message');
 
       window.removeEventListener('devskyyLog', eventHandler);
     });
