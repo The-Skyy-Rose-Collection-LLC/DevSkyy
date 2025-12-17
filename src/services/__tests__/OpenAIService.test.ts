@@ -224,7 +224,7 @@ describe('OpenAIService', () => {
         expect.any(Object)
       );
       expect(result.success).toBe(true);
-      expect(result.data.data[0].url).toBe('https://example.com/image.png');
+      expect(result.data.data[0]?.url).toBe('https://example.com/image.png');
     });
 
     it('should use custom size and quality', async () => {
@@ -386,7 +386,7 @@ describe('OpenAIService', () => {
         expect.any(Object)
       );
       expect(result.success).toBe(true);
-      expect(result.data.results[0].flagged).toBe(false);
+      expect(result.data.results[0]?.flagged).toBe(false);
     });
 
     it('should detect flagged content', async () => {
@@ -407,8 +407,8 @@ describe('OpenAIService', () => {
 
       const result = await service.moderateContent('Some hateful content');
 
-      expect(result.data.results[0].flagged).toBe(true);
-      expect(result.data.results[0].categories.hate).toBe(true);
+      expect(result.data.results[0]?.flagged).toBe(true);
+      expect(result.data.results[0]?.categories['hate']).toBe(true);
     });
   });
 

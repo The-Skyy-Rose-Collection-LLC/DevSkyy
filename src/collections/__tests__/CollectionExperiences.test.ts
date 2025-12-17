@@ -28,7 +28,7 @@ beforeAll(() => {
     rafCallbacks.push(callback);
     return ++rafId;
   });
-  global.cancelAnimationFrame = jest.fn((id: number) => {
+  global.cancelAnimationFrame = jest.fn((_id: number) => {
     // Just track cancellation
   });
 });
@@ -65,7 +65,7 @@ jest.mock('three', () => ({
   PointLight: jest.fn(() => ({ position: { set: jest.fn() }, castShadow: false, shadow: { mapSize: { width: 0, height: 0 } } })),
   SpotLight: jest.fn(() => ({ position: { set: jest.fn() }, target: { position: { set: jest.fn() } }, castShadow: false, shadow: { mapSize: { width: 0, height: 0 } } })),
   Mesh: jest.fn(() => ({ position: { set: jest.fn(), x: 0, y: 0, z: 0 }, rotation: { set: jest.fn(), x: 0, y: 0, z: 0 }, scale: { set: jest.fn(), setScalar: jest.fn(), x: 1, y: 1, z: 1 }, userData: {}, geometry: { dispose: jest.fn() }, material: { dispose: jest.fn() }, lookAt: jest.fn(), visible: true })),
-  Group: jest.fn(() => ({ add: jest.fn(), remove: jest.fn(), position: { set: jest.fn(), x: 0, y: 0, z: 0, z: 0 }, rotation: { set: jest.fn(), x: 0, y: 0, z: 0 }, scale: { set: jest.fn(), setScalar: jest.fn(), x: 1, y: 1, z: 1 }, children: [], lookAt: jest.fn(), userData: {}, traverse: jest.fn(), visible: true })),
+  Group: jest.fn(() => ({ add: jest.fn(), remove: jest.fn(), position: { set: jest.fn(), x: 0, y: 0, z: 0 }, rotation: { set: jest.fn(), x: 0, y: 0, z: 0 }, scale: { set: jest.fn(), setScalar: jest.fn(), x: 1, y: 1, z: 1 }, children: [], lookAt: jest.fn(), userData: {}, traverse: jest.fn(), visible: true })),
   BoxGeometry: jest.fn(),
   SphereGeometry: jest.fn(),
   PlaneGeometry: jest.fn(),
@@ -201,14 +201,14 @@ describe('BlackRoseExperience', () => {
   });
 
   it('should handle mouse move events', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     const event = new MouseEvent('mousemove', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
     expect(true).toBe(true);
   });
 
   it('should handle click events with no intersection', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     mockIntersectObjects.mockReturnValue([]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
@@ -232,9 +232,9 @@ describe('BlackRoseExperience', () => {
     experience.setOnProductClick(clickHandler);
     // Load products first
     await experience.loadProducts([
-      { id: 'prod-1', name: 'Test', price: 99.99, category: 'test', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] as [number, number, number] }
+      { id: 'prod-1', name: 'Test', price: 99.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] as [number, number, number] }
     ]);
-    const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, category: 'test', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] };
+    const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] };
     mockIntersectObjects.mockReturnValue([createMockIntersection({ productId: 'prod-1', product: mockProduct })]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
@@ -242,7 +242,7 @@ describe('BlackRoseExperience', () => {
   });
 
   it('should handle click with intersection but no productId', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     mockIntersectObjects.mockReturnValue([createMockIntersection({})]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
@@ -253,7 +253,7 @@ describe('BlackRoseExperience', () => {
     const experience = new BlackRoseExperience(container);
     const clickHandler = jest.fn();
     experience.setOnProductClick(clickHandler);
-    const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, category: 'test', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] };
+    const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] };
     // Object with no productId, but parent has it
     mockIntersectObjects.mockReturnValue([createMockIntersection({}, { userData: { productId: 'prod-1', product: mockProduct }, parent: null })]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
@@ -262,9 +262,9 @@ describe('BlackRoseExperience', () => {
   });
 
   it('should handle click with no handler set', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     // No handler set - should not throw
-    const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, category: 'test', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] };
+    const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] };
     mockIntersectObjects.mockReturnValue([createMockIntersection({ productId: 'prod-1', product: mockProduct })]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
@@ -284,7 +284,7 @@ describe('BlackRoseExperience', () => {
   });
 
   it('should handle easter egg click without handler', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     // No easter egg handler set
     mockIntersectObjects
       .mockReturnValueOnce([])
@@ -307,7 +307,7 @@ describe('BlackRoseExperience', () => {
   });
 
   it('should handle hover with intersection', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     mockIntersectObjects.mockReturnValue([createMockIntersection({ productId: 'prod-1' })]);
     const event = new MouseEvent('mousemove', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
@@ -328,7 +328,7 @@ describe('BlackRoseExperience', () => {
   });
 
   it('should handle resize events', () => {
-    const experience = new BlackRoseExperience(container);
+    void new BlackRoseExperience(container);
     window.dispatchEvent(new Event('resize'));
     expect(true).toBe(true);
   });
@@ -336,7 +336,7 @@ describe('BlackRoseExperience', () => {
   it('should load products', async () => {
     const experience = new BlackRoseExperience(container);
     await experience.loadProducts([
-      { id: 'prod-1', name: 'Test Rose', price: 199.99, category: 'accessories', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] }
+      { id: 'prod-1', name: 'Test Rose', price: 199.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] }
     ]);
     expect(true).toBe(true);
   });
@@ -344,14 +344,14 @@ describe('BlackRoseExperience', () => {
   it('should load easter egg products', async () => {
     const experience = new BlackRoseExperience(container);
     await experience.loadProducts([
-      { id: 'egg-1', name: 'Easter Egg', price: 999.99, category: 'exclusive', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0], isEasterEgg: true, exclusiveDropUrl: 'https://example.com/drop' }
+      { id: 'egg-1', name: 'Easter Egg', price: 999.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0], isEasterEgg: true, exclusiveDropUrl: 'https://example.com/drop' }
     ]);
     expect(true).toBe(true);
   });
 
   it('should create arbor', () => {
     const experience = new BlackRoseExperience(container);
-    experience.createArbor([0, 0, 0], { id: 'prod-1', name: 'Test', price: 99.99, category: 'accessories', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] });
+    experience.createArbor([0, 0, 0], { id: 'prod-1', name: 'Test', price: 99.99, modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] });
     expect(true).toBe(true);
   });
 
@@ -390,7 +390,7 @@ describe('SignatureExperience', () => {
   });
 
   it('should accept custom configuration', () => {
-    const experience = new SignatureExperience(container, { backgroundColor: 0xffffff, enableBloom: true, pedestalSpacing: 5 });
+    const experience = new SignatureExperience(container, { backgroundColor: 0xffffff, sunlightIntensity: 1.5 });
     expect(experience).toBeDefined();
   });
 
@@ -438,7 +438,7 @@ describe('SignatureExperience', () => {
   });
 
   it('should handle click events with no intersection', () => {
-    const experience = new SignatureExperience(container);
+    void new SignatureExperience(container);
     mockIntersectObjects.mockReturnValue([]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
     container.dispatchEvent(event);
@@ -498,7 +498,7 @@ describe('SignatureExperience', () => {
   });
 
   it('should handle pedestal click without handler', () => {
-    const experience = new SignatureExperience(container);
+    void new SignatureExperience(container);
     // No handler set
     const mockProduct = { id: 'prod-1', name: 'Test', price: 99.99, category: 'tops', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', pedestalPosition: [0, 0, 0] };
     mockIntersectObjects
@@ -510,7 +510,7 @@ describe('SignatureExperience', () => {
   });
 
   it('should handle pathway click without handler', () => {
-    const experience = new SignatureExperience(container);
+    void new SignatureExperience(container);
     // No handler set
     mockIntersectObjects
       .mockReturnValueOnce([])
@@ -545,7 +545,7 @@ describe('SignatureExperience', () => {
   });
 
   it('should handle resize events', () => {
-    const experience = new SignatureExperience(container);
+    void new SignatureExperience(container);
     window.dispatchEvent(new Event('resize'));
     expect(true).toBe(true);
   });
@@ -730,7 +730,7 @@ describe('RunwayExperience', () => {
       walkSpeed: 0.01
     });
     await experience.loadProducts([
-      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 }
+      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', walkOrder: 1 }
     ]);
     expect(true).toBe(true);
   });
@@ -751,7 +751,7 @@ describe('RunwayExperience', () => {
 
   it('should load products', async () => {
     const experience = new RunwayExperience(container);
-    await experience.loadProducts([{ id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 }]);
+    await experience.loadProducts([{ id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', walkOrder: 1 }]);
     expect(true).toBe(true);
   });
 
@@ -764,8 +764,8 @@ describe('RunwayExperience', () => {
   it('should start runway show with models', async () => {
     const experience = new RunwayExperience(container);
     await experience.loadProducts([
-      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 },
-      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', outfitName: 'Outfit 2', walkOrder: 2 }
+      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', walkOrder: 1 },
+      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', walkOrder: 2 }
     ]);
     experience.startShow();
     expect(true).toBe(true);
@@ -788,8 +788,8 @@ describe('RunwayExperience', () => {
   it('should run animation frame with models and show started', async () => {
     const experience = new RunwayExperience(container);
     await experience.loadProducts([
-      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 },
-      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', outfitName: 'Outfit 2', walkOrder: 2 }
+      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', walkOrder: 1 },
+      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', walkOrder: 2 }
     ]);
     experience.startShow();
     experience.start();
@@ -804,8 +804,8 @@ describe('RunwayExperience', () => {
   it('should complete walk cycle and move to next model', async () => {
     const experience = new RunwayExperience(container, { walkSpeed: 0.5 }); // Fast walk speed
     await experience.loadProducts([
-      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 },
-      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', outfitName: 'Outfit 2', walkOrder: 2 }
+      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', walkOrder: 1 },
+      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', walkOrder: 2 }
     ]);
     experience.startShow();
     experience.start();
@@ -820,7 +820,7 @@ describe('RunwayExperience', () => {
   it('should complete entire runway show', async () => {
     const experience = new RunwayExperience(container, { walkSpeed: 1.0 }); // Very fast walk
     await experience.loadProducts([
-      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 }
+      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', walkOrder: 1 }
     ]);
     experience.startShow();
     experience.start();
@@ -897,7 +897,7 @@ describe('LoveHurtsExperience', () => {
   });
 
   it('should handle click events with no intersection', () => {
-    const experience = new LoveHurtsExperience(container);
+    void new LoveHurtsExperience(container);
     mockIntersectObjects.mockReturnValue([]);
     mockIntersectObject.mockReturnValue([]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
@@ -968,7 +968,7 @@ describe('LoveHurtsExperience', () => {
   });
 
   it('should handle hero click without handler', () => {
-    const experience = new LoveHurtsExperience(container);
+    void new LoveHurtsExperience(container);
     // No handler set
     mockIntersectObject.mockReturnValue([createMockIntersection({})]);
     const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
@@ -977,7 +977,7 @@ describe('LoveHurtsExperience', () => {
   });
 
   it('should handle mirror click without handler', () => {
-    const experience = new LoveHurtsExperience(container);
+    void new LoveHurtsExperience(container);
     // No handler set
     mockIntersectObject.mockReturnValue([]);
     mockIntersectObjects
@@ -989,7 +989,7 @@ describe('LoveHurtsExperience', () => {
   });
 
   it('should handle floor spotlight click without handler', () => {
-    const experience = new LoveHurtsExperience(container);
+    void new LoveHurtsExperience(container);
     // No handler set
     mockIntersectObject.mockReturnValue([]);
     mockIntersectObjects
@@ -1027,7 +1027,7 @@ describe('LoveHurtsExperience', () => {
   });
 
   it('should handle resize events', () => {
-    const experience = new LoveHurtsExperience(container);
+    void new LoveHurtsExperience(container);
     window.dispatchEvent(new Event('resize'));
     expect(true).toBe(true);
   });
