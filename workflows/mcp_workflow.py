@@ -111,7 +111,7 @@ class MCPWorkflow:
 
             try:
                 with open("claude_desktop_config.example.json") as f:
-                    config = json.load(f)
+                    json.load(f)  # Validate JSON format
                 results["config_validation"] = {
                     "status": "passed",
                     "config_valid": True,
