@@ -10,7 +10,7 @@ import logging
 from datetime import UTC, datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 from orchestration.langgraph_integration import WorkflowState, WorkflowStatus
 
