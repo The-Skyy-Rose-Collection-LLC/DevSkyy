@@ -35,7 +35,7 @@ bentoml>=1.4.8  # Fixed: CVE-2025-27520, CVE-2025-32375 (Critical RCE vulnerabil
 
 # Experiment tracking
 wandb==0.18.7
-tensorboard==2.18.0
+tensorboard==2.20.0
 
 # Data visualization
 matplotlib==3.9.2
