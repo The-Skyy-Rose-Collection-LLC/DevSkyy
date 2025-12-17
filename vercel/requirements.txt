@@ -42,7 +42,7 @@ requests==2.32.5
 beautifulsoup4==4.12.3
 
 # AI integrations (core only)
-openai==1.57.2
+openai==2.13.0
 
 # Configuration
 pyyaml==6.0.2
