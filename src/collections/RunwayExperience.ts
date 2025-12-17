@@ -32,7 +32,7 @@ export interface RunwayConfig {
   walkSpeed?: number;
 }
 
-const DEFAULT_CONFIG: RunwayConfig = {
+const DEFAULT_CONFIG: Required<RunwayConfig> = {
   backgroundColor: 0x0a0a0a,
   runwayLength: 30,
   runwayWidth: 4,
@@ -47,7 +47,7 @@ export class RunwayExperience {
   private renderer: THREE.WebGLRenderer;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
-  private config: RunwayConfig;
+  private config: Required<RunwayConfig>;
   private animationId: number | null = null;
   private models: THREE.Object3D[] = [];
   private currentModelIndex: number = 0;
