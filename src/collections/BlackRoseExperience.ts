@@ -529,12 +529,66 @@ export class BlackRoseExperience {
   public dispose(): void {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
-    this.roseBushes.forEach((bush) => this.scene.remove(bush));
-    this.petals.forEach((petal) => this.scene.remove(petal));
-    this.arbors.forEach((arbor) => this.scene.remove(arbor));
-    this.renderer.dispose();
+
+    // Helper to dispose mesh resources
+    const disposeMesh = (obj: THREE.Object3D): void => {
+      if (obj instanceof THREE.Mesh) {
+        obj.geometry?.dispose();
+        if (obj.material instanceof THREE.Material) {
+          obj.material.dispose();
+        } else if (Array.isArray(obj.material)) {
+          obj.material.forEach((mat) => mat.dispose());
+        }
+      }
+    };
+
+    // Dispose rose bushes (Map)
+    this.roseBushes.forEach((bush) => {
+      bush.traverse(disposeMesh);
+      this.scene.remove(bush);
+    });
+    this.roseBushes.clear();
+
+    // Dispose petals
+    this.petals.forEach((petal) => {
+      disposeMesh(petal);
+      this.scene.remove(petal);
+    });
+    this.petals = [];
+
+    // Dispose arbors
+    this.arbors.forEach((arbor) => {
+      arbor.traverse(disposeMesh);
+      this.scene.remove(arbor);
+    });
+    this.arbors = [];
+
+    // Dispose all remaining scene objects
+    this.scene.traverse(disposeMesh);
+
+    // Dispose controls, composer, and renderer
+    this.controls.dispose();
     if (this.composer) this.composer.dispose();
+    this.renderer.dispose();
+    this.renderer.forceContextLoss();
+
     this.logger.info('BLACK ROSE experience disposed');
+  }
+
+  /**
+   * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
+   */
+  public handleContextLoss(): void {
+    this.logger.warn('WebGL context lost - attempting recovery');
+    this.stop();
+  }
+
+  /**
+   * Handle WebGL context restoration
+   */
+  public handleContextRestored(): void {
+    this.logger.info('WebGL context restored');
+    this.start();
   }
 
   public getScene(): THREE.Scene { return this.scene; }

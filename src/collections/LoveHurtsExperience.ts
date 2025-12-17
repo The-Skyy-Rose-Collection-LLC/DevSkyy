@@ -675,15 +675,90 @@ export class LoveHurtsExperience {
   public dispose(): void {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
-    if (this.enchantedRose) this.scene.remove(this.enchantedRose);
-    this.mirrors.forEach((m) => this.scene.remove(m));
-    this.candelabras.forEach((c) => this.scene.remove(c));
-    this.floorSpotlights.forEach((s) => this.scene.remove(s));
-    this.stainedGlass.forEach((s) => this.scene.remove(s));
-    if (this.particles) this.scene.remove(this.particles);
-    this.renderer.dispose();
+
+    // Helper to dispose mesh resources
+    const disposeMesh = (obj: THREE.Object3D): void => {
+      if (obj instanceof THREE.Mesh) {
+        obj.geometry?.dispose();
+        if (obj.material instanceof THREE.Material) {
+          obj.material.dispose();
+        } else if (Array.isArray(obj.material)) {
+          obj.material.forEach((mat) => mat.dispose());
+        }
+      }
+    };
+
+    // Dispose enchanted rose
+    if (this.enchantedRose) {
+      this.enchantedRose.traverse(disposeMesh);
+      this.scene.remove(this.enchantedRose);
+    }
+
+    // Dispose mirrors (Map)
+    this.mirrors.forEach((m) => {
+      m.traverse(disposeMesh);
+      this.scene.remove(m);
+    });
+    this.mirrors.clear();
+
+    // Dispose candelabras (Array)
+    this.candelabras.forEach((c) => {
+      c.traverse(disposeMesh);
+      this.scene.remove(c);
+    });
+    this.candelabras = [];
+
+    // Dispose floor spotlights (Map of Groups, not SpotLights)
+    this.floorSpotlights.forEach((s) => {
+      s.traverse(disposeMesh);
+      this.scene.remove(s);
+    });
+    this.floorSpotlights.clear();
+
+    // Dispose stained glass (Array)
+    this.stainedGlass.forEach((s) => {
+      s.traverse(disposeMesh);
+      this.scene.remove(s);
+    });
+    this.stainedGlass = [];
+
+    // Dispose particles
+    if (this.particles) {
+      if (this.particles instanceof THREE.Points) {
+        this.particles.geometry?.dispose();
+        if (this.particles.material instanceof THREE.Material) {
+          this.particles.material.dispose();
+        }
+      }
+      this.scene.remove(this.particles);
+    }
+
+    // Dispose all remaining scene objects
+    this.scene.traverse(disposeMesh);
+
+    // Dispose controls, composer, and renderer
+    this.controls.dispose();
     if (this.composer) this.composer.dispose();
+    this.renderer.dispose();
+    this.renderer.forceContextLoss();
+
     this.logger.info('LOVE HURTS experience disposed');
+  }
+
+  /**
+   * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
+   */
+  public handleContextLoss(): void {
+    this.logger.warn('WebGL context lost - attempting recovery');
+    this.stop();
+  }
+
+  /**
+   * Handle WebGL context restoration
+   */
+  public handleContextRestored(): void {
+    this.logger.info('WebGL context restored');
+    this.start();
   }
 
   public getScene(): THREE.Scene { return this.scene; }

@@ -247,14 +247,63 @@ export class ShowroomExperience {
 
   public dispose(): void {
     this.stop();
+
+    // Properly dispose of all products and their resources
     this.products.forEach((obj) => {
       this.scene.remove(obj);
+      if (obj instanceof THREE.Mesh) {
+        obj.geometry?.dispose();
+        if (obj.material instanceof THREE.Material) {
+          obj.material.dispose();
+        } else if (Array.isArray(obj.material)) {
+          obj.material.forEach((mat) => mat.dispose());
+        }
+      }
     });
+    this.products.clear();
+
+    // Dispose spotlights
     this.spotlights.forEach((light) => {
       this.scene.remove(light);
+      this.scene.remove(light.target);
+      light.dispose();
     });
+    this.spotlights.clear();
+
+    // Dispose of all scene objects
+    this.scene.traverse((object) => {
+      if (object instanceof THREE.Mesh) {
+        object.geometry?.dispose();
+        if (object.material instanceof THREE.Material) {
+          object.material.dispose();
+        } else if (Array.isArray(object.material)) {
+          object.material.forEach((mat) => mat.dispose());
+        }
+      }
+    });
+
+    // Dispose controls and renderer
+    this.controls.dispose();
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
+
     this.logger.info('Showroom experience disposed');
+  }
+
+  /**
+   * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
+   */
+  public handleContextLoss(): void {
+    this.logger.warn('WebGL context lost - attempting recovery');
+    this.stop();
+  }
+
+  /**
+   * Handle WebGL context restoration
+   */
+  public handleContextRestored(): void {
+    this.logger.info('WebGL context restored');
+    this.start();
   }
 }
 
