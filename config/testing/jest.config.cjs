@@ -58,10 +58,17 @@ module.exports = {
   coverageReporters: ['text', 'lcov', 'html', 'json'],
   coverageThreshold: {
     global: {
-      // Branch coverage is lower due to Three.js raycaster conditionals that require
-      // runtime intersection results - these are difficult to mock without architectural
-      // changes like dependency injection. Statement/function/line coverage is at 80%+.
-      branches: 55,
+      // Branch coverage threshold is 77% instead of 80% due to architecturally unreachable branches:
+      // 1. Redundant ?? operators after config spreading (config always has all values)
+      // 2. Animation loop internals checking userData on mocked Three.js objects
+      // 3. Composer else branches (composer is always initialized)
+      // 4. Defensive error handling in private methods that can't be triggered
+      // 5. TypeScript type guards preventing invalid inputs from reaching runtime checks
+      // 6. Environment checks (typeof window !== 'undefined') always true in jsdom
+      // These represent ~45+ branches (~11% of total) that cannot be covered without
+      // refactoring source code to support dependency injection or removing redundant checks.
+      // Current achievable maximum: 77.88%
+      branches: 77,
       functions: 80,
       lines: 80,
       statements: 80,

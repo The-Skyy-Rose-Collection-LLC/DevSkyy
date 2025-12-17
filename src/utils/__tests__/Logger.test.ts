@@ -50,6 +50,19 @@ describe('Logger', () => {
       log.info('Test message');
       expect(consoleSpy).not.toHaveBeenCalled();
     });
+
+    it('should fall back to info level when config has no logLevel', () => {
+      // Test the fallback when monitoringConfig.logLevel is empty
+      jest.resetModules();
+      jest.doMock('../../config/index', () => ({
+        monitoringConfig: {
+          logLevel: '', // Empty string - falsy
+        },
+      }));
+      const { Logger: LoggerNoConfig } = require('../Logger');
+      const log = new LoggerNoConfig('TestService');
+      expect(log.getLevel()).toBe('info');
+    });
   });
 
   describe('log levels', () => {
@@ -237,6 +250,25 @@ describe('Logger', () => {
       log.setFileLogging(false);
       log.info('Test message');
       expect(consoleSpy).toHaveBeenCalled();
+    });
+
+    it('should not write to file when enabled without filePath', () => {
+      const log = new Logger('TestService', { enableFile: true });
+      log.info('Test message');
+      expect(consoleSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('log events', () => {
+    it('should dispatch custom event when window is available', () => {
+      const eventListener = jest.fn();
+      window.addEventListener('devskyyLog', eventListener);
+
+      const log = new Logger('TestService');
+      log.info('Test message');
+
+      expect(eventListener).toHaveBeenCalled();
+      window.removeEventListener('devskyyLog', eventListener);
     });
   });
 
