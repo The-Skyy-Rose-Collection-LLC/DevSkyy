@@ -878,6 +878,57 @@ def _create_auth_router():
 
         refresh_token: str
 
+    async def verify_user_credentials(username: str, password: str) -> tuple[str, list[str]] | None:
+        """
+        Verify user credentials against database.
+
+        Args:
+            username: Username or email
+            password: Plain text password
+
+        Returns:
+            Tuple of (user_id, roles) if valid, None if invalid
+        """
+        try:
+            from database import UserRepository, get_db
+            from sqlalchemy.ext.asyncio import AsyncSession
+
+            # Get database session
+            async for db in get_db():
+                repo = UserRepository(db)
+
+                # Try username first, then email
+                user = await repo.get_by_username(username)
+                if not user:
+                    user = await repo.get_by_email(username)
+
+                if not user:
+                    logger.warning(f"User not found: {username}")
+                    return None
+
+                if not user.is_active:
+                    logger.warning(f"Inactive user attempted login: {username}")
+                    return None
+
+                # Verify password
+                if not password_manager.verify_password(password, user.hashed_password):
+                    logger.warning(f"Invalid password for user: {username}")
+                    return None
+
+                # Update last login
+                user.last_login = datetime.now(UTC)
+                await db.commit()
+
+                return (user.id, [user.role])
+
+        except ImportError:
+            # Database module not available - fall back to dev mode
+            logger.warning("Database not configured - using development mode authentication")
+            return None
+        except Exception as e:
+            logger.error(f"Error verifying user: {e}")
+            return None
+
     @router.post("/token", response_model=TokenResponse)
     async def login_for_access_token(form_data=Depends(_OAuth2Form)):
         """
@@ -888,14 +939,27 @@ def _create_auth_router():
 
         Returns access and refresh tokens.
         """
-        # In production, verify against database
-        # For now, accept any credentials for development
-        # TODO: Implement actual user verification
+        # Verify user credentials against database
+        user_info = await verify_user_credentials(form_data.username, form_data.password)
+
+        if not user_info:
+            # Check if we're in development mode (allow any credentials)
+            if os.environ.get("DEVSKYY_DEV_MODE", "").lower() == "true":
+                logger.warning("DEV MODE: Accepting any credentials")
+                user_info = (form_data.username, ["api_user"])
+            else:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid username or password",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+
+        user_id, roles = user_info
 
         # Create token pair
         tokens = jwt_manager.create_token_pair(
-            user_id=form_data.username,
-            roles=["api_user"],
+            user_id=user_id,
+            roles=roles,
         )
 
         return tokens
