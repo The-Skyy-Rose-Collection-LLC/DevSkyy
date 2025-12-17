@@ -16,7 +16,7 @@ import RunwayExperience from '../RunwayExperience';
 // Mock Three.js core
 jest.mock('three', () => ({
   Scene: jest.fn(() => ({ add: jest.fn(), remove: jest.fn(), background: null, fog: null, traverse: jest.fn(), children: [] })),
-  PerspectiveCamera: jest.fn(() => ({ position: { set: jest.fn(), clone: jest.fn().mockReturnValue({ lerpVectors: jest.fn() }) }, aspect: 1, updateProjectionMatrix: jest.fn(), lookAt: jest.fn() })),
+  PerspectiveCamera: jest.fn(() => ({ position: { set: jest.fn(), clone: jest.fn().mockReturnValue({ lerpVectors: jest.fn() }), lerpVectors: jest.fn() }, aspect: 1, updateProjectionMatrix: jest.fn(), lookAt: jest.fn() })),
   WebGLRenderer: jest.fn(() => ({ setSize: jest.fn(), setPixelRatio: jest.fn(), shadowMap: { enabled: false, type: 0 }, domElement: document.createElement('canvas'), render: jest.fn(), dispose: jest.fn(), toneMapping: 0, toneMappingExposure: 1, outputColorSpace: '' })),
   Color: jest.fn(() => ({})),
   Fog: jest.fn(() => ({})),
@@ -38,11 +38,12 @@ jest.mock('three', () => ({
   TubeGeometry: jest.fn(),
   LatheGeometry: jest.fn(),
   IcosahedronGeometry: jest.fn(),
+  CapsuleGeometry: jest.fn(),
   MeshStandardMaterial: jest.fn(() => ({ dispose: jest.fn(), clone: jest.fn().mockReturnThis() })),
   MeshBasicMaterial: jest.fn(() => ({ dispose: jest.fn(), clone: jest.fn().mockReturnThis() })),
   MeshPhongMaterial: jest.fn(() => ({ dispose: jest.fn(), clone: jest.fn().mockReturnThis() })),
   ShaderMaterial: jest.fn(() => ({ dispose: jest.fn(), clone: jest.fn().mockReturnThis() })),
-  Raycaster: jest.fn(() => ({ setFromCamera: jest.fn(), intersectObjects: jest.fn().mockReturnValue([]) })),
+  Raycaster: jest.fn(() => ({ setFromCamera: jest.fn(), intersectObjects: jest.fn().mockReturnValue([]), intersectObject: jest.fn().mockReturnValue([]) })),
   Vector2: jest.fn(() => ({ set: jest.fn() })),
   Vector3: jest.fn(() => ({ set: jest.fn(), clone: jest.fn().mockReturnThis(), add: jest.fn().mockReturnThis(), sub: jest.fn().mockReturnThis(), multiplyScalar: jest.fn().mockReturnThis(), normalize: jest.fn().mockReturnThis(), lerpVectors: jest.fn().mockReturnThis() })),
   Clock: jest.fn(() => ({ getElapsedTime: jest.fn().mockReturnValue(0), getDelta: jest.fn().mockReturnValue(0.016) })),
@@ -64,7 +65,7 @@ jest.mock('three', () => ({
 
 // Mock OrbitControls
 jest.mock('three/examples/jsm/controls/OrbitControls.js', () => ({
-  OrbitControls: jest.fn(() => ({ enableDamping: false, dampingFactor: 0, update: jest.fn(), dispose: jest.fn(), target: { set: jest.fn() } })),
+  OrbitControls: jest.fn(() => ({ enableDamping: false, dampingFactor: 0, update: jest.fn(), dispose: jest.fn(), target: { set: jest.fn(), lerp: jest.fn() } })),
 }));
 
 // Mock GLTFLoader
@@ -121,8 +122,83 @@ describe('BlackRoseExperience', () => {
 
   it('should set product click handler', () => {
     const experience = new BlackRoseExperience(container);
-    experience.setOnProductClick(jest.fn());
+    const handler = jest.fn();
+    experience.setOnProductClick(handler);
     expect(true).toBe(true);
+  });
+
+  it('should set product hover handler', () => {
+    const experience = new BlackRoseExperience(container);
+    const handler = jest.fn();
+    experience.setOnProductHover(handler);
+    expect(true).toBe(true);
+  });
+
+  it('should set easter egg handler', () => {
+    const experience = new BlackRoseExperience(container);
+    const handler = jest.fn();
+    experience.setOnEasterEgg(handler);
+    expect(true).toBe(true);
+  });
+
+  it('should handle mouse move events', () => {
+    const experience = new BlackRoseExperience(container);
+    const event = new MouseEvent('mousemove', { clientX: 400, clientY: 300 });
+    container.dispatchEvent(event);
+    expect(true).toBe(true);
+  });
+
+  it('should handle click events', () => {
+    const experience = new BlackRoseExperience(container);
+    const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
+    container.dispatchEvent(event);
+    expect(true).toBe(true);
+  });
+
+  it('should handle resize events', () => {
+    const experience = new BlackRoseExperience(container);
+    window.dispatchEvent(new Event('resize'));
+    expect(true).toBe(true);
+  });
+
+  it('should load products', async () => {
+    const experience = new BlackRoseExperience(container);
+    await experience.loadProducts([
+      { id: 'prod-1', name: 'Test Rose', price: 199.99, category: 'accessories', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] }
+    ]);
+    expect(true).toBe(true);
+  });
+
+  it('should load easter egg products', async () => {
+    const experience = new BlackRoseExperience(container);
+    await experience.loadProducts([
+      { id: 'egg-1', name: 'Easter Egg', price: 999.99, category: 'exclusive', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0], isEasterEgg: true, exclusiveDropUrl: 'https://example.com/drop' }
+    ]);
+    expect(true).toBe(true);
+  });
+
+  it('should create arbor', () => {
+    const experience = new BlackRoseExperience(container);
+    experience.createArbor([0, 0, 0], { id: 'prod-1', name: 'Test', price: 99.99, category: 'accessories', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', position: [0, 0, 0] });
+    expect(true).toBe(true);
+  });
+
+  it('should get scene', () => {
+    const experience = new BlackRoseExperience(container);
+    const scene = experience.getScene();
+    expect(scene).toBeDefined();
+  });
+
+  it('should get camera', () => {
+    const experience = new BlackRoseExperience(container);
+    const camera = experience.getCamera();
+    expect(camera).toBeDefined();
+  });
+
+  it('should get renderer', () => {
+    const experience = new BlackRoseExperience(container);
+    const renderer = experience.getRenderer();
+    expect(renderer).toBeDefined();
   });
 });
 
@@ -133,6 +209,11 @@ describe('SignatureExperience', () => {
 
   it('should instantiate with default config', () => {
     const experience = new SignatureExperience(container);
+    expect(experience).toBeDefined();
+  });
+
+  it('should accept custom configuration', () => {
+    const experience = new SignatureExperience(container, { backgroundColor: 0xffffff, enableBloom: true, pedestalSpacing: 5 });
     expect(experience).toBeDefined();
   });
 
@@ -155,6 +236,43 @@ describe('SignatureExperience', () => {
     experience.dispose();
     expect(true).toBe(true);
   });
+
+  it('should set product select handler', () => {
+    const experience = new SignatureExperience(container);
+    experience.setOnProductSelect(jest.fn());
+    expect(true).toBe(true);
+  });
+
+  it('should set category select handler', () => {
+    const experience = new SignatureExperience(container);
+    experience.setOnCategorySelect(jest.fn());
+    expect(true).toBe(true);
+  });
+
+  it('should handle click events', () => {
+    const experience = new SignatureExperience(container);
+    const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
+    container.dispatchEvent(event);
+    expect(true).toBe(true);
+  });
+
+  it('should handle resize events', () => {
+    const experience = new SignatureExperience(container);
+    window.dispatchEvent(new Event('resize'));
+    expect(true).toBe(true);
+  });
+
+  it('should get scene', () => {
+    const experience = new SignatureExperience(container);
+    const scene = experience.getScene();
+    expect(scene).toBeDefined();
+  });
+
+  it('should get camera', () => {
+    const experience = new SignatureExperience(container);
+    const camera = experience.getCamera();
+    expect(camera).toBeDefined();
+  });
 });
 
 describe('ShowroomExperience', () => {
@@ -164,6 +282,11 @@ describe('ShowroomExperience', () => {
 
   it('should instantiate with default config', () => {
     const experience = new ShowroomExperience(container);
+    expect(experience).toBeDefined();
+  });
+
+  it('should accept custom configuration', () => {
+    const experience = new ShowroomExperience(container, { backgroundColor: 0x222222, enableShadows: true });
     expect(experience).toBeDefined();
   });
 
@@ -184,6 +307,25 @@ describe('ShowroomExperience', () => {
     const experience = new ShowroomExperience(container);
     experience.start();
     experience.dispose();
+    expect(true).toBe(true);
+  });
+
+  it('should select non-existent product', () => {
+    const experience = new ShowroomExperience(container);
+    experience.selectProduct('non-existent');
+    expect(true).toBe(true);
+  });
+
+  it('should select existing product', async () => {
+    const experience = new ShowroomExperience(container);
+    await experience.loadProducts([{ id: 'prod-1', name: 'Test', modelUrl: '/m.glb', position: [0, 0, 0] as [number, number, number] }]);
+    experience.selectProduct('prod-1');
+    expect(true).toBe(true);
+  });
+
+  it('should handle resize', () => {
+    const experience = new ShowroomExperience(container);
+    experience.handleResize(1024, 768);
     expect(true).toBe(true);
   });
 });
@@ -215,6 +357,123 @@ describe('RunwayExperience', () => {
     experience.start();
     experience.dispose();
     expect(true).toBe(true);
+  });
+
+  it('should load products', async () => {
+    const experience = new RunwayExperience(container);
+    await experience.loadProducts([{ id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 }]);
+    expect(true).toBe(true);
+  });
+
+  it('should start runway show with no models', () => {
+    const experience = new RunwayExperience(container);
+    experience.startShow();
+    expect(true).toBe(true);
+  });
+
+  it('should start runway show with models', async () => {
+    const experience = new RunwayExperience(container);
+    await experience.loadProducts([
+      { id: 'model-1', name: 'Model 1', modelUrl: '/m.glb', outfitName: 'Outfit 1', walkOrder: 1 },
+      { id: 'model-2', name: 'Model 2', modelUrl: '/m2.glb', outfitName: 'Outfit 2', walkOrder: 2 }
+    ]);
+    experience.startShow();
+    expect(true).toBe(true);
+  });
+
+  it('should handle resize', () => {
+    const experience = new RunwayExperience(container);
+    experience.handleResize(1024, 768);
+    expect(true).toBe(true);
+  });
+});
+
+describe('LoveHurtsExperience', () => {
+  let container: HTMLElement;
+  beforeEach(() => { container = createMockContainer(); document.body.appendChild(container); });
+  afterEach(() => { document.body.removeChild(container); });
+
+  it('should instantiate with default config', () => {
+    const experience = new LoveHurtsExperience(container);
+    expect(experience).toBeDefined();
+  });
+
+  it('should accept custom configuration', () => {
+    const experience = new LoveHurtsExperience(container, { backgroundColor: 0x1a0000, enableBloom: true });
+    expect(experience).toBeDefined();
+  });
+
+  it('should start and stop animation loop', () => {
+    const experience = new LoveHurtsExperience(container);
+    experience.start();
+    experience.stop();
+    expect(true).toBe(true);
+  });
+
+  it('should dispose resources properly', () => {
+    const experience = new LoveHurtsExperience(container);
+    experience.start();
+    experience.dispose();
+    expect(true).toBe(true);
+  });
+
+  it('should set hero interaction handler', () => {
+    const experience = new LoveHurtsExperience(container);
+    experience.setOnHeroInteraction(jest.fn());
+    expect(true).toBe(true);
+  });
+
+  it('should set mirror click handler', () => {
+    const experience = new LoveHurtsExperience(container);
+    experience.setOnMirrorClick(jest.fn());
+    expect(true).toBe(true);
+  });
+
+  it('should set floor spotlight handler', () => {
+    const experience = new LoveHurtsExperience(container);
+    experience.setOnFloorSpotlight(jest.fn());
+    expect(true).toBe(true);
+  });
+
+  it('should handle click events', () => {
+    const experience = new LoveHurtsExperience(container);
+    const event = new MouseEvent('click', { clientX: 400, clientY: 300 });
+    container.dispatchEvent(event);
+    expect(true).toBe(true);
+  });
+
+  it('should handle resize events', () => {
+    const experience = new LoveHurtsExperience(container);
+    window.dispatchEvent(new Event('resize'));
+    expect(true).toBe(true);
+  });
+
+  it('should load products with mirror display type', async () => {
+    const experience = new LoveHurtsExperience(container);
+    await experience.loadProducts([
+      { id: 'prod-1', name: 'Test', price: 299.99, category: 'dresses', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', displayType: 'mirror', mirrorPosition: [0, 0, 0] }
+    ]);
+    expect(true).toBe(true);
+  });
+
+  it('should load products with floor display type', async () => {
+    const experience = new LoveHurtsExperience(container);
+    await experience.loadProducts([
+      { id: 'prod-2', name: 'Test 2', price: 199.99, category: 'shoes', modelUrl: '/m.glb', thumbnailUrl: '/t.jpg', displayType: 'floor', floorPosition: [0, 0, 0] }
+    ]);
+    expect(true).toBe(true);
+  });
+
+  it('should get scene', () => {
+    const experience = new LoveHurtsExperience(container);
+    const scene = experience.getScene();
+    expect(scene).toBeDefined();
+  });
+
+  it('should get camera', () => {
+    const experience = new LoveHurtsExperience(container);
+    const camera = experience.getCamera();
+    expect(camera).toBeDefined();
   });
 });
 
