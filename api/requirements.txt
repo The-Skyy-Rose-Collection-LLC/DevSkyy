@@ -1,0 +1,9 @@
+# DevSkyy API Requirements
+# ========================
+# Minimal requirements for Vercel serverless functions
+
+# No additional requirements needed for the mock API
+# Production would include:
+# httpx>=0.25.0
+# pydantic>=2.0.0
+# asyncpg>=0.29.0

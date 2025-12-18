@@ -1,0 +1,48 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "name": "devskyy",
+  "builds": [
+    {
+      "src": "frontend/package.json",
+      "use": "@vercel/next"
+    },
+    {
+      "src": "api/**/*.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/backend/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
+    }
+  ],
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "python3.11",
+      "maxDuration": 60
+    }
+  },
+  "env": {
+    "OPENAI_API_KEY": "@openai-api-key",
+    "ANTHROPIC_API_KEY": "@anthropic-api-key",
+    "GOOGLE_API_KEY": "@google-api-key",
+    "MISTRAL_API_KEY": "@mistral-api-key",
+    "COHERE_API_KEY": "@cohere-api-key",
+    "GROQ_API_KEY": "@groq-api-key",
+    "HUGGINGFACE_API_KEY": "@huggingface-api-key",
+    "TRIPO_API_KEY": "@tripo-api-key",
+    "FASHN_API_KEY": "@fashn-api-key",
+    "DATABASE_URL": "@database-url",
+    "REDIS_URL": "@redis-url"
+  },
+  "regions": ["iad1"]
+}

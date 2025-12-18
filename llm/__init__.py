@@ -83,6 +83,19 @@ from .router import (
     complete,
     get_router,
 )
+from .round_table import (
+    ABTestResult,
+    CompetitionStatus,
+    LLMProvider as RoundTableProvider,
+    LLMResponse,
+    LLMRoundTable,
+    ResponseScorer,
+    ResponseScores,
+    RoundTableDatabase,
+    RoundTableEntry,
+    RoundTableResult,
+    create_round_table,
+)
 
 __version__ = "1.0.0"
 
@@ -126,4 +139,16 @@ __all__ = [
     "LLMRouter",
     "get_router",
     "complete",
+    # Round Table
+    "RoundTableProvider",
+    "CompetitionStatus",
+    "LLMResponse",
+    "ResponseScores",
+    "RoundTableEntry",
+    "ABTestResult",
+    "RoundTableResult",
+    "RoundTableDatabase",
+    "ResponseScorer",
+    "LLMRoundTable",
+    "create_round_table",
 ]

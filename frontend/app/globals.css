@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 255 255 255;
+  --foreground: 10 10 10;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: 10 10 10;
+    --foreground: 255 255 255;
+  }
+}
+
+body {
+  color: rgb(var(--foreground));
+  background: rgb(var(--background));
+  font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+@media (prefers-color-scheme: dark) {
+  ::-webkit-scrollbar-thumb {
+    background: #374151;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #4b5563;
+  }
+}
+
+/* Agent color utilities */
+.bg-agent-commerce {
+  background-color: #10b981;
+}
+
+.bg-agent-creative {
+  background-color: #8b5cf6;
+}
+
+.bg-agent-marketing {
+  background-color: #f59e0b;
+}
+
+.bg-agent-support {
+  background-color: #3b82f6;
+}
+
+.bg-agent-operations {
+  background-color: #ef4444;
+}
+
+.bg-agent-analytics {
+  background-color: #06b6d4;
+}
+
+.text-agent-commerce {
+  color: #10b981;
+}
+
+.text-agent-creative {
+  color: #8b5cf6;
+}
+
+.text-agent-marketing {
+  color: #f59e0b;
+}
+
+.text-agent-support {
+  color: #3b82f6;
+}
+
+.text-agent-operations {
+  color: #ef4444;
+}
+
+.text-agent-analytics {
+  color: #06b6d4;
+}
+
+/* LLM provider color utilities */
+.bg-llm-anthropic {
+  background-color: #d97757;
+}
+
+.bg-llm-openai {
+  background-color: #10a37f;
+}
+
+.bg-llm-google {
+  background-color: #4285f4;
+}
+
+.bg-llm-mistral {
+  background-color: #ff7000;
+}
+
+.bg-llm-cohere {
+  background-color: #39594d;
+}
+
+.bg-llm-groq {
+  background-color: #f55036;
+}
+
+/* Animation utilities */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(183, 110, 121, 0);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s infinite;
+}
