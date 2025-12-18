@@ -35,7 +35,9 @@ from .tripo_agent import (
     TripoTaskStatus,
 )
 from .wordpress_asset_agent import (
+    GalleryResult,
     MediaUploadResult,
+    Model3DUploadResult,
     ProductAssetResult,
     WordPressAssetAgent,
     WordPressAssetConfig,
@@ -66,4 +68,6 @@ __all__ = [
     "WordPressAssetConfig",
     "MediaUploadResult",
     "ProductAssetResult",
+    "GalleryResult",
+    "Model3DUploadResult",
 ]

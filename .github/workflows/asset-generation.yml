@@ -1,0 +1,177 @@
+name: Asset Generation Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      product_id:
+        description: 'Product ID to process'
+        required: true
+        type: string
+      product_title:
+        description: 'Product title'
+        required: true
+        type: string
+      product_category:
+        description: 'Product category'
+        required: true
+        type: choice
+        options:
+          - apparel
+          - accessory
+          - footwear
+      collection:
+        description: 'SkyyRose collection'
+        required: false
+        type: choice
+        default: 'SIGNATURE'
+        options:
+          - BLACK_ROSE
+          - LOVE_HURTS
+          - SIGNATURE
+      garment_type:
+        description: 'Garment type (for apparel)'
+        required: false
+        type: choice
+        default: 'tee'
+        options:
+          - hoodie
+          - tee
+          - shirt
+          - jacket
+          - pants
+          - dress
+      enable_3d:
+        description: 'Enable 3D model generation'
+        required: false
+        type: boolean
+        default: true
+      enable_tryon:
+        description: 'Enable virtual try-on (apparel only)'
+        required: false
+        type: boolean
+        default: true
+      enable_wordpress:
+        description: 'Enable WordPress upload'
+        required: false
+        type: boolean
+        default: true
+
+  repository_dispatch:
+    types: [product_created, product_updated]
+
+env:
+  PYTHON_VERSION: "3.11"
+
+jobs:
+  validate-inputs:
+    name: Validate Pipeline Inputs
+    runs-on: ubuntu-latest
+    outputs:
+      product_id: ${{ steps.set-vars.outputs.product_id }}
+      product_title: ${{ steps.set-vars.outputs.product_title }}
+      product_category: ${{ steps.set-vars.outputs.product_category }}
+      collection: ${{ steps.set-vars.outputs.collection }}
+      garment_type: ${{ steps.set-vars.outputs.garment_type }}
+    steps:
+      - name: Set variables from dispatch or webhook
+        id: set-vars
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            echo "product_id=${{ inputs.product_id }}" >> $GITHUB_OUTPUT
+            echo "product_title=${{ inputs.product_title }}" >> $GITHUB_OUTPUT
+            echo "product_category=${{ inputs.product_category }}" >> $GITHUB_OUTPUT
+            echo "collection=${{ inputs.collection }}" >> $GITHUB_OUTPUT
+            echo "garment_type=${{ inputs.garment_type }}" >> $GITHUB_OUTPUT
+          else
+            echo "product_id=${{ github.event.client_payload.product_id }}" >> $GITHUB_OUTPUT
+            echo "product_title=${{ github.event.client_payload.title }}" >> $GITHUB_OUTPUT
+            echo "product_category=${{ github.event.client_payload.category }}" >> $GITHUB_OUTPUT
+            echo "collection=${{ github.event.client_payload.collection || 'SIGNATURE' }}" >> $GITHUB_OUTPUT
+            echo "garment_type=${{ github.event.client_payload.garment_type || 'tee' }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Validate required inputs
+        run: |
+          if [ -z "${{ steps.set-vars.outputs.product_id }}" ]; then
+            echo "Error: product_id is required"
+            exit 1
+          fi
+          if [ -z "${{ steps.set-vars.outputs.product_title }}" ]; then
+            echo "Error: product_title is required"
+            exit 1
+          fi
+
+  generate-assets:
+    name: Generate Product Assets
+    needs: validate-inputs
+    runs-on: ubuntu-latest
+    env:
+      TRIPO_API_KEY: ${{ secrets.TRIPO_API_KEY }}
+      TRIPO_API_BASE_URL: ${{ secrets.TRIPO_API_BASE_URL || 'https://api.tripo3d.ai/v2' }}
+      FASHN_API_KEY: ${{ secrets.FASHN_API_KEY }}
+      FASHN_API_BASE_URL: ${{ secrets.FASHN_API_BASE_URL || 'https://api.fashn.ai/v1' }}
+      WP_SITE_URL: ${{ secrets.WP_SITE_URL }}
+      WP_USERNAME: ${{ secrets.WP_USERNAME }}
+      WP_APP_PASSWORD: ${{ secrets.WP_APP_PASSWORD }}
+      WC_CONSUMER_KEY: ${{ secrets.WC_CONSUMER_KEY }}
+      WC_CONSUMER_SECRET: ${{ secrets.WC_CONSUMER_SECRET }}
+      PIPELINE_ENABLE_3D: ${{ inputs.enable_3d || 'true' }}
+      PIPELINE_ENABLE_TRYON: ${{ inputs.enable_tryon || 'true' }}
+      PIPELINE_ENABLE_WP: ${{ inputs.enable_wordpress || 'true' }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+
+      - name: Verify API credentials
+        run: python scripts/verify_env.py
+
+      - name: Create output directories
+        run: |
+          mkdir -p generated_assets/3d
+          mkdir -p generated_assets/tryon
+
+      - name: Run asset pipeline
+        id: pipeline
+        run: |
+          python scripts/run_asset_pipeline.py \
+            --product-id "${{ needs.validate-inputs.outputs.product_id }}" \
+            --title "${{ needs.validate-inputs.outputs.product_title }}" \
+            --category "${{ needs.validate-inputs.outputs.product_category }}" \
+            --collection "${{ needs.validate-inputs.outputs.collection }}" \
+            --garment-type "${{ needs.validate-inputs.outputs.garment_type }}"
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-assets-${{ needs.validate-inputs.outputs.product_id }}
+          path: |
+            generated_assets/3d/
+            generated_assets/tryon/
+          retention-days: 30
+          if-no-files-found: ignore
+
+  notify-completion:
+    name: Notify Pipeline Completion
+    needs: [validate-inputs, generate-assets]
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Send notification
+        run: |
+          STATUS="${{ needs.generate-assets.result }}"
+          PRODUCT_ID="${{ needs.validate-inputs.outputs.product_id }}"
+          PRODUCT_TITLE="${{ needs.validate-inputs.outputs.product_title }}"
+
+          echo "Pipeline completed for product: $PRODUCT_TITLE ($PRODUCT_ID)"
+          echo "Status: $STATUS"

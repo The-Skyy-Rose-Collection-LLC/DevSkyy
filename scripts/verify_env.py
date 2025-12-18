@@ -111,6 +111,24 @@ def main():
         ("DATABASE_URL", "Database connection (defaults to SQLite)"),
     ]
 
+    print()
+    print("=" * 80)
+    print("3D Asset Pipeline Variables:")
+    print("=" * 80)
+
+    asset_pipeline_vars = [
+        ("TRIPO_API_KEY", "Tripo3D API key for 3D model generation"),
+        ("TRIPO_API_BASE_URL", "Tripo3D API base URL (default: https://api.tripo3d.ai/v2)"),
+        ("FASHN_API_KEY", "FASHN API key for virtual try-on"),
+        ("FASHN_API_BASE_URL", "FASHN API base URL (default: https://api.fashn.ai/v1)"),
+    ]
+
+    for var_name, description in asset_pipeline_vars:
+        is_set, message = check_env_var(var_name, required=False)
+        status = "✓" if is_set else "-"
+        print(f"   [{status}] {var_name}: {message}")
+        print(f"       → {description}")
+
     for var_name, description in optional_vars:
         is_set, message = check_env_var(var_name, required=False)
         status = "✓" if is_set else "-"
