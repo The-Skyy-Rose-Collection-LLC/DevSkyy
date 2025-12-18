@@ -78,6 +78,36 @@ from .tool_registry import (
     ToolRegistry,
 )
 
+# RAG Components
+from .vector_store import (
+    BaseVectorStore,
+    ChromaVectorStore,
+    Document,
+    PineconeVectorStore,
+    SearchResult,
+    VectorDBType,
+    VectorStoreConfig,
+    create_vector_store,
+)
+from .embedding_engine import (
+    BaseEmbeddingEngine,
+    EmbeddingConfig,
+    EmbeddingProvider,
+    OpenAIEmbeddingEngine,
+    SentenceTransformerEngine,
+    create_embedding_engine,
+)
+from .document_ingestion import (
+    ChunkMetadata,
+    DocumentIngestionPipeline,
+    DocumentLoader,
+    DocumentType,
+    IngestionConfig,
+    IngestionResult,
+    TextChunker,
+    ingest_docs_directory,
+)
+
 __all__ = [
     # LLM Registry
     "LLMRegistry",
@@ -122,4 +152,29 @@ __all__ = [
     "WordPressAssetResult",
     "ProductCategory",
     "PipelineStage",
+    # RAG - Vector Store
+    "BaseVectorStore",
+    "ChromaVectorStore",
+    "PineconeVectorStore",
+    "VectorStoreConfig",
+    "VectorDBType",
+    "Document",
+    "SearchResult",
+    "create_vector_store",
+    # RAG - Embedding Engine
+    "BaseEmbeddingEngine",
+    "SentenceTransformerEngine",
+    "OpenAIEmbeddingEngine",
+    "EmbeddingConfig",
+    "EmbeddingProvider",
+    "create_embedding_engine",
+    # RAG - Document Ingestion
+    "DocumentIngestionPipeline",
+    "DocumentLoader",
+    "TextChunker",
+    "IngestionConfig",
+    "IngestionResult",
+    "ChunkMetadata",
+    "DocumentType",
+    "ingest_docs_directory",
 ]
