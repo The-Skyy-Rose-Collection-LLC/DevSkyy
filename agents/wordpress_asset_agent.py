@@ -130,6 +130,17 @@ class GalleryResult(BaseModel):
     total_images: int = 0
 
 
+class Model3DUploadResult(BaseModel):
+    """3D model upload result."""
+
+    media_id: int
+    glb_url: str | None = None
+    usdz_url: str | None = None
+    thumbnail_url: str | None = None
+    product_id: int | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
 # =============================================================================
 # WordPress Asset Agent
 # =============================================================================
@@ -667,6 +678,117 @@ class WordPressAssetAgent(SuperAgent):
 
             return await response.json()
 
+    async def upload_3d_model(
+        self,
+        glb_path: str | None = None,
+        usdz_path: str | None = None,
+        thumbnail_path: str | None = None,
+        product_id: int | None = None,
+        title: str = "",
+        alt_text: str = "",
+    ) -> dict[str, Any]:
+        """
+        Upload 3D model files (GLB and/or USDZ) to WordPress.
+
+        Args:
+            glb_path: Path to GLB file (web/Android)
+            usdz_path: Path to USDZ file (iOS/AR Quick Look)
+            thumbnail_path: Path to thumbnail image
+            product_id: Optional WooCommerce product ID to attach to
+            title: Media title
+            alt_text: Alt text for accessibility
+
+        Returns:
+            Model3DUploadResult with URLs for all uploaded files
+        """
+        await self._ensure_session()
+
+        result = Model3DUploadResult(
+            media_id=0,
+            metadata={
+                "format_glb": glb_path is not None,
+                "format_usdz": usdz_path is not None,
+            },
+        )
+
+        # Upload GLB file
+        if glb_path:
+            glb_result = await self._tool_upload_media(
+                file_path=glb_path,
+                title=f"{title} (GLB)" if title else "",
+                alt_text=alt_text,
+            )
+            result.glb_url = glb_result.get("url")
+            result.media_id = glb_result.get("id", 0)
+            result.metadata["glb_media_id"] = glb_result.get("id")
+
+        # Upload USDZ file
+        if usdz_path:
+            usdz_result = await self._tool_upload_media(
+                file_path=usdz_path,
+                title=f"{title} (USDZ)" if title else "",
+                alt_text=alt_text,
+            )
+            result.usdz_url = usdz_result.get("url")
+            result.metadata["usdz_media_id"] = usdz_result.get("id")
+            if not result.media_id:
+                result.media_id = usdz_result.get("id", 0)
+
+        # Upload thumbnail
+        if thumbnail_path:
+            thumb_result = await self._tool_upload_media(
+                file_path=thumbnail_path,
+                title=f"{title} (3D Preview)" if title else "",
+                alt_text=f"3D model preview: {alt_text}" if alt_text else "",
+            )
+            result.thumbnail_url = thumb_result.get("url")
+            result.metadata["thumbnail_media_id"] = thumb_result.get("id")
+
+        # Attach to product if specified
+        if product_id and result.thumbnail_url:
+            result.product_id = product_id
+            # Add thumbnail to product gallery
+            await self._tool_attach_to_product(
+                product_id=product_id,
+                media_id=result.metadata.get("thumbnail_media_id", 0),
+                is_featured=False,
+            )
+
+            # Store 3D model URLs in product meta (requires custom WooCommerce setup)
+            await self._update_product_3d_meta(
+                product_id=product_id,
+                glb_url=result.glb_url,
+                usdz_url=result.usdz_url,
+            )
+
+        return result.model_dump()
+
+    async def _update_product_3d_meta(
+        self,
+        product_id: int,
+        glb_url: str | None = None,
+        usdz_url: str | None = None,
+    ) -> None:
+        """Update product with 3D model metadata."""
+        url = f"{self.wp_config.site_url}/wp-json/wc/v3/products/{product_id}"
+
+        meta_data = []
+        if glb_url:
+            meta_data.append({"key": "_3d_model_glb_url", "value": glb_url})
+        if usdz_url:
+            meta_data.append({"key": "_3d_model_usdz_url", "value": usdz_url})
+
+        if meta_data:
+            async with self._session.put(
+                url,
+                json={"meta_data": meta_data},
+                auth=aiohttp.BasicAuth(
+                    self.wp_config.wc_consumer_key, self.wp_config.wc_consumer_secret
+                ),
+            ) as response:
+                if response.status >= 400:
+                    logger.warning(f"Failed to update product 3D meta: {response.status}")
+
     # -------------------------------------------------------------------------
     # HTTP Client Methods
     # -------------------------------------------------------------------------
@@ -694,4 +816,5 @@ __all__ = [
     "MediaUploadResult",
     "ProductAssetResult",
     "GalleryResult",
+    "Model3DUploadResult",
 ]

@@ -33,6 +33,12 @@ from typing import Any
 import aiofiles
 import aiohttp
 from pydantic import BaseModel, Field
+from tenacity import (
+    AsyncRetrying,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from base import (
     AgentCapability,
@@ -99,19 +105,37 @@ class TripoConfig:
         default_factory=lambda: os.getenv("TRIPO_API_KEY", "")
         or os.getenv("TRIPO3D_API_KEY", "")
     )
-    base_url: str = "https://api.tripo3d.ai/v2"
+    base_url: str = field(
+        default_factory=lambda: os.getenv("TRIPO_API_BASE_URL", "https://api.tripo3d.ai/v2")
+    )
     timeout: float = 300.0  # 5 minutes for generation
     poll_interval: float = 2.0
     max_retries: int = 3
+    retry_min_wait: float = 1.0  # Minimum wait between retries (seconds)
+    retry_max_wait: float = 30.0  # Maximum wait between retries (seconds)
     output_dir: str = "./generated_assets/3d"
+
+    # Texture quality settings
+    texture_quality: str = "high"  # low, medium, high
+    texture_resolution: int = 2048  # 512, 1024, 2048, 4096
+    pbr_enabled: bool = True  # Enable PBR materials
 
     @classmethod
     def from_env(cls) -> TripoConfig:
         """Create config from environment variables."""
         return cls(
             api_key=os.getenv("TRIPO_API_KEY", "") or os.getenv("TRIPO3D_API_KEY", ""),
+            base_url=os.getenv("TRIPO_API_BASE_URL", "https://api.tripo3d.ai/v2"),
             output_dir=os.getenv("TRIPO_OUTPUT_DIR", "./generated_assets/3d"),
         )
+
+    def validate(self) -> None:
+        """Validate configuration."""
+        if not self.api_key:
+            raise ValueError(
+                "TRIPO_API_KEY environment variable is required. "
+                "Get your API key from: https://www.tripo3d.ai/dashboard"
+            )
 
 
 # =============================================================================
@@ -678,28 +702,40 @@ class TripoAssetAgent(SuperAgent):
         endpoint: str,
         data: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Make API request with retry logic."""
+        """Make API request with tenacity retry logic."""
         await self._ensure_session()
 
         url = f"{self.tripo_config.base_url}/{endpoint.lstrip('/')}"
-        last_error: Exception | None = None
 
-        for attempt in range(self.tripo_config.max_retries):
-            try:
+        async for attempt in AsyncRetrying(
+            stop=stop_after_attempt(self.tripo_config.max_retries),
+            wait=wait_exponential(
+                min=self.tripo_config.retry_min_wait,
+                max=self.tripo_config.retry_max_wait,
+            ),
+            retry=retry_if_exception_type((aiohttp.ClientError, asyncio.TimeoutError)),
+            reraise=True,
+        ):
+            with attempt:
+                logger.debug(
+                    f"Tripo API request attempt {attempt.retry_state.attempt_number}: "
+                    f"{method} {endpoint}"
+                )
                 async with self._session.request(method, url, json=data) as response:
                     result = await response.json()
 
                     if response.status >= 400:
                         error_msg = result.get("message", str(result))
-                        raise Exception(f"Tripo API error ({response.status}): {error_msg}")
+                        # Raise retriable error for 5xx, non-retriable for 4xx
+                        if response.status >= 500:
+                            raise aiohttp.ClientError(
+                                f"Tripo API server error ({response.status}): {error_msg}"
+                            )
+                        raise ValueError(f"Tripo API error ({response.status}): {error_msg}")
 
                     return result
-            except aiohttp.ClientError as e:
-                last_error = e
-                if attempt < self.tripo_config.max_retries - 1:
-                    await asyncio.sleep(2**attempt)
 
-        raise last_error or Exception("API request failed")
+        raise Exception("API request failed after all retries")
 
     async def _poll_task(self, task_id: str) -> TripoTask:
         """Poll task until completion."""

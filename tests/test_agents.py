@@ -5,6 +5,8 @@ Tests for agents module
 Agent instantiation and workflow tests.
 """
 
+import pytest
+
 from agents import (
     COLLECTION_PROMPTS,
     GARMENT_TEMPLATES,
@@ -16,8 +18,17 @@ from agents import (
     TripoConfig,
     TryOnMode,
     WordPressAssetAgent,
+    WordPressAssetConfig,
+    Model3DUploadResult,
 )
 from base import AgentCapability
+from orchestration.asset_pipeline import (
+    ProductAssetPipeline,
+    PipelineConfig,
+    AssetPipelineResult,
+    ProductCategory,
+    PipelineStage,
+)
 
 
 class TestFashnAgent:
@@ -146,3 +157,131 @@ class TestAgentCapabilities:
 
         names = [a.name for a in agents]
         assert len(names) == len(set(names)), "Duplicate agent names"
+
+
+class TestTripoConfigValidation:
+    """Test Tripo3D configuration validation."""
+
+    def test_config_validate_success(self):
+        """Should validate config with API key."""
+        config = TripoConfig(api_key="test-key-12345")
+        # Should not raise
+        config.validate()
+
+    def test_config_validate_missing_key(self):
+        """Should raise on missing API key."""
+        config = TripoConfig(api_key="")
+        with pytest.raises(ValueError, match="TRIPO_API_KEY"):
+            config.validate()
+
+    def test_config_texture_settings(self):
+        """Should have texture quality settings."""
+        config = TripoConfig.from_env()
+        assert hasattr(config, "texture_quality")
+        assert hasattr(config, "texture_resolution")
+        assert hasattr(config, "pbr_enabled")
+
+    def test_config_retry_settings(self):
+        """Should have retry settings."""
+        config = TripoConfig.from_env()
+        assert config.retry_min_wait >= 1
+        assert config.retry_max_wait >= config.retry_min_wait
+
+
+class TestFashnConfigValidation:
+    """Test FASHN configuration validation."""
+
+    def test_config_validate_success(self):
+        """Should validate config with API key."""
+        config = FashnConfig(api_key="test-key-12345")
+        # Should not raise
+        config.validate()
+
+    def test_config_validate_missing_key(self):
+        """Should raise on missing API key."""
+        config = FashnConfig(api_key="")
+        with pytest.raises(ValueError, match="FASHN_API_KEY"):
+            config.validate()
+
+    def test_config_batch_settings(self):
+        """Should have batch processing settings."""
+        config = FashnConfig.from_env()
+        assert hasattr(config, "batch_size")
+        assert hasattr(config, "batch_delay")
+        assert config.batch_size > 0
+
+
+class TestWordPressAssetConfig:
+    """Test WordPress asset configuration."""
+
+    def test_config_from_env(self):
+        """Should create config from environment."""
+        config = WordPressAssetConfig.from_env()
+        assert config.timeout > 0
+
+    def test_3d_upload_result_model(self):
+        """Should have 3D upload result model."""
+        result = Model3DUploadResult(
+            media_id=123,
+            glb_url="https://example.com/model.glb",
+            usdz_url="https://example.com/model.usdz",
+        )
+        assert result.media_id == 123
+        assert result.glb_url is not None
+        assert result.usdz_url is not None
+
+
+class TestAssetPipeline:
+    """Test asset pipeline orchestrator."""
+
+    def test_pipeline_config_from_env(self):
+        """Should create pipeline config from environment."""
+        config = PipelineConfig.from_env()
+        assert config.enable_3d_generation is True
+        assert config.enable_virtual_tryon is True
+        assert config.enable_wordpress_upload is True
+
+    def test_pipeline_instantiation(self):
+        """Should instantiate pipeline."""
+        pipeline = ProductAssetPipeline()
+        assert pipeline.config is not None
+
+    def test_product_categories(self):
+        """Should have product categories."""
+        assert ProductCategory.APPAREL.value == "apparel"
+        assert ProductCategory.ACCESSORY.value == "accessory"
+        assert ProductCategory.FOOTWEAR.value == "footwear"
+
+    def test_pipeline_stages(self):
+        """Should have pipeline stages."""
+        assert PipelineStage.INITIALIZED.value == "initialized"
+        assert PipelineStage.GENERATING_3D.value == "generating_3d"
+        assert PipelineStage.GENERATING_TRYON.value == "generating_tryon"
+        assert PipelineStage.UPLOADING_ASSETS.value == "uploading_assets"
+        assert PipelineStage.COMPLETED.value == "completed"
+        assert PipelineStage.FAILED.value == "failed"
+
+    def test_pipeline_result_model(self):
+        """Should create pipeline result."""
+        result = AssetPipelineResult(
+            product_id="test-123",
+            status="processing",
+        )
+        assert result.product_id == "test-123"
+        assert result.status == "processing"
+        assert result.stage == PipelineStage.INITIALIZED
+        assert result.assets_3d == []
+        assert result.assets_tryon == []
+        assert result.errors == []
+
+    def test_pipeline_lazy_agent_creation(self):
+        """Should lazily create agents."""
+        pipeline = ProductAssetPipeline()
+        # Agents should not be created yet
+        assert pipeline._tripo_agent is None
+        assert pipeline._fashn_agent is None
+        assert pipeline._wordpress_agent is None
+
+        # Access should create them
+        _ = pipeline.tripo_agent
+        assert pipeline._tripo_agent is not None
