@@ -1,0 +1,26 @@
+{
+  "product_id": "SKR-2024-001",
+  "title": "SkyyRose Signature Hoodie",
+  "description": "Premium heavyweight cotton hoodie featuring the iconic SkyyRose embroidered logo. Crafted with attention to detail and designed for both comfort and style.",
+  "category": "apparel",
+  "collection": "SIGNATURE",
+  "garment_type": "hoodie",
+  "images": [
+    "tests/fixtures/images/hoodie_front.jpg",
+    "tests/fixtures/images/hoodie_back.jpg"
+  ],
+  "model_images": [
+    "tests/fixtures/images/model_1.jpg",
+    "tests/fixtures/images/model_2.jpg"
+  ],
+  "wp_product_id": 12345,
+  "metadata": {
+    "sku": "SKR-SIG-HOOD-001",
+    "price": 149.99,
+    "sizes": ["S", "M", "L", "XL", "XXL"],
+    "colors": ["Black", "White", "Rose Gold"],
+    "material": "100% Premium Cotton",
+    "weight": "450gsm"
+  }
+}
+

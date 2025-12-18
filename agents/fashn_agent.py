@@ -37,6 +37,12 @@ from typing import Any
 import aiofiles
 import aiohttp
 from pydantic import BaseModel, Field
+from tenacity import (
+    AsyncRetrying,
+    retry_if_exception_type,
+    stop_after_attempt,
+    wait_exponential,
+)
 
 from base import (
     AgentCapability,
@@ -98,23 +104,40 @@ class FashnConfig:
     """FASHN API configuration."""
 
     api_key: str = field(default_factory=lambda: os.getenv("FASHN_API_KEY", ""))
-    base_url: str = "https://api.fashn.ai/v1"
+    base_url: str = field(
+        default_factory=lambda: os.getenv("FASHN_API_BASE_URL", "https://api.fashn.ai/v1")
+    )
     timeout: float = 120.0
     poll_interval: float = 1.0
     max_retries: int = 3
+    retry_min_wait: float = 1.0  # Minimum wait between retries (seconds)
+    retry_max_wait: float = 30.0  # Maximum wait between retries (seconds)
     output_dir: str = "./generated_assets/tryon"
 
     # Default output size
     output_width: int = 576
     output_height: int = 864
 
+    # Batch processing settings
+    batch_size: int = 5  # Max concurrent try-on requests
+    batch_delay: float = 0.5  # Delay between batch items (seconds)
+
     @classmethod
     def from_env(cls) -> FashnConfig:
         """Create config from environment variables."""
         return cls(
             api_key=os.getenv("FASHN_API_KEY", ""),
+            base_url=os.getenv("FASHN_API_BASE_URL", "https://api.fashn.ai/v1"),
             output_dir=os.getenv("FASHN_OUTPUT_DIR", "./generated_assets/tryon"),
         )
+
+    def validate(self) -> None:
+        """Validate configuration."""
+        if not self.api_key:
+            raise ValueError(
+                "FASHN_API_KEY environment variable is required. "
+                "Get your API key from: https://fashn.ai/dashboard"
+            )
 
 
 # =============================================================================
@@ -480,6 +503,58 @@ class FashnTryOnAgent(SuperAgent):
 
         raise ValueError("No output generated")
 
+    async def batch_virtual_tryon(
+        self,
+        items: list[dict[str, Any]],
+    ) -> list[dict[str, Any]]:
+        """
+        Process multiple virtual try-on requests in batches.
+
+        Args:
+            items: List of dicts with keys: model_image, garment_image, category, mode
+
+        Returns:
+            List of TryOnResult dicts (or error dicts for failed items)
+        """
+        results: list[dict[str, Any]] = []
+        batch_size = self.fashn_config.batch_size
+
+        for i in range(0, len(items), batch_size):
+            batch = items[i : i + batch_size]
+            batch_tasks = []
+
+            for item in batch:
+                task = self._tool_virtual_tryon(
+                    model_image=item["model_image"],
+                    garment_image=item["garment_image"],
+                    category=item.get("category", GarmentCategory.TOPS.value),
+                    mode=item.get("mode", TryOnMode.BALANCED.value),
+                )
+                batch_tasks.append(task)
+
+            # Execute batch concurrently
+            batch_results = await asyncio.gather(*batch_tasks, return_exceptions=True)
+
+            for idx, result in enumerate(batch_results):
+                if isinstance(result, Exception):
+                    results.append({
+                        "success": False,
+                        "error": str(result),
+                        "error_type": type(result).__name__,
+                        "input": batch[idx],
+                    })
+                else:
+                    results.append({
+                        "success": True,
+                        **result,
+                    })
+
+            # Delay between batches to avoid rate limiting
+            if i + batch_size < len(items):
+                await asyncio.sleep(self.fashn_config.batch_delay)
+
+        return results
+
     # -------------------------------------------------------------------------
     # HTTP Client Methods
     # -------------------------------------------------------------------------
@@ -523,28 +598,40 @@ class FashnTryOnAgent(SuperAgent):
         endpoint: str,
         data: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
-        """Make API request with retry logic."""
+        """Make API request with tenacity retry logic."""
         await self._ensure_session()
 
         url = f"{self.fashn_config.base_url}/{endpoint.lstrip('/')}"
-        last_error: Exception | None = None
 
-        for attempt in range(self.fashn_config.max_retries):
-            try:
+        async for attempt in AsyncRetrying(
+            stop=stop_after_attempt(self.fashn_config.max_retries),
+            wait=wait_exponential(
+                min=self.fashn_config.retry_min_wait,
+                max=self.fashn_config.retry_max_wait,
+            ),
+            retry=retry_if_exception_type((aiohttp.ClientError, asyncio.TimeoutError)),
+            reraise=True,
+        ):
+            with attempt:
+                logger.debug(
+                    f"FASHN API request attempt {attempt.retry_state.attempt_number}: "
+                    f"{method} {endpoint}"
+                )
                 async with self._session.request(method, url, json=data) as response:
                     result = await response.json()
 
                     if response.status >= 400:
                         error_msg = result.get("error", {}).get("message", str(result))
-                        raise Exception(f"FASHN API error ({response.status}): {error_msg}")
+                        # Raise retriable error for 5xx, non-retriable for 4xx
+                        if response.status >= 500:
+                            raise aiohttp.ClientError(
+                                f"FASHN API server error ({response.status}): {error_msg}"
+                            )
+                        raise ValueError(f"FASHN API error ({response.status}): {error_msg}")
 
                     return result
-            except aiohttp.ClientError as e:
-                last_error = e
-                if attempt < self.fashn_config.max_retries - 1:
-                    await asyncio.sleep(2**attempt)
 
-        raise last_error or Exception("API request failed")
+        raise Exception("API request failed after all retries")
 
     async def _poll_prediction(self, prediction_id: str) -> FashnTask:
         """Poll prediction until complete."""

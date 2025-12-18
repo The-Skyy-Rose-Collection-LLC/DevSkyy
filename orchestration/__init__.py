@@ -27,6 +27,16 @@ Usage:
     result = await tool.execute(query="luxury streetwear trends")
 """
 
+from .asset_pipeline import (
+    Asset3DResult,
+    AssetPipelineResult,
+    PipelineConfig,
+    PipelineStage,
+    ProductAssetPipeline,
+    ProductCategory,
+    TryOnAssetResult,
+    WordPressAssetResult,
+)
 from .langgraph_integration import (
     AgentNode,
     WorkflowEdge,
@@ -103,4 +113,13 @@ __all__ = [
     "AgentNode",
     "WorkflowState",
     "WorkflowEdge",
+    # Asset Pipeline
+    "ProductAssetPipeline",
+    "PipelineConfig",
+    "AssetPipelineResult",
+    "Asset3DResult",
+    "TryOnAssetResult",
+    "WordPressAssetResult",
+    "ProductCategory",
+    "PipelineStage",
 ]

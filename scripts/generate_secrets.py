@@ -165,6 +165,20 @@ def main():
     print("   • Rotate keys periodically (recommended: every 90 days)")
     print("   • If keys are compromised, regenerate immediately")
 
+    # 3D Asset Pipeline API keys reminder
+    print("\n📦 3D ASSET PIPELINE CONFIGURATION:")
+    print("   The following API keys are required for the asset generation pipeline:")
+    print()
+    print("   Tripo3D (3D Model Generation):")
+    print("   • TRIPO_API_KEY - Get from: https://www.tripo3d.ai/dashboard")
+    print("   • TRIPO_API_BASE_URL - Default: https://api.tripo3d.ai/v2")
+    print()
+    print("   FASHN (Virtual Try-On):")
+    print("   • FASHN_API_KEY - Get from: https://fashn.ai/dashboard")
+    print("   • FASHN_API_BASE_URL - Default: https://api.fashn.ai/v1")
+    print()
+    print("   Add these to your .env file manually after obtaining API keys.")
+
     if args.show_only:
         print("\n💡 To update .env file, run without --show-only flag")
     else:
