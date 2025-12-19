@@ -9,6 +9,7 @@ Components:
 - ElementorBuilder: Elementor template generation
 - MediaManager: Media upload and management
 - WooCommerceProducts: Product CRUD operations
+- WordPress3DMediaSync: 3D asset sync for products
 
 Integration:
 - WordPress REST API v2
@@ -38,6 +39,13 @@ from .media import (
     MediaManager,
     MediaUpload,
 )
+from .media_3d_sync import (
+    InvalidAssetURLError,
+    ProductNotFoundError,
+    WordPress3DConfig,
+    WordPress3DMediaSync,
+    WordPress3DSyncError,
+)
 from .products import (
     ProductCreate,
     ProductUpdate,
@@ -65,6 +73,12 @@ __all__ = [
     "MediaManager",
     "MediaUpload",
     "ImageOptimizer",
+    # 3D Media Sync
+    "WordPress3DMediaSync",
+    "WordPress3DConfig",
+    "WordPress3DSyncError",
+    "ProductNotFoundError",
+    "InvalidAssetURLError",
     # Products
     "WooCommerceProducts",
     "ProductCreate",

@@ -27,18 +27,6 @@ All agents extend EnhancedSuperAgent and include:
 
 from .analytics_agent import AnalyticsAgent
 
-# Coding Doctor Agent (Meta-agent for codebase health)
-from .coding_doctor_agent import (
-    CodeIssue,
-    CodingDoctorAgent,
-    FileReview,
-    HealthCheckType,
-    HealthReport,
-    IssueCategory,
-    SeverityLevel,
-    create_coding_doctor,
-)
-
 # Enhanced Super Agent base and modules
 from .base_super_agent import (  # Types; Data classes; Modules; Base
     EnhancedSuperAgent,
@@ -54,6 +42,18 @@ from .base_super_agent import (  # Types; Data classes; Modules; Base
     SelfLearningModule,
     SuperAgentType,
     TaskCategory,
+)
+
+# Coding Doctor Agent (Meta-agent for codebase health)
+from .coding_doctor_agent import (
+    CodeIssue,
+    CodingDoctorAgent,
+    FileReview,
+    HealthCheckType,
+    HealthReport,
+    IssueCategory,
+    SeverityLevel,
+    create_coding_doctor,
 )
 
 # 6 SuperAgents
@@ -76,10 +76,6 @@ from .support_agent import SupportAgent
 from .tripo_agent import (
     COLLECTION_PROMPTS,
     GARMENT_TEMPLATES,
-)
-from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
-from .tripo_agent import GenerationResult as TripoGenerationResult
-from .tripo_agent import (
     ModelFormat,
     ModelStyle,
     TripoAssetAgent,
@@ -87,6 +83,8 @@ from .tripo_agent import (
     TripoTask,
     TripoTaskStatus,
 )
+from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
+from .tripo_agent import GenerationResult as TripoGenerationResult
 
 # Visual Generation (primary source for brand DNA and generation types)
 from .visual_generation import (

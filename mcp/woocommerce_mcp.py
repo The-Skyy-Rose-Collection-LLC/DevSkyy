@@ -27,7 +27,6 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
-from datetime import datetime
 from enum import Enum
 from typing import Any
 
@@ -785,7 +784,6 @@ async def get_woocommerce_client() -> WooCommerceMCPClient:
 # =============================================================================
 
 if __name__ == "__main__":
-    import sys
 
     async def main():
         print("WooCommerce MCP Client Test")

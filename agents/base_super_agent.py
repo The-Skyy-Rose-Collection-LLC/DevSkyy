@@ -53,8 +53,8 @@ from orchestration.prompt_engineering import (
 
 # Import LLM Router for intelligent provider selection
 try:
+    from llm.base import Message, ModelProvider
     from llm.router import LLMRouter, RoutingStrategy
-    from llm.base import ModelProvider, Message
     LLM_ROUTER_AVAILABLE = True
 except ImportError:
     LLMRouter = None
@@ -1107,7 +1107,7 @@ class SelfLearningModule:
         }
 
         # Aggregate technique stats across all task types
-        for task_type, opt in self._optimizations.items():
+        for _task_type, opt in self._optimizations.items():
             for tech, tech_stats in opt.get("techniques", {}).items():
                 if tech not in stats["technique_stats"]:
                     stats["technique_stats"][tech] = {"uses": 0, "successes": 0}
@@ -1121,10 +1121,10 @@ class SelfLearningModule:
                 stats["provider_stats"][prov]["successes"] += prov_stats.get("successes", 0)
 
         # Calculate success rates
-        for tech, s in stats["technique_stats"].items():
+        for _tech, s in stats["technique_stats"].items():
             s["success_rate"] = s["successes"] / s["uses"] if s["uses"] > 0 else 0
 
-        for prov, s in stats["provider_stats"].items():
+        for _prov, s in stats["provider_stats"].items():
             s["success_rate"] = s["successes"] / s["uses"] if s["uses"] > 0 else 0
 
         return stats
@@ -2123,7 +2123,7 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
 
         task_category = None
         if task_type:
-            try:
+            try:  # noqa: SIM105 - simple pattern, no need to import contextlib
                 task_category = TaskCategory(task_type)
             except ValueError:
                 pass
