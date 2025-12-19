@@ -19,26 +19,22 @@ Architecture:
 
 import asyncio
 import hashlib
-import json
 import logging
 import time
 from abc import abstractmethod
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable
-
-from pydantic import BaseModel
+from typing import Any
 
 # Import existing components
 from adk.base import (
     ADKProvider,
-    AgentCapability,
     AgentConfig,
     AgentResult,
     AgentStatus,
     BaseDevSkyyAgent,
-    ToolDefinition,
 )
 from orchestration.prompt_engineering import (
     ChainOfThought,

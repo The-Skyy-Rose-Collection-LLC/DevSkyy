@@ -24,10 +24,11 @@ import json
 import logging
 import os
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Callable
+from typing import Any
 from uuid import uuid4
 
 logger = logging.getLogger(__name__)
@@ -864,8 +865,8 @@ REASONING: Your detailed explanation"""
                 # Parse confidence
                 if "CONFIDENCE:" in judge_content.upper():
                     try:
-                        conf_line = [l for l in judge_content.split("\n")
-                                    if "CONFIDENCE:" in l.upper()][0]
+                        conf_line = [line for line in judge_content.split("\n")
+                                    if "CONFIDENCE:" in line.upper()][0]
                         confidence = float(conf_line.split(":")[-1].strip())
                     except (ValueError, IndexError):
                         pass

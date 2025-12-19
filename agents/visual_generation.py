@@ -28,7 +28,6 @@ import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from io import BytesIO
 from typing import Any
 from uuid import uuid4
 
@@ -268,7 +267,7 @@ class GoogleImagenClient:
 
     def _enhance_prompt(self, prompt: str) -> str:
         """Enhance prompt with SkyyRose brand DNA"""
-        brand_context = f"""
+        brand_context = """
         Style: luxury streetwear, premium quality, editorial photography
         Colors: rose gold accents (#B76E79), black foundation (#1A1A1A), white highlights
         Aesthetic: sophisticated, bold, elegant, high-fashion
