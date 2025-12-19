@@ -43,6 +43,47 @@
         "rag_list_sources",
         "rag_stats"
       ]
+    },
+    "devskyy-agents": {
+      "command": "python",
+      "args": ["mcp/agent_bridge_server.py"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
+        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}"
+      },
+      "description": "DevSkyy Agent Bridge - exposes all 6 SuperAgents as MCP tools",
+      "capabilities": [
+        "commerce_*",
+        "creative_*",
+        "marketing_*",
+        "support_*",
+        "operations_*",
+        "analytics_*",
+        "orchestration_*"
+      ]
+    },
+    "woocommerce": {
+      "command": "npx",
+      "args": ["woocommerce-mcp"],
+      "env": {
+        "WC_URL": "${WOOCOMMERCE_URL}",
+        "WC_KEY": "${WOOCOMMERCE_KEY}",
+        "WC_SECRET": "${WOOCOMMERCE_SECRET}"
+      },
+      "description": "Official WooCommerce MCP Server v10.3+ - products, orders, inventory",
+      "capabilities": [
+        "wc_get_product",
+        "wc_list_products",
+        "wc_create_product",
+        "wc_update_product",
+        "wc_get_order",
+        "wc_list_orders",
+        "wc_create_order",
+        "wc_update_stock",
+        "wc_get_customer",
+        "wc_validate_coupon"
+      ]
     }
   },
 
