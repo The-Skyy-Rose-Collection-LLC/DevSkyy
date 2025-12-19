@@ -123,13 +123,28 @@ app = FastAPI(
 # Middleware
 # =============================================================================
 
-# CORS
+# CORS - Enforce explicit origin whitelist
+cors_origins = os.getenv("CORS_ORIGINS", "").strip()
+if not cors_origins:
+    # Development default - customize for production!
+    cors_origins_list = ["http://localhost:3000", "http://localhost:8000"]
+    logger.warning(
+        "CORS_ORIGINS not configured. Using development defaults. "
+        "Set CORS_ORIGINS environment variable for production."
+    )
+else:
+    cors_origins_list = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
+
+if not cors_origins_list:
+    msg = "CORS_ORIGINS must contain at least one valid origin"
+    raise ValueError(msg)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=os.getenv("CORS_ORIGINS", "*").split(","),
+    allow_origins=cors_origins_list,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
 )
 
 # API Versioning

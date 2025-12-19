@@ -10,7 +10,6 @@ repos:
     hooks:
       - id: black
         name: Format Python code with Black
-        language_version: python3.11
         args: [--line-length=100]
         exclude: ^legacy/
 

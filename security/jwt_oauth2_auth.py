@@ -46,6 +46,13 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
+try:
+    import redis
+    from redis import Redis
+except ImportError:
+    redis = None  # type: ignore
+    Redis = None  # type: ignore
+
 logger = logging.getLogger(__name__)
 
 
@@ -367,6 +374,92 @@ class TokenBlacklist:
         expired = [jti for jti, exp in self._blacklist.items() if exp < now]
         for jti in expired:
             del self._blacklist[jti]
+
+
+class RedisTokenBlacklist(TokenBlacklist):
+    """
+    Redis-backed token blacklist for distributed systems.
+
+    Provides distributed token revocation with automatic expiration.
+    Implements the same interface as TokenBlacklist for drop-in replacement.
+    """
+
+    def __init__(self, redis_client: Redis | None = None) -> None:
+        """
+        Initialize Redis-backed token blacklist.
+
+        Args:
+            redis_client: Redis client instance. If None, creates a new connection.
+
+        Raises:
+            RuntimeError: If Redis module is not installed.
+        """
+        if redis is None or Redis is None:
+            msg = "redis package required for RedisTokenBlacklist. Install with: pip install redis"
+            raise RuntimeError(msg)
+
+        if redis_client is None:
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+            self._redis = redis.from_url(redis_url, decode_responses=True)
+        else:
+            self._redis = redis_client
+
+        # Key prefixes for Redis
+        self._blacklist_prefix = "token_blacklist:"
+        self._revoked_families_prefix = "token_families_revoked:"
+
+    def add(self, jti: str, expires_at: datetime) -> None:
+        """
+        Add token to Redis blacklist with automatic expiration.
+
+        Args:
+            jti: Token ID (JWT 'jti' claim)
+            expires_at: Token expiration datetime
+        """
+        key = f"{self._blacklist_prefix}{jti}"
+        ttl = max(1, int((expires_at - datetime.now(UTC)).total_seconds()))
+        self._redis.setex(key, ttl, "1")
+
+    def revoke_family(self, family_id: str) -> None:
+        """
+        Revoke all tokens in a family.
+
+        Args:
+            family_id: Token family identifier
+        """
+        key = f"{self._revoked_families_prefix}{family_id}"
+        # Set with 7-day TTL (refresh token lifetime)
+        self._redis.setex(key, 7 * 24 * 60 * 60, "1")
+
+    def is_blacklisted(self, jti: str) -> bool:
+        """
+        Check if token is blacklisted.
+
+        Args:
+            jti: Token ID to check
+
+        Returns:
+            True if token is blacklisted, False otherwise
+        """
+        key = f"{self._blacklist_prefix}{jti}"
+        return bool(self._redis.exists(key))
+
+    def is_family_revoked(self, family_id: str) -> bool:
+        """
+        Check if token family is revoked.
+
+        Args:
+            family_id: Family ID to check
+
+        Returns:
+            True if family is revoked, False otherwise
+        """
+        key = f"{self._revoked_families_prefix}{family_id}"
+        return bool(self._redis.exists(key))
+
+    def _cleanup(self) -> None:
+        """Not needed for Redis (automatic expiration via TTL)."""
+        pass
 
 
 # =============================================================================
