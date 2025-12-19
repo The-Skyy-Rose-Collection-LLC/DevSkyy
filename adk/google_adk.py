@@ -2,7 +2,7 @@
 Google ADK Integration
 ======================
 
-Integration with Google's Agent Development Kit (ADK) v1.20.0
+Integration with Google's Agent Development Kit (ADK) v1.21.0
 
 Features:
 - Multi-agent hierarchies
@@ -10,8 +10,12 @@ Features:
 - Session management
 - Built-in streaming
 - Vertex AI integration
+- Native Gemini 2.0 support
 
 Reference: https://google.github.io/adk-docs/
+
+Installation:
+    pip install google-adk
 """
 
 import logging
@@ -30,6 +34,23 @@ from adk.base import (
 )
 
 logger = logging.getLogger(__name__)
+
+# Check for Google ADK availability
+try:
+    from google.adk.agents import Agent as ADKAgent
+    from google.adk.runners import Runner
+    from google.adk.sessions import InMemorySessionService
+    from google.genai import types as genai_types
+
+    GOOGLE_ADK_AVAILABLE = True
+    logger.info("Google ADK v1.21.0 loaded successfully")
+except ImportError:
+    GOOGLE_ADK_AVAILABLE = False
+    ADKAgent = None
+    Runner = None
+    InMemorySessionService = None
+    genai_types = None
+    logger.warning("Google ADK not installed. Install with: pip install google-adk")
 
 
 # =============================================================================
@@ -63,19 +84,20 @@ class GoogleADKAgent(BaseDevSkyyAgent):
 
     async def initialize(self) -> None:
         """Initialize Google ADK agent"""
-        try:
-            from google.adk.agents import Agent
-            from google.adk.runners import Runner
-            from google.adk.sessions import InMemorySessionService
+        if not GOOGLE_ADK_AVAILABLE:
+            raise ImportError(
+                "Google ADK not installed. Install with: pip install google-adk"
+            )
 
+        try:
             # Build tools list
             tools = []
             for tool_def in self.config.tools:
                 # Convert to ADK tool format
                 tools.append(self._create_adk_tool(tool_def))
 
-            # Create agent
-            self._adk_agent = Agent(
+            # Create agent using ADKAgent (LlmAgent)
+            self._adk_agent = ADKAgent(
                 name=self.config.name,
                 model=self._get_model_string(),
                 instruction=self.config.system_prompt or self._default_instruction(),
@@ -99,13 +121,9 @@ class GoogleADKAgent(BaseDevSkyyAgent):
                 user_id="skyyrose",
             )
 
+            self._initialized = True
             logger.info(f"Google ADK agent initialized: {self.name}")
 
-        except ImportError as e:
-            logger.warning(f"Google ADK not available: {e}")
-            raise ImportError(
-                "Google ADK not installed. Install with: pip install google-adk"
-            ) from e
         except Exception as e:
             logger.error(f"Failed to initialize Google ADK agent: {e}")
             raise
@@ -168,16 +186,17 @@ Guidelines:
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute Google ADK agent"""
+        if not GOOGLE_ADK_AVAILABLE:
+            raise ImportError("Google ADK not available")
+
         start_time = datetime.now(UTC)
         tool_calls = []
 
         try:
-            from google.genai import types
-
-            # Create content
-            content = types.Content(
+            # Create content using genai_types
+            content = genai_types.Content(
                 role="user",
-                parts=[types.Part(text=prompt)],
+                parts=[genai_types.Part(text=prompt)],
             )
 
             # Run agent
@@ -275,13 +294,14 @@ class GoogleMultiAgent(BaseDevSkyyAgent):
 
     async def initialize(self) -> None:
         """Initialize multi-agent system"""
-        try:
-            from google.adk.agents import Agent
+        if not GOOGLE_ADK_AVAILABLE:
+            raise ImportError("Google ADK not available. Install with: pip install google-adk")
 
+        try:
             # Create sub-agents first
             sub_agent_instances = []
             for sub_config in self.sub_agent_configs:
-                sub_agent = Agent(
+                sub_agent = ADKAgent(
                     name=sub_config.name,
                     model="gemini-2.0-flash",
                     instruction=sub_config.system_prompt,
@@ -291,7 +311,7 @@ class GoogleMultiAgent(BaseDevSkyyAgent):
                 sub_agent_instances.append(sub_agent)
 
             # Create coordinator with sub-agents
-            self._coordinator = Agent(
+            self._coordinator = ADKAgent(
                 name=self.config.name,
                 model="gemini-2.0-flash",
                 instruction=self.config.system_prompt or self._coordinator_instruction(),
@@ -299,12 +319,14 @@ class GoogleMultiAgent(BaseDevSkyyAgent):
                 sub_agents=sub_agent_instances if sub_agent_instances else None,
             )
 
+            self._initialized = True
             logger.info(
                 f"Google Multi-Agent initialized: {self.name} with {len(self._sub_agents)} sub-agents"
             )
 
-        except ImportError as e:
-            raise ImportError("Google ADK not available") from e
+        except Exception as e:
+            logger.error(f"Failed to initialize Google Multi-Agent: {e}")
+            raise
 
     def _coordinator_instruction(self) -> str:
         return """You are the coordinator for SkyyRose AI operations.
@@ -323,13 +345,12 @@ Synthesize responses when multiple agents are involved.
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute multi-agent workflow"""
+        if not GOOGLE_ADK_AVAILABLE:
+            raise ImportError("Google ADK not available")
+
         start_time = datetime.now(UTC)
 
         try:
-            from google.adk.runners import Runner
-            from google.adk.sessions import InMemorySessionService
-            from google.genai import types
-
             # Create session
             session_service = InMemorySessionService()
             runner = Runner(
@@ -344,9 +365,9 @@ Synthesize responses when multiple agents are involved.
             )
 
             # Execute
-            content = types.Content(
+            content = genai_types.Content(
                 role="user",
-                parts=[types.Part(text=prompt)],
+                parts=[genai_types.Part(text=prompt)],
             )
 
             response_text = ""
@@ -370,6 +391,7 @@ Synthesize responses when multiple agents are involved.
             )
 
         except Exception as e:
+            logger.error(f"Google Multi-Agent execution failed: {e}")
             return AgentResult(
                 agent_name=self.name,
                 agent_provider=ADKProvider.GOOGLE,

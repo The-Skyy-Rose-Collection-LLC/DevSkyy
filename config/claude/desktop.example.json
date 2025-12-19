@@ -12,6 +12,17 @@
       },
       "description": "DevSkyy OpenAI MCP Server - GPT-4o, vision, code generation, agent orchestration"
     },
+    "devskyy-rag": {
+      "command": "python",
+      "args": ["/Users/coreyfoster/DevSkyy/mcp/rag_server.py"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "VECTOR_DB_PATH": "/Users/coreyfoster/DevSkyy/data/vectordb",
+        "RAG_COLLECTION": "devskyy_docs",
+        "EMBEDDING_PROVIDER": "sentence_transformers"
+      },
+      "description": "DevSkyy RAG MCP Server - semantic search, document ingestion, context retrieval"
+    },
     "devskyy-main": {
       "command": "python",
       "args": ["/Users/coreyfoster/DevSkyy/devskyy_mcp.py"],

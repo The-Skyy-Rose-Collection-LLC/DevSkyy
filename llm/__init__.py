@@ -75,18 +75,9 @@ from .providers import (
     MistralClient,
     OpenAIClient,
 )
-from .router import (
-    PROVIDER_CONFIGS,
-    LLMRouter,
-    ProviderConfig,
-    RoutingStrategy,
-    complete,
-    get_router,
-)
 from .round_table import (
     ABTestResult,
     CompetitionStatus,
-    LLMProvider as RoundTableProvider,
     LLMResponse,
     LLMRoundTable,
     ResponseScorer,
@@ -95,6 +86,15 @@ from .round_table import (
     RoundTableEntry,
     RoundTableResult,
     create_round_table,
+)
+from .round_table import LLMProvider as RoundTableProvider
+from .router import (
+    PROVIDER_CONFIGS,
+    LLMRouter,
+    ProviderConfig,
+    RoutingStrategy,
+    complete,
+    get_router,
 )
 
 __version__ = "1.0.0"

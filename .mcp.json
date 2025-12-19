@@ -25,6 +25,24 @@
         "agent_integration",
         "capabilities_info"
       ]
+    },
+    "devskyy-rag": {
+      "command": "python",
+      "args": ["mcp/rag_server.py"],
+      "env": {
+        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
+        "VECTOR_DB_PATH": "./data/vectordb",
+        "RAG_COLLECTION": "devskyy_docs",
+        "EMBEDDING_PROVIDER": "sentence_transformers"
+      },
+      "description": "DevSkyy RAG MCP Server - semantic search, document ingestion, context retrieval",
+      "capabilities": [
+        "rag_query",
+        "rag_ingest",
+        "rag_get_context",
+        "rag_list_sources",
+        "rag_stats"
+      ]
     }
   },
 

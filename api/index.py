@@ -5,7 +5,6 @@ Serverless API handler for Vercel deployment.
 """
 
 import json
-import os
 from http.server import BaseHTTPRequestHandler
 from typing import Any
 from urllib.parse import parse_qs, urlparse
@@ -343,13 +342,7 @@ class handler(BaseHTTPRequestHandler):
                 "createdAt": "2024-12-17T10:30:00Z",
             }
 
-        elif path.endswith("/start"):
-            response = {"success": True}
-
-        elif path.endswith("/stop"):
-            response = {"success": True}
-
-        elif path.endswith("/learn"):
+        elif path.endswith("/start") or path.endswith("/stop") or path.endswith("/learn"):
             response = {"success": True}
 
         else:
