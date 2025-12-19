@@ -227,3 +227,6 @@ export type OptionalFields<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, 
 export type Nullable<T> = T | null;
 
 export type Optional<T> = T | undefined;
+
+// Re-export product types
+export * from './product.js';

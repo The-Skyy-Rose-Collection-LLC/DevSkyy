@@ -7,6 +7,12 @@ Orchestrates the 3D asset generation pipeline connecting:
 - FASHN Agent: Virtual try-on images
 - WordPress Asset Agent: Media upload and product attachment
 
+Features (v2.0.0 - Stage 4.7.2 Optimizations):
+- Batch processing with 5 concurrent operations
+- Redis cache layer with 7-day TTL for 3D models
+- WebSocket progress tracking with real-time callbacks
+- Retry queue for failed operations with exponential backoff
+
 Usage:
     from orchestration.asset_pipeline import ProductAssetPipeline
 
@@ -19,13 +25,19 @@ Usage:
         category="apparel",
     )
 
+    # Batch processing
+    results = await pipeline.process_batch(products, progress_callback=my_callback)
+
 Author: DevSkyy Platform Team
-Version: 1.0.0
+Version: 2.0.0
 """
 
 from __future__ import annotations
 
+import asyncio
+import hashlib
 import os
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -40,6 +52,22 @@ from agents.tripo_agent import TripoAssetAgent, TripoConfig
 from agents.wordpress_asset_agent import WordPressAssetAgent, WordPressAssetConfig
 
 logger = structlog.get_logger(__name__)
+
+# =============================================================================
+# Redis Cache Layer (Optional - graceful fallback if not available)
+# =============================================================================
+
+try:
+    import redis.asyncio as aioredis
+
+    REDIS_AVAILABLE = True
+except ImportError:
+    aioredis = None  # type: ignore[assignment]
+    REDIS_AVAILABLE = False
+
+# Default cache settings
+CACHE_TTL_SECONDS = 7 * 24 * 60 * 60  # 7 days
+CACHE_KEY_PREFIX = "devskyy:asset_pipeline:"
 
 # =============================================================================
 # Prometheus Metrics (optional - only if prometheus_client is installed)
@@ -128,9 +156,23 @@ class PipelineConfig:
     # Model images for try-on (paths to default model images)
     default_model_images: dict[str, str] = field(default_factory=dict)
 
-    # Retry settings
+    # Retry settings (enhanced with exponential backoff)
     max_retries: int = 3
     retry_delay: float = 2.0
+    retry_backoff_multiplier: float = 2.0  # Exponential backoff
+    retry_max_delay: float = 60.0  # Max delay cap
+
+    # Batch processing settings (Stage 4.7.2)
+    batch_concurrency: int = 5  # Max concurrent operations
+    batch_timeout: float = 600.0  # 10 minute timeout per item
+
+    # Redis cache settings (Stage 4.7.2)
+    redis_url: str | None = None  # e.g., redis://localhost:6379
+    cache_enabled: bool = True
+    cache_ttl_seconds: int = CACHE_TTL_SECONDS  # 7 days default
+
+    # Progress tracking (Stage 4.7.2)
+    enable_progress_callbacks: bool = True
 
     @classmethod
     def from_env(cls) -> PipelineConfig:
@@ -142,7 +184,86 @@ class PipelineConfig:
             enable_3d_generation=os.getenv("PIPELINE_ENABLE_3D", "true").lower() == "true",
             enable_virtual_tryon=os.getenv("PIPELINE_ENABLE_TRYON", "true").lower() == "true",
             enable_wordpress_upload=os.getenv("PIPELINE_ENABLE_WP", "true").lower() == "true",
+            batch_concurrency=int(os.getenv("PIPELINE_BATCH_CONCURRENCY", "5")),
+            batch_timeout=float(os.getenv("PIPELINE_BATCH_TIMEOUT", "600")),
+            redis_url=os.getenv("REDIS_URL"),
+            cache_enabled=os.getenv("PIPELINE_CACHE_ENABLED", "true").lower() == "true",
+            cache_ttl_seconds=int(os.getenv("PIPELINE_CACHE_TTL", str(CACHE_TTL_SECONDS))),
         )
+
+
+# =============================================================================
+# Progress & Callback Types (Stage 4.7.2)
+# =============================================================================
+
+# Type alias for progress callbacks
+ProgressCallback = Callable[["ProgressEvent"], None]
+AsyncProgressCallback = Callable[["ProgressEvent"], "asyncio.coroutine[None]"]
+
+
+class ProgressEventType(str, Enum):
+    """Progress event types for WebSocket tracking."""
+
+    BATCH_STARTED = "batch_started"
+    BATCH_COMPLETED = "batch_completed"
+    ITEM_STARTED = "item_started"
+    ITEM_COMPLETED = "item_completed"
+    ITEM_FAILED = "item_failed"
+    STAGE_STARTED = "stage_started"
+    STAGE_COMPLETED = "stage_completed"
+    CACHE_HIT = "cache_hit"
+    RETRY_ATTEMPT = "retry_attempt"
+
+
+class ProgressEvent(BaseModel):
+    """Progress event for real-time tracking."""
+
+    event_type: ProgressEventType
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+    product_id: str | None = None
+    stage: str | None = None
+    progress_percent: float = 0.0
+    message: str = ""
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+    # Batch context
+    batch_id: str | None = None
+    batch_total: int = 0
+    batch_completed: int = 0
+    batch_failed: int = 0
+
+
+class RetryQueueItem(BaseModel):
+    """Item in the retry queue."""
+
+    product_id: str
+    title: str
+    description: str
+    images: list[str]
+    category: str
+    collection: str
+    garment_type: str
+    model_images: list[str] | None = None
+    wp_product_id: int | None = None
+    retry_count: int = 0
+    last_error: str | None = None
+    next_retry_at: str | None = None
+    created_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+
+
+class BatchResult(BaseModel):
+    """Result of batch processing."""
+
+    batch_id: str
+    started_at: str = Field(default_factory=lambda: datetime.now(UTC).isoformat())
+    completed_at: str | None = None
+    duration_seconds: float = 0.0
+    total_items: int = 0
+    successful_items: int = 0
+    failed_items: int = 0
+    cached_items: int = 0
+    results: list[AssetPipelineResult] = Field(default_factory=list)
+    retry_queue: list[RetryQueueItem] = Field(default_factory=list)
 
 
 # =============================================================================
@@ -218,6 +339,12 @@ class ProductAssetPipeline:
     1. Generate 3D models from product images/descriptions
     2. Create virtual try-on images for apparel
     3. Upload all assets to WordPress/WooCommerce
+
+    Stage 4.7.2 Features:
+    - Batch processing with configurable concurrency (default: 5)
+    - Redis cache layer for 3D models (7-day TTL)
+    - WebSocket progress tracking with real-time callbacks
+    - Retry queue with exponential backoff
     """
 
     def __init__(
@@ -231,6 +358,19 @@ class ProductAssetPipeline:
         self._tripo_agent: TripoAssetAgent | None = None
         self._fashn_agent: FashnTryOnAgent | None = None
         self._wordpress_agent: WordPressAssetAgent | None = None
+
+        # Stage 4.7.2: Batch processing semaphore
+        self._semaphore = asyncio.Semaphore(self.config.batch_concurrency)
+
+        # Stage 4.7.2: Redis cache client (lazy initialization)
+        self._redis: Any | None = None
+        self._redis_connected = False
+
+        # Stage 4.7.2: Retry queue
+        self._retry_queue: list[RetryQueueItem] = []
+
+        # Stage 4.7.2: Progress callbacks
+        self._progress_callbacks: list[ProgressCallback | AsyncProgressCallback] = []
 
         # Ensure output directories exist
         Path(self.config.tripo_config.output_dir).mkdir(parents=True, exist_ok=True)
@@ -258,13 +398,476 @@ class ProductAssetPipeline:
         return self._wordpress_agent
 
     async def close(self) -> None:
-        """Close all agent sessions."""
+        """Close all agent sessions and Redis connection."""
         if self._tripo_agent:
             await self._tripo_agent.close()
         if self._fashn_agent:
             await self._fashn_agent.close()
         if self._wordpress_agent:
             await self._wordpress_agent.close()
+        # Stage 4.7.2: Close Redis connection
+        if self._redis and self._redis_connected:
+            try:  # noqa: SIM105 - contextlib.suppress doesn't work with async
+                await self._redis.close()
+            except Exception:
+                pass
+
+    # =========================================================================
+    # Stage 4.7.2: Redis Cache Layer
+    # =========================================================================
+
+    async def _ensure_redis_connected(self) -> bool:
+        """Ensure Redis connection is established."""
+        if not REDIS_AVAILABLE or not self.config.cache_enabled:
+            return False
+
+        if self._redis_connected:
+            return True
+
+        if not self.config.redis_url:
+            return False
+
+        try:
+            self._redis = aioredis.from_url(
+                self.config.redis_url,
+                encoding="utf-8",
+                decode_responses=True,
+            )
+            # Test connection
+            await self._redis.ping()
+            self._redis_connected = True
+            logger.info("Redis cache connected", url=self.config.redis_url)
+            return True
+        except Exception as e:
+            logger.warning("Redis connection failed, caching disabled", error=str(e))
+            self._redis_connected = False
+            return False
+
+    def _generate_cache_key(
+        self,
+        product_id: str,
+        images: list[str],
+        category: str,
+    ) -> str:
+        """Generate a unique cache key for a product's assets."""
+        # Create hash from product details and image paths
+        content = f"{product_id}:{category}:{':'.join(sorted(images))}"
+        hash_value = hashlib.sha256(content.encode()).hexdigest()[:16]
+        return f"{CACHE_KEY_PREFIX}3d:{hash_value}"
+
+    async def _get_cached_result(self, cache_key: str) -> AssetPipelineResult | None:
+        """Retrieve cached pipeline result."""
+        if not await self._ensure_redis_connected():
+            return None
+
+        try:
+            cached = await self._redis.get(cache_key)
+            if cached:
+                logger.info("Cache hit", cache_key=cache_key)
+                return AssetPipelineResult.model_validate_json(cached)
+        except Exception as e:
+            logger.warning("Cache retrieval failed", error=str(e))
+
+        return None
+
+    async def _cache_result(self, cache_key: str, result: AssetPipelineResult) -> None:
+        """Cache a pipeline result."""
+        if not await self._ensure_redis_connected():
+            return
+
+        try:
+            await self._redis.setex(
+                cache_key,
+                self.config.cache_ttl_seconds,
+                result.model_dump_json(),
+            )
+            logger.info(
+                "Result cached",
+                cache_key=cache_key,
+                ttl_days=self.config.cache_ttl_seconds // 86400,
+            )
+        except Exception as e:
+            logger.warning("Cache storage failed", error=str(e))
+
+    # =========================================================================
+    # Stage 4.7.2: Progress Tracking
+    # =========================================================================
+
+    def register_progress_callback(
+        self,
+        callback: ProgressCallback | AsyncProgressCallback,
+    ) -> None:
+        """Register a callback for progress events."""
+        self._progress_callbacks.append(callback)
+        logger.debug("Progress callback registered", total=len(self._progress_callbacks))
+
+    def unregister_progress_callback(
+        self,
+        callback: ProgressCallback | AsyncProgressCallback,
+    ) -> None:
+        """Unregister a progress callback."""
+        if callback in self._progress_callbacks:
+            self._progress_callbacks.remove(callback)
+
+    async def _emit_progress(self, event: ProgressEvent) -> None:
+        """Emit a progress event to all registered callbacks."""
+        if not self.config.enable_progress_callbacks:
+            return
+
+        for callback in self._progress_callbacks:
+            try:
+                result = callback(event)
+                if asyncio.iscoroutine(result):
+                    await result
+            except Exception as e:
+                logger.warning("Progress callback error", error=str(e))
+
+    # =========================================================================
+    # Stage 4.7.2: Retry Queue Management
+    # =========================================================================
+
+    def _calculate_retry_delay(self, retry_count: int) -> float:
+        """Calculate delay with exponential backoff."""
+        delay = self.config.retry_delay * (
+            self.config.retry_backoff_multiplier ** retry_count
+        )
+        return min(delay, self.config.retry_max_delay)
+
+    def _add_to_retry_queue(
+        self,
+        product_id: str,
+        title: str,
+        description: str,
+        images: list[str],
+        category: str,
+        collection: str,
+        garment_type: str,
+        model_images: list[str] | None,
+        wp_product_id: int | None,
+        error: str,
+        retry_count: int = 0,
+    ) -> RetryQueueItem | None:
+        """Add a failed item to the retry queue."""
+        if retry_count >= self.config.max_retries:
+            logger.warning(
+                "Max retries exceeded, not adding to queue",
+                product_id=product_id,
+                retry_count=retry_count,
+            )
+            return None
+
+        delay = self._calculate_retry_delay(retry_count)
+        next_retry = datetime.now(UTC).timestamp() + delay
+        next_retry_iso = datetime.fromtimestamp(next_retry, UTC).isoformat()
+
+        item = RetryQueueItem(
+            product_id=product_id,
+            title=title,
+            description=description,
+            images=images,
+            category=category,
+            collection=collection,
+            garment_type=garment_type,
+            model_images=model_images,
+            wp_product_id=wp_product_id,
+            retry_count=retry_count + 1,
+            last_error=error,
+            next_retry_at=next_retry_iso,
+        )
+
+        self._retry_queue.append(item)
+        logger.info(
+            "Added to retry queue",
+            product_id=product_id,
+            retry_count=item.retry_count,
+            next_retry_at=next_retry_iso,
+        )
+        return item
+
+    async def process_retry_queue(self) -> list[AssetPipelineResult]:
+        """Process all items in the retry queue that are ready."""
+        now = datetime.now(UTC)
+        ready_items: list[RetryQueueItem] = []
+        remaining_items: list[RetryQueueItem] = []
+
+        for item in self._retry_queue:
+            if item.next_retry_at:
+                retry_time = datetime.fromisoformat(item.next_retry_at)
+                if retry_time <= now:
+                    ready_items.append(item)
+                else:
+                    remaining_items.append(item)
+            else:
+                ready_items.append(item)
+
+        self._retry_queue = remaining_items
+        results: list[AssetPipelineResult] = []
+
+        for item in ready_items:
+            await self._emit_progress(ProgressEvent(
+                event_type=ProgressEventType.RETRY_ATTEMPT,
+                product_id=item.product_id,
+                message=f"Retry attempt {item.retry_count}/{self.config.max_retries}",
+                metadata={"retry_count": item.retry_count},
+            ))
+
+            result = await self.process_product(
+                product_id=item.product_id,
+                title=item.title,
+                description=item.description,
+                images=item.images,
+                category=item.category,
+                collection=item.collection,
+                garment_type=item.garment_type,
+                model_images=item.model_images,
+                wp_product_id=item.wp_product_id,
+                _retry_count=item.retry_count,
+            )
+            results.append(result)
+
+        return results
+
+    def get_retry_queue_status(self) -> dict[str, Any]:
+        """Get current retry queue status."""
+        return {
+            "queue_length": len(self._retry_queue),
+            "items": [item.model_dump() for item in self._retry_queue],
+        }
+
+    # =========================================================================
+    # Stage 4.7.2: Batch Processing
+    # =========================================================================
+
+    async def process_batch(
+        self,
+        products: list[dict[str, Any]],
+        progress_callback: ProgressCallback | AsyncProgressCallback | None = None,
+    ) -> BatchResult:
+        """
+        Process multiple products concurrently with progress tracking.
+
+        Args:
+            products: List of product dicts with keys:
+                - product_id, title, description, images, category
+                - Optional: collection, garment_type, model_images, wp_product_id
+            progress_callback: Optional callback for progress events
+
+        Returns:
+            BatchResult with all results and retry queue
+        """
+        import uuid
+
+        batch_id = str(uuid.uuid4())[:8]
+        start_time = datetime.now(UTC)
+
+        # Register callback if provided
+        if progress_callback:
+            self.register_progress_callback(progress_callback)
+
+        batch_result = BatchResult(
+            batch_id=batch_id,
+            total_items=len(products),
+        )
+
+        # Emit batch started
+        await self._emit_progress(ProgressEvent(
+            event_type=ProgressEventType.BATCH_STARTED,
+            batch_id=batch_id,
+            batch_total=len(products),
+            message=f"Starting batch processing of {len(products)} products",
+        ))
+
+        logger.info(
+            "Starting batch processing",
+            batch_id=batch_id,
+            total_products=len(products),
+            concurrency=self.config.batch_concurrency,
+        )
+
+        async def process_with_semaphore(
+            product: dict[str, Any],
+            index: int,
+        ) -> tuple[int, AssetPipelineResult | None, RetryQueueItem | None]:
+            """Process a single product with semaphore control."""
+            async with self._semaphore:
+                product_id = product.get("product_id", f"unknown_{index}")
+
+                # Emit item started
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.ITEM_STARTED,
+                    product_id=product_id,
+                    batch_id=batch_id,
+                    batch_total=len(products),
+                    batch_completed=batch_result.successful_items,
+                    progress_percent=(index / len(products)) * 100,
+                    message=f"Processing product {index + 1}/{len(products)}",
+                ))
+
+                try:
+                    # Check cache first
+                    cache_key = self._generate_cache_key(
+                        product_id,
+                        product.get("images", []),
+                        product.get("category", "apparel"),
+                    )
+                    cached = await self._get_cached_result(cache_key)
+
+                    if cached and cached.status == "success":
+                        await self._emit_progress(ProgressEvent(
+                            event_type=ProgressEventType.CACHE_HIT,
+                            product_id=product_id,
+                            batch_id=batch_id,
+                            message="Using cached result",
+                        ))
+                        return (index, cached, None)
+
+                    # Process product with timeout
+                    result = await asyncio.wait_for(
+                        self.process_product(
+                            product_id=product_id,
+                            title=product.get("title", ""),
+                            description=product.get("description", ""),
+                            images=product.get("images", []),
+                            category=product.get("category", "apparel"),
+                            collection=product.get("collection", "SIGNATURE"),
+                            garment_type=product.get("garment_type", "tee"),
+                            model_images=product.get("model_images"),
+                            wp_product_id=product.get("wp_product_id"),
+                        ),
+                        timeout=self.config.batch_timeout,
+                    )
+
+                    # Emit completion
+                    await self._emit_progress(ProgressEvent(
+                        event_type=ProgressEventType.ITEM_COMPLETED
+                        if result.status == "success"
+                        else ProgressEventType.ITEM_FAILED,
+                        product_id=product_id,
+                        batch_id=batch_id,
+                        batch_total=len(products),
+                        message=f"Product {result.status}",
+                        metadata={"duration": result.duration_seconds},
+                    ))
+
+                    return (index, result, None)
+
+                except TimeoutError:
+                    error_msg = f"Timeout after {self.config.batch_timeout}s"
+                    logger.error("Product processing timeout", product_id=product_id)
+
+                    retry_item = self._add_to_retry_queue(
+                        product_id=product_id,
+                        title=product.get("title", ""),
+                        description=product.get("description", ""),
+                        images=product.get("images", []),
+                        category=product.get("category", "apparel"),
+                        collection=product.get("collection", "SIGNATURE"),
+                        garment_type=product.get("garment_type", "tee"),
+                        model_images=product.get("model_images"),
+                        wp_product_id=product.get("wp_product_id"),
+                        error=error_msg,
+                    )
+
+                    await self._emit_progress(ProgressEvent(
+                        event_type=ProgressEventType.ITEM_FAILED,
+                        product_id=product_id,
+                        batch_id=batch_id,
+                        message=error_msg,
+                    ))
+
+                    return (index, None, retry_item)
+
+                except Exception as e:
+                    error_msg = str(e)
+                    logger.error(
+                        "Product processing failed",
+                        product_id=product_id,
+                        error=error_msg,
+                    )
+
+                    retry_item = self._add_to_retry_queue(
+                        product_id=product_id,
+                        title=product.get("title", ""),
+                        description=product.get("description", ""),
+                        images=product.get("images", []),
+                        category=product.get("category", "apparel"),
+                        collection=product.get("collection", "SIGNATURE"),
+                        garment_type=product.get("garment_type", "tee"),
+                        model_images=product.get("model_images"),
+                        wp_product_id=product.get("wp_product_id"),
+                        error=error_msg,
+                    )
+
+                    await self._emit_progress(ProgressEvent(
+                        event_type=ProgressEventType.ITEM_FAILED,
+                        product_id=product_id,
+                        batch_id=batch_id,
+                        message=error_msg,
+                    ))
+
+                    return (index, None, retry_item)
+
+        # Process all products concurrently
+        tasks = [
+            process_with_semaphore(product, i)
+            for i, product in enumerate(products)
+        ]
+        results = await asyncio.gather(*tasks)
+
+        # Aggregate results
+        for _, result, retry_item in results:
+            if result:
+                batch_result.results.append(result)
+                if result.status == "success":
+                    batch_result.successful_items += 1
+                else:
+                    batch_result.failed_items += 1
+            elif retry_item:
+                batch_result.retry_queue.append(retry_item)
+                batch_result.failed_items += 1
+
+        # Check for cached items
+        batch_result.cached_items = sum(
+            1 for _, r, _ in results
+            if r and r.duration_seconds < 1.0  # Cached results are fast
+        )
+
+        # Finalize
+        end_time = datetime.now(UTC)
+        batch_result.completed_at = end_time.isoformat()
+        batch_result.duration_seconds = (end_time - start_time).total_seconds()
+
+        # Emit batch completed
+        await self._emit_progress(ProgressEvent(
+            event_type=ProgressEventType.BATCH_COMPLETED,
+            batch_id=batch_id,
+            batch_total=batch_result.total_items,
+            batch_completed=batch_result.successful_items,
+            batch_failed=batch_result.failed_items,
+            progress_percent=100.0,
+            message=f"Batch complete: {batch_result.successful_items}/{batch_result.total_items} successful",
+            metadata={
+                "duration_seconds": batch_result.duration_seconds,
+                "cached_items": batch_result.cached_items,
+                "retry_queue_size": len(batch_result.retry_queue),
+            },
+        ))
+
+        # Unregister callback if we registered it
+        if progress_callback:
+            self.unregister_progress_callback(progress_callback)
+
+        logger.info(
+            "Batch processing complete",
+            batch_id=batch_id,
+            total=batch_result.total_items,
+            successful=batch_result.successful_items,
+            failed=batch_result.failed_items,
+            cached=batch_result.cached_items,
+            duration=batch_result.duration_seconds,
+        )
+
+        return batch_result
 
     async def process_product(
         self,
@@ -277,6 +880,7 @@ class ProductAssetPipeline:
         garment_type: str = "tee",
         model_images: list[str] | None = None,
         wp_product_id: int | None = None,
+        _retry_count: int = 0,  # Stage 4.7.2: Internal retry tracking
     ) -> AssetPipelineResult:
         """
         Process a product through the complete asset pipeline.
@@ -291,11 +895,25 @@ class ProductAssetPipeline:
             garment_type: Type of garment (hoodie, tee, jacket, etc.)
             model_images: Optional model images for try-on
             wp_product_id: Optional WordPress product ID for attachment
+            _retry_count: Internal parameter for retry tracking (do not set manually)
 
         Returns:
             AssetPipelineResult with all generated assets
         """
         start_time = datetime.now(UTC)
+
+        # Stage 4.7.2: Check cache first
+        cache_key = self._generate_cache_key(product_id, images, category)
+        cached_result = await self._get_cached_result(cache_key)
+        if cached_result and cached_result.status == "success":
+            logger.info("Returning cached result", product_id=product_id)
+            await self._emit_progress(ProgressEvent(
+                event_type=ProgressEventType.CACHE_HIT,
+                product_id=product_id,
+                message="Using cached result",
+            ))
+            return cached_result
+
         result = AssetPipelineResult(
             product_id=product_id,
             status="processing",
@@ -322,6 +940,13 @@ class ProductAssetPipeline:
             # Stage 1: Generate 3D models
             if self.config.enable_3d_generation and images:
                 result.stage = PipelineStage.GENERATING_3D
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.STAGE_STARTED,
+                    product_id=product_id,
+                    stage=PipelineStage.GENERATING_3D.value,
+                    progress_percent=10.0,
+                    message="Generating 3D models",
+                ))
                 await self._generate_3d_models(
                     result=result,
                     title=title,
@@ -329,6 +954,13 @@ class ProductAssetPipeline:
                     collection=collection,
                     garment_type=garment_type,
                 )
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.STAGE_COMPLETED,
+                    product_id=product_id,
+                    stage=PipelineStage.GENERATING_3D.value,
+                    progress_percent=40.0,
+                    message=f"3D models generated: {len(result.assets_3d)}",
+                ))
 
             # Stage 2: Generate virtual try-on (apparel only)
             if (
@@ -337,21 +969,49 @@ class ProductAssetPipeline:
                 and images
             ):
                 result.stage = PipelineStage.GENERATING_TRYON
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.STAGE_STARTED,
+                    product_id=product_id,
+                    stage=PipelineStage.GENERATING_TRYON.value,
+                    progress_percent=45.0,
+                    message="Generating virtual try-on images",
+                ))
                 await self._generate_tryon_images(
                     result=result,
                     garment_images=images,
                     model_images=model_images,
                     garment_type=garment_type,
                 )
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.STAGE_COMPLETED,
+                    product_id=product_id,
+                    stage=PipelineStage.GENERATING_TRYON.value,
+                    progress_percent=70.0,
+                    message=f"Try-on images generated: {len(result.assets_tryon)}",
+                ))
 
             # Stage 3: Upload to WordPress
             if self.config.enable_wordpress_upload:
                 result.stage = PipelineStage.UPLOADING_ASSETS
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.STAGE_STARTED,
+                    product_id=product_id,
+                    stage=PipelineStage.UPLOADING_ASSETS.value,
+                    progress_percent=75.0,
+                    message="Uploading assets to WordPress",
+                ))
                 await self._upload_to_wordpress(
                     result=result,
                     title=title,
                     wp_product_id=wp_product_id,
                 )
+                await self._emit_progress(ProgressEvent(
+                    event_type=ProgressEventType.STAGE_COMPLETED,
+                    product_id=product_id,
+                    stage=PipelineStage.UPLOADING_ASSETS.value,
+                    progress_percent=95.0,
+                    message=f"Assets uploaded: {len(result.assets_wordpress)}",
+                ))
 
             result.stage = PipelineStage.COMPLETED
             result.status = "success"
@@ -412,6 +1072,27 @@ class ProductAssetPipeline:
             assets_generated=result.total_assets_generated,
             assets_uploaded=result.total_assets_uploaded,
         )
+
+        # Stage 4.7.2: Cache successful results
+        if result.status == "success":
+            await self._cache_result(cache_key, result)
+
+        # Stage 4.7.2: Add to retry queue on failure (if not already a retry)
+        if result.status == "error" and _retry_count < self.config.max_retries:
+            error_msg = result.errors[-1].get("error", "Unknown error") if result.errors else "Unknown error"
+            self._add_to_retry_queue(
+                product_id=product_id,
+                title=title,
+                description=description,
+                images=images,
+                category=category,
+                collection=collection,
+                garment_type=garment_type,
+                model_images=model_images,
+                wp_product_id=wp_product_id,
+                error=str(error_msg),
+                retry_count=_retry_count,
+            )
 
         return result
 
@@ -623,12 +1304,26 @@ class ProductAssetPipeline:
 # =============================================================================
 
 __all__ = [
+    # Core Pipeline
     "ProductAssetPipeline",
     "PipelineConfig",
+    # Result Types
     "AssetPipelineResult",
     "Asset3DResult",
     "TryOnAssetResult",
     "WordPressAssetResult",
+    # Enums
     "ProductCategory",
     "PipelineStage",
+    # Stage 4.7.2: Batch Processing
+    "BatchResult",
+    "RetryQueueItem",
+    # Stage 4.7.2: Progress Tracking
+    "ProgressEvent",
+    "ProgressEventType",
+    "ProgressCallback",
+    "AsyncProgressCallback",
+    # Stage 4.7.2: Cache Constants
+    "CACHE_TTL_SECONDS",
+    "CACHE_KEY_PREFIX",
 ]

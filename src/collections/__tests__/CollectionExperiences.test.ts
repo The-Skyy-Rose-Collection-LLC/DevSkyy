@@ -45,6 +45,64 @@ const runAnimationFrame = () => {
   callbacks.forEach(cb => cb(performance.now()));
 };
 
+// Helper to create mock ShowroomProduct with required e-commerce fields
+const createMockProduct = (overrides: Partial<{
+  id: string;
+  name: string;
+  modelUrl: string;
+  position: [number, number, number];
+  rotation: [number, number, number];
+  scale: [number, number, number];
+  spotlightColor: number;
+}> = {}): {
+  id: string;
+  name: string;
+  modelUrl: string;
+  position: [number, number, number];
+  rotation?: [number, number, number];
+  scale?: [number, number, number];
+  spotlightColor?: number;
+  sku: string;
+  price: number;
+  stockStatus: 'in_stock';
+  stockQuantity: number;
+  sizes: string[];
+  colors: { name: string; hex: string }[];
+} => {
+  const result: {
+    id: string;
+    name: string;
+    modelUrl: string;
+    position: [number, number, number];
+    rotation?: [number, number, number];
+    scale?: [number, number, number];
+    spotlightColor?: number;
+    sku: string;
+    price: number;
+    stockStatus: 'in_stock';
+    stockQuantity: number;
+    sizes: string[];
+    colors: { name: string; hex: string }[];
+  } = {
+    id: overrides.id || 'prod-1',
+    name: overrides.name || 'Test Product',
+    modelUrl: overrides.modelUrl || '/m.glb',
+    position: overrides.position || [0, 0, 0] as [number, number, number],
+    // Required e-commerce fields
+    sku: `SKU-${overrides.id || 'prod-1'}`,
+    price: 99.99,
+    stockStatus: 'in_stock' as const,
+    stockQuantity: 10,
+    sizes: ['S', 'M', 'L'],
+    colors: [{ name: 'Black', hex: '#000000' }],
+  };
+  // Only add optional properties if they're defined
+  if (overrides.rotation) result.rotation = overrides.rotation;
+  if (overrides.scale) result.scale = overrides.scale;
+  if (overrides.spotlightColor !== undefined) result.spotlightColor = overrides.spotlightColor;
+  return result;
+};
+
 // Helper to create mock intersection result
 const createMockIntersection = (userData: Record<string, unknown> = {}, parent: unknown = null) => ({
   object: { userData, parent },
@@ -598,19 +656,17 @@ describe('ShowroomExperience', () => {
 
   it('should load products', async () => {
     const experience = new ShowroomExperience(container);
-    await experience.loadProducts([{ id: 'prod-1', name: 'Test', modelUrl: '/m.glb', position: [0, 0, 0] as [number, number, number] }]);
+    await experience.loadProducts([createMockProduct()]);
     expect(true).toBe(true);
   });
 
   it('should load products with rotation and scale', async () => {
     const experience = new ShowroomExperience(container);
-    await experience.loadProducts([{
-      id: 'prod-1', name: 'Test', modelUrl: '/m.glb',
-      position: [0, 0, 0] as [number, number, number],
+    await experience.loadProducts([createMockProduct({
       rotation: [0, Math.PI / 2, 0] as [number, number, number],
-      scale: 2,
+      scale: [2, 2, 2] as [number, number, number],
       spotlightColor: 0xff0000
-    }]);
+    })]);
     expect(true).toBe(true);
   });
 
@@ -642,8 +698,8 @@ describe('ShowroomExperience', () => {
   it('should dispose with loaded products', async () => {
     const experience = new ShowroomExperience(container);
     await experience.loadProducts([
-      { id: 'prod-1', name: 'Test', modelUrl: '/m.glb', position: [0, 0, 0] as [number, number, number] },
-      { id: 'prod-2', name: 'Test 2', modelUrl: '/m2.glb', position: [2, 0, 0] as [number, number, number] }
+      createMockProduct({ id: 'prod-1' }),
+      createMockProduct({ id: 'prod-2', modelUrl: '/m2.glb', position: [2, 0, 0] as [number, number, number] })
     ]);
     experience.start();
     experience.dispose();
@@ -658,7 +714,7 @@ describe('ShowroomExperience', () => {
 
   it('should select existing product', async () => {
     const experience = new ShowroomExperience(container);
-    await experience.loadProducts([{ id: 'prod-1', name: 'Test', modelUrl: '/m.glb', position: [0, 0, 0] as [number, number, number] }]);
+    await experience.loadProducts([createMockProduct()]);
     experience.selectProduct('prod-1');
     expect(true).toBe(true);
   });
@@ -671,9 +727,7 @@ describe('ShowroomExperience', () => {
 
   it('should run animation frames with loaded products', async () => {
     const experience = new ShowroomExperience(container);
-    await experience.loadProducts([
-      { id: 'prod-1', name: 'Test', modelUrl: '/m.glb', position: [0, 0, 0] as [number, number, number] }
-    ]);
+    await experience.loadProducts([createMockProduct()]);
     experience.start();
     for (let i = 0; i < 5; i++) {
       runAnimationFrame();
@@ -684,9 +738,7 @@ describe('ShowroomExperience', () => {
 
   it('should select product and run animation', async () => {
     const experience = new ShowroomExperience(container);
-    await experience.loadProducts([
-      { id: 'prod-1', name: 'Test', modelUrl: '/m.glb', position: [0, 0, 0] as [number, number, number] }
-    ]);
+    await experience.loadProducts([createMockProduct()]);
     experience.selectProduct('prod-1');
     experience.start();
     for (let i = 0; i < 10; i++) {

@@ -16,16 +16,10 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Logger } from '../utils/Logger.js';
-
-export interface ShowroomProduct {
-  id: string;
-  name: string;
-  modelUrl: string;
-  position: [number, number, number];
-  rotation?: [number, number, number];
-  scale?: number;
-  spotlightColor?: number;
-}
+import type { ShowroomProduct } from '../types/product.js';
+import { ProductInteractionHandler } from '../lib/productInteraction.js';
+import { InventoryManager } from '../lib/inventory.js';
+import { CartManager } from '../lib/cartManager.js';
 
 export interface ShowroomConfig {
   backgroundColor?: number;
@@ -65,6 +59,13 @@ export class ShowroomExperience {
   private config: Required<ShowroomConfig>;
   private animationId: number | null = null;
 
+  // E-commerce integration
+  private inventoryManager: InventoryManager;
+  private cartManager: CartManager;
+  private interactionHandler: ProductInteractionHandler | null = null;
+  private raycaster: THREE.Raycaster;
+  private mouse: THREE.Vector2;
+
   constructor(container: HTMLElement, config: ShowroomConfig = {}) {
     this.logger = new Logger('ShowroomExperience');
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -103,8 +104,15 @@ export class ShowroomExperience {
     this.controls.minDistance = 3;
     this.controls.maxDistance = 20;
 
+    // Initialize e-commerce systems
+    this.inventoryManager = new InventoryManager();
+    this.cartManager = new CartManager();
+    this.raycaster = new THREE.Raycaster();
+    this.mouse = new THREE.Vector2();
+
     this.setupRoom();
     this.setupLighting();
+    this.setupInteractionHandlers();
     this.logger.info('Showroom experience initialized');
   }
 
@@ -148,6 +156,82 @@ export class ShowroomExperience {
     this.scene.add(mainLight);
   }
 
+  private setupInteractionHandlers(): void {
+    // Initialize product interaction handler
+    this.interactionHandler = new ProductInteractionHandler({
+      camera: this.camera,
+      scene: this.scene,
+      cart: this.cartManager,
+      inventory: this.inventoryManager,
+    });
+
+    // Setup mouse move for hover detection
+    this.renderer.domElement.addEventListener('mousemove', this.onMouseMove.bind(this));
+
+    // Setup click for product interaction
+    this.renderer.domElement.addEventListener('click', this.onClick.bind(this));
+
+    this.logger.info('Interaction handlers setup complete');
+  }
+
+  private onMouseMove(event: MouseEvent): void {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    this.mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+    // Update raycasting for hover detection
+    this.updateHover();
+  }
+
+  private onClick(_event: MouseEvent): void {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(
+      Array.from(this.products.values()),
+      true
+    );
+
+    if (intersects.length > 0) {
+      const firstIntersect = intersects[0];
+      if (!firstIntersect) return;
+      const productId = this.findProductId(firstIntersect.object);
+
+      if (productId && this.interactionHandler) {
+        this.interactionHandler.handleProductClick(productId);
+      }
+    }
+  }
+
+  private updateHover(): void {
+    this.raycaster.setFromCamera(this.mouse, this.camera);
+    const intersects = this.raycaster.intersectObjects(
+      Array.from(this.products.values()),
+      true
+    );
+
+    if (intersects.length > 0) {
+      const firstIntersect = intersects[0];
+      if (!firstIntersect) return;
+      const productId = this.findProductId(firstIntersect.object);
+
+      if (productId && this.interactionHandler) {
+        this.interactionHandler.highlightProduct(productId);
+        this.renderer.domElement.style.cursor = 'pointer';
+      }
+    } else {
+      this.renderer.domElement.style.cursor = 'default';
+    }
+  }
+
+  private findProductId(obj: THREE.Object3D): string | null {
+    let current: THREE.Object3D | null = obj;
+    while (current) {
+      const pid = current.userData['productId'] as string | undefined;
+      if (pid) return pid;
+      current = current.parent;
+    }
+    return null;
+  }
+
   public async loadProducts(products: ShowroomProduct[]): Promise<void> {
     for (const product of products) {
       await this.loadProduct(product);
@@ -164,10 +248,31 @@ export class ShowroomExperience {
     });
     const mesh = new THREE.Mesh(geometry, material);
     mesh.position.set(...product.position);
+
+    if (product.rotation) {
+      mesh.rotation.set(...product.rotation);
+    }
+
+    if (product.scale) {
+      const scale = Array.isArray(product.scale) ? product.scale : [product.scale, product.scale, product.scale];
+      mesh.scale.set(...scale as [number, number, number]);
+    }
+
     mesh.castShadow = true;
     mesh.userData = { productId: product.id, name: product.name };
     this.scene.add(mesh);
     this.products.set(product.id, mesh);
+
+    // Register product with interaction handler
+    if (this.interactionHandler) {
+      this.interactionHandler.setupProduct(mesh, product);
+    }
+
+    // Subscribe to inventory updates
+    this.inventoryManager.subscribe(product.id, (status) => {
+      this.logger.debug(`Inventory updated for ${product.name}:`, { status });
+    });
+
     this.addSpotlight(product);
   }
 
