@@ -14,6 +14,7 @@ Integrated security middleware for DevSkyy Enterprise Platform that combines:
 
 import json
 import logging
+import secrets
 import time
 from collections.abc import Callable
 
@@ -84,9 +85,13 @@ class SecurityMiddleware(BaseHTTPMiddleware):
             "X-Content-Type-Options": "nosniff",
             "X-Frame-Options": "DENY",
             "X-XSS-Protection": "1; mode=block",
+            "X-Permitted-Cross-Domain-Policies": "none",
             "Strict-Transport-Security": "max-age=31536000; includeSubDomains",
             "Referrer-Policy": "strict-origin-when-cross-origin",
             "Permissions-Policy": "geolocation=(), microphone=(), camera=()",
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "require-corp",
+            "Cross-Origin-Resource-Policy": "same-origin",
         }
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
@@ -272,8 +277,8 @@ class SecurityMiddleware(BaseHTTPMiddleware):
         for header, value in self.security_headers.items():
             response.headers[header] = value
 
-        # Add CSP header with nonce (simplified)
-        nonce = "abc123"  # In production, generate random nonce
+        # Add CSP header with cryptographically secure nonce
+        nonce = secrets.token_hex(16)
         csp = f"default-src 'self'; script-src 'self' 'nonce-{nonce}'; style-src 'self' 'unsafe-inline'"
         response.headers["Content-Security-Policy"] = csp
 
