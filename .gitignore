@@ -55,6 +55,9 @@ coverage/
 .env
 .env.local
 .env.*.local
+.env.save
+.env.backup
+.env.bak
 !.env.example
 secrets/
 credentials/
