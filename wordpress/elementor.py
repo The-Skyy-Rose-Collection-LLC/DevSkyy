@@ -66,6 +66,13 @@ class WidgetType(str, Enum):
     SLIDES = "slides"
     NAV_MENU = "nav-menu"
 
+    # SkyyRose 3D Widgets (Custom)
+    THREEJS_VIEWER = "skyyrose-3d-viewer"      # Single product 3D viewer
+    THREEJS_COLLECTION = "skyyrose-collection" # Full collection experience
+    AR_QUICK_LOOK = "skyyrose-ar-button"       # iOS AR Quick Look button
+    PRODUCT_CONFIGURATOR = "skyyrose-configurator"  # Color/size selector
+    MODEL_VIEWER = "skyyrose-model-viewer"     # Google Model Viewer widget
+
 
 class SectionLayout(str, Enum):
     """Section layout types."""
@@ -497,6 +504,308 @@ class ElementorBuilder:
                 "paginate": "yes",
             },
         )
+
+    # -------------------------------------------------------------------------
+    # 3D Widget Builders (SkyyRose Custom)
+    # -------------------------------------------------------------------------
+
+    def threejs_viewer(
+        self,
+        product_id: int | str,
+        glb_url: str,
+        usdz_url: str = "",
+        width: str = "100%",
+        height: str = "500px",
+        auto_rotate: bool = True,
+        enable_zoom: bool = True,
+        show_ar_button: bool = True,
+        background_color: str = "#000000",
+    ) -> dict[str, Any]:
+        """
+        Create 3D product viewer widget.
+
+        Uses Three.js/model-viewer for WebGL rendering and USDZ for iOS AR.
+
+        Args:
+            product_id: WooCommerce product ID
+            glb_url: URL to GLB model file
+            usdz_url: URL to USDZ model for iOS AR
+            width: Widget width
+            height: Widget height
+            auto_rotate: Enable auto-rotation
+            enable_zoom: Enable zoom controls
+            show_ar_button: Show AR Quick Look button on iOS
+            background_color: Viewer background color
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.THREEJS_VIEWER,
+            {
+                "product_id": str(product_id),
+                "glb_url": glb_url,
+                "usdz_url": usdz_url,
+                "viewer_width": width,
+                "viewer_height": height,
+                "auto_rotate": "yes" if auto_rotate else "no",
+                "enable_zoom": "yes" if enable_zoom else "no",
+                "show_ar_button": "yes" if show_ar_button else "no",
+                "background_color": background_color,
+                # Three.js specific
+                "camera_controls": "yes",
+                "shadow_intensity": "1",
+                "environment_image": "neutral",
+                # Loading
+                "poster_url": "",
+                "loading_animation": "dots",
+            },
+        )
+
+    def collection_experience(
+        self,
+        collection_slug: str,
+        experience_type: str = "showroom",
+        enable_navigation: bool = True,
+        enable_cart: bool = True,
+        spotlight_color: str = "#B76E79",
+        ambient_sound: str = "",
+    ) -> dict[str, Any]:
+        """
+        Create immersive 3D collection experience widget.
+
+        Full Three.js experience with multiple products, navigation, and cart.
+
+        Args:
+            collection_slug: WordPress collection/category slug
+            experience_type: Type of experience (showroom, runway, gallery, etc.)
+            enable_navigation: Allow 3D space navigation
+            enable_cart: Enable add-to-cart from 3D experience
+            spotlight_color: Product spotlight color (SkyyRose brand)
+            ambient_sound: Optional ambient audio URL
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.THREEJS_COLLECTION,
+            {
+                "collection_slug": collection_slug,
+                "experience_type": experience_type,
+                "enable_navigation": "yes" if enable_navigation else "no",
+                "enable_cart": "yes" if enable_cart else "no",
+                "spotlight_color": spotlight_color,
+                "ambient_sound": ambient_sound,
+                # Layout
+                "aspect_ratio": "16:9",
+                "fullscreen_button": "yes",
+                "loading_screen": "branded",
+                # Performance
+                "lod_enabled": "yes",
+                "shadow_quality": "medium",
+                "antialiasing": "yes",
+            },
+        )
+
+    def ar_quick_look_button(
+        self,
+        product_id: int | str,
+        usdz_url: str,
+        button_text: str = "View in AR",
+        button_style: str = "primary",
+        show_on_ios_only: bool = True,
+    ) -> dict[str, Any]:
+        """
+        Create AR Quick Look button for iOS Safari.
+
+        Uses rel="ar" link with USDZ format.
+
+        Args:
+            product_id: WooCommerce product ID
+            usdz_url: URL to USDZ model
+            button_text: Button label
+            button_style: primary or secondary
+            show_on_ios_only: Only display on iOS devices
+
+        Returns:
+            Widget configuration dict
+        """
+        bg_color = self.brand.colors.primary if button_style == "primary" else "transparent"
+        text_color = "#FFFFFF" if button_style == "primary" else self.brand.colors.primary
+
+        return self._widget(
+            WidgetType.AR_QUICK_LOOK,
+            {
+                "product_id": str(product_id),
+                "usdz_url": usdz_url,
+                "button_text": button_text,
+                "show_on_ios_only": "yes" if show_on_ios_only else "no",
+                # Styling
+                "button_background_color": bg_color,
+                "button_text_color": text_color,
+                "button_border_radius": {"size": 4, "unit": "px"},
+                "button_padding": {
+                    "top": "12", "right": "24", "bottom": "12", "left": "24"
+                },
+                # AR options
+                "ar_scale": "fixed",  # #allowsContentScaling=0
+                "ar_placement": "floor",
+            },
+        )
+
+    def product_configurator(
+        self,
+        product_id: int | str,
+        glb_url: str,
+        available_colors: list[str] | None = None,
+        available_sizes: list[str] | None = None,
+        show_price: bool = True,
+        show_stock: bool = True,
+    ) -> dict[str, Any]:
+        """
+        Create product configurator widget.
+
+        Real-time 3D model with color/size selection and price updates.
+
+        Args:
+            product_id: WooCommerce product ID
+            glb_url: URL to GLB model
+            available_colors: List of hex colors for material swapping
+            available_sizes: List of size options
+            show_price: Display price (updates with variation)
+            show_stock: Display stock status
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.PRODUCT_CONFIGURATOR,
+            {
+                "product_id": str(product_id),
+                "glb_url": glb_url,
+                "colors": available_colors or ["#000000", "#FFFFFF", "#B76E79"],
+                "sizes": available_sizes or ["XS", "S", "M", "L", "XL"],
+                "show_price": "yes" if show_price else "no",
+                "show_stock": "yes" if show_stock else "no",
+                # UI
+                "color_selector_style": "swatches",
+                "size_selector_style": "buttons",
+                "add_to_cart_button": "yes",
+                # 3D
+                "auto_rotate": "yes",
+                "enable_zoom": "yes",
+                "viewer_height": "400px",
+            },
+        )
+
+    def model_viewer(
+        self,
+        src: str,
+        ios_src: str = "",
+        alt: str = "3D Model",
+        ar: bool = True,
+        auto_rotate: bool = True,
+        camera_controls: bool = True,
+        poster: str = "",
+        reveal: str = "auto",
+    ) -> dict[str, Any]:
+        """
+        Create Google Model Viewer widget.
+
+        Uses <model-viewer> web component for cross-platform 3D.
+
+        Args:
+            src: GLB/GLTF model URL
+            ios_src: USDZ model URL for iOS
+            alt: Accessibility text
+            ar: Enable AR on supported devices
+            auto_rotate: Enable auto-rotation
+            camera_controls: Enable orbit controls
+            poster: Preview image URL
+            reveal: Loading behavior (auto, manual, interaction)
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.MODEL_VIEWER,
+            {
+                "src": src,
+                "ios_src": ios_src,
+                "alt": alt,
+                "ar": "yes" if ar else "no",
+                "ar_modes": "webxr scene-viewer quick-look",
+                "auto_rotate": "yes" if auto_rotate else "no",
+                "camera_controls": "yes" if camera_controls else "no",
+                "poster": poster,
+                "reveal": reveal,
+                "shadow_intensity": "1",
+                "exposure": "1",
+                "environment_image": "neutral",
+            },
+        )
+
+    # -------------------------------------------------------------------------
+    # 3D Section Builders
+    # -------------------------------------------------------------------------
+
+    def product_3d_section(
+        self,
+        product_id: int | str,
+        glb_url: str,
+        usdz_url: str = "",
+        title: str = "",
+        enable_configurator: bool = False,
+        available_colors: list[str] | None = None,
+    ) -> list[dict[str, Any]]:
+        """
+        Build complete 3D product section with viewer and optional configurator.
+
+        Args:
+            product_id: WooCommerce product ID
+            glb_url: GLB model URL
+            usdz_url: USDZ model URL for AR
+            title: Optional section title
+            enable_configurator: Include color/size configurator
+            available_colors: Colors for configurator
+
+        Returns:
+            List of widget dicts for section
+        """
+        widgets = []
+
+        if title:
+            widgets.append(self.heading(title, size="lg", tag="h2"))
+            widgets.append(self.spacer(24))
+
+        if enable_configurator:
+            widgets.append(
+                self.product_configurator(
+                    product_id=product_id,
+                    glb_url=glb_url,
+                    available_colors=available_colors,
+                )
+            )
+        else:
+            widgets.append(
+                self.threejs_viewer(
+                    product_id=product_id,
+                    glb_url=glb_url,
+                    usdz_url=usdz_url,
+                )
+            )
+
+        if usdz_url:
+            widgets.append(self.spacer(16))
+            widgets.append(
+                self.ar_quick_look_button(
+                    product_id=product_id,
+                    usdz_url=usdz_url,
+                )
+            )
+
+        widgets.append(self.spacer(32))
+        return widgets
 
     # -------------------------------------------------------------------------
     # Section Builders
