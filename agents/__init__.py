@@ -27,6 +27,18 @@ All agents extend EnhancedSuperAgent and include:
 
 from .analytics_agent import AnalyticsAgent
 
+# Coding Doctor Agent (Meta-agent for codebase health)
+from .coding_doctor_agent import (
+    CodeIssue,
+    CodingDoctorAgent,
+    FileReview,
+    HealthCheckType,
+    HealthReport,
+    IssueCategory,
+    SeverityLevel,
+    create_coding_doctor,
+)
+
 # Enhanced Super Agent base and modules
 from .base_super_agent import (  # Types; Data classes; Modules; Base
     EnhancedSuperAgent,
@@ -118,7 +130,7 @@ __all__ = [
     "LLMRoundTableInterface",
     # Enhanced Super Agent - Base
     "EnhancedSuperAgent",
-    # 6 SuperAgents
+    # 6 SuperAgents + Coding Doctor
     "CommerceAgent",
     "CreativeAgent",
     "VisualTaskType",
@@ -126,6 +138,15 @@ __all__ = [
     "SupportAgent",
     "OperationsAgent",
     "AnalyticsAgent",
+    # Coding Doctor Agent
+    "CodingDoctorAgent",
+    "create_coding_doctor",
+    "HealthCheckType",
+    "HealthReport",
+    "FileReview",
+    "CodeIssue",
+    "IssueCategory",
+    "SeverityLevel",
     # FASHN Agent
     "FashnTryOnAgent",
     "FashnConfig",
