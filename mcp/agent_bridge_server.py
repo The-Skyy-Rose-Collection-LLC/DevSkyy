@@ -46,7 +46,6 @@ Usage:
     }
 """
 
-import asyncio
 import json
 import logging
 import os
@@ -76,7 +75,7 @@ try:
         OperationsAgent,
         SupportAgent,
     )
-    from agents.base_super_agent import SuperAgentType, TaskCategory
+    from agents.base_super_agent import TaskCategory  # SuperAgentType used in type hints
 except ImportError as e:
     print(f"Agent imports failed: {e}")
     sys.exit(1)
@@ -768,7 +767,7 @@ async def creative_virtual_tryon(input: CreativeVirtualTryonInput) -> str:
             return format_response({"error": "Creative agent not available"}, input.response_format)
 
         result = await agent.execute_with_learning(
-            prompt=f"Virtual try-on: garment on model",
+            prompt="Virtual try-on: garment on model",
             task_category=TaskCategory.CREATIVE,
             context={
                 "model_image": input.model_image,
