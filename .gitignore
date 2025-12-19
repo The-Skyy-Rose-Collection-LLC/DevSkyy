@@ -129,3 +129,8 @@ coverage.xml
 bandit-report.json
 .pytest_cache/
 .tox/
+
+# Vector databases (runtime-generated)
+data/vectordb/
+data/*.sqlite3
+data/*.db
