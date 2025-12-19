@@ -89,6 +89,13 @@ from .prompt_engineering import (
     PromptTechnique,
     PromptTemplate,
 )
+from .query_rewriter import (
+    AdvancedQueryRewriter,
+    QueryRewriterConfig,
+    QueryRewriteStrategy,
+    RAGPipelineWithRewriting,
+    RewrittenQuery,
+)
 from .tool_registry import (
     ToolCategory,
     ToolDefinition,
@@ -168,6 +175,12 @@ __all__ = [
     "EmbeddingConfig",
     "EmbeddingProvider",
     "create_embedding_engine",
+    # RAG - Query Rewriting (Stage 4.11+)
+    "QueryRewriteStrategy",
+    "RewrittenQuery",
+    "QueryRewriterConfig",
+    "AdvancedQueryRewriter",
+    "RAGPipelineWithRewriting",
     # RAG - Document Ingestion
     "DocumentIngestionPipeline",
     "DocumentLoader",

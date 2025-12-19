@@ -63,6 +63,11 @@ try:
     from orchestration.document_ingestion import DocumentIngestionPipeline, IngestionConfig
     from orchestration.embedding_engine import EmbeddingConfig, EmbeddingProvider
     from orchestration.vector_store import VectorDBType, VectorStoreConfig
+    from orchestration.query_rewriter import (
+        AdvancedQueryRewriter,
+        QueryRewriteStrategy,
+        QueryRewriterConfig,
+    )
 except ImportError as e:
     print(f"❌ RAG components not available: {e}")
     print("Make sure orchestration module is properly installed")
@@ -77,9 +82,13 @@ VECTOR_DB_PATH = os.getenv("VECTOR_DB_PATH", "./data/vectordb")
 COLLECTION_NAME = os.getenv("RAG_COLLECTION", "devskyy_docs")
 EMBEDDING_PROVIDER = os.getenv("EMBEDDING_PROVIDER", "sentence_transformers")
 CHARACTER_LIMIT = 25000
+REDIS_URL = os.getenv("REDIS_URL", None)
 
 # Global pipeline instance
 _pipeline: DocumentIngestionPipeline | None = None
+
+# Global query rewriter instance
+_rewriter: AdvancedQueryRewriter | None = None
 
 
 # =============================================================================
@@ -131,6 +140,16 @@ class RAGContextInput(BaseInput):
     top_k: int = Field(default=5, ge=1, le=10, description="Number of chunks to retrieve")
 
 
+class RAGQueryRewriteInput(BaseInput):
+    """Input for query rewriting."""
+    query: str = Field(..., description="Query to rewrite", min_length=1, max_length=5000)
+    strategy: str = Field(
+        default="zero_shot",
+        description="Rewriting strategy: zero_shot, few_shot, sub_queries, step_back, hyde",
+    )
+    num_variations: int = Field(default=3, ge=1, le=5, description="Number of query variations")
+
+
 # =============================================================================
 # Helper Functions
 # =============================================================================
@@ -170,6 +189,20 @@ async def get_pipeline() -> DocumentIngestionPipeline:
         await _pipeline.initialize()
 
     return _pipeline
+
+
+def get_rewriter() -> AdvancedQueryRewriter:
+    """Get or create the query rewriter."""
+    global _rewriter
+
+    if _rewriter is None:
+        config = QueryRewriterConfig(
+            redis_url=REDIS_URL,
+            cache_enabled=REDIS_URL is not None,
+        )
+        _rewriter = AdvancedQueryRewriter(config)
+
+    return _rewriter
 
 
 def format_response(data: dict[str, Any], fmt: ResponseFormat) -> str:
@@ -323,6 +356,60 @@ async def rag_get_context(input: RAGContextInput) -> str:
         )
 
         response = {"context": context, "question": input.question}
+        return format_response(response, input.response_format)[:CHARACTER_LIMIT]
+
+    except Exception as e:
+        return format_response({"error": str(e)}, input.response_format)
+
+
+@mcp.tool()
+async def rag_query_rewrite(input: RAGQueryRewriteInput) -> str:
+    """
+    Rewrite a query to improve RAG retrieval.
+
+    Use this tool to improve query quality before semantic search.
+    Supports multiple rewriting strategies:
+    - zero_shot: Simple paraphrasing
+    - few_shot: Uses examples for consistent style
+    - sub_queries: Decomposes complex questions
+    - step_back: Generates higher-level conceptual questions
+    - hyde: Generates hypothetical answer passages
+
+    Args:
+        input: Query and rewriting parameters
+
+    Returns:
+        Rewritten query variations with explanations
+    """
+    try:
+        rewriter = get_rewriter()
+
+        # Map strategy string to enum
+        strategy_map = {
+            "zero_shot": QueryRewriteStrategy.ZERO_SHOT,
+            "few_shot": QueryRewriteStrategy.FEW_SHOT,
+            "sub_queries": QueryRewriteStrategy.SUB_QUERIES,
+            "step_back": QueryRewriteStrategy.STEP_BACK,
+            "hyde": QueryRewriteStrategy.HYDE,
+        }
+
+        strategy = strategy_map.get(input.strategy, QueryRewriteStrategy.ZERO_SHOT)
+
+        rewritten = rewriter.rewrite(
+            query=input.query,
+            strategy=strategy,
+            num_variations=input.num_variations,
+        )
+
+        response = {
+            "rewritten": {
+                "original_query": rewritten.original_query,
+                "rewritten_queries": rewritten.rewritten_queries,
+                "strategy": rewritten.strategy_used,
+                "reasoning": rewritten.reasoning,
+            }
+        }
+
         return format_response(response, input.response_format)[:CHARACTER_LIMIT]
 
     except Exception as e:
