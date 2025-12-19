@@ -35,7 +35,6 @@ from orchestration.prompt_engineering import PromptTechnique
 from .base_super_agent import (
     EnhancedSuperAgent,
     SuperAgentType,
-    TaskCategory,
 )
 
 logger = logging.getLogger(__name__)
@@ -684,10 +683,11 @@ Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
         # Use Round Table if multiple providers available
         if len(providers) > 1 and self.round_table:
             # Register provider generators
+            # Note: Use default argument to capture provider value (avoid closure issue)
             for provider in providers:
                 self.round_table.register_provider(
                     provider.value,
-                    lambda p, c: self._execute_visual_provider(provider, p, c)
+                    lambda p, c, prov=provider: self._execute_visual_provider(prov, p, c)
                 )
 
             result = await self.round_table.compete(prompt)

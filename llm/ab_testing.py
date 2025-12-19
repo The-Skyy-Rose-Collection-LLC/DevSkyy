@@ -18,7 +18,6 @@ Version: 1.0.0
 
 from __future__ import annotations
 
-import json
 import logging
 import math
 import os
@@ -577,8 +576,8 @@ class ABTestingEngine:
         Uses deterministic assignment if user_id provided,
         otherwise random assignment based on weights.
         """
-        import random
         import hashlib
+        import random
 
         exp = self._experiments.get(experiment_id)
         if not exp or not exp.variants:

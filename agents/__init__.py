@@ -25,50 +25,28 @@ All agents extend EnhancedSuperAgent and include:
 - LLM Round Table competition
 """
 
+from .analytics_agent import AnalyticsAgent
+
 # Enhanced Super Agent base and modules
-from .base_super_agent import (
-    # Types
-    SuperAgentType,
-    TaskCategory,
-    LLMProvider,
-    # Data classes
-    PromptTechniqueResult,
-    MLPrediction,
+from .base_super_agent import (  # Types; Data classes; Modules; Base
+    EnhancedSuperAgent,
     LearningRecord,
+    LLMProvider,
+    LLMRoundTableInterface,
+    MLCapabilitiesModule,
+    MLPrediction,
+    PromptEngineeringModule,
+    PromptTechniqueResult,
     RoundTableEntry,
     RoundTableResult,
-    # Modules
-    PromptEngineeringModule,
-    MLCapabilitiesModule,
     SelfLearningModule,
-    LLMRoundTableInterface,
-    # Base
-    EnhancedSuperAgent,
+    SuperAgentType,
+    TaskCategory,
 )
 
 # 6 SuperAgents
 from .commerce_agent import CommerceAgent
-from .creative_agent import CreativeAgent, VisualProvider as CreativeVisualProvider, VisualTaskType
-from .marketing_agent import MarketingAgent
-from .support_agent import SupportAgent
-from .operations_agent import OperationsAgent
-from .analytics_agent import AnalyticsAgent
-
-# Visual Generation
-from .visual_generation import (
-    VisualProvider,
-    GenerationType,
-    AspectRatio,
-    ImageQuality,
-    GenerationRequest,
-    GenerationResult,
-    SKYYROSE_BRAND_DNA,
-    GoogleImagenClient,
-    GoogleVeoClient,
-    HuggingFaceFluxClient,
-    VisualGenerationRouter,
-    create_visual_router,
-)
+from .creative_agent import CreativeAgent, VisualTaskType
 
 # Specialized agents
 from .fashn_agent import (
@@ -80,17 +58,38 @@ from .fashn_agent import (
     TryOnMode,
     TryOnResult,
 )
+from .marketing_agent import MarketingAgent
+from .operations_agent import OperationsAgent
+from .support_agent import SupportAgent
 from .tripo_agent import (
     COLLECTION_PROMPTS,
     GARMENT_TEMPLATES,
-    SKYYROSE_BRAND_DNA,
-    GenerationResult,
+)
+from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
+from .tripo_agent import GenerationResult as TripoGenerationResult
+from .tripo_agent import (
     ModelFormat,
     ModelStyle,
     TripoAssetAgent,
     TripoConfig,
     TripoTask,
     TripoTaskStatus,
+)
+
+# Visual Generation (primary source for brand DNA and generation types)
+from .visual_generation import (
+    SKYYROSE_BRAND_DNA,
+    AspectRatio,
+    GenerationRequest,
+    GenerationResult,
+    GenerationType,
+    GoogleImagenClient,
+    GoogleVeoClient,
+    HuggingFaceFluxClient,
+    ImageQuality,
+    VisualGenerationRouter,
+    VisualProvider,
+    create_visual_router,
 )
 from .wordpress_asset_agent import (
     GalleryResult,
@@ -122,7 +121,6 @@ __all__ = [
     # 6 SuperAgents
     "CommerceAgent",
     "CreativeAgent",
-    "VisualProvider",
     "VisualTaskType",
     "MarketingAgent",
     "SupportAgent",
@@ -140,13 +138,26 @@ __all__ = [
     "TripoAssetAgent",
     "TripoConfig",
     "TripoTask",
-    "GenerationResult",
+    "TripoGenerationResult",
     "ModelFormat",
     "ModelStyle",
     "TripoTaskStatus",
-    "SKYYROSE_BRAND_DNA",
+    "TRIPO_BRAND_DNA",
     "COLLECTION_PROMPTS",
     "GARMENT_TEMPLATES",
+    # Visual Generation (primary exports)
+    "VisualProvider",
+    "GenerationType",
+    "AspectRatio",
+    "ImageQuality",
+    "GenerationRequest",
+    "GenerationResult",
+    "SKYYROSE_BRAND_DNA",
+    "GoogleImagenClient",
+    "GoogleVeoClient",
+    "HuggingFaceFluxClient",
+    "VisualGenerationRouter",
+    "create_visual_router",
     # WordPress Asset Agent
     "WordPressAssetAgent",
     "WordPressAssetConfig",

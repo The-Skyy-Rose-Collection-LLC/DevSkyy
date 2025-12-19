@@ -13,21 +13,21 @@ from agents import (
     FashnConfig,
     FashnTryOnAgent,
     GarmentCategory,
+    Model3DUploadResult,
     ModelFormat,
     TripoAssetAgent,
     TripoConfig,
     TryOnMode,
     WordPressAssetAgent,
     WordPressAssetConfig,
-    Model3DUploadResult,
 )
 from base import AgentCapability
 from orchestration.asset_pipeline import (
-    ProductAssetPipeline,
-    PipelineConfig,
     AssetPipelineResult,
-    ProductCategory,
+    PipelineConfig,
     PipelineStage,
+    ProductAssetPipeline,
+    ProductCategory,
 )
 
 

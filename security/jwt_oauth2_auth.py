@@ -38,6 +38,10 @@ from typing import Any, TypeVar
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
+
+# FastAPI imports needed at module level for Python 3.14+ annotation resolution
+# (used in router endpoint type annotations evaluated at module load time)
+from fastapi import Request
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 from passlib.context import CryptContext
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -245,6 +249,19 @@ class UserInDB(BaseModel):
         if self.locked_until is None:
             return False
         return datetime.now(UTC) < self.locked_until
+
+
+class TokenRequest(BaseModel):
+    """Token request model for OAuth2 login."""
+
+    username: str
+    password: str
+
+
+class TokenRefreshRequest(BaseModel):
+    """Token refresh request model."""
+
+    refresh_token: str
 
 
 # =============================================================================
@@ -861,22 +878,13 @@ token_blacklist = TokenBlacklist()
 
 def _create_auth_router():
     """Create authentication router with endpoints."""
-    from fastapi import APIRouter, Depends, HTTPException, Request, status
+    from fastapi import APIRouter, Depends, HTTPException, status
     from fastapi.security import OAuth2PasswordRequestForm as _OAuth2Form
-    from pydantic import BaseModel
 
     router = APIRouter(prefix="/api/v1/auth", tags=["Authentication"])
 
-    class TokenRequest(BaseModel):
-        """Token request model."""
-
-        username: str
-        password: str
-
-    class TokenRefreshRequest(BaseModel):
-        """Token refresh request model."""
-
-        refresh_token: str
+    # Note: TokenRequest and TokenRefreshRequest are defined at module level
+    # for Python 3.14+ annotation resolution compatibility
 
     async def verify_user_credentials(username: str, password: str) -> tuple[str, list[str]] | None:
         """
