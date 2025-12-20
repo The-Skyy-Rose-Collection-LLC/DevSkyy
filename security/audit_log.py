@@ -25,10 +25,10 @@ from __future__ import annotations
 import hashlib
 import json
 import logging
-from dataclasses import dataclass, asdict
+from dataclasses import asdict, dataclass
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -90,16 +90,16 @@ class AuditLogEntry:
     timestamp: datetime
     event_type: AuditEventType
     severity: AuditSeverity
-    user_id: Optional[str]
+    user_id: str | None
     correlation_id: str
     resource_type: str
     resource_id: str
     action: str
     status: str  # "success" or "failure"
     details: dict[str, Any]
-    source_ip: Optional[str] = None
-    user_agent: Optional[str] = None
-    hash: Optional[str] = None  # Integrity hash
+    source_ip: str | None = None
+    user_agent: str | None = None
+    hash: str | None = None  # Integrity hash
 
     def calculate_hash(self) -> str:
         """
@@ -146,11 +146,11 @@ class AuditLogger:
         resource_id: str,
         action: str,
         status: str,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         correlation_id: str = "",
-        source_ip: Optional[str] = None,
-        user_agent: Optional[str] = None,
-        details: Optional[dict[str, Any]] = None,
+        source_ip: str | None = None,
+        user_agent: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditLogEntry:
         """
         Log an audit event.
@@ -205,11 +205,11 @@ class AuditLogger:
     def log_auth(
         self,
         event: str,
-        user_id: Optional[str],
+        user_id: str | None,
         success: bool,
         correlation_id: str = "",
-        source_ip: Optional[str] = None,
-        details: Optional[dict[str, Any]] = None,
+        source_ip: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditLogEntry:
         """Log authentication event."""
         return self.log(
@@ -230,10 +230,10 @@ class AuditLogger:
         resource_type: str,
         resource_id: str,
         action: str,
-        user_id: Optional[str],
+        user_id: str | None,
         correlation_id: str = "",
         success: bool = True,
-        details: Optional[dict[str, Any]] = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditLogEntry:
         """Log data access event."""
         event_map = {
@@ -261,10 +261,10 @@ class AuditLogger:
         event_type: AuditEventType,
         severity: AuditSeverity,
         resource_id: str,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
         correlation_id: str = "",
-        source_ip: Optional[str] = None,
-        details: Optional[dict[str, Any]] = None,
+        source_ip: str | None = None,
+        details: dict[str, Any] | None = None,
     ) -> AuditLogEntry:
         """Log security event."""
         return self.log(
@@ -336,7 +336,7 @@ class AuditLogger:
 
 
 # Global audit logger instance
-_audit_logger: Optional[AuditLogger] = None
+_audit_logger: AuditLogger | None = None
 
 
 def get_audit_logger() -> AuditLogger:

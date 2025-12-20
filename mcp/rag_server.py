@@ -62,12 +62,12 @@ except ImportError as e:
 try:
     from orchestration.document_ingestion import DocumentIngestionPipeline, IngestionConfig
     from orchestration.embedding_engine import EmbeddingConfig, EmbeddingProvider
-    from orchestration.vector_store import VectorDBType, VectorStoreConfig
     from orchestration.query_rewriter import (
         AdvancedQueryRewriter,
-        QueryRewriteStrategy,
         QueryRewriterConfig,
+        QueryRewriteStrategy,
     )
+    from orchestration.vector_store import VectorDBType, VectorStoreConfig
 except ImportError as e:
     print(f"❌ RAG components not available: {e}")
     print("Make sure orchestration module is properly installed")

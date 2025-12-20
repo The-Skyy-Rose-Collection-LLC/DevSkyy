@@ -56,8 +56,8 @@ groq>=0.37.0
 # redis>=5.0
 # celery>=5.3
 
-# Monitoring (optional)
-# prometheus-client>=0.19
+# Monitoring
+prometheus-client>=0.19
 # structlog>=23.2
 
 # WordPress (optional)

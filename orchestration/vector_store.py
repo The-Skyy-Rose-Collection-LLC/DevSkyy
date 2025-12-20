@@ -262,7 +262,7 @@ class ChromaVectorStore(BaseVectorStore):
         # Build where filter
         where_filter = None
         if filter_metadata:
-            where_filter = {k: v for k, v in filter_metadata.items()}
+            where_filter = dict(filter_metadata.items())
 
         results = self._collection.query(
             query_embeddings=[query_embedding],
@@ -332,7 +332,7 @@ class ChromaVectorStore(BaseVectorStore):
             for meta in result["metadatas"]:
                 if meta and "source" in meta:
                     sources.add(meta["source"])
-        return sorted(list(sources))
+        return sorted(sources)
 
     async def get_collection_stats(self) -> dict[str, Any]:
         """Get ChromaDB collection statistics."""

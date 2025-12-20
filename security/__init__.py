@@ -52,6 +52,22 @@ from .jwt_oauth2_auth import (  # Config; Enums; Models; Classes; Dependencies; 
     require_roles,
     token_blacklist,
 )
+from .secrets_manager import (
+    AWSSecretsManager,
+    HashiCorpVault,
+    LocalEncryptedBackend,
+    SecretBackendType,
+    SecretMetadata,
+    SecretNotFoundError,
+    SecretRotationError,
+    SecretsBackend,
+    SecretsBackendError,
+    SecretsManager,
+    SecretValue,
+    get_secret,
+    get_secrets_manager,
+    set_secret,
+)
 
 __all__ = [
     # Encryption
@@ -84,4 +100,19 @@ __all__ = [
     "jwt_manager",
     "password_manager",
     "token_blacklist",
+    # Secrets Management
+    "SecretsManager",
+    "SecretsBackend",
+    "AWSSecretsManager",
+    "HashiCorpVault",
+    "LocalEncryptedBackend",
+    "SecretBackendType",
+    "SecretValue",
+    "SecretMetadata",
+    "SecretsBackendError",
+    "SecretNotFoundError",
+    "SecretRotationError",
+    "get_secrets_manager",
+    "get_secret",
+    "set_secret",
 ]

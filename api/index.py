@@ -186,7 +186,7 @@ class handler(BaseHTTPRequestHandler):
         """Handle GET requests."""
         parsed = urlparse(self.path)
         path = parsed.path
-        query = parse_qs(parsed.query)
+        parse_qs(parsed.query)
 
         response: dict[str, Any] = {}
         status = 200

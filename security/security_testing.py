@@ -183,19 +183,50 @@ class SecurityTestSuite:
 
         start = time.time()
 
+        # Comprehensive SQL injection pattern detection
         sql_patterns = [
-            r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER)\b)",
-            r"(--|#|/\*)",
+            # Basic SQL keywords
+            r"(\b(SELECT|INSERT|UPDATE|DELETE|DROP|UNION|ALTER|CREATE|TRUNCATE|REPLACE)\b)",
+            # Comment indicators
+            r"(--|#|/\*|\*/)",
+            # Boolean-based injection
             r"(\bOR\b\s+\d+\s*=\s*\d+)",
             r"(\bAND\b\s+\d+\s*=\s*\d+)",
-            r"(;\s*(SELECT|INSERT|UPDATE|DELETE))",
+            r"(\bOR\b\s+['\"]?\w+['\"]?\s*=\s*['\"]?\w+['\"]?)",
+            r"(\bAND\b\s+['\"]?\w+['\"]?\s*=\s*['\"]?\w+['\"]?)",
+            # Stacked queries
+            r"(;\s*(SELECT|INSERT|UPDATE|DELETE|DROP|CREATE|ALTER))",
+            # String-based injection
             r"(\'\s*(OR|AND)\s*\')",
+            r"(\"\s*(OR|AND)\s*\")",
+            # Time-based blind injection
+            r"(\b(SLEEP|BENCHMARK|WAITFOR|pg_sleep)\b)",
+            # Union-based injection
+            r"(\bUNION\b\s+(ALL\s+)?SELECT)",
+            # Information schema exploitation
+            r"(\binformation_schema\b)",
+            # Database-specific commands
+            r"(\b(EXEC|EXECUTE|sp_executesql|xp_cmdshell)\b)",
+            # Substring/character extraction
+            r"(\b(SUBSTRING|SUBSTR|MID|CHAR|ASCII)\b\s*\()",
+            # Null byte and encoding bypasses
+            r"(%00|\\x00|\\0)",
+            # Hex encoding
+            r"(0x[0-9a-fA-F]+)",
+            # SQL functions often used in attacks
+            r"(\b(CONCAT|GROUP_CONCAT|LOAD_FILE|INTO\s+OUTFILE)\b)",
+            # Database fingerprinting
+            r"(\b(@@version|version\(\)|user\(\)|database\(\)|schema\(\))\b)",
         ]
 
         detected = []
+        detected_patterns = []
+
         for pattern in sql_patterns:
-            if re.search(pattern, input_data, re.IGNORECASE):
+            match = re.search(pattern, input_data, re.IGNORECASE)
+            if match:
                 detected.append(pattern)
+                detected_patterns.append(match.group(0))
 
         duration = (time.time() - start) * 1000
 
@@ -209,7 +240,10 @@ class SecurityTestSuite:
                 else "No SQL injection patterns detected"
             ),
             duration_ms=duration,
-            details={"patterns_detected": len(detected)},
+            details={
+                "patterns_detected": len(detected),
+                "matched_patterns": detected_patterns[:10],  # Limit to first 10
+            },
         )
 
     def test_xss_patterns(self, input_data: str) -> SecurityTestResult:

@@ -46,7 +46,6 @@ import asyncio
 import hashlib
 import json
 import logging
-import os
 import re
 import subprocess
 import time
@@ -60,16 +59,7 @@ from typing import Any
 from adk.base import AgentConfig, AgentResult, AgentStatus
 from agents.base_super_agent import (
     EnhancedSuperAgent,
-    PromptTechnique,
     SuperAgentType,
-    TaskCategory,
-)
-from orchestration.prompt_engineering import (
-    ChainOfThought,
-    ConstitutionalAI,
-    ReActPrompting,
-    StructuredOutput,
-    TreeOfThoughts,
 )
 
 logger = logging.getLogger(__name__)
@@ -1019,7 +1009,7 @@ class CodingDoctorAgent(EnhancedSuperAgent):
         try:
             task_category = self._infer_task_category(prompt)
             technique = self.select_technique(task_category)
-            enhanced = self.apply_technique(technique, prompt, **kwargs)
+            self.apply_technique(technique, prompt, **kwargs)
 
             result_text = f"Analysis completed using {technique.value} technique"
 
@@ -1296,7 +1286,7 @@ class CodingDoctorAgent(EnhancedSuperAgent):
         if high > 0:
             recommendations.append(f"HIGH: {high} high-severity issues should be fixed soon")
 
-        categories = set(i.category for i in issues)
+        categories = {i.category for i in issues}
 
         if IssueCategory.SECURITY in categories:
             recommendations.append("Security: Review credential handling and input validation")

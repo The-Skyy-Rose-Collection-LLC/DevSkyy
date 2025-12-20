@@ -1,0 +1,204 @@
+groups:
+  - name: security_alerts
+    interval: 30s
+    rules:
+      # Critical: Brute Force Attack Detection
+      - alert: BruteForceAttackDetected
+        expr: rate(security_failed_login_attempts[5m]) > 10
+        for: 2m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Brute force attack detected"
+          description: "High rate of failed login attempts detected: {{ $value }} attempts/sec from {{ $labels.ip_address }}"
+
+      # Critical: SQL Injection Attempt
+      - alert: SQLInjectionAttempt
+        expr: increase(security_injection_attempts_total[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "SQL injection attempt detected"
+          description: "SQL injection attempt from {{ $labels.ip_address }}"
+
+      # High: Rate Limit Exceeded
+      - alert: RateLimitExceeded
+        expr: rate(security_rate_limit_exceeded_total[5m]) > 5
+        for: 3m
+        labels:
+          severity: high
+          category: security
+        annotations:
+          summary: "Rate limit frequently exceeded"
+          description: "IP {{ $labels.ip_address }} exceeding rate limits: {{ $value }} violations/sec"
+
+      # High: Suspicious Activity Pattern
+      - alert: SuspiciousActivityPattern
+        expr: increase(security_suspicious_activity_total[10m]) > 5
+        for: 5m
+        labels:
+          severity: high
+          category: security
+        annotations:
+          summary: "Suspicious activity pattern detected"
+          description: "Unusual activity pattern from {{ $labels.ip_address }}"
+
+      # Medium: Multiple Failed Logins
+      - alert: MultipleFailedLogins
+        expr: increase(security_failed_login_attempts[15m]) > 3
+        for: 5m
+        labels:
+          severity: medium
+          category: security
+        annotations:
+          summary: "Multiple failed login attempts"
+          description: "{{ $value }} failed login attempts from {{ $labels.ip_address }}"
+
+      # Medium: Unauthorized Access Attempt
+      - alert: UnauthorizedAccessAttempt
+        expr: increase(security_access_denied_total[10m]) > 10
+        for: 5m
+        labels:
+          severity: medium
+          category: security
+        annotations:
+          summary: "Repeated unauthorized access attempts"
+          description: "{{ $value }} access denied events from {{ $labels.user_id }}"
+
+      # High: Threat Score Elevated
+      - alert: ThreatScoreElevated
+        expr: security_threat_score > 70
+        for: 5m
+        labels:
+          severity: high
+          category: security
+        annotations:
+          summary: "Security threat score elevated"
+          description: "Current threat score: {{ $value }}"
+
+      # Critical: Threat Score Critical
+      - alert: ThreatScoreCritical
+        expr: security_threat_score > 85
+        for: 2m
+        labels:
+          severity: critical
+          category: security
+        annotations:
+          summary: "Security threat score critical"
+          description: "Critical threat score reached: {{ $value }}"
+
+      # High: Multiple Blocked IPs
+      - alert: MultipleBlockedIPs
+        expr: increase(security_blocked_ips_total[1h]) > 10
+        for: 10m
+        labels:
+          severity: high
+          category: security
+        annotations:
+          summary: "High number of IP blocks"
+          description: "{{ $value }} IPs blocked in the last hour"
+
+      # Medium: Security Alert Unacknowledged
+      - alert: SecurityAlertsUnacknowledged
+        expr: security_alerts_unacknowledged > 5
+        for: 30m
+        labels:
+          severity: medium
+          category: operations
+        annotations:
+          summary: "Multiple unacknowledged security alerts"
+          description: "{{ $value }} security alerts awaiting acknowledgment"
+
+  - name: system_health
+    interval: 30s
+    rules:
+      # Critical: Service Down
+      - alert: ServiceDown
+        expr: up{job="devskyy-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "DevSkyy API service is down"
+          description: "API service {{ $labels.instance }} is not responding"
+
+      # Critical: Database Down
+      - alert: DatabaseDown
+        expr: up{job="postgres-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "PostgreSQL database is down"
+          description: "Database connection lost"
+
+      # Critical: Redis Down
+      - alert: RedisDown
+        expr: up{job="redis-exporter"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          category: infrastructure
+        annotations:
+          summary: "Redis cache is down"
+          description: "Redis connection lost"
+
+      # High: High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes * 100 > 85
+        for: 5m
+        labels:
+          severity: high
+          category: infrastructure
+        annotations:
+          summary: "High memory usage detected"
+          description: "Memory usage is at {{ $value }}%"
+
+      # High: High CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by (instance) (irate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: high
+          category: infrastructure
+        annotations:
+          summary: "High CPU usage detected"
+          description: "CPU usage is at {{ $value }}%"
+
+      # High: Disk Space Low
+      - alert: DiskSpaceLow
+        expr: (node_filesystem_avail_bytes / node_filesystem_size_bytes) * 100 < 15
+        for: 10m
+        labels:
+          severity: high
+          category: infrastructure
+        annotations:
+          summary: "Disk space running low"
+          description: "Disk usage is at {{ $value }}% on {{ $labels.mountpoint }}"
+
+      # Medium: High API Response Time
+      - alert: HighAPIResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 2
+        for: 10m
+        labels:
+          severity: medium
+          category: performance
+        annotations:
+          summary: "API response time degraded"
+          description: "95th percentile response time is {{ $value }}s"
+
+      # Medium: Database Connection Pool Exhausted
+      - alert: DatabaseConnectionPoolExhausted
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: medium
+          category: database
+        annotations:
+          summary: "Database connection pool nearly exhausted"
+          description: "{{ $value }}% of database connections in use"

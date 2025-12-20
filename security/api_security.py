@@ -27,6 +27,13 @@ from fastapi import HTTPException, Request, Response, status
 from pydantic import BaseModel, Field
 from starlette.middleware.base import BaseHTTPMiddleware
 
+try:
+    import redis
+    from redis import Redis
+except ImportError:
+    redis = None  # type: ignore
+    Redis = None  # type: ignore
+
 logger = logging.getLogger(__name__)
 
 
@@ -114,6 +121,109 @@ class RequestSignature(BaseModel):
     key_id: str
 
 
+class NonceCache:
+    """Base class for nonce storage (replay attack prevention)"""
+
+    def add(self, nonce: str, timestamp: int) -> None:
+        """Add nonce to cache"""
+        raise NotImplementedError
+
+    def exists(self, nonce: str, timestamp: int) -> bool:
+        """Check if nonce exists in cache"""
+        raise NotImplementedError
+
+    def cleanup(self) -> None:
+        """Clean up expired nonces"""
+        raise NotImplementedError
+
+
+class InMemoryNonceCache(NonceCache):
+    """In-memory nonce cache (for development/testing)"""
+
+    def __init__(self, expiry_seconds: int = 300):
+        self.used_nonces: set[str] = set()
+        self.expiry_seconds = expiry_seconds
+
+    def add(self, nonce: str, timestamp: int) -> None:
+        """Add nonce to cache"""
+        nonce_key = f"{nonce}:{timestamp}"
+        self.used_nonces.add(nonce_key)
+        self.cleanup()
+
+    def exists(self, nonce: str, timestamp: int) -> bool:
+        """Check if nonce exists"""
+        nonce_key = f"{nonce}:{timestamp}"
+        return nonce_key in self.used_nonces
+
+    def cleanup(self) -> None:
+        """Clean up old nonces"""
+        if len(self.used_nonces) > 10000:
+            self.used_nonces.clear()
+
+
+class RedisNonceCache(NonceCache):
+    """
+    Redis-backed nonce cache for distributed systems.
+
+    Provides distributed replay attack prevention with automatic expiration.
+    Pattern follows RedisTokenBlacklist from jwt_oauth2_auth.py.
+    """
+
+    def __init__(self, redis_client: Redis | None = None, expiry_seconds: int = 300):
+        """
+        Initialize Redis-backed nonce cache.
+
+        Args:
+            redis_client: Redis client instance. If None, creates a new connection.
+            expiry_seconds: TTL for nonces (default: 300 seconds = 5 minutes)
+
+        Raises:
+            RuntimeError: If Redis module is not installed.
+        """
+        if redis is None or Redis is None:
+            msg = "redis package required for RedisNonceCache. Install with: pip install redis"
+            raise RuntimeError(msg)
+
+        if redis_client is None:
+            redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+            self._redis = redis.from_url(redis_url, decode_responses=True)
+        else:
+            self._redis = redis_client
+
+        self.expiry_seconds = expiry_seconds
+        self._nonce_prefix = "request_nonce:"
+
+    def add(self, nonce: str, timestamp: int) -> None:
+        """
+        Add nonce to Redis cache with automatic expiration.
+
+        Args:
+            nonce: Nonce string
+            timestamp: Request timestamp
+        """
+        key = f"{self._nonce_prefix}{nonce}:{timestamp}"
+        # Store with TTL = expiry_seconds
+        self._redis.setex(key, self.expiry_seconds, "1")
+
+    def exists(self, nonce: str, timestamp: int) -> bool:
+        """
+        Check if nonce exists in cache.
+
+        Args:
+            nonce: Nonce to check
+            timestamp: Request timestamp
+
+        Returns:
+            True if nonce exists (replay attack), False otherwise
+        """
+        key = f"{self._nonce_prefix}{nonce}:{timestamp}"
+        return bool(self._redis.exists(key))
+
+    def cleanup(self) -> None:
+        """Not needed for Redis (automatic expiration via TTL)."""
+        pass
+
+
 class APISecurityManager:
     """
     Comprehensive API security manager.
@@ -128,7 +238,7 @@ class APISecurityManager:
     - Request/response validation
     """
 
-    def __init__(self):
+    def __init__(self, nonce_cache: NonceCache | None = None, use_redis: bool = False):
         self.cors_config = CORSConfig()
         self.headers_config = SecurityHeadersConfig()
 
@@ -136,11 +246,31 @@ class APISecurityManager:
         self.api_keys: dict[str, APIKeyConfig] = {}
 
         # Nonce cache for replay attack prevention
-        self.used_nonces: set[str] = set()
+        if nonce_cache:
+            self.nonce_cache = nonce_cache
+        elif use_redis:
+            try:
+                self.nonce_cache = RedisNonceCache()
+                logger.info("Using Redis-backed nonce cache for request signing")
+            except RuntimeError as e:
+                logger.warning(
+                    f"Failed to initialize Redis nonce cache: {e}. Falling back to in-memory cache."
+                )
+                self.nonce_cache = InMemoryNonceCache()
+        else:
+            self.nonce_cache = InMemoryNonceCache()
+
         self.nonce_expiry_seconds = 300  # 5 minutes
 
-        # Request signing secret
-        self.signing_secret = secrets.token_bytes(32)
+        # Request signing secret (from environment or generated)
+        secret_key = os.getenv("REQUEST_SIGNING_SECRET")
+        if secret_key:
+            self.signing_secret = secret_key.encode()
+        else:
+            self.signing_secret = secrets.token_bytes(32)
+            logger.warning(
+                "REQUEST_SIGNING_SECRET not set. Using ephemeral key - not suitable for production."
+            )
 
         # Supported API versions
         self.supported_versions = {"v1", "v2"}
@@ -257,16 +387,12 @@ class APISecurityManager:
             return False
 
         # Check nonce (prevent replay attacks)
-        nonce_key = f"{signature.nonce}:{signature.timestamp}"
-        if nonce_key in self.used_nonces:
+        if self.nonce_cache.exists(signature.nonce, signature.timestamp):
             logger.warning("Request nonce already used (replay attack detected)")
             return False
 
-        # Add nonce to used set
-        self.used_nonces.add(nonce_key)
-
-        # Clean old nonces periodically
-        self._cleanup_old_nonces()
+        # Add nonce to cache
+        self.nonce_cache.add(signature.nonce, signature.timestamp)
 
         # Recreate signature
         payload = f"{request.method}:{request.url.path}:{signature.timestamp}:{signature.nonce}:{hashlib.sha256(body).hexdigest()}"
@@ -277,12 +403,6 @@ class APISecurityManager:
 
         # Constant-time comparison
         return hmac.compare_digest(signature.signature, expected_signature)
-
-    def _cleanup_old_nonces(self):
-        """Clean up expired nonces"""
-        # In production, use Redis with TTL
-        if len(self.used_nonces) > 10000:
-            self.used_nonces.clear()
 
     def validate_api_version(self, version: str) -> tuple[bool, str | None]:
         """Validate API version and return deprecation warning if applicable"""
@@ -323,16 +443,53 @@ class APISecurityManager:
 
 
 class APISecurityMiddleware(BaseHTTPMiddleware):
-    """Middleware for API security enforcement"""
+    """
+    Middleware for API security enforcement.
 
-    def __init__(self, app, security_manager: APISecurityManager = None):
+    Features:
+    - API version validation
+    - Security headers injection
+    - Request signature verification for protected paths
+    - Replay attack prevention
+    """
+
+    def __init__(
+        self,
+        app,
+        security_manager: APISecurityManager = None,
+        protected_paths: list[str] | None = None,
+    ):
+        """
+        Initialize security middleware.
+
+        Args:
+            app: FastAPI application
+            security_manager: Security manager instance
+            protected_paths: List of path patterns requiring request signatures.
+                           Supports wildcards (e.g., "/api/v1/admin/*")
+        """
         super().__init__(app)
         self.security_manager = security_manager or APISecurityManager()
+        self.protected_paths = protected_paths or []
+
+    def _is_protected_path(self, path: str) -> bool:
+        """Check if path requires request signature"""
+        for pattern in self.protected_paths:
+            if pattern.endswith("/*"):
+                # Wildcard match
+                prefix = pattern[:-2]
+                if path.startswith(prefix):
+                    return True
+            elif path == pattern:
+                # Exact match
+                return True
+        return False
 
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
         """Apply security checks and headers"""
-        # Validate API version if present in path
         path = request.url.path
+
+        # Validate API version if present in path
         if path.startswith("/api/"):
             parts = path.split("/")
             if len(parts) >= 3:
@@ -341,6 +498,52 @@ class APISecurityMiddleware(BaseHTTPMiddleware):
 
                 if not is_valid:
                     raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=warning)
+
+        # Verify request signature for protected paths
+        if self._is_protected_path(path):
+            # Extract signature headers
+            timestamp_header = request.headers.get("X-Timestamp")
+            nonce_header = request.headers.get("X-Nonce")
+            signature_header = request.headers.get("X-Signature")
+            key_id_header = request.headers.get("X-Key-ID", "client")
+
+            if not all([timestamp_header, nonce_header, signature_header]):
+                logger.warning(f"Request to protected path {path} missing signature headers")
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Request signature required for this endpoint",
+                    headers={"WWW-Authenticate": "Signature"},
+                )
+
+            try:
+                # Parse signature
+                signature = RequestSignature(
+                    timestamp=int(timestamp_header),
+                    nonce=nonce_header,
+                    signature=signature_header,
+                    key_id=key_id_header,
+                )
+
+                # Read request body for signature verification
+                body = await request.body()
+
+                # Verify signature
+                if not self.security_manager.verify_request_signature(request, signature, body):
+                    logger.warning(f"Invalid signature for request to {path}")
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail="Invalid request signature",
+                        headers={"WWW-Authenticate": "Signature"},
+                    )
+
+                logger.debug(f"Request signature verified for {path}")
+
+            except ValueError as e:
+                logger.warning(f"Invalid signature format: {e}")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Invalid signature format",
+                )
 
         # Process request
         response = await call_next(request)

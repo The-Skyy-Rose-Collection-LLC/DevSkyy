@@ -29,7 +29,7 @@ import os
 import re
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 from anthropic import Anthropic
@@ -54,14 +54,14 @@ class RewrittenQuery(BaseModel):
     original_query: str = Field(description="The original user query")
     rewritten_queries: list[str] = Field(description="List of rewritten query variations")
     strategy_used: str = Field(description="The rewriting strategy applied")
-    reasoning: Optional[str] = Field(default=None, description="Explanation of the rewriting")
+    reasoning: str | None = Field(default=None, description="Explanation of the rewriting")
 
 
 @dataclass
 class QueryRewriterConfig:
     """Configuration for RAG query rewriting"""
 
-    api_key: Optional[str] = None
+    api_key: str | None = None
     model: str = "claude-haiku-4-5-20251001"  # Optimized for speed/cost
     max_tokens: int = 1000
     temperature: float = 0.7
@@ -70,7 +70,7 @@ class QueryRewriterConfig:
     # Redis caching
     cache_enabled: bool = True
     cache_ttl_seconds: int = 86400  # 24 hours
-    redis_url: Optional[str] = None
+    redis_url: str | None = None
 
 
 class AdvancedQueryRewriter:
@@ -84,7 +84,7 @@ class AdvancedQueryRewriter:
     - Async operations
     """
 
-    def __init__(self, config: Optional[QueryRewriterConfig] = None):
+    def __init__(self, config: QueryRewriterConfig | None = None):
         """
         Initialize the query rewriter.
 
@@ -136,10 +136,7 @@ class AdvancedQueryRewriter:
 
         # Skip queries that are already well-formed (contain clear keywords)
         clear_keywords = ["what is", "how do", "explain", "describe", "list"]
-        if any(kw in query.lower() for kw in clear_keywords):
-            return False
-
-        return True
+        return not any(kw in query.lower() for kw in clear_keywords)
 
     def _get_cache_key(self, query: str, strategy: str) -> str:
         """Generate cache key for rewritten query"""
@@ -148,7 +145,7 @@ class AdvancedQueryRewriter:
         content = f"{query}:{strategy}"
         return f"devsky_query_rewrite:{hashlib.md5(content.encode()).hexdigest()}"
 
-    def _get_cached_result(self, query: str, strategy: str) -> Optional[RewrittenQuery]:
+    def _get_cached_result(self, query: str, strategy: str) -> RewrittenQuery | None:
         """Retrieve cached rewritten query"""
         if not self._redis:
             return None
@@ -452,7 +449,7 @@ class RAGPipelineWithRewriting:
 
     def __init__(
         self,
-        rewriter_config: Optional[QueryRewriterConfig] = None,
+        rewriter_config: QueryRewriterConfig | None = None,
         vector_search_func=None,
     ):
         """

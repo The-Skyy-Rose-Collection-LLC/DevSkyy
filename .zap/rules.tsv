@@ -1,0 +1,167 @@
+# ZAP Scan Rule Configuration for DevSkyy Platform
+# Format: <rule_id>	<threshold>	<action>
+# Threshold: OFF, DEFAULT, LOW, MEDIUM, HIGH
+# Action: IGNORE, INFO, WARN, FAIL
+
+# ============================================================================
+# HIGH PRIORITY - FAIL ON DETECTION
+# ============================================================================
+
+# SQL Injection
+40018	HIGH	FAIL
+# SQL Injection - MySQL
+40019	HIGH	FAIL
+# SQL Injection - PostgreSQL
+40020	HIGH	FAIL
+# SQL Injection - SQLite
+40021	HIGH	FAIL
+
+# Cross-Site Scripting (XSS)
+40012	HIGH	FAIL
+# XSS - Reflected
+40014	HIGH	FAIL
+# XSS - Stored
+40016	HIGH	FAIL
+# XSS - DOM Based
+40017	HIGH	FAIL
+
+# Path Traversal
+6	HIGH	FAIL
+
+# Remote File Inclusion
+7	HIGH	FAIL
+
+# Server Side Request Forgery
+40046	HIGH	FAIL
+
+# Remote Code Execution
+20018	HIGH	FAIL
+
+# Command Injection
+90020	HIGH	FAIL
+
+# LDAP Injection
+40015	HIGH	FAIL
+
+# XML External Entity (XXE)
+90023	HIGH	FAIL
+
+# Insecure Deserialization
+90026	HIGH	FAIL
+
+# Authentication Bypass
+10101	HIGH	FAIL
+
+# Session Fixation
+40013	HIGH	FAIL
+
+# ============================================================================
+# MEDIUM PRIORITY - WARN
+# ============================================================================
+
+# Cross-Site Request Forgery (CSRF)
+10202	MEDIUM	WARN
+
+# Missing Anti-CSRF Tokens
+10202	MEDIUM	WARN
+
+# Insecure HTTP Methods
+90028	MEDIUM	WARN
+
+# Cookie Without Secure Flag
+10011	MEDIUM	WARN
+
+# Cookie Without HttpOnly Flag
+10010	MEDIUM	WARN
+
+# Cookie Without SameSite Attribute
+10054	MEDIUM	WARN
+
+# Missing Security Headers
+10020	MEDIUM	WARN
+# X-Content-Type-Options
+10021	MEDIUM	WARN
+# X-Frame-Options
+10020	MEDIUM	WARN
+# Content-Security-Policy
+10038	MEDIUM	WARN
+# Strict-Transport-Security
+10035	MEDIUM	WARN
+
+# Weak Authentication
+10100	MEDIUM	WARN
+
+# Insufficient Transport Layer Protection
+10029	MEDIUM	WARN
+
+# Information Disclosure
+10094	MEDIUM	WARN
+
+# Directory Browsing
+0	MEDIUM	WARN
+
+# Backup File Disclosure
+10095	MEDIUM	WARN
+
+# Source Code Disclosure
+41	MEDIUM	WARN
+
+# ============================================================================
+# LOW PRIORITY - INFO
+# ============================================================================
+
+# User Controllable HTML Element Attribute
+10031	LOW	INFO
+
+# User Controllable JavaScript Event
+10043	LOW	INFO
+
+# Application Error Disclosure
+90022	LOW	INFO
+
+# Server Leaks Version Information
+10036	LOW	INFO
+
+# X-Powered-By Header
+10037	LOW	INFO
+
+# Timestamp Disclosure
+10096	LOW	INFO
+
+# Hash Disclosure
+10097	LOW	INFO
+
+# Email Address Disclosure
+10098	LOW	INFO
+
+# Credit Card Disclosure
+10099	LOW	INFO
+
+# Private IP Disclosure
+2	LOW	INFO
+
+# ============================================================================
+# FALSE POSITIVES - IGNORE (DevSkyy specific)
+# ============================================================================
+
+# Ignore API documentation endpoints - intentional information disclosure
+# These will be handled separately with authentication
+# Adjust based on your needs
+0	DEFAULT	IGNORE
+
+# ============================================================================
+# POLICY SETTINGS
+# ============================================================================
+
+# Enable all passive scanners
+# Passive scanners don't send additional requests, safer for production-like testing
+
+# Enable active scanners but with controlled intensity
+# Active scanners will probe the application more aggressively
+
+# Scanner strength thresholds by category:
+# - Injection attacks: HIGH (comprehensive testing)
+# - XSS attacks: HIGH (comprehensive testing)
+# - Authentication: MEDIUM (avoid account lockouts)
+# - Information disclosure: LOW (avoid excessive noise)
+# - Headers/Config: MEDIUM (balance between coverage and noise)
