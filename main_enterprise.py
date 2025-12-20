@@ -32,7 +32,7 @@ from typing import Any
 
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
 from api.agents import agents_router
@@ -44,6 +44,7 @@ from api.webhooks import WebhookEventType, webhook_manager, webhook_router
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
+from security.api_security import APISecurityManager, APISecurityMiddleware
 from security.jwt_oauth2_auth import (
     RoleChecker,
     TokenPayload,
@@ -51,12 +52,18 @@ from security.jwt_oauth2_auth import (
     auth_router,
     get_current_user,
 )
+from security.prometheus_exporter import get_metrics
+from security.secrets_manager import SecretNotFoundError, SecretsManager
 
 # Configure logging
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Initialize Secrets Manager
+# Auto-detects backend (AWS Secrets Manager, HashiCorp Vault, or local encrypted)
+secrets_manager = SecretsManager()
 
 
 # =============================================================================
@@ -71,11 +78,68 @@ async def lifespan(app: FastAPI):
     logger.info("🚀 DevSkyy Enterprise Platform starting...")
     logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
 
-    # Verify security configuration
-    if not os.getenv("JWT_SECRET_KEY"):
-        logger.warning("⚠️ JWT_SECRET_KEY not set - using ephemeral key (NOT for production)")
-    if not os.getenv("ENCRYPTION_MASTER_KEY"):
-        logger.warning("⚠️ ENCRYPTION_MASTER_KEY not set - using ephemeral key (NOT for production)")
+    # Verify security configuration with secrets manager
+    # Try to load critical secrets from secrets manager, fallback to environment variables
+    try:
+        # JWT Secret Key
+        jwt_secret = secrets_manager.get_or_env(
+            secret_name="jwt/secret_key",
+            env_var="JWT_SECRET_KEY",
+        )
+        if jwt_secret:
+            os.environ["JWT_SECRET_KEY"] = str(jwt_secret)
+            logger.info("✓ JWT_SECRET_KEY loaded from secrets manager")
+        else:
+            logger.warning("⚠️ JWT_SECRET_KEY not found - using ephemeral key (NOT for production)")
+
+        # Encryption Master Key
+        encryption_key = secrets_manager.get_or_env(
+            secret_name="encryption/master_key",
+            env_var="ENCRYPTION_MASTER_KEY",
+        )
+        if encryption_key:
+            os.environ["ENCRYPTION_MASTER_KEY"] = str(encryption_key)
+            logger.info("✓ ENCRYPTION_MASTER_KEY loaded from secrets manager")
+        else:
+            logger.warning(
+                "⚠️ ENCRYPTION_MASTER_KEY not found - using ephemeral key (NOT for production)"
+            )
+
+        # Database URL (if configured)
+        try:
+            db_url = secrets_manager.get_or_env(
+                secret_name="database/connection_string",
+                env_var="DATABASE_URL",
+            )
+            if db_url:
+                os.environ["DATABASE_URL"] = str(db_url)
+                logger.info("✓ DATABASE_URL loaded from secrets manager")
+        except SecretNotFoundError:
+            # Database is optional for some deployments
+            logger.debug("DATABASE_URL not configured in secrets manager")
+
+        # API Keys (optional, for various integrations)
+        api_keys_to_load = [
+            ("openai/api_key", "OPENAI_API_KEY"),
+            ("anthropic/api_key", "ANTHROPIC_API_KEY"),
+            ("google/api_key", "GOOGLE_API_KEY"),
+            ("aws/access_key_id", "AWS_ACCESS_KEY_ID"),
+            ("aws/secret_access_key", "AWS_SECRET_ACCESS_KEY"),
+        ]
+
+        for secret_name, env_var in api_keys_to_load:
+            try:
+                api_key = secrets_manager.get_or_env(secret_name, env_var)
+                if api_key:
+                    os.environ[env_var] = str(api_key)
+                    logger.debug(f"✓ {env_var} loaded from secrets manager")
+            except SecretNotFoundError:
+                # API keys are optional
+                pass
+
+    except Exception as e:
+        logger.error(f"Error loading secrets: {e}", exc_info=True)
+        logger.warning("Falling back to environment variables for all secrets")
 
     yield
 
@@ -157,22 +221,148 @@ version_config = VersionConfig(
 )
 setup_api_versioning(app, version_config)
 
+# API Security Middleware with Request Signing
+# Protected paths requiring request signatures (Phase 2 Task 2)
+protected_paths = [
+    "/api/v1/admin/*",  # All admin operations
+    "/api/v1/agents/*/execute",  # Agent execution endpoints
+    "/api/v1/users/*/delete",  # User deletion
+    "/api/v1/payments/*",  # Payment operations
+    "/api/v1/keys/rotate",  # Key rotation
+]
+
+# Initialize security manager with Redis nonce cache if available
+use_redis = os.getenv("REDIS_URL") is not None
+api_security_manager = APISecurityManager(use_redis=use_redis)
+
+app.add_middleware(
+    APISecurityMiddleware,
+    security_manager=api_security_manager,
+    protected_paths=protected_paths,
+)
+
+logger.info(f"API Security Middleware activated with {len(protected_paths)} protected paths")
+if use_redis:
+    logger.info("Using Redis-backed nonce cache for replay attack prevention")
+else:
+    logger.info("Using in-memory nonce cache (set REDIS_URL for production)")
+
+
+# Tier-based rate limiting middleware
+@app.middleware("http")
+async def tier_rate_limit_middleware(request: Request, call_next):
+    """Enforce tier-based rate limiting for authenticated users"""
+    from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
+
+    from security.jwt_oauth2_auth import jwt_manager
+    from security.rate_limiting import rate_limiter
+
+    # Skip rate limiting for auth endpoints and health checks
+    excluded_paths = [
+        "/api/v1/auth/",
+        "/health",
+        "/ready",
+        "/live",
+        "/docs",
+        "/redoc",
+        "/openapi.json",
+    ]
+    if any(request.url.path.startswith(path) for path in excluded_paths):
+        return await call_next(request)
+
+    # Extract tier from JWT token
+    tier_name = "free"  # Default tier
+    auth_header = request.headers.get("Authorization", "")
+
+    if auth_header.startswith("Bearer "):
+        token = auth_header[7:]
+        try:
+            payload = jwt_manager.validate_token(token)
+            # Extract tier from token claims (will be added in jwt_oauth2_auth.py)
+            tier_name = getattr(payload, "tier", "free")
+            # Store tier in request state for later use
+            request.state.tier = tier_name
+            request.state.user_id = payload.sub
+        except (ExpiredSignatureError, InvalidTokenError):
+            # Token invalid or expired, use free tier
+            tier_name = "free"
+
+    # Check tier-based rate limit
+    try:
+        is_allowed, rate_info = rate_limiter.check_tier_limit(request, tier_name)
+
+        if not is_allowed:
+            from fastapi import HTTPException, status
+
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail=f"Rate limit exceeded for {tier_name} tier",
+                headers={
+                    "X-RateLimit-Limit": str(rate_info.get("limit", 0)),
+                    "X-RateLimit-Remaining": str(rate_info.get("remaining", 0)),
+                    "X-RateLimit-Reset": str(rate_info.get("reset", 0)),
+                    "Retry-After": str(rate_info.get("retry_after", 60)),
+                    "X-RateLimit-Tier": tier_name,
+                },
+            )
+
+        # Add rate limit headers to response
+        response = await call_next(request)
+        response.headers["X-RateLimit-Limit"] = str(rate_info.get("limit", 0))
+        response.headers["X-RateLimit-Remaining"] = str(rate_info.get("remaining", 0))
+        response.headers["X-RateLimit-Reset"] = str(rate_info.get("reset", 0))
+        response.headers["X-RateLimit-Tier"] = tier_name
+
+        return response
+
+    except Exception as e:
+        # Log error but don't block request on rate limiter failure
+        logger.error(f"Rate limiter error: {e}")
+        return await call_next(request)
+
 
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing"""
+    """Log all requests with timing and record Prometheus metrics"""
     import time
+    import uuid
+
+    from security.prometheus_exporter import exporter
 
     start = time.time()
+    request_id = str(uuid.uuid4())
+
+    # Start tracking request for metrics
+    exporter.start_api_request(request_id)
 
     response = await call_next(request)
 
-    duration = (time.time() - start) * 1000
-    logger.info(f"{request.method} {request.url.path} - {response.status_code} - {duration:.2f}ms")
+    duration_seconds = time.time() - start
+    duration_ms = duration_seconds * 1000
+
+    logger.info(
+        f"{request.method} {request.url.path} - {response.status_code} - {duration_ms:.2f}ms"
+    )
+
+    # Record metrics in Prometheus
+    exporter.finish_api_request(
+        request_id=request_id,
+        method=request.method,
+        endpoint=request.url.path,
+        status_code=response.status_code,
+    )
+
+    # Record security event for API requests
+    exporter.record_security_event(
+        event_type="api_request",
+        severity="info" if 200 <= response.status_code < 300 else "warning",
+        source_ip=request.client.host if request.client else "unknown",
+        endpoint=request.url.path,
+    )
 
     # Add timing header
-    response.headers["X-Response-Time"] = f"{duration:.2f}ms"
+    response.headers["X-Response-Time"] = f"{duration_ms:.2f}ms"
 
     return response
 
@@ -248,6 +438,13 @@ async def readiness_check():
 async def liveness_check():
     """Kubernetes liveness probe"""
     return {"alive": True}
+
+
+@app.get("/metrics", tags=["Monitoring"])
+async def metrics():
+    """Prometheus metrics endpoint"""
+    metrics_data = get_metrics()
+    return Response(content=metrics_data, media_type="text/plain; version=0.0.4; charset=utf-8")
 
 
 # =============================================================================

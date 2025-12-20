@@ -26,12 +26,10 @@ import logging
 import secrets
 import time
 from contextlib import contextmanager
-from typing import Any, Optional
+from typing import Any
 
 # Request correlation ID context variable for async compatibility
-_correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar(
-    "correlation_id", default=""
-)
+_correlation_id: contextvars.ContextVar[str] = contextvars.ContextVar("correlation_id", default="")
 
 _user_id: contextvars.ContextVar[str] = contextvars.ContextVar("user_id", default="")
 
@@ -224,7 +222,7 @@ def log_auth_attempt(
     logger: logging.Logger,
     username: str,
     success: bool,
-    reason: Optional[str] = None,
+    reason: str | None = None,
     **context: Any,
 ) -> None:
     """
@@ -257,7 +255,7 @@ def log_api_request(
     path: str,
     status_code: int,
     elapsed_ms: int,
-    user_id: Optional[str] = None,
+    user_id: str | None = None,
     **context: Any,
 ) -> None:
     """

@@ -19,7 +19,7 @@ Usage:
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
+from typing import Any
 
 import structlog
 
@@ -28,7 +28,6 @@ from orchestration.prompt_engineering import PromptTechnique
 from wordpress.collection_page_manager import (
     CollectionDesignTemplates,
     CollectionType,
-    WordPressCollectionPageManager,
 )
 
 logger = structlog.get_logger(__name__)
@@ -51,7 +50,7 @@ class CollectionContentAgent(EnhancedSuperAgent):
     - SIGNATURE: Premium essentials, runway showcase
     """
 
-    def __init__(self, config: Optional[dict[str, Any]] = None):
+    def __init__(self, config: dict[str, Any] | None = None):
         """
         Initialize Collection Content Agent.
 
@@ -78,7 +77,7 @@ class CollectionContentAgent(EnhancedSuperAgent):
         self,
         collection_type: str,
         task: str,
-        context: Optional[dict[str, Any]] = None,
+        context: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """
         Manage collection page content and structure.
@@ -357,7 +356,7 @@ Include exact commands and values to use.
         Returns:
             Design template as dict
         """
-        template = CollectionDesignTemplates.get_template(
+        CollectionDesignTemplates.get_template(
             CollectionType[collection_type.upper()]
         )
 
@@ -374,7 +373,7 @@ Include exact commands and values to use.
 
 
 def create_collection_content_agent(
-    config: Optional[dict[str, Any]] = None,
+    config: dict[str, Any] | None = None,
 ) -> CollectionContentAgent:
     """Factory function to create CollectionContentAgent"""
     return CollectionContentAgent(config)

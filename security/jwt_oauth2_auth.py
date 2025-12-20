@@ -152,6 +152,7 @@ class TokenPayload:
     type: TokenType  # Token type
     roles: list[str]  # User roles
     family_id: str | None = None  # Token family for rotation tracking
+    tier: str = "free"  # Subscription tier (free, starter, pro, enterprise)
     exp: datetime | None = None  # Expiration time
     iat: datetime | None = None  # Issued at time
     iss: str | None = None  # Issuer
@@ -560,6 +561,7 @@ class JWTManager:
         user_id: str,
         roles: list[str],
         family_id: str | None = None,
+        tier: str = "free",
         additional_claims: dict[str, Any] | None = None,
     ) -> str:
         """Create access token."""
@@ -572,6 +574,7 @@ class JWTManager:
             "type": TokenType.ACCESS.value,
             "roles": roles,
             "family_id": family_id or secrets.token_urlsafe(8),
+            "tier": tier,
             "iss": self.config.issuer,
             "aud": self.config.audience,
             "iat": now,
@@ -592,6 +595,7 @@ class JWTManager:
         user_id: str,
         roles: list[str],
         family_id: str,
+        tier: str = "free",
     ) -> str:
         """Create refresh token."""
         now = datetime.now(UTC)
@@ -603,6 +607,7 @@ class JWTManager:
             "type": TokenType.REFRESH.value,
             "roles": roles,
             "family_id": family_id,
+            "tier": tier,
             "iss": self.config.issuer,
             "aud": self.config.audience,
             "iat": now,
@@ -619,6 +624,7 @@ class JWTManager:
         self,
         user_id: str,
         roles: list[str],
+        tier: str = "free",
         additional_claims: dict[str, Any] | None = None,
     ) -> TokenResponse:
         """Create access and refresh token pair."""
@@ -628,6 +634,7 @@ class JWTManager:
             user_id=user_id,
             roles=roles,
             family_id=family_id,
+            tier=tier,
             additional_claims=additional_claims,
         )
 
@@ -635,6 +642,7 @@ class JWTManager:
             user_id=user_id,
             roles=roles,
             family_id=family_id,
+            tier=tier,
         )
 
         return TokenResponse(
@@ -695,6 +703,7 @@ class JWTManager:
             type=TokenType(payload["type"]),
             roles=payload.get("roles", []),
             family_id=payload.get("family_id"),
+            tier=payload.get("tier", "free"),
             exp=datetime.fromtimestamp(payload["exp"], tz=UTC),
             iat=datetime.fromtimestamp(payload["iat"], tz=UTC),
             iss=payload.get("iss"),
@@ -714,17 +723,19 @@ class JWTManager:
         if payload.exp:
             self.blacklist.add(payload.jti, payload.exp)
 
-        # Create new token pair with same family
+        # Create new token pair with same family and tier
         return TokenResponse(
             access_token=self.create_access_token(
                 user_id=payload.sub,
                 roles=payload.roles,
                 family_id=payload.family_id,
+                tier=payload.tier,
             ),
             refresh_token=self.create_refresh_token(
                 user_id=payload.sub,
                 roles=payload.roles,
                 family_id=payload.family_id or secrets.token_urlsafe(8),
+                tier=payload.tier,
             ),
             expires_in=self.config.access_token_expire_minutes * 60,
             refresh_expires_in=self.config.refresh_token_expire_days * 86400,

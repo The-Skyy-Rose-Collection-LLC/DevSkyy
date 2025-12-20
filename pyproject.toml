@@ -47,39 +47,42 @@ dependencies = [
     "uvicorn[standard]>=0.27",
     "pydantic>=2.5",
     "pydantic-settings>=2.1",
-    
+
     # Database
     "sqlalchemy>=2.0",
     "alembic>=1.13",
     "asyncpg>=0.29",
     "aiosqlite>=0.19",
-    
+
     # Caching & Queue
     "redis>=5.0",
     "celery>=5.3",
-    
+
+    # Monitoring
+    "prometheus-client>=0.19",
+
     # HTTP Clients
     "httpx>=0.25",
     "aiohttp>=3.9",
     "requests>=2.31",
     "aiofiles>=23.2",
-    
+
     # Utilities
     "python-dotenv>=1.0",
     "python-multipart>=0.0.6",
     "structlog>=24.1",
     "tenacity>=8.2",
-    
+
     # Security
     "cryptography>=42.0",
     "python-jose[cryptography]>=3.3",
     "passlib[argon2]>=1.7",
     "argon2-cffi>=23.1",
     "pyotp>=2.9",  # MFA/2FA support
-    
+
     # WooCommerce
     "woocommerce>=3.0",
-    
+
     # MCP Server
     "mcp>=1.23.0",  # Fixed: CVE-2025-53365, CVE-2025-53366, CVE-2025-66416
 ]
@@ -264,6 +267,7 @@ markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
+    "security: marks tests as security tests (XSS, CSRF, SQL injection, etc.)",
 ]
 
 # =============================================================================

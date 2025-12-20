@@ -1,0 +1,43 @@
+{
+  "name": "@devskyy/sdk",
+  "version": "1.0.0",
+  "description": "Official TypeScript SDK for DevSkyy Enterprise Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:watch": "tsc --watch",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "devskyy",
+    "api",
+    "sdk",
+    "security",
+    "hmac",
+    "request-signing"
+  ],
+  "author": "DevSkyy",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy.git",
+    "directory": "sdk/typescript"
+  }
+}

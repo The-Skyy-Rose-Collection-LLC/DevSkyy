@@ -10,7 +10,6 @@ Usage:
 
 import asyncio
 import os
-from pathlib import Path
 
 from wordpress import WordPress3DMediaSync
 
@@ -116,7 +115,7 @@ async def demo_bulk_sync():
         success_count = sum(1 for r in results if r["status"] == "success")
         failed_count = sum(1 for r in results if r["status"] == "failed")
 
-        print(f"\nBulk sync complete:")
+        print("\nBulk sync complete:")
         print(f"  Success: {success_count}/{len(results)}")
         print(f"  Failed: {failed_count}/{len(results)}")
 

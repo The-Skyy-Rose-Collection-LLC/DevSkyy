@@ -1,0 +1,162 @@
+# Security Alert Rules for DevSkyy
+# These rules monitor for security threats and anomalous behavior
+
+groups:
+  - name: security_alerts
+    interval: 15s
+    rules:
+      # Alert on high rate of failed login attempts
+      - alert: HighFailedLoginRate
+        expr: |
+          rate(security_events_total{event_type="failed_login"}[2m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          category: authentication
+          team: security
+        annotations:
+          summary: "High failed login rate detected"
+          description: "Failed login rate is {{ $value | humanize }} attempts/sec on {{ $labels.instance }} (threshold: 10/sec)"
+          runbook_url: "https://wiki.devskyy.com/runbooks/high-failed-login-rate"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+
+      # Alert on detected brute force attacks
+      - alert: BruteForceAttackDetected
+        expr: |
+          rate(security_events_total{event_type="brute_force_detected"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: authentication
+          team: security
+        annotations:
+          summary: "Brute force attack detected"
+          description: "Brute force attack detected at {{ $value | humanize }} events/sec on {{ $labels.instance }}"
+          runbook_url: "https://wiki.devskyy.com/runbooks/brute-force-attack"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+          action_required: "Review logs, block IP addresses, notify security team"
+
+      # Alert on SQL injection attempts
+      - alert: SQLInjectionAttempt
+        expr: |
+          rate(security_events_total{event_type="sql_injection_attempt"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: injection
+          team: security
+        annotations:
+          summary: "SQL injection attempt detected"
+          description: "SQL injection attempt detected at {{ $value | humanize }} events/sec on {{ $labels.instance }}"
+          runbook_url: "https://wiki.devskyy.com/runbooks/sql-injection"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+          action_required: "Review request logs, validate WAF rules, block malicious IPs"
+
+      # Alert on XSS (Cross-Site Scripting) attempts
+      - alert: XSSAttempt
+        expr: |
+          rate(security_events_total{event_type="xss_attempt"}[5m]) > 0
+        for: 1m
+        labels:
+          severity: critical
+          category: injection
+          team: security
+        annotations:
+          summary: "XSS attack attempt detected"
+          description: "XSS attempt detected at {{ $value | humanize }} events/sec on {{ $labels.instance }}"
+          runbook_url: "https://wiki.devskyy.com/runbooks/xss-attack"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+          action_required: "Review request payloads, validate input sanitization, update CSP headers"
+
+      # Alert on high threat scores
+      - alert: HighThreatScore
+        expr: |
+          threat_score > 80
+        for: 5m
+        labels:
+          severity: warning
+          category: threat_detection
+          team: security
+        annotations:
+          summary: "High threat score detected"
+          description: "Threat score is {{ $value | humanize }} on {{ $labels.instance }} (threshold: 80, duration: 5m)"
+          runbook_url: "https://wiki.devskyy.com/runbooks/high-threat-score"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+          action_required: "Investigate source IP, review recent activity, consider rate limiting"
+
+      # Alert on sustained very high threat scores
+      - alert: CriticalThreatScore
+        expr: |
+          threat_score > 95
+        for: 2m
+        labels:
+          severity: critical
+          category: threat_detection
+          team: security
+        annotations:
+          summary: "Critical threat score detected"
+          description: "Threat score is {{ $value | humanize }} on {{ $labels.instance }} (threshold: 95, duration: 2m)"
+          runbook_url: "https://wiki.devskyy.com/runbooks/critical-threat-score"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+          action_required: "IMMEDIATE ACTION: Block IP, escalate to security team, review all recent activity"
+
+      # Alert on anomalous API request patterns
+      - alert: AnomalousAPIRequestRate
+        expr: |
+          rate(security_events_total{event_type="api_request"}[5m]) > 100
+        for: 3m
+        labels:
+          severity: warning
+          category: performance
+          team: platform
+        annotations:
+          summary: "Anomalous API request rate detected"
+          description: "API request rate is {{ $value | humanize }} req/sec on {{ $labels.instance }} (threshold: 100/sec)"
+          runbook_url: "https://wiki.devskyy.com/runbooks/high-api-rate"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+
+      # Alert on CSRF token validation failures
+      - alert: CSRFValidationFailures
+        expr: |
+          rate(security_events_total{event_type="csrf_validation_failed"}[5m]) > 5
+        for: 2m
+        labels:
+          severity: warning
+          category: authentication
+          team: security
+        annotations:
+          summary: "High CSRF validation failure rate"
+          description: "CSRF validation failures at {{ $value | humanize }} events/sec on {{ $labels.instance }}"
+          runbook_url: "https://wiki.devskyy.com/runbooks/csrf-failures"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+
+      # Alert on rate limit violations
+      - alert: RateLimitViolations
+        expr: |
+          rate(security_events_total{event_type="rate_limit_exceeded"}[5m]) > 10
+        for: 2m
+        labels:
+          severity: warning
+          category: rate_limiting
+          team: platform
+        annotations:
+          summary: "High rate limit violation rate"
+          description: "Rate limit violations at {{ $value | humanize }} events/sec on {{ $labels.instance }}"
+          runbook_url: "https://wiki.devskyy.com/runbooks/rate-limit-violations"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+
+      # Alert on slow API responses (potential DoS)
+      - alert: SlowAPIResponses
+        expr: |
+          histogram_quantile(0.95, rate(api_request_duration_seconds_bucket[5m])) > 5
+        for: 3m
+        labels:
+          severity: warning
+          category: performance
+          team: platform
+        annotations:
+          summary: "Slow API response times detected"
+          description: "95th percentile API response time is {{ $value | humanize }}s on {{ $labels.instance }} (threshold: 5s)"
+          runbook_url: "https://wiki.devskyy.com/runbooks/slow-api-responses"
+          dashboard_url: "https://grafana.devskyy.com/d/security/security-overview"
+          action_required: "Check for DoS attack, review database queries, check system resources"
