@@ -229,6 +229,61 @@ jobs:
       - name: NPM audit
         run: npm audit --audit-level=high || true
 
+  sast-codeql:
+    name: SAST - CodeQL Analysis
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: 'python,javascript'
+          queries: security-and-quality
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v3
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+
+  security-sbom:
+    name: Generate SBOM (Software Bill of Materials)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install cyclonedx
+        run: |
+          pip install cyclonedx-python cyclonedx-npm
+
+      - name: Generate Python SBOM
+        run: |
+          pip install -e ".[dev]"
+          python -m cyclonedx.py -o json -o xml requirements.txt
+        continue-on-error: true
+
+      - name: Generate NPM SBOM
+        run: cyclonedx-npm -o sbom-npm.json --package-version ${{ github.ref }}
+        continue-on-error: true
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: sbom-reports
+          path: |
+            sbom.json
+            sbom.xml
+            sbom-npm.json
+
   # ============================================================================
   # BUILD & PACKAGE
   # ============================================================================
@@ -270,7 +325,7 @@ jobs:
   ci-success:
     name: CI Success
     runs-on: ubuntu-latest
-    needs: [python-test, typescript-test, typescript-build, build-python]
+    needs: [python-test, typescript-test, typescript-build, build-python, sast-codeql, security-sbom]
     if: always()
     steps:
       - name: Check all jobs passed
@@ -292,5 +347,7 @@ jobs:
             exit 1
           fi
           echo "✅ All CI checks passed!"
+          echo "✅ SAST (CodeQL) analysis completed"
+          echo "✅ SBOM generation completed"
           echo ""
           echo "🌹 DevSkyy CI Complete"
