@@ -1,0 +1,5 @@
+# DAST Reports Directory
+
+This directory stores vulnerability scan reports from OWASP ZAP and Nuclei.
+
+Reports are automatically archived after 30 days to the archive/ subdirectory.
