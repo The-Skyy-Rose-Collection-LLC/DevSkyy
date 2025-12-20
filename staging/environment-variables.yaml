@@ -1,0 +1,725 @@
+# DevSkyy Phase 2 - Environment Variables Documentation
+# Version: 2.0.0
+# Last Updated: 2025-12-19
+
+# ==============================================================================
+# ENVIRONMENT CONFIGURATION
+# ==============================================================================
+
+ENVIRONMENT:
+  description: "Deployment environment identifier"
+  staging_value: "staging"
+  production_value: "production"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+DEBUG:
+  description: "Enable debug mode (verbose logging, detailed errors)"
+  staging_value: "false"
+  production_value: "false"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+  notes: "NEVER enable in production - exposes sensitive information"
+
+LOG_LEVEL:
+  description: "Logging verbosity level"
+  staging_value: "INFO"
+  production_value: "WARNING"
+  required: true
+  valid_values: ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# WEB SERVER CONFIGURATION
+# ==============================================================================
+
+HOST:
+  description: "Server bind address"
+  staging_value: "0.0.0.0"
+  production_value: "0.0.0.0"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+PORT:
+  description: "Server port number"
+  staging_value: "8000"
+  production_value: "8000"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+WORKERS:
+  description: "Number of worker processes"
+  staging_value: "4"
+  production_value: "8"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+  notes: "Adjust based on available CPU cores (2x cores recommended)"
+
+CORS_ORIGINS:
+  description: "Allowed CORS origins (comma-separated)"
+  staging_value: "https://staging.devskyy.com,http://localhost:3000"
+  production_value: "https://devskyy.com,https://www.devskyy.com"
+  required: true
+  security_level: "medium"
+  rotation_policy: "as_needed"
+  notes: "Only include trusted domains"
+
+# ==============================================================================
+# DATABASE CONFIGURATION
+# ==============================================================================
+
+DATABASE_URL:
+  description: "PostgreSQL connection string"
+  staging_value: "postgresql://staging_user:PASSWORD@postgres:5432/devskyy_staging"
+  production_value: "postgresql://prod_user:PASSWORD@postgres:5432/devskyy_production"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+  notes: "Use connection pooling parameters: ?pool_size=20&max_overflow=10"
+  how_to_rotate: |
+    1. Create new database user with strong password
+    2. Grant same permissions as existing user
+    3. Update DATABASE_URL in .env
+    4. Restart application
+    5. Verify connectivity
+    6. Revoke old user permissions
+    7. Drop old user
+
+POSTGRES_DB:
+  description: "PostgreSQL database name"
+  staging_value: "devskyy_staging"
+  production_value: "devskyy_production"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+POSTGRES_USER:
+  description: "PostgreSQL username"
+  staging_value: "staging_user"
+  production_value: "prod_user"
+  required: true
+  security_level: "medium"
+  rotation_policy: "90_days"
+
+POSTGRES_PASSWORD:
+  description: "PostgreSQL password"
+  staging_value: "CHANGE_THIS_PASSWORD"
+  production_value: "MUST_BE_STRONG_PASSWORD"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+  notes: "Minimum 32 characters, use password manager"
+  how_to_generate: "openssl rand -base64 32"
+
+DB_POOL_SIZE:
+  description: "Database connection pool size"
+  staging_value: "20"
+  production_value: "50"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+DB_MAX_OVERFLOW:
+  description: "Maximum overflow connections"
+  staging_value: "10"
+  production_value: "20"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+DB_POOL_TIMEOUT:
+  description: "Connection pool timeout (seconds)"
+  staging_value: "30"
+  production_value: "30"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# REDIS CONFIGURATION
+# ==============================================================================
+
+REDIS_URL:
+  description: "Redis connection string"
+  staging_value: "redis://redis:6379/1"
+  production_value: "redis://redis:6379/0"
+  required: true
+  security_level: "medium"
+  rotation_policy: "never"
+  notes: "Use separate DB index for staging (1) vs production (0)"
+
+REDIS_MAX_CONNECTIONS:
+  description: "Maximum Redis connections"
+  staging_value: "50"
+  production_value: "100"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+REDIS_SOCKET_TIMEOUT:
+  description: "Redis socket timeout (seconds)"
+  staging_value: "5"
+  production_value: "5"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# SECURITY SETTINGS
+# ==============================================================================
+
+SECRET_KEY:
+  description: "Application secret key for signing cookies/sessions"
+  staging_value: "staging-secret-key-CHANGE-IN-PRODUCTION"
+  production_value: "MUST_BE_GENERATED_SECURELY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+  how_to_generate: "openssl rand -base64 64"
+  how_to_rotate: |
+    1. Generate new secret key
+    2. Add NEW_SECRET_KEY to environment
+    3. Update application to support both keys during transition
+    4. Deploy application
+    5. After 24 hours, remove old SECRET_KEY
+    6. Deploy again
+
+JWT_SECRET_KEY:
+  description: "JWT signing secret"
+  staging_value: "staging-jwt-key-CHANGE-IN-PRODUCTION"
+  production_value: "MUST_BE_GENERATED_SECURELY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+  how_to_generate: "openssl rand -base64 64"
+  notes: "Rotation invalidates all existing tokens"
+
+ENCRYPTION_MASTER_KEY:
+  description: "Master key for data encryption (AES-256-GCM)"
+  staging_value: "CHANGE_THIS_BASE64_ENCODED_KEY"
+  production_value: "MUST_BE_32_BYTES_BASE64_ENCODED"
+  required: true
+  security_level: "critical"
+  rotation_policy: "180_days"
+  how_to_generate: "openssl rand -base64 32"
+  notes: "CRITICAL: Rotation requires re-encrypting all data"
+  how_to_rotate: |
+    1. Generate new master key
+    2. Add NEW_ENCRYPTION_MASTER_KEY to environment
+    3. Run migration script to re-encrypt all data with new key
+    4. Verify all data re-encrypted successfully
+    5. Update ENCRYPTION_MASTER_KEY to new value
+    6. Remove NEW_ENCRYPTION_MASTER_KEY
+    7. Restart application
+
+SESSION_COOKIE_SECURE:
+  description: "Require HTTPS for session cookies"
+  staging_value: "true"
+  production_value: "true"
+  required: true
+  security_level: "high"
+  rotation_policy: "never"
+
+SESSION_COOKIE_HTTPONLY:
+  description: "Prevent JavaScript access to session cookies"
+  staging_value: "true"
+  production_value: "true"
+  required: true
+  security_level: "high"
+  rotation_policy: "never"
+
+SESSION_COOKIE_SAMESITE:
+  description: "SameSite cookie policy"
+  staging_value: "lax"
+  production_value: "strict"
+  required: true
+  valid_values: ["strict", "lax", "none"]
+  security_level: "high"
+  rotation_policy: "never"
+
+SESSION_MAX_AGE:
+  description: "Session timeout (seconds)"
+  staging_value: "3600"
+  production_value: "1800"
+  required: true
+  security_level: "medium"
+  rotation_policy: "never"
+
+MFA_ENABLED:
+  description: "Enable multi-factor authentication"
+  staging_value: "true"
+  production_value: "true"
+  required: true
+  security_level: "critical"
+  rotation_policy: "never"
+
+RATE_LIMIT_ENABLED:
+  description: "Enable rate limiting"
+  staging_value: "true"
+  production_value: "true"
+  required: true
+  security_level: "high"
+  rotation_policy: "never"
+
+REQUEST_SIGNING_ENABLED:
+  description: "Enable request signature verification"
+  staging_value: "true"
+  production_value: "true"
+  required: true
+  security_level: "high"
+  rotation_policy: "never"
+
+# ==============================================================================
+# LLM API KEYS
+# ==============================================================================
+
+OPENAI_API_KEY:
+  description: "OpenAI API key"
+  staging_value: "sk-staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "sk-prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+  notes: "Use separate keys for staging with spending limits"
+  how_to_rotate: |
+    1. Generate new API key in OpenAI dashboard
+    2. Set spending limit for new key
+    3. Update OPENAI_API_KEY in environment
+    4. Restart application
+    5. Verify new key works
+    6. Revoke old key in OpenAI dashboard
+
+ANTHROPIC_API_KEY:
+  description: "Anthropic Claude API key"
+  staging_value: "sk-ant-staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "sk-ant-prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+GOOGLE_API_KEY:
+  description: "Google AI (Gemini, Imagen, Veo) API key"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+MISTRAL_API_KEY:
+  description: "Mistral AI API key"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+COHERE_API_KEY:
+  description: "Cohere API key"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+GROQ_API_KEY:
+  description: "Groq API key"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+LLM_TIMEOUT:
+  description: "LLM API request timeout (seconds)"
+  staging_value: "30"
+  production_value: "30"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+LLM_MAX_RETRIES:
+  description: "Maximum retry attempts for LLM API calls"
+  staging_value: "3"
+  production_value: "3"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+LLM_RATE_LIMIT_PER_MINUTE:
+  description: "Rate limit for LLM API calls (per minute)"
+  staging_value: "60"
+  production_value: "120"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# VECTOR STORE CONFIGURATION
+# ==============================================================================
+
+PINECONE_API_KEY:
+  description: "Pinecone vector database API key"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+PINECONE_ENVIRONMENT:
+  description: "Pinecone environment"
+  staging_value: "staging"
+  production_value: "production"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+PINECONE_INDEX_NAME:
+  description: "Pinecone index name"
+  staging_value: "devskyy-staging"
+  production_value: "devskyy-production"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+CHROMA_PERSIST_DIRECTORY:
+  description: "ChromaDB persistence directory (local fallback)"
+  staging_value: "/app/data/chroma"
+  production_value: "/app/data/chroma"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+CHROMA_COLLECTION_NAME:
+  description: "ChromaDB collection name"
+  staging_value: "devskyy_staging"
+  production_value: "devskyy_production"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# VISUAL GENERATION API KEYS
+# ==============================================================================
+
+TRIPO3D_API_KEY:
+  description: "Tripo3D API key for 3D model generation"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+FASHN_API_KEY:
+  description: "FASHN API key for virtual try-on"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+GOOGLE_IMAGEN_API_KEY:
+  description: "Google Imagen API key (may be same as GOOGLE_API_KEY)"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: false
+  security_level: "critical"
+  rotation_policy: "90_days"
+  notes: "Often same as GOOGLE_API_KEY"
+
+# ==============================================================================
+# WORDPRESS INTEGRATION
+# ==============================================================================
+
+WORDPRESS_URL:
+  description: "WordPress site URL"
+  staging_value: "https://staging.skyyrose.com"
+  production_value: "https://skyyrose.com"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+WORDPRESS_USERNAME:
+  description: "WordPress admin username"
+  staging_value: "staging_admin"
+  production_value: "prod_admin"
+  required: true
+  security_level: "medium"
+  rotation_policy: "never"
+
+WORDPRESS_PASSWORD:
+  description: "WordPress admin password"
+  staging_value: "CHANGE_THIS_PASSWORD"
+  production_value: "MUST_BE_STRONG_PASSWORD"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+WORDPRESS_API_KEY:
+  description: "WordPress REST API application password"
+  staging_value: "staging-REPLACE-WITH-YOUR-KEY"
+  production_value: "prod-REPLACE-WITH-YOUR-KEY"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+# ==============================================================================
+# MONITORING & ALERTING
+# ==============================================================================
+
+PROMETHEUS_SCRAPE_INTERVAL:
+  description: "Prometheus scrape interval"
+  staging_value: "15s"
+  production_value: "15s"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+PROMETHEUS_RETENTION_DAYS:
+  description: "Prometheus data retention (days)"
+  staging_value: "30"
+  production_value: "90"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+GRAFANA_ADMIN_USER:
+  description: "Grafana admin username"
+  staging_value: "admin"
+  production_value: "admin"
+  required: true
+  security_level: "medium"
+  rotation_policy: "never"
+
+GRAFANA_ADMIN_PASSWORD:
+  description: "Grafana admin password"
+  staging_value: "CHANGE_THIS_PASSWORD"
+  production_value: "MUST_BE_STRONG_PASSWORD"
+  required: true
+  security_level: "critical"
+  rotation_policy: "90_days"
+
+GRAFANA_ROOT_URL:
+  description: "Grafana external URL"
+  staging_value: "https://staging.devskyy.com/grafana"
+  production_value: "https://devskyy.com/grafana"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+SLACK_WEBHOOK_URL:
+  description: "Slack webhook URL for alerts"
+  staging_value: "https://hooks.slack.com/services/YOUR/STAGING/WEBHOOK"
+  production_value: "https://hooks.slack.com/services/YOUR/PROD/WEBHOOK"
+  required: true
+  security_level: "critical"
+  rotation_policy: "180_days"
+  notes: "Keep staging and production webhooks separate"
+  how_to_rotate: |
+    1. Create new Slack incoming webhook
+    2. Update SLACK_WEBHOOK_URL
+    3. Test alert delivery
+    4. Deactivate old webhook
+
+PAGERDUTY_SERVICE_KEY:
+  description: "PagerDuty integration key"
+  staging_value: "REPLACE_WITH_YOUR_KEY"
+  production_value: "REPLACE_WITH_YOUR_KEY"
+  required: false
+  security_level: "high"
+  rotation_policy: "180_days"
+
+EMAIL_ALERT_TO:
+  description: "Email address for critical alerts"
+  staging_value: "staging-alerts@devskyy.com"
+  production_value: "alerts@devskyy.com"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# LOGGING CONFIGURATION
+# ==============================================================================
+
+LOG_FORMAT:
+  description: "Log output format"
+  staging_value: "json"
+  production_value: "json"
+  required: true
+  valid_values: ["json", "text"]
+  security_level: "low"
+  rotation_policy: "never"
+
+LOG_OUTPUT:
+  description: "Log file path"
+  staging_value: "/app/logs/devskyy.log"
+  production_value: "/app/logs/devskyy.log"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+LOG_ROTATION:
+  description: "Log rotation schedule"
+  staging_value: "daily"
+  production_value: "daily"
+  required: false
+  valid_values: ["daily", "weekly", "size"]
+  security_level: "low"
+  rotation_policy: "never"
+
+LOG_RETENTION_DAYS:
+  description: "Log retention period (days)"
+  staging_value: "30"
+  production_value: "90"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+LOKI_PUSH_URL:
+  description: "Loki push endpoint"
+  staging_value: "http://loki:3100/loki/api/v1/push"
+  production_value: "http://loki:3100/loki/api/v1/push"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# RATE LIMITING
+# ==============================================================================
+
+RATE_LIMIT_STORAGE:
+  description: "Redis URL for rate limit storage"
+  staging_value: "redis://redis:6379/2"
+  production_value: "redis://redis:6379/2"
+  required: true
+  security_level: "medium"
+  rotation_policy: "never"
+
+RATE_LIMIT_DEFAULT:
+  description: "Default rate limit"
+  staging_value: "100/hour"
+  production_value: "1000/hour"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+RATE_LIMIT_AUTH:
+  description: "Rate limit for authenticated users"
+  staging_value: "1000/hour"
+  production_value: "5000/hour"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+RATE_LIMIT_API:
+  description: "API rate limit"
+  staging_value: "5000/day"
+  production_value: "50000/day"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# FILE STORAGE
+# ==============================================================================
+
+UPLOAD_DIRECTORY:
+  description: "Directory for uploaded files"
+  staging_value: "/app/uploads"
+  production_value: "/app/uploads"
+  required: true
+  security_level: "low"
+  rotation_policy: "never"
+
+MAX_UPLOAD_SIZE_MB:
+  description: "Maximum upload file size (MB)"
+  staging_value: "50"
+  production_value: "100"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+ALLOWED_EXTENSIONS:
+  description: "Allowed file extensions (comma-separated)"
+  staging_value: "jpg,jpeg,png,gif,pdf,glb,gltf"
+  production_value: "jpg,jpeg,png,gif,pdf,glb,gltf,fbx"
+  required: false
+  security_level: "medium"
+  rotation_policy: "never"
+
+# ==============================================================================
+# FEATURE FLAGS
+# ==============================================================================
+
+FEATURE_LLM_ROUND_TABLE:
+  description: "Enable LLM Round Table feature"
+  staging_value: "true"
+  production_value: "true"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+FEATURE_AB_TESTING:
+  description: "Enable A/B testing feature"
+  staging_value: "true"
+  production_value: "true"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+FEATURE_AUTO_DEPLOYMENT:
+  description: "Enable automated WordPress deployment"
+  staging_value: "false"
+  production_value: "false"
+  required: false
+  security_level: "medium"
+  rotation_policy: "never"
+
+FEATURE_3D_GENERATION:
+  description: "Enable 3D asset generation"
+  staging_value: "true"
+  production_value: "true"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+FEATURE_VISUAL_TRY_ON:
+  description: "Enable virtual try-on feature"
+  staging_value: "true"
+  production_value: "true"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+# ==============================================================================
+# DEPLOYMENT METADATA
+# ==============================================================================
+
+DEPLOYMENT_VERSION:
+  description: "Application version"
+  staging_value: "2.0.0"
+  production_value: "2.0.0"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+GIT_COMMIT_SHA:
+  description: "Git commit SHA"
+  staging_value: "auto-populated-by-ci"
+  production_value: "auto-populated-by-ci"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
+
+BUILD_NUMBER:
+  description: "CI/CD build number"
+  staging_value: "auto-populated-by-ci"
+  production_value: "auto-populated-by-ci"
+  required: false
+  security_level: "low"
+  rotation_policy: "never"
