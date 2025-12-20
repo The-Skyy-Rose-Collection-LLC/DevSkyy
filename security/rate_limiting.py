@@ -62,6 +62,65 @@ class RateLimitRule(BaseModel):
             self.burst_limit = self.requests_per_minute * 2
 
 
+class RateLimitTier(BaseModel):
+    """Subscription tier configuration for tiered rate limiting"""
+
+    name: str
+    requests_per_minute: int
+    requests_per_hour: int
+    requests_per_day: int
+    burst_size: int
+    cost: float  # Monthly cost in USD
+
+    def to_rule(self, name_prefix: str = "") -> RateLimitRule:
+        """Convert tier to RateLimitRule"""
+        return RateLimitRule(
+            name=f"{name_prefix}{self.name}" if name_prefix else self.name,
+            limit_type=RateLimitType.USER_BASED,
+            requests_per_minute=self.requests_per_minute,
+            requests_per_hour=self.requests_per_hour,
+            requests_per_day=self.requests_per_day,
+            burst_limit=self.burst_size,
+        )
+
+
+# Subscription tier definitions
+RATE_LIMIT_TIERS: dict[str, RateLimitTier] = {
+    "free": RateLimitTier(
+        name="free",
+        requests_per_minute=10,
+        requests_per_hour=100,
+        requests_per_day=1000,
+        burst_size=15,
+        cost=0.0,
+    ),
+    "starter": RateLimitTier(
+        name="starter",
+        requests_per_minute=100,
+        requests_per_hour=5000,
+        requests_per_day=50000,
+        burst_size=150,
+        cost=29.0,
+    ),
+    "pro": RateLimitTier(
+        name="pro",
+        requests_per_minute=500,
+        requests_per_hour=25000,
+        requests_per_day=250000,
+        burst_size=750,
+        cost=99.0,
+    ),
+    "enterprise": RateLimitTier(
+        name="enterprise",
+        requests_per_minute=2000,
+        requests_per_hour=100000,
+        requests_per_day=1000000,
+        burst_size=3000,
+        cost=499.0,
+    ),
+}
+
+
 class TokenBucket:
     """Token bucket for rate limiting"""
 
@@ -242,6 +301,26 @@ class AdvancedRateLimiter:
         """Remove IP from blacklist after specified time"""
         await asyncio.sleep(seconds)
         self.ip_blacklist.discard(ip)
+
+    def check_tier_limit(self, request: Request, tier_name: str = "free") -> tuple[bool, dict]:
+        """
+        Check if request is within subscription tier rate limits.
+
+        Args:
+            request: FastAPI request object
+            tier_name: Subscription tier name (free, starter, pro, enterprise)
+
+        Returns:
+            Tuple of (is_allowed, rate_limit_info)
+        """
+        # Get tier configuration
+        tier = RATE_LIMIT_TIERS.get(tier_name, RATE_LIMIT_TIERS["free"])
+
+        # Convert tier to rate limit rule
+        rule = tier.to_rule(name_prefix="tier_")
+
+        # Use standard rate limit checking
+        return self.check_rate_limit(request, rule)
 
     def check_rate_limit(self, request: Request, rule: RateLimitRule) -> tuple[bool, dict]:
         """Check if request is within rate limits"""

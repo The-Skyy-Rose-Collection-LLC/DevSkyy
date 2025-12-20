@@ -12,16 +12,19 @@ Usage Examples:
 """
 
 import asyncio
-from typing import Optional
 
 import structlog
 
 from orchestration.document_ingestion import DocumentIngestionPipeline
-from orchestration.embedding_engine import EmbeddingConfig, EmbeddingProvider, create_embedding_engine
+from orchestration.embedding_engine import (
+    EmbeddingConfig,
+    EmbeddingProvider,
+    create_embedding_engine,
+)
 from orchestration.query_rewriter import (
     AdvancedQueryRewriter,
-    QueryRewriteStrategy,
     QueryRewriterConfig,
+    QueryRewriteStrategy,
     RAGPipelineWithRewriting,
 )
 from orchestration.vector_store import VectorDBType, VectorStoreConfig, create_vector_store
@@ -221,7 +224,7 @@ async def example_batch_rewriting():
     )
 
     print(f"\n✅ Completed {len(results)} rewrites")
-    for original, result in zip(queries, results):
+    for original, result in zip(queries, results, strict=False):
         print(f"\nOriginal: {original}")
         print(f"Rewritten: {result.rewritten_queries[0]}")
 

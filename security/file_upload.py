@@ -25,12 +25,9 @@ from __future__ import annotations
 import hashlib
 import logging
 import mimetypes
-import os
 import secrets
 from dataclasses import dataclass
-from datetime import UTC, datetime
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -62,26 +59,65 @@ class FileUploadConfig:
         if self.allowed_extensions is None:
             self.allowed_extensions = {
                 # Documents
-                "pdf", "doc", "docx", "xls", "xlsx", "ppt", "pptx",
-                "txt", "csv", "json", "xml",
+                "pdf",
+                "doc",
+                "docx",
+                "xls",
+                "xlsx",
+                "ppt",
+                "pptx",
+                "txt",
+                "csv",
+                "json",
+                "xml",
                 # Images
-                "jpg", "jpeg", "png", "gif", "webp", "svg",
+                "jpg",
+                "jpeg",
+                "png",
+                "gif",
+                "webp",
+                "svg",
                 # Archives
-                "zip", "tar", "gz",
+                "zip",
+                "tar",
+                "gz",
                 # Media
-                "mp4", "webm", "mp3", "wav",
+                "mp4",
+                "webm",
+                "mp3",
+                "wav",
             }
 
         if self.blocked_extensions is None:
             self.blocked_extensions = {
                 # Executables
-                "exe", "dll", "so", "dylib", "com", "msi", "app",
+                "exe",
+                "dll",
+                "so",
+                "dylib",
+                "com",
+                "msi",
+                "app",
                 # Scripts
-                "js", "py", "rb", "php", "jsp", "asp", "sh", "bash",
+                "js",
+                "py",
+                "rb",
+                "php",
+                "jsp",
+                "asp",
+                "sh",
+                "bash",
                 # System files
-                "bat", "cmd", "ps1", "reg", "scr", "vbs",
+                "bat",
+                "cmd",
+                "ps1",
+                "reg",
+                "scr",
+                "vbs",
                 # Archives with unknown contents
-                "rar", "7z", "iso",
+                "rar",
+                "7z",
+                "iso",
             }
 
         if self.allowed_mime_types is None:
@@ -131,7 +167,7 @@ class FileUploadConfig:
 class FileValidator:
     """Validates uploaded files."""
 
-    def __init__(self, config: Optional[FileUploadConfig] = None) -> None:
+    def __init__(self, config: FileUploadConfig | None = None) -> None:
         """Initialize validator with configuration."""
         self.config = config or FileUploadConfig()
 
@@ -156,10 +192,7 @@ class FileValidator:
             return False
 
         # Check if filename contains null bytes
-        if "\0" in filename:
-            return False
-
-        return True
+        return "\x00" not in filename
 
     def validate_extension(self, filename: str) -> bool:
         """
@@ -241,7 +274,7 @@ class FileValidator:
             return False
 
         # Verify MIME type matches extension
-        ext = filename.rsplit(".", 1)[1].lower() if "." in filename else ""
+        filename.rsplit(".", 1)[1].lower() if "." in filename else ""
         expected_types = mimetypes.guess_type(filename)[0]
         if expected_types and content_type not in expected_types:
             logger.warning(f"MIME type mismatch for {filename}: {content_type}")
@@ -253,7 +286,7 @@ class FileValidator:
 class FileUploader:
     """Secure file upload handler."""
 
-    def __init__(self, config: Optional[FileUploadConfig] = None) -> None:
+    def __init__(self, config: FileUploadConfig | None = None) -> None:
         """Initialize uploader."""
         self.config = config or FileUploadConfig()
         self.validator = FileValidator(config)
@@ -261,7 +294,7 @@ class FileUploader:
     def generate_safe_filename(
         self,
         original_filename: str,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
     ) -> str:
         """
         Generate a safe filename.
@@ -274,18 +307,12 @@ class FileUploader:
             Safe filename
         """
         # Extract extension
-        if "." not in original_filename:
-            ext = ""
-        else:
-            ext = original_filename.rsplit(".", 1)[1].lower()
+        ext = "" if "." not in original_filename else original_filename.rsplit(".", 1)[1].lower()
 
         # Generate random filename
         random_part = secrets.token_hex(16)
 
-        if user_id:
-            filename = f"{user_id}_{random_part}"
-        else:
-            filename = random_part
+        filename = f"{user_id}_{random_part}" if user_id else random_part
 
         if ext:
             filename = f"{filename}.{ext}"
@@ -335,7 +362,7 @@ class FileUploader:
         self,
         file_content: bytes,
         original_filename: str,
-        user_id: Optional[str] = None,
+        user_id: str | None = None,
     ) -> tuple[bool, str]:
         """
         Save uploaded file securely.
@@ -369,7 +396,7 @@ class FileUploader:
                 return False, ""
 
             logger.info(
-                f"File uploaded successfully",
+                "File uploaded successfully",
                 extra={
                     "original_filename": original_filename,
                     "stored_filename": safe_filename,

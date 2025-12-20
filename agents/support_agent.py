@@ -405,10 +405,7 @@ Escalate to human support when:
 
         # Check order value if provided
         order_value = context.get("order_value", 0)
-        if order_value > 500:
-            return True
-
-        return False
+        return order_value > 500
 
     async def _handle_escalation(
         self,

@@ -1,0 +1,230 @@
+# Zero Trust Architecture Configuration
+# This configuration defines Zero Trust security settings for DevSkyy
+
+zero_trust:
+  # Enable Zero Trust security features
+  # Set to true in production environments
+  enabled: false
+
+  # Certificate Authority type
+  # Options: self-signed (development), vault (production), cert-manager (Kubernetes)
+  ca_type: self-signed
+
+  # Directory for storing certificates
+  # Ensure this directory has appropriate permissions (0700)
+  cert_dir: /etc/devskyy/certs
+
+  # Automatic certificate rotation
+  auto_rotate: true
+
+  # Certificate rotation period in days
+  # Certificates will be rotated before expiry
+  cert_rotation_days: 30
+
+  # Peer verification settings
+  require_peer_verification: true
+  allow_insecure_connections: false
+
+  # Certificate chain validation
+  max_cert_chain_depth: 3
+
+  # Certificate revocation checking
+  crl_check_enabled: true
+  ocsp_check_enabled: false
+
+  # Cryptographic settings
+  key_size: 4096
+  signature_algorithm: SHA256
+
+  # Service definitions
+  # Each service requiring Zero Trust security must be listed here
+  services:
+    # API Gateway
+    - name: api
+      port: 8000
+      require_mtls: true
+      allowed_peers:
+        - database
+        - redis
+        - commerce-agent
+        - marketing-agent
+        - analytics-agent
+
+    # Database
+    - name: database
+      port: 5432
+      require_mtls: true
+      allowed_peers:
+        - api
+        - commerce-agent
+        - analytics-agent
+        - operations-agent
+
+    # Redis Cache
+    - name: redis
+      port: 6379
+      require_mtls: false  # Redis typically doesn't require mTLS in dev
+      allowed_peers:
+        - api
+        - commerce-agent
+        - marketing-agent
+
+    # Commerce Agent
+    - name: commerce-agent
+      port: 8001
+      require_mtls: true
+      allowed_peers:
+        - api
+        - database
+        - redis
+        - analytics-agent
+
+    # Creative Agent
+    - name: creative-agent
+      port: 8002
+      require_mtls: true
+      allowed_peers:
+        - api
+        - marketing-agent
+
+    # Marketing Agent
+    - name: marketing-agent
+      port: 8003
+      require_mtls: true
+      allowed_peers:
+        - api
+        - redis
+        - creative-agent
+        - analytics-agent
+
+    # Support Agent
+    - name: support-agent
+      port: 8004
+      require_mtls: true
+      allowed_peers:
+        - api
+        - database
+        - analytics-agent
+
+    # Operations Agent
+    - name: operations-agent
+      port: 8005
+      require_mtls: true
+      allowed_peers:
+        - api
+        - database
+
+    # Analytics Agent
+    - name: analytics-agent
+      port: 8006
+      require_mtls: true
+      allowed_peers:
+        - api
+        - database
+        - commerce-agent
+        - marketing-agent
+        - support-agent
+
+    # LLM Orchestrator
+    - name: llm-orchestrator
+      port: 8007
+      require_mtls: true
+      allowed_peers:
+        - api
+        - commerce-agent
+        - creative-agent
+        - marketing-agent
+        - support-agent
+        - operations-agent
+        - analytics-agent
+
+    # Frontend Next.js
+    - name: frontend
+      port: 3000
+      require_mtls: false  # Public-facing, uses OAuth/JWT
+      allowed_peers: []
+
+    # Prometheus Metrics
+    - name: prometheus
+      port: 9090
+      require_mtls: true
+      allowed_peers:
+        - api
+        - commerce-agent
+        - creative-agent
+        - marketing-agent
+        - support-agent
+        - operations-agent
+        - analytics-agent
+
+  # Network policies
+  network_policies:
+    # Default deny all traffic
+    default_policy: deny
+
+    # Egress rules
+    egress:
+      # Allow DNS queries
+      - protocol: UDP
+        port: 53
+        destination: any
+
+      # Allow HTTPS to external APIs
+      - protocol: TCP
+        port: 443
+        destination: external
+        services:
+          - api
+          - commerce-agent
+          - creative-agent
+          - marketing-agent
+
+    # Ingress rules
+    ingress:
+      # Allow health checks
+      - protocol: TCP
+        port: 8080
+        path: /health
+        allow_unauthenticated: true
+
+      # Allow metrics scraping from Prometheus
+      - protocol: TCP
+        port: 9090
+        source: prometheus
+        allow_authenticated: true
+
+  # Authentication settings
+  authentication:
+    # Service account token validity
+    token_ttl: 3600  # 1 hour
+
+    # JWT settings for service-to-service auth
+    jwt:
+      algorithm: ES256
+      issuer: devskyy-zero-trust
+      audience: devskyy-services
+
+  # Monitoring and alerting
+  monitoring:
+    # Log all mTLS connections
+    log_connections: true
+
+    # Alert on certificate expiry
+    alert_days_before_expiry: 7
+
+    # Alert on authentication failures
+    alert_on_auth_failure: true
+
+    # Maximum authentication failures before alerting
+    max_auth_failures: 5
+
+  # Production overrides
+  # Uncomment and modify for production deployment
+  # production:
+  #   enabled: true
+  #   ca_type: vault
+  #   vault_url: https://vault.devskyy.com
+  #   vault_pki_path: pki
+  #   cert_rotation_days: 90
+  #   require_peer_verification: true
+  #   allow_insecure_connections: false

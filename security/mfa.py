@@ -25,7 +25,6 @@ import logging
 import secrets
 from dataclasses import dataclass
 from datetime import UTC, datetime, timedelta
-from typing import Optional
 
 try:
     import pyotp
@@ -61,7 +60,7 @@ class MFAManager:
     TOTP is implemented using pyotp library with RFC 6238.
     """
 
-    def __init__(self, config: Optional[MFAConfig] = None) -> None:
+    def __init__(self, config: MFAConfig | None = None) -> None:
         """
         Initialize MFA manager.
 
@@ -161,10 +160,7 @@ class MFAManager:
         normalized = backup_code.replace(" ", "").replace("-", "").upper()
 
         # Check if it matches format and hasn't been used
-        if len(normalized) == 8 and normalized not in used_codes:
-            return True
-
-        return False
+        return bool(len(normalized) == 8 and normalized not in used_codes)
 
     def _generate_backup_codes(self) -> list[str]:
         """
@@ -202,7 +198,7 @@ class MFASession:
         self.user_id = user_id
         self.verified_at = datetime.now(UTC)
         self.expires_at = self.verified_at + timedelta(seconds=ttl_seconds)
-        self.verification_method: Optional[str] = None
+        self.verification_method: str | None = None
         self.used_backup_codes: set[str] = set()
 
     def is_valid(self) -> bool:

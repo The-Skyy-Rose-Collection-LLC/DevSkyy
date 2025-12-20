@@ -11,12 +11,9 @@ Specialized toolkits for advanced code analysis:
 
 from __future__ import annotations
 
-import json
 import logging
 import re
-from abc import ABC, abstractmethod
-from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -965,11 +962,11 @@ class LLMBestPracticesKB:
                 patterns = self.BEST_PRACTICES.get(language, {})
                 combined_patterns = {**patterns, **self._custom_patterns.get(language, {})}
 
-                for name, config in combined_patterns.items():
+                for _name, config in combined_patterns.items():
                     issues.extend(self._check_pattern(content, lines, rel_path, config))
 
                 # Check architecture patterns
-                for name, config in self.ARCHITECTURE_PATTERNS.items():
+                for _name, config in self.ARCHITECTURE_PATTERNS.items():
                     issues.extend(self._check_pattern(content, lines, rel_path, config))
 
         except Exception as e:
@@ -2886,7 +2883,7 @@ window.addEventListener('focus', startLoop);
 
         try:
             content = file_path.read_text()
-            lines = content.split("\n")
+            content.split("\n")
             rel_path = str(file_path.relative_to(self.repo_root))
 
             # Check for common rendering issues

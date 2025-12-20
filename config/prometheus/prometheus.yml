@@ -1,0 +1,74 @@
+# Prometheus Configuration for DevSkyy Security Monitoring
+# Global configuration settings
+
+global:
+  scrape_interval: 15s
+  scrape_timeout: 10s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'devskyy-production'
+    environment: 'production'
+
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - 'alertmanager:9093'
+      timeout: 10s
+      api_version: v2
+
+# Load alerting rules from files
+rule_files:
+  - 'alerts/*.yml'
+
+# Scrape configurations for all targets
+scrape_configs:
+  # DevSkyy API application metrics
+  - job_name: 'devskyy-api'
+    static_configs:
+      - targets:
+          - 'devskyy-api:8000'
+    metrics_path: '/metrics'
+    scrape_interval: 15s
+    scrape_timeout: 10s
+
+  # PostgreSQL database metrics
+  - job_name: 'postgres-exporter'
+    static_configs:
+      - targets:
+          - 'postgres-exporter:9187'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Redis cache metrics
+  - job_name: 'redis-exporter'
+    static_configs:
+      - targets:
+          - 'redis-exporter:9121'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Node/system metrics
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets:
+          - 'node-exporter:9100'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Container metrics (cAdvisor)
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets:
+          - 'cadvisor:8080'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+    metrics_path: '/metrics'
+
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets:
+          - 'localhost:9090'
+    scrape_interval: 30s
