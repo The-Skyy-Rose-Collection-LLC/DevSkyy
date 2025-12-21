@@ -1,32 +1,25 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "npm install && pip install -r requirements.txt",
   "framework": "nextjs",
-  "rootDirectory": "frontend",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "devCommand": "npm run dev",
-  "outputDirectory": ".next",
   "regions": ["iad1"],
   "functions": {
-    "app/api/**/*.ts": {
-      "maxDuration": 60
+    "api/**/*.py": {
+      "runtime": "python3.12",
+      "maxDuration": 60,
+      "memory": 1024
     }
   },
-  "headers": [
+  "routes": [
     {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "no-store, max-age=0"
-        }
-      ]
-    }
-  ],
-  "rewrites": [
+      "src": "/api/(.*)",
+      "dest": "/api/index.py"
+    },
     {
-      "source": "/api/backend/:path*",
-      "destination": "${BACKEND_URL}/:path*"
+      "src": "/(.*)",
+      "dest": "/frontend/$1"
     }
   ]
 }
