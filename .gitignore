@@ -134,3 +134,5 @@ bandit-report.json
 data/vectordb/
 data/*.sqlite3
 data/*.db
+.vercel
+.env*.local
