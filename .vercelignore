@@ -1,0 +1,28 @@
+# Node modules (npm install runs on Vercel)
+node_modules/
+frontend/node_modules/
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+
+# Build artifacts
+.next/
+frontend/.next/
+dist/
+build/
+
+# Development files
+.git/
+.github/
+staging/
+docs/
+tests/
+
+# Large files
+*.log
+*.zip
+*.tar.gz
