@@ -312,6 +312,60 @@ SKYYROSE_BRAND_DNA = {
 
 ---
 
+## 🌍 Environment Setup & Configuration
+
+### Required Environment Variables
+The platform requires multiple API keys and configurations. **NEVER commit secrets to git**.
+
+#### Copy and configure .env file:
+```bash
+cp .env.example .env
+# Edit .env with your actual values
+```
+
+#### Critical Production Variables:
+```bash
+# Security (REQUIRED for production)
+JWT_SECRET_KEY=     # Generate: python -c "import secrets; print(secrets.token_urlsafe(64))"
+ENCRYPTION_MASTER_KEY=  # Generate: python -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
+
+# Database (Use PostgreSQL in production, NOT SQLite)
+DATABASE_URL=postgresql+asyncpg://user:password@host:5432/devskyy
+
+# LLM Providers (at least one required)
+OPENAI_API_KEY=sk-...
+ANTHROPIC_API_KEY=sk-ant-...
+GOOGLE_AI_API_KEY=...
+MISTRAL_API_KEY=...
+COHERE_API_KEY=...
+GROQ_API_KEY=...
+
+# 3D & Visual Generation
+TRIPO_API_KEY=...        # https://www.tripo3d.ai/dashboard
+FASHN_API_KEY=...        # https://fashn.ai/dashboard
+
+# WordPress/WooCommerce
+WORDPRESS_URL=https://your-site.com
+WORDPRESS_APP_PASSWORD=xxxx-xxxx-xxxx-xxxx
+WOOCOMMERCE_KEY=ck_...
+WOOCOMMERCE_SECRET=cs_...
+
+# Caching & Performance
+REDIS_URL=redis://localhost:6379/0
+```
+
+### Secrets Management Best Practices
+1. **Local Development**: Use `.env` file (gitignored)
+2. **Staging/Production**: Use environment-specific secrets managers
+   - AWS: AWS Secrets Manager or Systems Manager Parameter Store
+   - Vercel: Environment Variables in project settings
+   - Docker: Docker secrets or external secret management
+3. **Never** hardcode secrets in source code
+4. **Rotate** secrets regularly (every 90 days minimum)
+5. **Audit** secret access via security logs
+
+---
+
 ## 🛠️ Common Commands
 
 ### Development
@@ -360,6 +414,51 @@ python devskyy_mcp.py --mcp-debug
 
 # Test MCP tools
 python -c "from devskyy_mcp import mcp; print(mcp.list_tools())"
+```
+
+### TypeScript/Node.js (Monorepo)
+```bash
+# Build TypeScript
+npm run build
+
+# Development server with hot reload
+npm run dev
+
+# Run TypeScript tests (Jest)
+npm run test
+
+# ESLint
+npm run lint
+npm run lint:fix
+
+# Type checking
+npm run type-check
+
+# Security audit
+npm run security:audit
+npm run security:fix
+```
+
+### 3D Collection Demos
+```bash
+# Preview immersive Three.js experiences
+npm run demo:black-rose    # Gothic rose garden
+npm run demo:signature     # Luxury outdoor
+npm run demo:love-hurts    # Castle ballroom
+npm run demo:showroom      # Virtual showroom
+npm run demo:runway        # Fashion runway
+```
+
+### Makefile Commands (Unified Python + TypeScript)
+```bash
+make help           # Show all available commands
+make dev            # Install Python + TypeScript dependencies
+make lint-all       # Lint Python + TypeScript
+make format-all     # Format Python + TypeScript
+make test-all       # Run all tests (Python + TypeScript)
+make ci             # Full CI pipeline locally
+make clean          # Clean build artifacts
+make docker-build   # Build Docker image
 ```
 
 ---
@@ -548,6 +647,50 @@ class ToolRegistry:
     def list_tools(self, permissions: List[str]) -> List[ToolSpec]: ...
 ```
 
+### Tool Categories & Severity Levels
+Tools are classified for safety and permission management:
+
+**Categories** (`ToolCategory`):
+- `CONTENT`: Content creation/modification
+- `COMMERCE`: E-commerce operations (orders, products)
+- `MEDIA`: Image/video/3D asset generation
+- `COMMUNICATION`: Email, notifications, messaging
+- `ANALYTICS`: Data analysis, reporting
+- `INTEGRATION`: External API calls (WordPress, WooCommerce)
+- `SYSTEM`: System operations (deployment, monitoring)
+- `AI`: LLM inference, embeddings
+- `OPERATIONS`: DevOps, infrastructure
+- `SECURITY`: Authentication, encryption, auditing
+
+**Severity Levels** (`ToolSeverity`):
+- `READ_ONLY`: No side effects (safe)
+- `LOW`: Minor side effects, easily reversible
+- `MEDIUM`: Moderate side effects, may require cleanup
+- `HIGH`: Significant side effects, careful review needed
+- `DESTRUCTIVE`: Irreversible actions, requires confirmation
+
+**Example Tool Registration**:
+```python
+from runtime.tools import ToolRegistry, ToolSpec, ToolCategory, ToolSeverity
+
+registry = ToolRegistry()
+registry.register(ToolSpec(
+    name="create_product",
+    description="Create a new WooCommerce product",
+    category=ToolCategory.COMMERCE,
+    severity=ToolSeverity.MEDIUM,
+    parameters={
+        "type": "object",
+        "properties": {
+            "name": {"type": "string"},
+            "price": {"type": "number"},
+        },
+        "required": ["name", "price"]
+    },
+    handler=create_product_handler
+))
+```
+
 ---
 
 ## 🔐 Security & Compliance
@@ -628,6 +771,63 @@ class ThreeDAssetPipeline:
 - [ ] Update documentation if interfaces changed
 - [ ] No TODO/FIXME/placeholder strings
 
+### Vercel Deployment (Serverless)
+DevSkyy uses Vercel for serverless deployment with Next.js frontend + Python backend.
+
+**Configuration**: `vercel.json`
+```json
+{
+  "builds": [
+    {"src": "frontend/package.json", "use": "@vercel/next"},
+    {"src": "api/**/*.py", "use": "@vercel/python"}
+  ],
+  "functions": {
+    "api/**/*.py": {"runtime": "python3.11", "maxDuration": 60}
+  }
+}
+```
+
+**Environment Variables** (set in Vercel dashboard):
+- All LLM API keys (OpenAI, Anthropic, Google, etc.)
+- Database connection strings (use Neon PostgreSQL for serverless)
+- Redis URL (use Upstash Redis for serverless)
+- Secrets (JWT, encryption keys)
+
+**Deployment Commands**:
+```bash
+# Deploy to production
+vercel --prod
+
+# Deploy to preview
+vercel
+
+# Check deployment status
+vercel ls
+```
+
+**Important Limitations**:
+- Lambda timeout: 60 seconds max (configurable in vercel.json)
+- Lambda size: 50MB max (use layers for large dependencies)
+- Cold starts: First request may be slow (~2-3s)
+- Stateless: No file system persistence (use S3/Cloudflare R2)
+
+### Docker Deployment (Traditional)
+For environments requiring long-running processes or state:
+
+```bash
+# Build Docker image
+make docker-build
+
+# Run with docker-compose
+docker-compose up -d
+
+# Check logs
+docker-compose logs -f api
+
+# Stop
+docker-compose down
+```
+
 ### CI/CD Pipeline (.github/workflows/ci.yml)
 ```yaml
 name: CI
@@ -685,6 +885,100 @@ feat(agents): implement Tool Runtime Layer
 
 Closes #123
 Breaking: Agents now require ToolRegistry injection
+```
+
+---
+
+## 📊 Monitoring & Observability
+
+### Prometheus Metrics
+DevSkyy exposes Prometheus metrics for monitoring:
+
+**Endpoint**: `/metrics` (production) or `http://localhost:8000/metrics` (local)
+
+**Key Metrics**:
+- `http_requests_total`: Total HTTP requests by method, path, status
+- `http_request_duration_seconds`: Request duration histogram
+- `agent_executions_total`: Agent execution count by agent_id, status
+- `agent_execution_duration_seconds`: Agent execution time
+- `tool_calls_total`: Tool calls by tool_name, status
+- `llm_requests_total`: LLM API calls by provider, model
+- `llm_tokens_total`: Token usage by provider, operation (input/output)
+- `cache_hits_total`, `cache_misses_total`: Cache performance
+
+**Example Prometheus Query**:
+```promql
+# Request rate per minute
+rate(http_requests_total[1m])
+
+# P95 latency
+histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))
+
+# Agent success rate
+sum(rate(agent_executions_total{status="success"}[5m])) / sum(rate(agent_executions_total[5m]))
+```
+
+### Structured Logging
+All logs use structured logging (JSON) for easy parsing:
+
+```python
+import structlog
+
+logger = structlog.get_logger()
+logger.info("agent_execution_started", 
+    agent_id="commerce_agent",
+    correlation_id="abc123",
+    task="create_product"
+)
+```
+
+**Log Levels**:
+- `DEBUG`: Development debugging
+- `INFO`: Normal operations, audit trail
+- `WARNING`: Recoverable errors, degraded performance
+- `ERROR`: Failures requiring attention
+- `CRITICAL`: System-level failures
+
+### Security Audit Logs
+All security-relevant events are logged to `security/audit_log.py`:
+- Authentication attempts (success/failure)
+- Authorization decisions
+- Secret access (encryption keys, API keys)
+- Data exports (GDPR compliance)
+- Configuration changes
+
+**Example Audit Log Entry**:
+```json
+{
+  "timestamp": "2024-12-20T23:57:00Z",
+  "event_type": "authentication_success",
+  "user_id": "user_123",
+  "ip_address": "192.168.1.1",
+  "correlation_id": "abc123"
+}
+```
+
+### Health Checks
+**Endpoints**:
+- `GET /health` - Basic health check (returns 200 if app is running)
+- `GET /health/ready` - Readiness check (database, Redis, etc.)
+- `GET /health/live` - Liveness check (minimal dependencies)
+
+**Use in Kubernetes**:
+```yaml
+livenessProbe:
+  httpGet:
+    path: /health/live
+    port: 8000
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+readinessProbe:
+  httpGet:
+    path: /health/ready
+    port: 8000
+  initialDelaySeconds: 5
+  periodSeconds: 5
 ```
 
 ---
