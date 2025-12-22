@@ -63,7 +63,7 @@ prophet==1.1.6
 
 # Reinforcement learning
 gym==0.26.2
-stable-baselines3==2.4.0
+stable-baselines3==2.7.1
 
 # Model interpretability
 shap==0.46.0
