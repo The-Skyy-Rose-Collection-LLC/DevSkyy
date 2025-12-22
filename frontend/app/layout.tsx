@@ -14,6 +14,7 @@ import {
   FlaskConical,
   Wrench,
   Settings,
+  Box,
 } from 'lucide-react';
 import './globals.css';
 
@@ -38,6 +39,7 @@ export const metadata: Metadata = {
 const navItems = [
   { href: '/', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/agents', label: 'Agents', icon: Bot },
+  { href: '/3d-pipeline', label: '3D Pipeline', icon: Box },
   { href: '/round-table', label: 'Round Table', icon: Trophy },
   { href: '/ab-testing', label: 'A/B Testing', icon: FlaskConical },
   { href: '/tools', label: 'Tools', icon: Wrench },
