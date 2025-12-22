@@ -72,7 +72,7 @@ transformers>=4.53.0  # Fixed: CVE-2024-11392, CVE-2024-11393, CVE-2024-11394 (R
 # Model utilities
 sentence-transformers==3.3.1  # For embeddings
 langchain==0.3.9  # For LLM orchestration
-langchain-openai==0.2.11
+langchain-openai==1.1.6
 langchain-anthropic==1.3.0
 
 # Vector database (optional)
