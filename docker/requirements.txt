@@ -9,7 +9,7 @@ starlette>=0.49.1  # Fixed: CVE-2025-62727 (DoS via Range header)
 # Database
 sqlalchemy==2.0.36
 alembic==1.14.0
-psycopg2-binary==2.9.10  # PostgreSQL adapter for production
+psycopg2-binary==2.9.11  # PostgreSQL adapter for production
 
 # Caching
 redis==7.1.0
