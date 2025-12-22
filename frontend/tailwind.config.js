@@ -53,6 +53,19 @@ module.exports = {
       animation: {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 3s linear infinite',
+        'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
+      },
+      keyframes: {
+        'pulse-glow': {
+          '0%, 100%': {
+            opacity: '1',
+            boxShadow: '0 0 10px currentColor',
+          },
+          '50%': {
+            opacity: '0.8',
+            boxShadow: '0 0 20px currentColor, 0 0 30px currentColor',
+          },
+        },
       },
     },
   },
