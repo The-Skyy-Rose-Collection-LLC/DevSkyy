@@ -33,7 +33,7 @@ orjson==3.10.12
 python-dotenv==1.2.1
 
 # Logging and monitoring
-structlog==24.4.0
+structlog==25.5.0
 loguru==0.7.2
 
 # Error handling and retries
