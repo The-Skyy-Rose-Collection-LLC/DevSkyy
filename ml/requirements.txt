@@ -74,7 +74,7 @@ polars==1.15.0
 pyarrow==18.1.0
 
 # Async ML
-asyncio==3.4.3
+asyncio==4.0.0
 
 # Configuration
 hydra-core==1.3.2
