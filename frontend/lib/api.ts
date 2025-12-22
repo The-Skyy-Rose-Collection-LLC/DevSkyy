@@ -19,7 +19,8 @@ import type {
   VisualGenerationResult,
 } from './types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/backend';
+// Use /api which maps to Python serverless functions
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 class APIError extends Error {
   constructor(
@@ -38,68 +39,77 @@ async function fetchAPI<T>(
 ): Promise<T> {
   const url = `${API_BASE}${endpoint}`;
 
-  const response = await fetch(url, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
-  });
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new APIError(
+        error.detail || error.message || `API request failed: ${response.statusText}`,
+        response.status,
+        error.code
+      );
+    }
+
+    return response.json();
+  } catch (error) {
+    if (error instanceof APIError) throw error;
     throw new APIError(
-      error.message || `API request failed: ${response.statusText}`,
-      response.status,
-      error.code
+      error instanceof Error ? error.message : 'Network error',
+      0,
+      'NETWORK_ERROR'
     );
   }
-
-  return response.json();
 }
 
-// Agent APIs
+// Agent APIs - using /v1/ prefix for versioned API
 export const agentsAPI = {
-  list: () => fetchAPI<AgentInfo[]>('/agents'),
+  list: () => fetchAPI<AgentInfo[]>('/v1/agents'),
 
-  get: (type: SuperAgentType) => fetchAPI<AgentInfo>(`/agents/${type}`),
+  get: (type: SuperAgentType) => fetchAPI<AgentInfo>(`/v1/agents/${type}`),
 
   getStats: (type: SuperAgentType) =>
-    fetchAPI<AgentInfo['stats']>(`/agents/${type}/stats`),
+    fetchAPI<AgentInfo['stats']>(`/v1/agents/${type}/stats`),
 
   getTools: (type: SuperAgentType) =>
-    fetchAPI<ToolInfo[]>(`/agents/${type}/tools`),
+    fetchAPI<ToolInfo[]>(`/v1/agents/${type}/tools`),
 
   start: (type: SuperAgentType) =>
-    fetchAPI<{ success: boolean }>(`/agents/${type}/start`, { method: 'POST' }),
+    fetchAPI<{ success: boolean; message: string }>(`/v1/agents/${type}/start`, { method: 'POST' }),
 
   stop: (type: SuperAgentType) =>
-    fetchAPI<{ success: boolean }>(`/agents/${type}/stop`, { method: 'POST' }),
+    fetchAPI<{ success: boolean; message: string }>(`/v1/agents/${type}/stop`, { method: 'POST' }),
 
   triggerLearning: (type: SuperAgentType) =>
-    fetchAPI<{ success: boolean }>(`/agents/${type}/learn`, { method: 'POST' }),
+    fetchAPI<{ success: boolean }>(`/v1/agents/${type}/learn`, { method: 'POST' }),
 };
 
 // Task APIs
 export const tasksAPI = {
   submit: (request: TaskRequest) =>
-    fetchAPI<TaskResponse>('/tasks', {
+    fetchAPI<TaskResponse>('/v1/tasks', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
 
-  get: (taskId: string) => fetchAPI<TaskResponse>(`/tasks/${taskId}`),
+  get: (taskId: string) => fetchAPI<TaskResponse>(`/v1/tasks/${taskId}`),
 
   list: (params?: { agentType?: SuperAgentType; limit?: number }) => {
     const searchParams = new URLSearchParams();
     if (params?.agentType) searchParams.set('agent_type', params.agentType);
     if (params?.limit) searchParams.set('limit', params.limit.toString());
     const query = searchParams.toString();
-    return fetchAPI<TaskResponse[]>(`/tasks${query ? `?${query}` : ''}`);
+    return fetchAPI<TaskResponse[]>(`/v1/tasks${query ? `?${query}` : ''}`);
   },
 
   cancel: (taskId: string) =>
-    fetchAPI<{ success: boolean }>(`/tasks/${taskId}/cancel`, {
+    fetchAPI<{ success: boolean }>(`/v1/tasks/${taskId}/cancel`, {
       method: 'POST',
     }),
 };
@@ -112,18 +122,18 @@ export const roundTableAPI = {
     if (params?.status) searchParams.set('status', params.status);
     const query = searchParams.toString();
     return fetchAPI<RoundTableEntry[]>(
-      `/round-table${query ? `?${query}` : ''}`
+      `/v1/round-table${query ? `?${query}` : ''}`
     );
   },
 
-  get: (id: string) => fetchAPI<RoundTableEntry>(`/round-table/${id}`),
+  get: (id: string) => fetchAPI<RoundTableEntry>(`/v1/round-table/${id}`),
 
-  getLatest: () => fetchAPI<RoundTableEntry>('/round-table/latest'),
+  getLatest: () => fetchAPI<RoundTableEntry>('/v1/round-table/latest'),
 
-  getProviders: () => fetchAPI<LLMProviderInfo[]>('/round-table/providers'),
+  getProviders: () => fetchAPI<LLMProviderInfo[]>('/v1/round-table/providers'),
 
   runCompetition: (prompt: string, taskType?: string) =>
-    fetchAPI<RoundTableEntry>('/round-table/compete', {
+    fetchAPI<RoundTableEntry>('/v1/round-table/compete', {
       method: 'POST',
       body: JSON.stringify({ prompt, task_type: taskType }),
     }),
@@ -136,24 +146,24 @@ export const abTestingAPI = {
     if (params?.limit) searchParams.set('limit', params.limit.toString());
     const query = searchParams.toString();
     return fetchAPI<ABTestHistoryEntry[]>(
-      `/ab-testing${query ? `?${query}` : ''}`
+      `/v1/ab-testing${query ? `?${query}` : ''}`
     );
   },
 
-  get: (testId: string) => fetchAPI<ABTestHistoryEntry>(`/ab-testing/${testId}`),
+  get: (testId: string) => fetchAPI<ABTestHistoryEntry>(`/v1/ab-testing/${testId}`),
 
   getStats: () =>
     fetchAPI<{
       totalTests: number;
       avgConfidence: number;
       winsByProvider: Record<string, number>;
-    }>('/ab-testing/stats'),
+    }>('/v1/ab-testing/stats'),
 };
 
 // Visual Generation APIs
 export const visualAPI = {
   generate: (request: VisualGenerationRequest) =>
-    fetchAPI<VisualGenerationResult>('/visual/generate', {
+    fetchAPI<VisualGenerationResult>('/v1/visual/generate', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
@@ -166,7 +176,7 @@ export const visualAPI = {
         types: string[];
         status: string;
       }>
-    >('/visual/providers'),
+    >('/v1/visual/providers'),
 
   getHistory: (params?: { limit?: number; type?: string }) => {
     const searchParams = new URLSearchParams();
@@ -174,21 +184,38 @@ export const visualAPI = {
     if (params?.type) searchParams.set('type', params.type);
     const query = searchParams.toString();
     return fetchAPI<VisualGenerationResult[]>(
-      `/visual/history${query ? `?${query}` : ''}`
+      `/v1/visual/history${query ? `?${query}` : ''}`
     );
   },
 };
 
+// 3D Pipeline APIs
+export const threeDAPI = {
+  getStatus: () => fetchAPI<{
+    status: string;
+    models: string[];
+    queueLength: number;
+    processingTime: number;
+    lastGenerated: string;
+  }>('/v1/3d/status'),
+  
+  generate: (request: { prompt: string; model?: string }) =>
+    fetchAPI<{ jobId: string; status: string }>('/v1/3d/generate', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+};
+
 // Metrics APIs
 export const metricsAPI = {
-  getDashboard: () => fetchAPI<DashboardMetrics>('/metrics/dashboard'),
+  getDashboard: () => fetchAPI<DashboardMetrics>('/v1/metrics/dashboard'),
 
   getTimeSeries: (params?: { range?: '1h' | '24h' | '7d' | '30d' }) => {
     const searchParams = new URLSearchParams();
     if (params?.range) searchParams.set('range', params.range);
     const query = searchParams.toString();
     return fetchAPI<MetricsTimeSeries>(
-      `/metrics/timeseries${query ? `?${query}` : ''}`
+      `/v1/metrics/timeseries${query ? `?${query}` : ''}`
     );
   },
 
@@ -197,18 +224,18 @@ export const metricsAPI = {
       tasksByCategory: Record<string, number>;
       successByCategory: Record<string, number>;
       avgLatencyByCategory: Record<string, number>;
-    }>(`/metrics/agents/${agentType}`),
+    }>(`/v1/metrics/agents/${agentType}`),
 };
 
 // Tools API
 export const toolsAPI = {
-  list: () => fetchAPI<ToolInfo[]>('/tools'),
+  list: () => fetchAPI<ToolInfo[]>('/v1/tools'),
 
   getByCategory: (category: string) =>
-    fetchAPI<ToolInfo[]>(`/tools/category/${category}`),
+    fetchAPI<ToolInfo[]>(`/v1/tools/category/${category}`),
 
   test: (toolName: string, parameters: Record<string, unknown>) =>
-    fetchAPI<{ result: unknown; error?: string }>('/tools/test', {
+    fetchAPI<{ result: unknown; error?: string }>('/v1/tools/test', {
       method: 'POST',
       body: JSON.stringify({ tool_name: toolName, parameters }),
     }),
@@ -221,6 +248,7 @@ export const api = {
   roundTable: roundTableAPI,
   abTesting: abTestingAPI,
   visual: visualAPI,
+  threeD: threeDAPI,
   metrics: metricsAPI,
   tools: toolsAPI,
 };
