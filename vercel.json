@@ -1,18 +1,39 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "rootDirectory": "frontend",
   "framework": "nextjs",
-  "buildCommand": "npm run build",
-  "installCommand": "npm install",
-  "outputDirectory": ".next",
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/.next",
+  "installCommand": "cd frontend && npm install",
   "regions": ["iad1"],
-  "env": {
-    "NEXT_PUBLIC_API_URL": "/api"
+  "functions": {
+    "api/**/*.py": {
+      "runtime": "@vercel/python@3.12",
+      "maxDuration": 60,
+      "memory": 1024
+    }
   },
+  "rewrites": [
+    {
+      "source": "/api/v1/:path*",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/health",
+      "destination": "/api/index.py"
+    },
+    {
+      "source": "/api/docs",
+      "destination": "/api/index.py"
+    }
+  ],
   "headers": [
     {
       "source": "/api/(.*)",
       "headers": [
+        { "key": "Access-Control-Allow-Credentials", "value": "true" },
+        { "key": "Access-Control-Allow-Origin", "value": "*" },
+        { "key": "Access-Control-Allow-Methods", "value": "GET,POST,PUT,DELETE,OPTIONS" },
+        { "key": "Access-Control-Allow-Headers", "value": "X-Requested-With, Content-Type, Authorization" },
         { "key": "X-Content-Type-Options", "value": "nosniff" },
         { "key": "X-Frame-Options", "value": "DENY" },
         { "key": "X-XSS-Protection", "value": "1; mode=block" },
