@@ -1,0 +1,35 @@
+# Asset taxonomy definition for style, mood, and color tags
+style:
+  - abstract
+  - realistic
+  - cartoon
+  - sketch
+  - photorealistic
+  - surreal
+mood:
+  - happy
+  - sad
+  - dark
+  - romantic
+  - mysterious
+  - energetic
+color:
+  - red
+  - blue
+  - green
+  - yellow
+  - black
+  - white
+  - pink
+  - purple
+
+# Image vision service configuration
+image_vision_service:
+  provider: GenericVisionAPI
+  endpoint: https://api.example.com/v1/analyze
+  api_key_env_var: IMAGE_VISION_API_KEY
+  description: >
+    This configuration defines the external image vision service that will
+    generate descriptive tags for assets based on the defined taxonomy. The
+    service should return tags corresponding to the style, mood, and color
+    categories listed above.
