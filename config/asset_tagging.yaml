@@ -1,0 +1,26 @@
+taxonomy:
+  style:
+    - photorealistic
+    - abstract
+    - minimalistic
+    - vintage
+    - illustration
+  mood:
+    - happy
+    - calm
+    - intense
+    - dark
+    - playful
+  color:
+    - warm
+    - cool
+    - neutral
+    - vibrant
+    - monochrome
+vision_service:
+  name: example-vision
+  endpoint: https://example.com/api/vision
+  api_key_env: VISION_API_KEY
+tagging:
+  threshold: 0.5
+  assign_multiple: true
