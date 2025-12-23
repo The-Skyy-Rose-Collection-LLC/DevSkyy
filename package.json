@@ -7,7 +7,7 @@
     "test": "tests"
   },
   "dependencies": {
-    "@ai-sdk/huggingface": "^0.0.12",
+    "@ai-sdk/huggingface": "^1.0.0",
     "@apollo/server": "^5.2.0",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
