@@ -373,7 +373,7 @@ jobs:
           ENVIRONMENT: testing
 
       - name: Run OWASP ZAP Full Scan
-        uses: zaproxy/action-full-scan@v0.7.0
+        uses: zaproxy/action-full-scan@v0.13.0
         with:
           target: 'http://localhost:8000'
           rules_file_name: '.zap/rules.tsv'
