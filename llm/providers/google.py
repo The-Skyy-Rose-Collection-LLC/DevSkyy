@@ -16,14 +16,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
-from ..base import (
-    BaseLLMClient,
-    CompletionResponse,
-    Message,
-    MessageRole,
-    StreamChunk,
-    ToolCall,
-)
+from ..base import BaseLLMClient, CompletionResponse, Message, MessageRole, StreamChunk, ToolCall
 
 logger = logging.getLogger(__name__)
 

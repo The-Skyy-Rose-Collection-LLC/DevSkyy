@@ -36,9 +36,9 @@ logger = logging.getLogger(__name__)
 # =============================================================================
 
 
-@dataclass
+@dataclass(slots=True)
 class ResponseScore:
-    """Quality scores for an LLM response."""
+    """Quality scores for an LLM response. Memory-optimized with __slots__."""
 
     provider: ModelProvider
     model: str
@@ -57,16 +57,16 @@ class ResponseScore:
     def __post_init__(self) -> None:
         # Weighted average
         self.total_score = (
-            self.coherence * 0.25 +
-            self.accuracy * 0.30 +
-            self.brand_alignment * 0.20 +
-            self.task_completion * 0.25
+            self.coherence * 0.25
+            + self.accuracy * 0.30
+            + self.brand_alignment * 0.20
+            + self.task_completion * 0.25
         )
 
 
-@dataclass
+@dataclass(slots=True)
 class TournamentResult:
-    """Result of a tournament."""
+    """Result of a tournament. Memory-optimized with __slots__."""
 
     winner: ResponseScore
     runner_up: ResponseScore | None = None
@@ -83,7 +83,9 @@ class ResponseScorer:
     Uses heuristics for fast scoring, optionally uses judge LLM for accuracy.
     """
 
-    def __init__(self, use_judge: bool = False, judge_provider: ModelProvider = ModelProvider.ANTHROPIC):
+    def __init__(
+        self, use_judge: bool = False, judge_provider: ModelProvider = ModelProvider.ANTHROPIC
+    ):
         self.use_judge = use_judge
         self.judge_provider = judge_provider
         self.router = LLMRouter() if use_judge else None
@@ -154,8 +156,19 @@ class ResponseScorer:
         score = 50.0  # Neutral base
 
         # Positive brand keywords
-        brand_positive = ["luxury", "premium", "elegant", "sophisticated", "rose", "gold",
-                         "exclusive", "limited", "quality", "crafted", "timeless"]
+        brand_positive = [
+            "luxury",
+            "premium",
+            "elegant",
+            "sophisticated",
+            "rose",
+            "gold",
+            "exclusive",
+            "limited",
+            "quality",
+            "crafted",
+            "timeless",
+        ]
         for kw in brand_positive:
             if kw in content_lower:
                 score += 5
@@ -200,7 +213,9 @@ REASONING: [brief explanation]"""
             if "SCORE:" in content:
                 score_line = content.split("SCORE:")[1].split("\n")[0]
                 score = float("".join(c for c in score_line if c.isdigit() or c == "."))
-                reasoning = content.split("REASONING:")[-1].strip() if "REASONING:" in content else ""
+                reasoning = (
+                    content.split("REASONING:")[-1].strip() if "REASONING:" in content else ""
+                )
                 return min(100.0, max(0.0, score)), reasoning
 
             return 70.0, "Could not parse judge response"
@@ -286,7 +301,10 @@ class LLMTournament:
         **kwargs: Any,
     ) -> list[tuple[ModelProvider, ModelResponse | Exception]]:
         """Round 1: Parallel generation from all providers."""
-        async def generate_one(provider: ModelProvider) -> tuple[ModelProvider, ModelResponse | Exception]:
+
+        async def generate_one(
+            provider: ModelProvider,
+        ) -> tuple[ModelProvider, ModelResponse | Exception]:
             try:
                 response = await asyncio.wait_for(
                     self.router.complete(messages=messages, provider=provider, **kwargs),
@@ -310,9 +328,7 @@ class LLMTournament:
         """Round 2: Score all responses."""
         scores = []
         for provider, response in responses:
-            score = await self.scorer.score_response(
-                response, provider, task_hint, original_prompt
-            )
+            score = await self.scorer.score_response(response, provider, task_hint, original_prompt)
             scores.append(score)
             logger.info(
                 f"{provider.value}: total={score.total_score:.1f} "
@@ -462,4 +478,3 @@ __all__ = [
     "ResponseScore",
     "TournamentResult",
 ]
-

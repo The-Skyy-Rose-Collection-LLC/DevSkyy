@@ -310,3 +310,11 @@ export function useTestTool() {
     api.tools.test(arg.toolName, arg.parameters)
   );
 }
+
+// Brand Hooks
+export function useBrand(config?: SWRConfiguration) {
+  return useSWR('brand', () => api.brand.get(), {
+    ...defaultConfig,
+    ...config,
+  });
+}

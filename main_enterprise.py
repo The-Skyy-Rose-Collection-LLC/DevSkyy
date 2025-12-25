@@ -36,6 +36,7 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
 from api.agents import agents_router
+from api.dashboard import dashboard_router
 from api.gdpr import gdpr_router
 
 # API modules
@@ -382,6 +383,9 @@ app.include_router(gdpr_router)
 
 # AI agent routes
 app.include_router(agents_router)
+
+# Dashboard API routes (for Next.js frontend)
+app.include_router(dashboard_router)
 
 
 # =============================================================================

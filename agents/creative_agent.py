@@ -32,16 +32,14 @@ from adk.base import (
 )
 from orchestration.prompt_engineering import PromptTechnique
 
-from .base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-)
+from .base_super_agent import EnhancedSuperAgent, SuperAgentType
 
 logger = logging.getLogger(__name__)
 
 
 class VisualProvider(str, Enum):
     """Visual generation providers"""
+
     GOOGLE_IMAGEN = "google_imagen"
     GOOGLE_VEO = "google_veo"
     HUGGINGFACE_FLUX = "huggingface_flux"
@@ -51,6 +49,7 @@ class VisualProvider(str, Enum):
 
 class VisualTaskType(str, Enum):
     """Types of visual tasks"""
+
     IMAGE_FROM_TEXT = "image_from_text"
     VIDEO_FROM_TEXT = "video_from_text"
     IMAGE_EDITING = "image_editing"
@@ -143,8 +142,8 @@ class CreativeAgent(EnhancedSuperAgent):
         "collections": {
             "BLACK ROSE": "dark elegance, limited edition, mysterious allure",
             "LOVE HURTS": "emotional expression, bold statements, vulnerable strength",
-            "SIGNATURE": "foundation wardrobe, timeless essentials, everyday luxury"
-        }
+            "SIGNATURE": "foundation wardrobe, timeless essentials, everyday luxury",
+        },
     }
 
     def __init__(self, config: AgentConfig | None = None):
@@ -255,7 +254,10 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                 parameters={
                     "prompt": {"type": "string", "description": "Image generation prompt"},
                     "style": {"type": "string", "description": "Style preset"},
-                    "aspect_ratio": {"type": "string", "description": "Aspect ratio (1:1, 16:9, etc.)"},
+                    "aspect_ratio": {
+                        "type": "string",
+                        "description": "Aspect ratio (1:1, 16:9, etc.)",
+                    },
                     "negative_prompt": {"type": "string", "description": "What to avoid"},
                 },
             ),
@@ -287,7 +289,10 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                 description="Generate 3D model from image using Tripo3D",
                 parameters={
                     "image_url": {"type": "string", "description": "Source image URL"},
-                    "quality": {"type": "string", "description": "Quality level (draft, standard, premium)"},
+                    "quality": {
+                        "type": "string",
+                        "description": "Quality level (draft, standard, premium)",
+                    },
                     "format": {"type": "string", "description": "Output format (glb, gltf, fbx)"},
                     "texture_quality": {"type": "string", "description": "Texture quality"},
                 },
@@ -308,7 +313,10 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                 parameters={
                     "garment_image": {"type": "string", "description": "Garment image URL"},
                     "model_image": {"type": "string", "description": "Model/person image URL"},
-                    "category": {"type": "string", "description": "Garment category (tops, bottoms, dresses)"},
+                    "category": {
+                        "type": "string",
+                        "description": "Garment category (tops, bottoms, dresses)",
+                    },
                     "adjust_hands": {"type": "boolean", "description": "Adjust hand positioning"},
                 },
             ),
@@ -356,7 +364,10 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                 description="Search brand asset library",
                 parameters={
                     "query": {"type": "string", "description": "Search query"},
-                    "asset_type": {"type": "string", "description": "Type filter (image, video, 3d)"},
+                    "asset_type": {
+                        "type": "string",
+                        "description": "Type filter (image, video, 3d)",
+                    },
                     "collection": {"type": "string", "description": "Collection filter"},
                 },
             ),
@@ -379,7 +390,7 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                 prompt,
                 role="creative director for SkyyRose luxury streetwear",
                 background=f"Brand DNA: {self.SKYYROSE_BRAND_DNA}",
-                **kwargs
+                **kwargs,
             )
 
             # Execute with backend
@@ -399,7 +410,7 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                     "task_type": task_type,
                     "technique": technique.value,
                     "providers": [p.value for p in self._get_providers_for_task(task_type)],
-                }
+                },
             )
 
         except Exception as e:
@@ -476,10 +487,7 @@ For full visual generation, ensure visual APIs are configured."""
     # =========================================================================
 
     async def generate_image(
-        self,
-        prompt: str,
-        provider: VisualProvider = VisualProvider.GOOGLE_IMAGEN,
-        **kwargs
+        self, prompt: str, provider: VisualProvider = VisualProvider.GOOGLE_IMAGEN, **kwargs
     ) -> dict[str, Any]:
         """
         Generate image using specified provider.
@@ -514,22 +522,13 @@ Return the generation command and expected result."""
                 "provider": "string",
                 "prompt_used": "string",
                 "parameters": "object",
-                "expected_output": "object"
-            }
+                "expected_output": "object",
+            },
         )
 
-        return {
-            "provider": provider.value,
-            "prompt": enhanced_prompt,
-            "result": result.content
-        }
+        return {"provider": provider.value, "prompt": enhanced_prompt, "result": result.content}
 
-    async def generate_video(
-        self,
-        prompt: str,
-        duration: int = 5,
-        **kwargs
-    ) -> dict[str, Any]:
+    async def generate_video(self, prompt: str, duration: int = 5, **kwargs) -> dict[str, Any]:
         """
         Generate video using Google Veo.
 
@@ -558,21 +557,18 @@ Parameters: {kwargs}"""
             task_prompt,
             task_type="video_generation",
             technique=PromptTechnique.ROLE_BASED,
-            role="video production director"
+            role="video production director",
         )
 
         return {
             "provider": "google_veo",
             "prompt": enhanced_prompt,
             "duration": duration,
-            "result": result.content
+            "result": result.content,
         }
 
     async def generate_3d_model(
-        self,
-        image_url: str,
-        quality: str = "standard",
-        **kwargs
+        self, image_url: str, quality: str = "standard", **kwargs
     ) -> dict[str, Any]:
         """
         Generate 3D model from image using Tripo3D.
@@ -597,24 +593,18 @@ The 3D model should:
 Parameters: {kwargs}"""
 
         result = await self.execute_with_learning(
-            task_prompt,
-            task_type="3d_generation",
-            technique=PromptTechnique.STRUCTURED_OUTPUT
+            task_prompt, task_type="3d_generation", technique=PromptTechnique.STRUCTURED_OUTPUT
         )
 
         return {
             "provider": "tripo3d",
             "source_image": image_url,
             "quality": quality,
-            "result": result.content
+            "result": result.content,
         }
 
     async def virtual_tryon(
-        self,
-        garment_image: str,
-        model_image: str,
-        category: str = "tops",
-        **kwargs
+        self, garment_image: str, model_image: str, category: str = "tops", **kwargs
     ) -> dict[str, Any]:
         """
         Apply virtual try-on using FASHN.
@@ -643,7 +633,7 @@ Parameters: {kwargs}"""
             task_prompt,
             task_type="virtual_tryon",
             technique=PromptTechnique.REACT,
-            tools=["fashn_tryon", "adjust_fit", "quality_check"]
+            tools=["fashn_tryon", "adjust_fit", "quality_check"],
         )
 
         return {
@@ -651,7 +641,7 @@ Parameters: {kwargs}"""
             "garment": garment_image,
             "model": model_image,
             "category": category,
-            "result": result.content
+            "result": result.content,
         }
 
     def _enhance_visual_prompt(self, prompt: str) -> str:
@@ -665,11 +655,7 @@ Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
 """
         return f"{prompt}\n\n{brand_context}"
 
-    async def route_visual_task(
-        self,
-        prompt: str,
-        **kwargs
-    ) -> dict[str, Any]:
+    async def route_visual_task(self, prompt: str, **kwargs) -> dict[str, Any]:
         """
         Automatically route visual task to appropriate provider.
 
@@ -687,14 +673,14 @@ Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
             for provider in providers:
                 self.round_table.register_provider(
                     provider.value,
-                    lambda p, c, prov=provider: self._execute_visual_provider(prov, p, c)
+                    lambda p, c, prov=provider: self._execute_visual_provider(prov, p, c),
                 )
 
             result = await self.round_table.compete(prompt)
             return {
                 "task_type": task_type.value,
                 "winner": result.winner.provider,
-                "result": result.winner.response
+                "result": result.winner.response,
             }
 
         # Single provider - execute directly
@@ -704,14 +690,11 @@ Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
         return {
             "task_type": task_type.value,
             "provider": primary_provider.value,
-            "result": result.content
+            "result": result.content,
         }
 
     async def _execute_visual_provider(
-        self,
-        provider: VisualProvider,
-        prompt: str,
-        context: dict | None
+        self, provider: VisualProvider, prompt: str, context: dict | None
     ) -> dict[str, Any]:
         """Execute visual generation with specific provider"""
         # Provider-specific execution logic
@@ -719,7 +702,7 @@ Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
             "provider": provider.value,
             "prompt": prompt,
             "text": f"Generated with {provider.value}: {prompt[:100]}...",
-            "cost": 0.01
+            "cost": 0.01,
         }
 
 

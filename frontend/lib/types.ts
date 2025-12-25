@@ -168,10 +168,66 @@ export interface TaskRequest {
 
 export interface TaskResponse {
   taskId: string;
+  agentType?: SuperAgentType;
+  prompt?: string;
   status: 'pending' | 'running' | 'completed' | 'failed';
   result?: unknown;
   error?: string;
   metrics?: TaskMetrics;
+  createdAt?: string;
+}
+
+// Brand Kit Types
+export interface BrandColor {
+  name: string;
+  hex: string;
+  rgb: string;
+}
+
+export interface BrandTone {
+  primary: string;
+  descriptors: string[];
+  avoid: string[];
+}
+
+export interface BrandTypography {
+  heading: string;
+  body: string;
+  accent: string;
+}
+
+export interface BrandTargetAudience {
+  age_range: string;
+  description: string;
+  interests: string[];
+  values: string[];
+}
+
+export interface CollectionConfig {
+  name: string;
+  tagline: string;
+  mood: string;
+  colors: string;
+  style: string;
+  description: string;
+}
+
+export interface BrandConfig {
+  name: string;
+  tagline: string;
+  philosophy: string;
+  location: string;
+  tone: BrandTone;
+  colors: Record<string, BrandColor>;
+  typography: BrandTypography;
+  target_audience: BrandTargetAudience;
+  product_types: string[];
+  quality_descriptors: string[];
+}
+
+export interface BrandData {
+  brand: BrandConfig;
+  collections: Record<string, CollectionConfig>;
 }
 
 export interface TaskMetrics {

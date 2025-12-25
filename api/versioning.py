@@ -28,15 +28,7 @@ from datetime import UTC, date, datetime
 from enum import Enum
 from functools import wraps
 
-from fastapi import (
-    APIRouter,
-    Depends,
-    FastAPI,
-    HTTPException,
-    Request,
-    Response,
-    status,
-)
+from fastapi import APIRouter, Depends, FastAPI, HTTPException, Request, Response, status
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse

@@ -37,12 +37,7 @@ from typing import Any
 import aiofiles
 import aiohttp
 from pydantic import BaseModel, Field
-from tenacity import (
-    AsyncRetrying,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
+from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from base import (
     AgentCapability,
@@ -537,17 +532,21 @@ class FashnTryOnAgent(SuperAgent):
 
             for idx, result in enumerate(batch_results):
                 if isinstance(result, Exception):
-                    results.append({
-                        "success": False,
-                        "error": str(result),
-                        "error_type": type(result).__name__,
-                        "input": batch[idx],
-                    })
+                    results.append(
+                        {
+                            "success": False,
+                            "error": str(result),
+                            "error_type": type(result).__name__,
+                            "input": batch[idx],
+                        }
+                    )
                 else:
-                    results.append({
-                        "success": True,
-                        **result,
-                    })
+                    results.append(
+                        {
+                            "success": True,
+                            **result,
+                        }
+                    )
 
             # Delay between batches to avoid rate limiting
             if i + batch_size < len(items):

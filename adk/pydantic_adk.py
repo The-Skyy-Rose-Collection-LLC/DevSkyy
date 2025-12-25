@@ -216,29 +216,87 @@ Always be professional, concise, and focused on value delivery.
 """
 
     def _register_pydantic_tool(self, tool_def: ToolDefinition) -> None:
-        """Register a tool with PydanticAI agent"""
+        """
+        Register a tool with PydanticAI agent.
+
+        Uses ToolRegistry as the single source of truth for tool handlers.
+        If no handler is registered in ToolRegistry, creates a handler
+        that routes to the ToolRegistry.execute() method.
+        """
         if not self._pydantic_agent:
             return
 
-        # Get or create handler
+        # Import ToolRegistry here to avoid circular imports
+        from runtime.tools import ToolCallContext, get_tool_registry
+
+        tool_registry = get_tool_registry()
+        tool_name = tool_def.name
+
+        # Check if tool exists in ToolRegistry
         if tool_def.name in self._tools:
+            # Use the explicitly registered handler
             handler = self._tools[tool_def.name]
+        elif tool_registry.get(tool_name):
+            # Tool exists in ToolRegistry - create handler that routes to it
+            async def registry_handler(**kwargs):
+                """Handler that routes to ToolRegistry."""
+                context = ToolCallContext(
+                    agent_id=self.name,
+                    metadata={"source": "pydantic_adk"},
+                )
+                result = await tool_registry.execute(tool_name, kwargs, context)
+                if result.success:
+                    return result.result
+                else:
+                    raise RuntimeError(f"Tool execution failed: {result.error}")
+
+            handler = registry_handler
         else:
-            # Create placeholder handler
-            async def placeholder_handler(**kwargs):
-                return f"Tool {tool_def.name} executed with: {kwargs}"
+            # Tool not in registry - register it and create forwarding handler
+            from runtime.tools import ToolCategory, ToolSeverity, ToolSpec
 
-            handler = placeholder_handler
+            # Create spec from tool definition
+            spec = ToolSpec(
+                name=tool_name,
+                description=tool_def.description,
+                category=ToolCategory.AI,  # Default category for dynamic tools
+                severity=ToolSeverity.LOW,
+                input_schema=tool_def.parameters or {},
+            )
 
-        # Register with decorator
+            # Create the forwarding handler
+            async def dynamic_handler(**kwargs):
+                """Dynamic handler for tools without explicit implementation."""
+                # Try to get handler from registry in case it was registered later
+                reg_handler = tool_registry.get_handler(tool_name)
+                if reg_handler:
+                    import inspect
+
+                    if inspect.iscoroutinefunction(reg_handler):
+                        return await reg_handler(**kwargs)
+                    return reg_handler(**kwargs)
+
+                # No handler available - log and return structured response
+                logger.warning(f"No handler for tool {tool_name}, returning parameter echo")
+                return {
+                    "tool": tool_name,
+                    "status": "no_handler",
+                    "params_received": kwargs,
+                }
+
+            # Register the spec (without handler - handler registered separately)
+            tool_registry.register(spec, dynamic_handler)
+            handler = dynamic_handler
+
+        # Register with PydanticAI decorator
         @self._pydantic_agent.tool
         async def tool_wrapper(**kwargs):
             return await handler(**kwargs)
 
-        tool_wrapper.__name__ = tool_def.name
+        tool_wrapper.__name__ = tool_name
         tool_wrapper.__doc__ = tool_def.description
 
-        self._tool_handlers[tool_def.name] = tool_wrapper
+        self._tool_handlers[tool_name] = tool_wrapper
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute PydanticAI agent"""

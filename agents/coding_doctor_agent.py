@@ -57,10 +57,7 @@ from pathlib import Path
 from typing import Any
 
 from adk.base import AgentConfig, AgentResult, AgentStatus
-from agents.base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-)
+from agents.base_super_agent import EnhancedSuperAgent, SuperAgentType
 
 logger = logging.getLogger(__name__)
 
@@ -72,6 +69,7 @@ logger = logging.getLogger(__name__)
 
 class HealthCheckType(str, Enum):
     """Types of health checks"""
+
     FULL = "full"
     QUICK = "quick"
     SECURITY = "security"
@@ -84,6 +82,7 @@ class HealthCheckType(str, Enum):
 
 class SeverityLevel(str, Enum):
     """Issue severity levels"""
+
     CRITICAL = "critical"
     HIGH = "high"
     MEDIUM = "medium"
@@ -93,6 +92,7 @@ class SeverityLevel(str, Enum):
 
 class IssueCategory(str, Enum):
     """Categories of code issues"""
+
     SECURITY = "security"
     PERFORMANCE = "performance"
     MAINTAINABILITY = "maintainability"
@@ -110,6 +110,7 @@ class IssueCategory(str, Enum):
 
 class HealingAction(str, Enum):
     """Types of self-healing actions"""
+
     AUTO_FORMAT = "auto_format"
     FIX_IMPORTS = "fix_imports"
     ADD_TYPE_HINTS = "add_type_hints"
@@ -128,6 +129,7 @@ class HealingAction(str, Enum):
 @dataclass
 class CodeIssue:
     """Represents a code issue found during analysis"""
+
     file_path: str
     line_number: int | None
     category: IssueCategory
@@ -157,6 +159,7 @@ class CodeIssue:
 @dataclass
 class HealingResult:
     """Result of a self-healing action"""
+
     action: HealingAction
     file_path: str
     success: bool
@@ -177,6 +180,7 @@ class HealingResult:
 @dataclass
 class LearningEntry:
     """Entry in the learning database"""
+
     pattern_hash: str
     category: IssueCategory
     pattern: str
@@ -194,6 +198,7 @@ class LearningEntry:
 @dataclass
 class FileReview:
     """Result of reviewing a single file"""
+
     file_path: str
     language: str
     lines_of_code: int
@@ -220,6 +225,7 @@ class FileReview:
 @dataclass
 class HealthReport:
     """Complete health check report"""
+
     check_type: HealthCheckType
     total_files: int
     total_lines: int
@@ -245,7 +251,9 @@ class HealthReport:
             "total_lines": self.total_lines,
             "overall_score": self.overall_score,
             "issues_count": len(self.issues),
-            "critical_issues": len([i for i in self.issues if i.severity == SeverityLevel.CRITICAL]),
+            "critical_issues": len(
+                [i for i in self.issues if i.severity == SeverityLevel.CRITICAL]
+            ),
             "high_issues": len([i for i in self.issues if i.severity == SeverityLevel.HIGH]),
             "auto_healed": len([h for h in self.healing_results if h.success]),
             "architecture_notes": self.architecture_notes,
@@ -360,7 +368,8 @@ class SelfLearningEngine:
         return {
             "total_patterns": len(self._patterns),
             "categories": categories,
-            "avg_success_rate": sum(e.success_rate for e in self._patterns.values()) / len(self._patterns),
+            "avg_success_rate": sum(e.success_rate for e in self._patterns.values())
+            / len(self._patterns),
         }
 
 
@@ -582,43 +591,53 @@ class ECommerceToolkit(BaseToolkit):
                     if "test" in rel_path.lower():
                         continue  # Skip test files
 
-                    if "async" not in line and "await" not in content[max(0, content.find(line)-100):content.find(line)+100]:
-                        issues.append(CodeIssue(
+                    if (
+                        "async" not in line
+                        and "await"
+                        not in content[max(0, content.find(line) - 100) : content.find(line) + 100]
+                    ):
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.ECOMMERCE,
+                                severity=SeverityLevel.MEDIUM,
+                                title="Payment operation may not be async",
+                                description="Payment operations should be async for proper error handling",
+                                suggestion="Ensure payment calls are awaited and wrapped in try/except",
+                            )
+                        )
+
+                # Check for hardcoded prices
+                price_match = re.search(r"price\s*=\s*(\d+\.?\d*)", line)
+                if price_match and "test" not in rel_path.lower():
+                    issues.append(
+                        CodeIssue(
                             file_path=rel_path,
                             line_number=i,
                             category=IssueCategory.ECOMMERCE,
                             severity=SeverityLevel.MEDIUM,
-                            title="Payment operation may not be async",
-                            description="Payment operations should be async for proper error handling",
-                            suggestion="Ensure payment calls are awaited and wrapped in try/except",
-                        ))
-
-                # Check for hardcoded prices
-                price_match = re.search(r'price\s*=\s*(\d+\.?\d*)', line)
-                if price_match and "test" not in rel_path.lower():
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=i,
-                        category=IssueCategory.ECOMMERCE,
-                        severity=SeverityLevel.MEDIUM,
-                        title="Hardcoded price detected",
-                        description=f"Price value {price_match.group(1)} is hardcoded",
-                        suggestion="Use configuration or database for pricing",
-                        code_snippet=line.strip()[:60],
-                    ))
+                            title="Hardcoded price detected",
+                            description=f"Price value {price_match.group(1)} is hardcoded",
+                            suggestion="Use configuration or database for pricing",
+                            code_snippet=line.strip()[:60],
+                        )
+                    )
 
                 # Check inventory without validation
                 if "quantity" in line_lower and "if" not in line_lower:
                     if "=" in line and ("+" in line or "-" in line):
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=i,
-                            category=IssueCategory.ECOMMERCE,
-                            severity=SeverityLevel.HIGH,
-                            title="Inventory modification without validation",
-                            description="Quantity change without bounds checking",
-                            suggestion="Add validation to prevent negative inventory",
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.ECOMMERCE,
+                                severity=SeverityLevel.HIGH,
+                                title="Inventory modification without validation",
+                                description="Quantity change without bounds checking",
+                                suggestion="Add validation to prevent negative inventory",
+                            )
+                        )
 
         except Exception as e:
             logger.error(f"E-commerce analysis failed for {file_path}: {e}")
@@ -655,45 +674,51 @@ class FinanceToolkit(BaseToolkit):
                 # Check for float usage with money
                 if any(term in line_lower for term in ["price", "amount", "total", "cost", "fee"]):
                     if "float(" in line and not has_decimal_import:
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=i,
-                            category=IssueCategory.FINANCE,
-                            severity=SeverityLevel.HIGH,
-                            title="Float used for monetary value",
-                            description="Using float for money can cause precision errors",
-                            suggestion="Use Decimal type for monetary calculations",
-                            code_snippet=line.strip()[:60],
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.FINANCE,
+                                severity=SeverityLevel.HIGH,
+                                title="Float used for monetary value",
+                                description="Using float for money can cause precision errors",
+                                suggestion="Use Decimal type for monetary calculations",
+                                code_snippet=line.strip()[:60],
+                            )
+                        )
 
                 # Check for transaction without error handling
                 if "transaction" in line_lower or "payment" in line_lower:
                     # Look ahead for try/except
-                    context = "\n".join(lines[max(0, i-5):min(len(lines), i+5)])
+                    context = "\n".join(lines[max(0, i - 5) : min(len(lines), i + 5)])
                     if "try:" not in context and "except" not in context:
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=i,
-                            category=IssueCategory.FINANCE,
-                            severity=SeverityLevel.HIGH,
-                            title="Transaction without error handling",
-                            description="Financial operations should have explicit error handling",
-                            suggestion="Wrap in try/except with proper rollback logic",
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.FINANCE,
+                                severity=SeverityLevel.HIGH,
+                                title="Transaction without error handling",
+                                description="Financial operations should have explicit error handling",
+                                suggestion="Wrap in try/except with proper rollback logic",
+                            )
+                        )
 
                 # Check for missing audit logging
                 if any(term in line_lower for term in ["charge", "refund", "transfer", "withdraw"]):
-                    context = "\n".join(lines[max(0, i-10):min(len(lines), i+10)])
+                    context = "\n".join(lines[max(0, i - 10) : min(len(lines), i + 10)])
                     if "log" not in context.lower() and "audit" not in context.lower():
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=i,
-                            category=IssueCategory.FINANCE,
-                            severity=SeverityLevel.MEDIUM,
-                            title="Financial operation without audit logging",
-                            description="Financial operations should be logged for auditing",
-                            suggestion="Add audit logging for financial transactions",
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.FINANCE,
+                                severity=SeverityLevel.MEDIUM,
+                                title="Financial operation without audit logging",
+                                description="Financial operations should be logged for auditing",
+                                suggestion="Add audit logging for financial transactions",
+                            )
+                        )
 
         except Exception as e:
             logger.error(f"Finance analysis failed for {file_path}: {e}")
@@ -718,7 +743,7 @@ class SecurityToolkit(BaseToolkit):
         (r'password\s*=\s*["\'][^"\']+["\']', "Hardcoded password"),
         (r'secret\s*=\s*["\'][^"\']+["\']', "Hardcoded secret"),
         (r'token\s*=\s*["\'][^"\']+["\']', "Hardcoded token"),
-        (r'private_key\s*=', "Hardcoded private key"),
+        (r"private_key\s*=", "Hardcoded private key"),
     ]
 
     SQL_INJECTION_PATTERNS = [
@@ -748,45 +773,53 @@ class SecurityToolkit(BaseToolkit):
                         if "environ" in line or "getenv" in line or "os.env" in line:
                             continue
                         # Skip test files with obvious test values
-                        if "test" in rel_path.lower() and any(t in line.lower() for t in ["test", "dummy", "fake", "mock"]):
+                        if "test" in rel_path.lower() and any(
+                            t in line.lower() for t in ["test", "dummy", "fake", "mock"]
+                        ):
                             continue
 
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=i,
-                            category=IssueCategory.SECURITY,
-                            severity=SeverityLevel.CRITICAL,
-                            title=description,
-                            description="Credentials should not be hardcoded in source code",
-                            suggestion="Use environment variables or a secrets manager",
-                            code_snippet=line.strip()[:50] + "...",
-                            auto_fixable=False,
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.SECURITY,
+                                severity=SeverityLevel.CRITICAL,
+                                title=description,
+                                description="Credentials should not be hardcoded in source code",
+                                suggestion="Use environment variables or a secrets manager",
+                                code_snippet=line.strip()[:50] + "...",
+                                auto_fixable=False,
+                            )
+                        )
 
                 # Check for SQL injection
                 for pattern, description in self.SQL_INJECTION_PATTERNS:
                     if re.search(pattern, line, re.IGNORECASE):
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=i,
-                            category=IssueCategory.SECURITY,
-                            severity=SeverityLevel.CRITICAL,
-                            title=description,
-                            description="SQL queries should use parameterized queries",
-                            suggestion="Use query parameters or an ORM",
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.SECURITY,
+                                severity=SeverityLevel.CRITICAL,
+                                title=description,
+                                description="SQL queries should use parameterized queries",
+                                suggestion="Use query parameters or an ORM",
+                            )
+                        )
 
                 # Check for eval/exec
                 if "eval(" in line or "exec(" in line:
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=i,
-                        category=IssueCategory.SECURITY,
-                        severity=SeverityLevel.HIGH,
-                        title="Use of eval/exec detected",
-                        description="eval() and exec() can execute arbitrary code",
-                        suggestion="Use safer alternatives like ast.literal_eval for data parsing",
-                    ))
+                    issues.append(
+                        CodeIssue(
+                            file_path=rel_path,
+                            line_number=i,
+                            category=IssueCategory.SECURITY,
+                            severity=SeverityLevel.HIGH,
+                            title="Use of eval/exec detected",
+                            description="eval() and exec() can execute arbitrary code",
+                            suggestion="Use safer alternatives like ast.literal_eval for data parsing",
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Security analysis failed for {file_path}: {e}")
@@ -827,42 +860,50 @@ class PerformanceToolkit(BaseToolkit):
                     loop_start = i
 
                 # Check for database queries in loops (N+1 pattern)
-                if in_loop and any(q in line.lower() for q in [".query(", ".filter(", ".get(", "select ", "fetch"]):
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=i,
-                        category=IssueCategory.PERFORMANCE,
-                        severity=SeverityLevel.HIGH,
-                        title="Potential N+1 query pattern",
-                        description=f"Database query inside loop starting at line {loop_start}",
-                        suggestion="Batch the query outside the loop or use eager loading",
-                    ))
+                if in_loop and any(
+                    q in line.lower() for q in [".query(", ".filter(", ".get(", "select ", "fetch"]
+                ):
+                    issues.append(
+                        CodeIssue(
+                            file_path=rel_path,
+                            line_number=i,
+                            category=IssueCategory.PERFORMANCE,
+                            severity=SeverityLevel.HIGH,
+                            title="Potential N+1 query pattern",
+                            description=f"Database query inside loop starting at line {loop_start}",
+                            suggestion="Batch the query outside the loop or use eager loading",
+                        )
+                    )
 
                 # Check for sync operations in async context
                 if "async def" in content and "requests.get" in line:
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=i,
-                        category=IssueCategory.PERFORMANCE,
-                        severity=SeverityLevel.MEDIUM,
-                        title="Sync HTTP in async context",
-                        description="Using synchronous requests in async code blocks the event loop",
-                        suggestion="Use aiohttp or httpx for async HTTP requests",
-                    ))
-
-                # Check for large list comprehension
-                if "[" in line and "for" in line and "range(" in line:
-                    range_match = re.search(r'range\((\d+)', line)
-                    if range_match and int(range_match.group(1)) > 10000:
-                        issues.append(CodeIssue(
+                    issues.append(
+                        CodeIssue(
                             file_path=rel_path,
                             line_number=i,
                             category=IssueCategory.PERFORMANCE,
                             severity=SeverityLevel.MEDIUM,
-                            title="Large list comprehension",
-                            description="Creating large lists in memory",
-                            suggestion="Use generators or itertools for large sequences",
-                        ))
+                            title="Sync HTTP in async context",
+                            description="Using synchronous requests in async code blocks the event loop",
+                            suggestion="Use aiohttp or httpx for async HTTP requests",
+                        )
+                    )
+
+                # Check for large list comprehension
+                if "[" in line and "for" in line and "range(" in line:
+                    range_match = re.search(r"range\((\d+)", line)
+                    if range_match and int(range_match.group(1)) > 10000:
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=i,
+                                category=IssueCategory.PERFORMANCE,
+                                severity=SeverityLevel.MEDIUM,
+                                title="Large list comprehension",
+                                description="Creating large lists in memory",
+                                suggestion="Use generators or itertools for large sequences",
+                            )
+                        )
 
                 # Reset loop tracking at function boundaries
                 if stripped.startswith("def ") or stripped.startswith("async def "):
@@ -899,32 +940,36 @@ class TestingToolkit(BaseToolkit):
                 if not test_path.exists():
                     # Check for classes/functions that should be tested
                     if "class " in content or "def " in content:
-                        issues.append(CodeIssue(
-                            file_path=rel_path,
-                            line_number=None,
-                            category=IssueCategory.TESTING,
-                            severity=SeverityLevel.LOW,
-                            title="Missing test file",
-                            description=f"No test file found at tests/test_{file_path.name}",
-                            suggestion="Create tests for public functions and classes",
-                        ))
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=None,
+                                category=IssueCategory.TESTING,
+                                severity=SeverityLevel.LOW,
+                                title="Missing test file",
+                                description=f"No test file found at tests/test_{file_path.name}",
+                                suggestion="Create tests for public functions and classes",
+                            )
+                        )
 
             # If this is a test file, check quality
             if "test" in rel_path.lower():
                 lines = content.split("\n")
-                test_count = len([l for l in lines if l.strip().startswith("def test_")])
+                test_count = len([line for line in lines if line.strip().startswith("def test_")])
                 assert_count = content.lower().count("assert")
 
                 if test_count > 0 and assert_count / test_count < 1:
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=None,
-                        category=IssueCategory.TESTING,
-                        severity=SeverityLevel.MEDIUM,
-                        title="Tests may lack assertions",
-                        description=f"{test_count} tests but only {assert_count} assertions",
-                        suggestion="Ensure each test has meaningful assertions",
-                    ))
+                    issues.append(
+                        CodeIssue(
+                            file_path=rel_path,
+                            line_number=None,
+                            category=IssueCategory.TESTING,
+                            severity=SeverityLevel.MEDIUM,
+                            title="Tests may lack assertions",
+                            description=f"{test_count} tests but only {assert_count} assertions",
+                            suggestion="Ensure each test has meaningful assertions",
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Testing analysis failed for {file_path}: {e}")
@@ -1105,15 +1150,9 @@ class CodingDoctorAgent(EnhancedSuperAgent):
         overall_score = self._calculate_score(all_issues)
 
         # Generate specialized findings
-        ecommerce_findings = [
-            i.title for i in all_issues if i.category == IssueCategory.ECOMMERCE
-        ]
-        finance_findings = [
-            i.title for i in all_issues if i.category == IssueCategory.FINANCE
-        ]
-        security_findings = [
-            i.title for i in all_issues if i.category == IssueCategory.SECURITY
-        ]
+        ecommerce_findings = [i.title for i in all_issues if i.category == IssueCategory.ECOMMERCE]
+        finance_findings = [i.title for i in all_issues if i.category == IssueCategory.FINANCE]
+        security_findings = [i.title for i in all_issues if i.category == IssueCategory.SECURITY]
         performance_suggestions = [
             i.suggestion or i.title for i in all_issues if i.category == IssueCategory.PERFORMANCE
         ]
@@ -1153,7 +1192,7 @@ class CodingDoctorAgent(EnhancedSuperAgent):
         try:
             content = file_path.read_text()
             lines = content.split("\n")
-            loc = len([l for l in lines if l.strip() and not l.strip().startswith("#")])
+            loc = len([line for line in lines if line.strip() and not line.strip().startswith("#")])
             rel_path = str(file_path.relative_to(self._repo_root))
 
             # Run all applicable toolkits
@@ -1210,41 +1249,47 @@ class CodingDoctorAgent(EnhancedSuperAgent):
 
         # Missing module docstring
         if not content.startswith('"""') and not content.startswith("'''"):
-            issues.append(CodeIssue(
-                file_path=rel_path,
-                line_number=1,
-                category=IssueCategory.DOCUMENTATION,
-                severity=SeverityLevel.LOW,
-                title="Missing module docstring",
-                description="Module should have a docstring",
-                suggestion="Add a module-level docstring",
-                auto_fixable=False,
-            ))
+            issues.append(
+                CodeIssue(
+                    file_path=rel_path,
+                    line_number=1,
+                    category=IssueCategory.DOCUMENTATION,
+                    severity=SeverityLevel.LOW,
+                    title="Missing module docstring",
+                    description="Module should have a docstring",
+                    suggestion="Add a module-level docstring",
+                    auto_fixable=False,
+                )
+            )
 
         # File too long
         if len(lines) > 500:
-            issues.append(CodeIssue(
-                file_path=rel_path,
-                line_number=None,
-                category=IssueCategory.MAINTAINABILITY,
-                severity=SeverityLevel.MEDIUM,
-                title="File too long",
-                description=f"File has {len(lines)} lines (max 500)",
-                suggestion="Split into multiple modules",
-            ))
+            issues.append(
+                CodeIssue(
+                    file_path=rel_path,
+                    line_number=None,
+                    category=IssueCategory.MAINTAINABILITY,
+                    severity=SeverityLevel.MEDIUM,
+                    title="File too long",
+                    description=f"File has {len(lines)} lines (max 500)",
+                    suggestion="Split into multiple modules",
+                )
+            )
 
         # TODO/FIXME
         for i, line in enumerate(lines, 1):
             if "TODO" in line or "FIXME" in line:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=i,
-                    category=IssueCategory.MAINTAINABILITY,
-                    severity=SeverityLevel.INFO,
-                    title="TODO/FIXME found",
-                    description=line.strip()[:60],
-                    suggestion="Address or document",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=i,
+                        category=IssueCategory.MAINTAINABILITY,
+                        severity=SeverityLevel.INFO,
+                        title="TODO/FIXME found",
+                        description=line.strip()[:60],
+                        suggestion="Address or document",
+                    )
+                )
 
         return issues
 
@@ -1349,12 +1394,14 @@ async def main():
     """CLI interface"""
     import sys
 
-    print("""
+    print(
+        """
 ╔══════════════════════════════════════════════════════════════════╗
 ║           DevSkyy Coding Doctor                                   ║
 ║   Self-Learning | Self-Healing | Full-Stack Analysis             ║
 ╚══════════════════════════════════════════════════════════════════╝
-""")
+"""
+    )
 
     doctor = create_coding_doctor()
     await doctor.initialize()
@@ -1368,7 +1415,9 @@ async def main():
 
         print(f"\n📊 Overall Score: {report.overall_score:.1f}/100")
         print(f"📁 Files: {report.total_files} | Lines: {report.total_lines}")
-        print(f"🔍 Issues: {len(report.issues)} | Auto-healed: {len([h for h in report.healing_results if h.success])}")
+        print(
+            f"🔍 Issues: {len(report.issues)} | Auto-healed: {len([h for h in report.healing_results if h.success])}"
+        )
         print(f"🧠 Learnings applied: {report.learnings_applied}")
 
         if report.issues:

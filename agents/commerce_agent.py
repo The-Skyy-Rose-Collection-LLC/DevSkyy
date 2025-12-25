@@ -32,11 +32,7 @@ from adk.base import (
 )
 from orchestration.prompt_engineering import PromptTechnique
 
-from .base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-    TaskCategory,
-)
+from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +174,10 @@ When analyzing or recommending, use this structure:
                 parameters={
                     "sku": {"type": "string", "description": "Product SKU"},
                     "include_stock": {"type": "boolean", "description": "Include stock info"},
-                    "include_analytics": {"type": "boolean", "description": "Include sales analytics"},
+                    "include_analytics": {
+                        "type": "boolean",
+                        "description": "Include sales analytics",
+                    },
                 },
             ),
             ToolDefinition(
@@ -205,7 +204,10 @@ When analyzing or recommending, use this structure:
                 name="get_inventory",
                 description="Get inventory levels for product(s)",
                 parameters={
-                    "sku": {"type": "string", "description": "Product SKU (optional, all if omitted)"},
+                    "sku": {
+                        "type": "string",
+                        "description": "Product SKU (optional, all if omitted)",
+                    },
                     "warehouse": {"type": "string", "description": "Warehouse location"},
                 },
             ),
@@ -259,7 +261,10 @@ When analyzing or recommending, use this structure:
                 description="Calculate dynamic pricing for product",
                 parameters={
                     "sku": {"type": "string", "description": "Product SKU"},
-                    "factors": {"type": "object", "description": "Pricing factors (demand, competition, etc.)"},
+                    "factors": {
+                        "type": "object",
+                        "description": "Pricing factors (demand, competition, etc.)",
+                    },
                 },
             ),
             ToolDefinition(
@@ -313,8 +318,7 @@ When analyzing or recommending, use this structure:
 
             # Select appropriate technique
             technique = self.TECHNIQUE_PREFERENCES.get(
-                task_type,
-                self.select_technique(TaskCategory.REASONING)
+                task_type, self.select_technique(TaskCategory.REASONING)
             )
 
             # Apply technique to enhance prompt
@@ -337,7 +341,7 @@ When analyzing or recommending, use this structure:
                 metadata={
                     "task_type": task_type,
                     "technique": technique.value,
-                }
+                },
             )
 
         except Exception as e:
@@ -389,11 +393,7 @@ Recommended Actions:
     # Commerce-Specific Methods
     # =========================================================================
 
-    async def forecast_demand(
-        self,
-        sku: str,
-        days_ahead: int = 30
-    ) -> dict[str, Any]:
+    async def forecast_demand(self, sku: str, days_ahead: int = 30) -> dict[str, Any]:
         """
         Forecast product demand using ML.
 
@@ -401,22 +401,19 @@ Recommended Actions:
         """
         if self.ml_module:
             prediction = await self.ml_module.predict(
-                "demand_forecaster",
-                {"sku": sku, "days": days_ahead}
+                "demand_forecaster", {"sku": sku, "days": days_ahead}
             )
             return {
                 "sku": sku,
                 "forecast_days": days_ahead,
                 "prediction": prediction.prediction,
-                "confidence": prediction.confidence
+                "confidence": prediction.confidence,
             }
 
         return {"sku": sku, "error": "ML module not available"}
 
     async def optimize_price(
-        self,
-        sku: str,
-        factors: dict[str, Any] | None = None
+        self, sku: str, factors: dict[str, Any] | None = None
     ) -> dict[str, Any]:
         """
         Calculate optimal price using ML.
@@ -424,28 +421,18 @@ Recommended Actions:
         Factors: demand, competition, inventory, seasonality
         """
         if self.ml_module:
-            input_data = {
-                "sku": sku,
-                "factors": factors or {}
-            }
-            prediction = await self.ml_module.predict(
-                "price_optimizer",
-                input_data
-            )
+            input_data = {"sku": sku, "factors": factors or {}}
+            prediction = await self.ml_module.predict("price_optimizer", input_data)
             return {
                 "sku": sku,
                 "recommended_price": prediction.prediction,
                 "confidence": prediction.confidence,
-                "factors_considered": factors
+                "factors_considered": factors,
             }
 
         return {"sku": sku, "error": "ML module not available"}
 
-    async def process_order(
-        self,
-        order_id: str,
-        action: str = "status"
-    ) -> AgentResult:
+    async def process_order(self, order_id: str, action: str = "status") -> AgentResult:
         """Process an order with full workflow"""
         prompt = f"""Process order {order_id}
 
@@ -460,16 +447,10 @@ Please:
 6. Return summary of actions taken"""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="order",
-            technique=PromptTechnique.REACT
+            prompt, task_type="order", technique=PromptTechnique.REACT
         )
 
-    async def manage_inventory(
-        self,
-        sku: str | None = None,
-        action: str = "status"
-    ) -> AgentResult:
+    async def manage_inventory(self, sku: str | None = None, action: str = "status") -> AgentResult:
         """Manage inventory with forecasting"""
         prompt = f"""Inventory management task
 
@@ -494,14 +475,12 @@ Please:
                 "days_of_supply": "number",
                 "reorder_recommendation": "boolean",
                 "reorder_quantity": "number",
-                "insights": "array"
-            }
+                "insights": "array",
+            },
         )
 
     async def analyze_pricing(
-        self,
-        sku: str,
-        competitor_prices: list[float] | None = None
+        self, sku: str, competitor_prices: list[float] | None = None
     ) -> AgentResult:
         """Analyze and recommend pricing"""
         prompt = f"""Pricing analysis for SKU: {sku}
@@ -519,9 +498,7 @@ Please analyze:
 Use Chain-of-Thought reasoning to explain your pricing strategy."""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="pricing",
-            technique=PromptTechnique.CHAIN_OF_THOUGHT
+            prompt, task_type="pricing", technique=PromptTechnique.CHAIN_OF_THOUGHT
         )
 
 

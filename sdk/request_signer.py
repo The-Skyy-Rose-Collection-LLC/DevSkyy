@@ -274,7 +274,7 @@ def example_sign_post_request():
 def example_httpx_request():
     """Example: Make a signed request with httpx"""
     try:
-        import httpx
+        import httpx  # noqa: F401
     except ImportError:
         print("httpx not installed. Install with: pip install httpx")
         return

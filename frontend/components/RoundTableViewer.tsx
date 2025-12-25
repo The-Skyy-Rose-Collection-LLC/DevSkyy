@@ -7,6 +7,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import {
   Trophy,
   Clock,
@@ -18,6 +19,8 @@ import {
   ChevronDown,
   ChevronUp,
   Crown,
+  FlaskConical,
+  ExternalLink,
 } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from './ui/card';
 import { Button } from './ui/button';
@@ -204,9 +207,19 @@ export function RoundTableViewer({
         {/* A/B Test Result */}
         {entry.abTestResult && (
           <div className="border-t pt-4">
-            <p className="text-xs text-gray-500 font-medium mb-2">
-              A/B Test Result
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs text-gray-500 font-medium flex items-center gap-1">
+                <FlaskConical className="h-3 w-3" />
+                A/B Test Result
+              </p>
+              {/* Cross-link to A/B Testing page */}
+              <Link href={`/ab-testing?testId=${entry.abTestResult.testId}`}>
+                <Button variant="ghost" size="sm" className="h-6 px-2 text-xs">
+                  View Details
+                  <ExternalLink className="ml-1 h-3 w-3" />
+                </Button>
+              </Link>
+            </div>
             <div className="bg-gray-50 dark:bg-gray-900 rounded-md p-3 space-y-2">
               <div className="flex justify-between text-sm">
                 <span>Winner</span>

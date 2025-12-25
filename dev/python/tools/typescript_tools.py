@@ -134,25 +134,32 @@ class TypeScriptTools:
         commands = []
 
         if check_outdated:
-            commands.append({
-                "name": "Check outdated packages",
-                "command": "npm outdated --json",
-            })
+            commands.append(
+                {
+                    "name": "Check outdated packages",
+                    "command": "npm outdated --json",
+                }
+            )
 
         if check_security:
-            commands.append({
-                "name": "Security audit",
-                "command": "npm audit --json",
-            })
+            commands.append(
+                {
+                    "name": "Security audit",
+                    "command": "npm audit --json",
+                }
+            )
 
-        commands.append({
-            "name": "List installed packages",
-            "command": "npm ls --json --depth=0",
-        })
+        commands.append(
+            {
+                "name": "List installed packages",
+                "command": "npm ls --json --depth=0",
+            }
+        )
 
         return {
             "packageJsonPath": package_json_path,
             "commands": commands,
+            "checkTypes": check_types,
             "typeCheckingGuidelines": {
                 "missingTypes": "Check if @types/{package} exists",
                 "bundledTypes": "Modern packages often include types",

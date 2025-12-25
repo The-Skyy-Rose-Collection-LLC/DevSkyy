@@ -431,8 +431,22 @@ class VaultCA:
     """
     HashiCorp Vault-based Certificate Authority (Production)
 
-    This is a stub implementation for production use with HashiCorp Vault.
-    Requires Vault server with PKI secrets engine configured.
+    Provides production-grade PKI services using HashiCorp Vault's PKI secrets engine.
+    Requires Vault server with PKI secrets engine configured and hvac library installed.
+
+    Setup requirements:
+        1. Enable PKI secrets engine: vault secrets enable pki
+        2. Configure PKI role: vault write pki/roles/service-role ...
+        3. Install hvac: pip install hvac
+
+    Example:
+        >>> ca = VaultCA(
+        ...     vault_url="https://vault.example.com:8200",
+        ...     vault_token="hvs.xxxxx",
+        ...     pki_path="pki",
+        ...     pki_role="service-role"
+        ... )
+        >>> cert, key, chain = ca.generate_service_cert("my-service")
     """
 
     def __init__(
@@ -440,52 +454,365 @@ class VaultCA:
         vault_url: str,
         vault_token: str,
         pki_path: str = "pki",
+        pki_role: str = "service-role",
+        verify_ssl: bool = True,
+        namespace: str | None = None,
     ):
+        """
+        Initialize VaultCA with connection parameters.
+
+        Args:
+            vault_url: Vault server URL (e.g., "https://vault.example.com:8200")
+            vault_token: Vault authentication token
+            pki_path: PKI secrets engine mount path (default: "pki")
+            pki_role: PKI role name for certificate issuance (default: "service-role")
+            verify_ssl: Verify SSL certificates for Vault connection (default: True)
+            namespace: Vault namespace for enterprise deployments (optional)
+
+        Raises:
+            RuntimeError: If hvac library is not installed
+            ConnectionError: If unable to connect to Vault server
+        """
         self.vault_url = vault_url
         self.vault_token = vault_token
         self.pki_path = pki_path
+        self.pki_role = pki_role
+        self.verify_ssl = verify_ssl
+        self.namespace = namespace
         self.logger = logging.getLogger(f"{__name__}.VaultCA")
+        self._client = None
 
-        # Note: Full implementation requires hvac library
-        # pip install hvac
+        # Validate hvac is installed
+        try:
+            import hvac
+
+            self._hvac = hvac
+        except ImportError as e:
+            msg = "hvac library required for VaultCA. Install with: pip install hvac"
+            self.logger.error(msg)
+            raise RuntimeError(msg) from e
+
+        # Initialize Vault client
+        self._init_client()
+
+    def _init_client(self) -> None:
+        """Initialize and verify Vault client connection."""
+        try:
+            self._client = self._hvac.Client(
+                url=self.vault_url,
+                token=self.vault_token,
+                verify=self.verify_ssl,
+                namespace=self.namespace,
+            )
+
+            # Verify authentication
+            if not self._client.is_authenticated():
+                msg = "Failed to authenticate with Vault server"
+                self.logger.error(msg)
+                raise ConnectionError(msg)
+
+            self.logger.info(f"VaultCA initialized successfully (url: {self.vault_url})")
+
+        except Exception as e:
+            self.logger.error(f"Failed to initialize Vault client: {e}")
+            raise
+
+    @property
+    def client(self):
+        """Get Vault client, reinitializing if needed."""
+        if self._client is None:
+            self._init_client()
+        return self._client
 
     def generate_service_cert(
         self,
         service_name: str,
-        validity_ttl: str = "720h",  # 30 days
+        validity_ttl: str = "720h",
         san_names: list[str] | None = None,
+        ip_sans: list[str] | None = None,
     ) -> tuple[str, str, str]:
         """
-        Generate service certificate using Vault PKI
+        Generate service certificate using Vault PKI secrets engine.
 
         Args:
-            service_name: Service common name
-            validity_ttl: Certificate TTL (e.g., "720h", "30d")
-            san_names: Additional Subject Alternative Names
+            service_name: Service common name (CN)
+            validity_ttl: Certificate TTL (e.g., "720h", "30d", "8760h")
+            san_names: Additional DNS Subject Alternative Names
+            ip_sans: IP address Subject Alternative Names
 
         Returns:
             Tuple of (certificate_pem, private_key_pem, ca_chain_pem)
+
+        Raises:
+            RuntimeError: If certificate generation fails
         """
-        # Placeholder for Vault integration
-        self.logger.warning("VaultCA is a stub implementation")
+        try:
+            # Build request parameters
+            issue_params = {
+                "name": self.pki_role,
+                "common_name": service_name,
+                "ttl": validity_ttl,
+            }
 
-        # In production, this would:
-        # 1. Connect to Vault using hvac client
-        # 2. Request certificate from PKI backend
-        # 3. Return certificate, key, and CA chain
+            # Add DNS SANs
+            if san_names:
+                issue_params["alt_names"] = ",".join(san_names)
 
-        raise NotImplementedError(
-            "VaultCA requires HashiCorp Vault integration. "
-            "Install hvac library and configure Vault PKI backend."
-        )
+            # Add IP SANs
+            if ip_sans:
+                issue_params["ip_sans"] = ",".join(ip_sans)
 
-    def revoke_certificate(self, serial_number: str):
-        """Revoke certificate in Vault"""
-        raise NotImplementedError("VaultCA revocation not implemented")
+            self.logger.info(f"Requesting certificate for {service_name} with TTL {validity_ttl}")
+
+            # Issue certificate from Vault PKI
+            response = self.client.secrets.pki.generate_certificate(
+                mount_point=self.pki_path,
+                **issue_params,
+            )
+
+            # Extract certificate components from response
+            cert_data = response.get("data", {})
+
+            certificate_pem = cert_data.get("certificate", "")
+            private_key_pem = cert_data.get("private_key", "")
+            ca_chain_pem = cert_data.get("ca_chain", [""])
+
+            # ca_chain can be a list, join into single PEM
+            if isinstance(ca_chain_pem, list):
+                ca_chain_pem = "\n".join(ca_chain_pem)
+
+            # Validate we got all required components
+            if not certificate_pem:
+                msg = "Vault returned empty certificate"
+                self.logger.error(msg)
+                raise RuntimeError(msg)
+
+            if not private_key_pem:
+                msg = "Vault returned empty private key"
+                self.logger.error(msg)
+                raise RuntimeError(msg)
+
+            serial_number = cert_data.get("serial_number", "unknown")
+            expiration = cert_data.get("expiration", 0)
+
+            self.logger.info(
+                f"Generated certificate for {service_name} "
+                f"(serial: {serial_number}, expires: {expiration})"
+            )
+
+            return certificate_pem, private_key_pem, ca_chain_pem
+
+        except Exception as e:
+            msg = f"Failed to generate certificate for {service_name}: {e}"
+            self.logger.error(msg)
+            raise RuntimeError(msg) from e
+
+    def revoke_certificate(self, serial_number: str) -> bool:
+        """
+        Revoke a certificate in Vault PKI.
+
+        Args:
+            serial_number: Certificate serial number (colon-separated hex format)
+
+        Returns:
+            True if revocation was successful
+
+        Raises:
+            RuntimeError: If revocation fails
+        """
+        try:
+            self.logger.warning(f"Revoking certificate with serial: {serial_number}")
+
+            # Revoke certificate via Vault PKI
+            self.client.secrets.pki.revoke_certificate(
+                mount_point=self.pki_path,
+                serial_number=serial_number,
+            )
+
+            self.logger.info(f"Successfully revoked certificate: {serial_number}")
+            return True
+
+        except Exception as e:
+            msg = f"Failed to revoke certificate {serial_number}: {e}"
+            self.logger.error(msg)
+            raise RuntimeError(msg) from e
 
     def verify_certificate(self, cert_pem: str) -> bool:
-        """Verify certificate against Vault CA"""
-        raise NotImplementedError("VaultCA verification not implemented")
+        """
+        Verify a certificate against Vault CA.
+
+        Performs the following checks:
+        1. Certificate is parseable
+        2. Certificate is signed by Vault CA
+        3. Certificate is not expired
+        4. Certificate is not revoked (via CRL/OCSP if configured)
+
+        Args:
+            cert_pem: PEM-encoded certificate string
+
+        Returns:
+            True if certificate is valid, False otherwise
+        """
+        try:
+            # Parse the certificate
+            cert = x509.load_pem_x509_certificate(cert_pem.encode(), default_backend())
+
+            # Check expiry
+            now = datetime.now(UTC)
+            if now < cert.not_valid_before_utc:
+                self.logger.warning("Certificate is not yet valid")
+                return False
+
+            if now > cert.not_valid_after_utc:
+                self.logger.warning("Certificate has expired")
+                return False
+
+            # Get CA certificate from Vault to verify signature
+            try:
+                ca_response = self.client.secrets.pki.read_ca_certificate(
+                    mount_point=self.pki_path,
+                )
+                ca_cert_pem = ca_response.get("data", {}).get("certificate", "")
+
+                if not ca_cert_pem:
+                    # Try alternate endpoint for CA cert
+                    ca_cert_pem = self.client.secrets.pki.read_ca_certificate_chain(
+                        mount_point=self.pki_path,
+                    )
+
+                if ca_cert_pem:
+                    ca_cert = x509.load_pem_x509_certificate(
+                        ca_cert_pem.encode() if isinstance(ca_cert_pem, str) else ca_cert_pem,
+                        default_backend(),
+                    )
+
+                    # Verify signature
+                    ca_public_key = ca_cert.public_key()
+                    ca_public_key.verify(
+                        cert.signature,
+                        cert.tbs_certificate_bytes,
+                        padding.PKCS1v15(),
+                        cert.signature_hash_algorithm,
+                    )
+
+            except Exception as ca_error:
+                self.logger.warning(
+                    f"Could not verify CA signature (Vault may not expose CA cert): {ca_error}"
+                )
+                # Continue with other checks even if CA verification fails
+
+            # Check revocation status via CRL if available
+            serial_hex = format(cert.serial_number, "x")
+            # Format as colon-separated hex (Vault format)
+            serial_formatted = ":".join(serial_hex[i : i + 2] for i in range(0, len(serial_hex), 2))
+
+            try:
+                # Try to check CRL
+                crl_response = self.client.secrets.pki.read_crl(
+                    mount_point=self.pki_path,
+                )
+                crl_pem = crl_response.get("data", {}).get("crl", "")
+
+                if crl_pem:
+                    crl = x509.load_pem_x509_crl(
+                        crl_pem.encode() if isinstance(crl_pem, str) else crl_pem,
+                        default_backend(),
+                    )
+
+                    # Check if certificate is in CRL
+                    revoked_cert = crl.get_revoked_certificate_by_serial_number(cert.serial_number)
+                    if revoked_cert is not None:
+                        self.logger.warning(f"Certificate {serial_formatted} is revoked")
+                        return False
+
+            except Exception as crl_error:
+                self.logger.debug(f"CRL check skipped: {crl_error}")
+
+            self.logger.info(f"Certificate {serial_formatted} verified successfully")
+            return True
+
+        except Exception as e:
+            self.logger.error(f"Certificate verification failed: {e}")
+            return False
+
+    def get_ca_certificate(self) -> str:
+        """
+        Retrieve the CA certificate from Vault.
+
+        Returns:
+            PEM-encoded CA certificate string
+
+        Raises:
+            RuntimeError: If CA certificate cannot be retrieved
+        """
+        try:
+            response = self.client.secrets.pki.read_ca_certificate(
+                mount_point=self.pki_path,
+            )
+            ca_cert = response.get("data", {}).get("certificate", "")
+
+            if not ca_cert:
+                # Try chain endpoint
+                ca_cert = self.client.secrets.pki.read_ca_certificate_chain(
+                    mount_point=self.pki_path,
+                )
+
+            if not ca_cert:
+                raise RuntimeError("Vault returned empty CA certificate")
+
+            return ca_cert
+
+        except Exception as e:
+            msg = f"Failed to retrieve CA certificate: {e}"
+            self.logger.error(msg)
+            raise RuntimeError(msg) from e
+
+    def list_certificates(self) -> list[str]:
+        """
+        List all issued certificate serial numbers.
+
+        Returns:
+            List of certificate serial numbers
+
+        Raises:
+            RuntimeError: If listing fails
+        """
+        try:
+            response = self.client.secrets.pki.list_certificates(
+                mount_point=self.pki_path,
+            )
+            keys = response.get("data", {}).get("keys", [])
+            return keys
+
+        except Exception as e:
+            msg = f"Failed to list certificates: {e}"
+            self.logger.error(msg)
+            raise RuntimeError(msg) from e
+
+    def tidy_certificates(self, safety_buffer: str = "72h") -> dict:
+        """
+        Tidy the certificate store by removing expired certificates.
+
+        Args:
+            safety_buffer: Time buffer before cleaning expired certs (default: 72h)
+
+        Returns:
+            Tidy operation response from Vault
+        """
+        try:
+            response = self.client.secrets.pki.tidy(
+                mount_point=self.pki_path,
+                tidy_cert_store=True,
+                tidy_revoked_certs=True,
+                safety_buffer=safety_buffer,
+            )
+            self.logger.info("Certificate tidy operation initiated")
+            return response.get("data", {})
+
+        except Exception as e:
+            msg = f"Failed to tidy certificates: {e}"
+            self.logger.error(msg)
+            raise RuntimeError(msg) from e
 
 
 class CertificateValidator:

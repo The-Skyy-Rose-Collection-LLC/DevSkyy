@@ -47,6 +47,7 @@ from .document_ingestion import (
     TextChunker,
     ingest_docs_directory,
 )
+from .domain_router import DomainRouter, TaskDomain
 from .embedding_engine import (
     BaseEmbeddingEngine,
     EmbeddingConfig,
@@ -55,12 +56,7 @@ from .embedding_engine import (
     SentenceTransformerEngine,
     create_embedding_engine,
 )
-from .langgraph_integration import (
-    AgentNode,
-    WorkflowEdge,
-    WorkflowManager,
-    WorkflowState,
-)
+from .langgraph_integration import AgentNode, WorkflowEdge, WorkflowManager, WorkflowState
 from .llm_clients import (
     AnthropicClient,
     BaseLLMClient,
@@ -70,25 +66,18 @@ from .llm_clients import (
     MistralClient,
     OpenAIClient,
 )
-from .llm_orchestrator import (
-    CompletionResult,
-    LLMOrchestrator,
-    RoutingStrategy,
-    TaskType,
+from .llm_orchestrator import CompletionResult, LLMOrchestrator, RoutingStrategy, TaskType
+from .llm_registry import LLMRegistry, ModelCapability, ModelDefinition, ModelProvider, ModelTier
+from .model_config import (
+    get_all_model_ids,
+    get_claude_sonnet,
+    get_gemini_2_flash,
+    get_gpt4o,
+    get_llama_3_3_70b,
+    get_model_id,
+    log_model_configuration,
 )
-from .llm_registry import (
-    LLMRegistry,
-    ModelCapability,
-    ModelDefinition,
-    ModelProvider,
-    ModelTier,
-)
-from .prompt_engineering import (
-    PromptChain,
-    PromptEngineer,
-    PromptTechnique,
-    PromptTemplate,
-)
+from .prompt_engineering import PromptChain, PromptEngineer, PromptTechnique, PromptTemplate
 from .query_rewriter import (
     AdvancedQueryRewriter,
     QueryRewriterConfig,
@@ -96,12 +85,7 @@ from .query_rewriter import (
     RAGPipelineWithRewriting,
     RewrittenQuery,
 )
-from .tool_registry import (
-    ToolCategory,
-    ToolDefinition,
-    ToolParameter,
-    ToolRegistry,
-)
+from .tool_registry import ToolCategory, ToolDefinition, ToolParameter, ToolRegistry
 
 # RAG Components
 from .vector_store import (
@@ -122,6 +106,14 @@ __all__ = [
     "ModelCapability",
     "ModelProvider",
     "ModelTier",
+    # Model Configuration
+    "get_model_id",
+    "get_all_model_ids",
+    "get_claude_sonnet",
+    "get_gpt4o",
+    "get_gemini_2_flash",
+    "get_llama_3_3_70b",
+    "log_model_configuration",
     # LLM Clients
     "BaseLLMClient",
     "OpenAIClient",
@@ -135,6 +127,9 @@ __all__ = [
     "TaskType",
     "RoutingStrategy",
     "CompletionResult",
+    # Domain Router
+    "DomainRouter",
+    "TaskDomain",
     # Tool Registry
     "ToolRegistry",
     "ToolDefinition",

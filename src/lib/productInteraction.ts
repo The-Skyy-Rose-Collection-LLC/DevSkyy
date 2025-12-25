@@ -276,7 +276,12 @@ export class ProductInteractionHandler {
     const inventoryStatus = this.inventory.getStatus(productId);
     if (inventoryStatus && inventoryStatus.stockStatus === 'out_of_stock') {
       this.logger.warn(`Product out of stock: ${productData.name}`);
-      // TODO: Show out-of-stock notification
+      // Dispatch out-of-stock notification event
+      this.dispatchNotification('out_of_stock', {
+        productId,
+        productName: productData.name,
+        message: `${productData.name} is currently out of stock`,
+      });
       return;
     }
 
@@ -295,8 +300,31 @@ export class ProductInteractionHandler {
       this.logger.info(`Added to cart: ${productData.name}`);
     } catch (error) {
       this.logger.error('Failed to add product to cart', error);
-      // TODO: Show error notification
+      // Dispatch error notification event
+      this.dispatchNotification('error', {
+        productId,
+        productName: productData.name,
+        message: `Failed to add ${productData.name} to cart`,
+        error: error instanceof Error ? error.message : String(error),
+      });
     }
+  }
+
+  /**
+   * Dispatch notification event for UI components to handle
+   */
+  private dispatchNotification(
+    type: 'out_of_stock' | 'error' | 'success' | 'info',
+    detail: Record<string, unknown>
+  ): void {
+    const event = new CustomEvent('product:notification', {
+      detail: {
+        type,
+        timestamp: Date.now(),
+        ...detail,
+      },
+    });
+    window.dispatchEvent(event);
   }
 
   /**

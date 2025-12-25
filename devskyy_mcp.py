@@ -45,8 +45,9 @@ from typing import Any, Literal
 
 try:
     import httpx
-    from mcp.server.fastmcp import FastMCP
     from pydantic import BaseModel, ConfigDict, Field
+
+    from mcp.server.fastmcp import FastMCP
 except ImportError as e:
     print(f"âŒ Missing required package: {e}")
     print("Install with: pip install fastmcp httpx pydantic python-jose[cryptography]")
@@ -56,8 +57,17 @@ except ImportError as e:
 # Configuration
 # ===========================
 
-API_BASE_URL = os.getenv("DEVSKYY_API_URL", "http://localhost:8000")
-API_KEY = os.getenv("DEVSKYY_API_KEY", "")
+# Backend selection: 'devskyy' (default) or 'critical-fuchsia-ape'
+MCP_BACKEND = os.getenv("MCP_BACKEND", "devskyy")
+
+# Dynamic configuration based on backend
+if MCP_BACKEND == "critical-fuchsia-ape":
+    API_BASE_URL = os.getenv("CRITICAL_FUCHSIA_APE_URL", "http://critical-fuchsia-ape:8000")
+    API_KEY = os.getenv("CRITICAL_FUCHSIA_APE_KEY", "")
+else:
+    API_BASE_URL = os.getenv("DEVSKYY_API_URL", "http://localhost:8000")
+    API_KEY = os.getenv("DEVSKYY_API_KEY", "")
+
 CHARACTER_LIMIT = 25000  # Maximum response size
 REQUEST_TIMEOUT = 60.0  # API request timeout in seconds
 
@@ -244,6 +254,56 @@ class DynamicPricingInput(BaseAgentInput):
     constraints: dict[str, Any] | None = Field(
         default=None,
         description="Pricing constraints (e.g., {'min_margin': 0.2, 'max_discount': 0.3})",
+    )
+
+
+class ThreeDGenerationInput(BaseAgentInput):
+    """Input for 3D model generation via Tripo3D."""
+
+    product_name: str = Field(
+        ...,
+        description="Name of the product to generate 3D model for",
+        min_length=1,
+        max_length=200,
+    )
+    collection: str = Field(
+        default="SIGNATURE",
+        description="SkyyRose collection: SIGNATURE, BLACK_ROSE, or LOVE_HURTS",
+        max_length=100,
+    )
+    garment_type: str = Field(
+        default="tee",
+        description="Garment type: hoodie, bomber, tee, jacket, shorts, etc.",
+        max_length=50,
+    )
+    additional_details: str = Field(
+        default="",
+        description="Additional design details (colors, materials, special features)",
+        max_length=1000,
+    )
+    output_format: Literal["glb", "gltf", "fbx", "obj", "usdz", "stl"] = Field(
+        default="glb",
+        description="Output 3D model format. GLB recommended for web.",
+    )
+
+
+class ThreeDImageInput(BaseAgentInput):
+    """Input for image-to-3D generation via Tripo3D."""
+
+    product_name: str = Field(
+        ...,
+        description="Name of the product to generate 3D model for",
+        min_length=1,
+        max_length=200,
+    )
+    image_url: str = Field(
+        ...,
+        description="URL or base64-encoded image for 3D generation",
+        max_length=10000,
+    )
+    output_format: Literal["glb", "gltf", "fbx", "obj", "usdz", "stl"] = Field(
+        default="glb",
+        description="Output 3D model format. GLB recommended for web.",
     )
 
 
@@ -860,6 +920,148 @@ async def dynamic_pricing(params: DynamicPricingInput) -> str:
 
 
 # ===========================
+# 3D Asset Generation Tools
+# ===========================
+
+
+@mcp.tool(
+    name="devskyy_generate_3d_from_description",
+    annotations={
+        "title": "DevSkyy 3D Model Generator (Text-to-3D)",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+    },
+)
+async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
+    """Generate 3D fashion models from text descriptions using Tripo3D AI.
+
+    **INDUSTRY FIRST**: Automated 3D model generation for fashion e-commerce.
+
+    The 3D Generation Agent creates high-quality 3D models of SkyyRose products
+    from detailed text descriptions. Perfect for:
+    - Product visualization in online stores
+    - Virtual try-on experiences
+    - Design iteration and prototyping
+    - Cross-platform catalog generation
+
+    **Supported Output Formats:**
+    - GLB (Binary glTF) - Recommended for web/AR
+    - GLTF (JSON glTF) - Human-readable 3D format
+    - FBX (Autodesk) - Professional 3D software
+    - OBJ (Wavefront) - Universal 3D format
+    - USDZ (Apple) - iOS/macOS AR ready
+    - STL - 3D printing format
+
+    **SkyyRose Collections:**
+    - SIGNATURE: Timeless essentials with rose gold details
+    - BLACK_ROSE: Dark elegance limited editions
+    - LOVE_HURTS: Emotional expression with bold design
+
+    **Garment Types:**
+    hoodie, bomber, track_pants, tee, sweatshirt, jacket,
+    shorts, cap, beanie, and more
+
+    Args:
+        params (ThreeDGenerationInput): Generation configuration containing:
+            - product_name: Name of the product
+            - collection: SkyyRose collection
+            - garment_type: Type of garment
+            - additional_details: Design specifications
+            - output_format: Output 3D format
+            - response_format: Output format (markdown/json)
+
+    Returns:
+        str: Generation result with model paths, URLs, and metadata
+
+    Example:
+        >>> generate_3d_from_description({
+        ...     "product_name": "Heart Rose Bomber",
+        ...     "collection": "BLACK_ROSE",
+        ...     "garment_type": "bomber",
+        ...     "additional_details": "Rose gold zipper, embroidered rose",
+        ...     "output_format": "glb"
+        ... })
+    """
+    data = await _make_api_request(
+        "3d/generate-from-description",
+        method="POST",
+        data={
+            "product_name": params.product_name,
+            "collection": params.collection,
+            "garment_type": params.garment_type,
+            "additional_details": params.additional_details,
+            "output_format": params.output_format,
+        },
+    )
+
+    return _format_response(data, params.response_format, "3D Model Generated (Text-to-3D)")
+
+
+@mcp.tool(
+    name="devskyy_generate_3d_from_image",
+    annotations={
+        "title": "DevSkyy 3D Model Generator (Image-to-3D)",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+    },
+)
+async def generate_3d_from_image(params: ThreeDImageInput) -> str:
+    """Generate 3D fashion models from reference images using Tripo3D AI.
+
+    Creates 3D models from 2D design images, sketches, or photos. Use for:
+    - Converting design sketches to 3D models
+    - Creating models from competitor products
+    - Generating 3D from customer design uploads
+    - Rapid prototyping from reference images
+
+    **Supported Input Formats:**
+    - JPEG, PNG image URLs
+    - Base64-encoded image data
+    - Multiple viewing angles for better quality
+
+    **Output Formats:**
+    - GLB (Binary glTF) - Recommended for web/AR
+    - GLTF (JSON glTF) - Human-readable
+    - FBX (Autodesk) - Professional use
+    - OBJ (Wavefront) - Universal
+    - USDZ (Apple) - iOS/macOS AR
+    - STL - 3D printing
+
+    Args:
+        params (ThreeDImageInput): Generation configuration containing:
+            - product_name: Name of the product
+            - image_url: Reference image URL or base64 data
+            - output_format: Output 3D format
+            - response_format: Output format (markdown/json)
+
+    Returns:
+        str: Generation result with model paths and URLs
+
+    Example:
+        >>> generate_3d_from_image({
+        ...     "product_name": "Custom Hoodie",
+        ...     "image_url": "https://example.com/design.jpg",
+        ...     "output_format": "glb"
+        ... })
+    """
+    data = await _make_api_request(
+        "3d/generate-from-image",
+        method="POST",
+        data={
+            "product_name": params.product_name,
+            "image_url": params.image_url,
+            "output_format": params.output_format,
+        },
+    )
+
+    return _format_response(data, params.response_format, "3D Model Generated (Image-to-3D)")
+
+
+# ===========================
 # Marketing Tools
 # ===========================
 
@@ -1169,6 +1371,8 @@ if __name__ == "__main__":
    â€¢ devskyy_ml_prediction - Machine learning predictions
    â€¢ devskyy_manage_products - E-commerce product management
    â€¢ devskyy_dynamic_pricing - ML-powered price optimization
+   â€¢ devskyy_generate_3d_from_description - 3D generation (text-to-3D)
+   â€¢ devskyy_generate_3d_from_image - 3D generation (image-to-3D)
    â€¢ devskyy_marketing_campaign - Multi-channel marketing automation
    â€¢ devskyy_multi_agent_workflow - Complex workflow orchestration
    â€¢ devskyy_system_monitoring - Real-time platform monitoring

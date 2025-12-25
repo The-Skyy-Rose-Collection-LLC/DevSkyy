@@ -136,3 +136,16 @@ data/*.sqlite3
 data/*.db
 .vercel
 .env*.local
+
+# Build artifacts
+*.tsbuildinfo
+dist/
+
+# Empty directories (should not be committed)
+keys/
+secrets/
+
+# Staging/deployment logs
+staging/
+backups/
+legacy/

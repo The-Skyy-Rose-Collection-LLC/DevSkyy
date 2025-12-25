@@ -1,0 +1,231 @@
+{
+  "collection": "love-hurts",
+  "collection_name": "LOVE HURTS",
+  "status": "generated",
+  "total_products": 5,
+  "models": [
+    {
+      "product_name": "IMG 0114",
+      "source_image": "love-hurts/IMG_0114.jpeg",
+      "source_image_size_mb": 21.87,
+      "collection": "love-hurts",
+      "status": "pending_generation",
+      "models": {
+        "glb": null,
+        "usdz": null,
+        "preview": null
+      },
+      "generation_pipeline": [
+        {
+          "stage": "image_optimization",
+          "status": "pending"
+        },
+        {
+          "stage": "huggingface_shap_e",
+          "status": "pending"
+        },
+        {
+          "stage": "tripo3d_conversion",
+          "status": "pending"
+        },
+        {
+          "stage": "wordpress_upload",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "product_name": "IMG 0115",
+      "source_image": "love-hurts/IMG_0115.jpeg",
+      "source_image_size_mb": 19.2,
+      "collection": "love-hurts",
+      "status": "pending_generation",
+      "models": {
+        "glb": null,
+        "usdz": null,
+        "preview": null
+      },
+      "generation_pipeline": [
+        {
+          "stage": "image_optimization",
+          "status": "pending"
+        },
+        {
+          "stage": "huggingface_shap_e",
+          "status": "pending"
+        },
+        {
+          "stage": "tripo3d_conversion",
+          "status": "pending"
+        },
+        {
+          "stage": "wordpress_upload",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "product_name": "IMG 0117",
+      "source_image": "love-hurts/IMG_0117.jpeg",
+      "source_image_size_mb": 0.6,
+      "collection": "love-hurts",
+      "status": "pending_generation",
+      "models": {
+        "glb": null,
+        "usdz": null,
+        "preview": null
+      },
+      "generation_pipeline": [
+        {
+          "stage": "image_optimization",
+          "status": "pending"
+        },
+        {
+          "stage": "huggingface_shap_e",
+          "status": "pending"
+        },
+        {
+          "stage": "tripo3d_conversion",
+          "status": "pending"
+        },
+        {
+          "stage": "wordpress_upload",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "product_name": "IMG 1733",
+      "source_image": "love-hurts/IMG_1733.jpeg",
+      "source_image_size_mb": 2.46,
+      "collection": "love-hurts",
+      "status": "pending_generation",
+      "models": {
+        "glb": null,
+        "usdz": null,
+        "preview": null
+      },
+      "generation_pipeline": [
+        {
+          "stage": "image_optimization",
+          "status": "pending"
+        },
+        {
+          "stage": "huggingface_shap_e",
+          "status": "pending"
+        },
+        {
+          "stage": "tripo3d_conversion",
+          "status": "pending"
+        },
+        {
+          "stage": "wordpress_upload",
+          "status": "pending"
+        }
+      ]
+    },
+    {
+      "product_name": "IMG 2102",
+      "source_image": "love-hurts/IMG_2102.png",
+      "source_image_size_mb": 3.85,
+      "collection": "love-hurts",
+      "status": "pending_generation",
+      "models": {
+        "glb": null,
+        "usdz": null,
+        "preview": null
+      },
+      "generation_pipeline": [
+        {
+          "stage": "image_optimization",
+          "status": "pending"
+        },
+        {
+          "stage": "huggingface_shap_e",
+          "status": "pending"
+        },
+        {
+          "stage": "tripo3d_conversion",
+          "status": "pending"
+        },
+        {
+          "stage": "wordpress_upload",
+          "status": "pending"
+        }
+      ]
+    }
+  ],
+  "brand_colors": {
+    "primary": "#2D1B1F",
+    "accent": "#B76E79",
+    "accent_secondary": "#E8B4BC"
+  },
+  "instructions": {
+    "stage_1_image_optimization": {
+      "description": "Prepare images for 3D generation",
+      "tools": [
+        "PIL",
+        "OpenCV"
+      ],
+      "steps": [
+        "Normalize image resolution to 1024x1024",
+        "Remove backgrounds (white/transparent recommended)",
+        "Enhance contrast for better 3D reconstruction",
+        "Validate image format (PNG recommended for transparency)"
+      ]
+    },
+    "stage_2_huggingface_shap_e": {
+      "description": "Generate quick 3D preview and optimization hints",
+      "tools": [
+        "orchestration/huggingface_3d_client.py"
+      ],
+      "steps": [
+        "Call HuggingFace Shap-E API with optimized image",
+        "Generate low-poly preview model",
+        "Extract optimization metadata (polycount hints, texture size)",
+        "Cache results for faster subsequent processing"
+      ],
+      "output": {
+        "format": "OBJ/MTL",
+        "polycount": "10K-50K",
+        "texture_size": "1024x1024"
+      }
+    },
+    "stage_3_tripo3d_conversion": {
+      "description": "Generate production-quality GLB and USDZ models",
+      "tools": [
+        "agents/tripo_agent.py"
+      ],
+      "steps": [
+        "Call Tripo3D API with source image",
+        "Request GLB format (web-optimized, 50-200K polygons)",
+        "Request USDZ format (AR-optimized for iOS)",
+        "Apply material/texture enhancements",
+        "Validate output model integrity",
+        "Store with version metadata"
+      ],
+      "output": {
+        "formats": [
+          "GLB",
+          "USDZ"
+        ],
+        "polycount": "50K-200K",
+        "filesize": "10-50MB"
+      }
+    },
+    "stage_4_wordpress_upload": {
+      "description": "Upload models to WordPress media library with metadata",
+      "tools": [
+        "wordpress/media_3d_sync.py"
+      ],
+      "steps": [
+        "Upload GLB to WordPress media library",
+        "Upload USDZ to WordPress media library",
+        "Set custom meta fields: _skyyrose_glb_url, _skyyrose_usdz_url, _skyyrose_ar_enabled",
+        "Link to WooCommerce product via product ID",
+        "Enable AR Quick Look for iOS",
+        "Test cross-browser compatibility"
+      ]
+    }
+  }
+}

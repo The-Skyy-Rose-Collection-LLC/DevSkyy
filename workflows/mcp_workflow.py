@@ -159,7 +159,9 @@ class MCPWorkflow:
         try:
             # Run Bandit security scan
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "bandit",
+                "pip",
+                "install",
+                "bandit",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -196,9 +198,11 @@ class MCPWorkflow:
 
             results["api_key_check"] = {
                 "status": "passed" if proc.returncode != 0 else "warning",
-                "message": "No API keys found in code"
-                if proc.returncode != 0
-                else "Potential API key exposure detected",
+                "message": (
+                    "No API keys found in code"
+                    if proc.returncode != 0
+                    else "Potential API key exposure detected"
+                ),
             }
 
         except Exception as e:

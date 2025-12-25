@@ -208,28 +208,36 @@ class PythonTools:
         commands = []
 
         if check_outdated:
-            commands.append({
-                "name": "Check outdated packages",
-                "command": "pip list --outdated --format json",
-            })
+            commands.append(
+                {
+                    "name": "Check outdated packages",
+                    "command": "pip list --outdated --format json",
+                }
+            )
 
         if check_security:
-            commands.append({
-                "name": "Security audit (pip-audit)",
-                "command": "pip-audit --format json",
-                "install": "pip install pip-audit",
-            })
-            commands.append({
-                "name": "Security audit (safety)",
-                "command": f"safety check -r {requirements_path} --json",
-                "install": "pip install safety",
-            })
+            commands.append(
+                {
+                    "name": "Security audit (pip-audit)",
+                    "command": "pip-audit --format json",
+                    "install": "pip install pip-audit",
+                }
+            )
+            commands.append(
+                {
+                    "name": "Security audit (safety)",
+                    "command": f"safety check -r {requirements_path} --json",
+                    "install": "pip install safety",
+                }
+            )
 
-        commands.append({
-            "name": "Dependency tree",
-            "command": "pipdeptree --json",
-            "install": "pip install pipdeptree",
-        })
+        commands.append(
+            {
+                "name": "Dependency tree",
+                "command": "pipdeptree --json",
+                "install": "pip install pipdeptree",
+            }
+        )
 
         return {
             "requirementsPath": requirements_path,
@@ -259,7 +267,10 @@ class PythonTools:
             "commands": [
                 {"name": "Python version", "command": f"{python} --version"},
                 {"name": "Pip version", "command": f"{python} -m pip --version"},
-                {"name": "Virtual env location", "command": f'{python} -c "import sys; print(sys.prefix)"'},
+                {
+                    "name": "Virtual env location",
+                    "command": f'{python} -c "import sys; print(sys.prefix)"',
+                },
                 {"name": "Installed packages", "command": f"{python} -m pip list --format json"},
             ],
             "venvCreation": {
@@ -312,11 +323,7 @@ class PythonTools:
             },
         }
 
-        commands = [
-            {"metric": m, **metric_commands[m]}
-            for m in metrics
-            if m in metric_commands
-        ]
+        commands = [{"metric": m, **metric_commands[m]} for m in metrics if m in metric_commands]
 
         return {
             "target": target,

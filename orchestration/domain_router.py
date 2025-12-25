@@ -38,6 +38,8 @@ class TaskDomain(str, Enum):
     PRODUCT_CONTENT = "product_content"
     FAST_INFERENCE = "fast_inference"
     RAG_SEARCH = "rag_search"
+    THREE_D_GENERATION = "three_d_generation"
+    MEDIA_GENERATION = "media_generation"
     GENERAL = "general"
 
 
@@ -117,6 +119,26 @@ DOMAIN_CONFIGS: dict[TaskDomain, DomainConfig] = {
         max_tokens=4096,
         temperature=0.7,
     ),
+    TaskDomain.THREE_D_GENERATION: DomainConfig(
+        domain=TaskDomain.THREE_D_GENERATION,
+        primary_provider=ModelProvider.ANTHROPIC,
+        primary_model="claude-sonnet-4-20250514",
+        fallback_provider=ModelProvider.OPENAI,
+        fallback_model="gpt-4o",
+        description="3D asset generation prompt optimization (Tripo3D, FASHN)",
+        max_tokens=2048,
+        temperature=0.5,  # Lower temp for consistency
+    ),
+    TaskDomain.MEDIA_GENERATION: DomainConfig(
+        domain=TaskDomain.MEDIA_GENERATION,
+        primary_provider=ModelProvider.GOOGLE,
+        primary_model="gemini-2.0-flash",
+        fallback_provider=ModelProvider.OPENAI,
+        fallback_model="gpt-4o",
+        description="Image, video, and media generation (Google Imagen/Veo)",
+        max_tokens=1024,
+        temperature=0.7,
+    ),
 }
 
 # File path patterns for domain detection (ordered by specificity)
@@ -125,7 +147,6 @@ PATH_PATTERNS: list[tuple[TaskDomain, str]] = [
     (TaskDomain.PRODUCT_CONTENT, r"product"),
     (TaskDomain.PRODUCT_CONTENT, r"catalog"),
     (TaskDomain.PRODUCT_CONTENT, r"description"),
-
     # Web design patterns
     (TaskDomain.WEB_DESIGN, r"/wordpress/"),
     (TaskDomain.WEB_DESIGN, r"/templates/"),
@@ -134,7 +155,12 @@ PATH_PATTERNS: list[tuple[TaskDomain, str]] = [
     (TaskDomain.WEB_DESIGN, r"\.css$"),
     (TaskDomain.WEB_DESIGN, r"\.scss$"),
     (TaskDomain.WEB_DESIGN, r"\.json$"),
-
+    # 3D and media generation patterns
+    (TaskDomain.THREE_D_GENERATION, r"/agents/tripo_agent\.py$"),
+    (TaskDomain.THREE_D_GENERATION, r"/agents/fashn_agent\.py$"),
+    (TaskDomain.MEDIA_GENERATION, r"/agents/creative_agent\.py$"),
+    (TaskDomain.MEDIA_GENERATION, r"visual_generation\.py$"),
+    (TaskDomain.MEDIA_GENERATION, r"tripo|fashn|3d|three_d"),
     # Code generation patterns (less specific - check last)
     (TaskDomain.CODE_GENERATION, r"/orchestration/"),
     (TaskDomain.CODE_GENERATION, r"/llm/"),
@@ -172,7 +198,9 @@ class DomainRouter:
 
     llm_router: LLMRouter = field(default_factory=LLMRouter)
 
-    def detect_domain(self, file_path: str | None = None, task_hint: str | None = None) -> TaskDomain:
+    def detect_domain(
+        self, file_path: str | None = None, task_hint: str | None = None
+    ) -> TaskDomain:
         """
         Detect the task domain from file path or task hint.
 
@@ -186,11 +214,20 @@ class DomainRouter:
         # Check task hints first
         if task_hint:
             hint_lower = task_hint.lower()
-            if any(kw in hint_lower for kw in ["code", "function", "class", "refactor", "debug", "python"]):
+            if any(
+                kw in hint_lower
+                for kw in ["code", "function", "class", "refactor", "debug", "python"]
+            ):
                 return TaskDomain.CODE_GENERATION
-            if any(kw in hint_lower for kw in ["html", "css", "template", "design", "layout", "elementor"]):
+            if any(
+                kw in hint_lower
+                for kw in ["html", "css", "template", "design", "layout", "elementor"]
+            ):
                 return TaskDomain.WEB_DESIGN
-            if any(kw in hint_lower for kw in ["product", "description", "marketing", "copy", "catalog"]):
+            if any(
+                kw in hint_lower
+                for kw in ["product", "description", "marketing", "copy", "catalog"]
+            ):
                 return TaskDomain.PRODUCT_CONTENT
             if any(kw in hint_lower for kw in ["fast", "quick", "chat", "streaming", "realtime"]):
                 return TaskDomain.FAST_INFERENCE
@@ -334,4 +371,3 @@ __all__ = [
     "TaskDomain",
     "DOMAIN_CONFIGS",
 ]
-

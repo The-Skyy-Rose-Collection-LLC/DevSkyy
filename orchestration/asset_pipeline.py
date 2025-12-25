@@ -50,6 +50,7 @@ from pydantic import BaseModel, Field
 from agents.fashn_agent import FashnConfig, FashnTryOnAgent, GarmentCategory
 from agents.tripo_agent import TripoAssetAgent, TripoConfig
 from agents.wordpress_asset_agent import WordPressAssetAgent, WordPressAssetConfig
+from orchestration.huggingface_3d_client import HuggingFace3DClient, HuggingFace3DConfig
 
 logger = structlog.get_logger(__name__)
 
@@ -144,11 +145,13 @@ class PipelineConfig:
     tripo_config: TripoConfig = field(default_factory=TripoConfig.from_env)
     fashn_config: FashnConfig = field(default_factory=FashnConfig.from_env)
     wordpress_config: WordPressAssetConfig = field(default_factory=WordPressAssetConfig.from_env)
+    huggingface_config: HuggingFace3DConfig = field(default_factory=HuggingFace3DConfig.from_env)
 
     # Pipeline settings
-    enable_3d_generation: bool = True
-    enable_virtual_tryon: bool = True
-    enable_wordpress_upload: bool = True
+    enable_huggingface_3d: bool = True  # Stage 0: HF 3D generation
+    enable_3d_generation: bool = True  # Stage 1: Tripo3D generation
+    enable_virtual_tryon: bool = True  # Stage 2: Virtual try-on
+    enable_wordpress_upload: bool = True  # Stage 3: WordPress upload
 
     # Output formats
     output_formats: list[str] = field(default_factory=lambda: ["glb", "usdz"])
@@ -181,6 +184,8 @@ class PipelineConfig:
             tripo_config=TripoConfig.from_env(),
             fashn_config=FashnConfig.from_env(),
             wordpress_config=WordPressAssetConfig.from_env(),
+            huggingface_config=HuggingFace3DConfig.from_env(),
+            enable_huggingface_3d=os.getenv("PIPELINE_ENABLE_HF_3D", "true").lower() == "true",
             enable_3d_generation=os.getenv("PIPELINE_ENABLE_3D", "true").lower() == "true",
             enable_virtual_tryon=os.getenv("PIPELINE_ENABLE_TRYON", "true").lower() == "true",
             enable_wordpress_upload=os.getenv("PIPELINE_ENABLE_WP", "true").lower() == "true",
@@ -355,6 +360,7 @@ class ProductAssetPipeline:
         self.config = config or PipelineConfig.from_env()
 
         # Initialize agents (lazy - created on first use)
+        self._huggingface_client: HuggingFace3DClient | None = None
         self._tripo_agent: TripoAssetAgent | None = None
         self._fashn_agent: FashnTryOnAgent | None = None
         self._wordpress_agent: WordPressAssetAgent | None = None
@@ -375,6 +381,13 @@ class ProductAssetPipeline:
         # Ensure output directories exist
         Path(self.config.tripo_config.output_dir).mkdir(parents=True, exist_ok=True)
         Path(self.config.fashn_config.output_dir).mkdir(parents=True, exist_ok=True)
+
+    @property
+    def huggingface_client(self) -> HuggingFace3DClient:
+        """Get or create HuggingFace 3D client."""
+        if self._huggingface_client is None:
+            self._huggingface_client = HuggingFace3DClient(config=self.config.huggingface_config)
+        return self._huggingface_client
 
     @property
     def tripo_agent(self) -> TripoAssetAgent:
@@ -399,6 +412,8 @@ class ProductAssetPipeline:
 
     async def close(self) -> None:
         """Close all agent sessions and Redis connection."""
+        if self._huggingface_client:
+            await self._huggingface_client.close()
         if self._tripo_agent:
             await self._tripo_agent.close()
         if self._fashn_agent:
@@ -528,9 +543,7 @@ class ProductAssetPipeline:
 
     def _calculate_retry_delay(self, retry_count: int) -> float:
         """Calculate delay with exponential backoff."""
-        delay = self.config.retry_delay * (
-            self.config.retry_backoff_multiplier ** retry_count
-        )
+        delay = self.config.retry_delay * (self.config.retry_backoff_multiplier**retry_count)
         return min(delay, self.config.retry_max_delay)
 
     def _add_to_retry_queue(
@@ -604,12 +617,14 @@ class ProductAssetPipeline:
         results: list[AssetPipelineResult] = []
 
         for item in ready_items:
-            await self._emit_progress(ProgressEvent(
-                event_type=ProgressEventType.RETRY_ATTEMPT,
-                product_id=item.product_id,
-                message=f"Retry attempt {item.retry_count}/{self.config.max_retries}",
-                metadata={"retry_count": item.retry_count},
-            ))
+            await self._emit_progress(
+                ProgressEvent(
+                    event_type=ProgressEventType.RETRY_ATTEMPT,
+                    product_id=item.product_id,
+                    message=f"Retry attempt {item.retry_count}/{self.config.max_retries}",
+                    metadata={"retry_count": item.retry_count},
+                )
+            )
 
             result = await self.process_product(
                 product_id=item.product_id,
@@ -670,12 +685,14 @@ class ProductAssetPipeline:
         )
 
         # Emit batch started
-        await self._emit_progress(ProgressEvent(
-            event_type=ProgressEventType.BATCH_STARTED,
-            batch_id=batch_id,
-            batch_total=len(products),
-            message=f"Starting batch processing of {len(products)} products",
-        ))
+        await self._emit_progress(
+            ProgressEvent(
+                event_type=ProgressEventType.BATCH_STARTED,
+                batch_id=batch_id,
+                batch_total=len(products),
+                message=f"Starting batch processing of {len(products)} products",
+            )
+        )
 
         logger.info(
             "Starting batch processing",
@@ -693,15 +710,17 @@ class ProductAssetPipeline:
                 product_id = product.get("product_id", f"unknown_{index}")
 
                 # Emit item started
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.ITEM_STARTED,
-                    product_id=product_id,
-                    batch_id=batch_id,
-                    batch_total=len(products),
-                    batch_completed=batch_result.successful_items,
-                    progress_percent=(index / len(products)) * 100,
-                    message=f"Processing product {index + 1}/{len(products)}",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.ITEM_STARTED,
+                        product_id=product_id,
+                        batch_id=batch_id,
+                        batch_total=len(products),
+                        batch_completed=batch_result.successful_items,
+                        progress_percent=(index / len(products)) * 100,
+                        message=f"Processing product {index + 1}/{len(products)}",
+                    )
+                )
 
                 try:
                     # Check cache first
@@ -713,12 +732,14 @@ class ProductAssetPipeline:
                     cached = await self._get_cached_result(cache_key)
 
                     if cached and cached.status == "success":
-                        await self._emit_progress(ProgressEvent(
-                            event_type=ProgressEventType.CACHE_HIT,
-                            product_id=product_id,
-                            batch_id=batch_id,
-                            message="Using cached result",
-                        ))
+                        await self._emit_progress(
+                            ProgressEvent(
+                                event_type=ProgressEventType.CACHE_HIT,
+                                product_id=product_id,
+                                batch_id=batch_id,
+                                message="Using cached result",
+                            )
+                        )
                         return (index, cached, None)
 
                     # Process product with timeout
@@ -738,16 +759,20 @@ class ProductAssetPipeline:
                     )
 
                     # Emit completion
-                    await self._emit_progress(ProgressEvent(
-                        event_type=ProgressEventType.ITEM_COMPLETED
-                        if result.status == "success"
-                        else ProgressEventType.ITEM_FAILED,
-                        product_id=product_id,
-                        batch_id=batch_id,
-                        batch_total=len(products),
-                        message=f"Product {result.status}",
-                        metadata={"duration": result.duration_seconds},
-                    ))
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=(
+                                ProgressEventType.ITEM_COMPLETED
+                                if result.status == "success"
+                                else ProgressEventType.ITEM_FAILED
+                            ),
+                            product_id=product_id,
+                            batch_id=batch_id,
+                            batch_total=len(products),
+                            message=f"Product {result.status}",
+                            metadata={"duration": result.duration_seconds},
+                        )
+                    )
 
                     return (index, result, None)
 
@@ -768,12 +793,14 @@ class ProductAssetPipeline:
                         error=error_msg,
                     )
 
-                    await self._emit_progress(ProgressEvent(
-                        event_type=ProgressEventType.ITEM_FAILED,
-                        product_id=product_id,
-                        batch_id=batch_id,
-                        message=error_msg,
-                    ))
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.ITEM_FAILED,
+                            product_id=product_id,
+                            batch_id=batch_id,
+                            message=error_msg,
+                        )
+                    )
 
                     return (index, None, retry_item)
 
@@ -798,20 +825,19 @@ class ProductAssetPipeline:
                         error=error_msg,
                     )
 
-                    await self._emit_progress(ProgressEvent(
-                        event_type=ProgressEventType.ITEM_FAILED,
-                        product_id=product_id,
-                        batch_id=batch_id,
-                        message=error_msg,
-                    ))
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.ITEM_FAILED,
+                            product_id=product_id,
+                            batch_id=batch_id,
+                            message=error_msg,
+                        )
+                    )
 
                     return (index, None, retry_item)
 
         # Process all products concurrently
-        tasks = [
-            process_with_semaphore(product, i)
-            for i, product in enumerate(products)
-        ]
+        tasks = [process_with_semaphore(product, i) for i, product in enumerate(products)]
         results = await asyncio.gather(*tasks)
 
         # Aggregate results
@@ -828,8 +854,7 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1 for _, r, _ in results
-            if r and r.duration_seconds < 1.0  # Cached results are fast
+            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize
@@ -838,20 +863,22 @@ class ProductAssetPipeline:
         batch_result.duration_seconds = (end_time - start_time).total_seconds()
 
         # Emit batch completed
-        await self._emit_progress(ProgressEvent(
-            event_type=ProgressEventType.BATCH_COMPLETED,
-            batch_id=batch_id,
-            batch_total=batch_result.total_items,
-            batch_completed=batch_result.successful_items,
-            batch_failed=batch_result.failed_items,
-            progress_percent=100.0,
-            message=f"Batch complete: {batch_result.successful_items}/{batch_result.total_items} successful",
-            metadata={
-                "duration_seconds": batch_result.duration_seconds,
-                "cached_items": batch_result.cached_items,
-                "retry_queue_size": len(batch_result.retry_queue),
-            },
-        ))
+        await self._emit_progress(
+            ProgressEvent(
+                event_type=ProgressEventType.BATCH_COMPLETED,
+                batch_id=batch_id,
+                batch_total=batch_result.total_items,
+                batch_completed=batch_result.successful_items,
+                batch_failed=batch_result.failed_items,
+                progress_percent=100.0,
+                message=f"Batch complete: {batch_result.successful_items}/{batch_result.total_items} successful",
+                metadata={
+                    "duration_seconds": batch_result.duration_seconds,
+                    "cached_items": batch_result.cached_items,
+                    "retry_queue_size": len(batch_result.retry_queue),
+                },
+            )
+        )
 
         # Unregister callback if we registered it
         if progress_callback:
@@ -907,11 +934,13 @@ class ProductAssetPipeline:
         cached_result = await self._get_cached_result(cache_key)
         if cached_result and cached_result.status == "success":
             logger.info("Returning cached result", product_id=product_id)
-            await self._emit_progress(ProgressEvent(
-                event_type=ProgressEventType.CACHE_HIT,
-                product_id=product_id,
-                message="Using cached result",
-            ))
+            await self._emit_progress(
+                ProgressEvent(
+                    event_type=ProgressEventType.CACHE_HIT,
+                    product_id=product_id,
+                    message="Using cached result",
+                )
+            )
             return cached_result
 
         result = AssetPipelineResult(
@@ -937,30 +966,62 @@ class ProductAssetPipeline:
             PIPELINE_ACTIVE.inc()
 
         try:
-            # Stage 1: Generate 3D models
+            # Stage 0: Generate initial 3D with HuggingFace (Shap-E)
+            hf_3d_result = None
+            if self.config.enable_huggingface_3d and images:
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_STARTED,
+                        product_id=product_id,
+                        stage="generating_hf_3d",
+                        progress_percent=5.0,
+                        message="Generating initial 3D model with HuggingFace Shap-E",
+                    )
+                )
+                hf_3d_result = await self._generate_3d_with_huggingface(
+                    result=result,
+                    title=title,
+                    images=images,
+                )
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_COMPLETED,
+                        product_id=product_id,
+                        stage="generating_hf_3d",
+                        progress_percent=15.0,
+                        message="HuggingFace 3D generation complete",
+                    )
+                )
+
+            # Stage 1: Generate 3D models with Tripo3D (optimized with HF hints)
             if self.config.enable_3d_generation and images:
                 result.stage = PipelineStage.GENERATING_3D
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.STAGE_STARTED,
-                    product_id=product_id,
-                    stage=PipelineStage.GENERATING_3D.value,
-                    progress_percent=10.0,
-                    message="Generating 3D models",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_STARTED,
+                        product_id=product_id,
+                        stage=PipelineStage.GENERATING_3D.value,
+                        progress_percent=20.0,
+                        message="Generating 3D models with Tripo3D (optimized with HF)",
+                    )
+                )
                 await self._generate_3d_models(
                     result=result,
                     title=title,
                     images=images,
                     collection=collection,
                     garment_type=garment_type,
+                    hf_3d_result=hf_3d_result,
                 )
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.STAGE_COMPLETED,
-                    product_id=product_id,
-                    stage=PipelineStage.GENERATING_3D.value,
-                    progress_percent=40.0,
-                    message=f"3D models generated: {len(result.assets_3d)}",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_COMPLETED,
+                        product_id=product_id,
+                        stage=PipelineStage.GENERATING_3D.value,
+                        progress_percent=40.0,
+                        message=f"3D models generated: {len(result.assets_3d)}",
+                    )
+                )
 
             # Stage 2: Generate virtual try-on (apparel only)
             if (
@@ -969,49 +1030,57 @@ class ProductAssetPipeline:
                 and images
             ):
                 result.stage = PipelineStage.GENERATING_TRYON
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.STAGE_STARTED,
-                    product_id=product_id,
-                    stage=PipelineStage.GENERATING_TRYON.value,
-                    progress_percent=45.0,
-                    message="Generating virtual try-on images",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_STARTED,
+                        product_id=product_id,
+                        stage=PipelineStage.GENERATING_TRYON.value,
+                        progress_percent=45.0,
+                        message="Generating virtual try-on images",
+                    )
+                )
                 await self._generate_tryon_images(
                     result=result,
                     garment_images=images,
                     model_images=model_images,
                     garment_type=garment_type,
                 )
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.STAGE_COMPLETED,
-                    product_id=product_id,
-                    stage=PipelineStage.GENERATING_TRYON.value,
-                    progress_percent=70.0,
-                    message=f"Try-on images generated: {len(result.assets_tryon)}",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_COMPLETED,
+                        product_id=product_id,
+                        stage=PipelineStage.GENERATING_TRYON.value,
+                        progress_percent=70.0,
+                        message=f"Try-on images generated: {len(result.assets_tryon)}",
+                    )
+                )
 
             # Stage 3: Upload to WordPress
             if self.config.enable_wordpress_upload:
                 result.stage = PipelineStage.UPLOADING_ASSETS
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.STAGE_STARTED,
-                    product_id=product_id,
-                    stage=PipelineStage.UPLOADING_ASSETS.value,
-                    progress_percent=75.0,
-                    message="Uploading assets to WordPress",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_STARTED,
+                        product_id=product_id,
+                        stage=PipelineStage.UPLOADING_ASSETS.value,
+                        progress_percent=75.0,
+                        message="Uploading assets to WordPress",
+                    )
+                )
                 await self._upload_to_wordpress(
                     result=result,
                     title=title,
                     wp_product_id=wp_product_id,
                 )
-                await self._emit_progress(ProgressEvent(
-                    event_type=ProgressEventType.STAGE_COMPLETED,
-                    product_id=product_id,
-                    stage=PipelineStage.UPLOADING_ASSETS.value,
-                    progress_percent=95.0,
-                    message=f"Assets uploaded: {len(result.assets_wordpress)}",
-                ))
+                await self._emit_progress(
+                    ProgressEvent(
+                        event_type=ProgressEventType.STAGE_COMPLETED,
+                        product_id=product_id,
+                        stage=PipelineStage.UPLOADING_ASSETS.value,
+                        progress_percent=95.0,
+                        message=f"Assets uploaded: {len(result.assets_wordpress)}",
+                    )
+                )
 
             result.stage = PipelineStage.COMPLETED
             result.status = "success"
@@ -1025,11 +1094,13 @@ class ProductAssetPipeline:
             )
             result.stage = PipelineStage.FAILED
             result.status = "error"
-            result.errors.append({
-                "stage": result.stage.value,
-                "error": str(e),
-                "error_type": type(e).__name__,
-            })
+            result.errors.append(
+                {
+                    "stage": result.stage.value,
+                    "error": str(e),
+                    "error_type": type(e).__name__,
+                }
+            )
 
             # Record error metrics
             if METRICS_ENABLED and ASSET_GENERATION_ERRORS:
@@ -1079,7 +1150,11 @@ class ProductAssetPipeline:
 
         # Stage 4.7.2: Add to retry queue on failure (if not already a retry)
         if result.status == "error" and _retry_count < self.config.max_retries:
-            error_msg = result.errors[-1].get("error", "Unknown error") if result.errors else "Unknown error"
+            error_msg = (
+                result.errors[-1].get("error", "Unknown error")
+                if result.errors
+                else "Unknown error"
+            )
             self._add_to_retry_queue(
                 product_id=product_id,
                 title=title,
@@ -1096,6 +1171,74 @@ class ProductAssetPipeline:
 
         return result
 
+    async def _generate_3d_with_huggingface(
+        self,
+        result: AssetPipelineResult,
+        title: str,
+        images: list[str],
+    ) -> Any:
+        """
+        Generate initial 3D model using HuggingFace Shap-E.
+
+        This is Stage 0 of the hybrid pipeline. HF generates a quick,
+        lower-quality 3D model that we analyze for optimization hints
+        to enhance the Tripo3D prompt.
+
+        Returns:
+            HF3DResult or None if generation fails
+        """
+        logger.info("Generating 3D model with HuggingFace Shap-E", title=title)
+
+        for image_path in images[:1]:  # Use first image only
+            try:
+                # Generate from image
+                hf_result = await self.huggingface_client.generate_from_image(
+                    image_path=image_path,
+                )
+
+                if hf_result:
+                    # Get optimization hints for Tripo3D
+                    if self.config.huggingface_config.enable_optimization_hints:
+                        hints = await self.huggingface_client.get_optimization_hints(hf_result)
+                        logger.info(
+                            "HF optimization hints generated",
+                            geometry=hints.detected_geometry,
+                            complexity=hints.detected_complexity,
+                            tripo_prompt=hints.suggested_tripo_prompt[:50],
+                        )
+
+                    # Store in result metadata for later use
+                    result.errors.append(
+                        {
+                            "stage": "hf_3d_generation",
+                            "type": "info",
+                            "message": "HF 3D generation successful",
+                            "hf_quality_score": hf_result.quality_score,
+                            "hf_model": hf_result.model_used.value,
+                            "hf_polycount": hf_result.polycount,
+                        }
+                    )
+
+                    return hf_result
+
+            except Exception as e:
+                logger.warning(
+                    "HuggingFace 3D generation failed (will fallback to Tripo3D only)",
+                    image=image_path,
+                    error=str(e),
+                )
+                # Don't fail pipeline - HF is optional enhancement
+                result.errors.append(
+                    {
+                        "stage": "hf_3d_generation",
+                        "type": "warning",
+                        "error": str(e),
+                        "message": "HF 3D generation failed, will use Tripo3D only",
+                    }
+                )
+
+        return None
+
     async def _generate_3d_models(
         self,
         result: AssetPipelineResult,
@@ -1103,49 +1246,77 @@ class ProductAssetPipeline:
         images: list[str],
         collection: str,
         garment_type: str,
+        hf_3d_result: Any = None,
     ) -> None:
-        """Generate 3D models using Tripo3D agent."""
-        logger.info("Generating 3D models", title=title, image_count=len(images))
+        """
+        Generate 3D models using Tripo3D agent (Stage 1).
+
+        If hf_3d_result is provided, uses optimization hints to enhance
+        the Tripo3D prompt for better quality output.
+        """
+        logger.info(
+            "Generating 3D models with Tripo3D",
+            title=title,
+            image_count=len(images),
+            has_hf_hints=hf_3d_result is not None,
+        )
 
         for image_path in images[:1]:  # Use first image for 3D generation
             try:
-                # Generate from image
-                gen_result = await self.tripo_agent.run({
+                # Build request with HF optimization hints if available
+                request_data = {
                     "action": "generate_from_image",
                     "image_path": image_path,
                     "product_name": title,
                     "output_format": "glb",
-                })
+                }
+
+                # If HF provided optimization hints, include them
+                if hf_3d_result and hf_3d_result.tripo3d_prompt:
+                    request_data["optimized_prompt"] = hf_3d_result.tripo3d_prompt
+                    logger.info(
+                        "Using HF-optimized prompt for Tripo3D",
+                        prompt=hf_3d_result.tripo3d_prompt[:50],
+                    )
+
+                # Generate from image
+                gen_result = await self.tripo_agent.run(request_data)
 
                 if gen_result.get("status") == "success":
                     data = gen_result.get("data", {})
-                    result.assets_3d.append(Asset3DResult(
-                        task_id=data.get("task_id", ""),
-                        model_path=data.get("model_path", ""),
-                        model_url=data.get("model_url"),
-                        format="glb",
-                        texture_path=data.get("texture_path"),
-                        thumbnail_path=data.get("thumbnail_path"),
-                        metadata={
-                            "collection": collection,
-                            "garment_type": garment_type,
-                            "source_image": image_path,
-                        },
-                    ))
+                    result.assets_3d.append(
+                        Asset3DResult(
+                            task_id=data.get("task_id", ""),
+                            model_path=data.get("model_path", ""),
+                            model_url=data.get("model_url"),
+                            format="glb",
+                            texture_path=data.get("texture_path"),
+                            thumbnail_path=data.get("thumbnail_path"),
+                            metadata={
+                                "collection": collection,
+                                "garment_type": garment_type,
+                                "source_image": image_path,
+                            },
+                        )
+                    )
                 else:
-                    result.errors.append({
-                        "stage": "3d_generation",
-                        "error": gen_result.get("error", "Unknown error"),
-                        "image": image_path,
-                    })
+                    result.errors.append(
+                        {
+                            "stage": "3d_generation",
+                            "error": gen_result.get("error", "Unknown error"),
+                            "image": image_path,
+                        }
+                    )
 
             except Exception as e:
                 logger.error("3D generation failed", image=image_path, error=str(e))
-                result.errors.append({
-                    "stage": "3d_generation",
-                    "error": str(e),
-                    "image": image_path,
-                })
+                result.errors.append(
+                    {
+                        "stage": "3d_generation",
+                        "error": str(e),
+                        "image": image_path,
+                    }
+                )
 
     async def _generate_tryon_images(
         self,
@@ -1186,13 +1357,15 @@ class ProductAssetPipeline:
         for garment_image in garment_images[:1]:  # Limit to first garment
             for model_image in models[:2]:  # Limit to 2 models
                 try:
-                    tryon_result = await self.fashn_agent.run({
-                        "action": "virtual_tryon",
-                        "model_image": model_image,
-                        "garment_image": garment_image,
-                        "category": category.value,
-                        "mode": "balanced",
-                    })
+                    tryon_result = await self.fashn_agent.run(
+                        {
+                            "action": "virtual_tryon",
+                            "model_image": model_image,
+                            "garment_image": garment_image,
+                            "category": category.value,
+                            "mode": "balanced",
+                        }
+                    )
 
                     if tryon_result.get("status") == "success":
                         data = tryon_result.get("data", {})
@@ -1200,21 +1373,25 @@ class ProductAssetPipeline:
                         if isinstance(data, dict) and "fashn_virtual_tryon" in data:
                             data = data.get("fashn_virtual_tryon", {})
 
-                        result.assets_tryon.append(TryOnAssetResult(
-                            task_id=data.get("task_id", ""),
-                            image_path=data.get("image_path", ""),
-                            image_url=data.get("image_url"),
-                            model_image=model_image,
-                            garment_image=garment_image,
-                            metadata={"category": category.value},
-                        ))
+                        result.assets_tryon.append(
+                            TryOnAssetResult(
+                                task_id=data.get("task_id", ""),
+                                image_path=data.get("image_path", ""),
+                                image_url=data.get("image_url"),
+                                model_image=model_image,
+                                garment_image=garment_image,
+                                metadata={"category": category.value},
+                            )
+                        )
                     else:
-                        result.errors.append({
-                            "stage": "tryon_generation",
-                            "error": tryon_result.get("error", "Unknown error"),
-                            "garment": garment_image,
-                            "model": model_image,
-                        })
+                        result.errors.append(
+                            {
+                                "stage": "tryon_generation",
+                                "error": tryon_result.get("error", "Unknown error"),
+                                "garment": garment_image,
+                                "model": model_image,
+                            }
+                        )
 
                 except Exception as e:
                     logger.error(
@@ -1223,12 +1400,14 @@ class ProductAssetPipeline:
                         model=model_image,
                         error=str(e),
                     )
-                    result.errors.append({
-                        "stage": "tryon_generation",
-                        "error": str(e),
-                        "garment": garment_image,
-                        "model": model_image,
-                    })
+                    result.errors.append(
+                        {
+                            "stage": "tryon_generation",
+                            "error": str(e),
+                            "garment": garment_image,
+                            "model": model_image,
+                        }
+                    )
 
     async def _upload_to_wordpress(
         self,
@@ -1256,47 +1435,57 @@ class ProductAssetPipeline:
                     alt_text=f"3D model of {title}",
                 )
 
-                result.assets_wordpress.append(WordPressAssetResult(
-                    media_id=upload_result.get("media_id", 0),
-                    url=upload_result.get("glb_url") or upload_result.get("usdz_url") or "",
-                    asset_type="3d_model",
-                    product_id=wp_product_id,
-                ))
+                result.assets_wordpress.append(
+                    WordPressAssetResult(
+                        media_id=upload_result.get("media_id", 0),
+                        url=upload_result.get("glb_url") or upload_result.get("usdz_url") or "",
+                        asset_type="3d_model",
+                        product_id=wp_product_id,
+                    )
+                )
 
             except Exception as e:
                 logger.error("3D model upload failed", error=str(e))
-                result.errors.append({
-                    "stage": "wordpress_upload",
-                    "error": str(e),
-                    "asset_type": "3d_model",
-                })
+                result.errors.append(
+                    {
+                        "stage": "wordpress_upload",
+                        "error": str(e),
+                        "asset_type": "3d_model",
+                    }
+                )
 
         # Upload try-on images
         for asset in result.assets_tryon:
             try:
-                upload_result = await self.wordpress_agent.run({
-                    "action": "upload_media",
-                    "file_path": asset.image_path,
-                    "title": f"{title} - Virtual Try-On",
-                    "alt_text": f"Virtual try-on of {title}",
-                })
+                upload_result = await self.wordpress_agent.run(
+                    {
+                        "action": "upload_media",
+                        "file_path": asset.image_path,
+                        "title": f"{title} - Virtual Try-On",
+                        "alt_text": f"Virtual try-on of {title}",
+                    }
+                )
 
                 if upload_result.get("status") == "success":
                     data = upload_result.get("data", {}).get("upload", {})
-                    result.assets_wordpress.append(WordPressAssetResult(
-                        media_id=data.get("id", 0),
-                        url=data.get("url", ""),
-                        asset_type="tryon_image",
-                        product_id=wp_product_id,
-                    ))
+                    result.assets_wordpress.append(
+                        WordPressAssetResult(
+                            media_id=data.get("id", 0),
+                            url=data.get("url", ""),
+                            asset_type="tryon_image",
+                            product_id=wp_product_id,
+                        )
+                    )
 
             except Exception as e:
                 logger.error("Try-on image upload failed", error=str(e))
-                result.errors.append({
-                    "stage": "wordpress_upload",
-                    "error": str(e),
-                    "asset_type": "tryon_image",
-                })
+                result.errors.append(
+                    {
+                        "stage": "wordpress_upload",
+                        "error": str(e),
+                        "asset_type": "tryon_image",
+                    }
+                )
 
 
 # =============================================================================

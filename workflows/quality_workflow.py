@@ -82,9 +82,7 @@ class QualityWorkflow:
         except Exception as e:
             logger.error(f"Quality workflow failed: {e}")
             quality_state.status = WorkflowStatus.FAILED
-            quality_state.errors.append(
-                {"node": quality_state.current_node, "error": str(e)}
-            )
+            quality_state.errors.append({"node": quality_state.current_node, "error": str(e)})
             return quality_state
 
     async def _run_linting(self, state: QualityWorkflowState) -> dict[str, Any]:
@@ -95,14 +93,18 @@ class QualityWorkflow:
             # Install ruff if not available
             # Note: In production, these tools should be pre-installed in the environment
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "ruff",
+                "pip",
+                "install",
+                "ruff",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "ruff", "check", ".",
+                "ruff",
+                "check",
+                ".",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -115,7 +117,9 @@ class QualityWorkflow:
 
             # ESLint for JavaScript/TypeScript
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "lint",
+                "npm",
+                "run",
+                "lint",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -143,7 +147,10 @@ class QualityWorkflow:
         try:
             # Ruff formatting for Python
             proc = await asyncio.create_subprocess_exec(
-                "ruff", "format", "--check", ".",
+                "ruff",
+                "format",
+                "--check",
+                ".",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -156,7 +163,9 @@ class QualityWorkflow:
 
             # Prettier for JavaScript/TypeScript
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "format:check",
+                "npm",
+                "run",
+                "format:check",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -169,8 +178,7 @@ class QualityWorkflow:
 
             # Overall pass status
             results["passed"] = all(
-                r.get("status") == "passed"
-                for r in [results["ruff_format"], results["prettier"]]
+                r.get("status") == "passed" for r in [results["ruff_format"], results["prettier"]]
             )
 
         except Exception as e:
@@ -186,14 +194,18 @@ class QualityWorkflow:
             # Install mypy if not available
             # Note: In production, these tools should be pre-installed in the environment
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "mypy",
+                "pip",
+                "install",
+                "mypy",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "mypy", ".", "--ignore-missing-imports",
+                "mypy",
+                ".",
+                "--ignore-missing-imports",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -206,7 +218,9 @@ class QualityWorkflow:
 
             # TypeScript type checking
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "type-check",
+                "npm",
+                "run",
+                "type-check",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -227,9 +241,7 @@ class QualityWorkflow:
 
         return results
 
-    async def _run_complexity_analysis(
-        self, state: QualityWorkflowState
-    ) -> dict[str, Any]:
+    async def _run_complexity_analysis(self, state: QualityWorkflowState) -> dict[str, Any]:
         """Run code complexity analysis"""
         results = {"radon": None}
 
@@ -237,7 +249,9 @@ class QualityWorkflow:
             # Install radon if not available
             # Note: In production, these tools should be pre-installed in the environment
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "radon",
+                "pip",
+                "install",
+                "radon",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )

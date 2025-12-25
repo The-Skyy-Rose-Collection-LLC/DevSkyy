@@ -23,13 +23,11 @@ Version: 1.0.0
 
 from __future__ import annotations
 
-import asyncio
-import hashlib
 import json
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import aiohttp
 import structlog
@@ -183,7 +181,7 @@ GUIDELINES:
 2. Use approved color palette for all designs
 3. Reference the 3D experience HTML file: {template.html_file_path}
 4. Ensure all content aligns with target audience: {template.metadata.get('target_audience', 'N/A') if template.metadata else 'N/A'}
-5. Keep copy consistent with "{template.metadata.get('vibe', 'luxury')}" vibe if metadata else "luxury"}
+5. Keep copy consistent with "{template.metadata.get('vibe', 'luxury') if template.metadata else 'luxury'}" vibe
 
 WHEN IN DOUBT: Reference the {template.html_file_path} file for design system,
 colors, and overall aesthetic.

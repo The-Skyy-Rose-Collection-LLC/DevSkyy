@@ -12,3 +12,5 @@ export { AgentCard } from './AgentCard';
 export { RoundTableViewer } from './RoundTableViewer';
 export { MetricsCard } from './MetricsCard';
 export { TaskExecutor } from './TaskExecutor';
+export { TaskHistoryPanel } from './TaskHistoryPanel';
+export { SkyyRose3DDashboard } from './SkyyRose3DDashboard';

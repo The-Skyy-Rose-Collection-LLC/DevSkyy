@@ -70,6 +70,7 @@ class WooCommerceMCPConfig:
 
 class OrderStatus(str, Enum):
     """WooCommerce order statuses."""
+
     PENDING = "pending"
     PROCESSING = "processing"
     ON_HOLD = "on-hold"
@@ -81,6 +82,7 @@ class OrderStatus(str, Enum):
 
 class StockStatus(str, Enum):
     """Product stock statuses."""
+
     IN_STOCK = "instock"
     OUT_OF_STOCK = "outofstock"
     ON_BACKORDER = "onbackorder"
@@ -88,6 +90,7 @@ class StockStatus(str, Enum):
 
 class ProductType(str, Enum):
     """WooCommerce product types."""
+
     SIMPLE = "simple"
     VARIABLE = "variable"
     GROUPED = "grouped"
@@ -101,6 +104,7 @@ class ProductType(str, Enum):
 
 class ProductVariation(BaseModel):
     """Product variation for variable products."""
+
     id: int | None = None
     sku: str | None = None
     price: str | None = None
@@ -113,6 +117,7 @@ class ProductVariation(BaseModel):
 
 class Product(BaseModel):
     """WooCommerce product model."""
+
     id: int | None = None
     name: str
     slug: str | None = None
@@ -136,6 +141,7 @@ class Product(BaseModel):
 
 class OrderItem(BaseModel):
     """Order line item."""
+
     id: int | None = None
     product_id: int
     variation_id: int | None = None
@@ -148,6 +154,7 @@ class OrderItem(BaseModel):
 
 class Order(BaseModel):
     """WooCommerce order model."""
+
     id: int | None = None
     number: str | None = None
     status: OrderStatus = OrderStatus.PENDING
@@ -167,6 +174,7 @@ class Order(BaseModel):
 
 class Customer(BaseModel):
     """WooCommerce customer model."""
+
     id: int | None = None
     email: str
     first_name: str = ""
@@ -182,6 +190,7 @@ class Customer(BaseModel):
 
 class Coupon(BaseModel):
     """WooCommerce coupon model."""
+
     id: int | None = None
     code: str
     discount_type: str = "percent"  # percent, fixed_cart, fixed_product
@@ -198,6 +207,7 @@ class Coupon(BaseModel):
 
 class InventoryUpdate(BaseModel):
     """Inventory update request."""
+
     product_id: int
     variation_id: int | None = None
     stock_quantity: int
@@ -574,11 +584,14 @@ class WooCommerceMCPClient:
 
         # Add order note if provided
         if note:
-            await self._call_mcp("wc_create_order_note", {
-                "order_id": order_id,
-                "note": note,
-                "customer_note": False,
-            })
+            await self._call_mcp(
+                "wc_create_order_note",
+                {
+                    "order_id": order_id,
+                    "note": note,
+                    "customer_note": False,
+                },
+            )
 
         return Order(**result.get("order", result))
 

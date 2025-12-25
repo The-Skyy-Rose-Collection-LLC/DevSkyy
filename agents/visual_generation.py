@@ -43,6 +43,7 @@ logger = logging.getLogger(__name__)
 
 class VisualProvider(str, Enum):
     """Visual generation providers"""
+
     GOOGLE_IMAGEN = "google_imagen"
     GOOGLE_VEO = "google_veo"
     HUGGINGFACE_FLUX = "huggingface_flux"
@@ -53,6 +54,7 @@ class VisualProvider(str, Enum):
 
 class GenerationType(str, Enum):
     """Type of visual generation"""
+
     IMAGE_FROM_TEXT = "image_from_text"
     IMAGE_FROM_IMAGE = "image_from_image"
     VIDEO_FROM_TEXT = "video_from_text"
@@ -63,6 +65,7 @@ class GenerationType(str, Enum):
 
 class AspectRatio(str, Enum):
     """Supported aspect ratios"""
+
     SQUARE = "1:1"
     PORTRAIT = "9:16"
     LANDSCAPE = "16:9"
@@ -72,6 +75,7 @@ class AspectRatio(str, Enum):
 
 class ImageQuality(str, Enum):
     """Image quality levels"""
+
     DRAFT = "draft"
     STANDARD = "standard"
     HIGH = "high"
@@ -86,6 +90,7 @@ class ImageQuality(str, Enum):
 @dataclass
 class GenerationRequest:
     """Request for visual generation"""
+
     id: str = field(default_factory=lambda: str(uuid4())[:16])
     prompt: str = ""
     negative_prompt: str = ""
@@ -110,6 +115,7 @@ class GenerationRequest:
 @dataclass
 class GenerationResult:
     """Result from visual generation"""
+
     id: str
     request_id: str
     provider: VisualProvider
@@ -139,25 +145,38 @@ SKYYROSE_BRAND_DNA = {
     "location": "Oakland, California",
     "aesthetic": "luxury streetwear",
     "colors": {
-        "primary": "#B76E79",      # Rose gold
-        "secondary": "#1A1A1A",    # Obsidian black
-        "accent": "#FFFFFF",       # White/ivory
-        "metallic": "#D4AF37",     # Gold accent
+        "primary": "#B76E79",  # Rose gold
+        "secondary": "#1A1A1A",  # Obsidian black
+        "accent": "#FFFFFF",  # White/ivory
+        "metallic": "#D4AF37",  # Gold accent
     },
     "style_keywords": [
-        "premium", "sophisticated", "bold", "elegant",
-        "luxury", "refined", "exclusive", "rose gold",
-        "modern", "editorial", "high-fashion"
+        "premium",
+        "sophisticated",
+        "bold",
+        "elegant",
+        "luxury",
+        "refined",
+        "exclusive",
+        "rose gold",
+        "modern",
+        "editorial",
+        "high-fashion",
     ],
     "avoid_keywords": [
-        "cheap", "basic", "generic", "low-quality",
-        "budget", "discount", "mass-produced"
+        "cheap",
+        "basic",
+        "generic",
+        "low-quality",
+        "budget",
+        "discount",
+        "mass-produced",
     ],
     "collections": {
         "BLACK ROSE": "dark elegance, mysterious, limited edition",
         "LOVE HURTS": "emotional expression, bold statements, heart motifs",
-        "SIGNATURE": "timeless essentials, foundation wardrobe"
-    }
+        "SIGNATURE": "timeless essentials, foundation wardrobe",
+    },
 }
 
 
@@ -191,7 +210,7 @@ class GoogleImagenClient:
                 request_id=request.id,
                 provider=VisualProvider.GOOGLE_IMAGEN,
                 success=False,
-                error="Google API key not configured"
+                error="Google API key not configured",
             )
 
         try:
@@ -215,19 +234,21 @@ class GoogleImagenClient:
                 "x-goog-api-key": self.api_key,
             }
 
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, headers=headers) as response:
-                    if response.status != 200:
-                        error_text = await response.text()
-                        return GenerationResult(
-                            id=result_id,
-                            request_id=request.id,
-                            provider=VisualProvider.GOOGLE_IMAGEN,
-                            success=False,
-                            error=f"API error {response.status}: {error_text[:200]}"
-                        )
+            async with (
+                aiohttp.ClientSession() as session,
+                session.post(url, json=payload, headers=headers) as response,
+            ):
+                if response.status != 200:
+                    error_text = await response.text()
+                    return GenerationResult(
+                        id=result_id,
+                        request_id=request.id,
+                        provider=VisualProvider.GOOGLE_IMAGEN,
+                        success=False,
+                        error=f"API error {response.status}: {error_text[:200]}",
+                    )
 
-                    data = await response.json()
+                data = await response.json()
 
             # Parse response
             images = data.get("images", [])
@@ -236,7 +257,9 @@ class GoogleImagenClient:
             for img in images:
                 if "bytesBase64Encoded" in img:
                     # Store base64 or convert to URL
-                    output_urls.append(f"data:image/png;base64,{img['bytesBase64Encoded'][:100]}...")
+                    output_urls.append(
+                        f"data:image/png;base64,{img['bytesBase64Encoded'][:100]}..."
+                    )
 
             latency = (time.time() - start_time) * 1000
 
@@ -251,7 +274,7 @@ class GoogleImagenClient:
                 height=request.height,
                 latency_ms=latency,
                 cost_usd=0.04 * request.num_outputs,  # Estimated cost
-                metadata={"enhanced_prompt": enhanced_prompt}
+                metadata={"enhanced_prompt": enhanced_prompt},
             )
 
         except Exception as e:
@@ -262,7 +285,7 @@ class GoogleImagenClient:
                 provider=VisualProvider.GOOGLE_IMAGEN,
                 success=False,
                 error=str(e),
-                latency_ms=(time.time() - start_time) * 1000
+                latency_ms=(time.time() - start_time) * 1000,
             )
 
     def _enhance_prompt(self, prompt: str) -> str:
@@ -277,11 +300,23 @@ class GoogleImagenClient:
 
     def _default_negative_prompt(self) -> str:
         """Default negative prompt for brand consistency"""
-        return ", ".join([
-            "low quality", "blurry", "pixelated", "cheap looking",
-            "amateur", "distorted", "watermark", "text", "logo",
-            "ugly", "deformed", "noisy", "grainy"
-        ])
+        return ", ".join(
+            [
+                "low quality",
+                "blurry",
+                "pixelated",
+                "cheap looking",
+                "amateur",
+                "distorted",
+                "watermark",
+                "text",
+                "logo",
+                "ugly",
+                "deformed",
+                "noisy",
+                "grainy",
+            ]
+        )
 
 
 class GoogleVeoClient:
@@ -307,7 +342,7 @@ class GoogleVeoClient:
                 request_id=request.id,
                 provider=VisualProvider.GOOGLE_VEO,
                 success=False,
-                error="Google API key not configured"
+                error="Google API key not configured",
             )
 
         try:
@@ -326,19 +361,21 @@ class GoogleVeoClient:
                 "x-goog-api-key": self.api_key,
             }
 
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, headers=headers) as response:
-                    if response.status != 200:
-                        error_text = await response.text()
-                        return GenerationResult(
-                            id=result_id,
-                            request_id=request.id,
-                            provider=VisualProvider.GOOGLE_VEO,
-                            success=False,
-                            error=f"API error {response.status}: {error_text[:200]}"
-                        )
+            async with (
+                aiohttp.ClientSession() as session,
+                session.post(url, json=payload, headers=headers) as response,
+            ):
+                if response.status != 200:
+                    error_text = await response.text()
+                    return GenerationResult(
+                        id=result_id,
+                        request_id=request.id,
+                        provider=VisualProvider.GOOGLE_VEO,
+                        success=False,
+                        error=f"API error {response.status}: {error_text[:200]}",
+                    )
 
-                    data = await response.json()
+                data = await response.json()
 
             # Handle async operation
             operation_name = data.get("name")
@@ -360,7 +397,7 @@ class GoogleVeoClient:
                 duration_seconds=request.duration_seconds,
                 latency_ms=latency,
                 cost_usd=0.10 * request.duration_seconds,  # Estimated
-                metadata={"enhanced_prompt": enhanced_prompt}
+                metadata={"enhanced_prompt": enhanced_prompt},
             )
 
         except Exception as e:
@@ -371,7 +408,7 @@ class GoogleVeoClient:
                 provider=VisualProvider.GOOGLE_VEO,
                 success=False,
                 error=str(e),
-                latency_ms=(time.time() - start_time) * 1000
+                latency_ms=(time.time() - start_time) * 1000,
             )
 
     async def _poll_operation(self, operation_name: str, timeout: int = 120) -> str | None:
@@ -430,7 +467,7 @@ class HuggingFaceFluxClient:
                 request_id=request.id,
                 provider=VisualProvider.HUGGINGFACE_FLUX,
                 success=False,
-                error="HuggingFace API key not configured"
+                error="HuggingFace API key not configured",
             )
 
         try:
@@ -444,7 +481,7 @@ class HuggingFaceFluxClient:
                     "height": request.height,
                     "guidance_scale": request.guidance_scale,
                     "num_inference_steps": request.num_inference_steps,
-                }
+                },
             }
 
             if request.seed:
@@ -459,21 +496,23 @@ class HuggingFaceFluxClient:
                 "Content-Type": "application/json",
             }
 
-            async with aiohttp.ClientSession() as session:
-                async with session.post(url, json=payload, headers=headers) as response:
-                    if response.status != 200:
-                        error_text = await response.text()
-                        return GenerationResult(
-                            id=result_id,
-                            request_id=request.id,
-                            provider=VisualProvider.HUGGINGFACE_FLUX,
-                            success=False,
-                            error=f"API error {response.status}: {error_text[:200]}"
-                        )
+            async with (
+                aiohttp.ClientSession() as session,
+                session.post(url, json=payload, headers=headers) as response,
+            ):
+                if response.status != 200:
+                    error_text = await response.text()
+                    return GenerationResult(
+                        id=result_id,
+                        request_id=request.id,
+                        provider=VisualProvider.HUGGINGFACE_FLUX,
+                        success=False,
+                        error=f"API error {response.status}: {error_text[:200]}",
+                    )
 
-                    # Response is binary image data
-                    image_data = await response.read()
-                    image_base64 = base64.b64encode(image_data).decode()
+                # Response is binary image data
+                image_data = await response.read()
+                image_base64 = base64.b64encode(image_data).decode()
 
             latency = (time.time() - start_time) * 1000
 
@@ -488,7 +527,7 @@ class HuggingFaceFluxClient:
                 height=request.height,
                 latency_ms=latency,
                 cost_usd=0.01,  # HF inference costs
-                metadata={"enhanced_prompt": enhanced_prompt, "model": self.MODEL}
+                metadata={"enhanced_prompt": enhanced_prompt, "model": self.MODEL},
             )
 
         except Exception as e:
@@ -499,7 +538,7 @@ class HuggingFaceFluxClient:
                 provider=VisualProvider.HUGGINGFACE_FLUX,
                 success=False,
                 error=str(e),
-                latency_ms=(time.time() - start_time) * 1000
+                latency_ms=(time.time() - start_time) * 1000,
             )
 
     def _enhance_prompt(self, prompt: str) -> str:
@@ -565,10 +604,7 @@ class VisualGenerationRouter:
 
         logger.info("Visual generation router initialized")
 
-    def get_providers_for_type(
-        self,
-        generation_type: GenerationType
-    ) -> list[VisualProvider]:
+    def get_providers_for_type(self, generation_type: GenerationType) -> list[VisualProvider]:
         """Get available providers for a generation type"""
         return self.ROUTING.get(generation_type, [VisualProvider.GOOGLE_IMAGEN])
 
@@ -576,7 +612,7 @@ class VisualGenerationRouter:
         self,
         request: GenerationRequest,
         provider: VisualProvider | None = None,
-        fallback: bool = True
+        fallback: bool = True,
     ) -> GenerationResult:
         """
         Generate visual content.
@@ -602,7 +638,7 @@ class VisualGenerationRouter:
                 request_id=request.id,
                 provider=provider,
                 success=False,
-                error=f"Provider {provider.value} not configured"
+                error=f"Provider {provider.value} not configured",
             )
 
         # Generate
@@ -632,7 +668,7 @@ class VisualGenerationRouter:
         width: int = 1024,
         height: int = 1024,
         provider: VisualProvider | None = None,
-        **kwargs
+        **kwargs,
     ) -> GenerationResult:
         """
         Convenience method for image generation.
@@ -650,7 +686,7 @@ class VisualGenerationRouter:
             provider=provider or VisualProvider.GOOGLE_IMAGEN,
             width=width,
             height=height,
-            **kwargs
+            **kwargs,
         )
         return await self.generate(request, provider)
 
@@ -659,7 +695,7 @@ class VisualGenerationRouter:
         prompt: str,
         duration: int = 5,
         aspect_ratio: AspectRatio = AspectRatio.LANDSCAPE,
-        **kwargs
+        **kwargs,
     ) -> GenerationResult:
         """
         Convenience method for video generation.
@@ -672,7 +708,7 @@ class VisualGenerationRouter:
             provider=VisualProvider.GOOGLE_VEO,
             duration_seconds=duration,
             aspect_ratio=aspect_ratio,
-            **kwargs
+            **kwargs,
         )
         return await self.generate(request, VisualProvider.GOOGLE_VEO)
 
@@ -682,7 +718,7 @@ class VisualGenerationRouter:
         collection: str = "SIGNATURE",
         style: str = "product photography",
         background: str = "white studio background",
-        **kwargs
+        **kwargs,
     ) -> GenerationResult:
         """
         Generate product image with SkyyRose branding.
@@ -708,11 +744,7 @@ class VisualGenerationRouter:
         return await self.generate_image(prompt.strip(), **kwargs)
 
     async def generate_campaign_video(
-        self,
-        concept: str,
-        collection: str = "SIGNATURE",
-        duration: int = 10,
-        **kwargs
+        self, concept: str, collection: str = "SIGNATURE", duration: int = 10, **kwargs
     ) -> GenerationResult:
         """
         Generate marketing campaign video.
@@ -743,8 +775,9 @@ class VisualGenerationRouter:
 
     def get_stats(self) -> dict[str, Any]:
         """Get generation statistics"""
-        stats: dict[str, dict] = {p.value: {"count": 0, "success": 0, "total_cost": 0.0}
-                                   for p in VisualProvider}
+        stats: dict[str, dict] = {
+            p.value: {"count": 0, "success": 0, "total_cost": 0.0} for p in VisualProvider
+        }
 
         for result in self._history:
             p = result.provider.value
@@ -754,7 +787,7 @@ class VisualGenerationRouter:
             stats[p]["total_cost"] += result.cost_usd
 
         # Calculate success rates
-        for p, s in stats.items():
+        for _p, s in stats.items():
             s["success_rate"] = s["success"] / s["count"] if s["count"] > 0 else 0.0
 
         return stats

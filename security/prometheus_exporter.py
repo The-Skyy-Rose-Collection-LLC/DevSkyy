@@ -89,6 +89,60 @@ cache_hit_rate = Gauge(
     "cache_hit_rate", "Cache hit rate percentage (0-100)", ["cache_type"], registry=devskyy_registry
 )
 
+# =============================================================================
+# LLM Round Table Metrics
+# =============================================================================
+
+# Counter: Round Table Competitions
+round_table_competitions_total = Counter(
+    "round_table_competitions_total",
+    "Total number of LLM Round Table competitions",
+    ["winner_provider", "use_production"],
+    registry=devskyy_registry,
+)
+
+# Counter: Round Table Provider Participations
+round_table_provider_participations = Counter(
+    "round_table_provider_participations_total",
+    "Total provider participations in Round Table",
+    ["provider", "outcome"],  # outcome: winner, finalist, participant
+    registry=devskyy_registry,
+)
+
+# Histogram: Round Table Competition Duration
+round_table_duration_seconds = Histogram(
+    "round_table_duration_seconds",
+    "Round Table competition duration in seconds",
+    ["use_production"],
+    buckets=(0.5, 1.0, 2.0, 5.0, 10.0, 20.0, 30.0, 60.0),
+    registry=devskyy_registry,
+)
+
+# Histogram: Round Table Provider Latency
+round_table_provider_latency_ms = Histogram(
+    "round_table_provider_latency_ms",
+    "Individual provider response latency in milliseconds",
+    ["provider"],
+    buckets=(100, 250, 500, 1000, 2000, 5000, 10000, 20000),
+    registry=devskyy_registry,
+)
+
+# Gauge: Round Table Provider Win Rate
+round_table_provider_win_rate = Gauge(
+    "round_table_provider_win_rate",
+    "Provider win rate in Round Table (0-1)",
+    ["provider"],
+    registry=devskyy_registry,
+)
+
+# Counter: Round Table Errors
+round_table_errors_total = Counter(
+    "round_table_errors_total",
+    "Total Round Table errors",
+    ["error_type", "provider"],
+    registry=devskyy_registry,
+)
+
 
 class PrometheusExporter:
     """
@@ -252,6 +306,72 @@ class PrometheusExporter:
             cache_type: Type of cache ('redis', 'memory', 'cdn')
         """
         cache_hit_rate.labels(cache_type=cache_type).set(hit_rate)
+
+    # =========================================================================
+    # LLM Round Table Metrics
+    # =========================================================================
+
+    def record_round_table_competition(
+        self,
+        winner_provider: str,
+        duration_seconds: float,
+        use_production: bool = True,
+    ) -> None:
+        """
+        Record a Round Table competition result.
+
+        Args:
+            winner_provider: The winning LLM provider
+            duration_seconds: Total competition duration
+            use_production: Whether production Round Table was used
+        """
+        round_table_competitions_total.labels(
+            winner_provider=winner_provider,
+            use_production=str(use_production).lower(),
+        ).inc()
+        round_table_duration_seconds.labels(use_production=str(use_production).lower()).observe(
+            duration_seconds
+        )
+
+    def record_round_table_provider(
+        self,
+        provider: str,
+        outcome: str,
+        latency_ms: float,
+    ) -> None:
+        """
+        Record a provider's participation in Round Table.
+
+        Args:
+            provider: LLM provider name
+            outcome: 'winner', 'finalist', or 'participant'
+            latency_ms: Provider response latency in milliseconds
+        """
+        round_table_provider_participations.labels(
+            provider=provider,
+            outcome=outcome,
+        ).inc()
+        round_table_provider_latency_ms.labels(provider=provider).observe(latency_ms)
+
+    def update_round_table_win_rate(self, provider: str, win_rate: float) -> None:
+        """
+        Update a provider's win rate.
+
+        Args:
+            provider: LLM provider name
+            win_rate: Win rate (0-1)
+        """
+        round_table_provider_win_rate.labels(provider=provider).set(win_rate)
+
+    def record_round_table_error(self, error_type: str, provider: str = "unknown") -> None:
+        """
+        Record a Round Table error.
+
+        Args:
+            error_type: Type of error (e.g., 'timeout', 'api_error', 'parse_error')
+            provider: Provider that caused the error
+        """
+        round_table_errors_total.labels(error_type=error_type, provider=provider).inc()
 
     def generate_metrics(self) -> bytes:
         """

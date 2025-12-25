@@ -23,14 +23,16 @@ const nextConfig = {
     ],
   },
   async rewrites() {
-    return [
-      {
-        source: '/api/backend/:path*',
-        destination: process.env.BACKEND_URL
-          ? `${process.env.BACKEND_URL}/:path*`
-          : 'http://localhost:8000/:path*',
-      },
-    ];
+    // In development, proxy to local Python server
+    // In production (Vercel), Python functions are at /api automatically
+    return process.env.NODE_ENV === 'development'
+      ? [
+          {
+            source: '/api/:path*',
+            destination: 'http://127.0.0.1:8000/api/:path*',
+          },
+        ]
+      : [];
   },
 };
 

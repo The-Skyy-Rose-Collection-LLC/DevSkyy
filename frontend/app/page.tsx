@@ -29,7 +29,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { AgentCard, MetricsCard, TaskExecutor, RoundTableViewer } from '@/components';
+import { AgentCard, MetricsCard, TaskExecutor, RoundTableViewer, TaskHistoryPanel } from '@/components';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
 import {
   useAgents,
@@ -279,6 +279,9 @@ export default function DashboardPage() {
           <TaskExecutor />
         </div>
       </div>
+
+      {/* Task History Panel */}
+      <TaskHistoryPanel limit={8} title="Recent Task History" />
     </div>
   );
 }
