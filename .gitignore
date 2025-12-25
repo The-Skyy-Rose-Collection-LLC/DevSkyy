@@ -58,6 +58,11 @@ coverage/
 .env.save
 .env.backup
 .env.bak
+.env.secrets
+.env.secrets.backup
+.env.critical-fuchsia-ape
+.env.skyyrose-experiences
+.env.staging
 !.env.example
 secrets/
 credentials/
