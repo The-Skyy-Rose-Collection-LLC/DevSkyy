@@ -9,6 +9,7 @@ Comprehensive test suite for the Tripo3D REST API endpoints including:
 - Agent discovery and metadata
 """
 
+from datetime import datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -23,7 +24,7 @@ from api.agents import (
     ThreeDGenerationResult,
 )
 from main_enterprise import app
-from security.jwt_oauth2_auth import TokenPayload
+from security.jwt_oauth2_auth import TokenPayload, TokenType
 
 # =============================================================================
 # Fixtures
@@ -41,8 +42,11 @@ def valid_token() -> TokenPayload:
     """Create a valid token payload for testing."""
     return TokenPayload(
         sub="test-user-id",
-        email="test@example.com",
-        scope="api:write",
+        jti="test-jti",
+        type=TokenType.ACCESS,
+        roles=["admin"],
+        tier="pro",
+        exp=datetime.utcnow() + timedelta(hours=1),
     )
 
 
@@ -69,8 +73,10 @@ class TestAgentDiscovery:
         with patch("api.agents.get_current_user") as mock_get_user:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:read",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             response = client.get(
@@ -89,8 +95,10 @@ class TestAgentDiscovery:
         with patch("api.agents.get_current_user") as mock_get_user:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:read",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             response = client.get(
@@ -110,8 +118,10 @@ class TestAgentDiscovery:
         with patch("api.agents.get_current_user") as mock_get_user:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:read",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             response = client.get(
@@ -173,8 +183,10 @@ class TestTextTo3DGeneration:
         ) as mock_execute:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:write",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             # Mock agent execution
@@ -282,8 +294,10 @@ class TestImageTo3DGeneration:
         ) as mock_execute:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:write",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             mock_execute.return_value = AsyncMock(
@@ -329,8 +343,10 @@ class TestTaskStatus:
         ) as mock_get_task:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:read",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             mock_task = MagicMock()
@@ -356,8 +372,10 @@ class TestTaskStatus:
         ) as mock_get_task:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:read",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             mock_get_task.return_value = None
@@ -493,8 +511,10 @@ class TestErrorHandling:
         with patch("api.agents.get_current_user") as mock_get_user:
             mock_get_user.return_value = TokenPayload(
                 sub="test-user",
-                email="test@example.com",
-                scope="api:write",
+                jti="test-jti",
+                type=TokenType.ACCESS,
+                roles=["admin"],
+                tier="pro",
             )
 
             response = client.post(

@@ -47,6 +47,7 @@ class AgentCategory(str, Enum):
     ECOMMERCE = "ecommerce"
     ML = "ml"
     SECURITY = "security"
+    THREE_D_GENERATION = "three_d_generation"
 
 
 class TaskStatus(str, Enum):
@@ -104,6 +105,53 @@ class AgentInfo(BaseModel):
     actions: list[str]
     is_active: bool = True
     model: str = "claude-sonnet"
+
+
+# =============================================================================
+# 3D Generation Agent Models
+# =============================================================================
+
+
+class ModelFormat(str, Enum):
+    """3D model output formats"""
+
+    GLB = "glb"
+    USDZ = "usdz"
+    OBJ = "obj"
+    FBX = "fbx"
+
+
+class GenerateFromDescriptionRequest(BaseModel):
+    """Request to generate 3D model from text description"""
+
+    description: str = Field(
+        ..., min_length=10, max_length=2000, description="3D model description"
+    )
+    format: ModelFormat = Field(default=ModelFormat.GLB, description="Output model format")
+    style: str = Field(default="realistic", description="Style: realistic, stylized, cartoon, etc.")
+    quality: str = Field(default="high", description="Quality: low, medium, high")
+
+
+class GenerateFromImageRequest(BaseModel):
+    """Request to generate 3D model from image"""
+
+    image_url: str = Field(..., description="URL or base64 data URI of the image")
+    format: ModelFormat = Field(default=ModelFormat.GLB, description="Output model format")
+    remove_background: bool = Field(default=True, description="Remove background from image")
+
+
+class ThreeDGenerationResult(BaseModel):
+    """Result of 3D generation task"""
+
+    task_id: str = Field(..., description="Unique task identifier")
+    status: str = Field(..., description="Task status: processing, completed, failed")
+    model_url: str | None = Field(None, description="URL to generated 3D model")
+    preview_url: str | None = Field(None, description="URL to preview image")
+    format: ModelFormat = Field(default=ModelFormat.GLB, description="Output model format")
+    size_mb: float | None = Field(None, description="File size in MB")
+    created_at: datetime = Field(default_factory=datetime.utcnow, description="Creation timestamp")
+    completed_at: datetime | None = Field(None, description="Completion timestamp")
+    error_message: str | None = Field(None, description="Error message if failed")
 
 
 # =============================================================================
@@ -741,4 +789,8 @@ __all__ = [
     "AgentTask",
     "AgentTaskResponse",
     "AgentCategory",
+    "ModelFormat",
+    "GenerateFromDescriptionRequest",
+    "GenerateFromImageRequest",
+    "ThreeDGenerationResult",
 ]
