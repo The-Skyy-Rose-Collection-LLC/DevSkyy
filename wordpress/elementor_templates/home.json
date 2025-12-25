@@ -1,0 +1,492 @@
+{
+  "version": "0.4",
+  "title": "Home",
+  "type": "page",
+  "content": [
+    {
+      "id": "sc52df4c",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_background": "gradient",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "c8fe2b79",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w11ebcd6",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wa7e18cf",
+              "elType": "widget",
+              "widgetType": "skyyrose-lottie",
+              "settings": {
+                "lottie_url": "/wp-content/uploads/animations/skyyrose-logo-spinning.json",
+                "loop": "yes",
+                "speed": "1.0",
+                "reverse": "no",
+                "segments": "",
+                "autoplay": "yes",
+                "trigger": "none",
+                "width": {
+                  "size": 200,
+                  "unit": "px"
+                },
+                "height": {
+                  "size": 200,
+                  "unit": "px"
+                },
+                "align": "center",
+                "responsive_pause": "yes"
+              }
+            },
+            {
+              "id": "w55ec51d",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 40,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s3307625",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        }
+      },
+      "elements": [
+        {
+          "id": "c91e81c8",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w0bc3e50",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wbdb3771",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Explore Our Collections",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "wcee855f",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "Where love meets luxury across three distinct experiences",
+                "align": "center",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "wf8b034c",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w10157d5",
+              "elType": "widget",
+              "widgetType": "skyyrose-collection-card",
+              "settings": {
+                "collection_slug": "black-rose",
+                "title": "BLACK ROSE",
+                "subtitle": "Dark Elegance & Mystery",
+                "description": "Limited edition pieces with gothic luxury aesthetic",
+                "color": "#C0C0C0",
+                "link": "/collection/black-rose",
+                "image_url": "/wp-content/uploads/collections/black-rose-hero.jpg",
+                "hover_effect": "lift"
+              }
+            },
+            {
+              "id": "w0dc35da",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 24,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wdbd1da5",
+              "elType": "widget",
+              "widgetType": "skyyrose-collection-card",
+              "settings": {
+                "collection_slug": "love-hurts",
+                "title": "LOVE HURTS",
+                "subtitle": "Emotional Expression",
+                "description": "Bold statements celebrating vulnerability and strength",
+                "color": "#B76E79",
+                "link": "/collection/love-hurts",
+                "image_url": "/wp-content/uploads/collections/love-hurts-hero.jpg",
+                "hover_effect": "lift"
+              }
+            },
+            {
+              "id": "w839dc5f",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 24,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w2a7d0dd",
+              "elType": "widget",
+              "widgetType": "skyyrose-collection-card",
+              "settings": {
+                "collection_slug": "signature",
+                "title": "SIGNATURE",
+                "subtitle": "Premium Essentials",
+                "description": "Oakland-made luxury streetwear fundamentals",
+                "color": "#C9A962",
+                "link": "/collection/signature",
+                "image_url": "/wp-content/uploads/collections/signature-hero.jpg",
+                "hover_effect": "lift"
+              }
+            },
+            {
+              "id": "w51569f9",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 24,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w04cf5da",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s4886b06",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_background": "color",
+        "background_color": "#F9F9F9"
+      },
+      "elements": [
+        {
+          "id": "c2b5a293",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w10b7cb7",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wc52bf07",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Born from Oakland's streets \u2014 evolved for the world.",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w1b8f59d",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w8198b2a",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>SkyyRose is more than fashion. It's a movement.</p><p>Each collection tells a story of identity, resilience, and luxury.</p>",
+                "align": "center",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w66b12a9",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 48,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wf621ec1",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Shop Now",
+                "link": {
+                  "url": "/shop",
+                  "is_external": false
+                },
+                "size": "lg",
+                "button_background_color": "#D4AF37",
+                "button_text_color": "#FFFFFF",
+                "button_border_border": "",
+                "button_border_width": {},
+                "button_border_color": "",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {
+                  "size": 1,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w59f9468",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w0870a2e",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Read Our Story",
+                "link": {
+                  "url": "/about",
+                  "is_external": false
+                },
+                "size": "lg",
+                "button_background_color": "transparent",
+                "button_text_color": "#D4AF37",
+                "button_border_border": "solid",
+                "button_border_width": {
+                  "top": "1",
+                  "right": "1",
+                  "bottom": "1",
+                  "left": "1"
+                },
+                "button_border_color": "#D4AF37",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {
+                  "size": 1,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w91819c0",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s7d37454",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        }
+      },
+      "elements": [
+        {
+          "id": "cd0ab1b1",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w9e8058e",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w3c4871a",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Stay in the Loop",
+                "size": "large",
+                "header_size": "h3",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w5f3c111",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "Get exclusive drops, early access, and behind-the-scenes content.",
+                "align": "center",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w361d1db",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w604e9d3",
+              "elType": "widget",
+              "widgetType": "form",
+              "settings": {
+                "form_name": "newsletter",
+                "form_id": "newsletter_signup",
+                "form_fields": [
+                  {
+                    "field_type": "email",
+                    "field_label": "Email Address",
+                    "placeholder": "you@example.com",
+                    "required": "yes"
+                  }
+                ],
+                "submit_button_text": "Join the Movement",
+                "success_message": "Thank you for joining! Check your email."
+              }
+            },
+            {
+              "id": "w41ffec5",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "hide_title": "yes",
+    "template": "elementor_canvas",
+    "post_title": "SkyyRose - Where Love Meets Luxury",
+    "meta_description": "Cinematic 3D luxury streetwear from Oakland. Explore immersive collections with interactive 3D experiences."
+  },
+  "metadata": {}
+}

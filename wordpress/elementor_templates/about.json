@@ -1,0 +1,666 @@
+{
+  "version": "0.4",
+  "title": "About SkyyRose",
+  "type": "page",
+  "content": [
+    {
+      "id": "scd9fe59",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_background": "gradient",
+        "background_color_a": "#0D0D0D",
+        "background_color_b": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "c658fced",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w945bb1f",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 100,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w67e3746",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Where Love Meets Luxury",
+                "size": "xxl",
+                "header_size": "h1",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w5d10ddb",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>A love letter to Oakland. A revolution in streetwear.</p>",
+                "align": "center",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w1d78461",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 100,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sa4643b2",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        }
+      },
+      "elements": [
+        {
+          "id": "c179edbd",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w14ab2ad",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wfa6d550",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our Origin Story",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w7eeda67",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 24,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wfee96fc",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "\n<p>SkyyRose was born from the heart of Oakland, where street culture meets luxury craftsmanship.</p>\n<p>What started as a vision to honor heritage and celebrate identity has evolved into a global movement\nfor emotional expression through fashion.</p>\n<p>Every piece tells a story. Every collection speaks to the soul.</p>\n",
+                "align": "left",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "wa42bd09",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 40,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w4d9727b",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w68efd80",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "The Collections",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w08722d4",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 24,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w160ae00",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "\n<p><strong>BLACK ROSE:</strong> Dark elegance meets modern luxury. Limited edition pieces that celebrate mystery and exclusivity.</p>\n<p><strong>LOVE HURTS:</strong> Raw emotion transformed into high fashion. Bold statements for the courageous.</p>\n<p><strong>SIGNATURE:</strong> Oakland-made essentials. Premium quality that lasts a lifetime.</p>\n",
+                "align": "left",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w22421e2",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 40,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w12c81cf",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wd111317",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our Commitment",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "wd375796",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 24,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wc0e72ee",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "\n<p>Sustainable. Ethical. Transparent.</p>\n<p>We believe luxury should never come at the expense of people or planet.\nEvery stitch, every material, every decision is made with intention.</p>\n",
+                "align": "left",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "wb74d51e",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s375d0c8",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        },
+        "background_color": "#F9F9F9"
+      },
+      "elements": [
+        {
+          "id": "c3daeba7",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "wb7ff23f",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w3ff1eba",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Press & Recognition",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "wcae1980",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w0912515",
+              "elType": "widget",
+              "widgetType": "skyyrose-timeline",
+              "settings": {
+                "date": "February 2024",
+                "title": "San Francisco Post",
+                "description": "Emerging Luxury Brands You Need to Know About in 2024",
+                "link": "https://sfpost.com/business/emerging-luxury-brands-2024",
+                "image": "/wp-content/uploads/press/logos/sf-post-logo.png"
+              }
+            },
+            {
+              "id": "w7239281",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w65d84d0",
+              "elType": "widget",
+              "widgetType": "skyyrose-timeline",
+              "settings": {
+                "date": "April 2024",
+                "title": "CEO Weekly",
+                "description": "Women in Fashion: The SkyyRose Success Story",
+                "link": "https://ceoweekly.com/fashion/skyyrose-founder",
+                "image": "/wp-content/uploads/press/logos/ceo-weekly-logo.png"
+              }
+            },
+            {
+              "id": "w0448bc7",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "we58cf7c",
+              "elType": "widget",
+              "widgetType": "skyyrose-timeline",
+              "settings": {
+                "date": "July 2024",
+                "title": "Forbes - 30 Under 30",
+                "description": "Meet the Founder Reimagining Luxury Fashion",
+                "link": "https://forbes.com/30under30/2024/fashion/skyyrose",
+                "image": "/wp-content/uploads/press/logos/forbes-logo.png"
+              }
+            },
+            {
+              "id": "wba4d890",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w35745eb",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s7505a99",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        }
+      },
+      "elements": [
+        {
+          "id": "c2850140",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "wd42ac98",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wdd77127",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our Impact",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w610ab7d",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w091e561",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "title": "50K+",
+                "description": "SkyyRose Community Members",
+                "title_color": "#D4AF37",
+                "description_color": "#666666"
+              }
+            },
+            {
+              "id": "w0de281a",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w228af63",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "title": "15+",
+                "description": "Countries Served",
+                "title_color": "#D4AF37",
+                "description_color": "#666666"
+              }
+            },
+            {
+              "id": "w004315a",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wb5f95df",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "title": "1000+",
+                "description": "Pieces Crafted Annually",
+                "title_color": "#D4AF37",
+                "description_color": "#666666"
+              }
+            },
+            {
+              "id": "w2bd7c0b",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w6ac507f",
+              "elType": "widget",
+              "widgetType": "icon-box",
+              "settings": {
+                "title": "100%",
+                "description": "Ethically Sourced Materials",
+                "title_color": "#D4AF37",
+                "description_color": "#666666"
+              }
+            },
+            {
+              "id": "waf87fe3",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w03cadd1",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "se3a2e67",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_color": "#D4AF37"
+      },
+      "elements": [
+        {
+          "id": "c0c38140",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "wd55fdbc",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wa8ee9a9",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Ready to Join the Movement?",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "wc91f15a",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 32,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w72b1b5c",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Shop Now",
+                "link": {
+                  "url": "/shop",
+                  "is_external": false
+                },
+                "size": "lg",
+                "button_background_color": "#D4AF37",
+                "button_text_color": "#FFFFFF",
+                "button_border_border": "",
+                "button_border_width": {},
+                "button_border_color": "",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {
+                  "size": 1,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w154c59d",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "hide_title": "yes",
+    "template": "elementor_canvas",
+    "post_title": "About Us - SkyyRose Luxury Streetwear",
+    "meta_description": "Learn the story behind SkyyRose: where Oakland heritage meets luxury fashion innovation."
+  },
+  "metadata": {}
+}
