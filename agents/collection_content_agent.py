@@ -25,10 +25,7 @@ import structlog
 
 from agents.base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 from orchestration.prompt_engineering import PromptTechnique
-from wordpress.collection_page_manager import (
-    CollectionDesignTemplates,
-    CollectionType,
-)
+from wordpress.collection_page_manager import CollectionDesignTemplates, CollectionType
 
 logger = structlog.get_logger(__name__)
 
@@ -121,11 +118,15 @@ class CollectionContentAgent(EnhancedSuperAgent):
                 prompt=prompt,
                 task_category=TaskCategory.CONTENT_GENERATION,
                 collection_type=collection_type,
-                template=template.to_dict() if hasattr(template, "to_dict") else {
-                    "name": template.name,
-                    "theme": template.theme,
-                    "colors": template.colors,
-                },
+                template=(
+                    template.to_dict()
+                    if hasattr(template, "to_dict")
+                    else {
+                        "name": template.name,
+                        "theme": template.theme,
+                        "colors": template.colors,
+                    }
+                ),
             )
 
             logger.info(
@@ -254,9 +255,7 @@ Return a structured response with:
         Returns:
             Validation result with issues and recommendations
         """
-        template = CollectionDesignTemplates.get_template(
-            CollectionType[collection_type.upper()]
-        )
+        template = CollectionDesignTemplates.get_template(CollectionType[collection_type.upper()])
 
         validation_prompt = f"""
 Validate this {template.name} design against the template:
@@ -307,9 +306,7 @@ Return validation with:
         Returns:
             Recovery instructions and template reference
         """
-        template = CollectionDesignTemplates.get_template(
-            CollectionType[collection_type.upper()]
-        )
+        template = CollectionDesignTemplates.get_template(CollectionType[collection_type.upper()])
 
         recovery_prompt = f"""
 COLLECTION DESIGN RECOVERY NEEDED
@@ -356,19 +353,14 @@ Include exact commands and values to use.
         Returns:
             Design template as dict
         """
-        CollectionDesignTemplates.get_template(
-            CollectionType[collection_type.upper()]
-        )
+        CollectionDesignTemplates.get_template(CollectionType[collection_type.upper()])
 
-        return CollectionDesignTemplates.to_agent_reference(
-            CollectionType[collection_type.upper()]
-        )
+        return CollectionDesignTemplates.to_agent_reference(CollectionType[collection_type.upper()])
 
     def get_all_templates(self) -> dict[str, Any]:
         """Get all collection design templates"""
         return {
-            key.value: CollectionDesignTemplates.to_agent_reference(key)
-            for key in CollectionType
+            key.value: CollectionDesignTemplates.to_agent_reference(key) for key in CollectionType
         }
 
 

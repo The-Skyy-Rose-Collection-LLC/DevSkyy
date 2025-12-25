@@ -369,20 +369,39 @@ export class CheckoutManager {
   }
 
   /**
-   * Restore Three.js state after returning from checkout
+   * Restore Three.js state after returning from checkout.
+   * Dispatches a custom event with saved state for scene components to handle.
    */
   restoreThreeJsState(): void {
     try {
       const stateJson = sessionStorage.getItem('threejs_state');
       if (!stateJson) return;
 
-      const savedState = JSON.parse(stateJson);
-      void savedState;  // Parsed state available for future restoration
+      const savedState = JSON.parse(stateJson) as {
+        timestamp: number;
+        cameraPosition?: { x: number; y: number; z: number };
+        cameraTarget?: { x: number; y: number; z: number };
+        selectedProduct?: string;
+        sceneState?: Record<string, unknown>;
+      };
 
-      // TODO: Restore camera position, scene state, etc.
-      // This would be implemented based on specific Three.js scene setup
+      // Dispatch event for Three.js scene components to restore state
+      const restoreEvent = new CustomEvent('threejs:restore', {
+        detail: {
+          savedState,
+          timestamp: Date.now(),
+        },
+      });
+      window.dispatchEvent(restoreEvent);
 
-      // Clear saved state
+      // Log restoration for debugging
+      console.debug('Three.js state restored:', {
+        savedAt: new Date(savedState.timestamp).toISOString(),
+        hasCamera: !!savedState.cameraPosition,
+        hasProduct: !!savedState.selectedProduct,
+      });
+
+      // Clear saved state after restoration
       sessionStorage.removeItem('threejs_state');
     } catch (error) {
       console.error('Error restoring Three.js state:', error);

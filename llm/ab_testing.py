@@ -37,6 +37,7 @@ logger = logging.getLogger(__name__)
 
 class ExperimentStatus(str, Enum):
     """Status of an A/B test experiment"""
+
     DRAFT = "draft"
     RUNNING = "running"
     PAUSED = "paused"
@@ -46,15 +47,17 @@ class ExperimentStatus(str, Enum):
 
 class MetricType(str, Enum):
     """Type of metric being tracked"""
-    CONVERSION = "conversion"      # Binary outcome (0 or 1)
-    REVENUE = "revenue"            # Continuous monetary value
-    COUNT = "count"                # Count-based metric
-    DURATION = "duration"          # Time-based metric
-    SCORE = "score"                # Rating/score metric
+
+    CONVERSION = "conversion"  # Binary outcome (0 or 1)
+    REVENUE = "revenue"  # Continuous monetary value
+    COUNT = "count"  # Count-based metric
+    DURATION = "duration"  # Time-based metric
+    SCORE = "score"  # Rating/score metric
 
 
 class WinnerStatus(str, Enum):
     """Winner determination status"""
+
     NO_DATA = "no_data"
     INSUFFICIENT_DATA = "insufficient_data"
     NO_WINNER = "no_winner"
@@ -71,6 +74,7 @@ class WinnerStatus(str, Enum):
 @dataclass
 class Variant:
     """A variant in an A/B test"""
+
     id: str
     name: str
     description: str = ""
@@ -82,11 +86,12 @@ class Variant:
 @dataclass
 class MetricResult:
     """Results for a metric in a variant"""
+
     variant_id: str
     sample_size: int = 0
-    conversions: int = 0            # For conversion metrics
-    total_value: float = 0.0        # Sum of values
-    sum_squares: float = 0.0        # For variance calculation
+    conversions: int = 0  # For conversion metrics
+    total_value: float = 0.0  # Sum of values
+    sum_squares: float = 0.0  # For variance calculation
 
     @property
     def mean(self) -> float:
@@ -108,8 +113,9 @@ class MetricResult:
         if self.sample_size < 2:
             return 0.0
         mean = self.mean
-        return (self.sum_squares - 2 * mean * self.total_value +
-                self.sample_size * mean * mean) / (self.sample_size - 1)
+        return (self.sum_squares - 2 * mean * self.total_value + self.sample_size * mean * mean) / (
+            self.sample_size - 1
+        )
 
     @property
     def std_error(self) -> float:
@@ -122,25 +128,27 @@ class MetricResult:
 @dataclass
 class StatisticalResult:
     """Statistical analysis result"""
+
     winner: WinnerStatus
     p_value: float
     confidence_level: float
     z_score: float
-    effect_size: float              # Relative improvement
-    absolute_effect: float          # Absolute difference
+    effect_size: float  # Relative improvement
+    absolute_effect: float  # Absolute difference
     control_mean: float
     treatment_mean: float
     sample_size_control: int
     sample_size_treatment: int
     power: float
     is_significant: bool
-    required_sample_size: int       # For target power
+    required_sample_size: int  # For target power
     estimated_days_remaining: int
 
 
 @dataclass
 class Experiment:
     """A/B test experiment definition"""
+
     id: str
     name: str
     description: str
@@ -177,9 +185,10 @@ class Experiment:
 @dataclass
 class ExperimentResult:
     """Complete experiment result with analysis"""
+
     experiment: Experiment
     metric_results: dict[str, dict[str, MetricResult]]  # metric -> variant_id -> result
-    statistical_results: dict[str, StatisticalResult]   # metric -> stats
+    statistical_results: dict[str, StatisticalResult]  # metric -> stats
     overall_winner: WinnerStatus
     recommendation: str
     summary: str
@@ -195,12 +204,7 @@ class StatisticalCalculator:
     """Statistical calculations for A/B testing"""
 
     @staticmethod
-    def calculate_z_score(
-        p1: float,
-        p2: float,
-        n1: int,
-        n2: int
-    ) -> float:
+    def calculate_z_score(p1: float, p2: float, n1: int, n2: int) -> float:
         """Calculate z-score for two proportions"""
         if n1 == 0 or n2 == 0:
             return 0.0
@@ -210,7 +214,7 @@ class StatisticalCalculator:
         if p_pooled == 0 or p_pooled == 1:
             return 0.0
 
-        se = math.sqrt(p_pooled * (1 - p_pooled) * (1/n1 + 1/n2))
+        se = math.sqrt(p_pooled * (1 - p_pooled) * (1 / n1 + 1 / n2))
 
         if se == 0:
             return 0.0
@@ -232,10 +236,7 @@ class StatisticalCalculator:
 
     @staticmethod
     def calculate_sample_size(
-        baseline_rate: float,
-        mde: float,
-        alpha: float = 0.05,
-        power: float = 0.8
+        baseline_rate: float, mde: float, alpha: float = 0.05, power: float = 0.8
     ) -> int:
         """
         Calculate required sample size per variant.
@@ -265,27 +266,23 @@ class StatisticalCalculator:
         if effect == 0:
             return 100000
 
-        numerator = (z_alpha * math.sqrt(2 * p_avg * (1 - p_avg)) +
-                    z_beta * math.sqrt(p1 * (1 - p1) + p2 * (1 - p2))) ** 2
-        denominator = effect ** 2
+        numerator = (
+            z_alpha * math.sqrt(2 * p_avg * (1 - p_avg))
+            + z_beta * math.sqrt(p1 * (1 - p1) + p2 * (1 - p2))
+        ) ** 2
+        denominator = effect**2
 
         return int(math.ceil(numerator / denominator))
 
     @staticmethod
-    def calculate_power(
-        p1: float,
-        p2: float,
-        n1: int,
-        n2: int,
-        alpha: float = 0.05
-    ) -> float:
+    def calculate_power(p1: float, p2: float, n1: int, n2: int, alpha: float = 0.05) -> float:
         """Calculate statistical power achieved"""
         if n1 == 0 or n2 == 0:
             return 0.0
 
         z_alpha = 1.96 if alpha == 0.05 else 2.576
 
-        se_null = math.sqrt(((p1 + p2) / 2) * (1 - (p1 + p2) / 2) * (1/n1 + 1/n2))
+        se_null = math.sqrt(((p1 + p2) / 2) * (1 - (p1 + p2) / 2) * (1 / n1 + 1 / n2))
         se_alt = math.sqrt(p1 * (1 - p1) / n1 + p2 * (1 - p2) / n2)
 
         if se_null == 0 or se_alt == 0:
@@ -298,7 +295,9 @@ class StatisticalCalculator:
         x = abs(z_effect)
         t = 1 / (1 + 0.2316419 * x)
         d = 0.3989423 * math.exp(-x * x / 2)
-        power = 1 - d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))))
+        power = 1 - d * t * (
+            0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274)))
+        )
 
         return max(0.0, min(1.0, power))
 
@@ -359,11 +358,8 @@ class ABTestingEngine:
         if self.db_url:
             try:
                 import asyncpg
-                self._pool = await asyncpg.create_pool(
-                    self.db_url,
-                    min_size=2,
-                    max_size=10
-                )
+
+                self._pool = await asyncpg.create_pool(self.db_url, min_size=2, max_size=10)
                 await self._create_schema()
                 self._initialized = True
                 logger.info("A/B Testing Engine initialized with database")
@@ -466,9 +462,7 @@ class ABTestingEngine:
         # Initialize metric data
         self._metric_data[exp_id] = {primary_metric: {}}
         for v in variants:
-            self._metric_data[exp_id][primary_metric][v.id] = MetricResult(
-                variant_id=v.id
-            )
+            self._metric_data[exp_id][primary_metric][v.id] = MetricResult(variant_id=v.id)
 
         logger.info(f"Created experiment: {name} (ID: {exp_id})")
         return experiment
@@ -497,11 +491,7 @@ class ABTestingEngine:
         exp.status = ExperimentStatus.PAUSED
         return True
 
-    def complete_experiment(
-        self,
-        experiment_id: str,
-        winner_id: str | None = None
-    ) -> bool:
+    def complete_experiment(self, experiment_id: str, winner_id: str | None = None) -> bool:
         """Complete an experiment"""
         exp = self._experiments.get(experiment_id)
         if not exp:
@@ -565,11 +555,7 @@ class ABTestingEngine:
 
         return True
 
-    def assign_variant(
-        self,
-        experiment_id: str,
-        user_id: str | None = None
-    ) -> Variant | None:
+    def assign_variant(self, experiment_id: str, user_id: str | None = None) -> Variant | None:
         """
         Assign a user to a variant (traffic splitting).
 
@@ -585,9 +571,7 @@ class ABTestingEngine:
 
         if user_id:
             # Deterministic assignment based on user ID
-            hash_val = int(hashlib.md5(
-                f"{experiment_id}:{user_id}".encode()
-            ).hexdigest(), 16)
+            hash_val = int(hashlib.md5(f"{experiment_id}:{user_id}".encode()).hexdigest(), 16)
             bucket = (hash_val % 100) / 100
         else:
             bucket = random.random()
@@ -606,9 +590,7 @@ class ABTestingEngine:
     # =========================================================================
 
     def analyze_experiment(
-        self,
-        experiment_id: str,
-        metric_name: str | None = None
+        self, experiment_id: str, metric_name: str | None = None
     ) -> ExperimentResult | None:
         """
         Analyze experiment results with statistical significance.
@@ -641,10 +623,7 @@ class ABTestingEngine:
 
         # Calculate statistics
         stats = self._calculate_statistics(
-            control_result,
-            treatment_result,
-            exp.confidence_threshold,
-            exp.minimum_effect_size
+            control_result, treatment_result, exp.confidence_threshold, exp.minimum_effect_size
         )
 
         # Determine winner
@@ -688,8 +667,7 @@ class ABTestingEngine:
                 power=0.0,
                 is_significant=False,
                 required_sample_size=self._calculator.calculate_sample_size(
-                    control.conversion_rate or 0.1,
-                    min_effect_size
+                    control.conversion_rate or 0.1, min_effect_size
                 ),
                 estimated_days_remaining=-1,
             )
@@ -726,7 +704,9 @@ class ABTestingEngine:
             winner = WinnerStatus.DRAW
 
         # Estimate days remaining
-        current_daily = (n1 + n2) / max(1, (datetime.now(UTC) - datetime(2025, 1, 1, tzinfo=UTC)).days)
+        current_daily = (n1 + n2) / max(
+            1, (datetime.now(UTC) - datetime(2025, 1, 1, tzinfo=UTC)).days
+        )
         remaining_samples = max(0, required * 2 - n1 - n2)
         days_remaining = int(remaining_samples / current_daily) if current_daily > 0 else -1
 
@@ -747,11 +727,7 @@ class ABTestingEngine:
             estimated_days_remaining=days_remaining,
         )
 
-    def _generate_recommendation(
-        self,
-        exp: Experiment,
-        stats: StatisticalResult
-    ) -> str:
+    def _generate_recommendation(self, exp: Experiment, stats: StatisticalResult) -> str:
         """Generate recommendation based on results"""
         if stats.winner == WinnerStatus.INSUFFICIENT_DATA:
             return "Continue collecting data - insufficient sample size for reliable conclusions."
@@ -759,7 +735,9 @@ class ABTestingEngine:
         if not stats.is_significant:
             if stats.power < 0.8:
                 return f"Continue experiment - need ~{stats.required_sample_size} samples per variant for 80% power."
-            return "No significant difference detected. Consider stopping or testing a larger change."
+            return (
+                "No significant difference detected. Consider stopping or testing a larger change."
+            )
 
         if stats.winner == WinnerStatus.VARIANT_B:
             lift = stats.effect_size * 100
@@ -770,11 +748,7 @@ class ABTestingEngine:
 
         return "Results inconclusive - consider extending the experiment."
 
-    def _generate_summary(
-        self,
-        exp: Experiment,
-        stats: StatisticalResult
-    ) -> str:
+    def _generate_summary(self, exp: Experiment, stats: StatisticalResult) -> str:
         """Generate experiment summary"""
         return f"""A/B Test Summary: {exp.name}
 
@@ -803,7 +777,7 @@ Winner: {stats.winner.value}"""
         baseline_rate: float,
         minimum_detectable_effect: float,
         confidence: float = 0.95,
-        power: float = 0.8
+        power: float = 0.8,
     ) -> dict[str, Any]:
         """
         Calculate required sample size for experiment planning.
@@ -819,10 +793,7 @@ Winner: {stats.winner.value}"""
         """
         alpha = 1 - confidence
         per_variant = self._calculator.calculate_sample_size(
-            baseline_rate,
-            minimum_detectable_effect,
-            alpha,
-            power
+            baseline_rate, minimum_detectable_effect, alpha, power
         )
 
         return {
@@ -834,10 +805,7 @@ Winner: {stats.winner.value}"""
             "power": power,
         }
 
-    def list_experiments(
-        self,
-        status: ExperimentStatus | None = None
-    ) -> list[Experiment]:
+    def list_experiments(self, status: ExperimentStatus | None = None) -> list[Experiment]:
         """List all experiments, optionally filtered by status"""
         experiments = list(self._experiments.values())
 

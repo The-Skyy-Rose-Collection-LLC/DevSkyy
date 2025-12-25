@@ -108,7 +108,8 @@ class FeedbackTracker:
     def _init_db(self) -> None:
         """Initialize SQLite database."""
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE TABLE IF NOT EXISTS response_metrics (
                     response_id TEXT PRIMARY KEY,
                     provider TEXT NOT NULL,
@@ -123,17 +124,22 @@ class FeedbackTracker:
                     created_at TEXT,
                     metadata TEXT
                 )
-            """)
+            """
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_provider
                 ON response_metrics(provider)
-            """)
+            """
+            )
 
-            conn.execute("""
+            conn.execute(
+                """
                 CREATE INDEX IF NOT EXISTS idx_task_type
                 ON response_metrics(task_type)
-            """)
+            """
+            )
 
             conn.commit()
 
@@ -159,27 +165,29 @@ class FeedbackTracker:
         provider_str = provider.value if isinstance(provider, ModelProvider) else provider
 
         with sqlite3.connect(self.db_path) as conn:
-            conn.execute("""
+            conn.execute(
+                """
                 INSERT INTO response_metrics
                 (response_id, provider, model, task_type, quality_score,
                  latency_ms, input_tokens, output_tokens, estimated_cost_usd,
                  created_at, metadata)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                response_id,
-                provider_str,
-                model,
-                task_type,
-                quality_score,
-                latency_ms,
-                input_tokens,
-                output_tokens,
-                estimated_cost_usd,
-                datetime.now(UTC).isoformat(),
-                json.dumps(metadata or {}),
-            ))
+            """,
+                (
+                    response_id,
+                    provider_str,
+                    model,
+                    task_type,
+                    quality_score,
+                    latency_ms,
+                    input_tokens,
+                    output_tokens,
+                    estimated_cost_usd,
+                    datetime.now(UTC).isoformat(),
+                    json.dumps(metadata or {}),
+                ),
+            )
             conn.commit()
 
         logger.debug(f"Recorded metric {response_id} for {provider_str}")
         return response_id
-

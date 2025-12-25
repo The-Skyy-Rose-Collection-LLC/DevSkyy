@@ -1,28 +1,115 @@
-# Node modules (npm install runs on Vercel)
-node_modules/
-frontend/node_modules/
+# =============================================================================
+# DevSkyy .vercelignore - Production Deployment
+# =============================================================================
+# This file excludes non-essential files from Vercel deployment.
+# Vercel has a 15,000 file limit. Our repo has 140k+ files without this.
 
-# Python
-__pycache__/
+# Node modules - CRITICAL (npm install runs on Vercel)
+node_modules
+**/node_modules
+frontend/node_modules
+
+# Python Virtual Environments - CRITICAL
+.venv
+venv
+env
+.env.local
+*.egg-info
+*.egg
+
+# Python Cache
+__pycache__
+**/__pycache__
 *.py[cod]
-.venv/
-venv/
-*.egg-info/
+*$py.class
+.Python
+*.so
 
-# Build artifacts
-.next/
-frontend/.next/
-dist/
-build/
+# Mypy Cache - CRITICAL (23k+ files)
+.mypy_cache
+**/.mypy_cache
+.pytest_cache
+**/.pytest_cache
+.ruff_cache
+**/.ruff_cache
 
-# Development files
-.git/
-.github/
-staging/
-docs/
-tests/
+# Build Artifacts
+.next
+frontend/.next
+dist
+build
+*.egg-info
+.eggs
 
-# Large files
+# Git
+.git
+.github
+.gitattributes
+
+# Vercel local build output
+.vercel/output
+
+# Development & Testing
+staging
+tests
+scripts
+dev
+
+# Documentation (regenerated)
+docs/reports
+docs/runbooks
+
+# Docker (not needed for Vercel)
+docker
+docker-compose*.yml
+Dockerfile*
+
+# IDE & Editor
+.idea
+.vscode
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Logs and temp files
 *.log
+logs
+*.tmp
+*.temp
+tmp
+temp
+
+# Archives
 *.zip
 *.tar.gz
+*.tar
+*.rar
+*.7z
+
+# Large assets (if any)
+*.mp4
+*.mov
+*.avi
+generated_assets
+
+# Coverage reports
+htmlcov
+.coverage
+coverage.xml
+*.cover
+
+# Jupyter notebooks
+.ipynb_checkpoints
+*.ipynb
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Lock files (Vercel generates its own)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+poetry.lock
+Pipfile.lock

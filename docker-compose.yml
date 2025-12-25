@@ -1,29 +1,24 @@
 version: '3.8'
 
 services:
-  # DevSkyy Application
+  # Main application
   devskyy-app:
     build:
       context: .
       dockerfile: Dockerfile
-      target: production
+    container_name: devskyy-app
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://devskyy:devskyy@postgres:5432/devskyy
-      - REDIS_URL=redis://redis:6379
-      - SECRET_KEY=${SECRET_KEY:-dev-secret-key-change-in-production}
-      - DEBUG=${DEBUG:-false}
-      - ENVIRONMENT=development
+      - DATABASE_URL=postgresql://devskyy:password@postgres:5432/devskyy
+      - REDIS_URL=redis://redis:6379/0
+      - ENVIRONMENT=production
     depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
+      - postgres
+      - redis
     volumes:
-      - ./logs:/app/logs
-      - ./data:/app/data
-      - ./uploads:/app/uploads
+      - app_logs:/app/logs
+      - app_data:/app/data
     networks:
       - devskyy-network
     restart: unless-stopped
@@ -34,19 +29,18 @@ services:
       retries: 3
       start_period: 40s
 
-  # PostgreSQL Database
+  # PostgreSQL database
   postgres:
     image: postgres:15-alpine
+    container_name: devskyy-postgres
     environment:
       - POSTGRES_DB=devskyy
       - POSTGRES_USER=devskyy
-      - POSTGRES_PASSWORD=devskyy
-      - POSTGRES_INITDB_ARGS=--auth-host=scram-sha-256
-    ports:
-      - "5432:5432"
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     volumes:
       - postgres_data:/var/lib/postgresql/data
-      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - devskyy-network
     restart: unless-stopped
@@ -56,34 +50,33 @@ services:
       timeout: 5s
       retries: 5
 
-  # Redis Cache
+  # Redis cache
   redis:
     image: redis:7-alpine
-    ports:
-      - "6379:6379"
+    container_name: devskyy-redis
+    command: redis-server --appendonly yes --requirepass redispassword
     volumes:
       - redis_data:/data
-      - ./config/redis/redis.conf:/usr/local/etc/redis/redis.conf:ro
-    command: redis-server /usr/local/etc/redis/redis.conf
     networks:
       - devskyy-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
       interval: 10s
-      timeout: 5s
-      retries: 3
+      timeout: 3s
+      retries: 5
 
-  # Nginx Reverse Proxy
+  # Nginx reverse proxy
   nginx:
     image: nginx:alpine
+    container_name: devskyy-nginx
     ports:
       - "80:80"
       - "443:443"
     volumes:
-      - ./config/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./config/nginx/ssl:/etc/nginx/ssl:ro
-      - ./static:/var/www/static:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
     depends_on:
       - devskyy-app
     networks:
@@ -98,10 +91,11 @@ services:
   # Monitoring with Prometheus
   prometheus:
     image: prom/prometheus:latest
+    container_name: devskyy-prometheus
     ports:
       - "9090:9090"
     volumes:
-      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -113,144 +107,30 @@ services:
     networks:
       - devskyy-network
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9090/-/healthy"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
 
-  # Grafana Dashboard
+  # Grafana for visualization
   grafana:
     image: grafana/grafana:latest
+    container_name: devskyy-grafana
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
-      - GF_USERS_ALLOW_SIGN_UP=false
-      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+      - GF_SECURITY_ADMIN_PASSWORD=admin
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
-      - ./config/grafana/dashboards:/etc/grafana/dashboards:ro
-    depends_on:
-      - prometheus
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # AlertManager for Prometheus Alerts
-  alertmanager:
-    image: prom/alertmanager:latest
-    ports:
-      - "9093:9093"
-    volumes:
-      - ./config/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
-      - alertmanager_data:/alertmanager
-    command:
-      - '--config.file=/etc/alertmanager/alertmanager.yml'
-      - '--storage.path=/alertmanager'
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:9093/-/healthy"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # PostgreSQL Exporter for Prometheus
-  postgres-exporter:
-    image: prometheuscommunity/postgres-exporter:latest
-    ports:
-      - "9187:9187"
-    environment:
-      - DATA_SOURCE_NAME=postgresql://devskyy:devskyy@postgres:5432/devskyy?sslmode=disable
-    depends_on:
-      - postgres
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-
-  # Redis Exporter for Prometheus
-  redis-exporter:
-    image: oliver006/redis_exporter:latest
-    ports:
-      - "9121:9121"
-    environment:
-      - REDIS_ADDR=redis://redis:6379
-    depends_on:
-      - redis
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-
-  # Node Exporter for System Metrics
-  node-exporter:
-    image: prom/node-exporter:latest
-    ports:
-      - "9100:9100"
-    command:
-      - '--path.procfs=/host/proc'
-      - '--path.sysfs=/host/sys'
-      - '--path.rootfs=/rootfs'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
-    volumes:
-      - /proc:/host/proc:ro
-      - /sys:/host/sys:ro
-      - /:/rootfs:ro
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-
-  # Log aggregation with Loki
-  loki:
-    image: grafana/loki:latest
-    ports:
-      - "3100:3100"
-    volumes:
-      - ./config/loki/loki.yml:/etc/loki/local-config.yaml:ro
-      - loki_data:/loki
-    command: -config.file=/etc/loki/local-config.yaml
-    networks:
-      - devskyy-network
-    restart: unless-stopped
-
-  # Log shipping with Promtail
-  promtail:
-    image: grafana/promtail:latest
-    volumes:
-      - ./config/promtail/promtail.yml:/etc/promtail/config.yml:ro
-      - ./logs:/var/log/devskyy:ro
-      - /var/log:/var/log:ro
-    command: -config.file=/etc/promtail/config.yml
-    depends_on:
-      - loki
     networks:
       - devskyy-network
     restart: unless-stopped
 
 volumes:
   postgres_data:
-    driver: local
   redis_data:
-    driver: local
+  app_logs:
+  app_data:
+  nginx_logs:
   prometheus_data:
-    driver: local
   grafana_data:
-    driver: local
-  loki_data:
-    driver: local
-  alertmanager_data:
-    driver: local
 
 networks:
   devskyy-network:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

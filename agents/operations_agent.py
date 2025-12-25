@@ -32,11 +32,7 @@ from adk.base import (
 )
 from orchestration.prompt_engineering import PromptTechnique
 
-from .base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-    TaskCategory,
-)
+from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
 logger = logging.getLogger(__name__)
 
@@ -214,8 +210,14 @@ When diagnosing issues:
                 description="Update WordPress plugin",
                 parameters={
                     "plugin_slug": {"type": "string", "description": "Plugin slug"},
-                    "version": {"type": "string", "description": "Target version (latest if omitted)"},
-                    "backup_first": {"type": "boolean", "description": "Create backup before update"},
+                    "version": {
+                        "type": "string",
+                        "description": "Target version (latest if omitted)",
+                    },
+                    "backup_first": {
+                        "type": "boolean",
+                        "description": "Create backup before update",
+                    },
                 },
             ),
             ToolDefinition(
@@ -239,7 +241,10 @@ When diagnosing issues:
                 name="elementor_get_templates",
                 description="List Elementor templates",
                 parameters={
-                    "template_type": {"type": "string", "description": "page, section, popup, etc."},
+                    "template_type": {
+                        "type": "string",
+                        "description": "page, section, popup, etc.",
+                    },
                     "category": {"type": "string", "description": "Template category"},
                 },
             ),
@@ -281,7 +286,10 @@ When diagnosing issues:
                 description="Check site uptime status",
                 parameters={
                     "time_range": {"type": "string", "description": "Time period to check"},
-                    "include_incidents": {"type": "boolean", "description": "Include incident history"},
+                    "include_incidents": {
+                        "type": "boolean",
+                        "description": "Include incident history",
+                    },
                 },
             ),
             ToolDefinition(
@@ -344,7 +352,10 @@ When diagnosing issues:
                 parameters={
                     "url": {"type": "string", "description": "Page URL to analyze"},
                     "device": {"type": "string", "description": "desktop or mobile"},
-                    "include_suggestions": {"type": "boolean", "description": "Include optimization suggestions"},
+                    "include_suggestions": {
+                        "type": "boolean",
+                        "description": "Include optimization suggestions",
+                    },
                 },
             ),
             ToolDefinition(
@@ -365,15 +376,14 @@ When diagnosing issues:
         try:
             task_type = self._classify_ops_task(prompt)
             technique = self.TECHNIQUE_PREFERENCES.get(
-                task_type,
-                self.select_technique(TaskCategory.DEBUGGING)
+                task_type, self.select_technique(TaskCategory.DEBUGGING)
             )
 
             enhanced = self.apply_technique(
                 technique,
                 prompt,
                 tools=["server_metrics", "error_logs", "health_check", "cache_clear"],
-                **kwargs
+                **kwargs,
             )
 
             if hasattr(self, "_backend_agent"):
@@ -388,7 +398,7 @@ When diagnosing issues:
                 content=content,
                 status=AgentStatus.COMPLETED,
                 started_at=start_time,
-                metadata={"task_type": task_type, "technique": technique.value}
+                metadata={"task_type": task_type, "technique": technique.value},
             )
 
         except Exception as e:
@@ -468,24 +478,18 @@ For each check, report:
                 "checks": "array",
                 "critical_issues": "array",
                 "warnings": "array",
-                "recommendations": "array"
-            }
+                "recommendations": "array",
+            },
         )
 
-    async def detect_anomalies(
-        self,
-        metrics: dict[str, float]
-    ) -> dict[str, Any]:
+    async def detect_anomalies(self, metrics: dict[str, float]) -> dict[str, Any]:
         """Detect anomalies in server metrics using ML"""
         if self.ml_module:
-            prediction = await self.ml_module.predict(
-                "anomaly_detector",
-                metrics
-            )
+            prediction = await self.ml_module.predict("anomaly_detector", metrics)
             return {
                 "anomalies_detected": prediction.prediction.get("anomalies", []),
                 "confidence": prediction.confidence,
-                "metrics_analyzed": list(metrics.keys())
+                "metrics_analyzed": list(metrics.keys()),
             }
 
         # Fallback threshold-based detection
@@ -493,23 +497,22 @@ For each check, report:
         for metric, value in metrics.items():
             threshold = self.THRESHOLDS.get(metric)
             if threshold and value > threshold:
-                anomalies.append({
-                    "metric": metric,
-                    "value": value,
-                    "threshold": threshold,
-                    "severity": "critical" if value > threshold * 1.2 else "warning"
-                })
+                anomalies.append(
+                    {
+                        "metric": metric,
+                        "value": value,
+                        "threshold": threshold,
+                        "severity": "critical" if value > threshold * 1.2 else "warning",
+                    }
+                )
 
         return {
             "anomalies_detected": anomalies,
             "confidence": 0.8,
-            "metrics_analyzed": list(metrics.keys())
+            "metrics_analyzed": list(metrics.keys()),
         }
 
-    async def optimize_performance(
-        self,
-        url: str | None = None
-    ) -> AgentResult:
+    async def optimize_performance(self, url: str | None = None) -> AgentResult:
         """Optimize site performance"""
         prompt = f"""Performance optimization for SkyyRose:
 
@@ -529,16 +532,10 @@ Please:
 5. Prioritize by effort vs. impact"""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="performance",
-            technique=PromptTechnique.CHAIN_OF_THOUGHT
+            prompt, task_type="performance", technique=PromptTechnique.CHAIN_OF_THOUGHT
         )
 
-    async def manage_backup(
-        self,
-        action: str = "status",
-        **kwargs
-    ) -> AgentResult:
+    async def manage_backup(self, action: str = "status", **kwargs) -> AgentResult:
         """Manage site backups"""
         prompt = f"""Backup management task:
 
@@ -562,14 +559,12 @@ Please:
                 "size_mb": "number",
                 "location": "string",
                 "verified": "boolean",
-                "retention_days": "number"
-            }
+                "retention_days": "number",
+            },
         )
 
     async def deploy_changes(
-        self,
-        environment: str = "staging",
-        commit: str | None = None
+        self, environment: str = "staging", commit: str | None = None
     ) -> AgentResult:
         """Deploy code changes"""
         prompt = f"""Deploy changes to {environment}:
@@ -591,9 +586,7 @@ Deployment process:
 Report deployment status and any issues."""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="deployment",
-            technique=PromptTechnique.CHAIN_OF_THOUGHT
+            prompt, task_type="deployment", technique=PromptTechnique.CHAIN_OF_THOUGHT
         )
 
 

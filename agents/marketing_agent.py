@@ -32,11 +32,7 @@ from adk.base import (
 )
 from orchestration.prompt_engineering import PromptTechnique
 
-from .base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-    TaskCategory,
-)
+from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
 logger = logging.getLogger(__name__)
 
@@ -178,7 +174,10 @@ You are an expert marketing strategist and content creator with expertise in:
                 name="create_content",
                 description="Create marketing content for various channels",
                 parameters={
-                    "content_type": {"type": "string", "description": "Type (post, blog, email, ad)"},
+                    "content_type": {
+                        "type": "string",
+                        "description": "Type (post, blog, email, ad)",
+                    },
                     "channel": {"type": "string", "description": "Target channel"},
                     "topic": {"type": "string", "description": "Content topic"},
                     "tone": {"type": "string", "description": "Tone override"},
@@ -199,7 +198,10 @@ You are an expert marketing strategist and content creator with expertise in:
                 description="Optimize content for engagement",
                 parameters={
                     "content": {"type": "string", "description": "Content to optimize"},
-                    "optimization_type": {"type": "string", "description": "SEO, engagement, or conversion"},
+                    "optimization_type": {
+                        "type": "string",
+                        "description": "SEO, engagement, or conversion",
+                    },
                 },
             ),
             # Social Media Tools
@@ -255,7 +257,10 @@ You are an expert marketing strategist and content creator with expertise in:
                 description="Create email campaign content",
                 parameters={
                     "campaign_type": {"type": "string", "description": "Campaign type"},
-                    "subject_variants": {"type": "integer", "description": "Number of subject line variants"},
+                    "subject_variants": {
+                        "type": "integer",
+                        "description": "Number of subject line variants",
+                    },
                     "audience_segment": {"type": "string", "description": "Target segment"},
                     "goal": {"type": "string", "description": "Campaign goal"},
                 },
@@ -276,7 +281,10 @@ You are an expert marketing strategist and content creator with expertise in:
                     "niche": {"type": "string", "description": "Influencer niche"},
                     "follower_range": {"type": "object", "description": "Follower count range"},
                     "platforms": {"type": "array", "description": "Target platforms"},
-                    "engagement_threshold": {"type": "number", "description": "Min engagement rate"},
+                    "engagement_threshold": {
+                        "type": "number",
+                        "description": "Min engagement rate",
+                    },
                 },
             ),
             ToolDefinition(
@@ -285,7 +293,10 @@ You are an expert marketing strategist and content creator with expertise in:
                 parameters={
                     "influencer_name": {"type": "string", "description": "Influencer name"},
                     "campaign_brief": {"type": "string", "description": "Campaign details"},
-                    "collaboration_type": {"type": "string", "description": "Type of collaboration"},
+                    "collaboration_type": {
+                        "type": "string",
+                        "description": "Type of collaboration",
+                    },
                 },
             ),
             # Analytics Tools
@@ -315,15 +326,14 @@ You are an expert marketing strategist and content creator with expertise in:
         try:
             task_type = self._classify_marketing_task(prompt)
             technique = self.TECHNIQUE_PREFERENCES.get(
-                task_type,
-                self.select_technique(TaskCategory.GENERATION)
+                task_type, self.select_technique(TaskCategory.GENERATION)
             )
 
             enhanced = self.apply_technique(
                 technique,
                 prompt,
                 role="marketing director for SkyyRose luxury streetwear",
-                **kwargs
+                **kwargs,
             )
 
             if hasattr(self, "_backend_agent"):
@@ -338,7 +348,7 @@ You are an expert marketing strategist and content creator with expertise in:
                 content=content,
                 status=AgentStatus.COMPLETED,
                 started_at=start_time,
-                metadata={"task_type": task_type, "technique": technique.value}
+                metadata={"task_type": task_type, "technique": technique.value},
             )
 
         except Exception as e:
@@ -390,9 +400,7 @@ For full marketing capabilities, ensure backend is configured."""
     # =========================================================================
 
     async def create_campaign(
-        self,
-        campaign_brief: str,
-        channels: list[str] | None = None
+        self, campaign_brief: str, channels: list[str] | None = None
     ) -> AgentResult:
         """Create a full marketing campaign"""
         channels = channels or ["instagram", "email", "website"]
@@ -412,15 +420,10 @@ Please provide:
 7. Budget allocation recommendations"""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="campaign",
-            technique=PromptTechnique.TREE_OF_THOUGHTS
+            prompt, task_type="campaign", technique=PromptTechnique.TREE_OF_THOUGHTS
         )
 
-    async def analyze_sentiment(
-        self,
-        content: str | list[str]
-    ) -> dict[str, Any]:
+    async def analyze_sentiment(self, content: str | list[str]) -> dict[str, Any]:
         """Analyze sentiment using ML"""
         if self.ml_module:
             if isinstance(content, str):
@@ -428,25 +431,21 @@ Please provide:
 
             results = []
             for text in content:
-                prediction = await self.ml_module.predict(
-                    "sentiment_analyzer",
-                    text
+                prediction = await self.ml_module.predict("sentiment_analyzer", text)
+                results.append(
+                    {
+                        "text": text[:100],
+                        "sentiment": prediction.prediction,
+                        "confidence": prediction.confidence,
+                    }
                 )
-                results.append({
-                    "text": text[:100],
-                    "sentiment": prediction.prediction,
-                    "confidence": prediction.confidence
-                })
 
             return {"analyses": results}
 
         return {"error": "ML module not available"}
 
     async def generate_social_content(
-        self,
-        topic: str,
-        platform: str = "instagram",
-        count: int = 5
+        self, topic: str, platform: str = "instagram", count: int = 5
     ) -> AgentResult:
         """Generate social media content"""
         prompt = f"""Generate {count} engaging {platform} posts for SkyyRose about: {topic}
@@ -472,20 +471,16 @@ For each post provide:
             examples=[
                 {
                     "input": "New bomber jacket launch",
-                    "output": "✨ Introducing the Rose Gold Bomber: Where street meets suite. Limited drop. Unlimited attitude. 🖤 #SkyyRose #LuxuryStreet #RoseGoldSeason"
+                    "output": "✨ Introducing the Rose Gold Bomber: Where street meets suite. Limited drop. Unlimited attitude. 🖤 #SkyyRose #LuxuryStreet #RoseGoldSeason",
                 },
                 {
                     "input": "Behind the scenes",
-                    "output": "Every stitch tells a story. Every seam speaks luxury. Behind the scenes of crafting your next statement piece. 🌹 #WhereLoveMeetsLuxury #SkyyRose"
-                }
-            ]
+                    "output": "Every stitch tells a story. Every seam speaks luxury. Behind the scenes of crafting your next statement piece. 🌹 #WhereLoveMeetsLuxury #SkyyRose",
+                },
+            ],
         )
 
-    async def optimize_seo(
-        self,
-        page_url: str,
-        target_keywords: list[str]
-    ) -> AgentResult:
+    async def optimize_seo(self, page_url: str, target_keywords: list[str]) -> AgentResult:
         """Optimize page for SEO"""
         prompt = f"""SEO optimization analysis for SkyyRose page:
 
@@ -514,8 +509,8 @@ Provide comprehensive SEO recommendations:
                 "keyword_recommendations": "array",
                 "internal_links": "array",
                 "schema_markup": "object",
-                "priority_actions": "array"
-            }
+                "priority_actions": "array",
+            },
         )
 
 

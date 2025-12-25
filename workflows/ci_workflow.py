@@ -93,7 +93,9 @@ class CIWorkflow:
         try:
             # NPM audit
             proc = await asyncio.create_subprocess_exec(
-                "npm", "audit", "--audit-level=moderate",
+                "npm",
+                "audit",
+                "--audit-level=moderate",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -108,14 +110,17 @@ class CIWorkflow:
         try:
             # Python security audit
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "pip-audit",
+                "pip",
+                "install",
+                "pip-audit",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "pip-audit", "--format=json",
+                "pip-audit",
+                "--format=json",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -130,14 +135,20 @@ class CIWorkflow:
         try:
             # Bandit security linter
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "bandit",
+                "pip",
+                "install",
+                "bandit",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "bandit", "-r", ".", "-f", "json",
+                "bandit",
+                "-r",
+                ".",
+                "-f",
+                "json",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -158,14 +169,18 @@ class CIWorkflow:
         try:
             # Ruff linting
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "ruff",
+                "pip",
+                "install",
+                "ruff",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "ruff", "check", ".",
+                "ruff",
+                "check",
+                ".",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -180,14 +195,18 @@ class CIWorkflow:
         try:
             # MyPy type checking
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "mypy",
+                "pip",
+                "install",
+                "mypy",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "mypy", ".", "--ignore-missing-imports",
+                "mypy",
+                ".",
+                "--ignore-missing-imports",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -202,7 +221,9 @@ class CIWorkflow:
         try:
             # ESLint
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "lint",
+                "npm",
+                "run",
+                "lint",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -217,7 +238,9 @@ class CIWorkflow:
         try:
             # Prettier
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "format:check",
+                "npm",
+                "run",
+                "format:check",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -238,7 +261,11 @@ class CIWorkflow:
         try:
             # Python tests with pytest
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "pytest", "pytest-asyncio", "pytest-cov",
+                "pip",
+                "install",
+                "pytest",
+                "pytest-asyncio",
+                "pytest-cov",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -264,7 +291,9 @@ class CIWorkflow:
         try:
             # JavaScript/TypeScript tests
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "test:ci",
+                "npm",
+                "run",
+                "test:ci",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -285,14 +314,18 @@ class CIWorkflow:
         try:
             # Python package build
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "build",
+                "pip",
+                "install",
+                "build",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await proc.communicate()
 
             proc = await asyncio.create_subprocess_exec(
-                "python", "-m", "build",
+                "python",
+                "-m",
+                "build",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -307,7 +340,9 @@ class CIWorkflow:
         try:
             # Frontend build
             proc = await asyncio.create_subprocess_exec(
-                "npm", "run", "build",
+                "npm",
+                "run",
+                "build",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )

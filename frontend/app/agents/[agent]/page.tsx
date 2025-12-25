@@ -36,7 +36,7 @@ import {
   PolarRadiusAxis,
   Radar,
 } from 'recharts';
-import { TaskExecutor, MetricsCard } from '@/components';
+import { TaskExecutor, MetricsCard, TaskHistoryPanel } from '@/components';
 import {
   Card,
   CardHeader,
@@ -397,6 +397,13 @@ export default function AgentDetailPage({ params }: AgentPageProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Agent Task History */}
+      <TaskHistoryPanel
+        agentType={agent.type}
+        limit={10}
+        title={`${agent.name} Task History`}
+      />
     </div>
   );
 }

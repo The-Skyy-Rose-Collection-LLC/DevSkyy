@@ -1,0 +1,17 @@
+{
+  "extracted_at": "2025-12-24T23:52:07.113062",
+  "total_files": 18,
+  "by_type": {
+    "other": 7,
+    "docs": 8,
+    "3d_models": 3
+  },
+  "by_collection": {
+    "signature": 3
+  },
+  "missing_files": [
+    "showroom",
+    "runway"
+  ],
+  "errors": []
+}

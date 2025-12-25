@@ -14,10 +14,7 @@ Version: 1.0.0
 
 from fastapi import FastAPI, HTTPException, Request
 
-from api.webhooks import (
-    WebhookReceiver,
-    webhook_manager,
-)
+from api.webhooks import WebhookReceiver, webhook_manager
 from security.security_webhooks import (
     SecurityEventSeverity,
     SecurityEventType,

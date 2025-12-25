@@ -15,6 +15,7 @@ import ssl
 import tempfile
 from datetime import datetime
 from pathlib import Path
+from unittest.mock import MagicMock, patch
 
 import pytest
 from cryptography import x509
@@ -635,23 +636,107 @@ class TestCertificateInfo:
 
 
 class TestVaultCA:
-    """Test VaultCA stub"""
+    """Test VaultCA production implementation"""
 
-    def test_vault_ca_not_implemented(self):
-        """Test VaultCA raises NotImplementedError"""
-        vault_ca = VaultCA(
-            vault_url="https://vault.example.com",
-            vault_token="test-token",
-        )
+    def test_vault_ca_requires_hvac(self):
+        """Test VaultCA raises RuntimeError when hvac is not installed"""
+        # VaultCA now requires the hvac library to be installed
+        # If hvac is not available, initialization should raise RuntimeError
+        try:
+            import hvac  # noqa: F401
 
-        with pytest.raises(NotImplementedError):
-            vault_ca.generate_service_cert("test-service")
+            # hvac is installed, skip this test as we can't test the missing-hvac path
+            pytest.skip("hvac is installed, cannot test missing-hvac behavior")
+        except ImportError:
+            # hvac is not installed, VaultCA should raise RuntimeError on init
+            with pytest.raises(RuntimeError, match="hvac library required"):
+                VaultCA(
+                    vault_url="https://vault.example.com",
+                    vault_token="test-token",
+                )
 
-        with pytest.raises(NotImplementedError):
-            vault_ca.revoke_certificate("12345")
+    def test_vault_ca_init_with_hvac(self):
+        """Test VaultCA initialization when hvac is available (mocked)"""
+        try:
+            import hvac  # noqa: F401
+        except ImportError:
+            pytest.skip("hvac not installed")
 
-        with pytest.raises(NotImplementedError):
-            vault_ca.verify_certificate("cert-pem")
+        # Mock the hvac client to avoid actual Vault connection
+        with patch("hvac.Client") as mock_client:
+            mock_instance = MagicMock()
+            mock_instance.is_authenticated.return_value = True
+            mock_client.return_value = mock_instance
+
+            vault_ca = VaultCA(
+                vault_url="https://vault.example.com",
+                vault_token="test-token",
+                pki_path="pki",
+                pki_role="test-role",
+            )
+
+            assert vault_ca.vault_url == "https://vault.example.com"
+            assert vault_ca.pki_path == "pki"
+            assert vault_ca.pki_role == "test-role"
+            mock_client.assert_called_once()
+
+    def test_vault_ca_generate_cert_with_hvac(self):
+        """Test VaultCA certificate generation (mocked)"""
+        try:
+            import hvac  # noqa: F401
+        except ImportError:
+            pytest.skip("hvac not installed")
+
+        with patch("hvac.Client") as mock_client:
+            mock_instance = MagicMock()
+            mock_instance.is_authenticated.return_value = True
+            mock_instance.secrets.pki.generate_certificate.return_value = {
+                "data": {
+                    "certificate": "-----BEGIN CERTIFICATE-----\nMOCK\n-----END CERTIFICATE-----",
+                    "private_key": "-----BEGIN PRIVATE KEY-----\nMOCK\n-----END PRIVATE KEY-----",
+                    "ca_chain": ["-----BEGIN CERTIFICATE-----\nCA\n-----END CERTIFICATE-----"],
+                    "serial_number": "12:34:56:78",
+                    "expiration": 1735689600,
+                }
+            }
+            mock_client.return_value = mock_instance
+
+            vault_ca = VaultCA(
+                vault_url="https://vault.example.com",
+                vault_token="test-token",
+            )
+
+            cert, key, chain = vault_ca.generate_service_cert(
+                "test-service",
+                validity_ttl="720h",
+                san_names=["test.example.com"],
+            )
+
+            assert "BEGIN CERTIFICATE" in cert
+            assert "BEGIN PRIVATE KEY" in key
+            assert chain is not None
+
+    def test_vault_ca_revoke_cert_with_hvac(self):
+        """Test VaultCA certificate revocation (mocked)"""
+        try:
+            import hvac  # noqa: F401
+        except ImportError:
+            pytest.skip("hvac not installed")
+
+        with patch("hvac.Client") as mock_client:
+            mock_instance = MagicMock()
+            mock_instance.is_authenticated.return_value = True
+            mock_instance.secrets.pki.revoke_certificate.return_value = {}
+            mock_client.return_value = mock_instance
+
+            vault_ca = VaultCA(
+                vault_url="https://vault.example.com",
+                vault_token="test-token",
+            )
+
+            result = vault_ca.revoke_certificate("12:34:56:78")
+            assert result is True
+            mock_instance.secrets.pki.revoke_certificate.assert_called_once()
 
 
 class TestServiceIdentity:

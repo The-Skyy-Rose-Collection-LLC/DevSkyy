@@ -83,7 +83,11 @@ class DockerWorkflow:
         try:
             # Test Docker build
             proc = await asyncio.create_subprocess_exec(
-                "docker", "build", "-t", "test-image", ".",
+                "docker",
+                "build",
+                "-t",
+                "test-image",
+                ".",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -114,7 +118,9 @@ class DockerWorkflow:
 
                 # Test health endpoint
                 proc = await asyncio.create_subprocess_exec(
-                    "curl", "-f", "http://localhost:8000/health",
+                    "curl",
+                    "-f",
+                    "http://localhost:8000/health",
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
@@ -127,12 +133,16 @@ class DockerWorkflow:
 
                 # Cleanup
                 await asyncio.create_subprocess_exec(
-                    "docker", "stop", "test-container",
+                    "docker",
+                    "stop",
+                    "test-container",
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
                 await asyncio.create_subprocess_exec(
-                    "docker", "rm", "test-container",
+                    "docker",
+                    "rm",
+                    "test-container",
                     stdout=asyncio.subprocess.PIPE,
                     stderr=asyncio.subprocess.PIPE,
                 )
@@ -154,7 +164,10 @@ class DockerWorkflow:
 
             # Setup Docker Buildx
             proc = await asyncio.create_subprocess_exec(
-                "docker", "buildx", "create", "--use",
+                "docker",
+                "buildx",
+                "create",
+                "--use",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )

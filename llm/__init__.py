@@ -44,8 +44,8 @@ Usage:
     )
 """
 
-from .base import (  # Enums; Models; Base Client
-    BaseLLMClient,
+from .base import (
+    BaseLLMClient,  # Enums; Models; Base Client
     CompletionResponse,
     Message,
     MessageRole,

@@ -51,8 +51,9 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from mcp.server.fastmcp import FastMCP
     from pydantic import BaseModel, ConfigDict, Field
+
+    from mcp.server.fastmcp import FastMCP
 except ImportError as e:
     print(f"❌ Missing required package: {e}")
     print("Install with: pip install fastmcp pydantic")
@@ -108,12 +109,14 @@ mcp = FastMCP(
 
 class ResponseFormat(str, Enum):
     """Output format for tool responses."""
+
     MARKDOWN = "markdown"
     JSON = "json"
 
 
 class BaseInput(BaseModel):
     """Base input model for all tools."""
+
     model_config = ConfigDict(str_strip_whitespace=True, validate_assignment=True, extra="forbid")
     response_format: ResponseFormat = Field(
         default=ResponseFormat.MARKDOWN, description="Output format: 'markdown' or 'json'"
@@ -122,6 +125,7 @@ class BaseInput(BaseModel):
 
 class RAGQueryInput(BaseInput):
     """Input for RAG search queries."""
+
     query: str = Field(..., description="Search query", min_length=1, max_length=5000)
     top_k: int = Field(default=5, ge=1, le=20, description="Number of results to return")
     source_filter: str | None = Field(default=None, description="Filter by source path")
@@ -129,12 +133,14 @@ class RAGQueryInput(BaseInput):
 
 class RAGIngestInput(BaseInput):
     """Input for document ingestion."""
+
     path: str = Field(..., description="File or directory path to ingest", min_length=1)
     recursive: bool = Field(default=True, description="Recursively ingest subdirectories")
 
 
 class RAGContextInput(BaseInput):
     """Input for context retrieval."""
+
     question: str = Field(..., description="Question to get context for", min_length=1)
     max_tokens: int = Field(default=2000, ge=100, le=8000, description="Maximum context tokens")
     top_k: int = Field(default=5, ge=1, le=10, description="Number of chunks to retrieve")
@@ -142,6 +148,7 @@ class RAGContextInput(BaseInput):
 
 class RAGQueryRewriteInput(BaseInput):
     """Input for query rewriting."""
+
     query: str = Field(..., description="Query to rewrite", min_length=1, max_length=5000)
     strategy: str = Field(
         default="zero_shot",
@@ -169,9 +176,11 @@ async def get_pipeline() -> DocumentIngestionPipeline:
 
         # Configure embeddings
         embedding_config = EmbeddingConfig(
-            provider=EmbeddingProvider.SENTENCE_TRANSFORMERS
-            if EMBEDDING_PROVIDER == "sentence_transformers"
-            else EmbeddingProvider.OPENAI,
+            provider=(
+                EmbeddingProvider.SENTENCE_TRANSFORMERS
+                if EMBEDDING_PROVIDER == "sentence_transformers"
+                else EmbeddingProvider.OPENAI
+            ),
         )
 
         # Create and initialize pipeline
@@ -310,7 +319,9 @@ async def rag_ingest(input: RAGIngestInput) -> str:
         path = Path(input.path)
 
         if not path.exists():
-            return format_response({"error": f"Path not found: {input.path}"}, input.response_format)
+            return format_response(
+                {"error": f"Path not found: {input.path}"}, input.response_format
+            )
 
         if path.is_file():
             doc_ids = await pipeline.ingest_file(path)
@@ -470,4 +481,3 @@ if __name__ == "__main__":
     print(f"   Collection: {COLLECTION_NAME}")
     print(f"   Embeddings: {EMBEDDING_PROVIDER}")
     mcp.run()
-

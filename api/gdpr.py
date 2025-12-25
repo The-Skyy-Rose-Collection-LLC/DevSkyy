@@ -26,12 +26,7 @@ from pydantic import BaseModel, Field
 from security.aes256_gcm_encryption import data_masker
 
 # Internal imports
-from security.jwt_oauth2_auth import (
-    RoleChecker,
-    TokenPayload,
-    UserRole,
-    get_current_user,
-)
+from security.jwt_oauth2_auth import RoleChecker, TokenPayload, UserRole, get_current_user
 
 logger = logging.getLogger(__name__)
 
@@ -184,16 +179,38 @@ class ConsentRecord(BaseModel):
 
 class GDPRService:
     """
-    GDPR compliance service
+    GDPR compliance service with database integration.
 
-    Handles data subject requests per GDPR Articles 15-22
+    Handles data subject requests per GDPR Articles 15-22.
+    Uses SQLAlchemy async sessions for database operations.
+    Falls back to in-memory storage if database is unavailable.
     """
 
-    def __init__(self):
-        # In-memory stores (use database in production)
+    def __init__(self, use_database: bool = True):
+        """
+        Initialize GDPR service.
+
+        Args:
+            use_database: Whether to use database storage (default True).
+                         Falls back to in-memory if database unavailable.
+        """
+        self._use_database = use_database
+        self._db_available = False
+
+        # In-memory fallback stores
         self._requests: dict[str, GDPRRequestRecord] = {}
         self._consents: dict[str, list[ConsentRecord]] = {}
-        self._user_data: dict[str, dict[str, Any]] = {}  # Simulated user data
+
+        # Try to initialize database connection
+        if use_database:
+            try:
+                from database.db import get_session  # noqa: F401
+
+                self._db_available = True
+                logger.info("GDPR service initialized with database backend")
+            except ImportError:
+                logger.warning("Database module not available, using in-memory storage")
+                self._db_available = False
 
         # Retention policies
         self._policies = [
@@ -294,49 +311,146 @@ class GDPRService:
     async def _gather_user_data(
         self, user_id: str, categories: list[DataCategory]
     ) -> dict[str, Any]:
-        """Gather all user data across categories"""
-        data = {}
+        """
+        Gather all user data across categories from database.
 
+        Uses real database queries when available, with fallback to
+        structured empty responses if user not found.
+        """
+        data: dict[str, Any] = {}
+
+        if self._db_available:
+            try:
+                from database.db import Order, User, get_session
+
+                async with get_session() as session:
+                    # Fetch user from database
+                    from sqlalchemy import select
+
+                    user_result = await session.execute(select(User).where(User.id == user_id))
+                    user = user_result.scalar_one_or_none()
+
+                    for category in categories:
+                        if category == DataCategory.IDENTITY:
+                            if user:
+                                data["identity"] = {
+                                    "user_id": user.id,
+                                    "email": data_masker.mask_email(user.email),
+                                    "username": user.username,
+                                    "role": user.role,
+                                    "is_active": user.is_active,
+                                    "is_verified": user.is_verified,
+                                    "created_at": (
+                                        user.created_at.isoformat() if user.created_at else None
+                                    ),
+                                }
+                            else:
+                                data["identity"] = {"user_id": user_id, "status": "not_found"}
+
+                        elif category == DataCategory.FINANCIAL:
+                            # Fetch orders for user
+                            orders_result = await session.execute(
+                                select(Order).where(Order.user_id == user_id)
+                            )
+                            orders = orders_result.scalars().all()
+
+                            order_data = []
+                            total_spent = 0.0
+                            for order in orders:
+                                order_data.append(
+                                    {
+                                        "order_id": order.id,
+                                        "order_number": order.order_number,
+                                        "total": order.total,
+                                        "status": order.status,
+                                        "date": (
+                                            order.created_at.isoformat()
+                                            if order.created_at
+                                            else None
+                                        ),
+                                    }
+                                )
+                                total_spent += order.total or 0.0
+
+                            data["financial"] = {
+                                "orders": order_data,
+                                "order_count": len(orders),
+                                "total_spent": round(total_spent, 2),
+                            }
+
+                        elif category == DataCategory.BEHAVIORAL:
+                            # Behavioral data from user metadata
+                            if user and user.metadata_json:
+                                import json
+
+                                try:
+                                    metadata = json.loads(user.metadata_json)
+                                    data["behavioral"] = {
+                                        "preferences": metadata.get("preferences", {}),
+                                        "wishlist": metadata.get("wishlist", []),
+                                    }
+                                except json.JSONDecodeError:
+                                    data["behavioral"] = {"preferences": {}}
+                            else:
+                                data["behavioral"] = {"preferences": {}}
+
+                        elif category == DataCategory.TECHNICAL:
+                            if user:
+                                data["technical"] = {
+                                    "last_login": (
+                                        user.last_login.isoformat() if user.last_login else None
+                                    ),
+                                    "account_created": (
+                                        user.created_at.isoformat() if user.created_at else None
+                                    ),
+                                    "account_updated": (
+                                        user.updated_at.isoformat() if user.updated_at else None
+                                    ),
+                                }
+                            else:
+                                data["technical"] = {}
+
+                        elif category == DataCategory.COMMUNICATIONS:
+                            # Communications data from user metadata
+                            if user and user.metadata_json:
+                                import json
+
+                                try:
+                                    metadata = json.loads(user.metadata_json)
+                                    data["communications"] = {
+                                        "email_subscriptions": metadata.get(
+                                            "email_subscriptions", []
+                                        ),
+                                        "notification_preferences": metadata.get(
+                                            "notifications", {}
+                                        ),
+                                    }
+                                except json.JSONDecodeError:
+                                    data["communications"] = {}
+                            else:
+                                data["communications"] = {}
+
+                    return data
+
+            except Exception as e:
+                logger.error(f"Database error gathering user data: {e}")
+                # Fall through to fallback
+
+        # Fallback: return structured empty data
         for category in categories:
             if category == DataCategory.IDENTITY:
                 data["identity"] = {
                     "user_id": user_id,
-                    "email": data_masker.mask_email("user@example.com"),
-                    "name": "User Name",
-                    "phone": data_masker.mask_phone("555-123-4567"),
-                    "created_at": "2024-01-01T00:00:00Z",
+                    "status": "database_unavailable",
                 }
-
             elif category == DataCategory.FINANCIAL:
-                data["financial"] = {
-                    "orders": [
-                        {"order_id": "ord_001", "total": 189.99, "date": "2024-06-01"},
-                        {"order_id": "ord_002", "total": 299.99, "date": "2024-09-15"},
-                    ],
-                    "payment_methods": [{"type": "card", "last4": "4242", "exp": "12/26"}],
-                    "total_spent": 489.98,
-                }
-
+                data["financial"] = {"orders": [], "total_spent": 0.0}
             elif category == DataCategory.BEHAVIORAL:
-                data["behavioral"] = {
-                    "preferences": {"style": "luxury", "size": "M"},
-                    "browsing_history": ["products", "collections"],
-                    "wishlist_count": 5,
-                }
-
+                data["behavioral"] = {"preferences": {}}
             elif category == DataCategory.TECHNICAL:
-                data["technical"] = {
-                    "last_login": "2024-12-09T10:00:00Z",
-                    "login_count": 42,
-                    "devices": ["Chrome/Windows", "Safari/iOS"],
-                }
-
+                data["technical"] = {}
             elif category == DataCategory.COMMUNICATIONS:
-                data["communications"] = {
-                    "support_tickets": 2,
-                    "email_subscriptions": ["newsletter", "promotions"],
-                    "notification_preferences": {"email": True, "sms": False},
-                }
+                data["communications"] = {}
 
         return data
 

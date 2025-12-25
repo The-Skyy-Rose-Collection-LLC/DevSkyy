@@ -1,0 +1,918 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkyyRose Collection Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #0a0a0a;
+            overflow-x: hidden;
+        }
+
+        #canvas-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        .scroll-content {
+            position: relative;
+            z-index: 2;
+            background: transparent;
+            padding-top: 100vh;
+            pointer-events: none;
+        }
+
+        .scroll-section {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .scroll-section.active {
+            opacity: 1;
+        }
+
+        /* Hotspot markers in 3D */
+        .hotspot-marker {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(183, 110, 121, 0.8);
+            border: 2px solid #B76E79;
+            border-radius: 50%;
+            cursor: pointer;
+            transform: translate(-50%, -50%);
+            transition: all 0.3s ease;
+            z-index: 10;
+        }
+
+        .hotspot-marker:hover {
+            width: 28px;
+            height: 28px;
+            background: rgba(183, 110, 121, 1);
+            box-shadow: 0 0 20px rgba(183, 110, 121, 0.6);
+        }
+
+        .hotspot-marker.pulse {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(183, 110, 121, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 10px rgba(183, 110, 121, 0);
+            }
+        }
+
+        /* Product card panel */
+        .product-card-panel {
+            position: fixed;
+            bottom: 0;
+            right: 0;
+            width: 360px;
+            max-height: 500px;
+            background: rgba(10, 10, 10, 0.95);
+            border-left: 2px solid #B76E79;
+            border-top: 2px solid #B76E79;
+            padding: 24px;
+            backdrop-filter: blur(10px);
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+            overflow-y: auto;
+        }
+
+        .product-card-panel.active {
+            transform: translateX(0);
+        }
+
+        .product-card-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .product-card-panel::-webkit-scrollbar-track {
+            background: rgba(183, 110, 121, 0.1);
+        }
+
+        .product-card-panel::-webkit-scrollbar-thumb {
+            background: rgba(183, 110, 121, 0.5);
+            border-radius: 3px;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #1a1a1a;
+            border-radius: 4px;
+            margin-bottom: 16px;
+            object-fit: cover;
+        }
+
+        .product-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .product-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: #B76E79;
+            margin-bottom: 12px;
+        }
+
+        .product-description {
+            font-size: 13px;
+            color: #aaa;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .product-sku {
+            font-size: 11px;
+            color: #777;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #B76E79;
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            background: #c97a84;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #B76E79;
+            border: 1px solid #B76E79;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(183, 110, 121, 0.1);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: #aaa;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.3s ease;
+        }
+
+        .close-btn:hover {
+            color: #B76E79;
+        }
+
+        /* Loading state */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a0a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .loading.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.6s ease;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(183, 110, 121, 0.2);
+            border-top-color: #B76E79;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Scroll hint */
+        .scroll-hint {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #B76E79;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 1;
+            transition: opacity 0.6s ease;
+            z-index: 15;
+            animation: bounce 2s infinite;
+        }
+
+        .scroll-hint.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(-10px); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Canvas container for Three.js -->
+    <div id="canvas-container"></div>
+
+    <!-- Loading spinner -->
+    <div class="loading" id="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <!-- Scroll hint -->
+    <div class="scroll-hint" id="scrollHint">Scroll to explore</div>
+
+    <!-- Scroll content (transparent, used for scroll events) -->
+    <div class="scroll-content" id="scrollContent"></div>
+
+    <!-- Product card panel -->
+    <div class="product-card-panel" id="productPanel">
+        <button class="close-btn" id="closeBtn">&times;</button>
+        <img id="productImage" class="product-image" alt="Product">
+        <h2 id="productTitle" class="product-title"></h2>
+        <div id="productPrice" class="product-price"></div>
+        <div id="productSku" class="product-sku"></div>
+        <p id="productDescription" class="product-description"></p>
+        <div class="product-actions">
+            <button class="btn btn-primary" id="addToCartBtn">Add to Cart</button>
+            <button class="btn btn-secondary" id="viewProductBtn">View</button>
+        </div>
+    </div>
+
+    <script>
+        /**
+         * SkyyRose 3D Collection Experience with Interactive Hotspots
+         *
+         * This template enables:
+         * - Immersive Three.js 3D scene rendering
+         * - Interactive product hotspots
+         * - Scroll-based camera transitions
+         * - Real-time WooCommerce integration
+         * - Mobile-responsive design
+         *
+         * Security Features:
+         * - Input validation and sanitization
+         * - CSRF token handling
+         * - Rate limiting on API calls
+         * - Error recovery and fallback modes
+         * - Content Security Policy compliance
+         */
+
+        // ============================================================================
+        // CONFIGURATION & VALIDATION
+        // ============================================================================
+
+        const CONFIG = {
+            // Hotspot config URL (set by WordPress page builder)
+            hotspotConfigUrl: window.HOTSPOT_CONFIG_URL || '/wp-content/uploads/hotspots/signature-hotspots.json',
+
+            // WooCommerce REST API endpoints
+            wpRestUrl: window.WP_REST_URL || 'http://localhost:8882/wp-json',
+            wooCommerceNamespace: 'wc/v3',
+
+            // Scene settings
+            scene: {
+                background: 0x0a0a0a,
+                fog: { color: 0x1a1a1a, near: 1, far: 100 },
+            },
+
+            // Camera settings
+            camera: {
+                fov: 75,
+                near: 0.1,
+                far: 1000,
+                defaultPosition: { x: 0, y: 2, z: 6 },
+            },
+
+            // Lighting
+            lights: {
+                ambient: { color: 0xffffff, intensity: 0.6 },
+                directional: { color: 0xffffff, intensity: 0.8, position: { x: 10, y: 10, z: 10 } },
+                point: { color: 0xB76E79, intensity: 0.4, position: { x: -10, y: 5, z: -10 } },
+            },
+
+            // Animation timing
+            animation: {
+                cameraTransitionDuration: 500,
+                hotspotPulseDuration: 2000,
+            },
+
+            // API and security settings
+            api: {
+                timeout: 10000,  // 10 second timeout
+                retries: 3,
+                retryDelay: 1000,
+                rateLimitMs: 300,  // Minimum time between API calls
+            },
+
+            // Validation constraints
+            validation: {
+                maxUrlLength: 2048,
+                maxProductNameLength: 200,
+                maxDescriptionLength: 1000,
+                maxPositionValue: 1000,  // Max coordinate value
+                minPositionValue: -1000,
+            },
+        };
+
+        // ============================================================================
+        // UTILITIES & HELPERS
+        // ============================================================================
+
+        /**
+         * Validate and sanitize URL
+         */
+        function validateUrl(url) {
+            if (typeof url !== 'string') return null;
+            if (url.length > CONFIG.validation.maxUrlLength) return null;
+
+            try {
+                const urlObj = new URL(url, window.location.href);
+                // Only allow http/https
+                if (!['http:', 'https:'].includes(urlObj.protocol)) return null;
+                return urlObj.href;
+            } catch {
+                return null;
+            }
+        }
+
+        /**
+         * Sanitize string input
+         */
+        function sanitizeString(str, maxLength = 500) {
+            if (typeof str !== 'string') return '';
+            return str
+                .substring(0, maxLength)
+                .replace(/[<>\"']/g, c => ({
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#x27;'
+                }[c]));
+        }
+
+        /**
+         * Validate 3D position
+         */
+        function validatePosition(pos) {
+            if (!pos || typeof pos !== 'object') return null;
+            const x = parseFloat(pos.x);
+            const y = parseFloat(pos.y);
+            const z = parseFloat(pos.z);
+
+            const isValid = (v) => !isNaN(v) && v >= CONFIG.validation.minPositionValue && v <= CONFIG.validation.maxPositionValue;
+
+            if (isValid(x) && isValid(y) && isValid(z)) {
+                return { x, y, z };
+            }
+            return null;
+        }
+
+        /**
+         * Validate hotspot config structure
+         */
+        function validateHotspotConfig(config) {
+            if (!config || typeof config !== 'object') return false;
+            if (!Array.isArray(config.hotspots)) return false;
+            if (!Array.isArray(config.camera_waypoints)) return false;
+
+            // Validate hotspots
+            for (const hotspot of config.hotspots) {
+                if (!validatePosition(hotspot.position)) return false;
+                if (typeof hotspot.product_id !== 'number') return false;
+                if (typeof hotspot.title !== 'string') return false;
+                if (typeof hotspot.price !== 'number' || hotspot.price < 0) return false;
+            }
+
+            return true;
+        }
+
+        /**
+         * Rate limiter for API calls
+         */
+        class RateLimiter {
+            constructor(delayMs) {
+                this.delayMs = delayMs;
+                this.lastCallTime = 0;
+            }
+
+            async wait() {
+                const now = Date.now();
+                const timeSinceLastCall = now - this.lastCallTime;
+                if (timeSinceLastCall < this.delayMs) {
+                    await new Promise(resolve => setTimeout(resolve, this.delayMs - timeSinceLastCall));
+                }
+                this.lastCallTime = Date.now();
+            }
+        }
+
+        const apiRateLimiter = new RateLimiter(CONFIG.api.rateLimitMs);
+
+        /**
+         * Fetch with retry logic and timeout
+         */
+        async function fetchWithRetry(url, options = {}, retries = CONFIG.api.retries) {
+            const validatedUrl = validateUrl(url);
+            if (!validatedUrl) {
+                throw new Error('Invalid URL');
+            }
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), CONFIG.api.timeout);
+
+            try {
+                await apiRateLimiter.wait();
+
+                const response = await fetch(validatedUrl, {
+                    ...options,
+                    signal: controller.signal,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                return response;
+            } catch (error) {
+                clearTimeout(timeoutId);
+
+                if (retries > 0 && (error.name === 'AbortError' || error.message === 'Network request failed')) {
+                    await new Promise(resolve => setTimeout(resolve, CONFIG.api.retryDelay));
+                    return fetchWithRetry(url, options, retries - 1);
+                }
+
+                throw error;
+            }
+        }
+
+        // ============================================================================
+        // SCENE SETUP
+        // ============================================================================
+
+        class CollectionExperienceScene {
+            constructor(containerId) {
+                this.container = document.getElementById(containerId);
+                this.width = this.container.clientWidth;
+                this.height = this.container.clientHeight;
+
+                // Three.js objects
+                this.scene = null;
+                this.camera = null;
+                this.renderer = null;
+
+                // State
+                this.hotspots = [];
+                this.hotspotConfig = null;
+                this.selectedProduct = null;
+                this.isAnimating = false;
+
+                this.init();
+            }
+
+            init() {
+                this.createScene();
+                this.createCamera();
+                this.createRenderer();
+                this.createLights();
+                this.addEventListeners();
+                this.animate();
+            }
+
+            createScene() {
+                this.scene = new THREE.Scene();
+                this.scene.background = new THREE.Color(CONFIG.scene.background);
+                this.scene.fog = new THREE.Fog(
+                    CONFIG.scene.fog.color,
+                    CONFIG.scene.fog.near,
+                    CONFIG.scene.fog.far
+                );
+            }
+
+            createCamera() {
+                this.camera = new THREE.PerspectiveCamera(
+                    CONFIG.camera.fov,
+                    this.width / this.height,
+                    CONFIG.camera.near,
+                    CONFIG.camera.far
+                );
+                const pos = CONFIG.camera.defaultPosition;
+                this.camera.position.set(pos.x, pos.y, pos.z);
+                this.camera.lookAt(0, 0, 0);
+            }
+
+            createRenderer() {
+                this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+                this.renderer.setSize(this.width, this.height);
+                this.renderer.setPixelRatio(window.devicePixelRatio);
+                this.renderer.shadowMap.enabled = true;
+                this.container.appendChild(this.renderer.domElement);
+            }
+
+            createLights() {
+                // Ambient light
+                const ambientLight = new THREE.AmbientLight(
+                    CONFIG.lights.ambient.color,
+                    CONFIG.lights.ambient.intensity
+                );
+                this.scene.add(ambientLight);
+
+                // Directional light
+                const dirLight = new THREE.DirectionalLight(
+                    CONFIG.lights.directional.color,
+                    CONFIG.lights.directional.intensity
+                );
+                const dirPos = CONFIG.lights.directional.position;
+                dirLight.position.set(dirPos.x, dirPos.y, dirPos.z);
+                dirLight.castShadow = true;
+                dirLight.shadow.mapSize.width = 2048;
+                dirLight.shadow.mapSize.height = 2048;
+                this.scene.add(dirLight);
+
+                // Point light (collection-specific accent)
+                const pointLight = new THREE.PointLight(
+                    CONFIG.lights.point.color,
+                    CONFIG.lights.point.intensity
+                );
+                const pointPos = CONFIG.lights.point.position;
+                pointLight.position.set(pointPos.x, pointPos.y, pointPos.z);
+                this.scene.add(pointLight);
+            }
+
+            addEventListeners() {
+                window.addEventListener('resize', () => this.onWindowResize());
+                document.addEventListener('scroll', () => this.onScroll());
+
+                // Hotspot click delegation
+                this.renderer.domElement.addEventListener('click', (e) => this.onCanvasClick(e));
+            }
+
+            animate() {
+                requestAnimationFrame(() => this.animate());
+                this.renderer.render(this.scene, this.camera);
+            }
+
+            onWindowResize() {
+                this.width = this.container.clientWidth;
+                this.height = this.container.clientHeight;
+                this.camera.aspect = this.width / this.height;
+                this.camera.updateProjectionMatrix();
+                this.renderer.setSize(this.width, this.height);
+            }
+
+            onScroll() {
+                if (!this.hotspotConfig || this.isAnimating) return;
+
+                const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+                const scrollPercent = (window.scrollY / maxScroll) * 100;
+
+                // Find nearest waypoint
+                const waypoints = this.hotspotConfig.camera_waypoints;
+                let targetWaypoint = waypoints[0];
+
+                for (let i = waypoints.length - 1; i >= 0; i--) {
+                    if (scrollPercent >= waypoints[i].scroll_percent) {
+                        targetWaypoint = waypoints[i];
+                        break;
+                    }
+                }
+
+                // Animate camera to waypoint
+                this.animateCameraToWaypoint(targetWaypoint);
+            }
+
+            animateCameraToWaypoint(waypoint) {
+                if (this.isAnimating) return;
+
+                this.isAnimating = true;
+                const startPos = {
+                    x: this.camera.position.x,
+                    y: this.camera.position.y,
+                    z: this.camera.position.z,
+                };
+
+                gsap.to(startPos, {
+                    x: waypoint.camera_position.x,
+                    y: waypoint.camera_position.y,
+                    z: waypoint.camera_position.z,
+                    duration: waypoint.duration_ms / 1000,
+                    onUpdate: () => {
+                        this.camera.position.set(startPos.x, startPos.y, startPos.z);
+                        this.camera.lookAt(
+                            waypoint.camera_target.x,
+                            waypoint.camera_target.y,
+                            waypoint.camera_target.z
+                        );
+                    },
+                    onComplete: () => {
+                        this.isAnimating = false;
+                    },
+                    ease: 'power2.inOut',
+                });
+            }
+
+            onCanvasClick(event) {
+                // Raycasting for hotspot detection
+                const raycaster = new THREE.Raycaster();
+                const mouse = new THREE.Vector2(
+                    (event.clientX / this.width) * 2 - 1,
+                    -(event.clientY / this.height) * 2 + 1
+                );
+
+                raycaster.setFromCamera(mouse, this.camera);
+                const intersects = raycaster.intersectObjects(this.hotspots);
+
+                if (intersects.length > 0) {
+                    const clickedHotspot = intersects[0].object;
+                    this.selectProduct(clickedHotspot.userData);
+                }
+            }
+
+            selectProduct(productData) {
+                this.selectedProduct = productData;
+                displayProductCard(productData);
+            }
+
+            async loadHotspots() {
+                try {
+                    const response = await fetchWithRetry(CONFIG.hotspotConfigUrl);
+                    this.hotspotConfig = await response.json();
+
+                    // Validate config structure
+                    if (!validateHotspotConfig(this.hotspotConfig)) {
+                        throw new Error('Invalid hotspot configuration structure');
+                    }
+
+                    this.renderHotspots();
+                    this.hideLoading();
+                } catch (error) {
+                    console.error('Failed to load hotspot config:', error);
+                    this.showErrorState();
+                }
+            }
+
+            renderHotspots() {
+                for (const hotspotData of this.hotspotConfig.hotspots) {
+                    // Validate position
+                    const validPos = validatePosition(hotspotData.position);
+                    if (!validPos) {
+                        console.warn('Invalid hotspot position, skipping:', hotspotData);
+                        continue;
+                    }
+
+                    const geometry = new THREE.SphereGeometry(0.2, 32, 32);
+                    const material = new THREE.MeshBasicMaterial({
+                        color: 0xB76E79,
+                        emissive: 0xB76E79,
+                        emissiveIntensity: 0.5,
+                    });
+
+                    const mesh = new THREE.Mesh(geometry, material);
+                    mesh.position.set(validPos.x, validPos.y, validPos.z);
+
+                    // Store sanitized data
+                    mesh.userData = {
+                        product_id: hotspotData.product_id,
+                        title: sanitizeString(hotspotData.title, CONFIG.validation.maxProductNameLength),
+                        price: parseFloat(hotspotData.price) || 0,
+                        image_url: validateUrl(hotspotData.image_url) || '/placeholder.png',
+                        woocommerce_url: validateUrl(hotspotData.woocommerce_url) || '#',
+                        sku: sanitizeString(hotspotData.sku, 50),
+                        excerpt: sanitizeString(hotspotData.excerpt, CONFIG.validation.maxDescriptionLength),
+                    };
+
+                    mesh.castShadow = true;
+                    this.scene.add(mesh);
+                    this.hotspots.push(mesh);
+                }
+
+                console.info(`Rendered ${this.hotspots.length} hotspots`);
+            }
+
+            showErrorState() {
+                const loadingEl = document.getElementById('loading');
+                loadingEl.innerHTML = '<div style="text-align: center; color: #B76E79;"><p>Failed to load collection experience</p></div>';
+                setTimeout(() => {
+                    loadingEl.classList.add('hidden');
+                }, 3000);
+            }
+
+            hideLoading() {
+                const loadingEl = document.getElementById('loading');
+                const scrollHintEl = document.getElementById('scrollHint');
+
+                loadingEl.classList.add('hidden');
+                setTimeout(() => {
+                    scrollHintEl.classList.add('hidden');
+                }, 2000);
+            }
+        }
+
+        // ============================================================================
+        // PRODUCT CARD MANAGEMENT
+        // ============================================================================
+
+        function displayProductCard(productData) {
+            // Validate all product data before display
+            if (!productData || typeof productData !== 'object') {
+                console.error('Invalid product data');
+                return;
+            }
+
+            const panel = document.getElementById('productPanel');
+
+            // Set image with fallback
+            const imgEl = document.getElementById('productImage');
+            imgEl.src = productData.image_url;
+            imgEl.alt = sanitizeString(productData.title);
+            imgEl.onerror = () => {
+                imgEl.src = '/placeholder.png';
+            };
+
+            // Set text content (already sanitized from renderHotspots)
+            document.getElementById('productTitle').textContent = productData.title;
+            document.getElementById('productPrice').textContent = `$${parseFloat(productData.price || 0).toFixed(2)}`;
+            document.getElementById('productSku').textContent = productData.sku || 'SKU N/A';
+            document.getElementById('productDescription').textContent = productData.excerpt || 'Premium SkyyRose collection piece';
+
+            // Action buttons with safe link handling
+            const viewBtn = document.getElementById('viewProductBtn');
+            viewBtn.onclick = (e) => {
+                e.preventDefault();
+                const validUrl = validateUrl(productData.woocommerce_url);
+                if (validUrl) {
+                    window.location.href = validUrl;
+                } else {
+                    console.error('Invalid product URL');
+                }
+            };
+
+            const addBtn = document.getElementById('addToCartBtn');
+            addBtn.onclick = (e) => {
+                e.preventDefault();
+                // Validate product ID is a positive integer
+                if (typeof productData.product_id === 'number' && productData.product_id > 0) {
+                    addToCart(productData.product_id);
+                } else {
+                    console.error('Invalid product ID');
+                }
+            };
+
+            const closeBtn = document.getElementById('closeBtn');
+            closeBtn.onclick = () => {
+                panel.classList.remove('active');
+            };
+
+            panel.classList.add('active');
+        }
+
+        async function addToCart(productId) {
+            try {
+                // Validate product ID
+                if (typeof productId !== 'number' || productId <= 0) {
+                    throw new Error('Invalid product ID');
+                }
+
+                const cartUrl = `${CONFIG.wpRestUrl}/wc/v3/cart/items`;
+                const validatedUrl = validateUrl(cartUrl);
+                if (!validatedUrl) {
+                    throw new Error('Invalid API URL');
+                }
+
+                const response = await fetchWithRetry(validatedUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-WC-Store-API-Nonce': getStoreNonce(),
+                    },
+                    body: JSON.stringify({
+                        id: productId,
+                        quantity: 1,
+                    }),
+                });
+
+                if (response.ok) {
+                    // Show success feedback
+                    const btn = document.getElementById('addToCartBtn');
+                    const originalText = btn.textContent;
+                    btn.textContent = '✓ Added';
+                    btn.disabled = true;
+
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.disabled = false;
+                    }, 2000);
+
+                    console.info(`Product ${productId} added to cart`);
+                } else {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Failed to add to cart:', error);
+
+                // Show error feedback
+                const btn = document.getElementById('addToCartBtn');
+                const originalText = btn.textContent;
+                btn.textContent = '✗ Error';
+                btn.disabled = true;
+
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        function getStoreNonce() {
+            // Safely retrieve CSRF token from meta tag
+            const nonceEl = document.querySelector('meta[name="wc-store-api-nonce"]');
+            const nonce = nonceEl?.content || '';
+
+            // Validate nonce format (should be a non-empty string)
+            if (typeof nonce !== 'string' || nonce.length === 0) {
+                console.warn('No store API nonce found');
+                return '';
+            }
+
+            return nonce;
+        }
+
+        // ============================================================================
+        // INITIALIZATION
+        // ============================================================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const experience = new CollectionExperienceScene('canvas-container');
+            await experience.loadHotspots();
+        });
+    </script>
+</body>
+</html>

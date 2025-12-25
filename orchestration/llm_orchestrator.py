@@ -32,13 +32,7 @@ from .llm_clients import (
     MistralClient,
     OpenAIClient,
 )
-from .llm_registry import (
-    LLMRegistry,
-    ModelCapability,
-    ModelDefinition,
-    ModelProvider,
-    ModelTier,
-)
+from .llm_registry import LLMRegistry, ModelCapability, ModelDefinition, ModelProvider, ModelTier
 
 logger = logging.getLogger(__name__)
 
@@ -81,6 +75,12 @@ class TaskType(str, Enum):
     # Speed-critical
     REAL_TIME = "real_time"
     STREAMING = "streaming"
+
+    # Media/3D Generation
+    THREE_D_GENERATION = "three_d_generation"
+    IMAGE_GENERATION = "image_generation"
+    VIDEO_GENERATION = "video_generation"
+    MEDIA_GENERATION = "media_generation"
 
 
 class RoutingStrategy(str, Enum):
@@ -207,6 +207,11 @@ class LLMOrchestrator:
             TaskType.FUNCTION_CALLING: {ModelCapability.FUNCTION_CALLING},
             TaskType.REAL_TIME: {ModelCapability.FAST_INFERENCE},
             TaskType.STREAMING: {ModelCapability.TEXT_GENERATION},
+            # Media/3D Generation (uses text generation for prompt engineering)
+            TaskType.THREE_D_GENERATION: {ModelCapability.TEXT_GENERATION},
+            TaskType.IMAGE_GENERATION: {ModelCapability.IMAGE_GENERATION},
+            TaskType.VIDEO_GENERATION: {ModelCapability.TEXT_GENERATION},
+            TaskType.MEDIA_GENERATION: {ModelCapability.TEXT_GENERATION},
         }
 
         # Task type to preferred models
@@ -251,6 +256,23 @@ class LLMOrchestrator:
                 "claude-3-5-sonnet-20241022",
                 "gpt-4o",
                 "gemini-2.0-flash-exp",
+            ],
+            # Media/3D Generation - Claude for structured prompts, OpenAI for diversity
+            TaskType.THREE_D_GENERATION: [
+                "claude-3-5-sonnet-20241022",  # Best for structured 3D generation prompts
+                "gpt-4o",  # Fallback with strong understanding of 3D concepts
+            ],
+            TaskType.IMAGE_GENERATION: [
+                "gpt-4o",  # OpenAI's best understanding of image generation
+                "gemini-2.0-flash-exp",  # Google's Imagen capabilities
+            ],
+            TaskType.VIDEO_GENERATION: [
+                "gpt-4o",  # OpenAI understanding for video generation
+                "gemini-2.0-flash-exp",  # Google's Veo capabilities
+            ],
+            TaskType.MEDIA_GENERATION: [
+                "claude-3-5-sonnet-20241022",  # General prompt engineering
+                "gpt-4o",  # Fallback
             ],
         }
 

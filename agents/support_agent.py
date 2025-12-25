@@ -32,11 +32,7 @@ from adk.base import (
 )
 from orchestration.prompt_engineering import PromptTechnique
 
-from .base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-    TaskCategory,
-)
+from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
 logger = logging.getLogger(__name__)
 
@@ -82,23 +78,23 @@ class SupportAgent(EnhancedSuperAgent):
     FAQ_KNOWLEDGE = {
         "shipping": {
             "question": "How long does shipping take?",
-            "answer": "Standard shipping takes 5-7 business days within the US. Express shipping (2-3 days) is available at checkout. International shipping typically takes 7-14 business days."
+            "answer": "Standard shipping takes 5-7 business days within the US. Express shipping (2-3 days) is available at checkout. International shipping typically takes 7-14 business days.",
         },
         "returns": {
             "question": "What is your return policy?",
-            "answer": "We accept returns within 30 days of purchase. Items must be unworn with original tags attached. Returns are free for exchanges; refunds are processed minus a $9.95 shipping fee."
+            "answer": "We accept returns within 30 days of purchase. Items must be unworn with original tags attached. Returns are free for exchanges; refunds are processed minus a $9.95 shipping fee.",
         },
         "sizing": {
             "question": "How do I find my size?",
-            "answer": "Check our size guide on each product page. We offer XS-3XL in most styles. Our pieces have a relaxed, streetwear fit - if between sizes, we recommend sizing down for a more fitted look."
+            "answer": "Check our size guide on each product page. We offer XS-3XL in most styles. Our pieces have a relaxed, streetwear fit - if between sizes, we recommend sizing down for a more fitted look.",
         },
         "payment": {
             "question": "What payment methods do you accept?",
-            "answer": "We accept all major credit cards, PayPal, Apple Pay, Google Pay, and Shop Pay. Installment payments available through Klarna and Afterpay."
+            "answer": "We accept all major credit cards, PayPal, Apple Pay, Google Pay, and Shop Pay. Installment payments available through Klarna and Afterpay.",
         },
         "tracking": {
             "question": "How do I track my order?",
-            "answer": "Once shipped, you'll receive an email with tracking information. You can also track your order in your account dashboard or by entering your order number on our tracking page."
+            "answer": "Once shipped, you'll receive an email with tracking information. You can also track your order in your account dashboard or by entering your order number on our tracking page.",
         },
     }
 
@@ -318,8 +314,7 @@ Escalate to human support when:
         try:
             task_type = self._classify_support_task(prompt)
             technique = self.TECHNIQUE_PREFERENCES.get(
-                task_type,
-                self.select_technique(TaskCategory.QA)
+                task_type, self.select_technique(TaskCategory.QA)
             )
 
             # Check for escalation needs
@@ -329,17 +324,10 @@ Escalate to human support when:
             # Apply RAG technique for FAQ-based queries
             if task_type == "faq":
                 faq_context = self._get_relevant_faqs(prompt)
-                enhanced = self.apply_technique(
-                    PromptTechnique.RAG,
-                    prompt,
-                    context=faq_context
-                )
+                enhanced = self.apply_technique(PromptTechnique.RAG, prompt, context=faq_context)
             else:
                 enhanced = self.apply_technique(
-                    technique,
-                    prompt,
-                    role="customer support specialist for SkyyRose",
-                    **kwargs
+                    technique, prompt, role="customer support specialist for SkyyRose", **kwargs
                 )
 
             if hasattr(self, "_backend_agent"):
@@ -354,11 +342,7 @@ Escalate to human support when:
                 content=content,
                 status=AgentStatus.COMPLETED,
                 started_at=start_time,
-                metadata={
-                    "task_type": task_type,
-                    "technique": technique.value,
-                    "escalated": False
-                }
+                metadata={"task_type": task_type, "technique": technique.value, "escalated": False},
             )
 
         except Exception as e:
@@ -407,11 +391,7 @@ Escalate to human support when:
         order_value = context.get("order_value", 0)
         return order_value > 500
 
-    async def _handle_escalation(
-        self,
-        prompt: str,
-        start_time: datetime
-    ) -> AgentResult:
+    async def _handle_escalation(self, prompt: str, start_time: datetime) -> AgentResult:
         """Handle escalation to human agent"""
         response = """I understand you'd like to speak with a human team member. I'm connecting you with our customer care team now.
 
@@ -431,8 +411,8 @@ Is there anything else I can help clarify before the handoff?"""
             metadata={
                 "task_type": "escalation",
                 "escalated": True,
-                "escalation_reason": "customer_request"
-            }
+                "escalation_reason": "customer_request",
+            },
         )
 
     def _get_relevant_faqs(self, query: str) -> list[dict[str, str]]:
@@ -452,10 +432,12 @@ Is there anything else I can help clarify before the handoff?"""
             if any(kw in query_lower for kw in keywords):
                 faq = self.FAQ_KNOWLEDGE.get(faq_key)
                 if faq:
-                    relevant.append({
-                        "text": f"Q: {faq['question']}\nA: {faq['answer']}",
-                        "source": f"faq_{faq_key}"
-                    })
+                    relevant.append(
+                        {
+                            "text": f"Q: {faq['question']}\nA: {faq['answer']}",
+                            "source": f"faq_{faq_key}",
+                        }
+                    )
 
         return relevant
 
@@ -480,9 +462,7 @@ We'll respond within 24 hours."""
     # =========================================================================
 
     async def handle_inquiry(
-        self,
-        message: str,
-        customer_context: dict | None = None
+        self, message: str, customer_context: dict | None = None
     ) -> AgentResult:
         """Handle customer inquiry with full context"""
         context = customer_context or {}
@@ -503,39 +483,25 @@ Please:
             prompt,
             task_type="inquiry",
             technique=PromptTechnique.RAG,
-            context=self._get_relevant_faqs(message)
+            context=self._get_relevant_faqs(message),
         )
 
-    async def classify_intent(
-        self,
-        message: str
-    ) -> dict[str, Any]:
+    async def classify_intent(self, message: str) -> dict[str, Any]:
         """Classify customer intent using ML"""
         if self.ml_module:
-            prediction = await self.ml_module.predict(
-                "intent_classifier",
-                message
-            )
+            prediction = await self.ml_module.predict("intent_classifier", message)
             return {
                 "message": message[:100],
                 "intent": prediction.prediction,
-                "confidence": prediction.confidence
+                "confidence": prediction.confidence,
             }
 
         # Fallback classification
         task_type = self._classify_support_task(message)
-        return {
-            "message": message[:100],
-            "intent": task_type,
-            "confidence": 0.7
-        }
+        return {"message": message[:100], "intent": task_type, "confidence": 0.7}
 
     async def process_return(
-        self,
-        order_id: str,
-        items: list[str],
-        reason: str,
-        preference: str = "refund"
+        self, order_id: str, items: list[str], reason: str, preference: str = "refund"
     ) -> AgentResult:
         """Process return request"""
         prompt = f"""Process return request:
@@ -553,26 +519,18 @@ Please:
 5. Offer exchange alternatives if applicable"""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="return",
-            technique=PromptTechnique.CHAIN_OF_THOUGHT
+            prompt, task_type="return", technique=PromptTechnique.CHAIN_OF_THOUGHT
         )
 
-    async def predict_escalation(
-        self,
-        conversation_history: list[str]
-    ) -> dict[str, Any]:
+    async def predict_escalation(self, conversation_history: list[str]) -> dict[str, Any]:
         """Predict if conversation needs escalation"""
         if self.ml_module:
             conversation_text = "\n".join(conversation_history)
-            prediction = await self.ml_module.predict(
-                "escalation_predictor",
-                conversation_text
-            )
+            prediction = await self.ml_module.predict("escalation_predictor", conversation_text)
             return {
                 "should_escalate": prediction.prediction.get("escalate", False),
                 "confidence": prediction.confidence,
-                "reason": prediction.prediction.get("reason", "unknown")
+                "reason": prediction.prediction.get("reason", "unknown"),
             }
 
         # Fallback based on keywords
@@ -581,7 +539,7 @@ Please:
         return {
             "should_escalate": should_escalate,
             "confidence": 0.7,
-            "reason": "keyword_match" if should_escalate else "none"
+            "reason": "keyword_match" if should_escalate else "none",
         }
 
 

@@ -1,8 +1,0 @@
-# Claude Agent SDK for Python
-claude-agent-sdk>=0.1.0
-
-# Environment management
-python-dotenv>=1.0.0
-
-# Type checking and linting tools (for Python analysis features)
-# These are optional but recommended for full functionality

@@ -332,9 +332,7 @@ Return ONLY the JSON, no other text."""
             variations = parsed.get("variations", [])
             queries = [query, step_back] + variations
         except Exception:
-            queries = [query] + self._extract_queries_from_response(
-                response, num_variations - 1
-            )
+            queries = [query] + self._extract_queries_from_response(response, num_variations - 1)
 
         return RewrittenQuery(
             original_query=query,
@@ -382,9 +380,7 @@ Return ONLY the JSON array, no other text."""
 
         return message.content[0].text
 
-    def _extract_queries_from_response(
-        self, response: str, expected_count: int
-    ) -> list[str]:
+    def _extract_queries_from_response(self, response: str, expected_count: int) -> list[str]:
         """Extract query strings from Claude's response."""
         # Try parsing as JSON first
         try:

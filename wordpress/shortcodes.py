@@ -23,7 +23,7 @@ def generate_3d_viewer_shortcode() -> str:
 
     Usage in WordPress: [skyyrose_3d_viewer model_url="https://..." height="500"]
     """
-    return '''<?php
+    return """<?php
 /**
  * SkyyRose 3D Product Viewer Shortcode
  *
@@ -144,12 +144,12 @@ function skyyrose_save_3d_model_meta($post_id) {
     }
 }
 add_action('save_post_product', 'skyyrose_save_3d_model_meta');
-?>'''
+?>"""
 
 
 def generate_virtual_tryon_shortcode() -> str:
     """Generate PHP code for the Virtual Try-On shortcode."""
-    return '''<?php
+    return """<?php
 /**
  * SkyyRose Virtual Try-On Shortcode
  *
@@ -192,7 +192,7 @@ function skyyrose_virtual_tryon_shortcode($atts) {
     return ob_get_clean();
 }
 add_shortcode('skyyrose_virtual_tryon', 'skyyrose_virtual_tryon_shortcode');
-?>'''
+?>"""
 
 
 def generate_collection_experience_shortcode() -> str:
@@ -201,7 +201,7 @@ def generate_collection_experience_shortcode() -> str:
     Embeds immersive 3D collection landing pages.
     Usage: [skyyrose_collection_experience collection="black_rose" height="800"]
     """
-    return '''<?php
+    return """<?php
 /**
  * SkyyRose Collection 3D Experience Shortcode
  *
@@ -327,7 +327,7 @@ function skyyrose_enqueue_collection_scripts() {
     }
 }
 add_action('wp_enqueue_scripts', 'skyyrose_enqueue_collection_scripts');
-?>'''
+?>"""
 
 
 # Export shortcode generator functions
@@ -336,4 +336,3 @@ __all__ = [
     "generate_virtual_tryon_shortcode",
     "generate_collection_experience_shortcode",
 ]
-

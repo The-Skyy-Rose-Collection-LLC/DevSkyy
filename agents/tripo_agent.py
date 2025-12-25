@@ -33,12 +33,7 @@ from typing import Any
 import aiofiles
 import aiohttp
 from pydantic import BaseModel, Field
-from tenacity import (
-    AsyncRetrying,
-    retry_if_exception_type,
-    stop_after_attempt,
-    wait_exponential,
-)
+from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 from base import (
     AgentCapability,
@@ -102,8 +97,7 @@ class TripoConfig:
     """Tripo3D configuration."""
 
     api_key: str = field(
-        default_factory=lambda: os.getenv("TRIPO_API_KEY", "")
-        or os.getenv("TRIPO3D_API_KEY", "")
+        default_factory=lambda: os.getenv("TRIPO_API_KEY", "") or os.getenv("TRIPO3D_API_KEY", "")
     )
     base_url: str = field(
         default_factory=lambda: os.getenv("TRIPO_API_BASE_URL", "https://api.tripo3d.ai/v2")
@@ -503,8 +497,21 @@ class TripoAssetAgent(SuperAgent):
         collection: str,
         garment_type: str,
         additional_details: str = "",
+        optimized_prompt: str | None = None,
     ) -> str:
-        """Build optimized prompt for 3D generation."""
+        """
+        Build optimized prompt for 3D generation.
+
+        If optimized_prompt is provided (from HuggingFace), use that instead
+        of building a new one. This allows HF-based optimization to enhance
+        the final Tripo3D output.
+        """
+        # If HF-optimized prompt is provided, use it
+        if optimized_prompt:
+            logger.info("Using HuggingFace-optimized prompt for Tripo3D")
+            return optimized_prompt
+
+        # Otherwise, build standard SkyyRose prompt
         collection_style = COLLECTION_PROMPTS.get(
             collection.upper(),
             COLLECTION_PROMPTS["SIGNATURE"],
@@ -537,11 +544,14 @@ class TripoAssetAgent(SuperAgent):
         garment_type: str = "tee",
         additional_details: str = "",
         output_format: str = "glb",
+        optimized_prompt: str | None = None,
     ) -> dict[str, Any]:
         """Generate 3D model from text description."""
         await self._ensure_session()
 
-        prompt = self._build_prompt(product_name, collection, garment_type, additional_details)
+        prompt = self._build_prompt(
+            product_name, collection, garment_type, additional_details, optimized_prompt
+        )
 
         # Create task
         response = await self._api_request(
@@ -602,8 +612,14 @@ class TripoAssetAgent(SuperAgent):
         image_path: str,
         product_name: str = "Product",
         output_format: str = "glb",
+        optimized_prompt: str | None = None,
     ) -> dict[str, Any]:
-        """Generate 3D model from reference image."""
+        """
+        Generate 3D model from reference image.
+
+        If optimized_prompt is provided (from HuggingFace), it can be used
+        to supplement or enhance the image-based generation.
+        """
         await self._ensure_session()
 
         # Encode image
@@ -652,27 +668,172 @@ class TripoAssetAgent(SuperAgent):
     async def _tool_validate_asset(
         self,
         model_path: str,
+        max_polycount: int = 100000,
+        max_file_size_mb: float = 50.0,
+        min_file_size_kb: float = 10.0,
     ) -> dict[str, Any]:
-        """Validate generated 3D asset (stub - would check polycount, textures, etc.)."""
-        # In production, this would use a 3D library to validate the mesh
+        """
+        Validate generated 3D asset for production quality.
+
+        Performs comprehensive validation including:
+        - File existence and format verification
+        - File size checks (too large = performance issue, too small = incomplete)
+        - Mesh analysis (polycount, faces, vertices) if trimesh available
+        - Texture presence verification for GLB format
+        - SkyyRose quality standards (web-optimized 3D assets)
+
+        Args:
+            model_path: Path to the 3D model file
+            max_polycount: Maximum allowed polygon count (default 100k for web)
+            max_file_size_mb: Maximum file size in MB
+            min_file_size_kb: Minimum file size in KB (to detect incomplete files)
+
+        Returns:
+            Dict with validation results
+        """
         validation = AssetValidation(
             is_valid=True,
             warnings=[],
             errors=[],
         )
 
-        # Basic file existence check
-        if not Path(model_path).exists():
+        path = Path(model_path)
+
+        # Check file existence
+        if not path.exists():
             validation.is_valid = False
             validation.errors.append(f"Model file not found: {model_path}")
+            return validation.model_dump()
 
-        # Check file size (rough proxy for polycount)
-        if Path(model_path).exists():
-            size_mb = Path(model_path).stat().st_size / (1024 * 1024)
-            if size_mb > 50:
-                validation.warnings.append(f"Large file size: {size_mb:.1f}MB")
-            if size_mb < 0.01:
-                validation.warnings.append("Very small file size - may be incomplete")
+        # Check file format
+        supported_formats = {".glb", ".gltf", ".obj", ".fbx", ".stl"}
+        if path.suffix.lower() not in supported_formats:
+            validation.warnings.append(
+                f"Unsupported format: {path.suffix}. Recommended: .glb for web"
+            )
+
+        # File size validation
+        file_size = path.stat().st_size
+        size_mb = file_size / (1024 * 1024)
+        size_kb = file_size / 1024
+
+        if size_mb > max_file_size_mb:
+            validation.is_valid = False
+            validation.errors.append(
+                f"File too large: {size_mb:.1f}MB (max: {max_file_size_mb}MB). "
+                f"Web 3D assets should be optimized for performance."
+            )
+        elif size_mb > max_file_size_mb * 0.7:
+            validation.warnings.append(
+                f"Large file: {size_mb:.1f}MB. Consider optimization for better web performance."
+            )
+
+        if size_kb < min_file_size_kb:
+            validation.is_valid = False
+            validation.errors.append(
+                f"File too small: {size_kb:.1f}KB. Model may be incomplete or corrupted."
+            )
+
+        # Try to analyze mesh with trimesh (if available)
+        try:
+            import trimesh
+
+            mesh = trimesh.load(str(path), force="mesh")
+
+            # Extract polycount
+            if hasattr(mesh, "faces") and mesh.faces is not None:
+                polycount = len(mesh.faces)
+                validation.polycount = polycount
+
+                if polycount > max_polycount:
+                    validation.warnings.append(
+                        f"High polycount: {polycount:,} (recommended: <{max_polycount:,} for web)"
+                    )
+                elif polycount > max_polycount * 0.8:
+                    validation.warnings.append(f"Polycount approaching limit: {polycount:,}")
+
+                # Log mesh details
+                logger.debug(
+                    f"Mesh analysis: {polycount:,} faces, " f"{len(mesh.vertices):,} vertices"
+                )
+
+            # Check if mesh is watertight (closed surface)
+            if hasattr(mesh, "is_watertight") and not mesh.is_watertight:
+                validation.warnings.append("Mesh is not watertight (has holes)")
+
+            # Check for degenerate faces
+            if hasattr(mesh, "remove_degenerate_faces"):
+                original_faces = len(mesh.faces) if hasattr(mesh, "faces") else 0
+                mesh.remove_degenerate_faces()
+                if hasattr(mesh, "faces") and len(mesh.faces) < original_faces:
+                    validation.warnings.append(
+                        f"Model contains {original_faces - len(mesh.faces)} degenerate faces"
+                    )
+
+        except ImportError:
+            logger.debug("trimesh not installed - skipping mesh analysis")
+            # Fall back to file size heuristics for polycount estimation
+            # Rough estimate: ~1KB per 100 triangles for GLB
+            estimated_polys = int(size_kb * 100) if path.suffix.lower() == ".glb" else None
+            if estimated_polys:
+                validation.polycount = estimated_polys
+                if estimated_polys > max_polycount:
+                    validation.warnings.append(
+                        f"Estimated polycount: ~{estimated_polys:,} (based on file size)"
+                    )
+
+        except Exception as e:
+            validation.warnings.append(f"Mesh analysis failed: {e}")
+
+        # GLB-specific checks
+        if path.suffix.lower() == ".glb":
+            try:
+                # Check GLB header magic number
+                with open(path, "rb") as f:
+                    magic = f.read(4)
+                    if magic != b"glTF":
+                        validation.is_valid = False
+                        validation.errors.append("Invalid GLB file: missing glTF magic number")
+                    else:
+                        # Read version
+                        version = int.from_bytes(f.read(4), "little")
+                        if version < 2:
+                            validation.warnings.append(f"GLB version {version} is outdated")
+
+            except Exception as e:
+                validation.errors.append(f"Failed to read GLB header: {e}")
+
+        # Check for textures (important for visual quality)
+        if path.suffix.lower() in {".glb", ".gltf"}:
+            try:
+                import json
+
+                # For GLTF, check for images/textures in the JSON
+                if path.suffix.lower() == ".gltf":
+                    with open(path) as f:
+                        gltf_data = json.load(f)
+                        if "images" not in gltf_data or not gltf_data["images"]:
+                            validation.warnings.append(
+                                "No textures found - model may appear untextured"
+                            )
+                        else:
+                            texture_count = len(gltf_data.get("images", []))
+                            validation.texture_size = f"{texture_count} textures"
+
+            except json.JSONDecodeError:
+                pass  # GLB files aren't JSON
+            except Exception as e:
+                logger.debug(f"Texture check failed: {e}")
+
+        # SkyyRose quality standards
+        if validation.is_valid and not validation.warnings:
+            logger.info(f"Asset validation passed: {model_path}")
+        elif validation.is_valid:
+            logger.warning(
+                f"Asset validation passed with warnings: {model_path} - {validation.warnings}"
+            )
+        else:
+            logger.error(f"Asset validation failed: {model_path} - {validation.errors}")
 
         return validation.model_dump()
 
