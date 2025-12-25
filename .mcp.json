@@ -72,41 +72,41 @@
         "WC_SECRET": "${WOOCOMMERCE_SECRET}"
       },
       "description": "Official WooCommerce MCP Server v10.3+ - products, orders, inventory",
-      \"capabilities\": [
-        \"wc_get_product\",
-        \"wc_list_products\",
-        \"wc_create_product\",
-        \"wc_update_product\",
-        \"wc_get_order\",
-        \"wc_list_orders\",
-        \"wc_create_order\",
-        \"wc_update_stock\",
-        \"wc_get_customer\",
-        \"wc_validate_coupon\"
+      "capabilities": [
+        "wc_get_product",
+        "wc_list_products",
+        "wc_create_product",
+        "wc_update_product",
+        "wc_get_order",
+        "wc_list_orders",
+        "wc_create_order",
+        "wc_update_stock",
+        "wc_get_customer",
+        "wc_validate_coupon"
       ]
     },
-    \"devskyy-critical-fuchsia-ape\": {
-      \"command\": \"python\",
-      \"args\": [\"devskyy_mcp.py\"],
-      \"env\": {
-        \"DEVSKYY_API_URL\": \"${CRITICAL_FUCHSIA_APE_URL}\",
-        \"DEVSKYY_API_KEY\": \"${CRITICAL_FUCHSIA_APE_KEY}\"
+    "devskyy-critical-fuchsia-ape": {
+      "command": "python",
+      "args": ["devskyy_mcp.py"],
+      "env": {
+        "DEVSKYY_API_URL": "${CRITICAL_FUCHSIA_APE_URL}",
+        "DEVSKYY_API_KEY": "${CRITICAL_FUCHSIA_APE_KEY}"
       },
-      \"description\": \"DevSkyy MCP Server integrated with critical-fuchsia-ape backend\",
-      \"capabilities\": [
-        \"devskyy_scan_code\",
-        \"devskyy_fix_code\",
-        \"devskyy_self_healing\",
-        \"devskyy_generate_wordpress_theme\",
-        \"devskyy_ml_prediction\",
-        \"devskyy_manage_products\",
-        \"devskyy_dynamic_pricing\",
-        \"devskyy_generate_3d_from_description\",
-        \"devskyy_generate_3d_from_image\",
-        \"devskyy_marketing_campaign\",
-        \"devskyy_multi_agent_workflow\",
-        \"devskyy_system_monitoring\",
-        \"devskyy_list_agents\"
+      "description": "DevSkyy MCP Server integrated with critical-fuchsia-ape backend",
+      "capabilities": [
+        "devskyy_scan_code",
+        "devskyy_fix_code",
+        "devskyy_self_healing",
+        "devskyy_generate_wordpress_theme",
+        "devskyy_ml_prediction",
+        "devskyy_manage_products",
+        "devskyy_dynamic_pricing",
+        "devskyy_generate_3d_from_description",
+        "devskyy_generate_3d_from_image",
+        "devskyy_marketing_campaign",
+        "devskyy_multi_agent_workflow",
+        "devskyy_system_monitoring",
+        "devskyy_list_agents"
       ]
     }
   },
