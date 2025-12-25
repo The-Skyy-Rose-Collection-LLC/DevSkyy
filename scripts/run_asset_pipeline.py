@@ -146,13 +146,13 @@ def main() -> int:
             print(f"3D Assets: {len(result['assets_3d'])}")
             print(f"Try-On Assets: {len(result['assets_tryon'])}")
             print(f"WordPress Uploads: {len(result['assets_wordpress'])}")
-            if result['errors']:
+            if result["errors"]:
                 print(f"Errors: {len(result['errors'])}")
-                for err in result['errors']:
+                for err in result["errors"]:
                     print(f"  - {err['stage']}: {err['error']}")
             print(f"{'='*50}")
 
-        return 0 if result['status'] == 'success' else 1
+        return 0 if result["status"] == "success" else 1
 
     except Exception as e:
         print(f"Pipeline failed: {e}", file=sys.stderr)
@@ -161,4 +161,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

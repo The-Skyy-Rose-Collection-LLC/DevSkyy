@@ -6,7 +6,9 @@
 
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import {
   FlaskConical,
   RefreshCw,
@@ -17,6 +19,8 @@ import {
   CheckCircle,
   XCircle,
   Scale,
+  ExternalLink,
+  Loader2,
 } from 'lucide-react';
 import {
   BarChart,
@@ -64,9 +68,38 @@ const LLM_COLORS: Record<LLMProvider, string> = {
   groq: '#f55036',
 };
 
+// Loading fallback for Suspense
+function ABTestingLoading() {
+  return (
+    <div className="flex items-center justify-center min-h-[400px]">
+      <Loader2 className="h-8 w-8 animate-spin text-brand-primary" />
+    </div>
+  );
+}
+
+// Main page wrapper with Suspense
 export default function ABTestingPage() {
+  return (
+    <Suspense fallback={<ABTestingLoading />}>
+      <ABTestingContent />
+    </Suspense>
+  );
+}
+
+function ABTestingContent() {
+  const searchParams = useSearchParams();
+  const highlightTestId = searchParams.get('testId');
+  const highlightRef = useRef<HTMLDivElement>(null);
+
   const { data: history, mutate: refreshHistory, isLoading } = useABTestHistory({ limit: 50 });
   const { data: stats } = useABTestStats();
+
+  // Scroll to highlighted test when page loads with testId parameter
+  useEffect(() => {
+    if (highlightTestId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [highlightTestId, history]);
 
   // Prepare chart data
   const winsByProvider = stats?.winsByProvider
@@ -228,7 +261,15 @@ export default function ABTestingPage() {
               </div>
             ) : (
               history?.map((test) => (
-                <ABTestCard key={test.id} test={test} />
+                <div
+                  key={test.id}
+                  ref={test.id === highlightTestId ? highlightRef : null}
+                >
+                  <ABTestCard
+                    test={test}
+                    isHighlighted={test.id === highlightTestId}
+                  />
+                </div>
               ))
             )}
           </div>
@@ -295,15 +336,16 @@ interface ABTestCardProps {
     confidence: number;
     createdAt: string;
   };
+  isHighlighted?: boolean;
 }
 
-function ABTestCard({ test }: ABTestCardProps) {
+function ABTestCard({ test, isHighlighted }: ABTestCardProps) {
   const isWinnerA = test.winner === 'A' || test.winner === test.variantA;
   const isWinnerB = test.winner === 'B' || test.winner === test.variantB;
   const isTie = test.winner === 'tie';
 
   return (
-    <div className="border rounded-lg p-4">
+    <div className={`border rounded-lg p-4 transition-all ${isHighlighted ? 'ring-2 ring-brand-primary bg-brand-primary/5' : ''}`}>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Badge variant="outline">{test.taskType}</Badge>

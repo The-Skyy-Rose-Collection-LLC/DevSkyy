@@ -71,3 +71,11 @@ pyyaml>=6.0
 orjson>=3.9
 python-dateutil>=2.8
 email-validator>=2.1
+
+# 3D & Visual Generation (for orchestration/asset_pipeline.py)
+Pillow>=10.0                    # Image processing for 3D asset pipeline
+opencv-python>=4.8             # Image optimization (background removal, contrast enhancement)
+
+# Performance & Testing (for deployment verification scripts)
+selenium>=4.15                  # Core Web Vitals measurement via Lighthouse
+playwright>=1.40                # Browser automation for functionality testing

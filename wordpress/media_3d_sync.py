@@ -231,9 +231,7 @@ class WordPress3DMediaSync:
                             response=text,
                             attempt=attempt + 1,
                         )
-                        raise WordPress3DSyncError(
-                            f"API error ({response.status}): {text}"
-                        )
+                        raise WordPress3DSyncError(f"API error ({response.status}): {text}")
 
                     return await response.json()
 
@@ -245,8 +243,10 @@ class WordPress3DMediaSync:
                     max_retries=self.config.max_retries,
                 )
                 if attempt == self.config.max_retries - 1:
-                    raise WordPress3DSyncError(f"Request failed after {self.config.max_retries} retries: {e}")
-                await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                    raise WordPress3DSyncError(
+                        f"Request failed after {self.config.max_retries} retries: {e}"
+                    )
+                await asyncio.sleep(2**attempt)  # Exponential backoff
 
     def _validate_url(self, url: str | None, field_name: str) -> None:
         """
@@ -392,11 +392,7 @@ class WordPress3DMediaSync:
             result = await self._request(
                 "PUT",
                 f"/products/{product_id}",
-                json={
-                    "meta_data": [
-                        {"key": self.META_AR_ENABLED, "value": str(enabled).lower()}
-                    ]
-                },
+                json={"meta_data": [{"key": self.META_AR_ENABLED, "value": str(enabled).lower()}]},
             )
 
             self._logger.info(
@@ -624,11 +620,7 @@ class WordPress3DMediaSync:
 
                     # Check if GLB URL is valid
                     glb_url = next(
-                        (
-                            item["value"]
-                            for item in meta_data
-                            if item["key"] == self.META_GLB_URL
-                        ),
+                        (item["value"] for item in meta_data if item["key"] == self.META_GLB_URL),
                         None,
                     )
 

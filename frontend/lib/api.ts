@@ -19,7 +19,7 @@ import type {
   VisualGenerationResult,
 } from './types';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api/backend';
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || '/api';
 
 class APIError extends Error {
   constructor(
@@ -214,6 +214,41 @@ export const toolsAPI = {
     }),
 };
 
+// Brand API
+export const brandAPI = {
+  get: () =>
+    fetchAPI<{
+      brand: {
+        name: string;
+        tagline: string;
+        philosophy: string;
+        location: string;
+        tone: { primary: string; descriptors: string[]; avoid: string[] };
+        colors: Record<string, { name: string; hex: string; rgb: string }>;
+        typography: { heading: string; body: string; accent: string };
+        target_audience: {
+          age_range: string;
+          description: string;
+          interests: string[];
+          values: string[];
+        };
+        product_types: string[];
+        quality_descriptors: string[];
+      };
+      collections: Record<
+        string,
+        {
+          name: string;
+          tagline: string;
+          mood: string;
+          colors: string;
+          style: string;
+          description: string;
+        }
+      >;
+    }>('/brand'),
+};
+
 // Export all APIs
 export const api = {
   agents: agentsAPI,
@@ -223,6 +258,7 @@ export const api = {
   visual: visualAPI,
   metrics: metricsAPI,
   tools: toolsAPI,
+  brand: brandAPI,
 };
 
 export default api;

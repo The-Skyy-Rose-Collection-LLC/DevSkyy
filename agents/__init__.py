@@ -28,8 +28,8 @@ All agents extend EnhancedSuperAgent and include:
 from .analytics_agent import AnalyticsAgent
 
 # Enhanced Super Agent base and modules
-from .base_super_agent import (  # Types; Data classes; Modules; Base
-    EnhancedSuperAgent,
+from .base_super_agent import (
+    EnhancedSuperAgent,  # Types; Data classes; Modules; Base
     LearningRecord,
     LLMProvider,
     LLMRoundTableInterface,
@@ -57,6 +57,7 @@ from .coding_doctor_agent import (
 )
 
 # 6 SuperAgents
+from .collection_content_agent import CollectionContentAgent
 from .commerce_agent import CommerceAgent
 from .creative_agent import CreativeAgent, VisualTaskType
 
@@ -129,6 +130,7 @@ __all__ = [
     # Enhanced Super Agent - Base
     "EnhancedSuperAgent",
     # 6 SuperAgents + Coding Doctor
+    "CollectionContentAgent",
     "CommerceAgent",
     "CreativeAgent",
     "VisualTaskType",

@@ -203,10 +203,7 @@ class SecurityMonitor:
         # Brute force detection
         if event.event_type == SecurityEventType.LOGIN_FAILED and event.ip_address:
             ip_key = f"ip:{event.ip_address}"
-            if (
-                self.event_counters[hour_key][ip_key]
-                >= self.thresholds["failed_logins_per_hour"]
-            ):
+            if self.event_counters[hour_key][ip_key] >= self.thresholds["failed_logins_per_hour"]:
                 self._create_alert(
                     title="Brute Force Attack Detected",
                     description=f"Multiple failed login attempts from IP {event.ip_address}",

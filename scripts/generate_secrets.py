@@ -53,9 +53,10 @@ def generate_encryption_key(bits: int = 256) -> str:
         Standard base64 encoded encryption key (required by AES-256-GCM)
     """
     import base64
+
     bytes_needed = bits // 8
     key_bytes = secrets.token_bytes(bytes_needed)
-    return base64.b64encode(key_bytes).decode('utf-8')
+    return base64.b64encode(key_bytes).decode("utf-8")
 
 
 def update_env_file(env_path: Path, jwt_key: str, encryption_key: str) -> None:

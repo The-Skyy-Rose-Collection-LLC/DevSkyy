@@ -592,6 +592,7 @@ class DataMasker:
             # Capture pattern_name in closure to avoid B023
             def make_replacer(pname: str):
                 return lambda m: self._mask_match(m.group(), mask_char, pname)
+
             result = pattern.sub(make_replacer(pattern_name), result)
 
         return result

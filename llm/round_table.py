@@ -41,6 +41,7 @@ logger = logging.getLogger(__name__)
 
 class LLMProvider(str, Enum):
     """LLM providers participating in Round Table"""
+
     CLAUDE = "claude"
     GPT4 = "gpt4"
     GEMINI = "gemini"
@@ -51,6 +52,7 @@ class LLMProvider(str, Enum):
 
 class CompetitionStatus(str, Enum):
     """Status of a Round Table competition"""
+
     PENDING = "pending"
     GENERATING = "generating"
     SCORING = "scoring"
@@ -64,9 +66,10 @@ class CompetitionStatus(str, Enum):
 # =============================================================================
 
 
-@dataclass
+@dataclass(slots=True)
 class LLMResponse:
-    """Response from an LLM provider"""
+    """Response from an LLM provider. Memory-optimized with __slots__."""
+
     provider: LLMProvider
     content: str
     latency_ms: float
@@ -76,30 +79,32 @@ class LLMResponse:
     error: str | None = None
 
 
-@dataclass
+@dataclass(slots=True)
 class ResponseScores:
-    """Scoring breakdown for a response"""
-    relevance: float = 0.0       # How relevant to the prompt
-    quality: float = 0.0         # Overall output quality
-    completeness: float = 0.0    # Task completion
-    efficiency: float = 0.0      # Token/cost efficiency
-    brand_alignment: float = 0.0 # Brand voice adherence
+    """Scoring breakdown for a response. Memory-optimized with __slots__."""
+
+    relevance: float = 0.0  # How relevant to the prompt
+    quality: float = 0.0  # Overall output quality
+    completeness: float = 0.0  # Task completion
+    efficiency: float = 0.0  # Token/cost efficiency
+    brand_alignment: float = 0.0  # Brand voice adherence
 
     @property
     def total(self) -> float:
         """Weighted total score"""
         return (
-            self.relevance * 0.25 +
-            self.quality * 0.25 +
-            self.completeness * 0.20 +
-            self.efficiency * 0.15 +
-            self.brand_alignment * 0.15
+            self.relevance * 0.25
+            + self.quality * 0.25
+            + self.completeness * 0.20
+            + self.efficiency * 0.15
+            + self.brand_alignment * 0.15
         )
 
 
 @dataclass
 class RoundTableEntry:
     """Entry in the Round Table competition"""
+
     provider: LLMProvider
     response: LLMResponse
     scores: ResponseScores = field(default_factory=ResponseScores)
@@ -113,6 +118,7 @@ class RoundTableEntry:
 @dataclass
 class ABTestResult:
     """Result from A/B testing between top 2"""
+
     entry_a: RoundTableEntry
     entry_b: RoundTableEntry
     winner: RoundTableEntry
@@ -125,6 +131,7 @@ class ABTestResult:
 @dataclass
 class RoundTableResult:
     """Complete result from a Round Table competition"""
+
     id: str
     task_id: str
     prompt: str
@@ -154,7 +161,7 @@ class RoundTableResult:
                 e.provider.value: {
                     "total": e.total_score,
                     "latency_ms": e.response.latency_ms,
-                    "cost_usd": e.response.cost_usd
+                    "cost_usd": e.response.cost_usd,
                 }
                 for e in self.entries
             },
@@ -226,11 +233,8 @@ class RoundTableDatabase:
 
         try:
             import asyncpg
-            self._pool = await asyncpg.create_pool(
-                self.connection_string,
-                min_size=2,
-                max_size=10
-            )
+
+            self._pool = await asyncpg.create_pool(self.connection_string, min_size=2, max_size=10)
 
             # Create schema
             async with self._pool.acquire() as conn:
@@ -253,7 +257,8 @@ class RoundTableDatabase:
             data = result.to_dict()
 
             async with self._pool.acquire() as conn:
-                await conn.execute("""
+                await conn.execute(
+                    """
                     INSERT INTO round_table_results (
                         id, task_id, prompt_hash, prompt_preview,
                         winner_provider, winner_score, winner_response,
@@ -303,8 +308,7 @@ class RoundTableDatabase:
         try:
             async with self._pool.acquire() as conn:
                 row = await conn.fetchrow(
-                    "SELECT * FROM round_table_results WHERE id = $1",
-                    result_id
+                    "SELECT * FROM round_table_results WHERE id = $1", result_id
                 )
                 return dict(row) if row else None
         except Exception as e:
@@ -312,10 +316,7 @@ class RoundTableDatabase:
             return None
 
     async def get_history(
-        self,
-        limit: int = 100,
-        task_id: str | None = None,
-        provider: str | None = None
+        self, limit: int = 100, task_id: str | None = None, provider: str | None = None
     ) -> list[dict]:
         """Get Round Table history"""
         if not self._initialized or not self._pool:
@@ -355,7 +356,8 @@ class RoundTableDatabase:
 
         try:
             async with self._pool.acquire() as conn:
-                rows = await conn.fetch("""
+                rows = await conn.fetch(
+                    """
                     SELECT
                         winner_provider,
                         COUNT(*) as wins,
@@ -366,14 +368,15 @@ class RoundTableDatabase:
                     WHERE status = 'completed'
                     GROUP BY winner_provider
                     ORDER BY wins DESC
-                """)
+                """
+                )
 
                 return {
                     row["winner_provider"]: {
                         "wins": row["wins"],
                         "avg_score": float(row["avg_score"]),
                         "avg_latency_ms": float(row["avg_latency"]),
-                        "avg_cost_usd": float(row["avg_cost"])
+                        "avg_cost_usd": float(row["avg_cost"]),
                     }
                     for row in rows
                 }
@@ -398,22 +401,40 @@ class ResponseScorer:
 
     # Brand-positive keywords for SkyyRose
     BRAND_POSITIVE = [
-        "luxury", "premium", "elegant", "sophisticated", "rose", "gold",
-        "exclusive", "limited", "quality", "crafted", "timeless", "love",
-        "oakland", "street", "elevated", "refined", "meticulous"
+        "luxury",
+        "premium",
+        "elegant",
+        "sophisticated",
+        "rose",
+        "gold",
+        "exclusive",
+        "limited",
+        "quality",
+        "crafted",
+        "timeless",
+        "love",
+        "oakland",
+        "street",
+        "elevated",
+        "refined",
+        "meticulous",
     ]
 
     # Brand-negative keywords to avoid
     BRAND_NEGATIVE = [
-        "cheap", "discount", "basic", "simple", "ordinary", "generic",
-        "budget", "low-cost", "mass-produced"
+        "cheap",
+        "discount",
+        "basic",
+        "simple",
+        "ordinary",
+        "generic",
+        "budget",
+        "low-cost",
+        "mass-produced",
     ]
 
     def score_response(
-        self,
-        response: LLMResponse,
-        prompt: str,
-        task_context: dict | None = None
+        self, response: LLMResponse, prompt: str, task_context: dict | None = None
     ) -> ResponseScores:
         """Score a response on all metrics"""
         content = response.content or ""
@@ -435,8 +456,26 @@ class ResponseScorer:
         content_words = set(content.lower().split())
 
         # Remove common words
-        stop_words = {"the", "a", "an", "is", "are", "was", "were", "be", "been",
-                      "and", "or", "but", "in", "on", "at", "to", "for", "of"}
+        stop_words = {
+            "the",
+            "a",
+            "an",
+            "is",
+            "are",
+            "was",
+            "were",
+            "be",
+            "been",
+            "and",
+            "or",
+            "but",
+            "in",
+            "on",
+            "at",
+            "to",
+            "for",
+            "of",
+        }
         prompt_words -= stop_words
         content_words -= stop_words
 
@@ -482,12 +521,7 @@ class ResponseScorer:
 
         return min(100.0, max(0.0, score))
 
-    def _score_completeness(
-        self,
-        content: str,
-        prompt: str,
-        task_context: dict | None
-    ) -> float:
+    def _score_completeness(self, content: str, prompt: str, task_context: dict | None) -> float:
         """Score task completion"""
         score = 60.0  # Base for non-empty
         prompt_lower = prompt.lower()
@@ -606,9 +640,7 @@ class LLMRoundTable:
         logger.info("LLM Round Table initialized")
 
     def register_provider(
-        self,
-        provider: LLMProvider,
-        generator: Callable[[str, dict | None], Any]
+        self, provider: LLMProvider, generator: Callable[[str, dict | None], Any]
     ):
         """
         Register an LLM provider.
@@ -635,7 +667,7 @@ class LLMRoundTable:
         task_id: str | None = None,
         providers: list[LLMProvider] | None = None,
         context: dict | None = None,
-        persist: bool = True
+        persist: bool = True,
     ) -> RoundTableResult:
         """
         Run Round Table competition.
@@ -668,8 +700,12 @@ class LLMRoundTable:
 
         if not entries:
             return self._create_failed_result(
-                result_id, task_id, prompt, prompt_hash,
-                "No providers generated responses", start_time
+                result_id,
+                task_id,
+                prompt,
+                prompt_hash,
+                "No providers generated responses",
+                start_time,
             )
 
         # Phase 2: Score all responses
@@ -726,10 +762,7 @@ class LLMRoundTable:
         return result
 
     async def _generate_all(
-        self,
-        prompt: str,
-        providers: list[LLMProvider],
-        context: dict | None
+        self, prompt: str, providers: list[LLMProvider], context: dict | None
     ) -> list[RoundTableEntry]:
         """Generate responses from all providers in parallel"""
         entries = []
@@ -794,25 +827,14 @@ class LLMRoundTable:
         return entries
 
     def _score_all(
-        self,
-        entries: list[RoundTableEntry],
-        prompt: str,
-        context: dict | None
+        self, entries: list[RoundTableEntry], prompt: str, context: dict | None
     ) -> list[RoundTableEntry]:
         """Score all entries"""
         for entry in entries:
-            entry.scores = self._scorer.score_response(
-                entry.response,
-                prompt,
-                context
-            )
+            entry.scores = self._scorer.score_response(entry.response, prompt, context)
         return entries
 
-    async def _ab_test(
-        self,
-        prompt: str,
-        top_two: list[RoundTableEntry]
-    ) -> ABTestResult:
+    async def _ab_test(self, prompt: str, top_two: list[RoundTableEntry]) -> ABTestResult:
         """A/B test between top 2 entries using judge LLM"""
         entry_a, entry_b = top_two[0], top_two[1]
 
@@ -865,8 +887,11 @@ REASONING: Your detailed explanation"""
                 # Parse confidence
                 if "CONFIDENCE:" in judge_content.upper():
                     try:
-                        conf_line = [line for line in judge_content.split("\n")
-                                    if "CONFIDENCE:" in line.upper()][0]
+                        conf_line = [
+                            line
+                            for line in judge_content.split("\n")
+                            if "CONFIDENCE:" in line.upper()
+                        ][0]
                         confidence = float(conf_line.split(":")[-1].strip())
                     except (ValueError, IndexError):
                         pass
@@ -897,7 +922,7 @@ REASONING: Your detailed explanation"""
         prompt: str,
         prompt_hash: str,
         error: str,
-        start_time: float
+        start_time: float,
     ) -> RoundTableResult:
         """Create a failed result"""
         return RoundTableResult(
@@ -923,9 +948,7 @@ REASONING: Your detailed explanation"""
         return self._history[-limit:]
 
     async def get_database_history(
-        self,
-        limit: int = 100,
-        task_id: str | None = None
+        self, limit: int = 100, task_id: str | None = None
     ) -> list[dict]:
         """Get competition history from database"""
         return await self._db.get_history(limit, task_id)
@@ -956,7 +979,7 @@ REASONING: Your detailed explanation"""
                     stats[result.winner.provider.value]["wins"] += 1
 
         # Calculate averages
-        for p, s in stats.items():
+        for _p, s in stats.items():
             if s["total"] > 0:
                 s["avg_score"] = s["total_score"] / s["total"]
             del s["total_score"]

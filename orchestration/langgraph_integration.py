@@ -691,31 +691,172 @@ def create_product_launch_workflow() -> WorkflowGraph:
     """
     workflow = WorkflowGraph("product_launch")
 
-    # Content generation node
+    # Content generation node - uses real LLM for content
     class ContentNode(AgentNode):
         async def execute(self, state: WorkflowState) -> WorkflowState:
-            # Generate description based on product info
+            """Generate product content using LLM."""
             product_name = state.context.get("product_name", "Product")
             collection = state.context.get("collection", "SIGNATURE")
+            product_type = state.context.get("product_type", "garment")
 
-            # Simulated content generation
-            description = f"Introducing {product_name} from the {collection} collection. Where Love Meets Luxury."
+            try:
+                # Import LLM router for content generation
+                from llm.router import get_llm_router
 
-            state.outputs[self.name] = {"description": description}
-            state.add_message("assistant", f"Generated content for {product_name}")
+                router = get_llm_router()
+
+                if router:
+                    # Build content generation prompt
+                    prompt = f"""Generate compelling product content for SkyyRose luxury streetwear.
+
+Product: {product_name}
+Collection: {collection}
+Type: {product_type}
+
+Brand Voice: "Where Love Meets Luxury" - premium, sophisticated, bold, gender-neutral
+
+Generate:
+1. A captivating product title (5-8 words)
+2. A short description (2-3 sentences, evocative and luxurious)
+3. Key features (3-5 bullet points)
+4. SEO meta description (150 characters max)
+
+Format as JSON with keys: title, description, features, meta_description"""
+
+                    response = await router.route_and_execute(
+                        prompt=prompt,
+                        preferred_provider="anthropic",  # Claude for creative content
+                        task_type="content_generation",
+                    )
+
+                    content_text = (
+                        response.content if hasattr(response, "content") else str(response)
+                    )
+
+                    # Try to parse JSON from response
+                    try:
+                        # Extract JSON if wrapped in markdown
+                        if "```json" in content_text:
+                            content_text = content_text.split("```json")[1].split("```")[0]
+                        elif "```" in content_text:
+                            content_text = content_text.split("```")[1].split("```")[0]
+
+                        content_data = json.loads(content_text.strip())
+                    except json.JSONDecodeError:
+                        # Fallback: use the raw text as description
+                        content_data = {
+                            "title": product_name,
+                            "description": content_text[:500],
+                            "features": [],
+                            "meta_description": content_text[:150],
+                        }
+
+                    state.outputs[self.name] = {
+                        "description": content_data.get("description", ""),
+                        "title": content_data.get("title", product_name),
+                        "features": content_data.get("features", []),
+                        "meta_description": content_data.get("meta_description", ""),
+                        "provider": response.model if hasattr(response, "model") else "llm",
+                    }
+                    state.add_message("assistant", f"Generated content for {product_name}")
+
+                else:
+                    raise RuntimeError("LLM router not available")
+
+            except ImportError:
+                logger.warning("LLM router not available, using template content")
+                state.outputs[self.name] = {
+                    "description": f"Introducing {product_name} from the {collection} collection. "
+                    f"Where Love Meets Luxury meets bold street poetry.",
+                    "title": f"SkyyRose {product_name}",
+                    "features": ["Premium materials", "Gender-neutral design", "Limited edition"],
+                    "meta_description": f"Discover {product_name} - SkyyRose {collection} Collection",
+                }
+                state.add_message("assistant", f"Generated template content for {product_name}")
+
+            except Exception as e:
+                logger.error(f"Content generation failed: {e}")
+                state.outputs[self.name] = {
+                    "error": str(e),
+                    "description": f"{product_name} from the {collection} collection.",
+                }
+                state.add_message("system", f"Content generation error: {e}")
 
             return state
 
-    # Image generation node
+    # Image generation node - uses real visual generation
     class ImageNode(AgentNode):
         async def execute(self, state: WorkflowState) -> WorkflowState:
+            """Generate product images using visual generation agents."""
             product_name = state.context.get("product_name", "Product")
+            collection = state.context.get("collection", "SIGNATURE")
+            product_type = state.context.get("product_type", "garment")
 
-            # Simulated image generation
-            state.outputs[self.name] = {
-                "images": [f"/images/{product_name.lower().replace(' ', '_')}_1.jpg"],
-            }
-            state.add_message("assistant", "Generated product images")
+            try:
+                # Try to use CreativeAgent for image generation
+                from agents.creative_agent import CreativeAgent
+
+                creative_agent = CreativeAgent()
+                await creative_agent.initialize()
+
+                # Build image generation prompt
+                prompt = f"""Generate a product image for SkyyRose luxury streetwear:
+
+Product: {product_name}
+Collection: {collection}
+Type: {product_type}
+
+Style: Professional product photography, clean white background,
+premium lighting, fashion editorial quality.
+
+Brand Colors: Rose gold (#D4AF37), Obsidian black (#0D0D0D), Ivory (#F5F5F0)
+Aesthetic: Elevated street poetry, intellectual luxury"""
+
+                result = await creative_agent.generate_image(prompt)
+
+                if result and hasattr(result, "content"):
+                    # Parse result for image URLs
+                    image_data = result.content
+                    if isinstance(image_data, str):
+                        try:
+                            image_data = json.loads(image_data)
+                        except json.JSONDecodeError:
+                            image_data = {"url": image_data}
+
+                    state.outputs[self.name] = {
+                        "images": (
+                            [image_data.get("url", image_data)]
+                            if isinstance(image_data, dict)
+                            else [image_data]
+                        ),
+                        "provider": (
+                            result.agent_provider.value
+                            if hasattr(result.agent_provider, "value")
+                            else "creative_agent"
+                        ),
+                    }
+                else:
+                    raise RuntimeError("No image generated")
+
+                state.add_message("assistant", "Generated product images via CreativeAgent")
+
+            except ImportError:
+                logger.warning("CreativeAgent not available, using fallback image paths")
+                sanitized_name = product_name.lower().replace(" ", "_").replace("-", "_")
+                state.outputs[self.name] = {
+                    "images": [f"/images/products/{sanitized_name}_hero.jpg"],
+                    "provider": "template",
+                }
+                state.add_message("assistant", "Generated fallback image paths")
+
+            except Exception as e:
+                logger.error(f"Image generation failed: {e}")
+                sanitized_name = product_name.lower().replace(" ", "_").replace("-", "_")
+                state.outputs[self.name] = {
+                    "images": [f"/images/products/{sanitized_name}_default.jpg"],
+                    "error": str(e),
+                }
+                state.add_message("system", f"Image generation error: {e}")
 
             return state
 

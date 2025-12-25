@@ -58,8 +58,9 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from mcp.server.fastmcp import FastMCP
     from pydantic import BaseModel, ConfigDict, Field
+
+    from mcp.server.fastmcp import FastMCP
 except ImportError as e:
     print(f"Missing required package: {e}")
     print("Install with: pip install fastmcp pydantic")
@@ -121,12 +122,14 @@ mcp = FastMCP(
 
 class ResponseFormat(str, Enum):
     """Output format for tool responses."""
+
     MARKDOWN = "markdown"
     JSON = "json"
 
 
 class AgentType(str, Enum):
     """Available agent types."""
+
     COMMERCE = "commerce"
     CREATIVE = "creative"
     MARKETING = "marketing"
@@ -137,10 +140,10 @@ class AgentType(str, Enum):
 
 class BaseInput(BaseModel):
     """Base input model for all tools."""
+
     model_config = ConfigDict(str_strip_whitespace=True, validate_assignment=True, extra="forbid")
     response_format: ResponseFormat = Field(
-        default=ResponseFormat.MARKDOWN,
-        description="Output format: 'markdown' or 'json'"
+        default=ResponseFormat.MARKDOWN, description="Output format: 'markdown' or 'json'"
     )
 
 
@@ -151,6 +154,7 @@ class BaseInput(BaseModel):
 
 class CommerceGetProductInput(BaseInput):
     """Input for getting product details."""
+
     sku: str = Field(..., description="Product SKU")
     include_stock: bool = Field(default=True, description="Include stock info")
     include_analytics: bool = Field(default=False, description="Include sales analytics")
@@ -158,12 +162,14 @@ class CommerceGetProductInput(BaseInput):
 
 class CommerceUpdateProductInput(BaseInput):
     """Input for updating a product."""
+
     sku: str = Field(..., description="Product SKU")
     updates: dict[str, Any] = Field(..., description="Fields to update")
 
 
 class CommerceCreateProductInput(BaseInput):
     """Input for creating a product."""
+
     name: str = Field(..., description="Product name")
     collection: str = Field(..., description="Collection (BLACK_ROSE, LOVE_HURTS, SIGNATURE)")
     price: float = Field(..., ge=0, description="Base price")
@@ -173,6 +179,7 @@ class CommerceCreateProductInput(BaseInput):
 
 class CommerceInventoryInput(BaseInput):
     """Input for inventory operations."""
+
     sku: str = Field(..., description="Product SKU")
     quantity: int | None = Field(default=None, description="Quantity (for updates)")
     action: str = Field(default="get", description="Action: get, set, add, subtract")
@@ -180,20 +187,25 @@ class CommerceInventoryInput(BaseInput):
 
 class CommerceForecastInput(BaseInput):
     """Input for demand forecasting."""
+
     sku: str = Field(..., description="Product SKU")
     days_ahead: int = Field(default=30, ge=7, le=90, description="Forecast horizon in days")
 
 
 class CommerceOrderInput(BaseInput):
     """Input for order operations."""
+
     order_id: str = Field(..., description="Order ID")
     include_history: bool = Field(default=False, description="Include order history")
 
 
 class CommerceOrderStatusInput(BaseInput):
     """Input for updating order status."""
+
     order_id: str = Field(..., description="Order ID")
-    status: str = Field(..., description="New status (pending, processing, shipped, delivered, cancelled)")
+    status: str = Field(
+        ..., description="New status (pending, processing, shipped, delivered, cancelled)"
+    )
     notify_customer: bool = Field(default=True, description="Send notification to customer")
 
 
@@ -204,6 +216,7 @@ class CommerceOrderStatusInput(BaseInput):
 
 class CreativeGenerateImageInput(BaseInput):
     """Input for image generation."""
+
     prompt: str = Field(..., description="Image generation prompt")
     collection: str = Field(default="SIGNATURE", description="Collection style")
     aspect_ratio: str = Field(default="1:1", description="Aspect ratio (1:1, 16:9, 9:16)")
@@ -212,6 +225,7 @@ class CreativeGenerateImageInput(BaseInput):
 
 class CreativeGenerate3DInput(BaseInput):
     """Input for 3D model generation."""
+
     product_name: str = Field(..., description="Product name")
     garment_type: str = Field(..., description="Garment type (hoodie, bomber, tee, etc.)")
     collection: str = Field(default="SIGNATURE", description="Collection")
@@ -220,6 +234,7 @@ class CreativeGenerate3DInput(BaseInput):
 
 class CreativeVirtualTryonInput(BaseInput):
     """Input for virtual try-on."""
+
     model_image: str = Field(..., description="Model/person image path or URL")
     garment_image: str = Field(..., description="Garment image path or URL")
     category: str = Field(default="tops", description="Garment category: tops, bottoms, outerwear")
@@ -232,14 +247,20 @@ class CreativeVirtualTryonInput(BaseInput):
 
 class MarketingContentInput(BaseInput):
     """Input for content generation."""
-    content_type: str = Field(..., description="Type: social_post, email, blog, product_description")
+
+    content_type: str = Field(
+        ..., description="Type: social_post, email, blog, product_description"
+    )
     topic: str = Field(..., description="Content topic or product name")
-    platform: str = Field(default="instagram", description="Platform: instagram, tiktok, email, blog")
+    platform: str = Field(
+        default="instagram", description="Platform: instagram, tiktok, email, blog"
+    )
     tone: str = Field(default="luxury", description="Tone: luxury, casual, bold, playful")
 
 
 class MarketingSEOInput(BaseInput):
     """Input for SEO analysis."""
+
     url: str | None = Field(default=None, description="Page URL to analyze")
     content: str | None = Field(default=None, description="Content to optimize")
     keywords: list[str] | None = Field(default=None, description="Target keywords")
@@ -247,6 +268,7 @@ class MarketingSEOInput(BaseInput):
 
 class MarketingCampaignInput(BaseInput):
     """Input for campaign management."""
+
     action: str = Field(..., description="Action: create, analyze, schedule")
     campaign_type: str = Field(default="product_launch", description="Campaign type")
     products: list[str] | None = Field(default=None, description="Product SKUs")
@@ -260,6 +282,7 @@ class MarketingCampaignInput(BaseInput):
 
 class SupportTicketInput(BaseInput):
     """Input for ticket operations."""
+
     action: str = Field(..., description="Action: create, update, close, get")
     ticket_id: str | None = Field(default=None, description="Ticket ID (for update/close/get)")
     subject: str | None = Field(default=None, description="Ticket subject (for create)")
@@ -269,12 +292,14 @@ class SupportTicketInput(BaseInput):
 
 class SupportFAQInput(BaseInput):
     """Input for FAQ queries."""
+
     question: str = Field(..., description="Customer question")
     category: str | None = Field(default=None, description="FAQ category filter")
 
 
 class SupportEscalationInput(BaseInput):
     """Input for escalation handling."""
+
     ticket_id: str = Field(..., description="Ticket ID to escalate")
     reason: str = Field(..., description="Escalation reason")
     assign_to: str | None = Field(default=None, description="Assign to specific agent/team")
@@ -287,6 +312,7 @@ class SupportEscalationInput(BaseInput):
 
 class OperationsWordPressInput(BaseInput):
     """Input for WordPress operations."""
+
     action: str = Field(..., description="Action: update_plugin, create_page, backup, optimize")
     target: str | None = Field(default=None, description="Target plugin/page/resource")
     options: dict[str, Any] | None = Field(default=None, description="Additional options")
@@ -294,6 +320,7 @@ class OperationsWordPressInput(BaseInput):
 
 class OperationsDeployInput(BaseInput):
     """Input for deployment operations."""
+
     environment: str = Field(default="staging", description="Environment: staging, production")
     version: str | None = Field(default=None, description="Version to deploy")
     rollback: bool = Field(default=False, description="Rollback to previous version")
@@ -301,6 +328,7 @@ class OperationsDeployInput(BaseInput):
 
 class OperationsMonitorInput(BaseInput):
     """Input for monitoring operations."""
+
     metric: str = Field(..., description="Metric: uptime, response_time, error_rate, traffic")
     period: str = Field(default="24h", description="Time period: 1h, 24h, 7d, 30d")
 
@@ -312,6 +340,7 @@ class OperationsMonitorInput(BaseInput):
 
 class AnalyticsSalesInput(BaseInput):
     """Input for sales analytics."""
+
     period: str = Field(default="30d", description="Time period: 7d, 30d, 90d, 1y")
     group_by: str = Field(default="day", description="Group by: hour, day, week, month")
     product_ids: list[str] | None = Field(default=None, description="Filter by product SKUs")
@@ -319,6 +348,7 @@ class AnalyticsSalesInput(BaseInput):
 
 class AnalyticsCustomerInput(BaseInput):
     """Input for customer analytics."""
+
     metric: str = Field(..., description="Metric: acquisition, retention, ltv, segments")
     segment: str | None = Field(default=None, description="Customer segment filter")
     period: str = Field(default="30d", description="Time period")
@@ -326,6 +356,7 @@ class AnalyticsCustomerInput(BaseInput):
 
 class AnalyticsReportInput(BaseInput):
     """Input for report generation."""
+
     report_type: str = Field(..., description="Type: sales, inventory, customers, marketing")
     period: str = Field(..., description="Time period")
     format: str = Field(default="json", description="Format: json, csv, pdf")
@@ -338,6 +369,7 @@ class AnalyticsReportInput(BaseInput):
 
 class RoundTableInput(BaseInput):
     """Input for LLM Round Table competition."""
+
     prompt: str = Field(..., description="Prompt for all LLMs to compete on")
     task_type: str = Field(default="general", description="Task type for scoring")
     max_providers: int = Field(default=4, ge=2, le=6, description="Max providers to compete")
@@ -345,6 +377,7 @@ class RoundTableInput(BaseInput):
 
 class RouterSelectInput(BaseInput):
     """Input for router model selection."""
+
     task_type: str = Field(..., description="Task type: reasoning, creative, code, analysis")
     requirements: str | None = Field(default=None, description="Specific requirements")
     budget: str = Field(default="balanced", description="Budget: economy, balanced, premium")
@@ -352,6 +385,7 @@ class RouterSelectInput(BaseInput):
 
 class LearningReportInput(BaseInput):
     """Input for self-learning reports."""
+
     agent_type: AgentType | None = Field(default=None, description="Filter by agent type")
     metric: str = Field(default="all", description="Metric: success_rate, latency, cost, all")
     period: str = Field(default="7d", description="Time period")
@@ -461,13 +495,16 @@ async def commerce_get_product(input: CommerceGetProductInput) -> str:
                 "sku": input.sku,
                 "include_stock": input.include_stock,
                 "include_analytics": input.include_analytics,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_get_product failed: {e}")
@@ -492,13 +529,16 @@ async def commerce_update_product(input: CommerceUpdateProductInput) -> str:
         result = await agent.execute_with_learning(
             prompt=f"Update product {input.sku} with: {json.dumps(input.updates)}",
             task_category=TaskCategory.DATA_EXTRACTION,
-            context={"sku": input.sku, "updates": input.updates}
+            context={"sku": input.sku, "updates": input.updates},
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_update_product failed: {e}")
@@ -529,13 +569,16 @@ async def commerce_create_product(input: CommerceCreateProductInput) -> str:
                 "price": input.price,
                 "description": input.description,
                 "variants": input.variants,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_create_product failed: {e}")
@@ -560,18 +603,23 @@ async def commerce_inventory(input: CommerceInventoryInput) -> str:
         if input.action == "get":
             prompt = f"Get inventory for SKU: {input.sku}"
         else:
-            prompt = f"{input.action.capitalize()} inventory for {input.sku}: quantity={input.quantity}"
+            prompt = (
+                f"{input.action.capitalize()} inventory for {input.sku}: quantity={input.quantity}"
+            )
 
         result = await agent.execute_with_learning(
             prompt=prompt,
             task_category=TaskCategory.DATA_EXTRACTION,
-            context={"sku": input.sku, "quantity": input.quantity, "action": input.action}
+            context={"sku": input.sku, "quantity": input.quantity, "action": input.action},
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_inventory failed: {e}")
@@ -596,13 +644,16 @@ async def commerce_forecast_demand(input: CommerceForecastInput) -> str:
         result = await agent.execute_with_learning(
             prompt=f"Forecast demand for {input.sku} for next {input.days_ahead} days",
             task_category=TaskCategory.REASONING,
-            context={"sku": input.sku, "days_ahead": input.days_ahead}
+            context={"sku": input.sku, "days_ahead": input.days_ahead},
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_forecast_demand failed: {e}")
@@ -627,13 +678,16 @@ async def commerce_get_order(input: CommerceOrderInput) -> str:
         result = await agent.execute_with_learning(
             prompt=f"Get order details for order #{input.order_id}",
             task_category=TaskCategory.DATA_EXTRACTION,
-            context={"order_id": input.order_id, "include_history": input.include_history}
+            context={"order_id": input.order_id, "include_history": input.include_history},
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_get_order failed: {e}")
@@ -662,13 +716,16 @@ async def commerce_update_order_status(input: CommerceOrderStatusInput) -> str:
                 "order_id": input.order_id,
                 "status": input.status,
                 "notify_customer": input.notify_customer,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "commerce",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "commerce",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"commerce_update_order_status failed: {e}")
@@ -702,13 +759,16 @@ async def creative_generate_image(input: CreativeGenerateImageInput) -> str:
                 "collection": input.collection,
                 "aspect_ratio": input.aspect_ratio,
                 "provider": input.provider,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "creative",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "creative",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"creative_generate_image failed: {e}")
@@ -738,13 +798,16 @@ async def creative_generate_3d_model(input: CreativeGenerate3DInput) -> str:
                 "garment_type": input.garment_type,
                 "collection": input.collection,
                 "output_format": input.output_format,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "creative",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "creative",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"creative_generate_3d_model failed: {e}")
@@ -773,13 +836,16 @@ async def creative_virtual_tryon(input: CreativeVirtualTryonInput) -> str:
                 "model_image": input.model_image,
                 "garment_image": input.garment_image,
                 "category": input.category,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "creative",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "creative",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"creative_virtual_tryon failed: {e}")
@@ -804,7 +870,9 @@ async def marketing_generate_content(input: MarketingContentInput) -> str:
     try:
         agent = await get_agent(AgentType.MARKETING)
         if not agent:
-            return format_response({"error": "Marketing agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Marketing agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"Generate {input.content_type} about {input.topic} for {input.platform}",
@@ -814,13 +882,16 @@ async def marketing_generate_content(input: MarketingContentInput) -> str:
                 "topic": input.topic,
                 "platform": input.platform,
                 "tone": input.tone,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "marketing",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "marketing",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"marketing_generate_content failed: {e}")
@@ -840,7 +911,9 @@ async def marketing_seo_analysis(input: MarketingSEOInput) -> str:
     try:
         agent = await get_agent(AgentType.MARKETING)
         if not agent:
-            return format_response({"error": "Marketing agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Marketing agent not available"}, input.response_format
+            )
 
         prompt = "Analyze SEO"
         if input.url:
@@ -851,13 +924,16 @@ async def marketing_seo_analysis(input: MarketingSEOInput) -> str:
         result = await agent.execute_with_learning(
             prompt=prompt,
             task_category=TaskCategory.ANALYSIS,
-            context={"url": input.url, "content": input.content, "keywords": input.keywords}
+            context={"url": input.url, "content": input.content, "keywords": input.keywords},
         )
 
-        return format_response({
-            "agent": "marketing",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "marketing",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"marketing_seo_analysis failed: {e}")
@@ -877,7 +953,9 @@ async def marketing_campaign(input: MarketingCampaignInput) -> str:
     try:
         agent = await get_agent(AgentType.MARKETING)
         if not agent:
-            return format_response({"error": "Marketing agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Marketing agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"{input.action.capitalize()} {input.campaign_type} campaign",
@@ -887,13 +965,16 @@ async def marketing_campaign(input: MarketingCampaignInput) -> str:
                 "campaign_type": input.campaign_type,
                 "products": input.products,
                 "start_date": input.start_date,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "marketing",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "marketing",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"marketing_campaign failed: {e}")
@@ -935,13 +1016,16 @@ async def support_ticket(input: SupportTicketInput) -> str:
                 "subject": input.subject,
                 "message": input.message,
                 "priority": input.priority,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "support",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "support",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"support_ticket failed: {e}")
@@ -966,13 +1050,16 @@ async def support_faq_search(input: SupportFAQInput) -> str:
         result = await agent.execute_with_learning(
             prompt=f"Find FAQ answer for: {input.question}",
             task_category=TaskCategory.QA,
-            context={"question": input.question, "category": input.category}
+            context={"question": input.question, "category": input.category},
         )
 
-        return format_response({
-            "agent": "support",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "support",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"support_faq_search failed: {e}")
@@ -1001,13 +1088,16 @@ async def support_escalate(input: SupportEscalationInput) -> str:
                 "ticket_id": input.ticket_id,
                 "reason": input.reason,
                 "assign_to": input.assign_to,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "support",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "support",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"support_escalate failed: {e}")
@@ -1032,18 +1122,23 @@ async def operations_wordpress(input: OperationsWordPressInput) -> str:
     try:
         agent = await get_agent(AgentType.OPERATIONS)
         if not agent:
-            return format_response({"error": "Operations agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Operations agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"WordPress: {input.action} {input.target or ''}",
             task_category=TaskCategory.REASONING,
-            context={"action": input.action, "target": input.target, "options": input.options}
+            context={"action": input.action, "target": input.target, "options": input.options},
         )
 
-        return format_response({
-            "agent": "operations",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "operations",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"operations_wordpress failed: {e}")
@@ -1063,7 +1158,9 @@ async def operations_deploy(input: OperationsDeployInput) -> str:
     try:
         agent = await get_agent(AgentType.OPERATIONS)
         if not agent:
-            return format_response({"error": "Operations agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Operations agent not available"}, input.response_format
+            )
 
         action = "Rollback" if input.rollback else "Deploy"
         result = await agent.execute_with_learning(
@@ -1073,13 +1170,16 @@ async def operations_deploy(input: OperationsDeployInput) -> str:
                 "environment": input.environment,
                 "version": input.version,
                 "rollback": input.rollback,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "operations",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "operations",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"operations_deploy failed: {e}")
@@ -1099,18 +1199,23 @@ async def operations_monitor(input: OperationsMonitorInput) -> str:
     try:
         agent = await get_agent(AgentType.OPERATIONS)
         if not agent:
-            return format_response({"error": "Operations agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Operations agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"Get {input.metric} metrics for {input.period}",
             task_category=TaskCategory.ANALYSIS,
-            context={"metric": input.metric, "period": input.period}
+            context={"metric": input.metric, "period": input.period},
         )
 
-        return format_response({
-            "agent": "operations",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "operations",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"operations_monitor failed: {e}")
@@ -1135,7 +1240,9 @@ async def analytics_sales(input: AnalyticsSalesInput) -> str:
     try:
         agent = await get_agent(AgentType.ANALYTICS)
         if not agent:
-            return format_response({"error": "Analytics agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Analytics agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"Get sales analytics for {input.period} grouped by {input.group_by}",
@@ -1144,13 +1251,16 @@ async def analytics_sales(input: AnalyticsSalesInput) -> str:
                 "period": input.period,
                 "group_by": input.group_by,
                 "product_ids": input.product_ids,
-            }
+            },
         )
 
-        return format_response({
-            "agent": "analytics",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "analytics",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"analytics_sales failed: {e}")
@@ -1170,18 +1280,23 @@ async def analytics_customers(input: AnalyticsCustomerInput) -> str:
     try:
         agent = await get_agent(AgentType.ANALYTICS)
         if not agent:
-            return format_response({"error": "Analytics agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Analytics agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"Get customer {input.metric} analytics for {input.period}",
             task_category=TaskCategory.ANALYSIS,
-            context={"metric": input.metric, "segment": input.segment, "period": input.period}
+            context={"metric": input.metric, "segment": input.segment, "period": input.period},
         )
 
-        return format_response({
-            "agent": "analytics",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "analytics",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"analytics_customers failed: {e}")
@@ -1201,18 +1316,27 @@ async def analytics_generate_report(input: AnalyticsReportInput) -> str:
     try:
         agent = await get_agent(AgentType.ANALYTICS)
         if not agent:
-            return format_response({"error": "Analytics agent not available"}, input.response_format)
+            return format_response(
+                {"error": "Analytics agent not available"}, input.response_format
+            )
 
         result = await agent.execute_with_learning(
             prompt=f"Generate {input.report_type} report for {input.period}",
             task_category=TaskCategory.REASONING,
-            context={"report_type": input.report_type, "period": input.period, "format": input.format}
+            context={
+                "report_type": input.report_type,
+                "period": input.period,
+                "format": input.format,
+            },
         )
 
-        return format_response({
-            "agent": "analytics",
-            "result": result.response if hasattr(result, 'response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "agent": "analytics",
+                "result": result.response if hasattr(result, "response") else str(result),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"analytics_generate_report failed: {e}")
@@ -1237,10 +1361,13 @@ async def orchestration_round_table(input: RoundTableInput) -> str:
     try:
         round_table = await get_round_table()
         if not round_table:
-            return format_response({
-                "error": "Round Table not available",
-                "note": "LLM Round Table module not imported"
-            }, input.response_format)
+            return format_response(
+                {
+                    "error": "Round Table not available",
+                    "note": "LLM Round Table module not imported",
+                },
+                input.response_format,
+            )
 
         # Run competition
         result = await round_table.compete(
@@ -1249,12 +1376,17 @@ async def orchestration_round_table(input: RoundTableInput) -> str:
             max_providers=input.max_providers,
         )
 
-        return format_response({
-            "competition": "round_table",
-            "winner": result.winner if hasattr(result, 'winner') else "N/A",
-            "scores": result.scores if hasattr(result, 'scores') else {},
-            "result": result.winning_response if hasattr(result, 'winning_response') else str(result),
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "competition": "round_table",
+                "winner": result.winner if hasattr(result, "winner") else "N/A",
+                "scores": result.scores if hasattr(result, "scores") else {},
+                "result": (
+                    result.winning_response if hasattr(result, "winning_response") else str(result)
+                ),
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"orchestration_round_table failed: {e}")
@@ -1274,10 +1406,10 @@ async def orchestration_router_select(input: RouterSelectInput) -> str:
     try:
         router = await get_router()
         if not router:
-            return format_response({
-                "error": "Router not available",
-                "note": "LLM Router module not imported"
-            }, input.response_format)
+            return format_response(
+                {"error": "Router not available", "note": "LLM Router module not imported"},
+                input.response_format,
+            )
 
         # Get provider recommendation
         provider = router.select_provider(
@@ -1286,12 +1418,15 @@ async def orchestration_router_select(input: RouterSelectInput) -> str:
             budget=input.budget,
         )
 
-        return format_response({
-            "router": "llm_router",
-            "recommended_provider": provider,
-            "task_type": input.task_type,
-            "budget": input.budget,
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "router": "llm_router",
+                "recommended_provider": provider,
+                "task_type": input.task_type,
+                "budget": input.budget,
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"orchestration_router_select failed: {e}")
@@ -1313,24 +1448,27 @@ async def orchestration_learning_report(input: LearningReportInput) -> str:
 
         if input.agent_type:
             agent = await get_agent(input.agent_type)
-            if agent and hasattr(agent, 'get_stats'):
+            if agent and hasattr(agent, "get_stats"):
                 stats[input.agent_type.value] = agent.get_stats()
         else:
             # Get stats from all agents
             for agent_type in AgentType:
                 try:
                     agent = await get_agent(agent_type)
-                    if agent and hasattr(agent, 'get_stats'):
+                    if agent and hasattr(agent, "get_stats"):
                         stats[agent_type.value] = agent.get_stats()
                 except Exception:
                     pass
 
-        return format_response({
-            "report": "self_learning",
-            "metric": input.metric,
-            "period": input.period,
-            "stats": stats,
-        }, input.response_format)[:CHARACTER_LIMIT]
+        return format_response(
+            {
+                "report": "self_learning",
+                "metric": input.metric,
+                "period": input.period,
+                "stats": stats,
+            },
+            input.response_format,
+        )[:CHARACTER_LIMIT]
 
     except Exception as e:
         logger.error(f"orchestration_learning_report failed: {e}")
@@ -1378,11 +1516,14 @@ async def orchestration_list_agents(input: BaseInput) -> str:
         },
     }
 
-    return format_response({
-        "agents": agents_info,
-        "total_tools": sum(a["tools"] for a in agents_info.values()),
-        "orchestration_tools": ["round_table", "router_select", "learning_report"],
-    }, input.response_format)[:CHARACTER_LIMIT]
+    return format_response(
+        {
+            "agents": agents_info,
+            "total_tools": sum(a["tools"] for a in agents_info.values()),
+            "orchestration_tools": ["round_table", "router_select", "learning_report"],
+        },
+        input.response_format,
+    )[:CHARACTER_LIMIT]
 
 
 # =============================================================================

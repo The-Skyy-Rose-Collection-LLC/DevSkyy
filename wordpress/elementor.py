@@ -67,11 +67,30 @@ class WidgetType(str, Enum):
     NAV_MENU = "nav-menu"
 
     # SkyyRose 3D Widgets (Custom)
-    THREEJS_VIEWER = "skyyrose-3d-viewer"      # Single product 3D viewer
-    THREEJS_COLLECTION = "skyyrose-collection" # Full collection experience
-    AR_QUICK_LOOK = "skyyrose-ar-button"       # iOS AR Quick Look button
+    THREEJS_VIEWER = "skyyrose-3d-viewer"  # Single product 3D viewer
+    THREEJS_COLLECTION = "skyyrose-collection"  # Full collection experience
+    AR_QUICK_LOOK = "skyyrose-ar-button"  # iOS AR Quick Look button
     PRODUCT_CONFIGURATOR = "skyyrose-configurator"  # Color/size selector
-    MODEL_VIEWER = "skyyrose-model-viewer"     # Google Model Viewer widget
+    MODEL_VIEWER = "skyyrose-model-viewer"  # Google Model Viewer widget
+
+    # SkyyRose Animation Widgets (Custom)
+    LOTTIE_ANIMATION = "skyyrose-lottie"  # Lottie animations (spinning logo, etc.)
+    THREEJS_BACKGROUND = "skyyrose-3d-background"  # 3D ambient background particles
+
+    # SkyyRose Collection Widgets (Custom)
+    COLLECTION_CARD = "skyyrose-collection-card"  # Featured collection card
+    PRODUCT_HOTSPOT_VIEWER = "skyyrose-hotspot-viewer"  # Interactive hotspot viewer
+
+    # SkyyRose Pre-Order Widgets (Custom)
+    COUNTDOWN_TIMER = "skyyrose-countdown"  # Server-synced countdown timer
+    PREORDER_FORM = "skyyrose-preorder-form"  # Pre-order notification form
+    JETPOPUP_TRIGGER = "skyyrose-jetpopup-trigger"  # JetPopup integration
+
+    # SkyyRose Timeline & Press (Custom)
+    TIMELINE = "skyyrose-timeline"  # Timeline widget for milestones
+    PRESS_MENTION = "skyyrose-press-mention"  # Press mention/article card
+    LOOP_CONTROLS = "loop-controls"  # Post loop controls/filters
+    TABS = "tabs"  # Tab widget for content organization
 
 
 class SectionLayout(str, Enum):
@@ -644,9 +663,7 @@ class ElementorBuilder:
                 "button_background_color": bg_color,
                 "button_text_color": text_color,
                 "button_border_radius": {"size": 4, "unit": "px"},
-                "button_padding": {
-                    "top": "12", "right": "24", "bottom": "12", "left": "24"
-                },
+                "button_padding": {"top": "12", "right": "24", "bottom": "12", "left": "24"},
                 # AR options
                 "ar_scale": "fixed",  # #allowsContentScaling=0
                 "ar_placement": "floor",
@@ -742,6 +759,291 @@ class ElementorBuilder:
                 "shadow_intensity": "1",
                 "exposure": "1",
                 "environment_image": "neutral",
+            },
+        )
+
+    # -------------------------------------------------------------------------
+    # Animation Widgets (Lottie, 3D Backgrounds)
+    # -------------------------------------------------------------------------
+
+    def lottie_animation(
+        self,
+        json_url: str,
+        loop: bool = True,
+        speed: float = 1.0,
+        reverse: bool = False,
+        width: str = "auto",
+        height: str = "auto",
+        align: str = "center",
+    ) -> dict[str, Any]:
+        """
+        Create Lottie animation widget.
+
+        Args:
+            json_url: URL to Lottie JSON animation file
+            loop: Enable looping
+            speed: Animation speed multiplier
+            reverse: Play animation in reverse
+            width: Widget width
+            height: Widget height
+            align: Alignment (left, center, right)
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.LOTTIE_ANIMATION,
+            {
+                "lottie_url": json_url,
+                "loop": "yes" if loop else "no",
+                "speed": str(speed),
+                "reverse": "yes" if reverse else "no",
+                "autoplay": "yes",
+                "trigger": "none",
+                "width": {"size": width, "unit": "px"} if width != "auto" else {},
+                "height": {"size": height, "unit": "px"} if height != "auto" else {},
+                "align": align,
+            },
+        )
+
+    def threejs_background(
+        self,
+        scene_type: str = "ambient_particles",
+        collection_slug: str = "signature",
+        particle_count: int = 100,
+        height: str = "400px",
+    ) -> dict[str, Any]:
+        """
+        Create Three.js background scene widget.
+
+        Args:
+            scene_type: Type of scene (ambient_particles, etc.)
+            collection_slug: Collection for color theme
+            particle_count: Number of particles
+            height: Section height
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.THREEJS_BACKGROUND,
+            {
+                "scene_type": scene_type,
+                "collection_slug": collection_slug,
+                "particle_count": str(particle_count),
+                "particle_speed": "0.5",
+                "background_color": self.brand.colors.background,
+                "height": {"size": height, "unit": "px"},
+                "enable_interaction": "yes",
+            },
+        )
+
+    # -------------------------------------------------------------------------
+    # Collection & Product Widgets
+    # -------------------------------------------------------------------------
+
+    def collection_card(
+        self,
+        collection_slug: str,
+        title: str,
+        subtitle: str = "",
+        description: str = "",
+        color: str = "",
+        image_url: str = "",
+        link: str = "#",
+    ) -> dict[str, Any]:
+        """
+        Create collection card widget.
+
+        Args:
+            collection_slug: Collection identifier
+            title: Card title
+            subtitle: Card subtitle
+            description: Card description
+            color: Brand color
+            image_url: Hero image URL
+            link: Card link
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.COLLECTION_CARD,
+            {
+                "collection_slug": collection_slug,
+                "title": title,
+                "subtitle": subtitle,
+                "description": description,
+                "color": color or self.brand.colors.primary,
+                "image_url": image_url,
+                "link": link,
+                "hover_effect": "lift",
+            },
+        )
+
+    def product_hotspot_viewer(
+        self,
+        collection_slug: str,
+        hotspot_config_url: str,
+        enable_cart: bool = True,
+        enable_wishlist: bool = True,
+    ) -> dict[str, Any]:
+        """
+        Create interactive product hotspot viewer.
+
+        Args:
+            collection_slug: Collection identifier
+            hotspot_config_url: URL to hotspot config JSON
+            enable_cart: Enable add-to-cart functionality
+            enable_wishlist: Enable wishlist button
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.PRODUCT_HOTSPOT_VIEWER,
+            {
+                "collection_slug": collection_slug,
+                "hotspot_config_url": hotspot_config_url,
+                "auto_load_products": "yes",
+                "enable_cart": "yes" if enable_cart else "no",
+                "enable_wishlist": "yes" if enable_wishlist else "no",
+                "card_style": "floating",
+            },
+        )
+
+    # -------------------------------------------------------------------------
+    # Pre-Order & Countdown Widgets
+    # -------------------------------------------------------------------------
+
+    def countdown_timer(
+        self,
+        product_id: int | str,
+        target_date: str,
+        display_format: str = "compact",
+        on_complete: str = "hide",
+    ) -> dict[str, Any]:
+        """
+        Create server-synced countdown timer widget.
+
+        Args:
+            product_id: WooCommerce product ID
+            target_date: ISO 8601 target date
+            display_format: compact | detailed
+            on_complete: hide | show-message
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.COUNTDOWN_TIMER,
+            {
+                "product_id": str(product_id),
+                "target_date": target_date,
+                "display_format": display_format,
+                "on_complete": on_complete,
+                "complete_message": "Now Blooming - Available to Purchase",
+                "timezone": "auto",
+                "sync_with_server": "yes",
+            },
+        )
+
+    def preorder_form(
+        self,
+        product_id: int | str,
+        klaviyo_list_id: str = "",
+    ) -> dict[str, Any]:
+        """
+        Create pre-order notification form.
+
+        Args:
+            product_id: WooCommerce product ID
+            klaviyo_list_id: Klaviyo list ID for email capture
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.PREORDER_FORM,
+            {
+                "form_name": "preorder_notify",
+                "product_id": str(product_id),
+                "form_fields": [
+                    {
+                        "field_type": "email",
+                        "field_label": "Email",
+                        "placeholder": "Get notified at launch",
+                        "required": "yes",
+                    }
+                ],
+                "submit_button_text": "Notify Me",
+                "integration": "klaviyo",
+                "klaviyo_list": klaviyo_list_id,
+            },
+        )
+
+    # -------------------------------------------------------------------------
+    # Timeline & Press Widgets
+    # -------------------------------------------------------------------------
+
+    def timeline_item(
+        self,
+        date: str,
+        title: str,
+        description: str = "",
+        link: str = "",
+        image_url: str = "",
+    ) -> dict[str, Any]:
+        """
+        Create timeline item widget.
+
+        Args:
+            date: Date label
+            title: Item title
+            description: Item description
+            link: Link URL
+            image_url: Optional image URL
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.TIMELINE,
+            {
+                "date": date,
+                "title": title,
+                "description": description,
+                "link": link,
+                "image": image_url,
+            },
+        )
+
+    def press_mention(
+        self,
+        publication: str,
+        title: str,
+        link: str = "",
+        logo_url: str = "",
+    ) -> dict[str, Any]:
+        """
+        Create press mention/article card.
+
+        Args:
+            publication: Publication name
+            title: Article title
+            link: Article URL
+            logo_url: Publication logo URL
+
+        Returns:
+            Widget configuration dict
+        """
+        return self._widget(
+            WidgetType.PRESS_MENTION,
+            {
+                "publication": publication,
+                "title": title,
+                "link": link,
+                "logo_url": logo_url,
             },
         )
 

@@ -21,11 +21,7 @@ from enum import Enum
 from pathlib import Path
 
 from cryptography.hazmat.primitives.asymmetric import rsa
-from cryptography.hazmat.primitives.serialization import (
-    Encoding,
-    NoEncryption,
-    PrivateFormat,
-)
+from cryptography.hazmat.primitives.serialization import Encoding, NoEncryption, PrivateFormat
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)

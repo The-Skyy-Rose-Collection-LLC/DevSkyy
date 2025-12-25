@@ -7,18 +7,8 @@ WordPress, Elementor, and WooCommerce tests.
 
 import json
 
-from wordpress import (
-    BrandKit,
-    ElementorBuilder,
-    PageSpec,
-    ProductCreate,
-    WordPressConfig,
-)
-from wordpress.elementor import (
-    SKYYROSE_BRAND_KIT,
-    PageType,
-    generate_template,
-)
+from wordpress import BrandKit, ElementorBuilder, PageSpec, ProductCreate, WordPressConfig
+from wordpress.elementor import SKYYROSE_BRAND_KIT, PageType, generate_template
 
 
 class TestWordPressClient:

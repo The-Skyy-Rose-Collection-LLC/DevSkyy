@@ -48,6 +48,7 @@ class IssueCategory(str, Enum):
 @dataclass
 class CodeIssue:
     """Code issue found during analysis"""
+
     file_path: str
     line_number: int | None
     category: IssueCategory
@@ -240,9 +241,13 @@ class ThreeJSToolkit:
             is_threejs_file = "three" in content.lower() or "THREE" in content
 
             if is_threejs_file:
-                issues.extend(self._check_patterns(content, lines, rel_path, self.PERFORMANCE_PATTERNS))
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.PERFORMANCE_PATTERNS)
+                )
                 issues.extend(self._check_patterns(content, lines, rel_path, self.MEMORY_PATTERNS))
-                issues.extend(self._check_patterns(content, lines, rel_path, self.ANIMATION_PATTERNS))
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.ANIMATION_PATTERNS)
+                )
                 issues.extend(self._check_patterns(content, lines, rel_path, self.BEST_PRACTICES))
 
             # Check for WebXR
@@ -276,7 +281,7 @@ class ThreeJSToolkit:
 
             for match in matches:
                 # Find line number
-                line_num = content[:match.start()].count("\n") + 1
+                line_num = content[: match.start()].count("\n") + 1
 
                 # Check context if needed
                 if "check_context" in config:
@@ -289,40 +294,46 @@ class ThreeJSToolkit:
 
                 # Check for positive pattern (good practice)
                 if config.get("check_positive"):
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=line_num,
-                        category=IssueCategory.THREEJS,
-                        severity=SeverityLevel.INFO,
-                        title=f"✓ {config['title']}",
-                        description="Good practice detected",
-                        suggestion=config.get("suggestion"),
-                    ))
+                    issues.append(
+                        CodeIssue(
+                            file_path=rel_path,
+                            line_number=line_num,
+                            category=IssueCategory.THREEJS,
+                            severity=SeverityLevel.INFO,
+                            title=f"✓ {config['title']}",
+                            description="Good practice detected",
+                            suggestion=config.get("suggestion"),
+                        )
+                    )
                     continue
 
                 # Check for missing pattern
                 if "check_missing" in config:
                     if config["check_missing"] not in content:
-                        issues.append(CodeIssue(
+                        issues.append(
+                            CodeIssue(
+                                file_path=rel_path,
+                                line_number=line_num,
+                                category=IssueCategory.THREEJS,
+                                severity=config["severity"],
+                                title=config["title"],
+                                description=f"Missing: {config['check_missing']}",
+                                suggestion=config.get("suggestion"),
+                            )
+                        )
+                else:
+                    # Regular issue
+                    issues.append(
+                        CodeIssue(
                             file_path=rel_path,
                             line_number=line_num,
                             category=IssueCategory.THREEJS,
                             severity=config["severity"],
                             title=config["title"],
-                            description=f"Missing: {config['check_missing']}",
+                            description=match.group(0)[:50],
                             suggestion=config.get("suggestion"),
-                        ))
-                else:
-                    # Regular issue
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=line_num,
-                        category=IssueCategory.THREEJS,
-                        severity=config["severity"],
-                        title=config["title"],
-                        description=match.group(0)[:50],
-                        suggestion=config.get("suggestion"),
-                    ))
+                        )
+                    )
 
         return issues
 
@@ -337,54 +348,62 @@ class ThreeJSToolkit:
 
         # Check for scene cleanup
         if "new THREE.Scene()" in content and "dispose" not in content:
-            issues.append(CodeIssue(
-                file_path=rel_path,
-                line_number=None,
-                category=IssueCategory.THREEJS,
-                severity=SeverityLevel.MEDIUM,
-                title="Scene without dispose",
-                description="Scene created but no disposal logic found",
-                suggestion="Implement dispose() to clean up scene, geometries, materials, textures",
-            ))
-
-        # Check for renderer cleanup
-        if "new THREE.WebGLRenderer" in content:
-            if "renderer.dispose" not in content and "dispose" not in content:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=None,
-                    category=IssueCategory.THREEJS,
-                    severity=SeverityLevel.HIGH,
-                    title="Renderer without dispose",
-                    description="WebGLRenderer created but not disposed",
-                    suggestion="Call renderer.dispose() on cleanup to release WebGL resources",
-                ))
-
-        # Check for pixel ratio
-        if "new THREE.WebGLRenderer" in content:
-            if "setPixelRatio" not in content:
-                issues.append(CodeIssue(
+            issues.append(
+                CodeIssue(
                     file_path=rel_path,
                     line_number=None,
                     category=IssueCategory.THREEJS,
                     severity=SeverityLevel.MEDIUM,
-                    title="Missing setPixelRatio",
-                    description="Renderer may not handle high-DPI displays correctly",
-                    suggestion="Add: renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))",
-                ))
+                    title="Scene without dispose",
+                    description="Scene created but no disposal logic found",
+                    suggestion="Implement dispose() to clean up scene, geometries, materials, textures",
+                )
+            )
+
+        # Check for renderer cleanup
+        if "new THREE.WebGLRenderer" in content:
+            if "renderer.dispose" not in content and "dispose" not in content:
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.THREEJS,
+                        severity=SeverityLevel.HIGH,
+                        title="Renderer without dispose",
+                        description="WebGLRenderer created but not disposed",
+                        suggestion="Call renderer.dispose() on cleanup to release WebGL resources",
+                    )
+                )
+
+        # Check for pixel ratio
+        if "new THREE.WebGLRenderer" in content:
+            if "setPixelRatio" not in content:
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.THREEJS,
+                        severity=SeverityLevel.MEDIUM,
+                        title="Missing setPixelRatio",
+                        description="Renderer may not handle high-DPI displays correctly",
+                        suggestion="Add: renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))",
+                    )
+                )
 
         # Check for shadow settings
         if "castShadow" in content or "receiveShadow" in content:
             if "shadow.mapSize" not in content:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=None,
-                    category=IssueCategory.THREEJS,
-                    severity=SeverityLevel.LOW,
-                    title="Shadow map size not configured",
-                    description="Using default shadow map size may cause quality issues",
-                    suggestion="Configure light.shadow.mapSize for better shadow quality",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.THREEJS,
+                        severity=SeverityLevel.LOW,
+                        title="Shadow map size not configured",
+                        description="Using default shadow map size may cause quality issues",
+                        suggestion="Configure light.shadow.mapSize for better shadow quality",
+                    )
+                )
 
         # Check for React Three Fiber patterns
         if "@react-three/fiber" in content or "react-three-fiber" in content:
@@ -404,28 +423,32 @@ class ThreeJSToolkit:
         # Check for useFrame without dependencies
         if "useFrame" in content:
             if "useFrame((" in content and "}, [" not in content:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=None,
-                    category=IssueCategory.THREEJS,
-                    severity=SeverityLevel.LOW,
-                    title="useFrame callback",
-                    description="useFrame may benefit from useCallback wrapper",
-                    suggestion="Wrap complex logic in useCallback with proper deps",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.THREEJS,
+                        severity=SeverityLevel.LOW,
+                        title="useFrame callback",
+                        description="useFrame may benefit from useCallback wrapper",
+                        suggestion="Wrap complex logic in useCallback with proper deps",
+                    )
+                )
 
         # Check for suspense with models
         if "useGLTF" in content or "useLoader" in content:
             if "Suspense" not in content and "<Suspense" not in content:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=None,
-                    category=IssueCategory.THREEJS,
-                    severity=SeverityLevel.MEDIUM,
-                    title="Missing Suspense",
-                    description="Model loaders should be wrapped in Suspense",
-                    suggestion="Wrap component tree with <Suspense fallback={...}>",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.THREEJS,
+                        severity=SeverityLevel.MEDIUM,
+                        title="Missing Suspense",
+                        description="Model loaders should be wrapped in Suspense",
+                        suggestion="Wrap component tree with <Suspense fallback={...}>",
+                    )
+                )
 
         return issues
 
@@ -679,28 +702,48 @@ class InteractiveWebToolkit:
             rel_path = str(file_path.relative_to(self.repo_root))
 
             # Only analyze relevant files
-            if not any(ext in rel_path for ext in [".ts", ".tsx", ".js", ".jsx", ".glsl", ".vert", ".frag"]):
+            if not any(
+                ext in rel_path for ext in [".ts", ".tsx", ".js", ".jsx", ".glsl", ".vert", ".frag"]
+            ):
                 return issues
 
             # GSAP patterns
             if "gsap" in content.lower() or "scrolltrigger" in content.lower():
                 issues.extend(self._check_patterns(content, lines, rel_path, self.GSAP_PATTERNS))
-                issues.extend(self._check_patterns(content, lines, rel_path, self.MOTION_PATH_PATTERNS))
-                issues.extend(self._check_patterns(content, lines, rel_path, self.SCROLL_PERF_PATTERNS))
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.MOTION_PATH_PATTERNS)
+                )
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.SCROLL_PERF_PATTERNS)
+                )
 
             # WebXR patterns
-            if "webxr" in content.lower() or "xrsession" in content.lower() or "immersive" in content.lower():
-                issues.extend(self._check_patterns(content, lines, rel_path, self.WEBXR_AR_PATTERNS))
-                issues.extend(self._check_patterns(content, lines, rel_path, self.WEBXR_SECURITY_PATTERNS))
+            if (
+                "webxr" in content.lower()
+                or "xrsession" in content.lower()
+                or "immersive" in content.lower()
+            ):
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.WEBXR_AR_PATTERNS)
+                )
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.WEBXR_SECURITY_PATTERNS)
+                )
 
             # Shader patterns
             if ".glsl" in rel_path or "shader" in content.lower() or "precision " in content:
-                issues.extend(self._check_patterns(content, lines, rel_path, self.SHADER_OPTIMIZATION_PATTERNS))
+                issues.extend(
+                    self._check_patterns(
+                        content, lines, rel_path, self.SHADER_OPTIMIZATION_PATTERNS
+                    )
+                )
 
             # Three.js patterns
             if "three" in content.lower():
                 issues.extend(self._check_patterns(content, lines, rel_path, self.WEBGPU_PATTERNS))
-                issues.extend(self._check_patterns(content, lines, rel_path, self.ASSET_OPTIMIZATION_PATTERNS))
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.ASSET_OPTIMIZATION_PATTERNS)
+                )
                 issues.extend(self._check_patterns(content, lines, rel_path, self.LOD_PATTERNS))
 
         except Exception as e:
@@ -713,16 +756,18 @@ class InteractiveWebToolkit:
         for pattern, config in patterns.items():
             matches = list(re.finditer(pattern, content, re.IGNORECASE))
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.THREEJS,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                ))
+                line_num = content[: match.start()].count("\n") + 1
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.THREEJS,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                    )
+                )
         return issues
 
     def get_webxr_checklist(self) -> list[dict]:
@@ -1009,7 +1054,7 @@ class LLMBestPracticesKB:
         matches = list(re.finditer(pattern, content, re.MULTILINE))
 
         for match in matches:
-            line_num = content[:match.start()].count("\n") + 1
+            line_num = content[: match.start()].count("\n") + 1
 
             # Context check
             if "check_context" in config:
@@ -1027,27 +1072,31 @@ class LLMBestPracticesKB:
 
             # Positive pattern (good practice)
             if config.get("check_positive"):
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.BEST_PRACTICE,
-                    severity=SeverityLevel.INFO,
-                    title=f"✓ {config.get('title', 'Good practice')}",
-                    description="Follows best practice",
-                    suggestion=config.get("suggestion"),
-                    reference_url=config.get("reference"),
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.BEST_PRACTICE,
+                        severity=SeverityLevel.INFO,
+                        title=f"✓ {config.get('title', 'Good practice')}",
+                        description="Follows best practice",
+                        suggestion=config.get("suggestion"),
+                        reference_url=config.get("reference"),
+                    )
+                )
             else:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.BEST_PRACTICE,
-                    severity=config.get("severity", SeverityLevel.LOW),
-                    title=config.get("title", "Pattern detected"),
-                    description=match.group(0)[:50] if match.group(0) else "",
-                    suggestion=config.get("suggestion"),
-                    reference_url=config.get("reference"),
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.BEST_PRACTICE,
+                        severity=config.get("severity", SeverityLevel.LOW),
+                        title=config.get("title", "Pattern detected"),
+                        description=match.group(0)[:50] if match.group(0) else "",
+                        suggestion=config.get("suggestion"),
+                        reference_url=config.get("reference"),
+                    )
+                )
 
         return issues
 
@@ -1158,17 +1207,19 @@ class FrontendToolkit:
             matches = list(re.finditer(pattern, content))
 
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
+                line_num = content[: match.start()].count("\n") + 1
 
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.FRONTEND,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.FRONTEND,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                    )
+                )
 
         return issues
 
@@ -1238,7 +1289,9 @@ class APIToolkit:
 
             # WebSocket checks
             if "websocket" in content.lower() or "socket.io" in content.lower():
-                issues.extend(self._check_patterns(content, lines, rel_path, self.WEBSOCKET_PATTERNS))
+                issues.extend(
+                    self._check_patterns(content, lines, rel_path, self.WEBSOCKET_PATTERNS)
+                )
 
         except Exception as e:
             logger.error(f"API analysis failed for {file_path}: {e}")
@@ -1259,17 +1312,19 @@ class APIToolkit:
             matches = list(re.finditer(pattern, content))
 
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
+                line_num = content[: match.start()].count("\n") + 1
 
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.API,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.API,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                    )
+                )
 
         return issues
 
@@ -1581,7 +1636,9 @@ class UIUXToolkit:
                 return issues
 
             # Design system
-            issues.extend(self._check_patterns(content, lines, rel_path, self.DESIGN_SYSTEM_PATTERNS))
+            issues.extend(
+                self._check_patterns(content, lines, rel_path, self.DESIGN_SYSTEM_PATTERNS)
+            )
 
             # Responsive
             issues.extend(self._check_patterns(content, lines, rel_path, self.RESPONSIVE_PATTERNS))
@@ -1590,7 +1647,9 @@ class UIUXToolkit:
             issues.extend(self._check_patterns(content, lines, rel_path, self.ANIMATION_PATTERNS))
 
             # Accessibility
-            issues.extend(self._check_patterns(content, lines, rel_path, self.ACCESSIBILITY_PATTERNS))
+            issues.extend(
+                self._check_patterns(content, lines, rel_path, self.ACCESSIBILITY_PATTERNS)
+            )
 
             # Loading states
             issues.extend(self._check_patterns(content, lines, rel_path, self.LOADING_PATTERNS))
@@ -1635,22 +1694,24 @@ class UIUXToolkit:
             matches = list(re.finditer(pattern, content))
 
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
+                line_num = content[: match.start()].count("\n") + 1
 
                 # Create appropriate issue category
                 category = IssueCategory.FRONTEND
                 if "accessibility" in str(config.get("title", "")).lower():
                     pass  # Keep FRONTEND category
 
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=category,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=category,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                    )
+                )
 
         return issues
 
@@ -1666,52 +1727,60 @@ class UIUXToolkit:
         # Check for empty states
         if "EmptyState" not in content and "empty-state" not in content:
             if any(term in content for term in ["map(", "filter(", ".length"]):
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=None,
-                    category=IssueCategory.FRONTEND,
-                    severity=SeverityLevel.LOW,
-                    title="Consider empty state",
-                    description="List rendering without explicit empty state",
-                    suggestion="Show helpful empty state when data is empty",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.FRONTEND,
+                        severity=SeverityLevel.LOW,
+                        title="Consider empty state",
+                        description="List rendering without explicit empty state",
+                        suggestion="Show helpful empty state when data is empty",
+                    )
+                )
 
         # Check for error boundaries
         if "ErrorBoundary" not in content and "error-boundary" not in content:
             if "<Suspense" in content:
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=None,
-                    category=IssueCategory.FRONTEND,
-                    severity=SeverityLevel.LOW,
-                    title="Consider Error Boundary",
-                    description="Suspense without Error Boundary",
-                    suggestion="Wrap with ErrorBoundary for graceful error handling",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=None,
+                        category=IssueCategory.FRONTEND,
+                        severity=SeverityLevel.LOW,
+                        title="Consider Error Boundary",
+                        description="Suspense without Error Boundary",
+                        suggestion="Wrap with ErrorBoundary for graceful error handling",
+                    )
+                )
 
         # Check contrast in Tailwind classes
         if "text-gray-400" in content and "bg-white" in content:
-            issues.append(CodeIssue(
-                file_path=rel_path,
-                line_number=None,
-                category=IssueCategory.FRONTEND,
-                severity=SeverityLevel.MEDIUM,
-                title="Potential contrast issue",
-                description="Light gray text on white may fail WCAG contrast",
-                suggestion="Use text-gray-600 or darker for body text",
-            ))
+            issues.append(
+                CodeIssue(
+                    file_path=rel_path,
+                    line_number=None,
+                    category=IssueCategory.FRONTEND,
+                    severity=SeverityLevel.MEDIUM,
+                    title="Potential contrast issue",
+                    description="Light gray text on white may fail WCAG contrast",
+                    suggestion="Use text-gray-600 or darker for body text",
+                )
+            )
 
         # Check for touch targets
-        if re.search(r'(w-4|w-5|h-4|h-5).*onClick', content):
-            issues.append(CodeIssue(
-                file_path=rel_path,
-                line_number=None,
-                category=IssueCategory.FRONTEND,
-                severity=SeverityLevel.MEDIUM,
-                title="Small touch target",
-                description="Clickable element may be too small",
-                suggestion="Minimum touch target: 44x44px (w-11 h-11)",
-            ))
+        if re.search(r"(w-4|w-5|h-4|h-5).*onClick", content):
+            issues.append(
+                CodeIssue(
+                    file_path=rel_path,
+                    line_number=None,
+                    category=IssueCategory.FRONTEND,
+                    severity=SeverityLevel.MEDIUM,
+                    title="Small touch target",
+                    description="Clickable element may be too small",
+                    suggestion="Minimum touch target: 44x44px (w-11 h-11)",
+                )
+            )
 
         return issues
 
@@ -2007,22 +2076,24 @@ class OWASP2025Toolkit:
             matches = list(re.finditer(pattern, content, re.IGNORECASE))
 
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
+                line_num = content[: match.start()].count("\n") + 1
 
                 # Skip test files for some patterns
                 if "test" in rel_path.lower() and config["severity"] == SeverityLevel.INFO:
                     continue
 
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.SECURITY,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:60],
-                    suggestion=config.get("suggestion"),
-                    reference_url="https://owasp.org/Top10/2025/",
-                ))
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.SECURITY,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:60],
+                        suggestion=config.get("suggestion"),
+                        reference_url="https://owasp.org/Top10/2025/",
+                    )
+                )
 
         return issues
 
@@ -2114,8 +2185,12 @@ class PCIDSSToolkit:
             lines = content.split("\n")
             rel_path = str(file_path.relative_to(self.repo_root))
 
-            issues.extend(self._check_patterns(content, lines, rel_path, self.PAYMENT_PAGE_PATTERNS))
-            issues.extend(self._check_patterns(content, lines, rel_path, self.TAMPER_DETECTION_PATTERNS))
+            issues.extend(
+                self._check_patterns(content, lines, rel_path, self.PAYMENT_PAGE_PATTERNS)
+            )
+            issues.extend(
+                self._check_patterns(content, lines, rel_path, self.TAMPER_DETECTION_PATTERNS)
+            )
             issues.extend(self._check_patterns(content, lines, rel_path, self.CARD_DATA_PATTERNS))
 
         except Exception as e:
@@ -2128,17 +2203,19 @@ class PCIDSSToolkit:
         for pattern, config in patterns.items():
             matches = list(re.finditer(pattern, content, re.IGNORECASE))
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.SECURITY,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                    reference_url="https://www.pcisecuritystandards.org/",
-                ))
+                line_num = content[: match.start()].count("\n") + 1
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.SECURITY,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                        reference_url="https://www.pcisecuritystandards.org/",
+                    )
+                )
         return issues
 
 
@@ -2308,16 +2385,18 @@ class WordPressSecurityToolkit:
         for pattern, config in patterns.items():
             matches = list(re.finditer(pattern, content, re.IGNORECASE))
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.SECURITY,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                ))
+                line_num = content[: match.start()].count("\n") + 1
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.SECURITY,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                    )
+                )
         return issues
 
 
@@ -2475,16 +2554,18 @@ class PythonPerformanceToolkit:
         for pattern, config in patterns.items():
             matches = list(re.finditer(pattern, content, re.MULTILINE))
             for match in matches:
-                line_num = content[:match.start()].count("\n") + 1
-                issues.append(CodeIssue(
-                    file_path=rel_path,
-                    line_number=line_num,
-                    category=IssueCategory.PERFORMANCE,
-                    severity=config["severity"],
-                    title=config["title"],
-                    description=match.group(0)[:50],
-                    suggestion=config.get("suggestion"),
-                ))
+                line_num = content[: match.start()].count("\n") + 1
+                issues.append(
+                    CodeIssue(
+                        file_path=rel_path,
+                        line_number=line_num,
+                        category=IssueCategory.PERFORMANCE,
+                        severity=config["severity"],
+                        title=config["title"],
+                        description=match.group(0)[:50],
+                        suggestion=config.get("suggestion"),
+                    )
+                )
         return issues
 
 
@@ -2506,7 +2587,7 @@ class RenderAutomationToolkit:
     # Render pipeline configuration patterns
     PIPELINE_PATTERNS = {
         "basic_renderer": {
-            "code": '''
+            "code": """
 // Verified Three.js renderer setup
 const renderer = new THREE.WebGLRenderer({
     antialias: true,
@@ -2520,11 +2601,11 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.0;
-''',
-            "description": "Production-ready renderer initialization"
+""",
+            "description": "Production-ready renderer initialization",
         },
         "shadow_config": {
-            "code": '''
+            "code": """
 // Optimized shadow configuration
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -2537,11 +2618,11 @@ directionalLight.shadow.mapSize.height = 2048;
 directionalLight.shadow.camera.near = 0.1;
 directionalLight.shadow.camera.far = 100;
 directionalLight.shadow.bias = -0.0001;
-''',
-            "description": "Optimized shadow mapping"
+""",
+            "description": "Optimized shadow mapping",
         },
         "post_processing": {
-            "code": '''
+            "code": """
 import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
@@ -2559,15 +2640,15 @@ composer.addPass(new SMAAPass(
     window.innerWidth * renderer.getPixelRatio(),
     window.innerHeight * renderer.getPixelRatio()
 ));
-''',
-            "description": "Post-processing pipeline with bloom and SMAA"
-        }
+""",
+            "description": "Post-processing pipeline with bloom and SMAA",
+        },
     }
 
     # Batch rendering patterns
     BATCH_RENDER_PATTERNS = {
         "multi_view_capture": {
-            "code": '''
+            "code": """
 async function captureMultipleViews(scene, camera, renderer, views) {
     const captures = [];
     const originalPosition = camera.position.clone();
@@ -2591,11 +2672,11 @@ async function captureMultipleViews(scene, camera, renderer, views) {
 
     return captures;
 }
-''',
-            "description": "Capture scene from multiple camera angles"
+""",
+            "description": "Capture scene from multiple camera angles",
         },
         "turntable_render": {
-            "code": '''
+            "code": """
 async function renderTurntable(scene, camera, renderer, frames = 36) {
     const captures = [];
     const radius = camera.position.length();
@@ -2613,9 +2694,9 @@ async function renderTurntable(scene, camera, renderer, frames = 36) {
 
     return captures;
 }
-''',
-            "description": "360-degree turntable capture for product visualization"
-        }
+""",
+            "description": "360-degree turntable capture for product visualization",
+        },
     }
 
     # Quality presets
@@ -2626,7 +2707,7 @@ async function renderTurntable(scene, camera, renderer, frames = 36) {
             "shadowMapSize": 512,
             "maxLights": 2,
             "postProcessing": False,
-            "description": "Mobile/low-end devices"
+            "description": "Mobile/low-end devices",
         },
         "medium": {
             "pixelRatio": 1.5,
@@ -2634,7 +2715,7 @@ async function renderTurntable(scene, camera, renderer, frames = 36) {
             "shadowMapSize": 1024,
             "maxLights": 4,
             "postProcessing": True,
-            "description": "Standard desktop"
+            "description": "Standard desktop",
         },
         "high": {
             "pixelRatio": 2,
@@ -2642,7 +2723,7 @@ async function renderTurntable(scene, camera, renderer, frames = 36) {
             "shadowMapSize": 2048,
             "maxLights": 8,
             "postProcessing": True,
-            "description": "High-end desktop"
+            "description": "High-end desktop",
         },
         "ultra": {
             "pixelRatio": 2,
@@ -2651,14 +2732,14 @@ async function renderTurntable(scene, camera, renderer, frames = 36) {
             "maxLights": 16,
             "postProcessing": True,
             "raytracing": True,
-            "description": "Production rendering"
-        }
+            "description": "Production rendering",
+        },
     }
 
     # GPU resource management
     GPU_MANAGEMENT_PATTERNS = {
         "memory_cleanup": {
-            "code": '''
+            "code": """
 function disposeScene(scene) {
     scene.traverse((object) => {
         if (object.geometry) {
@@ -2683,11 +2764,11 @@ function disposeMaterial(material) {
         }
     }
 }
-''',
-            "description": "Proper GPU memory cleanup"
+""",
+            "description": "Proper GPU memory cleanup",
         },
         "texture_pool": {
-            "code": '''
+            "code": """
 class TexturePool {
     constructor(maxSize = 100) {
         this.pool = new Map();
@@ -2718,15 +2799,15 @@ class TexturePool {
         this.pool.clear();
     }
 }
-''',
-            "description": "Texture caching with LRU eviction"
-        }
+""",
+            "description": "Texture caching with LRU eviction",
+        },
     }
 
     # Frame capture patterns
     CAPTURE_PATTERNS = {
         "png_export": {
-            "code": '''
+            "code": """
 function captureFrame(renderer, filename = 'render.png') {
     const dataUrl = renderer.domElement.toDataURL('image/png');
     const link = document.createElement('a');
@@ -2734,11 +2815,11 @@ function captureFrame(renderer, filename = 'render.png') {
     link.href = dataUrl;
     link.click();
 }
-''',
-            "description": "Single frame PNG export"
+""",
+            "description": "Single frame PNG export",
         },
         "video_recording": {
-            "code": '''
+            "code": """
 class SceneRecorder {
     constructor(canvas, fps = 30) {
         this.canvas = canvas;
@@ -2772,11 +2853,11 @@ class SceneRecorder {
         });
     }
 }
-''',
-            "description": "WebM video recording from canvas"
+""",
+            "description": "WebM video recording from canvas",
         },
         "high_res_capture": {
-            "code": '''
+            "code": """
 function captureHighRes(renderer, scene, camera, scale = 2) {
     const originalSize = renderer.getSize(new THREE.Vector2());
     const originalPixelRatio = renderer.getPixelRatio();
@@ -2794,15 +2875,15 @@ function captureHighRes(renderer, scene, camera, scale = 2) {
 
     return dataUrl;
 }
-''',
-            "description": "High-resolution frame capture (2x-4x)"
-        }
+""",
+            "description": "High-resolution frame capture (2x-4x)",
+        },
     }
 
     # Render loop patterns
     RENDER_LOOP_PATTERNS = {
         "optimized_loop": {
-            "code": '''
+            "code": """
 let frameId = null;
 let lastTime = 0;
 const targetFPS = 60;
@@ -2836,11 +2917,11 @@ function stopLoop() {
         frameId = null;
     }
 }
-''',
-            "description": "Frame-rate limited render loop"
+""",
+            "description": "Frame-rate limited render loop",
         },
         "visibility_aware": {
-            "code": '''
+            "code": """
 // Pause rendering when tab not visible
 document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
@@ -2853,9 +2934,9 @@ document.addEventListener('visibilitychange', () => {
 // Pause when window not focused (optional)
 window.addEventListener('blur', stopLoop);
 window.addEventListener('focus', startLoop);
-''',
-            "description": "Visibility-aware rendering to save resources"
-        }
+""",
+            "description": "Visibility-aware rendering to save resources",
+        },
     }
 
     def __init__(self, repo_root: Path):
@@ -2918,16 +2999,18 @@ window.addEventListener('focus', startLoop);
             for pattern, config in patterns.items():
                 matches = list(re.finditer(pattern, content))
                 for match in matches:
-                    line_num = content[:match.start()].count("\n") + 1
-                    issues.append(CodeIssue(
-                        file_path=rel_path,
-                        line_number=line_num,
-                        category=IssueCategory.PERFORMANCE,
-                        severity=config["severity"],
-                        title=config["title"],
-                        description=match.group(0)[:50],
-                        suggestion=config.get("suggestion"),
-                    ))
+                    line_num = content[: match.start()].count("\n") + 1
+                    issues.append(
+                        CodeIssue(
+                            file_path=rel_path,
+                            line_number=line_num,
+                            category=IssueCategory.PERFORMANCE,
+                            severity=config["severity"],
+                            title=config["title"],
+                            description=match.group(0)[:50],
+                            suggestion=config.get("suggestion"),
+                        )
+                    )
 
         except Exception as e:
             logger.error(f"Render analysis failed for {file_path}: {e}")

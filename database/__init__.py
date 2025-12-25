@@ -17,8 +17,8 @@ Usage:
         return await repo.get_all()
 """
 
-from database.db import (  # Manager; Models; Repositories
-    AgentTask,
+from database.db import (
+    AgentTask,  # Manager; Models; Repositories
     AuditLog,
     AuditLogRepository,
     Base,

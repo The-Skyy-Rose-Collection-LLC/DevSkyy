@@ -114,8 +114,7 @@ class WorkflowRunner:
 
             self.results.append(result)
             logger.info(
-                f"Workflow completed: {workflow_name} "
-                f"[{result.status}] in {duration:.2f}s"
+                f"Workflow completed: {workflow_name} " f"[{result.status}] in {duration:.2f}s"
             )
 
             return result

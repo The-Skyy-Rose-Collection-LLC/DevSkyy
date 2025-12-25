@@ -32,11 +32,7 @@ from adk.base import (
 )
 from orchestration.prompt_engineering import PromptTechnique
 
-from .base_super_agent import (
-    EnhancedSuperAgent,
-    SuperAgentType,
-    TaskCategory,
-)
+from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
 logger = logging.getLogger(__name__)
 
@@ -83,37 +79,37 @@ class AnalyticsAgent(EnhancedSuperAgent):
         "revenue": {
             "name": "Total Revenue",
             "formula": "sum(order_total)",
-            "target": "MoM growth > 10%"
+            "target": "MoM growth > 10%",
         },
         "aov": {
             "name": "Average Order Value",
             "formula": "revenue / order_count",
-            "target": "$150+"
+            "target": "$150+",
         },
         "conversion_rate": {
             "name": "Conversion Rate",
             "formula": "orders / sessions * 100",
-            "target": "3%+"
+            "target": "3%+",
         },
         "clv": {
             "name": "Customer Lifetime Value",
             "formula": "avg_order_value * purchase_frequency * customer_lifespan",
-            "target": "$500+"
+            "target": "$500+",
         },
         "cac": {
             "name": "Customer Acquisition Cost",
             "formula": "marketing_spend / new_customers",
-            "target": "< CLV/3"
+            "target": "< CLV/3",
         },
         "return_rate": {
             "name": "Return Rate",
             "formula": "returned_orders / total_orders * 100",
-            "target": "< 5%"
+            "target": "< 5%",
         },
         "cart_abandonment": {
             "name": "Cart Abandonment Rate",
             "formula": "(carts_created - orders) / carts_created * 100",
-            "target": "< 70%"
+            "target": "< 70%",
         },
     }
 
@@ -239,8 +235,14 @@ You are a senior data analyst and business intelligence expert with expertise in
                 name="generate_report",
                 description="Generate analytics report",
                 parameters={
-                    "report_type": {"type": "string", "description": "Report type (sales, customer, product)"},
-                    "time_period": {"type": "string", "description": "daily, weekly, monthly, custom"},
+                    "report_type": {
+                        "type": "string",
+                        "description": "Report type (sales, customer, product)",
+                    },
+                    "time_period": {
+                        "type": "string",
+                        "description": "daily, weekly, monthly, custom",
+                    },
                     "date_range": {"type": "object", "description": "Start and end dates"},
                     "dimensions": {"type": "array", "description": "Breakdown dimensions"},
                     "metrics": {"type": "array", "description": "Metrics to include"},
@@ -251,7 +253,10 @@ You are a senior data analyst and business intelligence expert with expertise in
                 description="Get KPI dashboard data",
                 parameters={
                     "kpis": {"type": "array", "description": "KPIs to include"},
-                    "comparison_period": {"type": "string", "description": "Comparison period (WoW, MoM, YoY)"},
+                    "comparison_period": {
+                        "type": "string",
+                        "description": "Comparison period (WoW, MoM, YoY)",
+                    },
                 },
             ),
             ToolDefinition(
@@ -270,7 +275,10 @@ You are a senior data analyst and business intelligence expert with expertise in
                 parameters={
                     "method": {"type": "string", "description": "rfm, behavioral, demographic"},
                     "num_segments": {"type": "integer", "description": "Number of segments"},
-                    "include_profiles": {"type": "boolean", "description": "Include segment profiles"},
+                    "include_profiles": {
+                        "type": "boolean",
+                        "description": "Include segment profiles",
+                    },
                 },
             ),
             ToolDefinition(
@@ -297,7 +305,10 @@ You are a senior data analyst and business intelligence expert with expertise in
                 parameters={
                     "product_scope": {"type": "string", "description": "all, collection, or SKU"},
                     "horizon_days": {"type": "integer", "description": "Forecast horizon"},
-                    "include_seasonality": {"type": "boolean", "description": "Include seasonal factors"},
+                    "include_seasonality": {
+                        "type": "boolean",
+                        "description": "Include seasonal factors",
+                    },
                     "scenarios": {"type": "array", "description": "Scenarios to model"},
                 },
             ),
@@ -307,7 +318,10 @@ You are a senior data analyst and business intelligence expert with expertise in
                 parameters={
                     "sku": {"type": "string", "description": "Product SKU"},
                     "horizon_days": {"type": "integer", "description": "Forecast horizon"},
-                    "confidence_level": {"type": "number", "description": "Confidence level (0.80-0.99)"},
+                    "confidence_level": {
+                        "type": "number",
+                        "description": "Confidence level (0.80-0.99)",
+                    },
                 },
             ),
             # A/B Testing Tools
@@ -327,7 +341,10 @@ You are a senior data analyst and business intelligence expert with expertise in
                 description="Analyze A/B test results",
                 parameters={
                     "experiment_id": {"type": "string", "description": "Experiment ID"},
-                    "confidence_level": {"type": "number", "description": "Required confidence (default 0.95)"},
+                    "confidence_level": {
+                        "type": "number",
+                        "description": "Required confidence (default 0.95)",
+                    },
                     "metrics": {"type": "array", "description": "Metrics to analyze"},
                 },
             ),
@@ -348,7 +365,10 @@ You are a senior data analyst and business intelligence expert with expertise in
                 parameters={
                     "metric": {"type": "string", "description": "Metric to analyze"},
                     "time_period": {"type": "string", "description": "Analysis period"},
-                    "decompose": {"type": "boolean", "description": "Decompose into trend/seasonal/residual"},
+                    "decompose": {
+                        "type": "boolean",
+                        "description": "Decompose into trend/seasonal/residual",
+                    },
                 },
             ),
             ToolDefinition(
@@ -365,8 +385,14 @@ You are a senior data analyst and business intelligence expert with expertise in
                 name="calculate_attribution",
                 description="Calculate marketing attribution",
                 parameters={
-                    "model": {"type": "string", "description": "last_touch, first_touch, linear, time_decay"},
-                    "conversion_window": {"type": "integer", "description": "Attribution window (days)"},
+                    "model": {
+                        "type": "string",
+                        "description": "last_touch, first_touch, linear, time_decay",
+                    },
+                    "conversion_window": {
+                        "type": "integer",
+                        "description": "Attribution window (days)",
+                    },
                     "channels": {"type": "array", "description": "Channels to include"},
                 },
             ),
@@ -388,15 +414,10 @@ You are a senior data analyst and business intelligence expert with expertise in
         try:
             task_type = self._classify_analytics_task(prompt)
             technique = self.TECHNIQUE_PREFERENCES.get(
-                task_type,
-                self.select_technique(TaskCategory.ANALYSIS)
+                task_type, self.select_technique(TaskCategory.ANALYSIS)
             )
 
-            enhanced = self.apply_technique(
-                technique,
-                prompt,
-                **kwargs
-            )
+            enhanced = self.apply_technique(technique, prompt, **kwargs)
 
             if hasattr(self, "_backend_agent"):
                 result = await self._backend_agent.run(enhanced.enhanced_prompt)
@@ -410,7 +431,7 @@ You are a senior data analyst and business intelligence expert with expertise in
                 content=content,
                 status=AgentStatus.COMPLETED,
                 started_at=start_time,
-                metadata={"task_type": task_type, "technique": technique.value}
+                metadata={"task_type": task_type, "technique": technique.value},
             )
 
         except Exception as e:
@@ -463,10 +484,7 @@ For full analytics capabilities, ensure backend is configured."""
     # =========================================================================
 
     async def generate_report(
-        self,
-        report_type: str = "sales",
-        time_period: str = "weekly",
-        **kwargs
+        self, report_type: str = "sales", time_period: str = "weekly", **kwargs
     ) -> AgentResult:
         """Generate comprehensive analytics report"""
         kpis = list(self.KPI_DEFINITIONS.keys())
@@ -519,55 +537,41 @@ Report Structure:
                 "insights": "array",
                 "recommendations": "array",
                 "period": "string",
-                "generated_at": "string"
-            }
+                "generated_at": "string",
+            },
         )
 
     async def forecast_sales(
-        self,
-        horizon_days: int = 30,
-        granularity: str = "daily"
+        self, horizon_days: int = 30, granularity: str = "daily"
     ) -> dict[str, Any]:
         """Forecast sales using ML"""
         if self.ml_module:
             prediction = await self.ml_module.predict(
-                "forecaster",
-                {
-                    "horizon": horizon_days,
-                    "granularity": granularity
-                }
+                "forecaster", {"horizon": horizon_days, "granularity": granularity}
             )
             return {
                 "forecast": prediction.prediction,
                 "confidence": prediction.confidence,
                 "horizon_days": horizon_days,
-                "granularity": granularity
+                "granularity": granularity,
             }
 
         return {"error": "ML module not available"}
 
-    async def segment_customers(
-        self,
-        method: str = "rfm"
-    ) -> dict[str, Any]:
+    async def segment_customers(self, method: str = "rfm") -> dict[str, Any]:
         """Segment customers using clustering"""
         if self.ml_module:
-            prediction = await self.ml_module.predict(
-                "clusterer",
-                {"method": method}
-            )
+            prediction = await self.ml_module.predict("clusterer", {"method": method})
             return {
                 "segments": prediction.prediction,
                 "method": method,
-                "confidence": prediction.confidence
+                "confidence": prediction.confidence,
             }
 
         return {"error": "ML module not available"}
 
     async def analyze_ab_test(
-        self,
-        experiment_id: str,
-        confidence_level: float = 0.95
+        self, experiment_id: str, confidence_level: float = 0.95
     ) -> AgentResult:
         """Analyze A/B test results"""
         prompt = f"""Analyze A/B test experiment: {experiment_id}
@@ -608,15 +612,11 @@ Analysis Framework:
    - Documentation for knowledge base"""
 
         return await self.execute_with_learning(
-            prompt,
-            task_type="ab_test",
-            technique=PromptTechnique.CHAIN_OF_THOUGHT
+            prompt, task_type="ab_test", technique=PromptTechnique.CHAIN_OF_THOUGHT
         )
 
     async def track_roi(
-        self,
-        channels: list[str] | None = None,
-        time_period: str = "30d"
+        self, channels: list[str] | None = None, time_period: str = "30d"
     ) -> AgentResult:
         """Track marketing ROI by channel"""
         channels = channels or ["paid_social", "email", "organic_search", "paid_search"]
@@ -666,8 +666,8 @@ Analysis Required:
                 "total_spend": "number",
                 "total_revenue": "number",
                 "overall_roas": "number",
-                "recommendations": "array"
-            }
+                "recommendations": "array",
+            },
         )
 
 

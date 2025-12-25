@@ -57,8 +57,9 @@ from typing import Any, Literal
 
 try:
     import httpx
-    from mcp.server.fastmcp import FastMCP
     from pydantic import BaseModel, ConfigDict, Field
+
+    from mcp.server.fastmcp import FastMCP
 except ImportError as e:
     print(f"❌ Missing required package: {e}")
     print("Install with: pip install fastmcp httpx pydantic openai python-jose[cryptography]")
@@ -728,6 +729,7 @@ async def tool_registry_info(
     try:
         # Import Tool Runtime
         import sys
+
         sys.path.insert(0, str(__file__).replace("/mcp/openai_server.py", ""))
         from runtime.tools import get_tool_registry
 
@@ -741,15 +743,17 @@ async def tool_registry_info(
         # Format tool list
         tool_list = []
         for tool in tools:
-            tool_list.append({
-                "name": tool.name,
-                "description": tool.description,
-                "category": tool.category.value,
-                "severity": tool.severity.value,
-                "timeout_seconds": tool.timeout_seconds,
-                "idempotent": tool.idempotent,
-                "cacheable": tool.cacheable,
-            })
+            tool_list.append(
+                {
+                    "name": tool.name,
+                    "description": tool.description,
+                    "category": tool.category.value,
+                    "severity": tool.severity.value,
+                    "timeout_seconds": tool.timeout_seconds,
+                    "idempotent": tool.idempotent,
+                    "cacheable": tool.cacheable,
+                }
+            )
 
         result = {
             "total_tools": len(tool_list),

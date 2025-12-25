@@ -45,7 +45,6 @@ SKYYROSE_BRAND: dict[str, Any] = {
     "tagline": "Luxury Streetwear with Soul",
     "philosophy": "Where Love Meets Luxury",
     "location": "Oakland, California",
-
     "tone": {
         "primary": "Elegant, empowering, romantic, bold",
         "descriptors": [
@@ -61,7 +60,6 @@ SKYYROSE_BRAND: dict[str, Any] = {
             "clichéd luxury language",
         ],
     },
-
     "colors": {
         "primary": {"name": "Black Rose", "hex": "#1A1A1A", "rgb": "26, 26, 26"},
         "accent": {"name": "Rose Gold", "hex": "#D4AF37", "rgb": "212, 175, 55"},
@@ -69,22 +67,26 @@ SKYYROSE_BRAND: dict[str, Any] = {
         "ivory": {"name": "Ivory", "hex": "#F5F5F0", "rgb": "245, 245, 240"},
         "obsidian": {"name": "Obsidian", "hex": "#0D0D0D", "rgb": "13, 13, 13"},
     },
-
     "typography": {
         "heading": "Playfair Display",
         "body": "Inter",
         "accent": "Cormorant Garamond",
     },
-
     "target_audience": {
         "age_range": "18-35",
         "description": "Fashion-forward individuals who value self-expression",
         "interests": ["streetwear", "luxury fashion", "self-expression", "art", "music"],
         "values": ["authenticity", "quality", "individuality", "emotional connection"],
     },
-
-    "product_types": ["hoodies", "tees", "bombers", "track pants", "accessories", "caps", "beanies"],
-
+    "product_types": [
+        "hoodies",
+        "tees",
+        "bombers",
+        "track pants",
+        "accessories",
+        "caps",
+        "beanies",
+    ],
     "quality_descriptors": [
         "premium heavyweight cotton",
         "meticulous construction",
@@ -284,9 +286,7 @@ Style: Luxury streetwear, Oakland CA. {brand['tagline']}."""
         # Check if first message is already a system message
         if messages and messages[0].role == "system":
             # Prepend brand context to existing system message
-            enhanced = Message.system(
-                f"{system_content}\n\n{messages[0].content}"
-            )
+            enhanced = Message.system(f"{system_content}\n\n{messages[0].content}")
             return [enhanced] + list(messages[1:])
 
         # Add new system message
@@ -331,6 +331,67 @@ Style: Luxury streetwear, Oakland CA. {brand['tagline']}."""
 
         return context
 
+    def get_3d_generation_context(
+        self,
+        product_name: str,
+        product_type: str,
+        collection: Collection | None = None,
+        garment_type: str | None = None,
+    ) -> str:
+        """
+        Generate 3D generation-specific context for Tripo3D/FASHN.
+
+        Args:
+            product_name: Name of the product
+            product_type: Type (hoodie, tee, bomber, etc.)
+            collection: Which collection it belongs to
+            garment_type: Specific garment type for try-on
+
+        Returns:
+            3D generation context string
+        """
+        brand = SKYYROSE_BRAND
+        context = f"""3D Asset Generation Context for {product_name}
+
+## Brand Aesthetic
+- Maintain SkyyRose brand DNA: {brand['tone']['primary']}
+- Primary Color: {brand['colors']['primary']['name']} {brand['colors']['primary']['hex']}
+- Accent Color: {brand['colors']['accent']['name']} {brand['colors']['accent']['hex']}
+- Highlight Color: {brand['colors']['highlight']['name']} {brand['colors']['highlight']['hex']}
+- Style: Luxury streetwear with meticulous construction
+
+## Product Details
+- Name: {product_name}
+- Type: {product_type}
+- Quality Level: Premium, production-ready 3D model"""
+
+        if collection:
+            coll = COLLECTION_CONTEXT[collection]
+            context += f"\n- Collection: {coll['name']}"
+            context += f"\n- Collection Mood: {coll['mood']}"
+            context += f"\n- Collection Colors: {coll['colors']}"
+
+        if garment_type:
+            context += f"\n- Garment Type: {garment_type}"
+
+        context += """
+
+## 3D Generation Requirements
+- Format: GLB (web-optimized), USDZ (AR-compatible)
+- Quality: High-poly, production-ready geometry
+- Textures: Premium finish, brand-aligned materials
+- Details: Seams, stitching, fabric drape authenticity
+- Color Accuracy: Match brand color palette precisely
+- Lighting: Professional studio lighting ready
+
+## File Specifications
+- Polycount: Optimized for web (target: 50k-200k polygons)
+- Texture Resolution: 2048x2048 minimum
+- File Size: Optimized for fast loading
+- Metadata: Brand-tagged, collection-categorized"""
+
+        return context.strip()
+
 
 # =============================================================================
 # Convenience Functions
@@ -362,4 +423,3 @@ __all__ = [
     "get_brand_system_prompt",
     "inject_brand_context",
 ]
-

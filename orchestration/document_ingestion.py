@@ -91,7 +91,9 @@ class IngestionConfig(BaseModel):
 
     # File patterns
     include_patterns: list[str] = Field(default_factory=lambda: ["*.md", "*.txt", "*.pdf"])
-    exclude_patterns: list[str] = Field(default_factory=lambda: ["**/node_modules/**", "**/.git/**"])
+    exclude_patterns: list[str] = Field(
+        default_factory=lambda: ["**/node_modules/**", "**/.git/**"]
+    )
 
 
 @dataclass
@@ -328,7 +330,7 @@ class DocumentIngestionPipeline:
         chunks = self._chunker.chunk_text(content, source=str(file_path))
 
         # Update document type in metadata
-        for chunk_text, metadata in chunks:
+        for _chunk_text, metadata in chunks:
             metadata.document_type = doc_type
 
         # Create documents
@@ -381,16 +383,14 @@ class DocumentIngestionPipeline:
 
             # Check include patterns
             matches_include = any(
-                fnmatch.fnmatch(file_path.name, pat)
-                for pat in self.config.include_patterns
+                fnmatch.fnmatch(file_path.name, pat) for pat in self.config.include_patterns
             )
             if not matches_include:
                 continue
 
             # Check exclude patterns
             matches_exclude = any(
-                fnmatch.fnmatch(str(file_path), pat)
-                for pat in self.config.exclude_patterns
+                fnmatch.fnmatch(str(file_path), pat) for pat in self.config.exclude_patterns
             )
             if matches_exclude:
                 continue
@@ -491,4 +491,3 @@ async def ingest_docs_directory(docs_path: str = "./docs") -> IngestionResult:
     pipeline = DocumentIngestionPipeline()
     await pipeline.initialize()
     return await pipeline.ingest_directory(docs_path)
-

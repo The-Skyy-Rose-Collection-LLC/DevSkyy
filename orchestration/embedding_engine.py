@@ -127,10 +127,14 @@ class SentenceTransformerEngine(BaseEmbeddingEngine):
             )
             self._dimension = self._model.get_sentence_embedding_dimension()
             self._initialized = True
-            logger.info(f"SentenceTransformer initialized: {self.config.st_model_name} (dim={self._dimension})")
+            logger.info(
+                f"SentenceTransformer initialized: {self.config.st_model_name} (dim={self._dimension})"
+            )
 
         except ImportError:
-            raise ImportError("sentence-transformers not installed. Run: pip install sentence-transformers")
+            raise ImportError(
+                "sentence-transformers not installed. Run: pip install sentence-transformers"
+            )
         except Exception as e:
             logger.error(f"SentenceTransformer initialization failed: {e}")
             raise
@@ -199,7 +203,9 @@ class OpenAIEmbeddingEngine(BaseEmbeddingEngine):
             self._client = AsyncOpenAI(api_key=api_key)
             self._dimension = self.MODEL_DIMS.get(self.config.openai_model, 1536)
             self._initialized = True
-            logger.info(f"OpenAI Embeddings initialized: {self.config.openai_model} (dim={self._dimension})")
+            logger.info(
+                f"OpenAI Embeddings initialized: {self.config.openai_model} (dim={self._dimension})"
+            )
 
         except ImportError:
             raise ImportError("openai not installed. Run: pip install openai")
@@ -278,4 +284,3 @@ def create_embedding_engine(config: EmbeddingConfig | None = None) -> BaseEmbedd
         return OpenAIEmbeddingEngine(config)
     else:
         return SentenceTransformerEngine(config)
-

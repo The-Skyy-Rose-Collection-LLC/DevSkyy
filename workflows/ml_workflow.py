@@ -115,7 +115,11 @@ except ImportError as e:
 
             # Run agent tests
             proc = await asyncio.create_subprocess_exec(
-                "pytest", "tests/", "-k", "agent", "-v",
+                "pytest",
+                "tests/",
+                "-k",
+                "agent",
+                "-v",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -128,7 +132,11 @@ except ImportError as e:
 
             # Test orchestration
             proc = await asyncio.create_subprocess_exec(
-                "pytest", "tests/", "-k", "orchestration", "-v",
+                "pytest",
+                "tests/",
+                "-k",
+                "orchestration",
+                "-v",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
@@ -250,7 +258,9 @@ if duration > 5.0:
         try:
             # Run Bandit on ML code
             proc = await asyncio.create_subprocess_exec(
-                "pip", "install", "bandit",
+                "pip",
+                "install",
+                "bandit",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )

@@ -110,7 +110,9 @@ class VectorStoreConfig(BaseModel):
 
     # Search settings
     default_top_k: int = Field(default=5, ge=1, le=100)
-    similarity_threshold: float = Field(default=0.5, ge=0.0, le=1.0)  # Lower threshold for L2 distance
+    similarity_threshold: float = Field(
+        default=0.5, ge=0.0, le=1.0
+    )  # Lower threshold for L2 distance
 
 
 # =============================================================================
@@ -287,7 +289,9 @@ class ChromaVectorStore(BaseVectorStore):
                     id=doc_id,
                     content=results["documents"][0][i] if results["documents"] else "",
                     metadata=results["metadatas"][0][i] if results["metadatas"] else {},
-                    source=results["metadatas"][0][i].get("source", "") if results["metadatas"] else "",
+                    source=(
+                        results["metadatas"][0][i].get("source", "") if results["metadatas"] else ""
+                    ),
                     status=DocumentStatus.INDEXED,
                 )
                 search_results.append(SearchResult(document=doc, score=score, distance=distance))
@@ -405,16 +409,22 @@ class PineconeVectorStore(BaseVectorStore):
 
         vectors = []
         for doc, emb in zip(documents, embeddings, strict=False):
-            vectors.append({
-                "id": doc.id,
-                "values": emb,
-                "metadata": {
-                    "content": doc.content[:8000],  # Pinecone metadata limit
-                    "source": doc.source,
-                    "created_at": doc.created_at.isoformat(),
-                    **{k: v for k, v in doc.metadata.items() if isinstance(v, (str, int, float, bool))},
-                },
-            })
+            vectors.append(
+                {
+                    "id": doc.id,
+                    "values": emb,
+                    "metadata": {
+                        "content": doc.content[:8000],  # Pinecone metadata limit
+                        "source": doc.source,
+                        "created_at": doc.created_at.isoformat(),
+                        **{
+                            k: v
+                            for k, v in doc.metadata.items()
+                            if isinstance(v, (str, int, float, bool))
+                        },
+                    },
+                }
+            )
 
         # Batch upsert (Pinecone limit is 100 vectors per request)
         batch_size = 100
@@ -454,7 +464,11 @@ class PineconeVectorStore(BaseVectorStore):
             doc = Document(
                 id=match.id,
                 content=metadata.get("content", ""),
-                metadata={k: v for k, v in metadata.items() if k not in ["content", "source", "created_at"]},
+                metadata={
+                    k: v
+                    for k, v in metadata.items()
+                    if k not in ["content", "source", "created_at"]
+                },
                 source=metadata.get("source", ""),
                 status=DocumentStatus.INDEXED,
             )
@@ -484,7 +498,11 @@ class PineconeVectorStore(BaseVectorStore):
             return Document(
                 id=document_id,
                 content=metadata.get("content", ""),
-                metadata={k: v for k, v in metadata.items() if k not in ["content", "source", "created_at"]},
+                metadata={
+                    k: v
+                    for k, v in metadata.items()
+                    if k not in ["content", "source", "created_at"]
+                },
                 source=metadata.get("source", ""),
                 status=DocumentStatus.INDEXED,
             )
@@ -539,4 +557,3 @@ def create_vector_store(config: VectorStoreConfig | None = None) -> BaseVectorSt
         return PineconeVectorStore(config)
     else:
         return ChromaVectorStore(config)
-

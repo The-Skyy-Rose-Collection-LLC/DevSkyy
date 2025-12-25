@@ -132,7 +132,9 @@ async def example_rag_pipeline_integration():
     original_results = await pipeline.search(query, top_k=3)
     print(f"\nOriginal query ({len(original_results)} results):")
     for result in original_results[:2]:
-        print(f"  - {result.get('document', {}).get('source', 'unknown')}: {result.get('score', 0):.3f}")
+        print(
+            f"  - {result.get('document', {}).get('source', 'unknown')}: {result.get('score', 0):.3f}"
+        )
 
     # Rewritten query retrieval
     for rewritten_query in rewritten.rewritten_queries[:1]:
@@ -140,7 +142,9 @@ async def example_rag_pipeline_integration():
         print(f"\nRewritten query: '{rewritten_query}'")
         print(f"Results ({len(rewritten_results)} found):")
         for result in rewritten_results[:2]:
-            print(f"  - {result.get('document', {}).get('source', 'unknown')}: {result.get('score', 0):.3f}")
+            print(
+                f"  - {result.get('document', {}).get('source', 'unknown')}: {result.get('score', 0):.3f}"
+            )
 
     await pipeline.close()
 
@@ -267,7 +271,9 @@ async def example_complete_rag_flow():
     )
 
     # Test complex query
-    complex_query = "I want to know what options I have for customizing my purchase and what's the process?"
+    complex_query = (
+        "I want to know what options I have for customizing my purchase and what's the process?"
+    )
 
     print(f"\n🎯 Complex Query: {complex_query}")
     print("-" * 40)

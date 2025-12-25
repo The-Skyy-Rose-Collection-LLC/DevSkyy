@@ -99,6 +99,12 @@ dev = [
     "isort>=5.13",
     "pre-commit>=3.6",
     "httpx>=0.25",  # For test client
+    # 3D & Visual Generation
+    "Pillow>=10.0",
+    "opencv-python>=4.8",
+    # Performance & Testing
+    "selenium>=4.15",  # For Core Web Vitals testing
+    "playwright>=1.40",  # Alternative browser automation
 ]
 
 ml = [

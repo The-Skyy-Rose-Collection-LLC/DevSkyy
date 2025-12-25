@@ -5,19 +5,8 @@ Tests for llm module
 LLM client and router tests.
 """
 
-from llm import (
-    CompletionResponse,
-    LLMRouter,
-    Message,
-    MessageRole,
-    ModelProvider,
-    RoutingStrategy,
-)
-from llm.exceptions import (
-    AuthenticationError,
-    LLMError,
-    RateLimitError,
-)
+from llm import CompletionResponse, LLMRouter, Message, MessageRole, ModelProvider, RoutingStrategy
+from llm.exceptions import AuthenticationError, LLMError, RateLimitError
 from llm.providers import (
     AnthropicClient,
     CohereClient,

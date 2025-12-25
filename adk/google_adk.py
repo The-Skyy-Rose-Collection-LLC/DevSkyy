@@ -85,9 +85,7 @@ class GoogleADKAgent(BaseDevSkyyAgent):
     async def initialize(self) -> None:
         """Initialize Google ADK agent"""
         if not GOOGLE_ADK_AVAILABLE:
-            raise ImportError(
-                "Google ADK not installed. Install with: pip install google-adk"
-            )
+            raise ImportError("Google ADK not installed. Install with: pip install google-adk")
 
         try:
             # Build tools list

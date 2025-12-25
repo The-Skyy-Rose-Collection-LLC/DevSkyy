@@ -29,10 +29,7 @@ from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
-from typing import (
-    Any,
-    TypeVar,
-)
+from typing import Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -100,12 +97,13 @@ class ExecutionStatus(str, Enum):
 # =============================================================================
 
 
-@dataclass
+@dataclass(slots=True)
 class ToolCallContext:
     """
     Execution context for tool calls.
 
     Provides tracing, permissions, timeouts, and metadata for tool execution.
+    Memory-optimized with __slots__ for high-frequency instantiation.
     """
 
     # Identification

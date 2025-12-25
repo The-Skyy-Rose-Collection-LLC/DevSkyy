@@ -34,11 +34,7 @@ from .elementor import (
     WidgetType,
     generate_template,
 )
-from .media import (
-    ImageOptimizer,
-    MediaManager,
-    MediaUpload,
-)
+from .media import ImageOptimizer, MediaManager, MediaUpload
 from .media_3d_sync import (
     InvalidAssetURLError,
     ProductNotFoundError,
@@ -46,12 +42,7 @@ from .media_3d_sync import (
     WordPress3DMediaSync,
     WordPress3DSyncError,
 )
-from .products import (
-    ProductCreate,
-    ProductUpdate,
-    ProductVariation,
-    WooCommerceProducts,
-)
+from .products import ProductCreate, ProductUpdate, ProductVariation, WooCommerceProducts
 
 __all__ = [
     # Client
