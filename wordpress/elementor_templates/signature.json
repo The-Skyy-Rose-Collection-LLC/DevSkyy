@@ -1,0 +1,306 @@
+{
+  "version": "0.4",
+  "title": "SIGNATURE Runway",
+  "type": "page",
+  "content": [
+    {
+      "id": "sc0eb3a8",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_color": "#000000"
+      },
+      "elements": [
+        {
+          "id": "ce2a482e",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "wf97997f",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w124e9bf",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "SIGNATURE Runway",
+                "size": "xxl",
+                "header_size": "h1",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "wa215178",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Premium Essentials, Oakland Heritage</p>",
+                "align": "center",
+                "text_color": "#666666",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w2bb34f6",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 40,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s9f9f1ad",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {}
+      },
+      "elements": [
+        {
+          "id": "c2b78ac3",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w902cd85",
+              "elType": "widget",
+              "widgetType": "video",
+              "settings": {
+                "video_type": "hosted",
+                "hosted_url": "https://skyyrose.local/experiences/signature-collection/",
+                "controls": "yes",
+                "autoplay": "no",
+                "loop": "yes",
+                "muted": "no",
+                "preload": "auto",
+                "aspect_ratio": "16:9"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sdecb2d1",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        }
+      },
+      "elements": [
+        {
+          "id": "cd27a8b6",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w818dcf4",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wac60dd8",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Featured Pieces from Signature",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w257dae1",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 40,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "wa3d40ef",
+              "elType": "widget",
+              "widgetType": "skyyrose-hotspot-viewer",
+              "settings": {
+                "collection_slug": "signature",
+                "hotspot_config_url": "/wp-content/uploads/hotspots/signature-hotspots.json",
+                "auto_load_products": "yes",
+                "enable_cart": "yes",
+                "enable_wishlist": "yes"
+              }
+            },
+            {
+              "id": "wed9ac3e",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 60,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sb7076da",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {}
+      },
+      "elements": [
+        {
+          "id": "c3f90764",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w2aec19e",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "\n<script>\n// Scroll-based camera transitions for SIGNATURE Runway\nwindow.initScrollCamera = function() {\n    const experience = document.querySelector('[data-experience=\"signature\"]');\n    if (!experience) return;\n\n    const waypoints = [\n        { scroll: 0, camera: [3, 2, 4] },\n        { scroll: 25, camera: [0, 2, 5] },\n        { scroll: 50, camera: [-3, 1, 4] },\n        { scroll: 75, camera: [4, 3, 3] },\n        { scroll: 100, camera: [0, 2, 4] }\n    ];\n\n    window.addEventListener('scroll', () => {\n        const scroll = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;\n        experience.dispatchEvent(new CustomEvent('camera-update', { detail: { scroll } }));\n    });\n};\n\nif (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', window.initScrollCamera);\n} else {\n    window.initScrollCamera();\n}\n</script>\n"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s720dfae",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {
+          "size": 1200,
+          "unit": "px"
+        },
+        "background_color": "#C9A962"
+      },
+      "elements": [
+        {
+          "id": "ca1313a9",
+          "elType": "column",
+          "settings": {
+            "_column_size": 100
+          },
+          "elements": [
+            {
+              "id": "w4b7c61d",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w3918194",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Shop the SIGNATURE Runway",
+                "size": "large",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#1A1A1A",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w13f8071",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Browse Collection",
+                "link": {
+                  "url": "/collection/signature-runway",
+                  "is_external": false
+                },
+                "size": "lg",
+                "button_background_color": "#D4AF37",
+                "button_text_color": "#FFFFFF",
+                "button_border_border": "",
+                "button_border_width": {},
+                "button_border_color": "",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {
+                  "size": 1,
+                  "unit": "px"
+                }
+              }
+            },
+            {
+              "id": "w6b98ff8",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {
+                "space": {
+                  "size": 80,
+                  "unit": "px"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "hide_title": "yes",
+    "template": "elementor_canvas",
+    "post_title": "SIGNATURE Runway",
+    "meta_description": "Premium essentials showcasing Oakland-made luxury streetwear. Runway show environment with gold accents."
+  },
+  "metadata": {}
+}
