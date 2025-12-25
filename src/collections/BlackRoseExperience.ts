@@ -1,15 +1,15 @@
 /**
  * BLACK ROSE Collection - 3D Immersive Experience
- * 
+ *
  * Gothic rose garden with black, white, and silver roses.
  * Dark ambient lighting with silver moonlight, fog effects, obsidian pathways.
- * 
+ *
  * Clickable Assets:
  * - 3D rose bushes revealing product cards on hover/click
  * - Floating silver petals as navigation hints
  * - Interactive rose arbors displaying featured items
  * - Hidden "Easter egg" assets (thorns, gates) linking to exclusive drops
- * 
+ *
  * @author DevSkyy Platform Team
  * @version 1.0.0
  */
@@ -20,6 +20,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { Logger } from '../utils/Logger.js';
+import { HotspotManager } from './HotspotManager.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -90,27 +91,28 @@ export class BlackRoseExperience {
   private logger: Logger;
   private container: HTMLElement;
   private config: Required<BlackRoseConfig>;
-  
+
   // Three.js core
   private scene: THREE.Scene;
   private renderer: THREE.WebGLRenderer;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private composer: EffectComposer | null = null;
-  
+
   // Scene objects
   private roseBushes: Map<string, THREE.Group> = new Map();
   private petals: THREE.Object3D[] = [];
   private arbors: THREE.Group[] = [];
   private easterEggs: Map<string, THREE.Object3D> = new Map();
-  
+
   // State
   private animationId: number | null = null;
   private clock: THREE.Clock;
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
   private hoveredProduct: string | null = null;
-  
+  private hotspotManager: HotspotManager | null = null;
+
   // Callbacks
   private onProductClick: ProductClickHandler | null = null;
   private onEasterEgg: EasterEggHandler | null = null;
@@ -129,15 +131,19 @@ export class BlackRoseExperience {
     this.renderer = this.createRenderer();
     this.camera = this.createCamera();
     this.controls = this.createControls();
-    
+
     if (this.config.enableBloom) {
       this.setupPostProcessing();
     }
 
     this.setupEnvironment();
     this.setupLighting();
+
+    // Initialize hotspot system
+    this.initializeHotspots();
+
     this.setupEventListeners();
-    
+
     this.logger.info('BLACK ROSE experience initialized');
   }
 
@@ -274,6 +280,40 @@ export class BlackRoseExperience {
       };
       this.scene.add(petal);
       this.petals.push(petal);
+    }
+  }
+
+  private async initializeHotspots(): Promise<void> {
+    try {
+      // Create hotspot manager
+      this.hotspotManager = new HotspotManager(
+        this.scene,
+        this.camera,
+        this.renderer
+      );
+
+      // Load hotspot configuration from WordPress
+      const configUrl = '/wp-content/uploads/hotspots/black-rose-hotspots.json';
+      await this.hotspotManager.loadConfig(configUrl);
+
+      // Set product selection callback
+      this.hotspotManager.setOnProductSelect((productData) => {
+        // Find matching product in rose bushes
+        for (const [id, bush] of this.roseBushes) {
+          if (parseInt(id) === productData.product_id) {
+            const product = bush.userData['product'] as BlackRoseProduct;
+            if (product && this.onProductClick) {
+              this.onProductClick(product);
+            }
+            break;
+          }
+        }
+      });
+
+      this.logger.info('Hotspots initialized for BLACK ROSE collection');
+    } catch (error) {
+      this.logger.warn(`Failed to initialize hotspots: ${error instanceof Error ? error.message : String(error)}`);
+      // Continue without hotspots - they're optional
     }
   }
 
@@ -530,6 +570,12 @@ export class BlackRoseExperience {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
 
+    // Cleanup hotspots
+    if (this.hotspotManager) {
+      this.hotspotManager.dispose();
+      this.hotspotManager = null;
+    }
+
     // Helper to dispose mesh resources
     const disposeMesh = (obj: THREE.Object3D): void => {
       if (obj instanceof THREE.Mesh) {
@@ -597,4 +643,3 @@ export class BlackRoseExperience {
 }
 
 export default BlackRoseExperience;
-

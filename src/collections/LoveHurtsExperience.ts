@@ -1,15 +1,15 @@
 /**
  * LOVE HURTS Collection - 3D Immersive Experience
- * 
+ *
  * Enchanted castle inspired by Beauty and the Beast aesthetic.
  * Dramatic candlelight, stained glass reflections, magical particle effects.
- * 
+ *
  * Clickable Assets:
  * - Enchanted rose under glass dome (hero product)
  * - Castle mirrors revealing product lookbooks
  * - Floating candelabras as category navigation
  * - Interactive ballroom floor with product spotlights
- * 
+ *
  * @author DevSkyy Platform Team
  * @version 1.0.0
  */
@@ -20,6 +20,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { Logger } from '../utils/Logger.js';
+import { HotspotManager } from './HotspotManager.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -83,14 +84,14 @@ export class LoveHurtsExperience {
   private logger: Logger;
   private container: HTMLElement;
   private config: Required<LoveHurtsConfig>;
-  
+
   // Three.js core
   private scene: THREE.Scene;
   private renderer: THREE.WebGLRenderer;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private composer: EffectComposer | null = null;
-  
+
   // Scene objects
   private enchantedRose: THREE.Group | null = null;
   private glassDome: THREE.Mesh | null = null;
@@ -99,13 +100,14 @@ export class LoveHurtsExperience {
   private floorSpotlights: Map<string, THREE.Group> = new Map();
   private particles: THREE.Points | null = null;
   private stainedGlass: THREE.Group[] = [];
-  
+
   // State
   private animationId: number | null = null;
   private clock: THREE.Clock;
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
-  
+  private hotspotManager: HotspotManager | null = null;
+
   // Callbacks
   private onHeroInteraction: HeroInteractionHandler | null = null;
   private onMirrorClick: MirrorClickHandler | null = null;
@@ -124,7 +126,7 @@ export class LoveHurtsExperience {
     this.renderer = this.createRenderer();
     this.camera = this.createCamera();
     this.controls = this.createControls();
-    
+
     if (this.config.enableBloom) {
       this.setupPostProcessing();
     }
@@ -133,8 +135,12 @@ export class LoveHurtsExperience {
     this.setupLighting();
     this.createEnchantedRose();
     this.createMagicParticles();
+
+    // Initialize hotspot system
+    this.initializeHotspots();
+
     this.setupEventListeners();
-    
+
     this.logger.info('LOVE HURTS experience initialized');
   }
 
@@ -462,6 +468,49 @@ export class LoveHurtsExperience {
     this.scene.add(this.particles);
   }
 
+  private async initializeHotspots(): Promise<void> {
+    try {
+      // Create hotspot manager
+      this.hotspotManager = new HotspotManager(
+        this.scene,
+        this.camera,
+        this.renderer
+      );
+
+      // Load hotspot configuration from WordPress
+      const configUrl = '/wp-content/uploads/hotspots/love-hurts-hotspots.json';
+      await this.hotspotManager.loadConfig(configUrl);
+
+      // Set product selection callback
+      this.hotspotManager.setOnProductSelect((productData) => {
+        // Find matching product in mirrors or floor spotlights
+        for (const [id, mirror] of this.mirrors) {
+          if (parseInt(id) === productData.product_id) {
+            const lookbookImages = mirror.userData['lookbookImages'] as string[] | undefined || [];
+            if (this.onMirrorClick) {
+              this.onMirrorClick(id, lookbookImages);
+            }
+            return;
+          }
+        }
+
+        for (const [id] of this.floorSpotlights) {
+          if (parseInt(id) === productData.product_id) {
+            if (this.onFloorSpotlight) {
+              this.onFloorSpotlight(id);
+            }
+            return;
+          }
+        }
+      });
+
+      this.logger.info('Hotspots initialized for LOVE HURTS collection');
+    } catch (error) {
+      this.logger.warn(`Failed to initialize hotspots: ${error instanceof Error ? error.message : String(error)}`);
+      // Continue without hotspots - they're optional
+    }
+  }
+
   private setupEventListeners(): void {
     this.container.addEventListener('click', this.onClick.bind(this));
     window.addEventListener('resize', this.onResize.bind(this));
@@ -676,6 +725,12 @@ export class LoveHurtsExperience {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
 
+    // Cleanup hotspots
+    if (this.hotspotManager) {
+      this.hotspotManager.dispose();
+      this.hotspotManager = null;
+    }
+
     // Helper to dispose mesh resources
     const disposeMesh = (obj: THREE.Object3D): void => {
       if (obj instanceof THREE.Mesh) {
@@ -766,4 +821,3 @@ export class LoveHurtsExperience {
 }
 
 export default LoveHurtsExperience;
-
