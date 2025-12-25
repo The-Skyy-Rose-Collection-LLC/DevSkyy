@@ -21,7 +21,6 @@ Version: 1.0.0
 from __future__ import annotations
 
 import asyncio
-import base64
 import logging
 import os
 from dataclasses import dataclass, field
@@ -30,10 +29,15 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
-import aiofiles
-import aiohttp
 from pydantic import BaseModel, Field
-from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
+
+# Import official Tripo3D SDK
+try:
+    from tripo3d import TripoClient, TaskStatus
+    TRIPO_SDK_AVAILABLE = True
+except ImportError:
+    TRIPO_SDK_AVAILABLE = False
+    TaskStatus = None
 
 from base import (
     AgentCapability,
@@ -263,8 +267,8 @@ class TripoAssetAgent(SuperAgent):
     ) -> None:
         agent_config = AgentConfig(
             name="tripo_asset",
-            description="Tripo3D Asset Generation Agent for 3D model creation",
-            version="1.0.0",
+            description="Tripo3D Asset Generation Agent for 3D model creation (Official SDK)",
+            version="2.0.0",
             capabilities={
                 AgentCapability.THREE_D_GENERATION,
                 AgentCapability.IMAGE_GENERATION,
@@ -276,8 +280,13 @@ class TripoAssetAgent(SuperAgent):
 
         super().__init__(agent_config, registry or get_tool_registry())
 
+        # Validate SDK availability
+        if not TRIPO_SDK_AVAILABLE:
+            logger.warning(
+                "Tripo3D SDK not installed. Install with: pip install tripo3d"
+            )
+
         self.tripo_config = config or TripoConfig.from_env()
-        self._session: aiohttp.ClientSession | None = None
 
         # Ensure output directory
         Path(self.tripo_config.output_dir).mkdir(parents=True, exist_ok=True)
@@ -480,10 +489,10 @@ class TripoAssetAgent(SuperAgent):
         # Find generation result
         for result in results:
             if result.tool_name.startswith("tripo_generate") and result.success:
-                output["data"] = result.result
+                output["data"] = result.result  # type: ignore[assignment]
                 break
 
-        output["results"] = [r.to_dict() for r in results]
+        output["results"] = [r.to_dict() for r in results]  # type: ignore[assignment]
 
         return output
 
@@ -546,66 +555,67 @@ class TripoAssetAgent(SuperAgent):
         output_format: str = "glb",
         optimized_prompt: str | None = None,
     ) -> dict[str, Any]:
-        """Generate 3D model from text description."""
-        await self._ensure_session()
+        """Generate 3D model from text description using official SDK."""
+        if not TRIPO_SDK_AVAILABLE:
+            raise RuntimeError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d"
+            )
 
         prompt = self._build_prompt(
             product_name, collection, garment_type, additional_details, optimized_prompt
         )
 
-        # Create task
-        response = await self._api_request(
-            "POST",
-            "/task",
-            {
-                "type": "text_to_model",
-                "prompt": prompt,
-                "model_version": "v2.0-20240919",
-            },
-        )
+        try:
+            async with TripoClient(api_key=self.tripo_config.api_key) as client:
+                # Generate 3D model from text
+                logger.info(f"Generating 3D model from text: {product_name}")
+                task_id = await client.text_to_model(prompt=prompt)
+                logger.info(f"Task created: {task_id}")
 
-        task_id = response.get("data", {}).get("task_id")
-        if not task_id:
-            raise ValueError("No task ID returned")
+                # Wait for completion
+                task = await client.wait_for_task(task_id, verbose=True)
 
-        # Poll for result
-        task = await self._poll_task(task_id)
+                if task.status == TaskStatus.SUCCESS:
+                    logger.info(f"Task {task_id} completed successfully")
 
-        # Download model
-        if task.model_url:
-            filename = f"{product_name.lower().replace(' ', '_')}_{task_id[:8]}.{output_format}"
-            model_path = await self._download_file(task.model_url, filename)
+                    # Download models
+                    output_dir = Path(self.tripo_config.output_dir) / collection.lower()
+                    output_dir.mkdir(parents=True, exist_ok=True)
 
-            result = GenerationResult(
-                task_id=task_id,
-                model_path=model_path,
-                model_url=task.model_url,
-                format=ModelFormat(output_format),
-                metadata={
-                    "product_name": product_name,
-                    "collection": collection,
-                    "garment_type": garment_type,
-                    "prompt": prompt,
-                },
-            )
+                    downloaded_files = await client.download_task_models(
+                        task, str(output_dir)
+                    )
 
-            # Download texture if available
-            if task.texture_url:
-                texture_filename = (
-                    f"{product_name.lower().replace(' ', '_')}_{task_id[:8]}_texture.png"
-                )
-                result.texture_path = await self._download_file(task.texture_url, texture_filename)
+                    # Extract model path
+                    model_path = downloaded_files.get("model_mesh")
+                    if not model_path:
+                        raise ValueError("No model file in download results")
 
-            # Download thumbnail if available
-            if task.thumbnail_url:
-                thumb_filename = f"{product_name.lower().replace(' ', '_')}_{task_id[:8]}_thumb.png"
-                result.thumbnail_path = await self._download_file(
-                    task.thumbnail_url, thumb_filename
-                )
+                    result = GenerationResult(
+                        task_id=task_id,
+                        model_path=str(model_path),
+                        model_url=str(model_path),
+                        format=ModelFormat(output_format),
+                        metadata={
+                            "product_name": product_name,
+                            "collection": collection,
+                            "garment_type": garment_type,
+                            "prompt": prompt,
+                        },
+                    )
 
-            return result.model_dump()
+                    # Log downloaded files
+                    for model_type, file_path in downloaded_files.items():
+                        if file_path:
+                            logger.info(f"Downloaded {model_type}: {file_path}")
 
-        raise ValueError("No model generated")
+                    return result.model_dump()
+
+                raise ValueError(f"Task failed: {task.status}")
+
+        except Exception as e:
+            logger.error(f"Text-to-3D generation failed: {e}")
+            raise
 
     async def _tool_generate_from_image(
         self,
@@ -615,55 +625,70 @@ class TripoAssetAgent(SuperAgent):
         optimized_prompt: str | None = None,
     ) -> dict[str, Any]:
         """
-        Generate 3D model from reference image.
+        Generate 3D model from reference image using official SDK.
 
         If optimized_prompt is provided (from HuggingFace), it can be used
         to supplement or enhance the image-based generation.
         """
-        await self._ensure_session()
+        if not TRIPO_SDK_AVAILABLE:
+            raise RuntimeError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d"
+            )
 
-        # Encode image
-        async with aiofiles.open(image_path, "rb") as f:
-            image_data = await f.read()
+        # Verify image exists
+        image_file = Path(image_path)
+        if not image_file.exists():
+            raise FileNotFoundError(f"Image file not found: {image_path}")
 
-        b64_image = base64.b64encode(image_data).decode()
+        try:
+            async with TripoClient(api_key=self.tripo_config.api_key) as client:
+                # Generate 3D model from image
+                logger.info(f"Generating 3D model from image: {image_file.name}")
+                task_id = await client.image_to_model(image=str(image_path))
+                logger.info(f"Task created: {task_id}")
 
-        # Create task
-        response = await self._api_request(
-            "POST",
-            "/task",
-            {
-                "type": "image_to_model",
-                "file": {
-                    "type": "png" if image_path.endswith(".png") else "jpg",
-                    "data": b64_image,
-                },
-                "model_version": "v2.0-20240919",
-            },
-        )
+                # Wait for completion with verbose logging
+                task = await client.wait_for_task(task_id, verbose=True)
 
-        task_id = response.get("data", {}).get("task_id")
-        if not task_id:
-            raise ValueError("No task ID returned")
+                if task.status == TaskStatus.SUCCESS:
+                    logger.info(f"Task {task_id} completed successfully")
 
-        task = await self._poll_task(task_id)
+                    # Download models
+                    output_dir = Path(self.tripo_config.output_dir) / "images"
+                    output_dir.mkdir(parents=True, exist_ok=True)
 
-        if task.model_url:
-            filename = f"{product_name.lower().replace(' ', '_')}_{task_id[:8]}.{output_format}"
-            model_path = await self._download_file(task.model_url, filename)
+                    downloaded_files = await client.download_task_models(
+                        task, str(output_dir)
+                    )
 
-            return GenerationResult(
-                task_id=task_id,
-                model_path=model_path,
-                model_url=task.model_url,
-                format=ModelFormat(output_format),
-                metadata={
-                    "product_name": product_name,
-                    "source_image": image_path,
-                },
-            ).model_dump()
+                    # Extract model path
+                    model_path = downloaded_files.get("model_mesh")
+                    if not model_path:
+                        raise ValueError("No model file in download results")
 
-        raise ValueError("No model generated")
+                    result = GenerationResult(
+                        task_id=task_id,
+                        model_path=str(model_path),
+                        model_url=str(model_path),
+                        format=ModelFormat(output_format),
+                        metadata={
+                            "product_name": product_name,
+                            "source_image": image_path,
+                        },
+                    )
+
+                    # Log downloaded files
+                    for model_type, file_path in downloaded_files.items():
+                        if file_path:
+                            logger.info(f"Downloaded {model_type}: {file_path}")
+
+                    return result.model_dump()
+
+                raise ValueError(f"Task failed: {task.status}")
+
+        except Exception as e:
+            logger.error(f"Image-to-3D generation failed: {e}")
+            raise
 
     async def _tool_validate_asset(
         self,
@@ -837,114 +862,7 @@ class TripoAssetAgent(SuperAgent):
 
         return validation.model_dump()
 
-    # -------------------------------------------------------------------------
-    # HTTP Client Methods
-    # -------------------------------------------------------------------------
 
-    async def _ensure_session(self) -> None:
-        """Ensure aiohttp session exists."""
-        if self._session is None or self._session.closed:
-            self._session = aiohttp.ClientSession(
-                headers={
-                    "Authorization": f"Bearer {self.tripo_config.api_key}",
-                    "Content-Type": "application/json",
-                },
-                timeout=aiohttp.ClientTimeout(total=self.tripo_config.timeout),
-            )
-
-    async def close(self) -> None:
-        """Close HTTP session."""
-        if self._session and not self._session.closed:
-            await self._session.close()
-
-    async def _api_request(
-        self,
-        method: str,
-        endpoint: str,
-        data: dict[str, Any] | None = None,
-    ) -> dict[str, Any]:
-        """Make API request with tenacity retry logic."""
-        await self._ensure_session()
-
-        url = f"{self.tripo_config.base_url}/{endpoint.lstrip('/')}"
-
-        async for attempt in AsyncRetrying(
-            stop=stop_after_attempt(self.tripo_config.max_retries),
-            wait=wait_exponential(
-                min=self.tripo_config.retry_min_wait,
-                max=self.tripo_config.retry_max_wait,
-            ),
-            retry=retry_if_exception_type((aiohttp.ClientError, asyncio.TimeoutError)),
-            reraise=True,
-        ):
-            with attempt:
-                logger.debug(
-                    f"Tripo API request attempt {attempt.retry_state.attempt_number}: "
-                    f"{method} {endpoint}"
-                )
-                async with self._session.request(method, url, json=data) as response:
-                    result = await response.json()
-
-                    if response.status >= 400:
-                        error_msg = result.get("message", str(result))
-                        # Raise retriable error for 5xx, non-retriable for 4xx
-                        if response.status >= 500:
-                            raise aiohttp.ClientError(
-                                f"Tripo API server error ({response.status}): {error_msg}"
-                            )
-                        raise ValueError(f"Tripo API error ({response.status}): {error_msg}")
-
-                    return result
-
-        raise Exception("API request failed after all retries")
-
-    async def _poll_task(self, task_id: str) -> TripoTask:
-        """Poll task until completion."""
-        while True:
-            result = await self._api_request("GET", f"/task/{task_id}")
-
-            data = result.get("data", {})
-            task = TripoTask(
-                task_id=task_id,
-                status=TripoTaskStatus(data.get("status", "queued")),
-                progress=data.get("progress", 0),
-                result=data.get("output"),
-            )
-
-            if task.status == TripoTaskStatus.SUCCESS:
-                output = data.get("output", {})
-                task.model_url = output.get("model", {}).get("url")
-                task.texture_url = output.get("pbr_model", {}).get("url")
-                task.thumbnail_url = output.get("rendered_image", {}).get("url")
-                task.completed_at = datetime.now(UTC).isoformat()
-                return task
-
-            if task.status == TripoTaskStatus.FAILED:
-                task.error = data.get("error", "Unknown error")
-                raise Exception(f"Task failed: {task.error}")
-
-            if task.status == TripoTaskStatus.CANCELLED:
-                raise Exception("Task was cancelled")
-
-            logger.debug(f"Task {task_id}: {task.status.value} ({task.progress}%)")
-            await asyncio.sleep(self.tripo_config.poll_interval)
-
-    async def _download_file(self, url: str, filename: str) -> str:
-        """Download file to output directory."""
-        await self._ensure_session()
-
-        filepath = Path(self.tripo_config.output_dir) / filename
-
-        async with self._session.get(url) as response:
-            if response.status >= 400:
-                raise Exception(f"Download failed: {response.status}")
-
-            async with aiofiles.open(filepath, "wb") as f:
-                async for chunk in response.content.iter_chunked(8192):
-                    await f.write(chunk)
-
-        logger.info(f"Downloaded: {filepath}")
-        return str(filepath)
 
 
 # =============================================================================
