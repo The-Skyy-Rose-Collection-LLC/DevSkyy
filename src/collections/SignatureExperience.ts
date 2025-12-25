@@ -1,15 +1,15 @@
 /**
  * SIGNATURE Collection - 3D Immersive Experience
- * 
+ *
  * Classic luxury rose garden with red, gold, and ivory roses.
  * Warm golden hour lighting, soft depth of field.
- * 
+ *
  * Clickable Assets:
  * - Garden pedestals showcasing products
  * - Interactive fountain centerpiece with collection video
  * - Rose-lined pathways leading to product categories
  * - Floating brand logo as navigation anchor
- * 
+ *
  * @author DevSkyy Platform Team
  * @version 1.0.0
  */
@@ -20,6 +20,7 @@ import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { Logger } from '../utils/Logger.js';
+import { HotspotManager } from './HotspotManager.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -84,27 +85,28 @@ export class SignatureExperience {
   private logger: Logger;
   private container: HTMLElement;
   private config: Required<SignatureConfig>;
-  
+
   // Three.js core
   private scene: THREE.Scene;
   private renderer: THREE.WebGLRenderer;
   private camera: THREE.PerspectiveCamera;
   private controls: OrbitControls;
   private composer: EffectComposer | null = null;
-  
+
   // Scene objects
   private pedestals: Map<string, THREE.Group> = new Map();
   private fountain: THREE.Group | null = null;
   private pathways: THREE.Group[] = [];
   private brandLogo: THREE.Group | null = null;
   private roses: THREE.Object3D[] = [];
-  
+
   // State
   private animationId: number | null = null;
   private clock: THREE.Clock;
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
-  
+  private hotspotManager: HotspotManager | null = null;
+
   // Callbacks
   private onProductSelect: ProductSelectHandler | null = null;
   private onCategorySelect: CategorySelectHandler | null = null;
@@ -122,7 +124,7 @@ export class SignatureExperience {
     this.renderer = this.createRenderer();
     this.camera = this.createCamera();
     this.controls = this.createControls();
-    
+
     if (this.config.enableDepthOfField) {
       this.setupPostProcessing();
     }
@@ -131,8 +133,12 @@ export class SignatureExperience {
     this.setupLighting();
     this.createFountain();
     this.createBrandLogo();
+
+    // Initialize hotspot system
+    this.initializeHotspots();
+
     this.setupEventListeners();
-    
+
     this.logger.info('SIGNATURE experience initialized');
   }
 
@@ -414,6 +420,40 @@ export class SignatureExperience {
     this.scene.add(this.brandLogo);
   }
 
+  private async initializeHotspots(): Promise<void> {
+    try {
+      // Create hotspot manager
+      this.hotspotManager = new HotspotManager(
+        this.scene,
+        this.camera,
+        this.renderer
+      );
+
+      // Load hotspot configuration from WordPress
+      const configUrl = '/wp-content/uploads/hotspots/signature-hotspots.json';
+      await this.hotspotManager.loadConfig(configUrl);
+
+      // Set product selection callback
+      this.hotspotManager.setOnProductSelect((productData) => {
+        // Find matching product in pedestals
+        for (const [id, pedestal] of this.pedestals) {
+          if (parseInt(id) === productData.product_id) {
+            const product = pedestal.userData['product'] as SignatureProduct;
+            if (product && this.onProductSelect) {
+              this.onProductSelect(product);
+            }
+            break;
+          }
+        }
+      });
+
+      this.logger.info('Hotspots initialized for SIGNATURE collection');
+    } catch (error) {
+      this.logger.warn(`Failed to initialize hotspots: ${error instanceof Error ? error.message : String(error)}`);
+      // Continue without hotspots - they're optional
+    }
+  }
+
   private setupEventListeners(): void {
     this.container.addEventListener('click', this.onClick.bind(this));
     window.addEventListener('resize', this.onResize.bind(this));
@@ -559,6 +599,12 @@ export class SignatureExperience {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
 
+    // Cleanup hotspots
+    if (this.hotspotManager) {
+      this.hotspotManager.dispose();
+      this.hotspotManager = null;
+    }
+
     // Helper to dispose mesh resources
     const disposeMesh = (obj: THREE.Object3D): void => {
       if (obj instanceof THREE.Mesh) {
@@ -637,4 +683,3 @@ export class SignatureExperience {
 }
 
 export default SignatureExperience;
-
