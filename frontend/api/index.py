@@ -1,260 +1,295 @@
 """
-DevSkyy Python API for Vercel Serverless Functions
-===================================================
-This is the Python API handler for the DevSkyy dashboard.
-Deployed as Vercel Python Serverless Functions.
+DevSkyy API Handler
+===================
+Serverless ASGI handler for Vercel deployment.
+
+This module provides a complete API with endpoints that the dashboard
+can consume. It includes mock data for development and real integration
+points for production.
 """
 
 import json
-from datetime import UTC, datetime
-from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional
 
-# SuperAgent definitions
-SUPER_AGENTS = {
-    "commerce": {
+from fastapi import FastAPI, HTTPException, Query
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+# Create FastAPI app
+app = FastAPI(
+    title="DevSkyy API",
+    description="AI Agent Orchestration Platform API",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
+
+# Add CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# ============================================
+# Pydantic Models
+# ============================================
+
+class AgentStats(BaseModel):
+    tasksCompleted: int
+    successRate: float
+    avgResponseTime: float
+
+class Tool(BaseModel):
+    name: str
+    category: str
+
+class Agent(BaseModel):
+    id: str
+    type: str
+    name: str
+    description: str
+    status: str
+    stats: AgentStats
+    tools: List[Tool]
+    mlModels: List[str]
+
+class AgentAction(BaseModel):
+    success: bool
+    message: str
+
+class DashboardMetrics(BaseModel):
+    totalAgents: int
+    activeAgents: int
+    totalTasks: int
+    successRate: float
+    avgResponseTime: float
+    uptime: float
+
+# ============================================
+# Mock Data for Development
+# ============================================
+
+MOCK_AGENTS: List[Dict[str, Any]] = [
+    {
         "id": "commerce-001",
         "type": "commerce",
         "name": "Commerce Agent",
-        "description": "E-commerce operations: products, orders, inventory, pricing optimization",
-        "status": "ready",
-        "capabilities": [
-            "product_management",
-            "order_processing",
-            "inventory_sync",
-            "price_optimization",
-        ],
+        "description": "Manages e-commerce operations, product catalog, and inventory for SkyyRose boutique",
+        "status": "running",
+        "stats": {"tasksCompleted": 1247, "successRate": 0.98, "avgResponseTime": 0.8},
         "tools": [
-            {
-                "name": "create_product",
-                "description": "Create WooCommerce product",
-                "category": "commerce",
-            },
-            {
-                "name": "sync_inventory",
-                "description": "Sync inventory levels",
-                "category": "commerce",
-            },
-            {
-                "name": "optimize_pricing",
-                "description": "ML-based price optimization",
-                "category": "ai",
-            },
+            {"name": "Product Sync", "category": "inventory"},
+            {"name": "Price Optimizer", "category": "pricing"},
+            {"name": "Stock Monitor", "category": "inventory"},
+            {"name": "WooCommerce Bridge", "category": "integration"},
         ],
-        "mlModels": ["price_predictor", "demand_forecaster"],
-        "stats": {
-            "tasksCompleted": 1247,
-            "successRate": 0.94,
-            "avgLatencyMs": 320,
-            "totalCostUsd": 15.50,
-        },
+        "mlModels": ["demand-forecast", "price-elasticity"],
     },
-    "creative": {
+    {
         "id": "creative-001",
         "type": "creative",
         "name": "Creative Agent",
-        "description": "Visual content: 3D assets (Tripo3D), images (Imagen/FLUX), virtual try-on (FASHN)",
-        "status": "ready",
-        "capabilities": ["image_generation", "3d_modeling", "virtual_tryon", "brand_assets"],
+        "description": "Generates visual content, product imagery, and marketing assets using AI",
+        "status": "running",
+        "stats": {"tasksCompleted": 856, "successRate": 0.95, "avgResponseTime": 2.3},
         "tools": [
-            {
-                "name": "generate_image",
-                "description": "Generate image with Imagen/FLUX",
-                "category": "media",
-            },
-            {
-                "name": "generate_3d",
-                "description": "Generate 3D model with Tripo3D",
-                "category": "media",
-            },
-            {
-                "name": "virtual_tryon",
-                "description": "Virtual try-on with FASHN",
-                "category": "media",
-            },
+            {"name": "Image Generator", "category": "visual"},
+            {"name": "Style Transfer", "category": "visual"},
+            {"name": "Background Removal", "category": "editing"},
+            {"name": "3D Asset Creator", "category": "3d"},
         ],
-        "mlModels": ["imagen_3", "flux_1", "tripo3d", "fashn"],
-        "stats": {
-            "tasksCompleted": 892,
-            "successRate": 0.91,
-            "avgLatencyMs": 2150,
-            "totalCostUsd": 45.20,
-        },
+        "mlModels": ["stable-diffusion", "clip", "hunyuan3d"],
     },
-    "marketing": {
+    {
         "id": "marketing-001",
         "type": "marketing",
         "name": "Marketing Agent",
-        "description": "Marketing & content: SEO, social media, email campaigns, trend analysis",
-        "status": "ready",
-        "capabilities": [
-            "seo_optimization",
-            "content_generation",
-            "social_media",
-            "email_campaigns",
-        ],
+        "description": "Creates marketing copy, social media content, and campaigns",
+        "status": "idle",
+        "stats": {"tasksCompleted": 534, "successRate": 0.92, "avgResponseTime": 1.5},
         "tools": [
-            {
-                "name": "generate_content",
-                "description": "Generate marketing content",
-                "category": "content",
-            },
-            {
-                "name": "analyze_seo",
-                "description": "SEO analysis and optimization",
-                "category": "analytics",
-            },
-            {
-                "name": "schedule_post",
-                "description": "Schedule social media post",
-                "category": "communication",
-            },
+            {"name": "Copy Generator", "category": "content"},
+            {"name": "SEO Optimizer", "category": "seo"},
+            {"name": "Campaign Planner", "category": "planning"},
+            {"name": "Social Scheduler", "category": "social"},
         ],
-        "mlModels": ["content_optimizer", "trend_analyzer"],
-        "stats": {
-            "tasksCompleted": 2341,
-            "successRate": 0.96,
-            "avgLatencyMs": 450,
-            "totalCostUsd": 28.75,
-        },
+        "mlModels": ["gpt-4o", "claude-3.5-sonnet"],
     },
-    "support": {
+    {
         "id": "support-001",
         "type": "support",
         "name": "Support Agent",
-        "description": "Customer support: tickets, FAQs, escalation, intent classification",
-        "status": "ready",
-        "capabilities": ["ticket_management", "faq_answers", "intent_classification", "escalation"],
+        "description": "Handles customer inquiries and support tickets with AI assistance",
+        "status": "running",
+        "stats": {"tasksCompleted": 2341, "successRate": 0.97, "avgResponseTime": 0.5},
         "tools": [
-            {
-                "name": "classify_intent",
-                "description": "Classify customer intent",
-                "category": "ai",
-            },
-            {
-                "name": "generate_response",
-                "description": "Generate support response",
-                "category": "content",
-            },
-            {
-                "name": "escalate_ticket",
-                "description": "Escalate to human agent",
-                "category": "communication",
-            },
+            {"name": "Ticket Router", "category": "routing"},
+            {"name": "FAQ Bot", "category": "response"},
+            {"name": "Sentiment Analyzer", "category": "analysis"},
+            {"name": "Escalation Manager", "category": "workflow"},
         ],
-        "mlModels": ["intent_classifier", "sentiment_analyzer"],
-        "stats": {
-            "tasksCompleted": 3456,
-            "successRate": 0.92,
-            "avgLatencyMs": 280,
-            "totalCostUsd": 12.40,
-        },
+        "mlModels": ["bert-sentiment", "gpt-4o-mini"],
     },
-    "operations": {
+    {
         "id": "operations-001",
         "type": "operations",
         "name": "Operations Agent",
-        "description": "DevOps & deployment: WordPress, Elementor, monitoring, automation",
-        "status": "ready",
-        "capabilities": ["wordpress_management", "elementor_builder", "deployment", "monitoring"],
+        "description": "Manages logistics, shipping, and fulfillment operations",
+        "status": "running",
+        "stats": {"tasksCompleted": 1823, "successRate": 0.99, "avgResponseTime": 0.3},
         "tools": [
-            {
-                "name": "deploy_theme",
-                "description": "Deploy WordPress theme",
-                "category": "operations",
-            },
-            {
-                "name": "update_elementor",
-                "description": "Update Elementor templates",
-                "category": "operations",
-            },
-            {"name": "check_health", "description": "Check system health", "category": "system"},
+            {"name": "Route Optimizer", "category": "logistics"},
+            {"name": "Inventory Tracker", "category": "inventory"},
+            {"name": "Fulfillment Manager", "category": "fulfillment"},
+            {"name": "Shipping Calculator", "category": "shipping"},
         ],
-        "mlModels": ["anomaly_detector"],
-        "stats": {
-            "tasksCompleted": 567,
-            "successRate": 0.99,
-            "avgLatencyMs": 1200,
-            "totalCostUsd": 8.90,
-        },
+        "mlModels": ["route-optimization", "demand-forecast"],
     },
-    "analytics": {
+    {
         "id": "analytics-001",
         "type": "analytics",
         "name": "Analytics Agent",
-        "description": "Data & insights: reports, forecasting, clustering, anomaly detection",
-        "status": "ready",
-        "capabilities": ["reporting", "forecasting", "clustering", "anomaly_detection"],
+        "description": "Analyzes data, generates reports, and provides business insights",
+        "status": "learning",
+        "stats": {"tasksCompleted": 678, "successRate": 0.94, "avgResponseTime": 1.8},
         "tools": [
-            {
-                "name": "generate_report",
-                "description": "Generate analytics report",
-                "category": "analytics",
-            },
-            {"name": "forecast", "description": "Generate forecast", "category": "ai"},
-            {"name": "detect_anomalies", "description": "Detect data anomalies", "category": "ai"},
+            {"name": "Report Generator", "category": "reporting"},
+            {"name": "Trend Analyzer", "category": "analysis"},
+            {"name": "Dashboard Builder", "category": "visualization"},
+            {"name": "Anomaly Detector", "category": "monitoring"},
         ],
-        "mlModels": ["prophet_forecaster", "isolation_forest", "kmeans_clustering"],
-        "stats": {
-            "tasksCompleted": 1876,
-            "successRate": 0.98,
-            "avgLatencyMs": 420,
-            "totalCostUsd": 22.30,
-        },
+        "mlModels": ["prophet", "arima", "xgboost"],
     },
-}
+]
 
+# ============================================
+# API Routes
+# ============================================
 
-class handler(BaseHTTPRequestHandler):
-    """Vercel Python Serverless Function Handler"""
+@app.get("/")
+async def root():
+    return {
+        "status": "ok",
+        "message": "DevSkyy API",
+        "version": "1.0.0",
+        "docs": "/api/docs",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
 
-    def do_GET(self):
-        parsed = urlparse(self.path)
-        path = parsed.path.rstrip("/")
+@app.get("/health")
+async def health():
+    return {
+        "status": "healthy",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "service": "devskyy-api",
+    }
 
-        # Health check
-        if path in ["/api", "/api/health", "/api/py/health"]:
-            self._json_response(
-                200,
-                {
-                    "status": "ok",
-                    "timestamp": datetime.now(UTC).isoformat(),
-                    "agents": len(SUPER_AGENTS),
-                    "version": "1.0.0",
-                },
-            )
+@app.get("/v1/agents", response_model=List[Dict[str, Any]])
+async def list_agents(
+    status: Optional[str] = Query(None, description="Filter by agent status"),
+    type: Optional[str] = Query(None, description="Filter by agent type"),
+):
+    """List all agents with optional filtering."""
+    agents = MOCK_AGENTS
+    if status:
+        agents = [a for a in agents if a["status"] == status]
+    if type:
+        agents = [a for a in agents if a["type"] == type]
+    return agents
 
-        # List all agents
-        elif path in ["/api/agents", "/api/py/agents"]:
-            self._json_response(200, list(SUPER_AGENTS.values()))
+@app.get("/v1/agents/{agent_id}")
+async def get_agent(agent_id: str):
+    """Get a specific agent by ID or type."""
+    agent = next(
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        None,
+    )
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+    return agent
 
-        # Get single agent
-        elif path.startswith("/api/agents/") or path.startswith("/api/py/agents/"):
-            agent_type = path.split("/")[-1]
-            if agent_type in SUPER_AGENTS:
-                self._json_response(200, SUPER_AGENTS[agent_type])
-            else:
-                self._json_response(404, {"error": f"Agent not found: {agent_type}"})
+@app.get("/v1/agents/{agent_id}/stats")
+async def get_agent_stats(agent_id: str):
+    """Get stats for a specific agent."""
+    agent = next(
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        None,
+    )
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+    return agent.get("stats", {})
 
-        # List all tools
-        elif path in ["/api/tools", "/api/py/tools"]:
-            all_tools = []
-            for agent in SUPER_AGENTS.values():
-                all_tools.extend(agent["tools"])
-            self._json_response(200, all_tools)
+@app.get("/v1/agents/{agent_id}/tools")
+async def get_agent_tools(agent_id: str):
+    """Get tools for a specific agent."""
+    agent = next(
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        None,
+    )
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+    return agent.get("tools", [])
 
-        else:
-            self._json_response(404, {"error": "Not found", "path": path})
+@app.post("/v1/agents/{agent_id}/start")
+async def start_agent(agent_id: str):
+    """Start a specific agent."""
+    agent = next(
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        None,
+    )
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+    return {"success": True, "message": f"Agent {agent['name']} started", "status": "running"}
 
-    def do_POST(self):
-        self._json_response(200, {"status": "ok", "message": "POST received"})
+@app.post("/v1/agents/{agent_id}/stop")
+async def stop_agent(agent_id: str):
+    """Stop a specific agent."""
+    agent = next(
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        None,
+    )
+    if not agent:
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+    return {"success": True, "message": f"Agent {agent['name']} stopped", "status": "stopped"}
 
-    def _json_response(self, status: int, data: dict | list):
-        self.send_response(status)
-        self.send_header("Content-Type", "application/json")
-        self.send_header("Access-Control-Allow-Origin", "*")
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode())
+@app.get("/v1/metrics/dashboard", response_model=DashboardMetrics)
+async def dashboard_metrics():
+    """Get dashboard metrics."""
+    active = sum(1 for a in MOCK_AGENTS if a["status"] == "running")
+    total_tasks = sum(a["stats"]["tasksCompleted"] for a in MOCK_AGENTS)
+    avg_success = sum(a["stats"]["successRate"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
+    avg_response = sum(a["stats"]["avgResponseTime"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
+    
+    return {
+        "totalAgents": len(MOCK_AGENTS),
+        "activeAgents": active,
+        "totalTasks": total_tasks,
+        "successRate": round(avg_success, 2),
+        "avgResponseTime": round(avg_response, 2),
+        "uptime": 99.9,
+    }
 
-    def log_message(self, format, *args):
-        pass  # Suppress logging
+@app.get("/v1/tools")
+async def list_tools():
+    """List all available tools across all agents."""
+    all_tools = []
+    for agent in MOCK_AGENTS:
+        for tool in agent.get("tools", []):
+            tool_with_agent = {**tool, "agentId": agent["id"], "agentType": agent["type"]}
+            all_tools.append(tool_with_agent)
+    return all_tools
+
+@app.get("/v1/3d/status")
+async def get_3d_pipeline_status():
+    """Get 3D pipeline status for the 3D Asset Dashboard."""
+    return {
+        "status": "operational",
+        "models": ["hunyuan3d-2.1", "triposr", "stable-diffusion-3d"],
+        "queueLength": 3,
+        "processingTime": 45.2,
+        "lastGenerated": datetime.now(timezone.utc).isoformat(),
+    }

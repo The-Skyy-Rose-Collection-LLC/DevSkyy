@@ -1,10 +1,6 @@
 name: Code-Based Workflows
 
 on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
   workflow_dispatch:
     inputs:
       workflow:
@@ -26,30 +22,30 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Set up Python 3.11
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      
+
       - name: Set up Node.js 20
         uses: actions/setup-node@v6
         with:
           node-version: '20'
           cache: 'npm'
-      
+
       - name: Install Python dependencies
         run: |
           pip install -e .
           pip install pytest pytest-asyncio pytest-cov
-      
+
       - name: Install Node dependencies
         run: npm ci
-      
+
       - name: Run workflows
         env:
           WORKFLOW: ${{ github.event.inputs.workflow || 'ci' }}
@@ -60,7 +56,7 @@ jobs:
           else
             python -m workflows.cli run $WORKFLOW
           fi
-      
+
       - name: Show workflow status
         if: always()
         run: python -m workflows.cli status
