@@ -1185,8 +1185,13 @@ class ProductAssetPipeline:
         to enhance the Tripo3D prompt.
 
         Returns:
-            HF3DResult or None if generation fails
+            HF3DResult or None if generation fails or HF is disabled
         """
+        # Early return if HuggingFace 3D generation is disabled
+        if not self.config.enable_huggingface_3d:
+            logger.debug("HuggingFace 3D generation disabled, skipping")
+            return None
+
         logger.info("Generating 3D model with HuggingFace Shap-E", title=title)
 
         for image_path in images[:1]:  # Use first image only
