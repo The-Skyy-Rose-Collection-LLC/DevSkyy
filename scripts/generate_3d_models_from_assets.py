@@ -24,7 +24,7 @@ import asyncio
 import json
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -45,7 +45,7 @@ class CollectionMetadata(BaseModel):
         default_factory=list, description="Generated models"
     )
     generation_status: str = Field(default="pending", description="Generation status")
-    generated_at: Optional[str] = Field(default=None, description="Generation timestamp")
+    generated_at: str | None = Field(default=None, description="Generation timestamp")
 
 
 class ModelGenerationPipeline:
@@ -168,7 +168,7 @@ class ModelGenerationPipeline:
     async def generate_collection_models(
         self,
         collection: str,
-        limit: Optional[int] = None,
+        limit: int | None = None,
     ) -> dict[str, Any]:
         """
         Generate 3D models for all products in a collection.
@@ -309,7 +309,7 @@ class ModelGenerationPipeline:
     async def generate_all_collections(
         self,
         collections: list[str],
-        limit: Optional[int] = None,
+        limit: int | None = None,
     ) -> dict[str, Any]:
         """
         Generate 3D models for multiple collections in parallel.
@@ -396,13 +396,13 @@ async def main():
 
     if args.collection:
         # Generate for specific collection
-        result = await pipeline.generate_collection_models(
+        await pipeline.generate_collection_models(
             args.collection,
             limit=args.limit,
         )
     elif args.all:
         # Generate for all collections
-        result = await pipeline.generate_all_collections(
+        await pipeline.generate_all_collections(
             ["signature", "black-rose", "love-hurts"],
             limit=args.limit,
         )

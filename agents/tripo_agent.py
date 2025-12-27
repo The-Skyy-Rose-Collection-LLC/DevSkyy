@@ -20,7 +20,6 @@ Version: 1.0.0
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import os
 from dataclasses import dataclass, field
@@ -33,7 +32,8 @@ from pydantic import BaseModel, Field
 
 # Import official Tripo3D SDK
 try:
-    from tripo3d import TripoClient, TaskStatus
+    from tripo3d import TaskStatus, TripoClient
+
     TRIPO_SDK_AVAILABLE = True
 except ImportError:
     TRIPO_SDK_AVAILABLE = False
@@ -282,9 +282,7 @@ class TripoAssetAgent(SuperAgent):
 
         # Validate SDK availability
         if not TRIPO_SDK_AVAILABLE:
-            logger.warning(
-                "Tripo3D SDK not installed. Install with: pip install tripo3d"
-            )
+            logger.warning("Tripo3D SDK not installed. Install with: pip install tripo3d")
 
         self.tripo_config = config or TripoConfig.from_env()
 
@@ -557,9 +555,7 @@ class TripoAssetAgent(SuperAgent):
     ) -> dict[str, Any]:
         """Generate 3D model from text description using official SDK."""
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError(
-                "Tripo3D SDK not available. Install with: pip install tripo3d"
-            )
+            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d")
 
         prompt = self._build_prompt(
             product_name, collection, garment_type, additional_details, optimized_prompt
@@ -582,9 +578,7 @@ class TripoAssetAgent(SuperAgent):
                     output_dir = Path(self.tripo_config.output_dir) / collection.lower()
                     output_dir.mkdir(parents=True, exist_ok=True)
 
-                    downloaded_files = await client.download_task_models(
-                        task, str(output_dir)
-                    )
+                    downloaded_files = await client.download_task_models(task, str(output_dir))
 
                     # Extract model path
                     model_path = downloaded_files.get("model_mesh")
@@ -631,9 +625,7 @@ class TripoAssetAgent(SuperAgent):
         to supplement or enhance the image-based generation.
         """
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError(
-                "Tripo3D SDK not available. Install with: pip install tripo3d"
-            )
+            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d")
 
         # Verify image exists
         image_file = Path(image_path)
@@ -657,9 +649,7 @@ class TripoAssetAgent(SuperAgent):
                     output_dir = Path(self.tripo_config.output_dir) / "images"
                     output_dir.mkdir(parents=True, exist_ok=True)
 
-                    downloaded_files = await client.download_task_models(
-                        task, str(output_dir)
-                    )
+                    downloaded_files = await client.download_task_models(task, str(output_dir))
 
                     # Extract model path
                     model_path = downloaded_files.get("model_mesh")
@@ -861,8 +851,6 @@ class TripoAssetAgent(SuperAgent):
             logger.error(f"Asset validation failed: {model_path} - {validation.errors}")
 
         return validation.model_dump()
-
-
 
 
 # =============================================================================

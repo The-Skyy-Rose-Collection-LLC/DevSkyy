@@ -22,11 +22,7 @@ from wordpress.collection_page_manager import (
     WordPressCollectionPageManager,
     WordPressConfig,
 )
-from wordpress.elementor import (
-    SKYYROSE_BRAND_KIT,
-    ElementorConfig,
-    ElementorTemplate,
-)
+from wordpress.elementor import SKYYROSE_BRAND_KIT, ElementorConfig, ElementorTemplate
 from wordpress.page_builders import (
     AboutPageBuilder,
     BlogPageBuilder,
@@ -35,7 +31,9 @@ from wordpress.page_builders import (
 )
 
 # Configure logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 logger = logging.getLogger(__name__)
 
 # Directories
@@ -69,7 +67,9 @@ class SkyyRoseDeploymentOrchestrator:
             self.wp_manager = WordPressCollectionPageManager(config=wp_config)
         else:
             self.wp_manager = None
-            logger.warning("WordPress credentials not provided - Phase 3 deployment will be skipped")
+            logger.warning(
+                "WordPress credentials not provided - Phase 3 deployment will be skipped"
+            )
 
     async def phase_1_5_generate_3d_models(self) -> dict[str, str]:
         """Phase 1.5: Generate 3D models from extracted product images.

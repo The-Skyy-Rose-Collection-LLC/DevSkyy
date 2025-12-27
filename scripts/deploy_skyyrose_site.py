@@ -27,7 +27,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
@@ -87,10 +87,10 @@ class DeploymentConfig(BaseModel):
         ...,
         description="WordPress admin password or app password",
     )
-    woocommerce_key: Optional[str] = Field(default=None)
-    woocommerce_secret: Optional[str] = Field(default=None)
-    tripo_api_key: Optional[str] = Field(default=None)
-    huggingface_api_key: Optional[str] = Field(default=None)
+    woocommerce_key: str | None = Field(default=None)
+    woocommerce_secret: str | None = Field(default=None)
+    tripo_api_key: str | None = Field(default=None)
+    huggingface_api_key: str | None = Field(default=None)
     collections: list[str] = Field(
         default=["black-rose", "love-hurts", "signature"],
         description="Collections to process",
@@ -113,7 +113,7 @@ class DeploymentPhase(BaseModel):
     status: str = Field(..., pattern="^(pending|in_progress|completed|failed)$")
     duration_seconds: float = 0.0
     artifacts: dict[str, Any] = Field(default_factory=dict)
-    error: Optional[str] = None
+    error: str | None = None
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
 
 
@@ -186,7 +186,7 @@ class SkyyRoseDeploymentOrchestrator:
 
             async with asyncio.TaskGroup() as tg:
                 # Phase 1.1: Extract assets from ZIP
-                extract_task = tg.create_task(
+                tg.create_task(
                     self._execute_phase(
                         "Phase 1.1",
                         "Extract Assets from ZIP",
@@ -560,7 +560,7 @@ class SkyyRoseDeploymentOrchestrator:
         logger.info("\nPhase Results:")
         logger.info("-" * 70)
 
-        for phase_id, phase in summary.phases.items():
+        for _phase_id, phase in summary.phases.items():
             status_icon = "✓" if phase.status == "completed" else "✗"
             logger.info(f"{status_icon} {phase.phase_name} ({phase.duration_seconds:.2f}s)")
             if phase.error:

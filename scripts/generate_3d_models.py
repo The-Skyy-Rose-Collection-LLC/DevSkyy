@@ -99,7 +99,7 @@ async def wait_for_task(session: aiohttp.ClientSession, task_id: str, max_wait: 
     """Poll task status until complete."""
     print(f"  Waiting for task {task_id}...")
 
-    for i in range(max_wait // 5):
+    for _i in range(max_wait // 5):
         async with session.get(
             f"{TRIPO_BASE_URL}/task/{task_id}",
             headers={"Authorization": f"Bearer {TRIPO_API_KEY}"},
