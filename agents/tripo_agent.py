@@ -553,9 +553,38 @@ class TripoAssetAgent(SuperAgent):
         output_format: str = "glb",
         optimized_prompt: str | None = None,
     ) -> dict[str, Any]:
-        """Generate 3D model from text description using official SDK."""
+        """Generate 3D model from text description using official SDK.
+
+        Args:
+            product_name: Name of the product to generate.
+            collection: SkyyRose collection (BLACK_ROSE, LOVE_HURTS, SIGNATURE).
+            garment_type: Type of garment (hoodie, tee, bomber, etc.).
+            additional_details: Extra details to include in the prompt.
+            output_format: Output format (glb, usdz, fbx, obj).
+            optimized_prompt: Optional HuggingFace-optimized prompt.
+
+        Returns:
+            GenerationResult dict with model paths and metadata.
+
+        Raises:
+            RuntimeError: If Tripo3D SDK is not available.
+            ValueError: If generation fails or API key is missing.
+            ConnectionError: If cannot connect to Tripo3D API.
+            TimeoutError: If generation times out.
+            OSError: If cannot write output files.
+        """
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d")
+            raise RuntimeError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d. "
+                "See https://docs.tripo3d.ai/ for setup instructions."
+            )
+
+        # Validate API key
+        if not self.tripo_config.api_key:
+            raise ValueError(
+                "TRIPO_API_KEY environment variable is required. "
+                "Get your API key from: https://www.tripo3d.ai/dashboard"
+            )
 
         prompt = self._build_prompt(
             product_name, collection, garment_type, additional_details, optimized_prompt
@@ -565,25 +594,58 @@ class TripoAssetAgent(SuperAgent):
             async with TripoClient(api_key=self.tripo_config.api_key) as client:
                 # Generate 3D model from text
                 logger.info(f"Generating 3D model from text: {product_name}")
-                task_id = await client.text_to_model(prompt=prompt)
+                try:
+                    task_id = await client.text_to_model(prompt=prompt)
+                except Exception as e:
+                    if "authentication" in str(e).lower() or "unauthorized" in str(e).lower():
+                        raise PermissionError(
+                            "Tripo3D API authentication failed. "
+                            "Check that your TRIPO_API_KEY is valid and not expired."
+                        ) from e
+                    raise ConnectionError(
+                        f"Failed to create Tripo3D task: {e}. "
+                        "Check your network connection and API status."
+                    ) from e
+
                 logger.info(f"Task created: {task_id}")
 
-                # Wait for completion
-                task = await client.wait_for_task(task_id, verbose=True)
+                # Wait for completion with timeout handling
+                try:
+                    task = await client.wait_for_task(task_id, verbose=True)
+                except TimeoutError as e:
+                    raise TimeoutError(
+                        f"Tripo3D generation timed out after {self.tripo_config.timeout}s. "
+                        "Complex models may take longer. Try again or simplify the prompt."
+                    ) from e
 
                 if task.status == TaskStatus.SUCCESS:
                     logger.info(f"Task {task_id} completed successfully")
 
                     # Download models
                     output_dir = Path(self.tripo_config.output_dir) / collection.lower()
-                    output_dir.mkdir(parents=True, exist_ok=True)
+                    try:
+                        output_dir.mkdir(parents=True, exist_ok=True)
+                    except OSError as e:
+                        raise OSError(
+                            f"Cannot create output directory {output_dir}: {e}. "
+                            "Check directory permissions."
+                        ) from e
 
-                    downloaded_files = await client.download_task_models(task, str(output_dir))
+                    try:
+                        downloaded_files = await client.download_task_models(task, str(output_dir))
+                    except Exception as e:
+                        raise RuntimeError(
+                            f"Failed to download model files: {e}. "
+                            "The model was generated but could not be saved."
+                        ) from e
 
                     # Extract model path
                     model_path = downloaded_files.get("model_mesh")
                     if not model_path:
-                        raise ValueError("No model file in download results")
+                        raise ValueError(
+                            "No model file in download results. "
+                            "The Tripo3D API may have returned an incomplete response."
+                        )
 
                     result = GenerationResult(
                         task_id=task_id,
@@ -605,11 +667,31 @@ class TripoAssetAgent(SuperAgent):
 
                     return result.model_dump()
 
-                raise ValueError(f"Task failed: {task.status}")
+                elif task.status == TaskStatus.FAILED:
+                    error_msg = getattr(task, 'error', 'Unknown error')
+                    raise RuntimeError(
+                        f"Tripo3D generation failed: {error_msg}. "
+                        "Try simplifying the prompt or using a different garment type."
+                    )
+                elif task.status == TaskStatus.CANCELLED:
+                    raise RuntimeError(
+                        "Tripo3D task was cancelled. This may be due to API quota limits."
+                    )
+                else:
+                    raise ValueError(
+                        f"Unexpected task status: {task.status}. "
+                        "Please report this issue."
+                    )
 
-        except Exception as e:
-            logger.error(f"Text-to-3D generation failed: {e}")
+        except (PermissionError, ConnectionError, TimeoutError, OSError, ValueError, RuntimeError):
+            # Re-raise known errors with their context
             raise
+        except Exception as e:
+            logger.error(f"Text-to-3D generation failed unexpectedly: {e}", exc_info=True)
+            raise RuntimeError(
+                f"Unexpected error during 3D generation: {e}. "
+                "Check the logs for more details."
+            ) from e
 
     async def _tool_generate_from_image(
         self,
@@ -618,43 +700,144 @@ class TripoAssetAgent(SuperAgent):
         output_format: str = "glb",
         optimized_prompt: str | None = None,
     ) -> dict[str, Any]:
-        """
-        Generate 3D model from reference image using official SDK.
+        """Generate 3D model from reference image using official SDK.
 
         If optimized_prompt is provided (from HuggingFace), it can be used
         to supplement or enhance the image-based generation.
+
+        Args:
+            image_path: Path to the source image file.
+            product_name: Name for the generated product.
+            output_format: Output format (glb, usdz, fbx, obj).
+            optimized_prompt: Optional HuggingFace-optimized prompt.
+
+        Returns:
+            GenerationResult dict with model paths and metadata.
+
+        Raises:
+            RuntimeError: If Tripo3D SDK is not available.
+            FileNotFoundError: If image file does not exist.
+            ValueError: If image format is unsupported or generation fails.
+            PermissionError: If API authentication fails.
+            ConnectionError: If cannot connect to Tripo3D API.
+            TimeoutError: If generation times out.
+            OSError: If cannot write output files.
         """
         if not TRIPO_SDK_AVAILABLE:
-            raise RuntimeError("Tripo3D SDK not available. Install with: pip install tripo3d")
+            raise RuntimeError(
+                "Tripo3D SDK not available. Install with: pip install tripo3d. "
+                "See https://docs.tripo3d.ai/ for setup instructions."
+            )
 
-        # Verify image exists
+        # Validate API key
+        if not self.tripo_config.api_key:
+            raise ValueError(
+                "TRIPO_API_KEY environment variable is required. "
+                "Get your API key from: https://www.tripo3d.ai/dashboard"
+            )
+
+        # Verify image exists and is readable
         image_file = Path(image_path)
         if not image_file.exists():
-            raise FileNotFoundError(f"Image file not found: {image_path}")
+            raise FileNotFoundError(
+                f"Image file not found: {image_path}. "
+                "Ensure the file path is correct and the file exists."
+            )
+
+        if not image_file.is_file():
+            raise ValueError(
+                f"Path is not a file: {image_path}. "
+                "Please provide a valid image file path."
+            )
+
+        # Validate image format
+        supported_formats = {".jpg", ".jpeg", ".png", ".webp"}
+        if image_file.suffix.lower() not in supported_formats:
+            raise ValueError(
+                f"Unsupported image format: {image_file.suffix}. "
+                f"Supported formats: {', '.join(supported_formats)}"
+            )
+
+        # Check file size
+        try:
+            file_size = image_file.stat().st_size
+            if file_size == 0:
+                raise ValueError(
+                    f"Image file is empty: {image_path}. "
+                    "Please provide a valid image file."
+                )
+            if file_size > 20 * 1024 * 1024:  # 20MB limit
+                raise ValueError(
+                    f"Image file too large: {file_size / (1024*1024):.1f}MB. "
+                    "Maximum allowed size is 20MB."
+                )
+        except OSError as e:
+            raise PermissionError(
+                f"Cannot read image file {image_path}: {e}. "
+                "Check file permissions."
+            ) from e
 
         try:
             async with TripoClient(api_key=self.tripo_config.api_key) as client:
                 # Generate 3D model from image
                 logger.info(f"Generating 3D model from image: {image_file.name}")
-                task_id = await client.image_to_model(image=str(image_path))
+                try:
+                    task_id = await client.image_to_model(image=str(image_path))
+                except Exception as e:
+                    if "authentication" in str(e).lower() or "unauthorized" in str(e).lower():
+                        raise PermissionError(
+                            "Tripo3D API authentication failed. "
+                            "Check that your TRIPO_API_KEY is valid and not expired."
+                        ) from e
+                    if "invalid image" in str(e).lower():
+                        raise ValueError(
+                            f"Tripo3D rejected the image: {e}. "
+                            "Ensure the image is clear, well-lit, and shows the product clearly."
+                        ) from e
+                    raise ConnectionError(
+                        f"Failed to create Tripo3D task: {e}. "
+                        "Check your network connection and API status."
+                    ) from e
+
                 logger.info(f"Task created: {task_id}")
 
                 # Wait for completion with verbose logging
-                task = await client.wait_for_task(task_id, verbose=True)
+                try:
+                    task = await client.wait_for_task(task_id, verbose=True)
+                except TimeoutError as e:
+                    raise TimeoutError(
+                        f"Tripo3D generation timed out after {self.tripo_config.timeout}s. "
+                        "Complex images may take longer. Try again or use a simpler image."
+                    ) from e
 
                 if task.status == TaskStatus.SUCCESS:
                     logger.info(f"Task {task_id} completed successfully")
 
                     # Download models
                     output_dir = Path(self.tripo_config.output_dir) / "images"
-                    output_dir.mkdir(parents=True, exist_ok=True)
+                    try:
+                        output_dir.mkdir(parents=True, exist_ok=True)
+                    except OSError as e:
+                        raise OSError(
+                            f"Cannot create output directory {output_dir}: {e}. "
+                            "Check directory permissions."
+                        ) from e
 
-                    downloaded_files = await client.download_task_models(task, str(output_dir))
+                    try:
+                        downloaded_files = await client.download_task_models(task, str(output_dir))
+                    except Exception as e:
+                        raise RuntimeError(
+                            f"Failed to download model files: {e}. "
+                            "The model was generated but could not be saved."
+                        ) from e
 
                     # Extract model path
                     model_path = downloaded_files.get("model_mesh")
                     if not model_path:
-                        raise ValueError("No model file in download results")
+                        raise ValueError(
+                            "No model file in download results. "
+                            "The Tripo3D API may have returned an incomplete response."
+                        )
 
                     result = GenerationResult(
                         task_id=task_id,
@@ -674,11 +857,31 @@ class TripoAssetAgent(SuperAgent):
 
                     return result.model_dump()
 
-                raise ValueError(f"Task failed: {task.status}")
+                elif task.status == TaskStatus.FAILED:
+                    error_msg = getattr(task, 'error', 'Unknown error')
+                    raise RuntimeError(
+                        f"Tripo3D generation failed: {error_msg}. "
+                        "Try using a clearer image with better lighting."
+                    )
+                elif task.status == TaskStatus.CANCELLED:
+                    raise RuntimeError(
+                        "Tripo3D task was cancelled. This may be due to API quota limits."
+                    )
+                else:
+                    raise ValueError(
+                        f"Unexpected task status: {task.status}. "
+                        "Please report this issue."
+                    )
 
-        except Exception as e:
-            logger.error(f"Image-to-3D generation failed: {e}")
+        except (PermissionError, ConnectionError, TimeoutError, OSError, ValueError, RuntimeError, FileNotFoundError):
+            # Re-raise known errors with their context
             raise
+        except Exception as e:
+            logger.error(f"Image-to-3D generation failed unexpectedly: {e}", exc_info=True)
+            raise RuntimeError(
+                f"Unexpected error during 3D generation: {e}. "
+                "Check the logs for more details."
+            ) from e
 
     async def _tool_validate_asset(
         self,
