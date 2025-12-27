@@ -1,6 +1,9 @@
 # SKYYROSE SIGNATURE COLLECTION PAGE SPECIFICATION
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro
 
 ---
@@ -14,16 +17,16 @@ page:
   template: "elementor_header_footer"
   collection_id: "signature"
   woocommerce_category: "signature"
-  
+
   seo:
     title: "SIGNATURE | Premium Essentials Built to Last | SkyyRose"
     description: "SIGNATURE - elevated essentials for your everyday wardrobe. Premium Pima cotton, reinforced construction, inclusive sizing. The foundation of luxury streetwear."
     keywords: ["premium basics", "luxury essentials", "quality streetwear", "elevated basics", "wardrobe staples"]
-    
+
   og:
     image: "/assets/images/og-signature.jpg"
     type: "product.group"
-    
+
   brand_essence:
     mood: "Clean, minimal, confident, timeless"
     tagline: "The Foundation. Built to Last."
@@ -48,12 +51,12 @@ collection_tokens:
     text_primary: "#0D0D0D"
     text_secondary: "#6B6B6B"
     text_gold: "#D4AF37"
-    
+
   gradients:
     gold: "linear-gradient(135deg, #D4AF37 0%, #F5D77A 50%, #D4AF37 100%)"
     rose_gold: "linear-gradient(135deg, #B76E79 0%, #E8B4BC 50%, #B76E79 100%)"
     subtle: "linear-gradient(180deg, #FAFAFA 0%, #F5F3EF 100%)"
-    
+
   typography:
     headings:
       color: "#0D0D0D"
@@ -62,7 +65,7 @@ collection_tokens:
     body:
       color: "#4A4A4A"
       family: "Inter"
-      
+
   ui_elements:
     badge_new:
       background: "#D4AF37"      # Gold
@@ -75,7 +78,7 @@ collection_tokens:
       color: "#FAFAFA"
       hover_background: "#D4AF37"
       hover_color: "#0D0D0D"
-      
+
   imagery:
     style: "Clean, minimal, premium"
     background: "White or cream seamless"
@@ -105,7 +108,7 @@ section:
     position: "center center"
     size: "cover"
     overlay: "linear-gradient(180deg, rgba(250,250,250,0.1) 0%, rgba(250,250,250,0.3) 100%)"
-    
+
   image_specs:
     style: "Clean white/grey studio"
     subject: "Single model or neatly arranged product flat lay"
@@ -123,7 +126,7 @@ content:
     weight: 400
     letter_spacing: "0.2em"
     color: "#0D0D0D"
-    
+
   tagline:
     text: "The Foundation. Built to Last."
     font: "Inter"
@@ -132,7 +135,7 @@ content:
     letter_spacing: "0.15em"
     color: "#6B6B6B"
     margin_top: "16px"
-    
+
   cta_primary:
     text: "BUILD YOUR WARDROBE"
     url: "#categories"
@@ -235,19 +238,19 @@ content:
     url: "/assets/images/signature-fabric-detail.jpg"
     alt: "Close-up of premium Pima cotton fabric"
     type: "macro_detail"
-    
+
   headline:
     text: "ESSENTIALS, ELEVATED"
     font: "Cormorant Garamond"
     size: "clamp(1.5rem, 4vw, 2.25rem)"
     color: "#0D0D0D"
-    
+
   body_copy:
     paragraphs:
       - text: "The SIGNATURE collection isn't about what's new. It's about what lasts."
         style: "primary"
         color: "#4A4A4A"
-        
+
       - text: "Premium cotton. Reinforced stitching. Cuts that flatter every body. These are the pieces you'll reach for first, always."
         style: "secondary"
         color: "#6B6B6B"
@@ -280,39 +283,39 @@ content:
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.75rem)"
     color: "#0D0D0D"
-    
+
   categories:
     - name: "TOPS"
       count: 12
       icon: "👕"
       image: "/assets/images/categories/tops.jpg"
       url: "/collection/signature/?category=tops"
-      
+
     - name: "BOTTOMS"
       count: 8
       icon: "👖"
       image: "/assets/images/categories/bottoms.jpg"
       url: "/collection/signature/?category=bottoms"
-      
+
     - name: "OUTERWEAR"
       count: 6
       icon: "🧥"
       image: "/assets/images/categories/outerwear.jpg"
       url: "/collection/signature/?category=outerwear"
-      
+
     - name: "ACCESSORIES"
       count: 4
       icon: "🧢"
       image: "/assets/images/categories/accessories.jpg"
       url: "/collection/signature/?category=accessories"
-      
+
     - name: "SETS"
       count: 3
       icon: "📦"
       image: "/assets/images/categories/sets.jpg"
       url: "/collection/signature/?category=sets"
       badge: "SAVE 20%"
-      
+
   card_style:
     background: "#FFFFFF"
     border: "1px solid rgba(0,0,0,0.05)"
@@ -360,7 +363,7 @@ content:
       label: "Sort"
       default: "Featured"
       options: ["Featured", "Price: Low to High", "Price: High to Low", "Newest"]
-      
+
   product_grid:
     source: "woocommerce"
     category: "signature"
@@ -371,7 +374,7 @@ content:
     gap: "16px"
     pagination: true
     products_per_page: 16
-    
+
   product_card:
     style: "clean"
     background: "#FFFFFF"
@@ -413,7 +416,7 @@ content:
     font: "Cormorant Garamond"
     size: "1.25rem"
     color: "#0D0D0D"
-    
+
   proof_points:
     columns:
       desktop: 6
@@ -422,22 +425,22 @@ content:
     items:
       - icon: "🌿"
         label: "Premium Pima Cotton"
-        
+
       - icon: "🧵"
         label: "Reinforced Seams"
-        
+
       - icon: "✓"
         label: "Pre-shrunk & Tested"
-        
+
       - icon: "📐"
         label: "Inclusive Sizing (XS-3XL)"
-        
+
       - icon: "↩️"
         label: "100-Day Returns"
-        
+
       - icon: "🌍"
         label: "Sustainably Made"
-        
+
   style:
     icon_size: "2rem"
     label_font: "Inter"
@@ -472,25 +475,25 @@ content:
     url: "/assets/images/signature-bundle.jpg"
     alt: "The Starter Bundle: Tee, Hoodie, and Jogger neatly folded"
     style: "Neatly stacked/folded products on clean background"
-    
+
   badge:
     text: "SAVE 20%"
     style:
       background: "#059669"
       color: "#FFFFFF"
-      
+
   headline:
     text: "THE STARTER BUNDLE"
     font: "Cormorant Garamond"
     size: "clamp(1.5rem, 4vw, 2rem)"
     color: "#0D0D0D"
-    
+
   subline:
     text: "3 essentials. 1 perfect foundation."
     font: "Inter"
     size: "1rem"
     color: "#6B6B6B"
-    
+
   pricing:
     original: "$375"
     sale: "$299"
@@ -501,12 +504,12 @@ content:
       font_size: "2rem"
       font_weight: 600
       color: "#0D0D0D"
-      
+
   bundle_contents:
     - "Essential Crew Tee"
     - "Signature Heavyweight Hoodie"
     - "Classic Fit Jogger"
-    
+
   cta:
     text: "BUILD YOUR BUNDLE"
     url: "/product/starter-bundle/"
@@ -527,25 +530,25 @@ page_sections:
   - section_id: "sig_hero"
     order: 1
     visible: true
-    
+
   - section_id: "sig_philosophy"
     order: 2
     visible: true
-    
+
   - section_id: "sig_categories"
     order: 3
     visible: true
     anchor: "categories"
-    
+
   - section_id: "sig_products"
     order: 4
     visible: true
     anchor: "products"
-    
+
   - section_id: "sig_quality"
     order: 5
     visible: true
-    
+
   - section_id: "sig_bundle"
     order: 6
     visible: true
@@ -558,30 +561,30 @@ execution_checklist:
   phase_1_setup:
     - task: "Create 'signature' WooCommerce category"
       status: "pending"
-      
+
     - task: "Create subcategory tags: tops, bottoms, outerwear, accessories, sets"
       status: "pending"
-      
+
   phase_2_content:
     - task: "Create hero image (clean studio shot)"
       specs:
         style: "Minimal white/grey studio"
         subject: "Model in signature basics or product flat lay"
       status: "pending"
-      
+
     - task: "Create fabric detail macro image"
       status: "pending"
-      
+
     - task: "Create 5 category card images"
       status: "pending"
-      
+
     - task: "Create bundle product image"
       status: "pending"
-      
+
   phase_3_build:
     - task: "Build all 6 sections"
       status: "pending"
-      
+
   phase_4_products:
     - task: "Create bundle product with 20% discount"
       status: "pending"

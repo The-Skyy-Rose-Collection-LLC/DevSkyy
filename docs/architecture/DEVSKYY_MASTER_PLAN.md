@@ -11,6 +11,7 @@ Upload basic product details â†’ System generates EVERYTHING â†’ Auto-
 ## ðŸ§  2-LLM Agreement Architecture
 
 ### Core Principle
+>
 > **Every output is validated by TWO industry-leading AI models before deployment.**
 >
 > This eliminates hallucinations, ensures quality, and produces outcomes that exceed single-model capabilities.
@@ -89,6 +90,7 @@ Upload basic product details â†’ System generates EVERYTHING â†’ Auto-
 ### Step-by-Step Breakdown
 
 #### Step 1: UPLOAD (Human Input - 2 minutes)
+
 ```yaml
 Required:
   - Product Name
@@ -104,6 +106,7 @@ Optional:
 ```
 
 #### Step 2: ENHANCE (AI Generation - 5 minutes)
+
 ```yaml
 Content Generated:
   - Full Product Description (500-1000 words)
@@ -126,6 +129,7 @@ Visuals Generated:
 ```
 
 #### Step 3: VALIDATE (2-LLM Agreement - 1 minute)
+
 ```yaml
 Quality Checks:
   - Content Quality Score: â‰¥90%
@@ -142,6 +146,7 @@ If Failed:
 ```
 
 #### Step 4: DEPLOY (Auto-Injection - 2 minutes)
+
 ```yaml
 WordPress/Elementor:
   - Create WooCommerce Product
@@ -160,6 +165,7 @@ Technical:
 ```
 
 #### Step 5: PROMOTE (Marketing Launch - Automated)
+
 ```yaml
 Social Media:
   - Instagram Post + Stories + Reel
@@ -184,6 +190,7 @@ Influencer:
 ```
 
 #### Step 6: OPTIMIZE (Continuous - Forever)
+
 ```yaml
 Self-Healing:
   - Error detection & auto-fix
@@ -571,6 +578,7 @@ Reporting:
 **Phase 1 starts NOW.**
 
 Which component should we build first?
+
 1. ðŸ”§ WordPress/WooCommerce Integration
 2. ðŸ§  2-LLM Orchestration Framework
 3. ðŸ“ Content Generation Engine

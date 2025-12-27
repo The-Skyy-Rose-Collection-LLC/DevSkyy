@@ -13,6 +13,7 @@ pip install -r requirements.txt
 ```
 
 Required packages:
+
 - `httpx` - HTTP client
 - `pydantic` - Data validation
 - `tenacity` - Retry logic
@@ -60,20 +61,20 @@ from orchestration import OpenAIClient, Message, MessageRole
 async def main():
     # Initialize client
     client = OpenAIClient()
-    
+
     # Create message
     messages = [
         Message(role=MessageRole.USER, content="What is Python?")
     ]
-    
+
     # Get completion
     response = await client.complete(messages=messages, model="gpt-4o-mini")
-    
+
     # Print result
     print(response.content)
     print(f"Tokens used: {response.total_tokens}")
     print(f"Latency: {response.latency_ms:.0f}ms")
-    
+
     # Close client
     await client.close()
 
@@ -128,25 +129,25 @@ from orchestration import LLMOrchestrator, TaskType
 
 async def main():
     orchestrator = LLMOrchestrator()
-    
+
     # Code generation - automatically uses Claude 3.5 Sonnet
     result = await orchestrator.complete(
         prompt="Write a Python function to sort a list",
         task_type=TaskType.CODE_GENERATION
     )
-    
+
     # Reasoning - automatically uses o1-preview
     result = await orchestrator.complete(
         prompt="Solve this logic puzzle...",
         task_type=TaskType.REASONING
     )
-    
+
     # Fast chat - automatically uses Llama 3.1 8B on Groq
     result = await orchestrator.complete(
         prompt="Hello!",
         task_type=TaskType.REAL_TIME
     )
-    
+
     print(f"Model used: {result.model}")
     print(f"Content: {result.content}")
 
@@ -160,16 +161,16 @@ asyncio.run(main())
 ```python
 async def stream_example():
     client = OpenAIClient()
-    
+
     messages = [
         Message(role=MessageRole.USER, content="Tell me a story")
     ]
-    
+
     print("Streaming response: ", end="", flush=True)
-    
+
     async for chunk in client.stream(messages=messages, model="gpt-4o-mini"):
         print(chunk.content, end="", flush=True)
-    
+
     print()  # New line
     await client.close()
 
@@ -278,28 +279,33 @@ except Exception as e:
 ## Best Practices
 
 1. **Always close clients** when done:
+
    ```python
    await client.close()
    ```
 
 2. **Use the orchestrator** for automatic model selection:
+
    ```python
    orchestrator = LLMOrchestrator()
    result = await orchestrator.complete(prompt, task_type=TaskType.CODE_GENERATION)
    ```
 
 3. **Set appropriate timeouts**:
+
    ```python
    client = OpenAIClient(timeout=30.0)
    ```
 
 4. **Monitor token usage**:
+
    ```python
    print(f"Tokens: {response.total_tokens}")
    print(f"Cost: ${response.total_tokens * 0.00001}")  # Approximate
    ```
 
 5. **Use streaming for long responses**:
+
    ```python
    async for chunk in client.stream(messages):
        print(chunk.content, end="")
@@ -310,21 +316,25 @@ except Exception as e:
 ## Troubleshooting
 
 ### "No module named 'tenacity'"
+
 ```bash
 pip install tenacity
 ```
 
 ### "API key not found"
+
 ```bash
 export OPENAI_API_KEY="your-key-here"
 ```
 
 ### "Connection timeout"
+
 ```python
 client = OpenAIClient(timeout=60.0)  # Increase timeout
 ```
 
 ### Check available providers
+
 ```python
 from orchestration import LLMRegistry
 
@@ -345,4 +355,3 @@ print(f"Available: {available}")
 ---
 
 **Happy coding with 6 LLM providers!** 🚀
-

@@ -132,6 +132,7 @@ dev/
 ## MCP Tools
 
 ### TypeScript Tools
+
 - `ts_type_check` - Run TypeScript type checking
 - `ts_analyze_config` - Analyze tsconfig.json
 - `ts_dependency_audit` - Audit npm dependencies
@@ -140,6 +141,7 @@ dev/
 - `ts_generate_types` - Generate type definitions
 
 ### Python Tools
+
 - `py_type_check` - Run mypy/pyright
 - `py_lint` - Run ruff/flake8
 - `py_format` - Run black/isort

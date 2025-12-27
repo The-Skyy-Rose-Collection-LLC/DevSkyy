@@ -64,14 +64,16 @@ The MCP server supports two backend modes:
 
 ### Environment Variables
 
-#### To use critical-fuchsia-ape:
+#### To use critical-fuchsia-ape
+
 ```bash
 export MCP_BACKEND=critical-fuchsia-ape
 export CRITICAL_FUCHSIA_APE_URL=http://critical-fuchsia-ape:8000
 export CRITICAL_FUCHSIA_APE_KEY=sk-your-key-here
 ```
 
-#### To use default DevSkyy backend:
+#### To use default DevSkyy backend
+
 ```bash
 export MCP_BACKEND=devskyy
 export DEVSKYY_API_URL=http://localhost:8000
@@ -267,8 +269,8 @@ python devskyy_mcp.py
 
 ## Documentation
 
-- **MCP Specification**: https://modelcontextprotocol.io
-- **FastMCP Guide**: https://gofastmcp.com
+- **MCP Specification**: <https://modelcontextprotocol.io>
+- **FastMCP Guide**: <https://gofastmcp.com>
 - **DevSkyy Docs**: [See main documentation](../docs/)
 
 ## Support
@@ -283,5 +285,5 @@ For issues or questions:
 
 ---
 
-**Last Updated**: 2025-12-24  
+**Last Updated**: 2025-12-24
 **Version**: 1.0.0

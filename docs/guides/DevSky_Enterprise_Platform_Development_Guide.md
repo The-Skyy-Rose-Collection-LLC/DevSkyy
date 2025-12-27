@@ -263,6 +263,7 @@ result = crew.kickoff(inputs={"category": "fashion", "region": "US"})
 ### Step-by-step FastAPI deployment
 
 **1. Project structure:**
+
 ```
 project/
 ├── api/
@@ -272,6 +273,7 @@ project/
 ```
 
 **2. FastAPI application (api/main.py):**
+
 ```python
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -297,6 +299,7 @@ def get_product(product_id: int):
 
 **3. Environment configuration:**
 Create a `.env.local` file with your configuration:
+
 ```bash
 DATABASE_URL=your-database-url
 CORS_ORIGINS=https://yourdomain.com,http://localhost:5173

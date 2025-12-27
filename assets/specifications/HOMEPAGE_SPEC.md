@@ -1,7 +1,11 @@
 # SKYYROSE HOMEPAGE SPECIFICATION
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro
+
 # Theme: Shoptimizer 2.9.0
 
 ---
@@ -42,7 +46,7 @@ design_tokens:
       black: "#0D0D0D"
       white: "#FAFAFA"
       cream: "#F5F3EF"
-      
+
     # Metallic Accents (from all collections)
     metallics:
       gold: "#D4AF37"              # From SIGNATURE
@@ -50,14 +54,14 @@ design_tokens:
       soft_gold: "#C9A962"         # Soft Gold
       silver: "#C0C0C0"            # From BLACK ROSE
       chrome: "#E8E8E8"            # Bright Silver
-      
+
     # Warm Tones (from LOVE HURTS)
     warm:
       deep_rose: "#8B3A3A"
       soft_rose: "#D4A5A5"
       warm_dark: "#2D1F1F"
       warm_cream: "#FDF8F8"
-      
+
     # Collection-Specific Accents
     collections:
       black_rose:
@@ -72,20 +76,20 @@ design_tokens:
         primary: "#0D0D0D"
         accent: "#D4AF37"          # Gold
         secondary: "#B76E79"       # Rose Gold
-        
+
     # UI Feedback
     ui:
       success: "#059669"
       warning: "#D97706"
       error: "#DC2626"
-      
+
     # Gradients (Mixed)
     gradients:
       hero: "linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 40%, #2D1F1F 70%, #0D0D0D 100%)"
       metallic_shimmer: "linear-gradient(90deg, #C0C0C0 0%, #D4AF37 50%, #B76E79 100%)"
       gold: "linear-gradient(135deg, #D4AF37 0%, #F5D77A 50%, #D4AF37 100%)"
       rose: "linear-gradient(135deg, #8B3A3A 0%, #D4A5A5 50%, #8B3A3A 100%)"
-      
+
   typography:
     headings:
       family: "'Cormorant Garamond', 'Playfair Display', serif"
@@ -100,7 +104,7 @@ design_tokens:
       body: "1rem"
       small: "0.875rem"
       xs: "0.75rem"
-      
+
   spacing:
     base: "8px"
     section_padding:
@@ -108,13 +112,13 @@ design_tokens:
       tablet: "60px"
       mobile: "48px"
     container_max: "1200px"
-    
+
   breakpoints:
     mobile: "375px"
     tablet: "768px"
     desktop: "1024px"
     wide: "1440px"
-    
+
   animations:
     duration:
       fast: "150ms"
@@ -159,7 +163,7 @@ content:
     weight: 400
     letter_spacing: "0.3em"
     color: "#FAFAFA"
-    
+
   tagline:
     type: "text"
     value: "WHERE LOVE MEETS LUXURY"
@@ -169,7 +173,7 @@ content:
     letter_spacing: "0.2em"
     color: "rgba(250, 250, 250, 0.8)"
     margin_top: "16px"
-    
+
   cta_primary:
     type: "button"
     text: "SHOP THE COLLECTIONS"
@@ -187,7 +191,7 @@ content:
         color: "#FAFAFA"
         transition: "all 0.3s ease"
     margin_top: "32px"
-    
+
   scroll_indicator:
     type: "icon"
     icon: "chevron-down"
@@ -276,7 +280,7 @@ agent_tasks:
   - agent: "content_agent"
     task: "Generate hero video content brief for Oakland sunset/lifestyle shoot"
     priority: "high"
-    
+
   - agent: "media_agent"
     task: "Source/create hero background video (15-30s loop, 4K, <10MB compressed)"
     priority: "high"
@@ -286,7 +290,7 @@ agent_tasks:
       format: "MP4 (H.264)"
       max_size: "10MB"
       content: "Oakland cityscape, Lake Merritt, model in SkyyRose pieces"
-      
+
   - agent: "seo_agent"
     task: "Optimize hero section for Core Web Vitals (LCP target <2.5s)"
     priority: "high"
@@ -325,7 +329,7 @@ collections:
     accent_color: "#C9A962"
     hover_effect: "zoom_overlay"
     badge: null
-    
+
   - id: "love_hurts"
     name: "LOVE HURTS"
     tagline: "Wear Your Heart. Own Your Story."
@@ -337,7 +341,7 @@ collections:
     accent_color: "#D4A5A5"
     hover_effect: "zoom_overlay"
     badge: null
-    
+
   - id: "signature"
     name: "SIGNATURE"
     tagline: "The Foundation. Built to Last."
@@ -481,7 +485,7 @@ agent_tasks:
         content: "Warm, emotional portrait, Oakland backdrop, burgundy tones"
       - file: "signature-card.jpg"
         content: "Clean, minimal studio shot, neutral tones, essential pieces"
-        
+
   - agent: "wordpress_agent"
     task: "Create WooCommerce product categories: BLACK ROSE, LOVE HURTS, SIGNATURE"
     priority: "high"
@@ -514,37 +518,37 @@ featured_product:
   dynamic: true
   source: "woocommerce_featured"
   fallback_product_id: 123
-  
+
   display:
     badge:
       text: "NEW ARRIVAL"
       background: "#0D0D0D"
       color: "#FAFAFA"
-      
+
     title:
       format: "{{product.name}}"
       font: "Cormorant Garamond"
       size: "clamp(1.5rem, 3vw, 2rem)"
-      
+
     price:
       format: "${{product.price}}"
       font: "Inter"
       size: "1.25rem"
       color: "#6B6B6B"
-      
+
     rating:
       show: true
       format: "stars"
       show_count: true
-      
+
     description:
       source: "short_description"
       max_chars: 100
-      
+
     trust_element:
       text: "✓ Free shipping over $150"
       color: "#059669"
-      
+
     cta:
       text: "ADD TO BAG"
       style: "primary"
@@ -665,13 +669,13 @@ function skyyrose_get_featured_product() {
         'orderby' => 'date',
         'order' => 'DESC'
     );
-    
+
     $featured = new WP_Query($args);
-    
+
     if ($featured->have_posts()) {
         $featured->the_post();
         $product = wc_get_product(get_the_ID());
-        
+
         return array(
             'id' => $product->get_id(),
             'name' => $product->get_name(),
@@ -683,7 +687,7 @@ function skyyrose_get_featured_product() {
             'url' => $product->get_permalink()
         );
     }
-    
+
     wp_reset_postdata();
     return null;
 }
@@ -696,7 +700,7 @@ agent_tasks:
   - agent: "wordpress_agent"
     task: "Set up featured product meta field and rotation logic"
     priority: "medium"
-    
+
   - agent: "media_agent"
     task: "Create featured product lifestyle image (1200x800px, on-model shot)"
     priority: "high"
@@ -736,7 +740,7 @@ content:
     size: "clamp(1.5rem, 4vw, 2.5rem)"
     color: "#FAFAFA"
     margin_bottom: "24px"
-    
+
   body:
     text: "From Oakland to the world, SkyyRose blends Bay Area authenticity with luxury craftsmanship. This isn't fast fashion—it's forever fashion."
     font: "Inter"
@@ -745,7 +749,7 @@ content:
     color: "rgba(250, 250, 250, 0.8)"
     max_chars: 200
     margin_bottom: "32px"
-    
+
   cta:
     text: "OUR STORY"
     url: "/about/"
@@ -845,7 +849,7 @@ agent_tasks:
       time: "Golden hour or blue hour"
       style: "Slightly desaturated, moody"
       landmarks: "Lake Merritt, downtown skyline optional"
-      
+
   - agent: "content_agent"
     task: "Draft brand story page content (500-800 words)"
     priority: "medium"
@@ -876,12 +880,12 @@ ugc:
     text: "THE SKYYROSE COMMUNITY"
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.75rem)"
-    
+
   source:
     type: "instagram_feed"
     hashtag: "#SKYYROSE"
     fallback: "curated_images"
-    
+
   grid:
     columns:
       desktop: 6
@@ -890,7 +894,7 @@ ugc:
     images: 6
     aspect_ratio: "1:1"
     gap: "8px"
-    
+
   footer:
     handle: "@skyyrose"
     hashtag: "#SKYYROSE"
@@ -956,7 +960,7 @@ plugins:
         columns_mobile: 3
         show_header: false
         show_follow_button: false
-        
+
   alternative:
     - name: "Spotlight Social Media Feeds"
       slug: "developer/developer"
@@ -969,11 +973,11 @@ agent_tasks:
   - agent: "social_agent"
     task: "Set up Instagram Business account and API integration"
     priority: "medium"
-    
+
   - agent: "wordpress_agent"
     task: "Install and configure Smash Balloon Instagram Feed plugin"
     priority: "medium"
-    
+
   - agent: "media_agent"
     task: "Create 6 placeholder UGC-style images for pre-launch"
     priority: "low"
@@ -1006,13 +1010,13 @@ newsletter:
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.5rem)"
     color: "#FAFAFA"
-    
+
   subheadline:
     text: "First access to drops. Exclusive offers. No spam—just love."
     font: "Inter"
     size: "0.875rem"
     color: "rgba(250, 250, 250, 0.7)"
-    
+
   form:
     provider: "klaviyo"
     list_id: "{{KLAVIYO_LIST_ID}}"
@@ -1024,11 +1028,11 @@ newsletter:
       text: "JOIN"
       style: "primary_inverted"
     success_message: "Welcome to the inner circle! Check your inbox."
-    
+
   privacy:
     text: "🔒 We respect your privacy"
     link: "/privacy-policy/"
-    
+
   incentive:
     text: "Get 10% off your first order"
     show: true
@@ -1105,10 +1109,10 @@ newsletter:
 <div class="klaviyo-form-container">
   <form id="skyyrose-newsletter" class="klaviyo-form">
     <div class="form-row">
-      <input 
-        type="email" 
-        name="email" 
-        placeholder="Email Address" 
+      <input
+        type="email"
+        name="email"
+        placeholder="Email Address"
         required
         class="klaviyo-email-input"
       />
@@ -1121,18 +1125,18 @@ newsletter:
   // Klaviyo API Integration
   document.getElementById('skyyrose-newsletter').addEventListener('submit', function(e) {
     e.preventDefault();
-    
+
     var email = this.querySelector('input[name="email"]').value;
-    
+
     _learnq.push(['identify', {
       '$email': email,
       'Newsletter Source': 'Homepage'
     }]);
-    
+
     _learnq.push(['track', 'Newsletter Signup', {
       'Source': 'Homepage Footer'
     }]);
-    
+
     // Show success message
     this.innerHTML = '<p class="success">Welcome to the inner circle! ✓</p>';
   });
@@ -1201,7 +1205,7 @@ newsletter:
   .klaviyo-form .form-row {
     flex-direction: column;
   }
-  
+
   .klaviyo-submit {
     width: 100%;
   }
@@ -1215,7 +1219,7 @@ agent_tasks:
   - agent: "marketing_agent"
     task: "Set up Klaviyo account and create homepage newsletter list"
     priority: "high"
-    
+
   - agent: "wordpress_agent"
     task: "Install Klaviyo plugin and configure API integration"
     priority: "high"
@@ -1256,7 +1260,7 @@ footer:
           url: "/collection/signature/"
         - text: "New Arrivals"
           url: "/shop/?orderby=date"
-          
+
     - title: "SUPPORT"
       links:
         - text: "Shipping & Delivery"
@@ -1269,7 +1273,7 @@ footer:
           url: "/contact/"
         - text: "FAQ"
           url: "/faq/"
-          
+
     - title: "COMPANY"
       links:
         - text: "Our Story"
@@ -1280,7 +1284,7 @@ footer:
           url: "/sustainability/"
         - text: "Careers"
           url: "/careers/"
-          
+
     - title: "CONNECT"
       links:
         - text: "Instagram"
@@ -1295,7 +1299,7 @@ footer:
           url: "https://pinterest.com/skyyrose"
           external: true
           icon: "pinterest"
-          
+
   bottom_bar:
     copyright: "© {{year}} SkyyRose. All rights reserved."
     links:
@@ -1434,27 +1438,27 @@ page_sections:
   - section_id: "hero"
     order: 1
     visible: true
-    
+
   - section_id: "collection_triptych"
     order: 2
     visible: true
-    
+
   - section_id: "featured_product"
     order: 3
     visible: true
-    
+
   - section_id: "brand_story"
     order: 4
     visible: true
-    
+
   - section_id: "ugc_gallery"
     order: 5
     visible: true
-    
+
   - section_id: "newsletter"
     order: 6
     visible: true
-    
+
   - section_id: "footer"
     order: 7
     visible: true
@@ -1469,7 +1473,7 @@ performance:
     lcp: "<2.5s"
     fid: "<100ms"
     cls: "<0.1"
-    
+
   optimization:
     - lazy_load_images: true
     - lazy_load_videos: true
@@ -1477,7 +1481,7 @@ performance:
     - defer_non_critical_css: true
     - minify_css: true
     - minify_js: true
-    
+
   image_specs:
     hero_video:
       format: "MP4 (H.264)"
@@ -1505,52 +1509,52 @@ execution_checklist:
         - "instagram-feed"
         - "klaviyo"
       status: "pending"
-      
+
     - task: "Configure global design tokens in Elementor"
       status: "pending"
-      
+
     - task: "Create page in WordPress"
       status: "pending"
-      
+
   phase_2_content:
     - task: "Upload hero video/image"
       status: "pending"
-      
+
     - task: "Upload collection card images"
       status: "pending"
-      
+
     - task: "Set featured product"
       status: "pending"
-      
+
     - task: "Upload brand story background"
       status: "pending"
-      
+
   phase_3_build:
     - task: "Build Section 1: Hero"
       status: "pending"
-      
+
     - task: "Build Section 2: Collection Triptych"
       status: "pending"
-      
+
     - task: "Build Section 3: Featured Product"
       status: "pending"
-      
+
     - task: "Build Section 4: Brand Story"
       status: "pending"
-      
+
     - task: "Build Section 5: UGC Gallery"
       status: "pending"
-      
+
     - task: "Build Section 6: Newsletter"
       status: "pending"
-      
+
   phase_4_optimize:
     - task: "Mobile responsive testing"
       status: "pending"
-      
+
     - task: "Page speed optimization"
       status: "pending"
-      
+
     - task: "SEO meta configuration"
       status: "pending"
 ```
@@ -1563,29 +1567,29 @@ execution_checklist:
 api_endpoints:
   wordpress:
     base_url: "{{SITE_URL}}/wp-json"
-    
+
     pages:
       create: "POST /wp/v2/pages"
       update: "PUT /wp/v2/pages/{id}"
       get: "GET /wp/v2/pages/{id}"
-      
+
     media:
       upload: "POST /wp/v2/media"
       get: "GET /wp/v2/media/{id}"
-      
+
   woocommerce:
     base_url: "{{SITE_URL}}/wp-json/wc/v3"
-    
+
     products:
       featured: "GET /products?featured=true"
       categories: "GET /products/categories"
-      
+
   elementor:
     template_import: "POST /elementor/v1/template/import"
-    
+
   klaviyo:
     base_url: "https://a.klaviyo.com/api"
-    
+
     lists:
       subscribe: "POST /v2/list/{list_id}/subscribe"
 ```

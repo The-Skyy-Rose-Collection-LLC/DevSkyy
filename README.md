@@ -37,6 +37,7 @@ DevSkyy includes five immersive Three.js-powered collection landing pages:
 | **Runway** | Fashion runway | Catwalk, lighting rigs, camera systems |
 
 Preview demos locally:
+
 ```bash
 make demo-black-rose    # Gothic rose garden
 make demo-signature     # Outdoor luxury
@@ -223,16 +224,16 @@ from base import SuperAgent, AgentConfig
 class MyAgent(SuperAgent):
     async def _plan(self, request, context):
         return [PlanStep(...)]
-    
+
     async def _retrieve(self, request, plan, context):
         return RetrievalContext(...)
-    
+
     async def _execute_step(self, step, retrieval_context, context):
         return ExecutionResult(...)
-    
+
     async def _validate(self, results, context):
         return ValidationResult(...)
-    
+
     async def _emit(self, results, validation, context):
         return {"status": "success", ...}
 ```

@@ -1,13 +1,13 @@
 /**
  * Runway Experience - 3D Collection Landing Template
- * 
+ *
  * A virtual fashion runway for showcasing SkyyRose collections.
  * Features:
  * - Animated model walk cycle
  * - Dynamic camera following
  * - Dramatic lighting effects
  * - Audience ambiance
- * 
+ *
  * @author DevSkyy Platform Team
  * @version 1.0.0
  */
@@ -110,7 +110,7 @@ export class RunwayExperience {
     // Runway edge lights
     const edgeLightGeometry = new THREE.BoxGeometry(0.1, 0.05, runwayLength);
     const edgeLightMaterial = new THREE.MeshBasicMaterial({ color: 0xd4af37 });
-    
+
     const leftEdge = new THREE.Mesh(edgeLightGeometry, edgeLightMaterial);
     leftEdge.position.set(-runwayWidth / 2, 0.025, 0);
     this.scene.add(leftEdge);
@@ -288,4 +288,3 @@ export class RunwayExperience {
 }
 
 export default RunwayExperience;
-

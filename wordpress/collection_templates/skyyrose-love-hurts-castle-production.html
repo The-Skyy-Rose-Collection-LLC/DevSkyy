@@ -6,14 +6,14 @@
     <title>SKYYROSE | LOVE HURTS CASTLE</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #000;
             color: #fff;
             overflow: hidden;
         }
-        
+
         #loading-screen {
             position: fixed;
             top: 0;
@@ -28,12 +28,12 @@
             z-index: 1000;
             transition: opacity 0.8s ease;
         }
-        
+
         #loading-screen.hidden {
             opacity: 0;
             pointer-events: none;
         }
-        
+
         .loading-logo {
             font-size: 3rem;
             font-weight: 300;
@@ -44,12 +44,12 @@
             -webkit-text-fill-color: transparent;
             animation: pulse 2s ease-in-out infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
         }
-        
+
         .loading-bar-container {
             width: 300px;
             height: 2px;
@@ -57,21 +57,21 @@
             border-radius: 1px;
             overflow: hidden;
         }
-        
+
         .loading-bar {
             height: 100%;
             background: linear-gradient(90deg, #9B59B6, #E91E63);
             width: 0%;
             transition: width 0.3s ease;
         }
-        
+
         .loading-text {
             margin-top: 1rem;
             font-size: 0.8rem;
             letter-spacing: 0.3rem;
             color: rgba(233, 30, 99, 0.7);
         }
-        
+
         #canvas-container {
             position: fixed;
             top: 0;
@@ -79,7 +79,7 @@
             width: 100%;
             height: 100%;
         }
-        
+
         #ui-overlay {
             position: fixed;
             top: 0;
@@ -89,28 +89,28 @@
             pointer-events: none;
             z-index: 100;
         }
-        
+
         .brand-header {
             position: absolute;
             top: 2rem;
             left: 2rem;
             pointer-events: auto;
         }
-        
+
         .brand-name {
             font-size: 1.5rem;
             font-weight: 300;
             letter-spacing: 0.5rem;
             color: #E91E63;
         }
-        
+
         .collection-name {
             font-size: 0.7rem;
             letter-spacing: 0.4rem;
             color: rgba(155, 89, 182, 0.8);
             margin-top: 0.3rem;
         }
-        
+
         .tagline {
             font-size: 0.6rem;
             letter-spacing: 0.2rem;
@@ -118,7 +118,7 @@
             margin-top: 0.5rem;
             font-style: italic;
         }
-        
+
         .nav-controls {
             position: absolute;
             bottom: 2rem;
@@ -128,7 +128,7 @@
             gap: 1rem;
             pointer-events: auto;
         }
-        
+
         .nav-btn {
             padding: 0.8rem 2rem;
             background: rgba(155, 89, 182, 0.2);
@@ -140,13 +140,13 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
         }
-        
+
         .nav-btn:hover {
             background: rgba(233, 30, 99, 0.3);
             border-color: #E91E63;
             box-shadow: 0 0 20px rgba(233, 30, 99, 0.3);
         }
-        
+
         .product-panel {
             position: absolute;
             right: 2rem;
@@ -160,11 +160,11 @@
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-        
+
         .product-panel.visible {
             opacity: 1;
         }
-        
+
         .product-title {
             font-size: 1.2rem;
             font-weight: 300;
@@ -172,21 +172,21 @@
             margin-bottom: 0.5rem;
             color: #E91E63;
         }
-        
+
         .product-price {
             font-size: 1.5rem;
             font-weight: 200;
             margin-bottom: 1rem;
             color: #fff;
         }
-        
+
         .product-desc {
             font-size: 0.8rem;
             line-height: 1.8;
             color: rgba(255, 255, 255, 0.7);
             margin-bottom: 1.5rem;
         }
-        
+
         .add-to-cart {
             width: 100%;
             padding: 1rem;
@@ -199,12 +199,12 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
         }
-        
+
         .add-to-cart:hover {
             box-shadow: 0 0 30px rgba(233, 30, 99, 0.5);
             transform: translateY(-2px);
         }
-        
+
         .scene-indicator {
             position: absolute;
             bottom: 6rem;
@@ -213,7 +213,7 @@
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .indicator-dot {
             width: 8px;
             height: 8px;
@@ -223,12 +223,12 @@
             pointer-events: auto;
             transition: all 0.3s ease;
         }
-        
+
         .indicator-dot.active {
             background: #E91E63;
             box-shadow: 0 0 10px rgba(233, 30, 99, 0.8);
         }
-        
+
         #debug-info {
             position: fixed;
             top: 10px;
@@ -252,10 +252,10 @@
         </div>
         <div class="loading-text" id="loading-text">ENTERING THE CASTLE...</div>
     </div>
-    
+
     <!-- 3D Canvas -->
     <div id="canvas-container"></div>
-    
+
     <!-- UI Overlay -->
     <div id="ui-overlay">
         <div class="brand-header">
@@ -263,31 +263,31 @@
             <div class="collection-name">LOVE HURTS COLLECTION</div>
             <div class="tagline">"Where Love Meets Luxury"</div>
         </div>
-        
+
         <div class="product-panel" id="product-panel">
             <div class="product-title">HEARTBREAK VELVET JACKET</div>
             <div class="product-price">$425</div>
             <div class="product-desc">
-                Crushed velvet statement piece with hidden heartbreak embroidery. 
+                Crushed velvet statement piece with hidden heartbreak embroidery.
                 Part of the emotional expression series honoring the HURT family legacy.
                 Featuring iridescent accents and custom brass hardware.
             </div>
             <button class="add-to-cart">ADD TO CART</button>
         </div>
-        
+
         <div class="scene-indicator">
             <div class="indicator-dot active" data-scene="0"></div>
             <div class="indicator-dot" data-scene="1"></div>
             <div class="indicator-dot" data-scene="2"></div>
         </div>
-        
+
         <div class="nav-controls">
             <button class="nav-btn" id="prev-btn">â† PREV</button>
             <button class="nav-btn" id="explore-btn">EXPLORE</button>
             <button class="nav-btn" id="next-btn">NEXT â†’</button>
         </div>
     </div>
-    
+
     <div id="debug-info">Loading...</div>
 
     <script type="module">
@@ -341,7 +341,7 @@
 
         async function init() {
             log('Initializing Love Hurts Castle...');
-            
+
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x0a0510);
             scene.fog = new THREE.FogExp2(0x0a0510, 0.015);
@@ -349,7 +349,7 @@
             camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 1000);
             camera.position.set(0, 5, 15);
 
-            renderer = new THREE.WebGLRenderer({ 
+            renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 powerPreference: 'high-performance'
             });
@@ -371,7 +371,7 @@
 
             composer = new EffectComposer(renderer);
             composer.addPass(new RenderPass(scene, camera));
-            
+
             const bloomPass = new UnrealBloomPass(
                 new THREE.Vector2(window.innerWidth, window.innerHeight),
                 0.8, 0.4, 0.7
@@ -383,9 +383,9 @@
             await loadEnvironment();
             await loadModels();
             createBallroomScene();
-            
+
             updateLoadProgress(100, 'WELCOME TO THE CASTLE');
-            
+
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
                 productPanel.classList.add('visible');
@@ -398,9 +398,9 @@
 
         async function loadEnvironment() {
             updateLoadProgress(20, 'LOADING ENVIRONMENT...');
-            
+
             const rgbeLoader = new RGBELoader();
-            
+
             try {
                 const hdriTexture = await new Promise((resolve, reject) => {
                     rgbeLoader.load(
@@ -463,9 +463,9 @@
 
         async function loadModels() {
             updateLoadProgress(50, 'LOADING 3D MODELS...');
-            
+
             const gltfLoader = new GLTFLoader();
-            
+
             // Load centerpiece model
             try {
                 const helmet = await new Promise((resolve, reject) => {
@@ -499,7 +499,7 @@
                 });
                 loadedModels.centerpiece = model;
                 scene.add(model);
-                
+
                 updateLoadProgress(70, 'MODEL LOADED...');
             } catch (error) {
                 log('Model load failed, creating placeholder');
@@ -548,7 +548,7 @@
 
         function createCenterpiece() {
             const group = new THREE.Group();
-            
+
             // Heart-shaped gem
             const heartShape = new THREE.Shape();
             heartShape.moveTo(0, 0.5);

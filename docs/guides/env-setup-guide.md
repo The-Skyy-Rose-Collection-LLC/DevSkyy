@@ -21,6 +21,7 @@ uvicorn main_enterprise:app --reload --port 8000
 ## What Has Been Set Up
 
 ✅ **`.env` file created** with:
+
 - Secure JWT_SECRET_KEY (512-bit, auto-generated)
 - Secure ENCRYPTION_MASTER_KEY (256-bit, auto-generated)
 - Development defaults for database, CORS, logging
@@ -45,6 +46,7 @@ uvicorn main_enterprise:app --reload --port 8000
 ### Optional Variables (Configure When Needed)
 
 #### AI/ML APIs
+
 ```bash
 # OpenAI GPT-4
 OPENAI_API_KEY=sk-...
@@ -57,6 +59,7 @@ GOOGLE_AI_API_KEY=...
 ```
 
 #### WordPress/WooCommerce Integration
+
 ```bash
 WORDPRESS_URL=https://your-site.com
 WORDPRESS_USERNAME=admin
@@ -66,6 +69,7 @@ WOOCOMMERCE_SECRET=cs_...
 ```
 
 #### Database (Production)
+
 ```bash
 # PostgreSQL (recommended for production)
 DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/devskyy
@@ -75,11 +79,13 @@ DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/devskyy
 ```
 
 #### Caching
+
 ```bash
 REDIS_URL=redis://localhost:6379/0
 ```
 
 #### Email/SMTP
+
 ```bash
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
@@ -130,14 +136,15 @@ services:
    - ✅ Check with: `git status` (should not show `.env`)
 
 2. **Use different keys per environment**
+
    ```bash
    # Development
    cp .env .env.development
-   
+
    # Staging
    cp .env .env.staging
    python scripts/generate_secrets.py --env-file .env.staging
-   
+
    # Production
    cp .env .env.production
    python scripts/generate_secrets.py --env-file .env.production
@@ -150,6 +157,7 @@ services:
    - Google Cloud Secret Manager
 
 4. **Rotate keys regularly**
+
    ```bash
    # Regenerate keys every 90 days
    python scripts/generate_secrets.py
@@ -178,22 +186,26 @@ python scripts/generate_secrets.py --env-file .env.production
 ## Verifying Setup
 
 ### Check that .env file exists
+
 ```bash
 ls -la .env
 ```
 
 ### Verify critical variables are set
+
 ```bash
 grep -E "JWT_SECRET_KEY|ENCRYPTION_MASTER_KEY" .env
 ```
 
 ### Test application startup
+
 ```bash
 # Should start without warnings about missing keys
 uvicorn main_enterprise:app --reload --port 8000
 ```
 
 Expected output:
+
 ```
 INFO:     🚀 DevSkyy Enterprise Platform starting...
 INFO:     Environment: development
@@ -205,6 +217,7 @@ INFO:     Application startup complete.
 ### Issue: Application warns about missing JWT_SECRET_KEY
 
 **Solution:**
+
 ```bash
 # Verify .env file exists
 ls -la .env
@@ -219,6 +232,7 @@ python scripts/generate_secrets.py
 ### Issue: .env not being loaded
 
 **Solution:**
+
 ```bash
 # Ensure python-dotenv is installed
 pip install python-dotenv
@@ -230,6 +244,7 @@ pip install -e .
 ### Issue: Different key needed for production
 
 **Solution:**
+
 ```bash
 # Create production-specific .env
 cp .env .env.production
@@ -244,6 +259,7 @@ uvicorn main_enterprise:app --env-file .env.production
 ## Environment-Specific Configuration
 
 ### Development
+
 ```bash
 ENVIRONMENT=development
 DEBUG=true
@@ -252,6 +268,7 @@ DATABASE_URL=sqlite+aiosqlite:///./devskyy.db
 ```
 
 ### Staging
+
 ```bash
 ENVIRONMENT=staging
 DEBUG=false
@@ -261,6 +278,7 @@ REDIS_URL=redis://staging-redis:6379/0
 ```
 
 ### Production
+
 ```bash
 ENVIRONMENT=production
 DEBUG=false
@@ -281,4 +299,4 @@ SENTRY_DSN=https://...@sentry.io/...
 
 - Check application logs: `tail -f logs/devskyy.log`
 - Review security configuration: `cat security/jwt_oauth2_auth.py`
-- Contact support: support@skyyrose.com
+- Contact support: <support@skyyrose.com>

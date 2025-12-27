@@ -2,7 +2,7 @@
 
 ###############################################################################
 # DevSkyy MCP Server Setup Script
-# 
+#
 # This script configures Model Context Protocol (MCP) servers for Claude Desktop
 # and other MCP-compatible clients.
 #
@@ -115,7 +115,7 @@ else
         cp "$CLAUDE_CONFIG_FILE" "$BACKUP_FILE"
         echo -e "${GREEN}✓ Backed up existing config to: $BACKUP_FILE${NC}"
     fi
-    
+
     # Copy example config
     if [ -f "config/claude/desktop.example.json" ]; then
         # Update paths in config
@@ -199,4 +199,3 @@ echo -e "  • fetch             - Web content"
 echo -e "  • memory            - Persistent context"
 echo ""
 echo -e "${GREEN}Happy coding! 🚀${NC}"
-

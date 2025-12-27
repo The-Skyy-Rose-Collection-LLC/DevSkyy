@@ -15,9 +15,11 @@ Comprehensive automated code quality enforcement through multi-stage compliance 
 ## 4 Enforcement Stages
 
 ### Stage 1: Pre-commit Hooks (2-5 seconds)
+
 **Purpose**: Block bad commits locally before they reach the repository
 
 **17 Automated Checks**:
+
 - **Code Formatting**: Black (PEP 8), isort (import sorting)
 - **Linting**: Ruff (9 rule sets: pycodestyle, Pyflakes, isort, bugbear, comprehensions, pyupgrade, unused-arguments, simplify)
 - **Type Checking**: MyPy with strict configuration
@@ -28,9 +30,11 @@ Comprehensive automated code quality enforcement through multi-stage compliance 
 **Auto-fixes**: Automatically fixes formatting, imports, and whitespace issues
 
 ### Stage 2: GitHub Actions CI/CD (5-10 minutes)
+
 **Purpose**: Validate on push/PR with comprehensive testing
 
 **5 Parallel Jobs**:
+
 1. **Code Quality**: Python 3.11 & 3.12 compatibility, all pre-commit hooks
 2. **Testing**: Full pytest suite with >80% coverage requirement, Codecov integration
 3. **Security Audit**: pip-audit, Safety, Bandit with SARIF upload
@@ -38,9 +42,11 @@ Comprehensive automated code quality enforcement through multi-stage compliance 
 5. **Documentation**: Markdown validation, link checking, build verification
 
 ### Stage 3: CodeQL Security Analysis (Weekly + PR)
+
 **Purpose**: Deep vulnerability analysis with GitHub Security integration
 
 **Detects**:
+
 - SQL injection vulnerabilities
 - Cross-site scripting (XSS)
 - Hardcoded credentials
@@ -50,9 +56,11 @@ Comprehensive automated code quality enforcement through multi-stage compliance 
 - Unsafe deserialization
 
 ### Stage 4: Dependabot (Weekly)
+
 **Purpose**: Automated dependency updates with security prioritization
 
 **Features**:
+
 - Weekly scans on Mondays
 - Grouped security updates (high priority)
 - Grouped minor updates (batched)
@@ -62,6 +70,7 @@ Comprehensive automated code quality enforcement through multi-stage compliance 
 ## Configuration Files
 
 ### `.pre-commit-config.yaml`
+
 ```yaml
 repos:
   - repo: https://github.com/psf/black
@@ -80,6 +89,7 @@ repos:
 ```
 
 ### `pyproject.toml` (Security Configuration)
+
 ```toml
 [tool.bandit]
 exclude_dirs = ["tests", "legacy", "venv"]
@@ -90,6 +100,7 @@ select = ["E", "W", "F", "I", "B", "C4", "UP", "ARG", "SIM"]
 ```
 
 ### `.github/workflows/quality-check.yml`
+
 ```yaml
 jobs:
   code-quality:
@@ -105,6 +116,7 @@ jobs:
 ## Developer Workflow
 
 ### One-time Setup
+
 ```bash
 # Run the setup script
 ./setup_compliance.sh
@@ -115,6 +127,7 @@ pre-commit install
 ```
 
 ### Daily Workflow
+
 ```bash
 # Normal development - hooks run automatically
 git add .
@@ -123,6 +136,7 @@ git push                           # CI/CD validates (5-10min)
 ```
 
 ### Manual Quality Checks
+
 ```bash
 # Run all pre-commit hooks
 pre-commit run --all-files
@@ -138,6 +152,7 @@ pytest --cov             # Test with coverage
 ## Quality Metrics
 
 ### Before Implementation
+
 - **Manual code review**: 2-4 hours per PR
 - **Bug detection**: 60-70% (human error prone)
 - **Security issues**: Often missed until production
@@ -145,6 +160,7 @@ pytest --cov             # Test with coverage
 - **Feedback time**: 24-48 hours
 
 ### After Implementation
+
 - **Automated checks**: 20+ checks in 2-5 seconds
 - **Bug detection**: 95%+ (automated + human)
 - **Security issues**: Caught at commit time
@@ -152,6 +168,7 @@ pytest --cov             # Test with coverage
 - **Feedback time**: Immediate (pre-commit) + 5-10 minutes (CI)
 
 ### Performance Impact
+
 - **99.9% faster feedback** (seconds vs. hours)
 - **Zero-config enforcement** after initial setup
 - **Reduced review time** by 80%
@@ -160,30 +177,35 @@ pytest --cov             # Test with coverage
 ## Tool Specifications
 
 ### Black (Code Formatting)
+
 - **Line length**: 88 characters
 - **Target**: Python 3.11+
 - **Auto-fix**: Yes
 - **Integration**: Pre-commit + CI
 
 ### Ruff (Linting)
+
 - **Rules**: 9 rule sets (E, W, F, I, B, C4, UP, ARG, SIM)
 - **Performance**: 10-100x faster than flake8
 - **Auto-fix**: Yes (safe fixes only)
 - **Exclusions**: Legacy code directory
 
 ### MyPy (Type Checking)
+
 - **Mode**: Strict type checking
 - **Target**: Python 3.11
 - **Ignores**: Missing imports (third-party)
 - **Coverage**: All source code
 
 ### Bandit (Security)
+
 - **Scope**: Security vulnerability detection
 - **Exclusions**: Test files (assert statements)
 - **Output**: JSON + text reports
 - **Integration**: SARIF upload to GitHub Security
 
 ### Detect-secrets (Credential Scanning)
+
 - **Baseline**: `.secrets.baseline`
 - **Plugins**: 20+ secret detectors
 - **Filters**: Heuristic false positive reduction
@@ -194,6 +216,7 @@ pytest --cov             # Test with coverage
 ### Common Issues
 
 1. **Pre-commit hook failures**
+
    ```bash
    # Update hooks
    pre-commit autoupdate
@@ -206,6 +229,7 @@ pytest --cov             # Test with coverage
    ```
 
 2. **Black/isort conflicts**
+
    ```bash
    # Run in order
    isort .
@@ -213,6 +237,7 @@ pytest --cov             # Test with coverage
    ```
 
 3. **MyPy type errors**
+
    ```bash
    # Add type ignore for third-party
    import some_library  # type: ignore
@@ -222,6 +247,7 @@ pytest --cov             # Test with coverage
    ```
 
 4. **Bandit false positives**
+
    ```python
    # Skip specific check
    password = get_password()  # nosec B106
@@ -250,16 +276,19 @@ pytest --cov             # Test with coverage
 ## Integration Points
 
 ### IDE Integration
+
 - **VS Code**: Extensions for Black, Ruff, MyPy
 - **PyCharm**: Built-in support for most tools
 - **Vim/Neovim**: Plugins available
 
 ### CI/CD Integration
+
 - **GitHub Actions**: Native integration
 - **GitLab CI**: Adaptable workflows
 - **Jenkins**: Plugin support
 
 ### Monitoring Integration
+
 - **Codecov**: Coverage reporting
 - **GitHub Security**: SARIF uploads
 - **Dependabot**: Automated updates
@@ -267,6 +296,7 @@ pytest --cov             # Test with coverage
 ## Customization
 
 ### Adding New Rules
+
 ```toml
 # pyproject.toml
 [tool.ruff.lint]
@@ -274,6 +304,7 @@ select = ["E", "W", "F", "I", "B", "C4", "UP", "ARG", "SIM", "NEW"]
 ```
 
 ### Excluding Files
+
 ```yaml
 # .pre-commit-config.yaml
 exclude: |
@@ -284,6 +315,7 @@ exclude: |
 ```
 
 ### Custom Hooks
+
 ```yaml
 # .pre-commit-config.yaml
 repos:
@@ -298,16 +330,19 @@ repos:
 ## Compliance Reporting
 
 ### Daily Reports
+
 - Pre-commit hook success/failure rates
 - Most common violations
 - Developer compliance scores
 
 ### Weekly Reports
+
 - Security scan results
 - Dependency update status
 - Code quality trends
 
 ### Monthly Reports
+
 - Overall system effectiveness
 - Performance metrics
 - Recommendation for improvements

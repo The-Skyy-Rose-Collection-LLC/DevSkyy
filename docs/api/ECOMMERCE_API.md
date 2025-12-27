@@ -36,6 +36,7 @@ Content-Type: application/json
 ```
 
 **Response:**
+
 ```json
 {
   "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
@@ -69,6 +70,7 @@ Rate limits are enforced per user and per IP address.
 | Webhooks | 1000 requests | 1 minute |
 
 **Rate Limit Headers:**
+
 ```http
 X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
@@ -76,6 +78,7 @@ X-RateLimit-Reset: 1703001600
 ```
 
 **Rate Limit Exceeded Response:**
+
 ```json
 {
   "error": "rate_limit_exceeded",
@@ -99,6 +102,7 @@ Authorization: Bearer <token>  # Optional for guest carts
 ```
 
 **Response:**
+
 ```json
 {
   "cart_id": "cart_123456",
@@ -153,6 +157,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -170,6 +175,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (Out of Stock):**
+
 ```json
 {
   "error": "insufficient_inventory",
@@ -196,6 +202,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -224,6 +231,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -248,6 +256,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -285,6 +294,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (Redirect Mode):**
+
 ```json
 {
   "session_id": "cs_test_abc123",
@@ -294,6 +304,7 @@ Authorization: Bearer <token>
 ```
 
 **Response (Embedded Mode):**
+
 ```json
 {
   "session_id": "cs_test_abc123",
@@ -315,6 +326,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "session_id": "cs_test_abc123",
@@ -354,6 +366,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "payment_intent_id": "pi_test_abc123",
@@ -386,6 +399,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -423,6 +437,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -466,6 +481,7 @@ Authorization: Bearer <token>
 ```
 
 **Response:**
+
 ```json
 {
   "success": true,
@@ -488,6 +504,7 @@ Authorization: Bearer <token>
 Stripe webhooks are handled at `/api/webhooks/stripe`.
 
 **Supported Events:**
+
 - `checkout.session.completed`
 - `payment_intent.succeeded`
 - `payment_intent.payment_failed`
@@ -510,6 +527,7 @@ stripe.Webhook.construct_event(
 Fired when a customer completes a Stripe Checkout session.
 
 **Webhook Payload:**
+
 ```json
 {
   "id": "evt_abc123",
@@ -532,6 +550,7 @@ Fired when a customer completes a Stripe Checkout session.
 ```
 
 **Automated Actions:**
+
 1. Create order in database
 2. Sync order to WooCommerce
 3. Update inventory
@@ -545,6 +564,7 @@ Fired when a customer completes a Stripe Checkout session.
 Fired when a payment fails.
 
 **Webhook Payload:**
+
 ```json
 {
   "id": "evt_xyz789",
@@ -568,6 +588,7 @@ Fired when a payment fails.
 ```
 
 **Automated Actions:**
+
 1. Log payment failure
 2. Notify user via email
 3. Preserve cart for retry
@@ -698,9 +719,10 @@ All endpoints are prefixed with `/api/v1/`. Future versions will be supported al
 ## Support
 
 For API support, contact:
-- **Email**: dev@skyyrose.com
-- **Docs**: https://docs.skyyrose.com
-- **GitHub**: https://github.com/skyyrose/platform/issues
+
+- **Email**: <dev@skyyrose.com>
+- **Docs**: <https://docs.skyyrose.com>
+- **GitHub**: <https://github.com/skyyrose/platform/issues>
 
 ---
 

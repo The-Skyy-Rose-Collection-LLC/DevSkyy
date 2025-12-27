@@ -7,6 +7,7 @@ Three immersive SkyyRose 3D experiences are available on your local WordPress de
 ## Virtual Experiences
 
 ### 1. Black Rose Collection
+
 **URL**: `http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html`
 
 - **Theme**: Dark elegance and gothic luxury
@@ -15,6 +16,7 @@ Three immersive SkyyRose 3D experiences are available on your local WordPress de
 - **Collection Type**: Limited/Premium
 
 ### 2. Love Hurts Collection
+
 **URL**: `http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html`
 
 - **Theme**: Emotional expression and vulnerability
@@ -23,6 +25,7 @@ Three immersive SkyyRose 3D experiences are available on your local WordPress de
 - **Collection Type**: Statement/Emotional
 
 ### 3. Signature Collection
+
 **URL**: `http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html`
 
 - **Theme**: Timeless essentials with luxury details
@@ -121,9 +124,10 @@ curl -s -o /dev/null -w "%{http_code}" \
 ### View in Browser
 
 Open each URL directly:
-- **Black Rose**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html
-- **Love Hurts**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html
-- **Signature**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html
+
+- **Black Rose**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html>
+- **Love Hurts**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html>
+- **Signature**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html>
 
 ## File Structure
 
@@ -186,6 +190,7 @@ campaigns = {
 ## Collection Metadata
 
 ### Black Rose
+
 ```json
 {
   "id": "BLACK_ROSE",
@@ -199,6 +204,7 @@ campaigns = {
 ```
 
 ### Love Hurts
+
 ```json
 {
   "id": "LOVE_HURTS",
@@ -212,6 +218,7 @@ campaigns = {
 ```
 
 ### Signature
+
 ```json
 {
   "id": "SIGNATURE",
@@ -245,6 +252,7 @@ ls -la /wp-content/plugins/skyyrose-virtual-experience/experiences/
 ### JavaScript Errors
 
 Check browser console (F12) for:
+
 - Three.js library loading issues
 - Missing texture files
 - CORS errors
@@ -260,23 +268,27 @@ Check browser console (F12) for:
 ## Development Workflow
 
 ### 1. Start WordPress
+
 ```bash
 docker-compose up -d wordpress
 # Wait for http://localhost:8882 to be ready
 ```
 
 ### 2. Start DevSkyy MCP
+
 ```bash
 export CRITICAL_FUCHSIA_APE_KEY="your-key"
 python3 devskyy_mcp.py
 ```
 
 ### 3. Access Experiences
-- Black Rose: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html
-- Love Hurts: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html
-- Signature: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html
+
+- Black Rose: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html>
+- Love Hurts: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html>
+- Signature: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html>
 
 ### 4. Generate 3D Assets
+
 ```bash
 # Use MCP to generate new 3D models for collections
 curl -X POST http://localhost:8000/api/v1/3d/generate-from-description \
@@ -295,11 +307,13 @@ curl -X POST http://localhost:8000/api/v1/3d/generate-from-description \
 For production deployment:
 
 1. **Update WordPress URL**
+
    ```bash
    export WORDPRESS_URL=https://skyyrose.com
    ```
 
 2. **Update Experience URLs**
+
    ```bash
    export SKYYROSE_BLACK_ROSE_URL=https://skyyrose.com/experiences/black-rose/
    export SKYYROSE_LOVE_HURTS_URL=https://skyyrose.com/experiences/love-hurts/
@@ -307,6 +321,7 @@ For production deployment:
    ```
 
 3. **Deploy MCP Server**
+
    ```bash
    # Use production backend
    export MCP_BACKEND=critical-fuchsia-ape
@@ -324,6 +339,7 @@ For production deployment:
 ## Support
 
 For issues with:
+
 - **Experiences**: Check `/wp-content/plugins/skyyrose-virtual-experience/`
 - **MCP Integration**: See `docs/CRITICAL_FUCHSIA_APE_SETUP.md`
 - **3D Generation**: Use `devskyy_generate_3d_from_description` tool
@@ -331,6 +347,6 @@ For issues with:
 
 ---
 
-**Last Updated**: 2025-12-24  
-**Status**: ✅ All 3 Experiences Available  
+**Last Updated**: 2025-12-24
+**Status**: ✅ All 3 Experiences Available
 **Collections**: BLACK_ROSE, LOVE_HURTS, SIGNATURE

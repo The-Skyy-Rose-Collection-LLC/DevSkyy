@@ -34,12 +34,14 @@ console.log(`Available agents: ${agents.length}`);
 ## 📦 Features
 
 ### Core Platform
+
 - **54-Agent Ecosystem**: Complete integration with all DevSkyy agents
 - **TypeScript Support**: Full type safety and IntelliSense
 - **Real-time Monitoring**: Live agent status and task tracking
 - **Error Handling**: Comprehensive error management and recovery
 
 ### AI Integrations
+
 - **OpenAI API**: GPT-4o, GPT-4o-mini, o1-preview models
 - **Text Generation**: Completions and chat completions
 - **Image Generation**: DALL-E 3 integration
@@ -47,12 +49,14 @@ console.log(`Available agents: ${agents.length}`);
 - **Embeddings**: Text vectorization for semantic search
 
 ### 3D Visualization
+
 - **Three.js Integration**: Complete 3D graphics support
 - **Scene Management**: Easy scene creation and manipulation
 - **Animation System**: Built-in animation loops and controls
 - **WebGL Optimization**: High-performance rendering
 
 ### Development Tools
+
 - **ESLint Configuration**: Comprehensive linting rules
 - **Prettier Formatting**: Consistent code formatting
 - **Jest Testing**: Complete test suite with utilities
@@ -63,6 +67,7 @@ console.log(`Available agents: ${agents.length}`);
 ### Core Classes
 
 #### `DevSkyy`
+
 Main SDK class for platform management:
 
 ```typescript
@@ -82,6 +87,7 @@ await platform.shutdown();
 ```
 
 #### `AgentService`
+
 Manages the 54-agent ecosystem:
 
 ```typescript
@@ -103,6 +109,7 @@ const task = agentService.getTask(taskId);
 ```
 
 #### `OpenAIService`
+
 Complete OpenAI API integration:
 
 ```typescript
@@ -129,6 +136,7 @@ const image = await openaiService.createImage({
 ```
 
 #### `ThreeJSService`
+
 3D graphics and visualization:
 
 ```typescript
@@ -154,6 +162,7 @@ threeJSService.startAnimation(() => {
 The SDK supports the 6 core DevSkyy agents:
 
 ### Core Business Agents
+
 - `wordpress_agent` - WordPress management and automation
 - `seo_agent` - SEO optimization and content analysis
 - `content_agent` - AI-powered content generation
@@ -381,4 +390,4 @@ MIT License - see LICENSE file for details.
 - **Documentation**: [docs.devskyy.com](https://docs.devskyy.com)
 - **Issues**: [GitHub Issues](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues)
 - **Discord**: [DevSkyy Community](https://discord.gg/devskyy)
-- **Email**: support@devskyy.com
+- **Email**: <support@devskyy.com>

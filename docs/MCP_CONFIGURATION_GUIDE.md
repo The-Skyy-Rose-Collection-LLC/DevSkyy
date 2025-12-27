@@ -48,6 +48,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
 ### DevSkyy Custom Servers
 
 #### 1. **devskyy-openai** - OpenAI Integration
+
 - **Purpose**: GPT-4o, GPT-4o-mini, o1-preview model access
 - **Capabilities**:
   - Text completion and generation
@@ -64,6 +65,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
   - Multi-step workflows
 
 #### 2. **devskyy-main** - 54-Agent Ecosystem
+
 - **Purpose**: Access to DevSkyy's specialized AI agents
 - **Capabilities**:
   - WordPress/WooCommerce automation
@@ -84,6 +86,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
 ### Standard MCP Servers
 
 #### 3. **filesystem** - File Operations
+
 - **Purpose**: Read, write, search files in DevSkyy repository
 - **Capabilities**:
   - Read file contents
@@ -99,6 +102,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
   - File organization
 
 #### 4. **git** - Version Control
+
 - **Purpose**: Git operations on DevSkyy repository
 - **Capabilities**:
   - Check status and diff
@@ -114,6 +118,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
   - Commit history analysis
 
 #### 5. **github** - GitHub API
+
 - **Purpose**: Interact with GitHub repositories
 - **Capabilities**:
   - Create/manage issues
@@ -129,6 +134,7 @@ After configuration, restart Claude Desktop to load the MCP servers.
   - Code search
 
 #### 6. **postgres** - Database Operations
+
 - **Purpose**: PostgreSQL database access
 - **Capabilities**:
   - Execute queries
@@ -143,12 +149,12 @@ After configuration, restart Claude Desktop to load the MCP servers.
   - Data migrations
 
 #### 7. **sequential-thinking** - Complex Reasoning
+
 - **Purpose**: Extended chain-of-thought for complex problems
 - **Capabilities**:
   - Multi-step reasoning
   - Problem decomposition
   - Decision analysis
-
 
 ## Usage Examples
 
@@ -381,10 +387,10 @@ Monitor these metrics for optimal performance:
 
 ## Resources
 
-- **MCP Specification**: https://modelcontextprotocol.io/specification/2025-06-18
-- **FastMCP Documentation**: https://gofastmcp.com
+- **MCP Specification**: <https://modelcontextprotocol.io/specification/2025-06-18>
+- **FastMCP Documentation**: <https://gofastmcp.com>
 - **DevSkyy Documentation**: `/Users/coreyfoster/DevSkyy/docs/`
-- **MCP Server Registry**: https://github.com/modelcontextprotocol/servers
+- **MCP Server Registry**: <https://github.com/modelcontextprotocol/servers>
 
 ## Support
 
@@ -393,17 +399,19 @@ For issues or questions:
 1. Check logs: `~/Library/Logs/Claude/mcp*.log`
 2. Review documentation: `docs/MCP_CONFIGURATION_GUIDE.md`
 3. Test servers manually: `python mcp/openai_server.py`
-4. GitHub Issues: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
+4. GitHub Issues: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues>
 
 ---
 
 **Last Updated**: 2025-12-16
 **Version**: 1.0.0
 **Maintained by**: The Skyy Rose Collection LLC
-  - System design
-  - Strategic planning
+
+- System design
+- Strategic planning
 
 #### 8. **brave-search** - Web Search
+
 - **Purpose**: Real-time web search capabilities
 - **Capabilities**:
   - Web search
@@ -418,6 +426,7 @@ For issues or questions:
   - Competitor analysis
 
 #### 9. **fetch** - Web Content
+
 - **Purpose**: Fetch and process web content
 - **Capabilities**:
   - HTTP requests
@@ -431,6 +440,7 @@ For issues or questions:
   - Integration testing
 
 #### 10. **memory** - Persistent Context
+
 - **Purpose**: Maintain context across conversations
 - **Capabilities**:
   - Store conversation context
@@ -442,4 +452,3 @@ For issues or questions:
   - Context retention
   - Preference learning
   - Workflow continuity
-

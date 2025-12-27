@@ -7,7 +7,7 @@ Supports GLB/GLTF models with orbit controls, lighting presets, and zoom.
 
 Usage in Elementor:
   Add as Custom HTML widget or embed via WordPress shortcode.
-  
+
 WordPress Shortcode: [skyyrose_3d_viewer model_url="..." product_id="123"]
 
 Author: DevSkyy Platform Team
@@ -20,7 +20,7 @@ Version: 1.0.0
     <title>SkyyRose 3D Viewer</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         .skyyrose-viewer-container {
             width: 100%;
             height: 500px;
@@ -30,13 +30,13 @@ Version: 1.0.0
             position: relative;
             font-family: 'Inter', -apple-system, sans-serif;
         }
-        
+
         #viewer-canvas {
             width: 100%;
             height: 100%;
             display: block;
         }
-        
+
         .viewer-controls {
             position: absolute;
             bottom: 20px;
@@ -49,7 +49,7 @@ Version: 1.0.0
             border-radius: 30px;
             backdrop-filter: blur(10px);
         }
-        
+
         .viewer-btn {
             background: transparent;
             border: 1px solid rgba(212, 175, 55, 0.5);
@@ -62,17 +62,17 @@ Version: 1.0.0
             letter-spacing: 1px;
             transition: all 0.3s ease;
         }
-        
+
         .viewer-btn:hover {
             background: #D4AF37;
             color: #1A1A1A;
         }
-        
+
         .viewer-btn.active {
             background: #D4AF37;
             color: #1A1A1A;
         }
-        
+
         .loading-overlay {
             position: absolute;
             top: 0;
@@ -86,7 +86,7 @@ Version: 1.0.0
             justify-content: center;
             color: #D4AF37;
         }
-        
+
         .loading-spinner {
             width: 50px;
             height: 50px;
@@ -95,17 +95,17 @@ Version: 1.0.0
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-        
+
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-        
+
         .loading-text {
             margin-top: 16px;
             font-size: 14px;
             letter-spacing: 2px;
         }
-        
+
         .viewer-info {
             position: absolute;
             top: 20px;
@@ -113,7 +113,7 @@ Version: 1.0.0
             color: rgba(255, 255, 255, 0.7);
             font-size: 11px;
         }
-        
+
         .ar-btn {
             position: absolute;
             top: 20px;
@@ -128,25 +128,25 @@ Version: 1.0.0
             font-size: 12px;
             display: none;
         }
-        
+
         .ar-btn.visible { display: block; }
     </style>
 </head>
 <body>
     <div class="skyyrose-viewer-container" id="viewer-container">
         <canvas id="viewer-canvas"></canvas>
-        
+
         <div class="loading-overlay" id="loading">
             <div class="loading-spinner"></div>
             <div class="loading-text">LOADING MODEL</div>
         </div>
-        
+
         <div class="viewer-info">
             <span>Drag to rotate • Scroll to zoom • Double-click to reset</span>
         </div>
-        
+
         <button class="ar-btn" id="ar-button">View in AR</button>
-        
+
         <div class="viewer-controls">
             <button class="viewer-btn active" data-lighting="studio">Studio</button>
             <button class="viewer-btn" data-lighting="outdoor">Outdoor</button>
@@ -375,4 +375,3 @@ Version: 1.0.0
     </script>
 </body>
 </html>
-

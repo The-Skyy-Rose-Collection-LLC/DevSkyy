@@ -1,6 +1,9 @@
 # SKYYROSE SHOP ARCHIVE PAGE SPECIFICATION
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro
 
 ---
@@ -13,12 +16,12 @@ page:
   slug: "/shop/"
   template: "elementor_header_footer"
   type: "archive"
-  
+
   seo:
     title: "Shop All | SkyyRose Luxury Streetwear"
     description: "Shop all SkyyRose collections. Premium luxury streetwear from Oakland. BLACK ROSE limited editions, LOVE HURTS emotional pieces, and SIGNATURE essentials."
     keywords: ["shop streetwear", "luxury clothing", "premium hoodies", "designer joggers"]
-    
+
   og:
     image: "/assets/images/og-shop.jpg"
     type: "website"
@@ -33,14 +36,14 @@ page_structure:
   sections:
     - id: "shop_header"
       order: 1
-      
+
     - id: "filter_bar"
       order: 2
       sticky: true
-      
+
     - id: "product_grid"
       order: 3
-      
+
     - id: "load_more"
       order: 4
 ```
@@ -72,7 +75,7 @@ content:
     weight: 400
     letter_spacing: "0.15em"
     color: "#FAFAFA"
-    
+
   subheadline:
     text: "All Collections"
     font: "Inter"
@@ -148,7 +151,7 @@ filters:
   layout:
     desktop: "row"
     mobile: "collapsible"
-    
+
   collection_filter:
     type: "pill_buttons"
     position: "left"
@@ -175,7 +178,7 @@ filters:
         color: "#4A4A4A"
       hover:
         border_color: "#0D0D0D"
-        
+
   dropdowns:
     position: "right"
     items:
@@ -183,12 +186,12 @@ filters:
         label: "Size"
         type: "multi_select"
         options: ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
-        
+
       - id: "color_filter"
         label: "Color"
         type: "multi_select"
         options: ["Black", "White", "Grey", "Cream", "Navy", "Burgundy"]
-        
+
       - id: "sort"
         label: "Sort"
         type: "single_select"
@@ -202,7 +205,7 @@ filters:
             value: "price"
           - label: "Price: High to Low"
             value: "price-desc"
-            
+
   mobile_toggle:
     text: "Filter & Sort"
     icon: "filter"
@@ -308,11 +311,11 @@ filters:
   .filter-dropdowns {
     display: none;
   }
-  
+
   .mobile-filter-toggle {
     display: block;
   }
-  
+
   .filter-bar.expanded .collection-pills,
   .filter-bar.expanded .filter-dropdowns {
     display: flex;
@@ -320,7 +323,7 @@ filters:
     width: 100%;
     margin-top: 16px;
   }
-  
+
   .filter-bar.expanded .collection-pills {
     flex-direction: row;
     flex-wrap: wrap;
@@ -354,9 +357,9 @@ grid:
     tablet: 3
     mobile: 2
   gap: "16px"
-  
+
   products_per_page: 16
-  
+
   editorial_cards:
     enabled: true
     insert_positions: [4, 12, 20]
@@ -369,7 +372,7 @@ grid:
         accent_color: "#C9A962"
         cta: "EXPLORE"
         url: "/collection/black-rose/"
-        
+
       - type: "collection_promo"
         collection: "love-hurts"
         background: "linear-gradient(135deg, #8B3A3A 0%, #5C2828 100%)"
@@ -377,13 +380,13 @@ grid:
         subline: "Wear Your Heart"
         cta: "SHOP NOW"
         url: "/collection/love-hurts/"
-        
+
       - type: "value_prop"
         background: "#0D0D0D"
         headline: "Free Shipping"
         subline: "On orders over $150"
         icon: "🚚"
-        
+
   product_card:
     aspect_ratio: "3:4"
     background: "#FFFFFF"
@@ -392,7 +395,7 @@ grid:
       border_color: "#0D0D0D"
       shadow: "0 8px 24px rgba(0,0,0,0.08)"
       image_effect: "secondary_image"
-      
+
     badges:
       new:
         text: "NEW"
@@ -409,12 +412,12 @@ grid:
         text: "SOLD OUT"
         overlay: true
         overlay_opacity: 0.6
-        
+
     quick_view:
       enabled: true
       trigger: "hover_icon"
       position: "bottom-center"
-      
+
     wishlist:
       enabled: true
       position: "top-right"
@@ -435,23 +438,23 @@ product_card_html:
             {{/each}}
           </div>
         {{/if}}
-        
+
         <a href="{{url}}">
           <img src="{{image}}" alt="{{title}}" class="product-card__img--primary" />
           {{#if secondary_image}}
             <img src="{{secondary_image}}" alt="{{title}}" class="product-card__img--secondary" />
           {{/if}}
         </a>
-        
+
         <button class="product-card__wishlist" aria-label="Add to wishlist">
           <span class="heart-icon">♡</span>
         </button>
-        
+
         <button class="product-card__quickview" aria-label="Quick view">
           Quick View
         </button>
       </div>
-      
+
       <div class="product-card__info">
         <h3 class="product-card__title">
           <a href="{{url}}">{{title}}</a>
@@ -728,7 +731,7 @@ pagination:
     hover:
       background: "#0D0D0D"
       color: "#FAFAFA"
-      
+
   counter:
     show: true
     format: "Showing {{displayed}} of {{total}} products"
@@ -746,16 +749,16 @@ page_sections:
   - section_id: "shop_header"
     order: 1
     visible: true
-    
+
   - section_id: "filter_bar"
     order: 2
     visible: true
     sticky: true
-    
+
   - section_id: "product_grid"
     order: 3
     visible: true
-    
+
   - section_id: "load_more"
     order: 4
     visible: true
@@ -770,30 +773,30 @@ execution_checklist:
   phase_1_setup:
     - task: "Create Shop page in WordPress"
       status: "pending"
-      
+
     - task: "Configure WooCommerce shop settings"
       status: "pending"
-      
+
   phase_2_build:
     - task: "Build shop header section"
       status: "pending"
-      
+
     - task: "Build filter bar with AJAX functionality"
       status: "pending"
-      
+
     - task: "Build product grid with editorial cards"
       status: "pending"
-      
+
     - task: "Implement load more pagination"
       status: "pending"
-      
+
   phase_3_functionality:
     - task: "Implement AJAX filtering"
       status: "pending"
-      
+
     - task: "Add quick view modal"
       status: "pending"
-      
+
     - task: "Add wishlist functionality"
       status: "pending"
 ```
