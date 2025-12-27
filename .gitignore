@@ -154,3 +154,5 @@ secrets/
 staging/
 backups/
 legacy/
+# Large archive files
+assets/_other/*.zip
