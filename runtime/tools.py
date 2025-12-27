@@ -486,6 +486,10 @@ class ToolRegistry:
         """Get tool specification by name."""
         return self._tools.get(name)
 
+    def get_tool(self, name: str) -> ToolSpec | None:
+        """Get tool specification by name (alias for get())."""
+        return self.get(name)
+
     def get_handler(self, name: str) -> ToolHandler | None:
         """Get tool handler by name."""
         return self._handlers.get(name)
@@ -591,7 +595,7 @@ class ToolRegistry:
             errors.append(f"Parameter {param.name} must be one of: {param.enum}")
 
         # Range validation
-        if isinstance(value, (int, float)):
+        if isinstance(value, int | float):
             if param.min_value is not None and value < param.min_value:
                 errors.append(f"Parameter {param.name} must be >= {param.min_value}")
             if param.max_value is not None and value > param.max_value:
