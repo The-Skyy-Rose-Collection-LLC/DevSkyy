@@ -12,14 +12,14 @@ import React, { useState, useEffect, useRef } from 'react';
 // Animated particle background
 const ParticleField = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    
+
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
-    
+
     let animationId: number;
     const particles: Array<{
       x: number;
@@ -29,14 +29,14 @@ const ParticleField = () => {
       size: number;
       opacity: number;
     }> = [];
-    
+
     const resize = () => {
       canvas.width = canvas.offsetWidth * 2;
       canvas.height = canvas.offsetHeight * 2;
       ctx.scale(2, 2);
     };
     resize();
-    
+
     // Create particles
     for (let i = 0; i < 80; i++) {
       particles.push({
@@ -48,23 +48,23 @@ const ParticleField = () => {
         opacity: Math.random() * 0.5 + 0.1
       });
     }
-    
+
     const animate = () => {
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
-      
+
       particles.forEach((p, i) => {
         p.x += p.vx;
         p.y += p.vy;
-        
+
         if (p.x < 0 || p.x > canvas.offsetWidth) p.vx *= -1;
         if (p.y < 0 || p.y > canvas.offsetHeight) p.vy *= -1;
-        
+
         // Draw particle
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(233, 30, 99, ${p.opacity})`;
         ctx.fill();
-        
+
         // Draw connections
         particles.slice(i + 1).forEach(p2 => {
           const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
@@ -77,14 +77,14 @@ const ParticleField = () => {
           }
         });
       });
-      
+
       animationId = requestAnimationFrame(animate);
     };
     animate();
-    
+
     return () => cancelAnimationFrame(animationId);
   }, []);
-  
+
   return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 };
 
@@ -98,7 +98,7 @@ interface GlowOrbProps {
 }
 
 const GlowOrb = ({ color, size, top, left, delay = 0 }: GlowOrbProps) => (
-  <div 
+  <div
     className="absolute rounded-full blur-3xl animate-pulse"
     style={{
       background: `radial-gradient(circle, ${color}40 0%, transparent 70%)`,
@@ -124,7 +124,7 @@ const StatusPulse = ({ status }: StatusPulseProps) => {
     error: 'bg-red-500',
     idle: 'bg-slate-500'
   };
-  
+
   return (
     <div className="relative flex items-center gap-2">
       <div className={`w-2 h-2 rounded-full ${colors[status]}`}>
@@ -147,8 +147,8 @@ interface MetricCardProps {
 
 const MetricCard = ({ label, value, unit, trend, icon, accent = false }: MetricCardProps) => (
   <div className={`relative group overflow-hidden rounded-2xl p-4 transition-all duration-500 hover:scale-[1.02] ${
-    accent 
-      ? 'bg-gradient-to-br from-rose-500/20 to-purple-600/20 border border-rose-500/30' 
+    accent
+      ? 'bg-gradient-to-br from-rose-500/20 to-purple-600/20 border border-rose-500/30'
       : 'bg-white/[0.03] border border-white/10'
   }`}>
     <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
@@ -532,4 +532,3 @@ const SkyyRose3DDashboard = () => {
 
 export default SkyyRose3DDashboard;
 export { SkyyRose3DDashboard };
-

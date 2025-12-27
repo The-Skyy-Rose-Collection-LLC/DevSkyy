@@ -52,7 +52,7 @@ function skyyrose_get_server_time($request) {
     try {
         // Get current time in UTC
         $current_time = current_time('timestamp', true); // GMT/UTC timestamp
-        
+
         // Validate timestamp is reasonable (not in past or far future)
         if ($current_time < 0 || $current_time > PHP_INT_MAX / 1000) {
             return new WP_Error(
@@ -72,21 +72,21 @@ function skyyrose_get_server_time($request) {
 
         // Create REST response with proper caching headers
         $response = new WP_REST_Response($response_data, 200);
-        
+
         // Allow browsers and CDNs to cache for 1 second
         // (short enough to be accurate, long enough to reduce traffic)
         $response->set_status(200);
-        
+
         // Set cache control headers
         header('Cache-Control: max-age=1, public');
         header('X-Accel-Expires: 1');
-        
+
         return $response;
 
     } catch (Exception $e) {
         // Log error
         error_log('SkyyRose server time error: ' . $e->getMessage());
-        
+
         return new WP_Error(
             'server_time_error',
             'Failed to get server time',
@@ -150,7 +150,7 @@ function skyyrose_register_product_countdown_endpoint() {
 function skyyrose_get_product_countdown($request) {
     try {
         $product_id = (int) $request['product_id'];
-        
+
         // Validate product exists and is published
         $product = wc_get_product($product_id);
         if (!$product) {
@@ -187,7 +187,7 @@ function skyyrose_get_product_countdown($request) {
             $launch_date_str,
             new DateTimeZone('UTC')
         );
-        
+
         if (!$launch_date) {
             $launch_date = new DateTime($launch_date_str, new DateTimeZone('UTC'));
         }
@@ -212,7 +212,7 @@ function skyyrose_get_product_countdown($request) {
 
     } catch (Exception $e) {
         error_log('SkyyRose countdown error: ' . $e->getMessage());
-        
+
         return new WP_Error(
             'countdown_error',
             'Failed to get countdown configuration',

@@ -262,12 +262,14 @@ pytest tests/test_huggingface_3d.py --cov=orchestration.huggingface_3d_client
 
 ## Files Created/Modified
 
-### Created:
+### Created
+
 - ✅ `orchestration/huggingface_3d_client.py` (387 lines)
 - ✅ `tests/test_huggingface_3d.py` (620 lines)
 - ✅ `docs/HUGGINGFACE_3D_INTEGRATION.md` (this file)
 
-### Modified:
+### Modified
+
 - ✅ `orchestration/asset_pipeline.py` - Added Stage 0, HF client integration
 - ✅ `agents/tripo_agent.py` - Added optimized_prompt support
 - ✅ `api/agents.py` - Enhanced endpoint documentation
@@ -277,16 +279,19 @@ pytest tests/test_huggingface_3d.py --cov=orchestration.huggingface_3d_client
 ### Quick Start
 
 1. **Set HuggingFace Token:**
+
    ```bash
    export HUGGINGFACE_API_TOKEN="hf_your_token_here"
    ```
 
 2. **Enable in Environment:**
+
    ```bash
    export PIPELINE_ENABLE_HF_3D=true
    ```
 
 3. **Use in Code:**
+
    ```python
    from orchestration.asset_pipeline import ProductAssetPipeline
 
@@ -309,6 +314,7 @@ pytest tests/test_huggingface_3d.py --cov=orchestration.huggingface_3d_client
 ### Advanced Configuration
 
 **For Development (Faster Testing):**
+
 ```bash
 export PIPELINE_ENABLE_HF_3D=true
 export HF_GUIDANCE_SCALE=7.0  # Lower = faster, lower quality
@@ -317,6 +323,7 @@ export HF_3D_CACHE_ENABLED=true
 ```
 
 **For Production (Best Quality):**
+
 ```bash
 export PIPELINE_ENABLE_HF_3D=true
 export HF_GUIDANCE_SCALE=15.0  # Higher = more guided
@@ -326,6 +333,7 @@ export PIPELINE_CACHE_TTL=604800  # 7 days
 ```
 
 **For HF-Only (No Tripo3D):**
+
 ```bash
 export PIPELINE_ENABLE_HF_3D=true
 export PIPELINE_ENABLE_3D=false  # Disable Tripo3D
@@ -399,6 +407,7 @@ logger.warning("HuggingFace 3D generation failed (will fallback to Tripo3D only)
 ### Metrics Exposed
 
 Via Prometheus endpoint at `/metrics`:
+
 - `devskyy_asset_generation_total` - Total generations by status
 - `devskyy_asset_generation_duration_seconds` - Pipeline duration
 - `devskyy_pipeline_active` - Active pipeline count
@@ -439,27 +448,35 @@ Via Prometheus endpoint at `/metrics`:
 ## Troubleshooting
 
 ### Issue: HF API Rate Limited
+
 **Solution:** Increase retry delays in config
+
 ```python
 config.retry_delay = 5.0
 config.retry_max_delay = 60.0
 ```
 
 ### Issue: Slow HF Generation
+
 **Solution:** Reduce guidance scale and steps
+
 ```python
 export HF_GUIDANCE_SCALE=7.0
 export HF_INFERENCE_STEPS=32
 ```
 
 ### Issue: Memory Errors with Large Models
+
 **Solution:** Reduce batch concurrency
+
 ```python
 export PIPELINE_BATCH_CONCURRENCY=2
 ```
 
 ### Issue: HF Token Not Found
+
 **Solution:** Verify environment variable
+
 ```bash
 echo $HUGGINGFACE_API_TOKEN  # Should print token
 python -c "from huggingface_hub import whoami; whoami()"
@@ -467,8 +484,8 @@ python -c "from huggingface_hub import whoami; whoami()"
 
 ## References
 
-- HuggingFace Shap-E Docs: https://huggingface.co/docs/diffusers/api/pipelines/shap_e
-- Tripo3D API: https://docs.tripo3d.ai/
+- HuggingFace Shap-E Docs: <https://huggingface.co/docs/diffusers/api/pipelines/shap_e>
+- Tripo3D API: <https://docs.tripo3d.ai/>
 - DevSkyy Architecture: `docs/architecture/DEVSKYY_MASTER_PLAN.md`
 - Asset Pipeline: `orchestration/asset_pipeline.py`
 

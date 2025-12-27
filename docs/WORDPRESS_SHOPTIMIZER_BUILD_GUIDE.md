@@ -217,6 +217,7 @@ h1, h2, h3, h4, h5, h6 {
 ### Black Rose Collection
 
 **Features:**
+
 - Cinematic video hero section
 - Philosophy/narrative text
 - Product grid with edition numbering
@@ -227,6 +228,7 @@ h1, h2, h3, h4, h5, h6 {
 `http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html`
 
 **Color Scheme:**
+
 - Primary: #0D0D0D (Black)
 - Accent: #C0C0C0 (Silver)
 - Gold: #C9A962
@@ -234,6 +236,7 @@ h1, h2, h3, h4, h5, h6 {
 ### Love Hurts Collection
 
 **Features:**
+
 - Rose-toned color palette
 - Romantic/passionate messaging
 - Limited edition product drops
@@ -243,6 +246,7 @@ h1, h2, h3, h4, h5, h6 {
 `http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html`
 
 **Color Scheme:**
+
 - Primary: #8B4860 (Deep Rose)
 - Accent: #B76E79 (Rose Gold)
 - Gold: #C9A962
@@ -250,6 +254,7 @@ h1, h2, h3, h4, h5, h6 {
 ### Signature Collection
 
 **Features:**
+
 - Gold-accented luxury aesthetic
 - Outdoor/lifestyle positioning
 - Flagship product lineup
@@ -259,6 +264,7 @@ h1, h2, h3, h4, h5, h6 {
 `http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html`
 
 **Color Scheme:**
+
 - Primary: #C9A962 (Gold)
 - Accent: #D4AF37 (Bright Gold)
 - Background: #1A1A1A (Charcoal)
@@ -301,7 +307,7 @@ function skyyrose_display_edition_badge() {
     global $product;
     $edition_number = get_post_meta($product->get_id(), '_edition_number', true);
     $total_editions = get_post_meta($product->get_id(), '_total_editions', true);
-    
+
     if ($edition_number && $total_editions) {
         echo sprintf(
             '<div class="edition-badge">LIMITED EDITION #%s/%d</div>',
@@ -319,7 +325,7 @@ add_action('woocommerce_single_product_summary', 'skyyrose_display_edition_badge
 // Show stock urgency
 function skyyrose_low_stock_warning() {
     global $product;
-    
+
     if ($product->get_stock_quantity() && $product->get_stock_quantity() < 3) {
         echo sprintf(
             '<div class="low-stock-warning">Only %d left in stock — order soon</div>',
@@ -354,6 +360,7 @@ add_action('woocommerce_single_product_summary', 'skyyrose_low_stock_warning', 2
 ### SVG Component
 
 The spinning logo rotates continuously with collection-specific colors:
+
 - Black Rose: #C0C0C0 (Silver)
 - Love Hurts: #B76E79 (Rose)
 - Signature: #C9A962 (Gold)
@@ -407,7 +414,7 @@ All three virtual experience files include:
 // Sync customer data
 function skyyrose_sync_customer_to_klaviyo($customer_id) {
     $customer = new WC_Customer($customer_id);
-    
+
     $data = [
         'email' => $customer->get_email(),
         'phone_number' => $customer->get_billing_phone(),
@@ -431,7 +438,7 @@ function skyyrose_sync_customer_to_klaviyo($customer_id) {
 // Track purchases
 function skyyrose_track_order_to_klaviyo($order_id) {
     $order = wc_get_order($order_id);
-    
+
     wp_remote_post(
         'https://a.klaviyo.com/api/v2/events',
         [

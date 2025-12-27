@@ -32,9 +32,10 @@ Value: 192.0.78.24
 ```
 
 **Verify & Activate:**
+
 - Wait 24-48 hours for DNS propagation
 - WordPress.com will auto-generate SSL certificate
-- Site will be accessible at https://skyyrose.co
+- Site will be accessible at <https://skyyrose.co>
 
 ---
 
@@ -211,6 +212,7 @@ If selling products on skyyrose.co:
 
 1. Enable WooCommerce on WordPress.com
 2. Add products with 3D models:
+
    ```php
    // Use WordPress3DMediaSync to attach 3D models
    $sync->sync_3d_model(
@@ -219,6 +221,7 @@ If selling products on skyyrose.co:
        usdz_url: 'https://cdn.skyyrose.com/models/product.usdz'
    )
    ```
+
 3. Customers can view 3D models in product pages
 4. AR viewer available on mobile (USDZ format)
 
@@ -227,11 +230,13 @@ If selling products on skyyrose.co:
 ### Step 6: SSL & Security
 
 ✅ WordPress.com provides:
+
 - Free SSL certificate (automatic)
 - HTTPS redirect
 - Jetpack security
 
 ✅ API Security:
+
 - JWT authentication enabled
 - CORS configured for skyyrose.co
 - Rate limiting active
@@ -306,19 +311,23 @@ curl -X POST https://frontend-skkyroseco.vercel.app/api/v1/agents/execute \
 ## Troubleshooting
 
 **DNS not resolving?**
+
 - Wait 24-48 hours for propagation
-- Check DNS records at: https://mxtoolbox.com/
+- Check DNS records at: <https://mxtoolbox.com/>
 
 **Plugin not loading?**
+
 - Verify SFTP upload to: `wp-content/plugins/devskyy-agents/`
 - Activate plugin in WordPress.com admin
 
 **API calls blocked?**
+
 - Check CORS configuration in Vercel
 - Verify JWT token in request headers
 - Check rate limiting (25/sec per IP)
 
 **3D models not displaying?**
+
 - Verify GLB/USDZ URLs are accessible
 - Check WooCommerce settings for custom meta fields
 

@@ -33,6 +33,7 @@ Widgets add a sixth field, `widgetType`, which identifies the widget (e.g., `woo
 The three core WooCommerce widgets each have distinct configuration structures. The **Add To Cart widget is mandatory** for single product templates—Elementor's editor will fail to load without it.
 
 **woocommerce-product-images** controls gallery display:
+
 ```json
 {
   "widgetType": "woocommerce-product-images",
@@ -47,6 +48,7 @@ The three core WooCommerce widgets each have distinct configuration structures. 
 ```
 
 **woocommerce-product-add-to-cart** handles purchase functionality:
+
 ```json
 {
   "widgetType": "woocommerce-product-add-to-cart",
@@ -61,6 +63,7 @@ The three core WooCommerce widgets each have distinct configuration structures. 
 ```
 
 **woocommerce-archive-products** displays product grids:
+
 ```json
 {
   "widgetType": "woocommerce-archive-products",
@@ -102,6 +105,7 @@ Elementor does **not expose dedicated REST endpoints** for template CRUD operati
 Creating a template via REST API requires a two-step process:
 
 **Step 1: Create the elementor_library post**
+
 ```bash
 curl -X POST "https://site.com/wp-json/wp/v2/posts" \
   -H "Authorization: Basic base64(username:app_password)" \
@@ -183,6 +187,7 @@ async def create_elementor_template(params: TemplateParams, ctx: Context) -> dic
 ```
 
 **Tool design best practices for AI consumption:**
+
 - Start descriptions with action verbs (Create, Get, Update, Delete)
 - Use Pydantic models with Field descriptions for complex inputs
 - Return structured data that helps agents decide next steps

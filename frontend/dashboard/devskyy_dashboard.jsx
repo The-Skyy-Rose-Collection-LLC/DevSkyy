@@ -105,7 +105,7 @@ export default function DevSkyyDashboard() {
                 <Activity className="h-4 w-4 text-green-400 animate-pulse" />
                 <span className="text-sm font-medium">All Systems Operational</span>
               </div>
-              
+
               <button
                 onClick={() => setAutoRefresh(!autoRefresh)}
                 className={`p-2 rounded-lg transition-all ${autoRefresh ? 'bg-purple-500 text-white' : darkMode ? 'bg-slate-800 text-slate-400' : 'bg-slate-200 text-slate-600'}`}

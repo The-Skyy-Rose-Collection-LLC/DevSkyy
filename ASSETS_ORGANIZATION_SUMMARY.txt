@@ -36,7 +36,7 @@ Key files:
   - Historical assets: IMG_8171.HEIC (iPhone photo)
   - Brand assets: The BLACK Rose Sherpa (multiple versions)
 
-LOVE HURTS COLLECTION (106 MB, 50 FILES)  
+LOVE HURTS COLLECTION (106 MB, 50 FILES)
 File count by type: 24 JPEG, 14 PNG, 11 JPG, 1 JPG (alt case)
 Key files:
   - Logo: Love Hurts Logo.jpg (PRIMARY COLLECTION BRAND ASSET)
@@ -146,7 +146,7 @@ FILE TYPE DISTRIBUTION
 Type           Count  Size    Purpose
 ─────────────────────────────────────────────────────────────────────────
 JPEG           41     ~92 MB  Product photography, lifestyle
-JPG            40     ~60 MB  Additional product images  
+JPG            40     ~60 MB  Additional product images
 PNG            24     ~12 MB  Mockups, transparent backgrounds
 Markdown       8      ~192 KB Design specifications & config
 MP4            1      ~2 MB   Product video (BLACK ROSE)

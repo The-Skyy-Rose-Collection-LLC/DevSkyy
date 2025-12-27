@@ -90,6 +90,7 @@ function function my_plugin_register_abilities() {
     ) );
 }
 ```
+
 ### `wp_before_execute_ability`
 
 Fires immediately before an ability gets executed, after permission checks have passed but before the execution callback is called.

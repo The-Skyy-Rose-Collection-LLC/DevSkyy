@@ -95,9 +95,9 @@ def retexture_model(
         request["text_style_prompt"] = text_prompt
     else:
         # Default prompt for fashion items
-        request["text_style_prompt"] = (
-            "High quality fabric texture, realistic clothing material, detailed stitching, professional fashion photography lighting"
-        )
+        request[
+            "text_style_prompt"
+        ] = "High quality fabric texture, realistic clothing material, detailed stitching, professional fashion photography lighting"
 
     # Submit to fal.ai
     result = fal_client.subscribe("fal-ai/meshy/v5/retexture", arguments=request, with_logs=True)

@@ -68,10 +68,10 @@ const statusColors = {
 export default function TasksPage() {
   const [agentFilter, setAgentFilter] = useState<SuperAgentType | undefined>();
   const [statusFilter, setStatusFilter] = useState<string>('all');
-  
-  const { data: tasks, isLoading, mutate } = useTasks({ 
-    agentType: agentFilter, 
-    limit: 50 
+
+  const { data: tasks, isLoading, mutate } = useTasks({
+    agentType: agentFilter,
+    limit: 50
   });
 
   // Calculate stats from tasks
@@ -83,8 +83,8 @@ export default function TasksPage() {
     : 0;
 
   // Filter tasks by status
-  const filteredTasks = statusFilter === 'all' 
-    ? tasks 
+  const filteredTasks = statusFilter === 'all'
+    ? tasks
     : tasks?.filter((t) => t.status === statusFilter);
 
   return (
@@ -251,4 +251,3 @@ function TaskTableRow({ task }: { task: TaskResponse }) {
     </tr>
   );
 }
-

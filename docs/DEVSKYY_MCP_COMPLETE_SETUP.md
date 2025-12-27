@@ -7,15 +7,16 @@ Complete setup guide for DevSkyy MCP with critical-fuchsia-ape backend and SkyyR
 | Component | Value | Status |
 |-----------|-------|--------|
 | **MCP Backend** | critical-fuchsia-ape | ✅ Configured |
-| **Backend URL** | https://critical-fuchsia-ape.fastmcp.app/mcp | ✅ Active |
-| **WordPress Server** | http://localhost:8882 | ✅ Local |
-| **Black Rose Experience** | http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html | ✅ Available |
-| **Love Hurts Experience** | http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html | ✅ Available |
-| **Signature Experience** | http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html | ✅ Available |
+| **Backend URL** | <https://critical-fuchsia-ape.fastmcp.app/mcp> | ✅ Active |
+| **WordPress Server** | <http://localhost:8882> | ✅ Local |
+| **Black Rose Experience** | <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html> | ✅ Available |
+| **Love Hurts Experience** | <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html> | ✅ Available |
+| **Signature Experience** | <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html> | ✅ Available |
 
 ## 5-Minute Setup
 
 ### Step 1: Configure Environment
+
 ```bash
 cd /Users/coreyfoster/DevSkyy
 
@@ -29,16 +30,19 @@ nano .env
 ```
 
 ### Step 2: Install Dependencies
+
 ```bash
 pip3 install -r mcp/requirements.txt
 ```
 
 ### Step 3: Start MCP Server
+
 ```bash
 python3 devskyy_mcp.py
 ```
 
 You should see:
+
 ```
 ═══════════════════════════════════════════════════════════
    DevSkyy MCP Server v1.0.0
@@ -54,14 +58,17 @@ You should see:
 ```
 
 ### Step 4: Access Experiences
+
 Open in browser:
-- **Black Rose**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html
-- **Love Hurts**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html
-- **Signature**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html
+
+- **Black Rose**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html>
+- **Love Hurts**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html>
+- **Signature**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html>
 
 ## Configuration Files
 
 ### Main Configuration: `.env`
+
 ```bash
 # Backend
 MCP_BACKEND=critical-fuchsia-ape
@@ -88,21 +95,25 @@ SKYYROSE_SIGNATURE_URL=http://localhost:8882/wp-content/plugins/skyyrose-virtual
 All 13 DevSkyy tools are available:
 
 ### Code Management
+
 1. **devskyy_scan_code** - Analyze code quality and security
 2. **devskyy_fix_code** - Automated code fixing
 3. **devskyy_self_healing** - System health monitoring
 
 ### WordPress & Content
+
 4. **devskyy_generate_wordpress_theme** - Theme generation
 5. **devskyy_generate_3d_from_description** - 3D model generation (text)
 6. **devskyy_generate_3d_from_image** - 3D model generation (image)
 
 ### E-Commerce
+
 7. **devskyy_manage_products** - Product management
 8. **devskyy_dynamic_pricing** - ML price optimization
 9. **devskyy_ml_prediction** - ML predictions (trends, forecasting)
 
 ### Marketing & Workflow
+
 10. **devskyy_marketing_campaign** - Campaign automation
 11. **devskyy_multi_agent_workflow** - Workflow orchestration
 12. **devskyy_system_monitoring** - System monitoring
@@ -111,26 +122,30 @@ All 13 DevSkyy tools are available:
 ## SkyyRose Collections
 
 ### Collection 1: Black Rose
+
 - **Description**: Dark elegance, limited editions
 - **Theme**: Gothic luxury
-- **URL**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html
+- **URL**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-black-rose-final.html>
 - **Collections Available**: `BLACK_ROSE`
 
 ### Collection 2: Love Hurts
+
 - **Description**: Emotional expression, bold statements
 - **Theme**: Statement pieces
-- **URL**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html
+- **URL**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-love-hurts-final.html>
 - **Collections Available**: `LOVE_HURTS`
 
 ### Collection 3: Signature
+
 - **Description**: Timeless essentials with luxury details
 - **Theme**: Premium basics
-- **URL**: http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html
+- **URL**: <http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experiences/skyyrose-signature-final.html>
 - **Collections Available**: `SIGNATURE`
 
 ## Integration Examples
 
 ### Generate 3D Model for Black Rose Collection
+
 ```bash
 # Using MCP tool
 curl -X POST http://localhost:8000/api/v1/3d/generate-from-description \
@@ -146,6 +161,7 @@ curl -X POST http://localhost:8000/api/v1/3d/generate-from-description \
 ```
 
 ### Create Marketing Campaign
+
 ```bash
 # Link experiences to marketing campaigns
 curl -X POST http://localhost:8000/api/v1/marketing/campaign \
@@ -161,6 +177,7 @@ curl -X POST http://localhost:8000/api/v1/marketing/campaign \
 ## Deployment
 
 ### Local Development
+
 ```bash
 # 1. Ensure WordPress is running
 curl http://localhost:8882/wp-admin/
@@ -173,6 +190,7 @@ open http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experi
 ```
 
 ### Production
+
 ```bash
 # 1. Update URLs
 export WORDPRESS_URL=https://skyyrose.com
@@ -190,6 +208,7 @@ python3 devskyy_mcp.py
 ## Troubleshooting
 
 ### MCP Server Won't Start
+
 ```bash
 # Check Python version
 python3 --version  # Must be 3.11+
@@ -202,6 +221,7 @@ echo $CRITICAL_FUCHSIA_APE_KEY
 ```
 
 ### Can't Connect to Backend
+
 ```bash
 # Test endpoint
 curl -I https://critical-fuchsia-ape.fastmcp.app/mcp
@@ -213,6 +233,7 @@ curl -H "Authorization: Bearer $CRITICAL_FUCHSIA_APE_KEY" \
 ```
 
 ### Experiences Not Loading
+
 ```bash
 # Check WordPress
 curl http://localhost:8882/
@@ -277,7 +298,7 @@ DevSkyy/
 - **MCP Setup**: `docs/CRITICAL_FUCHSIA_APE_SETUP.md`
 - **Quick Start**: `docs/CRITICAL_FUCHSIA_APE_QUICKSTART.md`
 - **Experiences**: `docs/SKYYROSE_EXPERIENCES_INTEGRATION.md`
-- **MCP Specification**: https://modelcontextprotocol.io
+- **MCP Specification**: <https://modelcontextprotocol.io>
 
 ## Quick Commands
 
@@ -300,7 +321,7 @@ open http://localhost:8882/wp-content/plugins/skyyrose-virtual-experience/experi
 
 ---
 
-**Setup Date**: 2025-12-24  
-**Status**: ✅ Ready to Configure  
-**Version**: 1.0.0  
+**Setup Date**: 2025-12-24
+**Status**: ✅ Ready to Configure
+**Version**: 1.0.0
 **Last Updated**: 2025-12-24

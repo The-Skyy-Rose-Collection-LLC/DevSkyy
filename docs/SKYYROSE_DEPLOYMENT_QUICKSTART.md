@@ -44,6 +44,7 @@ The deployment automatically executes a 4-stage 3D generation pipeline:
 4. **Stage 4 (WordPress Upload)**: Upload to media library and link to products
 
 **Why Two 3D Services?**
+
 - HuggingFace: Fast validation before expensive Tripo3D generation
 - Tripo3D: Production-quality models with material enhancements
 
@@ -102,6 +103,7 @@ python3 scripts/verify_core_web_vitals.py \
 ```
 
 **Expected Results**:
+
 - LCP < 2.5s ✓
 - FID < 100ms ✓
 - CLS < 0.1 ✓
@@ -117,6 +119,7 @@ python3 scripts/test_site_functionality.py \
 ```
 
 **Expected Results**:
+
 - ✓ All 5 collection experiences load
 - ✓ 3D hotspots are interactive
 - ✓ Countdown timers sync
@@ -133,6 +136,7 @@ python3 scripts/verify_seo.py \
 ```
 
 **Expected Results**:
+
 - RankMath Score: 90+ ✓
 - Meta tags present ✓
 - Schema markup configured ✓
@@ -144,6 +148,7 @@ python3 scripts/verify_seo.py \
 ## Collection-Specific Details
 
 ### Black Rose (Modern Luxury)
+
 - **Colors**: Primary #000000, Accent #C0C0C0 (Silver)
 - **Theme**: Dark elegance meets modern luxury
 - **Products**: 5 models with 50-200K polygons
@@ -151,6 +156,7 @@ python3 scripts/verify_seo.py \
 - **Hotspots**: 5 interactive 3D positions
 
 ### Love Hurts (Emotional)
+
 - **Colors**: Primary #2D1B1F, Accent #B76E79 (Rose Gold)
 - **Theme**: Raw emotion transformed into high fashion
 - **Products**: 5 models (note: 1 large 21.87MB image)
@@ -158,6 +164,7 @@ python3 scripts/verify_seo.py \
 - **Hotspots**: 5 interactive 3D positions
 
 ### Signature (Premium Essentials)
+
 - **Colors**: Primary #0D0D0D, Accent #D4AF37 (Gold)
 - **Theme**: Premium essentials built to last
 - **Products**: 5 models with varied file sizes
@@ -171,6 +178,7 @@ python3 scripts/verify_seo.py \
 ### Issue: Pydantic Validation Error
 
 **Solution**: Update Pydantic to v2.x
+
 ```bash
 pip install --upgrade pydantic
 ```
@@ -178,6 +186,7 @@ pip install --upgrade pydantic
 ### Issue: WordPress Connection Failed
 
 **Solution**: Verify WordPress URL and credentials
+
 ```bash
 # Test connection
 curl -X GET "http://localhost:8882/wp-json/wp/v2/posts" \
@@ -187,6 +196,7 @@ curl -X GET "http://localhost:8882/wp-json/wp/v2/posts" \
 ### Issue: Assets Not Found
 
 **Solution**: Verify ZIP extraction
+
 ```bash
 ls -la assets/3d-models/
 # Should show: black-rose/ love-hurts/ signature/
@@ -195,6 +205,7 @@ ls -la assets/3d-models/
 ### Issue: 3D Model Generation Timeout
 
 **Solution**: Increase timeout and use limit
+
 ```bash
 python3 scripts/deploy_skyyrose_site.py \
     --phase 3 \
@@ -287,5 +298,5 @@ Post-deployment verification:
 
 ---
 
-**Version**: 1.0.0  
+**Version**: 1.0.0
 **Last Updated**: December 25, 2025

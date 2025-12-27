@@ -86,9 +86,11 @@ The server uses the standard MCP protocol and communicates over stdio, so it wor
 ### OpenAI-Specific Tools
 
 #### 1. `openai_completion`
+
 Generate text using OpenAI models with full customization.
 
 **Example:**
+
 ```json
 {
   "prompt": "Explain quantum computing in simple terms",
@@ -99,9 +101,11 @@ Generate text using OpenAI models with full customization.
 ```
 
 #### 2. `openai_code_generation`
+
 Generate production-ready code with documentation and tests.
 
 **Example:**
+
 ```json
 {
   "description": "Create a FastAPI endpoint for user authentication",
@@ -112,9 +116,11 @@ Generate production-ready code with documentation and tests.
 ```
 
 #### 3. `openai_vision_analysis`
+
 Analyze images using GPT-4o or GPT-4o-mini vision capabilities.
 
 **Example:**
+
 ```json
 {
   "image_url": "https://example.com/product-image.jpg",
@@ -124,9 +130,11 @@ Analyze images using GPT-4o or GPT-4o-mini vision capabilities.
 ```
 
 #### 4. `openai_function_calling`
+
 Use OpenAI's function calling for structured actions.
 
 **Example:**
+
 ```json
 {
   "prompt": "What's the weather in San Francisco?",
@@ -147,9 +155,11 @@ Use OpenAI's function calling for structured actions.
 ```
 
 #### 5. `openai_model_selector`
+
 Intelligently select the optimal OpenAI model for your task.
 
 **Example:**
+
 ```json
 {
   "task_description": "Complex mathematical proof verification",
@@ -161,9 +171,11 @@ Intelligently select the optimal OpenAI model for your task.
 ### DevSkyy Integration Tools
 
 #### 6. `devskyy_agent_openai`
+
 Invoke DevSkyy's 54 specialized agents using OpenAI as the LLM backend.
 
 **Example:**
+
 ```json
 {
   "agent_name": "scanner",
@@ -176,6 +188,7 @@ Invoke DevSkyy's 54 specialized agents using OpenAI as the LLM backend.
 ```
 
 **Available Agents:**
+
 - `scanner` - Code quality analysis
 - `fixer` - Automated code fixing
 - `theme_builder` - WordPress theme generation
@@ -186,11 +199,13 @@ Invoke DevSkyy's 54 specialized agents using OpenAI as the LLM backend.
 - `content_generator` - Content creation
 
 #### 7. `openai_capabilities_info`
+
 Get detailed information about OpenAI models and capabilities.
 
 ## OpenAI Models
 
 ### GPT-4o
+
 - **Context Window**: 128,000 tokens
 - **Supports Vision**: ✅ Yes
 - **Supports Function Calling**: ✅ Yes
@@ -198,6 +213,7 @@ Get detailed information about OpenAI models and capabilities.
 - **Best For**: Complex reasoning, multimodal tasks, code, analysis
 
 ### GPT-4o-mini
+
 - **Context Window**: 128,000 tokens
 - **Supports Vision**: ✅ Yes
 - **Supports Function Calling**: ✅ Yes
@@ -205,6 +221,7 @@ Get detailed information about OpenAI models and capabilities.
 - **Best For**: Simple tasks, high volume, quick responses, cost optimization
 
 ### o1-preview
+
 - **Context Window**: 128,000 tokens
 - **Supports Vision**: ❌ No
 - **Supports Function Calling**: ❌ No
@@ -219,6 +236,7 @@ All tools support two response formats:
 2. **JSON** - Structured data for programmatic use
 
 Specify format in the request:
+
 ```json
 {
   "response_format": "json"
@@ -289,10 +307,10 @@ To add new tools, follow this pattern:
 )
 async def your_tool(params: YourInputModel) -> str:
     """Tool description for LLM.
-    
+
     Args:
         params: Input parameters
-        
+
     Returns:
         str: Formatted response
     """
@@ -319,6 +337,7 @@ async def your_tool(params: YourInputModel) -> str:
 ## Troubleshooting
 
 ### Server won't start
+
 ```bash
 # Check dependencies
 pip install fastmcp httpx pydantic openai python-jose[cryptography]
@@ -328,6 +347,7 @@ python --version  # Should be 3.11+
 ```
 
 ### OpenAI API errors
+
 ```bash
 # Verify API key
 echo $OPENAI_API_KEY
@@ -338,6 +358,7 @@ curl https://api.openai.com/v1/models \
 ```
 
 ### DevSkyy integration not working
+
 ```bash
 # Check DevSkyy configuration
 echo $DEVSKYY_API_URL
@@ -360,6 +381,6 @@ Copyright © 2025 The Skyy Rose Collection LLC
 
 ## Support
 
-- GitHub Issues: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
-- Documentation: https://docs.devskyy.com
-- API Reference: https://api.devskyy.com/docs
+- GitHub Issues: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues>
+- Documentation: <https://docs.devskyy.com>
+- API Reference: <https://api.devskyy.com/docs>

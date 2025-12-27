@@ -1,13 +1,13 @@
 /**
  * Showroom Experience - 3D Collection Landing Template
- * 
+ *
  * A virtual showroom environment for displaying SkyyRose collections.
  * Features:
  * - Gallery-style product placement
  * - Ambient lighting with spotlights on products
  * - Smooth camera transitions between products
  * - Interactive product selection
- * 
+ *
  * @author DevSkyy Platform Team
  * @version 1.0.0
  */
@@ -413,4 +413,3 @@ export class ShowroomExperience {
 }
 
 export default ShowroomExperience;
-

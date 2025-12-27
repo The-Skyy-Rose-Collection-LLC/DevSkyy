@@ -198,7 +198,7 @@ export const threeDAPI = {
     processingTime: number;
     lastGenerated: string;
   }>('/v1/3d/status'),
-  
+
   generate: (request: { prompt: string; model?: string }) =>
     fetchAPI<{ jobId: string; status: string }>('/v1/3d/generate', {
       method: 'POST',

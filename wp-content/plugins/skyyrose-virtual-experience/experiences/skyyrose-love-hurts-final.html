@@ -473,12 +473,12 @@
                 e.stopPropagation();
                 const productId = this.dataset.product;
                 const popup = document.querySelector(`[data-product="${productId}"]`);
-                
+
                 // Close all popups
                 document.querySelectorAll('.product-popup').forEach(p => {
                     p.classList.remove('active');
                 });
-                
+
                 // Open selected popup
                 if (popup) {
                     popup.classList.add('active');
@@ -509,7 +509,7 @@
         function addToCart(productId) {
             console.log('Adding to cart:', productId);
             alert('Product ' + productId + ' added to cart!');
-            
+
             // Close popup
             document.querySelectorAll('.product-popup').forEach(p => {
                 p.classList.remove('active');
@@ -544,13 +544,13 @@
             if (isMouseDown) {
                 const deltaX = e.clientX - lastX;
                 const deltaY = e.clientY - lastY;
-                
+
                 scrollX += deltaX * 0.5;
                 scrollY += deltaY * 0.5;
-                
+
                 scrollY = Math.max(-45, Math.min(45, scrollY));
             }
-            
+
             lastX = e.clientX;
             lastY = e.clientY;
         });
@@ -560,7 +560,7 @@
             const viewport = document.getElementById('scene-viewport');
             const rotateX = scrollY * 0.1;
             const rotateY = scrollX * 0.1;
-            
+
             viewport.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
             viewport.style.perspective = '1000px';
         }
@@ -578,10 +578,10 @@
         document.getElementById('scene-viewport').addEventListener('touchmove', (e) => {
             const deltaX = e.touches[0].clientX - touchStartX;
             const deltaY = e.touches[0].clientY - touchStartY;
-            
+
             scrollX += deltaX * 0.3;
             scrollY += deltaY * 0.3;
-            
+
             touchStartX = e.touches[0].clientX;
             touchStartY = e.touches[0].clientY;
         });

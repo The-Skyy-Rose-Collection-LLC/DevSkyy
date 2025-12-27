@@ -1,8 +1,8 @@
 /**
  * SkyyRose Collection Experiences
- * 
+ *
  * Immersive 3D landing pages for each SkyyRose collection.
- * 
+ *
  * @author DevSkyy Platform Team
  * @version 1.0.0
  */
@@ -116,4 +116,3 @@ export function createCollectionExperience(
       throw new Error(`Unknown collection type: ${spec.collection}`);
   }
 }
-

@@ -113,6 +113,7 @@
 ### DevSkyy Custom Servers
 
 #### devskyy-openai
+
 - **Technology**: FastMCP + OpenAI SDK
 - **Models**: GPT-4o, GPT-4o-mini, o1-preview
 - **Port**: stdio (MCP standard)
@@ -120,6 +121,7 @@
 - **Use Cases**: Complex reasoning, vision, code generation
 
 #### devskyy-main
+
 - **Technology**: FastMCP + DevSkyy API
 - **Agents**: 54 specialized agents
 - **Port**: stdio (MCP standard)
@@ -129,46 +131,54 @@
 ### Standard MCP Servers
 
 #### filesystem
+
 - **Provider**: @modelcontextprotocol/server-filesystem
 - **Scope**: /Users/coreyfoster/DevSkyy
 - **Operations**: read, write, search, list
 - **Security**: Sandboxed to project directory
 
 #### git
+
 - **Provider**: @modelcontextprotocol/server-git
 - **Repository**: /Users/coreyfoster/DevSkyy
 - **Operations**: status, diff, log, commit, branch
 - **Security**: Read-only by default
 
 #### github
+
 - **Provider**: @modelcontextprotocol/server-github
 - **Authentication**: GitHub Personal Access Token
 - **Operations**: issues, PRs, workflows, search
 - **Rate Limits**: GitHub API limits apply
 
 #### postgres
+
 - **Provider**: @modelcontextprotocol/server-postgres
 - **Connection**: postgresql://localhost/devskyy
 - **Operations**: queries, schema inspection
 - **Security**: Configurable read-only mode
 
 #### sequential-thinking
+
 - **Provider**: @modelcontextprotocol/server-sequential-thinking
 - **Purpose**: Extended chain-of-thought reasoning
 - **Use Cases**: Complex problem solving, planning
 
 #### brave-search
+
 - **Provider**: @modelcontextprotocol/server-brave-search
 - **Authentication**: Brave API Key
 - **Operations**: web search, news search
 - **Rate Limits**: Brave API limits apply
 
 #### fetch
+
 - **Provider**: @modelcontextprotocol/server-fetch
 - **Operations**: HTTP requests, web scraping
 - **Security**: Configurable allowed domains
 
 #### memory
+
 - **Provider**: @modelcontextprotocol/server-memory
 - **Storage**: Persistent across conversations
 - **Use Cases**: Context retention, preferences
@@ -272,18 +282,21 @@
 ## Deployment Scenarios
 
 ### Development
+
 - Local MCP servers
 - Claude Desktop integration
 - Hot reload enabled
 - Debug logging
 
 ### Production
+
 - Containerized MCP servers
 - Load balancer
 - Production logging
 - Monitoring enabled
 
 ### CI/CD
+
 - Automated testing
 - MCP server validation
 - Integration tests
@@ -291,7 +304,6 @@
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2025-12-16  
+**Version**: 1.0.0
+**Last Updated**: 2025-12-16
 **Maintained by**: The Skyy Rose Collection LLC
-

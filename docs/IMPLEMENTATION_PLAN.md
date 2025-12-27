@@ -15,11 +15,13 @@ Based on RPVAE protocol stages 0-3 (Research, Verify, Authenticate), this docume
 ## Verified Failures (Stage 2 Results)
 
 ### Critical Blockers
+
 1. **Python 3.14 annotation resolution** - `security/jwt_oauth2_auth.py:935`
    - `NameError: name 'Request' is not defined`
    - Blocks all security tests
 
 ### Type Errors (85+)
+
 - Legacy code: 40+ (acceptable - legacy folder)
 - Production code: 20+ (must fix)
 - Scripts: 25+ (should fix)
@@ -31,6 +33,7 @@ Based on RPVAE protocol stages 0-3 (Research, Verify, Authenticate), this docume
 ### Phase 1: Unblock Tests (IMMEDIATE)
 
 #### 1.1 Fix Python 3.14 Import Issue
+
 **File:** `security/jwt_oauth2_auth.py`
 **Line:** 25-45 (imports section)
 **Change:** Add `Request` to module-level imports
@@ -47,12 +50,14 @@ from fastapi import Request
 ### Phase 2: Security & Crypto Contract Fixes
 
 #### 2.1 Fix AES-256-GCM Type Mismatches
+
 **File:** `security/aes256_gcm_encryption.py`
 **Lines:** 535, 559, 655
 **Issue:** `dict[str, Any]` assigned to `str` variable
 **Fix:** Correct variable types or add proper type narrowing
 
 #### 2.2 Fix WordPress Client Null Safety
+
 **File:** `wordpress/client.py`
 **Line:** 103
 **Issue:** `ClientSession | None` accessed without null check
@@ -64,6 +69,7 @@ if self.session is None:
 ```
 
 #### 2.3 Fix CSP Middleware Return Types
+
 **File:** `security/csp_middleware.py`
 **Lines:** 126, 141
 **Issue:** `Returning Any` instead of `Response`
@@ -74,12 +80,14 @@ if self.session is None:
 ### Phase 3: Packaging/Import Hygiene
 
 #### 3.1 Fix Unused Imports
+
 **File:** `agents/__init__.py`
 **Lines:** 51, 60
 **Issue:** Unused imports `CreativeVisualProvider`, `GenerationType`
 **Fix:** Remove or add to `__all__`
 
 #### 3.2 Sort Imports
+
 **File:** `agents/__init__.py`
 **Fix:** Run `isort agents/__init__.py`
 
@@ -88,6 +96,7 @@ if self.session is None:
 ### Phase 4: Type Annotation Fixes
 
 #### 4.1 Production Code (Priority)
+
 | File | Line | Fix |
 |------|------|-----|
 | `security/aes256_gcm_encryption.py` | 593 | Add `-> None` return type |
@@ -95,6 +104,7 @@ if self.session is None:
 | `security/csp_middleware.py` | 110, 164, 166, 197 | Add generic type params |
 
 #### 4.2 Legacy Code (Defer)
+
 - `legacy/sqlite_auth_system.py` - 20+ implicit Optional issues
 - Plan: Add `# type: ignore` comments or fix as time permits
 
@@ -103,6 +113,7 @@ if self.session is None:
 ### Phase 5: Tool Runtime Layer (Based on Authenticated Research)
 
 #### 5.1 Create Tool Runtime Contracts
+
 **New File:** `runtime/contracts.py`
 
 Following MCP 2025-11-25 specification + LangChain ToolRuntime pattern:
@@ -157,14 +168,17 @@ class ToolCallResult(TypedDict):
 ```
 
 #### 5.2 Enhance Existing ToolRegistry
+
 **File:** `runtime/tools.py`
 **Changes:**
+
 - Add permission enforcement (deny-by-default)
 - Add timeout handling
 - Add idempotency key tracking
 - Add structured error taxonomy
 
 #### 5.3 Create Error Taxonomy
+
 **New File:** `runtime/errors.py`
 
 ```python
@@ -202,14 +216,18 @@ class ToolError(Exception):
 ### Phase 6: Agent Refactoring
 
 #### 6.1 Update Base SuperAgent
+
 **File:** `agents/base_super_agent.py`
 **Changes:**
+
 - Import and use `ToolCallContext` for all tool calls
 - Add permission validation before tool execution
 - Add structured logging with correlation IDs
 
 #### 6.2 Update Individual Agents
+
 **Files:**
+
 - `agents/commerce_agent.py`
 - `agents/creative_agent.py`
 - `agents/marketing_agent.py`
@@ -218,6 +236,7 @@ class ToolError(Exception):
 - `agents/analytics_agent.py`
 
 **Pattern for each:**
+
 ```python
 async def execute_tool(self, tool_name: str, args: dict, context: ToolCallContext) -> ToolCallResult:
     # Validate permissions
@@ -241,8 +260,10 @@ async def execute_tool(self, tool_name: str, args: dict, context: ToolCallContex
 ### Phase 7: MCP Server Enhancement
 
 #### 7.1 Update MCP Server
+
 **File:** `mcp/openai_server.py`
 **Changes:**
+
 - Expose tools from `ToolRegistry`
 - Implement deterministic tool discovery
 - Add validation and observability
@@ -270,6 +291,7 @@ class MCPServer:
 ### Phase 8: Three.js Collection Experiences
 
 #### 8.1 Create Experience Specification
+
 **New File:** `src/types/Collection3DSpec.ts`
 
 ```typescript
@@ -294,12 +316,15 @@ export interface PerformanceBudget {
 ```
 
 #### 8.2 Enhance Existing Experiences
+
 **Files:**
+
 - `src/collections/ShowroomExperience.ts`
 - `src/collections/RunwayExperience.ts`
 - `src/collections/BlackRoseExperience.ts` (adapt to Materials variant)
 
 **Required Additions:**
+
 - WebGL context loss handlers
 - DRACO/KTX2 loader configuration
 - prefers-reduced-motion support
@@ -307,6 +332,7 @@ export interface PerformanceBudget {
 - 2D fallback mode with structured logging
 
 #### 8.3 Add Playwright E2E Tests
+
 **New File:** `tests/e2e/collections.spec.ts`
 
 ```typescript
@@ -342,14 +368,18 @@ test.describe('Collection 3D Experiences', () => {
 ### Phase 9: CI/CD Alignment
 
 #### 9.1 Update GitHub Actions
+
 **File:** `.github/workflows/ci.yml`
 **Changes:**
+
 - Add version pinning check
 - Add Python 3.14 compatibility test
 - Add Three.js bundle size check
 
 #### 9.2 Add Version Pinning
+
 **New Files:**
+
 - `.nvmrc` (Node version)
 - `.python-version` (Python version)
 

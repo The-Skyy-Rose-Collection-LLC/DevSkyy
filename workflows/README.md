@@ -16,18 +16,22 @@ DevSkyy now uses **code-based workflows** instead of traditional YAML configurat
 ## Available Workflows
 
 ### CI/CD Pipeline (`ci`)
+
 Continuous integration workflow for code quality, testing, and security.
 
 **Executes:**
+
 - Security vulnerability scanning (npm audit, pip-audit, bandit)
 - Code quality checks (ruff, mypy, eslint, prettier)
 - Unit and integration tests (pytest, jest)
 - Build validation (Python package, frontend assets)
 
 ### Deployment Pipeline (`deployment`)
+
 Handles deployment to staging and production environments.
 
 **Executes:**
+
 - Pre-deployment validation
 - Docker image building and tagging
 - Security scanning of images (Trivy)
@@ -36,9 +40,11 @@ Handles deployment to staging and production environments.
 - Automatic rollback on failure
 
 ### Docker Workflow (`docker`)
+
 Docker container build, test, and deployment workflow.
 
 **Executes:**
+
 - Docker build testing
 - Container startup validation
 - Multi-platform builds (linux/amd64, linux/arm64)
@@ -46,9 +52,11 @@ Docker container build, test, and deployment workflow.
 - Security scanning (Trivy)
 
 ### MCP Workflow (`mcp`)
+
 Model Context Protocol testing and validation.
 
 **Executes:**
+
 - MCP server startup tests
 - Configuration validation
 - Integration tests (OpenAI, tools)
@@ -57,9 +65,11 @@ Model Context Protocol testing and validation.
 - Documentation validation
 
 ### ML Workflow (`ml`)
+
 Machine Learning and AI agent testing.
 
 **Executes:**
+
 - ML dependency validation
 - Model loading and configuration tests
 - Agent validation (FashnAgent, TripoAgent)
@@ -67,9 +77,11 @@ Machine Learning and AI agent testing.
 - Security scanning
 
 ### Quality Workflow (`quality`)
+
 Code quality and standards verification.
 
 **Executes:**
+
 - Code linting (Ruff, ESLint)
 - Code formatting checks (Ruff, Prettier)
 - Type checking (MyPy, TypeScript)
@@ -144,6 +156,7 @@ jobs:
 ### Workflow Structure
 
 Each workflow is a Python class that:
+
 1. Inherits workflow capabilities from the LangGraph infrastructure
 2. Defines execution steps as async methods
 3. Maintains state through `WorkflowState` objects
@@ -154,14 +167,14 @@ class CustomWorkflow:
     async def execute(self, state: WorkflowState) -> WorkflowState:
         # Step 1: Initialize
         state.status = WorkflowStatus.RUNNING
-        
+
         # Step 2: Execute tasks
         result = await self._run_task(state)
-        
+
         # Step 3: Complete
         state.status = WorkflowStatus.COMPLETED
         state.outputs = result
-        
+
         return state
 ```
 
@@ -176,6 +189,7 @@ Workflows use Pydantic models for type-safe state management:
 ### Error Handling
 
 Workflows include comprehensive error handling:
+
 - Automatic error capture and logging
 - Retry logic with exponential backoff
 - Rollback capabilities for deployment workflows
@@ -216,9 +230,9 @@ from orchestration.langgraph_integration import WorkflowState, WorkflowStatus
 class CustomWorkflow:
     async def execute(self, state: WorkflowState) -> WorkflowState:
         state.status = WorkflowStatus.RUNNING
-        
+
         # Your logic here
-        
+
         state.status = WorkflowStatus.COMPLETED
         return state
 ```
@@ -236,9 +250,9 @@ from orchestration.langgraph_integration import WorkflowState
 async def test_ci_workflow():
     workflow = CIWorkflow()
     state = WorkflowState(inputs={"test": True})
-    
+
     result = await workflow.execute(state)
-    
+
     assert result.status == "completed"
     assert "security" in result.outputs
 ```
@@ -246,6 +260,7 @@ async def test_ci_workflow():
 ## Migration from YAML Workflows
 
 The code-based workflows replace the following YAML files:
+
 - `.github/workflows/ci.yml` → `workflows/ci_workflow.py`
 - `.github/workflows/deploy.yml` → `workflows/deployment_workflow.py`
 - `.github/workflows/docker.yml` → `workflows/docker_workflow.py`
@@ -267,6 +282,7 @@ The code-based workflows replace the following YAML files:
 ## Monitoring and Observability
 
 Workflows provide detailed execution metrics:
+
 - Start and end timestamps
 - Duration in seconds
 - Step-by-step execution history
@@ -276,6 +292,7 @@ Workflows provide detailed execution metrics:
 ## Security
 
 All workflows include:
+
 - Security vulnerability scanning
 - Secret detection
 - Dependency auditing
@@ -285,6 +302,7 @@ All workflows include:
 ## Support
 
 For issues or questions about workflows:
+
 1. Check the workflow logs for detailed error messages
 2. Run workflows locally with `--debug` flag for more information
 3. Review workflow code in `workflows/` directory

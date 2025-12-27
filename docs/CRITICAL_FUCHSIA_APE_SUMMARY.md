@@ -7,11 +7,13 @@ Your `devskyy_mcp.py` has been successfully configured to connect to the **criti
 ## What Was Changed
 
 ### 1. **devskyy_mcp.py** (Core MCP Server)
+
 - ✅ Added backend selection logic with `MCP_BACKEND` environment variable
 - ✅ Dynamic credential loading based on selected backend
 - ✅ Supports both `devskyy` (default) and `critical-fuchsia-ape` backends
 
 **Code Changes:**
+
 ```python
 # Backend selection: 'devskyy' (default) or 'critical-fuchsia-ape'
 MCP_BACKEND = os.getenv("MCP_BACKEND", "devskyy")
@@ -26,11 +28,13 @@ else:
 ```
 
 ### 2. **.mcp.json** (MCP Server Registry)
+
 - ✅ Added `devskyy-critical-fuchsia-ape` server entry
 - ✅ Configured with all 13 DevSkyy tools as capabilities
 - ✅ Environment variables properly mapped
 
 **New Server Entry:**
+
 ```json
 "devskyy-critical-fuchsia-ape": {
   "command": "python",
@@ -58,10 +62,12 @@ else:
 ```
 
 ### 3. **mcp/.env.example** (Environment Template)
+
 - ✅ Added critical-fuchsia-ape environment variables
 - ✅ Provides template for easy configuration
 
 **New Variables:**
+
 ```bash
 # Critical Fuchsia Ape Integration (Alternative Backend)
 CRITICAL_FUCHSIA_APE_URL=http://critical-fuchsia-ape:8000
@@ -70,6 +76,7 @@ MCP_BACKEND=devskyy  # Set to 'critical-fuchsia-ape' to use that backend instead
 ```
 
 ### 4. **New Documentation**
+
 - ✅ `docs/CRITICAL_FUCHSIA_APE_SETUP.md` - Comprehensive setup guide
 - ✅ `scripts/setup_critical_fuchsia_ape.sh` - Automated setup script
 
@@ -82,6 +89,7 @@ MCP_BACKEND=devskyy  # Set to 'critical-fuchsia-ape' to use that backend instead
 ```
 
 This script will:
+
 1. ✅ Create `.env` file with your configuration
 2. ✅ Install Python dependencies
 3. ✅ Test connectivity to critical-fuchsia-ape
@@ -191,6 +199,7 @@ curl -H "Authorization: Bearer $CRITICAL_FUCHSIA_APE_KEY" \
 If you encounter issues:
 
 1. **Check environment variables:**
+
    ```bash
    echo $MCP_BACKEND
    echo $CRITICAL_FUCHSIA_APE_URL
@@ -198,6 +207,7 @@ If you encounter issues:
    ```
 
 2. **Test connectivity:**
+
    ```bash
    curl -v http://critical-fuchsia-ape:8000/health
    ```
@@ -213,6 +223,7 @@ To use with Claude Desktop:
 1. Edit `~/Library/Application Support/Claude/claude_desktop_config.json`
 
 2. Add the server configuration:
+
 ```json
 {
   "mcpServers": {
@@ -234,6 +245,7 @@ To use with Claude Desktop:
 ## Next Steps
 
 1. **Run the setup script:**
+
    ```bash
    ./scripts/setup_critical_fuchsia_ape.sh
    ```
@@ -243,6 +255,7 @@ To use with Claude Desktop:
    - API key
 
 3. **Start the MCP server:**
+
    ```bash
    python3 devskyy_mcp.py
    ```
@@ -256,10 +269,10 @@ To use with Claude Desktop:
 - **Setup Guide**: `docs/CRITICAL_FUCHSIA_APE_SETUP.md`
 - **Configuration Guide**: `docs/MCP_CONFIGURATION_GUIDE.md`
 - **Automated Setup**: `./scripts/setup_critical_fuchsia_ape.sh`
-- **MCP Docs**: https://modelcontextprotocol.io
+- **MCP Docs**: <https://modelcontextprotocol.io>
 
 ---
 
-**Setup Date**: 2025-12-24  
-**Status**: ✅ Ready to Configure  
+**Setup Date**: 2025-12-24
+**Status**: ✅ Ready to Configure
 **Version**: 1.0.0

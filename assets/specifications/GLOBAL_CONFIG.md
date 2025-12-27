@@ -1,7 +1,11 @@
 # SKYYROSE GLOBAL CONFIGURATION & COMPONENT LIBRARY
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro
+
 # Theme: Shoptimizer 2.9.0
 
 ---
@@ -13,50 +17,50 @@ site:
   name: "SkyyRose"
   tagline: "Where Love Meets Luxury"
   domain: "skyyrose.co"
-  
+
   wordpress:
     version: "6.4+"
     theme: "Shoptimizer"
     theme_version: "2.9.0"
-    
+
   plugins:
     required:
       - name: "Elementor Pro"
         version: "3.32.2+"
         purpose: "Page builder"
-        
+
       - name: "WooCommerce"
         version: "8.0+"
         purpose: "E-commerce"
-        
+
       - name: "Variation Swatches for WooCommerce"
         slug: "variation-swatches-for-woocommerce"
         purpose: "Color/size swatches"
-        
+
       - name: "YITH WooCommerce Quick View"
         slug: "yith-woocommerce-quick-view"
         purpose: "Product quick view modal"
-        
+
       - name: "YITH WooCommerce Wishlist"
         slug: "yith-woocommerce-wishlist"
         purpose: "Wishlist functionality"
-        
+
     recommended:
       - name: "WP Rocket"
         purpose: "Caching & performance"
-        
+
       - name: "ShortPixel"
         purpose: "Image optimization"
-        
+
       - name: "Smash Balloon Instagram Feed"
         purpose: "Instagram integration"
-        
+
       - name: "Klaviyo"
         purpose: "Email marketing"
-        
+
       - name: "Judge.me / Loox"
         purpose: "Product reviews with photos"
-        
+
       - name: "FiboSearch"
         purpose: "AJAX product search"
 ```
@@ -77,7 +81,7 @@ colors:
     gold: "#D4AF37"
     rose_gold: "#B76E79"
     silver: "#C0C0C0"
-    
+
   # Collection Colors (UPDATED 2024-12-12)
   collections:
     # BLACK ROSE: Dark, Mysterious, Icy, Exclusive
@@ -89,7 +93,7 @@ colors:
       white: "#FAFAFA"            # Pure White
       chrome: "#A8A8A8"           # Chrome/Steel
       text: "#FAFAFA"
-      
+
     # LOVE HURTS: Warm, Emotional, Authentic
     love_hurts:
       primary: "#8B3A3A"          # Deep Rose/Burgundy
@@ -98,7 +102,7 @@ colors:
       background: "#FDF8F8"       # Warm Cream
       background_dark: "#1A1212"  # Warm Dark
       text_dark: "#2D1F1F"
-      
+
     # SIGNATURE: Luxurious, Premium, Timeless
     signature:
       primary: "#0D0D0D"          # Black
@@ -108,7 +112,7 @@ colors:
       white: "#FAFAFA"            # Off-white
       cream: "#F5F3EF"            # Warm Grey
       text: "#0D0D0D"
-      
+
   # Homepage Mixed Palette (combines all collections)
   homepage:
     black: "#0D0D0D"
@@ -119,7 +123,7 @@ colors:
     silver: "#C0C0C0"             # From BLACK ROSE
     deep_rose: "#8B3A3A"          # From LOVE HURTS
     soft_rose: "#D4A5A5"          # From LOVE HURTS
-      
+
   # UI Colors
   ui:
     success: "#059669"
@@ -129,7 +133,7 @@ colors:
     error: "#DC2626"
     error_light: "#FEE2E2"
     info: "#2563EB"
-    
+
   # Greys
   grey:
     50: "#FAFAFA"
@@ -153,12 +157,12 @@ typography:
       family: "'Cormorant Garamond', 'Playfair Display', Georgia, serif"
       fallback: "Georgia, serif"
       google_fonts: "Cormorant+Garamond:wght@400;500;600;700"
-      
+
     body:
       family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
       fallback: "-apple-system, BlinkMacSystemFont, sans-serif"
       google_fonts: "Inter:wght@400;500;600"
-      
+
   scale:
     # Mobile first, use clamp() for responsive
     display: "clamp(2.5rem, 8vw, 5rem)"      # 40-80px
@@ -171,20 +175,20 @@ typography:
     body_small: "0.875rem"                    # 14px
     caption: "0.75rem"                        # 12px
     micro: "0.625rem"                         # 10px
-    
+
   weights:
     light: 300
     regular: 400
     medium: 500
     semibold: 600
     bold: 700
-    
+
   line_heights:
     tight: 1.2
     normal: 1.5
     relaxed: 1.7
     loose: 2
-    
+
   letter_spacing:
     tight: "-0.02em"
     normal: "0"
@@ -201,7 +205,7 @@ typography:
 spacing:
   # Base unit: 8px
   base: "8px"
-  
+
   scale:
     0: "0"
     1: "4px"
@@ -217,12 +221,12 @@ spacing:
     20: "80px"
     24: "96px"
     32: "128px"
-    
+
   section_padding:
     desktop: "80px"
     tablet: "60px"
     mobile: "48px"
-    
+
   container:
     max_width: "1200px"
     padding: "24px"
@@ -263,7 +267,7 @@ animations:
     normal: "300ms"
     slow: "500ms"
     slower: "700ms"
-    
+
   easing:
     linear: "linear"
     ease: "ease"
@@ -271,7 +275,7 @@ animations:
     ease_out: "cubic-bezier(0, 0, 0.2, 1)"
     ease_in_out: "cubic-bezier(0.4, 0, 0.2, 1)"
     bounce: "cubic-bezier(0.68, -0.55, 0.265, 1.55)"
-    
+
   transitions:
     default: "all 0.3s ease"
     fast: "all 0.15s ease"
@@ -295,29 +299,29 @@ animations:
   --color-black: #0D0D0D;
   --color-white: #FAFAFA;
   --color-cream: #F5F3EF;
-  
+
   --color-black-rose-accent: #C9A962;
   --color-love-hurts-primary: #8B3A3A;
   --color-signature-primary: #6B6B6B;
-  
+
   --color-success: #059669;
   --color-warning: #D97706;
   --color-error: #DC2626;
-  
+
   /* Typography */
   --font-heading: 'Cormorant Garamond', Georgia, serif;
   --font-body: 'Inter', -apple-system, sans-serif;
-  
+
   /* Spacing */
   --spacing-base: 8px;
   --container-max: 1200px;
   --section-padding: 80px;
   --section-padding-mobile: 48px;
-  
+
   /* Header */
   --header-height: 80px;
   --header-height-mobile: 60px;
-  
+
   /* Transitions */
   --transition-default: all 0.3s ease;
 }
@@ -482,29 +486,29 @@ button:
       color: "#FAFAFA"
       hover_background: "#4A4A4A"
       hover_color: "#FAFAFA"
-      
+
     secondary:
       background: "transparent"
       color: "#0D0D0D"
       border: "1px solid #0D0D0D"
       hover_background: "#0D0D0D"
       hover_color: "#FAFAFA"
-      
+
     white:
       background: "#FAFAFA"
       color: "#0D0D0D"
       hover_background: "#F5F3EF"
-      
+
     gold:
       background: "#C9A962"
       color: "#0D0D0D"
       hover_background: "#FAFAFA"
-      
+
     rose:
       background: "#8B3A3A"
       color: "#FAFAFA"
       hover_background: "#5C2828"
-      
+
   sizes:
     sm:
       padding: "10px 20px"
@@ -518,7 +522,7 @@ button:
     xl:
       padding: "20px 48px"
       font_size: "0.875rem"
-      
+
   base_styles:
     font_family: "Inter"
     font_weight: 500
@@ -540,7 +544,7 @@ input:
     border_radius: "0"
     background: "#FFFFFF"
     color: "#0D0D0D"
-    
+
   states:
     focus:
       border_color: "#0D0D0D"
@@ -550,7 +554,7 @@ input:
     disabled:
       background: "#F5F3EF"
       color: "#A3A3A3"
-      
+
   placeholder:
     color: "rgba(0, 0, 0, 0.4)"
 ```
@@ -565,13 +569,13 @@ product_card:
     hover_border: "#0D0D0D"
     hover_shadow: "0 8px 24px rgba(0, 0, 0, 0.08)"
     transition: "all 0.3s ease"
-    
+
   image:
     aspect_ratio: "3:4"
     background: "#F5F3EF"
     object_fit: "cover"
     hover_effect: "secondary_image_swap"
-    
+
   badges:
     position: "top-left"
     margin: "8px"
@@ -589,7 +593,7 @@ product_card:
         overlay: true
         background: "rgba(0, 0, 0, 0.6)"
         color: "#FAFAFA"
-        
+
   info:
     padding: "16px"
     title:
@@ -618,7 +622,7 @@ badge:
     font_weight: 600
     letter_spacing: "0.05em"
     text_transform: "uppercase"
-    
+
   variants:
     new:
       background: "#0D0D0D"
@@ -647,18 +651,18 @@ header:
   height:
     desktop: "80px"
     mobile: "60px"
-    
+
   behavior:
     sticky: true
     transparent_on_hero: true
     shrink_on_scroll: true
     shrunk_height: "60px"
     backdrop_blur: "10px"
-    
+
   layout:
     desktop: "nav-logo-icons"
     mobile: "hamburger-logo-icons"
-    
+
   # ===========================================
   # SPINNING LOGO (CENTER)
   # ===========================================
@@ -692,7 +696,7 @@ header:
       shop:
         color: "#D4AF37"      # Gold
         glow: "rgba(212, 175, 55, 0.3)"
-        
+
   elements:
     left:
       - type: "hamburger_menu"
@@ -708,11 +712,11 @@ header:
             megamenu: true
           - label: "About"
             url: "/about/"
-            
+
     center:
       - type: "spinning_logo"
         # See logo config above
-        
+
     right:
       - type: "search"
         icon: "search"
@@ -727,7 +731,7 @@ header:
         count_badge:
           background: "#D4AF37"
           color: "#0D0D0D"
-        
+
   megamenu:
     collections:
       columns:
@@ -759,7 +763,7 @@ footer:
   padding:
     desktop: "60px 24px 40px"
     mobile: "48px 16px 32px"
-    
+
   layout:
     columns:
       - title: "SHOP"
@@ -774,7 +778,7 @@ footer:
             url: "/collection/signature/"
           - text: "New Arrivals"
             url: "/shop/?orderby=date"
-            
+
       - title: "SUPPORT"
         links:
           - text: "Shipping & Delivery"
@@ -787,7 +791,7 @@ footer:
             url: "/contact/"
           - text: "FAQ"
             url: "/faq/"
-            
+
       - title: "COMPANY"
         links:
           - text: "Our Story"
@@ -798,7 +802,7 @@ footer:
             url: "/sustainability/"
           - text: "Careers"
             url: "/careers/"
-            
+
       - title: "CONNECT"
         type: "social"
         links:
@@ -811,7 +815,7 @@ footer:
           - text: "Pinterest"
             url: "https://pinterest.com/skyyrose"
             icon: "pinterest"
-            
+
   bottom_bar:
     copyright: "© {{year}} SkyyRose. All rights reserved."
     links:
@@ -839,24 +843,24 @@ woocommerce:
     default_sorting: "menu_order"
     columns: 4
     columns_mobile: 2
-    
+
   product:
     image_gallery: "thumbnails_below"
     zoom: true
     lightbox: true
-    
+
   cart:
     cart_page: true
     mini_cart: true
     free_shipping_threshold: 150
     shipping_calculator: false
-    
+
   checkout:
     guest_checkout: true
     create_account_default: true
     terms_and_conditions: true
     order_notes: false
-    
+
   currency:
     code: "USD"
     symbol: "$"
@@ -876,30 +880,30 @@ performance:
     lcp: "<2.5s"
     fid: "<100ms"
     cls: "<0.1"
-    
+
   lighthouse:
     performance: ">90"
     accessibility: ">90"
     best_practices: ">90"
     seo: ">90"
-    
+
   optimization:
     images:
       format: "WebP with JPEG fallback"
       quality: 85
       lazy_loading: true
       responsive_sizes: [400, 800, 1200, 1600]
-      
+
     css:
       minify: true
       critical_css: true
       defer_non_critical: true
-      
+
     javascript:
       minify: true
       defer: true
       async_non_critical: true
-      
+
     caching:
       browser_cache: "1 year"
       page_cache: true
@@ -918,18 +922,18 @@ agent_api:
       pages: "/wp/v2/pages"
       posts: "/wp/v2/posts"
       media: "/wp/v2/media"
-      
+
   woocommerce_rest:
     base: "{{SITE_URL}}/wp-json/wc/v3"
     endpoints:
       products: "/products"
       categories: "/products/categories"
       orders: "/orders"
-      
+
   elementor_api:
     template_import: "POST /elementor/v1/template/import"
     template_export: "GET /elementor/v1/template/export"
-    
+
   authentication:
     type: "application_password"
     header: "Authorization: Basic {{BASE64_CREDENTIALS}}"
@@ -944,22 +948,22 @@ files:
   specifications:
     - path: "HOMEPAGE_SPEC.md"
       description: "Complete homepage specification"
-      
+
     - path: "BLACK_ROSE_SPEC.md"
       description: "BLACK ROSE collection page specification"
-      
+
     - path: "LOVE_HURTS_SPEC.md"
       description: "LOVE HURTS collection page specification"
-      
+
     - path: "SIGNATURE_SPEC.md"
       description: "SIGNATURE collection page specification"
-      
+
     - path: "PRODUCT_PAGE_SPEC.md"
       description: "Single product page (PDP) specification"
-      
+
     - path: "SHOP_ARCHIVE_SPEC.md"
       description: "Shop/Archive page specification"
-      
+
     - path: "GLOBAL_CONFIG.md"
       description: "This file - global configuration and components"
 ```

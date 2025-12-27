@@ -18,16 +18,19 @@ cd DevSkyy
 ## Step 2: Install Dependencies
 
 ### Option A: Using pip (recommended)
+
 ```bash
 pip install fastmcp httpx pydantic openai python-jose[cryptography]
 ```
 
 ### Option B: Using project dependencies
+
 ```bash
 pip install -e ".[all]"
 ```
 
 ### Option C: Using uv (fastest)
+
 ```bash
 uv pip install fastmcp httpx pydantic openai python-jose[cryptography]
 ```
@@ -35,18 +38,21 @@ uv pip install fastmcp httpx pydantic openai python-jose[cryptography]
 ## Step 3: Set Environment Variables
 
 ### Linux/macOS
+
 ```bash
 export OPENAI_API_KEY="sk-your-openai-api-key-here"
 export DEVSKYY_API_KEY="your-devskyy-key-here"  # Optional
 ```
 
 ### Windows (PowerShell)
+
 ```powershell
 $env:OPENAI_API_KEY="sk-your-openai-api-key-here"
 $env:DEVSKYY_API_KEY="your-devskyy-key-here"  # Optional
 ```
 
 ### Windows (Command Prompt)
+
 ```cmd
 set OPENAI_API_KEY=sk-your-openai-api-key-here
 set DEVSKYY_API_KEY=your-devskyy-key-here
@@ -55,21 +61,25 @@ set DEVSKYY_API_KEY=your-devskyy-key-here
 ## Step 4: Test the Server
 
 ### Validate installation
+
 ```bash
 python test_server.py
 ```
 
 You should see:
+
 ```
 ✅ All validation checks passed!
 ```
 
 ### Run the server
+
 ```bash
 python server.py
 ```
 
 You should see:
+
 ```
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
@@ -92,17 +102,21 @@ Starting OpenAI MCP server on stdio...
 ## Step 5: Configure Claude Desktop
 
 ### macOS
+
 1. Locate config file:
+
    ```bash
    ~/Library/Application Support/Claude/claude_desktop_config.json
    ```
 
 2. Edit or create the file:
+
    ```bash
    code ~/Library/Application\ Support/Claude/claude_desktop_config.json
    ```
 
 3. Add server configuration:
+
    ```json
    {
      "mcpServers": {
@@ -119,7 +133,9 @@ Starting OpenAI MCP server on stdio...
    ```
 
 ### Windows
+
 1. Locate config file:
+
    ```
    %APPDATA%\Claude\claude_desktop_config.json
    ```
@@ -127,7 +143,9 @@ Starting OpenAI MCP server on stdio...
 2. Edit or create the file with the same configuration as macOS.
 
 ### Linux
+
 1. Locate config file:
+
    ```bash
    ~/.config/Claude/claude_desktop_config.json
    ```
@@ -146,26 +164,31 @@ Starting OpenAI MCP server on stdio...
 Try these example prompts:
 
 ### Text Generation
+
 ```
 Use openai_completion to explain quantum computing
 ```
 
 ### Code Generation
+
 ```
 Use openai_code_generation to create a FastAPI endpoint for user authentication in Python
 ```
 
 ### Vision Analysis
+
 ```
 Use openai_vision_analysis to analyze this image: [paste image URL]
 ```
 
 ### Model Selection
+
 ```
 Use openai_model_selector to recommend the best model for complex mathematical proofs
 ```
 
 ### DevSkyy Agent
+
 ```
 Use devskyy_agent_openai to scan code in the ./src directory
 ```
@@ -173,26 +196,34 @@ Use devskyy_agent_openai to scan code in the ./src directory
 ## Common Issues
 
 ### "Module not found: httpx"
+
 **Solution:** Install dependencies
+
 ```bash
 pip install fastmcp httpx pydantic openai python-jose[cryptography]
 ```
 
 ### "Authentication failed"
+
 **Solution:** Check your API key
+
 ```bash
 echo $OPENAI_API_KEY
 ```
 
 ### "Server not showing in Claude"
-**Solution:** 
+
+**Solution:**
+
 1. Check the config file path is correct
 2. Verify the absolute path to server.py
 3. Restart Claude Desktop completely
 4. Check Claude Desktop logs for errors
 
 ### "Permission denied"
+
 **Solution:** Make server.py executable (Linux/macOS)
+
 ```bash
 chmod +x server.py
 ```
@@ -200,6 +231,7 @@ chmod +x server.py
 ## Advanced Configuration
 
 ### Custom API URL
+
 ```json
 {
   "mcpServers": {
@@ -213,6 +245,7 @@ chmod +x server.py
 ```
 
 ### Multiple Servers
+
 ```json
 {
   "mcpServers": {
@@ -250,6 +283,7 @@ chmod +x server.py
 ## Examples
 
 ### Generate Production Code
+
 ```json
 {
   "description": "Create a REST API endpoint for user registration with email validation",
@@ -260,6 +294,7 @@ chmod +x server.py
 ```
 
 ### Analyze Product Images
+
 ```json
 {
   "image_url": "https://example.com/product.jpg",
@@ -269,6 +304,7 @@ chmod +x server.py
 ```
 
 ### Smart Model Selection
+
 ```json
 {
   "task_description": "Review and optimize a complex algorithm",
@@ -279,19 +315,20 @@ chmod +x server.py
 
 ## Community
 
-- GitHub: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy
-- Issues: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
-- Docs: https://docs.devskyy.com
+- GitHub: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy>
+- Issues: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues>
+- Docs: <https://docs.devskyy.com>
 
 ## Support
 
 Having trouble? Check:
+
 1. [Common Issues](#common-issues) above
 2. [Full documentation](SERVER_README.md)
 3. [GitHub Issues](https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues)
 
 ---
 
-**Last Updated:** December 2024  
-**Version:** 1.0.0  
+**Last Updated:** December 2024
+**Version:** 1.0.0
 **License:** Copyright © 2025 The Skyy Rose Collection LLC

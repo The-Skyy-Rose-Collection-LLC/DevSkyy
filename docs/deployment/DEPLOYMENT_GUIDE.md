@@ -74,9 +74,10 @@ uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --workers 4
 ```
 
 Access the application:
-- **API:** http://localhost:8000
-- **Docs:** http://localhost:8000/docs
-- **ReDoc:** http://localhost:8000/redoc
+
+- **API:** <http://localhost:8000>
+- **Docs:** <http://localhost:8000/docs>
+- **ReDoc:** <http://localhost:8000/redoc>
 
 ---
 
@@ -2740,12 +2741,14 @@ groups:
 ## Support & Resources
 
 ### Documentation
-- **API Docs:** https://api.devskyy.com/docs
-- **User Guide:** https://docs.devskyy.com
+
+- **API Docs:** <https://api.devskyy.com/docs>
+- **User Guide:** <https://docs.devskyy.com>
 - **Agent Documentation:** See AGENTS.md
 
 ### Contact
-- **Email:** support@devskyy.com
+
+- **Email:** <support@devskyy.com>
 - **Slack:** devskyy.slack.com
 - **GitHub:** github.com/SkyyRoseLLC/DevSkyy
 

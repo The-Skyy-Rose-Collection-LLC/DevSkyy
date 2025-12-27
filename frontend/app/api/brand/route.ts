@@ -94,4 +94,3 @@ export async function GET() {
     collections: COLLECTION_CONTEXT,
   });
 }
-

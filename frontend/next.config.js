@@ -34,7 +34,7 @@ const nextConfig = {
     // In development, proxy to local Python backend
     // In production (Vercel), /api routes go directly to Python serverless functions
     const isDev = process.env.NODE_ENV === 'development';
-    
+
     if (isDev) {
       return [
         {
@@ -45,7 +45,7 @@ const nextConfig = {
         },
       ];
     }
-    
+
     // In production, no rewrites needed - Vercel handles /api routes
     return [];
   },

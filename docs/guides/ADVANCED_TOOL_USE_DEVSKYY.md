@@ -176,6 +176,7 @@ response = client.beta.messages.create(
 ### Problem We're Solving
 
 DevSkyy workflows often involve:
+
 - Analyzing 1000+ products across multiple stores
 - Processing bulk inventory updates
 - Running multi-agent orchestration pipelines
@@ -292,6 +293,7 @@ print(json.dumps({
 ```
 
 **Result:**
+
 - 500+ inventory records processed
 - Only 2KB summary enters context (vs. 150KB+ raw data)
 - Parallel execution reduces latency 5x
@@ -338,6 +340,7 @@ for block in response.content:
 ### Problem We're Solving
 
 DevSkyy's complex tools have ambiguous parameters:
+
 - Date formats (ISO 8601? Unix timestamp?)
 - ID conventions (UUID? SKU format?)
 - Nested object structures
@@ -791,24 +794,28 @@ if __name__ == "__main__":
 ## Implementation Roadmap
 
 ### Phase 1: Tool Search Integration (Week 1)
+
 - [ ] Add `defer_loading=True` to 50+ non-critical tools
 - [ ] Keep 4 core tools always loaded
 - [ ] Add system prompt guidance
 - [ ] Test discovery accuracy
 
 ### Phase 2: Programmatic Tool Calling (Week 2)
+
 - [ ] Mark bulk operation tools with `allowed_callers`
 - [ ] Document return formats for code parsing
 - [ ] Create PTC workflow templates
 - [ ] Test parallel execution
 
 ### Phase 3: Tool Use Examples (Week 3)
+
 - [ ] Add 2-5 examples per complex tool
 - [ ] Cover minimal, standard, and full usage patterns
 - [ ] Focus on ambiguous parameters
 - [ ] Validate with real queries
 
 ### Phase 4: Production Deployment (Week 4)
+
 - [ ] Enable beta features in production
 - [ ] Monitor token usage metrics
 - [ ] A/B test accuracy improvements

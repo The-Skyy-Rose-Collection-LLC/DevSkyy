@@ -142,4 +142,3 @@ function TaskRow({ task }: { task: TaskResponse }) {
     </div>
   );
 }
-
