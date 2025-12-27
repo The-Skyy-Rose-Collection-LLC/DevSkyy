@@ -111,7 +111,14 @@ class ToolParameter(BaseModel):
 
 
 class ToolDefinition(BaseModel):
-    """Complete tool definition"""
+    """
+    Complete tool definition.
+
+    Supports Anthropic Advanced Tool Use (beta) features:
+    - defer_loading: Tool Search - load on-demand for 85% token reduction
+    - allowed_callers: Programmatic Tool Calling (PTC) - batch operations via code
+    - input_examples: Tool Use Examples - concrete examples for 90% accuracy
+    """
 
     name: str
     description: str
@@ -123,6 +130,11 @@ class ToolDefinition(BaseModel):
     rate_limit: int | None = None  # Requests per minute
     timeout: float = 30.0
     enabled: bool = True
+
+    # Advanced Tool Use (Anthropic Beta)
+    defer_loading: bool = False  # Tool Search: load on-demand vs upfront
+    allowed_callers: list[str] = []  # PTC: e.g. ["code_execution_20250825"]
+    input_examples: list[dict[str, Any]] = []  # Concrete parameter examples
 
     # Implementation reference
     handler: str | None = None  # Module path to handler function
@@ -151,9 +163,14 @@ class ToolDefinition(BaseModel):
             },
         }
 
-    def to_anthropic_tool(self) -> dict:
-        """Convert to Anthropic tool format"""
-        return {
+    def to_anthropic_tool(self, include_advanced: bool = True) -> dict:
+        """
+        Convert to Anthropic tool format.
+
+        Args:
+            include_advanced: Include Advanced Tool Use fields (defer_loading, allowed_callers, input_examples)
+        """
+        tool: dict[str, Any] = {
             "name": self.name,
             "description": self.description,
             "input_schema": {
@@ -163,9 +180,25 @@ class ToolDefinition(BaseModel):
             },
         }
 
-    def to_mcp_tool(self) -> dict:
-        """Convert to MCP tool format"""
-        return {
+        # Add Advanced Tool Use fields if present
+        if include_advanced:
+            if self.defer_loading:
+                tool["defer_loading"] = True
+            if self.allowed_callers:
+                tool["allowed_callers"] = self.allowed_callers
+            if self.input_examples:
+                tool["input_examples"] = self.input_examples
+
+        return tool
+
+    def to_mcp_tool(self, include_advanced: bool = True) -> dict:
+        """
+        Convert to MCP tool format.
+
+        Args:
+            include_advanced: Include Advanced Tool Use annotations
+        """
+        tool: dict[str, Any] = {
             "name": self.name,
             "description": self.description,
             "inputSchema": {
@@ -174,6 +207,23 @@ class ToolDefinition(BaseModel):
                 "required": self.get_required_params(),
             },
         }
+
+        # Add annotations with Advanced Tool Use fields
+        if include_advanced:
+            annotations: dict[str, Any] = {
+                "readOnlyHint": not self.requires_auth,
+                "idempotentHint": False,
+            }
+            if self.defer_loading:
+                annotations["defer_loading"] = True
+            if self.allowed_callers:
+                annotations["allowed_callers"] = self.allowed_callers
+            if self.input_examples:
+                annotations["input_examples"] = self.input_examples
+
+            tool["annotations"] = annotations
+
+        return tool
 
 
 # =============================================================================
@@ -294,7 +344,7 @@ class ToolRegistry:
                 errors.append(f"Parameter {name} must be string")
             elif expected_type == ParameterType.INTEGER and not isinstance(value, int):
                 errors.append(f"Parameter {name} must be integer")
-            elif expected_type == ParameterType.NUMBER and not isinstance(value, (int, float)):
+            elif expected_type == ParameterType.NUMBER and not isinstance(value, int | float):
                 errors.append(f"Parameter {name} must be number")
             elif expected_type == ParameterType.BOOLEAN and not isinstance(value, bool):
                 errors.append(f"Parameter {name} must be boolean")
@@ -308,7 +358,7 @@ class ToolRegistry:
                 errors.append(f"Parameter {name} must be one of: {param.enum}")
 
             # Range validation
-            if isinstance(value, (int, float)):
+            if isinstance(value, int | float):
                 if param.min_value is not None and value < param.min_value:
                     errors.append(f"Parameter {name} must be >= {param.min_value}")
                 if param.max_value is not None and value > param.max_value:
@@ -660,6 +710,24 @@ BUILTIN_TOOLS = [
             ),
         ],
         requires_auth=True,
+        # Advanced Tool Use
+        defer_loading=True,
+        allowed_callers=["code_execution_20250825"],  # Enable PTC for batch product creation
+        input_examples=[
+            {
+                "name": "Heart aRose Bomber Jacket",
+                "price": 299.99,
+                "description": "Premium bomber with rose gold accents",
+                "collection": "BLACK_ROSE",
+                "sizes": ["S", "M", "L", "XL"],
+            },
+            {
+                "name": "Love Hurts Hoodie",
+                "price": 149.99,
+                "description": "Oversized hoodie with signature thorns",
+                "collection": "LOVE_HURTS",
+            },
+        ],
     ),
     ToolDefinition(
         name="update_product",
@@ -680,6 +748,13 @@ BUILTIN_TOOLS = [
             ),
         ],
         requires_auth=True,
+        # Advanced Tool Use
+        defer_loading=True,
+        allowed_callers=["code_execution_20250825"],  # Enable PTC for batch updates
+        input_examples=[
+            {"product_id": 123, "updates": {"price": 199.99, "sale_price": 149.99}},
+            {"product_id": 456, "updates": {"stock_quantity": 50, "status": "publish"}},
+        ],
     ),
     ToolDefinition(
         name="get_product",
@@ -742,6 +817,13 @@ BUILTIN_TOOLS = [
             ),
         ],
         requires_auth=True,
+        # Advanced Tool Use
+        defer_loading=True,
+        allowed_callers=["code_execution_20250825"],  # Enable PTC for batch inventory sync
+        input_examples=[
+            {"product_id": 123, "quantity": 100},
+            {"product_id": 456, "quantity": 25, "variation_id": 789},
+        ],
     ),
     ToolDefinition(
         name="create_discount",
@@ -905,6 +987,24 @@ BUILTIN_TOOLS = [
         ],
         requires_auth=True,
         timeout=300.0,
+        # Advanced Tool Use
+        defer_loading=True,
+        allowed_callers=["code_execution_20250825"],  # Enable PTC for batch 3D generation
+        input_examples=[
+            {
+                "product_name": "Heart aRose Bomber",
+                "garment_type": "bomber",
+                "collection": "BLACK_ROSE",
+                "details": "Rose gold zippers, embroidered thorns on back",
+                "output_format": "glb",
+            },
+            {
+                "product_name": "Love Hurts Oversized Hoodie",
+                "garment_type": "hoodie",
+                "collection": "LOVE_HURTS",
+                "details": "Distressed look, oversized fit",
+            },
+        ],
     ),
     ToolDefinition(
         name="virtual_tryon",
@@ -933,6 +1033,15 @@ BUILTIN_TOOLS = [
         ],
         requires_auth=True,
         timeout=120.0,
+        # Advanced Tool Use
+        defer_loading=True,
+        input_examples=[
+            {
+                "model_image": "/images/models/model_01.jpg",
+                "garment_image": "/images/products/bomber_black_rose.png",
+                "category": "outerwear",
+            },
+        ],
     ),
     ToolDefinition(
         name="remove_background",
@@ -1238,6 +1347,12 @@ BUILTIN_TOOLS = [
             ),
         ],
         requires_auth=True,
+        # Advanced Tool Use
+        defer_loading=True,
+        input_examples=[
+            {"product_ids": [101, 102, 103], "horizon": 30},
+            {"product_ids": [201], "horizon": 90},
+        ],
     ),
     ToolDefinition(
         name="generate_report",
