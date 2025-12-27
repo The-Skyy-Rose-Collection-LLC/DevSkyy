@@ -772,22 +772,48 @@ class ThreeDAssetPipeline:
 - [ ] No TODO/FIXME/placeholder strings
 
 ### Vercel Deployment (Serverless)
-DevSkyy uses Vercel for serverless deployment with Next.js frontend + Python backend.
+DevSkyy uses Vercel for serverless deployment with Next.js frontend. The Python backend is deployed separately (via Docker or other hosting).
 
 **Configuration**: `vercel.json`
 ```json
 {
-  "builds": [
-    {"src": "frontend/package.json", "use": "@vercel/next"},
-    {"src": "api/**/*.py", "use": "@vercel/python"}
-  ],
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "rootDirectory": "frontend",
+  "buildCommand": "npm run build",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "outputDirectory": ".next",
+  "regions": ["iad1"],
   "functions": {
-    "api/**/*.py": {"runtime": "python3.11", "maxDuration": 60}
-  }
+    "app/api/**/*.ts": {
+      "maxDuration": 60
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/backend/:path*",
+      "destination": "${BACKEND_URL}/:path*"
+    }
+  ]
 }
 ```
 
+**Note**: The `rootDirectory: "frontend"` setting tells Vercel to deploy only the Next.js application from the frontend directory. Backend API calls are proxied to a separate backend deployment via the `BACKEND_URL` environment variable.
+
 **Environment Variables** (set in Vercel dashboard):
+- `BACKEND_URL`: URL of the Python backend API (required for API rewrites)
 - All LLM API keys (OpenAI, Anthropic, Google, etc.)
 - Database connection strings (use Neon PostgreSQL for serverless)
 - Redis URL (use Upstash Redis for serverless)
