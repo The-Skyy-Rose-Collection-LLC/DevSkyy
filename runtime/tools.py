@@ -235,6 +235,11 @@ class ToolSpec(BaseModel):
     Complete tool specification.
 
     Defines a tool's interface, constraints, and metadata.
+
+    Supports Anthropic Advanced Tool Use (beta) features:
+    - defer_loading: Tool Search - load on-demand for 85% token reduction
+    - allowed_callers: Programmatic Tool Calling (PTC) - batch operations via code
+    - input_examples: Tool Use Examples - concrete examples for 90% accuracy
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -263,6 +268,15 @@ class ToolSpec(BaseModel):
     idempotent: bool = False
     cacheable: bool = False
     cache_ttl_seconds: int = 300
+
+    # Advanced Tool Use (Anthropic Beta)
+    defer_loading: bool = False  # Tool Search: load on-demand vs upfront
+    allowed_callers: list[str] = Field(
+        default_factory=list
+    )  # PTC: e.g. ["code_execution_20250825"]
+    input_examples: list[dict[str, Any]] = Field(
+        default_factory=list
+    )  # Concrete parameter examples
 
     # Metadata
     tags: set[str] = Field(default_factory=set)
@@ -303,21 +317,60 @@ class ToolSpec(BaseModel):
             "parameters": self.get_json_schema(),
         }
 
-    def to_anthropic_tool(self) -> dict[str, Any]:
-        """Convert to Anthropic tool format."""
-        return {
+    def to_anthropic_tool(self, include_advanced: bool = True) -> dict[str, Any]:
+        """
+        Convert to Anthropic tool format.
+
+        Args:
+            include_advanced: Include Advanced Tool Use fields (defer_loading, allowed_callers, input_examples)
+        """
+        tool: dict[str, Any] = {
             "name": self.name,
             "description": self.description,
             "input_schema": self.get_json_schema(),
         }
 
-    def to_mcp_tool(self) -> dict[str, Any]:
-        """Convert to MCP tool format."""
-        return {
+        # Add Advanced Tool Use fields if present
+        if include_advanced:
+            if self.defer_loading:
+                tool["defer_loading"] = True
+            if self.allowed_callers:
+                tool["allowed_callers"] = self.allowed_callers
+            if self.input_examples:
+                tool["input_examples"] = self.input_examples
+
+        return tool
+
+    def to_mcp_tool(self, include_advanced: bool = True) -> dict[str, Any]:
+        """
+        Convert to MCP tool format.
+
+        Args:
+            include_advanced: Include Advanced Tool Use annotations
+        """
+        tool: dict[str, Any] = {
             "name": self.name,
             "description": self.description,
             "inputSchema": self.get_json_schema(),
         }
+
+        # Add annotations with Advanced Tool Use fields
+        if include_advanced:
+            annotations: dict[str, Any] = {
+                "readOnlyHint": self.severity == ToolSeverity.READ_ONLY,
+                "destructiveHint": self.severity == ToolSeverity.DESTRUCTIVE,
+                "idempotentHint": self.idempotent,
+            }
+            if self.defer_loading:
+                annotations["defer_loading"] = True
+            if self.allowed_callers:
+                annotations["allowed_callers"] = self.allowed_callers
+            if self.input_examples:
+                annotations["input_examples"] = self.input_examples
+
+            tool["annotations"] = annotations
+
+        return tool
 
 
 # =============================================================================
@@ -443,6 +496,10 @@ class ToolRegistry:
         cache_ttl_seconds: int = 300,
         timeout_seconds: float = 30.0,
         tags: set[str] | None = None,
+        # Advanced Tool Use (Anthropic Beta)
+        defer_loading: bool = False,
+        allowed_callers: list[str] | None = None,
+        input_examples: list[dict[str, Any]] | None = None,
         **kwargs: Any,
     ) -> Callable[[ToolHandler], ToolHandler]:
         """
@@ -453,6 +510,10 @@ class ToolRegistry:
                 name="my_tool",
                 description="Does something",
                 category=ToolCategory.SYSTEM,
+                # Advanced Tool Use (optional)
+                defer_loading=True,  # Load on-demand
+                allowed_callers=["code_execution_20250825"],  # Enable PTC
+                input_examples=[{"arg1": "example"}],  # Improve accuracy
             )
             async def my_tool(arg1: str) -> dict:
                 return {"result": arg1}
@@ -471,6 +532,9 @@ class ToolRegistry:
                 cache_ttl_seconds=cache_ttl_seconds,
                 timeout_seconds=timeout_seconds,
                 tags=tags or set(),
+                defer_loading=defer_loading,
+                allowed_callers=allowed_callers or [],
+                input_examples=input_examples or [],
                 **kwargs,
             )
             self.register(spec, func)
