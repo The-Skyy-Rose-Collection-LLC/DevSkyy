@@ -50,12 +50,58 @@ import json
 import logging
 import os
 import sys
+import traceback
 from enum import Enum
 from pathlib import Path
 from typing import Any
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
+
+
+# =============================================================================
+# Custom Exceptions for Better Error Classification
+# =============================================================================
+
+
+class AgentBridgeError(Exception):
+    """Base exception for Agent Bridge errors."""
+
+    def __init__(self, message: str, error_code: str = "BRIDGE_ERROR"):
+        self.message = message
+        self.error_code = error_code
+        super().__init__(message)
+
+
+class AgentNotAvailableError(AgentBridgeError):
+    """Raised when an agent is not available or failed to initialize."""
+
+    def __init__(self, agent_type: str, reason: str = ""):
+        message = f"Agent '{agent_type}' is not available"
+        if reason:
+            message += f": {reason}"
+        super().__init__(message, "AGENT_NOT_AVAILABLE")
+        self.agent_type = agent_type
+
+
+class AgentExecutionError(AgentBridgeError):
+    """Raised when agent execution fails."""
+
+    def __init__(self, agent_type: str, operation: str, reason: str):
+        message = f"Agent '{agent_type}' failed to execute '{operation}': {reason}"
+        super().__init__(message, "AGENT_EXECUTION_ERROR")
+        self.agent_type = agent_type
+        self.operation = operation
+
+
+class AgentTimeoutError(AgentBridgeError):
+    """Raised when agent execution times out."""
+
+    def __init__(self, agent_type: str, timeout_seconds: float):
+        message = f"Agent '{agent_type}' timed out after {timeout_seconds}s"
+        super().__init__(message, "AGENT_TIMEOUT")
+        self.agent_type = agent_type
+        self.timeout_seconds = timeout_seconds
 
 try:
     from pydantic import BaseModel, ConfigDict, Field
@@ -397,7 +443,17 @@ class LearningReportInput(BaseInput):
 
 
 async def get_agent(agent_type: AgentType) -> Any:
-    """Get or create an agent instance."""
+    """Get or create an agent instance.
+
+    Args:
+        agent_type: The type of agent to get.
+
+    Returns:
+        The agent instance.
+
+    Raises:
+        AgentNotAvailableError: If the agent cannot be created or initialized.
+    """
     global _agents
 
     if agent_type.value not in _agents:
@@ -410,12 +466,40 @@ async def get_agent(agent_type: AgentType) -> Any:
             AgentType.ANALYTICS: AnalyticsAgent,
         }
         agent_class = agent_classes.get(agent_type)
-        if agent_class:
+        if not agent_class:
+            raise AgentNotAvailableError(
+                agent_type.value,
+                reason="Unknown agent type",
+            )
+        try:
             agent = agent_class()
             await agent.initialize()
             _agents[agent_type.value] = agent
+            logger.info(f"Agent '{agent_type.value}' initialized successfully")
+        except ImportError as e:
+            raise AgentNotAvailableError(
+                agent_type.value,
+                reason=f"Missing dependency: {e}",
+            ) from e
+        except AttributeError as e:
+            raise AgentNotAvailableError(
+                agent_type.value,
+                reason=f"Agent initialization error: {e}",
+            ) from e
+        except Exception as e:
+            logger.error(
+                f"Failed to initialize agent '{agent_type.value}': {e}",
+                exc_info=True,
+            )
+            raise AgentNotAvailableError(
+                agent_type.value,
+                reason=str(e),
+            ) from e
 
-    return _agents.get(agent_type.value)
+    agent = _agents.get(agent_type.value)
+    if not agent:
+        raise AgentNotAvailableError(agent_type.value)
+    return agent
 
 
 async def get_router() -> LLMRouter | None:
@@ -435,7 +519,15 @@ async def get_round_table() -> LLMRoundTable | None:
 
 
 def format_response(data: dict[str, Any], fmt: ResponseFormat) -> str:
-    """Format response based on requested format."""
+    """Format response based on requested format.
+
+    Args:
+        data: Response data dict with 'result', 'error', 'agent', etc.
+        fmt: Output format (JSON or Markdown).
+
+    Returns:
+        Formatted response string.
+    """
     if fmt == ResponseFormat.JSON:
         return json.dumps(data, indent=2, default=str)
 
@@ -443,7 +535,14 @@ def format_response(data: dict[str, Any], fmt: ResponseFormat) -> str:
     output = []
 
     if "error" in data:
-        return f"**Error:** {data['error']}"
+        error_msg = f"**Error:** {data['error']}"
+        if "error_code" in data:
+            error_msg = f"**Error [{data['error_code']}]:** {data['error']}"
+        if "error_type" in data:
+            error_msg += f"\n- Type: `{data['error_type']}`"
+        if "suggestion" in data:
+            error_msg += f"\n- Suggestion: {data['suggestion']}"
+        return error_msg
 
     if "result" in data:
         result = data["result"]
@@ -468,6 +567,59 @@ def format_response(data: dict[str, Any], fmt: ResponseFormat) -> str:
     return "\n".join(output) if output else json.dumps(data, indent=2)
 
 
+def format_error_response(
+    error: Exception,
+    fmt: ResponseFormat,
+    agent_type: str = "",
+    operation: str = "",
+) -> str:
+    """Format an error response with full context.
+
+    Args:
+        error: The exception that occurred.
+        fmt: Output format.
+        agent_type: Optional agent type for context.
+        operation: Optional operation name for context.
+
+    Returns:
+        Formatted error response string.
+    """
+    error_data: dict[str, Any] = {
+        "error": str(error),
+        "error_type": type(error).__name__,
+    }
+
+    # Add specific error codes and suggestions for known error types
+    if isinstance(error, AgentNotAvailableError):
+        error_data["error_code"] = error.error_code
+        error_data["suggestion"] = "Check that the agent is properly configured and all dependencies are installed."
+    elif isinstance(error, AgentExecutionError):
+        error_data["error_code"] = error.error_code
+        error_data["suggestion"] = "Review the input parameters and try again. Check agent logs for details."
+    elif isinstance(error, AgentTimeoutError):
+        error_data["error_code"] = error.error_code
+        error_data["suggestion"] = "The operation took too long. Try with simpler inputs or check system load."
+    elif isinstance(error, TimeoutError):
+        error_data["error_code"] = "TIMEOUT"
+        error_data["suggestion"] = "The operation timed out. Try again or increase timeout settings."
+    elif isinstance(error, ConnectionError):
+        error_data["error_code"] = "CONNECTION_ERROR"
+        error_data["suggestion"] = "Check network connectivity and service availability."
+    elif isinstance(error, ValueError):
+        error_data["error_code"] = "INVALID_INPUT"
+        error_data["suggestion"] = "Check that all input parameters are valid."
+    elif isinstance(error, PermissionError):
+        error_data["error_code"] = "PERMISSION_DENIED"
+        error_data["suggestion"] = "Check that the agent has the required permissions."
+
+    if agent_type:
+        error_data["agent"] = agent_type
+    if operation:
+        error_data["operation"] = operation
+
+    return format_response(error_data, fmt)
+
+
 # =============================================================================
 # Commerce Agent MCP Tools
 # =============================================================================
@@ -485,8 +637,6 @@ async def commerce_get_product(input: CommerceGetProductInput) -> str:
     """
     try:
         agent = await get_agent(AgentType.COMMERCE)
-        if not agent:
-            return format_response({"error": "Commerce agent not available"}, input.response_format)
 
         result = await agent.execute_with_learning(
             prompt=f"Get product details for SKU: {input.sku}",
@@ -506,9 +656,23 @@ async def commerce_get_product(input: CommerceGetProductInput) -> str:
             input.response_format,
         )[:CHARACTER_LIMIT]
 
+    except AgentNotAvailableError as e:
+        logger.error(f"commerce_get_product: agent not available - {e}")
+        return format_error_response(e, input.response_format, "commerce", "get_product")
+    except TimeoutError as e:
+        logger.error(f"commerce_get_product: timeout - {e}")
+        return format_error_response(
+            AgentTimeoutError("commerce", 30.0),
+            input.response_format,
+            "commerce",
+            "get_product",
+        )
+    except ValueError as e:
+        logger.error(f"commerce_get_product: invalid input - {e}")
+        return format_error_response(e, input.response_format, "commerce", "get_product")
     except Exception as e:
-        logger.error(f"commerce_get_product failed: {e}")
-        return format_response({"error": str(e)}, input.response_format)
+        logger.error(f"commerce_get_product failed: {e}", exc_info=True)
+        return format_error_response(e, input.response_format, "commerce", "get_product")
 
 
 @mcp.tool()
@@ -523,8 +687,6 @@ async def commerce_update_product(input: CommerceUpdateProductInput) -> str:
     """
     try:
         agent = await get_agent(AgentType.COMMERCE)
-        if not agent:
-            return format_response({"error": "Commerce agent not available"}, input.response_format)
 
         result = await agent.execute_with_learning(
             prompt=f"Update product {input.sku} with: {json.dumps(input.updates)}",
@@ -540,9 +702,23 @@ async def commerce_update_product(input: CommerceUpdateProductInput) -> str:
             input.response_format,
         )[:CHARACTER_LIMIT]
 
+    except AgentNotAvailableError as e:
+        logger.error(f"commerce_update_product: agent not available - {e}")
+        return format_error_response(e, input.response_format, "commerce", "update_product")
+    except TimeoutError as e:
+        logger.error(f"commerce_update_product: timeout - {e}")
+        return format_error_response(
+            AgentTimeoutError("commerce", 30.0),
+            input.response_format,
+            "commerce",
+            "update_product",
+        )
+    except ValueError as e:
+        logger.error(f"commerce_update_product: invalid input - {e}")
+        return format_error_response(e, input.response_format, "commerce", "update_product")
     except Exception as e:
-        logger.error(f"commerce_update_product failed: {e}")
-        return format_response({"error": str(e)}, input.response_format)
+        logger.error(f"commerce_update_product failed: {e}", exc_info=True)
+        return format_error_response(e, input.response_format, "commerce", "update_product")
 
 
 @mcp.tool()
@@ -1457,8 +1633,15 @@ async def orchestration_learning_report(input: LearningReportInput) -> str:
                     agent = await get_agent(agent_type)
                     if agent and hasattr(agent, "get_stats"):
                         stats[agent_type.value] = agent.get_stats()
-                except Exception:
-                    pass
+                except AgentNotAvailableError:
+                    # Agent not available, skip silently (expected for uninitialized agents)
+                    logger.debug(f"Agent {agent_type.value} not available for stats collection")
+                except Exception as e:
+                    # Log unexpected errors but continue collecting other agent stats
+                    logger.warning(
+                        f"Failed to collect stats for agent {agent_type.value}: {e}",
+                        exc_info=False,
+                    )
 
         return format_response(
             {

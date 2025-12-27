@@ -36,6 +36,7 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
+import json
 import os
 from collections.abc import Callable
 from dataclasses import dataclass, field
@@ -45,7 +46,7 @@ from pathlib import Path
 from typing import Any
 
 import structlog
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ValidationError
 
 from agents.fashn_agent import FashnConfig, FashnTryOnAgent, GarmentCategory
 from agents.tripo_agent import TripoAssetAgent, TripoConfig
@@ -411,35 +412,87 @@ class ProductAssetPipeline:
         return self._wordpress_agent
 
     async def close(self) -> None:
-        """Close all agent sessions and Redis connection."""
+        """Close all agent sessions and Redis connection.
+
+        Logs any errors encountered during cleanup but does not raise,
+        ensuring all resources are attempted to be released.
+        """
+        errors: list[str] = []
+
         if self._huggingface_client:
-            await self._huggingface_client.close()
+            try:
+                await self._huggingface_client.close()
+            except Exception as e:
+                errors.append(f"HuggingFace client close error: {e}")
+                logger.warning("Failed to close HuggingFace client", error=str(e))
+
         if self._tripo_agent:
-            await self._tripo_agent.close()
+            try:
+                await self._tripo_agent.close()
+            except Exception as e:
+                errors.append(f"Tripo agent close error: {e}")
+                logger.warning("Failed to close Tripo agent", error=str(e))
+
         if self._fashn_agent:
-            await self._fashn_agent.close()
+            try:
+                await self._fashn_agent.close()
+            except Exception as e:
+                errors.append(f"FASHN agent close error: {e}")
+                logger.warning("Failed to close FASHN agent", error=str(e))
+
         if self._wordpress_agent:
-            await self._wordpress_agent.close()
+            try:
+                await self._wordpress_agent.close()
+            except Exception as e:
+                errors.append(f"WordPress agent close error: {e}")
+                logger.warning("Failed to close WordPress agent", error=str(e))
+
         # Stage 4.7.2: Close Redis connection
         if self._redis and self._redis_connected:
-            try:  # noqa: SIM105 - contextlib.suppress doesn't work with async
+            try:
                 await self._redis.close()
-            except Exception:
-                pass
+            except ConnectionError as e:
+                errors.append(f"Redis connection close error: {e}")
+                logger.warning("Redis connection already closed or unreachable", error=str(e))
+            except TimeoutError as e:
+                errors.append(f"Redis close timeout: {e}")
+                logger.warning("Redis close timed out", error=str(e))
+            except Exception as e:
+                errors.append(f"Redis close error: {e}")
+                logger.warning("Failed to close Redis connection", error=str(e), error_type=type(e).__name__)
+            finally:
+                self._redis_connected = False
+
+        if errors:
+            logger.info("Pipeline close completed with errors", error_count=len(errors), errors=errors)
 
     # =========================================================================
     # Stage 4.7.2: Redis Cache Layer
     # =========================================================================
 
     async def _ensure_redis_connected(self) -> bool:
-        """Ensure Redis connection is established."""
-        if not REDIS_AVAILABLE or not self.config.cache_enabled:
+        """Ensure Redis connection is established.
+
+        Returns:
+            True if Redis is connected and operational, False otherwise.
+
+        Note:
+            This method distinguishes between transient errors (retry-able)
+            and permanent errors (configuration issues) for better diagnostics.
+        """
+        if not REDIS_AVAILABLE:
+            logger.debug("Redis library not available, caching disabled")
+            return False
+
+        if not self.config.cache_enabled:
+            logger.debug("Redis caching is disabled by configuration")
             return False
 
         if self._redis_connected:
             return True
 
         if not self.config.redis_url:
+            logger.debug("Redis URL not configured, caching disabled")
             return False
 
         try:
@@ -448,13 +501,51 @@ class ProductAssetPipeline:
                 encoding="utf-8",
                 decode_responses=True,
             )
-            # Test connection
-            await self._redis.ping()
+            # Test connection with timeout
+            await asyncio.wait_for(self._redis.ping(), timeout=5.0)
             self._redis_connected = True
-            logger.info("Redis cache connected", url=self.config.redis_url)
+            logger.info("Redis cache connected", url=self.config.redis_url.split("@")[-1])  # Log host only, not credentials
             return True
+        except asyncio.TimeoutError:
+            logger.warning(
+                "Redis connection timed out (transient error, will retry on next request)",
+                redis_url=self.config.redis_url.split("@")[-1],
+            )
+            self._redis_connected = False
+            return False
+        except ConnectionRefusedError as e:
+            logger.warning(
+                "Redis connection refused - server may be down",
+                error=str(e),
+                redis_url=self.config.redis_url.split("@")[-1],
+            )
+            self._redis_connected = False
+            return False
+        except OSError as e:
+            # Network-level errors (DNS resolution, network unreachable, etc.)
+            logger.warning(
+                "Redis network error - check connectivity",
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            self._redis_connected = False
+            return False
+        except ValueError as e:
+            # Configuration errors (invalid URL format, etc.)
+            logger.error(
+                "Redis configuration error (permanent) - check REDIS_URL format",
+                error=str(e),
+            )
+            self._redis_connected = False
+            # Disable cache to prevent repeated config errors
+            self.config.cache_enabled = False
+            return False
         except Exception as e:
-            logger.warning("Redis connection failed, caching disabled", error=str(e))
+            logger.warning(
+                "Redis connection failed with unexpected error",
+                error=str(e),
+                error_type=type(e).__name__,
+            )
             self._redis_connected = False
             return False
 
@@ -471,38 +562,144 @@ class ProductAssetPipeline:
         return f"{CACHE_KEY_PREFIX}3d:{hash_value}"
 
     async def _get_cached_result(self, cache_key: str) -> AssetPipelineResult | None:
-        """Retrieve cached pipeline result."""
+        """Retrieve cached pipeline result.
+
+        Args:
+            cache_key: The cache key to look up.
+
+        Returns:
+            AssetPipelineResult if found and valid, None otherwise.
+
+        Note:
+            Cache failures are logged but do not propagate - the pipeline
+            will continue without cache on any error.
+        """
         if not await self._ensure_redis_connected():
             return None
 
         try:
-            cached = await self._redis.get(cache_key)
+            cached = await asyncio.wait_for(
+                self._redis.get(cache_key),
+                timeout=5.0,
+            )
             if cached:
                 logger.info("Cache hit", cache_key=cache_key)
                 return AssetPipelineResult.model_validate_json(cached)
+            return None
+        except asyncio.TimeoutError:
+            logger.warning(
+                "Cache retrieval timed out",
+                cache_key=cache_key,
+                timeout_seconds=5.0,
+            )
+            return None
+        except json.JSONDecodeError as e:
+            logger.error(
+                "Cache data corruption - invalid JSON",
+                cache_key=cache_key,
+                error=str(e),
+            )
+            # Attempt to delete corrupted cache entry
+            try:
+                await self._redis.delete(cache_key)
+                logger.info("Deleted corrupted cache entry", cache_key=cache_key)
+            except Exception as delete_err:
+                logger.debug(
+                    "Failed to delete corrupted cache entry (non-critical)",
+                    cache_key=cache_key,
+                    error=str(delete_err),
+                )
+            return None
+        except ValidationError as e:
+            logger.error(
+                "Cache data schema mismatch - data may be from older version",
+                cache_key=cache_key,
+                error=str(e),
+            )
+            # Delete incompatible cache entry
+            try:
+                await self._redis.delete(cache_key)
+                logger.info("Deleted incompatible cache entry", cache_key=cache_key)
+            except Exception as delete_err:
+                logger.debug(
+                    "Failed to delete incompatible cache entry (non-critical)",
+                    cache_key=cache_key,
+                    error=str(delete_err),
+                )
+            return None
+        except ConnectionError as e:
+            logger.warning(
+                "Redis connection lost during cache retrieval",
+                cache_key=cache_key,
+                error=str(e),
+            )
+            self._redis_connected = False
+            return None
         except Exception as e:
-            logger.warning("Cache retrieval failed", error=str(e))
-
-        return None
+            logger.warning(
+                "Cache retrieval failed with unexpected error",
+                cache_key=cache_key,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
+            return None
 
     async def _cache_result(self, cache_key: str, result: AssetPipelineResult) -> None:
-        """Cache a pipeline result."""
+        """Cache a pipeline result.
+
+        Args:
+            cache_key: The cache key to store under.
+            result: The pipeline result to cache.
+
+        Note:
+            Cache write failures are logged but do not affect the pipeline.
+            The result is still returned to the caller even if caching fails.
+        """
         if not await self._ensure_redis_connected():
             return
 
         try:
-            await self._redis.setex(
-                cache_key,
-                self.config.cache_ttl_seconds,
-                result.model_dump_json(),
+            serialized = result.model_dump_json()
+            await asyncio.wait_for(
+                self._redis.setex(
+                    cache_key,
+                    self.config.cache_ttl_seconds,
+                    serialized,
+                ),
+                timeout=5.0,
             )
             logger.info(
                 "Result cached",
                 cache_key=cache_key,
                 ttl_days=self.config.cache_ttl_seconds // 86400,
+                size_bytes=len(serialized),
+            )
+        except asyncio.TimeoutError:
+            logger.warning(
+                "Cache write timed out - result not cached",
+                cache_key=cache_key,
+                timeout_seconds=5.0,
+            )
+        except ConnectionError as e:
+            logger.warning(
+                "Redis connection lost during cache write",
+                cache_key=cache_key,
+                error=str(e),
+            )
+            self._redis_connected = False
+        except MemoryError as e:
+            logger.error(
+                "Redis out of memory - consider clearing cache or increasing memory",
+                cache_key=cache_key,
+                error=str(e),
             )
         except Exception as e:
-            logger.warning("Cache storage failed", error=str(e))
+            logger.warning(
+                "Cache storage failed with unexpected error",
+                cache_key=cache_key,
+                error=str(e),
+                error_type=type(e).__name__,
+            )
 
     # =========================================================================
     # Stage 4.7.2: Progress Tracking
