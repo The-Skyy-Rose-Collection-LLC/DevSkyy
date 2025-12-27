@@ -852,6 +852,16 @@ class TripoAssetAgent(SuperAgent):
 
         return validation.model_dump()
 
+    async def close(self) -> None:
+        """
+        Close agent resources.
+
+        The Tripo SDK handles connection management internally,
+        so this method is a no-op but provided for interface consistency
+        with other agents in the asset pipeline.
+        """
+        logger.debug("TripoAssetAgent close called (SDK manages connections)")
+
 
 # =============================================================================
 # Exports
