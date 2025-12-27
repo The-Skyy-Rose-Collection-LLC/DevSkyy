@@ -8,23 +8,12 @@ can consume. It includes mock data for development and real integration
 points for production.
 """
 
-import json
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
-import re
-
-from fastapi import FastAPI, HTTPException, Path, Query
+from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field, field_validator
-
-
-# Valid values for filtering
-VALID_AGENT_STATUSES = {"running", "idle", "learning", "stopped", "error"}
-VALID_AGENT_TYPES = {"commerce", "creative", "marketing", "support", "operations", "analytics"}
-
-# Regex pattern for valid agent IDs (alphanumeric, hyphens, underscores)
-AGENT_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{1,64}$")
+from pydantic import BaseModel
 
 # Create FastAPI app
 app = FastAPI(
@@ -48,14 +37,17 @@ app.add_middleware(
 # Pydantic Models
 # ============================================
 
+
 class AgentStats(BaseModel):
     tasksCompleted: int
     successRate: float
     avgResponseTime: float
 
+
 class Tool(BaseModel):
     name: str
     category: str
+
 
 class Agent(BaseModel):
     id: str
@@ -64,12 +56,14 @@ class Agent(BaseModel):
     description: str
     status: str
     stats: AgentStats
-    tools: List[Tool]
-    mlModels: List[str]
+    tools: list[Tool]
+    mlModels: list[str]
+
 
 class AgentAction(BaseModel):
     success: bool
     message: str
+
 
 class DashboardMetrics(BaseModel):
     totalAgents: int
@@ -79,11 +73,12 @@ class DashboardMetrics(BaseModel):
     avgResponseTime: float
     uptime: float
 
+
 # ============================================
 # Mock Data for Development
 # ============================================
 
-MOCK_AGENTS: List[Dict[str, Any]] = [
+MOCK_AGENTS: list[dict[str, Any]] = [
     {
         "id": "commerce-001",
         "type": "commerce",
@@ -180,6 +175,7 @@ MOCK_AGENTS: List[Dict[str, Any]] = [
 # API Routes
 # ============================================
 
+
 @app.get("/")
 async def root():
     return {
@@ -187,271 +183,110 @@ async def root():
         "message": "DevSkyy API",
         "version": "1.0.0",
         "docs": "/api/docs",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
+
 
 @app.get("/health")
 async def health():
     return {
         "status": "healthy",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "service": "devskyy-api",
     }
 
-def validate_agent_id(agent_id: str) -> str:
-    """Validate agent ID format to prevent injection attacks.
 
-    Args:
-        agent_id: The agent ID to validate.
-
-    Returns:
-        The validated agent ID.
-
-    Raises:
-        HTTPException: If the agent ID is invalid.
-    """
-    if not agent_id:
-        raise HTTPException(status_code=400, detail="Agent ID cannot be empty")
-    if len(agent_id) > 64:
-        raise HTTPException(status_code=400, detail="Agent ID too long (max 64 characters)")
-    if not AGENT_ID_PATTERN.match(agent_id):
-        raise HTTPException(
-            status_code=400,
-            detail="Invalid agent ID format. Must contain only alphanumeric characters, hyphens, and underscores.",
-        )
-    return agent_id
-
-
-@app.get("/v1/agents", response_model=List[Dict[str, Any]])
+@app.get("/v1/agents", response_model=list[dict[str, Any]])
 async def list_agents(
-    status: Optional[str] = Query(
-        None,
-        description="Filter by agent status",
-        pattern="^[a-z]+$",
-        max_length=20,
-    ),
-    type: Optional[str] = Query(
-        None,
-        description="Filter by agent type",
-        pattern="^[a-z]+$",
-        max_length=20,
-    ),
+    status: str | None = Query(None, description="Filter by agent status"),
+    type: str | None = Query(None, description="Filter by agent type"),
 ):
-    """List all agents with optional filtering.
-
-    Args:
-        status: Optional status filter (running, idle, learning, stopped, error).
-        type: Optional type filter (commerce, creative, marketing, support, operations, analytics).
-
-    Returns:
-        List of agents matching the filter criteria.
-    """
+    """List all agents with optional filtering."""
     agents = MOCK_AGENTS
-
-    # Validate status filter
     if status:
-        if status not in VALID_AGENT_STATUSES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid status '{status}'. Valid values: {', '.join(sorted(VALID_AGENT_STATUSES))}",
-            )
-        agents = [a for a in agents if a.get("status") == status]
-
-    # Validate type filter
+        agents = [a for a in agents if a["status"] == status]
     if type:
-        if type not in VALID_AGENT_TYPES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Invalid type '{type}'. Valid values: {', '.join(sorted(VALID_AGENT_TYPES))}",
-            )
-        agents = [a for a in agents if a.get("type") == type]
-
+        agents = [a for a in agents if a["type"] == type]
     return agents
 
+
 @app.get("/v1/agents/{agent_id}")
-async def get_agent(
-    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
-):
-    """Get a specific agent by ID or type.
-
-    Args:
-        agent_id: The agent ID (e.g., 'commerce-001') or type (e.g., 'commerce').
-
-    Returns:
-        Agent details including stats, tools, and ML models.
-
-    Raises:
-        HTTPException 400: If agent_id format is invalid.
-        HTTPException 404: If agent is not found.
-    """
-    validated_id = validate_agent_id(agent_id)
+async def get_agent(agent_id: str):
+    """Get a specific agent by ID or type."""
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return agent
 
 
 @app.get("/v1/agents/{agent_id}/stats")
-async def get_agent_stats(
-    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
-):
-    """Get stats for a specific agent.
-
-    Args:
-        agent_id: The agent ID or type.
-
-    Returns:
-        Agent statistics including tasks completed, success rate, and response time.
-    """
-    validated_id = validate_agent_id(agent_id)
+async def get_agent_stats(agent_id: str):
+    """Get stats for a specific agent."""
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return agent.get("stats", {})
 
 
 @app.get("/v1/agents/{agent_id}/tools")
-async def get_agent_tools(
-    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
-):
-    """Get tools for a specific agent.
-
-    Args:
-        agent_id: The agent ID or type.
-
-    Returns:
-        List of tools available to the agent.
-    """
-    validated_id = validate_agent_id(agent_id)
+async def get_agent_tools(agent_id: str):
+    """Get tools for a specific agent."""
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return agent.get("tools", [])
 
 
 @app.post("/v1/agents/{agent_id}/start")
-async def start_agent(
-    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
-):
-    """Start a specific agent.
-
-    Args:
-        agent_id: The agent ID or type.
-
-    Returns:
-        Success status and agent state.
-    """
-    validated_id = validate_agent_id(agent_id)
+async def start_agent(agent_id: str):
+    """Start a specific agent."""
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return {"success": True, "message": f"Agent {agent['name']} started", "status": "running"}
 
 
 @app.post("/v1/agents/{agent_id}/stop")
-async def stop_agent(
-    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
-):
-    """Stop a specific agent.
-
-    Args:
-        agent_id: The agent ID or type.
-
-    Returns:
-        Success status and agent state.
-    """
-    validated_id = validate_agent_id(agent_id)
+async def stop_agent(agent_id: str):
+    """Stop a specific agent."""
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
+        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return {"success": True, "message": f"Agent {agent['name']} stopped", "status": "stopped"}
+
 
 @app.get("/v1/metrics/dashboard", response_model=DashboardMetrics)
 async def dashboard_metrics():
-    """Get dashboard metrics.
+    """Get dashboard metrics."""
+    active = sum(1 for a in MOCK_AGENTS if a["status"] == "running")
+    total_tasks = sum(a["stats"]["tasksCompleted"] for a in MOCK_AGENTS)
+    avg_success = sum(a["stats"]["successRate"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
+    avg_response = sum(a["stats"]["avgResponseTime"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
 
-    Returns aggregated metrics across all agents including task counts,
-    success rates, and response times.
+    return {
+        "totalAgents": len(MOCK_AGENTS),
+        "activeAgents": active,
+        "totalTasks": total_tasks,
+        "successRate": round(avg_success, 2),
+        "avgResponseTime": round(avg_response, 2),
+        "uptime": 99.9,
+    }
 
-    Handles edge cases like empty agent lists gracefully.
-    """
-    try:
-        # Guard against empty agent list
-        if not MOCK_AGENTS:
-            return {
-                "totalAgents": 0,
-                "activeAgents": 0,
-                "totalTasks": 0,
-                "successRate": 0.0,
-                "avgResponseTime": 0.0,
-                "uptime": 99.9,
-            }
-
-        active = sum(1 for a in MOCK_AGENTS if a.get("status") == "running")
-
-        # Safely sum tasks, defaulting to 0 for missing/invalid stats
-        total_tasks = sum(
-            a.get("stats", {}).get("tasksCompleted", 0)
-            for a in MOCK_AGENTS
-        )
-
-        # Calculate averages with protection against division by zero
-        # and None/missing values
-        success_rates = [
-            a.get("stats", {}).get("successRate")
-            for a in MOCK_AGENTS
-            if a.get("stats", {}).get("successRate") is not None
-        ]
-        avg_success = (
-            sum(success_rates) / len(success_rates)
-            if success_rates else 0.0
-        )
-
-        response_times = [
-            a.get("stats", {}).get("avgResponseTime")
-            for a in MOCK_AGENTS
-            if a.get("stats", {}).get("avgResponseTime") is not None
-        ]
-        avg_response = (
-            sum(response_times) / len(response_times)
-            if response_times else 0.0
-        )
-
-        return {
-            "totalAgents": len(MOCK_AGENTS),
-            "activeAgents": active,
-            "totalTasks": total_tasks,
-            "successRate": round(avg_success, 2),
-            "avgResponseTime": round(avg_response, 2),
-            "uptime": 99.9,
-        }
-    except (TypeError, ValueError) as e:
-        # Handle unexpected data types in stats
-        raise HTTPException(
-            status_code=500,
-            detail=f"Error calculating metrics: {e}. Agent data may be corrupted.",
-        )
-    except Exception as e:
-        # Catch-all for unexpected errors
-        raise HTTPException(
-            status_code=500,
-            detail=f"Internal error calculating dashboard metrics: {e}",
-        )
 
 @app.get("/v1/tools")
 async def list_tools():
@@ -463,6 +298,7 @@ async def list_tools():
             all_tools.append(tool_with_agent)
     return all_tools
 
+
 @app.get("/v1/3d/status")
 async def get_3d_pipeline_status():
     """Get 3D pipeline status for the 3D Asset Dashboard."""
@@ -471,5 +307,5 @@ async def get_3d_pipeline_status():
         "models": ["hunyuan3d-2.1", "triposr", "stable-diffusion-3d"],
         "queueLength": 3,
         "processingTime": 45.2,
-        "lastGenerated": datetime.now(timezone.utc).isoformat(),
+        "lastGenerated": datetime.now(UTC).isoformat(),
     }

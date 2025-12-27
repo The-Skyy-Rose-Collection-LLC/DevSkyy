@@ -13,6 +13,7 @@ This directory contains MCP server implementations that expose DevSkyy's capabil
 **Purpose**: Integration with OpenAI models (GPT-4o, GPT-4o-mini, o1-preview)
 
 **Features**:
+
 - Text completion and generation
 - Vision analysis (GPT-4o)
 - Code generation with DevSkyy best practices
@@ -21,13 +22,15 @@ This directory contains MCP server implementations that expose DevSkyy's capabil
 - Agent orchestration
 
 **Usage**:
+
 ```bash
 python openai_server.py
 ```
 
 **Environment Variables**:
+
 - `OPENAI_API_KEY` - OpenAI API key (required)
-- `DEVSKYY_API_URL` - DevSkyy API endpoint (default: http://localhost:8000)
+- `DEVSKYY_API_URL` - DevSkyy API endpoint (default: <http://localhost:8000>)
 - `DEVSKYY_API_KEY` - DevSkyy API key
 
 ### 2. DevSkyy Main MCP Server (`../devskyy_mcp.py`)
@@ -35,6 +38,7 @@ python openai_server.py
 **Purpose**: Access to DevSkyy's 54-agent ecosystem
 
 **Features**:
+
 - WordPress/WooCommerce automation
 - SEO optimization
 - Content generation
@@ -45,11 +49,13 @@ python openai_server.py
 - ML predictions
 
 **Usage**:
+
 ```bash
 python ../devskyy_mcp.py
 ```
 
 **Environment Variables**:
+
 - `DEVSKYY_API_URL` - DevSkyy API endpoint (required)
 - `DEVSKYY_API_KEY` - DevSkyy API key (required)
 
@@ -66,17 +72,20 @@ Run the automated setup script:
 ### Manual Setup
 
 1. **Install Python dependencies**:
+
 ```bash
 pip install -r mcp/requirements.txt
 ```
 
 2. **Configure environment variables**:
+
 ```bash
 export OPENAI_API_KEY="sk-your-key"
 export DEVSKYY_API_KEY="your-key"
 ```
 
 3. **Test servers**:
+
 ```bash
 python mcp/openai_server.py
 python devskyy_mcp.py
@@ -190,8 +199,8 @@ chmod +x devskyy_mcp.py
 ## Documentation
 
 - **Full Configuration Guide**: `../docs/MCP_CONFIGURATION_GUIDE.md`
-- **MCP Specification**: https://modelcontextprotocol.io/specification/2025-06-18
-- **FastMCP Documentation**: https://gofastmcp.com
+- **MCP Specification**: <https://modelcontextprotocol.io/specification/2025-06-18>
+- **FastMCP Documentation**: <https://gofastmcp.com>
 - **DevSkyy Documentation**: `../docs/`
 
 ## Support
@@ -201,11 +210,10 @@ For issues or questions:
 1. Check logs: `~/Library/Logs/Claude/mcp*.log`
 2. Review documentation: `docs/MCP_CONFIGURATION_GUIDE.md`
 3. Test servers manually
-4. GitHub Issues: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
+4. GitHub Issues: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues>
 
 ---
 
-**Version**: 1.0.0  
-**Last Updated**: 2025-12-16  
+**Version**: 1.0.0
+**Last Updated**: 2025-12-16
 **Maintained by**: The Skyy Rose Collection LLC
-

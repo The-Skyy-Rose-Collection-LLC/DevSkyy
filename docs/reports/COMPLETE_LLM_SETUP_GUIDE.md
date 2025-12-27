@@ -9,6 +9,7 @@ Step-by-step guide to set up all 6 LLM providers for DevSkyy.
 - ✅ **OpenAI** - Already configured and working!
 
 **Remaining providers to set up:**
+
 - ⏳ Anthropic (Claude)
 - ⏳ Google (Gemini)
 - ⏳ Groq (Fast inference)
@@ -40,13 +41,14 @@ Open these URLs and create API keys:
 
 | Provider | URL | Notes |
 |----------|-----|-------|
-| **Anthropic** | https://console.anthropic.com/settings/keys | $5 free credit |
-| **Google** | https://aistudio.google.com/app/apikey | Free tier available |
-| **Groq** | https://console.groq.com/keys | Generous free tier |
-| Mistral | https://console.mistral.ai/api-keys/ | €5 free credit |
-| Cohere | https://dashboard.cohere.com/api-keys | Free trial |
+| **Anthropic** | <https://console.anthropic.com/settings/keys> | $5 free credit |
+| **Google** | <https://aistudio.google.com/app/apikey> | Free tier available |
+| **Groq** | <https://console.groq.com/keys> | Generous free tier |
+| Mistral | <https://console.mistral.ai/api-keys/> | €5 free credit |
+| Cohere | <https://dashboard.cohere.com/api-keys> | Free trial |
 
 **For each provider:**
+
 1. Sign up or log in
 2. Navigate to API keys section
 3. Click "Create API Key" or similar
@@ -64,6 +66,7 @@ Open these URLs and create API keys:
 ```
 
 This will:
+
 - Check which keys you already have
 - Prompt you for each missing key
 - Add them to your ~/.zshrc
@@ -111,95 +114,108 @@ You should see green checkmarks for each provider you configured.
 ### 1. Anthropic (Claude) - HIGHLY RECOMMENDED
 
 **Why use it:**
+
 - Best for coding tasks
 - Excellent reasoning
 - 200K context window
 - Very accurate
 
 **Models:**
+
 - `claude-3-5-sonnet-20241022` - Best overall (recommended)
 - `claude-3-opus-20240229` - Most capable
 - `claude-3-haiku-20240307` - Fastest, cheapest
 
 **Pricing:**
+
 - Sonnet: $3/$15 per 1M tokens (input/output)
 - Free $5 credit to start
 
-**Get key:** https://console.anthropic.com/settings/keys
+**Get key:** <https://console.anthropic.com/settings/keys>
 
 ---
 
 ### 2. Google (Gemini) - HIGHLY RECOMMENDED
 
 **Why use it:**
+
 - Massive 2M token context window
 - Free tier available
 - Good for document analysis
 - Multimodal (text + images)
 
 **Models:**
+
 - `gemini-2.0-flash-exp` - Latest, fastest
 - `gemini-1.5-pro` - Best quality
 - `gemini-1.5-flash` - Fast and cheap
 
 **Pricing:**
+
 - Free tier: 15 requests/minute
 - Pro: $1.25/$5 per 1M tokens
 
-**Get key:** https://aistudio.google.com/app/apikey
+**Get key:** <https://aistudio.google.com/app/apikey>
 
 ---
 
 ### 3. Groq - HIGHLY RECOMMENDED
 
 **Why use it:**
+
 - Ultra-fast inference (500+ tokens/sec)
 - Generous free tier
 - Great for development/testing
 - Open source models
 
 **Models:**
+
 - `llama-3.1-70b-versatile` - Best quality
 - `llama-3.1-8b-instant` - Fastest
 - `mixtral-8x7b-32768` - Good balance
 
 **Pricing:**
+
 - Free tier: 30 requests/minute
 - Very affordable paid tier
 
-**Get key:** https://console.groq.com/keys
+**Get key:** <https://console.groq.com/keys>
 
 ---
 
 ### 4. Mistral (Optional)
 
 **Why use it:**
+
 - European company (GDPR compliant)
 - Good for privacy-sensitive work
 - Competitive pricing
 - Code-specialized models
 
 **Models:**
+
 - `mistral-large-latest` - Best quality
 - `codestral-latest` - Code generation
 - `mistral-small-latest` - Fast and cheap
 
-**Get key:** https://console.mistral.ai/api-keys/
+**Get key:** <https://console.mistral.ai/api-keys/>
 
 ---
 
 ### 5. Cohere (Optional)
 
 **Why use it:**
+
 - Best for RAG (Retrieval Augmented Generation)
 - Excellent embeddings
 - Good for search applications
 
 **Models:**
+
 - `command-r-plus` - Best quality
 - `command-r` - Balanced
 
-**Get key:** https://dashboard.cohere.com/api-keys
+**Get key:** <https://dashboard.cohere.com/api-keys>
 
 ---
 
@@ -248,13 +264,13 @@ from orchestration import LLMOrchestrator, TaskType
 
 async def main():
     orchestrator = LLMOrchestrator()
-    
+
     # Automatically picks best model for the task
     result = await orchestrator.complete(
         prompt="Write a Python function to calculate fibonacci",
         task_type=TaskType.CODE_GENERATION
     )
-    
+
     print(f"Model used: {result.model}")
     print(f"Provider: {result.provider}")
     print(result.content)
@@ -270,7 +286,7 @@ from orchestration import AnthropicClient, Message, MessageRole
 
 async def main():
     client = AnthropicClient()
-    
+
     response = await client.complete(
         messages=[
             Message(role=MessageRole.USER, content="Explain async/await")
@@ -278,7 +294,7 @@ async def main():
         model="claude-3-5-sonnet-20241022",
         max_tokens=500
     )
-    
+
     print(response.content)
 
 asyncio.run(main())
@@ -325,16 +341,19 @@ After setup:
 ## 🆘 Troubleshooting
 
 ### "API key not found"
+
 ```bash
 source ~/.zshrc
 ```
 
 ### "Authentication failed"
+
 - Verify key at provider's website
 - Check for typos
 - Ensure key hasn't been revoked
 
 ### "Rate limit exceeded"
+
 - Check your usage dashboard
 - Wait a few minutes
 - Upgrade to paid tier if needed
@@ -351,4 +370,3 @@ source ~/.zshrc
 ---
 
 **Ready to set up? Run:** `./setup_all_llm_keys.sh`
-

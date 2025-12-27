@@ -276,7 +276,7 @@ describe('AgentService', () => {
     it('should handle task execution errors in catch block', async () => {
       // Mock executeTask to throw an error to test the catch block on line 142-143
       const errorSpy = jest.spyOn((service as any).logger, 'error');
-      
+
       // Spy on executeTask and make it throw
       jest.spyOn(service, 'executeTask').mockRejectedValueOnce(
         new Error('Task execution failed')
@@ -298,7 +298,7 @@ describe('AgentService', () => {
       // Test the internal catch block within executeTask (lines 182-195)
       const failedHandler = jest.fn();
       service.on('taskFailed', failedHandler);
-      
+
       // Mock simulateTaskExecution to throw an error
       jest.spyOn(service as any, 'simulateTaskExecution').mockRejectedValueOnce(
         new Error('Simulated execution error')

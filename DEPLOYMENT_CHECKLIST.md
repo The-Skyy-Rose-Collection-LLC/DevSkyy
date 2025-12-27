@@ -7,12 +7,14 @@
 ## Pre-Deployment (1-2 Hours)
 
 ### Environment Setup
+
 - [ ] Python 3.11 or 3.12 installed: `python3 --version`
 - [ ] Repository cloned: `/Users/coreyfoster/DevSkyy`
 - [ ] `.env` file created from `.env.example`
 - [ ] All environment variables configured (see below)
 
 ### Dependencies Installation
+
 - [ ] Install Python dependencies: `pip install -e .`
 - [ ] Verify installation: `python3 << 'EOF' [see INSTALLATION_REQUIREMENTS.md]`
 - [ ] Check Pydantic v2: `pip list | grep pydantic` (should show 2.5+)
@@ -20,6 +22,7 @@
 - [ ] Check OpenCV: `python3 -c "import cv2; print('✓')"`
 
 ### API Keys & Credentials
+
 - [ ] **WordPress**
   - [ ] WordPress URL: `http://localhost:8882` (or production URL)
   - [ ] Admin username: `admin` (or your username)
@@ -28,19 +31,20 @@
     - [ ] Copy password to `.env` as `WORDPRESS_PASSWORD`
 
 - [ ] **3D Generation APIs**
-  - [ ] HuggingFace API Key: https://huggingface.co/settings/tokens
+  - [ ] HuggingFace API Key: <https://huggingface.co/settings/tokens>
     - [ ] Create token with "read" scope
     - [ ] Copy to `.env` as `HUGGINGFACE_API_KEY`
-  - [ ] Tripo3D API Key: https://www.tripo3d.ai/dashboard/key
+  - [ ] Tripo3D API Key: <https://www.tripo3d.ai/dashboard/key>
     - [ ] Copy to `.env` as `TRIPO_API_KEY`
     - [ ] Check account has sufficient credits (~$5-10 recommended for 3 collections)
 
 - [ ] **LLM Providers** (at least one required)
-  - [ ] OpenAI: https://platform.openai.com/api-keys
-  - [ ] Anthropic: https://console.anthropic.com/
-  - [ ] Google: https://aistudio.google.com/app/apikey
+  - [ ] OpenAI: <https://platform.openai.com/api-keys>
+  - [ ] Anthropic: <https://console.anthropic.com/>
+  - [ ] Google: <https://aistudio.google.com/app/apikey>
 
 ### Assets Preparation
+
 - [ ] Verify ZIP file: `/Users/coreyfoster/Desktop/updev 4.zip` exists
 - [ ] Confirm ZIP contains 3 collection folders:
   - [ ] `black-rose/` (5 products, 0.62-1.28 MB)
@@ -48,6 +52,7 @@
   - [ ] `signature/` (5 products, 0.1-3.22 MB)
 
 ### WordPress Verification
+
 - [ ] WordPress accessible: `curl http://localhost:8882` returns HTML
 - [ ] WordPress API accessible: `curl http://localhost:8882/wp-json/wp/v2/posts`
 - [ ] Admin login works: `http://localhost:8882/wp-admin`
@@ -60,6 +65,7 @@
 ## Deployment (20-35 Minutes)
 
 ### Phase 1: Asset Extraction (2-5 min)
+
 ```bash
 python3 scripts/deploy_skyyrose_site.py \
     --assets-zip "/Users/coreyfoster/Desktop/updev 4.zip" \
@@ -68,6 +74,7 @@ python3 scripts/deploy_skyyrose_site.py \
 ```
 
 **Expected Output**:
+
 ```
 ✓ Extracting assets from ZIP...
 ✓ Found 15 product images (5 × 3 collections)
@@ -82,6 +89,7 @@ python3 scripts/deploy_skyyrose_site.py \
   - [ ] `signature_models_metadata.json` exists
 
 ### Phase 2-3: WordPress Page Builders (3-5 min)
+
 ```bash
 python3 scripts/deploy_skyyrose_site.py \
     --wordpress-url "http://localhost:8882" \
@@ -92,6 +100,7 @@ python3 scripts/deploy_skyyrose_site.py \
 ```
 
 **Expected Output**:
+
 ```
 ✓ Creating home page builder...
 ✓ Creating product page builder...
@@ -108,6 +117,7 @@ python3 scripts/deploy_skyyrose_site.py \
   - [ ] Collection pages created
 
 ### Phase 4-6: Features (5-10 min)
+
 ```bash
 python3 scripts/deploy_skyyrose_site.py \
     --wordpress-url "http://localhost:8882" \
@@ -118,6 +128,7 @@ python3 scripts/deploy_skyyrose_site.py \
 ```
 
 **Expected Output**:
+
 ```
 ✓ Configuring hotspot system...
 ✓ Setting up pre-order/countdown...
@@ -128,6 +139,7 @@ python3 scripts/deploy_skyyrose_site.py \
 - [ ] All feature phases complete
 
 ### Phase 7-9: Press, Deployment, Testing (5-10 min)
+
 ```bash
 python3 scripts/deploy_skyyrose_site.py \
     --wordpress-url "http://localhost:8882" \
@@ -138,6 +150,7 @@ python3 scripts/deploy_skyyrose_site.py \
 ```
 
 **Expected Output**:
+
 ```
 ✓ Importing press mentions...
 ✓ Configuring deployment agents...
@@ -148,6 +161,7 @@ python3 scripts/deploy_skyyrose_site.py \
 - [ ] All phases complete
 
 ### Full Deployment (All 9 Phases - 20-35 min)
+
 ```bash
 python3 scripts/deploy_skyyrose_site.py \
     --assets-zip "/Users/coreyfoster/Desktop/updev 4.zip" \
@@ -167,6 +181,7 @@ python3 scripts/deploy_skyyrose_site.py \
 ## Post-Deployment Verification (15-20 Minutes)
 
 ### Core Web Vitals Testing
+
 ```bash
 python3 scripts/verify_core_web_vitals.py \
     --site-url "http://localhost:8882" \
@@ -175,6 +190,7 @@ python3 scripts/verify_core_web_vitals.py \
 ```
 
 **Expected Results**:
+
 - [ ] Homepage LCP < 2.5s ✓
 - [ ] FID < 100ms ✓
 - [ ] CLS < 0.1 ✓
@@ -182,6 +198,7 @@ python3 scripts/verify_core_web_vitals.py \
 - [ ] Mobile PageSpeed 90+ ✓
 
 ### Functionality Testing
+
 ```bash
 python3 scripts/test_site_functionality.py \
     --site-url "http://localhost:8882" \
@@ -189,6 +206,7 @@ python3 scripts/test_site_functionality.py \
 ```
 
 **Expected Results**:
+
 - [ ] ✓ All 5 collection experiences load
 - [ ] ✓ 3D hotspots are interactive
 - [ ] ✓ Countdown timers sync with server
@@ -199,6 +217,7 @@ python3 scripts/test_site_functionality.py \
 - [ ] ✓ Navigation structure correct
 
 ### SEO Validation
+
 ```bash
 python3 scripts/verify_seo.py \
     --site-url "http://localhost:8882" \
@@ -206,6 +225,7 @@ python3 scripts/verify_seo.py \
 ```
 
 **Expected Results**:
+
 - [ ] RankMath Score: 90+ on all pages
 - [ ] Meta titles present on all pages
 - [ ] Meta descriptions present on all pages
@@ -216,7 +236,8 @@ python3 scripts/verify_seo.py \
 - [ ] robots.txt configured ✓
 
 ### Manual Verification
-- [ ] Visit homepage: http://localhost:8882
+
+- [ ] Visit homepage: <http://localhost:8882>
   - [ ] Spinning logo visible and rotating
   - [ ] Layout responsive on mobile
   - [ ] Featured collections displayed
@@ -271,43 +292,57 @@ python3 scripts/verify_seo.py \
 ## Troubleshooting During Deployment
 
 ### Issue: Pydantic Validation Error
+
 ```
 PydanticDeprecatedSince20: Support for class-based `config` is deprecated
 ```
+
 **Solution**: Update Pydantic: `pip install --upgrade pydantic>=2.5`
 
 ### Issue: WordPress Connection Failed
+
 ```
 ConnectionError: Failed to connect to http://localhost:8882
 ```
-**Solution**: 
+
+**Solution**:
+
 - Verify WordPress is running: `curl http://localhost:8882`
 - Check WORDPRESS_URL in `.env`
 - Verify WORDPRESS_PASSWORD is correct
 
 ### Issue: HuggingFace API Error
+
 ```
 AuthenticationError: Invalid authentication token
 ```
-**Solution**: 
+
+**Solution**:
+
 - Verify HUGGINGFACE_API_KEY in `.env`
 - Check token hasn't expired at huggingface.co/settings/tokens
 - Ensure token has "read" scope
 
 ### Issue: Tripo3D Generation Timeout
+
 ```
 TimeoutError: Tripo3D API did not respond within 120 seconds
 ```
-**Solution**: 
+
+**Solution**:
+
 - Tripo3D queue may be busy (try again in 5-10 min)
 - Increase timeout: `--tripo-timeout 180`
 - Check credits at tripo3d.ai dashboard
 
 ### Issue: Assets Not Found
+
 ```
 FileNotFoundError: /Users/coreyfoster/Desktop/updev 4.zip not found
 ```
-**Solution**: 
+
+**Solution**:
+
 - Verify ZIP file path
 - Ensure file isn't corrupted: `unzip -t "updev 4.zip"`
 - Extract manually if needed: `unzip -q "updev 4.zip" -d ./assets/3d-models/`
@@ -339,6 +374,7 @@ FileNotFoundError: /Users/coreyfoster/Desktop/updev 4.zip not found
 ## Success Criteria
 
 ✅ **Deployment Successful If**:
+
 - All 9 phases execute without errors
 - Core Web Vitals pass all thresholds
 - Functionality tests pass (20+ test cases)
@@ -349,6 +385,7 @@ FileNotFoundError: /Users/coreyfoster/Desktop/updev 4.zip not found
 - No errors in WordPress/PHP logs
 
 ✅ **Fully Operational When**:
+
 - Homepage loads in < 2.5s (LCP)
 - Mobile PageSpeed 90+
 - Users can add products to cart
@@ -364,11 +401,13 @@ If issues occur:
 
 1. **Stop current deployment**: Press Ctrl+C
 2. **Check logs**: `tail -f wp-content/debug.log`
-3. **Revert changes**: 
+3. **Revert changes**:
+
    ```bash
    git status  # See what changed
    git checkout .  # Revert all changes
    ```
+
 4. **Fix issue**: Resolve the problem, see Troubleshooting section
 5. **Redeploy**: Run deployment script again
 
@@ -414,7 +453,7 @@ If issues occur:
 
 **Deployed By**: _______________
 
-**Notes**: 
+**Notes**:
 
 ---
 

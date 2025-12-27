@@ -3,18 +3,21 @@
 ## Current State
 
 ### ✅ What's Currently Installed
+
 - `openai>=1.6` - Official OpenAI SDK ✅
 - `httpx>=0.25` - HTTP client (used for all other providers)
 - `tenacity>=8.2` - Retry logic
 - `pydantic>=2.5` - Data validation
 
 ### ❌ What's Missing (Commented Out)
+
 - `anthropic>=0.8` - Official Anthropic SDK (COMMENTED OUT)
 - `google-generativeai>=0.3` - Official Google Gemini SDK (COMMENTED OUT)
 
 ### ❌ Not Installed At All
+
 - Mistral SDK
-- Cohere SDK  
+- Cohere SDK
 - Groq SDK (uses OpenAI-compatible API)
 
 ---
@@ -53,11 +56,13 @@ class AnthropicClient(BaseLLMClient):
 ### Priority 1: Essential SDKs (Install These)
 
 #### 1. Anthropic SDK
+
 ```bash
 pip install anthropic>=0.40.0
 ```
 
 **Benefits:**
+
 - Official Claude SDK with full type safety
 - Built-in streaming support
 - Automatic retry logic
@@ -67,11 +72,13 @@ pip install anthropic>=0.40.0
 **Latest Version:** 0.40.0 (December 2024)
 
 #### 2. Google Generative AI SDK
+
 ```bash
 pip install google-generativeai>=0.8.0
 ```
 
 **Benefits:**
+
 - Official Gemini SDK
 - Supports Gemini 2.0 Flash
 - Built-in safety settings
@@ -81,11 +88,13 @@ pip install google-generativeai>=0.8.0
 **Latest Version:** 0.8.0 (December 2024)
 
 #### 3. Cohere SDK
+
 ```bash
 pip install cohere>=5.11.0
 ```
 
 **Benefits:**
+
 - Official Cohere SDK
 - RAG-optimized features
 - Embeddings support
@@ -99,11 +108,13 @@ pip install cohere>=5.11.0
 ### Priority 2: Optional SDKs
 
 #### 4. Mistral SDK
+
 ```bash
 pip install mistralai>=1.2.0
 ```
 
 **Benefits:**
+
 - Official Mistral SDK
 - Supports all Mistral models
 - Function calling support
@@ -112,11 +123,13 @@ pip install mistralai>=1.2.0
 **Latest Version:** 1.2.0 (December 2024)
 
 #### 5. Groq SDK
+
 ```bash
 pip install groq>=0.11.0
 ```
 
 **Benefits:**
+
 - Official Groq SDK (OpenAI-compatible)
 - Ultra-fast inference
 - Same interface as OpenAI
@@ -131,6 +144,7 @@ pip install groq>=0.11.0
 ## Additional Upgrades
 
 ### 1. LangChain Integration (Optional but Powerful)
+
 ```bash
 pip install langchain>=0.3.0
 pip install langchain-openai>=0.2.0
@@ -142,6 +156,7 @@ pip install langchain-groq>=0.2.0
 ```
 
 **Benefits:**
+
 - Unified interface across all providers
 - Built-in prompt templates
 - Chain multiple LLM calls
@@ -150,11 +165,13 @@ pip install langchain-groq>=0.2.0
 - Vector store integrations
 
 ### 2. LiteLLM (Universal LLM Gateway)
+
 ```bash
 pip install litellm>=1.50.0
 ```
 
 **Benefits:**
+
 - Single interface for 100+ LLM providers
 - Automatic fallbacks
 - Load balancing
@@ -163,17 +180,20 @@ pip install litellm>=1.50.0
 - Rate limiting
 
 ### 3. Instructor (Structured Outputs)
+
 ```bash
 pip install instructor>=1.6.0
 ```
 
 **Benefits:**
+
 - Pydantic models → LLM outputs
 - Automatic validation
 - Retry on validation failure
 - Works with all providers
 
 ### 4. OpenTelemetry (Observability)
+
 ```bash
 pip install opentelemetry-api>=1.27.0
 pip install opentelemetry-sdk>=1.27.0
@@ -181,6 +201,7 @@ pip install opentelemetry-instrumentation-httpx>=0.48b0
 ```
 
 **Benefits:**
+
 - Track LLM performance
 - Monitor costs
 - Trace requests
@@ -208,6 +229,7 @@ pip install groq>=0.11.0
 Rewrite `orchestration/llm_clients.py` to use official SDKs:
 
 **Before (current):**
+
 ```python
 class AnthropicClient(BaseLLMClient):
     async def complete(self, ...):
@@ -215,13 +237,14 @@ class AnthropicClient(BaseLLMClient):
 ```
 
 **After (with SDK):**
+
 ```python
 from anthropic import AsyncAnthropic
 
 class AnthropicClient(BaseLLMClient):
     def __init__(self, ...):
         self.client = AsyncAnthropic(api_key=api_key)
-    
+
     async def complete(self, ...):
         response = await self.client.messages.create(...)  # Official SDK
 ```
@@ -238,6 +261,7 @@ class AnthropicClient(BaseLLMClient):
 ## Cost-Benefit Analysis
 
 ### Current Approach (Raw HTTP)
+
 - ✅ Minimal dependencies
 - ✅ Full control
 - ❌ High maintenance
@@ -246,6 +270,7 @@ class AnthropicClient(BaseLLMClient):
 - ❌ Manual error handling
 
 ### With Official SDKs
+
 - ✅ Type safety
 - ✅ Better error messages
 - ✅ Built-in features (streaming, retries)
@@ -254,6 +279,7 @@ class AnthropicClient(BaseLLMClient):
 - ❌ More dependencies (~50MB total)
 
 ### With LangChain/LiteLLM
+
 - ✅ All SDK benefits
 - ✅ Unified interface
 - ✅ Advanced features (agents, chains)
@@ -266,7 +292,9 @@ class AnthropicClient(BaseLLMClient):
 ## Recommended Action
 
 ### Minimal Upgrade (Recommended)
+
 Install the 3 essential SDKs:
+
 ```bash
 pip install anthropic>=0.40.0 google-generativeai>=0.8.0 cohere>=5.11.0
 ```
@@ -275,7 +303,9 @@ pip install anthropic>=0.40.0 google-generativeai>=0.8.0 cohere>=5.11.0
 **Benefit:** Much better developer experience, fewer bugs
 
 ### Full Upgrade (If Building Production App)
+
 Install all SDKs + LangChain:
+
 ```bash
 pip install anthropic>=0.40.0 google-generativeai>=0.8.0 cohere>=5.11.0 \
             mistralai>=1.2.0 groq>=0.11.0 \
@@ -309,4 +339,3 @@ pip install anthropic>=0.40.0 google-generativeai>=0.8.0 cohere>=5.11.0 \
 ---
 
 **Recommendation:** Start with the **minimal upgrade** (3 essential SDKs), then add LangChain later if needed.
-

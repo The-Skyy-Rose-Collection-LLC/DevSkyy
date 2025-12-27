@@ -6,4 +6,3 @@ module.exports = {
   testMatch: ['**/*.test.ts'],
   passWithNoTests: true,
 };
-

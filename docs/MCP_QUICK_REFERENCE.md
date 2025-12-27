@@ -47,6 +47,7 @@ export BRAVE_API_KEY="..."               # For brave-search
 ## 💡 Common Use Cases
 
 ### WordPress Product Creation
+
 ```
 Ask Claude: "Create a WooCommerce product for the Heart aRose Bomber"
 
@@ -57,6 +58,7 @@ Uses:
 ```
 
 ### Code Review
+
 ```
 Ask Claude: "Review recent authentication changes"
 
@@ -68,6 +70,7 @@ Uses:
 ```
 
 ### Database Schema Update
+
 ```
 Ask Claude: "Add customer preferences table"
 
@@ -78,6 +81,7 @@ Uses:
 ```
 
 ### Image Analysis
+
 ```
 Ask Claude: "Analyze this product photo"
 
@@ -88,7 +92,7 @@ Uses:
 
 ## 🛠️ DevSkyy Agent Tools
 
-### Available via `devskyy-main` server:
+### Available via `devskyy-main` server
 
 | Agent Type | Capabilities |
 |------------|--------------|
@@ -104,6 +108,7 @@ Uses:
 ## 🔧 Troubleshooting
 
 ### Server Not Starting
+
 ```bash
 # Check dependencies
 pip install -r mcp/requirements.txt
@@ -113,6 +118,7 @@ python mcp/openai_server.py
 ```
 
 ### Environment Variables Not Set
+
 ```bash
 # Verify
 echo $OPENAI_API_KEY
@@ -122,6 +128,7 @@ source ~/.zshrc
 ```
 
 ### Claude Desktop Not Detecting Servers
+
 ```bash
 # Check config location
 cat ~/Library/Application\ Support/Claude/claude_desktop_config.json
@@ -157,14 +164,14 @@ tail -f ~/Library/Logs/Claude/mcp*.log
 1. Check logs: `~/Library/Logs/Claude/mcp*.log`
 2. Test servers: `python mcp/openai_server.py`
 3. Review docs: `docs/MCP_CONFIGURATION_GUIDE.md`
-4. GitHub Issues: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
+4. GitHub Issues: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues>
 
 ---
 
 **Quick Links**:
-- MCP Spec: https://modelcontextprotocol.io/specification/2025-06-18
-- FastMCP: https://gofastmcp.com
-- MCP Servers: https://github.com/modelcontextprotocol/servers
+
+- MCP Spec: <https://modelcontextprotocol.io/specification/2025-06-18>
+- FastMCP: <https://gofastmcp.com>
+- MCP Servers: <https://github.com/modelcontextprotocol/servers>
 
 **Version**: 1.0.0 | **Updated**: 2025-12-16
-

@@ -1,6 +1,9 @@
 # SKYYROSE BLACK ROSE COLLECTION PAGE SPECIFICATION
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro
 
 ---
@@ -14,18 +17,18 @@ page:
   template: "elementor_header_footer"
   collection_id: "black_rose"
   woocommerce_category: "black-rose"
-  
+
   seo:
     title: "BLACK ROSE | Limited Edition Dark Elegance | SkyyRose"
     description: "Discover BLACK ROSE - limited edition luxury streetwear. Only 50 pieces per style. When they're gone, they're gone. Shop the current drop now."
     keywords: ["limited edition streetwear", "luxury hoodies", "exclusive fashion", "numbered edition clothing"]
-    
+
   og:
     image: "/assets/images/og-black-rose.jpg"
     type: "product.group"
-    
+
   schema_type: "CollectionPage"
-  
+
   brand_essence:
     mood: "Dark, mysterious, exclusive"
     tagline: "Dark Elegance. Limited Always."
@@ -51,12 +54,12 @@ collection_tokens:
     text_primary: "#FAFAFA"
     text_secondary: "rgba(250, 250, 250, 0.7)"
     text_muted: "rgba(250, 250, 250, 0.5)"
-    
+
   gradients:
     hero: "linear-gradient(180deg, #000000 0%, #1A1A1A 50%, #0D0D0D 100%)"
     overlay: "linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%)"
     metallic: "linear-gradient(135deg, #A8A8A8 0%, #E8E8E8 50%, #C0C0C0 100%)"
-    
+
   typography:
     headings:
       color: "#C0C0C0"           # Metallic Silver headings
@@ -64,7 +67,7 @@ collection_tokens:
     body:
       color: "rgba(250, 250, 250, 0.8)"
       family: "Inter"
-      
+
   ui_elements:
     badge_low_stock:
       background: "#C0C0C0"      # Silver
@@ -99,7 +102,7 @@ section:
     video_url: "/assets/videos/black-rose-hero.mp4"
     fallback_image: "/assets/images/black-rose-hero-fallback.jpg"
     overlay: "linear-gradient(180deg, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.6) 100%)"
-    
+
   video_specs:
     content: "Slow-motion: dark studio, single dramatic light source, model in BLACK ROSE pieces, rose petals falling"
     duration: "15-20s loop"
@@ -120,7 +123,7 @@ content:
     letter_spacing: "0.3em"
     color: "#C9A962"
     text_shadow: "0 4px 20px rgba(0,0,0,0.5)"
-    
+
   tagline:
     text: "Dark Elegance. Limited Always."
     font: "Inter"
@@ -129,7 +132,7 @@ content:
     letter_spacing: "0.2em"
     color: "rgba(250, 250, 250, 0.7)"
     margin_top: "16px"
-    
+
   cta_primary:
     text: "ENTER THE COLLECTION"
     url: "#current-drop"
@@ -144,7 +147,7 @@ content:
         background: "#FAFAFA"
         color: "#0D0D0D"
     margin_top: "40px"
-    
+
   scarcity_badge:
     type: "bordered_box"
     content:
@@ -282,23 +285,23 @@ content:
     alt: "BLACK ROSE fabric detail showing quality stitching"
     type: "extreme_closeup"
     content: "Macro shot of fabric texture, stitching detail, or embroidery"
-    
+
   headline:
     text: "NOT EVERYTHING BEAUTIFUL IS MEANT FOR EVERYONE."
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.75rem)"
     color: "#C9A962"
     style: "italic"
-    
+
   body_copy:
     paragraphs:
       - text: "The BLACK ROSE collection exists for those who understand that true luxury is restraint."
         style: "primary"
-        
+
       - text: "Each piece is numbered. Each drop is final. When they're gone, they're gone."
         style: "italic"
         color: "rgba(250, 250, 250, 0.6)"
-        
+
   details:
     show: true
     items:
@@ -440,7 +443,7 @@ content:
         font: "Inter"
         size: "0.875rem"
         color: "rgba(250, 250, 250, 0.5)"
-        
+
   product_grid:
     source: "woocommerce"
     category: "black-rose"
@@ -451,7 +454,7 @@ content:
       mobile: 2
     gap: "16px"
     max_products: 8
-    
+
   product_card:
     show_edition_number: true
     edition_format: "#{{number}}/50"
@@ -466,7 +469,7 @@ content:
         text: "SOLD OUT"
         overlay: true
         overlay_color: "rgba(0,0,0,0.7)"
-        
+
   cta:
     text: "VIEW ALL {{count}} PIECES"
     url: "/shop/?collection=black-rose&drop=current"
@@ -483,16 +486,16 @@ product_card_spec:
     padding: "0"
     hover:
       border_color: "rgba(201, 169, 98, 0.3)"
-      
+
   image:
     aspect_ratio: "1:1"
     background: "#1A1A1A"
     hover_effect: "subtle_zoom"
-    
+
   badges:
     position: "top-left"
     margin: "8px"
-    
+
   edition_badge:
     position: "top-right"
     margin: "8px"
@@ -501,21 +504,21 @@ product_card_spec:
     border: "1px solid rgba(201, 169, 98, 0.3)"
     padding: "4px 8px"
     font_size: "0.625rem"
-    
+
   content:
     padding: "16px"
-    
+
   title:
     font: "Inter"
     size: "0.875rem"
     weight: 500
     color: "#C9A962"
-    
+
   price:
     font: "Inter"
     size: "0.875rem"
     color: "rgba(250, 250, 250, 0.6)"
-    
+
   stock_remaining:
     show: true
     format: "{{remaining}} left"
@@ -548,7 +551,7 @@ add_action('add_meta_boxes', 'skyyrose_add_edition_meta');
 function skyyrose_edition_meta_callback($post) {
     $edition_total = get_post_meta($post->ID, '_edition_total', true) ?: 50;
     $edition_sold = get_post_meta($post->ID, '_edition_sold', true) ?: 0;
-    
+
     echo '<p><label>Edition Total: <input type="number" name="edition_total" value="' . esc_attr($edition_total) . '" /></label></p>';
     echo '<p><label>Edition Sold: <input type="number" name="edition_sold" value="' . esc_attr($edition_sold) . '" /></label></p>';
     echo '<p>Next Edition: #' . ($edition_sold + 1) . '/' . $edition_total . '</p>';
@@ -557,15 +560,15 @@ function skyyrose_edition_meta_callback($post) {
 // Display edition number on product
 function skyyrose_display_edition_badge() {
     global $product;
-    
+
     if (!has_term('black-rose', 'product_cat', $product->get_id())) {
         return;
     }
-    
+
     $edition_total = get_post_meta($product->get_id(), '_edition_total', true) ?: 50;
     $edition_sold = get_post_meta($product->get_id(), '_edition_sold', true) ?: 0;
     $next_edition = $edition_sold + 1;
-    
+
     if ($next_edition <= $edition_total) {
         echo '<div class="edition-badge">#' . $next_edition . '/' . $edition_total . '</div>';
     } else {
@@ -577,9 +580,9 @@ add_action('woocommerce_before_shop_loop_item_title', 'skyyrose_display_edition_
 // Low stock badge
 function skyyrose_low_stock_badge() {
     global $product;
-    
+
     $stock = $product->get_stock_quantity();
-    
+
     if ($stock !== null && $stock <= 10 && $stock > 0) {
         echo '<span class="low-stock-badge">LOW STOCK</span>';
     }
@@ -695,7 +698,7 @@ content:
         font: "Inter"
         size: "0.75rem"
         color: "rgba(250, 250, 250, 0.3)"
-        
+
   archive_grid:
     source: "woocommerce"
     category: "black-rose"
@@ -707,21 +710,21 @@ content:
       mobile: 3
     gap: "8px"
     max_products: 12
-    
+
   overlay:
     apply_to_all: true
     style:
       background: "rgba(0,0,0,0.6)"
       text: "SOLD OUT"
       text_color: "rgba(250, 250, 250, 0.5)"
-      
+
   fomo_message:
     text: "You can't have these anymore.\nBut you can be first for the next."
     font: "Inter"
     size: "0.9375rem"
     style: "italic"
     color: "rgba(250, 250, 250, 0.5)"
-    
+
   cta:
     text: "JOIN EARLY ACCESS LIST"
     url: "#early-access"
@@ -846,14 +849,14 @@ content:
     font: "Cormorant Garamond"
     size: "clamp(1.5rem, 4vw, 2rem)"
     color: "#C9A962"
-    
+
   subheadline:
     text: "BLACK ROSE drops announce to members first.\nOften, they sell out before going public."
     font: "Inter"
     size: "0.9375rem"
     line_height: "1.7"
     color: "rgba(250, 250, 250, 0.6)"
-    
+
   form:
     provider: "klaviyo"
     list_id: "{{KLAVIYO_BLACK_ROSE_LIST}}"
@@ -869,7 +872,7 @@ content:
         hover:
           background: "#FAFAFA"
     success_message: "You're on the list. We'll be in touch."
-    
+
   note:
     text: "We'll notify you 24 hours before the next drop."
     font_size: "0.75rem"
@@ -882,15 +885,15 @@ content:
 klaviyo_segment:
   name: "BLACK ROSE Early Access"
   list_id: "{{KLAVIYO_BLACK_ROSE_LIST}}"
-  
+
   triggers:
     - event: "signup"
       flow: "black_rose_welcome"
-      
+
     - event: "new_drop"
       flow: "black_rose_drop_notification"
       timing: "24h_before_public"
-      
+
   properties:
     collection: "black_rose"
     tier: "early_access"
@@ -908,20 +911,20 @@ page_sections:
   - section_id: "br_hero"
     order: 1
     visible: true
-    
+
   - section_id: "br_philosophy"
     order: 2
     visible: true
-    
+
   - section_id: "br_current_drop"
     order: 3
     visible: true
     anchor: "current-drop"
-    
+
   - section_id: "br_archive"
     order: 4
     visible: true
-    
+
   - section_id: "br_newsletter"
     order: 5
     visible: true
@@ -935,13 +938,13 @@ execution_checklist:
   phase_1_setup:
     - task: "Create 'black-rose' WooCommerce category"
       status: "pending"
-      
+
     - task: "Create 'current-drop' and 'archive' product tags"
       status: "pending"
-      
+
     - task: "Set up edition number custom fields"
       status: "pending"
-      
+
   phase_2_content:
     - task: "Create hero video (15-20s, dark studio, rose petals)"
       specs:
@@ -951,40 +954,40 @@ execution_checklist:
         subject: "Model in BLACK ROSE pieces"
         elements: "Rose petals falling"
       status: "pending"
-      
+
     - task: "Create philosophy detail image"
       specs:
         type: "Extreme close-up"
         subject: "Fabric texture, stitching detail"
         size: "1200x800px"
       status: "pending"
-      
+
     - task: "Upload products with edition metadata"
       status: "pending"
-      
+
   phase_3_build:
     - task: "Build Section 1: Cinematic Hero"
       status: "pending"
-      
+
     - task: "Build Section 2: Philosophy"
       status: "pending"
-      
+
     - task: "Build Section 3: Current Drop Grid"
       status: "pending"
-      
+
     - task: "Build Section 4: Archive"
       status: "pending"
-      
+
     - task: "Build Section 5: Newsletter"
       status: "pending"
-      
+
   phase_4_integration:
     - task: "Set up Klaviyo BLACK ROSE list"
       status: "pending"
-      
+
     - task: "Create drop notification flow"
       status: "pending"
-      
+
     - task: "Test edition number display"
       status: "pending"
 ```

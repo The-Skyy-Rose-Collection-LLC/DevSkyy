@@ -11,6 +11,7 @@ wp_register_ability_category( string $slug, array $args ): ?\WP_Ability_Category
 ```
 
 **Parameters:**
+
 - `$slug` (`string`): A unique identifier for the category. Must contain only lowercase alphanumeric characters and dashes (no underscores, no uppercase).
 - `$args` (`array`): Category configuration with these keys:
   - `label` (`string`, **Required**): Human-readable name for the category. Should be translatable.
@@ -67,6 +68,7 @@ wp_unregister_ability_category( string $slug ) ?\WP_Ability_Category
 ```
 
 **Parameters:**
+
 - `$slug` (`string`): The slug of the registered category.
 
 **Return:** (`?\WP_Ability_Category`) The unregistered category instance on success, `null` on failure.
@@ -82,6 +84,7 @@ wp_get_ability_category( string $slug ) ?\WP_Ability_Category
 ```
 
 **Parameters:**
+
 - `$slug` (`string`): The slug of the registered category.
 
 **Return:** (`?\WP_Ability_Category`) The category instance on success, `null` on failure.
@@ -109,6 +112,7 @@ wp_register_ability( string $id, array $args ): ?\WP_Ability
 ```
 
 **Parameters:**
+
 - `$id` (`string`): A unique identifier for the ability.
 - `$args` (`array`): An array of arguments defining the ability configuration.
 
@@ -471,7 +475,7 @@ function my_plugin_register_post_validator_ability() {
             )
         ),
         'execute_callback' => function( $input ) {
-            $post_id = $input['post_id'];   
+            $post_id = $input['post_id'];
             $post = get_post( $post_id );
             if ( ! $post ) {
                 return new \WP_Error(
@@ -529,6 +533,7 @@ wp_has_ability( string $name ): bool
 ```
 
 **Parameters:**
+
 - `$name` (`string`): The name of the ability to check (namespace/ability-name).
 
 **Return:** (`bool`) `true` if the ability is registered, `false` otherwise.
@@ -563,17 +568,17 @@ function wp_get_ability( string $name ): ?WP_Ability
 $site_info_ability = wp_get_ability( 'my-plugin/get-site-info' );
 
 if ( $site_info_ability ) {
-	// Ability exists and is registered
-	$site_info = $site_info_ability->execute();
-	if ( is_wp_error( $site_info ) ) {
-		// Handle WP_Error
-		echo 'Error: ' . $site_info->get_error_message();
-	} else {
-		// Use $site_info array
-		echo 'Site Name: ' . $site_info['name'];
-	}
+ // Ability exists and is registered
+ $site_info = $site_info_ability->execute();
+ if ( is_wp_error( $site_info ) ) {
+  // Handle WP_Error
+  echo 'Error: ' . $site_info->get_error_message();
+ } else {
+  // Use $site_info array
+  echo 'Site Name: ' . $site_info['name'];
+ }
 } else {
-	// Ability not found or not registered
+ // Ability not found or not registered
 }
 ```
 
@@ -753,4 +758,3 @@ if ( is_null( $result ) ) {
 // Success - use the result
 // Process $result based on the ability's output schema
 ```
-

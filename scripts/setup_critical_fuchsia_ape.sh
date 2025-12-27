@@ -125,7 +125,7 @@ if command -v curl &> /dev/null; then
     HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
         -H "Authorization: Bearer $API_KEY" \
         "$API_URL/health" 2>/dev/null || echo "000")
-    
+
     if [ "$HTTP_CODE" = "200" ]; then
         echo -e "${GREEN}✓ Successfully connected to $API_URL${NC}"
     elif [ "$HTTP_CODE" = "401" ]; then

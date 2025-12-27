@@ -1,5 +1,7 @@
 # SKYYROSE UPDATED DESIGN TOKENS & SPINNING LOGO
+
 # Version: 1.1.0
+
 # Last Updated: 2024-12-12
 
 ---
@@ -26,9 +28,9 @@ colors:
       primary: "#FAFAFA"
       secondary: "rgba(250, 250, 250, 0.7)"
       accent: "#C0C0C0"
-      
+
   # ===========================================
-  # LOVE HURTS COLLECTION  
+  # LOVE HURTS COLLECTION
   # Mood: Warm, Emotional, Authentic, Bold
   # ===========================================
   love_hurts:
@@ -43,7 +45,7 @@ colors:
       muted: "rgba(250, 250, 250, 0.7)"
     gradient:
       warm: "linear-gradient(180deg, #5C2828 0%, #8B3A3A 50%, #1A1212 100%)"
-      
+
   # ===========================================
   # SIGNATURE COLLECTION
   # Mood: Luxurious, Timeless, Premium, Bold
@@ -62,7 +64,7 @@ colors:
       primary: "#0D0D0D"
       secondary: "#6B6B6B"
       gold: "#D4AF37"
-      
+
   # ===========================================
   # HOMEPAGE MIXED PALETTE
   # Combines elements from all three collections
@@ -72,20 +74,20 @@ colors:
     black: "#0D0D0D"
     white: "#FAFAFA"
     cream: "#F5F3EF"
-    
+
     # Metallic Accents (from all collections)
     gold: "#D4AF37"              # From SIGNATURE
     rose_gold: "#B76E79"         # From SIGNATURE
     silver: "#C0C0C0"            # From BLACK ROSE
-    
+
     # Warm Tones
     deep_rose: "#8B3A3A"         # From LOVE HURTS
     soft_rose: "#D4A5A5"         # From LOVE HURTS
-    
+
     # Gradients
     hero_gradient: "linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 40%, #2D1F1F 70%, #0D0D0D 100%)"
     metallic_accent: "linear-gradient(90deg, #C0C0C0 0%, #D4AF37 50%, #B76E79 100%)"
-    
+
     # Section Backgrounds (alternating)
     section_dark: "#0D0D0D"
     section_light: "#FAFAFA"
@@ -103,7 +105,7 @@ colors:
 spinning_logo:
   type: "animated_header_logo"
   format: "svg_or_image"
-  
+
   dimensions:
     desktop:
       width: "60px"
@@ -111,7 +113,7 @@ spinning_logo:
     mobile:
       width: "48px"
       height: "48px"
-      
+
   animation:
     type: "continuous_rotate"
     duration: "8s"
@@ -120,7 +122,7 @@ spinning_logo:
     play_state: "running"
     # Pause on hover for elegance
     hover_behavior: "pause"
-    
+
   logo_design:
     shape: "circular_rose_emblem"
     elements:
@@ -130,12 +132,12 @@ spinning_logo:
       default: "#D4AF37"         # Gold
       on_dark: "#D4AF37"         # Gold on dark backgrounds
       on_light: "#0D0D0D"        # Black on light backgrounds
-      
+
   glow_effect:
     enabled: true
     color: "rgba(212, 175, 55, 0.3)"
     blur: "20px"
-    
+
   position:
     header: "center"
     z_index: 100
@@ -362,11 +364,11 @@ spinning_logo:
     height: var(--header-height-mobile, 60px);
     padding: 0 16px;
   }
-  
+
   .site-header__nav {
     display: none;
   }
-  
+
   .site-header__icons {
     gap: 16px;
   }
@@ -380,31 +382,31 @@ spinning_logo:
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="skyyrose-logo__spinner">
   <!-- Outer Ring -->
   <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3"/>
-  
+
   <!-- Rose Petals (Stylized) -->
   <g fill="currentColor">
     <!-- Center Petal -->
     <path d="M50 15 C55 25, 60 35, 50 50 C40 35, 45 25, 50 15" opacity="0.9"/>
-    
+
     <!-- Right Petal -->
     <path d="M85 50 C75 55, 65 60, 50 50 C65 40, 75 45, 85 50" opacity="0.8"/>
-    
+
     <!-- Bottom Petal -->
     <path d="M50 85 C45 75, 40 65, 50 50 C60 65, 55 75, 50 85" opacity="0.9"/>
-    
+
     <!-- Left Petal -->
     <path d="M15 50 C25 45, 35 40, 50 50 C35 60, 25 55, 15 50" opacity="0.8"/>
-    
+
     <!-- Diagonal Petals -->
     <path d="M75 25 C68 32, 58 42, 50 50 C58 42, 68 32, 75 25" opacity="0.6" transform="rotate(45 50 50)"/>
     <path d="M75 25 C68 32, 58 42, 50 50 C58 42, 68 32, 75 25" opacity="0.6" transform="rotate(135 50 50)"/>
     <path d="M75 25 C68 32, 58 42, 50 50 C58 42, 68 32, 75 25" opacity="0.6" transform="rotate(225 50 50)"/>
     <path d="M75 25 C68 32, 58 42, 50 50 C58 42, 68 32, 75 25" opacity="0.6" transform="rotate(315 50 50)"/>
   </g>
-  
+
   <!-- Center Circle -->
   <circle cx="50" cy="50" r="8" fill="currentColor"/>
-  
+
   <!-- Inner Accent Ring -->
   <circle cx="50" cy="50" r="42" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.2"/>
 </svg>
@@ -428,14 +430,14 @@ spinning_logo:
       <a href="/about/">About</a>
     </nav>
   </div>
-  
+
   <!-- Center: Spinning Logo -->
   <div class="site-header__center">
     <a href="/" class="skyyrose-logo skyyrose-logo--gold" aria-label="SkyyRose Home">
       <img src="/assets/images/skyyrose-logo-spinner.svg" alt="SkyyRose" class="skyyrose-logo__spinner" />
     </a>
   </div>
-  
+
   <!-- Right: Icons -->
   <div class="site-header__right">
     <div class="site-header__icons">
@@ -461,10 +463,10 @@ spinning_logo:
 document.addEventListener('DOMContentLoaded', function() {
   const header = document.getElementById('site-header');
   let lastScroll = 0;
-  
+
   window.addEventListener('scroll', function() {
     const currentScroll = window.pageYOffset;
-    
+
     // Add scrolled class after 50px
     if (currentScroll > 50) {
       header.classList.add('site-header--scrolled');
@@ -473,7 +475,7 @@ document.addEventListener('DOMContentLoaded', function() {
       header.classList.remove('site-header--scrolled');
       header.classList.add('site-header--transparent');
     }
-    
+
     lastScroll = currentScroll;
   });
 });
@@ -501,27 +503,27 @@ logo_colors_by_page:
     variant: "gold"
     color: "#D4AF37"
     glow: "rgba(212, 175, 55, 0.3)"
-    
+
   black_rose:
     variant: "silver"
     color: "#C0C0C0"
     glow: "rgba(192, 192, 192, 0.3)"
-    
+
   love_hurts:
     variant: "deep-rose"
     color: "#D4A5A5"
     glow: "rgba(212, 165, 165, 0.3)"
-    
+
   signature:
     variant: "rose-gold"
     color: "#B76E79"
     glow: "rgba(183, 110, 121, 0.3)"
-    
+
   shop:
     variant: "gold"
     color: "#D4AF37"
     glow: "rgba(212, 175, 55, 0.3)"
-    
+
   product:
     variant: "inherit_from_collection"
     # Dynamically set based on product's collection
@@ -575,7 +577,7 @@ function skyyrose_enqueue_logo_styles() {
         array(),
         '1.0.0'
     );
-    
+
     wp_enqueue_script(
         'skyyrose-header-js',
         get_template_directory_uri() . '/assets/js/header.js',
@@ -591,24 +593,24 @@ function skyyrose_get_logo_variant() {
     if (is_front_page()) {
         return 'gold';
     }
-    
+
     if (is_product_category('black-rose') || is_page('black-rose')) {
         return 'silver';
     }
-    
+
     if (is_product_category('love-hurts') || is_page('love-hurts')) {
         return 'deep-rose';
     }
-    
+
     if (is_product_category('signature') || is_page('signature')) {
         return 'rose-gold';
     }
-    
+
     // For single products, check their category
     if (is_product()) {
         global $product;
         $categories = wp_get_post_terms($product->get_id(), 'product_cat', array('fields' => 'slugs'));
-        
+
         if (in_array('black-rose', $categories)) {
             return 'silver';
         } elseif (in_array('love-hurts', $categories)) {
@@ -617,7 +619,7 @@ function skyyrose_get_logo_variant() {
             return 'rose-gold';
         }
     }
-    
+
     return 'gold'; // Default
 }
 
@@ -626,8 +628,8 @@ function skyyrose_spinning_logo() {
     $variant = skyyrose_get_logo_variant();
     ?>
     <a href="<?php echo home_url('/'); ?>" class="skyyrose-logo skyyrose-logo--<?php echo esc_attr($variant); ?>" aria-label="SkyyRose Home">
-        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/skyyrose-logo-spinner.svg" 
-             alt="SkyyRose" 
+        <img src="<?php echo get_template_directory_uri(); ?>/assets/images/skyyrose-logo-spinner.svg"
+             alt="SkyyRose"
              class="skyyrose-logo__spinner" />
     </a>
     <?php
@@ -648,19 +650,19 @@ agent_tasks:
       viewbox: "0 0 100 100"
       style: "Geometric rose with elegant petals"
       colors: "Uses currentColor for flexibility"
-      
+
   - agent: "wordpress_agent"
     task: "Implement header with spinning logo in Elementor Theme Builder"
     priority: "critical"
-    
+
   - agent: "wordpress_agent"
     task: "Add PHP function for dynamic logo color based on page"
     priority: "high"
-    
+
   - agent: "frontend_agent"
     task: "Add CSS for spin animation and color variants"
     priority: "high"
-    
+
   - agent: "frontend_agent"
     task: "Add JavaScript for scroll behavior and logo color switching"
     priority: "medium"

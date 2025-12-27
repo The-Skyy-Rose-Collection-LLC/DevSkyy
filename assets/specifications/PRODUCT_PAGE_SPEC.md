@@ -1,6 +1,9 @@
 # SKYYROSE PRODUCT PAGE (PDP) SPECIFICATION
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro Theme Builder
 
 ---
@@ -13,13 +16,13 @@ page:
   type: "theme_builder_template"
   template_type: "single_product"
   applies_to: "all_products"
-  
+
   seo:
     title_format: "{{product.name}} | SkyyRose"
     description_format: "Shop {{product.name}} from {{product.collection}}. {{product.short_description}} Free shipping over $150."
-    
+
   schema_type: "Product"
-  
+
   conversion_elements:
     - "star_rating_above_fold"
     - "free_shipping_badge"
@@ -37,19 +40,19 @@ page_structure:
   sections:
     - id: "breadcrumbs"
       order: 1
-      
+
     - id: "product_hero"
       order: 2
-      
+
     - id: "product_tabs"
       order: 3
-      
+
     - id: "related_products"
       order: 4
-      
+
     - id: "ugc_section"
       order: 5
-      
+
     - id: "mobile_sticky_cta"
       order: 6
       mobile_only: true
@@ -75,7 +78,7 @@ section:
 content:
   format: "Home / {{collection}} / {{product.name}}"
   separator: " / "
-  
+
   style:
     font: "Inter"
     size: "0.75rem"
@@ -136,19 +139,19 @@ image_gallery:
   layout:
     desktop: "main_image_with_thumbnails"
     mobile: "swipeable_carousel"
-    
+
   main_image:
     aspect_ratio: "1:1"
     background: "#F5F3EF"
     zoom_on_hover: true
     lightbox_on_click: true
-    
+
   thumbnails:
     position: "below"
     count: 5
     active_indicator: "border"
     gap: "8px"
-    
+
   badges:
     edition_badge:
       position: "top-left"
@@ -158,7 +161,7 @@ image_gallery:
         background: "#0D0D0D"
         color: "#C9A962"
         border: "1px solid rgba(201, 169, 98, 0.3)"
-        
+
     new_badge:
       position: "top-left"
       show_for: "new_products"
@@ -166,7 +169,7 @@ image_gallery:
       style:
         background: "#0D0D0D"
         color: "#FAFAFA"
-        
+
     sale_badge:
       position: "top-left"
       show_for: "on_sale"
@@ -183,7 +186,7 @@ product_info:
   padding:
     desktop: "40px 48px"
     mobile: "24px 16px"
-    
+
   elements:
     - type: "collection_label"
       order: 1
@@ -193,7 +196,7 @@ product_info:
         letter_spacing: "0.1em"
         color: "#6B6B6B"
         text_transform: "uppercase"
-        
+
     - type: "product_title"
       order: 2
       config:
@@ -201,7 +204,7 @@ product_info:
         size: "clamp(1.5rem, 4vw, 2rem)"
         weight: 400
         color: "#0D0D0D"
-        
+
     - type: "rating_stars"
       order: 3
       config:
@@ -210,7 +213,7 @@ product_info:
         count_format: "({{count}} reviews)"
         count_color: "#6B6B6B"
         link_to_reviews: true
-        
+
     - type: "price"
       order: 4
       config:
@@ -221,20 +224,20 @@ product_info:
         sale_price_color: "#DC2626"
         original_price_style: "line-through"
         original_price_color: "#6B6B6B"
-        
+
     - type: "shipping_badge"
       order: 5
       config:
         text: "✓ Free shipping over $150"
         color: "#059669"
         font_size: "0.875rem"
-        
+
     - type: "divider"
       order: 6
       config:
         color: "rgba(0,0,0,0.1)"
         margin: "24px 0"
-        
+
     - type: "size_selector"
       order: 7
       config:
@@ -257,7 +260,7 @@ product_info:
             opacity: 0.3
             strikethrough: true
         gap: "8px"
-        
+
     - type: "color_selector"
       order: 8
       config:
@@ -270,7 +273,7 @@ product_info:
           ring_color: "#0D0D0D"
           ring_offset: "2px"
         gap: "8px"
-        
+
     - type: "add_to_cart"
       order: 9
       config:
@@ -291,7 +294,7 @@ product_info:
         success:
           text: "ADDED ✓"
           background: "#059669"
-          
+
     - type: "wishlist_button"
       order: 10
       config:
@@ -305,13 +308,13 @@ product_info:
         active:
           text: "♥ In Wishlist"
           color: "#DC2626"
-          
+
     - type: "divider"
       order: 11
       config:
         color: "rgba(0,0,0,0.1)"
         margin: "24px 0"
-        
+
     - type: "trust_badges"
       order: 12
       config:
@@ -467,12 +470,12 @@ section:
 tabs:
   style: "underline"
   active_indicator: "border-bottom"
-  
+
   items:
     - id: "description"
       label: "Description"
       content_source: "product.description"
-      
+
     - id: "size_guide"
       label: "Size Guide"
       content_source: "custom"
@@ -480,7 +483,7 @@ tabs:
         type: "size_chart"
         measurements: ["Chest", "Length", "Sleeve"]
         sizes: ["XS", "S", "M", "L", "XL", "XXL", "3XL"]
-        
+
     - id: "reviews"
       label: "Reviews ({{count}})"
       content_source: "woocommerce_reviews"
@@ -488,7 +491,7 @@ tabs:
         show_images: true
         show_verified_badge: true
         pagination: true
-        
+
   tab_style:
     font: "Inter"
     size: "0.875rem"
@@ -505,7 +508,7 @@ tabs:
 size_guide_config:
   measurement_unit: "inches"
   toggle_to_cm: true
-  
+
   data:
     tops:
       - size: "XS"
@@ -536,7 +539,7 @@ size_guide_config:
         chest: "46-48"
         length: "32"
         sleeve: "38"
-        
+
   fit_note: "Our pieces are designed for a relaxed, comfortable fit. If you prefer a more fitted look, we recommend sizing down."
 ```
 
@@ -565,7 +568,7 @@ content:
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.5rem)"
     color: "#0D0D0D"
-    
+
   products:
     source: "related"
     fallback: "same_collection"
@@ -574,7 +577,7 @@ content:
       desktop: 4
       tablet: 3
       mobile: 2
-      
+
   carousel:
     enable_mobile: true
     show_navigation: false
@@ -606,7 +609,7 @@ content:
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.5rem)"
     color: "#0D0D0D"
-    
+
   gallery:
     source: "product_tagged_ugc"
     fallback: "collection_ugc"
@@ -617,7 +620,7 @@ content:
     max_images: 6
     aspect_ratio: "1:1"
     gap: "8px"
-    
+
   cta:
     text: "Tag us @skyyrose to be featured"
     color: "#6B6B6B"
@@ -647,7 +650,7 @@ section:
 ```yaml
 content:
   layout: "flex_row"
-  
+
   elements:
     - type: "product_info"
       width: "flex-1"
@@ -663,7 +666,7 @@ content:
           size: "1rem"
           weight: 600
           color: "#0D0D0D"
-          
+
     - type: "add_to_cart_button"
       width: "auto"
       config:
@@ -743,9 +746,9 @@ content:
 document.addEventListener('DOMContentLoaded', function() {
   const addToCartButton = document.querySelector('.single_add_to_cart_button');
   const stickyBar = document.querySelector('.mobile-sticky-cta');
-  
+
   if (!addToCartButton || !stickyBar) return;
-  
+
   const observer = new IntersectionObserver(
     ([entry]) => {
       if (entry.isIntersecting) {
@@ -756,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function() {
     },
     { threshold: 0, rootMargin: '-100px 0px 0px 0px' }
   );
-  
+
   observer.observe(addToCartButton);
 });
 ```
@@ -773,12 +776,12 @@ black_rose_variations:
     edition_badge:
       show: true
       format: "#{{edition}}/50"
-      
+
   stock_display:
     show_remaining: true
     format: "Only {{remaining}} left"
     threshold: 10
-    
+
   urgency_messaging:
     enabled: true
     messages:
@@ -796,7 +799,7 @@ black_rose_variations:
 love_hurts_variations:
   color_scheme:
     accent_color: "#8B3A3A"
-    
+
   add_to_cart:
     hover_color: "#5C2828"
 ```
@@ -820,46 +823,46 @@ execution_checklist:
   phase_1_setup:
     - task: "Create Theme Builder Single Product template"
       status: "pending"
-      
+
     - task: "Install required widgets: YITH Wishlist, variation swatches"
       status: "pending"
-      
+
   phase_2_build:
     - task: "Build breadcrumbs section"
       status: "pending"
-      
+
     - task: "Build product hero (gallery + info)"
       status: "pending"
-      
+
     - task: "Build product tabs"
       status: "pending"
-      
+
     - task: "Build related products section"
       status: "pending"
-      
+
     - task: "Build UGC section"
       status: "pending"
-      
+
     - task: "Build mobile sticky CTA"
       status: "pending"
-      
+
   phase_3_customize:
     - task: "Add collection-specific CSS classes"
       status: "pending"
-      
+
     - task: "Implement edition badge for BLACK ROSE"
       status: "pending"
-      
+
     - task: "Add size guide modal"
       status: "pending"
-      
+
   phase_4_test:
     - task: "Test on all device sizes"
       status: "pending"
-      
+
     - task: "Test add to cart functionality"
       status: "pending"
-      
+
     - task: "Test variation selectors"
       status: "pending"
 ```

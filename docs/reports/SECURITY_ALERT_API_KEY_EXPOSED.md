@@ -1,7 +1,7 @@
 # 🚨 SECURITY ALERT - API KEY EXPOSED
 
-**Date:** December 16, 2025  
-**Severity:** CRITICAL  
+**Date:** December 16, 2025
+**Severity:** CRITICAL
 **Status:** IMMEDIATE ACTION REQUIRED
 
 ---
@@ -18,7 +18,7 @@ An OpenAI API key was exposed in the conversation history. This key has been com
 
 ### 1. Revoke the Exposed API Key (DO THIS NOW)
 
-1. Go to: https://platform.openai.com/api-keys
+1. Go to: <https://platform.openai.com/api-keys>
 2. Log in to your OpenAI account
 3. Find the key starting with `sk-proj-mxV316lWmUh5x6fW...`
 4. Click "Revoke" or "Delete" immediately
@@ -26,7 +26,7 @@ An OpenAI API key was exposed in the conversation history. This key has been com
 
 ### 2. Generate a New API Key
 
-1. On the same page: https://platform.openai.com/api-keys
+1. On the same page: <https://platform.openai.com/api-keys>
 2. Click "Create new secret key"
 3. Give it a descriptive name (e.g., "DevSkyy Production - Dec 2025")
 4. Copy the new key immediately (you won't see it again)
@@ -77,6 +77,7 @@ git log -p | grep -i "sk-proj-" || echo "No keys found in git history"
 ### Never Expose API Keys
 
 ❌ **DON'T:**
+
 - Share API keys in chat/messages
 - Commit API keys to git
 - Include API keys in code
@@ -84,6 +85,7 @@ git log -p | grep -i "sk-proj-" || echo "No keys found in git history"
 - Store API keys in plain text files (unless .gitignored)
 
 ✅ **DO:**
+
 - Use environment variables
 - Use `.env` files (with `.gitignore`)
 - Use secret management services (AWS Secrets Manager, HashiCorp Vault)
@@ -104,6 +106,7 @@ export GOOGLE_API_KEY="..."
 **For Production:**
 
 Use a secret management service:
+
 - AWS Secrets Manager
 - Google Cloud Secret Manager
 - Azure Key Vault
@@ -114,12 +117,14 @@ Use a secret management service:
 ### Using .env Files Safely
 
 1. **Create .env file:**
+
    ```bash
    touch .env
    chmod 600 .env  # Restrict permissions
    ```
 
 2. **Add to .gitignore:**
+
    ```bash
    echo ".env" >> .gitignore
    echo ".env.*" >> .gitignore
@@ -127,6 +132,7 @@ Use a secret management service:
    ```
 
 3. **Create .env.example template:**
+
    ```bash
    # .env.example (safe to commit)
    OPENAI_API_KEY=your-openai-key-here
@@ -135,6 +141,7 @@ Use a secret management service:
    ```
 
 4. **Load in Python:**
+
    ```python
    from dotenv import load_dotenv
    load_dotenv()  # Loads .env file
@@ -155,7 +162,7 @@ Use a secret management service:
 ### Monitoring for Unauthorized Usage
 
 1. Check OpenAI usage dashboard:
-   - https://platform.openai.com/usage
+   - <https://platform.openai.com/usage>
 
 2. Look for:
    - Unusual spikes in usage
@@ -164,7 +171,7 @@ Use a secret management service:
    - Activity during off-hours
 
 3. Set up billing alerts:
-   - https://platform.openai.com/account/billing/limits
+   - <https://platform.openai.com/account/billing/limits>
 
 ---
 
@@ -197,8 +204,8 @@ Going forward, rotate API keys regularly:
 
 ## 📞 Support Resources
 
-- **OpenAI Support:** https://help.openai.com/
-- **OpenAI Security:** security@openai.com
+- **OpenAI Support:** <https://help.openai.com/>
+- **OpenAI Security:** <security@openai.com>
 - **DevSkyy Security:** Check your internal security team
 
 ---
@@ -214,4 +221,3 @@ Going forward, rotate API keys regularly:
 **Remember:** This is a learning opportunity. Everyone makes mistakes. The important thing is to act quickly and learn from it.
 
 **Status:** Please confirm when you've revoked the old key and generated a new one.
-

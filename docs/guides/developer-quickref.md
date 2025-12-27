@@ -1,6 +1,6 @@
 # Developer Quick Reference - Clean Coding Compliance
 
-**For:** DevSkyy Contributors  
+**For:** DevSkyy Contributors
 **Purpose:** Fast reference for code quality tools and compliance agents
 
 ---
@@ -189,18 +189,22 @@ pre-commit install
 ### On `git commit` (Pre-Commit Hooks)
 
 ✅ **Code Formatting**
+
 - Black (Python formatter)
 - isort (Import sorter)
 
 ✅ **Code Quality**
+
 - Ruff (Fast linter)
 - MyPy (Type checker)
 
 ✅ **Security**
+
 - Bandit (Security scanner)
 - detect-secrets (Secret detection)
 
 ✅ **File Quality**
+
 - Trailing whitespace
 - End-of-file newlines
 - YAML/JSON/TOML validation
@@ -208,28 +212,33 @@ pre-commit install
 - Merge conflicts
 
 ✅ **Documentation**
+
 - Pydocstyle (Docstring checker)
 - Markdownlint (Markdown formatter)
 
 ### On `git push` (GitHub Actions)
 
 ✅ **Testing**
+
 - Full pytest suite
 - Code coverage (must be >80%)
 - Coverage reports
 
 ✅ **Security**
+
 - pip-audit (dependency vulnerabilities)
 - Safety check
 - Bandit security linter
 
 ✅ **Code Quality** (Python 3.11 & 3.12)
+
 - Black formatting check
 - isort check
 - Ruff linting
 - MyPy type checking
 
 ✅ **Dependencies**
+
 - Dependency review (on PRs)
 - Breaking change detection
 
@@ -416,13 +425,13 @@ pytest --help
 
 ### Resources
 
-- Pre-commit: https://pre-commit.com/
-- Black: https://black.readthedocs.io/
-- Ruff: https://beta.ruff.rs/docs/
-- MyPy: https://mypy.readthedocs.io/
-- Pytest: https://docs.pytest.org/
+- Pre-commit: <https://pre-commit.com/>
+- Black: <https://black.readthedocs.io/>
+- Ruff: <https://beta.ruff.rs/docs/>
+- MyPy: <https://mypy.readthedocs.io/>
+- Pytest: <https://docs.pytest.org/>
 
 ---
 
-**Last Updated:** December 14, 2025  
+**Last Updated:** December 14, 2025
 **Maintained By:** DevSkyy Team

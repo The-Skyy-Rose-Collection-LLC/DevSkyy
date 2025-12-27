@@ -6,14 +6,14 @@
     <title>SKYYROSE | BLACK ROSE GARDEN</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: #000;
             color: #fff;
             overflow: hidden;
         }
-        
+
         #loading-screen {
             position: fixed;
             top: 0;
@@ -28,12 +28,12 @@
             z-index: 1000;
             transition: opacity 0.8s ease;
         }
-        
+
         #loading-screen.hidden {
             opacity: 0;
             pointer-events: none;
         }
-        
+
         .loading-logo {
             font-size: 3rem;
             font-weight: 300;
@@ -44,12 +44,12 @@
             -webkit-text-fill-color: transparent;
             animation: pulse 2s ease-in-out infinite;
         }
-        
+
         @keyframes pulse {
             0%, 100% { opacity: 0.7; }
             50% { opacity: 1; }
         }
-        
+
         .loading-bar-container {
             width: 300px;
             height: 2px;
@@ -57,21 +57,21 @@
             border-radius: 1px;
             overflow: hidden;
         }
-        
+
         .loading-bar {
             height: 100%;
             background: linear-gradient(90deg, #8B0000, #DC143C);
             width: 0%;
             transition: width 0.3s ease;
         }
-        
+
         .loading-text {
             margin-top: 1rem;
             font-size: 0.8rem;
             letter-spacing: 0.3rem;
             color: rgba(220, 20, 60, 0.7);
         }
-        
+
         #canvas-container {
             position: fixed;
             top: 0;
@@ -79,7 +79,7 @@
             width: 100%;
             height: 100%;
         }
-        
+
         #ui-overlay {
             position: fixed;
             top: 0;
@@ -89,28 +89,28 @@
             pointer-events: none;
             z-index: 100;
         }
-        
+
         .brand-header {
             position: absolute;
             top: 2rem;
             left: 2rem;
             pointer-events: auto;
         }
-        
+
         .brand-name {
             font-size: 1.5rem;
             font-weight: 300;
             letter-spacing: 0.5rem;
             color: #DC143C;
         }
-        
+
         .collection-name {
             font-size: 0.7rem;
             letter-spacing: 0.4rem;
             color: rgba(139, 0, 0, 0.8);
             margin-top: 0.3rem;
         }
-        
+
         .nav-controls {
             position: absolute;
             bottom: 2rem;
@@ -120,7 +120,7 @@
             gap: 1rem;
             pointer-events: auto;
         }
-        
+
         .nav-btn {
             padding: 0.8rem 2rem;
             background: rgba(139, 0, 0, 0.2);
@@ -132,13 +132,13 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
         }
-        
+
         .nav-btn:hover {
             background: rgba(220, 20, 60, 0.3);
             border-color: #DC143C;
             box-shadow: 0 0 20px rgba(220, 20, 60, 0.3);
         }
-        
+
         .product-panel {
             position: absolute;
             right: 2rem;
@@ -152,11 +152,11 @@
             opacity: 0;
             transition: opacity 0.5s ease;
         }
-        
+
         .product-panel.visible {
             opacity: 1;
         }
-        
+
         .product-title {
             font-size: 1.2rem;
             font-weight: 300;
@@ -164,21 +164,21 @@
             margin-bottom: 0.5rem;
             color: #DC143C;
         }
-        
+
         .product-price {
             font-size: 1.5rem;
             font-weight: 200;
             margin-bottom: 1rem;
             color: #fff;
         }
-        
+
         .product-desc {
             font-size: 0.8rem;
             line-height: 1.8;
             color: rgba(255, 255, 255, 0.7);
             margin-bottom: 1.5rem;
         }
-        
+
         .add-to-cart {
             width: 100%;
             padding: 1rem;
@@ -191,12 +191,12 @@
             transition: all 0.3s ease;
             text-transform: uppercase;
         }
-        
+
         .add-to-cart:hover {
             box-shadow: 0 0 30px rgba(220, 20, 60, 0.5);
             transform: translateY(-2px);
         }
-        
+
         .scene-indicator {
             position: absolute;
             bottom: 6rem;
@@ -205,7 +205,7 @@
             display: flex;
             gap: 0.5rem;
         }
-        
+
         .indicator-dot {
             width: 8px;
             height: 8px;
@@ -215,16 +215,16 @@
             pointer-events: auto;
             transition: all 0.3s ease;
         }
-        
+
         .indicator-dot.active {
             background: #DC143C;
             box-shadow: 0 0 10px rgba(220, 20, 60, 0.8);
         }
-        
+
         .indicator-dot:hover {
             background: rgba(220, 20, 60, 0.8);
         }
-        
+
         #debug-info {
             position: fixed;
             top: 10px;
@@ -248,47 +248,47 @@
         </div>
         <div class="loading-text" id="loading-text">ENTERING THE GARDEN...</div>
     </div>
-    
+
     <!-- 3D Canvas -->
     <div id="canvas-container"></div>
-    
+
     <!-- UI Overlay -->
     <div id="ui-overlay">
         <div class="brand-header">
             <div class="brand-name">SKYYROSE</div>
             <div class="collection-name">BLACK ROSE COLLECTION</div>
         </div>
-        
+
         <div class="product-panel" id="product-panel">
             <div class="product-title">MIDNIGHT THORNS HOODIE</div>
             <div class="product-price">$285</div>
             <div class="product-desc">
-                Premium heavyweight cotton blend with hand-embroidered rose details. 
-                Limited edition Black Rose Collection piece featuring thorned rose motifs 
+                Premium heavyweight cotton blend with hand-embroidered rose details.
+                Limited edition Black Rose Collection piece featuring thorned rose motifs
                 and signature dark elegance.
             </div>
             <button class="add-to-cart">ADD TO CART</button>
         </div>
-        
+
         <div class="scene-indicator">
             <div class="indicator-dot active" data-scene="0"></div>
             <div class="indicator-dot" data-scene="1"></div>
             <div class="indicator-dot" data-scene="2"></div>
         </div>
-        
+
         <div class="nav-controls">
             <button class="nav-btn" id="prev-btn">â† PREV</button>
             <button class="nav-btn" id="explore-btn">EXPLORE</button>
             <button class="nav-btn" id="next-btn">NEXT â†’</button>
         </div>
     </div>
-    
+
     <!-- Debug Info -->
     <div id="debug-info">Loading...</div>
 
     <!-- Three.js from CDN -->
     <script src="https://unpkg.com/three@0.160.0/build/three.module.js" type="module"></script>
-    
+
     <script type="module">
         // ============================================
         // VERIFIED CDN ASSETS - ALL TESTED & WORKING
@@ -352,7 +352,7 @@
 
         async function init() {
             log('Initializing Three.js...');
-            
+
             // Scene
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x050505);
@@ -363,7 +363,7 @@
             camera.position.set(0, 2, 8);
 
             // Renderer
-            renderer = new THREE.WebGLRenderer({ 
+            renderer = new THREE.WebGLRenderer({
                 antialias: true,
                 powerPreference: 'high-performance'
             });
@@ -387,7 +387,7 @@
             // Post-processing
             composer = new EffectComposer(renderer);
             composer.addPass(new RenderPass(scene, camera));
-            
+
             const bloomPass = new UnrealBloomPass(
                 new THREE.Vector2(window.innerWidth, window.innerHeight),
                 0.5,  // strength
@@ -402,9 +402,9 @@
             await loadEnvironment();
             await loadModels();
             createGardenScene();
-            
+
             updateLoadProgress(100, 'WELCOME TO THE GARDEN');
-            
+
             setTimeout(() => {
                 loadingScreen.classList.add('hidden');
                 productPanel.classList.add('visible');
@@ -413,16 +413,16 @@
             // Event listeners
             window.addEventListener('resize', onWindowResize);
             setupNavigation();
-            
+
             // Start animation
             animate();
         }
 
         async function loadEnvironment() {
             updateLoadProgress(20, 'LOADING ENVIRONMENT...');
-            
+
             const rgbeLoader = new RGBELoader();
-            
+
             try {
                 const hdriTexture = await new Promise((resolve, reject) => {
                     rgbeLoader.load(
@@ -445,7 +445,7 @@
                 hdriTexture.mapping = THREE.EquirectangularReflectionMapping;
                 scene.environment = hdriTexture;
                 scene.background = hdriTexture;
-                
+
                 updateLoadProgress(40, 'ENVIRONMENT LOADED...');
             } catch (error) {
                 log('HDRI failed, using fallback lighting');
@@ -487,9 +487,9 @@
 
         async function loadModels() {
             updateLoadProgress(50, 'LOADING 3D MODELS...');
-            
+
             const gltfLoader = new GLTFLoader();
-            
+
             // Load Damaged Helmet as centerpiece
             try {
                 const helmet = await new Promise((resolve, reject) => {
@@ -523,7 +523,7 @@
                 });
                 loadedModels.helmet = helmetModel;
                 scene.add(helmetModel);
-                
+
                 updateLoadProgress(70, 'HELMET LOADED...');
             } catch (error) {
                 log('Helmet load failed, creating placeholder');
@@ -557,16 +557,16 @@
                         Math.sin(angle) * 6
                     );
                     lanternModel.scale.set(0.02, 0.02, 0.02);
-                    
+
                     // Add point light to each lantern
                     const lanternLight = new THREE.PointLight(0xDC143C, 1, 5);
                     lanternLight.position.copy(lanternModel.position);
                     lanternLight.position.y += 1;
                     scene.add(lanternLight);
-                    
+
                     scene.add(lanternModel);
                 }
-                
+
                 updateLoadProgress(85, 'LANTERNS PLACED...');
             } catch (error) {
                 log('Lantern load failed, skipping');
@@ -576,7 +576,7 @@
         function createPlaceholderModel() {
             // Create a sophisticated placeholder if model fails
             const group = new THREE.Group();
-            
+
             // Crystal/gem shape for centerpiece
             const crystalGeom = new THREE.OctahedronGeometry(1, 0);
             const crystalMat = new THREE.MeshPhysicalMaterial({
@@ -629,7 +629,7 @@
 
             // Fog enhancement
             scene.fog = new THREE.FogExp2(0x050505, 0.03);
-            
+
             updateLoadProgress(95, 'GARDEN COMPLETE...');
         }
 

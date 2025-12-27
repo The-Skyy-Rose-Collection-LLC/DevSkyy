@@ -20,7 +20,7 @@ Use this checklist to track your MCP server configuration progress.
 
 ### Required Keys
 
-- [ ] **OPENAI_API_KEY** - Get from https://platform.openai.com/api-keys
+- [ ] **OPENAI_API_KEY** - Get from <https://platform.openai.com/api-keys>
   - [ ] Key obtained
   - [ ] Added to `.env.mcp`
   - [ ] Added to `~/.zshrc` or `~/.bash_profile`
@@ -34,18 +34,18 @@ Use this checklist to track your MCP server configuration progress.
 
 ### Optional Keys
 
-- [ ] **GITHUB_TOKEN** - Get from https://github.com/settings/tokens
+- [ ] **GITHUB_TOKEN** - Get from <https://github.com/settings/tokens>
   - [ ] Token created with appropriate scopes (repo, workflow)
   - [ ] Added to `.env.mcp`
   - [ ] Added to shell profile
   - [ ] Verified: `echo $GITHUB_TOKEN`
 
-- [ ] **BRAVE_API_KEY** - Get from https://brave.com/search/api/
+- [ ] **BRAVE_API_KEY** - Get from <https://brave.com/search/api/>
   - [ ] Key obtained
   - [ ] Added to `.env.mcp`
   - [ ] Added to shell profile
 
-- [ ] **ANTHROPIC_API_KEY** - Get from https://console.anthropic.com/
+- [ ] **ANTHROPIC_API_KEY** - Get from <https://console.anthropic.com/>
   - [ ] Key obtained
   - [ ] Added to `.env.mcp`
   - [ ] Added to shell profile
@@ -54,17 +54,22 @@ Use this checklist to track your MCP server configuration progress.
 
 - [ ] Claude Desktop installed
 - [ ] Backup existing config (if any):
+
   ```bash
   cp ~/Library/Application\ Support/Claude/claude_desktop_config.json \
      ~/Library/Application\ Support/Claude/claude_desktop_config.json.backup
   ```
+
 - [ ] Copy example config:
+
   ```bash
   cp config/claude/desktop.example.json \
      ~/Library/Application\ Support/Claude/claude_desktop_config.json
   ```
+
 - [ ] Update paths in config to match your system
 - [ ] Verify config is valid JSON:
+
   ```bash
   python3 -m json.tool ~/Library/Application\ Support/Claude/claude_desktop_config.json
   ```
@@ -74,10 +79,13 @@ Use this checklist to track your MCP server configuration progress.
 - [ ] Run test script: `python3 scripts/test_mcp_servers.py`
 - [ ] All tests pass (4/4)
 - [ ] Test DevSkyy OpenAI server:
+
   ```bash
   timeout 5 python3 mcp/openai_server.py || echo "Server started OK"
   ```
+
 - [ ] Test DevSkyy Main server:
+
   ```bash
   timeout 5 python3 devskyy_mcp.py || echo "Server started OK"
   ```
@@ -87,10 +95,13 @@ Use this checklist to track your MCP server configuration progress.
 - [ ] Restart Claude Desktop (Quit and reopen)
 - [ ] Verify MCP servers loaded in Claude Desktop
 - [ ] Test a simple command in Claude:
+
   ```
   "List the files in the DevSkyy repository"
   ```
+
 - [ ] Test DevSkyy agent:
+
   ```
   "What agents are available in the DevSkyy platform?"
   ```
@@ -108,9 +119,11 @@ Use this checklist to track your MCP server configuration progress.
 - [ ] `.env.mcp` added to `.gitignore`
 - [ ] Environment variables set in shell profile only
 - [ ] File permissions correct on sensitive files:
+
   ```bash
   chmod 600 .env.mcp
   ```
+
 - [ ] GitHub token has minimal required scopes
 - [ ] Database connection uses appropriate permissions
 
@@ -187,13 +200,14 @@ _____________________________________________________________________
 You now have a fully configured MCP environment for DevSkyy!
 
 **Next Steps:**
+
 1. Start using Claude Desktop with MCP servers
 2. Explore the 54-agent ecosystem
 3. Automate your WordPress workflows
 4. Build custom integrations
 
 **Resources:**
+
 - Quick Reference: `docs/MCP_QUICK_REFERENCE.md`
 - Full Guide: `docs/MCP_CONFIGURATION_GUIDE.md`
-- Support: https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues
-
+- Support: <https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy/issues>

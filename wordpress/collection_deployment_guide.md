@@ -7,6 +7,7 @@
 ## 🚀 Quick Start - Go Live in 5 Steps
 
 ### Step 1: Verify WordPress Configuration
+
 ```bash
 # Test WordPress connection
 python3 -c "
@@ -21,6 +22,7 @@ print(f'✅ WordPress API Ready: {config.base_url}')
 ```
 
 ### Step 2: Upload 3D Experiences
+
 ```python
 import asyncio
 from wordpress.collection_page_manager import (
@@ -48,6 +50,7 @@ asyncio.run(deploy())
 ```
 
 ### Step 3: Create Collection Pages
+
 ```python
 async def create_pages():
     config = WordPressConfig(
@@ -75,6 +78,7 @@ asyncio.run(create_pages())
 ```
 
 ### Step 4: Enable Agent Template Reference
+
 ```python
 from agents.collection_content_agent import create_collection_content_agent
 
@@ -93,6 +97,7 @@ recovery = agent.recover_collection_design(
 ```
 
 ### Step 5: Publish Pages
+
 ```python
 async def publish():
     config = WordPressConfig(
@@ -118,6 +123,7 @@ asyncio.run(publish())
 ## 📋 Collection Pages Reference
 
 ### BLACK ROSE Garden
+
 - **URL**: `/collections/black-rose-garden`
 - **File**: `skyyrose-black-rose-garden-production.html` (30 KB)
 - **Colors**: Black (#000000), Silver (#C0C0C0), White (#FFFFFF)
@@ -127,6 +133,7 @@ asyncio.run(publish())
 **Agent Template Available**: `CollectionContentAgent.get_design_template('black_rose')`
 
 ### LOVE HURTS Castle
+
 - **URL**: `/collections/love-hurts-castle`
 - **File**: `skyyrose-love-hurts-castle-production.html` (31 KB)
 - **Colors**: Burgundy (#8B4049), Rose (#C9356C), Pink (#FF6B9D)
@@ -136,6 +143,7 @@ asyncio.run(publish())
 **Agent Template Available**: `CollectionContentAgent.get_design_template('love_hurts')`
 
 ### SIGNATURE Runway
+
 - **URL**: `/collections/signature-runway`
 - **File**: `skyyrose-signature-runway-production.html` (19 KB)
 - **Colors**: Gold (#C9A962), Bright Gold (#FFD700), Black (#000000)
@@ -149,6 +157,7 @@ asyncio.run(publish())
 ## 🔐 Authentication & Configuration
 
 ### WordPress REST API Requirements
+
 ```bash
 # Enable REST API in WordPress
 1. Settings → Permalinks → Save Changes (refreshes REST)
@@ -157,6 +166,7 @@ asyncio.run(publish())
 ```
 
 ### Environment Variables
+
 ```bash
 # .env file
 WORDPRESS_URL=https://skyyrose.com
@@ -170,6 +180,7 @@ export OPENAI_API_KEY=sk-...
 ```
 
 ### Verify Connection
+
 ```python
 from wordpress.collection_page_manager import WordPressConfig, WordPressCollectionPageManager
 import asyncio
@@ -196,6 +207,7 @@ asyncio.run(test_connection())
 ## 🎨 Design Consistency Check
 
 ### Automated Validation
+
 ```python
 from agents.collection_content_agent import create_collection_content_agent
 
@@ -220,6 +232,7 @@ else:
 ```
 
 ### Manual Template Reference
+
 ```python
 from wordpress.collection_page_manager import CollectionDesignTemplates, CollectionType
 
@@ -237,6 +250,7 @@ print(f"Description: {template.description}")
 ## 🚨 Recovery Protocol
 
 ### If Design Breaks
+
 ```python
 from agents.collection_content_agent import create_collection_content_agent
 
@@ -253,6 +267,7 @@ print(f"Instructions:\n{recovery['result']}")
 ```
 
 ### Restore from HTML Template
+
 ```bash
 # All original HTML files are stored in:
 ls -la wordpress/collection_templates/
@@ -262,6 +277,7 @@ ls -la wordpress/collection_templates/
 ```
 
 ### Manual Restoration
+
 1. **Get Template**: `CollectionDesignTemplates.get_template(CollectionType.BLACK_ROSE)`
 2. **Restore Colors**: Use exact HEX values from template
 3. **Verify Theme**: Check alignment with theme statement
@@ -272,6 +288,7 @@ ls -la wordpress/collection_templates/
 ## 📊 Status Dashboard
 
 ### Check Page Status
+
 ```python
 async def check_status():
     config = WordPressConfig(...)
@@ -288,6 +305,7 @@ asyncio.run(check_status())
 ```
 
 ### Monitor 3D Experience Performance
+
 - Browser console for WebGL errors
 - Performance tab for load times
 - Network tab for asset delivery
@@ -298,11 +316,13 @@ asyncio.run(check_status())
 ## 🔗 API Endpoints
 
 ### List Pages
+
 ```
 GET /wp-json/wp/v2/pages?per_page=100
 ```
 
 ### Create Page
+
 ```
 POST /wp-json/wp/v2/pages
 Body: {
@@ -314,12 +334,14 @@ Body: {
 ```
 
 ### Upload Media
+
 ```
 POST /wp-json/wp/v2/media
 Body: multipart/form-data with file
 ```
 
 ### Update Page
+
 ```
 POST /wp-json/wp/v2/pages/{id}
 Body: {
@@ -390,6 +412,7 @@ docs/
 ## 📞 Support & Recovery
 
 ### Get Agent Template Reference
+
 ```python
 agent = create_collection_content_agent()
 template = agent.get_design_template('black_rose')
@@ -397,6 +420,7 @@ template = agent.get_design_template('black_rose')
 ```
 
 ### Trigger Design Recovery
+
 ```python
 recovery = await agent.recover_collection_design(
     collection_type='black_rose',
@@ -406,6 +430,7 @@ recovery = await agent.recover_collection_design(
 ```
 
 ### Access Original Files
+
 ```bash
 # All 3D experiences permanently stored in:
 wordpress/collection_templates/

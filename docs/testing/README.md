@@ -9,6 +9,7 @@ The DevSkyy platform implements comprehensive testing across multiple levels to 
 ## 🧪 Testing Strategy
 
 ### Testing Pyramid
+
 ```
                     ┌─────────────────┐
                     │   E2E Tests     │  ← Few, high-value
@@ -25,6 +26,7 @@ The DevSkyy platform implements comprehensive testing across multiple levels to 
 ### Test Categories
 
 #### 1. Unit Tests
+
 - **Purpose**: Test individual components in isolation
 - **Location**: `tests/` directory
 - **Framework**: pytest
@@ -32,6 +34,7 @@ The DevSkyy platform implements comprehensive testing across multiple levels to 
 - **Speed**: <1 second per test
 
 #### 2. Integration Tests
+
 - **Purpose**: Test component interactions
 - **Scope**: API endpoints, database operations, external services
 - **Framework**: pytest with fixtures
@@ -39,6 +42,7 @@ The DevSkyy platform implements comprehensive testing across multiple levels to 
 - **Speed**: <10 seconds per test
 
 #### 3. End-to-End Tests
+
 - **Purpose**: Test complete user workflows
 - **Scope**: Full application stack
 - **Framework**: pytest + Selenium/Playwright
@@ -48,6 +52,7 @@ The DevSkyy platform implements comprehensive testing across multiple levels to 
 ## 📁 Test Structure
 
 ### Current Test Files
+
 - **[test_adk.py](../../tests/test_adk.py)** - Agent Development Kit tests
 - **[test_agents.py](../../tests/test_agents.py)** - AI agent functionality tests
 - **[test_gdpr.py](../../tests/test_gdpr.py)** - GDPR compliance tests
@@ -55,6 +60,7 @@ The DevSkyy platform implements comprehensive testing across multiple levels to 
 - **[conftest.py](../../tests/conftest.py)** - Shared test configuration
 
 ### Test Organization
+
 ```
 tests/
 ├── conftest.py              # Shared fixtures and configuration
@@ -75,6 +81,7 @@ tests/
 ## 🚀 Running Tests
 
 ### Basic Test Commands
+
 ```bash
 # Run all tests
 pytest
@@ -96,6 +103,7 @@ pytest -n auto
 ```
 
 ### Advanced Test Commands
+
 ```bash
 # Run only unit tests
 pytest tests/unit/
@@ -116,7 +124,9 @@ pytest --cov --cov-report=html
 ## 🔧 Test Configuration
 
 ### pytest Configuration
+
 **File**: `pyproject.toml`
+
 ```toml
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -132,7 +142,9 @@ markers = [
 ```
 
 ### Test Fixtures
+
 **File**: `tests/conftest.py`
+
 - **Database fixtures** - Test database setup/teardown
 - **Client fixtures** - Test client configuration
 - **Mock fixtures** - External service mocking
@@ -141,12 +153,14 @@ markers = [
 ## 📊 Test Coverage
 
 ### Coverage Requirements
+
 - **Minimum**: 80% overall coverage
 - **Target**: 90% for new code
 - **Critical paths**: 95% coverage required
 - **Exclusions**: Test files, migrations, legacy code
 
 ### Coverage Reports
+
 ```bash
 # Terminal coverage report
 pytest --cov --cov-report=term-missing
@@ -162,6 +176,7 @@ pytest --cov --cov-report=xml
 ## 🔒 Security Testing
 
 ### Security Test Categories
+
 1. **Authentication tests** - Login, logout, token validation
 2. **Authorization tests** - Permission checking, role validation
 3. **Input validation tests** - SQL injection, XSS prevention
@@ -169,6 +184,7 @@ pytest --cov --cov-report=xml
 5. **GDPR compliance tests** - Privacy controls, data deletion
 
 ### Security Test Examples
+
 ```python
 def test_sql_injection_prevention():
     """Test that SQL injection attempts are blocked"""
@@ -186,6 +202,7 @@ def test_xss_prevention():
 ## 🚀 Performance Testing
 
 ### Performance Test Types
+
 1. **Load testing** - Normal expected load
 2. **Stress testing** - Beyond normal capacity
 3. **Spike testing** - Sudden load increases
@@ -193,6 +210,7 @@ def test_xss_prevention():
 5. **Endurance testing** - Extended periods
 
 ### Performance Metrics
+
 - **Response time** - <200ms for API endpoints
 - **Throughput** - >1000 requests/second
 - **Concurrent users** - >100 simultaneous users
@@ -202,17 +220,20 @@ def test_xss_prevention():
 ## 🔄 Continuous Testing
 
 ### Pre-commit Testing
+
 - **Fast unit tests** - Run on every commit
 - **Linting and formatting** - Code quality checks
 - **Security scanning** - Credential and vulnerability detection
 
 ### CI/CD Testing
+
 - **Full test suite** - All tests on push/PR
 - **Multiple environments** - Python 3.11 and 3.12
 - **Coverage reporting** - Codecov integration
 - **Performance regression** - Automated performance checks
 
 ### Scheduled Testing
+
 - **Nightly tests** - Full regression testing
 - **Weekly security scans** - Comprehensive security testing
 - **Monthly performance tests** - Load and stress testing
@@ -220,12 +241,14 @@ def test_xss_prevention():
 ## 🐛 Test Debugging
 
 ### Common Issues
+
 1. **Flaky tests** - Tests that pass/fail inconsistently
 2. **Slow tests** - Tests taking too long to run
 3. **Environment issues** - Tests failing in CI but not locally
 4. **Data dependencies** - Tests depending on specific data
 
 ### Debugging Commands
+
 ```bash
 # Run single test with full output
 pytest tests/test_agents.py::test_specific -v -s
@@ -243,12 +266,14 @@ pytest --collect-only
 ## 📈 Test Metrics
 
 ### Quality Metrics
+
 - **Test coverage percentage** - Code covered by tests
 - **Test pass rate** - Percentage of passing tests
 - **Test execution time** - Time to run test suite
 - **Flaky test rate** - Tests with inconsistent results
 
 ### Tracking Tools
+
 - **Coverage.py** - Code coverage measurement
 - **pytest-benchmark** - Performance benchmarking
 - **pytest-xdist** - Parallel test execution

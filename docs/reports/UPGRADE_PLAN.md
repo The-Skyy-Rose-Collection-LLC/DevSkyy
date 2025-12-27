@@ -3,6 +3,7 @@
 ## Current Installation Status
 
 ### ✅ Currently Installed
+
 ```
 openai                    2.11.0    ✅ LATEST (Dec 2024)
 httpx                     0.28.1    ✅ LATEST
@@ -13,6 +14,7 @@ httpx-sse                 0.4.3     ✅ (for streaming)
 ```
 
 ### ❌ Missing Official SDKs
+
 ```
 anthropic                 NOT INSTALLED (should be 0.40.0+)
 google-generativeai       NOT INSTALLED (should be 0.8.0+)
@@ -26,6 +28,7 @@ groq                      NOT INSTALLED (should be 0.11.0+)
 ## Critical Issue: Using Raw HTTP Instead of SDKs
 
 **Current Implementation:**
+
 - ✅ OpenAI: Using official SDK ✅
 - ❌ Anthropic: Using raw `httpx` HTTP calls
 - ❌ Google: Using raw `httpx` HTTP calls
@@ -34,6 +37,7 @@ groq                      NOT INSTALLED (should be 0.11.0+)
 - ❌ Groq: Using raw `httpx` HTTP calls
 
 **This means:**
+
 - 5 out of 6 providers are using manual HTTP calls
 - Missing type safety, error handling, and features
 - Higher maintenance burden
@@ -45,6 +49,7 @@ groq                      NOT INSTALLED (should be 0.11.0+)
 ### Option 1: Minimal Upgrade (Recommended to Start)
 
 **Install 3 Essential SDKs:**
+
 ```bash
 python3 -m pip install anthropic>=0.40.0
 python3 -m pip install google-generativeai>=0.8.0
@@ -53,7 +58,8 @@ python3 -m pip install cohere>=5.11.0
 
 **Time:** 5 minutes
 **Size:** ~50MB
-**Benefit:** 
+**Benefit:**
+
 - Type safety for Claude, Gemini, Cohere
 - Better error messages
 - Built-in streaming and retries
@@ -64,6 +70,7 @@ python3 -m pip install cohere>=5.11.0
 ### Option 2: Full SDK Upgrade
 
 **Install All Provider SDKs:**
+
 ```bash
 python3 -m pip install anthropic>=0.40.0
 python3 -m pip install google-generativeai>=0.8.0
@@ -81,6 +88,7 @@ python3 -m pip install groq>=0.11.0
 ### Option 3: Production-Ready Upgrade (Advanced)
 
 **Add LangChain for Advanced Features:**
+
 ```bash
 # Core LangChain
 python3 -m pip install langchain>=0.3.0
@@ -102,6 +110,7 @@ python3 -m pip install langgraph>=0.2.0            # Agent workflows
 **Time:** 15 minutes
 **Size:** ~200MB
 **Benefits:**
+
 - Unified interface across all providers
 - Built-in prompt templates
 - Chain multiple LLM calls together
@@ -116,6 +125,7 @@ python3 -m pip install langgraph>=0.2.0            # Agent workflows
 ### Option 4: Ultimate Upgrade (Enterprise)
 
 **Add Everything:**
+
 ```bash
 # All SDKs (from Option 2)
 python3 -m pip install anthropic>=0.40.0 google-generativeai>=0.8.0 \
@@ -159,6 +169,7 @@ python3 -m pip install anthropic>=0.40.0 \
 ```
 
 **Why:**
+
 1. ✅ All providers get official SDK support
 2. ✅ Better developer experience
 3. ✅ Type safety and autocomplete
@@ -172,6 +183,7 @@ python3 -m pip install anthropic>=0.40.0 \
 ## Implementation Steps
 
 ### Step 1: Install SDKs
+
 ```bash
 python3 -m pip install anthropic>=0.40.0 \
                        google-generativeai>=0.8.0 \
@@ -181,7 +193,9 @@ python3 -m pip install anthropic>=0.40.0 \
 ```
 
 ### Step 2: Update requirements.txt
+
 Uncomment and update the SDK lines:
+
 ```diff
 - # anthropic>=0.8
 - # google-generativeai>=0.3
@@ -193,16 +207,19 @@ Uncomment and update the SDK lines:
 ```
 
 ### Step 3: Refactor LLM Clients
+
 I can help refactor `orchestration/llm_clients.py` to use the official SDKs instead of raw HTTP.
 
 ### Step 4: Test Everything
+
 Run the test suite to make sure all providers still work.
 
 ---
 
 ## What You'll Get After Upgrade
 
-### Before (Current):
+### Before (Current)
+
 ```python
 # Manual HTTP calls
 response = await self._client.post(
@@ -212,7 +229,8 @@ response = await self._client.post(
 data = response.json()  # Manual parsing
 ```
 
-### After (With SDK):
+### After (With SDK)
+
 ```python
 # Official SDK with types
 from anthropic import AsyncAnthropic
@@ -230,6 +248,7 @@ response = await client.messages.create(
 ## Ready to Upgrade?
 
 **I recommend we:**
+
 1. ✅ Install all 5 missing SDKs (Option 2)
 2. ✅ Update requirements.txt
 3. ✅ Refactor the LLM clients to use official SDKs
@@ -237,4 +256,3 @@ response = await client.messages.create(
 5. ⏸️ Consider LangChain later if you need advanced features
 
 **Want me to proceed with the upgrade?**
-

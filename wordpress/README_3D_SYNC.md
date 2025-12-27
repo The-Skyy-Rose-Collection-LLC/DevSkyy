@@ -94,6 +94,7 @@ result = await sync.sync_3d_model(
 **Returns:** Updated product data with meta fields
 
 **Raises:**
+
 - `ProductNotFoundError`: Product doesn't exist
 - `InvalidAssetURLError`: Invalid URL format
 - `WordPress3DSyncError`: Sync operation failed
@@ -412,23 +413,27 @@ Display 3D models on product pages:
 ## Best Practices
 
 1. **Always use async context manager**: Ensures proper cleanup
+
    ```python
    async with sync:
        await sync.sync_3d_model(...)
    ```
 
 2. **Validate URLs before sync**: Catch errors early
+
    ```python
    if not glb_url.startswith("https://"):
        raise ValueError("Must use HTTPS")
    ```
 
 3. **Use bulk operations**: More efficient than individual syncs
+
    ```python
    await sync.bulk_sync(products)  # Better than loop
    ```
 
 4. **Handle errors gracefully**: Don't fail entire batch on single error
+
    ```python
    results = await sync.bulk_sync(products)
    for result in results:
@@ -437,6 +442,7 @@ Display 3D models on product pages:
    ```
 
 5. **Regular cleanup**: Remove orphaned assets monthly
+
    ```python
    # Cron job: 0 0 1 * *
    await sync.cleanup_orphaned_assets()
@@ -449,6 +455,7 @@ Display 3D models on product pages:
 **Problem:** `401 Unauthorized`
 
 **Solution:**
+
 - Verify application password is correct
 - Ensure user has admin/shop_manager role
 - Check WooCommerce API is enabled
@@ -458,6 +465,7 @@ Display 3D models on product pages:
 **Problem:** SSL certificate errors
 
 **Solution:**
+
 ```python
 config = WordPress3DConfig(..., verify_ssl=False)  # Development only!
 ```
@@ -467,6 +475,7 @@ config = WordPress3DConfig(..., verify_ssl=False)  # Development only!
 **Problem:** Requests timing out
 
 **Solution:**
+
 ```python
 config = WordPress3DConfig(..., timeout=60.0)  # Increase timeout
 ```
@@ -476,6 +485,7 @@ config = WordPress3DConfig(..., timeout=60.0)  # Increase timeout
 **Problem:** `InvalidAssetURLError`
 
 **Solution:**
+
 - Ensure URLs use `https://` protocol
 - Verify file extensions (`.glb`, `.usdz`)
 - Check URLs are publicly accessible

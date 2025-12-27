@@ -14,6 +14,7 @@
 Since you've already authenticated to critical-fuchsia-ape via `/mcp`, you should have access to an API key.
 
 **Options:**
+
 - Check your critical-fuchsia-ape dashboard/console
 - Look in environment variables or config files
 - Contact critical-fuchsia-ape support for your key
@@ -21,6 +22,7 @@ Since you've already authenticated to critical-fuchsia-ape via `/mcp`, you shoul
 ### Step 2: Configure DevSkyy MCP
 
 **Option A: Using the template file (Recommended)**
+
 ```bash
 # Copy the template
 cp .env.critical-fuchsia-ape .env
@@ -31,6 +33,7 @@ nano .env
 ```
 
 **Option B: Create a new .env file**
+
 ```bash
 cat > .env << 'EOF'
 MCP_BACKEND=critical-fuchsia-ape
@@ -40,6 +43,7 @@ EOF
 ```
 
 **Option C: Use environment variables directly**
+
 ```bash
 export MCP_BACKEND=critical-fuchsia-ape
 export CRITICAL_FUCHSIA_APE_URL=https://critical-fuchsia-ape.fastmcp.app/mcp
@@ -60,6 +64,7 @@ python3 devskyy_mcp.py
 ### Step 4: Verify Configuration
 
 You should see output like:
+
 ```
 ═══════════════════════════════════════════════════════════
    DevSkyy MCP Server v1.0.0
@@ -85,13 +90,17 @@ Starting MCP server on stdio...
 ## Configuration Files
 
 ### `.env.critical-fuchsia-ape` (Template)
+
 Pre-configured template with the critical-fuchsia-ape endpoint:
+
 ```bash
 cat .env.critical-fuchsia-ape
 ```
 
 ### `.env` (Your actual configuration)
+
 Copy the template and add your API key:
+
 ```bash
 cp .env.critical-fuchsia-ape .env
 # Edit .env to add CRITICAL_FUCHSIA_APE_KEY
@@ -122,6 +131,7 @@ Then restart Claude Desktop.
 ## Troubleshooting
 
 ### Connection Refused
+
 ```bash
 # Verify the endpoint is reachable
 curl -I https://critical-fuchsia-ape.fastmcp.app/mcp
@@ -130,6 +140,7 @@ curl -I https://critical-fuchsia-ape.fastmcp.app/mcp
 ```
 
 ### Authentication Failed (401)
+
 ```bash
 # Verify API key is set
 echo $CRITICAL_FUCHSIA_APE_KEY
@@ -140,6 +151,7 @@ curl -H "Authorization: Bearer $CRITICAL_FUCHSIA_APE_KEY" \
 ```
 
 ### Invalid API Key
+
 - Check that the key is correct (no extra spaces)
 - Ensure it's a valid Bearer token for critical-fuchsia-ape
 - Contact support if the key has expired
@@ -171,6 +183,7 @@ All 13 DevSkyy tools work with critical-fuchsia-ape:
 ## Testing
 
 ### Manual Test
+
 ```bash
 # Start the MCP server
 python3 devskyy_mcp.py &
@@ -180,6 +193,7 @@ npx @modelcontextprotocol/inspector python /path/to/devskyy_mcp.py
 ```
 
 ### With Claude
+
 ```bash
 # Start the server, then ask Claude:
 # "Call the devskyy_list_agents tool"
@@ -202,6 +216,6 @@ npx @modelcontextprotocol/inspector python /path/to/devskyy_mcp.py
 
 ---
 
-**Endpoint**: https://critical-fuchsia-ape.fastmcp.app/mcp  
-**Status**: Active ✅  
+**Endpoint**: <https://critical-fuchsia-ape.fastmcp.app/mcp>
+**Status**: Active ✅
 **Last Updated**: 2025-12-24

@@ -8,9 +8,8 @@ can consume. It includes mock data for development and real integration
 points for production.
 """
 
-import json
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -38,14 +37,17 @@ app.add_middleware(
 # Pydantic Models
 # ============================================
 
+
 class AgentStats(BaseModel):
     tasksCompleted: int
     successRate: float
     avgResponseTime: float
 
+
 class Tool(BaseModel):
     name: str
     category: str
+
 
 class Agent(BaseModel):
     id: str
@@ -54,12 +56,14 @@ class Agent(BaseModel):
     description: str
     status: str
     stats: AgentStats
-    tools: List[Tool]
-    mlModels: List[str]
+    tools: list[Tool]
+    mlModels: list[str]
+
 
 class AgentAction(BaseModel):
     success: bool
     message: str
+
 
 class DashboardMetrics(BaseModel):
     totalAgents: int
@@ -69,11 +73,12 @@ class DashboardMetrics(BaseModel):
     avgResponseTime: float
     uptime: float
 
+
 # ============================================
 # Mock Data for Development
 # ============================================
 
-MOCK_AGENTS: List[Dict[str, Any]] = [
+MOCK_AGENTS: list[dict[str, Any]] = [
     {
         "id": "commerce-001",
         "type": "commerce",
@@ -170,6 +175,7 @@ MOCK_AGENTS: List[Dict[str, Any]] = [
 # API Routes
 # ============================================
 
+
 @app.get("/")
 async def root():
     return {
@@ -177,21 +183,23 @@ async def root():
         "message": "DevSkyy API",
         "version": "1.0.0",
         "docs": "/api/docs",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
+
 
 @app.get("/health")
 async def health():
     return {
         "status": "healthy",
-        "timestamp": datetime.now(timezone.utc).isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
         "service": "devskyy-api",
     }
 
-@app.get("/v1/agents", response_model=List[Dict[str, Any]])
+
+@app.get("/v1/agents", response_model=list[dict[str, Any]])
 async def list_agents(
-    status: Optional[str] = Query(None, description="Filter by agent status"),
-    type: Optional[str] = Query(None, description="Filter by agent type"),
+    status: str | None = Query(None, description="Filter by agent status"),
+    type: str | None = Query(None, description="Filter by agent type"),
 ):
     """List all agents with optional filtering."""
     agents = MOCK_AGENTS
@@ -200,6 +208,7 @@ async def list_agents(
     if type:
         agents = [a for a in agents if a["type"] == type]
     return agents
+
 
 @app.get("/v1/agents/{agent_id}")
 async def get_agent(agent_id: str):
@@ -212,6 +221,7 @@ async def get_agent(agent_id: str):
         raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return agent
 
+
 @app.get("/v1/agents/{agent_id}/stats")
 async def get_agent_stats(agent_id: str):
     """Get stats for a specific agent."""
@@ -222,6 +232,7 @@ async def get_agent_stats(agent_id: str):
     if not agent:
         raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return agent.get("stats", {})
+
 
 @app.get("/v1/agents/{agent_id}/tools")
 async def get_agent_tools(agent_id: str):
@@ -234,6 +245,7 @@ async def get_agent_tools(agent_id: str):
         raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return agent.get("tools", [])
 
+
 @app.post("/v1/agents/{agent_id}/start")
 async def start_agent(agent_id: str):
     """Start a specific agent."""
@@ -244,6 +256,7 @@ async def start_agent(agent_id: str):
     if not agent:
         raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return {"success": True, "message": f"Agent {agent['name']} started", "status": "running"}
+
 
 @app.post("/v1/agents/{agent_id}/stop")
 async def stop_agent(agent_id: str):
@@ -256,6 +269,7 @@ async def stop_agent(agent_id: str):
         raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
     return {"success": True, "message": f"Agent {agent['name']} stopped", "status": "stopped"}
 
+
 @app.get("/v1/metrics/dashboard", response_model=DashboardMetrics)
 async def dashboard_metrics():
     """Get dashboard metrics."""
@@ -263,7 +277,7 @@ async def dashboard_metrics():
     total_tasks = sum(a["stats"]["tasksCompleted"] for a in MOCK_AGENTS)
     avg_success = sum(a["stats"]["successRate"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
     avg_response = sum(a["stats"]["avgResponseTime"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
-    
+
     return {
         "totalAgents": len(MOCK_AGENTS),
         "activeAgents": active,
@@ -272,6 +286,7 @@ async def dashboard_metrics():
         "avgResponseTime": round(avg_response, 2),
         "uptime": 99.9,
     }
+
 
 @app.get("/v1/tools")
 async def list_tools():
@@ -283,6 +298,7 @@ async def list_tools():
             all_tools.append(tool_with_agent)
     return all_tools
 
+
 @app.get("/v1/3d/status")
 async def get_3d_pipeline_status():
     """Get 3D pipeline status for the 3D Asset Dashboard."""
@@ -291,5 +307,5 @@ async def get_3d_pipeline_status():
         "models": ["hunyuan3d-2.1", "triposr", "stable-diffusion-3d"],
         "queueLength": 3,
         "processingTime": 45.2,
-        "lastGenerated": datetime.now(timezone.utc).isoformat(),
+        "lastGenerated": datetime.now(UTC).isoformat(),
     }

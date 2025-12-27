@@ -68,4 +68,3 @@ gh api -X PUT repos/{owner}/{repo}/branches/main/protection \
 
 For organizations using GitHub Enterprise, consider creating repository rulesets
 for more granular control over branch protections, tag protections, and push rules.
-

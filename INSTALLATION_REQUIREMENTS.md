@@ -16,6 +16,7 @@ pip install -e ".[all]"
 ## Dependency Overview
 
 ### Core Dependencies
+
 - **FastAPI** (0.109+): Web framework
 - **Pydantic** (2.5+): Data validation **[CRITICAL: v2.x required]**
 - **SQLAlchemy** (2.0+): ORM
@@ -23,20 +24,24 @@ pip install -e ".[all]"
 - **Redis** (5.0+): Caching and queues
 
 ### For 3D Asset Pipeline
+
 - **Pillow** (PIL, 10.0+): Image processing for background removal, contrast enhancement
 - **OpenCV** (4.8+): Advanced image optimization
 - **numpy** (1.26+): Numerical operations for image processing
 
 ### For Deployment & Testing Scripts
+
 - **Selenium** (4.15+): Core Web Vitals measurement via Lighthouse
 - **Playwright** (1.40+): Browser automation for functionality testing
 - **aiohttp** (3.9+): Async HTTP for API calls
 
 ### For 3D Generation Services (External)
+
 - **orchestration/huggingface_3d_client.py**: Requires HUGGINGFACE_API_KEY (free tier available)
 - **agents/tripo_agent.py**: Requires TRIPO_API_KEY (paid service, ~$0.50-1.00 per model)
 
 ### LLM Provider SDKs
+
 - **OpenAI** (1.6+): GPT-4, GPT-4 Vision, DALL-E
 - **Anthropic** (0.75+): Claude models
 - **Google** (genai 1.50+): Gemini, Imagen, Veo
@@ -45,6 +50,7 @@ pip install -e ".[all]"
 - **Groq** (0.37+): Fast inference models
 
 ### WordPress Integration
+
 - **woocommerce** (3.0+): WooCommerce REST API client
 - **mcp** (1.23.0+): Model Context Protocol server
 
@@ -55,6 +61,7 @@ pip install -e ".[all]"
 **Error**: `PydanticDeprecatedSince20`, `PydanticUserError`
 
 **Solution**: Ensure Pydantic v2.x is installed
+
 ```bash
 pip install --upgrade pydantic>=2.5
 pip list | grep pydantic
@@ -66,6 +73,7 @@ pip list | grep pydantic
 **Error**: `ModuleNotFoundError: No module named 'PIL'`
 
 **Solution**: Install Pillow
+
 ```bash
 pip install Pillow>=10.0
 # Test
@@ -77,6 +85,7 @@ python3 -c "from PIL import Image; print('✓ Pillow working')"
 **Error**: `ModuleNotFoundError: No module named 'cv2'`
 
 **Solution**: Install OpenCV
+
 ```bash
 pip install opencv-python>=4.8
 # Test
@@ -88,6 +97,7 @@ python3 -c "import cv2; print(f'✓ OpenCV {cv2.__version__} working')"
 **Error**: `ModuleNotFoundError: No module named 'selenium'`
 
 **Solution**: Install browser automation tools
+
 ```bash
 # For Selenium (Chromium-based)
 pip install selenium>=4.15
@@ -178,25 +188,31 @@ EOF
 ## Minimal vs Full Installation
 
 ### Minimal (Core Only)
+
 ```bash
 pip install -e .
 ```
+
 **Includes**: FastAPI, Pydantic, SQLAlchemy, basic HTTP clients
 **Missing**: 3D generation, testing tools
 **Size**: ~200MB
 
 ### Development (Recommended)
+
 ```bash
 pip install -e ".[dev]"
 ```
+
 **Includes**: Core + testing, linting, formatting tools
 **Adds**: Selenium, Playwright, pytest, mypy, ruff
 **Size**: ~500MB
 
 ### Full (Everything)
+
 ```bash
 pip install -e ".[all]"
 ```
+
 **Includes**: Core + dev + ML libraries + LangGraph
 **Adds**: numpy, pandas, scikit-learn, langgraph
 **Size**: ~800MB+
@@ -204,25 +220,30 @@ pip install -e ".[all]"
 ## System Requirements
 
 ### Operating Systems
+
 - ✅ macOS (Intel & Apple Silicon)
 - ✅ Linux (Ubuntu 20.04+, Debian 11+)
 - ✅ Windows (WSL2 or native)
 
 ### Python Version
+
 - Minimum: Python 3.11
 - Recommended: Python 3.12 (better performance)
 
 ### RAM
+
 - Minimum: 2GB
 - Recommended: 4GB+
 - For 3D generation: 4GB+ (image processing)
 
 ### Disk Space
+
 - Installation: 500MB-1GB
 - Runtime (assets): 500MB-2GB
 - Generated models: 50-200MB per collection
 
 ### Network
+
 - Stable internet required
 - API calls to: WordPress, HuggingFace, Tripo3D, LLM providers
 
@@ -295,5 +316,5 @@ pip install -r requirements-lock.txt
 
 ---
 
-**Version**: 1.0.0  
+**Version**: 1.0.0
 **Last Updated**: December 25, 2025

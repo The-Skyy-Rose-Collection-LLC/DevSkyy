@@ -18,6 +18,7 @@ Advanced query rewriting system to improve RAG retrieval relevance by 15-55% dep
 ## 5 Rewriting Strategies
 
 ### 1. Zero-shot (Fast, Cost-effective)
+
 Paraphrases unclear queries without examples.
 
 ```python
@@ -38,6 +39,7 @@ result = rewriter.rewrite(
 ---
 
 ### 2. Few-shot (Consistent Terminology)
+
 Uses examples to guide rewriting style for domain consistency.
 
 ```python
@@ -55,6 +57,7 @@ result = rewriter.rewrite(
 ---
 
 ### 3. Sub-query Decomposition (Complex Questions)
+
 Breaks multi-part questions into focused sub-queries.
 
 ```python
@@ -76,6 +79,7 @@ result = rewriter.rewrite(
 ---
 
 ### 4. Step-back Prompting (Background Knowledge)
+
 Generates higher-level conceptual questions for broader context.
 
 ```python
@@ -97,6 +101,7 @@ result = rewriter.rewrite(
 ---
 
 ### 5. HyDE - Hypothetical Document Embeddings (High Relevance)
+
 Generates hypothetical answer passages for semantic matching.
 
 ```python
@@ -120,6 +125,7 @@ result = rewriter.rewrite(
 ## Integration Points
 
 ### 1. Direct Usage
+
 ```python
 from orchestration import AdvancedQueryRewriter, QueryRewriteStrategy
 
@@ -128,6 +134,7 @@ rewritten = rewriter.rewrite(user_query, QueryRewriteStrategy.ZERO_SHOT)
 ```
 
 ### 2. MCP Tool (Claude Integration)
+
 ```
 Tool: rag_query_rewrite
 Input: query, strategy, num_variations
@@ -135,6 +142,7 @@ Output: rewritten_queries with explanations
 ```
 
 Use in Claude Desktop or MCP clients:
+
 ```
 User: "Rewrite 'tell me about rose stuff' for better search"
 Claude: Uses rag_query_rewrite tool
@@ -142,6 +150,7 @@ Output: Clear, optimized query variations
 ```
 
 ### 3. With RAG Pipeline
+
 ```python
 from orchestration import RAGPipelineWithRewriting
 
@@ -154,6 +163,7 @@ result = pipeline.retrieve_with_rewrite(
 ```
 
 ### 4. With SuperAgent RAG Technique
+
 ```python
 # In base_super_agent.py - RAG technique
 if technique == PromptTechnique.RAG:
@@ -185,6 +195,7 @@ if technique == PromptTechnique.RAG:
 ## Configuration
 
 ### Basic Setup
+
 ```python
 from orchestration import AdvancedQueryRewriter, QueryRewriterConfig
 
@@ -201,6 +212,7 @@ rewriter = AdvancedQueryRewriter(config)
 ```
 
 ### Environment Variables
+
 ```bash
 ANTHROPIC_API_KEY=sk-...
 REDIS_URL=redis://localhost  # Optional caching
@@ -211,7 +223,9 @@ REDIS_URL=redis://localhost  # Optional caching
 ## Optimization Features
 
 ### 1. Smart Query Bypass
+
 Skips rewriting for short, well-formed queries:
+
 ```python
 config = QueryRewriterConfig(
     min_query_length_for_rewrite=20  # Skip queries < 20 chars
@@ -219,13 +233,17 @@ config = QueryRewriterConfig(
 ```
 
 ### 2. Redis Caching (24h TTL)
+
 Rewritten queries are cached:
+
 - **Hit rate:** ~60-70% for typical usage patterns
 - **Savings:** ~500ms per cached query
 - **Memory:** ~1KB per cached entry
 
 ### 3. Async Batch Processing
+
 Rewrite multiple queries in parallel:
+
 ```python
 results = await rewriter.rewrite_batch(
     ["query1", "query2", "query3"],
@@ -234,6 +252,7 @@ results = await rewriter.rewrite_batch(
 ```
 
 ### 4. Haiku Model for Speed/Cost
+
 - **Speed:** 50-100x faster than Opus
 - **Cost:** 90% cheaper than Sonnet
 - **Quality:** Sufficient for query rewriting task
@@ -243,6 +262,7 @@ results = await rewriter.rewrite_batch(
 ## Usage Examples
 
 ### Example 1: E-commerce Search
+
 ```python
 user_query = "where can i get the black rose collection"
 
@@ -265,6 +285,7 @@ for query in rewritten.rewritten_queries:
 ```
 
 ### Example 2: Complex Product Query
+
 ```python
 complex_query = "i want luxury jewelry that's customizable and works with ar try-on"
 
@@ -284,6 +305,7 @@ rewritten = rewriter.rewrite(
 ```
 
 ### Example 3: FAQ Retrieval
+
 ```python
 faq_query = "can i return a product if i don't like it"
 
@@ -315,16 +337,19 @@ rewritten = rewriter.rewrite(
 ## Troubleshooting
 
 ### Rewriting Too Expensive
+
 → Use ZERO_SHOT or enable query bypass
 → Implement Redis caching
 → Use cheaper model (already using Haiku)
 
 ### Poor Retrieval Results
+
 → Try HYDE for better semantic matching
 → Use SUB_QUERIES for complex questions
 → Check if query is already well-formed (bypass)
 
 ### Cache Not Working
+
 → Check REDIS_URL is set correctly
 → Verify Redis connection: `redis-cli ping`
 → Check TTL: `redis-cli ttl devsky_query_rewrite:*`

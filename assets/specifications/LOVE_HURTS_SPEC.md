@@ -1,6 +1,9 @@
 # SKYYROSE LOVE HURTS COLLECTION PAGE SPECIFICATION
+
 # Version: 1.0.0
+
 # Last Updated: 2024-12-11
+
 # Platform: WordPress + WooCommerce + Elementor Pro
 
 ---
@@ -14,16 +17,16 @@ page:
   template: "elementor_header_footer"
   collection_id: "love_hurts"
   woocommerce_category: "love-hurts"
-  
+
   seo:
     title: "LOVE HURTS | Wear Your Heart, Own Your Story | SkyyRose"
     description: "LOVE HURTS - where emotion meets luxury streetwear. A collection honoring family legacy and authentic expression. Born in Oakland, made with heart."
     keywords: ["emotional streetwear", "oakland fashion", "family legacy clothing", "heartfelt fashion"]
-    
+
   og:
     image: "/assets/images/og-love-hurts.jpg"
     type: "product.group"
-    
+
   brand_essence:
     mood: "Warm, emotional, authentic, bold"
     tagline: "Wear Your Heart. Own Your Story."
@@ -46,11 +49,11 @@ collection_tokens:
     text_primary: "#FAFAFA"
     text_dark: "#2D1F1F"
     text_muted: "rgba(250, 250, 250, 0.7)"
-    
+
   gradients:
     hero: "linear-gradient(180deg, #5C2828 0%, #8B3A3A 50%, #1A1212 100%)"
     warm_overlay: "linear-gradient(180deg, rgba(139,58,58,0.4) 0%, rgba(26,18,18,0.8) 100%)"
-    
+
   typography:
     headings:
       color: "#FAFAFA"
@@ -58,7 +61,7 @@ collection_tokens:
     body:
       color: "rgba(250, 250, 250, 0.85)"
       family: "Inter"
-      
+
   imagery:
     style: "Warm, emotional, authentic"
     subjects: "Models expressing genuine emotion - joy, contemplation, strength"
@@ -85,7 +88,7 @@ section:
     video_url: "/assets/videos/love-hurts-hero.mp4"
     fallback_image: "/assets/images/love-hurts-hero-fallback.jpg"
     overlay: "linear-gradient(180deg, rgba(139,58,58,0.3) 0%, rgba(26,18,18,0.7) 100%)"
-    
+
   video_specs:
     content: "Models expressing genuine emotion - not blank faces. Joy, contemplation, strength. Oakland backdrop visible."
     duration: "15-20s loop"
@@ -104,7 +107,7 @@ content:
     weight: 400
     letter_spacing: "0.2em"
     color: "#FAFAFA"
-    
+
   tagline:
     text: "Wear Your Heart. Own Your Story."
     font: "Inter"
@@ -113,7 +116,7 @@ content:
     letter_spacing: "0.15em"
     color: "rgba(250, 250, 250, 0.8)"
     margin_top: "16px"
-    
+
   cta_primary:
     text: "SHOP THE COLLECTION"
     url: "#products"
@@ -223,33 +226,33 @@ content:
     alt: "Heritage image representing the Hurts family legacy"
     type: "warm_portrait_or_vintage"
     content: "Could be vintage family photo style, Oakland heritage, or warm portrait"
-    
+
   pretitle:
     text: "THE NAME TELLS THE STORY"
     font: "Inter"
     size: "0.75rem"
     letter_spacing: "0.15em"
     color: "#8B3A3A"
-    
+
   headline:
     text: "LOVE HURTS isn't just a statement—it's a family legacy."
     font: "Cormorant Garamond"
     size: "clamp(1.5rem, 4vw, 2.25rem)"
     color: "#2D1F1F"
     style: "normal"
-    
+
   body_copy:
     paragraphs:
       - text: "The \"Hurts\" name has been part of our story for generations. This collection honors that history while inviting you to write your own."
         style: "primary"
         color: "#4A3535"
-        
+
       - text: "Because love—real love—leaves its mark."
         style: "italic"
         color: "#8B3A3A"
         font: "Cormorant Garamond"
         size: "1.125rem"
-        
+
   design_note: "This section should feel personal and inviting, not corporate"
 ```
 
@@ -385,37 +388,37 @@ content:
       - image: "/assets/images/lookbook/love-hurts-1.jpg"
         alt: "Model at Lake Merritt sunset in LOVE HURTS hoodie"
         caption: "Lake Merritt, Oakland"
-        
+
       - image: "/assets/images/lookbook/love-hurts-2.jpg"
         alt: "Urban Oakland street scene with LOVE HURTS joggers"
         caption: "Streets of Oakland"
-        
+
       - image: "/assets/images/lookbook/love-hurts-3.jpg"
         alt: "Intimate studio portrait expressing vulnerability"
         caption: "Studio Session"
-        
+
       - image: "/assets/images/lookbook/love-hurts-4.jpg"
         alt: "Friends laughing in LOVE HURTS collection"
         caption: "Community"
-        
+
       - image: "/assets/images/lookbook/love-hurts-5.jpg"
         alt: "Solo contemplative moment in LOVE HURTS tee"
         caption: "Reflection"
-        
+
   image_specs:
     aspect_ratio: "16:9"
     height:
       desktop: "70vh"
       mobile: "50vh"
     object_fit: "cover"
-    
+
   footer_text:
     text: "Every piece carries intention. What will yours say?"
     font: "Cormorant Garamond"
     size: "1.125rem"
     style: "italic"
     color: "#4A3535"
-    
+
   navigation:
     type: "dots"
     position: "bottom-center"
@@ -534,7 +537,7 @@ content:
         background: "transparent"
         color: "#4A3535"
         border: "1px solid rgba(139, 58, 58, 0.3)"
-        
+
   product_grid:
     source: "woocommerce"
     category: "love-hurts"
@@ -543,7 +546,7 @@ content:
       tablet: 3
       mobile: 2
     gap: "16px"
-    
+
   editorial_cards:
     insert_after_every: 4
     cards:
@@ -552,12 +555,12 @@ content:
         headline: "The Story"
         subline: "Behind the Collection →"
         url: "/about/love-hurts-story/"
-        
+
       - type: "quote_card"
         background: "#FDF8F8"
         quote: "\"Fashion should feel like an embrace.\""
         attribution: "— SkyyRose"
-        
+
   product_card:
     style: "warm"
     background: "#FFFFFF"
@@ -680,7 +683,7 @@ content:
     font: "Cormorant Garamond"
     size: "clamp(1.5rem, 4vw, 2rem)"
     color: "#2D1F1F"
-    
+
   stories:
     source: "ugc_reviews"
     max_display: 6
@@ -688,23 +691,23 @@ content:
       desktop: 3
       tablet: 2
       mobile: 1
-      
+
     fallback_stories:
       - image: "/assets/images/ugc/customer-1.jpg"
         quote: "This hoodie got me through my hardest days. It's like wearing a hug."
         name: "@maya_creates"
         product: "Heart Heavyweight Hoodie"
-        
+
       - image: "/assets/images/ugc/customer-2.jpg"
         quote: "Finally, a brand that gets it. Emotion isn't weakness—it's power."
         name: "@oakland_native"
         product: "Sentiment Crew Tee"
-        
+
       - image: "/assets/images/ugc/customer-3.jpg"
         quote: "Wore this to my graduation. My grandma would have loved it."
         name: "@jess.marie"
         product: "Legacy Joggers"
-        
+
   story_card:
     style: "centered_image_quote"
     image:
@@ -720,7 +723,7 @@ content:
       font: "Inter"
       size: "0.75rem"
       color: "#8B3A3A"
-      
+
   footer:
     cta_text: "Share Your Story"
     hashtag: "#LOVEHURTS"
@@ -856,13 +859,13 @@ content:
     font: "Cormorant Garamond"
     size: "clamp(1.25rem, 3vw, 1.5rem)"
     color: "#FAFAFA"
-    
+
   subheadline:
     text: "New pieces, customer stories, and moments that matter. Straight to your inbox."
     font: "Inter"
     size: "0.875rem"
     color: "rgba(250, 250, 250, 0.7)"
-    
+
   form:
     provider: "klaviyo"
     list_id: "{{KLAVIYO_LOVE_HURTS_LIST}}"
@@ -891,24 +894,24 @@ page_sections:
   - section_id: "lh_hero"
     order: 1
     visible: true
-    
+
   - section_id: "lh_origin"
     order: 2
     visible: true
-    
+
   - section_id: "lh_lookbook"
     order: 3
     visible: true
-    
+
   - section_id: "lh_products"
     order: 4
     visible: true
     anchor: "products"
-    
+
   - section_id: "lh_stories"
     order: 5
     visible: true
-    
+
   - section_id: "lh_newsletter"
     order: 6
     visible: true
@@ -921,10 +924,10 @@ execution_checklist:
   phase_1_setup:
     - task: "Create 'love-hurts' WooCommerce category"
       status: "pending"
-      
+
     - task: "Create product tags: tops, bottoms, outerwear, accessories"
       status: "pending"
-      
+
   phase_2_content:
     - task: "Create hero video (emotional, warm, Oakland backdrop)"
       specs:
@@ -933,39 +936,39 @@ execution_checklist:
         subjects: "Models with genuine expressions"
         locations: "Oakland streets, Lake Merritt"
       status: "pending"
-      
+
     - task: "Create origin story heritage image"
       specs:
         style: "Warm, personal, heritage feel"
         size: "1000x1200px"
       status: "pending"
-      
+
     - task: "Create 5 lookbook images"
       specs:
         locations: ["Lake Merritt", "Oakland streets", "Studio", "Community", "Solo"]
         aspect: "16:9"
         color_grade: "Warm, lifted shadows"
       status: "pending"
-      
+
     - task: "Collect or create 3+ customer story UGC images"
       status: "pending"
-      
+
   phase_3_build:
     - task: "Build Section 1: Emotional Hero"
       status: "pending"
-      
+
     - task: "Build Section 2: Origin Story"
       status: "pending"
-      
+
     - task: "Build Section 3: Lookbook Carousel"
       status: "pending"
-      
+
     - task: "Build Section 4: Product Grid"
       status: "pending"
-      
+
     - task: "Build Section 5: Customer Stories"
       status: "pending"
-      
+
     - task: "Build Section 6: Newsletter"
       status: "pending"
 ```
