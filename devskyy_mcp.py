@@ -1,5 +1,5 @@
 """
-DevSkyy MCP Server - Industry-First Multi-Agent AI Platform Integration
+DevSkyy MCP Server v2.0 - Advanced Tool Use Integration
 
 This MCP server exposes DevSkyy's 54 specialized AI agents as tools that any
 AI system can use. This enables revolutionary agent-to-agent communication and
@@ -12,7 +12,12 @@ Architecture:
 - Real-time monitoring and self-healing
 - WordPress theme generation, ML predictions, and more
 
-Version: 1.0.0
+Advanced Tool Use Features (Anthropic Beta):
+- Tool Search Tool: 85% token reduction via defer_loading
+- Programmatic Tool Calling: 37% latency improvement via allowed_callers
+- Tool Use Examples: 90% parameter accuracy via input_examples
+
+Version: 2.0.0
 Python: 3.11+
 Framework: FastMCP (MCP Python SDK)
 
@@ -72,10 +77,38 @@ CHARACTER_LIMIT = 25000  # Maximum response size
 REQUEST_TIMEOUT = 60.0  # API request timeout in seconds
 
 # ===========================
+# Advanced Tool Use Configuration
+# ===========================
+
+# System prompt for tool discovery guidance
+SYSTEM_PROMPT = """
+DevSkyy Enterprise Platform v2.0 - 54 Specialized AI Agents
+
+Available agent categories (use tool search to discover specific tools):
+- E-Commerce: Product analysis, pricing optimization, inventory management
+- ML/AI: Trend prediction, customer segmentation, demand forecasting
+- 3D Integration: Tripo AI (text/image to 3D), FASHN AI (virtual try-on)
+- Marketing: SEO, content generation, campaign management
+- Integration: WooCommerce, WordPress, API orchestration
+- Advanced: Theme generation, automation workflows
+- Infrastructure: Code scanning, self-healing, monitoring
+
+Use devskyy_list_agents for the complete agent directory.
+Use devskyy_system_monitoring for platform health status.
+"""
+
+# PTC caller identifier for programmatic tool calling
+PTC_CALLER = "code_execution_20250825"
+
+# ===========================
 # Initialize MCP Server
 # ===========================
 
-mcp = FastMCP("devskyy_mcp", dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"])
+mcp = FastMCP(
+    "devskyy_mcp_v2",
+    dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"],
+    description="54-agent AI platform with advanced tool use (defer_loading, PTC, examples)",
+)
 
 # ===========================
 # Enums & Models
@@ -491,6 +524,13 @@ def _format_response(data: dict[str, Any], format_type: ResponseFormat, title: s
         "destructiveHint": False,
         "idempotentHint": True,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred loading (discovered on-demand)
+        "defer_loading": True,
+        # Tool Use Examples for parameter accuracy
+        "input_examples": [
+            {"path": "./src", "file_types": ["py", "js"], "deep_scan": True},
+            {"path": "main.py", "file_types": ["py"], "deep_scan": False},
+        ],
     },
 )
 async def scan_code(params: ScanCodeInput) -> str:
@@ -544,6 +584,21 @@ async def scan_code(params: ScanCodeInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred loading
+        "defer_loading": True,
+        "input_examples": [
+            {
+                "scan_results": {"issues": [{"type": "syntax", "file": "main.py"}]},
+                "auto_apply": True,
+                "fix_types": ["syntax", "imports"],
+            },
+            {
+                "scan_results": {"issues": []},
+                "auto_apply": False,
+                "create_backup": True,
+                "fix_types": ["security"],
+            },
+        ],
     },
 )
 async def fix_code(params: FixCodeInput) -> str:
@@ -599,6 +654,13 @@ async def fix_code(params: FixCodeInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred loading
+        "defer_loading": True,
+        "input_examples": [
+            {"action": "scan", "auto_fix": False, "scope": ["performance", "errors"]},
+            {"action": "heal", "auto_fix": True, "scope": ["security", "performance"]},
+            {"action": "status"},
+        ],
     },
 )
 async def self_healing(params: SelfHealingInput) -> str:
@@ -653,6 +715,30 @@ async def self_healing(params: SelfHealingInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred loading + examples
+        "defer_loading": True,
+        "input_examples": [
+            {
+                "brand_name": "FashionHub",
+                "industry": "fashion",
+                "theme_type": "elementor",
+                "color_palette": ["#FF5733", "#3498DB", "#2ECC71"],
+                "pages": ["home", "shop", "about", "contact"],
+            },
+            {
+                "brand_name": "TechStore",
+                "industry": "electronics",
+                "theme_type": "divi",
+                "pages": ["home", "products", "support"],
+            },
+            {
+                "brand_name": "SkyyRose",
+                "industry": "luxury-fashion",
+                "theme_type": "elementor",
+                "color_palette": ["#B76E79", "#1A1A1A", "#F5F5F5"],
+                "pages": ["home", "shop", "lookbook", "about", "contact"],
+            },
+        ],
     },
 )
 async def generate_wordpress_theme(params: WordPressThemeInput) -> str:
@@ -720,6 +806,29 @@ async def generate_wordpress_theme(params: WordPressThemeInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + PTC for batch predictions
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "model_type": "trend_prediction",
+                "data": {"items": ["oversized_blazers", "cargo_pants"], "time_horizon": "3_months"},
+                "confidence_threshold": 0.7,
+            },
+            {
+                "model_type": "customer_segmentation",
+                "data": {"customer_data": [{"age": 25, "location": "US"}], "num_segments": 5},
+            },
+            {
+                "model_type": "demand_forecasting",
+                "data": {"product_id": "PROD123", "forecast_days": 30},
+                "confidence_threshold": 0.8,
+            },
+            {
+                "model_type": "dynamic_pricing",
+                "data": {"product_id": "PROD123", "market_data": {"competitor_price": 49.99}},
+            },
+        ],
     },
 )
 async def ml_prediction(params: MLPredictionInput) -> str:
@@ -785,6 +894,31 @@ async def ml_prediction(params: MLPredictionInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + PTC for bulk operations
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "action": "create",
+                "product_data": {
+                    "name": "Classic Denim Jacket",
+                    "price": 89.99,
+                    "category": "outerwear",
+                    "sku": "SKR-DEN-JAC-001",
+                },
+            },
+            {
+                "action": "update",
+                "product_id": "prod_abc123",
+                "product_data": {"price": 79.99, "sale_price": 59.99},
+            },
+            {
+                "action": "list",
+                "filters": {"category": "clothing", "price_min": 20},
+                "limit": 50,
+            },
+            {"action": "optimize", "product_id": "prod_abc123"},
+        ],
     },
 )
 async def manage_products(params: ProductManagementInput) -> str:
@@ -860,6 +994,25 @@ async def manage_products(params: ProductManagementInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + PTC for batch pricing
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "product_ids": ["PROD123", "PROD456"],
+                "strategy": "ml_optimized",
+                "constraints": {"min_margin": 0.2, "max_discount": 0.3},
+            },
+            {
+                "product_ids": ["PROD789"],
+                "strategy": "competitive",
+            },
+            {
+                "product_ids": ["PROD001", "PROD002", "PROD003"],
+                "strategy": "demand_based",
+                "constraints": {"min_margin": 0.15},
+            },
+        ],
     },
 )
 async def dynamic_pricing(params: DynamicPricingInput) -> str:
@@ -932,6 +1085,31 @@ async def dynamic_pricing(params: DynamicPricingInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + PTC for batch 3D generation
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "product_name": "Heart Rose Bomber",
+                "collection": "BLACK_ROSE",
+                "garment_type": "bomber",
+                "additional_details": "Rose gold zipper, embroidered rose on back",
+                "output_format": "glb",
+            },
+            {
+                "product_name": "Signature Hoodie",
+                "collection": "SIGNATURE",
+                "garment_type": "hoodie",
+                "output_format": "gltf",
+            },
+            {
+                "product_name": "Love Hurts Tee",
+                "collection": "LOVE_HURTS",
+                "garment_type": "tee",
+                "additional_details": "Bleeding heart graphic, distressed print",
+                "output_format": "glb",
+            },
+        ],
     },
 )
 async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
@@ -1007,6 +1185,21 @@ async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + PTC for batch image-to-3D
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "product_name": "Custom Hoodie",
+                "image_url": "https://cdn.skyyrose.co/designs/hoodie-front.jpg",
+                "output_format": "glb",
+            },
+            {
+                "product_name": "Sketch to 3D Jacket",
+                "image_url": "https://cdn.skyyrose.co/sketches/jacket-v1.png",
+                "output_format": "gltf",
+            },
+        ],
     },
 )
 async def generate_3d_from_image(params: ThreeDImageInput) -> str:
@@ -1074,6 +1267,24 @@ async def generate_3d_from_image(params: ThreeDImageInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + examples
+        "defer_loading": True,
+        "input_examples": [
+            {
+                "campaign_type": "email",
+                "target_audience": {"segment": "high_value", "location": "US"},
+                "schedule": "2025-10-25T10:00:00Z",
+            },
+            {
+                "campaign_type": "multi_channel",
+                "target_audience": {"segment": "new_customers", "age_range": "18-35"},
+                "content_template": "Welcome to SkyyRose! Enjoy 15% off your first order.",
+            },
+            {
+                "campaign_type": "social",
+                "target_audience": {"segment": "engaged", "platform": "instagram"},
+            },
+        ],
     },
 )
 async def marketing_campaign(params: MarketingCampaignInput) -> str:
@@ -1148,6 +1359,32 @@ async def marketing_campaign(params: MarketingCampaignInput) -> str:
         "destructiveHint": False,
         "idempotentHint": False,
         "openWorldHint": True,
+        # Advanced Tool Use: Deferred + examples
+        "defer_loading": True,
+        "input_examples": [
+            {
+                "workflow_name": "product_launch",
+                "parameters": {
+                    "product_data": {"name": "Summer Collection", "category": "seasonal"},
+                    "launch_date": "2025-11-01",
+                },
+                "parallel": True,
+            },
+            {
+                "workflow_name": "campaign_optimization",
+                "parameters": {"campaign_id": "camp_123", "optimize_for": "conversions"},
+                "agents": ["marketing", "analytics"],
+            },
+            {
+                "workflow_name": "inventory_optimization",
+                "parameters": {"warehouse_id": "wh_001", "forecast_days": 30},
+            },
+            {
+                "workflow_name": "customer_reengagement",
+                "parameters": {"segment": "inactive_90d", "offer_type": "discount"},
+                "parallel": True,
+            },
+        ],
     },
 )
 async def multi_agent_workflow(params: MultiAgentWorkflowInput) -> str:
@@ -1231,6 +1468,8 @@ async def multi_agent_workflow(params: MultiAgentWorkflowInput) -> str:
         "destructiveHint": False,
         "idempotentHint": True,
         "openWorldHint": True,
+        # Advanced Tool Use: Always loaded (core health monitoring)
+        "defer_loading": False,
     },
 )
 async def system_monitoring(params: MonitoringInput) -> str:
@@ -1306,6 +1545,8 @@ async def system_monitoring(params: MonitoringInput) -> str:
         "destructiveHint": False,
         "idempotentHint": True,
         "openWorldHint": True,
+        # Advanced Tool Use: Always loaded (core tool for discovery)
+        "defer_loading": False,
     },
 )
 async def list_agents(response_format: ResponseFormat = ResponseFormat.MARKDOWN) -> str:
@@ -1352,7 +1593,7 @@ if __name__ == "__main__":
         f"""
 â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
 â•‘                                                                  â•‘
-â•‘   DevSkyy MCP Server v1.0.0                                     â•‘
+â•'   DevSkyy MCP Server v2.0.0 - Advanced Tool Use                 â•'
 â•‘   Industry-First Multi-Agent AI Platform Integration            â•‘
 â•‘                                                                  â•‘
 â•‘   54 AI Agents â€¢ Enterprise Security â€¢ Multi-Model AI           â•‘
