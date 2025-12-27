@@ -436,27 +436,82 @@ class WordPressAssetAgent(SuperAgent):
         alt_text: str = "",
         caption: str = "",
     ) -> dict[str, Any]:
-        """Upload media file to WordPress."""
+        """Upload media file to WordPress.
+
+        Args:
+            file_path: Path to the file to upload.
+            title: Optional title for the media.
+            alt_text: Optional alt text for accessibility.
+            caption: Optional caption.
+
+        Returns:
+            MediaUploadResult dict with upload details.
+
+        Raises:
+            FileNotFoundError: If the file does not exist.
+            PermissionError: If the file cannot be read.
+            ValueError: If the file is too large or invalid.
+            ConnectionError: If WordPress cannot be reached.
+            RuntimeError: If the upload fails for other reasons.
+        """
         await self._ensure_session()
 
         path = Path(file_path)
+
+        # Validate file exists
         if not path.exists():
-            raise FileNotFoundError(f"File not found: {file_path}")
+            raise FileNotFoundError(
+                f"File not found: {file_path}. "
+                "Ensure the file path is correct and the file exists."
+            )
+
+        # Validate file is readable
+        if not path.is_file():
+            raise ValueError(
+                f"Path is not a file: {file_path}. "
+                "Directories cannot be uploaded."
+            )
 
         # Check file size
-        file_size = path.stat().st_size
+        try:
+            file_size = path.stat().st_size
+        except OSError as e:
+            raise PermissionError(
+                f"Cannot read file stats for {file_path}: {e}. "
+                "Check file permissions."
+            ) from e
+
+        if file_size == 0:
+            raise ValueError(
+                f"File is empty: {file_path}. "
+                "Cannot upload an empty file."
+            )
+
         max_size = self.wp_config.max_file_size_mb * 1024 * 1024
         if file_size > max_size:
             raise ValueError(
-                f"File too large: {file_size / (1024*1024):.1f}MB > {self.wp_config.max_file_size_mb}MB"
+                f"File too large: {file_size / (1024*1024):.1f}MB exceeds "
+                f"maximum allowed size of {self.wp_config.max_file_size_mb}MB. "
+                "Consider compressing the file or increasing the limit."
             )
 
         # Determine content type
         content_type = mimetypes.guess_type(file_path)[0] or "application/octet-stream"
 
-        # Read file
-        async with aiofiles.open(file_path, "rb") as f:
-            file_data = await f.read()
+        # Read file with error handling
+        try:
+            async with aiofiles.open(file_path, "rb") as f:
+                file_data = await f.read()
+        except PermissionError as e:
+            raise PermissionError(
+                f"Permission denied reading file {file_path}: {e}. "
+                "Check that the file is readable by the current user."
+            ) from e
+        except OSError as e:
+            raise RuntimeError(
+                f"Failed to read file {file_path}: {e}. "
+                "The file may be corrupted or on an inaccessible filesystem."
+            ) from e
 
         # Upload to WordPress
         url = f"{self.wp_config.site_url}/wp-json/wp/v2/media"
@@ -466,23 +521,63 @@ class WordPressAssetAgent(SuperAgent):
             "Content-Type": content_type,
         }
 
-        async with self._session.post(
-            url,
-            data=file_data,
-            headers=headers,
-            auth=aiohttp.BasicAuth(self.wp_config.username, self.wp_config.app_password),
-        ) as response:
-            if response.status >= 400:
-                error_text = await response.text()
-                raise Exception(f"Upload failed ({response.status}): {error_text}")
+        try:
+            async with self._session.post(
+                url,
+                data=file_data,
+                headers=headers,
+                auth=aiohttp.BasicAuth(self.wp_config.username, self.wp_config.app_password),
+            ) as response:
+                if response.status == 401:
+                    raise PermissionError(
+                        "WordPress authentication failed. "
+                        "Check WP_USERNAME and WP_APP_PASSWORD environment variables."
+                    )
+                elif response.status == 403:
+                    raise PermissionError(
+                        "WordPress authorization denied. "
+                        "The user may not have permission to upload media."
+                    )
+                elif response.status == 413:
+                    raise ValueError(
+                        f"File too large for WordPress server. "
+                        f"The server's upload limit may be lower than {self.wp_config.max_file_size_mb}MB. "
+                        "Check WordPress/PHP upload_max_filesize setting."
+                    )
+                elif response.status >= 400:
+                    error_text = await response.text()
+                    raise RuntimeError(
+                        f"WordPress upload failed with status {response.status}: {error_text}"
+                    )
 
-            result = await response.json()
+                result = await response.json()
+        except aiohttp.ClientConnectorError as e:
+            raise ConnectionError(
+                f"Cannot connect to WordPress at {self.wp_config.site_url}: {e}. "
+                "Check that the WordPress site is accessible."
+            ) from e
+        except aiohttp.ClientTimeout as e:
+            raise TimeoutError(
+                f"WordPress upload timed out after {self.wp_config.timeout}s: {e}. "
+                "The file may be too large or the server too slow."
+            ) from e
 
         media_id = result.get("id")
+        if not media_id:
+            raise RuntimeError(
+                "WordPress upload succeeded but returned no media ID. "
+                "This may indicate a plugin conflict or API issue."
+            )
 
         # Update metadata if provided
         if title or alt_text or caption:
-            await self._update_media_metadata(media_id, title, alt_text, caption)
+            try:
+                await self._update_media_metadata(media_id, title, alt_text, caption)
+            except Exception as e:
+                logger.warning(
+                    f"Failed to update media metadata for {media_id}: {e}. "
+                    "Upload succeeded but metadata was not set."
+                )
 
         return MediaUploadResult(
             id=media_id,

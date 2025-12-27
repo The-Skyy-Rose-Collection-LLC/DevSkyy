@@ -258,20 +258,75 @@ async def stop_agent(agent_id: str):
 
 @app.get("/v1/metrics/dashboard", response_model=DashboardMetrics)
 async def dashboard_metrics():
-    """Get dashboard metrics."""
-    active = sum(1 for a in MOCK_AGENTS if a["status"] == "running")
-    total_tasks = sum(a["stats"]["tasksCompleted"] for a in MOCK_AGENTS)
-    avg_success = sum(a["stats"]["successRate"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
-    avg_response = sum(a["stats"]["avgResponseTime"] for a in MOCK_AGENTS) / len(MOCK_AGENTS)
-    
-    return {
-        "totalAgents": len(MOCK_AGENTS),
-        "activeAgents": active,
-        "totalTasks": total_tasks,
-        "successRate": round(avg_success, 2),
-        "avgResponseTime": round(avg_response, 2),
-        "uptime": 99.9,
-    }
+    """Get dashboard metrics.
+
+    Returns aggregated metrics across all agents including task counts,
+    success rates, and response times.
+
+    Handles edge cases like empty agent lists gracefully.
+    """
+    try:
+        # Guard against empty agent list
+        if not MOCK_AGENTS:
+            return {
+                "totalAgents": 0,
+                "activeAgents": 0,
+                "totalTasks": 0,
+                "successRate": 0.0,
+                "avgResponseTime": 0.0,
+                "uptime": 99.9,
+            }
+
+        active = sum(1 for a in MOCK_AGENTS if a.get("status") == "running")
+
+        # Safely sum tasks, defaulting to 0 for missing/invalid stats
+        total_tasks = sum(
+            a.get("stats", {}).get("tasksCompleted", 0)
+            for a in MOCK_AGENTS
+        )
+
+        # Calculate averages with protection against division by zero
+        # and None/missing values
+        success_rates = [
+            a.get("stats", {}).get("successRate")
+            for a in MOCK_AGENTS
+            if a.get("stats", {}).get("successRate") is not None
+        ]
+        avg_success = (
+            sum(success_rates) / len(success_rates)
+            if success_rates else 0.0
+        )
+
+        response_times = [
+            a.get("stats", {}).get("avgResponseTime")
+            for a in MOCK_AGENTS
+            if a.get("stats", {}).get("avgResponseTime") is not None
+        ]
+        avg_response = (
+            sum(response_times) / len(response_times)
+            if response_times else 0.0
+        )
+
+        return {
+            "totalAgents": len(MOCK_AGENTS),
+            "activeAgents": active,
+            "totalTasks": total_tasks,
+            "successRate": round(avg_success, 2),
+            "avgResponseTime": round(avg_response, 2),
+            "uptime": 99.9,
+        }
+    except (TypeError, ValueError) as e:
+        # Handle unexpected data types in stats
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error calculating metrics: {e}. Agent data may be corrupted.",
+        )
+    except Exception as e:
+        # Catch-all for unexpected errors
+        raise HTTPException(
+            status_code=500,
+            detail=f"Internal error calculating dashboard metrics: {e}",
+        )
 
 @app.get("/v1/tools")
 async def list_tools():
