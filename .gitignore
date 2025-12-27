@@ -156,3 +156,13 @@ backups/
 legacy/
 # Large archive files
 assets/_other/*.zip
+
+# Secrets - comprehensive patterns
+*.secrets
+*.secrets.*
+.env.secrets
+.env.secrets.*
+**/secrets/**
+**/*.secret
+**/*.secrets
+
