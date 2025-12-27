@@ -603,8 +603,12 @@ class ProductAssetPipeline:
             try:
                 await self._redis.delete(cache_key)
                 logger.info("Deleted corrupted cache entry", cache_key=cache_key)
-            except Exception:
-                pass
+            except Exception as delete_err:
+                logger.debug(
+                    "Failed to delete corrupted cache entry (non-critical)",
+                    cache_key=cache_key,
+                    error=str(delete_err),
+                )
             return None
         except ValidationError as e:
             logger.error(
@@ -616,8 +620,12 @@ class ProductAssetPipeline:
             try:
                 await self._redis.delete(cache_key)
                 logger.info("Deleted incompatible cache entry", cache_key=cache_key)
-            except Exception:
-                pass
+            except Exception as delete_err:
+                logger.debug(
+                    "Failed to delete incompatible cache entry (non-critical)",
+                    cache_key=cache_key,
+                    error=str(delete_err),
+                )
             return None
         except ConnectionError as e:
             logger.warning(

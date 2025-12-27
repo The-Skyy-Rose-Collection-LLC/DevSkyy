@@ -12,9 +12,19 @@ import json
 from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
-from fastapi import FastAPI, HTTPException, Query
+import re
+
+from fastapi import FastAPI, HTTPException, Path, Query
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
+
+
+# Valid values for filtering
+VALID_AGENT_STATUSES = {"running", "idle", "learning", "stopped", "error"}
+VALID_AGENT_TYPES = {"commerce", "creative", "marketing", "support", "operations", "analytics"}
+
+# Regex pattern for valid agent IDs (alphanumeric, hyphens, underscores)
+AGENT_ID_PATTERN = re.compile(r"^[a-zA-Z0-9_-]{1,64}$")
 
 # Create FastAPI app
 app = FastAPI(
@@ -188,72 +198,187 @@ async def health():
         "service": "devskyy-api",
     }
 
+def validate_agent_id(agent_id: str) -> str:
+    """Validate agent ID format to prevent injection attacks.
+
+    Args:
+        agent_id: The agent ID to validate.
+
+    Returns:
+        The validated agent ID.
+
+    Raises:
+        HTTPException: If the agent ID is invalid.
+    """
+    if not agent_id:
+        raise HTTPException(status_code=400, detail="Agent ID cannot be empty")
+    if len(agent_id) > 64:
+        raise HTTPException(status_code=400, detail="Agent ID too long (max 64 characters)")
+    if not AGENT_ID_PATTERN.match(agent_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid agent ID format. Must contain only alphanumeric characters, hyphens, and underscores.",
+        )
+    return agent_id
+
+
 @app.get("/v1/agents", response_model=List[Dict[str, Any]])
 async def list_agents(
-    status: Optional[str] = Query(None, description="Filter by agent status"),
-    type: Optional[str] = Query(None, description="Filter by agent type"),
+    status: Optional[str] = Query(
+        None,
+        description="Filter by agent status",
+        pattern="^[a-z]+$",
+        max_length=20,
+    ),
+    type: Optional[str] = Query(
+        None,
+        description="Filter by agent type",
+        pattern="^[a-z]+$",
+        max_length=20,
+    ),
 ):
-    """List all agents with optional filtering."""
+    """List all agents with optional filtering.
+
+    Args:
+        status: Optional status filter (running, idle, learning, stopped, error).
+        type: Optional type filter (commerce, creative, marketing, support, operations, analytics).
+
+    Returns:
+        List of agents matching the filter criteria.
+    """
     agents = MOCK_AGENTS
+
+    # Validate status filter
     if status:
-        agents = [a for a in agents if a["status"] == status]
+        if status not in VALID_AGENT_STATUSES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid status '{status}'. Valid values: {', '.join(sorted(VALID_AGENT_STATUSES))}",
+            )
+        agents = [a for a in agents if a.get("status") == status]
+
+    # Validate type filter
     if type:
-        agents = [a for a in agents if a["type"] == type]
+        if type not in VALID_AGENT_TYPES:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Invalid type '{type}'. Valid values: {', '.join(sorted(VALID_AGENT_TYPES))}",
+            )
+        agents = [a for a in agents if a.get("type") == type]
+
     return agents
 
 @app.get("/v1/agents/{agent_id}")
-async def get_agent(agent_id: str):
-    """Get a specific agent by ID or type."""
+async def get_agent(
+    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
+):
+    """Get a specific agent by ID or type.
+
+    Args:
+        agent_id: The agent ID (e.g., 'commerce-001') or type (e.g., 'commerce').
+
+    Returns:
+        Agent details including stats, tools, and ML models.
+
+    Raises:
+        HTTPException 400: If agent_id format is invalid.
+        HTTPException 404: If agent is not found.
+    """
+    validated_id = validate_agent_id(agent_id)
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
     return agent
 
+
 @app.get("/v1/agents/{agent_id}/stats")
-async def get_agent_stats(agent_id: str):
-    """Get stats for a specific agent."""
+async def get_agent_stats(
+    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
+):
+    """Get stats for a specific agent.
+
+    Args:
+        agent_id: The agent ID or type.
+
+    Returns:
+        Agent statistics including tasks completed, success rate, and response time.
+    """
+    validated_id = validate_agent_id(agent_id)
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
     return agent.get("stats", {})
 
+
 @app.get("/v1/agents/{agent_id}/tools")
-async def get_agent_tools(agent_id: str):
-    """Get tools for a specific agent."""
+async def get_agent_tools(
+    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
+):
+    """Get tools for a specific agent.
+
+    Args:
+        agent_id: The agent ID or type.
+
+    Returns:
+        List of tools available to the agent.
+    """
+    validated_id = validate_agent_id(agent_id)
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
     return agent.get("tools", [])
 
+
 @app.post("/v1/agents/{agent_id}/start")
-async def start_agent(agent_id: str):
-    """Start a specific agent."""
+async def start_agent(
+    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
+):
+    """Start a specific agent.
+
+    Args:
+        agent_id: The agent ID or type.
+
+    Returns:
+        Success status and agent state.
+    """
+    validated_id = validate_agent_id(agent_id)
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
     return {"success": True, "message": f"Agent {agent['name']} started", "status": "running"}
 
+
 @app.post("/v1/agents/{agent_id}/stop")
-async def stop_agent(agent_id: str):
-    """Stop a specific agent."""
+async def stop_agent(
+    agent_id: str = Path(..., description="Agent ID or type", min_length=1, max_length=64),
+):
+    """Stop a specific agent.
+
+    Args:
+        agent_id: The agent ID or type.
+
+    Returns:
+        Success status and agent state.
+    """
+    validated_id = validate_agent_id(agent_id)
     agent = next(
-        (a for a in MOCK_AGENTS if a["id"] == agent_id or a["type"] == agent_id),
+        (a for a in MOCK_AGENTS if a["id"] == validated_id or a["type"] == validated_id),
         None,
     )
     if not agent:
-        raise HTTPException(status_code=404, detail=f"Agent '{agent_id}' not found")
+        raise HTTPException(status_code=404, detail=f"Agent '{validated_id}' not found")
     return {"success": True, "message": f"Agent {agent['name']} stopped", "status": "stopped"}
 
 @app.get("/v1/metrics/dashboard", response_model=DashboardMetrics)

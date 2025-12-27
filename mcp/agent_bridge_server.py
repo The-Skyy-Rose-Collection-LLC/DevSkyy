@@ -1633,8 +1633,15 @@ async def orchestration_learning_report(input: LearningReportInput) -> str:
                     agent = await get_agent(agent_type)
                     if agent and hasattr(agent, "get_stats"):
                         stats[agent_type.value] = agent.get_stats()
-                except Exception:
-                    pass
+                except AgentNotAvailableError:
+                    # Agent not available, skip silently (expected for uninitialized agents)
+                    logger.debug(f"Agent {agent_type.value} not available for stats collection")
+                except Exception as e:
+                    # Log unexpected errors but continue collecting other agent stats
+                    logger.warning(
+                        f"Failed to collect stats for agent {agent_type.value}: {e}",
+                        exc_info=False,
+                    )
 
         return format_response(
             {
