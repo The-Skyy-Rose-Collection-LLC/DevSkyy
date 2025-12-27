@@ -27,7 +27,7 @@ import argparse
 import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urljoin
 
 import aiohttp
@@ -115,7 +115,7 @@ class SEOValidator:
             "blog": "/blog",
         }
 
-    async def validate_all_pages(self, page_keys: Optional[list[str]] = None) -> dict[str, PageSEO]:
+    async def validate_all_pages(self, page_keys: list[str] | None = None) -> dict[str, PageSEO]:
         """Validate SEO for all pages.
 
         Args:

@@ -40,9 +40,8 @@ async def test_api_connection() -> bool:
 
     try:
         # Try with SSL verification first
-        async with aiohttp.ClientSession() as session:
-            async with session.head(base_url) as response:
-                logger.info(f"Base URL reachable (SSL verified): {response.status}")
+        async with aiohttp.ClientSession() as session, session.head(base_url) as response:
+            logger.info(f"Base URL reachable (SSL verified): {response.status}")
     except Exception as e:
         logger.warning(f"SSL verification failed: {e}")
         logger.info("Retrying with SSL verification disabled...")
@@ -55,7 +54,9 @@ async def test_api_connection() -> bool:
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
 
-            async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
+            async with aiohttp.ClientSession(
+                connector=aiohttp.TCPConnector(ssl=ssl_context)
+            ) as session:
                 async with session.head(base_url) as response:
                     logger.info(f"✓ Base URL reachable (SSL disabled): {response.status}")
                     logger.warning(
@@ -83,7 +84,9 @@ async def test_api_connection() -> bool:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        async with aiohttp.ClientSession(headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
+        async with aiohttp.ClientSession(
+            headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)
+        ) as session:
             # Try a simple endpoint that doesn't require much
             async with session.get(f"{base_url}/balance") as response:
                 logger.info(f"Balance endpoint status: {response.status}")
@@ -119,8 +122,10 @@ async def test_api_connection() -> bool:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        async with aiohttp.ClientSession(headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
-            logger.info(f"POST /task")
+        async with aiohttp.ClientSession(
+            headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)
+        ) as session:
+            logger.info("POST /task")
             logger.info(f"Payload: {json.dumps(payload, indent=2)}")
 
             async with session.post(f"{base_url}/task", json=payload) as response:
@@ -205,7 +210,9 @@ async def test_image_to_3d():
         return False
 
     # Try to find a test image
-    test_images = list(Path("assets/extracted").rglob("*.jpg")) + list(Path("assets/extracted").rglob("*.png"))
+    test_images = list(Path("assets/extracted").rglob("*.jpg")) + list(
+        Path("assets/extracted").rglob("*.png")
+    )
 
     if not test_images:
         logger.warning("No test images found in assets/extracted/")
@@ -245,8 +252,10 @@ async def test_image_to_3d():
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        async with aiohttp.ClientSession(headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)) as session:
-            logger.info(f"POST /task with image data")
+        async with aiohttp.ClientSession(
+            headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)
+        ) as session:
+            logger.info("POST /task with image data")
 
             async with session.post(f"{base_url}/task", json=payload) as response:
                 result = await response.json()

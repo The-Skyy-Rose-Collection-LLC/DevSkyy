@@ -1,0 +1,53 @@
+{
+  "session_id": "20251226_004918",
+  "site_url": "https://skyyrose.co/",
+  "username": "skyyroseco",
+  "timestamp": "2025-12-26T00:49:18.100009",
+  "phases": {
+    "pages": {
+      "home": 150,
+      "collections": 151,
+      "signature": 152,
+      "black-rose": 153,
+      "love-hurts": 154,
+      "about": 155
+    },
+    "products": {},
+    "models": {
+      "signature": 57,
+      "love-hurts": 31,
+      "black-rose": 0
+    },
+    "elementor": {
+      "love_hurts": {
+        "file": "/Users/coreyfoster/DevSkyy/wordpress/elementor_templates/love_hurts.json",
+        "elements": 0
+      },
+      "black_rose": {
+        "file": "/Users/coreyfoster/DevSkyy/wordpress/elementor_templates/black_rose.json",
+        "elements": 0
+      },
+      "about": {
+        "file": "/Users/coreyfoster/DevSkyy/wordpress/elementor_templates/about.json",
+        "elements": 0
+      },
+      "home": {
+        "file": "/Users/coreyfoster/DevSkyy/wordpress/elementor_templates/home.json",
+        "elements": 0
+      },
+      "blog": {
+        "file": "/Users/coreyfoster/DevSkyy/wordpress/elementor_templates/blog.json",
+        "elements": 0
+      },
+      "signature": {
+        "file": "/Users/coreyfoster/DevSkyy/wordpress/elementor_templates/signature.json",
+        "elements": 0
+      }
+    },
+    "verification": {
+      "pages_count": 11,
+      "products_count": 0,
+      "site_url": "https://skyyrose.co/"
+    }
+  }
+}

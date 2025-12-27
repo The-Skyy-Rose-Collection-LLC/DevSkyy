@@ -28,7 +28,6 @@ import argparse
 import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 import aiohttp
 
@@ -60,7 +59,7 @@ class TestCase:
     description: str
     status: str
     duration_seconds: float = 0.0
-    error: Optional[str] = None
+    error: str | None = None
 
     @property
     def passed(self) -> bool:
