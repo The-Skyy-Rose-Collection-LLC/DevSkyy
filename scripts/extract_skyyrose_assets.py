@@ -180,9 +180,7 @@ class AssetExtractor:
                 dest_dir = self.output_dir / "images" / (subcategory or "misc")
             elif category == "configs":
                 dest_dir = self.output_dir / "configs"
-            elif category == "templates":
-                dest_dir = self.output_dir / "reference-templates"
-            elif category == "docs":
+            elif category == "templates" or category == "docs":
                 dest_dir = self.output_dir / "reference-templates"
             else:
                 dest_dir = self.output_dir / "_other"

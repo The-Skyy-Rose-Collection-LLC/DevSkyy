@@ -26,7 +26,6 @@ import argparse
 import asyncio
 import logging
 from dataclasses import dataclass
-from typing import Optional
 from urllib.parse import urljoin
 
 import aiohttp
@@ -128,7 +127,7 @@ class CoreWebVitalsValidator:
         }
 
     async def validate_all_pages(
-        self, page_keys: Optional[list[str]] = None
+        self, page_keys: list[str] | None = None
     ) -> dict[str, PageMetrics]:
         """Validate Core Web Vitals for all pages.
 

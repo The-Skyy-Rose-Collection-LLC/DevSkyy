@@ -115,17 +115,23 @@ async def validate_wordpress_setup(
             async with session.get(urljoin(wordpress_url, "wp-json/wp/v2/plugins")) as resp:
                 if resp.status == 200:
                     plugins = await resp.json()
-                    elementor_installed = any("elementor" in p.get("slug", "").lower() for p in plugins)
+                    elementor_installed = any(
+                        "elementor" in p.get("slug", "").lower() for p in plugins
+                    )
                     if elementor_installed:
                         results["checks"]["elementor_installed"] = True
                         print("✓")
                     else:
                         results["checks"]["elementor_installed"] = False
-                        results["warnings"].append("Elementor plugin not found - install from WordPress.org")
+                        results["warnings"].append(
+                            "Elementor plugin not found - install from WordPress.org"
+                        )
                         print("✗ (not installed)")
                 else:
                     results["checks"]["elementor_installed"] = None
-                    results["warnings"].append("Could not check plugins (API returned " + str(resp.status) + ")")
+                    results["warnings"].append(
+                        "Could not check plugins (API returned " + str(resp.status) + ")"
+                    )
                     print("? (could not verify)")
         except Exception as e:
             results["checks"]["elementor_installed"] = None
@@ -138,13 +144,17 @@ async def validate_wordpress_setup(
             async with session.get(urljoin(wordpress_url, "wp-json/wp/v2/plugins")) as resp:
                 if resp.status == 200:
                     plugins = await resp.json()
-                    woocommerce_installed = any("woocommerce" in p.get("slug", "").lower() for p in plugins)
+                    woocommerce_installed = any(
+                        "woocommerce" in p.get("slug", "").lower() for p in plugins
+                    )
                     if woocommerce_installed:
                         results["checks"]["woocommerce_installed"] = True
                         print("✓")
                     else:
                         results["checks"]["woocommerce_installed"] = False
-                        results["warnings"].append("WooCommerce plugin not found - install from WordPress.org")
+                        results["warnings"].append(
+                            "WooCommerce plugin not found - install from WordPress.org"
+                        )
                         print("✗ (not installed)")
                 else:
                     results["checks"]["woocommerce_installed"] = None
@@ -156,7 +166,9 @@ async def validate_wordpress_setup(
 
     # Determine overall status
     all_checks = results["checks"]
-    critical_passed = all(all_checks.get(key) for key in ["site_accessible", "rest_api_enabled", "credentials_valid"])
+    critical_passed = all(
+        all_checks.get(key) for key in ["site_accessible", "rest_api_enabled", "credentials_valid"]
+    )
 
     if critical_passed:
         results["status"] = "ready"
