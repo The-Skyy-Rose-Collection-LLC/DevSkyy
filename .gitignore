@@ -166,3 +166,16 @@ assets/_other/*.zip
 **/*.secret
 **/*.secrets
 
+
+# Generated 3D assets (large binary files)
+assets/3d-models-generated/
+assets/3d-models/*/
+
+# External SDKs (install via pip instead)
+tripo-python-sdk/
+
+# Git internal / temp
+.git-rewrite/
+
+# Local tool configs
+.playwright-mcp/
