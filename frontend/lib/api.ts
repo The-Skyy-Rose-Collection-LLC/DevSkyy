@@ -68,32 +68,32 @@ async function fetchAPI<T>(
   }
 }
 
-// Agent APIs - using /v1/ prefix for versioned API
+// Agent APIs - using /api/v1/ prefix for versioned API
 export const agentsAPI = {
-  list: () => fetchAPI<AgentInfo[]>('/v1/agents'),
+  list: () => fetchAPI<AgentInfo[]>('/api/v1/agents'),
 
-  get: (type: SuperAgentType) => fetchAPI<AgentInfo>(`/v1/agents/${type}`),
+  get: (type: SuperAgentType) => fetchAPI<AgentInfo>(`/api/v1/agents/${type}`),
 
   getStats: (type: SuperAgentType) =>
-    fetchAPI<AgentInfo['stats']>(`/v1/agents/${type}/stats`),
+    fetchAPI<AgentInfo['stats']>(`/api/v1/agents/${type}/stats`),
 
   getTools: (type: SuperAgentType) =>
-    fetchAPI<ToolInfo[]>(`/v1/agents/${type}/tools`),
+    fetchAPI<ToolInfo[]>(`/api/v1/agents/${type}/tools`),
 
   start: (type: SuperAgentType) =>
-    fetchAPI<{ success: boolean; message: string }>(`/v1/agents/${type}/start`, { method: 'POST' }),
+    fetchAPI<{ success: boolean; message: string }>(`/api/v1/agents/${type}/start`, { method: 'POST' }),
 
   stop: (type: SuperAgentType) =>
-    fetchAPI<{ success: boolean; message: string }>(`/v1/agents/${type}/stop`, { method: 'POST' }),
+    fetchAPI<{ success: boolean; message: string }>(`/api/v1/agents/${type}/stop`, { method: 'POST' }),
 
   triggerLearning: (type: SuperAgentType) =>
-    fetchAPI<{ success: boolean }>(`/v1/agents/${type}/learn`, { method: 'POST' }),
+    fetchAPI<{ success: boolean }>(`/api/v1/agents/${type}/learn`, { method: 'POST' }),
 };
 
 // Task APIs
 export const tasksAPI = {
   submit: (request: TaskRequest) =>
-    fetchAPI<TaskResponse>('/v1/tasks', {
+    fetchAPI<TaskResponse>('/api/v1/tasks', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
@@ -128,12 +128,12 @@ export const roundTableAPI = {
 
   get: (id: string) => fetchAPI<RoundTableEntry>(`/v1/round-table/${id}`),
 
-  getLatest: () => fetchAPI<RoundTableEntry>('/v1/round-table/latest'),
+  getLatest: () => fetchAPI<RoundTableEntry>('/api/v1/round-table/latest'),
 
-  getProviders: () => fetchAPI<LLMProviderInfo[]>('/v1/round-table/providers'),
+  getProviders: () => fetchAPI<LLMProviderInfo[]>('/api/v1/round-table/providers'),
 
   runCompetition: (prompt: string, taskType?: string) =>
-    fetchAPI<RoundTableEntry>('/v1/round-table/compete', {
+    fetchAPI<RoundTableEntry>('/api/v1/round-table/compete', {
       method: 'POST',
       body: JSON.stringify({ prompt, task_type: taskType }),
     }),
@@ -157,13 +157,13 @@ export const abTestingAPI = {
       totalTests: number;
       avgConfidence: number;
       winsByProvider: Record<string, number>;
-    }>('/v1/ab-testing/stats'),
+    }>('/api/v1/ab-testing/stats'),
 };
 
 // Visual Generation APIs
 export const visualAPI = {
   generate: (request: VisualGenerationRequest) =>
-    fetchAPI<VisualGenerationResult>('/v1/visual/generate', {
+    fetchAPI<VisualGenerationResult>('/api/v1/visual/generate', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
@@ -176,7 +176,7 @@ export const visualAPI = {
         types: string[];
         status: string;
       }>
-    >('/v1/visual/providers'),
+    >('/api/v1/visual/providers'),
 
   getHistory: (params?: { limit?: number; type?: string }) => {
     const searchParams = new URLSearchParams();
@@ -226,10 +226,10 @@ interface ThreeDStatus {
 // 3D Pipeline APIs - Real endpoints
 export const threeDAPI = {
   // Get pipeline status
-  getStatus: () => fetchAPI<ThreeDStatus>('/v1/3d/status'),
+  getStatus: () => fetchAPI<ThreeDStatus>('/api/v1/3d/status'),
 
   // List available providers (TRELLIS, TRIPO)
-  getProviders: () => fetchAPI<ThreeDProvider[]>('/v1/3d/providers'),
+  getProviders: () => fetchAPI<ThreeDProvider[]>('/api/v1/3d/providers'),
 
   // List generation jobs
   listJobs: (params?: { limit?: number; status?: string }) => {
@@ -250,7 +250,7 @@ export const threeDAPI = {
     image_url?: string;
     options?: Record<string, unknown>;
   }) =>
-    fetchAPI<ThreeDJob>('/v1/3d/generate/text', {
+    fetchAPI<ThreeDJob>('/api/v1/3d/generate/text', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
@@ -262,7 +262,7 @@ export const threeDAPI = {
     prompt?: string;
     options?: Record<string, unknown>;
   }) =>
-    fetchAPI<ThreeDJob>('/v1/3d/generate/image', {
+    fetchAPI<ThreeDJob>('/api/v1/3d/generate/image', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
@@ -322,7 +322,7 @@ export const threeDAPI = {
 
 // Metrics APIs
 export const metricsAPI = {
-  getDashboard: () => fetchAPI<DashboardMetrics>('/v1/metrics/dashboard'),
+  getDashboard: () => fetchAPI<DashboardMetrics>('/api/v1/metrics/dashboard'),
 
   getTimeSeries: (params?: { range?: '1h' | '24h' | '7d' | '30d' }) => {
     const searchParams = new URLSearchParams();
@@ -343,13 +343,13 @@ export const metricsAPI = {
 
 // Tools API
 export const toolsAPI = {
-  list: () => fetchAPI<ToolInfo[]>('/v1/tools'),
+  list: () => fetchAPI<ToolInfo[]>('/api/v1/tools'),
 
   getByCategory: (category: string) =>
     fetchAPI<ToolInfo[]>(`/v1/tools/category/${category}`),
 
   test: (toolName: string, parameters: Record<string, unknown>) =>
-    fetchAPI<{ result: unknown; error?: string }>('/v1/tools/test', {
+    fetchAPI<{ result: unknown; error?: string }>('/api/v1/tools/test', {
       method: 'POST',
       body: JSON.stringify({ tool_name: toolName, parameters }),
     }),
@@ -383,7 +383,7 @@ export const brandAPI = {
         style: string;
         description: string;
       }>;
-    }>('/v1/brand'),
+    }>('/api/v1/brand'),
 
   getSummary: () =>
     fetchAPI<{
@@ -392,7 +392,7 @@ export const brandAPI = {
       philosophy: string;
       primary_color: string;
       accent_color: string;
-    }>('/v1/brand/summary'),
+    }>('/api/v1/brand/summary'),
 
   getCollections: () =>
     fetchAPI<
@@ -405,7 +405,7 @@ export const brandAPI = {
         style: string;
         description: string;
       }>
-    >('/v1/brand/collections'),
+    >('/api/v1/brand/collections'),
 
   getCollection: (id: string) =>
     fetchAPI<{
@@ -444,7 +444,7 @@ interface WordPressStatus {
 
 // WordPress API
 export const wordpressAPI = {
-  getStatus: () => fetchAPI<WordPressStatus>('/v1/wordpress/status'),
+  getStatus: () => fetchAPI<WordPressStatus>('/api/v1/wordpress/status'),
 
   listPages: (params?: { status?: string; limit?: number }) => {
     const searchParams = new URLSearchParams();
@@ -463,7 +463,7 @@ export const wordpressAPI = {
     }),
 
   createPage: (data: { title: string; content: string; status?: string }) =>
-    fetchAPI<WordPressPage>('/v1/wordpress/pages', {
+    fetchAPI<WordPressPage>('/api/v1/wordpress/pages', {
       method: 'POST',
       body: JSON.stringify(data),
     }),
@@ -475,7 +475,7 @@ export const wordpressAPI = {
     ),
 
   sync: () =>
-    fetchAPI<{ status: string; message: string }>('/v1/wordpress/sync', {
+    fetchAPI<{ status: string; message: string }>('/api/v1/wordpress/sync', {
       method: 'POST',
     }),
 };
