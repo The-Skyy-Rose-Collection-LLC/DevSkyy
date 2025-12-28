@@ -8,6 +8,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { threeDAPI } from '@/lib/api';
 
 // Types
 interface Particle {
@@ -19,17 +20,25 @@ interface Particle {
   opacity: number;
 }
 
-interface Asset {
-  name: string;
-  status: 'complete' | 'processing' | 'pending';
-  time: string;
-  score: number | null;
+interface ThreeDJob {
+  id: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  provider: string;
+  prompt?: string;
+  progress: number;
+  result_url?: string;
+  error_message?: string;
+  created_at: string;
+  processing_time_s?: number;
 }
 
-interface Model {
+interface ThreeDProvider {
+  id: string;
   name: string;
-  desc: string;
-  active: boolean;
+  description: string;
+  supported_inputs: string[];
+  avg_generation_time_s: number;
+  available: boolean;
 }
 
 interface Service {
@@ -320,22 +329,132 @@ export default function ThreeDPipelinePage() {
   const [activeTab, setActiveTab] = useState<'pipeline' | 'assets' | 'settings'>('pipeline');
   const [generating, setGenerating] = useState(false);
   const [uploadHover, setUploadHover] = useState(false);
+  const [currentJob, setCurrentJob] = useState<ThreeDJob | null>(null);
+  const [recentJobs, setRecentJobs] = useState<ThreeDJob[]>([]);
+  const [providers, setProviders] = useState<ThreeDProvider[]>([]);
+  const [selectedProvider, setSelectedProvider] = useState<string>('trellis');
+  const [pipelineStatus, setPipelineStatus] = useState<string>('operational');
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleGenerate = useCallback(() => {
-    setGenerating(true);
-    setTimeout(() => setGenerating(false), 5000);
+  // Fetch initial data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [providersData, jobsData, statusData] = await Promise.all([
+          threeDAPI.getProviders().catch(() => []),
+          threeDAPI.listJobs({ limit: 10 }).catch(() => []),
+          threeDAPI.getStatus().catch(() => ({ status: 'unknown' })),
+        ]);
+        setProviders(providersData);
+        setRecentJobs(jobsData);
+        setPipelineStatus(statusData.status);
+        if (providersData.length > 0) {
+          setSelectedProvider(providersData[0].id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch 3D pipeline data:', err);
+      }
+    };
+    fetchData();
   }, []);
 
-  const recentAssets: Asset[] = [
-    { name: 'BLACK ROSE Hoodie', status: 'complete', time: '2m ago', score: 94 },
-    { name: 'LOVE HURTS Tee', status: 'complete', time: '15m ago', score: 91 },
-    { name: 'Signature Cap', status: 'processing', time: 'now', score: null },
-    { name: 'Chain Pendant', status: 'pending', time: 'queued', score: null },
-  ];
+  // Handle file upload and generation
+  const handleGenerate = useCallback(async (file?: File) => {
+    setGenerating(true);
+    setError(null);
 
-  const models: Model[] = [
-    { name: 'Hunyuan3D-2.1', desc: 'Production Quality • ~10s', active: true },
-    { name: 'TripoSR', desc: 'Fast Preview • ~0.5s', active: false },
+    try {
+      let job: ThreeDJob;
+
+      if (file) {
+        // Upload file and generate
+        job = await threeDAPI.generateFromUpload(
+          file,
+          selectedProvider as 'trellis' | 'tripo'
+        );
+      } else {
+        // Demo: generate from text prompt (requires image for TRELLIS)
+        job = await threeDAPI.generateFromText({
+          prompt: 'SkyyRose luxury clothing item',
+          provider: selectedProvider as 'trellis' | 'tripo',
+        });
+      }
+
+      setCurrentJob(job);
+
+      // Poll for completion
+      const completedJob = await threeDAPI.pollJob(
+        job.id,
+        (updatedJob) => setCurrentJob(updatedJob),
+        2000,
+        60
+      );
+
+      setCurrentJob(completedJob);
+      // Refresh recent jobs list
+      const updatedJobs = await threeDAPI.listJobs({ limit: 10 });
+      setRecentJobs(updatedJobs);
+
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Generation failed');
+      console.error('3D generation error:', err);
+    } finally {
+      setGenerating(false);
+    }
+  }, [selectedProvider]);
+
+  // Handle file drop
+  const handleDrop = useCallback((e: React.DragEvent) => {
+    e.preventDefault();
+    setUploadHover(false);
+    const file = e.dataTransfer.files[0];
+    if (file && (file.type.startsWith('image/') || file.name.endsWith('.png') || file.name.endsWith('.jpg'))) {
+      handleGenerate(file);
+    }
+  }, [handleGenerate]);
+
+  // Handle file input change
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleGenerate(file);
+    }
+  }, [handleGenerate]);
+
+  // Convert job to display format
+  const getJobDisplayInfo = (job: ThreeDJob) => {
+    const timeAgo = getTimeAgo(job.created_at);
+    return {
+      name: job.prompt || `3D Asset ${job.id.slice(0, 8)}`,
+      status: job.status === 'completed' ? 'complete' as const :
+              job.status === 'processing' ? 'processing' as const : 'pending' as const,
+      time: timeAgo,
+      score: job.status === 'completed' ? 92 : null, // Placeholder score
+    };
+  };
+
+  const getTimeAgo = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
+  };
+
+  // Convert providers to display format
+  const models = providers.length > 0 ? providers.map(p => ({
+    id: p.id,
+    name: p.name,
+    desc: `${p.description} • ~${p.avg_generation_time_s}s`,
+    active: p.id === selectedProvider,
+  })) : [
+    { id: 'trellis', name: 'TRELLIS (Microsoft)', desc: 'HuggingFace Gradio • ~30s', active: selectedProvider === 'trellis' },
+    { id: 'tripo', name: 'Tripo3D', desc: 'Commercial API • ~10s', active: selectedProvider === 'tripo' },
   ];
 
   const services: Service[] = [
@@ -432,8 +551,15 @@ export default function ThreeDPipelinePage() {
                   setUploadHover(true);
                 }}
                 onDragLeave={() => setUploadHover(false)}
-                onDrop={() => setUploadHover(false)}
+                onDrop={handleDrop}
               >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleFileChange}
+                  className="hidden"
+                />
                 <div className="p-8 text-center">
                   <div
                     className={`w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center text-2xl transition-all ${
@@ -450,15 +576,25 @@ export default function ThreeDPipelinePage() {
                   <div className="text-sm text-slate-500 mb-4">
                     or click to browse • PNG, JPG up to 10MB
                   </div>
+                  {error && (
+                    <div className="text-sm text-red-400 mb-4 p-2 rounded bg-red-500/10">
+                      {error}
+                    </div>
+                  )}
                   <div className="flex justify-center gap-3">
                     <button
-                      onClick={handleGenerate}
-                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 font-medium hover:opacity-90 transition-opacity"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={generating}
+                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
                     >
-                      Generate 3D Model
+                      {generating ? 'Generating...' : 'Upload & Generate'}
                     </button>
-                    <button className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-                      Batch Upload
+                    <button
+                      onClick={() => handleGenerate()}
+                      disabled={generating}
+                      className="px-6 py-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all disabled:opacity-50"
+                    >
+                      Demo Generate
                     </button>
                   </div>
                 </div>
@@ -490,9 +626,10 @@ export default function ThreeDPipelinePage() {
                   Generation Model
                 </div>
                 <div className="space-y-2">
-                  {models.map((model, i) => (
+                  {models.map((model) => (
                     <div
-                      key={i}
+                      key={model.id}
+                      onClick={() => setSelectedProvider(model.id)}
                       className={`p-3 rounded-xl cursor-pointer transition-all ${
                         model.active
                           ? 'bg-gradient-to-r from-rose-500/20 to-purple-600/20 border border-rose-500/30'
@@ -524,29 +661,38 @@ export default function ThreeDPipelinePage() {
                   <button className="text-xs text-rose-400 hover:text-rose-300">View All →</button>
                 </div>
                 <div className="space-y-2">
-                  {recentAssets.map((asset, i) => (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer"
-                    >
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-xs text-slate-500">
-                        3D
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium truncate">{asset.name}</div>
-                        <div className="text-xs text-slate-500">{asset.time}</div>
-                      </div>
-                      {asset.score ? (
-                        <div className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400">
-                          {asset.score}%
-                        </div>
-                      ) : asset.status === 'processing' ? (
-                        <div className="w-4 h-4 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
-                      ) : (
-                        <div className="text-xs text-slate-500">queued</div>
-                      )}
+                  {recentJobs.length === 0 ? (
+                    <div className="text-sm text-slate-500 text-center py-4">
+                      No assets generated yet
                     </div>
-                  ))}
+                  ) : (
+                    recentJobs.map((job) => {
+                      const displayInfo = getJobDisplayInfo(job);
+                      return (
+                        <div
+                          key={job.id}
+                          className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer"
+                        >
+                          <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-xs text-slate-500">
+                            3D
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="text-sm font-medium truncate">{displayInfo.name}</div>
+                            <div className="text-xs text-slate-500">{displayInfo.time}</div>
+                          </div>
+                          {displayInfo.status === 'complete' ? (
+                            <div className="text-xs px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-400">
+                              {displayInfo.score}%
+                            </div>
+                          ) : displayInfo.status === 'processing' ? (
+                            <div className="w-4 h-4 border-2 border-rose-500 border-t-transparent rounded-full animate-spin" />
+                          ) : (
+                            <div className="text-xs text-slate-500">queued</div>
+                          )}
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               </div>
 

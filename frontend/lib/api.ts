@@ -189,21 +189,135 @@ export const visualAPI = {
   },
 };
 
-// 3D Pipeline APIs
-export const threeDAPI = {
-  getStatus: () => fetchAPI<{
-    status: string;
-    models: string[];
-    queueLength: number;
-    processingTime: number;
-    lastGenerated: string;
-  }>('/v1/3d/status'),
+// 3D Pipeline Types
+interface ThreeDProvider {
+  id: string;
+  name: string;
+  description: string;
+  supported_inputs: string[];
+  avg_generation_time_s: number;
+  cost_per_generation: number;
+  available: boolean;
+}
 
-  generate: (request: { prompt: string; model?: string }) =>
-    fetchAPI<{ jobId: string; status: string }>('/v1/3d/generate', {
+interface ThreeDJob {
+  id: string;
+  status: 'pending' | 'processing' | 'completed' | 'failed';
+  provider: string;
+  prompt?: string;
+  image_url?: string;
+  progress: number;
+  result_url?: string;
+  error_message?: string;
+  created_at: string;
+  completed_at?: string;
+  processing_time_s?: number;
+}
+
+interface ThreeDStatus {
+  status: string;
+  providers: string[];
+  active_jobs: number;
+  completed_today: number;
+  avg_processing_time_s: number;
+  queue_length: number;
+}
+
+// 3D Pipeline APIs - Real endpoints
+export const threeDAPI = {
+  // Get pipeline status
+  getStatus: () => fetchAPI<ThreeDStatus>('/v1/3d/status'),
+
+  // List available providers (TRELLIS, TRIPO)
+  getProviders: () => fetchAPI<ThreeDProvider[]>('/v1/3d/providers'),
+
+  // List generation jobs
+  listJobs: (params?: { limit?: number; status?: string }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    if (params?.status) searchParams.set('status', params.status);
+    const query = searchParams.toString();
+    return fetchAPI<ThreeDJob[]>(`/v1/3d/jobs${query ? `?${query}` : ''}`);
+  },
+
+  // Get single job by ID
+  getJob: (jobId: string) => fetchAPI<ThreeDJob>(`/v1/3d/jobs/${jobId}`),
+
+  // Generate from text prompt (requires image_url for TRELLIS)
+  generateFromText: (request: {
+    prompt: string;
+    provider?: 'trellis' | 'tripo';
+    image_url?: string;
+    options?: Record<string, unknown>;
+  }) =>
+    fetchAPI<ThreeDJob>('/v1/3d/generate/text', {
       method: 'POST',
       body: JSON.stringify(request),
     }),
+
+  // Generate from image URL
+  generateFromImage: (request: {
+    image_url: string;
+    provider?: 'trellis' | 'tripo';
+    prompt?: string;
+    options?: Record<string, unknown>;
+  }) =>
+    fetchAPI<ThreeDJob>('/v1/3d/generate/image', {
+      method: 'POST',
+      body: JSON.stringify(request),
+    }),
+
+  // Generate from file upload (FormData)
+  generateFromUpload: async (
+    file: File,
+    provider: 'trellis' | 'tripo' = 'trellis',
+    prompt?: string
+  ): Promise<ThreeDJob> => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('provider', provider);
+    if (prompt) formData.append('prompt', prompt);
+
+    const url = `${API_BASE}/v1/3d/generate/upload`;
+    const response = await fetch(url, {
+      method: 'POST',
+      body: formData,
+      // Don't set Content-Type - browser will set it with boundary for FormData
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new APIError(
+        error.detail || 'Upload failed',
+        response.status,
+        error.code
+      );
+    }
+
+    return response.json();
+  },
+
+  // Poll job until completion (utility)
+  pollJob: async (
+    jobId: string,
+    onProgress?: (job: ThreeDJob) => void,
+    intervalMs = 2000,
+    maxAttempts = 60
+  ): Promise<ThreeDJob> => {
+    let attempts = 0;
+    while (attempts < maxAttempts) {
+      const job = await threeDAPI.getJob(jobId);
+      if (onProgress) onProgress(job);
+
+      if (job.status === 'completed' || job.status === 'failed') {
+        return job;
+      }
+
+      await new Promise((resolve) => setTimeout(resolve, intervalMs));
+      attempts++;
+    }
+    throw new Error('Job polling timeout');
+  },
 };
 
 // Metrics APIs
@@ -245,35 +359,125 @@ export const toolsAPI = {
 export const brandAPI = {
   get: () =>
     fetchAPI<{
-      brand: {
+      name: string;
+      tagline: string;
+      philosophy: string;
+      location: string;
+      tone: { primary: string; descriptors: string[]; avoid: string[] };
+      colors: Record<string, { name: string; hex: string; rgb: string }>;
+      typography: { heading: string; body: string; accent: string };
+      target_audience: {
+        age_range: string;
+        description: string;
+        interests: string[];
+        values: string[];
+      };
+      product_types: string[];
+      quality_descriptors: string[];
+      collections: Array<{
+        id: string;
         name: string;
         tagline: string;
-        philosophy: string;
-        location: string;
-        tone: { primary: string; descriptors: string[]; avoid: string[] };
-        colors: Record<string, { name: string; hex: string; rgb: string }>;
-        typography: { heading: string; body: string; accent: string };
-        target_audience: {
-          age_range: string;
-          description: string;
-          interests: string[];
-          values: string[];
-        };
-        product_types: string[];
-        quality_descriptors: string[];
-      };
-      collections: Record<
-        string,
-        {
-          name: string;
-          tagline: string;
-          mood: string;
-          colors: string;
-          style: string;
-          description: string;
-        }
-      >;
-    }>('/brand'),
+        mood: string;
+        colors: string;
+        style: string;
+        description: string;
+      }>;
+    }>('/v1/brand'),
+
+  getSummary: () =>
+    fetchAPI<{
+      name: string;
+      tagline: string;
+      philosophy: string;
+      primary_color: string;
+      accent_color: string;
+    }>('/v1/brand/summary'),
+
+  getCollections: () =>
+    fetchAPI<
+      Array<{
+        id: string;
+        name: string;
+        tagline: string;
+        mood: string;
+        colors: string;
+        style: string;
+        description: string;
+      }>
+    >('/v1/brand/collections'),
+
+  getCollection: (id: string) =>
+    fetchAPI<{
+      id: string;
+      name: string;
+      tagline: string;
+      mood: string;
+      colors: string;
+      style: string;
+      description: string;
+    }>(`/v1/brand/collections/${id}`),
+};
+
+// WordPress Types
+interface WordPressPage {
+  id: number;
+  title: string;
+  slug: string;
+  status: string;
+  link: string;
+  modified: string;
+  excerpt: string;
+  content?: string;
+  author?: number;
+  created?: string;
+}
+
+interface WordPressStatus {
+  connected: boolean;
+  site_url: string;
+  last_sync: string | null;
+  pages_count: number;
+  posts_count: number;
+  media_count: number;
+}
+
+// WordPress API
+export const wordpressAPI = {
+  getStatus: () => fetchAPI<WordPressStatus>('/v1/wordpress/status'),
+
+  listPages: (params?: { status?: string; limit?: number }) => {
+    const searchParams = new URLSearchParams();
+    if (params?.status) searchParams.set('status', params.status);
+    if (params?.limit) searchParams.set('limit', params.limit.toString());
+    const query = searchParams.toString();
+    return fetchAPI<WordPressPage[]>(`/v1/wordpress/pages${query ? `?${query}` : ''}`);
+  },
+
+  getPage: (pageId: number) => fetchAPI<WordPressPage>(`/v1/wordpress/pages/${pageId}`),
+
+  updatePage: (pageId: number, data: Partial<WordPressPage>) =>
+    fetchAPI<WordPressPage>(`/v1/wordpress/pages/${pageId}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+
+  createPage: (data: { title: string; content: string; status?: string }) =>
+    fetchAPI<WordPressPage>('/v1/wordpress/pages', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  deletePage: (pageId: number, force?: boolean) =>
+    fetchAPI<{ success: boolean; message: string }>(
+      `/v1/wordpress/pages/${pageId}${force ? '?force=true' : ''}`,
+      { method: 'DELETE' }
+    ),
+
+  sync: () =>
+    fetchAPI<{ status: string; message: string }>('/v1/wordpress/sync', {
+      method: 'POST',
+    }),
 };
 
 // Export all APIs
@@ -287,6 +491,7 @@ export const api = {
   metrics: metricsAPI,
   tools: toolsAPI,
   brand: brandAPI,
+  wordpress: wordpressAPI,
 };
 
 export default api;
