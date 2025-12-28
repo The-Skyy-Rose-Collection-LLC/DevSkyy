@@ -353,8 +353,6 @@ Include exact commands and values to use.
         Returns:
             Design template as dict
         """
-        CollectionDesignTemplates.get_template(CollectionType[collection_type.upper()])
-
         return CollectionDesignTemplates.to_agent_reference(CollectionType[collection_type.upper()])
 
     def get_all_templates(self) -> dict[str, Any]:
