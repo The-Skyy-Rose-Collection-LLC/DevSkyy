@@ -50,7 +50,8 @@ export default function BrandKitPage() {
     );
   }
 
-  const brand = brandData?.brand;
+  // brandData IS the brand object (not nested)
+  const brand = brandData;
   const collections = brandData?.collections;
 
   return (
