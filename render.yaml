@@ -24,11 +24,11 @@ services:
       # CORS - Your Vercel frontend URL
       - key: CORS_ORIGINS
         value: https://frontend-tau-vert-63.vercel.app,https://skyyrose.co,http://localhost:3000
-      # Set these secrets in Render Dashboard > Environment
+      # Auto-generated secrets (Render creates these automatically)
       - key: JWT_SECRET_KEY
-        sync: false
+        generateValue: true
       - key: ENCRYPTION_MASTER_KEY
-        sync: false
+        generateValue: true
       - key: OPENAI_API_KEY
         sync: false
       - key: ANTHROPIC_API_KEY
