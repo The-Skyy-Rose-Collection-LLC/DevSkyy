@@ -11,6 +11,8 @@ import ssl
 from dataclasses import dataclass
 from pathlib import Path
 
+from datetime import datetime
+
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 
@@ -18,6 +20,28 @@ from security.certificate_authority import CertificateValidator, SelfSignedCA
 from security.zero_trust_config import ZeroTrustConfig
 
 logger = logging.getLogger(__name__)
+
+
+def get_cert_not_valid_before(cert: x509.Certificate) -> datetime:
+    """Get certificate not_valid_before with compatibility for cryptography < 42.0"""
+    try:
+        return cert.not_valid_before_utc
+    except AttributeError:
+        # Pre-42.0: not_valid_before is naive, assume UTC
+        from datetime import timezone
+        dt = cert.not_valid_before
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+
+
+def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
+    """Get certificate not_valid_after with compatibility for cryptography < 42.0"""
+    try:
+        return cert.not_valid_after_utc
+    except AttributeError:
+        # Pre-42.0: not_valid_after is naive, assume UTC
+        from datetime import timezone
+        dt = cert.not_valid_after
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
 
 
 @dataclass
@@ -460,8 +484,8 @@ class MTLSHandler:
                 "serial_number": str(cert.serial_number),
                 "san_names": san_names,
                 "fingerprint": fingerprint,
-                "not_valid_before": cert.not_valid_before_utc.isoformat(),
-                "not_valid_after": cert.not_valid_after_utc.isoformat(),
+                "not_valid_before": get_cert_not_valid_before(cert).isoformat(),
+                "not_valid_after": get_cert_not_valid_after(cert).isoformat(),
                 "is_expired": expiry_info["is_expired"],
                 "days_until_expiry": expiry_info["days_until_expiry"],
             }

@@ -12,9 +12,13 @@ Advanced input validation and sanitization for DevSkyy Enterprise Platform:
 - Parameter pollution protection
 """
 
+import hashlib
+import hmac
 import html
+import os
 import re
 import secrets
+import time
 import urllib.parse
 from typing import Any
 
@@ -395,17 +399,62 @@ class SecurityValidator:
 
         return validation_result
 
+    # CSRF secret key - should be set via environment variable in production
+    _csrf_secret: str = os.environ.get("CSRF_SECRET_KEY", secrets.token_urlsafe(32))
+    _csrf_token_expiry: int = 3600  # 1 hour in seconds
+
     def generate_csrf_token(self, session_id: str) -> str:
-        """Generate CSRF token for session"""
-        # Create token based on session ID and secret
-        secrets.token_urlsafe(32)
-        return secrets.token_urlsafe(32)
+        """
+        Generate CSRF token bound to session ID using HMAC.
+
+        Token format: {timestamp}.{hmac_signature}
+        The HMAC is computed over session_id + timestamp using the CSRF secret.
+        """
+        timestamp = str(int(time.time()))
+        message = f"{session_id}:{timestamp}"
+        signature = hmac.new(
+            self._csrf_secret.encode(),
+            message.encode(),
+            hashlib.sha256
+        ).hexdigest()
+        return f"{timestamp}.{signature}"
 
     def validate_csrf_token(self, token: str, session_id: str) -> bool:
-        """Validate CSRF token"""
-        # In production, store tokens in Redis/database with expiration
-        # This is a simplified implementation
-        return len(token) == 43 and token.replace("-", "").replace("_", "").isalnum()
+        """
+        Validate CSRF token is bound to session and not expired.
+
+        Verifies:
+        - Token format is valid
+        - Token is not expired (within expiry window)
+        - HMAC signature matches for given session_id
+        """
+        if not token or "." not in token:
+            return False
+
+        try:
+            parts = token.split(".", 1)
+            if len(parts) != 2:
+                return False
+
+            timestamp_str, provided_signature = parts
+            timestamp = int(timestamp_str)
+
+            # Check expiry
+            current_time = int(time.time())
+            if current_time - timestamp > self._csrf_token_expiry:
+                return False
+
+            # Verify signature using constant-time comparison
+            message = f"{session_id}:{timestamp_str}"
+            expected_signature = hmac.new(
+                self._csrf_secret.encode(),
+                message.encode(),
+                hashlib.sha256
+            ).hexdigest()
+
+            return hmac.compare_digest(expected_signature, provided_signature)
+        except (ValueError, TypeError):
+            return False
 
     def sanitize_filename(self, filename: str) -> str:
         """Sanitize filename for safe storage"""

@@ -21,6 +21,28 @@ from cryptography.x509.oid import NameOID
 logger = logging.getLogger(__name__)
 
 
+def get_cert_not_valid_before(cert: x509.Certificate) -> datetime:
+    """Get certificate not_valid_before with compatibility for cryptography < 42.0"""
+    try:
+        return cert.not_valid_before_utc
+    except AttributeError:
+        # Pre-42.0: not_valid_before is naive, assume UTC
+        from datetime import timezone
+        dt = cert.not_valid_before
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+
+
+def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
+    """Get certificate not_valid_after with compatibility for cryptography < 42.0"""
+    try:
+        return cert.not_valid_after_utc
+    except AttributeError:
+        # Pre-42.0: not_valid_after is naive, assume UTC
+        from datetime import timezone
+        dt = cert.not_valid_after
+        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+
+
 @dataclass
 class ServiceIdentity:
     """Service identity configuration"""
@@ -180,8 +202,8 @@ class CertificateInfo:
         self.subject = cert.subject
         self.issuer = cert.issuer
         self.serial_number = cert.serial_number
-        self.not_valid_before = cert.not_valid_before_utc
-        self.not_valid_after = cert.not_valid_after_utc
+        self.not_valid_before = get_cert_not_valid_before(cert)
+        self.not_valid_after = get_cert_not_valid_after(cert)
         self.fingerprint = cert.fingerprint(hashes.SHA256()).hex()
 
     @property
