@@ -3,24 +3,7 @@
 # Deploy: https://dashboard.render.com/blueprints
 # 1. Connect your GitHub repo
 # 2. Render auto-detects this file
-# 3. Set API keys in "devskyy-secrets" env group
-
-# Env Group for external API keys (create once, reuse across services)
-envGroups:
-  - name: devskyy-secrets
-    envVars:
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: ANTHROPIC_API_KEY
-        sync: false
-      - key: GOOGLE_AI_API_KEY
-        sync: false
-      - key: TRIPO3D_API_KEY
-        sync: false
-      - key: HUGGINGFACE_ACCESS_TOKEN
-        sync: false
-      - key: FASHN_API_KEY
-        sync: false
+# 3. Set API keys in Render Dashboard after deploy
 
 services:
   - type: web
@@ -33,8 +16,6 @@ services:
     startCommand: uvicorn main_enterprise:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /health
     autoDeploy: true
-    envVarGroups:
-      - devskyy-secrets
     envVars:
       - key: PYTHON_VERSION
         value: "3.11"
@@ -46,3 +27,10 @@ services:
         generateValue: true
       - key: ENCRYPTION_MASTER_KEY
         generateValue: true
+      # Set these manually in Render Dashboard > Environment after deploy
+      # - OPENAI_API_KEY
+      # - ANTHROPIC_API_KEY
+      # - GOOGLE_AI_API_KEY
+      # - TRIPO3D_API_KEY
+      # - HUGGINGFACE_ACCESS_TOKEN
+      # - FASHN_API_KEY
