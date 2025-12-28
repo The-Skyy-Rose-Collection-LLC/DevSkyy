@@ -10,6 +10,7 @@ Comprehensive rate limiting system for DevSkyy Enterprise Platform:
 - DDoS protection
 - Whitelist/blacklist support
 """
+from __future__ import annotations
 
 import asyncio
 import logging

@@ -29,7 +29,7 @@ from datetime import UTC, datetime, timedelta
 try:
     import pyotp
 except ImportError:
-    pyotp = None  # type: ignore
+    pyotp = None
 
 logger = logging.getLogger(__name__)
 
