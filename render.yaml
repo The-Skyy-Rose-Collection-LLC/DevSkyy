@@ -41,7 +41,7 @@ services:
       - key: ENVIRONMENT
         value: production
       - key: CORS_ORIGINS
-        value: https://frontend-tau-vert-63.vercel.app,https://skyyrose.co,http://localhost:3000
+        value: https://devskyy-dashboard.vercel.app,https://skyyrose.co,http://localhost:3000
       - key: JWT_SECRET_KEY
         generateValue: true
       - key: ENCRYPTION_MASTER_KEY
