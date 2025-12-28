@@ -17,6 +17,7 @@ Reference: https://google.github.io/adk-docs/
 Installation:
     pip install google-adk
 """
+from __future__ import annotations
 
 import logging
 from datetime import UTC, datetime
