@@ -1,0 +1,43 @@
+# Render Blueprint - DevSkyy Backend
+# ==================================
+# Deploy: https://dashboard.render.com/blueprints
+# 1. Connect your GitHub repo
+# 2. Render auto-detects this file
+# 3. Set environment variables in dashboard
+
+services:
+  - type: web
+    name: devskyy-api
+    runtime: python
+    region: oregon
+    plan: free  # Start free, upgrade to starter ($7/mo) for always-on
+    branch: main
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main_enterprise:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    autoDeploy: true
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11"
+      - key: ENVIRONMENT
+        value: production
+      # CORS - Your Vercel frontend URL
+      - key: CORS_ORIGINS
+        value: https://frontend-tau-vert-63.vercel.app,https://skyyrose.co,http://localhost:3000
+      # Set these secrets in Render Dashboard > Environment
+      - key: JWT_SECRET_KEY
+        sync: false
+      - key: ENCRYPTION_MASTER_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GOOGLE_AI_API_KEY
+        sync: false
+      - key: TRIPO3D_API_KEY
+        sync: false
+      - key: HUGGINGFACE_ACCESS_TOKEN
+        sync: false
+      - key: FASHN_API_KEY
+        sync: false

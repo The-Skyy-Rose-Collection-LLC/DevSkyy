@@ -42,6 +42,7 @@ from __future__ import annotations
 import asyncio
 import base64
 import os
+import ssl
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -50,6 +51,7 @@ from pathlib import Path
 from typing import Any
 
 import aiohttp
+import certifi
 import structlog
 from pydantic import BaseModel, Field
 
@@ -258,15 +260,23 @@ class HuggingFace3DClient:
         )
 
     async def _get_session(self) -> aiohttp.ClientSession:
-        """Get or create aiohttp session."""
+        """Get or create aiohttp session with proper SSL verification."""
         if self._session is None or self._session.closed:
             headers = {"Content-Type": "application/json"}
             token = self.config.api_token or self.config.api_key
             if token:
                 headers["Authorization"] = f"Bearer {token}"
 
+            # Use certifi for SSL certificate verification (macOS compatibility)
+            ssl_context = ssl.create_default_context(cafile=certifi.where())
+            connector = aiohttp.TCPConnector(ssl=ssl_context)
+
             timeout = aiohttp.ClientTimeout(total=self.config.timeout_seconds)
-            self._session = aiohttp.ClientSession(headers=headers, timeout=timeout)
+            self._session = aiohttp.ClientSession(
+                headers=headers,
+                timeout=timeout,
+                connector=connector,
+            )
         return self._session
 
     async def generate_from_text(

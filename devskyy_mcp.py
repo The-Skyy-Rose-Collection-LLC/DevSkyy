@@ -67,9 +67,11 @@ MCP_BACKEND = os.getenv("MCP_BACKEND", "devskyy")
 
 # Dynamic configuration based on backend
 if MCP_BACKEND == "critical-fuchsia-ape":
-    API_BASE_URL = os.getenv("CRITICAL_FUCHSIA_APE_URL", "http://critical-fuchsia-ape:8000")
+    # FastMCP hosted endpoint
+    API_BASE_URL = os.getenv("CRITICAL_FUCHSIA_APE_URL", "https://critical-fuchsia-ape.fastmcp.app")
     API_KEY = os.getenv("CRITICAL_FUCHSIA_APE_KEY", "")
 else:
+    # Local DevSkyy backend
     API_BASE_URL = os.getenv("DEVSKYY_API_URL", "http://localhost:8000")
     API_KEY = os.getenv("DEVSKYY_API_KEY", "")
 
@@ -104,11 +106,7 @@ PTC_CALLER = "code_execution_20250825"
 # Initialize MCP Server
 # ===========================
 
-mcp = FastMCP(
-    "devskyy_mcp_v2",
-    dependencies=["httpx>=0.24.0", "pydantic>=2.5.0"],
-    description="54-agent AI platform with advanced tool use (defer_loading, PTC, examples)",
-)
+mcp = FastMCP("devskyy_mcp_v2")
 
 # ===========================
 # Enums & Models

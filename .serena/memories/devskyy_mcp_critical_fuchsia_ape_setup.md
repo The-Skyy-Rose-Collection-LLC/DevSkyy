@@ -1,123 +1,101 @@
 # DevSkyy MCP - Critical Fuchsia Ape Setup
 
-## Status: ✅ CONFIGURED & READY TO USE
+## Status: ✅ CONFIGURED CORRECTLY
 
-The devskyy_mcp.py server has been fully configured to connect to critical-fuchsia-ape FastMCP endpoint.
+The devskyy_mcp.py server connects to critical-fuchsia-ape FastMCP endpoint.
 
-**Endpoint**: <https://critical-fuchsia-ape.fastmcp.app/mcp>
-**Authentication**: Bearer token
-**Status**: Active ✅
+**Endpoint**: `https://critical-fuchsia-ape.fastmcp.app`
+**Authentication**: Bearer token via `CRITICAL_FUCHSIA_APE_KEY`
+**Backend Selection**: `MCP_BACKEND=critical-fuchsia-ape`
 
-## Changes Made
+## Configuration Pattern
 
-### 1. **devskyy_mcp.py** - Backend Selection Logic
+### .mcp.json Server Entry
 
-- Added `MCP_BACKEND` environment variable support
-- Dynamic configuration: detects backend mode and loads appropriate API credentials
-- Supports two backends:
-  - `devskyy` (default): Uses DEVSKYY_API_URL and DEVSKYY_API_KEY
-  - `critical-fuchsia-ape`: Uses CRITICAL_FUCHSIA_APE_URL and CRITICAL_FUCHSIA_APE_KEY
+```json
+"devskyy-critical-fuchsia-ape": {
+  "command": "python",
+  "args": ["devskyy_mcp.py"],
+  "env": {
+    "MCP_BACKEND": "critical-fuchsia-ape",
+    "CRITICAL_FUCHSIA_APE_URL": "https://critical-fuchsia-ape.fastmcp.app",
+    "CRITICAL_FUCHSIA_APE_KEY": "${CRITICAL_FUCHSIA_APE_KEY}"
+  }
+}
+```
 
-### 2. **.mcp.json** - Server Configuration
+### devskyy_mcp.py Backend Selection
 
-- Added `devskyy-critical-fuchsia-ape` server entry
-- Configured with environment variables:
-  - CRITICAL_FUCHSIA_APE_URL
-  - CRITICAL_FUCHSIA_APE_KEY
-- Lists all 13 DevSkyy MCP tools as capabilities
+```python
+MCP_BACKEND = os.getenv("MCP_BACKEND", "devskyy")
 
-### 3. **mcp/.env.example** - Environment Template
+if MCP_BACKEND == "critical-fuchsia-ape":
+    # FastMCP hosted endpoint
+    API_BASE_URL = os.getenv("CRITICAL_FUCHSIA_APE_URL", "https://critical-fuchsia-ape.fastmcp.app")
+    API_KEY = os.getenv("CRITICAL_FUCHSIA_APE_KEY", "")
+else:
+    # Local DevSkyy backend
+    API_BASE_URL = os.getenv("DEVSKYY_API_URL", "http://localhost:8000")
+    API_KEY = os.getenv("DEVSKYY_API_KEY", "")
+```
 
-- Added critical-fuchsia-ape configuration section
-- Template variables:
-  - CRITICAL_FUCHSIA_APE_URL
-  - CRITICAL_FUCHSIA_APE_KEY
-  - MCP_BACKEND switch
+## Required Environment Variables
 
-### 4. **docs/CRITICAL_FUCHSIA_APE_SETUP.md** - Setup Documentation
-
-- Comprehensive guide for using critical-fuchsia-ape backend
-- Quick start instructions
-- Environment configuration examples
-- Troubleshooting section
-- API compatibility requirements
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `MCP_BACKEND` | Set to `critical-fuchsia-ape` to use FastMCP | Yes |
+| `CRITICAL_FUCHSIA_APE_URL` | FastMCP endpoint URL | Yes |
+| `CRITICAL_FUCHSIA_APE_KEY` | API key for authentication | Yes |
 
 ## How to Use
 
-### Option 1: Direct Environment Variable
+### Option 1: Environment Variables
 
 ```bash
 export MCP_BACKEND=critical-fuchsia-ape
-export CRITICAL_FUCHSIA_APE_URL="http://critical-fuchsia-ape:8000"
-export CRITICAL_FUCHSIA_APE_KEY="your-key"
+export CRITICAL_FUCHSIA_APE_URL="https://critical-fuchsia-ape.fastmcp.app"
+export CRITICAL_FUCHSIA_APE_KEY="your-api-key"
 python devskyy_mcp.py
 ```
 
-### Option 2: From .env File
-
-```bash
-# Copy and edit .env with critical-fuchsia-ape settings
-cp mcp/.env.example .env
-# Edit .env to set MCP_BACKEND=critical-fuchsia-ape
-python devskyy_mcp.py
-```
-
-### Option 3: Claude Desktop
+### Option 2: Claude Desktop Config
 
 Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "devskyy-critical-fuchsia-ape": {
+    "devskyy": {
       "command": "python",
       "args": ["/path/to/devskyy_mcp.py"],
       "env": {
         "MCP_BACKEND": "critical-fuchsia-ape",
-        "CRITICAL_FUCHSIA_APE_URL": "http://critical-fuchsia-ape:8000",
-        "CRITICAL_FUCHSIA_APE_KEY": "${CRITICAL_FUCHSIA_APE_KEY}"
+        "CRITICAL_FUCHSIA_APE_URL": "https://critical-fuchsia-ape.fastmcp.app",
+        "CRITICAL_FUCHSIA_APE_KEY": "your-api-key"
       }
     }
   }
 }
 ```
 
-## Configuration Details
+## Available Tools (13)
 
-**Endpoint**: <https://critical-fuchsia-ape.fastmcp.app/mcp> (FastMCP-hosted)
-**URL Variable**: CRITICAL_FUCHSIA_APE_URL
-**Key Variable**: CRITICAL_FUCHSIA_APE_KEY
-**Backend Selection**: MCP_BACKEND=critical-fuchsia-ape
+- `devskyy_scan_code` - Scan code for issues
+- `devskyy_fix_code` - Auto-fix code problems
+- `devskyy_self_healing` - Self-healing pipeline
+- `devskyy_generate_wordpress_theme` - Generate WP themes
+- `devskyy_ml_prediction` - ML predictions
+- `devskyy_manage_products` - Product management
+- `devskyy_dynamic_pricing` - Dynamic pricing
+- `devskyy_generate_3d_from_description` - Text-to-3D
+- `devskyy_generate_3d_from_image` - Image-to-3D
+- `devskyy_marketing_campaign` - Campaign generation
+- `devskyy_multi_agent_workflow` - Multi-agent tasks
+- `devskyy_system_monitoring` - System monitoring
+- `devskyy_list_agents` - List available agents
 
-### Files Ready
+## Files
 
-1. ✅ `.env.critical-fuchsia-ape` - Pre-configured template
-2. ✅ `docs/CRITICAL_FUCHSIA_APE_QUICKSTART.md` - Quick start guide
-3. ✅ `docs/CRITICAL_FUCHSIA_APE_SETUP.md` - Full documentation
-4. ✅ `scripts/setup_critical_fuchsia_ape.sh` - Automated setup
-
-## Next Steps for User
-
-1. **Get API Key** from critical-fuchsia-ape (you've already authenticated)
-2. **Configure .env**:
-
-   ```bash
-   cp .env.critical-fuchsia-ape .env
-   # Edit .env and add your CRITICAL_FUCHSIA_APE_KEY
-   ```
-
-3. **Start server**:
-
-   ```bash
-   python3 devskyy_mcp.py
-   ```
-
-4. **Integrate with Claude** (optional)
-5. **Use the 13 DevSkyy tools** via MCP
-
-## Files Modified/Created
-
-- ✅ devskyy_mcp.py (modified - backend selection logic)
-- ✅ .mcp.json (modified - added critical-fuchsia-ape server)
-- ✅ mcp/.env.example (modified - added env vars)
-- ✅ docs/CRITICAL_FUCHSIA_APE_SETUP.md (created)
+- `devskyy_mcp.py` - MCP server with backend selection
+- `.mcp.json` - Server configuration with critical-fuchsia-ape entry
+- `scripts/setup_critical_fuchsia_ape.sh` - Setup script
