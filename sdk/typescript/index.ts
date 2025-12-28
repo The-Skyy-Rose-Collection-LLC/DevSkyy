@@ -14,7 +14,13 @@
  * @packageDocumentation
  */
 
-export { RequestSigner, type SignatureHeaders, type SignRequestOptions, type SignatureDetails } from './RequestSigner';
+export {
+  RequestSigner,
+  PROTECTED_ENDPOINTS,
+  type SignatureHeaders,
+  type SignRequestOptions,
+  type SignatureDetails,
+} from './RequestSigner';
 
 /**
  * SDK version

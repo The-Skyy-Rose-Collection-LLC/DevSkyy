@@ -32,15 +32,28 @@
  * });
  * ```
  *
- * Protected Endpoints (require request signing):
- * - /api/v1/admin/*              - All admin operations
- * - /api/v1/agents/*/execute     - Agent execution
- * - /api/v1/users/*/delete       - User deletion
- * - /api/v1/payments/*           - Payment operations
- * - /api/v1/keys/rotate          - Key rotation
+ * Protected Endpoints:
+ * See {@link PROTECTED_ENDPOINTS} for the authoritative list of endpoints that require
+ * request signing. This list should remain synchronized with the backend protection logic.
  */
 
 import { createHash, createHmac, randomBytes } from 'crypto';
+
+/**
+ * List of protected API endpoints that require request signing.
+ *
+ * NOTE: This list must remain synchronized with backend protection logic.
+ * Any changes to protected endpoints should be reflected here and in the backend.
+ *
+ * @readonly
+ */
+export const PROTECTED_ENDPOINTS = [
+  '/api/v1/admin/*',
+  '/api/v1/agents/*/execute',
+  '/api/v1/users/*/delete',
+  '/api/v1/payments/*',
+  '/api/v1/keys/rotate',
+] as const;
 
 /**
  * Request signature headers
