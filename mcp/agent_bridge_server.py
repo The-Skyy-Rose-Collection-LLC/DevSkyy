@@ -45,12 +45,12 @@ Usage:
       }
     }
 """
+from __future__ import annotations
 
 import json
 import logging
 import os
 import sys
-import traceback
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -102,6 +102,7 @@ class AgentTimeoutError(AgentBridgeError):
         super().__init__(message, "AGENT_TIMEOUT")
         self.agent_type = agent_type
         self.timeout_seconds = timeout_seconds
+
 
 try:
     from pydantic import BaseModel, ConfigDict, Field
@@ -592,16 +593,24 @@ def format_error_response(
     # Add specific error codes and suggestions for known error types
     if isinstance(error, AgentNotAvailableError):
         error_data["error_code"] = error.error_code
-        error_data["suggestion"] = "Check that the agent is properly configured and all dependencies are installed."
+        error_data[
+            "suggestion"
+        ] = "Check that the agent is properly configured and all dependencies are installed."
     elif isinstance(error, AgentExecutionError):
         error_data["error_code"] = error.error_code
-        error_data["suggestion"] = "Review the input parameters and try again. Check agent logs for details."
+        error_data[
+            "suggestion"
+        ] = "Review the input parameters and try again. Check agent logs for details."
     elif isinstance(error, AgentTimeoutError):
         error_data["error_code"] = error.error_code
-        error_data["suggestion"] = "The operation took too long. Try with simpler inputs or check system load."
+        error_data[
+            "suggestion"
+        ] = "The operation took too long. Try with simpler inputs or check system load."
     elif isinstance(error, TimeoutError):
         error_data["error_code"] = "TIMEOUT"
-        error_data["suggestion"] = "The operation timed out. Try again or increase timeout settings."
+        error_data[
+            "suggestion"
+        ] = "The operation timed out. Try again or increase timeout settings."
     elif isinstance(error, ConnectionError):
         error_data["error_code"] = "CONNECTION_ERROR"
         error_data["suggestion"] = "Check network connectivity and service availability."
