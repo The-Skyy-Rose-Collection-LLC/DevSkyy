@@ -195,7 +195,7 @@ app = FastAPI(
 # Middleware
 # =============================================================================
 
-# CORS - Enforce explicit origin whitelist
+# CORS - Enforce explicit origin whitelist + Vercel preview support
 cors_origins = os.getenv("CORS_ORIGINS", "").strip()
 if not cors_origins:
     # Development default - customize for production!
@@ -211,9 +211,13 @@ if not cors_origins_list:
     msg = "CORS_ORIGINS must contain at least one valid origin"
     raise ValueError(msg)
 
+# Regex pattern to allow Vercel preview deployments
+vercel_preview_regex = r"https://.*\.vercel\.app"
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins_list,
+    allow_origin_regex=vercel_preview_regex,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
