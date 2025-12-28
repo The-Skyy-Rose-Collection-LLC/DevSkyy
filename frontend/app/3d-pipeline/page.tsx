@@ -9,6 +9,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { threeDAPI } from '@/lib/api';
+import { ModelViewer } from '@/components/ModelViewer';
 
 // Types
 interface Particle {
@@ -253,16 +254,23 @@ const PipelineStage: React.FC<PipelineStageProps> = ({ stage, status, time, acti
   </div>
 );
 
-// 3D Preview placeholder with rotating effect
-const Preview3D: React.FC<{ generating: boolean }> = ({ generating }) => {
+// 3D Preview with model-viewer or placeholder
+interface Preview3DProps {
+  generating: boolean;
+  modelUrl?: string;
+}
+
+const Preview3D: React.FC<Preview3DProps> = ({ generating, modelUrl }) => {
   const [rotation, setRotation] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setRotation((r) => (r + 1) % 360);
-    }, 50);
-    return () => clearInterval(interval);
-  }, []);
+    if (!modelUrl) {
+      const interval = setInterval(() => {
+        setRotation((r) => (r + 1) % 360);
+      }, 50);
+      return () => clearInterval(interval);
+    }
+  }, [modelUrl]);
 
   return (
     <div className="relative aspect-square rounded-2xl bg-gradient-to-br from-slate-900 to-black overflow-hidden border border-white/5">
@@ -275,27 +283,41 @@ const Preview3D: React.FC<{ generating: boolean }> = ({ generating }) => {
         }}
       />
 
-      {/* Rotating 3D placeholder */}
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div
-          className="relative w-32 h-32"
-          style={{ transform: `rotateY(${rotation}deg)`, transformStyle: 'preserve-3d' }}
-        >
-          {/* Cube faces */}
+      {modelUrl ? (
+        /* Actual 3D Model Viewer */
+        <ModelViewer
+          src={modelUrl}
+          alt="Generated 3D Asset"
+          autoRotate
+          cameraControls
+          ar
+          shadowIntensity={1}
+          exposure={1}
+          className="absolute inset-0"
+        />
+      ) : (
+        /* Rotating 3D placeholder */
+        <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="absolute inset-0 border-2 border-rose-500/30 bg-rose-500/5"
-            style={{ transform: 'translateZ(64px)' }}
-          />
-          <div
-            className="absolute inset-0 border-2 border-purple-500/30 bg-purple-500/5"
-            style={{ transform: 'rotateY(90deg) translateZ(64px)' }}
-          />
+            className="relative w-32 h-32"
+            style={{ transform: `rotateY(${rotation}deg)`, transformStyle: 'preserve-3d' }}
+          >
+            {/* Cube faces */}
+            <div
+              className="absolute inset-0 border-2 border-rose-500/30 bg-rose-500/5"
+              style={{ transform: 'translateZ(64px)' }}
+            />
+            <div
+              className="absolute inset-0 border-2 border-purple-500/30 bg-purple-500/5"
+              style={{ transform: 'rotateY(90deg) translateZ(64px)' }}
+            />
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Generating overlay */}
       {generating && (
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm">
+        <div className="absolute inset-0 bg-black/50 flex items-center justify-center backdrop-blur-sm z-10">
           <div className="text-center">
             <div className="w-12 h-12 border-2 border-rose-500 border-t-transparent rounded-full animate-spin mx-auto mb-3" />
             <div className="text-sm text-rose-400">Generating 3D Model</div>
@@ -305,7 +327,7 @@ const Preview3D: React.FC<{ generating: boolean }> = ({ generating }) => {
       )}
 
       {/* Controls overlay */}
-      <div className="absolute bottom-3 left-3 right-3 flex justify-between">
+      <div className="absolute bottom-3 left-3 right-3 flex justify-between z-10">
         <div className="flex gap-1">
           {['↻', '⊕', '⊖'].map((icon, i) => (
             <button
@@ -316,9 +338,11 @@ const Preview3D: React.FC<{ generating: boolean }> = ({ generating }) => {
             </button>
           ))}
         </div>
-        <button className="px-3 h-8 rounded-lg bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs hover:bg-rose-500/30 transition-all">
-          AR Preview
-        </button>
+        {!modelUrl && (
+          <button className="px-3 h-8 rounded-lg bg-rose-500/20 border border-rose-500/30 text-rose-400 text-xs hover:bg-rose-500/30 transition-all">
+            AR Preview
+          </button>
+        )}
       </div>
     </div>
   );
@@ -602,7 +626,7 @@ export default function ThreeDPipelinePage() {
 
               {/* 3D Preview */}
               <div className="grid md:grid-cols-2 gap-6">
-                <Preview3D generating={generating} />
+                <Preview3D generating={generating} modelUrl={currentJob?.result_url} />
 
                 {/* Pipeline Stages */}
                 <div className="space-y-3">
