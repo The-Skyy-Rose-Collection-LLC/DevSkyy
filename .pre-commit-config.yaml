@@ -119,7 +119,7 @@ repos:
         language: system
         files: \.(ts|tsx)$
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
 
       - id: jest-collections
         name: Jest Collection Tests
@@ -127,7 +127,7 @@ repos:
         language: system
         files: ^src/collections/.*\.(ts|tsx)$
         pass_filenames: false
-        stages: [commit]
+        stages: [pre-commit]
 
   # Commit message linting
   - repo: https://github.com/commitizen-tools/commitizen
