@@ -11,6 +11,7 @@ Enterprise-grade API security for DevSkyy Platform:
 - Request signing
 - Replay attack prevention
 """
+from __future__ import annotations
 
 import hashlib
 import hmac
@@ -31,8 +32,8 @@ try:
     import redis
     from redis import Redis
 except ImportError:
-    redis = None  # type: ignore
-    Redis = None  # type: ignore
+    redis = None
+    Redis = None
 
 logger = logging.getLogger(__name__)
 

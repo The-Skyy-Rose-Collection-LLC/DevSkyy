@@ -50,8 +50,8 @@ try:
     import redis
     from redis import Redis
 except ImportError:
-    redis = None  # type: ignore
-    Redis = None  # type: ignore
+    redis = None
+    Redis = None
 
 logger = logging.getLogger(__name__)
 
