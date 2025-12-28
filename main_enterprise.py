@@ -441,7 +441,6 @@ async def health_check():
             "api": "operational",
             "auth": "operational",
             "encryption": "operational",
-            "webhooks": "operational",
         },
     )
 
