@@ -89,10 +89,11 @@
       "command": "python",
       "args": ["devskyy_mcp.py"],
       "env": {
-        "DEVSKYY_API_URL": "${CRITICAL_FUCHSIA_APE_URL}",
-        "DEVSKYY_API_KEY": "${CRITICAL_FUCHSIA_APE_KEY}"
+        "MCP_BACKEND": "critical-fuchsia-ape",
+        "CRITICAL_FUCHSIA_APE_URL": "https://critical-fuchsia-ape.fastmcp.app",
+        "CRITICAL_FUCHSIA_APE_KEY": "${CRITICAL_FUCHSIA_APE_KEY}"
       },
-      "description": "DevSkyy MCP Server integrated with critical-fuchsia-ape backend",
+      "description": "DevSkyy MCP Server integrated with critical-fuchsia-ape FastMCP backend",
       "capabilities": [
         "devskyy_scan_code",
         "devskyy_fix_code",

@@ -31,23 +31,17 @@ const nextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
   },
   async rewrites() {
-    // In development, proxy to local Python backend
-    // In production (Vercel), /api routes go directly to Python serverless functions
-    const isDev = process.env.NODE_ENV === 'development';
+    // Proxy /api/* to Python backend
+    // Works in both development (localhost:8000) and production (BACKEND_URL)
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
 
-    if (isDev) {
-      return [
-        {
-          source: '/api/:path*',
-          destination: process.env.BACKEND_URL
-            ? `${process.env.BACKEND_URL}/:path*`
-            : 'http://localhost:8000/:path*',
-        },
-      ];
-    }
-
-    // In production, no rewrites needed - Vercel handles /api routes
-    return [];
+    return [
+      {
+        // /api/v1/agents → http://localhost:8000/api/v1/agents
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
+      },
+    ];
   },
   async headers() {
     return [

@@ -36,12 +36,19 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
 from api.agents import agents_router
+from api.brand import brand_router
 from api.dashboard import dashboard_router
 from api.gdpr import gdpr_router
+from api.round_table import round_table_router
+from api.tasks import tasks_router
+from api.three_d import three_d_router
+from api.tools import tools_router
 
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
+from api.visual import visual_router
 from api.webhooks import WebhookEventType, webhook_manager, webhook_router
+from api.wordpress import wordpress_router
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
@@ -385,7 +392,14 @@ app.include_router(gdpr_router)
 app.include_router(agents_router)
 
 # Dashboard API routes (for Next.js frontend)
-app.include_router(dashboard_router)
+app.include_router(dashboard_router, prefix="/api/v1")
+app.include_router(tasks_router, prefix="/api/v1")
+app.include_router(round_table_router, prefix="/api/v1")
+app.include_router(brand_router, prefix="/api/v1")
+app.include_router(tools_router, prefix="/api/v1")
+app.include_router(three_d_router, prefix="/api/v1")
+app.include_router(visual_router, prefix="/api/v1")
+app.include_router(wordpress_router, prefix="/api/v1")
 
 
 # =============================================================================
@@ -607,16 +621,7 @@ async def execute_agent(
     )
 
 
-@v1_router.get("/agents", response_model=list[dict[str, Any]])
-async def list_agents(user: TokenPayload = Depends(get_current_user)):
-    """List available AI agents"""
-    return [
-        {"name": "wordpress_agent", "status": "active", "category": "backend"},
-        {"name": "seo_agent", "status": "active", "category": "marketing"},
-        {"name": "inventory_agent", "status": "active", "category": "operations"},
-        {"name": "customer_service_agent", "status": "active", "category": "support"},
-        {"name": "pricing_agent", "status": "active", "category": "ml"},
-    ]
+# NOTE: /agents endpoints are handled by dashboard_router (api/dashboard.py)
 
 
 # ---- Admin Routes (RBAC Protected) ----
