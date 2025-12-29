@@ -82,7 +82,7 @@ omegaconf==2.3.0
 
 # Utilities
 tqdm==4.67.1
-joblib==1.4.2
+joblib==1.5.3
 dill==0.4.0
 
 # FastAPI integration
