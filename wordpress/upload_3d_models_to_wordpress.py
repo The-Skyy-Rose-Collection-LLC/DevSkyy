@@ -34,7 +34,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 import aiohttp
@@ -132,13 +132,13 @@ class UploadResult(BaseModel):
     product_name: str
     model_type: str
     status: str = Field(..., regex="^(success|failed|skipped)$")
-    media_id: Optional[int] = Field(default=None, description="WordPress media attachment ID")
+    media_id: int | None = Field(default=None, description="WordPress media attachment ID")
     message: str = Field(default="", max_length=500)
-    uploaded_at: Optional[datetime] = Field(default=None)
-    wordpress_url: Optional[str] = Field(default=None, max_length=2048)
+    uploaded_at: datetime | None = Field(default=None)
+    wordpress_url: str | None = Field(default=None, max_length=2048)
 
     @validator("wordpress_url", pre=True)
-    def validate_wp_url(cls, v: Any) -> Optional[str]:
+    def validate_wp_url(cls, v: Any) -> str | None:
         """Validate WordPress URL format."""
         if v is None:
             return None
@@ -162,7 +162,7 @@ class UploadSummary(BaseModel):
     skipped_uploads: int
     upload_results: list[UploadResult] = Field(default_factory=list)
     started_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = Field(default=None)
+    completed_at: datetime | None = Field(default=None)
 
     def add_result(self, result: UploadResult) -> None:
         """Add upload result and update counts."""
@@ -291,7 +291,7 @@ class ModelUploadManager:
 
         return summary
 
-    async def _load_collection_metadata(self, collection: str) -> Optional[dict[str, Any]]:
+    async def _load_collection_metadata(self, collection: str) -> dict[str, Any] | None:
         """Load collection metadata from JSON file."""
         metadata_file = self.metadata_dir / f"{collection}_models_metadata.json"
         if not metadata_file.exists():
@@ -397,7 +397,7 @@ class ModelUploadManager:
 
                     return attachment_id
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise FileUploadError("Upload timeout (60s)")
         except FileUploadError:
             raise
@@ -408,8 +408,8 @@ class ModelUploadManager:
         self,
         session: aiohttp.ClientSession,
         product_id: int,
-        glb_url: Optional[str] = None,
-        usdz_url: Optional[str] = None,
+        glb_url: str | None = None,
+        usdz_url: str | None = None,
         ar_enabled: bool = True,
     ) -> None:
         """
@@ -449,7 +449,7 @@ class ModelUploadManager:
                         f"Metadata update failed: {resp.status} - {error_text}"
                     )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise MetadataUpdateError("Metadata update timeout (30s)")
         except MetadataUpdateError:
             raise
@@ -457,7 +457,7 @@ class ModelUploadManager:
             raise MetadataUpdateError(f"Metadata update failed: {e}")
 
     async def generate_upload_report(
-        self, summary: UploadSummary, output_file: Optional[Path] = None
+        self, summary: UploadSummary, output_file: Path | None = None
     ) -> str:
         """
         Generate human-readable upload report.

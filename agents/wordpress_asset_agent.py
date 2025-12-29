@@ -467,25 +467,18 @@ class WordPressAssetAgent(SuperAgent):
 
         # Validate file is readable
         if not path.is_file():
-            raise ValueError(
-                f"Path is not a file: {file_path}. "
-                "Directories cannot be uploaded."
-            )
+            raise ValueError(f"Path is not a file: {file_path}. " "Directories cannot be uploaded.")
 
         # Check file size
         try:
             file_size = path.stat().st_size
         except OSError as e:
             raise PermissionError(
-                f"Cannot read file stats for {file_path}: {e}. "
-                "Check file permissions."
+                f"Cannot read file stats for {file_path}: {e}. " "Check file permissions."
             ) from e
 
         if file_size == 0:
-            raise ValueError(
-                f"File is empty: {file_path}. "
-                "Cannot upload an empty file."
-            )
+            raise ValueError(f"File is empty: {file_path}. " "Cannot upload an empty file.")
 
         max_size = self.wp_config.max_file_size_mb * 1024 * 1024
         if file_size > max_size:

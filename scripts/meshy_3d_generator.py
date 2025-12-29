@@ -165,9 +165,9 @@ def create_retexture_task(
     elif text_prompt:
         payload["text_style_prompt"] = text_prompt
     else:
-        payload[
-            "text_style_prompt"
-        ] = "High quality fabric texture, realistic clothing material, detailed stitching, professional lighting"
+        payload["text_style_prompt"] = (
+            "High quality fabric texture, realistic clothing material, detailed stitching, professional lighting"
+        )
 
     if WEBHOOK_URL:
         payload["webhook_url"] = WEBHOOK_URL

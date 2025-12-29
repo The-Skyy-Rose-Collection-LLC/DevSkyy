@@ -382,15 +382,18 @@ async def test_full_hybrid_pipeline():
             image_path.write_bytes(b"fake image data")
 
             # Mock the agents
-            with patch.object(
-                pipeline.huggingface_client,
-                "generate_from_image",
-                new_callable=AsyncMock,
-            ) as mock_hf, patch.object(
-                pipeline.tripo_agent,
-                "run",
-                new_callable=AsyncMock,
-            ) as mock_tripo:
+            with (
+                patch.object(
+                    pipeline.huggingface_client,
+                    "generate_from_image",
+                    new_callable=AsyncMock,
+                ) as mock_hf,
+                patch.object(
+                    pipeline.tripo_agent,
+                    "run",
+                    new_callable=AsyncMock,
+                ) as mock_tripo,
+            ):
                 # Setup HF mock
                 hf_result = HF3DResult(
                     task_id="hf_123",

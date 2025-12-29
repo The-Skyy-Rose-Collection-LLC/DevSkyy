@@ -459,12 +459,16 @@ class ProductAssetPipeline:
                 logger.warning("Redis close timed out", error=str(e))
             except Exception as e:
                 errors.append(f"Redis close error: {e}")
-                logger.warning("Failed to close Redis connection", error=str(e), error_type=type(e).__name__)
+                logger.warning(
+                    "Failed to close Redis connection", error=str(e), error_type=type(e).__name__
+                )
             finally:
                 self._redis_connected = False
 
         if errors:
-            logger.info("Pipeline close completed with errors", error_count=len(errors), errors=errors)
+            logger.info(
+                "Pipeline close completed with errors", error_count=len(errors), errors=errors
+            )
 
     # =========================================================================
     # Stage 4.7.2: Redis Cache Layer
@@ -504,9 +508,11 @@ class ProductAssetPipeline:
             # Test connection with timeout
             await asyncio.wait_for(self._redis.ping(), timeout=5.0)
             self._redis_connected = True
-            logger.info("Redis cache connected", url=self.config.redis_url.split("@")[-1])  # Log host only, not credentials
+            logger.info(
+                "Redis cache connected", url=self.config.redis_url.split("@")[-1]
+            )  # Log host only, not credentials
             return True
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Redis connection timed out (transient error, will retry on next request)",
                 redis_url=self.config.redis_url.split("@")[-1],
@@ -586,7 +592,7 @@ class ProductAssetPipeline:
                 logger.info("Cache hit", cache_key=cache_key)
                 return AssetPipelineResult.model_validate_json(cached)
             return None
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Cache retrieval timed out",
                 cache_key=cache_key,
@@ -674,7 +680,7 @@ class ProductAssetPipeline:
                 ttl_days=self.config.cache_ttl_seconds // 86400,
                 size_bytes=len(serialized),
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Cache write timed out - result not cached",
                 cache_key=cache_key,

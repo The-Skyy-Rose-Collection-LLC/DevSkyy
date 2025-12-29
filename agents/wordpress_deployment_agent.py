@@ -19,7 +19,7 @@ import asyncio
 import json
 import logging
 from datetime import datetime
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field
 
@@ -49,10 +49,10 @@ class AgentTask(BaseModel):
     task_name: str
     status: str = Field(default="pending", pattern="^(pending|in_progress|completed|failed)$")
     dependencies: list[str] = Field(default_factory=list)
-    result: Optional[dict[str, Any]] = None
-    error: Optional[str] = None
-    started_at: Optional[str] = None
-    completed_at: Optional[str] = None
+    result: dict[str, Any] | None = None
+    error: str | None = None
+    started_at: str | None = None
+    completed_at: str | None = None
 
 
 class DeploymentPlan(BaseModel):
@@ -169,7 +169,7 @@ class MockAnalyticsAgent:
 class WordPressDeploymentCoordinator:
     """Coordinates multiple agents for SkyyRose site deployment."""
 
-    def __init__(self, collections: Optional[list[str]] = None) -> None:
+    def __init__(self, collections: list[str] | None = None) -> None:
         """Initialize deployment coordinator.
 
         Args:
@@ -181,7 +181,7 @@ class WordPressDeploymentCoordinator:
         self.operations_agent = MockOperationsAgent()
         self.analytics_agent = MockAnalyticsAgent()
         self.tasks: dict[str, AgentTask] = {}
-        self.plan: Optional[DeploymentPlan] = None
+        self.plan: DeploymentPlan | None = None
 
     def create_deployment_plan(self) -> DeploymentPlan:
         """Create deployment plan with task dependencies.

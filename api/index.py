@@ -21,8 +21,8 @@ from api.brand import brand_router
 from api.dashboard import dashboard_router
 from api.round_table import round_table_router
 from api.tasks import tasks_router
-from api.tools import tools_router
 from api.three_d import three_d_router
+from api.tools import tools_router
 from api.visual import visual_router
 
 # Create FastAPI app
@@ -121,14 +121,10 @@ async def dashboard_metrics():
     active = sum(1 for a in agents_info if a.status == "running")
     total_tasks = sum(a.stats.tasksCompleted for a in agents_info)
     avg_success = (
-        sum(a.stats.successRate for a in agents_info) / len(agents_info)
-        if agents_info
-        else 0.0
+        sum(a.stats.successRate for a in agents_info) / len(agents_info) if agents_info else 0.0
     )
     avg_response = (
-        sum(a.stats.avgLatencyMs for a in agents_info) / len(agents_info)
-        if agents_info
-        else 0.0
+        sum(a.stats.avgLatencyMs for a in agents_info) / len(agents_info) if agents_info else 0.0
     )
 
     return {
