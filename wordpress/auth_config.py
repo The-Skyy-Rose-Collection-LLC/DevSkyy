@@ -22,6 +22,7 @@ from __future__ import annotations
 import base64
 import hashlib
 import hmac
+import logging
 import os
 import secrets
 import time
@@ -31,10 +32,15 @@ from enum import Enum
 from typing import Any
 from urllib.parse import urlencode
 
-import structlog
 from pydantic import BaseModel, Field, SecretStr
 
-logger = structlog.get_logger(__name__)
+# Use structlog if available, otherwise fall back to standard logging
+try:
+    import structlog
+    logger = structlog.get_logger(__name__)
+except ImportError:
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
 
 # ============================================================================

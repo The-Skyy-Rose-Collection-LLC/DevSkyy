@@ -18,18 +18,23 @@ Version: 1.0.0
 from __future__ import annotations
 
 import json
+import logging
 import os
-import secrets
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from enum import Enum
 from pathlib import Path
-from typing import Any, TypedDict
+from typing import Any
 
-import structlog
 from pydantic import BaseModel, Field, HttpUrl, SecretStr, field_validator
 
-logger = structlog.get_logger(__name__)
+# Use structlog if available, otherwise fall back to standard logging
+try:
+    import structlog
+    logger = structlog.get_logger(__name__)
+except ImportError:
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
 
 
 # ============================================================================
