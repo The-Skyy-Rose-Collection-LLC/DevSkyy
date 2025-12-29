@@ -119,14 +119,14 @@ async def dashboard_metrics():
     agents_info = agent_registry.list_agents()
 
     active = sum(1 for a in agents_info if a.status == "running")
-    total_tasks = sum(a.stats.tasks_completed for a in agents_info)
+    total_tasks = sum(a.stats.tasksCompleted for a in agents_info)
     avg_success = (
-        sum(a.stats.success_rate for a in agents_info) / len(agents_info)
+        sum(a.stats.successRate for a in agents_info) / len(agents_info)
         if agents_info
         else 0.0
     )
     avg_response = (
-        sum(a.stats.avg_latency_ms for a in agents_info) / len(agents_info)
+        sum(a.stats.avgLatencyMs for a in agents_info) / len(agents_info)
         if agents_info
         else 0.0
     )
