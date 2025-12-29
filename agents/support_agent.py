@@ -31,6 +31,14 @@ from adk.base import (
     ToolDefinition,
 )
 from orchestration.prompt_engineering import PromptTechnique
+from runtime.tools import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+)
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -306,6 +314,265 @@ Escalate to human support when:
                 },
             ),
         ]
+
+    def _register_tools(self) -> None:
+        """Register support tools with the global ToolRegistry for MCP integration."""
+        registry = ToolRegistry.get_instance()
+
+        support_tools = [
+            ToolSpec(
+                name="support_search_faq",
+                description="Search FAQ knowledge base for answers",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="query",
+                        type=ParameterType.STRING,
+                        description="Customer question to search",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="category",
+                        type=ParameterType.STRING,
+                        description="FAQ category filter",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="threshold",
+                        type=ParameterType.NUMBER,
+                        description="Confidence threshold (0-1)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"support", "faq", "search"},
+            ),
+            ToolSpec(
+                name="support_classify_intent",
+                description="Classify customer intent using ML",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="message",
+                        type=ParameterType.STRING,
+                        description="Customer message to classify",
+                        required=True,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"support", "intent", "ml"},
+            ),
+            ToolSpec(
+                name="support_lookup_order",
+                description="Look up order details by ID or email",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="order_id",
+                        type=ParameterType.STRING,
+                        description="Order ID",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="email",
+                        type=ParameterType.STRING,
+                        description="Customer email",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"support", "order", "lookup"},
+            ),
+            ToolSpec(
+                name="support_track_shipment",
+                description="Get shipment tracking status",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="order_id",
+                        type=ParameterType.STRING,
+                        description="Order ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="tracking_number",
+                        type=ParameterType.STRING,
+                        description="Tracking number",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"support", "tracking", "shipping"},
+            ),
+            ToolSpec(
+                name="support_initiate_return",
+                description="Start return process for order",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="order_id",
+                        type=ParameterType.STRING,
+                        description="Order ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="items",
+                        type=ParameterType.ARRAY,
+                        description="Items to return",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="reason",
+                        type=ParameterType.STRING,
+                        description="Return reason",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="preference",
+                        type=ParameterType.STRING,
+                        description="Refund or exchange preference",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"support", "return", "commerce"},
+            ),
+            ToolSpec(
+                name="support_process_refund",
+                description="Process refund for order",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.HIGH,
+                parameters=[
+                    ToolParameter(
+                        name="order_id",
+                        type=ParameterType.STRING,
+                        description="Order ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="amount",
+                        type=ParameterType.NUMBER,
+                        description="Refund amount",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="reason",
+                        type=ParameterType.STRING,
+                        description="Refund reason",
+                        required=True,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"support", "refund", "finance"},
+            ),
+            ToolSpec(
+                name="support_create_ticket",
+                description="Create support ticket",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="customer_email",
+                        type=ParameterType.STRING,
+                        description="Customer email",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="subject",
+                        type=ParameterType.STRING,
+                        description="Ticket subject",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="description",
+                        type=ParameterType.STRING,
+                        description="Issue description",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="priority",
+                        type=ParameterType.STRING,
+                        description="Priority level (low, medium, high, urgent)",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"support", "ticket", "create"},
+            ),
+            ToolSpec(
+                name="support_escalate_ticket",
+                description="Escalate ticket to human agent",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="ticket_id",
+                        type=ParameterType.STRING,
+                        description="Ticket ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="reason",
+                        type=ParameterType.STRING,
+                        description="Escalation reason",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="priority",
+                        type=ParameterType.STRING,
+                        description="Escalation priority",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="summary",
+                        type=ParameterType.STRING,
+                        description="Issue summary for human agent",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"support", "escalation", "ticket"},
+            ),
+            ToolSpec(
+                name="support_get_customer_history",
+                description="Get customer order and support history",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="customer_id",
+                        type=ParameterType.STRING,
+                        description="Customer ID",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="email",
+                        type=ParameterType.STRING,
+                        description="Customer email",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"support", "customer", "history"},
+            ),
+        ]
+
+        for spec in support_tools:
+            registry.register(spec)
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute support operation"""
