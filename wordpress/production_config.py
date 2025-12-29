@@ -170,10 +170,23 @@ class SkyyRoseProductionConfig:
     # Collections Configuration
     collections: dict[CollectionType, CollectionConfig] = field(default_factory=dict)
 
-    # Asset Paths
-    assets_base_path: str = "/home/user/DevSkyy/assets"
-    templates_path: str = "/home/user/DevSkyy/wordpress/elementor_templates"
-    hotspots_path: str = "/home/user/DevSkyy/wordpress/hotspots"
+    # Asset Paths - computed dynamically relative to project root
+    _project_root: Path = field(default_factory=lambda: Path(__file__).parent.parent)
+
+    @property
+    def assets_base_path(self) -> Path:
+        """Path to assets directory, relative to project root."""
+        return self._project_root / "assets"
+
+    @property
+    def templates_path(self) -> Path:
+        """Path to Elementor templates directory."""
+        return self._project_root / "wordpress" / "elementor_templates"
+
+    @property
+    def hotspots_path(self) -> Path:
+        """Path to hotspots configuration directory."""
+        return self._project_root / "wordpress" / "hotspots"
 
     # Production Settings
     enable_caching: bool = True
@@ -710,8 +723,27 @@ class ProductionDeploymentManager:
     async def deploy_page(
         self, page_name: str, page_config: PageConfig
     ) -> dict[str, Any]:
-        """Deploy a single page to WordPress."""
+        """
+        Deploy a single page to WordPress.
+
+        Args:
+            page_name: Internal page identifier
+            page_config: Page configuration
+
+        Returns:
+            Deployment result with page ID and status
+
+        Raises:
+            NotImplementedError: If WordPress credentials are not configured
+        """
         self._logger.info("deploying_page", name=page_name)
+
+        # Validate credentials are available
+        if not self.config.wordpress_credentials:
+            raise NotImplementedError(
+                "WordPress deployment requires credentials. Set WORDPRESS_URL, "
+                "WORDPRESS_USERNAME, and WORDPRESS_APP_PASSWORD environment variables."
+            )
 
         # Load Elementor template if configured
         template_content = None
@@ -721,9 +753,44 @@ class ProductionDeploymentManager:
                 with open(template_path) as f:
                     template_content = json.load(f)
 
-        # Create or update page via WordPress REST API
-        # This would call the actual WordPress API
-        return {"id": page_config.page_id or 0, "status": "deployed"}
+        # Import WordPress client for actual deployment
+        try:
+            from wordpress.client import WordPressClient
+
+            async with WordPressClient(
+                url=str(self.config.wordpress_credentials.site_url),
+                username=self.config.wordpress_credentials.username,
+                app_password=self.config.wordpress_credentials.app_password.get_secret_value(),
+            ) as client:
+                if page_config.page_id:
+                    # Update existing page
+                    result = await client.update_page(
+                        page_id=page_config.page_id,
+                        title=page_config.title,
+                        content=json.dumps(template_content) if template_content else "",
+                        status=page_config.status.value,
+                    )
+                else:
+                    # Create new page
+                    result = await client.create_page(
+                        title=page_config.title,
+                        slug=page_config.slug,
+                        content=json.dumps(template_content) if template_content else "",
+                        status=page_config.status.value,
+                    )
+                return {"id": result.get("id", 0), "status": "deployed"}
+
+        except ImportError:
+            # WordPress client not available - log warning and return mock result
+            self._logger.warning(
+                "wordpress_client_unavailable",
+                message="Install wordpress.client module for actual deployment",
+            )
+            return {
+                "id": page_config.page_id or 0,
+                "status": "skipped",
+                "reason": "WordPress client not available",
+            }
 
     async def deploy_hotspots(self, collection: CollectionConfig) -> None:
         """Deploy hotspot configuration for a collection."""

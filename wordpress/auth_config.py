@@ -102,12 +102,22 @@ class WordPressAuthConfig(BaseModel):
     @classmethod
     def from_env(cls) -> "WordPressAuthConfig":
         """Load configuration from environment variables."""
+        auth_method = AuthMethod(os.getenv("WP_AUTH_METHOD", "app_password"))
+        jwt_secret_env = os.getenv("WP_JWT_SECRET")
+
+        # Fail fast if JWT auth is selected but no secret is configured
+        if auth_method == AuthMethod.JWT and not jwt_secret_env:
+            raise ValueError(
+                "WP_JWT_SECRET environment variable is required when using JWT authentication. "
+                "Generate a secure secret with: python -c \"import secrets; print(secrets.token_urlsafe(64))\""
+            )
+
         return cls(
             site_url=os.getenv("WORDPRESS_URL", "https://skyyrose.co"),
-            auth_method=AuthMethod(os.getenv("WP_AUTH_METHOD", "app_password")),
+            auth_method=auth_method,
             username=os.getenv("WORDPRESS_USERNAME", ""),
             app_password=SecretStr(os.getenv("WORDPRESS_APP_PASSWORD", "")),
-            jwt_secret=SecretStr(os.getenv("WP_JWT_SECRET", secrets.token_urlsafe(32))),
+            jwt_secret=SecretStr(jwt_secret_env or ""),
             jwt_expiry_hours=int(os.getenv("WP_JWT_EXPIRY_HOURS", "24")),
             oauth_client_id=os.getenv("WP_OAUTH_CLIENT_ID", ""),
             oauth_client_secret=SecretStr(os.getenv("WP_OAUTH_CLIENT_SECRET", "")),
@@ -125,7 +135,8 @@ class WooCommerceAuthConfig(BaseModel):
     consumer_key: SecretStr = Field(..., description="WooCommerce consumer key")
     consumer_secret: SecretStr = Field(..., description="WooCommerce consumer secret")
     api_version: str = Field(default="wc/v3")
-    signature_method: str = Field(default="HMAC-SHA256")
+    # WooCommerce OAuth 1.0a uses HMAC-SHA1 by default
+    signature_method: str = Field(default="HMAC-SHA1")
 
     @classmethod
     def from_env(cls) -> "WooCommerceAuthConfig":
@@ -339,12 +350,17 @@ class WooCommerceAuthHandler:
         # Create signature key
         key = f"{self.config.consumer_secret.get_secret_value()}&"
 
+        # Select hash algorithm based on signature_method
+        hash_algo = hashlib.sha1  # Default for HMAC-SHA1
+        if self.config.signature_method == "HMAC-SHA256":
+            hash_algo = hashlib.sha256
+
         # Generate signature
         signature = base64.b64encode(
             hmac.new(
                 key.encode(),
                 base_string.encode(),
-                hashlib.sha256,
+                hash_algo,
             ).digest()
         ).decode()
 

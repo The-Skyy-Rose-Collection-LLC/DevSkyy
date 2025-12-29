@@ -329,7 +329,8 @@ class ProductionValidator:
             ))
 
     async def validate_pages(self) -> None:
-        """Validate all configured pages exist."""
+        """Validate all configured pages exist in WordPress."""
+        import os
         import time
 
         start = time.perf_counter()
@@ -344,28 +345,72 @@ class ProductionValidator:
             {"slug": "about-2", "id": 155, "title": "About"},
         ]
 
+        # Check if we have credentials to validate via API
+        wp_username = os.getenv("WORDPRESS_USERNAME", "")
+        wp_password = os.getenv("WORDPRESS_APP_PASSWORD", "")
+
+        if not wp_username or not wp_password:
+            # Skip validation if no credentials
+            self._report.add_result(ValidationResult(
+                name="pages_exist",
+                status=ValidationStatus.SKIP,
+                message="Skipped - WordPress credentials not configured for page validation",
+                details={"required_pages": [p["slug"] for p in required_pages]},
+                duration_ms=(time.perf_counter() - start) * 1000,
+            ))
+            return
+
         missing_pages = []
         found_pages = []
 
-        for page in required_pages:
-            # In production, this would check the WordPress API
-            # For now, we mark all as found
-            found_pages.append(page["slug"])
+        try:
+            import aiohttp
+            import base64
 
-        if missing_pages:
+            site_url = os.getenv("WORDPRESS_URL", "https://skyyrose.co")
+            credentials = f"{wp_username}:{wp_password}"
+            auth_header = base64.b64encode(credentials.encode()).decode()
+
+            async with aiohttp.ClientSession() as session:
+                for page in required_pages:
+                    url = f"{site_url}/wp-json/wp/v2/pages/{page['id']}"
+                    headers = {"Authorization": f"Basic {auth_header}"}
+
+                    try:
+                        async with session.get(url, headers=headers, timeout=10) as response:
+                            if response.status == 200:
+                                found_pages.append(page["slug"])
+                            else:
+                                missing_pages.append(page["slug"])
+                    except Exception:
+                        missing_pages.append(page["slug"])
+
+            duration = (time.perf_counter() - start) * 1000
+
+            if missing_pages:
+                self._report.add_result(ValidationResult(
+                    name="pages_exist",
+                    status=ValidationStatus.FAIL,
+                    message=f"Missing pages: {', '.join(missing_pages)}",
+                    details={"missing": missing_pages, "found": found_pages},
+                    duration_ms=duration,
+                ))
+            else:
+                self._report.add_result(ValidationResult(
+                    name="pages_exist",
+                    status=ValidationStatus.PASS,
+                    message=f"All {len(required_pages)} required pages verified via API",
+                    details={"pages": found_pages},
+                    duration_ms=duration,
+                ))
+
+        except ImportError:
+            # aiohttp not available - skip validation
             self._report.add_result(ValidationResult(
                 name="pages_exist",
-                status=ValidationStatus.FAIL,
-                message=f"Missing pages: {', '.join(missing_pages)}",
-                details={"missing": missing_pages, "found": found_pages},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
-        else:
-            self._report.add_result(ValidationResult(
-                name="pages_exist",
-                status=ValidationStatus.PASS,
-                message=f"All {len(required_pages)} required pages found",
-                details={"pages": [p["slug"] for p in required_pages]},
+                status=ValidationStatus.SKIP,
+                message="Skipped - aiohttp not available for API validation",
+                details={"required_pages": [p["slug"] for p in required_pages]},
                 duration_ms=(time.perf_counter() - start) * 1000,
             ))
 
