@@ -35,11 +35,11 @@ from urllib.parse import urlencode
 from pydantic import BaseModel, Field, SecretStr
 
 # Use structlog if available, otherwise fall back to standard logging
+# Note: Library code should only create loggers, not configure logging
 try:
     import structlog
     logger = structlog.get_logger(__name__)
 except ImportError:
-    logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
 

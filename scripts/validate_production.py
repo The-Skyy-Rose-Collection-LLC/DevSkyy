@@ -395,6 +395,7 @@ class ProductionValidator:
 
         missing_pages = []
         found_pages = []
+        error_pages: dict[str, str] = {}  # Track pages that failed due to errors
 
         try:
             import aiohttp
@@ -413,19 +414,55 @@ class ProductionValidator:
                         async with session.get(url, headers=headers, timeout=10) as response:
                             if response.status == 200:
                                 found_pages.append(page["slug"])
-                            else:
+                            elif response.status == 404:
                                 missing_pages.append(page["slug"])
-                    except Exception:
-                        missing_pages.append(page["slug"])
+                            else:
+                                # Track non-404 errors separately
+                                error_pages[page["slug"]] = f"HTTP {response.status}"
+                    except asyncio.TimeoutError:
+                        error_pages[page["slug"]] = "Request timeout"
+                        logger.warning(
+                            "page_validation_timeout",
+                            page=page["slug"],
+                            url=url,
+                        )
+                    except aiohttp.ClientError as e:
+                        error_pages[page["slug"]] = f"Network error: {type(e).__name__}"
+                        logger.warning(
+                            "page_validation_network_error",
+                            page=page["slug"],
+                            error=str(e),
+                        )
+                    except Exception as e:
+                        error_pages[page["slug"]] = f"Unexpected error: {type(e).__name__}"
+                        logger.error(
+                            "page_validation_unexpected_error",
+                            page=page["slug"],
+                            error=str(e),
+                            exc_info=True,
+                        )
 
             duration = (time.perf_counter() - start) * 1000
 
-            if missing_pages:
+            # Determine overall status based on results
+            if missing_pages or error_pages:
+                # Build detailed message
+                issues = []
+                if missing_pages:
+                    issues.append(f"missing: {', '.join(missing_pages)}")
+                if error_pages:
+                    error_summary = [f"{k} ({v})" for k, v in error_pages.items()]
+                    issues.append(f"errors: {', '.join(error_summary)}")
+
                 self._report.add_result(ValidationResult(
                     name="pages_exist",
                     status=ValidationStatus.FAIL,
-                    message=f"Missing pages: {', '.join(missing_pages)}",
-                    details={"missing": missing_pages, "found": found_pages},
+                    message=f"Page validation issues - {'; '.join(issues)}",
+                    details={
+                        "missing": missing_pages,
+                        "errors": error_pages,
+                        "found": found_pages,
+                    },
                     duration_ms=duration,
                 ))
             else:

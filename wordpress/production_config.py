@@ -29,11 +29,11 @@ from typing import Any
 from pydantic import BaseModel, Field, HttpUrl, SecretStr, field_validator
 
 # Use structlog if available, otherwise fall back to standard logging
+# Note: Library code should only create loggers, not configure logging
 try:
     import structlog
     logger = structlog.get_logger(__name__)
 except ImportError:
-    logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
 
@@ -603,14 +603,16 @@ class WordPressAuthValidator:
         try:
             import aiohttp
 
-            url = f"{self.config.site_url}/wp-json/wp/v2"
+            # Respect WORDPRESS_URL environment variable override
+            site_url = os.getenv("WORDPRESS_URL") or self.config.site_url
+            url = f"{site_url}/wp-json/wp/v2"
             async with aiohttp.ClientSession() as session:
                 async with session.get(url, timeout=10) as response:
                     if response.status == 200:
-                        self._logger.info("wordpress_api_ok")
+                        self._logger.info("wordpress_api_ok", url=site_url)
                         return True
                     self._logger.warning(
-                        "wordpress_api_error", status=response.status
+                        "wordpress_api_error", status=response.status, url=site_url
                     )
                     return False
         except Exception as e:
@@ -626,7 +628,9 @@ class WordPressAuthValidator:
         try:
             import aiohttp
 
-            url = f"{self.config.site_url}/wp-json/wc/v3/products"
+            # Respect WORDPRESS_URL environment variable override
+            site_url = os.getenv("WORDPRESS_URL") or self.config.site_url
+            url = f"{site_url}/wp-json/wc/v3/products"
             creds = self.config.woocommerce_credentials
             auth = aiohttp.BasicAuth(
                 creds.consumer_key.get_secret_value(),
