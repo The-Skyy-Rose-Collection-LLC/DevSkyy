@@ -409,7 +409,7 @@ async def main():
     logger.info(f"Parallelization Groups: {len(plan.parallelization_groups)}")
 
     # Execute deployment
-    results = await coordinator.execute_deployment()
+    await coordinator.execute_deployment()
 
     # Print summary
     summary = coordinator.get_execution_summary()
