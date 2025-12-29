@@ -1,3 +1,7 @@
+# Asset Tagging Configuration
+# ============================
+# Configure vision service and taxonomy for automatic image tagging.
+
 taxonomy:
   style:
     - photorealistic
@@ -17,10 +21,19 @@ taxonomy:
     - neutral
     - vibrant
     - monochrome
+
+# Vision Service Configuration
+# Supported providers:
+#   - google-vision: Google Cloud Vision API (set GOOGLE_AI_API_KEY)
+#   - openai-vision: OpenAI GPT-4 Vision (set OPENAI_API_KEY)
+#   - local: No API calls, returns empty tags (default fallback)
 vision_service:
-  name: example-vision
-  endpoint: https://example.com/api/vision
-  api_key_env: VISION_API_KEY
+  # Change to 'google-vision' or 'openai-vision' for production
+  name: local
+  api_key_env: GOOGLE_AI_API_KEY  # or OPENAI_API_KEY for openai-vision
+
 tagging:
+  # Minimum confidence score to assign a tag (0.0 to 1.0)
   threshold: 0.5
+  # If true, assign multiple tags per category; if false, only highest-scoring
   assign_multiple: true
