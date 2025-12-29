@@ -1,0 +1,153 @@
+{
+  "collection": "signature",
+  "name": "SIGNATURE Runway",
+  "version": "1.0.0",
+  "experience_url": "/experiences/signature/",
+  "config": {
+    "enable_cart": true,
+    "enable_wishlist": true,
+    "show_price": true,
+    "show_thumbnail": true,
+    "animation_style": "fade",
+    "hover_scale": 1.1
+  },
+  "hotspots": [
+    {
+      "id": "sig-classic-tee",
+      "product_id": 301,
+      "wc_product_id": null,
+      "position": {
+        "x": -2.0,
+        "y": 1.0,
+        "z": 0.0
+      },
+      "label": "Classic Logo Tee",
+      "description": "Essential cotton tee with embroidered SkyyRose logo",
+      "price": 79.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/classic-tee.jpg",
+      "product_url": "/product/classic-logo-tee/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": "ESSENTIAL"
+    },
+    {
+      "id": "sig-oakland-hoodie",
+      "product_id": 302,
+      "wc_product_id": null,
+      "position": {
+        "x": 0.0,
+        "y": 1.5,
+        "z": 1.0
+      },
+      "label": "Oakland Hoodie",
+      "description": "Premium heavyweight hoodie celebrating Oakland heritage",
+      "price": 159.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/oakland-hoodie.jpg",
+      "product_url": "/product/oakland-hoodie/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": "BESTSELLER"
+    },
+    {
+      "id": "sig-gold-cap",
+      "product_id": 303,
+      "wc_product_id": null,
+      "position": {
+        "x": 2.0,
+        "y": 0.8,
+        "z": -0.5
+      },
+      "label": "Gold Emblem Cap",
+      "description": "Structured cap with gold embroidered emblem",
+      "price": 59.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/gold-cap.jpg",
+      "product_url": "/product/gold-emblem-cap/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "sig-heritage-pants",
+      "product_id": 304,
+      "wc_product_id": null,
+      "position": {
+        "x": -1.0,
+        "y": 0.6,
+        "z": -1.5
+      },
+      "label": "Heritage Pants",
+      "description": "Tailored pants with gold hardware",
+      "price": 149.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/heritage-pants.jpg",
+      "product_url": "/product/heritage-pants/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "sig-runway-jacket",
+      "product_id": 305,
+      "wc_product_id": null,
+      "position": {
+        "x": 2.5,
+        "y": 1.8,
+        "z": 0.5
+      },
+      "label": "Runway Jacket",
+      "description": "Showpiece jacket with gold accents",
+      "price": 329.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/runway-jacket.jpg",
+      "product_url": "/product/runway-jacket/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": "NEW"
+    },
+    {
+      "id": "sig-gold-chain",
+      "product_id": 306,
+      "wc_product_id": null,
+      "position": {
+        "x": -2.5,
+        "y": 0.9,
+        "z": 1.5
+      },
+      "label": "Gold Chain",
+      "description": "24K gold-plated chain with SkyyRose pendant",
+      "price": 249.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/gold-chain.jpg",
+      "product_url": "/product/gold-chain/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    }
+  ],
+  "camera_waypoints": [
+    { "scroll": 0, "position": [5, 2, 6], "target": [0, 1, 0] },
+    { "scroll": 25, "position": [0, 2, 7], "target": [0, 1, 0] },
+    { "scroll": 50, "position": [-5, 1.5, 5], "target": [0, 1, 0] },
+    { "scroll": 75, "position": [3, 3, 4], "target": [0, 1, 0] },
+    { "scroll": 100, "position": [0, 2, 5], "target": [0, 1, 0] }
+  ],
+  "environment": {
+    "background_color": "#0A0A0A",
+    "runway_light_color": "#FFD700",
+    "runway_light_intensity": 1.0,
+    "spotlight_color": "#FFFFFF",
+    "spotlight_intensity": 1.2,
+    "enable_bloom": true,
+    "bloom_strength": 0.3
+  },
+  "generated_at": "2024-12-29T00:00:00Z"
+}
