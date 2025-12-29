@@ -5,6 +5,8 @@
 :root {
   --background: 255 255 255;
   --foreground: 10 10 10;
+  --font-inter: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-jetbrains-mono: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, 'Liberation Mono', monospace;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -17,7 +19,12 @@
 body {
   color: rgb(var(--foreground));
   background: rgb(var(--background));
+  font-family: var(--font-inter);
   font-feature-settings: "rlig" 1, "calt" 1;
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-jetbrains-mono);
 }
 
 /* Custom scrollbar */

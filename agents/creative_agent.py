@@ -31,6 +31,14 @@ from adk.base import (
     ToolDefinition,
 )
 from orchestration.prompt_engineering import PromptTechnique
+from runtime.tools import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+)
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType
 
@@ -372,6 +380,254 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                 },
             ),
         ]
+
+    def _register_tools(self) -> None:
+        """Register creative tools with the global ToolRegistry for MCP integration."""
+        registry = ToolRegistry.get_instance()
+
+        creative_tools = [
+            ToolSpec(
+                name="creative_generate_image_google",
+                description="Generate image using Google Imagen 3",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="prompt",
+                        type=ParameterType.STRING,
+                        description="Image generation prompt",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="style",
+                        type=ParameterType.STRING,
+                        description="Style preset",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="aspect_ratio",
+                        type=ParameterType.STRING,
+                        description="Aspect ratio (1:1, 16:9, etc.)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="negative_prompt",
+                        type=ParameterType.STRING,
+                        description="What to avoid in generation",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"creative", "image", "google", "generation"},
+            ),
+            ToolSpec(
+                name="creative_generate_image_flux",
+                description="Generate image using HuggingFace FLUX.1",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="prompt",
+                        type=ParameterType.STRING,
+                        description="Image generation prompt",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="width",
+                        type=ParameterType.INTEGER,
+                        description="Image width in pixels",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="height",
+                        type=ParameterType.INTEGER,
+                        description="Image height in pixels",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="guidance_scale",
+                        type=ParameterType.NUMBER,
+                        description="Guidance scale for generation",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"creative", "image", "flux", "huggingface"},
+            ),
+            ToolSpec(
+                name="creative_generate_video",
+                description="Generate video using Google Veo 2",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="prompt",
+                        type=ParameterType.STRING,
+                        description="Video generation prompt",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="duration",
+                        type=ParameterType.INTEGER,
+                        description="Duration in seconds",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="aspect_ratio",
+                        type=ParameterType.STRING,
+                        description="Aspect ratio",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"creative", "video", "google", "veo"},
+            ),
+            ToolSpec(
+                name="creative_generate_3d_model",
+                description="Generate 3D model from image using Tripo3D",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="image_url",
+                        type=ParameterType.STRING,
+                        description="Source image URL",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="quality",
+                        type=ParameterType.STRING,
+                        description="Quality level (draft, standard, premium)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="format",
+                        type=ParameterType.STRING,
+                        description="Output format (glb, gltf, fbx)",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"creative", "3d", "tripo", "generation"},
+            ),
+            ToolSpec(
+                name="creative_virtual_tryon",
+                description="Apply garment to model image using FASHN",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="garment_image",
+                        type=ParameterType.STRING,
+                        description="Garment image URL",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="model_image",
+                        type=ParameterType.STRING,
+                        description="Model/person image URL",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="category",
+                        type=ParameterType.STRING,
+                        description="Garment category (tops, bottoms, dresses)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"creative", "tryon", "fashn", "virtual"},
+            ),
+            ToolSpec(
+                name="creative_remove_background",
+                description="Remove background from image",
+                category=ToolCategory.MEDIA,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="image_url",
+                        type=ParameterType.STRING,
+                        description="Image URL to process",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="output_format",
+                        type=ParameterType.STRING,
+                        description="Output format (png, webp)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"creative", "image", "processing"},
+            ),
+            ToolSpec(
+                name="creative_upload_asset",
+                description="Upload asset to WordPress media library",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="file_url",
+                        type=ParameterType.STRING,
+                        description="Asset URL or path",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="title",
+                        type=ParameterType.STRING,
+                        description="Asset title",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="alt_text",
+                        type=ParameterType.STRING,
+                        description="Alt text for accessibility",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"creative", "asset", "wordpress", "upload"},
+            ),
+            ToolSpec(
+                name="creative_search_assets",
+                description="Search brand asset library",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="query",
+                        type=ParameterType.STRING,
+                        description="Search query",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="asset_type",
+                        type=ParameterType.STRING,
+                        description="Type filter (image, video, 3d)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="collection",
+                        type=ParameterType.STRING,
+                        description="Collection filter",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"creative", "asset", "search"},
+            ),
+        ]
+
+        for spec in creative_tools:
+            registry.register(spec)
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute creative operation"""

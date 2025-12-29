@@ -22,6 +22,26 @@ from cryptography.x509.oid import ExtensionOID, NameOID
 logger = logging.getLogger(__name__)
 
 
+def get_cert_not_valid_before(cert: x509.Certificate) -> datetime:
+    """Get certificate not_valid_before with compatibility for cryptography < 42.0"""
+    try:
+        return cert.not_valid_before_utc
+    except AttributeError:
+        # Pre-42.0: not_valid_before is naive, assume UTC
+        dt = cert.not_valid_before
+        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
+
+
+def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
+    """Get certificate not_valid_after with compatibility for cryptography < 42.0"""
+    try:
+        return cert.not_valid_after_utc
+    except AttributeError:
+        # Pre-42.0: not_valid_after is naive, assume UTC
+        dt = cert.not_valid_after
+        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
+
+
 class CertificateRevocationList:
     """Certificate Revocation List (CRL) manager"""
 
@@ -365,9 +385,10 @@ class SelfSignedCA:
             )
 
             # Check expiry with timezone-aware datetime
-
             now = datetime.now(UTC)
-            if now < cert.not_valid_before_utc or now > cert.not_valid_after_utc:
+            not_before = get_cert_not_valid_before(cert)
+            not_after = get_cert_not_valid_after(cert)
+            if now < not_before or now > not_after:
                 self.logger.error("Certificate is expired or not yet valid")
                 return False
 
@@ -413,8 +434,8 @@ class SelfSignedCA:
                 "subject": subject_attrs,
                 "issuer": issuer_attrs,
                 "serial_number": str(cert.serial_number),
-                "not_valid_before": cert.not_valid_before_utc.isoformat(),
-                "not_valid_after": cert.not_valid_after_utc.isoformat(),
+                "not_valid_before": get_cert_not_valid_before(cert).isoformat(),
+                "not_valid_after": get_cert_not_valid_after(cert).isoformat(),
                 "fingerprint": cert.fingerprint(hashes.SHA256()).hex(),
                 "is_ca": cert.extensions.get_extension_for_oid(
                     ExtensionOID.BASIC_CONSTRAINTS
@@ -659,11 +680,11 @@ class VaultCA:
 
             # Check expiry
             now = datetime.now(UTC)
-            if now < cert.not_valid_before_utc:
+            if now < get_cert_not_valid_before(cert):
                 self.logger.warning("Certificate is not yet valid")
                 return False
 
-            if now > cert.not_valid_after_utc:
+            if now > get_cert_not_valid_after(cert):
                 self.logger.warning("Certificate has expired")
                 return False
 
@@ -867,15 +888,17 @@ class CertificateValidator:
         """
 
         now = datetime.now(UTC)
-        days_until_expiry = (cert.not_valid_after_utc - now).days
+        not_after = get_cert_not_valid_after(cert)
+        not_before = get_cert_not_valid_before(cert)
+        days_until_expiry = (not_after - now).days
 
         return {
-            "is_expired": now > cert.not_valid_after_utc,
-            "not_yet_valid": now < cert.not_valid_before_utc,
+            "is_expired": now > not_after,
+            "not_yet_valid": now < not_before,
             "days_until_expiry": days_until_expiry,
             "needs_renewal": days_until_expiry < 7,
-            "not_valid_before": cert.not_valid_before_utc.isoformat(),
-            "not_valid_after": cert.not_valid_after_utc.isoformat(),
+            "not_valid_before": not_before.isoformat(),
+            "not_valid_after": not_after.isoformat(),
         }
 
     @staticmethod

@@ -31,6 +31,14 @@ from adk.base import (
     ToolDefinition,
 )
 from orchestration.prompt_engineering import PromptTechnique
+from runtime.tools import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+)
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -318,6 +326,253 @@ You are an expert marketing strategist and content creator with expertise in:
                 },
             ),
         ]
+
+    def _register_tools(self) -> None:
+        """Register marketing tools with the global ToolRegistry for MCP integration."""
+        registry = ToolRegistry.get_instance()
+
+        marketing_tools = [
+            ToolSpec(
+                name="marketing_create_content",
+                description="Create marketing content for various channels",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="content_type",
+                        type=ParameterType.STRING,
+                        description="Type (post, blog, email, ad)",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="channel",
+                        type=ParameterType.STRING,
+                        description="Target channel",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="topic",
+                        type=ParameterType.STRING,
+                        description="Content topic",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="tone",
+                        type=ParameterType.STRING,
+                        description="Tone override",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"marketing", "content", "creation"},
+            ),
+            ToolSpec(
+                name="marketing_generate_hashtags",
+                description="Generate relevant hashtags for social content",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="content",
+                        type=ParameterType.STRING,
+                        description="Content to generate hashtags for",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="platform",
+                        type=ParameterType.STRING,
+                        description="Target platform (instagram, tiktok, twitter)",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="count",
+                        type=ParameterType.INTEGER,
+                        description="Number of hashtags",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"marketing", "social", "hashtags"},
+            ),
+            ToolSpec(
+                name="marketing_schedule_post",
+                description="Schedule social media post",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="platform",
+                        type=ParameterType.STRING,
+                        description="Social platform",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="content",
+                        type=ParameterType.STRING,
+                        description="Post content",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="scheduled_time",
+                        type=ParameterType.STRING,
+                        description="ISO datetime for posting",
+                        required=True,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"marketing", "social", "schedule"},
+            ),
+            ToolSpec(
+                name="marketing_analyze_engagement",
+                description="Analyze social media engagement metrics",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="platform",
+                        type=ParameterType.STRING,
+                        description="Platform to analyze",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="time_period",
+                        type=ParameterType.STRING,
+                        description="Analysis period",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"marketing", "analytics", "engagement"},
+            ),
+            ToolSpec(
+                name="marketing_keyword_research",
+                description="Research keywords for SEO optimization",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="seed_keywords",
+                        type=ParameterType.ARRAY,
+                        description="Starting keywords for research",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="intent",
+                        type=ParameterType.STRING,
+                        description="Search intent type (informational, transactional)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"marketing", "seo", "keywords"},
+            ),
+            ToolSpec(
+                name="marketing_analyze_seo",
+                description="Analyze page SEO performance",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="url",
+                        type=ParameterType.STRING,
+                        description="Page URL to analyze",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="target_keywords",
+                        type=ParameterType.ARRAY,
+                        description="Target keywords to check",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"marketing", "seo", "analysis"},
+            ),
+            ToolSpec(
+                name="marketing_create_email",
+                description="Create email campaign content",
+                category=ToolCategory.CONTENT,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="campaign_type",
+                        type=ParameterType.STRING,
+                        description="Campaign type (welcome, promo, newsletter)",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="audience_segment",
+                        type=ParameterType.STRING,
+                        description="Target audience segment",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="goal",
+                        type=ParameterType.STRING,
+                        description="Campaign goal",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"marketing", "email", "campaign"},
+            ),
+            ToolSpec(
+                name="marketing_find_influencers",
+                description="Find brand-aligned influencers",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="niche",
+                        type=ParameterType.STRING,
+                        description="Influencer niche",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="platforms",
+                        type=ParameterType.ARRAY,
+                        description="Target platforms",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="engagement_threshold",
+                        type=ParameterType.NUMBER,
+                        description="Minimum engagement rate",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"marketing", "influencer", "search"},
+            ),
+            ToolSpec(
+                name="marketing_get_campaign_metrics",
+                description="Get campaign performance metrics",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="campaign_id",
+                        type=ParameterType.STRING,
+                        description="Campaign ID",
+                        required=True,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"marketing", "campaign", "metrics"},
+            ),
+        ]
+
+        for spec in marketing_tools:
+            registry.register(spec)
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute marketing operation"""
