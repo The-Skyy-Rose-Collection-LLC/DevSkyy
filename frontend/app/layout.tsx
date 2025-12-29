@@ -5,7 +5,6 @@
  */
 
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
 import Link from 'next/link';
 import Script from 'next/script';
 import {
@@ -19,15 +18,8 @@ import {
 } from 'lucide-react';
 import './globals.css';
 
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
-});
+// Use CSS custom properties for fonts - defined in globals.css
+// This avoids next/font build-time font fetching issues
 
 export const metadata: Metadata = {
   title: 'DevSkyy Dashboard',
@@ -52,7 +44,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en">
       <body className="min-h-screen bg-gray-50 dark:bg-gray-950 font-sans antialiased">
         {/* Google Model Viewer for 3D assets */}
         <Script

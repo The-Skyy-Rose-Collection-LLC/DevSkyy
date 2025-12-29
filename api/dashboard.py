@@ -288,6 +288,10 @@ class AgentRegistry:
 
         return DEFAULT_TOOLS.get(agent_type, [])
 
+    def list_agents(self) -> list[AgentInfo]:
+        """Get list of all agents with their info."""
+        return [self.get_agent_info(agent_type) for agent_type in AGENT_CLASSES]
+
     def update_stats(self, agent_type: str, success: bool, latency_ms: float, cost_usd: float = 0.0):
         """Update agent statistics after task execution."""
         stats = self._stats[agent_type]

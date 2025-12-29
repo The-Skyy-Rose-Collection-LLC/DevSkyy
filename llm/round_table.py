@@ -139,7 +139,7 @@ class RoundTableResult:
     entries: list[RoundTableEntry]
     top_two: list[RoundTableEntry]
     ab_test: ABTestResult | None
-    winner: RoundTableEntry
+    winner: RoundTableEntry | None
     status: CompetitionStatus
     total_duration_ms: float
     total_cost_usd: float
@@ -153,8 +153,8 @@ class RoundTableResult:
             "task_id": self.task_id,
             "prompt_hash": self.prompt_hash,
             "prompt_preview": self.prompt[:500],
-            "winner_provider": self.winner.provider.value,
-            "winner_score": self.winner.total_score,
+            "winner_provider": self.winner.provider.value if self.winner else None,
+            "winner_score": self.winner.total_score if self.winner else None,
             "runner_up_provider": self.top_two[1].provider.value if len(self.top_two) > 1 else None,
             "runner_up_score": self.top_two[1].total_score if len(self.top_two) > 1 else None,
             "all_scores": {

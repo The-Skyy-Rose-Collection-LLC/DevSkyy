@@ -31,6 +31,14 @@ from adk.base import (
     ToolDefinition,
 )
 from orchestration.prompt_engineering import PromptTechnique
+from runtime.tools import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+)
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -307,6 +315,138 @@ When analyzing or recommending, use this structure:
                 },
             ),
         ]
+
+    def _register_tools(self) -> None:
+        """Register commerce tools with the global ToolRegistry for MCP integration."""
+        registry = ToolRegistry.get_instance()
+
+        # Define commerce tool specifications
+        commerce_tools = [
+            ToolSpec(
+                name="commerce_get_product",
+                description="Get product details by SKU or ID",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
+                    ToolParameter(name="include_stock", type=ParameterType.BOOLEAN, description="Include stock info"),
+                    ToolParameter(name="include_analytics", type=ParameterType.BOOLEAN, description="Include sales analytics"),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"commerce", "product", "read"},
+            ),
+            ToolSpec(
+                name="commerce_update_product",
+                description="Update product information",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
+                    ToolParameter(name="updates", type=ParameterType.OBJECT, description="Fields to update", required=True),
+                ],
+                requires_auth=True,
+                tags={"commerce", "product", "write"},
+            ),
+            ToolSpec(
+                name="commerce_create_product",
+                description="Create a new product",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(name="name", type=ParameterType.STRING, description="Product name", required=True),
+                    ToolParameter(name="collection", type=ParameterType.STRING, description="Collection name", required=True),
+                    ToolParameter(name="price", type=ParameterType.NUMBER, description="Base price", required=True),
+                    ToolParameter(name="description", type=ParameterType.STRING, description="Product description"),
+                    ToolParameter(name="variants", type=ParameterType.ARRAY, description="Size/color variants"),
+                ],
+                requires_auth=True,
+                tags={"commerce", "product", "write"},
+            ),
+            ToolSpec(
+                name="commerce_get_inventory",
+                description="Get inventory levels for product(s)",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU (optional, all if omitted)"),
+                    ToolParameter(name="warehouse", type=ParameterType.STRING, description="Warehouse location"),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"commerce", "inventory", "read"},
+            ),
+            ToolSpec(
+                name="commerce_update_inventory",
+                description="Update product inventory levels",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
+                    ToolParameter(name="quantity", type=ParameterType.INTEGER, description="New quantity", required=True),
+                    ToolParameter(name="action", type=ParameterType.STRING, description="set, add, or subtract", required=True),
+                ],
+                requires_auth=True,
+                tags={"commerce", "inventory", "write"},
+            ),
+            ToolSpec(
+                name="commerce_forecast_demand",
+                description="Forecast product demand using ML",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
+                    ToolParameter(name="days_ahead", type=ParameterType.INTEGER, description="Forecast horizon", required=True),
+                ],
+                idempotent=True,
+                cacheable=True,
+                cache_ttl_seconds=3600,
+                tags={"commerce", "ml", "forecast"},
+            ),
+            ToolSpec(
+                name="commerce_get_order",
+                description="Get order details",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(name="order_id", type=ParameterType.STRING, description="Order ID", required=True),
+                    ToolParameter(name="include_history", type=ParameterType.BOOLEAN, description="Include order history"),
+                ],
+                idempotent=True,
+                requires_auth=True,
+                tags={"commerce", "order", "read"},
+            ),
+            ToolSpec(
+                name="commerce_update_order_status",
+                description="Update order status",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(name="order_id", type=ParameterType.STRING, description="Order ID", required=True),
+                    ToolParameter(name="status", type=ParameterType.STRING, description="New status", required=True),
+                    ToolParameter(name="notify_customer", type=ParameterType.BOOLEAN, description="Send notification"),
+                ],
+                requires_auth=True,
+                tags={"commerce", "order", "write"},
+            ),
+            ToolSpec(
+                name="commerce_calculate_price",
+                description="Calculate dynamic pricing for product",
+                category=ToolCategory.COMMERCE,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
+                    ToolParameter(name="factors", type=ParameterType.OBJECT, description="Pricing factors"),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"commerce", "pricing", "ml"},
+            ),
+        ]
+
+        for spec in commerce_tools:
+            registry.register(spec)
+            logger.debug(f"Registered commerce tool: {spec.name}")
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute commerce operation"""
