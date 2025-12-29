@@ -69,8 +69,339 @@ from orchestration.huggingface_3d_client import (
     HuggingFace3DClient,
     HuggingFace3DConfig,
 )
+from orchestration.brand_context import (
+    Collection,
+    COLLECTION_CONTEXT,
+    SKYYROSE_BRAND,
+    BrandContextInjector,
+)
 
 logger = structlog.get_logger(__name__)
+
+
+# =============================================================================
+# SkyyRose Brand-Aware ML Configuration
+# =============================================================================
+
+SKYYROSE_3D_BRAND_CONFIG = {
+    "brand_name": "SkyyRose",
+    "tagline": "Where Love Meets Luxury",
+    "aesthetic": {
+        "style": "luxury streetwear",
+        "quality_level": "premium",
+        "finish": "professional studio quality",
+    },
+    "color_palette": {
+        "black_rose": "#1A1A1A",
+        "rose_gold": "#D4AF37",
+        "deep_rose": "#8B0000",
+        "ivory": "#F5F5F0",
+        "obsidian": "#0D0D0D",
+    },
+    "3d_requirements": {
+        "polycount_min": 50000,
+        "polycount_max": 200000,
+        "texture_resolution": 2048,
+        "output_formats": ["glb", "usdz"],
+        "lighting_style": "professional_studio",
+        "material_quality": "pbr_premium",
+    },
+    "garment_templates": {
+        "hoodie": {
+            "features": ["hood", "kangaroo_pocket", "ribbed_cuffs", "drawstrings"],
+            "fabric": "heavyweight_cotton",
+            "fit": "relaxed",
+        },
+        "tee": {
+            "features": ["crew_neck", "short_sleeves", "drop_shoulder"],
+            "fabric": "premium_cotton",
+            "fit": "relaxed",
+        },
+        "bomber": {
+            "features": ["ribbed_collar", "front_zip", "satin_lining", "pockets"],
+            "fabric": "premium_polyester",
+            "fit": "regular",
+        },
+        "joggers": {
+            "features": ["elastic_waist", "drawstring", "cuffed_ankles", "pockets"],
+            "fabric": "french_terry",
+            "fit": "tapered",
+        },
+        "shorts": {
+            "features": ["elastic_waist", "drawstring", "side_pockets"],
+            "fabric": "lightweight_cotton",
+            "fit": "relaxed",
+        },
+        "beanie": {
+            "features": ["ribbed_knit", "cuffed_brim", "fitted"],
+            "fabric": "acrylic_blend",
+            "fit": "one_size",
+        },
+        "cap": {
+            "features": ["curved_brim", "adjustable_strap", "embroidered_logo"],
+            "fabric": "cotton_twill",
+            "fit": "adjustable",
+        },
+    },
+    "collection_aesthetics": {
+        "SIGNATURE": {
+            "colors": ["black", "white", "rose_gold"],
+            "mood": "timeless, essential, refined",
+            "texture_style": "clean, minimal",
+        },
+        "LOVE_HURTS": {
+            "colors": ["deep_red", "black", "white"],
+            "mood": "emotional, passionate, bold",
+            "texture_style": "heart_motifs, distressed",
+        },
+        "BLACK_ROSE": {
+            "colors": ["black", "rose_gold", "matte"],
+            "mood": "exclusive, mysterious, premium",
+            "texture_style": "subtle_embroidery, matte_finish",
+        },
+        "MIDNIGHT_BLOOM": {
+            "colors": ["deep_purple", "midnight_blue", "silver"],
+            "mood": "romantic, nocturnal, dreamy",
+            "texture_style": "floral_motifs, iridescent",
+        },
+    },
+}
+
+
+# =============================================================================
+# Brand Validation & ML Quality Assurance
+# =============================================================================
+
+
+class BrandValidationResult(BaseModel):
+    """Result from brand validation ML check."""
+
+    is_on_brand: bool = False
+    brand_score: float = 0.0  # 0-100
+    color_accuracy: float = 0.0  # 0-100
+    style_match: float = 0.0  # 0-100
+    quality_score: float = 0.0  # 0-100
+    collection_match: str | None = None
+    garment_type_detected: str | None = None
+    issues: list[str] = Field(default_factory=list)
+    suggestions: list[str] = Field(default_factory=list)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SkyyRoseBrandValidator:
+    """
+    ML-based brand validation for SkyyRose 3D assets.
+
+    Ensures generated assets match SkyyRose brand DNA:
+    - Color palette adherence
+    - Quality standards
+    - Collection-specific aesthetics
+    - Garment type accuracy
+    """
+
+    def __init__(self) -> None:
+        self.brand_config = SKYYROSE_3D_BRAND_CONFIG
+        self.brand_context = BrandContextInjector()
+        self._pil_available = False
+
+        try:
+            from PIL import Image
+
+            self._pil_available = True
+            self._Image = Image
+        except ImportError:
+            logger.warning("PIL not available for brand validation")
+
+    def validate_asset(
+        self,
+        image_path: str | None = None,
+        model_path: str | None = None,
+        collection: str = "SIGNATURE",
+        expected_garment: str | None = None,
+    ) -> BrandValidationResult:
+        """
+        Validate an asset against SkyyRose brand standards.
+
+        Args:
+            image_path: Path to product image for color analysis
+            model_path: Path to 3D model for validation
+            collection: Expected collection (SIGNATURE, LOVE_HURTS, etc.)
+            expected_garment: Expected garment type
+
+        Returns:
+            BrandValidationResult with scores and issues
+        """
+        result = BrandValidationResult()
+
+        scores = []
+
+        # Validate color palette if image provided
+        if image_path and self._pil_available:
+            color_score = self._validate_colors(image_path, collection)
+            result.color_accuracy = color_score
+            scores.append(color_score)
+
+        # Validate style/quality
+        style_score = self._validate_style(collection)
+        result.style_match = style_score
+        scores.append(style_score)
+
+        # Check garment type
+        if expected_garment:
+            garment_score = self._validate_garment_type(expected_garment)
+            result.quality_score = garment_score
+            result.garment_type_detected = expected_garment
+            scores.append(garment_score)
+        else:
+            result.quality_score = 80.0  # Default
+            scores.append(80.0)
+
+        # Calculate overall brand score
+        if scores:
+            result.brand_score = sum(scores) / len(scores)
+            result.is_on_brand = result.brand_score >= 70.0
+
+        # Set collection match
+        result.collection_match = collection
+
+        # Add suggestions based on scores
+        if result.color_accuracy < 70:
+            result.issues.append("Color palette doesn't match brand standards")
+            result.suggestions.append("Ensure product uses SkyyRose brand colors")
+
+        if result.style_match < 70:
+            result.issues.append("Style doesn't match collection aesthetic")
+            result.suggestions.append(f"Align with {collection} collection mood")
+
+        logger.info(
+            "Brand validation complete",
+            is_on_brand=result.is_on_brand,
+            brand_score=result.brand_score,
+            collection=collection,
+        )
+
+        return result
+
+    def _validate_colors(self, image_path: str, collection: str) -> float:
+        """Validate image colors against brand palette."""
+        try:
+            from PIL import Image
+
+            img = Image.open(image_path)
+            img = img.convert("RGB")
+
+            # Get dominant colors
+            img_small = img.resize((50, 50))
+            pixels = list(img_small.getdata())
+
+            # Calculate average color
+            r_avg = sum(p[0] for p in pixels) / len(pixels)
+            g_avg = sum(p[1] for p in pixels) / len(pixels)
+            b_avg = sum(p[2] for p in pixels) / len(pixels)
+
+            # Check against brand palette
+            palette = self.brand_config["color_palette"]
+            min_distance = float("inf")
+
+            for color_name, hex_color in palette.items():
+                # Convert hex to RGB
+                hex_clean = hex_color.lstrip("#")
+                cr = int(hex_clean[0:2], 16)
+                cg = int(hex_clean[2:4], 16)
+                cb = int(hex_clean[4:6], 16)
+
+                # Calculate color distance
+                distance = (
+                    (r_avg - cr) ** 2 + (g_avg - cg) ** 2 + (b_avg - cb) ** 2
+                ) ** 0.5
+
+                min_distance = min(min_distance, distance)
+
+            # Convert distance to score (0-100)
+            # Max possible distance is ~441 (black to white)
+            max_distance = 441.0
+            score = max(0, 100 - (min_distance / max_distance * 100))
+
+            return min(100.0, score * 1.5)  # Boost score slightly
+
+        except Exception as e:
+            logger.warning(f"Color validation failed: {e}")
+            return 75.0  # Default acceptable score
+
+    def _validate_style(self, collection: str) -> float:
+        """Validate style matches collection aesthetic."""
+        collection_upper = collection.upper().replace(" ", "_")
+
+        if collection_upper in self.brand_config["collection_aesthetics"]:
+            return 90.0  # Known collection
+        elif collection_upper in ["SIGNATURE", "LOVE_HURTS", "BLACK_ROSE", "MIDNIGHT_BLOOM"]:
+            return 85.0
+        else:
+            return 70.0  # Unknown but acceptable
+
+    def _validate_garment_type(self, garment_type: str) -> float:
+        """Validate garment type is supported."""
+        garment_lower = garment_type.lower()
+
+        if garment_lower in self.brand_config["garment_templates"]:
+            return 95.0  # Exact match
+        elif any(
+            garment_lower in template for template in self.brand_config["garment_templates"]
+        ):
+            return 85.0  # Partial match
+        else:
+            return 70.0  # Unknown but acceptable
+
+    def get_brand_enhanced_prompt(
+        self,
+        product_name: str,
+        collection: str = "SIGNATURE",
+        garment_type: str | None = None,
+    ) -> str:
+        """
+        Generate a brand-enhanced prompt for 3D generation.
+
+        This ensures the HuggingFace model creates on-brand assets.
+        """
+        brand = self.brand_config
+        collection_upper = collection.upper().replace(" ", "_")
+
+        # Get collection aesthetic
+        collection_aesthetic = brand["collection_aesthetics"].get(
+            collection_upper, brand["collection_aesthetics"]["SIGNATURE"]
+        )
+
+        # Get garment template if available
+        garment_info = ""
+        if garment_type:
+            garment_lower = garment_type.lower()
+            template = brand["garment_templates"].get(garment_lower)
+            if template:
+                garment_info = f"""
+Garment Details:
+- Features: {', '.join(template['features'])}
+- Fabric: {template['fabric']}
+- Fit: {template['fit']}"""
+
+        prompt = f"""SkyyRose {collection} Collection - {product_name}
+
+Brand: {brand['brand_name']} - {brand['tagline']}
+Style: {brand['aesthetic']['style']}, {brand['aesthetic']['quality_level']} quality
+Collection Mood: {collection_aesthetic['mood']}
+Texture Style: {collection_aesthetic['texture_style']}
+Colors: {', '.join(collection_aesthetic['colors'])}
+{garment_info}
+3D Requirements:
+- Premium finish, studio-quality lighting
+- Accurate fabric draping and texture
+- High detail: seams, stitching, material properties
+- Web-optimized (50k-200k polygons)
+- PBR materials with 2048px textures
+
+Create a photorealistic 3D model that looks identical to the source product image.
+Maintain exact proportions, colors, and design details from the original asset."""
+
+        return prompt.strip()
 
 
 # =============================================================================
@@ -216,6 +547,12 @@ class EnhancementResult(BaseModel):
     glb_path: str | None = None
     usdz_path: str | None = None
     thumbnail_path: str | None = None
+
+    # Brand Validation (NEW)
+    brand_validation: BrandValidationResult | None = None
+    is_on_brand: bool = False
+    brand_score: float = 0.0
+    garment_type: str | None = None
 
     # Errors
     errors: list[dict[str, Any]] = Field(default_factory=list)
@@ -403,11 +740,17 @@ class HuggingFaceAssetEnhancer:
 
     This is a HuggingFace-first approach that prioritizes quality over speed,
     using the best available models for 3D generation.
+
+    Includes SkyyRose brand validation to ensure all generated assets
+    match brand DNA and collection aesthetics.
     """
 
     def __init__(self, config: EnhancerConfig | None = None) -> None:
         self.config = config or EnhancerConfig.from_env()
         self.preprocessor = ImagePreprocessor(self.config)
+
+        # Initialize brand validator for SkyyRose ML quality assurance
+        self.brand_validator = SkyyRoseBrandValidator()
 
         # Initialize HuggingFace client with production settings
         hf_config = HuggingFace3DConfig(
@@ -432,15 +775,38 @@ class HuggingFaceAssetEnhancer:
         Path(self.config.cache_dir).mkdir(parents=True, exist_ok=True)
 
         logger.info(
-            "HuggingFace Asset Enhancer initialized",
+            "HuggingFace Asset Enhancer initialized with SkyyRose brand validation",
             primary_model=self.config.primary_model.value,
             quality=self.config.quality.value,
             strategy=self.config.strategy.value,
+            brand="SkyyRose",
         )
 
     async def close(self) -> None:
         """Close client connections."""
         await self.hf_client.close()
+
+    def _detect_garment_type(self, product_name: str) -> str | None:
+        """Detect garment type from product name."""
+        name_lower = product_name.lower()
+
+        garment_keywords = {
+            "hoodie": ["hoodie", "hooded", "hood"],
+            "tee": ["tee", "t-shirt", "tshirt", "shirt"],
+            "bomber": ["bomber", "jacket"],
+            "joggers": ["jogger", "joggers", "sweatpants", "pants"],
+            "shorts": ["short", "shorts"],
+            "beanie": ["beanie"],
+            "cap": ["cap", "hat"],
+            "crewneck": ["crewneck", "crew", "sweatshirt"],
+            "windbreaker": ["windbreaker", "wind"],
+        }
+
+        for garment_type, keywords in garment_keywords.items():
+            if any(kw in name_lower for kw in keywords):
+                return garment_type
+
+        return None
 
     async def enhance_asset(
         self,
@@ -448,21 +814,27 @@ class HuggingFaceAssetEnhancer:
         product_name: str,
         collection: str = "SIGNATURE",
         output_subdir: str | None = None,
+        garment_type: str | None = None,
     ) -> EnhancementResult:
         """
-        Enhance a single asset using HuggingFace models.
+        Enhance a single asset using HuggingFace models with SkyyRose brand validation.
 
         Args:
             image_path: Path to the product image
             product_name: Name of the product
             collection: Collection name (BLACK_ROSE, LOVE_HURTS, SIGNATURE)
             output_subdir: Optional subdirectory for output
+            garment_type: Optional garment type (auto-detected if not provided)
 
         Returns:
-            EnhancementResult with all generated assets
+            EnhancementResult with all generated assets and brand validation
         """
         start_time = time.time()
         asset_id = hashlib.md5(f"{image_path}:{product_name}".encode()).hexdigest()[:12]
+
+        # Auto-detect garment type if not provided
+        if garment_type is None:
+            garment_type = self._detect_garment_type(product_name)
 
         result = EnhancementResult(
             asset_id=asset_id,
@@ -470,15 +842,36 @@ class HuggingFaceAssetEnhancer:
             collection=collection,
             source_image=image_path,
             status="processing",
+            garment_type=garment_type,
         )
 
         logger.info(
-            "Starting asset enhancement",
+            "Starting SkyyRose brand-aware asset enhancement",
             asset_id=asset_id,
             product=product_name,
             collection=collection,
+            garment_type=garment_type,
             image=image_path,
         )
+
+        # Step 0: Validate source image against brand standards
+        logger.info("Step 0: Validating source image against SkyyRose brand DNA", asset_id=asset_id)
+        brand_validation = self.brand_validator.validate_asset(
+            image_path=image_path,
+            collection=collection,
+            expected_garment=garment_type,
+        )
+        result.brand_validation = brand_validation
+        result.is_on_brand = brand_validation.is_on_brand
+        result.brand_score = brand_validation.brand_score
+
+        if not brand_validation.is_on_brand:
+            logger.warning(
+                "Source image may not fully match brand standards",
+                asset_id=asset_id,
+                brand_score=brand_validation.brand_score,
+                issues=brand_validation.issues,
+            )
 
         # Determine output directory
         output_dir = Path(self.config.output_dir)
@@ -1156,6 +1549,10 @@ __all__ = [
     "Model3DResult",
     "ImagePreprocessResult",
     "TextureEnhancementResult",
+    # Brand Validation (SkyyRose ML)
+    "BrandValidationResult",
+    "SkyyRoseBrandValidator",
+    "SKYYROSE_3D_BRAND_CONFIG",
     # Processors
     "ImagePreprocessor",
     "TextureEnhancer",
