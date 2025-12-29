@@ -31,6 +31,14 @@ from adk.base import (
     ToolDefinition,
 )
 from orchestration.prompt_engineering import PromptTechnique
+from runtime.tools import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+)
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -406,6 +414,247 @@ You are a senior data analyst and business intelligence expert with expertise in
                 },
             ),
         ]
+
+    def _register_tools(self) -> None:
+        """Register analytics tools with the global ToolRegistry for MCP integration."""
+        registry = ToolRegistry.get_instance()
+
+        analytics_tools = [
+            ToolSpec(
+                name="analytics_generate_report",
+                description="Generate analytics report (sales, customer, product)",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="report_type",
+                        type=ParameterType.STRING,
+                        description="Report type (sales, customer, product)",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="time_period",
+                        type=ParameterType.STRING,
+                        description="Time period (daily, weekly, monthly)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="metrics",
+                        type=ParameterType.ARRAY,
+                        description="Metrics to include",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "report", "read"},
+            ),
+            ToolSpec(
+                name="analytics_get_kpi_dashboard",
+                description="Get KPI dashboard data with comparison",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="kpis",
+                        type=ParameterType.ARRAY,
+                        description="KPIs to include",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="comparison_period",
+                        type=ParameterType.STRING,
+                        description="Comparison period (WoW, MoM, YoY)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "kpi", "dashboard"},
+            ),
+            ToolSpec(
+                name="analytics_segment_customers",
+                description="Segment customers using RFM or behavioral analysis",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="method",
+                        type=ParameterType.STRING,
+                        description="Segmentation method (rfm, behavioral, demographic)",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="num_segments",
+                        type=ParameterType.INTEGER,
+                        description="Number of segments to create",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "customer", "segmentation"},
+            ),
+            ToolSpec(
+                name="analytics_forecast_sales",
+                description="Forecast future sales using ML",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="product_scope",
+                        type=ParameterType.STRING,
+                        description="Scope: all, collection, or SKU",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="horizon_days",
+                        type=ParameterType.INTEGER,
+                        description="Forecast horizon in days",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="include_seasonality",
+                        type=ParameterType.BOOLEAN,
+                        description="Include seasonal factors",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "forecast", "ml"},
+            ),
+            ToolSpec(
+                name="analytics_create_experiment",
+                description="Create A/B test experiment",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="name",
+                        type=ParameterType.STRING,
+                        description="Experiment name",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="hypothesis",
+                        type=ParameterType.STRING,
+                        description="Test hypothesis",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="primary_metric",
+                        type=ParameterType.STRING,
+                        description="Primary success metric",
+                        required=True,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"analytics", "experiment", "ab_test"},
+            ),
+            ToolSpec(
+                name="analytics_analyze_experiment",
+                description="Analyze A/B test results with statistical significance",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="experiment_id",
+                        type=ParameterType.STRING,
+                        description="Experiment ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="confidence_level",
+                        type=ParameterType.NUMBER,
+                        description="Required confidence (default 0.95)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "experiment", "analysis"},
+            ),
+            ToolSpec(
+                name="analytics_calculate_attribution",
+                description="Calculate marketing attribution by model",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="model",
+                        type=ParameterType.STRING,
+                        description="Attribution model (last_touch, first_touch, linear, time_decay)",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="conversion_window",
+                        type=ParameterType.INTEGER,
+                        description="Attribution window in days",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "attribution", "marketing"},
+            ),
+            ToolSpec(
+                name="analytics_calculate_roas",
+                description="Calculate return on ad spend by campaign",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="campaign_ids",
+                        type=ParameterType.ARRAY,
+                        description="Campaign IDs to analyze",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="time_period",
+                        type=ParameterType.STRING,
+                        description="Analysis period",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "roas", "marketing"},
+            ),
+            ToolSpec(
+                name="analytics_identify_anomalies",
+                description="Identify anomalies in metrics",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="metric",
+                        type=ParameterType.STRING,
+                        description="Metric to analyze",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="sensitivity",
+                        type=ParameterType.STRING,
+                        description="Sensitivity level (low, medium, high)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="time_period",
+                        type=ParameterType.STRING,
+                        description="Analysis period",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"analytics", "anomaly", "detection"},
+            ),
+        ]
+
+        for spec in analytics_tools:
+            registry.register(spec)
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute analytics task"""

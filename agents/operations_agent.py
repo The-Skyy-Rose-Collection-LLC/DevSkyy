@@ -31,6 +31,14 @@ from adk.base import (
     ToolDefinition,
 )
 from orchestration.prompt_engineering import PromptTechnique
+from runtime.tools import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolRegistry,
+    ToolSeverity,
+    ToolSpec,
+)
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -368,6 +376,311 @@ When diagnosing issues:
                 },
             ),
         ]
+
+    def _register_tools(self) -> None:
+        """Register operations tools with the global ToolRegistry for MCP integration."""
+        registry = ToolRegistry.get_instance()
+
+        operations_tools = [
+            ToolSpec(
+                name="operations_wp_get_status",
+                description="Get WordPress site status and health",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="include_plugins",
+                        type=ParameterType.BOOLEAN,
+                        description="Include plugin status",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="include_theme",
+                        type=ParameterType.BOOLEAN,
+                        description="Include theme info",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="include_db",
+                        type=ParameterType.BOOLEAN,
+                        description="Include database stats",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"operations", "wordpress", "health"},
+            ),
+            ToolSpec(
+                name="operations_wp_update_plugin",
+                description="Update WordPress plugin",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="plugin_slug",
+                        type=ParameterType.STRING,
+                        description="Plugin slug to update",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="version",
+                        type=ParameterType.STRING,
+                        description="Target version (latest if omitted)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="backup_first",
+                        type=ParameterType.BOOLEAN,
+                        description="Create backup before update",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"operations", "wordpress", "plugin"},
+            ),
+            ToolSpec(
+                name="operations_wp_manage_cache",
+                description="Manage WordPress caching",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.LOW,
+                parameters=[
+                    ToolParameter(
+                        name="action",
+                        type=ParameterType.STRING,
+                        description="Action: clear, enable, disable, status",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="cache_type",
+                        type=ParameterType.STRING,
+                        description="Cache type: object, page, browser, all",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"operations", "wordpress", "cache"},
+            ),
+            ToolSpec(
+                name="operations_get_server_metrics",
+                description="Get current server metrics",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="metrics",
+                        type=ParameterType.ARRAY,
+                        description="Metrics to retrieve (cpu, memory, disk)",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="time_range",
+                        type=ParameterType.STRING,
+                        description="Time range for data (1h, 24h, 7d)",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"operations", "monitoring", "metrics"},
+            ),
+            ToolSpec(
+                name="operations_get_error_logs",
+                description="Retrieve error logs",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="log_type",
+                        type=ParameterType.STRING,
+                        description="Log type: php, wordpress, access, error",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="severity",
+                        type=ParameterType.STRING,
+                        description="Minimum severity level",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="lines",
+                        type=ParameterType.INTEGER,
+                        description="Number of lines to retrieve",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"operations", "logs", "debugging"},
+            ),
+            ToolSpec(
+                name="operations_run_health_check",
+                description="Run comprehensive health check",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="checks",
+                        type=ParameterType.ARRAY,
+                        description="Specific checks to run",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="alert_threshold",
+                        type=ParameterType.STRING,
+                        description="Alert level threshold",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"operations", "health", "monitoring"},
+            ),
+            ToolSpec(
+                name="operations_deploy_code",
+                description="Deploy code changes to environment",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.HIGH,
+                parameters=[
+                    ToolParameter(
+                        name="environment",
+                        type=ParameterType.STRING,
+                        description="Target environment: staging, production",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="commit",
+                        type=ParameterType.STRING,
+                        description="Commit hash or branch",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="run_tests",
+                        type=ParameterType.BOOLEAN,
+                        description="Run tests before deploy",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"operations", "deployment", "devops"},
+            ),
+            ToolSpec(
+                name="operations_rollback_deployment",
+                description="Rollback to previous deployment",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.HIGH,
+                parameters=[
+                    ToolParameter(
+                        name="environment",
+                        type=ParameterType.STRING,
+                        description="Environment to rollback",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="target_version",
+                        type=ParameterType.STRING,
+                        description="Version to rollback to",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"operations", "rollback", "devops"},
+            ),
+            ToolSpec(
+                name="operations_create_backup",
+                description="Create site backup",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.MEDIUM,
+                parameters=[
+                    ToolParameter(
+                        name="backup_type",
+                        type=ParameterType.STRING,
+                        description="Backup type: full, database, files",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="compression",
+                        type=ParameterType.BOOLEAN,
+                        description="Compress backup",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="destination",
+                        type=ParameterType.STRING,
+                        description="Storage destination",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"operations", "backup", "data"},
+            ),
+            ToolSpec(
+                name="operations_restore_backup",
+                description="Restore from backup",
+                category=ToolCategory.SYSTEM,
+                severity=ToolSeverity.DESTRUCTIVE,
+                parameters=[
+                    ToolParameter(
+                        name="backup_id",
+                        type=ParameterType.STRING,
+                        description="Backup identifier",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="components",
+                        type=ParameterType.ARRAY,
+                        description="Components to restore",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="target_environment",
+                        type=ParameterType.STRING,
+                        description="Target environment",
+                        required=False,
+                    ),
+                ],
+                idempotent=False,
+                cacheable=False,
+                tags={"operations", "restore", "backup"},
+            ),
+            ToolSpec(
+                name="operations_analyze_performance",
+                description="Analyze site performance",
+                category=ToolCategory.AI,
+                severity=ToolSeverity.READ_ONLY,
+                parameters=[
+                    ToolParameter(
+                        name="url",
+                        type=ParameterType.STRING,
+                        description="Page URL to analyze",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="device",
+                        type=ParameterType.STRING,
+                        description="Device type: desktop, mobile",
+                        required=False,
+                    ),
+                    ToolParameter(
+                        name="include_suggestions",
+                        type=ParameterType.BOOLEAN,
+                        description="Include optimization suggestions",
+                        required=False,
+                    ),
+                ],
+                idempotent=True,
+                cacheable=True,
+                tags={"operations", "performance", "analysis"},
+            ),
+        ]
+
+        for spec in operations_tools:
+            registry.register(spec)
 
     async def execute(self, prompt: str, **kwargs) -> AgentResult:
         """Execute operations task"""
