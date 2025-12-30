@@ -21,6 +21,8 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { Logger } from '../utils/Logger.js';
 import { HotspotManager } from './HotspotManager.js';
+import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
+import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -91,6 +93,12 @@ export class BlackRoseExperience {
   private logger: Logger;
   private container: HTMLElement;
   private config: Required<BlackRoseConfig>;
+
+  // Production handlers
+  private modelLoader = getModelLoader({ cacheSizeMB: 256 });
+  private perfMonitor = getPerformanceMonitor({ showOverlay: false });
+  private loadedModels: Map<string, LoadedModel> = new Map();
+  private _isContextLost = false;
 
   // Three.js core
   private scene: THREE.Scene;
@@ -546,7 +554,12 @@ export class BlackRoseExperience {
   }
 
   public start(): void {
+    // Initialize performance monitoring
+    this.perfMonitor.attach(this.renderer, this.scene);
+    this.perfMonitor.start();
+
     const animate = (): void => {
+      this.perfMonitor.beginFrame();
       this.animationId = requestAnimationFrame(animate);
       const elapsed = this.clock.getElapsedTime();
       this.animatePetals(elapsed);
@@ -554,12 +567,14 @@ export class BlackRoseExperience {
 
       // Composer is always initialized when enableBloom is true (set in constructor)
       this.composer ? this.composer.render() : this.renderer.render(this.scene, this.camera);
+      this.perfMonitor.endFrame();
     };
     animate();
     this.logger.info('Animation started');
   }
 
   public stop(): void {
+    this.perfMonitor.stop();
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
@@ -625,6 +640,7 @@ export class BlackRoseExperience {
    * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
    */
   public handleContextLoss(): void {
+    this._isContextLost = true;
     this.logger.warn('WebGL context lost - attempting recovery');
     this.stop();
   }
@@ -633,8 +649,77 @@ export class BlackRoseExperience {
    * Handle WebGL context restoration
    */
   public handleContextRestored(): void {
+    this._isContextLost = false;
     this.logger.info('WebGL context restored');
     this.start();
+  }
+
+  // ============================================================================
+  // PRODUCTION API
+  // ============================================================================
+
+  /**
+   * Check if WebGL context is currently lost
+   */
+  public get isContextLost(): boolean {
+    return this._isContextLost;
+  }
+
+  /**
+   * Get current performance metrics
+   */
+  public getPerformanceMetrics(): PerformanceMetrics {
+    return this.perfMonitor.getMetrics();
+  }
+
+  /**
+   * Toggle performance overlay visibility
+   */
+  public showPerformanceOverlay(show: boolean): void {
+    this.perfMonitor.setConfig({ showOverlay: show });
+  }
+
+  /**
+   * Get model loader statistics
+   */
+  public getLoaderStats() {
+    return this.modelLoader.getStats();
+  }
+
+  /**
+   * Preload models for faster rendering
+   */
+  public async preloadModels(urls: string[]): Promise<void> {
+    await this.modelLoader.preload(urls);
+    this.logger.info(`Preloaded ${urls.length} models`);
+  }
+
+  /**
+   * Load a GLB model with production error handling
+   */
+  protected async loadGLBModel(
+    productId: string,
+    modelUrl: string,
+    productName: string
+  ): Promise<THREE.Object3D | null> {
+    try {
+      const loadedModel = await this.modelLoader.load(modelUrl, {
+        name: productName,
+        onProgress: (progress) => {
+          this.logger.debug(`Loading ${productName}: ${progress.percent}%`);
+        },
+      });
+      this.loadedModels.set(productId, loadedModel);
+      this.logger.info(`Loaded model: ${productName}`, {
+        triangles: loadedModel.metadata.triangleCount,
+      });
+      return loadedModel.scene;
+    } catch (error) {
+      if (error instanceof ModelLoadError) {
+        this.logger.warn(`Failed to load ${productName}: ${error.code}`);
+      }
+      return null;
+    }
   }
 
   public getScene(): THREE.Scene { return this.scene; }

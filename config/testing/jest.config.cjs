@@ -29,6 +29,9 @@ module.exports = {
   moduleNameMapper: {
     // Handle .js extensions in TypeScript imports (ESM compatibility)
     '^(\\.{1,2}/.*)\\.js$': '$1',
+    // Mock three.js modules for unit tests (rendering not needed)
+    '^three$': '<rootDir>/tests/__mocks__/three.js',
+    '^three/examples/jsm/(.*)$': '<rootDir>/tests/__mocks__/three-examples.js',
     // Path aliases
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
@@ -82,6 +85,11 @@ module.exports = {
     '/build/',
     '/.next/',
     '/.nuxt/',
+  ],
+
+  // Transform node_modules that use ESM (like three.js)
+  transformIgnorePatterns: [
+    '/node_modules/(?!(three|three/examples)/)',
   ],
 
   // Module directories
