@@ -131,7 +131,7 @@ mcp = [
     "aiohttp>=3.12.14",
     "asyncio==3.4.3",
     "aiofiles==24.1.0",
-    "orjson==3.10.12",
+    "orjson==3.11.5",
     "python-dotenv==1.0.1",
     "structlog==24.4.0",
     "loguru==0.7.2",
