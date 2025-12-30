@@ -5,17 +5,20 @@ module.exports = {
   // Test environment
   testEnvironment: 'node',
 
-  // TypeScript support - use regular preset for CJS compatibility
-  preset: 'ts-jest',
+  // TypeScript support - use ESM preset for three.js ESM imports
+  preset: 'ts-jest/presets/default-esm',
 
   // Module file extensions
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json'],
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'mjs'],
 
-  // Transform files
+  // Treat .ts and .mjs as ESM
+  extensionsToTreatAsEsm: ['.ts', '.tsx', '.mts'],
+
+  // Transform files with ESM support
   transform: {
     '^.+\\.tsx?$': ['ts-jest', {
       tsconfig: 'config/typescript/tsconfig.json',
-      // isolatedModules is set in tsconfig.json
+      useESM: true,
     }],
   },
 
@@ -30,8 +33,19 @@ module.exports = {
     // Handle .js extensions in TypeScript imports (ESM compatibility)
     '^(\\.{1,2}/.*)\\.js$': '$1',
     // Mock three.js modules for unit tests (rendering not needed)
-    '^three$': '<rootDir>/tests/__mocks__/three.js',
-    '^three/examples/jsm/(.*)$': '<rootDir>/tests/__mocks__/three-examples.js',
+    // Root-level __mocks__ folder for node_modules mocks
+    '^three$': '<rootDir>/__mocks__/three.cjs',
+    '^three/examples/jsm/controls/OrbitControls\\.js$': '<rootDir>/__mocks__/three/examples/jsm/controls/OrbitControls.js.cjs',
+    '^three/examples/jsm/postprocessing/EffectComposer\\.js$': '<rootDir>/__mocks__/three/examples/jsm/postprocessing/EffectComposer.js.cjs',
+    '^three/examples/jsm/postprocessing/RenderPass\\.js$': '<rootDir>/__mocks__/three/examples/jsm/postprocessing/RenderPass.js.cjs',
+    '^three/examples/jsm/postprocessing/UnrealBloomPass\\.js$': '<rootDir>/__mocks__/three/examples/jsm/postprocessing/UnrealBloomPass.js.cjs',
+    '^three/examples/jsm/postprocessing/BokehPass\\.js$': '<rootDir>/__mocks__/three/examples/jsm/postprocessing/BokehPass.js.cjs',
+    '^three/examples/jsm/postprocessing/OutputPass\\.js$': '<rootDir>/__mocks__/three/examples/jsm/postprocessing/OutputPass.js.cjs',
+    '^three/examples/jsm/loaders/(.*)$': '<rootDir>/tests/__mocks__/three-examples.cjs',
+    '^three/examples/jsm/libs/(.*)$': '<rootDir>/tests/__mocks__/three-examples.cjs',
+    // Mock ModelAssetLoader to avoid three.js ESM issues
+    '^.*/lib/ModelAssetLoader\\.js$': '<rootDir>/src/lib/__mocks__/ModelAssetLoader.js',
+    '^(\\.\\./)+lib/ModelAssetLoader\\.js$': '<rootDir>/src/lib/__mocks__/ModelAssetLoader.js',
     // Path aliases
     '^@/(.*)$': '<rootDir>/src/$1',
     '^@/components/(.*)$': '<rootDir>/src/components/$1',
@@ -45,8 +59,9 @@ module.exports = {
     '^@/security/(.*)$': '<rootDir>/src/security/$1',
   },
 
-  // Setup files disabled temporarily
-  // setupFilesAfterEnv: ['<rootDir>/tests/setup.js'],
+  // Setup files for three.js mocks (ESM compatibility)
+  // Use setupFiles instead of setupFilesAfterEnv for earlier mock application
+  setupFiles: ['<rootDir>/tests/setup-three-mocks.cjs'],
 
   // Coverage configuration
   collectCoverage: true,
