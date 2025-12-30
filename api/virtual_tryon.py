@@ -249,7 +249,7 @@ class TryOnJobStore:
     def __init__(self):
         """
         Initialize the in-memory job store's internal state.
-        
+
         Sets up dictionaries for tracking try-on jobs, batch jobs, and model-generation jobs, and initializes counters and timestamps used for aggregate metrics (total generated count, cumulative processing time in milliseconds, daily usage count, and the next daily reset timestamp).
         """
         self._jobs: dict[str, JobResponse] = {}
@@ -268,12 +268,12 @@ class TryOnJobStore:
     ) -> JobResponse:
         """
         Create a queued try-on job record.
-        
+
         Parameters:
             provider (TryOnProvider): The provider to execute the try-on (e.g., FASHN, IDM_VTON, ROUND_TABLE).
             category (GarmentCategory): The garment category for the job.
             metadata (dict[str, Any] | None): Optional additional metadata to attach to the job.
-        
+
         Returns:
             JobResponse: A JobResponse instance for the newly created job with status set to `QUEUED` and a creation timestamp.
         """
@@ -295,12 +295,12 @@ class TryOnJobStore:
     ) -> BatchJobResponse:
         """
         Create a batch container that groups multiple try-on jobs and registers it in the in-memory store.
-        
+
         The created BatchJobResponse will have a unique `batch_id`, initial status `QUEUED`, counts for total/completed/failed items, the provided jobs list, and a creation timestamp. The batch is stored in the job store's internal batches mapping before being returned.
-        
+
         Parameters:
             jobs (list[JobResponse]): List of individual try-on jobs to include in the batch.
-        
+
         Returns:
             BatchJobResponse: The newly created batch job object with metadata and `batch_id`.
         """
@@ -324,11 +324,11 @@ class TryOnJobStore:
     ) -> ModelGenerationResponse:
         """
         Create a queued AI model generation job for the given prompt and gender.
-        
+
         Parameters:
             prompt (str): Text prompt describing the desired model generation.
             gender (ModelGender): Target model gender.
-        
+
         Returns:
             ModelGenerationResponse: Job object containing a generated `job_id`, status `QUEUED`, the provided prompt and gender, and creation timestamp.
         """
@@ -346,7 +346,7 @@ class TryOnJobStore:
     def get_tryon_job(self, job_id: str) -> JobResponse | None:
         """
         Retrieve a try-on job by its identifier.
-        
+
         Returns:
             JobResponse: The job with the given `job_id` if it exists, `None` otherwise.
         """
@@ -355,7 +355,7 @@ class TryOnJobStore:
     def get_batch_job(self, batch_id: str) -> BatchJobResponse | None:
         """
         Retrieve a batch job by its identifier.
-        
+
         @returns BatchJobResponse if the batch exists, `None` otherwise.
         """
         return self._batches.get(batch_id)
@@ -363,10 +363,10 @@ class TryOnJobStore:
     def get_model_job(self, job_id: str) -> ModelGenerationResponse | None:
         """
         Retrieve a model generation job by its identifier.
-        
+
         Parameters:
             job_id (str): The job's unique identifier.
-        
+
         Returns:
             ModelGenerationResponse | None: The job if found, otherwise None.
         """
@@ -375,11 +375,11 @@ class TryOnJobStore:
     def update_tryon_job(self, job_id: str, **kwargs) -> JobResponse | None:
         """
         Update fields of an existing try-on job in the store.
-        
+
         Parameters:
             job_id (str): Identifier of the try-on job to update.
             **kwargs: Field names and values to set on the job; only attributes that exist on the job will be updated.
-        
+
         Returns:
             JobResponse | None: The updated job if found, `None` if no job with `job_id` exists.
         """
@@ -400,16 +400,16 @@ class TryOnJobStore:
     ) -> JobResponse | None:
         """
         Mark a try-on job as completed and record its result, processing duration, and cost.
-        
+
         Parameters:
-        	job_id (str): Identifier of the job to complete.
-        	result_url (str): Publicly accessible URL to the generated try-on image.
-        	result_path (str): Local filesystem path where the generated asset is stored.
-        	duration_ms (float): Processing duration in milliseconds.
-        	cost_usd (float): Cost in US dollars to attribute to the job (default 0.075).
-        
+            job_id (str): Identifier of the job to complete.
+            result_url (str): Publicly accessible URL to the generated try-on image.
+            result_path (str): Local filesystem path where the generated asset is stored.
+            duration_ms (float): Processing duration in milliseconds.
+            cost_usd (float): Cost in US dollars to attribute to the job (default 0.075).
+
         Returns:
-        	JobResponse | None: The updated JobResponse if the job was found and updated, `None` if no job exists with the given `job_id`.
+            JobResponse | None: The updated JobResponse if the job was found and updated, `None` if no job exists with the given `job_id`.
         """
         job = self._jobs.get(job_id)
         if job:
@@ -427,11 +427,11 @@ class TryOnJobStore:
     def fail_tryon_job(self, job_id: str, error: str) -> JobResponse | None:
         """
         Mark an existing try-on job as failed and record its error.
-        
+
         Parameters:
             job_id (str): Identifier of the try-on job to update.
             error (str): Human-readable error message describing the failure.
-        
+
         Returns:
             JobResponse | None: The updated job with status set to FAILED if found, otherwise `None`. The job's `completed_at` timestamp is set to the current UTC time.
         """
@@ -445,10 +445,10 @@ class TryOnJobStore:
     def update_batch_progress(self, batch_id: str) -> BatchJobResponse | None:
         """
         Recompute and update a batch job's progress from its constituent jobs.
-        
+
         Parameters:
             batch_id (str): Identifier of the batch to update.
-        
+
         Returns:
             BatchJobResponse | None: The updated batch object if found, `None` if no batch exists for the given id.
         """
@@ -470,10 +470,10 @@ class TryOnJobStore:
     def list_tryon_jobs(self, limit: int = 20) -> list[JobResponse]:
         """
         Retrieve recent try-on jobs ordered by creation time.
-        
+
         Parameters:
             limit (int): Maximum number of jobs to return; newest jobs are returned first.
-        
+
         Returns:
             list[JobResponse]: Jobs sorted by creation timestamp (newest first), limited to `limit`.
         """
@@ -484,7 +484,7 @@ class TryOnJobStore:
     def _increment_daily(self):
         """
         Update the internal daily counter, resetting it when the date advances (UTC).
-        
+
         Increments the store's internal `_daily_count` by one. If `_daily_reset` is unset or its UTC date is earlier than the current UTC date, `_daily_count` is reset to zero and `_daily_reset` is set to the current UTC timestamp.
         """
         now = datetime.now(UTC)
@@ -497,7 +497,7 @@ class TryOnJobStore:
     def queue_length(self) -> int:
         """
         Number of jobs currently in the queue or being processed.
-        
+
         Returns:
             count (int): Number of jobs whose status is `QUEUED` or `PROCESSING`.
         """
@@ -509,7 +509,7 @@ class TryOnJobStore:
     def avg_time_seconds(self) -> float:
         """
         Compute the average generation time in seconds.
-        
+
         Returns:
             average_time_seconds (float): Average time per completed generation in seconds. If no generations have completed yet, returns a default estimate of 12.0 seconds.
         """
@@ -521,7 +521,7 @@ class TryOnJobStore:
     def total_generated(self) -> int:
         """
         Get the total number of completed try-on generations.
-        
+
         Returns:
             int: Total completed try-on generations.
         """
@@ -531,7 +531,7 @@ class TryOnJobStore:
     def daily_used(self) -> int:
         """
         Get the number of try-on jobs completed since the last daily reset.
-        
+
         Returns:
             The count of completed try-on jobs since the most recent daily reset; zero if the reset date is unset or earlier than today.
         """
@@ -544,7 +544,7 @@ class TryOnJobStore:
     def last_generated(self) -> str | None:
         """
         Return the timestamp of the most recently completed job.
-        
+
         @returns `str` timestamp of the latest completed job (e.g., ISO 8601) or `None` if no job has completed.
         """
         completed = [j for j in self._jobs.values() if j.status == JobStatus.COMPLETED]
@@ -571,9 +571,9 @@ async def run_fashn_tryon(
 ):
     """
     Execute a FASHN provider virtual try-on job and update the in-memory job store with progress and results.
-    
+
     This runs inside a background task: it sets the job to PROCESSING, streams progress updates to the job store, invokes the FASHN try-on agent, and on success records the resulting image URL/path, duration, and cost; on failure it marks the job failed.
-    
+
     Parameters:
         job_id (str): Identifier of the try-on job to update.
         model_image_path (str): Local filesystem path to the model image.
@@ -589,7 +589,8 @@ async def run_fashn_tryon(
         job_store.update_tryon_job(job_id, status=JobStatus.PROCESSING, progress=0.1)
 
         # Import FASHN agent
-        from agents.fashn_agent import FashnTryOnAgent, GarmentCategory as FashnCategory
+        from agents.fashn_agent import FashnTryOnAgent
+        from agents.fashn_agent import GarmentCategory as FashnCategory
 
         agent = FashnTryOnAgent()
         job_store.update_tryon_job(job_id, progress=0.2)
@@ -642,9 +643,9 @@ async def run_idm_vton_tryon(
 ):
     """
     Run an IDM-VTON virtual try-on job using the HuggingFace Space and update the in-memory job store.
-    
+
     This background task calls the `yisol/IDM-VTON` Gradio space to composite `garment_image_path` onto `model_image_path`, updates job progress and status in `job_store`, and saves the resulting image to OUTPUT_DIR on success. If the `gradio_client` package is not available or the Space call fails, the job is marked as failed with an explanatory error.
-    
+
     Parameters:
         job_id (str): Identifier of the try-on job in the job store; updated for status/progress/results.
         model_image_path (str): Local filesystem path to the model/background image used by IDM-VTON.
@@ -746,9 +747,9 @@ async def run_round_table_tryon(
 ):
     """
     Run a round‑robin competition between FASHN and IDM‑VTON providers to produce a winning try-on result for a parent job.
-    
+
     Executes both provider workflows in parallel as sub-jobs, prefers FASHN's result if both succeed, and then completes the parent job with the chosen provider's result. Creates sub-jobs tied to the parent job, updates job progress and metadata with each provider's status, and marks the parent job as failed if both providers fail.
-    
+
     Parameters:
         job_id (str): Identifier of the parent try-on job to update with the competition result.
         model_image_path (str): Filesystem path to the model image used for both providers.
@@ -763,11 +764,7 @@ async def run_round_table_tryon(
     try:
         job_store.update_tryon_job(job_id, status=JobStatus.PROCESSING, progress=0.1)
 
-        # Run both providers in parallel
-        fashn_job_id = f"fashn_{job_id}"
-        idm_job_id = f"idm_{job_id}"
-
-        # Create sub-jobs
+        # Create sub-jobs for parallel execution
         fashn_job = job_store.create_tryon_job(
             TryOnProvider.FASHN, category, {"parent_job": job_id}
         )
@@ -777,8 +774,8 @@ async def run_round_table_tryon(
 
         job_store.update_tryon_job(job_id, progress=0.2)
 
-        # Run both concurrently
-        results = await asyncio.gather(
+        # Run both concurrently (results stored in job_store by background tasks)
+        await asyncio.gather(
             run_fashn_tryon(
                 fashn_job.job_id, model_image_path, garment_image_path, category, mode
             ),
@@ -836,13 +833,13 @@ async def run_fashn_model_generation(
 ):
     """
     Run a FASHN model generation job and update its stored job record.
-    
-    Executes the FASHN agent to generate an AI model image for the given prompt and gender. Updates the corresponding model job in the in-memory job_store: sets status to PROCESSING before execution, sets status to COMPLETED and populates `result_url`, `result_path`, and `completed_at` when an image is produced, or sets status to FAILED and records an error message on failure. Ensures the FASHN agent is closed after use.
+
+    Executes the FASHN agent to generate an AI model image for the given prompt and gender.
+    Updates the corresponding model job in the in-memory job_store: sets status to PROCESSING
+    before execution, sets status to COMPLETED and populates `result_url`, `result_path`, and
+    `completed_at` when an image is produced, or sets status to FAILED and records an error
+    message on failure. Ensures the FASHN agent is closed after use.
     """
-    import time
-
-    start_time = time.time()
-
     try:
         job = job_store.get_model_job(job_id)
         if job:
@@ -887,15 +884,15 @@ async def run_fashn_model_generation(
 async def download_image(url: str, job_id: str, prefix: str = "img") -> str:
     """
     Download an image from the given URL and save it to the uploads directory using a filename derived from the job id.
-    
+
     The function infers the file extension from the response Content-Type (supports image/jpeg, image/png, image/webp) and falls back to `.png` if unknown. The saved filename is `{prefix}_{job_id}{ext}` in the module's UPLOAD_DIR.
-    
+
     Parameters:
         prefix (str): Filename prefix to use; defaults to "img".
-    
+
     Returns:
         str: Filesystem path to the saved image.
-    
+
     Raises:
         httpx.HTTPError: If the HTTP request fails or returns a non-success status.
     """
@@ -930,7 +927,7 @@ async def download_image(url: str, job_id: str, prefix: str = "img") -> str:
 async def get_pipeline_status() -> PipelineStatus:
     """
     Provide current virtual try-on pipeline status including provider readiness and aggregate metrics.
-    
+
     Returns:
         pipeline_status (PipelineStatus): Current pipeline state containing provider availability and metadata (`providers`), queue length (`queue_length`), average processing time in seconds (`avg_processing_time_seconds`), timestamp of the last completed generation or `None` (`last_generated`), total completed generations (`total_generated`), configured daily limit (`daily_limit`), and today's usage count (`daily_used`).
     """
@@ -1006,7 +1003,7 @@ async def list_providers() -> list[ProviderInfo]:
 async def list_categories() -> list[dict[str, str]]:
     """
     Provide the supported garment categories.
-    
+
     Returns:
         categories (list[dict[str, str]]): A list of category objects, each with keys
             `id` (identifier), `name` (display name), and `description` (short summary).
@@ -1024,7 +1021,7 @@ async def list_categories() -> list[dict[str, str]]:
 async def list_jobs(limit: int = 20) -> list[JobResponse]:
     """
     Retrieve recent try-on jobs.
-    
+
     Returns:
         list[JobResponse]: Recent try-on jobs, up to `limit` items.
     """
@@ -1035,10 +1032,10 @@ async def list_jobs(limit: int = 20) -> list[JobResponse]:
 async def get_job(job_id: str) -> JobResponse:
     """
     Retrieve the try-on job with the given ID.
-    
+
     Returns:
         JobResponse: The try-on job matching the provided job_id.
-    
+
     Raises:
         HTTPException: with status code 404 if no job with the given ID exists.
     """
@@ -1055,18 +1052,18 @@ async def generate_tryon(
 ) -> JobResponse:
     """
     Create and queue a virtual try-on job from the provided model and garment image URLs.
-    
+
     Schedules a background task that downloads the images and executes the provider-specific try-on workflow (FASHN, IDM_VTON, or ROUND_TABLE). If image download or provider processing fails the background task will mark the job as failed; the function itself returns immediately with the created job.
-    
+
     Parameters:
-    	request (TryOnRequest): Request containing model_image_url, garment_image_url, category, mode, provider, and optional product_id.
-    	background_tasks (BackgroundTasks): FastAPI background task manager used to schedule asynchronous processing.
-    
+        request (TryOnRequest): Request containing model_image_url, garment_image_url, category, mode, provider, and optional product_id.
+        background_tasks (BackgroundTasks): FastAPI background task manager used to schedule asynchronous processing.
+
     Returns:
-    	JobResponse: The newly created job record in QUEUED state.
-    
+        JobResponse: The newly created job record in QUEUED state.
+
     Raises:
-    	HTTPException: If the requested provider is FASHN but the FASHN_API_KEY environment variable is not set.
+        HTTPException: If the requested provider is FASHN but the FASHN_API_KEY environment variable is not set.
     """
     # Validate provider
     if request.provider == TryOnProvider.FASHN and not os.getenv("FASHN_API_KEY"):
@@ -1091,7 +1088,7 @@ async def generate_tryon(
     async def run_with_download():
         """
         Download model and garment images for the current job and dispatch the selected provider's try-on workflow.
-        
+
         If both images download successfully, schedules and awaits the provider-specific try-on task (FASHN, IDM-VTON, or ROUND_TABLE) using the downloaded file paths. On any exception during download or dispatch, marks the job as failed with an error message.
         """
         try:
@@ -1127,9 +1124,9 @@ async def generate_tryon_upload(
 ) -> JobResponse:
     """
     Create a try-on job from two uploaded images, persist the files, and schedule the selected provider's background processing.
-    
+
     Validates that both uploads are images and that provider prerequisites are met, saves files to the configured upload directory, creates a queued JobResponse, and enqueues the appropriate background task to perform the try-on. May mark the job failed and raise an HTTPException on validation or save errors.
-    
+
     Parameters:
         model_image (UploadFile): Uploaded image of the model.
         garment_image (UploadFile): Uploaded image of the garment.
@@ -1137,10 +1134,10 @@ async def generate_tryon_upload(
         mode (TryOnMode): Desired quality/speed mode for providers that support it.
         provider (TryOnProvider): Selected provider to perform the try-on.
         background_tasks (BackgroundTasks): FastAPI BackgroundTasks instance used to schedule processing.
-    
+
     Returns:
         JobResponse: The created try-on job in queued state.
-    
+
     Raises:
         HTTPException: If an uploaded file is not an image, required provider configuration is missing (e.g., FASHN_API_KEY), or saving uploads fails.
     """
@@ -1207,12 +1204,12 @@ async def batch_tryon(
 ) -> BatchJobResponse:
     """
     Create and enqueue a batch of try-on jobs for a single model image.
-    
+
     Creates a BatchJobResponse containing one try-on job per garment in the request and schedules a background task that downloads the model and garment images and runs each job using the selected provider. The returned batch immediately reflects the queued jobs and their identifiers; actual processing and status updates occur asynchronously.
-    
+
     Returns:
         BatchJobResponse: The created batch container with queued jobs and metadata.
-    
+
     Raises:
         HTTPException: If the requested provider is FASHN and the `FASHN_API_KEY` environment variable is not configured.
     """
@@ -1246,13 +1243,13 @@ async def batch_tryon(
     async def run_batch():
         """
         Process a batch try-on request: download the model image, iterate garments, run provider-specific try-on jobs, and update batch progress.
-        
+
         For each garment in the batch this function:
         - downloads the garment image,
         - selects the garment category (defaults to "tops" if missing),
         - invokes the configured provider workflow (FASHN or IDM_VTON) to produce the try-on,
         - marks individual jobs as failed on per-item errors.
-        
+
         On a batch-level error it logs the exception, marks any still-queued child jobs as failed with the batch error, and updates the batch progress in the in-memory job store.
         """
         try:
@@ -1297,10 +1294,10 @@ async def batch_tryon(
 async def get_batch_job(batch_id: str) -> BatchJobResponse:
     """
     Retrieve the status of a batch try-on job.
-    
+
     Returns:
         BatchJobResponse: The batch job record containing status, counts, jobs, timestamps, and metadata.
-    
+
     Raises:
         HTTPException: With status code 404 if no batch with the given `batch_id` exists.
     """
@@ -1317,7 +1314,7 @@ async def generate_ai_model(
 ) -> ModelGenerationResponse:
     """
     Create and enqueue an AI fashion model generation job for the given prompt and gender.
-    
+
     Parameters:
         request (GenerateModelRequest): Request containing the generation `prompt` and target `gender`.
     Returns:
@@ -1344,13 +1341,13 @@ async def generate_ai_model(
 async def get_model_job(job_id: str) -> ModelGenerationResponse:
     """
     Retrieve an AI model generation job by its identifier.
-    
+
     Parameters:
         job_id (str): Unique identifier of the model generation job.
-    
+
     Returns:
         ModelGenerationResponse: The model generation job record including status, timestamps, result location, and metadata.
-    
+
     Raises:
         HTTPException: If no job exists with the given ID (404 Not Found).
     """

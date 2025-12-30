@@ -6,7 +6,6 @@ Tests for the virtual try-on router and job management.
 """
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from api.virtual_tryon import (
     GarmentCategory,
@@ -18,8 +17,6 @@ from api.virtual_tryon import (
     BatchTryOnRequest,
     GenerateModelRequest,
     JobResponse,
-    BatchJobResponse,
-    ModelGenerationResponse,
     PipelineStatus,
     ProviderInfo,
     TryOnJobStore,
@@ -255,7 +252,8 @@ class TestJobStore:
 
         job1 = store.create_tryon_job(TryOnProvider.FASHN, GarmentCategory.TOPS)
         job2 = store.create_tryon_job(TryOnProvider.FASHN, GarmentCategory.TOPS)
-        job3 = store.create_tryon_job(TryOnProvider.FASHN, GarmentCategory.TOPS)
+        # Third job stays in QUEUED state (not referenced after creation)
+        store.create_tryon_job(TryOnProvider.FASHN, GarmentCategory.TOPS)
 
         store.update_tryon_job(job1.job_id, status=JobStatus.PROCESSING)
         store.complete_tryon_job(
