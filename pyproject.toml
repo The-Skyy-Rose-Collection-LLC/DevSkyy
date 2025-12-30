@@ -203,7 +203,7 @@ ml = [
     "hyperopt==0.2.7",
     "librosa==0.10.2.post1",
     "soundfile==0.12.1",
-    "statsmodels==0.14.4",
+    "statsmodels==0.14.6",
     "prophet==1.2.1",
     "gym==0.26.2",
     "stable-baselines3==2.4.0",
