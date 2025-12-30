@@ -387,11 +387,22 @@ async def check_environment(args: argparse.Namespace) -> int:
     print("\nEnvironment Check")
     print("=" * 60)
 
+    all_ok = True
+
     # Check API token
     hf_token = os.getenv("HUGGINGFACE_API_TOKEN") or os.getenv("HF_TOKEN")
     print(f"\n  HuggingFace Token: {'✓ Set' if hf_token else '✗ NOT SET'}")
     if not hf_token:
-        print("    Set HUGGINGFACE_API_TOKEN or HF_TOKEN environment variable")
+        print("    ╭─────────────────────────────────────────────────────────╮")
+        print("    │  To get your HuggingFace token:                        │")
+        print("    │  1. Go to https://huggingface.co/settings/tokens       │")
+        print("    │  2. Create a token with 'Read' access                  │")
+        print("    │  3. Set it in your environment:                        │")
+        print("    │     export HUGGINGFACE_API_TOKEN=hf_your_token_here    │")
+        print("    │  Or add to .env file:                                  │")
+        print("    │     HUGGINGFACE_API_TOKEN=hf_your_token_here           │")
+        print("    ╰─────────────────────────────────────────────────────────╯")
+        all_ok = False
 
     # Check Python dependencies
     print("\n  Python Dependencies:")
@@ -401,8 +412,10 @@ async def check_environment(args: argparse.Namespace) -> int:
         ("structlog", "Logging"),
         ("PIL", "Image processing (Pillow)"),
         ("rembg", "Background removal"),
+        ("huggingface_hub", "HuggingFace API"),
     ]
 
+    missing_deps = []
     for module, desc in dependencies:
         try:
             if module == "PIL":
@@ -412,6 +425,32 @@ async def check_environment(args: argparse.Namespace) -> int:
             print(f"    ✓ {module} ({desc})")
         except ImportError:
             print(f"    ✗ {module} ({desc}) - NOT INSTALLED")
+            missing_deps.append(module.replace("PIL", "pillow"))
+            all_ok = False
+
+    if missing_deps:
+        print(f"\n    Install missing: pip install {' '.join(missing_deps)}")
+
+    # Check network connectivity
+    print("\n  Network Connectivity:")
+    try:
+        import aiohttp
+        async with aiohttp.ClientSession() as session:
+            try:
+                async with session.get(
+                    "https://huggingface.co/api/models?limit=1",
+                    timeout=aiohttp.ClientTimeout(total=10)
+                ) as resp:
+                    if resp.status == 200:
+                        print("    ✓ HuggingFace API reachable")
+                    else:
+                        print(f"    ○ HuggingFace API returned status {resp.status}")
+            except Exception as e:
+                print(f"    ✗ Cannot reach HuggingFace API: {type(e).__name__}")
+                print("      Check your network connection")
+                all_ok = False
+    except ImportError:
+        print("    ○ Cannot test (aiohttp not installed)")
 
     # Check directories
     print("\n  Directories:")
@@ -429,8 +468,34 @@ async def check_environment(args: argparse.Namespace) -> int:
             path.mkdir(parents=True, exist_ok=True)
             print(f"      Created directory")
 
+    # Count available assets
+    print("\n  Available Assets:")
+    product_images_path = Path("generated_assets/product_images")
+    if product_images_path.exists():
+        collections = [d for d in product_images_path.iterdir() if d.is_dir()]
+        total_assets = 0
+        for collection in collections:
+            images = list(collection.glob("*.jpg")) + list(collection.glob("*.jpeg")) + \
+                     list(collection.glob("*.png")) + list(collection.glob("*.JPG")) + \
+                     list(collection.glob("*.JPEG")) + list(collection.glob("*.PNG"))
+            count = len(images)
+            total_assets += count
+            print(f"    {collection.name}: {count} images")
+        print(f"    Total: {total_assets} assets ready for enhancement")
+    else:
+        print("    No product images directory found")
+
+    # Summary
     print("\n" + "=" * 60)
-    return 0
+    if all_ok:
+        print("  ✓ Environment ready for asset enhancement!")
+        print("\n  Run enhancement with:")
+        print("    python scripts/enhance_assets_huggingface.py all")
+    else:
+        print("  ✗ Please fix the issues above before running enhancement")
+    print("=" * 60)
+
+    return 0 if all_ok else 1
 
 
 def create_parser() -> argparse.ArgumentParser:
