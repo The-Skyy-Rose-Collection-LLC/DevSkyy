@@ -1273,43 +1273,18 @@ async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
     },
 )
 async def generate_3d_from_image(params: ThreeDImageInput) -> str:
-    """Generate 3D fashion models from reference images using Tripo3D AI.
-
-    Creates 3D models from 2D design images, sketches, or photos. Use for:
-    - Converting design sketches to 3D models
-    - Creating models from competitor products
-    - Generating 3D from customer design uploads
-    - Rapid prototyping from reference images
-
-    **Supported Input Formats:**
-    - JPEG, PNG image URLs
-    - Base64-encoded image data
-    - Multiple viewing angles for better quality
-
-    **Output Formats:**
-    - GLB (Binary glTF) - Recommended for web/AR
-    - GLTF (JSON glTF) - Human-readable
-    - FBX (Autodesk) - Professional use
-    - OBJ (Wavefront) - Universal
-    - USDZ (Apple) - iOS/macOS AR
-    - STL - 3D printing
-
-    Args:
-        params (ThreeDImageInput): Generation configuration containing:
-            - product_name: Name of the product
-            - image_url: Reference image URL or base64 data
-            - output_format: Output 3D format
-            - response_format: Output format (markdown/json)
-
+    """
+    Generate a 3D model from a reference image.
+    
+    Parameters:
+        params (ThreeDImageInput): Input containing:
+            - product_name: Human-readable name for the generated model.
+            - image_url: Reference image URL or base64-encoded image data.
+            - output_format: Desired 3D file format (e.g., "glb", "gltf", "fbx", "obj", "usdz", "stl").
+            - response_format: Desired response presentation (markdown or json).
+    
     Returns:
-        str: Generation result with model paths and URLs
-
-    Example:
-        >>> generate_3d_from_image({
-        ...     "product_name": "Custom Hoodie",
-        ...     "image_url": "https://example.com/design.jpg",
-        ...     "output_format": "glb"
-        ... })
+        str: Formatted result containing generated model URLs/paths and related metadata.
     """
     data = await _make_api_request(
         "3d/generate-from-image",
@@ -1365,54 +1340,21 @@ async def generate_3d_from_image(params: ThreeDImageInput) -> str:
     },
 )
 async def virtual_tryon(params: VirtualTryOnInput) -> str:
-    """Generate virtual try-on images for fashion products.
-
-    **INDUSTRY FIRST**: AI-powered virtual try-on for e-commerce.
-
-    Apply garments to model images using advanced AI:
-    - FASHN: Commercial API, fast and production-ready ($0.075/image)
-    - IDM-VTON: Open-source via HuggingFace, free
-    - Round Table: Both compete, returns best result
-
-    Perfect for:
-    - Product pages with "See on Model" feature
-    - Size visualization
-    - Style recommendations
-    - Customer engagement
-
-    **Garment Categories:**
-    - tops: T-shirts, blouses, shirts, sweaters
-    - bottoms: Pants, jeans, shorts, skirts
-    - dresses: Full dresses, jumpsuits
-    - outerwear: Jackets, coats, hoodies
-    - full_body: Complete outfits
-
-    **Quality Modes:**
-    - quality: Best results, ~20 seconds
-    - balanced: Good quality, ~12 seconds
-    - fast: Quick preview, ~6 seconds
-
-    Args:
-        params (VirtualTryOnInput): Try-on configuration containing:
-            - model_image_url: URL of model/person image
-            - garment_image_url: URL of garment to apply
-            - category: Garment category
-            - mode: Quality/speed tradeoff
-            - provider: fashn, idm_vton, or round_table
-            - product_id: Optional tracking ID
-            - response_format: Output format (markdown/json)
-
+    """
+    Generate a virtual try-on result that applies a garment image to a model image.
+    
+    Parameters:
+        params (VirtualTryOnInput): Configuration for the try-on request containing:
+            - model_image_url: URL of the model or person image.
+            - garment_image_url: URL of the garment to apply.
+            - category: Garment category (e.g., "tops", "bottoms", "dresses", "outerwear", "full_body").
+            - mode: Quality/speed tradeoff ("quality", "balanced", "fast").
+            - provider: Rendering provider ("fashn", "idm_vton", "round_table").
+            - product_id: Optional product tracking identifier.
+            - response_format: Desired output format (markdown or json).
+    
     Returns:
-        str: Job status with result URL when complete
-
-    Example:
-        >>> virtual_tryon({
-        ...     "model_image_url": "https://example.com/model.jpg",
-        ...     "garment_image_url": "https://example.com/hoodie.jpg",
-        ...     "category": "tops",
-        ...     "mode": "balanced",
-        ...     "provider": "fashn"
-        ... })
+        str: Formatted response string with the job status and result URL(s) when available; includes error information when the request fails.
     """
     data = await _make_api_request(
         "virtual-tryon/generate",
@@ -1455,44 +1397,19 @@ async def virtual_tryon(params: VirtualTryOnInput) -> str:
     },
 )
 async def batch_virtual_tryon(params: BatchVirtualTryOnInput) -> str:
-    """Process multiple garments on the same model in batch.
-
-    Efficiently generate try-on images for multiple products:
-    - Same model image applied to multiple garments
-    - Concurrent processing (up to 5 parallel)
-    - Progress tracking per item
-    - Cost optimization for bulk operations
-
-    Ideal for:
-    - Product catalog generation
-    - Collection launches
-    - Inventory photography
-    - Bulk content creation
-
-    Args:
+    """
+    Process a batch of garments on a single model image and return the formatted results.
+    
+    Parameters:
         params (BatchVirtualTryOnInput): Batch configuration containing:
-            - model_image_url: Single model image URL
-            - garments: List of garment objects with:
-                - garment_image_url: URL of garment
-                - category: tops, bottoms, etc.
-                - product_id: Optional tracking ID
-            - mode: Quality/speed tradeoff
-            - provider: fashn or idm_vton
-            - response_format: Output format
-
+            - model_image_url: URL of the model image to apply garments to.
+            - garments: List of garment objects, each with `garment_image_url`, `category`, and optional `product_id`.
+            - mode: Processing quality/speed preference (`quality`, `balanced`, or `fast`).
+            - provider: Service provider to use (`fashn` or `idm_vton`).
+            - response_format: Desired output format (`ResponseFormat`) for the returned string.
+    
     Returns:
-        str: Batch job status with individual results
-
-    Example:
-        >>> batch_virtual_tryon({
-        ...     "model_image_url": "https://example.com/model.jpg",
-        ...     "garments": [
-        ...         {"garment_image_url": "https://example.com/shirt.jpg", "category": "tops"},
-        ...         {"garment_image_url": "https://example.com/pants.jpg", "category": "bottoms"}
-        ...     ],
-        ...     "mode": "balanced",
-        ...     "provider": "fashn"
-        ... })
+        str: Batch job status with individual item results formatted according to `params.response_format`.
     """
     data = await _make_api_request(
         "virtual-tryon/batch",
@@ -1537,41 +1454,18 @@ async def batch_virtual_tryon(params: BatchVirtualTryOnInput) -> str:
     },
 )
 async def generate_ai_model(params: AIModelGenerationInput) -> str:
-    """Generate AI fashion model images for virtual try-on.
-
-    Create realistic fashion model images using AI:
-    - No need for expensive photoshoots
-    - Consistent model appearances
-    - Diverse representation
-    - Perfect for try-on workflows
-
-    **Styles:**
-    - professional: Clean studio photography
-    - casual: Relaxed, everyday settings
-    - editorial: High-fashion, dramatic
-    - street: Urban, streetwear focused
-
-    **Gender Options:**
-    - female, male, neutral (androgynous)
-
-    Generated models can be used with virtual_tryon tool.
-
-    Args:
-        params (AIModelGenerationInput): Generation configuration containing:
-            - prompt: Description of desired model
-            - gender: female, male, or neutral
-            - style: professional, casual, editorial, street
-            - response_format: Output format
-
+    """
+    Generate an AI fashion model image from the provided prompt, gender, and style.
+    
+    Parameters:
+        params (AIModelGenerationInput): Generation configuration with:
+            - prompt: Description of the desired model and pose.
+            - gender: "female", "male", or "neutral".
+            - style: "professional", "casual", "editorial", or "street".
+            - response_format: Desired output format (markdown or json).
+    
     Returns:
-        str: Generation job with result image URL
-
-    Example:
-        >>> generate_ai_model({
-        ...     "prompt": "Professional fashion model, full body",
-        ...     "gender": "female",
-        ...     "style": "professional"
-        ... })
+        str: Formatted response containing the generation result and the image URL or error details.
     """
     data = await _make_api_request(
         "virtual-tryon/models/generate",
@@ -1599,28 +1493,16 @@ async def generate_ai_model(params: AIModelGenerationInput) -> str:
     },
 )
 async def virtual_tryon_status(response_format: ResponseFormat = ResponseFormat.MARKDOWN) -> str:
-    """Get virtual try-on pipeline status and provider availability.
-
-    Check the health and availability of virtual try-on services:
-    - Provider status (FASHN, IDM-VTON)
-    - Queue length and processing times
-    - Daily usage and limits
-    - Cost estimates
-
-    Use this to:
-    - Verify API keys are configured
-    - Check service availability
-    - Monitor usage quotas
-    - Plan batch operations
-
-    Args:
-        response_format: Output format (markdown or json)
-
+    """
+    Get virtual try-on pipeline status and provider availability.
+    
+    Returns a formatted status report containing provider health, queue metrics, daily usage and limits, and cost estimates.
+    
+    Parameters:
+        response_format (ResponseFormat): Output format (`markdown` or `json`).
+    
     Returns:
-        str: Pipeline status with provider details
-
-    Example:
-        >>> virtual_tryon_status()
+        str: Formatted pipeline status report.
     """
     data = await _make_api_request("virtual-tryon/status", method="GET")
 
