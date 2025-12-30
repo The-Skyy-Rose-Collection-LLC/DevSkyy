@@ -71,7 +71,7 @@ lime==0.2.0.1
 
 # Data processing
 polars==1.15.0
-pyarrow==18.1.0
+pyarrow==22.0.0
 
 # Async ML
 asyncio==3.4.3
