@@ -24,7 +24,7 @@ aiohttp>=3.12.14  # Fixed: CVE-2025-53643 (HTTP request smuggling)
 
 # Async support
 asyncio==3.4.3
-aiofiles==24.1.0
+aiofiles==25.1.0
 
 # JSON handling
 orjson==3.11.5
