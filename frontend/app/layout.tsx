@@ -7,6 +7,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 import {
   LayoutDashboard,
   Bot,
@@ -102,6 +103,7 @@ export default function RootLayout({
           {/* Main Content */}
           <main className="ml-64 flex-1 p-8">{children}</main>
         </div>
+        <SpeedInsights />
       </body>
     </html>
   );
