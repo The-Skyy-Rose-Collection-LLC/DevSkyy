@@ -59,7 +59,7 @@ soundfile==0.12.1
 
 # Time series
 statsmodels==0.14.4
-prophet==1.1.6
+prophet==1.2.1
 
 # Reinforcement learning
 gym==0.26.2
