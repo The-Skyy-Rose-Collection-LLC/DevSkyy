@@ -1419,7 +1419,7 @@ class TextureEnhancer:
 
             # Call HuggingFace API
             session = await self._get_session()
-            url = f"https://api-inference.huggingface.co/models/{model_id}"
+            url = f"https://router.huggingface.co/hf-inference/models/{model_id}"
 
             async with session.post(
                 url,
