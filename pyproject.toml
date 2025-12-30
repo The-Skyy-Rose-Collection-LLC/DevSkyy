@@ -130,7 +130,7 @@ mcp = [
     "httpx>=0.28.1",
     "aiohttp>=3.12.14",
     "asyncio==3.4.3",
-    "aiofiles==24.1.0",
+    "aiofiles==25.1.0",
     "orjson==3.11.5",
     "python-dotenv==1.0.1",
     "structlog==25.5.0",

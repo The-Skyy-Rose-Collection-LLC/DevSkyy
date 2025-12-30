@@ -52,7 +52,7 @@ orjson==3.11.5
 python-dateutil==2.9.0.post0
 
 # File handling
-aiofiles==24.1.0
+aiofiles==25.1.0
 
 # Background tasks
 celery==5.4.0
