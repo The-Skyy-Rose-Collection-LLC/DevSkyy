@@ -338,6 +338,78 @@ class ThreeDImageInput(BaseAgentInput):
     )
 
 
+class VirtualTryOnInput(BaseAgentInput):
+    """Input for virtual try-on generation."""
+
+    model_image_url: str = Field(
+        ...,
+        description="URL of the model/person image to apply garment to",
+        max_length=2000,
+    )
+    garment_image_url: str = Field(
+        ...,
+        description="URL of the garment image to apply",
+        max_length=2000,
+    )
+    category: Literal["tops", "bottoms", "dresses", "outerwear", "full_body"] = Field(
+        default="tops",
+        description="Garment category for proper placement",
+    )
+    mode: Literal["quality", "balanced", "fast"] = Field(
+        default="balanced",
+        description="Quality/speed tradeoff: quality (~20s), balanced (~12s), fast (~6s)",
+    )
+    provider: Literal["fashn", "idm_vton", "round_table"] = Field(
+        default="fashn",
+        description="Try-on provider: fashn (commercial), idm_vton (free), round_table (both compete)",
+    )
+    product_id: str | None = Field(
+        default=None,
+        description="Optional product ID for tracking",
+        max_length=100,
+    )
+
+
+class BatchVirtualTryOnInput(BaseAgentInput):
+    """Input for batch virtual try-on generation."""
+
+    model_image_url: str = Field(
+        ...,
+        description="URL of the model/person image (same for all garments)",
+        max_length=2000,
+    )
+    garments: list[dict[str, Any]] = Field(
+        ...,
+        description="List of garments: [{garment_image_url, category, product_id}, ...]",
+    )
+    mode: Literal["quality", "balanced", "fast"] = Field(
+        default="balanced",
+        description="Quality/speed tradeoff",
+    )
+    provider: Literal["fashn", "idm_vton"] = Field(
+        default="fashn",
+        description="Try-on provider to use",
+    )
+
+
+class AIModelGenerationInput(BaseAgentInput):
+    """Input for AI fashion model generation."""
+
+    prompt: str = Field(
+        default="Professional fashion model in studio",
+        description="Description of the model to generate",
+        max_length=500,
+    )
+    gender: Literal["female", "male", "neutral"] = Field(
+        default="neutral",
+        description="Model gender",
+    )
+    style: Literal["professional", "casual", "editorial", "street"] = Field(
+        default="professional",
+        description="Photography style",
+    )
+
+
 class MarketingCampaignInput(BaseAgentInput):
     """Input for marketing campaign operations."""
 
@@ -1253,6 +1325,309 @@ async def generate_3d_from_image(params: ThreeDImageInput) -> str:
 
 
 # ===========================
+# Virtual Try-On Tools
+# ===========================
+
+
+@mcp.tool(
+    name="devskyy_virtual_tryon",
+    annotations={
+        "title": "DevSkyy Virtual Try-On",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+        # Advanced Tool Use: Deferred + PTC for batch operations
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "model_image_url": "https://cdn.skyyrose.co/models/model-front-001.jpg",
+                "garment_image_url": "https://cdn.skyyrose.co/products/black-rose-hoodie.jpg",
+                "category": "tops",
+                "mode": "balanced",
+                "provider": "fashn",
+            },
+            {
+                "model_image_url": "https://example.com/model.jpg",
+                "garment_image_url": "https://example.com/dress.jpg",
+                "category": "dresses",
+                "mode": "quality",
+                "provider": "idm_vton",
+            },
+            {
+                "model_image_url": "https://example.com/model.jpg",
+                "garment_image_url": "https://example.com/jacket.jpg",
+                "category": "outerwear",
+                "provider": "round_table",
+            },
+        ],
+    },
+)
+async def virtual_tryon(params: VirtualTryOnInput) -> str:
+    """Generate virtual try-on images for fashion products.
+
+    **INDUSTRY FIRST**: AI-powered virtual try-on for e-commerce.
+
+    Apply garments to model images using advanced AI:
+    - FASHN: Commercial API, fast and production-ready ($0.075/image)
+    - IDM-VTON: Open-source via HuggingFace, free
+    - Round Table: Both compete, returns best result
+
+    Perfect for:
+    - Product pages with "See on Model" feature
+    - Size visualization
+    - Style recommendations
+    - Customer engagement
+
+    **Garment Categories:**
+    - tops: T-shirts, blouses, shirts, sweaters
+    - bottoms: Pants, jeans, shorts, skirts
+    - dresses: Full dresses, jumpsuits
+    - outerwear: Jackets, coats, hoodies
+    - full_body: Complete outfits
+
+    **Quality Modes:**
+    - quality: Best results, ~20 seconds
+    - balanced: Good quality, ~12 seconds
+    - fast: Quick preview, ~6 seconds
+
+    Args:
+        params (VirtualTryOnInput): Try-on configuration containing:
+            - model_image_url: URL of model/person image
+            - garment_image_url: URL of garment to apply
+            - category: Garment category
+            - mode: Quality/speed tradeoff
+            - provider: fashn, idm_vton, or round_table
+            - product_id: Optional tracking ID
+            - response_format: Output format (markdown/json)
+
+    Returns:
+        str: Job status with result URL when complete
+
+    Example:
+        >>> virtual_tryon({
+        ...     "model_image_url": "https://example.com/model.jpg",
+        ...     "garment_image_url": "https://example.com/hoodie.jpg",
+        ...     "category": "tops",
+        ...     "mode": "balanced",
+        ...     "provider": "fashn"
+        ... })
+    """
+    data = await _make_api_request(
+        "virtual-tryon/generate",
+        method="POST",
+        data={
+            "model_image_url": params.model_image_url,
+            "garment_image_url": params.garment_image_url,
+            "category": params.category,
+            "mode": params.mode,
+            "provider": params.provider,
+            "product_id": params.product_id,
+        },
+    )
+
+    return _format_response(data, params.response_format, "Virtual Try-On Generated")
+
+
+@mcp.tool(
+    name="devskyy_batch_virtual_tryon",
+    annotations={
+        "title": "DevSkyy Batch Virtual Try-On",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+        "defer_loading": True,
+        "allowed_callers": [PTC_CALLER],
+        "input_examples": [
+            {
+                "model_image_url": "https://cdn.skyyrose.co/models/model-001.jpg",
+                "garments": [
+                    {"garment_image_url": "https://cdn.skyyrose.co/products/hoodie.jpg", "category": "tops", "product_id": "SKR-001"},
+                    {"garment_image_url": "https://cdn.skyyrose.co/products/jacket.jpg", "category": "outerwear", "product_id": "SKR-002"},
+                    {"garment_image_url": "https://cdn.skyyrose.co/products/tee.jpg", "category": "tops", "product_id": "SKR-003"},
+                ],
+                "mode": "balanced",
+                "provider": "fashn",
+            },
+        ],
+    },
+)
+async def batch_virtual_tryon(params: BatchVirtualTryOnInput) -> str:
+    """Process multiple garments on the same model in batch.
+
+    Efficiently generate try-on images for multiple products:
+    - Same model image applied to multiple garments
+    - Concurrent processing (up to 5 parallel)
+    - Progress tracking per item
+    - Cost optimization for bulk operations
+
+    Ideal for:
+    - Product catalog generation
+    - Collection launches
+    - Inventory photography
+    - Bulk content creation
+
+    Args:
+        params (BatchVirtualTryOnInput): Batch configuration containing:
+            - model_image_url: Single model image URL
+            - garments: List of garment objects with:
+                - garment_image_url: URL of garment
+                - category: tops, bottoms, etc.
+                - product_id: Optional tracking ID
+            - mode: Quality/speed tradeoff
+            - provider: fashn or idm_vton
+            - response_format: Output format
+
+    Returns:
+        str: Batch job status with individual results
+
+    Example:
+        >>> batch_virtual_tryon({
+        ...     "model_image_url": "https://example.com/model.jpg",
+        ...     "garments": [
+        ...         {"garment_image_url": "https://example.com/shirt.jpg", "category": "tops"},
+        ...         {"garment_image_url": "https://example.com/pants.jpg", "category": "bottoms"}
+        ...     ],
+        ...     "mode": "balanced",
+        ...     "provider": "fashn"
+        ... })
+    """
+    data = await _make_api_request(
+        "virtual-tryon/batch",
+        method="POST",
+        data={
+            "model_image_url": params.model_image_url,
+            "garments": params.garments,
+            "mode": params.mode,
+            "provider": params.provider,
+        },
+    )
+
+    return _format_response(data, params.response_format, "Batch Virtual Try-On")
+
+
+@mcp.tool(
+    name="devskyy_generate_ai_model",
+    annotations={
+        "title": "DevSkyy AI Fashion Model Generator",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+        "defer_loading": True,
+        "input_examples": [
+            {
+                "prompt": "Professional fashion model, studio lighting, full body shot",
+                "gender": "female",
+                "style": "professional",
+            },
+            {
+                "prompt": "Casual street style model, urban background",
+                "gender": "male",
+                "style": "street",
+            },
+            {
+                "prompt": "Editorial fashion model, high fashion pose, dramatic lighting",
+                "gender": "neutral",
+                "style": "editorial",
+            },
+        ],
+    },
+)
+async def generate_ai_model(params: AIModelGenerationInput) -> str:
+    """Generate AI fashion model images for virtual try-on.
+
+    Create realistic fashion model images using AI:
+    - No need for expensive photoshoots
+    - Consistent model appearances
+    - Diverse representation
+    - Perfect for try-on workflows
+
+    **Styles:**
+    - professional: Clean studio photography
+    - casual: Relaxed, everyday settings
+    - editorial: High-fashion, dramatic
+    - street: Urban, streetwear focused
+
+    **Gender Options:**
+    - female, male, neutral (androgynous)
+
+    Generated models can be used with virtual_tryon tool.
+
+    Args:
+        params (AIModelGenerationInput): Generation configuration containing:
+            - prompt: Description of desired model
+            - gender: female, male, or neutral
+            - style: professional, casual, editorial, street
+            - response_format: Output format
+
+    Returns:
+        str: Generation job with result image URL
+
+    Example:
+        >>> generate_ai_model({
+        ...     "prompt": "Professional fashion model, full body",
+        ...     "gender": "female",
+        ...     "style": "professional"
+        ... })
+    """
+    data = await _make_api_request(
+        "virtual-tryon/models/generate",
+        method="POST",
+        data={
+            "prompt": params.prompt,
+            "gender": params.gender,
+            "style": params.style,
+        },
+    )
+
+    return _format_response(data, params.response_format, "AI Fashion Model Generated")
+
+
+@mcp.tool(
+    name="devskyy_virtual_tryon_status",
+    annotations={
+        "title": "DevSkyy Virtual Try-On Status",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+        # Always loaded for status checks
+        "defer_loading": False,
+    },
+)
+async def virtual_tryon_status(response_format: ResponseFormat = ResponseFormat.MARKDOWN) -> str:
+    """Get virtual try-on pipeline status and provider availability.
+
+    Check the health and availability of virtual try-on services:
+    - Provider status (FASHN, IDM-VTON)
+    - Queue length and processing times
+    - Daily usage and limits
+    - Cost estimates
+
+    Use this to:
+    - Verify API keys are configured
+    - Check service availability
+    - Monitor usage quotas
+    - Plan batch operations
+
+    Args:
+        response_format: Output format (markdown or json)
+
+    Returns:
+        str: Pipeline status with provider details
+
+    Example:
+        >>> virtual_tryon_status()
+    """
+    data = await _make_api_request("virtual-tryon/status", method="GET")
+
+    return _format_response(data, response_format, "Virtual Try-On Pipeline Status")
+
+
+# ===========================
 # Marketing Tools
 # ===========================
 
@@ -1612,6 +1987,10 @@ if __name__ == "__main__":
    â€¢ devskyy_dynamic_pricing - ML-powered price optimization
    â€¢ devskyy_generate_3d_from_description - 3D generation (text-to-3D)
    â€¢ devskyy_generate_3d_from_image - 3D generation (image-to-3D)
+   â€¢ devskyy_virtual_tryon - Virtual try-on for fashion products
+   â€¢ devskyy_batch_virtual_tryon - Batch virtual try-on processing
+   â€¢ devskyy_generate_ai_model - AI fashion model generation
+   â€¢ devskyy_virtual_tryon_status - Try-on pipeline status
    â€¢ devskyy_marketing_campaign - Multi-channel marketing automation
    â€¢ devskyy_multi_agent_workflow - Complex workflow orchestration
    â€¢ devskyy_system_monitoring - Real-time platform monitoring

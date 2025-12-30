@@ -43,6 +43,23 @@ from .versioning import (
     version_router,
     versioned,
 )
+from .virtual_tryon import (
+    BatchJobResponse,  # Enums; Models; Store; Router
+    BatchTryOnRequest,
+    GarmentCategory,
+    GenerateModelRequest,
+    JobResponse,
+    JobStatus,
+    ModelGender,
+    ModelGenerationResponse,
+    PipelineStatus,
+    ProviderInfo,
+    TryOnJobStore,
+    TryOnMode,
+    TryOnProvider,
+    TryOnRequest,
+    virtual_tryon_router,
+)
 from .webhooks import (
     DeliveryStatus,  # Config; Models; Classes; Instances; Router
     WebhookConfig,
@@ -103,4 +120,20 @@ __all__ = [
     "AgentService",
     "agent_service",
     "agents_router",
+    # Virtual Try-On
+    "GarmentCategory",
+    "TryOnMode",
+    "TryOnProvider",
+    "JobStatus",
+    "ModelGender",
+    "TryOnRequest",
+    "BatchTryOnRequest",
+    "GenerateModelRequest",
+    "JobResponse",
+    "BatchJobResponse",
+    "ModelGenerationResponse",
+    "PipelineStatus",
+    "ProviderInfo",
+    "TryOnJobStore",
+    "virtual_tryon_router",
 ]
