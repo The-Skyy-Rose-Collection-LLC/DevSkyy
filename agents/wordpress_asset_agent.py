@@ -60,14 +60,24 @@ logger = logging.getLogger(__name__)
 class WordPressAssetConfig:
     """WordPress asset management configuration."""
 
-    # WordPress REST API
-    site_url: str = field(default_factory=lambda: os.getenv("WP_SITE_URL", ""))
-    username: str = field(default_factory=lambda: os.getenv("WP_USERNAME", ""))
-    app_password: str = field(default_factory=lambda: os.getenv("WP_APP_PASSWORD", ""))
+    # WordPress REST API (support both naming conventions)
+    site_url: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_URL", os.getenv("WP_SITE_URL", ""))
+    )
+    username: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_USERNAME", os.getenv("WP_USERNAME", ""))
+    )
+    app_password: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_APP_PASSWORD", os.getenv("WP_APP_PASSWORD", ""))
+    )
 
-    # WooCommerce REST API
-    wc_consumer_key: str = field(default_factory=lambda: os.getenv("WC_CONSUMER_KEY", ""))
-    wc_consumer_secret: str = field(default_factory=lambda: os.getenv("WC_CONSUMER_SECRET", ""))
+    # WooCommerce REST API (support both naming conventions)
+    wc_consumer_key: str = field(
+        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", os.getenv("WC_CONSUMER_KEY", ""))
+    )
+    wc_consumer_secret: str = field(
+        default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", os.getenv("WC_CONSUMER_SECRET", ""))
+    )
 
     # Settings
     timeout: float = 60.0
@@ -83,11 +93,11 @@ class WordPressAssetConfig:
     def from_env(cls) -> WordPressAssetConfig:
         """Create config from environment variables."""
         return cls(
-            site_url=os.getenv("WP_SITE_URL", ""),
-            username=os.getenv("WP_USERNAME", ""),
-            app_password=os.getenv("WP_APP_PASSWORD", ""),
-            wc_consumer_key=os.getenv("WC_CONSUMER_KEY", ""),
-            wc_consumer_secret=os.getenv("WC_CONSUMER_SECRET", ""),
+            site_url=os.getenv("WORDPRESS_URL", os.getenv("WP_SITE_URL", "")),
+            username=os.getenv("WORDPRESS_USERNAME", os.getenv("WP_USERNAME", "")),
+            app_password=os.getenv("WORDPRESS_APP_PASSWORD", os.getenv("WP_APP_PASSWORD", "")),
+            wc_consumer_key=os.getenv("WOOCOMMERCE_KEY", os.getenv("WC_CONSUMER_KEY", "")),
+            wc_consumer_secret=os.getenv("WOOCOMMERCE_SECRET", os.getenv("WC_CONSUMER_SECRET", "")),
         )
 
 

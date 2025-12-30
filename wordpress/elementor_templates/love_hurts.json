@@ -91,7 +91,7 @@
               "widgetType": "video",
               "settings": {
                 "video_type": "hosted",
-                "hosted_url": "https://skyyrose.local/experiences/love_hurts-collection/",
+                "hosted_url": "/experiences/love-hurts/",
                 "controls": "yes",
                 "autoplay": "no",
                 "loop": "yes",
