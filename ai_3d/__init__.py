@@ -1,34 +1,38 @@
+# ai_3d/__init__.py
 """
-AI 3D Module
-============
+AI-Powered 3D Generation Module for DevSkyy.
 
-AI-powered 3D model generation and validation for production.
-
-Components:
-- AI3DModelGenerator: Generate 3D models from 2D product images
-- VirtualPhotoshootGenerator: Generate lifestyle product imagery
-- ModelFidelityValidator: Validate 3D model accuracy
-
-Author: DevSkyy Platform Team
-Version: 1.0.0
+This module provides:
+- Image-to-3D model generation
+- Text-to-3D model generation
+- 3D model enhancement and refinement
+- Multi-provider support (Tripo3D, HuggingFace, Meshy)
+- Quality validation with 95% fidelity enforcement
 """
 
-from ai_3d.model_generator import (
-    AI3DModelGenerator,
-    GeneratedModel,
-    ModelGenerationError,
+from ai_3d.generation_pipeline import (
+    GenerationConfig,
+    GenerationResult,
+    ThreeDGenerationPipeline,
+    ThreeDProvider,
 )
-from ai_3d.virtual_photoshoot import (
-    GeneratedPhotoshoot,
-    PhotoshootScene,
-    VirtualPhotoshootGenerator,
+from ai_3d.providers.huggingface import HuggingFace3DClient
+from ai_3d.providers.tripo import TripoClient
+from ai_3d.quality_enhancer import (
+    EnhancementConfig,
+    ModelQualityEnhancer,
 )
 
 __all__ = [
-    "AI3DModelGenerator",
-    "GeneratedModel",
-    "ModelGenerationError",
-    "VirtualPhotoshootGenerator",
-    "PhotoshootScene",
-    "GeneratedPhotoshoot",
+    # Pipeline
+    "ThreeDGenerationPipeline",
+    "GenerationConfig",
+    "GenerationResult",
+    "ThreeDProvider",
+    # Providers
+    "TripoClient",
+    "HuggingFace3DClient",
+    # Enhancement
+    "ModelQualityEnhancer",
+    "EnhancementConfig",
 ]
