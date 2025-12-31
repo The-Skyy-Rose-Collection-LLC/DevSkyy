@@ -15,6 +15,8 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Logger } from '../utils/Logger.js';
+import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
+import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
 
 export interface RunwayProduct {
   id: string;
@@ -49,12 +51,20 @@ export class RunwayExperience {
   private controls: OrbitControls;
   private config: Required<RunwayConfig>;
   private animationId: number | null = null;
+
+  // Production handlers
+  private modelLoader = getModelLoader({ cacheSizeMB: 256 });
+  private perfMonitor = getPerformanceMonitor({ showOverlay: false });
+  private loadedModels: Map<string, LoadedModel> = new Map();
+  private _isContextLost = false;
+  private container: HTMLElement;
   private models: THREE.Object3D[] = [];
   private currentModelIndex: number = 0;
   private walkProgress: number = 0;
   private isWalking: boolean = false;
 
   constructor(container: HTMLElement, config: RunwayConfig = {}) {
+    this.container = container;
     this.logger = new Logger('RunwayExperience');
     this.config = { ...DEFAULT_CONFIG, ...config };
 
@@ -211,26 +221,35 @@ export class RunwayExperience {
   }
 
   public start(): void {
+    // Initialize performance monitoring
+    this.perfMonitor.attach(this.renderer, this.scene);
+    this.perfMonitor.start();
+
     const animate = (): void => {
+      this.perfMonitor.beginFrame();
       this.animationId = requestAnimationFrame(animate);
       this.updateWalk();
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
+      this.perfMonitor.endFrame();
     };
     animate();
   }
 
   public stop(): void {
+    this.perfMonitor.stop();
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
   }
 
-  public handleResize(width: number, height: number): void {
-    this.camera.aspect = width / height;
+  public handleResize(width?: number, height?: number): void {
+    const w = width ?? this.container.clientWidth;
+    const h = height ?? this.container.clientHeight;
+    this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
-    this.renderer.setSize(width, height);
+    this.renderer.setSize(w, h);
   }
 
   public dispose(): void {
@@ -274,6 +293,7 @@ export class RunwayExperience {
    * Handle WebGL context loss - prevents crashes on mobile/low-memory devices
    */
   public handleContextLoss(): void {
+    this._isContextLost = true;
     this.logger.warn('WebGL context lost - attempting recovery');
     this.stop();
   }
@@ -282,9 +302,81 @@ export class RunwayExperience {
    * Handle WebGL context restoration
    */
   public handleContextRestored(): void {
+    this._isContextLost = false;
     this.logger.info('WebGL context restored');
     this.start();
   }
+
+  // ============================================================================
+  // PRODUCTION API
+  // ============================================================================
+
+  /**
+   * Check if WebGL context is currently lost
+   */
+  public get isContextLost(): boolean {
+    return this._isContextLost;
+  }
+
+  /**
+   * Get current performance metrics
+   */
+  public getPerformanceMetrics(): PerformanceMetrics {
+    return this.perfMonitor.getMetrics();
+  }
+
+  /**
+   * Toggle performance overlay visibility
+   */
+  public showPerformanceOverlay(show: boolean): void {
+    this.perfMonitor.setConfig({ showOverlay: show });
+  }
+
+  /**
+   * Get model loader statistics
+   */
+  public getLoaderStats() {
+    return this.modelLoader.getStats();
+  }
+
+  /**
+   * Preload models for faster rendering
+   */
+  public async preloadModels(urls: string[]): Promise<void> {
+    await this.modelLoader.preload(urls);
+    this.logger.info(`Preloaded ${urls.length} models`);
+  }
+
+  /**
+   * Load a GLB model with production error handling
+   */
+  protected async loadGLBModel(
+    productId: string,
+    modelUrl: string,
+    productName: string
+  ): Promise<THREE.Object3D | null> {
+    try {
+      const loadedModel = await this.modelLoader.load(modelUrl, {
+        name: productName,
+        onProgress: (progress) => {
+          this.logger.debug(`Loading ${productName}: ${progress.percent}%`);
+        },
+      });
+      this.loadedModels.set(productId, loadedModel);
+      this.logger.info(`Loaded model: ${productName}`, {
+        triangles: loadedModel.metadata.triangleCount,
+      });
+      return loadedModel.scene;
+    } catch (error) {
+      if (error instanceof ModelLoadError) {
+        this.logger.warn(`Failed to load ${productName}: ${error.code}`);
+      }
+      return null;
+    }
+  }
+
+  public getScene(): THREE.Scene { return this.scene; }
+  public getCamera(): THREE.PerspectiveCamera { return this.camera; }
 }
 
 export default RunwayExperience;

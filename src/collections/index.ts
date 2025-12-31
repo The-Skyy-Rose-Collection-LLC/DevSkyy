@@ -4,8 +4,20 @@
  * Immersive 3D landing pages for each SkyyRose collection.
  *
  * @author DevSkyy Platform Team
- * @version 1.0.0
+ * @version 2.0.0 - Production-grade with model loading and performance monitoring
  */
+
+// Base Class & Production Utilities
+export { BaseCollectionExperience } from './BaseCollectionExperience.js';
+export type {
+  BaseProduct,
+  BaseExperienceConfig,
+  ExperienceState,
+  LifecycleEvent,
+  LifecycleHandler,
+} from './BaseCollectionExperience.js';
+
+export * from './ProductionHandlers.js';
 
 // Collection Experiences
 export { BlackRoseExperience } from './BlackRoseExperience.js';

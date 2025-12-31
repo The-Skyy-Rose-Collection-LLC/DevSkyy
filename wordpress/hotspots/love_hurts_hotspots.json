@@ -1,0 +1,153 @@
+{
+  "collection": "love_hurts",
+  "name": "LOVE HURTS Castle",
+  "version": "1.0.0",
+  "experience_url": "/experiences/love-hurts/",
+  "config": {
+    "enable_cart": true,
+    "enable_wishlist": true,
+    "show_price": true,
+    "show_thumbnail": true,
+    "animation_style": "fade",
+    "hover_scale": 1.1
+  },
+  "hotspots": [
+    {
+      "id": "lh-heartbreak-jacket",
+      "product_id": 201,
+      "wc_product_id": null,
+      "position": {
+        "x": -1.5,
+        "y": 1.8,
+        "z": 0.0
+      },
+      "label": "Heartbreak Jacket",
+      "description": "Oversized leather jacket with heart embroidery",
+      "price": 299.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/heartbreak-jacket.jpg",
+      "product_url": "/product/heartbreak-jacket/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": "NEW"
+    },
+    {
+      "id": "lh-rose-dress",
+      "product_id": 202,
+      "wc_product_id": null,
+      "position": {
+        "x": 2.5,
+        "y": 1.0,
+        "z": 1.0
+      },
+      "label": "Rose Dress",
+      "description": "Flowing dress with rose petal hem",
+      "price": 249.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/rose-dress.jpg",
+      "product_url": "/product/rose-dress/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "lh-throne-ring",
+      "product_id": 203,
+      "wc_product_id": null,
+      "position": {
+        "x": 0.0,
+        "y": 0.5,
+        "z": -1.5
+      },
+      "label": "Throne Ring",
+      "description": "Rose gold ring with crown detail",
+      "price": 179.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/throne-ring.jpg",
+      "product_url": "/product/throne-ring/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "lh-castle-hoodie",
+      "product_id": 204,
+      "wc_product_id": null,
+      "position": {
+        "x": -2.0,
+        "y": 1.2,
+        "z": 2.0
+      },
+      "label": "Castle Hoodie",
+      "description": "Premium hoodie with castle embroidery",
+      "price": 169.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/castle-hoodie.jpg",
+      "product_url": "/product/castle-hoodie/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": "BESTSELLER"
+    },
+    {
+      "id": "lh-vulnerability-tee",
+      "product_id": 205,
+      "wc_product_id": null,
+      "position": {
+        "x": 1.5,
+        "y": 0.8,
+        "z": -0.5
+      },
+      "label": "Vulnerability Tee",
+      "description": "Soft cotton tee with 'Vulnerability is Strength' print",
+      "price": 79.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/vulnerability-tee.jpg",
+      "product_url": "/product/vulnerability-tee/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "lh-easter-egg-mirror",
+      "product_id": 299,
+      "wc_product_id": null,
+      "position": {
+        "x": 3.5,
+        "y": 2.5,
+        "z": -2.0
+      },
+      "label": "Magic Mirror",
+      "description": "Look into the mirror to find yourself...",
+      "price": 0.00,
+      "currency": "USD",
+      "thumbnail_url": null,
+      "product_url": null,
+      "is_easter_egg": true,
+      "exclusive_drop_url": "/exclusive/love-hurts-limited/",
+      "in_stock": true,
+      "badge": "SECRET"
+    }
+  ],
+  "camera_waypoints": [
+    { "scroll": 0, "position": [3, 2, 4], "target": [0, 1, 0] },
+    { "scroll": 25, "position": [0, 2, 5], "target": [0, 1, 0] },
+    { "scroll": 50, "position": [-3, 1, 4], "target": [0, 1, 0] },
+    { "scroll": 75, "position": [4, 3, 3], "target": [0, 1, 0] },
+    { "scroll": 100, "position": [0, 2, 4], "target": [0, 1, 0] }
+  ],
+  "environment": {
+    "background_color": "#1A0A0F",
+    "candlelight_color": "#FFD700",
+    "candlelight_intensity": 0.6,
+    "chandelier_color": "#FFFACD",
+    "chandelier_intensity": 0.8,
+    "enable_bloom": true,
+    "bloom_strength": 0.5
+  },
+  "generated_at": "2024-12-29T00:00:00Z"
+}

@@ -45,12 +45,22 @@ logger = logging.getLogger(__name__)
 class WooCommerceMCPConfig:
     """WooCommerce MCP client configuration."""
 
-    # WooCommerce store URL
-    store_url: str = field(default_factory=lambda: os.getenv("WOOCOMMERCE_URL", ""))
+    # WooCommerce store URL (falls back to WordPress URL)
+    store_url: str = field(
+        default_factory=lambda: os.getenv("WOOCOMMERCE_URL", "")
+        or os.getenv("WORDPRESS_URL", "")
+        or os.getenv("WP_SITE_URL", "")
+    )
 
-    # WC REST API credentials
-    consumer_key: str = field(default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", ""))
-    consumer_secret: str = field(default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", ""))
+    # WC REST API credentials (supports both naming conventions)
+    consumer_key: str = field(
+        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "")
+        or os.getenv("WC_CONSUMER_KEY", "")
+    )
+    consumer_secret: str = field(
+        default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", "")
+        or os.getenv("WC_CONSUMER_SECRET", "")
+    )
 
     # MCP server settings
     mcp_server_url: str = field(

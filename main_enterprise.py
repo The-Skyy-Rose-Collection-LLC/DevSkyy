@@ -43,6 +43,7 @@ from api.round_table import round_table_router
 from api.tasks import tasks_router
 from api.three_d import three_d_router
 from api.tools import tools_router
+from api.virtual_tryon import virtual_tryon_router
 
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
@@ -403,6 +404,7 @@ app.include_router(brand_router, prefix="/api/v1")
 app.include_router(tools_router, prefix="/api/v1")
 app.include_router(three_d_router, prefix="/api/v1")
 app.include_router(visual_router, prefix="/api/v1")
+app.include_router(virtual_tryon_router, prefix="/api/v1")
 app.include_router(wordpress_router, prefix="/api/v1")
 
 

@@ -14,6 +14,7 @@ Coverage:
 - Error handling and resilience
 """
 
+import os
 import tempfile
 from pathlib import Path
 from unittest.mock import AsyncMock, patch
@@ -365,6 +366,10 @@ class TestAssetPipelineHFIntegration:
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(
+    not (os.getenv("HUGGINGFACE_API_TOKEN") or os.getenv("HF_TOKEN")),
+    reason="HUGGINGFACE_API_TOKEN or HF_TOKEN not set",
+)
 async def test_full_hybrid_pipeline():
     """Test full hybrid pipeline: HF -> Tripo3D."""
     config = PipelineConfig(
@@ -382,15 +387,18 @@ async def test_full_hybrid_pipeline():
             image_path.write_bytes(b"fake image data")
 
             # Mock the agents
-            with patch.object(
-                pipeline.huggingface_client,
-                "generate_from_image",
-                new_callable=AsyncMock,
-            ) as mock_hf, patch.object(
-                pipeline.tripo_agent,
-                "run",
-                new_callable=AsyncMock,
-            ) as mock_tripo:
+            with (
+                patch.object(
+                    pipeline.huggingface_client,
+                    "generate_from_image",
+                    new_callable=AsyncMock,
+                ) as mock_hf,
+                patch.object(
+                    pipeline.tripo_agent,
+                    "run",
+                    new_callable=AsyncMock,
+                ) as mock_tripo,
+            ):
                 # Setup HF mock
                 hf_result = HF3DResult(
                     task_id="hf_123",
