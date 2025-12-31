@@ -20,7 +20,7 @@ async def demo_basic_sync():
 
     # Initialize sync client
     sync = WordPress3DMediaSync(
-        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.com"),
+        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.co"),
         username=os.getenv("WP_USERNAME", "admin"),
         app_password=os.getenv("WP_APP_PASSWORD", ""),
     )
@@ -29,9 +29,9 @@ async def demo_basic_sync():
         # Sync 3D model to product 123
         result = await sync.sync_3d_model(
             product_id=123,
-            glb_url="https://cdn.skyyrose.com/models/black-rose-earrings.glb",
-            usdz_url="https://cdn.skyyrose.com/models/black-rose-earrings.usdz",
-            thumbnail_url="https://cdn.skyyrose.com/thumbnails/black-rose-earrings.jpg",
+            glb_url="https://cdn.skyyrose.co/models/black-rose-earrings.glb",
+            usdz_url="https://cdn.skyyrose.co/models/black-rose-earrings.usdz",
+            thumbnail_url="https://cdn.skyyrose.co/thumbnails/black-rose-earrings.jpg",
         )
 
         print(f"Synced product: {result['name']}")
@@ -44,7 +44,7 @@ async def demo_enable_ar():
     print("\n=== Demo: Enable AR ===\n")
 
     sync = WordPress3DMediaSync(
-        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.com"),
+        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.co"),
         username=os.getenv("WP_USERNAME", "admin"),
         app_password=os.getenv("WP_APP_PASSWORD", ""),
     )
@@ -60,7 +60,7 @@ async def demo_get_assets():
     print("\n=== Demo: Get 3D Assets ===\n")
 
     sync = WordPress3DMediaSync(
-        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.com"),
+        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.co"),
         username=os.getenv("WP_USERNAME", "admin"),
         app_password=os.getenv("WP_APP_PASSWORD", ""),
     )
@@ -81,7 +81,7 @@ async def demo_bulk_sync():
     print("\n=== Demo: Bulk Sync ===\n")
 
     sync = WordPress3DMediaSync(
-        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.com"),
+        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.co"),
         username=os.getenv("WP_USERNAME", "admin"),
         app_password=os.getenv("WP_APP_PASSWORD", ""),
     )
@@ -90,21 +90,21 @@ async def demo_bulk_sync():
     products = [
         {
             "product_id": 123,
-            "glb_url": "https://cdn.skyyrose.com/models/black-rose-earrings.glb",
-            "usdz_url": "https://cdn.skyyrose.com/models/black-rose-earrings.usdz",
-            "thumbnail_url": "https://cdn.skyyrose.com/thumbnails/black-rose-earrings.jpg",
+            "glb_url": "https://cdn.skyyrose.co/models/black-rose-earrings.glb",
+            "usdz_url": "https://cdn.skyyrose.co/models/black-rose-earrings.usdz",
+            "thumbnail_url": "https://cdn.skyyrose.co/thumbnails/black-rose-earrings.jpg",
         },
         {
             "product_id": 124,
-            "glb_url": "https://cdn.skyyrose.com/models/signature-necklace.glb",
-            "usdz_url": "https://cdn.skyyrose.com/models/signature-necklace.usdz",
-            "thumbnail_url": "https://cdn.skyyrose.com/thumbnails/signature-necklace.jpg",
+            "glb_url": "https://cdn.skyyrose.co/models/signature-necklace.glb",
+            "usdz_url": "https://cdn.skyyrose.co/models/signature-necklace.usdz",
+            "thumbnail_url": "https://cdn.skyyrose.co/thumbnails/signature-necklace.jpg",
         },
         {
             "product_id": 125,
-            "glb_url": "https://cdn.skyyrose.com/models/love-hurts-ring.glb",
-            "usdz_url": "https://cdn.skyyrose.com/models/love-hurts-ring.usdz",
-            "thumbnail_url": "https://cdn.skyyrose.com/thumbnails/love-hurts-ring.jpg",
+            "glb_url": "https://cdn.skyyrose.co/models/love-hurts-ring.glb",
+            "usdz_url": "https://cdn.skyyrose.co/models/love-hurts-ring.usdz",
+            "thumbnail_url": "https://cdn.skyyrose.co/thumbnails/love-hurts-ring.jpg",
         },
     ]
 
@@ -132,7 +132,7 @@ async def demo_cleanup():
     print("\n=== Demo: Cleanup Orphaned Assets ===\n")
 
     sync = WordPress3DMediaSync(
-        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.com"),
+        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.co"),
         username=os.getenv("WP_USERNAME", "admin"),
         app_password=os.getenv("WP_APP_PASSWORD", ""),
     )
@@ -147,7 +147,7 @@ async def demo_error_handling():
     print("\n=== Demo: Error Handling ===\n")
 
     sync = WordPress3DMediaSync(
-        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.com"),
+        wp_url=os.getenv("WP_SITE_URL", "https://skyyrose.co"),
         username=os.getenv("WP_USERNAME", "admin"),
         app_password=os.getenv("WP_APP_PASSWORD", ""),
     )

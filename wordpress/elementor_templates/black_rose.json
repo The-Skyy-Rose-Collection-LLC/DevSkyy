@@ -91,7 +91,7 @@
               "widgetType": "video",
               "settings": {
                 "video_type": "hosted",
-                "hosted_url": "https://skyyrose.local/experiences/black_rose-collection/",
+                "hosted_url": "/experiences/black-rose/",
                 "controls": "yes",
                 "autoplay": "no",
                 "loop": "yes",

@@ -5,7 +5,6 @@ Tests for security module
 Encryption and authentication tests.
 """
 
-import sys
 
 import pytest
 

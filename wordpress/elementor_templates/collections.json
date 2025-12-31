@@ -1,0 +1,493 @@
+{
+  "version": "0.4",
+  "title": "Collections",
+  "type": "page",
+  "content": [
+    {
+      "id": "s_hero",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "min_height": { "unit": "vh", "size": 50 },
+        "background_background": "gradient",
+        "background_color": "#0D0D0D",
+        "background_gradient_angle": { "unit": "deg", "size": 180 },
+        "background_color_b": "#1A1A1A"
+      },
+      "elements": [
+        {
+          "id": "c_hero",
+          "elType": "column",
+          "settings": { "_column_size": 100 },
+          "elements": [
+            {
+              "id": "w_spacer_1",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 100, "unit": "px" } }
+            },
+            {
+              "id": "w_heading_hero",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Our Collections",
+                "size": "xxl",
+                "header_size": "h1",
+                "align": "center",
+                "title_color": "#F5F5F0",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w_subheading",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Three distinct experiences, one unified vision of luxury.</p>",
+                "align": "center",
+                "text_color": "#D4AF37",
+                "typography_font_family": "Inter",
+                "typography_font_size": { "unit": "px", "size": 20 }
+              }
+            },
+            {
+              "id": "w_spacer_2",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 80, "unit": "px" } }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_black_rose",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "min_height": { "unit": "vh", "size": 80 },
+        "background_background": "classic",
+        "background_color": "#0D0D0D",
+        "background_image": {
+          "url": "/wp-content/uploads/collections/black-rose-bg.jpg"
+        },
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(0, 0, 0, 0.6)"
+      },
+      "elements": [
+        {
+          "id": "c_black_rose_left",
+          "elType": "column",
+          "settings": { "_column_size": 50 },
+          "elements": [
+            {
+              "id": "w_br_spacer",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 80, "unit": "px" } }
+            },
+            {
+              "id": "w_br_badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<span class='collection-badge'>COLLECTION 01</span>",
+                "text_color": "#C0C0C0",
+                "typography_font_size": { "unit": "px", "size": 12 },
+                "typography_letter_spacing": { "unit": "px", "size": 3 }
+              }
+            },
+            {
+              "id": "w_br_title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "BLACK ROSE",
+                "size": "xl",
+                "header_size": "h2",
+                "title_color": "#FFFFFF",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w_br_tagline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Dark Elegance, Mystery, Exclusivity",
+                "size": "md",
+                "header_size": "h3",
+                "title_color": "#C0C0C0",
+                "typography_font_family": "Inter",
+                "typography_font_style": "italic"
+              }
+            },
+            {
+              "id": "w_br_desc",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Enter the Gothic Rose Garden. Limited edition pieces where dark elegance meets modern luxury. Silver moonlight, floating petals, obsidian pathways lead you through an immersive 3D experience.</p>",
+                "text_color": "#CCCCCC",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w_br_btn",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Enter the Garden",
+                "link": { "url": "/black-rose/", "is_external": false },
+                "size": "lg",
+                "button_background_color": "#C0C0C0",
+                "button_text_color": "#0D0D0D",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "icon": { "value": "fas fa-arrow-right" },
+                "icon_position": "after"
+              }
+            }
+          ]
+        },
+        {
+          "id": "c_black_rose_right",
+          "elType": "column",
+          "settings": { "_column_size": 50 },
+          "elements": [
+            {
+              "id": "w_br_3d",
+              "elType": "widget",
+              "widgetType": "skyyrose-collection-card",
+              "settings": {
+                "collection_slug": "black-rose",
+                "preview_type": "3d_preview",
+                "enable_hover_animation": true,
+                "show_product_count": true,
+                "experience_url": "/experiences/black-rose/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_love_hurts",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "min_height": { "unit": "vh", "size": 80 },
+        "background_background": "classic",
+        "background_color": "#1A0A0F",
+        "background_image": {
+          "url": "/wp-content/uploads/collections/love-hurts-bg.jpg"
+        },
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(139, 64, 73, 0.5)"
+      },
+      "elements": [
+        {
+          "id": "c_lh_left",
+          "elType": "column",
+          "settings": { "_column_size": 50 },
+          "elements": [
+            {
+              "id": "w_lh_3d",
+              "elType": "widget",
+              "widgetType": "skyyrose-collection-card",
+              "settings": {
+                "collection_slug": "love-hurts",
+                "preview_type": "3d_preview",
+                "enable_hover_animation": true,
+                "show_product_count": true,
+                "experience_url": "/experiences/love-hurts/"
+              }
+            }
+          ]
+        },
+        {
+          "id": "c_lh_right",
+          "elType": "column",
+          "settings": { "_column_size": 50 },
+          "elements": [
+            {
+              "id": "w_lh_spacer",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 80, "unit": "px" } }
+            },
+            {
+              "id": "w_lh_badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<span class='collection-badge'>COLLECTION 02</span>",
+                "text_color": "#FF6B9D",
+                "typography_font_size": { "unit": "px", "size": 12 },
+                "typography_letter_spacing": { "unit": "px", "size": 3 }
+              }
+            },
+            {
+              "id": "w_lh_title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "LOVE HURTS",
+                "size": "xl",
+                "header_size": "h2",
+                "title_color": "#FFFFFF",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w_lh_tagline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Emotional Expression, Vulnerability, Strength",
+                "size": "md",
+                "header_size": "h3",
+                "title_color": "#FF6B9D",
+                "typography_font_family": "Inter",
+                "typography_font_style": "italic"
+              }
+            },
+            {
+              "id": "w_lh_desc",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Step into the Castle. Where vulnerability becomes strength and emotion transforms into art. Dramatic candlelight, stained glass windows, and an immersive throne room experience await.</p>",
+                "text_color": "#CCCCCC",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w_lh_btn",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Enter the Castle",
+                "link": { "url": "/love-hurts/", "is_external": false },
+                "size": "lg",
+                "button_background_color": "#FF6B9D",
+                "button_text_color": "#0D0D0D",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "icon": { "value": "fas fa-arrow-right" },
+                "icon_position": "after"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_signature",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "min_height": { "unit": "vh", "size": 80 },
+        "background_background": "classic",
+        "background_color": "#0A0A0A",
+        "background_image": {
+          "url": "/wp-content/uploads/collections/signature-bg.jpg"
+        },
+        "background_overlay_background": "classic",
+        "background_overlay_color": "rgba(201, 169, 98, 0.3)"
+      },
+      "elements": [
+        {
+          "id": "c_sig_left",
+          "elType": "column",
+          "settings": { "_column_size": 50 },
+          "elements": [
+            {
+              "id": "w_sig_spacer",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 80, "unit": "px" } }
+            },
+            {
+              "id": "w_sig_badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<span class='collection-badge'>COLLECTION 03</span>",
+                "text_color": "#C9A962",
+                "typography_font_size": { "unit": "px", "size": 12 },
+                "typography_letter_spacing": { "unit": "px", "size": 3 }
+              }
+            },
+            {
+              "id": "w_sig_title",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "SIGNATURE",
+                "size": "xl",
+                "header_size": "h2",
+                "title_color": "#FFFFFF",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w_sig_tagline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Premium Essentials, Oakland Heritage",
+                "size": "md",
+                "header_size": "h3",
+                "title_color": "#C9A962",
+                "typography_font_family": "Inter",
+                "typography_font_style": "italic"
+              }
+            },
+            {
+              "id": "w_sig_desc",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Walk the Runway. Premium essentials that define Oakland-made luxury streetwear. Gold accents, spotlight moments, and a virtual fashion show experience bring the collection to life.</p>",
+                "text_color": "#CCCCCC",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w_sig_btn",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Walk the Runway",
+                "link": { "url": "/signature/", "is_external": false },
+                "size": "lg",
+                "button_background_color": "#C9A962",
+                "button_text_color": "#0D0D0D",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600",
+                "icon": { "value": "fas fa-arrow-right" },
+                "icon_position": "after"
+              }
+            }
+          ]
+        },
+        {
+          "id": "c_sig_right",
+          "elType": "column",
+          "settings": { "_column_size": 50 },
+          "elements": [
+            {
+              "id": "w_sig_3d",
+              "elType": "widget",
+              "widgetType": "skyyrose-collection-card",
+              "settings": {
+                "collection_slug": "signature",
+                "preview_type": "3d_preview",
+                "enable_hover_animation": true,
+                "show_product_count": true,
+                "experience_url": "/experiences/signature/"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "s_cta",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": { "size": 1200, "unit": "px" },
+        "background_background": "gradient",
+        "background_color": "#D4AF37",
+        "background_color_b": "#C9A962"
+      },
+      "elements": [
+        {
+          "id": "c_cta",
+          "elType": "column",
+          "settings": { "_column_size": 100 },
+          "elements": [
+            {
+              "id": "w_cta_spacer1",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 80, "unit": "px" } }
+            },
+            {
+              "id": "w_cta_heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Can't Decide?",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#0D0D0D",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700"
+              }
+            },
+            {
+              "id": "w_cta_text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Explore all collections in our shop and find your perfect piece.</p>",
+                "align": "center",
+                "text_color": "#1A1A1A",
+                "typography_font_family": "Inter"
+              }
+            },
+            {
+              "id": "w_cta_btn",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "Shop All",
+                "link": { "url": "/shop/", "is_external": false },
+                "size": "lg",
+                "button_background_color": "#0D0D0D",
+                "button_text_color": "#D4AF37",
+                "align": "center",
+                "typography_font_family": "Inter",
+                "typography_font_weight": "600"
+              }
+            },
+            {
+              "id": "w_cta_spacer2",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": { "space": { "size": 80, "unit": "px" } }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "page_settings": {
+    "hide_title": "yes",
+    "template": "elementor_canvas",
+    "post_title": "Collections - SkyyRose",
+    "meta_description": "Explore our curated collections: Black Rose (Dark Elegance), Love Hurts (Emotional Expression), and Signature (Premium Essentials). Immersive 3D experiences await."
+  },
+  "metadata": {
+    "rankmath_schema": {
+      "schema_type": "CollectionPage",
+      "title": "Collections - SkyyRose",
+      "description": "Three distinct collections, one unified vision of luxury streetwear from Oakland.",
+      "url": "/collections/",
+      "image": "/wp-content/uploads/collections/collections-og.jpg"
+    }
+  }
+}

@@ -1,0 +1,154 @@
+{
+  "collection": "black_rose",
+  "name": "BLACK ROSE Garden",
+  "version": "1.0.0",
+  "experience_url": "/experiences/black-rose/",
+  "config": {
+    "enable_cart": true,
+    "enable_wishlist": true,
+    "show_price": true,
+    "show_thumbnail": true,
+    "animation_style": "fade",
+    "hover_scale": 1.1
+  },
+  "hotspots": [
+    {
+      "id": "br-rose-tee-1",
+      "product_id": 101,
+      "wc_product_id": null,
+      "position": {
+        "x": -2.5,
+        "y": 1.2,
+        "z": 0.5
+      },
+      "label": "Black Rose Tee",
+      "description": "Premium cotton tee with embroidered black rose",
+      "price": 89.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/black-rose-tee.jpg",
+      "product_url": "/product/black-rose-tee/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "br-midnight-hoodie",
+      "product_id": 102,
+      "wc_product_id": null,
+      "position": {
+        "x": 2.0,
+        "y": 1.5,
+        "z": -1.0
+      },
+      "label": "Midnight Hoodie",
+      "description": "Heavyweight hoodie with silver rose embroidery",
+      "price": 149.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/midnight-hoodie.jpg",
+      "product_url": "/product/midnight-hoodie/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": "BESTSELLER"
+    },
+    {
+      "id": "br-silver-chain",
+      "product_id": 103,
+      "wc_product_id": null,
+      "position": {
+        "x": 0.0,
+        "y": 0.8,
+        "z": 2.0
+      },
+      "label": "Silver Chain",
+      "description": "Sterling silver chain with rose pendant",
+      "price": 199.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/silver-chain.jpg",
+      "product_url": "/product/silver-chain/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "br-obsidian-pants",
+      "product_id": 104,
+      "wc_product_id": null,
+      "position": {
+        "x": -1.0,
+        "y": 0.5,
+        "z": -2.0
+      },
+      "label": "Obsidian Pants",
+      "description": "Tailored pants with silver hardware",
+      "price": 179.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/obsidian-pants.jpg",
+      "product_url": "/product/obsidian-pants/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "br-garden-cap",
+      "product_id": 105,
+      "wc_product_id": null,
+      "position": {
+        "x": 3.0,
+        "y": 1.0,
+        "z": 1.5
+      },
+      "label": "Garden Cap",
+      "description": "Structured cap with embroidered rose",
+      "price": 59.00,
+      "currency": "USD",
+      "thumbnail_url": "/wp-content/uploads/products/garden-cap.jpg",
+      "product_url": "/product/garden-cap/",
+      "is_easter_egg": false,
+      "exclusive_drop_url": null,
+      "in_stock": true,
+      "badge": null
+    },
+    {
+      "id": "br-easter-egg-gate",
+      "product_id": 199,
+      "wc_product_id": null,
+      "position": {
+        "x": -4.0,
+        "y": 2.0,
+        "z": -3.0
+      },
+      "label": "Secret Garden Gate",
+      "description": "You found a secret entrance...",
+      "price": 0.00,
+      "currency": "USD",
+      "thumbnail_url": null,
+      "product_url": null,
+      "is_easter_egg": true,
+      "exclusive_drop_url": "/exclusive/black-rose-limited/",
+      "in_stock": true,
+      "badge": "SECRET"
+    }
+  ],
+  "camera_waypoints": [
+    { "scroll": 0, "position": [3, 2, 4], "target": [0, 1, 0] },
+    { "scroll": 25, "position": [0, 2, 5], "target": [0, 1, 0] },
+    { "scroll": 50, "position": [-3, 1, 4], "target": [0, 1, 0] },
+    { "scroll": 75, "position": [4, 3, 3], "target": [0, 1, 0] },
+    { "scroll": 100, "position": [0, 2, 4], "target": [0, 1, 0] }
+  ],
+  "environment": {
+    "background_color": "#0D0D0D",
+    "fog_color": "#0A0A0A",
+    "fog_density": 0.03,
+    "moonlight_color": "#C0C0C0",
+    "moonlight_intensity": 0.8,
+    "petal_count": 50,
+    "enable_bloom": true,
+    "bloom_strength": 0.4
+  },
+  "generated_at": "2024-12-29T00:00:00Z"
+}

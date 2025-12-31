@@ -45,9 +45,15 @@ class NotFoundError(WordPressError):
 class WordPressConfig:
     """WordPress API configuration."""
 
-    site_url: str = field(default_factory=lambda: os.getenv("WP_SITE_URL", ""))
-    username: str = field(default_factory=lambda: os.getenv("WP_USERNAME", ""))
-    app_password: str = field(default_factory=lambda: os.getenv("WP_APP_PASSWORD", ""))
+    site_url: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_URL", os.getenv("WP_SITE_URL", ""))
+    )
+    username: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_USERNAME", os.getenv("WP_USERNAME", ""))
+    )
+    app_password: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_APP_PASSWORD", os.getenv("WP_APP_PASSWORD", ""))
+    )
     api_version: str = "wp/v2"
     timeout: float = 30.0
     max_retries: int = 3
