@@ -35,11 +35,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
+from api.admin_dashboard import admin_dashboard_router
 from api.agents import agents_router
+from api.ai_3d_endpoints import ai_3d_router
 from api.brand import brand_router
 from api.dashboard import dashboard_router
 from api.gdpr import gdpr_router
 from api.round_table import round_table_router
+from api.sync_endpoints import sync_router
 from api.tasks import tasks_router
 from api.three_d import three_d_router
 from api.tools import tools_router
@@ -406,6 +409,11 @@ app.include_router(three_d_router, prefix="/api/v1")
 app.include_router(visual_router, prefix="/api/v1")
 app.include_router(virtual_tryon_router, prefix="/api/v1")
 app.include_router(wordpress_router, prefix="/api/v1")
+
+# New Phase 11-15 routes (AI 3D, Sync, Enhanced Dashboard)
+app.include_router(ai_3d_router, prefix="/api/v1")
+app.include_router(sync_router, prefix="/api/v1")
+app.include_router(admin_dashboard_router, prefix="/api/v1")
 
 
 # =============================================================================
