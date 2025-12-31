@@ -298,9 +298,25 @@ export class ShowroomExperience {
     this.products.set(product.id, mesh);
 
     // Register product with interaction handler
-    // Cast to Mesh - works with both GLB groups and placeholder meshes
-    if (this.interactionHandler && mesh instanceof THREE.Mesh) {
-      this.interactionHandler.setupProduct(mesh, product);
+    // GLB models are Groups, not Meshes - traverse to find first mesh for interaction setup
+    if (this.interactionHandler) {
+      let meshForInteraction: THREE.Mesh | null = null;
+
+      if (mesh instanceof THREE.Mesh) {
+        // Direct mesh (placeholder case)
+        meshForInteraction = mesh;
+      } else if (mesh instanceof THREE.Group) {
+        // GLB model case - traverse to find first mesh
+        mesh.traverse((child) => {
+          if (!meshForInteraction && child instanceof THREE.Mesh) {
+            meshForInteraction = child;
+          }
+        });
+      }
+
+      if (meshForInteraction) {
+        this.interactionHandler.setupProduct(meshForInteraction, product);
+      }
     }
 
     // Subscribe to inventory updates

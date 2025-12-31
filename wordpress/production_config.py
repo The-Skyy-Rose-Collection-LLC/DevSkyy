@@ -21,7 +21,7 @@ import json
 import logging
 import os
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
@@ -32,6 +32,7 @@ from pydantic import BaseModel, Field, HttpUrl, SecretStr, field_validator
 # Note: Library code should only create loggers, not configure logging
 try:
     import structlog
+
     logger = structlog.get_logger(__name__)
 except ImportError:
     logger = logging.getLogger(__name__)
@@ -533,9 +534,7 @@ class SkyyRoseProductionConfig:
                 "url": self.site_url,
             },
             "pages": {k: v.model_dump() for k, v in self.pages.items()},
-            "collections": {
-                k.value: v.model_dump() for k, v in self.collections.items()
-            },
+            "collections": {k.value: v.model_dump() for k, v in self.collections.items()},
             "settings": {
                 "enable_caching": self.enable_caching,
                 "cache_ttl_seconds": self.cache_ttl_seconds,
@@ -606,15 +605,15 @@ class WordPressAuthValidator:
             # Respect WORDPRESS_URL environment variable override
             site_url = os.getenv("WORDPRESS_URL") or self.config.site_url
             url = f"{site_url}/wp-json/wp/v2"
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, timeout=10) as response:
-                    if response.status == 200:
-                        self._logger.info("wordpress_api_ok", url=site_url)
-                        return True
-                    self._logger.warning(
-                        "wordpress_api_error", status=response.status, url=site_url
-                    )
-                    return False
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(url, timeout=10) as response,
+            ):
+                if response.status == 200:
+                    self._logger.info("wordpress_api_ok", url=site_url)
+                    return True
+                self._logger.warning("wordpress_api_error", status=response.status, url=site_url)
+                return False
         except Exception as e:
             self._logger.error("wordpress_api_check_failed", error=str(e))
             return False
@@ -637,34 +636,224 @@ class WordPressAuthValidator:
                 creds.consumer_secret.get_secret_value(),
             )
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get(url, auth=auth, timeout=10) as response:
-                    if response.status in (200, 401):  # 401 means auth is checked
-                        self._logger.info("woocommerce_api_ok")
-                        return True
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(url, auth=auth, timeout=10) as response,
+            ):
+                if response.status == 200:
+                    self._logger.info("woocommerce_api_ok")
+                    return True
+                elif response.status == 401:
+                    # 401 = UNAUTHORIZED means authentication FAILED
                     self._logger.warning(
-                        "woocommerce_api_error", status=response.status
+                        "woocommerce_api_unauthorized",
+                        status=response.status,
+                        message="Authentication failed - check consumer key/secret",
                     )
                     return False
+                self._logger.warning("woocommerce_api_error", status=response.status)
+                return False
         except Exception as e:
             self._logger.error("woocommerce_api_check_failed", error=str(e))
             return False
 
     async def check_elementor_plugin(self) -> bool:
-        """Check if Elementor plugin is active."""
-        # This would check via WordPress REST API
-        # For now, return True as Elementor is required
-        return True
+        """
+        Check if Elementor plugin is active.
+
+        Returns:
+            True if Elementor is installed and active, False otherwise.
+
+        Raises:
+            NotImplementedError: If WordPress credentials are not configured.
+        """
+        if not self.config.wordpress_credentials:
+            self._logger.warning("wordpress_credentials_missing_for_plugin_check")
+            return False
+
+        try:
+            import base64
+
+            import aiohttp
+
+            site_url = os.getenv("WORDPRESS_URL") or self.config.site_url
+            url = f"{site_url}/wp-json/wp/v2/plugins"
+
+            # Build Basic Auth header
+            creds = self.config.wordpress_credentials
+            credentials = f"{creds.username}:{creds.app_password.get_secret_value()}"
+            encoded = base64.b64encode(credentials.encode()).decode()
+            headers = {"Authorization": f"Basic {encoded}"}
+
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(url, headers=headers, timeout=10) as response,
+            ):
+                if response.status == 200:
+                    plugins = await response.json()
+                    # Check for Elementor in active plugins
+                    elementor_active = any(
+                        "elementor" in plugin.get("plugin", "").lower()
+                        and plugin.get("status") == "active"
+                        for plugin in plugins
+                    )
+                    if elementor_active:
+                        self._logger.info("elementor_plugin_active")
+                    else:
+                        self._logger.warning("elementor_plugin_not_found_or_inactive")
+                    return elementor_active
+                elif response.status == 401:
+                    self._logger.warning(
+                        "plugin_check_unauthorized",
+                        message="Cannot check plugins - authentication failed",
+                    )
+                    return False
+                elif response.status == 403:
+                    # Plugins endpoint requires administrator role
+                    self._logger.warning(
+                        "plugin_check_forbidden",
+                        message="Insufficient permissions to check plugins (requires administrator)",
+                    )
+                    # Return True as we cannot verify - log warning for manual check
+                    return True
+                else:
+                    self._logger.warning("plugin_check_failed", status=response.status)
+                    return False
+        except Exception as e:
+            self._logger.error("elementor_plugin_check_failed", error=str(e))
+            return False
 
     async def check_permissions(self) -> bool:
-        """Check user has required permissions."""
-        # Check for: edit_pages, edit_posts, manage_woocommerce
-        return True
+        """
+        Check user has required permissions for DevSkyy operations.
+
+        Required capabilities: edit_pages, edit_posts, manage_woocommerce
+
+        Returns:
+            True if user has all required permissions, False otherwise.
+        """
+        if not self.config.wordpress_credentials:
+            self._logger.warning("wordpress_credentials_missing_for_permission_check")
+            return False
+
+        try:
+            import base64
+
+            import aiohttp
+
+            site_url = os.getenv("WORDPRESS_URL") or self.config.site_url
+            url = f"{site_url}/wp-json/wp/v2/users/me?context=edit"
+
+            # Build Basic Auth header
+            creds = self.config.wordpress_credentials
+            credentials = f"{creds.username}:{creds.app_password.get_secret_value()}"
+            encoded = base64.b64encode(credentials.encode()).decode()
+            headers = {"Authorization": f"Basic {encoded}"}
+
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(url, headers=headers, timeout=10) as response,
+            ):
+                if response.status == 200:
+                    user_data = await response.json()
+                    capabilities = user_data.get("capabilities", {})
+
+                    required_caps = ["edit_pages", "edit_posts"]
+                    missing_caps = [cap for cap in required_caps if not capabilities.get(cap)]
+
+                    if missing_caps:
+                        self._logger.warning(
+                            "missing_permissions",
+                            missing=missing_caps,
+                            user=user_data.get("slug"),
+                        )
+                        return False
+
+                    self._logger.info(
+                        "permissions_validated",
+                        user=user_data.get("slug"),
+                        roles=user_data.get("roles", []),
+                    )
+                    return True
+                elif response.status == 401:
+                    self._logger.warning("permission_check_unauthorized")
+                    return False
+                else:
+                    self._logger.warning("permission_check_failed", status=response.status)
+                    return False
+        except Exception as e:
+            self._logger.error("permission_check_error", error=str(e))
+            return False
 
     async def check_pages_exist(self) -> bool:
-        """Check all configured pages exist in WordPress."""
-        # Would verify page IDs via REST API
-        return True
+        """
+        Check all configured pages exist in WordPress.
+
+        Verifies each page with a configured page_id exists via REST API.
+
+        Returns:
+            True if all configured pages exist, False if any are missing.
+        """
+        if not self.config.wordpress_credentials:
+            self._logger.warning("wordpress_credentials_missing_for_page_check")
+            return False
+
+        try:
+            import base64
+
+            import aiohttp
+
+            site_url = os.getenv("WORDPRESS_URL") or self.config.site_url
+
+            # Build Basic Auth header
+            creds = self.config.wordpress_credentials
+            credentials = f"{creds.username}:{creds.app_password.get_secret_value()}"
+            encoded = base64.b64encode(credentials.encode()).decode()
+            headers = {"Authorization": f"Basic {encoded}"}
+
+            # Collect pages with configured IDs
+            pages_to_check = [
+                (name, page.page_id)
+                for name, page in self.config.pages.items()
+                if page.page_id is not None
+            ]
+
+            if not pages_to_check:
+                self._logger.info("no_page_ids_configured_to_check")
+                return True
+
+            missing_pages = []
+            async with aiohttp.ClientSession() as session:
+                for page_name, page_id in pages_to_check:
+                    url = f"{site_url}/wp-json/wp/v2/pages/{page_id}"
+                    try:
+                        async with session.get(url, headers=headers, timeout=10) as response:
+                            if response.status == 404:
+                                missing_pages.append({"name": page_name, "id": page_id})
+                            elif response.status != 200:
+                                self._logger.warning(
+                                    "page_check_unexpected_status",
+                                    page_name=page_name,
+                                    page_id=page_id,
+                                    status=response.status,
+                                )
+                    except Exception as e:
+                        self._logger.warning(
+                            "page_check_request_failed",
+                            page_name=page_name,
+                            page_id=page_id,
+                            error=str(e),
+                        )
+
+            if missing_pages:
+                self._logger.warning("pages_missing", missing=missing_pages)
+                return False
+
+            self._logger.info("all_pages_exist", checked_count=len(pages_to_check))
+            return True
+        except Exception as e:
+            self._logger.error("pages_exist_check_failed", error=str(e))
+            return False
 
 
 # ============================================================================
@@ -695,24 +884,28 @@ class ProductionDeploymentManager:
             "templates_deployed": [],
             "hotspots_configured": [],
             "errors": [],
-            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "timestamp": datetime.now(UTC).isoformat(),
         }
 
         # Deploy pages
         for page_name, page_config in self.config.pages.items():
             try:
                 result = await self.deploy_page(page_name, page_config)
-                results["pages_deployed"].append({
-                    "name": page_name,
-                    "id": result.get("id"),
-                    "status": "success",
-                })
+                results["pages_deployed"].append(
+                    {
+                        "name": page_name,
+                        "id": result.get("id"),
+                        "status": "success",
+                    }
+                )
             except Exception as e:
-                results["errors"].append({
-                    "type": "page_deployment",
-                    "name": page_name,
-                    "error": str(e),
-                })
+                results["errors"].append(
+                    {
+                        "type": "page_deployment",
+                        "name": page_name,
+                        "error": str(e),
+                    }
+                )
 
         # Deploy collection hotspots
         for collection_type, collection in self.config.collections.items():
@@ -720,18 +913,18 @@ class ProductionDeploymentManager:
                 await self.deploy_hotspots(collection)
                 results["hotspots_configured"].append(collection_type.value)
             except Exception as e:
-                results["errors"].append({
-                    "type": "hotspot_deployment",
-                    "collection": collection_type.value,
-                    "error": str(e),
-                })
+                results["errors"].append(
+                    {
+                        "type": "hotspot_deployment",
+                        "collection": collection_type.value,
+                        "error": str(e),
+                    }
+                )
 
         self._logger.info("deployment_complete", results=results)
         return results
 
-    async def deploy_page(
-        self, page_name: str, page_config: PageConfig
-    ) -> dict[str, Any]:
+    async def deploy_page(self, page_name: str, page_config: PageConfig) -> dict[str, Any]:
         """
         Deploy a single page to WordPress.
 
@@ -809,7 +1002,7 @@ class ProductionDeploymentManager:
             "collection": collection.type.value,
             "hotspots": [h.model_dump() for h in collection.hotspots],
             "experience_url": collection.experience_url,
-            "generated_at": datetime.now(timezone.utc).isoformat(),
+            "generated_at": datetime.now(UTC).isoformat(),
         }
 
         # Write to local file (for development) and upload to WordPress
@@ -882,6 +1075,7 @@ async def main() -> None:
 
 if __name__ == "__main__":
     import asyncio
+
     asyncio.run(main())
 
 

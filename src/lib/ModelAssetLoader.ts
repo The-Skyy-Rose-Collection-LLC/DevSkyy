@@ -531,6 +531,16 @@ export class ModelAssetLoader {
 
   private evictIfNeeded(incomingBytes: number): void {
     const limitBytes = this.config.cacheSizeMB * 1024 * 1024;
+
+    // Skip caching if single model exceeds cache limit to prevent infinite loop
+    if (incomingBytes > limitBytes) {
+      console.warn(
+        `Model size (${(incomingBytes / 1024 / 1024).toFixed(2)}MB) exceeds cache limit ` +
+        `(${this.config.cacheSizeMB}MB), skipping cache`
+      );
+      return;
+    }
+
     let currentSize = 0;
 
     for (const model of this.cache.values()) {

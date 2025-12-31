@@ -8,18 +8,18 @@ Tests for the virtual try-on router and job management.
 import pytest
 
 from api.virtual_tryon import (
-    GarmentCategory,
-    TryOnMode,
-    TryOnProvider,
-    JobStatus,
-    ModelGender,
-    TryOnRequest,
     BatchTryOnRequest,
+    GarmentCategory,
     GenerateModelRequest,
     JobResponse,
+    JobStatus,
+    ModelGender,
     PipelineStatus,
     ProviderInfo,
     TryOnJobStore,
+    TryOnMode,
+    TryOnProvider,
+    TryOnRequest,
     virtual_tryon_router,
 )
 
@@ -256,9 +256,7 @@ class TestJobStore:
         store.create_tryon_job(TryOnProvider.FASHN, GarmentCategory.TOPS)
 
         store.update_tryon_job(job1.job_id, status=JobStatus.PROCESSING)
-        store.complete_tryon_job(
-            job2.job_id, "url", "path", 1000
-        )
+        store.complete_tryon_job(job2.job_id, "url", "path", 1000)
 
         assert store.queue_length == 2  # 1 queued + 1 processing
 
@@ -372,18 +370,19 @@ class TestRouterEndpoints:
     def test_router_has_endpoints(self):
         """Should have expected endpoints."""
         routes = [r.path for r in virtual_tryon_router.routes]
+        prefix = virtual_tryon_router.prefix  # "/virtual-tryon"
 
-        assert "/status" in routes
-        assert "/providers" in routes
-        assert "/categories" in routes
-        assert "/jobs" in routes
-        assert "/jobs/{job_id}" in routes
-        assert "/generate" in routes
-        assert "/generate/upload" in routes
-        assert "/batch" in routes
-        assert "/batch/{batch_id}" in routes
-        assert "/models/generate" in routes
-        assert "/models/jobs/{job_id}" in routes
+        assert f"{prefix}/status" in routes
+        assert f"{prefix}/providers" in routes
+        assert f"{prefix}/categories" in routes
+        assert f"{prefix}/jobs" in routes
+        assert f"{prefix}/jobs/{{job_id}}" in routes
+        assert f"{prefix}/generate" in routes
+        assert f"{prefix}/generate/upload" in routes
+        assert f"{prefix}/batch" in routes
+        assert f"{prefix}/batch/{{batch_id}}" in routes
+        assert f"{prefix}/models/generate" in routes
+        assert f"{prefix}/models/jobs/{{job_id}}" in routes
 
 
 @pytest.mark.asyncio

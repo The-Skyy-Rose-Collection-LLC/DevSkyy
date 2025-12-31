@@ -305,11 +305,11 @@ export class ThreePerformanceMonitor {
     const metrics = this.currentMetrics;
     const thresholds = this.config.thresholds;
 
-    // Calculate individual scores
+    // Calculate individual scores with Math.max(0, ...) to ensure non-negative values
     const fpsScore = Math.min(100, (metrics.fps / 60) * 100);
     const frameTimeScore = Math.min(100, (16.67 / metrics.frameTime) * 100);
-    const drawCallScore = Math.min(100, (1 - metrics.drawCalls / thresholds.maxDrawCalls) * 100);
-    const triangleScore = Math.min(100, (1 - metrics.triangles / thresholds.maxTriangles) * 100);
+    const drawCallScore = Math.max(0, Math.min(100, (1 - metrics.drawCalls / thresholds.maxDrawCalls) * 100));
+    const triangleScore = Math.max(0, Math.min(100, (1 - metrics.triangles / thresholds.maxTriangles) * 100));
 
     // Weighted average
     return Math.round(

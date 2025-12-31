@@ -21,16 +21,20 @@ Version: 1.0.0
 from __future__ import annotations
 
 import asyncio
+import ipaddress
 import logging
 import os
+import socket
+import threading
 import uuid
 from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
-from fastapi import APIRouter, BackgroundTasks, File, HTTPException, UploadFile
-from pydantic import BaseModel, Field
+from fastapi import APIRouter, BackgroundTasks, File, HTTPException, Query, UploadFile
+from pydantic import BaseModel, Field, field_validator
 
 logger = logging.getLogger(__name__)
 
@@ -47,6 +51,119 @@ UPLOAD_DIR = Path(os.getenv("TRYON_UPLOAD_DIR", "./assets/tryon-uploads"))
 # Ensure directories exist
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
+
+# =============================================================================
+# Security Constants
+# =============================================================================
+
+# Maximum file size for image downloads (50MB)
+MAX_IMAGE_SIZE_BYTES = 50 * 1024 * 1024
+
+# Allowed URL schemes
+ALLOWED_URL_SCHEMES = {"http", "https"}
+
+# Allowed file extensions for uploads
+ALLOWED_IMAGE_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp", ".gif", ".bmp"}
+
+# Private IP ranges to block (SSRF protection)
+PRIVATE_IP_NETWORKS = [
+    ipaddress.ip_network("10.0.0.0/8"),
+    ipaddress.ip_network("172.16.0.0/12"),
+    ipaddress.ip_network("192.168.0.0/16"),
+    ipaddress.ip_network("127.0.0.0/8"),
+    ipaddress.ip_network("169.254.0.0/16"),  # Link-local
+    ipaddress.ip_network("::1/128"),  # IPv6 loopback
+    ipaddress.ip_network("fc00::/7"),  # IPv6 private
+    ipaddress.ip_network("fe80::/10"),  # IPv6 link-local
+]
+
+
+def is_private_ip(ip_str: str) -> bool:
+    """
+    Check if an IP address is in a private/reserved range.
+
+    Parameters:
+        ip_str: IP address string to check.
+
+    Returns:
+        True if the IP is private/reserved, False otherwise.
+    """
+    try:
+        ip = ipaddress.ip_address(ip_str)
+        return any(ip in network for network in PRIVATE_IP_NETWORKS)
+    except ValueError:
+        # Invalid IP, treat as private for safety
+        return True
+
+
+def validate_url_for_ssrf(url: str) -> None:
+    """
+    Validate a URL to prevent SSRF attacks.
+
+    Checks:
+    - URL scheme is http or https
+    - Host does not resolve to a private IP
+
+    Parameters:
+        url: The URL to validate.
+
+    Raises:
+        ValueError: If the URL is invalid or points to a private IP.
+    """
+    parsed = urlparse(url)
+
+    # Check scheme
+    if parsed.scheme not in ALLOWED_URL_SCHEMES:
+        raise ValueError(f"Invalid URL scheme '{parsed.scheme}'. Only http and https are allowed.")
+
+    # Check for empty host
+    if not parsed.hostname:
+        raise ValueError("URL must have a valid hostname.")
+
+    # Block localhost variants
+    hostname_lower = parsed.hostname.lower()
+    if hostname_lower in ("localhost", "127.0.0.1", "::1", "0.0.0.0"):
+        raise ValueError("Access to localhost is not allowed.")
+
+    # Resolve hostname and check if it's a private IP
+    try:
+        # Get all IP addresses for the hostname
+        ip_addresses = socket.getaddrinfo(
+            parsed.hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM
+        )
+        for addr_info in ip_addresses:
+            ip: str = str(addr_info[4][0])
+            if is_private_ip(ip):
+                raise ValueError("Access to private IP addresses is not allowed.")
+    except socket.gaierror:
+        # DNS resolution failed - could be intentional to bypass checks
+        raise ValueError(f"Could not resolve hostname: {parsed.hostname}")
+
+
+def validate_file_extension(filename: str | None) -> str:
+    """
+    Validate and extract file extension from a filename.
+
+    Parameters:
+        filename: The filename to validate.
+
+    Returns:
+        The validated file extension (lowercase, with dot).
+
+    Raises:
+        ValueError: If the extension is not in the allowlist.
+    """
+    if not filename:
+        return ".png"  # Default extension
+
+    ext = Path(filename).suffix.lower()
+    if not ext:
+        return ".png"
+
+    if ext not in ALLOWED_IMAGE_EXTENSIONS:
+        raise ValueError(f"File extension '{ext}' not allowed. Allowed: {ALLOWED_IMAGE_EXTENSIONS}")
+
+    return ext
 
 
 # =============================================================================
@@ -132,6 +249,15 @@ class TryOnRequest(BaseModel):
         description="Optional product ID for tracking",
     )
 
+    @field_validator("model_image_url", "garment_image_url")
+    @classmethod
+    def validate_url_scheme(cls, v: str) -> str:
+        """Validate URL has allowed scheme."""
+        parsed = urlparse(v)
+        if parsed.scheme not in ALLOWED_URL_SCHEMES:
+            raise ValueError(f"URL scheme must be http or https, got: {parsed.scheme}")
+        return v
+
 
 class BatchTryOnRequest(BaseModel):
     """Request for batch virtual try-on."""
@@ -148,6 +274,15 @@ class BatchTryOnRequest(BaseModel):
     )
     mode: TryOnMode = Field(default=TryOnMode.BALANCED)
     provider: TryOnProvider = Field(default=TryOnProvider.FASHN)
+
+    @field_validator("model_image_url")
+    @classmethod
+    def validate_url_scheme(cls, v: str) -> str:
+        """Validate URL has allowed scheme."""
+        parsed = urlparse(v)
+        if parsed.scheme not in ALLOWED_URL_SCHEMES:
+            raise ValueError(f"URL scheme must be http or https, got: {parsed.scheme}")
+        return v
 
 
 class GenerateModelRequest(BaseModel):
@@ -244,14 +379,17 @@ class ProviderInfo(BaseModel):
 
 
 class TryOnJobStore:
-    """In-memory job storage for try-on operations."""
+    """In-memory job storage for try-on operations with thread safety."""
 
-    def __init__(self):
+    def __init__(self) -> None:
         """
         Initialize the in-memory job store's internal state.
 
         Sets up dictionaries for tracking try-on jobs, batch jobs, and model-generation jobs, and initializes counters and timestamps used for aggregate metrics (total generated count, cumulative processing time in milliseconds, daily usage count, and the next daily reset timestamp).
+
+        Thread safety is ensured via a threading.Lock for all job operations.
         """
+        self._lock = threading.Lock()
         self._jobs: dict[str, JobResponse] = {}
         self._batches: dict[str, BatchJobResponse] = {}
         self._model_jobs: dict[str, ModelGenerationResponse] = {}
@@ -286,7 +424,8 @@ class TryOnJobStore:
             created_at=datetime.now(UTC).isoformat(),
             metadata=metadata or {},
         )
-        self._jobs[job_id] = job
+        with self._lock:
+            self._jobs[job_id] = job
         return job
 
     def create_batch_job(
@@ -314,7 +453,8 @@ class TryOnJobStore:
             jobs=jobs,
             created_at=datetime.now(UTC).isoformat(),
         )
-        self._batches[batch_id] = batch
+        with self._lock:
+            self._batches[batch_id] = batch
         return batch
 
     def create_model_job(
@@ -340,7 +480,8 @@ class TryOnJobStore:
             gender=gender.value,
             created_at=datetime.now(UTC).isoformat(),
         )
-        self._model_jobs[job_id] = job
+        with self._lock:
+            self._model_jobs[job_id] = job
         return job
 
     def get_tryon_job(self, job_id: str) -> JobResponse | None:
@@ -350,7 +491,8 @@ class TryOnJobStore:
         Returns:
             JobResponse: The job with the given `job_id` if it exists, `None` otherwise.
         """
-        return self._jobs.get(job_id)
+        with self._lock:
+            return self._jobs.get(job_id)
 
     def get_batch_job(self, batch_id: str) -> BatchJobResponse | None:
         """
@@ -358,7 +500,8 @@ class TryOnJobStore:
 
         @returns BatchJobResponse if the batch exists, `None` otherwise.
         """
-        return self._batches.get(batch_id)
+        with self._lock:
+            return self._batches.get(batch_id)
 
     def get_model_job(self, job_id: str) -> ModelGenerationResponse | None:
         """
@@ -370,9 +513,10 @@ class TryOnJobStore:
         Returns:
             ModelGenerationResponse | None: The job if found, otherwise None.
         """
-        return self._model_jobs.get(job_id)
+        with self._lock:
+            return self._model_jobs.get(job_id)
 
-    def update_tryon_job(self, job_id: str, **kwargs) -> JobResponse | None:
+    def update_tryon_job(self, job_id: str, **kwargs: Any) -> JobResponse | None:
         """
         Update fields of an existing try-on job in the store.
 
@@ -383,12 +527,13 @@ class TryOnJobStore:
         Returns:
             JobResponse | None: The updated job if found, `None` if no job with `job_id` exists.
         """
-        job = self._jobs.get(job_id)
-        if job:
-            for key, value in kwargs.items():
-                if hasattr(job, key):
-                    setattr(job, key, value)
-        return job
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job:
+                for key, value in kwargs.items():
+                    if hasattr(job, key):
+                        setattr(job, key, value)
+            return job
 
     def complete_tryon_job(
         self,
@@ -411,18 +556,19 @@ class TryOnJobStore:
         Returns:
             JobResponse | None: The updated JobResponse if the job was found and updated, `None` if no job exists with the given `job_id`.
         """
-        job = self._jobs.get(job_id)
-        if job:
-            job.status = JobStatus.COMPLETED
-            job.result_url = result_url
-            job.result_path = result_path
-            job.completed_at = datetime.now(UTC).isoformat()
-            job.progress = 1.0
-            job.cost_usd = cost_usd
-            self._total_generated += 1
-            self._total_time_ms += duration_ms
-            self._increment_daily()
-        return job
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job:
+                job.status = JobStatus.COMPLETED
+                job.result_url = result_url
+                job.result_path = result_path
+                job.completed_at = datetime.now(UTC).isoformat()
+                job.progress = 1.0
+                job.cost_usd = cost_usd
+                self._total_generated += 1
+                self._total_time_ms += duration_ms
+                self._increment_daily()
+            return job
 
     def fail_tryon_job(self, job_id: str, error: str) -> JobResponse | None:
         """
@@ -435,12 +581,13 @@ class TryOnJobStore:
         Returns:
             JobResponse | None: The updated job with status set to FAILED if found, otherwise `None`. The job's `completed_at` timestamp is set to the current UTC time.
         """
-        job = self._jobs.get(job_id)
-        if job:
-            job.status = JobStatus.FAILED
-            job.error = error
-            job.completed_at = datetime.now(UTC).isoformat()
-        return job
+        with self._lock:
+            job = self._jobs.get(job_id)
+            if job:
+                job.status = JobStatus.FAILED
+                job.error = error
+                job.completed_at = datetime.now(UTC).isoformat()
+            return job
 
     def update_batch_progress(self, batch_id: str) -> BatchJobResponse | None:
         """
@@ -452,36 +599,43 @@ class TryOnJobStore:
         Returns:
             BatchJobResponse | None: The updated batch object if found, `None` if no batch exists for the given id.
         """
-        batch = self._batches.get(batch_id)
-        if batch:
-            completed = sum(1 for j in batch.jobs if j.status == JobStatus.COMPLETED)
-            failed = sum(1 for j in batch.jobs if j.status == JobStatus.FAILED)
-            batch.completed_items = completed
-            batch.failed_items = failed
+        with self._lock:
+            batch = self._batches.get(batch_id)
+            if batch:
+                completed = sum(1 for j in batch.jobs if j.status == JobStatus.COMPLETED)
+                failed = sum(1 for j in batch.jobs if j.status == JobStatus.FAILED)
+                processing = sum(1 for j in batch.jobs if j.status == JobStatus.PROCESSING)
+                batch.completed_items = completed
+                batch.failed_items = failed
 
-            if completed + failed >= batch.total_items:
-                batch.status = JobStatus.COMPLETED if failed == 0 else JobStatus.FAILED
-                batch.completed_at = datetime.now(UTC).isoformat()
-            elif any(j.status == JobStatus.PROCESSING for j in batch.jobs):
-                batch.status = JobStatus.PROCESSING
+                if completed + failed >= batch.total_items:
+                    # All jobs finished
+                    batch.status = JobStatus.COMPLETED if failed == 0 else JobStatus.FAILED
+                    batch.completed_at = datetime.now(UTC).isoformat()
+                elif processing > 0 or completed > 0 or failed > 0:
+                    # At least one job has started or finished - batch is in progress
+                    batch.status = JobStatus.PROCESSING
 
-        return batch
+            return batch
 
     def list_tryon_jobs(self, limit: int = 20) -> list[JobResponse]:
         """
         Retrieve recent try-on jobs ordered by creation time.
 
         Parameters:
-            limit (int): Maximum number of jobs to return; newest jobs are returned first.
+            limit (int): Maximum number of jobs to return (capped at 100); newest jobs are returned first.
 
         Returns:
             list[JobResponse]: Jobs sorted by creation timestamp (newest first), limited to `limit`.
         """
-        jobs = list(self._jobs.values())
+        # Cap limit to prevent excessive memory usage
+        capped_limit = min(max(1, limit), 100)
+        with self._lock:
+            jobs = list(self._jobs.values())
         jobs.sort(key=lambda j: j.created_at, reverse=True)
-        return jobs[:limit]
+        return jobs[:capped_limit]
 
-    def _increment_daily(self):
+    def _increment_daily(self) -> None:
         """
         Update the internal daily counter, resetting it when the date advances (UTC).
 
@@ -501,9 +655,12 @@ class TryOnJobStore:
         Returns:
             count (int): Number of jobs whose status is `QUEUED` or `PROCESSING`.
         """
-        return sum(
-            1 for j in self._jobs.values() if j.status in (JobStatus.QUEUED, JobStatus.PROCESSING)
-        )
+        with self._lock:
+            return sum(
+                1
+                for j in self._jobs.values()
+                if j.status in (JobStatus.QUEUED, JobStatus.PROCESSING)
+            )
 
     @property
     def avg_time_seconds(self) -> float:
@@ -513,9 +670,10 @@ class TryOnJobStore:
         Returns:
             average_time_seconds (float): Average time per completed generation in seconds. If no generations have completed yet, returns a default estimate of 12.0 seconds.
         """
-        if self._total_generated == 0:
-            return 12.0  # Default estimate for balanced mode
-        return (self._total_time_ms / self._total_generated) / 1000
+        with self._lock:
+            if self._total_generated == 0:
+                return 12.0  # Default estimate for balanced mode
+            return (self._total_time_ms / self._total_generated) / 1000
 
     @property
     def total_generated(self) -> int:
@@ -525,7 +683,8 @@ class TryOnJobStore:
         Returns:
             int: Total completed try-on generations.
         """
-        return self._total_generated
+        with self._lock:
+            return self._total_generated
 
     @property
     def daily_used(self) -> int:
@@ -535,10 +694,11 @@ class TryOnJobStore:
         Returns:
             The count of completed try-on jobs since the most recent daily reset; zero if the reset date is unset or earlier than today.
         """
-        now = datetime.now(UTC)
-        if self._daily_reset is None or now.date() > self._daily_reset.date():
-            return 0
-        return self._daily_count
+        with self._lock:
+            now = datetime.now(UTC)
+            if self._daily_reset is None or now.date() > self._daily_reset.date():
+                return 0
+            return self._daily_count
 
     @property
     def last_generated(self) -> str | None:
@@ -547,11 +707,12 @@ class TryOnJobStore:
 
         @returns `str` timestamp of the latest completed job (e.g., ISO 8601) or `None` if no job has completed.
         """
-        completed = [j for j in self._jobs.values() if j.status == JobStatus.COMPLETED]
-        if completed:
-            completed.sort(key=lambda j: j.completed_at or "", reverse=True)
-            return completed[0].completed_at
-        return None
+        with self._lock:
+            completed = [j for j in self._jobs.values() if j.status == JobStatus.COMPLETED]
+            if completed:
+                completed.sort(key=lambda j: j.completed_at or "", reverse=True)
+                return completed[0].completed_at
+            return None
 
 
 job_store = TryOnJobStore()
@@ -568,7 +729,7 @@ async def run_fashn_tryon(
     garment_image_path: str,
     category: GarmentCategory,
     mode: TryOnMode,
-):
+) -> None:
     """
     Execute a FASHN provider virtual try-on job and update the in-memory job store with progress and results.
 
@@ -640,7 +801,7 @@ async def run_idm_vton_tryon(
     model_image_path: str,
     garment_image_path: str,
     category: GarmentCategory,
-):
+) -> None:
     """
     Run an IDM-VTON virtual try-on job using the HuggingFace Space and update the in-memory job store.
 
@@ -744,7 +905,7 @@ async def run_round_table_tryon(
     garment_image_path: str,
     category: GarmentCategory,
     mode: TryOnMode,
-):
+) -> None:
     """
     Run a round‑robin competition between FASHN and IDM‑VTON providers to produce a winning try-on result for a parent job.
 
@@ -776,9 +937,7 @@ async def run_round_table_tryon(
 
         # Run both concurrently (results stored in job_store by background tasks)
         await asyncio.gather(
-            run_fashn_tryon(
-                fashn_job.job_id, model_image_path, garment_image_path, category, mode
-            ),
+            run_fashn_tryon(fashn_job.job_id, model_image_path, garment_image_path, category, mode),
             run_idm_vton_tryon(idm_job.job_id, model_image_path, garment_image_path, category),
             return_exceptions=True,
         )
@@ -830,7 +989,7 @@ async def run_fashn_model_generation(
     job_id: str,
     prompt: str,
     gender: ModelGender,
-):
+) -> None:
     """
     Run a FASHN model generation job and update its stored job record.
 
@@ -885,31 +1044,75 @@ async def download_image(url: str, job_id: str, prefix: str = "img") -> str:
     """
     Download an image from the given URL and save it to the uploads directory using a filename derived from the job id.
 
-    The function infers the file extension from the response Content-Type (supports image/jpeg, image/png, image/webp) and falls back to `.png` if unknown. The saved filename is `{prefix}_{job_id}{ext}` in the module's UPLOAD_DIR.
+    The function validates the URL for SSRF attacks, checks content-length limits, and infers the file extension
+    from the response Content-Type (supports image/jpeg, image/png, image/webp, image/gif, image/bmp) and falls
+    back to `.png` if unknown. The saved filename is `{prefix}_{job_id}{ext}` in the module's UPLOAD_DIR.
+
+    Security features:
+    - URL scheme validation (http/https only)
+    - Private IP blocking (10.x, 172.16-31.x, 192.168.x, 127.x, localhost)
+    - Content-length limit (50MB max)
+    - Content-type validation
 
     Parameters:
+        url: The URL to download the image from.
+        job_id: Job identifier used for the filename.
         prefix (str): Filename prefix to use; defaults to "img".
 
     Returns:
         str: Filesystem path to the saved image.
 
     Raises:
+        ValueError: If URL validation fails (SSRF protection).
         httpx.HTTPError: If the HTTP request fails or returns a non-success status.
     """
     import httpx
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    # SSRF protection: validate URL before making request
+    validate_url_for_ssrf(url)
+
+    async with httpx.AsyncClient(timeout=30.0, follow_redirects=True, max_redirects=5) as client:
+        # First, do a HEAD request to check content-length before downloading
+        try:
+            head_resp = await client.head(url)
+            content_length_header = head_resp.headers.get("content-length")
+            if content_length_header:
+                content_length = int(content_length_header)
+                if content_length > MAX_IMAGE_SIZE_BYTES:
+                    raise ValueError(
+                        f"Image too large: {content_length} bytes exceeds limit of {MAX_IMAGE_SIZE_BYTES} bytes"
+                    )
+        except httpx.HTTPError:
+            # HEAD request failed, will check during GET
+            pass
+
+        # Download the image
         resp = await client.get(url)
         resp.raise_for_status()
 
-        # Determine extension
-        content_type = resp.headers.get("content-type", "image/png")
+        # Check actual content size
+        if len(resp.content) > MAX_IMAGE_SIZE_BYTES:
+            raise ValueError(
+                f"Image too large: {len(resp.content)} bytes exceeds limit of {MAX_IMAGE_SIZE_BYTES} bytes"
+            )
+
+        # Determine extension from content-type
+        # Normalize content-type by splitting on semicolon (e.g., "image/png; charset=utf-8" -> "image/png")
+        raw_content_type = resp.headers.get("content-type", "image/png")
+        content_type = raw_content_type.split(";")[0].strip().lower()
+
         ext_map = {
             "image/jpeg": ".jpg",
             "image/png": ".png",
             "image/webp": ".webp",
+            "image/gif": ".gif",
+            "image/bmp": ".bmp",
         }
         ext = ext_map.get(content_type, ".png")
+
+        # Validate the extension is allowed
+        if ext not in ALLOWED_IMAGE_EXTENSIONS:
+            ext = ".png"
 
         # Save to upload directory
         temp_path = UPLOAD_DIR / f"{prefix}_{job_id}{ext}"
@@ -1018,9 +1221,16 @@ async def list_categories() -> list[dict[str, str]]:
 
 
 @virtual_tryon_router.get("/jobs", response_model=list[JobResponse])
-async def list_jobs(limit: int = 20) -> list[JobResponse]:
+async def list_jobs(
+    limit: int = Query(
+        default=20, ge=1, le=100, description="Maximum number of jobs to return (1-100)"
+    )
+) -> list[JobResponse]:
     """
     Retrieve recent try-on jobs.
+
+    Parameters:
+        limit: Maximum number of jobs to return, between 1 and 100.
 
     Returns:
         list[JobResponse]: Recent try-on jobs, up to `limit` items.
@@ -1085,7 +1295,7 @@ async def generate_tryon(
     )
 
     # Download images in background
-    async def run_with_download():
+    async def run_with_download() -> None:
         """
         Download model and garment images for the current job and dispatch the selected provider's try-on workflow.
 
@@ -1115,12 +1325,12 @@ async def generate_tryon(
 
 @virtual_tryon_router.post("/generate/upload", response_model=JobResponse)
 async def generate_tryon_upload(
+    background_tasks: BackgroundTasks,
     model_image: UploadFile = File(...),
     garment_image: UploadFile = File(...),
     category: GarmentCategory = GarmentCategory.TOPS,
     mode: TryOnMode = TryOnMode.BALANCED,
     provider: TryOnProvider = TryOnProvider.FASHN,
-    background_tasks: BackgroundTasks = None,
 ) -> JobResponse:
     """
     Create a try-on job from two uploaded images, persist the files, and schedule the selected provider's background processing.
@@ -1128,23 +1338,30 @@ async def generate_tryon_upload(
     Validates that both uploads are images and that provider prerequisites are met, saves files to the configured upload directory, creates a queued JobResponse, and enqueues the appropriate background task to perform the try-on. May mark the job failed and raise an HTTPException on validation or save errors.
 
     Parameters:
+        background_tasks (BackgroundTasks): FastAPI BackgroundTasks instance used to schedule processing.
         model_image (UploadFile): Uploaded image of the model.
         garment_image (UploadFile): Uploaded image of the garment.
         category (GarmentCategory): Target garment category for the try-on.
         mode (TryOnMode): Desired quality/speed mode for providers that support it.
         provider (TryOnProvider): Selected provider to perform the try-on.
-        background_tasks (BackgroundTasks): FastAPI BackgroundTasks instance used to schedule processing.
 
     Returns:
         JobResponse: The created try-on job in queued state.
 
     Raises:
-        HTTPException: If an uploaded file is not an image, required provider configuration is missing (e.g., FASHN_API_KEY), or saving uploads fails.
+        HTTPException: If an uploaded file is not an image, file extension is not allowed, required provider configuration is missing (e.g., FASHN_API_KEY), or saving uploads fails.
     """
     # Validate file types
     for img, name in [(model_image, "model"), (garment_image, "garment")]:
         if not img.content_type or not img.content_type.startswith("image/"):
             raise HTTPException(status_code=400, detail=f"{name} file must be an image")
+
+    # Validate file extensions
+    try:
+        model_ext = validate_file_extension(model_image.filename)
+        garment_ext = validate_file_extension(garment_image.filename)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     # Validate provider
     if provider == TryOnProvider.FASHN and not os.getenv("FASHN_API_KEY"):
@@ -1164,18 +1381,29 @@ async def generate_tryon_upload(
         },
     )
 
-    # Save uploaded files
-    model_ext = Path(model_image.filename or "model.png").suffix or ".png"
-    garment_ext = Path(garment_image.filename or "garment.png").suffix or ".png"
-
+    # Save uploaded files with validated extensions
     model_path = UPLOAD_DIR / f"model_{job.job_id}{model_ext}"
     garment_path = UPLOAD_DIR / f"garment_{job.job_id}{garment_ext}"
 
     try:
         model_content = await model_image.read()
         garment_content = await garment_image.read()
+
+        # Check file sizes
+        if len(model_content) > MAX_IMAGE_SIZE_BYTES:
+            raise ValueError(
+                f"Model image too large: {len(model_content)} bytes exceeds limit of {MAX_IMAGE_SIZE_BYTES} bytes"
+            )
+        if len(garment_content) > MAX_IMAGE_SIZE_BYTES:
+            raise ValueError(
+                f"Garment image too large: {len(garment_content)} bytes exceeds limit of {MAX_IMAGE_SIZE_BYTES} bytes"
+            )
+
         model_path.write_bytes(model_content)
         garment_path.write_bytes(garment_content)
+    except ValueError as e:
+        job_store.fail_tryon_job(job.job_id, str(e))
+        raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         job_store.fail_tryon_job(job.job_id, f"Failed to save uploads: {e}")
         raise HTTPException(status_code=500, detail=f"Failed to save uploads: {e}")
@@ -1240,7 +1468,7 @@ async def batch_tryon(
     batch = job_store.create_batch_job(jobs)
 
     # Process in background
-    async def run_batch():
+    async def run_batch() -> None:
         """
         Process a batch try-on request: download the model image, iterate garments, run provider-specific try-on jobs, and update batch progress.
 
@@ -1332,7 +1560,9 @@ async def generate_ai_model(
     job = job_store.create_model_job(request.prompt, request.gender)
 
     # Schedule background task
-    background_tasks.add_task(run_fashn_model_generation, job.job_id, request.prompt, request.gender)
+    background_tasks.add_task(
+        run_fashn_model_generation, job.job_id, request.prompt, request.gender
+    )
 
     return job
 

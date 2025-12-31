@@ -27,7 +27,7 @@ import os
 import secrets
 import time
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from enum import Enum
 from typing import Any
 from urllib.parse import urlencode
@@ -38,6 +38,7 @@ from pydantic import BaseModel, Field, SecretStr
 # Note: Library code should only create loggers, not configure logging
 try:
     import structlog
+
     logger = structlog.get_logger(__name__)
 except ImportError:
     logger = logging.getLogger(__name__)
@@ -106,7 +107,7 @@ class WordPressAuthConfig(BaseModel):
     rate_limit_per_minute: int = Field(default=60)
 
     @classmethod
-    def from_env(cls) -> "WordPressAuthConfig":
+    def from_env(cls) -> WordPressAuthConfig:
         """Load configuration from environment variables."""
         auth_method = AuthMethod(os.getenv("WP_AUTH_METHOD", "app_password"))
         jwt_secret_env = os.getenv("WP_JWT_SECRET")
@@ -115,7 +116,7 @@ class WordPressAuthConfig(BaseModel):
         if auth_method == AuthMethod.JWT and not jwt_secret_env:
             raise ValueError(
                 "WP_JWT_SECRET environment variable is required when using JWT authentication. "
-                "Generate a secure secret with: python -c \"import secrets; print(secrets.token_urlsafe(64))\""
+                'Generate a secure secret with: python -c "import secrets; print(secrets.token_urlsafe(64))"'
             )
 
         return cls(
@@ -145,7 +146,7 @@ class WooCommerceAuthConfig(BaseModel):
     signature_method: str = Field(default="HMAC-SHA1")
 
     @classmethod
-    def from_env(cls) -> "WooCommerceAuthConfig":
+    def from_env(cls) -> WooCommerceAuthConfig:
         """Load configuration from environment variables."""
         return cls(
             consumer_key=SecretStr(os.getenv("WOOCOMMERCE_KEY", "")),
@@ -174,12 +175,12 @@ class AuthToken:
     @property
     def is_expired(self) -> bool:
         """Check if token is expired."""
-        return datetime.now(timezone.utc) >= self.expires_at
+        return datetime.now(UTC) >= self.expires_at
 
     @property
     def expires_in_seconds(self) -> int:
         """Get seconds until token expires."""
-        delta = self.expires_at - datetime.now(timezone.utc)
+        delta = self.expires_at - datetime.now(UTC)
         return max(0, int(delta.total_seconds()))
 
 
@@ -242,7 +243,7 @@ class WordPressAuthHandler:
         """Refresh JWT token."""
         # This would call the WordPress JWT endpoint
         # For now, return a mock token
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=self.config.jwt_expiry_hours)
+        expires_at = datetime.now(UTC) + timedelta(hours=self.config.jwt_expiry_hours)
         return AuthToken(
             token="jwt_token_placeholder",
             token_type="Bearer",
@@ -252,7 +253,7 @@ class WordPressAuthHandler:
     def _refresh_oauth2_token(self) -> AuthToken:
         """Refresh OAuth2 token."""
         # This would call the OAuth2 token endpoint
-        expires_at = datetime.now(timezone.utc) + timedelta(hours=1)
+        expires_at = datetime.now(UTC) + timedelta(hours=1)
         return AuthToken(
             token="oauth2_token_placeholder",
             token_type="Bearer",
@@ -268,26 +269,28 @@ class WordPressAuthHandler:
             url = f"{self.config.site_url}/wp-json/wp/v2/users/me"
 
             timeout = aiohttp.ClientTimeout(total=self.config.timeout_seconds)
-            async with aiohttp.ClientSession(timeout=timeout) as session:
-                async with session.get(
+            async with (
+                aiohttp.ClientSession(timeout=timeout) as session,
+                session.get(
                     url,
                     headers=headers,
                     ssl=self.config.verify_ssl,
-                ) as response:
-                    if response.status == 200:
-                        user_data = await response.json()
-                        self._logger.info(
-                            "credentials_validated",
-                            user_id=user_data.get("id"),
-                            username=user_data.get("slug"),
-                        )
-                        return True
-                    else:
-                        self._logger.warning(
-                            "credentials_invalid",
-                            status=response.status,
-                        )
-                        return False
+                ) as response,
+            ):
+                if response.status == 200:
+                    user_data = await response.json()
+                    self._logger.info(
+                        "credentials_validated",
+                        user_id=user_data.get("id"),
+                        username=user_data.get("slug"),
+                    )
+                    return True
+                else:
+                    self._logger.warning(
+                        "credentials_invalid",
+                        status=response.status,
+                    )
+                    return False
         except Exception as e:
             self._logger.error("credential_validation_failed", error=str(e))
             return False
@@ -305,6 +308,26 @@ class WooCommerceAuthHandler:
         self.site_url = site_url
         self._logger = logger.bind(component="wc_auth")
 
+    def get_auth_headers(self) -> dict[str, str]:
+        """
+        Get authentication headers for HTTPS WooCommerce API requests.
+
+        Uses HTTP Basic Auth with consumer_key:consumer_secret for secure transport.
+        This keeps credentials out of URL query strings and server logs.
+
+        Returns:
+            dict: Authorization header for Basic Auth
+        """
+        credentials = (
+            f"{self.config.consumer_key.get_secret_value()}:"
+            f"{self.config.consumer_secret.get_secret_value()}"
+        )
+        encoded = base64.b64encode(credentials.encode()).decode()
+        return {
+            "Authorization": f"Basic {encoded}",
+            "Content-Type": "application/json",
+        }
+
     def get_auth_params(
         self,
         method: str,
@@ -314,15 +337,19 @@ class WooCommerceAuthHandler:
         """
         Get authentication parameters for WooCommerce API request.
 
-        For HTTPS connections, uses query string authentication.
+        DEPRECATED for HTTPS: Use get_auth_headers() instead to keep secrets
+        out of URLs. This method is retained for HTTP (OAuth 1.0a) compatibility.
+
+        For HTTPS connections, returns empty dict (use get_auth_headers instead).
         For HTTP connections, uses OAuth 1.0a signature.
+
+        Returns:
+            dict: Query string parameters for authentication (empty for HTTPS)
         """
         if url.startswith("https://"):
-            # Use simple query string authentication for HTTPS
-            return {
-                "consumer_key": self.config.consumer_key.get_secret_value(),
-                "consumer_secret": self.config.consumer_secret.get_secret_value(),
-            }
+            # For HTTPS, use Authorization header instead of query params
+            # Return only consumer_key for identification (not secret)
+            return {"consumer_key": self.config.consumer_key.get_secret_value()}
         else:
             # Use OAuth 1.0a for HTTP (not recommended for production)
             return self._get_oauth_params(method, url, params or {})
@@ -386,14 +413,38 @@ class WooCommerceAuthHandler:
 
         try:
             url = f"{self.site_url}/wp-json/{self.config.api_version}/products"
-            auth_params = self.get_auth_params("GET", url)
 
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    url,
-                    params=auth_params,
-                    timeout=30,
-                ) as response:
+            # Use Authorization header for HTTPS (keeps secrets out of URL/logs)
+            if url.startswith("https://"):
+                headers = self.get_auth_headers()
+                async with (
+                    aiohttp.ClientSession() as session,
+                    session.get(
+                        url,
+                        headers=headers,
+                        timeout=30,
+                    ) as response,
+                ):
+                    if response.status == 200:
+                        self._logger.info("wc_credentials_validated")
+                        return True
+                    else:
+                        self._logger.warning(
+                            "wc_credentials_invalid",
+                            status=response.status,
+                        )
+                        return False
+            else:
+                # Use OAuth 1.0a params for HTTP (not recommended)
+                auth_params = self.get_auth_params("GET", url)
+                async with (
+                    aiohttp.ClientSession() as session,
+                    session.get(
+                        url,
+                        params=auth_params,
+                        timeout=30,
+                    ) as response,
+                ):
                     if response.status == 200:
                         self._logger.info("wc_credentials_validated")
                         return True
@@ -420,13 +471,13 @@ class AuthSession:
     session_id: str
     wp_handler: WordPressAuthHandler
     wc_handler: WooCommerceAuthHandler
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
-    last_used_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
+    last_used_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     request_count: int = 0
 
     def touch(self) -> None:
         """Update last used timestamp and increment request count."""
-        self.last_used_at = datetime.now(timezone.utc)
+        self.last_used_at = datetime.now(UTC)
         self.request_count += 1
 
 
@@ -474,12 +525,11 @@ class AuthSessionManager:
 
     def cleanup_expired_sessions(self, max_age_hours: int = 24) -> int:
         """Remove expired sessions."""
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         max_age = timedelta(hours=max_age_hours)
 
         expired = [
-            sid for sid, session in self._sessions.items()
-            if now - session.last_used_at > max_age
+            sid for sid, session in self._sessions.items() if now - session.last_used_at > max_age
         ]
 
         for sid in expired:
