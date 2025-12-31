@@ -1,466 +1,280 @@
 """
-Tests for Model Fidelity Validator
-===================================
+Tests for 3D Model Fidelity Validation System
+==============================================
 
-Tests for the ModelFidelityValidator class and fidelity validation.
+Tests the model fidelity validation, scoring, and enforcement
+for the DevSkyy 3D asset pipeline.
 
-Coverage:
-- Validator initialization
-- Fidelity report generation
-- Multi-angle validation
-- SSIM and color accuracy metrics
-- Threshold handling
-- Error handling
+CRITICAL: All models must achieve 95% fidelity to pass.
 """
 
-import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import Mock, patch
 
 import pytest
 
 from imagery.model_fidelity import (
-    AngleScore,
+    MINIMUM_FIDELITY_SCORE,
+    FidelityGrade,
     FidelityReport,
+    GeometryMetrics,
+    MaterialMetrics,
     ModelFidelityValidator,
-    ValidationConfig,
+    TextureMetrics,
 )
 
-# =============================================================================
-# ValidationConfig Tests
-# =============================================================================
+
+class TestFidelityThreshold:
+    """Tests for the 95% fidelity threshold constant."""
+
+    def test_minimum_fidelity_score(self):
+        """Test that minimum fidelity score is 95%."""
+        assert MINIMUM_FIDELITY_SCORE == 95.0
+
+    def test_validator_threshold(self):
+        """Test that validator uses 95% threshold."""
+        pytest.importorskip("trimesh")
+        validator = ModelFidelityValidator()
+        assert validator.minimum_fidelity == 95.0
 
 
-class TestValidationConfig:
-    """Tests for ValidationConfig."""
+class TestGeometryMetrics:
+    """Tests for geometry metrics data class."""
 
-    def test_default_config(self):
-        """Should have sensible defaults."""
-        config = ValidationConfig()
-
-        assert config.min_fidelity_score == 0.90
-        assert config.ssim_weight == 0.4
-        assert config.color_weight == 0.3
-        assert config.edge_weight == 0.3
-        assert len(config.angles) == 4  # front, back, left, right
-        assert config.render_resolution == (512, 512)
-
-    def test_custom_config(self):
-        """Should accept custom values."""
-        config = ValidationConfig(
-            min_fidelity_score=0.85,
-            ssim_weight=0.5,
-            color_weight=0.25,
-            edge_weight=0.25,
-            angles=["front", "back"],
-            render_resolution=(1024, 1024),
+    def test_geometry_metrics_creation(self):
+        """Test creating geometry metrics."""
+        metrics = GeometryMetrics(
+            vertex_count=1000,
+            face_count=500,
+            is_watertight=True,
+            is_manifold=True,
+            has_holes=False,
+            overall_score=95.0,
         )
+        assert metrics.vertex_count == 1000
+        assert metrics.face_count == 500
+        assert metrics.is_watertight is True
+        assert metrics.is_manifold is True
+        assert metrics.has_holes is False
+        assert metrics.overall_score == 95.0
 
-        assert config.min_fidelity_score == 0.85
-        assert config.ssim_weight == 0.5
-        assert len(config.angles) == 2
-        assert config.render_resolution == (1024, 1024)
+    def test_geometry_metrics_default_values(self):
+        """Test geometry metrics default values."""
+        metrics = GeometryMetrics()
+        assert metrics.vertex_count == 0
+        assert metrics.face_count == 0
+        assert metrics.is_watertight is False
+        assert metrics.is_manifold is False
+        assert metrics.has_holes is True
+        assert metrics.overall_score == 0.0
 
-    def test_weight_validation(self):
-        """Weights should be configurable."""
-        config = ValidationConfig(
-            ssim_weight=0.6,
-            color_weight=0.2,
-            edge_weight=0.2,
+
+class TestTextureMetrics:
+    """Tests for texture metrics data class."""
+
+    def test_texture_metrics_creation(self):
+        """Test creating texture metrics."""
+        metrics = TextureMetrics(
+            has_textures=True, resolution="2048x2048", uv_coverage=0.95, overall_score=96.0
         )
+        assert metrics.has_textures is True
+        assert metrics.resolution == "2048x2048"
+        assert metrics.uv_coverage == 0.95
+        assert metrics.overall_score == 96.0
 
-        total = config.ssim_weight + config.color_weight + config.edge_weight
-        assert abs(total - 1.0) < 0.001
-
-
-# =============================================================================
-# AngleScore Tests
-# =============================================================================
-
-
-class TestAngleScore:
-    """Tests for AngleScore dataclass."""
-
-    def test_angle_score_creation(self):
-        """Should create AngleScore with all metrics."""
-        score = AngleScore(
-            angle="front",
-            ssim_score=0.92,
-            color_accuracy=0.88,
-            edge_similarity=0.90,
-            combined_score=0.90,
-        )
-
-        assert score.angle == "front"
-        assert score.ssim_score == 0.92
-        assert score.color_accuracy == 0.88
-        assert score.edge_similarity == 0.90
-        assert score.combined_score == 0.90
+    def test_texture_metrics_default_values(self):
+        """Test texture metrics default values."""
+        metrics = TextureMetrics()
+        assert metrics.has_textures is False
+        assert metrics.resolution is None
+        assert metrics.uv_coverage == 0.0
+        assert metrics.overall_score == 0.0
 
 
-# =============================================================================
-# FidelityReport Tests
-# =============================================================================
+class TestMaterialMetrics:
+    """Tests for material metrics data class."""
+
+    def test_material_metrics_creation(self):
+        """Test creating material metrics."""
+        metrics = MaterialMetrics(has_materials=True, is_pbr=True, overall_score=98.0)
+        assert metrics.has_materials is True
+        assert metrics.is_pbr is True
+        assert metrics.overall_score == 98.0
+
+    def test_material_metrics_default_values(self):
+        """Test material metrics default values."""
+        metrics = MaterialMetrics()
+        assert metrics.has_materials is False
+        assert metrics.is_pbr is False
+        assert metrics.overall_score == 0.0
 
 
 class TestFidelityReport:
-    """Tests for FidelityReport dataclass."""
+    """Tests for fidelity report generation."""
 
-    def test_fidelity_report_creation(self):
-        """Should create FidelityReport with all fields."""
-        angles = [
-            AngleScore("front", 0.92, 0.88, 0.90, 0.90),
-            AngleScore("back", 0.90, 0.86, 0.88, 0.88),
-            AngleScore("left", 0.91, 0.87, 0.89, 0.89),
-            AngleScore("right", 0.89, 0.85, 0.87, 0.87),
-        ]
-
+    def test_report_creation_passing(self):
+        """Test creating a fidelity report that passes."""
         report = FidelityReport(
-            product_sku="SKR-001",
-            overall_score=0.885,
+            model_path="/path/to/model.glb",
+            overall_score=96.5,
+            grade=FidelityGrade.EXCELLENT,
             passed=True,
-            angle_scores=angles,
-            validation_time_seconds=5.2,
-            threshold=0.90,
-            recommendations=[],
+            minimum_threshold=95.0,
+            geometry=GeometryMetrics(
+                vertex_count=10000,
+                face_count=5000,
+                is_watertight=True,
+                is_manifold=True,
+                has_holes=False,
+                overall_score=97.0,
+            ),
+            textures=TextureMetrics(
+                has_textures=True, resolution="2048x2048", uv_coverage=0.95, overall_score=96.0
+            ),
+            materials=MaterialMetrics(has_materials=True, is_pbr=True, overall_score=96.0),
         )
-
-        assert report.product_sku == "SKR-001"
-        assert report.overall_score == 0.885
         assert report.passed is True
-        assert len(report.angle_scores) == 4
-        assert report.validation_time_seconds == 5.2
+        assert report.overall_score == 96.5
+        assert report.grade == FidelityGrade.EXCELLENT
 
-    def test_fidelity_report_with_recommendations(self):
-        """Should include recommendations for improvement."""
+    def test_report_creation_failing(self):
+        """Test that report fails when score is below 95%."""
         report = FidelityReport(
-            product_sku="SKR-002",
-            overall_score=0.75,
+            model_path="/path/to/model.glb",
+            overall_score=80.0,
+            grade=FidelityGrade.GOOD,
             passed=False,
-            angle_scores=[],
-            validation_time_seconds=3.0,
-            threshold=0.90,
-            recommendations=[
-                "Increase texture resolution",
-                "Improve back-angle geometry",
-            ],
+            minimum_threshold=95.0,
+            geometry=GeometryMetrics(
+                vertex_count=1000,
+                face_count=500,
+                is_watertight=False,
+                is_manifold=False,
+                has_holes=True,
+                overall_score=75.0,
+            ),
+            textures=TextureMetrics(
+                has_textures=False, resolution=None, uv_coverage=0.0, overall_score=0.0
+            ),
+            materials=MaterialMetrics(has_materials=False, is_pbr=False, overall_score=0.0),
         )
-
         assert report.passed is False
-        assert len(report.recommendations) == 2
+        assert report.overall_score < MINIMUM_FIDELITY_SCORE
 
-
-# =============================================================================
-# ModelFidelityValidator Tests
-# =============================================================================
+    def test_fidelity_grades(self):
+        """Test fidelity grade values."""
+        assert FidelityGrade.EXCELLENT.value == "excellent"
+        assert FidelityGrade.GOOD.value == "good"
+        assert FidelityGrade.ACCEPTABLE.value == "acceptable"
+        assert FidelityGrade.POOR.value == "poor"
+        assert FidelityGrade.FAILED.value == "failed"
 
 
 class TestModelFidelityValidator:
-    """Tests for ModelFidelityValidator class."""
+    """Tests for the ModelFidelityValidator class."""
 
     @pytest.fixture
-    def validator(self):
-        """Create validator instance."""
-        return ModelFidelityValidator()
+    def mock_trimesh(self):
+        """Mock trimesh for testing without actual library."""
+        with patch.dict("sys.modules", {"trimesh": Mock()}):
+            yield
 
-    @pytest.fixture
-    def custom_validator(self):
-        """Create validator with custom config."""
-        config = ValidationConfig(min_fidelity_score=0.85)
-        return ModelFidelityValidator(config=config)
-
-    @pytest.fixture
-    def sample_model(self, tmp_path):
-        """Create sample model file."""
-        model_path = tmp_path / "test_model.glb"
-        model_path.write_bytes(b"fake glb data")
-        return model_path
-
-    @pytest.fixture
-    def reference_images_dir(self, tmp_path):
-        """Create reference images directory."""
-        ref_dir = tmp_path / "references"
-        ref_dir.mkdir()
-        for angle in ["front", "back", "left", "right"]:
-            img_path = ref_dir / f"{angle}.jpg"
-            img_path.write_bytes(b"fake image data")
-        return ref_dir
-
-    def test_validator_initialization(self, validator):
-        """Should initialize with default config."""
-        assert validator.config is not None
-        assert validator.config.min_fidelity_score == 0.90
-
-    def test_validator_custom_config(self, custom_validator):
-        """Should use custom config."""
-        assert custom_validator.config.min_fidelity_score == 0.85
+    def test_validator_creation(self):
+        """Test validator instantiation."""
+        pytest.importorskip("trimesh")
+        validator = ModelFidelityValidator()
+        assert validator.minimum_fidelity == MINIMUM_FIDELITY_SCORE
 
     @pytest.mark.asyncio
-    async def test_validate_missing_model(self, validator):
-        """Should handle missing model file."""
-        from imagery.model_fidelity import ValidationError
+    async def test_validate_returns_fidelity_report(self):
+        """Test that validation returns a FidelityReport."""
+        pytest.importorskip("trimesh")
+        validator = ModelFidelityValidator()
 
-        with pytest.raises(ValidationError, match="Model file not found"):
-            await validator.validate(
-                model_path=Path("/nonexistent/model.glb"),
-                product_sku="SKR-001",
-            )
+        # Create a test GLB file path (doesn't need to exist for mock)
+        test_path = Path("/tmp/test_model.glb")
 
-    @pytest.mark.asyncio
-    async def test_validate_returns_report(self, validator, sample_model):
-        """Should return FidelityReport."""
-        # Mock the internal validation methods
-        mock_report = FidelityReport(
-            product_sku="SKR-001",
-            overall_score=0.92,
-            passed=True,
-            angle_scores=[
-                AngleScore("front", 0.93, 0.90, 0.91, 0.92),
-            ],
-            validation_time_seconds=4.5,
-            threshold=0.90,
-            recommendations=[],
-        )
+        with patch.object(validator, "_load_mesh") as mock_load:
+            # Create mock mesh
+            mock_mesh = Mock()
+            mock_mesh.is_watertight = True
+            mock_mesh.is_volume = True
+            mock_mesh.euler_number = 2
+            mock_mesh.volume = 100.0
+            mock_mesh.area = 200.0
+            mock_mesh.vertices = Mock()
+            mock_mesh.vertices.__len__ = Mock(return_value=10000)
+            mock_mesh.faces = Mock()
+            mock_mesh.faces.__len__ = Mock(return_value=5000)
+            mock_mesh.visual = Mock()
+            mock_mesh.visual.kind = "texture"
+            mock_mesh.visual.uv = Mock()
+            mock_mesh.visual.uv.__len__ = Mock(return_value=10000)
+            mock_mesh.visual.material = Mock()
+            mock_load.return_value = mock_mesh
 
-        with patch.object(
-            validator, "_run_validation", new_callable=AsyncMock
-        ) as mock_validate:
-            mock_validate.return_value = mock_report
+            report = await validator.validate(test_path)
 
-            result = await validator.validate(
-                model_path=sample_model,
-                product_sku="SKR-001",
-            )
+            assert isinstance(report, FidelityReport)
+            assert report.model_path == str(test_path)
 
-            assert isinstance(result, FidelityReport)
-            assert result.product_sku == "SKR-001"
-            assert result.passed is True
 
-    @pytest.mark.asyncio
-    async def test_validate_with_reference_images(
-        self, validator, sample_model, reference_images_dir
-    ):
-        """Should use reference images when provided."""
-        mock_report = FidelityReport(
-            product_sku="SKR-001",
-            overall_score=0.95,
-            passed=True,
-            angle_scores=[],
-            validation_time_seconds=6.0,
-            threshold=0.90,
-            recommendations=[],
-        )
+class TestFidelityEnforcement:
+    """Tests for fidelity enforcement in production."""
 
-        with patch.object(
-            validator, "_run_validation", new_callable=AsyncMock
-        ) as mock_validate:
-            mock_validate.return_value = mock_report
+    def test_passing_score_threshold(self):
+        """Test score passes at exactly 95%."""
+        score = 95.0
+        passed = score >= MINIMUM_FIDELITY_SCORE
+        assert passed is True
 
-            await validator.validate(
-                model_path=sample_model,
-                product_sku="SKR-001",
-                reference_images_dir=reference_images_dir,
-            )
+    def test_failing_score_threshold(self):
+        """Test score fails below 95%."""
+        score = 94.9
+        passed = score >= MINIMUM_FIDELITY_SCORE
+        assert passed is False
 
-            # Verify reference images were passed
-            call_args = mock_validate.call_args
-            assert call_args is not None
+    def test_excellent_score_passes(self):
+        """Test excellent score (96+) passes."""
+        score = 98.5
+        passed = score >= MINIMUM_FIDELITY_SCORE
+        assert passed is True
 
-    @pytest.mark.asyncio
-    async def test_validate_below_threshold(self, validator, sample_model):
-        """Should report failure when below threshold."""
-        mock_report = FidelityReport(
-            product_sku="SKR-001",
-            overall_score=0.75,
+    def test_report_issues_populated(self):
+        """Test that issues list is populated for failing models."""
+        report = FidelityReport(
+            model_path="/path/to/model.glb",
+            overall_score=70.0,
+            grade=FidelityGrade.POOR,
             passed=False,
-            angle_scores=[
-                AngleScore("front", 0.78, 0.72, 0.75, 0.75),
-            ],
-            validation_time_seconds=4.0,
-            threshold=0.90,
-            recommendations=["Improve texture quality"],
+            issues=["Model is not watertight", "Missing textures", "Low polygon count"],
+            recommendations=["Fix mesh holes", "Add textures", "Increase geometry detail"],
         )
 
-        with patch.object(
-            validator, "_run_validation", new_callable=AsyncMock
-        ) as mock_validate:
-            mock_validate.return_value = mock_report
+        assert len(report.issues) == 3
+        assert "Model is not watertight" in report.issues
+        assert len(report.recommendations) == 3
 
-            result = await validator.validate(
-                model_path=sample_model,
-                product_sku="SKR-001",
-            )
 
-            assert result.passed is False
-            assert result.overall_score < 0.90
-            assert len(result.recommendations) > 0
+class TestAPIIntegration:
+    """Tests for API integration with fidelity validation."""
 
-    @pytest.mark.asyncio
-    async def test_validate_all_angles(self, validator, sample_model):
-        """Should validate all configured angles."""
-        angle_scores = [
-            AngleScore("front", 0.93, 0.90, 0.91, 0.92),
-            AngleScore("back", 0.91, 0.88, 0.89, 0.89),
-            AngleScore("left", 0.92, 0.89, 0.90, 0.90),
-            AngleScore("right", 0.90, 0.87, 0.88, 0.88),
-        ]
+    def test_minimum_fidelity_score_exported(self):
+        """Test MINIMUM_FIDELITY_SCORE is correctly exported."""
+        from imagery.model_fidelity import MINIMUM_FIDELITY_SCORE as imported_score
 
-        mock_report = FidelityReport(
-            product_sku="SKR-001",
-            overall_score=0.8975,
+        assert imported_score == 95.0
+
+    def test_fidelity_report_serializable(self):
+        """Test FidelityReport can be serialized to dict."""
+        report = FidelityReport(
+            model_path="/path/to/model.glb",
+            overall_score=96.0,
+            grade=FidelityGrade.EXCELLENT,
             passed=True,
-            angle_scores=angle_scores,
-            validation_time_seconds=8.0,
-            threshold=0.85,
-            recommendations=[],
         )
 
-        with patch.object(
-            validator, "_run_validation", new_callable=AsyncMock
-        ) as mock_validate:
-            mock_validate.return_value = mock_report
-
-            result = await validator.validate(
-                model_path=sample_model,
-                product_sku="SKR-001",
-            )
-
-            assert len(result.angle_scores) == 4
-            angles = [s.angle for s in result.angle_scores]
-            assert "front" in angles
-            assert "back" in angles
-            assert "left" in angles
-            assert "right" in angles
-
-
-# =============================================================================
-# Metric Calculation Tests
-# =============================================================================
-
-
-class TestMetricCalculations:
-    """Tests for internal metric calculations."""
-
-    @pytest.fixture
-    def validator(self):
-        """Create validator instance."""
-        return ModelFidelityValidator()
-
-    def test_combined_score_calculation(self, validator):
-        """Should calculate combined score correctly."""
-        # Default weights: ssim=0.4, color=0.3, edge=0.3
-        ssim = 0.90
-        color = 0.85
-        edge = 0.88
-
-        expected = (0.4 * ssim) + (0.3 * color) + (0.3 * edge)
-
-        # Calculate using validator method if exposed, otherwise check formula
-        assert abs(expected - 0.879) < 0.001
-
-    def test_overall_score_averaging(self):
-        """Should average angle scores correctly."""
-        scores = [0.92, 0.89, 0.91, 0.88]
-        expected = sum(scores) / len(scores)
-
-        assert abs(expected - 0.90) < 0.001
-
-
-# =============================================================================
-# Error Handling Tests
-# =============================================================================
-
-
-class TestValidationErrors:
-    """Tests for validation error handling."""
-
-    @pytest.mark.asyncio
-    async def test_invalid_model_format(self):
-        """Should handle unsupported model formats."""
-        from imagery.model_fidelity import ValidationError
-
-        validator = ModelFidelityValidator()
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            invalid_model = Path(tmpdir) / "model.xyz"
-            invalid_model.write_bytes(b"invalid format")
-
-            with pytest.raises(ValidationError, match="Unsupported model format"):
-                await validator.validate(
-                    model_path=invalid_model,
-                    product_sku="SKR-001",
-                )
-
-    @pytest.mark.asyncio
-    async def test_corrupted_model(self):
-        """Should handle corrupted model files gracefully."""
-        from imagery.model_fidelity import ValidationError
-
-        validator = ModelFidelityValidator()
-
-        with tempfile.TemporaryDirectory() as tmpdir:
-            corrupted = Path(tmpdir) / "corrupted.glb"
-            corrupted.write_bytes(b"not a valid glb file at all")
-
-            # Should raise or return failed report
-            with patch.object(
-                validator, "_load_model", side_effect=Exception("Failed to parse GLB")
-            ), pytest.raises((ValidationError, Exception)):
-                await validator.validate(
-                    model_path=corrupted,
-                    product_sku="SKR-001",
-                )
-
-
-# =============================================================================
-# Integration Tests
-# =============================================================================
-
-
-@pytest.mark.asyncio
-@pytest.mark.integration
-async def test_full_validation_pipeline():
-    """Test full validation pipeline (mocked)."""
-    validator = ModelFidelityValidator()
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        # Create test model
-        model_path = Path(tmpdir) / "product.glb"
-        model_path.write_bytes(b"fake glb data")
-
-        # Mock the validation pipeline
-        mock_report = FidelityReport(
-            product_sku="TEST-001",
-            overall_score=0.93,
-            passed=True,
-            angle_scores=[
-                AngleScore("front", 0.94, 0.92, 0.93, 0.93),
-                AngleScore("back", 0.92, 0.90, 0.91, 0.91),
-            ],
-            validation_time_seconds=5.0,
-            threshold=0.90,
-            recommendations=[],
-        )
-
-        with patch.object(
-            validator, "_run_validation", new_callable=AsyncMock
-        ) as mock_validate:
-            mock_validate.return_value = mock_report
-
-            result = await validator.validate(
-                model_path=model_path,
-                product_sku="TEST-001",
-            )
-
-            assert result.passed is True
-            assert result.overall_score >= 0.90
-
-
-__all__ = [
-    "TestValidationConfig",
-    "TestAngleScore",
-    "TestFidelityReport",
-    "TestModelFidelityValidator",
-    "TestMetricCalculations",
-    "TestValidationErrors",
-]
+        report_dict = report.model_dump()
+        assert report_dict["overall_score"] == 96.0
+        assert report_dict["passed"] is True
+        assert report_dict["grade"] == "excellent"
