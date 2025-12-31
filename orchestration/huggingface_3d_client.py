@@ -58,7 +58,7 @@ from pydantic import BaseModel, Field
 logger = structlog.get_logger(__name__)
 
 # HuggingFace API endpoints
-HF_API_BASE = "https://api-inference.huggingface.co/models"
+HF_API_BASE = "https://router.huggingface.co/hf-inference/models"
 HF_SPACES_BASE = "https://huggingface.co/spaces"
 
 

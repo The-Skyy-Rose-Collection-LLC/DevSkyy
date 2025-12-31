@@ -91,7 +91,7 @@
               "widgetType": "video",
               "settings": {
                 "video_type": "hosted",
-                "hosted_url": "https://skyyrose.local/experiences/signature-collection/",
+                "hosted_url": "/experiences/signature/",
                 "controls": "yes",
                 "autoplay": "no",
                 "loop": "yes",
