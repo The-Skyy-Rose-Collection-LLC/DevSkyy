@@ -1,0 +1,449 @@
+/**
+ * SkyyRose 3D Experience Styles
+ *
+ * @package SkyyRose_3D_Experience
+ * @version 2.0.0
+ */
+
+/* =============================================================================
+   Container
+   ============================================================================= */
+
+.skyyrose-3d-container {
+    position: relative;
+    width: 100%;
+    min-height: 400px;
+    background-color: #1A1A1A;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.skyyrose-3d-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* =============================================================================
+   Loader
+   ============================================================================= */
+
+.skyyrose-3d-loader {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: inherit;
+    z-index: 100;
+    transition: opacity 0.5s ease-out;
+}
+
+.skyyrose-3d-loader.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+.skyyrose-3d-spinner {
+    width: 50px;
+    height: 50px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #B76E79;
+    border-radius: 50%;
+    animation: skyyrose-spin 1s linear infinite;
+}
+
+@keyframes skyyrose-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.skyyrose-3d-loader p {
+    margin-top: 1rem;
+    color: #888;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    font-size: 14px;
+}
+
+/* =============================================================================
+   Progress Bar
+   ============================================================================= */
+
+.skyyrose-3d-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    margin-top: 1rem;
+    overflow: hidden;
+}
+
+.skyyrose-3d-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #B76E79, #D4A5AA);
+    border-radius: 2px;
+    transition: width 0.3s ease;
+}
+
+/* =============================================================================
+   Fullscreen Button
+   ============================================================================= */
+
+.skyyrose-3d-fullscreen-btn {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.skyyrose-3d-fullscreen-btn:hover {
+    background: rgba(183, 110, 121, 0.5);
+    border-color: #B76E79;
+}
+
+.skyyrose-3d-fullscreen-btn svg {
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+/* Fullscreen mode */
+.skyyrose-3d-container:fullscreen,
+.skyyrose-3d-container:-webkit-full-screen {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+}
+
+/* =============================================================================
+   Product Cards
+   ============================================================================= */
+
+.skyyrose-3d-product-card {
+    position: absolute;
+    background: rgba(26, 26, 26, 0.95);
+    border: 1px solid rgba(183, 110, 121, 0.3);
+    border-radius: 12px;
+    padding: 1rem;
+    min-width: 200px;
+    max-width: 280px;
+    transform: translate(-50%, -100%);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 60;
+    backdrop-filter: blur(10px);
+}
+
+.skyyrose-3d-product-card.visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, calc(-100% - 10px));
+}
+
+.skyyrose-3d-product-card::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 8px solid transparent;
+    border-top-color: rgba(26, 26, 26, 0.95);
+}
+
+.skyyrose-3d-product-card h4 {
+    margin: 0 0 0.5rem;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.skyyrose-3d-product-card .price {
+    color: #B76E79;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+}
+
+.skyyrose-3d-product-card .cta-btn {
+    display: block;
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(135deg, #B76E79, #9A5A64);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    text-align: center;
+    text-decoration: none;
+}
+
+.skyyrose-3d-product-card .cta-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(183, 110, 121, 0.4);
+}
+
+/* =============================================================================
+   AR Button
+   ============================================================================= */
+
+.skyyrose-3d-ar-btn {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    padding: 10px 20px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+    z-index: 50;
+}
+
+.skyyrose-3d-ar-btn:hover {
+    background: rgba(183, 110, 121, 0.5);
+    border-color: #B76E79;
+}
+
+.skyyrose-3d-ar-btn svg {
+    width: 18px;
+    height: 18px;
+}
+
+/* =============================================================================
+   Hotspots
+   ============================================================================= */
+
+.skyyrose-3d-hotspot {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background: #B76E79;
+    border: 2px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    transform: translate(-50%, -50%);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    z-index: 40;
+}
+
+.skyyrose-3d-hotspot::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    background: #B76E79;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    animation: skyyrose-pulse 2s ease-out infinite;
+}
+
+@keyframes skyyrose-pulse {
+    0% {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2);
+        opacity: 0;
+    }
+}
+
+.skyyrose-3d-hotspot:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    box-shadow: 0 0 20px rgba(183, 110, 121, 0.6);
+}
+
+.skyyrose-3d-hotspot svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 16px;
+    height: 16px;
+    fill: white;
+}
+
+/* =============================================================================
+   Navigation
+   ============================================================================= */
+
+.skyyrose-3d-nav {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 12px;
+    backdrop-filter: blur(10px);
+    z-index: 50;
+}
+
+.skyyrose-3d-nav button {
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: white;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.skyyrose-3d-nav button:hover,
+.skyyrose-3d-nav button.active {
+    background: rgba(183, 110, 121, 0.5);
+    border-color: #B76E79;
+}
+
+/* =============================================================================
+   Error State
+   ============================================================================= */
+
+.skyyrose-3d-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #ff6b6b;
+    padding: 2rem;
+}
+
+.skyyrose-3d-error h3 {
+    margin: 0 0 1rem;
+    font-size: 18px;
+}
+
+.skyyrose-3d-error p {
+    margin: 0;
+    color: #888;
+    font-size: 14px;
+}
+
+.skyyrose-3d-error button {
+    margin-top: 1rem;
+    padding: 10px 20px;
+    background: #B76E79;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.skyyrose-3d-error button:hover {
+    background: #9A5A64;
+}
+
+/* =============================================================================
+   Performance Warning
+   ============================================================================= */
+
+.skyyrose-3d-perf-warning {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    border-radius: 8px;
+    color: #ffc107;
+    font-size: 13px;
+    z-index: 50;
+}
+
+/* =============================================================================
+   Responsive
+   ============================================================================= */
+
+@media (max-width: 768px) {
+    .skyyrose-3d-container {
+        min-height: 300px;
+    }
+
+    .skyyrose-3d-product-card {
+        min-width: 160px;
+        max-width: 220px;
+        padding: 0.75rem;
+    }
+
+    .skyyrose-3d-product-card h4 {
+        font-size: 14px;
+    }
+
+    .skyyrose-3d-product-card .price {
+        font-size: 16px;
+    }
+
+    .skyyrose-3d-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+        max-width: 90%;
+    }
+
+    .skyyrose-3d-nav button {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}
+
+/* =============================================================================
+   Print Styles
+   ============================================================================= */
+
+@media print {
+    .skyyrose-3d-container {
+        display: none;
+    }
+}
+
+/* =============================================================================
+   Reduced Motion
+   ============================================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+    .skyyrose-3d-spinner {
+        animation: none;
+    }
+
+    .skyyrose-3d-hotspot::before {
+        animation: none;
+    }
+
+    .skyyrose-3d-product-card,
+    .skyyrose-3d-fullscreen-btn,
+    .skyyrose-3d-ar-btn,
+    .skyyrose-3d-nav button {
+        transition: none;
+    }
+}
