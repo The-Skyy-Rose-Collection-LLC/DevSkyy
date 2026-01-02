@@ -18,6 +18,7 @@ Version: 1.0.0
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
+from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -26,6 +27,226 @@ from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel, Field
 
 logger = structlog.get_logger(__name__)
+
+
+# =============================================================================
+# Enums for Asset Management
+# =============================================================================
+
+
+class AssetType(str, Enum):
+    """Types of assets managed by the platform."""
+
+    MODEL_3D = "3d_model"
+    IMAGE = "image"
+    VIDEO = "video"
+    TEXTURE = "texture"
+
+
+class AssetStatus(str, Enum):
+    """Status of an asset in the pipeline."""
+
+    PENDING = "pending"
+    PROCESSING = "processing"
+    VALIDATED = "validated"
+    FAILED = "failed"
+    ARCHIVED = "archived"
+
+
+class PipelineType(str, Enum):
+    """Types of processing pipelines."""
+
+    MODEL_GENERATION = "model_generation"
+    PHOTOSHOOT = "photoshoot"
+    FIDELITY_CHECK = "fidelity_check"
+    SYNC = "sync"
+
+
+class PipelineStatus(str, Enum):
+    """Status of a pipeline run."""
+
+    QUEUED = "queued"
+    RUNNING = "running"
+    COMPLETED = "completed"
+    FAILED = "failed"
+    CANCELLED = "cancelled"
+
+
+class SyncChannel(str, Enum):
+    """E-commerce sync channels."""
+
+    WORDPRESS = "wordpress"
+    WOOCOMMERCE = "woocommerce"
+    SHOPIFY = "shopify"
+
+
+class SyncStatus(str, Enum):
+    """Status of a sync operation."""
+
+    PENDING = "pending"
+    IN_PROGRESS = "in_progress"
+    COMPLETED = "completed"
+    FAILED = "failed"
+
+
+# =============================================================================
+# Asset Management Models
+# =============================================================================
+
+
+class Asset3D(BaseModel):
+    """3D asset model for storage and retrieval."""
+
+    id: str
+    name: str
+    type: AssetType = AssetType.MODEL_3D
+    status: AssetStatus = AssetStatus.PENDING
+    file_path: str | None = None
+    file_size_bytes: int = 0
+    format: str = "glb"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    fidelity_score: float | None = None
+    fidelity_passed: bool = False
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class FidelityReport(BaseModel):
+    """Fidelity validation report."""
+
+    id: str
+    asset_id: str
+    asset_name: str
+    validation_time: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    overall_score: float
+    passed: bool
+    threshold_used: float = 95.0
+    geometry_metrics: dict[str, Any] = Field(default_factory=dict)
+    texture_metrics: dict[str, Any] = Field(default_factory=dict)
+    material_metrics: dict[str, Any] = Field(default_factory=dict)
+    issues: list[str] = Field(default_factory=list)
+    recommendations: list[str] = Field(default_factory=list)
+
+
+class PipelineInfo(BaseModel):
+    """Pipeline execution information."""
+
+    id: str
+    type: PipelineType
+    status: PipelineStatus = PipelineStatus.QUEUED
+    started_at: datetime | None = None
+    completed_at: datetime | None = None
+    asset_id: str | None = None
+    progress_percent: int = 0
+    error_message: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class DashboardMetrics(BaseModel):
+    """Dashboard overview metrics."""
+
+    total_assets: int = 0
+    assets_pending: int = 0
+    assets_processing: int = 0
+    assets_validated: int = 0
+    assets_failed: int = 0
+    fidelity_pass_rate: float = 0.0
+    active_pipelines: int = 0
+    synced_products: int = 0
+
+
+# =============================================================================
+# Asset Storage
+# =============================================================================
+
+
+class AdminAssetStore:
+    """In-memory storage for assets and reports."""
+
+    def __init__(self) -> None:
+        self._assets: dict[str, Asset3D] = {}
+        self._reports: dict[str, FidelityReport] = {}
+        self._pipelines: dict[str, PipelineInfo] = {}
+
+    def add_asset(self, asset: Asset3D) -> None:
+        """Add or update an asset."""
+        self._assets[asset.id] = asset
+
+    def get_asset(self, asset_id: str) -> Asset3D | None:
+        """Get an asset by ID."""
+        return self._assets.get(asset_id)
+
+    def delete_asset(self, asset_id: str) -> bool:
+        """Delete an asset by ID. Returns True if deleted, False if not found."""
+        if asset_id in self._assets:
+            del self._assets[asset_id]
+            return True
+        return False
+
+    def list_assets(
+        self,
+        status: AssetStatus | None = None,
+        asset_type: AssetType | None = None,
+    ) -> list[Asset3D]:
+        """List assets with optional filters."""
+        assets = list(self._assets.values())
+        if status:
+            assets = [a for a in assets if a.status == status]
+        if asset_type:
+            assets = [a for a in assets if a.type == asset_type]
+        return assets
+
+    def add_report(self, report: FidelityReport) -> None:
+        """Add a fidelity report."""
+        self._reports[report.id] = report
+
+    def get_report(self, report_id: str) -> FidelityReport | None:
+        """Get a fidelity report by ID."""
+        return self._reports.get(report_id)
+
+    def list_reports(self, asset_id: str | None = None) -> list[FidelityReport]:
+        """List fidelity reports."""
+        reports = list(self._reports.values())
+        if asset_id:
+            reports = [r for r in reports if r.asset_id == asset_id]
+        return reports
+
+    def add_pipeline(self, pipeline: PipelineInfo) -> None:
+        """Add a pipeline execution."""
+        self._pipelines[pipeline.id] = pipeline
+
+    def get_pipeline(self, pipeline_id: str) -> PipelineInfo | None:
+        """Get a pipeline by ID."""
+        return self._pipelines.get(pipeline_id)
+
+    def get_metrics(self) -> DashboardMetrics:
+        """Calculate dashboard metrics."""
+        assets = list(self._assets.values())
+        validated = [a for a in assets if a.status == AssetStatus.VALIDATED]
+        passed = [a for a in validated if a.fidelity_passed]
+
+        return DashboardMetrics(
+            total_assets=len(assets),
+            assets_pending=len([a for a in assets if a.status == AssetStatus.PENDING]),
+            assets_processing=len(
+                [a for a in assets if a.status == AssetStatus.PROCESSING]
+            ),
+            assets_validated=len(validated),
+            assets_failed=len([a for a in assets if a.status == AssetStatus.FAILED]),
+            fidelity_pass_rate=len(passed) / len(validated) if validated else 0.0,
+            active_pipelines=len(
+                [
+                    p
+                    for p in self._pipelines.values()
+                    if p.status in (PipelineStatus.QUEUED, PipelineStatus.RUNNING)
+                ]
+            ),
+            synced_products=0,  # Would be populated from sync engine
+        )
+
+
+# Singleton storage instance
+storage = AdminAssetStore()
 
 admin_dashboard_router = APIRouter(prefix="/admin", tags=["Admin Dashboard"])
 
@@ -369,4 +590,50 @@ async def get_product(product_sku: str) -> ProductSummary:
     )
 
 
-__all__ = ["admin_dashboard_router"]
+# Response wrapper models for API endpoints
+class ProductListResponse(BaseModel):
+    """Response containing list of products."""
+
+    products: list[ProductSummary] = Field(default_factory=list)
+    total: int = 0
+    page: int = 1
+    page_size: int = 50
+
+
+class SyncJobListResponse(BaseModel):
+    """Response containing list of sync jobs."""
+
+    jobs: list[SyncJobSummary] = Field(default_factory=list)
+    total: int = 0
+
+
+# Note: AdminDataStore is defined above as a separate class from AdminAssetStore
+# AdminAssetStore: works with Asset3D, FidelityReport, PipelineInfo
+# AdminDataStore: works with products, sync_jobs, orders
+
+
+__all__ = [
+    "admin_dashboard_router",
+    # Enums
+    "AssetType",
+    "AssetStatus",
+    "PipelineType",
+    "PipelineStatus",
+    "SyncChannel",
+    "SyncStatus",
+    # Models
+    "Asset3D",
+    "FidelityReport",
+    "PipelineInfo",
+    "DashboardMetrics",
+    "DashboardStats",
+    "ProductSummary",
+    "SyncJobSummary",
+    "SalesAnalytics",
+    "ProductListResponse",
+    "SyncJobListResponse",
+    # Storage
+    "storage",
+    "AdminAssetStore",
+    "AdminDataStore",  # Alias
+]

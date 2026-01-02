@@ -138,7 +138,7 @@ class GenerationConfig(BaseModel):
     """Configuration for 3D generation."""
 
     # Quality settings
-    quality_level: str = Field(default="high", pattern="^(draft|standard|high)$")
+    quality_level: str = Field(default="production", pattern="^(draft|standard|high|production)$")
     min_source_images: int = Field(default=4, ge=1, le=16)
     optimal_source_images: int = Field(default=8, ge=1, le=32)
 

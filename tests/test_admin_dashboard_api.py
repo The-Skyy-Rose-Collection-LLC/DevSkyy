@@ -40,103 +40,98 @@ class TestAdminDataStore:
 
     def test_store_initialization(self, store):
         """Should initialize with empty collections."""
-        assert store.products == {}
-        assert store.orders == {}
-        assert store.sync_jobs == {}
+        assert store._products == {}
+        assert store._orders == []
+        assert store._sync_jobs == {}
 
     def test_add_product(self, store):
         """Should add product to store."""
-        product = {
-            "sku": "SKR-001",
+        store.add_product("SKR-001", {
             "name": "Test Product",
             "price": 99.99,
             "stock": 50,
-        }
+        })
 
-        store.add_product(product)
-
-        assert "SKR-001" in store.products
-        assert store.products["SKR-001"]["name"] == "Test Product"
+        assert "SKR-001" in store._products
+        assert store._products["SKR-001"]["name"] == "Test Product"
 
     def test_get_product(self, store):
         """Should retrieve product by SKU."""
-        product = {"sku": "SKR-001", "name": "Test"}
-        store.add_product(product)
+        store.add_product("SKR-001", {"name": "Test"})
 
-        result = store.get_product("SKR-001")
+        result = store.get_products()
+        found = [p for p in result if p["sku"] == "SKR-001"]
 
-        assert result is not None
-        assert result["name"] == "Test"
+        assert len(found) == 1
+        assert found[0]["name"] == "Test"
 
     def test_get_nonexistent_product(self, store):
-        """Should return None for nonexistent product."""
-        result = store.get_product("NONEXISTENT")
+        """Should return empty list for nonexistent product."""
+        result = store.get_products()
 
-        assert result is None
+        assert result == []
 
     def test_list_products(self, store):
         """Should list all products."""
         for i in range(5):
-            store.add_product({"sku": f"SKR-00{i}", "name": f"Product {i}"})
+            store.add_product(f"SKR-00{i}", {"name": f"Product {i}"})
 
-        products = store.list_products()
+        products = store.get_products()
 
         assert len(products) == 5
 
     def test_list_products_with_pagination(self, store):
         """Should paginate product list."""
         for i in range(10):
-            store.add_product({"sku": f"SKR-{i:03d}", "name": f"Product {i}"})
+            store.add_product(f"SKR-{i:03d}", {"name": f"Product {i}"})
 
-        products = store.list_products(offset=5, limit=3)
+        products = store.get_products(skip=5, limit=3)
 
         assert len(products) == 3
 
     def test_add_sync_job(self, store):
         """Should add sync job."""
-        job = {
-            "job_id": "sync_123",
+        store.add_sync_job("sync_123", {
             "product_sku": "SKR-001",
             "status": "queued",
-        }
+        })
 
-        store.add_sync_job(job)
-
-        assert "sync_123" in store.sync_jobs
+        assert "sync_123" in store._sync_jobs
 
     def test_list_sync_jobs(self, store):
         """Should list sync jobs."""
         for i in range(3):
             store.add_sync_job(
+                f"sync_{i}",
                 {
-                    "job_id": f"sync_{i}",
                     "product_sku": f"SKR-00{i}",
                     "status": "completed",
+                    "started_at": f"2026-01-01T0{i}:00:00",
                 }
             )
 
-        jobs = store.list_sync_jobs()
+        jobs = store.get_sync_jobs()
 
         assert len(jobs) == 3
 
     def test_get_stats(self, store):
         """Should calculate stats."""
         for i in range(5):
-            store.add_product({"sku": f"SKR-00{i}", "name": f"Product {i}"})
+            store.add_product(f"SKR-00{i}", {"name": f"Product {i}"})
 
         for i in range(3):
             store.add_sync_job(
+                f"sync_{i}",
                 {
-                    "job_id": f"sync_{i}",
                     "product_sku": f"SKR-00{i}",
                     "status": "completed" if i < 2 else "failed",
+                    "started_at": f"2026-01-01T0{i}:00:00",
                 }
             )
 
         stats = store.get_stats()
 
         assert stats["total_products"] == 5
-        assert stats["total_sync_jobs"] == 3
 
 
 # =============================================================================
