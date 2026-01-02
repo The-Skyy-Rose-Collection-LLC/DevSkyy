@@ -39,10 +39,9 @@ class TestGenerationConfig:
         config = GenerationConfig()
 
         assert config.quality_level == "production"
-        assert config.target_polycount == 50000
-        assert config.texture_resolution == 2048
-        assert config.generate_lod is True
-        assert config.optimize_for_web is True
+        assert config.target_mesh_vertices == 50000
+        assert config.texture_size == 2048
+        assert config.validate_fidelity is True
 
     def test_draft_config(self):
         """Should create draft quality config."""
@@ -50,26 +49,24 @@ class TestGenerationConfig:
 
         assert config.quality_level == "draft"
 
-    def test_preview_config(self):
-        """Should create preview quality config."""
-        config = GenerationConfig(quality_level="preview")
+    def test_standard_config(self):
+        """Should create standard quality config."""
+        config = GenerationConfig(quality_level="standard")
 
-        assert config.quality_level == "preview"
+        assert config.quality_level == "standard"
 
     def test_custom_config(self):
         """Should accept custom values."""
         config = GenerationConfig(
-            quality_level="production",
-            target_polycount=100000,
-            texture_resolution=4096,
-            generate_lod=False,
-            optimize_for_web=False,
+            quality_level="high",
+            target_mesh_vertices=100000,
+            texture_size=4096,
+            validate_fidelity=False,
         )
 
-        assert config.target_polycount == 100000
-        assert config.texture_resolution == 4096
-        assert config.generate_lod is False
-        assert config.optimize_for_web is False
+        assert config.target_mesh_vertices == 100000
+        assert config.texture_size == 4096
+        assert config.validate_fidelity is False
 
 
 # =============================================================================

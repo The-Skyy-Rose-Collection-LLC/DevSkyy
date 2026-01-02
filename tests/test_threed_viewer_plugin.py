@@ -35,56 +35,45 @@ class TestViewerConfig:
         """Should have sensible defaults."""
         config = ViewerConfig()
 
-        assert config.canvas_width == 800
-        assert config.canvas_height == 600
-        assert config.background_color == "#ffffff"
-        assert config.enable_controls is True
         assert config.auto_rotate is True
         assert config.enable_zoom is True
-        assert config.enable_pan is True
-        assert config.camera_fov == 45
-        assert config.camera_near == 0.1
-        assert config.camera_far == 1000
+        assert config.enable_pan is False
+        assert config.camera_fov == 45.0
+        assert config.ambient_intensity == 0.5
+        assert config.ar_enabled is True
 
     def test_custom_config(self):
         """Should accept custom values."""
         config = ViewerConfig(
-            canvas_width=1024,
-            canvas_height=768,
-            background_color="#1A1A1A",
             auto_rotate=False,
-            camera_fov=60,
+            camera_fov=60.0,
+            enable_zoom=False,
         )
 
-        assert config.canvas_width == 1024
-        assert config.canvas_height == 768
-        assert config.background_color == "#1A1A1A"
         assert config.auto_rotate is False
-        assert config.camera_fov == 60
+        assert config.camera_fov == 60.0
+        assert config.enable_zoom is False
 
     def test_lighting_config(self):
         """Should configure lighting."""
         config = ViewerConfig(
-            ambient_light_intensity=0.6,
-            directional_light_intensity=0.8,
-            directional_light_position=(5, 10, 7.5),
+            ambient_intensity=0.6,
+            directional_intensity=0.8,
         )
 
-        assert config.ambient_light_intensity == 0.6
-        assert config.directional_light_intensity == 0.8
-        assert config.directional_light_position == (5, 10, 7.5)
+        assert config.ambient_intensity == 0.6
+        assert config.directional_intensity == 0.8
 
     def test_skyyrose_branding(self):
-        """Should support SkyyRose branding."""
+        """Should support AR configuration."""
         config = ViewerConfig(
-            background_color="#1A1A1A",
-            loader_color="#B76E79",
-            enable_watermark=True,
-            watermark_text="SkyyRose",
+            ar_enabled=True,
+            ar_button_text="View in AR",
+            loading_text="Loading SkyyRose 3D Model...",
         )
 
-        assert config.loader_color == "#B76E79"
-        assert config.enable_watermark is True
+        assert config.ar_enabled is True
+        assert config.ar_button_text == "View in AR"
 
 
 # =============================================================================
