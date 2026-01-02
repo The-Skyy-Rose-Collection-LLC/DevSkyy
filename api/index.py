@@ -34,13 +34,22 @@ app = FastAPI(
     redoc_url="/redoc",
 )
 
-# Add CORS
+# CORS Configuration - Production hardened
+# Only allow specific origins, not wildcard
+ALLOWED_ORIGINS = [
+    "https://skyyrose.co",
+    "https://www.skyyrose.co",
+    "https://devskyy.vercel.app",
+    "http://localhost:3000",  # Development only
+    "http://localhost:5173",  # Vite dev server
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
 )
 
 # ============================================
