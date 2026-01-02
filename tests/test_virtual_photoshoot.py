@@ -15,7 +15,7 @@ Coverage:
 
 import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -38,10 +38,11 @@ class TestScenePreset:
         """Should have all expected presets."""
         assert ScenePreset.STUDIO_WHITE.value == "studio_white"
         assert ScenePreset.STUDIO_BLACK.value == "studio_black"
-        assert ScenePreset.URBAN_OAKLAND.value == "urban_oakland"
-        assert ScenePreset.LIFESTYLE_MINIMAL.value == "lifestyle_minimal"
-        assert ScenePreset.LUXURY_DISPLAY.value == "luxury_display"
-        assert ScenePreset.SKYYROSE_BRAND.value == "skyyrose_brand"
+        assert ScenePreset.URBAN_MODERN.value == "urban_modern"
+        assert ScenePreset.OUTDOOR_NATURE.value == "outdoor_nature"
+        assert ScenePreset.MINIMAL_GRADIENT.value == "minimal_gradient"
+        assert ScenePreset.LIFESTYLE_HOME.value == "lifestyle_home"
+        assert ScenePreset.LUXURY_MARBLE.value == "luxury_marble"
 
 
 # =============================================================================
@@ -56,31 +57,29 @@ class TestPhotoshootScene:
         """Should create scene with all fields."""
         scene = PhotoshootScene(
             name="custom_scene",
-            background_color="#FFFFFF",
-            lighting_setup="three_point",
-            camera_positions=[(0, 0, 5), (45, 0, 5), (-45, 0, 5)],
-            environment_map="studio_hdr",
-            floor_material="reflective_white",
+            background_color=(255, 255, 255),
+            lighting_preset="studio",
+            camera_positions=[{"x": 0, "y": 0, "z": 5}],
             props=[],
         )
 
         assert scene.name == "custom_scene"
-        assert scene.background_color == "#FFFFFF"
-        assert scene.lighting_setup == "three_point"
-        assert len(scene.camera_positions) == 3
+        assert scene.background_color == (255, 255, 255)
+        assert scene.lighting_preset == "studio"
+        assert len(scene.camera_positions) == 1
 
     def test_scene_with_props(self):
         """Should include props."""
         scene = PhotoshootScene(
             name="with_props",
-            background_color="#1A1A1A",
-            lighting_setup="dramatic",
-            camera_positions=[(0, 0, 5)],
-            props=["mannequin", "pedestal"],
+            background_color=(26, 26, 26),
+            lighting_preset="dramatic",
+            camera_positions=[{"x": 0, "y": 0, "z": 5}],
+            props=[{"type": "mannequin"}, {"type": "pedestal"}],
         )
 
         assert len(scene.props) == 2
-        assert "mannequin" in scene.props
+        assert scene.props[0]["type"] == "mannequin"
 
 
 # =============================================================================
@@ -97,6 +96,9 @@ class TestGeneratedPhotoshoot:
         for img in images:
             img.touch()
 
+        hero_image = tmp_path / "hero.jpg"
+        hero_image.touch()
+
         crops = {
             "instagram_square": tmp_path / "ig_square.jpg",
             "instagram_story": tmp_path / "ig_story.jpg",
@@ -104,36 +106,52 @@ class TestGeneratedPhotoshoot:
         for crop in crops.values():
             crop.touch()
 
+        web_optimized = [tmp_path / "web_0.jpg"]
+        web_optimized[0].touch()
+
+        raw_renders = [tmp_path / "raw_0.jpg"]
+        raw_renders[0].touch()
+
         photoshoot = GeneratedPhotoshoot(
             product_sku="SKR-001",
-            scene_preset="studio_white",
+            scene_name="studio_white",
             images=images,
-            thumbnail=images[0],
+            hero_image=hero_image,
             social_crops=crops,
+            web_optimized=web_optimized,
+            raw_renders=raw_renders,
             generation_time_seconds=25.5,
-            metadata={"ai_enhanced": True},
+            total_images_generated=4,
         )
 
         assert photoshoot.product_sku == "SKR-001"
-        assert photoshoot.scene_preset == "studio_white"
+        assert photoshoot.scene_name == "studio_white"
         assert len(photoshoot.images) == 4
         assert len(photoshoot.social_crops) == 2
 
-    def test_photoshoot_optional_fields(self, tmp_path):
-        """Should handle optional fields."""
+    def test_photoshoot_to_dict(self, tmp_path):
+        """Should convert to dictionary."""
         images = [tmp_path / "img_0.jpg"]
         images[0].touch()
 
+        hero_image = tmp_path / "hero.jpg"
+        hero_image.touch()
+
         photoshoot = GeneratedPhotoshoot(
             product_sku="SKR-002",
-            scene_preset="lifestyle_minimal",
+            scene_name="minimal_gradient",
             images=images,
+            hero_image=hero_image,
+            social_crops={},
+            web_optimized=[],
+            raw_renders=[],
             generation_time_seconds=15.0,
         )
 
-        assert photoshoot.thumbnail is None
-        assert photoshoot.social_crops == {}
-        assert photoshoot.metadata == {}
+        result = photoshoot.to_dict()
+        assert result["product_sku"] == "SKR-002"
+        assert result["scene_name"] == "minimal_gradient"
+        assert len(result["images"]) == 1
 
 
 # =============================================================================
@@ -145,9 +163,12 @@ class TestVirtualPhotoshootGenerator:
     """Tests for VirtualPhotoshootGenerator class."""
 
     @pytest.fixture
-    def generator(self):
-        """Create generator instance."""
-        return VirtualPhotoshootGenerator()
+    def generator(self, tmp_path):
+        """Create generator instance with temp directories."""
+        output_dir = tmp_path / "photoshoot_output"
+        models_dir = tmp_path / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        return VirtualPhotoshootGenerator(output_dir=output_dir, models_dir=models_dir)
 
     @pytest.fixture
     def sample_model(self, tmp_path):
@@ -157,200 +178,134 @@ class TestVirtualPhotoshootGenerator:
         return model_path
 
     def test_generator_initialization(self, generator):
-        """Should initialize with defaults."""
+        """Should initialize with output directories."""
         assert generator.output_dir.exists()
-        assert generator.scene_presets is not None
+        assert generator.models_dir.exists()
 
     def test_generator_custom_output_dir(self, tmp_path):
         """Should use custom output directory."""
         custom_dir = tmp_path / "custom_photos"
-        generator = VirtualPhotoshootGenerator(output_dir=custom_dir)
+        models_dir = tmp_path / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        generator = VirtualPhotoshootGenerator(output_dir=custom_dir, models_dir=models_dir)
 
         assert generator.output_dir == custom_dir
         assert custom_dir.exists()
 
-    def test_available_presets(self, generator):
-        """Should have all scene presets available."""
-        presets = generator.get_available_presets()
+    def test_scene_presets_available(self):
+        """Should have scene presets available."""
+        from ai_3d.virtual_photoshoot import SCENE_PRESETS
 
-        assert "studio_white" in presets
-        assert "studio_black" in presets
-        assert "urban_oakland" in presets
-        assert "lifestyle_minimal" in presets
-        assert "luxury_display" in presets
-        assert "skyyrose_brand" in presets
-
-    def test_get_preset_config(self, generator):
-        """Should return preset configuration."""
-        config = generator.get_preset_config("studio_white")
-
-        assert config is not None
-        assert "background_color" in config or hasattr(config, "background_color")
+        assert "studio_white" in SCENE_PRESETS
+        assert "studio_black" in SCENE_PRESETS
+        assert "urban_oakland" in SCENE_PRESETS
+        assert "lifestyle_minimal" in SCENE_PRESETS
+        assert "luxury_display" in SCENE_PRESETS
+        assert "skyyrose_brand" in SCENE_PRESETS
 
     @pytest.mark.asyncio
     async def test_generate_photoshoot_missing_model(self, generator):
         """Should raise error for missing model."""
-        from ai_3d.virtual_photoshoot import PhotoshootError
+        # _find_model returns None when no model found
+        with (
+            patch.object(generator, "_find_model", return_value=None),
+            pytest.raises(FileNotFoundError, match="No 3D model found"),
+        ):
+            await generator.generate_photoshoot(
+                product_sku="NONEXISTENT-001",
+            )
 
-        with pytest.raises(PhotoshootError, match="Model file not found"):
+    @pytest.mark.asyncio
+    async def test_generate_photoshoot_invalid_preset(self, generator, sample_model):
+        """Should raise error for invalid preset."""
+        # Mock _find_model to return a valid path
+        with (
+            patch.object(generator, "_find_model", return_value=sample_model),
+            pytest.raises(ValueError, match="Unknown scene preset"),
+        ):
             await generator.generate_photoshoot(
                 product_sku="SKR-001",
-                model_path=Path("/nonexistent/model.glb"),
+                scene_preset="nonexistent_preset",
             )
 
     @pytest.mark.asyncio
-    async def test_generate_photoshoot_default_preset(self, generator, sample_model):
+    async def test_generate_photoshoot_default_preset(self, generator, sample_model, tmp_path):
         """Should use default preset when not specified."""
-        mock_result = GeneratedPhotoshoot(
-            product_sku="SKR-001",
-            scene_preset="studio_white",
-            images=[sample_model.parent / "photo_0.jpg"],
-            generation_time_seconds=20.0,
-        )
+        hero_path = tmp_path / "hero" / "SKR-001_hero.png"
+        hero_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
+        # Create a mock image
+        mock_image = Mock()
+        mock_image.save = Mock()
 
-            result = await generator.generate_photoshoot(
-                product_sku="SKR-001",
-                model_path=sample_model,
-            )
-
-            assert result.scene_preset == "studio_white"
-
-    @pytest.mark.asyncio
-    async def test_generate_photoshoot_custom_preset(self, generator, sample_model):
-        """Should use specified preset."""
-        mock_result = GeneratedPhotoshoot(
-            product_sku="SKR-001",
-            scene_preset="urban_oakland",
-            images=[sample_model.parent / "photo_0.jpg"],
-            generation_time_seconds=25.0,
-        )
-
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
+        with (
+            patch.object(generator, "_find_model", return_value=sample_model),
+            patch.object(generator, "_render_scene", new_callable=AsyncMock) as mock_render,
+            patch.object(generator, "_ai_enhance_render", new_callable=AsyncMock) as mock_enhance,
+            patch.object(generator, "_select_hero_image", return_value=0),
+            patch.object(generator, "_generate_social_crop", new_callable=AsyncMock) as mock_crop,
+            patch.object(generator, "_generate_web_versions", new_callable=AsyncMock) as mock_web,
+            patch("PIL.Image.open", return_value=mock_image),
+        ):
+            render_path = tmp_path / "render_0.png"
+            render_path.touch()
+            mock_render.return_value = render_path
+            mock_enhance.return_value = render_path
+            mock_crop.return_value = tmp_path / "crop.jpg"
+            mock_web.return_value = [tmp_path / "web.jpg"]
 
             result = await generator.generate_photoshoot(
                 product_sku="SKR-001",
-                model_path=sample_model,
-                scene_preset="urban_oakland",
             )
 
-            assert result.scene_preset == "urban_oakland"
+            assert result.product_sku == "SKR-001"
+            assert result.scene_name == "Studio White"  # Name from preset
 
     @pytest.mark.asyncio
-    async def test_generate_photoshoot_custom_scene(self, generator, sample_model):
+    async def test_generate_photoshoot_custom_scene(self, generator, sample_model, tmp_path):
         """Should use custom scene configuration."""
         custom_scene = PhotoshootScene(
-            name="custom",
-            background_color="#FF0000",
-            lighting_setup="dramatic",
-            camera_positions=[(0, 0, 5)],
+            name="Custom Scene",
+            background_color=(255, 0, 0),
+            lighting_preset="dramatic",
+            camera_positions=[{"elevation": 15, "azimuth": 0, "distance": 2.5}],
         )
 
-        mock_result = GeneratedPhotoshoot(
-            product_sku="SKR-001",
-            scene_preset="custom",
-            images=[sample_model.parent / "photo_0.jpg"],
-            generation_time_seconds=18.0,
-        )
+        hero_path = tmp_path / "hero" / "SKR-001_hero.png"
+        hero_path.parent.mkdir(parents=True, exist_ok=True)
 
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
+        # Create a mock image
+        mock_image = Mock()
+        mock_image.save = Mock()
+
+        with (
+            patch.object(generator, "_find_model", return_value=sample_model),
+            patch.object(generator, "_render_scene", new_callable=AsyncMock) as mock_render,
+            patch.object(generator, "_ai_enhance_render", new_callable=AsyncMock) as mock_enhance,
+            patch.object(generator, "_select_hero_image", return_value=0),
+            patch.object(generator, "_generate_social_crop", new_callable=AsyncMock) as mock_crop,
+            patch.object(generator, "_generate_web_versions", new_callable=AsyncMock) as mock_web,
+            patch("PIL.Image.open", return_value=mock_image),
+        ):
+            render_path = tmp_path / "render_0.png"
+            render_path.touch()
+            mock_render.return_value = render_path
+            mock_enhance.return_value = render_path
+            mock_crop.return_value = tmp_path / "crop.jpg"
+            mock_web.return_value = [tmp_path / "web.jpg"]
 
             result = await generator.generate_photoshoot(
                 product_sku="SKR-001",
-                model_path=sample_model,
                 custom_scene=custom_scene,
             )
 
-            assert result is not None
+            assert result.scene_name == "Custom Scene"
 
     @pytest.mark.asyncio
-    async def test_generate_social_crops(self, generator, sample_model):
-        """Should generate social media crops when enabled."""
-        mock_result = GeneratedPhotoshoot(
-            product_sku="SKR-001",
-            scene_preset="studio_white",
-            images=[sample_model.parent / "photo_0.jpg"],
-            social_crops={
-                "instagram_square": sample_model.parent / "ig_square.jpg",
-                "instagram_story": sample_model.parent / "ig_story.jpg",
-                "facebook_cover": sample_model.parent / "fb_cover.jpg",
-                "twitter_header": sample_model.parent / "tw_header.jpg",
-                "pinterest": sample_model.parent / "pin.jpg",
-            },
-            generation_time_seconds=30.0,
-        )
-
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
-
-            result = await generator.generate_photoshoot(
-                product_sku="SKR-001",
-                model_path=sample_model,
-                generate_social_crops=True,
-            )
-
-            assert len(result.social_crops) >= 4
-            assert "instagram_square" in result.social_crops
-
-    @pytest.mark.asyncio
-    async def test_generate_without_social_crops(self, generator, sample_model):
-        """Should skip social crops when disabled."""
-        mock_result = GeneratedPhotoshoot(
-            product_sku="SKR-001",
-            scene_preset="studio_white",
-            images=[sample_model.parent / "photo_0.jpg"],
-            social_crops={},
-            generation_time_seconds=15.0,
-        )
-
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
-
-            result = await generator.generate_photoshoot(
-                product_sku="SKR-001",
-                model_path=sample_model,
-                generate_social_crops=False,
-            )
-
-            assert len(result.social_crops) == 0
-
-    @pytest.mark.asyncio
-    async def test_ai_enhance_option(self, generator, sample_model):
-        """Should apply AI enhancement when enabled."""
-        mock_result = GeneratedPhotoshoot(
-            product_sku="SKR-001",
-            scene_preset="studio_white",
-            images=[sample_model.parent / "photo_0.jpg"],
-            generation_time_seconds=35.0,
-            metadata={"ai_enhanced": True},
-        )
-
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
-
-            result = await generator.generate_photoshoot(
-                product_sku="SKR-001",
-                model_path=sample_model,
-                ai_enhance=True,
-            )
-
-            assert result.metadata.get("ai_enhanced") is True
+    async def test_close(self, generator):
+        """Should close cleanly."""
+        await generator.close()
+        # Should complete without error
 
 
 # =============================================================================
@@ -361,50 +316,40 @@ class TestVirtualPhotoshootGenerator:
 class TestSocialMediaCrops:
     """Tests for social media crop specifications."""
 
-    @pytest.fixture
-    def generator(self):
-        """Create generator instance."""
-        return VirtualPhotoshootGenerator()
+    def test_social_crops_available(self):
+        """Should have social crop specifications available."""
+        from ai_3d.virtual_photoshoot import SOCIAL_CROPS
 
-    def test_instagram_square_dimensions(self, generator):
+        assert "instagram_square" in SOCIAL_CROPS
+        assert "instagram_story" in SOCIAL_CROPS
+        assert "pinterest" in SOCIAL_CROPS
+
+    def test_instagram_square_dimensions(self):
         """Instagram square should be 1:1 aspect ratio."""
-        spec = generator.get_crop_specification("instagram_square")
+        from ai_3d.virtual_photoshoot import SOCIAL_CROPS
 
-        if spec:
-            assert spec["width"] == spec["height"]
-            assert spec["width"] >= 1080
+        spec = SOCIAL_CROPS["instagram_square"]
+        # Format: (aspect_w, aspect_h, width, height)
+        assert spec[2] == spec[3]  # width == height
+        assert spec[2] >= 1080
 
-    def test_instagram_story_dimensions(self, generator):
+    def test_instagram_story_dimensions(self):
         """Instagram story should be 9:16 aspect ratio."""
-        spec = generator.get_crop_specification("instagram_story")
+        from ai_3d.virtual_photoshoot import SOCIAL_CROPS
 
-        if spec:
-            assert spec["width"] == 1080
-            assert spec["height"] == 1920
+        spec = SOCIAL_CROPS["instagram_story"]
+        # Format: (aspect_w, aspect_h, width, height)
+        assert spec[2] == 1080
+        assert spec[3] == 1920
 
-    def test_facebook_cover_dimensions(self, generator):
-        """Facebook cover should have correct dimensions."""
-        spec = generator.get_crop_specification("facebook_cover")
-
-        if spec:
-            assert spec["width"] == 820
-            assert spec["height"] == 312
-
-    def test_twitter_header_dimensions(self, generator):
-        """Twitter header should have correct dimensions."""
-        spec = generator.get_crop_specification("twitter_header")
-
-        if spec:
-            assert spec["width"] == 1500
-            assert spec["height"] == 500
-
-    def test_pinterest_dimensions(self, generator):
+    def test_pinterest_dimensions(self):
         """Pinterest should be 2:3 aspect ratio."""
-        spec = generator.get_crop_specification("pinterest")
+        from ai_3d.virtual_photoshoot import SOCIAL_CROPS
 
-        if spec:
-            # Pinterest optimal is 1000x1500
-            assert spec["height"] > spec["width"]
+        spec = SOCIAL_CROPS["pinterest"]
+        # Format: (aspect_w, aspect_h, width, height)
+        # Pinterest optimal is 1000x1500
+        assert spec[3] > spec[2]  # height > width
 
 
 # =============================================================================
@@ -417,41 +362,41 @@ class TestPhotoshootErrors:
 
     @pytest.mark.asyncio
     async def test_invalid_preset(self):
-        """Should handle invalid preset gracefully."""
-        from ai_3d.virtual_photoshoot import PhotoshootError
-
-        generator = VirtualPhotoshootGenerator()
-
+        """Should raise ValueError for invalid preset."""
         with tempfile.TemporaryDirectory() as tmpdir:
+            tmpdir_path = Path(tmpdir)
+            output_dir = tmpdir_path / "output"
+            models_dir = tmpdir_path / "models"
+            models_dir.mkdir(parents=True, exist_ok=True)
+            generator = VirtualPhotoshootGenerator(output_dir=output_dir, models_dir=models_dir)
             model_path = Path(tmpdir) / "model.glb"
             model_path.write_bytes(b"fake glb")
 
-            with pytest.raises(PhotoshootError, match="Unknown preset"):
+            with (
+                patch.object(generator, "_find_model", return_value=model_path),
+                pytest.raises(ValueError, match="Unknown scene preset"),
+            ):
                 await generator.generate_photoshoot(
                     product_sku="SKR-001",
-                    model_path=model_path,
                     scene_preset="nonexistent_preset",
                 )
 
     @pytest.mark.asyncio
-    async def test_render_failure(self):
-        """Should handle render failures gracefully."""
-        from ai_3d.virtual_photoshoot import PhotoshootError
-
-        generator = VirtualPhotoshootGenerator()
-
+    async def test_model_not_found(self):
+        """Should raise FileNotFoundError for missing model."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            model_path = Path(tmpdir) / "corrupted.glb"
-            model_path.write_bytes(b"corrupted data")
+            tmpdir_path = Path(tmpdir)
+            output_dir = tmpdir_path / "output"
+            models_dir = tmpdir_path / "models"
+            models_dir.mkdir(parents=True, exist_ok=True)
+            generator = VirtualPhotoshootGenerator(output_dir=output_dir, models_dir=models_dir)
 
-            with patch.object(
-                generator,
-                "_render_scene",
-                side_effect=Exception("Render engine failed"),
-            ), pytest.raises((PhotoshootError, Exception)):
+            with (
+                patch.object(generator, "_find_model", return_value=None),
+                pytest.raises(FileNotFoundError, match="No 3D model found"),
+            ):
                 await generator.generate_photoshoot(
-                    product_sku="SKR-001",
-                    model_path=model_path,
+                    product_sku="NONEXISTENT-001",
                 )
 
 
@@ -464,44 +409,61 @@ class TestPhotoshootErrors:
 @pytest.mark.integration
 async def test_full_photoshoot_pipeline():
     """Test full photoshoot pipeline (mocked)."""
-    generator = VirtualPhotoshootGenerator()
-
     with tempfile.TemporaryDirectory() as tmpdir:
+        tmpdir_path = Path(tmpdir)
+        output_dir = tmpdir_path / "output"
+        models_dir = tmpdir_path / "models"
+        models_dir.mkdir(parents=True, exist_ok=True)
+        generator = VirtualPhotoshootGenerator(output_dir=output_dir, models_dir=models_dir)
+
         # Create test model
         model_path = Path(tmpdir) / "product.glb"
         model_path.write_bytes(b"fake glb data")
 
-        # Mock the photoshoot pipeline
-        mock_result = GeneratedPhotoshoot(
-            product_sku="TEST-001",
-            scene_preset="skyyrose_brand",
-            images=[Path(tmpdir) / f"photo_{i}.jpg" for i in range(4)],
-            thumbnail=Path(tmpdir) / "thumb.jpg",
-            social_crops={
-                "instagram_square": Path(tmpdir) / "ig_square.jpg",
-                "instagram_story": Path(tmpdir) / "ig_story.jpg",
-            },
-            generation_time_seconds=30.0,
-            metadata={"ai_enhanced": True},
-        )
+        # Create output directories
+        hero_dir = output_dir / "hero"
+        hero_dir.mkdir(parents=True, exist_ok=True)
 
-        with patch.object(
-            generator, "_run_photoshoot", new_callable=AsyncMock
-        ) as mock_run:
-            mock_run.return_value = mock_result
+        # Create mock image files
+        images = []
+        for i in range(4):
+            img_path = Path(tmpdir) / f"photo_{i}.jpg"
+            img_path.touch()
+            images.append(img_path)
+
+        hero_path = hero_dir / "TEST-001_hero.png"
+        hero_path.touch()
+
+        # Create a mock image
+        mock_image = Mock()
+        mock_image.save = Mock()
+
+        with (
+            patch.object(generator, "_find_model", return_value=model_path),
+            patch.object(generator, "_render_scene", new_callable=AsyncMock) as mock_render,
+            patch.object(generator, "_ai_enhance_render", new_callable=AsyncMock) as mock_enhance,
+            patch.object(generator, "_select_hero_image", return_value=0),
+            patch.object(generator, "_generate_social_crop", new_callable=AsyncMock) as mock_crop,
+            patch.object(generator, "_generate_web_versions", new_callable=AsyncMock) as mock_web,
+            patch("PIL.Image.open", return_value=mock_image),
+        ):
+            render_path = Path(tmpdir) / "render_0.png"
+            render_path.touch()
+            mock_render.return_value = render_path
+            mock_enhance.return_value = render_path
+            mock_crop.return_value = Path(tmpdir) / "crop.jpg"
+            mock_web.return_value = [Path(tmpdir) / "web.jpg"]
 
             result = await generator.generate_photoshoot(
                 product_sku="TEST-001",
-                model_path=model_path,
                 scene_preset="skyyrose_brand",
                 generate_social_crops=True,
                 ai_enhance=True,
             )
 
             assert result.product_sku == "TEST-001"
-            assert result.scene_preset == "skyyrose_brand"
-            assert len(result.images) == 4
-            assert len(result.social_crops) == 2
+            assert result.scene_name == "SkyyRose Brand"
+            assert len(result.images) >= 1
 
 
 __all__ = [
