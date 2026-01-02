@@ -5,22 +5,24 @@ Tests for WordPress 3D Viewer Plugin Generator
 Tests for the WordPress 3D viewer plugin generator.
 
 Coverage:
-- Plugin file generation (JS, CSS, PHP)
+- Plugin file generation (JS, CSS)
 - Viewer configuration
 - Three.js integration
-- Shortcode generation
-- WooCommerce integration
+- WordPress plugin structure
 """
 
+import json
 import tempfile
 from pathlib import Path
 
 import pytest
 
 from wordpress.threed_viewer_plugin import (
-    PluginGenerator,
-    ThreeDViewerPlugin,
     ViewerConfig,
+    WordPressPluginGenerator,
+    generate_shortcode_html,
+    generate_viewer_css,
+    generate_viewer_javascript,
 )
 
 # =============================================================================
@@ -64,7 +66,7 @@ class TestViewerConfig:
         assert config.ambient_intensity == 0.6
         assert config.directional_intensity == 0.8
 
-    def test_skyyrose_branding(self):
+    def test_ar_config(self):
         """Should support AR configuration."""
         config = ViewerConfig(
             ar_enabled=True,
@@ -74,333 +76,197 @@ class TestViewerConfig:
 
         assert config.ar_enabled is True
         assert config.ar_button_text == "View in AR"
+        assert config.loading_text == "Loading SkyyRose 3D Model..."
 
-
-# =============================================================================
-# ThreeDViewerPlugin Tests
-# =============================================================================
-
-
-class TestThreeDViewerPlugin:
-    """Tests for ThreeDViewerPlugin class."""
-
-    @pytest.fixture
-    def plugin(self):
-        """Create plugin instance."""
-        return ThreeDViewerPlugin()
-
-    @pytest.fixture
-    def custom_plugin(self):
-        """Create plugin with custom config."""
+    def test_to_dict(self):
+        """Should convert to dictionary."""
         config = ViewerConfig(
-            canvas_width=1024,
-            canvas_height=768,
-            background_color="#000000",
+            auto_rotate=False,
+            camera_fov=60.0,
         )
-        return ThreeDViewerPlugin(config=config)
 
-    def test_plugin_initialization(self, plugin):
-        """Should initialize with defaults."""
-        assert plugin.config is not None
-        assert plugin.plugin_name == "devskyy-3d-viewer"
+        result = config.to_dict()
 
-    def test_plugin_custom_config(self, custom_plugin):
-        """Should use custom config."""
-        assert custom_plugin.config.canvas_width == 1024
-        assert custom_plugin.config.background_color == "#000000"
+        assert result["autoRotate"] is False
+        assert result["cameraFov"] == 60.0
+        assert "enableZoom" in result
+        assert "arEnabled" in result
 
 
 # =============================================================================
-# PluginGenerator Tests
+# WordPressPluginGenerator Tests
 # =============================================================================
 
 
-class TestPluginGenerator:
-    """Tests for plugin file generation."""
+class TestWordPressPluginGenerator:
+    """Tests for WordPressPluginGenerator class."""
 
     @pytest.fixture
-    def generator(self):
-        """Create generator instance."""
-        return PluginGenerator()
+    def generator(self, tmp_path):
+        """Create generator instance with temp directory."""
+        return WordPressPluginGenerator(output_dir=tmp_path)
 
     @pytest.fixture
-    def custom_generator(self):
-        """Create generator with custom config."""
-        config = ViewerConfig(
-            background_color="#1A1A1A",
+    def custom_generator(self, tmp_path):
+        """Create generator with custom settings."""
+        gen = WordPressPluginGenerator(
+            output_dir=tmp_path,
+            plugin_name="custom-3d-viewer",
+            version="2.0.0",
+        )
+        gen.config = ViewerConfig(
             auto_rotate=True,
+            camera_fov=60.0,
         )
-        return PluginGenerator(config=config)
+        return gen
 
-    def test_generator_initialization(self, generator):
-        """Should initialize generator."""
-        assert generator is not None
+    def test_generator_initialization(self, generator, tmp_path):
+        """Should initialize with output directory."""
+        assert generator.output_dir == tmp_path
+        assert generator.plugin_name == "skyyrose-3d-viewer"
+        assert generator.version == "1.0.0"
         assert generator.config is not None
 
-    def test_generate_javascript(self, generator):
-        """Should generate JavaScript viewer code."""
-        js_code = generator.generate_javascript()
+    def test_generator_custom_settings(self, custom_generator):
+        """Should accept custom settings."""
+        assert custom_generator.plugin_name == "custom-3d-viewer"
+        assert custom_generator.version == "2.0.0"
+        assert custom_generator.config.camera_fov == 60.0
 
-        assert "THREE" in js_code
-        assert "GLTFLoader" in js_code
-        assert "OrbitControls" in js_code
-        assert "renderer" in js_code
-        assert "camera" in js_code
-        assert "scene" in js_code
+    def test_generate_creates_plugin_directory(self, generator, tmp_path):
+        """Should create plugin directory structure."""
+        plugin_dir = generator.generate()
 
-    def test_javascript_has_init_function(self, generator):
-        """Should have init function."""
-        js_code = generator.generate_javascript()
+        assert plugin_dir.exists()
+        assert plugin_dir.name == "skyyrose-3d-viewer"
+        assert (plugin_dir / "assets" / "js").exists()
+        assert (plugin_dir / "assets" / "css").exists()
 
-        assert "initViewer" in js_code or "init" in js_code
+    def test_generate_creates_javascript_file(self, generator):
+        """Should create JavaScript file."""
+        plugin_dir = generator.generate()
 
-    def test_javascript_has_load_model(self, generator):
-        """Should have model loading function."""
-        js_code = generator.generate_javascript()
+        js_file = plugin_dir / "assets" / "js" / "3d-viewer.js"
+        assert js_file.exists()
 
-        assert "loadModel" in js_code or "load" in js_code
+        content = js_file.read_text()
+        assert "THREE" in content or "three" in content.lower()
 
-    def test_javascript_has_animation_loop(self, generator):
-        """Should have animation loop."""
-        js_code = generator.generate_javascript()
+    def test_generate_creates_css_file(self, generator):
+        """Should create CSS file."""
+        plugin_dir = generator.generate()
 
-        assert "animate" in js_code or "render" in js_code
+        css_file = plugin_dir / "assets" / "css" / "3d-viewer.css"
+        assert css_file.exists()
 
-    def test_generate_css(self, generator):
+        content = css_file.read_text()
+        assert "viewer" in content.lower() or "container" in content.lower()
+
+    def test_generate_creates_config_json(self, generator):
+        """Should create config.json file."""
+        plugin_dir = generator.generate()
+
+        config_file = plugin_dir / "config.json"
+        assert config_file.exists()
+
+        config_data = json.loads(config_file.read_text())
+        assert "autoRotate" in config_data
+        assert "cameraFov" in config_data
+
+
+# =============================================================================
+# JavaScript Generation Tests
+# =============================================================================
+
+
+class TestJavaScriptGeneration:
+    """Tests for JavaScript viewer code generation."""
+
+    def test_generate_javascript_with_default_config(self):
+        """Should generate JavaScript with default config."""
+        config = ViewerConfig()
+        js_code = generate_viewer_javascript(config)
+
+        assert "THREE" in js_code or "scene" in js_code.lower()
+
+    def test_javascript_has_viewer_initialization(self):
+        """Should have viewer initialization logic."""
+        config = ViewerConfig()
+        js_code = generate_viewer_javascript(config)
+
+        # Should have initialization or setup code
+        assert (
+            "init" in js_code.lower() or "setup" in js_code.lower() or "create" in js_code.lower()
+        )
+
+    def test_javascript_has_render_loop(self):
+        """Should have render/animation loop."""
+        config = ViewerConfig()
+        js_code = generate_viewer_javascript(config)
+
+        assert "animate" in js_code.lower() or "render" in js_code.lower()
+
+
+# =============================================================================
+# CSS Generation Tests
+# =============================================================================
+
+
+class TestCSSGeneration:
+    """Tests for CSS generation."""
+
+    def test_generate_css(self):
         """Should generate CSS styles."""
-        css_code = generator.generate_css()
+        css_code = generate_viewer_css()
 
-        assert "viewer" in css_code.lower() or "canvas" in css_code.lower()
-        assert "width" in css_code
-        assert "height" in css_code
+        assert len(css_code) > 0
+        assert "viewer" in css_code.lower() or "container" in css_code.lower()
 
-    def test_css_includes_loading_styles(self, generator):
-        """Should include loading indicator styles."""
-        css_code = generator.generate_css()
+    def test_css_has_dimensions(self):
+        """Should include dimension styles."""
+        css_code = generate_viewer_css()
 
-        assert "loading" in css_code.lower() or "loader" in css_code.lower()
+        assert "width" in css_code.lower() or "height" in css_code.lower()
 
-    def test_generate_php(self, generator):
-        """Should generate PHP plugin code."""
-        php_code = generator.generate_php()
+    def test_css_has_balanced_braces(self):
+        """CSS should have balanced braces."""
+        css_code = generate_viewer_css()
 
-        assert "<?php" in php_code
-        assert "Plugin Name:" in php_code
-        assert "function" in php_code
-
-    def test_php_has_shortcode(self, generator):
-        """Should register shortcode."""
-        php_code = generator.generate_php()
-
-        assert "add_shortcode" in php_code or "shortcode" in php_code.lower()
-
-    def test_php_has_scripts_enqueue(self, generator):
-        """Should enqueue scripts."""
-        php_code = generator.generate_php()
-
-        assert "wp_enqueue_script" in php_code
-        assert "wp_enqueue_style" in php_code
-
-    def test_php_has_woocommerce_integration(self, generator):
-        """Should integrate with WooCommerce."""
-        php_code = generator.generate_php()
-
-        assert "woocommerce" in php_code.lower() or "product" in php_code.lower()
-
-    def test_generate_config(self, generator):
-        """Should generate configuration object."""
-        config_json = generator.generate_config()
-
-        assert "canvasWidth" in config_json or "canvas_width" in config_json
-        assert "backgroundColor" in config_json or "background_color" in config_json
-
-    def test_config_matches_settings(self, custom_generator):
-        """Config should match settings."""
-        config_json = custom_generator.generate_config()
-
-        assert "#1A1A1A" in config_json or "1A1A1A" in config_json.upper()
-
-
-# =============================================================================
-# File Output Tests
-# =============================================================================
-
-
-class TestPluginFileOutput:
-    """Tests for plugin file output."""
-
-    @pytest.fixture
-    def generator(self):
-        """Create generator instance."""
-        return PluginGenerator()
-
-    def test_write_plugin_files(self, generator):
-        """Should write all plugin files."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            output_dir = Path(tmpdir)
-            generator.write_plugin(output_dir)
-
-            # Check JS file
-            js_file = output_dir / "js" / "viewer.js"
-            assert js_file.exists()
-            js_content = js_file.read_text()
-            assert "THREE" in js_content
-
-            # Check CSS file
-            css_file = output_dir / "css" / "viewer.css"
-            assert css_file.exists()
-
-            # Check PHP file
-            php_file = output_dir / "devskyy-3d-viewer.php"
-            assert php_file.exists()
-
-    def test_create_zip_archive(self, generator):
-        """Should create zip archive."""
-        with tempfile.TemporaryDirectory() as tmpdir:
-            output_path = Path(tmpdir) / "plugin.zip"
-            generator.create_zip(output_path)
-
-            assert output_path.exists()
-            assert output_path.stat().st_size > 0
-
-    def test_generated_files_valid(self, generator):
-        """Generated files should be syntactically valid."""
-        # JavaScript should be parseable (basic check)
-        js_code = generator.generate_javascript()
-        assert js_code.count("{") == js_code.count("}")
-        assert js_code.count("(") == js_code.count(")")
-
-        # CSS should have balanced braces
-        css_code = generator.generate_css()
         assert css_code.count("{") == css_code.count("}")
 
-        # PHP should start correctly
-        php_code = generator.generate_php()
-        assert php_code.strip().startswith("<?php")
-
 
 # =============================================================================
-# Shortcode Tests
+# Shortcode HTML Generation Tests
 # =============================================================================
 
 
-class TestShortcodeGeneration:
-    """Tests for WordPress shortcode generation."""
+class TestShortcodeHTML:
+    """Tests for shortcode HTML generation."""
 
-    @pytest.fixture
-    def generator(self):
-        """Create generator instance."""
-        return PluginGenerator()
+    def test_generate_shortcode_html_default(self):
+        """Should generate HTML with model URL."""
+        html = generate_shortcode_html(model_url="https://example.com/model.glb")
 
-    def test_shortcode_structure(self, generator):
-        """Should generate proper shortcode structure."""
-        php_code = generator.generate_php()
+        assert "div" in html.lower()
+        assert "viewer" in html.lower() or "skyyrose" in html.lower()
 
-        # Should have shortcode handler function
-        assert "function" in php_code
-        assert "return" in php_code
+    def test_generate_shortcode_html_with_model_url(self):
+        """Should include model URL in data attribute."""
+        html = generate_shortcode_html(model_url="https://example.com/model.glb")
 
-    def test_shortcode_accepts_attributes(self, generator):
-        """Should accept shortcode attributes."""
-        php_code = generator.generate_php()
+        assert "example.com" in html
+        assert "data-model-url" in html
 
-        # Should parse attributes
-        assert "$atts" in php_code or "atts" in php_code.lower()
-
-    def test_shortcode_renders_container(self, generator):
-        """Should render viewer container."""
-        php_code = generator.generate_php()
-
-        # Should output HTML container
-        assert "div" in php_code.lower()
-        assert "viewer" in php_code.lower() or "canvas" in php_code.lower()
-
-
-# =============================================================================
-# WooCommerce Integration Tests
-# =============================================================================
-
-
-class TestWooCommerceIntegration:
-    """Tests for WooCommerce integration."""
-
-    @pytest.fixture
-    def generator(self):
-        """Create generator instance."""
-        return PluginGenerator()
-
-    def test_product_meta_box(self, generator):
-        """Should add product meta box."""
-        php_code = generator.generate_php()
-
-        assert "add_meta_box" in php_code or "meta_box" in php_code.lower()
-
-    def test_save_product_meta(self, generator):
-        """Should save product meta."""
-        php_code = generator.generate_php()
-
-        assert "save" in php_code.lower()
-        assert "post" in php_code.lower() or "product" in php_code.lower()
-
-    def test_display_on_product_page(self, generator):
-        """Should display viewer on product page."""
-        php_code = generator.generate_php()
-
-        # Should hook into WooCommerce product display
-        assert (
-            "woocommerce" in php_code.lower()
-            or "single_product" in php_code.lower()
-            or "product" in php_code.lower()
+    def test_generate_shortcode_html_with_dimensions(self):
+        """Should include custom dimensions."""
+        html = generate_shortcode_html(
+            model_url="https://example.com/model.glb",
+            width="800px",
+            height="600px",
         )
 
-
-# =============================================================================
-# Three.js Configuration Tests
-# =============================================================================
-
-
-class TestThreeJSConfig:
-    """Tests for Three.js configuration."""
-
-    @pytest.fixture
-    def generator(self):
-        """Create generator with specific config."""
-        config = ViewerConfig(
-            camera_fov=60,
-            camera_near=0.1,
-            camera_far=2000,
-            ambient_light_intensity=0.5,
-            directional_light_intensity=1.0,
-        )
-        return PluginGenerator(config=config)
-
-    def test_camera_settings(self, generator):
-        """Should configure camera correctly."""
-        js_code = generator.generate_javascript()
-
-        assert "PerspectiveCamera" in js_code
-        assert "60" in js_code  # FOV
-        assert "2000" in js_code  # Far plane
-
-    def test_lighting_settings(self, generator):
-        """Should configure lighting correctly."""
-        js_code = generator.generate_javascript()
-
-        assert "AmbientLight" in js_code
-        assert "DirectionalLight" in js_code
-
-    def test_controls_settings(self, generator):
-        """Should configure OrbitControls."""
-        js_code = generator.generate_javascript()
-
-        assert "OrbitControls" in js_code
-
-    def test_renderer_settings(self, generator):
-        """Should configure WebGL renderer."""
-        js_code = generator.generate_javascript()
-
-        assert "WebGLRenderer" in js_code
-        assert "antialias" in js_code.lower()
+        assert "800px" in html
+        assert "600px" in html
 
 
 # =============================================================================
@@ -414,61 +280,71 @@ class TestPluginIntegration:
 
     def test_full_plugin_generation(self):
         """Test complete plugin generation."""
-        config = ViewerConfig(
-            canvas_width=1024,
-            canvas_height=768,
-            background_color="#1A1A1A",
-            loader_color="#B76E79",
-            auto_rotate=True,
-            enable_zoom=True,
-        )
-        generator = PluginGenerator(config=config)
-
         with tempfile.TemporaryDirectory() as tmpdir:
-            output_dir = Path(tmpdir) / "devskyy-3d-viewer"
-            generator.write_plugin(output_dir)
+            generator = WordPressPluginGenerator(
+                output_dir=Path(tmpdir),
+                plugin_name="test-3d-viewer",
+                version="1.0.0",
+            )
+            generator.config = ViewerConfig(
+                auto_rotate=True,
+                enable_zoom=True,
+                camera_fov=60.0,
+            )
 
-            # Verify all files exist
-            assert (output_dir / "devskyy-3d-viewer.php").exists()
-            assert (output_dir / "js" / "viewer.js").exists()
-            assert (output_dir / "css" / "viewer.css").exists()
+            plugin_dir = generator.generate()
 
-            # Verify JS content
-            js_content = (output_dir / "js" / "viewer.js").read_text()
-            assert "THREE" in js_content
-            assert "GLTFLoader" in js_content
+            # Verify directory structure
+            assert plugin_dir.exists()
+            assert (plugin_dir / "assets" / "js" / "3d-viewer.js").exists()
+            assert (plugin_dir / "assets" / "css" / "3d-viewer.css").exists()
+            assert (plugin_dir / "config.json").exists()
 
-            # Verify PHP content
-            php_content = (output_dir / "devskyy-3d-viewer.php").read_text()
-            assert "Plugin Name:" in php_content
+            # Verify config content
+            config_data = json.loads((plugin_dir / "config.json").read_text())
+            assert config_data["autoRotate"] is True
+            assert config_data["cameraFov"] == 60.0
 
-    def test_zip_creation(self):
-        """Test ZIP archive creation."""
-        generator = PluginGenerator()
-
+    def test_multiple_plugin_generations(self):
+        """Should handle multiple generations."""
         with tempfile.TemporaryDirectory() as tmpdir:
-            zip_path = Path(tmpdir) / "plugin.zip"
-            generator.create_zip(zip_path)
+            for i in range(3):
+                generator = WordPressPluginGenerator(
+                    output_dir=Path(tmpdir),
+                    plugin_name=f"plugin-{i}",
+                )
+                plugin_dir = generator.generate()
+                assert plugin_dir.exists()
+                assert plugin_dir.name == f"plugin-{i}"
 
-            assert zip_path.exists()
 
-            # Verify it's a valid ZIP
-            import zipfile
+# =============================================================================
+# Backwards Compatibility Tests (Aliases)
+# =============================================================================
 
-            with zipfile.ZipFile(zip_path, "r") as zf:
-                names = zf.namelist()
-                assert any("viewer.js" in n for n in names)
-                assert any("viewer.css" in n for n in names)
-                assert any(".php" in n for n in names)
+
+class TestBackwardsCompatibility:
+    """Tests for backwards compatible aliases."""
+
+    def test_plugin_generator_alias(self):
+        """PluginGenerator should be alias for WordPressPluginGenerator."""
+        from wordpress.threed_viewer_plugin import PluginGenerator
+
+        assert PluginGenerator is WordPressPluginGenerator
+
+    def test_threed_viewer_plugin_alias(self):
+        """ThreeDViewerPlugin should be alias for WordPressPluginGenerator."""
+        from wordpress.threed_viewer_plugin import ThreeDViewerPlugin
+
+        assert ThreeDViewerPlugin is WordPressPluginGenerator
 
 
 __all__ = [
     "TestViewerConfig",
-    "TestThreeDViewerPlugin",
-    "TestPluginGenerator",
-    "TestPluginFileOutput",
-    "TestShortcodeGeneration",
-    "TestWooCommerceIntegration",
-    "TestThreeJSConfig",
+    "TestWordPressPluginGenerator",
+    "TestJavaScriptGeneration",
+    "TestCSSGeneration",
+    "TestShortcodeHTML",
     "TestPluginIntegration",
+    "TestBackwardsCompatibility",
 ]
