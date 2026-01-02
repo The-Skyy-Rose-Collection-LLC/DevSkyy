@@ -28,6 +28,8 @@ from typing import TYPE_CHECKING, Any
 import structlog
 from pydantic import BaseModel, Field
 
+from errors.production_errors import SyncError
+
 if TYPE_CHECKING:
     pass
 
@@ -100,6 +102,36 @@ class CatalogSyncConfig(BaseModel):
     parallel_uploads: int = Field(default=3, ge=1, le=10)
     retry_failed: bool = Field(default=True)
     max_retries: int = Field(default=3, ge=1, le=10)
+
+
+class SyncConfig(BaseModel):
+    """Configuration for sync operations.
+
+    This is the standard sync configuration used by test suite
+    and external integrations.
+    """
+
+    # WordPress connection
+    wordpress_url: str = Field(
+        default_factory=lambda: os.environ.get("WORDPRESS_URL", "https://skyyrose.com")
+    )
+    woocommerce_key: str | None = Field(default_factory=lambda: os.environ.get("WOOCOMMERCE_KEY"))
+    woocommerce_secret: str | None = Field(
+        default_factory=lambda: os.environ.get("WOOCOMMERCE_SECRET")
+    )
+
+    # Generation flags
+    generate_3d_model: bool = Field(default=True)
+    generate_photoshoot: bool = Field(default=True)
+    upload_images: bool = Field(default=True)
+
+    # Retry configuration
+    retry_attempts: int = Field(default=3, ge=1, le=10)
+    retry_delay_seconds: float = Field(default=2.0, ge=0.1, le=60.0)
+
+    # Processing options
+    batch_size: int = Field(default=10, ge=1, le=100)
+    timeout_seconds: float = Field(default=300.0, ge=10.0, le=3600.0)
 
 
 # =============================================================================
@@ -622,9 +654,7 @@ class CatalogSyncEngine:
         """Clean up resources."""
         if self._model_generator is not None and hasattr(self._model_generator, "close"):
             await self._model_generator.close()
-        if self._photoshoot_generator is not None and hasattr(
-            self._photoshoot_generator, "close"
-        ):
+        if self._photoshoot_generator is not None and hasattr(self._photoshoot_generator, "close"):
             await self._photoshoot_generator.close()
         if self._wp_sync is not None and hasattr(self._wp_sync, "close"):
             await self._wp_sync.close()
@@ -634,5 +664,7 @@ class CatalogSyncEngine:
 __all__ = [
     "CatalogSyncEngine",
     "CatalogSyncConfig",
+    "SyncConfig",
+    "SyncError",
     "SyncResult",
 ]

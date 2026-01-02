@@ -223,7 +223,7 @@ async def run_product_sync(
 @sync_router.post("/product", response_model=SyncJobResponse)
 async def sync_single_product(
     request: ProductSyncRequest,
-    background_tasks: BackgroundTasks | None = None,
+    background_tasks: BackgroundTasks,
 ) -> SyncJobResponse:
     """
     Sync a single product to WordPress/WooCommerce.
@@ -264,7 +264,7 @@ async def sync_single_product(
 @sync_router.post("/bulk", response_model=BulkSyncResponse)
 async def sync_bulk_products(
     request: BulkSyncRequest,
-    background_tasks: BackgroundTasks | None = None,
+    background_tasks: BackgroundTasks,
 ) -> BulkSyncResponse:
     """Sync multiple products to WordPress/WooCommerce."""
     job_ids = []
@@ -290,7 +290,9 @@ async def sync_bulk_products(
             )
 
     # Get initial job states
-    results = [SyncJobResponse(**sync_job_store.get(jid)) for jid in job_ids if sync_job_store.get(jid)]
+    results = [
+        SyncJobResponse(**sync_job_store.get(jid)) for jid in job_ids if sync_job_store.get(jid)
+    ]
 
     return BulkSyncResponse(
         total=len(request.products),
@@ -361,7 +363,7 @@ async def get_sync_job(job_id: str) -> SyncJobResponse:
 
 @sync_router.post("/trigger-all")
 async def trigger_full_sync(
-    background_tasks: BackgroundTasks | None = None,
+    background_tasks: BackgroundTasks,
 ) -> dict[str, Any]:
     """Trigger sync for all pending products."""
     # In production, this would query the database for pending products

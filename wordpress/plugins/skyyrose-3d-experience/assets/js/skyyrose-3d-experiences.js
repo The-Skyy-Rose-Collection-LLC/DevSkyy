@@ -521,10 +521,16 @@
         showError(message) {
             const loader = this.container.querySelector('.skyyrose-3d-loader');
             if (loader) {
+                // Escape HTML to prevent XSS
+                const escapeHtml = (str) => {
+                    const div = document.createElement('div');
+                    div.textContent = str;
+                    return div.innerHTML;
+                };
                 loader.innerHTML = `
                     <div class="skyyrose-3d-error">
                         <h3>Unable to load 3D experience</h3>
-                        <p>${message}</p>
+                        <p>${escapeHtml(message)}</p>
                         <button onclick="location.reload()">Retry</button>
                     </div>
                 `;

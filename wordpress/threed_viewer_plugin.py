@@ -660,9 +660,16 @@ class WordPressPluginGenerator:
         return plugin_dir
 
 
+# Aliases for backwards compatibility and test expectations
+PluginGenerator = WordPressPluginGenerator
+ThreeDViewerPlugin = WordPressPluginGenerator
+
+
 __all__ = [
     "ViewerConfig",
     "WordPressPluginGenerator",
+    "PluginGenerator",  # Alias
+    "ThreeDViewerPlugin",  # Alias
     "generate_viewer_javascript",
     "generate_viewer_css",
     "generate_shortcode_html",

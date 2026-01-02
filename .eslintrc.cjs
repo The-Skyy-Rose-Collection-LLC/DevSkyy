@@ -112,5 +112,7 @@ module.exports = {
     '.next/',
     '.nuxt/',
     '*.min.js',
+    'frontend/e2e/',
+    'frontend/playwright.config.ts',
   ],
 };

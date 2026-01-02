@@ -518,11 +518,11 @@ export const PressTimeline: React.FC<PressTimelineProps> = ({
                     alt={mention.publication}
                     onError={(e) => {
                       e.currentTarget.style.display = 'none';
-                      e.currentTarget.parentElement!.innerHTML = `
-                        <div class="press-timeline__logo-fallback">
-                          ${mention.publication.substring(0, 2).toUpperCase()}
-                        </div>
-                      `;
+                      // Use textContent to prevent XSS
+                      const fallbackDiv = document.createElement('div');
+                      fallbackDiv.className = 'press-timeline__logo-fallback';
+                      fallbackDiv.textContent = mention.publication.substring(0, 2).toUpperCase();
+                      e.currentTarget.parentElement!.replaceChildren(fallbackDiv);
                     }}
                   />
                 </div>
