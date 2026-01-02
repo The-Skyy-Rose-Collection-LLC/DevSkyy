@@ -34,7 +34,7 @@ import logging
 import sys
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 import aiohttp
@@ -132,13 +132,13 @@ class UploadResult(BaseModel):
     product_name: str
     model_type: str
     status: str = Field(..., regex="^(success|failed|skipped)$")
-    media_id: Optional[int] = Field(default=None, description="WordPress media attachment ID")
+    media_id: int | None = Field(default=None, description="WordPress media attachment ID")
     message: str = Field(default="", max_length=500)
-    uploaded_at: Optional[datetime] = Field(default=None)
-    wordpress_url: Optional[str] = Field(default=None, max_length=2048)
+    uploaded_at: datetime | None = Field(default=None)
+    wordpress_url: str | None = Field(default=None, max_length=2048)
 
     @validator("wordpress_url", pre=True)
-    def validate_wp_url(cls, v: Any) -> Optional[str]:
+    def validate_wp_url(cls, v: Any) -> str | None:
         """Validate WordPress URL format."""
         if v is None:
             return None
@@ -162,7 +162,7 @@ class UploadSummary(BaseModel):
     skipped_uploads: int
     upload_results: list[UploadResult] = Field(default_factory=list)
     started_at: datetime = Field(default_factory=datetime.utcnow)
-    completed_at: Optional[datetime] = Field(default=None)
+    completed_at: datetime | None = Field(default=None)
 
     def add_result(self, result: UploadResult) -> None:
         """Add upload result and update counts."""
@@ -291,7 +291,7 @@ class ModelUploadManager:
 
         return summary
 
-    async def _load_collection_metadata(self, collection: str) -> Optional[dict[str, Any]]:
+    async def _load_collection_metadata(self, collection: str) -> dict[str, Any] | None:
         """Load collection metadata from JSON file."""
         metadata_file = self.metadata_dir / f"{collection}_models_metadata.json"
         if not metadata_file.exists():
@@ -328,18 +328,50 @@ class ModelUploadManager:
             )
 
         try:
-            # For now, we return a success result indicating the model is pending generation
-            # In production, this would upload actual GLB/USDZ files after generation
+            # Find existing GLB file for this product
+            glb_path = self._find_glb_for_product(product_name, source_image, collection)
+
+            if not glb_path or not glb_path.exists():
+                logger.info(f"No GLB found for {product_name} - needs generation")
+                return UploadResult(
+                    product_id=product_id,
+                    product_name=product_name,
+                    model_type="glb",
+                    status="pending",
+                    message=f"No GLB found - generation needed: {source_image}",
+                )
+
+            # Upload GLB to WordPress media library
+            logger.info(f"Uploading {glb_path.name} for {product_name}")
+            attachment_id, media_url = await self._upload_file_to_wordpress(
+                session, glb_path, f"{product_name} 3D Model"
+            )
+
+            # Update product metadata with 3D model URL
+            await self._update_product_metadata(
+                session, product_id, glb_url=media_url, ar_enabled=True
+            )
+
+            logger.info(f"Successfully uploaded 3D model for {product_name}: {media_url}")
             return UploadResult(
                 product_id=product_id,
                 product_name=product_name,
                 model_type="glb",
                 status="success",
-                message=f"Ready for generation: {source_image}",
-                wordpress_url=f"{self.wordpress_url}/wp-admin/upload.php?item={product_id}",
+                message=f"Uploaded: {glb_path.name}",
+                wordpress_url=media_url,
                 uploaded_at=datetime.utcnow(),
             )
 
+        except FileUploadError as e:
+            logger.error(f"File upload error for {product_name}: {e}")
+            return UploadResult(
+                product_id=product_id,
+                product_name=product_name,
+                model_type="glb",
+                status="failed",
+                message=str(e)[:500],
+            )
         except WordPressError as e:
             logger.error(f"WordPress API error for {product_name}: {e}")
             return UploadResult(
@@ -355,9 +387,9 @@ class ModelUploadManager:
         session: aiohttp.ClientSession,
         file_path: Path,
         product_name: str,
-    ) -> int:
+    ) -> tuple[int, str]:
         """
-        Upload file to WordPress media library and return attachment ID.
+        Upload file to WordPress media library and return attachment ID and URL.
 
         Args:
             session: aiohttp session with auth
@@ -365,7 +397,7 @@ class ModelUploadManager:
             product_name: Product name for media title
 
         Returns:
-            WordPress attachment ID
+            Tuple of (attachment_id, source_url)
 
         Raises:
             FileUploadError: If upload fails
@@ -392,24 +424,65 @@ class ModelUploadManager:
 
                     response_data = await resp.json()
                     attachment_id = response_data.get("id")
+                    source_url = response_data.get("source_url", "")
                     if not attachment_id:
                         raise FileUploadError("No attachment ID returned")
 
-                    return attachment_id
+                    return attachment_id, source_url
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise FileUploadError("Upload timeout (60s)")
         except FileUploadError:
             raise
         except Exception as e:
             raise FileUploadError(f"Upload failed: {e}")
 
+    def _find_glb_for_product(
+        self, product_name: str, source_image: str, collection: str
+    ) -> Path | None:
+        """
+        Find existing GLB file for a product.
+
+        Args:
+            product_name: Name of the product
+            source_image: Original source image path
+            collection: Collection name (signature, love-hurts, black-rose)
+
+        Returns:
+            Path to GLB file if found, None otherwise
+        """
+        generated_dir = Path("assets/3d-models-generated")
+
+        # Check collection-specific directory first
+        collection_dir = generated_dir / collection
+        if collection_dir.exists():
+            # Try exact name match based on product name
+            normalized_name = product_name.lower().replace(" ", "_").replace("-", "_")
+            for glb_file in collection_dir.glob("*.glb"):
+                if normalized_name in glb_file.stem.lower().replace("-", "_"):
+                    return glb_file
+
+            # Try match based on source image name
+            if source_image:
+                source_stem = Path(source_image).stem.lower().replace("-", "_")
+                for glb_file in collection_dir.glob("*.glb"):
+                    if source_stem in glb_file.stem.lower().replace("-", "_"):
+                        return glb_file
+
+        # Check meshy subdirectory as fallback
+        meshy_dir = generated_dir / "meshy" / collection
+        if meshy_dir.exists():
+            for glb_file in meshy_dir.glob("*.glb"):
+                return glb_file  # Return first available
+
+        return None
+
     async def _update_product_metadata(
         self,
         session: aiohttp.ClientSession,
         product_id: int,
-        glb_url: Optional[str] = None,
-        usdz_url: Optional[str] = None,
+        glb_url: str | None = None,
+        usdz_url: str | None = None,
         ar_enabled: bool = True,
     ) -> None:
         """
@@ -449,7 +522,7 @@ class ModelUploadManager:
                         f"Metadata update failed: {resp.status} - {error_text}"
                     )
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise MetadataUpdateError("Metadata update timeout (30s)")
         except MetadataUpdateError:
             raise
@@ -457,7 +530,7 @@ class ModelUploadManager:
             raise MetadataUpdateError(f"Metadata update failed: {e}")
 
     async def generate_upload_report(
-        self, summary: UploadSummary, output_file: Optional[Path] = None
+        self, summary: UploadSummary, output_file: Path | None = None
     ) -> str:
         """
         Generate human-readable upload report.
