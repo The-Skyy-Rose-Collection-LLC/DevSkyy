@@ -8,7 +8,6 @@ for the DevSkyy 3D asset pipeline.
 CRITICAL: All models must achieve 95% fidelity to pass.
 """
 
-from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
@@ -35,7 +34,7 @@ class TestFidelityThreshold:
         """Test that validator uses 95% threshold."""
         pytest.importorskip("trimesh")
         validator = ModelFidelityValidator()
-        assert validator.minimum_fidelity == 95.0
+        assert validator.minimum_threshold == 95.0
 
 
 class TestGeometryMetrics:
@@ -183,25 +182,27 @@ class TestModelFidelityValidator:
         """Test validator instantiation."""
         pytest.importorskip("trimesh")
         validator = ModelFidelityValidator()
-        assert validator.minimum_fidelity == MINIMUM_FIDELITY_SCORE
+        assert validator.minimum_threshold == MINIMUM_FIDELITY_SCORE
 
     @pytest.mark.asyncio
-    async def test_validate_returns_fidelity_report(self):
+    async def test_validate_returns_fidelity_report(self, tmp_path):
         """Test that validation returns a FidelityReport."""
         pytest.importorskip("trimesh")
         validator = ModelFidelityValidator()
 
-        # Create a test GLB file path (doesn't need to exist for mock)
-        test_path = Path("/tmp/test_model.glb")
+        # Create a test GLB file that exists
+        test_path = tmp_path / "test_model.glb"
+        test_path.touch()
 
-        with patch.object(validator, "_load_mesh") as mock_load:
-            # Create mock mesh
+        with patch("trimesh.load") as mock_load:
+            # Create mock mesh with all required attributes
             mock_mesh = Mock()
             mock_mesh.is_watertight = True
             mock_mesh.is_volume = True
             mock_mesh.euler_number = 2
             mock_mesh.volume = 100.0
             mock_mesh.area = 200.0
+            mock_mesh.bounds = [[0, 0, 0], [1, 1, 1]]  # Required for bounding box
             mock_mesh.vertices = Mock()
             mock_mesh.vertices.__len__ = Mock(return_value=10000)
             mock_mesh.faces = Mock()
@@ -211,6 +212,7 @@ class TestModelFidelityValidator:
             mock_mesh.visual.uv = Mock()
             mock_mesh.visual.uv.__len__ = Mock(return_value=10000)
             mock_mesh.visual.material = Mock()
+            mock_mesh.visual.material.image = None  # No texture image
             mock_load.return_value = mock_mesh
 
             report = await validator.validate(test_path)
