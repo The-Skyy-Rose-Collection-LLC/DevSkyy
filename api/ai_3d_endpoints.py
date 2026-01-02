@@ -269,11 +269,11 @@ async def get_job(job_id: str) -> dict[str, Any]:
 
 @ai_3d_router.post("/generate-model", response_model=GenerateModelResponse)
 async def generate_model(
+    background_tasks: BackgroundTasks,
     files: list[UploadFile] = File(...),
     product_sku: str = "",
     quality_level: str = "high",
     validate_fidelity: bool = True,
-    background_tasks: BackgroundTasks | None = None,
 ) -> GenerateModelResponse:
     """
     Generate a 3D model from product images.
@@ -347,7 +347,7 @@ async def generate_model(
 @ai_3d_router.post("/regenerate-model", response_model=GenerateModelResponse)
 async def regenerate_model(
     request: RegenerateRequest,
-    background_tasks: BackgroundTasks | None = None,
+    background_tasks: BackgroundTasks,
 ) -> GenerateModelResponse:
     """Regenerate model with feedback from failed validation."""
     product_sku = request.product_sku
@@ -424,4 +424,28 @@ async def get_model_info(product_sku: str) -> ModelInfoResponse:
     )
 
 
-__all__ = ["ai_3d_router"]
+# Aliases for test compatibility
+AI3DJobStore = JobStore
+AI3DPipelineStatus = PipelineStatusResponse
+RegenerateModelRequest = RegenerateRequest
+ModelJobResponse = GenerateModelResponse
+ModelStatusResponse = PipelineStatusResponse
+
+
+__all__ = [
+    "ai_3d_router",
+    # Job store
+    "JobStore",
+    "AI3DJobStore",  # Alias
+    "job_store",
+    # Request/Response models
+    "GenerateModelRequest",
+    "GenerateModelResponse",
+    "RegenerateRequest",
+    "RegenerateModelRequest",  # Alias
+    "ModelInfoResponse",
+    "PipelineStatusResponse",
+    "ModelJobResponse",  # Alias
+    "ModelStatusResponse",  # Alias
+    "AI3DPipelineStatus",  # Alias
+]

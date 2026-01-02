@@ -636,12 +636,12 @@ async def enhance_from_url(
 
 @visual_router.post("/visual/enhance/upload")
 async def enhance_from_upload(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     enhancement_type: EnhancementType = EnhancementType.FULL,
     upscale_factor: int = 2,
     new_background: str = "white studio",
     product_name: str = "Product",
-    background_tasks: BackgroundTasks = None,
 ):
     """
     Upload and enhance a product image.
@@ -690,10 +690,10 @@ async def enhance_from_upload(
 
 @visual_router.post("/visual/batch-enhance")
 async def batch_enhance(
+    background_tasks: BackgroundTasks,
     image_urls: list[str],
     enhancement_type: EnhancementType = EnhancementType.FULL,
     upscale_factor: int = 2,
-    background_tasks: BackgroundTasks = None,
 ):
     """
     Batch enhance multiple product images.

@@ -47,10 +47,11 @@ logger = logging.getLogger(__name__)
 class ThreeDProvider(str, Enum):
     """Supported 3D generation providers."""
 
+    TRELLIS = "trellis"  # HuggingFace TRELLIS (preferred)
     TRIPO = "tripo"
     HUGGINGFACE = "huggingface"
     MESHY = "meshy"
-    AUTO = "auto"  # Automatic provider selection
+    AUTO = "auto"  # Automatic provider selection with fallback chain
 
 
 class ModelFormat(str, Enum):
@@ -82,8 +83,8 @@ class GenerationConfig(BaseModel):
         description="3D generation provider",
     )
     fallback_providers: list[ThreeDProvider] = Field(
-        default=[ThreeDProvider.TRIPO, ThreeDProvider.HUGGINGFACE],
-        description="Fallback providers if primary fails",
+        default=[ThreeDProvider.TRELLIS, ThreeDProvider.MESHY, ThreeDProvider.TRIPO],
+        description="Fallback chain: TRELLIS -> Meshy -> Tripo3D",
     )
 
     # Quality settings
@@ -182,28 +183,30 @@ class ThreeDGenerationPipeline:
         self._init_providers()
 
     def _init_providers(self) -> None:
-        """Initialize available providers."""
-        # Tripo3D
-        if os.getenv("TRIPO_API_KEY"):
-            try:
-                from ai_3d.providers.tripo import TripoClient
+        """
+        Initialize available providers.
 
-                self._providers[ThreeDProvider.TRIPO] = TripoClient()
-                logger.info("Tripo3D provider initialized")
-            except Exception as e:
-                logger.warning(f"Failed to initialize Tripo3D: {e}")
-
-        # HuggingFace
+        Provider priority (fallback chain):
+        1. TRELLIS (HuggingFace) - Best quality, open-source
+        2. Meshy - Good quality, commercial
+        3. Tripo3D - Good quality, commercial
+        4. HuggingFace (TripoSR/Shap-E) - Fallback open-source
+        """
+        # TRELLIS (via HuggingFace) - PREFERRED
         if os.getenv("HUGGINGFACE_API_KEY") or os.getenv("HF_TOKEN"):
             try:
                 from ai_3d.providers.huggingface import HuggingFace3DClient
 
-                self._providers[ThreeDProvider.HUGGINGFACE] = HuggingFace3DClient()
-                logger.info("HuggingFace 3D provider initialized")
+                # TRELLIS client (uses TRELLIS as default model)
+                trellis_client = HuggingFace3DClient()
+                self._providers[ThreeDProvider.TRELLIS] = trellis_client
+                # Also register as HuggingFace for backward compatibility
+                self._providers[ThreeDProvider.HUGGINGFACE] = trellis_client
+                logger.info("TRELLIS/HuggingFace 3D provider initialized")
             except Exception as e:
-                logger.warning(f"Failed to initialize HuggingFace 3D: {e}")
+                logger.warning(f"Failed to initialize TRELLIS/HuggingFace: {e}")
 
-        # Meshy
+        # Meshy - Second priority
         if os.getenv("MESHY_API_KEY"):
             try:
                 from ai_3d.providers.meshy import MeshyClient
@@ -213,10 +216,20 @@ class ThreeDGenerationPipeline:
             except Exception as e:
                 logger.warning(f"Failed to initialize Meshy: {e}")
 
+        # Tripo3D - Third priority
+        if os.getenv("TRIPO_API_KEY"):
+            try:
+                from ai_3d.providers.tripo import TripoClient
+
+                self._providers[ThreeDProvider.TRIPO] = TripoClient()
+                logger.info("Tripo3D provider initialized")
+            except Exception as e:
+                logger.warning(f"Failed to initialize Tripo3D: {e}")
+
         if not self._providers:
             logger.warning(
                 "No 3D generation providers available. "
-                "Set TRIPO_API_KEY, HUGGINGFACE_API_KEY, or MESHY_API_KEY."
+                "Set HUGGINGFACE_API_KEY (for TRELLIS), MESHY_API_KEY, or TRIPO_API_KEY."
             )
 
     def get_available_providers(self) -> list[ThreeDProvider]:
@@ -436,20 +449,56 @@ class ThreeDGenerationPipeline:
         config: GenerationConfig,
         text_to_3d: bool = False,
     ) -> ThreeDProvider | None:
-        """Select the best available provider."""
+        """
+        Select the best available provider using fallback chain.
+
+        Priority order for image-to-3D:
+        1. TRELLIS (best quality)
+        2. Meshy
+        3. Tripo3D
+        4. HuggingFace (TripoSR fallback)
+
+        Priority order for text-to-3D:
+        1. Meshy (good text-to-3D support)
+        2. TRELLIS
+        3. Tripo3D
+        4. HuggingFace (Shap-E)
+        """
         if config.provider == ThreeDProvider.AUTO:
-            # Prefer Tripo for image-to-3D
-            priority = [ThreeDProvider.TRIPO, ThreeDProvider.HUGGINGFACE, ThreeDProvider.MESHY]
+            if text_to_3d:
+                # Different priority for text-to-3D
+                priority = [
+                    ThreeDProvider.MESHY,
+                    ThreeDProvider.TRELLIS,
+                    ThreeDProvider.TRIPO,
+                    ThreeDProvider.HUGGINGFACE,
+                ]
+            else:
+                # Prefer TRELLIS for image-to-3D (best quality)
+                priority = [
+                    ThreeDProvider.TRELLIS,
+                    ThreeDProvider.MESHY,
+                    ThreeDProvider.TRIPO,
+                    ThreeDProvider.HUGGINGFACE,
+                ]
+
             for provider in priority:
                 if provider in self._providers:
+                    logger.info(f"Auto-selected provider: {provider.value}")
                     return provider
         else:
             if config.provider in self._providers:
                 return config.provider
+            else:
+                logger.warning(
+                    f"Requested provider {config.provider.value} not available, "
+                    f"trying fallbacks"
+                )
 
-        # Try fallbacks
+        # Try fallbacks from config
         for provider in config.fallback_providers:
             if provider in self._providers:
+                logger.info(f"Using fallback provider: {provider.value}")
                 return provider
 
         return None
@@ -462,37 +511,62 @@ class ThreeDGenerationPipeline:
         config: GenerationConfig,
         correlation_id: str,
     ) -> Path | None:
-        """Generate with retry logic."""
-        last_error = None
+        """
+        Generate with retry logic and provider fallback.
 
-        for attempt in range(config.max_retries):
-            try:
-                logger.info(
-                    f"[{correlation_id}] Generation attempt {attempt + 1}/{config.max_retries}"
+        Tries the primary provider first, then falls back to other
+        providers in the fallback chain if the primary fails.
+        """
+        # Build ordered list of providers to try
+        providers_to_try = [provider]
+        for fallback in config.fallback_providers:
+            if fallback in self._providers and fallback not in providers_to_try:
+                providers_to_try.append(fallback)
+
+        for current_provider in providers_to_try:
+            logger.info(f"[{correlation_id}] Trying provider: {current_provider.value}")
+
+            last_error = None
+
+            for attempt in range(config.max_retries):
+                try:
+                    logger.info(
+                        f"[{correlation_id}] Generation attempt {attempt + 1}/{config.max_retries} "
+                        f"with {current_provider.value}"
+                    )
+
+                    client = self._providers[current_provider]
+                    model_path = await client.generate_from_image(
+                        image_path=str(image_path),
+                        output_dir=config.output_dir,
+                        output_format=config.output_format.value,
+                        prompt=prompt,
+                        texture_resolution=config.texture_resolution,
+                    )
+
+                    if model_path and Path(model_path).exists():
+                        logger.info(
+                            f"[{correlation_id}] Successfully generated with {current_provider.value}"
+                        )
+                        return Path(model_path)
+
+                except Exception as e:
+                    last_error = e
+                    logger.warning(
+                        f"[{correlation_id}] Attempt {attempt + 1} with {current_provider.value} failed: {e}"
+                    )
+
+                    if attempt < config.max_retries - 1:
+                        await asyncio.sleep(config.retry_delay_seconds)
+
+            # All retries failed for this provider, try next
+            if last_error:
+                logger.warning(
+                    f"[{correlation_id}] Provider {current_provider.value} failed after "
+                    f"{config.max_retries} attempts, trying next provider"
                 )
 
-                client = self._providers[provider]
-                model_path = await client.generate_from_image(
-                    image_path=str(image_path),
-                    output_dir=config.output_dir,
-                    output_format=config.output_format.value,
-                    prompt=prompt,
-                    texture_resolution=config.texture_resolution,
-                )
-
-                if model_path and Path(model_path).exists():
-                    return Path(model_path)
-
-            except Exception as e:
-                last_error = e
-                logger.warning(f"[{correlation_id}] Generation attempt {attempt + 1} failed: {e}")
-
-                if attempt < config.max_retries - 1:
-                    await asyncio.sleep(config.retry_delay_seconds)
-
-        if last_error:
-            logger.error(f"[{correlation_id}] All generation attempts failed: {last_error}")
-
+        logger.error(f"[{correlation_id}] All providers and retries exhausted")
         return None
 
     async def _generate_text_to_3d(

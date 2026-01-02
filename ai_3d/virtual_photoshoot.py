@@ -20,6 +20,7 @@ from __future__ import annotations
 import io
 import os
 from dataclasses import dataclass, field
+from enum import Enum
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -27,6 +28,19 @@ import structlog
 
 if TYPE_CHECKING:
     pass
+
+
+class ScenePreset(str, Enum):
+    """Available scene presets for virtual photoshoot."""
+
+    STUDIO_WHITE = "studio_white"
+    STUDIO_BLACK = "studio_black"
+    OUTDOOR_NATURE = "outdoor_nature"
+    URBAN_MODERN = "urban_modern"
+    MINIMAL_GRADIENT = "minimal_gradient"
+    LIFESTYLE_HOME = "lifestyle_home"
+    LUXURY_MARBLE = "luxury_marble"
+
 
 logger = structlog.get_logger(__name__)
 
@@ -275,9 +289,7 @@ class VirtualPhotoshootGenerator:
         # Generate renders from each camera position
         raw_renders = []
         for i, camera_pos in enumerate(scene.camera_positions):
-            render_path = await self._render_scene(
-                model_path, scene, camera_pos, product_sku, i
-            )
+            render_path = await self._render_scene(model_path, scene, camera_pos, product_sku, i)
             raw_renders.append(render_path)
 
         # AI enhance renders if enabled
@@ -393,9 +405,7 @@ class VirtualPhotoshootGenerator:
 
             # Apply background color if set
             if scene.background_color:
-                render_array = self._apply_background_color(
-                    render_array, scene.background_color
-                )
+                render_array = self._apply_background_color(render_array, scene.background_color)
 
             # Save
             Image.fromarray(render_array).save(render_path)
@@ -444,11 +454,14 @@ class VirtualPhotoshootGenerator:
             with open(render_path, "rb") as f:
                 img_data = f.read()
 
-            async with aiohttp.ClientSession() as session, session.post(
-                "https://api-inference.huggingface.co/models/ai-forever/Real-ESRGAN",
-                headers={"Authorization": f"Bearer {self.hf_token}"},
-                data=img_data,
-            ) as response:
+            async with (
+                aiohttp.ClientSession() as session,
+                session.post(
+                    "https://api-inference.huggingface.co/models/ai-forever/Real-ESRGAN",
+                    headers={"Authorization": f"Bearer {self.hf_token}"},
+                    data=img_data,
+                ) as response,
+            ):
                 if response.status == 200:
                     enhanced_data = await response.read()
                     from PIL import Image
@@ -566,9 +579,7 @@ class VirtualPhotoshootGenerator:
                         img_copy = background
 
                     # Save as WebP for web
-                    output_path = (
-                        self.output_dir / "web" / f"{product_sku}_{i}_{size_name}.webp"
-                    )
+                    output_path = self.output_dir / "web" / f"{product_sku}_{i}_{size_name}.webp"
                     img_copy.save(output_path, "WEBP", quality=85)
                     web_versions.append(output_path)
 
@@ -588,6 +599,7 @@ __all__ = [
     "VirtualPhotoshootGenerator",
     "PhotoshootScene",
     "GeneratedPhotoshoot",
+    "ScenePreset",
     "SCENE_PRESETS",
     "SOCIAL_CROPS",
 ]

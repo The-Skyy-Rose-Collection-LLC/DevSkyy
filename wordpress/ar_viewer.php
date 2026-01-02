@@ -497,14 +497,35 @@ class SkyyRose_AR_Quick_Look {
 
     /**
      * Track AR view via AJAX
+     *
+     * Uses output buffering to prevent PHP warnings from corrupting JSON response.
+     * Pattern recommended by WordPress Plugin Handbook and Mike Jolley (WooCommerce).
      */
     public function track_ar_view() {
-        // Verify nonce
-        check_ajax_referer('skyyrose_ar_nonce', 'nonce');
+        // Capture any stray output (PHP warnings, plugin interference, etc.)
+        ob_start();
+
+        // Verify nonce - use false to prevent HTML die() on failure
+        if (!check_ajax_referer('skyyrose_ar_nonce', 'nonce', false)) {
+            ob_end_clean();
+            wp_send_json_error(array('message' => __('Invalid security token', 'skyyrose-ar')), 403);
+            return;
+        }
+
+        // Check for any unexpected output before continuing
+        $stray_output = ob_get_clean();
+        if (!empty($stray_output)) {
+            error_log('SkyyRose AR AJAX: Unexpected output captured: ' . substr($stray_output, 0, 200));
+        }
+
+        // Re-start buffer for remainder of handler
+        ob_start();
 
         // Check if analytics is enabled
         if (get_option('skyyrose_ar_analytics_enabled', '1') !== '1') {
+            ob_end_clean();
             wp_send_json_success(array('tracked' => false));
+            return;
         }
 
         // Sanitize input
@@ -512,7 +533,9 @@ class SkyyRose_AR_Quick_Look {
         $event_type = isset($_POST['event_type']) ? sanitize_text_field($_POST['event_type']) : 'view';
 
         if (!$product_id) {
+            ob_end_clean();
             wp_send_json_error(array('message' => __('Invalid product ID', 'skyyrose-ar')));
+            return;
         }
 
         // Increment view counter
@@ -537,6 +560,9 @@ class SkyyRose_AR_Quick_Look {
                 array('%d', '%s', '%s', '%s', '%s')
             );
         }
+
+        // Clean any stray output before sending JSON response
+        ob_end_clean();
 
         wp_send_json_success(array(
             'tracked' => true,

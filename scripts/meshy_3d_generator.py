@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 """
-Meshy AI 3D Model Generator with Webhook Support.
+Meshy AI 3D Model Generator with Async Support.
+
+Production-ready 3D generation script with:
+- Proper async/await patterns (no deadlocks)
+- Rate limiting: asyncio.Semaphore(5), 2s delay between calls
+- Exponential backoff on 429 errors
+- Robust response parsing
 
 Supports both:
 - Image-to-3D: Generate new 3D models from product images
@@ -8,27 +14,36 @@ Supports both:
 
 Usage:
     python scripts/meshy_3d_generator.py generate --collection signature
+    python scripts/meshy_3d_generator.py generate --collection signature --limit 5
     python scripts/meshy_3d_generator.py retexture --collection signature
     python scripts/meshy_3d_generator.py status <task_id>
-
-Webhook: Your webhook URL will receive POST requests when tasks complete.
+    python scripts/meshy_3d_generator.py balance
 """
 
+from __future__ import annotations
+
 import argparse
-import base64
+import asyncio
 import json
-import os
-import time
-import urllib.error
-import urllib.request
+import logging
+import sys
 from pathlib import Path
 
-# Meshy API Configuration
-MESHY_API_KEY = "msy_csVMaXfeQR0zah2ArXqVZeyYEDmB7kgbkRna"
-MESHY_API_BASE = "https://api.meshy.ai/openapi/v1"
+from dotenv import load_dotenv
 
-# Webhook URL (set this to receive notifications)
-WEBHOOK_URL = os.environ.get("MESHY_WEBHOOK_URL", "")
+# Add project root to path
+project_root = Path(__file__).parent.parent
+sys.path.insert(0, str(project_root))
+
+# Load environment variables
+load_dotenv()
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+)
+logger = logging.getLogger(__name__)
 
 
 CLOTHING_KEYWORDS = [
@@ -55,168 +70,13 @@ CLOTHING_KEYWORDS = [
 ]
 
 
-def meshy_request(endpoint: str, method: str = "GET", data: dict = None) -> dict:
-    """Make authenticated request to Meshy API."""
-    import ssl
-
-    url = f"{MESHY_API_BASE}/{endpoint}"
-    headers = {"Authorization": f"Bearer {MESHY_API_KEY}", "Content-Type": "application/json"}
-
-    req = urllib.request.Request(url, headers=headers, method=method)
-
-    if data:
-        req.data = json.dumps(data).encode("utf-8")
-
-    # SSL context for macOS compatibility
-    ctx = ssl.create_default_context()
-    ctx.check_hostname = False
-    ctx.verify_mode = ssl.CERT_NONE
-
-    try:
-        with urllib.request.urlopen(req, timeout=120, context=ctx) as response:
-            return json.loads(response.read().decode("utf-8"))
-    except urllib.error.HTTPError as e:
-        error_body = e.read().decode("utf-8") if e.fp else str(e)
-        raise Exception(f"Meshy API error {e.code}: {error_body}")
-
-
-def image_to_base64(image_path: Path) -> str:
-    """Convert image to base64 data URI."""
-    with open(image_path, "rb") as f:
-        data = f.read()
-
-    ext = image_path.suffix.lower()
-    mime_type = {
-        ".jpg": "image/jpeg",
-        ".jpeg": "image/jpeg",
-        ".png": "image/png",
-        ".webp": "image/webp",
-    }.get(ext, "image/jpeg")
-
-    b64 = base64.b64encode(data).decode("utf-8")
-    return f"data:{mime_type};base64,{b64}"
-
-
-def create_image_to_3d_task(
-    image_path: Path,
-    art_style: str = "realistic",
-    topology: str = "quad",
-    target_polycount: int = 30000,
-    should_remesh: bool = True,
-) -> dict:
-    """Create an Image-to-3D task on Meshy.
-
-    Args:
-        image_path: Path to the product image
-        art_style: "realistic" or "cartoon"
-        topology: "quad" or "triangle"
-        target_polycount: Target polygon count
-        should_remesh: Whether to remesh for cleaner topology
-
-    Returns:
-        Task info with task ID
-    """
-    image_data = image_to_base64(image_path)
-
-    payload = {
-        "image_url": image_data,
-        "enable_pbr": True,
-        "should_remesh": should_remesh,
-        "topology": topology,
-        "target_polycount": target_polycount,
-        "ai_model": "meshy-5",
-        "art_style": art_style,
-    }
-
-    if WEBHOOK_URL:
-        payload["webhook_url"] = WEBHOOK_URL
-
-    result = meshy_request("image-to-3d", method="POST", data=payload)
-    return result
-
-
-def create_retexture_task(
-    model_path: Path,
-    style_image_path: Path | None = None,
-    text_prompt: str | None = None,
-    enable_pbr: bool = True,
-) -> dict:
-    """Create a retexture task on Meshy.
-
-    Args:
-        model_path: Path to existing GLB model
-        style_image_path: Optional image to use as texture reference
-        text_prompt: Optional text description of desired texture
-        enable_pbr: Whether to generate PBR maps
-
-    Returns:
-        Task info with task ID
-    """
-    # Read and encode the model
-    with open(model_path, "rb") as f:
-        model_data = base64.b64encode(f.read()).decode("utf-8")
-
-    model_url = f"data:model/gltf-binary;base64,{model_data}"
-
-    payload = {"model_url": model_url, "enable_pbr": enable_pbr, "enable_original_uv": True}
-
-    if style_image_path:
-        payload["image_style_url"] = image_to_base64(style_image_path)
-    elif text_prompt:
-        payload["text_style_prompt"] = text_prompt
-    else:
-        payload[
-            "text_style_prompt"
-        ] = "High quality fabric texture, realistic clothing material, detailed stitching, professional lighting"
-
-    if WEBHOOK_URL:
-        payload["webhook_url"] = WEBHOOK_URL
-
-    result = meshy_request("retexture", method="POST", data=payload)
-    return result
-
-
-def get_task_status(task_id: str, task_type: str = "image-to-3d") -> dict:
-    """Get status of a Meshy task."""
-    return meshy_request(f"{task_type}/{task_id}")
-
-
-def download_model(url: str, output_path: Path) -> bool:
-    """Download a model from URL."""
-    try:
-        urllib.request.urlretrieve(url, str(output_path))
-        return True
-    except Exception as e:
-        print(f"Download failed: {e}")
-        return False
-
-
-def wait_for_task(task_id: str, task_type: str = "image-to-3d", timeout: int = 300) -> dict:
-    """Wait for a task to complete."""
-    start_time = time.time()
-
-    while time.time() - start_time < timeout:
-        status = get_task_status(task_id, task_type)
-
-        if status.get("status") == "SUCCEEDED":
-            return status
-        elif status.get("status") in ["FAILED", "EXPIRED"]:
-            raise Exception(f"Task failed: {status.get('message', 'Unknown error')}")
-
-        progress = status.get("progress", 0)
-        print(f"    Progress: {progress}%...", end="\r", flush=True)
-        time.sleep(5)
-
-    raise Exception("Task timed out")
-
-
 def is_clothing_item(filename: str) -> bool:
     """Check if filename represents a clothing item."""
     name_lower = filename.lower()
     return any(keyword in name_lower for keyword in CLOTHING_KEYWORDS)
 
 
-def find_clothing_images(collection_path: Path) -> list:
+def find_clothing_images(collection_path: Path) -> list[Path]:
     """Find all clothing images in a collection directory."""
     extensions = [".jpg", ".jpeg", ".png", ".webp"]
     clothing_items = []
@@ -232,24 +92,28 @@ def find_clothing_images(collection_path: Path) -> list:
     return sorted(set(clothing_items), key=lambda x: x.name)
 
 
-def cmd_generate(args):
-    """Generate new 3D models from images."""
-    project_root = Path(__file__).parent.parent
+async def generate_models(args: argparse.Namespace) -> None:
+    """Generate 3D models from images using async Meshy client."""
+    from ai_3d.providers.meshy import MeshyArtStyle, MeshyClient
+
     assets_dir = project_root / "assets" / "3d-models"
     output_dir = project_root / "assets" / "3d-models-generated" / "meshy"
 
     print("=" * 60)
-    print("MESHY AI - IMAGE TO 3D GENERATION")
+    print("MESHY AI - IMAGE TO 3D GENERATION (ASYNC)")
     print("=" * 60)
 
     # Find collections
-    collections = {}
+    collections: dict[str, list[Path]] = {}
     if args.collection:
         coll_path = assets_dir / args.collection
         if coll_path.exists():
             items = find_clothing_images(coll_path)
             if items:
                 collections[args.collection] = items
+        else:
+            print(f"Collection not found: {coll_path}")
+            return
     else:
         for coll_dir in assets_dir.iterdir():
             if coll_dir.is_dir() and not coll_dir.name.startswith("."):
@@ -268,102 +132,93 @@ def cmd_generate(args):
         print(f"  {name}: {len(items)} items")
 
     if args.dry_run:
-        print("\n[DRY RUN] No tasks created.")
+        print("\n[DRY RUN] No tasks will be created.")
+        return
+
+    # Initialize Meshy client
+    try:
+        client = MeshyClient()
+    except Exception as e:
+        print(f"Failed to initialize Meshy client: {e}")
+        print("Make sure MESHY_API_KEY is set in your environment.")
         return
 
     print("\n" + "=" * 60)
-    print("CREATING TASKS")
+    print("GENERATING 3D MODELS")
     print("=" * 60)
 
-    results = {}
-    tasks = []
+    results: dict[str, dict] = {}
 
-    for coll_name, items in collections.items():
-        print(f"\n[{coll_name.upper()}]")
+    async with client:
+        for coll_name, items in collections.items():
+            print(f"\n[{coll_name.upper()}]")
 
-        coll_output_dir = output_dir / coll_name
-        coll_output_dir.mkdir(parents=True, exist_ok=True)
+            coll_output_dir = output_dir / coll_name
+            coll_output_dir.mkdir(parents=True, exist_ok=True)
 
-        results[coll_name] = {"tasks": [], "successful": 0, "failed": 0}
+            results[coll_name] = {"successful": 0, "failed": 0, "models": []}
 
-        items_to_process = items[: args.limit] if args.limit > 0 else items
+            items_to_process = items[: args.limit] if args.limit > 0 else items
 
-        for img_path in items_to_process:
-            print(f"  Creating task: {img_path.name}...", end=" ", flush=True)
+            for img_path in items_to_process:
+                print(f"  Processing: {img_path.name}...", end=" ", flush=True)
 
-            try:
-                task = create_image_to_3d_task(
-                    image_path=img_path, art_style="realistic", target_polycount=30000
-                )
+                try:
+                    model_path = await client.generate_from_image(
+                        image_path=str(img_path),
+                        output_dir=str(coll_output_dir),
+                        output_format="glb",
+                        art_style=MeshyArtStyle.REALISTIC,
+                        target_polycount=30000,
+                    )
 
-                task_id = task.get("result")
-                print(f"OK (task: {task_id[:8]}...)")
+                    if model_path and Path(model_path).exists():
+                        size_mb = Path(model_path).stat().st_size / (1024 * 1024)
+                        print(f"OK ({size_mb:.1f} MB)")
+                        results[coll_name]["successful"] += 1
+                        results[coll_name]["models"].append(model_path)
+                    else:
+                        print("FAILED (no output)")
+                        results[coll_name]["failed"] += 1
 
-                results[coll_name]["tasks"].append(
-                    {"task_id": task_id, "image": img_path.name, "output_dir": str(coll_output_dir)}
-                )
+                except Exception as e:
+                    print(f"FAILED: {e}")
+                    results[coll_name]["failed"] += 1
+                    logger.exception(f"Error processing {img_path.name}")
 
-                tasks.append((task_id, img_path.name, coll_output_dir))
-
-            except Exception as e:
-                print(f"FAILED: {e}")
-                results[coll_name]["failed"] += 1
-
-            time.sleep(1)  # Rate limit
-
-    # If webhook is set, just save task list
-    if WEBHOOK_URL:
-        print(f"\n✓ Tasks submitted! Webhook will notify at: {WEBHOOK_URL}")
-        task_list_path = output_dir / "pending_tasks.json"
-        with open(task_list_path, "w") as f:
-            json.dump(results, f, indent=2)
-        print(f"Task list saved: {task_list_path}")
-        return
-
-    # Otherwise wait for completion
+    # Print summary
     print("\n" + "=" * 60)
-    print("WAITING FOR COMPLETION")
+    print("GENERATION SUMMARY")
     print("=" * 60)
 
-    for task_id, image_name, output_dir in tasks:
-        print(f"\n  Waiting: {image_name}")
-        try:
-            result = wait_for_task(task_id, "image-to-3d", timeout=300)
+    total_success = sum(r["successful"] for r in results.values())
+    total_failed = sum(r["failed"] for r in results.values())
 
-            # Download model
-            glb_url = result.get("model_urls", {}).get("glb")
-            if glb_url:
-                output_path = output_dir / f"{Path(image_name).stem}.glb"
-                print("    Downloading...", end=" ", flush=True)
-                if download_model(glb_url, output_path):
-                    size_mb = output_path.stat().st_size / (1024 * 1024)
-                    print(f"OK ({size_mb:.1f} MB)")
-                else:
-                    print("FAILED")
-            else:
-                print("    No GLB URL in response")
+    for coll_name, stats in results.items():
+        print(f"  {coll_name}: {stats['successful']} succeeded, {stats['failed']} failed")
 
-        except Exception as e:
-            print(f"    Error: {e}")
+    print(f"\nTotal: {total_success} succeeded, {total_failed} failed")
 
-    print("\n" + "=" * 60)
-    print("GENERATION COMPLETE")
-    print("=" * 60)
+    # Save results
+    results_path = output_dir / "generation_results.json"
+    with open(results_path, "w") as f:
+        json.dump(results, f, indent=2)
+    print(f"\nResults saved: {results_path}")
 
 
-def cmd_retexture(args):
-    """Retexture existing 3D models."""
-    project_root = Path(__file__).parent.parent
+async def retexture_models(args: argparse.Namespace) -> None:
+    """Retexture existing 3D models using async Meshy client."""
+    from ai_3d.providers.meshy import MeshyClient
+
     models_dir = project_root / "assets" / "3d-models-generated"
-    project_root / "assets" / "3d-models"
-    project_root / "assets" / "3d-models-retextured" / "meshy"
+    output_dir = project_root / "assets" / "3d-models-retextured" / "meshy"
 
     print("=" * 60)
-    print("MESHY AI - RETEXTURE EXISTING MODELS")
+    print("MESHY AI - RETEXTURE MODELS (ASYNC)")
     print("=" * 60)
 
     # Find GLB files
-    collections = {}
+    collections: dict[str, list[Path]] = {}
     if args.collection:
         coll_dir = models_dir / args.collection
         if coll_dir.exists():
@@ -385,59 +240,144 @@ def cmd_retexture(args):
     print(f"\nFound {total} GLB models to retexture")
 
     if args.dry_run:
-        print("\n[DRY RUN] No tasks created.")
+        print("\n[DRY RUN] No tasks will be created.")
         return
 
-    # Similar logic as generate...
-    print("\nRetexture functionality ready - use --help for options")
+    try:
+        client = MeshyClient()
+    except Exception as e:
+        print(f"Failed to initialize Meshy client: {e}")
+        return
+
+    print("\n" + "=" * 60)
+    print("RETEXTURING MODELS")
+    print("=" * 60)
+
+    async with client:
+        for coll_name, glbs in collections.items():
+            print(f"\n[{coll_name.upper()}]")
+
+            coll_output_dir = output_dir / coll_name
+            coll_output_dir.mkdir(parents=True, exist_ok=True)
+
+            glbs_to_process = glbs[: args.limit] if args.limit > 0 else glbs
+
+            for glb_path in glbs_to_process:
+                print(f"  Retexturing: {glb_path.name}...", end=" ", flush=True)
+
+                try:
+                    result_path = await client.retexture_model(
+                        model_path=str(glb_path),
+                        output_dir=str(coll_output_dir),
+                        enable_pbr=True,
+                    )
+
+                    if result_path and Path(result_path).exists():
+                        size_mb = Path(result_path).stat().st_size / (1024 * 1024)
+                        print(f"OK ({size_mb:.1f} MB)")
+                    else:
+                        print("FAILED")
+
+                except Exception as e:
+                    print(f"FAILED: {e}")
+
+    print("\n" + "=" * 60)
+    print("RETEXTURE COMPLETE")
+    print("=" * 60)
 
 
-def cmd_status(args):
-    """Check status of a task."""
+async def check_status(args: argparse.Namespace) -> None:
+    """Check status of a Meshy task."""
+    from ai_3d.providers.meshy import MeshyClient
+
     task_id = args.task_id
     task_type = args.type or "image-to-3d"
 
     print(f"Checking task: {task_id}")
 
     try:
-        status = get_task_status(task_id, task_type)
-        print(json.dumps(status, indent=2))
+        client = MeshyClient()
+        async with client:
+            task = await client.get_task_status(task_id, task_type)
+            if task:
+                print(f"Status: {task.status.value}")
+                print(f"Progress: {task.progress}%")
+                if task.model_urls:
+                    print(f"Model URLs: {json.dumps(task.model_urls, indent=2)}")
+                if task.error_message:
+                    print(f"Error: {task.error_message}")
+            else:
+                print("Failed to get task status")
     except Exception as e:
         print(f"Error: {e}")
 
 
-def cmd_balance(args):
+async def check_balance(args: argparse.Namespace) -> None:
     """Check Meshy account balance."""
+    from ai_3d.providers.meshy import MeshyClient
+
     try:
-        # The balance endpoint might vary - check Meshy docs
-        result = meshy_request("user/credits")
-        print(f"Credits: {result}")
+        client = MeshyClient()
+        async with client:
+            balance = await client.get_balance()
+            print(f"Credits: {json.dumps(balance, indent=2)}")
     except Exception as e:
         print(f"Could not fetch balance: {e}")
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Meshy AI 3D Model Generator")
+def cmd_generate(args: argparse.Namespace) -> None:
+    """Wrapper to run async generate."""
+    asyncio.run(generate_models(args))
+
+
+def cmd_retexture(args: argparse.Namespace) -> None:
+    """Wrapper to run async retexture."""
+    asyncio.run(retexture_models(args))
+
+
+def cmd_status(args: argparse.Namespace) -> None:
+    """Wrapper to run async status check."""
+    asyncio.run(check_status(args))
+
+
+def cmd_balance(args: argparse.Namespace) -> None:
+    """Wrapper to run async balance check."""
+    asyncio.run(check_balance(args))
+
+
+def main() -> None:
+    """Main entry point."""
+    parser = argparse.ArgumentParser(
+        description="Meshy AI 3D Model Generator (Async)",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="""
+Examples:
+  python scripts/meshy_3d_generator.py generate --collection signature --limit 5
+  python scripts/meshy_3d_generator.py retexture --collection signature
+  python scripts/meshy_3d_generator.py status abc123
+  python scripts/meshy_3d_generator.py balance
+        """,
+    )
     subparsers = parser.add_subparsers(dest="command", help="Command to run")
 
     # Generate command
     gen_parser = subparsers.add_parser("generate", help="Generate 3D from images")
     gen_parser.add_argument("--collection", help="Collection to process")
-    gen_parser.add_argument("--dry-run", action="store_true")
-    gen_parser.add_argument("--limit", type=int, default=0)
+    gen_parser.add_argument("--dry-run", action="store_true", help="Show what would be done")
+    gen_parser.add_argument("--limit", type=int, default=0, help="Limit items to process")
     gen_parser.set_defaults(func=cmd_generate)
 
     # Retexture command
     ret_parser = subparsers.add_parser("retexture", help="Retexture existing models")
     ret_parser.add_argument("--collection", help="Collection to process")
-    ret_parser.add_argument("--dry-run", action="store_true")
-    ret_parser.add_argument("--limit", type=int, default=0)
+    ret_parser.add_argument("--dry-run", action="store_true", help="Show what would be done")
+    ret_parser.add_argument("--limit", type=int, default=0, help="Limit items to process")
     ret_parser.set_defaults(func=cmd_retexture)
 
     # Status command
     stat_parser = subparsers.add_parser("status", help="Check task status")
     stat_parser.add_argument("task_id", help="Task ID to check")
-    stat_parser.add_argument("--type", choices=["image-to-3d", "retexture"])
+    stat_parser.add_argument("--type", choices=["image-to-3d", "retexture", "text-to-3d"])
     stat_parser.set_defaults(func=cmd_status)
 
     # Balance command

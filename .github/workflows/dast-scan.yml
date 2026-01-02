@@ -1,0 +1,271 @@
+name: DAST Security Scan
+
+on:
+  # Run on every push to staging
+  push:
+    branches:
+      - staging
+  # Run on pull requests targeting main
+  pull_request:
+    branches:
+      - main
+  # Allow manual trigger
+  workflow_dispatch:
+  # Schedule weekly scans
+  schedule:
+    - cron: '0 2 * * 1' # Every Monday at 2 AM UTC
+
+env:
+  STAGING_URL: https://staging.skyyrose.com
+  REPORTS_DIR: staging/reports/dast
+
+jobs:
+  dast-scan:
+    name: DAST Vulnerability Scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          pip install --no-cache-dir -r requirements.txt || true
+
+      - name: Install Nuclei
+        run: |
+          wget -q https://github.com/projectdiscovery/nuclei/releases/latest/download/nuclei_linux_amd64.zip
+          unzip -q nuclei_linux_amd64.zip
+          sudo mv nuclei /usr/local/bin/
+          nuclei -version
+          nuclei -update-templates
+
+      - name: Pull OWASP ZAP Docker image
+        run: docker pull owasp/zap2docker-stable
+
+      - name: Create reports directory
+        run: mkdir -p ${{ env.REPORTS_DIR }}
+
+      - name: Run DAST scan
+        id: dast_scan
+        env:
+          STAGING_URL: ${{ env.STAGING_URL }}
+          ZAP_API_KEY: ${{ secrets.ZAP_API_KEY || 'changeme' }}
+          MAX_SCAN_DURATION: 3600
+          NUCLEI_TIMEOUT: 30m
+          RUN_PARALLEL: true
+        run: |
+          chmod +x staging/run_dast_scan.sh
+          ./staging/run_dast_scan.sh || echo "scan_failed=true" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: Upload ZAP HTML Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-html-report
+          path: ${{ env.REPORTS_DIR }}/zap_report_*.html
+          retention-days: 30
+
+      - name: Upload vulnerability reports
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: vulnerability-reports
+          path: |
+            ${{ env.REPORTS_DIR }}/*.json
+            ${{ env.REPORTS_DIR }}/*.txt
+          retention-days: 30
+
+      - name: Check for production blockers
+        id: check_blockers
+        run: |
+          LATEST_COMBINED=$(ls -t ${{ env.REPORTS_DIR }}/combined_vulnerability_report_*.json | head -1)
+          if [ -f "$LATEST_COMBINED" ]; then
+            BLOCKERS=$(jq '.blockers | length' "$LATEST_COMBINED")
+            echo "blockers=$BLOCKERS" >> $GITHUB_OUTPUT
+
+            if [ "$BLOCKERS" -gt 0 ]; then
+              echo "::error::Found $BLOCKERS production blocker(s)!"
+              exit 1
+            fi
+          fi
+
+      - name: Compare with baseline
+        if: always()
+        run: |
+          LATEST_COMBINED=$(ls -t ${{ env.REPORTS_DIR }}/combined_vulnerability_report_*.json | head -1)
+          BASELINE="${{ env.REPORTS_DIR }}/vulnerability_baseline.json"
+
+          if [ -f "$BASELINE" ] && [ -f "$LATEST_COMBINED" ]; then
+            python3 staging/compare_baseline.py \
+              "$LATEST_COMBINED" \
+              "$BASELINE" \
+              "${{ env.REPORTS_DIR }}/vulnerability_delta_$(date +%Y%m%d_%H%M%S).json"
+          else
+            echo "No baseline found, skipping comparison"
+          fi
+        continue-on-error: true
+
+      - name: Generate summary report
+        if: always()
+        run: |
+          LATEST_SUMMARY=$(ls -t ${{ env.REPORTS_DIR }}/vulnerability_summary_*.txt | head -1)
+          if [ -f "$LATEST_SUMMARY" ]; then
+            echo "## DAST Scan Results" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+            cat "$LATEST_SUMMARY" >> $GITHUB_STEP_SUMMARY
+            echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const glob = require('@actions/glob');
+
+            // Find latest combined report
+            const globber = await glob.create('${{ env.REPORTS_DIR }}/combined_vulnerability_report_*.json');
+            const files = await globber.glob();
+            if (files.length === 0) return;
+
+            const latestReport = files[files.length - 1];
+            const report = JSON.parse(fs.readFileSync(latestReport, 'utf8'));
+
+            const stats = report.statistics;
+            const blockers = report.blockers || [];
+
+            let comment = '## 🔒 DAST Security Scan Results\n\n';
+            comment += `**Target:** \`${{ env.STAGING_URL }}\`\n\n`;
+
+            // Summary table
+            comment += '### Summary\n\n';
+            comment += '| Severity | Count |\n';
+            comment += '|----------|-------|\n';
+            comment += `| Critical | ${stats.by_severity?.critical || 0} |\n`;
+            comment += `| High | ${stats.by_severity?.high || 0} |\n`;
+            comment += `| Medium | ${stats.by_severity?.medium || 0} |\n`;
+            comment += `| Low | ${stats.by_severity?.low || 0} |\n`;
+            comment += `| Info | ${stats.by_severity?.info || 0} |\n`;
+            comment += `| **Total** | **${stats.total_vulnerabilities || 0}** |\n\n`;
+
+            // Blockers
+            if (blockers.length > 0) {
+              comment += '### ⛔ Production Blockers\n\n';
+              comment += `Found **${blockers.length}** blocker(s) that must be fixed before production deployment:\n\n`;
+              blockers.forEach((blocker, i) => {
+                comment += `${i + 1}. **[${blocker.severity.toUpperCase()}]** ${blocker.title}\n`;
+                comment += `   - Type: ${blocker.vulnerability_type}\n`;
+                comment += `   - Sources: ${blocker.sources.join(', ')}\n\n`;
+              });
+              comment += '❌ **Deployment blocked until these issues are resolved.**\n\n';
+            } else {
+              comment += '### ✅ No Production Blockers\n\n';
+              comment += 'All critical issues have been addressed. Safe to proceed with deployment.\n\n';
+            }
+
+            comment += '---\n';
+            comment += '*View detailed reports in the workflow artifacts.*';
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Notify Slack
+        if: failure() && (github.ref == 'refs/heads/staging' || github.event_name == 'schedule')
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "DAST scan found security issues",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🔒 DAST Security Alert"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Blockers Found:* ${{ steps.check_blockers.outputs.blockers || 'Unknown' }}"
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Create GitHub Issue for blockers
+        if: steps.check_blockers.outputs.blockers > 0 && github.ref == 'refs/heads/staging'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const glob = require('@actions/glob');
+
+            const globber = await glob.create('${{ env.REPORTS_DIR }}/combined_vulnerability_report_*.json');
+            const files = await globber.glob();
+            if (files.length === 0) return;
+
+            const latestReport = files[files.length - 1];
+            const report = JSON.parse(fs.readFileSync(latestReport, 'utf8'));
+            const blockers = report.blockers || [];
+
+            if (blockers.length === 0) return;
+
+            let body = '## Security Blockers Found in DAST Scan\n\n';
+            body += `**Scan Date:** ${new Date().toISOString()}\n`;
+            body += `**Target:** ${{ env.STAGING_URL }}\n\n`;
+            body += '### Blockers\n\n';
+
+            blockers.forEach((blocker, i) => {
+              body += `#### ${i + 1}. ${blocker.title}\n\n`;
+              body += `- **Severity:** ${blocker.severity}\n`;
+              body += `- **Type:** ${blocker.vulnerability_type}\n`;
+              body += `- **Sources:** ${blocker.sources.join(', ')}\n`;
+              if (blocker.cve_id) {
+                body += `- **CVE:** ${blocker.cve_id}\n`;
+              }
+              body += `\n**Remediation:**\n${blocker.remediation}\n\n`;
+              body += `**Estimated Effort:** ${blocker.estimated_effort}\n\n`;
+              body += '---\n\n';
+            });
+
+            body += `\n[View Full Report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔒 Security: ${blockers.length} Production Blocker(s) Found`,
+              body: body,
+              labels: ['security', 'blocker', 'dast']
+            });
+
+      - name: Fail on blockers
+        if: steps.check_blockers.outputs.blockers > 0
+        run: |
+          echo "::error::Found ${{ steps.check_blockers.outputs.blockers }} production blocker(s)"
+          exit 1
