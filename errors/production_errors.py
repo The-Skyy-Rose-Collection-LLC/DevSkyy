@@ -24,6 +24,9 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field
 
+# Module-level constants
+MINIMUM_FIDELITY_SCORE = 95.0  # 95% minimum fidelity threshold for 3D models
+
 
 class DevSkyErrorSeverity(IntEnum):
     """Error severity levels for alerting and logging."""
@@ -94,6 +97,7 @@ class DevSkyErrorCode(str, Enum):
     PIPELINE_FAILED = "DEVSKYY-9001"
     PIPELINE_STEP_FAILED = "DEVSKYY-9002"
     PIPELINE_TIMEOUT = "DEVSKYY-9003"
+    SYNC_FAILED = "DEVSKYY-9004"
 
 
 class DevSkyError(Exception):
@@ -241,14 +245,21 @@ class RateLimitError(DevSkyError):
         self,
         message: str = "Rate limit exceeded",
         retry_after: int = 60,
+        service: str | None = None,
         **kwargs: Any,
     ) -> None:
+        context = kwargs.pop("context", {})
+        if service:
+            context["service"] = service
+            message = f"Rate limit exceeded for {service}"
+
         super().__init__(
             message,
             code=DevSkyErrorCode.RATE_LIMITED,
             severity=DevSkyErrorSeverity.WARNING,
             retryable=True,
             retry_after_seconds=retry_after,
+            context=context,
             **kwargs,
         )
 
@@ -263,6 +274,7 @@ class ExternalServiceError(DevSkyError):
         self,
         service_name: str,
         message: str | None = None,
+        error_message: str | None = None,  # Alias for message
         status_code: int | None = None,
         **kwargs: Any,
     ) -> None:
@@ -271,7 +283,8 @@ class ExternalServiceError(DevSkyError):
         if status_code:
             context["status_code"] = status_code
 
-        msg = message or f"External service '{service_name}' failed"
+        # Support both message and error_message parameters
+        msg = message or error_message or f"External service '{service_name}' failed"
         super().__init__(
             msg,
             code=DevSkyErrorCode.EXTERNAL_SERVICE_ERROR,
@@ -591,6 +604,134 @@ class AgentExecutionError(DevSkyError):
         )
 
 
+class PipelineError(DevSkyError):
+    """Raised when a pipeline operation fails."""
+
+    def __init__(
+        self,
+        pipeline_name: str,
+        stage: str | None = None,
+        message: str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        context = kwargs.pop("context", {})
+        context["pipeline_name"] = pipeline_name
+        if stage:
+            context["stage"] = stage
+
+        msg = message or f"Pipeline '{pipeline_name}' failed"
+        if stage:
+            msg += f" at stage '{stage}'"
+
+        super().__init__(
+            msg,
+            code=DevSkyErrorCode.PIPELINE_FAILED,
+            severity=DevSkyErrorSeverity.ERROR,
+            context=context,
+            retryable=True,
+            retry_after_seconds=30,
+            **kwargs,
+        )
+
+
+class SyncError(DevSkyError):
+    """Raised when a sync operation fails."""
+
+    def __init__(
+        self,
+        source: str,
+        target: str,
+        message: str | None = None,
+        **kwargs: Any,
+    ) -> None:
+        context = kwargs.pop("context", {})
+        context["source"] = source
+        context["target"] = target
+
+        msg = message or f"Sync from '{source}' to '{target}' failed"
+        super().__init__(
+            msg,
+            code=DevSkyErrorCode.SYNC_FAILED,
+            severity=DevSkyErrorSeverity.ERROR,
+            context=context,
+            retryable=True,
+            retry_after_seconds=60,
+            **kwargs,
+        )
+
+
+class AssetNotFoundError(ResourceNotFoundError):
+    """Raised when a 3D asset or media file is not found."""
+
+    def __init__(
+        self,
+        asset_id: str,
+        asset_type: str = "asset",
+        **kwargs: Any,
+    ) -> None:
+        context = kwargs.pop("context", {})
+        context["asset_type"] = asset_type
+
+        super().__init__(
+            resource_type=asset_type,
+            resource_id=asset_id,
+            context=context,
+            **kwargs,
+        )
+
+
+# Aliases for backwards compatibility
+ErrorSeverity = DevSkyErrorSeverity
+
+
+def create_correlation_id() -> str:
+    """Create a unique correlation ID for request tracing."""
+    import uuid
+    from datetime import UTC, datetime
+
+    timestamp = datetime.now(UTC).strftime("%Y%m%d%H%M%S")
+    unique_id = uuid.uuid4().hex[:8]
+    return f"devskyy-{timestamp}-{unique_id}"
+
+
+def format_error_response(
+    error: DevSkyError | Exception,
+    include_trace: bool = False,
+    correlation_id: str | None = None,
+) -> dict[str, Any]:
+    """Format an error into a standardized API response.
+
+    Args:
+        error: The error to format
+        include_trace: Whether to include stack trace (dev only)
+        correlation_id: Optional correlation ID to include
+
+    Returns:
+        Formatted error response dict
+    """
+    if correlation_id is None:
+        correlation_id = create_correlation_id()
+
+    if isinstance(error, DevSkyError):
+        response = error.to_dict()
+        response["correlation_id"] = correlation_id
+    else:
+        response = {
+            "error": True,
+            "code": "INTERNAL_ERROR",
+            "message": str(error),
+            "correlation_id": correlation_id,
+            "retryable": False,
+        }
+
+    if include_trace:
+        import traceback
+
+        response["trace"] = traceback.format_exc()
+
+    return response
+
+
 # --- Security Errors ---
 
 
@@ -636,43 +777,6 @@ class EncryptionError(DevSkyError):
             ),
             severity=DevSkyErrorSeverity.CRITICAL,
             context=context,
-            **kwargs,
-        )
-
-
-# --- Pipeline Errors ---
-
-
-class PipelineError(DevSkyError):
-    """Raised when a pipeline fails."""
-
-    def __init__(
-        self,
-        pipeline_name: str,
-        step: str | None = None,
-        message: str | None = None,
-        **kwargs: Any,
-    ) -> None:
-        context = kwargs.pop("context", {})
-        context["pipeline_name"] = pipeline_name
-        if step:
-            context["failed_step"] = step
-
-        msg = message or f"Pipeline '{pipeline_name}' failed"
-        if step:
-            msg = f"Pipeline '{pipeline_name}' failed at step '{step}'"
-
-        super().__init__(
-            msg,
-            code=(
-                DevSkyErrorCode.PIPELINE_FAILED
-                if not step
-                else DevSkyErrorCode.PIPELINE_STEP_FAILED
-            ),
-            severity=DevSkyErrorSeverity.ERROR,
-            context=context,
-            retryable=True,
-            retry_after_seconds=30,
             **kwargs,
         )
 

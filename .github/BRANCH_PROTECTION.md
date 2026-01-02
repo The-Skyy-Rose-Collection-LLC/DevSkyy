@@ -8,14 +8,27 @@ Recommended branch protection settings for the DevSkyy repository.
 
 Enable **"Require status checks to pass before merging"** with these checks:
 
+#### CI/CD Pipeline Checks
+
 | Check Name | Description | Required |
 |------------|-------------|----------|
-| `Python Tests` | pytest suite | ✅ Yes |
-| `TypeScript Tests` | Jest collection tests | ✅ Yes |
-| `TypeScript Build` | tsc compilation | ✅ Yes |
-| `Python Lint & Format` | ruff, black, isort | ✅ Yes |
-| `TypeScript Lint & Type Check` | tsc --noEmit | ✅ Yes |
-| `CI Success` | Final aggregated check | ✅ Yes |
+| `🔍 Lint & Static Analysis` | ruff, black, isort, mypy | ✅ Yes |
+| `🐍 Python Tests` | pytest suite with coverage | ✅ Yes |
+| `🔐 Security Scan` | pip-audit, bandit, semgrep | ✅ Yes |
+| `⚛️ Frontend Tests` | Next.js build and lint | ✅ Yes |
+| `🎮 Three.js Tests` | Three.js collection tests | ✅ Yes |
+| `🎭 Playwright E2E Tests` | End-to-end browser tests | ✅ Yes |
+| `🔌 API Integration Tests` | API endpoint tests | ✅ Yes |
+| `📊 Pipeline Summary` | Aggregated status check | ✅ Yes |
+
+#### Security Gate Checks
+
+| Check Name | Description | Required |
+|------------|-------------|----------|
+| `🔑 Secrets Scan` | Gitleaks + TruffleHog | ✅ Yes |
+| `🔬 CodeQL Analysis` | Static code analysis | ✅ Yes |
+| `📦 Dependency Review` | License and vulnerability check | ✅ Yes |
+| `📜 License Compliance` | OSS license verification | ⚠️ Recommended |
 
 ### Pull Request Settings
 
@@ -58,10 +71,26 @@ gh api repos/{owner}/{repo}/branches/main/protection
 
 # Enable branch protection (requires admin)
 gh api -X PUT repos/{owner}/{repo}/branches/main/protection \
-  -f required_status_checks='{"strict":true,"contexts":["Python Tests","TypeScript Tests","CI Success"]}' \
+  -f required_status_checks='{
+    "strict": true,
+    "contexts": [
+      "🔍 Lint & Static Analysis",
+      "🐍 Python Tests",
+      "🔐 Security Scan",
+      "⚛️ Frontend Tests",
+      "🎭 Playwright E2E Tests",
+      "🔌 API Integration Tests",
+      "📊 Pipeline Summary",
+      "🔑 Secrets Scan",
+      "🔬 CodeQL Analysis"
+    ]
+  }' \
   -f enforce_admins=true \
   -f required_pull_request_reviews='{"required_approving_review_count":1}' \
   -f restrictions=null
+
+# Require signed commits (recommended)
+gh api -X PUT repos/{owner}/{repo}/branches/main/protection/required_signatures
 ```
 
 ## Rulesets (GitHub Enterprise / Advanced)
