@@ -34,6 +34,15 @@ from .domain import (
     ToolCall,
 )
 from .infrastructure import ProviderFactory
+from .providers import (
+    AnthropicClient,
+    CohereClient,
+    GoogleClient,
+    GroqClient,
+    MistralClient,
+    OpenAIClient,
+)
+from .services import ab_testing, round_table, router
 
 __all__ = [
     # Domain Models
@@ -52,6 +61,17 @@ __all__ = [
     "IProviderFactory",
     # Infrastructure
     "ProviderFactory",
+    # Providers
+    "AnthropicClient",
+    "OpenAIClient",
+    "GoogleClient",
+    "MistralClient",
+    "CohereClient",
+    "GroqClient",
+    # Services
+    "router",
+    "round_table",
+    "ab_testing",
 ]
 
 __version__ = "1.0.0"
