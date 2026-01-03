@@ -33,6 +33,7 @@ from .domain import (
     StreamChunk,
     ToolCall,
 )
+from .infrastructure import ProviderFactory
 
 __all__ = [
     # Domain Models
@@ -49,6 +50,8 @@ __all__ = [
     "ILLMProvider",
     "ILLMRouter",
     "IProviderFactory",
+    # Infrastructure
+    "ProviderFactory",
 ]
 
 __version__ = "1.0.0"
