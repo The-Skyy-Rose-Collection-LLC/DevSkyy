@@ -68,6 +68,8 @@ class TestHuggingFace3DConfig:
 
     def test_config_from_env_with_hf_token(self, monkeypatch):
         """Test config with HF_TOKEN environment variable."""
+        # Clear HUGGINGFACE_API_TOKEN to ensure HF_TOKEN takes precedence
+        monkeypatch.delenv("HUGGINGFACE_API_TOKEN", raising=False)
         monkeypatch.setenv("HF_TOKEN", "hf_alternative_token")
 
         config = HuggingFace3DConfig.from_env()
