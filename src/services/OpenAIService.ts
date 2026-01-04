@@ -3,9 +3,9 @@
  * Integration with OpenAI API for AI capabilities
  */
 
-import { openaiConfig } from '../config/index.js';
-import { Logger } from '../utils/Logger.js';
-import type { ApiResponse } from '../types/index.js';
+import { openaiConfig } from '../config/index';
+import { Logger } from '../utils/Logger';
+import type { ApiResponse } from '../types/index';
 
 export interface OpenAICompletionRequest {
   prompt: string;

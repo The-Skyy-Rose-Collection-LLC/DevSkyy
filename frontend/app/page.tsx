@@ -216,7 +216,7 @@ export default function DashboardPage() {
                   variant={entry.provider}
                   className="text-xs"
                 >
-                  {entry.name}: {entry.value}
+                  {entry.name}: {String(entry.value)}
                 </Badge>
               ))}
             </div>

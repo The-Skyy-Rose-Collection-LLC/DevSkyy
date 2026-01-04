@@ -5,7 +5,6 @@ Tests for security module
 Encryption and authentication tests.
 """
 
-
 import pytest
 
 from security.aes256_gcm_encryption import (
@@ -1417,6 +1416,7 @@ class TestCSRFProtection:
     def test_csrf_token_randomness(self):
         """Should generate unique CSRF tokens for different sessions."""
         import time
+
         # Use different session IDs to ensure uniqueness
         tokens = []
         for i in range(10):

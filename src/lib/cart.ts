@@ -4,7 +4,7 @@
  * SkyyRose E-commerce Integration
  */
 
-import { Logger } from '../utils/Logger.js';
+import { Logger } from '../utils/Logger';
 
 // Cart Item Interface
 export interface CartItem {

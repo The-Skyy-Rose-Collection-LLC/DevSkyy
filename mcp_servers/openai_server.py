@@ -57,9 +57,8 @@ from typing import Any, Literal
 
 try:
     import httpx
-    from pydantic import BaseModel, ConfigDict, Field
-
     from mcp.server.fastmcp import FastMCP
+    from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"❌ Missing required package: {e}")
     print("Install with: pip install fastmcp httpx pydantic openai python-jose[cryptography]")

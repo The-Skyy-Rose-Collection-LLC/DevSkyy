@@ -30,14 +30,13 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import logging
 import sys
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
 from typing import Any
-
-import logging
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -45,6 +44,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 # Use standard logging if structlog not available
 try:
     import structlog
+
     logger = structlog.get_logger(__name__)
     USE_STRUCTLOG = True
 except ImportError:
@@ -127,7 +127,7 @@ class ValidationResult:
 class ValidationReport:
     """Complete validation report."""
 
-    timestamp: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    timestamp: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
     results: list[ValidationResult] = field(default_factory=list)
     summary: dict[str, int] = field(default_factory=dict)
 
@@ -140,7 +140,10 @@ class ValidationReport:
     @property
     def all_passed(self) -> bool:
         """Check if all validations passed."""
-        return all(r.status in (ValidationStatus.PASS, ValidationStatus.WARN, ValidationStatus.SKIP) for r in self.results)
+        return all(
+            r.status in (ValidationStatus.PASS, ValidationStatus.WARN, ValidationStatus.SKIP)
+            for r in self.results
+        )
 
     @property
     def critical_failures(self) -> list[ValidationResult]:
@@ -241,12 +244,14 @@ class ProductionValidator:
 
         # Skip if no WordPress URL configured
         if not site_url:
-            self._report.add_result(ValidationResult(
-                name="wordpress_api",
-                status=ValidationStatus.SKIP,
-                message="Skipped - WORDPRESS_URL not configured",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="wordpress_api",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - WORDPRESS_URL not configured",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
             return
 
         try:
@@ -260,35 +265,43 @@ class ProductionValidator:
 
                     if response.status == 200:
                         data = await response.json()
-                        self._report.add_result(ValidationResult(
-                            name="wordpress_api",
-                            status=ValidationStatus.PASS,
-                            message=f"WordPress API accessible at {site_url}",
-                            details={"namespaces": data.get("namespaces", [])[:5]},
-                            duration_ms=duration,
-                        ))
+                        self._report.add_result(
+                            ValidationResult(
+                                name="wordpress_api",
+                                status=ValidationStatus.PASS,
+                                message=f"WordPress API accessible at {site_url}",
+                                details={"namespaces": data.get("namespaces", [])[:5]},
+                                duration_ms=duration,
+                            )
+                        )
                     else:
-                        self._report.add_result(ValidationResult(
-                            name="wordpress_api",
-                            status=ValidationStatus.FAIL,
-                            message=f"WordPress API returned status {response.status}",
-                            duration_ms=duration,
-                        ))
+                        self._report.add_result(
+                            ValidationResult(
+                                name="wordpress_api",
+                                status=ValidationStatus.FAIL,
+                                message=f"WordPress API returned status {response.status}",
+                                duration_ms=duration,
+                            )
+                        )
 
         except ImportError:
-            self._report.add_result(ValidationResult(
-                name="wordpress_api",
-                status=ValidationStatus.SKIP,
-                message="Skipped - aiohttp not installed (pip install aiohttp)",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="wordpress_api",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - aiohttp not installed (pip install aiohttp)",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         except Exception as e:
-            self._report.add_result(ValidationResult(
-                name="wordpress_api",
-                status=ValidationStatus.FAIL,
-                message=f"Failed to connect to WordPress API: {e}",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="wordpress_api",
+                    status=ValidationStatus.FAIL,
+                    message=f"Failed to connect to WordPress API: {e}",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_woocommerce_api(self) -> None:
         """Validate WooCommerce API connectivity."""
@@ -302,21 +315,25 @@ class ProductionValidator:
         site_url = os.getenv("WORDPRESS_URL", "")
 
         if not wc_key or not wc_secret:
-            self._report.add_result(ValidationResult(
-                name="woocommerce_api",
-                status=ValidationStatus.SKIP,
-                message="Skipped - WooCommerce credentials not configured",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="woocommerce_api",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - WooCommerce credentials not configured",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
             return
 
         if not site_url:
-            self._report.add_result(ValidationResult(
-                name="woocommerce_api",
-                status=ValidationStatus.SKIP,
-                message="Skipped - WORDPRESS_URL not configured",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="woocommerce_api",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - WORDPRESS_URL not configured",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
             return
 
         try:
@@ -331,35 +348,43 @@ class ProductionValidator:
 
                     if response.status == 200:
                         products = await response.json()
-                        self._report.add_result(ValidationResult(
-                            name="woocommerce_api",
-                            status=ValidationStatus.PASS,
-                            message=f"WooCommerce API accessible, {len(products)} products found",
-                            details={"product_count": len(products)},
-                            duration_ms=duration,
-                        ))
+                        self._report.add_result(
+                            ValidationResult(
+                                name="woocommerce_api",
+                                status=ValidationStatus.PASS,
+                                message=f"WooCommerce API accessible, {len(products)} products found",
+                                details={"product_count": len(products)},
+                                duration_ms=duration,
+                            )
+                        )
                     else:
-                        self._report.add_result(ValidationResult(
-                            name="woocommerce_api",
-                            status=ValidationStatus.FAIL,
-                            message=f"WooCommerce API returned status {response.status}",
-                            duration_ms=duration,
-                        ))
+                        self._report.add_result(
+                            ValidationResult(
+                                name="woocommerce_api",
+                                status=ValidationStatus.FAIL,
+                                message=f"WooCommerce API returned status {response.status}",
+                                duration_ms=duration,
+                            )
+                        )
 
         except ImportError:
-            self._report.add_result(ValidationResult(
-                name="woocommerce_api",
-                status=ValidationStatus.SKIP,
-                message="Skipped - aiohttp not installed (pip install aiohttp)",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="woocommerce_api",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - aiohttp not installed (pip install aiohttp)",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         except Exception as e:
-            self._report.add_result(ValidationResult(
-                name="woocommerce_api",
-                status=ValidationStatus.FAIL,
-                message=f"Failed to connect to WooCommerce API: {e}",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="woocommerce_api",
+                    status=ValidationStatus.FAIL,
+                    message=f"Failed to connect to WooCommerce API: {e}",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_pages(self) -> None:
         """Validate all configured pages exist in WordPress."""
@@ -384,13 +409,15 @@ class ProductionValidator:
 
         if not wp_username or not wp_password:
             # Skip validation if no credentials
-            self._report.add_result(ValidationResult(
-                name="pages_exist",
-                status=ValidationStatus.SKIP,
-                message="Skipped - WordPress credentials not configured for page validation",
-                details={"required_pages": [p["slug"] for p in required_pages]},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="pages_exist",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - WordPress credentials not configured for page validation",
+                    details={"required_pages": [p["slug"] for p in required_pages]},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
             return
 
         missing_pages = []
@@ -398,8 +425,9 @@ class ProductionValidator:
         error_pages: dict[str, str] = {}  # Track pages that failed due to errors
 
         try:
-            import aiohttp
             import base64
+
+            import aiohttp
 
             site_url = os.getenv("WORDPRESS_URL", "https://skyyrose.co")
             credentials = f"{wp_username}:{wp_password}"
@@ -419,7 +447,7 @@ class ProductionValidator:
                             else:
                                 # Track non-404 errors separately
                                 error_pages[page["slug"]] = f"HTTP {response.status}"
-                    except asyncio.TimeoutError:
+                    except TimeoutError:
                         error_pages[page["slug"]] = "Request timeout"
                         logger.warning(
                             "page_validation_timeout",
@@ -454,35 +482,41 @@ class ProductionValidator:
                     error_summary = [f"{k} ({v})" for k, v in error_pages.items()]
                     issues.append(f"errors: {', '.join(error_summary)}")
 
-                self._report.add_result(ValidationResult(
-                    name="pages_exist",
-                    status=ValidationStatus.FAIL,
-                    message=f"Page validation issues - {'; '.join(issues)}",
-                    details={
-                        "missing": missing_pages,
-                        "errors": error_pages,
-                        "found": found_pages,
-                    },
-                    duration_ms=duration,
-                ))
+                self._report.add_result(
+                    ValidationResult(
+                        name="pages_exist",
+                        status=ValidationStatus.FAIL,
+                        message=f"Page validation issues - {'; '.join(issues)}",
+                        details={
+                            "missing": missing_pages,
+                            "errors": error_pages,
+                            "found": found_pages,
+                        },
+                        duration_ms=duration,
+                    )
+                )
             else:
-                self._report.add_result(ValidationResult(
-                    name="pages_exist",
-                    status=ValidationStatus.PASS,
-                    message=f"All {len(required_pages)} required pages verified via API",
-                    details={"pages": found_pages},
-                    duration_ms=duration,
-                ))
+                self._report.add_result(
+                    ValidationResult(
+                        name="pages_exist",
+                        status=ValidationStatus.PASS,
+                        message=f"All {len(required_pages)} required pages verified via API",
+                        details={"pages": found_pages},
+                        duration_ms=duration,
+                    )
+                )
 
         except ImportError:
             # aiohttp not available - skip validation
-            self._report.add_result(ValidationResult(
-                name="pages_exist",
-                status=ValidationStatus.SKIP,
-                message="Skipped - aiohttp not available for API validation",
-                details={"required_pages": [p["slug"] for p in required_pages]},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="pages_exist",
+                    status=ValidationStatus.SKIP,
+                    message="Skipped - aiohttp not available for API validation",
+                    details={"required_pages": [p["slug"] for p in required_pages]},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_elementor_templates(self) -> None:
         """Validate Elementor templates exist and are valid."""
@@ -527,21 +561,25 @@ class ProductionValidator:
 
         if missing or invalid:
             status = ValidationStatus.FAIL if missing else ValidationStatus.WARN
-            self._report.add_result(ValidationResult(
-                name="elementor_templates",
-                status=status,
-                message=f"Template issues: {len(missing)} missing, {len(invalid)} invalid",
-                details={"missing": missing, "invalid": invalid, "valid": valid},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="elementor_templates",
+                    status=status,
+                    message=f"Template issues: {len(missing)} missing, {len(invalid)} invalid",
+                    details={"missing": missing, "invalid": invalid, "valid": valid},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         else:
-            self._report.add_result(ValidationResult(
-                name="elementor_templates",
-                status=ValidationStatus.PASS,
-                message=f"All {len(valid)} Elementor templates valid",
-                details={"templates": valid},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="elementor_templates",
+                    status=ValidationStatus.PASS,
+                    message=f"All {len(valid)} Elementor templates valid",
+                    details={"templates": valid},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_hotspot_configs(self) -> None:
         """Validate hotspot configuration files."""
@@ -575,33 +613,39 @@ class ProductionValidator:
                 if "hotspots" not in data or "collection" not in data:
                     invalid.append(hotspot_name)
                 else:
-                    valid.append({
-                        "name": hotspot_name,
-                        "hotspot_count": len(data["hotspots"]),
-                        "collection": data["collection"],
-                    })
+                    valid.append(
+                        {
+                            "name": hotspot_name,
+                            "hotspot_count": len(data["hotspots"]),
+                            "collection": data["collection"],
+                        }
+                    )
 
             except json.JSONDecodeError:
                 invalid.append(hotspot_name)
 
         if missing or invalid:
             status = ValidationStatus.FAIL if missing else ValidationStatus.WARN
-            self._report.add_result(ValidationResult(
-                name="hotspot_configs",
-                status=status,
-                message=f"Hotspot issues: {len(missing)} missing, {len(invalid)} invalid",
-                details={"missing": missing, "invalid": invalid, "valid": valid},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="hotspot_configs",
+                    status=status,
+                    message=f"Hotspot issues: {len(missing)} missing, {len(invalid)} invalid",
+                    details={"missing": missing, "invalid": invalid, "valid": valid},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         else:
             total_hotspots = sum(h["hotspot_count"] for h in valid)
-            self._report.add_result(ValidationResult(
-                name="hotspot_configs",
-                status=ValidationStatus.PASS,
-                message=f"All hotspot configs valid ({total_hotspots} total hotspots)",
-                details={"configs": valid},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="hotspot_configs",
+                    status=ValidationStatus.PASS,
+                    message=f"All hotspot configs valid ({total_hotspots} total hotspots)",
+                    details={"configs": valid},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_3d_experiences(self) -> None:
         """Validate 3D experience source files."""
@@ -629,21 +673,25 @@ class ProductionValidator:
                 missing.append(exp_name)
 
         if missing:
-            self._report.add_result(ValidationResult(
-                name="3d_experiences",
-                status=ValidationStatus.FAIL,
-                message=f"Missing 3D experience files: {', '.join(missing)}",
-                details={"missing": missing, "found": found},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="3d_experiences",
+                    status=ValidationStatus.FAIL,
+                    message=f"Missing 3D experience files: {', '.join(missing)}",
+                    details={"missing": missing, "found": found},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         else:
-            self._report.add_result(ValidationResult(
-                name="3d_experiences",
-                status=ValidationStatus.PASS,
-                message=f"All {len(found)} 3D experience files found",
-                details={"experiences": found},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="3d_experiences",
+                    status=ValidationStatus.PASS,
+                    message=f"All {len(found)} 3D experience files found",
+                    details={"experiences": found},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_environment_variables(self) -> None:
         """Validate environment variables for production deployment."""
@@ -673,29 +721,35 @@ class ProductionValidator:
 
         if not configured:
             # No production variables configured - this is OK for local validation
-            self._report.add_result(ValidationResult(
-                name="environment_variables",
-                status=ValidationStatus.PASS,
-                message="Local validation mode (no production credentials configured)",
-                details={"note": "Set WORDPRESS_URL and credentials for production validation"},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="environment_variables",
+                    status=ValidationStatus.PASS,
+                    message="Local validation mode (no production credentials configured)",
+                    details={"note": "Set WORDPRESS_URL and credentials for production validation"},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         elif missing_recommended:
-            self._report.add_result(ValidationResult(
-                name="environment_variables",
-                status=ValidationStatus.WARN,
-                message=f"Partial configuration: {len(configured)}/{len(recommended_vars)} variables set",
-                details={"configured": configured, "missing": missing_recommended},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="environment_variables",
+                    status=ValidationStatus.WARN,
+                    message=f"Partial configuration: {len(configured)}/{len(recommended_vars)} variables set",
+                    details={"configured": configured, "missing": missing_recommended},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         else:
-            self._report.add_result(ValidationResult(
-                name="environment_variables",
-                status=ValidationStatus.PASS,
-                message="All production environment variables configured",
-                details={"configured": configured},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="environment_variables",
+                    status=ValidationStatus.PASS,
+                    message="All production environment variables configured",
+                    details={"configured": configured},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_ssl_configuration(self) -> None:
         """Validate SSL/HTTPS configuration."""
@@ -707,37 +761,45 @@ class ProductionValidator:
         site_url = os.getenv("WORDPRESS_URL", "")
 
         if not site_url:
-            self._report.add_result(ValidationResult(
-                name="ssl_configuration",
-                status=ValidationStatus.PASS,
-                message="Local validation mode (SSL check skipped)",
-                details={"note": "Set WORDPRESS_URL to validate SSL configuration"},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="ssl_configuration",
+                    status=ValidationStatus.PASS,
+                    message="Local validation mode (SSL check skipped)",
+                    details={"note": "Set WORDPRESS_URL to validate SSL configuration"},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         elif site_url.startswith("https://"):
-            self._report.add_result(ValidationResult(
-                name="ssl_configuration",
-                status=ValidationStatus.PASS,
-                message="Site uses HTTPS",
-                details={"url": site_url},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="ssl_configuration",
+                    status=ValidationStatus.PASS,
+                    message="Site uses HTTPS",
+                    details={"url": site_url},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         elif "localhost" in site_url or "127.0.0.1" in site_url:
-            self._report.add_result(ValidationResult(
-                name="ssl_configuration",
-                status=ValidationStatus.PASS,
-                message="Local development URL (HTTP acceptable)",
-                details={"url": site_url},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="ssl_configuration",
+                    status=ValidationStatus.PASS,
+                    message="Local development URL (HTTP acceptable)",
+                    details={"url": site_url},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         else:
-            self._report.add_result(ValidationResult(
-                name="ssl_configuration",
-                status=ValidationStatus.FAIL,
-                message="Production site should use HTTPS",
-                details={"url": site_url},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="ssl_configuration",
+                    status=ValidationStatus.FAIL,
+                    message="Production site should use HTTPS",
+                    details={"url": site_url},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
     async def validate_performance_requirements(self) -> None:
         """Validate performance requirements are met."""
@@ -756,26 +818,32 @@ class ProductionValidator:
                 if asset_file.is_file():
                     size_mb = asset_file.stat().st_size / (1024 * 1024)
                     if size_mb > max_asset_size_mb:
-                        large_assets.append({
-                            "path": str(asset_file.relative_to(assets_dir)),
-                            "size_mb": round(size_mb, 2),
-                        })
+                        large_assets.append(
+                            {
+                                "path": str(asset_file.relative_to(assets_dir)),
+                                "size_mb": round(size_mb, 2),
+                            }
+                        )
 
         if large_assets:
-            self._report.add_result(ValidationResult(
-                name="performance_requirements",
-                status=ValidationStatus.WARN,
-                message=f"Found {len(large_assets)} assets over {max_asset_size_mb}MB",
-                details={"large_assets": large_assets},
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="performance_requirements",
+                    status=ValidationStatus.WARN,
+                    message=f"Found {len(large_assets)} assets over {max_asset_size_mb}MB",
+                    details={"large_assets": large_assets},
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
         else:
-            self._report.add_result(ValidationResult(
-                name="performance_requirements",
-                status=ValidationStatus.PASS,
-                message="All assets within size limits",
-                duration_ms=(time.perf_counter() - start) * 1000,
-            ))
+            self._report.add_result(
+                ValidationResult(
+                    name="performance_requirements",
+                    status=ValidationStatus.PASS,
+                    message="All assets within size limits",
+                    duration_ms=(time.perf_counter() - start) * 1000,
+                )
+            )
 
 
 # ============================================================================
@@ -785,9 +853,7 @@ class ProductionValidator:
 
 async def main() -> int:
     """Main entry point."""
-    parser = argparse.ArgumentParser(
-        description="SkyyRose Production Validation Script"
-    )
+    parser = argparse.ArgumentParser(description="SkyyRose Production Validation Script")
     parser.add_argument(
         "--full",
         action="store_true",

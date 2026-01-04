@@ -51,9 +51,8 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 try:
-    from pydantic import BaseModel, ConfigDict, Field
-
     from mcp.server.fastmcp import FastMCP
+    from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"❌ Missing required package: {e}")
     print("Install with: pip install fastmcp pydantic")

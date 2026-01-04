@@ -53,7 +53,7 @@ class MediaAsset:
 
         # Calculate checksum
         with open(path, "rb") as f:
-            checksum = hashlib.md5(f.read()).hexdigest()
+            checksum = hashlib.md5(f.read(), usedforsecurity=False).hexdigest()
 
         # Determine MIME type
         mime_type, _ = mimetypes.guess_type(str(path))

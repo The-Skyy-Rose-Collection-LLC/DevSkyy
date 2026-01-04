@@ -6,9 +6,9 @@
  * @version 1.0.0
  */
 
-import { Logger } from '../utils/Logger.js';
-import type { ShowroomProduct, CartItem, CartState } from '../types/product.js';
-import type { AddToCartOptions } from './productInteraction.js';
+import { Logger } from '../utils/Logger';
+import type { ShowroomProduct, CartItem, CartState } from '../types/product';
+import type { AddToCartOptions } from './productInteraction';
 
 /**
  * Cart configuration

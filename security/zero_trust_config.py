@@ -8,7 +8,7 @@ including certificate management, service identity, and mTLS configuration.
 import logging
 import os
 from dataclasses import dataclass, field
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import yaml
@@ -27,9 +27,8 @@ def get_cert_not_valid_before(cert: x509.Certificate) -> datetime:
         return cert.not_valid_before_utc
     except AttributeError:
         # Pre-42.0: not_valid_before is naive, assume UTC
-        from datetime import timezone
         dt = cert.not_valid_before
-        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
 
 def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
@@ -38,9 +37,8 @@ def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
         return cert.not_valid_after_utc
     except AttributeError:
         # Pre-42.0: not_valid_after is naive, assume UTC
-        from datetime import timezone
         dt = cert.not_valid_after
-        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
 
 @dataclass

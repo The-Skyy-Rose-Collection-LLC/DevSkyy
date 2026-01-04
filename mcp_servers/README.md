@@ -77,14 +77,14 @@ Run the automated setup script:
 pip install -r mcp/requirements.txt
 ```
 
-2. **Configure environment variables**:
+1. **Configure environment variables**:
 
 ```bash
 export OPENAI_API_KEY="sk-your-key"
 export DEVSKYY_API_KEY="your-key"
 ```
 
-3. **Test servers**:
+1. **Test servers**:
 
 ```bash
 python mcp/openai_server.py

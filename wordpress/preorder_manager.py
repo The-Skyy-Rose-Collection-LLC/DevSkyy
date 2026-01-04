@@ -28,7 +28,7 @@ from __future__ import annotations
 import asyncio
 import logging
 from datetime import UTC, datetime, timedelta
-from typing import Any, Literal, Optional
+from typing import Any, Literal
 from urllib.parse import urlparse
 
 import aiohttp
@@ -83,10 +83,8 @@ class PreOrderMetadata(BaseModel):
     status: Literal["blooming_soon", "now_blooming", "available"] = Field(
         default="blooming_soon", description="Pre-order status"
     )
-    launch_date: Optional[datetime] = Field(
-        default=None, description="Product launch date and time"
-    )
-    early_access_list_id: Optional[str] = Field(
+    launch_date: datetime | None = Field(default=None, description="Product launch date and time")
+    early_access_list_id: str | None = Field(
         default=None, max_length=50, description="Klaviyo segment/list ID for early access"
     )
     notify_count: int = Field(
@@ -103,7 +101,7 @@ class PreOrderMetadata(BaseModel):
     )
 
     @validator("launch_date", pre=True)
-    def validate_launch_date(cls, v: Any) -> Optional[datetime]:
+    def validate_launch_date(cls, v: Any) -> datetime | None:
         """Validate launch date is in the future."""
         if v is None:
             return None
@@ -160,11 +158,11 @@ class PreOrderNotification(BaseModel):
     product_id: int = Field(..., ge=1)
     product_name: str = Field(..., min_length=1, max_length=200)
     launch_date: datetime
-    preview_image_url: Optional[str] = Field(default=None, max_length=2048)
+    preview_image_url: str | None = Field(default=None, max_length=2048)
     collection: str = Field(default="", max_length=50)
 
     @validator("preview_image_url", pre=True)
-    def validate_image_url(cls, v: Any) -> Optional[str]:
+    def validate_image_url(cls, v: Any) -> str | None:
         """Validate image URL format."""
         if v is None:
             return None
@@ -190,7 +188,7 @@ class PreOrderManager:
         self,
         wordpress_url: str,
         app_password: str,
-        klaviyo_api_key: Optional[str] = None,
+        klaviyo_api_key: str | None = None,
     ):
         """
         Initialize pre-order manager.
@@ -223,7 +221,7 @@ class PreOrderManager:
         self,
         product_id: int,
         status: Literal["blooming_soon", "now_blooming", "available"],
-        launch_date: Optional[datetime] = None,
+        launch_date: datetime | None = None,
         collection: str = "",
     ) -> PreOrderMetadata:
         """
@@ -312,7 +310,7 @@ class PreOrderManager:
     async def notify_early_access_list(
         self,
         product_id: int,
-        preview_image_url: Optional[str] = None,
+        preview_image_url: str | None = None,
     ) -> dict[str, Any]:
         """
         Send pre-order notification to early access list via Klaviyo.
@@ -410,18 +408,20 @@ class PreOrderManager:
         endpoint = f"{self.wordpress_url}/wp-json/wc/v3/products/{product_id}"
 
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
+            async with (
+                aiohttp.ClientSession() as session,
+                session.get(
                     endpoint,
                     auth=aiohttp.BasicAuth("admin", self.app_password),
                     timeout=aiohttp.ClientTimeout(total=10),
-                ) as resp:
-                    if resp.status == 404:
-                        raise PreOrderWordPressError(f"Product {product_id} not found")
-                    if resp.status != 200:
-                        raise PreOrderWordPressError(f"API error: {resp.status}")
-                    return await resp.json()
-        except asyncio.TimeoutError:
+                ) as resp,
+            ):
+                if resp.status == 404:
+                    raise PreOrderWordPressError(f"Product {product_id} not found")
+                if resp.status != 200:
+                    raise PreOrderWordPressError(f"API error: {resp.status}")
+                return await resp.json()
+        except TimeoutError:
             raise PreOrderWordPressError("Request timeout")
 
     async def _fetch_product_metadata(self, product_id: int) -> dict[str, Any]:
@@ -465,17 +465,19 @@ class PreOrderManager:
         payload = {"meta_data": meta_data}
 
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.post(
+            async with (
+                aiohttp.ClientSession() as session,
+                session.post(
                     endpoint,
                     json=payload,
                     auth=aiohttp.BasicAuth("admin", self.app_password),
                     timeout=aiohttp.ClientTimeout(total=15),
-                ) as resp:
-                    if resp.status not in (200, 201):
-                        raise PreOrderWordPressError(f"Update failed: {resp.status}")
+                ) as resp,
+            ):
+                if resp.status not in (200, 201):
+                    raise PreOrderWordPressError(f"Update failed: {resp.status}")
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             raise PreOrderWordPressError("Request timeout")
 
     async def _send_klaviyo_email(

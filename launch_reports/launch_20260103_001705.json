@@ -1,0 +1,19 @@
+{
+  "launch_id": "launch_20260103_001705",
+  "product_name": "TEST - Black Tee",
+  "collection": "SIGNATURE",
+  "started_at": "2026-01-03T00:17:05.598732",
+  "stages": {
+    "photography": {
+      "duration_seconds": 0.193838,
+      "images_generated": 0,
+      "backends_used": [],
+      "status": "success"
+    }
+  },
+  "assets": {},
+  "errors": [],
+  "status": "failed",
+  "error": "\"Missing 'hero' image in photo_results. Stage 1 photography may have failed. Available keys: []\"",
+  "failed_at": "2026-01-03T00:17:05.792627"
+}

@@ -46,6 +46,14 @@ make demo-showroom      # Virtual showroom
 make demo-runway        # Fashion runway
 ```
 
+## Requirements
+
+- **Python**: 3.11 or 3.12 (recommended)
+  - ⚠️ Python 3.14+ has compatibility issues with some dependencies (Cohere SDK, Pydantic V1)
+- **PostgreSQL**: 15+ (for Round Table persistence)
+- **Redis**: 7+ (optional, for caching)
+- **Node.js**: 18+ (for frontend dashboard)
+
 ## Installation
 
 ```bash
@@ -53,12 +61,18 @@ make demo-runway        # Fashion runway
 git clone https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy.git
 cd DevSkyy
 
+# Verify Python version (must be 3.11 or 3.12)
+python --version
+
 # Install Python + TypeScript dependencies
 make dev
 
 # Or install separately
 pip install -e ".[dev]"
 npm install
+
+# Verify dependencies
+python scripts/verify_dependencies.py
 ```
 
 ## Quick Start

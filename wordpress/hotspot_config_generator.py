@@ -22,7 +22,7 @@ import logging
 from datetime import datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -105,8 +105,8 @@ class HotspotConfig(BaseModel):
         ..., max_length=2048, description="Link to WooCommerce product page"
     )
     collection_slug: str = Field(..., description="Collection this product belongs to")
-    sku: Optional[str] = Field(default=None, max_length=50, description="Product SKU")
-    excerpt: Optional[str] = Field(
+    sku: str | None = Field(default=None, max_length=50, description="Product SKU")
+    excerpt: str | None = Field(
         default=None, max_length=1000, description="Short product description"
     )
 
@@ -536,7 +536,7 @@ class HotspotConfigGenerator:
     async def export_to_json(
         self,
         config: CollectionHotspotConfig,
-        filename: Optional[str] = None,
+        filename: str | None = None,
     ) -> Path:
         """
         Export hotspot configuration to JSON file.

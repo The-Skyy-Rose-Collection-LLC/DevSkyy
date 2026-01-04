@@ -7,9 +7,9 @@
  */
 
 import * as THREE from 'three';
-import { Logger } from '../utils/Logger.js';
-import type { ShowroomProduct, InventoryStatus } from '../types/product.js';
-import type { InventoryManager } from './inventory.js';
+import { Logger } from '../utils/Logger';
+import type { ShowroomProduct, InventoryStatus } from '../types/product';
+import type { InventoryManager } from './inventory';
 
 /**
  * Cart manager interface (to be implemented separately)

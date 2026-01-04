@@ -12,10 +12,10 @@
  */
 
 import * as THREE from 'three';
-import type { LoadedModel, LoadProgress, ModelAssetLoader } from '../lib/ModelAssetLoader.js';
-import { ModelLoadError } from '../lib/ModelAssetLoader.js';
-import type { ThreePerformanceMonitor, PerformanceWarning } from '../lib/ThreePerformanceMonitor.js';
-import { Logger } from '../utils/Logger.js';
+import type { LoadedModel, LoadProgress, ModelAssetLoader } from '../lib/ModelAssetLoader';
+import { ModelLoadError } from '../lib/ModelAssetLoader';
+import type { ThreePerformanceMonitor, PerformanceWarning } from '../lib/ThreePerformanceMonitor';
+import { Logger } from '../utils/Logger';
 
 // ============================================================================
 // TYPES

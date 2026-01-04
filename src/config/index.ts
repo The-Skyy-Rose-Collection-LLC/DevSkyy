@@ -3,7 +3,7 @@
  * Centralized configuration with environment-specific settings
  */
 
-import type { DevSkyyConfig, DatabaseConfig } from '../types/index.js';
+import type { DevSkyyConfig, DatabaseConfig } from '../types/index';
 
 // Environment variables with defaults
 const getEnvVar = (key: string, defaultValue?: string): string => {

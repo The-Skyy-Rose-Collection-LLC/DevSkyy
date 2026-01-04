@@ -860,9 +860,9 @@ class ThreeDRoundTable:
 
             if self.quality_config.enable_texture_upscaling and response.has_textures:
                 enhancement_details["texture_upscaled"] = True
-                enhancement_details[
-                    "target_resolution"
-                ] = self.quality_config.target_texture_resolution
+                enhancement_details["target_resolution"] = (
+                    self.quality_config.target_texture_resolution
+                )
 
             if self.quality_config.enable_mesh_optimization:
                 enhancement_details["mesh_optimized"] = True
@@ -963,8 +963,8 @@ class ThreeDRoundTable:
                     result.circuit_breaker_state = health.circuit_breaker.state.value
                     return result
 
-            except asyncio.TimeoutError:
-                last_error = asyncio.TimeoutError(f"Timeout after {timeout}s")
+            except TimeoutError:
+                last_error = TimeoutError(f"Timeout after {timeout}s")
             except self.retry_config.retryable_exceptions as e:
                 last_error = e
             except Exception as e:

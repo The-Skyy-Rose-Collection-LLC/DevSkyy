@@ -96,12 +96,13 @@ class TestModelFidelityError:
 class TestPipelineError:
     """Tests for PipelineError class."""
 
-    def test_pipeline_error_with_step(self):
-        """Test pipeline error with step information."""
-        error = PipelineError(pipeline_name="3d_generation", step="texture_mapping")
+    def test_pipeline_error_with_stage(self):
+        """Test pipeline error with stage information."""
+        error = PipelineError(pipeline_name="3d_generation", stage="texture_mapping")
         assert error.context.get("pipeline_name") == "3d_generation"
-        assert error.context.get("failed_step") == "texture_mapping"
+        assert error.context.get("stage") == "texture_mapping"
         assert "3d_generation" in error.message
+        assert "texture_mapping" in error.message
 
 
 class TestSyncError:

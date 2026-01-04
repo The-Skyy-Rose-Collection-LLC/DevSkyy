@@ -7,7 +7,7 @@
  */
 
 import * as THREE from 'three';
-import { Logger } from '../utils/Logger.js';
+import { Logger } from '../utils/Logger';
 
 /**
  * Material Swapper for dynamic color and texture changes
