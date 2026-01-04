@@ -1,4 +1,5 @@
-"""
+"""DevSkyy Enterprise FastAPI Application.
+
 DevSkyy Enterprise Platform - Main Application
 ===============================================
 
@@ -36,21 +37,22 @@ from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
 from api.admin_dashboard import admin_dashboard_router
-from api.elementor_3d import elementor_3d_router
 from api.agents import agents_router
 from api.brand import brand_router
 from api.dashboard import dashboard_router
+from api.elementor_3d import elementor_3d_router
 from api.gdpr import gdpr_router
 from api.round_table import round_table_router
 from api.tasks import tasks_router
 from api.three_d import three_d_router
 from api.tools import tools_router
-from api.virtual_tryon import virtual_tryon_router
 
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
+from api.virtual_tryon import virtual_tryon_router
 from api.visual import visual_router
 from api.webhooks import WebhookEventType, webhook_manager, webhook_router
+from api.websocket import ws_router
 from api.wordpress import wordpress_router
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
@@ -84,7 +86,7 @@ secrets_manager = SecretsManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifecycle management"""
+    """Application lifespan context manager."""
     # Startup
     logger.info("🚀 DevSkyy Enterprise Platform starting...")
     logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
@@ -266,7 +268,7 @@ else:
 # Tier-based rate limiting middleware
 @app.middleware("http")
 async def tier_rate_limit_middleware(request: Request, call_next):
-    """Enforce tier-based rate limiting for authenticated users"""
+    """Rate limiting middleware based on subscription tier."""
     from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
     from security.jwt_oauth2_auth import jwt_manager
@@ -339,7 +341,7 @@ async def tier_rate_limit_middleware(request: Request, call_next):
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing and record Prometheus metrics"""
+    """Log all requests with timing and correlation IDs."""
     import time
     import uuid
 
@@ -398,6 +400,9 @@ app.include_router(gdpr_router)
 # AI agent routes
 app.include_router(agents_router)
 
+# WebSocket routes for real-time updates
+app.include_router(ws_router)
+
 # Dashboard API routes (for Next.js frontend)
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(tasks_router, prefix="/api/v1")
@@ -422,7 +427,7 @@ app.include_router(elementor_3d_router, prefix="/api/v1")
 
 
 class HealthResponse(BaseModel):
-    """Health check response"""
+    """Health check response model."""
 
     status: str
     timestamp: str
@@ -433,7 +438,7 @@ class HealthResponse(BaseModel):
 
 @app.get("/", tags=["Root"])
 async def root():
-    """Root endpoint - platform info"""
+    """Root endpoint with API information."""
     return {
         "platform": "DevSkyy Enterprise",
         "version": "1.0.0",
@@ -445,7 +450,7 @@ async def root():
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
-    """Comprehensive health check"""
+    """Health check endpoint."""
     return HealthResponse(
         status="healthy",
         timestamp=datetime.now(UTC).isoformat(),
@@ -461,19 +466,19 @@ async def health_check():
 
 @app.get("/ready", tags=["Health"])
 async def readiness_check():
-    """Kubernetes readiness probe"""
+    """Readiness check - all services available."""
     return {"ready": True}
 
 
 @app.get("/live", tags=["Health"])
 async def liveness_check():
-    """Kubernetes liveness probe"""
+    """Liveness check - server is alive."""
     return {"alive": True}
 
 
 @app.get("/metrics", tags=["Monitoring"])
 async def metrics():
-    """Prometheus metrics endpoint"""
+    """Prometheus metrics endpoint."""
     metrics_data = get_metrics()
     return Response(content=metrics_data, media_type="text/plain; version=0.0.4; charset=utf-8")
 
@@ -489,6 +494,8 @@ v1_router = VersionedAPIRouter(version="v1", tags=["API v1"])
 
 
 class ProductCreate(BaseModel):
+    """Request model for creating a new product."""
+
     name: str
     description: str | None = None
     price: float
@@ -497,6 +504,8 @@ class ProductCreate(BaseModel):
 
 
 class ProductResponse(BaseModel):
+    """Response model for product data."""
+
     id: str
     name: str
     description: str | None
@@ -508,7 +517,7 @@ class ProductResponse(BaseModel):
 
 @v1_router.post("/products", response_model=ProductResponse)
 async def create_product(product: ProductCreate, user: TokenPayload = Depends(get_current_user)):
-    """Create a new product (authenticated)"""
+    """Create a new product (requires authentication)."""
     product_id = f"prod_{os.urandom(8).hex()}"
 
     # Publish webhook event
@@ -537,7 +546,7 @@ async def create_product(product: ProductCreate, user: TokenPayload = Depends(ge
 async def list_products(
     user: TokenPayload = Depends(get_current_user), limit: int = 10, offset: int = 0
 ):
-    """List products (authenticated)"""
+    """List all products (paginated)."""
     # Demo data
     return [
         ProductResponse(
@@ -556,12 +565,16 @@ async def list_products(
 
 
 class OrderCreate(BaseModel):
+    """Request model for creating a new order."""
+
     customer_id: str
     items: list[dict[str, Any]]
     shipping_address: dict[str, str]
 
 
 class OrderResponse(BaseModel):
+    """Response model for order data."""
+
     id: str
     customer_id: str
     status: str
@@ -571,7 +584,7 @@ class OrderResponse(BaseModel):
 
 @v1_router.post("/orders", response_model=OrderResponse)
 async def create_order(order: OrderCreate, user: TokenPayload = Depends(get_current_user)):
-    """Create a new order (authenticated)"""
+    """Create an order (requires authentication)."""
     order_id = f"ord_{os.urandom(8).hex()}"
 
     # Encrypt sensitive shipping data
@@ -600,12 +613,16 @@ async def create_order(order: OrderCreate, user: TokenPayload = Depends(get_curr
 
 
 class AgentExecuteRequest(BaseModel):
+    """Request model for executing a super agent."""
+
     agent_name: str
     task: str
     parameters: dict[str, Any] = {}
 
 
 class AgentResponse(BaseModel):
+    """Response model for agent execution."""
+
     agent_name: str
     task_id: str
     status: str
@@ -616,7 +633,7 @@ class AgentResponse(BaseModel):
 async def execute_agent(
     request: AgentExecuteRequest, user: TokenPayload = Depends(get_current_user)
 ):
-    """Execute an AI agent task (authenticated)"""
+    """Execute a super agent (requires authentication)."""
     task_id = f"task_{os.urandom(8).hex()}"
 
     # Publish webhook
@@ -645,7 +662,7 @@ async def execute_agent(
     dependencies=[Depends(RoleChecker([UserRole.ADMIN, UserRole.SUPER_ADMIN]))],
 )
 async def get_admin_stats():
-    """Get platform statistics (admin only)"""
+    """Get admin statistics (requires admin role)."""
     return {
         "total_users": 150,
         "total_orders": 1250,
@@ -658,7 +675,7 @@ async def get_admin_stats():
 
 @v1_router.get("/admin/security-audit", dependencies=[Depends(RoleChecker([UserRole.SUPER_ADMIN]))])
 async def get_security_audit():
-    """Get security audit log (super admin only)"""
+    """Get security audit log (requires admin role)."""
     return {
         "audit_log": [
             {
@@ -684,7 +701,7 @@ async def get_security_audit():
 
 @v1_router.post("/demo/encrypt")
 async def demo_encrypt(data: dict[str, Any], user: TokenPayload = Depends(get_current_user)):
-    """Demo: Encrypt sensitive fields in data"""
+    """Demo encryption (AES-256-GCM)."""
     encrypted = field_encryption.encrypt_dict(data, context=user.sub)
     return {
         "original_keys": list(data.keys()),
@@ -695,7 +712,7 @@ async def demo_encrypt(data: dict[str, Any], user: TokenPayload = Depends(get_cu
 
 @v1_router.post("/demo/mask")
 async def demo_mask(data: dict[str, str], user: TokenPayload = Depends(get_current_user)):
-    """Demo: Mask sensitive data for display"""
+    """Demo PII masking (SSN, email redaction)."""
     masked = {}
     for key, value in data.items():
         if "email" in key.lower():
@@ -722,7 +739,7 @@ app.include_router(v1_router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Custom HTTP exception handler"""
+    """Handle HTTP exceptions with proper error format."""
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -737,7 +754,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    """General exception handler"""
+    """Handle general exceptions with error tracking."""
     logger.error(f"Unhandled exception: {exc}", exc_info=True)
     return JSONResponse(
         status_code=500,

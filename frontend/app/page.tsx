@@ -32,11 +32,10 @@ import {
 import { AgentCard, MetricsCard, TaskExecutor, RoundTableViewer, TaskHistoryPanel } from '@/components';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
 import {
-  useAgents,
-  useDashboardMetrics,
-  useMetricsTimeSeries,
-  useLatestRoundTable,
-} from '@/lib/hooks';
+  useRealtimeAgents,
+  useRealtimeMetrics,
+  useRealtimeRoundTable,
+} from '@/lib/hooks/useRealtime';
 import {
   formatNumber,
   formatPercent,
@@ -58,19 +57,18 @@ const LLM_COLORS: Record<LLMProvider, string> = {
 export default function DashboardPage() {
   const [timeRange, setTimeRange] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
 
-  const { data: agents, mutate: refreshAgents } = useAgents();
-  const { data: metrics } = useDashboardMetrics();
-  const { data: timeSeries } = useMetricsTimeSeries(timeRange);
-  const { data: latestRoundTable } = useLatestRoundTable();
+  const { agents, isConnected: agentsConnected, refresh: refreshAgents } = useRealtimeAgents();
+  const { metrics, history: metricsHistory, isConnected: metricsConnected } = useRealtimeMetrics(100);
+  const { competition: latestRoundTable, isConnected: roundTableConnected } = useRealtimeRoundTable();
 
-  // Prepare chart data
-  const taskChartData = timeSeries?.tasks.map((point) => ({
+  // Prepare chart data from WebSocket metrics history
+  const taskChartData = metricsHistory.slice(0, 50).reverse().map((point) => ({
     time: new Date(point.timestamp).toLocaleTimeString([], {
       hour: '2-digit',
       minute: '2-digit',
     }),
-    tasks: point.value,
-  })) || [];
+    tasks: point.active_agents || 0,
+  }));
 
   const roundTableWinsData = metrics?.roundTableWins
     ? Object.entries(metrics.roundTableWins).map(([provider, wins]) => ({
