@@ -260,7 +260,7 @@ class ImageEnhancementPipeline:
 
         if not name or name.isdigit():
             # Generate hash-based SKU for unnamed files
-            hash_id = hashlib.md5(str(image_path).encode()).hexdigest()[:8]
+            hash_id = hashlib.md5(str(image_path).encode(), usedforsecurity=False).hexdigest()[:8]
             name = f"PROD_{hash_id}"
 
         # Add collection prefix

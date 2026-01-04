@@ -2,7 +2,7 @@
  * Brand DNA Editor
  * ================
  * Configure SkyyRose brand identity, voice, and styling.
- * 
+ *
  * Editable Brand Elements:
  * - Brand identity (name, tagline, philosophy)
  * - Tone and voice guidelines
@@ -135,7 +135,7 @@ export default function BrandDNAEditorPage() {
   useEffect(() => {
     const loadBrandDNA = async () => {
       try {
-        const response = await api.get('/api/v1/brand/dna');
+        const response = await api.brand.get();
         setBrandDNA(response);
       } catch (err) {
         console.error('Failed to load brand DNA:', err);
@@ -150,7 +150,7 @@ export default function BrandDNAEditorPage() {
     setSaveStatus('idle');
 
     try {
-      await api.post('/api/v1/brand/dna', brandDNA);
+      await api.brand.update(brandDNA);
       setHasChanges(false);
       setSaveStatus('success');
       setTimeout(() => setSaveStatus('idle'), 3000);
@@ -171,11 +171,11 @@ export default function BrandDNAEditorPage() {
     const pathParts = path.split('.');
     const newDNA = { ...brandDNA };
     let current: any = newDNA;
-    
+
     for (let i = 0; i < pathParts.length - 1; i++) {
       current = current[pathParts[i]];
     }
-    
+
     current[pathParts[pathParts.length - 1]] = value;
     setBrandDNA(newDNA);
     setHasChanges(true);
@@ -185,11 +185,11 @@ export default function BrandDNAEditorPage() {
     const pathParts = path.split('.');
     const current: any = brandDNA;
     let target: any = current;
-    
+
     for (const part of pathParts) {
       target = target[part];
     }
-    
+
     target.push(item);
     setBrandDNA({ ...brandDNA });
     setHasChanges(true);
@@ -199,11 +199,11 @@ export default function BrandDNAEditorPage() {
     const pathParts = path.split('.');
     const current: any = brandDNA;
     let target: any = current;
-    
+
     for (const part of pathParts) {
       target = target[part];
     }
-    
+
     target.splice(index, 1);
     setBrandDNA({ ...brandDNA });
     setHasChanges(true);
@@ -224,7 +224,7 @@ export default function BrandDNAEditorPage() {
           {hasChanges && (
             <Badge variant="warning">Unsaved Changes</Badge>
           )}
-          
+
           {saveStatus === 'success' && (
             <Badge variant="success">
               <Check className="mr-1 h-3 w-3" />

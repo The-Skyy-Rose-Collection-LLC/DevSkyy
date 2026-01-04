@@ -2,9 +2,9 @@
  * Virtual Try-On Page
  * ===================
  * AI-powered virtual try-on for jewelry and fashion.
- * 
+ *
  * Powered by FASHN API for production-grade virtual try-on.
- * 
+ *
  * Features:
  * - Upload model photo or use AI-generated model
  * - Select product to try on
@@ -70,7 +70,7 @@ export default function VirtualTryOnPage() {
   const [result, setResult] = useState<TryOnResult | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [history, setHistory] = useState<TryOnResult[]>([]);
-  
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock products (in real app, fetch from WooCommerce)
@@ -133,15 +133,35 @@ export default function VirtualTryOnPage() {
 
     try {
       // Call AI model generation endpoint
-      const response = await api.post('/api/v1/virtual-tryon/generate-model', {
+      const response = await api.virtualTryOn.generateModel({
         gender: 'female',
         ethnicity: 'diverse',
         age_range: '25-35',
-        pose: 'frontal',
+        body_type: 'average',
       });
 
-      setModelImage(response.model_url);
-      setIsProcessing(false);
+      // Poll for model generation completion
+      const pollInterval = setInterval(async () => {
+        const status = await api.virtualTryOn.getJobStatus(response.job_id);
+        if (status.status === 'completed') {
+          clearInterval(pollInterval);
+          setModelImage(status.result_url || '');
+          setIsProcessing(false);
+        } else if (status.status === 'failed') {
+          clearInterval(pollInterval);
+          setError(status.error || 'Model generation failed');
+          setIsProcessing(false);
+        }
+      }, 2000);
+
+      // Timeout after 2 minutes
+      setTimeout(() => {
+        clearInterval(pollInterval);
+        if (isProcessing) {
+          setError('Model generation timed out');
+          setIsProcessing(false);
+        }
+      }, 120000);
     } catch (err) {
       console.error('AI model generation error:', err);
       setError('Failed to generate AI model');
@@ -161,9 +181,9 @@ export default function VirtualTryOnPage() {
 
     try {
       // Submit try-on request
-      const response = await api.post('/api/v1/virtual-tryon/try-on', {
-        model_image_url: modelImage,
-        garment_image_url: selectedProduct.imageUrl,
+      const response = await api.virtualTryOn.tryOn({
+        model_url: modelImage,
+        garment_url: selectedProduct.imageUrl,
         category: selectedProduct.category,
       });
 
@@ -172,20 +192,20 @@ export default function VirtualTryOnPage() {
       // Poll for completion
       const pollInterval = setInterval(async () => {
         try {
-          const statusResponse = await api.get(`/api/v1/virtual-tryon/jobs/${job_id}`);
+          const statusResponse = await api.virtualTryOn.getJobStatus(job_id);
           const { status, result_url, error: jobError } = statusResponse;
 
           if (status === 'completed') {
             clearInterval(pollInterval);
-            
+
             const newResult: TryOnResult = {
               id: job_id,
-              resultUrl: result_url,
+              resultUrl: result_url || '',
               modelUrl: modelImage,
               productUrl: selectedProduct.imageUrl,
               timestamp: new Date().toISOString(),
             };
-            
+
             setResult(newResult);
             setHistory(prev => [newResult, ...prev].slice(0, 10)); // Keep last 10
             setIsProcessing(false);
@@ -217,7 +237,7 @@ export default function VirtualTryOnPage() {
 
   const handleDownload = () => {
     if (!result) return;
-    
+
     const link = document.createElement('a');
     link.href = result.resultUrl;
     link.download = `tryon-${selectedProduct?.name}-${Date.now()}.jpg`;

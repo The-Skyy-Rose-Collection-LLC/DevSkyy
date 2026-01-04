@@ -13,15 +13,15 @@
  */
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { Logger } from '../utils/Logger.js';
-import type { ShowroomProduct } from '../types/product.js';
-import { ProductInteractionHandler } from '../lib/productInteraction.js';
-import { InventoryManager } from '../lib/inventory.js';
-import { CartManager } from '../lib/cartManager.js';
-import { getModelLoader, ModelLoadError } from '../lib/ModelAssetLoader.js';
-import { getPerformanceMonitor } from '../lib/ThreePerformanceMonitor.js';
-// Note: Configs available from '../config/threejs.config.js' for future use
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { Logger } from '../utils/Logger';
+import type { ShowroomProduct } from '../types/product';
+import { ProductInteractionHandler } from '../lib/productInteraction';
+import { InventoryManager } from '../lib/inventory';
+import { CartManager } from '../lib/cartManager';
+import { getModelLoader, ModelLoadError } from '../lib/ModelAssetLoader';
+import { getPerformanceMonitor } from '../lib/ThreePerformanceMonitor';
+// Note: Configs available from '../config/threejs.config' for future use
 
 export interface ShowroomConfig {
   backgroundColor?: number;

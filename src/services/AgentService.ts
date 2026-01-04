@@ -3,9 +3,9 @@
  * Core service for managing the 6-agent ecosystem
  */
 
-import type { Agent, AgentTask, AgentType, TaskResult, TaskError } from '../types/index.js';
-import { agentConfig } from '../config/index.js';
-import { Logger } from '../utils/Logger.js';
+import type { Agent, AgentTask, AgentType, TaskResult, TaskError } from '../types/index';
+import { agentConfig } from '../config/index';
+import { Logger } from '../utils/Logger';
 import { EventEmitter } from 'events';
 
 export class AgentService extends EventEmitter {

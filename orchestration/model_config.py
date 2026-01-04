@@ -172,7 +172,7 @@ def get_all_model_ids() -> dict[str, str]:
         Dict mapping config_key -> resolved model_id
     """
     result = {}
-    for key in MODEL_CONFIG.keys():
+    for key in MODEL_CONFIG:
         try:
             result[key] = get_model_id(key)
         except KeyError as e:

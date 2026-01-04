@@ -7,8 +7,8 @@
  */
 
 // Product Configurator Component
-export { ProductConfigurator } from './ProductConfigurator.js';
-export type { ProductConfig, ProductConfiguratorProps } from './ProductConfigurator.js';
+export { ProductConfigurator } from './ProductConfigurator';
+export type { ProductConfig, ProductConfiguratorProps } from './ProductConfigurator';
 
 // 3D Price Tag Component
 export {
@@ -16,5 +16,5 @@ export {
   createPriceTag3DObject,
   setupCSS2DRenderer,
   updateCSS2DRenderer,
-} from './PriceTag3D.js';
-export type { PriceTag3DProps } from './PriceTag3D.js';
+} from './PriceTag3D';
+export type { PriceTag3DProps } from './PriceTag3D';

@@ -6,8 +6,8 @@
  * @version 1.0.0
  */
 
-import { Logger } from '../utils/Logger.js';
-import type { InventoryStatus, StockStatus } from '../types/product.js';
+import { Logger } from '../utils/Logger';
+import type { InventoryStatus, StockStatus } from '../types/product';
 
 /**
  * Inventory update event

@@ -106,9 +106,8 @@ class AgentTimeoutError(AgentBridgeError):
 
 
 try:
-    from pydantic import BaseModel, ConfigDict, Field
-
     from mcp.server.fastmcp import FastMCP
+    from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"Missing required package: {e}")
     print("Install with: pip install fastmcp pydantic")
@@ -594,24 +593,24 @@ def format_error_response(
     # Add specific error codes and suggestions for known error types
     if isinstance(error, AgentNotAvailableError):
         error_data["error_code"] = error.error_code
-        error_data[
-            "suggestion"
-        ] = "Check that the agent is properly configured and all dependencies are installed."
+        error_data["suggestion"] = (
+            "Check that the agent is properly configured and all dependencies are installed."
+        )
     elif isinstance(error, AgentExecutionError):
         error_data["error_code"] = error.error_code
-        error_data[
-            "suggestion"
-        ] = "Review the input parameters and try again. Check agent logs for details."
+        error_data["suggestion"] = (
+            "Review the input parameters and try again. Check agent logs for details."
+        )
     elif isinstance(error, AgentTimeoutError):
         error_data["error_code"] = error.error_code
-        error_data[
-            "suggestion"
-        ] = "The operation took too long. Try with simpler inputs or check system load."
+        error_data["suggestion"] = (
+            "The operation took too long. Try with simpler inputs or check system load."
+        )
     elif isinstance(error, TimeoutError):
         error_data["error_code"] = "TIMEOUT"
-        error_data[
-            "suggestion"
-        ] = "The operation timed out. Try again or increase timeout settings."
+        error_data["suggestion"] = (
+            "The operation timed out. Try again or increase timeout settings."
+        )
     elif isinstance(error, ConnectionError):
         error_data["error_code"] = "CONNECTION_ERROR"
         error_data["suggestion"] = "Check network connectivity and service availability."

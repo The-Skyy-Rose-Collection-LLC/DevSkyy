@@ -229,4 +229,4 @@ export type Nullable<T> = T | null;
 export type Optional<T> = T | undefined;
 
 // Re-export product types
-export * from './product.js';
+export * from './product';

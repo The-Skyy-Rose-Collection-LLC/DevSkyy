@@ -71,15 +71,15 @@ def verify_imports():
     all_ok = True
 
     try:
-        from orchestration.llm_clients import AnthropicClient  # noqa: F401
-        from orchestration.llm_clients import BaseLLMClient  # noqa: F401
-        from orchestration.llm_clients import CompletionResponse  # noqa: F401
-        from orchestration.llm_clients import Message  # noqa: F401
-        from orchestration.llm_clients import MessageRole  # noqa: F401
         from orchestration.llm_clients import (
+            AnthropicClient,  # noqa: F401
+            BaseLLMClient,  # noqa: F401
             CohereClient,
+            CompletionResponse,  # noqa: F401
             GoogleClient,
             GroqClient,
+            Message,  # noqa: F401
+            MessageRole,  # noqa: F401
             MistralClient,
             OpenAIClient,
         )

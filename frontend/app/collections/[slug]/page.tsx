@@ -2,14 +2,14 @@
  * Three.js Collection Viewer Page
  * ================================
  * Dynamic route for immersive 3D collection experiences.
- * 
+ *
  * Collections:
  * - /collections/black-rose - Black Rose Garden (dark luxury)
  * - /collections/signature - Signature Collection (premium showroom)
  * - /collections/love-hurts - Love Hurts (castle mirror interactive)
  * - /collections/showroom - Product Showroom (interactive showcase)
  * - /collections/runway - Runway Experience (fashion simulation)
- * 
+ *
  * Features:
  * - Full-screen immersive 3D experience
  * - Dynamic product loading from WooCommerce
@@ -75,10 +75,10 @@ export default function CollectionPage() {
   const params = useParams();
   const router = useRouter();
   const slug = params?.slug as string;
-  
+
   const containerRef = useRef<HTMLDivElement>(null);
   const experienceRef = useRef<CollectionExperience | null>(null);
-  
+
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -110,7 +110,15 @@ export default function CollectionPage() {
 
         // Fetch products for this collection (optional)
         // In a real implementation, this would fetch from WooCommerce API
-        const products = []; // TODO: Fetch from API
+        const products: Array<{
+          id: string;
+          name: string;
+          price?: number;
+          modelUrl?: string;
+          thumbnailUrl?: string;
+          position?: [number, number, number] | { x: number; y: number; z: number };
+          [key: string]: unknown;
+        }> = []; // TODO: Fetch from API
         setLoadProgress(50);
 
         // Create experience spec
@@ -146,28 +154,28 @@ export default function CollectionPage() {
         // Set up performance monitoring
         let frameCount = 0;
         let lastTime = performance.now();
-        
+
         const monitorFPS = () => {
           frameCount++;
           const currentTime = performance.now();
-          
+
           if (currentTime >= lastTime + 1000) {
             const currentFps = Math.round((frameCount * 1000) / (currentTime - lastTime));
             setFps(currentFps);
             frameCount = 0;
             lastTime = currentTime;
           }
-          
+
           if (experienceRef.current) {
             requestAnimationFrame(monitorFPS);
           }
         };
-        
+
         requestAnimationFrame(monitorFPS);
 
         setLoadProgress(100);
         setIsLoading(false);
-        
+
       } catch (err) {
         console.error('Failed to initialize collection experience:', err);
         setError(err instanceof Error ? err.message : 'Failed to load collection');
@@ -273,7 +281,7 @@ export default function CollectionPage() {
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back
           </Button>
-          
+
           <div className="hidden md:block">
             <h1 className="text-xl font-bold text-white">{collection?.name}</h1>
             <p className="text-sm text-gray-300">{collection?.description}</p>
@@ -284,7 +292,7 @@ export default function CollectionPage() {
           <Badge variant="secondary" className="bg-black/50 text-white">
             {fps} FPS
           </Badge>
-          
+
           <Button
             onClick={() => setShowInfo(!showInfo)}
             variant="ghost"

@@ -1,24 +1,24 @@
 /**
  * WebSocket client with auto-reconnect for real-time dashboard updates.
- * 
+ *
  * Replaces HTTP polling with <100ms real-time updates via WebSocket channels.
- * 
+ *
  * Channels:
  * - agents: Agent status and execution updates
  * - round_table: LLM Round Table competition progress
  * - tasks: Task execution status
  * - 3d_pipeline: 3D asset generation progress
  * - metrics: System performance metrics
- * 
+ *
  * Features:
  * - Automatic reconnection with exponential backoff
  * - Type-safe message handlers
  * - Connection state tracking
  * - Singleton instances per channel
- * 
+ *
  * Usage:
  *   import { agentsClient } from '@/lib/websocket';
- *   
+ *
  *   agentsClient.on('agent_status_update', (data) => {
  *     console.log('Agent update:', data);
  *   });
@@ -63,7 +63,7 @@ export class RealtimeClient {
   private reconnectAttempts = 0;
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private state: ConnectionState = ConnectionState.DISCONNECTED;
-  
+
   private readonly channel: string;
   private readonly options: Required<RealtimeClientOptions>;
 
@@ -89,10 +89,10 @@ export class RealtimeClient {
     }
 
     const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.NEXT_PUBLIC_WS_URL || 
+    const wsHost = process.env.NEXT_PUBLIC_WS_URL ||
                    process.env.NEXT_PUBLIC_API_URL?.replace(/^https?:/, wsProtocol) ||
                    `${wsProtocol}//${window.location.host}`;
-    
+
     return wsHost.replace(/\/$/, ''); // Remove trailing slash
   }
 
@@ -101,10 +101,10 @@ export class RealtimeClient {
    */
   private setState(newState: ConnectionState): void {
     if (this.state === newState) return;
-    
+
     this.state = newState;
     this.log(`State changed: ${newState}`);
-    
+
     this.stateHandlers.forEach(handler => {
       try {
         handler(newState);
@@ -153,7 +153,7 @@ export class RealtimeClient {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
           this.log('Received message:', message.type);
-          
+
           // Route message to registered handlers
           const messageHandlers = this.handlers.get(message.type) || new Set();
           messageHandlers.forEach(handler => {
@@ -202,7 +202,7 @@ export class RealtimeClient {
     }
 
     this.reconnectAttempts++;
-    
+
     // Exponential backoff: delay * 2^(attempts - 1)
     const delay = Math.min(
       this.options.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1),
@@ -291,7 +291,7 @@ export class RealtimeClient {
    */
   public disconnect(): void {
     this.log('Disconnecting');
-    
+
     // Clear reconnection timeout
     if (this.reconnectTimeout) {
       clearTimeout(this.reconnectTimeout);

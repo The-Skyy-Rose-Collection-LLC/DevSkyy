@@ -3,8 +3,8 @@
  * Structured logging with multiple transports and log levels
  */
 
-import type { LogEntry } from '../types/index.js';
-import { monitoringConfig } from '../config/index.js';
+import type { LogEntry } from '../types/index';
+import { monitoringConfig } from '../config/index';
 
 export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
 
