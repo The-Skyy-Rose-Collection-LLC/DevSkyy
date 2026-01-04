@@ -7,15 +7,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
-import {
-  LayoutDashboard,
-  Bot,
-  Trophy,
-  FlaskConical,
-  Wrench,
-  Settings,
-  Box,
-} from 'lucide-react';
+import { Settings } from 'lucide-react';
+import { CopilotProvider } from '@/components/providers/copilot-provider';
+import { Navigation } from '@/components/Navigation';
 import './globals.css';
 
 // Use CSS custom properties for fonts - defined in globals.css
@@ -28,15 +22,6 @@ export const metadata: Metadata = {
     icon: '/favicon.ico',
   },
 };
-
-const navItems = [
-  { href: '/', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/agents', label: 'Agents', icon: Bot },
-  { href: '/3d-pipeline', label: '3D Pipeline', icon: Box },
-  { href: '/round-table', label: 'Round Table', icon: Trophy },
-  { href: '/ab-testing', label: 'A/B Testing', icon: FlaskConical },
-  { href: '/tools', label: 'Tools', icon: Wrench },
-];
 
 export default function RootLayout({
   children,
@@ -66,18 +51,9 @@ export default function RootLayout({
             </div>
 
             {/* Navigation */}
-            <nav className="flex flex-col gap-1 p-4">
-              {navItems.map((item) => (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-50"
-                >
-                  <item.icon className="h-5 w-5" />
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+            <div className="p-4 h-[calc(100vh-8rem)] overflow-y-auto">
+              <Navigation />
+            </div>
 
             {/* Bottom Section */}
             <div className="absolute bottom-0 left-0 right-0 border-t border-gray-200 p-4 dark:border-gray-800">
@@ -100,7 +76,9 @@ export default function RootLayout({
           </aside>
 
           {/* Main Content */}
-          <main className="ml-64 flex-1 p-8">{children}</main>
+          <main className="ml-64 flex-1 p-8">
+            <CopilotProvider>{children}</CopilotProvider>
+          </main>
         </div>
       </body>
     </html>

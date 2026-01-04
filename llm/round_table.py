@@ -13,8 +13,7 @@ Flow:
 6. Implement winning response
 
 Author: DevSkyy Platform Team
-Version: 2.0.0
-"""
+Version: 2.0.0."""
 
 from __future__ import annotations
 
@@ -31,6 +30,18 @@ from enum import Enum
 from typing import Any
 from uuid import uuid4
 
+from llm.adaptive_learning import AdaptiveLearningEngine
+from llm.evaluation_metrics import AdvancedMetrics
+from llm.round_table_metrics import (
+    active_competitions,
+    record_ab_test,
+    record_competition,
+    record_provider_result,
+    record_scoring_components,
+    set_system_info,
+)
+from llm.statistics import StatisticalAnalyzer
+
 logger = logging.getLogger(__name__)
 
 
@@ -40,7 +51,7 @@ logger = logging.getLogger(__name__)
 
 
 class LLMProvider(str, Enum):
-    """LLM providers participating in Round Table"""
+    """LLM providers participating in Round Table."""
 
     CLAUDE = "claude"
     GPT4 = "gpt4"
@@ -51,7 +62,7 @@ class LLMProvider(str, Enum):
 
 
 class CompetitionStatus(str, Enum):
-    """Status of a Round Table competition"""
+    """Status of a Round Table competition."""
 
     PENDING = "pending"
     GENERATING = "generating"
@@ -77,33 +88,49 @@ class LLMResponse:
     cost_usd: float = 0.0
     model: str = ""
     error: str | None = None
+    tool_calls: list[dict[str, Any]] | None = None
 
 
 @dataclass(slots=True)
 class ResponseScores:
     """Scoring breakdown for a response. Memory-optimized with __slots__."""
 
-    relevance: float = 0.0  # How relevant to the prompt
-    quality: float = 0.0  # Overall output quality
-    completeness: float = 0.0  # Task completion
-    efficiency: float = 0.0  # Token/cost efficiency
-    brand_alignment: float = 0.0  # Brand voice adherence
+    # Heuristic metrics (60% total)
+    relevance: float = 0.0  # How relevant to the prompt (20%)
+    quality: float = 0.0  # Overall output quality (15%)
+    completeness: float = 0.0  # Task completion (10%)
+    efficiency: float = 0.0  # Token/cost efficiency (10%)
+    brand_alignment: float = 0.0  # Brand voice adherence (5%)
+    tool_usage_quality: float = 0.0  # Tool calling quality (10%)
+
+    # ML-based metrics (30% total)
+    coherence: float = 0.0  # Semantic coherence (10%)
+    factuality: float = 0.0  # Grounding in context (10%)
+    hallucination_risk: float = 0.0  # Lower = higher risk (5%)
+    safety: float = 0.0  # Toxicity/bias detection (5%)
 
     @property
     def total(self) -> float:
-        """Weighted total score"""
+        """Weighted total score with heuristic (60%) + ML-based (30%) metrics."""
         return (
-            self.relevance * 0.25
-            + self.quality * 0.25
-            + self.completeness * 0.20
-            + self.efficiency * 0.15
-            + self.brand_alignment * 0.15
+            # Heuristic metrics (60%)
+            self.relevance * 0.20
+            + self.quality * 0.15
+            + self.completeness * 0.10
+            + self.efficiency * 0.10
+            + self.brand_alignment * 0.05
+            + self.tool_usage_quality * 0.10
+            # ML-based metrics (30%)
+            + self.coherence * 0.10
+            + self.factuality * 0.10
+            + self.hallucination_risk * 0.05
+            + self.safety * 0.05
         )
 
 
 @dataclass
 class RoundTableEntry:
-    """Entry in the Round Table competition"""
+    """Entry in the Round Table competition."""
 
     provider: LLMProvider
     response: LLMResponse
@@ -117,7 +144,7 @@ class RoundTableEntry:
 
 @dataclass
 class ABTestResult:
-    """Result from A/B testing between top 2"""
+    """Result from A/B testing between top 2."""
 
     entry_a: RoundTableEntry
     entry_b: RoundTableEntry
@@ -127,10 +154,16 @@ class ABTestResult:
     confidence: float
     tested_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
+    # Statistical analysis (optional)
+    statistical_p_value: float | None = None
+    statistical_effect_size: float | None = None
+    bayesian_probability: float | None = None
+    is_statistically_significant: bool = False
+
 
 @dataclass
 class RoundTableResult:
-    """Complete result from a Round Table competition"""
+    """Complete result from a Round Table competition."""
 
     id: str
     task_id: str
@@ -147,7 +180,7 @@ class RoundTableResult:
     persisted: bool = False
 
     def to_dict(self) -> dict[str, Any]:
-        """Convert to dictionary for database storage"""
+        """Convert to dictionary for database storage."""
         return {
             "id": self.id,
             "task_id": self.task_id,
@@ -180,8 +213,7 @@ class RoundTableResult:
 
 
 class RoundTableDatabase:
-    """
-    Database persistence for Round Table results.
+    """Database persistence for Round Table results.
 
     Uses Neon PostgreSQL for serverless storage.
     """
@@ -217,16 +249,20 @@ class RoundTableDatabase:
         ON round_table_results(winner_provider);
 
     CREATE INDEX IF NOT EXISTS idx_round_table_task
-        ON round_table_results(task_id);
-    """
+        ON round_table_results(task_id);."""
 
     def __init__(self, connection_string: str | None = None):
+        """Initialize database with connection string.
+
+        Args:
+            connection_string: PostgreSQL connection string, defaults to DATABASE_URL env var.
+        """
         self.connection_string = connection_string or os.getenv("DATABASE_URL")
         self._pool = None
         self._initialized = False
 
-    async def initialize(self):
-        """Initialize database connection and schema"""
+    async def initialize(self) -> None:
+        """Initialize database connection and schema."""
         if not self.connection_string:
             logger.warning("No database connection string configured")
             return
@@ -235,6 +271,10 @@ class RoundTableDatabase:
             import asyncpg
 
             self._pool = await asyncpg.create_pool(self.connection_string, min_size=2, max_size=10)
+
+            # Type guard for pool
+            if self._pool is None:
+                raise RuntimeError("Failed to create connection pool")
 
             # Create schema
             async with self._pool.acquire() as conn:
@@ -249,7 +289,7 @@ class RoundTableDatabase:
             logger.error(f"Database initialization failed: {e}")
 
     async def save_result(self, result: RoundTableResult) -> bool:
-        """Save Round Table result to database"""
+        """Save Round Table result to database."""
         if not self._initialized or not self._pool:
             return False
 
@@ -273,8 +313,7 @@ class RoundTableDatabase:
                         all_scores = EXCLUDED.all_scores,
                         status = EXCLUDED.status,
                         total_duration_ms = EXCLUDED.total_duration_ms,
-                        total_cost_usd = EXCLUDED.total_cost_usd
-                """,
+                        total_cost_usd = EXCLUDED.total_cost_usd.""",
                     data["id"],
                     data["task_id"],
                     data["prompt_hash"],
@@ -301,7 +340,7 @@ class RoundTableDatabase:
             return False
 
     async def get_result(self, result_id: str) -> dict | None:
-        """Get a specific Round Table result"""
+        """Get a specific Round Table result."""
         if not self._initialized or not self._pool:
             return None
 
@@ -318,7 +357,7 @@ class RoundTableDatabase:
     async def get_history(
         self, limit: int = 100, task_id: str | None = None, provider: str | None = None
     ) -> list[dict]:
-        """Get Round Table history"""
+        """Get Round Table history."""
         if not self._initialized or not self._pool:
             return []
 
@@ -350,7 +389,7 @@ class RoundTableDatabase:
             return []
 
     async def get_provider_stats(self) -> dict[str, dict]:
-        """Get aggregated statistics per provider"""
+        """Get aggregated statistics per provider."""
         if not self._initialized or not self._pool:
             return {}
 
@@ -367,8 +406,7 @@ class RoundTableDatabase:
                     FROM round_table_results
                     WHERE status = 'completed'
                     GROUP BY winner_provider
-                    ORDER BY wins DESC
-                """
+                    ORDER BY wins DESC."""
                 )
 
                 return {
@@ -385,8 +423,8 @@ class RoundTableDatabase:
             logger.error(f"Failed to get provider stats: {e}")
             return {}
 
-    async def close(self):
-        """Close database connection"""
+    async def close(self) -> None:
+        """Close database connection."""
         if self._pool:
             await self._pool.close()
 
@@ -397,7 +435,7 @@ class RoundTableDatabase:
 
 
 class ResponseScorer:
-    """Scores LLM responses on quality metrics"""
+    """Scores LLM responses on quality metrics."""
 
     # Brand-positive keywords for SkyyRose
     BRAND_POSITIVE = [
@@ -433,25 +471,76 @@ class ResponseScorer:
         "mass-produced",
     ]
 
-    def score_response(
-        self, response: LLMResponse, prompt: str, task_context: dict | None = None
+    def __init__(self, enable_ml_scoring: bool = True):
+        """Initialize ResponseScorer with optional ML-based metrics.
+
+        Args:
+            enable_ml_scoring: Whether to enable ML-based scoring metrics
+                              Set to False to disable for faster scoring."""
+        self.enable_ml_scoring = enable_ml_scoring
+        self.advanced_metrics: AdvancedMetrics | None = None
+
+        if enable_ml_scoring:
+            try:
+                self.advanced_metrics = AdvancedMetrics()
+            except Exception as e:
+                logger.warning(f"Failed to initialize ML metrics, disabling: {e}")
+                self.enable_ml_scoring = False
+
+    async def initialize(self) -> None:
+        """Initialize ML models asynchronously.
+
+        Call this after creating the scorer to load ML models.
+        Safe to call multiple times (idempotent).."""
+        if self.enable_ml_scoring and self.advanced_metrics:
+            try:
+                await self.advanced_metrics.initialize()
+            except Exception as e:
+                logger.warning(f"Failed to initialize ML models: {e}")
+                self.enable_ml_scoring = False
+
+    async def score_response(
+        self,
+        response: LLMResponse,
+        prompt: str,
+        task_context: dict | None = None,
+        tools: list[dict[str, Any]] | None = None,
     ) -> ResponseScores:
-        """Score a response on all metrics"""
+        """Score a response on all metrics including tool usage and ML-based metrics."""
         content = response.content or ""
 
         if not content.strip() or response.error:
             return ResponseScores()
 
-        return ResponseScores(
+        # Heuristic scoring (always enabled)
+        scores = ResponseScores(
             relevance=self._score_relevance(content, prompt),
             quality=self._score_quality(content),
             completeness=self._score_completeness(content, prompt, task_context),
             efficiency=self._score_efficiency(response),
             brand_alignment=self._score_brand_alignment(content),
+            tool_usage_quality=self._score_tool_usage(response, tools, prompt),
         )
 
+        # ML-based scoring (optional, graceful degradation)
+        if self.enable_ml_scoring and self.advanced_metrics:
+            try:
+                scores.coherence = await self.advanced_metrics.score_coherence(content)
+                scores.factuality = await self.advanced_metrics.score_factuality(
+                    content, task_context
+                )
+                scores.hallucination_risk = await self.advanced_metrics.score_hallucination_risk(
+                    content
+                )
+                scores.safety = await self.advanced_metrics.score_safety(content)
+            except Exception as e:
+                logger.warning(f"ML scoring failed, using heuristics only: {e}")
+                # ML metrics default to 0.0, which is neutral in weighted average
+
+        return scores
+
     def _score_relevance(self, content: str, prompt: str) -> float:
-        """Score how relevant the response is to the prompt"""
+        """Score how relevant the response is to the prompt."""
         prompt_words = set(prompt.lower().split())
         content_words = set(content.lower().split())
 
@@ -488,7 +577,7 @@ class ResponseScorer:
         return min(100.0, max(0.0, score))
 
     def _score_quality(self, content: str) -> float:
-        """Score overall quality of the response"""
+        """Score overall quality of the response."""
         score = 50.0  # Base score
 
         word_count = len(content.split())
@@ -522,7 +611,7 @@ class ResponseScorer:
         return min(100.0, max(0.0, score))
 
     def _score_completeness(self, content: str, prompt: str, task_context: dict | None) -> float:
-        """Score task completion"""
+        """Score task completion."""
         score = 60.0  # Base for non-empty
         prompt_lower = prompt.lower()
 
@@ -553,7 +642,7 @@ class ResponseScorer:
         return min(100.0, max(0.0, score))
 
     def _score_efficiency(self, response: LLMResponse) -> float:
-        """Score efficiency based on latency and cost"""
+        """Score efficiency based on latency and cost."""
         score = 50.0
 
         # Latency scoring (ideal: 1-3 seconds)
@@ -579,7 +668,7 @@ class ResponseScorer:
         return min(100.0, max(0.0, score))
 
     def _score_brand_alignment(self, content: str) -> float:
-        """Score adherence to SkyyRose brand voice"""
+        """Score adherence to SkyyRose brand voice."""
         content_lower = content.lower()
         score = 50.0
 
@@ -595,6 +684,222 @@ class ResponseScorer:
 
         return min(100.0, max(0.0, score))
 
+    def _score_tool_usage(
+        self,
+        response: LLMResponse,
+        tools: list[dict[str, Any]] | None,
+        prompt: str,
+    ) -> float:
+        """Score quality of tool usage (0-100).
+
+        Evaluates 4 dimensions:
+        - Appropriateness (30%): Did agent call relevant tools?
+        - Argument validity (30%): Are tool arguments correct?
+        - Result integration (25%): Did agent use tool results well?
+        - Efficiency (15%): Minimal unnecessary tool calls
+
+        Args:
+            response: LLM response with potential tool calls
+            tools: Available tools for the task
+            prompt: Original prompt for context
+
+        Returns:
+            Score 0-100 (higher is better)."""
+        # No tools scenario - neutral score
+        if not tools:
+            return 100.0
+
+        tool_calls = response.tool_calls if hasattr(response, "tool_calls") else None
+
+        # Tools available but not used
+        if not tool_calls:
+            # Check if tools were likely needed based on prompt
+            prompt_lower = prompt.lower()
+            tool_keywords = ["search", "find", "lookup", "get", "fetch", "calculate", "analyze"]
+            if any(kw in prompt_lower for kw in tool_keywords):
+                return 50.0  # Penalty for not using tools when needed
+            return 100.0  # No tools needed, neutral
+
+        # Score each dimension
+        appropriateness = self._score_tool_appropriateness(tool_calls, tools, prompt)
+        validity = self._score_argument_validity(tool_calls, tools)
+        integration = self._score_result_integration(response.content or "", tool_calls)
+        efficiency = self._score_tool_efficiency(tool_calls, tools)
+
+        # Weighted average
+        total = appropriateness * 0.30 + validity * 0.30 + integration * 0.25 + efficiency * 0.15
+
+        return min(100.0, max(0.0, total))
+
+    def _score_tool_appropriateness(
+        self,
+        tool_calls: list[dict],
+        tools: list[dict[str, Any]],
+        prompt: str,
+    ) -> float:
+        """Score whether the called tools are appropriate for the task (0-100)."""
+        if not tool_calls:
+            return 100.0
+
+        # Create mapping of tool names for validation
+        available_tool_names = {tool.get("name") for tool in tools if "name" in tool}
+        score = 50.0  # Base score
+
+        valid_calls = 0
+        for call in tool_calls:
+            tool_name = call.get("name") or call.get("function", {}).get("name")
+            if not tool_name:
+                continue
+
+            # Check if tool exists
+            if tool_name in available_tool_names:
+                valid_calls += 1
+                score += 10
+            else:
+                score -= 15  # Penalty for calling non-existent tool
+
+        # Bonus for using multiple appropriate tools
+        if len(tool_calls) > 1 and valid_calls > 1:
+            score += 10
+
+        return min(100.0, max(0.0, score))
+
+    def _score_argument_validity(
+        self,
+        tool_calls: list[dict],
+        tools: list[dict[str, Any]],
+    ) -> float:
+        """Score whether tool arguments are valid (0-100)."""
+        if not tool_calls:
+            return 100.0
+
+        score = 50.0
+        valid_count = 0
+
+        # Create tool schema lookup
+        tool_schemas = {tool.get("name"): tool for tool in tools if "name" in tool}
+
+        for call in tool_calls:
+            tool_name = call.get("name") or call.get("function", {}).get("name")
+            arguments = call.get("arguments") or call.get("function", {}).get("arguments", {})
+
+            if not tool_name or tool_name not in tool_schemas:
+                continue
+
+            schema = tool_schemas[tool_name]
+            parameters = schema.get("parameters", {})
+            required = parameters.get("required", [])
+            properties = parameters.get("properties", {})
+
+            # Check required parameters present
+            if isinstance(arguments, dict):
+                missing_required = set(required) - set(arguments.keys())
+                if not missing_required:
+                    score += 15
+                    valid_count += 1
+                else:
+                    score -= 10  # Missing required args
+
+                # Check for extra/invalid parameters
+                valid_params = set(properties.keys())
+                invalid_params = set(arguments.keys()) - valid_params
+                if invalid_params:
+                    score -= 5  # Invalid parameters
+
+            else:
+                score -= 10  # Arguments not a dict
+
+        # Bonus for all calls having valid arguments
+        if valid_count == len(tool_calls) and valid_count > 0:
+            score += 20
+
+        return min(100.0, max(0.0, score))
+
+    def _score_result_integration(self, content: str, tool_calls: list[dict]) -> float:
+        """Score how well tool results are integrated into the response (0-100)."""
+        if not tool_calls or not content:
+            return 100.0
+
+        score = 50.0  # Base score
+
+        # Check if response references tool usage
+        tool_indicators = [
+            "found",
+            "searched",
+            "calculated",
+            "retrieved",
+            "fetched",
+            "analyzed",
+            "using",
+            "based on",
+            "according to",
+            "result",
+        ]
+
+        content_lower = content.lower()
+        indicator_count = sum(1 for indicator in tool_indicators if indicator in content_lower)
+
+        if indicator_count > 0:
+            score += min(25, indicator_count * 5)  # Up to 25 bonus
+
+        # Check if response is substantive (not just echoing tool calls)
+        word_count = len(content.split())
+        if word_count > 50:
+            score += 15
+        elif word_count > 20:
+            score += 10
+        elif word_count < 10:
+            score -= 15  # Too brief to integrate results
+
+        # Penalty if response just lists tool calls without integration
+        if content.count("tool_call") > len(tool_calls):
+            score -= 20  # Over-mentioning tools
+
+        return min(100.0, max(0.0, score))
+
+    def _score_tool_efficiency(
+        self,
+        tool_calls: list[dict],
+        tools: list[dict[str, Any]],
+    ) -> float:
+        """Score efficiency of tool usage (0-100)."""
+        if not tool_calls:
+            return 100.0
+
+        score = 50.0
+
+        # Ideal: 1-3 tool calls
+        call_count = len(tool_calls)
+        if call_count <= 3:
+            score += 30
+        elif call_count <= 5:
+            score += 20
+        elif call_count <= 7:
+            score += 10
+        else:
+            score -= 10  # Too many calls
+
+        # Check for duplicate calls (inefficient)
+        call_signatures = []
+        for call in tool_calls:
+            tool_name = call.get("name") or call.get("function", {}).get("name")
+            arguments = call.get("arguments") or call.get("function", {}).get("arguments")
+            # Simple signature: name + sorted arg keys
+            if tool_name and isinstance(arguments, dict):
+                sig = f"{tool_name}:{','.join(sorted(arguments.keys()))}"
+                call_signatures.append(sig)
+
+        # Penalty for duplicate calls
+        if len(call_signatures) != len(set(call_signatures)):
+            duplicates = len(call_signatures) - len(set(call_signatures))
+            score -= duplicates * 15
+
+        # Bonus for concise, targeted tool use
+        if call_count == 1:
+            score += 20  # Single precise call
+
+        return min(100.0, max(0.0, score))
+
 
 # =============================================================================
 # LLM Round Table
@@ -602,8 +907,7 @@ class ResponseScorer:
 
 
 class LLMRoundTable:
-    """
-    LLM Round Table Competition System.
+    """LLM Round Table Competition System.
 
     All registered LLMs compete on every task:
     1. Parallel generation from all LLMs
@@ -625,40 +929,72 @@ class LLMRoundTable:
         print(f"Winner: {result.winner.provider}")
     """
 
-    def __init__(self, db_url: str | None = None):
+    def __init__(
+        self,
+        db_url: str | None = None,
+        enable_ml_scoring: bool = True,
+        enable_adaptive_learning: bool = True,
+        enable_statistical_analysis: bool = True,
+    ):
+        """Initialize Round Table with configuration.
+
+        Args:
+            db_url: Database connection string, defaults to DATABASE_URL env var.
+            enable_ml_scoring: Enable ML-based evaluation metrics.
+            enable_adaptive_learning: Enable provider profiling and adaptive selection.
+            enable_statistical_analysis: Enable Bayesian analysis for A/B tests.
+        """
         self._providers: dict[LLMProvider, Callable] = {}
         self._judge_provider: LLMProvider = LLMProvider.CLAUDE
-        self._scorer = ResponseScorer()
+        self._scorer = ResponseScorer(enable_ml_scoring=enable_ml_scoring)
         self._db = RoundTableDatabase(db_url)
         self._history: list[RoundTableResult] = []
         self._initialized = False
 
-    async def initialize(self):
-        """Initialize Round Table and database"""
+        # Statistical analysis and adaptive learning
+        self._enable_adaptive_learning = enable_adaptive_learning
+        self._enable_statistical_analysis = enable_statistical_analysis
+        self._adaptive_engine = AdaptiveLearningEngine() if enable_adaptive_learning else None
+        self._statistical_analyzer = StatisticalAnalyzer() if enable_statistical_analysis else None
+
+    async def initialize(self) -> None:
+        """Initialize Round Table, database, and ML models."""
         await self._db.initialize()
+        await self._scorer.initialize()  # Initialize ML models
         self._initialized = True
-        logger.info("LLM Round Table initialized")
+
+        # Set system info for Prometheus metrics
+        set_system_info(
+            version="3.0.0",
+            providers=[p.value for p in self._providers],
+            ml_enabled=self._scorer.enable_ml_scoring,
+        )
+
+        logger.info(
+            f"LLM Round Table initialized with {len(self._providers)} providers, "
+            f"ML scoring: {self._scorer.enable_ml_scoring}, "
+            f"Adaptive learning: {self._enable_adaptive_learning}"
+        )
 
     def register_provider(
         self, provider: LLMProvider, generator: Callable[[str, dict | None], Any]
-    ):
-        """
-        Register an LLM provider.
+    ) -> None:
+        """Register an LLM provider.
 
         Args:
             provider: Provider enum value
-            generator: Async function that takes (prompt, context) and returns response
+            generator: Async function that takes (prompt, context) and returns response.
         """
         self._providers[provider] = generator
         logger.info(f"Registered provider: {provider.value}")
 
-    def set_judge(self, provider: LLMProvider):
-        """Set the judge provider for A/B testing"""
+    def set_judge(self, provider: LLMProvider) -> None:
+        """Set the judge provider for A/B testing."""
         self._judge_provider = provider
 
     @property
     def registered_providers(self) -> list[LLMProvider]:
-        """Get list of registered providers"""
+        """Get list of registered providers."""
         return list(self._providers.keys())
 
     async def compete(
@@ -667,16 +1003,19 @@ class LLMRoundTable:
         task_id: str | None = None,
         providers: list[LLMProvider] | None = None,
         context: dict | None = None,
+        tools: list[dict[str, Any]] | None = None,
+        tool_choice: str = "auto",
         persist: bool = True,
     ) -> RoundTableResult:
-        """
-        Run Round Table competition.
+        """Run Round Table competition with optional tool calling.
 
         Args:
             prompt: The task prompt
             task_id: Optional task identifier
             providers: Providers to include (default: all registered)
             context: Additional context for generation
+            tools: Optional tools for LLM tool calling
+            tool_choice: Tool choice strategy ("auto", "required", "none")
             persist: Whether to save to database
 
         Returns:
@@ -685,7 +1024,7 @@ class LLMRoundTable:
         start_time = time.time()
         result_id = str(uuid4())
         task_id = task_id or f"task_{int(time.time())}"
-        prompt_hash = hashlib.md5(prompt.encode()).hexdigest()
+        prompt_hash = hashlib.md5(prompt.encode(), usedforsecurity=False).hexdigest()
 
         # Use specified providers or all registered
         active_providers = providers or list(self._providers.keys())
@@ -695,76 +1034,136 @@ class LLMRoundTable:
 
         logger.info(f"Starting Round Table with {len(active_providers)} providers")
 
-        # Phase 1: Generate responses from all providers
-        entries = await self._generate_all(prompt, active_providers, context)
+        # Track active competitions metric
+        active_competitions.inc()
 
-        if not entries:
-            return self._create_failed_result(
-                result_id,
-                task_id,
-                prompt,
-                prompt_hash,
-                "No providers generated responses",
-                start_time,
+        try:
+            # Phase 1: Generate responses from all providers
+            entries = await self._generate_all(
+                prompt, active_providers, context, tools, tool_choice
             )
 
-        # Phase 2: Score all responses
-        scored_entries = self._score_all(entries, prompt, context)
+            if not entries:
+                return self._create_failed_result(
+                    result_id,
+                    task_id,
+                    prompt,
+                    prompt_hash,
+                    "No providers generated responses",
+                    start_time,
+                )
 
-        # Phase 3: Rank and select top 2
-        ranked_entries = sorted(scored_entries, key=lambda e: e.total_score, reverse=True)
-        for i, entry in enumerate(ranked_entries):
-            entry.rank = i + 1
+            # Phase 2: Score all responses
+            scored_entries = await self._score_all(entries, prompt, context, tools)
 
-        top_two = ranked_entries[:2]
+            # Phase 3: Rank and select top 2
+            ranked_entries = sorted(scored_entries, key=lambda e: e.total_score, reverse=True)
+            for i, entry in enumerate(ranked_entries):
+                entry.rank = i + 1
 
-        # Phase 4: A/B test between top 2
-        ab_result = None
-        if len(top_two) >= 2:
-            ab_result = await self._ab_test(prompt, top_two)
-            winner = ab_result.winner
-        else:
-            winner = top_two[0]
+            top_two = ranked_entries[:2]
 
-        # Calculate totals
-        total_duration_ms = (time.time() - start_time) * 1000
-        total_cost_usd = sum(e.response.cost_usd for e in entries)
+            # Phase 4: A/B test between top 2
+            ab_result = None
+            if len(top_two) >= 2:
+                ab_result = await self._ab_test(prompt, top_two)
+                winner = ab_result.winner
+            else:
+                winner = top_two[0]
 
-        # Create result
-        result = RoundTableResult(
-            id=result_id,
-            task_id=task_id,
-            prompt=prompt,
-            prompt_hash=prompt_hash,
-            entries=ranked_entries,
-            top_two=top_two,
-            ab_test=ab_result,
-            winner=winner,
-            status=CompetitionStatus.COMPLETED,
-            total_duration_ms=total_duration_ms,
-            total_cost_usd=total_cost_usd,
-        )
+            # Calculate totals
+            total_duration_ms = (time.time() - start_time) * 1000
+            total_cost_usd = sum(e.response.cost_usd for e in entries)
 
-        # Persist to database
-        if persist and self._db._initialized:
-            await self._db.save_result(result)
+            # Create result
+            result = RoundTableResult(
+                id=result_id,
+                task_id=task_id,
+                prompt=prompt,
+                prompt_hash=prompt_hash,
+                entries=ranked_entries,
+                top_two=top_two,
+                ab_test=ab_result,
+                winner=winner,
+                status=CompetitionStatus.COMPLETED,
+                total_duration_ms=total_duration_ms,
+                total_cost_usd=total_cost_usd,
+            )
 
-        # Add to in-memory history
-        self._history.append(result)
-        if len(self._history) > 1000:
-            self._history = self._history[-1000:]
+            # Persist to database
+            if persist and self._db._initialized:
+                await self._db.save_result(result)
 
-        logger.info(
-            f"Round Table completed: Winner={winner.provider.value}, "
-            f"Score={winner.total_score:.2f}, Duration={total_duration_ms:.0f}ms"
-        )
+            # Add to in-memory history
+            self._history.append(result)
+            if len(self._history) > 1000:
+                self._history = self._history[-1000:]
 
-        return result
+            # Record competition metrics
+            task_category = context.get("category", "unknown") if context else "unknown"
+            record_competition(
+                duration_seconds=total_duration_ms / 1000,
+                task_category=task_category,
+                provider_count=len(active_providers),
+            )
+
+            # Record provider results and update adaptive learning
+            for entry in ranked_entries:
+                won = entry == winner
+                record_provider_result(
+                    provider=entry.provider.value,
+                    won=won,
+                    score=entry.total_score,
+                    latency_ms=entry.response.latency_ms,
+                    cost_usd=entry.response.cost_usd,
+                    task_category=task_category,
+                )
+
+                # Update adaptive learning
+                if self._adaptive_engine:
+                    await self._adaptive_engine.update_from_competition(
+                        provider=entry.provider.value,
+                        won=won,
+                        score=entry.total_score,
+                        latency_ms=entry.response.latency_ms,
+                        cost=entry.response.cost_usd,
+                        category=task_category,
+                    )
+
+                # Record scoring components
+                scores_dict = {
+                    "relevance": entry.scores.relevance,
+                    "quality": entry.scores.quality,
+                    "completeness": entry.scores.completeness,
+                    "efficiency": entry.scores.efficiency,
+                    "brand_alignment": entry.scores.brand_alignment,
+                    "tool_usage_quality": entry.scores.tool_usage_quality,
+                    "coherence": entry.scores.coherence,
+                    "factuality": entry.scores.factuality,
+                    "hallucination_risk": entry.scores.hallucination_risk,
+                    "safety": entry.scores.safety,
+                }
+                record_scoring_components(entry.provider.value, scores_dict)
+
+            logger.info(
+                f"Round Table completed: Winner={winner.provider.value}, "
+                f"Score={winner.total_score:.2f}, Duration={total_duration_ms:.0f}ms"
+            )
+
+            return result
+        finally:
+            # Decrement active competitions
+            active_competitions.dec()
 
     async def _generate_all(
-        self, prompt: str, providers: list[LLMProvider], context: dict | None
+        self,
+        prompt: str,
+        providers: list[LLMProvider],
+        context: dict | None,
+        tools: list[dict[str, Any]] | None,
+        tool_choice: str,
     ) -> list[RoundTableEntry]:
-        """Generate responses from all providers in parallel"""
+        """Generate responses from all providers in parallel with optional tools."""
         entries = []
 
         async def generate_one(provider: LLMProvider) -> RoundTableEntry | None:
@@ -774,7 +1173,11 @@ class LLMRoundTable:
 
             start = time.time()
             try:
-                result = await generator(prompt, context)
+                # Call generator with tools if provided
+                if tools:
+                    result = await generator(prompt, context, tools=tools, tool_choice=tool_choice)
+                else:
+                    result = await generator(prompt, context)
                 latency = (time.time() - start) * 1000
 
                 # Handle different response formats
@@ -826,17 +1229,73 @@ class LLMRoundTable:
 
         return entries
 
-    def _score_all(
-        self, entries: list[RoundTableEntry], prompt: str, context: dict | None
+    async def _score_all(
+        self,
+        entries: list[RoundTableEntry],
+        prompt: str,
+        context: dict | None,
+        tools: list[dict[str, Any]] | None,
     ) -> list[RoundTableEntry]:
-        """Score all entries"""
+        """Score all entries with optional tool usage and ML-based evaluation."""
         for entry in entries:
-            entry.scores = self._scorer.score_response(entry.response, prompt, context)
+            entry.scores = await self._scorer.score_response(entry.response, prompt, context, tools)
         return entries
 
     async def _ab_test(self, prompt: str, top_two: list[RoundTableEntry]) -> ABTestResult:
-        """A/B test between top 2 entries using judge LLM"""
+        """A/B test between top 2 entries with statistical analysis."""
         entry_a, entry_b = top_two[0], top_two[1]
+
+        # Statistical analysis using historical data
+        p_value = None
+        effect_size = None
+        bayesian_prob = None
+        is_significant = False
+
+        if self._statistical_analyzer and len(self._history) >= 10:
+            # Gather historical scores for both providers
+            scores_a = [
+                e.total_score
+                for result in self._history[-50:]  # Last 50 competitions
+                for e in result.entries
+                if e.provider == entry_a.provider
+            ]
+            scores_b = [
+                e.total_score
+                for result in self._history[-50:]
+                for e in result.entries
+                if e.provider == entry_b.provider
+            ]
+
+            # Run statistical analysis if enough samples
+            if len(scores_a) >= 3 and len(scores_b) >= 3:
+                try:
+                    stat_result = self._statistical_analyzer.analyze_ab_test(
+                        scores_a=scores_a,
+                        scores_b=scores_b,
+                        provider_a=entry_a.provider.value,
+                        provider_b=entry_b.provider.value,
+                    )
+                    p_value = stat_result.p_value
+                    effect_size = stat_result.effect_size
+                    bayesian_prob = stat_result.bayesian_probability
+                    is_significant = stat_result.is_significant
+
+                    logger.info(
+                        f"Statistical analysis: {entry_a.provider.value} vs {entry_b.provider.value}, "
+                        f"p={p_value:.4f}, effect={effect_size:.3f}, "
+                        f"significant={is_significant}"
+                    )
+
+                    # Record AB test metrics
+                    record_ab_test(
+                        provider_a=entry_a.provider.value,
+                        provider_b=entry_b.provider.value,
+                        p_value=p_value,
+                        effect_size=effect_size,
+                        winner=stat_result.winner,
+                    )
+                except Exception as e:
+                    logger.warning(f"Statistical analysis failed: {e}")
 
         # Create judge prompt
         judge_prompt = f"""You are judging a competition between two AI responses.
@@ -859,7 +1318,7 @@ Evaluate both responses on:
 Respond in this exact format:
 WINNER: A or B
 CONFIDENCE: 0.0 to 1.0
-REASONING: Your detailed explanation"""
+REASONING: Your detailed explanation."""
 
         # Get judge's decision
         judge_generator = self._providers.get(self._judge_provider)
@@ -913,6 +1372,10 @@ REASONING: Your detailed explanation"""
             judge_provider=self._judge_provider,
             judge_reasoning=reasoning,
             confidence=confidence,
+            statistical_p_value=p_value,
+            statistical_effect_size=effect_size,
+            bayesian_probability=bayesian_prob,
+            is_statistically_significant=is_significant,
         )
 
     def _create_failed_result(
@@ -924,7 +1387,7 @@ REASONING: Your detailed explanation"""
         error: str,
         start_time: float,
     ) -> RoundTableResult:
-        """Create a failed result"""
+        """Create a failed result."""
         return RoundTableResult(
             id=result_id,
             task_id=task_id,
@@ -944,17 +1407,17 @@ REASONING: Your detailed explanation"""
     # =========================================================================
 
     def get_history(self, limit: int = 100) -> list[RoundTableResult]:
-        """Get recent competition history from memory"""
+        """Get recent competition history from memory."""
         return self._history[-limit:]
 
     async def get_database_history(
         self, limit: int = 100, task_id: str | None = None
     ) -> list[dict]:
-        """Get competition history from database"""
+        """Get competition history from database."""
         return await self._db.get_history(limit, task_id)
 
     async def get_provider_stats(self) -> dict[str, dict]:
-        """Get aggregated statistics per provider"""
+        """Get aggregated statistics per provider."""
         # Try database first
         db_stats = await self._db.get_provider_stats()
         if db_stats:
@@ -986,8 +1449,8 @@ REASONING: Your detailed explanation"""
 
         return stats
 
-    async def close(self):
-        """Close database connection"""
+    async def close(self) -> None:
+        """Close database connection."""
         await self._db.close()
 
 
@@ -997,7 +1460,7 @@ REASONING: Your detailed explanation"""
 
 
 async def create_round_table(db_url: str | None = None) -> LLMRoundTable:
-    """Factory function to create and initialize a Round Table"""
+    """Factory function to create and initialize a Round Table."""
     rt = LLMRoundTable(db_url)
     await rt.initialize()
     return rt

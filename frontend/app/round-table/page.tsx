@@ -48,8 +48,8 @@ import {
   useRoundTableHistory,
   useLLMProviders,
   useRunCompetition,
-  useLatestRoundTable,
 } from '@/lib/hooks';
+import { useRealtimeRoundTable } from '@/lib/hooks/useRealtime';
 import {
   formatNumber,
   formatPercent,
@@ -88,7 +88,7 @@ export default function RoundTablePage() {
     status: statusFilter === 'all' ? undefined : statusFilter,
   });
   const { data: providers } = useLLMProviders();
-  const { data: latest } = useLatestRoundTable();
+  const { competition: latest, isConnected: roundTableConnected } = useRealtimeRoundTable();
   const { trigger: runCompetition, isMutating: isRunning } = useRunCompetition();
 
   const handleRunCompetition = async () => {
