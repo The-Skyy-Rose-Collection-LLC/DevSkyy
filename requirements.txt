@@ -83,3 +83,11 @@ scipy>=1.14.1
 sentence-transformers>=3.3.1
 tiktoken>=0.8.0
 chromadb>=0.5.23
+
+# Agent SDK
+claude-agent-sdk==0.1.18  # Claude Agent SDK for multi-agent orchestration
+
+# Message Queue (Phase 1)
+celery>=5.3.0
+flower>=2.0.0
+redis>=5.0.0
