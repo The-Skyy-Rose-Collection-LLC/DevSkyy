@@ -11,7 +11,7 @@ services:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://devskyy:password@postgres:5432/devskyy
-      - REDIS_URL=redis://redis:6379/0
+      - REDIS_URL=redis://:redispassword@redis:6379/0
       - ENVIRONMENT=production
     depends_on:
       - postgres
@@ -65,6 +65,39 @@ services:
       interval: 10s
       timeout: 3s
       retries: 5
+
+  # Celery worker pool
+  celery-worker:
+    build: .
+    command: python -m agent_sdk.worker
+    environment:
+      - REDIS_URL=redis://:redispassword@redis:6379/0
+      - DATABASE_URL=postgresql://devskyy:password@postgres:5432/devskyy
+      - TRIPO_API_KEY=${TRIPO_API_KEY}
+      - FASHN_API_KEY=${FASHN_API_KEY}
+      - ENVIRONMENT=production
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - devskyy-network
+    restart: unless-stopped
+    deploy:
+      replicas: 3
+
+  # Celery monitoring (Flower)
+  celery-flower:
+    build: .
+    command: celery -A agent_sdk.worker flower --port=5555
+    container_name: devskyy-flower
+    ports:
+      - "5555:5555"
+    environment:
+      - REDIS_URL=redis://:redispassword@redis:6379/0
+    depends_on:
+      - celery-worker
+    networks:
+      - devskyy-network
 
   # Nginx reverse proxy
   nginx:
