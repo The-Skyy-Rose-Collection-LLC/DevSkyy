@@ -22,10 +22,11 @@ class TestWordPressClient:
         assert config.timeout == 30.0
 
     def test_base_url(self):
-        """Should construct base URL."""
+        """Should construct base URL using WordPress.com compatible format."""
         config = WordPressConfig(site_url="https://example.com")
 
-        assert config.base_url == "https://example.com/wp-json/wp/v2"
+        # Uses index.php?rest_route= format for WordPress.com hosted sites
+        assert config.base_url == "https://example.com/index.php?rest_route=/wp/v2"
 
 
 class TestBrandKit:

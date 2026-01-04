@@ -1,9 +1,9 @@
 /**
  * React hooks for WebSocket real-time updates.
- * 
+ *
  * These hooks replace SWR polling with WebSocket-based real-time updates,
  * achieving <100ms latency vs 2-30s with HTTP polling.
- * 
+ *
  * Available hooks:
  * - useRealtimeAgents: Agent status and execution updates
  * - useRealtimeRoundTable: Round Table competition progress
@@ -11,7 +11,7 @@
  * - useRealtime3DPipeline: 3D asset generation progress
  * - useRealtimeMetrics: System performance metrics
  * - useConnectionState: WebSocket connection state tracking
- * 
+ *
  * Usage:
  *   const { agents, isConnected } = useRealtimeAgents();
  *   const { competition, loading } = useRealtimeRoundTable();
@@ -35,25 +35,10 @@ import {
 // Type Definitions
 // =============================================================================
 
-export interface Agent {
-  id: string;
-  name: string;
-  status: 'idle' | 'running' | 'completed' | 'failed';
-  progress?: number;
-  message?: string;
-  last_updated?: string;
-  [key: string]: any;
-}
+import type { AgentInfo, RoundTableEntry } from '../types';
 
-export interface RoundTableCompetition {
-  id: string;
-  stage: 'generating' | 'scoring' | 'ab_testing' | 'completed' | 'failed';
-  progress?: number;
-  providers?: string[];
-  winner?: string;
-  scores?: Record<string, number>;
-  [key: string]: any;
-}
+export type Agent = AgentInfo;
+export type RoundTableCompetition = RoundTableEntry;
 
 export interface Task {
   id: string;
@@ -132,7 +117,7 @@ export function useRealtimeAgents(): UseRealtimeAgentsResult {
 
       setAgents(prev => {
         const index = prev.findIndex(a => a.id === agent_id);
-        
+
         if (index >= 0) {
           // Update existing agent
           const updated = [...prev];
@@ -252,7 +237,7 @@ export function useRealtimeTasks(): UseRealtimeTasksResult {
 
       setTasks(prev => {
         const index = prev.findIndex(t => t.id === task_id);
-        
+
         if (index >= 0) {
           // Update existing task
           const updated = [...prev];
@@ -317,7 +302,7 @@ export function useRealtime3DPipeline(): UseRealtime3DPipelineResult {
 
       setPipelines(prev => {
         const index = prev.findIndex(p => p.id === pipeline_id);
-        
+
         if (index >= 0) {
           // Update existing pipeline
           const updated = [...prev];
@@ -386,7 +371,7 @@ export function useRealtimeMetrics(historySize: number = 100): UseRealtimeMetric
       };
 
       setMetrics(metricsData);
-      
+
       // Add to history
       setHistory(prev => [metricsData, ...prev].slice(0, historySize));
     };

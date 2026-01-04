@@ -50,9 +50,8 @@ from typing import Any, Literal
 
 try:
     import httpx
-    from pydantic import BaseModel, ConfigDict, Field
-
     from mcp.server.fastmcp import FastMCP
+    from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"âŒ Missing required package: {e}")
     print("Install with: pip install fastmcp httpx pydantic python-jose[cryptography]")
@@ -171,7 +170,7 @@ class ScanCodeInput(BaseAgentInput):
     file_types: list[str] | None = Field(
         default=["py", "js", "ts", "jsx", "tsx"],
         description="File extensions to scan (e.g., ['py', 'js', 'html'])",
-        max_items=20,
+        max_length=20,
     )
     deep_scan: bool = Field(
         default=True,
@@ -194,7 +193,7 @@ class FixCodeInput(BaseAgentInput):
     fix_types: list[str] | None = Field(
         default=["syntax", "imports", "docstrings"],
         description="Types of fixes to apply: syntax, imports, docstrings, security, performance",
-        max_items=10,
+        max_length=10,
     )
 
 
@@ -220,12 +219,12 @@ class WordPressThemeInput(BaseAgentInput):
     color_palette: list[str] | None = Field(
         default=None,
         description="Hex color codes for brand colors (e.g., ['#FF5733', '#3498DB'])",
-        max_items=10,
+        max_length=10,
     )
     pages: list[str] | None = Field(
         default=["home", "shop", "about", "contact"],
         description="Pages to include in theme",
-        max_items=20,
+        max_length=20,
     )
 
 
@@ -276,8 +275,8 @@ class DynamicPricingInput(BaseAgentInput):
     product_ids: list[str] = Field(
         ...,
         description="Product IDs to optimize pricing for",
-        min_items=1,
-        max_items=100,
+        min_length=1,
+        max_length=100,
     )
     strategy: Literal["competitive", "demand_based", "ml_optimized", "time_based"] = Field(
         default="ml_optimized", description="Pricing strategy to use"
@@ -442,7 +441,7 @@ class SelfHealingInput(BaseAgentInput):
     scope: list[str] | None = Field(
         default=["performance", "errors", "security"],
         description="Areas to check: performance, errors, security, code_quality",
-        max_items=10,
+        max_length=10,
     )
 
 
@@ -459,7 +458,7 @@ class MultiAgentWorkflowInput(BaseAgentInput):
     agents: list[str] | None = Field(
         default=None,
         description="Specific agents to use (auto-selected if not provided)",
-        max_items=20,
+        max_length=20,
     )
     parallel: bool = Field(default=True, description="Execute agents in parallel when possible")
 
@@ -470,12 +469,77 @@ class MonitoringInput(BaseAgentInput):
     metrics: list[str] | None = Field(
         default=["health", "performance", "errors"],
         description="Metrics to retrieve: health, performance, errors, ml_accuracy, api_latency",
-        max_items=20,
+        max_length=20,
     )
     time_range: str | None = Field(
         default="1h",
         description="Time range for metrics (e.g., '1h', '24h', '7d')",
         max_length=10,
+    )
+
+
+class TrainLoRAInput(BaseAgentInput):
+    """Input for LoRA training from WooCommerce products."""
+
+    collections: list[str] | None = Field(
+        default=None,
+        description="Collections to train on: BLACK_ROSE, LOVE_HURTS, SIGNATURE (null = all collections)",
+        max_length=10,
+    )
+    max_products: int | None = Field(
+        default=None,
+        description="Maximum number of products to use (null = no limit)",
+        ge=1,
+        le=1000,
+    )
+    epochs: int = Field(
+        default=100,
+        description="Number of training epochs",
+        ge=1,
+        le=1000,
+    )
+    version: str | None = Field(
+        default=None,
+        description="LoRA version string (e.g., 'v1.1.0'). Auto-generated if null.",
+        max_length=50,
+    )
+
+
+class LoRADatasetPreviewInput(BaseAgentInput):
+    """Input for previewing LoRA training dataset."""
+
+    collections: list[str] | None = Field(
+        default=None,
+        description="Collections to preview: BLACK_ROSE, LOVE_HURTS, SIGNATURE (null = all)",
+        max_length=10,
+    )
+    max_products: int | None = Field(
+        default=50,
+        description="Maximum products to preview",
+        ge=1,
+        le=1000,
+    )
+
+
+class LoRAVersionInfoInput(BaseAgentInput):
+    """Input for retrieving LoRA version information."""
+
+    version: str = Field(
+        ...,
+        description="LoRA version string (e.g., 'v1.1.0')",
+        min_length=1,
+        max_length=50,
+    )
+
+
+class LoRAProductHistoryInput(BaseAgentInput):
+    """Input for retrieving product LoRA history."""
+
+    sku: str = Field(
+        ...,
+        description="Product SKU (e.g., 'SRS-BR-001')",
+        min_length=1,
+        max_length=100,
     )
 
 
@@ -1275,14 +1339,14 @@ async def generate_3d_from_description(params: ThreeDGenerationInput) -> str:
 async def generate_3d_from_image(params: ThreeDImageInput) -> str:
     """
     Generate a 3D model from a reference image.
-    
+
     Parameters:
         params (ThreeDImageInput): Input containing:
             - product_name: Human-readable name for the generated model.
             - image_url: Reference image URL or base64-encoded image data.
             - output_format: Desired 3D file format (e.g., "glb", "gltf", "fbx", "obj", "usdz", "stl").
             - response_format: Desired response presentation (markdown or json).
-    
+
     Returns:
         str: Formatted result containing generated model URLs/paths and related metadata.
     """
@@ -1342,7 +1406,7 @@ async def generate_3d_from_image(params: ThreeDImageInput) -> str:
 async def virtual_tryon(params: VirtualTryOnInput) -> str:
     """
     Generate a virtual try-on result that applies a garment image to a model image.
-    
+
     Parameters:
         params (VirtualTryOnInput): Configuration for the try-on request containing:
             - model_image_url: URL of the model or person image.
@@ -1352,7 +1416,7 @@ async def virtual_tryon(params: VirtualTryOnInput) -> str:
             - provider: Rendering provider ("fashn", "idm_vton", "round_table").
             - product_id: Optional product tracking identifier.
             - response_format: Desired output format (markdown or json).
-    
+
     Returns:
         str: Formatted response string with the job status and result URL(s) when available; includes error information when the request fails.
     """
@@ -1386,9 +1450,21 @@ async def virtual_tryon(params: VirtualTryOnInput) -> str:
             {
                 "model_image_url": "https://cdn.skyyrose.co/models/model-001.jpg",
                 "garments": [
-                    {"garment_image_url": "https://cdn.skyyrose.co/products/hoodie.jpg", "category": "tops", "product_id": "SKR-001"},
-                    {"garment_image_url": "https://cdn.skyyrose.co/products/jacket.jpg", "category": "outerwear", "product_id": "SKR-002"},
-                    {"garment_image_url": "https://cdn.skyyrose.co/products/tee.jpg", "category": "tops", "product_id": "SKR-003"},
+                    {
+                        "garment_image_url": "https://cdn.skyyrose.co/products/hoodie.jpg",
+                        "category": "tops",
+                        "product_id": "SKR-001",
+                    },
+                    {
+                        "garment_image_url": "https://cdn.skyyrose.co/products/jacket.jpg",
+                        "category": "outerwear",
+                        "product_id": "SKR-002",
+                    },
+                    {
+                        "garment_image_url": "https://cdn.skyyrose.co/products/tee.jpg",
+                        "category": "tops",
+                        "product_id": "SKR-003",
+                    },
                 ],
                 "mode": "balanced",
                 "provider": "fashn",
@@ -1399,7 +1475,7 @@ async def virtual_tryon(params: VirtualTryOnInput) -> str:
 async def batch_virtual_tryon(params: BatchVirtualTryOnInput) -> str:
     """
     Process a batch of garments on a single model image and return the formatted results.
-    
+
     Parameters:
         params (BatchVirtualTryOnInput): Batch configuration containing:
             - model_image_url: URL of the model image to apply garments to.
@@ -1407,7 +1483,7 @@ async def batch_virtual_tryon(params: BatchVirtualTryOnInput) -> str:
             - mode: Processing quality/speed preference (`quality`, `balanced`, or `fast`).
             - provider: Service provider to use (`fashn` or `idm_vton`).
             - response_format: Desired output format (`ResponseFormat`) for the returned string.
-    
+
     Returns:
         str: Batch job status with individual item results formatted according to `params.response_format`.
     """
@@ -1456,14 +1532,14 @@ async def batch_virtual_tryon(params: BatchVirtualTryOnInput) -> str:
 async def generate_ai_model(params: AIModelGenerationInput) -> str:
     """
     Generate an AI fashion model image from the provided prompt, gender, and style.
-    
+
     Parameters:
         params (AIModelGenerationInput): Generation configuration with:
             - prompt: Description of the desired model and pose.
             - gender: "female", "male", or "neutral".
             - style: "professional", "casual", "editorial", or "street".
             - response_format: Desired output format (markdown or json).
-    
+
     Returns:
         str: Formatted response containing the generation result and the image URL or error details.
     """
@@ -1495,12 +1571,12 @@ async def generate_ai_model(params: AIModelGenerationInput) -> str:
 async def virtual_tryon_status(response_format: ResponseFormat = ResponseFormat.MARKDOWN) -> str:
     """
     Get virtual try-on pipeline status and provider availability.
-    
+
     Returns a formatted status report containing provider health, queue metrics, daily usage and limits, and cost estimates.
-    
+
     Parameters:
         response_format (ResponseFormat): Output format (`markdown` or `json`).
-    
+
     Returns:
         str: Formatted pipeline status report.
     """
@@ -1788,6 +1864,180 @@ async def system_monitoring(params: MonitoringInput) -> str:
 
 
 # ===========================
+# LoRA Training Tools
+# ===========================
+
+
+@mcp.tool(
+    name="devskyy_train_lora_from_products",
+    annotations={
+        "title": "Train SkyyRose LoRA from WooCommerce Products",
+        "readOnlyHint": False,
+        "destructiveHint": False,
+        "idempotentHint": False,
+        "openWorldHint": True,
+        "defer_loading": True,
+        "category": "ai",
+    },
+)
+async def train_lora_from_products(params: TrainLoRAInput) -> str:
+    """Train SkyyRose LoRA using WooCommerce product images.
+
+    This tool orchestrates end-to-end LoRA training:
+    1. Fetches products from WooCommerce (filtered by collection)
+    2. Downloads and caches product images
+    3. Evaluates image quality (resolution, blur, brightness)
+    4. Prepares training dataset with brand DNA captions
+    5. Trains SDXL LoRA with PEFT (rank 32, alpha 32)
+    6. Saves version to SQLite database for tracking
+    7. Generates training metadata and progress logs
+
+    Collections:
+    - BLACK_ROSE: Dark romantic aesthetic, gothic elegance
+    - LOVE_HURTS: Edgy romance, heart motifs, vulnerable strength
+    - SIGNATURE: Classic SkyyRose style, rose gold accents, timeless sophistication
+
+    Training typically takes 2-4 hours for 100 products on GPU.
+
+    Args:
+        params: Training parameters including collections, epochs, version
+
+    Returns:
+        str: Training status with version info, dataset stats, and model path
+    """
+    data = await _make_api_request(
+        "lora/train",
+        method="POST",
+        data={
+            "collections": params.collections,
+            "max_products": params.max_products,
+            "epochs": params.epochs,
+            "version": params.version,
+        },
+    )
+
+    return _format_response(data, params.response_format, "LoRA Training Started")
+
+
+@mcp.tool(
+    name="devskyy_lora_dataset_preview",
+    annotations={
+        "title": "Preview LoRA Training Dataset",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+        "defer_loading": True,
+        "category": "ai",
+    },
+)
+async def lora_dataset_preview(params: LoRADatasetPreviewInput) -> str:
+    """Preview LoRA training dataset before starting training.
+
+    Shows:
+    - Total products and images that would be used
+    - Collection breakdown (BLACK_ROSE, LOVE_HURTS, SIGNATURE)
+    - Sample product SKUs and names
+    - Image quality scores
+    - Estimated training time
+
+    Use this to validate your dataset before committing to a full training run.
+
+    Args:
+        params: Preview parameters including collections filter and max products
+
+    Returns:
+        str: Dataset preview with product counts, collections, and sample data
+    """
+    data = await _make_api_request(
+        "lora/dataset/preview",
+        method="GET",
+        params={
+            "collections": (",".join(params.collections) if params.collections else None),
+            "max_products": params.max_products,
+        },
+    )
+
+    return _format_response(data, params.response_format, "LoRA Dataset Preview")
+
+
+@mcp.tool(
+    name="devskyy_lora_version_info",
+    annotations={
+        "title": "Get LoRA Version Information",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+        "defer_loading": True,
+        "category": "ai",
+    },
+)
+async def lora_version_info(params: LoRAVersionInfoInput) -> str:
+    """Get detailed information about a specific LoRA version.
+
+    Returns:
+    - Version metadata (created date, base model, training config)
+    - Dataset statistics (total images, total products, collection breakdown)
+    - Product contributions (SKUs, names, image counts, quality scores)
+    - Training metrics (epochs, loss, learning rate)
+    - Model path for downloading weights
+
+    Args:
+        params: Version query with version string (e.g., 'v1.1.0')
+
+    Returns:
+        str: Complete version information with all metadata and product details
+    """
+    data = await _make_api_request(f"lora/versions/{params.version}", method="GET")
+
+    return _format_response(data, params.response_format, f"LoRA Version: {params.version}")
+
+
+@mcp.tool(
+    name="devskyy_lora_product_history",
+    annotations={
+        "title": "Get Product LoRA Training History",
+        "readOnlyHint": True,
+        "destructiveHint": False,
+        "idempotentHint": True,
+        "openWorldHint": True,
+        "defer_loading": True,
+        "category": "ai",
+    },
+)
+async def lora_product_history(params: LoRAProductHistoryInput) -> str:
+    """Find all LoRA versions that include a specific product.
+
+    This tool searches the version database to find every LoRA training run
+    that used images from the specified product SKU.
+
+    Returns:
+    - List of all versions including this product
+    - Version creation dates
+    - Image counts used from this product in each version
+    - Quality scores for this product's images
+
+    Useful for:
+    - Understanding which products contributed to model improvements
+    - Debugging why certain products generate better results
+    - Tracking product representation across model versions
+
+    Args:
+        params: Product query with SKU (e.g., 'SRS-BR-001')
+
+    Returns:
+        str: Product training history across all LoRA versions
+    """
+    data = await _make_api_request(
+        f"lora/products/{params.sku}/history",
+        method="GET",
+    )
+
+    return _format_response(data, params.response_format, f"Product History: {params.sku}")
+
+
+# ===========================
 # Resource: List All Agents
 # ===========================
 
@@ -1876,6 +2126,10 @@ if __name__ == "__main__":
    â€¢ devskyy_marketing_campaign - Multi-channel marketing automation
    â€¢ devskyy_multi_agent_workflow - Complex workflow orchestration
    â€¢ devskyy_system_monitoring - Real-time platform monitoring
+   • devskyy_train_lora_from_products - Train LoRA from WooCommerce products
+   • devskyy_lora_dataset_preview - Preview LoRA training dataset
+   • devskyy_lora_version_info - Get LoRA version information
+   • devskyy_lora_product_history - Get product LoRA training history
    â€¢ devskyy_list_agents - View all 54 agents
 
 ðŸ“š Documentation: https://docs.devskyy.com/mcp

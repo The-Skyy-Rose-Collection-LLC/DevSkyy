@@ -8,47 +8,47 @@
  */
 
 // Base Class & Production Utilities
-export { BaseCollectionExperience } from './BaseCollectionExperience.js';
+export { BaseCollectionExperience } from './BaseCollectionExperience';
 export type {
   BaseProduct,
   BaseExperienceConfig,
   ExperienceState,
   LifecycleEvent,
   LifecycleHandler,
-} from './BaseCollectionExperience.js';
+} from './BaseCollectionExperience';
 
-export * from './ProductionHandlers.js';
+export * from './ProductionHandlers';
 
 // Collection Experiences
-export { BlackRoseExperience } from './BlackRoseExperience.js';
+export { BlackRoseExperience } from './BlackRoseExperience';
 export type {
   BlackRoseProduct,
   BlackRoseConfig,
   ProductCardData,
   ProductClickHandler,
   EasterEggHandler,
-} from './BlackRoseExperience.js';
+} from './BlackRoseExperience';
 
-export { SignatureExperience } from './SignatureExperience.js';
+export { SignatureExperience } from './SignatureExperience';
 export type {
   SignatureProduct,
   SignatureConfig,
   CategorySelectHandler,
   ProductSelectHandler,
-} from './SignatureExperience.js';
+} from './SignatureExperience';
 
-export { LoveHurtsExperience } from './LoveHurtsExperience.js';
+export { LoveHurtsExperience } from './LoveHurtsExperience';
 export type {
   LoveHurtsProduct,
   LoveHurtsConfig,
   HeroInteractionHandler,
   MirrorClickHandler,
   FloorSpotlightHandler,
-} from './LoveHurtsExperience.js';
+} from './LoveHurtsExperience';
 
 // Existing experiences
-export { ShowroomExperience } from './ShowroomExperience.js';
-export { default as RunwayExperience } from './RunwayExperience.js';
+export { ShowroomExperience } from './ShowroomExperience';
+export { default as RunwayExperience } from './RunwayExperience';
 
 // ============================================================================
 // Collection3DExperienceSpec - Unified schema for all collection experiences
@@ -101,11 +101,11 @@ export interface Collection3DExperienceSpec {
 // Experience Factory
 // ============================================================================
 
-import { BlackRoseExperience as BRE } from './BlackRoseExperience.js';
-import { SignatureExperience as SE } from './SignatureExperience.js';
-import { LoveHurtsExperience as LHE } from './LoveHurtsExperience.js';
-import { ShowroomExperience as SRE } from './ShowroomExperience.js';
-import RunwayExperience from './RunwayExperience.js';
+import { BlackRoseExperience as BRE } from './BlackRoseExperience';
+import { SignatureExperience as SE } from './SignatureExperience';
+import { LoveHurtsExperience as LHE } from './LoveHurtsExperience';
+import { ShowroomExperience as SRE } from './ShowroomExperience';
+import RunwayExperience from './RunwayExperience';
 
 export type CollectionExperience = BRE | SE | LHE | SRE | typeof RunwayExperience.prototype;
 

@@ -39,6 +39,30 @@ cohere>=5.0
 # Image Processing
 Pillow>=10.0
 gradio-client>=0.8
+scikit-image>=0.22.0
+imagehash>=4.3.1
+opencv-python-headless>=4.8
+
+# 3D Rendering (headless)
+trimesh>=4.0
+pyrender>=0.1.45
+pyglet>=2.0
+
+# SDXL Image Generation
+diffusers>=0.25.0
+transformers>=4.36.0
+accelerate>=0.25.0
+safetensors>=0.4.0
+xformers>=0.0.23  # Memory optimization (CUDA only)
+
+# LoRA Training
+peft>=0.7.0
+datasets>=2.16.0
+bitsandbytes>=0.42.0  # Quantization (optional)
+
+# PyTorch (install separately for your platform)
+# torch>=2.1.0
+# torchvision>=0.16.0
 
 # Utilities
 structlog>=23.2
@@ -50,5 +74,12 @@ aiofiles>=23.2
 # Async Support
 anyio>=4.0
 
-# Monitoring (optional but recommended)
+# Monitoring
 prometheus-client>=0.19
+
+# ML/AI - Critical for Round Table and RAG
+numpy>=2.1.3
+scipy>=1.14.1
+sentence-transformers>=3.3.1
+tiktoken>=0.8.0
+chromadb>=0.5.23

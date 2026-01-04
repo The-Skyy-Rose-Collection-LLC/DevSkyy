@@ -13,7 +13,7 @@ Features:
 - Sample size calculation
 
 Author: DevSkyy Platform Team
-Version: 1.0.0.""" 
+Version: 1.0.0."""
 from __future__ import annotations
 
 import logging
@@ -34,7 +34,7 @@ logger = logging.getLogger(__name__)
 
 
 class ExperimentStatus(str, Enum):
-    """Status of an A/B test experiment.""" 
+    """Status of an A/B test experiment."""
     DRAFT = "draft"
     RUNNING = "running"
     PAUSED = "paused"
@@ -43,7 +43,7 @@ class ExperimentStatus(str, Enum):
 
 
 class MetricType(str, Enum):
-    """Type of metric being tracked.""" 
+    """Type of metric being tracked."""
     CONVERSION = "conversion"  # Binary outcome (0 or 1)
     REVENUE = "revenue"  # Continuous monetary value
     COUNT = "count"  # Count-based metric
@@ -52,7 +52,7 @@ class MetricType(str, Enum):
 
 
 class WinnerStatus(str, Enum):
-    """Winner determination status.""" 
+    """Winner determination status."""
     NO_DATA = "no_data"
     INSUFFICIENT_DATA = "insufficient_data"
     NO_WINNER = "no_winner"
@@ -68,7 +68,7 @@ class WinnerStatus(str, Enum):
 
 @dataclass
 class Variant:
-    """A variant in an A/B test.""" 
+    """A variant in an A/B test."""
     id: str
     name: str
     description: str = ""
@@ -79,7 +79,7 @@ class Variant:
 
 @dataclass
 class MetricResult:
-    """Results for a metric in a variant.""" 
+    """Results for a metric in a variant."""
     variant_id: str
     sample_size: int = 0
     conversions: int = 0  # For conversion metrics
@@ -88,21 +88,21 @@ class MetricResult:
 
     @property
     def mean(self) -> float:
-        """Calculate mean value.""" 
+        """Calculate mean value."""
         if self.sample_size == 0:
             return 0.0
         return self.total_value / self.sample_size
 
     @property
     def conversion_rate(self) -> float:
-        """Calculate conversion rate.""" 
+        """Calculate conversion rate."""
         if self.sample_size == 0:
             return 0.0
         return self.conversions / self.sample_size
 
     @property
     def variance(self) -> float:
-        """Calculate variance.""" 
+        """Calculate variance."""
         if self.sample_size < 2:
             return 0.0
         mean = self.mean
@@ -112,7 +112,7 @@ class MetricResult:
 
     @property
     def std_error(self) -> float:
-        """Calculate standard error.""" 
+        """Calculate standard error."""
         if self.sample_size == 0:
             return 0.0
         return math.sqrt(self.variance / self.sample_size)
@@ -120,7 +120,7 @@ class MetricResult:
 
 @dataclass
 class StatisticalResult:
-    """Statistical analysis result.""" 
+    """Statistical analysis result."""
     winner: WinnerStatus
     p_value: float
     confidence_level: float
@@ -139,7 +139,7 @@ class StatisticalResult:
 
 @dataclass
 class Experiment:
-    """A/B test experiment definition.""" 
+    """A/B test experiment definition."""
     id: str
     name: str
     description: str
@@ -159,14 +159,14 @@ class Experiment:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def get_control(self) -> Variant | None:
-        """Get control variant.""" 
+        """Get control variant."""
         for v in self.variants:
             if v.is_control:
                 return v
         return self.variants[0] if self.variants else None
 
     def get_treatment(self) -> Variant | None:
-        """Get treatment variant (first non-control).""" 
+        """Get treatment variant (first non-control)."""
         for v in self.variants:
             if not v.is_control:
                 return v
@@ -175,7 +175,7 @@ class Experiment:
 
 @dataclass
 class ExperimentResult:
-    """Complete experiment result with analysis.""" 
+    """Complete experiment result with analysis."""
     experiment: Experiment
     metric_results: dict[str, dict[str, MetricResult]]  # metric -> variant_id -> result
     statistical_results: dict[str, StatisticalResult]  # metric -> stats
@@ -191,10 +191,10 @@ class ExperimentResult:
 
 
 class StatisticalCalculator:
-    """Statistical calculations for A/B testing.""" 
+    """Statistical calculations for A/B testing."""
     @staticmethod
     def calculate_z_score(p1: float, p2: float, n1: int, n2: int) -> float:
-        """Calculate z-score for two proportions.""" 
+        """Calculate z-score for two proportions."""
         if n1 == 0 or n2 == 0:
             return 0.0
 
@@ -212,7 +212,7 @@ class StatisticalCalculator:
 
     @staticmethod
     def z_to_p_value(z: float) -> float:
-        """Convert z-score to two-tailed p-value using approximation.""" 
+        """Convert z-score to two-tailed p-value using approximation."""
         # Approximation of standard normal CDF
         x = abs(z)
         t = 1 / (1 + 0.2316419 * x)
@@ -234,7 +234,7 @@ class StatisticalCalculator:
             baseline_rate: Current conversion rate (0-1)
             mde: Minimum detectable effect (relative, e.g., 0.05 for 5%)
             alpha: Significance level
-            power: Statistical power.""" 
+            power: Statistical power."""
         if baseline_rate <= 0 or baseline_rate >= 1:
             return 10000  # Default for invalid inputs
 
@@ -264,7 +264,7 @@ class StatisticalCalculator:
 
     @staticmethod
     def calculate_power(p1: float, p2: float, n1: int, n2: int, alpha: float = 0.05) -> float:
-        """Calculate statistical power achieved.""" 
+        """Calculate statistical power achieved."""
         if n1 == 0 or n2 == 0:
             return 0.0
 
@@ -398,7 +398,7 @@ class ABTestingEngine:
             ON ab_conversions(experiment_id, variant_id);
 
         CREATE INDEX IF NOT EXISTS idx_ab_conversions_created
-            ON ab_conversions(created_at);.""" 
+            ON ab_conversions(created_at);."""
         if self._pool is None:
             raise RuntimeError("Database pool not initialized")
 
@@ -423,7 +423,7 @@ class ABTestingEngine:
         minimum_effect_size: float = 0.05,
         metadata: dict[str, Any] | None = None,
     ) -> Experiment:
-        """Create a new A/B test experiment.""" 
+        """Create a new A/B test experiment."""
         exp_id = str(uuid4())[:16]
 
         # Ensure at least one control
@@ -457,11 +457,11 @@ class ABTestingEngine:
         return experiment
 
     def get_experiment(self, experiment_id: str) -> Experiment | None:
-        """Get experiment by ID.""" 
+        """Get experiment by ID."""
         return self._experiments.get(experiment_id)
 
     def start_experiment(self, experiment_id: str) -> bool:
-        """Start an experiment.""" 
+        """Start an experiment."""
         exp = self._experiments.get(experiment_id)
         if not exp:
             return False
@@ -472,7 +472,7 @@ class ABTestingEngine:
         return True
 
     def pause_experiment(self, experiment_id: str) -> bool:
-        """Pause an experiment.""" 
+        """Pause an experiment."""
         exp = self._experiments.get(experiment_id)
         if not exp:
             return False
@@ -481,7 +481,7 @@ class ABTestingEngine:
         return True
 
     def complete_experiment(self, experiment_id: str, winner_id: str | None = None) -> bool:
-        """Complete an experiment.""" 
+        """Complete an experiment."""
         exp = self._experiments.get(experiment_id)
         if not exp:
             return False
@@ -516,7 +516,7 @@ class ABTestingEngine:
             value: Value of conversion (for revenue metrics)
             metric_name: Metric name (defaults to primary metric)
             user_id: Optional user identifier
-            metadata: Additional metadata.""" 
+            metadata: Additional metadata."""
         exp = self._experiments.get(experiment_id)
         if not exp or exp.status != ExperimentStatus.RUNNING:
             return False
@@ -590,7 +590,7 @@ class ABTestingEngine:
 
         Args:
             experiment_id: Experiment ID
-            metric_name: Specific metric to analyze (defaults to primary).""" 
+            metric_name: Specific metric to analyze (defaults to primary)."""
         exp = self._experiments.get(experiment_id)
         if not exp:
             return None
@@ -641,7 +641,7 @@ class ABTestingEngine:
         confidence_threshold: float,
         min_effect_size: float,
     ) -> StatisticalResult:
-        """Calculate statistical significance.""" 
+        """Calculate statistical significance."""
         n1, n2 = control.sample_size, treatment.sample_size
 
         if n1 < 10 or n2 < 10:
@@ -720,7 +720,7 @@ class ABTestingEngine:
         )
 
     def _generate_recommendation(self, exp: Experiment, stats: StatisticalResult) -> str:
-        """Generate recommendation based on results.""" 
+        """Generate recommendation based on results."""
         if stats.winner == WinnerStatus.INSUFFICIENT_DATA:
             return "Continue collecting data - insufficient sample size for reliable conclusions."
 
@@ -741,7 +741,7 @@ class ABTestingEngine:
         return "Results inconclusive - consider extending the experiment."
 
     def _generate_summary(self, exp: Experiment, stats: StatisticalResult) -> str:
-        """Generate experiment summary.""" 
+        """Generate experiment summary."""
         return f"""A/B Test Summary: {exp.name}
 
 Hypothesis: {exp.hypothesis}
@@ -758,7 +758,7 @@ Statistical Analysis:
 - Power: {stats.power*100:.1f}%
 - Significant: {'Yes' if stats.is_significant else 'No'}
 
-Winner: {stats.winner.value}.""" 
+Winner: {stats.winner.value}."""
     # =========================================================================
     # Utilities
     # =========================================================================
@@ -780,7 +780,7 @@ Winner: {stats.winner.value}."""
             power: Statistical power (default 0.8)
 
         Returns:
-            Dict with sample size and runtime estimates.""" 
+            Dict with sample size and runtime estimates."""
         alpha = 1 - confidence
         per_variant = self._calculator.calculate_sample_size(
             baseline_rate, minimum_detectable_effect, alpha, power
@@ -796,7 +796,7 @@ Winner: {stats.winner.value}."""
         }
 
     def list_experiments(self, status: ExperimentStatus | None = None) -> list[Experiment]:
-        """List all experiments, optionally filtered by status.""" 
+        """List all experiments, optionally filtered by status."""
         experiments = list(self._experiments.values())
 
         if status:
@@ -816,7 +816,7 @@ Winner: {stats.winner.value}."""
 
 
 async def create_ab_engine(db_url: str | None = None) -> ABTestingEngine:
-    """Factory function to create and initialize A/B Testing Engine.""" 
+    """Factory function to create and initialize A/B Testing Engine."""
     engine = ABTestingEngine(db_url)
     await engine.initialize()
     return engine

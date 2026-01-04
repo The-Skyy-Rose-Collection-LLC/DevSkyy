@@ -7,7 +7,7 @@
  */
 
 // Material Swapper
-export { MaterialSwapper, materialSwapper } from './materialSwapper.js';
+export { MaterialSwapper, materialSwapper } from './materialSwapper';
 
 // Price Utilities
 export {
@@ -17,4 +17,4 @@ export {
   hasValidDiscount,
   getEffectivePrice,
   formatPriceRange,
-} from './priceUtils.js';
+} from './priceUtils';

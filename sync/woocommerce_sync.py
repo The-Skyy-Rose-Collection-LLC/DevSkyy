@@ -17,10 +17,49 @@ from dataclasses import dataclass
 from typing import Any
 
 import httpx
+from pydantic import BaseModel, Field
 
 from errors.production_errors import ConfigurationError, WordPressIntegrationError
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Models for LoRA Training
+# =============================================================================
+
+
+class Product(BaseModel):
+    """WooCommerce product model for LoRA training."""
+
+    id: int
+    name: str
+    slug: str
+    sku: str = ""
+    description: str = ""
+    short_description: str = ""
+    categories: list[dict[str, Any]] = Field(default_factory=list)
+    images: list[dict[str, Any]] = Field(default_factory=list)
+    attributes: list[dict[str, Any]] = Field(default_factory=list)
+    date_created: str = ""
+    date_modified: str = ""
+    status: str = "publish"
+
+    def get_image_urls(self) -> list[str]:
+        """Extract image URLs from product."""
+        return [img.get("src", "") for img in self.images if img.get("src")]
+
+    def get_category_names(self) -> list[str]:
+        """Extract category names."""
+        return [cat.get("name", "") for cat in self.categories]
+
+    def get_attribute(self, name: str) -> str | None:
+        """Get attribute value by name."""
+        for attr in self.attributes:
+            if attr.get("name", "").lower() == name.lower():
+                options = attr.get("options", [])
+                return options[0] if options else None
+        return None
 
 
 @dataclass
@@ -96,23 +135,24 @@ class WooCommerceSyncClient:
         per_page: int = 100,
         page: int = 1,
         **kwargs: Any,
-    ) -> list[dict[str, Any]]:
+    ) -> list[Product]:
         """
         Get products from WooCommerce.
 
         Args:
             per_page: Products per page
             page: Page number
-            **kwargs: Additional query parameters
+            **kwargs: Additional query parameters (status, category, search, etc.)
 
         Returns:
-            List of product dictionaries
+            List of Product objects
         """
         try:
             params = {"per_page": per_page, "page": page, **kwargs}
             response = await self._client.get("/products", params=params)
             response.raise_for_status()
-            return response.json()
+            data = response.json()
+            return [Product(**item) for item in data]
 
         except httpx.HTTPStatusError as e:
             raise WordPressIntegrationError(
@@ -120,6 +160,55 @@ class WooCommerceSyncClient:
                 endpoint="/products",
                 status_code=e.response.status_code,
             )
+
+    async def get_all_products(
+        self,
+        status: str = "publish",
+        category: str | None = None,
+        search: str | None = None,
+        max_products: int | None = None,
+    ) -> list[Product]:
+        """
+        Fetch all products with pagination for LoRA training.
+
+        Args:
+            status: Product status filter
+            category: Category slug filter
+            search: Search term
+            max_products: Maximum products to fetch
+
+        Returns:
+            List of all Product objects
+        """
+        all_products: list[Product] = []
+        page = 1
+        per_page = 100
+
+        kwargs: dict[str, Any] = {"status": status}
+        if category:
+            kwargs["category"] = category
+        if search:
+            kwargs["search"] = search
+
+        while True:
+            products = await self.get_products(page=page, per_page=per_page, **kwargs)
+
+            if not products:
+                break
+
+            all_products.extend(products)
+
+            if max_products and len(all_products) >= max_products:
+                all_products = all_products[:max_products]
+                break
+
+            if len(products) < per_page:
+                break
+
+            page += 1
+
+        logger.info(f"Fetched total of {len(all_products)} products")
+        return all_products
 
     async def get_product(self, product_id: int) -> dict[str, Any]:
         """Get a single product by ID."""

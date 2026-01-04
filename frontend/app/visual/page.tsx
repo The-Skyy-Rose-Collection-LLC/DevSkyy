@@ -2,12 +2,12 @@
  * Visual Generation Page
  * ======================
  * Generate product photography and visual content using AI.
- * 
+ *
  * Providers:
  * - Google Imagen 3: High-quality product photography
  * - HuggingFace FLUX.1: Fast, creative images
  * - Google Veo 2: Video generation (coming soon)
- * 
+ *
  * Styles:
  * - Product Studio: Clean white background
  * - Lifestyle: In-context lifestyle shots
@@ -128,7 +128,7 @@ export default function VisualGenerationPage() {
   const [style, setStyle] = useState<ImageStyle>('product_studio');
   const [aspectRatio, setAspectRatio] = useState<AspectRatio>('1:1');
   const [quality, setQuality] = useState<Quality>('high');
-  
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [jobId, setJobId] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -148,38 +148,59 @@ export default function VisualGenerationPage() {
     setProgress(0);
 
     try {
+      // Construct prompt from inputs
+      const prompt = `${productName} from ${collection} collection, ${style} style`;
+
       // Submit generation job
-      const response = await api.post('/api/v1/visual/generate', {
-        product_name: productName,
-        collection,
-        style,
-        provider: provider === 'google_veo' ? 'google_imagen' : provider, // Fallback for Veo (not yet available)
-        aspect_ratio: aspectRatio,
-        quality,
+      const result = await api.visual.generate({
+        type: 'image_from_text',
+        prompt,
+        provider: (provider === 'google_veo' ? 'google_imagen' : provider) as any,
+        options: {
+          aspect_ratio: aspectRatio,
+          quality,
+        },
       });
 
-      const { job_id } = response;
+      // If the API returns a direct result (synchronous), use it
+      if (result.url) {
+        setProgress(100);
+        const newImage: GeneratedImage = {
+          id: result.id,
+          url: result.url,
+          provider: result.provider,
+          style,
+          timestamp: new Date().toISOString(),
+        };
+        setResult(newImage);
+        setHistory(prev => [newImage, ...prev].slice(0, 20));
+        setIsGenerating(false);
+        return;
+      }
+
+      // Otherwise, assume job-based async pattern
+      const job_id = result.id;
       setJobId(job_id);
       setProgress(10);
 
       // Poll for completion
       const pollInterval = setInterval(async () => {
         try {
-          const statusResponse = await api.get(`/api/v1/visual/jobs/${job_id}`);
+          const statusResponse = await api.visual.getJobStatus(job_id);
           const { status, image_url, error: jobError } = statusResponse;
 
           if (status === 'completed') {
             clearInterval(pollInterval);
             setProgress(100);
-            
+
             const newImage: GeneratedImage = {
               id: job_id,
-              url: image_url,
+              url: image_url || '',
               provider: provider === 'auto' ? 'auto-selected' : provider,
               style,
               timestamp: new Date().toISOString(),
             };
-            
+
             setResult(newImage);
             setHistory(prev => [newImage, ...prev].slice(0, 20)); // Keep last 20
             setIsGenerating(false);

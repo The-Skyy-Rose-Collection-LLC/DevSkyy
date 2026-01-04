@@ -5,8 +5,8 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { CartManager, CartItem, CartState } from '../lib/cart.js';
-import { Logger } from '../utils/Logger.js';
+import { CartManager, CartItem, CartState } from '../lib/cart';
+import { Logger } from '../utils/Logger';
 
 // Hook return type
 export interface UseCartReturn {

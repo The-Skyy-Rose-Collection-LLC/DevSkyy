@@ -3,15 +3,15 @@
  * TypeScript/JavaScript SDK for the 6-agent ecosystem
  */
 
-import { config, validateConfig } from './config/index.js';
-import { Logger, createLogger } from './utils/Logger.js';
-import { AgentService } from './services/AgentService.js';
+import { config, validateConfig } from './config/index';
+import { Logger, createLogger } from './utils/Logger';
+import { AgentService } from './services/AgentService';
 
 // Export all public APIs
-export * from './types/index.js';
-export * from './config/index.js';
-export * from './utils/Logger.js';
-export * from './services/AgentService.js';
+export * from './types/index';
+export * from './config/index';
+export * from './utils/Logger';
+export * from './services/AgentService';
 
 // Main DevSkyy SDK class
 export class DevSkyy {

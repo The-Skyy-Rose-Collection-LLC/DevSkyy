@@ -451,6 +451,118 @@ class PromptEngineeringModule:
             return FewShotLearning.create_examples_for_domain(domain)
         return []
 
+    def apply_technique_with_tools(
+        self,
+        technique: PromptTechnique,
+        prompt: str,
+        tools: list[dict] | None = None,
+        **kwargs,
+    ) -> PromptTechniqueResult:
+        """Apply technique with tool calling optimization.
+
+        Enhances prompts for LLM Round Table competition when tools are available.
+        Adds tool-aware instructions based on the technique being used.
+
+        Args:
+            technique: Prompt technique to apply
+            prompt: Base prompt
+            tools: Available tools for the task
+            **kwargs: Additional technique-specific parameters
+
+        Returns:
+            PromptTechniqueResult with tool-optimized prompt
+        """
+        if not tools:
+            # No tools available, use standard technique
+            return self.apply_technique(technique, prompt, **kwargs)
+
+        # Apply base technique first
+        base_result = self.apply_technique(technique, prompt, tools=tools, **kwargs)
+        enhanced = base_result.enhanced_prompt
+
+        # Add tool-specific enhancements based on technique
+        tool_names = [t.get("name", "unknown") for t in tools]
+        tool_list = ", ".join(tool_names)
+
+        if technique == PromptTechnique.REACT:
+            # ReAct already handles tools, but enhance with format
+            tool_enhanced = f"""
+Task: {prompt}
+
+Available Tools: {tool_list}
+
+IMPORTANT: Use the ReAct format with tool calling:
+Thought: [Your reasoning about what to do]
+Action: tool_name(arguments)
+Observation: [Tool result will appear here]
+... (repeat Thought/Action/Observation as needed)
+Final Answer: [Your final response]
+
+{enhanced}
+"""
+            enhanced = tool_enhanced.strip()
+
+        elif technique == PromptTechnique.CHAIN_OF_THOUGHT:
+            # Add tool awareness to CoT
+            tool_enhanced = f"""
+{enhanced}
+
+Available Tools: {tool_list}
+
+When solving this problem step-by-step, consider which tools would help at each step.
+Call tools when you need information, data, or actions you cannot perform directly.
+"""
+            enhanced = tool_enhanced.strip()
+
+        elif technique == PromptTechnique.TREE_OF_THOUGHTS:
+            # Add tool usage to each branch
+            tool_enhanced = f"""
+{enhanced}
+
+Available Tools for exploration: {tool_list}
+
+For each branch of reasoning, identify which tools would provide the most valuable information.
+Prioritize tool calls that reduce uncertainty or provide critical data.
+"""
+            enhanced = tool_enhanced.strip()
+
+        elif technique == PromptTechnique.RAG:
+            # Combine RAG context with tool calling
+            tool_enhanced = f"""
+{enhanced}
+
+Additional Tools Available: {tool_list}
+
+Use tools to supplement the retrieved context when:
+- The context is insufficient
+- You need real-time data
+- You need to perform actions
+"""
+            enhanced = tool_enhanced.strip()
+
+        else:
+            # Generic tool awareness for other techniques
+            tool_enhanced = f"""
+{enhanced}
+
+Available Tools: {tool_list}
+
+You have access to these tools to help complete the task. Use them when appropriate.
+"""
+            enhanced = tool_enhanced.strip()
+
+        # Update metadata
+        metadata = base_result.metadata.copy()
+        metadata["tool_aware"] = True
+        metadata["available_tools"] = tool_names
+
+        return PromptTechniqueResult(
+            technique=technique,
+            original_prompt=prompt,
+            enhanced_prompt=enhanced,
+            metadata=metadata,
+        )
+
     def record_outcome(self, technique: PromptTechnique, success: bool, score: float = 0.0):
         """Record technique outcome for learning"""
         stats = self._technique_stats[technique]
@@ -571,7 +683,7 @@ class TaskCategoryAnalyzer:
         prompt_lower = prompt.lower()
 
         # Check cache first
-        cache_key = hashlib.md5(prompt_lower.encode()).hexdigest()[:16]
+        cache_key = hashlib.md5(prompt_lower.encode(), usedforsecurity=False).hexdigest()[:16]
         if cache_key in self._analysis_cache:
             category, confidence = self._analysis_cache[cache_key]
             reason = f"cached_analysis:{category.value}"
@@ -1242,7 +1354,7 @@ class SelfLearningModule:
         record = LearningRecord(
             task_id=task_id,
             task_type=task_type,
-            prompt_hash=hashlib.md5(prompt.encode()).hexdigest()[:16],
+            prompt_hash=hashlib.md5(prompt.encode(), usedforsecurity=False).hexdigest()[:16],
             technique_used=technique,
             llm_provider=llm_provider,
             success=success,
@@ -1425,7 +1537,7 @@ class SelfLearningModule:
 {response}
 """
             # Store in knowledge base
-            doc_key = f"learning:{task_type}:{hashlib.md5(prompt.encode()).hexdigest()[:12]}"
+            doc_key = f"learning:{task_type}:{hashlib.md5(prompt.encode(), usedforsecurity=False).hexdigest()[:12]}"
             self._knowledge_base[doc_key] = {
                 "value": {
                     "prompt": prompt,
@@ -1777,7 +1889,9 @@ class LLMRoundTableInterface:
             await self.initialize()
 
         start_time = time.time()
-        task_id = hashlib.md5(f"{prompt}{datetime.now(UTC).isoformat()}".encode()).hexdigest()[:16]
+        task_id = hashlib.md5(
+            f"{prompt}{datetime.now(UTC).isoformat()}".encode(), usedforsecurity=False
+        ).hexdigest()[:16]
         corr_id = correlation_id or task_id
 
         logger.info(

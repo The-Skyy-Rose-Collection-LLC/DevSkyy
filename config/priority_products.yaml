@@ -1,0 +1,71 @@
+# Priority Products for 3D Generation
+# These products will be processed first with quality gate validation
+
+settings:
+  fidelity_threshold: 90.0
+  output_dir: assets/3d-models-generated
+  upload_to_wordpress: true
+
+collections:
+  signature:
+    - name: "Signature Hoodie"
+      source_pattern: "*Hoodie*.jpg"
+      garment_type: "hoodie"
+      priority: 1
+
+    - name: "Cotton Candy Tee"
+      source_pattern: "*Cotton Candy Tee*.jpg"
+      garment_type: "tee"
+      priority: 2
+
+    - name: "Cotton Candy Shorts"
+      source_pattern: "*Cotton Candy Shorts*.jpg"
+      garment_type: "shorts"
+      priority: 3
+
+    - name: "Crop Hoodie"
+      source_pattern: "*Crop Hoodie*.jpg"
+      garment_type: "cropped_hoodie"
+      priority: 4
+
+    - name: "Lavender Rose Beanie"
+      source_pattern: "*Beanie*.jpg"
+      garment_type: "beanie"
+      priority: 5
+
+  black-rose:
+    - name: "Black Rose Sherpa"
+      source_pattern: "*Sherpa*.jpg"
+      garment_type: "jacket"
+      priority: 1
+
+    - name: "Black Rose Hooded Dress"
+      source_pattern: "*Hooded Dress*.jpg"
+      garment_type: "dress"
+      priority: 2
+
+    - name: "Black Rose Bomber"
+      source_pattern: "*Bomber*.jpg"
+      garment_type: "bomber"
+      priority: 3
+
+  love-hurts:
+    - name: "Love Hurts Windbreaker"
+      source_pattern: "*Windbreaker*.jpg"
+      garment_type: "windbreaker"
+      priority: 1
+
+    - name: "Love Hurts Joggers"
+      source_pattern: "*Jogger*.jpg"
+      garment_type: "joggers"
+      priority: 2
+
+    - name: "Love Hurts Fannie Pack"
+      source_pattern: "*Fannie*.jpg"
+      garment_type: "accessory"
+      priority: 3
+
+    - name: "Love Hurts Hoodie"
+      source_pattern: "*Hoodie*.jpg"
+      garment_type: "hoodie"
+      priority: 4

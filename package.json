@@ -9,6 +9,9 @@
   "dependencies": {
     "@ai-sdk/huggingface": "^0.0.12",
     "@apollo/server": "^5.2.0",
+    "@copilotkit/react-core": "^1.50.1",
+    "@copilotkit/react-ui": "^1.50.1",
+    "@copilotkit/runtime": "^1.50.1",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
     "@fastify/rate-limit": "^10.3.0",

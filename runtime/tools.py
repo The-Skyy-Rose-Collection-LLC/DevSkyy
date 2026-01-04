@@ -466,7 +466,22 @@ class ToolRegistry:
         spec: ToolSpec,
         handler: ToolHandler | None = None,
     ) -> None:
-        """Register a tool with its specification."""
+        """
+        Register a tool with its specification.
+
+        Auto-configures Programmatic Tool Calling (PTC) for READ_ONLY tools:
+        - READ_ONLY tools get allowed_callers=["code_execution_20250825"] by default
+        - Enables batch operations and data filtering for safe, read-only tools
+        - Can be overridden by explicitly setting allowed_callers
+        """
+        # Auto-configure PTC for READ_ONLY tools if not explicitly set
+        if spec.severity == ToolSeverity.READ_ONLY and not spec.allowed_callers:
+            spec.allowed_callers = ["code_execution_20250825"]
+            logger.debug(
+                f"Auto-configured PTC for READ_ONLY tool: {spec.name} "
+                f"(allowed_callers={spec.allowed_callers})"
+            )
+
         self._tools[spec.name] = spec
         if handler:
             self._handlers[spec.name] = handler

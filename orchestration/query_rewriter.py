@@ -143,7 +143,7 @@ class AdvancedQueryRewriter:
         import hashlib
 
         content = f"{query}:{strategy}"
-        return f"devsky_query_rewrite:{hashlib.md5(content.encode()).hexdigest()}"
+        return f"devsky_query_rewrite:{hashlib.md5(content.encode(), usedforsecurity=False).hexdigest()}"
 
     def _get_cached_result(self, query: str, strategy: str) -> RewrittenQuery | None:
         """Retrieve cached rewritten query"""

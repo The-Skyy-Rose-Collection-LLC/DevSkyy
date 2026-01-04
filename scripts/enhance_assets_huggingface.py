@@ -240,7 +240,9 @@ async def enhance_collection(args: argparse.Namespace) -> int:
         # Save collection metadata
         if args.save_metadata:
             metadata_path = (
-                Path(config.output_dir) / collection_name.lower().replace(" ", "_") / "collection_metadata.json"
+                Path(config.output_dir)
+                / collection_name.lower().replace(" ", "_")
+                / "collection_metadata.json"
             )
             metadata_path.parent.mkdir(parents=True, exist_ok=True)
             with open(metadata_path, "w") as f:
@@ -435,11 +437,12 @@ async def check_environment(args: argparse.Namespace) -> int:
     print("\n  Network Connectivity:")
     try:
         import aiohttp
+
         async with aiohttp.ClientSession() as session:
             try:
                 async with session.get(
                     "https://huggingface.co/api/models?limit=1",
-                    timeout=aiohttp.ClientTimeout(total=10)
+                    timeout=aiohttp.ClientTimeout(total=10),
                 ) as resp:
                     if resp.status == 200:
                         print("    ✓ HuggingFace API reachable")
@@ -466,7 +469,7 @@ async def check_environment(args: argparse.Namespace) -> int:
         print(f"    {'✓' if exists else '○'} {d}")
         if not exists and args.create_dirs:
             path.mkdir(parents=True, exist_ok=True)
-            print(f"      Created directory")
+            print("      Created directory")
 
     # Count available assets
     print("\n  Available Assets:")
@@ -475,9 +478,14 @@ async def check_environment(args: argparse.Namespace) -> int:
         collections = [d for d in product_images_path.iterdir() if d.is_dir()]
         total_assets = 0
         for collection in collections:
-            images = list(collection.glob("*.jpg")) + list(collection.glob("*.jpeg")) + \
-                     list(collection.glob("*.png")) + list(collection.glob("*.JPG")) + \
-                     list(collection.glob("*.JPEG")) + list(collection.glob("*.PNG"))
+            images = (
+                list(collection.glob("*.jpg"))
+                + list(collection.glob("*.jpeg"))
+                + list(collection.glob("*.png"))
+                + list(collection.glob("*.JPG"))
+                + list(collection.glob("*.JPEG"))
+                + list(collection.glob("*.PNG"))
+            )
             count = len(images)
             total_assets += count
             print(f"    {collection.name}: {count} images")
@@ -559,12 +567,20 @@ For more information, visit: https://github.com/skyyrose/devskyy
 
     # Collection command
     collection_parser = subparsers.add_parser("collection", help="Enhance a collection")
-    collection_parser.add_argument("--path", "-p", required=True, help="Path to collection directory")
-    collection_parser.add_argument("--name", "-n", help="Collection name (auto-detected if not provided)")
+    collection_parser.add_argument(
+        "--path", "-p", required=True, help="Path to collection directory"
+    )
+    collection_parser.add_argument(
+        "--name", "-n", help="Collection name (auto-detected if not provided)"
+    )
     collection_parser.add_argument("--output-dir", "-o", help="Output directory")
     collection_parser.add_argument("--output-subdir", help="Output subdirectory")
-    collection_parser.add_argument("--concurrency", "-c", type=int, default=3, help="Concurrent operations")
-    collection_parser.add_argument("--save-metadata", "-m", action="store_true", default=True, help="Save metadata")
+    collection_parser.add_argument(
+        "--concurrency", "-c", type=int, default=3, help="Concurrent operations"
+    )
+    collection_parser.add_argument(
+        "--save-metadata", "-m", action="store_true", default=True, help="Save metadata"
+    )
 
     # All collections command
     all_parser = subparsers.add_parser("all", help="Enhance all collections")
@@ -575,15 +591,21 @@ For more information, visit: https://github.com/skyyrose/devskyy
         help="Base path containing collections",
     )
     all_parser.add_argument("--output-dir", "-o", help="Output directory")
-    all_parser.add_argument("--concurrency", "-c", type=int, default=3, help="Concurrent operations")
-    all_parser.add_argument("--save-metadata", "-m", action="store_true", default=True, help="Save metadata")
+    all_parser.add_argument(
+        "--concurrency", "-c", type=int, default=3, help="Concurrent operations"
+    )
+    all_parser.add_argument(
+        "--save-metadata", "-m", action="store_true", default=True, help="Save metadata"
+    )
 
     # Models command
     subparsers.add_parser("models", help="List available HuggingFace 3D models")
 
     # Check command
     check_parser = subparsers.add_parser("check", help="Check environment and dependencies")
-    check_parser.add_argument("--create-dirs", action="store_true", help="Create missing directories")
+    check_parser.add_argument(
+        "--create-dirs", action="store_true", help="Create missing directories"
+    )
 
     return parser
 

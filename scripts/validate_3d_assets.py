@@ -509,11 +509,9 @@ class ThreeDAssetValidator:
         model_path: Path,
         source_path: Path | None,
     ) -> ValidationCheck:
-        """
-        Validate color similarity between 3D model and source image.
+        """Validate color similarity between 3D model render and source image.
 
-        Note: This is a simplified check. Full implementation would render
-        the 3D model and compare with the source image.
+        Renders the 3D model and compares color histograms with the source.
         """
         if source_path is None or not source_path.exists():
             return ValidationCheck(
@@ -523,34 +521,60 @@ class ThreeDAssetValidator:
             )
 
         try:
-            import numpy as np
-            from PIL import Image
+            from imagery.headless_renderer import CameraAngle, HeadlessRenderer
+            from imagery.visual_comparison import VisualComparisonEngine
 
-            # Load source image
-            source_img = Image.open(source_path).convert("RGB")
+            # Render the 3D model to an image
+            renderer = HeadlessRenderer()
+            render_dir = model_path.parent / ".renders"
+            result = renderer.render_model(
+                model_path,
+                render_dir,
+                angles=[CameraAngle.FRONT],
+            )
 
-            # Extract dominant colors from source
-            source_arr = np.array(source_img.resize((100, 100)))
-            source_colors = source_arr.reshape(-1, 3).mean(axis=0)
+            if not result.success or "front" not in result.images:
+                return ValidationCheck(
+                    name="color_match",
+                    status=ValidationStatus.WARNING,
+                    message=f"Could not render model for comparison: {result.errors}",
+                )
 
-            # For now, we assume the 3D model matches if the source is valid
-            # Full implementation would require 3D rendering
+            rendered_image = result.images["front"]
+
+            # Compare colors using visual comparison engine
+            comparator = VisualComparisonEngine(threshold=85.0)
+            comparison = comparator.compare_colors_only(source_path, rendered_image)
+
+            if comparison.color_similarity is None:
+                return ValidationCheck(
+                    name="color_match",
+                    status=ValidationStatus.WARNING,
+                    message="Color comparison unavailable (missing dependencies)",
+                )
+
+            status = (
+                ValidationStatus.PASSED
+                if comparison.color_similarity >= 0.70
+                else ValidationStatus.FAILED
+            )
 
             return ValidationCheck(
                 name="color_match",
-                status=ValidationStatus.PASSED,
-                message="Color analysis completed (source image validated)",
+                status=status,
+                message=f"Color similarity: {comparison.color_similarity:.1%}",
                 value={
-                    "source_dominant_color": source_colors.tolist(),
-                    "comparison_method": "source_validation_only",
+                    "color_similarity": comparison.color_similarity,
+                    "threshold": 0.70,
+                    "rendered_image": str(rendered_image),
                 },
             )
 
-        except ImportError:
+        except ImportError as e:
             return ValidationCheck(
                 name="color_match",
                 status=ValidationStatus.SKIPPED,
-                message="PIL not available for color analysis",
+                message=f"Dependencies not available: {e}",
             )
         except Exception as e:
             return ValidationCheck(
@@ -564,11 +588,10 @@ class ThreeDAssetValidator:
         model_path: Path,
         source_path: Path | None,
     ) -> ValidationCheck:
-        """
-        Validate shape/silhouette similarity.
+        """Validate shape/silhouette similarity between model and source.
 
-        Note: Full implementation would render the 3D model silhouette
-        and compare with the source image outline.
+        Renders the 3D model silhouette and compares with source image
+        using SSIM and perceptual hash metrics.
         """
         if source_path is None or not source_path.exists():
             return ValidationCheck(
@@ -577,24 +600,101 @@ class ThreeDAssetValidator:
                 message="No source image available for shape comparison",
             )
 
-        # Simplified check - verify source exists and model has geometry
-        if model_path.suffix.lower() == ".glb":
-            parser = GLBParser(model_path)
-            if parser.parse():
-                meshes = parser.json_data.get("meshes", [])
-                if meshes:
+        try:
+            from imagery.headless_renderer import CameraAngle, HeadlessRenderer
+            from imagery.visual_comparison import VisualComparisonEngine
+
+            # Render silhouette of the 3D model
+            renderer = HeadlessRenderer()
+            render_dir = model_path.parent / ".renders"
+            silhouette_path = render_dir / f"{model_path.stem}_silhouette.png"
+
+            silhouette = renderer.render_silhouette(
+                model_path,
+                silhouette_path,
+                angle=CameraAngle.FRONT,
+            )
+
+            if silhouette is None:
+                # Fall back to regular render comparison
+                result = renderer.render_model(
+                    model_path,
+                    render_dir,
+                    angles=[CameraAngle.FRONT],
+                )
+                if not result.success:
                     return ValidationCheck(
                         name="shape_match",
-                        status=ValidationStatus.PASSED,
-                        message=f"Shape validation: {len(meshes)} mesh(es) found",
-                        value={"mesh_count": len(meshes)},
+                        status=ValidationStatus.WARNING,
+                        message=f"Could not render model: {result.errors}",
                     )
+                rendered_image = result.images.get("front")
+            else:
+                rendered_image = silhouette
 
-        return ValidationCheck(
-            name="shape_match",
-            status=ValidationStatus.WARNING,
-            message="Could not verify shape data",
-        )
+            if rendered_image is None:
+                return ValidationCheck(
+                    name="shape_match",
+                    status=ValidationStatus.WARNING,
+                    message="No rendered image available for comparison",
+                )
+
+            # Compare shapes using visual comparison engine
+            comparator = VisualComparisonEngine(threshold=75.0)
+            comparison = comparator.compare(source_path, rendered_image)
+
+            # Use SSIM as primary shape metric (structure comparison)
+            shape_score = comparison.ssim_score
+            if shape_score is None:
+                # Fall back to perceptual similarity
+                shape_score = comparison.perceptual_similarity
+
+            if shape_score is None:
+                return ValidationCheck(
+                    name="shape_match",
+                    status=ValidationStatus.WARNING,
+                    message="Shape comparison unavailable (missing dependencies)",
+                )
+
+            status = ValidationStatus.PASSED if shape_score >= 0.60 else ValidationStatus.FAILED
+
+            return ValidationCheck(
+                name="shape_match",
+                status=status,
+                message=f"Shape similarity: {shape_score:.1%}",
+                value={
+                    "shape_similarity": shape_score,
+                    "ssim_score": comparison.ssim_score,
+                    "perceptual_similarity": comparison.perceptual_similarity,
+                    "threshold": 0.60,
+                    "rendered_image": str(rendered_image),
+                },
+            )
+
+        except ImportError as e:
+            # Fall back to basic mesh check if dependencies unavailable
+            if model_path.suffix.lower() == ".glb":
+                parser = GLBParser(model_path)
+                if parser.parse():
+                    meshes = parser.json_data.get("meshes", [])
+                    if meshes:
+                        return ValidationCheck(
+                            name="shape_match",
+                            status=ValidationStatus.WARNING,
+                            message=f"Basic check: {len(meshes)} mesh(es) (full comparison unavailable: {e})",
+                            value={"mesh_count": len(meshes), "comparison_available": False},
+                        )
+            return ValidationCheck(
+                name="shape_match",
+                status=ValidationStatus.SKIPPED,
+                message=f"Dependencies not available: {e}",
+            )
+        except Exception as e:
+            return ValidationCheck(
+                name="shape_match",
+                status=ValidationStatus.WARNING,
+                message=f"Shape analysis failed: {e}",
+            )
 
     async def validate_model(
         self,

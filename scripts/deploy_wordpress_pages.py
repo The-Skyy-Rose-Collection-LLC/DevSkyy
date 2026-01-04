@@ -31,7 +31,6 @@ from __future__ import annotations
 import argparse
 import asyncio
 import base64
-import json
 import logging
 import os
 import sys
@@ -47,6 +46,7 @@ try:
 except ImportError:
     print("Installing httpx...")
     import subprocess
+
     subprocess.run([sys.executable, "-m", "pip", "install", "httpx", "-q"])
     import httpx
 
@@ -60,12 +60,13 @@ logger = logging.getLogger(__name__)
 @dataclass
 class WordPressConfig:
     """WordPress API configuration."""
+
     url: str
     username: str
     app_password: str
 
     @classmethod
-    def from_env(cls) -> "WordPressConfig":
+    def from_env(cls) -> WordPressConfig:
         """Load from environment variables."""
         url = os.getenv("WORDPRESS_URL", "https://skyyrose.co")
         username = os.getenv("WORDPRESS_USERNAME", "")
@@ -120,7 +121,9 @@ COLLECTION_PAGES = [
 ]
 
 
-async def get_page_by_slug(client: httpx.AsyncClient, config: WordPressConfig, slug: str) -> dict | None:
+async def get_page_by_slug(
+    client: httpx.AsyncClient, config: WordPressConfig, slug: str
+) -> dict | None:
     """Get page by slug."""
     # Use index.php?rest_route= format for WordPress.com hosted sites
     url = f"{config.url}/index.php"
@@ -189,7 +192,9 @@ async def update_page(
         logger.info(f"Updated page: {result.get('slug')} (ID: {result.get('id')})")
         return result
     else:
-        logger.error(f"Failed to update page {page_id}: {response.status_code} - {response.text[:200]}")
+        logger.error(
+            f"Failed to update page {page_id}: {response.status_code} - {response.text[:200]}"
+        )
         return None
 
 
@@ -244,20 +249,24 @@ async def deploy_experiences_structure(config: WordPressConfig, dry_run: bool = 
                     f"[DRY RUN] Would update page {page_id} ({page_config['slug']}) "
                     f"with parent={parent_id}"
                 )
-                results["children_updated"].append({
-                    "id": page_id,
-                    "slug": page_config["slug"],
-                    "status": "would_update",
-                })
+                results["children_updated"].append(
+                    {
+                        "id": page_id,
+                        "slug": page_config["slug"],
+                        "status": "would_update",
+                    }
+                )
             else:
                 updated = await update_page(client, config, page_id, update_data)
                 if updated:
-                    results["children_updated"].append({
-                        "id": page_id,
-                        "slug": updated.get("slug"),
-                        "parent": updated.get("parent"),
-                        "status": "updated",
-                    })
+                    results["children_updated"].append(
+                        {
+                            "id": page_id,
+                            "slug": updated.get("slug"),
+                            "parent": updated.get("parent"),
+                            "status": "updated",
+                        }
+                    )
                 else:
                     results["errors"].append(f"Failed to update page {page_id}")
 
@@ -287,7 +296,10 @@ async def validate_structure(config: WordPressConfig) -> dict:
             try:
                 # Use index.php?rest_route= format for WordPress.com hosted sites
                 url = f"{config.url}/index.php"
-                params = {"rest_route": f"/wp/v2/pages/{page_config['id']}", "_fields": "id,slug,title,parent,status,link"}
+                params = {
+                    "rest_route": f"/wp/v2/pages/{page_config['id']}",
+                    "_fields": "id,slug,title,parent,status,link",
+                }
                 response = await client.get(
                     url,
                     params=params,
@@ -333,44 +345,46 @@ def print_results(results: dict, mode: str) -> None:
     print("=" * 60)
 
     if mode == "deploy":
-        print(f"\nParent Page:")
+        print("\nParent Page:")
         if results.get("parent_created"):
             print(f"  ✅ Created 'experiences' page (ID: {results['parent_id']})")
         elif results.get("parent_id"):
             print(f"  ✓ Already exists (ID: {results['parent_id']})")
 
-        print(f"\nChild Pages:")
+        print("\nChild Pages:")
         for child in results.get("children_updated", []):
             status = "✅" if child["status"] == "updated" else "→"
             print(f"  {status} {child['slug']} (ID: {child['id']})")
 
         if results.get("errors"):
-            print(f"\nErrors:")
+            print("\nErrors:")
             for error in results["errors"]:
                 print(f"  ❌ {error}")
 
     elif mode == "validate":
-        print(f"\nParent Page:")
+        print("\nParent Page:")
         if results.get("parent_exists"):
             print(f"  ✅ 'experiences' page exists (ID: {results['parent_id']})")
         else:
-            print(f"  ❌ 'experiences' page missing")
+            print("  ❌ 'experiences' page missing")
 
-        print(f"\nChild Pages:")
+        print("\nChild Pages:")
         for child in results.get("children", []):
             parent_ok = child.get("parent") == results.get("parent_id")
             slug_ok = child.get("slug") == child.get("expected_slug")
             status = "✅" if (parent_ok and slug_ok) else "⚠️"
-            print(f"  {status} ID {child['id']}: /{child.get('slug')}/ (parent={child.get('parent')})")
+            print(
+                f"  {status} ID {child['id']}: /{child.get('slug')}/ (parent={child.get('parent')})"
+            )
             if child.get("link"):
                 print(f"      URL: {child['link']}")
 
         if results.get("issues"):
-            print(f"\nIssues Found:")
+            print("\nIssues Found:")
             for issue in results["issues"]:
                 print(f"  ⚠️ {issue}")
         else:
-            print(f"\n✅ No issues found - structure is correct!")
+            print("\n✅ No issues found - structure is correct!")
 
     print("\n" + "=" * 60)
 
