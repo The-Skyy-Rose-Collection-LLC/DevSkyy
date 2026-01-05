@@ -207,7 +207,7 @@ ml = [
     "prophet==1.2.1",
     "gym==0.26.2",
     "stable-baselines3==2.4.0",
-    "shap==0.46.0",
+    "shap==0.50.0",
     "lime==0.2.0.1",
     "polars==1.15.0",
     "pyarrow==22.0.0",
