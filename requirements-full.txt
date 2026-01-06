@@ -47,3 +47,6 @@ pyglet>=2.0
 
 # Monitoring (optional)
 flower>=2.0.0
+
+# LlamaIndex HuggingFace (requires torch)
+llama-index-multi-modal-llms-huggingface>=0.1.0
