@@ -31,10 +31,10 @@ from enum import Enum
 from typing import Any
 
 import cohere
+import google.generativeai as genai
 
 # Official SDK imports
 from anthropic import AsyncAnthropic
-import google.generativeai as genai
 from google.generativeai import types as genai_types
 from groq import AsyncGroq
 from mistralai import Mistral
