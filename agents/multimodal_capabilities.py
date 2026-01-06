@@ -35,7 +35,12 @@ from llama_index.core.base.llms.types import ChatMessage, MessageRole
 from llama_index.core.multi_modal_llms import MultiModalLLM
 from llama_index.llms.openai import OpenAI
 from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
-from llama_index.multi_modal_llms.huggingface import HuggingFaceMultiModal
+
+# Optional: HuggingFace multimodal (requires torch - only in requirements-full.txt)
+try:
+    from llama_index.multi_modal_llms.huggingface import HuggingFaceMultiModal
+except ImportError:
+    HuggingFaceMultiModal = None
 
 logger = logging.getLogger(__name__)
 
