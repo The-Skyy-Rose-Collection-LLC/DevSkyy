@@ -31,6 +31,7 @@ Usage:
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import logging
 import os
@@ -44,6 +45,9 @@ logger = logging.getLogger(__name__)
 QUEUE_PREFIX = "devskyy:tasks:"
 RESULT_PREFIX = "devskyy:results:"
 TASK_TIMEOUT = 300  # 5 minutes default
+
+# Pub/Sub channels (Enterprise hardening: Zero-overhead result delivery)
+RESULT_CHANNEL = "devskyy:results:channel"
 
 
 class TaskStatus(str, Enum):
@@ -79,7 +83,7 @@ class TaskQueue:
     - core/redis_cache.py:80-100 (connection pattern)
     """
 
-    __slots__ = ("redis_url", "_redis", "_connected", "_metrics")
+    __slots__ = ("redis_url", "_redis", "_connected", "_metrics", "_health_check_task")
 
     def __init__(self, redis_url: str | None = None) -> None:
         """
@@ -91,6 +95,7 @@ class TaskQueue:
         self.redis_url = redis_url or os.getenv("REDIS_URL", "redis://localhost:6379/0")
         self._redis: Any = None
         self._connected = False
+        self._health_check_task: Any = None
         self._metrics = {
             "tasks_queued": 0,
             "tasks_completed": 0,
@@ -111,7 +116,8 @@ class TaskQueue:
         try:
             import redis.asyncio as redis
 
-            # Create Redis client from URL
+            # Create Redis client from URL with connection pooling
+            # Enterprise hardening: Connection pool prevents exhaustion under load
             self._redis = await redis.from_url(
                 self.redis_url,
                 encoding="utf-8",
@@ -119,11 +125,17 @@ class TaskQueue:
                 socket_timeout=5.0,
                 socket_connect_timeout=5.0,
                 retry_on_timeout=True,
+                max_connections=50,  # Limit concurrent connections
+                health_check_interval=30,  # Auto health check every 30s
             )
 
             # Test connection
             await self._redis.ping()
             self._connected = True
+
+            # Start periodic health check
+            if not self._health_check_task or self._health_check_task.done():
+                self._health_check_task = asyncio.create_task(self._periodic_health_check())
 
             logger.info(
                 f"Task queue connected to Redis: "
@@ -140,10 +152,47 @@ class TaskQueue:
 
     async def disconnect(self) -> None:
         """Disconnect from Redis."""
+        # Stop health check task
+        if self._health_check_task:
+            self._health_check_task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await self._health_check_task
+
         if self._redis:
             await self._redis.close()
             self._connected = False
             logger.info("Task queue disconnected")
+
+    async def _periodic_health_check(self) -> None:
+        """
+        Periodic health check to detect connection failures early.
+
+        Enterprise hardening: Proactive health monitoring prevents silent failures.
+        Auto-reconnects on failure to maintain availability.
+        """
+        while True:
+            try:
+                await asyncio.sleep(60)  # Check every minute
+
+                if self._redis and self._connected:
+                    try:
+                        await asyncio.wait_for(self._redis.ping(), timeout=5.0)
+                        logger.debug("Redis health check: OK")
+                    except TimeoutError:
+                        logger.warning("Redis health check timeout - reconnecting...")
+                        self._connected = False
+                        await self.connect()
+                    except Exception as e:
+                        logger.error(f"Redis health check failed: {e} - reconnecting...")
+                        self._connected = False
+                        await self.connect()
+
+            except asyncio.CancelledError:
+                logger.info("Health check task cancelled")
+                break
+            except Exception as e:
+                logger.error(f"Health check error: {e}", exc_info=True)
+                await asyncio.sleep(5)  # Brief pause before retry
 
     async def enqueue(
         self,
@@ -313,7 +362,9 @@ class TaskQueue:
 
     async def store_result(self, task_id: str, result: dict[str, Any], ttl: int = 300) -> bool:
         """
-        Store task result.
+        Store task result and notify via Pub/Sub.
+
+        Enterprise hardening: Pub/Sub notification enables zero-overhead result delivery.
 
         Args:
             task_id: Task identifier
@@ -331,8 +382,110 @@ class TaskQueue:
         result_key = f"{RESULT_PREFIX}{task_id}"
         await self._redis.setex(result_key, ttl, json.dumps(result))
 
+        # Pub/Sub notification (zero overhead for waiting clients)
+        await self.publish_result(task_id, result)
+
         logger.info(f"Task result stored: {task_id} (status: {result.get('status')})")
         return True
+
+    async def publish_result(self, task_id: str, result: dict[str, Any]) -> None:
+        """
+        Publish result notification via Pub/Sub.
+
+        Args:
+            task_id: Task identifier
+            result: Task result data
+        """
+        await self.connect()
+
+        if not self._connected:
+            return
+
+        # Publish task completion to channel
+        message = {"task_id": task_id, "status": result.get("status")}
+        await self._redis.publish(RESULT_CHANNEL, json.dumps(message))
+
+    async def get_result_pubsub(self, task_id: str, timeout: int = 30) -> dict[str, Any]:
+        """
+        Wait for task result via Pub/Sub (zero overhead).
+
+        Enterprise hardening: Replaces polling with Pub/Sub for instant notification.
+        Falls back to direct fetch if message not received (handles restarts).
+
+        Args:
+            task_id: Task identifier
+            timeout: Maximum time to wait for result (seconds)
+
+        Returns:
+            Task result or timeout error
+        """
+        await self.connect()
+
+        if not self._connected:
+            return {"status": TaskStatus.FAILED.value, "error": "Task queue not connected"}
+
+        # Subscribe to result channel
+        pubsub = self._redis.pubsub()
+        await pubsub.subscribe(RESULT_CHANNEL)
+
+        try:
+            # Check if result already exists (completed before subscription)
+            result_key = f"{RESULT_PREFIX}{task_id}"
+            existing_result = await self._redis.get(result_key)
+            if existing_result:
+                result_data = json.loads(existing_result)
+                # Update metrics
+                if result_data.get("status") == "completed":
+                    self._metrics["tasks_completed"] += 1
+                elif result_data.get("status") == "failed":
+                    self._metrics["tasks_failed"] += 1
+                return result_data
+
+            # Wait for Pub/Sub notification
+            end_time = datetime.now(UTC) + timedelta(seconds=timeout)
+
+            while datetime.now(UTC) < end_time:
+                try:
+                    # Check for message with short timeout
+                    message = await asyncio.wait_for(
+                        pubsub.get_message(ignore_subscribe_messages=True), timeout=1.0
+                    )
+
+                    if message and message["type"] == "message":
+                        data = json.loads(message["data"])
+
+                        # Check if this is our task
+                        if data.get("task_id") == task_id:
+                            # Fetch full result
+                            result_json = await self._redis.get(result_key)
+                            if result_json:
+                                result_data = json.loads(result_json)
+
+                                # Update metrics
+                                if result_data.get("status") == "completed":
+                                    self._metrics["tasks_completed"] += 1
+                                elif result_data.get("status") == "failed":
+                                    self._metrics["tasks_failed"] += 1
+
+                                return result_data
+
+                except TimeoutError:
+                    # No message yet, continue waiting
+                    continue
+
+            # Timeout
+            self._metrics["tasks_timeout"] += 1
+            logger.warning(f"Task timeout: {task_id}")
+
+            return {
+                "status": TaskStatus.TIMEOUT.value,
+                "error": "Timeout waiting for result",
+                "task_id": task_id,
+            }
+
+        finally:
+            await pubsub.unsubscribe(RESULT_CHANNEL)
+            await pubsub.close()
 
     async def get_queue_length(self, task_type: str) -> int:
         """

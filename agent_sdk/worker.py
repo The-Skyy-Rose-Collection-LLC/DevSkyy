@@ -26,17 +26,20 @@ import json
 import logging
 import os
 import signal
+import socket
 from datetime import UTC, datetime
 from typing import Any
 
 from agent_sdk.task_queue import (
     QUEUE_PREFIX,
-    RESULT_PREFIX,
+    TaskQueue,
     TaskStatus,
 )
-
-# Import working agents
 from agents.tripo_agent import TripoAssetAgent
+
+# Dead Letter Queue for failed tasks
+DLQ_PREFIX = "devskyy:dlq:"
+LOCK_PREFIX = "devskyy:locks:"
 
 # FASHN agent commented out - not yet integrated
 # from agents.fashn_agent import FashnTryOnAgent
@@ -56,7 +59,15 @@ class BackgroundWorker:
     - agent_sdk/integration_examples/approach_b_message_queue.py:323-482
     """
 
-    __slots__ = ("redis_url", "_redis", "running", "tripo_agent", "fashn_agent", "_shutdown_event")
+    __slots__ = (
+        "redis_url",
+        "_redis",
+        "_task_queue",
+        "running",
+        "tripo_agent",
+        "fashn_agent",
+        "_shutdown_event",
+    )
 
     def __init__(self, redis_url: str | None = None) -> None:
         """
@@ -67,6 +78,7 @@ class BackgroundWorker:
         """
         self.redis_url = redis_url or os.getenv("REDIS_URL", "redis://localhost:6379/0")
         self._redis: Any = None
+        self._task_queue: TaskQueue | None = None
         self.running = False
         self._shutdown_event = asyncio.Event()
 
@@ -75,7 +87,7 @@ class BackgroundWorker:
         self.fashn_agent: Any = None  # Not yet implemented
 
     async def connect(self) -> None:
-        """Connect to Redis."""
+        """Connect to Redis and TaskQueue."""
         if not self._redis:
             import redis.asyncio as redis
 
@@ -89,6 +101,12 @@ class BackgroundWorker:
 
             await self._redis.ping()
             logger.info("Worker connected to Redis")
+
+        # Initialize TaskQueue for Pub/Sub notifications
+        if not self._task_queue:
+            self._task_queue = TaskQueue(redis_url=self.redis_url)
+            await self._task_queue.connect()
+            logger.info("Worker connected to TaskQueue (Pub/Sub enabled)")
 
     async def process_generate_3d(self, task_data: dict[str, Any]) -> dict[str, Any]:
         """
@@ -222,16 +240,15 @@ class BackgroundWorker:
             else:
                 result = {"status": "failed", "error": f"Unknown task type: {task_type}"}
 
-            # Store result with TTL
-            result_key = f"{RESULT_PREFIX}{task_id}"
-            await self._redis.setex(result_key, 300, json.dumps(result))  # 5 minute TTL
+            # Enterprise hardening: Store result with Pub/Sub notification
+            await self._task_queue.store_result(task_id, result, ttl=300)
 
             logger.info(f"✅ Task {task_id} completed " f"(status: {result.get('status')})")
 
         except Exception as e:
             logger.error(f"❌ Task {task_id} failed: {e}", exc_info=True)
 
-            # Store error result
+            # Store error result with Pub/Sub notification
             error_result = {
                 "status": "failed",
                 "error": str(e),
@@ -239,8 +256,21 @@ class BackgroundWorker:
                 "failed_at": datetime.now(UTC).isoformat(),
             }
 
-            result_key = f"{RESULT_PREFIX}{task_id}"
-            await self._redis.setex(result_key, 300, json.dumps(error_result))
+            await self._task_queue.store_result(task_id, error_result, ttl=300)
+
+            # Enterprise hardening: Dead Letter Queue for failed tasks
+            # Preserves failed tasks for debugging (7 day TTL)
+            dlq_key = f"{DLQ_PREFIX}{task_id}"
+            dlq_entry = {
+                "task_id": task_id,
+                "task_data": task_data,
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "failed_at": datetime.now(UTC).isoformat(),
+                "worker_host": socket.gethostname(),
+            }
+            await self._redis.setex(dlq_key, 604800, json.dumps(dlq_entry))  # 7 days
+            logger.info(f"📝 Task moved to DLQ: {task_id}")
 
     async def run(self) -> None:
         """
@@ -272,23 +302,44 @@ class BackgroundWorker:
 
                         logger.info(f"🔄 Dequeued task: {task_id} " f"(priority: {priority})")
 
-                        # Fetch task data
-                        task_key = f"{QUEUE_PREFIX}{task_id}"
-                        task_json = await self._redis.get(task_key)
+                        # Enterprise hardening: Atomic task locking prevents duplicate processing
+                        task_lock_key = f"{LOCK_PREFIX}{task_id}"
+                        hostname = socket.gethostname()
 
-                        if task_json:
-                            task_data = json.loads(task_json)
+                        # Attempt atomic lock with TTL (NX = set only if not exists)
+                        acquired = await self._redis.set(
+                            task_lock_key, hostname, ex=300, nx=True  # 5 min lock TTL
+                        )
 
-                            # Update status to processing
-                            task_data["status"] = TaskStatus.PROCESSING.value
-                            task_data["started_at"] = datetime.now(UTC).isoformat()
+                        if not acquired:
+                            logger.warning(
+                                f"⚠️  Task {task_id} already locked by another worker - skipping"
+                            )
+                            continue
 
-                            await self._redis.setex(task_key, 300, json.dumps(task_data))
+                        try:
+                            # Fetch task data
+                            task_key = f"{QUEUE_PREFIX}{task_id}"
+                            task_json = await self._redis.get(task_key)
 
-                            # Process task
-                            await self.process_task(task_id, task_data)
-                        else:
-                            logger.warning(f"⚠️  Task data not found: {task_id}")
+                            if task_json:
+                                task_data = json.loads(task_json)
+
+                                # Update status to processing
+                                task_data["status"] = TaskStatus.PROCESSING.value
+                                task_data["started_at"] = datetime.now(UTC).isoformat()
+                                task_data["worker_host"] = hostname
+
+                                await self._redis.setex(task_key, 300, json.dumps(task_data))
+
+                                # Process task
+                                await self.process_task(task_id, task_data)
+                            else:
+                                logger.warning(f"⚠️  Task data not found: {task_id}")
+
+                        finally:
+                            # Always release lock
+                            await self._redis.delete(task_lock_key)
 
                 # Sleep briefly if no tasks
                 await asyncio.sleep(1)

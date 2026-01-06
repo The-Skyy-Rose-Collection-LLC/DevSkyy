@@ -10,6 +10,7 @@ Enhanced security features for DevSkyy Enterprise Platform:
 - Device fingerprinting
 - Suspicious activity detection
 """
+
 from __future__ import annotations
 
 import hashlib

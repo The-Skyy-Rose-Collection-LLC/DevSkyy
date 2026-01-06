@@ -413,9 +413,7 @@ class SecurityValidator:
         timestamp = str(int(time.time()))
         message = f"{session_id}:{timestamp}"
         signature = hmac.new(
-            self._csrf_secret.encode(),
-            message.encode(),
-            hashlib.sha256
+            self._csrf_secret.encode(), message.encode(), hashlib.sha256
         ).hexdigest()
         return f"{timestamp}.{signature}"
 
@@ -447,9 +445,7 @@ class SecurityValidator:
             # Verify signature using constant-time comparison
             message = f"{session_id}:{timestamp_str}"
             expected_signature = hmac.new(
-                self._csrf_secret.encode(),
-                message.encode(),
-                hashlib.sha256
+                self._csrf_secret.encode(), message.encode(), hashlib.sha256
             ).hexdigest()
 
             return hmac.compare_digest(expected_signature, provided_signature)

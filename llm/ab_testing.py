@@ -14,6 +14,7 @@ Features:
 
 Author: DevSkyy Platform Team
 Version: 1.0.0."""
+
 from __future__ import annotations
 
 import logging
@@ -35,6 +36,7 @@ logger = logging.getLogger(__name__)
 
 class ExperimentStatus(str, Enum):
     """Status of an A/B test experiment."""
+
     DRAFT = "draft"
     RUNNING = "running"
     PAUSED = "paused"
@@ -44,6 +46,7 @@ class ExperimentStatus(str, Enum):
 
 class MetricType(str, Enum):
     """Type of metric being tracked."""
+
     CONVERSION = "conversion"  # Binary outcome (0 or 1)
     REVENUE = "revenue"  # Continuous monetary value
     COUNT = "count"  # Count-based metric
@@ -53,6 +56,7 @@ class MetricType(str, Enum):
 
 class WinnerStatus(str, Enum):
     """Winner determination status."""
+
     NO_DATA = "no_data"
     INSUFFICIENT_DATA = "insufficient_data"
     NO_WINNER = "no_winner"
@@ -69,6 +73,7 @@ class WinnerStatus(str, Enum):
 @dataclass
 class Variant:
     """A variant in an A/B test."""
+
     id: str
     name: str
     description: str = ""
@@ -80,6 +85,7 @@ class Variant:
 @dataclass
 class MetricResult:
     """Results for a metric in a variant."""
+
     variant_id: str
     sample_size: int = 0
     conversions: int = 0  # For conversion metrics
@@ -121,6 +127,7 @@ class MetricResult:
 @dataclass
 class StatisticalResult:
     """Statistical analysis result."""
+
     winner: WinnerStatus
     p_value: float
     confidence_level: float
@@ -140,6 +147,7 @@ class StatisticalResult:
 @dataclass
 class Experiment:
     """A/B test experiment definition."""
+
     id: str
     name: str
     description: str
@@ -176,6 +184,7 @@ class Experiment:
 @dataclass
 class ExperimentResult:
     """Complete experiment result with analysis."""
+
     experiment: Experiment
     metric_results: dict[str, dict[str, MetricResult]]  # metric -> variant_id -> result
     statistical_results: dict[str, StatisticalResult]  # metric -> stats
@@ -192,6 +201,7 @@ class ExperimentResult:
 
 class StatisticalCalculator:
     """Statistical calculations for A/B testing."""
+
     @staticmethod
     def calculate_z_score(p1: float, p2: float, n1: int, n2: int) -> float:
         """Calculate z-score for two proportions."""
@@ -759,6 +769,7 @@ Statistical Analysis:
 - Significant: {'Yes' if stats.is_significant else 'No'}
 
 Winner: {stats.winner.value}."""
+
     # =========================================================================
     # Utilities
     # =========================================================================

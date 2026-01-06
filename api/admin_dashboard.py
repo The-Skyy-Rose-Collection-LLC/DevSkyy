@@ -228,9 +228,7 @@ class AdminAssetStore:
         return DashboardMetrics(
             total_assets=len(assets),
             assets_pending=len([a for a in assets if a.status == AssetStatus.PENDING]),
-            assets_processing=len(
-                [a for a in assets if a.status == AssetStatus.PROCESSING]
-            ),
+            assets_processing=len([a for a in assets if a.status == AssetStatus.PROCESSING]),
             assets_validated=len(validated),
             assets_failed=len([a for a in assets if a.status == AssetStatus.FAILED]),
             fidelity_pass_rate=len(passed) / len(validated) if validated else 0.0,
@@ -381,14 +379,12 @@ class AdminDataStore:
         orders_today = [
             o
             for o in self._orders
-            if datetime.fromisoformat(o.get("created_at", "")).replace(tzinfo=UTC)
-            >= today_start
+            if datetime.fromisoformat(o.get("created_at", "")).replace(tzinfo=UTC) >= today_start
         ]
         orders_month = [
             o
             for o in self._orders
-            if datetime.fromisoformat(o.get("created_at", "")).replace(tzinfo=UTC)
-            >= month_start
+            if datetime.fromisoformat(o.get("created_at", "")).replace(tzinfo=UTC) >= month_start
         ]
 
         return {

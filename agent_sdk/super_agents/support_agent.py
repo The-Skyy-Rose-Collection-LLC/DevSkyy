@@ -4,7 +4,6 @@ Support SuperAgent
 Handles customer service, tickets, FAQs, and escalation.
 """
 
-
 from claude_agent_sdk import AgentDefinition, ClaudeAgentOptions
 
 

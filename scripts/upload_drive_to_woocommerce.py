@@ -118,10 +118,7 @@ def extract_product_info(filename: str) -> dict[str, str]:
     sku = sku_match.group(1) if sku_match else ""
 
     # Extract product name (everything after SKU or full name)
-    if sku:
-        product_name = name.replace(sku, "").strip("_- ")
-    else:
-        product_name = name
+    product_name = name.replace(sku, "").strip("_- ") if sku else name
 
     # Clean up product name
     product_name = re.sub(r"[_-]+", " ", product_name)

@@ -4,7 +4,6 @@ Commerce SuperAgent
 Handles e-commerce operations: products, orders, inventory, pricing.
 """
 
-
 from claude_agent_sdk import AgentDefinition, ClaudeAgentOptions
 
 

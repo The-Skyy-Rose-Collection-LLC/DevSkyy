@@ -140,8 +140,7 @@ class WooCommerceConfig:
         default_factory=lambda: os.getenv("WORDPRESS_URL", os.getenv("WP_SITE_URL", ""))
     )
     consumer_key: str = field(
-        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "")
-        or os.getenv("WC_CONSUMER_KEY", "")
+        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "") or os.getenv("WC_CONSUMER_KEY", "")
     )
     consumer_secret: str = field(
         default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", "")

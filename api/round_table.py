@@ -173,9 +173,9 @@ async def list_competitions(limit: int = 20, offset: int = 0) -> list[HistoryEnt
         entries.append(
             HistoryEntry(
                 id=result.id,
-                prompt_preview=result.prompt[:100] + "..."
-                if len(result.prompt) > 100
-                else result.prompt,
+                prompt_preview=(
+                    result.prompt[:100] + "..." if len(result.prompt) > 100 else result.prompt
+                ),
                 winner_provider=result.winner.provider.value,
                 winner_score=result.winner.total_score,
                 total_cost_usd=result.total_cost_usd,
