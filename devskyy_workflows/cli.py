@@ -18,13 +18,13 @@ import logging
 import sys
 from typing import Any
 
-from workflows.ci_workflow import CIWorkflow
-from workflows.deployment_workflow import DeploymentWorkflow
-from workflows.docker_workflow import DockerWorkflow
-from workflows.mcp_workflow import MCPWorkflow
-from workflows.ml_workflow import MLWorkflow
-from workflows.quality_workflow import QualityWorkflow
-from workflows.workflow_runner import WorkflowRunner
+from devskyy_workflows.ci_workflow import CIWorkflow
+from devskyy_workflows.deployment_workflow import DeploymentWorkflow
+from devskyy_workflows.docker_workflow import DockerWorkflow
+from devskyy_workflows.mcp_workflow import MCPWorkflow
+from devskyy_workflows.ml_workflow import MLWorkflow
+from devskyy_workflows.quality_workflow import QualityWorkflow
+from devskyy_workflows.workflow_runner import WorkflowRunner
 
 # Configure logging
 logging.basicConfig(

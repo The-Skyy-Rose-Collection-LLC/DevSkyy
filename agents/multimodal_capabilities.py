@@ -31,27 +31,13 @@ from enum import Enum
 from pathlib import Path
 from typing import Any
 
+from llama_index.core.base.llms.types import ChatMessage, MessageRole
+from llama_index.core.multi_modal_llms import MultiModalLLM
+from llama_index.llms.openai import OpenAI
+from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
+from llama_index.multi_modal_llms.huggingface import HuggingFaceMultiModal
+
 logger = logging.getLogger(__name__)
-
-# Optional llama_index imports (disabled due to namespace collision with workflows/)
-try:
-    from llama_index.core.base.llms.types import ChatMessage, MessageRole
-    from llama_index.core.multi_modal_llms import MultiModalLLM
-    from llama_index.llms.openai import OpenAI
-    from llama_index.multi_modal_llms.anthropic import AnthropicMultiModal
-    from llama_index.multi_modal_llms.huggingface import HuggingFaceMultiModal
-
-    LLAMA_INDEX_AVAILABLE = True
-except ImportError as e:
-    logger.warning(f"llama_index not available, multimodal features disabled: {e}")
-    LLAMA_INDEX_AVAILABLE = False
-    # Provide stub types
-    ChatMessage = None
-    MessageRole = None
-    MultiModalLLM = None
-    OpenAI = None
-    AnthropicMultiModal = None
-    HuggingFaceMultiModal = None
 
 
 class MultimodalProvider(str, Enum):
