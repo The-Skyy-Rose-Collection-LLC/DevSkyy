@@ -22,9 +22,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./*"],
-      "@collections/*": ["../src/collections/*"],
-      "@src/*": ["../src/*"]
+      "@/*": ["./*"]
     },
     "target": "ES2017"
   },
@@ -37,6 +35,7 @@
   "exclude": [
     "node_modules",
     "e2e",
-    "playwright.config.ts"
+    "playwright.config.ts",
+    "../src/collections/**/*"
   ]
 }

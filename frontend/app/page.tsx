@@ -29,7 +29,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { AgentCard, MetricsCard, TaskExecutor, RoundTableViewer, TaskHistoryPanel } from '@/components';
+import { AgentCard, MetricsCard, TaskExecutor, RoundTableViewer, TaskHistoryPanel, ConnectionStatus } from '@/components';
 import { Card, CardHeader, CardTitle, CardContent, Badge, Button, Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui';
 import {
   useRealtimeAgents,
@@ -88,12 +88,7 @@ export default function DashboardPage() {
             Monitor your 6 SuperAgents and LLM Round Table
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          <Badge variant="success" className="animate-pulse-glow">
-            <Activity className="mr-1 h-3 w-3" />
-            System Online
-          </Badge>
-        </div>
+        <ConnectionStatus compact showDetails={false} />
       </div>
 
       {/* Metrics Cards */}

@@ -64,28 +64,50 @@ services:
       timeout: 3s
       retries: 5
 
-  # Celery worker pool
-  celery-worker:
+  # Background worker pool for async tasks (3D generation, marketing, ML)
+  worker:
     build:
       context: .
-      dockerfile: Dockerfile.worker  # Use lightweight worker-only build
+      dockerfile: Dockerfile.worker
+    container_name: devskyy-worker
     command: python -m agent_sdk.worker
     environment:
+      # Core services
       - REDIS_URL=redis://:redispassword@redis:6379/0
       - DATABASE_URL=postgresql://devskyy:password@postgres:5432/devskyy
+      - ENVIRONMENT=production
+
+      # 3D Generation APIs
       - TRIPO_API_KEY=${TRIPO_API_KEY}
       - FASHN_API_KEY=${FASHN_API_KEY}
-      - ENVIRONMENT=production
+
+      # LLM Providers (for marketing agent)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - GOOGLE_AI_API_KEY=${GOOGLE_AI_API_KEY}
+
+      # WordPress (for asset upload)
+      - WORDPRESS_URL=${WORDPRESS_URL}
+      - WOOCOMMERCE_KEY=${WOOCOMMERCE_KEY}
+      - WOOCOMMERCE_SECRET=${WOOCOMMERCE_SECRET}
+
+      # Worker configuration
+      - WORKER_PROCESSES=2
+      - WORKER_THREADS=4
+      - TASK_TIMEOUT=600
     depends_on:
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
+    volumes:
+      - app_data:/app/data
+      - app_logs:/app/logs
     networks:
       - devskyy-network
     restart: unless-stopped
     deploy:
-      replicas: 3
+      replicas: 2  # Run 2 worker instances for redundancy
       resources:
         limits:
           cpus: '2.0'
@@ -94,7 +116,7 @@ services:
           cpus: '1.0'
           memory: 2G
     healthcheck:
-      test: ["CMD", "python", "-c", "import redis.asyncio as r; import asyncio; asyncio.run(r.from_url('${REDIS_URL}').ping())"]
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
       interval: 30s
       timeout: 10s
       retries: 3

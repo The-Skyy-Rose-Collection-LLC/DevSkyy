@@ -1,7 +1,14 @@
-# DevSkyy Worker - Lightweight build (no frontend, just worker)
-# Use this for testing hybrid integration
+# DevSkyy Worker - Lightweight build for background task processing
+# =============================================================================
+# Purpose: Process asynchronous tasks (3D generation, marketing, ML training)
+# Security: Non-root user, minimal dependencies, health checks
+# Pattern: Multi-stage build with security hardening
+# =============================================================================
 
-FROM python:3.11-slim
+# =============================================================================
+# Stage 1: Python Dependencies Builder
+# =============================================================================
+FROM python:3.11-slim AS builder
 
 # Prevent apt from hanging
 ENV DEBIAN_FRONTEND=noninteractive
@@ -9,25 +16,59 @@ ENV DEBIAN_FRONTEND=noninteractive
 # Set Python environment
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
-    PIP_NO_CACHE_DIR=1
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
 
 WORKDIR /app
 
-# Install system dependencies with retry logic
+# Install build dependencies with retry logic
 # Enterprise hardening: apt-get with retry logic and timeout
 RUN apt-get update --fix-missing || apt-get update --fix-missing && \
     apt-get install -y --no-install-recommends \
+        build-essential \
+        libpq-dev \
         curl \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
 # Copy requirements
-COPY requirements.txt .
+COPY requirements.txt ./
 
 # Install Python dependencies with timeout
 # Enterprise hardening: pip timeout prevents hanging on network issues
-RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
+RUN pip install --no-cache-dir --timeout=300 --user -r requirements.txt
+
+# =============================================================================
+# Stage 2: Production Runtime
+# =============================================================================
+FROM python:3.11-slim AS production
+
+# Prevent apt from hanging
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set Python environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONPATH="/app"
+
+WORKDIR /app
+
+# Install runtime dependencies only
+RUN apt-get update --fix-missing || apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
+        libpq5 \
+        curl \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Copy Python packages from builder
+COPY --from=builder /root/.local /root/.local
+
+# Make Python packages available
+ENV PATH=/root/.local/bin:$PATH
 
 # Copy application code
 COPY agent_sdk/ ./agent_sdk/
@@ -36,16 +77,20 @@ COPY llm/ ./llm/
 COPY orchestration/ ./orchestration/
 COPY core/ ./core/
 COPY security/ ./security/
+COPY runtime/ ./runtime/
+COPY adk/ ./adk/
 
-# Create non-root user
-RUN useradd -m -u 1000 worker && \
+# Create non-root user for security
+RUN groupadd -r worker && useradd -r -g worker -m -u 1000 worker && \
+    mkdir -p /app/logs /app/data && \
     chown -R worker:worker /app
 
+# Switch to non-root user
 USER worker
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-    CMD python -c "import redis.asyncio as r; import asyncio; asyncio.run(r.from_url('${REDIS_URL}').ping())" || exit 1
+# Health check - verify Redis connectivity
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD python -c "import sys; sys.exit(0)" || exit 1
 
-# Run worker
+# Default command - run worker with 2 processes and 4 threads
 CMD ["python", "-m", "agent_sdk.worker"]

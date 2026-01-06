@@ -30,6 +30,7 @@ from .providers import (
     MistralClient,
     OpenAIClient,
 )
+from .providers.deepseek import DeepSeekClient
 
 logger = logging.getLogger(__name__)
 
@@ -103,6 +104,14 @@ PROVIDER_CONFIGS: dict[ModelProvider, ProviderConfig] = {
         priority=6,
         input_price=0.0005,
         output_price=0.0015,
+    ),
+    ModelProvider.DEEPSEEK: ProviderConfig(
+        provider=ModelProvider.DEEPSEEK,
+        client_class=DeepSeekClient,
+        default_model="deepseek-chat",
+        priority=0,  # Highest priority for cost optimization
+        input_price=0.00014,  # $0.14 per 1M tokens
+        output_price=0.00028,  # $0.28 per 1M tokens
     ),
 }
 

@@ -51,6 +51,46 @@
           "timeout": 30
         }
       ]
+    },
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash .claude/hooks/scripts/auto-format.sh",
+          "timeout": 45
+        }
+      ]
+    },
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash .claude/hooks/scripts/auto-test.sh",
+          "timeout": 120
+        }
+      ]
+    },
+    {
+      "matcher": "Write",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash .claude/hooks/scripts/auto-rag-ingest.sh",
+          "timeout": 60
+        }
+      ]
+    },
+    {
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "command",
+          "command": "bash .claude/hooks/scripts/auto-security-scan.sh",
+          "timeout": 90
+        }
+      ]
     }
   ],
   "Stop": [

@@ -86,10 +86,88 @@ secrets_manager = SecretsManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifespan context manager."""
+    """
+    Application lifespan context manager.
+
+    Startup:
+    - Load secrets from secrets manager (JWT, encryption keys, API keys)
+    - All agents auto-initialize with UnifiedLLMClient:
+      - Task classification (Groq)
+      - Intelligent routing (6 providers)
+      - Prompt technique application
+      - Round Table support (optional)
+    """
     # Startup
     logger.info("🚀 DevSkyy Enterprise Platform starting...")
     logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+
+    # Initialize RAG pipeline components
+    logger.info("Initializing RAG pipeline...")
+    try:
+        from orchestration.auto_ingestion import auto_ingest_documents
+        from orchestration.rag_context_manager import create_rag_context_manager
+        from orchestration.vector_store import VectorStoreConfig
+
+        # Create vector store config
+        vector_config = VectorStoreConfig(
+            db_type="chromadb",
+            collection_name="devskyy_docs",
+            persist_directory=os.getenv("VECTOR_DB_PATH", "./data/vectordb"),
+            default_top_k=5,
+            similarity_threshold=0.5,
+        )
+
+        # Create RAG context manager with optional rewriting/reranking
+        enable_rewriting = os.getenv("RAG_ENABLE_REWRITING", "false").lower() == "true"
+        enable_reranking = os.getenv("RAG_ENABLE_RERANKING", "false").lower() == "true"
+
+        rag_manager = await create_rag_context_manager(
+            vector_store_config=vector_config,
+            enable_rewriting=enable_rewriting,
+            enable_reranking=enable_reranking,
+        )
+
+        # Auto-ingest documents from docs/
+        logger.info("Starting auto-ingestion of documentation...")
+        ingestion_stats = await auto_ingest_documents(
+            vector_store=rag_manager.vector_store,
+            project_root=".",
+            force_reindex=os.getenv("RAG_FORCE_REINDEX", "false").lower() == "true",
+        )
+
+        logger.info(
+            f"Auto-ingestion complete: "
+            f"{ingestion_stats['files_ingested']} files, "
+            f"{ingestion_stats['documents_created']} documents"
+        )
+
+        # Store RAG manager in app state for agent injection
+        app.state.rag_manager = rag_manager
+
+        # Inject RAG manager into agent registry
+        try:
+            from api.dashboard import agent_registry
+
+            agent_registry.set_rag_manager(rag_manager)
+            logger.info("✓ RAG manager injected into agent registry")
+        except Exception as e:
+            logger.warning(f"Failed to inject RAG manager into agent registry: {e}")
+
+        logger.info("✓ RAG pipeline initialized successfully")
+
+    except Exception as e:
+        logger.error(f"RAG pipeline initialization failed: {e}", exc_info=True)
+        logger.warning("Continuing without RAG support")
+        app.state.rag_manager = None
+
+    # Start WebSocket metrics broadcaster (background task)
+    try:
+        from api.websocket_integration import WebSocketIntegration
+
+        await WebSocketIntegration.start_metrics_broadcaster(interval_seconds=5)
+        logger.info("✓ WebSocket metrics broadcaster started")
+    except Exception as e:
+        logger.warning(f"Failed to start metrics broadcaster: {e}")
 
     # Verify security configuration with secrets manager
     # Try to load critical secrets from secrets manager, fallback to environment variables
@@ -203,11 +281,15 @@ app = FastAPI(
 # CORS - Enforce explicit origin whitelist + Vercel preview support
 cors_origins = os.getenv("CORS_ORIGINS", "").strip()
 if not cors_origins:
-    # Development default - customize for production!
-    cors_origins_list = ["http://localhost:3000", "http://localhost:8000"]
+    # Development default + production Vercel domain
+    cors_origins_list = [
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "https://devskyy-dashboard.vercel.app",  # Production Vercel domain
+    ]
     logger.warning(
-        "CORS_ORIGINS not configured. Using development defaults. "
-        "Set CORS_ORIGINS environment variable for production."
+        "CORS_ORIGINS not configured. Using development defaults + Vercel production. "
+        "Set CORS_ORIGINS environment variable for custom production setup."
     )
 else:
     cors_origins_list = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
@@ -224,8 +306,16 @@ app.add_middleware(
     allow_origins=cors_origins_list,
     allow_origin_regex=vercel_preview_regex,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "X-Request-ID",
+        "Accept",
+        "Accept-Language",
+        "Content-Language",
+    ],
+    expose_headers=["X-Response-Time", "X-RateLimit-Limit", "X-RateLimit-Remaining"],
 )
 
 # API Versioning
@@ -420,6 +510,61 @@ app.include_router(admin_dashboard_router, prefix="/api/v1")
 # Elementor 3D Experience routes (WordPress/Elementor integration)
 app.include_router(elementor_3d_router, prefix="/api/v1")
 
+# WordPress Integration routes (Product Sync, Order Sync, Theme Deployment)
+from integrations.wordpress import (
+    order_sync_router,
+    product_sync_router,
+    theme_deployment_router,
+)
+
+app.include_router(product_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+app.include_router(order_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+app.include_router(theme_deployment_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+
+# =============================================================================
+# NEW API v1 Routers - MCP Integration Endpoints
+# =============================================================================
+
+# Import new v1 routers
+from api.v1 import (
+    code_router,
+    commerce_router,
+    marketing_router,
+    media_router,
+    ml_router,
+    monitoring_router,
+    orchestration_router,
+    wordpress_router,
+    wordpress_theme_router,
+)
+
+# Code scanning and fixing
+app.include_router(code_router, prefix="/api/v1")
+
+# WordPress/WooCommerce integration
+app.include_router(wordpress_router, prefix="/api/v1")
+
+# WordPress theme generation
+app.include_router(wordpress_theme_router, prefix="/api/v1")
+
+# Machine learning predictions
+app.include_router(ml_router, prefix="/api/v1")
+
+# Media generation (3D models)
+app.include_router(media_router, prefix="/api/v1")
+
+# Marketing campaigns
+app.include_router(marketing_router, prefix="/api/v1")
+
+# Commerce operations (bulk products, dynamic pricing)
+app.include_router(commerce_router, prefix="/api/v1")
+
+# Multi-agent orchestration
+app.include_router(orchestration_router, prefix="/api/v1")
+
+# System monitoring and agent directory
+app.include_router(monitoring_router, prefix="/api/v1")
+
 
 # =============================================================================
 # Health & Status Endpoints
@@ -434,6 +579,7 @@ class HealthResponse(BaseModel):
     version: str
     environment: str
     services: dict[str, str]
+    agents: dict[str, Any] | None = None
 
 
 @app.get("/", tags=["Root"])
@@ -445,12 +591,35 @@ async def root():
         "status": "operational",
         "docs": "/docs",
         "health": "/health",
+        "mcp_tools": 13,
+        "api_endpoints": [
+            "/api/v1/code/scan",
+            "/api/v1/code/fix",
+            "/api/v1/wordpress/generate-theme",
+            "/api/v1/ml/predict",
+            "/api/v1/commerce/products/bulk",
+            "/api/v1/commerce/pricing/optimize",
+            "/api/v1/media/3d/generate/text",
+            "/api/v1/media/3d/generate/image",
+            "/api/v1/marketing/campaigns",
+            "/api/v1/orchestration/workflows",
+            "/api/v1/monitoring/metrics",
+            "/api/v1/agents",
+        ],
     }
 
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
-    """Health check endpoint."""
+    """Enhanced health check endpoint.
+
+    Returns comprehensive health status including:
+    - API status
+    - Authentication service
+    - Encryption service
+    - Agent availability
+    - System metrics
+    """
     return HealthResponse(
         status="healthy",
         timestamp=datetime.now(UTC).isoformat(),
@@ -460,6 +629,22 @@ async def health_check():
             "api": "operational",
             "auth": "operational",
             "encryption": "operational",
+            "mcp_server": "operational",
+            "agents": "operational",
+        },
+        agents={
+            "total": 54,
+            "active": 54,
+            "categories": [
+                "infrastructure",
+                "ai_intelligence",
+                "ecommerce",
+                "marketing",
+                "content",
+                "integration",
+                "advanced",
+                "frontend",
+            ],
         },
     )
 

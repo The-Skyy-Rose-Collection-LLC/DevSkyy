@@ -2298,6 +2298,11 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         self._router: Any = None  # Type: LLMRouter | None
         self._router_available = LLM_ROUTER_AVAILABLE
 
+        # Enterprise Intelligence Modules (NEW)
+        self.enterprise_index: Any = None  # Type: EnterpriseIndex | None
+        self.semantic_analyzer: Any = None  # Type: SemanticCodeAnalyzer | None
+        self.verification_engine: Any = None  # Type: LLMVerificationEngine | None
+
         # State
         self._initialized = False
         self._execution_count = 0
@@ -2336,6 +2341,9 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
             except Exception as e:
                 logger.warning(f"Failed to initialize LLM Router: {e}")
                 self._router = None
+
+        # Initialize Enterprise Intelligence Modules (NEW)
+        await self._init_enterprise_intelligence()
 
         # Initialize backend
         try:
@@ -3301,6 +3309,176 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
             "task_category": task_category.value if task_category else None,
             "reasoning": f"Based on {agent_type} agent preferences and task requirements",
         }
+
+    async def _init_enterprise_intelligence(self) -> None:
+        """
+        Initialize Enterprise Intelligence Modules.
+
+        Sets up:
+        1. EnterpriseIndex - Multi-provider code search
+        2. SemanticCodeAnalyzer - Pattern detection
+        3. LLMVerificationEngine - DeepSeek + Claude verification
+        """
+        try:
+            # Import enterprise modules
+            from orchestration.enterprise_index import create_enterprise_index
+            from orchestration.semantic_analyzer import SemanticCodeAnalyzer
+            from llm.verification import LLMVerificationEngine, VerificationConfig
+            from llm.providers.deepseek import DeepSeekClient
+            from llm.providers.anthropic import AnthropicClient
+
+            # Initialize Enterprise Index
+            self.enterprise_index = create_enterprise_index()
+            await self.enterprise_index.initialize()
+            logger.info("EnterpriseIndex initialized with all configured providers")
+
+            # Initialize Semantic Analyzer
+            self.semantic_analyzer = SemanticCodeAnalyzer()
+            logger.info("SemanticCodeAnalyzer initialized")
+
+            # Initialize Verification Engine (DeepSeek + Claude)
+            generator_client = DeepSeekClient()
+            verifier_client = AnthropicClient()
+            verification_config = VerificationConfig(
+                generator_provider="deepseek",
+                generator_model="deepseek-chat",
+                verifier_provider="anthropic",
+                verifier_model="claude-3-5-sonnet-20241022",
+            )
+            self.verification_engine = LLMVerificationEngine(
+                generator_client=generator_client,
+                verifier_client=verifier_client,
+                config=verification_config,
+            )
+            logger.info("LLMVerificationEngine initialized (DeepSeek + Claude)")
+
+        except ImportError as e:
+            logger.warning(f"Enterprise intelligence modules not available: {e}")
+            self.enterprise_index = None
+            self.semantic_analyzer = None
+            self.verification_engine = None
+        except Exception as e:
+            logger.error(f"Failed to initialize enterprise intelligence: {e}")
+            self.enterprise_index = None
+            self.semantic_analyzer = None
+            self.verification_engine = None
+
+    async def gather_enterprise_context(
+        self,
+        task_description: str,
+        language: str = "python",
+    ) -> dict[str, Any]:
+        """
+        Gather enterprise context BEFORE code generation (Context-First Pattern).
+
+        This is the pre-flight phase that searches:
+        1. Enterprise code indexes (GitHub, GitLab, Sourcegraph)
+        2. Semantic patterns in existing codebase
+        3. Similar implementations for reference
+
+        Args:
+            task_description: What code needs to be generated
+            language: Programming language filter
+
+        Returns:
+            Context dict with:
+            - similar_code: List of similar implementations
+            - patterns: Detected patterns from semantic analysis
+            - recommendations: Best practices from existing code
+            - metadata: Search metadata
+        """
+        context = {
+            "similar_code": [],
+            "patterns": [],
+            "recommendations": [],
+            "metadata": {},
+        }
+
+        if not self.enterprise_index or not self.semantic_analyzer:
+            logger.warning("Enterprise intelligence not initialized, skipping context gathering")
+            return context
+
+        try:
+            # Import search types
+            from orchestration.enterprise_index import SearchLanguage
+
+            # Map string to enum
+            lang_map = {
+                "python": SearchLanguage.PYTHON,
+                "typescript": SearchLanguage.TYPESCRIPT,
+                "javascript": SearchLanguage.JAVASCRIPT,
+                "go": SearchLanguage.GO,
+                "rust": SearchLanguage.RUST,
+                "java": SearchLanguage.JAVA,
+            }
+            search_lang = lang_map.get(language.lower(), SearchLanguage.PYTHON)
+
+            # Phase 1: Search enterprise indexes
+            logger.info(f"Searching enterprise indexes for: {task_description[:50]}...")
+            search_results = await self.enterprise_index.search_code(
+                query=task_description,
+                language=search_lang,
+                max_results_per_provider=3,
+            )
+
+            context["similar_code"] = [
+                {
+                    "repository": r.repository,
+                    "file_path": r.file_path,
+                    "snippet": r.code_snippet[:200],  # Truncate for context
+                    "url": r.url,
+                    "provider": r.provider,
+                    "score": r.score,
+                }
+                for r in search_results[:5]  # Top 5 results
+            ]
+
+            # Phase 2: Semantic analysis of found code
+            if search_results:
+                logger.info(f"Analyzing {len(search_results)} code samples for patterns...")
+                patterns_found = set()
+
+                for result in search_results[:3]:  # Analyze top 3
+                    try:
+                        # Detect patterns in the code snippet
+                        if len(result.code_snippet) > 50:
+                            # For now, simple pattern extraction
+                            # TODO: Integrate with semantic_analyzer.analyze_file()
+                            if "class " in result.code_snippet:
+                                patterns_found.add("object_oriented")
+                            if "async " in result.code_snippet:
+                                patterns_found.add("async_await")
+                            if "def test" in result.code_snippet:
+                                patterns_found.add("test_driven")
+                    except Exception as e:
+                        logger.warning(f"Pattern analysis failed for {result.file_path}: {e}")
+
+                context["patterns"] = list(patterns_found)
+
+            # Phase 3: Generate recommendations
+            if context["similar_code"]:
+                context["recommendations"] = [
+                    f"Found {len(context['similar_code'])} similar implementations across enterprise codebases",
+                    f"Common patterns: {', '.join(context['patterns']) if context['patterns'] else 'none detected'}",
+                    "Consider following established patterns for consistency",
+                ]
+
+            context["metadata"] = {
+                "search_query": task_description,
+                "language": language,
+                "results_count": len(search_results),
+                "providers_used": list(set(r.provider for r in search_results)),
+            }
+
+            logger.info(
+                f"Enterprise context gathered: {len(context['similar_code'])} examples, "
+                f"{len(context['patterns'])} patterns"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to gather enterprise context: {e}")
+
+        return context
 
 
 # =============================================================================

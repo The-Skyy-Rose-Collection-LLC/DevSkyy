@@ -198,7 +198,7 @@ export function AgentCard({ agent, onRefresh }: AgentCardProps) {
         </div>
       </CardContent>
 
-      <CardFooter className="gap-2 pt-4 border-t">
+      <CardFooter className="gap-2 pt-4 border-t flex-wrap">
         {agent.status === 'running' ? (
           <Button
             variant="outline"
@@ -244,8 +244,11 @@ export function AgentCard({ agent, onRefresh }: AgentCardProps) {
           )}
           Learn
         </Button>
-        <Button variant="ghost" size="sm" asChild>
+        <Button variant="outline" size="sm" asChild className="flex-1">
           <Link href={`/agents/${agent.type}`}>Details</Link>
+        </Button>
+        <Button variant="default" size="sm" asChild className="flex-1">
+          <Link href={`/agents/${agent.type}/chat`}>Chat</Link>
         </Button>
       </CardFooter>
     </Card>

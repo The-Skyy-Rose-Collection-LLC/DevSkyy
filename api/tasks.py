@@ -24,6 +24,7 @@ from fastapi import APIRouter, BackgroundTasks, HTTPException, Query
 from pydantic import BaseModel, Field
 
 from .dashboard import agent_registry
+from .websocket_integration import WebSocketIntegration
 
 logger = logging.getLogger(__name__)
 
@@ -153,9 +154,20 @@ async def execute_task_background(
     """Execute a task in the background."""
     start_time = time.time()
 
+    # Generate agent ID
+    agent_id = f"{agent_type}-001"
+
     try:
         # Update status to running
         await task_store.update(task_id, status="running")
+
+        # Broadcast agent execution start
+        await WebSocketIntegration.broadcast_agent_execution_start(
+            agent_id=agent_id,
+            agent_type=agent_type,
+            task_id=task_id,
+            prompt=prompt,
+        )
 
         # Initialize agent if needed
         if not agent_registry._initialized.get(agent_type):
@@ -204,6 +216,16 @@ async def execute_task_background(
             metrics=metrics,
         )
 
+        # Broadcast agent execution complete
+        await WebSocketIntegration.broadcast_agent_execution_complete(
+            agent_id=agent_id,
+            agent_type=agent_type,
+            task_id=task_id,
+            result=result,
+            duration_ms=duration_ms,
+            technique_used=technique,
+        )
+
         # Update agent stats
         agent_registry.update_stats(agent_type, success=True, latency_ms=duration_ms)
         agent_registry.set_status(agent_type, "idle")
@@ -222,6 +244,14 @@ async def execute_task_background(
                 endTime=datetime.now(UTC).isoformat(),
                 durationMs=duration_ms,
             ),
+        )
+
+        # Broadcast agent execution error
+        await WebSocketIntegration.broadcast_agent_execution_error(
+            agent_id=agent_id,
+            agent_type=agent_type,
+            task_id=task_id,
+            error=str(e),
         )
 
         agent_registry.update_stats(agent_type, success=False, latency_ms=duration_ms)

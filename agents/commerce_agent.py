@@ -42,6 +42,14 @@ from runtime.tools import (
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
+# WordPress/WooCommerce integration
+try:
+    from integrations.wordpress_client import WordPressWooCommerceClient
+    WORDPRESS_AVAILABLE = True
+except ImportError:
+    WORDPRESS_AVAILABLE = False
+    WordPressWooCommerceClient = None
+
 logger = logging.getLogger(__name__)
 
 
@@ -82,7 +90,7 @@ class CommerceAgent(EnhancedSuperAgent):
         "forecast": PromptTechnique.CHAIN_OF_THOUGHT,
     }
 
-    def __init__(self, config: AgentConfig | None = None):
+    def __init__(self, config: AgentConfig | None = None, wordpress_client: Any = None):
         if config is None:
             config = AgentConfig(
                 name="commerce_agent",
@@ -98,6 +106,10 @@ class CommerceAgent(EnhancedSuperAgent):
                 temperature=0.3,  # Lower for accuracy
             )
         super().__init__(config)
+
+        # WordPress/WooCommerce client
+        self._wordpress_client = wordpress_client
+        self._wordpress_connected = False
 
     def _build_system_prompt(self) -> str:
         """Build the commerce agent system prompt"""
@@ -635,6 +647,227 @@ Recommended Actions:
 2. Check relevant data sources
 3. Apply business rules
 4. Generate structured response"""
+
+    # =========================================================================
+    # WordPress/WooCommerce Integration
+    # =========================================================================
+
+    async def _ensure_wordpress_client(self) -> None:
+        """Ensure WordPress client is initialized and connected."""
+        if self._wordpress_client is None and WORDPRESS_AVAILABLE:
+            self._wordpress_client = WordPressWooCommerceClient()
+            await self._wordpress_client.connect()
+            self._wordpress_connected = True
+            logger.info("WordPress/WooCommerce client connected")
+
+    async def close_wordpress_client(self) -> None:
+        """Close WordPress client connection."""
+        if self._wordpress_client and self._wordpress_connected:
+            await self._wordpress_client.close()
+            self._wordpress_connected = False
+            logger.info("WordPress/WooCommerce client closed")
+
+    async def sync_product_to_woocommerce(
+        self,
+        name: str,
+        price: float,
+        description: str = "",
+        short_description: str = "",
+        sku: str | None = None,
+        stock_quantity: int | None = None,
+        status: str = "draft",
+        categories: list[str] | None = None,
+        tags: list[str] | None = None,
+        images: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """
+        Sync a product to WooCommerce.
+
+        Args:
+            name: Product name
+            price: Regular price
+            description: Full description
+            short_description: Short description
+            sku: Stock keeping unit
+            stock_quantity: Available stock
+            status: Product status (draft, publish)
+            categories: Category names
+            tags: Tag names
+            images: Image URLs
+
+        Returns:
+            Created product data with WooCommerce ID
+        """
+        await self._ensure_wordpress_client()
+
+        if not self._wordpress_connected:
+            return {"error": "WordPress client not connected"}
+
+        try:
+            from integrations.wordpress_client import WooCommerceProduct, ProductStatus
+
+            # Prepare product data
+            product = WooCommerceProduct(
+                name=name,
+                regular_price=str(price),
+                description=description,
+                short_description=short_description,
+                sku=sku,
+                stock_quantity=stock_quantity,
+                status=ProductStatus(status) if status else ProductStatus.DRAFT,
+                categories=[{"name": cat} for cat in (categories or [])],
+                tags=[{"name": tag} for tag in (tags or [])],
+                images=[{"src": img} for img in (images or [])],
+            )
+
+            # Create in WooCommerce
+            result = await self._wordpress_client.create_product(product)
+
+            logger.info(f"Product synced to WooCommerce: {result.id} - {result.name}")
+
+            return {
+                "success": True,
+                "woocommerce_id": result.id,
+                "name": result.name,
+                "sku": result.sku,
+                "permalink": result.permalink,
+                "status": result.status,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to sync product to WooCommerce: {e}")
+            return {"error": str(e)}
+
+    async def get_woocommerce_product(self, product_id: int) -> dict[str, Any]:
+        """
+        Get product from WooCommerce.
+
+        Args:
+            product_id: WooCommerce product ID
+
+        Returns:
+            Product data
+        """
+        await self._ensure_wordpress_client()
+
+        if not self._wordpress_connected:
+            return {"error": "WordPress client not connected"}
+
+        try:
+            product = await self._wordpress_client.get_product(product_id)
+            return product.model_dump()
+        except Exception as e:
+            logger.error(f"Failed to get WooCommerce product {product_id}: {e}")
+            return {"error": str(e)}
+
+    async def update_woocommerce_product(
+        self,
+        product_id: int,
+        updates: dict[str, Any],
+    ) -> dict[str, Any]:
+        """
+        Update product in WooCommerce.
+
+        Args:
+            product_id: WooCommerce product ID
+            updates: Fields to update
+
+        Returns:
+            Updated product data
+        """
+        await self._ensure_wordpress_client()
+
+        if not self._wordpress_connected:
+            return {"error": "WordPress client not connected"}
+
+        try:
+            product = await self._wordpress_client.update_product(product_id, updates)
+            logger.info(f"Product updated in WooCommerce: {product_id}")
+            return product.model_dump()
+        except Exception as e:
+            logger.error(f"Failed to update WooCommerce product {product_id}: {e}")
+            return {"error": str(e)}
+
+    async def sync_orders_from_woocommerce(
+        self,
+        status: str | None = None,
+        limit: int = 10,
+    ) -> dict[str, Any]:
+        """
+        Sync orders from WooCommerce.
+
+        Args:
+            status: Filter by order status
+            limit: Maximum orders to fetch
+
+        Returns:
+            List of orders
+        """
+        await self._ensure_wordpress_client()
+
+        if not self._wordpress_connected:
+            return {"error": "WordPress client not connected"}
+
+        try:
+            from integrations.wordpress_client import OrderStatus
+
+            order_status = OrderStatus(status) if status else None
+            orders = await self._wordpress_client.list_orders(
+                per_page=limit,
+                status=order_status,
+            )
+
+            logger.info(f"Synced {len(orders)} orders from WooCommerce")
+
+            return {
+                "success": True,
+                "count": len(orders),
+                "orders": [order.model_dump() for order in orders],
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to sync orders from WooCommerce: {e}")
+            return {"error": str(e)}
+
+    async def update_order_status_in_woocommerce(
+        self,
+        order_id: int,
+        status: str,
+    ) -> dict[str, Any]:
+        """
+        Update order status in WooCommerce.
+
+        Args:
+            order_id: WooCommerce order ID
+            status: New order status
+
+        Returns:
+            Updated order data
+        """
+        await self._ensure_wordpress_client()
+
+        if not self._wordpress_connected:
+            return {"error": "WordPress client not connected"}
+
+        try:
+            from integrations.wordpress_client import OrderStatus
+
+            order = await self._wordpress_client.update_order_status(
+                order_id,
+                OrderStatus(status),
+            )
+
+            logger.info(f"Order {order_id} status updated to {status}")
+
+            return {
+                "success": True,
+                "order_id": order.id,
+                "status": order.status,
+            }
+
+        except Exception as e:
+            logger.error(f"Failed to update order {order_id} status: {e}")
+            return {"error": str(e)}
 
     # =========================================================================
     # Commerce-Specific Methods

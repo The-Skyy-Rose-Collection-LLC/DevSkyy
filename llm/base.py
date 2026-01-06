@@ -61,6 +61,7 @@ class ModelProvider(str, Enum):
     MISTRAL = "mistral"
     COHERE = "cohere"
     GROQ = "groq"
+    DEEPSEEK = "deepseek"
 
 
 class CallerType(str, Enum):

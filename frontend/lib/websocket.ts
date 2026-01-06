@@ -88,12 +88,21 @@ export class RealtimeClient {
       return 'ws://localhost:8000';
     }
 
-    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsHost = process.env.NEXT_PUBLIC_WS_URL ||
-                   process.env.NEXT_PUBLIC_API_URL?.replace(/^https?:/, wsProtocol) ||
-                   `${wsProtocol}//${window.location.host}`;
+    // Use explicit WS URL if provided
+    if (process.env.NEXT_PUBLIC_WS_URL) {
+      return process.env.NEXT_PUBLIC_WS_URL.replace(/\/$/, '');
+    }
 
-    return wsHost.replace(/\/$/, ''); // Remove trailing slash
+    // Convert API URL to WebSocket URL
+    if (process.env.NEXT_PUBLIC_API_URL) {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+      const wsUrl = apiUrl.replace(/^https?:/, apiUrl.startsWith('https') ? 'wss:' : 'ws:');
+      return wsUrl.replace(/\/$/, '');
+    }
+
+    // Fallback to current host
+    const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    return `${wsProtocol}//${window.location.host}`.replace(/\/$/, '');
   }
 
   /**
