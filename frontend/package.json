@@ -26,9 +26,6 @@
     "@radix-ui/react-slot": "^1.1.0",
     "@radix-ui/react-tabs": "^1.1.0",
     "@radix-ui/react-toast": "^1.2.1",
-    "@react-three/drei": "^10.7.7",
-    "@react-three/fiber": "^9.5.0",
-    "@types/three": "^0.182.0",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
@@ -38,8 +35,7 @@
     "react-dom": "^18.3.1",
     "recharts": "^2.12.7",
     "swr": "^2.2.5",
-    "tailwind-merge": "^2.5.2",
-    "three": "^0.182.0"
+    "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
     "@playwright/test": "^1.57.0",

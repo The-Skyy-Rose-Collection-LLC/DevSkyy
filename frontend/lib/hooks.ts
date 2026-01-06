@@ -318,3 +318,6 @@ export function useBrand(config?: SWRConfiguration) {
     ...config,
   });
 }
+
+// Re-export chat hooks
+export { useAgentChat } from './hooks/useAgentChat';

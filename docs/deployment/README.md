@@ -1,10 +1,31 @@
 # DevSkyy Deployment Documentation
 
-Deployment guides and production setup documentation for the DevSkyy Enterprise Platform.
+Comprehensive deployment guides for all supported platforms.
 
-## 📋 Available Documentation
+---
 
-- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - Main deployment guide
+## 📚 Available Guides
+
+### Render Platform (Recommended)
+
+**Best for**: Production deployments, easy setup, managed infrastructure
+
+| Guide | Description | Time | Audience |
+|-------|-------------|------|----------|
+| [Quick Start](./RENDER_QUICKSTART.md) | 5-minute setup guide | 20 min | All users |
+| [Full Guide](./RENDER_DEPLOYMENT_GUIDE.md) | Complete deployment reference | 1 hour | Production teams |
+
+**Why Render?**
+- ✅ Automatic HTTPS with Let's Encrypt
+- ✅ Built-in PostgreSQL and Redis
+- ✅ Auto-deploy from GitHub
+- ✅ Zero-downtime deployments
+- ✅ $21/month for production setup
+- ✅ Free tier for testing
+
+### Other Deployment Options
+
+- **[DEPLOYMENT_GUIDE.md](./DEPLOYMENT_GUIDE.md)** - General deployment guide (Docker, K8s)
 - **[PUSH_INSTRUCTIONS.md](./PUSH_INSTRUCTIONS.md)** - Git workflow and push instructions
 - **[Production_Grade_WordPress_Elementor_Automation_Guide.md](./Production_Grade_WordPress_Elementor_Automation_Guide.md)** - WordPress automation setup
 

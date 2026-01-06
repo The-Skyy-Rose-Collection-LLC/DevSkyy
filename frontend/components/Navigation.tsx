@@ -21,6 +21,7 @@ import {
   GalleryVertical,
   ChevronDown,
   ChevronRight,
+  Rocket,
 } from 'lucide-react';
 
 type NavItem = {
@@ -37,17 +38,8 @@ const navItems: NavItem[] = [
   { href: '/round-table', label: 'Round Table', icon: Trophy },
   { href: '/ab-testing', label: 'A/B Testing', icon: FlaskConical },
   { href: '/tools', label: 'Tools', icon: Wrench },
-  {
-    label: 'Collections',
-    icon: GalleryVertical,
-    items: [
-      { label: 'Black Rose Garden', href: '/collections/black-rose' },
-      { label: 'Signature', href: '/collections/signature' },
-      { label: 'Love Hurts', href: '/collections/love-hurts' },
-      { label: 'Showroom', href: '/collections/showroom' },
-      { label: 'Runway', href: '/collections/runway' },
-    ],
-  },
+  { href: '/ai-tools', label: 'AI Spaces', icon: Sparkles },
+  { href: '/hf-spaces', label: 'HuggingFace Spaces', icon: Rocket },
   { href: '/visual', label: 'Visual Generation', icon: Image },
   { href: '/try-on', label: 'Virtual Try-On', icon: UserCircle },
   { href: '/brand', label: 'Brand DNA', icon: Sparkles },

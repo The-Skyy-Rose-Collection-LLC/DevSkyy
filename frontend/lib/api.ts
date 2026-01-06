@@ -88,6 +88,24 @@ export const agentsAPI = {
 
   triggerLearning: (type: SuperAgentType) =>
     fetchAPI<{ success: boolean }>(`/api/v1/agents/${type}/learn`, { method: 'POST' }),
+
+  chat: async (type: SuperAgentType, message: string, stream = true) => {
+    const url = `${API_BASE}/api/v1/agents/chat`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agent_type: type, message, stream }),
+    });
+
+    if (!response.ok) {
+      throw new APIError(
+        `Chat request failed: ${response.statusText}`,
+        response.status
+      );
+    }
+
+    return response;
+  },
 };
 
 // Task APIs

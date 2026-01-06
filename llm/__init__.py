@@ -96,6 +96,20 @@ from .router import (
     complete,
     get_router,
 )
+from .classification import (
+    ClassificationConfig,
+    ClassificationExample,
+    ClassificationPrompts,
+    ClassificationResult,
+    ClassificationType,
+    GroqFastClassifier,
+    SentimentLabel,
+    analyze_sentiment,
+    classify_category,
+    classify_intent,
+    detect_language,
+    get_classifier,
+)
 
 __version__ = "1.0.0"
 
@@ -151,4 +165,17 @@ __all__ = [
     "ResponseScorer",
     "LLMRoundTable",
     "create_round_table",
+    # Classification
+    "ClassificationType",
+    "SentimentLabel",
+    "ClassificationExample",
+    "ClassificationResult",
+    "ClassificationConfig",
+    "ClassificationPrompts",
+    "GroqFastClassifier",
+    "get_classifier",
+    "classify_intent",
+    "classify_category",
+    "analyze_sentiment",
+    "detect_language",
 ]

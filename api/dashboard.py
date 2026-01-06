@@ -347,6 +347,15 @@ class AgentRegistry:
         )
         self._initialized: dict[str, bool] = dict.fromkeys(AGENT_CLASSES, False)
         self._task_counter = 0
+        self._rag_manager: Any = None  # RAG context manager for all agents
+
+    def set_rag_manager(self, rag_manager: Any) -> None:
+        """Set the RAG manager for all agents."""
+        self._rag_manager = rag_manager
+        # Inject into existing agents
+        for agent in self._agents.values():
+            agent.rag_manager = rag_manager
+        logger.info("RAG manager set for all agents")
 
     def get_agent(self, agent_type: str) -> EnhancedSuperAgent:
         """Get or create an agent instance."""
@@ -355,7 +364,11 @@ class AgentRegistry:
 
         if agent_type not in self._agents:
             agent_class = AGENT_CLASSES[agent_type]
-            self._agents[agent_type] = agent_class()
+            agent = agent_class()
+            # Inject RAG manager if available
+            if self._rag_manager:
+                agent.rag_manager = self._rag_manager
+            self._agents[agent_type] = agent
             logger.info(f"Initialized {agent_type} agent")
 
         return self._agents[agent_type]

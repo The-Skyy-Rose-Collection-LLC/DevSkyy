@@ -158,9 +158,8 @@ class ConnectionManager:
 manager = ConnectionManager()
 
 
-@ws_router.websocket("/ws/{channel}")
-async def websocket_endpoint(websocket: WebSocket, channel: str) -> None:
-    """WebSocket endpoint for real-time updates.
+async def websocket_handler(websocket: WebSocket, channel: str) -> None:
+    """WebSocket handler for a specific channel.
 
     Args:
         websocket: FastAPI WebSocket connection
@@ -214,6 +213,56 @@ async def websocket_endpoint(websocket: WebSocket, channel: str) -> None:
     except Exception as e:
         logger.error(f"WebSocket error on {channel}: {e}")
         manager.disconnect(websocket, channel)
+
+
+# =============================================================================
+# WebSocket Endpoints (Frontend-specific paths)
+# =============================================================================
+
+
+@ws_router.websocket("/api/ws/agents")
+async def websocket_agents(websocket: WebSocket) -> None:
+    """WebSocket endpoint for agent status updates."""
+    await websocket_handler(websocket, "agents")
+
+
+@ws_router.websocket("/api/ws/round_table")
+async def websocket_round_table(websocket: WebSocket) -> None:
+    """WebSocket endpoint for Round Table competition updates."""
+    await websocket_handler(websocket, "round_table")
+
+
+@ws_router.websocket("/api/ws/tasks")
+async def websocket_tasks(websocket: WebSocket) -> None:
+    """WebSocket endpoint for task execution updates."""
+    await websocket_handler(websocket, "tasks")
+
+
+@ws_router.websocket("/api/ws/3d_pipeline")
+async def websocket_3d_pipeline(websocket: WebSocket) -> None:
+    """WebSocket endpoint for 3D generation pipeline updates."""
+    await websocket_handler(websocket, "3d_pipeline")
+
+
+@ws_router.websocket("/api/ws/metrics")
+async def websocket_metrics(websocket: WebSocket) -> None:
+    """WebSocket endpoint for real-time system metrics."""
+    await websocket_handler(websocket, "metrics")
+
+
+# Legacy endpoint for backwards compatibility
+@ws_router.websocket("/ws/{channel}")
+async def websocket_endpoint(websocket: WebSocket, channel: str) -> None:
+    """Legacy WebSocket endpoint for real-time updates.
+
+    Args:
+        websocket: FastAPI WebSocket connection
+        channel: Channel name (agents, round_table, tasks, 3d_pipeline, metrics)
+
+    Raises:
+        WebSocketDisconnect: When client disconnects
+    """
+    await websocket_handler(websocket, channel)
 
 
 # =============================================================================

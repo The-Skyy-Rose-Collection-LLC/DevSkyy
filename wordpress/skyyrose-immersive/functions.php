@@ -423,6 +423,7 @@ function skyyrose_modify_script_tags($tag, $handle) {
 
 // Include additional functionality
 require_once SKYYROSE_IMMERSIVE_DIR . '/inc/elementor-widgets.php';
+require_once SKYYROSE_IMMERSIVE_DIR . '/inc/spinning-logo-functions.php';
 
 /**
  * Universal AJAX JSON Response Sanitizer

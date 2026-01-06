@@ -340,3 +340,43 @@ export interface LearningStats {
   topPerformingTasks: TaskCategory[];
   recentImprovements: string[];
 }
+
+// Chat Types
+export type MessageRole = 'user' | 'assistant' | 'system' | 'tool';
+
+export interface ChatMessage {
+  id: string;
+  role: MessageRole;
+  content: string;
+  timestamp: number;
+  agentType?: SuperAgentType;
+  toolCalls?: ToolCall[];
+  metadata?: Record<string, unknown>;
+}
+
+export interface ToolCall {
+  id: string;
+  name: string;
+  arguments: Record<string, unknown>;
+  result?: unknown;
+  status: 'pending' | 'running' | 'completed' | 'failed';
+  error?: string;
+  startTime?: number;
+  endTime?: number;
+}
+
+export interface StreamChunk {
+  type: 'content' | 'tool_call' | 'tool_result' | 'status' | 'error';
+  content?: string;
+  toolCall?: ToolCall;
+  status?: string;
+  error?: string;
+}
+
+export interface ChatSession {
+  id: string;
+  agentType: SuperAgentType;
+  messages: ChatMessage[];
+  createdAt: number;
+  updatedAt: number;
+}
