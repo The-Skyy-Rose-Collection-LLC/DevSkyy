@@ -45,5 +45,11 @@ pyglet>=2.0
 # torch>=2.1.0
 # torchvision>=0.16.0
 
+# LlamaIndex (optional - NOTE: namespace collision with workflows/)
+# llama-index>=0.10.0
+# llama-index-llms-openai>=0.1.0
+# llama-index-multi-modal-llms-anthropic>=0.1.0
+# llama-index-multi-modal-llms-huggingface>=0.1.0
+
 # Monitoring (optional)
 flower>=2.0.0

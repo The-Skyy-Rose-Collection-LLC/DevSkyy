@@ -64,12 +64,6 @@ python-wordpress-xmlrpc>=2.3
 # Agent SDK
 claude-agent-sdk==0.1.18
 
-# LlamaIndex (required for multimodal capabilities)
-llama-index>=0.10.0
-llama-index-llms-openai>=0.1.0
-llama-index-multi-modal-llms-anthropic>=0.1.0
-llama-index-multi-modal-llms-huggingface>=0.1.0
-
 # ============================================
 # OPTIONAL: Uncomment for advanced features
 # ============================================

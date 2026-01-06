@@ -449,6 +449,8 @@ class ToolRegistry:
         self._tools: dict[str, ToolSpec] = {}
         self._handlers: dict[str, ToolHandler] = {}
         self._cache: dict[str, Any] = {}
+        # Rate limiting: {(tool_name, user_id): [(timestamp1, timestamp2, ...)]}
+        self._rate_limit_tracker: dict[tuple[str, str], list[float]] = {}
 
     @classmethod
     def get_instance(cls) -> ToolRegistry:
@@ -689,6 +691,52 @@ class ToolRegistry:
 
         return errors
 
+    def _check_rate_limit(
+        self,
+        tool_name: str,
+        rate_limit: int,
+        user_id: str | None,
+    ) -> tuple[bool, str | None]:
+        """
+        Check if tool execution is within rate limits.
+
+        Args:
+            tool_name: Name of the tool
+            rate_limit: Requests per minute limit
+            user_id: User identifier for per-user rate limiting
+
+        Returns:
+            Tuple of (is_allowed, error_message)
+        """
+        if not user_id:
+            # No user ID means no rate limiting (admin/system calls)
+            return True, None
+
+        import time
+
+        current_time = time.time()
+        key = (tool_name, user_id)
+
+        # Get or create timestamp list for this user+tool combination
+        if key not in self._rate_limit_tracker:
+            self._rate_limit_tracker[key] = []
+
+        timestamps = self._rate_limit_tracker[key]
+
+        # Remove timestamps older than 60 seconds
+        cutoff_time = current_time - 60.0
+        timestamps[:] = [ts for ts in timestamps if ts > cutoff_time]
+
+        # Check if limit exceeded
+        if len(timestamps) >= rate_limit:
+            oldest_timestamp = min(timestamps)
+            wait_seconds = 60.0 - (current_time - oldest_timestamp)
+            return False, f"Rate limit exceeded for {tool_name}. Retry in {wait_seconds:.1f}s"
+
+        # Add current timestamp
+        timestamps.append(current_time)
+        return True, None
+
     # -------------------------------------------------------------------------
     # Execution
     # -------------------------------------------------------------------------
@@ -744,6 +792,24 @@ class ToolRegistry:
                 completed_at=datetime.now(UTC),
                 duration_seconds=0,
             )
+
+        # Check rate limits
+        if tool and tool.rate_limit:
+            is_allowed, rate_error = self._check_rate_limit(
+                tool_name, tool.rate_limit, context.user_id
+            )
+            if not is_allowed:
+                return ToolExecutionResult(
+                    tool_name=tool_name,
+                    request_id=context.request_id,
+                    status=ExecutionStatus.FAILED,
+                    success=False,
+                    error=rate_error or "Rate limit exceeded",
+                    error_type="RateLimitError",
+                    started_at=started_at,
+                    completed_at=datetime.now(UTC),
+                    duration_seconds=0,
+                )
 
         # Check cache
         if tool and tool.cacheable:
