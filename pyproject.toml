@@ -151,7 +151,7 @@ mcp = [
     "ratelimit==2.2.1",
     "cryptography==46.0.3",
     "pyjwt==2.10.1",
-    "sqlalchemy==2.0.36",
+    "sqlalchemy==2.0.45",
     "aiosqlite==0.22.1",
     "redis==7.1.0",
     "aioredis==2.0.1",
@@ -231,7 +231,7 @@ ml = [
     "fastapi>=0.119.0",
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
-    "sqlalchemy==2.0.36",
+    "sqlalchemy==2.0.45",
     "pymongo==4.10.1",
 ]
 
