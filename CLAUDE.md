@@ -24,6 +24,27 @@ GDPR compliance, production deployment, elimination of ALL stubs/placeholders.
 
 ---
 
+## 🔌 Context7 MCP Plugin
+
+**MANDATORY**: When generating code for DevSkyy, **ALWAYS** use the Context7 MCP Plugin to ensure:
+
+- **Up-to-date documentation**: Retrieve the latest codebase patterns, conventions, and examples
+- **Accurate references**: Access current API endpoints, tool schemas, and agent capabilities
+- **Consistent patterns**: Follow established architectural decisions and coding standards
+- **Real-time context**: Pull from `docs/`, `README.md`, and source files for current state
+
+**Auto-invoke Context7 for**:
+- Code generation tasks
+- Architecture decisions
+- API endpoint implementations
+- Agent integrations
+- Tool registry modifications
+- Security implementations
+
+**Configuration**: See `docs/guides/CLAUDE.md` for Context7 integration details and `MCP_CONFIGURATION.md` for setup.
+
+---
+
 ## 🏗️ Repository Structure
 
 ```text
