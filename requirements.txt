@@ -53,6 +53,7 @@ prometheus-client>=0.19
 
 # Minimal AI Support
 numpy>=1.24.0
+scipy>=1.14.1
 tiktoken>=0.8.0
 
 # Message Queue
