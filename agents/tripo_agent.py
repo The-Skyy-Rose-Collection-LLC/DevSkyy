@@ -668,7 +668,7 @@ class TripoAssetAgent(SuperAgent):
                     return result.model_dump()
 
                 elif task.status == TaskStatus.FAILED:
-                    error_msg = getattr(task, 'error', 'Unknown error')
+                    error_msg = getattr(task, "error", "Unknown error")
                     raise RuntimeError(
                         f"Tripo3D generation failed: {error_msg}. "
                         "Try simplifying the prompt or using a different garment type."
@@ -679,8 +679,7 @@ class TripoAssetAgent(SuperAgent):
                     )
                 else:
                     raise ValueError(
-                        f"Unexpected task status: {task.status}. "
-                        "Please report this issue."
+                        f"Unexpected task status: {task.status}. " "Please report this issue."
                     )
 
         except (PermissionError, ConnectionError, TimeoutError, OSError, ValueError, RuntimeError):
@@ -689,8 +688,7 @@ class TripoAssetAgent(SuperAgent):
         except Exception as e:
             logger.error(f"Text-to-3D generation failed unexpectedly: {e}", exc_info=True)
             raise RuntimeError(
-                f"Unexpected error during 3D generation: {e}. "
-                "Check the logs for more details."
+                f"Unexpected error during 3D generation: {e}. " "Check the logs for more details."
             ) from e
 
     async def _tool_generate_from_image(
@@ -746,8 +744,7 @@ class TripoAssetAgent(SuperAgent):
 
         if not image_file.is_file():
             raise ValueError(
-                f"Path is not a file: {image_path}. "
-                "Please provide a valid image file path."
+                f"Path is not a file: {image_path}. " "Please provide a valid image file path."
             )
 
         # Validate image format
@@ -763,8 +760,7 @@ class TripoAssetAgent(SuperAgent):
             file_size = image_file.stat().st_size
             if file_size == 0:
                 raise ValueError(
-                    f"Image file is empty: {image_path}. "
-                    "Please provide a valid image file."
+                    f"Image file is empty: {image_path}. " "Please provide a valid image file."
                 )
             if file_size > 20 * 1024 * 1024:  # 20MB limit
                 raise ValueError(
@@ -773,8 +769,7 @@ class TripoAssetAgent(SuperAgent):
                 )
         except OSError as e:
             raise PermissionError(
-                f"Cannot read image file {image_path}: {e}. "
-                "Check file permissions."
+                f"Cannot read image file {image_path}: {e}. " "Check file permissions."
             ) from e
 
         try:
@@ -858,7 +853,7 @@ class TripoAssetAgent(SuperAgent):
                     return result.model_dump()
 
                 elif task.status == TaskStatus.FAILED:
-                    error_msg = getattr(task, 'error', 'Unknown error')
+                    error_msg = getattr(task, "error", "Unknown error")
                     raise RuntimeError(
                         f"Tripo3D generation failed: {error_msg}. "
                         "Try using a clearer image with better lighting."
@@ -869,18 +864,24 @@ class TripoAssetAgent(SuperAgent):
                     )
                 else:
                     raise ValueError(
-                        f"Unexpected task status: {task.status}. "
-                        "Please report this issue."
+                        f"Unexpected task status: {task.status}. " "Please report this issue."
                     )
 
-        except (PermissionError, ConnectionError, TimeoutError, OSError, ValueError, RuntimeError, FileNotFoundError):
+        except (
+            PermissionError,
+            ConnectionError,
+            TimeoutError,
+            OSError,
+            ValueError,
+            RuntimeError,
+            FileNotFoundError,
+        ):
             # Re-raise known errors with their context
             raise
         except Exception as e:
             logger.error(f"Image-to-3D generation failed unexpectedly: {e}", exc_info=True)
             raise RuntimeError(
-                f"Unexpected error during 3D generation: {e}. "
-                "Check the logs for more details."
+                f"Unexpected error during 3D generation: {e}. " "Check the logs for more details."
             ) from e
 
     async def _tool_validate_asset(

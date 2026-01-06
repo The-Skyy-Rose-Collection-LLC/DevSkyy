@@ -4,7 +4,6 @@ Analytics SuperAgent
 Handles data analysis, reporting, forecasting, and business intelligence.
 """
 
-
 from claude_agent_sdk import AgentDefinition, ClaudeAgentOptions
 
 

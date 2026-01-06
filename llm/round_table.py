@@ -23,6 +23,7 @@ import json
 import logging
 import os
 import time
+from collections import OrderedDict
 from collections.abc import Callable
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -902,6 +903,79 @@ class ResponseScorer:
 
 
 # =============================================================================
+# LRU Cache (Enterprise Hardening)
+# =============================================================================
+
+
+class LRUHistory:
+    """
+    LRU cache for Round Table history.
+
+    Enterprise hardening: Prevents memory leak from unbounded history growth.
+    Maintains fixed-size cache with least-recently-used eviction policy.
+
+    Args:
+        maxsize: Maximum number of entries (default: 1000)
+    """
+
+    def __init__(self, maxsize: int = 1000):
+        self.maxsize = maxsize
+        self.cache: OrderedDict[str, RoundTableResult] = OrderedDict()
+
+    def add(self, result: RoundTableResult) -> None:
+        """
+        Add result to cache, evicting oldest if full.
+
+        Args:
+            result: Round table result to cache
+        """
+        # Remove if exists (to update access order)
+        if result.result_id in self.cache:
+            del self.cache[result.result_id]
+
+        # Add to end (most recent)
+        self.cache[result.result_id] = result
+
+        # Evict oldest if over limit
+        if len(self.cache) > self.maxsize:
+            oldest_key = next(iter(self.cache))
+            evicted = self.cache.pop(oldest_key)
+            logger.debug(
+                f"LRU cache evicted oldest result: {evicted.result_id} "
+                f"(cache size: {len(self.cache)}/{self.maxsize})"
+            )
+
+    def get(self, result_id: str) -> RoundTableResult | None:
+        """
+        Get result by ID, updating access order.
+
+        Args:
+            result_id: Result identifier
+
+        Returns:
+            Result if found, None otherwise
+        """
+        if result_id not in self.cache:
+            return None
+
+        # Move to end (most recent)
+        self.cache.move_to_end(result_id)
+        return self.cache[result_id]
+
+    def get_all(self) -> list[RoundTableResult]:
+        """Get all cached results (most recent first)."""
+        return list(reversed(self.cache.values()))
+
+    def clear(self) -> None:
+        """Clear all cached results."""
+        self.cache.clear()
+
+    def __len__(self) -> int:
+        """Get cache size."""
+        return len(self.cache)
+
+
+# =============================================================================
 # LLM Round Table
 # =============================================================================
 
@@ -948,7 +1022,8 @@ class LLMRoundTable:
         self._judge_provider: LLMProvider = LLMProvider.CLAUDE
         self._scorer = ResponseScorer(enable_ml_scoring=enable_ml_scoring)
         self._db = RoundTableDatabase(db_url)
-        self._history: list[RoundTableResult] = []
+        # Enterprise hardening: LRU cache prevents unbounded memory growth
+        self._history: LRUHistory = LRUHistory(maxsize=1000)
         self._initialized = False
 
         # Statistical analysis and adaptive learning
@@ -1094,10 +1169,8 @@ class LLMRoundTable:
             if persist and self._db._initialized:
                 await self._db.save_result(result)
 
-            # Add to in-memory history
-            self._history.append(result)
-            if len(self._history) > 1000:
-                self._history = self._history[-1000:]
+            # Add to in-memory history (LRU cache handles eviction automatically)
+            self._history.add(result)
 
             # Record competition metrics
             task_category = context.get("category", "unknown") if context else "unknown"
@@ -1407,8 +1480,9 @@ REASONING: Your detailed explanation."""
     # =========================================================================
 
     def get_history(self, limit: int = 100) -> list[RoundTableResult]:
-        """Get recent competition history from memory."""
-        return self._history[-limit:]
+        """Get recent competition history from memory (LRU cache)."""
+        all_results = self._history.get_all()  # Most recent first
+        return all_results[:limit]
 
     async def get_database_history(
         self, limit: int = 100, task_id: str | None = None

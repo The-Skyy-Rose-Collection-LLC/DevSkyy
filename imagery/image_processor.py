@@ -435,10 +435,7 @@ class BackgroundRemover:
             Image with transparent background
         """
         if method == "auto":
-            if self._rembg_available:
-                method = "ai"
-            else:
-                method = "color"
+            method = "ai" if self._rembg_available else "color"
 
         if method == "ai" and self._rembg_available:
             return await self._remove_with_rembg(image)

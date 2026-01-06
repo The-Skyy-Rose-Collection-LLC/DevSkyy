@@ -1,0 +1,104 @@
+# DevSkyy - Prometheus Configuration
+# Scrapes metrics from FastAPI application and infrastructure components
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    cluster: 'devskyy-production'
+    environment: 'production'
+
+# Alertmanager configuration (optional)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets:
+#           - alertmanager:9093
+
+# Load rules once and periodically evaluate them
+# rule_files:
+#   - "alerts/*.yml"
+
+# Scrape configurations
+scrape_configs:
+  # Prometheus self-monitoring
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+        labels:
+          service: 'prometheus'
+
+  # DevSkyy FastAPI application
+  - job_name: 'devskyy-app'
+    scrape_interval: 10s
+    static_configs:
+      - targets: ['devskyy-app:8000']
+        labels:
+          service: 'devskyy-app'
+          component: 'api'
+    metrics_path: '/metrics'
+    scheme: 'http'
+
+  # Celery workers (if they expose metrics)
+  - job_name: 'celery-workers'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['celery-worker:9091']
+        labels:
+          service: 'celery'
+          component: 'worker'
+    # Note: Requires prometheus-client in worker.py
+
+  # Celery Flower monitoring
+  - job_name: 'celery-flower'
+    scrape_interval: 15s
+    static_configs:
+      - targets: ['celery-flower:5555']
+        labels:
+          service: 'celery'
+          component: 'flower'
+
+  # Redis exporter (optional - requires redis_exporter sidecar)
+  # - job_name: 'redis'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets: ['redis-exporter:9121']
+  #       labels:
+  #         service: 'redis'
+  #         component: 'cache'
+
+  # PostgreSQL exporter (optional - requires postgres_exporter sidecar)
+  # - job_name: 'postgres'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets: ['postgres-exporter:9187']
+  #       labels:
+  #         service: 'postgres'
+  #         component: 'database'
+
+  # Nginx exporter (optional - requires nginx-prometheus-exporter)
+  # - job_name: 'nginx'
+  #   scrape_interval: 10s
+  #   static_configs:
+  #     - targets: ['nginx-exporter:9113']
+  #       labels:
+  #         service: 'nginx'
+  #         component: 'proxy'
+
+  # Docker container metrics (optional - requires cAdvisor)
+  # - job_name: 'cadvisor'
+  #   scrape_interval: 15s
+  #   static_configs:
+  #     - targets: ['cadvisor:8080']
+  #       labels:
+  #         service: 'docker'
+  #         component: 'containers'
+
+  # Node exporter for system metrics (optional)
+  # - job_name: 'node'
+  #   scrape_interval: 15s
+  #   static_configs:
+  #     - targets: ['node-exporter:9100']
+  #       labels:
+  #         service: 'node'
+  #         component: 'system'

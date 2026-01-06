@@ -203,7 +203,7 @@ to where Oakland street authenticity meets luxury craftsmanship.
         if self.wp_api is None:
             raise ValueError("WordPress API client not configured")
 
-        product_id = await self.wp_api.create_product(
+        await self.wp_api.create_product(
             name=product_specs.name,
             sku=product_specs.sku,
             price=product_specs.price,

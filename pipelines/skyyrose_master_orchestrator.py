@@ -235,9 +235,7 @@ class SkyyRoseMasterOrchestrator:
             # STAGE 6: Generate Social Media Assets
             print("\nSTAGE 6: Social Media Asset Generation")
             print("-" * 80)
-            social_results = await self._stage_6_social_assets(
-                photo_results, content_results, launch_report
-            )
+            await self._stage_6_social_assets(photo_results, content_results, launch_report)
 
             # Finalize report
             launch_report["completed_at"] = datetime.now().isoformat()
@@ -321,7 +319,7 @@ class SkyyRoseMasterOrchestrator:
         launch_report["stages"]["photography"] = {
             "duration_seconds": stage_duration,
             "images_generated": len(generated_images),
-            "backends_used": list(set(img["backend"] for img in generated_images.values())),
+            "backends_used": list({img["backend"] for img in generated_images.values()}),
             "status": "success",
         }
 

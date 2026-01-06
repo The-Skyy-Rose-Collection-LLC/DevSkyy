@@ -506,10 +506,7 @@ def render_glb_to_images(
     """
     renderer = HeadlessRenderer()
 
-    if angles:
-        camera_angles = [CameraAngle(a) for a in angles]
-    else:
-        camera_angles = None
+    camera_angles = [CameraAngle(a) for a in angles] if angles else None
 
     return renderer.render_model(model_path, output_dir, camera_angles)
 
