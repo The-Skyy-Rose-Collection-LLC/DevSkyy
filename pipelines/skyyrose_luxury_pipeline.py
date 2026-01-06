@@ -736,18 +736,6 @@ document.addEventListener('DOMContentLoaded', () => {{
 
     async def _stage_analytics(self, specs: DesignSpecs) -> None:
         """Stage 7: Set up analytics tracking."""
-        analytics_config = {
-            "product_id": specs.sku,
-            "collection": specs.collection,
-            "price_point": specs.price,
-            "tracking_events": [
-                "product_view",
-                "3d_viewer_interaction",
-                "virtual_tryon_start",
-                "add_to_cart",
-                "purchase",
-            ],
-        }
 
         logger.info(f"Analytics configured for {specs.sku}")
 

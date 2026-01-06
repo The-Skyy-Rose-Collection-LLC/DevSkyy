@@ -1,85 +1,112 @@
 # DevSkyy Platform - Multi-stage Docker Build
 # Optimized for production deployment with security hardening
+# Enterprise hardening: Retry logic, timeouts, minimal layers
 
-# Build stage for Node.js frontend
+# =============================================================================
+# Stage 1: Frontend Builder (Next.js Dashboard)
+# =============================================================================
 FROM node:20-alpine AS frontend-builder
 
 WORKDIR /app/frontend
 
-# Copy package files
-COPY package*.json ./
+# Copy package files from frontend directory
+COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production && npm cache clean --force
+# Install dependencies with legacy peer deps (React version conflicts)
+RUN npm ci --legacy-peer-deps && npm cache clean --force
 
-# Copy source code
-COPY src/ ./src/
-COPY config/typescript/ ./config/typescript/
-COPY config/testing/ ./config/testing/
+# Copy Next.js source code from frontend directory
+COPY frontend/app/ ./app/
+COPY frontend/components/ ./components/
+COPY frontend/lib/ ./lib/
+COPY frontend/public/ ./public/
+COPY frontend/templates/ ./templates/
+COPY frontend/*.config.js ./
+COPY frontend/*.config.ts ./
+COPY frontend/tsconfig*.json ./
+COPY frontend/next-env.d.ts ./
 
-# Build frontend assets
+# Build Next.js application
 RUN npm run build
 
-# Build stage for Python backend
+# =============================================================================
+# Stage 2: Python Backend Builder
+# =============================================================================
 FROM python:3.11-slim AS backend-builder
 
-# Set environment variables
+# Prevent apt from hanging
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set Python environment
 ENV PYTHONUNBUFFERED=1 \
     PYTHONDONTWRITEBYTECODE=1 \
     PIP_NO_CACHE_DIR=1 \
     PIP_DISABLE_PIP_VERSION_CHECK=1
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install Poetry
-RUN pip install poetry==1.7.1
-
-# Set work directory
-WORKDIR /app
-
-# Copy Poetry configuration
-COPY pyproject.toml poetry.lock ./
-
-# Configure Poetry
-RUN poetry config virtualenvs.create false
-
-# Install Python dependencies
-RUN poetry install --only=main --no-dev
-
-# Production stage
-FROM python:3.11-slim AS production
-
-# Set environment variables
-ENV PYTHONUNBUFFERED=1 \
-    PYTHONDONTWRITEBYTECODE=1 \
-    PATH="/app/.venv/bin:$PATH" \
-    PYTHONPATH="/app"
-
-# Create non-root user for security
-RUN groupadd -r devskyy && useradd -r -g devskyy devskyy
-
-# Install runtime dependencies
-RUN apt-get update && apt-get install -y \
-    curl \
+# Enterprise hardening: apt-get with retry logic and timeout
+RUN apt-get update --fix-missing || apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
+        build-essential \
+        curl \
+        ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-# Set work directory
+WORKDIR /app
+
+# Copy requirements
+COPY requirements.txt ./
+
+# Install Python dependencies with timeout
+RUN pip install --no-cache-dir --timeout=300 -r requirements.txt
+
+# =============================================================================
+# Stage 3: Production Runtime
+# =============================================================================
+FROM python:3.11-slim AS production
+
+# Prevent apt from hanging
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Set Python environment
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONPATH="/app"
+
+# Create non-root user for security
+RUN groupadd -r devskyy && useradd -r -g devskyy -m -u 1000 devskyy
+
+# Install runtime dependencies with retry logic
+RUN apt-get update --fix-missing || apt-get update --fix-missing && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
 WORKDIR /app
 
 # Copy Python dependencies from builder
 COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
 COPY --from=backend-builder /usr/local/bin /usr/local/bin
 
-# Copy frontend build artifacts
-COPY --from=frontend-builder /app/frontend/dist ./static/
+# Copy Next.js build artifacts
+COPY --from=frontend-builder /app/.next ./.next/
+COPY --from=frontend-builder /app/public ./public/
 
 # Copy application code
-COPY . .
+COPY agent_sdk/ ./agent_sdk/
+COPY agents/ ./agents/
+COPY llm/ ./llm/
+COPY orchestration/ ./orchestration/
+COPY core/ ./core/
+COPY security/ ./security/
+COPY api/ ./api/
+COPY mcp_servers/ ./mcp_servers/
+COPY adk/ ./adk/
+COPY runtime/ ./runtime/
+COPY main_enterprise.py ./
+COPY devskyy_mcp.py ./
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/data /app/uploads && \
@@ -88,12 +115,12 @@ RUN mkdir -p /app/logs /app/data /app/uploads && \
 # Switch to non-root user
 USER devskyy
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 \
+# Health check with timeout
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
     CMD curl -f http://localhost:8000/health || exit 1
 
 # Expose port
 EXPOSE 8000
 
-# Default command
+# Default command (FastAPI with 4 workers)
 CMD ["uvicorn", "main_enterprise:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]

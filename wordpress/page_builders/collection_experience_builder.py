@@ -52,7 +52,7 @@ class CollectionExperienceBuilder(ElementorBuilder):
         Returns:
             List of widget dicts
         """
-        template = CollectionDesignTemplates.get_template(collection_type)
+        CollectionDesignTemplates.get_template(collection_type)
 
         widgets = []
 

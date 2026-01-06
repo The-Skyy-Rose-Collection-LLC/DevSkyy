@@ -15,7 +15,8 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
@@ -116,6 +117,123 @@ class RoutingStrategy(str, Enum):
 
 
 # =============================================================================
+# Circuit Breaker (Enterprise Hardening)
+# =============================================================================
+
+
+@dataclass
+class CircuitBreaker:
+    """
+    Circuit breaker pattern for LLM providers.
+
+    Enterprise hardening: Prevents cascade failures by temporarily disabling
+    failing providers. Automatically recovers after timeout.
+
+    States:
+    - CLOSED: Normal operation
+    - OPEN: Provider disabled due to failures
+    - HALF_OPEN: Testing if provider recovered
+
+    Args:
+        failure_threshold: Number of failures before opening circuit (default: 5)
+        timeout: Seconds before attempting recovery (default: 60)
+        success_threshold: Successes needed to close circuit (default: 2)
+    """
+
+    failure_threshold: int = 5
+    timeout: int = 60  # seconds
+    success_threshold: int = 2
+
+    # Internal state
+    failures: dict[ModelProvider, int] = field(default_factory=dict)
+    successes: dict[ModelProvider, int] = field(default_factory=dict)
+    opened_at: dict[ModelProvider, float] = field(default_factory=dict)
+    state: dict[ModelProvider, str] = field(default_factory=dict)  # CLOSED, OPEN, HALF_OPEN
+
+    def is_available(self, provider: ModelProvider) -> bool:
+        """
+        Check if provider is available (circuit not open).
+
+        Returns:
+            True if provider should be tried
+        """
+        current_state = self.state.get(provider, "CLOSED")
+
+        if current_state == "CLOSED":
+            return True
+
+        if current_state == "OPEN":
+            # Check if timeout has passed
+            opened_time = self.opened_at.get(provider, 0)
+            if time.time() - opened_time >= self.timeout:
+                # Move to HALF_OPEN (allow one test request)
+                self.state[provider] = "HALF_OPEN"
+                self.successes[provider] = 0
+                logger.info(
+                    f"Circuit breaker {provider.value}: OPEN → HALF_OPEN (testing recovery)"
+                )
+                return True
+            return False
+
+        # HALF_OPEN: Allow request
+        return True
+
+    def record_success(self, provider: ModelProvider) -> None:
+        """Record successful request."""
+        current_state = self.state.get(provider, "CLOSED")
+
+        if current_state == "HALF_OPEN":
+            # Count successes in HALF_OPEN state
+            self.successes[provider] = self.successes.get(provider, 0) + 1
+
+            if self.successes[provider] >= self.success_threshold:
+                # Close circuit - provider recovered
+                self.state[provider] = "CLOSED"
+                self.failures[provider] = 0
+                logger.info(f"Circuit breaker {provider.value}: HALF_OPEN → CLOSED (recovered)")
+
+        elif current_state == "CLOSED":
+            # Reset failure count on success
+            self.failures[provider] = 0
+
+    def record_failure(self, provider: ModelProvider) -> None:
+        """Record failed request."""
+        current_state = self.state.get(provider, "CLOSED")
+
+        if current_state == "HALF_OPEN":
+            # Failed during recovery test - reopen circuit
+            self.state[provider] = "OPEN"
+            self.opened_at[provider] = time.time()
+            logger.warning(
+                f"Circuit breaker {provider.value}: HALF_OPEN → OPEN (recovery failed, retry in {self.timeout}s)"
+            )
+
+        else:
+            # Increment failure count
+            self.failures[provider] = self.failures.get(provider, 0) + 1
+
+            if self.failures[provider] >= self.failure_threshold:
+                # Open circuit - disable provider
+                self.state[provider] = "OPEN"
+                self.opened_at[provider] = time.time()
+                logger.error(
+                    f"Circuit breaker {provider.value}: CLOSED → OPEN "
+                    f"({self.failures[provider]} failures, retry in {self.timeout}s)"
+                )
+
+    def get_status(self) -> dict[str, Any]:
+        """Get circuit breaker status for all providers."""
+        return {
+            provider.value: {
+                "state": self.state.get(provider, "CLOSED"),
+                "failures": self.failures.get(provider, 0),
+                "opened_at": self.opened_at.get(provider),
+            }
+            for provider in ModelProvider
+        }
+
+
+# =============================================================================
 # LLM Router
 # =============================================================================
 
@@ -157,11 +275,14 @@ class LLMRouter:
         self,
         configs: dict[ModelProvider, ProviderConfig] | None = None,
         strategy: RoutingStrategy = RoutingStrategy.PRIORITY,
+        circuit_breaker: CircuitBreaker | None = None,
     ) -> None:
         self.configs = configs or PROVIDER_CONFIGS.copy()
         self.strategy = strategy
         self._clients: dict[ModelProvider, BaseLLMClient] = {}
         self._round_robin_index = 0
+        # Enterprise hardening: Circuit breaker prevents cascade failures
+        self.circuit_breaker = circuit_breaker or CircuitBreaker()
 
     async def __aenter__(self) -> LLMRouter:
         return self
@@ -239,12 +360,28 @@ class LLMRouter:
             CompletionResponse
         """
         provider = provider or self._select_provider()
+
+        # Enterprise hardening: Check circuit breaker before attempting
+        if not self.circuit_breaker.is_available(provider):
+            raise LLMError(
+                f"Provider {provider.value} temporarily unavailable (circuit breaker OPEN)",
+                details={"circuit_breaker_state": self.circuit_breaker.get_status()},
+            )
+
         client = self._get_client(provider)
 
         config = self.configs[provider]
         model = model or config.default_model
 
-        return await client.complete(messages, model=model, **kwargs)
+        try:
+            response = await client.complete(messages, model=model, **kwargs)
+            # Record success
+            self.circuit_breaker.record_success(provider)
+            return response
+        except Exception:
+            # Record failure
+            self.circuit_breaker.record_failure(provider)
+            raise
 
     async def complete_with_fallback(
         self,
@@ -256,6 +393,7 @@ class LLMRouter:
         Generate completion with automatic fallback.
 
         Tries providers in order until one succeeds.
+        Enterprise hardening: Skips providers with open circuit breakers.
 
         Args:
             messages: Conversation messages
@@ -269,9 +407,18 @@ class LLMRouter:
             p for p, c in sorted(self.configs.items(), key=lambda x: x[1].priority) if c.enabled
         ]
 
+        # Filter out providers with open circuits
+        available_providers = [p for p in providers if self.circuit_breaker.is_available(p)]
+
+        if not available_providers:
+            raise LLMError(
+                "No providers available (all circuit breakers OPEN)",
+                details={"circuit_breaker_status": self.circuit_breaker.get_status()},
+            )
+
         last_error: Exception | None = None
 
-        for provider in providers:
+        for provider in available_providers:
             try:
                 return await self.complete(messages, provider=provider, **kwargs)
             except Exception as e:
@@ -280,8 +427,11 @@ class LLMRouter:
                 continue
 
         raise LLMError(
-            f"All providers failed. Last error: {last_error}",
-            details={"providers_tried": [p.value for p in providers]},
+            f"All available providers failed. Last error: {last_error}",
+            details={
+                "providers_tried": [p.value for p in available_providers],
+                "circuit_breaker_status": self.circuit_breaker.get_status(),
+            },
         )
 
     async def complete_with_agreement(

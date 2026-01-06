@@ -328,9 +328,22 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.READ_ONLY,
                 parameters=[
-                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
-                    ToolParameter(name="include_stock", type=ParameterType.BOOLEAN, description="Include stock info"),
-                    ToolParameter(name="include_analytics", type=ParameterType.BOOLEAN, description="Include sales analytics"),
+                    ToolParameter(
+                        name="sku",
+                        type=ParameterType.STRING,
+                        description="Product SKU",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="include_stock",
+                        type=ParameterType.BOOLEAN,
+                        description="Include stock info",
+                    ),
+                    ToolParameter(
+                        name="include_analytics",
+                        type=ParameterType.BOOLEAN,
+                        description="Include sales analytics",
+                    ),
                 ],
                 idempotent=True,
                 cacheable=True,
@@ -342,8 +355,18 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.MEDIUM,
                 parameters=[
-                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
-                    ToolParameter(name="updates", type=ParameterType.OBJECT, description="Fields to update", required=True),
+                    ToolParameter(
+                        name="sku",
+                        type=ParameterType.STRING,
+                        description="Product SKU",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="updates",
+                        type=ParameterType.OBJECT,
+                        description="Fields to update",
+                        required=True,
+                    ),
                 ],
                 requires_auth=True,
                 tags={"commerce", "product", "write"},
@@ -354,11 +377,32 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.MEDIUM,
                 parameters=[
-                    ToolParameter(name="name", type=ParameterType.STRING, description="Product name", required=True),
-                    ToolParameter(name="collection", type=ParameterType.STRING, description="Collection name", required=True),
-                    ToolParameter(name="price", type=ParameterType.NUMBER, description="Base price", required=True),
-                    ToolParameter(name="description", type=ParameterType.STRING, description="Product description"),
-                    ToolParameter(name="variants", type=ParameterType.ARRAY, description="Size/color variants"),
+                    ToolParameter(
+                        name="name",
+                        type=ParameterType.STRING,
+                        description="Product name",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="collection",
+                        type=ParameterType.STRING,
+                        description="Collection name",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="price",
+                        type=ParameterType.NUMBER,
+                        description="Base price",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="description",
+                        type=ParameterType.STRING,
+                        description="Product description",
+                    ),
+                    ToolParameter(
+                        name="variants", type=ParameterType.ARRAY, description="Size/color variants"
+                    ),
                 ],
                 requires_auth=True,
                 tags={"commerce", "product", "write"},
@@ -369,8 +413,16 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.READ_ONLY,
                 parameters=[
-                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU (optional, all if omitted)"),
-                    ToolParameter(name="warehouse", type=ParameterType.STRING, description="Warehouse location"),
+                    ToolParameter(
+                        name="sku",
+                        type=ParameterType.STRING,
+                        description="Product SKU (optional, all if omitted)",
+                    ),
+                    ToolParameter(
+                        name="warehouse",
+                        type=ParameterType.STRING,
+                        description="Warehouse location",
+                    ),
                 ],
                 idempotent=True,
                 cacheable=True,
@@ -382,9 +434,24 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.MEDIUM,
                 parameters=[
-                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
-                    ToolParameter(name="quantity", type=ParameterType.INTEGER, description="New quantity", required=True),
-                    ToolParameter(name="action", type=ParameterType.STRING, description="set, add, or subtract", required=True),
+                    ToolParameter(
+                        name="sku",
+                        type=ParameterType.STRING,
+                        description="Product SKU",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="quantity",
+                        type=ParameterType.INTEGER,
+                        description="New quantity",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="action",
+                        type=ParameterType.STRING,
+                        description="set, add, or subtract",
+                        required=True,
+                    ),
                 ],
                 requires_auth=True,
                 tags={"commerce", "inventory", "write"},
@@ -395,8 +462,18 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.READ_ONLY,
                 parameters=[
-                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
-                    ToolParameter(name="days_ahead", type=ParameterType.INTEGER, description="Forecast horizon", required=True),
+                    ToolParameter(
+                        name="sku",
+                        type=ParameterType.STRING,
+                        description="Product SKU",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="days_ahead",
+                        type=ParameterType.INTEGER,
+                        description="Forecast horizon",
+                        required=True,
+                    ),
                 ],
                 idempotent=True,
                 cacheable=True,
@@ -409,8 +486,17 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.READ_ONLY,
                 parameters=[
-                    ToolParameter(name="order_id", type=ParameterType.STRING, description="Order ID", required=True),
-                    ToolParameter(name="include_history", type=ParameterType.BOOLEAN, description="Include order history"),
+                    ToolParameter(
+                        name="order_id",
+                        type=ParameterType.STRING,
+                        description="Order ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="include_history",
+                        type=ParameterType.BOOLEAN,
+                        description="Include order history",
+                    ),
                 ],
                 idempotent=True,
                 requires_auth=True,
@@ -422,9 +508,23 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.MEDIUM,
                 parameters=[
-                    ToolParameter(name="order_id", type=ParameterType.STRING, description="Order ID", required=True),
-                    ToolParameter(name="status", type=ParameterType.STRING, description="New status", required=True),
-                    ToolParameter(name="notify_customer", type=ParameterType.BOOLEAN, description="Send notification"),
+                    ToolParameter(
+                        name="order_id",
+                        type=ParameterType.STRING,
+                        description="Order ID",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="status",
+                        type=ParameterType.STRING,
+                        description="New status",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="notify_customer",
+                        type=ParameterType.BOOLEAN,
+                        description="Send notification",
+                    ),
                 ],
                 requires_auth=True,
                 tags={"commerce", "order", "write"},
@@ -435,8 +535,15 @@ When analyzing or recommending, use this structure:
                 category=ToolCategory.COMMERCE,
                 severity=ToolSeverity.READ_ONLY,
                 parameters=[
-                    ToolParameter(name="sku", type=ParameterType.STRING, description="Product SKU", required=True),
-                    ToolParameter(name="factors", type=ParameterType.OBJECT, description="Pricing factors"),
+                    ToolParameter(
+                        name="sku",
+                        type=ParameterType.STRING,
+                        description="Product SKU",
+                        required=True,
+                    ),
+                    ToolParameter(
+                        name="factors", type=ParameterType.OBJECT, description="Pricing factors"
+                    ),
                 ],
                 idempotent=True,
                 cacheable=True,

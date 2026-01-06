@@ -232,7 +232,9 @@ class AI3DModelGenerator:
                 config = HuggingFace3DConfig(
                     api_token=self.hf_token,
                     output_dir=str(self.output_dir / "temp"),
-                    default_quality="production" if self.config.quality_level == "high" else "standard",
+                    default_quality=(
+                        "production" if self.config.quality_level == "high" else "standard"
+                    ),
                 )
                 self._hf_client = HuggingFace3DClient(config)
             except ImportError:
@@ -460,7 +462,9 @@ class AI3DModelGenerator:
 
         # Calculate metrics
         file_size_mb = model_path.stat().st_size / (1024 * 1024)
-        vertex_count = len(optimized_mesh.vertices) if hasattr(optimized_mesh, "vertices") else 50000
+        vertex_count = (
+            len(optimized_mesh.vertices) if hasattr(optimized_mesh, "vertices") else 50000
+        )
         face_count = len(optimized_mesh.faces) if hasattr(optimized_mesh, "faces") else 16666
 
         return GeneratedModel(
@@ -668,12 +672,8 @@ class AI3DModelGenerator:
                 vertices = mesh.vertices
 
                 uv = np.zeros((len(vertices), 2))
-                uv[:, 0] = (vertices[:, 0] - bounds[0, 0]) / (
-                    bounds[1, 0] - bounds[0, 0] + 1e-8
-                )
-                uv[:, 1] = (vertices[:, 1] - bounds[0, 1]) / (
-                    bounds[1, 1] - bounds[0, 1] + 1e-8
-                )
+                uv[:, 0] = (vertices[:, 0] - bounds[0, 0]) / (bounds[1, 0] - bounds[0, 0] + 1e-8)
+                uv[:, 1] = (vertices[:, 1] - bounds[0, 1]) / (bounds[1, 1] - bounds[0, 1] + 1e-8)
 
                 material = trimesh.visual.material.PBRMaterial(
                     baseColorTexture=Image.open(texture_path),

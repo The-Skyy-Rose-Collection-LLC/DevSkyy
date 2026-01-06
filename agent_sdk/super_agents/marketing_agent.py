@@ -4,7 +4,6 @@ Marketing SuperAgent
 Handles content creation, SEO, social media, and email campaigns.
 """
 
-
 from claude_agent_sdk import AgentDefinition, ClaudeAgentOptions
 
 
