@@ -47,6 +47,8 @@ tenacity>=8.2
 orjson>=3.9
 aiofiles>=23.2
 anyio>=4.0
+PyYAML>=6.0
+toml>=0.10.2
 
 # Monitoring
 prometheus-client>=0.19
