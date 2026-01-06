@@ -34,8 +34,8 @@ import cohere
 
 # Official SDK imports
 from anthropic import AsyncAnthropic
-from google import genai
-from google.genai import types as genai_types
+import google.generativeai as genai
+from google.generativeai import types as genai_types
 from groq import AsyncGroq
 from mistralai import Mistral
 from openai import AsyncOpenAI
