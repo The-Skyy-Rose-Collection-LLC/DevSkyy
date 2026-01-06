@@ -30,6 +30,7 @@ aiohttp>=3.9
 certifi>=2023.0
 requests>=2.31
 woocommerce>=3.0.0
+gradio-client>=0.8
 
 # AI/LLM Providers (Required)
 openai>=1.3
