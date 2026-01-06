@@ -65,11 +65,11 @@ python-wordpress-xmlrpc>=2.3
 # Agent SDK
 claude-agent-sdk==0.1.18
 
-# LlamaIndex (multimodal capabilities)
+# LlamaIndex (multimodal capabilities - Anthropic + OpenAI only, no torch)
 llama-index>=0.10.0
 llama-index-llms-openai>=0.1.0
 llama-index-multi-modal-llms-anthropic>=0.1.0
-llama-index-multi-modal-llms-huggingface>=0.1.0
+# HuggingFace multimodal requires torch - see requirements-full.txt
 
 # ============================================
 # OPTIONAL: Uncomment for advanced features
