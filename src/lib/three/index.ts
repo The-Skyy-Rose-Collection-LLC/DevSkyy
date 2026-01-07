@@ -23,7 +23,7 @@ export {
   detectDeviceConfig,
   createRendererFromConfig,
   createCameraFromConfig,
-} from '../../config/threejs.config';
+} from '../../config/threejs.config.js';
 
 // Model Loading
 export {
@@ -36,7 +36,7 @@ export {
   ModelLoadError,
   getModelLoader,
   resetModelLoader,
-} from '../ModelAssetLoader';
+} from '../ModelAssetLoader.js';
 
 // Performance Monitoring
 export {
@@ -47,18 +47,18 @@ export {
   type MonitorConfig,
   getPerformanceMonitor,
   resetPerformanceMonitor,
-} from '../ThreePerformanceMonitor';
+} from '../ThreePerformanceMonitor.js';
 
 // Re-export Three.js for convenience
 export * as THREE from 'three';
 
 // Common Three.js addons
-export { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-export { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-export { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-export { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-export { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-export { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-export { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
-export { SSAOPass } from 'three/addons/postprocessing/SSAOPass.js';
-export { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+export { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+export { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+export { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+export { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+export { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+export { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+export { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
+export { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass.js';
+export { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';

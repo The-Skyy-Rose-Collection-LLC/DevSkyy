@@ -9,31 +9,31 @@
  */
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-import { Logger } from '../utils/Logger';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { Logger } from '../utils/Logger.js';
 import {
   ModelAssetLoader,
   getModelLoader,
   type LoadedModel,
   type LoadProgress,
   ModelLoadError
-} from '../lib/ModelAssetLoader';
+} from '../lib/ModelAssetLoader.js';
 import {
   ThreePerformanceMonitor,
   getPerformanceMonitor,
   type PerformanceMetrics,
   type PerformanceWarning
-} from '../lib/ThreePerformanceMonitor';
+} from '../lib/ThreePerformanceMonitor.js';
 import {
   type ThreeJSConfig,
   detectDeviceConfig,
   HIGH_QUALITY_CONFIG,
   MEDIUM_QUALITY_CONFIG,
   LOW_QUALITY_CONFIG
-} from '../config/threejs.config';
+} from '../config/threejs.config.js';
 
 // ============================================================================
 // TYPES

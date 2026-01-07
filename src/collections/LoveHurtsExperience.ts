@@ -15,14 +15,14 @@
  */
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
-import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
-import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-import { Logger } from '../utils/Logger';
-import { HotspotManager } from './HotspotManager';
-import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader';
-import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
+import { Logger } from '../utils/Logger.js';
+import { HotspotManager } from './HotspotManager.js';
+import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
+import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
 
 // ============================================================================
 // Types & Interfaces
