@@ -3321,11 +3321,11 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         """
         try:
             # Import enterprise modules
+            from llm.providers.anthropic import AnthropicClient
+            from llm.providers.deepseek import DeepSeekClient
+            from llm.verification import LLMVerificationEngine, VerificationConfig
             from orchestration.enterprise_index import create_enterprise_index
             from orchestration.semantic_analyzer import SemanticCodeAnalyzer
-            from llm.verification import LLMVerificationEngine, VerificationConfig
-            from llm.providers.deepseek import DeepSeekClient
-            from llm.providers.anthropic import AnthropicClient
 
             # Initialize Enterprise Index
             self.enterprise_index = create_enterprise_index()

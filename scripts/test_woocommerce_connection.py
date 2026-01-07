@@ -23,7 +23,7 @@ from pathlib import Path
 # Add parent directory to path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from integrations.wordpress_client import WordPressWooCommerceClient, WordPressConfig
+from integrations.wordpress_client import WordPressWooCommerceClient
 
 # Configure logging
 logging.basicConfig(
@@ -135,7 +135,7 @@ async def test_product_creation():
         print("Skipping product creation")
         return
 
-    from integrations.wordpress_client import WooCommerceProduct, ProductStatus
+    from integrations.wordpress_client import ProductStatus, WooCommerceProduct
 
     async with WordPressWooCommerceClient() as client:
         print("\nCreating test product...")
@@ -154,7 +154,7 @@ async def test_product_creation():
 
         created = await client.create_product(product)
 
-        print(f"  ✓ Product created successfully!\n")
+        print("  ✓ Product created successfully!\n")
         print("Product Details:")
         print(f"  ID: {created.id}")
         print(f"  Name: {created.name}")

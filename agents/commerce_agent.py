@@ -30,8 +30,7 @@ from adk.base import (
     AgentStatus,
     ToolDefinition,
 )
-from orchestration.prompt_engineering import PromptTechnique
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,
@@ -39,6 +38,7 @@ from runtime.tools import (
     ToolSeverity,
     ToolSpec,
 )
+from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -704,7 +704,7 @@ Recommended Actions:
             return {"error": "WordPress client not connected"}
 
         try:
-            from integrations.wordpress_client import WooCommerceProduct, ProductStatus
+            from integrations.wordpress_client import ProductStatus, WooCommerceProduct
 
             # Prepare product data
             product = WooCommerceProduct(

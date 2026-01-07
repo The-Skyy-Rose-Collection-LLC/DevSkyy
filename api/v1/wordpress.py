@@ -25,7 +25,6 @@ from pydantic import BaseModel, Field
 from integrations.wordpress_client import (
     OrderStatus,
     ProductStatus,
-    WooCommerceCustomer,
     WooCommerceOrder,
     WooCommerceProduct,
     WordPressError,

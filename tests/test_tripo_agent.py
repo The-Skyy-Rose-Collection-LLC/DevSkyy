@@ -15,7 +15,7 @@ from pathlib import Path
 import pytest
 
 from agents.tripo_agent import AssetValidation, TripoAssetAgent, TripoConfig
-from runtime.tools import ToolCallContext, ToolRegistry
+from core.runtime.tool_registry import ToolCallContext, ToolRegistry
 
 # =============================================================================
 # Fixtures

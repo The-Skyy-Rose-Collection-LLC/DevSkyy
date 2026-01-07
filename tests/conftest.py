@@ -61,7 +61,7 @@ def admin_headers(jwt_manager):
 @pytest.fixture
 def tool_registry():
     """Fresh tool registry for each test."""
-    from runtime.tools import ToolRegistry
+    from core.runtime.tool_registry import ToolRegistry
 
     return ToolRegistry()
 
@@ -69,7 +69,7 @@ def tool_registry():
 @pytest.fixture
 def tool_context():
     """Default tool call context."""
-    from runtime.tools import ToolCallContext
+    from core.runtime.tool_registry import ToolCallContext
 
     return ToolCallContext(
         request_id="test-request",

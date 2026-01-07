@@ -48,7 +48,6 @@ import asyncio
 import base64
 import hashlib
 import io
-import json
 import os
 import shutil
 import time
@@ -61,19 +60,15 @@ from typing import Any
 import structlog
 from pydantic import BaseModel, Field
 
+from orchestration.brand_context import (
+    BrandContextInjector,
+)
 from orchestration.huggingface_3d_client import (
     HF3DFormat,
     HF3DModel,
     HF3DQuality,
-    HF3DResult,
     HuggingFace3DClient,
     HuggingFace3DConfig,
-)
-from orchestration.brand_context import (
-    Collection,
-    COLLECTION_CONTEXT,
-    SKYYROSE_BRAND,
-    BrandContextInjector,
 )
 
 logger = structlog.get_logger(__name__)
@@ -1259,9 +1254,10 @@ class TextureEnhancer:
     async def _get_session(self) -> Any:
         """Get or create aiohttp session."""
         if self._session is None:
+            import ssl
+
             import aiohttp
             import certifi
-            import ssl
 
             headers = {"Content-Type": "application/json"}
             if self.api_token:

@@ -466,7 +466,7 @@ async def check_environment(args: argparse.Namespace) -> int:
         print(f"    {'✓' if exists else '○'} {d}")
         if not exists and args.create_dirs:
             path.mkdir(parents=True, exist_ok=True)
-            print(f"      Created directory")
+            print("      Created directory")
 
     # Count available assets
     print("\n  Available Assets:")

@@ -27,7 +27,7 @@ import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Literal
-from urllib.parse import urlencode, quote
+from urllib.parse import quote
 
 import aiohttp
 from pydantic import BaseModel, Field

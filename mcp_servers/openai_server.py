@@ -730,7 +730,7 @@ async def tool_registry_info(
         import sys
 
         sys.path.insert(0, str(__file__).replace("/mcp/openai_server.py", ""))
-        from runtime.tools import get_tool_registry
+        from core.runtime.tool_registry import get_tool_registry
 
         registry = get_tool_registry()
         tools = registry.list_enabled()
