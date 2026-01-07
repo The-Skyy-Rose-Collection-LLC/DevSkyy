@@ -54,14 +54,6 @@ module.exports = {
         'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
         'spin-slow': 'spin 3s linear infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
-        // SkyyRose rotating logo animations
-        'rotate3D': 'rotate3D 8s ease-in-out infinite',
-        'rotate3DContinuous': 'rotate3DContinuous 10s linear infinite',
-        'spinGlow': 'spinGlow 6s linear infinite',
-        'sparkle': 'sparkle 2s ease-in-out infinite',
-        'heartbeat': 'heartbeat 2s ease-in-out infinite',
-        'gentleFloat': 'gentleFloat 8s ease-in-out infinite',
-        'pulse': 'pulse 2s ease-in-out infinite',
       },
       keyframes: {
         'pulse-glow': {
@@ -73,43 +65,6 @@ module.exports = {
             opacity: '0.8',
             boxShadow: '0 0 20px currentColor, 0 0 30px currentColor',
           },
-        },
-        // SkyyRose rotating logo keyframes (defined in globals.css)
-        rotate3D: {
-          '0%': { transform: 'rotateY(0deg) rotateX(0deg)' },
-          '25%': { transform: 'rotateY(90deg) rotateX(10deg)' },
-          '50%': { transform: 'rotateY(180deg) rotateX(0deg)' },
-          '75%': { transform: 'rotateY(270deg) rotateX(-10deg)' },
-          '100%': { transform: 'rotateY(360deg) rotateX(0deg)' },
-        },
-        rotate3DContinuous: {
-          '0%': { transform: 'rotateY(0deg) rotateX(10deg) scale(1)' },
-          '25%': { transform: 'rotateY(90deg) rotateX(15deg) scale(1.1)' },
-          '50%': { transform: 'rotateY(180deg) rotateX(10deg) scale(1)' },
-          '75%': { transform: 'rotateY(270deg) rotateX(5deg) scale(1.05)' },
-          '100%': { transform: 'rotateY(360deg) rotateX(10deg) scale(1)' },
-        },
-        spinGlow: {
-          '0%': { transform: 'rotate(0deg)', filter: 'drop-shadow(0 0 10px currentColor)' },
-          '50%': { transform: 'rotate(180deg)', filter: 'drop-shadow(0 0 30px currentColor)' },
-          '100%': { transform: 'rotate(360deg)', filter: 'drop-shadow(0 0 10px currentColor)' },
-        },
-        sparkle: {
-          '0%, 100%': { filter: 'drop-shadow(0 15px 40px rgba(201, 169, 98, 0.6))' },
-          '50%': { filter: 'drop-shadow(0 20px 60px rgba(201, 169, 98, 0.9))' },
-        },
-        heartbeat: {
-          '0%, 100%': { transform: 'scale(1)' },
-          '25%': { transform: 'scale(1.05)' },
-          '50%': { transform: 'scale(1)' },
-        },
-        gentleFloat: {
-          '0%, 100%': { transform: 'translateY(0)' },
-          '50%': { transform: 'translateY(-20px)' },
-        },
-        pulse: {
-          '0%, 100%': { opacity: '1', transform: 'scale(1)' },
-          '50%': { opacity: '0.8', transform: 'scale(1.1)' },
         },
       },
     },
