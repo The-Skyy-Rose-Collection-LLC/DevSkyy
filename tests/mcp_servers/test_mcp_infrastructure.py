@@ -5,25 +5,23 @@ Tests for MCP Infrastructure
 Tests for process manager, catalog generator, and orchestrator.
 """
 
-import pytest
 from pathlib import Path
 
-from mcp_servers.process_manager import (
-    MCPProcessManager,
-    MCPServerDefinition,
-    ProcessStatus,
-    RestartPolicy,
-)
+import pytest
+
 from mcp_servers.catalog_generator import (
-    UnifiedToolRegistry,
-    ToolCatalogGenerator,
-    ToolMetadata,
-    ToolCategory,
-    ToolSeverity,
     ExportFormat,
+    ToolCatalogGenerator,
+    ToolCategory,
+    ToolMetadata,
+    ToolSeverity,
+    UnifiedToolRegistry,
 )
 from mcp_servers.orchestrator import MCPOrchestrator
-
+from mcp_servers.process_manager import (
+    MCPProcessManager,
+    ProcessStatus,
+)
 
 # =============================================================================
 # Process Manager Tests

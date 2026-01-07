@@ -9,7 +9,7 @@ import asyncio
 
 import pytest
 
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCallContext,
     ToolCategory,

@@ -15,7 +15,13 @@ Version: 1.0.0
 
 from __future__ import annotations
 
-from runtime.tools import ParameterType, ToolCategory, ToolParameter, ToolSeverity, ToolSpec
+from core.runtime.tool_registry import (
+    ParameterType,
+    ToolCategory,
+    ToolParameter,
+    ToolSeverity,
+    ToolSpec,
+)
 
 # =============================================================================
 # Code Execution Tool Definition

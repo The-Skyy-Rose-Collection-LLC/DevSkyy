@@ -10,23 +10,20 @@ All models use:
 - Timezone-aware timestamps
 - Explicit type hints and validation
 """
-from datetime import datetime
-from typing import Optional, Dict, Any, List
-from uuid import UUID, uuid4
-from decimal import Decimal
 
 from sqlalchemy import (
+    DECIMAL,
+    TIMESTAMP,
     Boolean,
     Column,
-    DECIMAL,
     ForeignKey,
     Integer,
     String,
     Text,
-    TIMESTAMP,
     text,
 )
-from sqlalchemy.dialects.postgresql import UUID as PG_UUID, JSONB, ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import UUID as PG_UUID
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 

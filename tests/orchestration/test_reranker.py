@@ -3,13 +3,14 @@ Tests for Cohere Reranker
 ==========================
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from orchestration.reranker import (
     CohereReranker,
-    RerankerConfig,
     RankedResult,
+    RerankerConfig,
 )
 
 

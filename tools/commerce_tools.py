@@ -14,7 +14,7 @@ Example tools:
 import logging
 from typing import Any
 
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,

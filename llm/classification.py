@@ -27,7 +27,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from .base import CompletionResponse, Message, ModelProvider
+from .base import Message
 from .exceptions import LLMError
 from .providers.groq import GroqClient
 
@@ -532,7 +532,7 @@ class GroqFastClassifier:
             # Build scores dict
             scores = data.get("scores", data.get("all_scores", {}))
             if not scores and expected_labels:
-                scores = {lbl: 0.0 for lbl in expected_labels}
+                scores = dict.fromkeys(expected_labels, 0.0)
                 scores[label] = data.get("confidence", 0.9)
 
             return ClassificationResult(

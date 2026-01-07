@@ -14,12 +14,11 @@ Features demonstrated:
 
 import asyncio
 
-from agents.commerce_agent import CommerceAgent
 from adk.base import AgentConfig
-from runtime.tools import (
+from agents.commerce_agent import CommerceAgent
+from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
-    ToolRegistry,
     ToolSeverity,
     get_tool_registry,
 )
