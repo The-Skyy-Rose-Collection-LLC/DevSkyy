@@ -1,0 +1,10 @@
+{
+  "name": "devskyy",
+  "version": "1.0.0",
+  "description": "DevSkyy AI platform development tools for SuperAgents, MCP servers, 3D pipelines, SkyyRose brand integration, and WordPress/Elementor workflows",
+  "author": "SkyyRose LLC",
+  "repository": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy",
+  "license": "MIT",
+  "tags": ["ai", "agents", "mcp", "3d", "wordpress", "ecommerce", "fashion"],
+  "minimumVersion": "0.1.0"
+}
