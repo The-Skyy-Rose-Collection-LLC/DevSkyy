@@ -4,6 +4,28 @@
 
 ---
 
+## ⚠️ MANDATORY WORKFLOW - READ FIRST
+
+**EVERY CODE CHANGE MUST FOLLOW THIS:**
+
+1. **Context7 FIRST** - Query Context7 MCP for documentation BEFORE writing ANY code
+   - `mcp__plugin_context7_context7__resolve-library-id` → library lookup
+   - `mcp__plugin_context7_context7__query-docs` → get current best practices
+   - NO exceptions - even for "simple" changes
+
+2. **Ralph-Wiggums ERROR LOOP** - Wrap ALL I/O operations in `ralph_wiggums_execute`
+   - File operations, API calls, Database queries, Git operations, External tools
+   - See `utils/ralph_wiggums.py` for examples
+
+3. **Serena MCP INTEGRATION** - Use Serena symbolic tools for code changes
+   - `mcp__plugin_serena_serena__find_symbol` for code discovery
+   - `mcp__plugin_serena_serena__replace_symbol_body` for edits
+   - Read `.serena/memories/` before starting work
+
+**If you violate these rules, STOP and restart using the correct approach.**
+
+---
+
 ## 🎯 Mission
 
 Transform DevSkyy B+ (52/100) → A+ (90+) via: Security hardening, API versioning,
@@ -34,6 +56,7 @@ GDPR compliance, production deployment, elimination of ALL stubs/placeholders.
 - **Real-time context**: Pull from `docs/`, `README.md`, and source files for current state
 
 **Auto-invoke Context7 for**:
+
 - Code generation tasks
 - Architecture decisions
 - API endpoint implementations
