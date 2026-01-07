@@ -3,11 +3,12 @@ Tests for DeepSeek LLM Provider
 ================================
 """
 
-import pytest
 from unittest.mock import AsyncMock, patch
 
+import pytest
+
+from llm.base import Message
 from llm.providers.deepseek import DeepSeekClient
-from llm.base import Message, MessageRole
 
 
 @pytest.mark.unit

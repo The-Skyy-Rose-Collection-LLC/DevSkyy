@@ -30,8 +30,7 @@ from adk.base import (
     AgentStatus,
     ToolDefinition,
 )
-from orchestration.prompt_engineering import PromptTechnique
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,
@@ -39,6 +38,7 @@ from runtime.tools import (
     ToolSeverity,
     ToolSpec,
 )
+from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType
 from .multimodal_capabilities import (

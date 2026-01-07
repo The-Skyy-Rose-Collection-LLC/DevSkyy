@@ -35,7 +35,6 @@ import google.generativeai as genai
 
 # Official SDK imports
 from anthropic import AsyncAnthropic
-from google.generativeai import types as genai_types
 from groq import AsyncGroq
 from mistralai import Mistral
 from openai import AsyncOpenAI

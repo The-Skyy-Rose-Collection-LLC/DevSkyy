@@ -20,13 +20,12 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
-from pathlib import Path
 from typing import Any
 
 import click
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 from rich.tree import Tree
 
 from mcp_servers.catalog_generator import ExportFormat

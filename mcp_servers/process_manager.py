@@ -20,13 +20,11 @@ from __future__ import annotations
 import asyncio
 import logging
 import os
-import signal
 import subprocess
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from enum import Enum
 from pathlib import Path
-from typing import Any
 
 import httpx
 from pydantic import BaseModel, Field
@@ -282,7 +280,7 @@ class MCPProcessManager:
                         await asyncio.wait_for(
                             asyncio.to_thread(process_info.process.wait), timeout=timeout
                         )
-                    except asyncio.TimeoutError:
+                    except TimeoutError:
                         logger.warning(f"Graceful shutdown timeout for {server_id}, forcing...")
                         process_info.process.kill()
                         process_info.process.wait()

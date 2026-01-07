@@ -39,7 +39,7 @@ from base import (
     SuperAgent,
     ValidationResult,
 )
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
     ToolRegistry,
