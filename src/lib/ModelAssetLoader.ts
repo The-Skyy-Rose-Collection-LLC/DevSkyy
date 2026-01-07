@@ -7,10 +7,10 @@
  */
 
 import * as THREE from 'three';
-import { GLTFLoader, type GLTF } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
-import type { ThreeJSLoaderConfig } from '../config/threejs.config';
+import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
+import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import type { ThreeJSLoaderConfig } from '../config/threejs.config.js';
 
 // ============================================================================
 // TYPES
@@ -531,16 +531,6 @@ export class ModelAssetLoader {
 
   private evictIfNeeded(incomingBytes: number): void {
     const limitBytes = this.config.cacheSizeMB * 1024 * 1024;
-
-    // Skip caching if single model exceeds cache limit to prevent infinite loop
-    if (incomingBytes > limitBytes) {
-      console.warn(
-        `Model size (${(incomingBytes / 1024 / 1024).toFixed(2)}MB) exceeds cache limit ` +
-        `(${this.config.cacheSizeMB}MB), skipping cache`
-      );
-      return;
-    }
-
     let currentSize = 0;
 
     for (const model of this.cache.values()) {
