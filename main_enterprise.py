@@ -623,7 +623,7 @@ async def health_check():
     return HealthResponse(
         status="healthy",
         timestamp=datetime.now(UTC).isoformat(),
-        version="1.0.0",
+        version="1.0.1",
         environment=os.getenv("ENVIRONMENT", "development"),
         services={
             "api": "operational",
