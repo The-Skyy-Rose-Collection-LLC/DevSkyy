@@ -10,6 +10,7 @@ import Script from 'next/script';
 import { Settings } from 'lucide-react';
 import { CopilotProvider } from '@/components/providers/copilot-provider';
 import { Navigation } from '@/components/Navigation';
+import { HeaderLogo } from '@/components/rotating-logo';
 import './globals.css';
 
 // Use CSS custom properties for fonts - defined in globals.css
@@ -42,10 +43,8 @@ export default function RootLayout({
           <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">
             {/* Logo */}
             <div className="flex h-16 items-center border-b border-gray-200 px-6 dark:border-gray-800">
-              <Link href="/" className="flex items-center gap-2">
-                <div className="h-8 w-8 rounded-lg bg-brand-primary flex items-center justify-center">
-                  <span className="text-white font-bold text-sm">DS</span>
-                </div>
+              <Link href="/" className="flex items-center gap-3">
+                <HeaderLogo className="w-10 h-10" />
                 <span className="font-bold text-lg">DevSkyy</span>
               </Link>
             </div>
@@ -64,13 +63,16 @@ export default function RootLayout({
                 <Settings className="h-5 w-5" />
                 Settings
               </Link>
-              <div className="mt-4 rounded-lg bg-brand-primary/10 p-3">
-                <p className="text-xs font-medium text-brand-primary">
-                  SkyyRose AI
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Where Love Meets Luxury
-                </p>
+              <div className="mt-4 rounded-lg bg-brand-primary/10 p-3 flex flex-col items-center gap-2">
+                <HeaderLogo className="w-12 h-12" />
+                <div className="text-center">
+                  <p className="text-xs font-medium text-brand-primary">
+                    SkyyRose AI
+                  </p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400">
+                    Where Love Meets Luxury
+                  </p>
+                </div>
               </div>
             </div>
           </aside>
