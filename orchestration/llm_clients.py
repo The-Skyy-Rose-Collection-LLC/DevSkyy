@@ -506,10 +506,10 @@ class GoogleClient(BaseLLMClient):
 
     def _messages_to_gemini(
         self, messages: list[Message]
-    ) -> tuple[str | None, list[genai_types.Content]]:
+    ) -> tuple[str | None, list[Any]]:
         """Convert to Gemini format using new SDK types"""
         system_instruction: str | None = None
-        contents: list[genai_types.Content] = []
+        contents: list[Any] = []
 
         for m in messages:
             if m.role == MessageRole.SYSTEM:
@@ -517,10 +517,7 @@ class GoogleClient(BaseLLMClient):
             else:
                 role = "user" if m.role == MessageRole.USER else "model"
                 contents.append(
-                    genai_types.Content(
-                        role=role,
-                        parts=[genai_types.Part(text=m.content)],
-                    )
+                    {"role": role, "parts": [{"text": m.content}]}
                 )
 
         return system_instruction, contents
@@ -539,14 +536,14 @@ class GoogleClient(BaseLLMClient):
 
         system_instruction, contents = self._messages_to_gemini(messages)
 
-        # Build configuration using new SDK types
-        config = genai_types.GenerateContentConfig(
-            temperature=temperature,
-            max_output_tokens=max_tokens,
-        )
+        # Build configuration using dict (compatible with deprecated SDK)
+        config = {
+            "temperature": temperature,
+            "max_output_tokens": max_tokens,
+        }
 
         if system_instruction:
-            config.system_instruction = system_instruction
+            config["system_instruction"] = system_instruction
 
         # Generate content using async client
         response = await self._client.aio.models.generate_content(
@@ -605,14 +602,14 @@ class GoogleClient(BaseLLMClient):
     ) -> AsyncIterator[StreamChunk]:
         system_instruction, contents = self._messages_to_gemini(messages)
 
-        # Build configuration using new SDK types
-        config = genai_types.GenerateContentConfig(
-            temperature=temperature,
-            max_output_tokens=max_tokens,
-        )
+        # Build configuration using dict (compatible with deprecated SDK)
+        config = {
+            "temperature": temperature,
+            "max_output_tokens": max_tokens,
+        }
 
         if system_instruction:
-            config.system_instruction = system_instruction
+            config["system_instruction"] = system_instruction
 
         # Stream content using async client
         async for chunk in await self._client.aio.models.generate_content_stream(
