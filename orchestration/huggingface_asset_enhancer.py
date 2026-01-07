@@ -48,6 +48,7 @@ import asyncio
 import base64
 import hashlib
 import io
+import json
 import os
 import shutil
 import time
@@ -60,15 +61,19 @@ from typing import Any
 import structlog
 from pydantic import BaseModel, Field
 
-from orchestration.brand_context import (
-    BrandContextInjector,
-)
 from orchestration.huggingface_3d_client import (
     HF3DFormat,
     HF3DModel,
     HF3DQuality,
+    HF3DResult,
     HuggingFace3DClient,
     HuggingFace3DConfig,
+)
+from orchestration.brand_context import (
+    Collection,
+    COLLECTION_CONTEXT,
+    SKYYROSE_BRAND,
+    BrandContextInjector,
 )
 
 logger = structlog.get_logger(__name__)
@@ -210,6 +215,7 @@ class SkyyRoseBrandValidator:
     def validate_asset(
         self,
         image_path: str | None = None,
+        model_path: str | None = None,
         collection: str = "SIGNATURE",
         expected_garment: str | None = None,
     ) -> BrandValidationResult:
@@ -218,6 +224,7 @@ class SkyyRoseBrandValidator:
 
         Args:
             image_path: Path to product image for color analysis
+            model_path: Path to 3D model for validation
             collection: Expected collection (SIGNATURE, LOVE_HURTS, etc.)
             expected_garment: Expected garment type
 
@@ -296,7 +303,7 @@ class SkyyRoseBrandValidator:
             palette = self.brand_config["color_palette"]
             min_distance = float("inf")
 
-            for _color_name, hex_color in palette.items():
+            for color_name, hex_color in palette.items():
                 # Convert hex to RGB
                 hex_clean = hex_color.lstrip("#")
                 cr = int(hex_clean[0:2], 16)
@@ -304,7 +311,9 @@ class SkyyRoseBrandValidator:
                 cb = int(hex_clean[4:6], 16)
 
                 # Calculate color distance
-                distance = ((r_avg - cr) ** 2 + (g_avg - cg) ** 2 + (b_avg - cb) ** 2) ** 0.5
+                distance = (
+                    (r_avg - cr) ** 2 + (g_avg - cg) ** 2 + (b_avg - cb) ** 2
+                ) ** 0.5
 
                 min_distance = min(min_distance, distance)
 
@@ -336,7 +345,9 @@ class SkyyRoseBrandValidator:
 
         if garment_lower in self.brand_config["garment_templates"]:
             return 95.0  # Exact match
-        elif any(garment_lower in template for template in self.brand_config["garment_templates"]):
+        elif any(
+            garment_lower in template for template in self.brand_config["garment_templates"]
+        ):
             return 85.0  # Partial match
         else:
             return 70.0  # Unknown but acceptable
@@ -467,7 +478,9 @@ class EnhancerConfig:
         """Create config from environment variables."""
         return cls(
             hf_api_token=os.getenv("HUGGINGFACE_API_TOKEN") or os.getenv("HF_TOKEN"),
-            primary_model=HF3DModel(os.getenv("HF_PRIMARY_MODEL", HF3DModel.HUNYUAN3D_2.value)),
+            primary_model=HF3DModel(
+                os.getenv("HF_PRIMARY_MODEL", HF3DModel.HUNYUAN3D_2.value)
+            ),
             quality=HF3DQuality(os.getenv("HF_QUALITY", HF3DQuality.PRODUCTION.value)),
             texture_quality=TextureQuality(
                 os.getenv("HF_TEXTURE_QUALITY", TextureQuality.HIGH.value)
@@ -611,7 +624,7 @@ class ImagePreprocessor:
         output_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Generate output filename
-        image_hash = hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()[:8]
+        image_hash = hashlib.md5(path.read_bytes()).hexdigest()[:8]
         output_filename = f"{path.stem}_{image_hash}_processed.png"
         output_path = output_dir_path / output_filename
 
@@ -632,8 +645,10 @@ class ImagePreprocessor:
             return result
 
         # Run preprocessing in executor to avoid blocking
-        loop = asyncio.get_running_loop()
-        return await loop.run_in_executor(None, self._preprocess_sync, path, output_path, result)
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(
+            None, self._preprocess_sync, path, output_path, result
+        )
 
     def _preprocess_sync(
         self,
@@ -815,9 +830,7 @@ class HuggingFaceAssetEnhancer:
             EnhancementResult with all generated assets and brand validation
         """
         start_time = time.time()
-        asset_id = hashlib.md5(
-            f"{image_path}:{product_name}".encode(), usedforsecurity=False
-        ).hexdigest()[:12]
+        asset_id = hashlib.md5(f"{image_path}:{product_name}".encode()).hexdigest()[:12]
 
         # Auto-detect garment type if not provided
         if garment_type is None:
@@ -920,7 +933,9 @@ class HuggingFaceAssetEnhancer:
 
             # Step 4: Generate USDZ for iOS AR (if enabled)
             if self.config.generate_usdz and result.glb_path:
-                result.usdz_path = await self._convert_to_usdz(result.glb_path, output_dir)
+                result.usdz_path = await self._convert_to_usdz(
+                    result.glb_path, output_dir
+                )
 
             # Step 5: Generate thumbnail
             if self.config.generate_thumbnails and result.preprocessing:
@@ -1135,7 +1150,9 @@ class HuggingFaceAssetEnhancer:
 
         extensions = file_extensions or [".jpg", ".jpeg", ".png", ".webp"]
         image_files = [
-            f for f in collection_dir.iterdir() if f.is_file() and f.suffix.lower() in extensions
+            f
+            for f in collection_dir.iterdir()
+            if f.is_file() and f.suffix.lower() in extensions
         ]
 
         result = CollectionEnhancementResult(
@@ -1179,7 +1196,8 @@ class HuggingFaceAssetEnhancer:
 
         result.completed_at = datetime.now(UTC).isoformat()
         result.duration_seconds = (
-            datetime.fromisoformat(result.completed_at) - datetime.fromisoformat(result.started_at)
+            datetime.fromisoformat(result.completed_at)
+            - datetime.fromisoformat(result.started_at)
         ).total_seconds()
 
         logger.info(
@@ -1241,10 +1259,9 @@ class TextureEnhancer:
     async def _get_session(self) -> Any:
         """Get or create aiohttp session."""
         if self._session is None:
-            import ssl
-
             import aiohttp
             import certifi
+            import ssl
 
             headers = {"Content-Type": "application/json"}
             if self.api_token:
@@ -1321,13 +1338,11 @@ class TextureEnhancer:
                 from PIL import ImageEnhance, ImageFilter
 
                 # Apply unsharp mask for detail enhancement
-                enhanced_img = enhanced_img.filter(
-                    ImageFilter.UnsharpMask(
-                        radius=1.5,
-                        percent=100,
-                        threshold=2,
-                    )
-                )
+                enhanced_img = enhanced_img.filter(ImageFilter.UnsharpMask(
+                    radius=1.5,
+                    percent=100,
+                    threshold=2,
+                ))
 
                 # Slight contrast boost
                 enhancer = ImageEnhance.Contrast(enhanced_img)
@@ -1375,9 +1390,7 @@ class TextureEnhancer:
             raise FileNotFoundError(f"Texture not found: {image_path}")
 
         if model not in self.UPSCALE_MODELS:
-            raise ValueError(
-                f"Unknown model: {model}. Available: {list(self.UPSCALE_MODELS.keys())}"
-            )
+            raise ValueError(f"Unknown model: {model}. Available: {list(self.UPSCALE_MODELS.keys())}")
 
         model_id = self.UPSCALE_MODELS[model]
 
