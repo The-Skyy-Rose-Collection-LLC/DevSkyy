@@ -78,10 +78,10 @@ def generate_all_spaces_html(collection_name: str) -> str:
         tabs_html += f"""
         <button class="hf-tab-btn {active_class}"
                 data-tab="space-{idx}"
-                style="padding: 1rem 2rem; background: {'#B76E79' if idx == 0 else 'transparent'};
-                       color: {'white' if idx == 0 else '#333'}; border: none; cursor: pointer;
+                style="padding: 1rem 2rem; background: {"#B76E79" if idx == 0 else "transparent"};
+                       color: {"white" if idx == 0 else "#333"}; border: none; cursor: pointer;
                        font-size: 1rem; border-radius: 8px 8px 0 0; transition: all 0.3s;">
-            {space['icon']} {space['name']}
+            {space["icon"]} {space["name"]}
         </button>
         """
     tabs_html += "</div>"
@@ -94,17 +94,17 @@ def generate_all_spaces_html(collection_name: str) -> str:
 <div class="hf-tab-panel" id="space-{idx}" style="display: {display_style};">
     <div class="skyyrose-space-experience" style="margin: 2rem 0;">
         <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem;">
-            {space['icon']} {space['name']}
+            {space["icon"]} {space["name"]}
         </h3>
         <p style="color: #666; margin-bottom: 1.5rem; font-size: 1.1rem;">
-            {space['description']}
+            {space["description"]}
         </p>
 
         <div class="hf-space-container" style="position: relative; width: 100%; max-width: 1200px;
                                                 margin: 0 auto; border: 2px solid #B76E79; border-radius: 12px;
                                                 overflow: hidden; box-shadow: 0 8px 16px rgba(183,110,121,0.2);">
             <iframe
-                src="{space['url']}"
+                src="{space["url"]}"
                 frameborder="0"
                 width="100%"
                 height="800"
@@ -115,7 +115,7 @@ def generate_all_spaces_html(collection_name: str) -> str:
         </div>
 
         <p style="margin-top: 1rem; text-align: center; color: #666; font-size: 0.9rem;">
-            Powered by AI | <a href="{space['url']}" target="_blank" rel="noopener" style="color: #B76E79; text-decoration: none;">Open in HuggingFace →</a>
+            Powered by AI | <a href="{space["url"]}" target="_blank" rel="noopener" style="color: #B76E79; text-decoration: none;">Open in HuggingFace →</a>
         </p>
     </div>
 </div>
@@ -262,9 +262,9 @@ def main() -> int:
             if page_id != list(EXPERIENCES_PAGES.keys())[-1]:
                 time.sleep(1)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Embedded {success_count}/{len(EXPERIENCES_PAGES)} HuggingFace Spaces")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if success_count == len(EXPERIENCES_PAGES):
         print("\n📋 Next Steps:")

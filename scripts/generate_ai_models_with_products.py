@@ -245,9 +245,9 @@ def main():
             time.sleep(1)
 
     # Summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Generated {success_count}/{len(product_images)} AI models")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nOutput directory: {OUTPUT_DIR}")
 
     if success_count == len(product_images):

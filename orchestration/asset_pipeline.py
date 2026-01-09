@@ -194,9 +194,11 @@ class PipelineConfig:
         """Create config from environment variables."""
         # Parse primary 3D generator from env
         generator_str = os.getenv("PIPELINE_PRIMARY_3D_GENERATOR", "huggingface").lower()
-        primary_generator = Primary3DGenerator(generator_str) if generator_str in [
-            e.value for e in Primary3DGenerator
-        ] else Primary3DGenerator.HUGGINGFACE
+        primary_generator = (
+            Primary3DGenerator(generator_str)
+            if generator_str in [e.value for e in Primary3DGenerator]
+            else Primary3DGenerator.HUGGINGFACE
+        )
 
         return cls(
             tripo_config=TripoConfig.from_env(),
@@ -477,12 +479,16 @@ class ProductAssetPipeline:
                 logger.warning("Redis close timed out", error=str(e))
             except Exception as e:
                 errors.append(f"Redis close error: {e}")
-                logger.warning("Failed to close Redis connection", error=str(e), error_type=type(e).__name__)
+                logger.warning(
+                    "Failed to close Redis connection", error=str(e), error_type=type(e).__name__
+                )
             finally:
                 self._redis_connected = False
 
         if errors:
-            logger.info("Pipeline close completed with errors", error_count=len(errors), errors=errors)
+            logger.info(
+                "Pipeline close completed with errors", error_count=len(errors), errors=errors
+            )
 
     # =========================================================================
     # Stage 4.7.2: Redis Cache Layer
@@ -522,7 +528,9 @@ class ProductAssetPipeline:
             # Test connection with timeout
             await asyncio.wait_for(self._redis.ping(), timeout=5.0)
             self._redis_connected = True
-            logger.info("Redis cache connected", url=self.config.redis_url.split("@")[-1])  # Log host only, not credentials
+            logger.info(
+                "Redis cache connected", url=self.config.redis_url.split("@")[-1]
+            )  # Log host only, not credentials
             return True
         except TimeoutError:
             logger.warning(
@@ -1069,7 +1077,9 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
+            1
+            for _, r, _ in results
+            if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize

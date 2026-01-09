@@ -180,7 +180,7 @@ async def monitor_progress(progress_file: Path) -> None:
 
                 if status == "completed":
                     elapsed = time.time() - start_time
-                    print(f"\n✅ Training Completed in {elapsed/3600:.1f} hours")
+                    print(f"\n✅ Training Completed in {elapsed / 3600:.1f} hours")
                     print(f"   Final Loss: {progress.get('loss', 0):.4f}")
                     print(f"   Model Path: {progress.get('model_path', 'N/A')}")
                     break

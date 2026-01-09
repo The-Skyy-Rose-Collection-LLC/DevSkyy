@@ -89,9 +89,9 @@ class TestGenerateSecrets:
 
             for var in required_vars:
                 pattern = f"^{var}=.+$"
-                assert re.search(
-                    pattern, content, re.MULTILINE
-                ), f"{var} not found in .env.production"
+                assert re.search(pattern, content, re.MULTILINE), (
+                    f"{var} not found in .env.production"
+                )
 
             # Verify JWT_SECRET_KEY length (should be ~86 chars for 64 bytes)
             jwt_match = re.search(r"^JWT_SECRET_KEY=(.+)$", content, re.MULTILINE)
@@ -100,18 +100,14 @@ class TestGenerateSecrets:
             assert len(jwt_value) >= 64, f"JWT_SECRET_KEY too short: {len(jwt_value)}"
 
             # Verify ENCRYPTION_MASTER_KEY is base64 (should be ~44 chars for 32 bytes)
-            enc_match = re.search(
-                r"^ENCRYPTION_MASTER_KEY=(.+)$", content, re.MULTILINE
-            )
+            enc_match = re.search(r"^ENCRYPTION_MASTER_KEY=(.+)$", content, re.MULTILINE)
             assert enc_match, "ENCRYPTION_MASTER_KEY not found"
             enc_value = enc_match.group(1).strip()
-            assert (
-                len(enc_value) >= 32
-            ), f"ENCRYPTION_MASTER_KEY too short: {len(enc_value)}"
+            assert len(enc_value) >= 32, f"ENCRYPTION_MASTER_KEY too short: {len(enc_value)}"
             # Should be base64-compatible
-            assert re.match(
-                r"^[A-Za-z0-9+/=]+$", enc_value
-            ), "ENCRYPTION_MASTER_KEY not valid base64"
+            assert re.match(r"^[A-Za-z0-9+/=]+$", enc_value), (
+                "ENCRYPTION_MASTER_KEY not valid base64"
+            )
 
         finally:
             os.chdir(original_dir)
@@ -312,12 +308,12 @@ class TestSecretSecurity:
                         secrets2[key] = value
 
             # Verify secrets are different
-            assert (
-                secrets1["JWT_SECRET_KEY"] != secrets2["JWT_SECRET_KEY"]
-            ), "JWT secrets should be different"
-            assert (
-                secrets1["ENCRYPTION_MASTER_KEY"] != secrets2["ENCRYPTION_MASTER_KEY"]
-            ), "Encryption keys should be different"
+            assert secrets1["JWT_SECRET_KEY"] != secrets2["JWT_SECRET_KEY"], (
+                "JWT secrets should be different"
+            )
+            assert secrets1["ENCRYPTION_MASTER_KEY"] != secrets2["ENCRYPTION_MASTER_KEY"], (
+                "Encryption keys should be different"
+            )
 
         finally:
             os.chdir(original_dir)
@@ -347,9 +343,9 @@ class TestSecretSecurity:
             ]
 
             for pattern in weak_patterns:
-                assert not re.search(
-                    pattern, content, re.IGNORECASE
-                ), f"Weak pattern '{pattern}' found in secrets"
+                assert not re.search(pattern, content, re.IGNORECASE), (
+                    f"Weak pattern '{pattern}' found in secrets"
+                )
 
         finally:
             os.chdir(original_dir)

@@ -209,7 +209,7 @@ class VirtualPhotoshootPipeline:
         """Initialize the photoshoot pipeline."""
         if not PIL_AVAILABLE:
             raise ImportError(
-                "Pillow is required for virtual photoshoot. " "Install with: pip install Pillow"
+                "Pillow is required for virtual photoshoot. Install with: pip install Pillow"
             )
 
         # Check for 3D rendering capability

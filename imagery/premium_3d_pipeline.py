@@ -223,7 +223,7 @@ class BlenderProcessor:
             self._bpy = bpy
             logger.info(f"Blender {bpy.app.version_string} available")
         except ImportError:
-            logger.warning("Blender Python module not available. " "Install with: pip install bpy")
+            logger.warning("Blender Python module not available. Install with: pip install bpy")
 
     def _ensure_bpy(self) -> Any:
         """Ensure bpy is available."""

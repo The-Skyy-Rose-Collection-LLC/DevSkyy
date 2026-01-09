@@ -84,7 +84,12 @@ def parse_env_file(filepath: Path) -> dict[str, str]:
                 value = value.strip()
 
                 # Remove quotes if present
-                if value.startswith('"') and value.endswith('"') or value.startswith("'") and value.endswith("'"):
+                if (
+                    value.startswith('"')
+                    and value.endswith('"')
+                    or value.startswith("'")
+                    and value.endswith("'")
+                ):
                     value = value[1:-1]
 
                 env_vars[key] = value
@@ -181,7 +186,9 @@ def categorize_variables(env_vars: dict[str, str]) -> dict[str, list[tuple[str, 
     return categories
 
 
-def generate_render_format(categories: dict[str, list[tuple[str, str, str]]], auto_generate: bool = True) -> str:
+def generate_render_format(
+    categories: dict[str, list[tuple[str, str, str]]], auto_generate: bool = True
+) -> str:
     """Generate environment variables in Render dashboard format.
 
     Args:
@@ -329,7 +336,9 @@ def generate_render_format(categories: dict[str, list[tuple[str, str, str]]], au
     return "\n".join(output)
 
 
-def validate_environment(categories: dict[str, list[tuple[str, str, str]]]) -> tuple[bool, list[str]]:
+def validate_environment(
+    categories: dict[str, list[tuple[str, str, str]]],
+) -> tuple[bool, list[str]]:
     """Validate environment variables for common issues.
 
     Returns:
@@ -430,7 +439,9 @@ def main():
     # Write to file or stdout
     if args.output:
         args.output.write_text(output)
-        print(f"{Colors.GREEN}✓ Generated environment variables written to {args.output}{Colors.NC}")
+        print(
+            f"{Colors.GREEN}✓ Generated environment variables written to {args.output}{Colors.NC}"
+        )
         print(f"\n{Colors.BLUE}Next steps:{Colors.NC}")
         print(f"1. Review the file: {args.output}")
         print("2. Create database and Redis in Render")

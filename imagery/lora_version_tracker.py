@@ -292,9 +292,7 @@ class LoRAVersionTracker:
 
             await db.commit()
 
-        logger.info(
-            f"Created version {version}: " f"{total_products} products, {total_images} images"
-        )
+        logger.info(f"Created version {version}: {total_products} products, {total_images} images")
 
         # Return LoRAVersion object
         return await self.get_version(version)

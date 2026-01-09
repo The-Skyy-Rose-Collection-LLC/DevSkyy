@@ -87,9 +87,9 @@ async def generate_angle_views(
         Professional luxury fashion product photography,
         {product_name},
         {angle_desc},
-        {aesthetic['environment']},
-        {aesthetic['mood']},
-        {aesthetic['details']},
+        {aesthetic["environment"]},
+        {aesthetic["mood"]},
+        {aesthetic["details"]},
         SkyyRose luxury streetwear brand,
         commercial product photography, catalog quality,
         ultra detailed, sharp focus, professional color grading
@@ -150,8 +150,8 @@ async def generate_360_spin_frames(
         rotated {degrees} degrees from front view,
         centered on white background,
         studio photography with consistent lighting,
-        {aesthetic['environment']},
-        {aesthetic['mood']},
+        {aesthetic["environment"]},
+        {aesthetic["mood"]},
         ultra detailed, sharp focus
         """
 
@@ -170,7 +170,7 @@ async def generate_360_spin_frames(
                 shutil.copy2(result, output_path)
 
             if i % 6 == 0:  # Progress every 6 frames
-                print(f"  {i+1}/{num_frames} frames")
+                print(f"  {i + 1}/{num_frames} frames")
 
             spin_frames.append({"frame": i, "degrees": degrees, "path": str(output_path)})
 
@@ -200,8 +200,8 @@ async def generate_depth_layers(
         Professional luxury fashion product photography,
         {product_name},
         {layer_desc},
-        {aesthetic['environment']},
-        {aesthetic['mood']},
+        {aesthetic["environment"]},
+        {aesthetic["mood"]},
         depth of field effect,
         professional bokeh background
         """
@@ -250,11 +250,11 @@ async def generate_product_2d_25d_assets(
     )
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Generating 2D/2.5D Assets: {product_name}")
     print(f"Collection: {collection}")
     print(f"Output: {output_dir}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Generate angle views
     angles = await generate_angle_views(
@@ -309,9 +309,9 @@ async def main():
     with open(master_manifest_path, "w") as f:
         json.dump(all_assets, f, indent=2)
 
-    print(f"\n\n{'='*60}")
+    print(f"\n\n{'=' * 60}")
     print("✅ 2D/2.5D Asset Generation Complete!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nGenerated assets for {len(all_assets)} products")
     print(f"Master manifest: {master_manifest_path}")
 

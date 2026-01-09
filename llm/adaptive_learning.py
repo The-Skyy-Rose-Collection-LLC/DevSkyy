@@ -342,7 +342,7 @@ class AdaptiveLearningEngine:
                 # Fall back to overall win rate
                 score += profile.win_rate * 100 * 0.3  # 30% weight
                 reasoning_parts.append(
-                    f"{provider} has {profile.win_rate*100:.1f}% overall win rate"
+                    f"{provider} has {profile.win_rate * 100:.1f}% overall win rate"
                 )
                 category_match = False
 

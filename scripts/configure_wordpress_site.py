@@ -242,9 +242,9 @@ def main():
         configure_navigation()
         configure_woocommerce()
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("✅ WordPress Site Configuration Complete!")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"\n🌐 Your site: {WP_URL}")
         print("\n📋 Next Steps:")
         print("  1. Visit WordPress Admin: {WP_URL}/wp-admin/")

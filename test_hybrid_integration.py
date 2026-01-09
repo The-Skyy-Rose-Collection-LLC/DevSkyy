@@ -243,7 +243,6 @@ async def test_backward_compatibility():
     print_test("Backward Compatibility (Approach A tools)")
 
     try:
-
         from agent_sdk.custom_tools import execute_deployment, handle_support_ticket, manage_product
 
         # These should still exist and be callable
@@ -266,7 +265,6 @@ async def test_http_stubs():
     print_test("HTTP API Stubs (Approach C)")
 
     try:
-
         from agent_sdk.custom_tools import analyze_data, create_marketing_content
 
         # These should exist as stubs
@@ -283,9 +281,9 @@ async def test_http_stubs():
         # Should return content with stub message
         assert "content" in result, "Should return content"
         content_text = result["content"][0]["text"]
-        assert (
-            "STUB" in content_text or "not yet implemented" in content_text.lower()
-        ), "Should indicate stub status"
+        assert "STUB" in content_text or "not yet implemented" in content_text.lower(), (
+            "Should indicate stub status"
+        )
 
         print_success("HTTP stubs return appropriate placeholder messages")
 

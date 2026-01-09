@@ -142,7 +142,7 @@ async def upload_media_with_metadata(
                     if attempt < max_retries - 1:
                         wait_time = 2**attempt  # 1s, 2s, 4s (ralph-loop)
                         print(
-                            f"  ⏳ {filepath.name} rate limited, retry {attempt+1}/{max_retries} in {wait_time}s"
+                            f"  ⏳ {filepath.name} rate limited, retry {attempt + 1}/{max_retries} in {wait_time}s"
                         )
                         await asyncio.sleep(wait_time)
                         continue
@@ -172,7 +172,7 @@ async def upload_media_with_metadata(
             if attempt < max_retries - 1:
                 wait_time = 2**attempt  # Ralph-loop: 1s, 2s, 4s
                 print(
-                    f"  ⚠ {filepath.name} error, retry {attempt+1}/{max_retries} in {wait_time}s: {error_msg[:50]}"
+                    f"  ⚠ {filepath.name} error, retry {attempt + 1}/{max_retries} in {wait_time}s: {error_msg[:50]}"
                 )
                 await asyncio.sleep(wait_time)
                 continue

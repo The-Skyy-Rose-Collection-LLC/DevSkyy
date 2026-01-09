@@ -221,9 +221,7 @@ class LLMVerificationEngine:
                 return generator_response, verification_result
 
             elif verification_result.decision == VerificationDecision.NEEDS_FIXES:
-                logger.warning(
-                    f"Code needs fixes ({len(verification_result.issues)} issues)"
-                )
+                logger.warning(f"Code needs fixes ({len(verification_result.issues)} issues)")
                 # For minor fixes, return with issues for human review
                 # In future, could auto-apply fixes here
                 verification_result.cost_savings_pct = self._calculate_savings(
@@ -233,9 +231,7 @@ class LLMVerificationEngine:
                 return generator_response, verification_result
 
             else:  # REJECTED
-                logger.error(
-                    f"Code REJECTED by {self.config.verifier_model}, retrying..."
-                )
+                logger.error(f"Code REJECTED by {self.config.verifier_model}, retrying...")
                 # Add rejection feedback to context for next attempt
                 critical_issues = [
                     i for i in verification_result.issues if i.level == IssueLevel.CRITICAL
@@ -247,13 +243,9 @@ class LLMVerificationEngine:
                 messages.append(Message.user(feedback))
 
         # Max retries exceeded
-        raise RuntimeError(
-            f"Code generation failed verification after {max_retries} attempts"
-        )
+        raise RuntimeError(f"Code generation failed verification after {max_retries} attempts")
 
-    async def _verify_code(
-        self, task_description: str, generated_code: str
-    ) -> VerificationResult:
+    async def _verify_code(self, task_description: str, generated_code: str) -> VerificationResult:
         """Run verification using premium model."""
         verification_prompt = self.config.verification_prompt_template.format(
             task_description=task_description,

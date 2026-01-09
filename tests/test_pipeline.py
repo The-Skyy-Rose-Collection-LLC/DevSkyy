@@ -63,7 +63,8 @@ async def test_complete_pipeline():
 
     # Launch (as draft)
     result = await orchestrator.launch_complete_product(
-        product_concept=test_product, auto_publish=False  # Keep as draft for testing
+        product_concept=test_product,
+        auto_publish=False,  # Keep as draft for testing
     )
 
     print("\n✅ Pipeline Test Complete!")

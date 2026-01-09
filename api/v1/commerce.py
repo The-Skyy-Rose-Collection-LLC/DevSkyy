@@ -39,9 +39,7 @@ class BulkProductRequest(BaseModel):
     products: list[dict[str, Any]] = Field(
         ..., description="List of product data", min_length=1, max_length=100
     )
-    validate_only: bool = Field(
-        default=False, description="Validate without applying changes"
-    )
+    validate_only: bool = Field(default=False, description="Validate without applying changes")
 
 
 class ProductResult(BaseModel):
@@ -75,8 +73,8 @@ class DynamicPricingRequest(BaseModel):
         min_length=1,
         max_length=100,
     )
-    strategy: Literal["competitive", "demand_based", "ml_optimized", "time_based"] = (
-        Field(default="ml_optimized", description="Pricing strategy to use")
+    strategy: Literal["competitive", "demand_based", "ml_optimized", "time_based"] = Field(
+        default="ml_optimized", description="Pricing strategy to use"
     )
     constraints: dict[str, Any] | None = Field(
         default=None,

@@ -857,7 +857,7 @@ class TestTieredRateLimiting:
         for i in range(free_tier.requests_per_minute):
             is_allowed, info = limiter.check_tier_limit(request, "free")
             if i < free_tier.requests_per_minute - 1:
-                assert is_allowed is True, f"Request {i+1} should be allowed"
+                assert is_allowed is True, f"Request {i + 1} should be allowed"
 
         # Next request should be blocked
         is_allowed, info = limiter.check_tier_limit(request, "free")

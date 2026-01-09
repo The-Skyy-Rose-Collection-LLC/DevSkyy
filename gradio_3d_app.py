@@ -167,7 +167,7 @@ async def generate_3d_from_image(
             status = f"""
 ## ✅ Generation Complete!
 
-**Provider Used:** {result.provider_used.value if result.provider_used else 'N/A'}
+**Provider Used:** {result.provider_used.value if result.provider_used else "N/A"}
 **Generation Time:** {result.generation_time_seconds:.2f}s
 **Fidelity Score:** {result.fidelity_score:.1f}% ({fidelity_status})
 **Model Path:** {result.model_path}
@@ -182,9 +182,9 @@ async def generate_3d_from_image(
 
 | Metric | Score | Status |
 |--------|-------|--------|
-| Geometry | {fr.geometry.overall_score:.1f}% | {'✅' if fr.geometry.overall_score >= 95 else '⚠️'} |
-| Textures | {fr.textures.overall_score:.1f}% | {'✅' if fr.textures.overall_score >= 95 else '⚠️'} |
-| Materials | {fr.materials.overall_score:.1f}% | {'✅' if fr.materials.overall_score >= 95 else '⚠️'} |
+| Geometry | {fr.geometry.overall_score:.1f}% | {"✅" if fr.geometry.overall_score >= 95 else "⚠️"} |
+| Textures | {fr.textures.overall_score:.1f}% | {"✅" if fr.textures.overall_score >= 95 else "⚠️"} |
+| Materials | {fr.materials.overall_score:.1f}% | {"✅" if fr.materials.overall_score >= 95 else "⚠️"} |
 | **Overall** | **{fr.overall_score:.1f}%** | **{fidelity_status}** |
 
 **Threshold:** {MINIMUM_FIDELITY_SCORE}%
@@ -258,11 +258,11 @@ async def enhance_3d_model(
 ## ✅ Enhancement Complete!
 
 **Original Issues:**
-{chr(10).join(f'- {issue}' for issue in analysis.get('issues', [])) or '- None detected'}
+{chr(10).join(f"- {issue}" for issue in analysis.get("issues", [])) or "- None detected"}
 
 **Enhanced Model:** {enhanced_path}
 **Final Fidelity:** {report.overall_score:.1f}%
-**Status:** {'✅ PASSED' if report.passed else '❌ Below threshold'}
+**Status:** {"✅ PASSED" if report.passed else "❌ Below threshold"}
 """
             progress(1.0, desc="Done!")
             return str(enhanced_path), status
@@ -315,24 +315,24 @@ async def validate_3d_model(model_file, progress=gr.Progress()) -> str:
 |--------|-------|
 | Vertex Count | {report.geometry.vertex_count:,} |
 | Face Count | {report.geometry.face_count:,} |
-| Is Watertight | {'✅' if report.geometry.is_watertight else '❌'} |
-| Has Holes | {'❌ Yes' if report.geometry.has_holes else '✅ No'} |
+| Is Watertight | {"✅" if report.geometry.is_watertight else "❌"} |
+| Has Holes | {"❌ Yes" if report.geometry.has_holes else "✅ No"} |
 | Geometry Score | {report.geometry.overall_score:.1f}% |
 
 ## Texture Analysis
 
 | Metric | Value |
 |--------|-------|
-| Has Textures | {'✅' if report.textures.has_textures else '❌'} |
-| Resolution | {report.textures.resolution or 'N/A'} |
+| Has Textures | {"✅" if report.textures.has_textures else "❌"} |
+| Resolution | {report.textures.resolution or "N/A"} |
 | Texture Score | {report.textures.overall_score:.1f}% |
 
 ## Material Analysis
 
 | Metric | Value |
 |--------|-------|
-| Has Materials | {'✅' if report.materials.has_materials else '❌'} |
-| Is PBR | {'✅' if report.materials.is_pbr else '❌'} |
+| Has Materials | {"✅" if report.materials.has_materials else "❌"} |
+| Is PBR | {"✅" if report.materials.is_pbr else "❌"} |
 | Material Score | {report.materials.overall_score:.1f}% |
 
 ---

@@ -1,4 +1,5 @@
 """Alembic environment configuration with async support."""
+
 import asyncio
 import os
 from logging.config import fileConfig
@@ -40,7 +41,7 @@ if str(project_root) not in sys.path:
 models_path = project_root / "agents" / "models.py"
 spec = importlib.util.spec_from_file_location("models", models_path)
 models = importlib.util.module_from_spec(spec)
-sys.modules['models'] = models
+sys.modules["models"] = models
 spec.loader.exec_module(models)
 
 # Get Base from the loaded module

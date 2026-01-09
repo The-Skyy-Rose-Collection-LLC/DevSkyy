@@ -45,6 +45,7 @@ from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 # WordPress/WooCommerce integration
 try:
     from integrations.wordpress_client import WordPressWooCommerceClient
+
     WORDPRESS_AVAILABLE = True
 except ImportError:
     WORDPRESS_AVAILABLE = False
@@ -934,7 +935,7 @@ Please:
         """Manage inventory with forecasting"""
         prompt = f"""Inventory management task
 
-SKU: {sku or 'All products'}
+SKU: {sku or "All products"}
 Action: {action}
 
 Please:
@@ -965,7 +966,7 @@ Please:
         """Analyze and recommend pricing"""
         prompt = f"""Pricing analysis for SKU: {sku}
 
-Competitor prices: {competitor_prices or 'Not provided'}
+Competitor prices: {competitor_prices or "Not provided"}
 
 Please analyze:
 1. Current product pricing position

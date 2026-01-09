@@ -175,9 +175,9 @@ async def batch_generate_models(
     }
 
     for collection, image_paths in images_by_collection.items():
-        logger.info(f"\n{'='*70}")
+        logger.info(f"\n{'=' * 70}")
         logger.info(f"Processing {collection} collection ({len(image_paths)} images)")
-        logger.info(f"{'='*70}")
+        logger.info(f"{'=' * 70}")
 
         collection_output_dir = output_dir / collection.lower()
         collection_output_dir.mkdir(parents=True, exist_ok=True)
@@ -312,9 +312,9 @@ async def main() -> None:
             )
 
             # Log final summary
-            logger.info(f"\n{'='*70}")
+            logger.info(f"\n{'=' * 70}")
             logger.info("GENERATION SUMMARY")
-            logger.info(f"{'='*70}")
+            logger.info(f"{'=' * 70}")
             logger.info(f"Total images: {summary['total_images']}")
             logger.info(f"Successful: {summary['successful']}")
             logger.info(f"Failed: {summary['failed']}")

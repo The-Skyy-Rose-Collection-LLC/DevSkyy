@@ -61,7 +61,9 @@ class ThemeAssetType(str, Enum):
 class ThemeAsset(BaseModel):
     """Individual theme asset."""
 
-    path: str = Field(..., description="Relative path within theme (e.g., 'style.css', 'templates/header.php')")
+    path: str = Field(
+        ..., description="Relative path within theme (e.g., 'style.css', 'templates/header.php')"
+    )
     content: str | bytes = Field(..., description="Asset content")
     asset_type: ThemeAssetType = Field(..., description="Type of asset")
 
@@ -162,9 +164,7 @@ async def deploy_theme(
         ThemeDeploymentResult with deployment status
     """
     correlation_id = str(uuid4())
-    logger.info(
-        f"[{correlation_id}] Starting theme deployment: {request.theme_slug}"
-    )
+    logger.info(f"[{correlation_id}] Starting theme deployment: {request.theme_slug}")
 
     try:
         # Step 1: Package theme
@@ -308,8 +308,7 @@ async def list_themes() -> ThemeListResponse:
             for theme_slug, data in _deployed_themes.items()
         ],
         active_theme=next(
-            (slug for slug, data in _deployed_themes.items() if data["status"] == "active"),
-            ""
+            (slug for slug, data in _deployed_themes.items() if data["status"] == "active"), ""
         ),
         count=len(_deployed_themes),
     )
@@ -558,8 +557,8 @@ Description: {metadata.description}
 Version: {metadata.version}
 License: {metadata.license}
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
-Text Domain: {metadata.text_domain or metadata.theme_name.lower().replace(' ', '-')}
-Tags: {', '.join(metadata.tags)}
+Text Domain: {metadata.text_domain or metadata.theme_name.lower().replace(" ", "-")}
+Tags: {", ".join(metadata.tags)}
 */
 """
     return header

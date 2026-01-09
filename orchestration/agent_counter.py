@@ -73,8 +73,7 @@ async def count_active_agents() -> dict[str, int]:
 
             if super_agents_dir.exists():
                 super_agent_files = [
-                    f for f in super_agents_dir.glob("*_agent.py")
-                    if f.stem != "__init__"
+                    f for f in super_agents_dir.glob("*_agent.py") if f.stem != "__init__"
                 ]
                 super_agents_count = len(super_agent_files)
                 logger.debug(f"Found {super_agents_count} SuperAgents in {super_agents_dir}")
@@ -87,7 +86,8 @@ async def count_active_agents() -> dict[str, int]:
 
             if legacy_agents_dir.exists():
                 legacy_agent_files = [
-                    f for f in legacy_agents_dir.glob("*_agent.py")
+                    f
+                    for f in legacy_agents_dir.glob("*_agent.py")
                     if f.stem not in ["__init__", "base_super_agent"]
                 ]
                 legacy_agents_count = len(legacy_agent_files)
@@ -168,8 +168,7 @@ def count_active_agents_sync() -> dict[str, int]:
         super_agents_count = 0
         if super_agents_dir.exists():
             super_agent_files = [
-                f for f in super_agents_dir.glob("*_agent.py")
-                if f.stem != "__init__"
+                f for f in super_agents_dir.glob("*_agent.py") if f.stem != "__init__"
             ]
             super_agents_count = len(super_agent_files)
 
@@ -178,7 +177,8 @@ def count_active_agents_sync() -> dict[str, int]:
         legacy_agents_count = 0
         if legacy_agents_dir.exists():
             legacy_agent_files = [
-                f for f in legacy_agents_dir.glob("*_agent.py")
+                f
+                for f in legacy_agents_dir.glob("*_agent.py")
                 if f.stem not in ["__init__", "base_super_agent"]
             ]
             legacy_agents_count = len(legacy_agent_files)

@@ -6,6 +6,7 @@ This script verifies:
 2. Alembic can detect the models via Base.metadata
 3. Model schema matches the baseline migration
 """
+
 import sys
 from pathlib import Path
 
@@ -27,6 +28,7 @@ def test_import_models():
             ToolExecution,
             User,
         )
+
         print("✅ Successfully imported all ORM models")
         return True
     except ImportError as e:
@@ -41,13 +43,13 @@ def test_base_metadata():
 
         tables = Base.metadata.tables
         expected_tables = {
-            'users',
-            'products',
-            'orders',
-            'llm_round_table_results',
-            'agent_executions',
-            'tool_executions',
-            'rag_documents',
+            "users",
+            "products",
+            "orders",
+            "llm_round_table_results",
+            "agent_executions",
+            "tool_executions",
+            "rag_documents",
         }
 
         actual_tables = set(tables.keys())
@@ -90,15 +92,23 @@ def test_alembic_env():
 def test_model_schema():
     """Test that model schema matches expected structure."""
     try:
-
         from agents.models import Order, Product, User
 
         # Check User model
         user_columns = {col.name for col in User.__table__.columns}
         expected_user_cols = {
-            'id', 'email', 'username', 'password_hash', 'full_name',
-            'role', 'is_active', 'is_verified', 'created_at', 'updated_at',
-            'last_login', 'metadata'
+            "id",
+            "email",
+            "username",
+            "password_hash",
+            "full_name",
+            "role",
+            "is_active",
+            "is_verified",
+            "created_at",
+            "updated_at",
+            "last_login",
+            "metadata",
         }
 
         if user_columns == expected_user_cols:
@@ -112,9 +122,18 @@ def test_model_schema():
         # Check Product model
         product_columns = {col.name for col in Product.__table__.columns}
         expected_product_cols = {
-            'id', 'sku', 'name', 'description', 'category', 'price',
-            'inventory_quantity', 'status', 'tags', 'created_at',
-            'updated_at', 'metadata'
+            "id",
+            "sku",
+            "name",
+            "description",
+            "category",
+            "price",
+            "inventory_quantity",
+            "status",
+            "tags",
+            "created_at",
+            "updated_at",
+            "metadata",
         }
 
         if product_columns == expected_product_cols:
@@ -128,8 +147,15 @@ def test_model_schema():
         # Check Order model
         order_columns = {col.name for col in Order.__table__.columns}
         expected_order_cols = {
-            'id', 'order_number', 'user_id', 'status', 'total_price',
-            'subtotal', 'created_at', 'updated_at', 'metadata'
+            "id",
+            "order_number",
+            "user_id",
+            "status",
+            "total_price",
+            "subtotal",
+            "created_at",
+            "updated_at",
+            "metadata",
         }
 
         if order_columns == expected_order_cols:
@@ -157,7 +183,7 @@ def test_relationships():
         user_mapper = inspect(User)
         user_relationships = {rel.key for rel in user_mapper.relationships}
 
-        if 'orders' in user_relationships and 'tool_executions' in user_relationships:
+        if "orders" in user_relationships and "tool_executions" in user_relationships:
             print("✅ User model relationships are properly defined")
         else:
             print("❌ User model missing expected relationships")
@@ -168,7 +194,7 @@ def test_relationships():
         order_mapper = inspect(Order)
         order_relationships = {rel.key for rel in order_mapper.relationships}
 
-        if 'user' in order_relationships:
+        if "user" in order_relationships:
             print("✅ Order model relationships are properly defined")
         else:
             print("❌ Order model missing 'user' relationship")
@@ -178,7 +204,7 @@ def test_relationships():
         tool_mapper = inspect(ToolExecution)
         tool_relationships = {rel.key for rel in tool_mapper.relationships}
 
-        if 'user' in tool_relationships:
+        if "user" in tool_relationships:
             print("✅ ToolExecution model relationships are properly defined")
             return True
         else:

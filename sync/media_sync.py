@@ -241,7 +241,7 @@ class MediaSyncManager:
 
         if path.suffix.lower() not in self.SUPPORTED_3D:
             raise ValueError(
-                f"Unsupported 3D format: {path.suffix}. " f"Supported: {self.SUPPORTED_3D}"
+                f"Unsupported 3D format: {path.suffix}. Supported: {self.SUPPORTED_3D}"
             )
 
         title = product_name or path.stem

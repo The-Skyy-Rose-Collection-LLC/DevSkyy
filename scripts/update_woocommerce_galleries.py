@@ -328,9 +328,9 @@ async def main():
                 unmatched.append(uploaded_name)
 
         # 5. Summary
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("📊 SUMMARY")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"Total uploaded products: {len(products_images)}")
         print(f"Matched to WooCommerce: {matched_count}")
         print(f"Galleries updated: {updated_count}")

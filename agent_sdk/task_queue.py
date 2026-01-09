@@ -245,7 +245,7 @@ class TaskQueue:
 
         self._metrics["tasks_queued"] += 1
 
-        logger.info(f"Task queued: {task_id} " f"(type: {task_type}, priority: {priority})")
+        logger.info(f"Task queued: {task_id} (type: {task_type}, priority: {priority})")
 
         return task_id
 

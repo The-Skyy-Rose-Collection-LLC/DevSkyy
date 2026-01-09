@@ -51,7 +51,7 @@ def generate_signature_content() -> str:
         <!-- wp:heading {"textAlign":"center","level":1,"style":{"typography":{"fontSize":"4rem"}}} -->
         <h1 class="has-text-align-center" style="font-size:4rem">SIGNATURE Collection</h1>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"1.5rem"}}} -->
         <p class="has-text-align-center" style="font-size:1.5rem">Premium Sophistication Meets Timeless Elegance</p>
         <!-- /wp:paragraph -->
@@ -70,15 +70,15 @@ def generate_signature_content() -> str:
         <!-- wp:heading {"level":2} -->
         <h2>The Essence of SIGNATURE</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph -->
         <p>The SIGNATURE Collection embodies refined luxury for those who appreciate understated elegance. Each piece is crafted with meticulous attention to detail, featuring premium materials and sophisticated design that transcends fleeting trends.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:paragraph -->
         <p><strong>Key Features:</strong></p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:list -->
         <ul>
             <li>Premium heavyweight fabrics (300+ GSM)</li>
@@ -90,17 +90,17 @@ def generate_signature_content() -> str:
         <!-- /wp:list -->
     </div>
     <!-- /wp:column -->
-    
+
     <!-- wp:column -->
     <div class="wp-block-column">
         <!-- wp:heading {"level":2} -->
         <h2>Design Philosophy</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph -->
         <p>SIGNATURE represents the perfect balance between luxury streetwear and classic sophistication. Inspired by architectural minimalism and high fashion, each piece is designed to be a wardrobe staple that elevates any outfit.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:paragraph -->
         <p>The collection features muted earth tones, soft grays, and crisp whites, accented with the iconic SkyyRose logo in subtle placements that speak volumes without shouting.</p>
         <!-- /wp:paragraph -->
@@ -144,7 +144,7 @@ def generate_black_rose_content() -> str:
         <!-- wp:heading {"textAlign":"center","level":1,"style":{"typography":{"fontSize":"4rem"},"color":{"text":"#B76E79"}}} -->
         <h1 class="has-text-align-center" style="font-size:4rem;color:#B76E79">BLACK ROSE Collection</h1>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"1.5rem"}}} -->
         <p class="has-text-align-center" style="font-size:1.5rem">Gothic Luxury. Dramatic Aesthetic. Rebellious Elegance.</p>
         <!-- /wp:paragraph -->
@@ -163,15 +163,15 @@ def generate_black_rose_content() -> str:
         <!-- wp:heading {"level":2,"textColor":"white"} -->
         <h2 class="has-white-color has-text-color">Darkness Meets Beauty</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph -->
         <p>BLACK ROSE is where gothic romance meets contemporary luxury. This collection celebrates the beauty found in darkness, featuring deep blacks, midnight burgundies, and blood reds that command attention.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:paragraph -->
         <p><strong>Collection Highlights:</strong></p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:list -->
         <ul>
             <li>Dramatic silhouettes & oversized fits</li>
@@ -183,17 +183,17 @@ def generate_black_rose_content() -> str:
         <!-- /wp:list -->
     </div>
     <!-- /wp:column -->
-    
+
     <!-- wp:column {"style":{"spacing":{"padding":{"top":"2rem","right":"2rem","bottom":"2rem","left":"2rem"}}}} -->
     <div class="wp-block-column" style="padding-top:2rem;padding-right:2rem;padding-bottom:2rem;padding-left:2rem">
         <!-- wp:heading {"level":2,"textColor":"white"} -->
         <h2 class="has-white-color has-text-color">The Dark Romance</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph -->
         <p>Inspired by Victorian gothic architecture and modern dark aesthetics, BLACK ROSE rejects conventional beauty standards. Each piece tells a story of defiance, individuality, and artistic expression.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:paragraph -->
         <p>This isn't fashion for the faint of heart—it's for those who embrace their shadows and wear their darkness as armor. From distressed hoodies to statement coats, every piece makes an unforgettable impression.</p>
         <!-- /wp:paragraph -->
@@ -237,7 +237,7 @@ def generate_love_hurts_content() -> str:
         <!-- wp:heading {"textAlign":"center","level":1,"style":{"typography":{"fontSize":"4rem"},"color":{"text":"#FF0066"}}} -->
         <h1 class="has-text-align-center" style="font-size:4rem;color:#FF0066">LOVE HURTS Collection</h1>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"1.5rem"}}} -->
         <p class="has-text-align-center" style="font-size:1.5rem">Edgy Passion. Emotional Depth. Vulnerable Strength.</p>
         <!-- /wp:paragraph -->
@@ -256,15 +256,15 @@ def generate_love_hurts_content() -> str:
         <!-- wp:heading {"level":2} -->
         <h2>Raw Emotion, Refined Style</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph -->
         <p>LOVE HURTS captures the beautiful contradiction of love's duality—the ecstasy and agony, the tenderness and pain. This collection channels raw emotional energy into wearable art that resonates with those who feel deeply.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:paragraph -->
         <p><strong>Signature Elements:</strong></p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:list -->
         <ul>
             <li>Bold graphic designs & provocative messaging</li>
@@ -276,21 +276,21 @@ def generate_love_hurts_content() -> str:
         <!-- /wp:list -->
     </div>
     <!-- /wp:column -->
-    
+
     <!-- wp:column -->
     <div class="wp-block-column">
         <!-- wp:heading {"level":2} -->
         <h2>Wear Your Heart</h2>
         <!-- /wp:heading -->
-        
+
         <!-- wp:paragraph -->
         <p>LOVE HURTS is for those unafraid to express vulnerability as strength. Inspired by street art, punk culture, and modern romance, this collection transforms heartbreak into haute couture.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:paragraph -->
         <p>Each piece features intentional imperfections—rips, fading, asymmetry—that mirror the beautiful mess of human emotion. This isn't polished perfection; it's authentic, rebellious luxury for the passionate soul.</p>
         <!-- /wp:paragraph -->
-        
+
         <!-- wp:quote -->
         <blockquote class="wp-block-quote">
             <p>"The deepest wounds make the most beautiful scars."</p>
@@ -377,7 +377,7 @@ def update_experience_page(page_id: int, page_config: dict) -> bool:
                 new_content = page_config["content_generator"]()
 
         else:
-            print(f"  ⚠ Could not retrieve page, using new content only")
+            print("  ⚠ Could not retrieve page, using new content only")
             new_content = page_config["content_generator"]()
 
     except Exception as e:
@@ -402,7 +402,7 @@ def update_experience_page(page_id: int, page_config: dict) -> bool:
 
         if response.status_code in [200, 201]:
             result = response.json()
-            print(f"  ✅ Page updated successfully")
+            print("  ✅ Page updated successfully")
             print(f"     URL: {result.get('link', 'N/A')}")
             return True
         else:
@@ -425,9 +425,9 @@ def main() -> int:
         if update_experience_page(page_id, page_config):
             success_count += 1
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Updated {success_count}/{len(COLLECTION_PAGES)} Experience Pages")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if success_count == len(COLLECTION_PAGES):
         print("\n🌟 Experience Pages Live:")
