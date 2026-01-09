@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Build COMPLETE Luxury Experience Pages for SkyyRose.
+"""Build COMPLETE Luxury Experience Pages for SkyyRose.
 
 Creates fully interactive, production-ready luxury brand experience pages with:
 - WooCommerce product integration (real products, not placeholders)

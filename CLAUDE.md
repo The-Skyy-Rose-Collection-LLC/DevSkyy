@@ -952,6 +952,12 @@ class ThreeDAssetPipeline:
 
 ## 🚀 Deployment Workflow
 
+### Production URLs
+
+- **Frontend**: https://app.devskyy.app (Vercel)
+- **Backend API**: https://api.devskyy.app (Render)
+- **API Documentation**: https://api.devskyy.app/docs
+
 ### Pre-Commit Checklist
 
 - [ ] Run formatters: `isort . && ruff check . --fix && black .`
