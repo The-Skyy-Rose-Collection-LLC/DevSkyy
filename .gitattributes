@@ -1,1 +1,5 @@
+assets/**/*.jpg filter=lfs diff=lfs merge=lfs -text
+assets/**/*.jpeg filter=lfs diff=lfs merge=lfs -text
+assets/**/*.png filter=lfs diff=lfs merge=lfs -text
+datasets/**/* filter=lfs diff=lfs merge=lfs -text
 wordpress-theme/skyyrose-flagship/assets/images/skyyrose-monogram-hero.mp4 !text !filter !merge !diff
