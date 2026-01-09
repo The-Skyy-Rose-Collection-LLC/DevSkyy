@@ -18,7 +18,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(project_root / ".env")
 
@@ -225,17 +225,6 @@ def configure_navigation():
 def configure_woocommerce():
     """Configure WooCommerce settings."""
     print("\n4. Configuring WooCommerce...")
-
-    # Basic WooCommerce settings via API
-    wc_settings = {
-        "store_name": "SkyyRose",
-        "store_address": "",
-        "currency": "USD",
-        "currency_pos": "left",
-        "thousand_sep": ",",
-        "decimal_sep": ".",
-        "price_num_decimals": 2,
-    }
 
     print("    ✓ WooCommerce settings ready")
     print("    ℹ Use WordPress admin for detailed configuration:")

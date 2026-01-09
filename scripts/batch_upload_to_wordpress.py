@@ -17,6 +17,8 @@ WP_URL = os.getenv("WORDPRESS_URL", "https://skyyrose.co")
 WP_USERNAME = os.getenv("WORDPRESS_USERNAME", "skyyroseco")
 WP_APP_PASSWORD = os.getenv("WORDPRESS_APP_PASSWORD")
 
+assert WP_APP_PASSWORD is not None, "WORDPRESS_APP_PASSWORD must be set"
+
 
 async def upload_media_batch(session, media_files):
     """Upload media files sequentially with ralph-loop retry pattern."""
@@ -41,7 +43,7 @@ async def upload_media_batch(session, media_files):
                     f"{WP_URL}/index.php?rest_route=/wp/v2/media",
                     data=file_data,
                     headers=headers,
-                    auth=aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD),
+                    auth=aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD),  # type: ignore[arg-type]
                 ) as resp:
                     if resp.status == 201:
                         result = await resp.json()
