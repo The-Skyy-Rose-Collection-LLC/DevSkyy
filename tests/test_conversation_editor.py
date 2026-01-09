@@ -30,7 +30,7 @@ from agents.visual_generation.conversation_editor import (
 )
 from agents.visual_generation.gemini_native import (
     GeminiProImageClient,
-    ImageGenerationResult,
+    GeneratedImage,
 )
 from orchestration.brand_context import Collection
 
@@ -55,10 +55,13 @@ def mock_image():
 @pytest.fixture
 def mock_generation_result(mock_image):
     """Mock successful image generation result."""
-    return ImageGenerationResult(
+    return GeneratedImage(
         image=mock_image,
+        base64_data="",
+        mime_type="image/jpeg",
         prompt="test prompt",
         model="gemini-3-pro-image-preview",
+        latency_ms=100.0,
         cost_usd=0.08,
         metadata={"resolution": "1K", "aspect_ratio": "1:1"},
     )
@@ -208,7 +211,7 @@ async def test_start_session_with_collection(mock_api_key, mock_generation_resul
     """Test starting session with BLACK_ROSE collection."""
     editor = ConversationalImageEditor()
 
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
@@ -227,7 +230,7 @@ async def test_continue_session_success(mock_api_key, mock_generation_result):
     editor = ConversationalImageEditor()
 
     # Create initial session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(
@@ -235,7 +238,7 @@ async def test_continue_session_success(mock_api_key, mock_generation_result):
             )
 
     # Continue session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         result = await editor.continue_session(
             session_id=session.session_id, prompt="Add rose gold highlights"
         )
@@ -253,7 +256,7 @@ async def test_continue_session_expired_raises_error(mock_api_key, mock_generati
     editor = ConversationalImageEditor()
 
     # Create session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(image="product.jpg", initial_prompt="Initial")
@@ -285,7 +288,7 @@ async def test_get_session_existing(mock_api_key, mock_generation_result):
     editor = ConversationalImageEditor()
 
     # Create session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(image="product.jpg", initial_prompt="Test")
@@ -324,7 +327,7 @@ async def test_list_active_sessions_with_sessions(mock_api_key, mock_generation_
     editor = ConversationalImageEditor()
 
     # Create 2 active sessions
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("11111111-1111-1111-1111-111111111111")
             session1 = await editor.start_session(image="p1.jpg", initial_prompt="Test 1")
@@ -348,7 +351,7 @@ async def test_cleanup_expired_sessions_none_expired(mock_api_key, mock_generati
     editor = ConversationalImageEditor()
 
     # Create 2 active sessions
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("11111111-1111-1111-1111-111111111111")
             await editor.start_session(image="p1.jpg", initial_prompt="Test 1")
@@ -369,7 +372,7 @@ async def test_cleanup_expired_sessions_removes_expired(mock_api_key, mock_gener
     editor = ConversationalImageEditor()
 
     # Create 3 sessions
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("11111111-1111-1111-1111-111111111111")
             session1 = await editor.start_session(image="p1.jpg", initial_prompt="Test 1")
@@ -398,7 +401,7 @@ async def test_close_session(mock_api_key, mock_generation_result):
     editor = ConversationalImageEditor()
 
     # Create session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(image="product.jpg", initial_prompt="Test")
@@ -426,7 +429,7 @@ async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result
     editor = ConversationalImageEditor()
 
     # Turn 1: Start session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(
@@ -436,13 +439,13 @@ async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result
             )
 
     # Turn 2: Add rose gold highlights
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
-        await editor.continue_session(
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
+        result2 = await editor.continue_session(
             session_id=session.session_id, prompt="Add rose gold highlights to logo"
         )
 
     # Turn 3: Increase contrast
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         result3 = await editor.continue_session(
             session_id=session.session_id, prompt="Increase contrast"
         )
@@ -463,7 +466,7 @@ async def test_concurrent_sessions(mock_api_key, mock_generation_result):
 
     # Create 5 concurrent sessions
     session_ids = []
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         for i in range(5):
             with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
                 mock_uuid.return_value = uuid.UUID(f"12345678-1234-5678-1234-{i:012d}")
@@ -476,7 +479,7 @@ async def test_concurrent_sessions(mock_api_key, mock_generation_result):
     assert len(editor._sessions) == 5
 
     # Continue each session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         for session_id in session_ids:
             result = await editor.continue_session(session_id=session_id, prompt="Continue")
             assert result["success"] is True
@@ -494,7 +497,7 @@ async def test_session_timeout_prevents_modification():
     mock_result = MagicMock()
 
     # Create and expire session
-    with patch.object(GeminiProImageClient, "generate", return_value=mock_result):  # noqa: SIM117
+    with patch.object(GeminiProImageClient, "generate", return_value=mock_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(image="product.jpg", initial_prompt="Test")
