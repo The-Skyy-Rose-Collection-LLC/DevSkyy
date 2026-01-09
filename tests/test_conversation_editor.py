@@ -27,6 +27,7 @@ from agents.visual_generation.conversation_editor import (
     ConversationEditor,
     GeneratedImage,
 )
+from errors.production_errors import DevSkyError
 
 
 # =============================================================================
@@ -386,8 +387,6 @@ async def test_close_all_sessions(mock_client):
 
 def test_chat_session_error_inheritance():
     """Test that ChatSessionError inherits from DevSkyError."""
-    from errors.production_errors import DevSkyError
-
     error = ChatSessionError("Test error")
     assert isinstance(error, DevSkyError)
 
