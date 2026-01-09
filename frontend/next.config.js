@@ -30,6 +30,15 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
   },
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/dashboard',
+        permanent: false, // Use 307 temporary redirect
+      },
+    ];
+  },
   async rewrites() {
     // Proxy /api/* to Python backend
     // Works in both development (localhost:8000) and production (BACKEND_URL)

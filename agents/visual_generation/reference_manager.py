@@ -186,7 +186,10 @@ class ReferenceImageManager:
             return False, f"At least {MIN_REFERENCE_IMAGES} reference image required"
 
         if len(images) > MAX_REFERENCE_IMAGES:
-            return False, f"Maximum {MAX_REFERENCE_IMAGES} reference images allowed, got {len(images)}"
+            return (
+                False,
+                f"Maximum {MAX_REFERENCE_IMAGES} reference images allowed, got {len(images)}",
+            )
 
         # Validate each image
         for i, image_path in enumerate(images):

@@ -8,7 +8,7 @@
 
 ### Step 1: Get Your HuggingFace Token
 
-1. Visit: https://huggingface.co/settings/tokens
+1. Visit: <https://huggingface.co/settings/tokens>
 2. Click "New token"
 3. Name: `skyyrose-lora-upload`
 4. Type: **Write** (required for uploading datasets)
@@ -35,7 +35,7 @@ python3 upload_lora_dataset_to_hf.py
 
 ## ✅ **Option 2: Web UI Upload (Easiest)**
 
-1. Visit: https://huggingface.co/new-dataset
+1. Visit: <https://huggingface.co/new-dataset>
 2. Dataset name: `skyyrose-lora-dataset-v1`
 3. Public/Private: **Public**
 4. Click "Create dataset"
@@ -73,6 +73,7 @@ git push
 **Directory**: `/Users/coreyfoster/DevSkyy/datasets/skyyrose_lora_v1/`
 
 **Files** (95 images + 3 metadata files):
+
 - `metadata.jsonl` - Training captions for all images
 - `dataset_manifest.json` - Brand DNA and dataset info
 - `training_config.json` - SDXL training configuration
@@ -87,11 +88,13 @@ git push
 ## 🔗 **After Upload**
 
 Once uploaded, the dataset will be available at:
+
 ```
 https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v1
 ```
 
 Then configure it in the training monitor Space:
+
 ```
 https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor
 ```
@@ -108,5 +111,6 @@ https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor
 ---
 
 **Need Help?**
-- HuggingFace Docs: https://huggingface.co/docs/huggingface_hub/guides/upload
-- Token Guide: https://huggingface.co/docs/hub/security-tokens
+
+- HuggingFace Docs: <https://huggingface.co/docs/huggingface_hub/guides/upload>
+- Token Guide: <https://huggingface.co/docs/hub/security-tokens>

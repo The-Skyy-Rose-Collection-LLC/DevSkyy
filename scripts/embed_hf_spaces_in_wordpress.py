@@ -39,10 +39,11 @@ except ImportError:
 
 
 # Page mappings: page_id -> (collection_name, hf_space_url)
+# Updated with actual deployed Space URLs
 EXPERIENCES_PAGES = {
     152: ("SIGNATURE", "https://dambruh-skyyrose-virtual-tryon.hf.space"),
-    153: ("BLACK_ROSE", "https://dambruh-skyyrose-product-analyzer.hf.space"),
-    154: ("LOVE_HURTS", "https://dambruh-skyyrose-flux-upscaler.hf.space"),
+    153: ("BLACK_ROSE", "https://dambruh-skyyrose-3d-converter.hf.space"),
+    154: ("LOVE_HURTS", "https://dambruh-skyyrose-lora-training-monitor.hf.space"),
 }
 
 

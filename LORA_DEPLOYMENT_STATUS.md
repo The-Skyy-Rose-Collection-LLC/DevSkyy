@@ -8,22 +8,26 @@
 ## ✅ Completed Tasks
 
 ### 1. LoRA Dataset Preparation
+
 - **Location**: `/Users/coreyfoster/DevSkyy/datasets/skyyrose_lora_v1/`
 - **Total Images**: **95 high-quality images**
 
 **Collection Breakdown**:
+
 - SIGNATURE: 40 images (38 products + 2 logos)
 - BLACK_ROSE: 2 images (1 product + 1 logo)
 - LOVE_HURTS: 53 images (51 products + 2 logos)
 
 **Dataset Files**:
+
 - `metadata.jsonl` - Training captions for all 95 images
 - `dataset_manifest.json` - Complete brand DNA and metadata
 - `training_config.json` - SDXL LoRA training configuration
 - 95 enhanced `.jpg` images (1024x1024, Lanczos upscaled + luxury post-processing)
 
 ### 2. HuggingFace Space Deployed
-- **Space URL**: https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor
+
+- **Space URL**: <https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor>
 - **Status**: ✅ Live
 - **Features**:
   - Training progress dashboard
@@ -33,7 +37,9 @@
   - Version history
 
 ### 3. Brand DNA Integration
+
 All products and logos have detailed captions with:
+
 - Collection-specific trigger words (`skyyrose signature collection`, `skyyrose black_rose collection`, `skyyrose love_hurts collection`)
 - Product descriptions (e.g., "premium athletic joggers", "luxury sherpa jacket")
 - Collection mood ("confident, sophisticated, effortlessly premium")
@@ -46,7 +52,7 @@ All products and logos have detailed captions with:
 
 **Option 1: HuggingFace Hub UI (Easiest)**
 
-1. Visit: https://huggingface.co/datasets
+1. Visit: <https://huggingface.co/datasets>
 2. Click "New Dataset"
 3. Name: `skyyrose-lora-dataset-v1`
 4. Upload folder: `/Users/coreyfoster/DevSkyy/datasets/skyyrose_lora_v1/`
@@ -75,6 +81,7 @@ Visit the training monitor Space and configure:
 **VAE**: `madebyollin/sdxl-vae-fp16-fix`
 **Dataset**: Link to your uploaded dataset
 **Training Config**:
+
 ```json
 {
   "resolution": 1024,
@@ -95,6 +102,7 @@ Click "Start Training" in the Space dashboard. Training will take approximately 
 ### 3. Monitor Progress
 
 The Space provides real-time monitoring:
+
 - Loss curves
 - Sample generations every 50 steps
 - Estimated completion time
@@ -121,6 +129,7 @@ skyyrose love_hurts collection premium windbreaker jacket, emotional authenticit
 ## 📊 Expected Results
 
 After training, the LoRA model will:
+
 - Generate new product variations maintaining SkyyRose brand DNA
 - Understand all 3 collection aesthetics (SIGNATURE, BLACK_ROSE, LOVE_HURTS)
 - Reproduce brand logos accurately
@@ -131,28 +140,31 @@ After training, the LoRA model will:
 
 ## 🔗 Quick Links
 
-- **Training Monitor**: https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor
+- **Training Monitor**: <https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor>
 - **Dataset Directory**: `/Users/coreyfoster/DevSkyy/datasets/skyyrose_lora_v1/`
 - **Training Config**: `/Users/coreyfoster/DevSkyy/datasets/skyyrose_lora_v1/training_config.json`
-- **WordPress Site**: https://skyyrose.co
+- **WordPress Site**: <https://skyyrose.co>
 
 ---
 
 ## 📝 Collection Details
 
 ### SIGNATURE Collection (40 images)
+
 **Trigger**: `skyyrose signature collection`
 **Mood**: Confident, sophisticated, effortlessly premium, timeless
 **Colors**: Rose, lavender, orchid, cotton candy pastels, premium whites
 **Products**: Hoodies, tees, shorts, beanies, sherpa jackets
 
 ### BLACK_ROSE Collection (2 images)
+
 **Trigger**: `skyyrose black_rose collection`
 **Mood**: Mysterious, powerful, unapologetically bold
 **Colors**: Black, deep rose, charcoal, midnight tones
 **Products**: Gothic luxury sherpa jacket, noir apparel
 
 ### LOVE_HURTS Collection (53 images)
+
 **Trigger**: `skyyrose love_hurts collection`
 **Mood**: Raw emotion, authentic, artistically refined, heartfelt
 **Colors**: Deep rose, burgundy, warm earth tones, emotional reds
