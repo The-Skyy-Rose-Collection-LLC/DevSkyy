@@ -20,13 +20,12 @@ from __future__ import annotations
 import asyncio
 import json
 import sys
-from pathlib import Path
 from typing import Any
 
 import click
 from rich.console import Console
-from rich.table import Table
 from rich.panel import Panel
+from rich.table import Table
 from rich.tree import Tree
 
 from mcp_servers.catalog_generator import ExportFormat
@@ -267,11 +266,7 @@ def health(ctx: click.Context, output_json: bool) -> None:
                 table.add_column("Health", justify="center")
 
                 for server_id, is_healthy in sorted(health_results.items()):
-                    status = (
-                        "[green]✓ Healthy[/green]"
-                        if is_healthy
-                        else "[red]✗ Unhealthy[/red]"
-                    )
+                    status = "[green]✓ Healthy[/green]" if is_healthy else "[red]✗ Unhealthy[/red]"
                     table.add_row(server_id, status)
 
                 console.print(table)

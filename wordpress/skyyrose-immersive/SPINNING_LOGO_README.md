@@ -117,17 +117,17 @@ See: `.serena/memories/spinning_logo_implementation.md`
 
 ## ✨ Features
 
-✅ Theme-agnostic (easy to migrate)  
-✅ No external dependencies  
-✅ Responsive (desktop/mobile)  
-✅ Accessibility compliant  
-✅ Elementor compatible  
-✅ Auto color detection  
-✅ Smooth animations  
-✅ Performance optimized  
+✅ Theme-agnostic (easy to migrate)
+✅ No external dependencies
+✅ Responsive (desktop/mobile)
+✅ Accessibility compliant
+✅ Elementor compatible
+✅ Auto color detection
+✅ Smooth animations
+✅ Performance optimized
 
 ---
 
-**Version**: 1.0.0  
-**Author**: SkyyRose LLC  
+**Version**: 1.0.0
+**Author**: SkyyRose LLC
 **Support**: support@skyyrose.com

@@ -38,8 +38,8 @@ require_once SKYYROSE_IMMERSIVE_DIR . '/inc/spinning-logo-functions.php';  // AD
 
 ```html
 <div class="skyyrose-logo skyyrose-logo--gold">
-  <img src="/wp-content/themes/skyyrose-immersive/assets/images/skyyrose-logo-spinner.svg" 
-       alt="SkyyRose" 
+  <img src="/wp-content/themes/skyyrose-immersive/assets/images/skyyrose-logo-spinner.svg"
+       alt="SkyyRose"
        class="skyyrose-logo__spinner" />
 </div>
 ```
@@ -121,7 +121,7 @@ Edit `assets/css/spinning-logo.css`:
 ## 📊 Performance Impact
 
 - **CSS Size**: ~4KB
-- **JS Size**: ~2KB  
+- **JS Size**: ~2KB
 - **SVG Size**: ~1KB
 - **Total Impact**: <10KB (minified)
 - **HTTP Requests**: +3 (cached after first load)
@@ -159,6 +159,6 @@ grep -r "spinning-logo-functions.php" wordpress/skyyrose-immersive/functions.php
 
 ---
 
-**Status**: ✅ Ready for Production  
-**Version**: 1.0.0  
+**Status**: ✅ Ready for Production
+**Version**: 1.0.0
 **Last Updated**: 2024-12-12

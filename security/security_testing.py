@@ -291,7 +291,7 @@ class SecurityTestSuite:
 
         # Check key length (minimum 256 bits = 32 bytes)
         if len(key) < 32:
-            issues.append(f"Key length {len(key)*8} bits is below minimum 256 bits")
+            issues.append(f"Key length {len(key) * 8} bits is below minimum 256 bits")
 
         # Check for low entropy (simple check)
         unique_bytes = len(set(key))

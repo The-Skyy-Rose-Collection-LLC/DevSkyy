@@ -227,7 +227,7 @@ Always be professional, concise, and focused on value delivery.
             return
 
         # Import ToolRegistry here to avoid circular imports
-        from runtime.tools import ToolCallContext, get_tool_registry
+        from core.runtime.tool_registry import ToolCallContext, get_tool_registry
 
         tool_registry = get_tool_registry()
         tool_name = tool_def.name
@@ -253,7 +253,7 @@ Always be professional, concise, and focused on value delivery.
             handler = registry_handler
         else:
             # Tool not in registry - register it and create forwarding handler
-            from runtime.tools import ToolCategory, ToolSeverity, ToolSpec
+            from core.runtime.tool_registry import ToolCategory, ToolSeverity, ToolSpec
 
             # Create spec from tool definition
             spec = ToolSpec(

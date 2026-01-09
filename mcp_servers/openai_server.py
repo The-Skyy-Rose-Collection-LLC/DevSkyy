@@ -730,7 +730,7 @@ async def tool_registry_info(
         import sys
 
         sys.path.insert(0, str(__file__).replace("/mcp/openai_server.py", ""))
-        from runtime.tools import get_tool_registry
+        from core.runtime.tool_registry import get_tool_registry
 
         registry = get_tool_registry()
         tools = registry.list_enabled()
@@ -795,8 +795,8 @@ if __name__ == "__main__":
 
 ✅ Configuration:
    DevSkyy API: {API_BASE_URL}
-   DevSkyy Key: {'Set ✓' if API_KEY else 'Not Set ⚠️'}
-   OpenAI Key: {'Set ✓' if OPENAI_API_KEY else 'Not Set ⚠️'}
+   DevSkyy Key: {"Set ✓" if API_KEY else "Not Set ⚠️"}
+   OpenAI Key: {"Set ✓" if OPENAI_API_KEY else "Not Set ⚠️"}
 
 🔧 Available Tools:
    • openai_completion - Generate text with OpenAI models

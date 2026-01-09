@@ -146,7 +146,7 @@ async def demo_alert_deduplication():
     print("Sending same alert 3 times (should deduplicate):")
     for i in range(3):
         results = await alerting.send_alert(alert)
-        print(f"  Attempt {i+1}: {results}")
+        print(f"  Attempt {i + 1}: {results}")
         await asyncio.sleep(1)
 
     stats = alerting.get_stats()

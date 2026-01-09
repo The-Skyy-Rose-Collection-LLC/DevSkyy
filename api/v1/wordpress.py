@@ -25,7 +25,6 @@ from pydantic import BaseModel, Field
 from integrations.wordpress_client import (
     OrderStatus,
     ProductStatus,
-    WooCommerceCustomer,
     WooCommerceOrder,
     WooCommerceProduct,
     WordPressError,
@@ -54,7 +53,9 @@ class ProductCreateRequest(BaseModel):
     sku: str | None = Field(default=None, description="Stock Keeping Unit")
     status: ProductStatus = Field(default=ProductStatus.DRAFT)
     stock_quantity: int | None = Field(default=None, description="Stock quantity")
-    categories: list[dict[str, Any]] = Field(default_factory=list, description="Category IDs or names")
+    categories: list[dict[str, Any]] = Field(
+        default_factory=list, description="Category IDs or names"
+    )
     tags: list[dict[str, Any]] = Field(default_factory=list, description="Tag IDs or names")
     images: list[dict[str, Any]] = Field(default_factory=list, description="Image URLs")
     meta_data: list[dict[str, Any]] = Field(default_factory=list, description="Custom meta data")

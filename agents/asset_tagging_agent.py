@@ -181,7 +181,7 @@ class AssetTaggingAgent:
         prompt = f"""Analyze this image and identify which of these tags apply.
 Return a JSON object where keys are tag names and values are confidence scores (0.0 to 1.0).
 
-Available tags: {', '.join(all_tags)}
+Available tags: {", ".join(all_tags)}
 
 Only include tags that are relevant to the image. Return valid JSON only."""
 

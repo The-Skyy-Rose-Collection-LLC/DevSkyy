@@ -13,10 +13,10 @@
  */
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Logger } from '../utils/Logger';
-import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader';
-import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Logger } from '../utils/Logger.js';
+import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
+import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
 
 export interface RunwayProduct {
   id: string;

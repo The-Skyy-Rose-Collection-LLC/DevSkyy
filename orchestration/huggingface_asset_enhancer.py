@@ -210,6 +210,7 @@ class SkyyRoseBrandValidator:
     def validate_asset(
         self,
         image_path: str | None = None,
+        model_path: str | None = None,
         collection: str = "SIGNATURE",
         expected_garment: str | None = None,
     ) -> BrandValidationResult:
@@ -218,6 +219,7 @@ class SkyyRoseBrandValidator:
 
         Args:
             image_path: Path to product image for color analysis
+            model_path: Path to 3D model for validation
             collection: Expected collection (SIGNATURE, LOVE_HURTS, etc.)
             expected_garment: Expected garment type
 
@@ -296,7 +298,7 @@ class SkyyRoseBrandValidator:
             palette = self.brand_config["color_palette"]
             min_distance = float("inf")
 
-            for _color_name, hex_color in palette.items():
+            for color_name, hex_color in palette.items():
                 # Convert hex to RGB
                 hex_clean = hex_color.lstrip("#")
                 cr = int(hex_clean[0:2], 16)
@@ -368,17 +370,17 @@ class SkyyRoseBrandValidator:
             if template:
                 garment_info = f"""
 Garment Details:
-- Features: {', '.join(template['features'])}
-- Fabric: {template['fabric']}
-- Fit: {template['fit']}"""
+- Features: {", ".join(template["features"])}
+- Fabric: {template["fabric"]}
+- Fit: {template["fit"]}"""
 
         prompt = f"""SkyyRose {collection} Collection - {product_name}
 
-Brand: {brand['brand_name']} - {brand['tagline']}
-Style: {brand['aesthetic']['style']}, {brand['aesthetic']['quality_level']} quality
-Collection Mood: {collection_aesthetic['mood']}
-Texture Style: {collection_aesthetic['texture_style']}
-Colors: {', '.join(collection_aesthetic['colors'])}
+Brand: {brand["brand_name"]} - {brand["tagline"]}
+Style: {brand["aesthetic"]["style"]}, {brand["aesthetic"]["quality_level"]} quality
+Collection Mood: {collection_aesthetic["mood"]}
+Texture Style: {collection_aesthetic["texture_style"]}
+Colors: {", ".join(collection_aesthetic["colors"])}
 {garment_info}
 3D Requirements:
 - Premium finish, studio-quality lighting
@@ -611,7 +613,7 @@ class ImagePreprocessor:
         output_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Generate output filename
-        image_hash = hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()[:8]
+        image_hash = hashlib.md5(path.read_bytes()).hexdigest()[:8]
         output_filename = f"{path.stem}_{image_hash}_processed.png"
         output_path = output_dir_path / output_filename
 
@@ -632,7 +634,7 @@ class ImagePreprocessor:
             return result
 
         # Run preprocessing in executor to avoid blocking
-        loop = asyncio.get_running_loop()
+        loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, self._preprocess_sync, path, output_path, result)
 
     def _preprocess_sync(
@@ -815,9 +817,7 @@ class HuggingFaceAssetEnhancer:
             EnhancementResult with all generated assets and brand validation
         """
         start_time = time.time()
-        asset_id = hashlib.md5(
-            f"{image_path}:{product_name}".encode(), usedforsecurity=False
-        ).hexdigest()[:12]
+        asset_id = hashlib.md5(f"{image_path}:{product_name}".encode()).hexdigest()[:12]
 
         # Auto-detect garment type if not provided
         if garment_type is None:

@@ -25,9 +25,17 @@ import os
 from dataclasses import dataclass, field
 from typing import Any, TypeVar
 
+from prometheus_client import Counter, Gauge
+
 logger = logging.getLogger(__name__)
 
 T = TypeVar("T")
+
+# Prometheus metrics for cache monitoring
+cache_hits = Counter("redis_cache_hits_total", "Total cache hits")
+cache_misses = Counter("redis_cache_misses_total", "Total cache misses")
+cache_errors = Counter("redis_cache_errors_total", "Total cache errors")
+cache_hit_rate = Gauge("redis_cache_hit_rate", "Cache hit rate percentage")
 
 
 @dataclass(slots=True)
@@ -138,13 +146,24 @@ class RedisCache:
 
             if data:
                 self._metrics["hits"] += 1
+                cache_hits.inc()
+                # Update hit rate gauge
+                total = self._metrics["hits"] + self._metrics["misses"]
+                if total > 0:
+                    cache_hit_rate.set((self._metrics["hits"] / total) * 100)
                 return json.loads(data)
 
             self._metrics["misses"] += 1
+            cache_misses.inc()
+            # Update hit rate gauge
+            total = self._metrics["hits"] + self._metrics["misses"]
+            if total > 0:
+                cache_hit_rate.set((self._metrics["hits"] / total) * 100)
             return None
 
         except Exception as e:
             self._metrics["errors"] += 1
+            cache_errors.inc()
             logger.debug(f"Cache get error: {e}")
             return None
 
@@ -168,5 +187,28 @@ class RedisCache:
 
         except Exception as e:
             self._metrics["errors"] += 1
+            cache_errors.inc()
             logger.debug(f"Cache set error: {e}")
             return False
+
+    async def get_stats(self) -> dict[str, Any]:
+        """Get cache statistics including hit rate.
+
+        Returns:
+            Dictionary with cache metrics:
+            - hit_rate: Percentage of cache hits (0-100)
+            - total_hits: Total number of cache hits
+            - total_misses: Total number of cache misses
+            - total_errors: Total number of cache errors
+            - connection_pool_size: Max connections in pool
+        """
+        total_requests = self._metrics["hits"] + self._metrics["misses"]
+        hit_rate = (self._metrics["hits"] / total_requests) * 100 if total_requests > 0 else 0.0
+
+        return {
+            "hit_rate": round(hit_rate, 2),
+            "total_hits": self._metrics["hits"],
+            "total_misses": self._metrics["misses"],
+            "total_errors": self._metrics["errors"],
+            "connection_pool_size": self._pool.max_connections if self._pool else 0,
+        }

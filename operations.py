@@ -31,7 +31,7 @@ from base import (
     SuperAgent,
     ValidationResult,
 )
-from runtime.tools import ToolCallContext, ToolCategory, ToolRegistry, ToolSeverity
+from core.runtime.tool_registry import ToolCallContext, ToolCategory, ToolRegistry, ToolSeverity
 
 logger = structlog.get_logger(__name__)
 

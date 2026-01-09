@@ -30,8 +30,7 @@ from adk.base import (
     AgentStatus,
     ToolDefinition,
 )
-from orchestration.prompt_engineering import PromptTechnique
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,
@@ -39,12 +38,14 @@ from runtime.tools import (
     ToolSeverity,
     ToolSpec,
 )
+from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
 # WordPress/WooCommerce integration
 try:
     from integrations.wordpress_client import WordPressWooCommerceClient
+
     WORDPRESS_AVAILABLE = True
 except ImportError:
     WORDPRESS_AVAILABLE = False
@@ -704,7 +705,7 @@ Recommended Actions:
             return {"error": "WordPress client not connected"}
 
         try:
-            from integrations.wordpress_client import WooCommerceProduct, ProductStatus
+            from integrations.wordpress_client import ProductStatus, WooCommerceProduct
 
             # Prepare product data
             product = WooCommerceProduct(
@@ -934,7 +935,7 @@ Please:
         """Manage inventory with forecasting"""
         prompt = f"""Inventory management task
 
-SKU: {sku or 'All products'}
+SKU: {sku or "All products"}
 Action: {action}
 
 Please:
@@ -965,7 +966,7 @@ Please:
         """Analyze and recommend pricing"""
         prompt = f"""Pricing analysis for SKU: {sku}
 
-Competitor prices: {competitor_prices or 'Not provided'}
+Competitor prices: {competitor_prices or "Not provided"}
 
 Please analyze:
 1. Current product pricing position

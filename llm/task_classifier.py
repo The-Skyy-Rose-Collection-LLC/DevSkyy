@@ -125,9 +125,7 @@ class TaskClassificationResult(BaseModel):
     model_config = {"extra": "forbid"}
 
     task_category: TaskCategory = Field(..., description="Classified task category")
-    recommended_technique: PromptTechnique = Field(
-        ..., description="Recommended prompt technique"
-    )
+    recommended_technique: PromptTechnique = Field(..., description="Recommended prompt technique")
     recommended_providers: list[str] = Field(
         default_factory=list, description="Ordered list of recommended providers"
     )

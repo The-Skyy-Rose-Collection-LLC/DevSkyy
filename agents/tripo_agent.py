@@ -49,7 +49,7 @@ from base import (
     SuperAgent,
     ValidationResult,
 )
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ToolCallContext,
     ToolCategory,
     ToolRegistry,
@@ -679,7 +679,7 @@ class TripoAssetAgent(SuperAgent):
                     )
                 else:
                     raise ValueError(
-                        f"Unexpected task status: {task.status}. " "Please report this issue."
+                        f"Unexpected task status: {task.status}. Please report this issue."
                     )
 
         except (PermissionError, ConnectionError, TimeoutError, OSError, ValueError, RuntimeError):
@@ -688,7 +688,7 @@ class TripoAssetAgent(SuperAgent):
         except Exception as e:
             logger.error(f"Text-to-3D generation failed unexpectedly: {e}", exc_info=True)
             raise RuntimeError(
-                f"Unexpected error during 3D generation: {e}. " "Check the logs for more details."
+                f"Unexpected error during 3D generation: {e}. Check the logs for more details."
             ) from e
 
     async def _tool_generate_from_image(
@@ -744,7 +744,7 @@ class TripoAssetAgent(SuperAgent):
 
         if not image_file.is_file():
             raise ValueError(
-                f"Path is not a file: {image_path}. " "Please provide a valid image file path."
+                f"Path is not a file: {image_path}. Please provide a valid image file path."
             )
 
         # Validate image format
@@ -760,16 +760,16 @@ class TripoAssetAgent(SuperAgent):
             file_size = image_file.stat().st_size
             if file_size == 0:
                 raise ValueError(
-                    f"Image file is empty: {image_path}. " "Please provide a valid image file."
+                    f"Image file is empty: {image_path}. Please provide a valid image file."
                 )
             if file_size > 20 * 1024 * 1024:  # 20MB limit
                 raise ValueError(
-                    f"Image file too large: {file_size / (1024*1024):.1f}MB. "
+                    f"Image file too large: {file_size / (1024 * 1024):.1f}MB. "
                     "Maximum allowed size is 20MB."
                 )
         except OSError as e:
             raise PermissionError(
-                f"Cannot read image file {image_path}: {e}. " "Check file permissions."
+                f"Cannot read image file {image_path}: {e}. Check file permissions."
             ) from e
 
         try:
@@ -864,7 +864,7 @@ class TripoAssetAgent(SuperAgent):
                     )
                 else:
                     raise ValueError(
-                        f"Unexpected task status: {task.status}. " "Please report this issue."
+                        f"Unexpected task status: {task.status}. Please report this issue."
                     )
 
         except (
@@ -881,7 +881,7 @@ class TripoAssetAgent(SuperAgent):
         except Exception as e:
             logger.error(f"Image-to-3D generation failed unexpectedly: {e}", exc_info=True)
             raise RuntimeError(
-                f"Unexpected error during 3D generation: {e}. " "Check the logs for more details."
+                f"Unexpected error during 3D generation: {e}. Check the logs for more details."
             ) from e
 
     async def _tool_validate_asset(
@@ -972,9 +972,7 @@ class TripoAssetAgent(SuperAgent):
                     validation.warnings.append(f"Polycount approaching limit: {polycount:,}")
 
                 # Log mesh details
-                logger.debug(
-                    f"Mesh analysis: {polycount:,} faces, " f"{len(mesh.vertices):,} vertices"
-                )
+                logger.debug(f"Mesh analysis: {polycount:,} faces, {len(mesh.vertices):,} vertices")
 
             # Check if mesh is watertight (closed surface)
             if hasattr(mesh, "is_watertight") and not mesh.is_watertight:

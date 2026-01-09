@@ -1,12 +1,15 @@
 """Alembic environment configuration with async support."""
+
 import asyncio
+import os
 from logging.config import fileConfig
+
+from dotenv import load_dotenv
 from sqlalchemy import pool
 from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
+
 from alembic import context
-import os
-from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
@@ -22,11 +25,12 @@ if os.getenv("DATABASE_URL"):
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
+import importlib.util
+
 # Import your models' MetaData object here for 'autogenerate' support
 # Import directly from models.py to avoid loading the entire agents package
 import sys
 from pathlib import Path
-import importlib.util
 
 # Add the project root to Python path if not already present
 project_root = Path(__file__).parent.parent
@@ -37,7 +41,7 @@ if str(project_root) not in sys.path:
 models_path = project_root / "agents" / "models.py"
 spec = importlib.util.spec_from_file_location("models", models_path)
 models = importlib.util.module_from_spec(spec)
-sys.modules['models'] = models
+sys.modules["models"] = models
 spec.loader.exec_module(models)
 
 # Get Base from the loaded module

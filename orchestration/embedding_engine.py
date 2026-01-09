@@ -57,7 +57,9 @@ class EmbeddingConfig(BaseModel):
     # Cohere settings
     cohere_model: str = Field(default="embed-english-v3.0")
     cohere_api_key: str | None = Field(default=None)
-    cohere_input_type: str = Field(default="search_document")  # search_document, search_query, classification, clustering
+    cohere_input_type: str = Field(
+        default="search_document"
+    )  # search_document, search_query, classification, clustering
 
     # Batch settings
     batch_size: int = Field(default=32, ge=1, le=256)

@@ -1,7 +1,7 @@
 /**
  * SkyyRose Spinning Logo Component
  * Version: 1.0.0
- * 
+ *
  * Implements an elegant spinning rose logo with collection-specific color variants
  */
 
@@ -223,11 +223,11 @@
     height: var(--header-height-mobile, 60px);
     padding: 0 16px;
   }
-  
+
   .site-header__nav {
     display: none;
   }
-  
+
   .site-header__icons {
     gap: 16px;
   }

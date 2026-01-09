@@ -220,11 +220,11 @@ async def enhance_and_generate_3d(
     product_name = image_info["name"].replace("_", " ").strip()
     collection = image_info["collection"].upper().replace("-", "_")
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Processing: {product_name}")
     print(f"Collection: {collection}")
     print(f"Source: {image_path}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if dry_run:
         print("[DRY RUN] Would enhance and generate 3D model")
@@ -299,9 +299,9 @@ async def enhance_and_generate_3d(
 
 async def process_collection(collection_name: str, dry_run: bool = False) -> dict:
     """Process all clothing items in a collection."""
-    print(f"\n{'#'*60}")
+    print(f"\n{'#' * 60}")
     print(f"# Processing Collection: {collection_name.upper()}")
-    print(f"{'#'*60}")
+    print(f"{'#' * 60}")
 
     # Find clothing images
     clothing_images = find_clothing_images(collection_name)
@@ -335,12 +335,12 @@ async def process_collection(collection_name: str, dry_run: bool = False) -> dic
     successful = sum(1 for r in results if r.get("status") == "success")
     failed = sum(1 for r in results if r.get("status") in ("failed", "error"))
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Collection {collection_name.upper()} Summary:")
     print(f"  Total: {len(results)}")
     print(f"  Success: {successful}")
     print(f"  Failed: {failed}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     return {
         "collection": collection_name,
@@ -389,9 +389,9 @@ async def main():
         all_results.append(result)
 
     # Final summary
-    print(f"\n{'#'*60}")
+    print(f"\n{'#' * 60}")
     print("# FINAL SUMMARY")
-    print(f"{'#'*60}")
+    print(f"{'#' * 60}")
 
     total_processed = sum(r["processed"] for r in all_results)
     total_successful = sum(r.get("successful", 0) for r in all_results)
