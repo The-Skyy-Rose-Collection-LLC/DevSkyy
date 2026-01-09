@@ -17,7 +17,7 @@
 4. **WordPress Integration**:
    - Upload all enhanced + 2D/2.5D assets to WordPress
    - Attach to WooCommerce products
-   - Get https://skyyrose.com FULLY FUNCTIONAL
+   - Get <https://skyyrose.com> FULLY FUNCTIONAL
 
 5. **HuggingFace Spaces**:
    - Deploy remaining spaces (3d-converter, lora-training-monitor, virtual-tryon)

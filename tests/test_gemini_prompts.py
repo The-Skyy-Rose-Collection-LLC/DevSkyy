@@ -9,7 +9,6 @@ Tests all 5 prompt optimization patterns:
 5. Google Search Grounding Optimizer
 """
 
-
 from agents.visual_generation.prompt_optimizer import (
     CameraAngle,
     CollectionPromptBuilder,
