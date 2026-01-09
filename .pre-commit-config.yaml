@@ -12,16 +12,16 @@ repos:
   # ==========================================================================
   # Python Code Quality (Fast Tier - Run First)
   # ==========================================================================
-  
+
   # Ruff: Ultra-fast linter (replaces isort, pylint, flake8, etc.)
   - repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: v0.8.8  # Updated to latest stable
+    rev: v0.9.10  # Latest stable (verified from GitHub)
     hooks:
       - id: ruff
         name: Lint with Ruff (Fast)
         args: [--fix]
         exclude: ^(legacy/|tests/|\.venv/)
-        
+
       - id: ruff-format
         name: Format with Ruff (Fast)
         exclude: ^(legacy/|\.venv/)
@@ -29,7 +29,7 @@ repos:
   # ==========================================================================
   # Security Scanning (Medium Tier)
   # ==========================================================================
-  
+
   - repo: https://github.com/Yelp/detect-secrets
     rev: v1.5.0
     hooks:
@@ -41,43 +41,43 @@ repos:
   # ==========================================================================
   # General File Checks (Fast Tier)
   # ==========================================================================
-  
+
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0  # Updated to latest
     hooks:
       - id: trailing-whitespace
         name: Trim trailing whitespace
         exclude: ^(legacy/|\.md$)
-        
+
       - id: end-of-file-fixer
         name: Fix end of files
         exclude: ^legacy/
-        
+
       - id: check-yaml
         name: Validate YAML files
         args: [--unsafe]  # Allow custom YAML tags
-        
+
       - id: check-json
         name: Validate JSON files
-        
+
       - id: check-toml
         name: Validate TOML files
-        
+
       - id: check-added-large-files
         name: Check for large files
         args: [--maxkb=2000]  # Increased for assets
         exclude: ^(assets/|hf-spaces/)
-        
+
       - id: check-merge-conflict
         name: Check for merge conflicts
-        
+
       - id: check-case-conflict
         name: Check for case conflicts
-        
+
       - id: mixed-line-ending
         name: Fix mixed line endings
         args: [--fix=lf]
-        
+
       - id: debug-statements
         name: Check for debug statements
         exclude: ^(legacy/|tests/)
@@ -85,14 +85,14 @@ repos:
   # ==========================================================================
   # Type Checking (Slow Tier - Optional in local, required in CI)
   # ==========================================================================
-  
+
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.14.0  # Updated to latest
     hooks:
       - id: mypy
         name: Type check with MyPy
         additional_dependencies:
-          - types-requests==2.32.0.20250102
+          - types-requests==2.32.4.20260107
           - types-python-dateutil==2.9.0.20250108
           - types-PyYAML==6.0.12.20240917
         args: [--config-file=pyproject.toml, --no-error-summary]
@@ -102,7 +102,7 @@ repos:
   # ==========================================================================
   # Security Deep Scan (Slow Tier - Only in CI)
   # ==========================================================================
-  
+
   - repo: https://github.com/PyCQA/bandit
     rev: 1.7.10  # Updated to latest
     hooks:
@@ -115,7 +115,7 @@ repos:
   # ==========================================================================
   # Documentation (Optional - Only if docstring changes)
   # ==========================================================================
-  
+
   - repo: https://github.com/pycqa/pydocstyle
     rev: 6.3.0
     hooks:
@@ -128,7 +128,7 @@ repos:
   # ==========================================================================
   # Commit Message Validation
   # ==========================================================================
-  
+
   - repo: https://github.com/commitizen-tools/commitizen
     rev: v4.5.0  # Updated to latest
     hooks:
@@ -143,7 +143,7 @@ repos:
 ci:
   autofix_commit_msg: |
     chore: auto fixes from pre-commit hooks
-    
+
     [skip ci]
   autofix_prs: true
   autoupdate_branch: main
