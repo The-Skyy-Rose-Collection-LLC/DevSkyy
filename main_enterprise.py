@@ -27,10 +27,12 @@ Dependencies (verified from PyPI December 2024):
 
 import logging
 import os
+import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
+import structlog
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
@@ -54,6 +56,8 @@ from api.visual import visual_router
 from api.webhooks import WebhookEventType, webhook_manager, webhook_router
 from api.websocket import ws_router
 from api.wordpress import wordpress_router
+from core.redis_cache import RedisCache
+from core.structured_logging import bind_contextvars, clear_contextvars, configure_logging
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
@@ -68,15 +72,16 @@ from security.jwt_oauth2_auth import (
 from security.prometheus_exporter import get_metrics
 from security.secrets_manager import SecretNotFoundError, SecretsManager
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# Note: Structured logging is configured in lifespan function
+# This is a placeholder logger for early startup messages
 logger = logging.getLogger(__name__)
 
 # Initialize Secrets Manager
 # Auto-detects backend (AWS Secrets Manager, HashiCorp Vault, or local encrypted)
 secrets_manager = SecretsManager()
+
+# Initialize Redis Cache
+redis_cache = RedisCache()
 
 
 # =============================================================================
@@ -97,12 +102,27 @@ async def lifespan(app: FastAPI):
       - Prompt technique application
       - Round Table support (optional)
     """
-    # Startup
-    logger.info("🚀 DevSkyy Enterprise Platform starting...")
-    logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    # Startup - Configure structured logging FIRST
+    log_level = os.getenv("LOG_LEVEL", "INFO")
+    json_output = os.getenv("LOG_JSON", "auto")
+    json_output_bool = None if json_output == "auto" else json_output.lower() == "true"
+
+    configure_logging(
+        json_output=json_output_bool,
+        log_level=log_level,
+        include_timestamp=True,
+    )
+
+    # Get structured logger
+    log = structlog.get_logger(__name__)
+    log.info(
+        "platform_starting",
+        environment=os.getenv("ENVIRONMENT", "development"),
+        log_format="json" if json_output_bool else "console",
+    )
 
     # Initialize RAG pipeline components
-    logger.info("Initializing RAG pipeline...")
+    log.info("rag_pipeline_initializing")
     try:
         from orchestration.auto_ingestion import auto_ingest_documents
         from orchestration.rag_context_manager import create_rag_context_manager
@@ -128,17 +148,17 @@ async def lifespan(app: FastAPI):
         )
 
         # Auto-ingest documents from docs/
-        logger.info("Starting auto-ingestion of documentation...")
+        log.info("rag_auto_ingestion_starting")
         ingestion_stats = await auto_ingest_documents(
             vector_store=rag_manager.vector_store,
             project_root=".",
             force_reindex=os.getenv("RAG_FORCE_REINDEX", "false").lower() == "true",
         )
 
-        logger.info(
-            f"Auto-ingestion complete: "
-            f"{ingestion_stats['files_ingested']} files, "
-            f"{ingestion_stats['documents_created']} documents"
+        log.info(
+            "rag_auto_ingestion_complete",
+            files_ingested=ingestion_stats["files_ingested"],
+            documents_created=ingestion_stats["documents_created"],
         )
 
         # Store RAG manager in app state for agent injection
@@ -149,16 +169,27 @@ async def lifespan(app: FastAPI):
             from api.dashboard import agent_registry
 
             agent_registry.set_rag_manager(rag_manager)
-            logger.info("✓ RAG manager injected into agent registry")
+            log.info("rag_manager_injected", target="agent_registry")
         except Exception as e:
-            logger.warning(f"Failed to inject RAG manager into agent registry: {e}")
+            log.warning("rag_manager_injection_failed", error=str(e))
 
-        logger.info("✓ RAG pipeline initialized successfully")
+        log.info("rag_pipeline_initialized")
 
     except Exception as e:
-        logger.error(f"RAG pipeline initialization failed: {e}", exc_info=True)
-        logger.warning("Continuing without RAG support")
+        log.error("rag_pipeline_initialization_failed", error=str(e), exc_info=True)
+        log.warning("continuing_without_rag")
         app.state.rag_manager = None
+
+    # Initialize Redis cache connection
+    log.info("redis_cache_connecting")
+    try:
+        cache_connected = await redis_cache.connect()
+        if cache_connected:
+            log.info("redis_cache_connected")
+        else:
+            log.warning("redis_cache_connection_failed", message="caching disabled")
+    except Exception as e:
+        log.error("redis_cache_connection_error", error=str(e), exc_info=True)
 
     # Start WebSocket metrics broadcaster (background task)
     try:
@@ -236,6 +267,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("DevSkyy Enterprise Platform shutting down...")
+    await redis_cache.disconnect()
     await webhook_manager.close()
 
 
@@ -352,11 +384,31 @@ app.add_middleware(
     protected_paths=protected_paths,
 )
 
-logger.info(f"API Security Middleware activated with {len(protected_paths)} protected paths")
-if use_redis:
-    logger.info("Using Redis-backed nonce cache for replay attack prevention")
-else:
-    logger.info("Using in-memory nonce cache (set REDIS_URL for production)")
+# Note: These early logger calls happen before structured logging is configured
+# They will use basic logging format
+
+
+# Correlation ID middleware
+@app.middleware("http")
+async def correlation_id_middleware(request: Request, call_next):
+    """Add correlation ID to request context for distributed tracing."""
+    # Get or generate correlation ID
+    correlation_id = request.headers.get("X-Correlation-ID") or str(uuid.uuid4())
+
+    # Bind to context variables for this request
+    bind_contextvars(correlation_id=correlation_id)
+
+    # Add to request state
+    request.state.correlation_id = correlation_id
+
+    try:
+        response = await call_next(request)
+        # Add correlation ID to response headers
+        response.headers["X-Correlation-ID"] = correlation_id
+        return response
+    finally:
+        # Clean up context variables after request
+        clear_contextvars()
 
 
 # Tier-based rate limiting middleware
@@ -435,30 +487,43 @@ async def tier_rate_limit_middleware(request: Request, call_next):
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing and correlation IDs."""
+    """Log all requests with timing and correlation IDs using structured logging."""
     import time
-    import uuid
 
     from security.prometheus_exporter import exporter
 
+    # Get structured logger
+    log = structlog.get_logger(__name__)
+
     start = time.time()
-    request_id = str(uuid.uuid4())
+
+    # Get correlation_id from request state (set by correlation_id_middleware)
+    correlation_id = getattr(request.state, "correlation_id", str(uuid.uuid4()))
+
+    # Bind correlation_id for this request (should already be set by correlation_id_middleware)
+    bind_contextvars(correlation_id=correlation_id)
 
     # Start tracking request for metrics
-    exporter.start_api_request(request_id)
+    exporter.start_api_request(correlation_id)
 
     response = await call_next(request)
 
     duration_seconds = time.time() - start
     duration_ms = duration_seconds * 1000
 
-    logger.info(
-        f"{request.method} {request.url.path} - {response.status_code} - {duration_ms:.2f}ms"
+    # Structured logging with all context
+    log.info(
+        "http_request",
+        method=request.method,
+        path=str(request.url.path),
+        status_code=response.status_code,
+        duration_ms=round(duration_ms, 2),
+        client_ip=request.client.host if request.client else "unknown",
     )
 
     # Record metrics in Prometheus
     exporter.finish_api_request(
-        request_id=request_id,
+        request_id=correlation_id,
         method=request.method,
         endpoint=request.url.path,
         status_code=response.status_code,
@@ -670,6 +735,37 @@ async def metrics():
     """Prometheus metrics endpoint."""
     metrics_data = get_metrics()
     return Response(content=metrics_data, media_type="text/plain; version=0.0.4; charset=utf-8")
+
+
+@app.get("/metrics/cache", tags=["Monitoring"])
+async def cache_metrics():
+    """Cache statistics and performance metrics.
+
+    Returns cache hit rate, total hits/misses, and recommendations for optimization.
+    Use this endpoint to monitor Redis cache effectiveness and identify performance issues.
+    """
+    try:
+        redis_stats = await redis_cache.get_stats()
+
+        # Add recommendation based on hit rate
+        hit_rate = redis_stats.get("hit_rate", 0.0)
+        if hit_rate >= 80:
+            recommendation = "Excellent cache performance - hit rate above 80%"
+        elif hit_rate >= 60:
+            recommendation = "Good cache performance - consider increasing cache TTL"
+        elif hit_rate >= 40:
+            recommendation = "Moderate cache performance - review caching strategy"
+        else:
+            recommendation = "Low cache performance - investigate cache misses and adjust TTL"
+
+        return {
+            "redis": redis_stats,
+            "recommendation": recommendation,
+            "target_hit_rate": 80.0,
+        }
+    except Exception as e:
+        logger.error(f"Failed to get cache stats: {e}", exc_info=True)
+        return {"error": "Failed to retrieve cache statistics", "message": str(e)}
 
 
 # =============================================================================
@@ -928,7 +1024,14 @@ app.include_router(v1_router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Handle HTTP exceptions with proper error format."""
+    """Handle HTTP exceptions with proper error format and structured logging."""
+    log = structlog.get_logger(__name__)
+    log.warning(
+        "http_exception",
+        status_code=exc.status_code,
+        message=exc.detail,
+        path=str(request.url.path),
+    )
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -943,8 +1046,15 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    """Handle general exceptions with error tracking."""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    """Handle general exceptions with error tracking and structured logging."""
+    log = structlog.get_logger(__name__)
+    log.error(
+        "unhandled_exception",
+        exception_type=type(exc).__name__,
+        error=str(exc),
+        path=str(request.url.path),
+        exc_info=True,
+    )
     return JSONResponse(
         status_code=500,
         content={

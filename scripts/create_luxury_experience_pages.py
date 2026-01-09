@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
-"""
-Create Luxury Experience Pages for SkyyRose Collections.
+"""Create Luxury Experience Pages for SkyyRose Collections.
 
 Builds premium, branded experience pages for:
 - SIGNATURE Collection: Premium sophistication
