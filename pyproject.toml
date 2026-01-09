@@ -355,6 +355,13 @@ warn_unused_ignores = true
 warn_no_return = true
 follow_imports = "silent"
 ignore_missing_imports = true
+exclude = [
+    "hf-spaces/.*",
+    "legacy/.*",
+    ".venv/.*",
+    "build/.*",
+    "dist/.*",
+]
 
 # Third-party libraries without type stubs
 [[tool.mypy.overrides]]
