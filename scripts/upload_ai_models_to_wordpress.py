@@ -18,7 +18,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Load .env file
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(project_root / ".env")
 
@@ -30,6 +30,8 @@ WP_APP_PASSWORD = os.getenv("WORDPRESS_APP_PASSWORD")
 if not WP_APP_PASSWORD:
     print("❌ WORDPRESS_APP_PASSWORD not set in .env")
     sys.exit(1)
+
+assert WP_APP_PASSWORD is not None
 
 # Directories
 AI_MODELS_DIR = project_root / "assets" / "ai-models-with-products"
@@ -58,7 +60,7 @@ async def upload_one_with_retry(
                 f"{WP_URL}/index.php?rest_route=/wp/v2/media",
                 data=file_data,
                 headers=headers,
-                auth=aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD),
+                auth=aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD),  # type: ignore[arg-type]
             ) as resp:
                 if resp.status == 201:
                     result = await resp.json()
@@ -74,7 +76,7 @@ async def upload_one_with_retry(
                     async with session.post(
                         f"{WP_URL}/index.php?rest_route=/wp/v2/media/{result['id']}",
                         json=update_data,
-                        auth=aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD),
+                        auth=aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD),  # type: ignore[arg-type]
                     ) as update_resp:
                         if update_resp.status == 200:
                             print(f"  ✓ {filepath.name} (ID: {result['id']})")
@@ -105,7 +107,6 @@ async def upload_one_with_retry(
                             "error": f"HTTP 429 after {max_retries} retries",
                         }
                 else:
-                    error_text = await resp.text()
                     print(f"  ✗ {filepath.name} HTTP {resp.status}")
                     return {"success": False, "file": str(filepath), "error": f"HTTP {resp.status}"}
 

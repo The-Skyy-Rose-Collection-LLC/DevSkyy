@@ -11,7 +11,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Load .env file
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(project_root / ".env")
 
@@ -24,6 +24,7 @@ if not WP_USERNAME or not WP_APP_PASSWORD:
     print("❌ WordPress credentials not found in .env")
     sys.exit(1)
 
+assert WP_USERNAME is not None and WP_APP_PASSWORD is not None
 print("✓ WordPress credentials loaded from .env")
 
 try:
@@ -83,7 +84,7 @@ def update_page_with_retry(
 ) -> bool:
     """Update WordPress page with HuggingFace Space embed using ralph-loop retry."""
 
-    auth = HTTPBasicAuth(WP_USERNAME, WP_APP_PASSWORD)
+    auth = HTTPBasicAuth(WP_USERNAME, WP_APP_PASSWORD)  # type: ignore[arg-type]
     endpoint = f"{WP_URL}/index.php?rest_route=/wp/v2/pages/{page_id}"
 
     # First, get current page content (ralph-loop)
