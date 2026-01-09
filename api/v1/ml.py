@@ -81,9 +81,7 @@ class MLPredictionResponse(BaseModel):
 # =============================================================================
 
 
-@router.post(
-    "/predict", response_model=MLPredictionResponse, status_code=status.HTTP_200_OK
-)
+@router.post("/predict", response_model=MLPredictionResponse, status_code=status.HTTP_200_OK)
 async def predict(
     request: MLPredictionRequest, user: TokenPayload = Depends(get_current_user)
 ) -> MLPredictionResponse:
@@ -118,8 +116,7 @@ async def predict(
     """
     prediction_id = str(uuid4())
     logger.info(
-        f"Starting ML prediction {prediction_id} for user {user.sub}: "
-        f"{request.model_type.value}"
+        f"Starting ML prediction {prediction_id} for user {user.sub}: {request.model_type.value}"
     )
 
     try:

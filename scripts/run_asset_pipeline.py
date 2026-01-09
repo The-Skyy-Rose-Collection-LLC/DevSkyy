@@ -140,7 +140,7 @@ def main() -> int:
         if args.output == "json":
             print(json.dumps(result, indent=2))
         else:
-            print(f"\n{'='*50}")
+            print(f"\n{'=' * 50}")
             print(f"Pipeline Result: {result['status'].upper()}")
             print(f"Duration: {result['duration_seconds']:.2f}s")
             print(f"3D Assets: {len(result['assets_3d'])}")
@@ -150,7 +150,7 @@ def main() -> int:
                 print(f"Errors: {len(result['errors'])}")
                 for err in result["errors"]:
                     print(f"  - {err['stage']}: {err['error']}")
-            print(f"{'='*50}")
+            print(f"{'=' * 50}")
 
         return 0 if result["status"] == "success" else 1
 

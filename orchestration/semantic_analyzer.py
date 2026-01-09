@@ -192,9 +192,7 @@ class SemanticCodeAnalyzer:
 
         # 6. Extract top-level entities
         analysis.classes = [s.name for s in analysis.symbols if s.type == "class"]
-        analysis.functions = [
-            s.name for s in analysis.symbols if s.type in ("function", "method")
-        ]
+        analysis.functions = [s.name for s in analysis.symbols if s.type in ("function", "method")]
 
         # Cache result
         self.cache[cache_key] = analysis
@@ -271,9 +269,7 @@ class SemanticCodeAnalyzer:
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 method_count = sum(
-                    1
-                    for n in node.body
-                    if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    1 for n in node.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
                 )
                 if method_count > 15:
                     patterns.append(
@@ -480,7 +476,7 @@ class SemanticCodeAnalyzer:
         """Calculate cosine similarity between two vectors"""
         import math
 
-        dot_product = sum(a * b for a, b in zip(vec1, vec2))
+        dot_product = sum(a * b for a, b in zip(vec1, vec2, strict=False))
         magnitude1 = math.sqrt(sum(a * a for a in vec1))
         magnitude2 = math.sqrt(sum(b * b for b in vec2))
 

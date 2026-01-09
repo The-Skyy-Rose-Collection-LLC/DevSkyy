@@ -261,7 +261,9 @@ def instructor_cache(
 
             return result
 
-        wrapper.cache_clear = lambda: cache_backend.clear() if hasattr(cache_backend, "clear") else None  # type: ignore
+        wrapper.cache_clear = lambda: (
+            cache_backend.clear() if hasattr(cache_backend, "clear") else None
+        )  # type: ignore
         return wrapper  # type: ignore
 
     return decorator

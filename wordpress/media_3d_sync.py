@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 import aiohttp
 import structlog
@@ -204,6 +204,7 @@ class WordPress3DMediaSync:
             WordPress3DSyncError: On API error
         """
         await self.connect()
+        assert self._session is not None, "Session not initialized"
         url = f"{self.config.base_url}/{endpoint.lstrip('/')}"
 
         for attempt in range(self.config.max_retries):
@@ -335,10 +336,13 @@ class WordPress3DMediaSync:
 
         # Update product
         try:
-            result = await self._request(
-                "PUT",
-                f"/products/{product_id}",
-                json={"meta_data": meta_data},
+            result = cast(
+                dict[str, Any],
+                await self._request(
+                    "PUT",
+                    f"/products/{product_id}",
+                    json={"meta_data": meta_data},
+                ),
             )
 
             self._logger.info(
@@ -389,10 +393,15 @@ class WordPress3DMediaSync:
         )
 
         try:
-            result = await self._request(
-                "PUT",
-                f"/products/{product_id}",
-                json={"meta_data": [{"key": self.META_AR_ENABLED, "value": str(enabled).lower()}]},
+            result = cast(
+                dict[str, Any],
+                await self._request(
+                    "PUT",
+                    f"/products/{product_id}",
+                    json={
+                        "meta_data": [{"key": self.META_AR_ENABLED, "value": str(enabled).lower()}]
+                    },
+                ),
             )
 
             self._logger.info(
@@ -525,9 +534,11 @@ class WordPress3DMediaSync:
         async def sync_one(product_config: dict) -> dict:
             async with semaphore:
                 product_id = product_config.get("product_id")
+                if product_id is None:
+                    return {"status": "error", "error": "Missing product_id", "product_id": None}
                 try:
                     result = await self.sync_3d_model(
-                        product_id=product_id,
+                        product_id=cast(int, product_id),
                         glb_url=product_config["glb_url"],
                         usdz_url=product_config.get("usdz_url"),
                         thumbnail_url=product_config.get("thumbnail_url"),

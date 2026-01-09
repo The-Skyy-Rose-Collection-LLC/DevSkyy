@@ -60,7 +60,7 @@ async def upload_media_batch(session, media_files):
                         if attempt < max_retries - 1:
                             wait_time = 2**attempt  # 1s, 2s, 4s
                             print(
-                                f"  ⏳ {filepath.name} rate limited, retry {attempt+1}/{max_retries} in {wait_time}s"
+                                f"  ⏳ {filepath.name} rate limited, retry {attempt + 1}/{max_retries} in {wait_time}s"
                             )
                             await asyncio.sleep(wait_time)
                             continue
@@ -84,7 +84,7 @@ async def upload_media_batch(session, media_files):
                 if attempt < max_retries - 1:
                     wait_time = 2**attempt
                     print(
-                        f"  ⚠ {filepath.name} error, retry {attempt+1}/{max_retries} in {wait_time}s: {e}"
+                        f"  ⚠ {filepath.name} error, retry {attempt + 1}/{max_retries} in {wait_time}s: {e}"
                     )
                     await asyncio.sleep(wait_time)
                     continue

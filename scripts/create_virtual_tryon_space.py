@@ -90,9 +90,9 @@ def main():
                 ignore_patterns=[".git/*", ".git"],
             )
 
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print("✅ Virtual Try-On Space Deployed Successfully!")
-            print(f"{'='*60}")
+            print(f"{'=' * 60}")
             print(f"\nSpace URL: https://huggingface.co/spaces/{repo_id}")
             print("\n📋 Next Steps:")
             print("  1. Space will build automatically")

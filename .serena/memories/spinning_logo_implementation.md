@@ -80,12 +80,12 @@ animation:
   timing_function: linear
   direction: normal
   hover_behavior: pause  # Pauses rotation on hover for elegance
-  
+
 glow_effect:
   enabled: true
   blur: 20px
   hover_blur: 30px  # Intensifies on hover
-  
+
 responsive:
   desktop: 60px × 60px
   mobile: 48px × 48px (below 768px)
@@ -167,8 +167,8 @@ Insert in Elementor:
 ### Option 2: Custom HTML Widget
 ```html
 <div class="skyyrose-logo skyyrose-logo--gold">
-  <img src="/wp-content/themes/skyyrose-immersive/assets/images/skyyrose-logo-spinner.svg" 
-       alt="SkyyRose" 
+  <img src="/wp-content/themes/skyyrose-immersive/assets/images/skyyrose-logo-spinner.svg"
+       alt="SkyyRose"
        class="skyyrose-logo__spinner" />
 </div>
 ```

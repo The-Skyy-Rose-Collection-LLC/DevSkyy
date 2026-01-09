@@ -48,6 +48,7 @@ class User(Base):
         last_login: Last successful login timestamp
         extra_data: Flexible JSONB field (maps to 'metadata' column in DB)
     """
+
     __tablename__ = "users"
 
     id = Column(
@@ -62,12 +63,8 @@ class User(Base):
     role = Column(String(50), server_default="customer", index=True)
     is_active = Column(Boolean, server_default="true")
     is_verified = Column(Boolean, server_default="false")
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     last_login = Column(TIMESTAMP(timezone=True))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
 
@@ -96,6 +93,7 @@ class Product(Base):
         updated_at: Last update timestamp (auto-updated via trigger)
         extra_data: Flexible JSONB field (maps to 'metadata' column, variants/specs)
     """
+
     __tablename__ = "products"
 
     id = Column(
@@ -111,12 +109,8 @@ class Product(Base):
     inventory_quantity = Column(Integer, server_default="0")
     status = Column(String(50), server_default="draft", index=True)
     tags = Column(ARRAY(Text))
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
 
     def __repr__(self) -> str:
@@ -137,6 +131,7 @@ class Order(Base):
         updated_at: Last update timestamp (auto-updated via trigger)
         extra_data: Flexible JSONB field (maps to 'metadata' column, items/shipping/payment)
     """
+
     __tablename__ = "orders"
 
     id = Column(
@@ -153,12 +148,8 @@ class Order(Base):
     status = Column(String(50), server_default="pending", index=True)
     total_price = Column(DECIMAL(10, 2), nullable=False)
     subtotal = Column(DECIMAL(10, 2), nullable=False)
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
 
     # Relationships
@@ -186,6 +177,7 @@ class LLMRoundTableResult(Base):
         created_at: Competition timestamp
         extra_data: Flexible JSONB field (maps to 'metadata' column, scores/metrics/config)
     """
+
     __tablename__ = "llm_round_table_results"
 
     id = Column(
@@ -199,9 +191,7 @@ class LLMRoundTableResult(Base):
     winner_provider = Column(String(50))
     winner_response = Column(Text)
     participants = Column(JSONB, nullable=False)
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
 
     def __repr__(self) -> str:
@@ -226,6 +216,7 @@ class AgentExecution(Base):
         created_at: Execution start timestamp
         extra_data: Flexible JSONB field (maps to 'metadata' column, plan/tools/etc.)
     """
+
     __tablename__ = "agent_executions"
 
     id = Column(
@@ -240,9 +231,7 @@ class AgentExecution(Base):
     result = Column(JSONB)
     tokens_used = Column(Integer)
     duration_ms = Column(Integer)
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
 
     def __repr__(self) -> str:
@@ -269,6 +258,7 @@ class ToolExecution(Base):
         created_at: Execution timestamp
         extra_data: Flexible JSONB field (maps to 'metadata' column, permissions/context)
     """
+
     __tablename__ = "tool_executions"
 
     id = Column(
@@ -288,9 +278,7 @@ class ToolExecution(Base):
     status = Column(String(50), nullable=False, index=True)
     duration_ms = Column(Integer)
     error_message = Column(Text)
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
 
     # Relationships
@@ -319,6 +307,7 @@ class RAGDocument(Base):
         created_at: Document ingestion timestamp
         updated_at: Last update timestamp (auto-updated via trigger)
     """
+
     __tablename__ = "rag_documents"
 
     id = Column(
@@ -334,12 +323,8 @@ class RAGDocument(Base):
     total_chunks = Column(Integer)
     embedding_model = Column(String(100))
     extra_data = Column("metadata", JSONB, server_default=text("'{}'::jsonb"))
-    created_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
-    updated_at = Column(
-        TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP")
-    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
 
     def __repr__(self) -> str:
         return f"<RAGDocument(id={self.id}, document_id={self.document_id}, chunk={self.chunk_index}/{self.total_chunks})>"

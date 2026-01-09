@@ -73,7 +73,9 @@ class MLTrainingInput(BaseModel):
 
     model_id: str = Field(..., description="Model identifier (sentiment, trend_predictor, etc.)")
     training_data_path: str = Field(..., description="Path to training dataset")
-    hyperparameters: dict[str, Any] = Field(default_factory=dict, description="Model hyperparameters")
+    hyperparameters: dict[str, Any] = Field(
+        default_factory=dict, description="Model hyperparameters"
+    )
     epochs: int = Field(10, description="Number of training epochs")
     user_id: str = Field(..., description="User ID for tracking")
 
@@ -82,7 +84,9 @@ class MLPredictionInput(BaseModel):
     """Input for ML model prediction."""
 
     model_id: str = Field(..., description="Model identifier")
-    input_data: dict[str, Any] | list[dict[str, Any]] = Field(..., description="Input data for prediction")
+    input_data: dict[str, Any] | list[dict[str, Any]] = Field(
+        ..., description="Input data for prediction"
+    )
     user_id: str = Field(..., description="User ID for tracking")
 
 
@@ -91,9 +95,7 @@ class MLPredictionInput(BaseModel):
 # =============================================================================
 
 
-async def process_3d_asset_generation(
-    task_id: str, input_data: dict[str, Any]
-) -> dict[str, Any]:
+async def process_3d_asset_generation(task_id: str, input_data: dict[str, Any]) -> dict[str, Any]:
     """
     Generate 3D asset via Tripo3D API.
 
@@ -173,9 +175,7 @@ async def process_3d_asset_generation(
         }
 
 
-async def execute_marketing_campaign(
-    task_id: str, input_data: dict[str, Any]
-) -> dict[str, Any]:
+async def execute_marketing_campaign(task_id: str, input_data: dict[str, Any]) -> dict[str, Any]:
     """
     Execute marketing campaign (email, social, SEO).
 
@@ -226,8 +226,7 @@ async def execute_marketing_campaign(
             raise ValueError(f"Unknown campaign type: {validated_input.campaign_type}")
 
         logger.info(
-            f"[Task {task_id}] ✅ Marketing campaign executed: "
-            f"sent={result.get('sent_count', 0)}"
+            f"[Task {task_id}] ✅ Marketing campaign executed: sent={result.get('sent_count', 0)}"
         )
 
         return {
@@ -300,8 +299,7 @@ async def train_ml_model(task_id: str, input_data: dict[str, Any]) -> dict[str, 
             raise ValueError(f"Unknown model ID: {validated_input.model_id}")
 
         logger.info(
-            f"[Task {task_id}] ✅ ML training completed: "
-            f"accuracy={result.get('accuracy', 'N/A')}"
+            f"[Task {task_id}] ✅ ML training completed: accuracy={result.get('accuracy', 'N/A')}"
         )
 
         return {
@@ -350,9 +348,7 @@ async def run_ml_prediction(task_id: str, input_data: dict[str, Any]) -> dict[st
         # Validate input
         validated_input = MLPredictionInput(**input_data)
 
-        logger.info(
-            f"[Task {task_id}] Starting ML prediction: " f"model={validated_input.model_id}"
-        )
+        logger.info(f"[Task {task_id}] Starting ML prediction: model={validated_input.model_id}")
 
         # Import ML module (lazy)
         from agents.base_super_agent import MLCapabilitiesModule
@@ -563,9 +559,7 @@ async def _train_segmentation_model(
         Training result with metrics
     """
     # Placeholder implementation
-    logger.info(
-        f"Training customer segmentation model from '{training_input.training_data_path}'"
-    )
+    logger.info(f"Training customer segmentation model from '{training_input.training_data_path}'")
 
     # TODO: Implement actual training logic
     await asyncio.sleep(0.5)
@@ -608,7 +602,11 @@ async def _run_sentiment_prediction(
             for item in input_data
         ]
     else:
-        predictions = {"sentiment": "positive", "confidence": 0.87, "text": input_data.get("text", "")}
+        predictions = {
+            "sentiment": "positive",
+            "confidence": 0.87,
+            "text": input_data.get("text", ""),
+        }
 
     return {"predictions": predictions, "model_version": "1.0.0"}
 
@@ -666,9 +664,7 @@ async def _run_segmentation_prediction(
     # Handle batch or single prediction
     input_data = prediction_input.input_data
     if isinstance(input_data, list):
-        predictions = [
-            {"segment": "premium_shoppers", "confidence": 0.92} for _ in input_data
-        ]
+        predictions = [{"segment": "premium_shoppers", "confidence": 0.92} for _ in input_data]
     else:
         predictions = {"segment": "premium_shoppers", "confidence": 0.92}
 

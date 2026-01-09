@@ -106,9 +106,9 @@ def main():
             if space != SPACES[-1]:
                 time.sleep(2)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Successfully redeployed {success_count}/{len(SPACES)} Spaces")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     if success_count == len(SPACES):
         print("\n📋 Next Steps:")

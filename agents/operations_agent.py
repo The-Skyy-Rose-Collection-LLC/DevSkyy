@@ -829,7 +829,7 @@ For each check, report:
         """Optimize site performance"""
         prompt = f"""Performance optimization for SkyyRose:
 
-Target URL: {url or 'Homepage'}
+Target URL: {url or "Homepage"}
 
 Please:
 1. Analyze current performance metrics
@@ -882,7 +882,7 @@ Please:
         """Deploy code changes"""
         prompt = f"""Deploy changes to {environment}:
 
-Commit: {commit or 'latest'}
+Commit: {commit or "latest"}
 
 Deployment process:
 1. Pre-deployment checks

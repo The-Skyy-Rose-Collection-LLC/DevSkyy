@@ -378,7 +378,7 @@ class SkyyRoseLoRATrainer:
             raise ValueError("Dataset is empty, cannot train")
 
         logger.info(
-            f"Starting LoRA training on {dataset.total_images} images " f"(device={self.device})"
+            f"Starting LoRA training on {dataset.total_images} images (device={self.device})"
         )
 
         try:
@@ -390,8 +390,7 @@ class SkyyRoseLoRATrainer:
 
         except ImportError as e:
             raise ImportError(
-                "Training dependencies not installed. Run: "
-                "pip install peft accelerate transformers"
+                "Training dependencies not installed. Run: pip install peft accelerate transformers"
             ) from e
 
         # Initialize accelerator
@@ -485,8 +484,8 @@ class SkyyRoseLoRATrainer:
 
                     if global_step % self.config.logging_steps == 0:
                         logger.info(
-                            f"Epoch {epoch+1}/{self.config.num_epochs}, "
-                            f"Step {step+1}/{len(train_dataloader)}, "
+                            f"Epoch {epoch + 1}/{self.config.num_epochs}, "
+                            f"Step {step + 1}/{len(train_dataloader)}, "
                             f"Loss: {loss.item():.4f}"
                         )
 
@@ -495,7 +494,7 @@ class SkyyRoseLoRATrainer:
                         accelerator.save_state(str(checkpoint_path))
 
             avg_loss = epoch_loss / len(train_dataloader)
-            logger.info(f"Epoch {epoch+1} completed, Average Loss: {avg_loss:.4f}")
+            logger.info(f"Epoch {epoch + 1} completed, Average Loss: {avg_loss:.4f}")
 
         # Save final model
         accelerator.wait_for_everyone()

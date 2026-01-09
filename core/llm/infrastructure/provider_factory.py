@@ -144,9 +144,7 @@ class ProviderFactory(IProviderFactory):
         """
         if provider not in self._provider_classes:
             available = ", ".join(p.value for p in self._provider_classes)
-            raise ValueError(
-                f"Unsupported provider: {provider}. " f"Available providers: {available}"
-            )
+            raise ValueError(f"Unsupported provider: {provider}. Available providers: {available}")
 
         provider_class = self._provider_classes[provider]
 

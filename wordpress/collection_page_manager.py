@@ -173,15 +173,15 @@ You are managing the {template.name} collection for SkyyRose.
 COLLECTION DETAILS:
 - Theme: {template.theme}
 - Description: {template.description}
-- Primary Color: {template.colors.get('primary', 'N/A')}
-- Environment: {template.metadata.get('environment', 'N/A') if template.metadata else 'N/A'}
+- Primary Color: {template.colors.get("primary", "N/A")}
+- Environment: {template.metadata.get("environment", "N/A") if template.metadata else "N/A"}
 
 GUIDELINES:
 1. Maintain brand consistency with the "{template.theme}" theme
 2. Use approved color palette for all designs
 3. Reference the 3D experience HTML file: {template.html_file_path}
-4. Ensure all content aligns with target audience: {template.metadata.get('target_audience', 'N/A') if template.metadata else 'N/A'}
-5. Keep copy consistent with "{template.metadata.get('vibe', 'luxury') if template.metadata else 'luxury'}" vibe
+4. Ensure all content aligns with target audience: {template.metadata.get("target_audience", "N/A") if template.metadata else "N/A"}
+5. Keep copy consistent with "{template.metadata.get("vibe", "luxury") if template.metadata else "luxury"}" vibe
 
 WHEN IN DOUBT: Reference the {template.html_file_path} file for design system,
 colors, and overall aesthetic.
@@ -440,9 +440,9 @@ class WordPressCollectionPageManager:
             for product in products:
                 products_html += f"""
                 <div class='product-item'>
-                    <h4>{product.get('name', 'Product')}</h4>
-                    <p class='price'>{product.get('price', '$TBD')}</p>
-                    <p class='description'>{product.get('description', '')}</p>
+                    <h4>{product.get("name", "Product")}</h4>
+                    <p class='price'>{product.get("price", "$TBD")}</p>
+                    <p class='description'>{product.get("description", "")}</p>
                 </div>
                 """
             products_html += "</div>"

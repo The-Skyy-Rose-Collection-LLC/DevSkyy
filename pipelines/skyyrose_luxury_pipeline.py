@@ -116,8 +116,7 @@ class SkyyRoseLuxuryPipeline:
 
     COLLECTION_INTROS = {
         "BLACK_ROSE": (
-            "From the BLACK ROSE collection: where darkness meets elegance "
-            "in limited edition form."
+            "From the BLACK ROSE collection: where darkness meets elegance in limited edition form."
         ),
         "LOVE_HURTS": (
             "From the LOVE HURTS collection: emotional expression through "
@@ -767,7 +766,7 @@ Each piece is designed with gender-neutral versatility, premium materials, and a
 • Designed in Oakland, CA
 • Limited availability
 • Gender-neutral sizing
-• Available in: {', '.join(specs.sizes)}
+• Available in: {", ".join(specs.sizes)}
 • Where love meets luxury
 """.strip()
 

@@ -16,7 +16,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
@@ -126,7 +126,7 @@ def get_wordpress_media_assets(collection_name: str | None = None) -> list[dict[
     try:
         # Get media from WordPress REST API
         media_url = f"{WP_URL}/index.php?rest_route=/wp/v2/media"
-        params: Dict[str, Any] = {"per_page": 100, "media_type": "image"}
+        params: dict[str, Any] = {"per_page": 100, "media_type": "image"}
 
         response = requests.get(media_url, auth=auth, params=params, timeout=30)
 
@@ -177,8 +177,8 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
     """Generate custom CSS for luxury styling."""
     return f"""
 <style>
-/* {collection['name']} Collection Custom Styles */
-.skyyrose-{collection['slug']}-page {{
+/* {collection["name"]} Collection Custom Styles */
+.skyyrose-{collection["slug"]}-page {{
     font-family: 'Playfair Display', 'Georgia', serif;
     color: #333;
 }}
@@ -186,7 +186,7 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
 .skyyrose-hero {{
     position: relative;
     min-height: 500px;
-    background: linear-gradient(135deg, {collection['color_secondary']} 0%, {collection['color_primary']} 100%);
+    background: linear-gradient(135deg, {collection["color_secondary"]} 0%, {collection["color_primary"]} 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -236,7 +236,7 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
     width: 100%;
     aspect-ratio: 1;
     overflow: hidden;
-    background: {collection['color_secondary']};
+    background: {collection["color_secondary"]};
 }}
 
 .skyyrose-product-image img {{
@@ -264,7 +264,7 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
 .skyyrose-product-price {{
     font-size: 1.5rem;
     font-weight: 700;
-    color: {collection['color_primary']};
+    color: {collection["color_primary"]};
     margin-bottom: 1rem;
 }}
 
@@ -277,19 +277,19 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
 
 .skyyrose-btn {{
     display: inline-block;
-    background: {collection['color_primary']};
+    background: {collection["color_primary"]};
     color: white;
     padding: 0.875rem 2rem;
     border-radius: 6px;
     text-decoration: none;
     font-weight: 600;
     transition: all 0.3s ease;
-    border: 2px solid {collection['color_primary']};
+    border: 2px solid {collection["color_primary"]};
 }}
 
 .skyyrose-btn:hover {{
     background: transparent;
-    color: {collection['color_primary']};
+    color: {collection["color_primary"]};
     transform: translateY(-2px);
 }}
 
@@ -310,8 +310,8 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
 .skyyrose-hf-tab-btn {{
     padding: 1rem 2rem;
     background: white;
-    border: 2px solid {collection['color_primary']};
-    color: {collection['color_primary']};
+    border: 2px solid {collection["color_primary"]};
+    color: {collection["color_primary"]};
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
@@ -320,7 +320,7 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
 
 .skyyrose-hf-tab-btn.active,
 .skyyrose-hf-tab-btn:hover {{
-    background: {collection['color_primary']};
+    background: {collection["color_primary"]};
     color: white;
 }}
 
@@ -328,7 +328,7 @@ def generate_custom_css(collection: dict[str, Any]) -> str:
     width: 100%;
     max-width: 1200px;
     margin: 0 auto;
-    border: 3px solid {collection['color_primary']};
+    border: 3px solid {collection["color_primary"]};
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 8px 24px rgba(0,0,0,0.15);
@@ -397,12 +397,12 @@ def generate_hf_spaces_html(collection_name: str) -> str:
         panels_html += f"""
 <div class="skyyrose-hf-tab-panel" id="space-{idx}" style="display: {display};">
     <div style="text-align: center; margin-bottom: 2rem;">
-        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{space['icon']} {space['name']}</h3>
-        <p style="color: #666; font-size: 1.1rem;">{space['description']}</p>
+        <h3 style="font-size: 2rem; margin-bottom: 0.5rem;">{space["icon"]} {space["name"]}</h3>
+        <p style="color: #666; font-size: 1.1rem;">{space["description"]}</p>
     </div>
     <iframe
         class="skyyrose-hf-iframe"
-        src="{space['url']}"
+        src="{space["url"]}"
         frameborder="0"
         width="100%"
         height="800"
@@ -410,7 +410,7 @@ def generate_hf_spaces_html(collection_name: str) -> str:
         sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
     ></iframe>
     <p style="text-align: center; margin-top: 1rem; color: #666;">
-        Powered by AI | <a href="{space['url']}" target="_blank" rel="noopener" style="color: #B76E79;">Open in HuggingFace →</a>
+        Powered by AI | <a href="{space["url"]}" target="_blank" rel="noopener" style="color: #B76E79;">Open in HuggingFace →</a>
     </p>
 </div>
 """
@@ -463,26 +463,26 @@ def generate_complete_page_html(collection: dict[str, Any], products: list[dict[
 
     return f"""{css}
 
-<div class="skyyrose-{collection['slug']}-page">
+<div class="skyyrose-{collection["slug"]}-page">
     <!-- Hero Section -->
     <div class="skyyrose-hero">
         <div>
-            <h1>{collection['title']}</h1>
-            <p>{collection['subtitle']}</p>
+            <h1>{collection["title"]}</h1>
+            <p>{collection["subtitle"]}</p>
         </div>
     </div>
 
     <!-- Collection Description -->
     <div style="max-width: 800px; margin: 3rem auto; padding: 0 2rem; text-align: center;">
         <p style="font-size: 1.2rem; line-height: 1.8; color: #555;">
-            {collection['description']}
+            {collection["description"]}
         </p>
     </div>
 
     <!-- Product Gallery -->
     <div style="background: white; padding: 2rem 0;">
         <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 2rem;">
-            Shop {collection['name']}
+            Shop {collection["name"]}
         </h2>
         {product_gallery}
     </div>
@@ -567,9 +567,9 @@ def main() -> int:
             if page_id != list(COLLECTIONS.keys())[-1]:
                 time.sleep(2)
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"✅ Successfully built {success_count}/{len(COLLECTIONS)} luxury pages")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
 
     if success_count == len(COLLECTIONS):
         print("\n🌐 Live Pages:")

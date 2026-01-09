@@ -14,7 +14,6 @@ Integrates with all providers: OpenAI, Anthropic, Google, Mistral, Cohere, Groq.
 
 from __future__ import annotations
 
-import logging
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -221,7 +220,9 @@ class TokenTracker:
 
         return by_model
 
-    def get_usage_by_task_type(self, since: datetime | None = None) -> dict[TaskType, dict[str, Any]]:
+    def get_usage_by_task_type(
+        self, since: datetime | None = None
+    ) -> dict[TaskType, dict[str, Any]]:
         """
         Get aggregated usage by task type.
 

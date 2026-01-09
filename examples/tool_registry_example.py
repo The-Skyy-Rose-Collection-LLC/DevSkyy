@@ -86,9 +86,9 @@ async def main():
                 {"product_id": 123, "regular_price": 199.99 + i},
                 user_id="demo_user",
             )
-            print(f"   Call {i+1}: SUCCESS - {result}")
+            print(f"   Call {i + 1}: SUCCESS - {result}")
         except RuntimeError as e:
-            print(f"   Call {i+1}: RATE LIMITED - {e}")
+            print(f"   Call {i + 1}: RATE LIMITED - {e}")
 
     # Step 6: Demonstrate permission checking
     print("\n6. Testing permission checking (missing permissions)...")
@@ -117,7 +117,9 @@ async def main():
     print(f"\n   Anthropic Tools format ({len(anthropic_tools)} tools):")
     print(f"   Sample: {anthropic_tools[0]['name']}")
     if "defer_loading" in anthropic_tools[0]:
-        print(f"   - Advanced Tool Use enabled: defer_loading={anthropic_tools[0]['defer_loading']}")
+        print(
+            f"   - Advanced Tool Use enabled: defer_loading={anthropic_tools[0]['defer_loading']}"
+        )
 
     # MCP Tools
     mcp_tools = registry.to_mcp_tools()

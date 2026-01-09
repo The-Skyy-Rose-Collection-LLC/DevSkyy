@@ -7,7 +7,7 @@
 ### 1. Mandatory Workflow Documentation
 Added prominent section to `CLAUDE.md` requiring:
 - **Context7 FIRST**: Query docs before ALL code changes
-- **Ralph-Wiggums ERROR LOOP**: Wrap ALL I/O operations  
+- **Ralph-Wiggums ERROR LOOP**: Wrap ALL I/O operations
 - **Serena MCP INTEGRATION**: Use symbolic tools for code changes
 
 ### 2. Consolidation Script

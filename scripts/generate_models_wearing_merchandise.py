@@ -89,10 +89,10 @@ async def generate_model_wearing_product(
     is identical to the product photo.
     """
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"Generating model wearing: {product_photo_path.name}")
     print(f"Collection: {collection}")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
 
     # Detect garment type
     garment_type = detect_garment_type(product_photo_path.name)
@@ -140,7 +140,7 @@ async def generate_model_wearing_product(
     prompt = f"""
     Professional fashion photography, full body shot,
     attractive model wearing the EXACT {garment_type} from reference image,
-    {brand_style['style']},
+    {brand_style["style"]},
     studio lighting, high fashion, commercial photography,
     model poses naturally, confident expression,
     SkyyRose luxury streetwear brand,
@@ -150,7 +150,7 @@ async def generate_model_wearing_product(
     """.strip()
 
     negative_prompt = f"""
-    {brand_style['negative']},
+    {brand_style["negative"]},
     different clothing, generic clothing, wrong colors, wrong design,
     blurry, low quality, distorted, amateur, bad anatomy,
     clothing that doesn't match reference
@@ -233,9 +233,9 @@ async def main():
     with open(results_path, "w") as f:
         json.dump(results, f, indent=2)
 
-    print(f"\n\n{'='*60}")
+    print(f"\n\n{'=' * 60}")
     print("✅ AI Model Generation Complete!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nGenerated {len(results)} model photos")
     print(f"Output: {output_dir}")
     print(f"Manifest: {results_path}")

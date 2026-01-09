@@ -306,9 +306,7 @@ class SkyyRoseBrandValidator:
                 cb = int(hex_clean[4:6], 16)
 
                 # Calculate color distance
-                distance = (
-                    (r_avg - cr) ** 2 + (g_avg - cg) ** 2 + (b_avg - cb) ** 2
-                ) ** 0.5
+                distance = ((r_avg - cr) ** 2 + (g_avg - cg) ** 2 + (b_avg - cb) ** 2) ** 0.5
 
                 min_distance = min(min_distance, distance)
 
@@ -340,9 +338,7 @@ class SkyyRoseBrandValidator:
 
         if garment_lower in self.brand_config["garment_templates"]:
             return 95.0  # Exact match
-        elif any(
-            garment_lower in template for template in self.brand_config["garment_templates"]
-        ):
+        elif any(garment_lower in template for template in self.brand_config["garment_templates"]):
             return 85.0  # Partial match
         else:
             return 70.0  # Unknown but acceptable
@@ -374,17 +370,17 @@ class SkyyRoseBrandValidator:
             if template:
                 garment_info = f"""
 Garment Details:
-- Features: {', '.join(template['features'])}
-- Fabric: {template['fabric']}
-- Fit: {template['fit']}"""
+- Features: {", ".join(template["features"])}
+- Fabric: {template["fabric"]}
+- Fit: {template["fit"]}"""
 
         prompt = f"""SkyyRose {collection} Collection - {product_name}
 
-Brand: {brand['brand_name']} - {brand['tagline']}
-Style: {brand['aesthetic']['style']}, {brand['aesthetic']['quality_level']} quality
-Collection Mood: {collection_aesthetic['mood']}
-Texture Style: {collection_aesthetic['texture_style']}
-Colors: {', '.join(collection_aesthetic['colors'])}
+Brand: {brand["brand_name"]} - {brand["tagline"]}
+Style: {brand["aesthetic"]["style"]}, {brand["aesthetic"]["quality_level"]} quality
+Collection Mood: {collection_aesthetic["mood"]}
+Texture Style: {collection_aesthetic["texture_style"]}
+Colors: {", ".join(collection_aesthetic["colors"])}
 {garment_info}
 3D Requirements:
 - Premium finish, studio-quality lighting
@@ -473,9 +469,7 @@ class EnhancerConfig:
         """Create config from environment variables."""
         return cls(
             hf_api_token=os.getenv("HUGGINGFACE_API_TOKEN") or os.getenv("HF_TOKEN"),
-            primary_model=HF3DModel(
-                os.getenv("HF_PRIMARY_MODEL", HF3DModel.HUNYUAN3D_2.value)
-            ),
+            primary_model=HF3DModel(os.getenv("HF_PRIMARY_MODEL", HF3DModel.HUNYUAN3D_2.value)),
             quality=HF3DQuality(os.getenv("HF_QUALITY", HF3DQuality.PRODUCTION.value)),
             texture_quality=TextureQuality(
                 os.getenv("HF_TEXTURE_QUALITY", TextureQuality.HIGH.value)
@@ -641,9 +635,7 @@ class ImagePreprocessor:
 
         # Run preprocessing in executor to avoid blocking
         loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            None, self._preprocess_sync, path, output_path, result
-        )
+        return await loop.run_in_executor(None, self._preprocess_sync, path, output_path, result)
 
     def _preprocess_sync(
         self,
@@ -928,9 +920,7 @@ class HuggingFaceAssetEnhancer:
 
             # Step 4: Generate USDZ for iOS AR (if enabled)
             if self.config.generate_usdz and result.glb_path:
-                result.usdz_path = await self._convert_to_usdz(
-                    result.glb_path, output_dir
-                )
+                result.usdz_path = await self._convert_to_usdz(result.glb_path, output_dir)
 
             # Step 5: Generate thumbnail
             if self.config.generate_thumbnails and result.preprocessing:
@@ -1145,9 +1135,7 @@ class HuggingFaceAssetEnhancer:
 
         extensions = file_extensions or [".jpg", ".jpeg", ".png", ".webp"]
         image_files = [
-            f
-            for f in collection_dir.iterdir()
-            if f.is_file() and f.suffix.lower() in extensions
+            f for f in collection_dir.iterdir() if f.is_file() and f.suffix.lower() in extensions
         ]
 
         result = CollectionEnhancementResult(
@@ -1191,8 +1179,7 @@ class HuggingFaceAssetEnhancer:
 
         result.completed_at = datetime.now(UTC).isoformat()
         result.duration_seconds = (
-            datetime.fromisoformat(result.completed_at)
-            - datetime.fromisoformat(result.started_at)
+            datetime.fromisoformat(result.completed_at) - datetime.fromisoformat(result.started_at)
         ).total_seconds()
 
         logger.info(
@@ -1334,11 +1321,13 @@ class TextureEnhancer:
                 from PIL import ImageEnhance, ImageFilter
 
                 # Apply unsharp mask for detail enhancement
-                enhanced_img = enhanced_img.filter(ImageFilter.UnsharpMask(
-                    radius=1.5,
-                    percent=100,
-                    threshold=2,
-                ))
+                enhanced_img = enhanced_img.filter(
+                    ImageFilter.UnsharpMask(
+                        radius=1.5,
+                        percent=100,
+                        threshold=2,
+                    )
+                )
 
                 # Slight contrast boost
                 enhancer = ImageEnhance.Contrast(enhanced_img)
@@ -1386,7 +1375,9 @@ class TextureEnhancer:
             raise FileNotFoundError(f"Texture not found: {image_path}")
 
         if model not in self.UPSCALE_MODELS:
-            raise ValueError(f"Unknown model: {model}. Available: {list(self.UPSCALE_MODELS.keys())}")
+            raise ValueError(
+                f"Unknown model: {model}. Available: {list(self.UPSCALE_MODELS.keys())}"
+            )
 
         model_id = self.UPSCALE_MODELS[model]
 

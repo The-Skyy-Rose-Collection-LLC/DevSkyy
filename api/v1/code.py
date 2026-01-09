@@ -92,9 +92,7 @@ class CodeFixRequest(BaseModel):
         default=False,
         description="Automatically apply fixes or generate suggestions only",
     )
-    create_backup: bool = Field(
-        default=True, description="Create backup before applying fixes"
-    )
+    create_backup: bool = Field(default=True, description="Create backup before applying fixes")
     fix_types: list[str] = Field(
         default=["syntax", "imports", "docstrings"],
         description="Types of fixes to apply",
@@ -157,9 +155,7 @@ async def scan_code(
         HTTPException: If path doesn't exist or scan fails
     """
     scan_id = str(uuid4())
-    logger.info(
-        f"Starting code scan {scan_id} for user {user.sub} at path: {request.path}"
-    )
+    logger.info(f"Starting code scan {scan_id} for user {user.sub} at path: {request.path}")
 
     try:
         # Validate path

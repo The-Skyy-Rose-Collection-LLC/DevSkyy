@@ -136,7 +136,7 @@ def enhance_product(input_path: Path, output_dir: Path, max_retries: int = 3) ->
 
         except Exception as e:
             if attempt < max_retries - 1:
-                print(f"    Retry {attempt+1}/{max_retries}: {e}")
+                print(f"    Retry {attempt + 1}/{max_retries}: {e}")
                 continue
             else:
                 return {"original": str(input_path), "error": str(e), "success": False}
@@ -178,9 +178,9 @@ async def main():
     successful = sum(1 for r in results if r["success"])
     failed = len(results) - successful
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("✅ Processing Complete!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Total products: {len(all_products)}")
     print(f"Successfully enhanced: {successful}")
     print(f"Failed: {failed}")

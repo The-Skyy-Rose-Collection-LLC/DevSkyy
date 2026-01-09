@@ -473,29 +473,28 @@ class WordPressAssetAgent(SuperAgent):
         # Validate file exists
         if not path.exists():
             raise FileNotFoundError(
-                f"File not found: {file_path}. "
-                "Ensure the file path is correct and the file exists."
+                f"File not found: {file_path}. Ensure the file path is correct and the file exists."
             )
 
         # Validate file is readable
         if not path.is_file():
-            raise ValueError(f"Path is not a file: {file_path}. " "Directories cannot be uploaded.")
+            raise ValueError(f"Path is not a file: {file_path}. Directories cannot be uploaded.")
 
         # Check file size
         try:
             file_size = path.stat().st_size
         except OSError as e:
             raise PermissionError(
-                f"Cannot read file stats for {file_path}: {e}. " "Check file permissions."
+                f"Cannot read file stats for {file_path}: {e}. Check file permissions."
             ) from e
 
         if file_size == 0:
-            raise ValueError(f"File is empty: {file_path}. " "Cannot upload an empty file.")
+            raise ValueError(f"File is empty: {file_path}. Cannot upload an empty file.")
 
         max_size = self.wp_config.max_file_size_mb * 1024 * 1024
         if file_size > max_size:
             raise ValueError(
-                f"File too large: {file_size / (1024*1024):.1f}MB exceeds "
+                f"File too large: {file_size / (1024 * 1024):.1f}MB exceeds "
                 f"maximum allowed size of {self.wp_config.max_file_size_mb}MB. "
                 "Consider compressing the file or increasing the limit."
             )

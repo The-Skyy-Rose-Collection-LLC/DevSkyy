@@ -149,7 +149,7 @@ class PrometheusExporter:
     Prometheus metrics exporter for DevSkyy security and performance monitoring.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
         """Initialize the Prometheus exporter."""
         self.registry = devskyy_registry
         self._request_start_times: dict[str, float] = {}

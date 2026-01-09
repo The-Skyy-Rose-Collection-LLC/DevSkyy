@@ -2107,7 +2107,7 @@ if __name__ == "__main__":
 
 âœ… Configuration:
    API URL: {API_BASE_URL}
-   API Key: {'Set âœ“' if API_KEY else 'Not Set âš ï¸'}
+   API Key: {"Set âœ“" if API_KEY else "Not Set âš ï¸"}
 
 ðŸ”§ Tools Available:
    â€¢ devskyy_scan_code - Code analysis and quality checking

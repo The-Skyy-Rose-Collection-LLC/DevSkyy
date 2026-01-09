@@ -29,6 +29,7 @@ T = TypeVar("T")
 
 class ErrorCategory(Enum):
     """Error categories for determining retry strategy."""
+
     NETWORK = "network"  # Network failures, connection issues
     AUTHENTICATION = "authentication"  # 401, 403, invalid credentials
     TIMEOUT = "timeout"  # Operation timeout
@@ -40,6 +41,7 @@ class ErrorCategory(Enum):
 
 class CircuitState(Enum):
     """Circuit breaker states."""
+
     CLOSED = "closed"  # Normal operation
     OPEN = "open"  # Failures exceeded threshold, rejecting calls
     HALF_OPEN = "half_open"  # Testing if service recovered
@@ -47,11 +49,13 @@ class CircuitState(Enum):
 
 class CircuitBreakerError(Exception):
     """Raised when circuit breaker is open."""
+
     pass
 
 
 class AllAttemptsFailedError(Exception):
     """Raised when all retry attempts have been exhausted."""
+
     def __init__(self, attempts: int, last_error: Exception):
         self.attempts = attempts
         self.last_error = last_error
@@ -74,15 +78,18 @@ def categorize_error(error: Exception) -> ErrorCategory:
     error_type = type(error).__name__.lower()
 
     # Network errors
-    if any(term in error_str or term in error_type for term in [
-        "connection", "network", "timeout", "unreachable", "refused"
-    ]):
+    if any(
+        term in error_str or term in error_type
+        for term in ["connection", "network", "timeout", "unreachable", "refused"]
+    ):
         if "timeout" in error_str or "timeout" in error_type:
             return ErrorCategory.TIMEOUT
         return ErrorCategory.NETWORK
 
     # Authentication errors
-    if any(term in error_str for term in ["401", "403", "unauthorized", "forbidden", "authentication"]):
+    if any(
+        term in error_str for term in ["401", "403", "unauthorized", "forbidden", "authentication"]
+    ):
         return ErrorCategory.AUTHENTICATION
 
     # Rate limiting
@@ -94,7 +101,9 @@ def categorize_error(error: Exception) -> ErrorCategory:
         return ErrorCategory.VALIDATION
 
     # Server errors
-    if any(term in error_str for term in ["500", "502", "503", "504", "server error", "internal error"]):
+    if any(
+        term in error_str for term in ["500", "502", "503", "504", "server error", "internal error"]
+    ):
         return ErrorCategory.SERVER_ERROR
 
     # Default to fatal
@@ -143,13 +152,16 @@ async def ralph_wiggums_execute(
         ]
 
     attempts_list = [operation] + (fallbacks or [])
+    last_exception: Exception | None = None
 
     for op_index, attempt in enumerate(attempts_list):
         op_name = f"operation_{op_index}" if op_index > 0 else "primary"
 
         for retry_count in range(max_attempts):
             try:
-                logger.debug(f"Ralph-Wiggums: Executing {op_name} (attempt {retry_count + 1}/{max_attempts})")
+                logger.debug(
+                    f"Ralph-Wiggums: Executing {op_name} (attempt {retry_count + 1}/{max_attempts})"
+                )
 
                 # Execute the operation
                 if asyncio.iscoroutinefunction(attempt):
@@ -161,6 +173,7 @@ async def ralph_wiggums_execute(
                 return (True, result, None)
 
             except Exception as e:
+                last_exception = e
                 category = categorize_error(e)
                 logger.warning(
                     f"Ralph-Wiggums: {op_name} failed (attempt {retry_count + 1}/{max_attempts}): "
@@ -169,7 +182,9 @@ async def ralph_wiggums_execute(
 
                 # Check if we should retry this error
                 if category not in retry_categories:
-                    logger.error(f"Ralph-Wiggums: Error category {category.value} not retryable, moving to next operation")
+                    logger.error(
+                        f"Ralph-Wiggums: Error category {category.value} not retryable, moving to next operation"
+                    )
                     break
 
                 # Last attempt for this operation?
@@ -178,11 +193,12 @@ async def ralph_wiggums_execute(
                     break
 
                 # Calculate backoff delay
-                delay = min(base_delay * (exponential_base ** retry_count), max_delay)
+                delay = min(base_delay * (exponential_base**retry_count), max_delay)
 
                 # Add jitter to avoid thundering herd
                 if jitter:
                     import random
+
                     delay = delay * (0.5 + random.random())
 
                 # Special handling for rate limits
@@ -194,7 +210,9 @@ async def ralph_wiggums_execute(
 
     # All operations and attempts failed
     logger.error("Ralph-Wiggums: All operations and attempts exhausted")
-    return (False, None, AllAttemptsFailedError(len(attempts_list) * max_attempts, e))
+    if last_exception is None:
+        last_exception = Exception("All operations failed with no exception captured")
+    return (False, None, AllAttemptsFailedError(len(attempts_list) * max_attempts, last_exception))
 
 
 class CircuitBreaker:
@@ -290,7 +308,9 @@ class CircuitBreaker:
         async with self._lock:
             if self.state == CircuitState.HALF_OPEN:
                 self.success_count += 1
-                logger.debug(f"Circuit breaker: HALF_OPEN success {self.success_count}/{self.half_open_attempts}")
+                logger.debug(
+                    f"Circuit breaker: HALF_OPEN success {self.success_count}/{self.half_open_attempts}"
+                )
 
                 if self.success_count >= self.half_open_attempts:
                     logger.info("Circuit breaker: Closing circuit (recovered)")
@@ -307,7 +327,9 @@ class CircuitBreaker:
             self.failure_count += 1
             self.last_failure_time = datetime.now()
 
-            logger.warning(f"Circuit breaker: Failure {self.failure_count}/{self.failure_threshold}")
+            logger.warning(
+                f"Circuit breaker: Failure {self.failure_count}/{self.failure_threshold}"
+            )
 
             if self.state == CircuitState.HALF_OPEN:
                 logger.warning("Circuit breaker: HALF_OPEN test failed, reopening")
@@ -338,6 +360,7 @@ def with_retry(
         ... async def fetch_data():
         ...     return await api.get("/data")
     """
+
     def decorator(func: Callable) -> Callable:
         @functools.wraps(func)
         async def wrapper(*args, **kwargs):
@@ -356,6 +379,7 @@ def with_retry(
                 raise error
 
         return wrapper
+
     return decorator
 
 
@@ -409,6 +433,7 @@ if __name__ == "__main__":
     # Example 1: Basic retry with exponential backoff
     async def flaky_operation():
         import random
+
         if random.random() < 0.7:  # 70% failure rate
             raise ConnectionError("Network temporarily unavailable")
         return "Success!"

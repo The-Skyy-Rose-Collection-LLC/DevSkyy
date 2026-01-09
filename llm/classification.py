@@ -497,7 +497,9 @@ class GroqFastClassifier:
         try:
             response = await client.complete(
                 messages=[
-                    Message.system("You are a classification assistant. Respond with valid JSON only."),
+                    Message.system(
+                        "You are a classification assistant. Respond with valid JSON only."
+                    ),
                     Message.user(prompt),
                 ],
                 model=self.config.model,

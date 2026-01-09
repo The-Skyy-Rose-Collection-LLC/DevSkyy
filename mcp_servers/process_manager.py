@@ -231,7 +231,9 @@ class MCPProcessManager:
 
             # Wait for startup
             if definition.port:
-                startup_success = await self._wait_for_startup(server_id, definition.startup_timeout)
+                startup_success = await self._wait_for_startup(
+                    server_id, definition.startup_timeout
+                )
                 if not startup_success:
                     await self._handle_startup_failure(server_id)
                     return False
