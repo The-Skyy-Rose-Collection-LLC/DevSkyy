@@ -51,12 +51,7 @@ from pydantic import BaseModel, Field, ValidationError
 from agents.fashn_agent import FashnConfig, FashnTryOnAgent, GarmentCategory
 from agents.tripo_agent import TripoAssetAgent, TripoConfig
 from agents.wordpress_asset_agent import WordPressAssetAgent, WordPressAssetConfig
-from orchestration.huggingface_3d_client import (
-    HF3DModel,
-    HF3DQuality,
-    HuggingFace3DClient,
-    HuggingFace3DConfig,
-)
+from orchestration.huggingface_3d_client import HuggingFace3DClient, HuggingFace3DConfig
 
 logger = structlog.get_logger(__name__)
 
@@ -1082,7 +1077,9 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
+            1
+            for _, r, _ in results
+            if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize
@@ -1477,6 +1474,8 @@ class ProductAssetPipeline:
         This uses Hunyuan3D 2.0 or InstantMesh for best quality output,
         bypassing Tripo3D entirely for higher fidelity.
         """
+        from orchestration.huggingface_3d_client import HF3DModel, HF3DQuality
+
         logger.info(
             "Generating 3D models with HuggingFace (primary)",
             title=title,

@@ -12,41 +12,35 @@ Author: DevSkyy Platform Team
 Version: 1.0.0
 """
 
-import pytest
 from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from fastapi.testclient import TestClient
+
+from integrations.wordpress.order_sync import (
+    FulfillmentStatus,
+    OrderFulfillmentRequest,
+    OrderStatus,
+    OrderWebhookPayload,
+    import_order_from_woocommerce,
+    process_order_fulfillment,
+)
 
 # Import the modules to test
 from integrations.wordpress.product_sync import (
     ProductSyncPayload,
     ProductSyncRequest,
-    ProductSyncResult,
     SyncDirection,
-    SyncStatus,
     sync_product_from_woocommerce,
     sync_product_to_woocommerce,
 )
-from integrations.wordpress.order_sync import (
-    OrderWebhookPayload,
-    OrderFulfillmentRequest,
-    OrderFulfillmentResult,
-    OrderStatus,
-    FulfillmentStatus,
-    import_order_from_woocommerce,
-    process_order_fulfillment,
-)
 from integrations.wordpress.theme_deployment import (
-    ThemeDeploymentRequest,
-    ThemeDeploymentResult,
-    ThemeMetadata,
     ThemeAsset,
     ThemeAssetType,
-    ThemeStatus,
+    ThemeDeploymentRequest,
+    ThemeMetadata,
     package_theme,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -57,6 +51,7 @@ from integrations.wordpress.theme_deployment import (
 def test_client():
     """Create FastAPI test client."""
     from main_enterprise import app
+
     return TestClient(app)
 
 
@@ -96,7 +91,7 @@ def sample_product_request():
 @pytest.fixture
 def sample_order_payload():
     """Sample WooCommerce order webhook payload."""
-    from integrations.wordpress.order_sync import OrderLineItem, OrderCustomer, OrderShipping
+    from integrations.wordpress.order_sync import OrderCustomer, OrderLineItem, OrderShipping
 
     return OrderWebhookPayload(
         id=67890,
@@ -370,7 +365,7 @@ class TestOrderSync:
 
     def test_order_payload_validation(self):
         """Test order payload validation."""
-        from integrations.wordpress.order_sync import OrderLineItem, OrderCustomer
+        from integrations.wordpress.order_sync import OrderCustomer
 
         # Valid payload
         payload = OrderWebhookPayload(
@@ -518,7 +513,9 @@ class TestWordPressIntegration:
         assert "/api/v1/wordpress/webhooks/order-created" in openapi["paths"]
         assert "/api/v1/wordpress/themes/deploy" in openapi["paths"]
 
-    def test_product_order_workflow(self, test_client, sample_product_payload, sample_order_payload):
+    def test_product_order_workflow(
+        self, test_client, sample_product_payload, sample_order_payload
+    ):
         """Test complete product -> order workflow."""
         # 1. Sync product from WooCommerce
         product_response = test_client.post(

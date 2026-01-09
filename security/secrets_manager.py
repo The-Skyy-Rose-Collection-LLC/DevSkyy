@@ -230,7 +230,7 @@ class AWSSecretsManager(SecretsBackend):
 
         except ImportError as e:
             raise SecretsBackendError(
-                "boto3 is required for AWS Secrets Manager. " "Install with: pip install boto3"
+                "boto3 is required for AWS Secrets Manager. Install with: pip install boto3"
             ) from e
         except Exception as e:
             raise SecretsBackendError(

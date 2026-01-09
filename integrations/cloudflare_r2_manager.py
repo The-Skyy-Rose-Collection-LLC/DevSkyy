@@ -100,7 +100,10 @@ class CloudflareR2Manager:
         # Convert to WebP (better compression than PNG)
         img_byte_arr = io.BytesIO()
         img.save(
-            img_byte_arr, format="WEBP", quality=90, method=6  # High quality  # Best compression
+            img_byte_arr,
+            format="WEBP",
+            quality=90,
+            method=6,  # High quality  # Best compression
         )
         img_byte_arr.seek(0)
 

@@ -350,7 +350,10 @@ class TestAdminEndpoints:
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-@pytest.mark.skip(reason="Requires test client fixtures from conftest.py")
+@pytest.mark.skip(
+    reason="Integration test: Requires running FastAPI app and database. "
+    "Run with: pytest -m integration --run-integration"
+)
 async def test_dashboard_integration(client, admin_headers):
     """Test dashboard endpoints with authenticated client."""
     # Get dashboard stats
@@ -363,7 +366,10 @@ async def test_dashboard_integration(client, admin_headers):
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-@pytest.mark.skip(reason="Requires test client fixtures from conftest.py")
+@pytest.mark.skip(
+    reason="Integration test: Requires running FastAPI app and database. "
+    "Run with: pytest -m integration --run-integration"
+)
 async def test_dashboard_requires_auth(client):
     """Test dashboard endpoints require authentication."""
     # Try without auth headers

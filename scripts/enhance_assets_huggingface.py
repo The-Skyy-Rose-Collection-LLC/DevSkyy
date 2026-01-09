@@ -299,7 +299,7 @@ async def enhance_all_collections(args: argparse.Namespace) -> int:
     try:
         for collection_dir in collections:
             collection_name = collection_dir.name.strip("_").replace("_", " ")
-            print(f"\n{'='*60}")
+            print(f"\n{'=' * 60}")
             print(f"Processing: {collection_name}")
             print("=" * 60)
 

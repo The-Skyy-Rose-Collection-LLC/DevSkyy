@@ -22,12 +22,10 @@ Features:
 
 import argparse
 import base64
-import os
 import re
 import secrets
 import sys
 from pathlib import Path
-from typing import Dict, List, Tuple
 
 
 class Colors:
@@ -56,7 +54,7 @@ def generate_api_key() -> str:
     return secrets.token_urlsafe(64)
 
 
-def parse_env_file(filepath: Path) -> Dict[str, str]:
+def parse_env_file(filepath: Path) -> dict[str, str]:
     """Parse .env file and return key-value pairs.
 
     Args:
@@ -71,7 +69,7 @@ def parse_env_file(filepath: Path) -> Dict[str, str]:
         print(f"{Colors.RED}Error: {filepath} not found{Colors.NC}")
         sys.exit(1)
 
-    with open(filepath, "r") as f:
+    with open(filepath) as f:
         for line_num, line in enumerate(f, 1):
             line = line.strip()
 
@@ -86,9 +84,12 @@ def parse_env_file(filepath: Path) -> Dict[str, str]:
                 value = value.strip()
 
                 # Remove quotes if present
-                if value.startswith('"') and value.endswith('"'):
-                    value = value[1:-1]
-                elif value.startswith("'") and value.endswith("'"):
+                if (
+                    value.startswith('"')
+                    and value.endswith('"')
+                    or value.startswith("'")
+                    and value.endswith("'")
+                ):
                     value = value[1:-1]
 
                 env_vars[key] = value
@@ -98,7 +99,7 @@ def parse_env_file(filepath: Path) -> Dict[str, str]:
     return env_vars
 
 
-def categorize_variables(env_vars: Dict[str, str]) -> Dict[str, List[Tuple[str, str, str]]]:
+def categorize_variables(env_vars: dict[str, str]) -> dict[str, list[tuple[str, str, str]]]:
     """Categorize environment variables by importance and type.
 
     Returns:
@@ -185,7 +186,9 @@ def categorize_variables(env_vars: Dict[str, str]) -> Dict[str, List[Tuple[str, 
     return categories
 
 
-def generate_render_format(categories: Dict[str, List[Tuple[str, str, str]]], auto_generate: bool = True) -> str:
+def generate_render_format(
+    categories: dict[str, list[tuple[str, str, str]]], auto_generate: bool = True
+) -> str:
     """Generate environment variables in Render dashboard format.
 
     Args:
@@ -333,7 +336,9 @@ def generate_render_format(categories: Dict[str, List[Tuple[str, str, str]]], au
     return "\n".join(output)
 
 
-def validate_environment(categories: Dict[str, List[Tuple[str, str, str]]]) -> Tuple[bool, List[str]]:
+def validate_environment(
+    categories: dict[str, list[tuple[str, str, str]]],
+) -> tuple[bool, list[str]]:
     """Validate environment variables for common issues.
 
     Returns:
@@ -434,12 +439,14 @@ def main():
     # Write to file or stdout
     if args.output:
         args.output.write_text(output)
-        print(f"{Colors.GREEN}✓ Generated environment variables written to {args.output}{Colors.NC}")
+        print(
+            f"{Colors.GREEN}✓ Generated environment variables written to {args.output}{Colors.NC}"
+        )
         print(f"\n{Colors.BLUE}Next steps:{Colors.NC}")
         print(f"1. Review the file: {args.output}")
-        print(f"2. Create database and Redis in Render")
-        print(f"3. Update DATABASE_URL and REDIS_URL with actual values")
-        print(f"4. Copy variables to Render Dashboard > Environment")
+        print("2. Create database and Redis in Render")
+        print("3. Update DATABASE_URL and REDIS_URL with actual values")
+        print("4. Copy variables to Render Dashboard > Environment")
     else:
         print(output)
 

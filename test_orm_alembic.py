@@ -6,6 +6,7 @@ This script verifies:
 2. Alembic can detect the models via Base.metadata
 3. Model schema matches the baseline migration
 """
+
 import sys
 from pathlib import Path
 
@@ -18,15 +19,16 @@ def test_import_models():
     """Test that models can be imported."""
     try:
         from agents.models import (
-            Base,
-            User,
-            Product,
-            Order,
-            LLMRoundTableResult,
             AgentExecution,
-            ToolExecution,
+            Base,
+            LLMRoundTableResult,
+            Order,
+            Product,
             RAGDocument,
+            ToolExecution,
+            User,
         )
+
         print("✅ Successfully imported all ORM models")
         return True
     except ImportError as e:
@@ -41,13 +43,13 @@ def test_base_metadata():
 
         tables = Base.metadata.tables
         expected_tables = {
-            'users',
-            'products',
-            'orders',
-            'llm_round_table_results',
-            'agent_executions',
-            'tool_executions',
-            'rag_documents',
+            "users",
+            "products",
+            "orders",
+            "llm_round_table_results",
+            "agent_executions",
+            "tool_executions",
+            "rag_documents",
         }
 
         actual_tables = set(tables.keys())
@@ -71,7 +73,6 @@ def test_base_metadata():
 def test_alembic_env():
     """Test that Alembic env.py imports Base correctly."""
     try:
-        from alembic import config
         from alembic.config import Config
         from alembic.script import ScriptDirectory
 
@@ -80,7 +81,6 @@ def test_alembic_env():
         script = ScriptDirectory.from_config(alembic_cfg)
 
         # Check that we can import the env module
-        import alembic.env
 
         print("✅ Alembic configuration loaded successfully")
         return True
@@ -92,21 +92,29 @@ def test_alembic_env():
 def test_model_schema():
     """Test that model schema matches expected structure."""
     try:
-        from agents.models import User, Product, Order
-        from sqlalchemy import inspect
+        from agents.models import Order, Product, User
 
         # Check User model
         user_columns = {col.name for col in User.__table__.columns}
         expected_user_cols = {
-            'id', 'email', 'username', 'password_hash', 'full_name',
-            'role', 'is_active', 'is_verified', 'created_at', 'updated_at',
-            'last_login', 'metadata'
+            "id",
+            "email",
+            "username",
+            "password_hash",
+            "full_name",
+            "role",
+            "is_active",
+            "is_verified",
+            "created_at",
+            "updated_at",
+            "last_login",
+            "metadata",
         }
 
         if user_columns == expected_user_cols:
             print("✅ User model schema matches expected structure")
         else:
-            print(f"❌ User model schema mismatch")
+            print("❌ User model schema mismatch")
             print(f"   Expected: {expected_user_cols}")
             print(f"   Actual: {user_columns}")
             return False
@@ -114,15 +122,24 @@ def test_model_schema():
         # Check Product model
         product_columns = {col.name for col in Product.__table__.columns}
         expected_product_cols = {
-            'id', 'sku', 'name', 'description', 'category', 'price',
-            'inventory_quantity', 'status', 'tags', 'created_at',
-            'updated_at', 'metadata'
+            "id",
+            "sku",
+            "name",
+            "description",
+            "category",
+            "price",
+            "inventory_quantity",
+            "status",
+            "tags",
+            "created_at",
+            "updated_at",
+            "metadata",
         }
 
         if product_columns == expected_product_cols:
             print("✅ Product model schema matches expected structure")
         else:
-            print(f"❌ Product model schema mismatch")
+            print("❌ Product model schema mismatch")
             print(f"   Expected: {expected_product_cols}")
             print(f"   Actual: {product_columns}")
             return False
@@ -130,15 +147,22 @@ def test_model_schema():
         # Check Order model
         order_columns = {col.name for col in Order.__table__.columns}
         expected_order_cols = {
-            'id', 'order_number', 'user_id', 'status', 'total_price',
-            'subtotal', 'created_at', 'updated_at', 'metadata'
+            "id",
+            "order_number",
+            "user_id",
+            "status",
+            "total_price",
+            "subtotal",
+            "created_at",
+            "updated_at",
+            "metadata",
         }
 
         if order_columns == expected_order_cols:
             print("✅ Order model schema matches expected structure")
             return True
         else:
-            print(f"❌ Order model schema mismatch")
+            print("❌ Order model schema mismatch")
             print(f"   Expected: {expected_order_cols}")
             print(f"   Actual: {order_columns}")
             return False
@@ -151,17 +175,18 @@ def test_model_schema():
 def test_relationships():
     """Test that model relationships are properly defined."""
     try:
-        from agents.models import User, Order, ToolExecution
         from sqlalchemy import inspect
+
+        from agents.models import Order, ToolExecution, User
 
         # Check User -> Order relationship
         user_mapper = inspect(User)
         user_relationships = {rel.key for rel in user_mapper.relationships}
 
-        if 'orders' in user_relationships and 'tool_executions' in user_relationships:
+        if "orders" in user_relationships and "tool_executions" in user_relationships:
             print("✅ User model relationships are properly defined")
         else:
-            print(f"❌ User model missing expected relationships")
+            print("❌ User model missing expected relationships")
             print(f"   Found: {user_relationships}")
             return False
 
@@ -169,21 +194,21 @@ def test_relationships():
         order_mapper = inspect(Order)
         order_relationships = {rel.key for rel in order_mapper.relationships}
 
-        if 'user' in order_relationships:
+        if "user" in order_relationships:
             print("✅ Order model relationships are properly defined")
         else:
-            print(f"❌ Order model missing 'user' relationship")
+            print("❌ Order model missing 'user' relationship")
             return False
 
         # Check ToolExecution -> User relationship
         tool_mapper = inspect(ToolExecution)
         tool_relationships = {rel.key for rel in tool_mapper.relationships}
 
-        if 'user' in tool_relationships:
+        if "user" in tool_relationships:
             print("✅ ToolExecution model relationships are properly defined")
             return True
         else:
-            print(f"❌ ToolExecution model missing 'user' relationship")
+            print("❌ ToolExecution model missing 'user' relationship")
             return False
 
     except Exception as e:

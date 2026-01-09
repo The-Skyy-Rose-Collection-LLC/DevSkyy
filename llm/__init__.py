@@ -53,6 +53,20 @@ from .base import (
     StreamChunk,
     ToolCall,
 )
+from .classification import (
+    ClassificationConfig,
+    ClassificationExample,
+    ClassificationPrompts,
+    ClassificationResult,
+    ClassificationType,
+    GroqFastClassifier,
+    SentimentLabel,
+    analyze_sentiment,
+    classify_category,
+    classify_intent,
+    detect_language,
+    get_classifier,
+)
 from .exceptions import (
     AuthenticationError,
     ContentFilterError,
@@ -95,20 +109,6 @@ from .router import (
     RoutingStrategy,
     complete,
     get_router,
-)
-from .classification import (
-    ClassificationConfig,
-    ClassificationExample,
-    ClassificationPrompts,
-    ClassificationResult,
-    ClassificationType,
-    GroqFastClassifier,
-    SentimentLabel,
-    analyze_sentiment,
-    classify_category,
-    classify_intent,
-    detect_language,
-    get_classifier,
 )
 
 __version__ = "1.0.0"

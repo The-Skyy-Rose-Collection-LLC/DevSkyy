@@ -367,7 +367,7 @@ class TestBulkSync:
             if call_count == 2:
                 raise ValueError("Simulated error")
             return SyncResult(
-                product_sku=f"SKR-00{call_count-1}",
+                product_sku=f"SKR-00{call_count - 1}",
                 success=True,
             )
 

@@ -3,16 +3,16 @@ Tests for LLM Verification Layer
 =================================
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
+from llm.base import CompletionResponse, Message
 from llm.verification import (
     LLMVerificationEngine,
     VerificationConfig,
     VerificationDecision,
-    VerificationResult,
 )
-from llm.base import Message, CompletionResponse
 
 
 @pytest.mark.unit

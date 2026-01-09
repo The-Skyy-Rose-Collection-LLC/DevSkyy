@@ -87,8 +87,8 @@ from .tripo_agent import (
 from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
 from .tripo_agent import GenerationResult as TripoGenerationResult
 
-# Visual Generation (primary source for brand DNA and generation types)
-from .visual_generation import (
+# Visual Generation Router (primary source for brand DNA and generation types)
+from .visual_generation_router import (
     SKYYROSE_BRAND_DNA,
     AspectRatio,
     GenerationRequest,

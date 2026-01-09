@@ -34,9 +34,10 @@ import logging
 import os
 import re
 import secrets
+from collections.abc import Callable
 from dataclasses import dataclass
 from enum import Enum
-from typing import Any
+from typing import Any, cast
 
 from cryptography.exceptions import InvalidTag
 from cryptography.hazmat.backends import default_backend
@@ -356,8 +357,7 @@ class AESGCMEncryption:
             return plaintext
         except InvalidTag:
             logger.error(
-                "Decryption failed: authentication tag mismatch. "
-                "Data may have been tampered with."
+                "Decryption failed: authentication tag mismatch. Data may have been tampered with."
             )
             raise DecryptionError("Authentication failed - data may be corrupted")
         except Exception as e:
@@ -378,7 +378,7 @@ class AESGCMEncryption:
     ) -> dict[str, Any]:
         """Decrypt and return as dictionary."""
         plaintext = self.decrypt_to_string(encrypted_data, aad)
-        return json.loads(plaintext)
+        return cast(dict[str, Any], json.loads(plaintext))
 
     def rotate_key(self, new_key: bytes | None = None) -> str:
         """
@@ -526,7 +526,7 @@ class FieldEncryption:
             Dictionary with sensitive fields encrypted
         """
         fields = fields_to_encrypt or self.SENSITIVE_FIELDS
-        result = {}
+        result: dict[str, Any] = {}
 
         for key, value in data.items():
             if key.lower() in fields and isinstance(value, str) and value:
@@ -546,7 +546,7 @@ class FieldEncryption:
     ) -> dict[str, Any]:
         """Decrypt sensitive fields in a dictionary."""
         fields = fields_to_decrypt or self.SENSITIVE_FIELDS
-        result = {}
+        result: dict[str, Any] = {}
 
         for key, value in data.items():
             if key.lower() in fields and isinstance(value, str) and value and ":" in value:
@@ -590,7 +590,7 @@ class DataMasker:
 
         for pattern_name, pattern in self.PATTERNS.items():
             # Capture pattern_name in closure to avoid B023
-            def make_replacer(pname: str):
+            def make_replacer(pname: str) -> Callable[[re.Match[str]], str]:
                 return lambda m: self._mask_match(m.group(), mask_char, pname)
 
             result = pattern.sub(make_replacer(pattern_name), result)
@@ -644,7 +644,7 @@ class DataMasker:
     ) -> dict[str, Any]:
         """Mask sensitive fields in a dictionary."""
         sensitive = sensitive_keys or FieldEncryption.SENSITIVE_FIELDS
-        result = {}
+        result: dict[str, Any] = {}
 
         for key, value in data.items():
             if key.lower() in sensitive:

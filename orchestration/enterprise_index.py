@@ -129,9 +129,7 @@ class BaseIndexProvider(ABC):
 
     async def initialize(self) -> None:
         """Initialize HTTP client."""
-        self._client = httpx.AsyncClient(
-            timeout=httpx.Timeout(self.config.timeout_seconds)
-        )
+        self._client = httpx.AsyncClient(timeout=httpx.Timeout(self.config.timeout_seconds))
 
     async def close(self) -> None:
         """Close HTTP client."""
@@ -347,6 +345,7 @@ class GitLabProvider(BaseIndexProvider):
         try:
             # Encode repo name for URL
             import urllib.parse
+
             encoded_repo = urllib.parse.quote(repo_name, safe="")
 
             response = await self._client.get(
@@ -362,7 +361,9 @@ class GitLabProvider(BaseIndexProvider):
                 primary_language="unknown",  # GitLab doesn't provide this easily
                 topics=data.get("topics", []),
                 stars=data.get("star_count", 0),
-                last_updated=datetime.fromisoformat(data["last_activity_at"].replace("Z", "+00:00")),
+                last_updated=datetime.fromisoformat(
+                    data["last_activity_at"].replace("Z", "+00:00")
+                ),
                 url=data["web_url"],
                 provider="gitlab",
             )
@@ -439,7 +440,12 @@ class SourcegraphProvider(BaseIndexProvider):
             data = response.json()
 
             results = []
-            for match in data.get("data", {}).get("search", {}).get("results", {}).get("results", [])[:max_results]:
+            for match in (
+                data.get("data", {})
+                .get("search", {})
+                .get("results", {})
+                .get("results", [])[:max_results]
+            ):
                 if "file" not in match:
                     continue
 

@@ -602,7 +602,7 @@ def main() -> None:
     total = report["total_photos"]
     usable = report["usable_for_3d"]
     print(f"\nTotal photos evaluated: {total}")
-    print(f"Usable for 3D generation: {usable} ({usable/total*100:.1f}%)" if total > 0 else "")
+    print(f"Usable for 3D generation: {usable} ({usable / total * 100:.1f}%)" if total > 0 else "")
 
     print("\nBy Collection:")
     for name, summary in report["summaries"].items():

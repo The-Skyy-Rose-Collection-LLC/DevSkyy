@@ -16,7 +16,7 @@ Version: 1.0.0
 """
 
 import os
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from fastapi.testclient import TestClient
@@ -24,14 +24,10 @@ from fastapi.testclient import TestClient
 from integrations.wordpress_client import (
     OrderStatus,
     ProductStatus,
-    WooCommerceCustomer,
-    WooCommerceOrder,
     WooCommerceProduct,
     WordPressConfig,
-    WordPressError,
     WordPressWooCommerceClient,
 )
-
 
 # =============================================================================
 # Fixtures

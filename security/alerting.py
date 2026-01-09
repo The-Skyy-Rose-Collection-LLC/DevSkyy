@@ -245,16 +245,16 @@ Security Alert Notification
 Alert ID: {alert.alert_id}
 Severity: {alert.severity.value.upper()}
 Event Type: {alert.event_type.value}
-Timestamp: {alert.timestamp.strftime('%Y-%m-%d %H:%M:%S UTC')}
+Timestamp: {alert.timestamp.strftime("%Y-%m-%d %H:%M:%S UTC")}
 
 Description:
 {alert.description}
 
 Recommended Action:
-{alert.recommended_action or 'No specific action recommended'}
+{alert.recommended_action or "No specific action recommended"}
 
 Source Events:
-{', '.join(alert.source_events) if alert.source_events else 'None'}
+{", ".join(alert.source_events) if alert.source_events else "None"}
 
 ---
 This is an automated security alert from DevSkyy Platform.

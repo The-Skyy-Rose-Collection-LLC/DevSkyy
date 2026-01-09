@@ -3,13 +3,14 @@ Tests for Cohere Reranker
 ==========================
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from orchestration.reranker import (
     CohereReranker,
-    RerankerConfig,
     RankedResult,
+    RerankerConfig,
 )
 
 
@@ -19,12 +20,14 @@ async def test_cohere_reranker_basic(mock_api_keys, mock_cohere_rerank_response)
     """Test basic reranking with Cohere."""
     with patch("cohere.AsyncClient") as mock_client_class:
         mock_client = MagicMock()
-        mock_client.rerank = AsyncMock(return_value=MagicMock(
-            results=[
-                MagicMock(index=r["index"], relevance_score=r["relevance_score"])
-                for r in mock_cohere_rerank_response["results"]
-            ]
-        ))
+        mock_client.rerank = AsyncMock(
+            return_value=MagicMock(
+                results=[
+                    MagicMock(index=r["index"], relevance_score=r["relevance_score"])
+                    for r in mock_cohere_rerank_response["results"]
+                ]
+            )
+        )
         mock_client_class.return_value = mock_client
 
         config = RerankerConfig()
@@ -62,12 +65,14 @@ async def test_reranker_improves_relevance(mock_api_keys):
 
     with patch("cohere.AsyncClient") as mock_client_class:
         mock_client = MagicMock()
-        mock_client.rerank = AsyncMock(return_value=MagicMock(
-            results=[
-                MagicMock(index=r["index"], relevance_score=r["relevance_score"])
-                for r in rerank_response["results"]
-            ]
-        ))
+        mock_client.rerank = AsyncMock(
+            return_value=MagicMock(
+                results=[
+                    MagicMock(index=r["index"], relevance_score=r["relevance_score"])
+                    for r in rerank_response["results"]
+                ]
+            )
+        )
         mock_client_class.return_value = mock_client
 
         config = RerankerConfig()
@@ -92,12 +97,14 @@ async def test_reranker_top_n_limiting(mock_api_keys, mock_cohere_rerank_respons
     """Test top_n limiting of results."""
     with patch("cohere.AsyncClient") as mock_client_class:
         mock_client = MagicMock()
-        mock_client.rerank = AsyncMock(return_value=MagicMock(
-            results=[
-                MagicMock(index=r["index"], relevance_score=r["relevance_score"])
-                for r in mock_cohere_rerank_response["results"]
-            ]
-        ))
+        mock_client.rerank = AsyncMock(
+            return_value=MagicMock(
+                results=[
+                    MagicMock(index=r["index"], relevance_score=r["relevance_score"])
+                    for r in mock_cohere_rerank_response["results"]
+                ]
+            )
+        )
         mock_client_class.return_value = mock_client
 
         config = RerankerConfig(default_top_n=5)
@@ -119,10 +126,7 @@ async def test_reranker_top_n_limiting(mock_api_keys, mock_cohere_rerank_respons
 async def test_reranker_with_rag_pipeline(mock_api_keys):
     """Test reranker integration with RAG pipeline."""
     # Simulate RAG pipeline: retrieve 20 docs, rerank to top 5
-    initial_results = [
-        {"content": f"Document {i}", "score": 0.5 + (i * 0.01)}
-        for i in range(20)
-    ]
+    initial_results = [{"content": f"Document {i}", "score": 0.5 + (i * 0.01)} for i in range(20)]
 
     # Mock reranker to improve top results
     rerank_response = {
@@ -137,12 +141,14 @@ async def test_reranker_with_rag_pipeline(mock_api_keys):
 
     with patch("cohere.AsyncClient") as mock_client_class:
         mock_client = MagicMock()
-        mock_client.rerank = AsyncMock(return_value=MagicMock(
-            results=[
-                MagicMock(index=r["index"], relevance_score=r["relevance_score"])
-                for r in rerank_response["results"]
-            ]
-        ))
+        mock_client.rerank = AsyncMock(
+            return_value=MagicMock(
+                results=[
+                    MagicMock(index=r["index"], relevance_score=r["relevance_score"])
+                    for r in rerank_response["results"]
+                ]
+            )
+        )
         mock_client_class.return_value = mock_client
 
         config = RerankerConfig()
@@ -194,12 +200,14 @@ async def test_reranker_performance(mock_api_keys, mock_cohere_rerank_response, 
     """Test reranker performance (should be fast)."""
     with patch("cohere.AsyncClient") as mock_client_class:
         mock_client = MagicMock()
-        mock_client.rerank = AsyncMock(return_value=MagicMock(
-            results=[
-                MagicMock(index=r["index"], relevance_score=r["relevance_score"])
-                for r in mock_cohere_rerank_response["results"]
-            ]
-        ))
+        mock_client.rerank = AsyncMock(
+            return_value=MagicMock(
+                results=[
+                    MagicMock(index=r["index"], relevance_score=r["relevance_score"])
+                    for r in mock_cohere_rerank_response["results"]
+                ]
+            )
+        )
         mock_client_class.return_value = mock_client
 
         config = RerankerConfig()

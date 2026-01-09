@@ -366,9 +366,9 @@ class PriorityProductsPipeline:
         start_time = time.time()
         result = ProcessingResult(product=product, status="pending")
 
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info(f"Processing: {product.name} ({product.collection})")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
 
         try:
             # Step 1: Find source photo
@@ -489,9 +489,7 @@ class PriorityProductsPipeline:
             for r in self.report.results:
                 status_emoji = {"success": "✓", "failed": "✗", "skipped": "○"}.get(r.status, "?")
                 fidelity = f"{r.fidelity_score:.1f}%" if r.fidelity_score else "N/A"
-                logger.info(
-                    f"  {status_emoji} {r.product.name}: {r.status} " f"(fidelity: {fidelity})"
-                )
+                logger.info(f"  {status_emoji} {r.product.name}: {r.status} (fidelity: {fidelity})")
 
                 if r.error:
                     logger.info(f"      Error: {r.error}")

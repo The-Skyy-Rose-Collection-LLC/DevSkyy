@@ -28,8 +28,11 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
+import structlog
+
 # Import existing components
 from adk.base import ADKProvider, AgentConfig, AgentResult, AgentStatus, BaseDevSkyyAgent
+from core.structured_logging import bind_contextvars, unbind_contextvars
 from orchestration.prompt_engineering import (
     ChainOfThought,
     ConstitutionalAI,
@@ -2722,12 +2725,22 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         )
 
         # Log the automatic selection for observability
-        logger.info(
-            f"[{correlation_id}] Auto technique selection: "
-            f"agent={self.agent_type.value if self.agent_type else 'unknown'}, "
-            f"category={task_category.value}, "
-            f"technique={technique.value}, "
-            f"confidence={confidence:.2f}"
+        log = structlog.get_logger(__name__)
+
+        # Bind execution-scoped context
+        bind_contextvars(
+            correlation_id=correlation_id,
+            agent_id=str(
+                getattr(self, "agent_id", self.agent_type.value if self.agent_type else "unknown")
+            ),
+        )
+
+        log.info(
+            "agent_technique_selection",
+            agent_type=self.agent_type.value if self.agent_type else "unknown",
+            task_category=task_category.value,
+            technique=technique.value,
+            confidence=round(confidence, 2),
         )
 
         # Apply technique to enhance prompt
@@ -2803,12 +2816,16 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
 
         self._execution_count += 1
 
-        logger.info(
-            f"[{correlation_id}] Execution complete: "
-            f"status={result.status.value}, "
-            f"latency={latency_ms:.0f}ms, "
-            f"technique={technique.value}"
+        log.info(
+            "agent_execution_complete",
+            status=result.status.value,
+            latency_ms=round(latency_ms, 0),
+            technique=technique.value,
+            success=success,
         )
+
+        # Unbind execution-scoped context
+        unbind_contextvars("correlation_id", "agent_id")
 
         return result
 
@@ -3321,11 +3338,11 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         """
         try:
             # Import enterprise modules
+            from llm.providers.anthropic import AnthropicClient
+            from llm.providers.deepseek import DeepSeekClient
+            from llm.verification import LLMVerificationEngine, VerificationConfig
             from orchestration.enterprise_index import create_enterprise_index
             from orchestration.semantic_analyzer import SemanticCodeAnalyzer
-            from llm.verification import LLMVerificationEngine, VerificationConfig
-            from llm.providers.deepseek import DeepSeekClient
-            from llm.providers.anthropic import AnthropicClient
 
             # Initialize Enterprise Index
             self.enterprise_index = create_enterprise_index()
@@ -3467,7 +3484,7 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
                 "search_query": task_description,
                 "language": language,
                 "results_count": len(search_results),
-                "providers_used": list(set(r.provider for r in search_results)),
+                "providers_used": list({r.provider for r in search_results}),
             }
 
             logger.info(
