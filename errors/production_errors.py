@@ -459,8 +459,7 @@ class ModelFidelityError(DevSkyError):
         context["fidelity_gap"] = required - actual_fidelity
 
         message = (
-            f"3D model fidelity {actual_fidelity:.1f}% is below "
-            f"required threshold {required:.1f}%"
+            f"3D model fidelity {actual_fidelity:.1f}% is below required threshold {required:.1f}%"
         )
         super().__init__(
             message,

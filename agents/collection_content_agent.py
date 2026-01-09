@@ -183,9 +183,9 @@ Theme: {template.theme}
 Description: {template.description}
 
 Color Palette:
-- Primary: {template.colors.get('primary')}
-- Secondary: {template.colors.get('secondary')}
-- Accent: {template.colors.get('accent')}
+- Primary: {template.colors.get("primary")}
+- Secondary: {template.colors.get("secondary")}
+- Accent: {template.colors.get("accent")}
 
 Design Characteristics:
 {json.dumps(template.metadata or {}, indent=2)}

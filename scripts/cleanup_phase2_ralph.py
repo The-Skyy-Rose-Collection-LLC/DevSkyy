@@ -202,7 +202,9 @@ async def move_file_safe(source: Path, dest: Path) -> bool:
     )
 
     if not success:
-        logger.error("Move failed after retries", source=str(source), dest=str(dest), error=str(error))
+        logger.error(
+            "Move failed after retries", source=str(source), dest=str(dest), error=str(error)
+        )
         return False
 
     return result

@@ -212,12 +212,12 @@ class BrandContextInjector:
         if collection:
             coll = COLLECTION_CONTEXT[collection]
             collection_context = f"""
-## Current Collection: {coll['name']}
-Tagline: {coll['tagline']}
-Mood: {coll['mood']}
-Colors: {coll['colors']}
-Style: {coll['style']}
-Description: {coll['description']}"""
+## Current Collection: {coll["name"]}
+Tagline: {coll["tagline"]}
+Mood: {coll["mood"]}
+Colors: {coll["colors"]}
+Style: {coll["style"]}
+Description: {coll["description"]}"""
 
         # Format quality descriptors
         quality = ", ".join(brand["quality_descriptors"][:4])
@@ -247,9 +247,9 @@ Description: {coll['description']}"""
         """Get a compact version of the brand prompt."""
         brand = SKYYROSE_BRAND
 
-        prompt = f"""SkyyRose Brand Voice: {brand['tone']['primary']}
+        prompt = f"""SkyyRose Brand Voice: {brand["tone"]["primary"]}
 Colors: Black Rose (#1A1A1A), Rose Gold (#D4AF37), Deep Rose (#8B0000)
-Style: Luxury streetwear, Oakland CA. {brand['tagline']}."""
+Style: Luxury streetwear, Oakland CA. {brand["tagline"]}."""
 
         if collection:
             coll = COLLECTION_CONTEXT[collection]
@@ -354,10 +354,10 @@ Style: Luxury streetwear, Oakland CA. {brand['tagline']}."""
         context = f"""3D Asset Generation Context for {product_name}
 
 ## Brand Aesthetic
-- Maintain SkyyRose brand DNA: {brand['tone']['primary']}
-- Primary Color: {brand['colors']['primary']['name']} {brand['colors']['primary']['hex']}
-- Accent Color: {brand['colors']['accent']['name']} {brand['colors']['accent']['hex']}
-- Highlight Color: {brand['colors']['highlight']['name']} {brand['colors']['highlight']['hex']}
+- Maintain SkyyRose brand DNA: {brand["tone"]["primary"]}
+- Primary Color: {brand["colors"]["primary"]["name"]} {brand["colors"]["primary"]["hex"]}
+- Accent Color: {brand["colors"]["accent"]["name"]} {brand["colors"]["accent"]["hex"]}
+- Highlight Color: {brand["colors"]["highlight"]["name"]} {brand["colors"]["highlight"]["hex"]}
 - Style: Luxury streetwear with meticulous construction
 
 ## Product Details

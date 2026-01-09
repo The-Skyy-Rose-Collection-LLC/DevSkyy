@@ -114,7 +114,7 @@ class MTLSHandler:
 
         if not cert_path.exists() or not key_path.exists():
             raise FileNotFoundError(
-                f"Certificate or key not found for {service_name}. " f"Generate certificates first."
+                f"Certificate or key not found for {service_name}. Generate certificates first."
             )
 
         if not ca_path.exists():
@@ -185,7 +185,7 @@ class MTLSHandler:
 
         if not cert_path.exists() or not key_path.exists():
             raise FileNotFoundError(
-                f"Certificate or key not found for {service_name}. " f"Generate certificates first."
+                f"Certificate or key not found for {service_name}. Generate certificates first."
             )
 
         if not ca_path.exists():

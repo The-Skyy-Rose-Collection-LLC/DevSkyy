@@ -189,9 +189,7 @@ class CohereReranker(BaseReranker):
             for result in response.results
         ]
 
-        logger.debug(
-            f"Reranked {len(documents)} documents, returned top {len(results)}"
-        )
+        logger.debug(f"Reranked {len(documents)} documents, returned top {len(results)}")
         return results
 
     async def rerank_with_metadata(

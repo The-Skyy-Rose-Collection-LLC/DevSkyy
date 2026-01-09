@@ -81,10 +81,10 @@ Use check_task_status tool to poll for completion.""",
                         "type": "text",
                         "text": f"""3D Model Generated Successfully!
 
-Model Path: {model_data.get('model_path')}
+Model Path: {model_data.get("model_path")}
 Task ID: {task_id}
 Style: {style}
-Collection: {model_data.get('metadata', {}).get('collection', 'N/A')}
+Collection: {model_data.get("metadata", {}).get("collection", "N/A")}
 
 The model is ready for download or integration.""",
                     }
@@ -163,10 +163,10 @@ async def virtual_tryon(args: dict[str, Any]) -> dict[str, Any]:
                     "type": "text",
                     "text": f"""⚠️  Virtual Try-On (STUB)
 
-{result.get('message', 'Not yet implemented')}
+{result.get("message", "Not yet implemented")}
 
 Task ID: {task_id}
-Status: {result.get('status')}
+Status: {result.get("status")}
 
 Integration Steps:
 {steps_text}""",
@@ -204,9 +204,9 @@ async def check_task_status(args: dict[str, Any]) -> dict[str, Any]:
                     "type": "text",
                     "text": f"""Task Status: {task_id}
 
-Status: {status.get('status', 'unknown')}
-Created: {status.get('created_at', 'N/A')}
-Priority: {status.get('priority', 'N/A')}
+Status: {status.get("status", "unknown")}
+Created: {status.get("created_at", "N/A")}
+Priority: {status.get("priority", "N/A")}
 
 {json.dumps(status, indent=2)}""",
                 }
@@ -389,7 +389,7 @@ async def handle_support_ticket(args: dict[str, Any]) -> dict[str, Any]:
                     "type": "text",
                     "text": f"""Support Ticket {action.title()} Completed
 
-Ticket ID: {ticket_id or 'New'}
+Ticket ID: {ticket_id or "New"}
 Priority: {priority}
 Status: {result.status.value}
 

@@ -153,9 +153,7 @@ async def get_metrics(
                     metric_name="system_uptime",
                     unit="seconds",
                     data_points=[
-                        MetricDataPoint(
-                            timestamp=datetime.now(UTC).isoformat(), value=86400.0
-                        )
+                        MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=86400.0)
                     ],
                     aggregation="last",
                 )
@@ -181,9 +179,7 @@ async def get_metrics(
                     metric_name="api_latency_p95",
                     unit="milliseconds",
                     data_points=[
-                        MetricDataPoint(
-                            timestamp=datetime.now(UTC).isoformat(), value=125.5
-                        )
+                        MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=125.5)
                     ],
                     aggregation="p95",
                 )
@@ -193,9 +189,7 @@ async def get_metrics(
                     metric_name="requests_per_second",
                     unit="requests/sec",
                     data_points=[
-                        MetricDataPoint(
-                            timestamp=datetime.now(UTC).isoformat(), value=45.2
-                        )
+                        MetricDataPoint(timestamp=datetime.now(UTC).isoformat(), value=45.2)
                     ],
                     aggregation="avg",
                 )
@@ -224,9 +218,7 @@ async def get_metrics(
         )
 
 
-@router.get(
-    "/agents", response_model=AgentListResponse, status_code=status.HTTP_200_OK
-)
+@router.get("/agents", response_model=AgentListResponse, status_code=status.HTTP_200_OK)
 async def list_agents(
     user: TokenPayload = Depends(get_current_user),
 ) -> AgentListResponse:

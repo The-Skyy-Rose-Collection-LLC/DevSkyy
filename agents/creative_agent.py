@@ -947,9 +947,9 @@ Parameters: {kwargs}"""
         """Enhance prompt with brand DNA"""
         brand_context = f"""
 Brand: SkyyRose - "Where Love Meets Luxury"
-Aesthetic: {self.SKYYROSE_BRAND_DNA['aesthetic']}
-Style: {self.SKYYROSE_BRAND_DNA['style']}
-Quality: {self.SKYYROSE_BRAND_DNA['quality']}
+Aesthetic: {self.SKYYROSE_BRAND_DNA["aesthetic"]}
+Style: {self.SKYYROSE_BRAND_DNA["style"]}
+Quality: {self.SKYYROSE_BRAND_DNA["quality"]}
 Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
 """
         return f"{prompt}\n\n{brand_context}"

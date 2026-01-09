@@ -166,7 +166,8 @@ async def test_generate_image_success(mock_api_key, mock_success_response, mock_
     client._client = mock_httpx_client
 
     result = await client.generate(
-        prompt="test prompt", inject_brand_dna=False  # Disable for simpler testing
+        prompt="test prompt",
+        inject_brand_dna=False,  # Disable for simpler testing
     )
 
     assert result.image is not None

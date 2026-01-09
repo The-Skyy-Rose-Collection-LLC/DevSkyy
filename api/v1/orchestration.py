@@ -39,17 +39,13 @@ class WorkflowExecutionRequest(BaseModel):
         min_length=1,
         max_length=100,
     )
-    parameters: dict[str, Any] = Field(
-        ..., description="Workflow-specific parameters"
-    )
+    parameters: dict[str, Any] = Field(..., description="Workflow-specific parameters")
     agents: list[str] | None = Field(
         default=None,
         description="Specific agents to use (auto-selected if not provided)",
         max_length=20,
     )
-    parallel: bool = Field(
-        default=True, description="Execute agents in parallel when possible"
-    )
+    parallel: bool = Field(default=True, description="Execute agents in parallel when possible")
 
 
 class AgentTaskResult(BaseModel):
@@ -139,8 +135,7 @@ async def execute_workflow(
     """
     workflow_id = str(uuid4())
     logger.info(
-        f"Starting workflow execution {workflow_id} for user {user.sub}: "
-        f"{request.workflow_name}"
+        f"Starting workflow execution {workflow_id} for user {user.sub}: {request.workflow_name}"
     )
 
     try:

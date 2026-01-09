@@ -266,7 +266,7 @@ Value: 123.45.67.89 (your backend server IP)
   ```bash
   # Option 1: Docker/Linux with Certbot
   certbot certonly --standalone -d api.devskyy.app
-  
+
   # Option 2: Cloud provider (AWS, Google Cloud, etc.)
   # Use provider's certificate management service
   ```

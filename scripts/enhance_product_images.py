@@ -735,9 +735,9 @@ class ImageEnhancementPipeline:
         if limit > 0:
             images = images[:limit]
 
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info(f"COLLECTION: {collection.upper()}")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
         logger.info(f"Found {len(images)} images to process")
 
         if dry_run:

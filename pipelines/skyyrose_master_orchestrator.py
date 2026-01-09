@@ -183,11 +183,11 @@ class SkyyRoseMasterOrchestrator:
         """
         launch_id = f"launch_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
 
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print(f"SKYYROSE PRODUCT LAUNCH: {product_concept['name']}")
         print(f"   Launch ID: {launch_id}")
         print(f"   Collection: {product_concept['collection']}")
-        print(f"{'='*80}\n")
+        print(f"{'=' * 80}\n")
 
         # Initialize launch report
         launch_report = {
@@ -462,13 +462,13 @@ class SkyyRoseMasterOrchestrator:
 
         return f"""{voice}
 
-**{product_concept['name']}** - {product_concept['garment_type']} in {product_concept['color']}
+**{product_concept["name"]}** - {product_concept["garment_type"]} in {product_concept["color"]}
 
-Crafted from {product_concept['fabric']}, this piece represents SkyyRose's commitment
+Crafted from {product_concept["fabric"]}, this piece represents SkyyRose's commitment
 to where Oakland street authenticity meets luxury craftsmanship.
 
 **Details:**
-- Premium {product_concept['fabric']}
+- Premium {product_concept["fabric"]}
 - Gender-neutral design
 - Limited availability
 - Designed in Oakland, California
@@ -735,9 +735,9 @@ Shop now: link in bio
 
     def _print_launch_summary(self, launch_report: dict):
         """Print beautiful launch summary."""
-        print(f"\n{'='*80}")
+        print(f"\n{'=' * 80}")
         print("PRODUCT LAUNCH COMPLETE")
-        print(f"{'='*80}")
+        print(f"{'=' * 80}")
         print(f"\nProduct: {launch_report['product_name']}")
         print(f"Collection: {launch_report['collection']}")
         print(f"URL: {launch_report.get('product_url', 'N/A')}")
@@ -748,7 +748,7 @@ Shop now: link in bio
             status_icon = "[OK]" if stage_data.get("status") == "success" else "[FAIL]"
             print(f"   {status_icon} {stage_name}: {stage_data.get('duration_seconds', 0):.1f}s")
 
-        print(f"\n{'='*80}\n")
+        print(f"\n{'=' * 80}\n")
 
     def _save_launch_report(self, launch_report: dict):
         """Save launch report to file."""

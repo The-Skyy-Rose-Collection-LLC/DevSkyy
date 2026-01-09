@@ -795,8 +795,8 @@ if __name__ == "__main__":
 
 ✅ Configuration:
    DevSkyy API: {API_BASE_URL}
-   DevSkyy Key: {'Set ✓' if API_KEY else 'Not Set ⚠️'}
-   OpenAI Key: {'Set ✓' if OPENAI_API_KEY else 'Not Set ⚠️'}
+   DevSkyy Key: {"Set ✓" if API_KEY else "Not Set ⚠️"}
+   OpenAI Key: {"Set ✓" if OPENAI_API_KEY else "Not Set ⚠️"}
 
 🔧 Available Tools:
    • openai_completion - Generate text with OpenAI models

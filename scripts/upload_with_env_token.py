@@ -80,9 +80,9 @@ def main():
             token=token,
         )
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("✅ Dataset Uploaded Successfully!")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"\nDataset URL: https://huggingface.co/datasets/{repo_id}")
         print("\n📋 Next Steps:")
         print("  1. Visit lora-training-monitor Space")

@@ -207,8 +207,8 @@ services:
     deploy:
       resources:
         limits:
-          memory: {self.docker_config.resource_limits['memory']}
-          cpus: '{self.docker_config.resource_limits['cpus']}'
+          memory: {self.docker_config.resource_limits["memory"]}
+          cpus: '{self.docker_config.resource_limits["cpus"]}'
         reservations:
           memory: 256m
     environment:

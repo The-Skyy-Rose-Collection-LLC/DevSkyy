@@ -410,9 +410,9 @@ def process_collection(
         if p not in images:
             images.append(p)
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(f"PRODUCTION-GRADE PREPROCESSING: {collection_name.upper()}")
-    print(f"{'='*70}")
+    print(f"{'=' * 70}")
     print(f"Quality Preset: {quality_preset.value.upper()}")
     print(f"Target Resolution: {config.target_resolution}px")
     print(f"BG Removal Model: {config.bg_removal_model}")
@@ -491,7 +491,7 @@ def process_collection(
             print(f"  [ERROR] {e}")
             stats["failed"] += 1
 
-    print(f"\n{'='*70}")
+    print(f"\n{'=' * 70}")
     print(
         f"COMPLETE: {stats['processed']} processed, {stats['skipped']} skipped, {stats['failed']} failed"
     )

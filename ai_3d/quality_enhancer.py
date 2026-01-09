@@ -123,7 +123,7 @@ class ModelQualityEnhancer:
         """Initialize the enhancer."""
         if not TRIMESH_AVAILABLE:
             raise ImportError(
-                "trimesh is required for model enhancement. " "Install with: pip install trimesh"
+                "trimesh is required for model enhancement. Install with: pip install trimesh"
             )
 
     async def enhance(

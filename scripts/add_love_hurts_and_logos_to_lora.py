@@ -372,9 +372,9 @@ async def main():
     with open(manifest_path, "w") as f:
         json.dump(manifest, f, indent=2)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("✅ Dataset Updated Successfully!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nTotal images: {manifest['total_images']}")
     print(f"  SIGNATURE: {manifest['collections_count']['SIGNATURE']} images")
     print(f"  BLACK_ROSE: {manifest['collections_count']['BLACK_ROSE']} images")

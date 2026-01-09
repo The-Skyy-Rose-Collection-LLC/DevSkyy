@@ -111,7 +111,7 @@ async def upload_one_with_retry(
                     if attempt < max_retries - 1:
                         wait_time = (2**attempt) * 2  # 2s, 4s, 8s, 16s, 32s
                         print(
-                            f"  ⏳ {filepath.name} rate limited, waiting {wait_time}s (attempt {attempt+1}/{max_retries})"
+                            f"  ⏳ {filepath.name} rate limited, waiting {wait_time}s (attempt {attempt + 1}/{max_retries})"
                         )
                         await asyncio.sleep(wait_time)
                         continue
@@ -183,9 +183,9 @@ async def main():
     successful = sum(1 for r in results if r["success"])
     failed = len(results) - successful
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("✅ Retry Complete!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Successful: {successful}/{len(results)}")
     print(f"Still Failed: {failed}")
 

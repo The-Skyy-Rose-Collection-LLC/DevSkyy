@@ -235,7 +235,7 @@ def prepare_dataset() -> dict:
         dataset_records.append(record)
         collection_counts[collection] += 1
 
-        print(f"  [{idx+1}/{len(products)}] {collection}: {garment_info['full_name']}")
+        print(f"  [{idx + 1}/{len(products)}] {collection}: {garment_info['full_name']}")
 
     # Save metadata.jsonl (required for diffusers training)
     metadata_path = dataset_dir / "metadata.jsonl"
@@ -285,9 +285,9 @@ def prepare_dataset() -> dict:
     with open(config_path, "w") as f:
         json.dump(training_config, f, indent=2)
 
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("✅ Dataset Preparation Complete!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nDataset location: {dataset_dir}")
     print(f"Total images: {len(dataset_records)}")
     print("Collections:")

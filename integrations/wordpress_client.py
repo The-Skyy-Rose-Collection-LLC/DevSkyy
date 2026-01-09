@@ -43,7 +43,9 @@ logger = logging.getLogger(__name__)
 class WordPressError(Exception):
     """Base WordPress/WooCommerce error."""
 
-    def __init__(self, message: str, status_code: int | None = None, response_data: dict | None = None) -> None:
+    def __init__(
+        self, message: str, status_code: int | None = None, response_data: dict | None = None
+    ) -> None:
         super().__init__(message)
         self.status_code = status_code
         self.response_data = response_data
@@ -159,25 +161,15 @@ class WooCommerceCustomer(BaseModel):
 class WordPressConfig:
     """WordPress/WooCommerce API configuration."""
 
-    site_url: str = field(
-        default_factory=lambda: os.getenv("WORDPRESS_URL", "")
-    )
+    site_url: str = field(default_factory=lambda: os.getenv("WORDPRESS_URL", ""))
 
     # WooCommerce OAuth 1.0a credentials
-    wc_consumer_key: str = field(
-        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "")
-    )
-    wc_consumer_secret: str = field(
-        default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", "")
-    )
+    wc_consumer_key: str = field(default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", ""))
+    wc_consumer_secret: str = field(default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", ""))
 
     # WordPress Application Password (for posts/pages)
-    wp_username: str = field(
-        default_factory=lambda: os.getenv("WORDPRESS_USERNAME", "")
-    )
-    wp_app_password: str = field(
-        default_factory=lambda: os.getenv("WORDPRESS_APP_PASSWORD", "")
-    )
+    wp_username: str = field(default_factory=lambda: os.getenv("WORDPRESS_USERNAME", ""))
+    wp_app_password: str = field(default_factory=lambda: os.getenv("WORDPRESS_APP_PASSWORD", ""))
 
     # Configuration
     api_version: str = "wc/v3"
@@ -244,7 +236,9 @@ class OAuth1Signature:
         sorted_params = sorted(all_params.items())
 
         # Create parameter string
-        param_string = "&".join([f"{quote(str(k), safe='')}={quote(str(v), safe='')}" for k, v in sorted_params])
+        param_string = "&".join(
+            [f"{quote(str(k), safe='')}={quote(str(v), safe='')}" for k, v in sorted_params]
+        )
 
         # Create signature base string
         base_string = f"{method.upper()}&{quote(url, safe='')}&{quote(param_string, safe='')}"
@@ -253,14 +247,11 @@ class OAuth1Signature:
         signing_key = f"{quote(consumer_secret, safe='')}&"
 
         # Generate signature
-        signature = hmac.new(
-            signing_key.encode(),
-            base_string.encode(),
-            hashlib.sha256
-        ).digest()
+        signature = hmac.new(signing_key.encode(), base_string.encode(), hashlib.sha256).digest()
 
         # Base64 encode
         import base64
+
         oauth_params["oauth_signature"] = base64.b64encode(signature).decode()
 
         return oauth_params
@@ -414,9 +405,11 @@ class WordPressWooCommerceClient:
 
             except aiohttp.ClientError as e:
                 if attempt == self.config.max_retries - 1:
-                    raise WordPressError(f"Request failed after {self.config.max_retries} retries: {e}")
+                    raise WordPressError(
+                        f"Request failed after {self.config.max_retries} retries: {e}"
+                    )
                 # Exponential backoff
-                await asyncio.sleep(2 ** attempt)
+                await asyncio.sleep(2**attempt)
 
         raise WordPressError("Request failed after max retries")
 
@@ -444,10 +437,7 @@ class WordPressWooCommerceClient:
         url = f"{self.config.wp_base_url}/{endpoint.lstrip('/')}"
 
         # Application Password authentication
-        auth = aiohttp.BasicAuth(
-            self.config.wp_username,
-            self.config.wp_app_password
-        )
+        auth = aiohttp.BasicAuth(self.config.wp_username, self.config.wp_app_password)
 
         for attempt in range(self.config.max_retries):
             try:
@@ -470,7 +460,7 @@ class WordPressWooCommerceClient:
             except aiohttp.ClientError as e:
                 if attempt == self.config.max_retries - 1:
                     raise WordPressError(str(e))
-                await asyncio.sleep(2 ** attempt)
+                await asyncio.sleep(2**attempt)
 
     # =========================================================================
     # WooCommerce Products

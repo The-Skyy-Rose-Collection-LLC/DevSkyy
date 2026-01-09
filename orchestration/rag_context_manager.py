@@ -124,7 +124,7 @@ class RAGContext:
 
         for i, doc in enumerate(self.documents):
             # Format: [Source 1] (score: 0.95) Content...
-            source_label = f"[{doc.source}]" if doc.source else f"[Document {i+1}]"
+            source_label = f"[{doc.source}]" if doc.source else f"[Document {i + 1}]"
             score_label = f"(score: {doc.score:.2f})"
             if doc.rerank_score is not None:
                 score_label += f" (rerank: {doc.rerank_score:.2f})"

@@ -227,9 +227,9 @@ async def main():
     with open(manifest_path, "w") as f:
         json.dump(enhanced_products, f, indent=2)
 
-    print(f"\n\n{'='*60}")
+    print(f"\n\n{'=' * 60}")
     print("✅ Enhancement Complete!")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nEnhanced {len(enhanced_products)} products")
     print(f"Saved to: {enhanced_dir}")
     print(f"Manifest: {manifest_path}")

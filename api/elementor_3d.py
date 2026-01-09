@@ -269,7 +269,7 @@ async def generate_shortcode(request: ShortcodeRequest):
     if request.products:
         attrs.append(f'products="{",".join(request.products)}"')
 
-    shortcode = f'[skyyrose_3d {" ".join(attrs)}]'
+    shortcode = f"[skyyrose_3d {' '.join(attrs)}]"
 
     # Generate iframe embed code
     embed_url = f"/3d-experience/{request.collection.value}"

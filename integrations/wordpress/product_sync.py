@@ -321,9 +321,7 @@ async def sync_product_from_woocommerce(
             try:
                 # For demo purposes, we'll construct a payload
                 # In production, replace with actual WooCommerce API call
-                logger.warning(
-                    f"[{correlation_id}] Product fetch not implemented, using mock data"
-                )
+                logger.warning(f"[{correlation_id}] Product fetch not implemented, using mock data")
                 payload = ProductSyncPayload(
                     id=wc_product_id,
                     name="Mock Product",
@@ -368,9 +366,7 @@ async def sync_product_from_woocommerce(
         "sync_source": "woocommerce",
     }
 
-    logger.info(
-        f"[{correlation_id}] Product imported: {internal_product_id} <- WC:{wc_product_id}"
-    )
+    logger.info(f"[{correlation_id}] Product imported: {internal_product_id} <- WC:{wc_product_id}")
     return internal_product_id
 
 
@@ -414,9 +410,7 @@ async def sync_product_to_woocommerce(
             # result = wc.create_product(...)
 
             wc_product_id = 12345  # Mock ID
-            logger.info(
-                f"[{correlation_id}] Product created in WooCommerce: ID {wc_product_id}"
-            )
+            logger.info(f"[{correlation_id}] Product created in WooCommerce: ID {wc_product_id}")
 
             # Update internal mapping
             internal_id = product_data["product_id"]
@@ -432,17 +426,13 @@ async def sync_product_to_woocommerce(
     except Exception as e:
         if retry_count < max_retries:
             wait_time = 2**retry_count  # Exponential backoff
-            logger.warning(
-                f"[{correlation_id}] Sync failed, retrying in {wait_time}s: {e}"
-            )
+            logger.warning(f"[{correlation_id}] Sync failed, retrying in {wait_time}s: {e}")
             await asyncio.sleep(wait_time)
             return await sync_product_to_woocommerce(
                 product_data, correlation_id, retry_count + 1, max_retries
             )
         else:
-            logger.error(
-                f"[{correlation_id}] Sync failed after {max_retries + 1} attempts: {e}"
-            )
+            logger.error(f"[{correlation_id}] Sync failed after {max_retries + 1} attempts: {e}")
             raise WordPressError(f"Failed to sync product to WooCommerce: {e}")
 
 

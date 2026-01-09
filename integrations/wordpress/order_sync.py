@@ -443,9 +443,7 @@ async def import_order_from_woocommerce(
         "imported_at": datetime.now(UTC).isoformat(),
     }
 
-    logger.info(
-        f"[{correlation_id}] Order imported: {internal_order_id} <- WC:{wc_order_id}"
-    )
+    logger.info(f"[{correlation_id}] Order imported: {internal_order_id} <- WC:{wc_order_id}")
     return internal_order_id
 
 
@@ -567,9 +565,7 @@ async def send_shipping_notification(
         if customer_email:
             # TODO: Send email via SendGrid/Mailgun/SES
             # TODO: Include tracking number and carrier info
-            logger.info(
-                f"[{correlation_id}] Shipping notification sent to {customer_email}"
-            )
+            logger.info(f"[{correlation_id}] Shipping notification sent to {customer_email}")
 
 
 # =============================================================================

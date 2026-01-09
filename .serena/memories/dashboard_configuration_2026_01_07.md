@@ -58,11 +58,11 @@ Integrated in 3 critical systems:
 1. **MCP Server** (`devskyy_mcp.py`):
    - Function: `_make_api_request()`
    - 3 retries, 1-30s backoff
-   
+
 2. **LLM Round Table** (`llm/round_table.py`):
    - Method: `_generate_all()`
    - 3 retries per provider, 2-30s backoff
-   
+
 3. **LLM Router** (`llm/router.py`):
    - Method: `complete_with_fallback()`
    - 2 retries per provider, 1-10s backoff

@@ -51,6 +51,7 @@ from integrations.wordpress.theme_deployment import (
 def test_client():
     """Create FastAPI test client."""
     from main_enterprise import app
+
     return TestClient(app)
 
 
@@ -512,7 +513,9 @@ class TestWordPressIntegration:
         assert "/api/v1/wordpress/webhooks/order-created" in openapi["paths"]
         assert "/api/v1/wordpress/themes/deploy" in openapi["paths"]
 
-    def test_product_order_workflow(self, test_client, sample_product_payload, sample_order_payload):
+    def test_product_order_workflow(
+        self, test_client, sample_product_payload, sample_order_payload
+    ):
         """Test complete product -> order workflow."""
         # 1. Sync product from WooCommerce
         product_response = test_client.post(

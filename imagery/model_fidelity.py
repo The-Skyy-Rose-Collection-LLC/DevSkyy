@@ -247,7 +247,7 @@ class ModelFidelityValidator:
         """
         if not TRIMESH_AVAILABLE:
             raise ImportError(
-                "trimesh is required for model validation. " "Install with: pip install trimesh"
+                "trimesh is required for model validation. Install with: pip install trimesh"
             )
 
         self.minimum_threshold = minimum_threshold

@@ -172,8 +172,7 @@ async def generate_theme(
             "seo_optimized": request.seo_optimized,
             "responsive": True,
             "accessibility": "WCAG 2.1 AA",
-            "color_palette": request.color_palette
-            or ["#2C3E50", "#3498DB", "#E74C3C"],
+            "color_palette": request.color_palette or ["#2C3E50", "#3498DB", "#E74C3C"],
             "estimated_setup_time": "5-10 minutes",
         }
 

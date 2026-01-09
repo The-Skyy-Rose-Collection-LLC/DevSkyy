@@ -743,7 +743,7 @@ class ABTestingEngine:
 
         if stats.winner == WinnerStatus.VARIANT_B:
             lift = stats.effect_size * 100
-            return f"Implement treatment variant - shows {lift:.1f}% improvement with {stats.confidence_level*100:.1f}% confidence."
+            return f"Implement treatment variant - shows {lift:.1f}% improvement with {stats.confidence_level * 100:.1f}% confidence."
 
         if stats.winner == WinnerStatus.VARIANT_A:
             return "Keep control variant - treatment showed lower performance."
@@ -757,16 +757,16 @@ class ABTestingEngine:
 Hypothesis: {exp.hypothesis}
 
 Results:
-- Control: {stats.control_mean*100:.2f}% (n={stats.sample_size_control})
-- Treatment: {stats.treatment_mean*100:.2f}% (n={stats.sample_size_treatment})
-- Absolute Effect: {stats.absolute_effect*100:+.2f}%
-- Relative Effect: {stats.effect_size*100:+.1f}%
+- Control: {stats.control_mean * 100:.2f}% (n={stats.sample_size_control})
+- Treatment: {stats.treatment_mean * 100:.2f}% (n={stats.sample_size_treatment})
+- Absolute Effect: {stats.absolute_effect * 100:+.2f}%
+- Relative Effect: {stats.effect_size * 100:+.1f}%
 
 Statistical Analysis:
 - P-value: {stats.p_value:.4f}
-- Confidence: {stats.confidence_level*100:.1f}%
-- Power: {stats.power*100:.1f}%
-- Significant: {'Yes' if stats.is_significant else 'No'}
+- Confidence: {stats.confidence_level * 100:.1f}%
+- Power: {stats.power * 100:.1f}%
+- Significant: {"Yes" if stats.is_significant else "No"}
 
 Winner: {stats.winner.value}."""
 

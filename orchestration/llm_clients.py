@@ -503,9 +503,7 @@ class GoogleClient(BaseLLMClient):
         """Initialize the Google GenAI SDK client"""
         self._client = genai.Client(api_key=self.api_key)
 
-    def _messages_to_gemini(
-        self, messages: list[Message]
-    ) -> tuple[str | None, list[Any]]:
+    def _messages_to_gemini(self, messages: list[Message]) -> tuple[str | None, list[Any]]:
         """Convert to Gemini format using new SDK types"""
         system_instruction: str | None = None
         contents: list[Any] = []
@@ -515,9 +513,7 @@ class GoogleClient(BaseLLMClient):
                 system_instruction = m.content
             else:
                 role = "user" if m.role == MessageRole.USER else "model"
-                contents.append(
-                    {"role": role, "parts": [{"text": m.content}]}
-                )
+                contents.append({"role": role, "parts": [{"text": m.content}]})
 
         return system_instruction, contents
 

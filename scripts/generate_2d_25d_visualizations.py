@@ -332,9 +332,9 @@ def main():
         total_generated += sum(1 for v in results.values() if v is not None)
 
     # Summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print(f"✅ Generated {total_generated}/{len(product_images) * 4} visualizations")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"\nOutput directory: {OUTPUT_DIR}")
     print("\nVariation types:")
     print("  1. Drop Shadow (_shadow.jpg) - Professional depth")

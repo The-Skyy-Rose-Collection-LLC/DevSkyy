@@ -296,9 +296,7 @@ class MCPOrchestrator:
             await self._collect_remote_tools()
 
         stats = self.tool_registry.get_statistics()
-        logger.info(
-            f"Catalog built: {stats.total_tools} tools from {stats.total_servers} servers"
-        )
+        logger.info(f"Catalog built: {stats.total_tools} tools from {stats.total_servers} servers")
 
         if stats.conflicts:
             logger.warning(f"Detected {len(stats.conflicts)} tool conflicts")
@@ -335,12 +333,8 @@ class MCPOrchestrator:
                         name=tool_data["name"],
                         description=tool_data.get("description", ""),
                         server_id=server_id,
-                        category=ToolCategory(
-                            tool_data.get("category", ToolCategory.SYSTEM.value)
-                        ),
-                        severity=ToolSeverity(
-                            tool_data.get("severity", ToolSeverity.MEDIUM.value)
-                        ),
+                        category=ToolCategory(tool_data.get("category", ToolCategory.SYSTEM.value)),
+                        severity=ToolSeverity(tool_data.get("severity", ToolSeverity.MEDIUM.value)),
                         input_schema=tool_data.get("inputSchema", {}),
                         read_only=tool_data.get("readOnly", False),
                         idempotent=tool_data.get("idempotent", False),

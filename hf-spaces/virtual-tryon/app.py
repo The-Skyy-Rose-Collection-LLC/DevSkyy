@@ -66,7 +66,7 @@ async def fashn_api_request(
     """Make authenticated request to FASHN API."""
     if not FASHN_API_KEY:
         raise ValueError(
-            "FASHN_API_KEY not configured. " "Get your API key from: https://fashn.ai/dashboard"
+            "FASHN_API_KEY not configured. Get your API key from: https://fashn.ai/dashboard"
         )
 
     url = f"{FASHN_API_BASE_URL}/{endpoint.lstrip('/')}"

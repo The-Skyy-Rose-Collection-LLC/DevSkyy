@@ -54,7 +54,7 @@ def main():
     """Generate all barcode images."""
 
     print("🏷️ SkyyRose Clothing Barcode Generator")
-    print(f"{'='*60}\n")
+    print(f"{'=' * 60}\n")
 
     # Read barcode numbers
     if not barcodes_file.exists():
@@ -82,9 +82,9 @@ def main():
             errors += 1
 
     # Summary
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("📊 SUMMARY")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"Generated: {generated}")
     print(f"Errors: {errors}")
     print(f"Total: {len(barcode_numbers)}")
