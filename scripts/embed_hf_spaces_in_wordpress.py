@@ -39,51 +39,139 @@ except ImportError:
     from requests.auth import HTTPBasicAuth
 
 
-# Page mappings: page_id -> (collection_name, hf_space_url)
-# Updated with actual deployed Space URLs
+# All HuggingFace Spaces (available on all collection pages)
+ALL_SPACES = [
+    {
+        "name": "Virtual Try-On",
+        "description": "Try on SkyyRose merchandise using AI-powered virtual fitting",
+        "url": "https://dambruh-skyyrose-virtual-tryon.hf.space",
+        "icon": "👗",
+    },
+    {
+        "name": "3D Product Viewer",
+        "description": "Explore products in immersive 3D with real-time visualization",
+        "url": "https://dambruh-skyyrose-3d-converter.hf.space",
+        "icon": "🔮",
+    },
+    {
+        "name": "Brand Style Explorer",
+        "description": "Discover how SkyyRose's AI learns and evolves our signature style",
+        "url": "https://dambruh-skyyrose-lora-training-monitor.hf.space",
+        "icon": "🎨",
+    },
+]
+
+# Page mappings: page_id -> collection_name
 EXPERIENCES_PAGES = {
-    152: ("SIGNATURE", "https://dambruh-skyyrose-virtual-tryon.hf.space"),
-    153: ("BLACK_ROSE", "https://dambruh-skyyrose-3d-converter.hf.space"),
-    154: ("LOVE_HURTS", "https://dambruh-skyyrose-lora-training-monitor.hf.space"),
+    152: "SIGNATURE",
+    153: "BLACK_ROSE",
+    154: "LOVE_HURTS",
 }
 
 
-def generate_embed_html(collection_name: str, space_url: str) -> str:
-    """Generate HTML with HuggingFace Space iframe embed."""
-    return f"""
-<!-- SkyyRose {collection_name} Collection Experience -->
-<div class="skyyrose-collection-experience" style="margin: 2rem 0;">
-    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 1rem;">
-        {collection_name} Collection Experience
-    </h2>
+def generate_all_spaces_html(collection_name: str) -> str:
+    """Generate HTML with all 3 HuggingFace Spaces in a tabbed interface."""
+    # Generate tab buttons
+    tabs_html = '<div class="hf-tabs" style="display: flex; gap: 1rem; margin-bottom: 2rem; border-bottom: 2px solid #ddd;">'
+    for idx, space in enumerate(ALL_SPACES):
+        active_class = "active" if idx == 0 else ""
+        tabs_html += f"""
+        <button class="hf-tab-btn {active_class}"
+                data-tab="space-{idx}"
+                style="padding: 1rem 2rem; background: {'#B76E79' if idx == 0 else 'transparent'};
+                       color: {'white' if idx == 0 else '#333'}; border: none; cursor: pointer;
+                       font-size: 1rem; border-radius: 8px 8px 0 0; transition: all 0.3s;">
+            {space['icon']} {space['name']}
+        </button>
+        """
+    tabs_html += "</div>"
 
-    <!-- HuggingFace Space Embed -->
-    <div class="hf-space-container" style="position: relative; width: 100%; max-width: 1200px; margin: 0 auto; border: 1px solid #ddd; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        <iframe
-            src="{space_url}"
-            frameborder="0"
-            width="100%"
-            height="800"
-            style="display: block;"
-            allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
-            sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
-        ></iframe>
+    # Generate tab content panels
+    panels_html = ""
+    for idx, space in enumerate(ALL_SPACES):
+        display_style = "block" if idx == 0 else "none"
+        panels_html += f"""
+<div class="hf-tab-panel" id="space-{idx}" style="display: {display_style};">
+    <div class="skyyrose-space-experience" style="margin: 2rem 0;">
+        <h3 style="font-family: 'Playfair Display', serif; font-size: 1.8rem; margin-bottom: 0.5rem;">
+            {space['icon']} {space['name']}
+        </h3>
+        <p style="color: #666; margin-bottom: 1.5rem; font-size: 1.1rem;">
+            {space['description']}
+        </p>
+
+        <div class="hf-space-container" style="position: relative; width: 100%; max-width: 1200px;
+                                                margin: 0 auto; border: 2px solid #B76E79; border-radius: 12px;
+                                                overflow: hidden; box-shadow: 0 8px 16px rgba(183,110,121,0.2);">
+            <iframe
+                src="{space['url']}"
+                frameborder="0"
+                width="100%"
+                height="800"
+                style="display: block;"
+                allow="accelerometer; ambient-light-sensor; camera; encrypted-media; geolocation; gyroscope; hid; microphone; midi; payment; usb; vr; xr-spatial-tracking"
+                sandbox="allow-forms allow-modals allow-popups allow-presentation allow-same-origin allow-scripts"
+            ></iframe>
+        </div>
+
+        <p style="margin-top: 1rem; text-align: center; color: #666; font-size: 0.9rem;">
+            Powered by AI | <a href="{space['url']}" target="_blank" rel="noopener" style="color: #B76E79; text-decoration: none;">Open in HuggingFace →</a>
+        </p>
     </div>
+</div>
+        """
 
-    <p style="margin-top: 1rem; text-align: center; color: #666; font-size: 0.9rem;">
-        Powered by AI | <a href="{space_url}" target="_blank" rel="noopener">Open in HuggingFace →</a>
+    # JavaScript for tab switching
+    script = """
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.hf-tab-btn');
+    const tabPanels = document.querySelectorAll('.hf-tab-panel');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const targetTab = this.getAttribute('data-tab');
+
+            // Update button styles
+            tabButtons.forEach(btn => {
+                btn.style.background = 'transparent';
+                btn.style.color = '#333';
+            });
+            this.style.background = '#B76E79';
+            this.style.color = 'white';
+
+            // Update panel visibility
+            tabPanels.forEach(panel => {
+                panel.style.display = 'none';
+            });
+            document.getElementById(targetTab).style.display = 'block';
+        });
+    });
+});
+</script>
+    """
+
+    return f"""
+<!-- SkyyRose {collection_name} Collection - AI Experiences -->
+<div class="skyyrose-experiences-hub" style="margin: 3rem 0; padding: 2rem; background: linear-gradient(135deg, #f5f5f5 0%, #fff 100%); border-radius: 16px;">
+    <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; margin-bottom: 0.5rem; text-align: center;">
+        Explore {collection_name} with AI
+    </h2>
+    <p style="text-align: center; color: #666; margin-bottom: 2rem; font-size: 1.1rem;">
+        Experience SkyyRose through cutting-edge AI technology
     </p>
+
+    {tabs_html}
+    {panels_html}
+    {script}
 </div>
 
 <!-- Original Collection Content Below -->
 """
 
 
-def update_page_with_retry(
-    page_id: int, collection_name: str, space_url: str, max_retries: int = 3
-) -> bool:
+def update_page_with_retry(page_id: int, collection_name: str, max_retries: int = 3) -> bool:
     """Update WordPress page with HuggingFace Space embed using ralph-loop retry."""
-
     auth = HTTPBasicAuth(WP_USERNAME, WP_APP_PASSWORD)  # type: ignore[arg-type]
     endpoint = f"{WP_URL}/index.php?rest_route=/wp/v2/pages/{page_id}"
 
@@ -114,7 +202,7 @@ def update_page_with_retry(
         return False
 
     # Generate embed HTML
-    embed_html = generate_embed_html(collection_name, space_url)
+    embed_html = generate_all_spaces_html(collection_name)
 
     # Prepend embed to existing content (don't overwrite)
     new_content = embed_html + current_content
@@ -159,17 +247,16 @@ def update_page_with_retry(
     return False
 
 
-def main():
+def main() -> int:
     """Embed HuggingFace Spaces in all /experiences/ pages."""
-
     print("=== Embedding HuggingFace Spaces in WordPress ===\n")
     print(f"Target site: {WP_URL}")
     print(f"Pages to update: {len(EXPERIENCES_PAGES)}\n")
 
     success_count = 0
 
-    for page_id, (collection_name, space_url) in EXPERIENCES_PAGES.items():
-        if update_page_with_retry(page_id, collection_name, space_url):
+    for page_id, collection_name in EXPERIENCES_PAGES.items():
+        if update_page_with_retry(page_id, collection_name):
             success_count += 1
             # Rate limiting: wait between pages
             if page_id != list(EXPERIENCES_PAGES.keys())[-1]:
