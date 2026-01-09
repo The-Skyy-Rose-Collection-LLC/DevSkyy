@@ -41,12 +41,17 @@ const nextConfig = {
   },
   async rewrites() {
     // Proxy /api/* to Python backend
-    // Works in both development (localhost:8000) and production (BACKEND_URL)
+    // Production: https://api.devskyy.app
+    // Development: http://localhost:8000
     const backendUrl = process.env.BACKEND_URL || 'http://localhost:8000';
 
     return [
       {
-        // /api/v1/agents → http://localhost:8000/api/v1/agents
+        source: '/api/backend/:path*',
+        destination: 'https://api.devskyy.app/:path*',
+      },
+      {
+        // Fallback: /api/v1/agents → http://localhost:8000/api/v1/agents (development)
         source: '/api/:path*',
         destination: `${backendUrl}/api/:path*`,
       },

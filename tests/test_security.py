@@ -238,8 +238,11 @@ class TestPasswordManager:
         assert pm.verify_password("wrong", hashed) is False
 
     @pytest.mark.skip(
-        reason="passlib/bcrypt compatibility issue - bcrypt 5.x changed password "
-        "length handling. Argon2 is the recommended default. Skip bcrypt fallback test."
+        reason="INTENTIONAL SKIP: passlib/bcrypt 5.x compatibility issue. "
+        "BCrypt 5.x changed password length handling which breaks passlib integration. "
+        "Argon2id is the production default per security best practices. "
+        "BCrypt support retained for legacy password verification only. "
+        "See: https://github.com/pyca/bcrypt/issues/684"
     )
     def test_bcrypt_fallback(self):
         """Should support BCrypt for legacy."""
