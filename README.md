@@ -9,6 +9,12 @@
 
 > 🌹 **SkyyRose** - Where Love Meets Luxury | [skyyrose.co](https://skyyrose.co)
 
+## 🌐 Production URLs
+
+- **Frontend**: https://app.devskyy.app
+- **API**: https://api.devskyy.app
+- **API Docs**: https://api.devskyy.app/docs
+
 ## Overview
 
 DevSkyy is a production-grade AI orchestration platform designed for luxury fashion e-commerce automation. It powers the SkyyRose brand with specialized agents for WordPress/WooCommerce management, immersive 3D collection experiences, virtual try-on, and autonomous theme building.

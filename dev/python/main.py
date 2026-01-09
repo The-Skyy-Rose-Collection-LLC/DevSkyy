@@ -174,14 +174,14 @@ class CodingArchitectAgent:
 
     async def review_code(self, file_path: str) -> AgentResult:
         """Review code with Chain-of-Thought reasoning."""
-        prompt = f"""{TASK_PROMPTS['code_review'].template}
+        prompt = f"""{TASK_PROMPTS["code_review"].template}
 
 Please review the code in: {file_path}"""
         return await self.query(prompt)
 
     async def design_architecture(self, requirements: str) -> AgentResult:
         """Design architecture with Tree of Thoughts."""
-        prompt = f"""{TASK_PROMPTS['architecture_design'].template}
+        prompt = f"""{TASK_PROMPTS["architecture_design"].template}
 
 Requirements: {requirements}"""
         return await self.query(prompt)
@@ -192,10 +192,10 @@ Requirements: {requirements}"""
         context: str | None = None,
     ) -> AgentResult:
         """Debug an issue with ReAct pattern."""
-        prompt = f"""{TASK_PROMPTS['debugging'].template}
+        prompt = f"""{TASK_PROMPTS["debugging"].template}
 
 Issue: {issue}
-{f'Context: {context}' if context else ''}"""
+{f"Context: {context}" if context else ""}"""
         return await self.query(prompt)
 
     async def refactor_code(
@@ -204,22 +204,22 @@ Issue: {issue}
         goals: str | None = None,
     ) -> AgentResult:
         """Refactor code with Constitutional AI principles."""
-        prompt = f"""{TASK_PROMPTS['refactoring'].template}
+        prompt = f"""{TASK_PROMPTS["refactoring"].template}
 
 File to refactor: {file_path}
-{f'Refactoring goals: {goals}' if goals else ''}"""
+{f"Refactoring goals: {goals}" if goals else ""}"""
         return await self.query(prompt)
 
     async def analyze_typescript(self, target: str) -> AgentResult:
         """Analyze TypeScript code."""
-        prompt = f"""{TASK_PROMPTS['typescript_analysis'].template}
+        prompt = f"""{TASK_PROMPTS["typescript_analysis"].template}
 
 Target: {target}"""
         return await self.query(prompt)
 
     async def analyze_python(self, target: str) -> AgentResult:
         """Analyze Python code."""
-        prompt = f"""{TASK_PROMPTS['python_analysis'].template}
+        prompt = f"""{TASK_PROMPTS["python_analysis"].template}
 
 Target: {target}"""
         return await self.query(prompt)

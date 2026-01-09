@@ -491,8 +491,7 @@ class ThreeDGenerationPipeline:
                 return config.provider
             else:
                 logger.warning(
-                    f"Requested provider {config.provider.value} not available, "
-                    f"trying fallbacks"
+                    f"Requested provider {config.provider.value} not available, trying fallbacks"
                 )
 
         # Try fallbacks from config

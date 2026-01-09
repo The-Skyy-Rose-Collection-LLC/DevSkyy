@@ -87,7 +87,7 @@ class ImageProcessor:
         """Initialize the image processor."""
         if not PIL_AVAILABLE:
             raise ImportError(
-                "Pillow is required for image processing. " "Install with: pip install Pillow"
+                "Pillow is required for image processing. Install with: pip install Pillow"
             )
 
     def load_image(self, source: str | Path | bytes | io.BytesIO) -> Image.Image:
@@ -179,8 +179,7 @@ class ImageProcessor:
         if isinstance(size, str):
             if size not in self.STANDARD_SIZES:
                 raise ImageProcessingError(
-                    f"Unknown size preset: {size}. "
-                    f"Available: {list(self.STANDARD_SIZES.keys())}"
+                    f"Unknown size preset: {size}. Available: {list(self.STANDARD_SIZES.keys())}"
                 )
             size = self.STANDARD_SIZES[size]
 

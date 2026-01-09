@@ -27,7 +27,7 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from .base import CompletionResponse, Message, ModelProvider
+from .base import Message
 from .exceptions import LLMError
 from .providers.groq import GroqClient
 
@@ -497,7 +497,9 @@ class GroqFastClassifier:
         try:
             response = await client.complete(
                 messages=[
-                    Message.system("You are a classification assistant. Respond with valid JSON only."),
+                    Message.system(
+                        "You are a classification assistant. Respond with valid JSON only."
+                    ),
                     Message.user(prompt),
                 ],
                 model=self.config.model,
@@ -532,7 +534,7 @@ class GroqFastClassifier:
             # Build scores dict
             scores = data.get("scores", data.get("all_scores", {}))
             if not scores and expected_labels:
-                scores = {lbl: 0.0 for lbl in expected_labels}
+                scores = dict.fromkeys(expected_labels, 0.0)
                 scores[label] = data.get("confidence", 0.9)
 
             return ClassificationResult(

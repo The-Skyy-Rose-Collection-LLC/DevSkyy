@@ -708,7 +708,7 @@ async def batch_enhance(
     async with httpx.AsyncClient() as client:
         for i, url in enumerate(image_urls):
             job = visual_job_store.create(
-                product_name=f"Product {i+1}",
+                product_name=f"Product {i + 1}",
                 style=ImageStyle.PRODUCT_STUDIO,
                 provider=VisualProvider.AUTO,
                 metadata={
@@ -730,7 +730,7 @@ async def batch_enhance(
                     run_image_enhancement,
                     job.job_id,
                     str(temp_path),
-                    f"Product {i+1}",
+                    f"Product {i + 1}",
                     enhancement_type,
                     upscale_factor,
                     "white studio",

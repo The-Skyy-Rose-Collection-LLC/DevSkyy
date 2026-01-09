@@ -100,10 +100,7 @@ async def run_all_workflows() -> None:
             print(f"❌ {result}")
         else:
             status_emoji = "✅" if result.status == "completed" else "❌"
-            print(
-                f"{status_emoji} {result.name}: {result.status} "
-                f"({result.duration_seconds:.2f}s)"
-            )
+            print(f"{status_emoji} {result.name}: {result.status} ({result.duration_seconds:.2f}s)")
 
     print("=" * 80 + "\n")
 

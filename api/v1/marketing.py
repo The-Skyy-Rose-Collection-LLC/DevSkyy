@@ -133,8 +133,7 @@ async def create_campaign(
     """
     campaign_id = str(uuid4())
     logger.info(
-        f"Creating marketing campaign {campaign_id} for user {user.sub}: "
-        f"{request.campaign_type}"
+        f"Creating marketing campaign {campaign_id} for user {user.sub}: {request.campaign_type}"
     )
 
     try:

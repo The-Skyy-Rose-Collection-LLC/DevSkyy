@@ -132,8 +132,7 @@ class BackgroundWorker:
             style = task_data.get("style", "realistic")
 
             logger.info(
-                f"Generating 3D model: prompt='{prompt}', "
-                f"image={bool(image_url)}, style={style}"
+                f"Generating 3D model: prompt='{prompt}', image={bool(image_url)}, style={style}"
             )
 
             # Call agent based on input type
@@ -243,7 +242,7 @@ class BackgroundWorker:
             # Enterprise hardening: Store result with Pub/Sub notification
             await self._task_queue.store_result(task_id, result, ttl=300)
 
-            logger.info(f"✅ Task {task_id} completed " f"(status: {result.get('status')})")
+            logger.info(f"✅ Task {task_id} completed (status: {result.get('status')})")
 
         except Exception as e:
             logger.error(f"❌ Task {task_id} failed: {e}", exc_info=True)
@@ -300,7 +299,7 @@ class BackgroundWorker:
                     if result:
                         task_id, priority = result[0]
 
-                        logger.info(f"🔄 Dequeued task: {task_id} " f"(priority: {priority})")
+                        logger.info(f"🔄 Dequeued task: {task_id} (priority: {priority})")
 
                         # Enterprise hardening: Atomic task locking prevents duplicate processing
                         task_lock_key = f"{LOCK_PREFIX}{task_id}"
@@ -308,7 +307,10 @@ class BackgroundWorker:
 
                         # Attempt atomic lock with TTL (NX = set only if not exists)
                         acquired = await self._redis.set(
-                            task_lock_key, hostname, ex=300, nx=True  # 5 min lock TTL
+                            task_lock_key,
+                            hostname,
+                            ex=300,
+                            nx=True,  # 5 min lock TTL
                         )
 
                         if not acquired:

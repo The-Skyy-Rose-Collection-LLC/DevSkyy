@@ -31,9 +31,9 @@ async def enhance_all_images():
 
     for collection in COLLECTIONS:
         items = find_clothing_images(collection)
-        print(f"\n{'='*50}")
+        print(f"\n{'=' * 50}")
         print(f"Processing {collection.upper()}: {len(items)} items")
-        print(f"{'='*50}")
+        print(f"{'=' * 50}")
 
         for item in items:
             try:
@@ -74,7 +74,7 @@ async def enhance_all_images():
             except Exception as e:
                 print(f"✗ {item['name']}: {e}")
 
-    print(f"\n{'='*50}")
+    print(f"\n{'=' * 50}")
     print(f"Enhanced {len(results)}/32 images")
     print(f"Output: {output_dir}")
 

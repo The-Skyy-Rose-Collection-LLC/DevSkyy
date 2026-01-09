@@ -339,7 +339,7 @@ class ThreeDAssetValidator:
                 return ValidationCheck(
                     name="file_size",
                     status=ValidationStatus.FAILED,
-                    message=f"File too small: {size_kb:.1f}KB (min: {self.config.min_file_size_bytes/1024:.0f}KB)",
+                    message=f"File too small: {size_kb:.1f}KB (min: {self.config.min_file_size_bytes / 1024:.0f}KB)",
                     value=size,
                     threshold=self.config.min_file_size_bytes,
                 )
@@ -348,7 +348,7 @@ class ThreeDAssetValidator:
                 return ValidationCheck(
                     name="file_size",
                     status=ValidationStatus.WARNING,
-                    message=f"File very large: {size_mb:.1f}MB (max recommended: {self.config.max_file_size_bytes/(1024*1024):.0f}MB)",
+                    message=f"File very large: {size_mb:.1f}MB (max recommended: {self.config.max_file_size_bytes / (1024 * 1024):.0f}MB)",
                     value=size,
                     threshold=self.config.max_file_size_bytes,
                 )
@@ -802,9 +802,9 @@ class ThreeDAssetValidator:
             logger.warning("No 3D models found to validate")
             return {}
 
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info("3D ASSET QUALITY VALIDATION")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
         logger.info(f"Found {len(models)} model(s) to validate\n")
 
         results_by_collection: dict[str, list[ValidationResult]] = {}
@@ -829,9 +829,9 @@ class ThreeDAssetValidator:
 
     def _print_summary(self, results: dict[str, list[ValidationResult]]) -> None:
         """Print validation summary."""
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info("VALIDATION SUMMARY")
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
 
         total_passed = 0
         total_warned = 0
@@ -856,14 +856,14 @@ class ThreeDAssetValidator:
             logger.info(f"  🚀 Production Ready (95%+): {ready}/{len(coll_results)}")
 
         total = sum(len(r) for r in results.values())
-        logger.info(f"\n{'='*60}")
+        logger.info(f"\n{'=' * 60}")
         logger.info(f"TOTAL: {total_passed} passed, {total_warned} warnings, {total_failed} failed")
         logger.info(
-            f"PRODUCTION READY: {total_production_ready}/{total} ({100*total_production_ready/total:.0f}%)"
+            f"PRODUCTION READY: {total_production_ready}/{total} ({100 * total_production_ready / total:.0f}%)"
             if total > 0
             else ""
         )
-        logger.info(f"{'='*60}")
+        logger.info(f"{'=' * 60}")
 
     def _save_report(self, results: dict[str, list[ValidationResult]]) -> Path:
         """Save validation report to JSON."""
@@ -1018,9 +1018,9 @@ async def main() -> int:
 
         result = await validator.validate_model(args.file, args.source)
 
-        print(f"\n{'='*60}")
+        print(f"\n{'=' * 60}")
         print("VALIDATION RESULT")
-        print(f"{'='*60}")
+        print(f"{'=' * 60}")
         print(f"Status: {result.status.value.upper()}")
         print(f"Fidelity Score: {result.fidelity_score:.1%}")
         print(f"Production Ready: {'Yes' if result.production_ready else 'No'}")

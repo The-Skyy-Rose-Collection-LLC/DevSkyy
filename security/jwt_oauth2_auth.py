@@ -799,7 +799,7 @@ def get_current_user_dependency():
     from fastapi import Header, HTTPException, status
 
     async def _get_current_user(
-        authorization: str | None = Header(None, alias="Authorization")
+        authorization: str | None = Header(None, alias="Authorization"),
     ) -> TokenPayload:
         """
         FastAPI dependency to get current authenticated user.

@@ -126,9 +126,7 @@ class LLMResponse(BaseModel):
     model_used: str = Field(..., description="Model that generated response")
 
     # Round Table results (if applicable)
-    round_table_winner: bool = Field(
-        default=False, description="Whether this won Round Table"
-    )
+    round_table_winner: bool = Field(default=False, description="Whether this won Round Table")
     round_table_competitors: list[str] = Field(
         default_factory=list, description="Competing providers in Round Table"
     )
@@ -352,9 +350,7 @@ class UnifiedLLMClient:
             # Round Table: All providers compete
             # TODO: Implement Round Table integration
             # For now, fallback to balanced mode
-            logger.warning(
-                "Round Table mode requested but not yet implemented, using BALANCED"
-            )
+            logger.warning("Round Table mode requested but not yet implemented, using BALANCED")
             completion = await router.complete_with_fallback(
                 messages=messages,
                 model=request.model,
@@ -423,7 +419,10 @@ async def complete(
 ) -> LLMResponse:
     """Quick completion using default client."""
     request = LLMRequest(
-        messages=messages, task_description=task_description, execution_mode=execution_mode, **kwargs
+        messages=messages,
+        task_description=task_description,
+        execution_mode=execution_mode,
+        **kwargs,
     )
     return await get_client().complete(request)
 

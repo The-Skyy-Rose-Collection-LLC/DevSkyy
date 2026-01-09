@@ -61,6 +61,20 @@ jobs:
           python-version: ${{ env.PYTHON_VERSION }}
           cache: 'pip'
 
+      - name: Get pip cache dir
+        id: pip-cache
+        shell: bash
+        run: |
+          echo "dir=$(pip cache dir)" >> $GITHUB_OUTPUT
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pip-cache.outputs.dir }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt', '**/pyproject.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
       - name: Install linting tools
         run: |
           python -m pip install --upgrade pip
@@ -68,19 +82,23 @@ jobs:
 
       - name: Run ruff (fast linter)
         run: ruff check . --output-format=github
-        continue-on-error: true
 
       - name: Check black formatting
         run: black --check --diff .
-        continue-on-error: true
 
       - name: Check isort imports
         run: isort --check-only --diff .
-        continue-on-error: true
+
+      - name: Cache mypy
+        uses: actions/cache@v4
+        with:
+          path: .mypy_cache
+          key: ${{ runner.os }}-mypy-${{ hashFiles('**/*.py') }}
+          restore-keys: |
+            ${{ runner.os }}-mypy-
 
       - name: Run mypy type checking
         run: mypy . --ignore-missing-imports --no-error-summary
-        continue-on-error: true
 
   # ===========================================================================
   # Stage 2: Python Backend Tests
@@ -117,6 +135,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -e ".[dev]" || pip install -e .
           pip install pytest pytest-asyncio pytest-cov pytest-xdist httpx
+
+      - name: Cache pytest
+        uses: actions/cache@v4
+        with:
+          path: .pytest_cache
+          key: ${{ runner.os }}-pytest-${{ hashFiles('tests/**/*.py') }}
+          restore-keys: |
+            ${{ runner.os }}-pytest-
 
       - name: Run pytest with coverage
         run: |
@@ -537,6 +563,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
 
       - name: Build frontend image
         uses: docker/build-push-action@v5
@@ -548,6 +576,8 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
         if: hashFiles('frontend/Dockerfile') != ''
 
   # ===========================================================================

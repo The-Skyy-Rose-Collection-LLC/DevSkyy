@@ -147,9 +147,7 @@ class TestMediaEndpoints:
             "additional_details": "Rose gold zipper",
             "output_format": "glb",
         }
-        response = client.post(
-            "/api/v1/media/3d/generate/text", json=payload, headers=auth_headers
-        )
+        response = client.post("/api/v1/media/3d/generate/text", json=payload, headers=auth_headers)
         assert response.status_code in [202, 401]
 
         if response.status_code == 202:
@@ -181,9 +179,7 @@ class TestMarketingEndpoints:
             "target_audience": {"segment": "high_value", "location": "US"},
             "schedule": "2025-10-25T10:00:00Z",
         }
-        response = client.post(
-            "/api/v1/marketing/campaigns", json=payload, headers=auth_headers
-        )
+        response = client.post("/api/v1/marketing/campaigns", json=payload, headers=auth_headers)
         assert response.status_code in [201, 401]
 
         if response.status_code == 201:
@@ -205,9 +201,7 @@ class TestCommerceEndpoints:
             ],
             "validate_only": False,
         }
-        response = client.post(
-            "/api/v1/commerce/products/bulk", json=payload, headers=auth_headers
-        )
+        response = client.post("/api/v1/commerce/products/bulk", json=payload, headers=auth_headers)
         assert response.status_code in [200, 401]
 
         if response.status_code == 200:

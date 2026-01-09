@@ -30,8 +30,7 @@ from adk.base import (
     AgentStatus,
     ToolDefinition,
 )
-from orchestration.prompt_engineering import PromptTechnique
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,
@@ -39,6 +38,7 @@ from runtime.tools import (
     ToolSeverity,
     ToolSpec,
 )
+from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType, TaskCategory
 
@@ -884,9 +884,7 @@ Provide comprehensive SEO recommendations:
                     if seo_title:
                         seo_meta.append({"key": "_yoast_wpseo_title", "value": seo_title})
                     if seo_description:
-                        seo_meta.append(
-                            {"key": "_yoast_wpseo_metadesc", "value": seo_description}
-                        )
+                        seo_meta.append({"key": "_yoast_wpseo_metadesc", "value": seo_description})
 
                     # Update post with SEO metadata
                     # Note: This requires custom meta update, not available in base WordPressClient

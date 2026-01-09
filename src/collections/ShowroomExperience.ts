@@ -13,15 +13,15 @@
  */
 
 import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { Logger } from '../utils/Logger';
-import type { ShowroomProduct } from '../types/product';
-import { ProductInteractionHandler } from '../lib/productInteraction';
-import { InventoryManager } from '../lib/inventory';
-import { CartManager } from '../lib/cartManager';
-import { getModelLoader, ModelLoadError } from '../lib/ModelAssetLoader';
-import { getPerformanceMonitor } from '../lib/ThreePerformanceMonitor';
-// Note: Configs available from '../config/threejs.config' for future use
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { Logger } from '../utils/Logger.js';
+import type { ShowroomProduct } from '../types/product.js';
+import { ProductInteractionHandler } from '../lib/productInteraction.js';
+import { InventoryManager } from '../lib/inventory.js';
+import { CartManager } from '../lib/cartManager.js';
+import { getModelLoader, ModelLoadError } from '../lib/ModelAssetLoader.js';
+import { getPerformanceMonitor } from '../lib/ThreePerformanceMonitor.js';
+// Note: Configs available from '../config/threejs.config.js' for future use
 
 export interface ShowroomConfig {
   backgroundColor?: number;
@@ -298,25 +298,9 @@ export class ShowroomExperience {
     this.products.set(product.id, mesh);
 
     // Register product with interaction handler
-    // GLB models are Groups, not Meshes - traverse to find first mesh for interaction setup
-    if (this.interactionHandler) {
-      let meshForInteraction: THREE.Mesh | null = null;
-
-      if (mesh instanceof THREE.Mesh) {
-        // Direct mesh (placeholder case)
-        meshForInteraction = mesh;
-      } else if (mesh instanceof THREE.Group) {
-        // GLB model case - traverse to find first mesh
-        mesh.traverse((child) => {
-          if (!meshForInteraction && child instanceof THREE.Mesh) {
-            meshForInteraction = child;
-          }
-        });
-      }
-
-      if (meshForInteraction) {
-        this.interactionHandler.setupProduct(meshForInteraction, product);
-      }
+    // Cast to Mesh - works with both GLB groups and placeholder meshes
+    if (this.interactionHandler && mesh instanceof THREE.Mesh) {
+      this.interactionHandler.setupProduct(mesh, product);
     }
 
     // Subscribe to inventory updates

@@ -165,7 +165,7 @@ async def collaborative_workflow():
         # Initial brief
         print("\n[Brief] Create 3D product concept")
         await client.query(
-            "I need a 3D concept for a new engagement ring. " "It should be elegant and modern."
+            "I need a 3D concept for a new engagement ring. It should be elegant and modern."
         )
 
         async for message in client.receive_response():

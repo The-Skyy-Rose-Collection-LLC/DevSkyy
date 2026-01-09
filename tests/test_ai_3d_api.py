@@ -399,7 +399,10 @@ class TestAliases:
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-@pytest.mark.skip(reason="Requires test client fixtures from conftest.py")
+@pytest.mark.skip(
+    reason="Integration test: Requires running FastAPI app with 3D pipeline. "
+    "Run with: pytest -m integration --run-integration"
+)
 async def test_ai3d_integration(client, auth_headers):
     """Test AI 3D endpoints with authenticated client."""
     # Get pipeline status

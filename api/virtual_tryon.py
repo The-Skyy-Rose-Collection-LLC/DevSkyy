@@ -1224,7 +1224,7 @@ async def list_categories() -> list[dict[str, str]]:
 async def list_jobs(
     limit: int = Query(
         default=20, ge=1, le=100, description="Maximum number of jobs to return (1-100)"
-    )
+    ),
 ) -> list[JobResponse]:
     """
     Retrieve recent try-on jobs.

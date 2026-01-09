@@ -101,9 +101,7 @@ class ValidationResult:
 
         # Print validated variables
         if self.validated_vars:
-            print(
-                f"{Colors.GREEN}✓ Validated Variables ({len(self.validated_vars)}):{Colors.NC}"
-            )
+            print(f"{Colors.GREEN}✓ Validated Variables ({len(self.validated_vars)}):{Colors.NC}")
             for var in self.validated_vars:
                 print(f"   {Colors.GREEN}✓{Colors.NC} {var}")
             print()
@@ -125,9 +123,7 @@ class ValidationResult:
                 )
         else:
             print(f"{Colors.RED}❌ VALIDATION FAILED{Colors.NC}")
-            print(
-                f"{Colors.RED}{len(self.errors)} critical error(s) must be fixed{Colors.NC}"
-            )
+            print(f"{Colors.RED}{len(self.errors)} critical error(s) must be fixed{Colors.NC}")
         print(f"{Colors.BLUE}{'=' * 80}{Colors.NC}\n")
 
 
@@ -141,18 +137,14 @@ def validate_env_var_set(var_name: str, result: ValidationResult) -> bool:
     return True
 
 
-def validate_secret_strength(
-    var_name: str, min_length: int, result: ValidationResult
-) -> bool:
+def validate_secret_strength(var_name: str, min_length: int, result: ValidationResult) -> bool:
     """Validate that a secret meets minimum length requirements."""
     value = os.getenv(var_name)
     if not value:
         return False
 
     if len(value) < min_length:
-        result.add_error(
-            f"{var_name} is too short (min {min_length} chars, got {len(value)})"
-        )
+        result.add_error(f"{var_name} is too short (min {min_length} chars, got {len(value)})")
         return False
 
     result.add_info(f"{var_name}: {len(value)} characters (strong)")
@@ -193,9 +185,7 @@ def validate_database_url(url: str, result: ValidationResult) -> bool:
 
         # Security check: warn about localhost in production
         if parsed.hostname in ["localhost", "127.0.0.1"]:
-            result.add_warning(
-                "DATABASE_URL uses localhost - update for production deployment"
-            )
+            result.add_warning("DATABASE_URL uses localhost - update for production deployment")
 
         result.add_info(
             f"Database: {parsed.scheme}://{parsed.hostname}:{parsed.port or 5432}{parsed.path}"
@@ -218,9 +208,7 @@ def validate_redis_url(url: str, result: ValidationResult) -> bool:
 
         # Check scheme
         if parsed.scheme not in ["redis", "rediss"]:
-            result.add_error(
-                f"REDIS_URL: Invalid scheme '{parsed.scheme}' (expected redis/rediss)"
-            )
+            result.add_error(f"REDIS_URL: Invalid scheme '{parsed.scheme}' (expected redis/rediss)")
             return False
 
         # Check host
@@ -230,9 +218,7 @@ def validate_redis_url(url: str, result: ValidationResult) -> bool:
 
         # Warn about localhost
         if parsed.hostname in ["localhost", "127.0.0.1"]:
-            result.add_warning(
-                "REDIS_URL uses localhost - update for production deployment"
-            )
+            result.add_warning("REDIS_URL uses localhost - update for production deployment")
 
         # Check for TLS in production
         if parsed.scheme == "redis":
@@ -268,9 +254,7 @@ def validate_wordpress_url(url: str, result: ValidationResult) -> bool:
 
         # Check for HTTPS in production
         if parsed.scheme == "http":
-            result.add_warning(
-                "WORDPRESS_URL uses HTTP - use HTTPS for production deployment"
-            )
+            result.add_warning("WORDPRESS_URL uses HTTP - use HTTPS for production deployment")
 
         # Check host
         if not parsed.hostname:
@@ -303,12 +287,8 @@ def validate_llm_providers(result: ValidationResult) -> bool:
             result.add_validated(env_var)
 
     if not configured_providers:
-        result.add_error(
-            "No LLM provider API keys configured - at least one is required"
-        )
-        result.add_info(
-            f"Available providers: {', '.join(llm_providers.keys())}"
-        )
+        result.add_error("No LLM provider API keys configured - at least one is required")
+        result.add_info(f"Available providers: {', '.join(llm_providers.keys())}")
         return False
 
     result.add_info(f"LLM Providers: {', '.join(configured_providers)}")
@@ -359,9 +339,7 @@ def validate_optional_features(result: ValidationResult) -> None:
             result.add_info(f"{category}: {', '.join(configured)}")
 
         if missing:
-            result.add_warning(
-                f"{category} features disabled: {', '.join(missing)}"
-            )
+            result.add_warning(f"{category} features disabled: {', '.join(missing)}")
 
 
 def validate_security_settings(result: ValidationResult) -> None:
@@ -369,9 +347,7 @@ def validate_security_settings(result: ValidationResult) -> None:
     # Check DEBUG mode
     debug = os.getenv("DEBUG", "false").lower()
     if debug in ["true", "1", "yes"]:
-        result.add_error(
-            "DEBUG=true in production environment - MUST be false for security"
-        )
+        result.add_error("DEBUG=true in production environment - MUST be false for security")
     else:
         result.add_info("Debug mode: disabled (correct for production)")
 

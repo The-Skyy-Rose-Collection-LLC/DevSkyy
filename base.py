@@ -27,7 +27,12 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from runtime.tools import ToolCallContext, ToolCategory, ToolRegistry, get_tool_registry
+from core.runtime.tool_registry import (
+    ToolCallContext,
+    ToolCategory,
+    ToolRegistry,
+    get_tool_registry,
+)
 
 # =============================================================================
 # Enums

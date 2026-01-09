@@ -287,7 +287,7 @@ Return ONLY the JSON array, no other text."""
 Original query: "{query}"
 
 If complex, break into {num_variations} or fewer focused sub-questions.
-If simple, provide original plus {num_variations-1} rephrased versions.
+If simple, provide original plus {num_variations - 1} rephrased versions.
 
 Return JSON object:
 {{"sub_queries": ["question 1", "question 2", ...]}}
@@ -317,7 +317,7 @@ Original query: "{query}"
 
 Generate:
 1. A step-back question (more generic, broader topic)
-2. {num_variations-1} variations of the step-back question
+2. {num_variations - 1} variations of the step-back question
 
 Return JSON:
 {{"step_back_question": "broader question", "variations": ["var1", "var2", ...]}}

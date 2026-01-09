@@ -239,7 +239,6 @@ async def upload_to_woocommerce(
         auth=(wc_key, wc_secret),
         timeout=60.0,
     ) as client:
-
         # Get category ID
         logger.info(f"🔍 Finding category: {category_slug}")
         response = await client.get("/products/categories", params={"slug": category_slug})

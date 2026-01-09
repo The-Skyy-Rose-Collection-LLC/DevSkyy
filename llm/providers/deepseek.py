@@ -19,7 +19,7 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
-from ..base import BaseLLMClient, CompletionResponse, Message, MessageRole, StreamChunk, ToolCall
+from ..base import BaseLLMClient, CompletionResponse, Message, StreamChunk, ToolCall
 
 logger = logging.getLogger(__name__)
 
@@ -66,10 +66,12 @@ class DeepSeekClient(BaseLLMClient):
         """Convert to OpenAI-compatible format (DeepSeek uses OpenAI API structure)."""
         formatted = []
         for m in messages:
-            formatted.append({
-                "role": m.role.value,
-                "content": m.content,
-            })
+            formatted.append(
+                {
+                    "role": m.role.value,
+                    "content": m.content,
+                }
+            )
         return formatted
 
     async def complete(
@@ -132,9 +134,11 @@ class DeepSeekClient(BaseLLMClient):
                         type="function",
                         function={
                             "name": tc["function"]["name"],
-                            "arguments": json.loads(tc["function"]["arguments"])
-                            if isinstance(tc["function"]["arguments"], str)
-                            else tc["function"]["arguments"],
+                            "arguments": (
+                                json.loads(tc["function"]["arguments"])
+                                if isinstance(tc["function"]["arguments"], str)
+                                else tc["function"]["arguments"]
+                            ),
                         },
                     )
                 )

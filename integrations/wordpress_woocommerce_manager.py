@@ -1,4 +1,5 @@
 # wordpress_woocommerce_manager.py
+from typing import Any, cast
 
 import requests
 from requests.auth import HTTPBasicAuth
@@ -180,7 +181,7 @@ class WordPressWooCommerceManager:
         )
 
         if response.status_code == 200:
-            product = response.json()
+            product = cast(dict[Any, Any], response.json())
             print("    ✓ Product updated")
             return product
         else:
@@ -254,7 +255,7 @@ class WordPressWooCommerceManager:
 
         if response.status_code == 201:
             media = response.json()
-            media_id = media["id"]
+            media_id = cast(int, media["id"])
 
             # Update alt text and caption if provided
             if alt_text or caption:
@@ -285,7 +286,7 @@ class WordPressWooCommerceManager:
         )
 
         if response.status_code == 200:
-            return response.json()
+            return cast(dict[Any, Any], response.json())
         else:
             raise Exception(f"Product not found: {product_id}")
 
@@ -309,7 +310,7 @@ class WordPressWooCommerceManager:
             List of products
         """
 
-        params = {"per_page": min(per_page, 100), "page": page}
+        params: dict[str, Any] = {"per_page": min(per_page, 100), "page": page}
 
         if status:
             params["status"] = status
@@ -322,7 +323,7 @@ class WordPressWooCommerceManager:
         )
 
         if response.status_code == 200:
-            return response.json()
+            return cast(list[dict[Any, Any]], response.json())
         else:
             raise Exception(f"Failed to list products: {response.status_code}")
 
@@ -361,7 +362,7 @@ class WordPressWooCommerceManager:
         )
 
         if response.status_code == 201:
-            return response.json()
+            return cast(dict[Any, Any], response.json())
         else:
             # Category might already exist
             if "term_exists" in response.text:
@@ -384,7 +385,7 @@ class WordPressWooCommerceManager:
         )
 
         if response.status_code == 200:
-            return response.json()
+            return cast(list[dict[Any, Any]], response.json())
         else:
             raise Exception(f"Failed to list categories: {response.status_code}")
 
@@ -411,7 +412,7 @@ class WordPressWooCommerceManager:
         )
 
         if response.status_code == 200:
-            result = response.json()
+            result = cast(dict[Any, Any], response.json())
             print("    ✓ Batch update complete")
             return result
         else:

@@ -30,8 +30,7 @@ from adk.base import (
     AgentStatus,
     ToolDefinition,
 )
-from orchestration.prompt_engineering import PromptTechnique
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,
@@ -39,6 +38,7 @@ from runtime.tools import (
     ToolSeverity,
     ToolSpec,
 )
+from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType
 from .multimodal_capabilities import (
@@ -947,9 +947,9 @@ Parameters: {kwargs}"""
         """Enhance prompt with brand DNA"""
         brand_context = f"""
 Brand: SkyyRose - "Where Love Meets Luxury"
-Aesthetic: {self.SKYYROSE_BRAND_DNA['aesthetic']}
-Style: {self.SKYYROSE_BRAND_DNA['style']}
-Quality: {self.SKYYROSE_BRAND_DNA['quality']}
+Aesthetic: {self.SKYYROSE_BRAND_DNA["aesthetic"]}
+Style: {self.SKYYROSE_BRAND_DNA["style"]}
+Quality: {self.SKYYROSE_BRAND_DNA["quality"]}
 Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
 """
         return f"{prompt}\n\n{brand_context}"

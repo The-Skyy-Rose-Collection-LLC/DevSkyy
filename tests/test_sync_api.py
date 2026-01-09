@@ -385,7 +385,10 @@ class TestSyncEndpoints:
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-@pytest.mark.skip(reason="Requires test client fixtures from conftest.py")
+@pytest.mark.skip(
+    reason="Integration test: Requires running FastAPI app with sync service. "
+    "Run with: pytest -m integration --run-integration"
+)
 async def test_sync_integration(client, auth_headers):
     """Test sync endpoints with authenticated client."""
     # Create a sync job
@@ -427,7 +430,10 @@ async def test_sync_integration(client, auth_headers):
 
 @pytest.mark.asyncio
 @pytest.mark.integration
-@pytest.mark.skip(reason="Requires test client fixtures from conftest.py")
+@pytest.mark.skip(
+    reason="Integration test: Requires running FastAPI app with sync service. "
+    "Run with: pytest -m integration --run-integration"
+)
 async def test_bulk_sync_integration(client, auth_headers):
     """Test bulk sync endpoint."""
     response = await client.post(
