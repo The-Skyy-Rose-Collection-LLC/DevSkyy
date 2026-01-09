@@ -278,17 +278,20 @@ app = FastAPI(
 # Middleware
 # =============================================================================
 
-# CORS - Enforce explicit origin whitelist + Vercel preview support
+# CORS - Enforce explicit origin whitelist + Vercel preview support + devskyy.app domains
 cors_origins = os.getenv("CORS_ORIGINS", "").strip()
 if not cors_origins:
-    # Development default + production Vercel domain
+    # Development defaults + production domains (Vercel + devskyy.app)
     cors_origins_list = [
         "http://localhost:3000",
         "http://localhost:8000",
         "https://devskyy-dashboard.vercel.app",  # Production Vercel domain
+        "https://app.devskyy.app",  # Production app domain
+        "https://api.devskyy.app",  # Production API domain
+        "https://staging.devskyy.com",  # Staging domain
     ]
     logger.warning(
-        "CORS_ORIGINS not configured. Using development defaults + Vercel production. "
+        "CORS_ORIGINS not configured. Using development defaults + production domains. "
         "Set CORS_ORIGINS environment variable for custom production setup."
     )
 else:
@@ -298,13 +301,14 @@ if not cors_origins_list:
     msg = "CORS_ORIGINS must contain at least one valid origin"
     raise ValueError(msg)
 
-# Regex pattern to allow Vercel preview deployments
-vercel_preview_regex = r"https://.*\.vercel\.app"
+# Regex patterns to allow Vercel preview deployments and devskyy.app subdomains
+# Combined into single regex that matches either pattern
+cors_origin_regex = r"https://.*\.(vercel\.app|devskyy\.app)"
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins_list,
-    allow_origin_regex=vercel_preview_regex,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
     allow_headers=[

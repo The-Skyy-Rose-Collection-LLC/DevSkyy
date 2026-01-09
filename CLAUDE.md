@@ -32,14 +32,16 @@ You always:
 **MANDATORY SEQUENCE FOR ALL CODING TASKS:**
 
 ### Phase 1: Research (Context7 FIRST)
+
 1. **BEFORE writing ANY code**, query Context7 for library documentation:
+
    ```python
    # Step 1: Resolve library ID
    mcp__plugin_context7_context7__resolve-library-id(
        query="[what you're trying to accomplish]",
        libraryName="[library name]"
    )
-   
+
    # Step 2: Query documentation
    mcp__plugin_context7_context7__query-docs(
        libraryId="[resolved ID from step 1]",
@@ -51,17 +53,19 @@ You always:
 3. **Only proceed to coding** after you have the correct API patterns
 
 ### Phase 2: Navigate (Serena for Codebase)
+
 1. **Use Serena for ALL file operations**:
+
    ```python
    # Find symbols/functions
    mcp__plugin_serena_serena__find_symbol(name_path_pattern="...")
-   
+
    # Read files
    mcp__plugin_serena_serena__read_file(relative_path="...")
-   
+
    # Search patterns
    mcp__plugin_serena_serena__search_for_pattern(substring_pattern="...")
-   
+
    # Get file overview
    mcp__plugin_serena_serena__get_symbols_overview(relative_path="...")
    ```
@@ -69,8 +73,10 @@ You always:
 2. **Navigate intelligently** - Use symbol-level operations, not full file reads
 
 ### Phase 3: Implement (Write Code)
+
 1. **After Context7 + Serena research complete**, write code using learned patterns
 2. **Use Serena for edits**:
+
    ```python
    # Replace content
    mcp__plugin_serena_serena__replace_content(
@@ -79,7 +85,7 @@ You always:
        repl="...",
        mode="regex"
    )
-   
+
    # Create files (only when necessary)
    mcp__plugin_serena_serena__create_text_file(
        relative_path="...",
@@ -88,29 +94,35 @@ You always:
    ```
 
 ### Phase 4: Validate (Think + Execute)
+
 1. **Think about collected information**:
+
    ```python
    mcp__plugin_serena_serena__think_about_collected_information()
    ```
 
 2. **Execute and test**:
+
    ```python
    mcp__plugin_serena_serena__execute_shell_command(command="...")
    ```
 
 3. **Think about whether you're done**:
+
    ```python
    mcp__plugin_serena_serena__think_about_whether_you_are_done()
    ```
 
-### ANTI-PATTERNS (NEVER DO THIS):
+### ANTI-PATTERNS (NEVER DO THIS)
+
 - ❌ Writing code without querying Context7 first
 - ❌ Using Read/Write tools instead of Serena
 - ❌ Guessing API patterns instead of looking them up
 - ❌ Skipping the think_about_* reflection steps
 - ❌ Not validating with execute_shell_command
 
-### CORRECT PATTERN EXAMPLE:
+### CORRECT PATTERN EXAMPLE
+
 ```python
 # 1. Query Context7 for aiohttp multipart upload
 resolve-library-id(query="upload files with aiohttp", libraryName="aiohttp")
@@ -137,6 +149,7 @@ serena.think_about_whether_you_are_done()
 ## 🎯 Project Mission
 
 Transform DevSkyy from B+ (52/100) → A+ (90+/100) enterprise readiness through:
+
 - **Security hardening** (zero vulnerabilities already achieved)
 - **API versioning** implementation
 - **GDPR compliance** modules
@@ -342,7 +355,9 @@ Transform DevSkyy from B+ (52/100) → A+ (90+/100) enterprise readiness through
 ## 🏛️ Architecture Overview
 
 ### 6 SuperAgents (`agents/`)
+
 All agents inherit from `EnhancedSuperAgent` in `base_super_agent.py`, which provides:
+
 - 17 prompt engineering techniques with auto-selection based on task type
 - ML capabilities module (scikit-learn, prophet)
 - Self-learning optimization with performance tracking
@@ -358,6 +373,7 @@ All agents inherit from `EnhancedSuperAgent` in `base_super_agent.py`, which pro
 | AnalyticsAgent | Data | Reports, forecasting, clustering, anomaly detection |
 
 ### LLM Layer (`llm/`)
+
 - **6 Providers**: OpenAI, Anthropic, Google, Mistral, Cohere, Groq
 - **router.py**: Task-based intelligent routing with cost/speed/quality optimization
 - **round_table.py**: LLM competition where all providers compete, top 2 go to A/B testing
@@ -365,6 +381,7 @@ All agents inherit from `EnhancedSuperAgent` in `base_super_agent.py`, which pro
 - **tournament.py**: Judge-based consensus mechanism
 
 ### Orchestration Layer (`orchestration/`)
+
 - **llm_orchestrator.py**: Central coordinator for model selection and task routing
 - **tool_registry.py**: Schema validation and permission-based tool execution
 - **prompt_engineering.py**: 17 techniques (CoT, Few-Shot, ToT, ReAct, RAG, Constitutional, etc.)
@@ -374,7 +391,9 @@ All agents inherit from `EnhancedSuperAgent` in `base_super_agent.py`, which pro
 - **document_ingestion.py**: Chunking and embedding for knowledge base
 
 ### ADK Adapters (`adk/`)
+
 Framework abstraction layer supporting multiple agent frameworks:
+
 - **PydanticAI**: Type-safe agents with Pydantic validation
 - **Google ADK**: Google's Agent Development Kit
 - **CrewAI**: Multi-agent collaboration
@@ -382,7 +401,9 @@ Framework abstraction layer supporting multiple agent frameworks:
 - **Agno**: Agno framework adapter
 
 ### Visual Generation (`agents/visual_generation.py`)
+
 Google + HuggingFace handle ALL imagery with SkyyRose brand assets:
+
 - **Google Imagen 3**: Text-to-image
 - **Google Veo 2**: Text-to-video
 - **HuggingFace FLUX.1**: High-quality image generation
@@ -390,21 +411,26 @@ Google + HuggingFace handle ALL imagery with SkyyRose brand assets:
 - **FASHN**: Virtual try-on (via fashn_agent.py)
 
 ### Frontend Architecture
+
 - **`src/collections/`**: 5 immersive Three.js experiences (Black Rose, Signature, Love Hurts, Showroom, Runway)
 - **`frontend/`**: Next.js 15 dashboard with agent control, Round Table viewer, A/B testing dashboard, tools browser
 
 ### Security (`security/`)
+
 Enterprise security modules: AES-256-GCM encryption, JWT/OAuth2, Argon2id hashing, PII protection, SSRF prevention, rate limiting
 
 ### Key Patterns
 
 #### Tool Execution
+
 Tools are registered in `runtime/tools.py` with schema validation. Execute via:
+
 ```python
 result = await agent.use_tool("tool_name", {"param": "value"})
 ```
 
 #### LLM Round Table Flow
+
 1. All 6 LLMs generate responses in parallel
 2. Responses scored on relevance, coherence, completeness, creativity
 3. Top 2 finalists go through A/B testing
@@ -412,7 +438,9 @@ result = await agent.use_tool("tool_name", {"param": "value"})
 5. Results persisted to Neon PostgreSQL
 
 #### Prompt Technique Selection
+
 `base_super_agent.py` auto-selects technique based on `TaskCategory`:
+
 - reasoning → chain_of_thought
 - classification → few_shot
 - creative → tree_of_thoughts
@@ -420,16 +448,20 @@ result = await agent.use_tool("tool_name", {"param": "value"})
 - qa → rag
 
 ### Database
+
 - **Neon PostgreSQL**: Serverless, connection pooling via `DATABASE_URL`
 - **Vector Stores**: Chroma (local), Pinecone (production)
 - **Redis**: Caching and task queues
 
 ### Deployment
+
 - **Vercel**: Full-stack serverless (`vercel.json` at root)
 - **Docker**: `make docker-build && make docker-run`
 
 ### Brand Context
+
 SkyyRose brand DNA is injected into all visual generation:
+
 ```python
 SKYYROSE_BRAND_DNA = {
     "name": "SkyyRose",
@@ -444,15 +476,18 @@ SKYYROSE_BRAND_DNA = {
 ## 🌍 Environment Setup & Configuration
 
 ### Required Environment Variables
+
 The platform requires multiple API keys and configurations. **NEVER commit secrets to git**.
 
-#### Copy and configure .env file:
+#### Copy and configure .env file
+
 ```bash
 cp .env.example .env
 # Edit .env with your actual values
 ```
 
-#### Critical Production Variables:
+#### Critical Production Variables
+
 ```bash
 # Security (REQUIRED for production)
 JWT_SECRET_KEY=     # Generate: python -c "import secrets; print(secrets.token_urlsafe(64))"
@@ -484,6 +519,7 @@ REDIS_URL=redis://localhost:6379/0
 ```
 
 ### Secrets Management Best Practices
+
 1. **Local Development**: Use `.env` file (gitignored)
 2. **Staging/Production**: Use environment-specific secrets managers
    - AWS: AWS Secrets Manager or Systems Manager Parameter Store
@@ -498,6 +534,7 @@ REDIS_URL=redis://localhost:6379/0
 ## 🛠️ Common Commands
 
 ### Development
+
 ```bash
 # Install dependencies
 pip install -e .
@@ -519,6 +556,7 @@ bandit -r .
 ```
 
 ### Testing
+
 ```bash
 # Run all tests
 pytest
@@ -534,6 +572,7 @@ pytest -m "not slow"
 ```
 
 ### MCP Server
+
 ```bash
 # Start MCP server
 python devskyy_mcp.py
@@ -546,6 +585,7 @@ python -c "from devskyy_mcp import mcp; print(mcp.list_tools())"
 ```
 
 ### TypeScript/Node.js (Monorepo)
+
 ```bash
 # Build TypeScript
 npm run build
@@ -569,6 +609,7 @@ npm run security:fix
 ```
 
 ### 3D Collection Demos
+
 ```bash
 # Preview immersive Three.js experiences
 npm run demo:black-rose    # Gothic rose garden
@@ -579,6 +620,7 @@ npm run demo:runway        # Fashion runway
 ```
 
 ### Makefile Commands (Unified Python + TypeScript)
+
 ```bash
 make help           # Show all available commands
 make dev            # Install Python + TypeScript dependencies
@@ -595,6 +637,7 @@ make docker-build   # Build Docker image
 ## 📋 Code Style Guidelines
 
 ### Python Style (PEP8)
+
 - Use **type hints** everywhere
 - Prefer **dataclasses/Pydantic** over dicts
 - **No mutable defaults** ([], {})
@@ -602,14 +645,15 @@ make docker-build   # Build Docker image
 - Use **async/await** for I/O operations
 - **Docstrings** for all public functions (Google style)
 
-### Example:
+### Example
+
 ```python
 from typing import Dict, List, Optional
 from pydantic import BaseModel, Field
 
 class ToolSpec(BaseModel):
     """Specification for a registered tool.
-    
+
     Attributes:
         name: Unique tool identifier
         schema: JSON schema for inputs
@@ -627,6 +671,7 @@ class ToolSpec(BaseModel):
 ```
 
 ### Error Handling
+
 ```python
 # GOOD - Explicit error taxonomy
 class DevSkyError(Exception):
@@ -645,6 +690,7 @@ raise Exception("Something went wrong")
 ```
 
 ### No Placeholder Strings
+
 ```python
 # BAD - Returns placeholder in production
 async def execute_agent(task: str) -> str:
@@ -654,7 +700,7 @@ async def execute_agent(task: str) -> str:
 async def execute_agent(task: str) -> AgentResult:
     if not self._initialized:
         raise RuntimeError("Agent not initialized")
-    
+
     plan = await self._plan(task)
     result = await self._execute(plan)
     return AgentResult(
@@ -669,6 +715,7 @@ async def execute_agent(task: str) -> AgentResult:
 ## 🔍 Testing Philosophy
 
 ### Test-Driven Development (TDD)
+
 1. **Write tests FIRST** based on expected behavior
 2. **Confirm tests fail** before implementation
 3. **Implement code** to pass tests
@@ -676,6 +723,7 @@ async def execute_agent(task: str) -> AgentResult:
 5. **Commit** tests and code separately
 
 ### Test Structure
+
 ```python
 # tests/test_agents.py
 import pytest
@@ -693,11 +741,11 @@ def tool_registry():
 async def test_commerce_agent_uses_tool_runtime(tool_registry):
     """Commerce agent must use ToolRegistry, not direct calls."""
     agent = CommerceAgent(tool_registry=tool_registry)
-    
+
     # Plan phase
     plan = await agent.plan("Create product listing")
     assert plan.tools_required  # Must identify needed tools
-    
+
     # Execute phase
     result = await agent.execute(plan)
     assert result.status == "completed"
@@ -710,6 +758,7 @@ async def test_commerce_agent_uses_tool_runtime(tool_registry):
 ## 🎨 WordPress/Elementor Integration
 
 ### Theme Builder Pattern
+
 ```python
 # NO - Hardcoded brand constants
 def generate_theme():
@@ -729,7 +778,7 @@ class PageSpec(BaseModel):
     type: Literal["home", "collection", "pdp", "about"]
     layout: LayoutConfig
     sections: List[SectionSpec]
-    
+
 # Usage
 brand = BrandKit.from_yaml("skyyrose_brand.yml")
 spec = PageSpec(type="pdp", layout="luxury_fashion")
@@ -737,6 +786,7 @@ theme = await builder.generate(brand, spec)
 ```
 
 ### Validation Pipeline
+
 ```python
 # Generate → Validate → Import → Assign
 theme_json = await builder.generate_theme(brand, pages)
@@ -753,7 +803,9 @@ await wp_client.assign_theme(site_id, wp_import.theme_id)
 ## 🤖 Agent Architecture
 
 ### Super Agent Pattern
+
 Each Super Agent MUST:
+
 1. **Plan** - Break down task into steps
 2. **Retrieve** - RAG-ready interface (stub acceptable)
 3. **Execute** - Use ToolRegistry for all actions
@@ -761,6 +813,7 @@ Each Super Agent MUST:
 5. **Emit** - Structured artifacts, not strings
 
 ### Tool Runtime Layer
+
 ```python
 # runtime/tools.py
 class ToolCallContext(BaseModel):
@@ -777,9 +830,11 @@ class ToolRegistry:
 ```
 
 ### Tool Categories & Severity Levels
+
 Tools are classified for safety and permission management:
 
 **Categories** (`ToolCategory`):
+
 - `CONTENT`: Content creation/modification
 - `COMMERCE`: E-commerce operations (orders, products)
 - `MEDIA`: Image/video/3D asset generation
@@ -792,6 +847,7 @@ Tools are classified for safety and permission management:
 - `SECURITY`: Authentication, encryption, auditing
 
 **Severity Levels** (`ToolSeverity`):
+
 - `READ_ONLY`: No side effects (safe)
 - `LOW`: Minor side effects, easily reversible
 - `MEDIUM`: Moderate side effects, may require cleanup
@@ -799,6 +855,7 @@ Tools are classified for safety and permission management:
 - `DESTRUCTIVE`: Irreversible actions, requires confirmation
 
 **Example Tool Registration**:
+
 ```python
 from runtime.tools import ToolRegistry, ToolSpec, ToolCategory, ToolSeverity
 
@@ -825,10 +882,11 @@ registry.register(ToolSpec(
 ## 🔐 Security & Compliance
 
 ### Crypto Contracts
+
 ```python
 # Encryption MUST support:
 # - str
-# - bytes  
+# - bytes
 # - dict (via stable JSON serialization)
 
 def encrypt(data: Union[str, bytes, dict]) -> bytes:
@@ -836,7 +894,7 @@ def encrypt(data: Union[str, bytes, dict]) -> bytes:
     if isinstance(data, dict):
         data = json.dumps(data, sort_keys=True)
     # ... implementation
-    
+
 def decrypt(ciphertext: bytes) -> str:
     """Decrypt and return as string by default."""
     # ... implementation
@@ -847,6 +905,7 @@ def decrypt_bytes(ciphertext: bytes) -> bytes:
 ```
 
 ### GDPR Endpoints
+
 - `GET /api/v1/gdpr/export` - Right of Access (Article 15)
 - `DELETE /api/v1/gdpr/delete` - Right to Erasure (Article 17)
 - `GET /api/v1/gdpr/retention-policy` - Right to Information (Article 13)
@@ -856,6 +915,7 @@ def decrypt_bytes(ciphertext: bytes) -> bytes:
 ## 📦 3D Asset Pipeline
 
 ### Production-Safe Pattern
+
 ```python
 class ThreeDAssetPipeline:
     async def generate(
@@ -865,10 +925,10 @@ class ThreeDAssetPipeline:
         idempotency_key: Optional[str] = None
     ) -> ThreeDAsset:
         """Generate 3D asset with retries and validation.
-        
+
         Returns:
             ThreeDAsset with validated polycount and texture size.
-            
+
         Raises:
             AssetGenerationError: If generation fails after retries.
             AssetValidationError: If output doesn't meet quality standards.
@@ -877,10 +937,10 @@ class ThreeDAssetPipeline:
         # Output validation (polycount, texture size)
         # WP media upload integration
         # WooCommerce product attachment
-        
+
     async def validate_output(self, asset: ThreeDAsset) -> ValidationResult:
         """Validate 3D asset meets quality standards.
-        
+
         Checks:
         - Polycount within acceptable range (stub acceptable)
         - Texture size appropriate for web (stub acceptable)
@@ -893,6 +953,7 @@ class ThreeDAssetPipeline:
 ## 🚀 Deployment Workflow
 
 ### Pre-Commit Checklist
+
 - [ ] Run formatters: `isort . && ruff check . --fix && black .`
 - [ ] Type check: `mypy .`
 - [ ] Run tests: `pytest`
@@ -901,9 +962,11 @@ class ThreeDAssetPipeline:
 - [ ] No TODO/FIXME/placeholder strings
 
 ### Vercel Deployment (Serverless)
+
 DevSkyy uses Vercel for serverless deployment with Next.js frontend. The Python backend is deployed separately (via Docker or other hosting).
 
 **Configuration**: `vercel.json`
+
 ```json
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
@@ -942,6 +1005,7 @@ DevSkyy uses Vercel for serverless deployment with Next.js frontend. The Python 
 **Note**: The `rootDirectory: "frontend"` setting tells Vercel to deploy only the Next.js application from the frontend directory. Backend API calls are proxied to a separate backend deployment via the `BACKEND_URL` environment variable.
 
 **Environment Variables** (set in Vercel dashboard):
+
 - `BACKEND_URL`: URL of the Python backend API (required for API rewrites)
 - All LLM API keys (OpenAI, Anthropic, Google, etc.)
 - Database connection strings (use Neon PostgreSQL for serverless)
@@ -949,6 +1013,7 @@ DevSkyy uses Vercel for serverless deployment with Next.js frontend. The Python 
 - Secrets (JWT, encryption keys)
 
 **Deployment Commands**:
+
 ```bash
 # Deploy to production
 vercel --prod
@@ -961,12 +1026,14 @@ vercel ls
 ```
 
 **Important Limitations**:
+
 - Lambda timeout: 60 seconds max (configurable in vercel.json)
 - Lambda size: 50MB max (use layers for large dependencies)
 - Cold starts: First request may be slow (~2-3s)
 - Stateless: No file system persistence (use S3/Cloudflare R2)
 
 ### Docker Deployment (Traditional)
+
 For environments requiring long-running processes or state:
 
 ```bash
@@ -984,6 +1051,7 @@ docker-compose down
 ```
 
 ### CI/CD Pipeline (.github/workflows/ci.yml)
+
 ```yaml
 name: CI
 on: [push, pull_request]
@@ -1030,6 +1098,7 @@ jobs:
 **Types**: feat, fix, docs, style, refactor, perf, test, chore
 
 **Example**:
+
 ```
 feat(agents): implement Tool Runtime Layer
 
@@ -1047,11 +1116,13 @@ Breaking: Agents now require ToolRegistry injection
 ## 📊 Monitoring & Observability
 
 ### Prometheus Metrics
+
 DevSkyy exposes Prometheus metrics for monitoring:
 
 **Endpoint**: `/metrics` (production) or `http://localhost:8000/metrics` (local)
 
 **Key Metrics**:
+
 - `http_requests_total`: Total HTTP requests by method, path, status
 - `http_request_duration_seconds`: Request duration histogram
 - `agent_executions_total`: Agent execution count by agent_id, status
@@ -1062,6 +1133,7 @@ DevSkyy exposes Prometheus metrics for monitoring:
 - `cache_hits_total`, `cache_misses_total`: Cache performance
 
 **Example Prometheus Query**:
+
 ```promql
 # Request rate per minute
 rate(http_requests_total[1m])
@@ -1074,13 +1146,14 @@ sum(rate(agent_executions_total{status="success"}[5m])) / sum(rate(agent_executi
 ```
 
 ### Structured Logging
+
 All logs use structured logging (JSON) for easy parsing:
 
 ```python
 import structlog
 
 logger = structlog.get_logger()
-logger.info("agent_execution_started", 
+logger.info("agent_execution_started",
     agent_id="commerce_agent",
     correlation_id="abc123",
     task="create_product"
@@ -1088,6 +1161,7 @@ logger.info("agent_execution_started",
 ```
 
 **Log Levels**:
+
 - `DEBUG`: Development debugging
 - `INFO`: Normal operations, audit trail
 - `WARNING`: Recoverable errors, degraded performance
@@ -1095,7 +1169,9 @@ logger.info("agent_execution_started",
 - `CRITICAL`: System-level failures
 
 ### Security Audit Logs
+
 All security-relevant events are logged to `security/audit_log.py`:
+
 - Authentication attempts (success/failure)
 - Authorization decisions
 - Secret access (encryption keys, API keys)
@@ -1103,6 +1179,7 @@ All security-relevant events are logged to `security/audit_log.py`:
 - Configuration changes
 
 **Example Audit Log Entry**:
+
 ```json
 {
   "timestamp": "2024-12-20T23:57:00Z",
@@ -1114,12 +1191,15 @@ All security-relevant events are logged to `security/audit_log.py`:
 ```
 
 ### Health Checks
+
 **Endpoints**:
+
 - `GET /health` - Basic health check (returns 200 if app is running)
 - `GET /health/ready` - Readiness check (database, Redis, etc.)
 - `GET /health/live` - Liveness check (minimal dependencies)
 
 **Use in Kubernetes**:
+
 ```yaml
 livenessProbe:
   httpGet:
@@ -1141,6 +1221,7 @@ readinessProbe:
 ## 🎓 Learning Resources
 
 ### Fashion Domain
+
 - PDP (Product Detail Page) vs Collection layout logic
 - Image hierarchy: hero → lifestyle → detail shots
 - Typography hierarchy: display → heading → body → caption
@@ -1148,6 +1229,7 @@ readinessProbe:
 - Color palette psychology in fashion
 
 ### ML/AI
+
 - Model registry with version control
 - Distributed caching strategies (Redis + in-memory)
 - SHAP-based explainability
@@ -1155,6 +1237,7 @@ readinessProbe:
 - Continuous retraining pipelines
 
 ### WordPress/Elementor
+
 - REST API authentication patterns
 - Media upload with proper MIME types
 - Shoptimizer 2.9.0 theme integration
@@ -1166,6 +1249,7 @@ readinessProbe:
 ## ⚠️ Common Pitfalls
 
 ### DON'T
+
 - ❌ Return placeholder strings in agent logic
 - ❌ Use mutable defaults (list=[], dict={})
 - ❌ Ignore failing tests
@@ -1175,6 +1259,7 @@ readinessProbe:
 - ❌ Skip documentation updates
 
 ### DO
+
 - ✅ Write tests before implementation (TDD)
 - ✅ Use type hints everywhere
 - ✅ Validate inputs with Pydantic
@@ -1188,6 +1273,7 @@ readinessProbe:
 ## 🔄 Workflow: Explore → Plan → Code → Commit
 
 ### 1. Explore Phase
+
 ```bash
 # Ask Claude to read relevant files
 read devskyy_mcp.py operations.py
@@ -1198,9 +1284,10 @@ read DEVSKYY_MASTER_PLAN.md
 ```
 
 ### 2. Plan Phase
+
 ```bash
 # Use extended thinking for complex problems
-"Think hard about implementing the Tool Runtime Layer. 
+"Think hard about implementing the Tool Runtime Layer.
 Consider:
 - How existing agents will migrate
 - What interfaces need to change
@@ -1211,6 +1298,7 @@ Create a detailed plan as a GitHub issue."
 ```
 
 ### 3. Code Phase
+
 ```bash
 # Implement with TDD
 "Now implement the Tool Runtime Layer following the plan.
@@ -1222,6 +1310,7 @@ Create a detailed plan as a GitHub issue."
 ```
 
 ### 4. Commit Phase
+
 ```bash
 # Git operations
 "Commit the changes with a descriptive message following our format.
@@ -1236,9 +1325,10 @@ Then create a PR with:
 ## 🎯 Current Sprint Focus
 
 ### Immediate Priorities (Next 7 Days)
+
 1. **Run test suite** → enumerate all failures
 2. **Fix security + crypto contract failures**
-3. **Fix packaging/import hygiene** 
+3. **Fix packaging/import hygiene**
 4. **Eliminate mutable defaults & typing leaks**
 5. **Implement Tool Runtime Layer**
 6. **Refactor Super Agents** to use Tool Runtime
@@ -1248,6 +1338,7 @@ Then create a PR with:
 10. **Align documentation & CI**
 
 ### Success Metrics
+
 - [ ] pytest passes with zero unexpected failures
 - [ ] All crypto methods exist and handle str/bytes/dict
 - [ ] Tool Runtime Layer operational with tests
@@ -1263,6 +1354,7 @@ Then create a PR with:
 ## 💡 Tips for Working with Claude Code
 
 ### Use Subagents for Verification
+
 ```bash
 # For complex tasks, verify details with subagents
 "Before implementing, please use subagents to:
@@ -1272,6 +1364,7 @@ Then create a PR with:
 ```
 
 ### Course Correct Early
+
 ```bash
 # Press ESC to interrupt and redirect
 # Double-tap ESC to go back and edit prompt
@@ -1283,6 +1376,7 @@ Tool Runtime module first, then migrate agents one at a time."
 ```
 
 ### Use Checklists for Complex Tasks
+
 ```bash
 "Create a checklist in TOOL_RUNTIME_MIGRATION.md:
 - [ ] Create runtime/tools.py
@@ -1301,9 +1395,9 @@ Work through each item, checking off as you complete."
 ## 📞 Emergency Contacts
 
 - **Repository Owner**: damBruh (SkyyRose LLC)
-- **Primary Email**: support@skyyrose.com
+- **Primary Email**: <support@skyyrose.com>
 - **GitHub Issues**: Use for bugs/features
-- **Security Issues**: security@skyyrose.com (private disclosure)
+- **Security Issues**: <security@skyyrose.com> (private disclosure)
 
 ---
 
@@ -1329,7 +1423,8 @@ Work through each item, checking off as you complete."
 
 ---
 
-# REMEMBER:
+# REMEMBER
+
 - This is NOT a demo - every line must be production-ready
 - Correctness > Elegance > Performance
 - No stubs, no placeholders, no TODOs in production paths
