@@ -179,3 +179,17 @@ tripo-python-sdk/
 
 # Local tool configs
 .playwright-mcp/
+
+# Large product image assets (uploaded to WordPress)
+assets/enhanced_products/all/*.jpg
+assets/enhanced_products/all/*.jpeg
+assets/enhanced_products/all/*.png
+assets/enhanced_products/all/*.JPG
+assets/enhanced_products/all/*.JPEG
+assets/enhanced_products/all/*.PNG
+assets/2d-25d-assets/*.jpg
+assets/2d-25d-assets/*.jpeg
+assets/2d-25d-assets/*.png
+assets/2d-25d-assets/*.JPG
+assets/2d-25d-assets/*.JPEG
+assets/2d-25d-assets/*.PNG
