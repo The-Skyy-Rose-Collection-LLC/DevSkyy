@@ -94,7 +94,7 @@
 # Security (REQUIRED)
 JWT_SECRET_KEY=     # python -c "import secrets; print(secrets.token_urlsafe(64))"
 ENCRYPTION_MASTER_KEY=  # python -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
-DATABASE_URL=postgresql+asyncpg://user:pass@host/devskyy  # Use PostgreSQL in prod
+DATABASE_URL=postgresql+asyncpg://user:pass@host/devskyy  # Use PostgreSQL in prod  # pragma: allowlist secret
 
 # LLM (≥1 required): OPENAI, ANTHROPIC, GOOGLE_AI, MISTRAL, COHERE, GROQ
 # 3D/Visual: TRIPO_API_KEY, FASHN_API_KEY
@@ -227,6 +227,16 @@ def foo(items: list = []): pass  # ❌
 
 ---
 
-**Version**: 1.0.0 | **Updated**: 2024-12-20 | **Status**: Production Hardening
+**Version**: 1.0.0 | **Status**: Production Hardening | **Last Updated**: 2026-01-07
 
-**REMEMBER**: NOT a demo • Correctness > Elegance > Performance • No stubs/TODOs • TDD mandatory • Update this file as patterns emerge
+**Owner**: damBruh (SkyyRose LLC) | **Email**: <support@skyyrose.com> | **Security**: <security@skyyrose.com>
+
+---
+
+## REMEMBER
+
+- NOT a demo - production-ready only
+- Correctness > Elegance > Performance
+- No stubs, no placeholders, no TODOs
+- TDD mandatory
+- Update this file as patterns emerge
