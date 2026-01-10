@@ -186,7 +186,7 @@ jobs:
 
       - name: Notify Slack
         if: failure() && (github.ref == 'refs/heads/staging' || github.event_name == 'schedule')
-        uses: slackapi/slack-github-action@v1
+        uses: slackapi/slack-github-action@v2
         with:
           payload: |
             {
