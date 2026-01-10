@@ -19,7 +19,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Load .env file
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(project_root / ".env")
 
@@ -215,7 +215,7 @@ async def update_product_gallery(
             auth=aiohttp.BasicAuth(WC_KEY, WC_SECRET),
         ) as resp:
             if resp.status == 200:
-                result = await resp.json()
+                await resp.json()  # Consume response body
                 print(f"  ✓ Product {product_id} gallery updated ({len(all_images)} images)")
                 return True
             else:
@@ -399,8 +399,9 @@ async def main():
                     if result["success"]:
                         uploaded_images.append(result)
 
-                # Polite delay
-                await asyncio.sleep(0.5)
+                # Rate limit protection: WordPress returned 429 during testing
+                # Increase delay to 3 seconds between uploads to respect rate limits
+                await asyncio.sleep(3.0)
 
             # Step 2: Update WooCommerce product gallery
             if uploaded_images and product_name in product_map:

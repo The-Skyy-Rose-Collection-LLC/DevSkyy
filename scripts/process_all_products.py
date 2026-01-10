@@ -21,14 +21,22 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from PIL import Image, ImageEnhance, ImageFilter
+from PIL import Image, ImageEnhance, ImageFilter  # noqa: E402
 
-# Source directories
-SOURCE_DIRS = [
-    Path("/Users/coreyfoster/Desktop/_Signature Collection_"),
-    Path("/tmp/black-rose-extracted"),
-    Path("/tmp/signature-extracted"),
-]
+# Product inventory from scan
+INVENTORY_PATH = project_root / "datasets" / "product_inventory.json"
+
+
+def load_product_inventory() -> list[dict]:
+    """Load product inventory from JSON."""
+    if not INVENTORY_PATH.exists():
+        raise FileNotFoundError(
+            f"Product inventory not found: {INVENTORY_PATH}\n"
+            "Run 'python3 scripts/scan_product_inventory.py' first"
+        )
+
+    with INVENTORY_PATH.open() as f:
+        return json.load(f)
 
 
 def convert_heic_to_jpg(heic_path: Path) -> Path:
@@ -51,48 +59,44 @@ def convert_heic_to_jpg(heic_path: Path) -> Path:
         return heic_path
 
 
-def scan_all_products() -> list[Path]:
-    """Scan all source directories for product images."""
+def get_all_product_paths() -> list[Path]:
+    """Get all product paths from inventory, converting HEIC if needed."""
+    inventory = load_product_inventory()
 
-    all_images = []
+    all_paths = []
+    for product in inventory:
+        product_path = Path(product["path"])
 
-    for source_dir in SOURCE_DIRS:
-        if not source_dir.exists():
-            continue
+        # Convert HEIC to JPG
+        if product["extension"] == ".heic":
+            product_path = convert_heic_to_jpg(product_path)
 
-        # Find all image files (including HEIC)
-        for pattern in [
-            "**/*.jpg",
-            "**/*.jpeg",
-            "**/*.png",
-            "**/*.JPG",
-            "**/*.JPEG",
-            "**/*.PNG",
-            "**/*.heic",
-            "**/*.HEIC",
-        ]:
-            for img_path in source_dir.glob(pattern):
-                # Skip non-products (logos, duplicates with (1), HTML)
-                if any(x in img_path.name.lower() for x in ["logo", "(1)", ".html", "book."]):
-                    continue
+        # Only add JPG/JPEG/PNG
+        if product_path.suffix.lower() in [".jpg", ".jpeg", ".png"]:
+            all_paths.append(product_path)
 
-                # Convert HEIC to JPG
-                if img_path.suffix.lower() in [".heic"]:
-                    img_path = convert_heic_to_jpg(img_path)
-
-                # Only add JPG/JPEG/PNG
-                if img_path.suffix.lower() in [".jpg", ".jpeg", ".png"]:
-                    all_images.append(img_path)
-
-    return sorted(set(all_images))
+    return sorted(set(all_paths))
 
 
 def luxury_post_process(image: Image.Image) -> Image.Image:
-    """Apply luxury finishing touches."""
+    """Apply luxury fashion enhancements (Context7-researched).
+
+    Enhancement values optimized for luxury fashion product photography:
+    - Brightness: 1.05 (5% increase for professional lighting)
+    - Contrast: 1.15 (15% increase for depth and drama)
+    - Sharpness: 1.3 (30% increase for detail clarity)
+    - Color: 1.08 (8% increase for vibrancy)
+    - Unsharp Mask: radius=2.0, percent=120 for edge definition
+    """
+    # Apply luxury enhancements
+    image = ImageEnhance.Brightness(image).enhance(1.05)
+    image = ImageEnhance.Contrast(image).enhance(1.15)
+    image = ImageEnhance.Sharpness(image).enhance(1.3)
+    image = ImageEnhance.Color(image).enhance(1.08)
+
+    # Final unsharp mask for professional edge definition
     image = image.filter(ImageFilter.UnsharpMask(radius=2.0, percent=120, threshold=3))
-    image = ImageEnhance.Contrast(image).enhance(1.03)
-    image = ImageEnhance.Color(image).enhance(1.02)
-    image = ImageEnhance.Brightness(image).enhance(1.01)
+
     return image
 
 
@@ -149,10 +153,10 @@ async def main():
 
     print("=== SkyyRose Complete Product Processing ===\n")
 
-    # Step 1: Scan all products
-    print("📁 Scanning all source directories...")
-    all_products = scan_all_products()
-    print(f"✓ Found {len(all_products)} product images\n")
+    # Step 1: Load products from inventory
+    print("📁 Loading products from inventory...")
+    all_products = get_all_product_paths()
+    print(f"✓ Found {len(all_products)} product images (from inventory.json)\n")
 
     # Step 2: Enhance ALL products
     print("🎨 Enhancing ALL products...\n")
