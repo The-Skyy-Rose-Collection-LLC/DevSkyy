@@ -19,7 +19,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Load .env file
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(project_root / ".env")
 
@@ -27,7 +27,7 @@ print("=== SkyyRose 2D/2.5D Visualization Generator ===\n")
 
 try:
     import numpy as np
-    from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
+    from PIL import Image, ImageEnhance, ImageFilter, ImageOps
 except ImportError:
     print("Installing required packages...")
     import subprocess
@@ -182,7 +182,7 @@ def create_parallax_layers(image: Image.Image) -> Image.Image:
         cv2.drawContours(mask, [largest_contour], -1, 255, -1)
 
         # Blur mask edges for smooth transition
-        mask = cv2.GaussianBlur(mask, (21, 21), 0)
+        mask = cv2.GaussianBlur(mask, (21, 21), 0)  # type: ignore[assignment]
         mask_pil = Image.fromarray(mask).convert("L")
 
         # Create foreground and background layers
@@ -238,10 +238,10 @@ def create_enhanced_detail(image: Image.Image, sharpness: float = 2.0) -> Image.
     return enhanced
 
 
-def generate_all_variations(product_path: Path, output_dir: Path) -> dict:
+def generate_all_variations(product_path: Path, output_dir: Path) -> dict[str, Path | None]:
     """Generate all 4 variations for a product."""
 
-    results = {
+    results: dict[str, Path | None] = {
         "drop_shadow": None,
         "depth_effect": None,
         "parallax_layers": None,
@@ -311,21 +311,57 @@ def main():
         print(f"❌ Enhanced products directory not found: {ENHANCED_DIR}")
         return 1
 
-    # Get all enhanced product images
-    product_images = list(ENHANCED_DIR.glob("*.jpg"))
+    # Get all enhanced product images (all supported formats)
+    product_images: list[Path] = []
+    for ext in ["*.jpg", "*.jpeg", "*.JPG", "*.JPEG", "*.png", "*.PNG"]:
+        product_images.extend(ENHANCED_DIR.glob(ext))
+
+    print(f"Found {len(product_images)} total images")
+
+    # Filter to only clothing items (exclude accessories, logos, packaging)
+    # User specified: "those folders are not all clothing"
+    non_clothing_keywords = [
+        "logo",
+        "tag",
+        "label",
+        "package",
+        "box",
+        "bag",
+        "hanger",
+        "receipt",
+        "card",
+        "sticker",
+        "icon",
+        "banner",
+        "button",
+    ]
+
+    def is_clothing_item(path: Path) -> bool:
+        name_lower = path.stem.lower()
+        # Exclude obvious non-clothing items (return True if no keywords match)
+        return not any(kw in name_lower for kw in non_clothing_keywords)
+
+    product_images = [p for p in product_images if is_clothing_item(p)]
 
     if not product_images:
         print(f"❌ No product images found in: {ENHANCED_DIR}")
         return 1
 
-    print(f"Found {len(product_images)} products")
+    print(f"Filtered to {len(product_images)} clothing items")
     print(f"Generating 4 variations each = {len(product_images) * 4} total images\n")
+
+    # Try to use tqdm for progress bar
+    try:
+        from tqdm import tqdm
+
+        product_iter = tqdm(product_images, desc="Generating 2D/2.5D", unit="product")
+    except ImportError:
+        print("Note: Install tqdm for progress bars (pip install tqdm)\n")
+        product_iter = product_images
 
     total_generated = 0
 
-    for idx, product_path in enumerate(product_images, 1):
-        print(f"\n[{idx}/{len(product_images)}] Processing: {product_path.name}")
-
+    for product_path in product_iter:
         results = generate_all_variations(product_path, OUTPUT_DIR)
 
         # Count successful generations
