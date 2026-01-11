@@ -1,0 +1,15 @@
+# Ralph Progress Log - Interactive Collection Pages
+Started: 2026-01-11
+Project: DevSkyy Interactive Collection Pages for SkyyRose
+---
+
+## Codebase Patterns
+- Use Context7 for all library documentation research (resolve-library-id → query-docs)
+- Use Serena for all codebase navigation (find_symbol, search_for_pattern, read_file)
+- TypeScript strict mode enabled - all code must pass mypy
+- Three.js scenes in src/collections/ - lazy-load for performance
+- WordPress integration via wordpress/ client (BrandKit pattern)
+- 2D/2.5D assets in assets/2d-25d-assets/ with CSS classes for effects
+- SkyyRose brand DNA: primary #B76E79, luxury + rebellious
+- Ralph workflow: ONE story at a time → implement → test → commit → update PRD → append progress
+---
