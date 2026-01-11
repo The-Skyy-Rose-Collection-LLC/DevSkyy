@@ -370,3 +370,56 @@ async def upload_media(
         alt_text=alt_text,
         mime_type="image/png",
     )
+
+
+# ============================================================================
+# WooCommerce Product Endpoints
+# ============================================================================
+
+
+@wordpress_router.get("/wordpress/products/categories")
+async def list_product_categories(per_page: int = 100) -> list[dict[str, Any]]:
+    """List WooCommerce product categories."""
+    from wordpress.products import WooCommerceConfig, WooCommerceProducts
+
+    config = WooCommerceConfig.from_env()
+
+    async with WooCommerceProducts(config) as woo:
+        categories = await woo.list_categories(per_page=per_page)
+        return categories
+
+
+@wordpress_router.get("/wordpress/products")
+async def list_products(
+    per_page: int = 20,
+    page: int = 1,
+    status: str = "publish",
+    category: int | None = None,
+    search: str | None = None,
+) -> list[dict[str, Any]]:
+    """List WooCommerce products filtered by category."""
+    from wordpress.products import WooCommerceConfig, WooCommerceProducts
+
+    config = WooCommerceConfig.from_env()
+
+    async with WooCommerceProducts(config) as woo:
+        products = await woo.list(
+            per_page=per_page,
+            page=page,
+            status=status,
+            category=category,
+            search=search,
+        )
+        return products
+
+
+@wordpress_router.get("/wordpress/products/{product_id}")
+async def get_product(product_id: int) -> dict[str, Any]:
+    """Get a specific WooCommerce product."""
+    from wordpress.products import WooCommerceConfig, WooCommerceProducts
+
+    config = WooCommerceConfig.from_env()
+
+    async with WooCommerceProducts(config) as woo:
+        product = await woo.get(product_id)
+        return product
