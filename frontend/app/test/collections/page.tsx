@@ -21,14 +21,14 @@ export default function CollectionsTestPage() {
 
   const collection = COLLECTIONS[selectedCollection];
 
+  const { products, loading, error, retry } = useCollectionProducts({
+    categorySlug: collection?.categorySlug || '',
+    perPage: 20,
+  });
+
   if (!collection) {
     return <div>Collection not found</div>;
   }
-
-  const { products, loading, error, retry } = useCollectionProducts({
-    categorySlug: collection.categorySlug,
-    perPage: 20,
-  });
 
   const handleProductClick = (product: Product) => {
     setSelectedProduct(product);

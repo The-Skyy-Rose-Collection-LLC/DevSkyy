@@ -262,14 +262,14 @@ export default function LoveHurtsPage() {
       '@type': 'Product',
       position: index + 1,
       name: product.name,
-      description: product.short_description || product.description,
+      description: product.shortDescription || product.description,
       image: product.images[0]?.src || '',
       offers: {
         '@type': 'Offer',
         price: product.price,
         priceCurrency: 'USD',
-        availability: product.stock_status === 'instock' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
-        url: product.permalink,
+        availability: product.inStock ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+        url: `https://skyyrose.com/product/${product.slug}`,
       },
       brand: {
         '@type': 'Brand',

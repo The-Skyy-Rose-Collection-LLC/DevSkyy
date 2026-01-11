@@ -33,7 +33,7 @@ import {
   HIGH_QUALITY_CONFIG,
   MEDIUM_QUALITY_CONFIG,
   LOW_QUALITY_CONFIG
-} from '../config/threejs.config.js';
+} from '../lib/three/index.js';
 
 // ============================================================================
 // TYPES
