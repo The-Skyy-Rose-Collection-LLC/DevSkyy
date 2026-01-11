@@ -170,7 +170,7 @@
         "Core Web Vitals pass (LCP <2.5s, FID <100ms, CLS <0.1)",
         "Bundle size analysis (no >500KB chunks)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-012",
