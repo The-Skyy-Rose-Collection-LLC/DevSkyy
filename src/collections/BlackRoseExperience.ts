@@ -112,6 +112,8 @@ export class BlackRoseExperience {
   private petals: THREE.Object3D[] = [];
   private arbors: THREE.Group[] = [];
   private easterEggs: Map<string, THREE.Object3D> = new Map();
+  private nightSky: THREE.Mesh | null = null;
+  private clouds: THREE.Sprite[] = [];
 
   // State
   private animationId: number | null = null;
@@ -206,6 +208,12 @@ export class BlackRoseExperience {
   }
 
   private setupEnvironment(): void {
+    // Night sky with shader
+    this.createNightSky();
+
+    // Moving clouds
+    this.createMovingClouds();
+
     // Obsidian pathway
     const pathGeometry = new THREE.PlaneGeometry(4, 30);
     const pathMaterial = new THREE.MeshStandardMaterial({
@@ -288,6 +296,107 @@ export class BlackRoseExperience {
       };
       this.scene.add(petal);
       this.petals.push(petal);
+    }
+  }
+
+  /**
+   * Creates night sky with shader material (dark gradient from bottom to top)
+   */
+  private createNightSky(): void {
+    // Vertex shader for sky
+    const vertexShader = `
+      varying vec3 vWorldPosition;
+      void main() {
+        vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+        vWorldPosition = worldPosition.xyz;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `;
+
+    // Fragment shader for night sky gradient
+    const fragmentShader = `
+      uniform vec3 topColor;
+      uniform vec3 bottomColor;
+      uniform float offset;
+      uniform float exponent;
+      varying vec3 vWorldPosition;
+      void main() {
+        float h = normalize(vWorldPosition + offset).y;
+        gl_FragColor = vec4(mix(bottomColor, topColor, max(pow(max(h, 0.0), exponent), 0.0)), 1.0);
+      }
+    `;
+
+    const uniforms = {
+      topColor: { value: new THREE.Color(0x0a0a1a) },    // Deep dark blue (night)
+      bottomColor: { value: new THREE.Color(0x000000) }, // Pure black (horizon)
+      offset: { value: 400 },
+      exponent: { value: 0.6 },
+    };
+
+    const skyGeo = new THREE.SphereGeometry(500, 32, 15);
+    const skyMat = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      uniforms,
+      side: THREE.BackSide,
+    });
+
+    this.nightSky = new THREE.Mesh(skyGeo, skyMat);
+    this.scene.add(this.nightSky);
+  }
+
+  /**
+   * Creates moving cloud sprites (animated particles)
+   */
+  private createMovingClouds(): void {
+    const cloudCount = 12;
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) return;
+
+    // Create cloud texture (soft gradient)
+    const gradient = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
+    gradient.addColorStop(0, 'rgba(30, 30, 40, 0.8)');
+    gradient.addColorStop(0.5, 'rgba(20, 20, 30, 0.4)');
+    gradient.addColorStop(1, 'rgba(10, 10, 20, 0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 128, 128);
+
+    const cloudTexture = new THREE.CanvasTexture(canvas);
+    const cloudMaterial = new THREE.SpriteMaterial({
+      map: cloudTexture,
+      transparent: true,
+      opacity: 0.3,
+      depthWrite: false,
+    });
+
+    for (let i = 0; i < cloudCount; i++) {
+      const cloud = new THREE.Sprite(cloudMaterial.clone());
+
+      // Random position in sky
+      cloud.position.set(
+        (Math.random() - 0.5) * 100,
+        20 + Math.random() * 30,
+        (Math.random() - 0.5) * 100
+      );
+
+      // Random size
+      const scale = 15 + Math.random() * 20;
+      cloud.scale.set(scale, scale * 0.5, 1);
+
+      // Movement data
+      cloud.userData = {
+        speedX: Math.random() * 0.2 + 0.1,
+        speedZ: Math.random() * 0.1,
+        initialX: cloud.position.x,
+        initialZ: cloud.position.z,
+      };
+
+      this.scene.add(cloud);
+      this.clouds.push(cloud);
     }
   }
 
@@ -551,6 +660,20 @@ export class BlackRoseExperience {
       petal.rotation.x += rotationSpeed;
       petal.rotation.z += rotationSpeed * 0.5;
     }
+
+    // Animate clouds (slow drift across sky)
+    for (const cloud of this.clouds) {
+      const speedX = cloud.userData['speedX'] as number;
+      const speedZ = cloud.userData['speedZ'] as number;
+      cloud.position.x += speedX * 0.01;
+      cloud.position.z += speedZ * 0.01;
+
+      // Wrap around when clouds move too far
+      if (cloud.position.x > 50) cloud.position.x = -50;
+      if (cloud.position.x < -50) cloud.position.x = 50;
+      if (cloud.position.z > 50) cloud.position.z = -50;
+      if (cloud.position.z < -50) cloud.position.z = 50;
+    }
   }
 
   public start(): void {
@@ -623,6 +746,23 @@ export class BlackRoseExperience {
       this.scene.remove(arbor);
     });
     this.arbors = [];
+
+    // Dispose night sky
+    if (this.nightSky) {
+      disposeMesh(this.nightSky);
+      this.scene.remove(this.nightSky);
+      this.nightSky = null;
+    }
+
+    // Dispose clouds
+    this.clouds.forEach((cloud) => {
+      if (cloud.material) {
+        cloud.material.dispose();
+        if (cloud.material.map) cloud.material.map.dispose();
+      }
+      this.scene.remove(cloud);
+    });
+    this.clouds = [];
 
     // Dispose all remaining scene objects
     this.scene.traverse(disposeMesh);
