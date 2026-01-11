@@ -119,15 +119,24 @@ class PageType(str, Enum):
 
 @dataclass
 class BrandColors:
-    """Brand color palette."""
+    """Brand color palette with luxury enhancements."""
 
+    # Primary brand color
     primary: str = "#D4AF37"  # Rose gold
+    # Secondary brand color
     secondary: str = "#0D0D0D"  # Obsidian black
+    # Accent/highlight color
     accent: str = "#F5F5F0"  # Ivory
+    # Text colors
     text: str = "#1A1A1A"
     text_light: str = "#666666"
+    # Background colors
     background: str = "#FFFFFF"
     background_alt: str = "#F9F9F9"
+    # Luxury additions
+    dark: str = "#0D0D0D"  # Dark color for text/backgrounds
+    light: str = "#F5F5F0"  # Light color for backgrounds
+    glow: str = "rgba(183, 110, 121, 0.3)"  # Glow effect color (for hovers)
 
 
 @dataclass
@@ -236,6 +245,55 @@ class BrandKit:
 
 # Default SkyyRose brand kit
 SKYYROSE_BRAND_KIT = BrandKit()
+
+# Collection-specific brand kits with luxury color palettes
+COLLECTION_BRAND_KITS = {
+    "signature": BrandKit(
+        name="Signature Collection",
+        colors=BrandColors(
+            primary="#C9A962",  # Rose gold
+            secondary="#B76E79",  # Pink cloud
+            accent="#FFD700",  # Gold
+            text="#1A1A1A",
+            text_light="#666666",
+            background="#FFFFFF",
+            background_alt="#F9F9F9",
+            dark="#0D0D0D",
+            light="#F5F5F0",
+            glow="rgba(201, 169, 98, 0.3)",
+        ),
+    ),
+    "love-hurts": BrandKit(
+        name="Love Hurts Collection",
+        colors=BrandColors(
+            primary="#B76E79",  # Deep rose
+            secondary="#DC143C",  # Crimson
+            accent="#1a1a2e",  # Midnight
+            text="#1A1A1A",
+            text_light="#666666",
+            background="#FFFFFF",
+            background_alt="#F9F9F9",
+            dark="#0D0D0D",
+            light="#F5F5F0",
+            glow="rgba(220, 20, 60, 0.3)",
+        ),
+    ),
+    "black-rose": BrandKit(
+        name="Black Rose Collection",
+        colors=BrandColors(
+            primary="#C0C0C0",  # Cosmic silver
+            secondary="#0A0A0A",  # Obsidian
+            accent="#c8c8dc",  # Moonlight
+            text="#1A1A1A",
+            text_light="#666666",
+            background="#FFFFFF",
+            background_alt="#F9F9F9",
+            dark="#0D0D0D",
+            light="#F5F5F0",
+            glow="rgba(192, 192, 192, 0.3)",
+        ),
+    ),
+}
 
 
 # =============================================================================
