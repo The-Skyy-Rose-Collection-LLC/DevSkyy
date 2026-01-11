@@ -74,3 +74,39 @@ Project: DevSkyy Interactive Collection Pages for SkyyRose
 **Commit:** feat: COLL-002 - BLACK ROSE Three.js integration (f35483982)
 
 ---
+
+## [2026-01-11] - COLL-003: WordPress API Product Fetching
+
+**What was implemented:**
+- Created useCollectionProducts React hook for fetching products
+- Implemented in-memory caching with 5 min TTL
+- Added automatic retry with exponential backoff (1s, 2s, 3s)
+- Created WooCommerce API endpoints in api/wordpress.py
+- Added category resolution (slug → ID conversion)
+- Implemented loading and error states with manual retry/refetch
+
+**Files changed:**
+- `src/hooks/useCollectionProducts.ts` (NEW) - React hook with caching
+- `api/wordpress.py` (MODIFIED) - Added WooCommerce product endpoints
+- `.ralph/prd-interactive-collections.json` - Marked COLL-003 as passes: true
+
+**Learnings for future iterations:**
+- **React hook caching**: Use Map<string, CacheEntry> shared across instances, check timestamp vs TTL
+- **Retry pattern**: useRef for retry count, setTimeout with exponential backoff (1000 * retryCount)
+- **Category resolution**: Must fetch all categories first, find by slug, then use ID for product filter
+- **API structure**: Backend at `/api/v1/wordpress/products` proxies to WooCommerceProducts class
+- **Cleanup pattern**: useRef(isMounted) to prevent state updates after unmount
+- **Cache bypass**: refetch() bypasses cache by passing bypassCache=true flag
+- **Error handling**: Retry only on failure (not on category not found), max 3 attempts
+- **TypeScript Product interface**: Already exists in types/collections.ts (reused)
+
+**API Endpoints Added:**
+- GET `/wordpress/products/categories` - List all WooCommerce categories
+- GET `/wordpress/products?category=ID&per_page=20&status=publish` - List products
+- GET `/wordpress/products/{id}` - Get single product
+
+**TypeScript checks:** ✅ PASSED
+**Pre-commit hooks:** ✅ PASSED (after ruff format)
+**Commit:** feat: COLL-003 - WordPress API product fetching (a0f25aa3a)
+
+---
