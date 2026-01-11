@@ -13,3 +13,33 @@ Project: DevSkyy Interactive Collection Pages for SkyyRose
 - SkyyRose brand DNA: primary #B76E79, luxury + rebellious
 - Ralph workflow: ONE story at a time → implement → test → commit → update PRD → append progress
 ---
+
+## [2026-01-11] - COLL-001: Base Collection Layout Component
+
+**What was implemented:**
+- Created foundational React component for collection pages
+- Implemented luxury brand styling with inline styles (codebase pattern)
+- Built responsive layout with hero, 3D experience, product grid, and story sections
+- Defined TypeScript interfaces for Collection, CollectionTheme, Product
+- Created COLLECTIONS constant with BLACK_ROSE, SIGNATURE, LOVE_HURTS configurations
+
+**Files changed:**
+- `src/components/collections/CollectionLayout.tsx` (NEW) - Main layout component
+- `src/types/collections.ts` (NEW) - TypeScript interfaces and collection data
+- `.ralph/prd-interactive-collections.json` - Marked COLL-001 as passes: true
+- `.serena/memories/interactive_collection_pages_requirements.md` - User requirements reference
+
+**Learnings for future iterations:**
+- **Inline styles pattern**: DevSkyy uses inline style objects (not CSS-in-JS). See CartModal.tsx for reference.
+- **Responsive typography**: Use clamp() for fluid responsive text (e.g., `clamp(3rem, 8vw, 6rem)`)
+- **Collection theming**: Each collection has primaryColor, backgroundColor, textColor, accentColor
+- **Component structure**: Hero (100vh) → 3D Experience → Products → Story (vertical flow)
+- **Brand colors**: BLACK_ROSE (#1a1a1a), SIGNATURE (#d4af37 gold), LOVE_HURTS (#b76e79 rose)
+- **Type-safety**: All collection data is strongly typed with interfaces exported from types/collections.ts
+- **Three.js integration**: Experience components passed as ReactNode props for flexibility
+
+**TypeScript checks:** ✅ PASSED
+**Pre-commit hooks:** ✅ PASSED (after linting fixes)
+**Commit:** feat: COLL-001 - Create base collection layout component (725103a39)
+
+---
