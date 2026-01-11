@@ -183,7 +183,7 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
         <div style={styles.empty}>
           <div style={styles.emptyTitle}>No Products Found</div>
           <div style={styles.emptyMessage}>
-            This collection doesn't have any products yet.
+            This collection does not have any products yet.
           </div>
         </div>
       </div>

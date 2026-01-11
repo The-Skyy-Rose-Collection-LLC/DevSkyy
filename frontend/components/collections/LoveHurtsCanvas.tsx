@@ -66,11 +66,6 @@ export const LoveHurtsCanvas: React.FC<LoveHurtsCanvasProps> = ({
 
         experienceRef.current = experience;
 
-        // Set callbacks
-        if (onProductClick) {
-          experience.setOnProductClick(onProductClick);
-        }
-
         // Load products
         await experience.loadProducts(products);
 

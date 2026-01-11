@@ -391,7 +391,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           </h2>
 
           <div style={styles.price}>
-            ${typeof product.price === 'string' ? parseFloat(product.price).toFixed(2) : product.price.toFixed(2)}
+            ${parseFloat(product.price).toFixed(2)}
           </div>
 
           <div
