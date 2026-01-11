@@ -298,3 +298,72 @@ ProductGrid:
 
 ---
 
+## [2026-01-11] - COLL-007: LOVE_HURTS Collection Page
+
+**What was implemented:**
+- Created LoveHurtsCanvas.tsx - React wrapper with lazy loading
+- Created /collections/love-hurts route page with Beauty and the Beast theme
+- Integrated LoveHurtsExperience.ts (existing) - enchanted castle with:
+  * Three display types: hero (enchanted rose), mirror (lookbooks), floor (spotlights)
+  * Candlelight effects with warm red-orange glow (0xff6347, intensity 1.8)
+  * Stained glass reflections (crimson, rose, dark red palette)
+  * UnrealBloomPass post-processing (strength 1.5) for magical glow
+  * 100 magical particle effects
+  * Interactive elements: enchanted rose dome, castle mirrors, floating candelabras
+- Implemented product display type strategy:
+  * Hero product (index 0): center position (0, 2, 0) - enchanted rose under glass
+  * Mirror products (index 1-4): circular layout at radius 8, height 3 - lookbook displays
+  * Floor products (index 5+): circular layout at radius 6, height 0.5 - ballroom spotlight displays
+- Fixed module resolution (removed .js extensions from imports)
+- Verified page compilation and HTTP 200 response
+
+**Files changed:**
+- `src/components/collections/LoveHurtsCanvas.tsx` (NEW) - Source copy
+- `frontend/components/collections/LoveHurtsCanvas.tsx` (NEW) - Frontend copy
+- `frontend/app/collections/love-hurts/page.tsx` (NEW) - LOVE_HURTS route
+- `frontend/collections/LoveHurtsExperience.ts` (MODIFIED) - Import fixes
+- `.ralph/prd-interactive-collections.json` - Marked COLL-007 as passes: true
+
+**Learnings for future iterations:**
+- **Display type strategy**: Three-tier product showcase (hero, mirror, floor) based on index
+- **Hero display**: Single product at center, elevated (y=2), represents the "enchanted rose"
+- **Mirror display**: 4 products in circular layout using angle = ((index-1)/4) * 2π, radius 8, height 3
+- **Floor display**: Remaining products using angle = ((index-5)/remaining) * 2π, radius 6, height 0.5
+- **Circular layout pattern**: Math.cos(angle) * radius for x, Math.sin(angle) * radius for z
+- **Theme colors**: Dark burgundy background (0x0a0505), candlelight glow (0xff6347), stained glass (crimson/rose/dark red)
+- **Post-processing**: UnrealBloomPass creates magical glow effect, strength 1.5 for visible but not overwhelming bloom
+- **Particle count**: 100 particles for atmospheric effect without performance impact
+- **Product conversion**: WooCommerce → LoveHurtsProduct mapping requires displayType, position, lookbookImages
+- **Module resolution**: Consistent with COLL-006 - remove .js extensions for frontend compatibility
+
+**Component Architecture:**
+LoveHurtsCanvas (React):
+- Lazy-loaded LoveHurtsExperience via dynamic import
+- State management: isFullscreen, isLoading, error
+- Lifecycle: init → loadProducts → start → dispose
+- Fullscreen toggle with requestFullscreen API
+- Error boundary with user-friendly messaging
+- Loading state with "Loading LOVE HURTS Castle..." text
+
+love-hurts/page.tsx:
+- Fetches LOVE_HURTS category products via useCollectionProducts
+- Converts first 10 products to LoveHurtsProduct format
+- Implements 3-tier display type logic
+- Uses CollectionLayout with experienceComponent and productGridComponent props
+- Theme: dark burgundy, crimson accents, "Passion Meets Pain" tagline
+
+LoveHurtsExperience (Three.js):
+- Beauty and the Beast inspired enchanted castle
+- Candlelight lighting with warm red-orange tones
+- Stained glass reflections with crimson/rose/dark red palette
+- Interactive enchanted rose under glass dome
+- Castle mirrors for lookbook product displays
+- Floating candelabras with particle effects
+- UnrealBloomPass for magical glow
+
+**TypeScript checks:** ✅ PASSED
+**Pre-commit hooks:** ✅ PASSED
+**Page verification:** ✅ http://localhost:3001/collections/love-hurts (200 OK, 727 modules in 3s)
+**Commit:** feat: COLL-007 - LOVE_HURTS collection page (38ef28e1d)
+
+---

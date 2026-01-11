@@ -7,8 +7,9 @@
  * @component
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { ProductCard } from './ProductCard';
+import { ProductModal } from './ProductModal';
 import { ScrollAnimatedSection } from './ScrollAnimatedSection';
 import type { Product } from '../../types/collections';
 
@@ -40,6 +41,25 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
   onProductClick,
   accentColor = '#B76E79',
 }) => {
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const handleProductClick = (product: Product) => {
+    setSelectedProduct(product);
+    if (onProductClick) {
+      onProductClick(product);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setSelectedProduct(null);
+  };
+
+  const handleAddToCart = (product: Product) => {
+    console.log('Adding to cart:', product);
+    // TODO: Integrate with cart system
+    // For now, just close the modal after adding
+    alert(`Added "${product.name}" to cart!`);
+  };
   const styles = {
     container: {
       width: '100%',
@@ -205,13 +225,21 @@ export const ProductGrid: React.FC<ProductGridProps> = ({
             >
               <ProductCard
                 product={product}
-                {...(onProductClick && { onClick: onProductClick })}
+                onClick={handleProductClick}
                 accentColor={accentColor}
               />
             </ScrollAnimatedSection>
           ))}
         </div>
       </div>
+
+      {/* Product Quick-View Modal */}
+      <ProductModal
+        product={selectedProduct}
+        onClose={handleCloseModal}
+        onAddToCart={handleAddToCart}
+        accentColor={accentColor}
+      />
     </>
   );
 };
