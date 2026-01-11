@@ -452,3 +452,170 @@ ProductGrid Integration:
 **Commit:** feat: COLL-008 - Product quick-view modal (f99b075ea)
 
 ---
+## [2026-01-11] - COLL-009: Collection Filtering and Sorting
+
+**What was implemented:**
+- Created useProductFilters hook with URL parameter synchronization
+- Created FilterSidebar component for desktop with collapsible sections
+- Created FilterDrawer component for mobile with slide-in animation
+- Integrated filters into SIGNATURE and LOVE_HURTS collection pages
+- Implemented filtering by size, color, and price range
+- Implemented sorting by newest, price-low, price-high, popular
+- Added product count display and active filter indicators
+- Created shareable filtered views via URL parameters
+- Responsive design with sidebar (desktop) and drawer (mobile)
+
+**Files changed:**
+- `src/hooks/useProductFilters.ts` (NEW) - Filter hook with URL sync (277 lines)
+- `frontend/hooks/useProductFilters.ts` (NEW) - Frontend copy
+- `src/components/collections/FilterSidebar.tsx` (NEW) - Desktop sidebar (366 lines)
+- `frontend/components/collections/FilterSidebar.tsx` (NEW) - Frontend copy
+- `src/components/collections/FilterDrawer.tsx` (NEW) - Mobile drawer (243 lines)
+- `frontend/components/collections/FilterDrawer.tsx` (NEW) - Frontend copy
+- `frontend/app/collections/signature/page.tsx` (MODIFIED) - Filter integration
+- `frontend/app/collections/love-hurts/page.tsx` (MODIFIED) - Filter integration
+
+**Learnings for future iterations:**
+- **URL synchronization**: Use window.history.replaceState() to update URL without page reload
+- **URL parsing**: new URLSearchParams(window.location.search) to read params on mount
+- **Filter state**: useState with computed availableFilters from product attributes
+- **Attribute extraction**: Find product.attributes by name.toLowerCase() for size/color
+- **Price filtering**: parseFloat(product.price) comparison with [min, max] range
+- **Sort algorithms**: Array.sort with custom comparators for price/ID sorting
+- **Collapsible sections**: max-height animation (0 → 1000px) with overflow hidden
+- **Mobile drawer**: Portal rendering + slide-in animation (translateX 100% → 0)
+- **Responsive design**: CSS @media (max-width: 1024px) to toggle sidebar/drawer
+- **Active filters**: Computed hasActiveFilters flag (sizes.length + colors.length + price range)
+- **Filter count display**: Show count in mobile button badge
+- **Client-side guards**: typeof window !== 'undefined' for SSR compatibility
+- **Portal pattern**: createPortal(content, document.body) for overlay/drawer
+
+**useProductFilters Hook Architecture:**
+Input: products array, optional initialFilters
+Output: filters, filteredProducts, availableFilters, updateFilters, clearFilters, hasActiveFilters
+State: ProductFilters (sizes, colors, priceRange, sortBy)
+Effects:
+  1. Read URL params on mount (parseFiltersFromURL)
+  2. Write URL params on filter change (filtersToURLParams + replaceState)
+Computed:
+  - availableFilters: Extract unique attribute values from all products
+  - filteredProducts: Filter by matchesFilters, then sortProducts
+  - hasActiveFilters: Check if any filter is active
+Functions:
+  - updateFilters: Merge partial updates into state
+  - clearFilters: Reset to DEFAULT_FILTERS
+
+**FilterSidebar Component Architecture:**
+Props: filters, availableFilters, onUpdateFilters, onClearFilters, hasActiveFilters, accentColor
+State: expandedSections (sort, size, color, price)
+Sections:
+  1. Sort By: Radio buttons (newest/price-low/price-high/popular)
+  2. Size: Checkboxes (dynamic from availableFilters.sizes)
+  3. Color: Checkboxes (dynamic from availableFilters.colors)
+  4. Price Range: Min/max number inputs
+Features:
+  - Collapse/expand with rotate arrow (0deg → 180deg)
+  - Max-height animation (0 → 1000px, 0.3s ease)
+  - Active filter highlighting (accentColor for selected items)
+  - Clear All button (disabled when hasActiveFilters false)
+  - Sticky positioning (position: sticky, top: 0)
+
+**FilterDrawer Component Architecture:**
+Props: isOpen, onClose, filters, availableFilters, onUpdateFilters, onClearFilters, hasActiveFilters, accentColor
+State: None (controlled by parent isFilterOpen)
+Layout:
+  - Overlay (fixed, backdrop-blur, fadeIn animation)
+  - Drawer (fixed right, 90% width, max 400px, slideInRight animation)
+  - Header (title + close button)
+  - Content (FilterSidebar component reused)
+  - Footer (Clear button + Apply button)
+Features:
+  - Portal rendering at document.body
+  - Body scroll lock (document.body.style.overflow = 'hidden')
+  - ESC key to close
+  - Click overlay to close
+  - Slide-in animation (translateX 100% → 0, 0.3s ease-out)
+  - Fade-in overlay (opacity 0 → 1, 0.3s ease-out)
+
+**Collection Page Integration Pattern:**
+State:
+  - isFilterOpen: boolean for mobile drawer
+Hook:
+  - useProductFilters(products) → { filters, filteredProducts, availableFilters, updateFilters, clearFilters, hasActiveFilters }
+Components:
+  1. filterControls: Product count + mobile filter button
+  2. Desktop FilterSidebar (hidden on mobile)
+  3. ProductGrid with filteredProducts
+  4. Mobile FilterDrawer (portal)
+CSS:
+  - .desktop-filter { display: none } @media (max-width: 1024px)
+  - .mobile-filter-button { display: block } @media (max-width: 1024px)
+
+**Filter Logic Details:**
+Size Matching:
+  - Find attribute where name.toLowerCase() === 'size'
+  - Check if attribute.options includes any of filters.sizes
+  - If filters.sizes empty, skip check (include all)
+Color Matching:
+  - Find attribute where name.toLowerCase() === 'color' or 'colour'
+  - Check if attribute.options includes any of filters.colors
+  - If filters.colors empty, skip check (include all)
+Price Matching:
+  - Parse product.price as float
+  - Check if price >= priceRange[0] && price <= priceRange[1]
+  - Default range: [0, Infinity] (include all)
+
+**Sort Algorithms:**
+Newest (default):
+  - products.sort((a, b) => b.id - a.id)
+  - Assumes higher IDs are newer products
+Price Low to High:
+  - products.sort((a, b) => parseFloat(a.price) - parseFloat(b.price))
+Price High to Low:
+  - products.sort((a, b) => parseFloat(b.price) - parseFloat(a.price))
+Popular:
+  - products.sort((a, b) => a.id - b.id)
+  - Assumes lower IDs are more established/popular
+  - TODO: Replace with actual sales/view count data
+
+**URL Parameter Format:**
+- sizes: ?sizes=S,M,L (comma-separated)
+- colors: ?colors=Red,Blue,Black (comma-separated)
+- priceMin: ?priceMin=10 (number)
+- priceMax: ?priceMax=100 (number)
+- sortBy: ?sortBy=price-low (newest|price-low|price-high|popular)
+Example: ?sizes=M,L&colors=Red&priceMin=20&priceMax=50&sortBy=price-low
+Shareable: Copy URL to share exact filtered view
+
+**Animations:**
+Collapse/Expand (FilterSection):
+  - Arrow rotation: transform: rotate(0deg) → rotate(180deg) (0.3s ease)
+  - Content height: max-height: 0 → 1000px (0.3s ease)
+  - Overflow: hidden (prevents content overflow during animation)
+Mobile Drawer:
+  - Overlay fade: opacity 0 → 1 (0.3s ease-out)
+  - Drawer slide: transform: translateX(100%) → translateX(0) (0.3s ease-out)
+  - Backdrop blur: backdrop-filter: blur(4px)
+
+**Performance Considerations:**
+- useMemo for filteredProducts (only recalculates on products/filters change)
+- useMemo for availableFilters (only recalculates on products change)
+- useCallback for updateFilters/clearFilters (stable function references)
+- Passive scroll lock (no scroll handlers, just overflow: hidden)
+- Client-side only URL sync (no server-side rendering conflicts)
+
+**Accessibility:**
+- Semantic HTML (input type="checkbox", type="radio", type="number")
+- aria-label on close button
+- Keyboard navigation (Tab, Space, Enter for checkboxes/radios)
+- Focus management (auto-focus close button on drawer open)
+- ESC key to close drawer
+- Clear visual feedback (active states, hover effects)
+
+**TypeScript Checks:** ✅ PASSED
+**Pre-commit Hooks:** ✅ PASSED (trailing whitespace fixed)
+**Page Verification:** ✅ http://localhost:3001/collections/signature (463 modules, 200 OK)
+**Page Verification:** ✅ http://localhost:3001/collections/love-hurts (200 OK)
+**Commit:** feat: COLL-009 - Collection filtering and sorting (21c57e7bd)
+
+---
