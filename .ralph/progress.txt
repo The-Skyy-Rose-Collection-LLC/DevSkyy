@@ -367,3 +367,88 @@ LoveHurtsExperience (Three.js):
 **Commit:** feat: COLL-007 - LOVE_HURTS collection page (38ef28e1d)
 
 ---
+## [2026-01-11] - COLL-008: Product Quick-View Modal
+
+**What was implemented:**
+- Created ProductModal.tsx - Accessible modal component with Portal rendering
+- Integrated modal into ProductGrid with state management
+- Implemented image gallery with thumbnail navigation
+- Added keyboard navigation (ESC to close, arrow keys for images)
+- Implemented focus trap with Tab key handling
+- Added ARIA labels and semantic HTML for accessibility
+- Smooth fade-in and slide-up animations
+- Body scroll lock when modal is open
+- Add to cart functionality (placeholder implementation)
+
+**Files changed:**
+- `src/components/collections/ProductModal.tsx` (NEW) - Modal component
+- `frontend/components/collections/ProductModal.tsx` (NEW) - Frontend copy
+- `src/components/collections/ProductGrid.tsx` (MODIFIED) - Modal integration
+- `frontend/components/collections/ProductGrid.tsx` (MODIFIED) - Frontend copy
+- `.ralph/prd-interactive-collections.json` - Marked COLL-008 as passes: true
+
+**Learnings for future iterations:**
+- **Portal rendering**: Use `createPortal(content, document.body)` to render modal at root level
+- **Focus trap**: Track focusable elements and prevent Tab from leaving modal (shift+Tab for reverse)
+- **Keyboard events**: Single event listener on document for ESC, ArrowLeft, ArrowRight, Tab
+- **State management**: `selectedProduct` state controls modal visibility and content
+- **Image gallery**: `currentImageIndex` state + prev/next buttons + thumbnail clicks
+- **Smooth animations**: CSS @keyframes (fadeIn 0.2s, slideUp 0.3s) with ease-out timing
+- **Body scroll lock**: Set `document.body.style.overflow = 'hidden'` when modal opens
+- **ARIA attributes**: role="dialog", aria-modal="true", aria-labelledby, aria-label on buttons
+- **Focus management**: Auto-focus close button on mount using `closeButtonRef.current?.focus()`
+- **Event cleanup**: Return cleanup function from useEffect to remove listeners and restore scroll
+- **Accessibility**: WAI-ARIA Modal Authoring Practices compliance
+- **Responsive design**: Grid switches to 1 column on mobile (max-width: 768px)
+- **Price formatting**: Handle both string and number types with conditional parseFloat
+- **Modal overlay**: Click overlay to close, stopPropagation on modal content
+
+**Component Architecture:**
+ProductModal:
+- Portal rendering at document.body level
+- Props: product, onClose, onAddToCart, accentColor
+- State: currentImageIndex, isAnimating (for smooth transitions)
+- Refs: modalRef (focus trap), closeButtonRef (auto-focus)
+- useEffect 1: Reset image index when product changes
+- useEffect 2: Focus management + keyboard handlers + body scroll lock
+- navigateImage: Handles prev/next with wrap-around logic
+- handleAddToCart: Placeholder with console.log + alert
+- Sections: Close button (absolute, top-right), Image gallery (main + thumbs + nav buttons), Details (title, price, description, add-to-cart)
+
+ProductGrid Integration:
+- State: selectedProduct (Product | null)
+- handleProductClick: Sets selectedProduct and calls optional onProductClick callback
+- handleCloseModal: Clears selectedProduct
+- handleAddToCart: Placeholder implementation
+- Passes accentColor to modal for consistent theming
+
+**Accessibility Features:**
+- role="dialog" and aria-modal="true" on overlay
+- aria-labelledby pointing to product name (id="modal-title")
+- aria-label on all interactive buttons (close, prev, next, add-to-cart)
+- Focus trap: Tab cycles through modal elements only
+- Auto-focus close button on open
+- Keyboard shortcuts: ESC (close), Left/Right arrows (navigate images)
+- Semantic HTML: h2 for title, proper button elements
+- Screen reader friendly image counter
+
+**Animation Details:**
+- Overlay: fadeIn 0.2s ease-out (opacity 0 → 1)
+- Modal: slideUp 0.3s ease-out (opacity 0, translateY(30px) → opacity 1, translateY(0))
+- Image transitions: opacity 0.5 when animating (300ms)
+- Button hover effects: translateY(-2px), scale(1.1), box-shadow
+- Thumbnail hover: opacity 0.6 → 1
+- Add to cart hover: translateY(-2px) + dynamic box-shadow with accentColor
+
+**TypeScript Fixes:**
+- Price formatting: `parseFloat(product.price).toFixed(2)` for string prices
+- Type safety: Product | null for selectedProduct state
+- Event types: React.MouseEvent, KeyboardEvent for proper typing
+
+**TypeScript checks:** ✅ PASSED (price formatting fixed)
+**Pre-commit hooks:** ✅ PASSED (end-of-file fixed automatically)
+**Page verification:** ✅ http://localhost:3001/collections/signature (730 modules, 200 OK)
+**Page verification:** ✅ http://localhost:3001/collections/love-hurts (457 modules, 200 OK)
+**Commit:** feat: COLL-008 - Product quick-view modal (f99b075ea)
+
+---
