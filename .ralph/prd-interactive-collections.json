@@ -63,7 +63,7 @@
         "Lazy-load images below fold",
         "Verify in browser using dev-browser skill"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-005",
