@@ -1,0 +1,164 @@
+/**
+ * SkyyRose Luxury Design System
+ * Version: 2.0.0
+ * Based on NET-A-PORTER/SSENSE standards
+ */
+
+:root {
+    /* ========== Brand Colors ========== */
+    /* Signature Collection */
+    --rose-gold: #C9A962;
+    --pink-cloud: #B76E79;
+
+    /* Love Hurts Collection */
+    --deep-rose: #B76E79;
+    --crimson: #DC143C;
+    --midnight: #1a1a2e;
+
+    /* Black Rose Collection */
+    --cosmic-silver: #C0C0C0;
+    --obsidian: #0A0A0A;
+    --moonlight: #c8c8dc;
+
+    /* Neutrals */
+    --black: #0D0D0D;
+    --charcoal: #1A1A1A;
+    --ivory: #F5F5F0;
+    --white: #FFFFFF;
+
+    /* ========== Typography ========== */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Type Scale (Major Third: 1.250) */
+    --text-xs: 0.75rem;    /* 12px */
+    --text-sm: 0.875rem;   /* 14px */
+    --text-base: 1rem;     /* 16px */
+    --text-lg: 1.125rem;   /* 18px */
+    --text-xl: 1.25rem;    /* 20px */
+    --text-2xl: 1.563rem;  /* 25px */
+    --text-3xl: 1.953rem;  /* 31px */
+    --text-4xl: 2.441rem;  /* 39px */
+    --text-5xl: 3.052rem;  /* 49px */
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.6;
+    --leading-loose: 2;
+
+    /* ========== Spacing (8px base) ========== */
+    --space-1: 0.5rem;   /* 8px */
+    --space-2: 1rem;     /* 16px */
+    --space-3: 1.5rem;   /* 24px */
+    --space-4: 2rem;     /* 32px */
+    --space-6: 3rem;     /* 48px - Luxury product gaps */
+    --space-8: 4rem;     /* 64px */
+    --space-10: 5rem;    /* 80px - Section padding */
+    --space-12: 6rem;    /* 96px */
+    --space-15: 7.5rem;  /* 120px - Major sections */
+
+    /* ========== Elevation (Shadows) ========== */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.25);
+
+    /* ========== Transitions ========== */
+    --transition-fast: 150ms ease;
+    --transition-base: 300ms ease;
+    --transition-slow: 500ms ease;
+
+    /* ========== Breakpoints ========== */
+    --screen-sm: 640px;
+    --screen-md: 768px;
+    --screen-lg: 1024px;
+    --screen-xl: 1280px;
+    --screen-2xl: 1536px;
+}
+
+/* ========== Typography Classes ========== */
+.text-display {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+}
+
+.text-heading-1 {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+}
+
+.text-heading-2 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    line-height: var(--leading-normal);
+}
+
+.text-body-large {
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
+    font-weight: 400;
+    line-height: var(--leading-relaxed);
+}
+
+.text-body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 400;
+    line-height: var(--leading-relaxed);
+}
+
+.text-caption {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 400;
+    line-height: var(--leading-normal);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ========== Luxury Button Styles ========== */
+.btn-primary {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: var(--space-2) var(--space-6);
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: var(--white);
+    color: var(--black);
+}
+
+.btn-secondary {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: var(--space-2) var(--space-6);
+    background: transparent;
+    color: var(--black);
+    border: 2px solid var(--black);
+    transition: all var(--transition-base);
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: var(--black);
+    color: var(--white);
+}

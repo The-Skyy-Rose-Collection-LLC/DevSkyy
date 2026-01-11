@@ -1,0 +1,118 @@
+/**
+ * Luxury Overrides - Apply design system to WooCommerce defaults.
+ *
+ * Transforms generic WooCommerce layouts into luxury fashion e-commerce
+ * following NET-A-PORTER/SSENSE standards.
+ *
+ * @package SkyyRose_Immersive
+ * @version 2.0.0
+ */
+
+/* =============================================================================
+   Product Archives (Shop/Collection Pages)
+   ========================================================================== */
+
+.woocommerce ul.products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6, 3rem);  /* 48px luxury gaps */
+    padding: var(--space-10, 5rem) 0;  /* 80px vertical */
+}
+
+.woocommerce ul.products li.product {
+    margin: 0;  /* Remove default margins */
+    text-align: left;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: var(--text-2xl, 1.563rem);
+    font-weight: 600;
+    color: var(--black, #0D0D0D);
+    margin-top: var(--space-3, 1.5rem);
+    line-height: var(--leading-normal, 1.5);
+}
+
+.woocommerce ul.products li.product .price {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: 600;
+    color: var(--rose-gold, #C9A962);
+    margin-top: var(--space-2, 1rem);
+}
+
+/* === Single Product Pages === */
+.woocommerce div.product {
+    padding: var(--space-10, 5rem) 0;
+}
+
+.woocommerce div.product .product_title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: var(--text-4xl, 2.441rem);
+    font-weight: 600;
+    line-height: var(--leading-tight, 1.2);
+    color: var(--black, #0D0D0D);
+    margin-bottom: var(--space-4, 2rem);
+}
+
+.woocommerce div.product .woocommerce-product-details__short-description {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--charcoal, #1A1A1A);
+    margin-bottom: var(--space-6, 3rem);
+}
+
+/* === Add to Cart Button === */
+.woocommerce .single_add_to_cart_button {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: var(--black, #0D0D0D);
+    color: var(--white, #FFFFFF);
+    border: 2px solid var(--black, #0D0D0D);
+    padding: var(--space-2, 1rem) var(--space-6, 3rem);
+    transition: all var(--transition-base, 300ms ease);
+}
+
+.woocommerce .single_add_to_cart_button:hover {
+    background: var(--white, #FFFFFF);
+    color: var(--black, #0D0D0D);
+}
+
+/* =============================================================================
+   Scroll Animations
+   ========================================================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+}
+
+/* === Mobile Optimization (<768px) === */
+@media (max-width: 768px) {
+    .woocommerce ul.products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);  /* Reduce to 24px on mobile */
+    }
+
+    .woocommerce div.product .product_title {
+        font-size: var(--text-3xl);  /* Smaller on mobile */
+    }
+
+    .luxury-product-card .card-title {
+        font-size: var(--text-xl);
+    }
+}
