@@ -31,7 +31,7 @@
         "Mobile-optimized (canvas resizing)",
         "Verify in browser using dev-browser skill"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-003",

@@ -43,3 +43,34 @@ Project: DevSkyy Interactive Collection Pages for SkyyRose
 **Commit:** feat: COLL-001 - Create base collection layout component (725103a39)
 
 ---
+
+## [2026-01-11] - COLL-002: BLACK ROSE Three.js Integration
+
+**What was implemented:**
+- Created BlackRoseCanvas.tsx - React wrapper component with lazy loading
+- Created RotatingBlackRoseLogo.tsx - CSS 3D rotating logo for header
+- Enhanced BlackRoseExperience.ts with night sky and moving clouds
+- Implemented fullscreen toggle button with smooth transitions
+- Added error handling and loading states for 3D scene
+
+**Files changed:**
+- `src/components/collections/BlackRoseCanvas.tsx` (NEW) - React component wrapper
+- `src/components/collections/RotatingBlackRoseLogo.tsx` (NEW) - Rotating header logo
+- `src/collections/BlackRoseExperience.ts` (MODIFIED) - Added night sky + clouds
+- `.ralph/prd-interactive-collections.json` - Marked COLL-002 as passes: true
+
+**Learnings for future iterations:**
+- **Lazy loading pattern**: Use dynamic import `await import('../../collections/BlackRoseExperience')` for code-splitting
+- **Night sky shader**: SphereGeometry(500) + ShaderMaterial(BackSide) with vertical gradient (topColor: #0a0a1a, bottomColor: #000000)
+- **Moving clouds**: Canvas-based sprite textures with radial gradient, 12 sprites, wrap-around at ±50 units
+- **CSS 3D rotation**: `transform-style: preserve-3d` + `rotateY(360deg)` animation for logo
+- **Fullscreen API**: Use `requestFullscreen()` / `exitFullscreen()` with error handling
+- **Three.js disposal**: Must dispose nightSky mesh, cloud sprites, and their materials/textures
+- **Cloud animation**: Update cloud.position in animate loop, wrap coordinates for infinite effect
+- **Shader uniforms**: topColor/bottomColor/offset/exponent control gradient appearance
+
+**TypeScript checks:** ✅ PASSED
+**Pre-commit hooks:** ✅ PASSED (after whitespace fixes)
+**Commit:** feat: COLL-002 - BLACK ROSE Three.js integration (f35483982)
+
+---
