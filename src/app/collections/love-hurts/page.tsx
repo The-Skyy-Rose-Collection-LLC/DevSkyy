@@ -10,9 +10,31 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { CollectionLayout } from '../../../components/collections/CollectionLayout';
-import { LoveHurtsCanvas } from '../../../components/collections/LoveHurtsCanvas';
 import { ProductGrid } from '../../../components/collections/ProductGrid';
+
+// Dynamic import for Three.js component (code splitting)
+const LoveHurtsCanvas = dynamic(
+  () => import('../../../components/collections/LoveHurtsCanvas').then(mod => ({ default: mod.LoveHurtsCanvas })),
+  {
+    loading: () => (
+      <div style={{
+        width: '100%',
+        height: '600px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1a1a1a',
+        color: '#8B4789',
+        fontSize: '1.2rem',
+      }}>
+        Loading 3D Experience...
+      </div>
+    ),
+    ssr: false, // Disable server-side rendering for Three.js
+  }
+);
 import { FilterSidebar } from '../../../components/collections/FilterSidebar';
 import { FilterDrawer } from '../../../components/collections/FilterDrawer';
 import { useCollectionProducts } from '../../../hooks/useCollectionProducts';
