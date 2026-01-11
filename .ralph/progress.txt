@@ -110,3 +110,65 @@ Project: DevSkyy Interactive Collection Pages for SkyyRose
 **Commit:** feat: COLL-003 - WordPress API product fetching (a0f25aa3a)
 
 ---
+
+## [2026-01-11] - COLL-004: Product Grid with CSS Parallax Effects
+
+**What was implemented:**
+- Created ProductCard component with mouse-tracking parallax
+- Built ProductGrid responsive layout (CSS Grid auto-fill)
+- Created test page at /test/collections for integration demo
+- Implemented loading, error, and empty states
+- Added Quick View overlay with slide-up animation
+- Sale badge for discounted products
+
+**Files changed:**
+- `src/components/collections/ProductCard.tsx` (NEW) - Card with parallax hover
+- `src/components/collections/ProductGrid.tsx` (NEW) - Responsive grid layout
+- `src/app/test/collections/page.tsx` (NEW) - Test page for demo
+- `.ralph/prd-interactive-collections.json` - Marked COLL-004 as passes: true
+
+**Learnings for future iterations:**
+- **CSS parallax pattern**: Track mouse position (clientX/Y relative to element), convert to -0.5 to 0.5 range, multiply by max pixels
+- **Mouse position state**: useState for {x, y}, update in onMouseMove, reset in onMouseLeave
+- **Transform combination**: `translate(${x}px, ${y}px) scale(${scale})` for smooth parallax + zoom
+- **Dynamic shadows**: Interpolate box-shadow blur/spread based on hover state (10px → 30px)
+- **Responsive grid**: `grid-template-columns: repeat(auto-fill, minmax(300px, 1fr))` for auto-responsive
+- **Media queries in React**: Use <style> tag with CSS for breakpoints (can't do in inline styles)
+- **Lazy loading**: `loading="lazy"` attribute on <img> for below-fold images
+- **Quick View pattern**: Absolute position with transform translateY (hover: 0, default: 20px) + opacity transition
+- **Sale badge**: Absolute position top-right with theme accent color
+- **Modal pattern**: Fixed overlay with stopPropagation on content to prevent close on inner click
+- **Test page structure**: Collection switcher → stats → grid → modal (demonstrates full flow)
+- **No pre-generated assets**: All effects are pure CSS - no 2D/2.5D asset files needed
+
+**Component Features:**
+
+ProductCard:
+- Mouse-tracking parallax (20px max movement)
+- Scale on hover (1.05x)
+- Dynamic shadow (10px → 30px blur)
+- Gradient overlay fade-in
+- Quick View slide-up button
+- Sale badge (conditional)
+- Lazy-loaded images
+
+ProductGrid:
+- CSS Grid responsive (3 → 2 → 1 cols)
+- Loading spinner with rotation animation
+- Error state with retry button
+- Empty state messaging
+- Hover effects on retry button
+
+**Test Page:**
+- URL: http://localhost:3000/test/collections
+- Collection switcher (BLACK_ROSE, SIGNATURE, LOVE_HURTS)
+- Live stats (product count, status)
+- Product modal with Add to Cart
+- Full useCollectionProducts integration
+
+**TypeScript checks:** ✅ PASSED
+**Pre-commit hooks:** ✅ PASSED (after whitespace fixes)
+**Frontend server:** ✅ RUNNING on http://localhost:3000
+**Commit:** feat: COLL-004 - Product grid with CSS parallax effects (3c1486665)
+
+---
