@@ -1,0 +1,191 @@
+{
+  "branchName": "ralph/interactive-collections",
+  "feature": "Interactive Collection Pages for SkyyRose",
+  "description": "Build production-ready interactive collection pages (BLACK_ROSE, SIGNATURE, LOVE_HURTS) with Three.js 3D experiences, luxury animations, and WordPress integration",
+  "userStories": [
+    {
+      "id": "COLL-001",
+      "priority": 1,
+      "title": "Create base collection page layout component",
+      "description": "Build the foundational React component for collection pages with luxury brand styling",
+      "acceptanceCriteria": [
+        "Component located at src/components/collections/CollectionLayout.tsx",
+        "Includes hero section, product grid, and 3D experience sections",
+        "Uses SkyyRose brand colors (primary: #B76E79)",
+        "Responsive design (mobile, tablet, desktop)",
+        "TypeScript with proper type definitions",
+        "Passes all type checks"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-002",
+      "priority": 2,
+      "title": "Integrate BLACK_ROSE Three.js experience",
+      "description": "Embed the existing BLACK_ROSE Three.js scene into the collection page",
+      "acceptanceCriteria": [
+        "Uses existing src/collections/black-rose/ code",
+        "3D scene loads without errors",
+        "Lazy-loaded for performance",
+        "Full-screen toggle button works",
+        "Mobile-optimized (canvas resizing)",
+        "Verify in browser using dev-browser skill"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-003",
+      "priority": 3,
+      "title": "Fetch products from WordPress API",
+      "description": "Connect to WordPress/WooCommerce API to fetch collection products dynamically",
+      "acceptanceCriteria": [
+        "Uses existing wordpress/ client code",
+        "Fetches products filtered by collection category",
+        "Handles loading states",
+        "Handles error states with retry",
+        "Caches responses (5 min TTL)",
+        "TypeScript interfaces for product data",
+        "Tests pass"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-004",
+      "priority": 4,
+      "title": "Build product grid with 2D/2.5D assets",
+      "description": "Display products in luxury grid layout with hover effects using 2D/2.5D variations",
+      "acceptanceCriteria": [
+        "Grid layout (3 cols desktop, 2 tablet, 1 mobile)",
+        "Product cards show: image, name, price, quick-view",
+        "Uses 2D/2.5D assets from assets/2d-25d-assets/",
+        "Parallax effect on hover",
+        "Smooth transitions (300ms ease-out)",
+        "Lazy-load images below fold",
+        "Verify in browser using dev-browser skill"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-005",
+      "priority": 5,
+      "title": "Add luxury scroll animations",
+      "description": "Implement scroll-triggered animations for premium feel",
+      "acceptanceCriteria": [
+        "Fade-in on scroll (IntersectionObserver)",
+        "Stagger animations for product cards",
+        "Smooth parallax backgrounds",
+        "60fps performance (no jank)",
+        "Respects prefers-reduced-motion",
+        "Verify animations in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-006",
+      "priority": 6,
+      "title": "Create SIGNATURE collection page",
+      "description": "Build SIGNATURE collection page using shared components from COLL-001 to COLL-005",
+      "acceptanceCriteria": [
+        "Reuses CollectionLayout component",
+        "Integrates src/collections/signature/ Three.js",
+        "Fetches SIGNATURE category products",
+        "Unique color scheme (luxe gold/cream)",
+        "All features from previous stories work",
+        "Verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-007",
+      "priority": 7,
+      "title": "Create LOVE_HURTS collection page",
+      "description": "Build LOVE_HURTS collection page with rebellious luxury theme",
+      "acceptanceCriteria": [
+        "Reuses CollectionLayout component",
+        "Integrates src/collections/love-hurts/ Three.js",
+        "Fetches LOVE_HURTS category products",
+        "Unique color scheme (dark red/black)",
+        "All features from previous stories work",
+        "Verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-008",
+      "priority": 8,
+      "title": "Add product quick-view modal",
+      "description": "Implement modal for quick product preview without leaving collection page",
+      "acceptanceCriteria": [
+        "Modal opens on product card click",
+        "Shows: images, description, price, add-to-cart",
+        "Image gallery with thumbnails",
+        "Keyboard navigation (ESC to close, arrows)",
+        "Accessible (ARIA labels, focus management)",
+        "Smooth open/close transitions",
+        "Verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-009",
+      "priority": 9,
+      "title": "Implement collection filtering/sorting",
+      "description": "Add filters (size, color, price) and sorting (newest, price) to collection pages",
+      "acceptanceCriteria": [
+        "Filter sidebar (desktop) or drawer (mobile)",
+        "Filters: size, color, price range",
+        "Sorting: newest, price-low, price-high, popular",
+        "URL params for shareable filtered views",
+        "Filter animations (collapse/expand)",
+        "Clear all filters button",
+        "Verify in browser"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-010",
+      "priority": 10,
+      "title": "Add SEO metadata and Open Graph",
+      "description": "Implement SEO best practices for collection pages",
+      "acceptanceCriteria": [
+        "Unique title/description per collection",
+        "Open Graph tags for social sharing",
+        "JSON-LD structured data (Product, BreadcrumbList)",
+        "Canonical URLs",
+        "Image alt tags from WordPress",
+        "Passes Lighthouse SEO audit (95+)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-011",
+      "priority": 11,
+      "title": "Performance optimization",
+      "description": "Optimize collection pages for production performance",
+      "acceptanceCriteria": [
+        "Code splitting for Three.js scenes",
+        "Image optimization (WebP, AVIF fallbacks)",
+        "Prefetch critical resources",
+        "Lighthouse Performance score 90+",
+        "Core Web Vitals pass (LCP <2.5s, FID <100ms, CLS <0.1)",
+        "Bundle size analysis (no >500KB chunks)"
+      ],
+      "passes": false
+    },
+    {
+      "id": "COLL-012",
+      "priority": 12,
+      "title": "Deploy to production and WordPress embed",
+      "description": "Deploy collection pages to Vercel and embed in skyyrose.com",
+      "acceptanceCriteria": [
+        "Vercel deployment succeeds",
+        "Custom domain routes (/collections/black-rose, etc.)",
+        "WordPress pages created with iframes",
+        "SSL certificates valid",
+        "Analytics tracking (Prometheus metrics)",
+        "Verify live on skyyrose.com"
+      ],
+      "passes": false
+    }
+  ]
+}
