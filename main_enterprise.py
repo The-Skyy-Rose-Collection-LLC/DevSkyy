@@ -32,6 +32,7 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
+import sentry_sdk
 import structlog
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -120,6 +121,32 @@ async def lifespan(app: FastAPI):
         environment=os.getenv("ENVIRONMENT", "development"),
         log_format="json" if json_output_bool else "console",
     )
+
+    # Initialize Sentry with user-provided DSN
+    sentry_dsn = os.getenv(
+        "SENTRY_DSN",
+        "https://5ddc352ad3ae6cf5e0d4727a8deeacdb@o4510219313545216.ingest.us.sentry.io/4510487462608896",
+    )
+    if sentry_dsn:
+        environment = os.getenv("ENVIRONMENT", "development")
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            environment=environment,
+            traces_sample_rate=1.0 if environment == "development" else 0.1,
+            profiles_sample_rate=1.0 if environment == "development" else 0.1,
+            enable_tracing=True,
+            send_default_pii=True,  # Enable PII for user context (as requested)
+            attach_stacktrace=True,
+            max_breadcrumbs=50,
+        )
+        log.info(
+            "sentry_initialized",
+            environment=environment,
+            dsn_configured=True,
+            send_default_pii=True,
+        )
+    else:
+        log.info("sentry_disabled", reason="SENTRY_DSN not configured")
 
     # Initialize RAG pipeline components
     log.info("rag_pipeline_initializing")
