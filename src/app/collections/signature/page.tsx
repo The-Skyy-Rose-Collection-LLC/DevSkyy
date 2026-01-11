@@ -10,9 +10,31 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { CollectionLayout } from '../../../components/collections/CollectionLayout';
-import { SignatureCanvas } from '../../../components/collections/SignatureCanvas';
 import { ProductGrid } from '../../../components/collections/ProductGrid';
+
+// Dynamic import for Three.js component (code splitting)
+const SignatureCanvas = dynamic(
+  () => import('../../../components/collections/SignatureCanvas').then(mod => ({ default: mod.SignatureCanvas })),
+  {
+    loading: () => (
+      <div style={{
+        width: '100%',
+        height: '600px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#1a1a1a',
+        color: '#B76E79',
+        fontSize: '1.2rem',
+      }}>
+        Loading 3D Experience...
+      </div>
+    ),
+    ssr: false, // Disable server-side rendering for Three.js
+  }
+);
 import { FilterSidebar } from '../../../components/collections/FilterSidebar';
 import { FilterDrawer } from '../../../components/collections/FilterDrawer';
 import { useCollectionProducts } from '../../../hooks/useCollectionProducts';

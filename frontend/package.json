@@ -39,6 +39,7 @@
     "tailwind-merge": "^2.5.2"
   },
   "devDependencies": {
+    "@next/bundle-analyzer": "^16.1.1",
     "@playwright/test": "^1.57.0",
     "@types/node": "^22.7.4",
     "@types/react": "^18.3.10",
