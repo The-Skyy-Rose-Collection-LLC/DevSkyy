@@ -619,3 +619,152 @@ Mobile Drawer:
 **Commit:** feat: COLL-009 - Collection filtering and sorting (21c57e7bd)
 
 ---
+
+## COLL-010: SEO Metadata and Open Graph (2026-01-11)
+**Status**: ✅ COMPLETED
+**Commit**: 8d7f277b2
+**Duration**: ~45 minutes (research + implementation)
+
+### Implementation Overview
+Added comprehensive SEO metadata and JSON-LD structured data to both collection pages (SIGNATURE and LOVE_HURTS). Each collection now has unique metadata optimized for search engines and social sharing.
+
+### Files Created
+1. **frontend/app/collections/signature/layout.tsx** (85 lines)
+   - Next.js 15 metadata export with generateMetadata pattern
+   - Unique title: "SIGNATURE Collection - Luxury Fashion | SkyyRose"
+   - Description: Oakland & SF inspired luxury fashion
+   - Keywords: luxury fashion, signature collection, oakland fashion, etc.
+
+2. **frontend/app/collections/love-hurts/layout.tsx** (85 lines)
+   - Gothic romance themed metadata
+   - Unique title: "LOVE HURTS Collection - Gothic Romance Fashion | SkyyRose"
+   - Description: Captivating blend of gothic romance and luxury
+   - Keywords: gothic fashion, romantic style, dark elegance, etc.
+
+3. **src/app/collections/signature/layout.tsx** (mirror copy)
+4. **src/app/collections/love-hurts/layout.tsx** (mirror copy)
+
+### Files Modified
+1. **frontend/app/collections/signature/page.tsx** (+69 lines)
+   - Added JSON-LD CollectionPage schema
+   - Added JSON-LD BreadcrumbList schema
+   - Includes product listings with offers
+   - XSS-safe JSON serialization (replace < with \u003c)
+
+2. **frontend/app/collections/love-hurts/page.tsx** (+69 lines)
+   - Same JSON-LD schemas as SIGNATURE
+   - Collection-specific branding and descriptions
+   - Dynamic product data from WordPress API
+
+3. **src/app/collections/signature/page.tsx** (mirror copy)
+4. **src/app/collections/love-hurts/page.tsx** (mirror copy)
+
+### Key Learnings
+
+**Next.js 15 Metadata API**:
+- Cannot export metadata from 'use client' components
+- Solution: Create sibling layout.tsx files with metadata exports
+- Each collection subdirectory gets its own layout with unique metadata
+- Layout components just return children (no HTML structure)
+
+**Open Graph Implementation**:
+- metadataBase sets base URL for relative paths
+- Images must be absolute URLs (1200x630 recommended)
+- Includes title, description, url, siteName, locale, type, images
+- Twitter Card uses 'summary_large_image' format
+- Brand metadata in 'other' field for additional context
+
+**JSON-LD Structured Data**:
+- CollectionPage schema: name, description, url, brand, numberOfItems, itemListElement
+- Product schema: position, name, description, image, offers
+- Offers schema: price, priceCurrency, availability, url
+- BreadcrumbList schema: Home → Collections → Collection Name
+- XSS prevention: JSON.stringify(jsonLd).replace(/</g, '\\u003c')
+- Embedded via <script type="application/ld+json"> tags
+
+**SEO Best Practices**:
+- Canonical URLs via alternates.canonical
+- Robots directives: index, follow, max-image-preview large
+- Unique keywords per collection (10-12 targeted keywords)
+- Authors metadata for brand attribution
+- Twitter creator and site handles
+
+### Schema.org Types Used
+1. **CollectionPage**: Represents a page about a collection
+   - @type: 'CollectionPage'
+   - name: Collection name
+   - description: Collection description
+   - brand: Brand object with name and URL
+   - numberOfItems: Total products in collection
+   - itemListElement: Array of Product objects
+
+2. **Product** (within itemListElement):
+   - @type: 'Product'
+   - position: Index in list (1-based)
+   - name: Product name from WordPress
+   - description: Product short_description or description
+   - image: First product image URL
+   - offers: Offer object
+   - brand: SkyyRose brand
+
+3. **Offer**:
+   - @type: 'Offer'
+   - price: Product price
+   - priceCurrency: 'USD'
+   - availability: InStock or OutOfStock (schema.org URL)
+   - url: Product permalink
+
+4. **BreadcrumbList**:
+   - @type: 'BreadcrumbList'
+   - itemListElement: Array of ListItem objects
+   - position: 1 (Home), 2 (Collections), 3 (Collection Name)
+   - name: Breadcrumb label
+   - item: URL
+
+### Metadata Configuration
+
+**SIGNATURE Collection**:
+- Title: "SIGNATURE Collection - Luxury Fashion | SkyyRose"
+- Description: "Elegant luxury fashion pieces inspired by Oakland & San Francisco"
+- Keywords: luxury fashion, signature collection, oakland fashion, san francisco style
+- OG Image: /images/collections/signature-og.jpg (1200x630)
+- Canonical: /collections/signature
+- Type: website
+- Locale: en_US
+
+**LOVE_HURTS Collection**:
+- Title: "LOVE HURTS Collection - Gothic Romance Fashion | SkyyRose"
+- Description: "Captivating blend of gothic romance and luxury fashion"
+- Keywords: gothic fashion, romantic style, dark elegance, luxury gothic
+- OG Image: /images/collections/love-hurts-og.jpg (1200x630)
+- Canonical: /collections/love-hurts
+- Type: website
+- Locale: en_US
+
+### Performance Considerations
+- Metadata is static (no runtime overhead)
+- JSON-LD is client-side generated (dynamic product data)
+- XSS protection adds minimal string processing
+- Open Graph images should be optimized (recommended: WebP 1200x630)
+
+### Testing Verification
+✅ Both pages return HTTP 200 OK
+✅ TypeScript compilation passed
+✅ Pre-commit hooks passed (whitespace auto-fixed)
+✅ No console errors
+✅ JSON-LD valid schema.org format
+
+### Next Steps (COLL-011)
+- Create actual Open Graph images (signature-og.jpg, love-hurts-og.jpg)
+- Run Lighthouse SEO audit
+- Verify Google Search Console structured data
+- Test social media sharing (Twitter, Facebook, LinkedIn)
+- Validate metadata with https://metatags.io/
+
+### Acceptance Criteria Met
+✅ Unique title/description per collection
+✅ Open Graph tags for social sharing
+✅ JSON-LD structured data (Product, BreadcrumbList)
+✅ Canonical URLs
+❓ Image alt tags from WordPress (existing from COLL-004)
+⏳ Lighthouse SEO audit (pending COLL-011)

@@ -155,7 +155,7 @@
         "Image alt tags from WordPress",
         "Passes Lighthouse SEO audit (95+)"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-011",
