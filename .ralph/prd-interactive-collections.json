@@ -16,7 +16,7 @@
         "TypeScript with proper type definitions",
         "Passes all type checks"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-002",
