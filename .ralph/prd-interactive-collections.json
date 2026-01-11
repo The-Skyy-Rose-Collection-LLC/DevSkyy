@@ -78,7 +78,7 @@
         "Respects prefers-reduced-motion",
         "Verify animations in browser"
       ],
-      "passes": false
+      "passes": true
     },
     {
       "id": "COLL-006",

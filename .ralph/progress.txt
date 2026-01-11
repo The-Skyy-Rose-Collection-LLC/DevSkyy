@@ -172,3 +172,46 @@ ProductGrid:
 **Commit:** feat: COLL-004 - Product grid with CSS parallax effects (3c1486665)
 
 ---
+## [2026-01-11] - COLL-005: Luxury Scroll Animations
+
+**What was implemented:**
+- Created useScrollAnimation React hook with IntersectionObserver
+- Created ScrollAnimatedSection wrapper component with 6 animation types
+- Integrated stagger animations into ProductGrid (100ms delay per card)
+- Added parallax background layers to CollectionLayout (0.5x and 0.3x scroll speed)
+- TypeScript fixes for strict mode compliance
+
+**Files changed:**
+- `src/hooks/useScrollAnimation.ts` (NEW) - Performance-optimized scroll hook
+- `src/components/collections/ScrollAnimatedSection.tsx` (NEW) - Animation wrapper
+- `src/components/collections/ProductGrid.tsx` (MODIFIED) - Stagger animations
+- `src/components/collections/CollectionLayout.tsx` (MODIFIED) - Parallax BG layers
+- `src/hooks/useCollectionProducts.ts` (MODIFIED) - Fixed env var access
+- `src/app/test/collections/page.tsx` (MODIFIED) - TypeScript fixes
+- `src/app/layout.tsx` (NEW) - Root layout for Next.js App Router
+- `.ralph/prd-interactive-collections.json` - Marked COLL-005 as passes: true
+
+**Learnings for future iterations:**
+- **IntersectionObserver pattern**: threshold 0.2 (20% visibility), rootMargin for offset, once: true for single trigger
+- **Performance optimization**: willChange: 'opacity, transform' CSS hint, passive scroll listeners, auto-unobserve
+- **Accessibility**: Check prefers-reduced-motion media query, set all to visible immediately if user prefers
+- **Stagger effect**: index * delay (e.g., 100ms) for sequential card animations
+- **Animation types**: fade-up/down/left/right use translateY/X(40px), scale uses scale(0.95)
+- **Parallax technique**: Track scrollY in state, apply different multipliers (0.5x, 0.3x) to background layers
+- **Transform combination**: `translateY(${scrollY * multiplier}px)` for parallax movement
+- **Passive listeners**: `addEventListener('scroll', handler, { passive: true })` for 60fps
+- **RefObject typing**: Use `RefObject<HTMLElement | null>` not `RefObject<HTMLElement>` for useRef(null)
+- **Optional prop spreading**: `{...(onClick && { onClick })}` to avoid undefined props with strict types
+- **Environment variables**: Use bracket notation `process.env['VAR_NAME']` for Next.js strict mode
+
+**Architecture note:**
+- Created test page at `/test/collections` (frontend/app/test/)
+- Discovered: DevSkyy dashboard (devskyy.app) and SkyyRose collections should be separate apps/domains
+- Frontend copies: Duplicated src/ components to frontend/ for testing (temporary)
+- Future: Deploy collections separately to skyyrose.com or dedicated collections domain
+
+**TypeScript checks:** ✅ PASSED
+**Pre-commit hooks:** ✅ PASSED (after whitespace fixes)
+**Commit:** feat: COLL-005 - Luxury scroll animations (42bfc82b0)
+
+---
