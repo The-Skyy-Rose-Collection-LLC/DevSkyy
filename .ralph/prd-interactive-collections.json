@@ -185,7 +185,7 @@
         "Analytics tracking (Prometheus metrics)",
         "Verify live on skyyrose.com"
       ],
-      "passes": false
+      "passes": true
     }
   ]
 }
