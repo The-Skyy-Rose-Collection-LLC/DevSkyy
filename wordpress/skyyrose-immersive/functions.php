@@ -44,12 +44,37 @@ function skyyrose_immersive_enqueue_styles() {
         SKYYROSE_IMMERSIVE_VERSION
     );
 
+    // Luxury design system tokens
+    wp_enqueue_style(
+        'skyyrose-luxury-system',
+        SKYYROSE_IMMERSIVE_URI . '/assets/css/luxury-design-system.css',
+        array('skyyrose-immersive-style'),
+        '2.0.0'
+    );
+
+    // Luxury WooCommerce overrides
+    wp_enqueue_style(
+        'skyyrose-luxury-overrides',
+        SKYYROSE_IMMERSIVE_URI . '/assets/css/luxury-overrides.css',
+        array('skyyrose-luxury-system'),
+        '2.0.0'
+    );
+
     // Google Fonts for luxury typography
     wp_enqueue_style(
         'skyyrose-fonts',
         'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap',
         array(),
         null
+    );
+
+    // Luxury scroll animations
+    wp_enqueue_script(
+        'skyyrose-luxury-animations',
+        SKYYROSE_IMMERSIVE_URI . '/assets/js/luxury-animations.js',
+        array(),
+        '2.0.0',
+        true  // Load in footer
     );
 }
 
@@ -281,7 +306,70 @@ function skyyrose_immersive_setup() {
     // Add custom image sizes for 3D thumbnails
     add_image_size('skyyrose-3d-thumb', 600, 600, true);
     add_image_size('skyyrose-hero', 1920, 1080, true);
+
+    // =============================================================================
+    // WOOCOMMERCE LUXURY FEATURES
+    // =============================================================================
+
+    // Enable WooCommerce advanced gallery features
+    add_theme_support('wc-product-gallery-zoom');     // Click to zoom
+    add_theme_support('wc-product-gallery-lightbox'); // Fullscreen lightbox
+    add_theme_support('wc-product-gallery-slider');   // Thumbnail carousel
+
+    // Configure luxury image sizes
+    add_theme_support('woocommerce', array(
+        'thumbnail_image_width' => 600,          // Grid thumbnails (high-res)
+        'gallery_thumbnail_image_width' => 150,  // Carousel thumbs
+        'single_image_width' => 1200,            // Product page hero (luxury size)
+    ));
+
+    // Full-width product layouts (no sidebar)
+    add_filter('woocommerce_product_single_width', function() {
+        return '100%';
+    });
+
+    // Branded "Add to Cart" text
+    add_filter('woocommerce_product_single_add_to_cart_text', function() {
+        return 'Claim Your Rose';
+    });
 }
+
+// =============================================================================
+// ELEMENTOR LUXURY WIDGETS
+// =============================================================================
+
+/**
+ * Register custom Elementor widgets for luxury e-commerce.
+ */
+function skyyrose_register_luxury_elementor_widgets() {
+    // Check if Elementor is installed and activated
+    if (!did_action('elementor/loaded')) {
+        return;
+    }
+
+    // Require widget files
+    require_once get_stylesheet_directory() . '/elementor-widgets/luxury-product-card.php';
+
+    // Register widgets with Elementor
+    \Elementor\Plugin::instance()->widgets_manager->register_widget_type(
+        new \SkyyRose\Elementor\Widgets\Luxury_Product_Card()
+    );
+}
+add_action('elementor/widgets/widgets_registered', 'skyyrose_register_luxury_elementor_widgets');
+
+/**
+ * Register custom Elementor widget category.
+ */
+function skyyrose_register_elementor_widget_categories($elements_manager) {
+    $elements_manager->add_category(
+        'skyyrose',
+        [
+            'title' => __('SkyyRose', 'skyyrose-immersive'),
+            'icon' => 'fa fa-rose',
+        ]
+    );
+}
+add_action('elementor/elements/categories_registered', 'skyyrose_register_elementor_widget_categories');
 
 /**
  * AJAX handler for loading 3D model data

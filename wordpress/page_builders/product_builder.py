@@ -77,6 +77,117 @@ class ProductPageBuilder(ElementorBuilder):
 
         return widgets
 
+    def build_luxury_product_hero(
+        self,
+        product: dict[str, Any],
+    ) -> dict[str, Any]:
+        """
+        Build luxury 2-column product layout: gallery left (60%), details right (40%).
+
+        Follows luxury e-commerce standards with:
+        - WooCommerce gallery with zoom/lightbox/slider (from Phase 1)
+        - 1200px images (luxury size from functions.php)
+        - Generous 48px spacing between columns
+        - Playfair Display typography for product title
+        - "Claim Your Rose" branded CTA button
+
+        Args:
+            product: Product data dictionary from WooCommerce API
+
+        Returns:
+            Elementor section configuration dict with 2-column layout
+        """
+        return {
+            "elType": "section",
+            "settings": {
+                "layout": "boxed",
+                "gap": "extended",  # 48px between columns
+                "padding": {"top": 80, "bottom": 80, "unit": "px"},
+            },
+            "elements": [
+                # Left column: Product gallery (60% width)
+                {
+                    "elType": "column",
+                    "settings": {"_column_size": 60},
+                    "elements": [
+                        {
+                            "elType": "widget",
+                            "widgetType": "woocommerce-product-images",  # Uses WooCommerce gallery
+                            "settings": {
+                                "image_size": "woocommerce_single",  # 1200px from Phase 1
+                                "enable_zoom": "yes",  # From Phase 1 theme support
+                                "enable_lightbox": "yes",
+                                "enable_slider": "yes",
+                                "thumbnail_size": 150,
+                                "gallery_columns": 4,
+                            },
+                        }
+                    ],
+                },
+                # Right column: Product details (40% width)
+                {
+                    "elType": "column",
+                    "settings": {
+                        "_column_size": 40,
+                        "padding": {"left": 48, "unit": "px"},  # Luxury spacing
+                    },
+                    "elements": [
+                        # Product title (Playfair Display)
+                        {
+                            "elType": "widget",
+                            "widgetType": "woocommerce-product-title",
+                            "settings": {
+                                "typography_font_family": "Playfair Display",
+                                "typography_font_size": {"size": 40, "unit": "px"},
+                                "typography_font_weight": 600,
+                                "color": "#0D0D0D",
+                            },
+                        },
+                        # Price
+                        {
+                            "elType": "widget",
+                            "widgetType": "woocommerce-product-price",
+                            "settings": {
+                                "typography_font_family": "Inter",
+                                "typography_font_size": {"size": 24, "unit": "px"},
+                                "color": "#1A1A1A",
+                            },
+                        },
+                        # Description (Inter, generous line-height)
+                        {
+                            "elType": "widget",
+                            "widgetType": "woocommerce-product-content",
+                            "settings": {
+                                "typography_font_family": "Inter",
+                                "typography_font_size": {"size": 16, "unit": "px"},
+                                "typography_line_height": {"size": 1.6, "unit": "em"},
+                                "color": "#1A1A1A",
+                            },
+                        },
+                        # Add to cart button (branded)
+                        {
+                            "elType": "widget",
+                            "widgetType": "woocommerce-product-add-to-cart",
+                            "settings": {
+                                "button_text": "Claim Your Rose",  # From Phase 1
+                                "typography_font_family": "Inter",
+                                "typography_font_weight": 600,
+                                "typography_text_transform": "uppercase",
+                                "button_background_color": "#0D0D0D",
+                                "button_hover_background_color": "#FFFFFF",
+                                "button_padding": {
+                                    "top": 16,
+                                    "bottom": 16,
+                                    "left": 48,
+                                    "right": 48,
+                                },
+                            },
+                        },
+                    ],
+                },
+            ],
+        }
+
     def build_product_tabs(
         self,
         product_id: int,
