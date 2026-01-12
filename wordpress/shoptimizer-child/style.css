@@ -1,0 +1,432 @@
+/*
+Theme Name:   Shoptimizer Child - SkyyRose Luxury
+Theme URI:    https://skyyrose.com
+Description:  High-converting luxury ecommerce theme for SkyyRose with Three.js interactive experiences
+Author:       SkyyRose LLC
+Author URI:   https://skyyrose.com
+Template:     shoptimizer
+Version:      1.0.0
+License:      GPL-2.0+
+Text Domain:  shoptimizer-child
+*/
+
+/* ==========================================================================
+   LUXURY DESIGN SYSTEM - SkyyRose Brand
+   ========================================================================== */
+
+:root {
+  /* Brand Colors */
+  --skyyrose-primary: #B76E79;
+  --skyyrose-dark: #1a1a1a;
+  --skyyrose-light: #f5f5f0;
+  --skyyrose-accent: #d4af37;
+
+  /* Spacing */
+  --space-xs: 0.5rem;
+  --space-sm: 1rem;
+  --space-md: 2rem;
+  --space-lg: 4rem;
+  --space-xl: 6rem;
+
+  /* Typography */
+  --font-display: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Transitions */
+  --transition-fast: 0.2s ease-out;
+  --transition-medium: 0.3s ease-out;
+  --transition-slow: 0.6s ease-out;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.15);
+  --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* ==========================================================================
+   GLASSMORPHISM COMPONENTS
+   ========================================================================== */
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-glass);
+  border-radius: 12px;
+  padding: var(--space-md);
+  transition: transform var(--transition-medium), box-shadow var(--transition-medium);
+}
+
+.glass-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.glass-card-dark {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ==========================================================================
+   PREMIUM ANIMATIONS
+   ========================================================================== */
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+/* Animation Classes */
+.animate-fadeInUp {
+  animation: fadeInUp var(--transition-slow) ease-out;
+}
+
+.animate-fadeIn {
+  animation: fadeIn var(--transition-medium) ease-out;
+}
+
+.animate-scaleIn {
+  animation: scaleIn var(--transition-medium) ease-out;
+}
+
+.animate-slideInRight {
+  animation: slideInRight var(--transition-slow) ease-out;
+}
+
+/* Stagger Delays */
+.animate-delay-1 { animation-delay: 0.1s; }
+.animate-delay-2 { animation-delay: 0.2s; }
+.animate-delay-3 { animation-delay: 0.3s; }
+.animate-delay-4 { animation-delay: 0.4s; }
+.animate-delay-5 { animation-delay: 0.5s; }
+
+/* ==========================================================================
+   PARALLAX EFFECTS
+   ========================================================================== */
+
+.parallax-bg {
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.parallax-element {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* ==========================================================================
+   PRODUCT CARDS - LUXURY STYLING
+   ========================================================================== */
+
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  transition: all var(--transition-medium);
+  background: #fff;
+}
+
+.woocommerce ul.products li.product:hover,
+.woocommerce-page ul.products li.product:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.woocommerce ul.products li.product img,
+.woocommerce-page ul.products li.product img {
+  transition: transform var(--transition-slow);
+}
+
+.woocommerce ul.products li.product:hover img,
+.woocommerce-page ul.products li.product:hover img {
+  transform: scale(1.05);
+}
+
+/* Product Card Overlay */
+.woocommerce ul.products li.product::after,
+.woocommerce-page ul.products li.product::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.05) 100%);
+  opacity: 0;
+  transition: opacity var(--transition-medium);
+  pointer-events: none;
+}
+
+.woocommerce ul.products li.product:hover::after,
+.woocommerce-page ul.products li.product:hover::after {
+  opacity: 1;
+}
+
+/* Add to Cart Button - Luxury Style */
+.woocommerce ul.products li.product .button,
+.woocommerce-page ul.products li.product .button,
+.woocommerce a.button,
+.woocommerce button.button {
+  background: var(--skyyrose-primary);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 2rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  transition: all var(--transition-medium);
+  box-shadow: var(--shadow-sm);
+}
+
+.woocommerce ul.products li.product .button:hover,
+.woocommerce-page ul.products li.product .button:hover,
+.woocommerce a.button:hover,
+.woocommerce button.button:hover {
+  background: #a15e69;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   SKELETON LOADING STATES
+   ========================================================================== */
+
+.skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 4px;
+}
+
+.skeleton-text {
+  height: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.skeleton-title {
+  height: 2rem;
+  width: 60%;
+  margin-bottom: 1rem;
+}
+
+.skeleton-image {
+  height: 300px;
+  width: 100%;
+}
+
+/* ==========================================================================
+   COLLECTION HERO SECTIONS
+   ========================================================================== */
+
+.collection-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: var(--skyyrose-dark);
+  color: #fff;
+}
+
+.collection-hero-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 800px;
+  padding: var(--space-md);
+}
+
+.collection-hero h1 {
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 1rem 0;
+  background: linear-gradient(135deg, var(--skyyrose-primary), var(--skyyrose-accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.collection-hero p {
+  font-size: clamp(1.25rem, 3vw, 1.75rem);
+  font-weight: 500;
+  opacity: 0.9;
+}
+
+/* Scroll Indicator */
+.scroll-indicator {
+  position: absolute;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0.6;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+.scroll-indicator::after {
+  content: '';
+  display: block;
+  width: 24px;
+  height: 24px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* ==========================================================================
+   THREE.JS CANVAS CONTAINER
+   ========================================================================== */
+
+.threejs-container {
+  width: 100%;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  background: var(--skyyrose-dark);
+}
+
+.threejs-container canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.threejs-loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #fff;
+  z-index: 100;
+}
+
+.threejs-loading-spinner {
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-top-color: var(--skyyrose-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .glass-card {
+    padding: var(--space-sm);
+  }
+
+  .collection-hero-content {
+    padding: var(--space-sm);
+  }
+
+  .parallax-bg {
+    background-attachment: scroll;
+  }
+}
+
+/* ==========================================================================
+   PERFORMANCE OPTIMIZATIONS
+   ========================================================================== */
+
+/* Reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .parallax-bg {
+    background-attachment: scroll;
+  }
+}
+
+/* GPU Acceleration */
+.animate-fadeInUp,
+.animate-scaleIn,
+.animate-slideInRight,
+.glass-card,
+.woocommerce ul.products li.product,
+.woocommerce-page ul.products li.product {
+  will-change: transform;
+  transform: translateZ(0);
+}
