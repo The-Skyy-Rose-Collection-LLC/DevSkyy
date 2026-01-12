@@ -494,8 +494,8 @@ async def process_order_fulfillment(order_id: str, correlation_id: str) -> None:
     logger.info(f"[{correlation_id}] Sending order {order_id} to warehouse")
     # TODO: Integrate with ShipStation, ShipBob, or custom warehouse system
 
-    # Step 3: Mark as processing
-    order["fulfillment_status"] = FulfillmentStatus.PROCESSING.value
+    # Step 3: Mark as processing (picking inventory)
+    order["fulfillment_status"] = FulfillmentStatus.PICKING.value
     order["updated_at"] = datetime.now(UTC).isoformat()
 
     logger.info(f"[{correlation_id}] Fulfillment workflow initiated for order {order_id}")
