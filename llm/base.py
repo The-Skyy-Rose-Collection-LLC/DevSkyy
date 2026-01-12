@@ -265,6 +265,8 @@ class CompletionResponse(BaseModel):
     finish_reason: str = ""
     tool_calls: list[ToolCall] = Field(default_factory=list)
     latency_ms: float = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)  # Provider-specific metadata
+    cost_usd: float | None = None  # Optional cost in USD
 
     # Raw response (for debugging)
     raw: dict[str, Any] = Field(default_factory=dict)
