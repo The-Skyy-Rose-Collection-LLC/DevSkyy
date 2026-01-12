@@ -193,3 +193,12 @@ assets/2d-25d-assets/*.png
 assets/2d-25d-assets/*.JPG
 assets/2d-25d-assets/*.JPEG
 assets/2d-25d-assets/*.PNG
+
+# WordPress large files and binaries
+wp-cli.phar
+wordpress/themes/
+wordpress/Logos/
+wordpress/skyyrose-immersive/
+wordpress/skyyrose-immersive.zip
+wordpress/shoptimizer-child-theme/
+wordpress/plugins/
