@@ -253,11 +253,17 @@ REDIS_URL=redis://:pass@localhost:6379/0
 """
         env_file.write_text(env_content)
 
-        # Run validation
+        # Run validation with clean environment (no LLM keys inherited from parent)
+        clean_env = {
+            k: v
+            for k, v in os.environ.items()
+            if not k.endswith("_API_KEY") and not k.endswith("_API_TOKEN")
+        }
         result = subprocess.run(
             ["python3", "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
+            env=clean_env,
         )
 
         # Should fail validation
@@ -332,6 +338,15 @@ class TestSecretSecurity:
 
             content = (tmp_path / ".env.production").read_text()
 
+            # Extract only the VALUES (after =) from the .env file
+            values = []
+            for line in content.splitlines():
+                if "=" in line and not line.strip().startswith("#"):
+                    # Get value after =, strip quotes
+                    value = line.split("=", 1)[1].strip().strip('"').strip("'")
+                    if value:  # Skip empty values
+                        values.append(value)
+
             # Common weak patterns
             weak_patterns = [
                 r"password",
@@ -342,10 +357,12 @@ class TestSecretSecurity:
                 r"test",
             ]
 
-            for pattern in weak_patterns:
-                assert not re.search(pattern, content, re.IGNORECASE), (
-                    f"Weak pattern '{pattern}' found in secrets"
-                )
+            # Check only VALUES, not variable names
+            for value in values:
+                for pattern in weak_patterns:
+                    assert not re.search(pattern, value, re.IGNORECASE), (
+                        f"Weak pattern '{pattern}' found in secret value: {value[:20]}..."
+                    )
 
         finally:
             os.chdir(original_dir)
