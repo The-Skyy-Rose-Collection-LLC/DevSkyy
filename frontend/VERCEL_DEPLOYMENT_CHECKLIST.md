@@ -104,7 +104,36 @@ All pages exist, compile successfully, and have correct routing:
 
 **All links validated** - no 404s!
 
-### 5. CORS Configuration
+### 5. vercel.json Configuration
+**File Location**: `/Users/coreyfoster/DevSkyy/vercel.json` (repository root)
+
+**Valid Properties** (updated 2026-01-12):
+```json
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "regions": ["iad1"],
+  "functions": {
+    "app/api/**/*.ts": {
+      "maxDuration": 60
+    }
+  },
+  "headers": [...],
+  "rewrites": [...]
+}
+```
+
+**What's Configured**:
+- ✅ **Regions**: Deploy to `iad1` (Virginia, USA)
+- ✅ **Functions**: API routes timeout after 60 seconds
+- ✅ **Headers**: CORS, security headers (see below)
+- ✅ **Rewrites**: Proxy `/api/*` to `https://api.devskyy.app`
+
+**What's NOT in vercel.json** (configure in dashboard):
+- ❌ `rootDirectory` - Set in Vercel Dashboard → General → Root Directory
+- ❌ `buildCommand` - Use dashboard default (`npm run build`)
+- ❌ `framework` - Auto-detected (Next.js)
+
+### 6. CORS Configuration
 **vercel.json** headers:
 ```json
 {
@@ -120,26 +149,27 @@ All pages exist, compile successfully, and have correct routing:
 
 **next.config.js** headers (same as above) ✅
 
-### 6. Build Status
+### 7. Build Status
 ```bash
-✓ Compiled successfully in 7.1s
-✓ Generating static pages (24/24)
+✓ Compiled successfully in 6.8s
+✓ Generating static pages (25/25)
 ✓ Finalizing page optimization
 
 Build Output:
-- 11 production pages (24 total including non-production)
+- 12 production pages (25 total including non-production)
 - 0 build errors
-- 3 ESLint warnings (non-blocking, related to collections/test pages)
+- 4 ESLint warnings (non-blocking, related to collections/test/wordpress pages)
 - Total First Load JS: 102 kB (shared)
 - Largest page: 264 kB (Dashboard with charts)
 ```
 
-### 7. Linting
+### 8. Linting
 ```bash
 npm run lint
-✅ Passed with 3 warnings (non-production pages)
+✅ Passed with 4 warnings (non-blocking)
 - collections/layout.tsx: Font loading warning
 - test/layout.tsx: Font loading warning
+- wordpress/page.tsx: useEffect dependency warning
 - ProductModal.tsx: useEffect dependency warning
 ```
 
@@ -202,8 +232,29 @@ After deploying to Vercel, test:
 
 ## 🚀 Deployment Commands
 
-### Deploy to Vercel
+### STEP 1: Configure Vercel Dashboard (REQUIRED)
+
+**CRITICAL**: Configure project settings in Vercel Dashboard BEFORE deploying:
+
+1. Go to: https://vercel.com/skyyroseco/devskyy-dashboard/settings/general
+
+2. **Configure Root Directory**:
+   - **Root Directory**: `frontend` ← **MUST BE SET**
+   - Framework Preset: Next.js (auto-detected)
+   - Build Command: `npm run build` (default)
+   - Output Directory: `.next` (default)
+   - Install Command: `npm install` (default)
+
+3. Click **Save**
+
+**Why This Is Required**:
+- The `rootDirectory` property is NOT valid in `vercel.json` (causes deployment errors)
+- Must be configured in the Vercel dashboard instead
+- Without this, Vercel will try to build from repository root instead of `frontend/` directory
+
+### STEP 2: Deploy to Vercel
 ```bash
+# From repository root (/Users/coreyfoster/DevSkyy)
 cd frontend
 
 # Install Vercel CLI (if not installed)
@@ -212,12 +263,21 @@ npm i -g vercel
 # Login to Vercel
 vercel login
 
+# Link to existing project (if not already linked)
+vercel link
+
 # Deploy to production
 vercel --prod
+```
 
-# Or link to existing project first
-vercel link
-vercel --prod
+**Expected Output**:
+```
+✓ Linked to skyyroseco/devskyy-dashboard
+✓ Inspecting 12 Serverless Functions
+✓ Building Production Bundle
+✓ Generating static pages (25/25)
+✓ Deployment Ready
+https://app.devskyy.app
 ```
 
 ### Environment Variables in Vercel Dashboard
@@ -244,6 +304,20 @@ After deployment, verify in Vercel Dashboard:
 ---
 
 ## 🔧 Troubleshooting
+
+### Issue: "Invalid vercel.json - should NOT have additional property 'rootDirectory'"
+**Solution**:
+1. This error means `vercel.json` contains properties that should be in the dashboard
+2. Configure Root Directory in Vercel Dashboard (see STEP 1 above)
+3. The `vercel.json` file should only contain: `regions`, `functions`, `headers`, `rewrites`
+4. Fixed in commit `f639207de` - ensure you have the latest version
+
+### Issue: Build fails with "Cannot find module" errors
+**Solution**:
+1. Verify Root Directory is set to `frontend` in Vercel Dashboard
+2. Ensure `package.json` exists in `frontend/` directory
+3. Check that `npm install` runs successfully locally
+4. Redeploy after verifying configuration
 
 ### Issue: Pages return 404
 **Solution**: Redeploy after fixing navigation. All pages now exist.
@@ -277,11 +351,11 @@ After deployment, verify in Vercel Dashboard:
 ## 📊 Performance Metrics
 
 ### Build Stats
-- **Total Pages**: 24 (11 production, 13 additional)
+- **Total Pages**: 25 (12 production, 13 additional)
 - **Largest Page**: 264 kB (Dashboard)
 - **Smallest Page**: 753 B (Agent Chat)
 - **Shared JS**: 102 kB
-- **Build Time**: ~7 seconds
+- **Build Time**: ~6.8 seconds
 
 ### Production Pages Sizes
 | Page | Size | First Load JS |
@@ -292,6 +366,7 @@ After deployment, verify in Vercel Dashboard:
 | A/B Testing | 2.9 kB | 250 kB |
 | Tools | 4.42 kB | 131 kB |
 | Settings | 3.99 kB | 124 kB |
+| WordPress | 5.61 kB | 122 kB |
 | 3D Pipeline | 4.23 kB | 106 kB |
 | HF Spaces | 3.77 kB | 106 kB |
 | RT History | 3.69 kB | 134 kB |
@@ -305,27 +380,31 @@ After deployment, verify in Vercel Dashboard:
 **Vercel Configuration**: PRODUCTION READY ✅
 
 **What's Ready:**
-- ✅ 11 production pages compile and load
+- ✅ 12 production pages compile and load (including WordPress)
 - ✅ Backend URL standardized to `https://api.devskyy.app`
 - ✅ Environment variables configured
 - ✅ CORS headers set correctly
 - ✅ All navigation links validated
 - ✅ Build succeeds with 0 errors
 - ✅ TypeScript compilation clean
-- ✅ Linting passed (3 non-blocking warnings)
+- ✅ Linting passed (4 non-blocking warnings)
+- ✅ vercel.json fixed (removed invalid `rootDirectory` property)
+- ✅ WordPress integration complete (12 API endpoints)
 
 **What's Next:**
 1. ✅ **Backend configured** - See `/RENDER_DEPLOYMENT_CHECKLIST.md` for deployment
-2. Deploy backend to Render at `https://api.devskyy.app`
-3. Configure Vercel environment variables in dashboard
-4. Run `vercel --prod` to deploy frontend to `https://app.devskyy.app`
-5. Test full-stack integration:
-   - All 11 pages load correctly
-   - API connections work (Dashboard metrics, Agent list, etc.)
+2. ✅ **vercel.json fixed** - Invalid properties removed (commit `f639207de`)
+3. **REQUIRED**: Configure Root Directory in Vercel Dashboard (see STEP 1 above)
+4. Deploy backend to Render at `https://api.devskyy.app`
+5. Configure Vercel environment variables in dashboard
+6. Run `vercel --prod` to deploy frontend to `https://app.devskyy.app`
+7. Test full-stack integration:
+   - All 12 pages load correctly (including WordPress)
+   - API connections work (Dashboard metrics, Agent list, WordPress sync)
    - WebSocket connections establish
    - Navigation links function
    - Real-time features work
-6. Monitor production metrics (Prometheus)
+8. Monitor production metrics (Prometheus)
 
 **Deployment URLs:**
 - Frontend: `https://app.devskyy.app` (Vercel - Ready)
@@ -333,5 +412,9 @@ After deployment, verify in Vercel Dashboard:
 
 ---
 
-**Last Updated**: 2026-01-12 (Ralph Loop Iteration 2 - Full-Stack Ready)
+**Last Updated**: 2026-01-12 (WordPress Integration + vercel.json Fix)
 **Validated By**: Ralph Loop Production Configuration (Frontend + Backend)
+**Recent Changes**:
+- Added WordPress management page (12th production page)
+- Fixed vercel.json (removed invalid `rootDirectory` property)
+- Updated deployment instructions with Vercel Dashboard configuration steps
