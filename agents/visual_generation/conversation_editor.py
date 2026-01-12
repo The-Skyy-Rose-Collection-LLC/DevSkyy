@@ -293,10 +293,7 @@ class ConversationalImageEditor:
         # Get session
         session = self._sessions.get(session_id)
         if not session:
-            raise ChatSessionExpiredError(
-                f"Session {session_id} not found",
-                model="gemini",
-            )
+            raise ChatSessionNotFoundError(f"Session {session_id} not found")
 
         # Check expiration
         if session.is_expired():
@@ -383,6 +380,21 @@ class ConversationalImageEditor:
         if session:
             asyncio.create_task(session.client.close())
             logger.info("chat_session_cleaned_up", session_id=session_id)
+
+    async def close_session(self, session_id: str) -> bool:
+        """
+        Close a specific session by ID.
+
+        Args:
+            session_id: ID of session to close
+
+        Returns:
+            True if session was closed, False if not found
+        """
+        if session_id in self._sessions:
+            self._cleanup_session(session_id)
+            return True
+        return False
 
     async def cleanup_expired_sessions(self) -> int:
         """
