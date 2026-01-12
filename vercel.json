@@ -63,7 +63,7 @@
   "rewrites": [
     {
       "source": "/api/:path*",
-      "destination": "https://api.devskyy.app/:path*"
+      "destination": "https://devskyy-api.onrender.com/:path*"
     }
   ]
 }
