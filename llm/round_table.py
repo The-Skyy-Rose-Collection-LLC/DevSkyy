@@ -930,11 +930,11 @@ class LRUHistory:
             result: Round table result to cache
         """
         # Remove if exists (to update access order)
-        if result.result_id in self.cache:
-            del self.cache[result.result_id]
+        if result.id in self.cache:
+            del self.cache[result.id]
 
         # Add to end (most recent)
-        self.cache[result.result_id] = result
+        self.cache[result.id] = result
 
         # Evict oldest if over limit
         if len(self.cache) > self.maxsize:
