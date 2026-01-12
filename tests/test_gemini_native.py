@@ -9,7 +9,7 @@ Author: DevSkyy Platform Team
 
 import base64
 from io import BytesIO
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 from PIL import Image
@@ -156,7 +156,7 @@ async def test_generate_image_success(mock_api_key, mock_success_response, mock_
     client = GeminiNativeImageClient(api_key=mock_api_key)
 
     # Mock the HTTP response
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = mock_success_response
     mock_httpx_client.request.return_value = mock_response
@@ -184,7 +184,7 @@ async def test_generate_image_with_config(mock_api_key, mock_success_response, m
     client = GeminiNativeImageClient(api_key=mock_api_key)
 
     # Mock response
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = mock_success_response
     mock_httpx_client.request.return_value = mock_response
@@ -209,7 +209,7 @@ async def test_generate_image_with_collection(
     """Test image generation with collection context."""
     client = GeminiFlashImageClient(api_key=mock_api_key)
 
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = mock_success_response
     mock_httpx_client.request.return_value = mock_response
@@ -236,7 +236,7 @@ async def test_authentication_error(mock_api_key, mock_httpx_client):
     client = GeminiNativeImageClient(api_key=mock_api_key)
 
     # Mock 401 response
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 401
     mock_httpx_client.request.return_value = mock_response
 
@@ -253,7 +253,7 @@ async def test_rate_limit_error_with_retry(mock_api_key, mock_httpx_client):
     client = GeminiNativeImageClient(api_key=mock_api_key)
 
     # Mock 429 response
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 429
     mock_response.headers = {"retry-after": "2"}
     mock_httpx_client.request.return_value = mock_response
@@ -275,7 +275,7 @@ async def test_service_unavailable_error_with_retry(mock_api_key, mock_httpx_cli
     client = GeminiNativeImageClient(api_key=mock_api_key)
 
     # Mock 503 response
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 503
     mock_httpx_client.request.return_value = mock_response
 
@@ -312,7 +312,7 @@ async def test_no_image_in_response(mock_api_key, mock_httpx_client):
     client = GeminiNativeImageClient(api_key=mock_api_key)
 
     # Mock response without image data
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = {"candidates": []}
     mock_httpx_client.request.return_value = mock_response
@@ -351,7 +351,7 @@ async def test_flash_ignores_image_size(mock_api_key, mock_success_response, moc
     """Test Flash client ignores image_size parameter."""
     client = GeminiFlashImageClient(api_key=mock_api_key)
 
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = mock_success_response
     mock_httpx_client.request.return_value = mock_response
@@ -372,7 +372,7 @@ async def test_pro_sets_default_image_size(mock_api_key, mock_success_response, 
     """Test Pro client sets default image_size to 2K."""
     client = GeminiProImageClient(api_key=mock_api_key)
 
-    mock_response = AsyncMock()
+    mock_response = Mock()
     mock_response.status_code = 200
     mock_response.json.return_value = mock_success_response
     mock_httpx_client.request.return_value = mock_response
