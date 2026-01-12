@@ -6,6 +6,7 @@
 # Core Framework
 fastapi>=0.104
 uvicorn[standard]>=0.24
+gunicorn>=21.2
 pydantic>=2.5
 pydantic-settings>=2.1
 python-multipart>=0.0.6
