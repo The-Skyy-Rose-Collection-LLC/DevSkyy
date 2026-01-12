@@ -53,6 +53,15 @@ def mock_image():
 
 
 @pytest.fixture
+def test_image_file(tmp_path):
+    """Create a temporary test image file."""
+    img = Image.new("RGB", (256, 256), color="red")
+    img_path = tmp_path / "product.jpg"
+    img.save(img_path, "JPEG")
+    return str(img_path)
+
+
+@pytest.fixture
 def mock_generation_result(mock_image):
     """Mock successful image generation result."""
     return GeneratedImage(
@@ -176,7 +185,7 @@ async def test_editor_init():
 
 
 @pytest.mark.asyncio
-async def test_start_session_with_prompt(mock_api_key, mock_generation_result):
+async def test_start_session_with_prompt(mock_api_key, mock_generation_result, test_image_file):
     """Test starting a new session with initial prompt."""
     editor = ConversationalImageEditor()
 
@@ -188,7 +197,7 @@ async def test_start_session_with_prompt(mock_api_key, mock_generation_result):
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
             session = await editor.start_session(
-                image="product.jpg", initial_prompt="Make background darker"
+                image=test_image_file, initial_prompt="Make background darker"
             )
 
             # Verify session creation
@@ -207,7 +216,7 @@ async def test_start_session_with_prompt(mock_api_key, mock_generation_result):
 
 
 @pytest.mark.asyncio
-async def test_start_session_with_collection(mock_api_key, mock_generation_result):
+async def test_start_session_with_collection(mock_api_key, mock_generation_result, test_image_file):
     """Test starting session with BLACK_ROSE collection."""
     editor = ConversationalImageEditor()
 
@@ -216,7 +225,7 @@ async def test_start_session_with_collection(mock_api_key, mock_generation_resul
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
 
             session = await editor.start_session(
-                image="product.jpg",
+                image=test_image_file,
                 initial_prompt="Gothic elegance",
                 collection=Collection.BLACK_ROSE,
             )
@@ -225,7 +234,7 @@ async def test_start_session_with_collection(mock_api_key, mock_generation_resul
 
 
 @pytest.mark.asyncio
-async def test_continue_session_success(mock_api_key, mock_generation_result):
+async def test_continue_session_success(mock_api_key, mock_generation_result, test_image_file):
     """Test continuing an existing session."""
     editor = ConversationalImageEditor()
 
@@ -234,7 +243,7 @@ async def test_continue_session_success(mock_api_key, mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(
-                image="product.jpg", initial_prompt="Initial prompt"
+                image=test_image_file, initial_prompt="Initial prompt"
             )
 
     # Continue session
@@ -251,7 +260,9 @@ async def test_continue_session_success(mock_api_key, mock_generation_result):
 
 
 @pytest.mark.asyncio
-async def test_continue_session_expired_raises_error(mock_api_key, mock_generation_result):
+async def test_continue_session_expired_raises_error(
+    mock_api_key, mock_generation_result, test_image_file
+):
     """Test continuing expired session raises ChatSessionExpiredError."""
     editor = ConversationalImageEditor()
 
@@ -259,7 +270,7 @@ async def test_continue_session_expired_raises_error(mock_api_key, mock_generati
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
-            session = await editor.start_session(image="product.jpg", initial_prompt="Initial")
+            session = await editor.start_session(image=test_image_file, initial_prompt="Initial")
 
     # Manually expire session
     session.created_at = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
@@ -283,7 +294,7 @@ async def test_continue_session_not_found_raises_error():
 
 
 @pytest.mark.asyncio
-async def test_get_session_existing(mock_api_key, mock_generation_result):
+async def test_get_session_existing(mock_api_key, mock_generation_result, test_image_file):
     """Test getting an existing session."""
     editor = ConversationalImageEditor()
 
@@ -291,10 +302,10 @@ async def test_get_session_existing(mock_api_key, mock_generation_result):
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
-            session = await editor.start_session(image="product.jpg", initial_prompt="Test")
+            session = await editor.start_session(image=test_image_file, initial_prompt="Test")
 
     # Get session
-    retrieved = await editor.get_session(session.session_id)
+    retrieved = editor.get_session(session.session_id)
 
     assert retrieved is not None
     assert retrieved.session_id == session.session_id
@@ -306,7 +317,7 @@ async def test_get_session_not_found():
     """Test getting non-existent session returns None."""
     editor = ConversationalImageEditor()
 
-    retrieved = await editor.get_session("non_existent_id")
+    retrieved = editor.get_session("non_existent_id")
 
     assert retrieved is None
 
@@ -316,13 +327,15 @@ async def test_list_active_sessions_empty():
     """Test listing active sessions when none exist."""
     editor = ConversationalImageEditor()
 
-    sessions = await editor.list_active_sessions()
+    sessions = editor.list_active_sessions()
 
     assert len(sessions) == 0
 
 
 @pytest.mark.asyncio
-async def test_list_active_sessions_with_sessions(mock_api_key, mock_generation_result):
+async def test_list_active_sessions_with_sessions(
+    mock_api_key, mock_generation_result, test_image_file
+):
     """Test listing active sessions excludes expired ones."""
     editor = ConversationalImageEditor()
 
@@ -330,23 +343,25 @@ async def test_list_active_sessions_with_sessions(mock_api_key, mock_generation_
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("11111111-1111-1111-1111-111111111111")
-            session1 = await editor.start_session(image="p1.jpg", initial_prompt="Test 1")
+            session1 = await editor.start_session(image=test_image_file, initial_prompt="Test 1")
 
             mock_uuid.return_value = uuid.UUID("22222222-2222-2222-2222-222222222222")
-            session2 = await editor.start_session(image="p2.jpg", initial_prompt="Test 2")
+            session2 = await editor.start_session(image=test_image_file, initial_prompt="Test 2")
 
     # Expire session1
     session1.created_at = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
 
     # List active sessions
-    active = await editor.list_active_sessions()
+    active = editor.list_active_sessions()
 
     assert len(active) == 1
     assert active[0]["session_id"] == session2.session_id
 
 
 @pytest.mark.asyncio
-async def test_cleanup_expired_sessions_none_expired(mock_api_key, mock_generation_result):
+async def test_cleanup_expired_sessions_none_expired(
+    mock_api_key, mock_generation_result, test_image_file
+):
     """Test cleanup when no sessions are expired."""
     editor = ConversationalImageEditor()
 
@@ -354,10 +369,10 @@ async def test_cleanup_expired_sessions_none_expired(mock_api_key, mock_generati
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("11111111-1111-1111-1111-111111111111")
-            await editor.start_session(image="p1.jpg", initial_prompt="Test 1")
+            await editor.start_session(image=test_image_file, initial_prompt="Test 1")
 
             mock_uuid.return_value = uuid.UUID("22222222-2222-2222-2222-222222222222")
-            await editor.start_session(image="p2.jpg", initial_prompt="Test 2")
+            await editor.start_session(image=test_image_file, initial_prompt="Test 2")
 
     # Cleanup
     cleaned = await editor.cleanup_expired_sessions()
@@ -367,7 +382,9 @@ async def test_cleanup_expired_sessions_none_expired(mock_api_key, mock_generati
 
 
 @pytest.mark.asyncio
-async def test_cleanup_expired_sessions_removes_expired(mock_api_key, mock_generation_result):
+async def test_cleanup_expired_sessions_removes_expired(
+    mock_api_key, mock_generation_result, test_image_file
+):
     """Test cleanup removes expired sessions."""
     editor = ConversationalImageEditor()
 
@@ -375,13 +392,13 @@ async def test_cleanup_expired_sessions_removes_expired(mock_api_key, mock_gener
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("11111111-1111-1111-1111-111111111111")
-            session1 = await editor.start_session(image="p1.jpg", initial_prompt="Test 1")
+            session1 = await editor.start_session(image=test_image_file, initial_prompt="Test 1")
 
             mock_uuid.return_value = uuid.UUID("22222222-2222-2222-2222-222222222222")
-            session2 = await editor.start_session(image="p2.jpg", initial_prompt="Test 2")
+            session2 = await editor.start_session(image=test_image_file, initial_prompt="Test 2")
 
             mock_uuid.return_value = uuid.UUID("33333333-3333-3333-3333-333333333333")
-            session3 = await editor.start_session(image="p3.jpg", initial_prompt="Test 3")
+            session3 = await editor.start_session(image=test_image_file, initial_prompt="Test 3")
 
     # Expire sessions 1 and 2
     session1.created_at = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
@@ -396,7 +413,7 @@ async def test_cleanup_expired_sessions_removes_expired(mock_api_key, mock_gener
 
 
 @pytest.mark.asyncio
-async def test_close_session(mock_api_key, mock_generation_result):
+async def test_close_session(mock_api_key, mock_generation_result, test_image_file):
     """Test manually closing a session."""
     editor = ConversationalImageEditor()
 
@@ -404,7 +421,7 @@ async def test_close_session(mock_api_key, mock_generation_result):
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
-            session = await editor.start_session(image="product.jpg", initial_prompt="Test")
+            session = await editor.start_session(image=test_image_file, initial_prompt="Test")
 
     # Close session
     success = await editor.close_session(session.session_id)
@@ -424,7 +441,7 @@ async def test_close_session_not_found():
 
 
 @pytest.mark.asyncio
-async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result):
+async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result, test_image_file):
     """Test complete multi-turn conversation workflow."""
     editor = ConversationalImageEditor()
 
@@ -433,7 +450,7 @@ async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
             session = await editor.start_session(
-                image="product.jpg",
+                image=test_image_file,
                 initial_prompt="Make background darker",
                 collection=Collection.BLACK_ROSE,
             )
@@ -451,7 +468,7 @@ async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result
         )
 
     # Verify conversation history
-    final_session = await editor.get_session(session.session_id)
+    final_session = editor.get_session(session.session_id)
     assert len(final_session.messages) == 6  # 3 turns × 2 messages each
     assert final_session.messages[0].content == "Make background darker"
     assert final_session.messages[2].content == "Add rose gold highlights to logo"
@@ -460,7 +477,7 @@ async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result
 
 
 @pytest.mark.asyncio
-async def test_concurrent_sessions(mock_api_key, mock_generation_result):
+async def test_concurrent_sessions(mock_api_key, mock_generation_result, test_image_file):
     """Test managing multiple concurrent sessions."""
     editor = ConversationalImageEditor()
 
@@ -471,7 +488,7 @@ async def test_concurrent_sessions(mock_api_key, mock_generation_result):
             with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
                 mock_uuid.return_value = uuid.UUID(f"12345678-1234-5678-1234-{i:012d}")
                 session = await editor.start_session(
-                    image=f"product_{i}.jpg", initial_prompt=f"Prompt {i}"
+                    image=test_image_file, initial_prompt=f"Prompt {i}"
                 )
                 session_ids.append(session.session_id)
 
@@ -486,12 +503,12 @@ async def test_concurrent_sessions(mock_api_key, mock_generation_result):
 
     # Verify all sessions still exist and have correct message count
     for session_id in session_ids:
-        session = await editor.get_session(session_id)
+        session = editor.get_session(session_id)
         assert len(session.messages) == 4  # 2 initial + 2 continue
 
 
 @pytest.mark.asyncio
-async def test_session_timeout_prevents_modification():
+async def test_session_timeout_prevents_modification(test_image_file):
     """Test that expired sessions cannot be modified."""
     editor = ConversationalImageEditor()
     mock_result = MagicMock()
@@ -500,7 +517,7 @@ async def test_session_timeout_prevents_modification():
     with patch.object(GeminiProImageClient, "generate", return_value=mock_result):
         with patch("agents.visual_generation.conversation_editor.uuid.uuid4") as mock_uuid:
             mock_uuid.return_value = uuid.UUID("12345678-1234-5678-1234-567812345678")
-            session = await editor.start_session(image="product.jpg", initial_prompt="Test")
+            session = await editor.start_session(image=test_image_file, initial_prompt="Test")
 
     # Expire session
     session.created_at = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
