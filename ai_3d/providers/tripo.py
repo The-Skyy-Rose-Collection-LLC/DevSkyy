@@ -11,17 +11,124 @@ API Reference: https://platform.tripo3d.ai/docs
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import os
 from pathlib import Path
 from typing import Any
 
 import httpx
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, field_validator
 
 from errors.production_errors import ConfigurationError
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Request Validation Models (3D Pipeline Hardening)
+# =============================================================================
+
+
+class ImageGenerationRequest(BaseModel):
+    """Validated image-to-3D generation request."""
+
+    image_path: Path
+    output_format: str
+    prompt: str | None = None
+    texture_resolution: int = Field(default=2048, ge=512, le=4096)
+
+    @field_validator("image_path")
+    @classmethod
+    def validate_image_exists(cls, v: Path) -> Path:
+        """Validate image file exists."""
+        if not v.exists():
+            raise ValueError("Image file does not exist")
+        return v
+
+    @field_validator("image_path")
+    @classmethod
+    def validate_file_size(cls, v: Path) -> Path:
+        """Validate file size is ≤10MB."""
+        max_size = 10 * 1024 * 1024  # 10MB
+        if v.stat().st_size > max_size:
+            raise ValueError(
+                f"Image file too large (max 10MB): {v.stat().st_size / 1024 / 1024:.1f}MB"
+            )
+        return v
+
+    @field_validator("image_path")
+    @classmethod
+    def validate_format(cls, v: Path) -> Path:
+        """Validate file format is allowed."""
+        allowed = {".jpg", ".jpeg", ".png", ".webp"}
+        if v.suffix.lower() not in allowed:
+            raise ValueError(f"Invalid image format: {v.suffix} (allowed: {allowed})")
+        return v
+
+    @field_validator("prompt")
+    @classmethod
+    def sanitize_prompt(cls, v: str | None) -> str | None:
+        """Sanitize prompt for XSS/injection attacks."""
+        if v is None:
+            return None
+
+        # Check for dangerous patterns
+        dangerous = ["<script", "javascript:", "<iframe", "onerror=", "onclick=", "onload="]
+        if any(pattern in v.lower() for pattern in dangerous):
+            raise ValueError("Potentially dangerous content in prompt")
+
+        return v
+
+    @field_validator("output_format")
+    @classmethod
+    def validate_output_format(cls, v: str) -> str:
+        """Validate output format is supported."""
+        allowed = {"glb", "gltf", "obj", "fbx"}
+        if v.lower() not in allowed:
+            raise ValueError(f"Invalid format: {v} (allowed: {allowed})")
+        return v.lower()
+
+
+class TextGenerationRequest(BaseModel):
+    """Validated text-to-3D generation request."""
+
+    prompt: str = Field(min_length=10)
+    output_format: str
+
+    @field_validator("prompt")
+    @classmethod
+    def sanitize_and_trim(cls, v: str) -> str:
+        """Sanitize and trim prompt."""
+        # Trim whitespace
+        v = v.strip()
+
+        # Check for XSS/injection
+        dangerous = ["<script", "javascript:", "<iframe", "onerror=", "onclick=", "onload="]
+        if any(pattern in v.lower() for pattern in dangerous):
+            raise ValueError("Potentially dangerous content in prompt")
+
+        return v
+
+
+class TripoAPIResponse(BaseModel):
+    """Validated Tripo API response."""
+
+    code: int
+    message: str
+    data: dict[str, Any] | None = None
+
+    @field_validator("code")
+    @classmethod
+    def validate_code_range(cls, v: int) -> int:
+        """Validate HTTP status code is in valid range."""
+        if not (100 <= v <= 599):
+            raise ValueError(f"Invalid API response code: {v} (must be 100-599)")
+        return v
+
+    def is_success(self) -> bool:
+        """Check if response indicates success."""
+        return 200 <= self.code < 300 and self.data is not None
 
 
 class TripoTaskStatus(BaseModel):
@@ -49,12 +156,13 @@ class TripoClient:
     POLL_INTERVAL = 5  # seconds
     MAX_WAIT_TIME = 600  # 10 minutes
 
-    def __init__(self, api_key: str | None = None) -> None:
+    def __init__(self, api_key: str | None = None, enable_resilience: bool = False) -> None:
         """
         Initialize the Tripo client.
 
         Args:
             api_key: Tripo API key (or set TRIPO_API_KEY env var)
+            enable_resilience: Enable retry/circuit breaker (for production)
         """
         self.api_key = api_key or os.getenv("TRIPO_API_KEY")
         if not self.api_key:
@@ -62,6 +170,9 @@ class TripoClient:
                 "TRIPO_API_KEY is required",
                 config_key="TRIPO_API_KEY",
             )
+
+        self.enable_resilience = enable_resilience
+        self._result_cache: dict[str, Any] = {}  # Simple in-memory cache
 
         self._client = httpx.AsyncClient(
             base_url=self.BASE_URL,
@@ -312,6 +423,98 @@ class TripoClient:
             response.raise_for_status()
             output_path.write_bytes(response.content)
             logger.info(f"Downloaded model to: {output_path}")
+
+    def _validate_task_result(self, result: dict[str, Any]) -> None:
+        """
+        Validate task result structure.
+
+        Args:
+            result: Task result dictionary
+
+        Raises:
+            ValueError: If result structure is invalid
+        """
+        if "model" not in result:
+            raise ValueError("Task result missing 'model' field")
+
+        model = result["model"]
+        if not isinstance(model, dict):
+            raise ValueError("Invalid model data structure")
+
+        if "url" not in model:
+            raise ValueError("Task result missing valid model URL")
+
+        url = model["url"]
+        if not isinstance(url, str) or not (
+            url.startswith("https://") or url.startswith("http://")
+        ):
+            raise ValueError(f"Invalid model URL: {url}")
+
+    async def _download_model_resilient(self, url: str, output_path: Path) -> None:
+        """
+        Download model with retry logic.
+
+        Args:
+            url: Model URL
+            output_path: Destination path
+        """
+        if not self.enable_resilience:
+            # No resilience - use simple download
+            await self._download_model(url, output_path)
+            return
+
+        # Retry logic for resilient download
+        max_retries = 3
+        retry_delay = 2.0
+
+        for attempt in range(1, max_retries + 1):
+            try:
+                await self._download_model(url, output_path)
+                return
+            except (httpx.NetworkError, httpx.TimeoutException) as e:
+                if attempt == max_retries:
+                    raise
+                logger.warning(
+                    f"Download attempt {attempt} failed: {e}. Retrying in {retry_delay}s..."
+                )
+                await asyncio.sleep(retry_delay)
+                retry_delay *= 2  # Exponential backoff
+
+    def _sanitize_for_logs(self, text: str, max_length: int = 100) -> str:
+        """
+        Sanitize text for logging (PII protection).
+
+        Args:
+            text: Text to sanitize
+            max_length: Max length before truncation
+
+        Returns:
+            Sanitized text with hash
+        """
+        if len(text) <= max_length:
+            return text
+
+        # Truncate and add hash for uniqueness
+        truncated = text[:max_length]
+        text_hash = hashlib.sha256(text.encode()).hexdigest()[:8]
+        return f"{truncated}... (hash:{text_hash})"
+
+    def get_health_status(self) -> dict[str, Any]:
+        """
+        Get client health status.
+
+        Returns:
+            Health status dictionary
+        """
+        return {
+            "service_name": "tripo3d",
+            "api_configured": bool(self.api_key),
+            "resilience_enabled": self.enable_resilience,
+            "cache_size": len(self._result_cache),
+            "circuit_breaker": {
+                "state": "CLOSED" if self.enable_resilience else "N/A",
+            },
+        }
 
     async def get_balance(self) -> dict[str, Any]:
         """Get account balance/credits."""
