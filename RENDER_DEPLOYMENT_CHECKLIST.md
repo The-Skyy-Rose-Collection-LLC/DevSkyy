@@ -149,7 +149,11 @@ SENTRY_DSN=https://...@sentry.io/...
 
 **API Categories** (13 endpoints documented):
 - Code scanning and fixing
-- WordPress/WooCommerce integration
+- WordPress/WooCommerce integration (12 endpoints)
+  - Pages: list, get, create, update, delete
+  - Products: list, get, categories
+  - Media: list, upload
+  - Sync: status, trigger sync
 - Machine learning predictions
 - 3D model generation
 - Marketing campaigns
@@ -319,11 +323,14 @@ COHERE_API_KEY=...
 # Optional: 3D Generation
 TRIPO_API_KEY=...
 FASHN_API_KEY=...
+HUGGINGFACE_ACCESS_TOKEN=...
 
-# Optional: WordPress
-WORDPRESS_URL=https://...
-WOOCOMMERCE_KEY=ck_...
-WOOCOMMERCE_SECRET=cs_...
+# WordPress/WooCommerce (configured)
+WORDPRESS_URL=https://skyyrose.co
+WORDPRESS_USERNAME=skyyroseco
+WORDPRESS_APP_PASSWORD=IQb3KFqFA76vhMJmsyT1tCTC
+WOOCOMMERCE_KEY=ck_f2c49886126f8ec0626a2ec6082ef44d7105ae7c
+WOOCOMMERCE_SECRET=cs_58bbf671bdbdd7fdab8a70c3460290dd63dff839
 ```
 
 3. Click **Save Changes**
