@@ -44,7 +44,7 @@ NEXT_PUBLIC_ENABLE_ROUND_TABLE=true
 2. Add all `NEXT_PUBLIC_*` variables from `.env.production`
 3. Add Stack Auth credentials (if using)
 
-### 3. Production Pages Validated (11 pages)
+### 3. Production Pages Validated (12 pages)
 All pages exist, compile successfully, and have correct routing:
 
 1. ✅ **Dashboard** (`/`) - 6.49 kB
@@ -86,6 +86,11 @@ All pages exist, compile successfully, and have correct routing:
 11. ✅ **HF Spaces** (`/hf-spaces`) - 3.77 kB
     - HuggingFace Space embeds
 
+12. ✅ **WordPress** (`/wordpress`) - New!
+    - WordPress & WooCommerce management
+    - Pages, products, media, sync status
+    - Links: External links to WordPress site
+
 ### 4. Navigation
 **Main Navigation** (in `layout.tsx`):
 - ✅ `/` → Dashboard
@@ -94,6 +99,7 @@ All pages exist, compile successfully, and have correct routing:
 - ✅ `/round-table` → Round Table
 - ✅ `/ab-testing` → A/B Testing
 - ✅ `/tools` → Tools
+- ✅ `/wordpress` → WordPress
 - ✅ `/settings` → Settings
 
 **All links validated** - no 404s!
