@@ -127,7 +127,7 @@ def test_ml_prediction_input_validation():
 @pytest.mark.asyncio
 async def test_process_3d_asset_generation_success():
     """Test 3D asset generation task succeeds with valid input."""
-    with patch("orchestration.tasks.TripoAssetAgent") as mock_agent_class:
+    with patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_class:
         # Mock agent instance
         mock_agent = AsyncMock()
         mock_agent._tool_generate_from_text = AsyncMock(
@@ -165,7 +165,7 @@ async def test_process_3d_asset_generation_success():
 @pytest.mark.asyncio
 async def test_process_3d_asset_generation_with_image():
     """Test 3D asset generation with image input."""
-    with patch("orchestration.tasks.TripoAssetAgent") as mock_agent_class:
+    with patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_class:
         mock_agent = AsyncMock()
         mock_agent._tool_generate_from_image = AsyncMock(
             return_value={"task_id": "tripo-xyz789", "status": "success"}
@@ -191,7 +191,7 @@ async def test_process_3d_asset_generation_with_image():
 @pytest.mark.asyncio
 async def test_process_3d_asset_generation_failure():
     """Test 3D asset generation handles errors correctly."""
-    with patch("orchestration.tasks.TripoAssetAgent") as mock_agent_class:
+    with patch("agents.tripo_agent.TripoAssetAgent") as mock_agent_class:
         mock_agent = AsyncMock()
         mock_agent._tool_generate_from_text = AsyncMock(side_effect=RuntimeError("API error"))
         mock_agent.close = AsyncMock()
@@ -213,7 +213,7 @@ async def test_process_3d_asset_generation_failure():
 @pytest.mark.asyncio
 async def test_execute_marketing_campaign_email():
     """Test marketing campaign execution (email)."""
-    with patch("orchestration.tasks.MarketingAgent") as mock_agent_class:
+    with patch("agents.marketing_agent.MarketingAgent") as mock_agent_class:
         mock_agent = AsyncMock()
         mock_agent.initialize = AsyncMock()
         mock_agent_class.return_value = mock_agent
@@ -243,7 +243,7 @@ async def test_execute_marketing_campaign_email():
 @pytest.mark.asyncio
 async def test_execute_marketing_campaign_invalid_type():
     """Test marketing campaign with invalid type."""
-    with patch("orchestration.tasks.MarketingAgent") as mock_agent_class:
+    with patch("agents.marketing_agent.MarketingAgent") as mock_agent_class:
         mock_agent = AsyncMock()
         mock_agent.initialize = AsyncMock()
         mock_agent_class.return_value = mock_agent

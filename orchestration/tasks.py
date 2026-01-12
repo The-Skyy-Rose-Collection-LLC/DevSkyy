@@ -282,10 +282,10 @@ async def train_ml_model(task_id: str, input_data: dict[str, Any]) -> dict[str, 
         )
 
         # Import ML module (lazy)
-        from agents.base_super_agent import MLCapabilitiesModule
+        from agents.base_super_agent import MLCapabilitiesModule, SuperAgentType
 
         # Initialize ML module
-        ml_module = MLCapabilitiesModule()
+        ml_module = MLCapabilitiesModule(agent_type=SuperAgentType.ANALYTICS)
 
         # Train model (placeholder - implement based on model_id)
         # TODO: Add actual model training logic for each model type
@@ -351,10 +351,10 @@ async def run_ml_prediction(task_id: str, input_data: dict[str, Any]) -> dict[st
         logger.info(f"[Task {task_id}] Starting ML prediction: model={validated_input.model_id}")
 
         # Import ML module (lazy)
-        from agents.base_super_agent import MLCapabilitiesModule
+        from agents.base_super_agent import MLCapabilitiesModule, SuperAgentType
 
         # Initialize ML module
-        ml_module = MLCapabilitiesModule()
+        ml_module = MLCapabilitiesModule(agent_type=SuperAgentType.ANALYTICS)
 
         # Run prediction (placeholder - implement based on model_id)
         # TODO: Add actual prediction logic for each model type
