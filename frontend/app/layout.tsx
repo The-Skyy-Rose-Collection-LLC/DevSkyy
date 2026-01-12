@@ -15,6 +15,7 @@ import {
   Wrench,
   Settings,
   Box,
+  Globe,
 } from 'lucide-react';
 import './globals.css';
 
@@ -43,6 +44,7 @@ const navItems = [
   { href: '/round-table', label: 'Round Table', icon: Trophy },
   { href: '/ab-testing', label: 'A/B Testing', icon: FlaskConical },
   { href: '/tools', label: 'Tools', icon: Wrench },
+  { href: '/wordpress', label: 'WordPress', icon: Globe },
 ];
 
 export default function RootLayout({
