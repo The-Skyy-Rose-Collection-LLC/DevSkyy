@@ -911,7 +911,7 @@ class TestRequestSigning:
 
     def test_request_signer_basic(self):
         """Should sign and verify request signature."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret-key")
 
@@ -939,7 +939,7 @@ class TestRequestSigning:
 
     def test_request_signer_with_dict_body(self):
         """Should sign requests with dict body."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
         body = {"user_id": "123", "action": "delete"}
@@ -959,7 +959,7 @@ class TestRequestSigning:
 
     def test_request_signer_empty_body(self):
         """Should sign GET requests with no body."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
 
@@ -977,7 +977,7 @@ class TestRequestSigning:
 
     def test_request_signer_tampered_signature_fails(self):
         """Should reject tampered signatures."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
         headers = signer.sign_request(method="POST", path="/api/v1/admin/stats", body=b"test")
@@ -997,7 +997,7 @@ class TestRequestSigning:
 
     def test_request_signer_different_body_fails(self):
         """Should reject signature if body changed."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
         headers = signer.sign_request(method="POST", path="/api/v1/admin/stats", body=b"original")
