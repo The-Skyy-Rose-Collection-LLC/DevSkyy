@@ -3,8 +3,8 @@
 ## Status: ✅ Connected
 
 The DevSkyy frontend is fully connected to the production backend at:
-- **API URL:** `https://devskyy-backend.onrender.com`
-- **WebSocket URL:** `wss://devskyy-backend.onrender.com`
+- **API URL:** `https://api.devskyy.app`
+- **WebSocket URL:** `wss://api.devskyy.app`
 
 ---
 
@@ -207,9 +207,9 @@ open http://localhost:3000/hf-spaces
 ## Production URLs
 
 - **Frontend (Vercel):** TBD (will be assigned after deployment)
-- **Backend (Render):** https://devskyy-backend.onrender.com
-- **Health Check:** https://devskyy-backend.onrender.com/health
-- **API Docs:** https://devskyy-backend.onrender.com/docs
+- **Backend (Production):** https://api.devskyy.app
+- **Health Check:** https://api.devskyy.app/health
+- **API Docs:** https://api.devskyy.app/docs
 
 ---
 
