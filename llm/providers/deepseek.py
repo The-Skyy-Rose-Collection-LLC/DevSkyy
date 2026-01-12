@@ -156,9 +156,19 @@ class DeepSeekClient(BaseLLMClient):
             output_tokens=usage.get("completion_tokens", 0),
             total_tokens=usage.get("total_tokens", 0),
             finish_reason=choice.get("finish_reason"),
-            tool_calls=tool_calls if tool_calls else None,
+            tool_calls=tool_calls if tool_calls else [],
             latency_ms=int((datetime.now(UTC) - start_time).total_seconds() * 1000),
         )
+
+        # Calculate cost based on model pricing
+        model_info = self.get_model_info(model)
+        if model_info:
+            input_cost_per_1m = model_info.get("cost_per_1m_input", 0)
+            output_cost_per_1m = model_info.get("cost_per_1m_output", 0)
+            response_obj.cost_usd = response_obj.get_cost_estimate(
+                input_cost_per_1m / 1000,  # Convert to per-1k pricing
+                output_cost_per_1m / 1000,
+            )
 
         # Add reasoning content to metadata for R1
         if reasoning_content:

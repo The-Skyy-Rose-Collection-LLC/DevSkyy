@@ -3,7 +3,7 @@ Tests for DeepSeek LLM Provider
 ================================
 """
 
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, Mock, patch
 
 import pytest
 
@@ -17,11 +17,11 @@ async def test_deepseek_chat_completion(mock_api_keys, mock_deepseek_response):
     """Test basic chat completion with DeepSeek."""
     with patch("httpx.AsyncClient") as mock_client_class:
         mock_client = AsyncMock()
-        mock_response = AsyncMock()
+        mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = mock_deepseek_response
-        mock_client.post.return_value = mock_response
-        mock_client_class.return_value.__aenter__.return_value = mock_client
+        mock_client.request = AsyncMock(return_value=mock_response)
+        mock_client_class.return_value = mock_client
 
         client = DeepSeekClient()
         messages = [Message.user("Write a factorial function")]
@@ -31,7 +31,7 @@ async def test_deepseek_chat_completion(mock_api_keys, mock_deepseek_response):
         assert response.content
         assert "factorial" in response.content.lower()
         assert response.model == "deepseek-chat"
-        assert response.usage.total_tokens == 70
+        assert response.total_tokens == 70
 
 
 @pytest.mark.unit
@@ -54,11 +54,11 @@ async def test_deepseek_reasoning_model(mock_api_keys):
 
     with patch("httpx.AsyncClient") as mock_client_class:
         mock_client = AsyncMock()
-        mock_response = AsyncMock()
+        mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = reasoning_response
-        mock_client.post.return_value = mock_response
-        mock_client_class.return_value.__aenter__.return_value = mock_client
+        mock_client.request = AsyncMock(return_value=mock_response)
+        mock_client_class.return_value = mock_client
 
         client = DeepSeekClient()
         messages = [Message.user("Solve this optimization problem")]
@@ -75,11 +75,11 @@ async def test_deepseek_cost_calculation(mock_api_keys, mock_deepseek_response):
     """Test cost calculation for DeepSeek (should be very cheap)."""
     with patch("httpx.AsyncClient") as mock_client_class:
         mock_client = AsyncMock()
-        mock_response = AsyncMock()
+        mock_response = Mock()
         mock_response.status_code = 200
         mock_response.json.return_value = mock_deepseek_response
-        mock_client.post.return_value = mock_response
-        mock_client_class.return_value.__aenter__.return_value = mock_client
+        mock_client.request = AsyncMock(return_value=mock_response)
+        mock_client_class.return_value = mock_client
 
         client = DeepSeekClient()
         messages = [Message.user("Test")]
@@ -97,8 +97,11 @@ async def test_deepseek_cost_calculation(mock_api_keys, mock_deepseek_response):
 
 
 @pytest.mark.unit
-def test_deepseek_provider_config():
+def test_deepseek_provider_config(mock_api_keys):
     """Test DeepSeek provider configuration."""
     assert DeepSeekClient.provider == "deepseek"
     assert DeepSeekClient.default_model == "deepseek-chat"
-    assert DeepSeekClient.base_url == "https://api.deepseek.com"
+
+    # Check default base_url via instance (it's an instance variable)
+    client = DeepSeekClient()
+    assert client.base_url == "https://api.deepseek.com/v1"
