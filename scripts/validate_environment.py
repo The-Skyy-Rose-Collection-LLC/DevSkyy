@@ -297,30 +297,30 @@ def validate_llm_providers(result: ValidationResult) -> bool:
 
 def validate_optional_features(result: ValidationResult) -> None:
     """Check optional feature API keys and provide warnings/info."""
-    optional_keys = {
-        "3D Generation": {
-            "TRIPO_API_KEY": "Tripo3D (3D model generation)",
-            "FASHN_API_KEY": "FASHN (virtual try-on)",
+    optional_keys = {  # pragma: allowlist secret
+        "3D Generation": {  # pragma: allowlist secret
+            "TRIPO_API_KEY": "Tripo3D (3D model generation)",  # pragma: allowlist secret
+            "FASHN_API_KEY": "FASHN (virtual try-on)",  # pragma: allowlist secret
         },
-        "Image Generation": {
-            "STABILITY_API_KEY": "Stability AI (Stable Diffusion)",
-            "REPLICATE_API_TOKEN": "Replicate (model hosting)",
+        "Image Generation": {  # pragma: allowlist secret
+            "STABILITY_API_KEY": "Stability AI (Stable Diffusion)",  # pragma: allowlist secret
+            "REPLICATE_API_TOKEN": "Replicate (model hosting)",  # pragma: allowlist secret
         },
         "E-commerce": {
             "WOOCOMMERCE_KEY": "WooCommerce API key",
-            "WOOCOMMERCE_SECRET": "WooCommerce API secret",
+            "WOOCOMMERCE_SECRET": "WooCommerce API secret",  # pragma: allowlist secret
         },
         "Monitoring": {
             "SENTRY_DSN": "Sentry error tracking",
-            "DD_API_KEY": "DataDog APM",
-            "NEW_RELIC_LICENSE_KEY": "New Relic monitoring",
+            "DD_API_KEY": "DataDog APM",  # pragma: allowlist secret
+            "NEW_RELIC_LICENSE_KEY": "New Relic monitoring",  # pragma: allowlist secret
         },
-        "Email/Notifications": {
-            "SENDGRID_API_KEY": "SendGrid email",
+        "Email/Notifications": {  # pragma: allowlist secret
+            "SENDGRID_API_KEY": "SendGrid email",  # pragma: allowlist secret
             "TWILIO_ACCOUNT_SID": "Twilio SMS",
         },
-        "Payments": {
-            "STRIPE_SECRET_KEY": "Stripe payments",
+        "Payments": {  # pragma: allowlist secret
+            "STRIPE_SECRET_KEY": "Stripe payments",  # pragma: allowlist secret
         },
     }
 
@@ -395,8 +395,8 @@ def validate_environment(env_file: str) -> bool:
     print(f"{Colors.BLUE}{'=' * 80}{Colors.NC}")
     print(f"{Colors.CYAN}Validating: {env_file}{Colors.NC}\n")
 
-    # Load environment file
-    load_dotenv(env_file)
+    # Load environment file (override existing vars for testing)
+    load_dotenv(env_file, override=True)
 
     # 1. Validate core security secrets
     print(f"{Colors.PURPLE}Checking security secrets...{Colors.NC}")
