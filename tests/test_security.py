@@ -5,8 +5,6 @@ Tests for security module
 Encryption and authentication tests.
 """
 
-import sys
-
 import pytest
 
 from security.aes256_gcm_encryption import (
@@ -240,8 +238,11 @@ class TestPasswordManager:
         assert pm.verify_password("wrong", hashed) is False
 
     @pytest.mark.skip(
-        reason="passlib/bcrypt compatibility issue - bcrypt 5.x changed password "
-        "length handling. Argon2 is the recommended default. Skip bcrypt fallback test."
+        reason="INTENTIONAL SKIP: passlib/bcrypt 5.x compatibility issue. "
+        "BCrypt 5.x changed password length handling which breaks passlib integration. "
+        "Argon2id is the production default per security best practices. "
+        "BCrypt support retained for legacy password verification only. "
+        "See: https://github.com/pyca/bcrypt/issues/684"
     )
     def test_bcrypt_fallback(self):
         """Should support BCrypt for legacy."""
@@ -856,7 +857,7 @@ class TestTieredRateLimiting:
         for i in range(free_tier.requests_per_minute):
             is_allowed, info = limiter.check_tier_limit(request, "free")
             if i < free_tier.requests_per_minute - 1:
-                assert is_allowed is True, f"Request {i+1} should be allowed"
+                assert is_allowed is True, f"Request {i + 1} should be allowed"
 
         # Next request should be blocked
         is_allowed, info = limiter.check_tier_limit(request, "free")
@@ -910,7 +911,7 @@ class TestRequestSigning:
 
     def test_request_signer_basic(self):
         """Should sign and verify request signature."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret-key")
 
@@ -938,7 +939,7 @@ class TestRequestSigning:
 
     def test_request_signer_with_dict_body(self):
         """Should sign requests with dict body."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
         body = {"user_id": "123", "action": "delete"}
@@ -958,7 +959,7 @@ class TestRequestSigning:
 
     def test_request_signer_empty_body(self):
         """Should sign GET requests with no body."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
 
@@ -976,7 +977,7 @@ class TestRequestSigning:
 
     def test_request_signer_tampered_signature_fails(self):
         """Should reject tampered signatures."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
         headers = signer.sign_request(method="POST", path="/api/v1/admin/stats", body=b"test")
@@ -996,7 +997,7 @@ class TestRequestSigning:
 
     def test_request_signer_different_body_fails(self):
         """Should reject signature if body changed."""
-        from sdk.request_signer import RequestSigner
+        from agent_sdk.utils.request_signer import RequestSigner
 
         signer = RequestSigner("test-secret")
         headers = signer.sign_request(method="POST", path="/api/v1/admin/stats", body=b"original")
@@ -1418,6 +1419,7 @@ class TestCSRFProtection:
     def test_csrf_token_randomness(self):
         """Should generate unique CSRF tokens for different sessions."""
         import time
+
         # Use different session IDs to ensure uniqueness
         tokens = []
         for i in range(10):

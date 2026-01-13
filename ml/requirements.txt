@@ -3,7 +3,7 @@
 
 # Core ML frameworks
 torch==2.9.1
-torchvision==0.20.1
+torchvision==0.24.1
 torchaudio==2.9.1
 transformers>=4.53.0  # Fixed: CVE-2024-11392, CVE-2024-11393, CVE-2024-11394, CVE-2025-3933, CVE-2025-5197, CVE-2025-6051, CVE-2025-6638, CVE-2025-6921
 huggingface-hub>=0.27.0
@@ -58,8 +58,8 @@ librosa==0.10.2.post1
 soundfile==0.12.1
 
 # Time series
-statsmodels==0.14.4
-prophet==1.1.6
+statsmodels==0.14.6
+prophet==1.2.1
 
 # Reinforcement learning
 gym==0.26.2
@@ -71,7 +71,7 @@ lime==0.2.0.1
 
 # Data processing
 polars==1.15.0
-pyarrow==18.1.0
+pyarrow==22.0.0
 
 # Async ML
 asyncio==3.4.3
@@ -82,7 +82,7 @@ omegaconf==2.3.0
 
 # Utilities
 tqdm==4.67.1
-joblib==1.4.2
+joblib==1.5.3
 dill==0.4.0
 
 # FastAPI integration

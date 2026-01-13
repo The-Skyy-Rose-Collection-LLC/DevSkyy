@@ -30,8 +30,7 @@ from adk.base import (
     AgentStatus,
     ToolDefinition,
 )
-from orchestration.prompt_engineering import PromptTechnique
-from runtime.tools import (
+from core.runtime.tool_registry import (
     ParameterType,
     ToolCategory,
     ToolParameter,
@@ -39,8 +38,13 @@ from runtime.tools import (
     ToolSeverity,
     ToolSpec,
 )
+from orchestration.prompt_engineering import PromptTechnique
 
 from .base_super_agent import EnhancedSuperAgent, SuperAgentType
+from .multimodal_capabilities import (
+    AnalysisType,
+    get_multimodal_capabilities,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -377,6 +381,45 @@ Google + HuggingFace handle ALL imagery/video/AI model generation - NO EXCEPTION
                         "description": "Type filter (image, video, 3d)",
                     },
                     "collection": {"type": "string", "description": "Collection filter"},
+                },
+            ),
+            # Multimodal Analysis Tools (LlamaIndex-powered)
+            ToolDefinition(
+                name="analyze_product_image",
+                description="AI-powered product image analysis with detailed description generation",
+                parameters={
+                    "image_path": {"type": "string", "description": "Path or URL to product image"},
+                    "product_type": {
+                        "type": "string",
+                        "description": "Type of product (clothing, jewelry, accessory)",
+                    },
+                    "include_technical": {
+                        "type": "boolean",
+                        "description": "Include technical details like dimensions",
+                    },
+                },
+            ),
+            ToolDefinition(
+                name="check_brand_compliance",
+                description="Check if image complies with SkyyRose brand guidelines",
+                parameters={
+                    "image_path": {"type": "string", "description": "Path or URL to image"},
+                    "check_colors": {"type": "boolean", "description": "Check color compliance"},
+                    "check_quality": {"type": "boolean", "description": "Check image quality"},
+                },
+            ),
+            ToolDefinition(
+                name="extract_image_colors",
+                description="Extract dominant colors from image for palette analysis",
+                parameters={
+                    "image_path": {"type": "string", "description": "Path or URL to image"},
+                },
+            ),
+            ToolDefinition(
+                name="analyze_visual_quality",
+                description="Analyze image quality, resolution, and technical specifications",
+                parameters={
+                    "image_path": {"type": "string", "description": "Path or URL to image"},
                 },
             ),
         ]
@@ -904,9 +947,9 @@ Parameters: {kwargs}"""
         """Enhance prompt with brand DNA"""
         brand_context = f"""
 Brand: SkyyRose - "Where Love Meets Luxury"
-Aesthetic: {self.SKYYROSE_BRAND_DNA['aesthetic']}
-Style: {self.SKYYROSE_BRAND_DNA['style']}
-Quality: {self.SKYYROSE_BRAND_DNA['quality']}
+Aesthetic: {self.SKYYROSE_BRAND_DNA["aesthetic"]}
+Style: {self.SKYYROSE_BRAND_DNA["style"]}
+Quality: {self.SKYYROSE_BRAND_DNA["quality"]}
 Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
 """
         return f"{prompt}\n\n{brand_context}"
@@ -960,6 +1003,182 @@ Colors: Rose gold (#B76E79), black (#1A1A1A), white (#FFFFFF)
             "text": f"Generated with {provider.value}: {prompt[:100]}...",
             "cost": 0.01,
         }
+
+    # =========================================================================
+    # Multimodal Analysis Methods (LlamaIndex Integration)
+    # =========================================================================
+
+    async def analyze_product_image_tool(
+        self, image_path: str, product_type: str = "clothing", include_technical: bool = True
+    ) -> dict[str, Any]:
+        """
+        Tool handler for product image analysis.
+
+        Uses LlamaIndex multimodal capabilities to analyze product images
+        and generate detailed e-commerce descriptions.
+
+        Args:
+            image_path: Path or URL to product image
+            product_type: Type of product (clothing, jewelry, accessory)
+            include_technical: Include technical details
+
+        Returns:
+            Analysis result with product description
+        """
+        try:
+            capabilities = get_multimodal_capabilities()
+            await capabilities.initialize()
+
+            result = await capabilities.analyze_product_image(
+                image_path=image_path,
+                product_type=product_type,
+                include_technical=include_technical,
+            )
+
+            return {
+                "success": True,
+                "product_type": product_type,
+                "description": result.text_response,
+                "confidence": result.confidence,
+                "provider": result.provider.value,
+                "processing_time_ms": result.processing_time_ms,
+                "metadata": result.metadata,
+            }
+
+        except Exception as e:
+            logger.error(f"Product image analysis failed: {e}", exc_info=True)
+            return {
+                "success": False,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            }
+
+    async def check_brand_compliance_tool(
+        self, image_path: str, check_colors: bool = True, check_quality: bool = True
+    ) -> dict[str, Any]:
+        """
+        Tool handler for brand compliance checking.
+
+        Analyzes images against SkyyRose brand guidelines.
+
+        Args:
+            image_path: Path or URL to image
+            check_colors: Check color compliance
+            check_quality: Check image quality
+
+        Returns:
+            Compliance analysis result
+        """
+        try:
+            capabilities = get_multimodal_capabilities()
+            await capabilities.initialize()
+
+            result = await capabilities.check_brand_compliance(
+                image_path=image_path,
+                brand_colors=self.SKYYROSE_BRAND_DNA["primary_colors"],
+                brand_style=self.SKYYROSE_BRAND_DNA["aesthetic"],
+            )
+
+            return {
+                "success": True,
+                "compliant": "✓ PASS" in result.text_response,
+                "analysis": result.text_response,
+                "provider": result.provider.value,
+                "processing_time_ms": result.processing_time_ms,
+                "checks": {
+                    "colors": check_colors,
+                    "quality": check_quality,
+                },
+            }
+
+        except Exception as e:
+            logger.error(f"Brand compliance check failed: {e}", exc_info=True)
+            return {
+                "success": False,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            }
+
+    async def extract_image_colors_tool(self, image_path: str) -> dict[str, Any]:
+        """
+        Tool handler for color extraction.
+
+        Analyzes and extracts dominant colors from images.
+
+        Args:
+            image_path: Path or URL to image
+
+        Returns:
+            Color analysis result
+        """
+        try:
+            capabilities = get_multimodal_capabilities()
+            await capabilities.initialize()
+
+            result = await capabilities.extract_colors(image_path=image_path)
+
+            return {
+                "success": True,
+                "colors": result.text_response,
+                "provider": result.provider.value,
+                "processing_time_ms": result.processing_time_ms,
+            }
+
+        except Exception as e:
+            logger.error(f"Color extraction failed: {e}", exc_info=True)
+            return {
+                "success": False,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            }
+
+    async def analyze_visual_quality_tool(self, image_path: str) -> dict[str, Any]:
+        """
+        Tool handler for visual quality analysis.
+
+        Analyzes image quality, resolution, and technical specifications.
+
+        Args:
+            image_path: Path or URL to image
+
+        Returns:
+            Quality analysis result
+        """
+        try:
+            capabilities = get_multimodal_capabilities()
+            await capabilities.initialize()
+
+            prompt = """Analyze this image's technical quality:
+
+1. **Resolution & Size**: Estimate resolution and dimensions
+2. **Image Quality**: Sharpness, clarity, compression artifacts
+3. **Lighting**: Lighting quality and consistency
+4. **Composition**: Framing, subject placement, background
+5. **Color Accuracy**: Color saturation, balance, accuracy
+6. **Technical Issues**: Any defects, noise, or problems
+
+Provide a quality score (1-10) and detailed recommendations."""
+
+            result = await capabilities.analyze_image(
+                image_path=image_path,
+                analysis_type=AnalysisType.QUALITY_CHECK,
+                prompt=prompt,
+            )
+
+            return {
+                "success": True,
+                "analysis": result.text_response,
+                "provider": result.provider.value,
+                "processing_time_ms": result.processing_time_ms,
+            }
+
+        except Exception as e:
+            logger.error(f"Quality analysis failed: {e}", exc_info=True)
+            return {
+                "success": False,
+                "error": str(e),
+                "error_type": type(e).__name__,
+            }
 
 
 # =============================================================================

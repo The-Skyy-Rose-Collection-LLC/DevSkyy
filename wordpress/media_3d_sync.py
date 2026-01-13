@@ -18,7 +18,7 @@ from __future__ import annotations
 
 import asyncio
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 import aiohttp
 import structlog
@@ -87,7 +87,7 @@ class WordPress3DMediaSync:
 
     Usage:
         sync = WordPress3DMediaSync(
-            wp_url="https://skyyrose.com",
+            wp_url="https://skyyrose.co",
             username="admin",
             app_password="xxxx xxxx xxxx xxxx",
         )
@@ -96,9 +96,9 @@ class WordPress3DMediaSync:
             # Sync 3D model to product
             result = await sync.sync_3d_model(
                 product_id=123,
-                glb_url="https://cdn.skyyrose.com/models/product-123.glb",
-                usdz_url="https://cdn.skyyrose.com/models/product-123.usdz",
-                thumbnail_url="https://cdn.skyyrose.com/thumbnails/product-123.jpg",
+                glb_url="https://cdn.skyyrose.co/models/product-123.glb",
+                usdz_url="https://cdn.skyyrose.co/models/product-123.usdz",
+                thumbnail_url="https://cdn.skyyrose.co/thumbnails/product-123.jpg",
             )
 
             # Enable AR for product
@@ -111,11 +111,11 @@ class WordPress3DMediaSync:
             products = [
                 {
                     "product_id": 123,
-                    "glb_url": "https://cdn.skyyrose.com/models/product-123.glb",
+                    "glb_url": "https://cdn.skyyrose.co/models/product-123.glb",
                 },
                 {
                     "product_id": 124,
-                    "glb_url": "https://cdn.skyyrose.com/models/product-124.glb",
+                    "glb_url": "https://cdn.skyyrose.co/models/product-124.glb",
                 },
             ]
             results = await sync.bulk_sync(products)
@@ -141,7 +141,7 @@ class WordPress3DMediaSync:
         Initialize WordPress 3D Media Sync client.
 
         Args:
-            wp_url: WordPress site URL (e.g., "https://skyyrose.com")
+            wp_url: WordPress site URL (e.g., "https://skyyrose.co")
             username: WordPress username
             app_password: WordPress application password
             config: Optional configuration override
@@ -204,6 +204,7 @@ class WordPress3DMediaSync:
             WordPress3DSyncError: On API error
         """
         await self.connect()
+        assert self._session is not None, "Session not initialized"
         url = f"{self.config.base_url}/{endpoint.lstrip('/')}"
 
         for attempt in range(self.config.max_retries):
@@ -304,9 +305,9 @@ class WordPress3DMediaSync:
         Example:
             >>> result = await sync.sync_3d_model(
             ...     product_id=123,
-            ...     glb_url="https://cdn.skyyrose.com/models/rose-earrings.glb",
-            ...     usdz_url="https://cdn.skyyrose.com/models/rose-earrings.usdz",
-            ...     thumbnail_url="https://cdn.skyyrose.com/thumbs/rose-earrings.jpg",
+            ...     glb_url="https://cdn.skyyrose.co/models/rose-earrings.glb",
+            ...     usdz_url="https://cdn.skyyrose.co/models/rose-earrings.usdz",
+            ...     thumbnail_url="https://cdn.skyyrose.co/thumbs/rose-earrings.jpg",
             ... )
         """
         # Validate URLs
@@ -335,10 +336,13 @@ class WordPress3DMediaSync:
 
         # Update product
         try:
-            result = await self._request(
-                "PUT",
-                f"/products/{product_id}",
-                json={"meta_data": meta_data},
+            result = cast(
+                dict[str, Any],
+                await self._request(
+                    "PUT",
+                    f"/products/{product_id}",
+                    json={"meta_data": meta_data},
+                ),
             )
 
             self._logger.info(
@@ -389,10 +393,15 @@ class WordPress3DMediaSync:
         )
 
         try:
-            result = await self._request(
-                "PUT",
-                f"/products/{product_id}",
-                json={"meta_data": [{"key": self.META_AR_ENABLED, "value": str(enabled).lower()}]},
+            result = cast(
+                dict[str, Any],
+                await self._request(
+                    "PUT",
+                    f"/products/{product_id}",
+                    json={
+                        "meta_data": [{"key": self.META_AR_ENABLED, "value": str(enabled).lower()}]
+                    },
+                ),
             )
 
             self._logger.info(
@@ -525,9 +534,11 @@ class WordPress3DMediaSync:
         async def sync_one(product_config: dict) -> dict:
             async with semaphore:
                 product_id = product_config.get("product_id")
+                if product_id is None:
+                    return {"status": "error", "error": "Missing product_id", "product_id": None}
                 try:
                     result = await self.sync_3d_model(
-                        product_id=product_id,
+                        product_id=cast(int, product_id),
                         glb_url=product_config["glb_url"],
                         usdz_url=product_config.get("usdz_url"),
                         thumbnail_url=product_config.get("thumbnail_url"),

@@ -28,8 +28,11 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
+import structlog
+
 # Import existing components
 from adk.base import ADKProvider, AgentConfig, AgentResult, AgentStatus, BaseDevSkyyAgent
+from core.structured_logging import bind_contextvars, unbind_contextvars
 from orchestration.prompt_engineering import (
     ChainOfThought,
     ConstitutionalAI,
@@ -451,6 +454,118 @@ class PromptEngineeringModule:
             return FewShotLearning.create_examples_for_domain(domain)
         return []
 
+    def apply_technique_with_tools(
+        self,
+        technique: PromptTechnique,
+        prompt: str,
+        tools: list[dict] | None = None,
+        **kwargs,
+    ) -> PromptTechniqueResult:
+        """Apply technique with tool calling optimization.
+
+        Enhances prompts for LLM Round Table competition when tools are available.
+        Adds tool-aware instructions based on the technique being used.
+
+        Args:
+            technique: Prompt technique to apply
+            prompt: Base prompt
+            tools: Available tools for the task
+            **kwargs: Additional technique-specific parameters
+
+        Returns:
+            PromptTechniqueResult with tool-optimized prompt
+        """
+        if not tools:
+            # No tools available, use standard technique
+            return self.apply_technique(technique, prompt, **kwargs)
+
+        # Apply base technique first
+        base_result = self.apply_technique(technique, prompt, tools=tools, **kwargs)
+        enhanced = base_result.enhanced_prompt
+
+        # Add tool-specific enhancements based on technique
+        tool_names = [t.get("name", "unknown") for t in tools]
+        tool_list = ", ".join(tool_names)
+
+        if technique == PromptTechnique.REACT:
+            # ReAct already handles tools, but enhance with format
+            tool_enhanced = f"""
+Task: {prompt}
+
+Available Tools: {tool_list}
+
+IMPORTANT: Use the ReAct format with tool calling:
+Thought: [Your reasoning about what to do]
+Action: tool_name(arguments)
+Observation: [Tool result will appear here]
+... (repeat Thought/Action/Observation as needed)
+Final Answer: [Your final response]
+
+{enhanced}
+"""
+            enhanced = tool_enhanced.strip()
+
+        elif technique == PromptTechnique.CHAIN_OF_THOUGHT:
+            # Add tool awareness to CoT
+            tool_enhanced = f"""
+{enhanced}
+
+Available Tools: {tool_list}
+
+When solving this problem step-by-step, consider which tools would help at each step.
+Call tools when you need information, data, or actions you cannot perform directly.
+"""
+            enhanced = tool_enhanced.strip()
+
+        elif technique == PromptTechnique.TREE_OF_THOUGHTS:
+            # Add tool usage to each branch
+            tool_enhanced = f"""
+{enhanced}
+
+Available Tools for exploration: {tool_list}
+
+For each branch of reasoning, identify which tools would provide the most valuable information.
+Prioritize tool calls that reduce uncertainty or provide critical data.
+"""
+            enhanced = tool_enhanced.strip()
+
+        elif technique == PromptTechnique.RAG:
+            # Combine RAG context with tool calling
+            tool_enhanced = f"""
+{enhanced}
+
+Additional Tools Available: {tool_list}
+
+Use tools to supplement the retrieved context when:
+- The context is insufficient
+- You need real-time data
+- You need to perform actions
+"""
+            enhanced = tool_enhanced.strip()
+
+        else:
+            # Generic tool awareness for other techniques
+            tool_enhanced = f"""
+{enhanced}
+
+Available Tools: {tool_list}
+
+You have access to these tools to help complete the task. Use them when appropriate.
+"""
+            enhanced = tool_enhanced.strip()
+
+        # Update metadata
+        metadata = base_result.metadata.copy()
+        metadata["tool_aware"] = True
+        metadata["available_tools"] = tool_names
+
+        return PromptTechniqueResult(
+            technique=technique,
+            original_prompt=prompt,
+            enhanced_prompt=enhanced,
+            metadata=metadata,
+        )
+
     def record_outcome(self, technique: PromptTechnique, success: bool, score: float = 0.0):
         """Record technique outcome for learning"""
         stats = self._technique_stats[technique]
@@ -571,7 +686,7 @@ class TaskCategoryAnalyzer:
         prompt_lower = prompt.lower()
 
         # Check cache first
-        cache_key = hashlib.md5(prompt_lower.encode()).hexdigest()[:16]
+        cache_key = hashlib.md5(prompt_lower.encode(), usedforsecurity=False).hexdigest()[:16]
         if cache_key in self._analysis_cache:
             category, confidence = self._analysis_cache[cache_key]
             reason = f"cached_analysis:{category.value}"
@@ -1242,7 +1357,7 @@ class SelfLearningModule:
         record = LearningRecord(
             task_id=task_id,
             task_type=task_type,
-            prompt_hash=hashlib.md5(prompt.encode()).hexdigest()[:16],
+            prompt_hash=hashlib.md5(prompt.encode(), usedforsecurity=False).hexdigest()[:16],
             technique_used=technique,
             llm_provider=llm_provider,
             success=success,
@@ -1425,7 +1540,7 @@ class SelfLearningModule:
 {response}
 """
             # Store in knowledge base
-            doc_key = f"learning:{task_type}:{hashlib.md5(prompt.encode()).hexdigest()[:12]}"
+            doc_key = f"learning:{task_type}:{hashlib.md5(prompt.encode(), usedforsecurity=False).hexdigest()[:12]}"
             self._knowledge_base[doc_key] = {
                 "value": {
                     "prompt": prompt,
@@ -1777,7 +1892,9 @@ class LLMRoundTableInterface:
             await self.initialize()
 
         start_time = time.time()
-        task_id = hashlib.md5(f"{prompt}{datetime.now(UTC).isoformat()}".encode()).hexdigest()[:16]
+        task_id = hashlib.md5(
+            f"{prompt}{datetime.now(UTC).isoformat()}".encode(), usedforsecurity=False
+        ).hexdigest()[:16]
         corr_id = correlation_id or task_id
 
         logger.info(
@@ -2184,6 +2301,11 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         self._router: Any = None  # Type: LLMRouter | None
         self._router_available = LLM_ROUTER_AVAILABLE
 
+        # Enterprise Intelligence Modules (NEW)
+        self.enterprise_index: Any = None  # Type: EnterpriseIndex | None
+        self.semantic_analyzer: Any = None  # Type: SemanticCodeAnalyzer | None
+        self.verification_engine: Any = None  # Type: LLMVerificationEngine | None
+
         # State
         self._initialized = False
         self._execution_count = 0
@@ -2222,6 +2344,9 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
             except Exception as e:
                 logger.warning(f"Failed to initialize LLM Router: {e}")
                 self._router = None
+
+        # Initialize Enterprise Intelligence Modules (NEW)
+        await self._init_enterprise_intelligence()
 
         # Initialize backend
         try:
@@ -2600,12 +2725,22 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         )
 
         # Log the automatic selection for observability
-        logger.info(
-            f"[{correlation_id}] Auto technique selection: "
-            f"agent={self.agent_type.value if self.agent_type else 'unknown'}, "
-            f"category={task_category.value}, "
-            f"technique={technique.value}, "
-            f"confidence={confidence:.2f}"
+        log = structlog.get_logger(__name__)
+
+        # Bind execution-scoped context
+        bind_contextvars(
+            correlation_id=correlation_id,
+            agent_id=str(
+                getattr(self, "agent_id", self.agent_type.value if self.agent_type else "unknown")
+            ),
+        )
+
+        log.info(
+            "agent_technique_selection",
+            agent_type=self.agent_type.value if self.agent_type else "unknown",
+            task_category=task_category.value,
+            technique=technique.value,
+            confidence=round(confidence, 2),
         )
 
         # Apply technique to enhance prompt
@@ -2681,12 +2816,16 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
 
         self._execution_count += 1
 
-        logger.info(
-            f"[{correlation_id}] Execution complete: "
-            f"status={result.status.value}, "
-            f"latency={latency_ms:.0f}ms, "
-            f"technique={technique.value}"
+        log.info(
+            "agent_execution_complete",
+            status=result.status.value,
+            latency_ms=round(latency_ms, 0),
+            technique=technique.value,
+            success=success,
         )
+
+        # Unbind execution-scoped context
+        unbind_contextvars("correlation_id", "agent_id")
 
         return result
 
@@ -3187,6 +3326,176 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
             "task_category": task_category.value if task_category else None,
             "reasoning": f"Based on {agent_type} agent preferences and task requirements",
         }
+
+    async def _init_enterprise_intelligence(self) -> None:
+        """
+        Initialize Enterprise Intelligence Modules.
+
+        Sets up:
+        1. EnterpriseIndex - Multi-provider code search
+        2. SemanticCodeAnalyzer - Pattern detection
+        3. LLMVerificationEngine - DeepSeek + Claude verification
+        """
+        try:
+            # Import enterprise modules
+            from llm.providers.anthropic import AnthropicClient
+            from llm.providers.deepseek import DeepSeekClient
+            from llm.verification import LLMVerificationEngine, VerificationConfig
+            from orchestration.enterprise_index import create_enterprise_index
+            from orchestration.semantic_analyzer import SemanticCodeAnalyzer
+
+            # Initialize Enterprise Index
+            self.enterprise_index = create_enterprise_index()
+            await self.enterprise_index.initialize()
+            logger.info("EnterpriseIndex initialized with all configured providers")
+
+            # Initialize Semantic Analyzer
+            self.semantic_analyzer = SemanticCodeAnalyzer()
+            logger.info("SemanticCodeAnalyzer initialized")
+
+            # Initialize Verification Engine (DeepSeek + Claude)
+            generator_client = DeepSeekClient()
+            verifier_client = AnthropicClient()
+            verification_config = VerificationConfig(
+                generator_provider="deepseek",
+                generator_model="deepseek-chat",
+                verifier_provider="anthropic",
+                verifier_model="claude-3-5-sonnet-20241022",
+            )
+            self.verification_engine = LLMVerificationEngine(
+                generator_client=generator_client,
+                verifier_client=verifier_client,
+                config=verification_config,
+            )
+            logger.info("LLMVerificationEngine initialized (DeepSeek + Claude)")
+
+        except ImportError as e:
+            logger.warning(f"Enterprise intelligence modules not available: {e}")
+            self.enterprise_index = None
+            self.semantic_analyzer = None
+            self.verification_engine = None
+        except Exception as e:
+            logger.error(f"Failed to initialize enterprise intelligence: {e}")
+            self.enterprise_index = None
+            self.semantic_analyzer = None
+            self.verification_engine = None
+
+    async def gather_enterprise_context(
+        self,
+        task_description: str,
+        language: str = "python",
+    ) -> dict[str, Any]:
+        """
+        Gather enterprise context BEFORE code generation (Context-First Pattern).
+
+        This is the pre-flight phase that searches:
+        1. Enterprise code indexes (GitHub, GitLab, Sourcegraph)
+        2. Semantic patterns in existing codebase
+        3. Similar implementations for reference
+
+        Args:
+            task_description: What code needs to be generated
+            language: Programming language filter
+
+        Returns:
+            Context dict with:
+            - similar_code: List of similar implementations
+            - patterns: Detected patterns from semantic analysis
+            - recommendations: Best practices from existing code
+            - metadata: Search metadata
+        """
+        context = {
+            "similar_code": [],
+            "patterns": [],
+            "recommendations": [],
+            "metadata": {},
+        }
+
+        if not self.enterprise_index or not self.semantic_analyzer:
+            logger.warning("Enterprise intelligence not initialized, skipping context gathering")
+            return context
+
+        try:
+            # Import search types
+            from orchestration.enterprise_index import SearchLanguage
+
+            # Map string to enum
+            lang_map = {
+                "python": SearchLanguage.PYTHON,
+                "typescript": SearchLanguage.TYPESCRIPT,
+                "javascript": SearchLanguage.JAVASCRIPT,
+                "go": SearchLanguage.GO,
+                "rust": SearchLanguage.RUST,
+                "java": SearchLanguage.JAVA,
+            }
+            search_lang = lang_map.get(language.lower(), SearchLanguage.PYTHON)
+
+            # Phase 1: Search enterprise indexes
+            logger.info(f"Searching enterprise indexes for: {task_description[:50]}...")
+            search_results = await self.enterprise_index.search_code(
+                query=task_description,
+                language=search_lang,
+                max_results_per_provider=3,
+            )
+
+            context["similar_code"] = [
+                {
+                    "repository": r.repository,
+                    "file_path": r.file_path,
+                    "snippet": r.code_snippet[:200],  # Truncate for context
+                    "url": r.url,
+                    "provider": r.provider,
+                    "score": r.score,
+                }
+                for r in search_results[:5]  # Top 5 results
+            ]
+
+            # Phase 2: Semantic analysis of found code
+            if search_results:
+                logger.info(f"Analyzing {len(search_results)} code samples for patterns...")
+                patterns_found = set()
+
+                for result in search_results[:3]:  # Analyze top 3
+                    try:
+                        # Detect patterns in the code snippet
+                        if len(result.code_snippet) > 50:
+                            # For now, simple pattern extraction
+                            # TODO: Integrate with semantic_analyzer.analyze_file()
+                            if "class " in result.code_snippet:
+                                patterns_found.add("object_oriented")
+                            if "async " in result.code_snippet:
+                                patterns_found.add("async_await")
+                            if "def test" in result.code_snippet:
+                                patterns_found.add("test_driven")
+                    except Exception as e:
+                        logger.warning(f"Pattern analysis failed for {result.file_path}: {e}")
+
+                context["patterns"] = list(patterns_found)
+
+            # Phase 3: Generate recommendations
+            if context["similar_code"]:
+                context["recommendations"] = [
+                    f"Found {len(context['similar_code'])} similar implementations across enterprise codebases",
+                    f"Common patterns: {', '.join(context['patterns']) if context['patterns'] else 'none detected'}",
+                    "Consider following established patterns for consistency",
+                ]
+
+            context["metadata"] = {
+                "search_query": task_description,
+                "language": language,
+                "results_count": len(search_results),
+                "providers_used": list({r.provider for r in search_results}),
+            }
+
+            logger.info(
+                f"Enterprise context gathered: {len(context['similar_code'])} examples, "
+                f"{len(context['patterns'])} patterns"
+            )
+
+        except Exception as e:
+            logger.error(f"Failed to gather enterprise context: {e}")
+
+        return context
 
 
 # =============================================================================

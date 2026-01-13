@@ -14,12 +14,14 @@
 
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Logger } from '../utils/Logger.js';
 import type { ShowroomProduct } from '../types/product.js';
 import { ProductInteractionHandler } from '../lib/productInteraction.js';
 import { InventoryManager } from '../lib/inventory.js';
 import { CartManager } from '../lib/cartManager.js';
+import { getModelLoader, ModelLoadError } from '../lib/ModelAssetLoader.js';
+import { getPerformanceMonitor } from '../lib/ThreePerformanceMonitor.js';
+// Note: Configs available from '../config/threejs.config.js' for future use
 
 export interface ShowroomConfig {
   backgroundColor?: number;
@@ -59,6 +61,10 @@ export class ShowroomExperience {
   private config: Required<ShowroomConfig>;
   private animationId: number | null = null;
 
+  // Model loading
+  private modelLoader = getModelLoader();
+  private perfMonitor = getPerformanceMonitor({ showOverlay: false });
+
   // E-commerce integration
   private inventoryManager: InventoryManager;
   private cartManager: CartManager;
@@ -69,9 +75,6 @@ export class ShowroomExperience {
   constructor(container: HTMLElement, config: ShowroomConfig = {}) {
     this.logger = new Logger('ShowroomExperience');
     this.config = { ...DEFAULT_CONFIG, ...config };
-    // GLTFLoader available for loading 3D product models
-    void GLTFLoader;
-
     // Initialize scene
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(this.config.backgroundColor);
@@ -239,14 +242,38 @@ export class ShowroomExperience {
   }
 
   private async loadProduct(product: ShowroomProduct): Promise<void> {
-    // Placeholder - in production, load actual GLB models
-    const geometry = new THREE.BoxGeometry(1, 1.5, 0.5);
-    const material = new THREE.MeshStandardMaterial({
-      color: 0xd4af37,  // Rose gold
-      roughness: 0.3,
-      metalness: 0.8,
-    });
-    const mesh = new THREE.Mesh(geometry, material);
+    // Load GLB model if URL provided, otherwise use placeholder
+    let mesh: THREE.Object3D;
+
+    if (product.modelUrl) {
+      try {
+        const loadedModel = await this.modelLoader.load(product.modelUrl, {
+          name: product.name,
+          onProgress: (progress) => {
+            this.logger.debug(`Loading ${product.name}: ${progress.percent}%`);
+          },
+        });
+
+        mesh = loadedModel.scene;
+        this.logger.info(`Loaded 3D model for ${product.name}`, {
+          triangles: loadedModel.metadata.triangleCount,
+          hasAnimations: loadedModel.metadata.hasAnimations,
+        });
+      } catch (error) {
+        // Fall back to placeholder on load failure
+        if (error instanceof ModelLoadError) {
+          this.logger.warn(`Failed to load model for ${product.name}: ${error.code}`, { url: error.url });
+        } else {
+          this.logger.error(`Unexpected error loading ${product.name}`, { error });
+        }
+        mesh = this.createPlaceholderMesh();
+      }
+    } else {
+      // No model URL - use placeholder
+      mesh = this.createPlaceholderMesh();
+    }
+
+    // Position, rotate, and scale the mesh
     mesh.position.set(...product.position);
 
     if (product.rotation) {
@@ -258,13 +285,21 @@ export class ShowroomExperience {
       mesh.scale.set(...scale as [number, number, number]);
     }
 
-    mesh.castShadow = true;
+    // Enable shadows for all mesh children
+    mesh.traverse((child) => {
+      if (child instanceof THREE.Mesh) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+
     mesh.userData = { productId: product.id, name: product.name };
     this.scene.add(mesh);
     this.products.set(product.id, mesh);
 
     // Register product with interaction handler
-    if (this.interactionHandler) {
+    // Cast to Mesh - works with both GLB groups and placeholder meshes
+    if (this.interactionHandler && mesh instanceof THREE.Mesh) {
       this.interactionHandler.setupProduct(mesh, product);
     }
 
@@ -274,6 +309,21 @@ export class ShowroomExperience {
     });
 
     this.addSpotlight(product);
+  }
+
+  /**
+   * Create a placeholder mesh when GLB model is unavailable
+   */
+  private createPlaceholderMesh(): THREE.Mesh {
+    const geometry = new THREE.BoxGeometry(1, 1.5, 0.5);
+    const material = new THREE.MeshStandardMaterial({
+      color: 0xd4af37, // Rose gold
+      roughness: 0.3,
+      metalness: 0.8,
+    });
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.castShadow = true;
+    return mesh;
   }
 
   private addSpotlight(product: ShowroomProduct): void {
@@ -329,19 +379,50 @@ export class ShowroomExperience {
   }
 
   public start(): void {
+    // Attach and start performance monitoring
+    this.perfMonitor.attach(this.renderer, this.scene);
+    this.perfMonitor.start();
+
     const animate = (): void => {
+      this.perfMonitor.beginFrame();
+
       this.animationId = requestAnimationFrame(animate);
       this.controls.update();
       this.renderer.render(this.scene, this.camera);
+
+      this.perfMonitor.endFrame();
     };
     animate();
   }
 
   public stop(): void {
+    this.perfMonitor.stop();
+
     if (this.animationId) {
       cancelAnimationFrame(this.animationId);
       this.animationId = null;
     }
+  }
+
+  /**
+   * Toggle performance monitoring overlay
+   */
+  public showPerformanceOverlay(show: boolean): void {
+    this.perfMonitor.setConfig({ showOverlay: show });
+  }
+
+  /**
+   * Get current performance metrics
+   */
+  public getPerformanceMetrics() {
+    return this.perfMonitor.getMetrics();
+  }
+
+  /**
+   * Get model loader statistics
+   */
+  public getLoaderStats() {
+    return this.modelLoader.getStats();
   }
 
   public handleResize(width: number, height: number): void {
@@ -391,6 +472,9 @@ export class ShowroomExperience {
     this.controls.dispose();
     this.renderer.dispose();
     this.renderer.forceContextLoss();
+
+    // Dispose performance monitor
+    this.perfMonitor.dispose();
 
     this.logger.info('Showroom experience disposed');
   }

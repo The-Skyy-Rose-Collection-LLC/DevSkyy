@@ -1,21 +1,24 @@
 {
   "name": "devskyy",
-  "version": "1.0.0",
-  "description": "[![Version](https://img.shields.io/badge/version-3.0.0--enterprise-blue.svg)](https://github.com/SkyyRoseLLC/DevSkyy) [![Python](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org) [![AI Models](https://img.shields.io/badge/AI-Claude%20Sonnet%204.5-purple.svg)](https://www.anthropic.com) [![Security](https://img.shields.io/badge/vulnerabilities-0-brightgreen.svg)](https://github.com/SkyyRoseLLC/DevSkyy) [![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black) [![Status](https://img.shields.io/badge/status-production--ready-green.svg)](https://github.com/SkyyRoseLLC/DevSkyy) [![License](https://img.shields.io/badge/license-Proprietary-red.svg)](LICENSE)",
-  "main": "index.js",
+  "version": "3.0.0",
+  "description": "AI-driven multi-agent orchestration platform for enterprise e-commerce automation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "directories": {
     "test": "tests"
   },
   "dependencies": {
     "@ai-sdk/huggingface": "^0.0.12",
     "@apollo/server": "^5.2.0",
+    "@copilotkit/react-core": "^1.50.1",
+    "@copilotkit/react-ui": "^1.50.1",
+    "@copilotkit/runtime": "^1.50.1",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
     "@fastify/rate-limit": "^10.3.0",
     "@prisma/client": "^7.1.0",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
-    "@types/three": "^0.182.0",
     "@types/vue": "^2.0.0",
     "@vitejs/plugin-react": "^5.1.2",
     "@vitejs/plugin-vue": "^6.0.3",
@@ -92,7 +95,8 @@
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
     "@types/jest": "^30.0.0",
-    "@types/node": "^25.0.2",
+    "@types/node": "^25.0.3",
+    "@types/three": "^0.182.0",
     "@typescript-eslint/eslint-plugin": "^8.49.0",
     "@typescript-eslint/parser": "^8.49.0",
     "eslint": "^9.39.2",

@@ -53,13 +53,19 @@ from typing import Any
 import aiohttp
 import certifi
 import structlog
+from gradio_client import Client as GradioClient
 from pydantic import BaseModel, Field
 
 logger = structlog.get_logger(__name__)
 
 # HuggingFace API endpoints
-HF_API_BASE = "https://api-inference.huggingface.co/models"
+HF_API_BASE = "https://router.huggingface.co/hf-inference/models"
 HF_SPACES_BASE = "https://huggingface.co/spaces"
+
+# Gradio Space IDs for 3D generation
+HF_SPACE_TRIPOSR = "stabilityai/TripoSR"
+HF_SPACE_INSTANTMESH = "TencentARC/InstantMesh"
+HF_SPACE_HUNYUAN3D = "tencent/Hunyuan3D-2"
 
 
 class HF3DModel(str, Enum):
@@ -653,23 +659,33 @@ class HuggingFace3DClient:
         remove_background: bool,
         task_id: str,
     ) -> HF3DResult:
-        """Call TripoSR for fast image-to-3D generation."""
-        url = f"{HF_API_BASE}/{HF3DModel.TRIPOSR.value}"
+        """Call TripoSR via Gradio Space for image-to-3D generation."""
+        import tempfile
 
-        image_b64 = base64.b64encode(image_data).decode()
+        # Save image to temp file for Gradio
+        with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
+            tmp.write(image_data)
+            tmp_path = tmp.name
 
-        payload = {
-            "inputs": image_b64,
-            "parameters": {
-                "foreground_ratio": self.config.triposr_foreground_ratio,
-                "mc_resolution": self.config.triposr_mc_resolution,
-                "remove_background": remove_background,
-            },
-        }
+        try:
+            # Connect to TripoSR Gradio Space
+            # Connect to TripoSR Gradio Space with token
+            gradio_client = GradioClient(
+                f"https://huggingface.co/spaces/{HF_SPACE_TRIPOSR}",
+            )
 
-        async with session.post(url, json=payload) as response:
-            if response.status == 200:
-                data = await response.read()
+            # Call the predict function
+            result = gradio_client.predict(
+                tmp_path,  # Input image
+                remove_background,  # Remove background
+                self.config.triposr_foreground_ratio,  # Foreground ratio
+                self.config.triposr_mc_resolution,  # MC resolution
+                api_name="/run",
+            )
+
+            # Result is typically a path to the generated 3D model
+            if result and Path(result).exists():
+                data = Path(result).read_bytes()
                 output_path = await self._save_model(data, task_id, output_format)
 
                 return HF3DResult(
@@ -680,16 +696,20 @@ class HuggingFace3DClient:
                     output_bytes=data,
                     quality_score=self._estimate_quality_score(len(data), HF3DQuality.STANDARD),
                     polycount=self._estimate_polycount(len(data)),
-                    has_textures=False,  # TripoSR generates geometry only
+                    has_textures=False,
                     metadata={
                         "source": "image",
                         "foreground_ratio": self.config.triposr_foreground_ratio,
                         "mc_resolution": self.config.triposr_mc_resolution,
+                        "gradio_space": HF_SPACE_TRIPOSR,
                     },
                 )
             else:
-                error_text = await response.text()
-                raise ValueError(f"TripoSR API error: {response.status} - {error_text}")
+                raise ValueError(f"TripoSR returned no valid output: {result}")
+
+        finally:
+            # Clean up temp file
+            Path(tmp_path).unlink(missing_ok=True)
 
     async def _call_lgm(
         self,

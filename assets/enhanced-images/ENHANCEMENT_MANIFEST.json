@@ -1,0 +1,162 @@
+{
+  "timestamp": "2026-01-01T15:04:48.443895",
+  "config": {
+    "bg_removal_model": "isnet-general-use",
+    "target_resolution": 2400,
+    "brand_color": "#b76e79"
+  },
+  "collections": {
+    "signature": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0,
+      "items": [
+        {
+          "sku": "SIG_PROD_5EFB374D",
+          "source": "IMG_0255.JPG",
+          "success": true,
+          "outputs": {
+            "main": "SIG_PROD_5EFB374D_main.jpg",
+            "thumb": "SIG_PROD_5EFB374D_thumb.jpg",
+            "gallery": "SIG_PROD_5EFB374D_gallery.jpg",
+            "retina": "SIG_PROD_5EFB374D_retina.jpg",
+            "transparent": "SIG_PROD_5EFB374D_transparent.png"
+          },
+          "duration_seconds": 1.72,
+          "errors": []
+        },
+        {
+          "sku": "SIG_PROD_FCCB8B16",
+          "source": "IMG_0255.JPG",
+          "success": true,
+          "outputs": {
+            "main": "SIG_PROD_FCCB8B16_main.jpg",
+            "thumb": "SIG_PROD_FCCB8B16_thumb.jpg",
+            "gallery": "SIG_PROD_FCCB8B16_gallery.jpg",
+            "retina": "SIG_PROD_FCCB8B16_retina.jpg",
+            "transparent": "SIG_PROD_FCCB8B16_transparent.png"
+          },
+          "duration_seconds": 2.1,
+          "errors": []
+        },
+        {
+          "sku": "SIG_DEC_18_2023_6_09_21_PM_13",
+          "source": "Photo Dec 18 2023, 6 09 21 PM (13).png",
+          "success": true,
+          "outputs": {
+            "main": "SIG_DEC_18_2023_6_09_21_PM_13_main.jpg",
+            "thumb": "SIG_DEC_18_2023_6_09_21_PM_13_thumb.jpg",
+            "gallery": "SIG_DEC_18_2023_6_09_21_PM_13_gallery.jpg",
+            "retina": "SIG_DEC_18_2023_6_09_21_PM_13_retina.jpg",
+            "transparent": "SIG_DEC_18_2023_6_09_21_PM_13_transparent.png"
+          },
+          "duration_seconds": 1.92,
+          "errors": []
+        }
+      ]
+    },
+    "love-hurts": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0,
+      "items": [
+        {
+          "sku": "LH_PROD_DD7FFCFD",
+          "source": "IMG_0114.jpeg",
+          "success": true,
+          "outputs": {
+            "main": "LH_PROD_DD7FFCFD_main.jpg",
+            "thumb": "LH_PROD_DD7FFCFD_thumb.jpg",
+            "gallery": "LH_PROD_DD7FFCFD_gallery.jpg",
+            "retina": "LH_PROD_DD7FFCFD_retina.jpg",
+            "transparent": "LH_PROD_DD7FFCFD_transparent.png"
+          },
+          "duration_seconds": 15.44,
+          "errors": []
+        },
+        {
+          "sku": "LH_PROD_309E1DFA",
+          "source": "IMG_0114.jpeg",
+          "success": true,
+          "outputs": {
+            "main": "LH_PROD_309E1DFA_main.jpg",
+            "thumb": "LH_PROD_309E1DFA_thumb.jpg",
+            "gallery": "LH_PROD_309E1DFA_gallery.jpg",
+            "retina": "LH_PROD_309E1DFA_retina.jpg",
+            "transparent": "LH_PROD_309E1DFA_transparent.png"
+          },
+          "duration_seconds": 12.88,
+          "errors": []
+        },
+        {
+          "sku": "LH_PROD_A461E90A",
+          "source": "IMG_0115.jpeg",
+          "success": true,
+          "outputs": {
+            "main": "LH_PROD_A461E90A_main.jpg",
+            "thumb": "LH_PROD_A461E90A_thumb.jpg",
+            "gallery": "LH_PROD_A461E90A_gallery.jpg",
+            "retina": "LH_PROD_A461E90A_retina.jpg",
+            "transparent": "LH_PROD_A461E90A_transparent.png"
+          },
+          "duration_seconds": 11.05,
+          "errors": []
+        }
+      ]
+    },
+    "black-rose": {
+      "total": 3,
+      "successful": 3,
+      "failed": 0,
+      "items": [
+        {
+          "sku": "BR_266AD7B0_88A6_4489_AA58_AB72A5",
+          "source": "266AD7B0-88A6-4489-AA58-AB72A575BD33 3.JPG",
+          "success": true,
+          "outputs": {
+            "main": "BR_266AD7B0_88A6_4489_AA58_AB72A5_main.jpg",
+            "thumb": "BR_266AD7B0_88A6_4489_AA58_AB72A5_thumb.jpg",
+            "gallery": "BR_266AD7B0_88A6_4489_AA58_AB72A5_gallery.jpg",
+            "retina": "BR_266AD7B0_88A6_4489_AA58_AB72A5_retina.jpg",
+            "transparent": "BR_266AD7B0_88A6_4489_AA58_AB72A5_transparent.png"
+          },
+          "duration_seconds": 1.17,
+          "errors": []
+        },
+        {
+          "sku": "BR_266AD7B0_88A6_4489_AA58_AB72A5",
+          "source": "266AD7B0-88A6-4489-AA58-AB72A575BD33 3.JPG",
+          "success": true,
+          "outputs": {
+            "main": "BR_266AD7B0_88A6_4489_AA58_AB72A5_main.jpg",
+            "thumb": "BR_266AD7B0_88A6_4489_AA58_AB72A5_thumb.jpg",
+            "gallery": "BR_266AD7B0_88A6_4489_AA58_AB72A5_gallery.jpg",
+            "retina": "BR_266AD7B0_88A6_4489_AA58_AB72A5_retina.jpg",
+            "transparent": "BR_266AD7B0_88A6_4489_AA58_AB72A5_transparent.png"
+          },
+          "duration_seconds": 1.09,
+          "errors": []
+        },
+        {
+          "sku": "BR_5A8946B1_B51F_4144_BCBB_F02846",
+          "source": "5A8946B1-B51F-4144-BCBB-F028462077A0.jpg",
+          "success": true,
+          "outputs": {
+            "main": "BR_5A8946B1_B51F_4144_BCBB_F02846_main.jpg",
+            "thumb": "BR_5A8946B1_B51F_4144_BCBB_F02846_thumb.jpg",
+            "gallery": "BR_5A8946B1_B51F_4144_BCBB_F02846_gallery.jpg",
+            "retina": "BR_5A8946B1_B51F_4144_BCBB_F02846_retina.jpg",
+            "transparent": "BR_5A8946B1_B51F_4144_BCBB_F02846_transparent.png"
+          },
+          "duration_seconds": 1.07,
+          "errors": []
+        }
+      ]
+    }
+  },
+  "summary": {
+    "total_processed": 9,
+    "total_successful": 9,
+    "total_failed": 0
+  }
+}

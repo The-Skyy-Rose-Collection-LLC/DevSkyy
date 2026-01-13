@@ -849,11 +849,11 @@ async def generate_from_image_url(
 
 @three_d_router.post("/3d/generate/upload", response_model=JobResponse)
 async def generate_from_upload(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     provider: ModelProvider = ModelProvider.TRELLIS,
     product_name: str = "",
     texture_size: int = 1024,
-    background_tasks: BackgroundTasks = None,
 ) -> JobResponse:
     """Generate 3D model from uploaded image file."""
     # Validate file type

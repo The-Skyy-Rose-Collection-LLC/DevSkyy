@@ -45,9 +45,17 @@ class NotFoundError(WordPressError):
 class WordPressConfig:
     """WordPress API configuration."""
 
-    site_url: str = field(default_factory=lambda: os.getenv("WP_SITE_URL", ""))
-    username: str = field(default_factory=lambda: os.getenv("WP_USERNAME", ""))
-    app_password: str = field(default_factory=lambda: os.getenv("WP_APP_PASSWORD", ""))
+    site_url: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_URL", os.getenv("WP_SITE_URL", ""))
+    )
+    username: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_USERNAME", os.getenv("WP_USERNAME", ""))
+    )
+    app_password: str = field(
+        default_factory=lambda: os.getenv(
+            "WORDPRESS_APP_PASSWORD", os.getenv("WP_APP_PASSWORD", "")
+        )
+    )
     api_version: str = "wp/v2"
     timeout: float = 30.0
     max_retries: int = 3
@@ -58,7 +66,8 @@ class WordPressConfig:
 
     @property
     def base_url(self) -> str:
-        return f"{self.site_url}/wp-json/{self.api_version}"
+        # Use index.php?rest_route= format for WordPress.com hosted sites
+        return f"{self.site_url}/index.php?rest_route=/{self.api_version}"
 
 
 class WordPressClient:
@@ -96,7 +105,8 @@ class WordPressClient:
         headers: dict[str, str] | None = None,
     ) -> Any:
         await self.connect()
-        url = f"{self.config.base_url}/{endpoint.lstrip('/')}"
+        # For index.php?rest_route= format, endpoint becomes part of the route
+        url = f"{self.config.site_url}/index.php?rest_route=/{self.config.api_version}/{endpoint.lstrip('/')}"
 
         for attempt in range(self.config.max_retries):
             try:
@@ -148,6 +158,21 @@ class WordPressClient:
 
     async def update_page(self, page_id: int, **kwargs: Any) -> dict[str, Any]:
         return await self._request("POST", f"/pages/{page_id}", json=kwargs)
+
+    async def delete_page(self, page_id: int, force: bool = True) -> dict[str, Any]:
+        """Delete a WordPress page permanently.
+
+        Args:
+            page_id: The ID of the page to delete
+            force: If True, permanently delete. If False, move to trash.
+
+        Returns:
+            Response from WordPress API
+        """
+        # Convert bool to string for aiohttp params
+        return await self._request(
+            "DELETE", f"/pages/{page_id}", params={"force": "true" if force else "false"}
+        )
 
     # Media
     async def get_media(self, per_page: int = 10, **kwargs: Any) -> list[dict[str, Any]]:

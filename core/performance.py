@@ -224,7 +224,8 @@ def instructor_cache(
 
             if is_pydantic and include_schema_hash:
                 schema_hash = hashlib.md5(
-                    json.dumps(return_type.model_json_schema(), sort_keys=True).encode()
+                    json.dumps(return_type.model_json_schema(), sort_keys=True).encode(),
+                    usedforsecurity=False,
                 ).hexdigest()[:8]
                 key_parts.insert(1, schema_hash)
 
@@ -260,7 +261,9 @@ def instructor_cache(
 
             return result
 
-        wrapper.cache_clear = lambda: cache_backend.clear() if hasattr(cache_backend, "clear") else None  # type: ignore
+        wrapper.cache_clear = lambda: (
+            cache_backend.clear() if hasattr(cache_backend, "clear") else None
+        )  # type: ignore
         return wrapper  # type: ignore
 
     return decorator

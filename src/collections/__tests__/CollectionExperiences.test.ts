@@ -174,6 +174,34 @@ jest.mock('three/examples/jsm/loaders/GLTFLoader.js', () => ({
   GLTFLoader: jest.fn(() => ({ load: jest.fn((_url, onLoad) => { onLoad({ scene: { traverse: jest.fn() } }); }) })),
 }));
 
+// Mock ModelAssetLoader
+const mockScene = {
+  position: { set: jest.fn(), x: 0, y: 0, z: 0 },
+  rotation: { set: jest.fn(), x: 0, y: 0, z: 0 },
+  scale: { set: jest.fn(), setScalar: jest.fn(), x: 1, y: 1, z: 1 },
+  traverse: jest.fn(),
+  userData: {},
+  add: jest.fn(),
+  remove: jest.fn(),
+  clone: jest.fn().mockReturnThis(),
+  children: [],
+};
+jest.mock('../../lib/ModelAssetLoader', () => ({
+  getModelLoader: jest.fn(() => ({
+    load: jest.fn().mockResolvedValue({
+      scene: mockScene,
+      animations: [],
+      metadata: { triangleCount: 1000, hasAnimations: false },
+    }),
+    getStats: jest.fn().mockReturnValue({ cacheSize: 0, cachedModels: 0 }),
+  })),
+  ModelLoadError: class extends Error {
+    constructor(message: string, public code: string, public url: string) {
+      super(message);
+    }
+  },
+}));
+
 // Mock post-processing
 jest.mock('three/examples/jsm/postprocessing/EffectComposer.js', () => ({
   EffectComposer: jest.fn(() => ({ addPass: jest.fn(), render: jest.fn(), setSize: jest.fn(), dispose: jest.fn() })),

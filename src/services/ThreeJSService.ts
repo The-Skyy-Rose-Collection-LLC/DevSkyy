@@ -4,8 +4,8 @@
  */
 
 import * as THREE from 'three';
-import { threejsConfig } from '../config/index.js';
-import { Logger } from '../utils/Logger.js';
+import { threejsConfig } from '../config/index';
+import { Logger } from '../utils/Logger';
 
 export interface SceneConfig {
   enableShadows?: boolean;

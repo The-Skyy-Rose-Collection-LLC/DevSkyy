@@ -61,6 +61,88 @@ class ModelProvider(str, Enum):
     MISTRAL = "mistral"
     COHERE = "cohere"
     GROQ = "groq"
+    DEEPSEEK = "deepseek"
+
+
+class CallerType(str, Enum):
+    """
+    Tool caller type for Programmatic Tool Calling (PTC).
+
+    - DIRECT: Traditional tool use (Claude calls tool directly)
+    - CODE_EXECUTION: Programmatic tool use (tool called from code execution container)
+    """
+
+    DIRECT = "direct"
+    CODE_EXECUTION = "code_execution_20250825"
+
+
+# =============================================================================
+# Programmatic Tool Calling (PTC) Models
+# =============================================================================
+
+
+class CallerInfo(BaseModel):
+    """
+    Information about who/what invoked a tool.
+
+    Used to track whether a tool was called directly by Claude or programmatically
+    from a code execution container.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    type: CallerType
+    tool_id: str | None = None  # References the code_execution tool_use block
+
+    @property
+    def is_programmatic(self) -> bool:
+        """Check if this was a programmatic call from code execution."""
+        return self.type == CallerType.CODE_EXECUTION
+
+    def model_post_init(self, __context: Any) -> None:
+        """Validate that code execution calls include tool_id."""
+        if self.type == CallerType.CODE_EXECUTION and not self.tool_id:
+            raise ValueError("tool_id required for code_execution caller type")
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        result: dict[str, Any] = {"type": self.type.value}
+        if self.tool_id:
+            result["tool_id"] = self.tool_id
+        return result
+
+
+class ContainerInfo(BaseModel):
+    """
+    Code execution container information.
+
+    Tracks container ID and expiration for container reuse across requests.
+    """
+
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    expires_at: datetime
+
+    @property
+    def is_expired(self) -> bool:
+        """Check if container has expired."""
+        return datetime.now(UTC) >= self.expires_at
+
+    @property
+    def time_remaining_seconds(self) -> float:
+        """Get time remaining before expiration in seconds."""
+        delta = self.expires_at - datetime.now(UTC)
+        return max(0, delta.total_seconds())
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        return {
+            "id": self.id,
+            "expires_at": self.expires_at.isoformat(),
+            "is_expired": self.is_expired,
+            "time_remaining_seconds": self.time_remaining_seconds,
+        }
 
 
 # =============================================================================
@@ -109,13 +191,19 @@ class Message(BaseModel):
 
 
 class ToolCall(BaseModel):
-    """Tool/function call request from LLM."""
+    """
+    Tool/function call request from LLM.
+
+    Enhanced with Programmatic Tool Calling (PTC) support to track
+    whether the tool was called directly or from code execution.
+    """
 
     model_config = ConfigDict(extra="forbid")
 
     id: str
     type: str = "function"
     function: dict[str, Any]
+    caller: CallerInfo | None = None  # NEW: PTC caller information
 
     @property
     def name(self) -> str:
@@ -127,6 +215,27 @@ class ToolCall(BaseModel):
         """Get function arguments."""
         return self.function.get("arguments", {})
 
+    @property
+    def is_programmatic(self) -> bool:
+        """
+        Check if this was a programmatic call from code execution.
+
+        Returns:
+            True if called from code execution, False for direct calls or unknown.
+        """
+        return self.caller is not None and self.caller.is_programmatic
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert to dictionary for serialization."""
+        result: dict[str, Any] = {
+            "id": self.id,
+            "type": self.type,
+            "function": self.function,
+        }
+        if self.caller:
+            result["caller"] = self.caller.to_dict()
+        return result
+
 
 # =============================================================================
 # Response Models
@@ -137,7 +246,7 @@ class CompletionResponse(BaseModel):
     """
     Unified completion response from any provider.
 
-    Includes content, usage stats, and metadata.
+    Includes content, usage stats, metadata, and Programmatic Tool Calling (PTC) support.
     """
 
     model_config = ConfigDict(extra="forbid")
@@ -156,12 +265,17 @@ class CompletionResponse(BaseModel):
     finish_reason: str = ""
     tool_calls: list[ToolCall] = Field(default_factory=list)
     latency_ms: float = 0
+    metadata: dict[str, Any] = Field(default_factory=dict)  # Provider-specific metadata
+    cost_usd: float | None = None  # Optional cost in USD
 
     # Raw response (for debugging)
     raw: dict[str, Any] = Field(default_factory=dict)
 
     # Timestamps
     created_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+
+    # Programmatic Tool Calling (PTC)
+    container: ContainerInfo | None = None  # NEW: Container info for reuse
 
     @property
     def has_tool_calls(self) -> bool:
@@ -403,6 +517,10 @@ __all__ = [
     # Enums
     "MessageRole",
     "ModelProvider",
+    "CallerType",
+    # PTC Models
+    "CallerInfo",
+    "ContainerInfo",
     # Models
     "Message",
     "ToolCall",

@@ -174,8 +174,34 @@ assets/3d-models/*/
 # External SDKs (install via pip instead)
 tripo-python-sdk/
 
+# Experimental/workspace directories
+huggingface-spaces/
+
 # Git internal / temp
 .git-rewrite/
 
 # Local tool configs
 .playwright-mcp/
+
+# Large product image assets (uploaded to WordPress)
+assets/enhanced_products/all/*.jpg
+assets/enhanced_products/all/*.jpeg
+assets/enhanced_products/all/*.png
+assets/enhanced_products/all/*.JPG
+assets/enhanced_products/all/*.JPEG
+assets/enhanced_products/all/*.PNG
+assets/2d-25d-assets/*.jpg
+assets/2d-25d-assets/*.jpeg
+assets/2d-25d-assets/*.png
+assets/2d-25d-assets/*.JPG
+assets/2d-25d-assets/*.JPEG
+assets/2d-25d-assets/*.PNG
+
+# WordPress large files and binaries
+wp-cli.phar
+wordpress/themes/
+wordpress/Logos/
+wordpress/skyyrose-immersive/
+wordpress/skyyrose-immersive.zip
+wordpress/shoptimizer-child-theme/
+wordpress/plugins/

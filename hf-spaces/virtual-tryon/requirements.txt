@@ -1,0 +1,3 @@
+gradio==6.3.0
+pillow>=10.0.0
+requests>=2.31.0

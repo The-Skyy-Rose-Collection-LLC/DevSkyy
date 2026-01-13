@@ -1,0 +1,489 @@
+/**
+ * SkyyRose Immersive - Additional Styles
+ * Elementor widget styles and 3D container enhancements
+ */
+
+/* =====================================================
+   CSS VARIABLES
+   ===================================================== */
+
+:root {
+    /* Brand Colors */
+    --skyyrose-primary: #B76E79;
+    --skyyrose-black: #0A0A0A;
+    --skyyrose-dark: #1A1A1A;
+    --skyyrose-gold: #C9A962;
+    --skyyrose-gold-light: #D4B87A;
+
+    /* Collection: Signature */
+    --signature-crimson: #DC143C;
+    --signature-gold: #FFD700;
+    --signature-ivory: #FFFFF0;
+
+    /* Collection: Love Hurts */
+    --lovehurts-burgundy: #722F37;
+    --lovehurts-midnight: #1a1a2e;
+    --lovehurts-crimson: #DC143C;
+
+    /* Collection: Black Rose */
+    --blackrose-obsidian: #0a0a0a;
+    --blackrose-moonlight: #c8c8dc;
+    --blackrose-silver: #C0C0C0;
+    --blackrose-darkred: #8B0000;
+
+    /* Typography */
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+    /* Transitions */
+    --transition-fast: 150ms ease;
+    --transition-base: 300ms ease;
+    --transition-slow: 500ms ease;
+}
+
+/* =====================================================
+   3D CONTAINER STYLES
+   ===================================================== */
+
+.skyyrose-3d-container {
+    position: relative;
+    width: 100%;
+    min-height: 100vh;
+    overflow: hidden;
+    background: var(--skyyrose-black);
+}
+
+.skyyrose-3d-container canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* Loading Screen */
+.skyyrose-3d-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--skyyrose-black);
+    color: #fff;
+    z-index: 100;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+}
+
+.skyyrose-3d-loading.loaded {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.skyyrose-3d-loading .loading-logo {
+    max-width: 200px;
+    max-height: 200px;
+    margin-bottom: 2rem;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.skyyrose-3d-loading .loading-text {
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+    letter-spacing: 0.2em;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+}
+
+.skyyrose-3d-loading .loading-bar {
+    width: 200px;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.skyyrose-3d-loading .loading-progress {
+    height: 100%;
+    background: var(--skyyrose-primary);
+    border-radius: 2px;
+    width: 0;
+    transition: width 0.3s ease;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.98); }
+}
+
+/* Navigation Instructions */
+.skyyrose-3d-instructions {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2rem;
+    padding: 1rem 2rem;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 50px;
+    z-index: 50;
+    opacity: 0.8;
+    transition: opacity var(--transition-base);
+}
+
+.skyyrose-3d-instructions:hover {
+    opacity: 1;
+}
+
+.skyyrose-3d-instructions .instruction-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.skyyrose-3d-instructions .instruction-icon {
+    font-size: 1rem;
+}
+
+/* Fullscreen Button */
+.skyyrose-fullscreen-btn {
+    position: absolute;
+    top: 1.5rem;
+    right: 1.5rem;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    color: #fff;
+    cursor: pointer;
+    z-index: 50;
+    transition: var(--transition-fast);
+}
+
+.skyyrose-fullscreen-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+    border-color: rgba(255, 255, 255, 0.4);
+    transform: scale(1.05);
+}
+
+/* =====================================================
+   COLLECTION-SPECIFIC 3D CONTAINERS
+   ===================================================== */
+
+/* Signature */
+.skyyrose-3d-signature {
+    background: linear-gradient(135deg, #1a1510 0%, #0a0a0a 100%);
+}
+
+.skyyrose-3d-signature .loading-progress {
+    background: var(--signature-gold);
+}
+
+.skyyrose-3d-signature .skyyrose-fullscreen-btn {
+    border-color: rgba(201, 169, 98, 0.3);
+}
+
+/* Love Hurts */
+.skyyrose-3d-lovehurts {
+    background: linear-gradient(135deg, #0a0510 0%, #0a0a0a 100%);
+}
+
+.skyyrose-3d-lovehurts .loading-progress {
+    background: var(--lovehurts-crimson);
+}
+
+.skyyrose-3d-lovehurts .skyyrose-fullscreen-btn {
+    border-color: rgba(220, 20, 60, 0.3);
+}
+
+/* Black Rose */
+.skyyrose-3d-blackrose {
+    background: linear-gradient(135deg, #050508 0%, #0a0a0a 100%);
+}
+
+.skyyrose-3d-blackrose .loading-progress {
+    background: var(--blackrose-darkred);
+}
+
+.skyyrose-3d-blackrose .skyyrose-fullscreen-btn {
+    border-color: rgba(139, 0, 0, 0.3);
+}
+
+/* =====================================================
+   HERO WIDGET STYLES
+   ===================================================== */
+
+.skyyrose-hero {
+    position: relative;
+    min-height: 60vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #fff;
+}
+
+.skyyrose-hero-content {
+    max-width: 800px;
+    z-index: 2;
+}
+
+.skyyrose-hero-logo {
+    max-width: 200px;
+    max-height: 200px;
+    margin: 0 auto 2rem;
+    border-radius: 12px;
+}
+
+.skyyrose-hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 4rem);
+    font-weight: 400;
+    letter-spacing: 0.15em;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.skyyrose-hero-tagline {
+    font-size: 1rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.8;
+    margin-bottom: 1rem;
+}
+
+.skyyrose-hero-description {
+    font-size: 1.125rem;
+    opacity: 0.7;
+    max-width: 500px;
+    margin: 0 auto 2rem;
+    line-height: 1.8;
+}
+
+.skyyrose-hero-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.skyyrose-hero-cta {
+    display: inline-flex;
+    align-items: center;
+    padding: 1rem 2.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    background: #fff;
+    color: #0a0a0a;
+    text-decoration: none;
+    transition: var(--transition-base);
+}
+
+.skyyrose-hero-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.skyyrose-hero-cta-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem 2rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    color: #fff;
+    text-decoration: none;
+    transition: var(--transition-base);
+}
+
+.skyyrose-hero-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+}
+
+.skyyrose-hero-scroll-indicator {
+    position: absolute;
+    bottom: 2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+    40% { transform: translateX(-50%) translateY(-10px); }
+    60% { transform: translateX(-50%) translateY(-5px); }
+}
+
+/* =====================================================
+   PRODUCT CARD STYLES
+   ===================================================== */
+
+.skyyrose-product-card {
+    position: relative;
+    cursor: pointer;
+    transition: transform var(--transition-base);
+}
+
+.skyyrose-product-card:hover {
+    transform: translateY(-5px);
+}
+
+.skyyrose-product-card-image {
+    aspect-ratio: 3/4;
+    background: var(--skyyrose-dark);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+.skyyrose-product-card-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+}
+
+.skyyrose-product-card:hover .skyyrose-product-card-image img {
+    transform: scale(1.05);
+}
+
+.skyyrose-product-card-badge {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    background: var(--skyyrose-black);
+    color: #fff;
+}
+
+.skyyrose-product-card-badge.limited {
+    background: var(--blackrose-darkred);
+}
+
+.skyyrose-product-card-badge.new {
+    background: var(--skyyrose-gold);
+    color: var(--skyyrose-black);
+}
+
+.skyyrose-product-card-title {
+    font-size: 0.9375rem;
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+}
+
+.skyyrose-product-card-price {
+    font-size: 0.9375rem;
+    color: var(--skyyrose-primary);
+}
+
+/* =====================================================
+   RESPONSIVE ADJUSTMENTS
+   ===================================================== */
+
+@media (max-width: 768px) {
+    .skyyrose-3d-instructions {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+    }
+
+    .skyyrose-hero-title {
+        font-size: 2rem;
+    }
+
+    .skyyrose-hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .skyyrose-hero-cta,
+    .skyyrose-hero-cta-secondary {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .skyyrose-3d-instructions {
+        display: none; /* Hide on very small screens */
+    }
+
+    .skyyrose-fullscreen-btn {
+        top: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+    }
+}
+
+/* =====================================================
+   FULLSCREEN MODE
+   ===================================================== */
+
+.skyyrose-3d-container:fullscreen {
+    width: 100vw;
+    height: 100vh;
+}
+
+.skyyrose-3d-container:fullscreen .skyyrose-fullscreen-btn svg path {
+    d: path("M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z");
+}
+
+/* =====================================================
+   ELEMENTOR EDITOR STYLES
+   ===================================================== */
+
+.elementor-editor-active .skyyrose-3d-container {
+    min-height: 400px;
+}
+
+.elementor-editor-active .skyyrose-3d-loading {
+    display: flex !important;
+}
+
+.elementor-preview-message {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 2rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.elementor-preview-message h3 {
+    font-family: var(--font-display);
+    margin-bottom: 0.5rem;
+}
+
+.elementor-preview-message p {
+    opacity: 0.7;
+    font-size: 0.875rem;
+}

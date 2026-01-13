@@ -1,0 +1,234 @@
+/**
+ * SkyyRose Spinning Logo Component
+ * Version: 1.0.0
+ *
+ * Implements an elegant spinning rose logo with collection-specific color variants
+ */
+
+/* ========================================
+   SPINNING LOGO COMPONENT
+   ======================================== */
+
+/* Logo Container */
+.skyyrose-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.skyyrose-logo__spinner {
+  width: 60px;
+  height: 60px;
+  animation: spin 8s linear infinite;
+  transition: filter 0.3s ease;
+}
+
+/* Pause on hover for elegance */
+.skyyrose-logo:hover .skyyrose-logo__spinner {
+  animation-play-state: paused;
+}
+
+/* Glow effect */
+.skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+}
+
+.skyyrose-logo:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.5));
+}
+
+/* Spin Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Mobile Size */
+@media (max-width: 768px) {
+  .skyyrose-logo__spinner {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ========================================
+   LOGO COLOR VARIANTS
+   ======================================== */
+
+/* Gold (Default - for dark backgrounds) */
+.skyyrose-logo--gold .skyyrose-logo__spinner path,
+.skyyrose-logo--gold .skyyrose-logo__spinner circle {
+  fill: #D4AF37;
+}
+
+/* Silver (BLACK ROSE pages) */
+.skyyrose-logo--silver .skyyrose-logo__spinner path,
+.skyyrose-logo--silver .skyyrose-logo__spinner circle {
+  fill: #C0C0C0;
+}
+
+.skyyrose-logo--silver .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.3));
+}
+
+/* Rose Gold (SIGNATURE pages) */
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner path,
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner circle {
+  fill: #B76E79;
+}
+
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(183, 110, 121, 0.3));
+}
+
+/* Deep Rose (LOVE HURTS pages) */
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner path,
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner circle {
+  fill: #D4A5A5;
+}
+
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 165, 165, 0.3));
+}
+
+/* Black (for light backgrounds) */
+.skyyrose-logo--black .skyyrose-logo__spinner path,
+.skyyrose-logo--black .skyyrose-logo__spinner circle {
+  fill: #0D0D0D;
+}
+
+.skyyrose-logo--black .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.2));
+}
+
+/* ========================================
+   HEADER WITH SPINNING LOGO
+   ======================================== */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--header-height, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+}
+
+/* Transparent header on hero sections */
+.site-header--transparent {
+  background: transparent;
+}
+
+/* Solid header on scroll */
+.site-header--scrolled {
+  background: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Layout */
+.site-header__left,
+.site-header__right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.site-header__left {
+  justify-content: flex-start;
+}
+
+.site-header__right {
+  justify-content: flex-end;
+}
+
+.site-header__center {
+  flex: 0 0 auto;
+}
+
+/* Navigation Links */
+.site-header__nav {
+  display: flex;
+  gap: 32px;
+}
+
+.site-header__nav a {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #FAFAFA;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.site-header__nav a:hover {
+  color: #D4AF37;
+}
+
+/* Header Icons */
+.site-header__icons {
+  display: flex;
+  gap: 20px;
+}
+
+.site-header__icon {
+  width: 20px;
+  height: 20px;
+  color: #FAFAFA;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.site-header__icon:hover {
+  color: #D4AF37;
+}
+
+/* Cart Count Badge */
+.site-header__cart {
+  position: relative;
+}
+
+.site-header__cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  background: #D4AF37;
+  color: #0D0D0D;
+  font-size: 0.625rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Mobile Header */
+@media (max-width: 768px) {
+  .site-header {
+    height: var(--header-height-mobile, 60px);
+    padding: 0 16px;
+  }
+
+  .site-header__nav {
+    display: none;
+  }
+
+  .site-header__icons {
+    gap: 16px;
+  }
+}

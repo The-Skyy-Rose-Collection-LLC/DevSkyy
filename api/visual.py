@@ -636,12 +636,12 @@ async def enhance_from_url(
 
 @visual_router.post("/visual/enhance/upload")
 async def enhance_from_upload(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     enhancement_type: EnhancementType = EnhancementType.FULL,
     upscale_factor: int = 2,
     new_background: str = "white studio",
     product_name: str = "Product",
-    background_tasks: BackgroundTasks = None,
 ):
     """
     Upload and enhance a product image.
@@ -690,10 +690,10 @@ async def enhance_from_upload(
 
 @visual_router.post("/visual/batch-enhance")
 async def batch_enhance(
+    background_tasks: BackgroundTasks,
     image_urls: list[str],
     enhancement_type: EnhancementType = EnhancementType.FULL,
     upscale_factor: int = 2,
-    background_tasks: BackgroundTasks = None,
 ):
     """
     Batch enhance multiple product images.
@@ -708,7 +708,7 @@ async def batch_enhance(
     async with httpx.AsyncClient() as client:
         for i, url in enumerate(image_urls):
             job = visual_job_store.create(
-                product_name=f"Product {i+1}",
+                product_name=f"Product {i + 1}",
                 style=ImageStyle.PRODUCT_STUDIO,
                 provider=VisualProvider.AUTO,
                 metadata={
@@ -730,7 +730,7 @@ async def batch_enhance(
                     run_image_enhancement,
                     job.job_id,
                     str(temp_path),
-                    f"Product {i+1}",
+                    f"Product {i + 1}",
                     enhancement_type,
                     upscale_factor,
                     "white studio",

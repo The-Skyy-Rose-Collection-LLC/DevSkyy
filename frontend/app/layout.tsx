@@ -5,9 +5,8 @@
  */
 
 import type { Metadata } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import Link from 'next/link';
-import Script from 'next/script';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 import {
   LayoutDashboard,
   Bot,
@@ -16,11 +15,19 @@ import {
   Wrench,
   Settings,
   Box,
+  Globe,
 } from 'lucide-react';
 import './globals.css';
 
-// Use CSS custom properties for fonts - defined in globals.css
-// This avoids next/font build-time font fetching issues
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-jetbrains-mono',
+});
 
 export const metadata: Metadata = {
   title: 'DevSkyy Dashboard',
@@ -37,6 +44,7 @@ const navItems = [
   { href: '/round-table', label: 'Round Table', icon: Trophy },
   { href: '/ab-testing', label: 'A/B Testing', icon: FlaskConical },
   { href: '/tools', label: 'Tools', icon: Wrench },
+  { href: '/wordpress', label: 'WordPress', icon: Globe },
 ];
 
 export default function RootLayout({
@@ -45,14 +53,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
       <body className="min-h-screen bg-gray-50 dark:bg-gray-950 font-sans antialiased">
-        {/* Google Model Viewer for 3D assets */}
-        <Script
-          src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.0.0/model-viewer.min.js"
-          type="module"
-          strategy="afterInteractive"
-        />
         <div className="flex min-h-screen">
           {/* Sidebar */}
           <aside className="fixed left-0 top-0 z-40 h-screen w-64 border-r border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-950">

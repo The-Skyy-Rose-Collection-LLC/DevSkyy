@@ -88,6 +88,24 @@ export const agentsAPI = {
 
   triggerLearning: (type: SuperAgentType) =>
     fetchAPI<{ success: boolean }>(`/api/v1/agents/${type}/learn`, { method: 'POST' }),
+
+  chat: async (type: SuperAgentType, message: string, stream = true) => {
+    const url = `${API_BASE}/api/v1/agents/chat`;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ agent_type: type, message, stream }),
+    });
+
+    if (!response.ok) {
+      throw new APIError(
+        `Chat request failed: ${response.statusText}`,
+        response.status
+      );
+    }
+
+    return response;
+  },
 };
 
 // Task APIs
@@ -167,6 +185,15 @@ export const visualAPI = {
       method: 'POST',
       body: JSON.stringify(request),
     }),
+
+  getJobStatus: (jobId: string) =>
+    fetchAPI<{
+      job_id: string;
+      status: 'pending' | 'processing' | 'completed' | 'failed';
+      progress?: number;
+      image_url?: string;
+      error?: string;
+    }>(`/api/v1/visual/jobs/${jobId}`),
 
   getProviders: () =>
     fetchAPI<
@@ -364,7 +391,13 @@ export const brandAPI = {
       philosophy: string;
       location: string;
       tone: { primary: string; descriptors: string[]; avoid: string[] };
-      colors: Record<string, { name: string; hex: string; rgb: string }>;
+      colors: {
+        primary: { name: string; hex: string; rgb: string };
+        accent: { name: string; hex: string; rgb: string };
+        highlight: { name: string; hex: string; rgb: string };
+        ivory: { name: string; hex: string; rgb: string };
+        obsidian: { name: string; hex: string; rgb: string };
+      };
       typography: { heading: string; body: string; accent: string };
       target_audience: {
         age_range: string;
@@ -374,7 +407,7 @@ export const brandAPI = {
       };
       product_types: string[];
       quality_descriptors: string[];
-      collections: Array<{
+      collections?: Array<{
         id: string;
         name: string;
         tagline: string;
@@ -417,6 +450,76 @@ export const brandAPI = {
       style: string;
       description: string;
     }>(`/v1/brand/collections/${id}`),
+
+  update: (data: {
+    name?: string;
+    tagline?: string;
+    philosophy?: string;
+    location?: string;
+    tone?: { primary: string; descriptors: string[]; avoid: string[] };
+    colors?: {
+      primary: { name: string; hex: string; rgb: string };
+      accent: { name: string; hex: string; rgb: string };
+      highlight: { name: string; hex: string; rgb: string };
+      ivory: { name: string; hex: string; rgb: string };
+      obsidian: { name: string; hex: string; rgb: string };
+    };
+    typography?: { heading: string; body: string; accent: string };
+    target_audience?: {
+      age_range: string;
+      description: string;
+      interests: string[];
+      values: string[];
+    };
+    product_types?: string[];
+    quality_descriptors?: string[];
+    collections?: Array<{
+      id: string;
+      name: string;
+      tagline: string;
+      mood: string;
+      colors: string;
+      style: string;
+      description: string;
+    }>;
+  }) =>
+    fetchAPI<{ success: boolean; message: string }>('/api/v1/brand', {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    }),
+};
+
+// Virtual Try-On API
+export const virtualTryOnAPI = {
+  generateModel: (params: {
+    gender: string;
+    ethnicity: string;
+    age_range: string;
+    body_type?: string;
+  }) =>
+    fetchAPI<{ job_id: string; status: string }>('/api/v1/virtual-tryon/generate-model', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
+
+  tryOn: (params: {
+    model_url: string;
+    garment_url: string;
+    category?: string;
+  }) =>
+    fetchAPI<{ job_id: string; status: string }>('/api/v1/virtual-tryon/try-on', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    }),
+
+  getJobStatus: (jobId: string) =>
+    fetchAPI<{
+      job_id: string;
+      status: 'pending' | 'processing' | 'completed' | 'failed';
+      result_url?: string;
+      error?: string;
+      progress?: number;
+    }>(`/api/v1/virtual-tryon/jobs/${jobId}`),
 };
 
 // WordPress Types
@@ -491,9 +594,9 @@ export const api = {
   metrics: metricsAPI,
   tools: toolsAPI,
   brand: brandAPI,
+  virtualTryOn: virtualTryOnAPI,
   wordpress: wordpressAPI,
 };
 
 export default api;
 export { APIError };
-

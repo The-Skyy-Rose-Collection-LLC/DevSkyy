@@ -7,9 +7,10 @@ Production-grade embedding generation for RAG pipelines.
 Supports:
 - Sentence Transformers (local, default)
 - OpenAI Embeddings (cloud)
+- Cohere Embeddings (cloud, RAG-optimized)
 
 Author: DevSkyy Platform Team
-Version: 1.0.0
+Version: 1.1.0
 """
 
 from __future__ import annotations
@@ -35,6 +36,7 @@ class EmbeddingProvider(str, Enum):
 
     SENTENCE_TRANSFORMERS = "sentence_transformers"
     OPENAI = "openai"
+    COHERE = "cohere"
 
 
 class EmbeddingConfig(BaseModel):
@@ -51,6 +53,13 @@ class EmbeddingConfig(BaseModel):
     # OpenAI settings
     openai_model: str = Field(default="text-embedding-ada-002")
     openai_api_key: str | None = Field(default=None)
+
+    # Cohere settings
+    cohere_model: str = Field(default="embed-english-v3.0")
+    cohere_api_key: str | None = Field(default=None)
+    cohere_input_type: str = Field(
+        default="search_document"
+    )  # search_document, search_query, classification, clustering
 
     # Batch settings
     batch_size: int = Field(default=32, ge=1, le=256)
@@ -257,6 +266,109 @@ class OpenAIEmbeddingEngine(BaseEmbeddingEngine):
 
 
 # =============================================================================
+# Cohere Embeddings Implementation
+# =============================================================================
+
+
+class CohereEmbeddingEngine(BaseEmbeddingEngine):
+    """Cohere embeddings engine (cloud, RAG-optimized)."""
+
+    # Model dimensions
+    MODEL_DIMS = {
+        "embed-english-v3.0": 1024,
+        "embed-english-light-v3.0": 384,
+        "embed-multilingual-v3.0": 1024,
+        "embed-multilingual-light-v3.0": 384,
+    }
+
+    def __init__(self, config: EmbeddingConfig):
+        super().__init__(config)
+        self._client = None
+
+    async def initialize(self) -> None:
+        """Initialize Cohere client."""
+        try:
+            import cohere
+
+            api_key = self.config.cohere_api_key or os.getenv("COHERE_API_KEY")
+            if not api_key:
+                raise ValueError("Cohere API key required")
+
+            self._client = cohere.AsyncClient(api_key=api_key)
+            self._dimension = self.MODEL_DIMS.get(self.config.cohere_model, 1024)
+            self._initialized = True
+            logger.info(
+                f"Cohere Embeddings initialized: {self.config.cohere_model} (dim={self._dimension})"
+            )
+
+        except ImportError:
+            raise ImportError("cohere not installed. Run: pip install cohere")
+        except Exception as e:
+            logger.error(f"Cohere Embeddings initialization failed: {e}")
+            raise
+
+    async def embed_text(self, text: str) -> list[float]:
+        """Generate embedding using Cohere API."""
+        if not self._initialized or not self._client:
+            raise RuntimeError("Cohere client not initialized")
+
+        # Truncate if needed
+        if len(text) > self.config.max_length * 4:
+            text = text[: self.config.max_length * 4]
+
+        response = await self._client.embed(
+            texts=[text],
+            model=self.config.cohere_model,
+            input_type=self.config.cohere_input_type,
+        )
+        return response.embeddings[0]
+
+    async def embed_batch(self, texts: list[str]) -> list[list[float]]:
+        """Generate embeddings for multiple texts."""
+        if not self._initialized or not self._client:
+            raise RuntimeError("Cohere client not initialized")
+
+        # Truncate texts
+        truncated = [t[: self.config.max_length * 4] for t in texts]
+
+        # Cohere has a limit of 96 texts per request
+        all_embeddings = []
+        batch_size = min(self.config.batch_size, 96)
+
+        for i in range(0, len(truncated), batch_size):
+            batch = truncated[i : i + batch_size]
+            response = await self._client.embed(
+                texts=batch,
+                model=self.config.cohere_model,
+                input_type=self.config.cohere_input_type,
+            )
+            all_embeddings.extend(response.embeddings)
+
+        return all_embeddings
+
+    async def embed_query(self, query: str) -> list[float]:
+        """
+        Generate query embedding using search_query input type.
+
+        This uses Cohere's optimized query embedding mode for better
+        retrieval performance.
+        """
+        if not self._initialized or not self._client:
+            raise RuntimeError("Cohere client not initialized")
+
+        # Truncate if needed
+        if len(query) > self.config.max_length * 4:
+            query = query[: self.config.max_length * 4]
+
+        response = await self._client.embed(
+            texts=[query],
+            model=self.config.cohere_model,
+            input_type="search_query",  # Use query-optimized mode
+        )
+        return response.embeddings[0]
+
+
+# =============================================================================
 # Factory
 # =============================================================================
 
@@ -282,5 +394,7 @@ def create_embedding_engine(config: EmbeddingConfig | None = None) -> BaseEmbedd
 
     if config.provider == EmbeddingProvider.OPENAI:
         return OpenAIEmbeddingEngine(config)
+    elif config.provider == EmbeddingProvider.COHERE:
+        return CohereEmbeddingEngine(config)
     else:
         return SentenceTransformerEngine(config)

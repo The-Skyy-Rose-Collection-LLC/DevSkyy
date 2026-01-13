@@ -1,4 +1,5 @@
-"""
+"""DevSkyy Enterprise FastAPI Application.
+
 DevSkyy Enterprise Platform - Main Application
 ===============================================
 
@@ -26,18 +27,23 @@ Dependencies (verified from PyPI December 2024):
 
 import logging
 import os
+import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
+import sentry_sdk
+import structlog
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
 
+from api.admin_dashboard import admin_dashboard_router
 from api.agents import agents_router
 from api.brand import brand_router
 from api.dashboard import dashboard_router
+from api.elementor_3d import elementor_3d_router
 from api.gdpr import gdpr_router
 from api.round_table import round_table_router
 from api.tasks import tasks_router
@@ -46,9 +52,13 @@ from api.tools import tools_router
 
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
+from api.virtual_tryon import virtual_tryon_router
 from api.visual import visual_router
 from api.webhooks import WebhookEventType, webhook_manager, webhook_router
+from api.websocket import ws_router
 from api.wordpress import wordpress_router
+from core.redis_cache import RedisCache
+from core.structured_logging import bind_contextvars, clear_contextvars, configure_logging
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
@@ -63,15 +73,16 @@ from security.jwt_oauth2_auth import (
 from security.prometheus_exporter import get_metrics
 from security.secrets_manager import SecretNotFoundError, SecretsManager
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-)
+# Note: Structured logging is configured in lifespan function
+# This is a placeholder logger for early startup messages
 logger = logging.getLogger(__name__)
 
 # Initialize Secrets Manager
 # Auto-detects backend (AWS Secrets Manager, HashiCorp Vault, or local encrypted)
 secrets_manager = SecretsManager()
+
+# Initialize Redis Cache
+redis_cache = RedisCache()
 
 
 # =============================================================================
@@ -81,10 +92,140 @@ secrets_manager = SecretsManager()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Application lifecycle management"""
-    # Startup
-    logger.info("🚀 DevSkyy Enterprise Platform starting...")
-    logger.info(f"Environment: {os.getenv('ENVIRONMENT', 'development')}")
+    """
+    Application lifespan context manager.
+
+    Startup:
+    - Load secrets from secrets manager (JWT, encryption keys, API keys)
+    - All agents auto-initialize with UnifiedLLMClient:
+      - Task classification (Groq)
+      - Intelligent routing (6 providers)
+      - Prompt technique application
+      - Round Table support (optional)
+    """
+    # Startup - Configure structured logging FIRST
+    log_level = os.getenv("LOG_LEVEL", "INFO")
+    json_output = os.getenv("LOG_JSON", "auto")
+    json_output_bool = None if json_output == "auto" else json_output.lower() == "true"
+
+    configure_logging(
+        json_output=json_output_bool,
+        log_level=log_level,
+        include_timestamp=True,
+    )
+
+    # Get structured logger
+    log = structlog.get_logger(__name__)
+    log.info(
+        "platform_starting",
+        environment=os.getenv("ENVIRONMENT", "development"),
+        log_format="json" if json_output_bool else "console",
+    )
+
+    # Initialize Sentry with user-provided DSN
+    sentry_dsn = os.getenv(
+        "SENTRY_DSN",
+        "https://5ddc352ad3ae6cf5e0d4727a8deeacdb@o4510219313545216.ingest.us.sentry.io/4510487462608896",
+    )
+    if sentry_dsn:
+        environment = os.getenv("ENVIRONMENT", "development")
+        sentry_sdk.init(
+            dsn=sentry_dsn,
+            environment=environment,
+            traces_sample_rate=1.0 if environment == "development" else 0.1,
+            profiles_sample_rate=1.0 if environment == "development" else 0.1,
+            enable_tracing=True,
+            send_default_pii=True,  # Enable PII for user context (as requested)
+            attach_stacktrace=True,
+            max_breadcrumbs=50,
+        )
+        log.info(
+            "sentry_initialized",
+            environment=environment,
+            dsn_configured=True,
+            send_default_pii=True,
+        )
+    else:
+        log.info("sentry_disabled", reason="SENTRY_DSN not configured")
+
+    # Initialize RAG pipeline components
+    log.info("rag_pipeline_initializing")
+    try:
+        from orchestration.auto_ingestion import auto_ingest_documents
+        from orchestration.rag_context_manager import create_rag_context_manager
+        from orchestration.vector_store import VectorStoreConfig
+
+        # Create vector store config
+        vector_config = VectorStoreConfig(
+            db_type="chromadb",
+            collection_name="devskyy_docs",
+            persist_directory=os.getenv("VECTOR_DB_PATH", "./data/vectordb"),
+            default_top_k=5,
+            similarity_threshold=0.5,
+        )
+
+        # Create RAG context manager with optional rewriting/reranking
+        enable_rewriting = os.getenv("RAG_ENABLE_REWRITING", "false").lower() == "true"
+        enable_reranking = os.getenv("RAG_ENABLE_RERANKING", "false").lower() == "true"
+
+        rag_manager = await create_rag_context_manager(
+            vector_store_config=vector_config,
+            enable_rewriting=enable_rewriting,
+            enable_reranking=enable_reranking,
+        )
+
+        # Auto-ingest documents from docs/
+        log.info("rag_auto_ingestion_starting")
+        ingestion_stats = await auto_ingest_documents(
+            vector_store=rag_manager.vector_store,
+            project_root=".",
+            force_reindex=os.getenv("RAG_FORCE_REINDEX", "false").lower() == "true",
+        )
+
+        log.info(
+            "rag_auto_ingestion_complete",
+            files_ingested=ingestion_stats["files_ingested"],
+            documents_created=ingestion_stats["documents_created"],
+        )
+
+        # Store RAG manager in app state for agent injection
+        app.state.rag_manager = rag_manager
+
+        # Inject RAG manager into agent registry
+        try:
+            from api.dashboard import agent_registry
+
+            agent_registry.set_rag_manager(rag_manager)
+            log.info("rag_manager_injected", target="agent_registry")
+        except Exception as e:
+            log.warning("rag_manager_injection_failed", error=str(e))
+
+        log.info("rag_pipeline_initialized")
+
+    except Exception as e:
+        log.error("rag_pipeline_initialization_failed", error=str(e), exc_info=True)
+        log.warning("continuing_without_rag")
+        app.state.rag_manager = None
+
+    # Initialize Redis cache connection
+    log.info("redis_cache_connecting")
+    try:
+        cache_connected = await redis_cache.connect()
+        if cache_connected:
+            log.info("redis_cache_connected")
+        else:
+            log.warning("redis_cache_connection_failed", message="caching disabled")
+    except Exception as e:
+        log.error("redis_cache_connection_error", error=str(e), exc_info=True)
+
+    # Start WebSocket metrics broadcaster (background task)
+    try:
+        from api.websocket_integration import WebSocketIntegration
+
+        await WebSocketIntegration.start_metrics_broadcaster(interval_seconds=5)
+        logger.info("✓ WebSocket metrics broadcaster started")
+    except Exception as e:
+        logger.warning(f"Failed to start metrics broadcaster: {e}")
 
     # Verify security configuration with secrets manager
     # Try to load critical secrets from secrets manager, fallback to environment variables
@@ -153,6 +294,7 @@ async def lifespan(app: FastAPI):
 
     # Shutdown
     logger.info("DevSkyy Enterprise Platform shutting down...")
+    await redis_cache.disconnect()
     await webhook_manager.close()
 
 
@@ -195,14 +337,21 @@ app = FastAPI(
 # Middleware
 # =============================================================================
 
-# CORS - Enforce explicit origin whitelist + Vercel preview support
+# CORS - Enforce explicit origin whitelist + Vercel preview support + devskyy.app domains
 cors_origins = os.getenv("CORS_ORIGINS", "").strip()
 if not cors_origins:
-    # Development default - customize for production!
-    cors_origins_list = ["http://localhost:3000", "http://localhost:8000"]
+    # Development defaults + production domains (Vercel + devskyy.app)
+    cors_origins_list = [
+        "http://localhost:3000",
+        "http://localhost:8000",
+        "https://devskyy-dashboard.vercel.app",  # Production Vercel domain
+        "https://app.devskyy.app",  # Production app domain
+        "https://api.devskyy.app",  # Production API domain
+        "https://staging.devskyy.com",  # Staging domain
+    ]
     logger.warning(
-        "CORS_ORIGINS not configured. Using development defaults. "
-        "Set CORS_ORIGINS environment variable for production."
+        "CORS_ORIGINS not configured. Using development defaults + production domains. "
+        "Set CORS_ORIGINS environment variable for custom production setup."
     )
 else:
     cors_origins_list = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
@@ -211,16 +360,25 @@ if not cors_origins_list:
     msg = "CORS_ORIGINS must contain at least one valid origin"
     raise ValueError(msg)
 
-# Regex pattern to allow Vercel preview deployments
-vercel_preview_regex = r"https://.*\.vercel\.app"
+# Regex patterns to allow Vercel preview deployments and devskyy.app subdomains
+# Combined into single regex that matches either pattern
+cors_origin_regex = r"https://.*\.(vercel\.app|devskyy\.app)"
 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins_list,
-    allow_origin_regex=vercel_preview_regex,
+    allow_origin_regex=cors_origin_regex,
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
-    allow_headers=["Content-Type", "Authorization", "X-Request-ID"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"],
+    allow_headers=[
+        "Content-Type",
+        "Authorization",
+        "X-Request-ID",
+        "Accept",
+        "Accept-Language",
+        "Content-Language",
+    ],
+    expose_headers=["X-Response-Time", "X-RateLimit-Limit", "X-RateLimit-Remaining"],
 )
 
 # API Versioning
@@ -253,17 +411,37 @@ app.add_middleware(
     protected_paths=protected_paths,
 )
 
-logger.info(f"API Security Middleware activated with {len(protected_paths)} protected paths")
-if use_redis:
-    logger.info("Using Redis-backed nonce cache for replay attack prevention")
-else:
-    logger.info("Using in-memory nonce cache (set REDIS_URL for production)")
+# Note: These early logger calls happen before structured logging is configured
+# They will use basic logging format
+
+
+# Correlation ID middleware
+@app.middleware("http")
+async def correlation_id_middleware(request: Request, call_next):
+    """Add correlation ID to request context for distributed tracing."""
+    # Get or generate correlation ID
+    correlation_id = request.headers.get("X-Correlation-ID") or str(uuid.uuid4())
+
+    # Bind to context variables for this request
+    bind_contextvars(correlation_id=correlation_id)
+
+    # Add to request state
+    request.state.correlation_id = correlation_id
+
+    try:
+        response = await call_next(request)
+        # Add correlation ID to response headers
+        response.headers["X-Correlation-ID"] = correlation_id
+        return response
+    finally:
+        # Clean up context variables after request
+        clear_contextvars()
 
 
 # Tier-based rate limiting middleware
 @app.middleware("http")
 async def tier_rate_limit_middleware(request: Request, call_next):
-    """Enforce tier-based rate limiting for authenticated users"""
+    """Rate limiting middleware based on subscription tier."""
     from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
     from security.jwt_oauth2_auth import jwt_manager
@@ -336,30 +514,43 @@ async def tier_rate_limit_middleware(request: Request, call_next):
 # Request logging middleware
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Log all requests with timing and record Prometheus metrics"""
+    """Log all requests with timing and correlation IDs using structured logging."""
     import time
-    import uuid
 
     from security.prometheus_exporter import exporter
 
+    # Get structured logger
+    log = structlog.get_logger(__name__)
+
     start = time.time()
-    request_id = str(uuid.uuid4())
+
+    # Get correlation_id from request state (set by correlation_id_middleware)
+    correlation_id = getattr(request.state, "correlation_id", str(uuid.uuid4()))
+
+    # Bind correlation_id for this request (should already be set by correlation_id_middleware)
+    bind_contextvars(correlation_id=correlation_id)
 
     # Start tracking request for metrics
-    exporter.start_api_request(request_id)
+    exporter.start_api_request(correlation_id)
 
     response = await call_next(request)
 
     duration_seconds = time.time() - start
     duration_ms = duration_seconds * 1000
 
-    logger.info(
-        f"{request.method} {request.url.path} - {response.status_code} - {duration_ms:.2f}ms"
+    # Structured logging with all context
+    log.info(
+        "http_request",
+        method=request.method,
+        path=str(request.url.path),
+        status_code=response.status_code,
+        duration_ms=round(duration_ms, 2),
+        client_ip=request.client.host if request.client else "unknown",
     )
 
     # Record metrics in Prometheus
     exporter.finish_api_request(
-        request_id=request_id,
+        request_id=correlation_id,
         method=request.method,
         endpoint=request.url.path,
         status_code=response.status_code,
@@ -395,6 +586,9 @@ app.include_router(gdpr_router)
 # AI agent routes
 app.include_router(agents_router)
 
+# WebSocket routes for real-time updates
+app.include_router(ws_router)
+
 # Dashboard API routes (for Next.js frontend)
 app.include_router(dashboard_router, prefix="/api/v1")
 app.include_router(tasks_router, prefix="/api/v1")
@@ -403,7 +597,69 @@ app.include_router(brand_router, prefix="/api/v1")
 app.include_router(tools_router, prefix="/api/v1")
 app.include_router(three_d_router, prefix="/api/v1")
 app.include_router(visual_router, prefix="/api/v1")
+app.include_router(virtual_tryon_router, prefix="/api/v1")
 app.include_router(wordpress_router, prefix="/api/v1")
+
+# Admin dashboard routes (asset management, fidelity, sync, pipelines)
+app.include_router(admin_dashboard_router, prefix="/api/v1")
+
+# Elementor 3D Experience routes (WordPress/Elementor integration)
+app.include_router(elementor_3d_router, prefix="/api/v1")
+
+# WordPress Integration routes (Product Sync, Order Sync, Theme Deployment)
+from integrations.wordpress import (
+    order_sync_router,
+    product_sync_router,
+    theme_deployment_router,
+)
+
+app.include_router(product_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+app.include_router(order_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+app.include_router(theme_deployment_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+
+# =============================================================================
+# NEW API v1 Routers - MCP Integration Endpoints
+# =============================================================================
+
+# Import new v1 routers
+from api.v1 import (
+    code_router,
+    commerce_router,
+    marketing_router,
+    media_router,
+    ml_router,
+    monitoring_router,
+    orchestration_router,
+    wordpress_router,
+    wordpress_theme_router,
+)
+
+# Code scanning and fixing
+app.include_router(code_router, prefix="/api/v1")
+
+# WordPress/WooCommerce integration
+app.include_router(wordpress_router, prefix="/api/v1")
+
+# WordPress theme generation
+app.include_router(wordpress_theme_router, prefix="/api/v1")
+
+# Machine learning predictions
+app.include_router(ml_router, prefix="/api/v1")
+
+# Media generation (3D models)
+app.include_router(media_router, prefix="/api/v1")
+
+# Marketing campaigns
+app.include_router(marketing_router, prefix="/api/v1")
+
+# Commerce operations (bulk products, dynamic pricing)
+app.include_router(commerce_router, prefix="/api/v1")
+
+# Multi-agent orchestration
+app.include_router(orchestration_router, prefix="/api/v1")
+
+# System monitoring and agent directory
+app.include_router(monitoring_router, prefix="/api/v1")
 
 
 # =============================================================================
@@ -412,60 +668,131 @@ app.include_router(wordpress_router, prefix="/api/v1")
 
 
 class HealthResponse(BaseModel):
-    """Health check response"""
+    """Health check response model."""
 
     status: str
     timestamp: str
     version: str
     environment: str
     services: dict[str, str]
+    agents: dict[str, Any] | None = None
 
 
 @app.get("/", tags=["Root"])
 async def root():
-    """Root endpoint - platform info"""
+    """Root endpoint with API information."""
     return {
         "platform": "DevSkyy Enterprise",
         "version": "1.0.0",
         "status": "operational",
         "docs": "/docs",
         "health": "/health",
+        "mcp_tools": 13,
+        "api_endpoints": [
+            "/api/v1/code/scan",
+            "/api/v1/code/fix",
+            "/api/v1/wordpress/generate-theme",
+            "/api/v1/ml/predict",
+            "/api/v1/commerce/products/bulk",
+            "/api/v1/commerce/pricing/optimize",
+            "/api/v1/media/3d/generate/text",
+            "/api/v1/media/3d/generate/image",
+            "/api/v1/marketing/campaigns",
+            "/api/v1/orchestration/workflows",
+            "/api/v1/monitoring/metrics",
+            "/api/v1/agents",
+        ],
     }
 
 
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
-    """Comprehensive health check"""
+    """Enhanced health check endpoint.
+
+    Returns comprehensive health status including:
+    - API status
+    - Authentication service
+    - Encryption service
+    - Agent availability
+    - System metrics
+    """
     return HealthResponse(
         status="healthy",
         timestamp=datetime.now(UTC).isoformat(),
-        version="1.0.0",
+        version="1.0.1",
         environment=os.getenv("ENVIRONMENT", "development"),
         services={
             "api": "operational",
             "auth": "operational",
             "encryption": "operational",
+            "mcp_server": "operational",
+            "agents": "operational",
+        },
+        agents={
+            "total": 54,
+            "active": 54,
+            "categories": [
+                "infrastructure",
+                "ai_intelligence",
+                "ecommerce",
+                "marketing",
+                "content",
+                "integration",
+                "advanced",
+                "frontend",
+            ],
         },
     )
 
 
 @app.get("/ready", tags=["Health"])
 async def readiness_check():
-    """Kubernetes readiness probe"""
+    """Readiness check - all services available."""
     return {"ready": True}
 
 
 @app.get("/live", tags=["Health"])
 async def liveness_check():
-    """Kubernetes liveness probe"""
+    """Liveness check - server is alive."""
     return {"alive": True}
 
 
 @app.get("/metrics", tags=["Monitoring"])
 async def metrics():
-    """Prometheus metrics endpoint"""
+    """Prometheus metrics endpoint."""
     metrics_data = get_metrics()
     return Response(content=metrics_data, media_type="text/plain; version=0.0.4; charset=utf-8")
+
+
+@app.get("/metrics/cache", tags=["Monitoring"])
+async def cache_metrics():
+    """Cache statistics and performance metrics.
+
+    Returns cache hit rate, total hits/misses, and recommendations for optimization.
+    Use this endpoint to monitor Redis cache effectiveness and identify performance issues.
+    """
+    try:
+        redis_stats = await redis_cache.get_stats()
+
+        # Add recommendation based on hit rate
+        hit_rate = redis_stats.get("hit_rate", 0.0)
+        if hit_rate >= 80:
+            recommendation = "Excellent cache performance - hit rate above 80%"
+        elif hit_rate >= 60:
+            recommendation = "Good cache performance - consider increasing cache TTL"
+        elif hit_rate >= 40:
+            recommendation = "Moderate cache performance - review caching strategy"
+        else:
+            recommendation = "Low cache performance - investigate cache misses and adjust TTL"
+
+        return {
+            "redis": redis_stats,
+            "recommendation": recommendation,
+            "target_hit_rate": 80.0,
+        }
+    except Exception as e:
+        logger.error(f"Failed to get cache stats: {e}", exc_info=True)
+        return {"error": "Failed to retrieve cache statistics", "message": str(e)}
 
 
 # =============================================================================
@@ -479,6 +806,8 @@ v1_router = VersionedAPIRouter(version="v1", tags=["API v1"])
 
 
 class ProductCreate(BaseModel):
+    """Request model for creating a new product."""
+
     name: str
     description: str | None = None
     price: float
@@ -487,6 +816,8 @@ class ProductCreate(BaseModel):
 
 
 class ProductResponse(BaseModel):
+    """Response model for product data."""
+
     id: str
     name: str
     description: str | None
@@ -498,7 +829,7 @@ class ProductResponse(BaseModel):
 
 @v1_router.post("/products", response_model=ProductResponse)
 async def create_product(product: ProductCreate, user: TokenPayload = Depends(get_current_user)):
-    """Create a new product (authenticated)"""
+    """Create a new product (requires authentication)."""
     product_id = f"prod_{os.urandom(8).hex()}"
 
     # Publish webhook event
@@ -527,7 +858,7 @@ async def create_product(product: ProductCreate, user: TokenPayload = Depends(ge
 async def list_products(
     user: TokenPayload = Depends(get_current_user), limit: int = 10, offset: int = 0
 ):
-    """List products (authenticated)"""
+    """List all products (paginated)."""
     # Demo data
     return [
         ProductResponse(
@@ -546,12 +877,16 @@ async def list_products(
 
 
 class OrderCreate(BaseModel):
+    """Request model for creating a new order."""
+
     customer_id: str
     items: list[dict[str, Any]]
     shipping_address: dict[str, str]
 
 
 class OrderResponse(BaseModel):
+    """Response model for order data."""
+
     id: str
     customer_id: str
     status: str
@@ -561,7 +896,7 @@ class OrderResponse(BaseModel):
 
 @v1_router.post("/orders", response_model=OrderResponse)
 async def create_order(order: OrderCreate, user: TokenPayload = Depends(get_current_user)):
-    """Create a new order (authenticated)"""
+    """Create an order (requires authentication)."""
     order_id = f"ord_{os.urandom(8).hex()}"
 
     # Encrypt sensitive shipping data
@@ -590,12 +925,16 @@ async def create_order(order: OrderCreate, user: TokenPayload = Depends(get_curr
 
 
 class AgentExecuteRequest(BaseModel):
+    """Request model for executing a super agent."""
+
     agent_name: str
     task: str
     parameters: dict[str, Any] = {}
 
 
 class AgentResponse(BaseModel):
+    """Response model for agent execution."""
+
     agent_name: str
     task_id: str
     status: str
@@ -606,7 +945,7 @@ class AgentResponse(BaseModel):
 async def execute_agent(
     request: AgentExecuteRequest, user: TokenPayload = Depends(get_current_user)
 ):
-    """Execute an AI agent task (authenticated)"""
+    """Execute a super agent (requires authentication)."""
     task_id = f"task_{os.urandom(8).hex()}"
 
     # Publish webhook
@@ -635,7 +974,7 @@ async def execute_agent(
     dependencies=[Depends(RoleChecker([UserRole.ADMIN, UserRole.SUPER_ADMIN]))],
 )
 async def get_admin_stats():
-    """Get platform statistics (admin only)"""
+    """Get admin statistics (requires admin role)."""
     return {
         "total_users": 150,
         "total_orders": 1250,
@@ -648,7 +987,7 @@ async def get_admin_stats():
 
 @v1_router.get("/admin/security-audit", dependencies=[Depends(RoleChecker([UserRole.SUPER_ADMIN]))])
 async def get_security_audit():
-    """Get security audit log (super admin only)"""
+    """Get security audit log (requires admin role)."""
     return {
         "audit_log": [
             {
@@ -674,7 +1013,7 @@ async def get_security_audit():
 
 @v1_router.post("/demo/encrypt")
 async def demo_encrypt(data: dict[str, Any], user: TokenPayload = Depends(get_current_user)):
-    """Demo: Encrypt sensitive fields in data"""
+    """Demo encryption (AES-256-GCM)."""
     encrypted = field_encryption.encrypt_dict(data, context=user.sub)
     return {
         "original_keys": list(data.keys()),
@@ -685,7 +1024,7 @@ async def demo_encrypt(data: dict[str, Any], user: TokenPayload = Depends(get_cu
 
 @v1_router.post("/demo/mask")
 async def demo_mask(data: dict[str, str], user: TokenPayload = Depends(get_current_user)):
-    """Demo: Mask sensitive data for display"""
+    """Demo PII masking (SSN, email redaction)."""
     masked = {}
     for key, value in data.items():
         if "email" in key.lower():
@@ -712,7 +1051,14 @@ app.include_router(v1_router)
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Custom HTTP exception handler"""
+    """Handle HTTP exceptions with proper error format and structured logging."""
+    log = structlog.get_logger(__name__)
+    log.warning(
+        "http_exception",
+        status_code=exc.status_code,
+        message=exc.detail,
+        path=str(request.url.path),
+    )
     return JSONResponse(
         status_code=exc.status_code,
         content={
@@ -727,8 +1073,15 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 
 @app.exception_handler(Exception)
 async def general_exception_handler(request: Request, exc: Exception):
-    """General exception handler"""
-    logger.error(f"Unhandled exception: {exc}", exc_info=True)
+    """Handle general exceptions with error tracking and structured logging."""
+    log = structlog.get_logger(__name__)
+    log.error(
+        "unhandled_exception",
+        exception_type=type(exc).__name__,
+        error=str(exc),
+        path=str(request.url.path),
+        exc_info=True,
+    )
     return JSONResponse(
         status_code=500,
         content={

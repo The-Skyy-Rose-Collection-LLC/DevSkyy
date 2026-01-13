@@ -138,6 +138,14 @@ class PipelineStage(str, Enum):
     FAILED = "failed"
 
 
+class Primary3DGenerator(str, Enum):
+    """Primary 3D generator selection."""
+
+    HUGGINGFACE = "huggingface"  # Use HuggingFace models (recommended for quality)
+    TRIPO3D = "tripo3d"  # Use Tripo3D (original behavior)
+    HYBRID = "hybrid"  # HuggingFace for hints, Tripo3D for generation
+
+
 @dataclass
 class PipelineConfig:
     """Asset pipeline configuration."""
@@ -147,6 +155,9 @@ class PipelineConfig:
     fashn_config: FashnConfig = field(default_factory=FashnConfig.from_env)
     wordpress_config: WordPressAssetConfig = field(default_factory=WordPressAssetConfig.from_env)
     huggingface_config: HuggingFace3DConfig = field(default_factory=HuggingFace3DConfig.from_env)
+
+    # Primary 3D generator selection (NEW)
+    primary_3d_generator: Primary3DGenerator = Primary3DGenerator.HUGGINGFACE
 
     # Pipeline settings
     enable_huggingface_3d: bool = True  # Stage 0: HF 3D generation
@@ -181,11 +192,20 @@ class PipelineConfig:
     @classmethod
     def from_env(cls) -> PipelineConfig:
         """Create config from environment variables."""
+        # Parse primary 3D generator from env
+        generator_str = os.getenv("PIPELINE_PRIMARY_3D_GENERATOR", "huggingface").lower()
+        primary_generator = (
+            Primary3DGenerator(generator_str)
+            if generator_str in [e.value for e in Primary3DGenerator]
+            else Primary3DGenerator.HUGGINGFACE
+        )
+
         return cls(
             tripo_config=TripoConfig.from_env(),
             fashn_config=FashnConfig.from_env(),
             wordpress_config=WordPressAssetConfig.from_env(),
             huggingface_config=HuggingFace3DConfig.from_env(),
+            primary_3d_generator=primary_generator,
             enable_huggingface_3d=os.getenv("PIPELINE_ENABLE_HF_3D", "true").lower() == "true",
             enable_3d_generation=os.getenv("PIPELINE_ENABLE_3D", "true").lower() == "true",
             enable_virtual_tryon=os.getenv("PIPELINE_ENABLE_TRYON", "true").lower() == "true",
@@ -459,12 +479,16 @@ class ProductAssetPipeline:
                 logger.warning("Redis close timed out", error=str(e))
             except Exception as e:
                 errors.append(f"Redis close error: {e}")
-                logger.warning("Failed to close Redis connection", error=str(e), error_type=type(e).__name__)
+                logger.warning(
+                    "Failed to close Redis connection", error=str(e), error_type=type(e).__name__
+                )
             finally:
                 self._redis_connected = False
 
         if errors:
-            logger.info("Pipeline close completed with errors", error_count=len(errors), errors=errors)
+            logger.info(
+                "Pipeline close completed with errors", error_count=len(errors), errors=errors
+            )
 
     # =========================================================================
     # Stage 4.7.2: Redis Cache Layer
@@ -504,9 +528,11 @@ class ProductAssetPipeline:
             # Test connection with timeout
             await asyncio.wait_for(self._redis.ping(), timeout=5.0)
             self._redis_connected = True
-            logger.info("Redis cache connected", url=self.config.redis_url.split("@")[-1])  # Log host only, not credentials
+            logger.info(
+                "Redis cache connected", url=self.config.redis_url.split("@")[-1]
+            )  # Log host only, not credentials
             return True
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Redis connection timed out (transient error, will retry on next request)",
                 redis_url=self.config.redis_url.split("@")[-1],
@@ -586,7 +612,7 @@ class ProductAssetPipeline:
                 logger.info("Cache hit", cache_key=cache_key)
                 return AssetPipelineResult.model_validate_json(cached)
             return None
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Cache retrieval timed out",
                 cache_key=cache_key,
@@ -674,7 +700,7 @@ class ProductAssetPipeline:
                 ttl_days=self.config.cache_ttl_seconds // 86400,
                 size_bytes=len(serialized),
             )
-        except asyncio.TimeoutError:
+        except TimeoutError:
             logger.warning(
                 "Cache write timed out - result not cached",
                 cache_key=cache_key,
@@ -1051,7 +1077,9 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
+            1
+            for _, r, _ in results
+            if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize
@@ -1163,62 +1191,126 @@ class ProductAssetPipeline:
             PIPELINE_ACTIVE.inc()
 
         try:
-            # Stage 0: Generate initial 3D with HuggingFace (Shap-E)
+            # 3D Generation based on primary generator setting
             hf_3d_result = None
-            if self.config.enable_huggingface_3d and images:
-                await self._emit_progress(
-                    ProgressEvent(
-                        event_type=ProgressEventType.STAGE_STARTED,
-                        product_id=product_id,
-                        stage="generating_hf_3d",
-                        progress_percent=5.0,
-                        message="Generating initial 3D model with HuggingFace Shap-E",
-                    )
-                )
-                hf_3d_result = await self._generate_3d_with_huggingface(
-                    result=result,
-                    title=title,
-                    images=images,
-                )
-                await self._emit_progress(
-                    ProgressEvent(
-                        event_type=ProgressEventType.STAGE_COMPLETED,
-                        product_id=product_id,
-                        stage="generating_hf_3d",
-                        progress_percent=15.0,
-                        message="HuggingFace 3D generation complete",
-                    )
-                )
 
-            # Stage 1: Generate 3D models with Tripo3D (optimized with HF hints)
-            if self.config.enable_3d_generation and images:
-                result.stage = PipelineStage.GENERATING_3D
-                await self._emit_progress(
-                    ProgressEvent(
-                        event_type=ProgressEventType.STAGE_STARTED,
-                        product_id=product_id,
-                        stage=PipelineStage.GENERATING_3D.value,
-                        progress_percent=20.0,
-                        message="Generating 3D models with Tripo3D (optimized with HF)",
+            if self.config.primary_3d_generator == Primary3DGenerator.HUGGINGFACE:
+                # Use HuggingFace as primary 3D generator (recommended for quality)
+                if images:
+                    result.stage = PipelineStage.GENERATING_3D
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_STARTED,
+                            product_id=product_id,
+                            stage=PipelineStage.GENERATING_3D.value,
+                            progress_percent=10.0,
+                            message="Generating high-quality 3D model with HuggingFace",
+                        )
                     )
-                )
-                await self._generate_3d_models(
-                    result=result,
-                    title=title,
-                    images=images,
-                    collection=collection,
-                    garment_type=garment_type,
-                    hf_3d_result=hf_3d_result,
-                )
-                await self._emit_progress(
-                    ProgressEvent(
-                        event_type=ProgressEventType.STAGE_COMPLETED,
-                        product_id=product_id,
-                        stage=PipelineStage.GENERATING_3D.value,
-                        progress_percent=40.0,
-                        message=f"3D models generated: {len(result.assets_3d)}",
+                    await self._generate_3d_with_huggingface_primary(
+                        result=result,
+                        title=title,
+                        images=images,
+                        collection=collection,
+                        garment_type=garment_type,
                     )
-                )
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_COMPLETED,
+                            product_id=product_id,
+                            stage=PipelineStage.GENERATING_3D.value,
+                            progress_percent=40.0,
+                            message=f"HuggingFace 3D models generated: {len(result.assets_3d)}",
+                        )
+                    )
+
+            elif self.config.primary_3d_generator == Primary3DGenerator.HYBRID:
+                # Hybrid: HuggingFace for hints, Tripo3D for generation
+                if self.config.enable_huggingface_3d and images:
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_STARTED,
+                            product_id=product_id,
+                            stage="generating_hf_3d",
+                            progress_percent=5.0,
+                            message="Generating optimization hints with HuggingFace",
+                        )
+                    )
+                    hf_3d_result = await self._generate_3d_with_huggingface(
+                        result=result,
+                        title=title,
+                        images=images,
+                    )
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_COMPLETED,
+                            product_id=product_id,
+                            stage="generating_hf_3d",
+                            progress_percent=15.0,
+                            message="HuggingFace optimization complete",
+                        )
+                    )
+
+                # Generate with Tripo3D using HF hints
+                if self.config.enable_3d_generation and images:
+                    result.stage = PipelineStage.GENERATING_3D
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_STARTED,
+                            product_id=product_id,
+                            stage=PipelineStage.GENERATING_3D.value,
+                            progress_percent=20.0,
+                            message="Generating 3D models with Tripo3D (HF-optimized)",
+                        )
+                    )
+                    await self._generate_3d_models(
+                        result=result,
+                        title=title,
+                        images=images,
+                        collection=collection,
+                        garment_type=garment_type,
+                        hf_3d_result=hf_3d_result,
+                    )
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_COMPLETED,
+                            product_id=product_id,
+                            stage=PipelineStage.GENERATING_3D.value,
+                            progress_percent=40.0,
+                            message=f"3D models generated: {len(result.assets_3d)}",
+                        )
+                    )
+
+            else:
+                # TRIPO3D: Original behavior - Tripo3D only
+                if self.config.enable_3d_generation and images:
+                    result.stage = PipelineStage.GENERATING_3D
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_STARTED,
+                            product_id=product_id,
+                            stage=PipelineStage.GENERATING_3D.value,
+                            progress_percent=20.0,
+                            message="Generating 3D models with Tripo3D",
+                        )
+                    )
+                    await self._generate_3d_models(
+                        result=result,
+                        title=title,
+                        images=images,
+                        collection=collection,
+                        garment_type=garment_type,
+                        hf_3d_result=None,
+                    )
+                    await self._emit_progress(
+                        ProgressEvent(
+                            event_type=ProgressEventType.STAGE_COMPLETED,
+                            product_id=product_id,
+                            stage=PipelineStage.GENERATING_3D.value,
+                            progress_percent=40.0,
+                            message=f"3D models generated: {len(result.assets_3d)}",
+                        )
+                    )
 
             # Stage 2: Generate virtual try-on (apparel only)
             if (
@@ -1367,6 +1459,113 @@ class ProductAssetPipeline:
             )
 
         return result
+
+    async def _generate_3d_with_huggingface_primary(
+        self,
+        result: AssetPipelineResult,
+        title: str,
+        images: list[str],
+        collection: str,
+        garment_type: str,
+    ) -> None:
+        """
+        Generate production-quality 3D models using HuggingFace as primary generator.
+
+        This uses Hunyuan3D 2.0 or InstantMesh for best quality output,
+        bypassing Tripo3D entirely for higher fidelity.
+        """
+        from orchestration.huggingface_3d_client import HF3DModel, HF3DQuality
+
+        logger.info(
+            "Generating 3D models with HuggingFace (primary)",
+            title=title,
+            image_count=len(images),
+        )
+
+        # Use production quality settings
+        models_to_try = [
+            HF3DModel.HUNYUAN3D_2,  # Best quality
+            HF3DModel.INSTANTMESH,  # Good for complex geometry
+            HF3DModel.TRIPOSR,  # Fallback
+        ]
+
+        for image_path in images[:1]:  # Use first image for 3D generation
+            best_result = None
+            best_score = 0.0
+
+            for model in models_to_try:
+                try:
+                    logger.info(
+                        f"Trying HuggingFace model: {model.value}",
+                        image=image_path,
+                    )
+
+                    hf_result = await self.huggingface_client.generate_from_image(
+                        image_path=image_path,
+                        model=model,
+                        quality=HF3DQuality.PRODUCTION,
+                        remove_background=True,
+                    )
+
+                    if hf_result.status == "completed" and hf_result.output_path:
+                        score = hf_result.quality_score or 0.0
+
+                        if score > best_score:
+                            best_score = score
+                            best_result = hf_result
+
+                        logger.info(
+                            f"HuggingFace {model.value} succeeded",
+                            quality_score=score,
+                            path=hf_result.output_path,
+                        )
+
+                        # If we got a good result, stop trying other models
+                        if score >= 85.0:
+                            break
+
+                except Exception as e:
+                    logger.warning(
+                        f"HuggingFace model {model.value} failed",
+                        error=str(e),
+                    )
+                    continue
+
+            # Add best result to pipeline output
+            if best_result and best_result.output_path:
+                result.assets_3d.append(
+                    Asset3DResult(
+                        task_id=best_result.task_id,
+                        model_path=best_result.output_path,
+                        model_url=best_result.output_url,
+                        format=best_result.format.value,
+                        thumbnail_path=None,
+                        metadata={
+                            "collection": collection,
+                            "garment_type": garment_type,
+                            "source_image": image_path,
+                            "hf_model": best_result.model_used.value,
+                            "quality_score": best_result.quality_score,
+                            "polycount": best_result.polycount,
+                            "has_textures": best_result.has_textures,
+                            "generation_time_ms": best_result.generation_time_ms,
+                        },
+                    )
+                )
+                logger.info(
+                    "HuggingFace 3D generation successful",
+                    model=best_result.model_used.value,
+                    quality_score=best_score,
+                    path=best_result.output_path,
+                )
+            else:
+                result.errors.append(
+                    {
+                        "stage": "hf_3d_generation_primary",
+                        "error": "All HuggingFace models failed to generate 3D",
+                        "image": image_path,
+                    }
+                )
 
     async def _generate_3d_with_huggingface(
         self,
@@ -1706,6 +1905,7 @@ __all__ = [
     # Enums
     "ProductCategory",
     "PipelineStage",
+    "Primary3DGenerator",
     # Stage 4.7.2: Batch Processing
     "BatchResult",
     "RetryQueueItem",

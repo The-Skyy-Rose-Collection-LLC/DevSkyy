@@ -17,6 +17,7 @@ Reference: https://google.github.io/adk-docs/
 Installation:
     pip install google-adk
 """
+
 from __future__ import annotations
 
 import logging
@@ -41,7 +42,7 @@ try:
     from google.adk.agents import Agent as ADKAgent
     from google.adk.runners import Runner
     from google.adk.sessions import InMemorySessionService
-    from google.genai import types as genai_types
+    from google.generativeai import types as genai_types
 
     GOOGLE_ADK_AVAILABLE = True
     logger.info("Google ADK v1.21.0 loaded successfully")

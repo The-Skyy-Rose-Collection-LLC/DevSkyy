@@ -42,7 +42,9 @@ logger = logging.getLogger(__name__)
 # Types matching frontend/lib/types.ts
 # =============================================================================
 
-SuperAgentTypeLiteral = Literal["commerce", "creative", "marketing", "support", "operations", "analytics"]
+SuperAgentTypeLiteral = Literal[
+    "commerce", "creative", "marketing", "support", "operations", "analytics"
+]
 
 
 class ToolParameter(BaseModel):
@@ -114,37 +116,73 @@ AGENT_METADATA: dict[str, dict[str, Any]] = {
     "commerce": {
         "name": "Commerce Agent",
         "description": "E-commerce operations: products, orders, inventory, pricing optimization",
-        "capabilities": ["product_management", "order_processing", "inventory_tracking", "pricing_optimization", "demand_forecasting"],
+        "capabilities": [
+            "product_management",
+            "order_processing",
+            "inventory_tracking",
+            "pricing_optimization",
+            "demand_forecasting",
+        ],
         "mlModels": ["demand_forecast", "price_optimization", "customer_segmentation"],
     },
     "creative": {
         "name": "Creative Agent",
         "description": "Visual content: 3D assets (Tripo3D), images (Imagen/FLUX), virtual try-on (FASHN)",
-        "capabilities": ["image_generation", "video_generation", "3d_model_creation", "virtual_tryon", "brand_asset_creation"],
+        "capabilities": [
+            "image_generation",
+            "video_generation",
+            "3d_model_creation",
+            "virtual_tryon",
+            "brand_asset_creation",
+        ],
         "mlModels": ["imagen_3", "flux_1", "tripo3d", "fashn_virtual_tryon"],
     },
     "marketing": {
         "name": "Marketing Agent",
         "description": "Marketing & content: SEO, social media, email campaigns, trend analysis",
-        "capabilities": ["seo_optimization", "content_generation", "social_media", "email_campaigns", "trend_analysis"],
+        "capabilities": [
+            "seo_optimization",
+            "content_generation",
+            "social_media",
+            "email_campaigns",
+            "trend_analysis",
+        ],
         "mlModels": ["content_optimizer", "sentiment_analyzer", "trend_predictor"],
     },
     "support": {
         "name": "Support Agent",
         "description": "Customer support: tickets, FAQs, escalation, intent classification",
-        "capabilities": ["ticket_management", "faq_responses", "intent_classification", "sentiment_analysis", "escalation"],
+        "capabilities": [
+            "ticket_management",
+            "faq_responses",
+            "intent_classification",
+            "sentiment_analysis",
+            "escalation",
+        ],
         "mlModels": ["intent_classifier", "sentiment_analyzer", "response_generator"],
     },
     "operations": {
         "name": "Operations Agent",
         "description": "DevOps & deployment: WordPress, Elementor, monitoring, infrastructure",
-        "capabilities": ["wordpress_management", "elementor_builder", "deployment", "monitoring", "infrastructure"],
+        "capabilities": [
+            "wordpress_management",
+            "elementor_builder",
+            "deployment",
+            "monitoring",
+            "infrastructure",
+        ],
         "mlModels": ["anomaly_detector", "capacity_planner"],
     },
     "analytics": {
         "name": "Analytics Agent",
         "description": "Data & insights: reports, forecasting, clustering, anomaly detection",
-        "capabilities": ["reporting", "forecasting", "clustering", "anomaly_detection", "data_visualization"],
+        "capabilities": [
+            "reporting",
+            "forecasting",
+            "clustering",
+            "anomaly_detection",
+            "data_visualization",
+        ],
         "mlModels": ["prophet_forecaster", "isolation_forest", "kmeans_clustering"],
     },
 }
@@ -152,48 +190,143 @@ AGENT_METADATA: dict[str, dict[str, Any]] = {
 # Default tools per agent type
 DEFAULT_TOOLS: dict[str, list[ToolInfo]] = {
     "commerce": [
-        ToolInfo(name="create_product", description="Create WooCommerce product", category="commerce", parameters=[
-            ToolParameter(name="name", type="string", description="Product name", required=True)
-        ]),
-        ToolInfo(name="update_inventory", description="Update product inventory", category="commerce", parameters=[
-            ToolParameter(name="product_id", type="string", description="Product ID", required=True)
-        ]),
-        ToolInfo(name="analyze_pricing", description="AI pricing optimization", category="analytics", parameters=[]),
+        ToolInfo(
+            name="create_product",
+            description="Create WooCommerce product",
+            category="commerce",
+            parameters=[
+                ToolParameter(name="name", type="string", description="Product name", required=True)
+            ],
+        ),
+        ToolInfo(
+            name="update_inventory",
+            description="Update product inventory",
+            category="commerce",
+            parameters=[
+                ToolParameter(
+                    name="product_id", type="string", description="Product ID", required=True
+                )
+            ],
+        ),
+        ToolInfo(
+            name="analyze_pricing",
+            description="AI pricing optimization",
+            category="analytics",
+            parameters=[],
+        ),
     ],
     "creative": [
-        ToolInfo(name="generate_image", description="Generate image with Imagen/FLUX", category="media", parameters=[
-            ToolParameter(name="prompt", type="string", description="Image prompt", required=True)
-        ]),
-        ToolInfo(name="generate_3d", description="Generate 3D model with Tripo3D", category="media", parameters=[
-            ToolParameter(name="prompt", type="string", description="3D prompt", required=True)
-        ]),
-        ToolInfo(name="virtual_tryon", description="Virtual try-on with FASHN", category="media", parameters=[]),
+        ToolInfo(
+            name="generate_image",
+            description="Generate image with Imagen/FLUX",
+            category="media",
+            parameters=[
+                ToolParameter(
+                    name="prompt", type="string", description="Image prompt", required=True
+                )
+            ],
+        ),
+        ToolInfo(
+            name="generate_3d",
+            description="Generate 3D model with Tripo3D",
+            category="media",
+            parameters=[
+                ToolParameter(name="prompt", type="string", description="3D prompt", required=True)
+            ],
+        ),
+        ToolInfo(
+            name="virtual_tryon",
+            description="Virtual try-on with FASHN",
+            category="media",
+            parameters=[],
+        ),
     ],
     "marketing": [
-        ToolInfo(name="generate_content", description="Generate marketing content", category="content", parameters=[
-            ToolParameter(name="topic", type="string", description="Content topic", required=True)
-        ]),
-        ToolInfo(name="analyze_seo", description="SEO analysis and optimization", category="analytics", parameters=[]),
-        ToolInfo(name="schedule_post", description="Schedule social media post", category="social", parameters=[]),
+        ToolInfo(
+            name="generate_content",
+            description="Generate marketing content",
+            category="content",
+            parameters=[
+                ToolParameter(
+                    name="topic", type="string", description="Content topic", required=True
+                )
+            ],
+        ),
+        ToolInfo(
+            name="analyze_seo",
+            description="SEO analysis and optimization",
+            category="analytics",
+            parameters=[],
+        ),
+        ToolInfo(
+            name="schedule_post",
+            description="Schedule social media post",
+            category="social",
+            parameters=[],
+        ),
     ],
     "support": [
-        ToolInfo(name="create_ticket", description="Create support ticket", category="support", parameters=[
-            ToolParameter(name="subject", type="string", description="Ticket subject", required=True)
-        ]),
-        ToolInfo(name="classify_intent", description="Classify customer intent", category="ai", parameters=[]),
-        ToolInfo(name="generate_response", description="Generate support response", category="content", parameters=[]),
+        ToolInfo(
+            name="create_ticket",
+            description="Create support ticket",
+            category="support",
+            parameters=[
+                ToolParameter(
+                    name="subject", type="string", description="Ticket subject", required=True
+                )
+            ],
+        ),
+        ToolInfo(
+            name="classify_intent",
+            description="Classify customer intent",
+            category="ai",
+            parameters=[],
+        ),
+        ToolInfo(
+            name="generate_response",
+            description="Generate support response",
+            category="content",
+            parameters=[],
+        ),
     ],
     "operations": [
-        ToolInfo(name="deploy_site", description="Deploy WordPress site", category="operations", parameters=[]),
-        ToolInfo(name="update_theme", description="Update Elementor theme", category="wordpress", parameters=[]),
-        ToolInfo(name="check_health", description="Check system health", category="monitoring", parameters=[]),
+        ToolInfo(
+            name="deploy_site",
+            description="Deploy WordPress site",
+            category="operations",
+            parameters=[],
+        ),
+        ToolInfo(
+            name="update_theme",
+            description="Update Elementor theme",
+            category="wordpress",
+            parameters=[],
+        ),
+        ToolInfo(
+            name="check_health",
+            description="Check system health",
+            category="monitoring",
+            parameters=[],
+        ),
     ],
     "analytics": [
-        ToolInfo(name="generate_report", description="Generate analytics report", category="analytics", parameters=[
-            ToolParameter(name="report_type", type="string", description="Type of report", required=True)
-        ]),
+        ToolInfo(
+            name="generate_report",
+            description="Generate analytics report",
+            category="analytics",
+            parameters=[
+                ToolParameter(
+                    name="report_type", type="string", description="Type of report", required=True
+                )
+            ],
+        ),
         ToolInfo(name="forecast", description="Generate forecast", category="ai", parameters=[]),
-        ToolInfo(name="detect_anomalies", description="Detect data anomalies", category="ai", parameters=[]),
+        ToolInfo(
+            name="detect_anomalies",
+            description="Detect data anomalies",
+            category="ai",
+            parameters=[],
+        ),
     ],
 }
 
@@ -209,13 +342,20 @@ class AgentRegistry:
         self._stats: dict[str, AgentStats] = {
             agent_type: AgentStats() for agent_type in AGENT_CLASSES
         }
-        self._status: dict[str, Literal["idle", "running", "error", "learning"]] = {
-            agent_type: "idle" for agent_type in AGENT_CLASSES
-        }
-        self._initialized: dict[str, bool] = {
-            agent_type: False for agent_type in AGENT_CLASSES
-        }
+        self._status: dict[str, Literal["idle", "running", "error", "learning"]] = dict.fromkeys(
+            AGENT_CLASSES, "idle"
+        )
+        self._initialized: dict[str, bool] = dict.fromkeys(AGENT_CLASSES, False)
         self._task_counter = 0
+        self._rag_manager: Any = None  # RAG context manager for all agents
+
+    def set_rag_manager(self, rag_manager: Any) -> None:
+        """Set the RAG manager for all agents."""
+        self._rag_manager = rag_manager
+        # Inject into existing agents
+        for agent in self._agents.values():
+            agent.rag_manager = rag_manager
+        logger.info("RAG manager set for all agents")
 
     def get_agent(self, agent_type: str) -> EnhancedSuperAgent:
         """Get or create an agent instance."""
@@ -224,7 +364,11 @@ class AgentRegistry:
 
         if agent_type not in self._agents:
             agent_class = AGENT_CLASSES[agent_type]
-            self._agents[agent_type] = agent_class()
+            agent = agent_class()
+            # Inject RAG manager if available
+            if self._rag_manager:
+                agent.rag_manager = self._rag_manager
+            self._agents[agent_type] = agent
             logger.info(f"Initialized {agent_type} agent")
 
         return self._agents[agent_type]
@@ -283,8 +427,8 @@ class AgentRegistry:
                         )
                         for t in raw_tools
                     ]
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Failed to parse tool schema for agent {agent_type}: {e}")
 
         return DEFAULT_TOOLS.get(agent_type, [])
 
@@ -292,7 +436,9 @@ class AgentRegistry:
         """Get list of all agents with their info."""
         return [self.get_agent_info(agent_type) for agent_type in AGENT_CLASSES]
 
-    def update_stats(self, agent_type: str, success: bool, latency_ms: float, cost_usd: float = 0.0):
+    def update_stats(
+        self, agent_type: str, success: bool, latency_ms: float, cost_usd: float = 0.0
+    ):
         """Update agent statistics after task execution."""
         stats = self._stats[agent_type]
         total = stats.tasksCompleted + 1

@@ -27,6 +27,8 @@ Usage:
     result = await tool.execute(query="luxury streetwear trends")
 """
 
+from core.runtime.tool_registry import ToolCategory, ToolDefinition, ToolParameter, ToolRegistry
+
 from .asset_pipeline import (
     Asset3DResult,
     AssetPipelineResult,
@@ -85,7 +87,6 @@ from .query_rewriter import (
     RAGPipelineWithRewriting,
     RewrittenQuery,
 )
-from .tool_registry import ToolCategory, ToolDefinition, ToolParameter, ToolRegistry
 
 # RAG Components
 from .vector_store import (

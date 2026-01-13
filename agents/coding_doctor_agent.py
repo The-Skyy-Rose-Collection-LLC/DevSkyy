@@ -326,7 +326,9 @@ class SelfLearningEngine:
         success: bool,
     ):
         """Learn from an issue resolution"""
-        pattern_hash = hashlib.md5(f"{category.value}:{pattern}".encode()).hexdigest()[:16]
+        pattern_hash = hashlib.md5(
+            f"{category.value}:{pattern}".encode(), usedforsecurity=False
+        ).hexdigest()[:16]
 
         if pattern_hash in self._patterns:
             entry = self._patterns[pattern_hash]
@@ -347,7 +349,9 @@ class SelfLearningEngine:
 
     def get_solution(self, category: IssueCategory, pattern: str) -> str | None:
         """Get a learned solution for a pattern"""
-        pattern_hash = hashlib.md5(f"{category.value}:{pattern}".encode()).hexdigest()[:16]
+        pattern_hash = hashlib.md5(
+            f"{category.value}:{pattern}".encode(), usedforsecurity=False
+        ).hexdigest()[:16]
 
         entry = self._patterns.get(pattern_hash)
         if entry and entry.success_rate > 0.7:

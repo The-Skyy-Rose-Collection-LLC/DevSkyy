@@ -16,6 +16,7 @@ Reference: https://microsoft.github.io/autogen/
 
 import logging
 import os
+import tempfile
 from collections.abc import Callable
 from datetime import UTC, datetime
 
@@ -437,9 +438,11 @@ class AutoGenCodeAgent(AutoGenAgent):
         result = await agent.run("Write code to analyze sales data")
     """
 
-    def __init__(self, config: AgentConfig, work_dir: str = "/tmp/autogen_work"):
+    def __init__(self, config: AgentConfig, work_dir: str | None = None):
         super().__init__(config, agent_type="code_executor")
-        self.work_dir = work_dir
+        self.work_dir = work_dir or os.getenv(
+            "AUTOGEN_WORK_DIR", os.path.join(tempfile.gettempdir(), "autogen_work")
+        )
         self._code_executor = None
 
     async def initialize(self) -> None:

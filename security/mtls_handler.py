@@ -9,9 +9,8 @@ import logging
 import socket
 import ssl
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from pathlib import Path
-
-from datetime import datetime
 
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
@@ -28,9 +27,8 @@ def get_cert_not_valid_before(cert: x509.Certificate) -> datetime:
         return cert.not_valid_before_utc
     except AttributeError:
         # Pre-42.0: not_valid_before is naive, assume UTC
-        from datetime import timezone
         dt = cert.not_valid_before
-        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
 
 def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
@@ -39,9 +37,8 @@ def get_cert_not_valid_after(cert: x509.Certificate) -> datetime:
         return cert.not_valid_after_utc
     except AttributeError:
         # Pre-42.0: not_valid_after is naive, assume UTC
-        from datetime import timezone
         dt = cert.not_valid_after
-        return dt.replace(tzinfo=timezone.utc) if dt.tzinfo is None else dt
+        return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt
 
 
 @dataclass
@@ -117,7 +114,7 @@ class MTLSHandler:
 
         if not cert_path.exists() or not key_path.exists():
             raise FileNotFoundError(
-                f"Certificate or key not found for {service_name}. " f"Generate certificates first."
+                f"Certificate or key not found for {service_name}. Generate certificates first."
             )
 
         if not ca_path.exists():
@@ -188,7 +185,7 @@ class MTLSHandler:
 
         if not cert_path.exists() or not key_path.exists():
             raise FileNotFoundError(
-                f"Certificate or key not found for {service_name}. " f"Generate certificates first."
+                f"Certificate or key not found for {service_name}. Generate certificates first."
             )
 
         if not ca_path.exists():

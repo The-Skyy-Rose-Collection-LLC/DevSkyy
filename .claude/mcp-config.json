@@ -1,0 +1,44 @@
+{
+  "mcpServers": {
+    "devskyy-main": {
+      "command": "python3",
+      "args": ["/Users/coreyfoster/DevSkyy/devskyy_mcp.py"],
+      "env": {
+        "DEVSKYY_API_URL": "http://localhost:8000",
+        "DEVSKYY_API_KEY": "",
+        "MCP_BACKEND": "devskyy"
+      }
+    },
+    "devskyy-rag": {
+      "command": "python3",
+      "args": ["/Users/coreyfoster/DevSkyy/mcp_servers/rag_server.py"],
+      "env": {
+        "VECTOR_DB_PATH": "./data/vectordb",
+        "EMBEDDING_PROVIDER": "cohere"
+      }
+    },
+    "devskyy-agents": {
+      "command": "python3",
+      "args": ["/Users/coreyfoster/DevSkyy/mcp_servers/agent_bridge_server.py"],
+      "env": {
+        "BACKEND_URL": "http://localhost:8000"
+      }
+    },
+    "devskyy-woocommerce": {
+      "command": "python3",
+      "args": ["/Users/coreyfoster/DevSkyy/mcp_servers/woocommerce_mcp.py"],
+      "env": {
+        "WORDPRESS_URL": "",
+        "WOOCOMMERCE_KEY": "",
+        "WOOCOMMERCE_SECRET": ""
+      }
+    },
+    "devskyy-openai": {
+      "command": "python3",
+      "args": ["/Users/coreyfoster/DevSkyy/mcp_servers/openai_server.py"],
+      "env": {
+        "OPENAI_API_KEY": ""
+      }
+    }
+  }
+}

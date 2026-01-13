@@ -1,0 +1,45 @@
+{
+  "name": "critical-fuchsia-ape",
+  "description": "DevSkyy MCP Server - 17 AI-powered tools for e-commerce automation",
+  "version": "2.0.0",
+  "entrypoint": "devskyy_mcp.py",
+  "runtime": "python3.11",
+  "environment": {
+    "MCP_BACKEND": "critical-fuchsia-ape",
+    "ENVIRONMENT": "production",
+    "DEBUG": "false"
+  },
+  "secrets": [
+    "CRITICAL_FUCHSIA_APE_KEY",
+    "DEVSKYY_API_KEY",
+    "OPENAI_API_KEY",
+    "ANTHROPIC_API_KEY",
+    "TRIPO_API_KEY",
+    "FASHN_API_KEY"
+  ],
+  "dependencies": {
+    "python": [
+      "fastmcp>=0.4.0",
+      "httpx>=0.27.0",
+      "pydantic>=2.0.0",
+      "python-jose[cryptography]>=3.3.0"
+    ]
+  },
+  "endpoints": {
+    "health": "/health",
+    "tools": "/tools"
+  },
+  "metadata": {
+    "author": "SkyyRose LLC",
+    "repository": "https://github.com/damBruh/DevSkyy",
+    "tools_count": 17,
+    "categories": [
+      "infrastructure",
+      "ai-intelligence",
+      "ecommerce",
+      "marketing",
+      "3d-generation",
+      "virtual-tryon"
+    ]
+  }
+}

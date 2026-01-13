@@ -31,7 +31,7 @@ from base import (
     SuperAgent,
     ValidationResult,
 )
-from runtime.tools import ToolCallContext, ToolCategory, ToolRegistry, ToolSeverity
+from core.runtime.tool_registry import ToolCallContext, ToolCategory, ToolRegistry, ToolSeverity
 
 logger = structlog.get_logger(__name__)
 
@@ -362,7 +362,7 @@ class OperationsAgent(SuperAgent):
                 "status": "completed",
                 "template_id": template_id,
                 "wordpress_page_id": target_page_id or 12345,
-                "url": f"https://skyyrose.com/page/{target_page_id or 12345}",
+                "url": f"https://skyyrose.co/page/{target_page_id or 12345}",
                 "synced_at": datetime.now(UTC).isoformat(),
             }
 
@@ -447,7 +447,7 @@ class OperationsAgent(SuperAgent):
                 "version": version,
                 "components": components or ["api", "frontend", "workers"],
                 "status": "completed",
-                "url": f"https://{'staging.' if environment == 'staging' else ''}skyyrose.com",
+                "url": f"https://{'staging.' if environment == 'staging' else ''}skyyrose.co",
                 "started_at": datetime.now(UTC).isoformat(),
                 "completed_at": datetime.now(UTC).isoformat(),
             }

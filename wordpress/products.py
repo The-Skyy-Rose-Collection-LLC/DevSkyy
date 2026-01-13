@@ -136,16 +136,15 @@ class Product(BaseModel):
 class WooCommerceConfig:
     """WooCommerce API configuration."""
 
-    site_url: str = field(default_factory=lambda: os.getenv("WP_SITE_URL", ""))
+    site_url: str = field(
+        default_factory=lambda: os.getenv("WORDPRESS_URL", os.getenv("WP_SITE_URL", ""))
+    )
     consumer_key: str = field(
-        default_factory=lambda: os.getenv("WC_CONSUMER_KEY", "")
-        or os.getenv("WOOCOMMERCE_KEY", "")
-        or os.getenv("WOOCOMMERCE_CONSUMER_KEY", "")
+        default_factory=lambda: os.getenv("WOOCOMMERCE_KEY", "") or os.getenv("WC_CONSUMER_KEY", "")
     )
     consumer_secret: str = field(
-        default_factory=lambda: os.getenv("WC_CONSUMER_SECRET", "")
-        or os.getenv("WOOCOMMERCE_SECRET", "")
-        or os.getenv("WOOCOMMERCE_CONSUMER_SECRET", "")
+        default_factory=lambda: os.getenv("WOOCOMMERCE_SECRET", "")
+        or os.getenv("WC_CONSUMER_SECRET", "")
     )
     api_version: str = "wc/v3"
     timeout: float = 30.0
