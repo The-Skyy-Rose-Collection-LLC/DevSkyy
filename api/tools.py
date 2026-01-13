@@ -157,7 +157,10 @@ async def test_tool(request: ToolTestRequest) -> ToolTestResponse:
                             error=f"Agent {agent_type} does not support tool execution",
                             duration_ms=(time.time() - start_time) * 1000,
                         )
-            except Exception:
+            except Exception as e:
+                logger.warning(
+                    f"Failed to test tool '{request.tool_name}' with agent {agent_type}: {e}"
+                )
                 continue
 
         return ToolTestResponse(
