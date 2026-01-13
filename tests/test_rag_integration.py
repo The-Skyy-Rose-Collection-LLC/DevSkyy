@@ -12,6 +12,9 @@ from pathlib import Path
 
 import pytest
 
+# Skip all tests in this module if chromadb is not installed or incompatible
+pytest.importorskip("chromadb", reason="chromadb not installed or incompatible with Pydantic v2")
+
 from adk.base import AgentConfig
 from agents.commerce_agent import CommerceAgent
 from orchestration.auto_ingestion import auto_ingest_documents
