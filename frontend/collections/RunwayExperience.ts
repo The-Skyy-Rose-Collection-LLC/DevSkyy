@@ -17,6 +17,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { Logger } from '../utils/Logger.js';
 import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
 import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
+import { AccessibilityController } from './AccessibilityController.js';
 
 export interface RunwayProduct {
   id: string;
@@ -62,6 +63,7 @@ export class RunwayExperience {
   private currentModelIndex: number = 0;
   private walkProgress: number = 0;
   private isWalking: boolean = false;
+  private accessibilityController: AccessibilityController;
 
   constructor(container: HTMLElement, config: RunwayConfig = {}) {
     this.container = container;
@@ -96,6 +98,27 @@ export class RunwayExperience {
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.enableDamping = true;
     this.controls.target.set(0, 1.5, 0);
+
+    // Initialize accessibility
+    this.accessibilityController = new AccessibilityController({
+      onProductActivated: (id) => {
+        // Pause show and display selected model
+        this.isWalking = false;
+        const modelIndex = this.models.findIndex((m) => m.userData['productId'] === id);
+        if (modelIndex !== -1) {
+          // Hide all models
+          this.models.forEach((m) => m.visible = false);
+          // Show selected model at center
+          const model = this.models[modelIndex];
+          if (model) {
+            model.visible = true;
+            model.position.set(0, 0.9, 0);
+            this.logger.info(`Model activated via keyboard: ${model.userData['name']}`);
+          }
+        }
+      },
+      logger: this.logger,
+    });
 
     this.setupRunway();
     this.setupLighting();
@@ -175,6 +198,14 @@ export class RunwayExperience {
       model.visible = false;
       this.scene.add(model);
       this.models.push(model);
+
+      // Register model with accessibility controller
+      this.accessibilityController.registerProduct({
+        id: product.id,
+        name: product.name,
+        mesh: model,
+        position: model.position,
+      });
     }
   }
 
@@ -225,6 +256,9 @@ export class RunwayExperience {
     this.perfMonitor.attach(this.renderer, this.scene);
     this.perfMonitor.start();
 
+    // Enable keyboard navigation
+    this.accessibilityController.enable(this.renderer.domElement);
+
     const animate = (): void => {
       this.perfMonitor.beginFrame();
       this.animationId = requestAnimationFrame(animate);
@@ -254,6 +288,10 @@ export class RunwayExperience {
 
   public dispose(): void {
     this.stop();
+
+    // Cleanup accessibility
+    this.accessibilityController.disable(this.renderer.domElement);
+    this.accessibilityController.dispose();
 
     // Properly dispose of all models and their resources
     this.models.forEach((model) => {

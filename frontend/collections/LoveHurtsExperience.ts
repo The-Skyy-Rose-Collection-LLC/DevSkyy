@@ -21,6 +21,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { Logger } from '../utils/Logger';
 import { HotspotManager } from './HotspotManager';
+import { AccessibilityController } from './AccessibilityController';
 import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader';
 import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor';
 
@@ -115,6 +116,7 @@ export class LoveHurtsExperience {
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
   private hotspotManager: HotspotManager | null = null;
+  private accessibilityController: AccessibilityController;
 
   // Callbacks
   private onHeroInteraction: HeroInteractionHandler | null = null;
@@ -146,6 +148,27 @@ export class LoveHurtsExperience {
 
     // Initialize hotspot system
     this.initializeHotspots();
+
+    // Initialize accessibility
+    this.accessibilityController = new AccessibilityController({
+      onProductActivated: (id) => {
+        // Find product in mirrors or floor spotlights userData
+        const mirror = this.mirrors.get(id);
+        const spotlight = this.floorSpotlights.get(id);
+        const productMesh = mirror || spotlight;
+
+        if (productMesh) {
+          const productName = productMesh.userData['name'] as string;
+          this.logger.info(`Product activated via keyboard: ${productName || id}`);
+
+          // Trigger hero interaction if callback is set
+          if (this.onHeroInteraction) {
+            this.onHeroInteraction();
+          }
+        }
+      },
+      logger: this.logger,
+    });
 
     this.setupEventListeners();
 
@@ -589,8 +612,26 @@ export class LoveHurtsExperience {
     for (const product of products) {
       if (product.displayType === 'mirror') {
         this.createMirror(product);
+        const mirror = this.mirrors.get(product.id);
+        if (mirror) {
+          this.accessibilityController.registerProduct({
+            id: product.id,
+            name: product.name,
+            mesh: mirror,
+            position: mirror.position,
+          });
+        }
       } else if (product.displayType === 'floor') {
         this.createFloorSpotlight(product);
+        const spotlight = this.floorSpotlights.get(product.id);
+        if (spotlight) {
+          this.accessibilityController.registerProduct({
+            id: product.id,
+            name: product.name,
+            mesh: spotlight,
+            position: spotlight.position,
+          });
+        }
       }
     }
     this.logger.info(`Loaded ${products.length} products`);
@@ -680,6 +721,9 @@ export class LoveHurtsExperience {
     this.perfMonitor.attach(this.renderer, this.scene);
     this.perfMonitor.start();
 
+    // Enable keyboard accessibility
+    this.accessibilityController.enable(this.renderer.domElement);
+
     const animate = (): void => {
       this.perfMonitor.beginFrame();
       this.animationId = requestAnimationFrame(animate);
@@ -739,6 +783,10 @@ export class LoveHurtsExperience {
   public dispose(): void {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
+
+    // Cleanup accessibility
+    this.accessibilityController.disable(this.renderer.domElement);
+    this.accessibilityController.dispose();
 
     // Cleanup hotspots
     if (this.hotspotManager) {
