@@ -108,7 +108,7 @@ async function handleRequest(
 
     const response = await proxyToBackend(fullPath, method, {
       revalidate,
-      timeout: 30000, // 30 second timeout
+      timeout: 50000, // 50 second timeout (handles Render cold starts)
       headers: customHeaders,
     }, body);
 

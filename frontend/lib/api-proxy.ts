@@ -9,7 +9,7 @@ export const BACKEND_URL = process.env.BACKEND_URL || 'https://devskyy-backend.o
 export interface ProxyOptions {
   /** Cache duration in seconds (default: 0 = no cache) */
   revalidate?: number;
-  /** Request timeout in milliseconds (default: 30000) */
+  /** Request timeout in milliseconds (default: 50000) */
   timeout?: number;
   /** Additional headers to include */
   headers?: Record<string, string>;
@@ -28,7 +28,7 @@ export async function proxyToBackend(
 ) {
   const {
     revalidate = 0,
-    timeout = 30000,
+    timeout = 50000, // 50 seconds to handle Render cold starts
     headers: customHeaders = {},
     credentials = 'omit',
   } = options;
