@@ -173,7 +173,13 @@ export const LoveHurtsCanvas: React.FC<LoveHurtsCanvasProps> = ({
   };
 
   return (
-    <div style={styles.container} ref={containerRef}>
+    <div
+      style={styles.container}
+      ref={containerRef}
+      role="application"
+      tabIndex={0}
+      aria-label="LOVE HURTS Collection 3D Experience - Use Tab to navigate products, Enter to select"
+    >
       {isLoading && (
         <div style={styles.loading}>
           <div>Loading LOVE HURTS Castle...</div>

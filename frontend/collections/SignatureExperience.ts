@@ -21,6 +21,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { BokehPass } from 'three/examples/jsm/postprocessing/BokehPass.js';
 import { Logger } from '../utils/Logger';
 import { HotspotManager } from './HotspotManager';
+import { AccessibilityController } from './AccessibilityController';
 import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader';
 import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor';
 
@@ -114,6 +115,7 @@ export class SignatureExperience {
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
   private hotspotManager: HotspotManager | null = null;
+  private accessibilityController: AccessibilityController;
 
   // Callbacks
   private onProductSelect: ProductSelectHandler | null = null;
@@ -144,6 +146,22 @@ export class SignatureExperience {
 
     // Initialize hotspot system
     this.initializeHotspots();
+
+    // Initialize accessibility
+    this.accessibilityController = new AccessibilityController({
+      onProductActivated: (id) => {
+        // Find product in pedestals userData
+        const pedestal = this.pedestals.get(id);
+        if (pedestal) {
+          const product = pedestal.userData['product'] as SignatureProduct;
+          if (product && this.onProductSelect) {
+            this.onProductSelect(product);
+            this.logger.info(`Product activated via keyboard: ${product.name}`);
+          }
+        }
+      },
+      logger: this.logger,
+    });
 
     this.setupEventListeners();
 
@@ -522,6 +540,15 @@ export class SignatureExperience {
   public async loadProducts(products: SignatureProduct[]): Promise<void> {
     for (const product of products) {
       this.createPedestal(product);
+      const pedestal = this.pedestals.get(product.id);
+      if (pedestal) {
+        this.accessibilityController.registerProduct({
+          id: product.id,
+          name: product.name,
+          mesh: pedestal,
+          position: pedestal.position,
+        });
+      }
     }
     this.logger.info(`Loaded ${products.length} products`);
   }
@@ -571,6 +598,9 @@ export class SignatureExperience {
     this.perfMonitor.attach(this.renderer, this.scene);
     this.perfMonitor.start();
 
+    // Enable keyboard accessibility
+    this.accessibilityController.enable(this.renderer.domElement);
+
     const animate = (): void => {
       this.perfMonitor.beginFrame();
       this.animationId = requestAnimationFrame(animate);
@@ -613,6 +643,10 @@ export class SignatureExperience {
   public dispose(): void {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
+
+    // Cleanup accessibility
+    this.accessibilityController.disable(this.renderer.domElement);
+    this.accessibilityController.dispose();
 
     // Cleanup hotspots
     if (this.hotspotManager) {

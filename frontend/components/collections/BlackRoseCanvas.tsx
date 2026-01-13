@@ -184,7 +184,13 @@ export const BlackRoseCanvas: React.FC<BlackRoseCanvasProps> = ({
   };
 
   return (
-    <div style={styles.container} ref={containerRef}>
+    <div
+      style={styles.container}
+      ref={containerRef}
+      role="application"
+      tabIndex={0}
+      aria-label="BLACK ROSE Collection 3D Experience - Use Tab to navigate products, Enter to select"
+    >
       {isLoading && (
         <div style={styles.loading}>
           <div>Loading BLACK ROSE Garden...</div>
