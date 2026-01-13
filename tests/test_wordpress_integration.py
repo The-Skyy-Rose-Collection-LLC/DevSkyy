@@ -130,8 +130,10 @@ class TestConnection:
     async def test_real_connection(self):
         """Test real connection to WooCommerce API (integration test)."""
         # Skip if credentials not available
-        if not os.getenv("WOOCOMMERCE_KEY"):
-            pytest.skip("WooCommerce credentials not available")
+        required_vars = ["WORDPRESS_URL", "WOOCOMMERCE_KEY", "WOOCOMMERCE_SECRET"]
+        missing = [var for var in required_vars if not os.getenv(var)]
+        if missing:
+            pytest.skip(f"Missing required environment variables: {', '.join(missing)}")
 
         async with WordPressWooCommerceClient() as client:
             result = await client.test_connection()
@@ -268,8 +270,11 @@ class TestProducts:
     @pytest.mark.integration
     async def test_real_product_crud(self):
         """Test real product CRUD operations (integration test)."""
-        if not os.getenv("WOOCOMMERCE_KEY"):
-            pytest.skip("WooCommerce credentials not available")
+        # Skip if credentials not available
+        required_vars = ["WORDPRESS_URL", "WOOCOMMERCE_KEY", "WOOCOMMERCE_SECRET"]
+        missing = [var for var in required_vars if not os.getenv(var)]
+        if missing:
+            pytest.skip(f"Missing required environment variables: {', '.join(missing)}")
 
         async with WordPressWooCommerceClient() as client:
             # Create product

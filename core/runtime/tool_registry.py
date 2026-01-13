@@ -449,6 +449,7 @@ class ToolRegistry:
         self._tools: dict[str, ToolSpec] = {}
         self._handlers: dict[str, ToolHandler] = {}
         self._cache: dict[str, Any] = {}
+        self._rate_limit_tracker: dict[tuple[str, str], list[float]] = {}
 
     @classmethod
     def get_instance(cls) -> ToolRegistry:
@@ -717,6 +718,24 @@ class ToolRegistry:
         tool = self.get(tool_name)
         handler = self.get_handler(tool_name)
 
+        # Check rate limiting if tool has rate_limit set
+        if tool and tool.rate_limit:
+            is_allowed, rate_limit_error = self._check_rate_limit(
+                tool_name, context.user_id, tool.rate_limit
+            )
+            if not is_allowed:
+                return ToolExecutionResult(
+                    tool_name=tool_name,
+                    request_id=context.request_id,
+                    status=ExecutionStatus.FAILED,
+                    success=False,
+                    error=rate_limit_error,
+                    error_type="RateLimitError",
+                    started_at=started_at,
+                    completed_at=datetime.now(UTC),
+                    duration_seconds=0,
+                )
+
         if not handler:
             return ToolExecutionResult(
                 tool_name=tool_name,
@@ -822,6 +841,52 @@ class ToolRegistry:
             duration_seconds=(completed_at - started_at).total_seconds(),
             retries=retries,
         )
+
+    def _check_rate_limit(
+        self, tool_name: str, user_id: str | None, rate_limit: int, window_seconds: int = 60
+    ) -> tuple[bool, str]:
+        """
+        Check if tool call exceeds rate limit.
+
+        Args:
+            tool_name: Name of the tool
+            user_id: User identifier
+            rate_limit: Max requests allowed in window
+            window_seconds: Time window in seconds (default 60)
+
+        Returns:
+            Tuple of (is_allowed, error_message)
+        """
+        # Skip rate limiting if no user_id (admin/system calls)
+        if not user_id:
+            return (True, "")
+
+        import time
+
+        now = time.time()
+        cutoff = now - window_seconds
+        key = (tool_name, user_id)
+
+        # Get existing requests for this key
+        if key not in self._rate_limit_tracker:
+            self._rate_limit_tracker[key] = []
+
+        # Filter out requests outside the window
+        self._rate_limit_tracker[key] = [
+            timestamp for timestamp in self._rate_limit_tracker[key] if timestamp > cutoff
+        ]
+
+        # Check if limit exceeded
+        if len(self._rate_limit_tracker[key]) >= rate_limit:
+            return (
+                False,
+                f"Rate limit exceeded: {rate_limit} requests per {window_seconds} seconds",
+            )
+
+        # Add current request
+        self._rate_limit_tracker[key].append(now)
+
+        return (True, "")
 
     # -------------------------------------------------------------------------
     # Export Formats
