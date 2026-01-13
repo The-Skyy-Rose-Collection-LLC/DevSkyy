@@ -105,6 +105,7 @@ export default function RootLayout({
           {/* Main Content */}
           <main className="ml-64 flex-1 p-8">{children}</main>
         </div>
+        <SpeedInsights />
       </body>
     </html>
   );
