@@ -3,72 +3,103 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Base settings
   reactStrictMode: true,
   swcMinify: true,
 
+  // Experimental features - MERGED
   experimental: {
-    serverActions: true,
+    serverActions: {
+      bodySizeLimit: '2mb',
+    },
   },
 
-  // Image optimization with WebP and AVIF support
+  // Image optimization - MERGED ALL DOMAINS
   images: {
     formats: ['image/avif', 'image/webp'],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
     minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
     remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'skyyrose.com',
-        port: '',
-        pathname: '/wp-content/uploads/**',
-      },
-      {
-        protocol: 'https',
-        hostname: '**.skyyrose.com',
-        port: '',
-        pathname: '/**',
-      },
+      // Google services
+      { protocol: 'https', hostname: '*.googleusercontent.com' },
+      { protocol: 'https', hostname: 'storage.googleapis.com' },
+      // HuggingFace
+      { protocol: 'https', hostname: '*.huggingface.co' },
+      // SkyyRose domains
+      { protocol: 'https', hostname: 'skyyrose.co' },
+      { protocol: 'https', hostname: 'skyyrose.com', pathname: '/wp-content/uploads/**' },
+      { protocol: 'https', hostname: '**.skyyrose.com', pathname: '/**' },
     ],
   },
 
-  // Sentry will be configured automatically
+  // Environment variables
+  env: {
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
+  },
+
+  // CRITICAL: Root redirect
+  async redirects() {
+    return [
+      {
+        source: '/',
+        destination: '/dashboard',
+        permanent: false,
+      },
+    ];
+  },
+
+  // CRITICAL: API proxy rewrites
+  async rewrites() {
+    const backendUrl = process.env.BACKEND_URL ||
+                      process.env.NEXT_PUBLIC_API_URL ||
+                      'http://localhost:8000';
+
+    return [
+      {
+        source: '/api/backend/:path*',
+        destination: 'https://api.devskyy.app/:path*',
+      },
+      {
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
+      },
+    ];
+  },
+
+  // CRITICAL: CORS headers
+  async headers() {
+    return [
+      {
+        source: '/api/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,POST,PUT,DELETE,OPTIONS' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-Requested-With, Content-Type, Authorization' },
+        ],
+      },
+    ];
+  },
 };
 
-// Compose bundle analyzer with config (enabled via ANALYZE=true)
+// Compose: Bundle Analyzer + Sentry
 const configWithBundleAnalyzer = withBundleAnalyzer({
   enabled: process.env.ANALYZE === 'true',
 })(nextConfig);
 
 export default withSentryConfig(
   configWithBundleAnalyzer,
-  nextConfig,
   {
-    // For all available options, see:
-    // https://github.com/getsentry/sentry-webpack-plugin#options
-
-    // Suppresses source map uploading logs during build
+    org: 'skyyrose',
+    project: 'devskyy-frontend',
     silent: true,
-    org: "skyyrose",
-    project: "devskyy-frontend",
   },
   {
-    // For all available options, see:
-    // https://docs.sentry.io/platforms/javascript/guides/nextjs/manual-setup/
-
-    // Upload a larger set of source maps for prettier stack traces (increases build time)
     widenClientFileUpload: true,
-
-    // Transpiles SDK to be compatible with IE11 (increases bundle size)
     transpileClientSDK: true,
-
-    // Routes browser requests to Sentry through a Next.js rewrite to circumvent ad-blockers (increases server load)
-    tunnelRoute: "/monitoring",
-
-    // Hides source maps from generated client bundles
+    tunnelRoute: '/monitoring',
     hideSourceMaps: true,
-
-    // Automatically tree-shake Sentry logger statements to reduce bundle size
     disableLogger: true,
   }
 );

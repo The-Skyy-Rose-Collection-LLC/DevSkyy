@@ -225,7 +225,7 @@ class SemanticCodeAnalyzer:
                     )
                 )
 
-            elif isinstance(node, ast.FunctionDef) or isinstance(node, ast.AsyncFunctionDef):
+            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 # Extract function/method
                 symbols.append(
                     CodeSymbol(
@@ -429,7 +429,7 @@ class SemanticCodeAnalyzer:
     def _get_cache_key(self, file_path: Path) -> str:
         """Generate cache key based on file path and modification time"""
         mtime = file_path.stat().st_mtime
-        return hashlib.md5(f"{file_path}:{mtime}".encode()).hexdigest()
+        return hashlib.md5(f"{file_path}:{mtime}".encode(), usedforsecurity=False).hexdigest()
 
     async def find_similar_code(
         self, code_snippet: str, threshold: float = 0.7

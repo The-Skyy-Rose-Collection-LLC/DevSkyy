@@ -298,7 +298,7 @@ class SkyyRoseBrandValidator:
             palette = self.brand_config["color_palette"]
             min_distance = float("inf")
 
-            for color_name, hex_color in palette.items():
+            for _color_name, hex_color in palette.items():
                 # Convert hex to RGB
                 hex_clean = hex_color.lstrip("#")
                 cr = int(hex_clean[0:2], 16)
@@ -613,7 +613,7 @@ class ImagePreprocessor:
         output_dir_path.mkdir(parents=True, exist_ok=True)
 
         # Generate output filename
-        image_hash = hashlib.md5(path.read_bytes()).hexdigest()[:8]
+        image_hash = hashlib.md5(path.read_bytes(), usedforsecurity=False).hexdigest()[:8]
         output_filename = f"{path.stem}_{image_hash}_processed.png"
         output_path = output_dir_path / output_filename
 
@@ -817,7 +817,9 @@ class HuggingFaceAssetEnhancer:
             EnhancementResult with all generated assets and brand validation
         """
         start_time = time.time()
-        asset_id = hashlib.md5(f"{image_path}:{product_name}".encode()).hexdigest()[:12]
+        asset_id = hashlib.md5(
+            f"{image_path}:{product_name}".encode(), usedforsecurity=False
+        ).hexdigest()[:12]
 
         # Auto-detect garment type if not provided
         if garment_type is None:

@@ -427,8 +427,8 @@ class AgentRegistry:
                         )
                         for t in raw_tools
                     ]
-                except Exception:
-                    pass
+                except Exception as e:
+                    logger.warning(f"Failed to parse tool schema for agent {agent_type}: {e}")
 
         return DEFAULT_TOOLS.get(agent_type, [])
 

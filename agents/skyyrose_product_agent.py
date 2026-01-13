@@ -5,11 +5,14 @@ Integrates with the existing agent ecosystem.
 """
 
 import asyncio
+import logging
 import os
 from dataclasses import dataclass
 
 # Import the orchestrator
 from pipelines.skyyrose_master_orchestrator import SkyyRoseMasterOrchestrator
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -156,8 +159,8 @@ class SkyyRoseProductAgent:
                 ],
             }
             requests.post(webhook_url, json=message, timeout=10)
-        except Exception:
-            pass
+        except Exception as e:
+            logger.warning(f"Failed to send webhook notification: {e}")
 
     def get_status(self) -> dict:
         """Get agent status and health."""

@@ -25,7 +25,9 @@ from __future__ import annotations
 import hashlib
 import logging
 import mimetypes
+import os
 import secrets
+import tempfile
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -50,8 +52,8 @@ class FileUploadConfig:
     # Unsafe MIME types that could be dangerous
     dangerous_mime_types: set[str] = None  # type: ignore
 
-    # Upload directory
-    upload_dir: Path = Path("/tmp/uploads")
+    # Upload directory (defaults to secure temp directory, override via env var)
+    upload_dir: Path = Path(os.getenv("UPLOAD_DIR", str(Path(tempfile.gettempdir()) / "uploads")))
     secure_filename: bool = True
 
     def __post_init__(self) -> None:
