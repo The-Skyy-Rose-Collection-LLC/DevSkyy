@@ -174,6 +174,9 @@ assets/3d-models/*/
 # External SDKs (install via pip instead)
 tripo-python-sdk/
 
+# Experimental/workspace directories
+huggingface-spaces/
+
 # Git internal / temp
 .git-rewrite/
 
