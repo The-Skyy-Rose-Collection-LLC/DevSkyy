@@ -9,6 +9,7 @@ Version: 1.0.0
 """
 
 import logging
+import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -284,7 +285,7 @@ async def fix_code(
 
         backup_path = None
         if request.create_backup and request.auto_apply:
-            backup_path = f"/tmp/backup_{fix_id}"
+            backup_path = str(Path(tempfile.gettempdir()) / f"backup_{fix_id}")
 
         return CodeFixResponse(
             fix_id=fix_id,

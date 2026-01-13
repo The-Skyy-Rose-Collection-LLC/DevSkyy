@@ -91,8 +91,12 @@ COPY --from=backend-builder /usr/local/lib/python3.11/site-packages /usr/local/l
 COPY --from=backend-builder /usr/local/bin /usr/local/bin
 
 # Copy Next.js build artifacts
-COPY --from=frontend-builder /app/.next ./.next/
-COPY --from=frontend-builder /app/public ./public/
+COPY --from=frontend-builder /app/frontend/.next ./.next/
+COPY --from=frontend-builder /app/frontend/public ./public/
+
+# Verify Next.js build artifacts exist
+RUN test -d ./.next || (echo "ERROR: .next directory not found" && exit 1)
+RUN test -d ./public || (echo "ERROR: public directory not found" && exit 1)
 
 # Copy application code
 COPY agent_sdk/ ./agent_sdk/
