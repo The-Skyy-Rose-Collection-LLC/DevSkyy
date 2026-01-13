@@ -49,23 +49,10 @@ const nextConfig = {
     ];
   },
 
-  // CRITICAL: API proxy rewrites
-  async rewrites() {
-    const backendUrl = process.env.BACKEND_URL ||
-                      process.env.NEXT_PUBLIC_API_URL ||
-                      'http://localhost:8000';
-
-    return [
-      {
-        source: '/api/backend/:path*',
-        destination: 'https://api.devskyy.app/:path*',
-      },
-      {
-        source: '/api/:path*',
-        destination: `${backendUrl}/api/:path*`,
-      },
-    ];
-  },
+  // NOTE: API rewrites removed - now handled by Next.js API route handlers
+  // See: frontend/app/api/[...path]/route.ts for the universal proxy
+  // This approach provides better error handling, caching, and avoids
+  // Vercel's ROUTER_EXTERNAL_TARGET_ERROR with external rewrites
 
   // CRITICAL: CORS headers
   async headers() {
