@@ -170,7 +170,7 @@ export const getAgentsByType = (type: import('./types/index.js').AgentType): imp
 // Auto-initialize in Node.js environment
 if (typeof window === 'undefined' && typeof process !== 'undefined') {
   // Only auto-initialize if not in test environment
-  if (process.env['NODE_ENV'] !== 'testing') {
+  if (process.env['NODE_ENV'] !== 'test') {
     initialize().catch(error => {
       console.error('Failed to auto-initialize DevSkyy platform:', error);
     });
