@@ -43,25 +43,47 @@ Testing reveals **two different errors**:
 
 ## Solution
 
-### Step 1: Remove Platform-Level Rewrite
+### Step 1: Configure Root Directory (CRITICAL)
+
+**Issue**: Vercel is building from repository root instead of `frontend/` subdirectory
 
 1. Go to [Vercel Dashboard](https://vercel.com/dashboard)
 2. Navigate to the `frontend` project
-3. Go to **Settings** → **Rewrites**
-4. Look for any rewrite rules with:
+3. Go to **Settings** → **General**
+4. Find **Root Directory** section
+5. Set to: `frontend`
+6. Click **Save**
+
+### Step 2: Remove Platform-Level Rewrite
+
+1. In same project, go to **Settings** → **Rewrites**
+2. Look for any rewrite rules with:
    - Source: `/api/:path*` or `/api/*`
    - Destination: `https://devskyy-backend.onrender.com*`
-5. **Delete** this rewrite rule
-6. Save changes
+3. **Delete** this rewrite rule
+4. Save changes
 
-### Step 2: Verify Configuration
+### Step 3: Verify Configuration
 
 1. Check that no other rewrite rules reference the backend
 2. Ensure "Rewrites" section is empty or only contains non-API rules
 
-### Step 3: Test After Changes
+### Step 4: Trigger Redeploy
 
-Once the platform rewrite is removed, test these endpoints:
+After setting Root Directory, trigger a new deployment:
+
+```bash
+# From local machine
+cd /Users/coreyfoster/DevSkyy
+git commit --allow-empty -m "chore: trigger redeploy after Root Directory fix"
+git push origin main
+```
+
+Or use Vercel Dashboard → Deployments → Redeploy
+
+### Step 5: Test After Successful Deployment
+
+Once deployment succeeds (check Dashboard), test these endpoints:
 
 ```bash
 # Simple endpoint (no backend call) - should respond instantly
@@ -151,13 +173,20 @@ After removing the platform rewrite:
 3. Keep-alive cron job code is deployed but not active
 4. **Both issues must be fixed**: routing AND builds
 
-### Investigation Needed
+### Build Error Investigation Results
 
-Check Vercel Dashboard → Deployments → Recent Failed Builds for:
-- Build error messages
-- TypeScript compilation errors
-- Dependency issues
-- Timeout errors
+**Errors Found**:
+
+1. **TypeScript Compilation Errors** (First 10+ failed deployments)
+   - 42 TypeScript errors in root `src/app/collections/` and `src/components/collections/`
+   - Broken collections code duplicated from frontend subdirectory
+   - Fixed by removing 3,717 lines in commit 5c6f39214
+
+2. **CopilotKit Dependency Conflict** (Latest deployment)
+   - npm ERESOLVE error with @copilotkit/runtime-client-gql versions
+   - Root `package.json` has conflicting CopilotKit dependencies
+   - **Root Cause**: Vercel building from repository root, not `frontend/` subdirectory
+   - **Solution**: Configure Root Directory in Dashboard (see Step 1 above)
 
 ### Priority
 
