@@ -9,8 +9,7 @@ export async function GET() {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
       },
-      // Cache for 30 seconds
-      next: { revalidate: 30 },
+      // Note: Caching handled via Cache-Control response headers
     });
 
     if (!response.ok) {

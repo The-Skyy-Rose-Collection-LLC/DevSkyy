@@ -50,7 +50,7 @@ export async function proxyToBackend(
       body,
       credentials,
       signal: controller.signal,
-      ...(revalidate > 0 ? { next: { revalidate } } : {}),
+      // Note: Caching handled via Cache-Control response headers, not fetch options
     });
 
     clearTimeout(timeoutId);
