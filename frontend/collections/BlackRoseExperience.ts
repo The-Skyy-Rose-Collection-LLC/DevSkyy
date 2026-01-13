@@ -21,6 +21,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js';
 import { Logger } from '../utils/Logger.js';
 import { HotspotManager } from './HotspotManager.js';
+import { AccessibilityController } from './AccessibilityController.js';
 import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
 import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
 
@@ -122,6 +123,7 @@ export class BlackRoseExperience {
   private mouse: THREE.Vector2;
   private hoveredProduct: string | null = null;
   private hotspotManager: HotspotManager | null = null;
+  private accessibilityController: AccessibilityController;
 
   // Callbacks
   private onProductClick: ProductClickHandler | null = null;
@@ -151,6 +153,18 @@ export class BlackRoseExperience {
 
     // Initialize hotspot system
     this.initializeHotspots();
+
+    // Initialize accessibility
+    this.accessibilityController = new AccessibilityController({
+      onProductActivated: (id) => {
+        const product = this.getProductById(id);
+        if (product && this.onProductClick) {
+          this.onProductClick(product);
+          this.logger.info(`Product activated via keyboard: ${product.name}`);
+        }
+      },
+      logger: this.logger,
+    });
 
     this.setupEventListeners();
 
@@ -525,6 +539,15 @@ export class BlackRoseExperience {
   public async loadProducts(products: BlackRoseProduct[]): Promise<void> {
     for (const product of products) {
       await this.createRoseBush(product);
+      const bush = this.roseBushes.get(product.id);
+      if (bush) {
+        this.accessibilityController.registerProduct({
+          id: product.id,
+          name: product.name,
+          mesh: bush,
+          position: bush.position,
+        });
+      }
     }
     this.logger.info(`Loaded ${products.length} products`);
   }
@@ -681,6 +704,9 @@ export class BlackRoseExperience {
     this.perfMonitor.attach(this.renderer, this.scene);
     this.perfMonitor.start();
 
+    // Enable keyboard accessibility
+    this.accessibilityController.enable(this.renderer.domElement);
+
     const animate = (): void => {
       this.perfMonitor.beginFrame();
       this.animationId = requestAnimationFrame(animate);
@@ -707,6 +733,10 @@ export class BlackRoseExperience {
   public dispose(): void {
     this.stop();
     window.removeEventListener('resize', this.onResize.bind(this));
+
+    // Cleanup accessibility
+    this.accessibilityController.disable(this.renderer.domElement);
+    this.accessibilityController.dispose();
 
     // Cleanup hotspots
     if (this.hotspotManager) {

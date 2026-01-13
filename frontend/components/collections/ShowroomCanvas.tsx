@@ -1,78 +1,68 @@
 /**
- * SIGNATURE Collection - React Canvas Component
+ * SHOWROOM Collection - React Canvas Component
  *
- * Lazy-loads and manages the Three.js SignatureExperience.
+ * Lazy-loads and manages the Three.js ShowroomExperience.
  * Includes fullscreen toggle, product click handling, and responsive resizing.
  *
  * @component
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import type { SignatureExperience, SignatureProduct } from '../../collections/SignatureExperience';
+import type { ShowroomExperience, ShowroomConfig } from '../../collections/ShowroomExperience';
+import type { ShowroomProduct } from '../../types/product';
 
-export interface SignatureCanvasProps {
-  /** Products to display on pedestals */
-  products: SignatureProduct[];
+export interface ShowroomCanvasProps {
+  /** Products to display in gallery */
+  products: ShowroomProduct[];
 
   /** Callback when product is clicked */
-  onProductClick?: (product: SignatureProduct) => void;
+  onProductClick?: (product: ShowroomProduct) => void;
 
-  /** Callback when category pathway is clicked */
-  onCategorySelect?: (category: string) => void;
-
-  /** Enable depth of field post-processing (default: true) */
-  enableDepthOfField?: boolean;
+  /** Showroom configuration */
+  config?: ShowroomConfig;
 
   /** Show performance overlay (default: false) */
   showPerformance?: boolean;
 }
 
-export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
+export const ShowroomCanvas: React.FC<ShowroomCanvasProps> = ({
   products,
   onProductClick,
-  onCategorySelect,
-  enableDepthOfField = true,
+  config = {},
   showPerformance = false,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const experienceRef = useRef<SignatureExperience | null>(null);
+  const experienceRef = useRef<ShowroomExperience | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    let experience: SignatureExperience | null = null;
+    let experience: ShowroomExperience | null = null;
     let isMounted = true;
 
     const initExperience = async () => {
       if (!containerRef.current) return;
 
       try {
-        // Lazy-load SignatureExperience (code-splitting)
-        const { SignatureExperience } = await import('../../collections/SignatureExperience');
+        // Lazy-load ShowroomExperience (code-splitting)
+        const { ShowroomExperience } = await import('../../collections/ShowroomExperience');
 
         if (!isMounted) return;
 
         // Initialize experience
-        experience = new SignatureExperience(containerRef.current, {
-          enableDepthOfField,
-          backgroundColor: 0xfff8e7, // Warm white
-          sunlightColor: 0xffd700, // Gold
-          sunlightIntensity: 1.2,
-          ambientColor: 0xffe4c4, // Bisque
-          focusDistance: 10,
+        experience = new ShowroomExperience(containerRef.current, {
+          backgroundColor: 0x0d0d0d,
+          ambientLightIntensity: 0.3,
+          floorColor: 0x1a1a1a,
+          wallColor: 0x0d0d0d,
+          roomWidth: 20,
+          roomDepth: 30,
+          roomHeight: 8,
+          ...config,
         });
 
         experienceRef.current = experience;
-
-        // Set callbacks
-        if (onProductClick) {
-          experience.setOnProductSelect(onProductClick);
-        }
-
-        if (onCategorySelect) {
-          experience.setOnCategorySelect(onCategorySelect);
-        }
 
         // Load products
         await experience.loadProducts(products);
@@ -102,7 +92,7 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
         experience.dispose();
       }
     };
-  }, [products, enableDepthOfField, showPerformance, onProductClick, onCategorySelect]);
+  }, [products, config, showPerformance, onProductClick]);
 
   const toggleFullscreen = async () => {
     if (!containerRef.current) return;
@@ -126,14 +116,14 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
       width: '100%',
       height: '100vh',
       overflow: 'hidden',
-      backgroundColor: '#fff8e7',
+      backgroundColor: '#0d0d0d',
     },
     loading: {
       position: 'absolute' as const,
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      color: '#2a2a2a',
+      color: '#d4af37',
       fontFamily: "'Inter', sans-serif",
       fontSize: '1.2rem',
       fontWeight: 300,
@@ -145,12 +135,12 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
       top: '50%',
       left: '50%',
       transform: 'translate(-50%, -50%)',
-      color: '#8b0000',
+      color: '#ff4444',
       fontFamily: "'Inter', sans-serif",
       fontSize: '1rem',
       textAlign: 'center' as const,
       padding: '2rem',
-      backgroundColor: 'rgba(255, 248, 231, 0.95)',
+      backgroundColor: 'rgba(13, 13, 13, 0.95)',
       borderRadius: '8px',
       border: '1px solid rgba(212, 175, 55, 0.3)',
       maxWidth: '400px',
@@ -162,7 +152,7 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
       background: 'rgba(212, 175, 55, 0.9)',
       border: '1px solid rgba(212, 175, 55, 1)',
       borderRadius: '8px',
-      color: '#2a2a2a',
+      color: '#0d0d0d',
       padding: '0.75rem 1.5rem',
       fontSize: '0.9rem',
       fontFamily: "'Inter', sans-serif",
@@ -186,13 +176,13 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
       ref={containerRef}
       role="application"
       tabIndex={0}
-      aria-label="SIGNATURE Collection 3D Experience - Use Tab to navigate products, Enter to select"
+      aria-label="SHOWROOM Collection 3D Experience - Use Tab to navigate products, Enter to select"
     >
       {isLoading && (
         <div style={styles.loading}>
-          <div>Loading SIGNATURE Garden...</div>
+          <div>Loading SHOWROOM Gallery...</div>
           <div style={{ fontSize: '0.8rem', marginTop: '1rem', opacity: 0.6 }}>
-            Preparing luxury experience
+            Preparing luxury exhibition
           </div>
         </div>
       )}
@@ -230,4 +220,4 @@ export const SignatureCanvas: React.FC<SignatureCanvasProps> = ({
   );
 };
 
-export default SignatureCanvas;
+export default ShowroomCanvas;

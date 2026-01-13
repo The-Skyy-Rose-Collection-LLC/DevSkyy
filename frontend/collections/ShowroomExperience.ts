@@ -21,6 +21,7 @@ import { InventoryManager } from '../lib/inventory.js';
 import { CartManager } from '../lib/cartManager.js';
 import { getModelLoader, ModelLoadError } from '../lib/ModelAssetLoader.js';
 import { getPerformanceMonitor } from '../lib/ThreePerformanceMonitor.js';
+import { AccessibilityController } from './AccessibilityController.js';
 // Note: Configs available from '../config/threejs.config.js' for future use
 
 export interface ShowroomConfig {
@@ -71,6 +72,7 @@ export class ShowroomExperience {
   private interactionHandler: ProductInteractionHandler | null = null;
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
+  private accessibilityController: AccessibilityController;
 
   constructor(container: HTMLElement, config: ShowroomConfig = {}) {
     this.logger = new Logger('ShowroomExperience');
@@ -112,6 +114,17 @@ export class ShowroomExperience {
     this.cartManager = new CartManager();
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
+
+    // Initialize accessibility
+    this.accessibilityController = new AccessibilityController({
+      onProductActivated: (id) => {
+        if (this.interactionHandler) {
+          this.interactionHandler.handleProductClick(id);
+          this.logger.info(`Product activated via keyboard: ${id}`);
+        }
+      },
+      logger: this.logger,
+    });
 
     this.setupRoom();
     this.setupLighting();
@@ -297,6 +310,14 @@ export class ShowroomExperience {
     this.scene.add(mesh);
     this.products.set(product.id, mesh);
 
+    // Register product with accessibility controller
+    this.accessibilityController.registerProduct({
+      id: product.id,
+      name: product.name,
+      mesh: mesh,
+      position: mesh.position,
+    });
+
     // Register product with interaction handler
     // Cast to Mesh - works with both GLB groups and placeholder meshes
     if (this.interactionHandler && mesh instanceof THREE.Mesh) {
@@ -383,6 +404,9 @@ export class ShowroomExperience {
     this.perfMonitor.attach(this.renderer, this.scene);
     this.perfMonitor.start();
 
+    // Enable keyboard navigation
+    this.accessibilityController.enable(this.renderer.domElement);
+
     const animate = (): void => {
       this.perfMonitor.beginFrame();
 
@@ -433,6 +457,10 @@ export class ShowroomExperience {
 
   public dispose(): void {
     this.stop();
+
+    // Cleanup accessibility
+    this.accessibilityController.disable(this.renderer.domElement);
+    this.accessibilityController.dispose();
 
     // Properly dispose of all products and their resources
     this.products.forEach((obj) => {
