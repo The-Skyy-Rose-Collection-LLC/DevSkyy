@@ -27,6 +27,20 @@ Vercel has **platform-level rewrite configuration** that is proxying all `/api/*
 - Current `vercel.json` has `"rewrites": []` but still getting ROUTER_EXTERNAL_TARGET_ERROR
 - Backend is healthy (0.25s response) but Vercel proxy times out
 
+### Intermittent Error Patterns
+
+Testing reveals **two different errors**:
+
+1. **HTTP 502** - `ROUTER_EXTERNAL_TARGET_ERROR` (most common)
+   - Vercel platform trying to proxy to external backend
+   - Confirms platform-level rewrite is active
+
+2. **HTTP 503** - `x-render-routing: dynamic-hibernate-error-503` (occasional)
+   - Request reaches application code
+   - Old deployment (still live) trying to reach hibernated backend
+
+**Why Two Errors?**: All deployments have failed for 14+ hours, so an older successful deployment is serving traffic. That deployment has backend proxy code. The intermittent behavior suggests edge cache variability or routing flapping between platform rewrite and application code.
+
 ## Solution
 
 ### Step 1: Remove Platform-Level Rewrite
@@ -124,15 +138,34 @@ After removing the platform rewrite:
 3. If still seeing errors, check Vercel deployment logs
 4. If successful, configure CRON_SECRET for cron job security
 
-## Build Failures Note
+## Build Failures - Separate Critical Issue
 
-All deployments from the past 14+ hours show "Error" status, but the site is still accessible. This suggests:
+**Status**: All deployments have failed for 14+ hours
+**Impact**: Cannot deploy new code (routing fixes, keep-alive cron)
+**Current State**: Old successful deployment still serving traffic
 
-1. An older successful deployment is still serving traffic
-2. Recent build failures are a separate issue from the routing problem
-3. Check build logs in Vercel Dashboard for specific error messages
+### What This Means
 
-The routing fix should be prioritized first, as it's blocking API functionality.
+1. Site is accessible because an old deployment is live
+2. New deployments (with routing fixes) cannot go live
+3. Keep-alive cron job code is deployed but not active
+4. **Both issues must be fixed**: routing AND builds
+
+### Investigation Needed
+
+Check Vercel Dashboard → Deployments → Recent Failed Builds for:
+- Build error messages
+- TypeScript compilation errors
+- Dependency issues
+- Timeout errors
+
+### Priority
+
+1. **Fix routing first** (unblocks API testing)
+2. **Fix builds second** (enables deploying fixes)
+3. **Test keep-alive** (after both are resolved)
+
+Without successful builds, the routing fix in `vercel.json` (`rewrites: []`) cannot take effect.
 
 ---
 
