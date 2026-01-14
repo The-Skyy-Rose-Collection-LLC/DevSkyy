@@ -18,6 +18,7 @@ import {
   Globe,
 } from 'lucide-react';
 import './globals.css';
+import { ToastProvider } from '@/components/ToastProvider';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -105,6 +106,7 @@ export default function RootLayout({
           {/* Main Content */}
           <main className="ml-64 flex-1 p-8">{children}</main>
         </div>
+        <ToastProvider />
       </body>
     </html>
   );
