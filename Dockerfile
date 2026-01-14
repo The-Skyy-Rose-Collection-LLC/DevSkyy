@@ -105,14 +105,16 @@ RUN test -d ./public || (echo "ERROR: public directory not found" && exit 1)
 # Copy application code
 COPY agent_sdk/ ./agent_sdk/
 COPY agents/ ./agents/
-COPY llm/ ./llm/
-COPY orchestration/ ./orchestration/
-COPY core/ ./core/
-COPY security/ ./security/
 COPY api/ ./api/
-COPY mcp_servers/ ./mcp_servers/
 COPY adk/ ./adk/
+COPY core/ ./core/
+COPY integrations/ ./integrations/
+COPY llm/ ./llm/
+COPY mcp_servers/ ./mcp_servers/
+COPY orchestration/ ./orchestration/
 COPY runtime/ ./runtime/
+COPY security/ ./security/
+COPY wordpress/ ./wordpress/
 COPY main_enterprise.py ./
 COPY devskyy_mcp.py ./
 COPY docker-entrypoint.sh /app/
