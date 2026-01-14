@@ -231,16 +231,29 @@ async def lifespan(app: FastAPI):
         log.info("rag_pipeline_disabled", reason="RAG_AUTO_INGEST not enabled")
         app.state.rag_manager = None
 
-    # Initialize Redis cache connection
-    log.info("redis_cache_connecting")
-    try:
-        cache_connected = await redis_cache.connect()
-        if cache_connected:
-            log.info("redis_cache_connected")
-        else:
-            log.warning("redis_cache_connection_failed", message="caching disabled")
-    except Exception as e:
-        log.error("redis_cache_connection_error", error=str(e), exc_info=True)
+    # Initialize Redis cache connection (optional - graceful fallback)
+    cache_enabled = os.getenv("REDIS_URL") is not None
+    if cache_enabled:
+        log.info("redis_cache_connecting")
+        try:
+            cache_connected = await redis_cache.connect()
+            if cache_connected:
+                log.info(
+                    "redis_cache_connected",
+                    url=os.getenv("REDIS_URL", "").split("@")[-1] if os.getenv("REDIS_URL") else "",
+                )
+            else:
+                log.warning(
+                    "redis_cache_connection_failed",
+                    reason="connection_attempt_failed",
+                    message="caching will be unavailable",
+                )
+        except Exception as e:
+            log.error("redis_cache_connection_error", error=str(e), exc_info=True)
+            log.warning("continuing_without_cache", reason="connection_error")
+    else:
+        log.info("redis_cache_disabled", reason="REDIS_URL not configured")
+        app.state.cache_enabled = False
 
     # Start WebSocket metrics broadcaster (background task)
     try:
@@ -252,33 +265,57 @@ async def lifespan(app: FastAPI):
         logger.warning(f"Failed to start metrics broadcaster: {e}")
 
     # Verify security configuration with secrets manager
-    # Try to load critical secrets from secrets manager, fallback to environment variables
+    # Load and validate critical secrets (JWT, encryption keys, etc.)
+    log.info("secrets_validation_starting")
+
+    missing_required_secrets = []
+
     try:
-        # JWT Secret Key
+        # JWT Secret Key (REQUIRED)
         jwt_secret = secrets_manager.get_or_env(
             secret_name="jwt/secret_key",
             env_var="JWT_SECRET_KEY",
         )
         if jwt_secret:
             os.environ["JWT_SECRET_KEY"] = str(jwt_secret)
-            logger.info("✓ JWT_SECRET_KEY loaded from secrets manager")
+            log.info("jwt_secret_loaded", source="secrets_manager")
         else:
-            logger.warning("⚠️ JWT_SECRET_KEY not found - using ephemeral key (NOT for production)")
+            if environment == "production":
+                missing_required_secrets.append("JWT_SECRET_KEY")
+            else:
+                log.warning(
+                    "jwt_secret_ephemeral", reason="not_configured", environment=environment
+                )
 
-        # Encryption Master Key
+        # Encryption Master Key (REQUIRED)
         encryption_key = secrets_manager.get_or_env(
             secret_name="encryption/master_key",
             env_var="ENCRYPTION_MASTER_KEY",
         )
         if encryption_key:
             os.environ["ENCRYPTION_MASTER_KEY"] = str(encryption_key)
-            logger.info("✓ ENCRYPTION_MASTER_KEY loaded from secrets manager")
+            log.info("encryption_key_loaded", source="secrets_manager")
         else:
-            logger.warning(
-                "⚠️ ENCRYPTION_MASTER_KEY not found - using ephemeral key (NOT for production)"
+            if environment == "production":
+                missing_required_secrets.append("ENCRYPTION_MASTER_KEY")
+            else:
+                log.warning(
+                    "encryption_key_ephemeral", reason="not_configured", environment=environment
+                )
+
+        # FAIL FAST in production if critical secrets are missing
+        if missing_required_secrets and environment == "production":
+            log.error(
+                "production_secrets_missing",
+                missing_secrets=missing_required_secrets,
+                message="Cannot start in production without critical secrets",
+            )
+            raise SecretNotFoundError(
+                f"Missing required production secrets: {', '.join(missing_required_secrets)}. "
+                f"Set via: fly secrets set KEY=value"
             )
 
-        # Database URL (if configured)
+        # Database URL (optional but recommended for production)
         try:
             db_url = secrets_manager.get_or_env(
                 secret_name="database/connection_string",
@@ -286,33 +323,52 @@ async def lifespan(app: FastAPI):
             )
             if db_url:
                 os.environ["DATABASE_URL"] = str(db_url)
-                logger.info("✓ DATABASE_URL loaded from secrets manager")
+                log.info("database_url_loaded", source="secrets_manager")
+            else:
+                log.warning(
+                    "database_url_not_configured", message="database features will be unavailable"
+                )
         except SecretNotFoundError:
-            # Database is optional for some deployments
-            logger.debug("DATABASE_URL not configured in secrets manager")
+            log.debug("database_url_not_in_secrets_manager")
 
-        # API Keys (optional, for various integrations)
-        api_keys_to_load = [
-            ("openai/api_key", "OPENAI_API_KEY"),
-            ("anthropic/api_key", "ANTHROPIC_API_KEY"),
-            ("google/api_key", "GOOGLE_API_KEY"),
-            ("aws/access_key_id", "AWS_ACCESS_KEY_ID"),
-            ("aws/secret_access_key", "AWS_SECRET_ACCESS_KEY"),
+        # API Keys (optional - integrations won't work if not configured)
+        optional_api_keys = [
+            ("openai/api_key", "OPENAI_API_KEY", "OpenAI"),
+            ("anthropic/api_key", "ANTHROPIC_API_KEY", "Anthropic"),
+            ("google/api_key", "GOOGLE_API_KEY", "Google"),
+            ("aws/access_key_id", "AWS_ACCESS_KEY_ID", "AWS"),
+            ("aws/secret_access_key", "AWS_SECRET_ACCESS_KEY", "AWS Secret"),
         ]
 
-        for secret_name, env_var in api_keys_to_load:
+        loaded_api_keys = []
+        for secret_name, env_var, display_name in optional_api_keys:
             try:
                 api_key = secrets_manager.get_or_env(secret_name, env_var)
                 if api_key:
                     os.environ[env_var] = str(api_key)
-                    logger.debug(f"✓ {env_var} loaded from secrets manager")
+                    loaded_api_keys.append(display_name)
+                    log.debug("api_key_loaded", service=display_name)
             except SecretNotFoundError:
-                # API keys are optional
-                pass
+                log.debug("api_key_not_configured", service=display_name)
 
+        if loaded_api_keys:
+            log.info("optional_api_keys_loaded", services=", ".join(loaded_api_keys))
+        else:
+            log.warning("no_api_keys_configured", message="LLM integrations may be limited")
+
+    except SecretNotFoundError as e:
+        log.error("critical_secret_missing", error=str(e), exc_info=True)
+        if environment == "production":
+            raise
+        else:
+            log.warning("continuing_with_missing_secrets", environment=environment)
     except Exception as e:
-        logger.error(f"Error loading secrets: {e}", exc_info=True)
-        logger.warning("Falling back to environment variables for all secrets")
+        log.error("secrets_loading_error", error=str(e), exc_info=True)
+        if environment == "production":
+            log.critical("production_startup_failed", reason="secrets_error")
+            raise
+        else:
+            log.warning("falling_back_to_environment_variables")
 
     yield
 
@@ -533,6 +589,50 @@ async def tier_rate_limit_middleware(request: Request, call_next):
         # Log error but don't block request on rate limiter failure
         logger.error(f"Rate limiter error: {e}")
         return await call_next(request)
+
+
+# Security headers middleware - OWASP best practices
+@app.middleware("http")
+async def security_headers_middleware(request: Request, call_next):
+    """Add security headers to all responses (OWASP, CSP, X-Frame-Options, etc)."""
+    response = await call_next(request)
+
+    # OWASP Security Headers
+    response.headers["X-Content-Type-Options"] = "nosniff"  # Prevent MIME sniffing
+    response.headers["X-Frame-Options"] = "DENY"  # Prevent clickjacking
+    response.headers["X-XSS-Protection"] = "1; mode=block"  # XSS protection
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"  # HSTS
+
+    # Content Security Policy - strict but allows necessary resources
+    csp = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://api.devskyy.app; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https: blob:; "
+        "font-src 'self' https://cdn.jsdelivr.net; "
+        "connect-src 'self' https: wss:; "
+        "frame-ancestors 'none'; "
+        "base-uri 'self'; "
+        "form-action 'self'"
+    )
+    response.headers["Content-Security-Policy"] = csp
+
+    # Referrer Policy
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+    # Permissions Policy (formerly Feature Policy)
+    response.headers["Permissions-Policy"] = (
+        "geolocation=(), "
+        "microphone=(), "
+        "camera=(), "
+        "payment=(), "
+        "usb=(), "
+        "magnetometer=(), "
+        "gyroscope=(), "
+        "accelerometer=()"
+    )
+
+    return response
 
 
 # Request logging middleware

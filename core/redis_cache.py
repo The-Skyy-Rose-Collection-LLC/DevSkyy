@@ -46,9 +46,15 @@ class RedisConfig:
     max_connections: int = field(
         default_factory=lambda: int(os.getenv("REDIS_MAX_CONNECTIONS", "20"))
     )
-    socket_timeout: float = 5.0
-    socket_connect_timeout: float = 5.0
-    retry_on_timeout: bool = True
+    socket_timeout: float = field(
+        default_factory=lambda: float(os.getenv("REDIS_SOCKET_TIMEOUT", "2.0"))
+    )
+    socket_connect_timeout: float = field(
+        default_factory=lambda: float(os.getenv("REDIS_CONNECT_TIMEOUT", "2.0"))
+    )
+    retry_on_timeout: bool = field(
+        default_factory=lambda: os.getenv("REDIS_RETRY_ON_TIMEOUT", "true").lower() == "true"
+    )
     decode_responses: bool = True
     # LLM cache specific
     llm_cache_ttl: int = field(default_factory=lambda: int(os.getenv("LLM_CACHE_TTL", "3600")))
