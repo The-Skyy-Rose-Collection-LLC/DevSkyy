@@ -41,10 +41,17 @@ build
 *.egg-info
 .eggs
 
-# Git
+# Git (includes large pack files)
 .git
 .github
 .gitattributes
+
+# Serena cache (large pkl files)
+.serena
+**/.serena
+
+# Assets folder (large media files)
+assets
 
 # Vercel local build output
 .vercel/output
