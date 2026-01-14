@@ -115,6 +115,8 @@ COPY adk/ ./adk/
 COPY runtime/ ./runtime/
 COPY main_enterprise.py ./
 COPY devskyy_mcp.py ./
+COPY docker-entrypoint.sh /app/
+RUN chmod +x /app/docker-entrypoint.sh
 
 # Create necessary directories
 RUN mkdir -p /app/logs /app/data /app/uploads && \
@@ -130,5 +132,5 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
 # Expose port
 EXPOSE 8000
 
-# Default command (FastAPI with 4 workers)
-CMD ["uvicorn", "main_enterprise:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "4"]
+# Start with entrypoint script that handles startup errors
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
