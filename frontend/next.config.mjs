@@ -5,7 +5,6 @@ import withBundleAnalyzer from '@next/bundle-analyzer';
 const nextConfig = {
   // Base settings
   reactStrictMode: true,
-  swcMinify: true,
 
   // Experimental features - MERGED
   experimental: {
