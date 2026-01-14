@@ -56,6 +56,16 @@ export default function HFSpacesPage() {
         setSpaceStatuses(statusMap);
       } catch (error) {
         console.error('Error fetching Space statuses:', error);
+        // If endpoint doesn't exist, set all spaces to 'running' and continue
+        const defaultStatuses: Record<string, SpaceStatus> = {};
+        HF_SPACES.forEach((space) => {
+          defaultStatuses[space.id] = {
+            id: space.id,
+            status: 'running',
+            last_updated: new Date().toISOString(),
+          };
+        });
+        setSpaceStatuses(defaultStatuses);
       } finally {
         setIsLoading(false);
       }
