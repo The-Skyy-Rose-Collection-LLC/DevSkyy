@@ -21,6 +21,7 @@ COPY frontend/components/ ./components/
 COPY frontend/lib/ ./lib/
 COPY frontend/public/ ./public/
 COPY frontend/templates/ ./templates/
+COPY frontend/utils/ ./utils/
 COPY frontend/*.config.js ./
 COPY frontend/*.config.ts ./
 COPY frontend/tsconfig*.json ./
