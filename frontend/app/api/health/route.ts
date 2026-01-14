@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://devskyy-backend.onrender.com';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://devskyy.fly.dev';
 
 export async function GET() {
   try {
