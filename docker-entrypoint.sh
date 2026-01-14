@@ -58,16 +58,24 @@ fi
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] main_enterprise.py found"
 
 # Test that we can import the module (check for syntax errors)
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Testing Python import of main_enterprise..."
-python3 -c "import sys; sys.path.insert(0, '/app'); import main_enterprise; print('✓ main_enterprise imported successfully')" 2>&1 || {
-    echo "[$(date '+%Y-%m-%d %H:%M:%S')] ERROR: Failed to import main_enterprise"
-    python3 -c "import sys; sys.path.insert(0, '/app'); import main_enterprise" 2>&1
-    exit 1
-}
+# NOTE: Import test is skipped - uvicorn will catch import errors and fail fast
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Skipping import validation - uvicorn will catch errors on startup"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ======================================"
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting uvicorn server..."
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ======================================"
 
 # Start application - use exec to replace shell with uvicorn
-# Note: Using single command line to avoid bash continuation issues
-exec python3 -m uvicorn main_enterprise:app --host 0.0.0.0 --port 8000 --workers 1 --timeout-keep-alive 65 --timeout-notify 30 --access-log 2>&1
+# Enterprise production settings:
+# - workers: 1 (Fly.io VM constraint, use horizontal scaling)
+# - timeout-keep-alive: 65s (Fly.io proxy timeout is 60s, allow buffer)
+# - lifespan: on (enable startup/shutdown lifecycle)
+# - proxy-headers: enabled for X-Forwarded-* from Fly.io proxy
+exec python3 -m uvicorn main_enterprise:app \
+    --host 0.0.0.0 \
+    --port 8000 \
+    --workers 1 \
+    --timeout-keep-alive 65 \
+    --lifespan on \
+    --proxy-headers \
+    --forwarded-allow-ips '*' \
+    --access-log 2>&1
