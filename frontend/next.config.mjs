@@ -38,16 +38,7 @@ const nextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || '/api',
   },
 
-  // CRITICAL: Root redirect
-  async redirects() {
-    return [
-      {
-        source: '/',
-        destination: '/dashboard',
-        permanent: false,
-      },
-    ];
-  },
+  // Root redirect removed - dashboard is at root /
 
   // NOTE: API rewrites removed - now handled by Next.js API route handlers
   // See: frontend/app/api/[...path]/route.ts for the universal proxy
