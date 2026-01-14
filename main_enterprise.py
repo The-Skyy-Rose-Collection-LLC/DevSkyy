@@ -50,6 +50,19 @@ from api.tasks import tasks_router
 from api.three_d import three_d_router
 from api.tools import tools_router
 
+# API v1 MCP Integration routers (code, commerce, HF Spaces, ML, media, etc.)
+from api.v1 import (
+    code_router,
+    commerce_router,
+    hf_spaces_router,
+    marketing_router,
+    media_router,
+    ml_router,
+    monitoring_router,
+    orchestration_router,
+    wordpress_theme_router,
+)
+
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
 from api.virtual_tryon import virtual_tryon_router
@@ -59,6 +72,11 @@ from api.websocket import ws_router
 from api.wordpress import wordpress_router
 from core.redis_cache import RedisCache
 from core.structured_logging import bind_contextvars, clear_contextvars, configure_logging
+from integrations.wordpress import (
+    order_sync_router,
+    product_sync_router,
+    theme_deployment_router,
+)
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
@@ -606,13 +624,7 @@ app.include_router(admin_dashboard_router, prefix="/api/v1")
 # Elementor 3D Experience routes (WordPress/Elementor integration)
 app.include_router(elementor_3d_router, prefix="/api/v1")
 
-# WordPress Integration routes (Product Sync, Order Sync, Theme Deployment)
-from integrations.wordpress import (
-    order_sync_router,
-    product_sync_router,
-    theme_deployment_router,
-)
-
+# WordPress Integration routes registration (Product Sync, Order Sync, Theme Deployment)
 app.include_router(product_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
 app.include_router(order_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
 app.include_router(theme_deployment_router, prefix="/api/v1/wordpress", tags=["wordpress"])
@@ -621,21 +633,11 @@ app.include_router(theme_deployment_router, prefix="/api/v1/wordpress", tags=["w
 # NEW API v1 Routers - MCP Integration Endpoints
 # =============================================================================
 
-# Import new v1 routers
-from api.v1 import (
-    code_router,
-    commerce_router,
-    marketing_router,
-    media_router,
-    ml_router,
-    monitoring_router,
-    orchestration_router,
-    wordpress_router,
-    wordpress_theme_router,
-)
-
 # Code scanning and fixing
 app.include_router(code_router, prefix="/api/v1")
+
+# HuggingFace Spaces management
+app.include_router(hf_spaces_router, prefix="/api/v1")
 
 # WordPress/WooCommerce integration
 app.include_router(wordpress_router, prefix="/api/v1")
