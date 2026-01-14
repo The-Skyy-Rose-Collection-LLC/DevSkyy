@@ -3,14 +3,14 @@ import { NextRequest, NextResponse } from 'next/server';
 /**
  * Keep-Alive Cron Job
  *
- * Pings the Render backend every 10 minutes to prevent hibernation.
- * Render free/starter tier hibernates after 15 minutes of inactivity.
+ * Pings the Fly.io backend every 10 minutes to maintain app responsiveness.
+ * Fly.io free tier apps auto-stop after 30 minutes of inactivity, but this cron
  *
  * Vercel Cron: Runs on schedule defined in vercel.json
  * Security: Verifies CRON_SECRET to prevent unauthorized execution
  */
 
-const BACKEND_URL = process.env.BACKEND_URL || 'https://devskyy-backend.onrender.com';
+const BACKEND_URL = process.env.BACKEND_URL || 'https://devskyy.fly.dev';
 
 export async function GET(request: NextRequest) {
   // Verify cron secret for security
