@@ -166,63 +166,69 @@ async def lifespan(app: FastAPI):
     else:
         log.info("sentry_disabled", reason="SENTRY_DSN not configured")
 
-    # Initialize RAG pipeline components
-    log.info("rag_pipeline_initializing")
-    try:
-        from orchestration.auto_ingestion import auto_ingest_documents
-        from orchestration.rag_context_manager import create_rag_context_manager
-        from orchestration.vector_store import VectorStoreConfig
+    # Initialize RAG pipeline components (conditional on RAG_AUTO_INGEST env var)
+    rag_auto_ingest_enabled = os.getenv("RAG_AUTO_INGEST", "false").lower() == "true"
 
-        # Create vector store config
-        vector_config = VectorStoreConfig(
-            db_type="chromadb",
-            collection_name="devskyy_docs",
-            persist_directory=os.getenv("VECTOR_DB_PATH", "./data/vectordb"),
-            default_top_k=5,
-            similarity_threshold=0.5,
-        )
-
-        # Create RAG context manager with optional rewriting/reranking
-        enable_rewriting = os.getenv("RAG_ENABLE_REWRITING", "false").lower() == "true"
-        enable_reranking = os.getenv("RAG_ENABLE_RERANKING", "false").lower() == "true"
-
-        rag_manager = await create_rag_context_manager(
-            vector_store_config=vector_config,
-            enable_rewriting=enable_rewriting,
-            enable_reranking=enable_reranking,
-        )
-
-        # Auto-ingest documents from docs/
-        log.info("rag_auto_ingestion_starting")
-        ingestion_stats = await auto_ingest_documents(
-            vector_store=rag_manager.vector_store,
-            project_root=".",
-            force_reindex=os.getenv("RAG_FORCE_REINDEX", "false").lower() == "true",
-        )
-
-        log.info(
-            "rag_auto_ingestion_complete",
-            files_ingested=ingestion_stats["files_ingested"],
-            documents_created=ingestion_stats["documents_created"],
-        )
-
-        # Store RAG manager in app state for agent injection
-        app.state.rag_manager = rag_manager
-
-        # Inject RAG manager into agent registry
+    if rag_auto_ingest_enabled:
+        log.info("rag_pipeline_initializing")
         try:
-            from api.dashboard import agent_registry
+            from orchestration.auto_ingestion import auto_ingest_documents
+            from orchestration.rag_context_manager import create_rag_context_manager
+            from orchestration.vector_store import VectorStoreConfig
 
-            agent_registry.set_rag_manager(rag_manager)
-            log.info("rag_manager_injected", target="agent_registry")
+            # Create vector store config
+            vector_config = VectorStoreConfig(
+                db_type="chromadb",
+                collection_name="devskyy_docs",
+                persist_directory=os.getenv("VECTOR_DB_PATH", "./data/vectordb"),
+                default_top_k=5,
+                similarity_threshold=0.5,
+            )
+
+            # Create RAG context manager with optional rewriting/reranking
+            enable_rewriting = os.getenv("RAG_ENABLE_REWRITING", "false").lower() == "true"
+            enable_reranking = os.getenv("RAG_ENABLE_RERANKING", "false").lower() == "true"
+
+            rag_manager = await create_rag_context_manager(
+                vector_store_config=vector_config,
+                enable_rewriting=enable_rewriting,
+                enable_reranking=enable_reranking,
+            )
+
+            # Auto-ingest documents from docs/
+            log.info("rag_auto_ingestion_starting")
+            ingestion_stats = await auto_ingest_documents(
+                vector_store=rag_manager.vector_store,
+                project_root=".",
+                force_reindex=os.getenv("RAG_FORCE_REINDEX", "false").lower() == "true",
+            )
+
+            log.info(
+                "rag_auto_ingestion_complete",
+                files_ingested=ingestion_stats["files_ingested"],
+                documents_created=ingestion_stats["documents_created"],
+            )
+
+            # Store RAG manager in app state for agent injection
+            app.state.rag_manager = rag_manager
+
+            # Inject RAG manager into agent registry
+            try:
+                from api.dashboard import agent_registry
+
+                agent_registry.set_rag_manager(rag_manager)
+                log.info("rag_manager_injected", target="agent_registry")
+            except Exception as e:
+                log.warning("rag_manager_injection_failed", error=str(e))
+
+            log.info("rag_pipeline_initialized")
+
         except Exception as e:
-            log.warning("rag_manager_injection_failed", error=str(e))
-
-        log.info("rag_pipeline_initialized")
-
-    except Exception as e:
-        log.error("rag_pipeline_initialization_failed", error=str(e), exc_info=True)
-        log.warning("continuing_without_rag")
+            log.error("rag_pipeline_initialization_failed", error=str(e), exc_info=True)
+            log.warning("continuing_without_rag")
+            app.state.rag_manager = None
+    else:
+        log.info("rag_pipeline_disabled", reason="RAG_AUTO_INGEST not enabled")
         app.state.rag_manager = None
 
     # Initialize Redis cache connection
