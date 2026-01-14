@@ -1,6 +1,9 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_SITE_URL": "https://app.devskyy.app"
+  },
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 60
