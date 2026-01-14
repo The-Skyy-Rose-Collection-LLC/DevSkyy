@@ -19,6 +19,10 @@ kill_timeout = '30s'
   PYTHONUNBUFFERED = '1'
   PYTHONDONTWRITEBYTECODE = '1'
   SENTRY_ENVIRONMENT = 'production'
+  # RAG Pipeline Configuration
+  RAG_AUTO_INGEST = 'false'  # Disabled by default to allow fast startup
+  RAG_ENABLE_REWRITING = 'false'
+  RAG_ENABLE_RERANKING = 'false'
   # IMPORTANT: Set these via secrets, not env:
   # fly secrets set DATABASE_URL=postgresql+asyncpg://...
   # fly secrets set REDIS_URL=redis://...
