@@ -13,23 +13,55 @@ kill_timeout = '30s'
 # Environment variables (non-sensitive only)
 # Secrets should be set via: fly secrets set KEY=value
 [env]
+  # Core Production Settings
   ENVIRONMENT = 'production'
   LOG_LEVEL = 'INFO'
   LOG_JSON = 'true'
   PYTHONUNBUFFERED = '1'
   PYTHONDONTWRITEBYTECODE = '1'
+
+  # Monitoring & Observability
   SENTRY_ENVIRONMENT = 'production'
-  # RAG Pipeline Configuration
-  RAG_AUTO_INGEST = 'false'  # Disabled by default to allow fast startup
+  SENTRY_TRACES_SAMPLE_RATE = '0.1'  # Sample 10% of traces in production
+  SENTRY_PROFILES_SAMPLE_RATE = '0.05'  # Sample 5% of profiles
+
+  # Security & Feature Flags
+  CORS_ORIGINS = 'https://app.devskyy.app,https://api.devskyy.app,https://*.devskyy.app'
+  SESSION_TIMEOUT_MINUTES = '60'
+  MAX_LOGIN_ATTEMPTS = '5'
+  LOGIN_LOCKOUT_MINUTES = '15'
+
+  # Redis Cache Configuration (Optional - graceful fallback if unavailable)
+  REDIS_SOCKET_TIMEOUT = '2.0'  # Reduced from 5.0 for faster timeout
+  REDIS_CONNECT_TIMEOUT = '2.0'
+  REDIS_RETRY_ON_TIMEOUT = 'true'
+  REDIS_MAX_CONNECTIONS = '10'
+
+  # RAG Pipeline Configuration (disabled by default)
+  RAG_AUTO_INGEST = 'false'
   RAG_ENABLE_REWRITING = 'false'
   RAG_ENABLE_RERANKING = 'false'
-  # IMPORTANT: Set these via secrets, not env:
+
+  # Request & Connection Limits
+  MAX_REQUEST_BODY_SIZE = '10485760'  # 10MB
+  REQUEST_TIMEOUT_SECONDS = '60'
+  KEEPALIVE_TIMEOUT_SECONDS = '65'
+
+  # Database Configuration (when available)
+  DATABASE_POOL_SIZE = '5'
+  DATABASE_MAX_OVERFLOW = '10'
+  DATABASE_POOL_TIMEOUT = '5'
+  DATABASE_POOL_RECYCLE = '3600'
+  DATABASE_CONNECT_TIMEOUT = '10'
+
+  # IMPORTANT: Set these via secrets, not env vars:
   # fly secrets set DATABASE_URL=postgresql+asyncpg://...
   # fly secrets set REDIS_URL=redis://...
   # fly secrets set JWT_SECRET_KEY=...
   # fly secrets set ENCRYPTION_MASTER_KEY=...
   # fly secrets set OPENAI_API_KEY=...
   # fly secrets set ANTHROPIC_API_KEY=...
+  # fly secrets set SENTRY_DSN=https://...
 
 [build]
   # Uses Dockerfile in root directory
@@ -48,6 +80,16 @@ kill_timeout = '30s'
     type = 'requests'
     hard_limit = 250
     soft_limit = 200
+
+# Auto-scaling configuration for production
+[http_service.auto_scaling]
+  min_machines = 1
+  max_machines = 5  # Max 5 machines for cost control + performance
+  # Scale up when CPU or memory exceeds threshold
+  [http_service.auto_scaling.metrics]
+    cpu_threshold = 75  # Scale up if CPU > 75%
+    memory_threshold = 80  # Scale up if memory > 80%
+    requests_per_second_threshold = 100  # Scale up if RPS > 100
 
 # Health checks for load balancer
 [[http_service.checks]]
