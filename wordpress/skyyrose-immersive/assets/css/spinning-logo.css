@@ -20,22 +20,27 @@
 .skyyrose-logo__spinner {
   width: 60px;
   height: 60px;
-  animation: spin 8s linear infinite;
-  transition: filter 0.3s ease;
+  /* GIF has built-in animation, but add CSS rotation as fallback */
+  animation: glow-pulse 3s ease-in-out infinite;
+  transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Ensure crisp rendering for small animated GIFs */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
 }
 
-/* Pause on hover for elegance */
+/* Pause on hover for elegance + scale up */
 .skyyrose-logo:hover .skyyrose-logo__spinner {
   animation-play-state: paused;
+  transform: scale(1.1);
 }
 
-/* Glow effect */
+/* Glow effect - enhanced */
 .skyyrose-logo__spinner {
-  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.3));
+  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
 }
 
 .skyyrose-logo:hover .skyyrose-logo__spinner {
-  filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.5));
+  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 60px rgba(212, 175, 55, 0.2));
 }
 
 /* Spin Animation */
@@ -45,6 +50,16 @@
   }
   to {
     transform: rotate(360deg);
+  }
+}
+
+/* Pulsing Glow Animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
   }
 }
 
@@ -60,50 +75,47 @@
    LOGO COLOR VARIANTS
    ======================================== */
 
+/* Note: GIF logos have built-in colors, so we only adjust glow effects */
+
 /* Gold (Default - for dark backgrounds) */
-.skyyrose-logo--gold .skyyrose-logo__spinner path,
-.skyyrose-logo--gold .skyyrose-logo__spinner circle {
-  fill: #D4AF37;
+.skyyrose-logo--gold .skyyrose-logo__spinner {
+  /* Default gold glow already applied above */
 }
 
 /* Silver (BLACK ROSE pages) */
-.skyyrose-logo--silver .skyyrose-logo__spinner path,
-.skyyrose-logo--silver .skyyrose-logo__spinner circle {
-  fill: #C0C0C0;
+.skyyrose-logo--silver .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 30px rgba(192, 192, 192, 0.2));
 }
 
-.skyyrose-logo--silver .skyyrose-logo__spinner {
-  filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.3));
+.skyyrose-logo--silver:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.5)) drop-shadow(0 0 40px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 60px rgba(192, 192, 192, 0.2));
 }
 
 /* Rose Gold (SIGNATURE pages) */
-.skyyrose-logo--rose-gold .skyyrose-logo__spinner path,
-.skyyrose-logo--rose-gold .skyyrose-logo__spinner circle {
-  fill: #B76E79;
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 30px rgba(183, 110, 121, 0.2));
 }
 
-.skyyrose-logo--rose-gold .skyyrose-logo__spinner {
-  filter: drop-shadow(0 0 20px rgba(183, 110, 121, 0.3));
+.skyyrose-logo--rose-gold:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(183, 110, 121, 0.5)) drop-shadow(0 0 40px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 60px rgba(183, 110, 121, 0.2));
 }
 
 /* Deep Rose (LOVE HURTS pages) */
-.skyyrose-logo--deep-rose .skyyrose-logo__spinner path,
-.skyyrose-logo--deep-rose .skyyrose-logo__spinner circle {
-  fill: #D4A5A5;
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 30px rgba(212, 165, 165, 0.2));
 }
 
-.skyyrose-logo--deep-rose .skyyrose-logo__spinner {
-  filter: drop-shadow(0 0 20px rgba(212, 165, 165, 0.3));
+.skyyrose-logo--deep-rose:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 165, 165, 0.5)) drop-shadow(0 0 40px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 60px rgba(212, 165, 165, 0.2));
 }
 
 /* Black (for light backgrounds) */
-.skyyrose-logo--black .skyyrose-logo__spinner path,
-.skyyrose-logo--black .skyyrose-logo__spinner circle {
-  fill: #0D0D0D;
+.skyyrose-logo--black .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 20px rgba(0, 0, 0, 0.1));
 }
 
-.skyyrose-logo--black .skyyrose-logo__spinner {
-  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.2));
+.skyyrose-logo--black:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 30px rgba(0, 0, 0, 0.2));
 }
 
 /* ========================================

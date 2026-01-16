@@ -108,12 +108,26 @@ function skyyrose_get_logo_variant() {
  */
 function skyyrose_spinning_logo() {
     $variant = skyyrose_get_logo_variant();
-    $logo_url = SKYYROSE_IMMERSIVE_URI . '/assets/images/skyyrose-logo-spinner.svg';
+
+    // Map variant to collection-specific animated logo
+    $logo_map = array(
+        'rose-gold' => 'signature',
+        'silver' => 'black-rose',
+        'deep-rose' => 'love-hurts',
+        'gold' => 'skyyrose', // Default/main logo
+    );
+
+    $logo_prefix = isset($logo_map[$variant]) ? $logo_map[$variant] : 'skyyrose';
+
+    // Use collection-specific animated GIF logo with responsive srcset
+    $logo_url_60 = SKYYROSE_IMMERSIVE_URI . '/assets/images/' . $logo_prefix . '-logo-60px.gif';
+    $logo_url_120 = SKYYROSE_IMMERSIVE_URI . '/assets/images/' . $logo_prefix . '-logo-120px.gif';
     ?>
     <a href="<?php echo esc_url(home_url('/')); ?>"
        class="skyyrose-logo skyyrose-logo--<?php echo esc_attr($variant); ?>"
        aria-label="SkyyRose Home">
-        <img src="<?php echo esc_url($logo_url); ?>"
+        <img src="<?php echo esc_url($logo_url_60); ?>"
+             srcset="<?php echo esc_url($logo_url_60); ?> 1x, <?php echo esc_url($logo_url_120); ?> 2x"
              alt="SkyyRose"
              class="skyyrose-logo__spinner" />
     </a>
@@ -195,17 +209,31 @@ function skyyrose_spinning_logo_shortcode($atts) {
     ), $atts, 'skyyrose_spinning_logo');
 
     $variant = !empty($atts['variant']) ? sanitize_key($atts['variant']) : skyyrose_get_logo_variant();
-    $logo_url = SKYYROSE_IMMERSIVE_URI . '/assets/images/skyyrose-logo-spinner.svg';
 
     $allowed_variants = array('gold', 'silver', 'rose-gold', 'deep-rose', 'black');
     if (!in_array($variant, $allowed_variants)) {
         $variant = 'gold';
     }
 
+    // Map variant to collection-specific animated logo
+    $logo_map = array(
+        'rose-gold' => 'signature',
+        'silver' => 'black-rose',
+        'deep-rose' => 'love-hurts',
+        'gold' => 'skyyrose', // Default/main logo
+    );
+
+    $logo_prefix = isset($logo_map[$variant]) ? $logo_map[$variant] : 'skyyrose';
+
+    // Use collection-specific animated GIF logo with responsive srcset
+    $logo_url_60 = SKYYROSE_IMMERSIVE_URI . '/assets/images/' . $logo_prefix . '-logo-60px.gif';
+    $logo_url_120 = SKYYROSE_IMMERSIVE_URI . '/assets/images/' . $logo_prefix . '-logo-120px.gif';
+
     ob_start();
     ?>
     <div class="skyyrose-logo skyyrose-logo--<?php echo esc_attr($variant); ?>">
-        <img src="<?php echo esc_url($logo_url); ?>"
+        <img src="<?php echo esc_url($logo_url_60); ?>"
+             srcset="<?php echo esc_url($logo_url_60); ?> 1x, <?php echo esc_url($logo_url_120); ?> 2x"
              alt="SkyyRose"
              class="skyyrose-logo__spinner" />
     </div>
