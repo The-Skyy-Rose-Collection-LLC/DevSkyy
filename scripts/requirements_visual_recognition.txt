@@ -1,0 +1,20 @@
+# Visual Product Recognition Dependencies
+
+# Core ML/AI
+torch>=2.0.0
+torchvision>=0.15.0
+transformers>=4.30.0
+
+# Image processing
+Pillow>=9.5.0
+
+# Numerical computing
+numpy>=1.24.0
+scipy>=1.10.0
+
+# Progress bars
+tqdm>=4.65.0
+
+# Already in main requirements.txt:
+# - aiohttp (WordPress API)
+# - python-dotenv (.env files)
