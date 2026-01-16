@@ -1,0 +1,74 @@
+{
+  "manifest_version": "0.2",
+  "name": "wordpress-com-mcp",
+  "version": "0.0.1",
+  "display_name": "WordPress.com",
+  "description": "MCP server providing WordPress.com account and site management tools",
+  "long_description": "A Model Context Protocol server that provides AI assistants with access to WordPress.com account management, site analytics, content operations, and user profile tools. This extension enables AI assistants to help users manage their WordPress.com sites, analyze site performance, search content, and access account information.",
+  "icon": "icon.png",
+  "author": {
+    "name": "Automattic",
+    "email": "support@wordpress.com",
+    "url": "https://automattic.com"
+  },
+  "license": "GPL-2.0-or-later",
+  "homepage": "https://wordpress.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/mcpb"
+  },
+  "keywords": [
+    "wordpress",
+    "wpcom",
+    "mcp",
+    "development",
+    "tools",
+    "api"
+  ],
+  "server": {
+    "type": "node",
+    "entry_point": "dist/index.js",
+    "mcp_config": {
+      "command": "node",
+      "args": ["${__dirname}/dist/index.js"],
+      "env": {
+        "NODE_ENV": "production",
+        "LOG_FILE": "${user_config.logFile}"
+      }
+    }
+  },
+  "user_config": {
+    "logFile": {
+      "type": "string",
+      "title": "Log File Path",
+      "description": "Path where MCP server logs will be saved (leave empty to disable file logging)",
+      "required": false,
+      "default": ""
+    }
+  },
+  "tools": [
+    {
+      "name": "user_management",
+      "description": "Access user profile, sites, notifications, and account information"
+    },
+    {
+      "name": "site_analytics",
+      "description": "Retrieve site statistics, performance metrics, and visitor data"
+    },
+    {
+      "name": "content_operations",
+      "description": "Search and retrieve posts, comments, and site content"
+    },
+    {
+      "name": "site_administration",
+      "description": "Manage site settings, plugins, users, and configurations"
+    }
+  ],
+  "compatibility": {
+    "claude_desktop": ">=0.13.37",
+    "platforms": ["darwin", "linux", "win32"],
+    "runtimes": {
+      "node": ">=18.0.0"
+    }
+  }
+}

@@ -1,0 +1,76 @@
+{
+  "name": "@automattic/wpcom-mcp-bundle",
+  "version": "0.0.1",
+  "description": "WordPress.com MCP Bundle",
+  "type": "module",
+  "main": "dist/index.js",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "build": "tsup && ./build.sh",
+    "build:watch": "tsup --watch",
+    "build:bundle": "./build.sh",
+    "start": "node dist/index.js",
+    "dev": "NODE_ENV=development node dist/index.js",
+    "clean": "rm -rf dist node_modules *.mcpb",
+    "test": "echo 'Use build.sh for testing'"
+  },
+  "keywords": [
+    "mcp",
+    "wordpress",
+    "wpcom",
+    "desktop-extension",
+    "automattic"
+  ],
+  "author": {
+    "name": "Automattic",
+    "email": "support@wordpress.com",
+    "url": "https://automattic.com"
+  },
+  "license": "GPL-2.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Automattic/wp-calypso.git",
+    "directory": "wp-content/mu-plugins/wpcom-mcp/mcpb"
+  },
+  "homepage": "https://wordpress.com",
+  "dependencies": {
+    "@automattic/mcp-wordpress-remote": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "^18.19.0",
+    "tsup": "^8.0.2",
+    "typescript": "^5.3.3"
+  },
+  "files": [
+    "dist/",
+    "manifest.json",
+    "README.md"
+  ],
+  "tsup": {
+    "entry": [
+      "src/index.ts"
+    ],
+    "format": [
+      "esm"
+    ],
+    "dts": false,
+    "clean": true,
+    "outDir": "dist",
+    "splitting": false,
+    "external": [
+      "node:*"
+    ],
+    "noExternal": [
+      "@automattic/mcp-wordpress-remote"
+    ],
+    "minify": true,
+    "sourcemap": false,
+    "target": "node18",
+    "platform": "node",
+    "banner": {
+      "js": "#!/usr/bin/env node\n"
+    }
+  }
+}
