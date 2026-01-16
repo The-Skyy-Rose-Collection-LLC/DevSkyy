@@ -92,7 +92,7 @@ echo ""
 
 # Process images
 for format in $FORMATS; do
-    for input_file in "$INPUT_DIR"/$format 2>/dev/null; do
+    for input_file in "$INPUT_DIR"/$format; do
         # Skip if glob didn't match
         [ -e "$input_file" ] || continue
 

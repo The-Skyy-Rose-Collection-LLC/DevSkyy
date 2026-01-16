@@ -142,7 +142,7 @@ format_bytes() {
 FORMATS="*.jpg *.jpeg *.png *.JPG *.JPEG *.PNG"
 
 for format in $FORMATS; do
-    for input_file in "$INPUT_DIR"/$format 2>/dev/null; do
+    for input_file in "$INPUT_DIR"/$format; do
         [ -e "$input_file" ] || continue
 
         TOTAL=$((TOTAL + 1))
