@@ -303,10 +303,10 @@ def main():
         ],
         "clusters": [
             {
-                "cluster_id": c.cluster_id,
+                "cluster_id": int(c.cluster_id),
                 "size": len(c),
                 "images": [p.name for p in c.image_paths],
-                "mean_similarity": round(c.mean_similarity, 3),
+                "mean_similarity": round(float(c.mean_similarity), 3),
             }
             for c in clusters
             if len(c) > 1
