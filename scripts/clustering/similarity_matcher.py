@@ -192,6 +192,8 @@ class SimilarityMatcher:
 
         # Compute distance matrix (1 - similarity)
         similarity_matrix = self.compute_similarity_matrix(embeddings)
+        # Clip to [0, 1] to handle floating point precision issues
+        similarity_matrix = np.clip(similarity_matrix, 0.0, 1.0)
         distance_matrix = 1 - similarity_matrix
 
         # Convert to condensed distance matrix for scipy
