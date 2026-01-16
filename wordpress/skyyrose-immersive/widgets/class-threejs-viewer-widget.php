@@ -50,18 +50,16 @@ class SkyyRose_ThreeJS_Viewer_Widget extends \Elementor\Widget_Base {
 
     /**
      * Get script dependencies
+     *
+     * IMPORTANT: Never call get_settings() here - this runs before register_controls()
+     * These handle names must match the registered scripts in skyyrose-3d-experience plugin
      */
     public function get_script_depends() {
-        $collection = $this->get_settings('collection');
-
-        $scripts = ['threejs', 'threejs-orbit-controls', 'skyyrose-experience-base'];
-
-        // Add collection-specific script
-        if (!empty($collection)) {
-            $scripts[] = 'skyyrose-' . $collection . '-experience';
-        }
-
-        return $scripts;
+        return [
+            'three-js',           // Three.js core from skyyrose-3d-experience plugin
+            'three-js-addons',    // OrbitControls, GLTFLoader, etc.
+            'skyyrose-3d',        // Main experience bundle
+        ];
     }
 
     /**
