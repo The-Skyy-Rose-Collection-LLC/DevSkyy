@@ -5,6 +5,16 @@ WordPress WebP Integration Script
 Uploads WebP-optimized product images to WordPress and configures
 the theme to serve WebP with JPG fallback using <picture> tags.
 
+Based on WordPress REST API documentation:
+https://developer.wordpress.org/rest-api/reference/media/
+
+Authentication:
+    Requires Application Password (WordPress 5.6+)
+    Generate: WordPress Admin → Users → Profile → Application Passwords
+
+Troubleshooting:
+    Run diagnostics first: python scripts/diagnose_wordpress_api.py
+
 Usage:
     python scripts/integrate_webp_wordpress.py --webp-dir <dir> --fallback-dir <dir> [--limit N]
 
@@ -35,6 +45,12 @@ WP_APP_PASSWORD = os.getenv("WORDPRESS_APP_PASSWORD")
 if not all([WP_URL, WP_USERNAME, WP_APP_PASSWORD]):
     print("ERROR: WordPress credentials not found in environment")
     print("Required: WORDPRESS_URL, WORDPRESS_USERNAME, WORDPRESS_APP_PASSWORD")
+    print("\nAdd to .env file:")
+    print("  WORDPRESS_URL=https://skyyrose.co")
+    print("  WORDPRESS_USERNAME=your_username")
+    print("  WORDPRESS_APP_PASSWORD=xxxx xxxx xxxx xxxx xxxx xxxx")
+    print("\nGenerate Application Password:")
+    print("  WordPress Admin → Users → Profile → Application Passwords → Add New")
     sys.exit(1)
 
 
@@ -50,17 +66,20 @@ class WordPressWebPIntegrator:
     async def upload_image(
         self, session: aiohttp.ClientSession, filepath: Path, alt_text: str = ""
     ) -> dict | None:
-        """Upload single image to WordPress Media Library."""
+        """Upload single image to WordPress Media Library.
+
+        Uses WordPress REST API media upload endpoint with Application Password authentication.
+        Based on official WordPress REST API documentation:
+        https://developer.wordpress.org/rest-api/reference/media/
+        """
         try:
             with open(filepath, "rb") as f:
                 file_data = f.read()
 
-            # Determine content type
-            content_type = "image/webp" if filepath.suffix.lower() == ".webp" else "image/jpeg"
-
+            # WordPress REST API media upload format (official docs)
+            # Only Content-Disposition header required - WordPress detects MIME type automatically
             headers = {
                 "Content-Disposition": f'attachment; filename="{filepath.name}"',
-                "Content-Type": content_type,
             }
 
             auth = aiohttp.BasicAuth(WP_USERNAME, WP_APP_PASSWORD)
@@ -71,14 +90,27 @@ class WordPressWebPIntegrator:
                 headers=headers,
                 auth=auth,
             ) as resp:
+                # Check for HTML response (authentication redirect)
+                content_type = resp.headers.get("Content-Type", "")
+
                 if resp.status == 201:
                     result = await resp.json()
                     print(f"  ✓ Uploaded: {filepath.name} (ID: {result['id']})")
                     return result
+                elif "text/html" in content_type:
+                    # Got HTML instead of JSON - likely authentication issue
+                    error_text = await resp.text()
+                    print(
+                        f"  ✗ Failed: {filepath.name} - Authentication error (got HTML, expected JSON)"
+                    )
+                    print(f"    Status: {resp.status}")
+                    print("    Hint: Verify WordPress Application Password is correct")
+                    print("    Run: python scripts/diagnose_wordpress_api.py")
+                    return None
                 else:
                     error_text = await resp.text()
                     print(f"  ✗ Failed: {filepath.name} ({resp.status})")
-                    print(f"    Error: {error_text[:100]}")
+                    print(f"    Error: {error_text[:200]}")
                     return None
 
         except Exception as e:
