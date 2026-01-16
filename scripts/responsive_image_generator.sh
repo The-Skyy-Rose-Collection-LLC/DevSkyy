@@ -61,14 +61,8 @@ if [ $# -lt 2 ]; then
 fi
 
 # Breakpoint definitions (width×height)
-declare -A BREAKPOINTS=(
-    ["desktop"]="1920x1080"
-    ["desktop-2x"]="3840x2160"
-    ["tablet"]="1024x576"
-    ["mobile"]="768x432"
-    ["mobile-2x"]="1536x864"
-    ["small"]="375x211"
-)
+# Format: "name:widthxheight"
+BREAKPOINTS="desktop:1920x1080 desktop-2x:3840x2160 tablet:1024x576 mobile:768x432 mobile-2x:1536x864 small:375x211"
 
 # Check ImageMagick
 if ! command -v magick &> /dev/null; then
@@ -157,7 +151,7 @@ echo ""
 FORMATS="*.jpg *.jpeg *.png *.JPG *.JPEG *.PNG"
 
 for format in $FORMATS; do
-    for input_file in "$INPUT_DIR"/$format 2>/dev/null; do
+    for input_file in "$INPUT_DIR"/$format; do
         [ -e "$input_file" ] || continue
 
         TOTAL=$((TOTAL + 1))
