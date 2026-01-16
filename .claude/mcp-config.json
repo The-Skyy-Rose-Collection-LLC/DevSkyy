@@ -33,6 +33,13 @@
         "WOOCOMMERCE_SECRET": ""
       }
     },
+    "wordpress-com": {
+      "command": "node",
+      "args": ["/Users/coreyfoster/DevSkyy/mcp_servers/wordpress-com/dist/index.js"],
+      "env": {
+        "NODE_ENV": "production"
+      }
+    },
     "devskyy-openai": {
       "command": "python3",
       "args": ["/Users/coreyfoster/DevSkyy/mcp_servers/openai_server.py"],

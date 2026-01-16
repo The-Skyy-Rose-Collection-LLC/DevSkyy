@@ -1,25 +1,26 @@
 """
-WooCommerce MCP Client Integration
-===================================
+WooCommerce MCP Server
+======================
 
-Client wrapper for the official WooCommerce MCP server (v10.3+).
+FastMCP server exposing WooCommerce/WordPress operations as MCP tools.
 
 This module provides:
-- Type-safe WooCommerce operations via MCP
-- Real-time inventory sync
-- Order management
-- Customer operations
-- Coupon handling
-
-Based on official WooCommerce MCP documentation:
-https://developer.woocommerce.com/docs/features/mcp/
+- Product management (CRUD, search, inventory)
+- Order management (list, update status, refunds)
+- Customer operations (search, create)
+- Coupon validation and management
+- Store health checks
 
 Requirements:
-- WooCommerce 10.3+ with MCP beta enabled
-- WordPress 6.9+ with Abilities API
-- Valid WC REST API keys
+- WooCommerce REST API credentials (consumer key/secret)
+- WordPress site URL
 
-Version: 1.0.0
+Environment Variables:
+- WORDPRESS_URL or WOOCOMMERCE_URL: Store URL
+- WOOCOMMERCE_KEY or WC_CONSUMER_KEY: API consumer key
+- WOOCOMMERCE_SECRET or WC_CONSUMER_SECRET: API consumer secret
+
+Version: 2.0.0
 """
 
 import asyncio
@@ -31,9 +32,16 @@ from enum import Enum
 from typing import Any
 
 import aiohttp
+from mcp.server.fastmcp import FastMCP
 from pydantic import BaseModel, Field
 
 logger = logging.getLogger(__name__)
+
+# =============================================================================
+# FastMCP Server Initialization
+# =============================================================================
+
+mcp = FastMCP("woocommerce-mcp")
 
 
 # =============================================================================
@@ -802,28 +810,327 @@ async def get_woocommerce_client() -> WooCommerceMCPClient:
 
 
 # =============================================================================
-# CLI Testing
+# MCP Tool Definitions
+# =============================================================================
+
+
+@mcp.tool(
+    name="wc_health_check",
+    annotations={
+        "title": "WooCommerce Health Check",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_health_check() -> str:
+    """Check WooCommerce API health and connectivity.
+
+    Returns store health status including WooCommerce version,
+    WordPress version, and MCP availability.
+    """
+    client = await get_woocommerce_client()
+    result = await client.health_check()
+    return json.dumps(result, indent=2)
+
+
+@mcp.tool(
+    name="wc_search_products",
+    annotations={
+        "title": "Search WooCommerce Products",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_search_products(
+    query: str | None = None,
+    category: int | None = None,
+    sku: str | None = None,
+    status: str = "publish",
+    per_page: int = 20,
+    page: int = 1,
+) -> str:
+    """Search WooCommerce products with optional filters.
+
+    Args:
+        query: Search term for product name/description
+        category: Category ID to filter by
+        sku: Exact SKU match
+        status: Product status (publish, draft, pending)
+        per_page: Results per page (max 100)
+        page: Page number
+
+    Returns:
+        JSON array of matching products with id, name, sku, price, stock info
+    """
+    client = await get_woocommerce_client()
+    products = await client.search_products(
+        query=query,
+        category=category,
+        sku=sku,
+        status=status,
+        per_page=per_page,
+        page=page,
+    )
+    return json.dumps([p.model_dump() for p in products], indent=2)
+
+
+@mcp.tool(
+    name="wc_get_product",
+    annotations={
+        "title": "Get WooCommerce Product",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_get_product(product_id: int) -> str:
+    """Get a single product by ID.
+
+    Args:
+        product_id: WooCommerce product ID
+
+    Returns:
+        JSON object with full product details or error
+    """
+    client = await get_woocommerce_client()
+    product = await client.get_product(product_id)
+    if product:
+        return json.dumps(product.model_dump(), indent=2)
+    return json.dumps({"error": f"Product {product_id} not found"})
+
+
+@mcp.tool(
+    name="wc_update_stock",
+    annotations={
+        "title": "Update Product Stock",
+        "readOnlyHint": False,
+        "idempotentHint": False,
+    },
+)
+async def wc_update_stock(
+    product_id: int,
+    quantity: int,
+    variation_id: int | None = None,
+) -> str:
+    """Update stock quantity for a product or variation.
+
+    Args:
+        product_id: WooCommerce product ID
+        quantity: New stock quantity
+        variation_id: Optional variation ID for variable products
+
+    Returns:
+        JSON object with updated stock info
+    """
+    client = await get_woocommerce_client()
+    result = await client.update_stock(
+        product_id=product_id,
+        quantity=quantity,
+        variation_id=variation_id,
+    )
+    return json.dumps(result, indent=2)
+
+
+@mcp.tool(
+    name="wc_list_orders",
+    annotations={
+        "title": "List WooCommerce Orders",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_list_orders(
+    status: str | None = None,
+    customer_id: int | None = None,
+    per_page: int = 20,
+    page: int = 1,
+) -> str:
+    """List WooCommerce orders with optional filters.
+
+    Args:
+        status: Filter by status (pending, processing, on-hold, completed, cancelled, refunded, failed)
+        customer_id: Filter by customer ID
+        per_page: Results per page (max 100)
+        page: Page number
+
+    Returns:
+        JSON array of orders with id, number, status, total, customer info
+    """
+    client = await get_woocommerce_client()
+    order_status = OrderStatus(status) if status else None
+    orders = await client.list_orders(
+        status=order_status,
+        customer_id=customer_id,
+        per_page=per_page,
+        page=page,
+    )
+    return json.dumps([o.model_dump() for o in orders], indent=2)
+
+
+@mcp.tool(
+    name="wc_get_order",
+    annotations={
+        "title": "Get WooCommerce Order",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_get_order(order_id: int) -> str:
+    """Get a single order by ID.
+
+    Args:
+        order_id: WooCommerce order ID
+
+    Returns:
+        JSON object with full order details or error
+    """
+    client = await get_woocommerce_client()
+    order = await client.get_order(order_id)
+    if order:
+        return json.dumps(order.model_dump(), indent=2)
+    return json.dumps({"error": f"Order {order_id} not found"})
+
+
+@mcp.tool(
+    name="wc_update_order_status",
+    annotations={
+        "title": "Update Order Status",
+        "readOnlyHint": False,
+        "idempotentHint": False,
+    },
+)
+async def wc_update_order_status(
+    order_id: int,
+    status: str,
+    note: str | None = None,
+) -> str:
+    """Update order status.
+
+    Args:
+        order_id: WooCommerce order ID
+        status: New status (pending, processing, on-hold, completed, cancelled, refunded, failed)
+        note: Optional order note
+
+    Returns:
+        JSON object with updated order or error
+    """
+    client = await get_woocommerce_client()
+    order = await client.update_order_status(
+        order_id=order_id,
+        status=OrderStatus(status),
+        note=note,
+    )
+    if order:
+        return json.dumps(order.model_dump(), indent=2)
+    return json.dumps({"error": f"Failed to update order {order_id}"})
+
+
+@mcp.tool(
+    name="wc_search_customers",
+    annotations={
+        "title": "Search WooCommerce Customers",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_search_customers(
+    email: str | None = None,
+    search: str | None = None,
+    per_page: int = 20,
+    page: int = 1,
+) -> str:
+    """Search WooCommerce customers.
+
+    Args:
+        email: Exact email match
+        search: Search term for name/email
+        per_page: Results per page (max 100)
+        page: Page number
+
+    Returns:
+        JSON array of customers with id, email, name, order count
+    """
+    client = await get_woocommerce_client()
+    customers = await client.search_customers(
+        email=email,
+        search=search,
+        per_page=per_page,
+        page=page,
+    )
+    return json.dumps([c.model_dump() for c in customers], indent=2)
+
+
+@mcp.tool(
+    name="wc_validate_coupon",
+    annotations={
+        "title": "Validate WooCommerce Coupon",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_validate_coupon(
+    code: str,
+    cart_total: str | None = None,
+) -> str:
+    """Validate a coupon code.
+
+    Args:
+        code: Coupon code to validate
+        cart_total: Optional cart total to check minimum amount requirements
+
+    Returns:
+        JSON object with validation result, discount type, and amount
+    """
+    client = await get_woocommerce_client()
+    result = await client.validate_coupon(code=code, cart_total=cart_total)
+    return json.dumps(result, indent=2)
+
+
+@mcp.tool(
+    name="wc_get_store_settings",
+    annotations={
+        "title": "Get WooCommerce Store Settings",
+        "readOnlyHint": True,
+        "idempotentHint": True,
+    },
+)
+async def wc_get_store_settings() -> str:
+    """Get WooCommerce store settings.
+
+    Returns:
+        JSON object with store configuration including currency, location, etc.
+    """
+    client = await get_woocommerce_client()
+    result = await client.get_store_settings()
+    return json.dumps(result, indent=2)
+
+
+# =============================================================================
+# Main Entry Point
 # =============================================================================
 
 if __name__ == "__main__":
+    print(
+        """
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║   WooCommerce MCP Server v2.0.0                                 ║
+║   WordPress/WooCommerce Integration for Claude                  ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
 
-    async def main():
-        print("WooCommerce MCP Client Test")
-        print("=" * 40)
+🔧 Tools Available:
+   • wc_health_check - Check store connectivity
+   • wc_search_products - Search products
+   • wc_get_product - Get product by ID
+   • wc_update_stock - Update inventory
+   • wc_list_orders - List orders
+   • wc_get_order - Get order by ID
+   • wc_update_order_status - Update order status
+   • wc_search_customers - Search customers
+   • wc_validate_coupon - Validate coupon codes
+   • wc_get_store_settings - Get store config
 
-        client = WooCommerceMCPClient()
-        await client.initialize()
-
-        # Health check
-        health = await client.health_check()
-        print(f"Health: {json.dumps(health, indent=2)}")
-
-        # List products
-        products = await client.search_products(per_page=5)
-        print(f"\nProducts found: {len(products)}")
-        for p in products[:3]:
-            print(f"  - {p.name} (SKU: {p.sku}, Price: {p.price})")
-
-        await client.close()
-
-    asyncio.run(main())
+Starting MCP server on stdio...
+"""
+    )
+    mcp.run()
