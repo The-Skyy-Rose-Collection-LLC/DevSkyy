@@ -103,6 +103,7 @@ RUN test -d ./.next || (echo "ERROR: .next directory not found" && exit 1)
 RUN test -d ./public || (echo "ERROR: public directory not found" && exit 1)
 
 # Copy application code
+COPY base.py ./
 COPY agent_sdk/ ./agent_sdk/
 COPY agents/ ./agents/
 COPY api/ ./api/

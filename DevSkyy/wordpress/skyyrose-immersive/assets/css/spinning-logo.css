@@ -1,0 +1,246 @@
+/**
+ * SkyyRose Spinning Logo Component
+ * Version: 1.0.0
+ *
+ * Implements an elegant spinning rose logo with collection-specific color variants
+ */
+
+/* ========================================
+   SPINNING LOGO COMPONENT
+   ======================================== */
+
+/* Logo Container */
+.skyyrose-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.skyyrose-logo__spinner {
+  width: 60px;
+  height: 60px;
+  /* GIF has built-in animation, but add CSS rotation as fallback */
+  animation: glow-pulse 3s ease-in-out infinite;
+  transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Ensure crisp rendering for small animated GIFs */
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+}
+
+/* Pause on hover for elegance + scale up */
+.skyyrose-logo:hover .skyyrose-logo__spinner {
+  animation-play-state: paused;
+  transform: scale(1.1);
+}
+
+/* Glow effect - enhanced */
+.skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
+}
+
+.skyyrose-logo:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 60px rgba(212, 175, 55, 0.2));
+}
+
+/* Spin Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulsing Glow Animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Mobile Size */
+@media (max-width: 768px) {
+  .skyyrose-logo__spinner {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ========================================
+   LOGO COLOR VARIANTS
+   ======================================== */
+
+/* Note: GIF logos have built-in colors, so we only adjust glow effects */
+
+/* Gold (Default - for dark backgrounds) */
+.skyyrose-logo--gold .skyyrose-logo__spinner {
+  /* Default gold glow already applied above */
+}
+
+/* Silver (BLACK ROSE pages) */
+.skyyrose-logo--silver .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 30px rgba(192, 192, 192, 0.2));
+}
+
+.skyyrose-logo--silver:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.5)) drop-shadow(0 0 40px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 60px rgba(192, 192, 192, 0.2));
+}
+
+/* Rose Gold (SIGNATURE pages) */
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 30px rgba(183, 110, 121, 0.2));
+}
+
+.skyyrose-logo--rose-gold:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(183, 110, 121, 0.5)) drop-shadow(0 0 40px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 60px rgba(183, 110, 121, 0.2));
+}
+
+/* Deep Rose (LOVE HURTS pages) */
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 30px rgba(212, 165, 165, 0.2));
+}
+
+.skyyrose-logo--deep-rose:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 165, 165, 0.5)) drop-shadow(0 0 40px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 60px rgba(212, 165, 165, 0.2));
+}
+
+/* Black (for light backgrounds) */
+.skyyrose-logo--black .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 20px rgba(0, 0, 0, 0.1));
+}
+
+.skyyrose-logo--black:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 30px rgba(0, 0, 0, 0.2));
+}
+
+/* ========================================
+   HEADER WITH SPINNING LOGO
+   ======================================== */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--header-height, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+}
+
+/* Transparent header on hero sections */
+.site-header--transparent {
+  background: transparent;
+}
+
+/* Solid header on scroll */
+.site-header--scrolled {
+  background: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Layout */
+.site-header__left,
+.site-header__right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.site-header__left {
+  justify-content: flex-start;
+}
+
+.site-header__right {
+  justify-content: flex-end;
+}
+
+.site-header__center {
+  flex: 0 0 auto;
+}
+
+/* Navigation Links */
+.site-header__nav {
+  display: flex;
+  gap: 32px;
+}
+
+.site-header__nav a {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #FAFAFA;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.site-header__nav a:hover {
+  color: #D4AF37;
+}
+
+/* Header Icons */
+.site-header__icons {
+  display: flex;
+  gap: 20px;
+}
+
+.site-header__icon {
+  width: 20px;
+  height: 20px;
+  color: #FAFAFA;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.site-header__icon:hover {
+  color: #D4AF37;
+}
+
+/* Cart Count Badge */
+.site-header__cart {
+  position: relative;
+}
+
+.site-header__cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  background: #D4AF37;
+  color: #0D0D0D;
+  font-size: 0.625rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Mobile Header */
+@media (max-width: 768px) {
+  .site-header {
+    height: var(--header-height-mobile, 60px);
+    padding: 0 16px;
+  }
+
+  .site-header__nav {
+    display: none;
+  }
+
+  .site-header__icons {
+    gap: 16px;
+  }
+}

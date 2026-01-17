@@ -33,6 +33,8 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from core.runtime.input_validator import tool_input_validator
+
 logger = logging.getLogger(__name__)
 
 
@@ -717,6 +719,24 @@ class ToolRegistry:
 
         tool = self.get(tool_name)
         handler = self.get_handler(tool_name)
+
+        # Enhanced input validation (prevents injection, DOS, malformed inputs)
+        input_schema = tool.get_json_schema() if tool else None
+        is_valid_input, input_errors = tool_input_validator.validate(
+            tool_name, params, input_schema=input_schema, request_id=context.request_id
+        )
+        if not is_valid_input:
+            return ToolExecutionResult(
+                tool_name=tool_name,
+                request_id=context.request_id,
+                status=ExecutionStatus.FAILED,
+                success=False,
+                error="Input validation failed: " + "; ".join(input_errors),
+                error_type="InputValidationError",
+                started_at=started_at,
+                completed_at=datetime.now(UTC),
+                duration_seconds=0,
+            )
 
         # Check rate limiting if tool has rate_limit set
         if tool and tool.rate_limit:

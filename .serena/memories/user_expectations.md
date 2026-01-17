@@ -9,6 +9,7 @@
 
 ## Do
 
+- **USE CONTEXT7 ON EVERY TASK** - Query library docs before writing any code
 - Build working solutions FIRST TIME
 - Deliver actual 3D clothing models, not geometric primitives
 - Test before deploying

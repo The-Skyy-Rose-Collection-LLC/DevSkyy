@@ -71,10 +71,22 @@ def test_2_rest_api_enabled() -> bool:
 
     try:
         response = requests.get(endpoint, timeout=10)
+        content_type = response.headers.get("Content-Type", "")
+
         if response.status_code == 200:
-            data = response.json()
-            print_test("REST API enabled", "PASS", f"Namespace: {data.get('namespaces', [])}")
-            return True
+            # Check if response is JSON
+            if "application/json" in content_type:
+                data = response.json()
+                print_test("REST API enabled", "PASS", f"Namespace: {data.get('namespaces', [])}")
+                return True
+            else:
+                # Got HTML or other non-JSON response
+                print_test(
+                    "REST API enabled", "FAIL", f"Got {content_type}, expected application/json"
+                )
+                print(f"       Response preview: {response.text[:300]}")
+                print("       This usually means REST API is disabled or blocked")
+                return False
         else:
             print_test("REST API enabled", "FAIL", f"Status: {response.status_code}")
             print(f"       Response: {response.text[:200]}")
@@ -117,23 +129,35 @@ def test_4_authentication() -> bool:
     try:
         auth = HTTPBasicAuth(WP_USERNAME, WP_APP_PASSWORD)
         response = requests.get(endpoint, auth=auth, timeout=10)
+        content_type = response.headers.get("Content-Type", "")
 
         if response.status_code == 200:
-            data = response.json()
-            print_test(
-                "Authentication", "PASS", f"Logged in as: {data.get('name')} (ID: {data.get('id')})"
-            )
-            return True
+            # Check if response is JSON
+            if "application/json" in content_type:
+                data = response.json()
+                print_test(
+                    "Authentication",
+                    "PASS",
+                    f"Logged in as: {data.get('name')} (ID: {data.get('id')})",
+                )
+                return True
+            else:
+                print_test("Authentication", "FAIL", f"Got {content_type}, expected JSON")
+                print(f"       Response preview: {response.text[:300]}")
+                print("       Hint: REST API may be disabled or returning login page")
+                return False
         elif response.status_code == 401:
             print_test("Authentication", "FAIL", "401 Unauthorized - Check credentials")
             print(f"       Response: {response.text[:200]}")
             return False
         else:
             print_test("Authentication", "FAIL", f"Status: {response.status_code}")
-            print(f"       Response: {response.text[:200]}")
+            print(f"       Content-Type: {content_type}")
+            print(f"       Response: {response.text[:300]}")
             return False
     except Exception as e:
         print_test("Authentication", "FAIL", f"Error: {e}")
+        print("       This usually means response is not valid JSON")
         return False
 
 
@@ -149,11 +173,17 @@ def test_5_media_endpoint() -> bool:
     try:
         auth = HTTPBasicAuth(WP_USERNAME, WP_APP_PASSWORD)
         response = requests.get(endpoint, auth=auth, timeout=10)
+        content_type = response.headers.get("Content-Type", "")
 
         if response.status_code == 200:
-            data = response.json()
-            print_test("Media endpoint", "PASS", f"Found {len(data)} media items")
-            return True
+            if "application/json" in content_type:
+                data = response.json()
+                print_test("Media endpoint", "PASS", f"Found {len(data)} media items")
+                return True
+            else:
+                print_test("Media endpoint", "FAIL", f"Got {content_type}, expected JSON")
+                print(f"       Response preview: {response.text[:300]}")
+                return False
         elif response.status_code == 401:
             print_test("Media endpoint", "FAIL", "401 Unauthorized")
             return False
@@ -181,18 +211,24 @@ def test_6_media_upload_capability() -> bool:
     try:
         auth = HTTPBasicAuth(WP_USERNAME, WP_APP_PASSWORD)
         response = requests.get(endpoint, auth=auth, params={"context": "edit"}, timeout=10)
+        content_type = response.headers.get("Content-Type", "")
 
         if response.status_code == 200:
-            data = response.json()
-            capabilities = data.get("capabilities", {})
-            has_upload = capabilities.get("upload_files", False)
+            if "application/json" in content_type:
+                data = response.json()
+                capabilities = data.get("capabilities", {})
+                has_upload = capabilities.get("upload_files", False)
 
-            if has_upload:
-                print_test("Upload capability", "PASS", "User has 'upload_files' capability")
-                return True
+                if has_upload:
+                    print_test("Upload capability", "PASS", "User has 'upload_files' capability")
+                    return True
+                else:
+                    print_test("Upload capability", "FAIL", "User lacks 'upload_files' capability")
+                    print(f"       Capabilities: {list(capabilities.keys())}")
+                    return False
             else:
-                print_test("Upload capability", "FAIL", "User lacks 'upload_files' capability")
-                print(f"       Capabilities: {list(capabilities.keys())}")
+                print_test("Upload capability", "FAIL", f"Got {content_type}, expected JSON")
+                print(f"       Response preview: {response.text[:300]}")
                 return False
         else:
             print_test(

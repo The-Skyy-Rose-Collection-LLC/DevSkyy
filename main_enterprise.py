@@ -27,6 +27,7 @@ Dependencies (verified from PyPI December 2024):
 
 import logging
 import os
+import secrets
 import uuid
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
@@ -60,6 +61,8 @@ from api.v1 import (
     ml_router,
     monitoring_router,
     orchestration_router,
+    sync_router,
+    training_router,
     wordpress_theme_router,
 )
 
@@ -595,6 +598,12 @@ async def tier_rate_limit_middleware(request: Request, call_next):
 @app.middleware("http")
 async def security_headers_middleware(request: Request, call_next):
     """Add security headers to all responses (OWASP, CSP, X-Frame-Options, etc)."""
+    # Generate nonce for this request (used for inline scripts)
+    nonce = secrets.token_urlsafe(16)
+
+    # Store nonce in request state for access in templates/responses
+    request.state.csp_nonce = nonce
+
     response = await call_next(request)
 
     # OWASP Security Headers
@@ -603,10 +612,11 @@ async def security_headers_middleware(request: Request, call_next):
     response.headers["X-XSS-Protection"] = "1; mode=block"  # XSS protection
     response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"  # HSTS
 
-    # Content Security Policy - strict but allows necessary resources
+    # Content Security Policy with nonce-based inline script support
+    # Nonce prevents XSS attacks by only allowing scripts with matching nonce attribute
     csp = (
         "default-src 'self'; "
-        "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://api.devskyy.app; "
+        f"script-src 'self' 'nonce-{nonce}' https://cdn.jsdelivr.net https://api.devskyy.app; "
         "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
         "img-src 'self' data: https: blob:; "
         "font-src 'self' https://cdn.jsdelivr.net; "
@@ -616,6 +626,9 @@ async def security_headers_middleware(request: Request, call_next):
         "form-action 'self'"
     )
     response.headers["Content-Security-Policy"] = csp
+
+    # Add nonce to response headers for frontend JavaScript access
+    response.headers["X-CSP-Nonce"] = nonce
 
     # Referrer Policy
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
@@ -744,6 +757,10 @@ app.include_router(code_router, prefix="/api/v1")
 
 # HuggingFace Spaces management
 app.include_router(hf_spaces_router, prefix="/api/v1")
+
+# Training and Sync Pipeline routers
+app.include_router(training_router, prefix="/api/v1")
+app.include_router(sync_router, prefix="/api/v1")
 
 # WordPress/WooCommerce integration
 app.include_router(wordpress_router, prefix="/api/v1")

@@ -1,0 +1,785 @@
+/**
+ * SkyyRose Luxury Design System
+ * Version: 2.0.0
+ * Based on NET-A-PORTER/SSENSE standards
+ */
+
+:root {
+    /* ========== Brand Colors ========== */
+    /* Signature Collection */
+    --rose-gold: #C9A962;
+    --pink-cloud: #B76E79;
+
+    /* Love Hurts Collection */
+    --deep-rose: #B76E79;
+    --crimson: #DC143C;
+    --midnight: #1a1a2e;
+
+    /* Black Rose Collection */
+    --cosmic-silver: #C0C0C0;
+    --obsidian: #0A0A0A;
+    --moonlight: #c8c8dc;
+
+    /* Neutrals */
+    --black: #0D0D0D;
+    --charcoal: #1A1A1A;
+    --ivory: #F5F5F0;
+    --white: #FFFFFF;
+
+    /* ========== Typography ========== */
+    --font-display: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+
+    /* Type Scale (Major Third: 1.250) */
+    --text-xs: 0.75rem;    /* 12px */
+    --text-sm: 0.875rem;   /* 14px */
+    --text-base: 1rem;     /* 16px */
+    --text-lg: 1.125rem;   /* 18px */
+    --text-xl: 1.25rem;    /* 20px */
+    --text-2xl: 1.563rem;  /* 25px */
+    --text-3xl: 1.953rem;  /* 31px */
+    --text-4xl: 2.441rem;  /* 39px */
+    --text-5xl: 3.052rem;  /* 49px */
+
+    /* Line Heights */
+    --leading-none: 1;
+    --leading-tight: 1.2;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.6;
+    --leading-loose: 2;
+
+    /* ========== Spacing (8px base) ========== */
+    --space-1: 0.5rem;   /* 8px */
+    --space-2: 1rem;     /* 16px */
+    --space-3: 1.5rem;   /* 24px */
+    --space-4: 2rem;     /* 32px */
+    --space-6: 3rem;     /* 48px - Luxury product gaps */
+    --space-8: 4rem;     /* 64px */
+    --space-10: 5rem;    /* 80px - Section padding */
+    --space-12: 6rem;    /* 96px */
+    --space-15: 7.5rem;  /* 120px - Major sections */
+
+    /* ========== Elevation (Shadows) ========== */
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.25);
+
+    /* Collection Glow Shadows */
+    --glow-gold: 0 0 30px rgba(212, 175, 55, 0.4);
+    --glow-rose-gold: 0 0 30px rgba(183, 110, 121, 0.4);
+    --glow-silver: 0 0 30px rgba(192, 192, 192, 0.4);
+    --glow-deep-rose: 0 0 30px rgba(212, 165, 165, 0.4);
+
+    /* ========== Transitions ========== */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 500ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-luxury: 600ms cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* ========== Precious Metal Gradients ========== */
+    --gradient-gold: linear-gradient(135deg, #D4AF37 0%, #F5D76E 50%, #D4AF37 100%);
+    --gradient-rose-gold: linear-gradient(135deg, #B76E79 0%, #D4A5A5 50%, #B76E79 100%);
+    --gradient-silver: linear-gradient(135deg, #A0A0A0 0%, #E8E8E8 50%, #C0C0C0 100%);
+    --gradient-obsidian: linear-gradient(180deg, #0D0D0D 0%, #1A1A1A 100%);
+
+    /* ========== Breakpoints ========== */
+    --screen-sm: 640px;
+    --screen-md: 768px;
+    --screen-lg: 1024px;
+    --screen-xl: 1280px;
+    --screen-2xl: 1536px;
+}
+
+/* ========== Typography Classes ========== */
+.text-display {
+    font-family: var(--font-display);
+    font-size: var(--text-5xl);
+    font-weight: 700;
+    line-height: var(--leading-tight);
+    letter-spacing: -0.02em;
+}
+
+.text-heading-1 {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 600;
+    line-height: var(--leading-tight);
+}
+
+.text-heading-2 {
+    font-family: var(--font-display);
+    font-size: var(--text-3xl);
+    font-weight: 600;
+    line-height: var(--leading-normal);
+}
+
+.text-body-large {
+    font-family: var(--font-body);
+    font-size: var(--text-lg);
+    font-weight: 400;
+    line-height: var(--leading-relaxed);
+}
+
+.text-body {
+    font-family: var(--font-body);
+    font-size: var(--text-base);
+    font-weight: 400;
+    line-height: var(--leading-relaxed);
+}
+
+.text-caption {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 400;
+    line-height: var(--leading-normal);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ========== Luxury Button Styles ========== */
+.btn-primary {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: var(--space-2) var(--space-6);
+    background: var(--black);
+    color: var(--white);
+    border: 2px solid var(--black);
+    transition: all var(--transition-luxury);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: left var(--transition-slow);
+}
+
+.btn-primary:hover {
+    background: var(--white);
+    color: var(--black);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:hover::before {
+    left: 100%;
+}
+
+.btn-secondary {
+    font-family: var(--font-body);
+    font-size: var(--text-sm);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: var(--space-2) var(--space-6);
+    background: transparent;
+    color: var(--black);
+    border: 2px solid var(--black);
+    transition: all var(--transition-luxury);
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: var(--black);
+    color: var(--white);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ========== Collection-Specific Buttons ========== */
+.btn-gold {
+    background: var(--gradient-gold);
+    border-color: #D4AF37;
+    color: var(--black);
+}
+
+.btn-gold:hover {
+    box-shadow: var(--glow-gold);
+}
+
+.btn-rose-gold {
+    background: var(--gradient-rose-gold);
+    border-color: #B76E79;
+    color: var(--white);
+}
+
+.btn-rose-gold:hover {
+    box-shadow: var(--glow-rose-gold);
+}
+
+.btn-silver {
+    background: var(--gradient-silver);
+    border-color: #C0C0C0;
+    color: var(--black);
+}
+
+.btn-silver:hover {
+    box-shadow: var(--glow-silver);
+}
+
+/* ========== Global Heading Typography (Override Theme) ========== */
+h1, h2, h3, h4,
+.elementor-heading-title,
+.entry-title,
+.page-title,
+.product_title,
+.woocommerce-loop-product__title,
+.collection-title,
+.hero-title {
+    font-family: 'Playfair Display', Georgia, serif !important;
+    font-weight: 600;
+    line-height: var(--leading-tight);
+    letter-spacing: -0.01em;
+}
+
+h1, .elementor-widget-heading h1 {
+    font-size: var(--text-5xl) !important;
+    font-weight: 700;
+}
+
+h2, .elementor-widget-heading h2 {
+    font-size: var(--text-4xl) !important;
+}
+
+h3, .elementor-widget-heading h3 {
+    font-size: var(--text-3xl) !important;
+}
+
+h4, .elementor-widget-heading h4 {
+    font-size: var(--text-2xl) !important;
+}
+
+/* Body text - Inter for readability */
+body,
+p,
+.elementor-widget-text-editor,
+.woocommerce-product-details__short-description {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: var(--text-base);
+    line-height: var(--leading-relaxed);
+}
+
+/* ========== Button Color Override (Gold Brand) ========== */
+.woocommerce .button,
+.woocommerce .button.alt,
+.elementor-button,
+.wp-block-button__link,
+button[type="submit"],
+input[type="submit"],
+.btn,
+a.button {
+    background: var(--gradient-gold) !important;
+    background-color: #D4AF37 !important;
+    border-color: #D4AF37 !important;
+    color: var(--black) !important;
+    font-family: 'Inter', sans-serif !important;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    transition: all var(--transition-luxury);
+}
+
+.woocommerce .button:hover,
+.woocommerce .button.alt:hover,
+.elementor-button:hover,
+.wp-block-button__link:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover,
+.btn:hover,
+a.button:hover {
+    background: var(--black) !important;
+    background-color: var(--black) !important;
+    border-color: var(--black) !important;
+    color: var(--white) !important;
+    transform: translateY(-2px);
+    box-shadow: var(--glow-gold);
+}
+
+/* Secondary/outline buttons */
+.woocommerce .button.checkout-button,
+.elementor-button-outline {
+    background: transparent !important;
+    border: 2px solid #D4AF37 !important;
+    color: #D4AF37 !important;
+}
+
+.woocommerce .button.checkout-button:hover,
+.elementor-button-outline:hover {
+    background: #D4AF37 !important;
+    color: var(--black) !important;
+}
+/**
+ * Luxury Overrides - Apply design system to WooCommerce defaults.
+ *
+ * Transforms generic WooCommerce layouts into luxury fashion e-commerce
+ * following NET-A-PORTER/SSENSE standards.
+ *
+ * @package SkyyRose_Immersive
+ * @version 2.0.0
+ */
+
+/* =============================================================================
+   Product Archives (Shop/Collection Pages)
+   ========================================================================== */
+
+.woocommerce ul.products {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6, 3rem);  /* 48px luxury gaps */
+    padding: var(--space-10, 5rem) 0;  /* 80px vertical */
+}
+
+.woocommerce ul.products li.product {
+    margin: 0;  /* Remove default margins */
+    text-align: left;
+}
+
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: var(--text-2xl, 1.563rem);
+    font-weight: 600;
+    color: var(--black, #0D0D0D);
+    margin-top: var(--space-3, 1.5rem);
+    line-height: var(--leading-normal, 1.5);
+}
+
+.woocommerce ul.products li.product .price {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: var(--text-lg, 1.125rem);
+    font-weight: 600;
+    color: var(--rose-gold, #C9A962);
+    margin-top: var(--space-2, 1rem);
+}
+
+/* === Single Product Pages === */
+.woocommerce div.product {
+    padding: var(--space-10, 5rem) 0;
+}
+
+.woocommerce div.product .product_title {
+    font-family: var(--font-display, 'Playfair Display', serif);
+    font-size: var(--text-4xl, 2.441rem);
+    font-weight: 600;
+    line-height: var(--leading-tight, 1.2);
+    color: var(--black, #0D0D0D);
+    margin-bottom: var(--space-4, 2rem);
+}
+
+.woocommerce div.product .woocommerce-product-details__short-description {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: var(--text-base, 1rem);
+    line-height: var(--leading-relaxed, 1.6);
+    color: var(--charcoal, #1A1A1A);
+    margin-bottom: var(--space-6, 3rem);
+}
+
+/* === Add to Cart Button === */
+.woocommerce .single_add_to_cart_button {
+    font-family: var(--font-body, 'Inter', sans-serif);
+    font-size: var(--text-sm, 0.875rem);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    background: var(--black, #0D0D0D);
+    color: var(--white, #FFFFFF);
+    border: 2px solid var(--black, #0D0D0D);
+    padding: var(--space-2, 1rem) var(--space-6, 3rem);
+    transition: all var(--transition-base, 300ms ease);
+}
+
+.woocommerce .single_add_to_cart_button:hover {
+    background: var(--white, #FFFFFF);
+    color: var(--black, #0D0D0D);
+}
+
+/* =============================================================================
+   Enhanced Scroll Animations
+   ========================================================================== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(40px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes scaleIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.fade-in-up {
+    animation: fadeInUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fade-in-left {
+    animation: fadeInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fade-in-right {
+    animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.scale-in {
+    animation: scaleIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger delays for sequential reveals */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Precious metal shimmer effect */
+.shimmer-gold {
+    background: linear-gradient(90deg, #D4AF37 0%, #F5D76E 25%, #D4AF37 50%, #F5D76E 75%, #D4AF37 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.shimmer-silver {
+    background: linear-gradient(90deg, #A0A0A0 0%, #E8E8E8 25%, #C0C0C0 50%, #E8E8E8 75%, #A0A0A0 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.shimmer-rose {
+    background: linear-gradient(90deg, #B76E79 0%, #D4A5A5 25%, #B76E79 50%, #D4A5A5 75%, #B76E79 100%);
+    background-size: 200% 100%;
+    animation: shimmer 3s linear infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* === Mobile Optimization (<768px) === */
+@media (max-width: 768px) {
+    .woocommerce ul.products {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--space-3);  /* Reduce to 24px on mobile */
+    }
+
+    .woocommerce div.product .product_title {
+        font-size: var(--text-3xl);  /* Smaller on mobile */
+    }
+
+    .luxury-product-card .card-title {
+        font-size: var(--text-xl);
+    }
+}
+/**
+ * SkyyRose Spinning Logo Component
+ * Version: 1.0.0
+ *
+ * Implements an elegant spinning rose logo with collection-specific color variants
+ */
+
+/* ========================================
+   SPINNING LOGO COMPONENT
+   ======================================== */
+
+/* Logo Container */
+.skyyrose-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.skyyrose-logo__spinner {
+  width: 60px;
+  height: 60px;
+  animation: spin 8s linear infinite, glow-pulse 3s ease-in-out infinite;
+  transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Pause on hover for elegance + scale up */
+.skyyrose-logo:hover .skyyrose-logo__spinner {
+  animation-play-state: paused, paused;
+  transform: scale(1.1);
+}
+
+/* Glow effect - enhanced */
+.skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
+}
+
+.skyyrose-logo:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 60px rgba(212, 175, 55, 0.2));
+}
+
+/* Spin Animation */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Pulsing Glow Animation */
+@keyframes glow-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+
+/* Mobile Size */
+@media (max-width: 768px) {
+  .skyyrose-logo__spinner {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+/* ========================================
+   LOGO COLOR VARIANTS
+   ======================================== */
+
+/* Gold (Default - for dark backgrounds) */
+.skyyrose-logo--gold .skyyrose-logo__spinner path,
+.skyyrose-logo--gold .skyyrose-logo__spinner circle {
+  fill: #D4AF37;
+}
+
+/* Silver (BLACK ROSE pages) */
+.skyyrose-logo--silver .skyyrose-logo__spinner path,
+.skyyrose-logo--silver .skyyrose-logo__spinner circle {
+  fill: #C0C0C0;
+}
+
+.skyyrose-logo--silver .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 30px rgba(192, 192, 192, 0.2));
+}
+
+.skyyrose-logo--silver:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.5)) drop-shadow(0 0 40px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 60px rgba(192, 192, 192, 0.2));
+}
+
+/* Rose Gold (SIGNATURE pages) */
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner path,
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner circle {
+  fill: #B76E79;
+}
+
+.skyyrose-logo--rose-gold .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 30px rgba(183, 110, 121, 0.2));
+}
+
+.skyyrose-logo--rose-gold:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(183, 110, 121, 0.5)) drop-shadow(0 0 40px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 60px rgba(183, 110, 121, 0.2));
+}
+
+/* Deep Rose (LOVE HURTS pages) */
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner path,
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner circle {
+  fill: #D4A5A5;
+}
+
+.skyyrose-logo--deep-rose .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 30px rgba(212, 165, 165, 0.2));
+}
+
+.skyyrose-logo--deep-rose:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 20px rgba(212, 165, 165, 0.5)) drop-shadow(0 0 40px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 60px rgba(212, 165, 165, 0.2));
+}
+
+/* Black (for light backgrounds) */
+.skyyrose-logo--black .skyyrose-logo__spinner path,
+.skyyrose-logo--black .skyyrose-logo__spinner circle {
+  fill: #0D0D0D;
+}
+
+.skyyrose-logo--black .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 20px rgba(0, 0, 0, 0.1));
+}
+
+.skyyrose-logo--black:hover .skyyrose-logo__spinner {
+  filter: drop-shadow(0 0 15px rgba(0, 0, 0, 0.3)) drop-shadow(0 0 30px rgba(0, 0, 0, 0.2));
+}
+
+/* ========================================
+   HEADER WITH SPINNING LOGO
+   ======================================== */
+
+.site-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  height: var(--header-height, 80px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  transition: all 0.3s ease;
+}
+
+/* Transparent header on hero sections */
+.site-header--transparent {
+  background: transparent;
+}
+
+/* Solid header on scroll */
+.site-header--scrolled {
+  background: rgba(13, 13, 13, 0.95);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Header Layout */
+.site-header__left,
+.site-header__right {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+
+.site-header__left {
+  justify-content: flex-start;
+}
+
+.site-header__right {
+  justify-content: flex-end;
+}
+
+.site-header__center {
+  flex: 0 0 auto;
+}
+
+/* Navigation Links */
+.site-header__nav {
+  display: flex;
+  gap: 32px;
+}
+
+.site-header__nav a {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #FAFAFA;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.site-header__nav a:hover {
+  color: #D4AF37;
+}
+
+/* Header Icons */
+.site-header__icons {
+  display: flex;
+  gap: 20px;
+}
+
+.site-header__icon {
+  width: 20px;
+  height: 20px;
+  color: #FAFAFA;
+  transition: color 0.3s ease;
+  cursor: pointer;
+}
+
+.site-header__icon:hover {
+  color: #D4AF37;
+}
+
+/* Cart Count Badge */
+.site-header__cart {
+  position: relative;
+}
+
+.site-header__cart-count {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  width: 18px;
+  height: 18px;
+  background: #D4AF37;
+  color: #0D0D0D;
+  font-size: 0.625rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+/* Mobile Header */
+@media (max-width: 768px) {
+  .site-header {
+    height: var(--header-height-mobile, 60px);
+    padding: 0 16px;
+  }
+
+  .site-header__nav {
+    display: none;
+  }
+
+  .site-header__icons {
+    gap: 16px;
+  }
+}

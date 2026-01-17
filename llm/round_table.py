@@ -250,7 +250,7 @@ class RoundTableDatabase:
         ON round_table_results(winner_provider);
 
     CREATE INDEX IF NOT EXISTS idx_round_table_task
-        ON round_table_results(task_id);."""
+        ON round_table_results(task_id);"""
 
     def __init__(self, connection_string: str | None = None):
         """Initialize database with connection string.
@@ -298,6 +298,12 @@ class RoundTableDatabase:
             data = result.to_dict()
 
             async with self._pool.acquire() as conn:
+                # Safe content extraction with guards
+                winner_content = ""
+                if result.winner and result.winner.response and result.winner.response.content:
+                    content = result.winner.response.content
+                    winner_content = str(content)[:5000] if content else ""
+
                 await conn.execute(
                     """
                     INSERT INTO round_table_results (
@@ -314,14 +320,14 @@ class RoundTableDatabase:
                         all_scores = EXCLUDED.all_scores,
                         status = EXCLUDED.status,
                         total_duration_ms = EXCLUDED.total_duration_ms,
-                        total_cost_usd = EXCLUDED.total_cost_usd.""",
+                        total_cost_usd = EXCLUDED.total_cost_usd""",
                     data["id"],
                     data["task_id"],
                     data["prompt_hash"],
                     data["prompt_preview"],
                     data["winner_provider"],
                     data["winner_score"],
-                    result.winner.response.content[:5000],
+                    winner_content,
                     data["runner_up_provider"],
                     data["runner_up_score"],
                     json.dumps(data["all_scores"]),
@@ -646,24 +652,28 @@ class ResponseScorer:
         """Score efficiency based on latency and cost."""
         score = 50.0
 
+        # Handle None values gracefully
+        latency_ms = response.latency_ms if response.latency_ms is not None else 5000.0
+        cost_usd = response.cost_usd if response.cost_usd is not None else 0.02
+
         # Latency scoring (ideal: 1-3 seconds)
-        if response.latency_ms < 1000:
+        if latency_ms < 1000:
             score += 25
-        elif response.latency_ms < 3000:
+        elif latency_ms < 3000:
             score += 20
-        elif response.latency_ms < 5000:
+        elif latency_ms < 5000:
             score += 10
-        elif response.latency_ms > 10000:
+        elif latency_ms > 10000:
             score -= 15
 
         # Cost scoring (ideal: < $0.01)
-        if response.cost_usd < 0.005:
+        if cost_usd < 0.005:
             score += 25
-        elif response.cost_usd < 0.01:
+        elif cost_usd < 0.01:
             score += 20
-        elif response.cost_usd < 0.05:
+        elif cost_usd < 0.05:
             score += 10
-        elif response.cost_usd > 0.10:
+        elif cost_usd > 0.10:
             score -= 15
 
         return min(100.0, max(0.0, score))
@@ -1132,7 +1142,12 @@ class LLMRoundTable:
             scored_entries = await self._score_all(entries, prompt, context, tools)
 
             # Phase 3: Rank and select top 2
-            ranked_entries = sorted(scored_entries, key=lambda e: e.total_score, reverse=True)
+            # Handle None scores (failed providers) by treating them as 0
+            ranked_entries = sorted(
+                scored_entries,
+                key=lambda e: e.total_score if e.total_score is not None else 0.0,
+                reverse=True,
+            )
             for i, entry in enumerate(ranked_entries):
                 entry.rank = i + 1
 
@@ -1146,9 +1161,11 @@ class LLMRoundTable:
             else:
                 winner = top_two[0]
 
-            # Calculate totals
+            # Calculate totals with guards for None values
             total_duration_ms = (time.time() - start_time) * 1000
-            total_cost_usd = sum(e.response.cost_usd for e in entries)
+            total_cost_usd = sum(
+                (e.response.cost_usd or 0.0) if e.response else 0.0 for e in entries
+            )
 
             # Create result
             result = RoundTableResult(
@@ -1183,10 +1200,11 @@ class LLMRoundTable:
             # Record provider results and update adaptive learning
             for entry in ranked_entries:
                 won = entry == winner
+                entry_score = entry.total_score if entry.total_score is not None else 0.0
                 record_provider_result(
                     provider=entry.provider.value,
                     won=won,
-                    score=entry.total_score,
+                    score=entry_score,
                     latency_ms=entry.response.latency_ms,
                     cost_usd=entry.response.cost_usd,
                     task_category=task_category,
@@ -1197,7 +1215,7 @@ class LLMRoundTable:
                     await self._adaptive_engine.update_from_competition(
                         provider=entry.provider.value,
                         won=won,
-                        score=entry.total_score,
+                        score=entry_score,
                         latency_ms=entry.response.latency_ms,
                         cost=entry.response.cost_usd,
                         category=task_category,
@@ -1218,9 +1236,10 @@ class LLMRoundTable:
                 }
                 record_scoring_components(entry.provider.value, scores_dict)
 
+            winner_score = winner.total_score if winner.total_score is not None else 0.0
             logger.info(
                 f"Round Table completed: Winner={winner.provider.value}, "
-                f"Score={winner.total_score:.2f}, Duration={total_duration_ms:.0f}ms"
+                f"Score={winner_score:.2f}, Duration={total_duration_ms:.0f}ms"
             )
 
             return result
@@ -1256,13 +1275,14 @@ class LLMRoundTable:
                 # Handle different response formats
                 if isinstance(result, dict):
                     content = result.get("content") or result.get("text") or str(result)
-                    tokens = result.get("tokens_used", 0)
-                    cost = result.get("cost_usd", 0.0)
+                    tokens = result.get("total_tokens", 0) or result.get("tokens_used", 0)
+                    cost = result.get("cost_usd") or 0.0
                     model = result.get("model", "")
                 elif hasattr(result, "content"):
                     content = result.content
-                    tokens = getattr(result, "tokens_used", 0)
-                    cost = getattr(result, "cost_usd", 0.0)
+                    # CompletionResponse uses total_tokens, not tokens_used
+                    tokens = getattr(result, "total_tokens", 0) or getattr(result, "tokens_used", 0)
+                    cost = getattr(result, "cost_usd", None) or 0.0
                     model = getattr(result, "model", "")
                 else:
                     content = str(result)
@@ -1325,18 +1345,18 @@ class LLMRoundTable:
         is_significant = False
 
         if self._statistical_analyzer and len(self._history) >= 10:
-            # Gather historical scores for both providers
+            # Gather historical scores for both providers (filter out None values)
             scores_a = [
                 e.total_score
                 for result in self._history[-50:]  # Last 50 competitions
                 for e in result.entries
-                if e.provider == entry_a.provider
+                if e.provider == entry_a.provider and e.total_score is not None
             ]
             scores_b = [
                 e.total_score
                 for result in self._history[-50:]
                 for e in result.entries
-                if e.provider == entry_b.provider
+                if e.provider == entry_b.provider and e.total_score is not None
             ]
 
             # Run statistical analysis if enough samples
@@ -1397,7 +1417,9 @@ REASONING: Your detailed explanation."""
         judge_generator = self._providers.get(self._judge_provider)
         confidence = 0.5
         reasoning = "Fallback to scores"
-        winner = entry_a if entry_a.total_score >= entry_b.total_score else entry_b
+        score_a = entry_a.total_score if entry_a.total_score is not None else 0.0
+        score_b = entry_b.total_score if entry_b.total_score is not None else 0.0
+        winner = entry_a if score_a >= score_b else entry_b
 
         if judge_generator:
             try:
@@ -1509,7 +1531,9 @@ REASONING: Your detailed explanation."""
                 for entry in result.entries:
                     p = entry.provider.value
                     stats[p]["total"] += 1
-                    stats[p]["total_score"] += entry.total_score
+                    # Guard against None total_score
+                    score = entry.total_score if entry.total_score is not None else 0.0
+                    stats[p]["total_score"] += score
 
                 # Count win
                 if result.winner:

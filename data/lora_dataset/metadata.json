@@ -1,0 +1,1252 @@
+{
+  "dataset_name": "skyyrose-product-lora",
+  "num_images": 249,
+  "images": [
+    {
+      "file_name": "image_0000.jpg",
+      "caption": "skyyrose IMG collection, 1733, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0001.jpg",
+      "caption": "skyyrose IMG collection, 3267, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0002.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Original Label Tee (White), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0003.jpg",
+      "caption": "skyyrose PhotoRoom collection, 018 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0004.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0005.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 201933, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0006.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20221210 093149, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0007.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection   Fannie  Pack front 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0008.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20230130 001050, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0009.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0010.jpg",
+      "caption": "skyyrose Photo Sep 20 2022, 7 56 54 PM collection, Photo Sep 20 2022, 7 56 54 PM_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Sep 20 2022, 7 56 54 PM"
+    },
+    {
+      "file_name": "image_0011.jpg",
+      "caption": "skyyrose PhotoRoom collection, 017 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0012.jpg",
+      "caption": "skyyrose Men windbreaker jacket (1) collection, Men windbreaker jacket (1)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Men windbreaker jacket (1)"
+    },
+    {
+      "file_name": "image_0013.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Original Label Tee (Orchid), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0014.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Cotton Candy Tee, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0015.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM collection, Photo Dec 18 2023, 6 09 21 PM_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM"
+    },
+    {
+      "file_name": "image_0016.jpg",
+      "caption": "skyyrose PhotoRoom collection, 009 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0017.jpg",
+      "caption": "skyyrose The Mint n Lavender Women Hooded Dress collection, The Mint n Lavender Women Hooded Dress_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Mint n Lavender Women Hooded Dress"
+    },
+    {
+      "file_name": "image_0018.jpg",
+      "caption": "skyyrose PhotoRoom collection, 006 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0019.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 202007, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0020.jpg",
+      "caption": "skyyrose PhotoRoom collection, 022 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0021.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0022.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20221110 200039, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0023.jpg",
+      "caption": "skyyrose IMG collection, 0114, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0024.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  Sincerely Hearted Joggers (Black), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0025.jpg",
+      "caption": "skyyrose PhotoRoom collection, 011 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0026.jpg",
+      "caption": "skyyrose The Signature Shorts collection, The Signature Shorts_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Signature Shorts"
+    },
+    {
+      "file_name": "image_0027.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  The Fannie 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0028.jpg",
+      "caption": "skyyrose PhotoRoom collection, 008 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0029.jpg",
+      "caption": "skyyrose PhotoRoom collection, 007 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0030.jpg",
+      "caption": "skyyrose IMG collection, 0115, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0031.jpg",
+      "caption": "skyyrose Love Hurts Logo collection, Love Hurts Logo_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Love Hurts Logo"
+    },
+    {
+      "file_name": "image_0032.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0033.jpg",
+      "caption": "skyyrose Stay Golden Tee collection, Stay Golden Tee_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Stay Golden Tee"
+    },
+    {
+      "file_name": "image_0034.jpg",
+      "caption": "skyyrose PhotoRoom collection, 023 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0035.jpg",
+      "caption": "skyyrose IMG collection, 2103, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0036.jpg",
+      "caption": "skyyrose PhotoRoom collection, 019 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0037.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20221110 201626, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0038.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 202133, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0039.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  Sincerely Hearted Joggers (White), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0040.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Lavender Rose Beanie, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0041.jpg",
+      "caption": "skyyrose IMG collection, 0255, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0042.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0043.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0044.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (2) collection, Photo Dec 18 2023, 6 09 21 PM (2)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (2)"
+    },
+    {
+      "file_name": "image_0045.jpg",
+      "caption": "skyyrose product collection, 11, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0046.jpg",
+      "caption": "skyyrose IMG collection, 2102, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0047.jpg",
+      "caption": "skyyrose PhotoRoom collection, 016 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0048.jpg",
+      "caption": "skyyrose PhotoRoom collection, 004 20221110 200039, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0049.jpg",
+      "caption": "skyyrose PhotoRoom collection, 005 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0050.jpg",
+      "caption": "skyyrose PhotoRoom collection, 013 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0051.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Signature Shorts(1), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0052.jpg",
+      "caption": "skyyrose The Mint and Lavender Hoodie collection, The Mint and Lavender Hoodie_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Mint and Lavender Hoodie"
+    },
+    {
+      "file_name": "image_0053.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0054.jpg",
+      "caption": "skyyrose Womens windbreaker jackets collection, Womens windbreaker jackets_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Womens windbreaker jackets"
+    },
+    {
+      "file_name": "image_0055.jpg",
+      "caption": "skyyrose PhotoRoom collection, 021 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0056.jpg",
+      "caption": "skyyrose PhotoRoom collection, 005 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0057.jpg",
+      "caption": "skyyrose The Pink Smoke Crewneck collection, The Pink Smoke Crewneck_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Pink Smoke Crewneck"
+    },
+    {
+      "file_name": "image_0058.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0059.jpg",
+      "caption": "skyyrose Signature Collection Logo 1 collection, Signature Collection Logo 1_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Signature Collection Logo 1"
+    },
+    {
+      "file_name": "image_0060.jpg",
+      "caption": "skyyrose mens Windbreaker shorts collection, mens Windbreaker shorts_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "mens Windbreaker shorts"
+    },
+    {
+      "file_name": "image_0061.jpg",
+      "caption": "skyyrose PhotoRoom collection, 014 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0062.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0063.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Crop Hoodie back, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0064.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (13) collection, Photo Dec 18 2023, 6 09 21 PM (13)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (13)"
+    },
+    {
+      "file_name": "image_0065.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0066.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Hoodie, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0067.jpg",
+      "caption": "skyyrose IMG collection, 0117, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0068.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Cotton Candy Shorts, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0069.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection   Fannie  Pack, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0070.jpg",
+      "caption": "skyyrose PhotoRoom collection, 015 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0071.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (4) collection, Photo Dec 18 2023, 6 09 21 PM (4)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (4)"
+    },
+    {
+      "file_name": "image_0072.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Signature Shorts, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0073.jpg",
+      "caption": "skyyrose PhotoRoom collection, 004 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0074.jpg",
+      "caption": "skyyrose  collection, The Signature Collection  The Sherpa 3, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0075.jpg",
+      "caption": "skyyrose PhotoRoom collection, 012 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0076.jpg",
+      "caption": "skyyrose The FANNIE Pack collection, The FANNIE Pack_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The FANNIE Pack"
+    },
+    {
+      "file_name": "image_0077.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Crop Hoodie front, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0078.jpg",
+      "caption": "skyyrose  collection, The Signature Collection  The Sherpa 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0079.jpg",
+      "caption": "skyyrose Signature Collection Red Rose Beanie collection, Signature Collection Red Rose Beanie_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Signature Collection Red Rose Beanie"
+    },
+    {
+      "file_name": "image_0080.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0081.jpg",
+      "caption": "skyyrose product collection, 12, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0082.jpg",
+      "caption": "skyyrose product collection, 15, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0083.jpg",
+      "caption": "skyyrose IMG collection, 1733, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0084.jpg",
+      "caption": "skyyrose IMG collection, 3267, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0085.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Original Label Tee (White), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0086.jpg",
+      "caption": "skyyrose PhotoRoom collection, 018 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0087.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0088.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 201933, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0089.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20221210 093149, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0090.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection   Fannie  Pack front 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0091.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20230130 001050, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0092.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0093.jpg",
+      "caption": "skyyrose Photo Sep 20 2022, 7 56 54 PM collection, Photo Sep 20 2022, 7 56 54 PM_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Sep 20 2022, 7 56 54 PM"
+    },
+    {
+      "file_name": "image_0094.jpg",
+      "caption": "skyyrose PhotoRoom collection, 017 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0095.jpg",
+      "caption": "skyyrose Men windbreaker jacket (1) collection, Men windbreaker jacket (1)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Men windbreaker jacket (1)"
+    },
+    {
+      "file_name": "image_0096.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Original Label Tee (Orchid), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0097.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Cotton Candy Tee, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0098.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM collection, Photo Dec 18 2023, 6 09 21 PM_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM"
+    },
+    {
+      "file_name": "image_0099.jpg",
+      "caption": "skyyrose PhotoRoom collection, 009 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0100.jpg",
+      "caption": "skyyrose The Mint n Lavender Women Hooded Dress collection, The Mint n Lavender Women Hooded Dress_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Mint n Lavender Women Hooded Dress"
+    },
+    {
+      "file_name": "image_0101.jpg",
+      "caption": "skyyrose PhotoRoom collection, 006 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0102.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 202007, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0103.jpg",
+      "caption": "skyyrose PhotoRoom collection, 022 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0104.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0105.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20221110 200039, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0106.jpg",
+      "caption": "skyyrose IMG collection, 0114, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0107.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  Sincerely Hearted Joggers (Black), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0108.jpg",
+      "caption": "skyyrose PhotoRoom collection, 011 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0109.jpg",
+      "caption": "skyyrose The Signature Shorts collection, The Signature Shorts_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Signature Shorts"
+    },
+    {
+      "file_name": "image_0110.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  The Fannie 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0111.jpg",
+      "caption": "skyyrose PhotoRoom collection, 008 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0112.jpg",
+      "caption": "skyyrose PhotoRoom collection, 007 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0113.jpg",
+      "caption": "skyyrose IMG collection, 0115, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0114.jpg",
+      "caption": "skyyrose Love Hurts Logo collection, Love Hurts Logo_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Love Hurts Logo"
+    },
+    {
+      "file_name": "image_0115.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0116.jpg",
+      "caption": "skyyrose Stay Golden Tee collection, Stay Golden Tee_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Stay Golden Tee"
+    },
+    {
+      "file_name": "image_0117.jpg",
+      "caption": "skyyrose PhotoRoom collection, 023 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0118.jpg",
+      "caption": "skyyrose IMG collection, 2103, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0119.jpg",
+      "caption": "skyyrose PhotoRoom collection, 019 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0120.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20221110 201626, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0121.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 202133, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0122.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  Sincerely Hearted Joggers (White), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0123.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Lavender Rose Beanie, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0124.jpg",
+      "caption": "skyyrose IMG collection, 0255, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0125.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0126.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0127.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (2) collection, Photo Dec 18 2023, 6 09 21 PM (2)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (2)"
+    },
+    {
+      "file_name": "image_0128.jpg",
+      "caption": "skyyrose product collection, 11, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0129.jpg",
+      "caption": "skyyrose IMG collection, 2102, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0130.jpg",
+      "caption": "skyyrose PhotoRoom collection, 016 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0131.jpg",
+      "caption": "skyyrose PhotoRoom collection, 004 20221110 200039, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0132.jpg",
+      "caption": "skyyrose PhotoRoom collection, 005 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0133.jpg",
+      "caption": "skyyrose PhotoRoom collection, 013 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0134.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Signature Shorts(1), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0135.jpg",
+      "caption": "skyyrose The Mint and Lavender Hoodie collection, The Mint and Lavender Hoodie_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Mint and Lavender Hoodie"
+    },
+    {
+      "file_name": "image_0136.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0137.jpg",
+      "caption": "skyyrose Womens windbreaker jackets collection, Womens windbreaker jackets_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Womens windbreaker jackets"
+    },
+    {
+      "file_name": "image_0138.jpg",
+      "caption": "skyyrose PhotoRoom collection, 021 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0139.jpg",
+      "caption": "skyyrose PhotoRoom collection, 005 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0140.jpg",
+      "caption": "skyyrose The Pink Smoke Crewneck collection, The Pink Smoke Crewneck_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Pink Smoke Crewneck"
+    },
+    {
+      "file_name": "image_0141.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0142.jpg",
+      "caption": "skyyrose Signature Collection Logo 1 collection, Signature Collection Logo 1_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Signature Collection Logo 1"
+    },
+    {
+      "file_name": "image_0143.jpg",
+      "caption": "skyyrose mens Windbreaker shorts collection, mens Windbreaker shorts_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "mens Windbreaker shorts"
+    },
+    {
+      "file_name": "image_0144.jpg",
+      "caption": "skyyrose PhotoRoom collection, 014 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0145.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0146.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Crop Hoodie back, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0147.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (13) collection, Photo Dec 18 2023, 6 09 21 PM (13)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (13)"
+    },
+    {
+      "file_name": "image_0148.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0149.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Hoodie, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0150.jpg",
+      "caption": "skyyrose IMG collection, 0117, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0151.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Cotton Candy Shorts, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0152.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection   Fannie  Pack, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0153.jpg",
+      "caption": "skyyrose PhotoRoom collection, 015 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0154.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (4) collection, Photo Dec 18 2023, 6 09 21 PM (4)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (4)"
+    },
+    {
+      "file_name": "image_0155.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Signature Shorts, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0156.jpg",
+      "caption": "skyyrose PhotoRoom collection, 004 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0157.jpg",
+      "caption": "skyyrose  collection, The Signature Collection  The Sherpa 3, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0158.jpg",
+      "caption": "skyyrose PhotoRoom collection, 012 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0159.jpg",
+      "caption": "skyyrose The FANNIE Pack collection, The FANNIE Pack_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The FANNIE Pack"
+    },
+    {
+      "file_name": "image_0160.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Crop Hoodie front, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0161.jpg",
+      "caption": "skyyrose  collection, The Signature Collection  The Sherpa 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0162.jpg",
+      "caption": "skyyrose Signature Collection Red Rose Beanie collection, Signature Collection Red Rose Beanie_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Signature Collection Red Rose Beanie"
+    },
+    {
+      "file_name": "image_0163.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0164.jpg",
+      "caption": "skyyrose product collection, 12, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0165.jpg",
+      "caption": "skyyrose product collection, 15, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0166.jpg",
+      "caption": "skyyrose IMG collection, 1733, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0167.jpg",
+      "caption": "skyyrose IMG collection, 3267, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0168.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Original Label Tee (White), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0169.jpg",
+      "caption": "skyyrose PhotoRoom collection, 018 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0170.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0171.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 201933, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0172.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20221210 093149, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0173.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection   Fannie  Pack front 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0174.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20230130 001050, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0175.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0176.jpg",
+      "caption": "skyyrose Photo Sep 20 2022, 7 56 54 PM collection, Photo Sep 20 2022, 7 56 54 PM_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Sep 20 2022, 7 56 54 PM"
+    },
+    {
+      "file_name": "image_0177.jpg",
+      "caption": "skyyrose PhotoRoom collection, 017 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0178.jpg",
+      "caption": "skyyrose Men windbreaker jacket (1) collection, Men windbreaker jacket (1)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Men windbreaker jacket (1)"
+    },
+    {
+      "file_name": "image_0179.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Original Label Tee (Orchid), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0180.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Cotton Candy Tee, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0181.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM collection, Photo Dec 18 2023, 6 09 21 PM_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM"
+    },
+    {
+      "file_name": "image_0182.jpg",
+      "caption": "skyyrose PhotoRoom collection, 009 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0183.jpg",
+      "caption": "skyyrose The Mint n Lavender Women Hooded Dress collection, The Mint n Lavender Women Hooded Dress_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Mint n Lavender Women Hooded Dress"
+    },
+    {
+      "file_name": "image_0184.jpg",
+      "caption": "skyyrose PhotoRoom collection, 006 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0185.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 202007, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0186.jpg",
+      "caption": "skyyrose PhotoRoom collection, 022 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0187.jpg",
+      "caption": "skyyrose PhotoRoom collection, 001 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0188.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20221110 200039, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0189.jpg",
+      "caption": "skyyrose IMG collection, 0114, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0190.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  Sincerely Hearted Joggers (Black), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0191.jpg",
+      "caption": "skyyrose PhotoRoom collection, 011 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0192.jpg",
+      "caption": "skyyrose The Signature Shorts collection, The Signature Shorts_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Signature Shorts"
+    },
+    {
+      "file_name": "image_0193.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  The Fannie 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0194.jpg",
+      "caption": "skyyrose PhotoRoom collection, 008 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0195.jpg",
+      "caption": "skyyrose PhotoRoom collection, 007 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0196.jpg",
+      "caption": "skyyrose IMG collection, 0115, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0197.jpg",
+      "caption": "skyyrose Love Hurts Logo collection, Love Hurts Logo_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Love Hurts Logo"
+    },
+    {
+      "file_name": "image_0198.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0199.jpg",
+      "caption": "skyyrose Stay Golden Tee collection, Stay Golden Tee_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Stay Golden Tee"
+    },
+    {
+      "file_name": "image_0200.jpg",
+      "caption": "skyyrose PhotoRoom collection, 023 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0201.jpg",
+      "caption": "skyyrose IMG collection, 2103, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0202.jpg",
+      "caption": "skyyrose PhotoRoom collection, 019 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0203.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20221110 201626, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0204.jpg",
+      "caption": "skyyrose PhotoRoom collection, 20221110 202133, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0205.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection  Sincerely Hearted Joggers (White), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0206.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Lavender Rose Beanie, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0207.jpg",
+      "caption": "skyyrose IMG collection, 0255, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0208.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0209.jpg",
+      "caption": "skyyrose PhotoRoom collection, 000 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0210.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (2) collection, Photo Dec 18 2023, 6 09 21 PM (2)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (2)"
+    },
+    {
+      "file_name": "image_0211.jpg",
+      "caption": "skyyrose product collection, 11, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0212.jpg",
+      "caption": "skyyrose IMG collection, 2102, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0213.jpg",
+      "caption": "skyyrose PhotoRoom collection, 016 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0214.jpg",
+      "caption": "skyyrose PhotoRoom collection, 004 20221110 200039, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0215.jpg",
+      "caption": "skyyrose PhotoRoom collection, 005 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0216.jpg",
+      "caption": "skyyrose PhotoRoom collection, 013 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0217.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Signature Shorts(1), luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0218.jpg",
+      "caption": "skyyrose The Mint and Lavender Hoodie collection, The Mint and Lavender Hoodie_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Mint and Lavender Hoodie"
+    },
+    {
+      "file_name": "image_0219.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0220.jpg",
+      "caption": "skyyrose Womens windbreaker jackets collection, Womens windbreaker jackets_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Womens windbreaker jackets"
+    },
+    {
+      "file_name": "image_0221.jpg",
+      "caption": "skyyrose PhotoRoom collection, 021 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0222.jpg",
+      "caption": "skyyrose PhotoRoom collection, 005 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0223.jpg",
+      "caption": "skyyrose The Pink Smoke Crewneck collection, The Pink Smoke Crewneck_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The Pink Smoke Crewneck"
+    },
+    {
+      "file_name": "image_0224.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0225.jpg",
+      "caption": "skyyrose Signature Collection Logo 1 collection, Signature Collection Logo 1_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Signature Collection Logo 1"
+    },
+    {
+      "file_name": "image_0226.jpg",
+      "caption": "skyyrose mens Windbreaker shorts collection, mens Windbreaker shorts_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "mens Windbreaker shorts"
+    },
+    {
+      "file_name": "image_0227.jpg",
+      "caption": "skyyrose PhotoRoom collection, 014 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0228.jpg",
+      "caption": "skyyrose PhotoRoom collection, 002 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0229.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Crop Hoodie back, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0230.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (13) collection, Photo Dec 18 2023, 6 09 21 PM (13)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (13)"
+    },
+    {
+      "file_name": "image_0231.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0232.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Hoodie, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0233.jpg",
+      "caption": "skyyrose IMG collection, 0117, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "IMG"
+    },
+    {
+      "file_name": "image_0234.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Cotton Candy Shorts, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0235.jpg",
+      "caption": "skyyrose  collection, Love Hurts Collection   Fannie  Pack, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0236.jpg",
+      "caption": "skyyrose PhotoRoom collection, 015 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0237.jpg",
+      "caption": "skyyrose Photo Dec 18 2023, 6 09 21 PM (4) collection, Photo Dec 18 2023, 6 09 21 PM (4)_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Photo Dec 18 2023, 6 09 21 PM (4)"
+    },
+    {
+      "file_name": "image_0238.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Signature Shorts, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0239.jpg",
+      "caption": "skyyrose PhotoRoom collection, 004 20231221 222005, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0240.jpg",
+      "caption": "skyyrose  collection, The Signature Collection  The Sherpa 3, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0241.jpg",
+      "caption": "skyyrose PhotoRoom collection, 012 20231221 160237, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0242.jpg",
+      "caption": "skyyrose The FANNIE Pack collection, The FANNIE Pack_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "The FANNIE Pack"
+    },
+    {
+      "file_name": "image_0243.jpg",
+      "caption": "skyyrose  collection, Signature Collection  Crop Hoodie front, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0244.jpg",
+      "caption": "skyyrose  collection, The Signature Collection  The Sherpa 2, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": ""
+    },
+    {
+      "file_name": "image_0245.jpg",
+      "caption": "skyyrose Signature Collection Red Rose Beanie collection, Signature Collection Red Rose Beanie_main, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "Signature Collection Red Rose Beanie"
+    },
+    {
+      "file_name": "image_0246.jpg",
+      "caption": "skyyrose PhotoRoom collection, 003 20231221 072338, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "PhotoRoom"
+    },
+    {
+      "file_name": "image_0247.jpg",
+      "caption": "skyyrose product collection, 12, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    },
+    {
+      "file_name": "image_0248.jpg",
+      "caption": "skyyrose product collection, 15, luxury streetwear, professional product photography, studio lighting, rose gold accents",
+      "collection": "product"
+    }
+  ],
+  "created_at": "2026-01-14T10:54:47.475143"
+}

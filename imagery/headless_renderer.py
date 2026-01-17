@@ -22,7 +22,39 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 # Set headless rendering before importing pyrender
-os.environ["PYOPENGL_PLATFORM"] = "osmesa"  # or "egl" on Linux with GPU
+import platform
+
+
+def _configure_opengl_platform():
+    """Configure OpenGL platform for headless rendering."""
+    system = platform.system()
+
+    if system == "Darwin":  # macOS
+        # Check for Homebrew Mesa EGL (headless support)
+        homebrew_egl = "/opt/homebrew/Cellar/mesa/25.3.3/lib/libEGL.dylib"
+        homebrew_lib = "/opt/homebrew/lib/libEGL.dylib"
+
+        if os.path.exists(homebrew_egl) or os.path.exists(homebrew_lib):
+            # Add Homebrew lib to path for EGL
+            os.environ["DYLD_LIBRARY_PATH"] = "/opt/homebrew/lib:" + os.environ.get(
+                "DYLD_LIBRARY_PATH", ""
+            )
+            os.environ["PYOPENGL_PLATFORM"] = "egl"
+            return "egl"
+        # Otherwise use native CGL (requires display)
+        return "cgl"
+    else:  # Linux
+        if os.path.exists("/usr/lib/libEGL.so") or os.path.exists(
+            "/usr/lib/x86_64-linux-gnu/libEGL.so"
+        ):
+            os.environ["PYOPENGL_PLATFORM"] = "egl"
+            return "egl"
+        else:
+            os.environ["PYOPENGL_PLATFORM"] = "osmesa"
+            return "osmesa"
+
+
+_opengl_platform = _configure_opengl_platform()
 
 # Optional imports with availability flags
 try:

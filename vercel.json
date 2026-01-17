@@ -1,5 +1,6 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rootDirectory": "frontend",
   "regions": ["iad1"],
   "env": {
     "NEXT_PUBLIC_SITE_URL": "https://app.devskyy.app"
