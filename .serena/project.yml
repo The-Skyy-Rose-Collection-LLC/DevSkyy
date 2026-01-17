@@ -16,6 +16,7 @@
 languages:
 - python
 - typescript
+- java
 encoding: "utf-8"
 
 # whether to use the project's gitignore file to ignore files
@@ -89,3 +90,4 @@ included_optional_tools:
 - replace_lines
 - restart_language_server
 - summarize_changes
+fixed_tools: []

@@ -54,6 +54,21 @@ interface WooCommerceProduct {
   link: string;
 }
 
+// WordPress media interface
+interface WordPressMedia {
+  id: number;
+  title: string;
+  source_url: string;
+  alt_text: string;
+  mime_type: string;
+  date: string;
+  media_details?: {
+    width: number;
+    height: number;
+    file: string;
+  };
+}
+
 export default function WordPressPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'pages' | 'products' | 'media' | 'sync'>('overview');
   const [status, setStatus] = useState<WordPressStatus | null>(null);
@@ -61,6 +76,8 @@ export default function WordPressPage() {
   const [syncing, setSyncing] = useState(false);
   const [pages, setPages] = useState<WordPressPage[]>([]);
   const [products, setProducts] = useState<WooCommerceProduct[]>([]);
+  const [media, setMedia] = useState<WordPressMedia[]>([]);
+  const [mediaFilter, setMediaFilter] = useState<'all' | 'image' | 'video' | 'document'>('all');
 
   // Fetch WordPress status
   useEffect(() => {
@@ -108,6 +125,28 @@ export default function WordPressPage() {
     }
   };
 
+  // Fetch media
+  const fetchMedia = async () => {
+    try {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/v1/wordpress/media`);
+      if (response.ok) {
+        const data = await response.json();
+        setMedia(data.items || data || []);
+      }
+    } catch (error) {
+      console.error('Failed to fetch media:', error);
+    }
+  };
+
+  // Filter media by type
+  const filteredMedia = media.filter((item) => {
+    if (mediaFilter === 'all') return true;
+    if (mediaFilter === 'image') return item.mime_type?.startsWith('image/');
+    if (mediaFilter === 'video') return item.mime_type?.startsWith('video/');
+    if (mediaFilter === 'document') return !item.mime_type?.startsWith('image/') && !item.mime_type?.startsWith('video/');
+    return true;
+  });
+
   // Trigger sync
   const handleSync = async () => {
     setSyncing(true);
@@ -134,6 +173,9 @@ export default function WordPressPage() {
     }
     if (activeTab === 'products' && products.length === 0) {
       fetchProducts();
+    }
+    if (activeTab === 'media' && media.length === 0) {
+      fetchMedia();
     }
   }, [activeTab]);
 
@@ -415,14 +457,92 @@ export default function WordPressPage() {
         {activeTab === 'media' && (
           <Card>
             <CardHeader>
-              <CardTitle>Media Library</CardTitle>
-              <CardDescription>Manage WordPress media files</CardDescription>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Media Library</CardTitle>
+                  <CardDescription>
+                    {media.length} media items • {filteredMedia.length} showing
+                  </CardDescription>
+                </div>
+                <div className="flex items-center gap-2">
+                  <select
+                    value={mediaFilter}
+                    onChange={(e) => setMediaFilter(e.target.value as any)}
+                    className="px-3 py-1 border rounded text-sm"
+                  >
+                    <option value="all">All Types</option>
+                    <option value="image">Images</option>
+                    <option value="video">Videos</option>
+                    <option value="document">Documents</option>
+                  </select>
+                  <button
+                    onClick={fetchMedia}
+                    className="flex items-center gap-1 px-3 py-1 border rounded text-sm hover:bg-gray-50"
+                  >
+                    <RefreshCw className="h-3 w-3" />
+                    Refresh
+                  </button>
+                </div>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-12 text-gray-500">
-                <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Media management coming soon</p>
-              </div>
+              {media.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                  <p>No media found. Sync with WordPress to load media.</p>
+                  <button
+                    onClick={fetchMedia}
+                    className="mt-4 px-4 py-2 bg-brand-primary text-white rounded hover:bg-brand-primary/90"
+                  >
+                    Load Media
+                  </button>
+                </div>
+              ) : (
+                <div className="grid gap-4 grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5">
+                  {filteredMedia.map((item) => (
+                    <div
+                      key={item.id}
+                      className="group relative border rounded-lg overflow-hidden hover:shadow-lg transition-shadow"
+                    >
+                      {item.mime_type?.startsWith('image/') ? (
+                        <div className="aspect-square bg-gray-100">
+                          <img
+                            src={item.source_url}
+                            alt={item.alt_text || item.title}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-square bg-gray-100 flex items-center justify-center">
+                          <FileText className="h-12 w-12 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="p-2">
+                        <p className="text-xs font-medium truncate" title={item.title}>
+                          {item.title}
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          {item.media_details?.width && item.media_details?.height
+                            ? `${item.media_details.width}×${item.media_details.height}`
+                            : item.mime_type?.split('/')[1]?.toUpperCase() || 'File'}
+                        </p>
+                      </div>
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                        <a
+                          href={item.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 bg-white rounded-full hover:bg-gray-100"
+                          title="View full size"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         )}

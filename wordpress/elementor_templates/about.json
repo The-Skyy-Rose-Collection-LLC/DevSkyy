@@ -74,7 +74,7 @@
                 "editor": "<p>A love letter to Oakland. Born from The Town's heart, where BART rumbles beneath heritage and the Bay Bridge frames our ambition. A revolution in streetwear forged on Oakland streets.</p>",
                 "align": "center",
                 "text_color": "#D4AF37",
-                "typography_font_family": "Inter",
+                "typography_font_family": "Outfit",
                 "typography_font_size": {"size": 22, "unit": "px"},
                 "typography_font_style": "italic"
               }
@@ -141,7 +141,7 @@
                 "editor": "<p style='font-size: 18px; line-height: 1.8; margin-bottom: 24px;'>SkyyRose was born from Oakland's beating heart — where West Oakland warehouses meet Lake Merritt sunsets, where BART commuters carry dreams beneath the city's pulse, where the Bay Bridge rises through fog each morning as The Town awakens. Street culture forged in Oakland's fire meets luxury craftsmanship refined for global stages.</p><p style='font-size: 18px; line-height: 1.8; margin-bottom: 24px;'>What started as late nights in Oakland studios — surrounded by Fillmore jazz heritage, inspired by day-one supporters who believed when The Town was our only audience — has evolved into a global movement. From underground fashion shows in Jack London Square to international runways, Oakland's authenticity remains our foundation. The Bay Area doesn't follow trends; we set the standard the world chases.</p><p style='font-size: 18px; line-height: 1.8;'><strong>Every piece tells Oakland's story. Every collection honors the streets that raised us. Every stitch carries The Town's soul to the world.</strong></p>",
                 "align": "center",
                 "text_color": "#666666",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit"
               }
             },
             {
@@ -365,7 +365,7 @@
                 "header_size": "h3",
                 "align": "center",
                 "title_color": "#D4AF37",
-                "typography_font_family": "Inter",
+                "typography_font_family": "Outfit",
                 "typography_font_weight": "600",
                 "typography_font_size": {"size": 24, "unit": "px"}
               }
@@ -384,7 +384,7 @@
                 "editor": "<p style='font-size: 18px; line-height: 1.8;'>Oakland taught us luxury never comes at the expense of community or planet. The Town's values guide every stitch, every material, every decision made with Bay Area intention. From our suppliers to our day-one supporters, transparency isn't a trend — it's the Oakland way.</p>",
                 "align": "center",
                 "text_color": "#666666",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit"
               }
             },
             {
@@ -692,7 +692,7 @@
                 "align": "center",
                 "button_background_color": "#0D0D0D",
                 "button_text_color": "#D4AF37",
-                "typography_font_family": "Inter",
+                "typography_font_family": "Outfit",
                 "typography_font_weight": "600",
                 "typography_letter_spacing": {"size": 1, "unit": "px"},
                 "border_radius": {"size": 4, "unit": "px"}

@@ -1,0 +1,63 @@
+{
+  "wordpress_url": "https://skyyrose.co",
+  "total": 7,
+  "successful": 7,
+  "results": [
+    {
+      "success": true,
+      "page_id": 8536,
+      "title": "About Us - SkyyRose Luxury Streetwear",
+      "slug": "about",
+      "url": "https://skyyrose.co/about/",
+      "action": "updated"
+    },
+    {
+      "success": true,
+      "page_id": 153,
+      "title": "BLACK ROSE Collection - SkyyRose",
+      "slug": "black-rose",
+      "url": "https://skyyrose.co/experiences/black-rose/",
+      "action": "updated"
+    },
+    {
+      "success": true,
+      "page_id": 8992,
+      "title": "The Oakland Edit - SkyyRose Blog",
+      "slug": "blog",
+      "url": "https://skyyrose.co/blog/",
+      "action": "created"
+    },
+    {
+      "success": true,
+      "page_id": 8993,
+      "title": "Collections - SkyyRose",
+      "slug": "collections",
+      "url": "https://skyyrose.co/collections/",
+      "action": "created"
+    },
+    {
+      "success": true,
+      "page_id": 8530,
+      "title": "SkyyRose - Where Love Meets Luxury",
+      "slug": "home",
+      "url": "https://skyyrose.co/",
+      "action": "updated"
+    },
+    {
+      "success": true,
+      "page_id": 154,
+      "title": "LOVE HURTS Collection - SkyyRose",
+      "slug": "love-hurts",
+      "url": "https://skyyrose.co/experiences/love-hurts/",
+      "action": "updated"
+    },
+    {
+      "success": true,
+      "page_id": 152,
+      "title": "SIGNATURE Collection - SkyyRose",
+      "slug": "signature",
+      "url": "https://skyyrose.co/experiences/signature/",
+      "action": "updated"
+    }
+  ]
+}

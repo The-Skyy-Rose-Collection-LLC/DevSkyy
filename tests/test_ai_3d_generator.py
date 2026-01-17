@@ -374,9 +374,9 @@ class TestAI3DModelGenerator:
                 assert e.__cause__.score == 0.80
                 assert e.__cause__.threshold == 0.95
 
-            assert (
-                raised
-            ), "ModelGenerationError (wrapping ModelFidelityError) should have been raised"
+            assert raised, (
+                "ModelGenerationError (wrapping ModelFidelityError) should have been raised"
+            )
 
     @pytest.mark.asyncio
     async def test_close(self, generator):

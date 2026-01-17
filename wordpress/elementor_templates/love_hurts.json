@@ -1,295 +1,498 @@
 {
   "version": "0.4",
-  "title": "LOVE HURTS Castle",
+  "title": "LOVE HURTS Collection",
   "type": "page",
   "content": [
     {
-      "id": "sfae338e",
+      "id": "lh_hero",
       "elType": "section",
       "settings": {
         "layout": "full_width",
         "content_width": {},
-        "background_color": "#FF6B9D"
+        "min_height": {"unit": "vh", "size": 70},
+        "background_background": "gradient",
+        "background_color": "#2D1A1F",
+        "background_color_b": "#1A0D12",
+        "background_gradient_angle": {"unit": "deg", "size": 225}
       },
       "elements": [
         {
-          "id": "c14d7ab7",
+          "id": "lh_hero_col",
           "elType": "column",
-          "settings": {
-            "_column_size": 100
-          },
+          "settings": {"_column_size": 100},
           "elements": [
             {
-              "id": "w35a5fda",
+              "id": "lh_floating_petals",
               "elType": "widget",
-              "widgetType": "spacer",
+              "widgetType": "html",
               "settings": {
-                "space": {
-                  "size": 60,
-                  "unit": "px"
-                }
+                "html": "<div class='floating-petals-container' style='position: absolute; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: 1;'></div>"
               }
             },
             {
-              "id": "wae192ee",
+              "id": "lh_spacer_top",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            },
+            {
+              "id": "lh_spinning_logo",
+              "elType": "widget",
+              "widgetType": "shortcode",
+              "settings": {
+                "shortcode": "[skyyrose_spinning_logo variant=\"rose-gold\"]"
+              }
+            },
+            {
+              "id": "lh_spacer_after_logo",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 40, "unit": "px"}}
+            },
+            {
+              "id": "lh_badge",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p class='collection-badge'>COLLECTION 02</p>",
+                "align": "center",
+                "text_color": "#D4A5A5",
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 12, "unit": "px"},
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 3, "unit": "px"}
+              }
+            },
+            {
+              "id": "lh_title",
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "LOVE HURTS Castle",
+                "title": "LOVE HURTS",
                 "size": "xxl",
                 "header_size": "h1",
                 "align": "center",
-                "title_color": "#1A1A1A",
+                "title_color": "#B76E79",
                 "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 84, "unit": "px"},
+                "typography_font_size_tablet": {"size": 64, "unit": "px"},
+                "typography_font_size_mobile": {"size": 48, "unit": "px"},
+                "_animation": "fadeInUp",
+                "_animation_duration": "normal",
+                "_css_classes": "shimmer-rose"
               }
             },
             {
-              "id": "w19cda20",
+              "id": "lh_tagline",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Glass Cloche • Crimson Petals • Gothic Romance",
+                "size": "lg",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#D4A5A5",
+                "typography_font_family": "Outfit",
+                "typography_font_style": "italic",
+                "typography_font_size": {"size": 24, "unit": "px"}
+              }
+            },
+            {
+              "id": "lh_spacer_after_tagline",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 40, "unit": "px"}}
+            },
+            {
+              "id": "lh_desc",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Emotional Expression, Vulnerability, Strength</p>",
+                "editor": "<p style='max-width: 700px; margin: 0 auto;'>Step into the castle where the enchanted rose blooms eternal under glass — the Hurts family name carrying Oakland generations. Beauty & the Beast for The Town: BART at 5am, dreams rising like the Bay Bridge through morning fog. Crimson velvet, gold filigree, candlelit vulnerability meeting streetwear rebellion. Each piece celebrates passion born from struggle, strength forged in Oakland's fire.</p>",
+                "align": "center",
+                "text_color": "#E8D5D5",
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 18, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"}
+              }
+            },
+            {
+              "id": "lh_glass_cloche_icon",
+              "elType": "widget",
+              "widgetType": "html",
+              "settings": {
+                "html": "<div class='glass-cloche' style='width: 180px; height: 180px; margin: 60px auto 40px; position: relative; border-radius: 50%; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(183, 110, 121, 0.3), transparent 60%), linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05)); border: 2px solid rgba(212, 165, 165, 0.3); box-shadow: 0 20px 60px rgba(183, 110, 121, 0.4), inset 0 -20px 40px rgba(255,255,255,0.05); backdrop-filter: blur(20px); transition: all 0.3s ease;'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 72px; color: #B76E79; text-shadow: 0 0 30px rgba(183, 110, 121, 0.8);'>🌹</div></div>"
+              }
+            },
+            {
+              "id": "lh_spacer_bottom",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 80, "unit": "px"}}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lh_experience",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_background": "classic",
+        "background_color": "#1A0D12"
+      },
+      "elements": [
+        {
+          "id": "lh_exp_col",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "lh_3d_viewer",
+              "elType": "widget",
+              "widgetType": "html",
+              "settings": {
+                "html": "<div class='skyyrose-3d-experience' style='width: 100%; height: 85vh; min-height: 650px; position: relative; background: linear-gradient(135deg, #2D1A1F 0%, #1A0D12 100%);'>\n  <iframe src='https://app.devskyy.app/experiences/love-hurts' style='width: 100%; height: 100%; border: none;' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope' loading='lazy' title='LOVE HURTS 3D Experience'></iframe>\n  <div style='position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(45,26,31,0.9); padding: 16px 32px; border-radius: 8px; border: 1px solid rgba(183,110,121,0.3);'>\n    <p style='color: #D4A5A5; font-family: Inter, sans-serif; font-size: 14px; margin: 0; letter-spacing: 0.5px;'>✨ Click hotspots to explore • Drag to rotate • Scroll to zoom</p>\n  </div>\n</div>"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lh_hotspot_showcase",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {"size": 1400, "unit": "px"},
+        "background_background": "gradient",
+        "background_color": "#2D1A1F",
+        "background_color_b": "#1A0D12",
+        "background_gradient_angle": {"unit": "deg", "size": 180}
+      },
+      "elements": [
+        {
+          "id": "lh_hotspot_col",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "lh_hotspot_spacer_top",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            },
+            {
+              "id": "lh_hotspot_heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Interactive Experience",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#B76E79",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 48, "unit": "px"},
+                "_animation": "fadeInUp"
+              }
+            },
+            {
+              "id": "lh_hotspot_desc",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Explore the enchanted collection through interactive hotspots. Click each glowing rose to reveal exclusive pieces and pre-order upcoming designs.</p>",
+                "align": "center",
+                "text_color": "#D4A5A5",
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"}
+              }
+            },
+            {
+              "id": "lh_hotspot_grid",
+              "elType": "widget",
+              "widgetType": "html",
+              "settings": {
+                "html": "<div style='display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; margin-top: 60px; margin-bottom: 60px;'>\n  <div class='hotspot glass-cloche' data-collection='love-hurts' data-product='enchanted-rose-hoodie' style='position: relative; padding: 60px 32px; background: radial-gradient(circle at 50% 50%, rgba(183, 110, 121, 0.2), transparent 70%); border: 2px solid rgba(212, 165, 165, 0.3); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);'>\n    <div style='font-size: 48px; text-align: center; margin-bottom: 20px;'>🌹</div>\n    <h3 style='color: #B76E79; font-family: \"Playfair Display\", serif; font-size: 24px; text-align: center; margin: 0 0 12px 0;'>Enchanted Rose Hoodie</h3>\n    <p style='color: #D4A5A5; font-family: Inter, sans-serif; font-size: 14px; text-align: center; margin: 0;'>Limited Edition Pre-Order</p>\n    <div class='hotspot-tooltip' style='position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); background: rgba(45,26,31,0.95); padding: 8px 16px; border-radius: 4px; white-space: nowrap; opacity: 0; transition: all 0.3s ease; pointer-events: none;'>\n      <span style='color: #D4A5A5; font-size: 12px; letter-spacing: 0.5px;'>CLICK TO PRE-ORDER</span>\n    </div>\n  </div>\n  <div class='hotspot glass-cloche' data-collection='love-hurts' data-product='crimson-petals-tee' style='position: relative; padding: 60px 32px; background: radial-gradient(circle at 50% 50%, rgba(183, 110, 121, 0.2), transparent 70%); border: 2px solid rgba(212, 165, 165, 0.3); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);'>\n    <div style='font-size: 48px; text-align: center; margin-bottom: 20px;'>🥀</div>\n    <h3 style='color: #B76E79; font-family: \"Playfair Display\", serif; font-size: 24px; text-align: center; margin: 0 0 12px 0;'>Crimson Petals Tee</h3>\n    <p style='color: #D4A5A5; font-family: Inter, sans-serif; font-size: 14px; text-align: center; margin: 0;'>Gothic Romance Collection</p>\n    <div class='hotspot-tooltip' style='position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); background: rgba(45,26,31,0.95); padding: 8px 16px; border-radius: 4px; white-space: nowrap; opacity: 0; transition: all 0.3s ease; pointer-events: none;'>\n      <span style='color: #D4A5A5; font-size: 12px; letter-spacing: 0.5px;'>CLICK TO PRE-ORDER</span>\n    </div>\n  </div>\n  <div class='hotspot glass-cloche' data-collection='love-hurts' data-product='gold-filigree-joggers' style='position: relative; padding: 60px 32px; background: radial-gradient(circle at 50% 50%, rgba(183, 110, 121, 0.2), transparent 70%); border: 2px solid rgba(212, 165, 165, 0.3); border-radius: 12px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px);'>\n    <div style='font-size: 48px; text-align: center; margin-bottom: 20px;'>👑</div>\n    <h3 style='color: #B76E79; font-family: \"Playfair Display\", serif; font-size: 24px; text-align: center; margin: 0 0 12px 0;'>Gold Filigree Joggers</h3>\n    <p style='color: #D4A5A5; font-family: Inter, sans-serif; font-size: 14px; text-align: center; margin: 0;'>Luxury Streetwear Fusion</p>\n    <div class='hotspot-tooltip' style='position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); background: rgba(45,26,31,0.95); padding: 8px 16px; border-radius: 4px; white-space: nowrap; opacity: 0; transition: all 0.3s ease; pointer-events: none;'>\n      <span style='color: #D4A5A5; font-size: 12px; letter-spacing: 0.5px;'>CLICK TO PRE-ORDER</span>\n    </div>\n  </div>\n</div>"
+              }
+            },
+            {
+              "id": "lh_hotspot_spacer_bottom",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lh_products",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {"size": 1400, "unit": "px"},
+        "background_background": "classic",
+        "background_color": "#FFFFFF"
+      },
+      "elements": [
+        {
+          "id": "lh_products_col",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "lh_products_spacer_top",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            },
+            {
+              "id": "lh_products_heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Current Collection",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#2D1A1F",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 42, "unit": "px"},
+                "_animation": "fadeInUp",
+                "_animation_duration": "normal"
+              }
+            },
+            {
+              "id": "lh_products_subhead",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p>Where Beauty & the Beast meets The Town's streetwear rebellion. Each piece tells the Hurts family story — Oakland passion persisting through generations, resilience rising like the Bay Bridge from water.</p>",
                 "align": "center",
                 "text_color": "#666666",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 16, "unit": "px"}
               }
             },
             {
-              "id": "wfa27e5e",
+              "id": "lh_products_spacer_1",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": {
-                "space": {
-                  "size": 40,
-                  "unit": "px"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "s9f0fcd9",
-      "elType": "section",
-      "settings": {
-        "layout": "full_width",
-        "content_width": {}
-      },
-      "elements": [
-        {
-          "id": "cae1246a",
-          "elType": "column",
-          "settings": {
-            "_column_size": 100
-          },
-          "elements": [
+              "settings": {"space": {"size": 60, "unit": "px"}}
+            },
             {
-              "id": "w4c6d8ec",
+              "id": "lh_shortcode",
               "elType": "widget",
-              "widgetType": "video",
+              "widgetType": "shortcode",
               "settings": {
-                "video_type": "hosted",
-                "hosted_url": "/experiences/love-hurts/",
-                "controls": "yes",
-                "autoplay": "no",
-                "loop": "yes",
-                "muted": "no",
-                "preload": "auto",
-                "aspect_ratio": "16:9"
+                "shortcode": "[products category='love-hurts' limit='8' columns='4' orderby='popularity']"
               }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "se3cbd9c",
-      "elType": "section",
-      "settings": {
-        "layout": "boxed",
-        "content_width": {
-          "size": 1200,
-          "unit": "px"
-        }
-      },
-      "elements": [
-        {
-          "id": "c97e13aa",
-          "elType": "column",
-          "settings": {
-            "_column_size": 100
-          },
-          "elements": [
+            },
             {
-              "id": "wdaa4e63",
+              "id": "lh_products_spacer_2",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": {
-                "space": {
-                  "size": 60,
-                  "unit": "px"
-                }
-              }
+              "settings": {"space": {"size": 60, "unit": "px"}}
             },
             {
-              "id": "w1c8803c",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "Featured Pieces from Love Hurts",
-                "size": "large",
-                "header_size": "h2",
-                "align": "center",
-                "title_color": "#1A1A1A",
-                "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
-              }
-            },
-            {
-              "id": "wb6b3650",
-              "elType": "widget",
-              "widgetType": "spacer",
-              "settings": {
-                "space": {
-                  "size": 40,
-                  "unit": "px"
-                }
-              }
-            },
-            {
-              "id": "wca2b677",
-              "elType": "widget",
-              "widgetType": "skyyrose-hotspot-viewer",
-              "settings": {
-                "collection_slug": "love_hurts",
-                "hotspot_config_url": "/wp-content/uploads/hotspots/love_hurts-hotspots.json",
-                "auto_load_products": "yes",
-                "enable_cart": "yes",
-                "enable_wishlist": "yes"
-              }
-            },
-            {
-              "id": "we22092e",
-              "elType": "widget",
-              "widgetType": "spacer",
-              "settings": {
-                "space": {
-                  "size": 60,
-                  "unit": "px"
-                }
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "s987714e",
-      "elType": "section",
-      "settings": {
-        "layout": "full_width",
-        "content_width": {}
-      },
-      "elements": [
-        {
-          "id": "c5d886a7",
-          "elType": "column",
-          "settings": {
-            "_column_size": 100
-          },
-          "elements": [
-            {
-              "id": "w6b65e91",
-              "elType": "widget",
-              "widgetType": "text-editor",
-              "settings": {
-                "editor": "\n<script>\n// Scroll-based camera transitions for LOVE HURTS Castle\nwindow.initScrollCamera = function() {\n    const experience = document.querySelector('[data-experience=\"love_hurts\"]');\n    if (!experience) return;\n\n    const waypoints = [\n        { scroll: 0, camera: [3, 2, 4] },\n        { scroll: 25, camera: [0, 2, 5] },\n        { scroll: 50, camera: [-3, 1, 4] },\n        { scroll: 75, camera: [4, 3, 3] },\n        { scroll: 100, camera: [0, 2, 4] }\n    ];\n\n    window.addEventListener('scroll', () => {\n        const scroll = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;\n        experience.dispatchEvent(new CustomEvent('camera-update', { detail: { scroll } }));\n    });\n};\n\nif (document.readyState === 'loading') {\n    document.addEventListener('DOMContentLoaded', window.initScrollCamera);\n} else {\n    window.initScrollCamera();\n}\n</script>\n"
-              }
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "id": "s75acd1e",
-      "elType": "section",
-      "settings": {
-        "layout": "boxed",
-        "content_width": {
-          "size": 1200,
-          "unit": "px"
-        },
-        "background_color": "#8B4049"
-      },
-      "elements": [
-        {
-          "id": "c70ee384",
-          "elType": "column",
-          "settings": {
-            "_column_size": 100
-          },
-          "elements": [
-            {
-              "id": "w67dacd4",
-              "elType": "widget",
-              "widgetType": "spacer",
-              "settings": {
-                "space": {
-                  "size": 80,
-                  "unit": "px"
-                }
-              }
-            },
-            {
-              "id": "w3d62622",
-              "elType": "widget",
-              "widgetType": "heading",
-              "settings": {
-                "title": "Shop the LOVE HURTS Castle",
-                "size": "large",
-                "header_size": "h2",
-                "align": "center",
-                "title_color": "#1A1A1A",
-                "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
-              }
-            },
-            {
-              "id": "w2a6581d",
+              "id": "lh_shop_btn",
               "elType": "widget",
               "widgetType": "button",
               "settings": {
-                "text": "Browse Collection",
-                "link": {
-                  "url": "/collection/love-hurts-castle",
-                  "is_external": false
-                },
+                "text": "Shop All Love Hurts",
+                "link": {"url": "/product-category/love-hurts/", "is_external": false},
                 "size": "lg",
-                "button_background_color": "#D4AF37",
+                "align": "center",
+                "button_background_color": "#B76E79",
                 "button_text_color": "#FFFFFF",
-                "button_border_border": "",
-                "button_border_width": {},
-                "button_border_color": "",
-                "typography_font_family": "Inter",
+                "typography_font_family": "Outfit",
                 "typography_font_weight": "600",
-                "typography_letter_spacing": {
-                  "size": 1,
-                  "unit": "px"
-                }
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "_css_classes": "shimmer-rose"
               }
             },
             {
-              "id": "wfc02e97",
+              "id": "lh_products_spacer_bottom",
               "elType": "widget",
               "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lh_story",
+      "elType": "section",
+      "settings": {
+        "layout": "boxed",
+        "content_width": {"size": 1000, "unit": "px"},
+        "background_background": "gradient",
+        "background_color": "#2D1A1F",
+        "background_color_b": "#1A0D12",
+        "background_gradient_angle": {"unit": "deg", "size": 135}
+      },
+      "elements": [
+        {
+          "id": "lh_story_col",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "lh_story_spacer_top",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            },
+            {
+              "id": "lh_story_icon",
+              "elType": "widget",
+              "widgetType": "html",
               "settings": {
-                "space": {
-                  "size": 80,
-                  "unit": "px"
-                }
+                "html": "<div class='glass-cloche' style='width: 140px; height: 140px; margin: 0 auto 40px; position: relative; border-radius: 50%; background: radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(183, 110, 121, 0.4), transparent 60%); border: 2px solid rgba(212, 165, 165, 0.4); box-shadow: 0 15px 40px rgba(183, 110, 121, 0.5), inset 0 -15px 30px rgba(255,255,255,0.08); backdrop-filter: blur(15px);'><div style='position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 56px;'>🌹</div></div>"
               }
+            },
+            {
+              "id": "lh_story_heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "The Enchanted Rose Story",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#B76E79",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "_animation": "fadeInUp",
+                "_animation_duration": "normal"
+              }
+            },
+            {
+              "id": "lh_story_spacer_1",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 32, "unit": "px"}}
+            },
+            {
+              "id": "lh_story_text",
+              "elType": "widget",
+              "widgetType": "text-editor",
+              "settings": {
+                "editor": "<p style='margin-bottom: 24px;'>In the castle's west wing, beneath a glass cloche, the enchanted rose blooms eternal — the Hurts family legacy from Oakland generations. Each crimson petal carries BART commutes at 5am, dreams rising through fog off the Bay Bridge. True beauty lies within those who persist: love transforms even the most wounded hearts, especially hearts forged in The Town's struggle.</p><p style='margin-bottom: 24px;'>LOVE HURTS celebrates Oakland's paradox: the vulnerability in strength, the beauty born from darkness, the rebellion in romance. Beauty & the Beast meets The Town — gothic luxury meets Bay Area streetwear edge. For those who know passion is worth the risk, and that Oakland builds crowns from thorns.</p><p style='font-style: italic; color: #D4A5A5;'>\"She warned him not to be deceived by appearances, for beauty is found within.\" — Every Hurts family generation understands this truth.</p>",
+                "align": "center",
+                "text_color": "#E8D5D5",
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 18, "unit": "px"},
+                "typography_line_height": {"size": 1.9, "unit": "em"}
+              }
+            },
+            {
+              "id": "lh_story_spacer_bottom",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "lh_cta",
+      "elType": "section",
+      "settings": {
+        "layout": "full_width",
+        "content_width": {},
+        "background_background": "gradient",
+        "background_color": "#D4A5A5",
+        "background_color_b": "#B76E79",
+        "background_gradient_angle": {"unit": "deg", "size": 180}
+      },
+      "elements": [
+        {
+          "id": "lh_cta_col",
+          "elType": "column",
+          "settings": {"_column_size": 100},
+          "elements": [
+            {
+              "id": "lh_cta_spacer_top",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 80, "unit": "px"}}
+            },
+            {
+              "id": "lh_cta_heading",
+              "elType": "widget",
+              "widgetType": "heading",
+              "settings": {
+                "title": "Explore More Collections",
+                "size": "xl",
+                "header_size": "h2",
+                "align": "center",
+                "title_color": "#2D1A1F",
+                "typography_font_family": "Playfair Display",
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 36, "unit": "px"},
+                "_animation": "fadeInUp",
+                "_animation_duration": "normal"
+              }
+            },
+            {
+              "id": "lh_cta_spacer_1",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 32, "unit": "px"}}
+            },
+            {
+              "id": "lh_cta_btn_br",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "BLACK ROSE",
+                "link": {"url": "/experiences/black-rose/", "is_external": false},
+                "size": "lg",
+                "align": "center",
+                "button_background_color": "#1A1A1A",
+                "button_text_color": "#C0C0C0",
+                "typography_font_family": "Outfit",
+                "typography_font_weight": "600"
+              }
+            },
+            {
+              "id": "lh_cta_spacer_2",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 16, "unit": "px"}}
+            },
+            {
+              "id": "lh_cta_btn_sig",
+              "elType": "widget",
+              "widgetType": "button",
+              "settings": {
+                "text": "SIGNATURE",
+                "link": {"url": "/experiences/signature/", "is_external": false},
+                "size": "lg",
+                "align": "center",
+                "button_background_color": "#1A1A1A",
+                "button_text_color": "#C9A962",
+                "typography_font_family": "Outfit",
+                "typography_font_weight": "600"
+              }
+            },
+            {
+              "id": "lh_cta_spacer_bottom",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 80, "unit": "px"}}
             }
           ]
         }
@@ -299,8 +502,8 @@
   "page_settings": {
     "hide_title": "yes",
     "template": "elementor_canvas",
-    "post_title": "LOVE HURTS Castle",
-    "meta_description": "Emotional expression pieces honoring founder's family name. Castle/throne room environment with dramatic lighting."
+    "post_title": "LOVE HURTS Collection - SkyyRose",
+    "meta_description": "Beauty & the Beast meets streetwear rebellion. Enchanted rose designs with crimson petals, gold filigree, and gothic romance. Limited edition pieces celebrating passion and strength."
   },
   "metadata": {}
 }

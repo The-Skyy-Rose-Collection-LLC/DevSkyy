@@ -80,8 +80,12 @@ final class SkyyRose_3D_Experience {
         add_action('admin_menu', [$this, 'admin_menu']);
         add_action('admin_init', [$this, 'register_settings']);
 
-        // Shortcode
+        // Shortcodes
         add_shortcode('skyyrose_3d', [$this, 'render_shortcode']);
+        add_shortcode('skyyrose_spinning_logo', [$this, 'render_spinning_logo_shortcode']);
+
+        // Inline styles for spinning logo (no external CSS dependency)
+        add_action('wp_head', [$this, 'output_spinning_logo_styles'], 5);
 
         // REST API
         add_action('rest_api_init', [$this, 'register_rest_routes']);
@@ -497,6 +501,255 @@ final class SkyyRose_3D_Experience {
 
         require_once ABSPATH . 'wp-admin/includes/upgrade.php';
         dbDelta($sql);
+    }
+
+    /**
+     * Output spinning logo styles inline (no external CSS file dependency)
+     */
+    public function output_spinning_logo_styles(): void {
+        ?>
+        <style id="skyyrose-spinning-logo-css">
+        /* SkyyRose Spinning Logo - Inline CSS v2.0 */
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@400;500;600&display=swap');
+
+        :root {
+            --sr-rose-gold: #B76E79;
+            --sr-gold: #D4AF37;
+            --sr-silver: #C0C0C0;
+            --sr-deep-rose: #D4A5A5;
+            --sr-obsidian: #0D0D0D;
+            --sr-ivory: #FAFAFA;
+        }
+
+        /* Logo Container */
+        .skyyrose-logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            text-decoration: none !important;
+        }
+
+        .skyyrose-logo__spinner {
+            width: 60px;
+            height: 60px;
+            animation: sr-spin 8s linear infinite, sr-glow-pulse 3s ease-in-out infinite;
+            transition: filter 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2));
+        }
+
+        .skyyrose-logo:hover .skyyrose-logo__spinner {
+            animation-play-state: paused, paused;
+            transform: scale(1.1);
+            filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.5)) drop-shadow(0 0 40px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 60px rgba(212, 175, 55, 0.2));
+        }
+
+        @keyframes sr-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes sr-glow-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.85; }
+        }
+
+        /* Color Variants */
+        .skyyrose-logo--gold .skyyrose-logo__spinner { filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.3)) drop-shadow(0 0 30px rgba(212, 175, 55, 0.2)); }
+        .skyyrose-logo--gold .skyyrose-logo__spinner path, .skyyrose-logo--gold .skyyrose-logo__spinner circle { fill: #D4AF37; }
+
+        .skyyrose-logo--silver .skyyrose-logo__spinner { filter: drop-shadow(0 0 15px rgba(192, 192, 192, 0.3)) drop-shadow(0 0 30px rgba(192, 192, 192, 0.2)); }
+        .skyyrose-logo--silver .skyyrose-logo__spinner path, .skyyrose-logo--silver .skyyrose-logo__spinner circle { fill: #C0C0C0; }
+        .skyyrose-logo--silver:hover .skyyrose-logo__spinner { filter: drop-shadow(0 0 20px rgba(192, 192, 192, 0.5)) drop-shadow(0 0 40px rgba(192, 192, 192, 0.3)); }
+
+        .skyyrose-logo--rose-gold .skyyrose-logo__spinner { filter: drop-shadow(0 0 15px rgba(183, 110, 121, 0.3)) drop-shadow(0 0 30px rgba(183, 110, 121, 0.2)); }
+        .skyyrose-logo--rose-gold .skyyrose-logo__spinner path, .skyyrose-logo--rose-gold .skyyrose-logo__spinner circle { fill: #B76E79; }
+        .skyyrose-logo--rose-gold:hover .skyyrose-logo__spinner { filter: drop-shadow(0 0 20px rgba(183, 110, 121, 0.5)) drop-shadow(0 0 40px rgba(183, 110, 121, 0.3)); }
+
+        .skyyrose-logo--deep-rose .skyyrose-logo__spinner { filter: drop-shadow(0 0 15px rgba(212, 165, 165, 0.3)) drop-shadow(0 0 30px rgba(212, 165, 165, 0.2)); }
+        .skyyrose-logo--deep-rose .skyyrose-logo__spinner path, .skyyrose-logo--deep-rose .skyyrose-logo__spinner circle { fill: #D4A5A5; }
+        .skyyrose-logo--deep-rose:hover .skyyrose-logo__spinner { filter: drop-shadow(0 0 20px rgba(212, 165, 165, 0.5)) drop-shadow(0 0 40px rgba(212, 165, 165, 0.3)); }
+
+        .skyyrose-logo--black .skyyrose-logo__spinner { filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.2)) drop-shadow(0 0 20px rgba(0, 0, 0, 0.1)); }
+        .skyyrose-logo--black .skyyrose-logo__spinner path, .skyyrose-logo--black .skyyrose-logo__spinner circle { fill: #0D0D0D; }
+
+        /* Mobile */
+        @media (max-width: 768px) {
+            .skyyrose-logo__spinner { width: 48px; height: 48px; }
+        }
+
+        /* Luxury Typography */
+        h1, h2, h3, h4, h5, h6, .elementor-heading-title {
+            font-family: 'Playfair Display', Georgia, serif !important;
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        body, p, .elementor-widget-text-editor {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        /* Luxury Buttons */
+        .woocommerce .button,
+        .elementor-button,
+        .wp-block-button__link {
+            background: linear-gradient(135deg, #D4AF37 0%, #F5D76E 50%, #D4AF37 100%) !important;
+            color: #0D0D0D !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 600 !important;
+            letter-spacing: 0.05em !important;
+            border: none !important;
+            border-radius: 0 !important;
+            padding: 14px 32px !important;
+            text-transform: uppercase !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .woocommerce .button:hover,
+        .elementor-button:hover,
+        .wp-block-button__link:hover {
+            background: linear-gradient(135deg, #C9A962 0%, #E8CA5D 50%, #C9A962 100%) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(212, 175, 55, 0.3) !important;
+        }
+
+        /* Luxury Product Cards */
+        .woocommerce ul.products li.product,
+        .elementor-product {
+            background: #0D0D0D;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            padding: 20px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .woocommerce ul.products li.product:hover {
+            border-color: rgba(212, 175, 55, 0.3);
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .woocommerce ul.products li.product .woocommerce-loop-product__title {
+            color: #FAFAFA !important;
+            font-family: 'Playfair Display', serif !important;
+            font-size: 1.1rem !important;
+        }
+
+        .woocommerce ul.products li.product .price {
+            color: #D4AF37 !important;
+            font-family: 'Inter', sans-serif !important;
+            font-weight: 500 !important;
+        }
+
+        /* Collection-specific accents */
+        body.collection-signature { --collection-accent: #B76E79; }
+        body.collection-blackrose { --collection-accent: #C0C0C0; }
+        body.collection-lovehurts { --collection-accent: #D4A5A5; }
+        </style>
+        <?php
+    }
+
+    /**
+     * Render spinning logo shortcode
+     */
+    public function render_spinning_logo_shortcode(array $atts): string {
+        $atts = shortcode_atts([
+            'variant' => '',
+            'size' => '60',
+            'link' => 'true',
+        ], $atts, 'skyyrose_spinning_logo');
+
+        // Auto-detect variant based on page
+        $variant = !empty($atts['variant']) ? sanitize_key($atts['variant']) : $this->detect_logo_variant();
+
+        $allowed_variants = ['gold', 'silver', 'rose-gold', 'deep-rose', 'black'];
+        if (!in_array($variant, $allowed_variants)) {
+            $variant = 'gold';
+        }
+
+        $size = intval($atts['size']);
+        $show_link = filter_var($atts['link'], FILTER_VALIDATE_BOOLEAN);
+
+        // Inline SVG for the rose logo (no external file dependency)
+        $svg = $this->get_rose_svg();
+
+        $wrapper_start = $show_link
+            ? '<a href="' . esc_url(home_url('/')) . '" class="skyyrose-logo skyyrose-logo--' . esc_attr($variant) . '" aria-label="SkyyRose Home">'
+            : '<div class="skyyrose-logo skyyrose-logo--' . esc_attr($variant) . '">';
+
+        $wrapper_end = $show_link ? '</a>' : '</div>';
+
+        $style = $size !== 60 ? ' style="width:' . $size . 'px;height:' . $size . 'px;"' : '';
+
+        return $wrapper_start . '<div class="skyyrose-logo__spinner"' . $style . '>' . $svg . '</div>' . $wrapper_end;
+    }
+
+    /**
+     * Auto-detect logo variant based on current page
+     */
+    private function detect_logo_variant(): string {
+        if (is_front_page()) {
+            return 'gold';
+        }
+
+        if (is_page()) {
+            $page_slug = get_post_field('post_name', get_the_ID());
+
+            if (strpos($page_slug, 'black-rose') !== false || strpos($page_slug, 'blackrose') !== false) {
+                return 'silver';
+            }
+            if (strpos($page_slug, 'love-hurts') !== false || strpos($page_slug, 'lovehurts') !== false) {
+                return 'deep-rose';
+            }
+            if (strpos($page_slug, 'signature') !== false) {
+                return 'rose-gold';
+            }
+        }
+
+        // Check product category
+        if (function_exists('is_product') && is_product()) {
+            global $product;
+            if ($product instanceof \WC_Product) {
+                $categories = wp_get_post_terms($product->get_id(), 'product_cat', ['fields' => 'slugs']);
+                if (in_array('black-rose', $categories)) return 'silver';
+                if (in_array('love-hurts', $categories)) return 'deep-rose';
+                if (in_array('signature', $categories)) return 'rose-gold';
+            }
+        }
+
+        return 'gold';
+    }
+
+    /**
+     * Get inline SVG for rose logo
+     */
+    private function get_rose_svg(): string {
+        return '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="roseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.8"/>
+                    <stop offset="100%" style="stop-color:currentColor;stop-opacity:1"/>
+                </linearGradient>
+            </defs>
+            <!-- Rose Petals -->
+            <g fill="currentColor" opacity="0.95">
+                <!-- Center -->
+                <circle cx="50" cy="50" r="8"/>
+                <!-- Inner petals -->
+                <ellipse cx="50" cy="35" rx="12" ry="18" transform="rotate(0 50 50)"/>
+                <ellipse cx="50" cy="35" rx="12" ry="18" transform="rotate(72 50 50)"/>
+                <ellipse cx="50" cy="35" rx="12" ry="18" transform="rotate(144 50 50)"/>
+                <ellipse cx="50" cy="35" rx="12" ry="18" transform="rotate(216 50 50)"/>
+                <ellipse cx="50" cy="35" rx="12" ry="18" transform="rotate(288 50 50)"/>
+                <!-- Outer petals -->
+                <ellipse cx="50" cy="25" rx="10" ry="22" transform="rotate(36 50 50)" opacity="0.7"/>
+                <ellipse cx="50" cy="25" rx="10" ry="22" transform="rotate(108 50 50)" opacity="0.7"/>
+                <ellipse cx="50" cy="25" rx="10" ry="22" transform="rotate(180 50 50)" opacity="0.7"/>
+                <ellipse cx="50" cy="25" rx="10" ry="22" transform="rotate(252 50 50)" opacity="0.7"/>
+                <ellipse cx="50" cy="25" rx="10" ry="22" transform="rotate(324 50 50)" opacity="0.7"/>
+            </g>
+            <!-- Stem hint -->
+            <path d="M50 75 Q48 85 50 95" stroke="currentColor" stroke-width="2" fill="none" opacity="0.5"/>
+        </svg>';
     }
 }
 

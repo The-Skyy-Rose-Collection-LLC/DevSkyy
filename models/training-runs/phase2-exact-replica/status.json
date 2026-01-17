@@ -1,0 +1,37 @@
+{
+  "version": "phase2-exact-replica",
+  "status": "failed",
+  "started_at": "2026-01-17T03:14:51.529273",
+  "current_epoch": 0,
+  "total_epochs": 10,
+  "current_step": 0,
+  "total_steps": 1000,
+  "progress_percentage": 0.0,
+  "loss": 0.0,
+  "learning_rate": 1e-05,
+  "avg_loss": 0.0,
+  "best_loss": Infinity,
+  "total_images": 254,
+  "total_products": 254,
+  "collections": {
+    "signature": 85,
+    "love_hurts": 92,
+    "black_rose": 77
+  },
+  "message": "Training failed - check logs for details",
+  "training_focus": {
+    "lighting_intelligence": true,
+    "texture_enhancement": true,
+    "color_calibration": true,
+    "logo_preservation": true,
+    "design_preservation": true
+  },
+  "quality_targets": {
+    "logo_similarity_threshold": 0.99,
+    "color_deviation_threshold": 0.02,
+    "sharpness_gain_target": 0.2,
+    "noise_reduction_target": 0.3
+  },
+  "completed_at": "2026-01-17T03:15:38.885672",
+  "error": "Training failed with exit code 1"
+}
