@@ -1,0 +1,43 @@
+{
+  "model_name": "stabilityai/stable-diffusion-xl-base-1.0",
+  "dataset_name": "damBruh/skyyrose-lora-dataset-v2",
+  "output_dir": "./models/training-runs/phase2-exact-replica",
+  "hub_model_id": "damBruh/skyyrose-lora-phase2-exact-replica",
+  "instance_prompt": "exact replica, SkyyRose product, preserve all logos and colors, professional studio photography, enhance quality only",
+  "class_prompt": "professional product photography",
+  "resolution": 1024,
+  "train_batch_size": 1,
+  "gradient_accumulation_steps": 4,
+  "learning_rate": 1e-05,
+  "lr_scheduler": "constant",
+  "lr_warmup_steps": 0,
+  "max_train_steps": 1000,
+  "checkpointing_steps": 100,
+  "validation_steps": 100,
+  "rank": 32,
+  "lora_alpha": 64,
+  "mixed_precision": "fp16",
+  "use_8bit_adam": true,
+  "enable_xformers": true,
+  "gradient_checkpointing": true,
+  "prior_loss_weight": 1.0,
+  "seed": 42,
+  "logging_dir": "./models/training-runs/phase2-exact-replica/logs",
+  "report_to": "tensorboard",
+  "validation_prompt": "exact replica, SkyyRose signature collection cotton candy tee, preserve all logos and colors, enhance clarity and sharpness only, professional studio photography, preserve original rose gold accents",
+  "num_validation_images": 4,
+  "training_focus": {
+    "lighting_intelligence": true,
+    "texture_enhancement": true,
+    "color_calibration": true,
+    "logo_preservation": true,
+    "design_preservation": true
+  },
+  "quality_metrics": {
+    "logo_similarity_threshold": 0.99,
+    "color_deviation_threshold": 0.02,
+    "sharpness_gain_target": 0.2,
+    "noise_reduction_target": 0.3
+  },
+  "use_hf": false
+}

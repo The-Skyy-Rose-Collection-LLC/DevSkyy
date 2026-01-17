@@ -9,23 +9,37 @@
       "settings": {
         "layout": "full_width",
         "content_width": {},
-        "min_height": { "unit": "vh", "size": 50 },
+        "min_height": {"unit": "vh", "size": 50},
         "background_background": "gradient",
         "background_color": "#0D0D0D",
-        "background_gradient_angle": { "unit": "deg", "size": 180 },
-        "background_color_b": "#1A1A1A"
+        "background_color_b": "#1A1A1A",
+        "background_gradient_angle": {"unit": "deg", "size": 180}
       },
       "elements": [
         {
           "id": "c_hero",
           "elType": "column",
-          "settings": { "_column_size": 100 },
+          "settings": {"_column_size": 100},
           "elements": [
             {
               "id": "w_spacer_1",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 100, "unit": "px" } }
+              "settings": {"space": {"size": 100, "unit": "px"}}
+            },
+            {
+              "id": "w_spinning_logo",
+              "elType": "widget",
+              "widgetType": "shortcode",
+              "settings": {
+                "shortcode": "[skyyrose_spinning_logo variant=\"gold\"]"
+              }
+            },
+            {
+              "id": "w_spacer_after_logo",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 40, "unit": "px"}}
             },
             {
               "id": "w_heading_hero",
@@ -38,7 +52,12 @@
                 "align": "center",
                 "title_color": "#F5F5F0",
                 "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 64, "unit": "px"},
+                "typography_font_size_tablet": {"size": 48, "unit": "px"},
+                "typography_font_size_mobile": {"size": 36, "unit": "px"},
+                "_animation": "fadeInUp",
+                "_animation_duration": "normal"
               }
             },
             {
@@ -46,18 +65,19 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Three distinct experiences, one unified vision of luxury.</p>",
+                "editor": "<p>Three collections, one vision — Oakland luxury, elevated. Immersive 3D experiences that hit different.</p>",
                 "align": "center",
                 "text_color": "#D4AF37",
-                "typography_font_family": "Inter",
-                "typography_font_size": { "unit": "px", "size": 20 }
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"unit": "px", "size": 20},
+                "typography_line_height": {"size": 1.6, "unit": "em"}
               }
             },
             {
               "id": "w_spacer_2",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 80, "unit": "px" } }
+              "settings": {"space": {"size": 80, "unit": "px"}}
             }
           ]
         }
@@ -69,37 +89,39 @@
       "settings": {
         "layout": "full_width",
         "content_width": {},
-        "min_height": { "unit": "vh", "size": 80 },
-        "background_background": "classic",
+        "min_height": {"unit": "vh", "size": 80},
+        "background_background": "gradient",
         "background_color": "#0D0D0D",
-        "background_image": {
-          "url": "/wp-content/uploads/collections/black-rose-bg.jpg"
-        },
-        "background_overlay_background": "classic",
-        "background_overlay_color": "rgba(0, 0, 0, 0.6)"
+        "background_color_b": "#1A1A1A",
+        "background_gradient_angle": {"unit": "deg", "size": 135}
       },
       "elements": [
         {
           "id": "c_black_rose_left",
           "elType": "column",
-          "settings": { "_column_size": 50 },
+          "settings": {"_column_size": 50},
           "elements": [
             {
               "id": "w_br_spacer",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 80, "unit": "px" } }
+              "settings": {"space": {"size": 80, "unit": "px"}}
             },
             {
               "id": "w_br_badge",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<span class='collection-badge'>COLLECTION 01</span>",
-                "text_color": "#C0C0C0",
-                "typography_font_size": { "unit": "px", "size": 12 },
-                "typography_letter_spacing": { "unit": "px", "size": 3 }
+                "editor": "<p style='display: inline-block; padding: 8px 16px; background: rgba(192, 192, 192, 0.1); border: 1px solid #C0C0C0; border-radius: 4px; font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; color: #C0C0C0;'>COLLECTION 01</p>",
+                "align": "left",
+                "text_color": "#C0C0C0"
               }
+            },
+            {
+              "id": "w_br_spacer_after_badge",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 16, "unit": "px"}}
             },
             {
               "id": "w_br_title",
@@ -111,7 +133,12 @@
                 "header_size": "h2",
                 "title_color": "#FFFFFF",
                 "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 56, "unit": "px"},
+                "typography_font_size_tablet": {"size": 42, "unit": "px"},
+                "typography_font_size_mobile": {"size": 32, "unit": "px"},
+                "_animation": "fadeInLeft",
+                "_animation_duration": "normal"
               }
             },
             {
@@ -123,19 +150,34 @@
                 "size": "md",
                 "header_size": "h3",
                 "title_color": "#C0C0C0",
-                "typography_font_family": "Inter",
-                "typography_font_style": "italic"
+                "typography_font_family": "Outfit",
+                "typography_font_style": "italic",
+                "typography_font_size": {"size": 20, "unit": "px"}
               }
+            },
+            {
+              "id": "w_br_spacer_after_tagline",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 24, "unit": "px"}}
             },
             {
               "id": "w_br_desc",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Enter the Gothic Rose Garden. Limited edition pieces where dark elegance meets modern luxury. Silver moonlight, floating petals, obsidian pathways lead you through an immersive 3D experience.</p>",
+                "editor": "<p>Step into the Rose Garden, straight from The Town. Limited drops where Oakland's dark mystique meets refined luxury. Silver moonlight, floating petals — this ain't your average collection. Real recognize real. Get it before it's gone.</p>",
                 "text_color": "#CCCCCC",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"}
               }
+            },
+            {
+              "id": "w_br_spacer_before_btn",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 32, "unit": "px"}}
             },
             {
               "id": "w_br_btn",
@@ -143,14 +185,14 @@
               "widgetType": "button",
               "settings": {
                 "text": "Enter the Garden",
-                "link": { "url": "/black-rose/", "is_external": false },
+                "link": {"url": "/experiences/black-rose/", "is_external": false},
                 "size": "lg",
                 "button_background_color": "#C0C0C0",
                 "button_text_color": "#0D0D0D",
-                "typography_font_family": "Inter",
+                "typography_font_family": "Outfit",
                 "typography_font_weight": "600",
-                "icon": { "value": "fas fa-arrow-right" },
-                "icon_position": "after"
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "border_radius": {"size": 4, "unit": "px"}
               }
             }
           ]
@@ -158,18 +200,14 @@
         {
           "id": "c_black_rose_right",
           "elType": "column",
-          "settings": { "_column_size": 50 },
+          "settings": {"_column_size": 50},
           "elements": [
             {
-              "id": "w_br_3d",
+              "id": "w_br_3d_preview",
               "elType": "widget",
-              "widgetType": "skyyrose-collection-card",
+              "widgetType": "html",
               "settings": {
-                "collection_slug": "black-rose",
-                "preview_type": "3d_preview",
-                "enable_hover_animation": true,
-                "show_product_count": true,
-                "experience_url": "/experiences/black-rose/"
+                "html": "<div class='collection-3d-preview' style='width: 100%; height: 500px; position: relative; background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(192, 192, 192, 0.15);'>\n  <iframe src='https://app.devskyy.app/experiences/black-rose' style='width: 100%; height: 100%; border: none;' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope' loading='lazy' title='BLACK ROSE 3D Preview'></iframe>\n  <div style='position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 24px; text-align: center;'>\n    <p style='color: #C0C0C0; font-family: Inter, sans-serif; font-size: 13px; margin: 0;'>Drag to explore the Gothic Rose Garden</p>\n  </div>\n</div>"
               }
             }
           ]
@@ -182,31 +220,24 @@
       "settings": {
         "layout": "full_width",
         "content_width": {},
-        "min_height": { "unit": "vh", "size": 80 },
-        "background_background": "classic",
+        "min_height": {"unit": "vh", "size": 80},
+        "background_background": "gradient",
         "background_color": "#1A0A0F",
-        "background_image": {
-          "url": "/wp-content/uploads/collections/love-hurts-bg.jpg"
-        },
-        "background_overlay_background": "classic",
-        "background_overlay_color": "rgba(139, 64, 73, 0.5)"
+        "background_color_b": "#2D1A1F",
+        "background_gradient_angle": {"unit": "deg", "size": 135}
       },
       "elements": [
         {
           "id": "c_lh_left",
           "elType": "column",
-          "settings": { "_column_size": 50 },
+          "settings": {"_column_size": 50},
           "elements": [
             {
-              "id": "w_lh_3d",
+              "id": "w_lh_3d_preview",
               "elType": "widget",
-              "widgetType": "skyyrose-collection-card",
+              "widgetType": "html",
               "settings": {
-                "collection_slug": "love-hurts",
-                "preview_type": "3d_preview",
-                "enable_hover_animation": true,
-                "show_product_count": true,
-                "experience_url": "/experiences/love-hurts/"
+                "html": "<div class='collection-3d-preview' style='width: 100%; height: 500px; position: relative; background: linear-gradient(135deg, #1A0A0F 0%, #2D1A1F 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(183, 110, 121, 0.2);'>\n  <iframe src='https://app.devskyy.app/experiences/love-hurts' style='width: 100%; height: 100%; border: none;' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope' loading='lazy' title='LOVE HURTS 3D Preview'></iframe>\n  <div style='position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 24px; text-align: center;'>\n    <p style='color: #B76E79; font-family: Inter, sans-serif; font-size: 13px; margin: 0;'>Drag to explore the Enchanted Castle</p>\n  </div>\n</div>"
               }
             }
           ]
@@ -214,24 +245,29 @@
         {
           "id": "c_lh_right",
           "elType": "column",
-          "settings": { "_column_size": 50 },
+          "settings": {"_column_size": 50},
           "elements": [
             {
               "id": "w_lh_spacer",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 80, "unit": "px" } }
+              "settings": {"space": {"size": 80, "unit": "px"}}
             },
             {
               "id": "w_lh_badge",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<span class='collection-badge'>COLLECTION 02</span>",
-                "text_color": "#FF6B9D",
-                "typography_font_size": { "unit": "px", "size": 12 },
-                "typography_letter_spacing": { "unit": "px", "size": 3 }
+                "editor": "<p style='display: inline-block; padding: 8px 16px; background: rgba(183, 110, 121, 0.1); border: 1px solid #B76E79; border-radius: 4px; font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; color: #B76E79;'>COLLECTION 02</p>",
+                "align": "left",
+                "text_color": "#B76E79"
               }
+            },
+            {
+              "id": "w_lh_spacer_after_badge",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 16, "unit": "px"}}
             },
             {
               "id": "w_lh_title",
@@ -243,7 +279,12 @@
                 "header_size": "h2",
                 "title_color": "#FFFFFF",
                 "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 56, "unit": "px"},
+                "typography_font_size_tablet": {"size": 42, "unit": "px"},
+                "typography_font_size_mobile": {"size": 32, "unit": "px"},
+                "_animation": "fadeInRight",
+                "_animation_duration": "normal"
               }
             },
             {
@@ -254,20 +295,35 @@
                 "title": "Emotional Expression, Vulnerability, Strength",
                 "size": "md",
                 "header_size": "h3",
-                "title_color": "#FF6B9D",
-                "typography_font_family": "Inter",
-                "typography_font_style": "italic"
+                "title_color": "#B76E79",
+                "typography_font_family": "Outfit",
+                "typography_font_style": "italic",
+                "typography_font_size": {"size": 20, "unit": "px"}
               }
+            },
+            {
+              "id": "w_lh_spacer_after_tagline",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 24, "unit": "px"}}
             },
             {
               "id": "w_lh_desc",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Step into the Castle. Where vulnerability becomes strength and emotion transforms into art. Dramatic candlelight, stained glass windows, and an immersive throne room experience await.</p>",
+                "editor": "<p>Welcome to the Castle, built from The Town's heart. Where showing emotion is power, where vulnerability ain't weakness — it's art. Candlelight, stained glass, throne vibes. This collection hits different. Real ones know.</p>",
                 "text_color": "#CCCCCC",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"}
               }
+            },
+            {
+              "id": "w_lh_spacer_before_btn",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 32, "unit": "px"}}
             },
             {
               "id": "w_lh_btn",
@@ -275,14 +331,14 @@
               "widgetType": "button",
               "settings": {
                 "text": "Enter the Castle",
-                "link": { "url": "/love-hurts/", "is_external": false },
+                "link": {"url": "/experiences/love-hurts/", "is_external": false},
                 "size": "lg",
-                "button_background_color": "#FF6B9D",
-                "button_text_color": "#0D0D0D",
-                "typography_font_family": "Inter",
+                "button_background_color": "#B76E79",
+                "button_text_color": "#FFFFFF",
+                "typography_font_family": "Outfit",
                 "typography_font_weight": "600",
-                "icon": { "value": "fas fa-arrow-right" },
-                "icon_position": "after"
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "border_radius": {"size": 4, "unit": "px"}
               }
             }
           ]
@@ -295,37 +351,39 @@
       "settings": {
         "layout": "full_width",
         "content_width": {},
-        "min_height": { "unit": "vh", "size": 80 },
-        "background_background": "classic",
+        "min_height": {"unit": "vh", "size": 80},
+        "background_background": "gradient",
         "background_color": "#0A0A0A",
-        "background_image": {
-          "url": "/wp-content/uploads/collections/signature-bg.jpg"
-        },
-        "background_overlay_background": "classic",
-        "background_overlay_color": "rgba(201, 169, 98, 0.3)"
+        "background_color_b": "#1A1A1A",
+        "background_gradient_angle": {"unit": "deg", "size": 135}
       },
       "elements": [
         {
           "id": "c_sig_left",
           "elType": "column",
-          "settings": { "_column_size": 50 },
+          "settings": {"_column_size": 50},
           "elements": [
             {
               "id": "w_sig_spacer",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 80, "unit": "px" } }
+              "settings": {"space": {"size": 80, "unit": "px"}}
             },
             {
               "id": "w_sig_badge",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<span class='collection-badge'>COLLECTION 03</span>",
-                "text_color": "#C9A962",
-                "typography_font_size": { "unit": "px", "size": 12 },
-                "typography_letter_spacing": { "unit": "px", "size": 3 }
+                "editor": "<p style='display: inline-block; padding: 8px 16px; background: rgba(201, 169, 98, 0.1); border: 1px solid #C9A962; border-radius: 4px; font-family: Inter, sans-serif; font-size: 12px; font-weight: 600; letter-spacing: 3px; color: #C9A962;'>COLLECTION 03</p>",
+                "align": "left",
+                "text_color": "#C9A962"
               }
+            },
+            {
+              "id": "w_sig_spacer_after_badge",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 16, "unit": "px"}}
             },
             {
               "id": "w_sig_title",
@@ -337,7 +395,12 @@
                 "header_size": "h2",
                 "title_color": "#FFFFFF",
                 "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 56, "unit": "px"},
+                "typography_font_size_tablet": {"size": 42, "unit": "px"},
+                "typography_font_size_mobile": {"size": 32, "unit": "px"},
+                "_animation": "fadeInLeft",
+                "_animation_duration": "normal"
               }
             },
             {
@@ -349,19 +412,34 @@
                 "size": "md",
                 "header_size": "h3",
                 "title_color": "#C9A962",
-                "typography_font_family": "Inter",
-                "typography_font_style": "italic"
+                "typography_font_family": "Outfit",
+                "typography_font_style": "italic",
+                "typography_font_size": {"size": 20, "unit": "px"}
               }
+            },
+            {
+              "id": "w_sig_spacer_after_tagline",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 24, "unit": "px"}}
             },
             {
               "id": "w_sig_desc",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Walk the Runway. Premium essentials that define Oakland-made luxury streetwear. Gold accents, spotlight moments, and a virtual fashion show experience bring the collection to life.</p>",
+                "editor": "<p>Walk the Runway, Oakland style. Premium essentials straight from The Town — where the Bay meets high fashion. Gold accents, spotlight moments, runway vibes. This is what Oakland luxury looks like. Get familiar.</p>",
                 "text_color": "#CCCCCC",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 16, "unit": "px"},
+                "typography_line_height": {"size": 1.8, "unit": "em"}
               }
+            },
+            {
+              "id": "w_sig_spacer_before_btn",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 32, "unit": "px"}}
             },
             {
               "id": "w_sig_btn",
@@ -369,14 +447,14 @@
               "widgetType": "button",
               "settings": {
                 "text": "Walk the Runway",
-                "link": { "url": "/signature/", "is_external": false },
+                "link": {"url": "/experiences/signature/", "is_external": false},
                 "size": "lg",
                 "button_background_color": "#C9A962",
                 "button_text_color": "#0D0D0D",
-                "typography_font_family": "Inter",
+                "typography_font_family": "Outfit",
                 "typography_font_weight": "600",
-                "icon": { "value": "fas fa-arrow-right" },
-                "icon_position": "after"
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "border_radius": {"size": 4, "unit": "px"}
               }
             }
           ]
@@ -384,18 +462,14 @@
         {
           "id": "c_sig_right",
           "elType": "column",
-          "settings": { "_column_size": 50 },
+          "settings": {"_column_size": 50},
           "elements": [
             {
-              "id": "w_sig_3d",
+              "id": "w_sig_3d_preview",
               "elType": "widget",
-              "widgetType": "skyyrose-collection-card",
+              "widgetType": "html",
               "settings": {
-                "collection_slug": "signature",
-                "preview_type": "3d_preview",
-                "enable_hover_animation": true,
-                "show_product_count": true,
-                "experience_url": "/experiences/signature/"
+                "html": "<div class='collection-3d-preview' style='width: 100%; height: 500px; position: relative; background: linear-gradient(135deg, #0A0A0A 0%, #1A1A1A 100%); border-radius: 8px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(201, 169, 98, 0.2);'>\n  <iframe src='https://app.devskyy.app/experiences/signature' style='width: 100%; height: 100%; border: none;' allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope' loading='lazy' title='SIGNATURE 3D Preview'></iframe>\n  <div style='position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); padding: 24px; text-align: center;'>\n    <p style='color: #C9A962; font-family: Inter, sans-serif; font-size: 13px; margin: 0;'>Drag to explore the Golden Runway</p>\n  </div>\n</div>"
               }
             }
           ]
@@ -407,22 +481,23 @@
       "elType": "section",
       "settings": {
         "layout": "boxed",
-        "content_width": { "size": 1200, "unit": "px" },
+        "content_width": {"size": 1200, "unit": "px"},
         "background_background": "gradient",
         "background_color": "#D4AF37",
-        "background_color_b": "#C9A962"
+        "background_color_b": "#C9A962",
+        "background_gradient_angle": {"unit": "deg", "size": 135}
       },
       "elements": [
         {
           "id": "c_cta",
           "elType": "column",
-          "settings": { "_column_size": 100 },
+          "settings": {"_column_size": 100},
           "elements": [
             {
               "id": "w_cta_spacer1",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 80, "unit": "px" } }
+              "settings": {"space": {"size": 80, "unit": "px"}}
             },
             {
               "id": "w_cta_heading",
@@ -435,40 +510,58 @@
                 "align": "center",
                 "title_color": "#0D0D0D",
                 "typography_font_family": "Playfair Display",
-                "typography_font_weight": "700"
+                "typography_font_weight": "700",
+                "typography_font_size": {"size": 42, "unit": "px"},
+                "_animation": "fadeInUp",
+                "_animation_duration": "normal"
               }
+            },
+            {
+              "id": "w_cta_spacer_after_heading",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 16, "unit": "px"}}
             },
             {
               "id": "w_cta_text",
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Explore all collections in our shop and find your perfect piece.</p>",
+                "editor": "<p>Can't decide? Explore all collections in our shop. Find your fit. Rep The Town.</p>",
                 "align": "center",
                 "text_color": "#1A1A1A",
-                "typography_font_family": "Inter"
+                "typography_font_family": "Outfit",
+                "typography_font_size": {"size": 18, "unit": "px"}
               }
+            },
+            {
+              "id": "w_cta_spacer_before_btn",
+              "elType": "widget",
+              "widgetType": "spacer",
+              "settings": {"space": {"size": 32, "unit": "px"}}
             },
             {
               "id": "w_cta_btn",
               "elType": "widget",
               "widgetType": "button",
               "settings": {
-                "text": "Shop All",
-                "link": { "url": "/shop/", "is_external": false },
+                "text": "Shop All Collections",
+                "link": {"url": "/shop/", "is_external": false},
                 "size": "lg",
+                "align": "center",
                 "button_background_color": "#0D0D0D",
                 "button_text_color": "#D4AF37",
-                "align": "center",
-                "typography_font_family": "Inter",
-                "typography_font_weight": "600"
+                "typography_font_family": "Outfit",
+                "typography_font_weight": "600",
+                "typography_letter_spacing": {"size": 1, "unit": "px"},
+                "border_radius": {"size": 4, "unit": "px"}
               }
             },
             {
               "id": "w_cta_spacer2",
               "elType": "widget",
               "widgetType": "spacer",
-              "settings": { "space": { "size": 80, "unit": "px" } }
+              "settings": {"space": {"size": 80, "unit": "px"}}
             }
           ]
         }
@@ -481,13 +574,5 @@
     "post_title": "Collections - SkyyRose",
     "meta_description": "Explore our curated collections: Black Rose (Dark Elegance), Love Hurts (Emotional Expression), and Signature (Premium Essentials). Immersive 3D experiences await."
   },
-  "metadata": {
-    "rankmath_schema": {
-      "schema_type": "CollectionPage",
-      "title": "Collections - SkyyRose",
-      "description": "Three distinct collections, one unified vision of luxury streetwear from Oakland.",
-      "url": "/collections/",
-      "image": "/wp-content/uploads/collections/collections-og.jpg"
-    }
-  }
+  "metadata": {}
 }

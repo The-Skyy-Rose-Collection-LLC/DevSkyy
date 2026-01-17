@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Oakland Edit - SkyyRose Magazine</title>
+    <meta name="description" content="Stories from Oakland's streets to fashion heights. Award-winning luxury streetwear, culture, and the journey of SkyyRose.">
+
+    <!-- Fonts: Crimson Pro (headings), Outfit (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:wght@300;400;600;700;900&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            /* Brand Colors */
+            --rose-gold: #B76E79;
+            --silver: #C0C0C0;
+            --gold: #C9A962;
+            --dark-bg: #0D0D0D;
+            --dark-secondary: #1A1A1A;
+            --dark-tertiary: #2D2D2D;
+
+            /* Typography */
+            --font-display: 'Crimson Pro', serif;
+            --font-body: 'Outfit', sans-serif;
+
+            /* Spacing */
+            --container-width: 1400px;
+            --gutter: 2rem;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background: var(--dark-bg);
+            color: #E5E5E5;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Film Grain Texture Overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+            pointer-events: none;
+            z-index: 9999;
+            mix-blend-mode: overlay;
+        }
+
+        /* Sticky Navigation */
+        .nav-bar {
+            position: sticky;
+            top: 0;
+            background: rgba(13, 13, 13, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(183, 110, 121, 0.1);
+            padding: 1.5rem var(--gutter);
+            z-index: 1000;
+            opacity: 0;
+            animation: fadeInDown 0.8s ease forwards;
+        }
+
+        .nav-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            background: linear-gradient(135deg, var(--rose-gold), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-search {
+            position: relative;
+        }
+
+        .search-input {
+            background: var(--dark-secondary);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 24px;
+            padding: 0.75rem 3rem 0.75rem 1.5rem;
+            color: #E5E5E5;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            width: 300px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--rose-gold);
+            box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            right: 1.25rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--silver);
+        }
+
+        /* Hero Featured Post */
+        .hero-section {
+            position: relative;
+            height: 85vh;
+            min-height: 600px;
+            margin-bottom: 4rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.2s forwards;
+        }
+
+        .hero-image {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, #0D0D0D 0%, #1A1A1A 100%);
+            overflow: hidden;
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+            transition: transform 0.6s ease;
+        }
+
+        .hero-section:hover .hero-image img {
+            transform: scale(1.05);
+        }
+
+        .hero-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(13, 13, 13, 0.3) 50%,
+                rgba(13, 13, 13, 0.95) 100%
+            );
+        }
+
+        .hero-content {
+            position: relative;
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: var(--gutter);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding-bottom: 4rem;
+        }
+
+        .hero-category {
+            display: inline-block;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, var(--rose-gold), #D47B86);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            width: fit-content;
+            opacity: 0;
+            animation: fadeInLeft 0.8s ease 0.6s forwards;
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+            max-width: 900px;
+            letter-spacing: -0.02em;
+            opacity: 0;
+            animation: fadeInUp 1s ease 0.8s forwards;
+        }
+
+        .hero-excerpt {
+            font-size: 1.25rem;
+            line-height: 1.7;
+            max-width: 700px;
+            color: #CCCCCC;
+            margin-bottom: 2rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1s forwards;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            font-size: 0.95rem;
+            color: var(--silver);
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.2s forwards;
+        }
+
+        .hero-read-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: white;
+            color: var(--dark-bg);
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+        }
+
+        .hero-read-btn:hover {
+            background: var(--rose-gold);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* Category Filters */
+        .category-filters {
+            max-width: var(--container-width);
+            margin: 0 auto 4rem;
+            padding: 0 var(--gutter);
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.4s forwards;
+        }
+
+        .filters-wrapper {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(192, 192, 192, 0.1);
+        }
+
+        .category-btn {
+            padding: 0.75rem 1.75rem;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            color: #E5E5E5;
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .category-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--rose-gold), var(--gold));
+            transition: left 0.3s ease;
+            z-index: -1;
+        }
+
+        .category-btn:hover::before,
+        .category-btn.active::before {
+            left: 0;
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            border-color: var(--rose-gold);
+            color: white;
+        }
+
+        /* Blog Grid - Bento Layout */
+        .blog-grid-container {
+            max-width: var(--container-width);
+            margin: 0 auto;
+            padding: 0 var(--gutter);
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 4rem;
+            margin-bottom: 6rem;
+        }
+
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2.5rem;
+            opacity: 0;
+            animation: fadeInUp 1s ease 1.6s forwards;
+        }
+
+        /* Article Cards */
+        .article-card {
+            background: var(--dark-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .article-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(183, 110, 121, 0.3);
+        }
+
+        .article-card.featured {
+            grid-column: span 2;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+        }
+
+        .card-image {
+            position: relative;
+            height: 300px;
+            background: linear-gradient(135deg, var(--dark-bg), var(--dark-secondary));
+            overflow: hidden;
+        }
+
+        .article-card.featured .card-image {
+            height: 100%;
+        }
+
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s ease;
+        }
+
+        .article-card:hover .card-image img {
+            transform: scale(1.1);
+        }
+
+        .card-category {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(13, 13, 13, 0.8);
+            backdrop-filter: blur(10px);
+            color: var(--rose-gold);
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            border-radius: 4px;
+            border: 1px solid var(--rose-gold);
+        }
+
+        .card-content {
+            padding: 2rem;
+        }
+
+        .card-title {
+            font-family: var(--font-display);
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .article-card.featured .card-title {
+            font-size: 2.25rem;
+        }
+
+        .card-excerpt {
+            color: #B8B8B8;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--silver);
+        }
+
+        .card-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            opacity: 0;
+            animation: fadeInRight 1s ease 1.8s forwards;
+        }
+
+        .sidebar-section {
+            background: var(--dark-secondary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(192, 192, 192, 0.1);
+        }
+
+        .sidebar-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: white;
+        }
+
+        .popular-post {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(192, 192, 192, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .popular-post:hover {
+            transform: translateX(5px);
+        }
+
+        .popular-post:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .popular-post-image {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .popular-post-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin-bottom: 0.5rem;
+            color: white;
+        }
+
+        .popular-post-date {
+            font-size: 0.8rem;
+            color: var(--silver);
+        }
+
+        /* Newsletter Signup */
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .newsletter-input {
+            background: var(--dark-bg);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            color: white;
+            font-family: var(--font-body);
+            transition: border-color 0.3s ease;
+        }
+
+        .newsletter-input:focus {
+            outline: none;
+            border-color: var(--rose-gold);
+        }
+
+        .newsletter-btn {
+            background: linear-gradient(135deg, var(--rose-gold), var(--gold));
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 1rem;
+            font-family: var(--font-body);
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .newsletter-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Pagination */
+        .pagination {
+            max-width: var(--container-width);
+            margin: 0 auto 6rem;
+            padding: 0 var(--gutter);
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .page-btn {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--dark-secondary);
+            border: 1px solid rgba(192, 192, 192, 0.2);
+            color: #E5E5E5;
+            font-weight: 500;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .page-btn:hover,
+        .page-btn.active {
+            background: var(--rose-gold);
+            border-color: var(--rose-gold);
+            color: white;
+        }
+
+        /* Footer CTA */
+        .footer-cta {
+            position: relative;
+            padding: 8rem var(--gutter);
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--dark-secondary) 100%);
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .footer-cta::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--rose-gold), transparent);
+        }
+
+        .cta-content {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-family: var(--font-display);
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, white, var(--silver));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .cta-text {
+            font-size: 1.15rem;
+            color: #B8B8B8;
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+        }
+
+        .cta-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.25rem 3rem;
+            background: linear-gradient(135deg, var(--rose-gold), var(--gold));
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(183, 110, 121, 0.4);
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .blog-grid-container {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .article-card.featured {
+                grid-column: span 1;
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --gutter: 1.25rem;
+            }
+
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .hero-section {
+                height: 70vh;
+                min-height: 500px;
+            }
+
+            .filters-wrapper {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding-bottom: 1rem;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .category-btn {
+                flex-shrink: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-container">
+            <div class="logo">SKYYROSE</div>
+            <div class="nav-search">
+                <input type="search" class="search-input" placeholder="Search stories..." aria-label="Search blog posts">
+                <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                </svg>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Featured Post -->
+    <section class="hero-section">
+        <div class="hero-image">
+            <img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1d5d?w=1600&h=900&fit=crop" alt="Oakland skyline at golden hour" loading="eager">
+        </div>
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+            <span class="hero-category">FEATURE</span>
+            <h1 class="hero-title">From Oakland's Streets to Fashion Heights: The SkyyRose Story</h1>
+            <p class="hero-excerpt">
+                How one father turned adversity into artistry, building a luxury streetwear empire that represents Oakland pride and authentic Bay Area culture.
+            </p>
+            <div class="hero-meta">
+                <a href="#" class="hero-read-btn">
+                    Read Story
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                </a>
+                <span>12 min read</span>
+                <span>Dec 15, 2024</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Filters -->
+    <section class="category-filters">
+        <div class="filters-wrapper">
+            <button class="category-btn active" data-category="all">All Stories</button>
+            <button class="category-btn" data-category="fashion">Fashion</button>
+            <button class="category-btn" data-category="culture">Culture</button>
+            <button class="category-btn" data-category="behind-scenes">Behind the Scenes</button>
+            <button class="category-btn" data-category="community">Community</button>
+        </div>
+    </section>
+
+    <!-- Blog Grid + Sidebar -->
+    <div class="blog-grid-container">
+        <!-- Main Grid -->
+        <div class="blog-grid">
+
+            <!-- Featured Article -->
+            <article class="article-card featured">
+                <div class="card-image">
+                    <span class="card-category">Culture</span>
+                    <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=800&h=600&fit=crop" alt="Oakland street art and fashion" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">14 Game-Changing Entrepreneurs to Watch in 2023</h2>
+                    <p class="card-excerpt">
+                        Maxim Magazine highlights SkyyRose founder as one of the year's most innovative entrepreneurs, transforming personal struggle into a thriving fashion empire.
+                    </p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Jan 15, 2023
+                        </span>
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            8 min
+                        </span>
+                        <a href="https://www.maxim.com/partner/14-game-changing-entrepreneurs-to-watch-in-2023/" target="_blank" rel="noopener" style="color: var(--rose-gold); text-decoration: none;">
+                            Read on Maxim →
+                        </a>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 2 -->
+            <article class="article-card">
+                <div class="card-image">
+                    <span class="card-category">Behind the Scenes</span>
+                    <img src="https://images.unsplash.com/photo-1556742111-a301076d9d18?w=600&h=400&fit=crop" alt="Fashion entrepreneur working" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">The Unyielding Journey of a Single Father</h2>
+                    <p class="card-excerpt">
+                        CEO Weekly explores the remarkable story of balancing fatherhood with building a fashion empire from Oakland's streets.
+                    </p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Mar 8, 2024
+                        </span>
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            10 min
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 3 -->
+            <article class="article-card">
+                <div class="card-image">
+                    <span class="card-category">Fashion</span>
+                    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&h=400&fit=crop" alt="Luxury streetwear collection" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">From Oakland's Streets to Fashion Heights</h2>
+                    <p class="card-excerpt">
+                        San Francisco Post chronicles how SkyyRose elevated Bay Area streetwear to luxury fashion status, one design at a time.
+                    </p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Jun 22, 2024
+                        </span>
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            7 min
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 4 -->
+            <article class="article-card">
+                <div class="card-image">
+                    <span class="card-category">Community</span>
+                    <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=600&h=400&fit=crop" alt="Award ceremony" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">Best Bay Area Clothing Line Award 2024</h2>
+                    <p class="card-excerpt">
+                        SkyyRose takes home the prestigious Best of Best Review award, recognized for exceptional design, quality, and community impact.
+                    </p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Oct 30, 2024
+                        </span>
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            5 min
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 5 -->
+            <article class="article-card">
+                <div class="card-image">
+                    <span class="card-category">Fashion</span>
+                    <img src="https://images.unsplash.com/photo-1523381210434-271e8be1f52b?w=600&h=400&fit=crop" alt="Black Rose collection piece" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">Inside the Black Rose Collection</h2>
+                    <p class="card-excerpt">
+                        A deep dive into our most enigmatic collection, where dark elegance meets modern luxury in every stitch and silhouette.
+                    </p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Nov 18, 2024
+                        </span>
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            6 min
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article 6 -->
+            <article class="article-card">
+                <div class="card-image">
+                    <span class="card-category">Culture</span>
+                    <img src="https://images.unsplash.com/photo-1578916171728-46686eac8d58?w=600&h=400&fit=crop" alt="Oakland street culture" loading="lazy">
+                </div>
+                <div class="card-content">
+                    <h2 class="card-title">Oakland Pride: Design Language of The Town</h2>
+                    <p class="card-excerpt">
+                        How Oakland's unique culture, history, and spirit infuse every design decision we make at SkyyRose.
+                    </p>
+                    <div class="card-meta">
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            Dec 5, 2024
+                        </span>
+                        <span class="card-meta-item">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                            9 min
+                        </span>
+                    </div>
+                </div>
+            </article>
+
+        </div>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+
+            <!-- Popular Posts -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Popular Stories</h3>
+
+                <div class="popular-post">
+                    <img src="https://images.unsplash.com/photo-1558769132-cb1aea1f1d5d?w=160&h=160&fit=crop" alt="Oakland" class="popular-post-image">
+                    <div>
+                        <div class="popular-post-title">The Making of a Collection</div>
+                        <div class="popular-post-date">Dec 10, 2024</div>
+                    </div>
+                </div>
+
+                <div class="popular-post">
+                    <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=160&h=160&fit=crop" alt="Design" class="popular-post-image">
+                    <div>
+                        <div class="popular-post-title">Sustainable Streetwear Future</div>
+                        <div class="popular-post-date">Dec 3, 2024</div>
+                    </div>
+                </div>
+
+                <div class="popular-post">
+                    <img src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=160&h=160&fit=crop" alt="Fashion" class="popular-post-image">
+                    <div>
+                        <div class="popular-post-title">Bay Area Fashion Evolution</div>
+                        <div class="popular-post-date">Nov 28, 2024</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="sidebar-section">
+                <h3 class="sidebar-title">Stay Connected</h3>
+                <p style="color: #B8B8B8; font-size: 0.95rem; margin-bottom: 1.5rem; line-height: 1.6;">
+                    Get exclusive stories, behind-the-scenes content, and collection previews delivered to your inbox.
+                </p>
+                <form class="newsletter-form" aria-label="Newsletter signup">
+                    <input type="email" class="newsletter-input" placeholder="Your email" required aria-label="Email address">
+                    <button type="submit" class="newsletter-btn">Subscribe</button>
+                </form>
+            </div>
+
+            <!-- Social Proof -->
+            <div class="sidebar-section" style="background: linear-gradient(135deg, var(--rose-gold), var(--gold)); padding: 2rem; text-align: center;">
+                <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏆</div>
+                <h3 style="font-family: var(--font-display); font-size: 1.25rem; color: white; margin-bottom: 0.5rem;">Award Winner</h3>
+                <p style="color: rgba(255,255,255,0.9); font-size: 0.9rem;">Best Bay Area Clothing Line 2024</p>
+            </div>
+
+        </aside>
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+        <button class="page-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </button>
+        <button class="page-btn active">1</button>
+        <button class="page-btn">2</button>
+        <button class="page-btn">3</button>
+        <button class="page-btn">...</button>
+        <button class="page-btn">8</button>
+        <button class="page-btn">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+        </button>
+    </div>
+
+    <!-- Footer CTA -->
+    <section class="footer-cta">
+        <div class="cta-content">
+            <h2 class="cta-title">Ready to Explore Our Collections?</h2>
+            <p class="cta-text">
+                From Oakland's streets to your wardrobe. Discover luxury streetwear that tells your story.
+            </p>
+            <a href="/shop/" class="cta-btn">
+                Shop Collections
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M5 12h14M12 5l7 7-7 7"/>
+                </svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- JavaScript for Interactions -->
+    <script>
+        // Category Filter
+        const categoryBtns = document.querySelectorAll('.category-btn');
+        const articleCards = document.querAll('.article-card');
+
+        categoryBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                categoryBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const category = btn.dataset.category;
+
+                // Filter articles (in production, this would fetch filtered data)
+                articleCards.forEach(card => {
+                    if (category === 'all' || card.querySelector('.card-category').textContent.toLowerCase() === category) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        // Article card click navigation
+        document.querySelectorAll('.article-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                // Don't navigate if clicking on a link
+                if (e.target.tagName !== 'A') {
+                    const link = card.querySelector('a[href]');
+                    if (link) {
+                        window.location.href = link.href;
+                    }
+                }
+            });
+        });
+
+        // Newsletter form
+        const newsletterForm = document.querySelector('.newsletter-form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const email = newsletterForm.querySelector('input[type="email"]').value;
+
+                // In production, send to backend
+                console.log('Newsletter signup:', email);
+
+                // Show success message
+                const btn = newsletterForm.querySelector('.newsletter-btn');
+                btn.textContent = 'Subscribed! ✓';
+                btn.style.background = '#27AE60';
+
+                setTimeout(() => {
+                    btn.textContent = 'Subscribe';
+                    btn.style.background = '';
+                    newsletterForm.reset();
+                }, 3000);
+            });
+        }
+
+        // Search functionality
+        const searchInput = document.querySelector('.search-input');
+        if (searchInput) {
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.toLowerCase();
+
+                // In production, implement debounced search API call
+                console.log('Search query:', query);
+            });
+        }
+
+        // Lazy load images with intersection observer
+        const images = document.querySelectorAll('img[loading="lazy"]');
+        if ('IntersectionObserver' in window) {
+            const imageObserver = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const img = entry.target;
+                        img.src = img.src; // Trigger load
+                        imageObserver.unobserve(img);
+                    }
+                });
+            });
+
+            images.forEach(img => imageObserver.observe(img));
+        }
+
+        // Smooth scroll for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>

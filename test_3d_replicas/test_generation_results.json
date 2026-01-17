@@ -1,0 +1,35 @@
+{
+  "timestamp": "2026-01-16T23:31:41.699226+00:00",
+  "config": {
+    "quality": "production",
+    "texture_resolution": 4096,
+    "minimum_fidelity": 0.95,
+    "provider": "auto"
+  },
+  "results": [
+    {
+      "success": false,
+      "collection": "signature",
+      "product_name": "SIG_000_20231221_222005",
+      "source_image": "assets/enhanced-images/signature/SIG_000_20231221_222005/SIG_000_20231221_222005_transparent.png",
+      "error": "unsupported operand type(s) for -: 'float' and 'str'",
+      "timestamp": "2026-01-16T23:31:41.324954+00:00"
+    },
+    {
+      "success": false,
+      "collection": "signature",
+      "product_name": "SIG_001_20231221_222005",
+      "source_image": "assets/enhanced-images/signature/SIG_001_20231221_222005/SIG_001_20231221_222005_transparent.png",
+      "error": "unsupported operand type(s) for -: 'float' and 'str'",
+      "timestamp": "2026-01-16T23:31:41.513997+00:00"
+    },
+    {
+      "success": false,
+      "collection": "signature",
+      "product_name": "SIG_002_20231221_222005",
+      "source_image": "assets/enhanced-images/signature/SIG_002_20231221_222005/SIG_002_20231221_222005_transparent.png",
+      "error": "unsupported operand type(s) for -: 'float' and 'str'",
+      "timestamp": "2026-01-16T23:31:41.698962+00:00"
+    }
+  ]
+}

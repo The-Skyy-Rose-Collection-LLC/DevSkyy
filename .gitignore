@@ -205,3 +205,13 @@ wordpress/skyyrose-immersive/
 wordpress/skyyrose-immersive.zip
 wordpress/shoptimizer-child-theme/
 wordpress/plugins/
+# 3D Models (large binary files)
+generated_3d_models/
+
+# Large files moved to HuggingFace Hub
+# https://huggingface.co/datasets/damBruh/skyyrose-assets
+# https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v1
+# https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v2
+assets/
+datasets/
+generated_3d_models_color_accurate/

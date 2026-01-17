@@ -1,0 +1,15 @@
+{
+  "base_model": "stabilityai/stable-diffusion-xl-base-1.0",
+  "project_name": "skyyrose-lora",
+  "training_type": "dreambooth_lora",
+  "instance_prompt": "skyyrose luxury streetwear",
+  "resolution": 1024,
+  "train_batch_size": 1,
+  "gradient_accumulation_steps": 4,
+  "learning_rate": 0.0001,
+  "lr_scheduler": "constant",
+  "max_train_steps": 500,
+  "lora_r": 32,
+  "lora_alpha": 64,
+  "mixed_precision": "fp16"
+}
