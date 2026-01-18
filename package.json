@@ -11,9 +11,9 @@
     "@ai-sdk/huggingface": "^0.0.12",
     "@anthropic-ai/sdk": "^0.57.0",
     "@apollo/server": "^5.2.0",
-    "@copilotkit/react-core": "^1.50.1",
-    "@copilotkit/react-ui": "^1.50.1",
-    "@copilotkit/runtime": "^1.50.1",
+    "@copilotkit/react-core": "^1.51.2",
+    "@copilotkit/react-ui": "^1.51.2",
+    "@copilotkit/runtime": "^1.51.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
     "@fastify/rate-limit": "^10.3.0",
@@ -109,5 +109,12 @@
     "ts-jest": "^29.4.6",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "hono": ">=4.11.4",
+      "prismjs": ">=1.30.0",
+      "diff": ">=8.0.3"
+    }
   }
 }
