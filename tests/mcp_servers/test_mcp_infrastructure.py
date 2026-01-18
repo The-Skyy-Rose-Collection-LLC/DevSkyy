@@ -268,7 +268,7 @@ def test_catalog_generator_markdown_format():
     assert "# MCP Tool Catalog" in markdown
     assert "test_tool" in markdown
     assert "Commerce Tools" in markdown
-    assert "Read-only: True" in markdown
+    assert "**Read-only**: True" in markdown
 
 
 @pytest.mark.unit

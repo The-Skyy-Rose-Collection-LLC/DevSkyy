@@ -221,7 +221,7 @@ def run_training():
 
     # Add HuggingFace upload flags only if token available
     if CONFIG.get("use_hf", False):
-        train_cmd.extend(
+        cmd.extend(
             [
                 "--push_to_hub",
                 f"--hub_model_id={CONFIG['hub_model_id']}",

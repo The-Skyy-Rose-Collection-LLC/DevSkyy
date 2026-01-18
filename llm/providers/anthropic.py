@@ -16,6 +16,12 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
+# Import config for API keys (loads .env.hf)
+try:
+    from config import ANTHROPIC_API_KEY
+except ImportError:
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+
 from ..base import (
     BaseLLMClient,
     CallerInfo,
@@ -66,7 +72,7 @@ class AnthropicClient(BaseLLMClient):
             **kwargs: Additional arguments passed to BaseLLMClient
         """
         super().__init__(
-            api_key=api_key or os.getenv("ANTHROPIC_API_KEY", ""),
+            api_key=api_key or ANTHROPIC_API_KEY or os.getenv("ANTHROPIC_API_KEY", ""),
             base_url=base_url,
             **kwargs,
         )

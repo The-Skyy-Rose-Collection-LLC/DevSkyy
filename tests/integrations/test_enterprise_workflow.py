@@ -19,15 +19,16 @@ Coverage:
 - Cost savings validation
 """
 
-import pytest
-from unittest.mock import AsyncMock, patch, Mock
+from unittest.mock import AsyncMock, Mock, patch
 
-from llm.classification import GroqFastClassifier, ClassificationResult, ClassificationType
+import pytest
+
+from llm.classification import GroqFastClassifier
 from orchestration.embedding_engine import CohereEmbeddingEngine, EmbeddingConfig, EmbeddingProvider
 from orchestration.enterprise_index import (
+    CodeSearchResult,
     EnterpriseIndex,
     EnterpriseIndexConfig,
-    CodeSearchResult,
     SearchLanguage,
 )
 from orchestration.reranker import CohereReranker, RerankerConfig, RerankerProvider
@@ -267,19 +268,21 @@ async def test_parallel_provider_search(mock_api_keys):
         )
     ]
 
-    with patch.object(
-        GitHubEnterpriseProvider, "search_code", new_callable=AsyncMock, return_value=gh_results
-    ):
-        with patch.object(
+    with (
+        patch.object(
+            GitHubEnterpriseProvider, "search_code", new_callable=AsyncMock, return_value=gh_results
+        ),
+        patch.object(
             GitLabProvider, "search_code", new_callable=AsyncMock, return_value=gl_results
-        ):
-            await index.initialize()
+        ),
+    ):
+        await index.initialize()
 
-            import time
+        import time
 
-            start = time.monotonic()
-            results = await index.search_code("authentication")
-            elapsed = time.monotonic() - start
+        start = time.monotonic()
+        results = await index.search_code("authentication")
+        elapsed = time.monotonic() - start
 
     # Should get results from both providers
     assert len(results) == 2

@@ -680,7 +680,468 @@ async def test_tool(tool_name: str, parameters: dict[str, Any] | None = None):
 
 
 # =============================================================================
+# AR Analytics Endpoints
+# =============================================================================
+
+
+class ARDashboardOverview(BaseModel):
+    """AR dashboard overview for admin panel."""
+
+    total_sessions: int = 0
+    active_sessions: int = 0
+    total_tryons: int = 0
+    conversion_rate: float = 0.0
+    popular_collections: list[dict[str, Any]] = []
+    recent_sessions: list[dict[str, Any]] = []
+
+
+@dashboard_router.get("/ar/overview", response_model=ARDashboardOverview)
+async def get_ar_overview():
+    """
+    Get AR analytics overview for dashboard.
+
+    Integrates with ar_sessions API to provide dashboard metrics.
+    """
+    try:
+        # Import ar_sessions store (lazy import to avoid circular deps)
+        from api.ar_sessions import session_store
+
+        analytics = session_store.get_analytics()
+
+        # Get recent sessions
+        sessions = list(session_store._sessions.values())
+        recent = sorted(sessions, key=lambda s: s.updated_at, reverse=True)[:10]
+
+        # Collection popularity
+        collection_counts: dict[str, int] = {}
+        for s in sessions:
+            col = s.collection.value
+            collection_counts[col] = collection_counts.get(col, 0) + 1
+
+        popular_collections = [
+            {"collection": c, "sessions": count}
+            for c, count in sorted(collection_counts.items(), key=lambda x: x[1], reverse=True)
+        ]
+
+        return ARDashboardOverview(
+            total_sessions=analytics.total_sessions,
+            active_sessions=analytics.active_sessions,
+            total_tryons=sum(s.try_on_count for s in sessions),
+            conversion_rate=analytics.conversion_rate,
+            popular_collections=popular_collections,
+            recent_sessions=[
+                {
+                    "session_id": s.session_id,
+                    "collection": s.collection.value,
+                    "mode": s.mode.value,
+                    "status": s.status.value,
+                    "try_on_count": s.try_on_count,
+                    "created_at": s.created_at.isoformat(),
+                }
+                for s in recent
+            ],
+        )
+    except ImportError:
+        # AR sessions module not available
+        return ARDashboardOverview()
+    except Exception as e:
+        logger.warning(f"AR analytics unavailable: {e}")
+        return ARDashboardOverview()
+
+
+@dashboard_router.get("/ar/metrics")
+async def get_ar_metrics():
+    """
+    Get detailed AR metrics for monitoring.
+
+    Returns mode distribution, hourly activity, and product performance.
+    """
+    try:
+        from api.ar_sessions import session_store
+
+        analytics = session_store.get_analytics()
+
+        return {
+            "mode_distribution": analytics.mode_distribution,
+            "popular_products": analytics.popular_products,
+            "avg_try_on_count": analytics.avg_try_on_count,
+            "total_sessions": analytics.total_sessions,
+            "active_sessions": analytics.active_sessions,
+            "conversion_rate": analytics.conversion_rate,
+        }
+    except ImportError:
+        return {"error": "AR sessions module not available"}
+    except Exception as e:
+        logger.warning(f"AR metrics unavailable: {e}")
+        return {"error": str(e)}
+
+
+# =============================================================================
+# WordPress Dashboard Endpoints
+# =============================================================================
+
+
+class WordPressDashboardOverview(BaseModel):
+    """WordPress/WooCommerce dashboard overview."""
+
+    site_url: str = "https://skyyrose.com"
+    total_products: int = 0
+    published_products: int = 0
+    draft_products: int = 0
+    total_orders: int = 0
+    pending_orders: int = 0
+    processing_orders: int = 0
+    completed_orders: int = 0
+    total_revenue: float = 0.0
+    recent_orders: list[dict[str, Any]] = []
+    sync_status: str = "unknown"
+    last_sync: str | None = None
+
+
+@dashboard_router.get("/wordpress/overview", response_model=WordPressDashboardOverview)
+async def get_wordpress_overview():
+    """
+    Get WordPress/WooCommerce overview for dashboard.
+
+    Integrates with WooCommerce API to provide e-commerce metrics.
+    """
+    import os
+
+    try:
+        from integrations.wordpress_client import WordPressWooCommerceClient
+
+        wc_key = os.getenv("WOOCOMMERCE_KEY")
+        wc_secret = os.getenv("WOOCOMMERCE_SECRET")
+
+        if not wc_key or not wc_secret:
+            return WordPressDashboardOverview(
+                sync_status="not_configured",
+                site_url="https://skyyrose.com",
+            )
+
+        async with WordPressWooCommerceClient() as client:
+            # Get products summary
+            products = await client.get_products(per_page=100)
+            published = sum(1 for p in products if p.get("status") == "publish")
+            draft = sum(1 for p in products if p.get("status") == "draft")
+
+            # Get orders summary
+            orders = await client.get_orders(per_page=50)
+            pending = sum(1 for o in orders if o.get("status") == "pending")
+            processing = sum(1 for o in orders if o.get("status") == "processing")
+            completed = sum(1 for o in orders if o.get("status") == "completed")
+            revenue = sum(
+                float(o.get("total", 0)) for o in orders if o.get("status") == "completed"
+            )
+
+            recent = [
+                {
+                    "id": o.get("id"),
+                    "status": o.get("status"),
+                    "total": o.get("total"),
+                    "date": o.get("date_created"),
+                }
+                for o in orders[:10]
+            ]
+
+            return WordPressDashboardOverview(
+                site_url="https://skyyrose.com",
+                total_products=len(products),
+                published_products=published,
+                draft_products=draft,
+                total_orders=len(orders),
+                pending_orders=pending,
+                processing_orders=processing,
+                completed_orders=completed,
+                total_revenue=revenue,
+                recent_orders=recent,
+                sync_status="connected",
+                last_sync=datetime.now(UTC).isoformat(),
+            )
+    except ImportError:
+        return WordPressDashboardOverview(sync_status="module_unavailable")
+    except Exception as e:
+        logger.warning(f"WordPress overview unavailable: {e}")
+        return WordPressDashboardOverview(sync_status=f"error: {str(e)[:50]}")
+
+
+@dashboard_router.get("/wordpress/products")
+async def get_wordpress_products(limit: int = 20, status: str | None = None):
+    """Get WordPress/WooCommerce products for dashboard."""
+    import os
+
+    try:
+        from integrations.wordpress_client import WordPressWooCommerceClient
+
+        wc_key = os.getenv("WOOCOMMERCE_KEY")
+        wc_secret = os.getenv("WOOCOMMERCE_SECRET")
+
+        if not wc_key or not wc_secret:
+            return {"error": "WooCommerce not configured", "products": []}
+
+        async with WordPressWooCommerceClient() as client:
+            products = await client.get_products(per_page=limit, status=status)
+            return {
+                "total": len(products),
+                "products": [
+                    {
+                        "id": p.get("id"),
+                        "name": p.get("name"),
+                        "status": p.get("status"),
+                        "price": p.get("price"),
+                        "stock_status": p.get("stock_status"),
+                        "image": p.get("images", [{}])[0].get("src") if p.get("images") else None,
+                    }
+                    for p in products
+                ],
+            }
+    except Exception as e:
+        logger.warning(f"WordPress products unavailable: {e}")
+        return {"error": str(e), "products": []}
+
+
+@dashboard_router.get("/wordpress/orders")
+async def get_wordpress_orders(limit: int = 20, status: str | None = None):
+    """Get WordPress/WooCommerce orders for dashboard."""
+    import os
+
+    try:
+        from integrations.wordpress_client import WordPressWooCommerceClient
+
+        wc_key = os.getenv("WOOCOMMERCE_KEY")
+        wc_secret = os.getenv("WOOCOMMERCE_SECRET")
+
+        if not wc_key or not wc_secret:
+            return {"error": "WooCommerce not configured", "orders": []}
+
+        async with WordPressWooCommerceClient() as client:
+            orders = await client.get_orders(per_page=limit, status=status)
+            return {
+                "total": len(orders),
+                "orders": [
+                    {
+                        "id": o.get("id"),
+                        "status": o.get("status"),
+                        "total": o.get("total"),
+                        "currency": o.get("currency"),
+                        "customer": o.get("billing", {}).get("email"),
+                        "date": o.get("date_created"),
+                        "items_count": len(o.get("line_items", [])),
+                    }
+                    for o in orders
+                ],
+            }
+    except Exception as e:
+        logger.warning(f"WordPress orders unavailable: {e}")
+        return {"error": str(e), "orders": []}
+
+
+# =============================================================================
+# HuggingFace Dashboard Endpoints
+# =============================================================================
+
+
+class HuggingFaceDashboardOverview(BaseModel):
+    """HuggingFace dashboard overview."""
+
+    username: str = "damBruh"
+    total_spaces: int = 0
+    running_spaces: int = 0
+    building_spaces: int = 0
+    error_spaces: int = 0
+    total_datasets: int = 0
+    total_models: int = 0
+    training_status: str = "idle"
+    training_progress: float = 0.0
+    spaces: list[dict[str, Any]] = []
+    datasets: list[dict[str, Any]] = []
+    models: list[dict[str, Any]] = []
+
+
+@dashboard_router.get("/huggingface/overview", response_model=HuggingFaceDashboardOverview)
+async def get_huggingface_overview():
+    """
+    Get HuggingFace overview for dashboard.
+
+    Shows Spaces status, datasets, models, and training status.
+    """
+    import os
+
+    os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_ACCESS_TOKEN")
+    hf_username = "damBruh"
+
+    # Known SkyyRose assets
+    known_datasets = [
+        {"name": "skyyrose-lora-dataset-v3", "downloads": 390, "status": "active"},
+        {"name": "skyyrose-lora-dataset-v2", "downloads": 30, "status": "active"},
+        {"name": "skyyrose-lora-dataset-v1", "likes": 82, "status": "active"},
+        {"name": "skyyrose-assets", "likes": 24, "status": "active"},
+    ]
+
+    known_models = [
+        {"name": "skyyrose-lora-model-v2", "type": "lora", "status": "available"},
+        {"name": "skyyrose-lora-v1", "type": "lora", "status": "available"},
+    ]
+
+    known_spaces = [
+        {"name": "skyyrose-3d-converter", "category": "media", "status": "running"},
+        {"name": "skyyrose-virtual-tryon", "category": "ai", "status": "running"},
+        {"name": "skyyrose-product-analyzer", "category": "analytics", "status": "running"},
+        {"name": "skyyrose-lora-training-monitor", "category": "ai", "status": "running"},
+    ]
+
+    try:
+        # Try to get live training status
+        from api.v1.training_status import get_training_status
+
+        training = await get_training_status()
+        training_status = training.status
+        training_progress = training.progress_percentage
+    except Exception:
+        training_status = "idle"
+        training_progress = 0.0
+
+    try:
+        # Try to get live Spaces status
+        from api.v1.hf_spaces import get_all_spaces_status
+
+        spaces_data = await get_all_spaces_status()
+        running = spaces_data.running
+        building = spaces_data.building
+        error = spaces_data.error
+        spaces_list = [
+            {"name": s.id, "category": s.category, "status": s.status, "url": s.url}
+            for s in spaces_data.spaces
+        ]
+    except Exception:
+        running = len([s for s in known_spaces if s["status"] == "running"])
+        building = 0
+        error = 0
+        spaces_list = known_spaces
+
+    return HuggingFaceDashboardOverview(
+        username=hf_username,
+        total_spaces=len(spaces_list),
+        running_spaces=running,
+        building_spaces=building,
+        error_spaces=error,
+        total_datasets=len(known_datasets),
+        total_models=len(known_models),
+        training_status=training_status,
+        training_progress=training_progress,
+        spaces=spaces_list,
+        datasets=known_datasets,
+        models=known_models,
+    )
+
+
+@dashboard_router.get("/huggingface/spaces")
+async def get_huggingface_spaces():
+    """Get HuggingFace Spaces status for dashboard."""
+    try:
+        from api.v1.hf_spaces import get_all_spaces_status
+
+        spaces_data = await get_all_spaces_status()
+        return {
+            "total": spaces_data.total_spaces,
+            "running": spaces_data.running,
+            "building": spaces_data.building,
+            "error": spaces_data.error,
+            "spaces": [
+                {
+                    "id": s.id,
+                    "name": s.name,
+                    "description": s.description,
+                    "url": s.url,
+                    "category": s.category,
+                    "status": s.status,
+                    "last_updated": s.last_updated,
+                }
+                for s in spaces_data.spaces
+            ],
+            "checked_at": spaces_data.checked_at,
+        }
+    except Exception as e:
+        logger.warning(f"HuggingFace Spaces unavailable: {e}")
+        return {"error": str(e), "spaces": []}
+
+
+@dashboard_router.get("/huggingface/training")
+async def get_huggingface_training():
+    """Get LoRA training status for dashboard."""
+    try:
+        from api.v1.training_status import get_training_status
+
+        training = await get_training_status()
+        return {
+            "status": training.status,
+            "version": training.version,
+            "current_epoch": training.current_epoch,
+            "total_epochs": training.total_epochs,
+            "current_step": training.current_step,
+            "total_steps": training.total_steps,
+            "progress_percentage": training.progress_percentage,
+            "loss": training.loss,
+            "learning_rate": training.learning_rate,
+            "avg_loss": training.avg_loss,
+            "best_loss": training.best_loss,
+        }
+    except Exception as e:
+        logger.warning(f"Training status unavailable: {e}")
+        return {"status": "unavailable", "error": str(e)}
+
+
+@dashboard_router.get("/huggingface/datasets")
+async def get_huggingface_datasets():
+    """Get HuggingFace datasets info for dashboard."""
+    from pathlib import Path
+
+    # Known datasets with local info
+    datasets_info = []
+    hf_username = "damBruh"
+
+    dataset_configs = [
+        {"name": "skyyrose-lora-dataset-v3", "local_path": "datasets/skyyrose_lora_v3"},
+        {"name": "skyyrose-lora-dataset-v2", "local_path": "datasets/skyyrose_lora_v2"},
+        {"name": "skyyrose-lora-dataset-v1", "local_path": "datasets/skyyrose_lora_v1"},
+    ]
+
+    for ds in dataset_configs:
+        local_path = Path(ds["local_path"])
+        image_count = 0
+        if local_path.exists():
+            image_count = len(list(local_path.glob("**/*.jpg"))) + len(
+                list(local_path.glob("**/*.png"))
+            )
+
+        datasets_info.append(
+            {
+                "name": ds["name"],
+                "hf_url": f"https://huggingface.co/datasets/{hf_username}/{ds['name']}",
+                "local_path": str(local_path),
+                "local_images": image_count,
+                "exists_locally": local_path.exists(),
+            }
+        )
+
+    return {
+        "username": hf_username,
+        "total": len(datasets_info),
+        "datasets": datasets_info,
+    }
+
+
+# =============================================================================
 # Export
 # =============================================================================
 
-__all__ = ["dashboard_router", "agent_registry", "AgentInfo", "ToolInfo", "AgentStats"]
+__all__ = [
+    "dashboard_router",
+    "agent_registry",
+    "AgentInfo",
+    "ToolInfo",
+    "AgentStats",
+    "ARDashboardOverview",
+    "WordPressDashboardOverview",
+    "HuggingFaceDashboardOverview",
+]

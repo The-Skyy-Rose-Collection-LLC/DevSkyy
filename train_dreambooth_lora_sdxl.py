@@ -742,10 +742,7 @@ def parse_args(input_args=None):
         help="The image interpolation method to use for resizing images.",
     )
 
-    if input_args is not None:
-        args = parser.parse_args(input_args)
-    else:
-        args = parser.parse_args()
+    args = parser.parse_args(input_args) if input_args is not None else parser.parse_args()
 
     if args.dataset_name is None and args.instance_data_dir is None:
         raise ValueError("Specify either `--dataset_name` or `--instance_data_dir`")
@@ -765,9 +762,13 @@ def parse_args(input_args=None):
     else:
         # logger is not available yet
         if args.class_data_dir is not None:
-            warnings.warn("You need not use --class_data_dir without --with_prior_preservation.")
+            warnings.warn(
+                "You need not use --class_data_dir without --with_prior_preservation.", stacklevel=2
+            )
         if args.class_prompt is not None:
-            warnings.warn("You need not use --class_prompt without --with_prior_preservation.")
+            warnings.warn(
+                "You need not use --class_prompt without --with_prior_preservation.", stacklevel=2
+            )
 
     return args
 
@@ -883,7 +884,7 @@ class DreamBoothDataset(Dataset):
         )
         for image in self.instance_images:
             image = exif_transpose(image)
-            if not image.mode == "RGB":
+            if image.mode != "RGB":
                 image = image.convert("RGB")
             self.original_sizes.append((image.height, image.width))
             image = train_resize(image)
@@ -952,7 +953,7 @@ class DreamBoothDataset(Dataset):
             class_image = Image.open(self.class_images_path[index % self.num_class_images])
             class_image = exif_transpose(class_image)
 
-            if not class_image.mode == "RGB":
+            if class_image.mode != "RGB":
                 class_image = class_image.convert("RGB")
             example["class_images"] = self.image_transforms(class_image)
             example["class_prompt"] = self.class_prompt
@@ -1497,7 +1498,7 @@ def main(args):
         )
         args.optimizer = "adamw"
 
-    if args.use_8bit_adam and not args.optimizer.lower() == "adamw":
+    if args.use_8bit_adam and args.optimizer.lower() != "adamw":
         logger.warning(
             f"use_8bit_adam is ignored when optimizer is not set to 'AdamW'. Optimizer was "
             f"set to {args.optimizer.lower()}"
@@ -1788,7 +1789,7 @@ def main(args):
             accelerator.unwrap_model(text_encoder_one).text_model.embeddings.requires_grad_(True)
             accelerator.unwrap_model(text_encoder_two).text_model.embeddings.requires_grad_(True)
 
-        for step, batch in enumerate(train_dataloader):
+        for _step, batch in enumerate(train_dataloader):
             with accelerator.accumulate(unet):
                 pixel_values = batch["pixel_values"].to(dtype=vae.dtype)
                 prompts = batch["prompts"]

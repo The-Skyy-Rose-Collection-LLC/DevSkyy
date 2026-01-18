@@ -154,9 +154,8 @@ def enhance_dataset_captions(dataset_path: Path):
     backup_path = dataset_path / "metadata.jsonl.backup"
     if not backup_path.exists():
         print(f"💾 Backing up original to {backup_path}")
-        with open(metadata_path) as f:
-            with open(backup_path, "w") as fb:
-                fb.write(f.read())
+        with open(metadata_path) as f, open(backup_path, "w") as fb:
+            fb.write(f.read())
 
     # Write enhanced captions
     with open(metadata_path, "w") as f:

@@ -49,7 +49,7 @@ Check build status:
 If using FASHN API:
 
 1. Visit: <https://huggingface.co/spaces/damBruh/skyyrose-virtual-tryon/settings>
-2. Add secret: `FASHN_API_KEY` = your FASHN API key
+2. Add secret: `FASHN_API_KEY` = your FASHN API key  <!-- pragma: allowlist secret -->
 
 ### 3. Test Spaces
 

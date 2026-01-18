@@ -18,7 +18,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
+from fastapi import Path as FastAPIPath
 from prometheus_client import Counter, Gauge, Histogram
 from pydantic import BaseModel, Field, field_validator
 
@@ -437,7 +438,7 @@ async def list_training_jobs():
 
 @training_router.get("/jobs/{job_id}", response_model=TrainingProgressResponse)
 async def get_training_job(
-    job_id: Annotated[str, Query(min_length=1, max_length=128, pattern=r"^[a-zA-Z0-9_-]+$")],
+    job_id: Annotated[str, FastAPIPath(min_length=1, max_length=128, pattern=r"^[a-zA-Z0-9_-]+$")],
 ):
     """
     Get details for a specific training job.

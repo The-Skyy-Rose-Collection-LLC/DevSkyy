@@ -14,7 +14,6 @@ Coverage:
 
 import re
 from datetime import UTC, datetime, timedelta
-from unittest.mock import patch
 
 import pytest
 
@@ -24,7 +23,6 @@ pytest.importorskip("pyotp")
 import pyotp
 
 from security.mfa import MFAConfig, MFAManager, MFASession, MFASetupData
-
 
 # =============================================================================
 # Fixtures
@@ -318,7 +316,7 @@ class TestBackupCodes:
 
         # No set should be identical to another
         for i, set1 in enumerate(sets):
-            for j, set2 in enumerate(sets[i + 1 :], start=i + 1):
+            for _j, set2 in enumerate(sets[i + 1 :], start=i + 1):
                 assert set1 != set2
 
 

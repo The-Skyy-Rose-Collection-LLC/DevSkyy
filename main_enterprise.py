@@ -25,23 +25,35 @@ Dependencies (verified from PyPI December 2024):
 - pydantic==2.5.2
 """
 
+# Load environment variables FIRST (before any other imports use os.getenv)
+
+import asyncio
 import logging
 import os
 import secrets
 import uuid
+from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
 import sentry_sdk
+import sqlalchemy
 import structlog
 from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel
+from sqlalchemy.ext.asyncio import (
+    AsyncEngine,
+    AsyncSession,
+    async_sessionmaker,
+    create_async_engine,
+)
 
 from api.admin_dashboard import admin_dashboard_router
 from api.agents import agents_router
+from api.ar_sessions import ar_sessions_router
 from api.brand import brand_router
 from api.dashboard import dashboard_router
 from api.elementor_3d import elementor_3d_router
@@ -65,6 +77,7 @@ from api.v1 import (
     training_router,
     wordpress_theme_router,
 )
+from api.v1 import wordpress_router as wordpress_v1_router
 
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
@@ -105,6 +118,10 @@ secrets_manager = SecretsManager()
 # Initialize Redis Cache
 redis_cache = RedisCache()
 
+# Database engine and session factory (initialized in lifespan)
+async_engine: AsyncEngine | None = None
+async_session_factory: async_sessionmaker[AsyncSession] | None = None
+
 
 # =============================================================================
 # Application Lifecycle
@@ -124,6 +141,9 @@ async def lifespan(app: FastAPI):
       - Prompt technique application
       - Round Table support (optional)
     """
+    # Global declarations must be at the start of the function
+    global async_engine, async_session_factory
+
     # Startup - Configure structured logging FIRST
     log_level = os.getenv("LOG_LEVEL", "INFO")
     json_output = os.getenv("LOG_JSON", "auto")
@@ -234,26 +254,72 @@ async def lifespan(app: FastAPI):
         log.info("rag_pipeline_disabled", reason="RAG_AUTO_INGEST not enabled")
         app.state.rag_manager = None
 
-    # Initialize Redis cache connection (optional - graceful fallback)
+    # Initialize Redis cache connection with exponential backoff (optional - graceful fallback)
     cache_enabled = os.getenv("REDIS_URL") is not None
     if cache_enabled:
         log.info("redis_cache_connecting")
-        try:
-            cache_connected = await redis_cache.connect()
-            if cache_connected:
-                log.info(
-                    "redis_cache_connected",
-                    url=os.getenv("REDIS_URL", "").split("@")[-1] if os.getenv("REDIS_URL") else "",
-                )
-            else:
-                log.warning(
-                    "redis_cache_connection_failed",
-                    reason="connection_attempt_failed",
-                    message="caching will be unavailable",
-                )
-        except Exception as e:
-            log.error("redis_cache_connection_error", error=str(e), exc_info=True)
-            log.warning("continuing_without_cache", reason="connection_error")
+
+        # Exponential backoff retry configuration
+        max_retries = int(os.getenv("REDIS_MAX_RETRIES", "3"))
+        base_delay = float(os.getenv("REDIS_RETRY_BASE_DELAY", "1.0"))  # seconds
+        max_delay = float(os.getenv("REDIS_RETRY_MAX_DELAY", "30.0"))  # seconds
+        cache_connected = False
+
+        for attempt in range(max_retries):
+            try:
+                cache_connected = await redis_cache.connect()
+                if cache_connected:
+                    log.info(
+                        "redis_cache_connected",
+                        url=(
+                            os.getenv("REDIS_URL", "").split("@")[-1]
+                            if os.getenv("REDIS_URL")
+                            else ""
+                        ),
+                        attempt=attempt + 1,
+                    )
+                    app.state.cache_enabled = True
+                    break
+                else:
+                    # Connection returned False without exception
+                    if attempt < max_retries - 1:
+                        delay = min(base_delay * (2**attempt), max_delay)
+                        log.warning(
+                            "redis_cache_connection_retry",
+                            attempt=attempt + 1,
+                            max_retries=max_retries,
+                            retry_delay=delay,
+                            reason="connection_returned_false",
+                        )
+                        await asyncio.sleep(delay)
+                    else:
+                        log.warning(
+                            "redis_cache_connection_failed",
+                            reason="max_retries_exceeded",
+                            attempts=max_retries,
+                            message="caching will be unavailable",
+                        )
+                        app.state.cache_enabled = False
+            except Exception as e:
+                if attempt < max_retries - 1:
+                    delay = min(base_delay * (2**attempt), max_delay)
+                    log.warning(
+                        "redis_cache_connection_retry",
+                        attempt=attempt + 1,
+                        max_retries=max_retries,
+                        retry_delay=delay,
+                        error=str(e),
+                    )
+                    await asyncio.sleep(delay)
+                else:
+                    log.error(
+                        "redis_cache_connection_error",
+                        error=str(e),
+                        attempts=max_retries,
+                        exc_info=True,
+                    )
+                    log.warning("continuing_without_cache", reason="connection_error_after_retries")
+                    app.state.cache_enabled = False
     else:
         log.info("redis_cache_disabled", reason="REDIS_URL not configured")
         app.state.cache_enabled = False
@@ -263,9 +329,9 @@ async def lifespan(app: FastAPI):
         from api.websocket_integration import WebSocketIntegration
 
         await WebSocketIntegration.start_metrics_broadcaster(interval_seconds=5)
-        logger.info("✓ WebSocket metrics broadcaster started")
+        log.info("websocket_metrics_broadcaster_started", interval_seconds=5)
     except Exception as e:
-        logger.warning(f"Failed to start metrics broadcaster: {e}")
+        log.warning("websocket_metrics_broadcaster_failed", error=str(e))
 
     # Verify security configuration with secrets manager
     # Load and validate critical secrets (JWT, encryption keys, etc.)
@@ -327,6 +393,59 @@ async def lifespan(app: FastAPI):
             if db_url:
                 os.environ["DATABASE_URL"] = str(db_url)
                 log.info("database_url_loaded", source="secrets_manager")
+
+                # Initialize async database engine with connection pooling
+                log.info("database_engine_initializing")
+
+                try:
+                    # Convert postgresql:// to postgresql+asyncpg:// for async driver
+                    async_db_url = str(db_url)
+                    if async_db_url.startswith("postgresql://"):
+                        async_db_url = async_db_url.replace(
+                            "postgresql://", "postgresql+asyncpg://", 1
+                        )
+                    elif async_db_url.startswith("postgres://"):
+                        async_db_url = async_db_url.replace(
+                            "postgres://", "postgresql+asyncpg://", 1
+                        )
+
+                    # Create async engine with connection pooling
+                    async_engine = create_async_engine(
+                        async_db_url,
+                        echo=log_level == "DEBUG",  # Echo SQL queries in debug mode
+                        pool_size=10,  # Connection pool size
+                        max_overflow=20,  # Extra connections during peak load
+                        pool_pre_ping=True,  # Verify connections before use
+                        pool_recycle=3600,  # Recycle connections after 1 hour
+                    )
+
+                    # Create session factory with expire_on_commit=False for async patterns
+                    async_session_factory = async_sessionmaker(
+                        async_engine,
+                        class_=AsyncSession,
+                        expire_on_commit=False,  # Prevent object expiration after commit
+                    )
+
+                    # Verify database connectivity
+                    async with async_engine.begin() as conn:
+                        await conn.execute(sqlalchemy.text("SELECT 1"))
+
+                    log.info(
+                        "database_engine_initialized",
+                        pool_size=10,
+                        max_overflow=20,
+                        driver="asyncpg",
+                    )
+
+                    # Store in app state for route access
+                    app.state.db_engine = async_engine
+                    app.state.db_session_factory = async_session_factory
+
+                except Exception as e:
+                    log.error("database_engine_initialization_failed", error=str(e), exc_info=True)
+                    log.warning("continuing_without_database", reason="engine_initialization_error")
+                    async_engine = None
+                    async_session_factory = None
             else:
                 log.warning(
                     "database_url_not_configured", message="database features will be unavailable"
@@ -376,9 +495,55 @@ async def lifespan(app: FastAPI):
     yield
 
     # Shutdown
-    logger.info("DevSkyy Enterprise Platform shutting down...")
+    log.info("platform_shutting_down")
+
+    # Dispose database engine and close all connections
+    if async_engine:
+        log.info("database_engine_disposing")
+        await async_engine.dispose()
+        log.info("database_engine_disposed")
+
     await redis_cache.disconnect()
     await webhook_manager.close()
+    log.info("platform_shutdown_complete")
+
+
+# =============================================================================
+# Database Dependency Injection
+# =============================================================================
+
+
+async def get_db() -> AsyncGenerator[AsyncSession, None]:
+    """
+    FastAPI dependency for database sessions.
+
+    Usage in routes:
+        @router.get("/items")
+        async def get_items(db: AsyncSession = Depends(get_db)):
+            result = await db.execute(select(Item))
+            return result.scalars().all()
+
+    Yields:
+        AsyncSession: Database session with automatic commit/rollback
+
+    Raises:
+        HTTPException: If database is not configured
+    """
+    if async_session_factory is None:
+        raise HTTPException(
+            status_code=503,
+            detail="Database not configured. Set DATABASE_URL environment variable.",
+        )
+
+    async with async_session_factory() as session:
+        try:
+            yield session
+            await session.commit()
+        except Exception:
+            await session.rollback()
+            raise
+        finally:
+            await session.close()
 
 
 # =============================================================================
@@ -432,9 +597,10 @@ if not cors_origins:
         "https://api.devskyy.app",  # Production API domain
         "https://staging.devskyy.com",  # Staging domain
     ]
-    logger.warning(
-        "CORS_ORIGINS not configured. Using development defaults + production domains. "
-        "Set CORS_ORIGINS environment variable for custom production setup."
+    log = structlog.get_logger(__name__)
+    log.warning(
+        "cors_origins_not_configured",
+        message="Using development defaults + production domains. Set CORS_ORIGINS for custom setup.",
     )
 else:
     cors_origins_list = [origin.strip() for origin in cors_origins.split(",") if origin.strip()]
@@ -590,7 +756,8 @@ async def tier_rate_limit_middleware(request: Request, call_next):
 
     except Exception as e:
         # Log error but don't block request on rate limiter failure
-        logger.error(f"Rate limiter error: {e}")
+        log = structlog.get_logger(__name__)
+        log.error("rate_limiter_error", error=str(e), exc_info=True)
         return await call_next(request)
 
 
@@ -735,6 +902,7 @@ app.include_router(tools_router, prefix="/api/v1")
 app.include_router(three_d_router, prefix="/api/v1")
 app.include_router(visual_router, prefix="/api/v1")
 app.include_router(virtual_tryon_router, prefix="/api/v1")
+app.include_router(ar_sessions_router, prefix="/api/v1")
 app.include_router(wordpress_router, prefix="/api/v1")
 
 # Admin dashboard routes (asset management, fidelity, sync, pipelines)
@@ -762,8 +930,8 @@ app.include_router(hf_spaces_router, prefix="/api/v1")
 app.include_router(training_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")
 
-# WordPress/WooCommerce integration
-app.include_router(wordpress_router, prefix="/api/v1")
+# WordPress/WooCommerce v1 API (test-connection, products, orders endpoints)
+app.include_router(wordpress_v1_router, prefix="/api/v1")
 
 # WordPress theme generation
 app.include_router(wordpress_theme_router, prefix="/api/v1")
@@ -916,7 +1084,8 @@ async def cache_metrics():
             "target_hit_rate": 80.0,
         }
     except Exception as e:
-        logger.error(f"Failed to get cache stats: {e}", exc_info=True)
+        log = structlog.get_logger(__name__)
+        log.error("cache_stats_failed", error=str(e), exc_info=True)
         return {"error": "Failed to retrieve cache statistics", "message": str(e)}
 
 

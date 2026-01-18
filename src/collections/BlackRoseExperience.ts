@@ -23,6 +23,8 @@ import { Logger } from '../utils/Logger.js';
 import { HotspotManager } from './HotspotManager.js';
 import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
 import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
+import { ARTryOnViewer, type ARProduct, type ARTryOnConfig } from './ARTryOnViewer.js';
+import { EnvironmentTransition } from './EnvironmentTransition.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -127,6 +129,12 @@ export class BlackRoseExperience {
   private onProductClick: ProductClickHandler | null = null;
   private onEasterEgg: EasterEggHandler | null = null;
   private onProductHover: ((data: ProductCardData | null) => void) | null = null;
+
+  // AR Try-On
+  private arViewer: ARTryOnViewer | null = null;
+  private arContainer: HTMLDivElement | null = null;
+  private envTransition: EnvironmentTransition | null = null;
+  private isARModeActive = false;
 
   constructor(container: HTMLElement, config: BlackRoseConfig = {}) {
     this.logger = new Logger('BlackRoseExperience');
@@ -865,6 +873,135 @@ export class BlackRoseExperience {
   public getScene(): THREE.Scene { return this.scene; }
   public getCamera(): THREE.PerspectiveCamera { return this.camera; }
   public getRenderer(): THREE.WebGLRenderer { return this.renderer; }
+
+  // ============================================================================
+  // AR Try-On Integration
+  // ============================================================================
+
+  /**
+   * Launch AR try-on mode for a product
+   * Transitions from 3D environment to AR camera view
+   */
+  public async launchARTryOn(
+    product: ARProduct,
+    config?: Partial<Omit<ARTryOnConfig, 'container' | 'collection'>>
+  ): Promise<void> {
+    if (this.isARModeActive) {
+      this.logger.warn('AR mode already active');
+      return;
+    }
+
+    this.logger.info(`Launching AR try-on for: ${product.name}`);
+
+    // Create AR container
+    this.arContainer = document.createElement('div');
+    this.arContainer.id = 'black-rose-ar-tryon';
+    Object.assign(this.arContainer.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      opacity: '0',
+      zIndex: '100',
+    });
+    this.container.appendChild(this.arContainer);
+
+    // Initialize environment transition
+    if (!this.envTransition) {
+      this.envTransition = new EnvironmentTransition(this.scene, this.camera, this.renderer);
+    }
+
+    // Initialize AR viewer
+    const arConfig: ARTryOnConfig = {
+      container: this.arContainer,
+      collection: 'black_rose',
+      onTryOnComplete: (resultUrl, prod) => {
+        this.logger.info(`Try-on complete for ${prod.name}`, { resultUrl });
+      },
+      onError: (error) => {
+        this.logger.error('AR try-on error:', error);
+      },
+      onAddToCart: (prod, variantId) => {
+        this.logger.info(`Add to cart: ${prod.name}`, { variantId });
+        // Trigger WooCommerce add to cart
+        window.dispatchEvent(new CustomEvent('skyyrose:add-to-cart', {
+          detail: { productId: prod.id, variantId },
+        }));
+      },
+      ...config,
+    };
+
+    this.arViewer = new ARTryOnViewer(arConfig);
+
+    try {
+      await this.arViewer.initialize();
+      this.arViewer.setProduct(product);
+
+      // Transition to AR
+      await this.envTransition.transitionToAR(this.arContainer);
+      this.isARModeActive = true;
+
+      // Pause 3D animation while in AR mode
+      if (this.animationId !== null) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+
+      this.logger.info('AR mode activated');
+    } catch (error) {
+      this.logger.error('Failed to launch AR try-on:', error);
+      this.closeARTryOn();
+      throw error;
+    }
+  }
+
+  /**
+   * Close AR try-on mode and return to 3D environment
+   */
+  public async closeARTryOn(): Promise<void> {
+    if (!this.isARModeActive) return;
+
+    this.logger.info('Closing AR try-on');
+
+    // Transition back to 3D
+    if (this.envTransition && this.arContainer) {
+      await this.envTransition.transitionFromAR(this.arContainer);
+    }
+
+    // Cleanup AR viewer
+    if (this.arViewer) {
+      this.arViewer.dispose();
+      this.arViewer = null;
+    }
+
+    // Remove AR container
+    if (this.arContainer) {
+      this.arContainer.remove();
+      this.arContainer = null;
+    }
+
+    this.isARModeActive = false;
+
+    // Resume 3D animation loop
+    this.start();
+
+    this.logger.info('Returned to 3D environment');
+  }
+
+  /**
+   * Check if AR mode is currently active
+   */
+  public get isARActive(): boolean {
+    return this.isARModeActive;
+  }
+
+  /**
+   * Get the current AR viewer instance (if active)
+   */
+  public getARViewer(): ARTryOnViewer | null {
+    return this.arViewer;
+  }
 }
 
 export default BlackRoseExperience;

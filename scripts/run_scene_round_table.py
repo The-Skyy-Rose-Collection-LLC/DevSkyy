@@ -312,9 +312,9 @@ async def elite_judge_responses(
                     "verdict": verdict_value,
                     "pillars": pillars_dict,
                     "summary": str(verdict_summary) if verdict_summary else "",
-                    "recommendations": list(verdict_recommendations)
-                    if verdict_recommendations
-                    else [],
+                    "recommendations": (
+                        list(verdict_recommendations) if verdict_recommendations else []
+                    ),
                 }
             )
 
@@ -457,9 +457,9 @@ async def run_collection_competition(
                     "verdict": winner_verdict,
                     "pillars": winner.get("pillars", {}) if isinstance(winner, dict) else {},
                     "summary": winner.get("summary", "") if isinstance(winner, dict) else "",
-                    "recommendations": winner.get("recommendations", [])
-                    if isinstance(winner, dict)
-                    else [],
+                    "recommendations": (
+                        winner.get("recommendations", []) if isinstance(winner, dict) else []
+                    ),
                     "response": winner_response,
                 },
                 "rankings": elite_results,

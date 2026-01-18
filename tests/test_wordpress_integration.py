@@ -85,12 +85,12 @@ async def wp_client(wp_config):
 class TestConnection:
     """Test WordPress/WooCommerce connection and authentication."""
 
-    def test_config_from_env(self):
+    def test_config_from_env(self, monkeypatch):
         """Test configuration from environment variables."""
-        # Set environment variables
-        os.environ["WORDPRESS_URL"] = "https://test.com"
-        os.environ["WOOCOMMERCE_KEY"] = "test_key"
-        os.environ["WOOCOMMERCE_SECRET"] = "test_secret"
+        # Set environment variables (monkeypatch auto-restores after test)
+        monkeypatch.setenv("WORDPRESS_URL", "https://test.com")
+        monkeypatch.setenv("WOOCOMMERCE_KEY", "test_key")
+        monkeypatch.setenv("WOOCOMMERCE_SECRET", "test_secret")
 
         config = WordPressConfig.from_env()
 

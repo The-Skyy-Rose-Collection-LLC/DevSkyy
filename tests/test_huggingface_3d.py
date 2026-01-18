@@ -17,7 +17,7 @@ Coverage:
 import os
 import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -388,32 +388,36 @@ async def test_full_hybrid_pipeline():
             image_path = Path(tmpdir) / "product.jpg"
             image_path.write_bytes(b"fake image data")
 
-            # Mock the agents
-            with (
-                patch.object(
-                    pipeline.huggingface_client,
-                    "generate_from_image",
-                    new_callable=AsyncMock,
-                ) as mock_hf,
-                patch.object(
-                    pipeline.tripo_agent,
-                    "run",
-                    new_callable=AsyncMock,
-                ) as mock_tripo,
-            ):
-                # Setup HF mock
-                hf_result = HF3DResult(
-                    task_id="hf_123",
-                    model_used=HF3DModel.SHAP_E_IMG,
-                    format=HF3DFormat.PLY,
-                    quality_score=85.0,
-                    polycount=50000,
-                    tripo3d_prompt="3D model optimized prompt",
-                )
-                mock_hf.return_value = hf_result
+            # Setup HF mock result with status=completed and output_path
+            hf_result = HF3DResult(
+                task_id="hf_123",
+                model_used=HF3DModel.SHAP_E_IMG,
+                format=HF3DFormat.PLY,
+                status="completed",
+                output_path=str(image_path),  # Use the temp file path
+                quality_score=85.0,
+                polycount=50000,
+                tripo3d_prompt="3D model optimized prompt",
+            )
 
-                # Setup Tripo3D mock
-                mock_tripo.return_value = {
+            # Mock the clients directly on the pipeline instance (before lazy property access)
+            mock_hf_client = MagicMock(spec=HuggingFace3DClient)
+            mock_hf_client.generate_from_image = AsyncMock(return_value=hf_result)
+            mock_hf_client.get_optimization_hints = AsyncMock(
+                return_value=HF3DOptimizationHints(
+                    detected_geometry="organic",
+                    detected_complexity="medium",
+                    suggested_tripo_prompt="3D model of hoodie with realistic style",
+                    confidence_score=0.85,
+                )
+            )
+            mock_hf_client.close = AsyncMock()
+            pipeline._huggingface_client = mock_hf_client
+
+            # Mock Tripo3D agent
+            mock_tripo = MagicMock()
+            mock_tripo.run = AsyncMock(
+                return_value={
                     "status": "success",
                     "data": {
                         "task_id": "tripo_123",
@@ -421,21 +425,24 @@ async def test_full_hybrid_pipeline():
                         "model_url": "https://example.com/model.glb",
                     },
                 }
+            )
+            mock_tripo.close = AsyncMock()
+            pipeline._tripo_agent = mock_tripo
 
-                # Run pipeline
-                result = await pipeline.process_product(
-                    product_id="test_123",
-                    title="Test Hoodie",
-                    description="Test product",
-                    images=[str(image_path)],
-                    category="apparel",
-                    collection="SIGNATURE",
-                    garment_type="hoodie",
-                )
+            # Run pipeline
+            result = await pipeline.process_product(
+                product_id="test_123",
+                title="Test Hoodie",
+                description="Test product",
+                images=[str(image_path)],
+                category="apparel",
+                collection="SIGNATURE",
+                garment_type="hoodie",
+            )
 
-                # Verify
-                assert result.status == "success"
-                assert len(result.assets_3d) > 0
+            # Verify
+            assert result.status == "success"
+            assert len(result.assets_3d) > 0
 
     finally:
         await pipeline.close()

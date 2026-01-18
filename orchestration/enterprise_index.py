@@ -505,8 +505,6 @@ class BitbucketProvider(BaseIndexProvider):
         if cached:
             return cached
 
-        headers = {"Authorization": f"Bearer {self.config.bitbucket_token}"}
-
         try:
             # Bitbucket search API (limited compared to others)
             # Note: Bitbucket Cloud doesn't have a dedicated code search API

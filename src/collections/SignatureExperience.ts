@@ -23,6 +23,8 @@ import { Logger } from '../utils/Logger.js';
 import { HotspotManager } from './HotspotManager.js';
 import { getModelLoader, ModelLoadError, type LoadedModel } from '../lib/ModelAssetLoader.js';
 import { getPerformanceMonitor, type PerformanceMetrics } from '../lib/ThreePerformanceMonitor.js';
+import { ARTryOnViewer, type ARProduct, type ARTryOnConfig } from './ARTryOnViewer.js';
+import { EnvironmentTransition } from './EnvironmentTransition.js';
 
 // ============================================================================
 // Types & Interfaces
@@ -118,6 +120,12 @@ export class SignatureExperience {
   // Callbacks
   private onProductSelect: ProductSelectHandler | null = null;
   private onCategorySelect: CategorySelectHandler | null = null;
+
+  // AR Try-On
+  private arViewer: ARTryOnViewer | null = null;
+  private arContainer: HTMLDivElement | null = null;
+  private envTransition: EnvironmentTransition | null = null;
+  private isARModeActive = false;
 
   constructor(container: HTMLElement, config: SignatureConfig = {}) {
     this.logger = new Logger('SignatureExperience');
@@ -765,6 +773,129 @@ export class SignatureExperience {
 
   public getScene(): THREE.Scene { return this.scene; }
   public getCamera(): THREE.PerspectiveCamera { return this.camera; }
+  public getRenderer(): THREE.WebGLRenderer { return this.renderer; }
+
+  // ============================================================================
+  // AR Try-On Integration
+  // ============================================================================
+
+  /**
+   * Launch AR try-on mode for a product
+   * Transitions from garden environment to AR camera view
+   */
+  public async launchARTryOn(
+    product: ARProduct,
+    config?: Partial<Omit<ARTryOnConfig, 'container' | 'collection'>>
+  ): Promise<void> {
+    if (this.isARModeActive) {
+      this.logger.warn('AR mode already active');
+      return;
+    }
+
+    this.logger.info(`Launching AR try-on for: ${product.name}`);
+
+    // Create AR container
+    this.arContainer = document.createElement('div');
+    this.arContainer.id = 'signature-ar-tryon';
+    Object.assign(this.arContainer.style, {
+      position: 'absolute',
+      top: '0',
+      left: '0',
+      width: '100%',
+      height: '100%',
+      opacity: '0',
+      zIndex: '100',
+    });
+    this.container.appendChild(this.arContainer);
+
+    // Initialize environment transition
+    if (!this.envTransition) {
+      this.envTransition = new EnvironmentTransition(this.scene, this.camera, this.renderer);
+    }
+
+    // Initialize AR viewer with Signature gold theme
+    const arConfig: ARTryOnConfig = {
+      container: this.arContainer,
+      collection: 'signature',
+      onTryOnComplete: (resultUrl, prod) => {
+        this.logger.info(`Try-on complete for ${prod.name}`, { resultUrl });
+      },
+      onError: (error) => {
+        this.logger.error('AR try-on error:', error);
+      },
+      onAddToCart: (prod, variantId) => {
+        this.logger.info(`Add to cart: ${prod.name}`, { variantId });
+        window.dispatchEvent(new CustomEvent('skyyrose:add-to-cart', {
+          detail: { productId: prod.id, variantId },
+        }));
+      },
+      ...config,
+    };
+
+    this.arViewer = new ARTryOnViewer(arConfig);
+
+    try {
+      await this.arViewer.initialize();
+      this.arViewer.setProduct(product);
+
+      // Transition to AR
+      await this.envTransition.transitionToAR(this.arContainer);
+      this.isARModeActive = true;
+
+      // Pause garden animation while in AR mode
+      if (this.animationId !== null) {
+        cancelAnimationFrame(this.animationId);
+        this.animationId = null;
+      }
+
+      this.logger.info('AR mode activated');
+    } catch (error) {
+      this.logger.error('Failed to launch AR try-on:', error);
+      this.closeARTryOn();
+      throw error;
+    }
+  }
+
+  /**
+   * Close AR try-on mode and return to garden environment
+   */
+  public async closeARTryOn(): Promise<void> {
+    if (!this.isARModeActive) return;
+
+    this.logger.info('Closing AR try-on');
+
+    if (this.envTransition && this.arContainer) {
+      await this.envTransition.transitionFromAR(this.arContainer);
+    }
+
+    if (this.arViewer) {
+      this.arViewer.dispose();
+      this.arViewer = null;
+    }
+
+    if (this.arContainer) {
+      this.arContainer.remove();
+      this.arContainer = null;
+    }
+
+    this.isARModeActive = false;
+    this.start();
+    this.logger.info('Returned to garden environment');
+  }
+
+  /**
+   * Check if AR mode is currently active
+   */
+  public get isARActive(): boolean {
+    return this.isARModeActive;
+  }
+
+  /**
+   * Get the current AR viewer instance (if active)
+   */
+  public getARViewer(): ARTryOnViewer | null {
+    return this.arViewer;
+  }
 }
 
 export default SignatureExperience;
