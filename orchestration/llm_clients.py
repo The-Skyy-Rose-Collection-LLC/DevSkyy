@@ -41,6 +41,25 @@ from openai import AsyncOpenAI
 from pydantic import BaseModel
 from tenacity import retry, stop_after_attempt, wait_exponential
 
+# Import config for API keys (loads .env.hf)
+try:
+    from config import (
+        ANTHROPIC_API_KEY,
+        COHERE_API_KEY,
+        GOOGLE_API_KEY,
+        GROQ_API_KEY,
+        MISTRAL_API_KEY,
+        OPENAI_API_KEY,
+    )
+except ImportError:
+    # Fallback for standalone usage
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+    ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
+    MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY", "")
+    COHERE_API_KEY = os.getenv("COHERE_API_KEY", "")
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+
 logger = logging.getLogger(__name__)
 
 
@@ -206,7 +225,7 @@ class OpenAIClient(BaseLLMClient):
         **kwargs,
     ):
         super().__init__(
-            api_key=api_key or os.getenv("OPENAI_API_KEY", ""),
+            api_key=api_key or OPENAI_API_KEY or os.getenv("OPENAI_API_KEY", ""),
             base_url=base_url,
             **kwargs,
         )
@@ -336,7 +355,7 @@ class AnthropicClient(BaseLLMClient):
         **kwargs,
     ):
         super().__init__(
-            api_key=api_key or os.getenv("ANTHROPIC_API_KEY", ""),
+            api_key=api_key or ANTHROPIC_API_KEY or os.getenv("ANTHROPIC_API_KEY", ""),
             base_url=base_url,
             **kwargs,
         )
@@ -494,7 +513,7 @@ class GoogleClient(BaseLLMClient):
         **kwargs,
     ):
         super().__init__(
-            api_key=api_key or os.getenv("GOOGLE_API_KEY", ""),
+            api_key=api_key or GOOGLE_API_KEY or os.getenv("GOOGLE_API_KEY", ""),
             **kwargs,
         )
         self._init_client()
@@ -638,7 +657,7 @@ class MistralClient(BaseLLMClient):
         **kwargs,
     ):
         super().__init__(
-            api_key=api_key or os.getenv("MISTRAL_API_KEY", ""),
+            api_key=api_key or MISTRAL_API_KEY or os.getenv("MISTRAL_API_KEY", ""),
             **kwargs,
         )
         self._init_client()
@@ -751,7 +770,7 @@ class CohereClient(BaseLLMClient):
         **kwargs,
     ):
         super().__init__(
-            api_key=api_key or os.getenv("COHERE_API_KEY", ""),
+            api_key=api_key or COHERE_API_KEY or os.getenv("COHERE_API_KEY", ""),
             **kwargs,
         )
         self._init_client()
@@ -875,7 +894,7 @@ class GroqClient(BaseLLMClient):
         **kwargs,
     ):
         super().__init__(
-            api_key=api_key or os.getenv("GROQ_API_KEY", ""),
+            api_key=api_key or GROQ_API_KEY or os.getenv("GROQ_API_KEY", ""),
             **kwargs,
         )
         self._init_client()

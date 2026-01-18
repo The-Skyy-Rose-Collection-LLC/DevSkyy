@@ -3,7 +3,7 @@ Tests for LLM Verification Layer
 =================================
 """
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -256,7 +256,7 @@ async def test_verification_cost_savings_calculation(mock_api_keys):
     # Assuming GPT-4 would cost ~$0.015 for same task
     gpt4_cost = 0.015
     actual_cost = verification.total_cost_usd
-    savings_pct = ((gpt4_cost - actual_cost) / gpt4_cost) * 100
+    ((gpt4_cost - actual_cost) / gpt4_cost) * 100
 
     assert verification.cost_savings_pct > 50  # Should save >50% vs premium-only
     assert verification.total_cost_usd < 0.002

@@ -10,7 +10,8 @@ Tests for tool input validation including:
 """
 
 import pytest
-from core.runtime.input_validator import ToolInputValidator, ToolInputValidationError
+
+from core.runtime.input_validator import ToolInputValidator
 
 
 @pytest.fixture

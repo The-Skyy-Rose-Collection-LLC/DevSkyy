@@ -149,6 +149,9 @@ class UnifiedToolRegistry:
         self._tools: dict[str, ToolMetadata] = {}
         self._tools_by_server: dict[str, list[str]] = defaultdict(list)
         self._tools_by_category: dict[ToolCategory, list[str]] = defaultdict(list)
+        self._all_registrations: dict[str, list[ToolMetadata]] = defaultdict(
+            list
+        )  # Track ALL registrations for conflict detection
 
     # -------------------------------------------------------------------------
     # Registration
@@ -156,6 +159,9 @@ class UnifiedToolRegistry:
 
     def register_tool(self, tool: ToolMetadata) -> None:
         """Register a tool in the unified registry."""
+        # Track ALL registrations for conflict detection (even duplicates)
+        self._all_registrations[tool.name].append(tool)
+
         # Check for duplicates
         if tool.name in self._tools:
             existing = self._tools[tool.name]
@@ -228,13 +234,8 @@ class UnifiedToolRegistry:
         """Detect conflicts between tools."""
         conflicts = []
 
-        # Group tools by name
-        tools_by_name: dict[str, list[ToolMetadata]] = defaultdict(list)
-        for tool in self._tools.values():
-            tools_by_name[tool.name].append(tool)
-
-        # Check for duplicates and schema mismatches
-        for tool_name, tools in tools_by_name.items():
+        # Use _all_registrations to detect conflicts (includes all registration attempts)
+        for tool_name, tools in self._all_registrations.items():
             if len(tools) > 1:
                 server_ids = [t.server_id for t in tools]
 

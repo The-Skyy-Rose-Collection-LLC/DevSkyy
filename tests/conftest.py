@@ -326,6 +326,30 @@ def sample_mcp_server_definition():
     )
 
 
+@pytest.fixture
+def performance_timer():
+    """Simple performance timer for benchmark tests."""
+    import time
+
+    class Timer:
+        def __init__(self):
+            self._start = None
+            self._end = None
+
+        def start(self):
+            self._start = time.perf_counter()
+
+        def stop(self):
+            self._end = time.perf_counter()
+
+        def elapsed_ms(self) -> float:
+            if self._start is None or self._end is None:
+                return 0.0
+            return (self._end - self._start) * 1000
+
+    return Timer()
+
+
 # Markers
 def pytest_configure(config):
     """Configure custom markers."""

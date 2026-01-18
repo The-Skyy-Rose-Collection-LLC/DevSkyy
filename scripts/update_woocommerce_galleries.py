@@ -140,7 +140,7 @@ async def fetch_all_woocommerce_products(session: aiohttp.ClientSession) -> list
                             return all_products
 
                     else:
-                        error_text = await resp.text()
+                        await resp.text()
                         print(f"  ✗ Failed to fetch products (page {page}): {resp.status}")
                         return all_products
 

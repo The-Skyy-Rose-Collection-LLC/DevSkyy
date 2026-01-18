@@ -11,9 +11,8 @@ Comprehensive tests for 3D asset pipeline security and resilience features:
 - PII sanitization
 """
 
-import asyncio
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
+from unittest.mock import patch
 
 import httpx
 import pytest
@@ -35,7 +34,6 @@ from ai_3d.resilience import (
     RetryConfig,
     RetryStrategy,
 )
-
 
 # =============================================================================
 # Request Validation Tests

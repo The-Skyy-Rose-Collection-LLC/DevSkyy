@@ -17,10 +17,10 @@ Testing Pattern:
 - Security tests for attack scenarios
 """
 
-import json
-import pytest
 from datetime import UTC, datetime, timedelta
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
+
+import pytest
 
 from api.gdpr import (
     DataCategory,
@@ -28,7 +28,6 @@ from api.gdpr import (
     GDPRDeleteRequest,
     GDPRExportRequest,
     GDPRService,
-    RequestType,
 )
 
 pytestmark = [pytest.mark.unit]
@@ -200,7 +199,7 @@ class TestRateLimiting:
         user_id = "test_user_123"
 
         # Should allow first 10 requests
-        for i in range(10):
+        for _i in range(10):
             service._check_rate_limit(user_id, max_requests=10, window_hours=1)
 
         # 10th request should succeed (no exception)
@@ -213,7 +212,7 @@ class TestRateLimiting:
         user_id = "test_user_123"
 
         # Fill up rate limit
-        for i in range(10):
+        for _i in range(10):
             service._check_rate_limit(user_id, max_requests=10, window_hours=1)
 
         # 11th request should be blocked

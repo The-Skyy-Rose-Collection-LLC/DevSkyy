@@ -1,242 +1,240 @@
-# DevSkyy - Claude Code Configuration
+# DevSkyy — Claude Config
 
-> **Principal Engineer Instructions for Production-Grade Enterprise AI Platform**
-
-## 🌟 Global Rules
-
-**Mission**: 100% production-quality code — no hacks, no stubs, no TODOs. Real integration tests only.
-
-**Core Behaviors**:
-- Full ownership: complete tasks without premature exits
-- Proactive: ask focused questions only when blocked
-- Engineering cycle: understand → design → implement → test → document
-- Propose better alternatives when user's approach is suboptimal
-- Code quality check after EVERY file
-- **MANDATORY**: Context7 for library docs, Serena for codebase navigation
+> Enterprise AI | SkyyRose Luxury Fashion | 54 Agents | **pytest AFTER EVERY CHANGE**
 
 ---
 
-## 🧠 Tool Calling Workflow (MANDATORY)
-
-**4-Phase Sequence for ALL coding tasks:**
-
-**Phases**:
-1. **Research** (Context7 BEFORE code): resolve-library-id → query-docs → analyze patterns
-2. **Navigate** (Serena only): find_symbol / read_file / search_for_pattern / get_symbols_overview
-3. **Implement** (Serena only): replace_content (prefer regex mode) / create_text_file (rare)
-4. **Validate** (Serena): think_about_collected_information → execute_shell_command → think_about_whether_you_are_done
-
-**Anti-Patterns**: ❌ Code before Context7 ❌ Read/Write instead of Serena ❌ Skip reflection steps
-
----
-
-## 🎯 Mission & Rules
-
-**Mission**: DevSkyy B+ (52/100) → A+ (90+/100) via security, API versioning, GDPR, deployment readiness. Zero stubs/TODOs.
-
-**Absolute Rules**:
-1. **Priority**: Correctness > Elegance > Performance (no magic, explicit behavior)
-2. **No Deletions**: Refactor YES, remove capabilities NO (agents/MCP/RAG/3D/security/WordPress)
-3. **Truthful**: README/version/license = reality; production = tests + CI
-4. **Deterministic**: All agent actions traceable/validated/testable
-5. **Explicit Contracts**: Pydantic validation, typed outputs, classified errors, documented side effects
-6. **Interface Changes**: Update ALL call sites + tests + docs
-
----
-
-## 🏗️ Repository Structure
-
-**Quick Reference** (full details in `docs/architecture/DEVSKYY_MASTER_PLAN.md`):
+## ⚡ PROTOCOL
 
 ```
-├── 🎯 Core: main_enterprise.py (FastAPI), devskyy_mcp.py (MCP server)
-├── 🤖 agents/: 54 agents (6 super, 48 specialized) + base_super_agent.py (17 techniques)
-├── 🧠 llm/: 6 providers + router + round_table + ab_testing + tournament
-├── 🎭 orchestration/: llm_orchestrator + tool_registry + prompt_engineering + vector_store
-├── ⚙️  runtime/tools.py: ToolSpec, ToolRegistry, ToolCallContext
-├── 🔌 adk/: PydanticAI, Google ADK, CrewAI, AutoGen, Agno adapters
-├── 🔒 security/: AES-256-GCM, JWT, PII, rate limiting, SSRF, audit, zero-trust
-├── 🌐 api/: index, agents, gdpr, webhooks, versioning
-├── 🛠️ mcp/: openai, agent_bridge, rag, woocommerce servers
-├── 📝 wordpress/: REST API client + AR viewer
-├── ✅ tests/: 1,063 tests (9 skipped, documented)
-├── 🎨 frontend/: Next.js 15 dashboard
-├── 💎 src/collections/: 5 Three.js experiences
-└── 📚 docs/: Architecture, API, security runbooks
+1. CONTEXT7    → resolve-library-id → get-library-docs (BEFORE library code)
+2. SKILLS      → view /mnt/skills/*/SKILL.md (before complex tasks)
+3. NAVIGATE    → view/bash (understand first, NO code)
+4. IMPLEMENT   → str_replace (targeted) | create_file (new only)
+5. TEST        → pytest -v (MANDATORY after EVERY file touch)
+6. FORMAT      → isort . && ruff check --fix && black .
 ```
 
 ---
 
-## 🏛️ Architecture
+## 🔧 TOOLS
 
-### Super Agents
-6 agents (Commerce, Creative, Marketing, Support, Operations, Analytics) + `base_super_agent.py` (17 prompt techniques, auto-selection, LLM Round Table)
+### Core
+| Tool | Use |
+|------|-----|
+| `Context7:resolve-library-id` → `get-library-docs` | ALWAYS first for any library |
+| `view` | Read files/dirs |
+| `str_replace` | Edit files (prefer over rewrites) |
+| `create_file` | New files only |
+| `bash_tool` | pytest, format, git |
+| `web_search` / `web_fetch` | Current docs, APIs |
 
-### LLM Layer
-6 providers (OpenAI, Anthropic, Google, Mistral, Cohere, Groq) → router (task-based) → round_table (competition) → ab_testing (significance) → tournament (consensus)
+### DevSkyy MCP (`devskyy_mcp.py`)
+`agent_orchestrator` `rag_query` `rag_ingest` `brand_context` `product_search` `order_management` `wordpress_sync` `3d_generate` `analytics_query` `cache_ops` `health_check` `tool_catalog` `llm_route`
 
-### Key Patterns
-- **Tool Execution**: `runtime/tools.py` registry → `await agent.use_tool(name, params)`
-- **LLM Round Table**: All 6 parallel → score → top 2 A/B test → winner (PostgreSQL)
-- **Prompt Technique**: Auto-select (reasoning→CoT, classification→few-shot, creative→ToT, search→ReAct, qa→RAG)
-- **Database**: Neon PostgreSQL (serverless), Chroma/Pinecone (vectors), Redis (cache)
-- **Deployment**: Vercel (serverless) + Docker (traditional)
-- **Brand DNA**: SkyyRose context injected (`{"name": "SkyyRose", "colors": {"primary": "#B76E79"}, "style": ["luxury", "sophisticated"]}`)
+### External MCP Integrations
+| Service | Key Tools |
+|---------|-----------|
+| **Figma** | `get_design_context` `get_screenshot` `get_metadata` `get_code_connect_map` |
+| **Notion** | `notion-search` `notion-fetch` `notion-create-pages` `notion-update-page` `notion-create-database` |
+| **HuggingFace** | `model_search` `dataset_search` `paper_search` `hf_jobs` `hub_repo_details` `hf_doc_search` |
+| **Vercel** | `deploy_to_vercel` `list_deployments` `get_deployment_build_logs` `search_vercel_documentation` |
+| **WordPress.com** | `wpcom-mcp-posts-search` `wpcom-mcp-post-get` `wpcom-mcp-site-settings` `wpcom-mcp-site-statistics` |
+| **Google Drive** | `google_drive_search` `google_drive_fetch` |
+| **Desktop Commander** | `read_file` `write_file` `edit_block` `start_process` `start_search` `list_directory` |
+| **Stripe** | Payment integrations |
+| **Cloudflare** | Edge deployments |
 
 ---
 
-## 🌍 Environment & Secrets
+## 📂 SKILLS (Read BEFORE Complex Tasks)
 
-**Setup**: `cp .env.example .env` then configure
+| Task | Skill |
+|------|-------|
+| Word docs | `/mnt/skills/public/docx/SKILL.md` |
+| Spreadsheets | `/mnt/skills/public/xlsx/SKILL.md` |
+| Presentations | `/mnt/skills/public/pptx/SKILL.md` |
+| PDFs | `/mnt/skills/public/pdf/SKILL.md` |
+| Frontend/UI | `/mnt/skills/public/frontend-design/SKILL.md` |
+| **SkyyRose brand** | `/mnt/skills/user/skyyrose-brand-dna/SKILL.md` |
+| **WordPress/WooCommerce** | `/mnt/skills/user/wordpress-woocommerce-automation/SKILL.md` |
+| **Agent building** | `/mnt/skills/user/devskyy-agent-builder/SKILL.md` |
+| **MCP debugging** | `/mnt/skills/user/mcp-server-debugger/SKILL.md` |
+| **RAG optimization** | `/mnt/skills/user/rag-query-rewriter/SKILL.md` |
+| **Production checks** | `/mnt/skills/user/production-readiness-checker/SKILL.md` |
+| Conversation analysis | `/mnt/skills/user/conversation-reflection/SKILL.md` |
 
-**Critical Variables**:
+---
+
+## 📁 CODEBASE
+
+```
+main_enterprise.py        # FastAPI (47+ endpoints)
+devskyy_mcp.py            # MCP server (13 tools)
+runtime/tools.py          # ToolSpec, ToolRegistry, ToolCallContext
+agents/                   # 6 SuperAgents + base (17 techniques)
+  base_super_agent.py     # plan→retrieve→execute→validate→emit
+llm/                      # 6 providers, router, round_table, ab_testing
+orchestration/            # tool_registry, vector_store, brand_context
+security/                 # AES-256-GCM, JWT, audit_log
+services/elementor/       # BrandKit theme builder
+services/three_d/         # Tripo3D, FASHN (95% fidelity)
+api/v1/                   # REST, gdpr, webhooks
+tests/                    # 1200+ tests
+```
+
+---
+
+## 💻 COMMANDS
+
 ```bash
-# Security (REQUIRED)
-JWT_SECRET_KEY=     # python -c "import secrets; print(secrets.token_urlsafe(64))"
-ENCRYPTION_MASTER_KEY=  # python -c "import secrets, base64; print(base64.b64encode(secrets.token_bytes(32)).decode())"
-DATABASE_URL=postgresql+asyncpg://user:pass@host/devskyy  # Use PostgreSQL in prod  # pragma: allowlist secret
-
-# LLM (≥1 required): OPENAI, ANTHROPIC, GOOGLE_AI, MISTRAL, COHERE, GROQ
-# 3D/Visual: TRIPO_API_KEY, FASHN_API_KEY
-# WordPress: WORDPRESS_URL, WORDPRESS_APP_PASSWORD, WOOCOMMERCE_KEY, WOOCOMMERCE_SECRET
-# Cache: REDIS_URL=redis://localhost:6379/0
+pip install -e ".[dev]"              # Install
+pytest -v                            # TEST (AFTER EVERY CHANGE!)
+pytest tests/test_X.py -v            # Single module
+pytest --cov=. --cov-report=html     # Coverage (>90%)
+isort . && ruff check --fix && black . # Format
+mypy . --strict                      # Types
+pip-audit && bandit -r .             # Security
+python devskyy_mcp.py --mcp-debug    # MCP server
+uvicorn main_enterprise:app --reload # Dev server
 ```
 
-**Secrets Management**: Local (`.env`), Prod (AWS Secrets Manager/Vercel), never hardcode, rotate 90d, audit access
+---
+
+## 🎯 RULES
+
+| Rule | Action |
+|------|--------|
+| Correctness > Elegance > Performance | Explicit, no magic |
+| No deletions | Refactor only |
+| Truthful | README = reality |
+| Deterministic agents | Trace all actions |
+| Contracts | Pydantic in, typed out |
+| Interface change | Update ALL sites+tests+docs |
 
 ---
 
-## 🛠️ Commands
+## 📝 PATTERNS
 
-**Dev**: `pip install -e .` → `isort . && ruff check . --fix && black .` → `mypy .` → `pytest -v` → `pip-audit && bandit -r .`
-**Test**: `pytest --cov=. --cov-report=html` / `pytest tests/test_agents.py::test_tool_runtime -v` / `pytest -m "not slow"`
-**MCP**: `python devskyy_mcp.py [--mcp-debug]` / `python -c "from devskyy_mcp import mcp; print(mcp.list_tools())"`
-**TypeScript**: `npm run build/dev/test/lint/lint:fix/type-check/security:audit`
-**3D Demos**: `npm run demo:{black-rose,signature,love-hurts,showroom,runway}`
-**Makefile**: `make {help,dev,lint-all,format-all,test-all,ci,clean,docker-build}`
-
----
-
-## 📋 Code Style
-
-**Python**: Type hints everywhere, Pydantic > dicts, no mutable defaults, async/await for I/O, Google-style docstrings
-
-**Patterns**:
 ```python
-# ✅ Good: Explicit error taxonomy
+# ✅ GOOD
 class DevSkyError(Exception): pass
-class ToolExecutionError(DevSkyError):
-    def __init__(self, tool_name: str, reason: str):
-        super().__init__(f"Tool {tool_name} failed: {reason}")
+class ToolError(DevSkyError):
+    def __init__(self, tool: str, reason: str, *, correlation_id: str | None = None):
+        self.correlation_id = correlation_id
+        super().__init__(f"{tool}: {reason}")
 
-# ❌ Bad: Generic exceptions, placeholder strings, mutable defaults
-raise Exception("error")  # ❌
-return "Agent execution simulated"  # ❌
-def foo(items: list = []): pass  # ❌
+async def process(data: InputModel, *, correlation_id: str | None = None) -> OutputModel:
+    """Docstring with Args, Returns, Raises."""
+    return OutputModel(result=InputModel.model_validate(data).value)
+
+# ❌ BAD
+raise Exception("error")           # Generic
+return "simulated"                 # Placeholder
+def f(x: list = []): pass          # Mutable default
+try: ... except: pass              # Bare except
 ```
 
 ---
 
-## 🔍 Testing
+## 🧪 TESTING (CRITICAL)
 
-**TDD**: Tests FIRST → confirm fail → implement → iterate → commit separately
+```bash
+# ⚠️ AFTER EVERY FILE CHANGE:
+pytest tests/ -v --tb=short
 
-**Pattern**: Fixtures + async tests + ToolRegistry validation (see `tests/test_agents.py`)
+# Current: Fix these 19 failures
+# DB(10) MCP(2) reranker(2) WP(3) API(1) env(1)
+```
 
----
-
-## 🎨 WordPress & 🤖 Agents
-
-**WordPress Pattern**: BrandKit abstraction (`BrandKit.from_yaml`) → PageSpec → generate → validate → import → assign
-**Agent Pattern**: Plan → Retrieve (RAG) → Execute (ToolRegistry) → Validate (schema) → Emit (structured)
-**Tool Runtime**: ToolRegistry + ToolSpec + ToolCallContext (`runtime/tools.py`)
-**Tool Classification**:
-- **Categories**: CONTENT, COMMERCE, MEDIA, COMMUNICATION, ANALYTICS, INTEGRATION, SYSTEM, AI, OPERATIONS, SECURITY
-- **Severity**: READ_ONLY, LOW, MEDIUM, HIGH, DESTRUCTIVE
+**Test Pattern:**
+```python
+@pytest.mark.asyncio
+async def test_feature(fixture: Type) -> None:
+    """Feature should do X when Y."""
+    result = await function(input)
+    assert result.success is True
 ```
 
 ---
 
-## 🔐 Security & 📦 3D Pipeline
+## 🔐 SECURITY
 
-**Crypto**: AES-256-GCM supports str/bytes/dict (JSON stable serialization) → `encrypt()` / `decrypt()` / `decrypt_bytes()`
-**GDPR**: `/api/v1/gdpr/{export,delete,retention-policy}` (Articles 15, 17, 13)
-**3D Pipeline**: `generate(prompt, retries=3, idempotency_key)` → validate (polycount/texture) → WP upload → WooCommerce attach
+| Component | Implementation |
+|-----------|----------------|
+| Crypto | AES-256-GCM: `encrypt(str\|bytes\|dict)` → `decrypt()` |
+| Auth | JWT + refresh, OAuth2, TOTP |
+| GDPR | `/api/v1/gdpr/{export,delete,retention-policy}` |
+| Audit | All changes logged with correlation_id |
+| Secrets | `.env` local, AWS Secrets Manager prod |
+
+---
+
+## 🎨 BRAND
+
+```python
+SKYYROSE = {"name": "SkyyRose", "tagline": "Where Love Meets Luxury",
+            "colors": {"primary": "#B76E79", "secondary": "#1A1A1A"},
+            "style": ["luxury", "sophisticated", "bold", "Oakland"]}
 ```
 
----
-
-## 🚀 Deployment
-
-**Production URLs**: Frontend (`app.devskyy.app`), API (`api.devskyy.app`), Docs (`api.devskyy.app/docs`)
-
-**Pre-Commit**: formatters → mypy → pytest → security audit → update docs → no TODOs
-
-**Vercel** (serverless): `vercel.json` (`rootDirectory: "frontend"`, 60s timeout, 50MB max) → `vercel --prod` | **Limitations**: cold starts ~2-3s, stateless (S3/R2)
-**Docker** (traditional): `make docker-build` → `docker-compose up -d` → `docker-compose logs -f api`
-**CI/CD**: `.github/workflows/ci.yml` (checkout → Python 3.11 → install → lint/type/security/test → codecov)
+**BrandKit**: NO hardcoded values. Use `BrandKit.from_config()` for theme generation.
 
 ---
 
-## 📝 Commits & 📊 Monitoring
+## ⚡ TOKEN EFFICIENCY
 
-**Commit Format**: `<type>(<scope>): <subject>` (types: feat/fix/docs/style/refactor/perf/test/chore)
+```bash
+# ❌ WASTEFUL              # ✅ EFFICIENT
+cat large.py              → head -50 && tail -50
+git diff                  → git diff --stat (then targeted)
+grep -r "x" .             → grep -r "x" src/ -l
+```
 
-**Prometheus** (`/metrics`): `http_requests_total`, `http_request_duration_seconds`, `agent_executions_total`, `agent_execution_duration_seconds`, `tool_calls_total`, `llm_requests_total`, `llm_tokens_total`, `cache_hits/misses_total`
-**Queries**: `rate(http_requests_total[1m])` / `histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m]))`
-
-**Logging**: structlog (JSON), levels (DEBUG/INFO/WARNING/ERROR/CRITICAL), correlation IDs
-**Security Audit**: `security/audit_log.py` (auth attempts, authz, secrets, GDPR exports, config changes)
-**Health**: `/health` (basic), `/health/ready` (DB/Redis), `/health/live` (minimal)
-
----
-
-## 🎓 Resources & ⚠️ Pitfalls
-
-**Fashion**: PDP vs Collection layouts, image hierarchy (hero→lifestyle→detail), typography (display→heading→body), size algorithms, color psychology
-**ML/AI**: Model registry, distributed caching (Redis+memory), SHAP explainability, A/B testing, continuous retraining
-**WordPress**: REST auth, MIME types, Shoptimizer 2.9.0, Elementor Pro 3.32.2, WooCommerce variants
-
-**DON'T**: ❌ Placeholders ❌ Mutable defaults ❌ Ignore tests ❌ Hand-wave validation ❌ Premature optimization ❌ Commit secrets ❌ Skip docs
-**DO**: ✅ TDD ✅ Type hints ✅ Pydantic validation ✅ Structured objects ✅ Correlation IDs ✅ Update all files ✅ Run formatters
+**MCP**: `defer_loading=True` for low-frequency tools (saves ~60K tokens)
 
 ---
 
-## 🔄 Workflow
+## ⚠️ GOTCHAS
 
-1. **Explore**: Read files, analyze (NO code yet)
-2. **Plan**: Extended thinking on architecture/migration/tests/compatibility → detailed plan
-3. **Code**: TDD (tests → fail → implement → pass → commit separately)
-4. **Commit**: Descriptive message → PR (summary, breaking changes, testing)
-
----
-
-## 🎯 Sprint & 💡 Tips
-
-**Priorities** (7d): Test suite → fix security/crypto → packaging → mutable defaults → Tool Runtime → refactor agents/MCP → harden Elementor/3D → docs/CI
-**Success**: pytest ✓, crypto str/bytes/dict ✓, Tool Runtime ✓, ToolRegistry ✓, Elementor validation ✓, 3D retry/validation ✓, CI ✓, zero TODOs ✓
-
-**Tips**: Subagents for verification, ESC to redirect, `/clear` between tasks, checklists for complex migrations
+- **WP.com API**: `index.php?rest_route=` NOT `/wp-json/`
+- **Themes**: Cannot upload via REST - use admin
+- **3D CDNs**: VERIFY URLs exist before implementation
+- **Correlation IDs**: ALWAYS propagate through async
 
 ---
 
-## 📞 Contacts & 📚 Docs
+## ❌→✅
 
-**Contacts**: damBruh (SkyyRose LLC), support@skyyrose.com, GitHub issues (bugs/features), security@skyyrose.com (private)
-**Docs**: `docs/{architecture/DEVSKYY_MASTER_PLAN,MCP_ARCHITECTURE,MCP_CONFIGURATION_GUIDE,MCP_QUICK_REFERENCE,ZERO_TRUST_ARCHITECTURE,LLM_CLIENTS_QUICK_START,api/ECOMMERCE_API,javascript-typescript-sdk,runbooks/,IMPLEMENTATION_PLAN,SECRETS_MIGRATION}.md`
+| Don't | Do |
+|-------|-----|
+| Code before Context7 | Research first |
+| Skip pytest | Test EVERY edit |
+| Generic exceptions | Typed errors |
+| Placeholders | Real code |
+| Mutable defaults | `default_factory` |
+| Ignore failures | Fix or document |
 
 ---
 
-**Version**: 1.0.0 | **Status**: Production Hardening | **Last Updated**: 2026-01-07
+## 📊 HEALTH
 
-**Owner**: damBruh (SkyyRose LLC) | **Email**: <support@skyyrose.com> | **Security**: <security@skyyrose.com>
+`/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
 
 ---
 
-## REMEMBER
+## 📚 DOCS
 
-- NOT a demo - production-ready only
-- Correctness > Elegance > Performance
-- No stubs, no placeholders, no TODOs
-- TDD mandatory
-- Update this file as patterns emerge
+`docs/architecture/DEVSKYY_MASTER_PLAN.md` | `docs/MCP_*.md` | `docs/ZERO_TRUST_ARCHITECTURE.md`
+
+---
+
+## 🎯 SPRINT
+
+1. Fix tests (19→0) 2. Security 3. ToolRuntime 4. Agents 5. MCP 6. 3D 7. Docs
+
+**Done**: pytest✓ | crypto str/bytes/dict✓ | ToolRegistry✓ | Zero TODOs✓
+
+---
+
+**v1.2.0** | damBruh (SkyyRose LLC) | Production Hardening | 2026-01-17

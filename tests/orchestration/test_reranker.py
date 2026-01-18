@@ -20,11 +20,12 @@ async def test_cohere_reranker_basic(mock_api_keys, mock_cohere_rerank_response)
     """Test basic reranking with Cohere."""
     with patch("cohere.AsyncClient") as mock_client_class:
         mock_client = MagicMock()
+        # Mock returns only top 2 results (simulating real API behavior with top_n=2)
         mock_client.rerank = AsyncMock(
             return_value=MagicMock(
                 results=[
                     MagicMock(index=r["index"], relevance_score=r["relevance_score"])
-                    for r in mock_cohere_rerank_response["results"]
+                    for r in mock_cohere_rerank_response["results"][:2]  # Respect top_n
                 ]
             )
         )

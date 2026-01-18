@@ -41,7 +41,7 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, selectinload
-from sqlalchemy.pool import NullPool, QueuePool
+from sqlalchemy.pool import NullPool, QueuePool, StaticPool
 
 logger = logging.getLogger(__name__)
 
@@ -260,13 +260,27 @@ class DatabaseManager:
 
         # Determine pool class based on database type
         is_sqlite = "sqlite" in config.url
-        pool_class = NullPool if is_sqlite else QueuePool
+        is_memory = ":memory:" in config.url
+
+        # Use StaticPool for in-memory SQLite (keeps single connection alive)
+        # Use NullPool for file-based SQLite (allows multiple processes)
+        # Use QueuePool for PostgreSQL (connection pooling)
+        if is_memory:
+            pool_class = StaticPool
+        elif is_sqlite:
+            pool_class = NullPool
+        else:
+            pool_class = QueuePool
 
         # Create engine with connection pooling
         engine_kwargs = {
             "echo": config.echo,
             "poolclass": pool_class,
         }
+
+        # StaticPool needs connect_args for SQLite threading
+        if is_memory:
+            engine_kwargs["connect_args"] = {"check_same_thread": False}
 
         if not is_sqlite:
             engine_kwargs.update(

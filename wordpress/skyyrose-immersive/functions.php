@@ -195,6 +195,61 @@ function skyyrose_immersive_register_scripts() {
         'nonce' => wp_create_nonce('skyyrose_3d_nonce'),
         'isMobile' => wp_is_mobile(),
     ));
+
+    // ==========================================================================
+    // BUNDLED IMMERSIVE EXPERIENCE (Production Build)
+    // Three.js + GSAP + Lenis bundled into single IIFE for WordPress compatibility
+    // ==========================================================================
+    wp_register_script(
+        'skyyrose-immersive-bundle',
+        SKYYROSE_IMMERSIVE_URI . '/dist/skyyrose-immersive.iife.js',
+        array(), // No external dependencies - all bundled
+        SKYYROSE_IMMERSIVE_VERSION,
+        true
+    );
+
+    // Localize the bundle with configuration
+    wp_localize_script('skyyrose-immersive-bundle', 'skyyRoseConfig', array(
+        'themeUri' => SKYYROSE_IMMERSIVE_URI,
+        'modelsPath' => '/wp-content/uploads/3d-models/',
+        'dracoPath' => '/wp-content/plugins/skyyrose-3d-experience/draco/',
+        'collections' => array(
+            'signature' => array('color' => '#C9A962', 'name' => 'Signature'),
+            'love-hurts' => array('color' => '#B76E79', 'name' => 'Love Hurts'),
+            'black-rose' => array('color' => '#C0C0C0', 'name' => 'Black Rose'),
+        ),
+    ));
+}
+
+/**
+ * Enqueue immersive bundle on collection pages
+ */
+add_action('wp_enqueue_scripts', 'skyyrose_enqueue_immersive_bundle', 20);
+function skyyrose_enqueue_immersive_bundle() {
+    // Only load on collection pages
+    if (!is_page()) return;
+
+    $page_slug = get_post_field('post_name', get_the_ID());
+
+    // Check if this is a collection page
+    $collection_pages = array('signature', 'love-hurts', 'lovehurts', 'black-rose', 'blackrose', 'collections');
+    $is_collection_page = false;
+
+    foreach ($collection_pages as $collection) {
+        if (strpos($page_slug, $collection) !== false) {
+            $is_collection_page = true;
+            break;
+        }
+    }
+
+    // Also check for pages with 3D viewer shortcode
+    $post_content = get_post_field('post_content', get_the_ID());
+    $has_3d_shortcode = strpos($post_content, '[skyyrose_collection_experience') !== false
+                     || strpos($post_content, 'data-3d-viewer') !== false;
+
+    if ($is_collection_page || $has_3d_shortcode) {
+        wp_enqueue_script('skyyrose-immersive-bundle');
+    }
 }
 
 /**
@@ -500,6 +555,7 @@ function skyyrose_modify_script_tags($tag, $handle) {
         'skyyrose-signature-experience',
         'skyyrose-lovehurts-experience',
         'skyyrose-blackrose-experience',
+        'skyyrose-immersive-bundle', // Bundled Three.js + GSAP + Lenis
     );
 
     if (in_array($handle, $defer_scripts)) {

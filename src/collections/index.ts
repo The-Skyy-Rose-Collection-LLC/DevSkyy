@@ -50,6 +50,24 @@ export type {
 export { ShowroomExperience } from './ShowroomExperience.js';
 export { default as RunwayExperience } from './RunwayExperience.js';
 
+// AR Try-On & Transitions
+export { ARTryOnViewer } from './ARTryOnViewer.js';
+export type { ARProduct, ARTryOnConfig } from './ARTryOnViewer.js';
+
+export { WebXRARViewer, createBestARViewer } from './WebXRARViewer.js';
+export type { WebXRProduct, WebXRConfig } from './WebXRARViewer.js';
+
+export { EnvironmentTransition } from './EnvironmentTransition.js';
+export type { TransitionType, TransitionConfig, CollectionType as TransitionCollectionType } from './EnvironmentTransition.js';
+
+// WooCommerce Integration
+export { WooCommerceProductLoader, getProductLoader, initProductLoader } from './WooCommerceProductLoader.js';
+export type {
+  WooCommerceProduct,
+  WooCommerceVariation,
+  ProductLoaderConfig,
+} from './WooCommerceProductLoader.js';
+
 // ============================================================================
 // Collection3DExperienceSpec - Unified schema for all collection experiences
 // ============================================================================

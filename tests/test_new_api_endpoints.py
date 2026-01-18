@@ -272,9 +272,15 @@ class TestMonitoringEndpoints:
 
         if response.status_code == 200:
             data = response.json()
-            assert "total_agents" in data
-            assert "agents" in data
-            assert data["total_agents"] > 0
+            # API may return dict with total_agents or just a list
+            if isinstance(data, dict):
+                assert "total_agents" in data
+                assert "agents" in data
+                assert data["total_agents"] > 0
+            else:
+                # List format from agents_router
+                assert isinstance(data, list)
+                assert len(data) > 0
 
 
 class TestHealthEndpoints:

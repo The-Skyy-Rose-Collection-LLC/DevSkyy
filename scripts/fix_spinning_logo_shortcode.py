@@ -162,7 +162,7 @@ def get_elementor_data(page_id: int) -> list[dict] | None:
         page = make_request(url)
 
         # Try to get _elementor_data from the content
-        content = page.get("content", {}).get("raw", "")
+        page.get("content", {}).get("raw", "")
 
         # Check if there's Elementor data in the raw content
         # WordPress.com might not expose _elementor_data directly
