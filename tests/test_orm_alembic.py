@@ -78,7 +78,7 @@ def test_alembic_env():
 
         # Load Alembic config
         alembic_cfg = Config("alembic.ini")
-        script = ScriptDirectory.from_config(alembic_cfg)
+        ScriptDirectory.from_config(alembic_cfg)
 
         # Check that we can import the env module
 

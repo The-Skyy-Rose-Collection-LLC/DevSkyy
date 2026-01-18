@@ -13,19 +13,18 @@ Coverage:
 - Caching mechanism
 """
 
-import json
-import pytest
 import time
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock
 
-from llm.base import CompletionResponse, Message
+import pytest
+
+from llm.base import CompletionResponse
 from llm.classification import (
     ClassificationConfig,
     ClassificationExample,
     ClassificationResult,
     ClassificationType,
     GroqFastClassifier,
-    SentimentLabel,
     get_classifier,
 )
 
@@ -267,7 +266,7 @@ async def test_cache_expiration(mock_api_keys):
     classifier._client = mock_client
 
     # First call
-    result1 = await classifier.analyze_sentiment("Great!")
+    await classifier.analyze_sentiment("Great!")
     assert mock_client.complete.call_count == 1
 
     # Wait for cache to expire
@@ -276,7 +275,7 @@ async def test_cache_expiration(mock_api_keys):
     await asyncio.sleep(1.5)
 
     # Second call (cache expired, should call API again)
-    result2 = await classifier.analyze_sentiment("Great!")
+    await classifier.analyze_sentiment("Great!")
     assert mock_client.complete.call_count == 2
 
 

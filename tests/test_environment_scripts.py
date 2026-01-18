@@ -177,11 +177,18 @@ REDIS_URL=redis://:pass@localhost:6379/0
 """
         env_file.write_text(env_content)
 
-        # Run validation
+        # Run validation with clean environment (prevent inheritance from parent)
+        # Only keep PATH and HOME which are needed for subprocess execution
+        clean_env = {
+            "PATH": os.environ.get("PATH", "/usr/bin:/bin"),
+            "HOME": os.environ.get("HOME", "/tmp"),
+        }
+
         result = subprocess.run(
             ["python3", "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
+            env=clean_env,
         )
 
         # Should fail validation

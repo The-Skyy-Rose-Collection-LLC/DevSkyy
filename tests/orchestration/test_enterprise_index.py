@@ -11,9 +11,9 @@ Coverage:
 - Cache functionality
 """
 
-import pytest
-from datetime import UTC, datetime
 from unittest.mock import AsyncMock, patch
+
+import pytest
 
 from orchestration.enterprise_index import (
     CodeSearchResult,
@@ -74,19 +74,21 @@ async def test_enterprise_index_parallel_search(mock_api_keys):
         ),
     ]
 
-    with patch.object(
-        GitHubEnterpriseProvider, "search_code", new_callable=AsyncMock, return_value=gh_results
-    ):
-        with patch.object(
+    with (
+        patch.object(
+            GitHubEnterpriseProvider, "search_code", new_callable=AsyncMock, return_value=gh_results
+        ),
+        patch.object(
             GitLabProvider, "search_code", new_callable=AsyncMock, return_value=gl_results
-        ):
-            await index.initialize()
+        ),
+    ):
+        await index.initialize()
 
-            results = await index.search_code(
-                query="authentication middleware",
-                language=SearchLanguage.PYTHON,
-                max_results_per_provider=5,
-            )
+        results = await index.search_code(
+            query="authentication middleware",
+            language=SearchLanguage.PYTHON,
+            max_results_per_provider=5,
+        )
 
     # Should get results from both providers
     assert len(results) == 3
@@ -129,18 +131,20 @@ async def test_enterprise_index_resilience(mock_api_keys):
     ]
 
     # Mock GitHub to fail, GitLab to succeed
-    with patch.object(
-        GitHubEnterpriseProvider,
-        "search_code",
-        new_callable=AsyncMock,
-        side_effect=Exception("GitHub API error"),
-    ):
-        with patch.object(
+    with (
+        patch.object(
+            GitHubEnterpriseProvider,
+            "search_code",
+            new_callable=AsyncMock,
+            side_effect=Exception("GitHub API error"),
+        ),
+        patch.object(
             GitLabProvider, "search_code", new_callable=AsyncMock, return_value=gl_results
-        ):
-            await index.initialize()
+        ),
+    ):
+        await index.initialize()
 
-            results = await index.search_code("test")
+        results = await index.search_code("test")
 
     # Should still get GitLab results despite GitHub failure
     assert len(results) == 1

@@ -441,7 +441,7 @@ def configure_homepage_settings(client: WordPressClient, dry_run: bool = False) 
     try:
         # WordPress settings are typically updated via options
         # REST API settings endpoint requires specific permissions
-        result = client.put(
+        client.put(
             "/wp/v2/settings",
             {
                 "show_on_front": "page",

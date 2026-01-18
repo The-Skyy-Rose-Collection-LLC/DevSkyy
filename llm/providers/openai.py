@@ -16,6 +16,12 @@ from collections.abc import AsyncIterator
 from datetime import UTC, datetime
 from typing import Any
 
+# Import config for API keys (loads .env.hf)
+try:
+    from config import OPENAI_API_KEY
+except ImportError:
+    OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
+
 from ..base import BaseLLMClient, CompletionResponse, Message, StreamChunk, ToolCall
 
 logger = logging.getLogger(__name__)
@@ -47,7 +53,7 @@ class OpenAIClient(BaseLLMClient):
         **kwargs: Any,
     ) -> None:
         super().__init__(
-            api_key=api_key or os.getenv("OPENAI_API_KEY", ""),
+            api_key=api_key or OPENAI_API_KEY or os.getenv("OPENAI_API_KEY", ""),
             base_url=base_url,
             **kwargs,
         )

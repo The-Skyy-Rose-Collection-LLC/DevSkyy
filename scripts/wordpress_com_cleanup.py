@@ -1,25 +1,13 @@
 #!/usr/bin/env python3
 """
-WordPress.com Page Cleanup via OAuth
+WordPress Page Cleanup via REST API
 
-Deletes all existing WordPress.com pages and prepares for production.
+Deletes/renames WordPress pages and prepares for production.
 
 Requirements in .env:
   - WORDPRESS_URL (e.g., https://skyyrose.co)
-  - WORDPRESS_COM_ACCESS_TOKEN (OAuth bearer token from WordPress.com)
-
-Setup OAuth Token:
-  1. Go to https://developer.wordpress.com/apps/
-  2. Create app → get Client ID & Secret
-  3. Get authorization code from:
-     https://public-api.wordpress.com/oauth2/authorize?client_id=ID&redirect_uri=YOUR_REDIRECT&response_type=code
-  4. Exchange code for token:
-     curl -X POST https://public-api.wordpress.com/oauth2/token \
-       -d "client_id=ID" \
-       -d "client_secret=SECRET" \
-       -d "code=CODE" \
-       -d "grant_type=authorization_code"
-  5. Add access_token to .env as WORDPRESS_COM_ACCESS_TOKEN
+  - WORDPRESS_USERNAME (e.g., skyyroseco)
+  - WORDPRESS_APP_PASSWORD (Application password from WP Admin)
 
 Usage:
     python scripts/wordpress_com_cleanup.py [--list-only] [--dry-run]
@@ -28,7 +16,6 @@ Usage:
 import argparse
 import sys
 from pathlib import Path
-from urllib.parse import urlparse
 
 try:
     import requests
@@ -37,70 +24,58 @@ except ImportError:
     sys.exit(1)
 
 
-class WordPressCOMClient:
-    """WordPress.com REST API v1.1 client using OAuth."""
+class WordPressRESTClient:
+    """WordPress REST API v2 client using Application Password."""
 
-    BASE_URL = "https://public-api.wordpress.com/rest/v1.1"
-
-    def __init__(self, site_url: str, access_token: str):
-        """Initialize WordPress.com client.
+    def __init__(self, site_url: str, username: str, app_password: str):
+        """Initialize WordPress REST API client.
 
         Args:
             site_url: Full site URL (e.g., https://skyyrose.co)
-            access_token: OAuth access token from WordPress.com
+            username: WordPress username
+            app_password: Application password from WP Admin
         """
-        # Extract domain from URL
-        parsed = urlparse(site_url)
         self.site_url = site_url.rstrip("/")
-        self.domain = parsed.netloc  # e.g., skyyrose.co
-        self.access_token = access_token
-        self.headers = {
-            "Authorization": f"Bearer {access_token}",
-            "Accept": "application/json",
-            "Content-Type": "application/json",
-        }
+        self.api_base = f"{self.site_url}/wp-json/wp/v2"
+        self.auth = (username, app_password)
 
     def get_pages(self) -> list[dict]:
-        """Fetch all pages from WordPress.com."""
+        """Fetch all pages from WordPress."""
         pages = []
         per_page = 100
         page_num = 1
 
         while True:
-            url = f"{self.BASE_URL}/sites/{self.domain}/posts/"
+            url = f"{self.api_base}/pages"
             params = {
-                "type": "page",
                 "per_page": per_page,
                 "page": page_num,
-                "status": "publish,draft",
+                "status": "publish,draft,private",
             }
 
             try:
-                response = requests.get(url, headers=self.headers, params=params, timeout=10)
+                response = requests.get(url, auth=self.auth, params=params, timeout=30)
                 response.raise_for_status()
                 result = response.json()
 
-                if "posts" not in result:
-                    print(f"Error: Unexpected response format: {result}")
+                if not result:
                     break
 
-                posts = result["posts"]
-                if not posts:
-                    break
-
-                pages.extend(posts)
-                if len(posts) < per_page:
+                pages.extend(result)
+                if len(result) < per_page:
                     break
 
                 page_num += 1
             except requests.exceptions.RequestException as e:
                 print(f"Error fetching pages: {e}")
+                if hasattr(e, "response") and e.response is not None:
+                    print(f"Response: {e.response.text[:500]}")
                 break
 
         return pages
 
     def delete_page(self, page_id: int, title: str, dry_run: bool = False) -> bool:
-        """Delete a page from WordPress.com.
+        """Delete a page from WordPress (move to trash).
 
         Args:
             page_id: WordPress page ID
@@ -114,20 +89,54 @@ class WordPressCOMClient:
             print(f"  [DRY-RUN] Would delete: {title} (ID: {page_id})")
             return True
 
-        url = f"{self.BASE_URL}/sites/{self.domain}/posts/{page_id}"
-        params = {"status": "delete"}
+        url = f"{self.api_base}/pages/{page_id}"
 
         try:
-            response = requests.post(url, headers=self.headers, params=params, timeout=10)
+            # force=true permanently deletes, omit for trash
+            response = requests.delete(url, auth=self.auth, timeout=30)
             if response.status_code in (200, 204):
                 print(f"  ✓ Deleted: {title} (ID: {page_id})")
                 return True
             else:
-                error_msg = response.json().get("message", response.text)
+                error_msg = response.json().get("message", response.text[:200])
                 print(f"  ✗ Error deleting {title}: {error_msg}")
                 return False
         except requests.exceptions.RequestException as e:
             print(f"  ✗ Error deleting {title}: {e}")
+            return False
+
+    def update_page_slug(
+        self, page_id: int, new_slug: str, title: str, dry_run: bool = False
+    ) -> bool:
+        """Update a page's slug.
+
+        Args:
+            page_id: WordPress page ID
+            new_slug: New URL slug
+            title: Page title (for logging)
+            dry_run: If True, don't actually update
+
+        Returns:
+            True if successful or dry-run
+        """
+        if dry_run:
+            print(f"  [DRY-RUN] Would rename: {title} → /{new_slug}/")
+            return True
+
+        url = f"{self.api_base}/pages/{page_id}"
+        data = {"slug": new_slug}
+
+        try:
+            response = requests.post(url, auth=self.auth, json=data, timeout=30)
+            if response.status_code == 200:
+                print(f"  ✓ Renamed: {title} → /{new_slug}/")
+                return True
+            else:
+                error_msg = response.json().get("message", response.text[:200])
+                print(f"  ✗ Error renaming {title}: {error_msg}")
+                return False
+        except requests.exceptions.RequestException as e:
+            print(f"  ✗ Error renaming {title}: {e}")
             return False
 
 
@@ -142,21 +151,47 @@ def load_env(env_file: str = ".env") -> dict[str, str]:
     with open(env_path) as f:
         for line in f:
             line = line.strip()
-            if not line or line.startswith("#"):
+            if not line or line.startswith("#") or line.startswith("export "):
                 continue
             if "=" in line:
                 key, value = line.split("=", 1)
-                env_vars[key.strip()] = value.strip()
+                # Strip quotes
+                value = value.strip().strip("'\"")
+                env_vars[key.strip()] = value
 
     return env_vars
 
 
+# Pages to rename (old-slug -> new-slug)
+RENAME_MAP = {
+    "home-2": "home",
+    "about-2": "about",
+}
+
+# Pages to keep as-is
+KEEP_PAGES = {
+    "signature",
+    "black-rose",
+    "love-hurts",
+    "collections",
+    "shop",
+    "cart",
+    "checkout",
+    "my-account",
+    "experiences",
+    "home",
+    "about",
+    "contact",
+}
+
+
 def main():
     parser = argparse.ArgumentParser(
-        description="Clean up WordPress.com pages and prepare for production"
+        description="Clean up WordPress pages and prepare for production"
     )
-    parser.add_argument("--list-only", action="store_true", help="List pages without deleting")
-    parser.add_argument("--dry-run", action="store_true", help="Show what would be deleted")
+    parser.add_argument("--list-only", action="store_true", help="List pages without modifying")
+    parser.add_argument("--dry-run", action="store_true", help="Show what would be changed")
+    parser.add_argument("--delete-all", action="store_true", help="Delete ALL pages (dangerous)")
     parser.add_argument(
         "--env-file",
         default="/Users/coreyfoster/DevSkyy/.env",
@@ -167,18 +202,23 @@ def main():
     # Load environment
     env = load_env(args.env_file)
     site_url = env.get("WORDPRESS_URL", "").strip("'\"")
-    access_token = env.get("WORDPRESS_COM_ACCESS_TOKEN", "").strip("'\"")
+    username = env.get("WORDPRESS_USERNAME", "").strip("'\"")
+    app_password = env.get("WORDPRESS_APP_PASSWORD", "").strip("'\"")
 
     if not site_url:
         print("Error: WORDPRESS_URL not found in .env")
         sys.exit(1)
 
-    if not access_token:
-        print("Error: WORDPRESS_COM_ACCESS_TOKEN not found in .env")
-        print("See wordpress/WORDPRESS_COM_CLEANUP_GUIDE.md for setup instructions.")
+    if not username:
+        print("Error: WORDPRESS_USERNAME not found in .env")
         sys.exit(1)
 
-    client = WordPressCOMClient(site_url, access_token)
+    if not app_password:
+        print("Error: WORDPRESS_APP_PASSWORD not found in .env")
+        print("Generate one at: WP Admin → Users → Profile → Application Passwords")
+        sys.exit(1)
+
+    client = WordPressRESTClient(site_url, username, app_password)
 
     print(f"\n📋 Fetching pages from {site_url}...\n")
     pages = client.get_pages()
@@ -188,40 +228,72 @@ def main():
         return
 
     print(f"Found {len(pages)} page(s):\n")
+
+    to_rename = []
+    to_delete = []
+    to_keep = []
+
     for page in pages:
-        status = "📌" if page.get("status") == "publish" else "📝"
-        print(f"  {status} {page['status']:8} | {page['title']} (ID: {page['ID']})")
+        slug = page.get("slug", "")
+        title = page.get("title", {}).get("rendered", "Untitled")
+        page_id = page.get("id")
+        status = page.get("status", "unknown")
+
+        status_icon = "📌" if status == "publish" else "📝"
+
+        if slug in RENAME_MAP:
+            new_slug = RENAME_MAP[slug]
+            print(f"  {status_icon} {status:8} | {title} (/{slug}/) → RENAME to /{new_slug}/")
+            to_rename.append((page_id, title, slug, new_slug))
+        elif slug in KEEP_PAGES:
+            print(f"  {status_icon} {status:8} | {title} (/{slug}/) → KEEP")
+            to_keep.append((page_id, title, slug))
+        elif args.delete_all:
+            print(f"  {status_icon} {status:8} | {title} (/{slug}/) → DELETE")
+            to_delete.append((page_id, title, slug))
+        else:
+            print(f"  {status_icon} {status:8} | {title} (/{slug}/)")
+            to_keep.append((page_id, title, slug))
+
+    print("\n📊 Summary:")
+    print(f"   Keep: {len(to_keep)}")
+    print(f"   Rename: {len(to_rename)}")
+    print(f"   Delete: {len(to_delete)}")
 
     if args.list_only:
-        print("\n(Use without --list-only to delete these pages)\n")
+        print("\n(Use without --list-only to make changes)\n")
         return
 
-    # Confirm deletion unless dry-run
+    if not to_rename and not to_delete:
+        print("\n✓ No changes needed.\n")
+        return
+
+    # Confirm changes unless dry-run
     if not args.dry_run:
-        print(f"\n⚠️  About to delete {len(pages)} page(s). Type 'DELETE' to confirm: ", end="")
+        changes = len(to_rename) + len(to_delete)
+        print(f"\n⚠️  About to modify {changes} page(s). Type 'YES' to confirm: ", end="")
         confirm = input().strip()
-        if confirm != "DELETE":
+        if confirm != "YES":
             print("Cancelled.\n")
             return
 
-    print("\nDeleting pages...\n")
-    deleted_count = 0
-    for page in pages:
-        if client.delete_page(page["ID"], page["title"], dry_run=args.dry_run):
-            deleted_count += 1
+    print("\n🔄 Processing changes...\n")
 
+    success_count = 0
+
+    # Rename pages
+    for page_id, title, _old_slug, new_slug in to_rename:
+        if client.update_page_slug(page_id, new_slug, title, dry_run=args.dry_run):
+            success_count += 1
+
+    # Delete pages
+    for page_id, title, slug in to_delete:
+        if client.delete_page(page_id, title, dry_run=args.dry_run):
+            success_count += 1
+
+    total = len(to_rename) + len(to_delete)
     mode = "DRY-RUN" if args.dry_run else "COMPLETED"
-    print(f"\n✓ {mode}: Deleted {deleted_count}/{len(pages)} pages.\n")
-
-    print("📝 Production Pages Ready to Create:")
-    print("  - / (Home)")
-    print("  - /shop (Product Archive)")
-    print("  - /experiences/signature (Signature Collection)")
-    print("  - /experiences/black-rose (Black Rose Collection)")
-    print("  - /experiences/love-hurts (Love Hurts Collection)")
-    print("  - /about (About SkyyRose)")
-    print("  - /contact (Contact)")
-    print()
+    print(f"\n✓ {mode}: Modified {success_count}/{total} pages.\n")
 
 
 if __name__ == "__main__":

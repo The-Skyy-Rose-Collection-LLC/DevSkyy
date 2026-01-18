@@ -457,7 +457,7 @@ async def test_multi_turn_conversation_flow(mock_api_key, mock_generation_result
 
     # Turn 2: Add rose gold highlights
     with patch.object(GeminiProImageClient, "generate", return_value=mock_generation_result):
-        result2 = await editor.continue_session(
+        await editor.continue_session(
             session_id=session.session_id, prompt="Add rose gold highlights to logo"
         )
 

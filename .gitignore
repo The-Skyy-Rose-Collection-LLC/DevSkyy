@@ -215,3 +215,6 @@ generated_3d_models/
 assets/
 datasets/
 generated_3d_models_color_accurate/
+
+# Large training data files
+skyyrose_training_data.zip

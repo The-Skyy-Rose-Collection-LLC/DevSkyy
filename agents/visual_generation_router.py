@@ -48,6 +48,7 @@ class VisualProvider(str, Enum):
     GOOGLE_VEO = "google_veo"
     HUGGINGFACE_FLUX = "huggingface_flux"
     HUGGINGFACE_SD = "huggingface_sd"  # Stable Diffusion
+    REPLICATE_LORA = "replicate_lora"  # SkyyRose custom LoRA (exact products)
     TRIPO3D = "tripo3d"
     FASHN = "fashn"
 
@@ -61,6 +62,7 @@ class GenerationType(str, Enum):
     VIDEO_FROM_IMAGE = "video_from_image"
     MODEL_3D = "model_3d"
     VIRTUAL_TRYON = "virtual_tryon"
+    EXACT_PRODUCT = "exact_product"  # LoRA-based exact product generation
 
 
 class AspectRatio(str, Enum):
@@ -547,6 +549,200 @@ class HuggingFaceFluxClient:
         return f"{prompt}, {style}, high quality, professional photography"
 
 
+class ReplicateLoRAClient:
+    """
+    Replicate LoRA client for exact SkyyRose product generation.
+
+    Uses custom-trained LoRA (v3) on 390 exact product images.
+    Model: devskyy/skyyrose-lora-v3
+    Trigger word: skyyrose
+    """
+
+    MODEL_ID = "devskyy/skyyrose-lora-v3"
+    MODEL_VERSION = "64dbb859fed83670e7cde81fc161c183bd9d0607fb7028b01bfc0a000ec114b4"  # pragma: allowlist secret
+    TRIGGER_WORD = "skyyrose"
+    API_BASE = "https://api.replicate.com/v1"
+
+    # Collection style mappings
+    COLLECTION_STYLES = {
+        "SIGNATURE": {
+            "style": "signature collection, lavender rose, classic elegant, timeless",
+            "colors": "lavender, rose gold, soft pastels, cream white",
+        },
+        "BLACK_ROSE": {
+            "style": "black_rose collection, dark elegance, gothic luxury, midnight",
+            "colors": "obsidian black, deep burgundy, silver accents",
+        },
+        "LOVE_HURTS": {
+            "style": "love_hurts collection, bold red, emotional expression, urban",
+            "colors": "vivid red, black contrast, white accents",
+        },
+    }
+
+    def __init__(self, api_token: str | None = None):
+        self.api_token = api_token or os.getenv("REPLICATE_API_TOKEN")
+        if not self.api_token:
+            logger.warning("REPLICATE_API_TOKEN not configured for LoRA")
+
+    async def generate(self, request: GenerationRequest) -> GenerationResult:
+        """Generate exact product image using trained LoRA."""
+        start_time = time.time()
+        result_id = str(uuid4())[:16]
+
+        if not self.api_token:
+            return GenerationResult(
+                id=result_id,
+                request_id=request.id,
+                provider=VisualProvider.REPLICATE_LORA,
+                success=False,
+                error="REPLICATE_API_TOKEN not configured",
+            )
+
+        try:
+            import httpx
+
+            # Extract collection from metadata or default
+            collection = request.metadata.get("collection", "SIGNATURE").upper()
+            garment_type = request.metadata.get("garment_type", "")
+
+            # Build enhanced prompt with LoRA trigger word
+            enhanced_prompt = self._build_prompt(request.prompt, collection, garment_type)
+
+            headers = {
+                "Authorization": f"Bearer {self.api_token}",
+                "Content-Type": "application/json",
+            }
+
+            input_params = {
+                "prompt": enhanced_prompt,
+                "num_outputs": min(request.num_outputs, 4),
+                "guidance_scale": request.guidance_scale or 3.5,
+                "num_inference_steps": request.num_inference_steps or 28,
+                "output_format": "webp",
+                "output_quality": 90,
+                "disable_safety_checker": False,
+            }
+
+            if request.seed is not None:
+                input_params["seed"] = request.seed
+
+            # Create prediction
+            async with httpx.AsyncClient(timeout=120.0) as client:
+                response = await client.post(
+                    f"{self.API_BASE}/predictions",
+                    headers=headers,
+                    json={
+                        "version": self.MODEL_VERSION,
+                        "input": input_params,
+                    },
+                )
+
+                if response.status_code not in (200, 201):
+                    return GenerationResult(
+                        id=result_id,
+                        request_id=request.id,
+                        provider=VisualProvider.REPLICATE_LORA,
+                        success=False,
+                        error=f"API error {response.status_code}: {response.text[:200]}",
+                        latency_ms=(time.time() - start_time) * 1000,
+                    )
+
+                prediction = response.json()
+                pred_id = prediction.get("id")
+
+                # Poll for completion
+                status = prediction.get("status")
+                while status in ("starting", "processing"):
+                    await asyncio.sleep(2)
+
+                    poll_response = await client.get(
+                        f"{self.API_BASE}/predictions/{pred_id}",
+                        headers=headers,
+                    )
+                    if poll_response.status_code == 200:
+                        prediction = poll_response.json()
+                        status = prediction.get("status")
+
+                if status == "succeeded":
+                    output = prediction.get("output", [])
+                    output_urls = list(output) if isinstance(output, list) else [output]
+
+                    latency_ms = (time.time() - start_time) * 1000
+                    cost_usd = 0.003 * request.num_outputs  # Estimated Flux LoRA cost
+
+                    return GenerationResult(
+                        id=result_id,
+                        request_id=request.id,
+                        provider=VisualProvider.REPLICATE_LORA,
+                        success=True,
+                        output_urls=output_urls,
+                        output_url=output_urls[0] if output_urls else None,
+                        content_type="image/webp",
+                        width=request.width,
+                        height=request.height,
+                        latency_ms=latency_ms,
+                        cost_usd=cost_usd,
+                        metadata={
+                            "prediction_id": pred_id,
+                            "model": f"{self.MODEL_ID}:{self.MODEL_VERSION[:12]}",
+                            "enhanced_prompt": enhanced_prompt,
+                            "collection": collection,
+                            "garment_type": garment_type,
+                        },
+                    )
+                else:
+                    return GenerationResult(
+                        id=result_id,
+                        request_id=request.id,
+                        provider=VisualProvider.REPLICATE_LORA,
+                        success=False,
+                        error=prediction.get("error") or f"Generation failed: {status}",
+                        latency_ms=(time.time() - start_time) * 1000,
+                    )
+
+        except Exception as e:
+            logger.exception(f"Replicate LoRA error: {e}")
+            return GenerationResult(
+                id=result_id,
+                request_id=request.id,
+                provider=VisualProvider.REPLICATE_LORA,
+                success=False,
+                error=str(e),
+                latency_ms=(time.time() - start_time) * 1000,
+            )
+
+    def _build_prompt(self, prompt: str, collection: str, garment_type: str = "") -> str:
+        """Build enhanced prompt with brand DNA and trigger word."""
+        parts = [self.TRIGGER_WORD]
+
+        # Add collection style
+        collection_data = self.COLLECTION_STYLES.get(
+            collection, self.COLLECTION_STYLES["SIGNATURE"]
+        )
+        parts.append(collection_data["style"])
+
+        # Add garment description if specified
+        if garment_type:
+            parts.append(garment_type)
+
+        # Add user prompt
+        parts.append(prompt)
+
+        # Add quality keywords
+        parts.extend(
+            [
+                "luxury streetwear",
+                "product photography",
+                "studio lighting",
+                "white background",
+                "high quality",
+                "professional photo",
+            ]
+        )
+
+        return ", ".join(parts)
+
+
 # =============================================================================
 # Visual Generation Router
 # =============================================================================
@@ -570,6 +766,7 @@ class VisualGenerationRouter:
         GenerationType.IMAGE_FROM_TEXT: [
             VisualProvider.GOOGLE_IMAGEN,
             VisualProvider.HUGGINGFACE_FLUX,
+            VisualProvider.REPLICATE_LORA,  # Fallback for brand-specific
         ],
         GenerationType.IMAGE_FROM_IMAGE: [
             VisualProvider.GOOGLE_IMAGEN,
@@ -587,6 +784,10 @@ class VisualGenerationRouter:
         GenerationType.VIRTUAL_TRYON: [
             VisualProvider.FASHN,
         ],
+        GenerationType.EXACT_PRODUCT: [
+            VisualProvider.REPLICATE_LORA,  # Primary: exact product match
+            VisualProvider.GOOGLE_IMAGEN,  # Fallback: generic generation
+        ],
     }
 
     def __init__(self):
@@ -602,7 +803,10 @@ class VisualGenerationRouter:
         # Initialize HuggingFace client
         self._clients[VisualProvider.HUGGINGFACE_FLUX] = HuggingFaceFluxClient()
 
-        logger.info("Visual generation router initialized")
+        # Initialize Replicate LoRA client (exact product generation)
+        self._clients[VisualProvider.REPLICATE_LORA] = ReplicateLoRAClient()
+
+        logger.info("Visual generation router initialized with LoRA support")
 
     def get_providers_for_type(self, generation_type: GenerationType) -> list[VisualProvider]:
         """Get available providers for a generation type"""
@@ -743,6 +947,42 @@ class VisualGenerationRouter:
 
         return await self.generate_image(prompt.strip(), **kwargs)
 
+    async def generate_exact_product(
+        self,
+        product_description: str,
+        collection: str = "SIGNATURE",
+        garment_type: str = "",
+        num_outputs: int = 1,
+        **kwargs,
+    ) -> GenerationResult:
+        """
+        Generate EXACT SkyyRose product using trained LoRA.
+
+        Uses the custom LoRA trained on 390 real product images.
+        This produces images that match actual products, not generic generations.
+
+        Args:
+            product_description: What to generate (e.g., "lavender beanie with rose embroidery")
+            collection: SkyyRose collection (SIGNATURE, BLACK_ROSE, LOVE_HURTS)
+            garment_type: Type of garment (hoodie, tee, beanie, shorts, jacket, etc.)
+            num_outputs: Number of images to generate (1-4)
+
+        Returns:
+            GenerationResult with exact product images
+        """
+        request = GenerationRequest(
+            prompt=product_description,
+            generation_type=GenerationType.EXACT_PRODUCT,
+            provider=VisualProvider.REPLICATE_LORA,
+            num_outputs=min(num_outputs, 4),
+            metadata={
+                "collection": collection.upper(),
+                "garment_type": garment_type,
+            },
+            **kwargs,
+        )
+        return await self.generate(request, VisualProvider.REPLICATE_LORA, fallback=True)
+
     async def generate_campaign_video(
         self, concept: str, collection: str = "SIGNATURE", duration: int = 10, **kwargs
     ) -> GenerationResult:
@@ -820,6 +1060,7 @@ __all__ = [
     "GoogleImagenClient",
     "GoogleVeoClient",
     "HuggingFaceFluxClient",
+    "ReplicateLoRAClient",
     # Router
     "VisualGenerationRouter",
     # Factory

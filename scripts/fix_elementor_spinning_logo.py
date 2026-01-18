@@ -45,7 +45,7 @@ def get_spinning_logo_html(variant: str = "gold") -> str:
     glow_light = f"rgba({r},{g},{b},0.3)"
     glow_med = f"rgba({r},{g},{b},0.2)"
 
-    return f'''<style>
+    return f"""<style>
 @keyframes sr-spin {{ from {{ transform: rotate(0deg); }} to {{ transform: rotate(360deg); }} }}
 @keyframes sr-glow {{ 0%,100% {{ opacity:1; }} 50% {{ opacity:0.85; }} }}
 .sr-logo:hover .sr-spinner {{ animation-play-state: paused !important; transform: scale(1.1); }}
@@ -69,7 +69,7 @@ def get_spinning_logo_html(variant: str = "gold") -> str:
 <path d="M50 75 Q48 85 50 95" stroke="{color}" stroke-width="2" fill="none" opacity="0.5"/>
 </svg>
 </a>
-</div>'''
+</div>"""
 
 
 def make_request(url: str, method: str = "GET", data: dict | None = None) -> dict:

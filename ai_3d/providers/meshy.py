@@ -28,6 +28,12 @@ from typing import Any
 
 import httpx
 
+# Import config for API keys (loads .env.hf)
+try:
+    from config import MESHY_API_KEY
+except ImportError:
+    MESHY_API_KEY = os.getenv("MESHY_API_KEY", "")
+
 from errors.production_errors import (
     ConfigurationError,
     ExternalServiceError,
@@ -129,7 +135,7 @@ class MeshyClient:
         Raises:
             ConfigurationError: If API key is not provided
         """
-        self.api_key = api_key or os.getenv("MESHY_API_KEY")
+        self.api_key = api_key or MESHY_API_KEY or os.getenv("MESHY_API_KEY")
         if not self.api_key:
             raise ConfigurationError(
                 "MESHY_API_KEY is required for Meshy 3D generation",

@@ -262,7 +262,10 @@ class TestFullAlertingPipeline:
         # May be empty if webhook not configured, but should not error
 
 
-@pytest.mark.skipif(not os.getenv("SLACK_WEBHOOK_URL"), reason="SLACK_WEBHOOK_URL not set")
+@pytest.mark.skipif(
+    not os.getenv("SLACK_WEBHOOK_URL") or "YOUR" in os.getenv("SLACK_WEBHOOK_URL", ""),
+    reason="SLACK_WEBHOOK_URL not set or contains placeholder value",
+)
 class TestLiveSlackIntegration:
     """Live integration tests with actual Slack webhook"""
 

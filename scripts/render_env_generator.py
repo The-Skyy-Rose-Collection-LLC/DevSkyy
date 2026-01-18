@@ -351,7 +351,7 @@ def validate_environment(
     if not security_vars:
         issues.append("Missing required security variables")
 
-    for key, value, status in security_vars:
+    for key, _value, status in security_vars:
         if status == "placeholder":
             issues.append(f"Security variable '{key}' has placeholder value")
 

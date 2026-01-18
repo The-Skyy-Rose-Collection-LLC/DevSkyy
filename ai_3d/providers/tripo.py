@@ -22,6 +22,12 @@ from pydantic import BaseModel, Field, field_validator
 
 from errors.production_errors import ConfigurationError
 
+# Import config for API keys (loads .env.hf)
+try:
+    from config import TRIPO3D_API_KEY
+except ImportError:
+    TRIPO3D_API_KEY = os.getenv("TRIPO3D_API_KEY", "")
+
 logger = logging.getLogger(__name__)
 
 
@@ -164,11 +170,14 @@ class TripoClient:
             api_key: Tripo API key (or set TRIPO_API_KEY env var)
             enable_resilience: Enable retry/circuit breaker (for production)
         """
-        self.api_key = api_key or os.getenv("TRIPO_API_KEY")
+        # Check multiple env var names for compatibility
+        self.api_key = (
+            api_key or TRIPO3D_API_KEY or os.getenv("TRIPO3D_API_KEY") or os.getenv("TRIPO_API_KEY")
+        )
         if not self.api_key:
             raise ConfigurationError(
-                "TRIPO_API_KEY is required",
-                config_key="TRIPO_API_KEY",
+                "TRIPO3D_API_KEY is required (set in .env.hf or environment)",
+                config_key="TRIPO3D_API_KEY",
             )
 
         self.enable_resilience = enable_resilience

@@ -332,10 +332,7 @@ def list_tools(
         asyncio.run(orchestrator.build_catalog())
 
     # Get tools
-    if search:
-        tools = orchestrator.search_tools(search)
-    else:
-        tools = orchestrator.get_all_tools()
+    tools = orchestrator.search_tools(search) if search else orchestrator.get_all_tools()
 
     # Filter by category if specified
     if category:

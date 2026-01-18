@@ -16,7 +16,7 @@ print("=" * 70)
 
 # Training configuration
 config = {
-    "dataset_id": "damBruh/skyyrose-lora-dataset-v1",
+    "dataset_id": "damBruh/skyyrose-lora-dataset-v3",
     "trigger_word": "skyyrose",
     "collections": ["BLACK_ROSE", "SIGNATURE", "LOVE_HURTS"],
     "epochs": 100,

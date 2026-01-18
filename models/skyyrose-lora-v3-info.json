@@ -1,0 +1,35 @@
+{
+  "model": "devskyy/skyyrose-lora-v3",
+  "version": "64dbb859fed83670e7cde81fc161c183bd9d0607fb7028b01bfc0a000ec114b4",
+  "training_id": "banvwyg251rmt0cvsx58b733fw",
+  "status": "succeeded",
+  "weights_url": "https://replicate.delivery/xezq/vuExeSF2BxSaYaLyM8y0BkdBJK2baGg5b0Z4JKH7CrJvhQfVA/trained_model.tar",
+  "trigger_word": "skyyrose",
+  "training_config": {
+    "base_model": "ostris/flux-dev-lora-trainer",
+    "steps": 1000,
+    "lora_rank": 16,
+    "optimizer": "adamw8bit",
+    "batch_size": 1,
+    "resolution": "512,768,1024",
+    "learning_rate": 0.0004
+  },
+  "dataset": {
+    "source": "damBruh/skyyrose-lora-dataset-v3",
+    "images": 390,
+    "original": 604,
+    "duplicates_removed": 200,
+    "non_products_removed": 14
+  },
+  "collections": ["SIGNATURE", "BLACK_ROSE", "LOVE_HURTS"],
+  "usage": {
+    "python": "replicate.run('devskyy/skyyrose-lora-v3:64dbb859fed83670e7cde81fc161c183bd9d0607fb7028b01bfc0a000ec114b4', input={'prompt': 'skyyrose [description]'})",
+    "api": "POST https://api.replicate.com/v1/predictions with version: 64dbb859fed83670e7cde81fc161c183bd9d0607fb7028b01bfc0a000ec114b4"
+  },
+  "test_results": {
+    "signature_beanie": "models/skyyrose-lora-v3-tests/signature_beanie.webp",
+    "blackrose_sherpa": "models/skyyrose-lora-v3-tests/blackrose_sherpa.webp",
+    "lovehurts_windbreaker": "models/skyyrose-lora-v3-tests/lovehurts_windbreaker.webp"
+  },
+  "created_at": "2026-01-17T21:23:00Z"
+}
