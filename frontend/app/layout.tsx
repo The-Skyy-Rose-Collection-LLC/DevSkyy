@@ -3,8 +3,8 @@
  * ===========
  * The root layout for the DevSkyy Dashboard.
  *
- * Uses system font stacks for maximum reliability across all environments.
- * No external font fetching required - works offline and in CI/CD.
+ * Font configuration is handled via global styles (see globals.css or Tailwind config).
+ * This layout is designed to work reliably in offline and CI/CD environments.
  */
 
 import type { Metadata } from 'next';
