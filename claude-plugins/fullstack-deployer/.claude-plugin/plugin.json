@@ -1,0 +1,19 @@
+{
+  "name": "fullstack-deployer",
+  "version": "1.0.0",
+  "description": "Autonomous full-stack deployment plugin for Vercel, Next.js, WordPress, and WooCommerce. Self-learning with Context7 integration for official documentation.",
+  "author": {
+    "name": "Corey Foster"
+  },
+  "keywords": [
+    "deployment",
+    "vercel",
+    "nextjs",
+    "wordpress",
+    "woocommerce",
+    "headless-cms",
+    "autonomous",
+    "testing",
+    "code-quality"
+  ]
+}

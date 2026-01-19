@@ -1,0 +1,21 @@
+{
+  "name": "devops-autopilot",
+  "version": "1.0.0",
+  "description": "Autonomous DevOps plugin that proactively handles CI/CD pipelines, containers, and infrastructure. Auto-triggers on frontend projects and deployment discussions.",
+  "author": {
+    "name": "Corey Foster"
+  },
+  "keywords": [
+    "devops",
+    "cicd",
+    "github-actions",
+    "gitlab-ci",
+    "jenkins",
+    "docker",
+    "kubernetes",
+    "terraform",
+    "ecs",
+    "autonomous",
+    "infrastructure"
+  ]
+}
