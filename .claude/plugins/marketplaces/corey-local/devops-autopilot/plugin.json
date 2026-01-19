@@ -1,0 +1,81 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "devops-autopilot",
+  "version": "2.1.0",
+  "description": "Intelligent DevOps automation for CI/CD pipelines, Docker, Kubernetes, and infrastructure-as-code. Advisory mode - generates configurations without executing.",
+  "author": {
+    "name": "Corey Foster",
+    "email": "corey@local"
+  },
+  "repository": "",
+  "license": "MIT",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "keywords": [
+    "devops",
+    "ci-cd",
+    "docker",
+    "kubernetes",
+    "terraform",
+    "github-actions",
+    "gitlab-ci",
+    "infrastructure"
+  ],
+  "commands": [
+    {
+      "name": "pipeline",
+      "description": "Generate or analyze CI/CD pipeline configurations (GitHub Actions, GitLab CI, Azure DevOps, CircleCI)",
+      "usage": "/pipeline [platform] [options]",
+      "examples": [
+        "/pipeline github-actions",
+        "/pipeline gitlab --with-docker",
+        "/pipeline analyze"
+      ]
+    },
+    {
+      "name": "docker",
+      "description": "Generate optimized Dockerfile, docker-compose, or analyze container configurations with security hardening",
+      "usage": "/docker [action] [options]",
+      "examples": [
+        "/docker generate",
+        "/docker compose",
+        "/docker analyze",
+        "/docker optimize"
+      ]
+    },
+    {
+      "name": "deploy-check",
+      "description": "Pre-deployment checklist and environment validation with security scanning",
+      "usage": "/deploy-check [environment]",
+      "examples": [
+        "/deploy-check staging",
+        "/deploy-check production --strict"
+      ]
+    },
+    {
+      "name": "infra",
+      "description": "Infrastructure as code generation (Terraform, Pulumi, CloudFormation, Kubernetes manifests)",
+      "usage": "/infra [provider] [resource]",
+      "examples": [
+        "/infra terraform aws-ecs",
+        "/infra k8s deployment",
+        "/infra helm chart"
+      ]
+    }
+  ],
+  "skills": [
+    "devops-automation"
+  ],
+  "permissions": {
+    "fileRead": true,
+    "fileWrite": false,
+    "networkAccess": false,
+    "shellExecution": false
+  },
+  "settings": {
+    "advisoryOnly": true,
+    "requireConfirmation": false,
+    "outputFormat": "markdown"
+  }
+}
