@@ -22,7 +22,7 @@
     {
       "name": "fullstack-deployer",
       "description": "Full-stack deployment orchestration for Next.js, WordPress, and hybrid architectures. Advisory mode.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Corey Foster",
         "email": "corey@local"
