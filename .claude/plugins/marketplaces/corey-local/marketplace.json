@@ -44,7 +44,7 @@
     {
       "name": "security-guidance",
       "description": "Security best practices and vulnerability detection. Advisory warnings only - never blocks.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Corey Foster",
         "email": "corey@local"
