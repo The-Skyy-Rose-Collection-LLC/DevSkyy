@@ -1,0 +1,56 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "corey-local-plugins",
+  "version": "1.0.0",
+  "description": "Custom plugins for DevOps automation, full-stack deployment, immersive WordPress development, and security guidance",
+  "owner": {
+    "name": "Corey Foster",
+    "email": "corey@local"
+  },
+  "plugins": [
+    {
+      "name": "devops-autopilot",
+      "description": "Intelligent DevOps automation for CI/CD pipelines, Docker, and infrastructure. Advisory mode - never blocks.",
+      "version": "2.0.0",
+      "author": {
+        "name": "Corey Foster",
+        "email": "corey@local"
+      },
+      "source": "./devops-autopilot",
+      "category": "development"
+    },
+    {
+      "name": "fullstack-deployer",
+      "description": "Full-stack deployment orchestration for Next.js, WordPress, and hybrid architectures. Advisory mode.",
+      "version": "2.0.0",
+      "author": {
+        "name": "Corey Foster",
+        "email": "corey@local"
+      },
+      "source": "./fullstack-deployer",
+      "category": "development"
+    },
+    {
+      "name": "immersive-architect",
+      "description": "Award-winning immersive WordPress theme development for luxury e-commerce. 5-gate validation system. Advisory only.",
+      "version": "2.0.0",
+      "author": {
+        "name": "Corey Foster",
+        "email": "corey@local"
+      },
+      "source": "./immersive-architect",
+      "category": "development"
+    },
+    {
+      "name": "security-guidance",
+      "description": "Security best practices and vulnerability detection. Advisory warnings only - never blocks.",
+      "version": "2.0.0",
+      "author": {
+        "name": "Corey Foster",
+        "email": "corey@local"
+      },
+      "source": "./security-guidance",
+      "category": "security"
+    }
+  ]
+}
