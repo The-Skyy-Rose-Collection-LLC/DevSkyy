@@ -334,7 +334,7 @@ class TestDataRetentionEnforcement:
         service._db_available = True
 
         # Mock the database module imports
-        with patch("api.gdpr.get_session", create=True):
+        with patch("api.gdpr.get_session", create=True):  # noqa: SIM117
             with patch("api.gdpr.User", create=True):
                 with patch("api.gdpr.Order", create=True):
                     result = await service.enforce_retention_policies()

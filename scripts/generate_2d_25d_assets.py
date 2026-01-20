@@ -24,7 +24,7 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from agents.creative_agent import CreativeAgent
+from agents.creative_agent import CreativeAgent  # noqa: E402
 
 # 2D/2.5D asset types to generate
 ASSET_TYPES = {

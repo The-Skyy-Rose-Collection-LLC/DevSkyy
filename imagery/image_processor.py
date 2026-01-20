@@ -101,7 +101,7 @@ class ImageProcessor:
             PIL Image object
         """
         try:
-            if isinstance(source, (str, Path)):
+            if isinstance(source, str | Path):
                 return Image.open(source)
             elif isinstance(source, bytes):
                 return Image.open(io.BytesIO(source))

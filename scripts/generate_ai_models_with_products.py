@@ -15,7 +15,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
 # Load .env file
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(project_root / ".env")
 
@@ -26,7 +26,6 @@ try:
     import torch
     from diffusers import AutoPipelineForText2Image, DDIMScheduler
     from diffusers.utils import load_image
-    from PIL import Image
     from transformers import CLIPVisionModelWithProjection
 except ImportError:
     print("Installing required packages...")

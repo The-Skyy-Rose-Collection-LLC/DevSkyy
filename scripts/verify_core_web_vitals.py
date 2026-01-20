@@ -258,11 +258,11 @@ class CoreWebVitalsValidator:
         return float(lcp_values.get(page_key, 2000))
 
     @staticmethod
-    def _generate_mock_fid(page_key: str) -> float:
+    def _generate_mock_fid(_page_key: str) -> float:
         """Generate mock FID value.
 
         Args:
-            page_key: Page identifier
+            _page_key: Page identifier (unused, returns constant)
 
         Returns:
             FID value in milliseconds
@@ -289,11 +289,11 @@ class CoreWebVitalsValidator:
         return cls_values.get(page_key, 0.08)
 
     @staticmethod
-    def _generate_mock_ttfb(page_key: str) -> float:
+    def _generate_mock_ttfb(_page_key: str) -> float:
         """Generate mock TTFB value.
 
         Args:
-            page_key: Page identifier
+            _page_key: Page identifier (unused, returns constant)
 
         Returns:
             TTFB value in milliseconds

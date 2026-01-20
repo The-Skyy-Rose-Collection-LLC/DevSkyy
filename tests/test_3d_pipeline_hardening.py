@@ -517,7 +517,7 @@ class TestIntegration:
         client = TripoClient(api_key="test-key", enable_resilience=False)
 
         # Mock the API calls
-        with patch.object(client, "_create_image_to_3d_task") as mock_create:
+        with patch.object(client, "_create_image_to_3d_task") as mock_create:  # noqa: SIM117
             with patch.object(client, "_wait_for_task") as mock_wait:
                 with patch.object(client, "_download_model") as mock_download:
                     # Setup mocks
@@ -547,7 +547,7 @@ class TestIntegration:
 
         client = TripoClient(api_key="test-key", enable_resilience=False)
 
-        with patch.object(client, "_create_text_to_3d_task") as mock_create:
+        with patch.object(client, "_create_text_to_3d_task") as mock_create:  # noqa: SIM117
             with patch.object(client, "_wait_for_task") as mock_wait:
                 with patch.object(client, "_download_model") as mock_download:
                     mock_create.return_value = "task-456"

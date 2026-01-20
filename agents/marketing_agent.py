@@ -841,7 +841,7 @@ Provide comprehensive SEO recommendations:
                         # Download and upload image to WordPress media library
                         import aiohttp
 
-                        async with aiohttp.ClientSession() as session:
+                        async with aiohttp.ClientSession() as session:  # noqa: SIM117
                             async with session.get(featured_image_url) as resp:
                                 if resp.status == 200:
                                     # Save temporarily

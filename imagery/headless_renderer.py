@@ -22,7 +22,7 @@ from PIL import Image
 logger = logging.getLogger(__name__)
 
 # Set headless rendering before importing pyrender
-import platform
+import platform  # noqa: E402
 
 
 def _configure_opengl_platform():

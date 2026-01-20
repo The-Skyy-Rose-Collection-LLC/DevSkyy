@@ -75,7 +75,7 @@ class Position3D(BaseModel):
     @classmethod
     def validate_finite(cls, v):
         """Ensure coordinates are finite numbers."""
-        if not isinstance(v, (int, float)):
+        if not isinstance(v, int | float):
             raise ValueError("Coordinates must be numbers")
         if not (-1000 <= v <= 1000):
             raise ValueError("Coordinates must be between -1000 and 1000")

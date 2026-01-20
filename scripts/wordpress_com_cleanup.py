@@ -287,7 +287,7 @@ def main():
             success_count += 1
 
     # Delete pages
-    for page_id, title, slug in to_delete:
+    for page_id, title, _slug in to_delete:
         if client.delete_page(page_id, title, dry_run=args.dry_run):
             success_count += 1
 

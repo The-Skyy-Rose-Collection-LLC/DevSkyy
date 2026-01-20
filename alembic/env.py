@@ -25,12 +25,12 @@ if os.getenv("DATABASE_URL"):
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-import importlib.util
+import importlib.util  # noqa: E402
 
 # Import your models' MetaData object here for 'autogenerate' support
 # Import directly from models.py to avoid loading the entire agents package
-import sys
-from pathlib import Path
+import sys  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 # Add the project root to Python path if not already present
 project_root = Path(__file__).parent.parent

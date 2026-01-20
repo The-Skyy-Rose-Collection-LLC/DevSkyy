@@ -218,11 +218,11 @@ class VirtualPhotoshootPipeline:
 
     def _init_renderer(self) -> None:
         """Initialize the 3D renderer."""
-        try:
-            import trimesh
+        import importlib.util
 
+        if importlib.util.find_spec("trimesh") is not None:
             self._trimesh_available = True
-        except ImportError:
+        else:
             self._trimesh_available = False
             logger.warning("trimesh not available, using placeholder rendering")
 

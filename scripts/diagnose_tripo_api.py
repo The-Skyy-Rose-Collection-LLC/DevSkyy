@@ -54,7 +54,7 @@ async def test_api_connection() -> bool:
             ssl_context.check_hostname = False
             ssl_context.verify_mode = ssl.CERT_NONE
 
-            async with aiohttp.ClientSession(
+            async with aiohttp.ClientSession(  # noqa: SIM117
                 connector=aiohttp.TCPConnector(ssl=ssl_context)
             ) as session:
                 async with session.head(base_url) as response:
@@ -84,7 +84,7 @@ async def test_api_connection() -> bool:
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
 
-        async with aiohttp.ClientSession(
+        async with aiohttp.ClientSession(  # noqa: SIM117
             headers=headers, connector=aiohttp.TCPConnector(ssl=ssl_context)
         ) as session:
             # Try a simple endpoint that doesn't require much
