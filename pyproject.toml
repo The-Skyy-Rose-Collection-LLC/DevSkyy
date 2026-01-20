@@ -248,6 +248,7 @@ Changelog = "https://github.com/devskyy/devskyy/blob/main/CHANGELOG.md"
 
 [project.scripts]
 devskyy = "main_enterprise:main"
+prompt-enhance = "cli.prompt_enhance:cli"
 
 [tool.setuptools.packages.find]
 where = ["."]
