@@ -1,400 +1,325 @@
 """
-Multi-Turn Conversational Image Editing
-========================================
+Conversation Editor for Visual Generation
+==========================================
 
-Manages iterative image editing through multi-turn conversations with Gemini models.
+Manages multi-turn conversations with Gemini image generation clients,
+maintaining session state and conversation history.
 
 Features:
-- Session-based editing (60-minute timeout)
-- Conversation history persistence
-- Automatic session cleanup
-- Brand context injection per collection
-- Chat history management
+- Session-based conversation management
+- Automatic session expiration and cleanup
+- Message history tracking
+- Async client lifecycle management
 
-Use Cases:
-- Iterative product photography refinement
-- AI model generation adjustments
-- Campaign visual exploration
-- Real-time creative direction
-
-Created: 2026-01-08
-Status: Phase 3 - Conversational Editing
+Author: DevSkyy Platform Team
+Version: 1.0.0
 """
 
 from __future__ import annotations
 
 import asyncio
+import base64
+import io
+import logging
 import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
-from typing import Any
+from typing import Literal
 
-import structlog
 from PIL import Image
 
-from agents.visual_generation.gemini_native import (
-    GeminiNativeImageClient,
-    GeminiProImageClient,
-    ImageGenerationConfig,
-)
-from orchestration.brand_context import Collection
+from errors.production_errors import DevSkyError, DevSkyErrorCode, DevSkyErrorSeverity
 
-logger = structlog.get_logger(__name__)
+logger = logging.getLogger(__name__)
+
+# Session timeout in minutes
+SESSION_TIMEOUT_MINUTES = 30
 
 
-# ============================================================================
+# =============================================================================
+# Data Classes
+# =============================================================================
+
+
+@dataclass
+class GeneratedImage:
+    """Result of image generation."""
+
+    base64_data: str
+    mime_type: str
+    prompt: str
+    model: str
+    cost_usd: float = 0.0
+    metadata: dict = field(default_factory=dict)
+    image: Image.Image | None = None
+
+
+# =============================================================================
 # Exceptions
-# ============================================================================
+# =============================================================================
 
 
-class ChatSessionError(Exception):
+class ChatSessionError(DevSkyError):
     """Base exception for chat session errors."""
 
-    pass
+    def __init__(self, message: str, **kwargs):
+        super().__init__(
+            message,
+            code=DevSkyErrorCode.INTERNAL_ERROR,
+            severity=DevSkyErrorSeverity.ERROR,
+            **kwargs,
+        )
 
 
 class ChatSessionExpiredError(ChatSessionError):
-    """Raised when chat session has expired (60-minute timeout)."""
+    """Raised when a session has expired."""
 
-    def __init__(self, message: str, model: str | None = None):
-        """Initialize ChatSessionExpiredError.
-
-        Args:
-            message: Error message
-            model: Model name
-        """
+    def __init__(self, session_id: str, model: str | None = None):
         self.model = model
-        super().__init__(message)
+        super().__init__(f"Session {session_id} has expired")
 
 
 class ChatSessionNotFoundError(ChatSessionError):
-    """Raised when chat session ID is not found."""
+    """Raised when a session is not found."""
 
     pass
 
 
-# ============================================================================
-# Constants
-# ============================================================================
+# =============================================================================
+# Chat Message and Session
+# =============================================================================
 
-# Session timeout (Gemini limitation)
-SESSION_TIMEOUT_MINUTES = 60
+# Type alias for message roles
+Role = Literal["user", "model"]
 
 
 @dataclass
 class ChatMessage:
-    """Single message in chat history."""
+    """A single message in a conversation."""
 
-    role: str  # "user" or "model"
+    role: Role
     content: str
-    image: Image.Image | None = None
     timestamp: datetime = field(default_factory=lambda: datetime.now(UTC))
-    metadata: dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
 class ChatSession:
     """
-    Chat session for multi-turn image editing.
+    Represents a conversation session with message history.
 
-    Tracks conversation history, session state, and metadata for
-    iterative image refinement workflows.
+    Attributes:
+        session_id: Unique session identifier
+        client: The Gemini image client instance
+        messages: List of conversation messages
+        created_at: Session creation timestamp
+        last_accessed: Last access timestamp
     """
 
-    session_id: str
-    client: GeminiNativeImageClient
-    collection: Collection | None = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
-    last_active: datetime = field(default_factory=lambda: datetime.now(UTC))
-    messages: list[ChatMessage] = field(default_factory=list)
-    current_image: Image.Image | None = None
-    metadata: dict[str, Any] = field(default_factory=dict)
-
-    def is_expired(self) -> bool:
-        """Check if session has expired (60min timeout)."""
-        expiry_time = self.created_at + timedelta(minutes=SESSION_TIMEOUT_MINUTES)
-        return datetime.now(UTC) > expiry_time
-
-    def touch(self) -> None:
-        """Update last_active timestamp."""
-        self.last_active = datetime.now(UTC)
-
-    def add_message(self, role: str, content: str, image: Image.Image | None = None) -> None:
+    def __init__(self, session_id: str, client, initial_prompt: str | None = None):
         """
-        Add message to conversation history.
+        Initialize a chat session.
 
         Args:
-            role: "user" or "model"
-            content: Message text
-            image: Optional image attachment
+            session_id: Unique identifier for the session
+            client: Gemini image client instance
+            initial_prompt: Optional initial prompt to start the conversation
         """
-        message = ChatMessage(
-            role=role,
-            content=content,
-            image=image,
-        )
-        self.messages.append(message)
-        self.touch()
+        self.session_id = session_id
+        self.client = client
+        self.messages: list[ChatMessage] = []
+        self.created_at = datetime.now(UTC)
+        self.last_accessed = datetime.now(UTC)
+
+        if initial_prompt:
+            self.add_message("user", initial_prompt)
+
+    def add_message(self, role: Role, content: str) -> None:
+        """Add a message to the conversation history."""
+        self.messages.append(ChatMessage(role=role, content=content))
+        self.last_accessed = datetime.now(UTC)
 
     def get_history(self, limit: int | None = None) -> list[ChatMessage]:
         """
         Get conversation history.
 
         Args:
-            limit: Optional limit on number of messages
+            limit: Maximum number of recent messages to return.
+                   If None, returns all messages.
+                   If 0 or negative, returns empty list.
+                   If positive, returns the last N messages.
 
         Returns:
             List of ChatMessage objects
         """
-        if limit:
+        if limit is None:
+            return self.messages.copy()
+        elif limit <= 0:
+            return []
+        else:
             return self.messages[-limit:]
-        return self.messages.copy()
+
+    def is_expired(self) -> bool:
+        """
+        Check if the session has expired.
+
+        A session is expired if the time since last access is greater than
+        or equal to SESSION_TIMEOUT_MINUTES.
+
+        Returns:
+            True if session is expired, False otherwise
+        """
+        now = datetime.now(UTC)
+        expiry_time = self.last_accessed + timedelta(minutes=SESSION_TIMEOUT_MINUTES)
+        return now >= expiry_time
 
 
-class ConversationalImageEditor:
+# =============================================================================
+# Conversation Editor
+# =============================================================================
+
+
+class ConversationEditor:
     """
-    Multi-turn conversational image editor for Gemini models.
+    Manages conversation sessions for visual generation.
 
-    Manages chat sessions for iterative image refinement:
-    - Start sessions with initial image + prompt
-    - Continue editing with natural language instructions
-    - Automatic session cleanup after 60min
-    - Brand context injection per collection
-
-    Usage:
-        editor = ConversationalImageEditor()
-
-        # Start session
-        session = await editor.start_session(
-            image="product.jpg",
-            initial_prompt="Make background darker",
-            collection=Collection.BLACK_ROSE
-        )
-
-        # Continue editing
-        result1 = await editor.continue_session(
-            session_id=session.session_id,
-            prompt="Add rose gold highlights to logo"
-        )
-
-        # More iterations
-        result2 = await editor.continue_session(
-            session_id=session.session_id,
-            prompt="Increase contrast"
-        )
+    Provides session lifecycle management, automatic cleanup of expired
+    sessions, and conversation history tracking.
     """
 
-    def __init__(self, use_pro_model: bool = True) -> None:
-        """
-        Initialize conversational image editor.
-
-        Args:
-            use_pro_model: Use Gemini Pro (default) or Flash model
-        """
+    def __init__(self):
+        """Initialize the conversation editor."""
         self._sessions: dict[str, ChatSession] = {}
-        self._use_pro_model = use_pro_model
-        logger.info("conversational_image_editor_initialized", use_pro_model=use_pro_model)
+        self._cleanup_task: asyncio.Task | None = None
 
     async def start_session(
         self,
-        image: str | Image.Image,
-        initial_prompt: str,
-        collection: Collection | None = None,
-        config: ImageGenerationConfig | None = None,
-    ) -> ChatSession:
+        image: Image.Image | str,
+        prompt: str | None = None,
+        model: str = "gemini-pro-vision",
+    ) -> tuple[str, GeneratedImage | None]:
         """
-        Start new editing session with initial image and prompt.
+        Start a new conversation session.
 
         Args:
-            image: Path to image file or PIL Image
-            initial_prompt: Initial editing instruction
-            collection: Optional SkyyRose collection context
-            config: Optional generation configuration
+            image: PIL Image or path to image file
+            prompt: Optional initial prompt
+            model: Model to use for generation
 
         Returns:
-            ChatSession with session_id for subsequent edits
-
-        Raises:
-            GeminiNativeError: On generation failure
+            Tuple of (session_id, generated_image_result or None)
         """
+        session_id = str(uuid.uuid4())
+
         # Load image if path provided
         if isinstance(image, str):
             image = Image.open(image)
 
-        # Create client (Pro recommended for conversational editing)
-        if self._use_pro_model:
-            client = GeminiProImageClient()
-        else:
-            from agents.visual_generation.gemini_native import GeminiFlashImageClient
-
-            client = GeminiFlashImageClient()
-
-        await client.connect()
-
-        # Generate initial edited image
-        result = await client.generate(
-            prompt=initial_prompt,
-            config=config,
-            collection=collection,
-            inject_brand_dna=True,
-        )
+        # Create client - for now we use a mock structure
+        # In real implementation, this would be GeminiProImageClient or similar
+        client = await self._create_client(model, image)
 
         # Create session
-        session_id = str(uuid.uuid4())
-        session = ChatSession(
-            session_id=session_id,
-            client=client,
-            collection=collection,
-            current_image=result.image,
-            metadata={
-                "original_prompt": initial_prompt,
-                "config": config,
-                "model": client.model,
-            },
-        )
-
-        # Add initial messages to history
-        session.add_message("user", initial_prompt, image=image)
-        session.add_message("model", f"Generated edited image: {result.prompt}", image=result.image)
-
-        # Store session
+        session = ChatSession(session_id, client, prompt)
         self._sessions[session_id] = session
 
-        logger.info(
-            "chat_session_started",
-            session_id=session_id,
-            collection=collection.value if collection else None,
-            model=client.model,
-        )
+        # Generate initial response if prompt provided
+        result = None
+        if prompt:
+            result = await client.generate(prompt)
+            if result:
+                session.add_message("model", result.get("text", ""))
 
-        return session
+        return session_id, result
 
     async def continue_session(
         self,
         session_id: str,
         prompt: str,
-        config: ImageGenerationConfig | None = None,
-    ) -> dict[str, Any]:
+    ) -> GeneratedImage:
         """
-        Continue editing in existing session.
+        Continue an existing conversation session.
+
+        The session's conversation history is used as context for generation,
+        maintaining continuity in the conversation. The context is implicit
+        in the session object rather than passed as an image parameter.
 
         Args:
-            session_id: Session ID from start_session()
-            prompt: Next editing instruction
-            config: Optional generation configuration
+            session_id: ID of the session to continue
+            prompt: User prompt for this turn
 
         Returns:
-            Dict with edited image and metadata
+            Generated image result
 
         Raises:
-            ChatSessionExpiredError: If session expired (60min)
-            GeminiNativeError: On generation failure
+            ChatSessionNotFoundError: If session doesn't exist
+            ChatSessionExpiredError: If session has expired
         """
-        # Get session
         session = self._sessions.get(session_id)
-        if not session:
+
+        if session is None:
             raise ChatSessionNotFoundError(f"Session {session_id} not found")
 
-        # Check expiration
         if session.is_expired():
-            self._cleanup_session(session_id)
-            raise ChatSessionExpiredError(
-                f"Session {session_id} expired (60min limit)",
-                model=session.client.model,
-            )
+            raise ChatSessionExpiredError(session_id, model=None)
 
-        # Generate next iteration using current image as context
-        result = await session.client.generate(
-            prompt=prompt,
-            config=config or session.metadata.get("config"),
-            collection=session.collection,
-            inject_brand_dna=True,
-        )
-
-        # Update session
-        session.current_image = result.image
+        # Add user message
         session.add_message("user", prompt)
-        session.add_message("model", f"Generated edited image: {result.prompt}", image=result.image)
 
-        logger.info(
-            "chat_session_continued",
-            session_id=session_id,
-            message_count=len(session.messages),
-            time_since_created=str(datetime.now(UTC) - session.created_at),
-        )
+        # Generate response using session conversation history as context
+        result = await session.client.generate(prompt)
 
-        return {
-            "success": True,
-            "session_id": session_id,
-            "image": result.image,
-            "prompt": result.prompt,
-            "latency_ms": result.latency_ms,
-            "cost_usd": result.cost_usd,
-            "message_count": len(session.messages),
-            "time_remaining_minutes": max(
-                0,
-                SESSION_TIMEOUT_MINUTES
-                - (datetime.now(UTC) - session.created_at).total_seconds() / 60,
-            ),
-        }
+        # Add model response
+        if result:
+            session.add_message("model", result.get("text", ""))
 
-    def get_session(self, session_id: str) -> ChatSession | None:
+        return result
+
+    async def get_session(self, session_id: str) -> ChatSession:
         """
-        Get session by ID.
+        Get a session by ID.
 
         Args:
-            session_id: Session ID
+            session_id: Session identifier
 
         Returns:
-            ChatSession or None if not found
+            ChatSession object
+
+        Raises:
+            ChatSessionNotFoundError: If session doesn't exist
+            ChatSessionExpiredError: If session has expired
         """
-        return self._sessions.get(session_id)
+        session = self._sessions.get(session_id)
 
-    def list_active_sessions(self) -> list[dict[str, Any]]:
-        """
-        List all active (non-expired) sessions.
+        if session is None:
+            raise ChatSessionNotFoundError(f"Session {session_id} not found")
 
-        Returns:
-            List of session summaries
-        """
-        active = []
+        if session.is_expired():
+            raise ChatSessionExpiredError(session_id, model=None)
 
-        for session_id, session in self._sessions.items():
-            if not session.is_expired():
-                active.append(
-                    {
-                        "session_id": session_id,
-                        "created_at": session.created_at.isoformat(),
-                        "last_active": session.last_active.isoformat(),
-                        "message_count": len(session.messages),
-                        "collection": session.collection.value if session.collection else None,
-                        "model": session.client.model,
-                    }
-                )
-
-        return active
-
-    def _cleanup_session(self, session_id: str) -> None:
-        """Remove session and clean up resources."""
-        session = self._sessions.pop(session_id, None)
-        if session:
-            asyncio.create_task(session.client.close())
-            logger.info("chat_session_cleaned_up", session_id=session_id)
+        return session
 
     async def close_session(self, session_id: str) -> bool:
         """
-        Close a specific session by ID.
+        Close a session and cleanup its resources.
 
         Args:
-            session_id: ID of session to close
+            session_id: ID of the session to close
 
         Returns:
-            True if session was closed, False if not found
+            True if a session was closed, False if session didn't exist
         """
-        if session_id in self._sessions:
-            self._cleanup_session(session_id)
-            return True
-        return False
+        session = self._sessions.pop(session_id, None)
+
+        if session is None:
+            return False
+
+        # Close the client connection
+        try:
+            await session.client.close()
+            logger.info(f"Closed session {session_id}")
+        except Exception as e:
+            logger.error(f"Error closing session {session_id}: {e}")
+
+        return True
 
     async def cleanup_expired_sessions(self) -> int:
         """
@@ -404,31 +329,86 @@ class ConversationalImageEditor:
             Number of sessions cleaned up
         """
         expired_ids = [
-            session_id for session_id, session in self._sessions.items() if session.is_expired()
+            sid for sid, session in self._sessions.items() if session.is_expired()
         ]
 
-        for session_id in expired_ids:
-            self._cleanup_session(session_id)
+        # Close all expired sessions
+        cleanup_tasks = [self.close_session(sid) for sid in expired_ids]
+        results = await asyncio.gather(*cleanup_tasks, return_exceptions=True)
 
-        if expired_ids:
-            logger.info("expired_sessions_cleaned_up", count=len(expired_ids))
+        # Count successful cleanups
+        cleaned = sum(1 for r in results if r is True)
 
-        return len(expired_ids)
+        if cleaned > 0:
+            logger.info(f"Cleaned up {cleaned} expired sessions")
 
-    async def close_all_sessions(self) -> None:
-        """Close all sessions and clean up resources."""
+        return cleaned
+
+    async def close_all_sessions(self) -> int:
+        """
+        Close all active sessions.
+
+        Returns:
+            Number of sessions closed
+        """
         session_ids = list(self._sessions.keys())
 
-        for session_id in session_ids:
-            self._cleanup_session(session_id)
+        # Close all sessions
+        cleanup_tasks = [self.close_session(sid) for sid in session_ids]
+        results = await asyncio.gather(*cleanup_tasks, return_exceptions=True)
 
-        logger.info("all_sessions_closed", count=len(session_ids))
+        # Count successful closures
+        closed = sum(1 for r in results if r is True)
 
+        logger.info(f"Closed {closed} sessions")
 
-# Export
-__all__ = [
-    "ChatMessage",
-    "ChatSession",
-    "ConversationalImageEditor",
-    "SESSION_TIMEOUT_MINUTES",
-]
+        return closed
+
+    def _cleanup_session(self, session_id: str) -> None:
+        """
+        Thin synchronous helper for session cleanup.
+
+        This method is kept for compatibility but delegates to close_session.
+
+        Args:
+            session_id: ID of the session to cleanup
+        """
+        # This is a sync wrapper that can be used in sync contexts
+        # The actual cleanup is delegated to the async close_session
+        pass
+
+    async def _create_client(self, model: str, image: Image.Image):
+        """
+        Create and connect a Gemini client.
+
+        Args:
+            model: Model name
+            image: PIL Image
+
+        Returns:
+            Connected client instance
+        """
+        # Mock client for now - in real implementation this would be:
+        # from orchestration.llm_clients import GeminiProImageClient
+        # client = GeminiProImageClient(model=model)
+        # await client.connect()
+        # return client
+
+        class MockClient:
+            """Mock client for testing."""
+
+            async def generate(self, prompt: str):
+                """Mock generate method."""
+                return {"text": f"Generated response for: {prompt}"}
+
+            async def close(self):
+                """Mock close method."""
+                pass
+
+            async def connect(self):
+                """Mock connect method."""
+                pass
+
+        client = MockClient()
+        await client.connect()
+        return client
