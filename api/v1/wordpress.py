@@ -31,8 +31,12 @@ from integrations.wordpress_client import (
     WordPressWooCommerceClient,
 )
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from security.input_validation import SecurityValidator
 
 logger = logging.getLogger(__name__)
+
+# Initialize security validator for HTML sanitization
+_security_validator = SecurityValidator()
 
 # Create router
 router = APIRouter(prefix="/wordpress", tags=["WordPress/WooCommerce"])
@@ -183,7 +187,7 @@ async def get_wc_client() -> WordPressWooCommerceClient:
 )
 async def list_products(
     per_page: int = Query(10, ge=1, le=100),
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1, le=10000),  # SECURITY: Upper bound to prevent DoS
     status: ProductStatus | None = None,
     search: str | None = None,
     sku: str | None = None,
@@ -365,7 +369,7 @@ async def delete_product(
 )
 async def list_orders(
     per_page: int = Query(10, ge=1, le=100),
-    page: int = Query(1, ge=1),
+    page: int = Query(1, ge=1, le=10000),  # SECURITY: Upper bound to prevent DoS
     status: OrderStatus | None = None,
     customer: int | None = None,
     client: WordPressWooCommerceClient = Depends(get_wc_client),
@@ -578,10 +582,16 @@ async def publish_content(
     publish_id = str(uuid4())
     logger.info(f"Publishing content {publish_id} to WordPress: {request.title}")
 
+    # SECURITY: Sanitize HTML content to prevent XSS
+    # Allow safe HTML tags for WordPress content
+    safe_tags = ["p", "br", "strong", "em", "u", "a", "ul", "ol", "li", "h1", "h2", "h3", "h4", "h5", "h6", "img", "blockquote", "pre", "code"]
+    sanitized_content = _security_validator.sanitize_html(request.content, allowed_tags=safe_tags)
+    sanitized_title = _security_validator.sanitize_html(request.title, allowed_tags=[])
+
     try:
         post_data = await client.create_post(
-            title=request.title,
-            content=request.content,
+            title=sanitized_title,
+            content=sanitized_content,
             status=request.status,
             categories=request.categories,
             tags=request.tags,
