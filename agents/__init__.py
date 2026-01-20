@@ -87,8 +87,8 @@ from .tripo_agent import (
 from .tripo_agent import SKYYROSE_BRAND_DNA as TRIPO_BRAND_DNA
 from .tripo_agent import GenerationResult as TripoGenerationResult
 
-# Visual Generation Router (primary source for brand DNA and generation types)
-from .visual_generation_router import (
+# Visual Generation (primary source for brand DNA and generation types)
+from .visual_generation import (
     SKYYROSE_BRAND_DNA,
     AspectRatio,
     GenerationRequest,
@@ -101,6 +101,7 @@ from .visual_generation_router import (
     VisualGenerationRouter,
     VisualProvider,
     create_visual_router,
+    ConversationEditor,
 )
 from .wordpress_asset_agent import (
     GalleryResult,
@@ -179,6 +180,7 @@ __all__ = [
     "HuggingFaceFluxClient",
     "VisualGenerationRouter",
     "create_visual_router",
+    "ConversationEditor",
     # WordPress Asset Agent
     "WordPressAssetAgent",
     "WordPressAssetConfig",
