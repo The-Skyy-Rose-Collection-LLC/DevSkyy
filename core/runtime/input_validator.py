@@ -217,7 +217,7 @@ class ToolInputValidator:
         if isinstance(param_value, str):
             errors.extend(self._validate_string(param_name, param_value))
 
-        elif isinstance(param_value, (list, tuple)):
+        elif isinstance(param_value, list | tuple):
             errors.extend(self._validate_array(tool_name, param_name, param_value, depth))
 
         elif isinstance(param_value, dict):
@@ -227,7 +227,7 @@ class ToolInputValidator:
             # None is acceptable
             pass
 
-        elif isinstance(param_value, (int, float, bool)):
+        elif isinstance(param_value, int | float | bool):
             # Primitives are safe after type checking
             pass
 

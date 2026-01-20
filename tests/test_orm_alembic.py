@@ -18,7 +18,7 @@ sys.path.insert(0, str(project_root))
 def test_import_models():
     """Test that models can be imported."""
     try:
-        from agents.models import (
+        from agents.models import (  # noqa: F401
             AgentExecution,
             Base,
             LLMRoundTableResult,

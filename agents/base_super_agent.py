@@ -1273,7 +1273,7 @@ class MLCapabilitiesModule:
                 prediction = model.predict(input_data, **kwargs)
                 confidence = 0.85
             elif isinstance(
-                model, (SklearnModelWrapper, ProphetModelWrapper, TrendExtrapolationWrapper)
+                model, SklearnModelWrapper | ProphetModelWrapper | TrendExtrapolationWrapper
             ):
                 prediction = model.predict(input_data, **kwargs)
                 confidence = model.get_confidence()

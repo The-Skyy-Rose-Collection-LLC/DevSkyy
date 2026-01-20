@@ -28,7 +28,7 @@ async def test_cohere_embed_query(mock_api_keys, mock_cohere_client, monkeypatch
     engine = CohereEmbeddingEngine(config)
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: mock_cohere_client)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: mock_cohere_client)
 
     await engine.initialize()
 
@@ -53,7 +53,7 @@ async def test_cohere_embed_batch(mock_api_keys, mock_cohere_client, monkeypatch
     engine = CohereEmbeddingEngine(config)
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: mock_cohere_client)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: mock_cohere_client)
 
     await engine.initialize()
 
@@ -81,7 +81,7 @@ async def test_cohere_dimension(mock_api_keys, mock_cohere_client, monkeypatch):
     engine = CohereEmbeddingEngine(config)
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: mock_cohere_client)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: mock_cohere_client)
 
     await engine.initialize()
 
@@ -97,7 +97,7 @@ async def test_cohere_embed_single_text(mock_api_keys, mock_cohere_client, monke
     engine = CohereEmbeddingEngine(config)
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: mock_cohere_client)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: mock_cohere_client)
 
     await engine.initialize()
 
@@ -121,7 +121,7 @@ async def test_cohere_embed_truncation(mock_api_keys, mock_cohere_client, monkey
     engine = CohereEmbeddingEngine(config)
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: mock_cohere_client)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: mock_cohere_client)
 
     await engine.initialize()
 
@@ -158,7 +158,7 @@ async def test_cohere_batch_chunking(mock_api_keys, monkeypatch):
     custom_mock.embed = mock_embed_dynamic
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: custom_mock)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: custom_mock)
 
     await engine.initialize()
 
@@ -220,7 +220,7 @@ async def test_cohere_get_info(mock_api_keys, mock_cohere_client, monkeypatch):
     engine = CohereEmbeddingEngine(config)
 
     # Mock the Cohere client
-    monkeypatch.setattr("cohere.AsyncClient", lambda **kwargs: mock_cohere_client)
+    monkeypatch.setattr("cohere.AsyncClient", lambda **_kwargs: mock_cohere_client)
 
     await engine.initialize()
 

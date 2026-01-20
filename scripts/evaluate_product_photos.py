@@ -31,7 +31,7 @@ from PIL import Image
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-from dotenv import load_dotenv
+from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv()
 
@@ -117,12 +117,10 @@ class PhotoEvaluator:
 
     def __init__(self) -> None:
         """Initialize evaluator."""
-        self._opencv_available = False
-        try:
-            import cv2
+        import importlib.util
 
-            self._opencv_available = True
-        except ImportError:
+        self._opencv_available = importlib.util.find_spec("cv2") is not None
+        if not self._opencv_available:
             logger.warning("OpenCV not available. Some metrics will be limited.")
 
     def _compute_blur_score(self, image: Image.Image) -> float:

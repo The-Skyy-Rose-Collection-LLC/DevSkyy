@@ -420,7 +420,7 @@ class PineconeVectorStore(BaseVectorStore):
                         **{
                             k: v
                             for k, v in doc.metadata.items()
-                            if isinstance(v, (str, int, float, bool))
+                            if isinstance(v, str | int | float | bool)
                         },
                     },
                 }

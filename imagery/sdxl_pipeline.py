@@ -344,7 +344,7 @@ class SDXLPipeline:
             # Prepare ControlNet conditioning
             controlnet_image = None
             if config.controlnet_mode != ControlNetMode.NONE and reference_image:
-                if isinstance(reference_image, (str, Path)):
+                if isinstance(reference_image, str | Path):
                     reference_image = Image.open(reference_image).convert("RGB")
 
                 if config.controlnet_mode == ControlNetMode.CANNY:

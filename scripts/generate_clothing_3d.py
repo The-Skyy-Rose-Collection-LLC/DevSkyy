@@ -261,7 +261,7 @@ async def generate_3d_model(image_path: Path, api_key: str, output_dir: Path) ->
 
     try:
         download_req = urllib.request.Request(model_url)
-        with urllib.request.urlopen(download_req, context=ctx, timeout=120) as resp:
+        with urllib.request.urlopen(download_req, context=ctx, timeout=120) as resp:  # noqa: SIM117
             with open(output_path, "wb") as f:
                 f.write(resp.read())
         size_mb = output_path.stat().st_size / 1024 / 1024
