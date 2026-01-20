@@ -80,7 +80,7 @@ async def fashn_api_request(
 
     timeout = aiohttp.ClientTimeout(total=TIMEOUT)
 
-    async with aiohttp.ClientSession(headers=request_headers, timeout=timeout) as session:
+    async with aiohttp.ClientSession(headers=request_headers, timeout=timeout) as session:  # noqa: SIM117
         async with session.request(method, url, json=data) as response:
             result = await response.json()
 
@@ -163,7 +163,7 @@ async def virtual_tryon_async(
 
     # Download result image
     timeout = aiohttp.ClientTimeout(total=30.0)
-    async with aiohttp.ClientSession(timeout=timeout) as session:
+    async with aiohttp.ClientSession(timeout=timeout) as session:  # noqa: SIM117
         async with session.get(image_url) as response:
             if response.status >= 400:
                 raise Exception(f"Download failed: {response.status}")

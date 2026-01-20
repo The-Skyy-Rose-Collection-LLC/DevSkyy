@@ -191,7 +191,7 @@ async def test_reranker_error_handling(mock_api_keys):
         documents = ["doc1", "doc2", "doc3"]
         query = "test"
 
-        with pytest.raises(Exception):
+        with pytest.raises(Exception, match="API Error"):
             await reranker.rerank(query, documents)
 
 

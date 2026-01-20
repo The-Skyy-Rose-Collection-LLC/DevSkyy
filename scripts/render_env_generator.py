@@ -218,7 +218,7 @@ def generate_render_format(
         output.append(f"ENCRYPTION_MASTER_KEY={generate_encryption_key()}")
         output.append(f"SECRET_KEY={generate_jwt_secret()}")
     else:
-        for key, value, status in categories["required_security"]:
+        for key, value, _status in categories["required_security"]:
             output.append(f"{key}={value}")
 
     output.append("")
@@ -248,7 +248,7 @@ def generate_render_format(
     output.append("REQUIRED - Application Settings")
     output.append("=" * 80)
 
-    for key, value, status in categories["required_app"]:
+    for key, value, _status in categories["required_app"]:
         output.append(f"{key}={value}")
 
     output.append("")

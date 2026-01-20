@@ -259,7 +259,7 @@ class ProductionValidator:
 
             url = f"{site_url}/wp-json/wp/v2"
 
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession() as session:  # noqa: SIM117
                 async with session.get(url, timeout=10) as response:
                     duration = (time.perf_counter() - start) * 1000
 
@@ -342,7 +342,7 @@ class ProductionValidator:
             url = f"{site_url}/wp-json/wc/v3/products"
             auth = aiohttp.BasicAuth(wc_key, wc_secret)
 
-            async with aiohttp.ClientSession() as session:
+            async with aiohttp.ClientSession() as session:  # noqa: SIM117
                 async with session.get(url, auth=auth, timeout=10) as response:
                     duration = (time.perf_counter() - start) * 1000
 

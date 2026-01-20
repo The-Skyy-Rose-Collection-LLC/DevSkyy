@@ -225,7 +225,7 @@ class SemanticCodeAnalyzer:
                     )
                 )
 
-            elif isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            elif isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 # Extract function/method
                 symbols.append(
                     CodeSymbol(
@@ -269,7 +269,7 @@ class SemanticCodeAnalyzer:
         for node in ast.walk(tree):
             if isinstance(node, ast.ClassDef):
                 method_count = sum(
-                    1 for n in node.body if isinstance(n, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    1 for n in node.body if isinstance(n, ast.FunctionDef | ast.AsyncFunctionDef)
                 )
                 if method_count > 15:
                     patterns.append(
@@ -286,7 +286,7 @@ class SemanticCodeAnalyzer:
 
         # 2. Detect Long Methods (>50 lines)
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 if hasattr(node, "end_lineno"):
                     method_length = node.end_lineno - node.lineno
                     if method_length > 50:
@@ -304,7 +304,7 @@ class SemanticCodeAnalyzer:
 
         # 3. Detect Excessive Parameters (>5 params)
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 param_count = len(node.args.args)
                 if param_count > 5:
                     patterns.append(
@@ -322,7 +322,7 @@ class SemanticCodeAnalyzer:
         # 4. Detect Magic Numbers
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant):
-                if isinstance(node.value, (int, float)):
+                if isinstance(node.value, int | float):
                     if node.value not in (0, 1, -1, 100):  # Exclude common values
                         patterns.append(
                             CodePattern(
@@ -343,7 +343,7 @@ class SemanticCodeAnalyzer:
         complexities: list[int] = []
 
         for node in ast.walk(tree):
-            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            if isinstance(node, ast.FunctionDef | ast.AsyncFunctionDef):
                 complexities.append(self._calculate_function_complexity(node))
 
         return sum(complexities) / len(complexities) if complexities else 1.0
@@ -354,7 +354,7 @@ class SemanticCodeAnalyzer:
 
         for child in ast.walk(node):
             # Each decision point adds 1
-            if isinstance(child, (ast.If, ast.While, ast.For, ast.ExceptHandler)):
+            if isinstance(child, ast.If | ast.While | ast.For | ast.ExceptHandler):
                 complexity += 1
             elif isinstance(child, ast.BoolOp):
                 # Each boolean operator adds 1

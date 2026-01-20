@@ -114,9 +114,9 @@ def elementor_builder():
 # =============================================================================
 
 
-import asyncio
-import os
-from unittest.mock import AsyncMock, MagicMock, Mock
+import asyncio  # noqa: E402
+import os  # noqa: E402
+from unittest.mock import AsyncMock, MagicMock, Mock  # noqa: E402
 
 
 @pytest.fixture(scope="session", autouse=True)

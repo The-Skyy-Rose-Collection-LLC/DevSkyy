@@ -314,7 +314,7 @@ class AdvancedMetrics:
         """
         parts = []
         for key, value in context.items():
-            if isinstance(value, (str, int, float)):
+            if isinstance(value, str | int | float):
                 parts.append(f"{key}: {value}")
             elif isinstance(value, dict):
                 parts.append(f"{key}: {self._context_to_text(value)}")

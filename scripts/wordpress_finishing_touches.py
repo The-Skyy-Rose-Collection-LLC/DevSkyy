@@ -330,7 +330,7 @@ def configure_navigation_menus(client: WordPressClient, dry_run: bool = False) -
     logger.info("Configuring navigation menus...")
 
     if dry_run:
-        for menu_slug, menu_config in MENU_STRUCTURE.items():
+        for _menu_slug, menu_config in MENU_STRUCTURE.items():
             logger.info(f"[DRY RUN] Would create menu: {menu_config['name']}")
             for item in menu_config["items"]:
                 logger.info(f"  - {item['title']} → {item['url']}")
