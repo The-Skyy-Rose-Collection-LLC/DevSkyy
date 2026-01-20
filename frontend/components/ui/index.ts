@@ -73,3 +73,34 @@ export {
   CommandShortcut,
   CommandSeparator,
 } from './command';
+export {
+  Dialog,
+  DialogPortal,
+  DialogOverlay,
+  DialogTrigger,
+  DialogClose,
+  DialogContent,
+  DialogHeader,
+  DialogFooter,
+  DialogTitle,
+  DialogDescription,
+} from './dialog';
+export { Avatar, AvatarImage, AvatarFallback } from './avatar';
+export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './tooltip';
+export { Separator } from './separator';
+export { Switch } from './switch';
+export { Alert, AlertTitle, AlertDescription } from './alert';
+export { Skeleton } from './skeleton';
+export { Label } from './label';
+export {
+  SelectRoot,
+  SelectGroup,
+  SelectValue,
+  SelectTrigger,
+  SelectContent,
+  SelectLabel,
+  SelectItem,
+  SelectSeparator,
+  SelectScrollUpButton,
+  SelectScrollDownButton,
+} from './select';
