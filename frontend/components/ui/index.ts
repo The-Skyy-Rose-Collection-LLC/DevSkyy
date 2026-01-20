@@ -16,3 +16,24 @@ export {
 export { Badge, badgeVariants, type BadgeProps } from './badge';
 export { Progress } from './progress';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
+export {
+  // Variants
+  fadeIn,
+  fadeInUp,
+  fadeInLeft,
+  fadeInRight,
+  scaleUp,
+  staggerContainer,
+  staggerItem,
+  pulse,
+  slideInOverlay,
+  slideInBottom,
+  slideInFromRight,
+  // Components
+  MotionDiv,
+  MotionCard,
+  MotionList,
+  MotionListItem,
+  PageTransition,
+  AnimatePresence,
+} from './motion';
