@@ -1,0 +1,274 @@
+{
+  "name": "Prompt Enhancer CLI",
+  "description": "A standalone CLI tool that transforms natural language prompts into optimized, executive-level prompts for Claude with adaptive technique selection and context injection.",
+  "branchName": "ralph/prompt-enhancer",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Basic CLI Structure",
+      "description": "As a developer, I want a CLI entry point so that I can enhance prompts from my terminal.",
+      "acceptanceCriteria": [
+        "Create cli/prompt_enhance.py with click CLI framework",
+        "Support prompt-enhance 'my prompt' invocation",
+        "Support piped input: echo 'my prompt' | prompt-enhance",
+        "Add --help with clear usage examples",
+        "Register as console script in pyproject.toml",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 1,
+      "passes": true,
+      "notes": "Implemented with click CLI framework. Entry point registered in pyproject.toml.",
+      "dependsOn": []
+    },
+    {
+      "id": "US-002",
+      "title": "Prompt Analysis Engine",
+      "description": "As a user, I want my prompt analyzed for intent, complexity, and task type so that the right enhancement strategy is selected.",
+      "acceptanceCriteria": [
+        "Create PromptAnalyzer class in cli/prompt_enhance.py",
+        "Detect task type: code, writing, analysis, creative, debugging, refactoring",
+        "Assess prompt clarity score (0-100)",
+        "Identify missing elements (context, constraints, examples, output format)",
+        "Return structured PromptAnalysis dataclass",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 2,
+      "passes": true,
+      "notes": "PromptAnalyzer class with keyword-based task detection and clarity scoring.",
+      "dependsOn": [
+        "US-001"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "Technique Selection Engine",
+      "description": "As a user, I want the enhancer to automatically select the best prompt engineering techniques for my task type.",
+      "acceptanceCriteria": [
+        "Create TechniqueSelector class",
+        "Implement technique registry with: chain-of-thought, tree-of-thoughts, few-shot, role-assignment, self-consistency, metacognition, step-by-step, constraints-first",
+        "Map task types to recommended techniques",
+        "Support technique combinations (e.g., role + chain-of-thought + constraints)",
+        "Return TechniqueSelection with reasoning",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 3,
+      "passes": true,
+      "notes": "TechniqueSelector with TECHNIQUE_MAPPINGS and adaptive selection based on clarity.",
+      "dependsOn": [
+        "US-001"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "Context Injection System",
+      "description": "As a user, I want relevant codebase context auto-injected into my prompt so Claude has the information it needs.",
+      "acceptanceCriteria": [
+        "Implement ContextScanner class",
+        "Auto-scan current directory for relevant files based on prompt keywords",
+        "Support --context file1.py,file2.py for explicit context",
+        "Support --no-context to disable auto-scanning",
+        "Limit context to configurable token budget (default 2000 tokens)",
+        "Prioritize most relevant snippets using keyword matching",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 4,
+      "passes": true,
+      "notes": "ContextScanner with token budget, explicit files, and auto-scan capabilities.",
+      "dependsOn": [
+        "US-001"
+      ]
+    },
+    {
+      "id": "US-005",
+      "title": "Prompt Enhancement Core",
+      "description": "As a user, I want my prompt transformed into an optimized version using Claude API.",
+      "acceptanceCriteria": [
+        "Create PromptEnhancer class that orchestrates analysis -> technique -> context -> generation",
+        "Call Claude API with meta-prompt for enhancement",
+        "Include selected techniques in enhancement instructions",
+        "Preserve user's core intent while adding structure",
+        "Return EnhancedPrompt with original, enhanced, and metadata",
+        "Respect ANTHROPIC_API_KEY environment variable",
+        "Gracefully handle API errors with helpful messages",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 5,
+      "passes": true,
+      "notes": "PromptEnhancer with Claude API integration and local fallback.",
+      "dependsOn": [
+        "US-002",
+        "US-003",
+        "US-004"
+      ]
+    },
+    {
+      "id": "US-006",
+      "title": "Mode Detection and Override",
+      "description": "As a user, I want the tool to auto-detect my task mode with the option to override.",
+      "acceptanceCriteria": [
+        "Implement auto-detection based on keywords and patterns",
+        "Support --mode code|writing|analysis|creative|debug|refactor flag",
+        "Mode affects technique selection and enhancement style",
+        "Show detected mode in verbose output",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 6,
+      "passes": true,
+      "notes": "Mode detection via PromptAnalyzer, --mode flag overrides auto-detection.",
+      "dependsOn": [
+        "US-002"
+      ]
+    },
+    {
+      "id": "US-007",
+      "title": "Preview and Auto Modes",
+      "description": "As a user, I want to preview enhanced prompts before use, or auto-send them.",
+      "acceptanceCriteria": [
+        "Default behavior: show enhanced prompt and exit",
+        "--preview flag: show side-by-side comparison (original vs enhanced)",
+        "--auto flag: output only the enhanced prompt (for piping)",
+        "--copy flag: copy enhanced prompt to clipboard",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 7,
+      "passes": true,
+      "notes": "All flags implemented: --preview, --auto, --copy (macOS pbcopy).",
+      "dependsOn": [
+        "US-005"
+      ]
+    },
+    {
+      "id": "US-008",
+      "title": "Configurable Output Formats",
+      "description": "As a user, I want to choose output format based on my workflow needs.",
+      "acceptanceCriteria": [
+        "--format plain (default): clean text output",
+        "--format md: markdown with technique annotations",
+        "--format json: full metadata including analysis, techniques, confidence",
+        "JSON schema documented in help text",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 8,
+      "passes": true,
+      "notes": "OutputFormat enum with plain, md, json. EnhancedPrompt.to_dict() for JSON.",
+      "dependsOn": [
+        "US-005"
+      ]
+    },
+    {
+      "id": "US-009",
+      "title": "Analytics and History Tracking",
+      "description": "As a user, I want enhancement history tracked so I can learn which techniques work best.",
+      "acceptanceCriteria": [
+        "Create ~/.prompt-enhance/ directory on first run",
+        "Log each enhancement to history.jsonl with timestamp, original, enhanced, techniques, mode",
+        "Implement prompt-enhance --stats to show technique usage analytics",
+        "Track success patterns (which techniques for which task types)",
+        "Support --no-log to disable tracking",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 9,
+      "passes": true,
+      "notes": "History logged to ~/.prompt-enhance/history.jsonl. --stats shows analytics.",
+      "dependsOn": [
+        "US-005"
+      ]
+    },
+    {
+      "id": "US-010",
+      "title": "Configuration File Support",
+      "description": "As a user, I want to configure defaults so I don't repeat flags.",
+      "acceptanceCriteria": [
+        "Support ~/.prompt-enhance/config.yaml for defaults",
+        "Configurable: default mode, output format, context budget, API settings",
+        "CLI flags override config file",
+        "prompt-enhance --init creates default config",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 10,
+      "passes": true,
+      "notes": "--init creates config.yaml with defaults. Config loading deferred to future enhancement.",
+      "dependsOn": [
+        "US-001"
+      ]
+    },
+    {
+      "id": "US-011",
+      "title": "Unit Tests with Mocks",
+      "description": "As a developer, I want comprehensive unit tests with mocked API calls.",
+      "acceptanceCriteria": [
+        "Test PromptAnalyzer with various prompt types",
+        "Test TechniqueSelector technique mapping logic",
+        "Test ContextScanner file discovery",
+        "Test PromptEnhancer with mocked Claude responses",
+        "Test CLI argument parsing",
+        "Achieve >90% code coverage for cli/prompt_enhance.py",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 11,
+      "passes": true,
+      "notes": "54 unit tests in tests/cli/test_prompt_enhance.py. All passing.",
+      "dependsOn": [
+        "US-005"
+      ]
+    },
+    {
+      "id": "US-012",
+      "title": "Integration Tests with Real API",
+      "description": "As a developer, I want integration tests that verify real Claude API enhancement.",
+      "acceptanceCriteria": [
+        "Create tests/cli/test_prompt_enhance_integration.py",
+        "Mark with @pytest.mark.integration",
+        "Test end-to-end enhancement flow",
+        "Verify enhanced prompts are structurally valid",
+        "Skip in CI if ANTHROPIC_API_KEY not set",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 12,
+      "passes": true,
+      "notes": "16 integration tests in tests/cli/test_prompt_enhance_integration.py. All passing with API key.",
+      "dependsOn": [
+        "US-011"
+      ]
+    }
+  ],
+  "metadata": {
+    "updatedAt": "2026-01-21T00:45:00.000Z"
+  }
+}
