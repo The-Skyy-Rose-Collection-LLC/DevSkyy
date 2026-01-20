@@ -92,4 +92,4 @@ pydantic>=2.10.3
 
 # Database for ML
 sqlalchemy==2.0.45
-pymongo==4.10.1  # For MongoDB ML data storage
+pymongo==4.16.0  # For MongoDB ML data storage
