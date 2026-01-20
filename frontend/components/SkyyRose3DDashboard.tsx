@@ -148,10 +148,10 @@ interface MetricCardProps {
 const MetricCard = ({ label, value, unit, trend, icon, accent = false }: MetricCardProps) => (
   <div className={`relative group overflow-hidden rounded-2xl p-4 transition-all duration-500 hover:scale-[1.02] ${
     accent
-      ? 'bg-gradient-to-br from-rose-500/20 to-purple-600/20 border border-rose-500/30'
-      : 'bg-white/[0.03] border border-white/10'
+      ? 'bg-linear-to-br from-rose-500/20 to-purple-600/20 border border-rose-500/30'
+      : 'bg-white/3 border border-white/10'
   }`}>
-    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+    <div className="absolute inset-0 bg-linear-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
     <div className="relative">
       <div className="flex items-center justify-between mb-2">
         <span className="text-[10px] uppercase tracking-[0.2em] text-slate-500">{label}</span>
@@ -182,7 +182,7 @@ interface PipelineStageProps {
 
 const PipelineStage = ({ stage, status, time, active }: PipelineStageProps) => (
   <div className={`relative flex items-center gap-3 p-3 rounded-xl transition-all duration-300 ${
-    active ? 'bg-rose-500/10 border border-rose-500/30' : 'bg-white/[0.02]'
+    active ? 'bg-rose-500/10 border border-rose-500/30' : 'bg-white/2'
   }`}>
     <div className={`w-10 h-10 rounded-xl flex items-center justify-center text-lg ${
       status === 'complete' ? 'bg-emerald-500/20 text-emerald-400' :
@@ -197,7 +197,7 @@ const PipelineStage = ({ stage, status, time, active }: PipelineStageProps) => (
     </div>
     {active && (
       <div className="w-16 h-1 bg-slate-800 rounded-full overflow-hidden">
-        <div className="h-full bg-gradient-to-r from-rose-500 to-purple-500 animate-pulse" style={{ width: '60%' }} />
+        <div className="h-full bg-linear-to-r from-rose-500 to-purple-500 animate-pulse" style={{ width: '60%' }} />
       </div>
     )}
   </div>
@@ -219,7 +219,7 @@ const Preview3D = ({ generating }: Preview3DProps) => {
   }, []);
 
   return (
-    <div className="relative aspect-square rounded-2xl bg-gradient-to-br from-slate-900 to-black overflow-hidden border border-white/5">
+    <div className="relative aspect-square rounded-2xl bg-linear-to-br from-slate-900 to-black overflow-hidden border border-white/5">
       {/* Grid pattern */}
       <div className="absolute inset-0 opacity-20"
         style={{
@@ -313,7 +313,7 @@ const SkyyRose3DDashboard = () => {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500 to-purple-600 flex items-center justify-center font-bold text-lg">
+                  <div className="w-10 h-10 rounded-xl bg-linear-to-br from-rose-500 to-purple-600 flex items-center justify-center font-bold text-lg">
                     S
                   </div>
                   <div>
@@ -341,7 +341,7 @@ const SkyyRose3DDashboard = () => {
                     </button>
                   ))}
                 </div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-rose-500 to-purple-600 border-2 border-white/20" />
+                <div className="w-10 h-10 rounded-full bg-linear-to-br from-rose-500 to-purple-600 border-2 border-white/20" />
               </div>
             </div>
           </div>
@@ -365,7 +365,7 @@ const SkyyRose3DDashboard = () => {
                 className={`relative rounded-2xl border-2 border-dashed transition-all duration-300 ${
                   uploadHover
                     ? 'border-rose-500 bg-rose-500/5'
-                    : 'border-white/10 bg-white/[0.02]'
+                    : 'border-white/10 bg-white/2'
                 }`}
                 onDragOver={(e) => { e.preventDefault(); setUploadHover(true); }}
                 onDragLeave={() => setUploadHover(false)}
@@ -386,7 +386,7 @@ const SkyyRose3DDashboard = () => {
                   <div className="flex justify-center gap-3">
                     <button
                       onClick={handleGenerate}
-                      className="px-6 py-3 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 font-medium hover:opacity-90 transition-opacity"
+                      className="px-6 py-3 rounded-xl bg-linear-to-r from-rose-500 to-purple-600 font-medium hover:opacity-90 transition-opacity"
                     >
                       Generate 3D Model
                     </button>
@@ -415,7 +415,7 @@ const SkyyRose3DDashboard = () => {
 
             {/* Right Sidebar - Model Selection */}
             <div className="space-y-6">
-              <div className="rounded-2xl bg-white/[0.02] border border-white/5 p-4">
+              <div className="rounded-2xl bg-white/2 border border-white/5 p-4">
                 <div className="text-xs uppercase tracking-[0.2em] text-slate-500 mb-4">Generation Model</div>
                 <div className="space-y-2">
                   {[
@@ -426,8 +426,8 @@ const SkyyRose3DDashboard = () => {
                       key={i}
                       className={`p-3 rounded-xl cursor-pointer transition-all ${
                         model.active
-                          ? 'bg-gradient-to-r from-rose-500/20 to-purple-600/20 border border-rose-500/30'
-                          : 'bg-white/[0.02] border border-transparent hover:border-white/10'
+                          ? 'bg-linear-to-r from-rose-500/20 to-purple-600/20 border border-rose-500/30'
+                          : 'bg-white/2 border border-transparent hover:border-white/10'
                       }`}
                     >
                       <div className="flex items-center justify-between">
@@ -445,7 +445,7 @@ const SkyyRose3DDashboard = () => {
               </div>
 
               {/* Recent Assets */}
-              <div className="rounded-2xl bg-white/[0.02] border border-white/5 p-4">
+              <div className="rounded-2xl bg-white/2 border border-white/5 p-4">
                 <div className="flex items-center justify-between mb-4">
                   <div className="text-xs uppercase tracking-[0.2em] text-slate-500">Recent Assets</div>
                   <button className="text-xs text-rose-400 hover:text-rose-300">View All →</button>
@@ -453,7 +453,7 @@ const SkyyRose3DDashboard = () => {
                 <div className="space-y-2">
                   {recentAssets.map((asset, i) => (
                     <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
-                      <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-xs text-slate-500">
+                      <div className="w-10 h-10 rounded-lg bg-linear-to-br from-slate-800 to-slate-900 flex items-center justify-center text-xs text-slate-500">
                         3D
                       </div>
                       <div className="flex-1 min-w-0">
@@ -475,7 +475,7 @@ const SkyyRose3DDashboard = () => {
               </div>
 
               {/* Quick Stats */}
-              <div className="rounded-2xl bg-gradient-to-br from-rose-500/10 to-purple-600/10 border border-rose-500/20 p-4">
+              <div className="rounded-2xl bg-linear-to-br from-rose-500/10 to-purple-600/10 border border-rose-500/20 p-4">
                 <div className="text-xs uppercase tracking-[0.2em] text-rose-400/70 mb-3">This Week</div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -500,7 +500,7 @@ const SkyyRose3DDashboard = () => {
           </div>
 
           {/* Bottom Integration Status */}
-          <div className="mt-8 rounded-2xl bg-white/[0.02] border border-white/5 p-4">
+          <div className="mt-8 rounded-2xl bg-white/2 border border-white/5 p-4">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-6 flex-wrap">
                 <div className="text-xs uppercase tracking-[0.2em] text-slate-500">DevSkyy Integration</div>

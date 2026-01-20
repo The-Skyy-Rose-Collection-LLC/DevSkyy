@@ -98,11 +98,11 @@ export default function HFSpacesPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900">
+    <div className="min-h-screen bg-linear-to-br from-gray-900 via-purple-900 to-gray-900">
       {/* Header */}
       <div className="bg-black/30 backdrop-blur-sm border-b border-purple-500/30">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-linear-to-r from-purple-400 to-pink-600">
             🤗 HuggingFace Spaces
           </h1>
           <p className="mt-2 text-gray-300">

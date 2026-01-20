@@ -85,13 +85,13 @@ export default function DevSkyyDashboard() {
   }
 
   return (
-    <div className={`${darkMode ? 'bg-slate-950 text-white' : 'bg-gradient-to-br from-slate-50 to-slate-100 text-slate-900'} min-h-screen`}>
+    <div className={`${darkMode ? 'bg-slate-950 text-white' : 'bg-linear-to-br from-slate-50 to-slate-100 text-slate-900'} min-h-screen`}>
       {/* Header */}
       <header className={`${darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-200'} border-b sticky top-0 z-40`}>
         <div className="max-w-7xl mx-auto px-6 py-4">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+              <div className="h-10 w-10 bg-linear-to-br from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
                 <Layers className="h-6 w-6 text-white" />
               </div>
               <div>
@@ -378,7 +378,7 @@ function ThemeBuilderTab({ metrics, darkMode }) {
                 </div>
                 <div className={`${darkMode ? 'bg-slate-800' : 'bg-slate-200'} rounded-full h-2 overflow-hidden`}>
                   <div
-                    className="bg-gradient-to-r from-purple-500 to-blue-500 h-full"
+                    className="bg-linear-to-r from-purple-500 to-blue-500 h-full"
                     style={{ width: `${item.percentage}%` }}
                   ></div>
                 </div>
@@ -398,7 +398,7 @@ function ThemeBuilderTab({ metrics, darkMode }) {
             <option>Streetwear</option>
             <option>Minimalist</option>
           </select>
-          <button className="col-span-full bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2">
+          <button className="col-span-full bg-linear-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2">
             <Play className="h-4 w-4" />
             Generate Theme
           </button>
@@ -454,7 +454,7 @@ function SelfHealingTab({ metrics, darkMode }) {
                 <span className="text-purple-400 font-bold">74%</span>
               </div>
               <div className={`${darkMode ? 'bg-slate-800' : 'bg-slate-200'} rounded-full h-3 overflow-hidden`}>
-                <div className="bg-gradient-to-r from-green-500 to-emerald-500 h-full" style={{ width: '74%' }}></div>
+                <div className="bg-linear-to-r from-green-500 to-emerald-500 h-full" style={{ width: '74%' }}></div>
               </div>
             </div>
             <div>
@@ -463,7 +463,7 @@ function SelfHealingTab({ metrics, darkMode }) {
                 <span className="text-blue-400 font-bold">96%</span>
               </div>
               <div className={`${darkMode ? 'bg-slate-800' : 'bg-slate-200'} rounded-full h-3 overflow-hidden`}>
-                <div className="bg-gradient-to-r from-blue-500 to-cyan-500 h-full" style={{ width: '96%' }}></div>
+                <div className="bg-linear-to-r from-blue-500 to-cyan-500 h-full" style={{ width: '96%' }}></div>
               </div>
             </div>
           </div>
@@ -475,7 +475,7 @@ function SelfHealingTab({ metrics, darkMode }) {
         <h3 className="text-lg font-bold mb-4">Trigger Code Scan</h3>
         <div className="flex gap-4">
           <input type="text" placeholder="Directory path (e.g., ./src)" className={`flex-1 px-4 py-2 rounded-lg border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`} />
-          <button className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
+          <button className="bg-linear-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center gap-2">
             <Zap className="h-4 w-4" />
             Scan
           </button>
@@ -551,7 +551,7 @@ function ProductsTab({ metrics, darkMode }) {
           <input type="text" placeholder="Product Name" className={`px-4 py-2 rounded-lg border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`} />
           <input type="text" placeholder="SKU" className={`px-4 py-2 rounded-lg border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`} />
           <input type="number" placeholder="Price" className={`px-4 py-2 rounded-lg border ${darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-slate-300'}`} />
-          <button className="col-span-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2">
+          <button className="col-span-full bg-linear-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white px-6 py-2 rounded-lg font-bold transition-all flex items-center justify-center gap-2">
             <ShoppingCart className="h-4 w-4" />
             Create Product
           </button>
