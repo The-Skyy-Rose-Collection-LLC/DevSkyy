@@ -9,8 +9,8 @@
 
 import React from 'react';
 
-// Extend JSX to include model-viewer custom element
-declare global {
+// Extend JSX to include model-viewer custom element (React 19 compatible)
+declare module 'react' {
   namespace JSX {
     interface IntrinsicElements {
       'model-viewer': React.DetailedHTMLProps<

@@ -164,7 +164,7 @@ export const PreorderCountdown: React.FC<PreorderCountdownProps> = ({
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [timeDrift, setTimeDrift] = useState(0); // Client vs server time
 
-  const animationFrameRef = useRef<number>();
+  const animationFrameRef = useRef<number | undefined>(undefined);
   const serverTimeFetchRef = useRef<number>(Date.now());
   const launchNotifiedRef = useRef(false);
 
