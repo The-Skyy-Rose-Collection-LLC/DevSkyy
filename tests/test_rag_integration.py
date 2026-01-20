@@ -8,6 +8,7 @@ To run:
     pytest tests/test_rag_integration.py -v
 """
 
+import os
 from pathlib import Path
 
 import pytest
@@ -23,13 +24,16 @@ from orchestration.vector_store import VectorStoreConfig
 
 
 @pytest.fixture
-async def rag_manager():
+async def rag_manager(tmp_path):
     """Create a RAG context manager for testing."""
-    # Use temporary vector store
+    # Use unique temporary vector store for each test
+    vector_db_path = tmp_path / "vectordb"
+    vector_db_path.mkdir(parents=True, exist_ok=True)
+
     vector_config = VectorStoreConfig(
         db_type="chromadb",
         collection_name="test_devskyy_docs",
-        persist_directory="./data/test_vectordb",
+        persist_directory=str(vector_db_path),
         default_top_k=3,
         similarity_threshold=0.3,
     )
@@ -50,18 +54,14 @@ async def rag_manager():
 
     yield manager
 
-    # Cleanup
-    import shutil
-
-    if Path("./data/test_vectordb").exists():
-        shutil.rmtree("./data/test_vectordb")
+    # tmp_path cleanup is handled automatically by pytest
 
 
 @pytest.fixture
-async def ingested_rag_manager(rag_manager):
+async def ingested_rag_manager(rag_manager, tmp_path):
     """RAG manager with ingested test documents."""
-    # Create test documents
-    test_docs_dir = Path("./data/test_docs")
+    # Create test documents in unique temp dir
+    test_docs_dir = tmp_path / "test_docs"
     test_docs_dir.mkdir(parents=True, exist_ok=True)
 
     # Create sample markdown files
@@ -108,22 +108,18 @@ GET /api/v1/products
 """
     )
 
-    # Ingest documents
+    # Ingest documents using absolute path
     stats = await auto_ingest_documents(
         vector_store=rag_manager.vector_store,
-        project_root=".",
-        scan_directories=["data/test_docs"],
+        project_root=str(tmp_path),
+        scan_directories=["test_docs"],
     )
 
     assert stats["files_ingested"] > 0, "No files were ingested"
 
     yield rag_manager
 
-    # Cleanup
-    import shutil
-
-    if test_docs_dir.exists():
-        shutil.rmtree(test_docs_dir)
+    # tmp_path cleanup is handled automatically by pytest
 
 
 @pytest.mark.asyncio
@@ -151,6 +147,10 @@ async def test_rag_context_retrieval(ingested_rag_manager):
 
 
 @pytest.mark.asyncio
+@pytest.mark.skipif(
+    not os.environ.get("OPENAI_API_KEY"),
+    reason="OPENAI_API_KEY not set - required for agent execution"
+)
 async def test_agent_with_rag_context(ingested_rag_manager):
     """Test that SuperAgent uses RAG context during execution."""
     # Create a Commerce agent
@@ -213,24 +213,24 @@ async def test_rag_document_chunking():
     vector_store = create_vector_store(vector_config)
     await vector_store.initialize()
 
-    # Create ingestion instance
-    ingestion = AutoDocumentIngestion(
-        vector_store=vector_store,
-        chunk_size=500,  # Small chunks for testing
-        chunk_overlap=100,
-    )
-
-    # Create a long document
+    # Create a long document first
     test_docs_dir = Path("./data/test_chunking_docs")
     test_docs_dir.mkdir(parents=True, exist_ok=True)
 
     long_content = "This is a test sentence. " * 100  # ~2000 chars
     (test_docs_dir / "long_doc.md").write_text(long_content)
 
+    # Create ingestion instance with scan_directories in constructor
+    ingestion = AutoDocumentIngestion(
+        vector_store=vector_store,
+        scan_directories=["data/test_chunking_docs"],
+        chunk_size=500,  # Small chunks for testing
+        chunk_overlap=100,
+    )
+
     # Ingest
     stats = await ingestion.ingest_all(
         project_root=".",
-        scan_directories=["data/test_chunking_docs"],
     )
 
     # Verify chunking occurred

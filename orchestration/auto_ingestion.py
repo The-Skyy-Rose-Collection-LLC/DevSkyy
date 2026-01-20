@@ -179,6 +179,8 @@ class AutoDocumentIngestion:
             # Create documents
             documents = []
             for i, chunk in enumerate(chunks):
+                # Use filename as source (safe fallback)
+                source = file_path.name
                 doc = Document(
                     content=chunk,
                     metadata={
@@ -188,7 +190,7 @@ class AutoDocumentIngestion:
                         "total_chunks": len(chunks),
                         "file_hash": file_hash,
                     },
-                    source=str(file_path.relative_to(file_path.parents[len(file_path.parts) - 1])),
+                    source=source,
                     created_at=datetime.now(UTC),
                     status=DocumentStatus.PENDING,
                 )

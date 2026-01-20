@@ -94,10 +94,10 @@ export default function RootLayout({
               </Link>
               <div className="mt-4 rounded-lg bg-brand-primary/10 p-3">
                 <p className="text-xs font-medium text-brand-primary">
-                  SkyyRose AI
+                  DevSkyy
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Where Love Meets Luxury
+                  Enterprise AI Platform
                 </p>
               </div>
             </div>
