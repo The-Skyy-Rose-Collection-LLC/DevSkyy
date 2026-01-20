@@ -195,6 +195,9 @@ class AgentResult(BaseModel):
     error: str | None = None
     error_type: str | None = None
 
+    # Extensible metadata for technique selection, correlation, etc.
+    metadata: dict[str, Any] | None = None
+
     def __str__(self) -> str:
         return f"AgentResult({self.agent_name}, status={self.status}, tokens={self.total_tokens})"
 

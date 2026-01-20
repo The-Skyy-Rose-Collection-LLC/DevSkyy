@@ -134,6 +134,8 @@ class TestRedisNonceCache:
         mock_client.exists = MagicMock()
         return mock_client
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_init_with_redis_client(self, mock_redis_client):
         """Should initialize with provided Redis client"""
         cache = RedisNonceCache(redis_client=mock_redis_client, expiry_seconds=600)
@@ -142,6 +144,7 @@ class TestRedisNonceCache:
         assert cache.expiry_seconds == 600
         assert cache._nonce_prefix == "request_nonce:"
 
+    @patch("security.api_security.Redis", MagicMock())
     @patch("security.api_security.redis")
     def test_init_without_redis_client_creates_connection(self, mock_redis_module):
         """Should create Redis connection when none provided"""
@@ -156,6 +159,7 @@ class TestRedisNonceCache:
         )
         assert cache._redis == mock_client
 
+    @patch("security.api_security.Redis", MagicMock())
     @patch("security.api_security.redis")
     def test_init_uses_default_redis_url(self, mock_redis_module):
         """Should use default Redis URL when REDIS_URL not set"""
@@ -181,6 +185,8 @@ class TestRedisNonceCache:
         ):
             RedisNonceCache()
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_add_nonce_stores_with_ttl(self, mock_redis_client):
         """Should store nonce in Redis with TTL"""
         cache = RedisNonceCache(redis_client=mock_redis_client, expiry_seconds=300)
@@ -192,6 +198,8 @@ class TestRedisNonceCache:
         expected_key = f"request_nonce:{nonce}:{timestamp}"
         mock_redis_client.setex.assert_called_once_with(expected_key, 300, "1")
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_add_nonce_uses_custom_expiry(self, mock_redis_client):
         """Should use custom expiry seconds when storing nonce"""
         cache = RedisNonceCache(redis_client=mock_redis_client, expiry_seconds=600)
@@ -203,6 +211,8 @@ class TestRedisNonceCache:
         expected_key = f"request_nonce:{nonce}:{timestamp}"
         mock_redis_client.setex.assert_called_once_with(expected_key, 600, "1")
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_exists_returns_true_when_nonce_present(self, mock_redis_client):
         """Should return True when nonce exists in Redis"""
         mock_redis_client.exists.return_value = 1  # Redis returns 1 for exists
@@ -217,6 +227,8 @@ class TestRedisNonceCache:
         mock_redis_client.exists.assert_called_once_with(expected_key)
         assert result is True
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_exists_returns_false_when_nonce_absent(self, mock_redis_client):
         """Should return False when nonce doesn't exist in Redis"""
         mock_redis_client.exists.return_value = 0  # Redis returns 0 for non-existent
@@ -231,6 +243,8 @@ class TestRedisNonceCache:
         mock_redis_client.exists.assert_called_once_with(expected_key)
         assert result is False
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_cleanup_is_noop(self, mock_redis_client):
         """Cleanup should be a no-op for Redis (automatic TTL expiration)"""
         cache = RedisNonceCache(redis_client=mock_redis_client)
@@ -372,6 +386,8 @@ class TestNonceCacheEdgeCases:
         cache.add(long_nonce, timestamp)
         assert cache.exists(long_nonce, timestamp) is True
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_redis_cache_handles_concurrent_adds(self, mocker):
         """Should handle concurrent add operations"""
         mock_redis = MagicMock()
@@ -387,6 +403,8 @@ class TestNonceCacheEdgeCases:
         # Should have called setex 100 times
         assert mock_redis.setex.call_count == 100
 
+    @patch("security.api_security.redis", MagicMock())
+    @patch("security.api_security.Redis", MagicMock())
     def test_redis_cache_key_format_consistency(self, mocker):
         """Should maintain consistent key format"""
         mock_redis = MagicMock()
