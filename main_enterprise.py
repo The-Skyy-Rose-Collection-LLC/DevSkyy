@@ -163,28 +163,38 @@ async def lifespan(app: FastAPI):
         log_format="json" if json_output_bool else "console",
     )
 
-    # Initialize Sentry with user-provided DSN
-    sentry_dsn = os.getenv(
-        "SENTRY_DSN",
-        "https://5ddc352ad3ae6cf5e0d4727a8deeacdb@o4510219313545216.ingest.us.sentry.io/4510487462608896",
-    )
+    # Initialize Sentry with user-provided DSN (SECURITY: no hardcoded default)
+    sentry_dsn = os.getenv("SENTRY_DSN")
     if sentry_dsn:
         environment = os.getenv("ENVIRONMENT", "development")
+
+        def _sentry_before_send(event: dict, hint: dict) -> dict | None:
+            """Scrub sensitive data before sending to Sentry."""
+            # Remove sensitive headers
+            if "request" in event and "headers" in event["request"]:
+                sensitive_headers = {"authorization", "cookie", "x-api-key"}
+                event["request"]["headers"] = {
+                    k: "[REDACTED]" if k.lower() in sensitive_headers else v
+                    for k, v in event["request"]["headers"].items()
+                }
+            return event
+
         sentry_sdk.init(
             dsn=sentry_dsn,
             environment=environment,
             traces_sample_rate=1.0 if environment == "development" else 0.1,
             profiles_sample_rate=1.0 if environment == "development" else 0.1,
             enable_tracing=True,
-            send_default_pii=True,  # Enable PII for user context (as requested)
+            send_default_pii=False,  # SECURITY: Disable PII by default (GDPR/CCPA)
             attach_stacktrace=True,
             max_breadcrumbs=50,
+            before_send=_sentry_before_send,
         )
         log.info(
             "sentry_initialized",
             environment=environment,
             dsn_configured=True,
-            send_default_pii=True,
+            send_default_pii=False,
         )
     else:
         log.info("sentry_disabled", reason="SENTRY_DSN not configured")
@@ -755,9 +765,18 @@ async def tier_rate_limit_middleware(request: Request, call_next):
         return response
 
     except Exception as e:
-        # Log error but don't block request on rate limiter failure
+        # SECURITY: Fail secure in production - block requests if rate limiter fails
         log = structlog.get_logger(__name__)
         log.error("rate_limiter_error", error=str(e), exc_info=True)
+        environment = os.getenv("ENVIRONMENT", "development")
+        if environment == "production":
+            # Fail secure: block request on rate limiter failure in production
+            from fastapi import HTTPException, status
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail="Rate limiting service temporarily unavailable",
+            )
+        # In development, allow request through with warning
         return await call_next(request)
 
 
