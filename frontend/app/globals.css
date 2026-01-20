@@ -1,6 +1,47 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+
+/* Tailwind v4 CSS-first configuration */
+@theme {
+  /* SkyyRose brand colors */
+  --color-brand-primary: #B76E79;
+  --color-brand-secondary: #1A1A1A;
+  --color-brand-accent: #FFFFFF;
+  --color-brand-rose-50: #fdf2f4;
+  --color-brand-rose-100: #fce7ea;
+  --color-brand-rose-200: #f9d0d7;
+  --color-brand-rose-300: #f4a9b6;
+  --color-brand-rose-400: #ec7a8f;
+  --color-brand-rose-500: #B76E79;
+  --color-brand-rose-600: #c73e5a;
+  --color-brand-rose-700: #a72f47;
+  --color-brand-rose-800: #8c2a3f;
+  --color-brand-rose-900: #77283b;
+
+  /* Agent type colors */
+  --color-agent-commerce: #10b981;
+  --color-agent-creative: #8b5cf6;
+  --color-agent-marketing: #f59e0b;
+  --color-agent-support: #3b82f6;
+  --color-agent-operations: #ef4444;
+  --color-agent-analytics: #06b6d4;
+
+  /* LLM provider colors */
+  --color-llm-anthropic: #d97757;
+  --color-llm-openai: #10a37f;
+  --color-llm-google: #4285f4;
+  --color-llm-mistral: #ff7000;
+  --color-llm-cohere: #39594d;
+  --color-llm-groq: #f55036;
+
+  /* Fonts */
+  --font-sans: var(--font-inter), system-ui, sans-serif;
+  --font-mono: var(--font-jetbrains-mono), monospace;
+
+  /* Custom animations */
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  --animate-spin-slow: spin 3s linear infinite;
+  --animate-pulse-glow: pulse-glow 2s ease-in-out infinite;
+}
 
 :root {
   --background: 255 255 255;

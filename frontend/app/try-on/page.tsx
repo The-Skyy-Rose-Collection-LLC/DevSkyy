@@ -328,7 +328,7 @@ export default function VirtualTryOnPage() {
 
             {/* Model Preview */}
             {modelImage && (
-              <div className="aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
+              <div className="aspect-3/4 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800 relative">
                 <img
                   src={modelImage}
                   alt="Selected model"
@@ -344,7 +344,7 @@ export default function VirtualTryOnPage() {
             )}
 
             {!modelImage && (
-              <div className="aspect-[3/4] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
+              <div className="aspect-3/4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
                 <div className="text-center p-4">
                   <User className="h-12 w-12 mx-auto text-gray-400 mb-2" />
                   <p className="text-sm text-gray-500">No model selected</p>
@@ -451,7 +451,7 @@ export default function VirtualTryOnPage() {
           <CardContent className="space-y-4">
             {result ? (
               <>
-                <div className="aspect-[3/4] rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
+                <div className="aspect-3/4 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
                   <img
                     src={result.resultUrl}
                     alt="Try-on result"
@@ -479,7 +479,7 @@ export default function VirtualTryOnPage() {
                 </div>
               </>
             ) : (
-              <div className="aspect-[3/4] rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
+              <div className="aspect-3/4 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-700 flex items-center justify-center">
                 <div className="text-center p-4">
                   <Sparkles className="h-12 w-12 mx-auto text-gray-400 mb-2" />
                   <p className="text-sm text-gray-500">

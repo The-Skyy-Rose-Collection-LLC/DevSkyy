@@ -52,7 +52,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={`flex gap-3 ${isUser ? 'justify-end' : 'justify-start'}`}>
       {!isUser && (
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <div className="h-8 w-8 rounded-full bg-brand-primary flex items-center justify-center">
             {isTool ? (
               <Wrench className="h-4 w-4 text-white" />
@@ -73,7 +73,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
                 : 'bg-gray-100 dark:bg-gray-800'
           }`}
         >
-          <p className="whitespace-pre-wrap break-words">{message.content}</p>
+          <p className="whitespace-pre-wrap wrap-break-word">{message.content}</p>
         </div>
 
         {/* Tool calls */}
@@ -96,7 +96,7 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       </div>
 
       {isUser && (
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <div className="h-8 w-8 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
             <User className="h-4 w-4 text-gray-700 dark:text-gray-300" />
           </div>
