@@ -2782,7 +2782,7 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         # Calculate metrics
         latency_ms = (time.time() - start_time) * 1000
         success = result.status == AgentStatus.COMPLETED
-        cost_usd = result.usage.get("cost_usd", 0.0) if result.usage else 0.0
+        cost_usd = result.cost_usd
 
         # Record for learning
         if self.learning_module:
@@ -2987,7 +2987,7 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
         # Calculate metrics
         latency_ms = (time.time() - start_time) * 1000
         success = result.status == AgentStatus.COMPLETED
-        cost_usd = result.usage.get("cost_usd", 0.0) if result.usage else 0.0
+        cost_usd = result.cost_usd
 
         # Record for learning with actual provider used
         if self.learning_module:
