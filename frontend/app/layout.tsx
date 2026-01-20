@@ -2,10 +2,12 @@
  * Root Layout
  * ===========
  * The root layout for the DevSkyy Dashboard.
+ *
+ * Font configuration is handled via global styles (see globals.css or Tailwind config).
+ * This layout is designed to work reliably in offline and CI/CD environments.
  */
 
 import type { Metadata } from 'next';
-import { Inter, JetBrains_Mono } from 'next/font/google';
 import Link from 'next/link';
 import {
   LayoutDashboard,
@@ -19,16 +21,6 @@ import {
 } from 'lucide-react';
 import './globals.css';
 import { ToastProvider } from '@/components/ToastProvider';
-
-const inter = Inter({
-  subsets: ['latin'],
-  variable: '--font-inter',
-});
-
-const jetbrainsMono = JetBrains_Mono({
-  subsets: ['latin'],
-  variable: '--font-jetbrains-mono',
-});
 
 export const metadata: Metadata = {
   title: 'DevSkyy Dashboard',
@@ -54,7 +46,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en">
       <body className="min-h-screen bg-gray-50 dark:bg-gray-950 font-sans antialiased">
         <div className="flex min-h-screen">
           {/* Sidebar */}
