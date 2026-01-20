@@ -23,11 +23,66 @@ from pathlib import Path
 from typing import TYPE_CHECKING
 
 import click
+import yaml
 
 if TYPE_CHECKING:
     from typing import Any
 
 __version__ = "0.1.0"
+
+# =============================================================================
+# Configuration Loading
+# =============================================================================
+
+CONFIG_DIR = Path.home() / ".prompt-enhance"
+CONFIG_FILE = CONFIG_DIR / "config.yaml"
+
+DEFAULT_CONFIG: dict[str, Any] = {
+    "default_mode": "auto",
+    "default_format": "plain",
+    "context_budget": 2000,
+    "api": {
+        "provider": "anthropic",
+        "model": "claude-sonnet-4-20250514",
+    },
+    "logging": {
+        "enabled": True,
+        "history_file": str(CONFIG_DIR / "history.jsonl"),
+    },
+}
+
+
+def load_config() -> dict[str, Any]:
+    """Load configuration from ~/.prompt-enhance/config.yaml."""
+    if not CONFIG_FILE.exists():
+        return DEFAULT_CONFIG.copy()
+
+    try:
+        with open(CONFIG_FILE) as f:
+            user_config = yaml.safe_load(f) or {}
+
+        # Merge with defaults (user config takes precedence)
+        config = DEFAULT_CONFIG.copy()
+        for key, value in user_config.items():
+            if isinstance(value, dict) and key in config and isinstance(config[key], dict):
+                config[key] = {**config[key], **value}
+            else:
+                config[key] = value
+        return config
+    except Exception:
+        return DEFAULT_CONFIG.copy()
+
+
+# Global config loaded once
+_config: dict[str, Any] | None = None
+
+
+def get_config() -> dict[str, Any]:
+    """Get cached configuration."""
+    global _config
+    if _config is None:
+        _config = load_config()
+    return _config
 
 
 # =============================================================================
@@ -151,16 +206,16 @@ Examples:
     "-m",
     "--mode",
     type=click.Choice([m.value for m in TaskMode], case_sensitive=False),
-    default="auto",
-    help="Task mode (auto-detected if not specified).",
+    default=None,
+    help="Task mode (auto-detected if not specified). Default from config.",
 )
 @click.option(
     "-f",
     "--format",
     "output_format",
     type=click.Choice([f.value for f in OutputFormat], case_sensitive=False),
-    default="plain",
-    help="Output format.",
+    default=None,
+    help="Output format. Default from config.",
 )
 @click.option(
     "-p",
@@ -215,11 +270,17 @@ Examples:
     is_flag=True,
     help="Disable logging this enhancement to history.",
 )
+@click.option(
+    "--model",
+    "model_override",
+    default=None,
+    help="Claude model to use (e.g., claude-opus-4-20250514). Default from config.",
+)
 @click.version_option(version=__version__, prog_name="prompt-enhance")
 def main(
     prompt: str | None,
-    mode: str,
-    output_format: str,
+    mode: str | None,
+    output_format: str | None,
     preview: bool,
     auto_mode: bool,
     copy_clipboard: bool,
@@ -229,6 +290,7 @@ def main(
     init_config: bool,
     verbose: bool,
     no_log: bool,
+    model_override: str | None,
 ) -> None:
     """
     Transform natural language prompts into optimized, executive-level prompts.
@@ -239,6 +301,15 @@ def main(
     prompt engineering techniques, and generates an enhanced version optimized
     for Claude.
     """
+    # Load configuration
+    config = get_config()
+
+    # Apply config defaults for unspecified options
+    if mode is None:
+        mode = config.get("default_mode", "auto")
+    if output_format is None:
+        output_format = config.get("default_format", "plain")
+
     # Handle special commands first
     if stats:
         _show_stats()
@@ -264,10 +335,15 @@ def main(
     task_mode = TaskMode(mode)
     fmt = OutputFormat(output_format)
 
+    # Get model from config (CLI override takes precedence)
+    model = model_override or config.get("api", {}).get("model", "claude-sonnet-4-20250514")
+    context_budget = config.get("context_budget", 2000)
+
     # Process the prompt
     if verbose:
         click.echo(f"Mode: {task_mode.value}", err=True)
         click.echo(f"Format: {fmt.value}", err=True)
+        click.echo(f"Model: {model}", err=True)
         click.echo(f"Context files: {context_files or 'auto'}", err=True)
 
     try:
@@ -277,6 +353,8 @@ def main(
             context_files=list(context_files) if context_files else None,
             no_context=no_context,
             verbose=verbose,
+            model=model,
+            context_budget=context_budget,
         )
     except EnhancementError as e:
         raise click.ClickException(str(e)) from e
@@ -878,6 +956,8 @@ def _enhance_prompt(
     context_files: list[str] | None,
     no_context: bool,
     verbose: bool,
+    model: str = "claude-sonnet-4-20250514",
+    context_budget: int = 2000,
 ) -> EnhancedPrompt:
     """
     Enhance a prompt using analysis, technique selection, and Claude API.
@@ -910,14 +990,14 @@ def _enhance_prompt(
         click.echo(f"Techniques: {', '.join(t.value for t in techniques.techniques)}", err=True)
 
     # US-004: Scan for context
-    scanner = ContextScanner()
+    scanner = ContextScanner(token_budget=context_budget)
     context, files_used = scanner.scan(prompt, context_files, no_context)
 
     if verbose and files_used:
         click.echo(f"Context from: {', '.join(files_used)}", err=True)
 
     # US-005: Enhance the prompt
-    enhancer = PromptEnhancer()
+    enhancer = PromptEnhancer(model=model)
     enhanced = enhancer.enhance(prompt, analysis, techniques, context)
 
     latency_ms = (time.time() - start_time) * 1000
