@@ -6,7 +6,7 @@ const nextConfig = {
   // Base settings
   reactStrictMode: true,
 
-  // Experimental features - MERGED
+  // Experimental features
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb',
