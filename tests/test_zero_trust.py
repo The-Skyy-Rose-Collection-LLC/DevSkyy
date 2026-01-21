@@ -256,9 +256,27 @@ class TestCertificateAuthority:
 
     def test_verify_certificate_expired(self, self_signed_ca, root_ca):
         """Test certificate verification with expired certificate"""
-        # This test would require generating a certificate that's already expired
-        # For now, we'll skip this as it requires manipulating system time
-        pytest.skip("Requires time manipulation")
+        from datetime import timedelta
+
+        from freezegun import freeze_time
+
+        ca_cert, ca_key = root_ca
+
+        # Generate a certificate with 1-day validity
+        service_cert, _ = self_signed_ca.generate_service_cert(
+            "test-service",
+            validity_days=1,
+        )
+
+        # Verify it's valid now
+        is_valid = self_signed_ca.verify_certificate(service_cert)
+        assert is_valid is True
+
+        # Travel 2 days into the future when cert is expired
+        future_date = datetime.now() + timedelta(days=2)
+        with freeze_time(future_date):
+            is_valid = self_signed_ca.verify_certificate(service_cert)
+            assert is_valid is False
 
     def test_revoke_certificate(self, self_signed_ca, root_ca):
         """Test certificate revocation"""
