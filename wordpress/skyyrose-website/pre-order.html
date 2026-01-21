@@ -5,7 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SKYYROSE | Pre-Order Experience | Where Love Meets Luxury</title>
     <meta name="description" content="Exclusive pre-order access to all SkyyRose collections - BLACK ROSE, LOVE HURTS, and SIGNATURE. Immersive 3D shopping experience.">
-    
+
+    <!-- GSAP for luxury animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Luxury Design System -->
+    <link rel="stylesheet" href="assets/css/luxury-design.css">
+
     <script type="importmap">
     {
         "imports": {
@@ -787,7 +794,7 @@
         }
     </style>
 </head>
-<body>
+<body class="luxury-film-grain">
     <!-- Navigation -->
     <nav class="navbar">
         <a href="homepage.html" class="nav-logo">SKYYROSE</a>
@@ -1774,5 +1781,8 @@
         // Initialize cart UI
         updateCartUI();
     </script>
+
+    <!-- Luxury Animations -->
+    <script src="assets/js/luxury-animations.js"></script>
 </body>
 </html>

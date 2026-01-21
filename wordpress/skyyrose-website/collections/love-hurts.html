@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LOVE HURTS Collection | SkyyRose</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- GSAP for luxury animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Luxury Design System -->
+    <link rel="stylesheet" href="../assets/css/luxury-design.css">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -573,7 +581,7 @@
         }
     </style>
 </head>
-<body>
+<body class="luxury-film-grain theme-lovehurts">
     <!-- Floating Hearts -->
     <div class="floating-hearts" id="floatingHearts"></div>
 
@@ -599,9 +607,9 @@
 
     <!-- Hero Section -->
     <section class="hero">
-        <div class="hero-content">
+        <div class="hero-content reveal">
             <span class="collection-badge">Spring/Summer 2024</span>
-            <h1>LOVE HURTS</h1>
+            <h1 class="gradient-text-animated">LOVE HURTS</h1>
             <p class="hero-subtitle">A tribute to raw emotion. Each piece tells a story of heartbreak transformed into strength, vulnerability worn as armor.</p>
             <div style="margin-top: 2rem;">
                 <a href="../experiences/love-hurts.html" style="padding: 1rem 2rem; border: 1px solid rgba(255,255,255,0.3); color: #fff; text-decoration: none; font-size: 0.85rem; letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s ease;">View 3D Experience</a>
@@ -614,7 +622,7 @@
     </section>
 
     <!-- Story Section -->
-    <section class="story-section">
+    <section class="story-section reveal">
         <div class="story-content">
             <h2>The Heart of the Collection</h2>
             <p>LOVE HURTS was born from the understanding that pain and beauty are inseparable. This collection transforms emotional experiences into wearable art, celebrating the strength found in vulnerability.</p>
@@ -624,7 +632,7 @@
     </section>
 
     <!-- Products Section -->
-    <section class="products-section">
+    <section class="products-section reveal">
         <div class="section-header">
             <h2>The Collection</h2>
             <p>Pieces that speak to the soul</p>
@@ -635,7 +643,7 @@
     </section>
 
     <!-- Emotion Section -->
-    <section class="emotion-section">
+    <section class="emotion-section reveal">
         <div class="emotion-grid">
             <div class="emotion-card">
                 <div class="emotion-icon">💔</div>
@@ -656,7 +664,7 @@
     </section>
 
     <!-- CTA Section -->
-    <section class="cta-section">
+    <section class="cta-section reveal">
         <h2>Wear Your Story</h2>
         <p>Join a community that celebrates authenticity, embraces emotion, and transforms experiences into timeless style.</p>
         <a href="checkout.html" class="cta-btn">Shop the Collection</a>
@@ -815,5 +823,8 @@
             createFloatingHearts();
         });
     </script>
+
+    <!-- Luxury Animations -->
+    <script src="../assets/js/luxury-animations.js"></script>
 </body>
 </html>

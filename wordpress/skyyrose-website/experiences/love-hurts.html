@@ -598,7 +598,78 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // Custom Film Grain Shader
+        const FilmGrainShader = {
+            uniforms: {
+                tDiffuse: { value: null },
+                time: { value: 0.0 },
+                noiseIntensity: { value: 0.10 },
+                scanlineIntensity: { value: 0.015 },
+                scanlineCount: { value: 800 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float time;
+                uniform float noiseIntensity;
+                uniform float scanlineIntensity;
+                uniform float scanlineCount;
+                varying vec2 vUv;
+
+                float random(vec2 p) {
+                    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+                }
+
+                void main() {
+                    vec4 color = texture2D(tDiffuse, vUv);
+                    float noise = random(vUv + time) * noiseIntensity;
+                    color.rgb += noise - (noiseIntensity / 2.0);
+                    float scanline = sin(vUv.y * scanlineCount) * scanlineIntensity;
+                    color.rgb -= scanline;
+                    gl_FragColor = color;
+                }
+            `
+        };
+
+        // Custom Vignette Shader
+        const VignetteShader = {
+            uniforms: {
+                tDiffuse: { value: null },
+                offset: { value: 1.0 },
+                darkness: { value: 0.4 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float offset;
+                uniform float darkness;
+                varying vec2 vUv;
+
+                void main() {
+                    vec4 color = texture2D(tDiffuse, vUv);
+                    vec2 center = vUv - 0.5;
+                    float dist = length(center);
+                    float vignette = smoothstep(0.8, offset * 0.5, dist * (darkness + offset));
+                    color.rgb *= vignette;
+                    gl_FragColor = color;
+                }
+            `
+        };
 
         // ============================================
         // SKYYROSE LOVE HURTS COLLECTION
@@ -609,6 +680,7 @@
         let hearts = [], candles = [], throne;
         let clock = new THREE.Clock();
         let hotspots3D = [];
+        let filmGrainPass;
 
         // Product Data - Honoring the Hurt Family
         const products = {
@@ -1083,17 +1155,32 @@
         function setupPostProcessing() {
             composer = new EffectComposer(renderer);
 
+            // 1. Render Pass
             const renderPass = new RenderPass(scene, camera);
             composer.addPass(renderPass);
 
+            // 2. Enhanced Bloom Pass (Love Hurts: Romantic, warm glow)
             const bloomPass = new UnrealBloomPass(
                 new THREE.Vector2(window.innerWidth, window.innerHeight),
-                1.0,   // strength - higher for romantic glow
-                0.5,   // radius
-                0.3    // threshold
+                1.5,   // strength - higher for romantic dreamy effect
+                0.7,   // radius - softer, more diffuse
+                0.2    // threshold - lower to catch more light
             );
             composer.addPass(bloomPass);
 
+            // 3. Film Grain Pass (Cinematic texture)
+            filmGrainPass = new ShaderPass(FilmGrainShader);
+            filmGrainPass.uniforms.noiseIntensity.value = 0.06;
+            filmGrainPass.uniforms.scanlineIntensity.value = 0.01;
+            composer.addPass(filmGrainPass);
+
+            // 4. Vignette Pass (Romantic focus)
+            const vignettePass = new ShaderPass(VignetteShader);
+            vignettePass.uniforms.offset.value = 1.1;
+            vignettePass.uniforms.darkness.value = 0.4;
+            composer.addPass(vignettePass);
+
+            // 5. Output Pass
             const outputPass = new OutputPass();
             composer.addPass(outputPass);
         }
@@ -1106,12 +1193,20 @@
             // Update controls
             controls.update();
 
-            // Animate floating hearts
+            // Update film grain time for animated noise
+            if (filmGrainPass) {
+                filmGrainPass.uniforms.time.value = time;
+            }
+
+            // Animate floating hearts with enhanced motion
             hearts.forEach(heart => {
-                heart.position.y = heart.userData.baseY + 
+                heart.position.y = heart.userData.baseY +
                     Math.sin(time * heart.userData.speed + heart.userData.phase) * 0.3;
                 heart.rotation.y += heart.userData.rotSpeed;
                 heart.rotation.z = Math.sin(time + heart.userData.phase) * 0.1;
+                // Add subtle pulsing scale for heartbeat effect
+                const pulse = 1 + Math.sin(time * 2 + heart.userData.phase) * 0.05;
+                heart.scale.setScalar(heart.userData.baseScale * pulse);
             });
 
             // Animate candle flames

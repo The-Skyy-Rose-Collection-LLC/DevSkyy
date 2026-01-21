@@ -582,7 +582,83 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // Custom Film Grain Shader
+        const FilmGrainShader = {
+            uniforms: {
+                tDiffuse: { value: null },
+                time: { value: 0.0 },
+                noiseIntensity: { value: 0.12 },
+                scanlineIntensity: { value: 0.02 },
+                scanlineCount: { value: 800 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float time;
+                uniform float noiseIntensity;
+                uniform float scanlineIntensity;
+                uniform float scanlineCount;
+                varying vec2 vUv;
+
+                float random(vec2 p) {
+                    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
+                }
+
+                void main() {
+                    vec4 color = texture2D(tDiffuse, vUv);
+
+                    // Film grain
+                    float noise = random(vUv + time) * noiseIntensity;
+                    color.rgb += noise - (noiseIntensity / 2.0);
+
+                    // Scanlines
+                    float scanline = sin(vUv.y * scanlineCount) * scanlineIntensity;
+                    color.rgb -= scanline;
+
+                    gl_FragColor = color;
+                }
+            `
+        };
+
+        // Custom Vignette Shader
+        const VignetteShader = {
+            uniforms: {
+                tDiffuse: { value: null },
+                offset: { value: 1.0 },
+                darkness: { value: 0.5 }
+            },
+            vertexShader: `
+                varying vec2 vUv;
+                void main() {
+                    vUv = uv;
+                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                }
+            `,
+            fragmentShader: `
+                uniform sampler2D tDiffuse;
+                uniform float offset;
+                uniform float darkness;
+                varying vec2 vUv;
+
+                void main() {
+                    vec4 color = texture2D(tDiffuse, vUv);
+                    vec2 center = vUv - 0.5;
+                    float dist = length(center);
+                    float vignette = smoothstep(0.8, offset * 0.5, dist * (darkness + offset));
+                    color.rgb *= vignette;
+                    gl_FragColor = color;
+                }
+            `
+        };
 
         // ============================================
         // SKYYROSE BLACK ROSE COLLECTION
@@ -931,20 +1007,38 @@
             });
         }
 
+        // Film grain pass reference for animation
+        let filmGrainPass;
+
         function setupPostProcessing() {
             composer = new EffectComposer(renderer);
 
+            // 1. Render Pass
             const renderPass = new RenderPass(scene, camera);
             composer.addPass(renderPass);
 
+            // 2. Enhanced Bloom Pass (Black Rose: Dark, intense)
             const bloomPass = new UnrealBloomPass(
                 new THREE.Vector2(window.innerWidth, window.innerHeight),
-                0.8,  // strength
-                0.4,  // radius
-                0.2   // threshold
+                1.2,  // strength - higher for dramatic effect
+                0.6,  // radius - softer glow spread
+                0.15  // threshold - lower to catch more highlights
             );
             composer.addPass(bloomPass);
 
+            // 3. Film Grain Pass (Cinematic texture)
+            filmGrainPass = new ShaderPass(FilmGrainShader);
+            filmGrainPass.uniforms.noiseIntensity.value = 0.08;
+            filmGrainPass.uniforms.scanlineIntensity.value = 0.015;
+            composer.addPass(filmGrainPass);
+
+            // 4. Vignette Pass (Luxury darkened edges)
+            const vignettePass = new ShaderPass(VignetteShader);
+            vignettePass.uniforms.offset.value = 1.0;
+            vignettePass.uniforms.darkness.value = 0.5;
+            composer.addPass(vignettePass);
+
+            // 5. Output Pass
             const outputPass = new OutputPass();
             composer.addPass(outputPass);
         }
@@ -958,21 +1052,30 @@
             // Update controls
             controls.update();
 
+            // Update film grain time for animated noise
+            if (filmGrainPass) {
+                filmGrainPass.uniforms.time.value = time;
+            }
+
             // Animate orbs
             orbs.forEach((orb, i) => {
                 orb.position.y = orb.userData.baseY + Math.sin(time * 2 + orb.userData.phase) * 0.1;
                 orb.material.opacity = 0.6 + Math.sin(time * 3 + orb.userData.phase) * 0.2;
             });
 
-            // Animate particles
+            // Animate particles with fade-in/fade-out lifecycle
             if (particles) {
                 const positions = particles.geometry.attributes.position.array;
                 const velocities = particles.userData.velocities;
 
                 for (let i = 0; i < velocities.length; i++) {
-                    positions[i * 3] += velocities[i].x;
+                    // Add wind field simulation
+                    const windX = Math.sin(time * 0.5 + positions[i * 3] * 0.1) * 0.002;
+                    const windZ = Math.cos(time * 0.3 + positions[i * 3 + 2] * 0.1) * 0.002;
+
+                    positions[i * 3] += velocities[i].x + windX;
                     positions[i * 3 + 1] += velocities[i].y;
-                    positions[i * 3 + 2] += velocities[i].z;
+                    positions[i * 3 + 2] += velocities[i].z + windZ;
 
                     // Reset particles that fall below ground
                     if (positions[i * 3 + 1] < -0.5) {

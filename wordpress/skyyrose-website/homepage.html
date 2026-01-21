@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SkyyRose | Where Love Meets Luxury</title>
+    <meta name="description" content="SkyyRose - Where Love Meets Luxury. Oakland-born streetwear featuring three distinct collections: Black Rose, Love Hurts, and Signature.">
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- GSAP for luxury animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Luxury Design System -->
+    <link rel="stylesheet" href="assets/css/luxury-design.css">
+
     <style>
         * {
             margin: 0;
@@ -841,7 +852,7 @@
         }
     </style>
 </head>
-<body>
+<body class="luxury-film-grain">
     <!-- Navigation -->
     <nav class="navbar" id="navbar">
         <a href="homepage.html" class="logo">SKYYROSE</a>
@@ -863,17 +874,17 @@
     </nav>
 
     <!-- Hero Section -->
-    <section class="hero">
+    <section class="hero parallax-container">
         <div class="hero-bg">
-            <div class="orb orb-1"></div>
-            <div class="orb orb-2"></div>
-            <div class="orb orb-3"></div>
+            <div class="orb orb-1" data-speed="0.3"></div>
+            <div class="orb orb-2" data-speed="0.5"></div>
+            <div class="orb orb-3" data-speed="0.7"></div>
         </div>
         <div class="hero-content">
-            <span class="hero-badge">Oakland Luxury Streetwear</span>
+            <span class="hero-badge glow-pulse">Oakland Luxury Streetwear</span>
             <h1 class="hero-title">
-                <span>Where Love</span>
-                <span>Meets Luxury</span>
+                <span class="gradient-text-animated">Where Love</span>
+                <span class="gradient-text-animated">Meets Luxury</span>
             </h1>
             <p class="hero-subtitle">
                 Three distinct collections, one unified vision. Born in Oakland, crafted with passion, 
@@ -891,18 +902,18 @@
 
     <!-- Collections Section -->
     <section class="collections" id="collections">
-        <div class="section-header">
-            <span class="section-label">The Collections</span>
-            <h2 class="section-title">Three Stories, One Vision</h2>
-            <p class="section-subtitle">
+        <div class="section-header reveal">
+            <span class="section-label luxury-label">The Collections</span>
+            <h2 class="section-title gradient-text">Three Stories, One Vision</h2>
+            <p class="section-subtitle luxury-body">
                 Each collection represents a chapter in our story—from dark elegance to emotional depth to timeless luxury.
             </p>
         </div>
         <div class="collections-grid">
-            <div class="collection-card black-rose">
+            <div class="collection-card black-rose glass-card luxury-card-3d">
                 <div class="collection-bg"></div>
                 <div class="collection-content">
-                    <h3 class="collection-name">BLACK ROSE</h3>
+                    <h3 class="collection-name gradient-text-blackrose">BLACK ROSE</h3>
                     <p class="collection-tagline">Dark elegance for the bold</p>
                     <a href="experiences/black-rose.html" class="collection-link">
                         Explore Experience
@@ -912,10 +923,10 @@
                     </a>
                 </div>
             </div>
-            <div class="collection-card love-hurts">
+            <div class="collection-card love-hurts glass-card luxury-card-3d">
                 <div class="collection-bg"></div>
                 <div class="collection-content">
-                    <h3 class="collection-name">LOVE HURTS</h3>
+                    <h3 class="collection-name gradient-text-lovehurts">LOVE HURTS</h3>
                     <p class="collection-tagline">Where emotion meets fashion</p>
                     <a href="experiences/love-hurts.html" class="collection-link">
                         Explore Experience
@@ -925,10 +936,10 @@
                     </a>
                 </div>
             </div>
-            <div class="collection-card signature">
+            <div class="collection-card signature glass-card luxury-card-3d">
                 <div class="collection-bg"></div>
                 <div class="collection-content">
-                    <h3 class="collection-name">SIGNATURE</h3>
+                    <h3 class="collection-name gradient-text-signature">SIGNATURE</h3>
                     <p class="collection-tagline">Timeless luxury essentials</p>
                     <a href="experiences/signature.html" class="collection-link">
                         Explore Experience
@@ -943,16 +954,16 @@
 
     <!-- Featured Products -->
     <section class="featured">
-        <div class="section-header">
-            <span class="section-label">Featured</span>
-            <h2 class="section-title">New Arrivals</h2>
-            <p class="section-subtitle">
+        <div class="section-header reveal">
+            <span class="section-label luxury-label">Featured</span>
+            <h2 class="section-title gradient-text">New Arrivals</h2>
+            <p class="section-subtitle luxury-body">
                 The latest additions to our collections, each piece crafted with intention.
             </p>
         </div>
         <div class="products-grid">
-            <div class="product-card">
-                <span class="product-badge new">New</span>
+            <div class="product-card luxury-card">
+                <span class="product-badge luxury-badge-new">New</span>
                 <div class="product-image">
                     <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #2a0a0a, #1a0505); border-radius: 8px;"></div>
                 </div>
@@ -967,8 +978,8 @@
                     <p class="product-price">$185</p>
                 </div>
             </div>
-            <div class="product-card">
-                <span class="product-badge limited">Limited</span>
+            <div class="product-card luxury-card">
+                <span class="product-badge luxury-badge-limited">Limited</span>
                 <div class="product-image">
                     <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #3d1a20, #2a1015); border-radius: 8px;"></div>
                 </div>
@@ -983,7 +994,7 @@
                     <p class="product-price">$195</p>
                 </div>
             </div>
-            <div class="product-card">
+            <div class="product-card luxury-card">
                 <div class="product-image">
                     <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #2d2820, #1a1810); border-radius: 8px;"></div>
                 </div>
@@ -998,8 +1009,8 @@
                     <p class="product-price">$425</p>
                 </div>
             </div>
-            <div class="product-card">
-                <span class="product-badge new">New</span>
+            <div class="product-card luxury-card">
+                <span class="product-badge luxury-badge-new">New</span>
                 <div class="product-image">
                     <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #1a0808, #0a0303); border-radius: 8px;"></div>
                 </div>
@@ -1021,9 +1032,9 @@
     <section class="brand-story">
         <div class="brand-story-bg"></div>
         <div class="brand-story-content">
-            <div class="brand-story-text">
-                <span class="section-label">Our Story</span>
-                <h2>Born in Oakland,<br>Crafted with Love</h2>
+            <div class="brand-story-text reveal-left">
+                <span class="section-label luxury-label">Our Story</span>
+                <h2 class="gradient-text">Born in Oakland,<br>Crafted with Love</h2>
                 <p>
                     SkyyRose emerged from the vibrant streets of Oakland, where authenticity isn't just valued—it's essential. 
                     Founded with a vision to bridge the gap between street culture and luxury fashion, we create pieces that 
@@ -1034,21 +1045,21 @@
                     fabric of every piece. This personal connection infuses each collection with genuine emotion and 
                     uncompromising quality.
                 </p>
-                <a href="about.html" class="btn btn-outline">Learn More</a>
+                <a href="about.html" class="btn btn-outline btn-magnetic">Learn More</a>
             </div>
-            <div class="brand-story-visual"></div>
+            <div class="brand-story-visual reveal-right"></div>
         </div>
     </section>
 
     <!-- Newsletter -->
-    <section class="newsletter">
-        <div class="newsletter-content">
-            <span class="section-label">Stay Connected</span>
-            <h2>Join the SkyyRose Family</h2>
-            <p>Be the first to know about new drops, exclusive offers, and behind-the-scenes content.</p>
+    <section class="newsletter glass-panel-dark">
+        <div class="newsletter-content reveal">
+            <span class="section-label luxury-label">Stay Connected</span>
+            <h2 class="gradient-text">Join the SkyyRose Family</h2>
+            <p class="luxury-body">Be the first to know about new drops, exclusive offers, and behind-the-scenes content.</p>
             <form class="newsletter-form">
-                <input type="email" placeholder="Enter your email" required>
-                <button type="submit" class="btn btn-primary">Subscribe</button>
+                <input type="email" placeholder="Enter your email" required class="luxury-input">
+                <button type="submit" class="btn btn-primary btn-luxury btn-luxury-primary">Subscribe</button>
             </form>
         </div>
     </section>
@@ -1146,5 +1157,8 @@
             e.target.reset();
         });
     </script>
+
+    <!-- Luxury Animations -->
+    <script src="assets/js/luxury-animations.js"></script>
 </body>
 </html>
