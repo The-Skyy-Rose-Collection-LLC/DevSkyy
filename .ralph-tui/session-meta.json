@@ -1,0 +1,15 @@
+{
+  "id": "876f4ac2-4629-45dd-9399-345e31643c2f",
+  "status": "interrupted",
+  "startedAt": "2026-01-21T02:57:52.546Z",
+  "updatedAt": "2026-01-21T02:58:50.180Z",
+  "agentPlugin": "claude",
+  "trackerPlugin": "json",
+  "prdPath": "./tasks/prd-asset-ml-pipeline.json",
+  "currentIteration": 3,
+  "maxIterations": 5,
+  "totalTasks": 0,
+  "tasksCompleted": 0,
+  "cwd": "/Users/coreyfoster/DevSkyy",
+  "endedAt": "2026-01-21T02:58:50.180Z"
+}

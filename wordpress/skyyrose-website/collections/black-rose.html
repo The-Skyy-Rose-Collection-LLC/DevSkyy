@@ -4,7 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLACK ROSE Collection | SkyyRose</title>
+    <meta name="description" content="BLACK ROSE Collection - Dark elegance for the bold. Limited edition streetwear from SkyyRose.">
+
+    <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- GSAP for luxury animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Luxury Design System -->
+    <link rel="stylesheet" href="../assets/css/luxury-design.css">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -499,7 +510,7 @@
         }
     </style>
 </head>
-<body>
+<body class="luxury-film-grain theme-blackrose">
     <!-- Floating Roses -->
     <div class="floating-element" style="left: 10%; animation-delay: 0s;">🥀</div>
     <div class="floating-element" style="left: 30%; animation-delay: 3s;">🌹</div>
@@ -525,9 +536,9 @@
 
     <section class="collection-hero">
         <div class="collection-hero-bg"></div>
-        <div class="collection-hero-content">
+        <div class="collection-hero-content reveal">
             <span class="collection-badge">Limited Edition</span>
-            <h1 class="collection-title">
+            <h1 class="collection-title gradient-text-animated">
                 <span>BLACK ROSE</span>
             </h1>
             <p class="collection-subtitle">Dark elegance for the bold. Each piece embodies the beauty found in shadows, crafted for those who dare to stand apart.</p>
@@ -537,7 +548,7 @@
         </div>
     </section>
 
-    <div class="filter-bar">
+    <div class="filter-bar glass-panel reveal">
         <div class="filter-group">
             <button class="filter-btn active">All</button>
             <button class="filter-btn">Hoodies</button>
@@ -553,9 +564,9 @@
         </select>
     </div>
 
-    <section class="products-section">
+    <section class="products-section reveal">
         <div class="products-grid">
-            <div class="product-card" data-id="thorn-hoodie" data-name="Thorn Hoodie" data-price="185" data-collection="Black Rose">
+            <div class="product-card luxury-card-3d" data-id="thorn-hoodie" data-name="Thorn Hoodie" data-price="185" data-collection="Black Rose">
                 <span class="product-badge limited">Limited</span>
                 <div class="product-image">
                     <div class="product-actions">
@@ -577,7 +588,7 @@
                 </div>
             </div>
 
-            <div class="product-card" data-id="midnight-jacket" data-name="Midnight Jacket" data-price="295" data-collection="Black Rose">
+            <div class="product-card luxury-card-3d" data-id="midnight-jacket" data-name="Midnight Jacket" data-price="295" data-collection="Black Rose">
                 <span class="product-badge new">New</span>
                 <div class="product-image">
                     <div class="product-actions">
@@ -597,7 +608,7 @@
                 </div>
             </div>
 
-            <div class="product-card" data-id="gothic-tee" data-name="Gothic Tee" data-price="75" data-collection="Black Rose">
+            <div class="product-card luxury-card-3d" data-id="gothic-tee" data-name="Gothic Tee" data-price="75" data-collection="Black Rose">
                 <div class="product-image">
                     <div class="product-actions">
                         <button class="product-action-btn" title="Quick View">👁️</button>
@@ -617,7 +628,7 @@
                 </div>
             </div>
 
-            <div class="product-card" data-id="chain-cargo" data-name="Chain Cargo" data-price="195" data-collection="Black Rose">
+            <div class="product-card luxury-card-3d" data-id="chain-cargo" data-name="Chain Cargo" data-price="195" data-collection="Black Rose">
                 <span class="product-badge bestseller">Bestseller</span>
                 <div class="product-image">
                     <div class="product-actions">
@@ -638,7 +649,7 @@
                 </div>
             </div>
 
-            <div class="product-card" data-id="thorn-cap" data-name="Thorn Cap" data-price="55" data-collection="Black Rose">
+            <div class="product-card luxury-card-3d" data-id="thorn-cap" data-name="Thorn Cap" data-price="55" data-collection="Black Rose">
                 <div class="product-image">
                     <div class="product-actions">
                         <button class="product-action-btn" title="Quick View">👁️</button>
@@ -657,7 +668,7 @@
                 </div>
             </div>
 
-            <div class="product-card" data-id="shadow-shorts" data-name="Shadow Shorts" data-price="95" data-collection="Black Rose">
+            <div class="product-card luxury-card-3d" data-id="shadow-shorts" data-name="Shadow Shorts" data-price="95" data-collection="Black Rose">
                 <div class="product-image">
                     <div class="product-actions">
                         <button class="product-action-btn" title="Quick View">👁️</button>
@@ -678,9 +689,9 @@
         </div>
     </section>
 
-    <section class="collection-story">
+    <section class="collection-story reveal">
         <div class="story-content">
-            <div class="story-text">
+            <div class="story-text reveal">
                 <h2>The BLACK ROSE Philosophy</h2>
                 <p>In a world of fleeting trends, BLACK ROSE stands eternal. Each piece is born from the shadows, designed for those who find strength in darkness and elegance in the unconventional.</p>
                 <p>Our signature thorn motif represents resilience—the protective beauty that guards what's precious. Every stitch, every detail is crafted to empower you to embrace your authentic self.</p>
@@ -817,5 +828,8 @@
             }
         });
     </script>
+
+    <!-- Luxury Animations -->
+    <script src="../assets/js/luxury-animations.js"></script>
 </body>
 </html>

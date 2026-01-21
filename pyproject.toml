@@ -262,6 +262,7 @@ include = [
     "runtime*",
     "llm*",
     "cli*",
+    "services*",
 ]
 exclude = ["tests*", "docs*", "legacy*"]
 
