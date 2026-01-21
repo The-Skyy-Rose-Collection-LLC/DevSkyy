@@ -377,126 +377,6 @@
             color: var(--sr-wine);
         }
 
-        /* Navigation Bar */
-        .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 500;
-            padding: 1rem 2rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(74, 14, 30, 0.8);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(196, 30, 58, 0.2);
-        }
-
-        .nav-logo {
-            font-family: var(--font-display);
-            font-size: 1.5rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--sr-blush), var(--sr-deep-rose));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-decoration: none;
-        }
-
-        .nav-links {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-        }
-
-        .nav-links a {
-            color: var(--sr-cream);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 500;
-            letter-spacing: 1.5px;
-            text-transform: uppercase;
-            transition: color 0.3s ease;
-        }
-
-        .nav-links a:hover {
-            color: var(--sr-blush);
-        }
-
-        .nav-links a.active {
-            color: var(--sr-blush);
-        }
-
-        .nav-actions {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .nav-icon {
-            color: var(--sr-cream);
-            text-decoration: none;
-            font-size: 1.2rem;
-            cursor: pointer;
-            position: relative;
-            transition: color 0.3s ease;
-        }
-
-        .nav-icon:hover {
-            color: var(--sr-blush);
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--sr-deep-rose);
-            color: #fff;
-            font-size: 0.6rem;
-            width: 16px;
-            height: 16px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 600;
-        }
-
-        /* Shop Collection CTA */
-        .shop-cta {
-            position: fixed;
-            top: 50%;
-            right: 2rem;
-            transform: translateY(-50%);
-            z-index: 100;
-        }
-
-        .shop-btn {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 1.5rem 1rem;
-            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-burgundy));
-            border: none;
-            color: #fff;
-            font-family: var(--font-body);
-            font-size: 0.7rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
-            writing-mode: vertical-rl;
-            text-orientation: mixed;
-        }
-
-        .shop-btn:hover {
-            background: linear-gradient(135deg, var(--sr-blush), var(--sr-deep-rose));
-            box-shadow: 0 0 30px rgba(196, 30, 58, 0.5);
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .collection-name { font-size: 1.5rem; }
@@ -504,41 +384,10 @@
             .product-card.visible { right: 0; }
             .nav-controls { flex-wrap: wrap; justify-content: center; }
             .family-tribute { display: none; }
-            .navbar { padding: 1rem; }
-            .nav-links { display: none; }
-            .shop-cta { right: 1rem; }
-            .shop-btn { padding: 1rem 0.8rem; font-size: 0.6rem; }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <a href="../homepage.html" class="nav-logo">SKYYROSE</a>
-        <ul class="nav-links">
-            <li><a href="black-rose.html">Black Rose</a></li>
-            <li><a href="love-hurts.html" class="active">Love Hurts</a></li>
-            <li><a href="signature.html">Signature</a></li>
-            <li><a href="../about.html">About</a></li>
-            <li><a href="../blog.html">Journal</a></li>
-        </ul>
-        <div class="nav-actions">
-            <span class="nav-icon">🔍</span>
-            <a href="../wishlist.html" class="nav-icon">♡</a>
-            <a href="../cart.html" class="nav-icon" style="position: relative;">
-                🛒
-                <span class="cart-count" id="cartCount">0</span>
-            </a>
-        </div>
-    </nav>
-
-    <!-- Shop Collection CTA -->
-    <div class="shop-cta">
-        <a href="../collections/love-hurts.html" class="shop-btn">
-            Shop Collection
-        </a>
-    </div>
-
     <!-- Loading Screen -->
     <div id="loading-screen">
         <div class="loading-logo">SKYYROSE</div>
@@ -598,78 +447,7 @@
         import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
         import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
         import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
-        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
         import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
-
-        // Custom Film Grain Shader
-        const FilmGrainShader = {
-            uniforms: {
-                tDiffuse: { value: null },
-                time: { value: 0.0 },
-                noiseIntensity: { value: 0.10 },
-                scanlineIntensity: { value: 0.015 },
-                scanlineCount: { value: 800 }
-            },
-            vertexShader: `
-                varying vec2 vUv;
-                void main() {
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                uniform sampler2D tDiffuse;
-                uniform float time;
-                uniform float noiseIntensity;
-                uniform float scanlineIntensity;
-                uniform float scanlineCount;
-                varying vec2 vUv;
-
-                float random(vec2 p) {
-                    return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453);
-                }
-
-                void main() {
-                    vec4 color = texture2D(tDiffuse, vUv);
-                    float noise = random(vUv + time) * noiseIntensity;
-                    color.rgb += noise - (noiseIntensity / 2.0);
-                    float scanline = sin(vUv.y * scanlineCount) * scanlineIntensity;
-                    color.rgb -= scanline;
-                    gl_FragColor = color;
-                }
-            `
-        };
-
-        // Custom Vignette Shader
-        const VignetteShader = {
-            uniforms: {
-                tDiffuse: { value: null },
-                offset: { value: 1.0 },
-                darkness: { value: 0.4 }
-            },
-            vertexShader: `
-                varying vec2 vUv;
-                void main() {
-                    vUv = uv;
-                    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-                }
-            `,
-            fragmentShader: `
-                uniform sampler2D tDiffuse;
-                uniform float offset;
-                uniform float darkness;
-                varying vec2 vUv;
-
-                void main() {
-                    vec4 color = texture2D(tDiffuse, vUv);
-                    vec2 center = vUv - 0.5;
-                    float dist = length(center);
-                    float vignette = smoothstep(0.8, offset * 0.5, dist * (darkness + offset));
-                    color.rgb *= vignette;
-                    gl_FragColor = color;
-                }
-            `
-        };
 
         // ============================================
         // SKYYROSE LOVE HURTS COLLECTION
@@ -680,7 +458,6 @@
         let hearts = [], candles = [], throne;
         let clock = new THREE.Clock();
         let hotspots3D = [];
-        let filmGrainPass;
 
         // Product Data - Honoring the Hurt Family
         const products = {
@@ -1155,32 +932,17 @@
         function setupPostProcessing() {
             composer = new EffectComposer(renderer);
 
-            // 1. Render Pass
             const renderPass = new RenderPass(scene, camera);
             composer.addPass(renderPass);
 
-            // 2. Enhanced Bloom Pass (Love Hurts: Romantic, warm glow)
             const bloomPass = new UnrealBloomPass(
                 new THREE.Vector2(window.innerWidth, window.innerHeight),
-                1.5,   // strength - higher for romantic dreamy effect
-                0.7,   // radius - softer, more diffuse
-                0.2    // threshold - lower to catch more light
+                1.0,   // strength - higher for romantic glow
+                0.5,   // radius
+                0.3    // threshold
             );
             composer.addPass(bloomPass);
 
-            // 3. Film Grain Pass (Cinematic texture)
-            filmGrainPass = new ShaderPass(FilmGrainShader);
-            filmGrainPass.uniforms.noiseIntensity.value = 0.06;
-            filmGrainPass.uniforms.scanlineIntensity.value = 0.01;
-            composer.addPass(filmGrainPass);
-
-            // 4. Vignette Pass (Romantic focus)
-            const vignettePass = new ShaderPass(VignetteShader);
-            vignettePass.uniforms.offset.value = 1.1;
-            vignettePass.uniforms.darkness.value = 0.4;
-            composer.addPass(vignettePass);
-
-            // 5. Output Pass
             const outputPass = new OutputPass();
             composer.addPass(outputPass);
         }
@@ -1193,20 +955,12 @@
             // Update controls
             controls.update();
 
-            // Update film grain time for animated noise
-            if (filmGrainPass) {
-                filmGrainPass.uniforms.time.value = time;
-            }
-
-            // Animate floating hearts with enhanced motion
+            // Animate floating hearts
             hearts.forEach(heart => {
-                heart.position.y = heart.userData.baseY +
+                heart.position.y = heart.userData.baseY + 
                     Math.sin(time * heart.userData.speed + heart.userData.phase) * 0.3;
                 heart.rotation.y += heart.userData.rotSpeed;
                 heart.rotation.z = Math.sin(time + heart.userData.phase) * 0.1;
-                // Add subtle pulsing scale for heartbeat effect
-                const pulse = 1 + Math.sin(time * 2 + heart.userData.phase) * 0.05;
-                heart.scale.setScalar(heart.userData.baseScale * pulse);
             });
 
             // Animate candle flames
@@ -1280,30 +1034,8 @@
         };
 
         window.addToCart = function() {
-            const productTitle = document.getElementById('product-title').textContent;
-            const productPrice = document.getElementById('product-price').textContent;
-
-            let cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
-            cart.push({
-                name: productTitle,
-                price: productPrice,
-                collection: 'Love Hurts',
-                quantity: 1
-            });
-            localStorage.setItem('skyyrose_cart', JSON.stringify(cart));
-            updateCartCount();
-
-            alert(`${productTitle} added to cart!`);
-            closeProductCard();
+            alert('Added to cart! (Demo mode)');
         };
-
-        // Initialize cart count
-        function updateCartCount() {
-            const cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
-            const countEl = document.getElementById('cartCount');
-            if (countEl) countEl.textContent = cart.length;
-        }
-        updateCartCount();
 
         window.activateAR = function() {
             alert('AR feature requires a compatible device. Try on mobile!');
