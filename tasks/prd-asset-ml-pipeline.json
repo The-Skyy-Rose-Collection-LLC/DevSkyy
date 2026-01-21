@@ -1,0 +1,818 @@
+{
+  "name": "SkyyRose Asset ML Pipeline",
+  "description": "A unified machine learning pipeline for SkyyRose that automates product photo enhancement, learns brand DNA, generates AI-powered marketing visuals, creates SEO-optimized product copy, analyzes competitor trends, and enables 3D asset generation via Replicate.",
+  "branchName": "ralph/asset-ml-pipeline",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create Replicate client abstraction",
+      "description": "As a developer, I want a unified Replicate client so that all ML operations go through a consistent, testable interface.",
+      "acceptanceCriteria": [
+        "Create `services/ml/replicate_client.py` with async client wrapper",
+        "Support authentication via environment variable `REPLICATE_API_TOKEN`",
+        "Implement retry logic with exponential backoff (max 3 retries)",
+        "Add request/response logging with correlation_id",
+        "Create `ReplicateError` exception class following project patterns",
+        "Unit tests with mocked Replicate responses",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 1,
+      "dependsOn": [],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Implement image ingestion API endpoint",
+      "description": "As a user, I want to upload images via API so that external systems can submit images for processing.",
+      "acceptanceCriteria": [
+        "Create `POST /api/v1/assets/ingest` endpoint",
+        "Accept multipart/form-data with image file(s)",
+        "Accept JSON metadata: `source`, `product_id`, `processing_profile`",
+        "Validate image format (JPEG, PNG, WebP, TIFF)",
+        "Validate image size (max 50MB, min 100x100px)",
+        "Return job_id for async tracking",
+        "Store original image to R2 with metadata",
+        "Add to processing queue",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 2,
+      "dependsOn": [
+        "US-001",
+        "US-021"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Implement WooCommerce auto-ingestion webhook",
+      "description": "As a store admin, I want new product images to automatically enter the pipeline so that I don't have to manually upload them.",
+      "acceptanceCriteria": [
+        "Create webhook handler for WooCommerce product.created/updated events",
+        "Extract product images from webhook payload",
+        "Download and validate images",
+        "Auto-submit to processing queue with `source: woocommerce`",
+        "Link job to WooCommerce product_id for later sync",
+        "Skip if image already processed (hash-based deduplication)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 3,
+      "dependsOn": [
+        "US-002"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Implement admin dashboard upload",
+      "description": "As a store admin, I want to manually upload images via dashboard so that I can process images not yet in WooCommerce.",
+      "acceptanceCriteria": [
+        "Add upload component to existing admin dashboard",
+        "Support drag-and-drop multiple files",
+        "Show upload progress per file",
+        "Allow selecting processing profile before upload",
+        "Display job status after submission",
+        "Link to job detail view",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 4,
+      "dependsOn": [
+        "US-002",
+        "US-011"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Create background removal service",
+      "description": "As a user, I want product backgrounds removed/replaced so that images have clean, consistent backgrounds.",
+      "acceptanceCriteria": [
+        "Integrate Replicate background removal model (recommend: `lucataco/remove-bg`)",
+        "Preserve product edges with high precision (no halo artifacts)",
+        "Support transparent PNG output",
+        "Support solid color background replacement",
+        "Support custom background image replacement",
+        "CRITICAL: Verify product pixels unchanged via hash comparison of masked region",
+        "Store both transparent and white-background versions",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 5,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Create lighting normalization service",
+      "description": "As a user, I want consistent lighting across all product images so that the catalog looks professional.",
+      "acceptanceCriteria": [
+        "Integrate Replicate lighting/exposure model",
+        "Normalize exposure without altering product colors",
+        "Remove harsh shadows while maintaining depth",
+        "Apply consistent soft lighting profile",
+        "CRITICAL: Color calibration check - product colors must match original within Delta-E < 2",
+        "Configurable intensity (subtle, moderate, strong)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 6,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Create image upscaling service",
+      "description": "As a user, I want low-resolution images upscaled so that all images meet e-commerce quality standards.",
+      "acceptanceCriteria": [
+        "Integrate Replicate upscaling model (recommend: `nightmareai/real-esrgan`)",
+        "Support 2x and 4x upscaling",
+        "Maintain sharpness without over-sharpening artifacts",
+        "CRITICAL: Product text/logos must remain legible and unaltered",
+        "Skip if image already meets minimum resolution (2000px longest edge)",
+        "Output comparison metrics (PSNR, SSIM)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 7,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Create format optimization service",
+      "description": "As a user, I want images automatically optimized for all platforms so that pages load fast and images look great everywhere.",
+      "acceptanceCriteria": [
+        "Generate WebP for web (quality 85, < 500KB target)",
+        "Generate optimized JPEG fallback (quality 90)",
+        "Generate print-ready TIFF (300 DPI, uncompressed)",
+        "Generate social variants: Instagram square (1080x1080), Pinterest (1000x1500)",
+        "Generate thumbnail sizes: 150x150, 300x300, 600x600",
+        "Preserve EXIF data for print files, strip for web",
+        "Store all variants with consistent naming convention",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 8,
+      "dependsOn": [
+        "US-021"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Create enhancement pipeline orchestrator",
+      "description": "As a user, I want a single pipeline that runs all enhancements in the correct order so that I get fully processed images with one request.",
+      "acceptanceCriteria": [
+        "Create `services/ml/pipeline_orchestrator.py`",
+        "Define pipeline stages: ingest → validate → background → lighting → upscale → format",
+        "Support skipping stages via processing profile",
+        "Run stages sequentially with intermediate storage",
+        "Implement checkpoint/resume for failed jobs",
+        "Emit events at each stage for monitoring",
+        "Total pipeline < 2 minutes for standard image",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 9,
+      "dependsOn": [
+        "US-005",
+        "US-006",
+        "US-007",
+        "US-008",
+        "US-012"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Create processing queue with fallback chain",
+      "description": "As a developer, I want failed ML tasks to automatically try alternative models so that processing continues despite model issues.",
+      "acceptanceCriteria": [
+        "Implement job queue using existing infrastructure (or Redis if needed)",
+        "Define fallback model chains per task type",
+        "On primary model failure, automatically try fallback",
+        "After all fallbacks exhausted, move to dead letter queue",
+        "Admin notification on DLQ items",
+        "Manual retry/skip interface for DLQ items",
+        "Metrics: success rate, fallback rate, DLQ rate",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 10,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Create job status API",
+      "description": "As a user, I want to check processing status so that I know when my images are ready.",
+      "acceptanceCriteria": [
+        "Create `GET /api/v1/assets/jobs/{job_id}` endpoint",
+        "Return: status, current_stage, progress_percent, timestamps",
+        "Return: output URLs when complete",
+        "Return: error details if failed",
+        "Create `GET /api/v1/assets/jobs` for listing user's jobs",
+        "Support filtering by status, date range, source",
+        "Webhook callback option for completion notification",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 11,
+      "dependsOn": [
+        "US-010"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Implement product authenticity validator",
+      "description": "As a business owner, I want automated checks ensuring products aren't misrepresented so that we maintain customer trust and legal compliance.",
+      "acceptanceCriteria": [
+        "Create `services/ml/authenticity_validator.py`",
+        "Compare original vs enhanced using perceptual hashing on product region",
+        "Flag if product region similarity < 95%",
+        "Detect logo/text regions and verify unchanged",
+        "Color accuracy check: Delta-E < 2 for product pixels",
+        "Block auto-publish if validation fails",
+        "Generate validation report with visual diff",
+        "Human review queue for flagged images",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 12,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Create brand asset ingestion for training",
+      "description": "As a brand manager, I want to feed our existing assets into the system so that it learns our visual identity.",
+      "acceptanceCriteria": [
+        "Create bulk ingestion endpoint for training assets",
+        "Accept categorized assets: products, lifestyle, campaigns, mood boards",
+        "Extract and store: color palettes, composition patterns, lighting profiles",
+        "Store metadata: campaign, season, photographer, approval status",
+        "Minimum 500 assets for training baseline",
+        "Progress tracking for large batch ingestion",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 13,
+      "dependsOn": [
+        "US-021"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Generate brand DNA embeddings",
+      "description": "As a developer, I want brand assets converted to embeddings so that we can retrieve similar styles and maintain consistency.",
+      "acceptanceCriteria": [
+        "Use Replicate CLIP or similar for image embeddings",
+        "Store embeddings in existing vector store infrastructure",
+        "Create embedding clusters: color, composition, mood, product-type",
+        "Enable similarity search: find images like this",
+        "Update embeddings when new approved assets added",
+        "Expose via RAG query interface",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 14,
+      "dependsOn": [
+        "US-001",
+        "US-013"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Create brand consistency scorer",
+      "description": "As a brand manager, I want to score how well new images match our brand so that off-brand content is flagged.",
+      "acceptanceCriteria": [
+        "Compare new image embedding to brand cluster centroids",
+        "Return brand_score (0-100) with breakdown by dimension",
+        "Flag images scoring < 70 for review",
+        "Provide suggestions: lighting too harsh, colors don't match palette",
+        "Track brand consistency over time (dashboard metric)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 15,
+      "dependsOn": [
+        "US-014"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "title": "Create style transfer service",
+      "description": "As a user, I want to apply SkyyRose brand style to images so that UGC and vendor photos match our aesthetic.",
+      "acceptanceCriteria": [
+        "Integrate Replicate style transfer model",
+        "Train/fine-tune on SkyyRose brand assets",
+        "Apply brand lighting profile",
+        "Apply brand color grading (without changing product colors)",
+        "Configurable intensity (subtle, moderate, full)",
+        "CRITICAL: Product authenticity validation before/after",
+        "A/B comparison output for review",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 16,
+      "dependsOn": [
+        "US-001",
+        "US-012",
+        "US-014"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "Refactor existing 3D services for Replicate",
+      "description": "As a developer, I want existing Tripo3D/FASHN services abstracted so that we can use Replicate models interchangeably.",
+      "acceptanceCriteria": [
+        "Create `services/three_d/provider_interface.py` abstract base",
+        "Implement `ReplicateProvider` using Replicate 3D models",
+        "Maintain existing `Tripo3DProvider` and `FASHNProvider` as options",
+        "Factory pattern for provider selection based on config",
+        "Consistent input/output contract across providers",
+        "Provider health checks and automatic failover",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 17,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Create 3D model generation from product photos",
+      "description": "As a user, I want to generate 3D models from product photos so that customers can view products from all angles.",
+      "acceptanceCriteria": [
+        "Accept single image or multi-view images",
+        "Generate GLB/GLTF 3D model via Replicate",
+        "Support texture quality levels: preview, standard, high",
+        "Processing time < 5 minutes for standard quality",
+        "Store 3D asset with linked 2D source images",
+        "Validate model has reasonable geometry (no major artifacts)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 18,
+      "dependsOn": [
+        "US-017",
+        "US-021"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "Create 3D viewer embed component",
+      "description": "As a store admin, I want to embed 3D viewers on product pages so that customers can interact with products.",
+      "acceptanceCriteria": [
+        "Create embeddable 3D viewer component (model-viewer or Three.js)",
+        "Support GLB/GLTF loading from R2 CDN",
+        "Touch/mouse rotation controls",
+        "Zoom in/out",
+        "Optional AR view (mobile)",
+        "Lazy loading with placeholder image",
+        "WordPress shortcode for easy embedding",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 19,
+      "dependsOn": [
+        "US-018"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "title": "Create 3D thumbnail generator",
+      "description": "As a user, I want static renders from 3D models so that I can use them as additional product images.",
+      "acceptanceCriteria": [
+        "Generate 4-8 angle renders from 3D model",
+        "Consistent lighting matching brand profile",
+        "Transparent background option",
+        "Output at multiple resolutions",
+        "Auto-add to product image gallery (with approval)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 20,
+      "dependsOn": [
+        "US-018",
+        "US-014"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "title": "Implement Cloudflare R2 storage service",
+      "description": "As a developer, I want a storage abstraction using R2 so that we have cost-efficient, fast asset delivery.",
+      "acceptanceCriteria": [
+        "Create `services/storage/r2_client.py`",
+        "Implement: upload, download, delete, list, presigned URLs",
+        "Organize by: `/originals/`, `/processed/`, `/3d/`, `/training/`, `/generated/`",
+        "Set appropriate cache headers for CDN",
+        "Implement lifecycle rules: delete temp files after 7 days",
+        "Cost tracking and alerts",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 1,
+      "dependsOn": [],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "title": "Create WordPress media sync with approval",
+      "description": "As a store admin, I want processed images synced to WordPress after my approval so that only verified images go live.",
+      "acceptanceCriteria": [
+        "Create approval queue UI in admin dashboard",
+        "Show original vs processed side-by-side comparison",
+        "Approve/reject with optional notes",
+        "On approve: upload to WordPress media library via REST API",
+        "On approve: update WooCommerce product gallery",
+        "On reject: move to revision queue with feedback",
+        "Batch approval for multiple images",
+        "Email notification when images ready for review",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 21,
+      "dependsOn": [
+        "US-009",
+        "US-011",
+        "US-012"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "title": "Create asset versioning system",
+      "description": "As a user, I want to access previous versions of processed images so that I can revert if needed.",
+      "acceptanceCriteria": [
+        "Store all processing versions with timestamp",
+        "Original always preserved (never deleted)",
+        "Version history API endpoint",
+        "Revert to previous version action",
+        "Configurable retention: keep last N versions or last N days",
+        "Storage cost impact visible in dashboard",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 22,
+      "dependsOn": [
+        "US-021"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-024",
+      "title": "Create invisible watermarking service",
+      "description": "As a business owner, I want all AI-generated imagery to contain invisible watermarks so that we can track AI content internally.",
+      "acceptanceCriteria": [
+        "Create `services/ml/watermark_service.py`",
+        "Implement steganographic watermarking (invisible to human eye)",
+        "Encode: generation date, model used, source product_id, job_id",
+        "Watermark survives: compression, resizing, format conversion",
+        "Create detection endpoint to extract watermark data",
+        "Batch scanning tool for auditing existing assets",
+        "Watermark not visible in any output format",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 23,
+      "dependsOn": [],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-025",
+      "title": "Create lifestyle scene generator",
+      "description": "As a marketer, I want to place real products in AI-generated lifestyle scenes so that we have aspirational marketing visuals without photoshoots.",
+      "acceptanceCriteria": [
+        "Accept product image (with transparent background)",
+        "Accept scene prompt: luxury bedroom, outdoor picnic, modern office",
+        "Generate scene via Replicate (SDXL, Flux, or similar)",
+        "Composite real product into generated scene with proper lighting/shadows",
+        "CRITICAL: Product must be the actual cutout, not AI-regenerated",
+        "Support scene style presets matching brand DNA",
+        "Output multiple variations per prompt",
+        "Apply invisible watermark to all outputs",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 24,
+      "dependsOn": [
+        "US-001",
+        "US-005",
+        "US-014",
+        "US-024"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-026",
+      "title": "Create virtual try-on for apparel",
+      "description": "As a customer, I want to see how clothing looks on different body types so that I can make confident purchase decisions.",
+      "acceptanceCriteria": [
+        "Integrate Replicate virtual try-on model (IDM-VTON, OOTDiffusion, or similar)",
+        "Support model images: diverse body types, poses, skin tones",
+        "Accept garment image and model image",
+        "Generate realistic try-on with proper draping/fit",
+        "CRITICAL: Garment colors, patterns, logos must match original exactly",
+        "Support front and back views where applicable",
+        "Generate 3-5 variations per garment",
+        "Apply invisible watermark",
+        "Output optimized for product pages and social",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 25,
+      "dependsOn": [
+        "US-001",
+        "US-012",
+        "US-024"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-027",
+      "title": "Create marketing campaign visual generator",
+      "description": "As a marketer, I want to generate campaign visuals featuring our products so that we can rapidly create seasonal/promotional content.",
+      "acceptanceCriteria": [
+        "Accept product images and campaign brief (theme, mood, text overlays)",
+        "Generate hero images, banner variations, social posts",
+        "Support aspect ratios: 16:9, 1:1, 9:16, 4:5",
+        "Apply brand color palette and typography",
+        "Support text overlay with brand fonts",
+        "Generate 5-10 variations per campaign brief",
+        "CRITICAL: Products must be real cutouts composited in",
+        "Apply invisible watermark",
+        "Export to design-ready formats (PSD layers if possible)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 26,
+      "dependsOn": [
+        "US-001",
+        "US-005",
+        "US-014",
+        "US-024"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-028",
+      "title": "Create AI imagery approval workflow",
+      "description": "As a brand manager, I want a dedicated review process for AI-generated imagery so that we maintain quality control.",
+      "acceptanceCriteria": [
+        "Separate approval queue for AI-generated content",
+        "Show: original product, generated output, prompt used, model info",
+        "Quality checklist: product accuracy, brand alignment, professional quality",
+        "Approve/reject/request revision workflow",
+        "Revision requests include specific feedback",
+        "Track approval rates by generation type",
+        "Approved images auto-tagged with AI generation metadata",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 27,
+      "dependsOn": [
+        "US-025",
+        "US-026",
+        "US-027"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-029",
+      "title": "Create image-to-description pipeline",
+      "description": "As a store admin, I want product descriptions auto-generated from images so that I can rapidly populate product listings.",
+      "acceptanceCriteria": [
+        "Accept product image(s) and category",
+        "Extract visual features: color, material, style, details",
+        "Generate base description (100-200 words)",
+        "Use vision model via Replicate (LLaVA, BLIP, or similar)",
+        "Support batch processing for catalog upload",
+        "Return structured output: description, features list, suggested tags",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 28,
+      "dependsOn": [
+        "US-001"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-030",
+      "title": "Create SEO-optimized description generator",
+      "description": "As a marketer, I want product descriptions optimized for search engines so that products rank well organically.",
+      "acceptanceCriteria": [
+        "Accept base description and target keywords",
+        "Generate SEO title (< 60 chars)",
+        "Generate meta description (< 160 chars)",
+        "Generate H1 and H2 suggestions",
+        "Create bullet-point feature list (5-7 points)",
+        "Generate long-form description (300-500 words)",
+        "Include natural keyword placement",
+        "Readability score (target: Grade 8 level)",
+        "Output in structured JSON for easy WooCommerce import",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 29,
+      "dependsOn": [
+        "US-029"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-031",
+      "title": "Create brand voice fine-tuning system",
+      "description": "As a brand manager, I want generated copy to match SkyyRose's voice so that all content feels authentically on-brand.",
+      "acceptanceCriteria": [
+        "Ingest existing SkyyRose product descriptions (100+ examples)",
+        "Extract brand voice characteristics: tone, vocabulary, sentence structure",
+        "Create brand voice embedding/profile",
+        "Apply voice transformation to generated descriptions",
+        "A/B comparison: generic vs brand-voiced output",
+        "Voice consistency scoring (compare to training examples)",
+        "Support multiple voice variants: luxurious, playful, bold",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 30,
+      "dependsOn": [
+        "US-014",
+        "US-029"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-032",
+      "title": "Create multi-language description generator",
+      "description": "As a global seller, I want descriptions in multiple languages so that we can expand to international markets.",
+      "acceptanceCriteria": [
+        "Support languages: English, Spanish, French, German, Italian, Portuguese",
+        "Generate from English source or directly from image",
+        "Maintain brand voice across languages",
+        "Cultural adaptation (not just translation)",
+        "SEO optimization per language/market",
+        "Native speaker quality validation checklist",
+        "Store all language variants linked to product",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 31,
+      "dependsOn": [
+        "US-030",
+        "US-031"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-033",
+      "title": "Create copy approval and editing workflow",
+      "description": "As a content manager, I want to review and refine generated copy before publishing so that quality is maintained.",
+      "acceptanceCriteria": [
+        "Approval queue for generated descriptions",
+        "Side-by-side: product image, generated copy, existing copy (if any)",
+        "Inline editing with change tracking",
+        "Approve/reject/request regeneration workflow",
+        "Regenerate with feedback: make it shorter, more luxurious tone",
+        "Approved copy auto-syncs to WooCommerce",
+        "Track edit rates to improve generation quality",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 32,
+      "dependsOn": [
+        "US-030",
+        "US-031",
+        "US-032"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-034",
+      "title": "Create competitor image upload and tagging",
+      "description": "As a strategist, I want to upload and organize competitor imagery so that we can analyze their visual strategies.",
+      "acceptanceCriteria": [
+        "Create competitor asset library (separate from brand assets)",
+        "Upload interface with competitor name, product category, source URL",
+        "Auto-extract visual features via ML",
+        "Tag: composition type, color scheme, style, price positioning",
+        "Store without processing (analysis only)",
+        "GDPR-compliant: no scraping, manual upload only",
+        "Access restricted to strategy/marketing roles",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 33,
+      "dependsOn": [
+        "US-021"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-035",
+      "title": "Create visual style analyzer",
+      "description": "As a strategist, I want to analyze competitor visual styles so that we understand market positioning.",
+      "acceptanceCriteria": [
+        "Generate embeddings for competitor images",
+        "Cluster by visual style: minimal, luxurious, bold, lifestyle-heavy",
+        "Compare SkyyRose style clusters to competitors",
+        "Identify style gaps: competitors use more lifestyle shots",
+        "Generate style comparison report",
+        "Visualize brand positioning map (2D embedding projection)",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 34,
+      "dependsOn": [
+        "US-014",
+        "US-034"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-036",
+      "title": "Create e-commerce trend analyzer",
+      "description": "As a strategist, I want to identify visual trends in fashion e-commerce so that we stay ahead of the market.",
+      "acceptanceCriteria": [
+        "Accept trend research dataset (manually curated from industry sources)",
+        "Identify emerging patterns: colors, compositions, presentation styles",
+        "Track trend evolution over time",
+        "Alert when new trends detected",
+        "Generate trend adoption recommendations",
+        "Monthly trend report generation",
+        "Integration with brand DNA to suggest aligned trends",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 35,
+      "dependsOn": [
+        "US-014",
+        "US-035"
+      ],
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-037",
+      "title": "Create competitive benchmarking dashboard",
+      "description": "As a manager, I want a dashboard comparing our visuals to competitors so that I can track our market position.",
+      "acceptanceCriteria": [
+        "Dashboard showing: brand consistency score vs competitors",
+        "Visual quality metrics comparison",
+        "Style diversity analysis",
+        "Trend adoption speed comparison",
+        "Strengths/weaknesses summary",
+        "Exportable report for stakeholders",
+        "Refresh on new asset uploads",
+        "pytest -v && isort . && ruff check --fix && black ."
+      ],
+      "priority": 36,
+      "dependsOn": [
+        "US-015",
+        "US-035",
+        "US-036"
+      ],
+      "passes": false,
+      "notes": ""
+    }
+  ],
+  "metadata": {
+    "totalStories": 37,
+    "phases": 7,
+    "criticalConstraints": [
+      "NEVER modify product logos, branding, labels, or text",
+      "NEVER change product colors, textures, or physical features",
+      "All AI-generated imagery must contain invisible watermark",
+      "Original unmodified images must always be preserved",
+      "Human approval required before WordPress sync"
+    ],
+    "techStack": {
+      "mlBackend": "Replicate",
+      "storage": "Cloudflare R2"
+    },
+    "updatedAt": "2026-01-21T02:58:30.621Z"
+  }
+}

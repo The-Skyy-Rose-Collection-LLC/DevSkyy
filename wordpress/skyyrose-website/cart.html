@@ -5,6 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Shopping Cart | SkyyRose</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- GSAP for luxury animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Luxury Design System -->
+    <link rel="stylesheet" href="assets/css/luxury-design.css">
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -469,7 +477,7 @@
         }
     </style>
 </head>
-<body>
+<body class="luxury-film-grain">
     <nav class="navbar">
         <a href="homepage.html" class="logo">SKYYROSE</a>
         <ul class="nav-links">
@@ -487,8 +495,8 @@
     </nav>
 
     <main class="cart-page">
-        <div class="cart-header">
-            <h1>Shopping Cart</h1>
+        <div class="cart-header reveal">
+            <h1 class="gradient-text-animated">Shopping Cart</h1>
             <p id="itemCount">0 items</p>
         </div>
 
@@ -497,7 +505,7 @@
                 <!-- Items loaded by JS -->
             </div>
 
-            <div class="order-summary" id="orderSummary">
+            <div class="order-summary glass-panel" id="orderSummary">
                 <h3>Order Summary</h3>
                 <div class="summary-row">
                     <span>Subtotal</span>
@@ -666,5 +674,8 @@
             */
         }
     </script>
+
+    <!-- Luxury Animations -->
+    <script src="assets/js/luxury-animations.js"></script>
 </body>
 </html>
