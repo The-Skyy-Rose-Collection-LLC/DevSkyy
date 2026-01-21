@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thorn Hoodie | BLACK ROSE | SkyyRose</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --black-rose: #8B0000;
+            --black-rose-dark: #5C0000;
+            --love-hurts: #B76E79;
+            --signature-gold: #D4AF37;
+            --bg-dark: #0A0A0A;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Collection-specific gradient overlay */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at 30% 30%, rgba(139, 0, 0, 0.08) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--love-hurts), var(--signature-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .nav-links a:hover { color: var(--signature-gold); }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--black-rose);
+            color: #fff;
+            font-size: 0.65rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            padding: 120px 4rem 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+        }
+
+        .breadcrumb a:hover { color: var(--signature-gold); }
+
+        .breadcrumb span { color: rgba(255, 255, 255, 0.3); margin: 0 0.5rem; }
+
+        .breadcrumb .current { color: #fff; }
+
+        /* Product Section */
+        .product-section {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem 4rem 6rem;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6rem;
+        }
+
+        /* Gallery */
+        .product-gallery {
+            position: sticky;
+            top: 120px;
+            align-self: start;
+        }
+
+        .main-image {
+            height: 600px;
+            background: linear-gradient(135deg, #1a0808 0%, #0a0303 100%);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .main-image::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.1) 0%, transparent 70%);
+        }
+
+        .product-badges {
+            position: absolute;
+            top: 1.5rem;
+            left: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .badge {
+            padding: 0.5rem 1rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .badge.collection {
+            background: var(--black-rose);
+            color: #fff;
+        }
+
+        .badge.limited {
+            background: var(--signature-gold);
+            color: var(--bg-dark);
+        }
+
+        .thumbnails {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .thumbnail {
+            height: 100px;
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s ease;
+        }
+
+        .thumbnail:hover,
+        .thumbnail.active {
+            border-color: var(--black-rose);
+        }
+
+        /* Product Info */
+        .product-info {
+            padding-top: 1rem;
+        }
+
+        .collection-link {
+            display: inline-block;
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--black-rose);
+            text-decoration: none;
+            margin-bottom: 1rem;
+            transition: color 0.3s ease;
+        }
+
+        .collection-link:hover { color: var(--love-hurts); }
+
+        .product-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 3rem;
+            font-weight: 400;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: 300;
+            color: var(--signature-gold);
+            margin-bottom: 2rem;
+        }
+
+        .product-description {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.9;
+            margin-bottom: 2rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Options */
+        .option-group {
+            margin-bottom: 2rem;
+        }
+
+        .option-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .option-label span {
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .option-label a {
+            font-size: 0.8rem;
+            color: var(--love-hurts);
+            text-decoration: underline;
+        }
+
+        .size-options,
+        .color-options {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .size-btn {
+            width: 50px;
+            height: 50px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .size-btn:hover {
+            border-color: var(--black-rose);
+        }
+
+        .size-btn.active {
+            background: var(--black-rose);
+            border-color: var(--black-rose);
+        }
+
+        .size-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .color-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .color-btn.active {
+            border-color: var(--signature-gold);
+        }
+
+        .color-btn.black { background: #1a1a1a; }
+        .color-btn.crimson { background: var(--black-rose); }
+        .color-btn.charcoal { background: #333; }
+
+        /* Quantity */
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .qty-btn {
+            width: 45px;
+            height: 45px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .qty-btn:hover {
+            border-color: var(--signature-gold);
+            color: var(--signature-gold);
+        }
+
+        .qty-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Actions */
+        .product-actions {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .btn {
+            padding: 1.2rem 2.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .btn-primary {
+            flex: 1;
+            background: linear-gradient(135deg, var(--black-rose), var(--black-rose-dark));
+            color: #fff;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 40px rgba(139, 0, 0, 0.4);
+        }
+
+        .btn-wishlist {
+            width: 60px;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            font-size: 1.3rem;
+        }
+
+        .btn-wishlist:hover {
+            border-color: var(--love-hurts);
+            color: var(--love-hurts);
+        }
+
+        /* Accordions */
+        .accordion {
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 0;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .accordion-header:hover { color: var(--signature-gold); }
+
+        .accordion-header h4 {
+            font-size: 0.9rem;
+            font-weight: 500;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .accordion-icon {
+            font-size: 1.5rem;
+            transition: transform 0.3s ease;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(45deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+        }
+
+        .accordion-item.open .accordion-content {
+            max-height: 300px;
+        }
+
+        .accordion-content-inner {
+            padding-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.8;
+        }
+
+        .accordion-content-inner ul {
+            list-style: none;
+            margin-top: 1rem;
+        }
+
+        .accordion-content-inner li {
+            padding: 0.3rem 0;
+            padding-left: 1rem;
+            position: relative;
+        }
+
+        .accordion-content-inner li::before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: var(--black-rose);
+        }
+
+        /* Related Products */
+        .related-section {
+            padding: 6rem 4rem;
+            background: #111;
+        }
+
+        .related-section h2 {
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .related-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s ease;
+        }
+
+        .related-card:hover {
+            border-color: rgba(139, 0, 0, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .related-image {
+            height: 280px;
+            background: linear-gradient(135deg, #1a1a1a, #0a0a0a);
+        }
+
+        .related-info {
+            padding: 1.5rem;
+        }
+
+        .related-info h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .related-info p {
+            color: var(--signature-gold);
+            font-weight: 500;
+        }
+
+        /* Footer */
+        .footer {
+            padding: 5rem 4rem 2rem;
+            background: var(--bg-dark);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 4rem;
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+            margin-top: 1.5rem;
+            max-width: 300px;
+        }
+
+        .footer-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-links { list-style: none; }
+        .footer-links li { margin-bottom: 0.75rem; }
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.6);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .footer-links a:hover { color: var(--signature-gold); }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: var(--black-rose);
+            color: #fff;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            transform: translateX(150%);
+            transition: transform 0.4s ease;
+            z-index: 2000;
+        }
+
+        .toast.show { transform: translateX(0); }
+
+        @media (max-width: 1024px) {
+            .navbar { padding: 1rem 2rem; }
+            .nav-links { display: none; }
+            .product-section { grid-template-columns: 1fr; gap: 3rem; }
+            .product-gallery { position: static; }
+            .related-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .related-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="homepage.html" class="logo">SKYYROSE</a>
+        <ul class="nav-links">
+            <li><a href="experiences/black-rose.html">Black Rose</a></li>
+            <li><a href="experiences/love-hurts.html">Love Hurts</a></li>
+            <li><a href="experiences/signature.html">Signature</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="blog.html">Journal</a></li>
+        </ul>
+        <div class="nav-actions">
+            <span class="nav-icon">🔍</span>
+            <a href="wishlist.html" class="nav-icon">♡</a>
+            <a href="cart.html" class="nav-icon" style="position: relative; text-decoration: none;">🛒<span class="cart-count" id="cartCount">0</span></a>
+        </div>
+    </nav>
+
+    <div class="breadcrumb">
+        <a href="homepage.html">Home</a>
+        <span>/</span>
+        <a href="collections/black-rose.html">Black Rose</a>
+        <span>/</span>
+        <span class="current">Thorn Hoodie</span>
+    </div>
+
+    <section class="product-section">
+        <div class="product-gallery">
+            <div class="main-image" id="mainImage">
+                <div class="product-badges">
+                    <span class="badge collection">Black Rose</span>
+                    <span class="badge limited">Limited Edition</span>
+                </div>
+            </div>
+            <div class="thumbnails">
+                <div class="thumbnail active"></div>
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+                <div class="thumbnail"></div>
+            </div>
+        </div>
+
+        <div class="product-info">
+            <a href="collections/black-rose.html" class="collection-link">Black Rose Collection</a>
+            <h1 class="product-title">Thorn Hoodie</h1>
+            <p class="product-price">$185</p>
+            <p class="product-description">
+                The Thorn Hoodie embodies the essence of the BLACK ROSE collection—dark elegance with an edge. 
+                Crafted from premium heavyweight cotton with a custom thorn embroidery detail, this piece makes 
+                a statement while providing unmatched comfort and durability.
+            </p>
+
+            <div class="option-group">
+                <div class="option-label">
+                    <span>Size</span>
+                    <a href="#">Size Guide</a>
+                </div>
+                <div class="size-options">
+                    <button class="size-btn">XS</button>
+                    <button class="size-btn">S</button>
+                    <button class="size-btn active">M</button>
+                    <button class="size-btn">L</button>
+                    <button class="size-btn">XL</button>
+                    <button class="size-btn disabled">XXL</button>
+                </div>
+            </div>
+
+            <div class="option-group">
+                <div class="option-label">
+                    <span>Color: <strong id="colorName">Onyx Black</strong></span>
+                </div>
+                <div class="color-options">
+                    <button class="color-btn black active" data-color="Onyx Black"></button>
+                    <button class="color-btn crimson" data-color="Crimson"></button>
+                    <button class="color-btn charcoal" data-color="Charcoal"></button>
+                </div>
+            </div>
+
+            <div class="quantity-selector">
+                <span style="font-size: 0.85rem; letter-spacing: 1px; text-transform: uppercase;">Quantity</span>
+                <button class="qty-btn" id="qtyMinus">−</button>
+                <span class="qty-value" id="qtyValue">1</span>
+                <button class="qty-btn" id="qtyPlus">+</button>
+            </div>
+
+            <div class="product-actions">
+                <button class="btn btn-primary" id="addToCart">Add to Cart</button>
+                <button class="btn btn-wishlist" id="addToWishlist">♡</button>
+            </div>
+
+            <div class="accordion">
+                <div class="accordion-item open">
+                    <div class="accordion-header">
+                        <h4>Details & Fit</h4>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>Oversized fit with dropped shoulders for a relaxed silhouette. Custom thorn embroidery on chest and back.</p>
+                            <ul>
+                                <li>450 GSM premium heavyweight cotton</li>
+                                <li>Brushed fleece interior</li>
+                                <li>Ribbed cuffs and hem</li>
+                                <li>Front kangaroo pocket</li>
+                                <li>Model wears size M (6'0", 175 lbs)</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Materials & Care</h4>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <ul>
+                                <li>100% Premium Cotton</li>
+                                <li>Machine wash cold, inside out</li>
+                                <li>Tumble dry low</li>
+                                <li>Do not bleach</li>
+                                <li>Iron on low heat if needed</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="accordion-item">
+                    <div class="accordion-header">
+                        <h4>Shipping & Returns</h4>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <ul>
+                                <li>Free shipping on orders over $150</li>
+                                <li>Standard shipping: 5-7 business days</li>
+                                <li>Express shipping: 2-3 business days</li>
+                                <li>30-day return policy on unworn items</li>
+                                <li>Free returns on all domestic orders</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="related-section">
+        <h2>Complete the Look</h2>
+        <div class="related-grid">
+            <div class="related-card">
+                <div class="related-image"></div>
+                <div class="related-info">
+                    <h3>Midnight Jacket</h3>
+                    <p>$295</p>
+                </div>
+            </div>
+            <div class="related-card">
+                <div class="related-image"></div>
+                <div class="related-info">
+                    <h3>Gothic Tee</h3>
+                    <p>$75</p>
+                </div>
+            </div>
+            <div class="related-card">
+                <div class="related-image"></div>
+                <div class="related-info">
+                    <h3>Chain Cargo</h3>
+                    <p>$195</p>
+                </div>
+            </div>
+            <div class="related-card">
+                <div class="related-image"></div>
+                <div class="related-info">
+                    <h3>Thorn Cap</h3>
+                    <p>$55</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="homepage.html" class="logo">SKYYROSE</a>
+                <p>Where love meets luxury. Oakland-born streetwear for those who wear their heart on their sleeve.</p>
+            </div>
+            <div>
+                <h4 class="footer-title">Shop</h4>
+                <ul class="footer-links">
+                    <li><a href="collections/black-rose.html">Black Rose</a></li>
+                    <li><a href="collections/love-hurts.html">Love Hurts</a></li>
+                    <li><a href="collections/signature.html">Signature</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Company</h4>
+                <ul class="footer-links">
+                    <li><a href="about.html">About Us</a></li>
+                    <li><a href="blog.html">Journal</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Size Guide</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="footer-title">Connect</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Instagram</a></li>
+                    <li><a href="#">TikTok</a></li>
+                    <li><a href="#">Twitter</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 SkyyRose. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <div class="toast" id="toast">Added to cart!</div>
+
+    <script>
+        // Cart
+        let cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
+        
+        function updateCartCount() {
+            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.qty, 0);
+        }
+        updateCartCount();
+
+        // Quantity
+        let qty = 1;
+        document.getElementById('qtyMinus').addEventListener('click', () => {
+            if (qty > 1) {
+                qty--;
+                document.getElementById('qtyValue').textContent = qty;
+            }
+        });
+        document.getElementById('qtyPlus').addEventListener('click', () => {
+            qty++;
+            document.getElementById('qtyValue').textContent = qty;
+        });
+
+        // Size selection
+        document.querySelectorAll('.size-btn:not(.disabled)').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            });
+        });
+
+        // Color selection
+        document.querySelectorAll('.color-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.color-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                document.getElementById('colorName').textContent = btn.dataset.color;
+            });
+        });
+
+        // Add to cart
+        document.getElementById('addToCart').addEventListener('click', () => {
+            const size = document.querySelector('.size-btn.active')?.textContent || 'M';
+            const color = document.getElementById('colorName').textContent;
+            
+            const item = {
+                id: 'thorn-hoodie-' + size + '-' + color,
+                name: 'Thorn Hoodie',
+                collection: 'Black Rose',
+                price: 185,
+                size: size,
+                color: color,
+                qty: qty
+            };
+
+            const existingIndex = cart.findIndex(i => i.id === item.id);
+            if (existingIndex > -1) {
+                cart[existingIndex].qty += qty;
+            } else {
+                cart.push(item);
+            }
+
+            localStorage.setItem('skyyrose_cart', JSON.stringify(cart));
+            updateCartCount();
+
+            // Show toast
+            const toast = document.getElementById('toast');
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 3000);
+        });
+
+        // Accordions
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const item = header.parentElement;
+                item.classList.toggle('open');
+            });
+        });
+
+        // Thumbnail selection
+        document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+            thumb.addEventListener('click', () => {
+                document.querySelectorAll('.thumbnail').forEach(t => t.classList.remove('active'));
+                thumb.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
