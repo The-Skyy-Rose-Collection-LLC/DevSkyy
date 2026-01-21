@@ -185,6 +185,55 @@ function skyyrose_immersive_register_scripts() {
         true
     );
 
+    // ==========================================================================
+    // NEW IMMERSIVE LANDING PAGE SCENES (ES Modules)
+    // ==========================================================================
+
+    // Homepage 3D Hero Scene
+    wp_register_script(
+        'skyyrose-hero-scene',
+        SKYYROSE_IMMERSIVE_URI . '/assets/js/hero-scene.js',
+        array('threejs', 'threejs-orbit-controls'),
+        SKYYROSE_IMMERSIVE_VERSION,
+        true
+    );
+
+    // Pre-Order Full Experience Scene
+    wp_register_script(
+        'skyyrose-preorder-scene',
+        SKYYROSE_IMMERSIVE_URI . '/assets/js/preorder-scene.js',
+        array('threejs', 'threejs-orbit-controls'),
+        SKYYROSE_IMMERSIVE_VERSION,
+        true
+    );
+
+    // Black Rose Collection Landing Scene
+    wp_register_script(
+        'skyyrose-blackrose-scene',
+        SKYYROSE_IMMERSIVE_URI . '/assets/js/collections/black-rose-scene.js',
+        array('threejs', 'threejs-orbit-controls'),
+        SKYYROSE_IMMERSIVE_VERSION,
+        true
+    );
+
+    // Love Hurts Collection Landing Scene
+    wp_register_script(
+        'skyyrose-lovehurts-scene',
+        SKYYROSE_IMMERSIVE_URI . '/assets/js/collections/love-hurts-scene.js',
+        array('threejs', 'threejs-orbit-controls'),
+        SKYYROSE_IMMERSIVE_VERSION,
+        true
+    );
+
+    // Signature Collection Landing Scene
+    wp_register_script(
+        'skyyrose-signature-scene',
+        SKYYROSE_IMMERSIVE_URI . '/assets/js/collections/signature-scene.js',
+        array('threejs', 'threejs-orbit-controls'),
+        SKYYROSE_IMMERSIVE_VERSION,
+        true
+    );
+
     // Localize script with theme data
     wp_localize_script('skyyrose-3d-init', 'skyyrose3D', array(
         'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -322,9 +371,17 @@ function skyyrose_collection_body_class($classes) {
  */
 add_filter('theme_page_templates', 'skyyrose_register_page_templates');
 function skyyrose_register_page_templates($templates) {
-    $templates['templates/template-signature.php'] = __('Signature Collection (Immersive)', 'skyyrose-immersive');
-    $templates['templates/template-lovehurts.php'] = __('Love Hurts Collection (Immersive)', 'skyyrose-immersive');
-    $templates['templates/template-blackrose.php'] = __('Black Rose Collection (Immersive)', 'skyyrose-immersive');
+    // Collection Templates (Immersive Landing Pages)
+    $templates['templates/template-collection-signature.php'] = __('Signature Collection (Immersive)', 'skyyrose-immersive');
+    $templates['templates/template-collection-lovehurts.php'] = __('Love Hurts Collection (Immersive)', 'skyyrose-immersive');
+    $templates['templates/template-collection-blackrose.php'] = __('Black Rose Collection (Immersive)', 'skyyrose-immersive');
+
+    // Experience Templates
+    $templates['templates/template-preorder.php'] = __('Pre-Order Experience (Immersive)', 'skyyrose-immersive');
+
+    // Custom Luxury Pages
+    $templates['templates/template-about.php'] = __('About Us (Luxury)', 'skyyrose-immersive');
+    $templates['templates/template-blog.php'] = __('Blog (Luxury Editorial)', 'skyyrose-immersive');
 
     return $templates;
 }
@@ -568,6 +625,7 @@ function skyyrose_modify_script_tags($tag, $handle) {
 // Include additional functionality
 require_once SKYYROSE_IMMERSIVE_DIR . '/inc/elementor-widgets.php';
 require_once SKYYROSE_IMMERSIVE_DIR . '/inc/spinning-logo-functions.php';
+require_once SKYYROSE_IMMERSIVE_DIR . '/inc/admin-settings.php';
 
 /**
  * Universal AJAX JSON Response Sanitizer
@@ -718,6 +776,49 @@ function skyyrose_collection_experience_shortcode($atts) {
 }
 
 /**
+ * AJAX Handler: Add to Cart (for immersive landing pages)
+ */
+add_action('wp_ajax_skyyrose_add_to_cart', 'skyyrose_ajax_add_to_cart');
+add_action('wp_ajax_nopriv_skyyrose_add_to_cart', 'skyyrose_ajax_add_to_cart');
+function skyyrose_ajax_add_to_cart() {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['nonce'] ?? '', 'skyyrose_ajax_nonce')) {
+        wp_send_json_error(['message' => 'Invalid security token'], 403);
+        return;
+    }
+
+    $product_id = intval($_POST['product_id'] ?? 0);
+    $quantity = intval($_POST['quantity'] ?? 1);
+    $variation_id = intval($_POST['variation_id'] ?? 0);
+
+    if (!$product_id) {
+        wp_send_json_error(['message' => 'Invalid product ID'], 400);
+        return;
+    }
+
+    // Validate product exists
+    $product = wc_get_product($product_id);
+    if (!$product) {
+        wp_send_json_error(['message' => 'Product not found'], 404);
+        return;
+    }
+
+    // Add to cart
+    $cart_item_key = WC()->cart->add_to_cart($product_id, $quantity, $variation_id);
+
+    if ($cart_item_key) {
+        wp_send_json_success([
+            'message' => 'Added to cart',
+            'cart_item_key' => $cart_item_key,
+            'cart_count' => WC()->cart->get_cart_contents_count(),
+            'cart_total' => WC()->cart->get_cart_total(),
+        ]);
+    } else {
+        wp_send_json_error(['message' => 'Could not add to cart'], 400);
+    }
+}
+
+/**
  * Shortcode styles
  */
 add_action('wp_head', 'skyyrose_shortcode_styles');
@@ -737,4 +838,76 @@ function skyyrose_shortcode_styles() {
     .ar-button{position:absolute;bottom:80px;right:20px;border-radius:25px;display:flex;align-items:center;gap:8px}
     .collection-signature{--accent:#D4AF37}.collection-black_rose{--accent:#722F37}.collection-love_hurts{--accent:#DC143C}
     </style>';
+}
+
+/**
+ * Get hex color value from color name (for product color swatches)
+ *
+ * @param string $color_name The color name
+ * @return string Hex color code
+ */
+function skyyrose_get_color_hex($color_name) {
+    $colors = array(
+        // SkyyRose Brand Colors
+        'rose gold'     => '#B76E79',
+        'rosegold'      => '#B76E79',
+        'gold'          => '#D4AF37',
+        'champagne'     => '#F7E7CE',
+        'obsidian'      => '#1A1A1A',
+        'black'         => '#000000',
+        'white'         => '#FFFFFF',
+
+        // Black Rose Collection
+        'crimson'       => '#DC143C',
+        'silver'        => '#C0C0C0',
+
+        // Love Hurts Collection
+        'rose'          => '#E91E63',
+        'pink'          => '#E91E63',
+        'burgundy'      => '#880E4F',
+        'purple'        => '#9B59B6',
+
+        // Signature Collection
+        'midnight'      => '#191970',
+        'navy'          => '#000080',
+
+        // Standard colors
+        'red'           => '#FF0000',
+        'blue'          => '#0000FF',
+        'green'         => '#008000',
+        'yellow'        => '#FFFF00',
+        'orange'        => '#FFA500',
+        'brown'         => '#8B4513',
+        'gray'          => '#808080',
+        'grey'          => '#808080',
+        'beige'         => '#F5F5DC',
+        'cream'         => '#FFFDD0',
+        'ivory'         => '#FFFFF0',
+        'tan'           => '#D2B48C',
+        'olive'         => '#808000',
+        'maroon'        => '#800000',
+        'coral'         => '#FF7F50',
+        'salmon'        => '#FA8072',
+        'teal'          => '#008080',
+        'turquoise'     => '#40E0D0',
+        'lavender'      => '#E6E6FA',
+        'mauve'         => '#E0B0FF',
+    );
+
+    $normalized = strtolower(trim($color_name));
+
+    return isset($colors[$normalized]) ? $colors[$normalized] : '#CCCCCC';
+}
+
+/**
+ * Localize scripts with nonce for WooCommerce AJAX
+ */
+add_action('wp_enqueue_scripts', 'skyyrose_localize_cart_scripts', 20);
+function skyyrose_localize_cart_scripts() {
+    if (is_product() || is_cart() || is_checkout()) {
+        wp_localize_script('skyyrose-immersive-style', 'skyyrose_ajax', array(
+            'ajax_url' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('skyyrose_add_to_cart'),
+        ));
+    }
 }
