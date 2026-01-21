@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOVE HURTS Collection | SkyyRose Virtual Castle</title>
+    <meta name="description" content="Enter the LOVE HURTS virtual castle - an immersive 3D throne room experience featuring SkyyRose's emotional expression collection">
+    
+    <!-- Import Maps for Three.js ES Modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <style>
+        /* SkyyRose LOVE HURTS Collection Theme */
+        :root {
+            --sr-deep-rose: #C41E3A;
+            --sr-burgundy: #722F37;
+            --sr-blush: #DE5D83;
+            --sr-wine: #4A0E1E;
+            --sr-gold: #D4AF37;
+            --sr-cream: #FFFDD0;
+            --sr-charcoal: #1A1A1A;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: var(--font-body);
+            background: var(--sr-wine);
+            color: #fff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--sr-wine) 0%, #2a0a12 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-logo {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-blush));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            14% { transform: scale(1.05); }
+            28% { transform: scale(1); }
+            42% { transform: scale(1.05); }
+            70% { transform: scale(1); }
+        }
+
+        .loading-subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--sr-blush);
+            margin-bottom: 3rem;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--sr-burgundy), var(--sr-deep-rose), var(--sr-blush));
+            transition: width 0.3s ease;
+        }
+
+        /* Canvas Container */
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+        }
+
+        canvas { display: block; }
+
+        /* Collection Title Overlay */
+        .collection-header {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .collection-name {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, #fff 0%, var(--sr-blush) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(196, 30, 58, 0.6);
+        }
+
+        .collection-tagline {
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--sr-blush);
+            margin-top: 0.5rem;
+        }
+
+        /* Heart-shaped Hotspots */
+        .hotspot {
+            position: absolute;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            pointer-events: auto;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+
+        .hotspot-inner {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--sr-deep-rose) 0%, transparent 70%);
+            border: 2px solid var(--sr-blush);
+            animation: heart-pulse 1.5s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+            clip-path: path('M22 8.5c0-6-5-9-10-4C7 0 2 3 2 8.5C2 15.5 12 22 12 22s10-6.5 10-13.5');
+            transform: scale(1.8);
+        }
+
+        .hotspot-inner::before {
+            content: '♡';
+            font-size: 1rem;
+            color: #fff;
+        }
+
+        @keyframes heart-pulse {
+            0%, 100% { 
+                transform: scale(1.8); 
+                filter: drop-shadow(0 0 5px rgba(196, 30, 58, 0.5));
+            }
+            50% { 
+                transform: scale(2); 
+                filter: drop-shadow(0 0 15px rgba(196, 30, 58, 0.8));
+            }
+        }
+
+        /* Product Card */
+        .product-card {
+            position: fixed;
+            right: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px;
+            background: linear-gradient(135deg, rgba(74,14,30,0.95) 0%, rgba(42,10,18,0.95) 100%);
+            border-left: 1px solid var(--sr-deep-rose);
+            padding: 2rem;
+            z-index: 200;
+            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+        }
+
+        .product-card.visible {
+            right: 0;
+        }
+
+        .product-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--sr-blush);
+            background: transparent;
+            color: var(--sr-blush);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .product-close:hover {
+            border-color: var(--sr-deep-rose);
+            color: #fff;
+            background: var(--sr-deep-rose);
+        }
+
+        .product-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-burgundy));
+            color: #fff;
+            font-size: 0.7rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, var(--sr-wine), #2a0a12);
+            border: 1px solid rgba(196, 30, 58, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 4rem;
+        }
+
+        .product-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            color: var(--sr-blush);
+            margin-bottom: 1rem;
+        }
+
+        .product-description {
+            font-size: 0.9rem;
+            color: rgba(255,255,255,0.8);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-cta {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-burgundy));
+            border: none;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .product-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(196, 30, 58, 0.5);
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(74, 14, 30, 0.8);
+            border: 1px solid var(--sr-blush);
+            color: var(--sr-blush);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--sr-deep-rose);
+            border-color: var(--sr-deep-rose);
+            color: #fff;
+        }
+
+        /* Family Tribute */
+        .family-tribute {
+            position: fixed;
+            top: 50%;
+            left: 2rem;
+            transform: translateY(-50%);
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+            font-family: var(--font-display);
+            font-size: 0.75rem;
+            letter-spacing: 0.3em;
+            color: var(--sr-blush);
+            opacity: 0.6;
+            z-index: 100;
+        }
+
+        /* Brand Logo */
+        .brand-logo {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            letter-spacing: 0.3em;
+            color: var(--sr-blush);
+            opacity: 0.6;
+            z-index: 100;
+        }
+
+        /* AR Button */
+        .ar-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            padding: 0.8rem 1.2rem;
+            background: rgba(74, 14, 30, 0.9);
+            border: 1px solid var(--sr-gold);
+            color: var(--sr-gold);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .ar-btn:hover {
+            background: var(--sr-gold);
+            color: var(--sr-wine);
+        }
+
+        /* Navigation Bar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 500;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(74, 14, 30, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(196, 30, 58, 0.2);
+        }
+
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--sr-blush), var(--sr-deep-rose));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--sr-cream);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--sr-blush);
+        }
+
+        .nav-links a.active {
+            color: var(--sr-blush);
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: var(--sr-cream);
+            text-decoration: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-icon:hover {
+            color: var(--sr-blush);
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: var(--sr-deep-rose);
+            color: #fff;
+            font-size: 0.6rem;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Shop Collection CTA */
+        .shop-cta {
+            position: fixed;
+            top: 50%;
+            right: 2rem;
+            transform: translateY(-50%);
+            z-index: 100;
+        }
+
+        .shop-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 1.5rem 1rem;
+            background: linear-gradient(135deg, var(--sr-deep-rose), var(--sr-burgundy));
+            border: none;
+            color: #fff;
+            font-family: var(--font-body);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        .shop-btn:hover {
+            background: linear-gradient(135deg, var(--sr-blush), var(--sr-deep-rose));
+            box-shadow: 0 0 30px rgba(196, 30, 58, 0.5);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .collection-name { font-size: 1.5rem; }
+            .product-card { width: 100%; right: -100%; }
+            .product-card.visible { right: 0; }
+            .nav-controls { flex-wrap: wrap; justify-content: center; }
+            .family-tribute { display: none; }
+            .navbar { padding: 1rem; }
+            .nav-links { display: none; }
+            .shop-cta { right: 1rem; }
+            .shop-btn { padding: 1rem 0.8rem; font-size: 0.6rem; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <a href="../homepage.html" class="nav-logo">SKYYROSE</a>
+        <ul class="nav-links">
+            <li><a href="black-rose.html">Black Rose</a></li>
+            <li><a href="love-hurts.html" class="active">Love Hurts</a></li>
+            <li><a href="signature.html">Signature</a></li>
+            <li><a href="../about.html">About</a></li>
+            <li><a href="../blog.html">Journal</a></li>
+        </ul>
+        <div class="nav-actions">
+            <span class="nav-icon">🔍</span>
+            <a href="../wishlist.html" class="nav-icon">♡</a>
+            <a href="../cart.html" class="nav-icon" style="position: relative;">
+                🛒
+                <span class="cart-count" id="cartCount">0</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- Shop Collection CTA -->
+    <div class="shop-cta">
+        <a href="../collections/love-hurts.html" class="shop-btn">
+            Shop Collection
+        </a>
+    </div>
+
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-logo">SKYYROSE</div>
+        <div class="loading-subtitle">Love Hurts Collection</div>
+        <div class="loading-progress">
+            <div class="loading-bar" id="loading-bar"></div>
+        </div>
+    </div>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Collection Header -->
+    <div class="collection-header">
+        <h1 class="collection-name">Love Hurts</h1>
+        <p class="collection-tagline">Honoring the Hurt Family Legacy</p>
+    </div>
+
+    <!-- Product Hotspots (positioned by JS) -->
+    <div id="hotspots-container"></div>
+
+    <!-- Product Card -->
+    <div class="product-card" id="product-card">
+        <button class="product-close" onclick="closeProductCard()">×</button>
+        <span class="product-badge" id="product-badge">Emotional Expression</span>
+        <div class="product-image" id="product-image">💔</div>
+        <h2 class="product-title" id="product-title">Heartbreak Hoodie</h2>
+        <p class="product-price" id="product-price">$165</p>
+        <p class="product-description" id="product-description">
+            A tribute piece featuring hand-stitched broken heart motif. 
+            Part of our LOVE HURTS collection honoring the Hurt family name.
+        </p>
+        <button class="product-cta" onclick="addToCart()">Add to Cart</button>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-controls">
+        <button class="nav-btn active" data-view="throne">Throne View</button>
+        <button class="nav-btn" data-view="altar">Heart Altar</button>
+        <button class="nav-btn" data-view="gallery">Gallery</button>
+    </div>
+
+    <!-- Family Tribute -->
+    <div class="family-tribute">THE HURT FAMILY LEGACY</div>
+
+    <!-- AR Button -->
+    <button class="ar-btn" onclick="activateAR()">
+        <span>💝</span> View in AR
+    </button>
+
+    <!-- Brand Logo -->
+    <div class="brand-logo">SKYYROSE</div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // ============================================
+        // SKYYROSE LOVE HURTS COLLECTION
+        // Virtual Castle Throne Room Experience
+        // ============================================
+
+        let scene, camera, renderer, controls, composer;
+        let hearts = [], candles = [], throne;
+        let clock = new THREE.Clock();
+        let hotspots3D = [];
+
+        // Product Data - Honoring the Hurt Family
+        const products = {
+            'heartbreak-hoodie': {
+                title: 'Heartbreak Hoodie',
+                price: '$165',
+                description: 'A tribute piece featuring hand-stitched broken heart motif. Premium French terry with vintage wash.',
+                badge: 'Family Tribute',
+                emoji: '💔',
+                position: new THREE.Vector3(-3, 1.5, 1)
+            },
+            'love-letter-jacket': {
+                title: 'Love Letter Jacket',
+                price: '$245',
+                description: 'Satin bomber with embroidered love letters from the Hurt family archives. Each piece tells a story.',
+                badge: 'Heritage Piece',
+                emoji: '💌',
+                position: new THREE.Vector3(3, 2, 0)
+            },
+            'bleeding-heart-tee': {
+                title: 'Bleeding Heart Tee',
+                price: '$85',
+                description: 'Oversized cotton tee with anatomical heart graphic. Water-based inks for a soft, worn feel.',
+                badge: 'Best Seller',
+                emoji: '❤️‍🩹',
+                position: new THREE.Vector3(0, 1.5, 3)
+            },
+            'thorns-of-love-pants': {
+                title: 'Thorns of Love Pants',
+                price: '$145',
+                description: 'Cargo pants with thorn embroidery down the seams. Heavy cotton twill with adjustable cuffs.',
+                badge: 'New Drop',
+                emoji: '🥀',
+                position: new THREE.Vector3(-2, 1, -2)
+            }
+        };
+
+        // Camera Views
+        const cameraViews = {
+            throne: { position: new THREE.Vector3(0, 3, 8), target: new THREE.Vector3(0, 2, 0) },
+            altar: { position: new THREE.Vector3(5, 2, 0), target: new THREE.Vector3(0, 2, 0) },
+            gallery: { position: new THREE.Vector3(-5, 4, 5), target: new THREE.Vector3(0, 1, 0) }
+        };
+
+        // Initialize
+        init();
+        animate();
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a0a10);
+            scene.fog = new THREE.FogExp2(0x1a0a10, 0.04);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                55,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                100
+            );
+            camera.position.copy(cameraViews.throne.position);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                powerPreference: 'high-performance'
+            });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.9;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.copy(cameraViews.throne.target);
+            controls.minDistance = 3;
+            controls.maxDistance = 15;
+            controls.maxPolarAngle = Math.PI / 1.8;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.2;
+
+            // Lighting
+            setupLighting();
+
+            // Create Scene Elements
+            createFloor();
+            createWalls();
+            createThrone();
+            createHeartAltar();
+            createFloatingHearts();
+            createCandles();
+            createHotspots();
+
+            // Post-processing with Bloom
+            setupPostProcessing();
+
+            // Events
+            window.addEventListener('resize', onWindowResize);
+            setupNavigation();
+
+            // Loading complete
+            simulateLoading();
+        }
+
+        function setupLighting() {
+            // Ambient - warm undertone
+            const ambient = new THREE.AmbientLight(0x2a1015, 0.4);
+            scene.add(ambient);
+
+            // Main spotlight on throne
+            const throneLight = new THREE.SpotLight(0xC41E3A, 3, 20, Math.PI / 6, 0.5);
+            throneLight.position.set(0, 10, 5);
+            throneLight.target.position.set(0, 2, -2);
+            throneLight.castShadow = true;
+            throneLight.shadow.mapSize.width = 1024;
+            throneLight.shadow.mapSize.height = 1024;
+            scene.add(throneLight);
+            scene.add(throneLight.target);
+
+            // Rose-colored accent lights
+            const accent1 = new THREE.PointLight(0xDE5D83, 1.5, 12);
+            accent1.position.set(-6, 4, -4);
+            scene.add(accent1);
+
+            const accent2 = new THREE.PointLight(0xDE5D83, 1.5, 12);
+            accent2.position.set(6, 4, -4);
+            scene.add(accent2);
+
+            // Gold rim light
+            const rimLight = new THREE.PointLight(0xD4AF37, 1, 15);
+            rimLight.position.set(0, 6, -8);
+            scene.add(rimLight);
+
+            // Hemisphere for subtle fill
+            const hemi = new THREE.HemisphereLight(0x2a1520, 0x0a0508, 0.3);
+            scene.add(hemi);
+        }
+
+        function createFloor() {
+            // Castle stone floor
+            const floorGeo = new THREE.PlaneGeometry(30, 30, 20, 20);
+            const floorMat = new THREE.MeshStandardMaterial({
+                color: 0x2a1a1a,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Carpet runner
+            const carpetGeo = new THREE.PlaneGeometry(3, 12);
+            const carpetMat = new THREE.MeshStandardMaterial({
+                color: 0x722F37,
+                roughness: 0.8
+            });
+            const carpet = new THREE.Mesh(carpetGeo, carpetMat);
+            carpet.rotation.x = -Math.PI / 2;
+            carpet.position.set(0, 0.01, 2);
+            scene.add(carpet);
+        }
+
+        function createWalls() {
+            const wallMat = new THREE.MeshStandardMaterial({
+                color: 0x1a0a10,
+                roughness: 0.95,
+                metalness: 0.05
+            });
+
+            // Back wall
+            const backWall = new THREE.Mesh(
+                new THREE.PlaneGeometry(30, 15),
+                wallMat
+            );
+            backWall.position.set(0, 7.5, -10);
+            scene.add(backWall);
+
+            // Side walls
+            const leftWall = new THREE.Mesh(
+                new THREE.PlaneGeometry(20, 15),
+                wallMat
+            );
+            leftWall.position.set(-10, 7.5, 0);
+            leftWall.rotation.y = Math.PI / 2;
+            scene.add(leftWall);
+
+            const rightWall = new THREE.Mesh(
+                new THREE.PlaneGeometry(20, 15),
+                wallMat
+            );
+            rightWall.position.set(10, 7.5, 0);
+            rightWall.rotation.y = -Math.PI / 2;
+            scene.add(rightWall);
+
+            // Gothic arches
+            createGothicArches();
+        }
+
+        function createGothicArches() {
+            const archPositions = [-6, -3, 3, 6];
+            
+            archPositions.forEach(x => {
+                // Arch columns
+                const columnGeo = new THREE.CylinderGeometry(0.3, 0.35, 8, 16);
+                const columnMat = new THREE.MeshStandardMaterial({
+                    color: 0x2a1a1a,
+                    roughness: 0.7,
+                    metalness: 0.2
+                });
+
+                const leftCol = new THREE.Mesh(columnGeo, columnMat);
+                leftCol.position.set(x - 1, 4, -9);
+                scene.add(leftCol);
+
+                const rightCol = new THREE.Mesh(columnGeo, columnMat);
+                rightCol.position.set(x + 1, 4, -9);
+                scene.add(rightCol);
+
+                // Arch top
+                const archGeo = new THREE.TorusGeometry(1, 0.15, 8, 16, Math.PI);
+                const arch = new THREE.Mesh(archGeo, columnMat);
+                arch.position.set(x, 8, -9);
+                arch.rotation.x = Math.PI / 2;
+                scene.add(arch);
+            });
+        }
+
+        function createThrone() {
+            throne = new THREE.Group();
+
+            // Throne seat
+            const seatGeo = new THREE.BoxGeometry(2, 0.3, 2);
+            const throneMat = new THREE.MeshStandardMaterial({
+                color: 0x722F37,
+                roughness: 0.4,
+                metalness: 0.3
+            });
+            const seat = new THREE.Mesh(seatGeo, throneMat);
+            seat.position.y = 1;
+            throne.add(seat);
+
+            // Throne back
+            const backGeo = new THREE.BoxGeometry(2.2, 4, 0.3);
+            const back = new THREE.Mesh(backGeo, throneMat);
+            back.position.set(0, 3, -0.85);
+            throne.add(back);
+
+            // Throne top ornament (heart shape made from spheres)
+            const heartTop = createHeartShape(0.5, 0xD4AF37);
+            heartTop.position.set(0, 5.2, -0.85);
+            throne.add(heartTop);
+
+            // Armrests
+            const armGeo = new THREE.BoxGeometry(0.3, 0.8, 1.8);
+            const leftArm = new THREE.Mesh(armGeo, throneMat);
+            leftArm.position.set(-1.1, 1.5, 0);
+            throne.add(leftArm);
+
+            const rightArm = new THREE.Mesh(armGeo, throneMat);
+            rightArm.position.set(1.1, 1.5, 0);
+            throne.add(rightArm);
+
+            // Gold trim
+            const trimMat = new THREE.MeshStandardMaterial({
+                color: 0xD4AF37,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+
+            const trimGeo = new THREE.TorusGeometry(0.08, 0.02, 8, 32);
+            for (let i = 0; i < 6; i++) {
+                const trim = new THREE.Mesh(trimGeo, trimMat);
+                trim.position.set(0, 1.5 + i * 0.6, -0.7);
+                trim.rotation.y = Math.PI / 2;
+                throne.add(trim);
+            }
+
+            throne.position.set(0, 0, -4);
+            throne.castShadow = true;
+            scene.add(throne);
+        }
+
+        function createHeartShape(size, color) {
+            const heartGroup = new THREE.Group();
+            const mat = new THREE.MeshStandardMaterial({
+                color: color,
+                roughness: 0.3,
+                metalness: 0.6
+            });
+
+            // Heart made from spheres and cone
+            const leftLobe = new THREE.Mesh(
+                new THREE.SphereGeometry(size * 0.6, 16, 16),
+                mat
+            );
+            leftLobe.position.set(-size * 0.35, size * 0.3, 0);
+            heartGroup.add(leftLobe);
+
+            const rightLobe = new THREE.Mesh(
+                new THREE.SphereGeometry(size * 0.6, 16, 16),
+                mat
+            );
+            rightLobe.position.set(size * 0.35, size * 0.3, 0);
+            heartGroup.add(rightLobe);
+
+            const bottom = new THREE.Mesh(
+                new THREE.ConeGeometry(size * 0.7, size, 16),
+                mat
+            );
+            bottom.position.set(0, -size * 0.3, 0);
+            bottom.rotation.z = Math.PI;
+            heartGroup.add(bottom);
+
+            return heartGroup;
+        }
+
+        function createHeartAltar() {
+            // Central altar with glowing heart
+            const altarBase = new THREE.Mesh(
+                new THREE.CylinderGeometry(1, 1.2, 0.5, 32),
+                new THREE.MeshStandardMaterial({
+                    color: 0x2a1a1a,
+                    roughness: 0.6,
+                    metalness: 0.3
+                })
+            );
+            altarBase.position.set(0, 0.25, 0);
+            scene.add(altarBase);
+
+            // Glowing heart on altar
+            const glowingHeart = createHeartShape(0.8, 0xC41E3A);
+            glowingHeart.position.set(0, 1.5, 0);
+            scene.add(glowingHeart);
+
+            // Heart glow
+            const glowGeo = new THREE.SphereGeometry(1.2, 32, 32);
+            const glowMat = new THREE.MeshBasicMaterial({
+                color: 0xC41E3A,
+                transparent: true,
+                opacity: 0.15
+            });
+            const glow = new THREE.Mesh(glowGeo, glowMat);
+            glow.position.set(0, 1.5, 0);
+            scene.add(glow);
+
+            // Point light from heart
+            const heartLight = new THREE.PointLight(0xC41E3A, 2, 8);
+            heartLight.position.set(0, 1.5, 0);
+            scene.add(heartLight);
+        }
+
+        function createFloatingHearts() {
+            const heartCount = 50;
+
+            for (let i = 0; i < heartCount; i++) {
+                const size = Math.random() * 0.2 + 0.1;
+                const colors = [0xC41E3A, 0xDE5D83, 0x722F37, 0xD4AF37];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+
+                const heart = createHeartShape(size, color);
+
+                // Random position in room
+                heart.position.set(
+                    (Math.random() - 0.5) * 16,
+                    Math.random() * 8 + 2,
+                    (Math.random() - 0.5) * 16
+                );
+
+                heart.userData.baseY = heart.position.y;
+                heart.userData.phase = Math.random() * Math.PI * 2;
+                heart.userData.speed = Math.random() * 0.5 + 0.5;
+                heart.userData.rotSpeed = (Math.random() - 0.5) * 0.02;
+
+                hearts.push(heart);
+                scene.add(heart);
+            }
+        }
+
+        function createCandles() {
+            const candlePositions = [
+                { x: -4, z: -3 },
+                { x: 4, z: -3 },
+                { x: -2, z: 2 },
+                { x: 2, z: 2 },
+                { x: -6, z: 0 },
+                { x: 6, z: 0 }
+            ];
+
+            candlePositions.forEach((pos, i) => {
+                const candleGroup = new THREE.Group();
+
+                // Candle stick
+                const stickGeo = new THREE.CylinderGeometry(0.15, 0.2, 1.5, 16);
+                const stickMat = new THREE.MeshStandardMaterial({
+                    color: 0xD4AF37,
+                    roughness: 0.3,
+                    metalness: 0.7
+                });
+                const stick = new THREE.Mesh(stickGeo, stickMat);
+                stick.position.y = 0.75;
+                candleGroup.add(stick);
+
+                // Candle
+                const candleGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.8, 16);
+                const candleMat = new THREE.MeshStandardMaterial({
+                    color: 0xFFF8DC,
+                    roughness: 0.9
+                });
+                const candle = new THREE.Mesh(candleGeo, candleMat);
+                candle.position.y = 1.9;
+                candleGroup.add(candle);
+
+                // Flame (emissive sphere)
+                const flameGeo = new THREE.SphereGeometry(0.06, 16, 16);
+                const flameMat = new THREE.MeshBasicMaterial({
+                    color: 0xFFAA00
+                });
+                const flame = new THREE.Mesh(flameGeo, flameMat);
+                flame.position.y = 2.4;
+                flame.userData.baseY = 2.4;
+                flame.userData.phase = i * 0.5;
+                candleGroup.add(flame);
+
+                // Candle light
+                const candleLight = new THREE.PointLight(0xFFAA00, 0.5, 4);
+                candleLight.position.y = 2.4;
+                candleGroup.add(candleLight);
+
+                candleGroup.position.set(pos.x, 0, pos.z);
+                candles.push({ group: candleGroup, flame, light: candleLight });
+                scene.add(candleGroup);
+            });
+        }
+
+        function createHotspots() {
+            Object.entries(products).forEach(([id, product]) => {
+                // 3D marker (heart-shaped glow)
+                const markerGeo = new THREE.SphereGeometry(0.15, 16, 16);
+                const markerMat = new THREE.MeshBasicMaterial({
+                    color: 0xDE5D83,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const marker = new THREE.Mesh(markerGeo, markerMat);
+                marker.position.copy(product.position);
+                marker.userData.productId = id;
+                scene.add(marker);
+                hotspots3D.push(marker);
+
+                // Pulsing ring
+                const ringGeo = new THREE.RingGeometry(0.2, 0.28, 32);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: 0xD4AF37,
+                    transparent: true,
+                    opacity: 0.5,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.position.copy(product.position);
+                ring.lookAt(camera.position);
+                scene.add(ring);
+            });
+        }
+
+        function setupPostProcessing() {
+            composer = new EffectComposer(renderer);
+
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                1.0,   // strength - higher for romantic glow
+                0.5,   // radius
+                0.3    // threshold
+            );
+            composer.addPass(bloomPass);
+
+            const outputPass = new OutputPass();
+            composer.addPass(outputPass);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = clock.getElapsedTime();
+
+            // Update controls
+            controls.update();
+
+            // Animate floating hearts
+            hearts.forEach(heart => {
+                heart.position.y = heart.userData.baseY + 
+                    Math.sin(time * heart.userData.speed + heart.userData.phase) * 0.3;
+                heart.rotation.y += heart.userData.rotSpeed;
+                heart.rotation.z = Math.sin(time + heart.userData.phase) * 0.1;
+            });
+
+            // Animate candle flames
+            candles.forEach((candle, i) => {
+                const flicker = Math.sin(time * 10 + candle.flame.userData.phase) * 0.02;
+                candle.flame.position.y = candle.flame.userData.baseY + flicker;
+                candle.flame.scale.setScalar(1 + Math.sin(time * 15 + i) * 0.1);
+                candle.light.intensity = 0.4 + Math.sin(time * 8 + i) * 0.15;
+            });
+
+            // Animate hotspots
+            hotspots3D.forEach((marker, i) => {
+                marker.scale.setScalar(1 + Math.sin(time * 2 + i) * 0.15);
+            });
+
+            // Gentle throne sway
+            if (throne) {
+                throne.rotation.y = Math.sin(time * 0.5) * 0.02;
+            }
+
+            // Render with post-processing
+            composer.render();
+
+            // Update 2D hotspot positions
+            updateHotspotPositions();
+        }
+
+        function updateHotspotPositions() {
+            const container = document.getElementById('hotspots-container');
+            container.innerHTML = '';
+
+            hotspots3D.forEach(marker => {
+                const screenPos = marker.position.clone().project(camera);
+                
+                if (screenPos.z < 1) {
+                    const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+
+                    const hotspot = document.createElement('div');
+                    hotspot.className = 'hotspot';
+                    hotspot.style.left = `${x}px`;
+                    hotspot.style.top = `${y}px`;
+                    hotspot.innerHTML = '<div class="hotspot-inner"></div>';
+                    hotspot.onclick = () => showProduct(marker.userData.productId);
+                    container.appendChild(hotspot);
+                }
+            });
+        }
+
+        function showProduct(productId) {
+            const product = products[productId];
+            if (!product) return;
+
+            document.getElementById('product-badge').textContent = product.badge;
+            document.getElementById('product-image').textContent = product.emoji;
+            document.getElementById('product-title').textContent = product.title;
+            document.getElementById('product-price').textContent = product.price;
+            document.getElementById('product-description').textContent = product.description;
+
+            document.getElementById('product-card').classList.add('visible');
+
+            // Animate camera to product
+            animateCameraTo(
+                product.position.clone().add(new THREE.Vector3(2, 1, 2)),
+                product.position
+            );
+        }
+
+        window.closeProductCard = function() {
+            document.getElementById('product-card').classList.remove('visible');
+        };
+
+        window.addToCart = function() {
+            const productTitle = document.getElementById('product-title').textContent;
+            const productPrice = document.getElementById('product-price').textContent;
+
+            let cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
+            cart.push({
+                name: productTitle,
+                price: productPrice,
+                collection: 'Love Hurts',
+                quantity: 1
+            });
+            localStorage.setItem('skyyrose_cart', JSON.stringify(cart));
+            updateCartCount();
+
+            alert(`${productTitle} added to cart!`);
+            closeProductCard();
+        };
+
+        // Initialize cart count
+        function updateCartCount() {
+            const cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
+            const countEl = document.getElementById('cartCount');
+            if (countEl) countEl.textContent = cart.length;
+        }
+        updateCartCount();
+
+        window.activateAR = function() {
+            alert('AR feature requires a compatible device. Try on mobile!');
+        };
+
+        function animateCameraTo(position, target) {
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const duration = 1200;
+            const startTime = Date.now();
+
+            function updateCamera() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                camera.position.lerpVectors(startPos, position, eased);
+                controls.target.lerpVectors(startTarget, target, eased);
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCamera);
+                }
+            }
+
+            controls.autoRotate = false;
+            updateCamera();
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const view = btn.dataset.view;
+                    const viewData = cameraViews[view];
+                    if (viewData) {
+                        animateCameraTo(viewData.position, viewData.target);
+                        
+                        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function simulateLoading() {
+            const loadingBar = document.getElementById('loading-bar');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 12;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').classList.add('hidden');
+                    }, 500);
+                }
+                loadingBar.style.width = `${progress}%`;
+            }, 100);
+        }
+    </script>
+</body>
+</html>

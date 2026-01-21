@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Us | SkyyRose</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --black-rose: #8B0000;
+            --love-hurts: #B76E79;
+            --signature-gold: #D4AF37;
+            --bg-dark: #0A0A0A;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            min-height: 100vh;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9999;
+        }
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--love-hurts), var(--signature-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            transition: color 0.3s ease;
+        }
+        .nav-links a:hover { color: var(--signature-gold); }
+        .page-header {
+            padding: 10rem 4rem 4rem;
+            text-align: center;
+            background: radial-gradient(ellipse at center, rgba(183, 110, 121, 0.1) 0%, transparent 70%);
+        }
+        .page-header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+        }
+        .page-header p {
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .contact-section {
+            padding: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+        }
+        .contact-info h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+            color: var(--signature-gold);
+        }
+        .contact-item {
+            display: flex;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .contact-icon {
+            font-size: 1.5rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .contact-item h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .contact-item p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+        .contact-form h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 2rem;
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--signature-gold);
+        }
+        .form-group textarea { min-height: 150px; resize: vertical; }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: linear-gradient(135deg, var(--black-rose), var(--love-hurts));
+            color: #fff;
+            border: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.3);
+        }
+        .faq-section {
+            padding: 6rem 4rem;
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .faq-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .faq-grid {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem 0;
+        }
+        .faq-item h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+            color: var(--love-hurts);
+        }
+        .faq-item p {
+            color: rgba(255, 255, 255, 0.6);
+            line-height: 1.8;
+        }
+        footer {
+            background: #050505;
+            padding: 3rem 4rem;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        footer p { color: rgba(255, 255, 255, 0.4); font-size: 0.85rem; }
+        @media (max-width: 768px) {
+            .contact-section { grid-template-columns: 1fr; }
+            .form-row { grid-template-columns: 1fr; }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="homepage.html" class="logo">SKYYROSE</a>
+        <ul class="nav-links">
+            <li><a href="experiences/black-rose.html">Black Rose</a></li>
+            <li><a href="experiences/love-hurts.html">Love Hurts</a></li>
+            <li><a href="experiences/signature.html">Signature</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="blog.html">Journal</a></li>
+        </ul>
+        <div class="nav-actions">
+            <span class="nav-icon">🔍</span>
+            <a href="wishlist.html" class="nav-icon">♡</a>
+            <a href="cart.html" class="nav-icon" style="position: relative;">🛒<span class="cart-count" id="cartCount">0</span></a>
+        </div>
+    </nav>
+
+    <header class="page-header">
+        <h1>Get in Touch</h1>
+        <p>We'd love to hear from you. Whether you have a question about our collections, need styling advice, or want to collaborate, our team is here to help.</p>
+    </header>
+
+    <section class="contact-section">
+        <div class="contact-info">
+            <h2>Contact Information</h2>
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div>
+                    <h3>Location</h3>
+                    <p>Oakland, California<br>By Appointment Only</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">✉️</div>
+                <div>
+                    <h3>Email</h3>
+                    <p>hello@skyyrose.co<br>press@skyyrose.co</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">📱</div>
+                <div>
+                    <h3>Social</h3>
+                    <p>@skyyrose on Instagram<br>@skyyrose on TikTok</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">⏰</div>
+                <div>
+                    <h3>Response Time</h3>
+                    <p>We typically respond within 24-48 hours during business days.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form">
+            <h2>Send Us a Message</h2>
+            <form id="contactForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>First Name</label>
+                        <input type="text" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Last Name</label>
+                        <input type="text" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" required>
+                </div>
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select required>
+                        <option value="">Select a topic</option>
+                        <option>Order Inquiry</option>
+                        <option>Product Question</option>
+                        <option>Styling Advice</option>
+                        <option>Collaboration</option>
+                        <option>Press & Media</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Message</label>
+                    <textarea placeholder="Tell us how we can help..." required></textarea>
+                </div>
+                <button type="submit" class="submit-btn">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <section class="faq-section">
+        <h2>Frequently Asked Questions</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>What is your shipping policy?</h3>
+                <p>We offer free standard shipping on all orders over $150. Standard shipping typically takes 5-7 business days. Express shipping options are available at checkout.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Can I return or exchange my order?</h3>
+                <p>Yes! We accept returns within 30 days of delivery for unworn items in original condition. Exchanges are always free. Pre-order items may have different policies.</p>
+            </div>
+            <div class="faq-item">
+                <h3>How do I find my size?</h3>
+                <p>Check our detailed Size Guide on each product page. We recommend measuring yourself and comparing to our size charts. When in between sizes, we suggest sizing up for a relaxed fit or down for a more fitted look.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Do you ship internationally?</h3>
+                <p>Yes, we ship worldwide! International shipping rates and delivery times vary by location. All duties and taxes are the responsibility of the customer.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Are your products limited edition?</h3>
+                <p>Many of our pieces are produced in limited quantities. Once they're gone, they're gone. Sign up for our newsletter to be notified of new drops and restocks.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <p>&copy; 2024 SkyyRose. All rights reserved.</p>
+    </footer>
+
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert('Thank you for your message! We\'ll get back to you within 24-48 hours.');
+            e.target.reset();
+        });
+    </script>
+</body>
+</html>
