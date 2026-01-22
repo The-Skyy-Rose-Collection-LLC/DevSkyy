@@ -57,7 +57,7 @@
                 "editor": "<p class='collection-badge'>COLLECTION 02</p>",
                 "align": "center",
                 "text_color": "#D4A5A5",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 12, "unit": "px"},
                 "typography_font_weight": "600",
                 "typography_letter_spacing": {"size": 3, "unit": "px"}
@@ -93,7 +93,7 @@
                 "header_size": "h2",
                 "align": "center",
                 "title_color": "#D4A5A5",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_style": "italic",
                 "typography_font_size": {"size": 24, "unit": "px"}
               }
@@ -109,10 +109,10 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='max-width: 700px; margin: 0 auto;'>Step into the castle where the enchanted rose blooms eternal under glass — the Hurts family name carrying Oakland generations. Beauty & the Beast for The Town: BART at 5am, dreams rising like the Bay Bridge through morning fog. Crimson velvet, gold filigree, candlelit vulnerability meeting streetwear rebellion. Each piece celebrates passion born from struggle, strength forged in Oakland's fire.</p>",
+                "editor": "<p style='max-width: 700px; margin: 0 auto;'>Step into the castle where the enchanted rose blooms eternal under glass. Beauty & the Beast meets streetwear rebellion. Crimson velvet, gold filigree, candlelit vulnerability — each piece a bold statement celebrating passion, strength, and the beauty in both.</p>",
                 "align": "center",
                 "text_color": "#E8D5D5",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 18, "unit": "px"},
                 "typography_line_height": {"size": 1.8, "unit": "em"}
               }
@@ -209,7 +209,7 @@
                 "editor": "<p>Explore the enchanted collection through interactive hotspots. Click each glowing rose to reveal exclusive pieces and pre-order upcoming designs.</p>",
                 "align": "center",
                 "text_color": "#D4A5A5",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 16, "unit": "px"},
                 "typography_line_height": {"size": 1.8, "unit": "em"}
               }
@@ -275,10 +275,10 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Where Beauty & the Beast meets The Town's streetwear rebellion. Each piece tells the Hurts family story — Oakland passion persisting through generations, resilience rising like the Bay Bridge from water.</p>",
+                "editor": "<p>Where gothic romance meets streetwear rebellion. Each piece tells a story of passion and resilience.</p>",
                 "align": "center",
                 "text_color": "#666666",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 16, "unit": "px"}
               }
             },
@@ -313,7 +313,7 @@
                 "align": "center",
                 "button_background_color": "#B76E79",
                 "button_text_color": "#FFFFFF",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_weight": "600",
                 "typography_letter_spacing": {"size": 1, "unit": "px"},
                 "_css_classes": "shimmer-rose"
@@ -388,10 +388,10 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='margin-bottom: 24px;'>In the castle's west wing, beneath a glass cloche, the enchanted rose blooms eternal — the Hurts family legacy from Oakland generations. Each crimson petal carries BART commutes at 5am, dreams rising through fog off the Bay Bridge. True beauty lies within those who persist: love transforms even the most wounded hearts, especially hearts forged in The Town's struggle.</p><p style='margin-bottom: 24px;'>LOVE HURTS celebrates Oakland's paradox: the vulnerability in strength, the beauty born from darkness, the rebellion in romance. Beauty & the Beast meets The Town — gothic luxury meets Bay Area streetwear edge. For those who know passion is worth the risk, and that Oakland builds crowns from thorns.</p><p style='font-style: italic; color: #D4A5A5;'>\"She warned him not to be deceived by appearances, for beauty is found within.\" — Every Hurts family generation understands this truth.</p>",
+                "editor": "<p style='margin-bottom: 24px;'>In the castle's west wing, beneath a glass cloche, the enchanted rose blooms eternal — each crimson petal a reminder that true beauty lies within, and that love can transform even the most wounded hearts.</p><p style='margin-bottom: 24px;'>LOVE HURTS celebrates this paradox: the vulnerability in strength, the beauty in darkness, the rebellion in romance. Gothic luxury meets streetwear edge — for those who know that passion is worth the risk.</p><p style='font-style: italic; color: #D4A5A5;'>\"She warned him not to be deceived by appearances, for beauty is found within.\"</p>",
                 "align": "center",
                 "text_color": "#E8D5D5",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 18, "unit": "px"},
                 "typography_line_height": {"size": 1.9, "unit": "em"}
               }
@@ -463,7 +463,7 @@
                 "align": "center",
                 "button_background_color": "#1A1A1A",
                 "button_text_color": "#C0C0C0",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_weight": "600"
               }
             },
@@ -484,7 +484,7 @@
                 "align": "center",
                 "button_background_color": "#1A1A1A",
                 "button_text_color": "#C9A962",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_weight": "600"
               }
             },

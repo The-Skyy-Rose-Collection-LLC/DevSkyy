@@ -44,7 +44,7 @@
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "The Town Meets<br>Timeless",
+                "title": "Where Love<br>Meets Luxury",
                 "size": "xxl",
                 "header_size": "h1",
                 "align": "left",
@@ -77,7 +77,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='max-width: 520px; font-family: var(--font-body); font-size: 18px; line-height: 1.7; color: #CCCCCC; letter-spacing: 0.5px;'>Born from The Town's grind — BART commutes at dawn, Bay Bridge rising through fog, dreams built in between. Three collections, one Oakland legacy. Step into immersive 3D worlds where fashion becomes family history.</p>",
+                "editor": "<p style='max-width: 520px; font-family: var(--font-body); font-size: 18px; line-height: 1.7; color: #CCCCCC; letter-spacing: 0.5px;'>Cinematic streetwear born from Oakland's heartbeat. Three distinct worlds, infinite stories. Step into immersive 3D experiences where fashion transcends fabric.</p>",
                 "_animation": "fadeInUp",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-4"
@@ -161,7 +161,7 @@
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "Three Collections, One Oakland Soul",
+                "title": "Immersive Collections",
                 "size": "xl",
                 "header_size": "h2",
                 "align": "center",
@@ -182,7 +182,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='max-width: 640px; margin: 24px auto 0; font-family: var(--font-body); font-size: 18px; line-height: 1.7; color: #6B6B6B; letter-spacing: 0.5px;'>From The Town's streets to global runways. Each collection is a fully realized world — Beauty & the Beast meets BART stations, noir elegance in fog-wrapped nights, art deco precision honoring day-one supporters. These aren't just clothes. They're Oakland made manifest.</p>",
+                "editor": "<p style='max-width: 640px; margin: 24px auto 0; font-family: var(--font-body); font-size: 18px; line-height: 1.7; color: #6B6B6B; letter-spacing: 0.5px;'>Step beyond clothing into cinematic experiences. Each collection is a fully realized world with its own aesthetic language, storytelling, and 3D immersive environment.</p>",
                 "align": "center",
                 "_animation": "fadeInUp",
                 "_animation_duration": "normal",
@@ -266,7 +266,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='font-family: var(--font-body); font-size: 20px; font-style: italic; color: #C0C0C0; margin-top: 12px; letter-spacing: 0.5px;'>Moonlit Garden • Silver Noir • The Town After Dark</p>",
+                "editor": "<p style='font-family: var(--font-body); font-size: 20px; font-style: italic; color: #C0C0C0; margin-top: 12px; letter-spacing: 0.5px;'>Moonlit Garden • Silver Noir • Obsidian Elegance</p>",
                 "_animation": "fadeInRight",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-3"
@@ -283,7 +283,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='font-family: var(--font-body); font-size: 17px; line-height: 1.8; color: #CCCCCC; letter-spacing: 0.3px; max-width: 480px;'>Oakland unfolds past midnight — fog rolling off the Bay, silver petals catching penthouse lights, obsidian paths through The Town's most exclusive spaces. Limited drops for those who move in silence. Dark elegance that speaks volumes without saying a word.</p>",
+                "editor": "<p style='font-family: var(--font-body); font-size: 17px; line-height: 1.8; color: #CCCCCC; letter-spacing: 0.3px; max-width: 480px;'>Enter the moonlit garden where silver petals float on obsidian winds. Limited edition gothic luxury meets modern streetwear. Exclusive pieces with mysterious allure and dark elegance.</p>",
                 "_animation": "fadeInUp",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-4"
@@ -345,7 +345,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p class='collection-badge' style='color: #B76E79; font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;'>Collection 02 • Enchanted × The Town</p>",
+                "editor": "<p class='collection-badge' style='color: #B76E79; font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;'>Collection 02 • Enchanted</p>",
                 "_animation": "fadeInLeft",
                 "_animation_duration": "fast",
                 "_css_classes": "stagger-1"
@@ -374,7 +374,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='font-family: var(--font-body); font-size: 20px; font-style: italic; color: #D4A5A5; margin-top: 12px; letter-spacing: 0.5px;'>Enchanted Rose • Crimson Petals • Beauty & the Beast Bay Area</p>",
+                "editor": "<p style='font-family: var(--font-body); font-size: 20px; font-style: italic; color: #D4A5A5; margin-top: 12px; letter-spacing: 0.5px;'>Glass Cloche • Crimson Petals • Gothic Romance</p>",
                 "_animation": "fadeInLeft",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-3"
@@ -391,7 +391,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='font-family: var(--font-body); font-size: 17px; line-height: 1.8; color: #E8C5C5; letter-spacing: 0.3px; max-width: 480px;'>The Hurts family name carries Oakland generations — BART at 5am, dreams rising like the Bay Bridge from water. Beauty & the Beast for The Town: the enchanted rose under glass, gold filigree meeting streetwear rebellion. Passion persists through struggle. That's the Oakland way.</p>",
+                "editor": "<p style='font-family: var(--font-body); font-size: 17px; line-height: 1.8; color: #E8C5C5; letter-spacing: 0.3px; max-width: 480px;'>Step into the castle where the enchanted rose blooms eternal under glass. Beauty & the Beast meets streetwear rebellion. Crimson velvet, gold filigree, candlelit vulnerability — bold statements celebrating passion and strength.</p>",
                 "_animation": "fadeInUp",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-4"
@@ -493,7 +493,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p class='collection-badge' style='color: #C9A962; font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;'>Collection 03 • Day-One Oakland</p>",
+                "editor": "<p class='collection-badge' style='color: #C9A962; font-family: var(--font-body); font-size: 12px; font-weight: 700; letter-spacing: 4px; text-transform: uppercase;'>Collection 03</p>",
                 "_animation": "fadeInRight",
                 "_animation_duration": "fast",
                 "_css_classes": "stagger-1"
@@ -522,7 +522,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='font-family: var(--font-body); font-size: 20px; font-style: italic; color: #C9A962; margin-top: 12px; letter-spacing: 0.5px;'>Art Deco • Geometric Gold • Day-One Oakland</p>",
+                "editor": "<p style='font-family: var(--font-body); font-size: 20px; font-style: italic; color: #C9A962; margin-top: 12px; letter-spacing: 0.5px;'>Art Deco • Geometric Gold • Refined Minimalism</p>",
                 "_animation": "fadeInRight",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-3"
@@ -539,7 +539,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='font-family: var(--font-body); font-size: 17px; line-height: 1.8; color: #6B6B6B; letter-spacing: 0.3px; max-width: 480px;'>The Town to Fillmore to Silicon Valley — SIGNATURE honors our day-one supporters. Golden hour on the Bay Bridge, geometric skylines, art deco precision. Premium streetwear fundamentals with Oakland foundation. The Bay sets standards; we exceed them.</p>",
+                "editor": "<p style='font-family: var(--font-body); font-size: 17px; line-height: 1.8; color: #6B6B6B; letter-spacing: 0.3px; max-width: 480px;'>Walk the runway where geometric gold meets Oakland craftsmanship. Premium luxury streetwear fundamentals with art deco precision. Every piece is a statement of refined elegance and timeless design.</p>",
                 "_animation": "fadeInUp",
                 "_animation_duration": "normal",
                 "_css_classes": "stagger-4"
@@ -618,7 +618,7 @@
               "elType": "widget",
               "widgetType": "heading",
               "settings": {
-                "title": "Oakland Built —<br>World Recognized",
+                "title": "Born from Oakland's streets —<br>evolved for the world.",
                 "size": "large",
                 "header_size": "h2",
                 "align": "center",
@@ -646,7 +646,7 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='max-width: 800px; margin: 0 auto; font-family: var(--font-body); font-size: 20px; line-height: 1.8; color: #CCCCCC; letter-spacing: 0.5px;'>SkyyRose isn't just fashion — it's The Town's heartbeat made wearable. Born from BART commutes and Bay Bridge sunrises, grown through Oakland hustle and Silicon Valley ambition. Each collection tells our family's story: Beauty & the Beast for the Hurts legacy, noir elegance for The Town after dark, art deco precision for our foundation. We blend immersive 3D experiences with Oakland-born luxury because we know: real rebels wear crowns.</p>",
+                "editor": "<p style='max-width: 800px; margin: 0 auto; font-family: var(--font-body); font-size: 20px; line-height: 1.8; color: #CCCCCC; letter-spacing: 0.5px;'>SkyyRose is more than fashion. It's a movement. Each collection tells a story of identity, resilience, and luxury. We blend cinematic 3D experiences with Oakland-born streetwear to create immersive worlds you can wear.</p>",
                 "align": "center",
                 "_animation": "fadeInUp",
                 "_animation_duration": "normal",
