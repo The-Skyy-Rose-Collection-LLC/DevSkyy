@@ -77,7 +77,7 @@ from collections.abc import Callable
 from functools import wraps
 from typing import ParamSpec, TypeVar
 
-from logging_utils import (
+from utils.logging_utils import (
     configure_logging,
     get_correlation_id,
     get_logger,
@@ -86,9 +86,9 @@ from logging_utils import (
     log_error,
     set_correlation_id,
 )
-from rate_limiting import check_rate_limit, get_rate_limit_stats
-from request_deduplication import deduplicate_request, get_deduplication_stats
-from security_utils import (
+from utils.rate_limiting import check_rate_limit, get_rate_limit_stats
+from utils.request_deduplication import deduplicate_request, get_deduplication_stats
+from utils.security_utils import (
     SecurityError,
     sanitize_file_types,
     sanitize_path,
