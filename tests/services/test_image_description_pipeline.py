@@ -99,26 +99,35 @@ class TestVisionModelClient:
 
     @pytest.mark.asyncio
     async def test_model_endpoints_defined(self) -> None:
-        """Should have all model endpoints defined."""
+        """Should have all Replicate model endpoints defined."""
         client = VisionModelClient()
 
-        assert VisionModel.LLAVA_34B in client.MODEL_ENDPOINTS
-        assert VisionModel.LLAVA_13B in client.MODEL_ENDPOINTS
-        assert VisionModel.BLIP2 in client.MODEL_ENDPOINTS
+        # Replicate endpoints
+        assert VisionModel.LLAVA_34B in client.REPLICATE_ENDPOINTS
+        assert VisionModel.LLAVA_13B in client.REPLICATE_ENDPOINTS
+        assert VisionModel.BLIP2 in client.REPLICATE_ENDPOINTS
 
     @pytest.mark.asyncio
-    async def test_generate_unknown_model(self) -> None:
-        """Should raise error for unknown model."""
+    async def test_generate_unknown_replicate_model(self) -> None:
+        """Should raise error for unknown Replicate model."""
         client = VisionModelClient()
 
-        # Mock the _get_client method
-        client._get_client = AsyncMock()
+        # Mock the _get_replicate_client method
+        client._get_replicate_client = AsyncMock()
 
-        with pytest.raises(ValueError, match="Unknown model"):
-            # Create a fake model value
+        with pytest.raises(ValueError, match="Unknown Replicate model"):
+            # Create a fake Replicate model value
             fake_model = MagicMock()
-            fake_model.value = "fake-model"
+            fake_model.value = "fake-replicate-model"
+            fake_model.is_gemini = MagicMock(return_value=False)
             await client.generate(fake_model, "https://example.com/img.jpg", "prompt")
+
+    def test_gemini_model_detection(self) -> None:
+        """Test that Gemini models are correctly detected."""
+        assert VisionModel.GEMINI_FLASH.is_gemini() is True
+        assert VisionModel.GEMINI_PRO.is_gemini() is True
+        assert VisionModel.LLAVA_34B.is_gemini() is False
+        assert VisionModel.BLIP2.is_gemini() is False
 
 
 # =============================================================================

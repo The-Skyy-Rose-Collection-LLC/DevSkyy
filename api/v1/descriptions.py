@@ -133,13 +133,13 @@ async def generate_quick_description(
 ) -> DescriptionOutput:
     """Quick description generation with minimal parameters.
 
-    Simplified endpoint for fast description generation using query parameters.
+    Simplified endpoint using Gemini Flash (no rate limiting issues).
     """
     request = DescriptionRequest(
         image_url=image_url,
         product_type=product_type,
         style=style,
-        model=VisionModel.LLAVA_13B,  # Use faster model
+        model=VisionModel.GEMINI_FLASH,  # Use Gemini (no rate limits)
         target_word_count=100,  # Shorter target
     )
 
@@ -221,31 +221,60 @@ async def list_models(
     """List available vision models.
 
     Returns available models with their characteristics.
+    Gemini models recommended (no rate limiting issues).
     """
     return [
+        # Gemini models (RECOMMENDED)
+        {
+            "id": VisionModel.GEMINI_PRO.value,
+            "name": "Gemini Pro 2.5",
+            "description": "Most capable, best quality analysis (RECOMMENDED)",
+            "provider": "google",
+            "speed": "medium",
+            "quality": "highest",
+            "rate_limited": False,
+            "recommended_for": ["full descriptions", "luxury content", "detailed analysis"],
+        },
+        {
+            "id": VisionModel.GEMINI_FLASH.value,
+            "name": "Gemini Flash 2.5",
+            "description": "Fast and reliable, excellent quality (RECOMMENDED)",
+            "provider": "google",
+            "speed": "fast",
+            "quality": "high",
+            "rate_limited": False,
+            "recommended_for": ["quick descriptions", "batch processing", "high volume"],
+        },
+        # Replicate models (may have rate limits)
         {
             "id": VisionModel.LLAVA_34B.value,
             "name": "LLaVA 34B",
-            "description": "Highest quality, best for detailed descriptions",
+            "description": "High quality (Replicate - may have rate limits)",
+            "provider": "replicate",
             "speed": "slow",
             "quality": "highest",
-            "recommended_for": ["full descriptions", "luxury content", "detailed analysis"],
+            "rate_limited": True,
+            "recommended_for": ["full descriptions", "luxury content"],
         },
         {
             "id": VisionModel.LLAVA_13B.value,
             "name": "LLaVA 13B",
-            "description": "Good balance of speed and quality",
+            "description": "Good balance (Replicate - may have rate limits)",
+            "provider": "replicate",
             "speed": "medium",
             "quality": "high",
-            "recommended_for": ["quick descriptions", "batch processing", "feature extraction"],
+            "rate_limited": True,
+            "recommended_for": ["quick descriptions", "feature extraction"],
         },
         {
             "id": VisionModel.BLIP2.value,
             "name": "BLIP-2",
-            "description": "Fast fallback model",
+            "description": "Fast fallback (Replicate - may have rate limits)",
+            "provider": "replicate",
             "speed": "fast",
             "quality": "good",
-            "recommended_for": ["fallback", "basic captions", "high volume"],
+            "rate_limited": True,
+            "recommended_for": ["fallback", "basic captions"],
         },
     ]
 
@@ -300,20 +329,30 @@ async def health_check(
     """Check health of description service.
 
     Returns status of vision models and service availability.
+    Prioritizes Gemini models (recommended, no rate limits).
     """
-    # Check primary model
-    primary_ok = await vision_client.health_check(VisionModel.LLAVA_34B)
-    fallback_ok = await vision_client.health_check(VisionModel.BLIP2)
+    # Check Gemini models (primary - no rate limits)
+    gemini_flash_ok = await vision_client.health_check(VisionModel.GEMINI_FLASH)
+    gemini_pro_ok = await vision_client.health_check(VisionModel.GEMINI_PRO)
+
+    # Check Replicate models (fallback)
+    llava_ok = await vision_client.health_check(VisionModel.LLAVA_34B)
+
+    # Service is healthy if Gemini is available
+    is_healthy = gemini_flash_ok or gemini_pro_ok or llava_ok
 
     return {
-        "status": "healthy" if (primary_ok or fallback_ok) else "degraded",
+        "status": "healthy" if is_healthy else "degraded",
+        "recommended_provider": "gemini" if (gemini_flash_ok or gemini_pro_ok) else "replicate",
         "models": {
-            "llava_34b": "available" if primary_ok else "unavailable",
-            "llava_13b": "not_checked",
-            "blip2": "available" if fallback_ok else "unavailable",
+            # Gemini (recommended)
+            "gemini_flash": "available" if gemini_flash_ok else "unavailable",
+            "gemini_pro": "available" if gemini_pro_ok else "unavailable",
+            # Replicate (may be rate limited)
+            "llava_34b": "available" if llava_ok else "unavailable",
         },
         "service": "descriptions",
-        "version": "1.0.0",
+        "version": "1.1.0",  # Updated with Gemini support
     }
 
 

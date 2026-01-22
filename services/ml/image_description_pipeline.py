@@ -46,36 +46,57 @@ logger = logging.getLogger(__name__)
 
 
 class VisionModelClient:
-    """Client for calling vision models via Replicate."""
+    """Client for calling vision models via Replicate or Gemini.
+
+    Supports automatic fallback from rate-limited Replicate to Gemini.
+    """
 
     # Model endpoints on Replicate
-    MODEL_ENDPOINTS = {
+    REPLICATE_ENDPOINTS = {
         VisionModel.LLAVA_34B: "yorickvp/llava-v1.6-34b:41ecfbfb261e6c1adf3ad896c9066ca98346996d7c4045c5bc944a79d430f174",
         VisionModel.LLAVA_13B: "yorickvp/llava-13b:b5f6212d032508382d61ff00469ddce3f3ed7ee5ad76f7be1c8b0a6c9c5db2e4",
         VisionModel.BLIP2: "salesforce/blip:2e1dddc8621f72155f24cf2e0adbde548458d3cab9f00c0139eea840d0ac4746",
     }
 
-    def __init__(self, replicate_api_token: str | None = None) -> None:
+    def __init__(
+        self,
+        replicate_api_token: str | None = None,
+        google_api_key: str | None = None,
+    ) -> None:
         """Initialize vision model client.
 
         Args:
             replicate_api_token: Replicate API token (uses env var if not provided)
+            google_api_key: Google AI API key for Gemini (uses env var if not provided)
         """
-        self._api_token = replicate_api_token
-        self._client: Any = None
+        self._replicate_token = replicate_api_token
+        self._google_api_key = google_api_key
+        self._replicate_client: Any = None
+        self._gemini_client: Any = None
 
-    async def _get_client(self) -> Any:
+    async def _get_replicate_client(self) -> Any:
         """Get or create Replicate client."""
-        if self._client is None:
+        if self._replicate_client is None:
             try:
                 import replicate
 
-                self._client = replicate
+                self._replicate_client = replicate
             except ImportError as e:
                 raise ImportError(
                     "replicate package required. Install with: pip install replicate"
                 ) from e
-        return self._client
+        return self._replicate_client
+
+    async def _get_gemini_client(self) -> Any:
+        """Get or create Gemini client."""
+        if self._gemini_client is None:
+            from services.ml.gemini_client import GeminiClient, GeminiConfig
+
+            config = GeminiConfig()
+            if self._google_api_key:
+                config.api_key = self._google_api_key
+            self._gemini_client = GeminiClient(config)
+        return self._gemini_client
 
     async def generate(
         self,
@@ -88,6 +109,9 @@ class VisionModelClient:
     ) -> str:
         """Generate text from image using vision model.
 
+        Supports both Replicate and Gemini models. Gemini models are
+        recommended to avoid Replicate rate limiting.
+
         Args:
             model: Vision model to use
             image_url: URL of image to analyze
@@ -98,11 +122,64 @@ class VisionModelClient:
         Returns:
             Generated text response
         """
-        client = await self._get_client()
+        # Route to appropriate provider
+        if model.is_gemini():
+            return await self._generate_gemini(
+                model, image_url, prompt, max_tokens, temperature
+            )
+        else:
+            return await self._generate_replicate(
+                model, image_url, prompt, max_tokens, temperature
+            )
 
-        model_version = self.MODEL_ENDPOINTS.get(model)
+    async def _generate_gemini(
+        self,
+        model: VisionModel,
+        image_url: str,
+        prompt: str,
+        max_tokens: int,
+        temperature: float,
+    ) -> str:
+        """Generate using Gemini vision model."""
+        from services.ml.gemini_client import GeminiModel
+
+        client = await self._get_gemini_client()
+
+        # Map VisionModel to GeminiModel
+        gemini_model = (
+            GeminiModel.GEMINI_PRO
+            if model == VisionModel.GEMINI_PRO
+            else GeminiModel.FLASH_2_5
+        )
+
+        try:
+            response = await client.analyze_image(
+                image_url,
+                prompt,
+                model=gemini_model,
+                max_tokens=max_tokens,
+                temperature=temperature,
+            )
+            return response.text
+
+        except Exception as e:
+            logger.error(f"Gemini vision model error: {e}")
+            raise
+
+    async def _generate_replicate(
+        self,
+        model: VisionModel,
+        image_url: str,
+        prompt: str,
+        max_tokens: int,
+        temperature: float,
+    ) -> str:
+        """Generate using Replicate vision model."""
+        client = await self._get_replicate_client()
+
+        model_version = self.REPLICATE_ENDPOINTS.get(model)
         if not model_version:
-            raise ValueError(f"Unknown model: {model}")
+            raise ValueError(f"Unknown Replicate model: {model}")
 
         try:
             # Run model with image and prompt
@@ -123,7 +200,7 @@ class VisionModelClient:
             return str(output)
 
         except Exception as e:
-            logger.error(f"Vision model error: {e}")
+            logger.error(f"Replicate vision model error: {e}")
             raise
 
     async def health_check(self, model: VisionModel) -> bool:
@@ -135,9 +212,25 @@ class VisionModelClient:
         Returns:
             True if model is available
         """
+        if model.is_gemini():
+            return await self._health_check_gemini()
+        else:
+            return await self._health_check_replicate(model)
+
+    async def _health_check_gemini(self) -> bool:
+        """Check Gemini availability."""
         try:
-            client = await self._get_client()
-            model_version = self.MODEL_ENDPOINTS.get(model)
+            client = await self._get_gemini_client()
+            result = await client.health_check()
+            return result.get("status") == "healthy"
+        except Exception:
+            return False
+
+    async def _health_check_replicate(self, model: VisionModel) -> bool:
+        """Check Replicate model availability."""
+        try:
+            client = await self._get_replicate_client()
+            model_version = self.REPLICATE_ENDPOINTS.get(model)
             if not model_version:
                 return False
 
@@ -160,14 +253,14 @@ class ImageDescriptionPipeline:
     def __init__(
         self,
         vision_client: VisionModelClient | None = None,
-        default_model: VisionModel = VisionModel.LLAVA_34B,
-        fallback_model: VisionModel = VisionModel.BLIP2,
+        default_model: VisionModel = VisionModel.GEMINI_FLASH,
+        fallback_model: VisionModel = VisionModel.GEMINI_PRO,
     ) -> None:
         """Initialize pipeline.
 
         Args:
             vision_client: Vision model client (creates default if not provided)
-            default_model: Primary model to use
+            default_model: Primary model to use (Gemini recommended to avoid rate limits)
             fallback_model: Fallback model if primary fails
         """
         self._vision_client = vision_client or VisionModelClient()
