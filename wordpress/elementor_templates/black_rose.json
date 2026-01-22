@@ -49,7 +49,7 @@
                 "editor": "<p class='collection-badge'>COLLECTION 01</p>",
                 "align": "center",
                 "text_color": "#C0C0C0",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 12, "unit": "px"},
                 "typography_font_weight": "600",
                 "typography_letter_spacing": {"size": 3, "unit": "px"}
@@ -85,7 +85,7 @@
                 "header_size": "h2",
                 "align": "center",
                 "title_color": "#C0C0C0",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_style": "italic",
                 "typography_font_size": {"size": 24, "unit": "px"}
               }
@@ -101,10 +101,10 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='max-width: 700px; margin: 0 auto;'>The Town after dark — fog rolling off the Bay, penthouse views over Oakland's glowing grid, silver light catching obsidian pathways. This is noir editorial from the city that moves in silence. Gothic luxury meets Bay Area mystique: exclusive pieces for those who know darkness isn't empty, it's Oakland building empires while others sleep.</p>",
+                "editor": "<p style='max-width: 700px; margin: 0 auto;'>Enter the moonlit garden where silver petals float on midnight air and obsidian pathways wind through shadows. Noir editorial meets gothic luxury — exclusive pieces for those who find beauty in mystery and strength in darkness.</p>",
                 "align": "center",
                 "text_color": "#D0D0D0",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 18, "unit": "px"},
                 "typography_line_height": {"size": 1.8, "unit": "em"}
               }
@@ -202,7 +202,7 @@
                 "editor": "<p>Navigate the obsidian pathways through interactive hotspots. Click each shimmering node to discover exclusive pieces and pre-order upcoming noir designs.</p>",
                 "align": "center",
                 "text_color": "#C0C0C0",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 16, "unit": "px"},
                 "typography_line_height": {"size": 1.8, "unit": "em"}
               }
@@ -268,10 +268,10 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p>Limited edition pieces crafted with obsidian elegance — The Town after dark, where fog meets penthouse glass and Oakland's elite move through shadows with purpose. Cosmic mystery born from Bay Area noir.</p>",
+                "editor": "<p>Limited edition pieces crafted with obsidian elegance and cosmic mystery.</p>",
                 "align": "center",
                 "text_color": "#666666",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 16, "unit": "px"}
               }
             },
@@ -306,7 +306,7 @@
                 "align": "center",
                 "button_background_color": "#C0C0C0",
                 "button_text_color": "#0D0D0D",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_weight": "600",
                 "typography_letter_spacing": {"size": 1, "unit": "px"},
                 "_css_classes": "shimmer-silver"
@@ -382,10 +382,10 @@
               "elType": "widget",
               "widgetType": "text-editor",
               "settings": {
-                "editor": "<p style='margin-bottom: 24px;'>Past midnight in Oakland, where Bay fog catches city light and obsidian pathways wind through penthouse districts. BLACK ROSE pieces exist as rare artifacts from The Town after dark — when silicon meets street wisdom, when fog blankets ambition, when Oakland builds in silence what others announce in daylight.</p><p style='margin-bottom: 24px;'>This is noir editorial meets Bay Area gothic luxury. Exclusive designs for Oakland's elite who understand: true sophistication lives in mystery, strength emerges from fog-wrapped determination, and beauty flourishes in the shadows between the Port and the Piedmont hills.</p><p style='font-style: italic; color: #A0A0A0;'>Limited edition. Crafted for The Town's exclusive few who move in silence and strike with precision.</p>",
+                "editor": "<p style='margin-bottom: 24px;'>Past midnight in the secret garden, where silver petals catch starlight and obsidian pathways wind through eternal shadow, BLACK ROSE pieces exist as rare artifacts of dark elegance.</p><p style='margin-bottom: 24px;'>This is noir editorial meets gothic luxury — exclusive designs for those who understand that true sophistication lives in mystery, that strength emerges from darkness, and that beauty flourishes in the shadows.</p><p style='font-style: italic; color: #A0A0A0;'>Limited edition. Crafted for the exclusive few.</p>",
                 "align": "center",
                 "text_color": "#D0D0D0",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_size": {"size": 18, "unit": "px"},
                 "typography_line_height": {"size": 1.9, "unit": "em"}
               }
@@ -456,7 +456,7 @@
                 "align": "center",
                 "button_background_color": "#0D0D0D",
                 "button_text_color": "#B76E79",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_weight": "600"
               }
             },
@@ -477,7 +477,7 @@
                 "align": "center",
                 "button_background_color": "#0D0D0D",
                 "button_text_color": "#C9A962",
-                "typography_font_family": "Outfit",
+                "typography_font_family": "Inter",
                 "typography_font_weight": "600"
               }
             },
