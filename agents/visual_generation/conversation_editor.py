@@ -18,8 +18,6 @@ Version: 1.0.0
 from __future__ import annotations
 
 import asyncio
-import base64
-import io
 import logging
 import uuid
 from dataclasses import dataclass, field

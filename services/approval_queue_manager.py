@@ -17,7 +17,6 @@ Version: 1.0.0
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
 from typing import Any

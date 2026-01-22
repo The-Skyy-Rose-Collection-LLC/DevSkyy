@@ -166,6 +166,30 @@ async def lifespan(app: FastAPI):
     # Get environment early so it's available throughout lifespan
     environment = os.getenv("ENVIRONMENT", "development")
 
+    # SECURITY: Validate production environment configuration
+    # Prevent dangerous settings from being enabled in production
+    if environment == "production":
+        dev_mode = os.getenv("DEVSKYY_DEV_MODE", "").lower() == "true"
+        if dev_mode:
+            log.critical(
+                "SECURITY_VIOLATION: DEVSKYY_DEV_MODE is enabled in production!",
+                environment=environment,
+                dev_mode_enabled=True,
+            )
+            raise RuntimeError(
+                "SECURITY: Cannot enable DEVSKYY_DEV_MODE in production environment. "
+                "This is a critical security violation. Remove DEVSKYY_DEV_MODE or "
+                "set ENVIRONMENT to a non-production value."
+            )
+
+        # Warn if JWT secrets are using defaults (only check format, not actual values)
+        jwt_secret = os.getenv("JWT_SECRET_KEY", "")
+        if not jwt_secret or len(jwt_secret) < 32:
+            log.error(
+                "SECURITY_WARNING: JWT_SECRET_KEY not properly configured for production",
+                secret_length=len(jwt_secret) if jwt_secret else 0,
+            )
+
     # Initialize Sentry with user-provided DSN (SECURITY: no hardcoded default)
     sentry_dsn = os.getenv("SENTRY_DSN")
     if sentry_dsn:

@@ -6,23 +6,20 @@ Implements US-013: Brand asset ingestion for training.
 Author: DevSkyy Platform Team
 """
 
-import pytest
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from api.v1.brand_assets import (
-    router,
-    BrandAssetCategory,
     AssetApprovalStatus,
-    IngestionJobStatus,
-    TrainingReadinessStatus,
+    BrandAssetCategory,
     _brand_assets,
     _ingestion_jobs,
+    router,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -432,7 +429,7 @@ class TestStatistics:
 
     def test_stats_with_data(self, client: TestClient) -> None:
         """Should return accurate statistics."""
-        from api.v1.brand_assets import BrandAsset, VisualFeatures, ColorPalette
+        from api.v1.brand_assets import BrandAsset, ColorPalette, VisualFeatures
 
         # Create assets with different categories and statuses
         for i, cat in enumerate([

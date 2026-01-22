@@ -7,10 +7,8 @@ Tests for session management, conversation history, and client lifecycle.
 
 from __future__ import annotations
 
-import asyncio
 import base64
 import io
-import uuid
 from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
@@ -28,7 +26,6 @@ from agents.visual_generation.conversation_editor import (
     GeneratedImage,
 )
 from errors.production_errors import DevSkyError
-
 
 # =============================================================================
 # Fixtures

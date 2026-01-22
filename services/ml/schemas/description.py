@@ -16,7 +16,6 @@ from uuid import uuid4
 
 from pydantic import BaseModel, Field, HttpUrl
 
-
 # =============================================================================
 # Enums
 # =============================================================================
@@ -77,9 +76,7 @@ class DescriptionRequest(BaseModel):
     product_name: str | None = Field(None, description="Product name if known")
     product_type: ProductType = Field(ProductType.APPAREL, description="Type of product")
     style: DescriptionStyle = Field(DescriptionStyle.LUXURY, description="Writing style")
-    brand_context: str | None = Field(
-        None, description="Brand-specific context to include"
-    )
+    brand_context: str | None = Field(None, description="Brand-specific context to include")
     target_word_count: int = Field(150, ge=50, le=500, description="Target word count")
     include_seo: bool = Field(True, description="Generate SEO content")
     include_bullets: bool = Field(True, description="Generate bullet points")
@@ -94,9 +91,7 @@ class BatchDescriptionRequest(BaseModel):
     requests: list[DescriptionRequest] = Field(
         ..., min_length=1, max_length=50, description="Images to process"
     )
-    callback_url: str | None = Field(
-        None, description="Webhook URL for completion notification"
-    )
+    callback_url: str | None = Field(None, description="Webhook URL for completion notification")
 
 
 class FeatureExtractionRequest(BaseModel):
@@ -121,9 +116,7 @@ class ColorInfo(BaseModel):
     name: str = Field(..., description="Color name (e.g., 'charcoal black')")
     hex: str | None = Field(None, description="Hex code if determinable")
     category: str = Field(..., description="Color category (neutral, warm, cool)")
-    prominence: float = Field(
-        0.0, ge=0.0, le=1.0, description="How prominent in image (0-1)"
-    )
+    prominence: float = Field(0.0, ge=0.0, le=1.0, description="How prominent in image (0-1)")
 
 
 class MaterialInfo(BaseModel):
@@ -141,12 +134,8 @@ class StyleAttributes(BaseModel):
 
     aesthetic: str = Field(..., description="Overall aesthetic (minimalist, bold, etc.)")
     mood: str = Field(..., description="Mood conveyed (sophisticated, casual, etc.)")
-    occasion: list[str] = Field(
-        default_factory=list, description="Suitable occasions"
-    )
-    season: list[str] = Field(
-        default_factory=list, description="Suitable seasons"
-    )
+    occasion: list[str] = Field(default_factory=list, description="Suitable occasions")
+    season: list[str] = Field(default_factory=list, description="Suitable seasons")
 
 
 class ExtractedFeatures(BaseModel):
@@ -158,9 +147,7 @@ class ExtractedFeatures(BaseModel):
     detected_elements: list[str] = Field(
         default_factory=list, description="Detected visual elements"
     )
-    confidence_score: float = Field(
-        0.0, ge=0.0, le=1.0, description="Overall confidence"
-    )
+    confidence_score: float = Field(0.0, ge=0.0, le=1.0, description="Overall confidence")
 
 
 class BulletPoint(BaseModel):
@@ -174,13 +161,9 @@ class SEOContent(BaseModel):
     """SEO-optimized content."""
 
     title: str = Field(..., max_length=60, description="SEO title (< 60 chars)")
-    meta_description: str = Field(
-        ..., max_length=160, description="Meta description (< 160 chars)"
-    )
+    meta_description: str = Field(..., max_length=160, description="Meta description (< 160 chars)")
     focus_keyword: str = Field(..., description="Primary keyword")
-    secondary_keywords: list[str] = Field(
-        default_factory=list, description="Secondary keywords"
-    )
+    secondary_keywords: list[str] = Field(default_factory=list, description="Secondary keywords")
 
 
 class DescriptionOutput(BaseModel):
@@ -192,9 +175,7 @@ class DescriptionOutput(BaseModel):
 
     # Main description
     description: str = Field(..., description="Full product description (100-200 words)")
-    short_description: str = Field(
-        ..., description="Short description (< 50 words)"
-    )
+    short_description: str = Field(..., description="Short description (< 50 words)")
 
     # Structured content
     bullet_points: list[BulletPoint] = Field(default_factory=list)

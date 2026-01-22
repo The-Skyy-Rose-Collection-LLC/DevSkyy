@@ -1,10 +1,16 @@
 # tests/services/three_d/test_provider_factory.py
 """Tests for 3D provider factory."""
 
-import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
-from datetime import datetime, UTC
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
+
+from services.three_d.provider_factory import (
+    FactoryConfig,
+    ProviderConfig,
+    ProviderPriority,
+    ThreeDProviderFactory,
+)
 from services.three_d.provider_interface import (
     OutputFormat,
     ProviderHealth,
@@ -13,15 +19,6 @@ from services.three_d.provider_interface import (
     ThreeDProviderError,
     ThreeDRequest,
     ThreeDResponse,
-    ThreeDTimeoutError,
-)
-from services.three_d.provider_factory import (
-    FactoryConfig,
-    ProviderConfig,
-    ProviderPriority,
-    ThreeDProviderFactory,
-    get_provider_factory,
-    reset_provider_factory,
 )
 
 

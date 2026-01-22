@@ -10,22 +10,20 @@ import base64
 import hashlib
 import hmac
 import json
-import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from api.v1.woocommerce_webhooks import (
-    router,
-    WooCommerceSignatureVerifier,
-    WooCommerceProduct,
     WooCommerceImage,
+    WooCommerceProduct,
+    WooCommerceSignatureVerifier,
     WooCommerceWebhookConfig,
+    router,
 )
 from services.image_ingestion import IngestionResult, IngestionStatus
-
 
 # =============================================================================
 # Fixtures

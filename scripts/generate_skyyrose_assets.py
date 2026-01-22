@@ -40,7 +40,6 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from dotenv import load_dotenv
 
 from services.three_d.provider_factory import (
-    ThreeDProviderFactory,
     get_provider_factory,
 )
 from services.three_d.provider_interface import (

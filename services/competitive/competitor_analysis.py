@@ -11,12 +11,9 @@ from __future__ import annotations
 
 import logging
 from collections import Counter
-from datetime import UTC, datetime
 from typing import Any
 
 from services.competitive.schemas import (
-    CompositionDistribution,
-    CompositionType,
     Competitor,
     CompetitorAsset,
     CompetitorAssetCreate,
@@ -25,6 +22,8 @@ from services.competitive.schemas import (
     CompetitorAssetUpdate,
     CompetitorCreate,
     CompetitorListResponse,
+    CompositionDistribution,
+    CompositionType,
     ExtractedAttributes,
     PriceAnalytics,
     StyleAnalyticsResponse,

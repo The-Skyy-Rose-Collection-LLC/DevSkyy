@@ -6,22 +6,18 @@ Implements US-023: Asset versioning with retention policies.
 Author: DevSkyy Platform Team
 """
 
+from unittest.mock import MagicMock
+
 import pytest
-from datetime import datetime, UTC, timedelta
-from unittest.mock import AsyncMock, MagicMock
 
 from services.storage import (
-    AssetInfo,
     AssetNotFoundError,
     AssetVersionManager,
-    CleanupResult,
     CreateVersionRequest,
     RetentionPolicy,
     RevertVersionRequest,
     UpdateRetentionRequest,
-    VersionInfo,
     VersioningError,
-    VersionListResponse,
     VersionNotFoundError,
     VersionStatus,
 )

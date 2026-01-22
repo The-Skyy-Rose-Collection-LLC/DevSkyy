@@ -8,17 +8,12 @@ Author: DevSkyy Platform Team
 
 from __future__ import annotations
 
-from datetime import UTC, datetime
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from services.ml.gemini_client import (
-    AspectRatio,
     GeminiClient,
-    GeminiConfig,
-    GeminiError,
-    GeminiModel,
     GeneratedImage,
     ImageGenerationResponse,
     ImageInput,
@@ -32,7 +27,6 @@ from services.three_d.provider_interface import (
     ThreeDProviderError,
     ThreeDRequest,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -171,22 +165,21 @@ class TestGenerateFromImage:
             "generate_image",
             new_callable=AsyncMock,
             return_value=mock_response,
+        ), patch.object(
+            ImageInput,
+            "from_url",
+            new_callable=AsyncMock,
+            return_value=ImageInput(base64_data="dGVzdA==", mime_type="image/png"),
         ):
-            with patch.object(
-                ImageInput,
-                "from_url",
-                new_callable=AsyncMock,
-                return_value=ImageInput(base64_data="dGVzdA==", mime_type="image/png"),
-            ):
-                request = ThreeDRequest(
-                    image_url="https://example.com/product.jpg",
-                    prompt="Change background to studio lighting",
-                )
+            request = ThreeDRequest(
+                image_url="https://example.com/product.jpg",
+                prompt="Change background to studio lighting",
+            )
 
-                response = await provider.generate_from_image(request)
+            response = await provider.generate_from_image(request)
 
-                assert response.success is True
-                assert response.metadata["source_image"] == "https://example.com/product.jpg"
+            assert response.success is True
+            assert response.metadata["source_image"] == "https://example.com/product.jpg"
 
     @pytest.mark.asyncio
     async def test_edit_image_no_source(self, provider: GeminiImageProvider) -> None:
@@ -388,12 +381,11 @@ class TestContextManager:
 
             with patch.object(
                 provider._client, "connect", new_callable=AsyncMock
-            ) as mock_connect:
-                with patch.object(
-                    provider._client, "close", new_callable=AsyncMock
-                ) as mock_close:
-                    async with provider as p:
-                        assert p is provider
-                        mock_connect.assert_called_once()
+            ) as mock_connect, patch.object(
+                provider._client, "close", new_callable=AsyncMock
+            ) as mock_close:
+                async with provider as p:
+                    assert p is provider
+                    mock_connect.assert_called_once()
 
-                    mock_close.assert_called_once()
+                mock_close.assert_called_once()

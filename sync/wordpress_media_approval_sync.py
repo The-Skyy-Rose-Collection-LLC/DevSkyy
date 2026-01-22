@@ -50,7 +50,7 @@ class WordPressSyncConfig:
     max_retries: int = 3
 
     @classmethod
-    def from_env(cls) -> "WordPressSyncConfig":
+    def from_env(cls) -> WordPressSyncConfig:
         """Create config from environment."""
         return cls(
             wordpress_url=os.getenv("WORDPRESS_URL", ""),

@@ -28,7 +28,6 @@ from pathlib import Path
 from typing import Any
 
 from services.three_d.provider_interface import (
-    I3DProvider,
     OutputFormat,
     ProviderHealth,
     ProviderStatus,
@@ -328,7 +327,7 @@ class HuggingFaceProvider:
             )
 
         logger.info(
-            f"Generating 3D from text via HuggingFace",
+            "Generating 3D from text via HuggingFace",
             extra={
                 "correlation_id": correlation_id,
                 "model": model.value,
@@ -432,7 +431,7 @@ class HuggingFaceProvider:
             )
 
         logger.info(
-            f"Generating 3D from image via HuggingFace",
+            "Generating 3D from image via HuggingFace",
             extra={
                 "correlation_id": correlation_id,
                 "model": model.value,
