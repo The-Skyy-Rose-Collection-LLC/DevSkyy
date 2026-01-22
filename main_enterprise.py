@@ -163,10 +163,12 @@ async def lifespan(app: FastAPI):
         log_format="json" if json_output_bool else "console",
     )
 
+    # Get environment early so it's available throughout lifespan
+    environment = os.getenv("ENVIRONMENT", "development")
+
     # Initialize Sentry with user-provided DSN (SECURITY: no hardcoded default)
     sentry_dsn = os.getenv("SENTRY_DSN")
     if sentry_dsn:
-        environment = os.getenv("ENVIRONMENT", "development")
 
         def _sentry_before_send(event: dict, hint: dict) -> dict | None:
             """Scrub sensitive data before sending to Sentry."""
