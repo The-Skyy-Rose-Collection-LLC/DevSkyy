@@ -975,6 +975,23 @@ app.include_router(orchestration_router, prefix="/api/v1")
 # System monitoring and agent directory
 app.include_router(monitoring_router, prefix="/api/v1")
 
+# Asset ML Pipeline routers (US-003, US-013, US-022, US-023, US-029, US-034)
+from api.v1 import (
+    approval_router,
+    assets_router,
+    brand_assets_router,
+    competitors_router,
+    descriptions_router,
+    woocommerce_webhooks_router,
+)
+
+app.include_router(assets_router, prefix="/api/v1")
+app.include_router(approval_router, prefix="/api/v1")
+app.include_router(brand_assets_router, prefix="/api/v1")
+app.include_router(competitors_router, prefix="/api/v1")
+app.include_router(descriptions_router, prefix="/api/v1")
+app.include_router(woocommerce_webhooks_router, prefix="/api/v1")
+
 
 # =============================================================================
 # Health & Status Endpoints
