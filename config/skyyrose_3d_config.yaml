@@ -1,0 +1,92 @@
+# SkyyRose 3D Asset Generation Configuration
+# ===========================================
+# Quality requirements: 95% fidelity minimum, 4K textures, exact replicas
+
+generation:
+  # Quality settings
+  quality: production
+  texture_resolution: 4096
+  minimum_fidelity: 0.95
+  enforce_fidelity: true
+
+  # Output settings
+  output_format: glb
+  output_dir: ./assets/3d-models
+
+  # Mesh settings
+  max_vertices: 100000
+  optimize_mesh: true
+  generate_pbr: true
+
+providers:
+  # Provider priority order (failover chain)
+  priority:
+    - replicate      # Primary: Wonder3D, Shap-E
+    - huggingface    # Fallback: TRELLIS, TripoSR
+    - tripo          # Backup: Tripo3D (if SDK installed)
+
+  # Provider-specific settings
+  replicate:
+    image_to_3d_model: "adirik/wonder3d:e6a3eda1a67e8a9b915e45e1d7b3f7e3"
+    text_to_3d_model: "cjwbw/shap-e:5957069d5c509126a73c7cb68abcddbb985aeefa"
+    timeout_seconds: 300
+
+  huggingface:
+    model: "TRELLIS"
+    fallback_model: "TripoSR"
+    timeout_seconds: 300
+
+reference_images:
+  base_path: ./assets/reference-images
+
+  black_rose:
+    - black-jersey.jpg
+    - giants-jersey.jpg
+    - sherpa-jacket.jpg
+    - hooded-dress.jpg
+    - hockey-hoodie-3d.png
+    - green-jersey-crewneck.png
+
+  love_hurts:
+    - pink-shorts.jpg
+    - white-shorts.jpg
+
+  signature:
+    - bay-bridge-set.jpg
+    - golden-gate-set.jpg
+
+  logos:
+    - love-hurts-3d.png
+    - skyyrose-sr-3d.png
+
+output_structure:
+  # Where 3D models will be saved
+  black_rose: ./assets/3d-models/black-rose/
+  love_hurts: ./assets/3d-models/love-hurts/
+  signature: ./assets/3d-models/signature/
+  logos: ./assets/3d-models/logos/
+
+threejs_integration:
+  # Scene files that will load these models
+  scenes:
+    black_rose: ./skyyrose-website/experiences/black-rose.html
+    love_hurts: ./skyyrose-website/experiences/love-hurts.html
+    signature: ./skyyrose-website/experiences/signature.html
+
+  # Model loading settings
+  draco_compression: true
+  shadow_casting: true
+  environment_map: true
+
+quality_targets:
+  # MANDATORY requirements
+  fidelity_score: ">= 0.95"
+  texture_quality: "4K PBR (albedo, normal, roughness, metallic, AO)"
+  mesh_topology: "Clean quads, animation-ready"
+  file_format: "GLB with embedded textures"
+
+  # Visual requirements
+  fabric_detail: "Visible weave/knit patterns"
+  stitch_detail: "Seam allowances and reinforcements"
+  hardware_detail: "Metallic buttons, zippers, grommets"
+  graphic_detail: "Maximum resolution prints/embroidery"
