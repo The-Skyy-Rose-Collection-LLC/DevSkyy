@@ -14,9 +14,13 @@ Version: 1.0.0
 
 from __future__ import annotations
 
+import asyncio
+import hashlib
+import json
 import logging
 import os
 from abc import ABC, abstractmethod
+from collections import OrderedDict
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from enum import Enum
@@ -26,6 +30,120 @@ from uuid import uuid4
 from pydantic import BaseModel, ConfigDict, Field
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Performance: LRU Cache for Vector Search Results
+# =============================================================================
+
+
+class VectorSearchCache:
+    """Thread-safe LRU cache for vector search results.
+
+    Caches search results by embedding hash to reduce redundant vector queries.
+    Provides significant latency improvement for repeated searches.
+    """
+
+    def __init__(self, maxsize: int = 256, ttl_seconds: int = 300):
+        """Initialize the cache.
+
+        Args:
+            maxsize: Maximum number of cached results (default: 256)
+            ttl_seconds: Time-to-live in seconds (default: 300 = 5 minutes)
+        """
+        self._maxsize = maxsize
+        self._ttl = ttl_seconds
+        self._cache: OrderedDict[str, tuple[list[dict[str, Any]], float]] = OrderedDict()
+        self._lock = asyncio.Lock()
+        self._hits = 0
+        self._misses = 0
+
+    def _generate_key(
+        self, embedding: list[float], top_k: int, filter_metadata: dict | None
+    ) -> str:
+        """Generate a cache key from embedding and search params."""
+        # Round embedding values to reduce key variations
+        rounded_emb = [round(v, 6) for v in embedding[:32]]  # First 32 dims for key
+        content = json.dumps({"e": rounded_emb, "k": top_k, "f": filter_metadata}, sort_keys=True)
+        return hashlib.sha256(content.encode("utf-8")).hexdigest()[:32]
+
+    async def get(
+        self, embedding: list[float], top_k: int, filter_metadata: dict | None
+    ) -> list[dict[str, Any]] | None:
+        """Get search results from cache if available and not expired."""
+        import time
+
+        key = self._generate_key(embedding, top_k, filter_metadata)
+        async with self._lock:
+            if key in self._cache:
+                results, timestamp = self._cache[key]
+                if time.time() - timestamp < self._ttl:
+                    self._cache.move_to_end(key)
+                    self._hits += 1
+                    logger.debug(f"Vector search cache hit for key: {key[:8]}...")
+                    return results
+                else:
+                    del self._cache[key]
+            self._misses += 1
+            return None
+
+    async def put(
+        self,
+        embedding: list[float],
+        top_k: int,
+        filter_metadata: dict | None,
+        results: list[dict[str, Any]],
+    ) -> None:
+        """Store search results in cache."""
+        import time
+
+        key = self._generate_key(embedding, top_k, filter_metadata)
+        async with self._lock:
+            if key in self._cache:
+                self._cache.move_to_end(key)
+                self._cache[key] = (results, time.time())
+            else:
+                if len(self._cache) >= self._maxsize:
+                    self._cache.popitem(last=False)
+                self._cache[key] = (results, time.time())
+
+    def get_stats(self) -> dict[str, Any]:
+        """Get cache statistics."""
+        total = self._hits + self._misses
+        hit_rate = (self._hits / total * 100) if total > 0 else 0.0
+        return {
+            "hits": self._hits,
+            "misses": self._misses,
+            "hit_rate_percent": round(hit_rate, 2),
+            "size": len(self._cache),
+            "maxsize": self._maxsize,
+            "ttl_seconds": self._ttl,
+        }
+
+    async def clear(self) -> None:
+        """Clear the cache."""
+        async with self._lock:
+            self._cache.clear()
+            self._hits = 0
+            self._misses = 0
+
+
+# Global vector search cache instance
+_vector_search_cache: VectorSearchCache | None = None
+
+
+def get_vector_search_cache() -> VectorSearchCache:
+    """Get or create the global vector search cache instance."""
+    global _vector_search_cache
+    if _vector_search_cache is None:
+        ttl = int(os.getenv("VECTOR_SEARCH_CACHE_TTL", "300"))
+        _vector_search_cache = VectorSearchCache(maxsize=256, ttl_seconds=ttl)
+        logger.info(f"Initialized vector search cache with maxsize=256, ttl={ttl}s")
+    return _vector_search_cache
+
+
+# ChromaDB batch size for optimal performance
+CHROMA_BATCH_SIZE = 1000
 
 
 # =============================================================================
@@ -228,7 +346,11 @@ class ChromaVectorStore(BaseVectorStore):
     async def add_documents(
         self, documents: list[Document], embeddings: list[list[float]]
     ) -> list[str]:
-        """Add documents with embeddings to ChromaDB."""
+        """Add documents with embeddings to ChromaDB using batch operations.
+
+        For large ingestion, batches documents in chunks of 1000 (ChromaDB optimal)
+        to prevent memory issues and improve throughput.
+        """
         if not self._initialized or not self._collection:
             raise RuntimeError("ChromaDB not initialized")
 
@@ -239,12 +361,25 @@ class ChromaVectorStore(BaseVectorStore):
             for doc in documents
         ]
 
-        self._collection.add(
-            ids=ids,
-            embeddings=embeddings,
-            documents=contents,
-            metadatas=metadatas,
-        )
+        # Use batch operations for large document sets
+        if len(documents) > CHROMA_BATCH_SIZE:
+            logger.info(f"Using batch mode for {len(documents)} documents")
+            for i in range(0, len(documents), CHROMA_BATCH_SIZE):
+                batch_end = min(i + CHROMA_BATCH_SIZE, len(documents))
+                self._collection.add(
+                    ids=ids[i:batch_end],
+                    embeddings=embeddings[i:batch_end],
+                    documents=contents[i:batch_end],
+                    metadatas=metadatas[i:batch_end],
+                )
+                logger.debug(f"Added batch {i // CHROMA_BATCH_SIZE + 1}: {batch_end - i} documents")
+        else:
+            self._collection.add(
+                ids=ids,
+                embeddings=embeddings,
+                documents=contents,
+                metadatas=metadatas,
+            )
 
         logger.info(f"Added {len(documents)} documents to ChromaDB")
         return ids
@@ -255,11 +390,34 @@ class ChromaVectorStore(BaseVectorStore):
         top_k: int | None = None,
         filter_metadata: dict[str, Any] | None = None,
     ) -> list[SearchResult]:
-        """Search for similar documents in ChromaDB."""
+        """Search for similar documents in ChromaDB with caching.
+
+        Results are cached by embedding hash for faster repeated queries.
+        """
         if not self._initialized or not self._collection:
             raise RuntimeError("ChromaDB not initialized")
 
         k = top_k or self.config.default_top_k
+
+        # Check cache first
+        cache = get_vector_search_cache()
+        cached = await cache.get(query_embedding, k, filter_metadata)
+        if cached is not None:
+            # Reconstruct SearchResult from cached data
+            return [
+                SearchResult(
+                    document=Document(
+                        id=r["id"],
+                        content=r["content"],
+                        metadata=r["metadata"],
+                        source=r["source"],
+                        status=DocumentStatus.INDEXED,
+                    ),
+                    score=r["score"],
+                    distance=r["distance"],
+                )
+                for r in cached
+            ]
 
         # Build where filter
         where_filter = None
@@ -295,6 +453,20 @@ class ChromaVectorStore(BaseVectorStore):
                     status=DocumentStatus.INDEXED,
                 )
                 search_results.append(SearchResult(document=doc, score=score, distance=distance))
+
+        # Cache results
+        cache_data = [
+            {
+                "id": r.document.id,
+                "content": r.document.content,
+                "metadata": r.document.metadata,
+                "source": r.document.source,
+                "score": r.score,
+                "distance": r.distance,
+            }
+            for r in search_results
+        ]
+        await cache.put(query_embedding, k, filter_metadata, cache_data)
 
         return search_results
 

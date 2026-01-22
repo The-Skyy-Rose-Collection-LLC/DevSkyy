@@ -97,6 +97,11 @@ dependencies = [
     "Pillow>=10.0",
     "opencv-python>=4.8",
 
+    # Performance & Async I/O
+    "aiofiles>=24.1.0",
+    "fastapi-cache2>=0.2.1",
+    "redis>=5.0",
+
     # ML/AI - Critical for Round Table and RAG
     "numpy>=2.1.3",
     "scipy>=1.14.1",

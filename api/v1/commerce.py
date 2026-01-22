@@ -8,15 +8,19 @@ This module provides endpoints for:
 Version: 1.0.0
 """
 
+import asyncio
 import logging
 from datetime import UTC, datetime
 from typing import Any, Literal
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+
+# In-memory task status store (replace with Redis in production)
+_bulk_task_status: dict[str, dict[str, Any]] = {}
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -107,8 +111,108 @@ class DynamicPricingResponse(BaseModel):
 
 
 # =============================================================================
+# Background Task Processing
+# =============================================================================
+
+
+async def _process_bulk_products_background(
+    operation_id: str,
+    action: str,
+    products: list[dict[str, Any]],
+    user_id: str,
+) -> None:
+    """Process bulk product operations in the background.
+
+    This prevents request timeouts for large batch operations.
+    Results can be polled via GET /commerce/products/bulk/{operation_id}/status
+    """
+    logger.info(f"Background task started: {operation_id}")
+
+    try:
+        _bulk_task_status[operation_id] = {
+            "status": "processing",
+            "progress": 0,
+            "total": len(products),
+            "started_at": datetime.now(UTC).isoformat(),
+        }
+
+        results = []
+        successful = 0
+        failed = 0
+
+        for i, product_data in enumerate(products):
+            # TODO: Integrate with agents/commerce_agent.py CommerceAgent
+            # Simulate processing delay
+            await asyncio.sleep(0.01)  # Small delay to prevent blocking
+
+            # Mock validation
+            if i % 10 == 0:  # Simulate 10% failure rate
+                results.append(
+                    {
+                        "product_id": None,
+                        "sku": product_data.get("sku"),
+                        "status": "failed",
+                        "message": "Invalid SKU format",
+                    }
+                )
+                failed += 1
+            else:
+                product_id = f"prod_{uuid4().hex[:8]}"
+                results.append(
+                    {
+                        "product_id": product_id,
+                        "sku": product_data.get("sku"),
+                        "status": "success",
+                        "message": None,
+                    }
+                )
+                successful += 1
+
+            # Update progress
+            _bulk_task_status[operation_id]["progress"] = i + 1
+
+        # Store final results
+        _bulk_task_status[operation_id] = {
+            "status": "completed",
+            "progress": len(products),
+            "total": len(products),
+            "started_at": _bulk_task_status[operation_id]["started_at"],
+            "completed_at": datetime.now(UTC).isoformat(),
+            "action": action,
+            "successful": successful,
+            "failed": failed,
+            "results": results,
+        }
+        logger.info(f"Background task completed: {operation_id}")
+
+    except Exception as e:
+        logger.error(f"Background task failed: {operation_id}: {e}", exc_info=True)
+        _bulk_task_status[operation_id] = {
+            "status": "failed",
+            "error": str(e),
+            "completed_at": datetime.now(UTC).isoformat(),
+        }
+
+
+# =============================================================================
 # Endpoints
 # =============================================================================
+
+
+class BulkTaskStatusResponse(BaseModel):
+    """Response for bulk operation status check."""
+
+    operation_id: str
+    status: str  # pending, processing, completed, failed
+    progress: int | None = None
+    total: int | None = None
+    started_at: str | None = None
+    completed_at: str | None = None
+    action: str | None = None
+    successful: int | None = None
+    failed: int | None = None
+    results: list[ProductResult] | None = None
+    error: str | None = None
 
 
 @router.post(
@@ -117,14 +221,17 @@ class DynamicPricingResponse(BaseModel):
     status_code=status.HTTP_200_OK,
 )
 async def bulk_product_operations(
-    request: BulkProductRequest, user: TokenPayload = Depends(get_current_user)
+    request: BulkProductRequest,
+    background_tasks: BackgroundTasks,
+    user: TokenPayload = Depends(get_current_user),
 ) -> BulkProductResponse:
     """Perform bulk operations on products.
 
-    Supports creating, updating, or deleting multiple products in a single operation.
+    For large batches (>50 products), operations run in the background.
+    Use GET /commerce/products/bulk/{operation_id}/status to check progress.
 
     **Features:**
-    - Batch processing with transaction support
+    - Batch processing with background task support
     - Automatic validation
     - AI-powered SEO optimization for new products
     - Inventory sync across platforms
@@ -132,10 +239,11 @@ async def bulk_product_operations(
 
     Args:
         request: Bulk operation configuration (action, products, validate_only)
+        background_tasks: FastAPI background tasks handler
         user: Authenticated user (from JWT token)
 
     Returns:
-        BulkProductResponse with operation results
+        BulkProductResponse with operation results or task_id for background ops
 
     Raises:
         HTTPException: If bulk operation fails
@@ -146,10 +254,31 @@ async def bulk_product_operations(
         f"{request.action} ({len(request.products)} products)"
     )
 
-    try:
-        # TODO: Integrate with agents/commerce_agent.py CommerceAgent
-        # For now, return mock data demonstrating the structure
+    # For large batches, use background processing to prevent timeouts
+    if len(request.products) > 50 and not request.validate_only:
+        # Start background task
+        background_tasks.add_task(
+            _process_bulk_products_background,
+            operation_id,
+            request.action,
+            request.products,
+            user.sub,
+        )
 
+        # Return immediately with task reference
+        return BulkProductResponse(
+            operation_id=operation_id,
+            status="processing",
+            timestamp=datetime.now(UTC).isoformat(),
+            action=request.action,
+            total_products=len(request.products),
+            successful=0,
+            failed=0,
+            results=[],
+        )
+
+    try:
+        # Process synchronously for small batches
         results = []
         successful = 0
         failed = 0
@@ -195,6 +324,56 @@ async def bulk_product_operations(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Bulk product operation failed: {str(e)}",
         )
+
+
+@router.get(
+    "/products/bulk/{operation_id}/status",
+    response_model=BulkTaskStatusResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def get_bulk_operation_status(
+    operation_id: str,
+    user: TokenPayload = Depends(get_current_user),
+) -> BulkTaskStatusResponse:
+    """Get the status of a background bulk operation.
+
+    Poll this endpoint to check progress of large batch operations.
+
+    Args:
+        operation_id: The operation ID returned from POST /products/bulk
+        user: Authenticated user (from JWT token)
+
+    Returns:
+        BulkTaskStatusResponse with current status and progress
+
+    Raises:
+        HTTPException: If operation not found
+    """
+    if operation_id not in _bulk_task_status:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Operation {operation_id} not found",
+        )
+
+    status_data = _bulk_task_status[operation_id]
+
+    return BulkTaskStatusResponse(
+        operation_id=operation_id,
+        status=status_data.get("status", "unknown"),
+        progress=status_data.get("progress"),
+        total=status_data.get("total"),
+        started_at=status_data.get("started_at"),
+        completed_at=status_data.get("completed_at"),
+        action=status_data.get("action"),
+        successful=status_data.get("successful"),
+        failed=status_data.get("failed"),
+        results=(
+            [ProductResult(**r) for r in status_data.get("results", [])]
+            if status_data.get("results")
+            else None
+        ),
+        error=status_data.get("error"),
+    )
 
 
 @router.post(
