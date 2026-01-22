@@ -174,6 +174,9 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
 
   return (
     <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="success-title"
       style={{
         position: 'fixed',
         top: 0,
@@ -248,6 +251,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
 
         {/* Success Message */}
         <h2
+          id="success-title"
           style={{
             fontSize: '32px',
             fontWeight: 'bold',
@@ -317,6 +321,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
         <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
           <button
             onClick={onContinueShopping}
+            aria-label="Continue shopping"
             style={{
               backgroundColor: '#B76E79',
               color: '#FFFFFF',
@@ -346,6 +351,7 @@ export const SuccessCelebration: React.FC<SuccessCelebrationProps> = ({
           {onViewOrder && (
             <button
               onClick={() => onViewOrder(orderId)}
+              aria-label="View order details"
               style={{
                 backgroundColor: 'transparent',
                 color: '#B76E79',

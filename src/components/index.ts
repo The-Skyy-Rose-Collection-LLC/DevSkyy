@@ -18,3 +18,12 @@ export {
   updateCSS2DRenderer,
 } from './PriceTag3D';
 export type { PriceTag3DProps } from './PriceTag3D';
+
+// Error Boundary Component
+export {
+  ErrorBoundary,
+  ErrorFallback,
+  withErrorBoundary,
+  useErrorHandler,
+} from './ErrorBoundary';
+export type { ErrorBoundaryProps, ErrorFallbackProps } from './ErrorBoundary';
