@@ -75,7 +75,6 @@ Focus on:
 5. Styling possibilities
 
 Do NOT mention specific prices. Do NOT use generic phrases like "high-quality" without specifics.""",
-
     "casual": """You are a friendly fashion copywriter.
 
 Analyze this product image and write an approachable product description that:
@@ -88,7 +87,6 @@ Write a {word_count}-word description for this {product_type}.
 {brand_context}
 
 Focus on practical benefits and how it fits into daily life.""",
-
     "technical": """You are a technical fashion writer.
 
 Analyze this product image and write a detailed product description that:
@@ -101,7 +99,6 @@ Write a {word_count}-word description for this {product_type}.
 {brand_context}
 
 Be precise and factual. Avoid marketing language.""",
-
     "minimal": """Analyze this product image and write a concise, minimal product description.
 
 Style: Clean, essential, no fluff.
@@ -110,7 +107,6 @@ Product type: {product_type}
 {brand_context}
 
 Focus only on what matters: silhouette, material, color, key feature.""",
-
     "storytelling": """You are a narrative fashion writer for SkyyRose.
 
 Analyze this product image and craft a story-driven product description that:
@@ -209,8 +205,8 @@ Example: black dress, midi length, evening wear, formal, elegant, silk, minimali
 
 
 def get_description_prompt(
-    style: "DescriptionStyle",
-    product_type: "ProductType",
+    style: DescriptionStyle,
+    product_type: ProductType,
     word_count: int,
     brand_context: str | None = None,
 ) -> str:

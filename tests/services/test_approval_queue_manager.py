@@ -6,13 +6,13 @@ Implements US-022: WordPress media sync with approval.
 Author: DevSkyy Platform Team
 """
 
+from datetime import UTC, datetime
+
 import pytest
-from datetime import datetime, UTC
 
 from services.approval_queue_manager import (
     ApprovalAction,
     ApprovalActionRequest,
-    ApprovalItem,
     ApprovalItemCreate,
     ApprovalItemNotFoundError,
     ApprovalQueueFilter,
@@ -22,7 +22,6 @@ from services.approval_queue_manager import (
     InvalidApprovalActionError,
     RevisionPriority,
 )
-
 
 # =============================================================================
 # Fixtures

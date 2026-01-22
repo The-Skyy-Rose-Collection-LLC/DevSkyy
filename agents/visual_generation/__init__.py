@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+# Import conversation editor
+from .conversation_editor import ConversationEditor
+
 # Import and re-export everything from the main visual generation module
 from .visual_generation import (
     SKYYROSE_BRAND_DNA,
@@ -17,9 +20,6 @@ from .visual_generation import (
     VisualProvider,
     create_visual_router,
 )
-
-# Import conversation editor
-from .conversation_editor import ConversationEditor
 
 __all__ = [
     # From visual_generation

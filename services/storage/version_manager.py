@@ -26,7 +26,7 @@ from errors.production_errors import (
     DevSkyErrorCode,
     DevSkyErrorSeverity,
 )
-from services.storage.r2_client import AssetCategory, R2Client
+from services.storage.r2_client import R2Client
 from services.storage.schemas import (
     AssetInfo,
     CleanupResult,

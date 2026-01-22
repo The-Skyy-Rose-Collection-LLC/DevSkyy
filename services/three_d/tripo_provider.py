@@ -17,7 +17,6 @@ from dataclasses import dataclass, field
 from datetime import UTC, datetime
 
 from services.three_d.provider_interface import (
-    I3DProvider,
     OutputFormat,
     ProviderHealth,
     ProviderStatus,
@@ -141,7 +140,7 @@ class TripoProvider:
             )
 
         logger.info(
-            f"Generating 3D from text via Tripo3D",
+            "Generating 3D from text via Tripo3D",
             extra={
                 "correlation_id": correlation_id,
                 "collection": request.collection,
@@ -234,7 +233,7 @@ class TripoProvider:
             )
 
         logger.info(
-            f"Generating 3D from image via Tripo3D",
+            "Generating 3D from image via Tripo3D",
             extra={
                 "correlation_id": correlation_id,
                 "image_source": image_source[:100],

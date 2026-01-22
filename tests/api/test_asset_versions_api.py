@@ -6,12 +6,12 @@ Implements US-023: Asset versioning with retention policies.
 Author: DevSkyy Platform Team
 """
 
-import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
-from fastapi.testclient import TestClient
+import pytest
 from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 from services.storage import (
     AssetInfo,
@@ -134,7 +134,7 @@ def mock_user() -> MagicMock:
 @pytest.fixture
 def app(mock_version_manager: MagicMock, mock_user: MagicMock) -> FastAPI:
     """Create test FastAPI app with mocked dependencies."""
-    from api.v1.assets import router, get_version_manager
+    from api.v1.assets import get_version_manager, router
     from security.jwt_oauth2_auth import get_current_user
 
     app = FastAPI()

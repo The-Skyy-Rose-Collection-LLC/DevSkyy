@@ -16,7 +16,6 @@ import uuid
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 
 import httpx
 
@@ -24,15 +23,12 @@ from services.ml.replicate_client import (
     ReplicateClient,
     ReplicateConfig,
     ReplicateError,
-    ReplicatePredictionStatus,
     ReplicateTimeoutError,
 )
 from services.three_d.provider_interface import (
-    I3DProvider,
     OutputFormat,
     ProviderHealth,
     ProviderStatus,
-    QualityLevel,
     ThreeDCapability,
     ThreeDGenerationError,
     ThreeDProviderError,
@@ -202,7 +198,7 @@ class ReplicateProvider:
             )
 
         logger.info(
-            f"Generating 3D from text via Replicate",
+            "Generating 3D from text via Replicate",
             extra={
                 "correlation_id": correlation_id,
                 "prompt_length": len(request.prompt),
@@ -314,7 +310,7 @@ class ReplicateProvider:
             )
 
         logger.info(
-            f"Generating 3D from image via Replicate",
+            "Generating 3D from image via Replicate",
             extra={
                 "correlation_id": correlation_id,
                 "image_source": image_source[:100],

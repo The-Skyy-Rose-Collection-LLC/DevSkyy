@@ -1,11 +1,8 @@
 # tests/services/three_d/test_provider_interface.py
 """Tests for 3D provider interface and models."""
 
-import pytest
-from datetime import datetime, UTC
 
 from services.three_d.provider_interface import (
-    I3DProvider,
     OutputFormat,
     ProviderHealth,
     ProviderStatus,

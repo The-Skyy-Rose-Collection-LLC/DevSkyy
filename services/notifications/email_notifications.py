@@ -19,11 +19,10 @@ import logging
 import os
 import smtplib
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from enum import Enum
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from services.approval_queue_manager import ApprovalItem
@@ -51,7 +50,7 @@ class EmailConfig:
     dashboard_url: str = ""
 
     @classmethod
-    def from_env(cls) -> "EmailConfig":
+    def from_env(cls) -> EmailConfig:
         """Create config from environment variables."""
         recipients = os.getenv("APPROVAL_EMAIL_RECIPIENTS", "")
         return cls(
@@ -458,7 +457,7 @@ class EmailNotificationService:
 
     async def send_approval_notification(
         self,
-        item: "ApprovalItem",
+        item: ApprovalItem,
         *,
         correlation_id: str | None = None,
     ) -> bool:
@@ -534,7 +533,7 @@ class EmailNotificationService:
 
     async def send_revision_notification(
         self,
-        item: "ApprovalItem",
+        item: ApprovalItem,
         revision_id: str,
         *,
         correlation_id: str | None = None,

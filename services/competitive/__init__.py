@@ -3,8 +3,6 @@
 
 from services.competitive.competitor_analysis import CompetitorAnalysisService
 from services.competitive.schemas import (
-    CompositionDistribution,
-    CompositionType,
     Competitor,
     CompetitorAsset,
     CompetitorAssetCreate,
@@ -14,6 +12,8 @@ from services.competitive.schemas import (
     CompetitorCategory,
     CompetitorCreate,
     CompetitorListResponse,
+    CompositionDistribution,
+    CompositionType,
     ExtractedAttributes,
     PriceAnalytics,
     PricePositioning,

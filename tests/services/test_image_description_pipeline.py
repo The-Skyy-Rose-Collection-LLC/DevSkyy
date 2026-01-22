@@ -7,8 +7,9 @@ Author: DevSkyy Platform Team
 """
 
 import json
+from unittest.mock import AsyncMock, MagicMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from services.ml.image_description_pipeline import (
     ImageDescriptionPipeline,
@@ -18,12 +19,10 @@ from services.ml.schemas.description import (
     BatchDescriptionRequest,
     DescriptionRequest,
     DescriptionStyle,
-    ExtractedFeatures,
     FeatureExtractionRequest,
     ProductType,
     VisionModel,
 )
-
 
 # =============================================================================
 # Fixtures

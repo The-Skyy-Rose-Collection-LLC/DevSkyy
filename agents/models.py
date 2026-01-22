@@ -328,3 +328,106 @@ class RAGDocument(Base):
 
     def __repr__(self) -> str:
         return f"<RAGDocument(id={self.id}, document_id={self.document_id}, chunk={self.chunk_index}/{self.total_chunks})>"
+
+
+class BrandAsset(Base):
+    """Brand asset for training data preparation (US-013).
+
+    Stores brand assets with extracted visual features for LoRA training.
+
+    Attributes:
+        id: Primary key UUID
+        url: Original source URL of the asset
+        category: Asset category (product, lifestyle, campaign, etc.)
+        approval_status: Approval status (pending, approved, rejected)
+        campaign: Campaign name
+        season: Season/collection
+        photographer: Photographer credit
+        tags: Array of tags
+        r2_key: R2 storage key
+        file_size_bytes: File size in bytes
+        width: Image width in pixels
+        height: Image height in pixels
+        mime_type: MIME type
+        visual_features: Extracted visual features (color, composition, lighting)
+        quality_score: Quality score (0.0-1.0)
+        created_by: User who uploaded the asset
+        created_at: Creation timestamp
+        updated_at: Last update timestamp
+    """
+
+    __tablename__ = "brand_assets"
+
+    id = Column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuid_generate_v4()"),
+    )
+    url = Column(String(2048), nullable=False)
+    category = Column(String(50), nullable=False, index=True)
+    approval_status = Column(String(50), server_default="pending", index=True)
+    campaign = Column(String(255), index=True)
+    season = Column(String(100))
+    photographer = Column(String(255))
+    location = Column(String(255))
+    shoot_date = Column(TIMESTAMP(timezone=True))
+    tags = Column(ARRAY(Text))
+    notes = Column(Text)
+    r2_key = Column(String(500), index=True)
+    file_size_bytes = Column(Integer, server_default="0")
+    width = Column(Integer)
+    height = Column(Integer)
+    mime_type = Column(String(100))
+    visual_features = Column(JSONB, server_default=text("'{}'::jsonb"))
+    quality_score = Column(DECIMAL(3, 2), server_default="0.0")
+    created_by = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+
+    def __repr__(self) -> str:
+        return f"<BrandAsset(id={self.id}, category={self.category}, status={self.approval_status})>"
+
+
+class BrandAssetIngestionJob(Base):
+    """Bulk ingestion job tracking (US-013).
+
+    Tracks progress of bulk brand asset ingestion jobs.
+
+    Attributes:
+        id: Primary key UUID
+        status: Job status (pending, processing, completed, failed, partial)
+        total: Total assets in job
+        processed: Number of assets processed
+        succeeded: Number of successful ingestions
+        failed: Number of failed ingestions
+        results: JSONB array of individual results
+        created_by: User who started the job
+        created_at: Job start timestamp
+        completed_at: Job completion timestamp
+    """
+
+    __tablename__ = "brand_asset_ingestion_jobs"
+
+    id = Column(
+        PG_UUID(as_uuid=True),
+        primary_key=True,
+        server_default=text("uuid_generate_v4()"),
+    )
+    status = Column(String(50), server_default="pending", index=True)
+    total = Column(Integer, server_default="0")
+    processed = Column(Integer, server_default="0")
+    succeeded = Column(Integer, server_default="0")
+    failed = Column(Integer, server_default="0")
+    results = Column(JSONB, server_default=text("'[]'::jsonb"))
+    created_by = Column(
+        PG_UUID(as_uuid=True),
+        ForeignKey("users.id", ondelete="SET NULL"),
+    )
+    created_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
+    completed_at = Column(TIMESTAMP(timezone=True))
+
+    def __repr__(self) -> str:
+        return f"<BrandAssetIngestionJob(id={self.id}, status={self.status}, {self.succeeded}/{self.total})>"

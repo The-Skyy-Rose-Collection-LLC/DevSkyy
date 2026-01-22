@@ -6,16 +6,15 @@ Implements US-022: WordPress media sync with approval.
 Author: DevSkyy Platform Team
 """
 
-import pytest
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
 from api.v1.approval import router
 from services.approval_queue_manager import (
-    ApprovalAction,
     ApprovalItem,
     ApprovalQueueManager,
     ApprovalQueueResponse,
@@ -25,7 +24,6 @@ from services.approval_queue_manager import (
     RevisionPriority,
     RevisionQueueResponse,
 )
-
 
 # =============================================================================
 # Fixtures

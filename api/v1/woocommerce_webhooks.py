@@ -20,7 +20,6 @@ import hashlib
 import hmac
 import logging
 import os
-from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
@@ -29,7 +28,6 @@ from fastapi import APIRouter, BackgroundTasks, Header, HTTPException, Request, 
 from pydantic import BaseModel, Field
 
 from services.image_ingestion import (
-    ImageIngestionService,
     IngestionRequest,
     IngestionResult,
     IngestionSource,
@@ -59,7 +57,7 @@ class WooCommerceWebhookConfig:
         self.max_age_seconds = 300  # 5 minutes
 
     @classmethod
-    def from_env(cls) -> "WooCommerceWebhookConfig":
+    def from_env(cls) -> WooCommerceWebhookConfig:
         """Create config from environment."""
         return cls()
 

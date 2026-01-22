@@ -6,10 +6,10 @@ Implements US-034: Competitor image upload and tagging.
 Author: DevSkyy Platform Team
 """
 
-import pytest
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from unittest.mock import MagicMock
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
@@ -19,15 +19,11 @@ from services.competitive.competitor_analysis import (
     _competitors,
 )
 from services.competitive.schemas import (
-    CompositionType,
-    Competitor,
     CompetitorAsset,
-    CompetitorCategory,
+    CompositionType,
     ExtractedAttributes,
-    PricePositioning,
     StyleCategory,
 )
-
 
 # =============================================================================
 # Fixtures
