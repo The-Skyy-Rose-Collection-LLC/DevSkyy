@@ -30,12 +30,13 @@ export interface CartModalProps {
 
 /**
  * Cart Item Row Component
+ * Memoized to prevent unnecessary re-renders when parent state changes
  */
 const CartItemRow: React.FC<{
   item: CartItem;
   onUpdateQuantity: (productId: string, quantity: number, size?: string, color?: string) => void;
   onRemove: (productId: string, size?: string, color?: string) => void;
-}> = ({ item, onUpdateQuantity, onRemove }) => {
+}> = React.memo(({ item, onUpdateQuantity, onRemove }) => {
   const price = item.salePrice ?? item.price;
   const itemTotal = price * item.quantity;
 
@@ -137,7 +138,9 @@ const CartItemRow: React.FC<{
         {/* Quantity Controls */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <button
+            className="cart-quantity-btn"
             onClick={() => onUpdateQuantity(item.productId, item.quantity - 1, item.size, item.color)}
+            aria-label="Decrease quantity"
             style={{
               width: '28px',
               height: '28px',
@@ -153,16 +156,6 @@ const CartItemRow: React.FC<{
               transition: 'all 0.2s',
             }}
             disabled={item.quantity <= 1}
-            onMouseOver={(e) => {
-              if (item.quantity > 1) {
-                e.currentTarget.style.borderColor = COLORS.roseGold;
-                e.currentTarget.style.color = COLORS.roseGold;
-              }
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = COLORS.mediumGray;
-              e.currentTarget.style.color = COLORS.black;
-            }}
           >
             -
           </button>
@@ -180,7 +173,9 @@ const CartItemRow: React.FC<{
           </span>
 
           <button
+            className="cart-quantity-btn"
             onClick={() => onUpdateQuantity(item.productId, item.quantity + 1, item.size, item.color)}
+            aria-label="Increase quantity"
             style={{
               width: '28px',
               height: '28px',
@@ -195,20 +190,14 @@ const CartItemRow: React.FC<{
               justifyContent: 'center',
               transition: 'all 0.2s',
             }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.borderColor = COLORS.roseGold;
-              e.currentTarget.style.color = COLORS.roseGold;
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.borderColor = COLORS.mediumGray;
-              e.currentTarget.style.color = COLORS.black;
-            }}
           >
             +
           </button>
 
           <button
+            className="cart-remove-btn"
             onClick={() => onRemove(item.productId, item.size, item.color)}
+            aria-label={`Remove ${item.name} from cart`}
             style={{
               marginLeft: 'auto',
               padding: '4px 8px',
@@ -219,12 +208,6 @@ const CartItemRow: React.FC<{
               cursor: 'pointer',
               textDecoration: 'underline',
               transition: 'opacity 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.opacity = '0.7';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.opacity = '1';
             }}
           >
             Remove
@@ -245,7 +228,7 @@ const CartItemRow: React.FC<{
       </div>
     </div>
   );
-};
+});
 
 /**
  * Cart Modal Component
@@ -320,6 +303,9 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
 
       {/* Modal */}
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="cart-title"
         style={{
           position: 'fixed',
           top: 0,
@@ -347,6 +333,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
         >
           <div>
             <h2
+              id="cart-title"
               style={{
                 margin: 0,
                 fontSize: '24px',
@@ -368,7 +355,9 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
           </div>
 
           <button
+            className="cart-close-btn"
             onClick={onClose}
+            aria-label="Close cart"
             style={{
               width: '32px',
               height: '32px',
@@ -382,14 +371,6 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
               alignItems: 'center',
               justifyContent: 'center',
               transition: 'all 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.roseGold;
-              e.currentTarget.style.color = COLORS.white;
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = COLORS.lightGray;
-              e.currentTarget.style.color = COLORS.black;
             }}
           >
             ×
@@ -501,6 +482,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
             {/* Action Buttons */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <button
+                className="cart-checkout-btn"
                 onClick={handleCheckout}
                 style={{
                   width: '100%',
@@ -514,21 +496,12 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = '#A05D68';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                  e.currentTarget.style.boxShadow = '0 4px 12px rgba(183, 110, 121, 0.3)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = COLORS.roseGold;
-                  e.currentTarget.style.transform = 'translateY(0)';
-                  e.currentTarget.style.boxShadow = 'none';
-                }}
               >
                 Checkout
               </button>
 
               <button
+                className="cart-continue-btn"
                 onClick={onClose}
                 style={{
                   width: '100%',
@@ -542,17 +515,12 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
                   cursor: 'pointer',
                   transition: 'all 0.2s',
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = COLORS.lightGray;
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = COLORS.white;
-                }}
               >
                 Continue Shopping
               </button>
 
               <button
+                className="cart-clear-btn"
                 onClick={clearCart}
                 style={{
                   width: '100%',
@@ -566,12 +534,6 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
                   textDecoration: 'underline',
                   transition: 'color 0.2s',
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.color = COLORS.error;
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.color = COLORS.darkGray;
-                }}
               >
                 Clear Cart
               </button>
@@ -580,7 +542,7 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
         )}
       </div>
 
-      {/* Animations */}
+      {/* Animations and Hover Styles */}
       <style>
         {`
           @keyframes fadeIn {
@@ -599,6 +561,40 @@ export const CartModal: React.FC<CartModalProps> = ({ isOpen, onClose, onCheckou
             to {
               transform: translateX(0);
             }
+          }
+
+          /* Quantity buttons hover */
+          .cart-quantity-btn:hover:not(:disabled) {
+            border-color: #B76E79 !important;
+            color: #B76E79 !important;
+          }
+
+          /* Remove button hover */
+          .cart-remove-btn:hover {
+            opacity: 0.7;
+          }
+
+          /* Close button hover */
+          .cart-close-btn:hover {
+            background-color: #B76E79 !important;
+            color: #FFFFFF !important;
+          }
+
+          /* Checkout button hover */
+          .cart-checkout-btn:hover {
+            background-color: #A05D68 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(183, 110, 121, 0.3);
+          }
+
+          /* Continue Shopping button hover */
+          .cart-continue-btn:hover {
+            background-color: #F5F5F5 !important;
+          }
+
+          /* Clear Cart button hover */
+          .cart-clear-btn:hover {
+            color: #DC2626 !important;
           }
         `}
       </style>
