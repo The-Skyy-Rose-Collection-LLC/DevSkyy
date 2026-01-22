@@ -10,6 +10,7 @@ Routes:
 - POST /api/v1/training/export - Export Round Table results to HuggingFace dataset
 """
 
+import asyncio
 import json
 import logging
 import os
@@ -18,6 +19,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Annotated, Any, Literal
 
+import aiofiles
 from fastapi import APIRouter, HTTPException
 from fastapi import Path as FastAPIPath
 from prometheus_client import Counter, Gauge, Histogram
@@ -246,13 +248,17 @@ def _safe_path_resolve(base_dir: Path, relative_path: str, filename: str) -> Pat
         return None
 
 
-def _load_progress_file(version: str) -> dict[str, Any] | None:
-    """Load progress.json for a specific training version with path safety."""
+async def _load_progress_file(version: str) -> dict[str, Any] | None:
+    """Load progress.json for a specific training version with path safety.
+
+    Uses aiofiles for non-blocking file I/O to prevent event loop blocking.
+    """
     progress_path = _safe_path_resolve(TRAINING_OUTPUT_DIR, version, "progress.json")
     if progress_path:
         try:
-            with open(progress_path) as f:
-                return json.load(f)
+            async with aiofiles.open(progress_path) as f:
+                content = await f.read()
+                return json.loads(content)
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in progress file {progress_path}: {e}")
         except Exception as e:
@@ -260,13 +266,17 @@ def _load_progress_file(version: str) -> dict[str, Any] | None:
     return None
 
 
-def _load_status_file(version: str) -> dict[str, Any] | None:
-    """Load status.json for a specific training version with path safety."""
+async def _load_status_file(version: str) -> dict[str, Any] | None:
+    """Load status.json for a specific training version with path safety.
+
+    Uses aiofiles for non-blocking file I/O to prevent event loop blocking.
+    """
     status_path = _safe_path_resolve(TRAINING_OUTPUT_DIR, version, "status.json")
     if status_path:
         try:
-            with open(status_path) as f:
-                return json.load(f)
+            async with aiofiles.open(status_path) as f:
+                content = await f.read()
+                return json.loads(content)
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in status file {status_path}: {e}")
         except Exception as e:
@@ -274,25 +284,35 @@ def _load_status_file(version: str) -> dict[str, Any] | None:
     return None
 
 
-def _find_training_versions() -> list[str]:
-    """Find all training version directories."""
+async def _find_training_versions() -> list[str]:
+    """Find all training version directories.
+
+    Uses asyncio.to_thread for non-blocking directory iteration.
+    """
     if not TRAINING_OUTPUT_DIR.exists():
         return []
 
-    versions = []
-    for item in TRAINING_OUTPUT_DIR.iterdir():
-        if item.is_dir() and (item / "progress.json").exists():
-            versions.append(item.name)
+    def _sync_find_versions() -> list[str]:
+        """Sync version finding for thread execution."""
+        versions = []
+        for item in TRAINING_OUTPUT_DIR.iterdir():
+            if item.is_dir() and (item / "progress.json").exists():
+                versions.append(item.name)
+        return sorted(versions, reverse=True)
 
-    return sorted(versions, reverse=True)
+    return await asyncio.to_thread(_sync_find_versions)
 
 
-def _load_round_table_results() -> dict[str, Any] | None:
-    """Load Round Table elite results."""
+async def _load_round_table_results() -> dict[str, Any] | None:
+    """Load Round Table elite results.
+
+    Uses aiofiles for non-blocking file I/O to prevent event loop blocking.
+    """
     if ROUND_TABLE_RESULTS_PATH.exists():
         try:
-            with open(ROUND_TABLE_RESULTS_PATH) as f:
-                return json.load(f)
+            async with aiofiles.open(ROUND_TABLE_RESULTS_PATH) as f:
+                content = await f.read()
+                return json.loads(content)
         except Exception as e:
             logger.error(f"Failed to load Round Table results: {e}")
     return None
@@ -556,7 +576,7 @@ async def export_round_table_to_hf(request: ExportRequest):
             )
 
         # TODO: Implement actual HuggingFace upload using huggingface_hub
-        # For now, save to local export file
+        # For now, save to local export file using async I/O
         export_path = Path("assets/exports") / f"{request.dataset_name}.json"
         export_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -567,8 +587,8 @@ async def export_round_table_to_hf(request: ExportRequest):
             "items": export_items,
         }
 
-        with open(export_path, "w") as f:
-            json.dump(export_data, f, indent=2)
+        async with aiofiles.open(export_path, "w") as f:
+            await f.write(json.dumps(export_data, indent=2))
 
         logger.info(f"Exported {len(export_items)} items to {export_path}")
 

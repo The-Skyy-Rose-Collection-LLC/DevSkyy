@@ -90,6 +90,70 @@ cache_hit_rate = Gauge(
 )
 
 # =============================================================================
+# Performance Cache Metrics (Embedding, Reranking, Vector Search)
+# =============================================================================
+
+# Counter: Cache Hits
+cache_hits_total = Counter(
+    "cache_hits_total",
+    "Total cache hits",
+    ["cache_type"],
+    registry=devskyy_registry,
+)
+
+# Counter: Cache Misses
+cache_misses_total = Counter(
+    "cache_misses_total",
+    "Total cache misses",
+    ["cache_type"],
+    registry=devskyy_registry,
+)
+
+# Gauge: Cache Size
+cache_size = Gauge(
+    "cache_size",
+    "Current number of items in cache",
+    ["cache_type"],
+    registry=devskyy_registry,
+)
+
+# Histogram: Cache Lookup Latency
+cache_lookup_duration_seconds = Histogram(
+    "cache_lookup_duration_seconds",
+    "Cache lookup duration in seconds",
+    ["cache_type", "result"],  # result: hit or miss
+    buckets=(0.0001, 0.0005, 0.001, 0.005, 0.01, 0.025, 0.05, 0.1),
+    registry=devskyy_registry,
+)
+
+# Histogram: Embedding Generation Latency
+embedding_generation_duration_seconds = Histogram(
+    "embedding_generation_duration_seconds",
+    "Embedding generation duration in seconds",
+    ["provider", "batch_size_bucket"],
+    buckets=(0.01, 0.05, 0.1, 0.25, 0.5, 1.0, 2.5, 5.0, 10.0),
+    registry=devskyy_registry,
+)
+
+# Histogram: Reranking Latency
+reranking_duration_seconds = Histogram(
+    "reranking_duration_seconds",
+    "Reranking operation duration in seconds",
+    ["provider", "doc_count_bucket"],
+    buckets=(0.05, 0.1, 0.25, 0.5, 1.0, 2.0, 5.0),
+    registry=devskyy_registry,
+)
+
+# Histogram: Vector Search Latency
+vector_search_duration_seconds = Histogram(
+    "vector_search_duration_seconds",
+    "Vector search duration in seconds",
+    ["store_type", "top_k_bucket"],
+    buckets=(0.001, 0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5),
+    registry=devskyy_registry,
+)
+
+# =============================================================================
 # LLM Round Table Metrics
 # =============================================================================
 
@@ -306,6 +370,137 @@ class PrometheusExporter:
             cache_type: Type of cache ('redis', 'memory', 'cdn')
         """
         cache_hit_rate.labels(cache_type=cache_type).set(hit_rate)
+
+    # =========================================================================
+    # Performance Cache Metrics
+    # =========================================================================
+
+    def record_cache_hit(self, cache_type: str) -> None:
+        """
+        Record a cache hit.
+
+        Args:
+            cache_type: Type of cache ('embedding', 'reranking', 'vector_search')
+        """
+        cache_hits_total.labels(cache_type=cache_type).inc()
+
+    def record_cache_miss(self, cache_type: str) -> None:
+        """
+        Record a cache miss.
+
+        Args:
+            cache_type: Type of cache ('embedding', 'reranking', 'vector_search')
+        """
+        cache_misses_total.labels(cache_type=cache_type).inc()
+
+    def update_cache_size(self, size: int, cache_type: str) -> None:
+        """
+        Update the current cache size.
+
+        Args:
+            size: Number of items in cache
+            cache_type: Type of cache ('embedding', 'reranking', 'vector_search')
+        """
+        cache_size.labels(cache_type=cache_type).set(size)
+
+    def record_cache_lookup(self, duration: float, cache_type: str, hit: bool) -> None:
+        """
+        Record a cache lookup operation.
+
+        Args:
+            duration: Lookup duration in seconds
+            cache_type: Type of cache
+            hit: Whether the lookup was a hit
+        """
+        result = "hit" if hit else "miss"
+        cache_lookup_duration_seconds.labels(cache_type=cache_type, result=result).observe(duration)
+
+    def record_embedding_generation(
+        self, duration: float, provider: str, batch_size: int
+    ) -> None:
+        """
+        Record embedding generation metrics.
+
+        Args:
+            duration: Generation duration in seconds
+            provider: Embedding provider (openai, cohere, local)
+            batch_size: Number of texts embedded
+        """
+        # Bucket batch sizes for cardinality control
+        if batch_size <= 1:
+            bucket = "1"
+        elif batch_size <= 10:
+            bucket = "2-10"
+        elif batch_size <= 50:
+            bucket = "11-50"
+        elif batch_size <= 100:
+            bucket = "51-100"
+        else:
+            bucket = "100+"
+        embedding_generation_duration_seconds.labels(
+            provider=provider, batch_size_bucket=bucket
+        ).observe(duration)
+
+    def record_reranking(self, duration: float, provider: str, doc_count: int) -> None:
+        """
+        Record reranking operation metrics.
+
+        Args:
+            duration: Reranking duration in seconds
+            provider: Reranking provider (cohere, local)
+            doc_count: Number of documents reranked
+        """
+        if doc_count <= 5:
+            bucket = "1-5"
+        elif doc_count <= 10:
+            bucket = "6-10"
+        elif doc_count <= 25:
+            bucket = "11-25"
+        else:
+            bucket = "25+"
+        reranking_duration_seconds.labels(provider=provider, doc_count_bucket=bucket).observe(
+            duration
+        )
+
+    def record_vector_search(self, duration: float, store_type: str, top_k: int) -> None:
+        """
+        Record vector search metrics.
+
+        Args:
+            duration: Search duration in seconds
+            store_type: Vector store type (chromadb, pinecone)
+            top_k: Number of results requested
+        """
+        if top_k <= 5:
+            bucket = "1-5"
+        elif top_k <= 10:
+            bucket = "6-10"
+        elif top_k <= 25:
+            bucket = "11-25"
+        else:
+            bucket = "25+"
+        vector_search_duration_seconds.labels(store_type=store_type, top_k_bucket=bucket).observe(
+            duration
+        )
+
+    def update_cache_metrics_from_stats(
+        self, cache_type: str, hits: int, misses: int, size: int
+    ) -> None:
+        """
+        Bulk update cache metrics from cache stats.
+
+        Args:
+            cache_type: Type of cache ('embedding', 'reranking', 'vector_search')
+            hits: Total hits
+            misses: Total misses
+            size: Current cache size
+        """
+        # Calculate and update hit rate
+        total = hits + misses
+        if total > 0:
+            hit_rate = (hits / total) * 100
+            self.update_cache_hit_rate(hit_rate, cache_type)
+        self.update_cache_size(size, cache_type)
 
     # =========================================================================
     # LLM Round Table Metrics
