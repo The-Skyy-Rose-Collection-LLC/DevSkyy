@@ -22,11 +22,37 @@ from typing import Any
 from uuid import uuid4
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field
 
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
+from services.ml.visual_feature_extractor import (
+    VisualFeatureExtractor,
+    get_visual_feature_extractor,
+)
+from services.storage.r2_client import R2Client, R2Config, R2Error
 
 logger = logging.getLogger(__name__)
+
+# Feature extractor instance
+_feature_extractor: VisualFeatureExtractor | None = None
+
+# R2 client instance (lazy init to avoid startup errors)
+_r2_client: R2Client | None = None
+
+
+def _get_r2_client() -> R2Client | None:
+    """Get or create R2 client if credentials are configured."""
+    global _r2_client
+    if _r2_client is None:
+        try:
+            config = R2Config.from_env()
+            config.validate()
+            _r2_client = R2Client(config)
+        except R2Error as e:
+            logger.warning(f"R2 not configured, storage disabled: {e}")
+            return None
+    return _r2_client
+
 
 router = APIRouter(prefix="/brand-assets", tags=["Brand Assets"])
 
@@ -244,9 +270,10 @@ async def extract_visual_features(
     *,
     correlation_id: str | None = None,
 ) -> VisualFeatures:
-    """Extract visual features from image.
+    """Extract visual features from image using Gemini vision.
 
-    In production, this would call ML models to analyze the image.
+    Uses the VisualFeatureExtractor service to analyze images
+    and extract color palettes, composition, lighting, and style.
 
     Args:
         image_url: URL of image to analyze
@@ -255,27 +282,147 @@ async def extract_visual_features(
     Returns:
         VisualFeatures with extracted data
     """
-    # TODO: Integrate with actual ML pipeline
-    # For now, return placeholder features
-    return VisualFeatures(
-        color_palette=ColorPalette(
-            primary="#1A1A1A",
-            secondary=["#B76E79", "#FFFFFF"],
-            accent="#B76E79",
-        ),
-        composition=CompositionAnalysis(
-            type="centered",
-            focal_point="center",
-            balance="balanced",
-        ),
-        lighting=LightingProfile(
-            type="studio",
-            direction="front",
-            mood="dramatic",
-        ),
-        style_tags=["luxury", "minimal", "sophisticated"],
-        quality_score=0.85,
-    )
+    global _feature_extractor
+
+    try:
+        # Get or create extractor
+        if _feature_extractor is None:
+            _feature_extractor = await get_visual_feature_extractor()
+
+        # Extract features using Gemini
+        extracted = await _feature_extractor.extract(
+            image_url,
+            correlation_id=correlation_id,
+        )
+
+        # Map to API response models
+        return VisualFeatures(
+            color_palette=ColorPalette(
+                primary=extracted.color_palette.primary if extracted.color_palette else "#1A1A1A",
+                secondary=extracted.color_palette.secondary if extracted.color_palette else [],
+                accent=extracted.color_palette.accent if extracted.color_palette else None,
+            ),
+            composition=CompositionAnalysis(
+                type=extracted.composition.type if extracted.composition else "centered",
+                focal_point=extracted.composition.focal_point if extracted.composition else None,
+                balance=extracted.composition.balance if extracted.composition else "balanced",
+            ),
+            lighting=LightingProfile(
+                type=extracted.lighting.type if extracted.lighting else "studio",
+                direction=extracted.lighting.direction if extracted.lighting else None,
+                mood=extracted.lighting.mood if extracted.lighting else None,
+            ),
+            style_tags=extracted.style_tags,
+            quality_score=extracted.quality_score,
+        )
+
+    except Exception as e:
+        logger.warning(
+            f"Feature extraction failed, using defaults: {e}",
+            extra={"image_url": image_url, "correlation_id": correlation_id},
+        )
+        # Fallback to SkyyRose brand defaults
+        return VisualFeatures(
+            color_palette=ColorPalette(
+                primary="#1A1A1A",
+                secondary=["#B76E79", "#FFFFFF"],
+                accent="#B76E79",
+            ),
+            composition=CompositionAnalysis(
+                type="centered",
+                focal_point="center",
+                balance="balanced",
+            ),
+            lighting=LightingProfile(
+                type="studio",
+                direction="front",
+                mood="dramatic",
+            ),
+            style_tags=["luxury", "minimal", "sophisticated"],
+            quality_score=0.85,
+        )
+
+
+async def upload_to_r2(
+    image_url: str,
+    asset_id: str,
+    category: BrandAssetCategory,
+    *,
+    correlation_id: str | None = None,
+) -> tuple[str | None, int, int | None, int | None, str | None]:
+    """Download image from URL and upload to R2.
+
+    Args:
+        image_url: Source image URL
+        asset_id: Asset ID for storage key
+        category: Asset category
+        correlation_id: Optional correlation ID
+
+    Returns:
+        Tuple of (r2_key, file_size, width, height, mime_type)
+        Returns (None, 0, None, None, None) if R2 not configured
+    """
+    import io
+
+    import httpx
+    from PIL import Image
+
+    r2_client = _get_r2_client()
+    if r2_client is None:
+        logger.debug("R2 not configured, skipping upload")
+        return None, 0, None, None, None
+
+    try:
+        # Download image
+        async with httpx.AsyncClient(timeout=30.0) as http_client:
+            response = await http_client.get(image_url)
+            response.raise_for_status()
+            image_data = response.content
+            content_type = response.headers.get("content-type", "image/jpeg")
+
+        # Get image dimensions
+        width, height = None, None
+        try:
+            img = Image.open(io.BytesIO(image_data))
+            width, height = img.size
+        except Exception as e:
+            logger.warning(f"Could not read image dimensions: {e}")
+
+        # Generate key and upload
+        from pathlib import Path
+
+        ext = Path(image_url).suffix or ".jpg"
+        key = f"brand/{category.value}/{asset_id}{ext}"
+
+        result = r2_client.upload_bytes(
+            image_data,
+            key,
+            content_type=content_type,
+            metadata={
+                "asset-id": asset_id,
+                "category": category.value,
+                "source-url": image_url[:200],  # Truncate long URLs
+            },
+            correlation_id=correlation_id,
+        )
+
+        logger.info(
+            f"Uploaded brand asset to R2: {key}",
+            extra={
+                "asset_id": asset_id,
+                "size": len(image_data),
+                "correlation_id": correlation_id,
+            },
+        )
+
+        return result.key, len(image_data), width, height, content_type
+
+    except Exception as e:
+        logger.error(
+            f"Failed to upload to R2: {e}",
+            extra={"image_url": image_url, "correlation_id": correlation_id},
+        )
+        return None, 0, None, None, None
 
 
 async def process_bulk_ingestion(
@@ -298,6 +445,17 @@ async def process_bulk_ingestion(
 
     for asset_upload in request.assets:
         try:
+            # Generate asset ID first (needed for R2 key)
+            asset_id = str(uuid4())
+
+            # Upload to R2 storage
+            r2_key, file_size, width, height, mime_type = await upload_to_r2(
+                asset_upload.url,
+                asset_id,
+                asset_upload.category,
+                correlation_id=job_id,
+            )
+
             # Extract features if requested
             features = None
             if request.extract_features:
@@ -306,8 +464,9 @@ async def process_bulk_ingestion(
                     correlation_id=job_id,
                 )
 
-            # Create asset
+            # Create asset with all extracted data
             asset = BrandAsset(
+                id=asset_id,
                 url=asset_upload.url,
                 category=asset_upload.category,
                 approval_status=(
@@ -317,6 +476,11 @@ async def process_bulk_ingestion(
                 ),
                 metadata=asset_upload.metadata,
                 visual_features=features,
+                file_size_bytes=file_size,
+                width=width,
+                height=height,
+                mime_type=mime_type,
+                r2_key=r2_key,
                 created_by=user_id,
             )
 
@@ -603,7 +767,10 @@ async def check_training_readiness(
     # Determine status
     if len(approved) >= minimum_assets:
         status_val = TrainingReadinessStatus.READY
-    elif len(approved) + sum(1 for a in assets if a.approval_status == AssetApprovalStatus.PENDING) >= minimum_assets:
+    elif (
+        len(approved) + sum(1 for a in assets if a.approval_status == AssetApprovalStatus.PENDING)
+        >= minimum_assets
+    ):
         status_val = TrainingReadinessStatus.NEEDS_REVIEW
     else:
         status_val = TrainingReadinessStatus.NOT_READY
@@ -683,5 +850,5 @@ async def get_brand_assets_stats(
         "by_category": by_category,
         "by_approval_status": by_status,
         "average_quality_score": round(avg_quality, 2),
-        "campaigns": list(set(a.metadata.campaign for a in assets if a.metadata.campaign)),
+        "campaigns": list({a.metadata.campaign for a in assets if a.metadata.campaign}),
     }

@@ -91,6 +91,7 @@ from .tripo_agent import GenerationResult as TripoGenerationResult
 from .visual_generation import (
     SKYYROSE_BRAND_DNA,
     AspectRatio,
+    ConversationEditor,
     GenerationRequest,
     GenerationResult,
     GenerationType,
@@ -101,7 +102,6 @@ from .visual_generation import (
     VisualGenerationRouter,
     VisualProvider,
     create_visual_router,
-    ConversationEditor,
 )
 from .wordpress_asset_agent import (
     GalleryResult,

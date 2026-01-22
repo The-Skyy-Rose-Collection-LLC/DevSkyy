@@ -19,7 +19,6 @@ Version: 1.0.0
 from __future__ import annotations
 
 import logging
-import os
 import uuid
 from datetime import UTC, datetime
 from typing import Any
@@ -30,14 +29,12 @@ from services.ml.gemini_client import (
     GeminiConfig,
     GeminiError,
     GeminiModel,
-    GeneratedImage,
     ImageGenerationRequest,
     ImageGenerationResponse,
     ImageInput,
     ImageSize,
 )
 from services.three_d.provider_interface import (
-    I3DProvider,
     OutputFormat,
     ProviderHealth,
     ProviderStatus,

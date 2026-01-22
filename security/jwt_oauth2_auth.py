@@ -1076,9 +1076,37 @@ def _create_auth_router():
             login_rate_limiter.record_attempt(rate_limit_key)
 
             # Check if we're in development mode (allow any credentials)
-            if os.environ.get("DEVSKYY_DEV_MODE", "").lower() == "true":
-                logger.warning("DEV MODE: Accepting any credentials")
+            # SECURITY: Restrict dev mode to localhost only and block in production
+            dev_mode_enabled = os.environ.get("DEVSKYY_DEV_MODE", "").lower() == "true"
+            environment = os.environ.get("ENVIRONMENT", "development").lower()
+            is_localhost = client_ip in ("127.0.0.1", "localhost", "::1")
+
+            if dev_mode_enabled and environment != "production" and is_localhost:
+                logger.warning(
+                    "DEV MODE: Accepting credentials (localhost only)",
+                    extra={"client_ip": client_ip, "username": form_data.username},
+                )
                 user_info = (form_data.username, ["api_user"])
+            elif dev_mode_enabled and environment == "production":
+                logger.error(
+                    "SECURITY: Dev mode attempted in production - BLOCKED",
+                    extra={"client_ip": client_ip},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid username or password",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
+            elif dev_mode_enabled and not is_localhost:
+                logger.warning(
+                    "SECURITY: Dev mode auth attempted from non-localhost - BLOCKED",
+                    extra={"client_ip": client_ip},
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Invalid username or password",
+                    headers={"WWW-Authenticate": "Bearer"},
+                )
             else:
                 raise HTTPException(
                     status_code=status.HTTP_401_UNAUTHORIZED,

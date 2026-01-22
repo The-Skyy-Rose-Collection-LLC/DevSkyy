@@ -134,8 +134,9 @@ class ImageDeduplicator:
             Perceptual hash string
         """
         try:
-            from PIL import Image
             import io
+
+            from PIL import Image
 
             # Load image
             img = Image.open(io.BytesIO(content))

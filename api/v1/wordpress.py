@@ -30,8 +30,8 @@ from integrations.wordpress_client import (
     WordPressError,
     WordPressWooCommerceClient,
 )
-from security.jwt_oauth2_auth import TokenPayload, get_current_user
 from security.input_validation import SecurityValidator
+from security.jwt_oauth2_auth import TokenPayload, get_current_user
 
 logger = logging.getLogger(__name__)
 

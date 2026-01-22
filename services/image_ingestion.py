@@ -26,9 +26,6 @@ from typing import Any
 import httpx
 
 from services.image_deduplication import (
-    DuplicateCheckResult,
-    HashAlgorithm,
-    HashResult,
     ImageDeduplicator,
     get_deduplicator,
 )
@@ -263,7 +260,7 @@ class ImageIngestionService:
                     result.completed_at = datetime.now(UTC)
 
                     logger.info(
-                        f"Skipped duplicate image",
+                        "Skipped duplicate image",
                         extra={
                             "existing_asset": dedup_result.existing_asset_id,
                             "correlation_id": correlation_id,
@@ -310,7 +307,7 @@ class ImageIngestionService:
             result.completed_at = datetime.now(UTC)
 
             logger.info(
-                f"Ingestion completed",
+                "Ingestion completed",
                 extra={
                     "job_id": job_id,
                     "asset_id": asset_id,
