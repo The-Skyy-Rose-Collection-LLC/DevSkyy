@@ -47,9 +47,22 @@ class ProductType(str, Enum):
 class VisionModel(str, Enum):
     """Vision model to use for analysis."""
 
+    # Replicate models
     LLAVA_34B = "yorickvp/llava-v1.6-34b"  # Primary - best quality
     LLAVA_13B = "yorickvp/llava-13b"  # Fast - lower latency
     BLIP2 = "salesforce/blip-2"  # Fallback
+
+    # Gemini models (no rate limiting issues)
+    GEMINI_FLASH = "gemini-2.5-flash-preview-05-20"  # Fast, reliable
+    GEMINI_PRO = "gemini-2.5-pro-preview-05-06"  # Best quality
+
+    def is_gemini(self) -> bool:
+        """Check if this is a Gemini model."""
+        return self.value.startswith("gemini-")
+
+    def is_replicate(self) -> bool:
+        """Check if this is a Replicate model."""
+        return not self.is_gemini()
 
 
 # =============================================================================
