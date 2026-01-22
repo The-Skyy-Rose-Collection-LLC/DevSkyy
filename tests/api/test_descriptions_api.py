@@ -6,22 +6,18 @@ Implements US-029: Image-to-description pipeline.
 Author: DevSkyy Platform Team
 """
 
-import pytest
-from datetime import datetime, UTC
-from unittest.mock import AsyncMock, MagicMock, patch
+from datetime import UTC, datetime
+from unittest.mock import AsyncMock, MagicMock
 
+import pytest
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
 
-from api.v1.descriptions import router, get_pipeline, get_vision_client
+from api.v1.descriptions import get_pipeline, get_vision_client, router
 from services.ml.schemas.description import (
     DescriptionOutput,
-    DescriptionStyle,
     ExtractedFeatures,
-    ProductType,
-    VisionModel,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -330,10 +326,7 @@ class TestBatchDescription:
         response = client.post(
             "/descriptions/generate/batch",
             json={
-                "requests": [
-                    {"image_url": f"https://example.com/img{i}.jpg"}
-                    for i in range(51)
-                ],
+                "requests": [{"image_url": f"https://example.com/img{i}.jpg"} for i in range(51)],
             },
         )
 
@@ -418,11 +411,27 @@ class TestModelsEndpoint:
 
         assert response.status_code == 200
         data = response.json()
-        assert len(data) == 3
+        assert len(data) == 5  # 2 Gemini + 3 Replicate
 
-        # Check LLaVA 34B
+        # Check Gemini Pro (recommended, no rate limits)
+        gemini_pro = next(
+            m for m in data if "gemini" in m["id"].lower() and "pro" in m["id"].lower()
+        )
+        assert gemini_pro["provider"] == "google"
+        assert gemini_pro["rate_limited"] is False
+        assert "(RECOMMENDED)" in gemini_pro["description"]
+
+        # Check Gemini Flash (fast, no rate limits)
+        gemini_flash = next(
+            m for m in data if "gemini" in m["id"].lower() and "flash" in m["id"].lower()
+        )
+        assert gemini_flash["provider"] == "google"
+        assert gemini_flash["rate_limited"] is False
+
+        # Check LLaVA 34B (Replicate)
         llava_34b = next(m for m in data if "34b" in m["id"].lower())
         assert llava_34b["quality"] == "highest"
+        assert llava_34b["provider"] == "replicate"
 
         # Check BLIP-2
         blip2 = next(m for m in data if "blip" in m["id"].lower())
@@ -503,15 +512,18 @@ class TestHealthCheck:
 class TestProductTypes:
     """Tests for product type handling."""
 
-    @pytest.mark.parametrize("product_type", [
-        "apparel",
-        "footwear",
-        "accessories",
-        "jewelry",
-        "home",
-        "beauty",
-        "other",
-    ])
+    @pytest.mark.parametrize(
+        "product_type",
+        [
+            "apparel",
+            "footwear",
+            "accessories",
+            "jewelry",
+            "home",
+            "beauty",
+            "other",
+        ],
+    )
     def test_all_product_types_accepted(
         self,
         client: TestClient,
@@ -541,13 +553,16 @@ class TestProductTypes:
 class TestDescriptionStyles:
     """Tests for description style handling."""
 
-    @pytest.mark.parametrize("style", [
-        "luxury",
-        "casual",
-        "technical",
-        "minimal",
-        "storytelling",
-    ])
+    @pytest.mark.parametrize(
+        "style",
+        [
+            "luxury",
+            "casual",
+            "technical",
+            "minimal",
+            "storytelling",
+        ],
+    )
     def test_all_styles_accepted(
         self,
         client: TestClient,

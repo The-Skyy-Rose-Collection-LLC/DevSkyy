@@ -70,6 +70,10 @@ class FactoryConfig:
     image_to_3d_order: list[str] = field(
         default_factory=lambda: ["tripo", "huggingface", "replicate"]
     )
+    # Image generation order (Gemini Nano Banana Pro is primary - no rate limits)
+    image_generation_order: list[str] = field(
+        default_factory=lambda: ["gemini", "replicate", "huggingface"]
+    )
 
     # Failover settings
     enable_failover: bool = True
@@ -184,6 +188,25 @@ class ThreeDProviderFactory:
                 weight=60,
             ),
         )
+
+        # Register Gemini provider (Nano Banana Pro) - no rate limits
+        try:
+            from services.three_d.gemini_provider import GeminiImageProvider
+
+            self._register_provider(
+                "gemini",
+                GeminiImageProvider(),
+                ProviderConfig(
+                    provider_type="gemini",
+                    priority=ProviderPriority.PRIMARY,  # Primary for image gen
+                    weight=120,  # Higher weight - no rate limits
+                ),
+            )
+            logger.info("Gemini Nano Banana Pro provider registered")
+        except ImportError:
+            logger.warning("Gemini provider not available")
+        except Exception as e:
+            logger.warning(f"Failed to initialize Gemini provider: {e}")
 
         self._initialized = True
         logger.info(f"ThreeDProviderFactory initialized with {len(self._providers)} providers")
