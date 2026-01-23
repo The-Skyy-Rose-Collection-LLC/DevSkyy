@@ -86,7 +86,7 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <Alert variant="destructive\" className="bg-red-900/50 border-red-800" data-testid="error-message">
+              <Alert variant="destructive" className="bg-red-900/50 border-red-800" data-testid="error-message">
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
