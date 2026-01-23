@@ -17,11 +17,15 @@ Version: 1.0.0
 from __future__ import annotations
 
 import asyncio
+import json
 from dataclasses import dataclass
+from datetime import datetime
+from pathlib import Path
 from typing import Any, cast
 
 import aiohttp
 import structlog
+from pydantic import BaseModel
 
 logger = structlog.get_logger(__name__)
 
@@ -683,10 +687,553 @@ class WordPress3DMediaSync:
         )
 
 
+class QAApprovedModel(BaseModel):
+    """Model representing an approved 3D model from the QA queue."""
+
+    model_config = {"protected_namespaces": ()}
+
+    id: str
+    product_id: int
+    product_name: str
+    collection: str
+    glb_path: str
+    usdz_path: str | None = None
+    thumbnail_path: str | None = None
+    fidelity_score: float
+    approved_at: str
+    sku: str | None = None
+
+
+class WordPress3DPipelineSync:
+    """
+    Pipeline sync for approved 3D models.
+
+    Bridges the generation pipeline with WordPress/WooCommerce by:
+    - Syncing approved models from QA queue
+    - Uploading GLB/USDZ files to WordPress media library
+    - Updating product meta with 3D URLs
+    - Regenerating hotspot configurations
+
+    Usage:
+        sync = WordPress3DPipelineSync(
+            wp_url="https://skyyrose.co",
+            username="admin",
+            app_password="xxxx xxxx xxxx xxxx",
+            cdn_base_url="https://cdn.skyyrose.co",
+        )
+
+        async with sync:
+            # Sync all approved models from QA queue
+            results = await sync.sync_approved_models()
+
+            # Sync a single approved model
+            result = await sync.sync_single_model(model)
+
+            # Regenerate hotspots for collection
+            await sync.regenerate_collection_hotspots("black-rose")
+    """
+
+    def __init__(
+        self,
+        wp_url: str,
+        username: str,
+        app_password: str,
+        cdn_base_url: str = "https://cdn.skyyrose.co",
+        generated_models_dir: str = "./assets/3d-models-generated",
+        hotspots_dir: str = "./wordpress/hotspots",
+    ) -> None:
+        """
+        Initialize pipeline sync.
+
+        Args:
+            wp_url: WordPress site URL
+            username: WordPress username
+            app_password: WordPress application password
+            cdn_base_url: Base URL for CDN-hosted 3D models
+            generated_models_dir: Directory containing generated GLB files
+            hotspots_dir: Directory for hotspot configuration files
+        """
+        self.media_sync = WordPress3DMediaSync(
+            wp_url=wp_url,
+            username=username,
+            app_password=app_password,
+        )
+        self.cdn_base_url = cdn_base_url.rstrip("/")
+        self.generated_models_dir = Path(generated_models_dir)
+        self.hotspots_dir = Path(hotspots_dir)
+        self._logger = logger.bind(component="pipeline_sync")
+
+    async def __aenter__(self) -> WordPress3DPipelineSync:
+        """Async context manager entry."""
+        await self.media_sync.connect()
+        return self
+
+    async def __aexit__(self, *args: Any) -> None:
+        """Async context manager exit."""
+        await self.media_sync.close()
+
+    async def sync_approved_models(
+        self,
+        qa_queue_path: str = "./data/qa_queue.json",
+    ) -> list[dict[str, Any]]:
+        """
+        Sync all approved models from QA queue to WordPress.
+
+        Args:
+            qa_queue_path: Path to QA queue JSON file
+
+        Returns:
+            List of sync results for each model
+
+        Raises:
+            WordPress3DSyncError: If sync fails
+        """
+        self._logger.info("sync_approved_models_start", queue_path=qa_queue_path)
+
+        try:
+            # Load QA queue
+            queue_path = Path(qa_queue_path)
+            if not queue_path.exists():
+                self._logger.warning("qa_queue_not_found", path=qa_queue_path)
+                return []
+
+            with open(queue_path) as f:
+                queue_data = json.load(f)
+
+            # Filter approved models
+            approved = [
+                QAApprovedModel.model_validate(item)
+                for item in queue_data.get("items", [])
+                if item.get("status") == "approved"
+            ]
+
+            if not approved:
+                self._logger.info("no_approved_models")
+                return []
+
+            self._logger.info("found_approved_models", count=len(approved))
+
+            # Sync each model
+            results = []
+            for model in approved:
+                result = await self.sync_single_model(model)
+                results.append(result)
+
+            # Update QA queue status
+            await self._mark_synced_in_queue(queue_path, [m.id for m in approved])
+
+            # Group by collection and regenerate hotspots
+            collections = {m.collection for m in approved}
+            for collection in collections:
+                await self.regenerate_collection_hotspots(collection)
+
+            self._logger.info(
+                "sync_approved_models_complete",
+                total=len(results),
+                success=sum(1 for r in results if r["status"] == "success"),
+            )
+
+            return results
+
+        except Exception as e:
+            self._logger.error("sync_approved_models_failed", error=str(e))
+            raise WordPress3DSyncError(f"Failed to sync approved models: {e}")
+
+    async def sync_single_model(
+        self,
+        model: QAApprovedModel,
+    ) -> dict[str, Any]:
+        """
+        Sync a single approved model to WordPress.
+
+        Args:
+            model: Approved model from QA queue
+
+        Returns:
+            Sync result with status and details
+        """
+        self._logger.info(
+            "sync_single_model_start",
+            model_id=model.id,
+            product_id=model.product_id,
+            collection=model.collection,
+        )
+
+        try:
+            # Build CDN URLs from paths
+            glb_url = self._build_cdn_url(model.glb_path)
+            usdz_url = self._build_cdn_url(model.usdz_path) if model.usdz_path else None
+            thumbnail_url = (
+                self._build_cdn_url(model.thumbnail_path) if model.thumbnail_path else None
+            )
+
+            # Verify GLB file exists
+            glb_path = self.generated_models_dir / model.collection / Path(model.glb_path).name
+            if not glb_path.exists():
+                self._logger.warning(
+                    "glb_file_not_found",
+                    path=str(glb_path),
+                    model_id=model.id,
+                )
+
+            # Sync to WordPress
+            result = await self.media_sync.sync_3d_model(
+                product_id=model.product_id,
+                glb_url=glb_url,
+                usdz_url=usdz_url,
+                thumbnail_url=thumbnail_url,
+            )
+
+            # Enable AR if USDZ available
+            if usdz_url:
+                await self.media_sync.enable_ar(model.product_id, enabled=True)
+
+            self._logger.info(
+                "sync_single_model_success",
+                model_id=model.id,
+                product_id=model.product_id,
+            )
+
+            return {
+                "model_id": model.id,
+                "product_id": model.product_id,
+                "status": "success",
+                "glb_url": glb_url,
+                "usdz_url": usdz_url,
+                "fidelity_score": model.fidelity_score,
+            }
+
+        except Exception as e:
+            self._logger.error(
+                "sync_single_model_failed",
+                model_id=model.id,
+                error=str(e),
+            )
+            return {
+                "model_id": model.id,
+                "product_id": model.product_id,
+                "status": "failed",
+                "error": str(e),
+            }
+
+    def _build_cdn_url(self, path: str) -> str:
+        """
+        Build CDN URL from local path.
+
+        Args:
+            path: Local file path or relative path
+
+        Returns:
+            Full CDN URL
+        """
+        # Extract relative path from full path
+        path_obj = Path(path)
+        if path_obj.is_absolute():
+            # Convert absolute path to relative from generated_models_dir
+            try:
+                rel_path = path_obj.relative_to(self.generated_models_dir)
+            except ValueError:
+                rel_path = path_obj.name
+        else:
+            rel_path = path_obj
+
+        return f"{self.cdn_base_url}/models/{rel_path}"
+
+    async def _mark_synced_in_queue(
+        self,
+        queue_path: Path,
+        model_ids: list[str],
+    ) -> None:
+        """
+        Mark models as synced in QA queue.
+
+        Args:
+            queue_path: Path to QA queue JSON
+            model_ids: List of model IDs to mark as synced
+        """
+        try:
+            with open(queue_path) as f:
+                queue_data = json.load(f)
+
+            # Update status for synced models
+            for item in queue_data.get("items", []):
+                if item.get("id") in model_ids:
+                    item["status"] = "synced"
+                    item["synced_at"] = datetime.now().isoformat()
+
+            # Write back
+            with open(queue_path, "w") as f:
+                json.dump(queue_data, f, indent=2)
+
+            self._logger.info("marked_synced", count=len(model_ids))
+
+        except Exception as e:
+            self._logger.warning("mark_synced_failed", error=str(e))
+
+    async def regenerate_collection_hotspots(
+        self,
+        collection: str,
+    ) -> Path | None:
+        """
+        Regenerate hotspot configuration for a collection.
+
+        Updates hotspot configs with new 3D model URLs for products
+        that have been synced.
+
+        Args:
+            collection: Collection slug (black-rose, love-hurts, signature)
+
+        Returns:
+            Path to updated hotspot config file, or None if failed
+        """
+        from wordpress.hotspot_config_generator import (
+            CollectionType,
+            HotspotConfigGenerator,
+        )
+
+        self._logger.info("regenerate_hotspots_start", collection=collection)
+
+        try:
+            # Map collection slug to enum
+            collection_map = {
+                "black-rose": CollectionType.BLACK_ROSE,
+                "love-hurts": CollectionType.LOVE_HURTS,
+                "signature": CollectionType.SIGNATURE,
+            }
+
+            if collection not in collection_map:
+                self._logger.warning("unknown_collection", collection=collection)
+                return None
+
+            collection_type = collection_map[collection]
+
+            # Load existing hotspot config
+            hotspot_file = self.hotspots_dir / f"{collection}-hotspots.json"
+            if not hotspot_file.exists():
+                self._logger.warning(
+                    "hotspot_file_not_found",
+                    path=str(hotspot_file),
+                )
+                return None
+
+            with open(hotspot_file) as f:
+                hotspot_data = json.load(f)
+
+            # Get 3D assets for all products in collection
+            updated_count = 0
+            for hotspot in hotspot_data.get("hotspots", []):
+                product_id = hotspot.get("product_id")
+                if not product_id:
+                    continue
+
+                try:
+                    assets = await self.media_sync.get_3d_assets(product_id)
+
+                    # Update hotspot with 3D URLs
+                    if assets.get("glb_url"):
+                        hotspot["glb_url"] = assets["glb_url"]
+                        hotspot["usdz_url"] = assets.get("usdz_url")
+                        hotspot["ar_enabled"] = assets.get("ar_enabled", False)
+                        updated_count += 1
+
+                except Exception as e:
+                    self._logger.warning(
+                        "hotspot_update_failed",
+                        product_id=product_id,
+                        error=str(e),
+                    )
+
+            # Update timestamp
+            hotspot_data["updated_at"] = datetime.now().isoformat()
+            hotspot_data["models_count"] = updated_count
+
+            # Write back
+            with open(hotspot_file, "w") as f:
+                json.dump(hotspot_data, f, indent=2)
+
+            self._logger.info(
+                "regenerate_hotspots_complete",
+                collection=collection,
+                updated=updated_count,
+            )
+
+            return hotspot_file
+
+        except Exception as e:
+            self._logger.error(
+                "regenerate_hotspots_failed",
+                collection=collection,
+                error=str(e),
+            )
+            return None
+
+    async def sync_batch_results(
+        self,
+        batch_id: str,
+        results_path: str,
+    ) -> dict[str, Any]:
+        """
+        Sync results from a batch generation job.
+
+        Args:
+            batch_id: Batch job ID
+            results_path: Path to batch results JSON file
+
+        Returns:
+            Summary of sync operation
+        """
+        self._logger.info(
+            "sync_batch_results_start",
+            batch_id=batch_id,
+            results_path=results_path,
+        )
+
+        try:
+            # Load batch results
+            with open(results_path) as f:
+                batch_data = json.load(f)
+
+            # Filter completed results
+            completed = [
+                r for r in batch_data.get("results", []) if r.get("status") == "completed"
+            ]
+
+            if not completed:
+                self._logger.info("no_completed_results", batch_id=batch_id)
+                return {"batch_id": batch_id, "synced": 0, "status": "empty"}
+
+            # Build sync configs
+            products = []
+            for result in completed:
+                product_id = result.get("product_id")
+                glb_path = result.get("glb_path")
+
+                if not product_id or not glb_path:
+                    continue
+
+                products.append(
+                    {
+                        "product_id": product_id,
+                        "glb_url": self._build_cdn_url(glb_path),
+                        "usdz_url": (
+                            self._build_cdn_url(result["usdz_path"])
+                            if result.get("usdz_path")
+                            else None
+                        ),
+                        "thumbnail_url": (
+                            self._build_cdn_url(result["thumbnail_path"])
+                            if result.get("thumbnail_path")
+                            else None
+                        ),
+                    }
+                )
+
+            # Bulk sync to WordPress
+            results = await self.media_sync.bulk_sync(products)
+
+            success_count = sum(1 for r in results if r["status"] == "success")
+
+            self._logger.info(
+                "sync_batch_results_complete",
+                batch_id=batch_id,
+                total=len(results),
+                success=success_count,
+            )
+
+            return {
+                "batch_id": batch_id,
+                "total": len(results),
+                "synced": success_count,
+                "failed": len(results) - success_count,
+                "status": "complete",
+            }
+
+        except Exception as e:
+            self._logger.error(
+                "sync_batch_results_failed",
+                batch_id=batch_id,
+                error=str(e),
+            )
+            raise WordPress3DSyncError(f"Failed to sync batch results: {e}")
+
+
+# =============================================================================
+# CLI Entry Point
+# =============================================================================
+
+
+async def main() -> None:
+    """CLI entry point for syncing approved models."""
+    import argparse
+    import os
+
+    parser = argparse.ArgumentParser(description="WordPress 3D Media Sync")
+    parser.add_argument(
+        "--mode",
+        choices=["approved", "batch", "cleanup"],
+        default="approved",
+        help="Sync mode",
+    )
+    parser.add_argument(
+        "--qa-queue",
+        default="./data/qa_queue.json",
+        help="Path to QA queue JSON",
+    )
+    parser.add_argument(
+        "--batch-id",
+        help="Batch ID for batch mode",
+    )
+    parser.add_argument(
+        "--batch-results",
+        help="Path to batch results JSON",
+    )
+
+    args = parser.parse_args()
+
+    # Load credentials from environment
+    wp_url = os.environ.get("WP_URL", "https://skyyrose.co")
+    wp_user = os.environ.get("WP_USERNAME", "")
+    wp_pass = os.environ.get("WP_APP_PASSWORD", "")
+    cdn_url = os.environ.get("CDN_BASE_URL", "https://cdn.skyyrose.co")
+
+    if not wp_user or not wp_pass:
+        print("Error: WP_USERNAME and WP_APP_PASSWORD environment variables required")
+        return
+
+    sync = WordPress3DPipelineSync(
+        wp_url=wp_url,
+        username=wp_user,
+        app_password=wp_pass,
+        cdn_base_url=cdn_url,
+    )
+
+    async with sync:
+        if args.mode == "approved":
+            results = await sync.sync_approved_models(args.qa_queue)
+            print(f"Synced {len(results)} models")
+
+        elif args.mode == "batch":
+            if not args.batch_id or not args.batch_results:
+                print("Error: --batch-id and --batch-results required for batch mode")
+                return
+            result = await sync.sync_batch_results(args.batch_id, args.batch_results)
+            print(f"Batch sync complete: {result}")
+
+        elif args.mode == "cleanup":
+            count = await sync.media_sync.cleanup_orphaned_assets()
+            print(f"Cleaned up {count} orphaned assets")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
+
+
 __all__ = [
     "WordPress3DMediaSync",
     "WordPress3DConfig",
     "WordPress3DSyncError",
     "ProductNotFoundError",
     "InvalidAssetURLError",
+    "QAApprovedModel",
+    "WordPress3DPipelineSync",
 ]
