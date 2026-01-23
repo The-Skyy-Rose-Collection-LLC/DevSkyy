@@ -1,6 +1,7 @@
 """API v1 Package.
 
 This package contains all v1 API routers:
+- analytics/business: Business metrics (revenue, orders, AOV, funnel)
 - assets: Asset processing and job status
 - code: Code scanning and fixing
 - commerce: Bulk products and dynamic pricing
@@ -37,11 +38,15 @@ from api.v1.training_status import training_router
 from api.v1.woocommerce_webhooks import router as woocommerce_webhooks_router
 from api.v1.wordpress import router as wordpress_router
 from api.v1.wordpress_theme import router as wordpress_theme_router
+from api.v1.analytics.business import router as business_router
+from api.v1.analytics.dashboard import router as analytics_dashboard_router
 
 __all__ = [
     "approval_router",
     "assets_router",
     "brand_assets_router",
+    "business_router",
+    "analytics_dashboard_router",
     "code_router",
     "commerce_router",
     "competitors_router",
