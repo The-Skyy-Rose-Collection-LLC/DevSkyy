@@ -1,2 +1,32 @@
+# Vercel
 .vercel
+
+# Environment
 .env*.local
+
+# Next.js
+.next/
+out/
+
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+
+# Testing
+playwright-report/
+playwright/
+test-results/
+coverage/
+
+# Build
+dist/
+build/
+
+# IDE
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
