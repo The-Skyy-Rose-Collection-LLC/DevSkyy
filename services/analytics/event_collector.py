@@ -22,7 +22,7 @@ import contextlib
 import json
 import logging
 import uuid
-from collections.abc import Callable, Mapping
+from collections.abc import Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
@@ -425,13 +425,24 @@ class AnalyticsEventCollector:
                 extra={"count": len(events_to_flush)},
             )
         except Exception as e:
-            # Put events back in buffer on failure
-            self._buffer = events_to_flush + self._buffer
+            # Put events back in buffer on failure, respecting overflow limit
+            available_space = MAX_BUFFER_OVERFLOW - len(self._buffer)
+            restore_count = min(len(events_to_flush), available_space)
+            if restore_count > 0:
+                self._buffer = events_to_flush[:restore_count] + self._buffer
+            dropped = len(events_to_flush) - restore_count
+            if dropped > 0:
+                self._events_dropped += dropped
+                logger.warning(
+                    "Dropped %d events due to buffer overflow",
+                    dropped,
+                    extra={"dropped": dropped, "buffer_size": len(self._buffer)},
+                )
             self._flush_errors += 1
             logger.exception("Failed to flush events: %s", e)
             raise EventCollectorError(
                 f"Failed to flush {len(events_to_flush)} events: {e}",
-                context={"event_count": len(events_to_flush)},
+                context={"event_count": len(events_to_flush), "dropped": dropped},
             ) from e
 
     async def _batch_insert(
@@ -444,8 +455,6 @@ class AnalyticsEventCollector:
             return
 
         # Use raw SQL for performance with batch insert
-        import json
-
         values = []
         for event in events:
             values.append(
