@@ -26,3 +26,18 @@ after each iteration and included in agent prompts for context.
   - `update_updated_at_column()` trigger function must exist (from prior migrations)
 ---
 
+## 2026-01-22 - US-002
+- **What was implemented:** Analytics Event Collector Service with async buffered event ingestion
+- **Files changed:**
+  - `services/analytics/__init__.py`
+  - `services/analytics/event_collector.py`
+  - `tests/services/analytics/__init__.py`
+  - `tests/services/analytics/test_event_collector.py`
+- **Learnings:**
+  - `DevSkyError` uses `context` not `details` for extra error info
+  - Use `contextlib.suppress(asyncio.CancelledError)` instead of try/except/pass (ruff SIM105)
+  - Pydantic models with `use_enum_values = True` serialize enums as their values
+  - Background flush tasks need proper cancellation handling in `stop()`
+  - Batch inserts with raw SQL are faster than ORM for high-volume analytics
+---
+
