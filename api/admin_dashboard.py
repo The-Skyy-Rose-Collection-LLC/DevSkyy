@@ -581,8 +581,15 @@ async def get_sales_analytics(
 
 
 @admin_dashboard_router.post("/products")
-async def create_product(product: ProductSummary) -> dict[str, Any]:
-    """Create or update a product."""
+async def create_product(
+    product: ProductSummary,
+    current_user: TokenPayload = Depends(require_admin),
+) -> dict[str, Any]:
+    """Create or update a product. Requires admin role."""
+    logger.info(
+        "Admin created/updated product",
+        extra={"user_id": str(current_user.sub), "product_sku": product.sku},
+    )
     admin_data.add_product(
         product.sku,
         {
@@ -599,8 +606,15 @@ async def create_product(product: ProductSummary) -> dict[str, Any]:
 
 
 @admin_dashboard_router.get("/products/{product_sku}")
-async def get_product(product_sku: str) -> ProductSummary:
-    """Get product details."""
+async def get_product(
+    product_sku: str,
+    current_user: TokenPayload = Depends(require_admin),
+) -> ProductSummary:
+    """Get product details. Requires admin role."""
+    logger.info(
+        "Admin requested product details",
+        extra={"user_id": str(current_user.sub), "product_sku": product_sku},
+    )
     products = admin_data.get_products(limit=1000)
     product = next((p for p in products if p.get("sku") == product_sku), None)
 
