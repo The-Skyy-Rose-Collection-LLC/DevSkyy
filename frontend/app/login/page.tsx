@@ -1,69 +1,256 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Eye, EyeOff } from 'lucide-react';
+import { Loader2, Eye, EyeOff, Shield } from 'lucide-react';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+// =============================================================================
+// CONFIGURATION
+// =============================================================================
 
-interface LoginResponse {
-  access_token: string;
-  refresh_token: string;
-  token_type: string;
-  expires_in?: number;
+const API_URL = (() => {
+  const url = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+  try {
+    new URL(url);
+    return url;
+  } catch {
+    console.error('Invalid API_URL configuration');
+    return 'http://localhost:8000';
+  }
+})();
+
+const LOGIN_RATE_LIMIT_MS = 1000; // Minimum time between login attempts
+const MAX_LOGIN_ATTEMPTS = 5; // Max attempts before temporary lockout
+const LOCKOUT_DURATION_MS = 60000; // 1 minute lockout
+
+// =============================================================================
+// ZOD SCHEMAS
+// =============================================================================
+
+const LoginFormSchema = z.object({
+  email: z
+    .string()
+    .min(1, 'Email is required')
+    .email('Please enter a valid email address')
+    .max(254, 'Email is too long')
+    .transform((val) => val.toLowerCase().trim()),
+  password: z
+    .string()
+    .min(1, 'Password is required')
+    .min(8, 'Password must be at least 8 characters')
+    .max(128, 'Password is too long'),
+  rememberMe: z.boolean().optional().default(false),
+});
+
+const LoginResponseSchema = z.object({
+  access_token: z.string().min(1),
+  refresh_token: z.string().min(1),
+  token_type: z.string().default('Bearer'),
+  expires_in: z.number().optional().default(900),
+});
+
+type LoginForm = z.infer<typeof LoginFormSchema>;
+type LoginResponse = z.infer<typeof LoginResponseSchema>;
+
+// =============================================================================
+// SECURITY UTILITIES
+// =============================================================================
+
+function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return Array.from(array, (byte) => byte.toString(16).padStart(2, '0')).join('');
 }
+
+function setSecureCookie(name: string, value: string, maxAge: number): void {
+  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+  const sameSite = '; SameSite=Strict';
+  document.cookie = `${name}=${encodeURIComponent(value)}; path=/; max-age=${maxAge}${secure}${sameSite}`;
+}
+
+function clearAuthData(): void {
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('token_type');
+  document.cookie = 'access_token=; path=/; max-age=0';
+}
+
+// Rate limiting state (stored in memory, resets on page reload)
+let loginAttempts = 0;
+let lastAttemptTime = 0;
+let lockoutUntil = 0;
+
+function checkRateLimit(): { allowed: boolean; waitTime: number } {
+  const now = Date.now();
+
+  // Check if currently locked out
+  if (lockoutUntil > now) {
+    return { allowed: false, waitTime: Math.ceil((lockoutUntil - now) / 1000) };
+  }
+
+  // Check if attempting too fast
+  if (now - lastAttemptTime < LOGIN_RATE_LIMIT_MS) {
+    return { allowed: false, waitTime: 1 };
+  }
+
+  return { allowed: true, waitTime: 0 };
+}
+
+function recordLoginAttempt(success: boolean): void {
+  const now = Date.now();
+  lastAttemptTime = now;
+
+  if (success) {
+    loginAttempts = 0;
+    lockoutUntil = 0;
+  } else {
+    loginAttempts++;
+    if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
+      lockoutUntil = now + LOCKOUT_DURATION_MS;
+      loginAttempts = 0;
+    }
+  }
+}
+
+// =============================================================================
+// COMPONENT
+// =============================================================================
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const [nonce, setNonce] = useState<string>('');
+
+  // Generate CSRF nonce on mount
+  useEffect(() => {
+    setNonce(generateNonce());
+    // Clear any stale auth data
+    if (window.location.search.includes('logout=true')) {
+      clearAuthData();
+    }
+  }, []);
+
+  const validateForm = useCallback((): LoginForm | null => {
+    const result = LoginFormSchema.safeParse({ email, password, rememberMe });
+
+    if (!result.success) {
+      const errors: Record<string, string> = {};
+      result.error.issues.forEach((issue) => {
+        const field = issue.path[0] as string;
+        if (!errors[field]) {
+          errors[field] = issue.message;
+        }
+      });
+      setFieldErrors(errors);
+      return null;
+    }
+
+    setFieldErrors({});
+    return result.data;
+  }, [email, password, rememberMe]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
     setError(null);
 
+    // Check rate limiting
+    const rateCheck = checkRateLimit();
+    if (!rateCheck.allowed) {
+      setError(`Please wait ${rateCheck.waitTime} seconds before trying again.`);
+      return;
+    }
+
+    // Validate form
+    const formData = validateForm();
+    if (!formData) {
+      return;
+    }
+
+    setIsLoading(true);
+
     try {
-      const formData = new URLSearchParams();
-      formData.append('username', email);
-      formData.append('password', password);
-      formData.append('grant_type', 'password');
+      const requestBody = new URLSearchParams();
+      requestBody.append('username', formData.email);
+      requestBody.append('password', formData.password);
+      requestBody.append('grant_type', 'password');
+
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000);
 
       const response = await fetch(`${API_URL}/api/v1/auth/token`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
+          'X-Request-ID': crypto.randomUUID(),
+          'X-CSRF-Token': nonce,
         },
-        body: formData.toString(),
+        body: requestBody.toString(),
+        signal: controller.signal,
+        credentials: 'include',
       });
 
+      clearTimeout(timeoutId);
+
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || 'Invalid credentials');
+        recordLoginAttempt(false);
+
+        // Handle specific error codes
+        if (response.status === 401) {
+          throw new Error('Invalid email or password');
+        } else if (response.status === 429) {
+          throw new Error('Too many login attempts. Please try again later.');
+        } else if (response.status >= 500) {
+          throw new Error('Server error. Please try again later.');
+        } else {
+          // Don't expose specific error details from server
+          throw new Error('Login failed. Please check your credentials.');
+        }
       }
 
-      const data: LoginResponse = await response.json();
+      const rawData = await response.json();
+      const parseResult = LoginResponseSchema.safeParse(rawData);
 
-      // Store tokens
+      if (!parseResult.success) {
+        console.error('Invalid login response:', parseResult.error);
+        throw new Error('Invalid response from server');
+      }
+
+      const data = parseResult.data;
+      recordLoginAttempt(true);
+
+      // Store tokens securely
+      const tokenExpiry = formData.rememberMe ? 2592000 : data.expires_in; // 30 days or session
+
       localStorage.setItem('access_token', data.access_token);
       localStorage.setItem('refresh_token', data.refresh_token);
       localStorage.setItem('token_type', data.token_type);
 
-      // Set cookie for SSR
-      document.cookie = `access_token=${data.access_token}; path=/; max-age=${data.expires_in || 900}`;
+      // Set secure cookie for SSR
+      setSecureCookie('access_token', data.access_token, tokenExpiry);
+
+      // Regenerate nonce after successful login
+      setNonce(generateNonce());
 
       // Redirect to dashboard
       router.push('/admin');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      if (err instanceof Error && err.name === 'AbortError') {
+        setError('Login request timed out. Please try again.');
+      } else {
+        setError(err instanceof Error ? err.message : 'Login failed. Please try again.');
+      }
     } finally {
       setIsLoading(false);
     }
@@ -83,11 +270,15 @@ export default function LoginPage() {
             Sign in to your DevSkyy account
           </CardDescription>
         </CardHeader>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} noValidate>
+          <input type="hidden" name="_csrf" value={nonce} />
           <CardContent className="space-y-4">
             {error && (
               <Alert variant="destructive" className="bg-red-900/50 border-red-800" data-testid="error-message">
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription className="flex items-center gap-2">
+                  <Shield className="h-4 w-4" />
+                  {error}
+                </AlertDescription>
               </Alert>
             )}
 
@@ -101,12 +292,28 @@ export default function LoginPage() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) {
+                    setFieldErrors((prev) => ({ ...prev, email: '' }));
+                  }
+                }}
                 required
                 disabled={isLoading}
-                className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-rose-500 focus:ring-rose-500"
+                autoComplete="email"
+                autoFocus
+                aria-invalid={!!fieldErrors.email}
+                aria-describedby={fieldErrors.email ? 'email-error' : undefined}
+                className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-rose-500 focus:ring-rose-500 ${
+                  fieldErrors.email ? 'border-red-500' : ''
+                }`}
                 data-testid="username"
               />
+              {fieldErrors.email && (
+                <p id="email-error" className="text-sm text-red-400">
+                  {fieldErrors.email}
+                </p>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -129,10 +336,20 @@ export default function LoginPage() {
                   type={showPassword ? 'text' : 'password'}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value);
+                    if (fieldErrors.password) {
+                      setFieldErrors((prev) => ({ ...prev, password: '' }));
+                    }
+                  }}
                   required
                   disabled={isLoading}
-                  className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-rose-500 focus:ring-rose-500 pr-10"
+                  autoComplete="current-password"
+                  aria-invalid={!!fieldErrors.password}
+                  aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+                  className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 focus:border-rose-500 focus:ring-rose-500 pr-10 ${
+                    fieldErrors.password ? 'border-red-500' : ''
+                  }`}
                   data-testid="password"
                 />
                 <button
@@ -140,10 +357,16 @@ export default function LoginPage() {
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-300"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  tabIndex={-1}
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p id="password-error" className="text-sm text-red-400">
+                  {fieldErrors.password}
+                </p>
+              )}
             </div>
 
             <div className="flex items-center space-x-2">
@@ -151,6 +374,8 @@ export default function LoginPage() {
                 type="checkbox"
                 id="remember"
                 name="remember"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
                 className="h-4 w-4 rounded border-gray-600 bg-gray-700 text-rose-500 focus:ring-rose-500"
                 data-testid="remember-me"
               />

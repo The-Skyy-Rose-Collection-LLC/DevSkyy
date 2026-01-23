@@ -19,9 +19,10 @@ from __future__ import annotations
 
 import asyncio
 import contextlib
+import json
 import logging
 import uuid
-from collections.abc import Mapping
+from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from decimal import Decimal
 from enum import Enum
@@ -47,6 +48,7 @@ logger = logging.getLogger(__name__)
 DEFAULT_BUFFER_SIZE = 100
 DEFAULT_FLUSH_INTERVAL_SECONDS = 5.0
 MAX_BUFFER_SIZE = 1000
+MAX_BUFFER_OVERFLOW = 5000  # Hard limit to prevent memory exhaustion on flush failures
 
 
 # =============================================================================
@@ -158,6 +160,7 @@ class AnalyticsEventCollector:
         self._running = False
         self._events_collected = 0
         self._events_flushed = 0
+        self._events_dropped = 0
         self._flush_errors = 0
 
     @property
@@ -166,6 +169,7 @@ class AnalyticsEventCollector:
         return {
             "events_collected": self._events_collected,
             "events_flushed": self._events_flushed,
+            "events_dropped": self._events_dropped,
             "buffer_size": len(self._buffer),
             "flush_errors": self._flush_errors,
         }
@@ -196,6 +200,7 @@ class AnalyticsEventCollector:
             self._flush_task.cancel()
             with contextlib.suppress(asyncio.CancelledError):
                 await self._flush_task
+            self._flush_task = None
 
         # Final flush
         await self._flush()

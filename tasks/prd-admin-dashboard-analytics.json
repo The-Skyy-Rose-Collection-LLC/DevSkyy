@@ -1,0 +1,306 @@
+{
+  "name": "Admin Dashboard Analytics",
+  "description": "Comprehensive analytics API endpoints for system health, SkyyRose business metrics, and ML pipeline monitoring with configurable alerting across multiple notification channels.",
+  "branchName": "ralph/admin-dashboard-analytics",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Analytics Database Schema and Migrations",
+      "description": "As a developer, I want database tables for analytics data so that historical metrics can be stored and queried efficiently.",
+      "acceptanceCriteria": [
+        "Create `analytics_events` table for raw event storage",
+        "Create `analytics_rollups` table for pre-computed aggregations (hourly/daily/weekly)",
+        "Create `alert_configs` table for threshold configurations",
+        "Create `alert_history` table for triggered alerts",
+        "Add indexes for common query patterns (timestamp, event_type, provider)",
+        "Alembic migration file created at `alembic/versions/003_add_analytics_tables.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "",
+      "dependsOn": []
+    },
+    {
+      "id": "US-002",
+      "title": "Analytics Event Collector Service",
+      "description": "As a system, I want to collect and store analytics events so that metrics can be aggregated for historical analysis.",
+      "acceptanceCriteria": [
+        "Create `services/analytics/event_collector.py`",
+        "Implement `AnalyticsEventCollector` class with async event ingestion",
+        "Support event types: `api_request`, `ml_job`, `order`, `error`, `alert`",
+        "Buffer events and batch insert for performance",
+        "Include correlation_id tracking for request tracing",
+        "Unit tests at `tests/services/analytics/test_event_collector.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-001"
+      ]
+    },
+    {
+      "id": "US-003",
+      "title": "Scheduled Rollup Aggregation Service",
+      "description": "As a system, I want scheduled jobs to pre-compute metric rollups so that historical queries are fast.",
+      "acceptanceCriteria": [
+        "Create `services/analytics/rollup_scheduler.py`",
+        "Implement hourly rollup job (runs every hour, aggregates last hour)",
+        "Implement daily rollup job (runs at midnight UTC)",
+        "Implement weekly rollup job (runs Sunday midnight UTC)",
+        "Rollups include: count, sum, avg, min, max, p50, p95, p99",
+        "Automatic cleanup of raw events older than 7 days",
+        "Unit tests at `tests/services/analytics/test_rollup_scheduler.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-002"
+      ]
+    },
+    {
+      "id": "US-004",
+      "title": "System Health Metrics API",
+      "description": "As an admin, I want API endpoints for system health metrics so that I can monitor platform performance.",
+      "acceptanceCriteria": [
+        "Create `api/v1/analytics/health.py` router",
+        "`GET /analytics/health/overview` - Current system status (uptime, error rate, latency)",
+        "`GET /analytics/health/api` - API endpoint performance (latency by endpoint, error rates)",
+        "`GET /analytics/health/database` - Database health (connection pool, query latency)",
+        "`GET /analytics/health/timeseries` - Historical health metrics with time range params",
+        "Support `?range=1h|24h|7d|30d` query parameter",
+        "Pull real-time data from Prometheus `/metrics` endpoint",
+        "Unit tests at `tests/api/analytics/test_health_analytics.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-002"
+      ]
+    },
+    {
+      "id": "US-005",
+      "title": "ML Pipeline Analytics API",
+      "description": "As an admin, I want API endpoints for ML pipeline metrics so that I can monitor AI service usage and costs.",
+      "acceptanceCriteria": [
+        "Create `api/v1/analytics/ml_pipelines.py` router",
+        "`GET /analytics/ml/overview` - Summary across all pipelines",
+        "`GET /analytics/ml/3d` - 3D generation metrics (jobs, success rate, duration)",
+        "`GET /analytics/ml/descriptions` - Image description metrics",
+        "`GET /analytics/ml/assets` - Asset processing metrics (ingestion, versioning, approval)",
+        "`GET /analytics/ml/providers` - Provider-level breakdown (Replicate, Tripo, HuggingFace, Gemini)",
+        "Include cost estimates per provider where available",
+        "Support time range and provider filters",
+        "Unit tests at `tests/api/analytics/test_ml_analytics.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-002"
+      ]
+    },
+    {
+      "id": "US-006",
+      "title": "Business Metrics API (SkyyRose)",
+      "description": "As a business stakeholder, I want API endpoints for e-commerce metrics so that I can track SkyyRose sales performance.",
+      "acceptanceCriteria": [
+        "Create `api/v1/analytics/business.py` router",
+        "`GET /analytics/business/overview` - Revenue, orders, AOV summary",
+        "`GET /analytics/business/sales` - Sales timeseries with breakdown",
+        "`GET /analytics/business/products` - Product performance (views, conversions, inventory)",
+        "`GET /analytics/business/collections` - Collection-level metrics (Black Rose, Love Hurts, Signature)",
+        "`GET /analytics/business/funnel` - Conversion funnel (traffic → cart → checkout → complete)",
+        "Support comparison periods (vs previous period, vs same period last year)",
+        "Unit tests at `tests/api/analytics/test_business_analytics.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-002"
+      ]
+    },
+    {
+      "id": "US-007",
+      "title": "Alert Configuration API",
+      "description": "As an admin, I want to configure alert thresholds so that I'm notified when metrics exceed limits.",
+      "acceptanceCriteria": [
+        "Create `api/v1/analytics/alerts.py` router",
+        "`GET /analytics/alerts/configs` - List all alert configurations",
+        "`POST /analytics/alerts/configs` - Create alert config",
+        "`PUT /analytics/alerts/configs/{id}` - Update alert config",
+        "`DELETE /analytics/alerts/configs/{id}` - Delete alert config",
+        "Support metric types: `threshold_above`, `threshold_below`, `rate_of_change`, `anomaly`",
+        "Support severity levels: `info`, `warning`, `critical`",
+        "Validate threshold values and metric names",
+        "Unit tests at `tests/api/analytics/test_alert_configs.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-001"
+      ]
+    },
+    {
+      "id": "US-008",
+      "title": "Alert Evaluation Engine",
+      "description": "As a system, I want an alert evaluation engine so that configured alerts are checked against current metrics.",
+      "acceptanceCriteria": [
+        "Create `services/analytics/alert_engine.py`",
+        "Implement `AlertEvaluationEngine` class",
+        "Evaluate alerts on configurable schedule (default: every minute)",
+        "Support all threshold types (above, below, rate_of_change)",
+        "Implement alert cooldown to prevent notification spam",
+        "Record alert history with trigger details",
+        "Unit tests at `tests/services/analytics/test_alert_engine.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-007"
+      ]
+    },
+    {
+      "id": "US-009",
+      "title": "Multi-Channel Alert Notifications",
+      "description": "As an admin, I want alerts sent via multiple channels so that I never miss critical issues.",
+      "acceptanceCriteria": [
+        "Create `services/analytics/alert_notifier.py`",
+        "Implement `AlertNotifier` with channel support",
+        "Email via existing `EmailNotificationService`",
+        "Slack webhook integration",
+        "In-app notifications (stored in database)",
+        "SMS via Twilio for critical alerts",
+        "Channel routing based on alert severity",
+        "Support notification preferences per user/team",
+        "Unit tests at `tests/services/analytics/test_alert_notifier.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-008"
+      ]
+    },
+    {
+      "id": "US-010",
+      "title": "Alert History and Acknowledgment API",
+      "description": "As an admin, I want to view and acknowledge alerts so that I can track incident response.",
+      "acceptanceCriteria": [
+        "`GET /analytics/alerts/history` - List triggered alerts with filters",
+        "`GET /analytics/alerts/active` - Currently active (unacknowledged) alerts",
+        "`POST /analytics/alerts/{id}/acknowledge` - Acknowledge alert",
+        "`POST /analytics/alerts/{id}/resolve` - Mark alert resolved",
+        "Include alert metadata: trigger time, metric value, threshold, notifications sent",
+        "Support bulk acknowledgment",
+        "Unit tests at `tests/api/analytics/test_alert_history.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-009"
+      ]
+    },
+    {
+      "id": "US-011",
+      "title": "Analytics Dashboard Summary API",
+      "description": "As a dashboard consumer, I want a unified summary endpoint so that the dashboard can load all key metrics in one call.",
+      "acceptanceCriteria": [
+        "`GET /analytics/dashboard/summary` - Unified dashboard data",
+        "Include sections: system_health, ml_pipelines, business, active_alerts",
+        "Support role-based response (admins see all, business users see business metrics)",
+        "Implement response caching (1-minute TTL for real-time section)",
+        "Support `?sections=health,ml,business,alerts` to request specific sections",
+        "Unit tests at `tests/api/analytics/test_dashboard_summary.py`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-004",
+        "US-005",
+        "US-006",
+        "US-010"
+      ]
+    },
+    {
+      "id": "US-012",
+      "title": "Register Analytics Routers in Main App",
+      "description": "As a developer, I want analytics routers registered so that endpoints are accessible.",
+      "acceptanceCriteria": [
+        "Update `api/v1/__init__.py` to include analytics routers",
+        "Update `main_enterprise.py` to register analytics routes under `/api/v1/analytics`",
+        "Add analytics endpoints to OpenAPI schema with proper tags",
+        "Verify all endpoints accessible via `/docs`",
+        "pytest -v passes",
+        "isort . passes",
+        "ruff check --fix passes",
+        "black . passes"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": "",
+      "dependsOn": [
+        "US-004",
+        "US-005",
+        "US-006",
+        "US-007",
+        "US-010",
+        "US-011"
+      ]
+    }
+  ],
+  "metadata": {
+    "updatedAt": "2026-01-22T12:52:12.104Z"
+  }
+}
