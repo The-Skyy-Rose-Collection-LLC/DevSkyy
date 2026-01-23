@@ -23,10 +23,15 @@ from pathlib import Path
 from typing import Any
 
 import structlog
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
+from security import TokenPayload, UserRole, require_roles
+
 logger = structlog.get_logger(__name__)
+
+# Admin role requirement for all admin dashboard endpoints
+require_admin = require_roles([UserRole.ADMIN])
 
 
 # =============================================================================
@@ -408,8 +413,14 @@ admin_data = AdminDataStore()
 
 
 @admin_dashboard_router.get("/stats", response_model=DashboardStats)
-async def get_dashboard_stats() -> DashboardStats:
-    """Get dashboard statistics."""
+async def get_dashboard_stats(
+    current_user: TokenPayload = Depends(require_admin),
+) -> DashboardStats:
+    """Get dashboard statistics. Requires admin role."""
+    logger.info(
+        "Admin dashboard stats requested",
+        extra={"user_id": str(current_user.sub)},
+    )
     stats = admin_data.get_stats()
 
     # Add file-based stats
@@ -427,8 +438,13 @@ async def get_products(
     limit: int = Query(50, ge=1, le=100),
     status: str | None = None,
     has_3d: bool | None = None,
+    current_user: TokenPayload = Depends(require_admin),
 ) -> list[ProductSummary]:
-    """Get product list with filters."""
+    """Get product list with filters. Requires admin role."""
+    logger.info(
+        "Admin product list requested",
+        extra={"user_id": str(current_user.sub), "skip": skip, "limit": limit},
+    )
     products = admin_data.get_products(skip, limit, status, has_3d)
 
     # Supplement with file-based 3D model info
@@ -459,8 +475,13 @@ async def get_products(
 async def get_sync_jobs(
     status: str | None = None,
     limit: int = Query(20, ge=1, le=100),
+    current_user: TokenPayload = Depends(require_admin),
 ) -> list[SyncJobSummary]:
-    """Get recent sync jobs."""
+    """Get recent sync jobs. Requires admin role."""
+    logger.info(
+        "Admin sync jobs list requested",
+        extra={"user_id": str(current_user.sub)},
+    )
     jobs = admin_data.get_sync_jobs(limit, status)
 
     # Also check sync_endpoints job store
@@ -496,8 +517,14 @@ async def get_sync_jobs(
 
 
 @admin_dashboard_router.post("/sync-all")
-async def trigger_full_sync() -> dict[str, Any]:
-    """Trigger sync for all products."""
+async def trigger_full_sync(
+    current_user: TokenPayload = Depends(require_admin),
+) -> dict[str, Any]:
+    """Trigger sync for all products. Requires admin role."""
+    logger.info(
+        "Admin triggered full sync",
+        extra={"user_id": str(current_user.sub)},
+    )
     products = admin_data.get_products(limit=1000)
     unsynced = [p for p in products if not p.get("synced")]
 
@@ -522,8 +549,13 @@ async def trigger_full_sync() -> dict[str, Any]:
 @admin_dashboard_router.get("/analytics/sales", response_model=SalesAnalytics)
 async def get_sales_analytics(
     days: int = Query(30, ge=1, le=365),
+    current_user: TokenPayload = Depends(require_admin),
 ) -> SalesAnalytics:
-    """Get sales analytics."""
+    """Get sales analytics. Requires admin role."""
+    logger.info(
+        "Admin sales analytics requested",
+        extra={"user_id": str(current_user.sub), "days": days},
+    )
     # Generate sample data (would come from database in production)
     now = datetime.now(UTC)
     data = []
