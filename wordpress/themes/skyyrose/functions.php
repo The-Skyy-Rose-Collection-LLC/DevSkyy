@@ -587,6 +587,9 @@ if (class_exists('WooCommerce')) {
     require_once SKYYROSE_DIR . '/inc/woocommerce.php';
 }
 
+// Klaviyo email marketing integration
+require_once SKYYROSE_DIR . '/inc/klaviyo-integration.php';
+
 /**
  * ============================================================================
  * Email Capture & Newsletter System
