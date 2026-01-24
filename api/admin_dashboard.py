@@ -26,12 +26,12 @@ import structlog
 from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel, Field
 
-from security import TokenPayload, UserRole, require_roles
+from security import RoleChecker, TokenPayload, UserRole
 
 logger = structlog.get_logger(__name__)
 
 # Admin role requirement for all admin dashboard endpoints
-require_admin = require_roles([UserRole.ADMIN])
+require_admin = RoleChecker([UserRole.ADMIN])
 
 
 # =============================================================================
