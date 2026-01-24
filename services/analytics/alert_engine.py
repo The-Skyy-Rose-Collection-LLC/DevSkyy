@@ -189,8 +189,8 @@ class AlertEngineError(DevSkyError):
         context: dict[str, Any] | None = None,
     ) -> None:
         super().__init__(
-            message=message,
-            error_code=DevSkyErrorCode.INTERNAL_ERROR,
+            message,
+            code=DevSkyErrorCode.INTERNAL_ERROR,
             severity=DevSkyErrorSeverity.ERROR,
             correlation_id=correlation_id,
             context=context or {},
@@ -356,8 +356,7 @@ class AlertEvaluationEngine:
         configs: list[AlertConfig] = []
 
         async with self._session_factory() as session:
-            result = await session.execute(
-                text("""
+            result = await session.execute(text("""
                     SELECT id, name, description, metric_name, condition_type,
                            condition_operator, threshold_value, threshold_unit,
                            window_duration_seconds, evaluation_interval_seconds,
@@ -366,8 +365,7 @@ class AlertEvaluationEngine:
                            created_by, updated_by, created_at, updated_at
                     FROM alert_configs
                     WHERE is_enabled = true
-                """)
-            )
+                """))
             rows = result.fetchall()
 
             for row in rows:
@@ -445,7 +443,11 @@ class AlertEvaluationEngine:
         # Create trigger
         trigger = AlertTrigger(
             alert_config_id=config.id,
-            severity=AlertSeverity(config.severity) if isinstance(config.severity, str) else config.severity,
+            severity=(
+                AlertSeverity(config.severity)
+                if isinstance(config.severity, str)
+                else config.severity
+            ),
             title=self._build_alert_title(config, metric_value),
             message=self._build_alert_message(config, metric_value),
             metric_value=metric_value,
@@ -551,8 +553,16 @@ class AlertEvaluationEngine:
         metric_value: Decimal,
     ) -> str:
         """Build alert title."""
-        severity = config.severity.upper() if isinstance(config.severity, str) else config.severity.value.upper()
-        op = config.condition_operator if isinstance(config.condition_operator, str) else config.condition_operator.value
+        severity = (
+            config.severity.upper()
+            if isinstance(config.severity, str)
+            else config.severity.value.upper()
+        )
+        op = (
+            config.condition_operator
+            if isinstance(config.condition_operator, str)
+            else config.condition_operator.value
+        )
 
         if op in ("gt", "gte"):
             action = "exceeded"
@@ -594,12 +604,20 @@ class AlertEvaluationEngine:
                 {
                     "id": str(trigger.id),
                     "config_id": str(trigger.alert_config_id),
-                    "status": trigger.status if isinstance(trigger.status, str) else trigger.status.value,
-                    "severity": trigger.severity if isinstance(trigger.severity, str) else trigger.severity.value,
+                    "status": (
+                        trigger.status if isinstance(trigger.status, str) else trigger.status.value
+                    ),
+                    "severity": (
+                        trigger.severity
+                        if isinstance(trigger.severity, str)
+                        else trigger.severity.value
+                    ),
                     "title": trigger.title,
                     "message": trigger.message,
                     "metric_value": float(trigger.metric_value) if trigger.metric_value else None,
-                    "threshold_value": float(trigger.threshold_value) if trigger.threshold_value else None,
+                    "threshold_value": (
+                        float(trigger.threshold_value) if trigger.threshold_value else None
+                    ),
                     "context": str(trigger.context).replace("'", '"') if trigger.context else "{}",
                     "triggered_at": trigger.triggered_at,
                 },
