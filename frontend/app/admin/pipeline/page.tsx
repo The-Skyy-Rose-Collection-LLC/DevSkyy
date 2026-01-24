@@ -328,7 +328,7 @@ function QueueStatCard({
 }: {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: 'gray' | 'blue' | 'green' | 'red' | 'purple';
   animate?: boolean;
 }) {

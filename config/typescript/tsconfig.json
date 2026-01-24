@@ -56,7 +56,10 @@
     "../../.next",
     "../../.nuxt",
     "../../tests",
-    "../../examples"
+    "../../examples",
+    "../../src/**/__tests__/**",
+    "../../src/**/*.test.ts",
+    "../../src/**/*.test.tsx"
   ],
   "ts-node": {
     "esm": true,
