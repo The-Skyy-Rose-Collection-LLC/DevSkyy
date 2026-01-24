@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useState, useRef } from 'react';
+import { useCallback, useState, useRef, useEffect } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -35,10 +35,11 @@ import {
 import {
   useAssets,
   useBatchJob,
+  useDebounce,
   type Collection,
   type AssetType,
   type ViewMode,
-} from '@/hooks/useAssets';
+} from '@/hooks';
 import { type Asset } from '@/lib/api';
 import { ThreeViewer, ModelViewerFallback } from '@/components/three-viewer';
 
@@ -90,7 +91,16 @@ export default function AssetsPage() {
   const [selectedCollection, setSelectedCollection] = useState<Collection>('black_rose');
   const [batchJobId, setBatchJobId] = useState<string | null>(null);
   const [showBatchModal, setShowBatchModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Debounce search query
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  // Update filter when debounced value changes
+  useEffect(() => {
+    setSearch(debouncedSearch);
+  }, [debouncedSearch, setSearch]);
 
   const { job: batchJob } = useBatchJob(batchJobId);
 
@@ -126,16 +136,6 @@ export default function AssetsPage() {
       setShowBatchModal(false);
     }
   };
-
-  // Handle search with debounce
-  const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    // Simple debounce
-    const timeoutId = setTimeout(() => {
-      setSearch(value);
-    }, 300);
-    return () => clearTimeout(timeoutId);
-  }, [setSearch]);
 
   if (loading && assets.length === 0) {
     return <AssetsSkeleton />;
@@ -231,7 +231,8 @@ export default function AssetsPage() {
             ref={searchInputRef}
             placeholder="Search assets..."
             className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
-            onChange={handleSearchChange}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
 
