@@ -298,7 +298,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
    * Lifecycle method called when error is caught
    * Used for logging error information
    */
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo): void {
     // Log error to console in development
     console.error('ErrorBoundary caught an error:', error);
     console.error('Error info:', errorInfo);
@@ -324,7 +324,7 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     });
   };
 
-  render(): ReactNode {
+  override render(): ReactNode {
     const { hasError, error } = this.state;
     const { children, FallbackComponent, fallbackRender } = this.props;
 

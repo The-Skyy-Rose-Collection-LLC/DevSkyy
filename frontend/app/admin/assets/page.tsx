@@ -50,7 +50,7 @@ const COLLECTIONS: { id: Collection; label: string; color: string }[] = [
   { id: 'runway', label: 'Runway', color: 'bg-purple-800' },
 ];
 
-const ASSET_TYPES: { id: AssetType; label: string; icon: React.ElementType }[] = [
+const ASSET_TYPES: { id: AssetType; label: string; icon: React.ComponentType<{ className?: string }> }[] = [
   { id: 'image', label: 'Images', icon: ImageIcon },
   { id: '3d_model', label: '3D Models', icon: Box },
   { id: 'video', label: 'Videos', icon: Film },

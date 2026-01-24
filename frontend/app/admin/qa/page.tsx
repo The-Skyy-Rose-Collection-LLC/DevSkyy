@@ -483,7 +483,7 @@ function StatCard({
 }: {
   title: string;
   value: string | number;
-  icon: React.ElementType;
+  icon: React.ComponentType<{ className?: string }>;
   color: 'amber' | 'green' | 'red' | 'purple';
   onClick?: () => void;
   active?: boolean;
