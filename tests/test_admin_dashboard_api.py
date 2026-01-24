@@ -11,6 +11,8 @@ Coverage:
 - Analytics endpoints
 """
 
+from uuid import uuid4
+
 import pytest
 
 from api.admin_dashboard import (
@@ -28,6 +30,18 @@ from api.admin_dashboard import (
     get_sales_analytics,
     get_sync_jobs,
 )
+from security import TokenPayload, TokenType, UserRole
+
+
+@pytest.fixture
+def mock_admin_user() -> TokenPayload:
+    """Create mock admin user for testing."""
+    return TokenPayload(
+        sub=str(uuid4()),
+        jti=str(uuid4()),
+        type=TokenType.ACCESS,
+        roles=[UserRole.ADMIN.value],
+    )
 
 # =============================================================================
 # AdminDataStore Tests
@@ -307,37 +321,39 @@ class TestAdminRouter:
 class TestAdminEndpoints:
     """Tests for admin endpoint responses."""
 
-    async def test_get_dashboard_stats(self):
+    async def test_get_dashboard_stats(self, mock_admin_user):
         """Should return dashboard stats."""
-        stats = await get_dashboard_stats()
+        stats = await get_dashboard_stats(current_user=mock_admin_user)
 
         assert isinstance(stats, DashboardStats)
         assert stats.total_products >= 0
 
-    async def test_get_products(self):
+    async def test_get_products(self, mock_admin_user):
         """Should return product list."""
         # Pass actual values since Query defaults aren't resolved outside HTTP context
-        products = await get_products(skip=0, limit=50)
+        products = await get_products(skip=0, limit=50, current_user=mock_admin_user)
 
         assert isinstance(products, list)
 
-    async def test_get_products_with_filters(self):
+    async def test_get_products_with_filters(self, mock_admin_user):
         """Should filter products."""
-        products = await get_products(skip=0, limit=10, status=None, has_3d=None)
+        products = await get_products(
+            skip=0, limit=10, status=None, has_3d=None, current_user=mock_admin_user
+        )
 
         assert isinstance(products, list)
         assert len(products) <= 10
 
-    async def test_get_sync_jobs(self):
+    async def test_get_sync_jobs(self, mock_admin_user):
         """Should return sync job list."""
         # Pass actual values since Query defaults aren't resolved outside HTTP context
-        jobs = await get_sync_jobs(limit=50, status=None)
+        jobs = await get_sync_jobs(limit=50, status=None, current_user=mock_admin_user)
 
         assert isinstance(jobs, list)
 
-    async def test_get_sales_analytics(self):
+    async def test_get_sales_analytics(self, mock_admin_user):
         """Should return sales analytics with days parameter."""
-        analytics = await get_sales_analytics(days=30)
+        analytics = await get_sales_analytics(days=30, current_user=mock_admin_user)
 
         assert isinstance(analytics, SalesAnalytics)
         assert analytics.period_days == 30
