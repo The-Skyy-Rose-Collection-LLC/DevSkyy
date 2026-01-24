@@ -586,3 +586,344 @@ require_once SKYYROSE_DIR . '/inc/customizer.php';
 if (class_exists('WooCommerce')) {
     require_once SKYYROSE_DIR . '/inc/woocommerce.php';
 }
+
+/**
+ * ============================================================================
+ * Email Capture & Newsletter System
+ * ============================================================================
+ */
+
+/**
+ * Handle email capture AJAX request
+ */
+function skyyrose_handle_email_capture(): void {
+    // Verify nonce
+    if (!wp_verify_nonce($_POST['email_nonce'] ?? '', 'skyyrose_email_capture')) {
+        wp_send_json_error('Security check failed');
+        return;
+    }
+
+    $email = sanitize_email($_POST['email'] ?? '');
+    $source = sanitize_text_field($_POST['source'] ?? 'unknown');
+
+    if (!is_email($email)) {
+        wp_send_json_error('Please enter a valid email address');
+        return;
+    }
+
+    // Check if email already exists
+    $existing = get_users([
+        'search'         => $email,
+        'search_columns' => ['user_email'],
+        'number'         => 1,
+    ]);
+
+    $subscriber_exists = !empty($existing);
+
+    // Also check newsletter subscribers table/option
+    $subscribers = get_option('skyyrose_newsletter_subscribers', []);
+    if (isset($subscribers[$email])) {
+        $subscriber_exists = true;
+    }
+
+    // Generate discount code
+    $discount_code = skyyrose_generate_discount_code($email);
+
+    if (!$subscriber_exists) {
+        // Store subscriber
+        $subscribers[$email] = [
+            'email'      => $email,
+            'source'     => $source,
+            'subscribed' => current_time('mysql'),
+            'ip'         => sanitize_text_field($_SERVER['REMOTE_ADDR'] ?? ''),
+            'discount'   => $discount_code,
+        ];
+        update_option('skyyrose_newsletter_subscribers', $subscribers);
+
+        // Create WooCommerce customer if WooCommerce is active
+        if (class_exists('WooCommerce')) {
+            $customer = new WC_Customer();
+            $customer->set_email($email);
+            $customer->set_billing_email($email);
+            $customer->save();
+        }
+
+        // Send welcome email
+        skyyrose_send_welcome_email($email, $discount_code);
+
+        // Hook for external integrations (Mailchimp, Klaviyo, etc.)
+        do_action('skyyrose_new_subscriber', $email, $source, $discount_code);
+    }
+
+    wp_send_json_success([
+        'message' => 'Welcome to the SkyyRose family!',
+        'code'    => $discount_code,
+    ]);
+}
+add_action('wp_ajax_skyyrose_capture_email', 'skyyrose_handle_email_capture');
+add_action('wp_ajax_nopriv_skyyrose_capture_email', 'skyyrose_handle_email_capture');
+
+/**
+ * Generate a unique discount code for new subscriber
+ */
+function skyyrose_generate_discount_code(string $email): string {
+    $discount_percent = get_theme_mod('skyyrose_popup_discount', '15');
+
+    // Create unique code based on email hash
+    $code = 'ROSE' . strtoupper(substr(md5($email . wp_salt()), 0, 6));
+
+    // Create WooCommerce coupon if it doesn't exist
+    if (class_exists('WooCommerce')) {
+        $existing_coupon = wc_get_coupon_id_by_code($code);
+
+        if (!$existing_coupon) {
+            $coupon = new WC_Coupon();
+            $coupon->set_code($code);
+            $coupon->set_discount_type('percent');
+            $coupon->set_amount($discount_percent);
+            $coupon->set_individual_use(true);
+            $coupon->set_usage_limit(1);
+            $coupon->set_usage_limit_per_user(1);
+            $coupon->set_email_restrictions([$email]);
+            $coupon->set_date_expires(strtotime('+30 days'));
+            $coupon->set_description('Welcome discount for ' . $email);
+            $coupon->save();
+        }
+    }
+
+    return $code;
+}
+
+/**
+ * Send welcome email with discount code
+ */
+function skyyrose_send_welcome_email(string $email, string $discount_code): void {
+    $discount_percent = get_theme_mod('skyyrose_popup_discount', '15');
+    $shop_url = wc_get_page_permalink('shop');
+
+    $subject = 'Welcome to the Rose Garden - Your ' . $discount_percent . '% Discount Inside';
+
+    $message = '
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: Arial, sans-serif; background-color: #0A0A0A; color: #ffffff;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0A0A0A;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="max-width: 600px;">
+                    <!-- Logo -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 30px;">
+                            <h1 style="font-family: Georgia, serif; font-size: 32px; color: #B76E79; margin: 0;">SkyyRose</h1>
+                            <p style="color: #888; font-size: 12px; margin: 5px 0 0; letter-spacing: 2px;">WHERE LOVE MEETS LUXURY</p>
+                        </td>
+                    </tr>
+
+                    <!-- Hero -->
+                    <tr>
+                        <td style="background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 100%); border-radius: 16px; padding: 40px; text-align: center;">
+                            <h2 style="font-family: Georgia, serif; font-size: 28px; color: #ffffff; margin: 0 0 20px;">Welcome to the Garden</h2>
+                            <p style="color: #aaa; font-size: 16px; line-height: 1.6; margin: 0 0 30px;">
+                                Thank you for joining the SkyyRose family. As a welcome gift, here\'s your exclusive discount:
+                            </p>
+
+                            <!-- Discount Code Box -->
+                            <div style="background: rgba(183, 110, 121, 0.1); border: 2px dashed #B76E79; border-radius: 8px; padding: 20px; margin: 0 0 30px;">
+                                <p style="color: #888; font-size: 12px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: 2px;">Your Discount Code</p>
+                                <p style="font-family: monospace; font-size: 28px; font-weight: bold; color: #B76E79; margin: 0; letter-spacing: 3px;">' . esc_html($discount_code) . '</p>
+                                <p style="color: #aaa; font-size: 14px; margin: 10px 0 0;">' . esc_html($discount_percent) . '% off your first order</p>
+                            </div>
+
+                            <!-- CTA Button -->
+                            <a href="' . esc_url($shop_url) . '" style="display: inline-block; background: #B76E79; color: #ffffff; text-decoration: none; padding: 16px 40px; border-radius: 8px; font-weight: 600; font-size: 16px;">Shop Now</a>
+
+                            <p style="color: #666; font-size: 12px; margin: 30px 0 0;">
+                                Code expires in 30 days. One-time use only.
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="padding: 30px; text-align: center;">
+                            <p style="color: #666; font-size: 12px; margin: 0;">
+                                SkyyRose LLC | Oakland, CA<br>
+                                <a href="' . esc_url(home_url('/privacy-policy/')) . '" style="color: #B76E79;">Privacy Policy</a> |
+                                <a href="' . esc_url(home_url('/unsubscribe/?email=' . urlencode($email))) . '" style="color: #B76E79;">Unsubscribe</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>';
+
+    $headers = [
+        'Content-Type: text/html; charset=UTF-8',
+        'From: SkyyRose <hello@skyyrose.co>',
+    ];
+
+    wp_mail($email, $subject, $message, $headers);
+}
+
+/**
+ * Include email popup in footer
+ */
+function skyyrose_include_email_popup(): void {
+    // Only show on frontend, not in admin
+    if (is_admin()) {
+        return;
+    }
+
+    // Check if popup is enabled
+    if (!get_theme_mod('skyyrose_enable_popup', true)) {
+        return;
+    }
+
+    get_template_part('template-parts/email-capture-popup');
+}
+add_action('wp_footer', 'skyyrose_include_email_popup');
+
+/**
+ * Admin page for viewing subscribers
+ */
+function skyyrose_add_subscribers_menu(): void {
+    add_submenu_page(
+        'woocommerce',
+        'Newsletter Subscribers',
+        'Newsletter',
+        'manage_woocommerce',
+        'skyyrose-subscribers',
+        'skyyrose_subscribers_page'
+    );
+}
+add_action('admin_menu', 'skyyrose_add_subscribers_menu');
+
+/**
+ * Render subscribers admin page
+ */
+function skyyrose_subscribers_page(): void {
+    $subscribers = get_option('skyyrose_newsletter_subscribers', []);
+    $count = count($subscribers);
+
+    echo '<div class="wrap">';
+    echo '<h1>Newsletter Subscribers (' . esc_html($count) . ')</h1>';
+
+    // Export button
+    echo '<p><a href="' . esc_url(admin_url('admin.php?page=skyyrose-subscribers&export=csv')) . '" class="button">Export CSV</a></p>';
+
+    // Handle CSV export
+    if (isset($_GET['export']) && $_GET['export'] === 'csv') {
+        header('Content-Type: text/csv');
+        header('Content-Disposition: attachment; filename="skyyrose-subscribers-' . date('Y-m-d') . '.csv"');
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, ['Email', 'Source', 'Subscribed', 'Discount Code']);
+
+        foreach ($subscribers as $sub) {
+            fputcsv($output, [
+                $sub['email'],
+                $sub['source'],
+                $sub['subscribed'],
+                $sub['discount'] ?? '',
+            ]);
+        }
+
+        fclose($output);
+        exit;
+    }
+
+    // Display table
+    if (empty($subscribers)) {
+        echo '<p>No subscribers yet.</p>';
+    } else {
+        echo '<table class="wp-list-table widefat fixed striped">';
+        echo '<thead><tr><th>Email</th><th>Source</th><th>Subscribed</th><th>Discount</th></tr></thead>';
+        echo '<tbody>';
+
+        foreach (array_reverse($subscribers) as $sub) {
+            echo '<tr>';
+            echo '<td>' . esc_html($sub['email']) . '</td>';
+            echo '<td>' . esc_html($sub['source']) . '</td>';
+            echo '<td>' . esc_html($sub['subscribed']) . '</td>';
+            echo '<td><code>' . esc_html($sub['discount'] ?? 'N/A') . '</code></td>';
+            echo '</tr>';
+        }
+
+        echo '</tbody></table>';
+    }
+
+    echo '</div>';
+}
+
+/**
+ * Add customizer settings for email popup
+ */
+function skyyrose_email_customizer(WP_Customize_Manager $wp_customize): void {
+    // Add section
+    $wp_customize->add_section('skyyrose_email_popup', [
+        'title'    => __('Email Popup', 'skyyrose'),
+        'priority' => 35,
+    ]);
+
+    // Enable popup
+    $wp_customize->add_setting('skyyrose_enable_popup', [
+        'default'           => true,
+        'sanitize_callback' => 'wp_validate_boolean',
+    ]);
+
+    $wp_customize->add_control('skyyrose_enable_popup', [
+        'label'   => __('Enable Email Popup', 'skyyrose'),
+        'section' => 'skyyrose_email_popup',
+        'type'    => 'checkbox',
+    ]);
+
+    // Discount percentage
+    $wp_customize->add_setting('skyyrose_popup_discount', [
+        'default'           => '15',
+        'sanitize_callback' => 'absint',
+    ]);
+
+    $wp_customize->add_control('skyyrose_popup_discount', [
+        'label'   => __('Discount Percentage', 'skyyrose'),
+        'section' => 'skyyrose_email_popup',
+        'type'    => 'number',
+    ]);
+
+    // Popup delay
+    $wp_customize->add_setting('skyyrose_popup_delay', [
+        'default'           => 5000,
+        'sanitize_callback' => 'absint',
+    ]);
+
+    $wp_customize->add_control('skyyrose_popup_delay', [
+        'label'       => __('Popup Delay (ms)', 'skyyrose'),
+        'description' => __('Time before popup appears (in milliseconds)', 'skyyrose'),
+        'section'     => 'skyyrose_email_popup',
+        'type'        => 'number',
+    ]);
+
+    // Collection theme
+    $wp_customize->add_setting('skyyrose_popup_collection', [
+        'default'           => 'signature',
+        'sanitize_callback' => 'sanitize_text_field',
+    ]);
+
+    $wp_customize->add_control('skyyrose_popup_collection', [
+        'label'   => __('Popup Theme', 'skyyrose'),
+        'section' => 'skyyrose_email_popup',
+        'type'    => 'select',
+        'choices' => [
+            'signature'  => __('Signature (Gold)', 'skyyrose'),
+            'black-rose' => __('Black Rose (Red)', 'skyyrose'),
+            'love-hurts' => __('Love Hurts (Pink)', 'skyyrose'),
+        ],
+    ]);
+}
+add_action('customize_register', 'skyyrose_email_customizer');
