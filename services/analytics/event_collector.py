@@ -258,7 +258,7 @@ class AnalyticsEventCollector:
             session_id=session_id,
             correlation_id=correlation_id,
             properties=properties or {},
-            numeric_value=Decimal(str(numeric_value)) if numeric_value else None,
+            numeric_value=Decimal(str(numeric_value)) if numeric_value is not None else None,
             string_value=string_value,
             ip_address=ip_address,
             user_agent=user_agent,
