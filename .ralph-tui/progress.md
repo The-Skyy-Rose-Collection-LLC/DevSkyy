@@ -41,3 +41,54 @@ after each iteration and included in agent prompts for context.
   - Batch inserts with raw SQL are faster than ORM for high-volume analytics
 ---
 
+## 2026-01-23 - Admin Dashboard Security Hardening
+- **What was implemented:** Added authentication to all admin dashboard endpoints (CRITICAL security fix)
+- **Files changed:**
+  - `api/admin_dashboard.py` - Added `require_admin` dependency to all 7 endpoints
+- **Learnings:**
+  - All admin endpoints MUST have `Depends(require_admin)` for proper access control
+  - Use `from security import TokenPayload, UserRole, require_roles` for auth imports
+  - Log user_id in audit trail for all admin actions
+---
+
+## 2026-01-23 - Analytics Module (US-003 through US-012)
+- **What was implemented:** Complete analytics API and services module
+- **Files changed:**
+  - `api/v1/analytics/business.py` - Business metrics API (837 lines)
+  - `api/v1/analytics/dashboard.py` - Dashboard summary API (665 lines)
+  - `api/v1/analytics/health.py` - Health metrics API
+  - `api/v1/analytics/__init__.py` - Module exports
+  - `services/analytics/event_collector.py` - Bug fix: `numeric_value is not None` check
+  - `services/analytics/rollup_scheduler.py` - Rollup aggregation scheduler (US-003)
+  - `services/analytics/__init__.py` - Added RollupScheduler exports
+  - `tests/services/analytics/test_rollup_scheduler.py` - 18 unit tests
+  - `tests/api/analytics/` - 82 tests across 3 test files
+- **Learnings:**
+  - `if numeric_value` treats `0` as falsy - use `if numeric_value is not None` instead
+  - Role-based access: admins see all sections, business users see business only
+  - Cache TTL patterns: 60s for real-time, 300s for business metrics
+  - Scheduled background tasks should support both auto-start loop and manual trigger
+  - Use asyncio.Lock to serialize concurrent rollup operations
+---
+
+## Analytics Module Summary (as of 2026-01-23)
+
+**Completed Services:**
+- `event_collector.py` (US-002) - ✅ Async buffered event ingestion, 20 tests
+- `rollup_scheduler.py` (US-003) - ✅ Scheduled aggregations (hourly/daily/weekly), 18 tests
+
+**Completed APIs:**
+- `health.py` (US-004) - ✅ System health metrics, uptime, error rates
+- `business.py` (US-006) - ✅ Revenue, orders, AOV, funnel analytics
+- `dashboard.py` (US-011) - ✅ Unified dashboard summary endpoint
+
+**Total Analytics Tests:** 120 (all passing)
+
+**Pending (designs exist, files not written due to permission issues):**
+- US-005: ML Pipeline API - designs in agent output
+- US-007: Alert Config API - designs in agent output
+- US-008: Alert Engine - designs in agent output
+- US-009: Alert Notifier - designs in agent output
+- US-010: Alert History API - designs in agent output
+---
+
