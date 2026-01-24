@@ -35,8 +35,11 @@ defined('ABSPATH') || exit;
                             <?php if (is_active_sidebar('footer-newsletter')) : ?>
                                 <?php dynamic_sidebar('footer-newsletter'); ?>
                             <?php else : ?>
-                                <!-- Klaviyo-ready fallback form -->
-                                <form class="newsletter-form klaviyo-form" action="#" method="post" data-klaviyo-list="<?php echo esc_attr(get_theme_mod('skyyrose_klaviyo_list_id', '')); ?>">
+                                <!-- SkyyRose Newsletter Form with AJAX -->
+                                <form class="newsletter-form" id="footerNewsletterForm" action="<?php echo esc_url(admin_url('admin-ajax.php')); ?>" method="POST">
+                                    <?php wp_nonce_field('skyyrose_email_capture', 'email_nonce'); ?>
+                                    <input type="hidden" name="action" value="skyyrose_capture_email">
+                                    <input type="hidden" name="source" value="footer">
                                     <div class="form-group">
                                         <label for="newsletter-email" class="sr-only"><?php esc_attr_e('Email address', 'skyyrose'); ?></label>
                                         <input
@@ -50,6 +53,13 @@ defined('ABSPATH') || exit;
                                         >
                                         <button type="submit" class="newsletter-submit btn btn-primary">
                                             <span class="btn-text"><?php esc_html_e('Subscribe', 'skyyrose'); ?></span>
+                                            <span class="btn-loading" style="display: none;">
+                                                <svg class="spinner" width="18" height="18" viewBox="0 0 24 24">
+                                                    <circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="32" stroke-linecap="round">
+                                                        <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                                                    </circle>
+                                                </svg>
+                                            </span>
                                             <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <line x1="5" y1="12" x2="19" y2="12"></line>
                                                 <polyline points="12 5 19 12 12 19"></polyline>
@@ -59,7 +69,61 @@ defined('ABSPATH') || exit;
                                     <p class="newsletter-disclaimer">
                                         <?php esc_html_e('By subscribing, you agree to our Privacy Policy and consent to receive updates.', 'skyyrose'); ?>
                                     </p>
+                                    <p class="newsletter-success" style="display: none;">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                            <polyline points="22 4 12 14.01 9 11.01"/>
+                                        </svg>
+                                        <?php esc_html_e('Welcome! Check your email for your discount code.', 'skyyrose'); ?>
+                                    </p>
                                 </form>
+                                <script>
+                                (function() {
+                                    const form = document.getElementById('footerNewsletterForm');
+                                    if (!form) return;
+
+                                    form.addEventListener('submit', async function(e) {
+                                        e.preventDefault();
+                                        const btn = form.querySelector('button[type="submit"]');
+                                        const btnText = btn.querySelector('.btn-text');
+                                        const btnIcon = btn.querySelector('.btn-icon');
+                                        const btnLoading = btn.querySelector('.btn-loading');
+                                        const formGroup = form.querySelector('.form-group');
+                                        const disclaimer = form.querySelector('.newsletter-disclaimer');
+                                        const success = form.querySelector('.newsletter-success');
+
+                                        btn.disabled = true;
+                                        btnText.style.display = 'none';
+                                        btnIcon.style.display = 'none';
+                                        btnLoading.style.display = 'inline-flex';
+
+                                        try {
+                                            const formData = new FormData(form);
+                                            const response = await fetch(form.action, { method: 'POST', body: formData });
+                                            const data = await response.json();
+
+                                            if (data.success) {
+                                                formGroup.style.display = 'none';
+                                                disclaimer.style.display = 'none';
+                                                success.style.display = 'flex';
+                                                localStorage.setItem('skyyrose_email_subscribed', formData.get('email'));
+                                            } else {
+                                                alert(data.data || 'Something went wrong.');
+                                                btn.disabled = false;
+                                                btnText.style.display = 'inline';
+                                                btnIcon.style.display = 'inline';
+                                                btnLoading.style.display = 'none';
+                                            }
+                                        } catch (error) {
+                                            alert('Something went wrong.');
+                                            btn.disabled = false;
+                                            btnText.style.display = 'inline';
+                                            btnIcon.style.display = 'inline';
+                                            btnLoading.style.display = 'none';
+                                        }
+                                    });
+                                })();
+                                </script>
                             <?php endif; ?>
                         </div>
                     </div>
