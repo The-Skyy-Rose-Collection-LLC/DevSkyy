@@ -46,63 +46,116 @@ function skyyrose_add_to_klaviyo(string $email, string $source, string $discount
     }
 
     $creds = skyyrose_get_klaviyo_credentials();
+    $headers = [
+        'Authorization' => 'Klaviyo-API-Key ' . $creds['api_key'],
+        'Content-Type' => 'application/json',
+        'Accept' => 'application/json',
+        'revision' => '2024-02-15',
+    ];
 
-    // Klaviyo API v3 endpoint
-    $url = 'https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/';
-
-    $body = [
+    // Step 1: Create profile with custom properties
+    $profile_url = 'https://a.klaviyo.com/api/profiles/';
+    $profile_body = [
         'data' => [
-            'type' => 'profile-subscription-bulk-create-job',
+            'type' => 'profile',
             'attributes' => [
-                'profiles' => [
-                    'data' => [
-                        [
-                            'type' => 'profile',
-                            'attributes' => [
-                                'email' => $email,
-                                'properties' => [
-                                    'source' => $source,
-                                    'discount_code' => $discount_code,
-                                    'signup_date' => current_time('c'),
-                                    'brand' => 'SkyyRose',
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-                'historical_import' => false,
-            ],
-            'relationships' => [
-                'list' => [
-                    'data' => [
-                        'type' => 'list',
-                        'id' => $creds['list_id'],
-                    ],
+                'email' => $email,
+                'properties' => [
+                    'source' => $source,
+                    'discount_code' => $discount_code,
+                    'signup_date' => current_time('c'),
+                    'brand' => 'SkyyRose',
                 ],
             ],
         ],
     ];
 
-    $response = wp_remote_post($url, [
+    $profile_response = wp_remote_post($profile_url, [
         'timeout' => 30,
-        'headers' => [
-            'Authorization' => 'Klaviyo-API-Key ' . $creds['api_key'],
-            'Content-Type' => 'application/json',
-            'Accept' => 'application/json',
-            'revision' => '2024-02-15',
-        ],
-        'body' => wp_json_encode($body),
+        'headers' => $headers,
+        'body' => wp_json_encode($profile_body),
     ]);
 
-    if (is_wp_error($response)) {
-        error_log('Klaviyo API error: ' . $response->get_error_message());
+    if (is_wp_error($profile_response)) {
+        error_log('Klaviyo profile creation error: ' . $profile_response->get_error_message());
         return false;
     }
 
-    $code = wp_remote_retrieve_response_code($response);
+    $profile_code = wp_remote_retrieve_response_code($profile_response);
+    $profile_data = json_decode(wp_remote_retrieve_body($profile_response), true);
 
-    if ($code >= 200 && $code < 300) {
-        // Also track the signup event
+    // Profile might already exist (409 conflict), try to get existing
+    if ($profile_code === 409) {
+        // Get existing profile by email
+        $search_url = 'https://a.klaviyo.com/api/profiles/?filter=equals(email,\'' . urlencode($email) . '\')';
+        $search_response = wp_remote_get($search_url, [
+            'timeout' => 30,
+            'headers' => $headers,
+        ]);
+
+        if (!is_wp_error($search_response)) {
+            $search_data = json_decode(wp_remote_retrieve_body($search_response), true);
+            if (!empty($search_data['data'][0]['id'])) {
+                $profile_id = $search_data['data'][0]['id'];
+
+                // Update profile with new properties
+                $update_url = 'https://a.klaviyo.com/api/profiles/' . $profile_id . '/';
+                $update_body = [
+                    'data' => [
+                        'type' => 'profile',
+                        'id' => $profile_id,
+                        'attributes' => [
+                            'properties' => [
+                                'source' => $source,
+                                'discount_code' => $discount_code,
+                                'last_signup' => current_time('c'),
+                                'brand' => 'SkyyRose',
+                            ],
+                        ],
+                    ],
+                ];
+                wp_remote_request($update_url, [
+                    'method' => 'PATCH',
+                    'timeout' => 30,
+                    'headers' => $headers,
+                    'body' => wp_json_encode($update_body),
+                ]);
+            }
+        }
+    } elseif ($profile_code >= 200 && $profile_code < 300) {
+        $profile_id = $profile_data['data']['id'] ?? null;
+    } else {
+        error_log('Klaviyo profile error: ' . wp_remote_retrieve_body($profile_response));
+        return false;
+    }
+
+    if (empty($profile_id)) {
+        return false;
+    }
+
+    // Step 2: Subscribe profile to list
+    $subscribe_url = 'https://a.klaviyo.com/api/lists/' . $creds['list_id'] . '/relationships/profiles/';
+    $subscribe_body = [
+        'data' => [
+            ['type' => 'profile', 'id' => $profile_id],
+        ],
+    ];
+
+    $subscribe_response = wp_remote_post($subscribe_url, [
+        'timeout' => 30,
+        'headers' => $headers,
+        'body' => wp_json_encode($subscribe_body),
+    ]);
+
+    if (is_wp_error($subscribe_response)) {
+        error_log('Klaviyo subscribe error: ' . $subscribe_response->get_error_message());
+        return false;
+    }
+
+    $subscribe_code = wp_remote_retrieve_response_code($subscribe_response);
+
+    if ($subscribe_code >= 200 && $subscribe_code < 300) {
+        // Track the signup event
         skyyrose_track_klaviyo_event($email, 'Newsletter Signup', [
             'source' => $source,
             'discount_code' => $discount_code,
@@ -111,7 +164,7 @@ function skyyrose_add_to_klaviyo(string $email, string $source, string $discount
         return true;
     }
 
-    error_log('Klaviyo API error: ' . wp_remote_retrieve_body($response));
+    error_log('Klaviyo subscribe error: ' . wp_remote_retrieve_body($subscribe_response));
     return false;
 }
 
