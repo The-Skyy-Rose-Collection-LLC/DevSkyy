@@ -930,3 +930,157 @@ function skyyrose_email_customizer(WP_Customize_Manager $wp_customize): void {
     ]);
 }
 add_action('customize_register', 'skyyrose_email_customizer');
+
+/**
+ * Load More Products AJAX Handler
+ */
+function skyyrose_load_more_products(): void {
+    $page = isset($_GET['page']) ? absint($_GET['page']) : 1;
+    $collection = isset($_GET['collection']) ? sanitize_text_field($_GET['collection']) : 'all';
+    $per_page = 12;
+
+    // Collection mappings
+    $collections = [
+        'signature' => ['category_id' => 19, 'color' => '#D4AF37', 'name' => 'Signature'],
+        'black-rose' => ['category_id' => 20, 'color' => '#8B0000', 'name' => 'Black Rose'],
+        'love-hurts' => ['category_id' => 18, 'color' => '#B76E79', 'name' => 'Love Hurts'],
+    ];
+
+    $args = [
+        'post_type' => 'product',
+        'posts_per_page' => $per_page,
+        'paged' => $page,
+        'post_status' => 'publish',
+    ];
+
+    if ($collection !== 'all' && isset($collections[$collection]['category_id'])) {
+        $args['tax_query'] = [
+            [
+                'taxonomy' => 'product_cat',
+                'field' => 'term_id',
+                'terms' => $collections[$collection]['category_id'],
+            ],
+        ];
+    }
+
+    $products = new WP_Query($args);
+    $products_data = [];
+
+    if ($products->have_posts()) {
+        while ($products->have_posts()) {
+            $products->the_post();
+            global $product;
+
+            $image_id = $product->get_image_id();
+            $image_url = wp_get_attachment_image_url($image_id, 'skyyrose-product');
+
+            // Determine collection
+            $terms = get_the_terms($product->get_id(), 'product_cat');
+            $product_collection = 'signature';
+            $badge_color = '#D4AF37';
+            $collection_name = 'Signature';
+
+            if ($terms && !is_wp_error($terms)) {
+                foreach ($terms as $term) {
+                    $slug = strtolower($term->slug);
+                    if (strpos($slug, 'signature') !== false) {
+                        $product_collection = 'signature';
+                        $badge_color = '#D4AF37';
+                        $collection_name = 'Signature';
+                    } elseif (strpos($slug, 'black') !== false || strpos($slug, 'rose') !== false) {
+                        $product_collection = 'black-rose';
+                        $badge_color = '#8B0000';
+                        $collection_name = 'Black Rose';
+                    } elseif (strpos($slug, 'love') !== false || strpos($slug, 'hurts') !== false) {
+                        $product_collection = 'love-hurts';
+                        $badge_color = '#B76E79';
+                        $collection_name = 'Love Hurts';
+                    }
+                }
+            }
+
+            $products_data[] = [
+                'id' => $product->get_id(),
+                'name' => $product->get_name(),
+                'price' => $product->get_price(),
+                'image' => $image_url ?: '',
+                'permalink' => get_permalink(),
+                'collection' => $product_collection,
+                'collection_name' => $collection_name,
+                'badge_color' => $badge_color,
+            ];
+        }
+        wp_reset_postdata();
+    }
+
+    wp_send_json_success([
+        'products' => $products_data,
+        'has_more' => $products->max_num_pages > $page,
+        'page' => $page,
+        'total_pages' => $products->max_num_pages,
+    ]);
+}
+add_action('wp_ajax_skyyrose_load_more_products', 'skyyrose_load_more_products');
+add_action('wp_ajax_nopriv_skyyrose_load_more_products', 'skyyrose_load_more_products');
+
+/**
+ * WooCommerce AJAX Add to Cart Handler
+ */
+function skyyrose_wc_ajax_add_to_cart(): void {
+    $product_id = apply_filters('woocommerce_add_to_cart_product_id', absint($_POST['product_id']));
+    $quantity = empty($_POST['quantity']) ? 1 : wc_stock_amount(absint($_POST['quantity']));
+    $variation_id = absint($_POST['variation_id'] ?? 0);
+    $passed_validation = apply_filters('woocommerce_add_to_cart_validation', true, $product_id, $quantity);
+    $product_status = get_post_status($product_id);
+
+    if ($passed_validation && WC()->cart->add_to_cart($product_id, $quantity, $variation_id) && 'publish' === $product_status) {
+        do_action('woocommerce_ajax_added_to_cart', $product_id);
+
+        if ('yes' === get_option('woocommerce_cart_redirect_after_add')) {
+            wc_add_to_cart_message([$product_id => $quantity], true);
+        }
+
+        WC_AJAX::get_refreshed_fragments();
+    } else {
+        $data = [
+            'error' => true,
+            'product_url' => apply_filters('woocommerce_cart_redirect_after_error', get_permalink($product_id), $product_id),
+        ];
+
+        wp_send_json($data);
+    }
+
+    wp_die();
+}
+add_action('wp_ajax_woocommerce_ajax_add_to_cart', 'skyyrose_wc_ajax_add_to_cart');
+add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart', 'skyyrose_wc_ajax_add_to_cart');
+
+/**
+ * Use custom shop template
+ */
+function skyyrose_custom_shop_template(string $template): string {
+    if (is_shop() || is_product_category()) {
+        $custom_template = locate_template('woocommerce/archive-product-custom.php');
+        if ($custom_template) {
+            return $custom_template;
+        }
+    }
+    return $template;
+}
+add_filter('template_include', 'skyyrose_custom_shop_template', 99);
+
+/**
+ * Ensure GSAP and fonts are loaded on shop pages
+ */
+function skyyrose_shop_assets(): void {
+    if (is_shop() || is_product_category()) {
+        // Playfair Display font
+        wp_enqueue_style(
+            'skyyrose-playfair',
+            'https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&display=swap',
+            [],
+            null
+        );
+    }
+}
+add_action('wp_enqueue_scripts', 'skyyrose_shop_assets');
