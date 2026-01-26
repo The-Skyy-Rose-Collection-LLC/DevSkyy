@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGNATURE Collection | SkyyRose Virtual Runway</title>
+    <meta name="description" content="Experience the SIGNATURE virtual runway - an immersive 3D fashion show featuring SkyyRose's premium foundation essentials">
+    
+    <!-- Import Maps for Three.js ES Modules -->
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <style>
+        /* SkyyRose SIGNATURE Collection Theme */
+        :root {
+            --sr-black: #0A0A0A;
+            --sr-gold: #D4AF37;
+            --sr-rose-gold: #B76E79;
+            --sr-platinum: #E5E4E2;
+            --sr-champagne: #F7E7CE;
+            --sr-onyx: #1A1A1A;
+            --sr-cream: #FFFEF2;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        body {
+            font-family: var(--font-body);
+            background: var(--sr-black);
+            color: #fff;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        /* Loading Screen */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, var(--sr-black) 0%, var(--sr-onyx) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loading-logo {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            font-weight: 600;
+            letter-spacing: 0.4em;
+            margin-bottom: 2rem;
+            background: linear-gradient(135deg, var(--sr-gold), var(--sr-champagne), var(--sr-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: shimmer 2s ease-in-out infinite;
+        }
+
+        @keyframes shimmer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .loading-subtitle {
+            font-size: 0.9rem;
+            letter-spacing: 0.6em;
+            text-transform: uppercase;
+            color: var(--sr-gold);
+            margin-bottom: 3rem;
+        }
+
+        .loading-progress {
+            width: 200px;
+            height: 2px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .loading-bar {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--sr-gold), var(--sr-champagne));
+            transition: width 0.3s ease;
+        }
+
+        /* Canvas Container */
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+        }
+
+        canvas { display: block; }
+
+        /* Collection Title Overlay */
+        .collection-header {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            z-index: 100;
+            pointer-events: none;
+        }
+
+        .collection-name {
+            font-family: var(--font-display);
+            font-size: 2.5rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            background: linear-gradient(180deg, var(--sr-gold) 0%, var(--sr-champagne) 50%, var(--sr-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .collection-tagline {
+            font-size: 0.85rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--sr-rose-gold);
+            margin-top: 0.5rem;
+        }
+
+        /* Product Hotspots */
+        .hotspot {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            pointer-events: auto;
+            transform: translate(-50%, -50%);
+            z-index: 50;
+        }
+
+        .hotspot-inner {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, var(--sr-gold) 0%, transparent 70%);
+            border: 1px solid var(--sr-gold);
+            border-radius: 50%;
+            animation: luxury-pulse 2s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .hotspot-inner::before {
+            content: '✦';
+            font-size: 0.9rem;
+            color: var(--sr-gold);
+        }
+
+        @keyframes luxury-pulse {
+            0%, 100% { 
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4);
+            }
+            50% { 
+                transform: scale(1.1);
+                box-shadow: 0 0 20px 5px rgba(212, 175, 55, 0.2);
+            }
+        }
+
+        /* Product Card */
+        .product-card {
+            position: fixed;
+            right: -400px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 350px;
+            background: linear-gradient(135deg, rgba(10,10,10,0.97) 0%, rgba(26,26,26,0.97) 100%);
+            border-left: 1px solid var(--sr-gold);
+            padding: 2rem;
+            z-index: 200;
+            transition: right 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(20px);
+        }
+
+        .product-card.visible {
+            right: 0;
+        }
+
+        .product-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--sr-gold);
+            background: transparent;
+            color: var(--sr-gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .product-close:hover {
+            background: var(--sr-gold);
+            color: var(--sr-black);
+        }
+
+        .product-badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: transparent;
+            border: 1px solid var(--sr-gold);
+            color: var(--sr-gold);
+            font-size: 0.7rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 1rem;
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, var(--sr-black), var(--sr-onyx));
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 4rem;
+        }
+
+        .product-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--sr-cream);
+        }
+
+        .product-price {
+            font-size: 1.25rem;
+            color: var(--sr-gold);
+            margin-bottom: 1rem;
+        }
+
+        .product-description {
+            font-size: 0.9rem;
+            color: var(--sr-platinum);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .product-cta {
+            width: 100%;
+            padding: 1rem;
+            background: transparent;
+            border: 1px solid var(--sr-gold);
+            color: var(--sr-gold);
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .product-cta:hover {
+            background: var(--sr-gold);
+            color: var(--sr-black);
+        }
+
+        /* Navigation Controls */
+        .nav-controls {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 1rem;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            padding: 0.8rem 1.5rem;
+            background: rgba(10, 10, 10, 0.8);
+            border: 1px solid var(--sr-gold);
+            color: var(--sr-gold);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            background: var(--sr-gold);
+            color: var(--sr-black);
+        }
+
+        /* Brand Logo */
+        .brand-logo {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            font-family: var(--font-display);
+            font-size: 1rem;
+            letter-spacing: 0.4em;
+            color: var(--sr-gold);
+            opacity: 0.6;
+            z-index: 100;
+        }
+
+        /* Season Badge */
+        .season-badge {
+            position: fixed;
+            top: 50%;
+            left: 2rem;
+            transform: translateY(-50%) rotate(-90deg);
+            font-size: 0.7rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: var(--sr-rose-gold);
+            opacity: 0.7;
+            z-index: 100;
+            transform-origin: center center;
+        }
+
+        /* AR Button */
+        .ar-btn {
+            position: fixed;
+            bottom: 2rem;
+            left: 2rem;
+            padding: 0.8rem 1.2rem;
+            background: rgba(10, 10, 10, 0.9);
+            border: 1px solid var(--sr-rose-gold);
+            color: var(--sr-rose-gold);
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            z-index: 100;
+        }
+
+        .ar-btn:hover {
+            background: var(--sr-rose-gold);
+            color: var(--sr-black);
+        }
+
+        /* Spotlight Effect */
+        .spotlight-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse 50% 50% at 50% 30%, transparent 0%, rgba(0,0,0,0.3) 100%);
+            z-index: 2;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .collection-name { font-size: 1.5rem; letter-spacing: 0.15em; }
+            .product-card { width: 100%; right: -100%; }
+            .product-card.visible { right: 0; }
+            .nav-controls { flex-wrap: wrap; justify-content: center; }
+            .season-badge { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loading-logo">SKYYROSE</div>
+        <div class="loading-subtitle">Signature Collection</div>
+        <div class="loading-progress">
+            <div class="loading-bar" id="loading-bar"></div>
+        </div>
+    </div>
+
+    <!-- 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- Spotlight Overlay -->
+    <div class="spotlight-overlay"></div>
+
+    <!-- Collection Header -->
+    <div class="collection-header">
+        <h1 class="collection-name">Signature</h1>
+        <p class="collection-tagline">Premium Foundation Essentials</p>
+    </div>
+
+    <!-- Season Badge -->
+    <div class="season-badge">Spring / Summer 2026</div>
+
+    <!-- Product Hotspots (positioned by JS) -->
+    <div id="hotspots-container"></div>
+
+    <!-- Product Card -->
+    <div class="product-card" id="product-card">
+        <button class="product-close" onclick="closeProductCard()">×</button>
+        <span class="product-badge" id="product-badge">Essential</span>
+        <div class="product-image" id="product-image">👔</div>
+        <h2 class="product-title" id="product-title">Foundation Blazer</h2>
+        <p class="product-price" id="product-price">$395</p>
+        <p class="product-description" id="product-description">
+            Premium Italian wool blend blazer with gold-tone hardware. 
+            The cornerstone of our SIGNATURE collection.
+        </p>
+        <button class="product-cta" onclick="addToCart()">Add to Cart</button>
+    </div>
+
+    <!-- Navigation -->
+    <div class="nav-controls">
+        <button class="nav-btn active" data-view="front">Front Row</button>
+        <button class="nav-btn" data-view="side">Side View</button>
+        <button class="nav-btn" data-view="backstage">Backstage</button>
+    </div>
+
+    <!-- AR Button -->
+    <button class="ar-btn" onclick="activateAR()">
+        <span>📱</span> View in AR
+    </button>
+
+    <!-- Brand Logo -->
+    <div class="brand-logo">SKYYROSE</div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // ============================================
+        // SKYYROSE SIGNATURE COLLECTION
+        // Virtual Runway Show Experience
+        // ============================================
+
+        let scene, camera, renderer, controls, composer;
+        let spotlights = [], mannequins = [];
+        let particles;
+        let clock = new THREE.Clock();
+        let hotspots3D = [];
+
+        // Product Data
+        const products = {
+            'foundation-blazer': {
+                title: 'Foundation Blazer',
+                price: '$395',
+                description: 'Premium Italian wool blend blazer with gold-tone hardware and silk lining. The cornerstone of luxury streetwear.',
+                badge: 'Signature',
+                emoji: '🧥',
+                position: new THREE.Vector3(-3, 1.5, 2)
+            },
+            'essential-trouser': {
+                title: 'Essential Trouser',
+                price: '$245',
+                description: 'Tailored wool trousers with perfect drape and hidden stretch. Built for all-day sophistication.',
+                badge: 'Essential',
+                emoji: '👖',
+                position: new THREE.Vector3(3, 1.2, 2)
+            },
+            'luxury-tee': {
+                title: 'Luxury Cotton Tee',
+                price: '$125',
+                description: 'Pima cotton tee with gold thread detail at hem. The foundation of any outfit.',
+                badge: 'Foundation',
+                emoji: '👕',
+                position: new THREE.Vector3(0, 1.5, 5)
+            },
+            'heritage-coat': {
+                title: 'Heritage Overcoat',
+                price: '$595',
+                description: 'Double-faced cashmere blend coat with timeless silhouette. Investment dressing at its finest.',
+                badge: 'Investment Piece',
+                emoji: '🧥',
+                position: new THREE.Vector3(-2, 1.8, -3)
+            },
+            'classic-oxford': {
+                title: 'Classic Oxford Shirt',
+                price: '$175',
+                description: 'Egyptian cotton oxford with mother-of-pearl buttons. Crisp yet effortless elegance.',
+                badge: 'Wardrobe Staple',
+                emoji: '👔',
+                position: new THREE.Vector3(2, 1.5, -3)
+            }
+        };
+
+        // Camera Views
+        const cameraViews = {
+            front: { position: new THREE.Vector3(0, 2, 12), target: new THREE.Vector3(0, 1.5, 0) },
+            side: { position: new THREE.Vector3(10, 3, 5), target: new THREE.Vector3(0, 1.5, 0) },
+            backstage: { position: new THREE.Vector3(0, 3, -10), target: new THREE.Vector3(0, 2, 2) }
+        };
+
+        // Initialize
+        init();
+        animate();
+
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0a0a0a);
+            scene.fog = new THREE.Fog(0x0a0a0a, 20, 50);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                50,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                100
+            );
+            camera.position.copy(cameraViews.front.position);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ 
+                antialias: true,
+                powerPreference: 'high-performance'
+            });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.0;
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Controls
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.copy(cameraViews.front.target);
+            controls.minDistance = 5;
+            controls.maxDistance = 25;
+            controls.maxPolarAngle = Math.PI / 2;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.15;
+
+            // Lighting
+            setupLighting();
+
+            // Create Scene Elements
+            createRunway();
+            createSeating();
+            createMannequins();
+            createGoldenParticles();
+            createHotspots();
+
+            // Post-processing with Bloom
+            setupPostProcessing();
+
+            // Events
+            window.addEventListener('resize', onWindowResize);
+            setupNavigation();
+
+            // Loading complete
+            simulateLoading();
+        }
+
+        function setupLighting() {
+            // Minimal ambient for drama
+            const ambient = new THREE.AmbientLight(0x1a1a1a, 0.3);
+            scene.add(ambient);
+
+            // Main runway spotlight
+            const mainSpot = new THREE.SpotLight(0xFFFFF0, 4, 30, Math.PI / 8, 0.4);
+            mainSpot.position.set(0, 15, 5);
+            mainSpot.target.position.set(0, 0, 0);
+            mainSpot.castShadow = true;
+            mainSpot.shadow.mapSize.width = 1024;
+            mainSpot.shadow.mapSize.height = 1024;
+            scene.add(mainSpot);
+            scene.add(mainSpot.target);
+            spotlights.push(mainSpot);
+
+            // Side spotlights with golden tint
+            const positions = [
+                { x: -6, z: 0 },
+                { x: 6, z: 0 },
+                { x: -4, z: 6 },
+                { x: 4, z: 6 }
+            ];
+
+            positions.forEach((pos, i) => {
+                const color = i % 2 === 0 ? 0xD4AF37 : 0xB76E79;
+                const spot = new THREE.SpotLight(color, 2, 20, Math.PI / 6, 0.5);
+                spot.position.set(pos.x, 12, pos.z);
+                spot.target.position.set(0, 0, pos.z > 0 ? 3 : -3);
+                scene.add(spot);
+                scene.add(spot.target);
+                spotlights.push(spot);
+            });
+
+            // Backlight for silhouette effect
+            const backLight = new THREE.PointLight(0xD4AF37, 1, 20);
+            backLight.position.set(0, 5, -10);
+            scene.add(backLight);
+
+            // Fill light from front
+            const fillLight = new THREE.PointLight(0xE5E4E2, 0.5, 25);
+            fillLight.position.set(0, 3, 15);
+            scene.add(fillLight);
+        }
+
+        function createRunway() {
+            // Main runway
+            const runwayLength = 30;
+            const runwayWidth = 4;
+            const runwayGeo = new THREE.BoxGeometry(runwayWidth, 0.3, runwayLength);
+            const runwayMat = new THREE.MeshStandardMaterial({
+                color: 0x0a0a0a,
+                roughness: 0.2,
+                metalness: 0.8
+            });
+            const runway = new THREE.Mesh(runwayGeo, runwayMat);
+            runway.position.set(0, 0.15, 0);
+            runway.receiveShadow = true;
+            scene.add(runway);
+
+            // Gold edge trim
+            const trimMat = new THREE.MeshStandardMaterial({
+                color: 0xD4AF37,
+                roughness: 0.3,
+                metalness: 0.9,
+                emissive: 0xD4AF37,
+                emissiveIntensity: 0.1
+            });
+
+            const leftTrim = new THREE.Mesh(
+                new THREE.BoxGeometry(0.05, 0.35, runwayLength),
+                trimMat
+            );
+            leftTrim.position.set(-runwayWidth / 2, 0.175, 0);
+            scene.add(leftTrim);
+
+            const rightTrim = new THREE.Mesh(
+                new THREE.BoxGeometry(0.05, 0.35, runwayLength),
+                trimMat
+            );
+            rightTrim.position.set(runwayWidth / 2, 0.175, 0);
+            scene.add(rightTrim);
+
+            // End platform
+            const platformGeo = new THREE.BoxGeometry(8, 0.3, 4);
+            const platform = new THREE.Mesh(platformGeo, runwayMat);
+            platform.position.set(0, 0.15, -runwayLength / 2 - 2);
+            scene.add(platform);
+
+            // Floor around runway
+            const floorGeo = new THREE.PlaneGeometry(50, 50);
+            const floorMat = new THREE.MeshStandardMaterial({
+                color: 0x050505,
+                roughness: 0.9,
+                metalness: 0.1
+            });
+            const floor = new THREE.Mesh(floorGeo, floorMat);
+            floor.rotation.x = -Math.PI / 2;
+            floor.position.y = -0.01;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Runway lights (floor strips)
+            for (let i = 0; i < 10; i++) {
+                const lightStrip = new THREE.Mesh(
+                    new THREE.BoxGeometry(0.1, 0.05, 0.5),
+                    new THREE.MeshBasicMaterial({ color: 0xD4AF37 })
+                );
+                lightStrip.position.set(-runwayWidth / 2 - 0.2, 0.02, -runwayLength / 2 + 3 + i * 3);
+                scene.add(lightStrip);
+
+                const lightStrip2 = lightStrip.clone();
+                lightStrip2.position.set(runwayWidth / 2 + 0.2, 0.02, -runwayLength / 2 + 3 + i * 3);
+                scene.add(lightStrip2);
+            }
+        }
+
+        function createSeating() {
+            // Front row seating (luxury benches)
+            const benchPositions = [
+                { x: -5, z: 8 },
+                { x: 5, z: 8 },
+                { x: -6, z: 10 },
+                { x: 6, z: 10 }
+            ];
+
+            const benchMat = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.5,
+                metalness: 0.3
+            });
+
+            benchPositions.forEach(pos => {
+                // Bench base
+                const benchGeo = new THREE.BoxGeometry(3, 0.5, 0.8);
+                const bench = new THREE.Mesh(benchGeo, benchMat);
+                bench.position.set(pos.x, 0.25, pos.z);
+                bench.castShadow = true;
+                scene.add(bench);
+
+                // Gold legs
+                const legMat = new THREE.MeshStandardMaterial({
+                    color: 0xD4AF37,
+                    roughness: 0.3,
+                    metalness: 0.8
+                });
+                const legGeo = new THREE.CylinderGeometry(0.05, 0.05, 0.5, 8);
+                
+                [[-1.3, 0.3], [-1.3, -0.3], [1.3, 0.3], [1.3, -0.3]].forEach(([x, z]) => {
+                    const leg = new THREE.Mesh(legGeo, legMat);
+                    leg.position.set(pos.x + x, 0.25, pos.z + z);
+                    scene.add(leg);
+                });
+            });
+
+            // Camera stations
+            const camPositions = [
+                { x: -8, z: 6 },
+                { x: 8, z: 6 }
+            ];
+
+            camPositions.forEach(pos => {
+                const tripodGeo = new THREE.CylinderGeometry(0.03, 0.05, 2, 8);
+                const tripodMat = new THREE.MeshStandardMaterial({ color: 0x333333 });
+                const tripod = new THREE.Mesh(tripodGeo, tripodMat);
+                tripod.position.set(pos.x, 1, pos.z);
+                scene.add(tripod);
+
+                const camGeo = new THREE.BoxGeometry(0.3, 0.2, 0.4);
+                const cam = new THREE.Mesh(camGeo, tripodMat);
+                cam.position.set(pos.x, 2.1, pos.z);
+                scene.add(cam);
+            });
+        }
+
+        function createMannequins() {
+            // Abstract geometric mannequins
+            const positions = [
+                { x: -1.5, z: 0, rotation: 0 },
+                { x: 1.5, z: 0, rotation: 0 },
+                { x: 0, z: 4, rotation: Math.PI },
+                { x: -2, z: -4, rotation: 0 },
+                { x: 2, z: -4, rotation: 0 }
+            ];
+
+            const mannequinMat = new THREE.MeshStandardMaterial({
+                color: 0x1a1a1a,
+                roughness: 0.4,
+                metalness: 0.6
+            });
+
+            positions.forEach((pos, i) => {
+                const mannequinGroup = new THREE.Group();
+
+                // Torso
+                const torsoGeo = new THREE.CylinderGeometry(0.2, 0.25, 0.8, 16);
+                const torso = new THREE.Mesh(torsoGeo, mannequinMat);
+                torso.position.y = 1.2;
+                mannequinGroup.add(torso);
+
+                // Head
+                const headGeo = new THREE.SphereGeometry(0.15, 16, 16);
+                const head = new THREE.Mesh(headGeo, mannequinMat);
+                head.position.y = 1.8;
+                mannequinGroup.add(head);
+
+                // Neck
+                const neckGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.2, 8);
+                const neck = new THREE.Mesh(neckGeo, mannequinMat);
+                neck.position.y = 1.65;
+                mannequinGroup.add(neck);
+
+                // Hips
+                const hipsGeo = new THREE.CylinderGeometry(0.25, 0.2, 0.3, 16);
+                const hips = new THREE.Mesh(hipsGeo, mannequinMat);
+                hips.position.y = 0.7;
+                mannequinGroup.add(hips);
+
+                // Legs
+                const legGeo = new THREE.CylinderGeometry(0.08, 0.07, 0.7, 8);
+                const leftLeg = new THREE.Mesh(legGeo, mannequinMat);
+                leftLeg.position.set(-0.1, 0.35, 0);
+                mannequinGroup.add(leftLeg);
+
+                const rightLeg = new THREE.Mesh(legGeo, mannequinMat);
+                rightLeg.position.set(0.1, 0.35, 0);
+                mannequinGroup.add(rightLeg);
+
+                // Base
+                const baseGeo = new THREE.CylinderGeometry(0.3, 0.35, 0.05, 16);
+                const baseMat = new THREE.MeshStandardMaterial({
+                    color: 0xD4AF37,
+                    roughness: 0.3,
+                    metalness: 0.8
+                });
+                const base = new THREE.Mesh(baseGeo, baseMat);
+                base.position.y = 0.025;
+                mannequinGroup.add(base);
+
+                mannequinGroup.position.set(pos.x, 0, pos.z);
+                mannequinGroup.rotation.y = pos.rotation;
+                mannequinGroup.castShadow = true;
+                
+                scene.add(mannequinGroup);
+                mannequins.push(mannequinGroup);
+            });
+        }
+
+        function createGoldenParticles() {
+            const particleCount = 1500;
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+
+            const colorPalette = [
+                new THREE.Color(0xD4AF37),  // Gold
+                new THREE.Color(0xB76E79),  // Rose gold
+                new THREE.Color(0xE5E4E2),  // Platinum
+                new THREE.Color(0xF7E7CE)   // Champagne
+            ];
+
+            for (let i = 0; i < particleCount; i++) {
+                // Concentrate particles above runway
+                positions[i * 3] = (Math.random() - 0.5) * 20;
+                positions[i * 3 + 1] = Math.random() * 12 + 3;
+                positions[i * 3 + 2] = (Math.random() - 0.5) * 25;
+
+                const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+
+                sizes[i] = Math.random() * 0.08 + 0.02;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+            const material = new THREE.PointsMaterial({
+                size: 0.08,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+
+        function createHotspots() {
+            Object.entries(products).forEach(([id, product]) => {
+                const markerGeo = new THREE.SphereGeometry(0.12, 16, 16);
+                const markerMat = new THREE.MeshBasicMaterial({
+                    color: 0xD4AF37,
+                    transparent: true,
+                    opacity: 0.9
+                });
+                const marker = new THREE.Mesh(markerGeo, markerMat);
+                marker.position.copy(product.position);
+                marker.userData.productId = id;
+                scene.add(marker);
+                hotspots3D.push(marker);
+
+                // Outer glow ring
+                const ringGeo = new THREE.RingGeometry(0.18, 0.22, 32);
+                const ringMat = new THREE.MeshBasicMaterial({
+                    color: 0xB76E79,
+                    transparent: true,
+                    opacity: 0.4,
+                    side: THREE.DoubleSide
+                });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.position.copy(product.position);
+                ring.lookAt(camera.position);
+                scene.add(ring);
+            });
+        }
+
+        function setupPostProcessing() {
+            composer = new EffectComposer(renderer);
+
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                0.6,   // strength - subtle for luxury feel
+                0.4,   // radius
+                0.85   // threshold - higher for selective bloom
+            );
+            composer.addPass(bloomPass);
+
+            const outputPass = new OutputPass();
+            composer.addPass(outputPass);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = clock.getElapsedTime();
+
+            // Update controls
+            controls.update();
+
+            // Animate particles - slow drift downward
+            if (particles) {
+                const positions = particles.geometry.attributes.position.array;
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i + 1] -= 0.003;
+                    if (positions[i + 1] < 0) {
+                        positions[i + 1] = 15;
+                    }
+                    // Subtle horizontal drift
+                    positions[i] += Math.sin(time + i) * 0.001;
+                }
+                particles.geometry.attributes.position.needsUpdate = true;
+                particles.rotation.y += 0.0002;
+            }
+
+            // Subtle spotlight movement
+            spotlights.forEach((spot, i) => {
+                if (i > 0) {
+                    spot.intensity = 2 + Math.sin(time * 0.5 + i) * 0.3;
+                }
+            });
+
+            // Subtle mannequin rotation
+            mannequins.forEach((mannequin, i) => {
+                mannequin.rotation.y = Math.sin(time * 0.2 + i * 0.5) * 0.05;
+            });
+
+            // Animate hotspots
+            hotspots3D.forEach((marker, i) => {
+                marker.scale.setScalar(1 + Math.sin(time * 1.5 + i) * 0.1);
+            });
+
+            // Render with post-processing
+            composer.render();
+
+            // Update 2D hotspot positions
+            updateHotspotPositions();
+        }
+
+        function updateHotspotPositions() {
+            const container = document.getElementById('hotspots-container');
+            container.innerHTML = '';
+
+            hotspots3D.forEach(marker => {
+                const screenPos = marker.position.clone().project(camera);
+                
+                if (screenPos.z < 1) {
+                    const x = (screenPos.x * 0.5 + 0.5) * window.innerWidth;
+                    const y = (-screenPos.y * 0.5 + 0.5) * window.innerHeight;
+
+                    const hotspot = document.createElement('div');
+                    hotspot.className = 'hotspot';
+                    hotspot.style.left = `${x}px`;
+                    hotspot.style.top = `${y}px`;
+                    hotspot.innerHTML = '<div class="hotspot-inner"></div>';
+                    hotspot.onclick = () => showProduct(marker.userData.productId);
+                    container.appendChild(hotspot);
+                }
+            });
+        }
+
+        function showProduct(productId) {
+            const product = products[productId];
+            if (!product) return;
+
+            document.getElementById('product-badge').textContent = product.badge;
+            document.getElementById('product-image').textContent = product.emoji;
+            document.getElementById('product-title').textContent = product.title;
+            document.getElementById('product-price').textContent = product.price;
+            document.getElementById('product-description').textContent = product.description;
+
+            document.getElementById('product-card').classList.add('visible');
+
+            animateCameraTo(
+                product.position.clone().add(new THREE.Vector3(2, 1, 4)),
+                product.position
+            );
+        }
+
+        window.closeProductCard = function() {
+            document.getElementById('product-card').classList.remove('visible');
+        };
+
+        window.addToCart = function() {
+            alert('Added to cart! (Demo mode)');
+        };
+
+        window.activateAR = function() {
+            alert('AR feature requires a compatible device. Try on mobile!');
+        };
+
+        function animateCameraTo(position, target) {
+            const startPos = camera.position.clone();
+            const startTarget = controls.target.clone();
+            const duration = 1200;
+            const startTime = Date.now();
+
+            function updateCamera() {
+                const elapsed = Date.now() - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+
+                camera.position.lerpVectors(startPos, position, eased);
+                controls.target.lerpVectors(startTarget, target, eased);
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCamera);
+                }
+            }
+
+            controls.autoRotate = false;
+            updateCamera();
+        }
+
+        function setupNavigation() {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const view = btn.dataset.view;
+                    const viewData = cameraViews[view];
+                    if (viewData) {
+                        animateCameraTo(viewData.position, viewData.target);
+                        
+                        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                    }
+                });
+            });
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function simulateLoading() {
+            const loadingBar = document.getElementById('loading-bar');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 12;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').classList.add('hidden');
+                    }, 500);
+                }
+                loadingBar.style.width = `${progress}%`;
+            }, 100);
+        }
+    </script>
+</body>
+</html>
