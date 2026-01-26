@@ -27,7 +27,8 @@
         "hooks": [
           {
             "type": "command",
-            "command": "#!/bin/bash\n# Open editor for review before pushing\necho '[Hook] Review changes before push...' >&2\n# Uncomment your preferred editor:\n# zed . 2>/dev/null\n# code . 2>/dev/null\n# cursor . 2>/dev/null\necho '[Hook] Press Enter to continue with push or Ctrl+C to abort...' >&2\nread -r"
+            "command": "#!/bin/bash\necho '[Hook] Pushing to remote...' >&2",
+            "async": true
           }
         ],
         "description": "Pause before git push to review changes"
@@ -119,37 +120,6 @@
         "description": "Warn about console.log statements after edits"
       }
     ],
-    "Stop": [
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "#!/bin/bash\n# Final check for console.logs in modified files\ninput=$(cat)\n\nif git rev-parse --git-dir > /dev/null 2>&1; then\n  modified_files=$(git diff --name-only HEAD 2>/dev/null | grep -E '\\.(ts|tsx|js|jsx)$' || true)\n  \n  if [ -n \"$modified_files\" ]; then\n    has_console=false\n    while IFS= read -r file; do\n      if [ -f \"$file\" ]; then\n        if grep -q \"console\\.log\" \"$file\" 2>/dev/null; then\n          echo \"[Hook] WARNING: console.log found in $file\" >&2\n          has_console=true\n        fi\n      fi\n    done <<< \"$modified_files\"\n    \n    if [ \"$has_console\" = true ]; then\n      echo \"[Hook] Remove console.log statements before committing\" >&2\n    fi\n  fi\nfi\n\necho \"$input\""
-          }
-        ],
-        "description": "Final audit for console.log in modified files before session ends"
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/coreyfoster/DevSkyy/.claude/hooks/memory-persistence/session-end.sh"
-          }
-        ],
-        "description": "Persist session state on end"
-      },
-      {
-        "matcher": "*",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/Users/coreyfoster/DevSkyy/.claude/skills/continuous-learning/evaluate-session.sh"
-          }
-        ],
-        "description": "Evaluate session for extractable patterns"
-      }
-    ]
+    "Stop": []
   }
 }

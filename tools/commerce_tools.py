@@ -11,8 +11,14 @@ Example tools:
 - commerce_process_order: Process order
 """
 
+from __future__ import annotations
+
 import logging
+import os
+from datetime import UTC, datetime
 from typing import Any
+
+import httpx
 
 from core.runtime.tool_registry import (
     ParameterType,
@@ -24,6 +30,119 @@ from core.runtime.tool_registry import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# WooCommerce Client Configuration
+# =============================================================================
+
+
+class WooCommerceClientError(Exception):
+    """WooCommerce API error with status code."""
+
+    def __init__(self, message: str, status_code: int | None = None) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def _get_wc_config() -> tuple[str, str, str]:
+    """
+    Get WooCommerce configuration from environment variables.
+
+    Returns:
+        Tuple of (base_url, consumer_key, consumer_secret)
+
+    Raises:
+        WooCommerceClientError: If required environment variables are missing
+    """
+    base_url = os.getenv("WORDPRESS_URL") or os.getenv("WP_URL") or os.getenv("WOOCOMMERCE_URL")
+    consumer_key = os.getenv("WC_CONSUMER_KEY") or os.getenv("WOOCOMMERCE_KEY")
+    consumer_secret = os.getenv("WC_CONSUMER_SECRET") or os.getenv("WOOCOMMERCE_SECRET")
+
+    if not base_url:
+        raise WooCommerceClientError(
+            "Missing WooCommerce URL. Set WORDPRESS_URL, WP_URL, or WOOCOMMERCE_URL"
+        )
+    if not consumer_key:
+        raise WooCommerceClientError(
+            "Missing WooCommerce consumer key. Set WC_CONSUMER_KEY or WOOCOMMERCE_KEY"
+        )
+    if not consumer_secret:
+        raise WooCommerceClientError(
+            "Missing WooCommerce consumer secret. Set WC_CONSUMER_SECRET or WOOCOMMERCE_SECRET"
+        )
+
+    # Ensure base URL doesn't have trailing slash
+    base_url = base_url.rstrip("/")
+
+    return base_url, consumer_key, consumer_secret
+
+
+async def _wc_request(
+    method: str,
+    endpoint: str,
+    *,
+    json_data: dict[str, Any] | None = None,
+    params: dict[str, Any] | None = None,
+    timeout: float = 60.0,
+) -> dict[str, Any]:
+    """
+    Make an authenticated request to the WooCommerce REST API.
+
+    Args:
+        method: HTTP method (GET, POST, PUT, DELETE)
+        endpoint: API endpoint (e.g., "products", "orders/123")
+        json_data: JSON body for POST/PUT requests
+        params: Query parameters
+        timeout: Request timeout in seconds
+
+    Returns:
+        API response as dictionary
+
+    Raises:
+        WooCommerceClientError: If the request fails
+    """
+    base_url, consumer_key, consumer_secret = _get_wc_config()
+
+    url = f"{base_url}/wp-json/wc/v3/{endpoint.lstrip('/')}"
+
+    async with httpx.AsyncClient(
+        auth=(consumer_key, consumer_secret),
+        timeout=timeout,
+    ) as client:
+        try:
+            response = await client.request(
+                method=method,
+                url=url,
+                json=json_data,
+                params=params,
+            )
+            response.raise_for_status()
+
+            if response.status_code == 204:
+                return {}
+
+            return response.json()
+
+        except httpx.HTTPStatusError as e:
+            error_detail = ""
+            try:
+                error_body = e.response.json()
+                error_detail = error_body.get("message", str(error_body))
+            except Exception:
+                error_detail = e.response.text[:500] if e.response.text else "Unknown error"
+
+            logger.error(
+                f"WooCommerce API error: {method} {endpoint} -> {e.response.status_code}: {error_detail}"
+            )
+            raise WooCommerceClientError(
+                f"WooCommerce API error: {error_detail}",
+                status_code=e.response.status_code,
+            ) from e
+
+        except httpx.RequestError as e:
+            logger.error(f"WooCommerce request failed: {method} {endpoint} -> {e}")
+            raise WooCommerceClientError(f"Request failed: {e}") from e
 
 
 # =============================================================================
@@ -53,20 +172,83 @@ async def commerce_create_product(
     Returns:
         Created product data with ID
     """
-    # TODO: Implement actual WooCommerce API call
     logger.info(f"Creating product: {name} at ${price}")
 
-    return {
-        "id": 12345,
-        "name": name,
-        "price": price,
-        "description": description,
-        "collection": collection,
-        "sizes": sizes or [],
-        "images": images or [],
-        "status": "draft",
-        "created_at": "2026-01-05T00:00:00Z",
-    }
+    try:
+        # Build product data for WooCommerce API
+        product_data: dict[str, Any] = {
+            "name": name,
+            "regular_price": str(price),
+            "description": description,
+            "status": "draft",
+        }
+
+        # Add collection as a category tag in meta_data
+        meta_data: list[dict[str, Any]] = []
+        if collection:
+            meta_data.append({"key": "_skyyrose_collection", "value": collection})
+
+        # Add size attributes if provided
+        if sizes:
+            product_data["attributes"] = [
+                {
+                    "name": "Size",
+                    "visible": True,
+                    "variation": True,
+                    "options": sizes,
+                }
+            ]
+
+        # Add images if provided
+        if images:
+            product_data["images"] = [{"src": img_url} for img_url in images]
+
+        if meta_data:
+            product_data["meta_data"] = meta_data
+
+        # Make API call to create product
+        result = await _wc_request("POST", "products", json_data=product_data)
+
+        return {
+            "id": result.get("id"),
+            "name": result.get("name"),
+            "price": float(result.get("regular_price", 0)),
+            "description": result.get("description", ""),
+            "collection": collection,
+            "sizes": sizes or [],
+            "images": [img.get("src", "") for img in result.get("images", [])],
+            "status": result.get("status", "draft"),
+            "created_at": result.get("date_created", datetime.now(UTC).isoformat()),
+        }
+
+    except WooCommerceClientError as e:
+        logger.error(f"Failed to create product '{name}': {e}")
+        return {
+            "id": None,
+            "name": name,
+            "price": price,
+            "description": description,
+            "collection": collection,
+            "sizes": sizes or [],
+            "images": images or [],
+            "status": "error",
+            "error": str(e),
+            "created_at": datetime.now(UTC).isoformat(),
+        }
+    except Exception as e:
+        logger.exception(f"Unexpected error creating product '{name}': {e}")
+        return {
+            "id": None,
+            "name": name,
+            "price": price,
+            "description": description,
+            "collection": collection,
+            "sizes": sizes or [],
+            "images": images or [],
+            "status": "error",
+            "error": f"Unexpected error: {e}",
+            "created_at": datetime.now(UTC).isoformat(),
+        }
 
 
 async def commerce_update_pricing(
@@ -85,15 +267,61 @@ async def commerce_update_pricing(
     Returns:
         Updated product pricing data
     """
-    # TODO: Implement actual WooCommerce API call
     logger.info(f"Updating pricing for product {product_id}")
 
-    return {
-        "product_id": product_id,
-        "regular_price": regular_price,
-        "sale_price": sale_price,
-        "updated_at": "2026-01-05T00:00:00Z",
-    }
+    try:
+        # Build update data - only include prices that are provided
+        update_data: dict[str, Any] = {}
+
+        if regular_price is not None:
+            update_data["regular_price"] = str(regular_price)
+
+        if sale_price is not None:
+            update_data["sale_price"] = str(sale_price)
+
+        if not update_data:
+            logger.warning(f"No pricing updates provided for product {product_id}")
+            return {
+                "product_id": product_id,
+                "regular_price": regular_price,
+                "sale_price": sale_price,
+                "updated_at": datetime.now(UTC).isoformat(),
+                "status": "no_changes",
+            }
+
+        # Make API call to update product
+        result = await _wc_request("PUT", f"products/{product_id}", json_data=update_data)
+
+        return {
+            "product_id": result.get("id"),
+            "regular_price": (
+                float(result.get("regular_price", 0)) if result.get("regular_price") else None
+            ),
+            "sale_price": float(result.get("sale_price", 0)) if result.get("sale_price") else None,
+            "updated_at": result.get("date_modified", datetime.now(UTC).isoformat()),
+            "status": "updated",
+        }
+
+    except WooCommerceClientError as e:
+        logger.error(f"Failed to update pricing for product {product_id}: {e}")
+        return {
+            "product_id": product_id,
+            "regular_price": regular_price,
+            "sale_price": sale_price,
+            "updated_at": datetime.now(UTC).isoformat(),
+            "status": "error",
+            "error": str(e),
+        }
+    except Exception as e:
+        logger.exception(f"Unexpected error updating pricing for product {product_id}: {e}")
+        return {
+            "product_id": product_id,
+            "regular_price": regular_price,
+            "sale_price": sale_price,
+            "updated_at": datetime.now(UTC).isoformat(),
+            "status": "error",
+            "error": f"Unexpected error: {e}",
+        }
 
 
 async def commerce_get_inventory(
@@ -112,16 +340,111 @@ async def commerce_get_inventory(
     Returns:
         Inventory data
     """
-    # TODO: Implement actual WooCommerce API call
     logger.info(f"Getting inventory for product_id={product_id}, sku={sku}")
 
-    return {
-        "items": [
-            {"product_id": product_id or 123, "sku": sku or "SKU-123", "stock": 50},
-        ],
-        "low_stock_threshold": 10,
-        "retrieved_at": "2026-01-05T00:00:00Z",
-    }
+    # Default low stock threshold (WooCommerce default)
+    low_stock_threshold = 10
+
+    try:
+        items: list[dict[str, Any]] = []
+
+        if product_id:
+            # Get single product by ID
+            result = await _wc_request("GET", f"products/{product_id}")
+
+            stock_quantity = result.get("stock_quantity")
+            is_low_stock = stock_quantity is not None and stock_quantity <= low_stock_threshold
+
+            if not low_stock_only or is_low_stock:
+                items.append(
+                    {
+                        "product_id": result.get("id"),
+                        "sku": result.get("sku", ""),
+                        "name": result.get("name", ""),
+                        "stock": stock_quantity,
+                        "stock_status": result.get("stock_status", ""),
+                        "manage_stock": result.get("manage_stock", False),
+                        "low_stock": is_low_stock,
+                    }
+                )
+
+        elif sku:
+            # Search by SKU
+            result = await _wc_request("GET", "products", params={"sku": sku})
+
+            if isinstance(result, list) and result:
+                product = result[0]
+                stock_quantity = product.get("stock_quantity")
+                is_low_stock = stock_quantity is not None and stock_quantity <= low_stock_threshold
+
+                if not low_stock_only or is_low_stock:
+                    items.append(
+                        {
+                            "product_id": product.get("id"),
+                            "sku": product.get("sku", ""),
+                            "name": product.get("name", ""),
+                            "stock": stock_quantity,
+                            "stock_status": product.get("stock_status", ""),
+                            "manage_stock": product.get("manage_stock", False),
+                            "low_stock": is_low_stock,
+                        }
+                    )
+
+        else:
+            # Get all products with managed stock
+            params: dict[str, Any] = {
+                "per_page": 100,
+                "stock_status": "instock,outofstock,onbackorder",
+            }
+
+            result = await _wc_request("GET", "products", params=params)
+
+            if isinstance(result, list):
+                for product in result:
+                    stock_quantity = product.get("stock_quantity")
+                    is_low_stock = (
+                        stock_quantity is not None and stock_quantity <= low_stock_threshold
+                    )
+
+                    if not low_stock_only or is_low_stock:
+                        items.append(
+                            {
+                                "product_id": product.get("id"),
+                                "sku": product.get("sku", ""),
+                                "name": product.get("name", ""),
+                                "stock": stock_quantity,
+                                "stock_status": product.get("stock_status", ""),
+                                "manage_stock": product.get("manage_stock", False),
+                                "low_stock": is_low_stock,
+                            }
+                        )
+
+        return {
+            "items": items,
+            "count": len(items),
+            "low_stock_threshold": low_stock_threshold,
+            "low_stock_only": low_stock_only,
+            "retrieved_at": datetime.now(UTC).isoformat(),
+        }
+
+    except WooCommerceClientError as e:
+        logger.error(f"Failed to get inventory: {e}")
+        return {
+            "items": [],
+            "count": 0,
+            "low_stock_threshold": low_stock_threshold,
+            "error": str(e),
+            "retrieved_at": datetime.now(UTC).isoformat(),
+        }
+    except Exception as e:
+        logger.exception(f"Unexpected error getting inventory: {e}")
+        return {
+            "items": [],
+            "count": 0,
+            "low_stock_threshold": low_stock_threshold,
+            "error": f"Unexpected error: {e}",
+            "retrieved_at": datetime.now(UTC).isoformat(),
+        }
 
 
 async def commerce_process_order(
@@ -134,22 +457,106 @@ async def commerce_process_order(
 
     Args:
         order_id: Order ID
-        action: Action to perform (fulfill, cancel, refund)
+        action: Action to perform (fulfill, cancel, refund, hold)
         notes: Optional notes
 
     Returns:
         Order processing result
     """
-    # TODO: Implement actual WooCommerce API call
     logger.info(f"Processing order {order_id}: {action}")
 
-    return {
-        "order_id": order_id,
-        "action": action,
-        "notes": notes,
-        "status": "completed",
-        "processed_at": "2026-01-05T00:00:00Z",
+    # Map action to WooCommerce order status
+    action_to_status: dict[str, str] = {
+        "fulfill": "completed",
+        "cancel": "cancelled",
+        "refund": "refunded",
+        "hold": "on-hold",
     }
+
+    if action not in action_to_status:
+        logger.error(f"Invalid action '{action}' for order {order_id}")
+        return {
+            "order_id": order_id,
+            "action": action,
+            "notes": notes,
+            "status": "error",
+            "error": f"Invalid action: {action}. Valid actions: {list(action_to_status.keys())}",
+            "processed_at": datetime.now(UTC).isoformat(),
+        }
+
+    try:
+        new_status = action_to_status[action]
+
+        # Handle refund separately - requires creating a refund object
+        if action == "refund":
+            # First get the order to get the total
+            order = await _wc_request("GET", f"orders/{order_id}")
+            order_total = order.get("total", "0")
+
+            # Create refund
+            refund_data: dict[str, Any] = {
+                "amount": order_total,
+                "reason": notes or "Refund requested",
+            }
+
+            refund_result = await _wc_request(
+                "POST",
+                f"orders/{order_id}/refunds",
+                json_data=refund_data,
+            )
+
+            return {
+                "order_id": order_id,
+                "action": action,
+                "notes": notes,
+                "status": "refunded",
+                "refund_id": refund_result.get("id"),
+                "refund_amount": refund_result.get("amount"),
+                "processed_at": refund_result.get("date_created", datetime.now(UTC).isoformat()),
+            }
+
+        # For other actions, update order status
+        update_data: dict[str, Any] = {"status": new_status}
+
+        result = await _wc_request("PUT", f"orders/{order_id}", json_data=update_data)
+
+        # Add order note if provided
+        if notes:
+            note_data = {
+                "note": notes,
+                "customer_note": False,
+            }
+            await _wc_request("POST", f"orders/{order_id}/notes", json_data=note_data)
+
+        return {
+            "order_id": result.get("id"),
+            "action": action,
+            "notes": notes,
+            "status": result.get("status"),
+            "previous_status": order.get("status") if "order" in dir() else None,
+            "processed_at": result.get("date_modified", datetime.now(UTC).isoformat()),
+        }
+
+    except WooCommerceClientError as e:
+        logger.error(f"Failed to process order {order_id} ({action}): {e}")
+        return {
+            "order_id": order_id,
+            "action": action,
+            "notes": notes,
+            "status": "error",
+            "error": str(e),
+            "processed_at": datetime.now(UTC).isoformat(),
+        }
+    except Exception as e:
+        logger.exception(f"Unexpected error processing order {order_id} ({action}): {e}")
+        return {
+            "order_id": order_id,
+            "action": action,
+            "notes": notes,
+            "status": "error",
+            "error": f"Unexpected error: {e}",
+            "processed_at": datetime.now(UTC).isoformat(),
+        }
 
 
 # =============================================================================

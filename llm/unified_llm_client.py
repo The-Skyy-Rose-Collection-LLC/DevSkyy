@@ -30,6 +30,11 @@ from pydantic import BaseModel, Field
 
 from .base import CompletionResponse, Message, ModelProvider
 from .exceptions import LLMError
+from .round_table import LLMProvider as RoundTableProvider
+from .round_table import (
+    LLMRoundTable,
+    RoundTableResult,
+)
 from .router import LLMRouter, RoutingStrategy
 from .task_classifier import (
     PromptTechnique,
@@ -38,6 +43,30 @@ from .task_classifier import (
 )
 
 logger = logging.getLogger(__name__)
+
+
+# =============================================================================
+# Provider Mapping
+# =============================================================================
+
+# Mapping between ModelProvider (base.py) and LLMProvider (round_table.py)
+MODEL_TO_ROUND_TABLE_PROVIDER: dict[ModelProvider, RoundTableProvider] = {
+    ModelProvider.ANTHROPIC: RoundTableProvider.CLAUDE,
+    ModelProvider.OPENAI: RoundTableProvider.GPT4,
+    ModelProvider.GOOGLE: RoundTableProvider.GEMINI,
+    ModelProvider.GROQ: RoundTableProvider.LLAMA,
+    ModelProvider.MISTRAL: RoundTableProvider.MISTRAL,
+    ModelProvider.COHERE: RoundTableProvider.COHERE,
+}
+
+ROUND_TABLE_TO_MODEL_PROVIDER: dict[RoundTableProvider, ModelProvider] = {
+    RoundTableProvider.CLAUDE: ModelProvider.ANTHROPIC,
+    RoundTableProvider.GPT4: ModelProvider.OPENAI,
+    RoundTableProvider.GEMINI: ModelProvider.GOOGLE,
+    RoundTableProvider.LLAMA: ModelProvider.GROQ,
+    RoundTableProvider.MISTRAL: ModelProvider.MISTRAL,
+    RoundTableProvider.COHERE: ModelProvider.COHERE,
+}
 
 
 # =============================================================================
@@ -194,6 +223,7 @@ class UnifiedLLMClient:
         router: LLMRouter | None = None,
         classifier: TaskClassifier | None = None,
         technique_applicator: Any | None = None,  # PromptEngineeringModule
+        round_table: LLMRoundTable | None = None,
     ) -> None:
         """
         Initialize the unified LLM client.
@@ -202,10 +232,12 @@ class UnifiedLLMClient:
             router: LLM router for provider selection
             classifier: Task classifier for category detection
             technique_applicator: Module for applying prompt techniques
+            round_table: Round Table for multi-LLM consensus (optional)
         """
         self._router = router
         self._classifier = classifier
         self._technique_applicator = technique_applicator
+        self._round_table = round_table
 
     async def _get_router(self) -> LLMRouter:
         """Lazy initialization of LLM router."""
@@ -218,6 +250,94 @@ class UnifiedLLMClient:
         if self._classifier is None:
             self._classifier = TaskClassifier()
         return self._classifier
+
+    async def _get_round_table(self) -> LLMRoundTable:
+        """Lazy initialization of Round Table with auto-registered providers."""
+        if self._round_table is None:
+            # Import here to avoid circular dependency
+            from .round_table import create_round_table
+
+            self._round_table = await create_round_table()
+        return self._round_table
+
+    async def _execute_round_table(
+        self,
+        request: LLMRequest,
+        messages: list[Message],
+        task_classification: TaskClassificationResult | None,
+    ) -> tuple[CompletionResponse, RoundTableResult]:
+        """
+        Execute Round Table competition for multi-LLM consensus.
+
+        Args:
+            request: Original LLM request
+            messages: Processed messages
+            task_classification: Optional task classification result
+
+        Returns:
+            Tuple of (CompletionResponse, RoundTableResult)
+        """
+        round_table = await self._get_round_table()
+
+        # Build prompt from messages
+        prompt_parts = []
+        for msg in messages:
+            if msg.role.value == "system":
+                prompt_parts.append(f"[System]: {msg.content}")
+            elif msg.role.value == "user":
+                prompt_parts.append(f"[User]: {msg.content}")
+            elif msg.role.value == "assistant":
+                prompt_parts.append(f"[Assistant]: {msg.content}")
+        prompt = "\n\n".join(prompt_parts)
+
+        # Determine which providers to use
+        rt_providers: list[RoundTableProvider] | None = None
+        if request.round_table_providers:
+            # Convert ModelProvider to RoundTableProvider
+            rt_providers = [
+                MODEL_TO_ROUND_TABLE_PROVIDER[p]
+                for p in request.round_table_providers
+                if p in MODEL_TO_ROUND_TABLE_PROVIDER
+            ]
+
+        # Build context for Round Table
+        context: dict[str, Any] = {}
+        if task_classification:
+            context["category"] = task_classification.task_category.value
+            context["confidence"] = task_classification.confidence
+
+        # Run Round Table competition
+        result = await round_table.compete(
+            prompt=prompt,
+            task_id=request.task_id,
+            providers=rt_providers,
+            context=context if context else None,
+            tools=request.tools,
+            persist=True,
+        )
+
+        # Convert winner to CompletionResponse
+        if result.winner is None:
+            raise LLMError("Round Table competition failed: no winner")
+
+        winner = result.winner
+        winner_provider = ROUND_TABLE_TO_MODEL_PROVIDER.get(
+            winner.provider, ModelProvider.ANTHROPIC
+        )
+
+        completion = CompletionResponse(
+            content=winner.response.content,
+            model=winner.response.model,
+            provider=winner_provider.value,
+            input_tokens=0,  # Not tracked in Round Table
+            output_tokens=winner.response.tokens_used,
+            total_tokens=winner.response.tokens_used,
+            finish_reason="stop",
+            latency_ms=winner.response.latency_ms,
+            cost_usd=winner.response.cost_usd,
+        )
+
+        return completion, result
 
     async def complete(self, request: LLMRequest) -> LLMResponse:
         """
@@ -347,16 +467,33 @@ class UnifiedLLMClient:
             )
 
         elif request.execution_mode == ExecutionMode.ROUND_TABLE:
-            # Round Table: All providers compete
-            # TODO: Implement Round Table integration
-            # For now, fallback to balanced mode
-            logger.warning("Round Table mode requested but not yet implemented, using BALANCED")
-            completion = await router.complete_with_fallback(
+            # Round Table: All providers compete for consensus
+            logger.info("Executing Round Table mode for multi-LLM consensus")
+
+            completion, rt_result = await self._execute_round_table(
+                request=request,
                 messages=messages,
-                model=request.model,
-                temperature=request.temperature,
-                max_tokens=request.max_tokens,
-                tools=request.tools,
+                task_classification=task_classification,
+            )
+
+            completion_latency_ms = (time.monotonic() - completion_start) * 1000
+            total_latency_ms = (time.monotonic() - start_time) * 1000
+
+            # Extract competitor providers from Round Table result
+            round_table_competitors = [entry.provider.value for entry in rt_result.entries]
+
+            return LLMResponse(
+                content=completion.content,
+                completion=completion,
+                task_classification=task_classification,
+                technique_used=technique_used,
+                provider_used=ModelProvider(completion.provider),
+                model_used=completion.model,
+                round_table_winner=True,
+                round_table_competitors=round_table_competitors,
+                total_latency_ms=total_latency_ms,
+                classification_latency_ms=classification_latency_ms,
+                completion_latency_ms=completion_latency_ms,
             )
 
         else:
@@ -386,6 +523,8 @@ class UnifiedLLMClient:
             await self._router.close()
         if self._classifier:
             await self._classifier.close()
+        if self._round_table:
+            await self._round_table.close()
 
     async def __aenter__(self) -> UnifiedLLMClient:
         """Async context manager entry."""
