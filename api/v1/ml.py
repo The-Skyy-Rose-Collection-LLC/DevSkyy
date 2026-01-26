@@ -17,10 +17,8 @@ from uuid import uuid4
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from core.task_status_store import TaskStatusStore, get_initialized_task_status_store
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
-
-# In-memory task status store (replace with Redis in production)
-_ml_task_status: dict[str, dict[str, Any]] = {}
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -91,20 +89,34 @@ async def _run_ml_prediction_background(
     data: dict[str, Any],
     confidence_threshold: float,
     user_id: str,
+    store: TaskStatusStore,
 ) -> None:
     """Run ML prediction in the background for heavy computation.
 
     This prevents request timeouts for complex ML models like demand forecasting
     and customer segmentation which may take significant time.
+
+    Args:
+        prediction_id: Unique prediction identifier
+        model_type: Type of ML model to run
+        data: Input data for the model
+        confidence_threshold: Minimum confidence for predictions
+        user_id: ID of user who initiated the prediction
+        store: TaskStatusStore for persisting status (Redis-backed)
     """
     logger.info(f"Background ML task started: {prediction_id}")
 
+    started_at = datetime.now(UTC).isoformat()
+
     try:
-        _ml_task_status[prediction_id] = {
-            "status": "processing",
-            "model_type": model_type,
-            "started_at": datetime.now(UTC).isoformat(),
-        }
+        await store.set_status(
+            prediction_id,
+            {
+                "status": "processing",
+                "model_type": model_type,
+                "started_at": started_at,
+            },
+        )
 
         # Simulate ML computation time
         await asyncio.sleep(0.5)
@@ -113,24 +125,30 @@ async def _run_ml_prediction_background(
         # Generate mock predictions based on model type
         predictions, metrics = _generate_mock_predictions(model_type)
 
-        _ml_task_status[prediction_id] = {
-            "status": "completed",
-            "model_type": model_type,
-            "model_version": "v2.1.0",
-            "started_at": _ml_task_status[prediction_id]["started_at"],
-            "completed_at": datetime.now(UTC).isoformat(),
-            "predictions": predictions,
-            "metrics": metrics,
-        }
+        await store.set_status(
+            prediction_id,
+            {
+                "status": "completed",
+                "model_type": model_type,
+                "model_version": "v2.1.0",
+                "started_at": started_at,
+                "completed_at": datetime.now(UTC).isoformat(),
+                "predictions": predictions,
+                "metrics": metrics,
+            },
+        )
         logger.info(f"Background ML task completed: {prediction_id}")
 
     except Exception as e:
         logger.error(f"Background ML task failed: {prediction_id}: {e}", exc_info=True)
-        _ml_task_status[prediction_id] = {
-            "status": "failed",
-            "error": str(e),
-            "completed_at": datetime.now(UTC).isoformat(),
-        }
+        await store.set_status(
+            prediction_id,
+            {
+                "status": "failed",
+                "error": str(e),
+                "completed_at": datetime.now(UTC).isoformat(),
+            },
+        )
 
 
 def _generate_mock_predictions(model_type: str) -> tuple[list[dict[str, Any]], dict[str, Any]]:
@@ -278,6 +296,7 @@ async def predict(
     request: MLPredictionRequest,
     background_tasks: BackgroundTasks,
     user: TokenPayload = Depends(get_current_user),
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
 ) -> MLPredictionResponse:
     """Run machine learning predictions for fashion e-commerce.
 
@@ -321,7 +340,7 @@ async def predict(
     heavy_models = {MLModelType.DEMAND_FORECASTING, MLModelType.CUSTOMER_SEGMENTATION}
 
     if request.model_type in heavy_models:
-        # Start background task
+        # Start background task with Redis-backed store
         background_tasks.add_task(
             _run_ml_prediction_background,
             prediction_id,
@@ -329,6 +348,7 @@ async def predict(
             request.data,
             request.confidence_threshold,
             user.sub,
+            store,
         )
 
         # Return immediately with task reference
@@ -382,6 +402,7 @@ async def predict(
 async def get_prediction_status(
     prediction_id: str,
     user: TokenPayload = Depends(get_current_user),
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
 ) -> MLTaskStatusResponse:
     """Get the status of a background ML prediction.
 
@@ -391,6 +412,7 @@ async def get_prediction_status(
     Args:
         prediction_id: The prediction ID returned from POST /predict
         user: Authenticated user (from JWT token)
+        store: TaskStatusStore for retrieving status (Redis-backed)
 
     Returns:
         MLTaskStatusResponse with current status and results when complete
@@ -398,13 +420,13 @@ async def get_prediction_status(
     Raises:
         HTTPException: If prediction not found
     """
-    if prediction_id not in _ml_task_status:
+    status_data = await store.get_status(prediction_id)
+
+    if status_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Prediction {prediction_id} not found",
         )
-
-    status_data = _ml_task_status[prediction_id]
 
     predictions = None
     if status_data.get("predictions"):

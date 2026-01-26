@@ -758,9 +758,18 @@ async def tier_rate_limit_middleware(request: Request, call_next):
             # Store tier in request state for later use
             request.state.tier = tier_name
             request.state.user_id = payload.sub
-        except (ExpiredSignatureError, InvalidTokenError):
+        except (ExpiredSignatureError, InvalidTokenError) as e:
+            # Log token validation failures for security monitoring
+            log = structlog.get_logger(__name__)
+            log.warning(
+                "token_validation_failed",
+                error_type=type(e).__name__,
+                path=str(request.url.path),
+                client_ip=request.client.host if request.client else "unknown",
+            )
             # Token invalid or expired, use free tier
             tier_name = "free"
+            request.state.auth_error = str(e)
 
     # Check tier-based rate limit
     try:
@@ -1416,11 +1425,13 @@ app.include_router(v1_router)
 async def http_exception_handler(request: Request, exc: HTTPException):
     """Handle HTTP exceptions with proper error format and structured logging."""
     log = structlog.get_logger(__name__)
+    correlation_id = getattr(request.state, "correlation_id", None)
     log.warning(
         "http_exception",
         status_code=exc.status_code,
         message=exc.detail,
         path=str(request.url.path),
+        correlation_id=correlation_id,
     )
     return JSONResponse(
         status_code=exc.status_code,
@@ -1430,6 +1441,7 @@ async def http_exception_handler(request: Request, exc: HTTPException):
             "message": exc.detail,
             "path": str(request.url.path),
             "timestamp": datetime.now(UTC).isoformat(),
+            "correlation_id": correlation_id,
         },
     )
 
@@ -1438,11 +1450,13 @@ async def http_exception_handler(request: Request, exc: HTTPException):
 async def general_exception_handler(request: Request, exc: Exception):
     """Handle general exceptions with error tracking and structured logging."""
     log = structlog.get_logger(__name__)
+    correlation_id = getattr(request.state, "correlation_id", None)
     log.error(
         "unhandled_exception",
         exception_type=type(exc).__name__,
         error=str(exc),
         path=str(request.url.path),
+        correlation_id=correlation_id,
         exc_info=True,
     )
     return JSONResponse(
@@ -1453,6 +1467,7 @@ async def general_exception_handler(request: Request, exc: Exception):
             "message": "Internal server error",
             "path": str(request.url.path),
             "timestamp": datetime.now(UTC).isoformat(),
+            "correlation_id": correlation_id,
         },
     )
 
