@@ -1,7 +1,5 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { SidebarProvider, SidebarInset, SidebarTrigger } from '@/components/ui/sidebar';
 import { AppSidebar } from '@/components/dashboard/app-sidebar';
 import { Separator } from '@/components/ui/separator';
@@ -11,29 +9,7 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      router.push('/login');
-    } else {
-      setIsAuthenticated(true);
-    }
-  }, [router]);
-
-  if (isAuthenticated === null) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-900">
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-rose-500 border-t-transparent" />
-          <p className="text-gray-400">Loading DevSkyy...</p>
-        </div>
-      </div>
-    );
-  }
-
+  // Auth disabled for development - TODO: re-enable for production
   return (
     <SidebarProvider>
       <AppSidebar />
