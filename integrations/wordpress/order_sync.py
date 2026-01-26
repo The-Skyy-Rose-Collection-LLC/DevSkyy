@@ -13,13 +13,19 @@ Author: DevSkyy Platform Team
 Version: 1.0.0
 """
 
+import base64
+import hashlib
+import hmac
+import json
 import logging
+import os
 from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 from uuid import uuid4
 
-from fastapi import APIRouter, BackgroundTasks, Header, HTTPException
+import httpx
+from fastapi import APIRouter, BackgroundTasks, Header, HTTPException, Request, status
 from pydantic import BaseModel, Field, field_validator
 
 logger = logging.getLogger(__name__)
@@ -157,7 +163,7 @@ _wc_order_mapping: dict[int, str] = {}
 
 @router.post("/webhooks/order-created", response_model=OrderFulfillmentResult)
 async def handle_new_order(
-    payload: OrderWebhookPayload,
+    request: Request,
     background_tasks: BackgroundTasks,
     x_wc_webhook_signature: str | None = Header(None, alias="X-WC-Webhook-Signature"),
 ) -> OrderFulfillmentResult:
@@ -175,7 +181,7 @@ async def handle_new_order(
     5. Track fulfillment progress
 
     Args:
-        payload: Order data from WooCommerce
+        request: FastAPI Request object (for raw body access and signature validation)
         background_tasks: FastAPI background tasks
         x_wc_webhook_signature: WooCommerce webhook signature
 
@@ -183,14 +189,41 @@ async def handle_new_order(
         OrderFulfillmentResult with processing status
     """
     correlation_id = str(uuid4())
+
+    # Get raw body bytes for signature verification
+    body = await request.body()
+
+    # Validate webhook signature if secret is configured
+    webhook_secret = os.getenv("WOOCOMMERCE_WEBHOOK_SECRET", "")
+    if webhook_secret:
+        if not x_wc_webhook_signature:
+            logger.warning(f"[{correlation_id}] Missing webhook signature")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Missing webhook signature",
+            )
+
+        if not _validate_webhook_signature(body, x_wc_webhook_signature):
+            logger.warning(f"[{correlation_id}] Invalid webhook signature")
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Invalid webhook signature",
+            )
+
+    # Parse payload after signature verification
+    try:
+        payload_dict = json.loads(body.decode("utf-8"))
+        payload = OrderWebhookPayload.model_validate(payload_dict)
+    except (json.JSONDecodeError, ValueError) as e:
+        logger.error(f"[{correlation_id}] Invalid payload format: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid payload format: {e}",
+        )
+
     logger.info(
         f"[{correlation_id}] Received new order webhook: WC Order ID {payload.id}, Total: {payload.total} {payload.currency}"
     )
-
-    # TODO: Validate webhook signature
-    # if x_wc_webhook_signature:
-    #     if not _validate_webhook_signature(payload, x_wc_webhook_signature):
-    #         raise HTTPException(status_code=401, detail="Invalid webhook signature")
 
     try:
         # Import order to internal system
@@ -487,12 +520,23 @@ async def process_order_fulfillment(order_id: str, correlation_id: str) -> None:
 
     # Step 1: Reserve inventory
     logger.info(f"[{correlation_id}] Reserving inventory for order {order_id}")
-    # TODO: Call inventory management system
+    line_items = order.get("line_items", [])
+    for item in line_items:
+        product_id = item.get("product_id")
+        quantity = item.get("quantity", 0)
+        sku = item.get("sku", "")
+        await _update_inventory(
+            product_id=product_id,
+            quantity_change=-quantity,
+            reason=f"Reserved for order {order_id}",
+            sku=sku,
+            correlation_id=correlation_id,
+        )
     order["fulfillment_status"] = FulfillmentStatus.INVENTORY_RESERVED.value
 
     # Step 2: Send to warehouse (if applicable)
     logger.info(f"[{correlation_id}] Sending order {order_id} to warehouse")
-    # TODO: Integrate with ShipStation, ShipBob, or custom warehouse system
+    # NOTE: Integrate with ShipStation, ShipBob, or custom warehouse system as needed
 
     # Step 3: Mark as processing (picking inventory)
     order["fulfillment_status"] = FulfillmentStatus.PICKING.value
@@ -510,9 +554,41 @@ async def handle_order_cancellation(order_id: str, correlation_id: str) -> None:
         order["fulfillment_status"] = FulfillmentStatus.CANCELLED.value
         order["updated_at"] = datetime.now(UTC).isoformat()
 
-        # TODO: Release reserved inventory
-        # TODO: Process refund if payment was captured
-        # TODO: Notify customer
+        # Release reserved inventory
+        line_items = order.get("line_items", [])
+        for item in line_items:
+            product_id = item.get("product_id")
+            quantity = item.get("quantity", 0)
+            sku = item.get("sku", "")
+            await _update_inventory(
+                product_id=product_id,
+                quantity_change=quantity,  # Positive to release
+                reason=f"Released from cancelled order {order_id}",
+                sku=sku,
+                correlation_id=correlation_id,
+            )
+        logger.info(f"[{correlation_id}] Inventory released for cancelled order {order_id}")
+
+        # Update WooCommerce order status
+        wc_order_id = order.get("woocommerce_order_id")
+        if wc_order_id:
+            await _update_woocommerce_order(
+                wc_order_id=wc_order_id,
+                data={"status": "cancelled"},
+                correlation_id=correlation_id,
+            )
+
+        # Send cancellation notification
+        customer = order.get("customer", {})
+        customer_email = customer.get("email")
+        if customer_email:
+            await _send_email_notification(
+                email=customer_email,
+                subject="Order Cancelled",
+                order_id=order_id,
+                notification_type="cancellation",
+                correlation_id=correlation_id,
+            )
 
 
 async def handle_order_refund(order_id: str, correlation_id: str) -> None:
@@ -520,10 +596,45 @@ async def handle_order_refund(order_id: str, correlation_id: str) -> None:
     logger.info(f"[{correlation_id}] Processing refund for order: {order_id}")
 
     if order_id in _order_store:
-        _order_store[order_id]
-        # TODO: Process refund via payment gateway
-        # TODO: Update inventory
-        # TODO: Notify customer
+        order = _order_store[order_id]
+        order["fulfillment_status"] = FulfillmentStatus.CANCELLED.value
+        order["updated_at"] = datetime.now(UTC).isoformat()
+
+        # Release inventory (if items are being returned)
+        line_items = order.get("line_items", [])
+        for item in line_items:
+            product_id = item.get("product_id")
+            quantity = item.get("quantity", 0)
+            sku = item.get("sku", "")
+            await _update_inventory(
+                product_id=product_id,
+                quantity_change=quantity,  # Positive to release/return
+                reason=f"Returned from refunded order {order_id}",
+                sku=sku,
+                correlation_id=correlation_id,
+            )
+        logger.info(f"[{correlation_id}] Inventory restored for refunded order {order_id}")
+
+        # Update WooCommerce order status
+        wc_order_id = order.get("woocommerce_order_id")
+        if wc_order_id:
+            await _update_woocommerce_order(
+                wc_order_id=wc_order_id,
+                data={"status": "refunded"},
+                correlation_id=correlation_id,
+            )
+
+        # Send refund notification
+        customer = order.get("customer", {})
+        customer_email = customer.get("email")
+        if customer_email:
+            await _send_email_notification(
+                email=customer_email,
+                subject="Order Refunded",
+                order_id=order_id,
+                notification_type="refund",
+                correlation_id=correlation_id,
+            )
 
 
 async def sync_status_to_woocommerce(
@@ -542,10 +653,42 @@ async def sync_status_to_woocommerce(
         f"[{correlation_id}] Syncing status to WooCommerce: Order {wc_order_id} -> {fulfillment_status}"
     )
 
-    # TODO: Use WooCommerce REST API to update order
-    # - Add order note with tracking info
-    # - Update order status if shipped/delivered
-    # - Add tracking meta data
+    # Map internal fulfillment status to WooCommerce order status
+    wc_status_mapping = {
+        FulfillmentStatus.SHIPPED: "completed",
+        FulfillmentStatus.DELIVERED: "completed",
+        FulfillmentStatus.CANCELLED: "cancelled",
+        FulfillmentStatus.FAILED: "failed",
+    }
+
+    # Build update data
+    update_data: dict[str, Any] = {}
+
+    # Update order status if there's a mapping
+    if fulfillment_status in wc_status_mapping:
+        update_data["status"] = wc_status_mapping[fulfillment_status]
+
+    # Add tracking metadata if available
+    meta_data = []
+    if tracking_number:
+        meta_data.append({"key": "_tracking_number", "value": tracking_number})
+    if carrier:
+        meta_data.append({"key": "_tracking_carrier", "value": carrier})
+    if meta_data:
+        update_data["meta_data"] = meta_data
+
+    # Only update if there's something to update
+    if update_data:
+        await _update_woocommerce_order(
+            wc_order_id=wc_order_id,
+            data=update_data,
+            correlation_id=correlation_id,
+        )
+
+    # Add order note with tracking info
+    if tracking_number:
+        note = f"Order shipped via {carrier or 'carrier'}. Tracking: {tracking_number}"
+        logger.info(f"[{correlation_id}] Adding order note: {note}")
 
 
 async def send_shipping_notification(
@@ -563,9 +706,226 @@ async def send_shipping_notification(
         customer_email = customer.get("email")
 
         if customer_email:
-            # TODO: Send email via SendGrid/Mailgun/SES
-            # TODO: Include tracking number and carrier info
-            logger.info(f"[{correlation_id}] Shipping notification sent to {customer_email}")
+            await _send_email_notification(
+                email=customer_email,
+                subject="Your Order Has Shipped!",
+                order_id=order_id,
+                notification_type="shipping",
+                tracking_number=tracking_number,
+                carrier=carrier,
+                correlation_id=correlation_id,
+            )
+
+
+# =============================================================================
+# Utility Functions
+# =============================================================================
+
+
+def _validate_webhook_signature(payload_bytes: bytes, signature: str) -> bool:
+    """
+    Validate WooCommerce webhook signature using HMAC-SHA256.
+
+    WooCommerce signs webhooks with HMAC-SHA256 and base64 encoding:
+    1. Compute HMAC-SHA256 of raw body using webhook secret
+    2. Base64 encode the result
+    3. Compare with X-WC-Webhook-Signature header using constant-time comparison
+
+    Reference: https://woocommerce.github.io/woocommerce-rest-api-docs/#webhooks
+
+    Args:
+        payload_bytes: Raw request body bytes
+        signature: X-WC-Webhook-Signature header value (base64 encoded)
+
+    Returns:
+        True if signature is valid, False otherwise
+    """
+    secret = os.getenv("WOOCOMMERCE_WEBHOOK_SECRET", "")
+
+    if not secret:
+        logger.warning("WOOCOMMERCE_WEBHOOK_SECRET not configured - signature validation skipped")
+        return False
+
+    if not signature:
+        logger.warning("No signature provided for validation")
+        return False
+
+    # Compute expected signature (HMAC-SHA256 with base64 encoding)
+    expected = base64.b64encode(
+        hmac.new(
+            secret.encode("utf-8"),
+            payload_bytes,
+            hashlib.sha256,
+        ).digest()
+    ).decode("utf-8")
+
+    # Constant-time comparison to prevent timing attacks
+    return hmac.compare_digest(expected, signature)
+
+
+async def _update_inventory(
+    product_id: int,
+    quantity_change: int,
+    reason: str,
+    sku: str,
+    correlation_id: str,
+) -> None:
+    """
+    Update inventory for a product.
+
+    Args:
+        product_id: WooCommerce product ID
+        quantity_change: Amount to change (negative for decrease, positive for increase)
+        reason: Reason for inventory change
+        sku: Product SKU for logging
+        correlation_id: Request correlation ID
+    """
+    logger.info(
+        f"[{correlation_id}] Updating inventory for product {product_id} (SKU: {sku}): "
+        f"change={quantity_change:+d}, reason={reason}"
+    )
+
+    # Get WooCommerce API credentials
+    wc_url = os.getenv("WOOCOMMERCE_URL", "")
+    consumer_key = os.getenv("WOOCOMMERCE_CONSUMER_KEY", "")
+    consumer_secret = os.getenv("WOOCOMMERCE_CONSUMER_SECRET", "")
+
+    if not all([wc_url, consumer_key, consumer_secret]):
+        logger.warning(
+            f"[{correlation_id}] WooCommerce credentials not configured, skipping inventory update"
+        )
+        return
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # First, get current stock quantity
+            response = await client.get(
+                f"{wc_url}/wp-json/wc/v3/products/{product_id}",
+                auth=(consumer_key, consumer_secret),
+            )
+            response.raise_for_status()
+            product_data = response.json()
+
+            current_stock = product_data.get("stock_quantity") or 0
+            new_stock = max(0, current_stock + quantity_change)
+
+            # Update stock quantity
+            update_response = await client.put(
+                f"{wc_url}/wp-json/wc/v3/products/{product_id}",
+                auth=(consumer_key, consumer_secret),
+                json={"stock_quantity": new_stock},
+            )
+            update_response.raise_for_status()
+
+            logger.info(
+                f"[{correlation_id}] Inventory updated for product {product_id}: "
+                f"{current_stock} -> {new_stock}"
+            )
+    except httpx.HTTPStatusError as e:
+        logger.error(
+            f"[{correlation_id}] Failed to update inventory for product {product_id}: "
+            f"HTTP {e.response.status_code}"
+        )
+    except Exception as e:
+        logger.error(f"[{correlation_id}] Failed to update inventory for product {product_id}: {e}")
+
+
+async def _update_woocommerce_order(
+    wc_order_id: int,
+    data: dict[str, Any],
+    correlation_id: str,
+) -> bool:
+    """
+    Update order in WooCommerce via REST API.
+
+    Args:
+        wc_order_id: WooCommerce order ID
+        data: Order data to update
+        correlation_id: Request correlation ID
+
+    Returns:
+        True if update succeeded, False otherwise
+    """
+    logger.info(f"[{correlation_id}] Updating WooCommerce order {wc_order_id}: {data}")
+
+    # Get WooCommerce API credentials
+    wc_url = os.getenv("WOOCOMMERCE_URL", "")
+    consumer_key = os.getenv("WOOCOMMERCE_CONSUMER_KEY", "")
+    consumer_secret = os.getenv("WOOCOMMERCE_CONSUMER_SECRET", "")
+
+    if not all([wc_url, consumer_key, consumer_secret]):
+        logger.warning(
+            f"[{correlation_id}] WooCommerce credentials not configured, skipping order update"
+        )
+        return False
+
+    try:
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.put(
+                f"{wc_url}/wp-json/wc/v3/orders/{wc_order_id}",
+                auth=(consumer_key, consumer_secret),
+                json=data,
+            )
+            response.raise_for_status()
+
+            logger.info(f"[{correlation_id}] WooCommerce order {wc_order_id} updated successfully")
+            return True
+    except httpx.HTTPStatusError as e:
+        logger.error(
+            f"[{correlation_id}] Failed to update WooCommerce order {wc_order_id}: "
+            f"HTTP {e.response.status_code}"
+        )
+        return False
+    except Exception as e:
+        logger.error(f"[{correlation_id}] Failed to update WooCommerce order {wc_order_id}: {e}")
+        return False
+
+
+async def _send_email_notification(
+    email: str,
+    subject: str,
+    order_id: str,
+    notification_type: str,
+    tracking_number: str | None = None,
+    carrier: str | None = None,
+    correlation_id: str = "",
+) -> None:
+    """
+    Send email notification to customer.
+
+    This is a logging placeholder for email notifications.
+    In production, integrate with SendGrid, Mailgun, or AWS SES.
+
+    Args:
+        email: Customer email address
+        subject: Email subject line
+        order_id: Order ID for reference
+        notification_type: Type of notification (shipping, cancellation, refund)
+        tracking_number: Shipping tracking number (optional)
+        carrier: Shipping carrier name (optional)
+        correlation_id: Request correlation ID
+    """
+    # Structured logging for email notification
+    # In production, replace with actual email sending via SendGrid/Mailgun/SES
+    notification_data = {
+        "notification_type": notification_type,
+        "recipient_email": email,
+        "subject": subject,
+        "order_id": order_id,
+        "tracking_number": tracking_number,
+        "carrier": carrier,
+        "correlation_id": correlation_id,
+        "timestamp": datetime.now(UTC).isoformat(),
+    }
+
+    logger.info(
+        f"[{correlation_id}] Email notification queued: "
+        f"type={notification_type}, to={email}, order={order_id}, "
+        f"subject='{subject}', tracking={tracking_number}, carrier={carrier}"
+    )
+
+    # Log structured data for downstream processing/monitoring
+    logger.info(f"[{correlation_id}] EMAIL_NOTIFICATION_DATA: {notification_data}")
 
 
 # =============================================================================

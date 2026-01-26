@@ -130,7 +130,7 @@ class CountdownConfig(BaseModel):
     launch_date_iso: str = Field(..., description="ISO 8601 launch date")
     launch_date_unix: int = Field(..., ge=0, description="Unix timestamp")
     server_time_unix: int = Field(..., ge=0, description="Current server Unix timestamp")
-    status: str = Field(..., regex="^(blooming_soon|now_blooming|available)$")
+    status: str = Field(..., pattern="^(blooming_soon|now_blooming|available)$")
     ar_enabled: bool = Field(default=True)
     collection: str = Field(default="")
     time_remaining_seconds: int = Field(default=0, ge=0, description="Seconds until launch")
