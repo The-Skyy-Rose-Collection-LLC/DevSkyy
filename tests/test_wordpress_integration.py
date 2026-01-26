@@ -480,8 +480,10 @@ class TestAPIEndpoints:
 
         return TestClient(app)
 
+    @pytest.mark.integration
     def test_test_connection_endpoint(self, client):
-        """Test connection test endpoint."""
+        """Test connection test endpoint (makes real network calls)."""
+        pytest.skip("Integration test: Makes real network calls. Run with: pytest -m integration")
         # This endpoint doesn't require auth
         response = client.get("/api/v1/wordpress/test-connection")
 

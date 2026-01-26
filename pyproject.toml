@@ -434,6 +434,10 @@ addopts = [
     "-q",
     "--strict-markers",
     "--strict-config",
+    "-n", "auto",  # Parallel execution with pytest-xdist
+    "--dist", "loadgroup",  # Smart test distribution
+    "-x",  # Stop on first failure (fast feedback)
+    "--tb=short",  # Shorter tracebacks
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
@@ -444,7 +448,10 @@ markers = [
     "integration: marks tests as integration tests",
     "unit: marks tests as unit tests",
     "security: marks tests as security tests (XSS, CSRF, SQL injection, etc.)",
+    "smoke: critical path tests for CI (run with '-m smoke')",
 ]
+# Production test timeouts
+timeout = 30  # 30 second default timeout per test
 
 # =============================================================================
 # Coverage Configuration
