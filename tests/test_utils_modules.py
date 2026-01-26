@@ -672,24 +672,25 @@ class TestRequestDeduplicator:
         result = await dedup.deduplicate("/api/test", "GET", request_func)
         assert result == {"result": "success"}
 
-    @pytest.mark.asyncio
-    async def test_deduplicator_clear(self):
+    def test_deduplicator_clear(self):
         """Should clear all pending requests."""
         from utils.request_deduplication import PendingRequest, RequestDeduplicator
 
         dedup = RequestDeduplicator()
-        future = asyncio.Future()
+        loop = asyncio.new_event_loop()
+        future = loop.create_future()
         dedup.pending["test"] = PendingRequest(future=future, started_at=datetime.now())
         dedup.clear()
         assert len(dedup.pending) == 0
+        loop.close()
 
-    @pytest.mark.asyncio
-    async def test_deduplicator_get_stats(self):
+    def test_deduplicator_get_stats(self):
         """Should return statistics."""
         from utils.request_deduplication import PendingRequest, RequestDeduplicator
 
         dedup = RequestDeduplicator()
-        future = asyncio.Future()
+        loop = asyncio.new_event_loop()
+        future = loop.create_future()
         dedup.pending["test_hash"] = PendingRequest(future=future, started_at=datetime.now())
 
         stats = dedup.get_stats()
@@ -697,6 +698,7 @@ class TestRequestDeduplicator:
         assert len(stats["requests"]) == 1
         assert stats["requests"][0]["hash"] == "test_hash"
         assert "age_seconds" in stats["requests"][0]
+        loop.close()
 
 
 class TestDeduplicationHelpers:

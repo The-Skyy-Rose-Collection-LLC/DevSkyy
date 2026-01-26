@@ -71,6 +71,14 @@ credentials/
 *.crt
 .secrets/
 
+# Claude Code Plugin Secrets
+.claude/*.local.md
+.claude/claude-intelligence-core.local.md
+.claude/plugins/*/data/
+.claude/chroma_data/
+*.duckdb
+*.duckdb.wal
+
 # Database
 *.db
 *.sqlite

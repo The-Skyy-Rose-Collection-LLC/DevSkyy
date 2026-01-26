@@ -186,37 +186,41 @@ jobs:
 
       - name: Notify Slack
         if: failure() && (github.ref == 'refs/heads/staging' || github.event_name == 'schedule')
-        uses: slackapi/slack-github-action@fcfb566f8b0aab22203f066d80ca1d7e4b5d05b3  # v1
-        with:
-          payload: |
-            {
-              "text": "DAST scan found security issues",
-              "blocks": [
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          BLOCKERS: ${{ steps.check_blockers.outputs.blockers || 'Unknown' }}
+          REPO: ${{ github.repository }}
+          BRANCH: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          curl -X POST -H 'Content-type: application/json' \
+            --data "{
+              \"text\": \"DAST scan found security issues\",
+              \"blocks\": [
                 {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "🔒 DAST Security Alert"
+                  \"type\": \"header\",
+                  \"text\": {
+                    \"type\": \"plain_text\",
+                    \"text\": \"🔒 DAST Security Alert\"
                   }
                 },
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Repository:* ${{ github.repository }}\n*Branch:* ${{ github.ref_name }}\n*Blockers Found:* ${{ steps.check_blockers.outputs.blockers || 'Unknown' }}"
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"*Repository:* $REPO\n*Branch:* $BRANCH\n*Blockers Found:* $BLOCKERS\"
                   }
                 },
                 {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>"
+                  \"type\": \"section\",
+                  \"text\": {
+                    \"type\": \"mrkdwn\",
+                    \"text\": \"<$RUN_URL|View Workflow Run>\"
                   }
                 }
               ]
-            }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+            }" \
+            "$SLACK_WEBHOOK_URL" || true
 
       - name: Create GitHub Issue for blockers
         if: steps.check_blockers.outputs.blockers > 0 && github.ref == 'refs/heads/staging'
