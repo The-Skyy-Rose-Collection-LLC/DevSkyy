@@ -984,6 +984,15 @@ class LRUHistory:
         """Get cache size."""
         return len(self.cache)
 
+    def __iter__(self):
+        """Iterate over cached results (most recent first)."""
+        return iter(reversed(list(self.cache.values())))
+
+    def __getitem__(self, key):
+        """Support indexing and slicing."""
+        items = list(reversed(list(self.cache.values())))
+        return items[key]
+
 
 # =============================================================================
 # LLM Round Table
@@ -1558,10 +1567,156 @@ REASONING: Your detailed explanation."""
 
 
 async def create_round_table(db_url: str | None = None) -> LLMRoundTable:
-    """Factory function to create and initialize a Round Table."""
+    """Factory function to create and initialize a Round Table with auto-registered providers."""
     rt = LLMRoundTable(db_url)
     await rt.initialize()
+
+    # Auto-register providers based on available API keys
+    await _auto_register_providers(rt)
+
     return rt
+
+
+async def _auto_register_providers(rt: LLMRoundTable) -> None:
+    """Auto-register all providers with available API keys."""
+    import os
+
+    # Provider configurations: (env_var, provider_enum, model_name)
+    provider_configs = [
+        ("ANTHROPIC_API_KEY", LLMProvider.CLAUDE, "claude-sonnet-4-20250514"),
+        ("OPENAI_API_KEY", LLMProvider.GPT4, "gpt-4o"),
+        ("GOOGLE_API_KEY", LLMProvider.GEMINI, "gemini-2.0-flash"),
+        ("GROQ_API_KEY", LLMProvider.LLAMA, "llama-3.3-70b-versatile"),
+        ("MISTRAL_API_KEY", LLMProvider.MISTRAL, "mistral-small-latest"),
+        ("COHERE_API_KEY", LLMProvider.COHERE, "command-a-03-2025"),
+    ]
+
+    for env_var, provider, model in provider_configs:
+        api_key = os.getenv(env_var)
+        if api_key:
+            try:
+                generator = _create_provider_generator(provider, model, api_key)
+                rt.register_provider(provider, generator)
+                logger.info(f"Auto-registered provider: {provider.value}")
+            except Exception as e:
+                logger.warning(f"Failed to register {provider.value}: {e}")
+
+
+def _create_provider_generator(
+    provider: LLMProvider, model: str, api_key: str
+) -> Callable:
+    """Create a generator function for a provider."""
+
+    async def generator(prompt: str, context: dict | None = None) -> LLMResponse:
+        """Generate response from provider."""
+        import time
+
+        start = time.time()
+
+        try:
+            if provider == LLMProvider.CLAUDE:
+                import anthropic
+
+                client = anthropic.AsyncAnthropic(api_key=api_key)
+                response = await client.messages.create(
+                    model=model,
+                    max_tokens=2048,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                content = response.content[0].text
+                tokens = response.usage.input_tokens + response.usage.output_tokens
+
+            elif provider == LLMProvider.GPT4:
+                import openai
+
+                client = openai.AsyncOpenAI(api_key=api_key)
+                response = await client.chat.completions.create(
+                    model=model,
+                    max_tokens=2048,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                content = response.choices[0].message.content or ""
+                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+
+            elif provider == LLMProvider.GEMINI:
+                from google import genai
+
+                client = genai.Client(api_key=api_key)
+                response = await client.aio.models.generate_content(
+                    model=model,
+                    contents=prompt,
+                )
+                content = response.text
+                tokens = response.usage_metadata.total_token_count if response.usage_metadata else 0
+
+            elif provider == LLMProvider.LLAMA:
+                import groq
+
+                client = groq.AsyncGroq(api_key=api_key)
+                response = await client.chat.completions.create(
+                    model=model,
+                    max_tokens=2048,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                content = response.choices[0].message.content or ""
+                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+
+            elif provider == LLMProvider.MISTRAL:
+                from mistralai import Mistral
+
+                client = Mistral(api_key=api_key)
+                response = await client.chat.complete_async(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                content = response.choices[0].message.content or ""
+                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+
+            elif provider == LLMProvider.COHERE:
+                import cohere
+
+                client = cohere.AsyncClientV2(api_key=api_key)
+                response = await client.chat(
+                    model=model,
+                    messages=[{"role": "user", "content": prompt}],
+                )
+                content = response.message.content[0].text if response.message.content else ""
+                tokens = (response.usage.tokens.input_tokens + response.usage.tokens.output_tokens) if response.usage else 0
+
+            else:
+                raise ValueError(f"Unknown provider: {provider}")
+
+            latency_ms = (time.time() - start) * 1000
+            cost = _estimate_cost(provider, tokens)
+
+            return LLMResponse(
+                content=content,
+                provider=provider,
+                model=model,
+                latency_ms=latency_ms,
+                tokens_used=tokens,
+                cost_usd=cost,
+            )
+
+        except Exception as e:
+            logger.error(f"Provider {provider.value} error: {e}")
+            raise
+
+    return generator
+
+
+def _estimate_cost(provider: LLMProvider, tokens: int) -> float:
+    """Estimate cost based on provider and tokens."""
+    # Approximate costs per 1K tokens (blended input/output)
+    costs_per_1k = {
+        LLMProvider.CLAUDE: 0.006,
+        LLMProvider.GPT4: 0.01,
+        LLMProvider.GEMINI: 0.0005,
+        LLMProvider.LLAMA: 0.0008,
+        LLMProvider.MISTRAL: 0.002,
+        LLMProvider.COHERE: 0.003,
+    }
+    return (tokens / 1000) * costs_per_1k.get(provider, 0.005)
 
 
 __all__ = [

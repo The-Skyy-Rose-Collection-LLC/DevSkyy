@@ -51,7 +51,7 @@ async function fetchDashboardData(): Promise<{
   const totalCompetitions = rtStats.reduce((sum, p) => sum + p.total_competitions, 0);
   const topProvider =
     rtStats.length > 0
-      ? rtStats.reduce((a, b) => (a.win_rate > b.win_rate ? a : b)).name
+      ? rtStats.reduce((a, b) => (a.win_rate > b.win_rate ? a : b)).provider
       : 'N/A';
   const avgLatency =
     rtStats.length > 0
@@ -253,8 +253,8 @@ function ProviderRankingsCard({ providerStats }: { providerStats: ProviderStats[
       </CardHeader>
       <CardContent>
         <div className="space-y-4" role="list" aria-label="Provider rankings">
-          {providerStats.slice(0, 5).map((provider, index) => (
-            <div key={provider.provider_id} className="flex items-center gap-4" role="listitem">
+          {providerStats.slice(0, 5).map((stat, index) => (
+            <div key={stat.provider} className="flex items-center gap-4" role="listitem">
               <div
                 className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-sm font-medium text-gray-400"
                 aria-label={`Rank ${index + 1}`}
@@ -263,21 +263,21 @@ function ProviderRankingsCard({ providerStats }: { providerStats: ProviderStats[
               </div>
               <div className="flex-1">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="font-medium text-white">{provider.name}</span>
+                  <span className="font-medium text-white">{stat.provider}</span>
                   <span className="text-sm text-gray-400">
-                    {(provider.win_rate * 100).toFixed(1)}% win rate
+                    {(stat.win_rate * 100).toFixed(1)}% win rate
                   </span>
                 </div>
                 <div
                   className="h-2 rounded-full bg-gray-800"
                   role="progressbar"
-                  aria-valuenow={provider.win_rate * 100}
+                  aria-valuenow={stat.win_rate * 100}
                   aria-valuemin={0}
                   aria-valuemax={100}
                 >
                   <div
                     className="h-2 rounded-full bg-gradient-to-r from-rose-500 to-rose-400"
-                    style={{ width: `${provider.win_rate * 100}%` }}
+                    style={{ width: `${stat.win_rate * 100}%` }}
                   />
                 </div>
               </div>

@@ -19,7 +19,7 @@ import {
   XCircle,
   Sparkles,
 } from 'lucide-react';
-import { api, type ProviderInfo, type ProviderStats, type HistoryEntry, type CompetitionResponse } from '@/lib/api';
+import { api, type ProviderInfo, type ProviderStats, type HistoryEntry, type CompetitionResponse, type CompetitionEntry } from '@/lib/api';
 import { useRoundTableWS } from '@/hooks/useWebSocket';
 
 export default function RoundTablePage() {
@@ -66,9 +66,19 @@ export default function RoundTablePage() {
     try {
       const result = await api.roundTable.compete({ prompt: prompt.trim() });
       setLastResult(result);
-      setHistory((prev) => [{ ...result, results: result.results } as HistoryEntry, ...prev.slice(0, 9)]);
+      // Convert CompetitionResponse to HistoryEntry format
+      const historyEntry: HistoryEntry = {
+        id: result.id,
+        prompt_preview: result.prompt_preview,
+        winner_provider: result.winner?.provider || 'unknown',
+        winner_score: result.winner?.scores.total || 0,
+        total_cost_usd: result.total_cost_usd,
+        created_at: result.created_at,
+      };
+      setHistory((prev) => [historyEntry, ...prev.slice(0, 9)]);
       const newStats = await api.roundTable.getStats();
       setStats(newStats);
+      setPrompt(''); // Clear prompt on success
     } catch (err) {
       console.error('Competition failed:', err);
     } finally {
@@ -152,36 +162,39 @@ export default function RoundTablePage() {
               Latest Competition Result
             </CardTitle>
             <CardDescription className="text-gray-400">
-              Winner: <span className="text-rose-400 font-medium">{lastResult.winner}</span>
+              Winner: <span className="text-rose-400 font-medium">{lastResult.winner?.provider || 'N/A'}</span>
+              {lastResult.ab_test_confidence && (
+                <span className="ml-2 text-xs">({(lastResult.ab_test_confidence * 100).toFixed(0)}% confidence)</span>
+              )}
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {lastResult.results
-                .sort((a, b) => b.score - a.score)
-                .map((result, index) => (
+              {lastResult.entries
+                .sort((a, b) => b.scores.total - a.scores.total)
+                .map((entry, index) => (
                   <div
-                    key={result.provider_id}
+                    key={entry.provider}
                     className={`rounded-lg p-4 ${
                       index === 0 ? 'bg-rose-500/10 border border-rose-500/30' : 'bg-gray-800'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <span className="font-medium text-white">{result.provider_id}</span>
+                      <span className="font-medium text-white">{entry.provider}</span>
                       {index === 0 && <Trophy className="h-4 w-4 text-yellow-400" />}
                     </div>
                     <div className="space-y-1 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-400">Score:</span>
-                        <span className="text-white">{result.score.toFixed(2)}</span>
+                        <span className="text-white">{entry.scores.total.toFixed(2)}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Latency:</span>
-                        <span className="text-white">{result.latency_ms}ms</span>
+                        <span className="text-white">{entry.latency_ms.toFixed(0)}ms</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-400">Cost:</span>
-                        <span className="text-white">${result.cost.toFixed(4)}</span>
+                        <span className="text-white">${entry.cost_usd.toFixed(4)}</span>
                       </div>
                     </div>
                   </div>
@@ -207,41 +220,36 @@ export default function RoundTablePage() {
         <TabsContent value="providers">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {providers.map((provider) => (
-              <Card key={provider.provider_id} className="bg-gray-900 border-gray-800">
+              <Card key={provider.name} className="bg-gray-900 border-gray-800">
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg text-white">{provider.name}</CardTitle>
+                    <CardTitle className="text-lg text-white">{provider.display_name}</CardTitle>
                     <Badge
                       variant="outline"
                       className={
-                        provider.status === 'online'
+                        provider.enabled
                           ? 'border-green-500 text-green-400'
-                          : provider.status === 'degraded'
-                          ? 'border-yellow-500 text-yellow-400'
                           : 'border-red-500 text-red-400'
                       }
                     >
-                      {provider.status}
+                      {provider.enabled ? 'online' : 'offline'}
                     </Badge>
                   </div>
-                  <CardDescription className="text-gray-500">{provider.model}</CardDescription>
+                  <CardDescription className="text-gray-500">{provider.name}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
-                      <span className="text-gray-400">Cost/1K tokens:</span>
-                      <span className="text-white">${provider.cost_per_1k_tokens.toFixed(4)}</span>
+                      <span className="text-gray-400">Win Rate:</span>
+                      <span className="text-white">{(provider.win_rate * 100).toFixed(1)}%</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-400">Avg Latency:</span>
-                      <span className="text-white">{provider.avg_latency_ms}ms</span>
+                      <span className="text-white">{provider.avg_latency_ms.toFixed(0)}ms</span>
                     </div>
-                    <div className="flex flex-wrap gap-1 mt-3">
-                      {provider.capabilities.slice(0, 3).map((cap) => (
-                        <Badge key={cap} variant="secondary" className="bg-gray-800 text-gray-300 text-xs">
-                          {cap}
-                        </Badge>
-                      ))}
+                    <div className="flex justify-between">
+                      <span className="text-gray-400">Competitions:</span>
+                      <span className="text-white">{provider.total_competitions}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -261,9 +269,9 @@ export default function RoundTablePage() {
             <CardContent>
               <div className="space-y-6">
                 {stats.map((stat) => (
-                  <div key={stat.provider_id} className="space-y-2">
+                  <div key={stat.provider} className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium text-white">{stat.name}</span>
+                      <span className="font-medium text-white">{stat.provider}</span>
                       <div className="flex items-center gap-4 text-sm">
                         <span className="text-gray-400">
                           <Trophy className="inline h-4 w-4 mr-1 text-yellow-400" />
@@ -271,11 +279,11 @@ export default function RoundTablePage() {
                         </span>
                         <span className="text-gray-400">
                           <Clock className="inline h-4 w-4 mr-1" />
-                          {stat.avg_latency_ms}ms avg
+                          {stat.avg_latency_ms.toFixed(0)}ms avg
                         </span>
                         <span className="text-gray-400">
                           <DollarSign className="inline h-4 w-4 mr-1" />
-                          ${stat.total_cost.toFixed(4)} total
+                          ${stat.total_cost_usd.toFixed(4)} total
                         </span>
                       </div>
                     </div>
@@ -316,14 +324,14 @@ export default function RoundTablePage() {
                   <div key={entry.id} className="rounded-lg bg-gray-800 p-4">
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex-1">
-                        <p className="text-white font-medium line-clamp-2">{entry.prompt}</p>
+                        <p className="text-white font-medium line-clamp-2">{entry.prompt_preview}</p>
                         <p className="text-sm text-gray-500 mt-1">
-                          {new Date(entry.created_at).toLocaleString()}
+                          {new Date(entry.created_at).toLocaleString()} • Score: {entry.winner_score.toFixed(2)} • Cost: ${entry.total_cost_usd.toFixed(4)}
                         </p>
                       </div>
                       <Badge className="bg-rose-500/10 text-rose-400 border-rose-500/30">
                         <Trophy className="h-3 w-3 mr-1" />
-                        {entry.winner}
+                        {entry.winner_provider}
                       </Badge>
                     </div>
                   </div>

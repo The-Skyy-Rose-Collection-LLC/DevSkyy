@@ -55,8 +55,8 @@ export function ProviderPerformanceChart({ stats }: ProviderPerformanceChartProp
   const chartConfig: ChartConfig = useMemo(() => {
     const config: ChartConfig = {};
     stats.forEach((stat, index) => {
-      config[stat.provider_id] = {
-        label: stat.name,
+      config[stat.provider] = {
+        label: stat.provider,
         color: CHART_COLORS[index % CHART_COLORS.length],
       };
     });
@@ -65,7 +65,7 @@ export function ProviderPerformanceChart({ stats }: ProviderPerformanceChartProp
 
   const chartData = useMemo(() => {
     return stats.map((stat, index) => ({
-      name: stat.name,
+      name: stat.provider,
       winRate: Math.round(stat.win_rate * 100),
       avgScore: Math.round(stat.avg_score * 100) / 100,
       competitions: stat.total_competitions,

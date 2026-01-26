@@ -7,7 +7,7 @@ Unified clients for all major LLM providers using official SDKs.
 Providers:
 - OpenAI (GPT-4, o1) - using `openai` SDK
 - Anthropic (Claude) - using `anthropic` SDK
-- Google (Gemini) - using `google-generativeai` SDK
+- Google (Gemini) - using `google-genai` SDK
 - Mistral - using `mistralai` SDK
 - Cohere (Command) - using `cohere` SDK
 - Groq (Llama, Mixtral) - using `groq` SDK
@@ -31,7 +31,7 @@ from enum import Enum
 from typing import Any
 
 import cohere
-import google.generativeai as genai
+from google import genai
 
 # Official SDK imports
 from anthropic import AsyncAnthropic
