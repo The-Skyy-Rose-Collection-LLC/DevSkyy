@@ -123,8 +123,9 @@ GET /api/v1/products
 
 
 @pytest.mark.asyncio
+@pytest.mark.slow
 async def test_rag_context_retrieval(ingested_rag_manager):
-    """Test RAG context retrieval."""
+    """Test RAG context retrieval (slow - involves embeddings)."""
     # Query the RAG system
     context = await ingested_rag_manager.get_context(
         query="How do I create a product?",
@@ -147,12 +148,13 @@ async def test_rag_context_retrieval(ingested_rag_manager):
 
 
 @pytest.mark.asyncio
+@pytest.mark.slow
 @pytest.mark.skipif(
     not os.environ.get("OPENAI_API_KEY"),
     reason="OPENAI_API_KEY not set - required for agent execution"
 )
 async def test_agent_with_rag_context(ingested_rag_manager):
-    """Test that SuperAgent uses RAG context during execution."""
+    """Test that SuperAgent uses RAG context during execution (slow)."""
     # Create a Commerce agent
     config = AgentConfig(
         name="test_commerce_agent",

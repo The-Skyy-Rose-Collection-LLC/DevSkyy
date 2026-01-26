@@ -518,8 +518,9 @@ class TestEnhancedPrompt:
 # =============================================================================
 
 
+@pytest.mark.slow
 class TestCLI:
-    """Tests for CLI argument parsing and execution."""
+    """Tests for CLI argument parsing and execution (runs actual CLI commands)."""
 
     def test_help_option(self, runner: CliRunner) -> None:
         """--help should display usage information."""
@@ -632,8 +633,9 @@ class TestCLI:
 # =============================================================================
 
 
+@pytest.mark.slow
 class TestIntegrationLight:
-    """Light integration tests without real API calls."""
+    """Light integration tests without real API calls (runs actual CLI)."""
 
     @patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}, clear=False)
     def test_full_enhancement_flow_without_api(self, runner: CliRunner) -> None:

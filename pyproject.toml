@@ -434,10 +434,7 @@ addopts = [
     "-q",
     "--strict-markers",
     "--strict-config",
-    "-n", "auto",  # Parallel execution with pytest-xdist
-    "--dist", "loadgroup",  # Smart test distribution
-    "-x",  # Stop on first failure (fast feedback)
-    "--tb=short",  # Shorter tracebacks
+    "--tb=short",
 ]
 filterwarnings = [
     "ignore::DeprecationWarning",
@@ -450,8 +447,8 @@ markers = [
     "security: marks tests as security tests (XSS, CSRF, SQL injection, etc.)",
     "smoke: critical path tests for CI (run with '-m smoke')",
 ]
-# Production test timeouts
-timeout = 30  # 30 second default timeout per test
+# Production test timeouts - 120s allows for network/ML operations
+timeout = 120
 
 # =============================================================================
 # Coverage Configuration
