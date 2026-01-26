@@ -35,6 +35,12 @@
     "three": "^0.172.0",
     "zod": "^4.3.6"
   },
+  "pnpm": {
+    "overrides": {
+      "lodash": "^4.17.23",
+      "lodash-es": "^4.17.23"
+    }
+  },
   "devDependencies": {
     "@playwright/test": "^1.52.0",
     "@types/node": "^22",
