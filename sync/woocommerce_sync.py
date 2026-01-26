@@ -356,7 +356,7 @@ class WooCommerceSyncClient:
             product_data["meta_data"] = meta_data
 
         if existing:
-            return await self.update_product(existing["id"], product_data)
+            return await self.update_product(existing.id, product_data)
         else:
             return await self.create_product(product_data)
 
