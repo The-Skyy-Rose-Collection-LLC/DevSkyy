@@ -50,50 +50,70 @@ export class ApiError extends Error {
 // ZOD SCHEMAS - Runtime validation
 // =============================================================================
 
+// Schema matching backend ProviderInfo model
 const ProviderInfoSchema = z.object({
   name: z.string(),
-  provider_id: z.string(),
-  model: z.string(),
-  capabilities: z.array(z.string()),
-  cost_per_1k_tokens: z.number(),
+  display_name: z.string(),
+  enabled: z.boolean(),
   avg_latency_ms: z.number(),
-  status: z.enum(['online', 'offline', 'degraded']),
+  win_rate: z.number(),
+  total_competitions: z.number(),
 });
 
+// Schema matching backend ProviderStats model
 const ProviderStatsSchema = z.object({
-  provider_id: z.string(),
-  name: z.string(),
+  provider: z.string(),
   total_competitions: z.number(),
   wins: z.number(),
   win_rate: z.number(),
   avg_score: z.number(),
   avg_latency_ms: z.number(),
-  total_cost: z.number(),
+  total_cost_usd: z.number(),
 });
 
-const CompetitionResultSchema = z.object({
-  provider_id: z.string(),
-  response: z.string(),
-  score: z.number(),
+// Score breakdown schema
+const EntryScoreSchema = z.object({
+  relevance: z.number().default(0),
+  quality: z.number().default(0),
+  completeness: z.number().default(0),
+  efficiency: z.number().default(0),
+  brand_alignment: z.number().default(0),
+  total: z.number().default(0),
+});
+
+// Competition entry schema matching backend
+const CompetitionEntrySchema = z.object({
+  provider: z.string(),
+  rank: z.number(),
+  scores: EntryScoreSchema,
   latency_ms: z.number(),
-  cost: z.number(),
-  evaluation: z.record(z.string(), z.number()),
+  cost_usd: z.number(),
+  response_preview: z.string().default(''),
 });
 
+// Competition response matching backend
 const CompetitionResponseSchema = z.object({
   id: z.string(),
-  prompt: z.string(),
-  winner: z.string(),
-  results: z.array(CompetitionResultSchema),
+  task_id: z.string(),
+  prompt_preview: z.string(),
+  status: z.string(),
+  winner: CompetitionEntrySchema.nullable(),
+  entries: z.array(CompetitionEntrySchema),
+  ab_test_reasoning: z.string().nullable().optional(),
+  ab_test_confidence: z.number().nullable().optional(),
+  total_duration_ms: z.number(),
+  total_cost_usd: z.number(),
   created_at: z.string(),
 });
 
+// History entry schema matching backend
 const HistoryEntrySchema = z.object({
   id: z.string(),
-  prompt: z.string(),
-  winner: z.string(),
+  prompt_preview: z.string(),
+  winner_provider: z.string(),
+  winner_score: z.number(),
+  total_cost_usd: z.number(),
   created_at: z.string(),
-  results: z.array(CompetitionResultSchema),
 });
 
 const PipelineStatusSchema = z.object({
@@ -211,7 +231,8 @@ const BatchJobSchema = z.object({
 
 export type ProviderInfo = z.infer<typeof ProviderInfoSchema>;
 export type ProviderStats = z.infer<typeof ProviderStatsSchema>;
-export type CompetitionResult = z.infer<typeof CompetitionResultSchema>;
+export type EntryScore = z.infer<typeof EntryScoreSchema>;
+export type CompetitionEntry = z.infer<typeof CompetitionEntrySchema>;
 export type CompetitionResponse = z.infer<typeof CompetitionResponseSchema>;
 export type HistoryEntry = z.infer<typeof HistoryEntrySchema>;
 export type PipelineStatus = z.infer<typeof PipelineStatusSchema>;
