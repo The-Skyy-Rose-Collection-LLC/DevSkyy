@@ -1,0 +1,1674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SKYYROSE | Pre-Order Experience | Where Love Meets Luxury</title>
+    <meta name="description" content="Exclusive pre-order access to all SkyyRose collections - BLACK ROSE, LOVE HURTS, and SIGNATURE. Immersive 3D shopping experience.">
+    
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+
+    <style>
+        :root {
+            /* BLACK ROSE */
+            --br-crimson: #DC143C;
+            --br-dark: #0A0505;
+            --br-silver: #C0C0C0;
+            /* LOVE HURTS */
+            --lh-rose: #E91E63;
+            --lh-burgundy: #880E4F;
+            --lh-blush: #F8BBD9;
+            /* SIGNATURE */
+            --sg-gold: #D4AF37;
+            --sg-rose-gold: #B76E79;
+            --sg-black: #0A0A0A;
+            /* Universal */
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', -apple-system, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+        html, body {
+            font-family: var(--font-body);
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* ==================== LOADING SCREEN ==================== */
+        #loading-screen {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 1s ease, visibility 1s ease;
+        }
+
+        #loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-logo {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 600;
+            letter-spacing: 0.5em;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, var(--br-crimson), var(--lh-rose), var(--sg-gold), var(--br-crimson));
+            background-size: 300% 100%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradient-shift 3s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .loader-tagline {
+            font-size: 0.9rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 3rem;
+        }
+
+        .loader-ring {
+            width: 80px;
+            height: 80px;
+            border: 2px solid rgba(255,255,255,0.1);
+            border-top-color: var(--sg-gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loader-progress {
+            margin-top: 2rem;
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            color: var(--sg-gold);
+        }
+
+        /* ==================== HERO CANVAS ==================== */
+        #hero-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            z-index: 1;
+        }
+
+        /* ==================== SCROLL CONTENT ==================== */
+        .scroll-content {
+            position: relative;
+            z-index: 10;
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .hero-badge {
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--sg-gold);
+            font-size: 0.7rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: var(--sg-gold);
+            margin-bottom: 2rem;
+            animation: pulse-border 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-border {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(212, 175, 55, 0.2); }
+        }
+
+        .hero-title {
+            font-family: var(--font-display);
+            font-size: 6rem;
+            font-weight: 600;
+            letter-spacing: 0.3em;
+            margin-bottom: 1rem;
+            background: linear-gradient(180deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.6);
+            margin-bottom: 3rem;
+        }
+
+        .hero-cta {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .cta-btn {
+            padding: 1rem 2.5rem;
+            font-family: var(--font-body);
+            font-size: 0.8rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .cta-primary {
+            background: linear-gradient(135deg, var(--sg-gold), var(--sg-rose-gold));
+            border: none;
+            color: #000;
+        }
+
+        .cta-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(212, 175, 55, 0.4);
+        }
+
+        .cta-secondary {
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: #fff;
+        }
+
+        .cta-secondary:hover {
+            border-color: #fff;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(255,255,255,0.4);
+            font-size: 0.7rem;
+            letter-spacing: 0.3em;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* ==================== COLLECTION SECTIONS ==================== */
+        .collection-section {
+            min-height: 100vh;
+            padding: 8rem 5%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .collection-bg {
+            position: absolute;
+            inset: 0;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* BLACK ROSE Section */
+        .black-rose-section {
+            background: linear-gradient(180deg, #000 0%, var(--br-dark) 50%, #000 100%);
+        }
+
+        .black-rose-section .collection-bg {
+            background: radial-gradient(ellipse at 30% 50%, var(--br-crimson) 0%, transparent 50%);
+        }
+
+        /* LOVE HURTS Section */
+        .love-hurts-section {
+            background: linear-gradient(180deg, #000 0%, #0d0408 50%, #000 100%);
+        }
+
+        .love-hurts-section .collection-bg {
+            background: radial-gradient(ellipse at 70% 50%, var(--lh-rose) 0%, transparent 50%);
+        }
+
+        /* SIGNATURE Section */
+        .signature-section {
+            background: linear-gradient(180deg, #000 0%, var(--sg-black) 50%, #000 100%);
+        }
+
+        .signature-section .collection-bg {
+            background: radial-gradient(ellipse at 50% 50%, var(--sg-gold) 0%, transparent 40%);
+        }
+
+        .collection-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .collection-number {
+            font-size: 0.8rem;
+            letter-spacing: 0.5em;
+            color: rgba(255,255,255,0.3);
+            margin-bottom: 1rem;
+        }
+
+        .collection-title {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            margin-bottom: 1rem;
+        }
+
+        .black-rose-section .collection-title {
+            background: linear-gradient(135deg, var(--br-crimson), var(--br-silver));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .love-hurts-section .collection-title {
+            background: linear-gradient(135deg, var(--lh-rose), var(--lh-blush));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .signature-section .collection-title {
+            background: linear-gradient(135deg, var(--sg-gold), var(--sg-rose-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .collection-tagline {
+            font-size: 1rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* Product Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            padding: 1.5rem;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, transparent 0%, rgba(255,255,255,0.05) 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255,255,255,0.2);
+        }
+
+        .product-card:hover::before {
+            opacity: 1;
+        }
+
+        .product-image {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 5rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 0.3rem 0.6rem;
+            font-size: 0.65rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .black-rose-section .product-badge {
+            background: var(--br-crimson);
+        }
+
+        .love-hurts-section .product-badge {
+            background: var(--lh-burgundy);
+        }
+
+        .signature-section .product-badge {
+            background: transparent;
+            border: 1px solid var(--sg-gold);
+            color: var(--sg-gold);
+        }
+
+        .product-name {
+            font-family: var(--font-display);
+            font-size: 1.3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .black-rose-section .product-price { color: var(--br-crimson); }
+        .love-hurts-section .product-price { color: var(--lh-rose); }
+        .signature-section .product-price { color: var(--sg-gold); }
+
+        .product-description {
+            font-size: 0.85rem;
+            color: rgba(255,255,255,0.6);
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .preorder-btn {
+            width: 100%;
+            padding: 0.8rem;
+            font-family: var(--font-body);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .black-rose-section .preorder-btn {
+            background: transparent;
+            border: 1px solid var(--br-crimson);
+            color: var(--br-crimson);
+        }
+
+        .black-rose-section .preorder-btn:hover {
+            background: var(--br-crimson);
+            color: #fff;
+        }
+
+        .love-hurts-section .preorder-btn {
+            background: transparent;
+            border: 1px solid var(--lh-rose);
+            color: var(--lh-rose);
+        }
+
+        .love-hurts-section .preorder-btn:hover {
+            background: var(--lh-rose);
+            color: #fff;
+        }
+
+        .signature-section .preorder-btn {
+            background: transparent;
+            border: 1px solid var(--sg-gold);
+            color: var(--sg-gold);
+        }
+
+        .signature-section .preorder-btn:hover {
+            background: var(--sg-gold);
+            color: #000;
+        }
+
+        /* ==================== FLOATING 3D PREVIEW ==================== */
+        #floating-preview {
+            position: fixed;
+            top: 50%;
+            right: 5%;
+            transform: translateY(-50%);
+            width: 300px;
+            height: 300px;
+            z-index: 100;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        #floating-preview.visible {
+            opacity: 1;
+        }
+
+        /* ==================== CART SIDEBAR ==================== */
+        .cart-btn {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            background: rgba(0,0,0,0.8);
+            border: 1px solid var(--sg-gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .cart-btn:hover {
+            background: var(--sg-gold);
+            color: #000;
+        }
+
+        .cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: var(--lh-rose);
+            border-radius: 50%;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cart-sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: rgba(10,10,10,0.98);
+            border-left: 1px solid rgba(255,255,255,0.1);
+            z-index: 2000;
+            transition: right 0.4s ease;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .cart-sidebar.open {
+            right: 0;
+        }
+
+        .cart-header {
+            padding: 2rem;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .cart-title {
+            font-family: var(--font-display);
+            font-size: 1.5rem;
+            letter-spacing: 0.2em;
+        }
+
+        .cart-close {
+            width: 40px;
+            height: 40px;
+            background: transparent;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+        }
+
+        .cart-items {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .cart-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .cart-item-price {
+            font-size: 0.85rem;
+            color: var(--sg-gold);
+        }
+
+        .cart-item-remove {
+            background: transparent;
+            border: none;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+
+        .cart-footer {
+            padding: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cart-total-price {
+            color: var(--sg-gold);
+            font-family: var(--font-display);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, var(--sg-gold), var(--sg-rose-gold));
+            border: none;
+            color: #000;
+            font-family: var(--font-body);
+            font-size: 0.85rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .cart-empty {
+            text-align: center;
+            color: rgba(255,255,255,0.4);
+            padding: 3rem;
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            padding: 4rem 5%;
+            background: #000;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            letter-spacing: 0.4em;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--sg-gold), var(--sg-rose-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .footer-tagline {
+            font-size: 0.85rem;
+            letter-spacing: 0.3em;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: rgba(255,255,255,0.6);
+            text-decoration: none;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--sg-gold);
+        }
+
+        .footer-copyright {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.3);
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; letter-spacing: 0.2em; }
+            .collection-title { font-size: 2.5rem; }
+            .hero-cta { flex-direction: column; }
+            .cart-sidebar { width: 100%; right: -100%; }
+            #floating-preview { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Screen -->
+    <div id="loading-screen">
+        <div class="loader-logo">SKYYROSE</div>
+        <div class="loader-tagline">Where Love Meets Luxury</div>
+        <div class="loader-ring"></div>
+        <div class="loader-progress" id="loader-progress">Loading Experience...</div>
+    </div>
+
+    <!-- Hero 3D Canvas -->
+    <canvas id="hero-canvas"></canvas>
+
+    <!-- Floating 3D Preview -->
+    <canvas id="floating-preview"></canvas>
+
+    <!-- Cart Button -->
+    <button class="cart-btn" onclick="toggleCart()">
+        🛒
+        <span class="cart-count" id="cart-count">0</span>
+    </button>
+
+    <!-- Cart Sidebar -->
+    <div class="cart-sidebar" id="cart-sidebar">
+        <div class="cart-header">
+            <h2 class="cart-title">Pre-Order Bag</h2>
+            <button class="cart-close" onclick="toggleCart()">×</button>
+        </div>
+        <div class="cart-items" id="cart-items">
+            <div class="cart-empty">Your bag is empty</div>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">
+                <span>Total</span>
+                <span class="cart-total-price" id="cart-total">$0</span>
+            </div>
+            <button class="checkout-btn" onclick="checkout()">Complete Pre-Order</button>
+        </div>
+    </div>
+
+    <!-- Scroll Content -->
+    <div class="scroll-content">
+        <!-- Hero Section -->
+        <section class="hero-section">
+            <span class="hero-badge">Exclusive Pre-Order Access</span>
+            <h1 class="hero-title">SKYYROSE</h1>
+            <p class="hero-subtitle">Where Love Meets Luxury</p>
+            <div class="hero-cta">
+                <a href="#black-rose" class="cta-btn cta-primary">Explore Collections</a>
+                <a href="#signature" class="cta-btn cta-secondary">View Signature</a>
+            </div>
+            <div class="scroll-indicator">
+                <span>Scroll to Explore</span>
+                <span>↓</span>
+            </div>
+        </section>
+
+        <!-- BLACK ROSE Collection -->
+        <section class="collection-section black-rose-section" id="black-rose">
+            <div class="collection-bg"></div>
+            <div class="collection-header">
+                <p class="collection-number">COLLECTION 01</p>
+                <h2 class="collection-title">BLACK ROSE</h2>
+                <p class="collection-tagline">Dark Elegance • Limited Edition</p>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        🥀
+                        <span class="product-badge">Limited</span>
+                    </div>
+                    <h3 class="product-name">Thorn Hoodie</h3>
+                    <p class="product-price">$185</p>
+                    <p class="product-description">Heavyweight French terry with embroidered thorns cascading down the sleeves. Dark gothic elegance.</p>
+                    <button class="preorder-btn" onclick="addToCart('Thorn Hoodie', 185, '🥀', 'BLACK ROSE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        🖤
+                        <span class="product-badge">Exclusive</span>
+                    </div>
+                    <h3 class="product-name">Midnight Jacket</h3>
+                    <p class="product-price">$295</p>
+                    <p class="product-description">Matte leather jacket with crimson satin lining and silver rose hardware. Statement piece.</p>
+                    <button class="preorder-btn" onclick="addToCart('Midnight Jacket', 295, '🖤', 'BLACK ROSE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        🌹
+                        <span class="product-badge">New</span>
+                    </div>
+                    <h3 class="product-name">Gothic Rose Tee</h3>
+                    <p class="product-price">$75</p>
+                    <p class="product-description">Oversized vintage wash tee with hand-drawn rose graphic. Comfort meets darkness.</p>
+                    <button class="preorder-btn" onclick="addToCart('Gothic Rose Tee', 75, '🌹', 'BLACK ROSE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        ⛓️
+                        <span class="product-badge">Limited</span>
+                    </div>
+                    <h3 class="product-name">Chain Cargo Pants</h3>
+                    <p class="product-price">$165</p>
+                    <p class="product-description">Heavy canvas cargo with detachable silver chain details. Multiple utility pockets.</p>
+                    <button class="preorder-btn" onclick="addToCart('Chain Cargo Pants', 165, '⛓️', 'BLACK ROSE')">Pre-Order Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- LOVE HURTS Collection -->
+        <section class="collection-section love-hurts-section" id="love-hurts">
+            <div class="collection-bg"></div>
+            <div class="collection-header">
+                <p class="collection-number">COLLECTION 02</p>
+                <h2 class="collection-title">LOVE HURTS</h2>
+                <p class="collection-tagline">Honoring the Hurt Family Legacy</p>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        💔
+                        <span class="product-badge">Signature</span>
+                    </div>
+                    <h3 class="product-name">Heartbreak Hoodie</h3>
+                    <p class="product-price">$195</p>
+                    <p class="product-description">Premium heavyweight hoodie with embroidered broken heart motif and "HURT" family crest.</p>
+                    <button class="preorder-btn" onclick="addToCart('Heartbreak Hoodie', 195, '💔', 'LOVE HURTS')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        💧
+                        <span class="product-badge">Limited</span>
+                    </div>
+                    <h3 class="product-name">Tears of Gold Jacket</h3>
+                    <p class="product-price">$325</p>
+                    <p class="product-description">Satin bomber with gold tear embroidery. Interior lined with love letter print from archives.</p>
+                    <button class="preorder-btn" onclick="addToCart('Tears of Gold Jacket', 325, '💧', 'LOVE HURTS')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        🩹
+                        <span class="product-badge">Best Seller</span>
+                    </div>
+                    <h3 class="product-name">Wounded Heart Tee</h3>
+                    <p class="product-price">$85</p>
+                    <p class="product-description">Oversized tee with anatomical heart graphic and rose thorns. Hand-distressed finish.</p>
+                    <button class="preorder-btn" onclick="addToCart('Wounded Heart Tee', 85, '🩹', 'LOVE HURTS')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        🖤
+                        <span class="product-badge">New</span>
+                    </div>
+                    <h3 class="product-name">Scar Cargo Pants</h3>
+                    <p class="product-price">$165</p>
+                    <p class="product-description">Heavy canvas cargo with embroidered scar details. Multiple utility pockets.</p>
+                    <button class="preorder-btn" onclick="addToCart('Scar Cargo Pants', 165, '🖤', 'LOVE HURTS')">Pre-Order Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- SIGNATURE Collection -->
+        <section class="collection-section signature-section" id="signature">
+            <div class="collection-bg"></div>
+            <div class="collection-header">
+                <p class="collection-number">COLLECTION 03</p>
+                <h2 class="collection-title">SIGNATURE</h2>
+                <p class="collection-tagline">Premium Foundation Essentials</p>
+            </div>
+            <div class="products-grid">
+                <div class="product-card">
+                    <div class="product-image">
+                        🧥
+                        <span class="product-badge">Investment</span>
+                    </div>
+                    <h3 class="product-name">Foundation Blazer</h3>
+                    <p class="product-price">$395</p>
+                    <p class="product-description">Premium Italian wool blend blazer with gold-tone hardware and silk lining. Cornerstone piece.</p>
+                    <button class="preorder-btn" onclick="addToCart('Foundation Blazer', 395, '🧥', 'SIGNATURE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        👖
+                        <span class="product-badge">Essential</span>
+                    </div>
+                    <h3 class="product-name">Essential Trouser</h3>
+                    <p class="product-price">$245</p>
+                    <p class="product-description">Tailored wool trousers with perfect drape and hidden stretch. All-day sophistication.</p>
+                    <button class="preorder-btn" onclick="addToCart('Essential Trouser', 245, '👖', 'SIGNATURE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        👕
+                        <span class="product-badge">Foundation</span>
+                    </div>
+                    <h3 class="product-name">Luxury Cotton Tee</h3>
+                    <p class="product-price">$125</p>
+                    <p class="product-description">Pima cotton tee with gold thread detail at hem. The foundation of any outfit.</p>
+                    <button class="preorder-btn" onclick="addToCart('Luxury Cotton Tee', 125, '👕', 'SIGNATURE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        🧥
+                        <span class="product-badge">Investment</span>
+                    </div>
+                    <h3 class="product-name">Heritage Overcoat</h3>
+                    <p class="product-price">$595</p>
+                    <p class="product-description">Double-faced cashmere blend coat with timeless silhouette. Investment dressing.</p>
+                    <button class="preorder-btn" onclick="addToCart('Heritage Overcoat', 595, '🧥', 'SIGNATURE')">Pre-Order Now</button>
+                </div>
+                <div class="product-card">
+                    <div class="product-image">
+                        👔
+                        <span class="product-badge">Staple</span>
+                    </div>
+                    <h3 class="product-name">Classic Oxford Shirt</h3>
+                    <p class="product-price">$175</p>
+                    <p class="product-description">Egyptian cotton oxford with mother-of-pearl buttons. Crisp yet effortless elegance.</p>
+                    <button class="preorder-btn" onclick="addToCart('Classic Oxford Shirt', 175, '👔', 'SIGNATURE')">Pre-Order Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="footer-logo">SKYYROSE</div>
+            <p class="footer-tagline">Where Love Meets Luxury • Oakland, California</p>
+            <div class="footer-links">
+                <a href="#">About</a>
+                <a href="#">Shipping</a>
+                <a href="#">Returns</a>
+                <a href="#">Contact</a>
+                <a href="#">Instagram</a>
+            </div>
+            <p class="footer-copyright">© 2026 SkyyRose. All rights reserved. Pre-orders ship Spring 2026.</p>
+        </footer>
+    </div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+        import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+        import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+        import { ShaderPass } from 'three/addons/postprocessing/ShaderPass.js';
+        import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+        // ============================================
+        // SKYYROSE PRE-ORDER EXPERIENCE
+        // Mind-Blowing 3D Visual Showcase
+        // ============================================
+
+        let scene, camera, renderer, composer;
+        let morphingGeometry, particles, rings = [];
+        let floatingScene, floatingCamera, floatingRenderer;
+        let clock = new THREE.Clock();
+        let scrollY = 0;
+        let targetScrollY = 0;
+
+        // Color themes for each collection
+        const themes = {
+            hero: { 
+                primary: new THREE.Color(0xD4AF37),
+                secondary: new THREE.Color(0xE91E63),
+                tertiary: new THREE.Color(0xDC143C),
+                bg: new THREE.Color(0x000000)
+            },
+            blackRose: {
+                primary: new THREE.Color(0xDC143C),
+                secondary: new THREE.Color(0xC0C0C0),
+                tertiary: new THREE.Color(0x8B0000),
+                bg: new THREE.Color(0x0A0505)
+            },
+            loveHurts: {
+                primary: new THREE.Color(0xE91E63),
+                secondary: new THREE.Color(0xF8BBD9),
+                tertiary: new THREE.Color(0x880E4F),
+                bg: new THREE.Color(0x0D0408)
+            },
+            signature: {
+                primary: new THREE.Color(0xD4AF37),
+                secondary: new THREE.Color(0xB76E79),
+                tertiary: new THREE.Color(0xE5E4E2),
+                bg: new THREE.Color(0x0A0A0A)
+            }
+        };
+
+        let currentTheme = themes.hero;
+
+        init();
+        animate();
+
+        function init() {
+            // Main Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                60,
+                window.innerWidth / window.innerHeight,
+                0.1,
+                1000
+            );
+            camera.position.z = 30;
+
+            // Renderer
+            const canvas = document.getElementById('hero-canvas');
+            renderer = new THREE.WebGLRenderer({ 
+                canvas,
+                antialias: true,
+                alpha: true
+            });
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 1.2;
+
+            // Create Visual Elements
+            createMorphingCore();
+            createParticleField();
+            createOrbitingRings();
+            createFloatingLogos();
+
+            // Post-processing
+            setupPostProcessing();
+
+            // Events
+            window.addEventListener('resize', onWindowResize);
+            window.addEventListener('scroll', onScroll);
+
+            // Initialize floating preview
+            initFloatingPreview();
+
+            // Loading
+            simulateLoading();
+        }
+
+        function createMorphingCore() {
+            // Central morphing geometry - icosahedron that morphs
+            const geometry = new THREE.IcosahedronGeometry(5, 4);
+            
+            // Store original positions for morphing
+            const positionAttribute = geometry.attributes.position;
+            const originalPositions = new Float32Array(positionAttribute.array);
+            geometry.userData.originalPositions = originalPositions;
+
+            // Custom shader material
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                    uColor1: { value: themes.hero.primary },
+                    uColor2: { value: themes.hero.secondary },
+                    uColor3: { value: themes.hero.tertiary },
+                    uMorphProgress: { value: 0 }
+                },
+                vertexShader: `
+                    uniform float uTime;
+                    uniform float uMorphProgress;
+                    varying vec3 vNormal;
+                    varying vec3 vPosition;
+                    varying float vDisplacement;
+                    
+                    // Simplex noise function
+                    vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+                    vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
+                    vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+                    
+                    float snoise(vec3 v) {
+                        const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+                        const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+                        vec3 i  = floor(v + dot(v, C.yyy));
+                        vec3 x0 = v - i + dot(i, C.xxx);
+                        vec3 g = step(x0.yzx, x0.xyz);
+                        vec3 l = 1.0 - g;
+                        vec3 i1 = min(g.xyz, l.zxy);
+                        vec3 i2 = max(g.xyz, l.zxy);
+                        vec3 x1 = x0 - i1 + C.xxx;
+                        vec3 x2 = x0 - i2 + C.yyy;
+                        vec3 x3 = x0 - D.yyy;
+                        i = mod289(i);
+                        vec4 p = permute(permute(permute(
+                            i.z + vec4(0.0, i1.z, i2.z, 1.0))
+                            + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+                            + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+                        float n_ = 0.142857142857;
+                        vec3 ns = n_ * D.wyz - D.xzx;
+                        vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+                        vec4 x_ = floor(j * ns.z);
+                        vec4 y_ = floor(j - 7.0 * x_);
+                        vec4 x = x_ *ns.x + ns.yyyy;
+                        vec4 y = y_ *ns.x + ns.yyyy;
+                        vec4 h = 1.0 - abs(x) - abs(y);
+                        vec4 b0 = vec4(x.xy, y.xy);
+                        vec4 b1 = vec4(x.zw, y.zw);
+                        vec4 s0 = floor(b0)*2.0 + 1.0;
+                        vec4 s1 = floor(b1)*2.0 + 1.0;
+                        vec4 sh = -step(h, vec4(0.0));
+                        vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
+                        vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
+                        vec3 p0 = vec3(a0.xy, h.x);
+                        vec3 p1 = vec3(a0.zw, h.y);
+                        vec3 p2 = vec3(a1.xy, h.z);
+                        vec3 p3 = vec3(a1.zw, h.w);
+                        vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2,p2), dot(p3,p3)));
+                        p0 *= norm.x;
+                        p1 *= norm.y;
+                        p2 *= norm.z;
+                        p3 *= norm.w;
+                        vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+                        m = m * m;
+                        return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+                    }
+                    
+                    void main() {
+                        vNormal = normalize(normalMatrix * normal);
+                        
+                        // Multiple noise layers for organic movement
+                        float noise1 = snoise(position * 0.3 + uTime * 0.2);
+                        float noise2 = snoise(position * 0.6 + uTime * 0.3) * 0.5;
+                        float noise3 = snoise(position * 1.2 + uTime * 0.1) * 0.25;
+                        
+                        float displacement = (noise1 + noise2 + noise3) * (1.0 + uMorphProgress * 0.5);
+                        vDisplacement = displacement;
+                        
+                        vec3 newPosition = position + normal * displacement * 0.8;
+                        vPosition = newPosition;
+                        
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uTime;
+                    uniform vec3 uColor1;
+                    uniform vec3 uColor2;
+                    uniform vec3 uColor3;
+                    varying vec3 vNormal;
+                    varying vec3 vPosition;
+                    varying float vDisplacement;
+                    
+                    void main() {
+                        // Fresnel effect for edge glow
+                        vec3 viewDirection = normalize(cameraPosition - vPosition);
+                        float fresnel = pow(1.0 - dot(viewDirection, vNormal), 3.0);
+                        
+                        // Color mixing based on displacement and position
+                        float colorMix1 = sin(vDisplacement * 3.0 + uTime) * 0.5 + 0.5;
+                        float colorMix2 = cos(vPosition.y * 0.5 + uTime * 0.5) * 0.5 + 0.5;
+                        
+                        vec3 color = mix(uColor1, uColor2, colorMix1);
+                        color = mix(color, uColor3, colorMix2 * 0.5);
+                        
+                        // Add fresnel glow
+                        color += fresnel * uColor1 * 0.5;
+                        
+                        // Emissive effect
+                        float emissive = smoothstep(0.3, 0.8, fresnel);
+                        
+                        gl_FragColor = vec4(color, 0.9 + emissive * 0.1);
+                    }
+                `,
+                transparent: true,
+                side: THREE.DoubleSide
+            });
+
+            morphingGeometry = new THREE.Mesh(geometry, material);
+            scene.add(morphingGeometry);
+        }
+
+        function createParticleField() {
+            const particleCount = 5000;
+            const positions = new Float32Array(particleCount * 3);
+            const colors = new Float32Array(particleCount * 3);
+            const sizes = new Float32Array(particleCount);
+            const velocities = new Float32Array(particleCount * 3);
+
+            const colorOptions = [
+                new THREE.Color(0xD4AF37),
+                new THREE.Color(0xE91E63),
+                new THREE.Color(0xDC143C),
+                new THREE.Color(0xC0C0C0),
+                new THREE.Color(0xF8BBD9)
+            ];
+
+            for (let i = 0; i < particleCount; i++) {
+                // Spherical distribution with varying radius
+                const radius = 15 + Math.random() * 35;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.acos(2 * Math.random() - 1);
+
+                positions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+                positions[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta);
+                positions[i * 3 + 2] = radius * Math.cos(phi);
+
+                // Random velocities for movement
+                velocities[i * 3] = (Math.random() - 0.5) * 0.02;
+                velocities[i * 3 + 1] = (Math.random() - 0.5) * 0.02;
+                velocities[i * 3 + 2] = (Math.random() - 0.5) * 0.02;
+
+                const color = colorOptions[Math.floor(Math.random() * colorOptions.length)];
+                colors[i * 3] = color.r;
+                colors[i * 3 + 1] = color.g;
+                colors[i * 3 + 2] = color.b;
+
+                sizes[i] = Math.random() * 0.15 + 0.05;
+            }
+
+            const geometry = new THREE.BufferGeometry();
+            geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+            geometry.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+            geometry.userData.velocities = velocities;
+
+            const material = new THREE.PointsMaterial({
+                size: 0.1,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.8,
+                blending: THREE.AdditiveBlending,
+                sizeAttenuation: true
+            });
+
+            particles = new THREE.Points(geometry, material);
+            scene.add(particles);
+        }
+
+        function createOrbitingRings() {
+            const ringCount = 5;
+            
+            for (let i = 0; i < ringCount; i++) {
+                const radius = 8 + i * 3;
+                const geometry = new THREE.TorusGeometry(radius, 0.02 + i * 0.01, 16, 100);
+                
+                const colors = [0xD4AF37, 0xE91E63, 0xDC143C, 0xB76E79, 0xC0C0C0];
+                
+                const material = new THREE.MeshBasicMaterial({
+                    color: colors[i],
+                    transparent: true,
+                    opacity: 0.4 - i * 0.05
+                });
+
+                const ring = new THREE.Mesh(geometry, material);
+                ring.rotation.x = Math.random() * Math.PI;
+                ring.rotation.y = Math.random() * Math.PI;
+                ring.userData.rotationSpeed = {
+                    x: (Math.random() - 0.5) * 0.01,
+                    y: (Math.random() - 0.5) * 0.01,
+                    z: (Math.random() - 0.5) * 0.005
+                };
+
+                rings.push(ring);
+                scene.add(ring);
+            }
+        }
+
+        function createFloatingLogos() {
+            // Create floating geometric shapes representing brand identity
+            const shapes = [];
+            
+            // Hearts for LOVE HURTS
+            for (let i = 0; i < 8; i++) {
+                const heartShape = new THREE.Shape();
+                const x = 0, y = 0;
+                heartShape.moveTo(x + 0.25, y + 0.25);
+                heartShape.bezierCurveTo(x + 0.25, y + 0.25, x + 0.2, y, x, y);
+                heartShape.bezierCurveTo(x - 0.35, y, x - 0.35, y + 0.35, x - 0.35, y + 0.35);
+                heartShape.bezierCurveTo(x - 0.35, y + 0.55, x - 0.2, y + 0.77, x + 0.25, y + 0.95);
+                heartShape.bezierCurveTo(x + 0.7, y + 0.77, x + 0.85, y + 0.55, x + 0.85, y + 0.35);
+                heartShape.bezierCurveTo(x + 0.85, y + 0.35, x + 0.85, y, x + 0.5, y);
+                heartShape.bezierCurveTo(x + 0.35, y, x + 0.25, y + 0.25, x + 0.25, y + 0.25);
+
+                const geometry = new THREE.ShapeGeometry(heartShape);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0xE91E63,
+                    transparent: true,
+                    opacity: 0.3,
+                    side: THREE.DoubleSide
+                });
+
+                const heart = new THREE.Mesh(geometry, material);
+                heart.position.set(
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 20 - 10
+                );
+                heart.rotation.z = Math.PI;
+                heart.scale.setScalar(Math.random() * 1 + 0.5);
+                heart.userData.floatSpeed = Math.random() * 0.5 + 0.5;
+                heart.userData.floatOffset = Math.random() * Math.PI * 2;
+                heart.userData.baseY = heart.position.y;
+                
+                shapes.push(heart);
+                scene.add(heart);
+            }
+
+            // Roses for BLACK ROSE
+            for (let i = 0; i < 6; i++) {
+                const roseGroup = new THREE.Group();
+                
+                for (let j = 0; j < 5; j++) {
+                    const petalGeo = new THREE.TorusGeometry(0.3 + j * 0.1, 0.05, 8, 16, Math.PI * 1.5);
+                    const petalMat = new THREE.MeshBasicMaterial({
+                        color: 0xDC143C,
+                        transparent: true,
+                        opacity: 0.3 - j * 0.04
+                    });
+                    const petal = new THREE.Mesh(petalGeo, petalMat);
+                    petal.rotation.x = j * 0.2;
+                    petal.rotation.z = j * Math.PI / 5;
+                    roseGroup.add(petal);
+                }
+
+                roseGroup.position.set(
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 20 - 10
+                );
+                roseGroup.scale.setScalar(Math.random() * 1.5 + 0.5);
+                roseGroup.userData.floatSpeed = Math.random() * 0.3 + 0.3;
+                roseGroup.userData.floatOffset = Math.random() * Math.PI * 2;
+                roseGroup.userData.baseY = roseGroup.position.y;
+                roseGroup.userData.rotSpeed = (Math.random() - 0.5) * 0.01;
+
+                shapes.push(roseGroup);
+                scene.add(roseGroup);
+            }
+
+            // Diamonds for SIGNATURE
+            for (let i = 0; i < 6; i++) {
+                const geometry = new THREE.OctahedronGeometry(0.5 + Math.random() * 0.5);
+                const material = new THREE.MeshBasicMaterial({
+                    color: 0xD4AF37,
+                    transparent: true,
+                    opacity: 0.25,
+                    wireframe: true
+                });
+
+                const diamond = new THREE.Mesh(geometry, material);
+                diamond.position.set(
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 40,
+                    (Math.random() - 0.5) * 20 - 10
+                );
+                diamond.userData.floatSpeed = Math.random() * 0.4 + 0.2;
+                diamond.userData.floatOffset = Math.random() * Math.PI * 2;
+                diamond.userData.baseY = diamond.position.y;
+                diamond.userData.rotSpeed = (Math.random() - 0.5) * 0.02;
+
+                shapes.push(diamond);
+                scene.add(diamond);
+            }
+
+            // Store for animation
+            scene.userData.floatingShapes = shapes;
+        }
+
+        function setupPostProcessing() {
+            composer = new EffectComposer(renderer);
+
+            const renderPass = new RenderPass(scene, camera);
+            composer.addPass(renderPass);
+
+            // Bloom for glow effect
+            const bloomPass = new UnrealBloomPass(
+                new THREE.Vector2(window.innerWidth, window.innerHeight),
+                1.5,    // strength
+                0.4,    // radius
+                0.85    // threshold
+            );
+            composer.addPass(bloomPass);
+
+            // Custom chromatic aberration shader
+            const chromaticAberrationShader = {
+                uniforms: {
+                    tDiffuse: { value: null },
+                    uIntensity: { value: 0.002 },
+                    uTime: { value: 0 }
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform sampler2D tDiffuse;
+                    uniform float uIntensity;
+                    uniform float uTime;
+                    varying vec2 vUv;
+                    
+                    void main() {
+                        vec2 center = vec2(0.5);
+                        vec2 dir = vUv - center;
+                        float dist = length(dir);
+                        
+                        float intensity = uIntensity * (1.0 + sin(uTime * 0.5) * 0.2);
+                        
+                        vec2 redOffset = dir * dist * intensity;
+                        vec2 blueOffset = -dir * dist * intensity;
+                        
+                        float r = texture2D(tDiffuse, vUv + redOffset).r;
+                        float g = texture2D(tDiffuse, vUv).g;
+                        float b = texture2D(tDiffuse, vUv + blueOffset).b;
+                        
+                        gl_FragColor = vec4(r, g, b, 1.0);
+                    }
+                `
+            };
+
+            const chromaticPass = new ShaderPass(chromaticAberrationShader);
+            composer.addPass(chromaticPass);
+
+            const outputPass = new OutputPass();
+            composer.addPass(outputPass);
+
+            // Store for animation
+            scene.userData.chromaticPass = chromaticPass;
+        }
+
+        function initFloatingPreview() {
+            // Initialize a smaller scene for product preview (optional enhancement)
+            const previewCanvas = document.getElementById('floating-preview');
+            floatingScene = new THREE.Scene();
+            floatingCamera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+            floatingCamera.position.z = 5;
+
+            floatingRenderer = new THREE.WebGLRenderer({
+                canvas: previewCanvas,
+                antialias: true,
+                alpha: true
+            });
+            floatingRenderer.setSize(300, 300);
+            floatingRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            const time = clock.getElapsedTime();
+            const delta = clock.getDelta();
+
+            // Smooth scroll interpolation
+            scrollY += (targetScrollY - scrollY) * 0.1;
+
+            // Update morphing geometry
+            if (morphingGeometry) {
+                morphingGeometry.material.uniforms.uTime.value = time;
+                morphingGeometry.rotation.y = time * 0.1;
+                morphingGeometry.rotation.x = Math.sin(time * 0.2) * 0.2;
+
+                // Update colors based on scroll position
+                const scrollProgress = scrollY / (document.body.scrollHeight - window.innerHeight);
+                updateThemeColors(scrollProgress);
+            }
+
+            // Animate particles
+            if (particles) {
+                particles.rotation.y += 0.0005;
+                particles.rotation.x += 0.0002;
+
+                const positions = particles.geometry.attributes.position.array;
+                const velocities = particles.geometry.userData.velocities;
+
+                for (let i = 0; i < positions.length; i += 3) {
+                    positions[i] += velocities[i];
+                    positions[i + 1] += velocities[i + 1];
+                    positions[i + 2] += velocities[i + 2];
+
+                    // Boundary check - wrap around
+                    const dist = Math.sqrt(
+                        positions[i] ** 2 + 
+                        positions[i + 1] ** 2 + 
+                        positions[i + 2] ** 2
+                    );
+                    if (dist > 50) {
+                        const scale = 15 / dist;
+                        positions[i] *= scale;
+                        positions[i + 1] *= scale;
+                        positions[i + 2] *= scale;
+                    }
+                }
+                particles.geometry.attributes.position.needsUpdate = true;
+            }
+
+            // Animate orbiting rings
+            rings.forEach(ring => {
+                ring.rotation.x += ring.userData.rotationSpeed.x;
+                ring.rotation.y += ring.userData.rotationSpeed.y;
+                ring.rotation.z += ring.userData.rotationSpeed.z;
+            });
+
+            // Animate floating shapes
+            if (scene.userData.floatingShapes) {
+                scene.userData.floatingShapes.forEach(shape => {
+                    if (shape.userData.baseY !== undefined) {
+                        shape.position.y = shape.userData.baseY + 
+                            Math.sin(time * shape.userData.floatSpeed + shape.userData.floatOffset) * 2;
+                    }
+                    if (shape.userData.rotSpeed) {
+                        shape.rotation.y += shape.userData.rotSpeed;
+                        shape.rotation.z += shape.userData.rotSpeed * 0.5;
+                    }
+                });
+            }
+
+            // Update chromatic aberration
+            if (scene.userData.chromaticPass) {
+                scene.userData.chromaticPass.uniforms.uTime.value = time;
+            }
+
+            // Camera movement based on scroll
+            camera.position.z = 30 - scrollY * 0.01;
+            camera.position.y = scrollY * 0.005;
+
+            // Render
+            composer.render();
+        }
+
+        function updateThemeColors(progress) {
+            let theme;
+            
+            if (progress < 0.25) {
+                // Hero section
+                theme = lerpTheme(themes.hero, themes.blackRose, progress * 4);
+            } else if (progress < 0.5) {
+                // BLACK ROSE section
+                theme = lerpTheme(themes.blackRose, themes.loveHurts, (progress - 0.25) * 4);
+            } else if (progress < 0.75) {
+                // LOVE HURTS section
+                theme = lerpTheme(themes.loveHurts, themes.signature, (progress - 0.5) * 4);
+            } else {
+                // SIGNATURE section
+                theme = themes.signature;
+            }
+
+            // Update morphing geometry colors
+            if (morphingGeometry) {
+                morphingGeometry.material.uniforms.uColor1.value.copy(theme.primary);
+                morphingGeometry.material.uniforms.uColor2.value.copy(theme.secondary);
+                morphingGeometry.material.uniforms.uColor3.value.copy(theme.tertiary);
+            }
+        }
+
+        function lerpTheme(theme1, theme2, t) {
+            return {
+                primary: theme1.primary.clone().lerp(theme2.primary, t),
+                secondary: theme1.secondary.clone().lerp(theme2.secondary, t),
+                tertiary: theme1.tertiary.clone().lerp(theme2.tertiary, t),
+                bg: theme1.bg.clone().lerp(theme2.bg, t)
+            };
+        }
+
+        function onScroll() {
+            targetScrollY = window.scrollY;
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function simulateLoading() {
+            const progressEl = document.getElementById('loader-progress');
+            let progress = 0;
+            
+            const interval = setInterval(() => {
+                progress += Math.random() * 8;
+                if (progress >= 100) {
+                    progress = 100;
+                    clearInterval(interval);
+                    progressEl.textContent = 'Welcome to SkyyRose';
+                    setTimeout(() => {
+                        document.getElementById('loading-screen').classList.add('hidden');
+                    }, 800);
+                } else {
+                    progressEl.textContent = `Loading ${Math.floor(progress)}%`;
+                }
+            }, 100);
+        }
+
+        // Expose to global scope for buttons
+        window.updateThemeColors = updateThemeColors;
+    </script>
+
+    <script>
+        // ============================================
+        // CART FUNCTIONALITY
+        // ============================================
+        
+        let cart = [];
+
+        function addToCart(name, price, emoji, collection) {
+            cart.push({ name, price, emoji, collection });
+            updateCartUI();
+            
+            // Visual feedback
+            const btn = event.target;
+            const originalText = btn.textContent;
+            btn.textContent = '✓ Added!';
+            btn.style.background = collection === 'SIGNATURE' ? '#D4AF37' : 
+                                   collection === 'LOVE HURTS' ? '#E91E63' : '#DC143C';
+            btn.style.color = collection === 'SIGNATURE' ? '#000' : '#fff';
+            
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.style.background = '';
+                btn.style.color = '';
+            }, 1500);
+        }
+
+        function updateCartUI() {
+            // Update count
+            document.getElementById('cart-count').textContent = cart.length;
+
+            // Update items
+            const itemsContainer = document.getElementById('cart-items');
+            
+            if (cart.length === 0) {
+                itemsContainer.innerHTML = '<div class="cart-empty">Your bag is empty</div>';
+            } else {
+                itemsContainer.innerHTML = cart.map((item, index) => `
+                    <div class="cart-item">
+                        <div class="cart-item-image">${item.emoji}</div>
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">$${item.price}</div>
+                        </div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${index})">×</button>
+                    </div>
+                `).join('');
+            }
+
+            // Update total
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('cart-total').textContent = `$${total}`;
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartUI();
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-sidebar').classList.toggle('open');
+        }
+
+        function checkout() {
+            if (cart.length === 0) {
+                alert('Your bag is empty!');
+                return;
+            }
+            
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const items = cart.map(item => item.name).join(', ');
+            
+            alert(`Pre-Order Summary:\n\nItems: ${items}\nTotal: $${total}\n\nThank you for your pre-order! You'll receive a confirmation email shortly.\n\nExpected shipping: Spring 2026`);
+            
+            cart = [];
+            updateCartUI();
+            toggleCart();
+        }
+
+        // Initialize cart UI
+        updateCartUI();
+    </script>
+</body>
+</html>
