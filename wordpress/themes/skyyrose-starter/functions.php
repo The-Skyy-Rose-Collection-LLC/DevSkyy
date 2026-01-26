@@ -136,6 +136,22 @@ function skyyrose_scripts(): void {
         true
     );
 
+    // Luxury Aesthetics (premium visual effects)
+    wp_enqueue_style(
+        'skyyrose-aesthetics',
+        SKYYROSE_URI . '/assets/css/luxury-aesthetics.css',
+        ['skyyrose-style'],
+        SKYYROSE_VERSION
+    );
+
+    wp_enqueue_script(
+        'skyyrose-aesthetics',
+        SKYYROSE_URI . '/assets/js/luxury-aesthetics.js',
+        ['skyyrose-main'],
+        SKYYROSE_VERSION,
+        true
+    );
+
     // Localize script for AJAX
     wp_localize_script('skyyrose-main', 'skyyrose', [
         'ajax_url' => admin_url('admin-ajax.php'),
