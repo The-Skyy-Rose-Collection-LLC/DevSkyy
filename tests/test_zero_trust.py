@@ -254,6 +254,7 @@ class TestCertificateAuthority:
         is_valid = self_signed_ca.verify_certificate(service_cert)
         assert is_valid is True
 
+    @pytest.mark.slow
     def test_verify_certificate_expired(self, self_signed_ca, root_ca):
         """Test certificate verification with expired certificate"""
         from datetime import timedelta

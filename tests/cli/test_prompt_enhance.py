@@ -658,6 +658,7 @@ class TestIntegrationLight:
         assert data["analysis"]["clarity_score"] > 0
         assert len(data["techniques"]["applied"]) > 0
 
+    @pytest.mark.slow
     @patch.dict("os.environ", {"ANTHROPIC_API_KEY": ""}, clear=False)
     def test_all_task_types_work(self, runner: CliRunner) -> None:
         """All task types should work without errors."""

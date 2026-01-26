@@ -161,13 +161,16 @@ jobs:
           MINIMUM_FIDELITY_SCORE: "95.0"
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@b9fd7d16f6d7d1b5d2bec1a2887e65ceed900238  # v4
-        with:
-          files: coverage.xml
-          flags: python
-          fail_ci_if_error: false
         env:
           CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+        run: |
+          curl -Os https://cli.codecov.io/latest/linux/codecov
+          chmod +x codecov
+          ./codecov --verbose upload-process \
+            --fail-on-error=false \
+            -t "$CODECOV_TOKEN" \
+            -f coverage.xml \
+            -F python || true
 
       - name: Upload test results
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4
