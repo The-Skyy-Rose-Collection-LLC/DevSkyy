@@ -17,10 +17,8 @@ from uuid import uuid4
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 
+from core.task_status_store import TaskStatusStore, get_initialized_task_status_store
 from security.jwt_oauth2_auth import TokenPayload, get_current_user
-
-# In-memory task status store (replace with Redis in production)
-_bulk_task_status: dict[str, dict[str, Any]] = {}
 
 # Configure logging
 logger = logging.getLogger(__name__)
@@ -120,21 +118,34 @@ async def _process_bulk_products_background(
     action: str,
     products: list[dict[str, Any]],
     user_id: str,
+    store: TaskStatusStore,
 ) -> None:
     """Process bulk product operations in the background.
 
     This prevents request timeouts for large batch operations.
     Results can be polled via GET /commerce/products/bulk/{operation_id}/status
+
+    Args:
+        operation_id: Unique operation identifier
+        action: Bulk operation type (create, update, delete)
+        products: List of product data to process
+        user_id: ID of user who initiated the operation
+        store: TaskStatusStore for persisting status (Redis-backed)
     """
     logger.info(f"Background task started: {operation_id}")
 
+    started_at = datetime.now(UTC).isoformat()
+
     try:
-        _bulk_task_status[operation_id] = {
-            "status": "processing",
-            "progress": 0,
-            "total": len(products),
-            "started_at": datetime.now(UTC).isoformat(),
-        }
+        await store.set_status(
+            operation_id,
+            {
+                "status": "processing",
+                "progress": 0,
+                "total": len(products),
+                "started_at": started_at,
+            },
+        )
 
         results = []
         successful = 0
@@ -168,30 +179,37 @@ async def _process_bulk_products_background(
                 )
                 successful += 1
 
-            # Update progress
-            _bulk_task_status[operation_id]["progress"] = i + 1
+            # Update progress periodically (every 10 items to reduce Redis calls)
+            if (i + 1) % 10 == 0 or i == len(products) - 1:
+                await store.update_status(operation_id, {"progress": i + 1})
 
         # Store final results
-        _bulk_task_status[operation_id] = {
-            "status": "completed",
-            "progress": len(products),
-            "total": len(products),
-            "started_at": _bulk_task_status[operation_id]["started_at"],
-            "completed_at": datetime.now(UTC).isoformat(),
-            "action": action,
-            "successful": successful,
-            "failed": failed,
-            "results": results,
-        }
+        await store.set_status(
+            operation_id,
+            {
+                "status": "completed",
+                "progress": len(products),
+                "total": len(products),
+                "started_at": started_at,
+                "completed_at": datetime.now(UTC).isoformat(),
+                "action": action,
+                "successful": successful,
+                "failed": failed,
+                "results": results,
+            },
+        )
         logger.info(f"Background task completed: {operation_id}")
 
     except Exception as e:
         logger.error(f"Background task failed: {operation_id}: {e}", exc_info=True)
-        _bulk_task_status[operation_id] = {
-            "status": "failed",
-            "error": str(e),
-            "completed_at": datetime.now(UTC).isoformat(),
-        }
+        await store.set_status(
+            operation_id,
+            {
+                "status": "failed",
+                "error": str(e),
+                "completed_at": datetime.now(UTC).isoformat(),
+            },
+        )
 
 
 # =============================================================================
@@ -224,6 +242,7 @@ async def bulk_product_operations(
     request: BulkProductRequest,
     background_tasks: BackgroundTasks,
     user: TokenPayload = Depends(get_current_user),
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
 ) -> BulkProductResponse:
     """Perform bulk operations on products.
 
@@ -256,13 +275,14 @@ async def bulk_product_operations(
 
     # For large batches, use background processing to prevent timeouts
     if len(request.products) > 50 and not request.validate_only:
-        # Start background task
+        # Start background task with Redis-backed store
         background_tasks.add_task(
             _process_bulk_products_background,
             operation_id,
             request.action,
             request.products,
             user.sub,
+            store,
         )
 
         # Return immediately with task reference
@@ -334,6 +354,7 @@ async def bulk_product_operations(
 async def get_bulk_operation_status(
     operation_id: str,
     user: TokenPayload = Depends(get_current_user),
+    store: TaskStatusStore = Depends(get_initialized_task_status_store),
 ) -> BulkTaskStatusResponse:
     """Get the status of a background bulk operation.
 
@@ -342,6 +363,7 @@ async def get_bulk_operation_status(
     Args:
         operation_id: The operation ID returned from POST /products/bulk
         user: Authenticated user (from JWT token)
+        store: TaskStatusStore for retrieving status (Redis-backed)
 
     Returns:
         BulkTaskStatusResponse with current status and progress
@@ -349,13 +371,13 @@ async def get_bulk_operation_status(
     Raises:
         HTTPException: If operation not found
     """
-    if operation_id not in _bulk_task_status:
+    status_data = await store.get_status(operation_id)
+
+    if status_data is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Operation {operation_id} not found",
         )
-
-    status_data = _bulk_task_status[operation_id]
 
     return BulkTaskStatusResponse(
         operation_id=operation_id,

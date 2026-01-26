@@ -61,9 +61,14 @@ class VectorSearchCache:
     def _generate_key(
         self, embedding: list[float], top_k: int, filter_metadata: dict | None
     ) -> str:
-        """Generate a cache key from embedding and search params."""
+        """Generate a cache key from embedding and search params.
+
+        Uses 64 dimensions and 8 decimal precision to reduce cache collisions
+        while maintaining reasonable key sizes.
+        """
         # Round embedding values to reduce key variations
-        rounded_emb = [round(v, 6) for v in embedding[:32]]  # First 32 dims for key
+        # Use 64 dims and 8 decimal precision to minimize collision risk
+        rounded_emb = [round(v, 8) for v in embedding[:64]]
         content = json.dumps({"e": rounded_emb, "k": top_k, "f": filter_metadata}, sort_keys=True)
         return hashlib.sha256(content.encode("utf-8")).hexdigest()[:32]
 
