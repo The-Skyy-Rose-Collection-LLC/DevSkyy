@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGNATURE Collection | SkyyRose</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --signature-gold: #D4AF37;
+            --signature-cream: #F5F0E6;
+            --signature-dark: #B8960C;
+            --champagne: #F7E7CE;
+            --bronze: #CD7F32;
+            --text-primary: #1A1A1A;
+            --bg-dark: #0A0A0A;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* Art Deco Pattern Overlay */
+        .art-deco-pattern {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 1;
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 50px,
+                rgba(212, 175, 55, 0.02) 50px,
+                rgba(212, 175, 55, 0.02) 100px
+            );
+        }
+
+        /* Navigation */
+        .navbar {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 1000;
+            padding: 1.5rem 4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s ease;
+            background: transparent;
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem 4rem;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            background: linear-gradient(135deg, var(--signature-gold), var(--champagne));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -8px; left: 0;
+            width: 0; height: 1px;
+            background: var(--signature-gold);
+            transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover::after { width: 100%; }
+        .nav-links a:hover { color: var(--signature-gold); }
+
+        .nav-actions {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav-icon {
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.3s ease;
+            background: none;
+            border: none;
+        }
+
+        .nav-icon:hover { color: var(--signature-gold); }
+
+        .cart-count {
+            position: absolute;
+            top: -8px; right: -8px;
+            background: var(--signature-gold);
+            color: var(--bg-dark);
+            font-size: 0.65rem;
+            width: 18px; height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px; height: 600px;
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            border-radius: 50%;
+            animation: pulseRing 4s ease-in-out infinite;
+        }
+
+        @keyframes pulseRing {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.1; }
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 10;
+            padding: 2rem;
+        }
+
+        .collection-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--signature-gold);
+            color: var(--signature-gold);
+            font-size: 0.75rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 5rem;
+            font-weight: 400;
+            letter-spacing: 12px;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--signature-gold) 0%, var(--champagne) 50%, var(--signature-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 500px;
+            margin: 0 auto 3rem;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 3rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: rgba(212, 175, 55, 0.5);
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(10px); }
+        }
+
+        /* Craftsmanship Section */
+        .craftsmanship-section {
+            padding: 8rem 4rem;
+            background: linear-gradient(180deg, transparent 0%, rgba(212, 175, 55, 0.03) 100%);
+        }
+
+        .craftsmanship-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            align-items: center;
+        }
+
+        .craftsmanship-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: var(--signature-gold);
+        }
+
+        .craftsmanship-content p {
+            font-size: 1rem;
+            line-height: 2;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+
+        .craftsmanship-features {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--signature-gold);
+        }
+
+        .feature-item h4 {
+            font-size: 0.9rem;
+            margin-bottom: 0.3rem;
+            color: #fff;
+        }
+
+        .feature-item p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 0;
+        }
+
+        .craftsmanship-image {
+            aspect-ratio: 4/5;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(205, 127, 50, 0.1));
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 6rem;
+        }
+
+        /* Products Section */
+        .products-section {
+            padding: 6rem 4rem;
+            position: relative;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .section-header p {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 1rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .product-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 175, 55, 0.15);
+            border-radius: 4px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+            position: relative;
+        }
+
+        .product-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--signature-gold);
+            box-shadow: 0 20px 60px rgba(212, 175, 55, 0.15);
+        }
+
+        .product-image {
+            aspect-ratio: 3/4;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.15), rgba(205, 127, 50, 0.1));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .product-image::before {
+            content: '◆';
+            font-size: 3rem;
+            color: rgba(212, 175, 55, 0.2);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 1rem; left: 1rem;
+            background: var(--signature-gold);
+            color: var(--bg-dark);
+            padding: 0.3rem 0.8rem;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .quick-add {
+            position: absolute;
+            bottom: 1rem; left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: var(--signature-gold);
+            color: var(--bg-dark);
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .product-card:hover .quick-add {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .quick-add:hover {
+            background: #fff;
+        }
+
+        .product-info {
+            padding: 1.5rem;
+        }
+
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-name a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .product-name a:hover { color: var(--signature-gold); }
+
+        .product-price {
+            font-size: 1.1rem;
+            color: var(--signature-gold);
+            font-weight: 500;
+        }
+
+        /* Quality Promise Section */
+        .quality-section {
+            padding: 8rem 4rem;
+            background: radial-gradient(ellipse at center, rgba(212, 175, 55, 0.08) 0%, transparent 60%);
+            text-align: center;
+        }
+
+        .quality-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--signature-gold);
+        }
+
+        .quality-section > p {
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto 4rem;
+            line-height: 1.8;
+        }
+
+        .quality-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .quality-item {
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(212, 175, 55, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .quality-item:hover {
+            border-color: var(--signature-gold);
+            transform: translateY(-5px);
+        }
+
+        .quality-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .quality-item h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.2rem;
+            margin-bottom: 0.5rem;
+            color: var(--champagne);
+        }
+
+        .quality-item p {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 4rem;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.08) 0%, rgba(205, 127, 50, 0.05) 100%);
+        }
+
+        .cta-section h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-section p {
+            color: rgba(255, 255, 255, 0.7);
+            max-width: 600px;
+            margin: 0 auto 2rem;
+            line-height: 1.8;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 1rem 3rem;
+            background: var(--signature-gold);
+            color: var(--bg-dark);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            border: 2px solid var(--signature-gold);
+            transition: all 0.3s ease;
+        }
+
+        .cta-btn:hover {
+            background: transparent;
+            color: var(--signature-gold);
+        }
+
+        /* Footer */
+        footer {
+            background: #050505;
+            padding: 5rem 4rem 2rem;
+            border-top: 1px solid rgba(212, 175, 55, 0.1);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr repeat(4, 1fr);
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+        }
+
+        .footer-brand .logo {
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            display: inline-block;
+        }
+
+        .footer-brand p {
+            color: rgba(255, 255, 255, 0.5);
+            line-height: 1.8;
+            font-size: 0.9rem;
+        }
+
+        .footer-column h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            color: var(--signature-gold);
+        }
+
+        .footer-column ul { list-style: none; }
+        .footer-column li { margin-bottom: 0.8rem; }
+
+        .footer-column a {
+            color: rgba(255, 255, 255, 0.5);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-column a:hover { color: var(--signature-gold); }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            padding-top: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .footer-bottom p {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .social-links a {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.2rem;
+            transition: color 0.3s ease;
+        }
+
+        .social-links a:hover { color: var(--signature-gold); }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero h1 { font-size: 3.5rem; }
+            .craftsmanship-grid { grid-template-columns: 1fr; }
+            .quality-grid { grid-template-columns: repeat(2, 1fr); }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 768px) {
+            .navbar { padding: 1rem 2rem; }
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.5rem; letter-spacing: 6px; }
+            .products-section, .craftsmanship-section, .quality-section { padding: 4rem 2rem; }
+            .quality-grid { grid-template-columns: 1fr; }
+            .footer-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Art Deco Pattern -->
+    <div class="art-deco-pattern"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="homepage.html" class="logo">SKYYROSE</a>
+        <ul class="nav-links">
+            <li><a href="collection-black-rose.html">Black Rose</a></li>
+            <li><a href="collection-love-hurts.html">Love Hurts</a></li>
+            <li><a href="collection-signature.html" style="color: var(--signature-gold);">Signature</a></li>
+            <li><a href="about.html">About</a></li>
+            <li><a href="blog.html">Journal</a></li>
+        </ul>
+        <div class="nav-actions">
+            <button class="nav-icon" title="Search">🔍</button>
+            <button class="nav-icon" title="Account">👤</button>
+            <button class="nav-icon" title="Wishlist">♡</button>
+            <button class="nav-icon" onclick="window.location.href='cart.html'" title="Cart">
+                🛒
+                <span class="cart-count" id="cartCount">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="collection-badge">Timeless Luxury</span>
+            <h1>SIGNATURE</h1>
+            <p class="hero-subtitle">The foundation of elegance. Meticulously crafted essentials that transcend trends, built for those who appreciate lasting quality.</p>
+        </div>
+        <div class="scroll-indicator">
+            <span>Discover</span>
+            <span>↓</span>
+        </div>
+    </section>
+
+    <!-- Craftsmanship Section -->
+    <section class="craftsmanship-section">
+        <div class="craftsmanship-grid">
+            <div class="craftsmanship-content">
+                <h2>The Art of Craftsmanship</h2>
+                <p>Every SIGNATURE piece represents the pinnacle of luxury streetwear. We source only the finest materials from renowned mills and work with master craftspeople who share our obsession with perfection.</p>
+                <p>From the initial sketch to the final stitch, each garment undergoes rigorous quality checks to ensure it meets our exacting standards. This is clothing built to be cherished for generations.</p>
+                
+                <div class="craftsmanship-features">
+                    <div class="feature-item">
+                        <span class="feature-icon">✦</span>
+                        <div>
+                            <h4>Premium Materials</h4>
+                            <p>Italian leathers, Japanese denim, Egyptian cotton</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✦</span>
+                        <div>
+                            <h4>Expert Construction</h4>
+                            <p>Hand-finished details by master tailors</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✦</span>
+                        <div>
+                            <h4>Timeless Design</h4>
+                            <p>Classic silhouettes that never date</p>
+                        </div>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">✦</span>
+                        <div>
+                            <h4>Limited Production</h4>
+                            <p>Small batches for exclusivity</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="craftsmanship-image">◆</div>
+        </div>
+    </section>
+
+    <!-- Products Section -->
+    <section class="products-section">
+        <div class="section-header">
+            <h2>The Collection</h2>
+            <p>Investment pieces for the discerning wardrobe</p>
+        </div>
+        <div class="products-grid" id="productsGrid">
+            <!-- Products loaded via JS -->
+        </div>
+    </section>
+
+    <!-- Quality Promise Section -->
+    <section class="quality-section">
+        <h2>Our Quality Promise</h2>
+        <p>Every SIGNATURE piece is backed by our commitment to excellence. We stand behind every stitch, every seam, every detail.</p>
+        <div class="quality-grid">
+            <div class="quality-item">
+                <div class="quality-icon">🏆</div>
+                <h3>Lifetime Warranty</h3>
+                <p>Covers manufacturing defects for the life of the garment</p>
+            </div>
+            <div class="quality-item">
+                <div class="quality-icon">🔧</div>
+                <h3>Free Repairs</h3>
+                <p>Complimentary alterations and repairs for the first year</p>
+            </div>
+            <div class="quality-item">
+                <div class="quality-icon">📦</div>
+                <h3>Premium Packaging</h3>
+                <p>Each piece arrives in our signature luxury presentation</p>
+            </div>
+            <div class="quality-item">
+                <div class="quality-icon">💎</div>
+                <h3>Authenticity Card</h3>
+                <p>Numbered certificate of authenticity with each purchase</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <h2>Invest in Excellence</h2>
+        <p>Join the discerning few who understand that true luxury is an investment in craftsmanship, quality, and timeless style.</p>
+        <a href="checkout.html" class="cta-btn">Shop Signature</a>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="homepage.html" class="logo">SKYYROSE</a>
+                <p>Where love meets luxury. Oakland-born streetwear with a soul, crafted for those who dare to feel deeply and dress boldly.</p>
+            </div>
+            <div class="footer-column">
+                <h4>Shop</h4>
+                <ul>
+                    <li><a href="collection-black-rose.html">Black Rose</a></li>
+                    <li><a href="collection-love-hurts.html">Love Hurts</a></li>
+                    <li><a href="collection-signature.html">Signature</a></li>
+                    <li><a href="homepage.html#new">New Arrivals</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="about.html">Our Story</a></li>
+                    <li><a href="blog.html">Journal</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="#">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Shipping</a></li>
+                    <li><a href="#">Returns</a></li>
+                    <li><a href="#">Size Guide</a></li>
+                    <li><a href="#">FAQ</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                    <li><a href="#">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 SkyyRose. All rights reserved.</p>
+            <div class="social-links">
+                <a href="#" title="Instagram">📷</a>
+                <a href="#" title="Twitter">🐦</a>
+                <a href="#" title="TikTok">🎵</a>
+                <a href="#" title="Pinterest">📌</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Products Data
+        const products = [
+            { id: 'sig1', name: 'Foundation Blazer', price: 495, badge: 'Flagship', image: '🧥' },
+            { id: 'sig2', name: 'Essential Trouser', price: 295, badge: null, image: '👖' },
+            { id: 'sig3', name: 'Luxury Logo Tee', price: 125, badge: 'Bestseller', image: '👕' },
+            { id: 'sig4', name: 'Heritage Overcoat', price: 595, badge: 'Limited', image: '🧥' },
+            { id: 'sig5', name: 'Classic Oxford Shirt', price: 185, badge: null, image: '👔' },
+            { id: 'sig6', name: 'Premium Knit Polo', price: 165, badge: 'New', image: '👕' },
+            { id: 'sig7', name: 'Signature Cashmere Sweater', price: 385, badge: null, image: '🧶' },
+            { id: 'sig8', name: 'Executive Leather Belt', price: 145, badge: null, image: '〰️' }
+        ];
+
+        // Render Products
+        function renderProducts() {
+            const grid = document.getElementById('productsGrid');
+            grid.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <div class="product-image">
+                        ${p.badge ? `<span class="product-badge">${p.badge}</span>` : ''}
+                        <button class="quick-add" onclick="addToCart('${p.id}', '${p.name}', ${p.price})">Quick Add</button>
+                    </div>
+                    <div class="product-info">
+                        <h3 class="product-name"><a href="single-product.html?id=${p.id}&collection=signature">${p.name}</a></h3>
+                        <p class="product-price">$${p.price}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart Functions
+        function getCart() {
+            return JSON.parse(localStorage.getItem('skyyrose_cart') || '[]');
+        }
+
+        function saveCart(cart) {
+            localStorage.setItem('skyyrose_cart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        function addToCart(id, name, price) {
+            const cart = getCart();
+            const existing = cart.find(item => item.id === id);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                cart.push({ id, name, price, quantity: 1, collection: 'signature' });
+            }
+            saveCart(cart);
+            showNotification(`${name} added to cart`);
+        }
+
+        function updateCartCount() {
+            const cart = getCart();
+            const count = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartCount').textContent = count;
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed; bottom: 2rem; right: 2rem;
+                background: var(--signature-gold); color: var(--bg-dark);
+                padding: 1rem 2rem; border-radius: 4px;
+                z-index: 10000; animation: slideIn 0.3s ease;
+                font-weight: 600;
+            `;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            setTimeout(() => notification.remove(), 3000);
+        }
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            navbar.classList.toggle('scrolled', window.scrollY > 50);
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCartCount();
+        });
+    </script>
+</body>
+</html>
