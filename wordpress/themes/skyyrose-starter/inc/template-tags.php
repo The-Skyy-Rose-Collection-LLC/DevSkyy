@@ -8,16 +8,20 @@
 defined('ABSPATH') || exit;
 
 /**
- * Display the logo
+ * Display the logo with WebP support
  */
 function skyyrose_logo(): void {
     if (has_custom_logo()) {
         the_custom_logo();
     } else {
-        $logo_url = SKYYROSE_URI . '/assets/images/logos/skyyrose-logo.png';
+        $logo_png = SKYYROSE_URI . '/assets/images/logos/skyyrose-logo.png';
+        $logo_webp = SKYYROSE_URI . '/assets/images/logos/skyyrose-logo.webp';
         ?>
         <a href="<?php echo esc_url(home_url('/')); ?>" class="logo">
-            <img src="<?php echo esc_url($logo_url); ?>" alt="SkyyRose" class="site-logo" width="180" height="60">
+            <picture>
+                <source srcset="<?php echo esc_url($logo_webp); ?>" type="image/webp">
+                <img src="<?php echo esc_url($logo_png); ?>" alt="SkyyRose" class="site-logo" width="180" height="60" loading="eager" decoding="async">
+            </picture>
         </a>
         <?php
     }
@@ -164,9 +168,14 @@ function skyyrose_collection_cards(): void {
         <div class="collection-card <?php echo esc_attr($slug); ?>">
             <div class="collection-bg" style="--collection-color: <?php echo esc_attr($collection['color']); ?>"></div>
             <div class="collection-content">
-                <?php if (!empty($collection['logo'])) : ?>
+                <?php if (!empty($collection['logo'])) :
+                    $logo_webp = preg_replace('/\.(jpg|jpeg|png)$/i', '.webp', $collection['logo']);
+                ?>
                 <div class="collection-logo">
-                    <img src="<?php echo esc_url($collection['logo']); ?>" alt="<?php echo esc_attr($collection['name']); ?>" loading="lazy">
+                    <picture>
+                        <source srcset="<?php echo esc_url($logo_webp); ?>" type="image/webp">
+                        <img src="<?php echo esc_url($collection['logo']); ?>" alt="<?php echo esc_attr($collection['name']); ?>" loading="lazy" decoding="async">
+                    </picture>
                 </div>
                 <?php endif; ?>
                 <h3 class="collection-name"><?php echo esc_html($collection['name']); ?></h3>
