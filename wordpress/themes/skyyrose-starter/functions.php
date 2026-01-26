@@ -183,18 +183,21 @@ function skyyrose_get_collections(): array {
             'tagline'     => 'Dark elegance for the bold',
             'color'       => '#8B0000',
             'category_id' => get_option('skyyrose_blackrose_cat', 0),
+            'logo'        => SKYYROSE_URI . '/assets/images/logos/black-rose-logo.jpg',
         ],
         'love-hurts' => [
             'name'        => 'LOVE HURTS',
             'tagline'     => 'Where emotion meets fashion',
             'color'       => '#B76E79',
             'category_id' => get_option('skyyrose_lovehurts_cat', 0),
+            'logo'        => SKYYROSE_URI . '/assets/images/logos/love-hurts-logo.jpg',
         ],
         'signature' => [
             'name'        => 'SIGNATURE',
             'tagline'     => 'Timeless luxury essentials',
             'color'       => '#D4AF37',
             'category_id' => get_option('skyyrose_signature_cat', 0),
+            'logo'        => SKYYROSE_URI . '/assets/images/logos/signature-logo.png',
         ],
     ];
 }
