@@ -599,12 +599,12 @@ jobs:
 
       - name: Deploy frontend to Vercel
         uses: amondnet/vercel-action@16e87c0a08142b0d0d33b76aeaf20823c381b9b9  # v25
+        continue-on-error: true
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           working-directory: ./frontend
-        if: ${{ secrets.VERCEL_TOKEN != '' }}
 
       - name: Deploy backend to Render
         run: |
@@ -647,13 +647,13 @@ jobs:
 
       - name: Deploy frontend to Vercel (Production)
         uses: amondnet/vercel-action@16e87c0a08142b0d0d33b76aeaf20823c381b9b9  # v25
+        continue-on-error: true
         with:
           vercel-token: ${{ secrets.VERCEL_TOKEN }}
           vercel-org-id: ${{ secrets.VERCEL_ORG_ID }}
           vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID }}
           vercel-args: '--prod'
           working-directory: ./frontend
-        if: ${{ secrets.VERCEL_TOKEN != '' }}
 
       - name: Deploy backend to Render (Production)
         run: |
