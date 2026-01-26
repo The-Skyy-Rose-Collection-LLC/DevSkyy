@@ -105,8 +105,9 @@ class TestWordPressEndpoints:
             assert data["brand_name"] == "TestBrand"
 
 
+@pytest.mark.slow
 class TestMLEndpoints:
-    """Test machine learning prediction endpoints."""
+    """Test machine learning prediction endpoints (slow - ML operations)."""
 
     def test_ml_prediction_trend(self, client, auth_headers):
         """Test POST /api/v1/ml/predict with trend prediction."""

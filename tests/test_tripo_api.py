@@ -267,8 +267,9 @@ class TestImageTo3DGeneration:
         assert request.format == ModelFormat.GLB
         assert request.remove_background is True
 
+    @pytest.mark.slow
     def test_generate_from_image_endpoint(self, client: TestClient, auth_headers: dict) -> None:
-        """Test the image-to-3D generation endpoint."""
+        """Test the image-to-3D generation endpoint (slow - rate limited)."""
         payload = {
             "image_url": "https://example.com/design.jpg",
             "format": "glb",
