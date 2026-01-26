@@ -120,6 +120,22 @@ function skyyrose_scripts(): void {
         true
     );
 
+    // Conversion Boosters (sales-driving features)
+    wp_enqueue_style(
+        'skyyrose-conversion',
+        SKYYROSE_URI . '/assets/css/conversion-boosters.css',
+        ['skyyrose-style'],
+        SKYYROSE_VERSION
+    );
+
+    wp_enqueue_script(
+        'skyyrose-conversion',
+        SKYYROSE_URI . '/assets/js/conversion-boosters.js',
+        ['skyyrose-main'],
+        SKYYROSE_VERSION,
+        true
+    );
+
     // Localize script for AJAX
     wp_localize_script('skyyrose-main', 'skyyrose', [
         'ajax_url' => admin_url('admin-ajax.php'),
