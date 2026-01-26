@@ -14,8 +14,11 @@ function skyyrose_logo(): void {
     if (has_custom_logo()) {
         the_custom_logo();
     } else {
+        $logo_url = SKYYROSE_URI . '/assets/images/logos/skyyrose-logo.png';
         ?>
-        <a href="<?php echo esc_url(home_url('/')); ?>" class="logo">SKYYROSE</a>
+        <a href="<?php echo esc_url(home_url('/')); ?>" class="logo">
+            <img src="<?php echo esc_url($logo_url); ?>" alt="SkyyRose" class="site-logo" width="180" height="60">
+        </a>
         <?php
     }
 }
@@ -161,6 +164,11 @@ function skyyrose_collection_cards(): void {
         <div class="collection-card <?php echo esc_attr($slug); ?>">
             <div class="collection-bg" style="--collection-color: <?php echo esc_attr($collection['color']); ?>"></div>
             <div class="collection-content">
+                <?php if (!empty($collection['logo'])) : ?>
+                <div class="collection-logo">
+                    <img src="<?php echo esc_url($collection['logo']); ?>" alt="<?php echo esc_attr($collection['name']); ?>" loading="lazy">
+                </div>
+                <?php endif; ?>
                 <h3 class="collection-name"><?php echo esc_html($collection['name']); ?></h3>
                 <p class="collection-tagline"><?php echo esc_html($collection['tagline']); ?></p>
                 <a href="<?php echo esc_url($link); ?>" class="collection-link">
