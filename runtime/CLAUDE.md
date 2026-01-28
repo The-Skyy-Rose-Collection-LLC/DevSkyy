@@ -28,11 +28,12 @@ class SafeCodeExecutor:
         return subprocess.run(["python", "-c", code], capture_output=True, timeout=30)
 ```
 
-## Security
-| Rule | Enforcement |
-|------|-------------|
-| No file access | AST validation |
-| No network | Blocked imports |
-| Timeout | 30s default |
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
+- **Agent**: `security-reviewer` for sandbox review
 
 **"Never trust user code. Always sandbox."**

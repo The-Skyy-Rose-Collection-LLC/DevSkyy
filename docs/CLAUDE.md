@@ -34,11 +34,15 @@ Common issues and solutions.
 | Guides | How-to | docs/guides/ |
 | Runbooks | Operations | docs/runbooks/ |
 
-## USE THESE TOOLS (MANDATORY)
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | Update docs | **Agent**: `doc-updater` |
 | Generate codemaps | **Command**: `/update-codemaps` |
-| API docs | **MCP**: `tool_catalog` |
 
 **"If it's not documented, it doesn't exist."**

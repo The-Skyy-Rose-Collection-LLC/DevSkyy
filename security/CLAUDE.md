@@ -32,7 +32,12 @@ class SecurityValidator:
 | Validation | XSS/SQLi prevention |
 | Audit | Immutable logging |
 
-## Related
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 - **Agent**: `security-reviewer` | **Skill**: `security-review`
 
 **"Security is not a feature. It's the foundation."**

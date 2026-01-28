@@ -4,10 +4,11 @@
 
 ## Protocol
 1. **Context7** → `resolve-library-id` → `get-library-docs` (BEFORE library code)
-2. **Navigate** → Read first, understand, NO code until clear
-3. **Implement** → `str_replace` (targeted) | `create_file` (new only)
-4. **Test** → `pytest -v` (MANDATORY after EVERY file touch)
-5. **Format** → `isort . && ruff check --fix && black .`
+2. **Serena** → Codebase navigation and symbol lookup
+3. **Navigate** → Read first, understand, NO code until clear
+4. **Implement** → `str_replace` (targeted) | `create_file` (new only)
+5. **Test** → `pytest -v` (MANDATORY after EVERY file touch)
+6. **Format** → `isort . && ruff check --fix && black .`
 
 ## MCP Tools
 **DevSkyy**: `agent_orchestrator` `rag_query` `brand_context` `product_search` `wordpress_sync` `3d_generate` `analytics_query` `health_check`

@@ -27,12 +27,16 @@ def deploy(target: Target, env: str = "production", dry_run: bool = False):
 | cleanup_*.py (5) | maintenance/cleanup.py |
 | generate_*_3d*.py (6) | generation/3d_assets.py |
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | WordPress deploy | **MCP**: `wordpress_sync` |
 | Vercel deploy | **MCP**: Vercel `deploy_to_vercel` |
 | 3D generation | **MCP**: `3d_generate` |
-| Cleanup review | **Agent**: `refactor-cleaner` |
 
 **"138 scripts is chaos. 50 is a toolkit."**

@@ -36,7 +36,12 @@ alembic upgrade head                             # Apply
 alembic downgrade -1                             # Rollback
 ```
 
-## Related
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 - **MCP**: `analytics_query` | **Skill**: `backend-patterns`
 
 **"Every migration is reviewed. Every rollback is planned."**
