@@ -298,6 +298,9 @@ SEO Rules:
         """Initialize SkyyRose Content Agent."""
         from adk.base import AgentConfig as _AgentConfig, ADKProvider as _ADKProvider
 
+        # Extract agent-specific kwargs before passing to super
+        self._default_wp_client: Any = kwargs.pop("wp_client", None)
+
         if config is None:
             config = _AgentConfig(
                 name=self.AGENT_NAME,
