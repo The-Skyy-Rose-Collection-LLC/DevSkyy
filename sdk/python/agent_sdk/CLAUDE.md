@@ -46,8 +46,8 @@ class RoundTable:
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Agent invocation | **MCP**: `agent_orchestrator` |
-| Multi-agent | **MCP**: `llm_route` for routing |
+| Agent invocation | **MCP**: `multi_agent_workflow` |
+| List agents | **MCP**: `list_agents` |
 | SDK examples | `examples/` folder |
 
 **"An SDK should guide, not constrain."**

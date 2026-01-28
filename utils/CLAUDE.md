@@ -38,7 +38,7 @@ class TokenBucketLimiter:
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Rate limiting | **MCP**: `cache_ops` |
+| Monitoring | **MCP**: `system_monitoring` |
 | Utils review | **Agent**: `code-reviewer` |
 
 **"A utility should do one thing perfectly."**

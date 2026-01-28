@@ -36,7 +36,7 @@ class ToolRegistry:
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Tool debugging | **MCP**: `tool_catalog`, `health_check` |
+| Tool debugging | **MCP**: `list_agents`, `health_check` |
 | Core changes | **Agent**: `architect` for design review |
 
 **"The core serves everyone. It depends on no one."**

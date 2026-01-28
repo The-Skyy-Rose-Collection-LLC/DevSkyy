@@ -35,8 +35,8 @@ def deploy(target: Target, env: str = "production", dry_run: bool = False):
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| WordPress deploy | **MCP**: `wordpress_sync` |
-| Vercel deploy | **MCP**: Vercel `deploy_to_vercel` |
-| 3D generation | **MCP**: `3d_generate` |
+| WordPress deploy | **MCP**: `generate_wordpress_theme` |
+| Vercel deploy | **MCP** (Vercel): `deploy_to_vercel` |
+| 3D generation | **MCP**: `generate_3d_from_description` |
 
 **"138 scripts is chaos. 50 is a toolkit."**

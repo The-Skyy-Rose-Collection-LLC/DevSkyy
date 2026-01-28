@@ -35,7 +35,7 @@ Anthropic (Claude) | OpenAI (GPT) | Google (Gemini) | Mistral | Groq
 3. **Verify**: `pytest -v` after EVERY change
 
 ## USE THESE TOOLS
-- **MCP**: `llm_route` for routing
-- **Skill**: `backend-patterns` for async patterns
+- **MCP**: `multi_agent_workflow` for multi-LLM tasks
+- **MCP**: `system_monitoring` for provider metrics
 
 **"One prompt. Many models. Best answer wins."**

@@ -39,8 +39,8 @@ class SDXLPipeline:
 ## USE THESE TOOLS (MANDATORY)
 | Task | Tool |
 |------|------|
-| Brand context | **MCP**: `brand_context` |
-| Model search | **MCP**: HuggingFace `model_search` |
-| Visual review | **Agent**: `creative_agent` via orchestrator |
+| LoRA generation | **MCP**: `lora_generate`, `lora_upscale` |
+| Product images | **MCP**: `product_caption` |
+| Model search | **MCP** (HF): `model_search` |
 
 **"Luxury is in the details."**

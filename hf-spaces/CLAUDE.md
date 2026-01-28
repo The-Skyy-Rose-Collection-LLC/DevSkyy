@@ -37,7 +37,8 @@ def create_space_app() -> gr.Blocks:
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| 3D generation | **MCP**: `3d_generate` |
-| Model search | **MCP**: HuggingFace `model_search` |
+| 3D from image | **MCP**: `generate_3d_from_image` |
+| Virtual try-on | **MCP**: `virtual_tryon` |
+| LoRA upscale | **MCP**: `lora_upscale` |
 
 **"Every Space is a production service in waiting."**

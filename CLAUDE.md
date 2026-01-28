@@ -11,7 +11,7 @@
 6. **Format** → `isort . && ruff check --fix && black .`
 
 ## MCP Tools
-**DevSkyy** (`devskyy_mcp.py`): `agent_orchestrator` `rag_query` `rag_ingest` `brand_context` `product_search` `order_management` `wordpress_sync` `3d_generate` `analytics_query` `cache_ops` `health_check` `tool_catalog` `llm_route`
+**DevSkyy** (`devskyy_mcp.py`): `multi_agent_workflow` `manage_products` `dynamic_pricing` `generate_wordpress_theme` `generate_3d_from_description` `generate_3d_from_image` `virtual_tryon` `lora_generate` `product_caption` `marketing_campaign` `system_monitoring` `health_check` `list_agents` `scan_code` `fix_code` `self_healing`
 
 | Service | Key Tools |
 |---------|-----------|
@@ -21,21 +21,11 @@
 | **WordPress.com** | `wpcom-mcp-posts-search` `wpcom-mcp-post-get` `wpcom-mcp-site-settings` |
 | **Vercel** | `deploy_to_vercel` `list_deployments` `get_deployment_build_logs` |
 
-## Skills (Read BEFORE Complex Tasks)
-| Task | Path |
-|------|------|
-| SkyyRose brand | `/mnt/skills/user/skyyrose-brand-dna/SKILL.md` |
-| WordPress/WooCommerce | `/mnt/skills/user/wordpress-woocommerce-automation/SKILL.md` |
-| Agent building | `/mnt/skills/user/devskyy-agent-builder/SKILL.md` |
-| MCP debugging | `/mnt/skills/user/mcp-server-debugger/SKILL.md` |
-| RAG optimization | `/mnt/skills/user/rag-query-rewriter/SKILL.md` |
-| Production checks | `/mnt/skills/user/production-readiness-checker/SKILL.md` |
-
 ## Codebase
 ```
 main_enterprise.py        # FastAPI (47+ endpoints)
-devskyy_mcp.py            # MCP server (13 tools)
-agents/                   # 6 SuperAgents + base (17 techniques)
+devskyy_mcp.py            # MCP server (27 tools)
+agents/                   # SuperAgents + base
 llm/                      # 6 providers, router, round_table
 security/                 # AES-256-GCM, JWT, audit_log
 api/v1/                   # REST, gdpr, webhooks

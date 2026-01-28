@@ -43,8 +43,8 @@ templates/elementor/
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Brand assets | **MCP**: `brand_context` |
-| WordPress sync | **MCP**: `wordpress_sync` |
+| WP themes | **MCP**: `generate_wordpress_theme` |
+| WP sync | **MCP** (WP.com): `wpcom-mcp-*` |
 | Template review | **Agent**: `code-reviewer` |
 
 **"Templates are brand promises in code."**

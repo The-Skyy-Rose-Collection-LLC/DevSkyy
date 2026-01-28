@@ -34,7 +34,7 @@ class SuperAgent(EnhancedSuperAgent):
 3. **Verify**: `pytest -v` after EVERY change
 
 ## USE THESE TOOLS
-- **MCP**: `agent_orchestrator` for routing
-- **Skill**: `~/.claude/agents/` for Claude Code agents
+- **MCP**: `multi_agent_workflow` for routing
+- **MCP**: `list_agents` to see available agents
 
 **"Agents don't guess. They plan, execute, and verify."**

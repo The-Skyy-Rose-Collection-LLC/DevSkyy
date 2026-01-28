@@ -42,6 +42,6 @@ alembic downgrade -1                             # Rollback
 3. **Verify**: `pytest -v` after EVERY change
 
 ## USE THESE TOOLS
-- **MCP**: `analytics_query` | **Skill**: `backend-patterns`
+- **MCP**: `system_monitoring` for metrics
 
 **"Every migration is reviewed. Every rollback is planned."**

@@ -38,6 +38,6 @@ async def create_product(
 |------|------|
 | New endpoints | **Agent**: `tdd-guide` (tests first) |
 | Auth/security | **Agent**: `security-reviewer` (ALWAYS) |
-| API docs | **MCP**: `tool_catalog` |
+| API docs | **MCP**: `list_agents` |
 
 **"Document every endpoint. Type every response."**

@@ -38,8 +38,8 @@ class Tripo3DPipeline:
 ## USE THESE TOOLS (MANDATORY)
 | Task | Tool |
 |------|------|
-| 3D generation | **MCP**: `3d_generate` |
-| WordPress sync | **MCP**: `wordpress_sync` |
+| 3D from text | **MCP**: `generate_3d_from_description` |
+| 3D from image | **MCP**: `generate_3d_from_image` |
 | Quality review | **Agent**: `code-reviewer` |
 
 **"3D or it didn't happen."**

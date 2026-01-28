@@ -39,6 +39,6 @@ def health():
 | Task | Tool |
 |------|------|
 | Health check | **MCP**: `health_check` |
-| Tool listing | **MCP**: `tool_catalog` |
+| Tool listing | **MCP**: `list_agents` |
 
 **"Every command should be self-documenting."**

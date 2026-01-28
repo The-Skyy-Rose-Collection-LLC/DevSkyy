@@ -43,7 +43,8 @@ python -m devskyy_workflows quality      # Quality checks
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Deploy | **MCP**: `wordpress_sync`, Vercel `deploy_to_vercel` |
+| WP Deploy | **MCP**: `generate_wordpress_theme` |
+| Vercel | **MCP** (Vercel): `deploy_to_vercel` |
 | Quality | **Command**: `/verify` |
 | Workflow errors | **Agent**: `build-error-resolver` |
 

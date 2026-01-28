@@ -37,6 +37,6 @@ class RAGContextManager:
 3. **Verify**: `pytest -v` after EVERY change
 
 ## USE THESE TOOLS
-- **MCP**: `rag_query`, `rag_ingest` | **Skill**: `rag-ingest`
+- **MCP** (rag_server): `rag_query`, `rag_ingest`, `rag_get_context`
 
 **"Context is king. RAG is the kingmaker."**

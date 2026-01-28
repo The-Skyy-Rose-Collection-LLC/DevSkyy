@@ -41,7 +41,8 @@ async def main(query: str) -> None:
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Running examples | **MCP**: `rag_query`, `agent_orchestrator` |
+| RAG examples | **MCP** (rag_server): `rag_query` |
+| Agent examples | **MCP**: `multi_agent_workflow` |
 | Example testing | **Agent**: `tdd-guide` |
 
 **"Every example should run on first try."**

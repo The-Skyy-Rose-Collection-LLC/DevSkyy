@@ -35,9 +35,9 @@ class WordPressClient(BaseIntegrationClient):
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| WordPress | **MCP**: `wordpress_sync`, `wpcom-mcp-*` |
-| HuggingFace | **MCP**: `model_search`, `dataset_search` |
-| 3D/FASHN | **MCP**: `3d_generate` |
-| Payments | **MCP**: Stripe tools |
+| WordPress | **MCP**: `generate_wordpress_theme`, `wpcom-mcp-*` |
+| HuggingFace | **MCP** (HF): `model_search`, `dataset_search` |
+| 3D | **MCP**: `generate_3d_from_image`, `generate_3d_from_description` |
+| Try-on | **MCP**: `virtual_tryon` |
 
 **"Integrations fail. Good integrations recover."**

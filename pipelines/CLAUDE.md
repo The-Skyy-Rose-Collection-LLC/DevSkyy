@@ -36,8 +36,8 @@ class LuxuryPipeline:
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| 3D generation | **MCP**: `3d_generate` |
-| Brand assets | **MCP**: `brand_context` |
+| 3D generation | **MCP**: `generate_3d_from_description` |
+| LoRA generation | **MCP**: `lora_generate` |
 | Pipeline errors | **Agent**: `build-error-resolver` |
 
 **"Build pipelines that heal themselves."**

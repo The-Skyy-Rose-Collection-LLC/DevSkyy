@@ -1,46 +1,44 @@
 # DevSkyy MCP Servers
 
-> MCP 1.0 compliant, tool-first | 12 files
+> MCP 1.0 compliant, tool-first | Multiple servers
 
 ## Architecture
 ```
 mcp_servers/
-├── devskyy_mcp.py          # Main server (13 tools)
-├── config.py               # Configuration
-└── tools/                  # Tool implementations
+├── rag_server.py           # RAG pipeline (6 tools)
+├── agent_bridge_server.py  # Agent bridge
+├── openai_server.py        # OpenAI proxy
+├── orchestrator.py         # Multi-server orchestration
+├── server_manager.py       # Server lifecycle
+├── context7_client.py      # Context7 integration
+├── serena_client.py        # Serena integration
+└── wordpress-com/          # WP.com MCP
 ```
 
-## Tools (13 Total)
-| Tool | Category | Description |
-|------|----------|-------------|
-| agent_orchestrator | Agents | Invoke SuperAgents |
-| rag_query | Knowledge | Query RAG pipeline |
-| rag_ingest | Knowledge | Ingest documents |
-| brand_context | Brand | SkyyRose DNA |
-| product_search | Commerce | Search products |
-| order_management | Commerce | Manage orders |
-| wordpress_sync | Integration | Sync to WordPress |
-| 3d_generate | Visual | Generate 3D models |
-| analytics_query | Analytics | Query metrics |
-| cache_ops | Ops | Cache management |
-| health_check | Ops | System health |
-| tool_catalog | Meta | List available tools |
-| llm_route | LLM | Route LLM requests |
+## RAG Server Tools (`rag_server.py`)
+| Tool | Description |
+|------|-------------|
+| rag_query | Query RAG pipeline |
+| rag_ingest | Ingest documents |
+| rag_get_context | Get context for query |
+| rag_query_rewrite | Rewrite/expand queries |
+| rag_list_sources | List ingested sources |
+| rag_stats | Pipeline statistics |
+
+## Main MCP Tools (`devskyy_mcp.py` - root)
+`multi_agent_workflow` `manage_products` `dynamic_pricing` `generate_wordpress_theme` `generate_3d_from_description` `virtual_tryon` `lora_generate` `product_caption` `marketing_campaign` `system_monitoring` `health_check` `list_agents` `scan_code` `fix_code`
 
 ## Pattern
 ```python
-@server.tool()
-async def rag_query(query: str, top_k: int = 5) -> dict:
-    context = await rag_manager.get_context(query=query, top_k=top_k)
-    return context.model_dump()
+@mcp.tool()
+async def rag_query(input: RAGQueryInput) -> str:
+    results = await pipeline.search(input.query, top_k=input.top_k)
+    return format_response(results, input.response_format)
 ```
 
 ## BEFORE CODING (MANDATORY)
 1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
 2. **Serena**: Use for codebase navigation and symbol lookup
 3. **Verify**: `pytest -v` after EVERY change
-
-## USE THESE TOOLS
-- **Skill**: `mcp-health` for diagnostics
 
 **"MCP is the future. We're building it today."**

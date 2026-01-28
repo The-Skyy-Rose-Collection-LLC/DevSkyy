@@ -44,6 +44,6 @@ class CommerceTools:
 3. **Verify**: `pytest -v` after EVERY change
 
 ## USE THESE TOOLS
-- **MCP**: `product_search`, `tool_catalog`
+- **MCP**: `manage_products`, `list_agents`
 
 **"Tools should compose like LEGO."**
