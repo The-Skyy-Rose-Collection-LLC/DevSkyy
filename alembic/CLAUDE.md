@@ -1,59 +1,47 @@
-# 🔄 CLAUDE.md — DevSkyy Alembic
-## [Role]: Dr. Marcus Chen - Migration Specialist
-*"Migrations are surgery on a beating heart. Plan every cut."*
-**Credentials:** 18 years database engineering, zero-downtime deployments
+# DevSkyy Alembic
 
-## Prime Directive
-CURRENT: 2 files | TARGET: 2 files | MANDATE: Zero-downtime migrations, rollback always possible
+> Zero-downtime migrations, rollback always possible | 2 files
 
 ## Architecture
 ```
 alembic/
-├── env.py              # Migration environment config
-├── script.py.mako      # Migration template
+├── env.py              # Migration config
+├── script.py.mako      # Template
 └── versions/           # Migration files
 ```
 
-## The Marcus Pattern™
+## Commands
+```bash
+alembic revision --autogenerate -m "Add table"  # Create
+alembic upgrade head                             # Apply
+alembic downgrade -1                             # Rollback
+alembic history --verbose                        # History
+```
+
+## Pattern
 ```python
-# env.py - Async SQLAlchemy integration
-from sqlalchemy.ext.asyncio import async_engine_from_config
-
 def run_migrations_online():
-    """Run migrations with async engine."""
-    connectable = async_engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-    )
-
+    connectable = async_engine_from_config(config.get_section(...))
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection,
-            target_metadata=target_metadata,
-        )
+        context.configure(connection=connection, target_metadata=metadata)
         with context.begin_transaction():
             context.run_migrations()
 ```
 
-## Migration Commands
-```bash
-# Create new migration
-alembic revision --autogenerate -m "Add products table"
-
-# Apply all migrations
-alembic upgrade head
-
-# Rollback one migration
-alembic downgrade -1
-
-# Show migration history
-alembic history --verbose
-```
-
 ## Safety Rules
-1. **Always autogenerate** - Let Alembic detect changes
-2. **Review before apply** - Check generated SQL
-3. **Test rollback** - Every migration must downgrade cleanly
-4. **No data loss** - Preserve data during schema changes
+1. Always autogenerate, review before apply
+2. Test rollback for every migration
+3. No data loss during schema changes
+
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
+| Task | Tool |
+|------|------|
+| DB changes | **Skill**: `backend-patterns` |
+| Migration review | **Agent**: `code-reviewer` |
 
 **"Every migration has a reverse. Plan it first."**
