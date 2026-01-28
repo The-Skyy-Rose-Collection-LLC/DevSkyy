@@ -11,11 +11,36 @@
 6. **Format** → `isort . && ruff check --fix && black .`
 
 ## MCP Tools
-**DevSkyy**: `agent_orchestrator` `rag_query` `brand_context` `product_search` `wordpress_sync` `3d_generate` `analytics_query` `health_check`
-**External**: Figma, Notion, HuggingFace, Vercel, WordPress.com, Stripe, Cloudflare
+**DevSkyy** (`devskyy_mcp.py`): `agent_orchestrator` `rag_query` `rag_ingest` `brand_context` `product_search` `order_management` `wordpress_sync` `3d_generate` `analytics_query` `cache_ops` `health_check` `tool_catalog` `llm_route`
+
+| Service | Key Tools |
+|---------|-----------|
+| **Figma** | `get_design_context` `get_screenshot` `get_metadata` `get_code_connect_map` |
+| **Notion** | `notion-search` `notion-fetch` `notion-create-pages` `notion-update-page` |
+| **HuggingFace** | `model_search` `dataset_search` `paper_search` `hf_doc_search` |
+| **WordPress.com** | `wpcom-mcp-posts-search` `wpcom-mcp-post-get` `wpcom-mcp-site-settings` |
+| **Vercel** | `deploy_to_vercel` `list_deployments` `get_deployment_build_logs` |
+
+## Skills (Read BEFORE Complex Tasks)
+| Task | Path |
+|------|------|
+| SkyyRose brand | `/mnt/skills/user/skyyrose-brand-dna/SKILL.md` |
+| WordPress/WooCommerce | `/mnt/skills/user/wordpress-woocommerce-automation/SKILL.md` |
+| Agent building | `/mnt/skills/user/devskyy-agent-builder/SKILL.md` |
+| MCP debugging | `/mnt/skills/user/mcp-server-debugger/SKILL.md` |
+| RAG optimization | `/mnt/skills/user/rag-query-rewriter/SKILL.md` |
+| Production checks | `/mnt/skills/user/production-readiness-checker/SKILL.md` |
 
 ## Codebase
-`main_enterprise.py` (FastAPI) | `devskyy_mcp.py` (MCP) | `agents/` (6 SuperAgents) | `llm/` (6 providers) | `security/` (AES-256-GCM, JWT) | `tests/` (1200+)
+```
+main_enterprise.py        # FastAPI (47+ endpoints)
+devskyy_mcp.py            # MCP server (13 tools)
+agents/                   # 6 SuperAgents + base (17 techniques)
+llm/                      # 6 providers, router, round_table
+security/                 # AES-256-GCM, JWT, audit_log
+api/v1/                   # REST, gdpr, webhooks
+tests/                    # 1200+ tests
+```
 
 ## Rules
 - Correctness > Elegance > Performance | No deletions, refactor only

@@ -10,7 +10,7 @@ mcp_servers/
 └── tools/                  # Tool implementations
 ```
 
-## Tools
+## Tools (13 Total)
 | Tool | Category | Description |
 |------|----------|-------------|
 | agent_orchestrator | Agents | Invoke SuperAgents |
@@ -18,10 +18,14 @@ mcp_servers/
 | rag_ingest | Knowledge | Ingest documents |
 | brand_context | Brand | SkyyRose DNA |
 | product_search | Commerce | Search products |
+| order_management | Commerce | Manage orders |
 | wordpress_sync | Integration | Sync to WordPress |
 | 3d_generate | Visual | Generate 3D models |
 | analytics_query | Analytics | Query metrics |
+| cache_ops | Ops | Cache management |
 | health_check | Ops | System health |
+| tool_catalog | Meta | List available tools |
+| llm_route | LLM | Route LLM requests |
 
 ## Pattern
 ```python
