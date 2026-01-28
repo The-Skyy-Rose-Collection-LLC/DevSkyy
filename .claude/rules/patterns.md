@@ -1,37 +1,14 @@
 # Common Patterns
 
-## API Response Format
-
+## API Response
 ```typescript
 interface ApiResponse<T> {
-  success: boolean
-  data?: T
-  error?: string
-  meta?: {
-    total: number
-    page: number
-    limit: number
-  }
-}
-```
-
-## Custom Hooks Pattern
-
-```typescript
-export function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value)
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay)
-    return () => clearTimeout(handler)
-  }, [value, delay])
-
-  return debouncedValue
+  success: boolean; data?: T; error?: string
+  meta?: { total: number; page: number; limit: number }
 }
 ```
 
 ## Repository Pattern
-
 ```typescript
 interface Repository<T> {
   findAll(filters?: Filters): Promise<T[]>
@@ -42,14 +19,19 @@ interface Repository<T> {
 }
 ```
 
-## Skeleton Projects
+## Custom Hooks
+```typescript
+function useDebounce<T>(value: T, delay: number): T {
+  const [debounced, setDebounced] = useState(value)
+  useEffect(() => {
+    const timer = setTimeout(() => setDebounced(value), delay)
+    return () => clearTimeout(timer)
+  }, [value, delay])
+  return debounced
+}
+```
 
-When implementing new functionality:
+## New Features
 1. Search for battle-tested skeleton projects
-2. Use parallel agents to evaluate options:
-   - Security assessment
-   - Extensibility analysis
-   - Relevance scoring
-   - Implementation planning
-3. Clone best match as foundation
-4. Iterate within proven structure
+2. Evaluate with parallel agents (security, extensibility)
+3. Clone and iterate within proven structure
