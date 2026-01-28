@@ -29,11 +29,15 @@ def create_space_app() -> gr.Blocks:
 | virtual-tryon | T4 GPU | Real-time try-on |
 | 3d-converter | A10G | Mesh generation |
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | 3D generation | **MCP**: `3d_generate` |
 | Model search | **MCP**: HuggingFace `model_search` |
-| Space deploy | **MCP**: `huggingface_deploy` |
 
 **"Every Space is a production service in waiting."**

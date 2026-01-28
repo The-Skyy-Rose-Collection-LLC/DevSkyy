@@ -33,11 +33,15 @@ async def main(query: str) -> None:
 | Agents | agent_sdk, multi_agent |
 | Integration | webhook, wordpress_3d |
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | Running examples | **MCP**: `rag_query`, `agent_orchestrator` |
 | Example testing | **Agent**: `tdd-guide` |
-| Example docs | **Agent**: `doc-updater` |
 
 **"Every example should run on first try."**

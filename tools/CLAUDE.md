@@ -38,7 +38,12 @@ class CommerceTools:
 | Typed inputs/outputs | Pydantic validation |
 | Error as data | Return ToolResult, never throw |
 
-## Related
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 - **MCP**: `product_search`, `tool_catalog`
 
 **"Tools should compose like LEGO."**

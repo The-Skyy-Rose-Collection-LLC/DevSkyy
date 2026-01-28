@@ -31,7 +31,12 @@ async def rag_query(query: str, top_k: int = 5) -> dict:
     return context.model_dump()
 ```
 
-## Related
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 - **Skill**: `mcp-health` for diagnostics
 
 **"MCP is the future. We're building it today."**

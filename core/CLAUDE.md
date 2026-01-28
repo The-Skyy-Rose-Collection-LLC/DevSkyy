@@ -28,11 +28,15 @@ class ToolRegistry:
     def get(self, name: str) -> BaseTool | None: return self._tools.get(name)
 ```
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | Tool debugging | **MCP**: `tool_catalog`, `health_check` |
 | Core changes | **Agent**: `architect` for design review |
-| Validation issues | **Skill**: `coding-standards` |
 
 **"The core serves everyone. It depends on no one."**

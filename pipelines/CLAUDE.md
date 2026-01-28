@@ -28,12 +28,16 @@ class LuxuryPipeline:
         return results
 ```
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | 3D generation | **MCP**: `3d_generate` |
 | Brand assets | **MCP**: `brand_context` |
 | Pipeline errors | **Agent**: `build-error-resolver` |
-| Visual tasks | **Agent**: `creative_agent` via orchestrator |
 
 **"Build pipelines that heal themselves."**

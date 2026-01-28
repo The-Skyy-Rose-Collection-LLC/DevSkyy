@@ -33,11 +33,15 @@ dataset = load_dataset("imagefolder", data_dir="./data/training")
 | Checkpoints | Save every N steps |
 | Outputs | Clear before commit |
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | Model search | **MCP**: HuggingFace `model_search` |
 | Dataset ops | **MCP**: HuggingFace `dataset_search` |
-| Training monitor | HF Space: `lora-training-monitor` |
 
 **"A notebook should run top-to-bottom without errors."**

@@ -33,11 +33,15 @@ def run_migrations_online():
 2. Test rollback for every migration
 3. No data loss during schema changes
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | DB changes | **Skill**: `backend-patterns` |
 | Migration review | **Agent**: `code-reviewer` |
-| Schema issues | **Agent**: `build-error-resolver` |
 
 **"Every migration has a reverse. Plan it first."**

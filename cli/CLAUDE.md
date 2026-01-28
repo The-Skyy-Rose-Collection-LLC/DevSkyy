@@ -30,11 +30,15 @@ def health():
     console.print("[green]✓ All systems operational[/green]" if result.healthy else f"[red]✗ {result.message}[/red]")
 ```
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | Health check | **MCP**: `health_check` |
 | Tool listing | **MCP**: `tool_catalog` |
-| Server debug | **Skill**: `mcp-health` |
 
 **"Every command should be self-documenting."**

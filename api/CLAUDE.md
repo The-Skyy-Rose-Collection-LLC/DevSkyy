@@ -28,12 +28,16 @@ async def create_product(
     return ProductResponse.model_validate(product)
 ```
 
-## USE THESE TOOLS (MANDATORY)
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | New endpoints | **Agent**: `tdd-guide` (tests first) |
 | Auth/security | **Agent**: `security-reviewer` (ALWAYS) |
 | API docs | **MCP**: `tool_catalog` |
-| WordPress | **MCP**: `wordpress_sync` |
 
 **"Document every endpoint. Type every response."**
