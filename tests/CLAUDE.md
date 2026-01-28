@@ -27,12 +27,16 @@ async def test_rag_retrieval(mock_rag_manager):
     assert len(context.documents) > 0
 ```
 
-## USE THESE TOOLS (MANDATORY)
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 | Task | Tool |
 |------|------|
 | Writing tests | **Agent**: `tdd-guide` (ALWAYS) |
 | E2E tests | **Agent**: `e2e-runner` for Playwright |
 | Test failures | **Agent**: `build-error-resolver` |
-| Coverage check | **Command**: `/verify`, `/tdd` |
 
 **"Red-green-refactor. Every. Single. Time."**

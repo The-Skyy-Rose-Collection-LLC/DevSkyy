@@ -25,7 +25,7 @@
 - **Sources**: `docs/`, `README.md`, `AGENTS.md`, `server.py`
 - **Threshold**: 0.7 similarity | **Max**: 10 results | **Real-time**: Always current
 
-## Best Practices
-- Be specific, mention context (dev/prod/test)
-- Rate limit: 60/min, 1000/hr
-- Health: `/health` | Logs: `logs/mcp_server.log`
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change

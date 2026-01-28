@@ -30,11 +30,15 @@ class TokenBucketLimiter:
         return False
 ```
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Rate limiting | **MCP**: `cache_ops` for Redis-backed limits |
-| Logging issues | **Skill**: `backend-patterns` |
+| Rate limiting | **MCP**: `cache_ops` |
 | Utils review | **Agent**: `code-reviewer` |
 
 **"A utility should do one thing perfectly."**

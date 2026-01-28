@@ -32,10 +32,15 @@ def get_settings() -> Settings:
 | .env.example | Template | Yes |
 | .env | Local | No |
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS
 | Task | Tool |
 |------|------|
-| Missing secrets | **MCP**: `health_check` for env validation |
+| Missing secrets | **MCP**: `health_check` |
 | Config review | **Agent**: `security-reviewer` |
 
 **"12 factors. Zero exceptions."**

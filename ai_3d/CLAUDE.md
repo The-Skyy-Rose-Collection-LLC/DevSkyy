@@ -30,6 +30,11 @@ class Tripo3DPipeline:
 | Time | <30s |
 | Vertices | <100k |
 
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
 ## USE THESE TOOLS (MANDATORY)
 | Task | Tool |
 |------|------|

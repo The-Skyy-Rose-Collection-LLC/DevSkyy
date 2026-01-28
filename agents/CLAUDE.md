@@ -28,7 +28,12 @@ class SuperAgent(EnhancedSuperAgent):
         return result
 ```
 
-## Related
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
 - **MCP**: `agent_orchestrator` for routing
 - **Skill**: `~/.claude/agents/` for Claude Code agents
 
