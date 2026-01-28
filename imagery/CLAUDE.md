@@ -1,78 +1,41 @@
-# 🎨 CLAUDE.md — DevSkyy Imagery
-## [Role]: Dr. Sophia Laurent - Visual AI Director
-*"Every pixel tells a story. Make it luxury."*
-**Credentials:** PhD Computer Vision, 12 years fashion AI imaging
+# DevSkyy Imagery
 
-## Prime Directive
-CURRENT: 14 files | TARGET: 12 files | MANDATE: 95% fidelity, brand-consistent visuals
+> 95% fidelity, brand-consistent visuals | 14 files
 
 ## Architecture
 ```
 imagery/
-├── __init__.py
-├── sdxl_pipeline.py           # Stable Diffusion XL generation
-├── headless_renderer.py       # Server-side rendering
-├── image_processor.py         # Image manipulation
+├── sdxl_pipeline.py           # SDXL generation
 ├── virtual_photoshoot.py      # AI model photography
 ├── lora_trainer.py            # LoRA fine-tuning
-├── lora_version_tracker.py    # Version management
-├── skyyrose_lora_generator.py # Brand-specific LoRA
 ├── quality_gate.py            # Quality assurance
-├── model_fidelity.py          # Fidelity scoring
-├── visual_comparison.py       # A/B comparison
-├── luxury_photography.py      # Premium photo styles
-├── premium_3d_pipeline.py     # 3D rendering
-└── training_progress_reporter.py
+└── luxury_photography.py      # Premium styles
 ```
 
-## The Sophia Pattern™
+## Pattern
 ```python
-from dataclasses import dataclass
-from enum import Enum
-
-class ImageQuality(str, Enum):
-    DRAFT = "draft"       # 512px, fast
-    STANDARD = "standard" # 1024px, balanced
-    PREMIUM = "premium"   # 2048px, highest
-
-@dataclass
-class GenerationResult:
-    image_url: str
-    quality: ImageQuality
-    fidelity_score: float  # 0.0-1.0
-    generation_time_ms: int
-
 class SDXLPipeline:
-    """Brand-consistent SDXL generation."""
-
-    async def generate(
-        self,
-        prompt: str,
-        *,
-        negative_prompt: str | None = None,
-        quality: ImageQuality = ImageQuality.STANDARD,
-        lora_weights: str | None = None,
-    ) -> GenerationResult:
-        # Apply brand context
+    async def generate(self, prompt: str, *, quality: ImageQuality = ImageQuality.STANDARD) -> GenerationResult:
         enhanced_prompt = self._apply_brand_style(prompt)
-
-        # Generate with quality gate
         image = await self._generate_with_retry(enhanced_prompt)
-
-        # Score fidelity
         score = self._calculate_fidelity(image)
         if score < 0.95:
             log.warning("fidelity_below_threshold", score=score)
-
-        return GenerationResult(...)
+        return GenerationResult(image_url=..., fidelity_score=score)
 ```
 
 ## Quality Targets
 | Metric | Target |
 |--------|--------|
-| Fidelity Score | >0.95 |
+| Fidelity | >0.95 |
 | Brand Consistency | 100% |
-| Generation Time | <15s |
-| Resolution | 2048px+ |
+| Time | <15s |
+
+## USE THESE TOOLS (MANDATORY)
+| Task | Tool |
+|------|------|
+| Brand context | **MCP**: `brand_context` |
+| Model search | **MCP**: HuggingFace `model_search` |
+| Visual review | **Agent**: `creative_agent` via orchestrator |
 
 **"Luxury is in the details."**

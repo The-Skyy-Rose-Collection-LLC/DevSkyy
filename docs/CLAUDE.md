@@ -1,55 +1,28 @@
-# 📚 CLAUDE.md — DevSkyy Documentation
-## [Role]: Dr. Emily Watson - Documentation Lead
-*"Documentation is the product's memory. Keep it fresh."*
-**Credentials:** 15 years technical writing, docs-as-code advocate
+# DevSkyy Documentation
 
-## Prime Directive
-CURRENT: 50+ files | TARGET: 40 files | MANDATE: Accurate, searchable, up-to-date
+> Accurate, searchable, up-to-date | 50+ files
 
 ## Architecture
 ```
 docs/
-├── architecture/           # System design docs
-│   └── DEVSKYY_MASTER_PLAN.md
+├── architecture/           # DEVSKYY_MASTER_PLAN.md
 ├── api/                    # API reference
-├── agents/                 # Agent documentation
-├── database/               # Schema docs
-├── deployment/             # Deploy guides
 ├── guides/                 # How-to guides
-│   └── CLAUDE.md
-├── reports/                # Generated reports
 ├── runbooks/               # Operational runbooks
-├── security/               # Security docs
-│   └── ZERO_TRUST_ARCHITECTURE.md
-├── testing/                # Test documentation
-└── archive/                # Historical docs
+└── security/               # ZERO_TRUST_ARCHITECTURE.md
 ```
 
-## The Emily Pattern™
+## Pattern
 ```markdown
 # Feature Name
-
 ## Overview
-Brief description of the feature and its purpose.
-
+Brief description.
 ## Quick Start
 \`\`\`bash
-# Minimal steps to get started
-pip install devskyy
-devskyy serve
+pip install devskyy && devskyy serve
 \`\`\`
-
-## Architecture
-Diagram or description of how it works.
-
 ## API Reference
 | Endpoint | Method | Description |
-|----------|--------|-------------|
-| /api/v1/... | GET | ... |
-
-## Examples
-Real-world usage examples.
-
 ## Troubleshooting
 Common issues and solutions.
 ```
@@ -59,7 +32,13 @@ Common issues and solutions.
 |------|---------|----------|
 | Reference | API specs | docs/api/ |
 | Guides | How-to | docs/guides/ |
-| Architecture | Design | docs/architecture/ |
 | Runbooks | Operations | docs/runbooks/ |
+
+## USE THESE TOOLS (MANDATORY)
+| Task | Tool |
+|------|------|
+| Update docs | **Agent**: `doc-updater` |
+| Generate codemaps | **Command**: `/update-codemaps` |
+| API docs | **MCP**: `tool_catalog` |
 
 **"If it's not documented, it doesn't exist."**
