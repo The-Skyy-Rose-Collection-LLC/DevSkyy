@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@ai-sdk/huggingface": "^0.0.12",
-    "@anthropic-ai/sdk": "^0.57.0",
+    "@anthropic-ai/sdk": "^0.71.2",
     "@apollo/server": "^5.2.0",
     "@copilotkit/react-core": "^1.51.2",
     "@copilotkit/react-ui": "^1.51.2",
