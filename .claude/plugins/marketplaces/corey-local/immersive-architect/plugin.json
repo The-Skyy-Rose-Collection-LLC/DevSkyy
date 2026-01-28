@@ -1,0 +1,98 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "immersive-architect",
+  "version": "2.1.0",
+  "description": "Award-winning immersive WordPress theme development for luxury e-commerce. 5-gate validation system with Three.js/WebGL integration patterns.",
+  "author": {
+    "name": "Corey Foster",
+    "email": "corey@local"
+  },
+  "repository": "",
+  "license": "MIT",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "keywords": [
+    "wordpress",
+    "theme-development",
+    "threejs",
+    "webgl",
+    "woocommerce",
+    "luxury",
+    "e-commerce",
+    "immersive",
+    "3d"
+  ],
+  "commands": [
+    {
+      "name": "theme-plan",
+      "description": "Generate comprehensive theme architecture plan with component hierarchy and asset pipeline",
+      "usage": "/theme-plan [type] [options]",
+      "examples": [
+        "/theme-plan luxury-ecommerce",
+        "/theme-plan portfolio --with-3d",
+        "/theme-plan analyze existing"
+      ]
+    },
+    {
+      "name": "validate",
+      "description": "Run 5-gate validation on theme code: Standards, Performance, Security, Accessibility, SEO",
+      "usage": "/validate [gate] [options]",
+      "examples": [
+        "/validate all",
+        "/validate performance --lighthouse",
+        "/validate security --strict",
+        "/validate a11y"
+      ]
+    },
+    {
+      "name": "component",
+      "description": "Generate immersive component with Three.js/WebGL integration, GSAP animations, and WordPress hooks",
+      "usage": "/component [type] [options]",
+      "examples": [
+        "/component hero-3d",
+        "/component product-viewer --webgl",
+        "/component parallax-section",
+        "/component interactive-gallery"
+      ]
+    },
+    {
+      "name": "optimize",
+      "description": "Performance optimization recommendations for immersive features with Core Web Vitals focus",
+      "usage": "/optimize [target] [options]",
+      "examples": [
+        "/optimize bundle",
+        "/optimize images --webp --avif",
+        "/optimize 3d-assets",
+        "/optimize critical-css"
+      ]
+    }
+  ],
+  "skills": [
+    "theme-validation"
+  ],
+  "permissions": {
+    "fileRead": true,
+    "fileWrite": false,
+    "networkAccess": false,
+    "shellExecution": false
+  },
+  "settings": {
+    "advisoryOnly": true,
+    "requireConfirmation": false,
+    "outputFormat": "markdown",
+    "validationGates": [
+      "standards",
+      "performance",
+      "security",
+      "accessibility",
+      "seo"
+    ],
+    "supportedIntegrations": [
+      "woocommerce",
+      "acf",
+      "elementor",
+      "gutenberg"
+    ]
+  }
+}

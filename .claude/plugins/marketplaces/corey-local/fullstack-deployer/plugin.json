@@ -1,0 +1,88 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "fullstack-deployer",
+  "version": "2.1.0",
+  "description": "Full-stack deployment orchestration for Next.js, WordPress, and hybrid architectures. Generates deployment configs for Vercel, AWS, DigitalOcean, and more.",
+  "author": {
+    "name": "Corey Foster",
+    "email": "corey@local"
+  },
+  "repository": "",
+  "license": "MIT",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "keywords": [
+    "deployment",
+    "fullstack",
+    "nextjs",
+    "wordpress",
+    "vercel",
+    "aws",
+    "digitalocean",
+    "serverless"
+  ],
+  "commands": [
+    {
+      "name": "deploy",
+      "description": "Generate deployment configuration for target platform with environment-specific settings",
+      "usage": "/deploy [platform] [options]",
+      "examples": [
+        "/deploy vercel",
+        "/deploy aws-amplify",
+        "/deploy digitalocean-app",
+        "/deploy docker-swarm"
+      ]
+    },
+    {
+      "name": "validate",
+      "description": "Validate deployment readiness without executing - checks configs, env vars, and dependencies",
+      "usage": "/validate [environment]",
+      "examples": [
+        "/validate staging",
+        "/validate production --strict"
+      ]
+    },
+    {
+      "name": "rollback",
+      "description": "Generate rollback procedures and scripts for current deployment architecture",
+      "usage": "/rollback [strategy]",
+      "examples": [
+        "/rollback plan",
+        "/rollback script --previous-version",
+        "/rollback database"
+      ]
+    },
+    {
+      "name": "env-sync",
+      "description": "Environment variable management, validation, and sync configuration across stages",
+      "usage": "/env-sync [action] [environment]",
+      "examples": [
+        "/env-sync validate",
+        "/env-sync diff staging production",
+        "/env-sync template"
+      ]
+    }
+  ],
+  "skills": [
+    "deployment"
+  ],
+  "permissions": {
+    "fileRead": true,
+    "fileWrite": false,
+    "networkAccess": false,
+    "shellExecution": false
+  },
+  "settings": {
+    "advisoryOnly": true,
+    "requireConfirmation": false,
+    "outputFormat": "markdown",
+    "supportedPlatforms": [
+      "vercel",
+      "aws",
+      "digitalocean",
+      "docker",
+      "kubernetes"
+    ]
+  }
+}

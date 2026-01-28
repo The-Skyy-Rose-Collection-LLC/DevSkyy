@@ -1,0 +1,105 @@
+{
+  "$schema": "https://anthropic.com/claude-code/plugin.schema.json",
+  "name": "security-guidance",
+  "version": "2.1.0",
+  "description": "Comprehensive security analysis covering OWASP Top 10, secret detection, dependency vulnerabilities, and secure coding patterns. Advisory only.",
+  "author": {
+    "name": "Corey Foster",
+    "email": "corey@local"
+  },
+  "repository": "",
+  "license": "MIT",
+  "engines": {
+    "claude-code": ">=1.0.0"
+  },
+  "keywords": [
+    "security",
+    "owasp",
+    "vulnerability",
+    "secrets",
+    "audit",
+    "dependencies",
+    "xss",
+    "sql-injection",
+    "hardening"
+  ],
+  "commands": [
+    {
+      "name": "audit",
+      "description": "Comprehensive security audit covering OWASP Top 10, input validation, authentication, and authorization patterns",
+      "usage": "/audit [scope] [options]",
+      "examples": [
+        "/audit full",
+        "/audit file src/auth.js",
+        "/audit api-endpoints",
+        "/audit --owasp-focus injection"
+      ]
+    },
+    {
+      "name": "secrets",
+      "description": "Scan for exposed secrets, credentials, API keys, tokens, and sensitive data patterns",
+      "usage": "/secrets [action] [options]",
+      "examples": [
+        "/secrets scan",
+        "/secrets scan --include-env",
+        "/secrets patterns",
+        "/secrets remediate"
+      ]
+    },
+    {
+      "name": "deps",
+      "description": "Check dependencies for known CVEs, outdated packages, and supply chain risks",
+      "usage": "/deps [action] [options]",
+      "examples": [
+        "/deps check",
+        "/deps audit --severity high",
+        "/deps update-plan",
+        "/deps licenses"
+      ]
+    },
+    {
+      "name": "harden",
+      "description": "Generate security hardening recommendations for configs, headers, and infrastructure",
+      "usage": "/harden [target] [options]",
+      "examples": [
+        "/harden headers",
+        "/harden nginx",
+        "/harden docker",
+        "/harden csp"
+      ]
+    }
+  ],
+  "skills": [
+    "security"
+  ],
+  "permissions": {
+    "fileRead": true,
+    "fileWrite": false,
+    "networkAccess": false,
+    "shellExecution": false
+  },
+  "settings": {
+    "advisoryOnly": true,
+    "requireConfirmation": false,
+    "outputFormat": "markdown",
+    "severityLevels": [
+      "critical",
+      "high",
+      "medium",
+      "low",
+      "info"
+    ],
+    "owaspCategories": [
+      "injection",
+      "broken-auth",
+      "sensitive-data",
+      "xxe",
+      "broken-access",
+      "misconfig",
+      "xss",
+      "insecure-deserialization",
+      "vulnerable-components",
+      "logging"
+    ]
+  }
+}
