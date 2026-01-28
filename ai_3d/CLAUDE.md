@@ -1,15 +1,10 @@
-# 🎮 CLAUDE.md — DevSkyy AI 3D
-## [Role]: Dr. Maya Okonkwo - 3D Generation Lead
-*"The third dimension is where products come alive."*
-**Credentials:** PhD Computer Graphics, 10 years 3D AI systems
+# DevSkyy AI 3D
 
-## Prime Directive
-CURRENT: 10 files | TARGET: 8 files | MANDATE: 95% fidelity, <30s generation
+> 95% fidelity, <30s generation | 10 files
 
 ## Architecture
 ```
 ai_3d/
-├── __init__.py
 ├── tripo_pipeline.py       # Tripo3D integration
 ├── mesh_optimizer.py       # Geometry optimization
 ├── texture_generator.py    # AI texture synthesis
@@ -17,67 +12,34 @@ ai_3d/
 └── quality_metrics.py      # Fidelity scoring
 ```
 
-## The Maya Pattern™
+## Pattern
 ```python
-from dataclasses import dataclass
-from enum import Enum
-
-class ModelFormat(str, Enum):
-    GLTF = "gltf"
-    GLB = "glb"
-    OBJ = "obj"
-    FBX = "fbx"
-
-@dataclass
-class Model3DResult:
-    model_url: str
-    format: ModelFormat
-    vertices: int
-    file_size_mb: float
-    fidelity_score: float  # 0.0-1.0
-
 class Tripo3DPipeline:
-    """End-to-end 3D generation pipeline."""
-
-    async def generate(
-        self,
-        prompt: str,
-        reference_image: str | None = None,
-        *,
-        format: ModelFormat = ModelFormat.GLB,
-        optimize: bool = True,
-    ) -> Model3DResult:
-        # 1. Generate base mesh
-        task = await self.client.create_task(
-            prompt=prompt,
-            image_url=reference_image,
-        )
-
-        # 2. Poll for completion
+    async def generate(self, prompt: str, reference_image: str | None = None) -> Model3DResult:
+        task = await self.client.create_task(prompt=prompt, image_url=reference_image)
         result = await self._wait_for_task(task.id)
-
-        # 3. Optimize geometry if requested
-        if optimize:
-            result = await self._optimize_mesh(result)
-
-        # 4. Score fidelity
+        result = await self._optimize_mesh(result)
         score = await self._calculate_fidelity(result, reference_image)
-
-        return Model3DResult(
-            model_url=result.model_url,
-            format=format,
-            vertices=result.vertex_count,
-            file_size_mb=result.file_size / 1_000_000,
-            fidelity_score=score,
-        )
+        return Model3DResult(model_url=result.model_url, fidelity_score=score)
 ```
 
 ## Quality Targets
 | Metric | Target |
 |--------|--------|
-| Fidelity Score | >0.95 |
-| Generation Time | <30s |
-| Vertex Count | <100k |
-| File Size | <10MB |
+| Fidelity | >0.95 |
+| Time | <30s |
+| Vertices | <100k |
+
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS (MANDATORY)
+| Task | Tool |
+|------|------|
+| 3D generation | **MCP**: `3d_generate` |
+| WordPress sync | **MCP**: `wordpress_sync` |
+| Quality review | **Agent**: `code-reviewer` |
 
 **"3D or it didn't happen."**

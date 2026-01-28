@@ -1,71 +1,42 @@
-# 🏗️ CLAUDE.md — DevSkyy Core
-## [Role]: Dr. Nathan Blackwell - Core Systems Architect
-*"The core is the heartbeat. Miss a beat, lose the patient."*
-**Credentials:** PhD Systems Engineering, 20 years enterprise platforms
+# DevSkyy Core
 
-## Prime Directive
-CURRENT: 16 files | TARGET: 12 files | MANDATE: Zero dependencies on outer layers
+> Zero dependencies on outer layers | 16 files
 
 ## Architecture
 ```
 core/
-├── __init__.py
 ├── runtime/
-│   ├── __init__.py
 │   ├── input_validator.py    # Pydantic validation
 │   └── tools.py              # ToolSpec, ToolRegistry
-├── llm/
-│   └── infrastructure/
-│       └── provider_factory.py  # Provider abstraction
-└── errors.py                 # Core exception hierarchy
+├── llm/infrastructure/       # Provider abstraction
+└── errors.py                 # Exception hierarchy
 ```
 
-## The Nathan Pattern™
+## Pattern
 ```python
-from abc import ABC, abstractmethod
-from pydantic import BaseModel
-from typing import TypeVar, Generic
-
-T = TypeVar("T", bound=BaseModel)
-R = TypeVar("R", bound=BaseModel)
-
 class ToolSpec(BaseModel, Generic[T, R]):
-    """Type-safe tool specification."""
     name: str
-    description: str
     input_schema: type[T]
     output_schema: type[R]
 
 class BaseTool(ABC, Generic[T, R]):
-    """Abstract base for all tools."""
     spec: ToolSpec[T, R]
-
-    @abstractmethod
-    async def execute(
-        self,
-        input: T,
-        *,
-        correlation_id: str | None = None,
-    ) -> R:
-        """Execute tool with typed input/output."""
-        ...
+    async def execute(self, input: T, *, correlation_id: str | None = None) -> R: ...
 
 class ToolRegistry:
-    """Central registry for tool discovery."""
-    _tools: dict[str, BaseTool] = {}
-
-    def register(self, tool: BaseTool) -> None:
-        self._tools[tool.spec.name] = tool
-
-    def get(self, name: str) -> BaseTool | None:
-        return self._tools.get(name)
+    def register(self, tool: BaseTool) -> None: self._tools[tool.spec.name] = tool
+    def get(self, name: str) -> BaseTool | None: return self._tools.get(name)
 ```
 
-## File Disposition
-| File | Status | Reason |
-|------|--------|--------|
-| runtime/tools.py | KEEP | Tool foundation |
-| runtime/input_validator.py | KEEP | Validation |
-| errors.py | KEEP | Exception hierarchy |
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
+| Task | Tool |
+|------|------|
+| Tool debugging | **MCP**: `tool_catalog`, `health_check` |
+| Core changes | **Agent**: `architect` for design review |
 
 **"The core serves everyone. It depends on no one."**

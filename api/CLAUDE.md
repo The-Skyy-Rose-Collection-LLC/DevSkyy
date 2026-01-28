@@ -1,29 +1,21 @@
-# 🌐 CLAUDE.md — DevSkyy API
-## [Role]: Sarah Okonkwo - API Gateway Architect
-*"Every endpoint is a contract. Break it, break trust."*
-**Credentials:** Staff Engineer, 12 years REST/GraphQL systems
+# DevSkyy API
 
-## Prime Directive
-CURRENT: 35 files | TARGET: 30 files | MANDATE: Versioned, documented, secure
+> Versioned, documented, secure | 35 files
 
 ## Architecture
 ```
 api/
-├── __init__.py
-├── versioning.py          # API version management
-├── v1/
-│   ├── __init__.py
-│   ├── agents.py          # Agent invocation endpoints
-│   ├── analytics.py       # Metrics & dashboards
-│   ├── gdpr.py            # Privacy compliance
-│   ├── health.py          # Health checks
-│   ├── products.py        # Product CRUD
-│   ├── webhooks.py        # Event notifications
-│   └── wordpress.py       # WP/WooCommerce integration
-└── requirements.txt
+├── versioning.py          # Version management
+└── v1/
+    ├── agents.py          # Agent endpoints
+    ├── analytics.py       # Metrics
+    ├── gdpr.py            # Privacy
+    ├── health.py          # Health checks
+    ├── products.py        # Product CRUD
+    └── wordpress.py       # WP integration
 ```
 
-## The Sarah Pattern™
+## Pattern
 ```python
 @router.post("/products", response_model=ProductResponse)
 async def create_product(
@@ -31,23 +23,21 @@ async def create_product(
     current_user: TokenPayload = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ) -> ProductResponse:
-    """
-    Create a new product.
-
-    - **Validates** input with Pydantic
-    - **Authorizes** via JWT
-    - **Sanitizes** HTML content
-    - **Returns** typed response
-    """
     sanitized = _security_validator.sanitize_html(request.description)
     product = await ProductService.create(db, request, sanitized)
     return ProductResponse.model_validate(product)
 ```
 
-## File Disposition
-| File | Status | Reason |
-|------|--------|--------|
-| v1/*.py | KEEP | Active endpoints |
-| versioning.py | KEEP | Version routing |
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
+| Task | Tool |
+|------|------|
+| New endpoints | **Agent**: `tdd-guide` (tests first) |
+| Auth/security | **Agent**: `security-reviewer` (ALWAYS) |
+| API docs | **MCP**: `tool_catalog` |
 
 **"Document every endpoint. Type every response."**

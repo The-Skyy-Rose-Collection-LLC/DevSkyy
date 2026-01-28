@@ -1,64 +1,43 @@
-# 🤗 CLAUDE.md — DevSkyy HuggingFace Spaces
-## [Role]: Dr. Luna Martinez - ML Ops Lead
-*"Spaces are demos that scale. Build them for production."*
-**Credentials:** 12 years MLOps, HuggingFace contributor
+# DevSkyy HuggingFace Spaces
 
-## Prime Directive
-CURRENT: 6 spaces | TARGET: 6 spaces | MANDATE: GPU-optimized, responsive, monitored
+> GPU-optimized, responsive, monitored | 6 spaces
 
-## Architecture
+## Spaces
 ```
 hf-spaces/
 ├── 3d-converter/          # Image to 3D mesh
-├── flux-upscaler/         # FLUX image upscaling
-├── lora-training-monitor/ # LoRA training dashboard
-├── product-analyzer/      # Product image analysis
+├── flux-upscaler/         # FLUX upscaling
+├── product-analyzer/      # Product analysis
 ├── product-photography/   # AI product photos
-└── virtual-tryon/         # FASHN virtual try-on
+└── virtual-tryon/         # FASHN try-on
 ```
 
-## The Luna Pattern™
+## Pattern
 ```python
-import gradio as gr
-from huggingface_hub import HfApi
-
-# Space configuration
-SPACE_CONFIG = {
-    "sdk": "gradio",
-    "sdk_version": "4.44.0",
-    "python_version": "3.11",
-    "hardware": "cpu-basic",  # or t4-small, a10g-small
-}
-
 def create_space_app() -> gr.Blocks:
-    """Create Gradio app for HF Space."""
     with gr.Blocks(theme=gr.themes.Soft()) as demo:
         gr.Markdown("# SkyyRose Product Analyzer")
-
-        with gr.Row():
-            input_image = gr.Image(label="Upload Product")
-            output_analysis = gr.JSON(label="Analysis")
-
-        analyze_btn = gr.Button("Analyze", variant="primary")
-        analyze_btn.click(
-            fn=analyze_product,
-            inputs=input_image,
-            outputs=output_analysis,
-        )
-
+        input_image = gr.Image(label="Upload Product")
+        output = gr.JSON(label="Analysis")
+        gr.Button("Analyze").click(fn=analyze, inputs=input_image, outputs=output)
     return demo
-
-if __name__ == "__main__":
-    demo = create_space_app()
-    demo.launch()
 ```
 
-## Space Types
+## Hardware
 | Space | Hardware | Purpose |
 |-------|----------|---------|
 | virtual-tryon | T4 GPU | Real-time try-on |
 | 3d-converter | A10G | Mesh generation |
-| flux-upscaler | T4 GPU | Image enhancement |
-| lora-monitor | CPU | Training dashboard |
+
+## BEFORE CODING (MANDATORY)
+1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
+2. **Serena**: Use for codebase navigation and symbol lookup
+3. **Verify**: `pytest -v` after EVERY change
+
+## USE THESE TOOLS
+| Task | Tool |
+|------|------|
+| 3D generation | **MCP**: `3d_generate` |
+| Model search | **MCP**: HuggingFace `model_search` |
 
 **"Every Space is a production service in waiting."**
