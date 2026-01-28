@@ -77,7 +77,7 @@ from api.v1 import (
     training_router,
     wordpress_theme_router,
 )
-from api.v1 import wordpress_router as wordpress_v1_router
+from api.v1.wordpress_integration import router as wordpress_router
 
 # API modules
 from api.versioning import VersionConfig, VersionedAPIRouter, setup_api_versioning
@@ -85,14 +85,8 @@ from api.virtual_tryon import virtual_tryon_router
 from api.visual import visual_router
 from api.webhooks import WebhookEventType, webhook_manager, webhook_router
 from api.websocket import ws_router
-from api.wordpress import wordpress_router
 from core.redis_cache import RedisCache
 from core.structured_logging import bind_contextvars, clear_contextvars, configure_logging
-from integrations.wordpress import (
-    order_sync_router,
-    product_sync_router,
-    theme_deployment_router,
-)
 from security.aes256_gcm_encryption import data_masker, field_encryption
 
 # Security modules
