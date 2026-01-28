@@ -1,0 +1,22 @@
+{
+  "name": "test-workflow-cleaner",
+  "version": "1.0.0",
+  "description": "Autonomous test management that keeps test suites clean, relevant, and passing. Analyzes workflows, removes outdated tests, and Ralph Loops until 100% pass.",
+  "author": {
+    "name": "Corey Foster",
+    "email": "support@skyyrose.com"
+  },
+  "repository": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy",
+  "license": "MIT",
+  "keywords": [
+    "testing",
+    "pytest",
+    "jest",
+    "vitest",
+    "test-automation",
+    "ralph-loop",
+    "cleanup",
+    "ci-cd",
+    "workflow"
+  ]
+}

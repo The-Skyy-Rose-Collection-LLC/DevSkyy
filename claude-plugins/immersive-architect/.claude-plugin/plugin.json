@@ -1,0 +1,23 @@
+{
+  "name": "immersive-architect",
+  "version": "1.0.0",
+  "description": "Award-winning creative studio team that plans deeply and builds stunning immersive e-commerce experiences. Masters of Elementor, Divi, WooCommerce, 3D web, and advanced animations.",
+  "author": {
+    "name": "Corey Foster"
+  },
+  "keywords": [
+    "immersive",
+    "ecommerce",
+    "wordpress",
+    "elementor",
+    "divi",
+    "woocommerce",
+    "3d",
+    "threejs",
+    "animations",
+    "gsap",
+    "themes",
+    "interactive",
+    "design"
+  ]
+}

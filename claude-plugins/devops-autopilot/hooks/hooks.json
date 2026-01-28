@@ -1,0 +1,42 @@
+{
+  "hooks": [
+    {
+      "event": "UserPromptSubmit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Check if the user's message mentions any frontend frameworks (React, Next.js, Vue, Angular, Svelte, Nuxt), deployment topics (deploy, production, release, ship), or DevOps needs (CI/CD, pipeline, docker, kubernetes, terraform, infrastructure). If detected and DevOps setup doesn't exist for the project, proactively suggest setting up DevOps automation and consider triggering the devops-orchestrator agent."
+        }
+      ]
+    },
+    {
+      "event": "PostToolUse",
+      "matcher": "Write",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "If a package.json was just created or modified, check if the project has CI/CD configuration (.github/workflows/, .gitlab-ci.yml, Jenkinsfile). If no CI/CD exists, proactively offer to generate pipelines, Dockerfile, and infrastructure code for the project."
+        }
+      ]
+    },
+    {
+      "event": "PreToolUse",
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "If this command deploys to production (kubectl apply, terraform apply, docker push to production), verify:\n1. Configuration files are valid (YAML lint, Terraform validate)\n2. Security best practices followed (no secrets in code)\n3. Target environment is correct (not accidentally deploying to prod)\n\nOnly proceed if all checks pass."
+        }
+      ]
+    },
+    {
+      "event": "SessionStart",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "DEVOPS AUTOPILOT ACTIVE\n\nThis plugin proactively handles CI/CD, containers, and infrastructure when frontend projects are detected.\n\nCapabilities:\n- GitHub Actions, GitLab CI, Jenkins pipelines\n- Docker and Kubernetes configuration\n- Terraform infrastructure as code\n- AWS ECS deployment\n\nPrinciples:\n- Proactive DevOps setup for frontend projects\n- Autonomous operation using Context7 documentation\n- Complete, production-ready configurations\n\nAvailable commands: /pipeline, /docker, /k8s, /terraform, /deploy-infra, /devops-status"
+        }
+      ]
+    }
+  ]
+}
