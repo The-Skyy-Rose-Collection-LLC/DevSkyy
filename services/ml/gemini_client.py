@@ -620,9 +620,11 @@ Do NOT mention any prices or sizing."""
             "responseModalities": ["TEXT", "IMAGE"],
         }
 
+        # candidateCount replaces numberOfImages at top level
+        generation_config["candidateCount"] = request.number_of_images
+
         # Image config varies by model
         image_config: dict[str, Any] = {
-            "numberOfImages": request.number_of_images,
             "aspectRatio": request.aspect_ratio.value,
         }
 
