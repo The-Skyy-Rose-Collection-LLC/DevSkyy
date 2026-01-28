@@ -1,81 +1,45 @@
-# 🔄 CLAUDE.md — DevSkyy Workflows
-## [Role]: Cmdr. Jake Morrison - Workflow Architect
-*"Workflows are automation blueprints. Make them reliable."*
-**Credentials:** 15 years DevOps, CI/CD specialist
+# DevSkyy Workflows
 
-## Prime Directive
-CURRENT: 11 files | TARGET: 10 files | MANDATE: Idempotent, observable, recoverable
+> Idempotent, observable, recoverable | 11 files
 
 ## Architecture
 ```
 devskyy_workflows/
-├── __init__.py
-├── __main__.py             # CLI entry point
-├── cli.py                  # Workflow CLI
-├── config.py               # Configuration
 ├── workflow_runner.py      # Execution engine
 ├── ci_workflow.py          # CI/CD automation
 ├── deployment_workflow.py  # Deploy orchestration
 ├── docker_workflow.py      # Container workflows
-├── mcp_workflow.py         # MCP server management
-├── ml_workflow.py          # ML training workflows
-├── quality_workflow.py     # Code quality checks
-├── README.md               # Documentation
-└── QUICKSTART.md           # Getting started
+├── mcp_workflow.py         # MCP management
+└── quality_workflow.py     # Code quality
 ```
 
-## The Jake Pattern™
+## Pattern
 ```python
-from dataclasses import dataclass
-from enum import Enum
-from typing import Callable
-
-class WorkflowStatus(str, Enum):
-    PENDING = "pending"
-    RUNNING = "running"
-    SUCCESS = "success"
-    FAILED = "failed"
-    SKIPPED = "skipped"
-
-@dataclass
-class WorkflowStep:
-    name: str
-    action: Callable
-    depends_on: list[str] = None
-    retry_count: int = 3
-
 class WorkflowRunner:
-    """Execute workflows with dependency resolution."""
-
-    async def run(
-        self,
-        steps: list[WorkflowStep],
-        *,
-        fail_fast: bool = True,
-    ) -> dict[str, WorkflowStatus]:
-        results = {}
+    async def run(self, steps: list[WorkflowStep], *, fail_fast: bool = True) -> dict:
         for step in self._topological_sort(steps):
             if self._dependencies_met(step, results):
                 try:
                     await step.action()
                     results[step.name] = WorkflowStatus.SUCCESS
-                except Exception as e:
+                except Exception:
                     results[step.name] = WorkflowStatus.FAILED
-                    if fail_fast:
-                        break
+                    if fail_fast: break
         return results
 ```
 
-## Workflow Commands
+## Commands
 ```bash
-# Run CI workflow
-python -m devskyy_workflows ci
-
-# Deploy to staging
-python -m devskyy_workflows deploy --env staging
-
-# Quality checks
-python -m devskyy_workflows quality --fix
+python -m devskyy_workflows ci           # CI workflow
+python -m devskyy_workflows deploy       # Deploy
+python -m devskyy_workflows quality      # Quality checks
 ```
+
+## USE THESE TOOLS
+| Task | Tool |
+|------|------|
+| Deploy | **MCP**: `wordpress_sync`, Vercel `deploy_to_vercel` |
+| Quality | **Command**: `/verify` |
+| Workflow errors | **Agent**: `build-error-resolver` |
 
 **"Workflows that break should heal themselves."**
