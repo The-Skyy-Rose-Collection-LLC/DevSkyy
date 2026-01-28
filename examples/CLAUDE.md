@@ -1,67 +1,43 @@
-# 📖 CLAUDE.md — DevSkyy Examples
-## [Role]: Dr. Maria Santos - Developer Advocate
-*"Examples are the best documentation. Make them run."*
-**Credentials:** 10 years developer relations, technical writing expert
+# DevSkyy Examples
 
-## Prime Directive
-CURRENT: 10 files | TARGET: 10 files | MANDATE: Runnable, documented, up-to-date
+> Runnable, documented, up-to-date | 10 files
 
-## Architecture
+## Examples
 ```
 examples/
-├── basic_query.py              # Simple RAG query
-├── basic-usage.ts              # TypeScript SDK usage
-├── claude_agent_sdk_demo.py    # Agent SDK demo
-├── continuous_conversation.py  # Multi-turn chat
-├── llamaindex_multimodal_demo.py
-├── multi_agent_workflow.py     # Agent orchestration
-├── security_alerting_demo.py   # Security alerts
+├── basic_query.py              # RAG query
+├── claude_agent_sdk_demo.py    # Agent SDK
+├── multi_agent_workflow.py     # Orchestration
+├── security_alerting_demo.py   # Security
 ├── tool_registry_example.py    # Tool registration
-├── webhook_integration_example.py
-└── wordpress_3d_sync_demo.py   # 3D WordPress sync
+└── wordpress_3d_sync_demo.py   # WP 3D sync
 ```
 
-## The Maria Pattern™
+## Pattern
 ```python
 """
 Example: Basic RAG Query
-========================
-
-This example demonstrates how to perform a basic
-RAG query using the DevSkyy orchestration layer.
-
-Prerequisites:
-    pip install devskyy[rag]
-
-Usage:
-    python basic_query.py "What is SkyyRose?"
+Prerequisites: pip install devskyy[rag]
+Usage: python basic_query.py "query"
 """
-
-import asyncio
-import sys
-from orchestration import RAGOrchestrator
-
 async def main(query: str) -> None:
     orchestrator = RAGOrchestrator()
-
-    # Perform RAG query
     result = await orchestrator.query(query)
-
-    print(f"Query: {query}")
     print(f"Response: {result.response}")
-    print(f"Sources: {result.sources}")
-
-if __name__ == "__main__":
-    query = sys.argv[1] if len(sys.argv) > 1 else "Hello"
-    asyncio.run(main(query))
 ```
 
-## Example Categories
+## Categories
 | Category | Examples |
 |----------|----------|
-| RAG | basic_query, llamaindex_multimodal |
-| Agents | claude_agent_sdk, multi_agent_workflow |
-| Integration | webhook, wordpress_3d_sync |
-| Security | security_alerting |
+| RAG | basic_query, llamaindex |
+| Agents | agent_sdk, multi_agent |
+| Integration | webhook, wordpress_3d |
+
+## USE THESE TOOLS
+| Task | Tool |
+|------|------|
+| Running examples | **MCP**: `rag_query`, `agent_orchestrator` |
+| Example testing | **Agent**: `tdd-guide` |
+| Example docs | **Agent**: `doc-updater` |
 
 **"Every example should run on first try."**
