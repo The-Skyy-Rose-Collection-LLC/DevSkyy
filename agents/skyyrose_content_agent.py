@@ -58,6 +58,45 @@ class ContentStatus(str, Enum):
     ARCHIVED = "archived"
 
 
+def _safe_collection_value(collection: Collection | str | None) -> str:
+    """Safely extract collection string value from enum or string.
+    
+    Args:
+        collection: Collection enum, string representation, or None
+        
+    Returns:
+        Lowercase hyphenated collection string (e.g., "signature", "black-rose")
+        Empty string if collection is None
+        
+    Examples:
+        >>> _safe_collection_value(Collection.SIGNATURE)
+        'signature'
+        >>> _safe_collection_value("SIGNATURE")
+        'signature'
+        >>> _safe_collection_value("signature")
+        'signature'
+        >>> _safe_collection_value(None)
+        ''
+    """
+    if collection is None:
+        return ""
+    
+    if isinstance(collection, Collection):
+        return collection.value
+    
+    if isinstance(collection, str):
+        # Handle both formats: "SIGNATURE" (enum name) or "signature" (enum value)
+        # First try to convert to enum
+        try:
+            normalized = collection.upper().replace('-', '_')
+            return Collection[normalized].value
+        except (KeyError, AttributeError):
+            # If it's already in value format (lowercase with hyphens), return as-is
+            return collection.lower().replace('_', '-')
+    
+    return ""
+
+
 @dataclass
 class BrandDNA:
     """Accumulated brand awareness gathered before content creation.
@@ -518,7 +557,7 @@ SEO Rules:
         # Collection-specific brand context
         if request.collection:
             collection_context = self.brand_context.get_product_context(
-                product_name=request.title or f"{request.collection.value.replace('_', ' ').title()} Content",
+                product_name=request.title or f"{_safe_collection_value(request.collection).replace('-', ' ').title()} Content",
                 product_type=request.content_type.value,
                 collection=request.collection,
             )
@@ -532,7 +571,7 @@ SEO Rules:
         )
 
         if request.collection:
-            user_content += f"Collection: {request.collection.value.replace('_', ' ').title()}\n"
+            user_content += f"Collection: {_safe_collection_value(request.collection).replace('-', ' ').title()}\n"
 
         if request.target_url:
             user_content += f"Target URL: {request.target_url}\n"
@@ -666,7 +705,7 @@ SEO Rules:
 
         try:
             # Build WordPress post payload with brand meta
-            collection_value = content.collection.value if content.collection else ""
+            collection_value = _safe_collection_value(content.collection)
 
             wp_response = await wp_client.create_post(
                 title=content.title,
@@ -858,11 +897,11 @@ SEO Rules:
         request = ContentRequest(
             content_type=ContentType.COLLECTION_PAGE,
             collection=collection,
-            title=f"{collection.value.replace('_', ' ').title()} Collection",
-            target_url=f"/collection/{collection.value.replace('_', '-')}/",
+            title=f"{_safe_collection_value(collection).replace('-', ' ').title()} Collection",
+            target_url=f"/collection/{_safe_collection_value(collection)}/",
             seo_keywords=[
-                f"skyyrose {collection.value.replace('_', ' ')}",
-                f"luxury {collection.value.replace('_', ' ')} jewelry",
+                f"skyyrose {_safe_collection_value(collection).replace('-', ' ')}",
+                f"luxury {_safe_collection_value(collection).replace('-', ' ')} jewelry",
                 "skyyrose collection",
                 "luxury fashion oakland",
             ],
@@ -904,7 +943,7 @@ SEO Rules:
             seo_keywords=[
                 product_name.lower(),
                 f"skyyrose {product_name.lower()}",
-                f"{collection.value.replace('_', ' ')} {product_name.split()[-1].lower()}",
+                f"{_safe_collection_value(collection).replace('-', ' ')} {product_name.split()[-1].lower()}",
             ],
             additional_direction=(
                 f"Price: ${price}\n"
