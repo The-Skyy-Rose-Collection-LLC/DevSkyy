@@ -19,8 +19,17 @@ class WordPressConfig(BaseModel):
     """WordPress.com site configuration."""
 
     site_url: str = Field(..., description="WordPress.com site URL (e.g., https://skyyrose.co)")
-    api_token: str = Field(..., description="WordPress.com OAuth2 access token")
+    api_token: str | None = Field(default=None, description="WordPress.com OAuth2 access token (Bearer auth)")
+    username: str | None = Field(default=None, description="WordPress username (for Application Password auth)")
+    app_password: str | None = Field(default=None, description="WordPress Application Password (Basic auth)")
     timeout: int = Field(default=30, description="Request timeout in seconds")
+
+    def model_post_init(self, __context: Any) -> None:
+        """Validate that either api_token or username+app_password is provided."""
+        if not self.api_token and not (self.username and self.app_password):
+            raise ValueError(
+                "Must provide either 'api_token' (OAuth2) or both 'username' and 'app_password' (Application Password)"
+            )
 
 
 class WooCommerceConfig(BaseModel):
@@ -71,15 +80,27 @@ class WordPressComClient:
         self.config = config
         self.woo_config = woo_config
 
-        # WordPress.com REST API client
-        self.wp_client = httpx.AsyncClient(
-            base_url=config.site_url,
-            headers={
-                "Authorization": f"Bearer {config.api_token}",
-                "Content-Type": "application/json",
-            },
-            timeout=config.timeout,
-        )
+        # WordPress REST API client - use appropriate auth method
+        if config.username and config.app_password:
+            # Application Password authentication (Basic Auth)
+            self.wp_client = httpx.AsyncClient(
+                base_url=config.site_url,
+                auth=(config.username, config.app_password),
+                headers={"Content-Type": "application/json"},
+                timeout=config.timeout,
+            )
+        elif config.api_token:
+            # OAuth2 authentication (Bearer token)
+            self.wp_client = httpx.AsyncClient(
+                base_url=config.site_url,
+                headers={
+                    "Authorization": f"Bearer {config.api_token}",
+                    "Content-Type": "application/json",
+                },
+                timeout=config.timeout,
+            )
+        else:
+            raise ValueError("WordPress authentication not configured")
 
         # WooCommerce REST API client (uses Basic Auth)
         if woo_config:
