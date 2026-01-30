@@ -960,9 +960,10 @@ app.include_router(admin_dashboard_router, prefix="/api/v1")
 app.include_router(elementor_3d_router, prefix="/api/v1")
 
 # WordPress Integration routes registration (Product Sync, Order Sync, Theme Deployment)
-app.include_router(product_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
-app.include_router(order_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
-app.include_router(theme_deployment_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+# TODO: Implement these routers
+# app.include_router(product_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+# app.include_router(order_sync_router, prefix="/api/v1/wordpress", tags=["wordpress"])
+# app.include_router(theme_deployment_router, prefix="/api/v1/wordpress", tags=["wordpress"])
 
 # =============================================================================
 # NEW API v1 Routers - MCP Integration Endpoints
@@ -979,7 +980,8 @@ app.include_router(training_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")
 
 # WordPress/WooCommerce v1 API (test-connection, products, orders endpoints)
-app.include_router(wordpress_v1_router, prefix="/api/v1")
+# TODO: Define wordpress_v1_router or use wordpress_router instead
+# app.include_router(wordpress_v1_router, prefix="/api/v1")
 
 # WordPress theme generation
 app.include_router(wordpress_theme_router, prefix="/api/v1")
@@ -1025,6 +1027,10 @@ app.include_router(woocommerce_webhooks_router, prefix="/api/v1")
 # Dashboard summary API (US-011: unified dashboard data)
 from api.v1.analytics.dashboard import router as analytics_dashboard_router
 app.include_router(analytics_dashboard_router, prefix="/api/v1")
+
+# 3D Generation Pipeline (DevSkyy Imagery Pipeline)
+from api.v1.pipeline import router as pipeline_router
+app.include_router(pipeline_router, prefix="/api/v1")
 
 
 # =============================================================================
