@@ -1,0 +1,224 @@
+// ... (previous code)
+
+function setupNavigation() {
+const buttons = document.querySelectorAll('[data-view]');
+buttons.forEach(btn => {
+btn.addEventListener('click', (e) => {
+// Update UI
+buttons.forEach(b => b.classList.remove('active'));
+e.target.classList.add('active');
+
+// Move Camera
+const view = cameraViews[e.target.dataset.view];
+if (view) {
+moveCamera(view.position, view.target);
+}
+});
+});
+}
+
+function moveCamera(position, target) {
+const duration = 2000;
+const startPos = camera.position.clone();
+const startTarget = controls.target.clone();
+const startTime = Date.now();
+
+function animateCamera() {
+const now = Date.now();
+const progress = Math.min((now - startTime) / duration, 1);
+// Ease out cubic
+const ease = 1 - Math.pow(1 - progress, 3);
+
+camera.position.lerpVectors(startPos, position, ease);
+controls.target.lerpVectors(startTarget, target, ease);
+controls.update();
+
+if (progress < 1) { requestAnimationFrame(animateCamera); } } animateCamera(); } // Raycaster for interactions const
+    raycaster=new THREE.Raycaster(); const mouse=new THREE.Vector2(); window.addEventListener('mousemove', (event)=> {
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+    updateHotspots();
+    });
+
+    window.addEventListener('click', (event) => {
+    if (activeHotspot) {
+    showProductCard(activeHotspot.userData.productId);
+    }
+    });
+
+    let activeHotspot = null;
+
+    function updateHotspots() {
+    raycaster.setFromCamera(mouse, camera);
+    const intersects = raycaster.intersectObjects(hotspots3D);
+
+    if (intersects.length > 0) {
+    const object = intersects[0].object;
+    if (object !== activeHotspot) {
+    activeHotspot = object;
+    document.body.style.cursor = 'pointer';
+    // Scale up effect
+    new TWEEN.Tween(object.scale)
+    .to({ x: 1.5, y: 1.5, z: 1.5 }, 300)
+    .easing(TWEEN.Easing.Back.Out)
+    .start();
+    }
+    } else {
+    if (activeHotspot) {
+    new TWEEN.Tween(activeHotspot.scale)
+    .to({ x: 1, y: 1, z: 1 }, 300)
+    .easing(TWEEN.Easing.Back.Out)
+    .start();
+    activeHotspot = null;
+    document.body.style.cursor = 'default';
+    }
+    }
+    }
+
+    function animate() {
+    requestAnimationFrame(animate);
+
+    const time = clock.getElapsedTime();
+
+    // Animate particles
+    if (particles) {
+    const positions = particles.geometry.attributes.position.array;
+    const velocities = particles.userData.velocities;
+
+    for (let i = 0; i < velocities.length; i++) { const idx=i * 3; positions[idx] +=velocities[i].x; positions[idx + 1]
+        +=velocities[i].y; positions[idx + 2] +=velocities[i].z; // Reset if too low if (positions[idx + 1] < 0) {
+        positions[idx + 1]=10; } } particles.geometry.attributes.position.needsUpdate=true; particles.rotation.y=time *
+        0.05; } // Animate Pillars/Orbs orbs.forEach(orb=> {
+        orb.position.y = orb.userData.baseY + Math.sin(time + orb.userData.phase) * 0.2;
+        });
+
+        // Update TWEEN
+        TWEEN.update();
+
+        controls.update();
+        composer.render();
+        updateHTMLHotspots();
+        }
+
+        // Project 3D positions to 2D screen for HTML labels if needed
+        function updateHTMLHotspots() {
+        // (Optional: standard HTML overlays instead of 3D objects)
+        }
+
+        function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        function simulateLoading() {
+        const bar = document.getElementById('loading-bar');
+        let width = 0;
+        const interval = setInterval(() => {
+        width += Math.random() * 5;
+        if (width > 100) {
+        width = 100;
+        clearInterval(interval);
+        setTimeout(() => {
+        document.getElementById('loading-screen').classList.add('hidden');
+        }, 500);
+        }
+        bar.style.width = width + '%';
+        }, 50);
+        }
+
+        // Expose functions to global scope for HTML events
+        window.closeProductCard = () => {
+        document.getElementById('product-card').classList.remove('visible');
+        };
+
+        window.addToCart = () => {
+        const btn = document.querySelector('.product-cta');
+        const originalText = btn.textContent;
+        btn.textContent = 'Added to Cart';
+        btn.style.background = '#4CAF50';
+        setTimeout(() => {
+        btn.textContent = originalText;
+        btn.style.background = '';
+        }, 2000);
+        };
+
+        window.activateAR = () => {
+        alert('Launching AR Experience... (Requires Mobile Device)');
+        };
+
+        function showProductCard(productId) {
+        const data = products[productId];
+        if (!data) return;
+
+        document.getElementById('product-title').textContent = data.title;
+        document.getElementById('product-price').textContent = data.price;
+        document.getElementById('product-description').textContent = data.description;
+        document.getElementById('product-badge').textContent = data.badge;
+        document.getElementById('product-image').textContent = data.emoji;
+        document.getElementById('product-card').classList.add('visible');
+        }
+
+        // Simple TWEEN implementation since we didn't import it
+        const TWEEN = {
+        tweens: [],
+        getAll() { return this.tweens; },
+        removeAll() { this.tweens = []; },
+        add(tween) { this.tweens.push(tween); },
+        remove(tween) {
+        const i = this.tweens.indexOf(tween);
+        if (i !== -1) this.tweens.splice(i, 1);
+        },
+        update(time) {
+        if (this.tweens.length === 0) return false;
+        let i = 0;
+        time = time !== undefined ? time : Date.now();
+        while (i < this.tweens.length) { if (this.tweens[i].update(time)) { i++; } else { this.tweens.splice(i, 1); } }
+            return true; }, Tween: class { constructor(object) { this.object=object; this.valuesStart={};
+            this.valuesEnd={}; this.duration=1000; this.startTime=null; this.easingFunction=k=> k;
+            }
+            to(properties, duration) {
+            this.valuesEnd = properties;
+            if (duration !== undefined) this.duration = duration;
+            return this;
+            }
+            start(time) {
+            TWEEN.add(this);
+            this.startTime = time !== undefined ? time : Date.now();
+            for (const property in this.valuesEnd) {
+            this.valuesStart[property] = this.object[property];
+            }
+            return this;
+            }
+            easing(easing) {
+            this.easingFunction = easing;
+            return this;
+            }
+            update(time) {
+            if (time < this.startTime) return true; let elapsed=(time - this.startTime) / this.duration;
+                elapsed=elapsed> 1 ? 1 : elapsed;
+                const value = this.easingFunction(elapsed);
+                for (const property in this.valuesEnd) {
+                const start = this.valuesStart[property];
+                const end = this.valuesEnd[property];
+                this.object[property] = start + (end - start) * value;
+                }
+                if (elapsed === 1) return false;
+                return true;
+                }
+                },
+                Easing: {
+                Back: {
+                Out: function (k) {
+                const s = 1.70158;
+                return --k * k * ((s + 1) * k + s) + 1;
+                }
+                }
+                }
+                };
+
+                </script>
+                </body>
+
+                </html>
