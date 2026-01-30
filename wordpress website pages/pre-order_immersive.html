@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>THE VAULT | SkyyRose Pre-Order</title>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --sr-neon: #00ff41;
+            --sr-metal: #2a2a2a;
+            --font-mono: 'Share Tech Mono', monospace;
+            --font-display: 'Playfair Display', serif;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+        }
+
+        .hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+            background: linear-gradient(0deg, rgba(0, 0, 0, 0.5) 0%, transparent 20%, transparent 80%, rgba(0, 0, 0, 0.5) 100%);
+        }
+
+        .header {
+            position: absolute;
+            top: 3rem;
+            left: 4rem;
+        }
+
+        .title {
+            font-family: var(--font-display);
+            font-size: 3rem;
+            margin: 0;
+            letter-spacing: 5px;
+        }
+
+        .subtitle {
+            font-family: var(--font-mono);
+            color: #888;
+            font-size: 1rem;
+        }
+
+        .countdown {
+            position: absolute;
+            bottom: 4rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 2rem;
+        }
+
+        .time-block {
+            text-align: center;
+        }
+
+        .time-val {
+            font-family: var(--font-mono);
+            font-size: 4rem;
+            color: #fff;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+        }
+
+        .time-lbl {
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: #666;
+            letter-spacing: 2px;
+        }
+
+        /* Lock Interaction */
+        .lock-panel {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 200;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .lock-panel.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .panel-content {
+            background: #111;
+            border: 1px solid #333;
+            padding: 3rem;
+            width: 400px;
+            text-align: center;
+            border-radius: 4px;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+        }
+
+        .code-input {
+            background: #000;
+            border: 1px solid #333;
+            color: var(--sr-neon);
+            font-family: var(--font-mono);
+            font-size: 2rem;
+            width: 100%;
+            padding: 1rem;
+            margin: 2rem 0;
+            text-align: center;
+            letter-spacing: 10px;
+        }
+
+        .submit-btn {
+            background: #fff;
+            color: #000;
+            border: none;
+            padding: 1rem 2rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover {
+            background: var(--sr-neon);
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            animation: scan 3s linear infinite;
+            z-index: 50;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0
+            }
+
+            100% {
+                top: 100%
+            }
+        }
+
+        .status-badge {
+            font-family: var(--font-mono);
+            color: var(--sr-neon);
+            border: 1px solid var(--sr-neon);
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="scan-line"></div>
+    <div class="hud">
+        <div class="header">
+            <h1 class="title">THE VAULT</h1>
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 300px;">
+                <p class="subtitle">Secure Archive // Pre-Order Access</p>
+                <span class="status-badge">SECURE</span>
+            </div>
+        </div>
+
+        <div class="countdown">
+            <div class="time-block">
+                <div class="time-val">04</div>
+                <div class="time-lbl">Days</div>
+            </div>
+            <div class="time-block">
+                <div class="time-val">12</div>
+                <div class="time-lbl">Hours</div>
+            </div>
+            <div class="time-block">
+                <div class="time-val">33</div>
+                <div class="time-lbl">Mins</div>
+            </div>
+        </div>
+
+        <a href="homepage.html"
+            style="position:fixed; top:3rem; right:4rem; color:#fff; text-decoration:none; font-family:var(--font-mono); pointer-events:auto;">[
+            EXIT VAULT ]</a>
+    </div>
+
+    <div class="lock-panel" id="lock-panel">
+        <div class="panel-content">
+            <h2 style="font-family: var(--font-display); letter-spacing: 2px; margin-bottom: 0.5rem;">ACCESS REQUIRED
+            </h2>
+            <p style="color: #666; font-size: 0.9rem;">Enter access code to view unreleased item.</p>
+            <input type="text" class="code-input" placeholder="____" maxlength="4">
+            <button class="submit-btn" onclick="unlock()">AUTHENTICATE</button>
+            <br><br>
+            <button onclick="closePanel()"
+                style="background:none; border:none; color:#444; cursor:pointer;">Cancel</button>
+        </div>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        let scene, camera, renderer, controls;
+        let vaults = [];
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x050505);
+            scene.fog = new THREE.Fog(0x050505, 10, 40);
+
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(0, 0, 15);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // Lighting
+            const ambient = new THREE.AmbientLight(0x222222);
+            scene.add(ambient);
+
+            // Grid lights (Tron-like)
+            const gridHelper = new THREE.GridHelper(50, 50, 0x333333, 0x111111);
+            scene.add(gridHelper);
+
+            // Create Vault Boxes
+            const positions = [-6, 0, 6];
+            positions.forEach(x => {
+                const group = new THREE.Group();
+                group.position.x = x;
+
+                // Pedestal
+                const pedGeo = new THREE.BoxGeometry(3, 1, 3);
+                const pedMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, metalness: 0.8, roughness: 0.2 });
+                const ped = new THREE.Mesh(pedGeo, pedMat);
+                group.add(ped);
+
+                // Glass Case
+                const glassGeo = new THREE.BoxGeometry(2.5, 4, 2.5);
+                const glassMat = new THREE.MeshPhysicalMaterial({
+                    color: 0x88ccff,
+                    transmission: 0.9,
+                    opacity: 0.3,
+                    transparent: true,
+                    roughness: 0,
+                    metalness: 0.1
+                });
+                const glass = new THREE.Mesh(glassGeo, glassMat);
+                glass.position.y = 2.5;
+                group.add(glass);
+
+                // Floating Item (Placeholder Box)
+                const itemGeo = new THREE.BoxGeometry(1, 1, 1);
+                const itemMat = new THREE.MeshNormalMaterial({ wireframe: true });
+                const item = new THREE.Mesh(itemGeo, itemMat);
+                item.position.y = 2.5;
+                item.rotation.x = Math.PI / 4;
+                item.userData = { id: x, label: 'LOCKED ASSET' };
+                group.add(item);
+                vaults.push(item);
+
+                // Light inside case
+                const light = new THREE.PointLight(0x00ff41, 1, 5);
+                light.position.y = 1;
+                group.add(light);
+
+                scene.add(group);
+            });
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+
+            window.addEventListener('resize', onResize);
+            window.addEventListener('click', onClick);
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onClick(e) {
+            if (e.target.closest('.lock-panel') || e.target.closest('a')) return;
+
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(vaults);
+
+            if (intersects.length > 0) {
+                document.getElementById('lock-panel').classList.add('active');
+            }
+        }
+
+        window.closePanel = function () {
+            document.getElementById('lock-panel').classList.remove('active');
+        }
+
+        window.unlock = function () {
+            const btn = document.querySelector('.submit-btn');
+            btn.innerHTML = 'ACCESS DENIED';
+            btn.style.background = 'red';
+            btn.style.color = 'white';
+            setTimeout(() => {
+                btn.innerHTML = 'AUTHENTICATE';
+                btn.style.background = 'white';
+                btn.style.color = 'black';
+            }, 1000);
+        }
+
+        function animate() {
+            vaults.forEach(v => {
+                v.rotation.y += 0.01;
+                v.position.y = 2.5 + Math.sin(Date.now() * 0.002) * 0.1;
+            });
+            controls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+
+</html>

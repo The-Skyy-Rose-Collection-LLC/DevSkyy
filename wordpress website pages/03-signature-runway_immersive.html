@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIGNATURE Collection | SkyyRose Virtual Runway</title>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --sr-gold: #D4AF37;
+            --sr-black: #000000;
+            --sr-white: #FFFFFF;
+            --font-display: 'Playfair Display', Georgia, serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #000;
+            color: #fff;
+            font-family: var(--font-body);
+        }
+
+        #canvas-container {
+            position: fixed;
+            inset: 0;
+            z-index: 1;
+        }
+
+        /* UI */
+        .ui-layer {
+            position: fixed;
+            z-index: 100;
+            pointer-events: none;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+
+        .header {
+            position: absolute;
+            top: 2rem;
+            left: 4rem;
+            text-align: left;
+        }
+
+        .title {
+            font-family: var(--font-display);
+            font-size: 4rem;
+            margin: 0;
+            color: var(--sr-gold);
+            letter-spacing: -2px;
+            line-height: 0.9;
+        }
+
+        .collection-label {
+            font-size: 0.8rem;
+            letter-spacing: 0.4em;
+            text-transform: uppercase;
+            color: #fff;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Camera Controls */
+        .cam-dock {
+            position: absolute;
+            bottom: 3rem;
+            right: 4rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            pointer-events: auto;
+        }
+
+        .cam-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .cam-btn:hover {
+            background: var(--sr-gold);
+            border-color: var(--sr-gold);
+            color: #000;
+        }
+
+        /* Product Info */
+        #product-panel {
+            position: fixed;
+            bottom: -300px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 500px;
+            background: rgba(0, 0, 0, 0.8);
+            border-top: 2px solid var(--sr-gold);
+            padding: 2rem;
+            z-index: 200;
+            transition: bottom 0.5s ease;
+            backdrop-filter: blur(10px);
+            pointer-events: auto;
+            text-align: center;
+        }
+
+        #product-panel.visible {
+            bottom: 0;
+        }
+
+        .pp-title {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: #fff;
+            margin: 0;
+        }
+
+        .pp-price {
+            color: var(--sr-gold);
+            font-size: 1.2rem;
+            margin: 0.5rem 0;
+        }
+
+        .pp-desc {
+            color: #888;
+            margin-bottom: 1.5rem;
+        }
+
+        .pp-btn {
+            padding: 1rem 3rem;
+            background: var(--sr-white);
+            color: #000;
+            border: none;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 2px;
+            cursor: pointer;
+        }
+
+        .pp-btn:hover {
+            background: var(--sr-gold);
+        }
+
+        /* Loader */
+        #curtain {
+            position: fixed;
+            inset: 0;
+            bg: #000;
+            z-index: 999;
+            background: #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: transform 1s cubic-bezier(0.7, 0, 0.3, 1);
+        }
+
+        #curtain.open {
+            transform: translateY(-100%);
+        }
+
+        .logo-load {
+            font-family: var(--font-display);
+            font-size: 2rem;
+            color: var(--sr-gold);
+            letter-spacing: 5px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="curtain">
+        <div class="logo-load">SKYYROSE</div>
+    </div>
+
+    <div class="ui-layer">
+        <div class="header">
+            <div class="collection-label">Fall/Winter 2025</div>
+            <h1 class="title">SIGNATURE<br>RUNWAY</h1>
+        </div>
+
+        <div class="cam-dock">
+            <button class="cam-btn" onclick="setCam(1)">1</button>
+            <button class="cam-btn" onclick="setCam(2)">2</button>
+            <button class="cam-btn" onclick="setCam(3)">3</button>
+        </div>
+
+        <a href="collection-signature.html"
+            style="position:fixed; top:2rem; right:4rem; color:var(--sr-gold); text-decoration:none; text-transform:uppercase; font-size:0.8rem; letter-spacing:0.2em; pointer-events:auto; border-bottom:1px solid var(--sr-gold);">Exit
+            Show</a>
+    </div>
+
+    <div id="product-panel">
+        <h2 class="pp-title" id="pp-title">Foundation Blazer</h2>
+        <div class="pp-price" id="pp-price">$425</div>
+        <p class="pp-desc" id="pp-desc">Italian wool blend with gold button detailing. The piece that started it all.
+        </p>
+        <button class="pp-btn">Pre-Order</button>
+        <button onclick="closePanel()"
+            style="position: absolute; top:10px; right:15px; background:none; border:none; color:#555; cursor:pointer;">✕</button>
+    </div>
+
+    <div id="canvas-container"></div>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+        let scene, camera, renderer, controls;
+        let spotlights = [];
+        let runway;
+
+        const models = [
+            { id: 1, name: 'Foundation Blazer', price: '$425', desc: 'Italian wool blend with gold button detailing.', pos: new THREE.Vector3(0, 1.5, -5) },
+            { id: 2, name: 'Silhouette Dress', price: '$350', desc: 'Form-fitting architectural knitwear.', pos: new THREE.Vector3(0, 1.5, 0) },
+            { id: 3, name: 'Icon Trench', price: '$595', desc: 'Water-resistant bonded cotton with signature gold lining.', pos: new THREE.Vector3(0, 1.5, 5) }
+        ];
+
+        const hotspots = [];
+
+        init();
+        animate();
+
+        function init() {
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x000000);
+            scene.fog = new THREE.Fog(0x000000, 10, 50);
+
+            camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 100);
+            camera.position.set(8, 5, 12);
+            camera.lookAt(0, 0, 0);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+            // RUNWAY FLOOR
+            const floorGeo = new THREE.PlaneGeometry(8, 40);
+            const floorMat = new THREE.MeshStandardMaterial({
+                color: 0x111111,
+                roughness: 0.1,
+                metalness: 0.5
+            });
+            runway = new THREE.Mesh(floorGeo, floorMat);
+            runway.rotation.x = -Math.PI / 2;
+            runway.receiveShadow = true;
+            scene.add(runway);
+
+            // SIDE FLOORS (Audience area)
+            const sideGeo = new THREE.PlaneGeometry(40, 40);
+            const sideMat = new THREE.MeshBasicMaterial({ color: 0x050505 });
+            const leftSide = new THREE.Mesh(sideGeo, sideMat);
+            leftSide.rotation.x = -Math.PI / 2;
+            leftSide.position.set(-24, -0.1, 0);
+            scene.add(leftSide);
+            const rightSide = new THREE.Mesh(sideGeo, sideMat);
+            rightSide.rotation.x = -Math.PI / 2;
+            rightSide.position.set(24, -0.1, 0);
+            scene.add(rightSide);
+
+            // LIGHTING
+            const ambient = new THREE.AmbientLight(0x222222);
+            scene.add(ambient);
+
+            // Spotlights setup
+            for (let i = 0; i < 5; i++) {
+                const spot = new THREE.SpotLight(0xffffff, 2);
+                spot.position.set(i % 2 === 0 ? -5 : 5, 10, -10 + i * 5);
+                spot.angle = 0.5;
+                spot.penumbra = 0.5;
+                spot.decay = 2;
+                spot.distance = 50;
+                spot.castShadow = true;
+                spot.target.position.set(0, 0, -10 + i * 5);
+                scene.add(spot);
+                scene.add(spot.target);
+                spotlights.push(spot);
+
+                // Add visible beam effect (cone)
+                const coneGeo = new THREE.ConeGeometry(2, 10, 32, 1, true);
+                const coneMat = new THREE.MeshBasicMaterial({
+                    color: 0xffffff,
+                    transparent: true,
+                    opacity: 0.03,
+                    side: THREE.DoubleSide
+                });
+                const cone = new THREE.Mesh(coneGeo, coneMat);
+                cone.position.set(spot.position.x, spot.position.y - 5, spot.position.z);
+                // Point down roughly
+                cone.lookAt(spot.target.position);
+                cone.rotation.x += Math.PI / 2;
+                scene.add(cone);
+            }
+
+            // MANNEQUINS / PRODUCTS
+            const manGeo = new THREE.CylinderGeometry(0.5, 0.5, 3, 16);
+            manGeo.translate(0, 1.5, 0);
+            const manMat = new THREE.MeshStandardMaterial({ color: 0x333333, metalness: 0.8, roughness: 0.2 });
+
+            models.forEach(m => {
+                const mesh = new THREE.Mesh(manGeo, manMat);
+                mesh.position.copy(m.pos);
+                mesh.castShadow = true;
+                mesh.userData = { data: m };
+                scene.add(mesh);
+                hotspots.push(mesh);
+
+                // Label
+                const ring = new THREE.Mesh(
+                    new THREE.RingGeometry(0.8, 0.85, 32),
+                    new THREE.MeshBasicMaterial({ color: 0xD4AF37, side: THREE.DoubleSide })
+                );
+                ring.position.set(m.pos.x, 0.1, m.pos.z);
+                ring.rotation.x = -Math.PI / 2;
+                scene.add(ring);
+            });
+
+            // FLASHES (Paparazzi)
+            setInterval(() => {
+                const flash = new THREE.PointLight(0xffffff, 5, 10);
+                flash.position.set(
+                    (Math.random() > 0.5 ? 8 : -8),
+                    Math.random() * 3 + 1,
+                    Math.random() * 20 - 10
+                );
+                scene.add(flash);
+                setTimeout(() => scene.remove(flash), 100);
+            }, 500);
+
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.autoRotate = true;
+            controls.autoRotateSpeed = 0.5;
+            controls.maxPolarAngle = Math.PI / 2 - 0.1;
+
+            window.addEventListener('resize', onResize);
+            window.addEventListener('click', onClick);
+
+            setTimeout(() => {
+                document.getElementById('curtain').classList.add('open');
+            }, 1000);
+        }
+
+        function onResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        function onClick(e) {
+            if (e.target.closest('button') || e.target.closest('a')) return;
+
+            mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(hotspots);
+
+            if (intersects.length > 0) {
+                const d = intersects[0].object.userData.data;
+                document.getElementById('pp-title').innerText = d.name;
+                document.getElementById('pp-price').innerText = d.price;
+                document.getElementById('pp-desc').innerText = d.desc;
+                document.getElementById('product-panel').classList.add('visible');
+            } else {
+                closePanel();
+            }
+        }
+
+        window.closePanel = function () {
+            document.getElementById('product-panel').classList.remove('visible');
+        }
+
+        window.setCam = function (view) {
+            controls.autoRotate = false;
+            if (view === 1) {
+                camera.position.set(0, 2, 12); // Front row
+                controls.target.set(0, 1.5, 0);
+            } else if (view === 2) {
+                camera.position.set(10, 8, 0); // High side
+                controls.target.set(0, 0, 0);
+            } else {
+                camera.position.set(0, 5, -12); // Backstage
+                controls.target.set(0, 1.5, 0);
+            }
+        }
+
+        function animate() {
+            controls.update();
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+    </script>
+</body>
+
+</html>

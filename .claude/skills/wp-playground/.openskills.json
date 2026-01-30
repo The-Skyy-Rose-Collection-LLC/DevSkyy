@@ -1,0 +1,7 @@
+{
+  "source": "Wordpress/agent-skills",
+  "sourceType": "git",
+  "repoUrl": "https://github.com/Wordpress/agent-skills",
+  "subpath": "skills/wp-playground",
+  "installedAt": "2026-01-30T22:46:18.212Z"
+}

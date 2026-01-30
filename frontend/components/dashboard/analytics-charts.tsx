@@ -75,7 +75,7 @@ export function ProviderPerformanceChart({ stats }: ProviderPerformanceChartProp
 
   if (stats.length === 0) {
     return (
-      <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+      <Card className="glass border-rose-500/20">
         <CardHeader>
           <CardTitle className="text-white">Provider Performance</CardTitle>
           <CardDescription className="text-gray-400">
@@ -90,8 +90,8 @@ export function ProviderPerformanceChart({ stats }: ProviderPerformanceChartProp
   }
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden">
-      <div className="h-1 bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500" />
+    <Card className="glass overflow-hidden border-rose-500/20 transition-all hover:border-rose-500/40">
+      <div className="h-1 bg-gradient-to-r from-rose-500 via-purple-500 to-blue-500 opacity-80" />
       <CardHeader>
         <CardTitle className="text-white">Provider Win Rates</CardTitle>
         <CardDescription className="text-gray-400">
@@ -101,14 +101,14 @@ export function ProviderPerformanceChart({ stats }: ProviderPerformanceChartProp
       <CardContent>
         <ChartContainer config={chartConfig} className="h-64 w-full">
           <BarChart data={chartData} layout="vertical" margin={{ left: 0, right: 16 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" horizontal={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" horizontal={false} />
             <YAxis
               dataKey="name"
               type="category"
               tickLine={false}
               axisLine={false}
               width={100}
-              tick={{ fill: '#9CA3AF', fontSize: 12 }}
+              tick={{ fill: '#9CA3AF', fontSize: 12, fontWeight: 500 }}
             />
             <XAxis
               type="number"
@@ -120,15 +120,19 @@ export function ProviderPerformanceChart({ stats }: ProviderPerformanceChartProp
             />
             <ChartTooltip
               content={<ChartTooltipContent />}
-              cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+              cursor={{ fill: 'rgba(255,255,255,0.03)' }}
             />
             <Bar
               dataKey="winRate"
-              radius={[0, 4, 4, 0]}
-              className="drop-shadow-lg"
+              radius={[0, 8, 8, 0]}
+              className="drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
             >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={entry.fill}
+                  fillOpacity={0.9}
+                />
               ))}
             </Bar>
           </BarChart>
@@ -162,11 +166,11 @@ export function CompetitionTrendChart({ data }: CompetitionTrendChartProps) {
   const chartData = data.length > 0 ? data : generateSampleTrendData();
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden">
-      <div className="h-1 bg-gradient-to-r from-rose-500 to-purple-500" />
+    <Card className="glass overflow-hidden border-rose-500/20 transition-all hover:border-rose-500/40">
+      <div className="h-1 bg-gradient-to-r from-rose-500 via-purple-500 to-rose-400 opacity-80" />
       <CardHeader>
-        <CardTitle className="text-white">Competition Trends</CardTitle>
-        <CardDescription className="text-gray-400">
+        <CardTitle className="text-white font-bold tracking-tight">Competition Trends</CardTitle>
+        <CardDescription className="text-gray-400 font-medium">
           Daily competition volume and response times
         </CardDescription>
       </CardHeader>
@@ -175,20 +179,20 @@ export function CompetitionTrendChart({ data }: CompetitionTrendChartProps) {
           <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="competitionsGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={BRAND_COLORS.rose} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={BRAND_COLORS.rose} stopOpacity={0} />
+                <stop offset="5%" stopColor={BRAND_COLORS.rose} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={BRAND_COLORS.rose} stopOpacity={0.02} />
               </linearGradient>
               <linearGradient id="latencyGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor={BRAND_COLORS.purple} stopOpacity={0.4} />
-                <stop offset="95%" stopColor={BRAND_COLORS.purple} stopOpacity={0} />
+                <stop offset="5%" stopColor={BRAND_COLORS.purple} stopOpacity={0.3} />
+                <stop offset="95%" stopColor={BRAND_COLORS.purple} stopOpacity={0.02} />
               </linearGradient>
             </defs>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis
               dataKey="date"
               tickLine={false}
               axisLine={false}
-              tick={{ fill: '#9CA3AF', fontSize: 11 }}
+              tick={{ fill: '#9CA3AF', fontSize: 11, fontWeight: 500 }}
             />
             <YAxis
               tickLine={false}
@@ -200,7 +204,7 @@ export function CompetitionTrendChart({ data }: CompetitionTrendChartProps) {
               type="monotone"
               dataKey="competitions"
               stroke={BRAND_COLORS.rose}
-              strokeWidth={2}
+              strokeWidth={3}
               fill="url(#competitionsGradient)"
             />
             <ChartLegend content={<ChartLegendContent />} />
@@ -241,8 +245,8 @@ export function AgentStatusChart({ active, idle, offline }: AgentStatusChartProp
   ];
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden">
-      <div className="h-1 bg-gradient-to-r from-emerald-500 via-amber-500 to-gray-500" />
+    <Card className="glass overflow-hidden border-rose-500/20 transition-all hover:border-rose-500/40">
+      <div className="h-1 bg-gradient-to-r from-emerald-500 via-amber-500 to-gray-500 opacity-80" />
       <CardHeader>
         <CardTitle className="text-white">Agent Status</CardTitle>
         <CardDescription className="text-gray-400">
@@ -263,7 +267,7 @@ export function AgentStatusChart({ active, idle, offline }: AgentStatusChartProp
               strokeWidth={0}
             >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} className="drop-shadow-lg" />
+                <Cell key={`cell-${index}`} fill={entry.fill} className="drop-shadow-[0_0_8px_rgba(0,0,0,0.3)]" />
               ))}
             </Pie>
             <ChartTooltip content={<ChartTooltipContent />} />
@@ -271,15 +275,15 @@ export function AgentStatusChart({ active, idle, offline }: AgentStatusChartProp
           </PieChart>
         </ChartContainer>
         <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-          <div className="rounded-lg bg-emerald-500/10 p-2">
+          <div className="rounded-lg bg-emerald-500/10 p-2 border border-emerald-500/20">
             <div className="text-lg font-bold text-emerald-400">{active}</div>
             <div className="text-xs text-gray-400">Active</div>
           </div>
-          <div className="rounded-lg bg-amber-500/10 p-2">
+          <div className="rounded-lg bg-amber-500/10 p-2 border border-amber-500/20">
             <div className="text-lg font-bold text-amber-400">{idle}</div>
             <div className="text-xs text-gray-400">Idle</div>
           </div>
-          <div className="rounded-lg bg-gray-500/10 p-2">
+          <div className="rounded-lg bg-gray-500/10 p-2 border border-gray-500/20">
             <div className="text-lg font-bold text-gray-400">{offline}</div>
             <div className="text-xs text-gray-400">Offline</div>
           </div>
@@ -314,8 +318,8 @@ export function PipelineMetricsChart({
   ];
 
   return (
-    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden">
-      <div className="h-1 bg-gradient-to-r from-blue-500 via-rose-500 to-emerald-500" />
+    <Card className="glass overflow-hidden border-rose-500/20 transition-all hover:border-rose-500/40">
+      <div className="h-1 bg-gradient-to-r from-blue-500 via-rose-500 to-emerald-500 opacity-80" />
       <CardHeader>
         <CardTitle className="text-white">3D Pipeline Metrics</CardTitle>
         <CardDescription className="text-gray-400">
@@ -325,12 +329,12 @@ export function PipelineMetricsChart({
       <CardContent>
         <ChartContainer config={chartConfig} className="h-48 w-full">
           <BarChart data={chartData} margin={{ top: 10, right: 10, left: -10, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" vertical={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" vertical={false} />
             <XAxis
               dataKey="metric"
               tickLine={false}
               axisLine={false}
-              tick={{ fill: '#9CA3AF', fontSize: 11 }}
+              tick={{ fill: '#9CA3AF', fontSize: 11, fontWeight: 500 }}
             />
             <YAxis
               tickLine={false}
@@ -338,9 +342,9 @@ export function PipelineMetricsChart({
               tick={{ fill: '#9CA3AF', fontSize: 11 }}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+            <Bar dataKey="value" radius={[6, 6, 0, 0]} className="drop-shadow-md">
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.fill} />
+                <Cell key={`cell-${index}`} fill={entry.fill} fillOpacity={0.9} />
               ))}
             </Bar>
           </BarChart>

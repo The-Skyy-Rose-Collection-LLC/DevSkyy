@@ -2,7 +2,6 @@
 
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch, AsyncMock
 
 pytestmark = pytest.mark.asyncio
 
@@ -64,7 +63,7 @@ class TestBatchGeneration:
 
     async def test_batch_generation_invalid_provider(self, client, auth_headers):
         """Test batch generation with invalid provider."""
-        response = client.post(
+        response = await client.post(
             "/api/v1/pipeline/batch-generate",
             json={
                 "asset_ids": ["asset-1"],
@@ -77,7 +76,7 @@ class TestBatchGeneration:
 
     async def test_batch_generation_empty_assets(self, client, auth_headers):
         """Test batch generation with no assets."""
-        response = client.post(
+        response = await client.post(
             "/api/v1/pipeline/batch-generate",
             json={"asset_ids": [], "provider": "tripo", "quality": "high"},
         )
@@ -87,10 +86,8 @@ class TestBatchGeneration:
     async def test_batch_generation_quality_tiers(self, client, auth_headers):
         """Test different quality tiers."""
         for quality in ["draft", "standard", "high"]:
-            with patch("api.v1.pipeline.start_batch_generation") as mock_start:
-                mock_start.return_value = {"id": f"job-{quality}", "quality": quality}
 
-                response = client.post(
+                response = await client.post(
                     "/api/v1/pipeline/batch-generate",
                     json={"asset_ids": ["asset-1"], "provider": "tripo", "quality": quality},
                 )
@@ -103,10 +100,8 @@ class TestJobStatus:
 
     async def test_get_job_status(self, client, auth_headers, mock_3d_job):
         """Test getting job status."""
-        with patch("api.v1.pipeline.get_job") as mock_get:
-            mock_get.return_value = mock_3d_job
 
-            response = client.get("/api/v1/pipeline/jobs/job-123")
+            response = await client.get("/api/v1/pipeline/jobs/job-123")
 
             assert response.status_code == 200
             data = response.json()
@@ -115,10 +110,8 @@ class TestJobStatus:
 
     async def test_get_job_not_found(self, client, auth_headers):
         """Test getting non-existent job."""
-        with patch("api.v1.pipeline.get_job") as mock_get:
-            mock_get.return_value = None
 
-            response = client.get("/api/v1/pipeline/jobs/nonexistent")
+            response = await client.get("/api/v1/pipeline/jobs/nonexistent")
 
             assert response.status_code == 404
 
@@ -136,10 +129,8 @@ class TestJobStatus:
             ],
         }
 
-        with patch("api.v1.pipeline.get_job") as mock_get:
-            mock_get.return_value = completed_job
 
-            response = client.get("/api/v1/pipeline/jobs/job-complete")
+            response = await client.get("/api/v1/pipeline/jobs/job-complete")
 
             assert response.status_code == 200
             data = response.json()
@@ -152,7 +143,6 @@ class TestJobsList:
 
     async def test_list_jobs(self, client, auth_headers, mock_3d_job):
         """Test listing all jobs."""
-        with patch("api.v1.pipeline.list_jobs") as mock_list:
             mock_list.return_value = {
                 "jobs": [mock_3d_job],
                 "total": 1,
@@ -160,7 +150,7 @@ class TestJobsList:
                 "page_size": 20,
             }
 
-            response = client.get("/api/v1/pipeline/jobs")
+            response = await client.get("/api/v1/pipeline/jobs")
 
             assert response.status_code == 200
             data = response.json()
@@ -168,7 +158,7 @@ class TestJobsList:
 
     async def test_list_jobs_with_status_filter(self, client, auth_headers):
         """Test filtering jobs by status."""
-        response = client.get("/api/v1/pipeline/jobs?status=completed")
+        response = await client.get("/api/v1/pipeline/jobs?status=completed")
 
         assert response.status_code == 200
 
@@ -178,10 +168,9 @@ class TestSingleGeneration:
 
     async def test_generate_single_3d_model(self, client, auth_headers, mock_3d_result):
         """Test generating a single 3D model."""
-        with patch("api.v1.pipeline.generate_3d_model") as mock_gen:
             mock_gen.return_value = mock_3d_result
 
-            response = client.post(
+            response = await client.post(
                 "/api/v1/pipeline/generate",
                 json={
                     "asset_id": "asset-1",
@@ -198,10 +187,9 @@ class TestSingleGeneration:
 
     async def test_generate_with_default_quality(self, client, auth_headers):
         """Test generation with default quality settings."""
-        with patch("api.v1.pipeline.generate_3d_model") as mock_gen:
             mock_gen.return_value = {"asset_id": "asset-1", "quality": "standard"}
 
-            response = client.post(
+            response = await client.post(
                 "/api/v1/pipeline/generate",
                 json={"asset_id": "asset-1"},
             )
@@ -228,10 +216,9 @@ class TestFidelityQA:
             "approved": True,
         }
 
-        with patch("api.v1.pipeline.get_fidelity") as mock_fidelity:
             mock_fidelity.return_value = fidelity_data
 
-            response = client.get("/api/v1/pipeline/fidelity/asset-1")
+            response = await client.get("/api/v1/pipeline/fidelity/asset-1")
 
             assert response.status_code == 200
             data = response.json()
@@ -240,10 +227,9 @@ class TestFidelityQA:
 
     async def test_approve_fidelity(self, client, auth_headers):
         """Test approving a 3D model's fidelity."""
-        with patch("api.v1.pipeline.approve_fidelity") as mock_approve:
             mock_approve.return_value = {"asset_id": "asset-1", "approved": True}
 
-            response = client.post(
+            response = await client.post(
                 "/api/v1/pipeline/fidelity/asset-1/approve",
                 json={"approved": True},
             )
@@ -252,10 +238,9 @@ class TestFidelityQA:
 
     async def test_reject_fidelity_with_regeneration(self, client, auth_headers):
         """Test rejecting fidelity and requesting regeneration."""
-        with patch("api.v1.pipeline.reject_fidelity") as mock_reject:
             mock_reject.return_value = {"asset_id": "asset-1", "regenerate": True}
 
-            response = client.post(
+            response = await client.post(
                 "/api/v1/pipeline/fidelity/asset-1/reject",
                 json={
                     "reason": "Low geometry accuracy",
@@ -293,10 +278,9 @@ class TestProviders:
             ]
         }
 
-        with patch("api.v1.pipeline.get_providers") as mock_providers:
             mock_providers.return_value = providers
 
-            response = client.get("/api/v1/pipeline/providers")
+            response = await client.get("/api/v1/pipeline/providers")
 
             assert response.status_code == 200
             data = response.json()
@@ -304,7 +288,6 @@ class TestProviders:
 
     async def test_get_provider_status(self, client, auth_headers):
         """Test getting individual provider status."""
-        with patch("api.v1.pipeline.get_provider_status") as mock_status:
             mock_status.return_value = {
                 "id": "tripo",
                 "available": True,
@@ -312,7 +295,7 @@ class TestProviders:
                 "est_wait_time": 300.0,
             }
 
-            response = client.get("/api/v1/pipeline/providers/tripo")
+            response = await client.get("/api/v1/pipeline/providers/tripo")
 
             assert response.status_code == 200
 
@@ -332,7 +315,6 @@ class TestCostEstimation:
 
     async def test_estimate_batch_cost(self, client, auth_headers):
         """Test estimating cost for batch generation."""
-        with patch("api.v1.pipeline.estimate_cost") as mock_cost:
             mock_cost.return_value = {
                 "total_cost": 15.50,
                 "per_asset_cost": 0.50,
@@ -341,7 +323,7 @@ class TestCostEstimation:
                 "quality": "high",
             }
 
-            response = client.post(
+            response = await client.post(
                 "/api/v1/pipeline/estimate",
                 json={
                     "asset_count": 31,
