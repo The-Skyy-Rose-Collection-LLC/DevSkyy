@@ -1,0 +1,110 @@
+{
+  "brand_dna": {
+    "brand_name": "SkyyRose",
+    "tagline": "Where Love Meets Luxury",
+    "collections": [
+      "signature",
+      "black-rose",
+      "love-hurts"
+    ],
+    "tone_descriptors": [
+      "sophisticated",
+      "bold",
+      "romantic",
+      "empowering",
+      "Oakland-rooted"
+    ],
+    "target_audience": "Discerning luxury fashion consumers aged 25-45",
+    "top_performers": 0
+  },
+  "generated": [
+    {
+      "content_id": "58d3393f-9521-4922-8b7f-f96d51174713",
+      "title": "Signature Collection: Define Discerning Taste",
+      "type": "collection_page",
+      "collection": "SIGNATURE",
+      "body_length": 1340,
+      "excerpt_length": 238,
+      "seo_title": "Signature Collection | SkyyRose Luxury",
+      "seo_desc_length": 138,
+      "tokens": 1526
+    },
+    {
+      "content_id": "2dc8c30c-30a3-4600-8849-05ba73da3407",
+      "title": "Black Rose Collection: Where Shadow Dances with Silver",
+      "type": "collection_page",
+      "collection": "BLACK_ROSE",
+      "body_length": 1187,
+      "excerpt_length": 166,
+      "seo_title": "Black Rose Collection | SkyyRose Gothic Luxury",
+      "seo_desc_length": 153,
+      "tokens": 1492
+    },
+    {
+      "content_id": "3fe59911-51ef-417e-ac08-1029377c9a49",
+      "title": "LOVE HURTS: Feel Everything",
+      "type": "collection_page",
+      "collection": "LOVE_HURTS",
+      "body_length": 1190,
+      "excerpt_length": 218,
+      "seo_title": "LOVE HURTS Collection | Rose Gold Jewelry | SkyyRose",
+      "seo_desc_length": 161,
+      "tokens": 1552
+    },
+    {
+      "content_id": "6fe70261-54cb-4ba3-8111-06aa70263605",
+      "title": "SkyyRose: Oakland Luxury, Defined.",
+      "type": "hero_copy",
+      "collection": "brand",
+      "body_length": 842,
+      "excerpt_length": 150,
+      "seo_title": "SkyyRose: Oakland Luxury Fashion | Where Love Meets Luxury",
+      "seo_desc_length": 127,
+      "tokens": 1420
+    },
+    {
+      "content_id": "84857ec2-bb17-4404-8755-9b77f1aec8f4",
+      "title": "Step Inside the Signature Virtual Experience",
+      "type": "landing_page",
+      "collection": "SIGNATURE",
+      "body_length": 1362,
+      "excerpt_length": 259,
+      "seo_title": "Signature Virtual Experience | SkyyRose",
+      "seo_desc_length": 127,
+      "tokens": 1568
+    }
+  ],
+  "published": [
+    {
+      "content_id": "58d3393f-9521-4922-8b7f-f96d51174713",
+      "wp_post_id": 9157,
+      "title": "Signature Collection: Define Discerning Taste",
+      "collection": "SIGNATURE"
+    },
+    {
+      "content_id": "2dc8c30c-30a3-4600-8849-05ba73da3407",
+      "wp_post_id": 9158,
+      "title": "Black Rose Collection: Where Shadow Dances with Silver",
+      "collection": "BLACK_ROSE"
+    },
+    {
+      "content_id": "3fe59911-51ef-417e-ac08-1029377c9a49",
+      "wp_post_id": 9159,
+      "title": "LOVE HURTS: Feel Everything",
+      "collection": "LOVE_HURTS"
+    },
+    {
+      "content_id": "6fe70261-54cb-4ba3-8111-06aa70263605",
+      "wp_post_id": 9160,
+      "title": "SkyyRose: Oakland Luxury, Defined.",
+      "collection": "brand"
+    },
+    {
+      "content_id": "84857ec2-bb17-4404-8755-9b77f1aec8f4",
+      "wp_post_id": 9161,
+      "title": "Step Inside the Signature Virtual Experience",
+      "collection": "SIGNATURE"
+    }
+  ],
+  "errors": []
+}

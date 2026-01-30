@@ -1,212 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BLACK ROSE Collection | SkyyRose</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap"
+        rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
             --black-rose: #8B0000;
-            --black-rose-dark: #5C0000;
-            --love-hurts: #B76E79;
-            --signature-gold: #D4AF37;
-            --bg-dark: #0A0A0A;
+            --black-rose-glow: #ff0000;
+            --bg-dark: #030303;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-blur: blur(20px);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Inter', sans-serif;
             background: var(--bg-dark);
             color: #fff;
+            overflow-x: hidden;
+            line-height: 1.6;
         }
 
+        /* Ambient Background */
         body::before {
             content: '';
             position: fixed;
-            inset: 0;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
-            opacity: 0.03;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background:
+                radial-gradient(circle at 15% 15%, rgba(139, 0, 0, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 85%, rgba(139, 0, 0, 0.1) 0%, transparent 40%);
+            z-index: -1;
             pointer-events: none;
-            z-index: 9999;
         }
 
-        /* Collection-specific overlay */
+        /* Noise Texture */
         body::after {
             content: '';
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at 50% 0%, rgba(139, 0, 0, 0.15) 0%, transparent 60%);
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
+            opacity: 0.04;
             pointer-events: none;
-            z-index: -1;
+            z-index: 9999;
+            mix-blend-mode: overlay;
         }
 
+        /* Utility Classes */
+        .glass {
+            background: var(--glass-bg);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, #fff 0%, var(--black-rose) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Navbar */
         .navbar {
             position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 1400px;
             z-index: 1000;
-            padding: 1.5rem 4rem;
+            padding: 1rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 100px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .navbar.scrolled {
+            background: rgba(10, 10, 10, 0.8);
+            width: 95%;
+            top: 1rem;
         }
 
         .logo {
             font-family: 'Playfair Display', serif;
-            font-size: 1.8rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             letter-spacing: 2px;
-            background: linear-gradient(135deg, var(--love-hurts), var(--signature-gold));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: #fff;
             text-decoration: none;
         }
 
         .nav-links {
             display: flex;
-            gap: 3rem;
+            gap: 2.5rem;
             list-style: none;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.5rem 2rem;
+            border-radius: 100px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .nav-links a {
-            color: #fff;
+            color: rgba(255, 255, 255, 0.8);
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             font-weight: 500;
             letter-spacing: 1.5px;
             text-transform: uppercase;
-            position: relative;
+            transition: all 0.3s ease;
         }
 
-        .nav-links a.active::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--black-rose);
-        }
-
-        .nav-links a:hover { color: var(--signature-gold); }
-
-        .nav-actions {
-            display: flex;
-            gap: 1.5rem;
-            align-items: center;
-        }
-
-        .nav-icon {
+        .nav-links a:hover,
+        .nav-links a.active {
             color: #fff;
-            font-size: 1.2rem;
-            cursor: pointer;
-            position: relative;
-            text-decoration: none;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
         }
 
-        .cart-count {
-            position: absolute;
-            top: -8px;
-            right: -8px;
-            background: var(--black-rose);
-            color: #fff;
-            font-size: 0.65rem;
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Collection Hero */
-        .collection-hero {
-            min-height: 70vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            padding-top: 100px;
-            overflow: hidden;
-        }
-
-        .collection-hero-bg {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, rgba(139, 0, 0, 0.2) 0%, transparent 50%);
-        }
-
-        /* Floating roses animation */
-        .floating-element {
-            position: absolute;
-            font-size: 2rem;
-            opacity: 0.15;
-            animation: floatUp 15s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 0.15; }
-            90% { opacity: 0.15; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
-
-        .collection-hero-content {
+        /* Hero */
+        .hero {
+            padding: 180px 0 80px;
             text-align: center;
-            z-index: 10;
-            max-width: 800px;
-            padding: 0 2rem;
+            position: relative;
         }
 
-        .collection-badge {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
-            background: var(--black-rose);
-            font-size: 0.75rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            margin-bottom: 2rem;
-        }
-
-        .collection-title {
+        .hero-title {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 8vw, 5rem);
-            font-weight: 400;
-            margin-bottom: 1.5rem;
-            line-height: 1.1;
+            font-size: 5rem;
+            margin-bottom: 1rem;
+            animation: fadeUp 1s ease-out;
         }
 
-        .collection-title span {
-            display: block;
-            background: linear-gradient(135deg, #fff 0%, var(--black-rose) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .collection-subtitle {
+        .hero-subtitle {
             font-size: 1.1rem;
-            color: rgba(255, 255, 255, 0.7);
-            max-width: 500px;
-            margin: 0 auto;
-            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            animation: fadeUp 1s ease-out 0.2s backwards;
         }
 
         /* Filter Bar */
-        .filter-bar {
-            padding: 2rem 4rem;
+        .filter-container {
+            max-width: 1400px;
+            margin: 0 auto 4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            max-width: 1400px;
-            margin: 0 auto;
+            padding: 0 2rem;
+            animation: fadeUp 1s ease-out 0.4s backwards;
         }
 
         .filter-group {
@@ -215,611 +172,244 @@
         }
 
         .filter-btn {
-            padding: 0.75rem 1.5rem;
             background: transparent;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 0.8rem;
-            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.7);
+            padding: 0.5rem 1.5rem;
+            border-radius: 30px;
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .filter-btn:hover,
         .filter-btn.active {
-            background: var(--black-rose);
             border-color: var(--black-rose);
+            color: var(--black-rose);
+            box-shadow: 0 0 15px rgba(139, 0, 0, 0.2);
         }
 
-        .sort-select {
-            padding: 0.75rem 2rem 0.75rem 1rem;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: #fff;
-            font-size: 0.8rem;
-            cursor: pointer;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 0.75rem center;
-        }
-
-        .sort-select option { background: var(--bg-dark); }
-
-        /* Products Grid */
-        .products-section {
-            padding: 4rem;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
+        /* Product Grid */
         .products-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto 8rem;
+            padding: 0 2rem;
         }
 
         .product-card {
-            position: relative;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
             overflow: hidden;
-            transition: all 0.4s ease;
+            transition: transform 0.4s ease;
+            position: relative;
+            cursor: pointer;
         }
 
         .product-card:hover {
-            border-color: rgba(139, 0, 0, 0.5);
-            transform: translateY(-5px);
+            transform: translateY(-10px);
         }
 
-        .product-badge {
-            position: absolute;
-            top: 1rem;
-            left: 1rem;
-            padding: 0.4rem 0.8rem;
-            font-size: 0.65rem;
-            font-weight: 600;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            z-index: 10;
-        }
-
-        .product-badge.new { background: var(--signature-gold); color: var(--bg-dark); }
-        .product-badge.limited { background: var(--black-rose); color: #fff; }
-        .product-badge.bestseller { background: #fff; color: var(--bg-dark); }
-
-        .product-image {
+        .card-image-wrapper {
             height: 400px;
-            background: linear-gradient(135deg, #1a0808 0%, #0a0303 100%);
+            background: rgba(255, 255, 255, 0.02);
             display: flex;
             align-items: center;
             justify-content: center;
+            font-size: 4rem;
             position: relative;
             overflow: hidden;
         }
 
-        .product-actions {
+        .card-image-wrapper::after {
+            content: '';
             position: absolute;
-            bottom: -60px;
-            left: 0;
-            right: 0;
-            display: flex;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.9), transparent);
-            transition: bottom 0.4s ease;
+            inset: 0;
+            background: radial-gradient(circle, rgba(139, 0, 0, 0.2) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
         }
 
-        .product-card:hover .product-actions { bottom: 0; }
-
-        .product-action-btn {
-            width: 45px;
-            height: 45px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            background: rgba(0, 0, 0, 0.5);
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 1.1rem;
-        }
-
-        .product-action-btn:hover {
-            background: var(--black-rose);
-            border-color: var(--black-rose);
+        .product-card:hover .card-image-wrapper::after {
+            opacity: 1;
         }
 
         .product-info {
             padding: 1.5rem;
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
         }
 
-        .product-name {
+        .product-title {
             font-family: 'Playfair Display', serif;
-            font-size: 1.2rem;
+            font-size: 1.4rem;
             margin-bottom: 0.5rem;
         }
 
-        .product-name a {
-            color: #fff;
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .product-name a:hover { color: var(--black-rose); }
-
-        .product-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
         .product-price {
+            color: var(--black-rose-glow);
             font-size: 1.1rem;
-            font-weight: 600;
-            color: var(--signature-gold);
+            letter-spacing: 1px;
         }
 
-        .product-colors {
-            display: flex;
-            gap: 0.4rem;
+        .add-btn {
+            width: 100%;
+            padding: 1rem;
+            margin-top: 1rem;
+            background: linear-gradient(90deg, transparent, rgba(139, 0, 0, 0.3), transparent);
+            border: 1px solid var(--black-rose);
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .color-dot {
-            width: 14px;
-            height: 14px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.3);
+        .add-btn:hover {
+            background: var(--black-rose);
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
         }
 
-        /* Collection Story */
-        .collection-story {
-            padding: 8rem 4rem;
-            background: linear-gradient(180deg, #111 0%, var(--bg-dark) 100%);
-        }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
 
-        .story-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 6rem;
-            align-items: center;
-        }
-
-        .story-text h2 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .story-text p {
-            color: rgba(255, 255, 255, 0.7);
-            line-height: 2;
-            margin-bottom: 1rem;
-        }
-
-        .story-visual {
-            height: 400px;
-            background: linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(92, 0, 0, 0.3));
-            position: relative;
-        }
-
-        .story-visual::before {
-            content: '🥀';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 8rem;
-            opacity: 0.3;
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Footer */
-        .footer {
-            padding: 5rem 4rem 2rem;
-            background: var(--bg-dark);
+        footer {
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .footer-grid {
-            display: grid;
-            grid-template-columns: 2fr repeat(4, 1fr);
-            gap: 4rem;
-            max-width: 1400px;
-            margin: 0 auto 4rem;
-        }
-
-        .footer-brand p {
-            color: rgba(255, 255, 255, 0.6);
-            line-height: 1.8;
-            margin-top: 1.5rem;
-            max-width: 300px;
-        }
-
-        .footer-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-links { list-style: none; }
-        .footer-links li { margin-bottom: 0.75rem; }
-        .footer-links a {
-            color: rgba(255, 255, 255, 0.6);
-            text-decoration: none;
-            font-size: 0.9rem;
-        }
-        .footer-links a:hover { color: var(--signature-gold); }
-
-        .footer-bottom {
-            display: flex;
-            justify-content: space-between;
-            padding-top: 2rem;
-            border-top: 1px solid rgba(255, 255, 255, 0.05);
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .footer-bottom p {
+            padding: 4rem 2rem;
+            text-align: center;
             color: rgba(255, 255, 255, 0.4);
-            font-size: 0.85rem;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            background: var(--black-rose);
-            color: #fff;
-            padding: 1rem 2rem;
-            transform: translateX(150%);
-            transition: transform 0.4s ease;
-            z-index: 2000;
-        }
-
-        .toast.show { transform: translateX(0); }
-
-        @media (max-width: 1024px) {
-            .navbar { padding: 1rem 2rem; }
-            .nav-links { display: none; }
-            .products-grid { grid-template-columns: repeat(2, 1fr); }
-            .story-content { grid-template-columns: 1fr; gap: 3rem; }
-            .filter-bar { flex-direction: column; gap: 1rem; }
-        }
-
-        @media (max-width: 768px) {
-            .products-grid { grid-template-columns: 1fr; }
-            .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
         }
     </style>
 </head>
-<body>
-    <!-- Floating Roses -->
-    <div class="floating-element" style="left: 10%; animation-delay: 0s;">🥀</div>
-    <div class="floating-element" style="left: 30%; animation-delay: 3s;">🌹</div>
-    <div class="floating-element" style="left: 50%; animation-delay: 6s;">🥀</div>
-    <div class="floating-element" style="left: 70%; animation-delay: 9s;">🌹</div>
-    <div class="floating-element" style="left: 90%; animation-delay: 12s;">🥀</div>
 
-    <nav class="navbar">
-        <a href="homepage.html" class="logo">SKYYROSE</a>
-        <ul class="nav-links">
-            <li><a href="collection-black-rose.html" class="active">Black Rose</a></li>
-            <li><a href="collection-love-hurts.html">Love Hurts</a></li>
-            <li><a href="collection-signature.html">Signature</a></li>
-            <li><a href="pre-order.html" class="nav-highlight">Pre-Order</a></li>
-            <li><a href="about.html">About</a></li>
+<body>
+    <nav class="navbar glass" id="navbar">
+        <a href="homepage_enhanced.html" class="logo text-gradient">SKYYROSE</a>
+        <ul class="nav-links glass">
+            <li><a href="01-black-rose-garden_immersive.html" class="active">Black Rose</a></li>
+            <li><a href="02-love-hurts-castle_immersive.html">Love Hurts</a></li>
+            <li><a href="03-signature-runway_immersive.html">Signature</a></li>
+            <li><a href="pre-order_immersive.html">Pre-Order</a></li>
         </ul>
-        <div class="nav-actions">
-            <span class="nav-icon">🔍</span>
-            <a href="wishlist.html" class="nav-icon">♡</a>
-            <a href="cart.html" class="nav-icon" style="position: relative;">🛒<span class="cart-count" id="cartCount">0</span></a>
-        </div>
+        <div style="color: rgba(255,255,255,0.6);">CART (0)</div>
     </nav>
 
-    <section class="collection-hero">
-        <div class="collection-hero-bg"></div>
-        <div class="collection-hero-content">
-            <span class="collection-badge">Limited Edition</span>
-            <h1 class="collection-title">
-                <span>BLACK ROSE</span>
-            </h1>
-            <p class="collection-subtitle">Dark elegance for the bold. Each piece embodies the beauty found in shadows, crafted for those who dare to stand apart.</p>
+    <section class="hero">
+        <div
+            style="position: absolute; top: -50px; left: 50%; transform: translateX(-50%); width: 1px; height: 150px; background: linear-gradient(to bottom, transparent, var(--black-rose));">
         </div>
+        <h1 class="hero-title">Black <span class="text-gradient">Rose</span></h1>
+        <p class="hero-subtitle">Dark elegance born from the shadows. A collection representing resilience and
+            protection.</p>
     </section>
 
-    <div class="filter-bar">
+    <div class="filter-container">
         <div class="filter-group">
             <button class="filter-btn active">All</button>
-            <button class="filter-btn">Hoodies</button>
-            <button class="filter-btn">Jackets</button>
-            <button class="filter-btn">Tees</button>
-            <button class="filter-btn">Pants</button>
+            <button class="filter-btn">Outerwear</button>
+            <button class="filter-btn">Tops</button>
+            <button class="filter-btn">Bottoms</button>
         </div>
-        <select class="sort-select">
-            <option>Sort by: Featured</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
-            <option>Newest</option>
-        </select>
+        <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">6 PRODUCTS</div>
     </div>
 
-    <section class="products-section">
-        <div class="products-grid">
-            <div class="product-card" data-id="thorn-hoodie" data-name="Thorn Hoodie" data-price="185" data-collection="Black Rose">
-                <span class="product-badge limited">Limited</span>
-                <div class="product-image">
-                    <div class="product-actions">
-                        <button class="product-action-btn" title="Quick View">👁️</button>
-                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">♡</button>
-                        <button class="product-action-btn add-to-cart-btn" title="Add to Cart">🛒</button>
-                    </div>
+    <div class="products-grid">
+        <!-- Product 1 -->
+        <div class="product-card glass" onclick="window.location.href='single-product.html?id=thorn-hoodie'">
+            <div class="card-image-wrapper">🥀</div>
+            <div class="product-info">
+                <h3 class="product-title">Thorn Hoodie</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="product-price">$185</span>
+                    <span style="font-size: 0.8rem; color: #666;">LIMITED</span>
                 </div>
-                <div class="product-info">
-                    <h3 class="product-name"><a href="single-product.html">Thorn Hoodie</a></h3>
-                    <div class="product-meta">
-                        <span class="product-price">$185</span>
-                        <div class="product-colors">
-                            <span class="color-dot" style="background: #1a1a1a;"></span>
-                            <span class="color-dot" style="background: #8B0000;"></span>
-                            <span class="color-dot" style="background: #333;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="midnight-jacket" data-name="Midnight Jacket" data-price="295" data-collection="Black Rose">
-                <span class="product-badge new">New</span>
-                <div class="product-image">
-                    <div class="product-actions">
-                        <button class="product-action-btn" title="Quick View">👁️</button>
-                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">♡</button>
-                        <button class="product-action-btn add-to-cart-btn" title="Add to Cart">🛒</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name"><a href="single-product.html">Midnight Jacket</a></h3>
-                    <div class="product-meta">
-                        <span class="product-price">$295</span>
-                        <div class="product-colors">
-                            <span class="color-dot" style="background: #1a1a1a;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="gothic-tee" data-name="Gothic Tee" data-price="75" data-collection="Black Rose">
-                <div class="product-image">
-                    <div class="product-actions">
-                        <button class="product-action-btn" title="Quick View">👁️</button>
-                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">♡</button>
-                        <button class="product-action-btn add-to-cart-btn" title="Add to Cart">🛒</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name"><a href="single-product.html">Gothic Tee</a></h3>
-                    <div class="product-meta">
-                        <span class="product-price">$75</span>
-                        <div class="product-colors">
-                            <span class="color-dot" style="background: #1a1a1a;"></span>
-                            <span class="color-dot" style="background: #8B0000;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="chain-cargo" data-name="Chain Cargo" data-price="195" data-collection="Black Rose">
-                <span class="product-badge bestseller">Bestseller</span>
-                <div class="product-image">
-                    <div class="product-actions">
-                        <button class="product-action-btn" title="Quick View">👁️</button>
-                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">♡</button>
-                        <button class="product-action-btn add-to-cart-btn" title="Add to Cart">🛒</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name"><a href="single-product.html">Chain Cargo</a></h3>
-                    <div class="product-meta">
-                        <span class="product-price">$195</span>
-                        <div class="product-colors">
-                            <span class="color-dot" style="background: #1a1a1a;"></span>
-                            <span class="color-dot" style="background: #333;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="thorn-cap" data-name="Thorn Cap" data-price="55" data-collection="Black Rose">
-                <div class="product-image">
-                    <div class="product-actions">
-                        <button class="product-action-btn" title="Quick View">👁️</button>
-                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">♡</button>
-                        <button class="product-action-btn add-to-cart-btn" title="Add to Cart">🛒</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name"><a href="single-product.html">Thorn Cap</a></h3>
-                    <div class="product-meta">
-                        <span class="product-price">$55</span>
-                        <div class="product-colors">
-                            <span class="color-dot" style="background: #1a1a1a;"></span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="product-card" data-id="shadow-shorts" data-name="Shadow Shorts" data-price="95" data-collection="Black Rose">
-                <div class="product-image">
-                    <div class="product-actions">
-                        <button class="product-action-btn" title="Quick View">👁️</button>
-                        <button class="product-action-btn wishlist-btn" title="Add to Wishlist">♡</button>
-                        <button class="product-action-btn add-to-cart-btn" title="Add to Cart">🛒</button>
-                    </div>
-                </div>
-                <div class="product-info">
-                    <h3 class="product-name"><a href="single-product.html">Shadow Shorts</a></h3>
-                    <div class="product-meta">
-                        <span class="product-price">$95</span>
-                        <div class="product-colors">
-                            <span class="color-dot" style="background: #1a1a1a;"></span>
-                        </div>
-                    </div>
-                </div>
+                <button class="add-btn">Add to Cart</button>
             </div>
         </div>
-    </section>
 
-    <section class="collection-story">
-        <div class="story-content">
-            <div class="story-text">
-                <h2>The BLACK ROSE Philosophy</h2>
-                <p>In a world of fleeting trends, BLACK ROSE stands eternal. Each piece is born from the shadows, designed for those who find strength in darkness and elegance in the unconventional.</p>
-                <p>Our signature thorn motif represents resilience—the protective beauty that guards what's precious. Every stitch, every detail is crafted to empower you to embrace your authentic self.</p>
-            </div>
-            <div class="story-visual"></div>
-        </div>
-    </section>
-
-    <!-- Experience CTA -->
-    <section class="experience-cta" style="padding: 4rem 4rem; text-align: center; background: linear-gradient(135deg, rgba(139, 0, 0, 0.15) 0%, transparent 100%);">
-        <h2 style="font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 1rem;">Enter the Virtual Garden</h2>
-        <p style="color: rgba(255, 255, 255, 0.7); max-width: 500px; margin: 0 auto 2rem; line-height: 1.8;">Immerse yourself in our 3D BLACK ROSE experience. Explore products in a dark, enchanting virtual garden.</p>
-        <a href="01-black-rose-garden.html" style="display: inline-block; padding: 1rem 2.5rem; background: var(--black-rose); color: #fff; text-decoration: none; font-size: 0.85rem; font-weight: 600; letter-spacing: 2px; text-transform: uppercase; transition: all 0.3s ease;">Enter Experience →</a>
-    </section>
-
-    <footer class="footer">
-        <div class="footer-grid">
-            <div class="footer-brand">
-                <a href="homepage.html" class="logo">SKYYROSE</a>
-                <p>Where love meets luxury. Oakland-born streetwear for those who wear their heart on their sleeve.</p>
-            </div>
-            <div>
-                <h4 class="footer-title">Shop</h4>
-                <ul class="footer-links">
-                    <li><a href="collection-black-rose.html">Black Rose</a></li>
-                    <li><a href="collection-love-hurts.html">Love Hurts</a></li>
-                    <li><a href="collection-signature.html">Signature</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-title">Company</h4>
-                <ul class="footer-links">
-                    <li><a href="about.html">About Us</a></li>
-                    <li><a href="blog.html">Journal</a></li>
-                    <li><a href="contact.html">Contact</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-title">Support</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Shipping</a></li>
-                    <li><a href="#">Size Guide</a></li>
-                    <li><a href="#">FAQ</a></li>
-                </ul>
-            </div>
-            <div>
-                <h4 class="footer-title">Connect</h4>
-                <ul class="footer-links">
-                    <li><a href="#">Instagram</a></li>
-                    <li><a href="#">TikTok</a></li>
-                    <li><a href="#">Twitter</a></li>
-                </ul>
+        <!-- Product 2 -->
+        <div class="product-card glass" onclick="window.location.href='single-product.html?id=midnight-jacket'">
+            <div class="card-image-wrapper">🌹</div>
+            <div class="product-info">
+                <h3 class="product-title">Midnight Jacket</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="product-price">$295</span>
+                    <span style="font-size: 0.8rem; color: #666;">NEW</span>
+                </div>
+                <button class="add-btn">Add to Cart</button>
             </div>
         </div>
-        <div class="footer-bottom">
-            <p>&copy; 2025 SkyyRose. All rights reserved.</p>
+
+        <!-- Product 3 -->
+        <div class="product-card glass" onclick="window.location.href='single-product.html?id=chain-cargo'">
+            <div class="card-image-wrapper">⚔️</div>
+            <div class="product-info">
+                <h3 class="product-title">Chain Cargo</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="product-price">$195</span>
+                    <span style="font-size: 0.8rem; color: #666;">BESTSELLER</span>
+                </div>
+                <button class="add-btn">Add to Cart</button>
+            </div>
         </div>
+
+        <!-- Product 4 -->
+        <div class="product-card glass" onclick="window.location.href='single-product.html?id=gothic-tee'">
+            <div class="card-image-wrapper">🖤</div>
+            <div class="product-info">
+                <h3 class="product-title">Gothic Tee</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="product-price">$75</span>
+                </div>
+                <button class="add-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- Product 5 -->
+        <div class="product-card glass" onclick="window.location.href='single-product.html?id=thorn-cap'">
+            <div class="card-image-wrapper">🧢</div>
+            <div class="product-info">
+                <h3 class="product-title">Thorn Cap</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="product-price">$55</span>
+                </div>
+                <button class="add-btn">Add to Cart</button>
+            </div>
+        </div>
+
+        <!-- Product 6 -->
+        <div class="product-card glass" onclick="window.location.href='single-product.html?id=shadow-shorts'">
+            <div class="card-image-wrapper">🩳</div>
+            <div class="product-info">
+                <h3 class="product-title">Shadow Shorts</h3>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="product-price">$95</span>
+                </div>
+                <button class="add-btn">Add to Cart</button>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 SkyyRose. Where Love Meets Luxury.</p>
     </footer>
 
-    <div class="toast" id="toast">Added to cart!</div>
-
     <script>
-        let cart = JSON.parse(localStorage.getItem('skyyrose_cart')) || [];
-        let wishlist = JSON.parse(localStorage.getItem('skyyrose_wishlist')) || [];
-
-        function updateCartCount() {
-            document.getElementById('cartCount').textContent = cart.reduce((sum, item) => sum + item.qty, 0);
-        }
-        updateCartCount();
-
-        // Filter buttons
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-            });
-        });
-
-        // Add to cart
-        document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.product-card');
-                const item = {
-                    id: card.dataset.id,
-                    name: card.dataset.name,
-                    collection: card.dataset.collection,
-                    price: parseInt(card.dataset.price),
-                    size: 'M',
-                    color: 'Default',
-                    qty: 1
-                };
-
-                const existing = cart.findIndex(i => i.id === item.id);
-                if (existing > -1) {
-                    cart[existing].qty++;
-                } else {
-                    cart.push(item);
-                }
-
-                localStorage.setItem('skyyrose_cart', JSON.stringify(cart));
-                updateCartCount();
-
-                const toast = document.getElementById('toast');
-                toast.textContent = `${item.name} added to cart!`;
-                toast.classList.add('show');
-                setTimeout(() => toast.classList.remove('show'), 3000);
-            });
-        });
-
-        // Add to wishlist
-        document.querySelectorAll('.wishlist-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const card = btn.closest('.product-card');
-                const item = {
-                    id: card.dataset.id,
-                    name: card.dataset.name,
-                    collection: card.dataset.collection,
-                    price: parseInt(card.dataset.price)
-                };
-
-                if (!wishlist.find(i => i.id === item.id)) {
-                    wishlist.push(item);
-                    localStorage.setItem('skyyrose_wishlist', JSON.stringify(wishlist));
-                    btn.textContent = '❤️';
-                    
-                    const toast = document.getElementById('toast');
-                    toast.textContent = `${item.name} added to wishlist!`;
-                    toast.classList.add('show');
-                    setTimeout(() => toast.classList.remove('show'), 3000);
-                }
-            });
-        });
-
-        // Check if items are already in wishlist
-        wishlist.forEach(item => {
-            const card = document.querySelector(`[data-id="${item.id}"]`);
-            if (card) {
-                card.querySelector('.wishlist-btn').textContent = '❤️';
-            }
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) navbar.classList.add('scrolled');
+            else navbar.classList.remove('scrolled');
         });
     </script>
 </body>
+
 </html>

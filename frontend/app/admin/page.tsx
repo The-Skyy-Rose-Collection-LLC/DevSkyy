@@ -76,6 +76,23 @@ async function fetchDashboardData(): Promise<{
   };
 }
 
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1 },
+};
+
 export default function AdminDashboard() {
   const { data, loading, error, refetch } = useQuery(
     'dashboard',
@@ -101,22 +118,29 @@ export default function AdminDashboard() {
   const { stats, providerStats } = data!;
 
   return (
-    <div className="space-y-6">
+    <motion.div
+      initial="hidden"
+      animate="visible"
+      variants={containerVariants}
+      className="space-y-8"
+    >
       {/* Header */}
-      <header className="flex items-center justify-between">
+      <motion.header variants={itemVariants} className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white">DevSkyy Dashboard</h1>
-          <p className="text-gray-400 mt-1">Enterprise AI Platform Overview</p>
+          <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            DevSkyy <span className="gradient-text-vibrant">Dashboard</span>
+          </h1>
+          <p className="text-gray-400 mt-2 text-lg font-medium">Enterprise AI Platform Overview</p>
         </div>
-        <Badge variant="outline" className="border-green-500 text-green-400">
-          <Activity className="h-3 w-3 mr-1" aria-hidden="true" />
+        <Badge variant="outline" className="border-green-500/50 bg-green-500/5 text-green-400 backdrop-blur-sm px-4 py-1">
+          <Activity className="h-3 w-3 mr-2 animate-pulse" aria-hidden="true" />
           All Systems Operational
         </Badge>
-      </header>
+      </motion.header>
 
       {/* Stats Grid */}
-      <section aria-label="Platform Statistics">
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      <motion.section variants={itemVariants} aria-label="Platform Statistics">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <StatsCard
             title="LLM Competitions"
             value={stats.roundTable.totalCompetitions}
@@ -150,24 +174,24 @@ export default function AdminDashboard() {
             trendDirection="up"
           />
         </div>
-      </section>
+      </motion.section>
 
       {/* Provider & Pipeline Status */}
-      <section aria-label="Provider and Pipeline Status">
-        <div className="grid gap-6 lg:grid-cols-2">
+      <motion.section variants={itemVariants} aria-label="Provider and Pipeline Status">
+        <div className="grid gap-8 lg:grid-cols-2">
           <ProviderRankingsCard providerStats={providerStats} />
           <PipelineStatusCard status={stats.pipeline3d} />
         </div>
-      </section>
+      </motion.section>
 
       {/* Analytics Charts */}
-      <section aria-label="Analytics Charts">
-        <div className="grid gap-6 lg:grid-cols-2">
+      <motion.section variants={itemVariants} aria-label="Analytics Charts">
+        <div className="grid gap-8 lg:grid-cols-2">
           <ProviderPerformanceChart stats={providerStats} />
           <CompetitionTrendChart data={[]} />
         </div>
 
-        <div className="grid gap-6 lg:grid-cols-2 mt-6">
+        <div className="grid gap-8 lg:grid-cols-2 mt-8">
           <AgentStatusChart
             active={stats.agents.active}
             idle={42}
@@ -180,10 +204,10 @@ export default function AdminDashboard() {
             completedToday={12}
           />
         </div>
-      </section>
+      </motion.section>
 
       {/* Quick Actions */}
-      <section aria-label="Quick Actions">
+      <motion.section variants={itemVariants} aria-label="Quick Actions">
         <Card className="bg-gray-900 border-gray-800">
           <CardHeader>
             <CardTitle className="text-white">Quick Actions</CardTitle>
@@ -229,8 +253,8 @@ export default function AdminDashboard() {
             </div>
           </CardContent>
         </Card>
-      </section>
-    </div>
+      </motion.section>
+    </motion.div>
   );
 }
 
