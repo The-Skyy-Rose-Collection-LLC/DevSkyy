@@ -960,3 +960,224 @@ async def delete_asset_version(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Failed to delete version",
         )
+
+
+# =============================================================================
+# Asset Management CRUD Operations (for Dashboard UI)
+# =============================================================================
+
+
+class AssetMetadata(BaseModel):
+    """Asset metadata for CRUD operations."""
+
+    collection: str | None = None
+    sku: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    type: str | None = None
+
+
+class AssetResponse(BaseModel):
+    """Response model for asset CRUD."""
+
+    id: str
+    name: str
+    url: str
+    collection: str | None = None
+    sku: str | None = None
+    tags: list[str] = Field(default_factory=list)
+    type: str
+    size: int | None = None
+    dimensions: dict[str, int] | None = None
+    uploaded_at: str
+
+
+class AssetListResponse(BaseModel):
+    """Response for asset list."""
+
+    assets: list[AssetResponse]
+    total: int
+    page: int
+    page_size: int
+    has_more: bool
+
+
+class AssetUploadResponse(AssetResponse):
+    """Response for asset upload."""
+
+    pass
+
+
+# In-memory storage for demo (replace with database in production)
+_assets: dict[str, dict[str, Any]] = {}
+_collection_stats: dict[str, int] = {
+    "black_rose": 0,
+    "signature": 0,
+    "love_hurts": 0,
+    "showroom": 0,
+    "runway": 0,
+}
+
+
+@router.get("", response_model=AssetListResponse, summary="List assets")
+async def list_assets(
+    collection: str | None = Query(None),
+    type: str | None = Query(None),
+    search: str | None = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(20, ge=1, le=100),
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """List all assets with filtering and pagination."""
+    assets = list(_assets.values())
+
+    # Apply filters
+    if collection:
+        assets = [a for a in assets if a.get("collection") == collection]
+    if type:
+        assets = [a for a in assets if a.get("type") == type]
+    if search:
+        search_lower = search.lower()
+        assets = [
+            a
+            for a in assets
+            if search_lower in a.get("name", "").lower() or search_lower in a.get("sku", "").lower()
+        ]
+
+    total = len(assets)
+    start = (page - 1) * limit
+    end = start + limit
+    paginated = assets[start:end]
+
+    return AssetListResponse(
+        assets=[AssetResponse(**a) for a in paginated],
+        total=total,
+        page=page,
+        page_size=limit,
+        has_more=end < total,
+    )
+
+
+@router.get("/{asset_id}", response_model=AssetResponse, summary="Get asset by ID")
+async def get_asset(
+    asset_id: str,
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Get a single asset by ID."""
+    if asset_id not in _assets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset {asset_id} not found",
+        )
+    return AssetResponse(**_assets[asset_id])
+
+
+@router.patch("/{asset_id}", response_model=AssetResponse, summary="Update asset")
+async def update_asset(
+    asset_id: str,
+    metadata: AssetMetadata,
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Update asset metadata."""
+    if asset_id not in _assets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset {asset_id} not found",
+        )
+
+    asset = _assets[asset_id]
+    if metadata.collection is not None:
+        # Update collection stats
+        old_collection = asset.get("collection")
+        if old_collection and old_collection in _collection_stats:
+            _collection_stats[old_collection] -= 1
+        if metadata.collection in _collection_stats:
+            _collection_stats[metadata.collection] += 1
+        asset["collection"] = metadata.collection
+
+    if metadata.sku is not None:
+        asset["sku"] = metadata.sku
+    if metadata.tags:
+        asset["tags"] = metadata.tags
+    if metadata.type is not None:
+        asset["type"] = metadata.type
+
+    return AssetResponse(**asset)
+
+
+@router.delete("/{asset_id}", status_code=status.HTTP_200_OK, summary="Delete asset")
+async def delete_asset(
+    asset_id: str,
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Delete an asset."""
+    if asset_id not in _assets:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Asset {asset_id} not found",
+        )
+
+    asset = _assets[asset_id]
+    collection = asset.get("collection")
+    if collection and collection in _collection_stats:
+        _collection_stats[collection] -= 1
+
+    del _assets[asset_id]
+    return {"status": "deleted", "asset_id": asset_id}
+
+
+@router.post(
+    "/upload",
+    response_model=AssetUploadResponse,
+    status_code=status.HTTP_201_CREATED,
+    summary="Upload asset",
+)
+async def upload_asset(
+    file: UploadFile = File(...),
+    collection: str = Form(...),
+    sku: str | None = Form(None),
+    tags: str | None = Form(None),  # JSON string
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Upload a new asset file."""
+    import json
+    from uuid import uuid4
+
+    # Validate file type
+    if file.content_type not in ALLOWED_IMAGE_FORMATS and not file.content_type.startswith(
+        "model/"
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid file type: {file.content_type}",
+        )
+
+    # Create asset
+    asset_id = f"asset-{uuid4().hex[:8]}"
+    asset = {
+        "id": asset_id,
+        "name": file.filename,
+        "url": f"https://storage.example.com/assets/{asset_id}/{file.filename}",
+        "collection": collection,
+        "sku": sku,
+        "tags": json.loads(tags) if tags else [],
+        "type": "3d_model" if file.content_type.startswith("model/") else "image",
+        "size": file.size if hasattr(file, "size") else None,
+        "dimensions": None,
+        "uploaded_at": datetime.now(UTC).isoformat(),
+    }
+
+    _assets[asset_id] = asset
+
+    # Update collection stats
+    if collection in _collection_stats:
+        _collection_stats[collection] += 1
+
+    return AssetUploadResponse(**asset)
+
+
+@router.get("/stats/collections", summary="Get collection statistics")
+async def get_collection_stats(
+    current_user: TokenPayload = Depends(get_current_user),
+):
+    """Get asset counts per collection."""
+    return _collection_stats
