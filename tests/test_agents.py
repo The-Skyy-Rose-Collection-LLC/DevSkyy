@@ -217,18 +217,19 @@ class TestWordPressAssetConfig:
     def test_config_from_env(self):
         """Should create config from environment."""
         config = WordPressAssetConfig.from_env()
-        assert config.timeout > 0
+        assert config.site_id is not None  # May be empty string from env
+        assert config.base_url  # Should have default value
 
     def test_3d_upload_result_model(self):
         """Should have 3D upload result model."""
         result = Model3DUploadResult(
+            success=True,
             media_id=123,
-            glb_url="https://example.com/model.glb",
-            usdz_url="https://example.com/model.usdz",
+            cdn_url="https://example.com/model.glb",
         )
+        assert result.success is True
         assert result.media_id == 123
-        assert result.glb_url is not None
-        assert result.usdz_url is not None
+        assert result.cdn_url == "https://example.com/model.glb"
 
 
 class TestAssetPipeline:
