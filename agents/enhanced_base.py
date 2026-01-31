@@ -29,7 +29,7 @@ from agents.errors import (
     ValidationError,
     wrap_exception,
 )
-from base import (
+from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,

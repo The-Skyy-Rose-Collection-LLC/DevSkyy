@@ -239,7 +239,8 @@ result = await registry.execute("my_tool", {"param": "value"}, context)
 All agents follow the Plan → Retrieve → Execute → Validate → Emit workflow:
 
 ```python
-from base import SuperAgent, AgentConfig
+from agents.base_super_agent import EnhancedSuperAgent
+from adk.base import AgentConfig
 
 class MyAgent(SuperAgent):
     async def _plan(self, request, context):

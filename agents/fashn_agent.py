@@ -39,7 +39,7 @@ import aiohttp
 from pydantic import BaseModel, Field
 from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
-from base import (
+from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,

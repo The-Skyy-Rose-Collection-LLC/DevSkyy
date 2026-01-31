@@ -7,7 +7,7 @@ with zero dependencies on outer application layers (api, agents, services).
 
 Modules:
 - auth: Authentication types, models, and interfaces
-- registry: Service registry for dependency injection (coming in Phase 4)
+- registry: Service registry for dependency injection
 
 Design Principles:
 1. Zero Circular Dependencies: Core never imports from api/, security/, agents/, or services/
@@ -15,6 +15,6 @@ Design Principles:
 3. Dependency Inversion: Outer layers depend on core abstractions, not vice versa
 """
 
-from . import auth
+from . import auth, registry
 
-__all__ = ["auth"]
+__all__ = ["auth", "registry"]
