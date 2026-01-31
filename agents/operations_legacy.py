@@ -21,7 +21,7 @@ from typing import Any
 
 import structlog
 
-from base import (
+from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
     ExecutionResult,
