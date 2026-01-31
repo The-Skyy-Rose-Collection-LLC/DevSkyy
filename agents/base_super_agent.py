@@ -2272,7 +2272,7 @@ REASONING: Your explanation"""
 # =============================================================================
 
 
-class EnhancedSuperAgent(BaseDevSkyyAgent):
+class EnhancedSuperAgent(BaseDevSkyyAgent):  # Implements ISuperAgent via duck typing
     """
     Enhanced Base Super Agent with all modules integrated.
 
@@ -2288,8 +2288,32 @@ class EnhancedSuperAgent(BaseDevSkyyAgent):
     agent_type: SuperAgentType = None
     sub_capabilities: list[str] = []
 
-    def __init__(self, config: AgentConfig):
+    def __init__(
+        self,
+        config: AgentConfig,
+        *,
+        rag_manager: Any | None = None,
+        ml_pipeline: Any | None = None,
+        llm_client: Any | None = None,
+        cache: Any | None = None,
+    ):
+        """
+        Initialize Enhanced Super Agent with optional dependency injection.
+
+        Args:
+            config: Agent configuration
+            rag_manager: Optional RAG manager (IRAGManager)
+            ml_pipeline: Optional ML pipeline (IMLPipeline)
+            llm_client: Optional LLM client
+            cache: Optional cache provider (ICacheProvider)
+        """
         super().__init__(config)
+
+        # Store injected dependencies or fetch from registry
+        self._rag_manager = rag_manager
+        self._ml_pipeline = ml_pipeline
+        self._llm_client = llm_client
+        self._cache = cache
 
         # Initialize modules
         self.prompt_module = PromptEngineeringModule()

@@ -219,6 +219,16 @@ async def lifespan(app: FastAPI):
     else:
         log.info("sentry_disabled", reason="SENTRY_DSN not configured")
 
+    # Register services for dependency injection (Phase 4)
+    log.info("registering_services_for_di")
+    try:
+        from core.registry.registrations import register_all_services
+        register_all_services()
+        log.info("services_registered_successfully")
+    except Exception as e:
+        log.error("service_registration_failed", error=str(e), exc_info=True)
+        # Non-critical - continue startup even if registration fails
+
     # Initialize RAG pipeline components (conditional on RAG_AUTO_INGEST env var)
     rag_auto_ingest_enabled = os.getenv("RAG_AUTO_INGEST", "false").lower() == "true"
 
@@ -536,6 +546,16 @@ async def lifespan(app: FastAPI):
     await redis_cache.disconnect()
     await webhook_manager.close()
     log.info("platform_shutdown_complete")
+
+    # Register services for dependency injection (Phase 4)
+    log.info("registering_services_for_di")
+    try:
+        from core.registry.registrations import register_all_services
+        register_all_services()
+        log.info("services_registered_successfully")
+    except Exception as e:
+        log.error("service_registration_failed", error=str(e), exc_info=True)
+        # Non-critical - continue startup even if registration fails
 
 
 # =============================================================================
