@@ -2,9 +2,19 @@
 
 System architecture and design documentation for the DevSkyy Enterprise Platform.
 
-## 📋 Available Documentation
+**Version**: 1.3.0
+**Last Updated**: 2026-01-30
 
-- **[DEVSKYY_MASTER_PLAN.md](./DEVSKYY_MASTER_PLAN.md)** - Master architectural plan and system design
+## Available Documentation
+
+| Document | Description |
+|----------|-------------|
+| [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) | Layered architecture, dependency rules, component responsibilities |
+| [DATA_FLOW.md](./DATA_FLOW.md) | Request flows, RAG pipeline, WordPress sync, 3D generation |
+| [COMPONENTS.md](./COMPONENTS.md) | Detailed breakdown of all modules and their internals |
+| [DEVSKYY_MASTER_PLAN.md](./DEVSKYY_MASTER_PLAN.md) | Strategic roadmap and master plan |
+| [AUTHENTICATED_IMPLEMENTATIONS.md](./AUTHENTICATED_IMPLEMENTATIONS.md) | Auth implementation details |
+| [../testing/COVERAGE_MATRIX.md](../testing/COVERAGE_MATRIX.md) | Test coverage by module |
 
 ## 🏗️ System Architecture Overview
 
@@ -181,4 +191,12 @@ System architecture and design documentation for the DevSkyy Enterprise Platform
 
 ---
 
-For detailed architectural specifications, see [DEVSKYY_MASTER_PLAN.md](./DEVSKYY_MASTER_PLAN.md).
+## Quick Start
+
+For new developers, start with:
+
+1. [SYSTEM_ARCHITECTURE.md](./SYSTEM_ARCHITECTURE.md) - Understand the layered architecture
+2. [COMPONENTS.md](./COMPONENTS.md) - Learn about specific modules
+3. [DATA_FLOW.md](./DATA_FLOW.md) - See how data moves through the system
+
+For strategic planning, see [DEVSKYY_MASTER_PLAN.md](./DEVSKYY_MASTER_PLAN.md).
