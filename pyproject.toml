@@ -92,6 +92,9 @@ dependencies = [
     "python-dateutil>=2.8",
     "email-validator>=2.1",
     "structlog>=25.5.0",
+    "python-jose[cryptography]>=3.3",
+    "sentry-sdk>=2.49.0",
+    "toml>=0.10.2",
 
     # 3D & Visual Generation
     "Pillow>=10.0",
@@ -125,6 +128,10 @@ dev = [
     "pre-commit>=3.6",
     "selenium>=4.15",
     "playwright>=1.40",
+    # Additional dev tools from requirements-dev.txt
+    "pip-tools>=7.3",
+    "ipython>=8.18",
+    "watchfiles>=0.21",
 ]
 
 api = [
@@ -239,10 +246,35 @@ ml = [
     "pydantic>=2.10.3",
     "sqlalchemy==2.0.45",
     "pymongo==4.10.1",
+    # LlamaIndex multimodal capabilities
+    "llama-index>=0.12.0",
+    "llama-index-llms-openai>=0.3.0",
+    "llama-index-multi-modal-llms-anthropic>=0.2.0",
+    "llama-index-multi-modal-llms-huggingface>=0.2.0",
+    # Gradio client for HF Spaces
+    "gradio-client>=1.5.0",
+]
+
+worker = [
+    # Background task processing
+    "celery>=5.4.0",
+    "kombu>=5.4.2",
+    "flower>=2.0.0",
+]
+
+deploy = [
+    # Production deployment
+    "gunicorn>=23.0.0",
+    "uvicorn[standard]>=0.32.1",
+]
+
+sdk = [
+    # Claude Agent SDK integration
+    "claude-agent-sdk>=0.1.18",
 ]
 
 all = [
-    "devskyy[dev,api,mcp,ml]",
+    "devskyy[dev,api,mcp,ml,worker,deploy,sdk]",
 ]
 
 [project.urls]
