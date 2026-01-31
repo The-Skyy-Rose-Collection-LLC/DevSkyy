@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "devskyy"
-version = "3.0.0"
+version = "3.1.0"
 description = "AI-driven multi-agent orchestration platform for enterprise e-commerce automation with WordPress/WooCommerce integration, 3D asset generation, and LangGraph workflows"
 readme = "README.md"
 license = { text = "MIT" }
@@ -290,6 +290,7 @@ prompt-enhance = "cli.prompt_enhance:cli"
 [tool.setuptools.packages.find]
 where = ["."]
 include = [
+    "core*",
     "api*",
     "security*",
     "database*",
@@ -337,7 +338,7 @@ ignore = [
 ]
 
 [tool.ruff.lint.isort]
-known-first-party = ["api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
+known-first-party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["ARG001", "ARG002"]
@@ -373,7 +374,7 @@ exclude = '''
 [tool.isort]
 profile = "black"
 line_length = 100
-known_first_party = ["api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
+known_first_party = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
 skip = ["legacy/", ".venv/"]
 
 # =============================================================================
@@ -428,6 +429,7 @@ ignore_missing_imports = true
 # First-party code - enforce strict typing
 [[tool.mypy.overrides]]
 module = [
+    "core.*",
     "api.*",
     "security.*",
     "database.*",
@@ -436,7 +438,6 @@ module = [
     "orchestration.*",
     "runtime.*",
     "llm.*",
-    "core.*",
     "mcp_servers.*",
     "pipelines.*",
 ]
@@ -487,7 +488,7 @@ timeout = 120
 # =============================================================================
 
 [tool.coverage.run]
-source = ["api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
+source = ["core", "api", "security", "database", "wordpress", "agents", "orchestration", "runtime", "llm"]
 branch = true
 omit = ["tests/*", "*/__init__.py", "legacy/*"]
 
