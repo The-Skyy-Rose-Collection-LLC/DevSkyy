@@ -17,6 +17,10 @@ languages:
 - python
 - typescript
 - java
+- php
+
+# the encoding used by text files in the project
+# For a list of possible encodings, see https://docs.python.org/3.11/library/codecs.html#standard-encodings
 encoding: "utf-8"
 
 # whether to use the project's gitignore file to ignore files
@@ -82,12 +86,32 @@ initial_prompt: |
   Key areas: Super Agents, LLM orchestration, 3D asset generation (Tripo3D),
   WordPress/Elementor integration, and security modules.
   Always check memories for deployment status and critical directives.
-
+# the name by which the project can be referenced within Serena
 project_name: "DevSkyy"
+
+# list of tools to include that would otherwise be disabled (particularly optional tools that are disabled by default)
 included_optional_tools:
 - delete_lines
 - insert_at_line
 - replace_lines
 - restart_language_server
 - summarize_changes
+
+# fixed set of tools to use as the base tool set (if non-empty), replacing Serena's default set of tools.
+# This cannot be combined with non-empty excluded_tools or included_optional_tools.
 fixed_tools: []
+
+# list of mode names to that are always to be included in the set of active modes
+# The full set of modes to be activated is base_modes + default_modes.
+# If the setting is undefined, the base_modes from the global configuration (serena_config.yml) apply.
+# Otherwise, this setting overrides the global configuration.
+# Set this to [] to disable base modes for this project.
+# Set this to a list of mode names to always include the respective modes for this project.
+base_modes:
+
+# list of mode names that are to be activated by default.
+# The full set of modes to be activated is base_modes + default_modes.
+# If the setting is undefined, the default_modes from the global configuration (serena_config.yml) apply.
+# Otherwise, this overrides the setting from the global configuration (serena_config.yml).
+# This setting can, in turn, be overridden by CLI parameters (--mode).
+default_modes:

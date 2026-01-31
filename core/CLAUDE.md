@@ -1,10 +1,16 @@
 # DevSkyy Core
 
-> Zero dependencies on outer layers | 16 files
+> Zero dependencies on outer layers | 22 files
 
 ## Architecture
 ```
 core/
+├── auth/                     # AUTHENTICATION TYPES (NEW - v1.3.0)
+│   ├── types.py             # UserRole, TokenType, AuthStatus (6 enums)
+│   ├── models.py            # TokenResponse, UserCreate, UserInDB (8 models)
+│   ├── interfaces.py        # IAuthProvider, ITokenValidator (5 ABCs)
+│   ├── token_payload.py     # TokenPayload dataclass
+│   └── role_hierarchy.py    # ROLE_HIERARCHY + utilities
 ├── runtime/
 │   ├── input_validator.py    # Pydantic validation
 │   └── tools.py              # ToolSpec, ToolRegistry
@@ -12,7 +18,20 @@ core/
 └── errors.py                 # Exception hierarchy
 ```
 
-## Pattern
+## Patterns
+
+### Auth Types (Zero Dependencies)
+```python
+from core.auth import UserRole, TokenPayload, IAuthProvider
+
+# Types are defined in core, implementations in security/
+payload = token_validator.validate_token(token)
+if payload.has_role(UserRole.ADMIN):
+    # Admin-specific logic
+    pass
+```
+
+### Tool Registry
 ```python
 class ToolSpec(BaseModel, Generic[T, R]):
     name: str
