@@ -35,9 +35,10 @@
 ```
 main_enterprise.py        # FastAPI (47+ endpoints)
 devskyy_mcp.py            # MCP server (13 tools)
+core/auth/                # Auth types, models, interfaces (zero deps)
 agents/                   # 6 SuperAgents + base (17 techniques)
 llm/                      # 6 providers, router, round_table
-security/                 # AES-256-GCM, JWT, audit_log
+security/                 # AES-256-GCM, JWT, audit_log (uses core.auth)
 api/v1/                   # REST, gdpr, webhooks
 tests/                    # 1200+ tests
 ```
@@ -67,4 +68,22 @@ SkyyRose: `#B76E79` primary | "Where Love Meets Luxury" | Use `BrandKit.from_con
 ## Health
 `/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
 
-**v1.2.0** | SkyyRose LLC | Production Hardening
+## Dependencies
+**Single Source**: `pyproject.toml` only (use `pip install -e ".[all]"`)
+- **Core**: FastAPI, Pydantic, SQLAlchemy, PyJWT, Sentry
+- **ML**: torch, transformers, diffusers, chromadb, llama-index
+- **Worker**: celery, kombu, flower
+- **Deploy**: gunicorn, uvicorn
+- **MCP**: 13 MCP tools + 6 LLM providers
+
+## Architecture (NEW - v1.3.0)
+**Dependency Flow** (one-way, no cycles):
+```
+core/auth (types, interfaces) ← ZERO dependencies on outer layers
+    ↓
+security (implementations)
+    ↓
+api, agents, services
+```
+
+**v1.3.0** | SkyyRose LLC | Component Refactoring
