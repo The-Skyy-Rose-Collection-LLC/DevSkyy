@@ -35,12 +35,20 @@
 ```
 main_enterprise.py        # FastAPI (47+ endpoints)
 devskyy_mcp.py            # MCP server (13 tools)
-core/auth/                # Auth types, models, interfaces (zero deps)
-agents/                   # 6 SuperAgents + base (17 techniques)
+core/
+├── auth/                 # Auth types, models, interfaces (zero deps)
+└── registry/             # Service registry for dependency injection
+agents/
+├── base_super_agent.py   # Enhanced base (17 techniques, ADK-based)
+├── base_legacy.py        # Legacy base classes (deprecated, use ADK)
+└── operations_legacy.py  # Legacy operations agent (deprecated)
+adk/                      # Agent Development Kit (symlink to sdk/python/adk)
 llm/                      # 6 providers, router, round_table
 security/                 # AES-256-GCM, JWT, audit_log (uses core.auth)
 api/v1/                   # REST, gdpr, webhooks
-tests/                    # 1200+ tests
+tests/
+├── integration/          # Integration tests (moved from root)
+└── ...                   # 1200+ tests
 ```
 
 ## Rules
@@ -76,14 +84,24 @@ SkyyRose: `#B76E79` primary | "Where Love Meets Luxury" | Use `BrandKit.from_con
 - **Deploy**: gunicorn, uvicorn
 - **MCP**: 13 MCP tools + 6 LLM providers
 
-## Architecture (NEW - v1.3.0)
+## Architecture (NEW - v1.3.1)
 **Dependency Flow** (one-way, no cycles):
 ```
-core/auth (types, interfaces) ← ZERO dependencies on outer layers
+core/ (auth + registry) ← ZERO dependencies on outer layers
+    ↓
+adk/ (Agent Development Kit)
     ↓
 security (implementations)
     ↓
-api, agents, services
+agents (use adk.base, not legacy base.py)
+    ↓
+api, services
 ```
 
-**v1.3.0** | SkyyRose LLC | Component Refactoring
+**Phase 2 Complete** (v1.3.1):
+- ✅ Root cleanup: base.py, operations.py → agents/
+- ✅ Test organization: test files → tests/integration/
+- ✅ Service registry: core/registry/ for dependency injection
+- ✅ Updated imports: agents use base_legacy until ADK migration
+
+**v1.3.1** | SkyyRose LLC | Phase 2: Structural Reorganization
