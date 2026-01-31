@@ -1,35 +1,20 @@
 """
-DevSkyy Core Utilities
-======================
+DevSkyy Core Module
+===================
 
-Performance-optimized utilities following industry best practices from:
-- FastAPI Best Practices (zhanymkanov/fastapi-best-practices)
-- Python LLM Caching Strategies (instructor)
-- Production-grade async patterns
+Foundation layer providing shared types, interfaces, and utilities
+with zero dependencies on outer application layers (api, agents, services).
 
 Modules:
-- performance: Caching, connection pooling, lazy imports
-- constants: Application-wide constants
+- auth: Authentication types, models, and interfaces
+- registry: Service registry for dependency injection (coming in Phase 4)
+
+Design Principles:
+1. Zero Circular Dependencies: Core never imports from api/, security/, agents/, or services/
+2. Type-Only Exports: Provides types and interfaces, not implementations
+3. Dependency Inversion: Outer layers depend on core abstractions, not vice versa
 """
 
-from .performance import (
-    AsyncConnectionPool,
-    CacheMetrics,
-    HierarchicalCache,
-    LazyImport,
-    async_lru_cache,
-    cached_property,
-    instructor_cache,
-    timed_lru_cache,
-)
+from . import auth
 
-__all__ = [
-    "instructor_cache",
-    "timed_lru_cache",
-    "async_lru_cache",
-    "cached_property",
-    "CacheMetrics",
-    "HierarchicalCache",
-    "AsyncConnectionPool",
-    "LazyImport",
-]
+__all__ = ["auth"]
