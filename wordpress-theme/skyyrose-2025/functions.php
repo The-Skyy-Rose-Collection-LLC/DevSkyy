@@ -238,3 +238,368 @@ function skyyrose_save_3d_model_meta($post_id) {
     }
 }
 add_action('save_post', 'skyyrose_save_3d_model_meta');
+
+/**
+ * Contact Form Handler
+ */
+add_action('wp_ajax_skyyrose_contact_form', 'skyyrose_handle_contact_form');
+add_action('wp_ajax_nopriv_skyyrose_contact_form', 'skyyrose_handle_contact_form');
+
+function skyyrose_handle_contact_form() {
+    // Verify nonce
+    if (!isset($_POST['contact_nonce']) || !wp_verify_nonce($_POST['contact_nonce'], 'skyyrose_contact')) {
+        wp_send_json_error('Security check failed');
+    }
+
+    // Sanitize inputs
+    $name = sanitize_text_field($_POST['name'] ?? '');
+    $email = sanitize_email($_POST['email'] ?? '');
+    $subject = sanitize_text_field($_POST['subject'] ?? '');
+    $message = sanitize_textarea_field($_POST['message'] ?? '');
+
+    // Validate
+    if (empty($name) || empty($email) || empty($subject) || empty($message)) {
+        wp_send_json_error('All fields are required');
+    }
+
+    if (!is_email($email)) {
+        wp_send_json_error('Invalid email address');
+    }
+
+    // Send email
+    $to = 'hello@skyyrose.co';
+    $email_subject = "SkyyRose Contact Form: $subject";
+    $email_message = "Name: $name\n";
+    $email_message .= "Email: $email\n";
+    $email_message .= "Subject: $subject\n\n";
+    $email_message .= "Message:\n$message";
+
+    $headers = array('Reply-To: ' . $email);
+
+    $sent = wp_mail($to, $email_subject, $email_message, $headers);
+
+    if ($sent) {
+        wp_send_json_success('Message sent successfully');
+    } else {
+        wp_send_json_error('Failed to send message. Please try again.');
+    }
+}
+
+/**
+ * AJAX Add to Cart Handler
+ */
+add_action('wp_ajax_woocommerce_ajax_add_to_cart', 'skyyrose_ajax_add_to_cart');
+add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart', 'skyyrose_ajax_add_to_cart');
+
+function skyyrose_ajax_add_to_cart() {
+    $product_id = absint($_POST['product_id'] ?? 0);
+    $quantity = absint($_POST['quantity'] ?? 1);
+
+    if ($product_id && $quantity) {
+        $added = WC()->cart->add_to_cart($product_id, $quantity);
+
+        if ($added) {
+            wp_send_json_success(array(
+                'message' => 'Product added to cart',
+                'cart_count' => WC()->cart->get_cart_contents_count(),
+            ));
+        } else {
+            wp_send_json_error('Failed to add product to cart');
+        }
+    } else {
+        wp_send_json_error('Invalid product or quantity');
+    }
+}
+
+/**
+ * Custom Product Meta Fields
+ */
+function skyyrose_add_custom_product_meta_boxes() {
+    add_meta_box(
+        'skyyrose_product_meta',
+        __('SkyyRose Product Details', 'skyyrose-2025'),
+        'skyyrose_product_meta_box_callback',
+        'product',
+        'normal',
+        'default'
+    );
+}
+add_action('add_meta_boxes', 'skyyrose_add_custom_product_meta_boxes');
+
+function skyyrose_product_meta_box_callback($post) {
+    $collection = get_post_meta($post->ID, '_skyyrose_collection', true);
+    $badge = get_post_meta($post->ID, '_product_badge', true);
+    $fabric = get_post_meta($post->ID, '_fabric_composition', true);
+    $care = get_post_meta($post->ID, '_care_instructions', true);
+    $vault_preorder = get_post_meta($post->ID, '_vault_preorder', true);
+
+    wp_nonce_field('skyyrose_product_meta', 'skyyrose_product_meta_nonce');
+    ?>
+    <style>
+        .skyyrose-meta-field { margin-bottom: 15px; }
+        .skyyrose-meta-field label { display: block; font-weight: 600; margin-bottom: 5px; }
+        .skyyrose-meta-field input[type="text"],
+        .skyyrose-meta-field textarea,
+        .skyyrose-meta-field select { width: 100%; }
+    </style>
+
+    <div class="skyyrose-meta-field">
+        <label for="skyyrose_collection"><?php _e('Collection', 'skyyrose-2025'); ?></label>
+        <select name="skyyrose_collection" id="skyyrose_collection">
+            <option value="">Select Collection</option>
+            <option value="black-rose" <?php selected($collection, 'black-rose'); ?>>Black Rose</option>
+            <option value="love-hurts" <?php selected($collection, 'love-hurts'); ?>>Love Hurts</option>
+            <option value="signature" <?php selected($collection, 'signature'); ?>>Signature</option>
+        </select>
+    </div>
+
+    <div class="skyyrose-meta-field">
+        <label for="product_badge"><?php _e('Product Badge (Optional)', 'skyyrose-2025'); ?></label>
+        <select name="product_badge" id="product_badge">
+            <option value="">No Badge</option>
+            <option value="NEW" <?php selected($badge, 'NEW'); ?>>NEW</option>
+            <option value="LIMITED" <?php selected($badge, 'LIMITED'); ?>>LIMITED</option>
+            <option value="EXCLUSIVE" <?php selected($badge, 'EXCLUSIVE'); ?>>EXCLUSIVE</option>
+        </select>
+    </div>
+
+    <div class="skyyrose-meta-field">
+        <label for="fabric_composition"><?php _e('Fabric Composition', 'skyyrose-2025'); ?></label>
+        <input type="text" name="fabric_composition" id="fabric_composition" value="<?php echo esc_attr($fabric); ?>" placeholder="e.g., 80% Cotton, 20% Polyester">
+    </div>
+
+    <div class="skyyrose-meta-field">
+        <label for="care_instructions"><?php _e('Care Instructions', 'skyyrose-2025'); ?></label>
+        <textarea name="care_instructions" id="care_instructions" rows="3" placeholder="e.g., Machine wash cold, tumble dry low"><?php echo esc_textarea($care); ?></textarea>
+    </div>
+
+    <div class="skyyrose-meta-field">
+        <label>
+            <input type="checkbox" name="vault_preorder" value="1" <?php checked($vault_preorder, '1'); ?>>
+            <?php _e('Show in The Vault (Pre-Order)', 'skyyrose-2025'); ?>
+        </label>
+    </div>
+    <?php
+}
+
+function skyyrose_save_product_meta($post_id) {
+    if (!isset($_POST['skyyrose_product_meta_nonce']) ||
+        !wp_verify_nonce($_POST['skyyrose_product_meta_nonce'], 'skyyrose_product_meta')) {
+        return;
+    }
+
+    if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+        return;
+    }
+
+    if (isset($_POST['skyyrose_collection'])) {
+        update_post_meta($post_id, '_skyyrose_collection', sanitize_text_field($_POST['skyyrose_collection']));
+    }
+
+    if (isset($_POST['product_badge'])) {
+        update_post_meta($post_id, '_product_badge', sanitize_text_field($_POST['product_badge']));
+    }
+
+    if (isset($_POST['fabric_composition'])) {
+        update_post_meta($post_id, '_fabric_composition', sanitize_text_field($_POST['fabric_composition']));
+    }
+
+    if (isset($_POST['care_instructions'])) {
+        update_post_meta($post_id, '_care_instructions', sanitize_textarea_field($_POST['care_instructions']));
+    }
+
+    if (isset($_POST['vault_preorder'])) {
+        update_post_meta($post_id, '_vault_preorder', '1');
+    } else {
+        delete_post_meta($post_id, '_vault_preorder');
+    }
+}
+add_action('save_post_product', 'skyyrose_save_product_meta');
+
+/**
+ * Security Hardening
+ */
+
+// Disable XML-RPC (prevents brute force and DDoS attacks)
+add_filter('xmlrpc_enabled', '__return_false');
+
+// Remove XML-RPC from HTTP headers
+add_filter('wp_headers', function($headers) {
+    unset($headers['X-Pingback']);
+    return $headers;
+});
+
+// Block XML-RPC requests
+add_filter('xmlrpc_methods', function($methods) {
+    unset($methods['pingback.ping']);
+    unset($methods['pingback.extensions.getPingbacks']);
+    return $methods;
+});
+
+// Disable XML-RPC authentication
+add_filter('authenticate', function($user, $username, $password) {
+    if (isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], 'xmlrpc.php') !== false) {
+        return new WP_Error('xmlrpc_disabled', __('XML-RPC services are disabled on this site.'));
+    }
+    return $user;
+}, 20, 3);
+
+// Remove RSD link (used by XML-RPC)
+remove_action('wp_head', 'rsd_link');
+
+// Security headers
+add_action('send_headers', function() {
+    header('X-Content-Type-Options: nosniff');
+    header('X-Frame-Options: SAMEORIGIN');
+    header('X-XSS-Protection: 1; mode=block');
+    header('Referrer-Policy: strict-origin-when-cross-origin');
+    header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
+});
+
+// Disable file editing in WordPress admin
+if (!defined('DISALLOW_FILE_EDIT')) {
+    define('DISALLOW_FILE_EDIT', true);
+}
+
+// Remove WordPress version from head
+remove_action('wp_head', 'wp_generator');
+
+// Disable REST API for unauthorized users (except WooCommerce and OAuth)
+add_filter('rest_authentication_errors', function($result) {
+    if (!empty($result)) {
+        return $result;
+    }
+
+    // Allow WooCommerce REST API
+    if (strpos($_SERVER['REQUEST_URI'], '/wc/') !== false) {
+        return $result;
+    }
+
+    // Allow OAuth authentication
+    if (isset($_SERVER['HTTP_AUTHORIZATION']) || isset($_GET['oauth_token'])) {
+        return $result;
+    }
+
+    // Allow Basic Authentication (for API access)
+    if (isset($_SERVER['PHP_AUTH_USER'])) {
+        return $result;
+    }
+
+    // Allow logged-in users
+    if (is_user_logged_in()) {
+        return $result;
+    }
+
+    // Allow public endpoints (posts, pages - read-only)
+    $public_routes = ['/wp/v2/posts', '/wp/v2/pages', '/wp/v2/media', '/wp/v2/categories', '/wp/v2/tags'];
+    foreach ($public_routes as $route) {
+        if (strpos($_SERVER['REQUEST_URI'], $route) !== false && $_SERVER['REQUEST_METHOD'] === 'GET') {
+            return $result;
+        }
+    }
+
+    // Block unauthenticated REST API access
+    return new WP_Error('rest_disabled', __('REST API is disabled for unauthorized users.'), array('status' => 403));
+});
+
+// Limit login attempts (basic implementation)
+add_action('wp_login_failed', function($username) {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    $attempts_key = 'login_attempts_' . md5($ip);
+    $attempts = get_transient($attempts_key) ?: 0;
+    $attempts++;
+    set_transient($attempts_key, $attempts, 15 * MINUTE_IN_SECONDS);
+
+    if ($attempts >= 5) {
+        wp_die(__('Too many failed login attempts. Please try again in 15 minutes.'), 403);
+    }
+});
+
+// Reset login attempts on successful login
+add_action('wp_login', function($username, $user) {
+    $ip = $_SERVER['REMOTE_ADDR'];
+    delete_transient('login_attempts_' . md5($ip));
+}, 10, 2);
+
+/**
+ * WordPress.com API Rate Limit Handling
+ */
+
+// Cache API responses to reduce calls
+function skyyrose_cache_api_response($endpoint, $callback, $expiration = HOUR_IN_SECONDS) {
+    $cache_key = 'api_cache_' . md5($endpoint);
+    $cached = get_transient($cache_key);
+
+    if ($cached !== false) {
+        return $cached;
+    }
+
+    $response = call_user_func($callback);
+    set_transient($cache_key, $response, $expiration);
+
+    return $response;
+}
+
+// Add rate limit retry logic for API calls
+function skyyrose_api_request_with_retry($url, $args = [], $max_retries = 3) {
+    $retry_count = 0;
+    $retry_delay = 2; // seconds
+
+    while ($retry_count < $max_retries) {
+        $response = wp_remote_request($url, $args);
+
+        // Check for rate limit error
+        if (is_wp_error($response)) {
+            $retry_count++;
+            if ($retry_count < $max_retries) {
+                sleep($retry_delay);
+                $retry_delay *= 2; // Exponential backoff
+                continue;
+            }
+            return $response;
+        }
+
+        $response_code = wp_remote_retrieve_response_code($response);
+
+        // Rate limit hit (429) - retry with backoff
+        if ($response_code === 429) {
+            $retry_count++;
+            if ($retry_count < $max_retries) {
+                // Check for Retry-After header
+                $retry_after = wp_remote_retrieve_header($response, 'retry-after');
+                $wait_time = $retry_after ? intval($retry_after) : $retry_delay;
+                sleep($wait_time);
+                $retry_delay *= 2;
+                continue;
+            }
+            return new WP_Error('rate_limit_exceeded', __('API rate limit exceeded. Please try again later.'));
+        }
+
+        // Success or other error - return response
+        return $response;
+    }
+
+    return new WP_Error('max_retries_exceeded', __('Maximum API retry attempts exceeded.'));
+}
+
+// Optimize WooCommerce queries to reduce API calls
+add_filter('woocommerce_product_query', function($q) {
+    // Cache product queries
+    $q->set('cache_results', true);
+    $q->set('update_post_meta_cache', true);
+    $q->set('update_post_term_cache', true);
+    return $q;
+});
+
+// Add API request logging (for debugging rate limits)
+add_action('http_api_debug', function($response, $context, $class, $args, $url) {
+    if (defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_LOG') && WP_DEBUG_LOG) {
+        $log_entry = sprintf(
+            "[%s] API Request: %s | Response Code: %s\n",
+            current_time('mysql'),
+            $url,
+            is_wp_error($response) ? 'ERROR' : wp_remote_retrieve_response_code($response)
+        );
+        error_log($log_entry);
+    }
+}, 10, 5);
