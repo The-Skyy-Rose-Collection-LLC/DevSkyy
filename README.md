@@ -1,4 +1,4 @@
-# DevSkyy v3.0.0
+# DevSkyy v3.1.0
 
 **Autonomous Fashion-Specific WordPress/Elementor Theme-Building Platform**
 
@@ -111,43 +111,155 @@ template.to_file("home.json")
 
 ## Architecture
 
+DevSkyy is organized into 8 core components with clear dependency boundaries:
+
+### Component Layers
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    HTTP/WebSocket Layer                      │
+│                   (FastAPI + ASGI)                          │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Security Layer                            │
+│         (JWT, OAuth2, Rate Limiting, Audit)                 │
+└─────────────────────────────────────────────────────────────┘
+                            ↓
+┌────────────┬──────────────┬──────────────┬─────────────────┐
+│  API       │  Agents      │  MCP         │  Orchestration  │
+│  Routes    │  (54 agents) │  Servers     │  (RAG/LLM)      │
+└────────────┴──────────────┴──────────────┴─────────────────┘
+                            ↓
+┌────────────┬──────────────┬──────────────┬─────────────────┐
+│  Services  │  LLM         │  Database    │  Integrations   │
+│  (ML/3D)   │  Providers   │  (Postgres)  │  (WP/Stripe)    │
+└────────────┴──────────────┴──────────────┴─────────────────┘
+                            ↓
+┌─────────────────────────────────────────────────────────────┐
+│                    Core Layer                                │
+│   (Auth Types, Logging, Caching, Validation, Utilities)    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 1. **Core** - Foundation Layer
+   - **Zero dependencies** on outer layers (api, agents, services)
+   - `core/auth/` - Authentication types, models, interfaces
+   - `core/registry/` - Service registry for dependency injection
+   - `core/runtime/` - Tool registry, input validation
+
+### 2. **Security** - Authentication & Encryption
+   - AES-256-GCM encryption (NIST SP 800-38D)
+   - JWT + OAuth2 implementation (uses `core/auth` interfaces)
+   - Argon2id password hashing (OWASP recommended)
+   - Audit logging, rate limiting, zero-trust architecture
+
+### 3. **Database** - Data Access Layer
+   - Async SQLAlchemy + repository pattern
+   - PostgreSQL 15+ with connection pooling
+   - Alembic migrations
+   - Repository interfaces defined in `core/repositories`
+
+### 4. **LLM** - Multi-Provider Router
+   - **6 Providers**: OpenAI, Anthropic, Google, Mistral, Cohere, Groq
+   - Tournament-style routing for consensus
+   - Provider abstraction via `core/llm/interfaces`
+   - Cost optimization and fallback handling
+
+### 5. **Orchestration** - RAG & Workflows
+   - RAG pipeline (ChromaDB + Pinecone)
+   - Context management and query rewriting
+   - Workflow orchestration (LangGraph, CrewAI)
+   - Brand context injection
+
+### 6. **Services** - Business Logic
+   - **ML Services**: Stable Diffusion, ControlNet, DreamBooth
+   - **3D Services**: Tripo3D, Meshy, Replicate
+   - **Analytics**: User behavior, product insights
+   - **Media Pipeline**: Image processing, CDN management
+
+### 7. **Agents** - AI Orchestration
+   - **54 specialized agents** using EnhancedSuperAgent base
+   - **17 prompt techniques** (CoT, ReAct, ToT, Self-Refine, etc.)
+   - **ADK Integration**: Multi-framework support (Google ADK, PydanticAI, CrewAI)
+   - Agent capabilities: 3D generation, virtual try-on, WordPress automation
+
+### 8. **API** - REST & WebSocket Endpoints
+   - **47+ endpoints** (FastAPI)
+   - GDPR compliance endpoints
+   - Webhook handlers (Stripe, WooCommerce)
+   - Admin dashboard
+   - MCP server integration (13 tools)
+
+### Dependency Flow Rules
+
+```
+Core (no deps)
+  ↓
+Security, Database, LLM
+  ↓
+Orchestration, Services
+  ↓
+Agents
+  ↓
+API
+```
+
+**One-way dependencies**: Lower layers never import upper layers. Horizontal dependencies use interfaces + dependency injection via `ServiceRegistry`.
+
+See [docs/architecture/SYSTEM_ARCHITECTURE.md](docs/architecture/SYSTEM_ARCHITECTURE.md) for detailed diagrams.
+
+## Test Coverage
+
+- **Unit Tests**: 150+ tests (fast, isolated)
+- **Integration Tests**: 40+ tests (multi-component)
+- **E2E Tests**: 8 tests (critical user flows)
+- **Overall Coverage**: 85%+
+
+```bash
+# Run test suite
+pytest tests/unit -v          # Unit tests (<1s each)
+pytest tests/integration -v   # Integration tests (<10s each)
+pytest tests/e2e -v           # E2E tests (<60s each)
+
+# Generate coverage report
+pytest --cov=. --cov-report=html --cov-report=term-missing
+```
+
+See [docs/testing/COVERAGE_MATRIX.md](docs/testing/COVERAGE_MATRIX.md) for feature → test mappings.
+
+## File Structure
+
 ```
 DevSkyy/
-├── runtime/               # Tool registry and execution
-│   └── tools.py           # ToolRegistry, ToolSpec, ToolCallContext
-├── base.py                # SuperAgent base class
-├── llm/                   # LLM provider clients
-│   ├── providers.py       # OpenAI, Anthropic, Google, Mistral, Cohere, Groq
-│   ├── router.py          # Multi-provider routing
-│   └── tournament.py      # Tournament-style LLM consensus
-├── orchestration/         # Domain routing and context
-│   ├── llm_clients.py     # Official SDK-based LLM clients
-│   ├── domain_router.py   # Task-based LLM routing
-│   └── brand_context.py   # SkyyRose brand context injection
-├── security/              # Enterprise security
-│   ├── aes256_gcm_encryption.py
-│   ├── jwt_oauth2_auth.py
-│   └── argon2_password_hashing.py
-├── agents/                # Super Agents
-│   ├── fashn_agent.py     # Virtual try-on (FASHN API)
-│   ├── tripo_agent.py     # 3D generation (Tripo3D)
-│   └── wordpress_asset_agent.py
-├── wordpress/             # WordPress integration
-│   ├── client.py          # REST API client
-│   ├── elementor.py       # Template builder with BrandKit
-│   ├── media.py           # Media management
-│   └── products.py        # WooCommerce products
+├── core/                   # Foundation layer (zero outer dependencies)
+│   ├── auth/              # Auth types, models, interfaces
+│   ├── registry/          # Service registry for DI
+│   └── runtime/           # Tool registry, validation
+├── security/              # Encryption, JWT, audit
+├── database/              # SQLAlchemy, repositories
+├── llm/                   # LLM provider router (6 providers)
+├── orchestration/         # RAG, workflows, context
+├── services/              # Business logic (ML, 3D, analytics)
+├── agents/                # 54 AI agents
+│   ├── base_super_agent.py  # EnhancedSuperAgent (17 techniques)
+│   └── */                 # Specialized agents
+├── api/                   # FastAPI endpoints
+│   └── v1/               # REST API routes
+├── integrations/          # External services (WordPress, Stripe)
 ├── src/                   # TypeScript SDK
-│   ├── collections/       # 3D Collection Experiences
-│   │   ├── BlackRoseExperience.ts
-│   │   ├── SignatureExperience.ts
-│   │   ├── LoveHurtsExperience.ts
-│   │   ├── ShowroomExperience.ts
-│   │   └── RunwayExperience.ts
-│   └── services/          # Three.js, Agent, OpenAI services
-├── templates/elementor/   # Elementor JSON templates
-├── demo/                  # 3D experience demo pages
-└── tests/                 # Python test suite (pytest)
+│   ├── collections/       # 3D experiences (Three.js)
+│   └── services/          # Frontend services
+├── tests/                 # Test suite (1200+ tests)
+│   ├── unit/             # Fast, isolated tests
+│   ├── integration/      # Multi-component tests
+│   └── e2e/              # End-to-end flows
+├── docs/                  # Documentation
+│   ├── architecture/      # System design, data flow
+│   └── testing/          # Coverage matrix
+├── scripts/               # Utility scripts
+├── main_enterprise.py     # FastAPI app (47+ endpoints)
+└── devskyy_mcp.py        # MCP server (13 tools)
 ```
 
 ## Configuration
