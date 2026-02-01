@@ -1,0 +1,42 @@
+{
+  "hooks": [
+    {
+      "event": "PreToolUse",
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "5-GATE VALIDATION PROTOCOL - PRE-EXECUTION CHECK\n\nBefore writing or editing ANY code, run validation against all 5 gates:\n\nGATE 1 - DESIGN & ARCHITECTURE:\n- Does it follow WordPress theme hierarchy?\n- Are functions/classes properly namespaced with prefixes?\n- Does it use hooks instead of direct overwrites?\n\nGATE 2 - SECURITY:\n- Are all inputs sanitized with sanitize_*() functions?\n- Are all outputs escaped with esc_html(), esc_attr(), esc_url()?\n- Are nonces verified for forms and AJAX?\n- Are capability checks in place?\n- Is SQL using $wpdb->prepare()?\n\nGATE 3 - WOOCOMMERCE:\n- Does it use WooCommerce hooks properly?\n- Does it preserve shop loop integrity?\n- Is it compatible with HPOS?\n\nGATE 4 - PERFORMANCE:\n- Are assets conditionally loaded?\n- Is JavaScript deferred where possible?\n- Are database queries optimized?\n\nGATE 5 - IMMERSIVE INTEGRITY:\n- Does it work without JavaScript (progressive enhancement)?\n- Does it respect prefers-reduced-motion?\n- Are there fallbacks for unsupported browsers?\n\nRespond with gate status:\n- VERIFIED: G1 OK | G2 OK | G3 OK | G4 OK | G5 OK - [proceed]\n- PARTIAL: [which gate needs attention] - [research first]\n- BLOCKED: [critical security issue] - [halt and resolve]"
+        }
+      ]
+    },
+    {
+      "event": "PostToolUse",
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "POST-EXECUTION QUALITY CHECK\n\nReview the code that was just written:\n\n1. SECURITY SCAN:\n   - No unescaped output?\n   - No unsanitized input?\n   - No direct database queries without prepare()?\n\n2. WORDPRESS STANDARDS:\n   - Proper hook usage?\n   - Namespaced functions?\n   - Translatable strings?\n\n3. PERFORMANCE CHECK:\n   - No unnecessary database calls?\n   - Assets properly enqueued?\n\n4. ACCESSIBILITY:\n   - ARIA labels where needed?\n   - Keyboard accessible?\n\nIf issues found, flag for immediate correction. We Ralph Loop until perfect."
+        }
+      ]
+    },
+    {
+      "event": "Stop",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "FINAL QUALITY GATE\n\nBefore completing this task, verify:\n\n1. All code passed 5-gate validation\n2. No security vulnerabilities introduced\n3. WordPress coding standards followed\n4. WooCommerce compatibility maintained\n5. Performance targets achievable\n6. Accessibility requirements met\n7. Progressive enhancement in place\n\nIf ANY item is incomplete or uncertain, continue working. This team does not ship incomplete work."
+        }
+      ]
+    },
+    {
+      "event": "SessionStart",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "IMMERSIVE ARCHITECT STUDIO - SESSION INITIALIZED\n\nThis is an award-winning creative studio team. Standards in effect:\n\n5-GATE VALIDATION PROTOCOL:\n- Gate 1: Design & Architecture Alignment\n- Gate 2: Security & WordPress Standards\n- Gate 3: WooCommerce Integration\n- Gate 4: Performance & Optimization\n- Gate 5: Immersive Experience Integrity\n\nCORE PRINCIPLES:\n- Plan deeply before building\n- Verify ALL code before applying\n- Ralph Loop until perfection\n- Use Context7 for official documentation\n- Use Serena for project management\n\nNO CODE IS APPLIED unless it passes all 5 gates:\n1. Authenticated (matches design system)\n2. Tested (validated approach)\n3. Verifiable (confirmed correct)\n4. Secure (WordPress standards)\n5. Performant (Core Web Vitals targets)\n\nExcellence is the only acceptable standard."
+        }
+      ]
+    }
+  ]
+}

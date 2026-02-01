@@ -1,0 +1,24 @@
+{
+  "PostToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "A file was just written or edited. If this was a test file (test_*.py, *_test.py, *.test.js, *.spec.js, *.test.ts, *.spec.ts, *_test.go, *_test.rs) or a source file that has corresponding tests, remind me that I should run the test-runner agent to ensure all tests pass. Suggest using /test-loop for Ralph Loop testing."
+        }
+      ]
+    }
+  ],
+  "Stop": [
+    {
+      "matcher": ".*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Before completing this task, verify: (1) Were any test files modified? (2) Were any source files with tests modified? If yes to either, remind about running tests with /test-loop to ensure all tests pass."
+        }
+      ]
+    }
+  ]
+}
