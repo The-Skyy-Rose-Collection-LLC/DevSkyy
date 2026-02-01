@@ -249,7 +249,7 @@ ml = [
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
     "sqlalchemy==2.0.45",
-    "pymongo==4.10.1",
+    "pymongo==4.16.0",
     # Compatibility constraints for dependency resolution
     "protobuf>=5.26.1,<6.0",  # Required by google-ai-generativelanguage and grpcio-status
     "fsspec<=2024.9.0",  # Required by datasets
