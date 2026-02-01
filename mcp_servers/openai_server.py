@@ -782,8 +782,7 @@ if __name__ == "__main__":
         print("⚠️  Warning: DEVSKYY_API_KEY not set (DevSkyy integration disabled).")
         print("   Set it with: export DEVSKYY_API_KEY='your-key-here'")
 
-    print(
-        f"""
+    print(f"""
 ╔══════════════════════════════════════════════════════════════╗
 ║                                                              ║
 ║   DevSkyy OpenAI MCP Server v1.0.0                          ║
@@ -817,8 +816,7 @@ if __name__ == "__main__":
 📖 OpenAI Docs: https://platform.openai.com/docs
 
 Starting OpenAI MCP server on stdio...
-"""
-    )
+""")
 
     # Run the server
     mcp.run()

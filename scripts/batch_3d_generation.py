@@ -34,7 +34,6 @@ import argparse
 import asyncio
 import json
 import logging
-import os
 import sys
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -49,9 +48,9 @@ from services.three_d.provider_factory import (
     ThreeDProviderFactory,
 )
 from services.three_d.provider_interface import (
+    ThreeDProviderError,
     ThreeDRequest,
     ThreeDResponse,
-    ThreeDProviderError,
 )
 
 # Configure logging
@@ -341,7 +340,7 @@ class BatchGenerator:
                         last_error = str(e)
                         logger.warning(f"Attempt {attempt + 1} failed for {asset.id}: {e}")
                         if attempt < self.quality_config["retries"]:
-                            await asyncio.sleep(2 ** attempt)  # Exponential backoff
+                            await asyncio.sleep(2**attempt)  # Exponential backoff
 
                 if not response or not response.success:
                     duration = (datetime.now(UTC) - start_time).total_seconds()
@@ -357,6 +356,7 @@ class BatchGenerator:
                 if output_path and output_path.exists():
                     # Copy to organized location
                     import shutil
+
                     shutil.copy2(output_path, asset.output_path)
 
                 duration = (datetime.now(UTC) - start_time).total_seconds()
@@ -429,6 +429,7 @@ class BatchGenerator:
 
         # Add some variance
         import random
+
         variance = random.uniform(-3.0, 3.0)
         return min(100.0, max(0.0, base_score + variance))
 
@@ -448,10 +449,7 @@ class BatchGenerator:
             Updated progress
         """
         # Filter out already processed assets
-        assets_to_process = [
-            a for a in assets
-            if a.id not in progress.processed_ids
-        ]
+        assets_to_process = [a for a in assets if a.id not in progress.processed_ids]
 
         if not assets_to_process:
             logger.info("All assets already processed")
@@ -462,7 +460,7 @@ class BatchGenerator:
         # Process in batches for checkpoint saving
         batch_size = 10
         for i in range(0, len(assets_to_process), batch_size):
-            batch = assets_to_process[i:i + batch_size]
+            batch = assets_to_process[i : i + batch_size]
 
             # Process batch concurrently
             tasks = [self.generate_single(asset) for asset in batch]
@@ -515,17 +513,19 @@ async def populate_qa_queue(results: list[GenerationResult]) -> None:
     # Add new results
     for result in results:
         if result.success and result.output_path:
-            queue.append({
-                "id": f"qa-{result.asset.id.replace('/', '-')}-{int(result.timestamp.timestamp())}",
-                "asset_id": result.asset.id,
-                "reference_image_url": f"/assets/3d-models/{result.asset.collection}/{result.asset.filename}",
-                "generated_model_url": str(result.output_path),
-                "fidelity_score": result.fidelity_score,
-                "fidelity_breakdown": result.fidelity_breakdown,
-                "status": "pending",
-                "provider": result.provider,
-                "created_at": result.timestamp.isoformat(),
-            })
+            queue.append(
+                {
+                    "id": f"qa-{result.asset.id.replace('/', '-')}-{int(result.timestamp.timestamp())}",
+                    "asset_id": result.asset.id,
+                    "reference_image_url": f"/assets/3d-models/{result.asset.collection}/{result.asset.filename}",
+                    "generated_model_url": str(result.output_path),
+                    "fidelity_score": result.fidelity_score,
+                    "fidelity_breakdown": result.fidelity_breakdown,
+                    "status": "pending",
+                    "provider": result.provider,
+                    "created_at": result.timestamp.isoformat(),
+                }
+            )
 
     # Save queue
     qa_queue_file.write_text(json.dumps(queue, indent=2))
@@ -581,30 +581,37 @@ def generate_report(progress: BatchProgress) -> str:
     for coll, results in sorted(by_collection.items()):
         successful = [r for r in results if r.success]
         failed = [r for r in results if not r.success]
-        avg_fidelity = sum(r.fidelity_score or 0 for r in successful) / len(successful) if successful else 0
+        avg_fidelity = (
+            sum(r.fidelity_score or 0 for r in successful) / len(successful) if successful else 0
+        )
 
-        lines.extend([
-            "",
-            f"  {coll.upper().replace('_', ' ')}:",
-            f"    Total:     {len(results)}",
-            f"    Success:   {len(successful)}",
-            f"    Failed:    {len(failed)}",
-            f"    Fidelity:  {avg_fidelity:.1f}%",
-        ])
+        lines.extend(
+            [
+                "",
+                f"  {coll.upper().replace('_', ' ')}:",
+                f"    Total:     {len(results)}",
+                f"    Success:   {len(successful)}",
+                f"    Failed:    {len(failed)}",
+                f"    Fidelity:  {avg_fidelity:.1f}%",
+            ]
+        )
 
     # Fidelity threshold check
     below_threshold = [
-        r for r in progress.results
+        r
+        for r in progress.results
         if r.success and r.fidelity_score and r.fidelity_score < FIDELITY_THRESHOLD
     ]
 
     if below_threshold:
-        lines.extend([
-            "",
-            "-" * 60,
-            f"BELOW {FIDELITY_THRESHOLD}% FIDELITY THRESHOLD ({len(below_threshold)} items)",
-            "-" * 60,
-        ])
+        lines.extend(
+            [
+                "",
+                "-" * 60,
+                f"BELOW {FIDELITY_THRESHOLD}% FIDELITY THRESHOLD ({len(below_threshold)} items)",
+                "-" * 60,
+            ]
+        )
         for result in below_threshold[:10]:
             lines.append(f"  - {result.asset.id}: {result.fidelity_score:.1f}%")
         if len(below_threshold) > 10:
@@ -613,24 +620,28 @@ def generate_report(progress: BatchProgress) -> str:
     # Failed items
     failed_results = [r for r in progress.results if not r.success]
     if failed_results:
-        lines.extend([
-            "",
-            "-" * 60,
-            f"FAILED ITEMS ({len(failed_results)} total)",
-            "-" * 60,
-        ])
+        lines.extend(
+            [
+                "",
+                "-" * 60,
+                f"FAILED ITEMS ({len(failed_results)} total)",
+                "-" * 60,
+            ]
+        )
         for result in failed_results[:10]:
             lines.append(f"  - {result.asset.id}: {result.error}")
         if len(failed_results) > 10:
             lines.append(f"  ... and {len(failed_results) - 10} more")
 
-    lines.extend([
-        "",
-        "=" * 60,
-        f"Output Directory: {OUTPUT_DIR}",
-        f"QA Queue File:    qa_queue.json",
-        "=" * 60,
-    ])
+    lines.extend(
+        [
+            "",
+            "=" * 60,
+            f"Output Directory: {OUTPUT_DIR}",
+            "QA Queue File:    qa_queue.json",
+            "=" * 60,
+        ]
+    )
 
     return "\n".join(lines)
 
@@ -651,7 +662,9 @@ async def main(args: argparse.Namespace) -> int:
         Exit code (0 for success)
     """
     logger.info("Starting SkyyRose 3D Batch Generation")
-    logger.info(f"Quality: {args.quality} | Provider: {args.provider or 'auto'} | Concurrency: {args.concurrency}")
+    logger.info(
+        f"Quality: {args.quality} | Provider: {args.provider or 'auto'} | Concurrency: {args.concurrency}"
+    )
 
     # Discover assets
     assets = discover_assets(collection=args.collection)

@@ -17,7 +17,6 @@ Version: 1.0.0
 """
 
 import argparse
-import os
 import secrets
 import shutil
 from datetime import UTC, datetime
@@ -104,25 +103,29 @@ def rotate_keys(env_path: Path, backup_dir: Path, dry_run: bool = False) -> dict
             changes["old_encryption_key"] = line.split("=", 1)[1].strip()
             updated_lines.append(f"ENCRYPTION_MASTER_KEY={new_encryption_key}\n")
             encryption_found = True
-            print(f"✓ ENCRYPTION_MASTER_KEY will be rotated")
+            print("✓ ENCRYPTION_MASTER_KEY will be rotated")
         elif line.startswith("JWT_SECRET_KEY="):
             changes["old_jwt_secret"] = line.split("=", 1)[1].strip()
             updated_lines.append(f"JWT_SECRET_KEY={new_jwt_secret}\n")
             jwt_found = True
-            print(f"✓ JWT_SECRET_KEY will be rotated")
+            print("✓ JWT_SECRET_KEY will be rotated")
         else:
             updated_lines.append(line)
 
     # Add keys if not found
     if not encryption_found:
-        updated_lines.append(f"\n# Security Keys (Auto-rotated)\nENCRYPTION_MASTER_KEY={new_encryption_key}\n")
+        updated_lines.append(
+            f"\n# Security Keys (Auto-rotated)\nENCRYPTION_MASTER_KEY={new_encryption_key}\n"
+        )
         print("✓ ENCRYPTION_MASTER_KEY will be added")
 
     if not jwt_found:
         if not encryption_found:  # Already added section header
             updated_lines.append(f"JWT_SECRET_KEY={new_jwt_secret}\n")
         else:
-            updated_lines.append(f"\n# Security Keys (Auto-rotated)\nJWT_SECRET_KEY={new_jwt_secret}\n")
+            updated_lines.append(
+                f"\n# Security Keys (Auto-rotated)\nJWT_SECRET_KEY={new_jwt_secret}\n"
+            )
         print("✓ JWT_SECRET_KEY will be added")
 
     if dry_run:
@@ -136,7 +139,7 @@ def rotate_keys(env_path: Path, backup_dir: Path, dry_run: bool = False) -> dict
     with open(env_path, "w") as f:
         f.writelines(updated_lines)
 
-    print(f"\n✅ Keys rotated successfully!")
+    print("\n✅ Keys rotated successfully!")
     print(f"   Old backup: {backup_path}")
     print(f"   New .env: {env_path}")
 
@@ -158,13 +161,15 @@ def write_rotation_log(backup_dir: Path, changes: dict[str, str]) -> None:
         f.write(f"\n{'='*60}\n")
         f.write(f"Rotation Event: {timestamp}\n")
         f.write(f"{'='*60}\n")
-        f.write(f"ENCRYPTION_MASTER_KEY: {'rotated' if changes['old_encryption_key'] else 'added'}\n")
+        f.write(
+            f"ENCRYPTION_MASTER_KEY: {'rotated' if changes['old_encryption_key'] else 'added'}\n"
+        )
         f.write(f"JWT_SECRET_KEY: {'rotated' if changes['old_jwt_secret'] else 'added'}\n")
-        if changes['old_encryption_key']:
+        if changes["old_encryption_key"]:
             f.write(f"Old ENCRYPTION_MASTER_KEY: {changes['old_encryption_key'][:16]}...\n")
-        if changes['old_jwt_secret']:
+        if changes["old_jwt_secret"]:
             f.write(f"Old JWT_SECRET_KEY: {changes['old_jwt_secret'][:16]}...\n")
-        f.write(f"\n")
+        f.write("\n")
 
     print(f"✓ Audit log updated: {log_path}")
 

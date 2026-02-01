@@ -193,9 +193,7 @@ class RollupScheduler:
             "last_hourly_run": (
                 self._last_hourly_run.isoformat() if self._last_hourly_run else None
             ),
-            "last_daily_run": (
-                self._last_daily_run.isoformat() if self._last_daily_run else None
-            ),
+            "last_daily_run": (self._last_daily_run.isoformat() if self._last_daily_run else None),
             "last_weekly_run": (
                 self._last_weekly_run.isoformat() if self._last_weekly_run else None
             ),
@@ -340,9 +338,7 @@ class RollupScheduler:
             now = datetime.now(UTC)
             if target_hour is None:
                 # Aggregate the previous hour
-                target_hour = now.replace(
-                    minute=0, second=0, microsecond=0
-                ) - timedelta(hours=1)
+                target_hour = now.replace(minute=0, second=0, microsecond=0) - timedelta(hours=1)
 
             period_start = target_hour.replace(minute=0, second=0, microsecond=0)
             period_end = period_start + timedelta(hours=1)
@@ -400,9 +396,9 @@ class RollupScheduler:
             now = datetime.now(UTC)
             if target_date is None:
                 # Aggregate yesterday
-                target_date = now.replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                ) - timedelta(days=1)
+                target_date = now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(
+                    days=1
+                )
 
             period_start = target_date.replace(hour=0, minute=0, second=0, microsecond=0)
             period_end = period_start + timedelta(days=1)
@@ -461,14 +457,12 @@ class RollupScheduler:
             if target_week_start is None:
                 # Find last Sunday
                 days_since_sunday = (now.weekday() + 1) % 7
-                last_sunday = now.replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                ) - timedelta(days=days_since_sunday + 7)
+                last_sunday = now.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(
+                    days=days_since_sunday + 7
+                )
                 target_week_start = last_sunday
 
-            period_start = target_week_start.replace(
-                hour=0, minute=0, second=0, microsecond=0
-            )
+            period_start = target_week_start.replace(hour=0, minute=0, second=0, microsecond=0)
             period_end = period_start + timedelta(weeks=1)
 
             logger.info(
@@ -650,27 +644,13 @@ class RollupScheduler:
                 period_start=period_start,
                 period_end=period_end,
                 count=row.count or 0,
-                sum_value=(
-                    Decimal(str(row.sum_value)) if row.sum_value is not None else None
-                ),
-                avg_value=(
-                    Decimal(str(row.avg_value)) if row.avg_value is not None else None
-                ),
-                min_value=(
-                    Decimal(str(row.min_value)) if row.min_value is not None else None
-                ),
-                max_value=(
-                    Decimal(str(row.max_value)) if row.max_value is not None else None
-                ),
-                p50_value=(
-                    Decimal(str(row.p50_value)) if row.p50_value is not None else None
-                ),
-                p95_value=(
-                    Decimal(str(row.p95_value)) if row.p95_value is not None else None
-                ),
-                p99_value=(
-                    Decimal(str(row.p99_value)) if row.p99_value is not None else None
-                ),
+                sum_value=(Decimal(str(row.sum_value)) if row.sum_value is not None else None),
+                avg_value=(Decimal(str(row.avg_value)) if row.avg_value is not None else None),
+                min_value=(Decimal(str(row.min_value)) if row.min_value is not None else None),
+                max_value=(Decimal(str(row.max_value)) if row.max_value is not None else None),
+                p50_value=(Decimal(str(row.p50_value)) if row.p50_value is not None else None),
+                p95_value=(Decimal(str(row.p95_value)) if row.p95_value is not None else None),
+                p99_value=(Decimal(str(row.p99_value)) if row.p99_value is not None else None),
             )
             rollups.append(rollup)
 
@@ -730,27 +710,13 @@ class RollupScheduler:
                     "period_start": rollup.period_start.isoformat(),
                     "period_end": rollup.period_end.isoformat(),
                     "count": rollup.count,
-                    "sum_value": (
-                        str(rollup.sum_value) if rollup.sum_value is not None else None
-                    ),
-                    "avg_value": (
-                        str(rollup.avg_value) if rollup.avg_value is not None else None
-                    ),
-                    "min_value": (
-                        str(rollup.min_value) if rollup.min_value is not None else None
-                    ),
-                    "max_value": (
-                        str(rollup.max_value) if rollup.max_value is not None else None
-                    ),
-                    "p50_value": (
-                        str(rollup.p50_value) if rollup.p50_value is not None else None
-                    ),
-                    "p95_value": (
-                        str(rollup.p95_value) if rollup.p95_value is not None else None
-                    ),
-                    "p99_value": (
-                        str(rollup.p99_value) if rollup.p99_value is not None else None
-                    ),
+                    "sum_value": (str(rollup.sum_value) if rollup.sum_value is not None else None),
+                    "avg_value": (str(rollup.avg_value) if rollup.avg_value is not None else None),
+                    "min_value": (str(rollup.min_value) if rollup.min_value is not None else None),
+                    "max_value": (str(rollup.max_value) if rollup.max_value is not None else None),
+                    "p50_value": (str(rollup.p50_value) if rollup.p50_value is not None else None),
+                    "p95_value": (str(rollup.p95_value) if rollup.p95_value is not None else None),
+                    "p99_value": (str(rollup.p99_value) if rollup.p99_value is not None else None),
                     "metadata": json.dumps(rollup.metadata),
                 },
             )

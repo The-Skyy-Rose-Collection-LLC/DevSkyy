@@ -17,7 +17,7 @@ Version: 1.0.0 (Phase 4 Refactoring)
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Protocol
+from typing import Protocol
 
 from adk.base import AgentResult
 
@@ -33,9 +33,7 @@ class IAgent(Protocol):
     agent_type: str
 
     @abstractmethod
-    async def execute(
-        self, prompt: str, *, correlation_id: str | None = None
-    ) -> AgentResult:
+    async def execute(self, prompt: str, *, correlation_id: str | None = None) -> AgentResult:
         """
         Execute agent task.
 
@@ -67,9 +65,7 @@ class ISuperAgent(IAgent, Protocol):
     """
 
     @abstractmethod
-    async def execute_auto(
-        self, prompt: str, *, correlation_id: str | None = None
-    ) -> AgentResult:
+    async def execute_auto(self, prompt: str, *, correlation_id: str | None = None) -> AgentResult:
         """
         Execute with automatic technique selection.
 
@@ -104,9 +100,7 @@ class IAgentOrchestrator(ABC):
     """
 
     @abstractmethod
-    async def route(
-        self, task: str, *, correlation_id: str | None = None
-    ) -> IAgent:
+    async def route(self, task: str, *, correlation_id: str | None = None) -> IAgent:
         """
         Route task to most appropriate agent.
 

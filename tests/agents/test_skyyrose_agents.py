@@ -6,7 +6,6 @@ Tests the Imagery Agent and Content Agent individually and together.
 from __future__ import annotations
 
 import json
-import os
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -28,9 +27,8 @@ from agents.skyyrose_imagery_agent import (
     ModelPose,
     SkyyRoseImageryAgent,
 )
-from llm.base import CompletionResponse, Message
+from llm.base import CompletionResponse
 from orchestration.brand_context import Collection
-
 
 # =============================================================================
 # Imagery Agent Tests
@@ -170,9 +168,7 @@ class TestSkyyRoseImageryAgent:
 
         # Mock Gemini to fail
         mock_gemini = AsyncMock()
-        mock_gemini.generate_product_image = AsyncMock(
-            side_effect=Exception("Gemini API error")
-        )
+        mock_gemini.generate_product_image = AsyncMock(side_effect=Exception("Gemini API error"))
         agent._gemini = mock_gemini
 
         # Mock provider factory as fallback
@@ -427,14 +423,16 @@ class TestSkyyRoseContentAgent:
         mock_gemini = AsyncMock()
         mock_gemini.complete = AsyncMock(
             return_value=CompletionResponse(
-                content=json.dumps({
-                    "title": "Signature Collection",
-                    "body_html": "<h1>Signature Collection</h1><p>Luxury gold.</p>",
-                    "excerpt": "Defining luxury.",
-                    "seo_title": "SkyyRose Signature Collection",
-                    "seo_description": "Luxury gold jewelry collection from SkyyRose Oakland.",
-                    "seo_keywords": ["skyyrose", "signature", "gold"],
-                }),
+                content=json.dumps(
+                    {
+                        "title": "Signature Collection",
+                        "body_html": "<h1>Signature Collection</h1><p>Luxury gold.</p>",
+                        "excerpt": "Defining luxury.",
+                        "seo_title": "SkyyRose Signature Collection",
+                        "seo_description": "Luxury gold jewelry collection from SkyyRose Oakland.",
+                        "seo_keywords": ["skyyrose", "signature", "gold"],
+                    }
+                ),
                 model="gemini-2.0-flash",
                 provider="google",
                 total_tokens=150,
@@ -469,14 +467,16 @@ class TestSkyyRoseContentAgent:
         mock_gemini = AsyncMock()
         mock_gemini.complete = AsyncMock(
             return_value=CompletionResponse(
-                content=json.dumps({
-                    "title": "Test Title",
-                    "body_html": "<p>Test body</p>",
-                    "excerpt": "Test excerpt",
-                    "seo_title": "Test SEO",
-                    "seo_description": "Test meta",
-                    "seo_keywords": ["test"],
-                }),
+                content=json.dumps(
+                    {
+                        "title": "Test Title",
+                        "body_html": "<p>Test body</p>",
+                        "excerpt": "Test excerpt",
+                        "seo_title": "Test SEO",
+                        "seo_description": "Test meta",
+                        "seo_keywords": ["test"],
+                    }
+                ),
                 model="gemini-2.0-flash",
                 provider="google",
                 total_tokens=100,
@@ -501,14 +501,16 @@ class TestSkyyRoseContentAgent:
         """Should extract JSON even when wrapped in markdown code blocks."""
         agent._brand_dna = BrandDNA()
 
-        json_payload = json.dumps({
-            "title": "Wrapped Title",
-            "body_html": "<p>Body</p>",
-            "excerpt": "Excerpt",
-            "seo_title": "SEO",
-            "seo_description": "Meta",
-            "seo_keywords": ["k1"],
-        })
+        json_payload = json.dumps(
+            {
+                "title": "Wrapped Title",
+                "body_html": "<p>Body</p>",
+                "excerpt": "Excerpt",
+                "seo_title": "SEO",
+                "seo_description": "Meta",
+                "seo_keywords": ["k1"],
+            }
+        )
 
         # Gemini often wraps JSON in markdown
         mock_gemini = AsyncMock()
@@ -547,9 +549,7 @@ class TestSkyyRoseContentAgent:
         )
 
         mock_wp_client = AsyncMock()
-        mock_wp_client.create_post = AsyncMock(
-            return_value={"id": 789, "status": "draft"}
-        )
+        mock_wp_client.create_post = AsyncMock(return_value={"id": 789, "status": "draft"})
 
         result = await agent.publish_to_wordpress(content, mock_wp_client, status="draft")
 
@@ -646,15 +646,25 @@ class TestSkyyRoseContentAgent:
 
         agent._learning_records = [
             LearningRecord(
-                task_id="t1", task_type="test", prompt_hash="h1",
-                technique_used="g", llm_provider="google",
-                success=True, latency_ms=1000.0, cost_usd=0.0,
+                task_id="t1",
+                task_type="test",
+                prompt_hash="h1",
+                technique_used="g",
+                llm_provider="google",
+                success=True,
+                latency_ms=1000.0,
+                cost_usd=0.0,
                 user_feedback=0.8,
             ),
             LearningRecord(
-                task_id="t2", task_type="test", prompt_hash="h2",
-                technique_used="g", llm_provider="google",
-                success=True, latency_ms=1000.0, cost_usd=0.0,
+                task_id="t2",
+                task_type="test",
+                prompt_hash="h2",
+                technique_used="g",
+                llm_provider="google",
+                success=True,
+                latency_ms=1000.0,
+                cost_usd=0.0,
                 user_feedback=0.9,
             ),
         ]
@@ -676,14 +686,16 @@ class TestSkyyRoseContentAgent:
         mock_gemini = AsyncMock()
         mock_gemini.complete = AsyncMock(
             return_value=CompletionResponse(
-                content=json.dumps({
-                    "title": "Black Rose Collection",
-                    "body_html": "<h1>Black Rose</h1><p>Gothic luxury.</p>",
-                    "excerpt": "Into the darkness.",
-                    "seo_title": "Black Rose Collection | SkyyRose",
-                    "seo_description": "Gothic luxury jewelry.",
-                    "seo_keywords": ["black rose", "skyyrose"],
-                }),
+                content=json.dumps(
+                    {
+                        "title": "Black Rose Collection",
+                        "body_html": "<h1>Black Rose</h1><p>Gothic luxury.</p>",
+                        "excerpt": "Into the darkness.",
+                        "seo_title": "Black Rose Collection | SkyyRose",
+                        "seo_description": "Gothic luxury jewelry.",
+                        "seo_keywords": ["black rose", "skyyrose"],
+                    }
+                ),
                 model="gemini-2.0-flash",
                 provider="google",
                 total_tokens=200,
@@ -781,14 +793,16 @@ class TestDualAgentIntegration:
         mock_gemini_content = AsyncMock()
         mock_gemini_content.complete = AsyncMock(
             return_value=CompletionResponse(
-                content=json.dumps({
-                    "title": "Signature Collection",
-                    "body_html": '<h1>Signature</h1><img src="https://cdn.skyyrose.co/sig-hero.jpg" />',
-                    "excerpt": "Gold luxury.",
-                    "seo_title": "Signature | SkyyRose",
-                    "seo_description": "Luxury gold collection.",
-                    "seo_keywords": ["signature"],
-                }),
+                content=json.dumps(
+                    {
+                        "title": "Signature Collection",
+                        "body_html": '<h1>Signature</h1><img src="https://cdn.skyyrose.co/sig-hero.jpg" />',
+                        "excerpt": "Gold luxury.",
+                        "seo_title": "Signature | SkyyRose",
+                        "seo_description": "Luxury gold collection.",
+                        "seo_keywords": ["signature"],
+                    }
+                ),
                 model="gemini-2.0-flash",
                 provider="google",
                 total_tokens=120,

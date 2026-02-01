@@ -2,11 +2,12 @@
 # dependencies = ["trl>=0.12.0", "peft>=0.7.0", "trackio", "datasets", "transformers", "accelerate", "bitsandbytes"]
 # ///
 
-from datasets import load_dataset
-from peft import LoraConfig
-from trl import SFTTrainer, SFTConfig
-import trackio
 import os
+
+from peft import LoraConfig
+from trl import SFTConfig, SFTTrainer
+
+from datasets import load_dataset
 
 # Get HF token from environment
 hf_token = os.environ.get("HF_TOKEN")

@@ -152,7 +152,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="jersey",
         description="Premium black baseball jersey with 'BLACK IS BEAUTIFUL' in white arc lettering across chest. Full button front with silver snap buttons. White piping along button placket and V-neck collar. White stripe bands on sleeves. SkyyRose tag at collar. BLACK ROSE Collection authenticity patch at hem. Mesh athletic fabric.",
         price="$145",
-        style_keywords=["baseball jersey", "button front", "arc lettering", "athletic", "streetwear"],
+        style_keywords=[
+            "baseball jersey",
+            "button front",
+            "arc lettering",
+            "athletic",
+            "streetwear",
+        ],
         color_palette=["black mesh fabric", "white lettering", "white piping", "silver buttons"],
         reference_image="./assets/reference-images/black-rose/black-jersey.jpg",
     ),
@@ -162,8 +168,19 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="jersey",
         description="Premium black baseball jersey with 'BLACK IS BEAUTIFUL' in SF Giants orange arc lettering across chest. Full button front with silver snap buttons. Orange piping along button placket and V-neck collar. Orange stripe bands on sleeves. SkyyRose tag at collar. BLACK ROSE Collection authenticity patch at hem. San Francisco tribute colorway.",
         price="$145",
-        style_keywords=["baseball jersey", "button front", "giants colors", "SF tribute", "streetwear"],
-        color_palette=["black mesh fabric", "SF Giants orange lettering", "orange piping", "silver buttons"],
+        style_keywords=[
+            "baseball jersey",
+            "button front",
+            "giants colors",
+            "SF tribute",
+            "streetwear",
+        ],
+        color_palette=[
+            "black mesh fabric",
+            "SF Giants orange lettering",
+            "orange piping",
+            "silver buttons",
+        ],
         reference_image="./assets/reference-images/black-rose/giants-jersey.jpg",
     ),
     SkyyRoseProduct(
@@ -172,7 +189,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="jacket",
         description="Premium black satin bomber jacket with attached fleece-lined hood. Features embroidered Black Rose logo on left chest - detailed rose emerging from clouds artwork in gray/white thread. Snap button front closure. Ribbed cuffs and hem in black. Satin sheen outer shell. Two side pockets. SkyyRose tag at collar.",
         price="$225",
-        style_keywords=["bomber jacket", "sherpa hood", "satin", "embroidered logo", "premium outerwear"],
+        style_keywords=[
+            "bomber jacket",
+            "sherpa hood",
+            "satin",
+            "embroidered logo",
+            "premium outerwear",
+        ],
         color_palette=["black satin", "black fleece hood", "gray/white embroidery", "silver snaps"],
         reference_image="./assets/reference-images/black-rose/sherpa-jacket.jpg",
     ),
@@ -182,7 +205,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="dress",
         description="Premium black hoodie dress featuring large Black Rose graphic print on front - detailed rose bloom emerging from stylized clouds. Elongated hoodie silhouette with kangaroo pocket. Drawstring hood. Ribbed cuffs. Soft fleece interior. SkyyRose branding. Feminine streetwear.",
         price="$165",
-        style_keywords=["hoodie dress", "graphic print", "feminine streetwear", "oversized", "rose graphic"],
+        style_keywords=[
+            "hoodie dress",
+            "graphic print",
+            "feminine streetwear",
+            "oversized",
+            "rose graphic",
+        ],
         color_palette=["black fleece", "gray/white rose print", "black drawstrings"],
         reference_image="./assets/reference-images/black-rose/hooded-dress.jpg",
     ),
@@ -192,7 +221,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="hoodie",
         description="Premium black hockey-style hoodie with circular Black Rose logo on chest featuring detailed rose artwork in teal/turquoise accents. 'BLACK IS BEAUTIFUL' text with #0 on front. Teal horizontal stripes at hem and sleeves. Lace-up V-neck detail. Hockey jersey styling with hoodie comfort. Full front and back views shown.",
         price="$195",
-        style_keywords=["hockey hoodie", "circular logo", "teal accents", "sports luxe", "streetwear"],
+        style_keywords=[
+            "hockey hoodie",
+            "circular logo",
+            "teal accents",
+            "sports luxe",
+            "streetwear",
+        ],
         color_palette=["black", "teal/turquoise stripes", "white text", "gray rose artwork"],
         reference_image="./assets/reference-images/black-rose/hockey-hoodie-3d.png",
     ),
@@ -202,7 +237,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="jersey",
         description="Premium green baseball jersey with 'BLACK IS BEAUTIFUL' in gold/yellow arc lettering. Button front with Oakland A's inspired colorway. Green base with yellow piping and accents. SkyyRose authenticity patch. Oakland tribute piece.",
         price="$145",
-        style_keywords=["baseball jersey", "oakland colors", "A's tribute", "green gold", "streetwear"],
+        style_keywords=[
+            "baseball jersey",
+            "oakland colors",
+            "A's tribute",
+            "green gold",
+            "streetwear",
+        ],
         color_palette=["green fabric", "gold/yellow lettering", "yellow piping"],
         reference_image="./assets/reference-images/black-rose/green-jersey-crewneck.png",
     ),
@@ -212,11 +253,16 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="sweatshirt",
         description="Premium black crewneck sweatshirt with large Black Rose graphic on front - detailed rose bloom with stylized cloud/smoke effect at base. Heavyweight fleece. Ribbed collar, cuffs, and hem. Classic fit. Pairs with shorts.",
         price="$125",
-        style_keywords=["crewneck", "graphic print", "heavyweight fleece", "rose artwork", "classic fit"],
+        style_keywords=[
+            "crewneck",
+            "graphic print",
+            "heavyweight fleece",
+            "rose artwork",
+            "classic fit",
+        ],
         color_palette=["black fleece", "gray/white rose print", "cloud effect"],
         reference_image="./assets/reference-images/black-rose/green-jersey-crewneck.png",
     ),
-
     # ==========================================================================
     # LOVE HURTS Collection - Romantic Streetwear
     # ==========================================================================
@@ -240,7 +286,6 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         color_palette=["white", "dusty rose panel", "red/green rose embroidery"],
         reference_image="./assets/reference-images/love-hurts/white-shorts.jpg",
     ),
-
     # ==========================================================================
     # SIGNATURE Collection - Oakland/Bay Area Tribute
     # ==========================================================================
@@ -250,7 +295,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="tee",
         description="Premium white t-shirt with Blue Rose graphic on chest - surreal artwork of rose bloom containing Oakland Bay Bridge cityscape. Rose emerges from stylized blue and gray clouds. SR monogram at collar. Relaxed fit premium cotton.",
         price="$95",
-        style_keywords=["graphic tee", "oakland tribute", "bay bridge", "blue rose", "cityscape art"],
+        style_keywords=[
+            "graphic tee",
+            "oakland tribute",
+            "bay bridge",
+            "blue rose",
+            "cityscape art",
+        ],
         color_palette=["white tee", "blue rose", "gray/blue clouds", "bay bridge cityscape"],
         reference_image="./assets/reference-images/signature/bay-bridge-set.jpg",
     ),
@@ -260,7 +311,13 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="shorts",
         description="Premium mesh athletic shorts with all-over Oakland Bay Bridge cityscape print in blue tones. Elastic waistband with white drawstrings. Blue rose patch on leg. Side mesh panels. Part of Bay Bridge matching set.",
         price="$85",
-        style_keywords=["mesh shorts", "all-over print", "oakland tribute", "bay bridge", "athletic"],
+        style_keywords=[
+            "mesh shorts",
+            "all-over print",
+            "oakland tribute",
+            "bay bridge",
+            "athletic",
+        ],
         color_palette=["blue tones", "bay bridge print", "white drawstrings"],
         reference_image="./assets/reference-images/signature/bay-bridge-set.jpg",
     ),
@@ -280,11 +337,16 @@ SKYYROSE_PRODUCTS: list[SkyyRoseProduct] = [
         garment_type="shorts",
         description="Premium mesh athletic shorts with all-over Golden Gate Bridge sunset print in purple/orange tones. Elastic waistband with white drawstrings. Purple rose patch on leg. Side mesh panels. Part of Golden Gate matching set.",
         price="$85",
-        style_keywords=["mesh shorts", "all-over print", "sf tribute", "golden gate", "sunset colors"],
+        style_keywords=[
+            "mesh shorts",
+            "all-over print",
+            "sf tribute",
+            "golden gate",
+            "sunset colors",
+        ],
         color_palette=["purple/orange tones", "golden gate print", "white drawstrings"],
         reference_image="./assets/reference-images/signature/golden-gate-set.jpg",
     ),
-
     # ==========================================================================
     # 3D LOGO ASSETS - For Virtual Experiences
     # ==========================================================================
@@ -606,7 +668,9 @@ Examples:
         elif args.collection:
             await generator.generate_collection(args.collection)
         elif args.product:
-            product = next((p for p in SKYYROSE_PRODUCTS if p.name.lower() == args.product.lower()), None)
+            product = next(
+                (p for p in SKYYROSE_PRODUCTS if p.name.lower() == args.product.lower()), None
+            )
             if not product:
                 logger.error(f"Product not found: {args.product}")
                 logger.info("Use --list to see all available products")
@@ -620,7 +684,9 @@ Examples:
         generator.save_manifest()
 
         # Print summary
-        successful = len([p for p in generator.manifest["products"] if p.get("status") == "success"])
+        successful = len(
+            [p for p in generator.manifest["products"] if p.get("status") == "success"]
+        )
         total = len(generator.manifest["products"])
 
         print("\n" + "=" * 60)

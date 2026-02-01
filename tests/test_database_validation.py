@@ -478,7 +478,9 @@ class TestDatabaseErrorHandling:
             await repo.create(user1)
 
         # Try to create duplicate email
-        with pytest.raises(Exception, match="duplicate|unique|integrity"):  # Should raise integrity error
+        with pytest.raises(
+            Exception, match="duplicate|unique|integrity"
+        ):  # Should raise integrity error
             async with db_manager.session() as session:
                 repo = UserRepository(session)
                 user2 = User(

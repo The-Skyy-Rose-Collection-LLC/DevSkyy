@@ -33,9 +33,7 @@ class WordPressAssetConfig:
         return cls(
             site_id=os.environ.get("WP_SITE_ID", ""),
             oauth_token=os.environ.get("WP_OAUTH_TOKEN", ""),
-            base_url=os.environ.get(
-                "WP_BASE_URL", "https://api.wordpress.com/v2"
-            ),
+            base_url=os.environ.get("WP_BASE_URL", "https://api.wordpress.com/v2"),
         )
 
 
@@ -94,49 +92,49 @@ class WordPressAssetAgent(EnhancedSuperAgent):
     async def execute(self, prompt: str, **kwargs) -> Any:
         """
         Execute WordPress asset management task.
-        
+
         Args:
             prompt: Task description (e.g., "upload image to WordPress", "create product gallery")
             **kwargs: Additional arguments (media_file, product_id, etc.)
-            
+
         Returns:
             Result of the asset operation
         """
         # Parse prompt to determine operation type
         prompt_lower = prompt.lower()
-        
+
         if "upload" in prompt_lower and "3d" in prompt_lower:
             file_path = kwargs.get("file_path")
             if not file_path:
                 return {"success": False, "error": "file_path required for 3D upload"}
             return await self.upload_3d_model(file_path)
-            
+
         elif "upload" in prompt_lower and "media" in prompt_lower:
             file_path = kwargs.get("file_path")
             media_type = kwargs.get("media_type", "image")
             if not file_path:
                 return {"success": False, "error": "file_path required for media upload"}
             return await self.upload_media(file_path, media_type)
-            
+
         elif "gallery" in prompt_lower:
             product_id = kwargs.get("product_id")
             media_ids = kwargs.get("media_ids", [])
             if not product_id:
                 return {"success": False, "error": "product_id required for gallery"}
             return await self.create_gallery(product_id, media_ids)
-            
+
         elif "product" in prompt_lower and "assets" in prompt_lower:
             product_id = kwargs.get("product_id")
             assets = kwargs.get("assets", [])
             if not product_id:
                 return {"success": False, "error": "product_id required for product assets"}
             return await self.upload_product_assets(product_id, assets)
-            
+
         else:
             return {
                 "success": False,
                 "error": f"Unknown WordPress asset operation: {prompt}. "
-                "Supported: 'upload media', 'upload 3d', 'create gallery', 'upload product assets'"
+                "Supported: 'upload media', 'upload 3d', 'create gallery', 'upload product assets'",
             }
 
     def get_capabilities(self) -> list[Any]:
@@ -147,7 +145,6 @@ class WordPressAssetAgent(EnhancedSuperAgent):
             LegacyCapability.WORDPRESS_MANAGEMENT,
             LegacyCapability.PRODUCT_MANAGEMENT,
         ]
-
 
     async def upload_media(
         self,
@@ -160,9 +157,7 @@ class WordPressAssetAgent(EnhancedSuperAgent):
         """Upload a media file to WordPress.com."""
         if not self.wp_config:
             return MediaUploadResult(success=False, error="Config not set")
-        return MediaUploadResult(
-            success=True, media_id=0, url="", error=None
-        )
+        return MediaUploadResult(success=True, media_id=0, url="", error=None)
 
     async def upload_product_assets(
         self,

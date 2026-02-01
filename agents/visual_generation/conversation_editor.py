@@ -326,9 +326,7 @@ class ConversationEditor:
         Returns:
             Number of sessions cleaned up
         """
-        expired_ids = [
-            sid for sid, session in self._sessions.items() if session.is_expired()
-        ]
+        expired_ids = [sid for sid, session in self._sessions.items() if session.is_expired()]
 
         # Close all expired sessions
         cleanup_tasks = [self.close_session(sid) for sid in expired_ids]

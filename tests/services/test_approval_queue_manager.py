@@ -502,20 +502,26 @@ class TestStatistics:
         # Create various items
         item1 = await manager.create_item(
             ApprovalItemCreate(
-                asset_id="a1", job_id="j1",
-                original_url="http://x/o1", enhanced_url="http://x/e1",
+                asset_id="a1",
+                job_id="j1",
+                original_url="http://x/o1",
+                enhanced_url="http://x/e1",
             )
         )
         item2 = await manager.create_item(
             ApprovalItemCreate(
-                asset_id="a2", job_id="j2",
-                original_url="http://x/o2", enhanced_url="http://x/e2",
+                asset_id="a2",
+                job_id="j2",
+                original_url="http://x/o2",
+                enhanced_url="http://x/e2",
             )
         )
         await manager.create_item(
             ApprovalItemCreate(
-                asset_id="a3", job_id="j3",
-                original_url="http://x/o3", enhanced_url="http://x/e3",
+                asset_id="a3",
+                job_id="j3",
+                original_url="http://x/o3",
+                enhanced_url="http://x/e3",
             )
         )
 

@@ -7,19 +7,18 @@ Device: CPU (Apple Silicon optimized)
 """
 
 import json
-import os
-from pathlib import Path
 
 import torch
-from datasets import Dataset
-from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
+from peft import LoraConfig, get_peft_model
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    TrainingArguments,
-    Trainer,
     DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
 )
+
+from datasets import Dataset
 
 # Configuration
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
@@ -175,7 +174,9 @@ def main():
     print(f"  - Epochs: {NUM_EPOCHS}")
     print(f"  - Learning rate: {LEARNING_RATE}")
     print(f"  - Max sequence length: {MAX_SEQ_LENGTH}")
-    print(f"  - Total steps: {len(tokenized_dataset) * NUM_EPOCHS // (BATCH_SIZE * GRADIENT_ACCUMULATION_STEPS)}")
+    print(
+        f"  - Total steps: {len(tokenized_dataset) * NUM_EPOCHS // (BATCH_SIZE * GRADIENT_ACCUMULATION_STEPS)}"
+    )
 
     # Train
     print("\n[6/6] Training...")
@@ -212,6 +213,7 @@ def main():
     except Exception as e:
         print(f"\n✗ Training failed: {e}")
         import traceback
+
         traceback.print_exc()
 
 

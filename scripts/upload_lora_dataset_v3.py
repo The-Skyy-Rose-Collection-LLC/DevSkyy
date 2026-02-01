@@ -64,8 +64,7 @@ def main():
     print(f"\n{'=' * 60}")
     print("✅ V3 DATASET UPLOADED SUCCESSFULLY!")
     print(f"{'=' * 60}")
-    print(
-        f"""
+    print(f"""
     URL: https://huggingface.co/datasets/{repo_id}
 
     Dataset Contents:
@@ -77,8 +76,7 @@ def main():
     Next Steps:
     1. Train LoRA: python scripts/train_lora_from_products.py
     2. Test generation: python scripts/demo_image_generation.py
-    """
-    )
+    """)
     return 0
 
 

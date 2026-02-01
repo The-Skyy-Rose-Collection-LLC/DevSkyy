@@ -56,9 +56,7 @@ class TestAssetCreation:
         assert asset.retention_value is None
 
     @pytest.mark.asyncio
-    async def test_create_asset_with_product_id(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_create_asset_with_product_id(self, version_manager: AssetVersionManager) -> None:
         """Should create asset linked to a product."""
         asset = await version_manager.create_asset(
             name="product_image.jpg",
@@ -88,9 +86,7 @@ class TestVersionCreation:
     """Tests for version creation."""
 
     @pytest.mark.asyncio
-    async def test_create_first_version(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_create_first_version(self, version_manager: AssetVersionManager) -> None:
         """First version should be marked as original."""
         asset = await version_manager.create_asset(
             name="image.jpg",
@@ -113,9 +109,7 @@ class TestVersionCreation:
         assert version.status == VersionStatus.ACTIVE
 
     @pytest.mark.asyncio
-    async def test_create_second_version(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_create_second_version(self, version_manager: AssetVersionManager) -> None:
         """Second version should archive the first."""
         asset = await version_manager.create_asset(
             name="image.jpg",
@@ -191,9 +185,7 @@ class TestVersionRetrieval:
         assert version.content_hash == "sha256_abc"
 
     @pytest.mark.asyncio
-    async def test_get_nonexistent_version(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_get_nonexistent_version(self, version_manager: AssetVersionManager) -> None:
         """Should raise error for nonexistent version."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
         await version_manager.create_version(
@@ -267,9 +259,7 @@ class TestVersionRetrieval:
         assert response.total == 2
 
         # Include deleted
-        response_all = await version_manager.list_versions(
-            asset.asset_id, include_deleted=True
-        )
+        response_all = await version_manager.list_versions(asset.asset_id, include_deleted=True)
         assert response_all.total == 3
 
 
@@ -277,9 +267,7 @@ class TestVersionRevert:
     """Tests for version revert functionality."""
 
     @pytest.mark.asyncio
-    async def test_revert_creates_new_version(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_revert_creates_new_version(self, version_manager: AssetVersionManager) -> None:
         """Revert should create a new version with old content."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
 
@@ -316,9 +304,7 @@ class TestVersionRevert:
         assert "Reverted to version 1" in reverted.change_description
 
     @pytest.mark.asyncio
-    async def test_revert_pointer_only(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_revert_pointer_only(self, version_manager: AssetVersionManager) -> None:
         """Revert with create_new_version=False should just update pointer."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
 
@@ -354,9 +340,7 @@ class TestVersionRevert:
         assert asset_info.current_version == 1
 
     @pytest.mark.asyncio
-    async def test_revert_nonexistent_version(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_revert_nonexistent_version(self, version_manager: AssetVersionManager) -> None:
         """Should raise error when reverting to nonexistent version."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
         await version_manager.create_version(
@@ -403,9 +387,7 @@ class TestVersionDeletion:
         assert v2.status == VersionStatus.PENDING_DELETE
 
     @pytest.mark.asyncio
-    async def test_cannot_delete_original(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_cannot_delete_original(self, version_manager: AssetVersionManager) -> None:
         """Should not allow deleting original version."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
         await version_manager.create_version(
@@ -427,9 +409,7 @@ class TestRetentionPolicies:
     """Tests for retention policy functionality."""
 
     @pytest.mark.asyncio
-    async def test_update_retention_keep_last_n(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_update_retention_keep_last_n(self, version_manager: AssetVersionManager) -> None:
         """Should update to KEEP_LAST_N policy."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
 
@@ -461,9 +441,7 @@ class TestRetentionPolicies:
             )
 
     @pytest.mark.asyncio
-    async def test_retention_marks_old_versions(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_retention_marks_old_versions(self, version_manager: AssetVersionManager) -> None:
         """Retention policy should mark old versions for deletion."""
         asset = await version_manager.create_asset(
             name="test.jpg",
@@ -528,17 +506,13 @@ class TestEdgeCases:
     """Tests for edge cases and error handling."""
 
     @pytest.mark.asyncio
-    async def test_get_asset_not_found(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_get_asset_not_found(self, version_manager: AssetVersionManager) -> None:
         """Should raise error for nonexistent asset."""
         with pytest.raises(AssetNotFoundError):
             await version_manager.get_asset("nonexistent_id")
 
     @pytest.mark.asyncio
-    async def test_get_asset_with_versions(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_get_asset_with_versions(self, version_manager: AssetVersionManager) -> None:
         """Should include versions when requested."""
         asset = await version_manager.create_asset(name="test.jpg", category="original")
         await version_manager.create_version(
@@ -550,17 +524,13 @@ class TestEdgeCases:
             )
         )
 
-        asset_with_versions = await version_manager.get_asset(
-            asset.asset_id, include_versions=True
-        )
+        asset_with_versions = await version_manager.get_asset(asset.asset_id, include_versions=True)
 
         assert asset_with_versions.versions is not None
         assert len(asset_with_versions.versions) == 1
 
     @pytest.mark.asyncio
-    async def test_version_key_generation(
-        self, version_manager: AssetVersionManager
-    ) -> None:
+    async def test_version_key_generation(self, version_manager: AssetVersionManager) -> None:
         """Should generate correct R2 keys."""
         key = version_manager._generate_versioned_key("asset_123", 2, "image.jpg")
         assert key == "versioned/asset_123/v2/image.jpg"

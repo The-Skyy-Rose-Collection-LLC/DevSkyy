@@ -277,7 +277,9 @@ class ThreeDProviderFactory:
         cached = self._health_cache.get(provider_name)
         if cached:
             health, timestamp = cached
-            if datetime.now(UTC) - timestamp < timedelta(seconds=self.config.health_cache_ttl_seconds):
+            if datetime.now(UTC) - timestamp < timedelta(
+                seconds=self.config.health_cache_ttl_seconds
+            ):
                 return health
 
         return None
@@ -366,7 +368,7 @@ class ThreeDProviderFactory:
             )
 
         # Limit to max failover attempts
-        providers = providers[:self.config.max_failover_attempts]
+        providers = providers[: self.config.max_failover_attempts]
 
         errors: list[tuple[str, Exception]] = []
 
@@ -494,15 +496,17 @@ class ThreeDProviderFactory:
             config = self._provider_configs.get(name)
             health = health_results.get(name)
 
-            providers.append({
-                "name": name,
-                "capabilities": [c.value for c in provider.capabilities],
-                "priority": config.priority.value if config else "unknown",
-                "enabled": config.enabled if config else False,
-                "status": health.status.value if health else "unknown",
-                "latency_ms": health.latency_ms if health else None,
-                "circuit_breaker_open": self._is_circuit_open(name),
-            })
+            providers.append(
+                {
+                    "name": name,
+                    "capabilities": [c.value for c in provider.capabilities],
+                    "priority": config.priority.value if config else "unknown",
+                    "enabled": config.enabled if config else False,
+                    "status": health.status.value if health else "unknown",
+                    "latency_ms": health.latency_ms if health else None,
+                    "circuit_breaker_open": self._is_circuit_open(name),
+                }
+            )
 
         return providers
 

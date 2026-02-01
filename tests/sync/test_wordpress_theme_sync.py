@@ -3,19 +3,19 @@
 Comprehensive test suite for WordPress media approval sync functionality.
 """
 
-import pytest
+from datetime import UTC, datetime
 from unittest.mock import AsyncMock, MagicMock, patch
-from datetime import datetime, UTC
 
+import pytest
+
+from services.approval_queue_manager import ApprovalItem, ApprovalStatus
 from sync.wordpress_media_approval_sync import (
-    WordPressMediaApprovalSync,
-    SyncStatus,
-    SyncResult,
     BatchSyncResult,
+    SyncResult,
+    SyncStatus,
+    WordPressMediaApprovalSync,
     get_wordpress_sync,
 )
-from services.approval_queue_manager import ApprovalItem, ApprovalStatus
-
 
 # =============================================================================
 # Fixtures
@@ -26,7 +26,9 @@ from services.approval_queue_manager import ApprovalItem, ApprovalStatus
 def mock_wordpress_client():
     """Mock WordPress API client."""
     client = MagicMock()
-    client.upload_media = AsyncMock(return_value={"id": 12345, "url": "https://example.com/media/12345.jpg"})
+    client.upload_media = AsyncMock(
+        return_value={"id": 12345, "url": "https://example.com/media/12345.jpg"}
+    )
     client.update_media = AsyncMock(return_value={"id": 12345, "updated": True})
     client.delete_media = AsyncMock(return_value={"deleted": True})
     client.is_configured = True
@@ -83,7 +85,7 @@ class TestWordPressMediaApprovalSync:
         mock_wordpress_client.upload_media.return_value = {"id": 98765}
 
         # Patch the actual implementation to use the mock
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id="asset-123",
                 success=True,
@@ -100,7 +102,7 @@ class TestWordPressMediaApprovalSync:
         """Should handle sync failures gracefully."""
         mock_wordpress_client.upload_media.side_effect = Exception("Network error")
 
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id="asset-123",
                 success=False,
@@ -133,10 +135,15 @@ class TestWordPressMediaApprovalSync:
         asset_ids = ["asset-1", "asset-2", "asset-3"]
 
         # Mock partial failure
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.side_effect = [
                 SyncResult(item_id="asset-1", success=True, status=SyncStatus.COMPLETED),
-                SyncResult(item_id="asset-2", success=False, status=SyncStatus.FAILED, error="Upload failed"),
+                SyncResult(
+                    item_id="asset-2",
+                    success=False,
+                    status=SyncStatus.FAILED,
+                    error="Upload failed",
+                ),
                 SyncResult(item_id="asset-3", success=True, status=SyncStatus.COMPLETED),
             ]
 
@@ -164,10 +171,14 @@ class TestWordPressMediaApprovalSync:
         """Should collect all errors from failed syncs."""
         asset_ids = ["asset-1", "asset-2"]
 
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.side_effect = [
-                SyncResult(item_id="asset-1", success=False, status=SyncStatus.FAILED, error="Error 1"),
-                SyncResult(item_id="asset-2", success=False, status=SyncStatus.FAILED, error="Error 2"),
+                SyncResult(
+                    item_id="asset-1", success=False, status=SyncStatus.FAILED, error="Error 1"
+                ),
+                SyncResult(
+                    item_id="asset-2", success=False, status=SyncStatus.FAILED, error="Error 2"
+                ),
             ]
 
             result = await sync_service.batch_sync(asset_ids)
@@ -189,7 +200,7 @@ class TestWordPressSyncIntegration:
     @pytest.mark.asyncio
     async def test_sync_updates_approval_item(self, sync_service, sample_approval_item):
         """Should update approval item after successful sync."""
-        with patch('services.approval_queue_manager.ApprovalQueueManager') as MockManager:
+        with patch("services.approval_queue_manager.ApprovalQueueManager") as MockManager:
             manager = MockManager.return_value
             manager.get_item = AsyncMock(return_value=sample_approval_item)
             manager.update_wordpress_sync = AsyncMock(return_value=sample_approval_item)
@@ -236,7 +247,7 @@ class TestWordPressSyncIntegration:
 
         # In real implementation, this should be skipped
         # Test that the sync service validates status
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id=pending_item.id,
                 success=False,
@@ -263,7 +274,7 @@ class TestErrorHandling:
         """Should handle network errors gracefully."""
         mock_wordpress_client.upload_media.side_effect = ConnectionError("Network unavailable")
 
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id="asset-123",
                 success=False,
@@ -279,9 +290,11 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_wordpress_api_error(self, sync_service, mock_wordpress_client):
         """Should handle WordPress API errors."""
-        mock_wordpress_client.upload_media.side_effect = Exception("WordPress API Error: 403 Forbidden")
+        mock_wordpress_client.upload_media.side_effect = Exception(
+            "WordPress API Error: 403 Forbidden"
+        )
 
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id="asset-123",
                 success=False,
@@ -297,7 +310,7 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_invalid_asset_id(self, sync_service):
         """Should handle invalid asset IDs."""
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id="invalid-id",
                 success=False,
@@ -313,10 +326,9 @@ class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_timeout_handling(self, sync_service, mock_wordpress_client):
         """Should handle timeouts appropriately."""
-        import asyncio
-        mock_wordpress_client.upload_media.side_effect = asyncio.TimeoutError()
+        mock_wordpress_client.upload_media.side_effect = TimeoutError()
 
-        with patch.object(sync_service, 'sync_approved_asset') as mock_sync:
+        with patch.object(sync_service, "sync_approved_asset") as mock_sync:
             mock_sync.return_value = SyncResult(
                 item_id="asset-123",
                 success=False,

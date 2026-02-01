@@ -87,12 +87,12 @@ class TestBatchGeneration:
         """Test different quality tiers."""
         for quality in ["draft", "standard", "high"]:
 
-                response = await client.post(
-                    "/api/v1/pipeline/batch-generate",
-                    json={"asset_ids": ["asset-1"], "provider": "tripo", "quality": quality},
-                )
+            response = await client.post(
+                "/api/v1/pipeline/batch-generate",
+                json={"asset_ids": ["asset-1"], "provider": "tripo", "quality": quality},
+            )
 
-                assert response.status_code == 200
+            assert response.status_code == 200
 
 
 class TestJobStatus:
@@ -100,20 +100,18 @@ class TestJobStatus:
 
     async def test_get_job_status(self, client, auth_headers, mock_3d_job):
         """Test getting job status."""
+        response = await client.get("/api/v1/pipeline/jobs/job-123")
 
-            response = await client.get("/api/v1/pipeline/jobs/job-123")
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["id"] == "job-123"
-            assert data["progress_percentage"] == 50.0
+        assert response.status_code == 200
+        data = response.json()
+        assert data["id"] == "job-123"
+        assert data["progress_percentage"] == 50.0
 
     async def test_get_job_not_found(self, client, auth_headers):
         """Test getting non-existent job."""
+        response = await client.get("/api/v1/pipeline/jobs/nonexistent")
 
-            response = await client.get("/api/v1/pipeline/jobs/nonexistent")
-
-            assert response.status_code == 404
+        assert response.status_code == 404
 
     async def test_get_completed_job(self, client, auth_headers):
         """Test getting completed job with results."""
@@ -129,13 +127,12 @@ class TestJobStatus:
             ],
         }
 
+        response = await client.get("/api/v1/pipeline/jobs/job-complete")
 
-            response = await client.get("/api/v1/pipeline/jobs/job-complete")
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["status"] == "completed"
-            assert len(data["results"]) == 2
+        assert response.status_code == 200
+        data = response.json()
+        assert data["status"] == "completed"
+        assert len(data["results"]) == 2
 
 
 class TestJobsList:
@@ -143,18 +140,18 @@ class TestJobsList:
 
     async def test_list_jobs(self, client, auth_headers, mock_3d_job):
         """Test listing all jobs."""
-            mock_list.return_value = {
-                "jobs": [mock_3d_job],
-                "total": 1,
-                "page": 1,
-                "page_size": 20,
-            }
+        mock_list.return_value = {
+            "jobs": [mock_3d_job],
+            "total": 1,
+            "page": 1,
+            "page_size": 20,
+        }
 
-            response = await client.get("/api/v1/pipeline/jobs")
+        response = await client.get("/api/v1/pipeline/jobs")
 
-            assert response.status_code == 200
-            data = response.json()
-            assert len(data["jobs"]) == 1
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["jobs"]) == 1
 
     async def test_list_jobs_with_status_filter(self, client, auth_headers):
         """Test filtering jobs by status."""
@@ -168,33 +165,33 @@ class TestSingleGeneration:
 
     async def test_generate_single_3d_model(self, client, auth_headers, mock_3d_result):
         """Test generating a single 3D model."""
-            mock_gen.return_value = mock_3d_result
+        mock_gen.return_value = mock_3d_result
 
-            response = await client.post(
-                "/api/v1/pipeline/generate",
-                json={
-                    "asset_id": "asset-1",
-                    "provider": "tripo",
-                    "quality": "high",
-                    "fidelity_target": 98.0,
-                },
-            )
+        response = await client.post(
+            "/api/v1/pipeline/generate",
+            json={
+                "asset_id": "asset-1",
+                "provider": "tripo",
+                "quality": "high",
+                "fidelity_target": 98.0,
+            },
+        )
 
-            assert response.status_code == 200
-            data = response.json()
-            assert data["asset_id"] == "asset-1"
-            assert data["fidelity_score"] >= 98.0
+        assert response.status_code == 200
+        data = response.json()
+        assert data["asset_id"] == "asset-1"
+        assert data["fidelity_score"] >= 98.0
 
     async def test_generate_with_default_quality(self, client, auth_headers):
         """Test generation with default quality settings."""
-            mock_gen.return_value = {"asset_id": "asset-1", "quality": "standard"}
+        mock_gen.return_value = {"asset_id": "asset-1", "quality": "standard"}
 
-            response = await client.post(
-                "/api/v1/pipeline/generate",
-                json={"asset_id": "asset-1"},
-            )
+        response = await client.post(
+            "/api/v1/pipeline/generate",
+            json={"asset_id": "asset-1"},
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
 
 class TestFidelityQA:
@@ -216,40 +213,40 @@ class TestFidelityQA:
             "approved": True,
         }
 
-            mock_fidelity.return_value = fidelity_data
+        mock_fidelity.return_value = fidelity_data
 
-            response = await client.get("/api/v1/pipeline/fidelity/asset-1")
+        response = await client.get("/api/v1/pipeline/fidelity/asset-1")
 
-            assert response.status_code == 200
-            data = response.json()
-            assert data["fidelity_score"] == 98.5
-            assert data["breakdown"]["colors"] == 99.5
+        assert response.status_code == 200
+        data = response.json()
+        assert data["fidelity_score"] == 98.5
+        assert data["breakdown"]["colors"] == 99.5
 
     async def test_approve_fidelity(self, client, auth_headers):
         """Test approving a 3D model's fidelity."""
-            mock_approve.return_value = {"asset_id": "asset-1", "approved": True}
+        mock_approve.return_value = {"asset_id": "asset-1", "approved": True}
 
-            response = await client.post(
-                "/api/v1/pipeline/fidelity/asset-1/approve",
-                json={"approved": True},
-            )
+        response = await client.post(
+            "/api/v1/pipeline/fidelity/asset-1/approve",
+            json={"approved": True},
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
     async def test_reject_fidelity_with_regeneration(self, client, auth_headers):
         """Test rejecting fidelity and requesting regeneration."""
-            mock_reject.return_value = {"asset_id": "asset-1", "regenerate": True}
+        mock_reject.return_value = {"asset_id": "asset-1", "regenerate": True}
 
-            response = await client.post(
-                "/api/v1/pipeline/fidelity/asset-1/reject",
-                json={
-                    "reason": "Low geometry accuracy",
-                    "regenerate": True,
-                    "parameters": {"quality": "high", "fidelity_target": 99.0},
-                },
-            )
+        response = await client.post(
+            "/api/v1/pipeline/fidelity/asset-1/reject",
+            json={
+                "reason": "Low geometry accuracy",
+                "regenerate": True,
+                "parameters": {"quality": "high", "fidelity_target": 99.0},
+            },
+        )
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
 
 class TestProviders:
@@ -278,26 +275,26 @@ class TestProviders:
             ]
         }
 
-            mock_providers.return_value = providers
+        mock_providers.return_value = providers
 
-            response = await client.get("/api/v1/pipeline/providers")
+        response = await client.get("/api/v1/pipeline/providers")
 
-            assert response.status_code == 200
-            data = response.json()
-            assert len(data["providers"]) >= 2
+        assert response.status_code == 200
+        data = response.json()
+        assert len(data["providers"]) >= 2
 
     async def test_get_provider_status(self, client, auth_headers):
         """Test getting individual provider status."""
-            mock_status.return_value = {
-                "id": "tripo",
-                "available": True,
-                "queue_length": 5,
-                "est_wait_time": 300.0,
-            }
+        mock_status.return_value = {
+            "id": "tripo",
+            "available": True,
+            "queue_length": 5,
+            "est_wait_time": 300.0,
+        }
 
-            response = await client.get("/api/v1/pipeline/providers/tripo")
+        response = await client.get("/api/v1/pipeline/providers/tripo")
 
-            assert response.status_code == 200
+        assert response.status_code == 200
 
 
 class TestWebSocketPipeline:
@@ -315,23 +312,23 @@ class TestCostEstimation:
 
     async def test_estimate_batch_cost(self, client, auth_headers):
         """Test estimating cost for batch generation."""
-            mock_cost.return_value = {
-                "total_cost": 15.50,
-                "per_asset_cost": 0.50,
+        mock_cost.return_value = {
+            "total_cost": 15.50,
+            "per_asset_cost": 0.50,
+            "asset_count": 31,
+            "provider": "tripo",
+            "quality": "high",
+        }
+
+        response = await client.post(
+            "/api/v1/pipeline/estimate",
+            json={
                 "asset_count": 31,
                 "provider": "tripo",
                 "quality": "high",
-            }
+            },
+        )
 
-            response = await client.post(
-                "/api/v1/pipeline/estimate",
-                json={
-                    "asset_count": 31,
-                    "provider": "tripo",
-                    "quality": "high",
-                },
-            )
-
-            assert response.status_code == 200
-            data = response.json()
-            assert data["total_cost"] == 15.50
+        assert response.status_code == 200
+        data = response.json()
+        assert data["total_cost"] == 15.50

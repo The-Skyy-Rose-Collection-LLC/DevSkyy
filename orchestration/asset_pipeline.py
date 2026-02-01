@@ -1077,9 +1077,7 @@ class ProductAssetPipeline:
 
         # Check for cached items
         batch_result.cached_items = sum(
-            1
-            for _, r, _ in results
-            if r and r.duration_seconds < 1.0  # Cached results are fast
+            1 for _, r, _ in results if r and r.duration_seconds < 1.0  # Cached results are fast
         )
 
         # Finalize

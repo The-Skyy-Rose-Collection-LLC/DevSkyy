@@ -160,16 +160,19 @@ class TestGenerateFromImage:
             duration_ms=1500,
         )
 
-        with patch.object(
-            provider._client,
-            "generate_image",
-            new_callable=AsyncMock,
-            return_value=mock_response,
-        ), patch.object(
-            ImageInput,
-            "from_url",
-            new_callable=AsyncMock,
-            return_value=ImageInput(base64_data="dGVzdA==", mime_type="image/png"),
+        with (
+            patch.object(
+                provider._client,
+                "generate_image",
+                new_callable=AsyncMock,
+                return_value=mock_response,
+            ),
+            patch.object(
+                ImageInput,
+                "from_url",
+                new_callable=AsyncMock,
+                return_value=ImageInput(base64_data="dGVzdA==", mime_type="image/png"),
+            ),
         ):
             request = ThreeDRequest(
                 image_url="https://example.com/product.jpg",
@@ -379,11 +382,10 @@ class TestContextManager:
         with patch.dict("os.environ", {"GOOGLE_AI_API_KEY": "test-key"}):
             provider = GeminiImageProvider(api_key="test-key")
 
-            with patch.object(
-                provider._client, "connect", new_callable=AsyncMock
-            ) as mock_connect, patch.object(
-                provider._client, "close", new_callable=AsyncMock
-            ) as mock_close:
+            with (
+                patch.object(provider._client, "connect", new_callable=AsyncMock) as mock_connect,
+                patch.object(provider._client, "close", new_callable=AsyncMock) as mock_close,
+            ):
                 async with provider as p:
                     assert p is provider
                     mock_connect.assert_called_once()

@@ -3307,8 +3307,7 @@ if __name__ == "__main__":
         print("âš ï¸  Warning: DEVSKYY_API_KEY not set. Using empty key for testing.")
         print("   Set it with: export DEVSKYY_API_KEY='your-key-here'")
 
-    print(
-        f"""
+    print(f"""
 â•”â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•—
 â•‘                                                                  â•‘
 â•'   DevSkyy MCP Server v2.0.0 - Advanced Tool Use                 â•'
@@ -3349,8 +3348,7 @@ if __name__ == "__main__":
 ðŸ”— API Reference: {API_BASE_URL}/docs
 
 Starting MCP server on stdio...
-"""
-    )
+""")
 
     # Run the server
     mcp.run()

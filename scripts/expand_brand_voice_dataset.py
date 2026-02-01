@@ -15,7 +15,6 @@ import asyncio
 import json
 import os
 from pathlib import Path
-from typing import Any
 
 import httpx
 from dotenv import load_dotenv
@@ -279,13 +278,15 @@ async def expand_dataset():
             for i, prompt in enumerate(prompts, 1):
                 response = await generate_response(prompt, client)
                 if response:
-                    examples.append({
-                        "messages": [
-                            {"role": "system", "content": SYSTEM_PROMPT},
-                            {"role": "user", "content": prompt},
-                            {"role": "assistant", "content": response},
-                        ]
-                    })
+                    examples.append(
+                        {
+                            "messages": [
+                                {"role": "system", "content": SYSTEM_PROMPT},
+                                {"role": "user", "content": prompt},
+                                {"role": "assistant", "content": response},
+                            ]
+                        }
+                    )
                 print(f"    [{i}/{len(prompts)}] ✓", end="\r")
                 await asyncio.sleep(0.5)  # Rate limiting
             print(f"    [{len(prompts)}/{len(prompts)}] ✓ Complete")
@@ -295,13 +296,15 @@ async def expand_dataset():
         for i, prompt in enumerate(SOCIAL_MEDIA_PROMPTS, 1):
             response = await generate_response(prompt, client)
             if response:
-                examples.append({
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt},
-                        {"role": "assistant", "content": response},
-                    ]
-                })
+                examples.append(
+                    {
+                        "messages": [
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt},
+                            {"role": "assistant", "content": response},
+                        ]
+                    }
+                )
             print(f"  [{i}/{len(SOCIAL_MEDIA_PROMPTS)}] ✓", end="\r")
             await asyncio.sleep(0.5)
         print(f"  [{len(SOCIAL_MEDIA_PROMPTS)}/{len(SOCIAL_MEDIA_PROMPTS)}] ✓ Complete")
@@ -311,13 +314,15 @@ async def expand_dataset():
         for i, prompt in enumerate(EMAIL_PROMPTS, 1):
             response = await generate_response(prompt, client)
             if response:
-                examples.append({
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt},
-                        {"role": "assistant", "content": response},
-                    ]
-                })
+                examples.append(
+                    {
+                        "messages": [
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt},
+                            {"role": "assistant", "content": response},
+                        ]
+                    }
+                )
             print(f"  [{i}/{len(EMAIL_PROMPTS)}] ✓", end="\r")
             await asyncio.sleep(0.5)
         print(f"  [{len(EMAIL_PROMPTS)}/{len(EMAIL_PROMPTS)}] ✓ Complete")
@@ -327,13 +332,15 @@ async def expand_dataset():
         for i, prompt in enumerate(CUSTOMER_SERVICE_PROMPTS, 1):
             response = await generate_response(prompt, client)
             if response:
-                examples.append({
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt},
-                        {"role": "assistant", "content": response},
-                    ]
-                })
+                examples.append(
+                    {
+                        "messages": [
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt},
+                            {"role": "assistant", "content": response},
+                        ]
+                    }
+                )
             print(f"  [{i}/{len(CUSTOMER_SERVICE_PROMPTS)}] ✓", end="\r")
             await asyncio.sleep(0.5)
         print(f"  [{len(CUSTOMER_SERVICE_PROMPTS)}/{len(CUSTOMER_SERVICE_PROMPTS)}] ✓ Complete")
@@ -343,13 +350,15 @@ async def expand_dataset():
         for i, prompt in enumerate(STORYTELLING_PROMPTS, 1):
             response = await generate_response(prompt, client)
             if response:
-                examples.append({
-                    "messages": [
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": prompt},
-                        {"role": "assistant", "content": response},
-                    ]
-                })
+                examples.append(
+                    {
+                        "messages": [
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {"role": "user", "content": prompt},
+                            {"role": "assistant", "content": response},
+                        ]
+                    }
+                )
             print(f"  [{i}/{len(STORYTELLING_PROMPTS)}] ✓", end="\r")
             await asyncio.sleep(0.5)
         print(f"  [{len(STORYTELLING_PROMPTS)}/{len(STORYTELLING_PROMPTS)}] ✓ Complete")
@@ -367,7 +376,7 @@ async def expand_dataset():
     print("  DATASET EXPANSION COMPLETE")
     print("=" * 70)
     print(f"  Generated: {len(examples)} examples")
-    print(f"  Original: 5 examples")
+    print("  Original: 5 examples")
     print(f"  Expansion: {len(examples) / 5:.1f}x")
     print(f"  Saved to: {output_path}")
     print()

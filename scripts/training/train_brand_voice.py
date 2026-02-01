@@ -3,17 +3,21 @@
 
 Fine-tunes Qwen2.5-1.5B-Instruct on SkyyRose brand voice dataset.
 """
+
 import os
-from datasets import load_dataset
+
 from peft import LoraConfig
 from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-from trl import SFTTrainer, SFTConfig
+from trl import SFTConfig, SFTTrainer
+
+from datasets import load_dataset
 
 # Configuration
 MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
 DATASET_NAME = "damBruh/skyyrose-brand-voice-training"
 OUTPUT_DIR = "./skyyrose-brand-voice-llm"
 HF_USERNAME = "damBruh"
+
 
 def main():
     """Run training."""
@@ -56,7 +60,15 @@ def main():
         r=16,
         lora_alpha=32,
         lora_dropout=0.05,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
         bias="none",
         task_type="CAUSAL_LM",
     )
@@ -100,7 +112,10 @@ def main():
     print("Pushing to Hub...")
     trainer.push_to_hub()
 
-    print(f"Training complete! Model available at: huggingface.co/{HF_USERNAME}/skyyrose-brand-voice-llm")
+    print(
+        f"Training complete! Model available at: huggingface.co/{HF_USERNAME}/skyyrose-brand-voice-llm"
+    )
+
 
 if __name__ == "__main__":
     main()

@@ -20,6 +20,8 @@ Version: 1.0.0
 
 """
 
+from api.v1.analytics.business import router as business_router
+from api.v1.analytics.dashboard import router as analytics_dashboard_router
 from api.v1.approval import router as approval_router
 from api.v1.assets import router as assets_router
 from api.v1.brand_assets import router as brand_assets_router
@@ -38,8 +40,6 @@ from api.v1.training_status import training_router
 from api.v1.woocommerce_webhooks import router as woocommerce_webhooks_router
 from api.v1.wordpress import router as wordpress_router
 from api.v1.wordpress_theme import router as wordpress_theme_router
-from api.v1.analytics.business import router as business_router
-from api.v1.analytics.dashboard import router as analytics_dashboard_router
 
 __all__ = [
     "approval_router",

@@ -1398,14 +1398,12 @@ async def main():
     """CLI interface"""
     import sys
 
-    print(
-        """
+    print("""
 ╔══════════════════════════════════════════════════════════════════╗
 ║           DevSkyy Coding Doctor                                   ║
 ║   Self-Learning | Self-Healing | Full-Stack Analysis             ║
 ╚══════════════════════════════════════════════════════════════════╝
-"""
-    )
+""")
 
     doctor = create_coding_doctor()
     await doctor.initialize()

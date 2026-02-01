@@ -65,8 +65,7 @@ async def ingested_rag_manager(rag_manager, tmp_path):
     test_docs_dir.mkdir(parents=True, exist_ok=True)
 
     # Create sample markdown files
-    (test_docs_dir / "product_guide.md").write_text(
-        """
+    (test_docs_dir / "product_guide.md").write_text("""
 # Product Management Guide
 
 ## Creating Products
@@ -85,11 +84,9 @@ Our dynamic pricing engine considers:
 - Demand forecasting
 - Inventory levels
 - Seasonal trends
-"""
-    )
+""")
 
-    (test_docs_dir / "commerce_api.md").write_text(
-        """
+    (test_docs_dir / "commerce_api.md").write_text("""
 # Commerce API Documentation
 
 ## Product Endpoints
@@ -105,8 +102,7 @@ POST /api/v1/products
 GET /api/v1/products
 - Returns paginated list of products
 - Supports filtering by category, price range
-"""
-    )
+""")
 
     # Ingest documents using absolute path
     stats = await auto_ingest_documents(
@@ -151,7 +147,7 @@ async def test_rag_context_retrieval(ingested_rag_manager):
 @pytest.mark.slow
 @pytest.mark.skipif(
     not os.environ.get("OPENAI_API_KEY"),
-    reason="OPENAI_API_KEY not set - required for agent execution"
+    reason="OPENAI_API_KEY not set - required for agent execution",
 )
 async def test_agent_with_rag_context(ingested_rag_manager):
     """Test that SuperAgent uses RAG context during execution (slow)."""

@@ -35,9 +35,7 @@ class IRAGManager(ABC):
         ...
 
     @abstractmethod
-    async def ingest(
-        self, documents: list[str], *, metadata: dict | None = None
-    ) -> int:
+    async def ingest(self, documents: list[str], *, metadata: dict | None = None) -> int:
         """
         Ingest documents into RAG system.
 
@@ -97,9 +95,7 @@ class ICacheProvider(ABC):
         ...
 
     @abstractmethod
-    async def set(
-        self, key: str, value: Any, *, ttl: int | None = None
-    ) -> None:
+    async def set(self, key: str, value: Any, *, ttl: int | None = None) -> None:
         """
         Set value in cache.
 

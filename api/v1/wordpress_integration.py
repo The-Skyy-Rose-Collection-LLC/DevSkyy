@@ -30,12 +30,8 @@ class WordPressSettings(BaseModel):
     site_url: str = Field(default_factory=lambda: os.getenv("WORDPRESS_SITE_URL", ""))
     api_token: str = Field(default_factory=lambda: os.getenv("WORDPRESS_API_TOKEN", ""))
     consumer_key: str = Field(default_factory=lambda: os.getenv("WC_CONSUMER_KEY", ""))
-    consumer_secret: str = Field(
-        default_factory=lambda: os.getenv("WC_CONSUMER_SECRET", "")
-    )
-    webhook_secret: str = Field(
-        default_factory=lambda: os.getenv("WC_WEBHOOK_SECRET", "")
-    )
+    consumer_secret: str = Field(default_factory=lambda: os.getenv("WC_CONSUMER_SECRET", ""))
+    webhook_secret: str = Field(default_factory=lambda: os.getenv("WC_WEBHOOK_SECRET", ""))
 
 
 def get_settings() -> WordPressSettings:

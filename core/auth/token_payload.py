@@ -47,7 +47,7 @@ class TokenPayload:
 
     sub: str  # Subject (user_id)
     jti: str  # JWT ID (unique identifier)
-    type: "TokenType"  # Token type
+    type: TokenType  # Token type
     roles: list[str] = field(default_factory=list)  # User roles
     family_id: str | None = None  # Token family for rotation tracking
     tier: str = "free"  # Subscription tier
@@ -56,7 +56,7 @@ class TokenPayload:
     iss: str | None = None  # Issuer
     aud: str | None = None  # Audience
 
-    def has_role(self, role: "UserRole") -> bool:
+    def has_role(self, role: UserRole) -> bool:
         """
         Check if payload has a specific role.
 
@@ -68,7 +68,7 @@ class TokenPayload:
         """
         return role.value in self.roles
 
-    def has_any_role(self, roles: set["UserRole"]) -> bool:
+    def has_any_role(self, roles: set[UserRole]) -> bool:
         """
         Check if payload has any of the specified roles.
 
@@ -81,7 +81,7 @@ class TokenPayload:
         role_values = {r.value for r in roles}
         return bool(set(self.roles) & role_values)
 
-    def has_all_roles(self, roles: set["UserRole"]) -> bool:
+    def has_all_roles(self, roles: set[UserRole]) -> bool:
         """
         Check if payload has all of the specified roles.
 
@@ -94,7 +94,7 @@ class TokenPayload:
         role_values = {r.value for r in roles}
         return role_values.issubset(set(self.roles))
 
-    def get_highest_role(self) -> "UserRole | None":
+    def get_highest_role(self) -> UserRole | None:
         """
         Get the highest privilege role.
 

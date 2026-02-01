@@ -1,9 +1,10 @@
 """Tests for Assets API endpoints."""
 
+import io
+from unittest.mock import patch
+
 import pytest
 from fastapi.testclient import TestClient
-from unittest.mock import Mock, patch, AsyncMock
-import io
 from PIL import Image
 
 pytestmark = pytest.mark.asyncio

@@ -12,10 +12,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load OAuth credentials
-load_dotenv('.env.wordpress')
+load_dotenv(".env.wordpress")
 
-CLIENT_ID = os.getenv('WORDPRESS_CLIENT_ID')
-CLIENT_SECRET = os.getenv('WORDPRESS_CLIENT_SECRET')
+CLIENT_ID = os.getenv("WORDPRESS_CLIENT_ID")
+CLIENT_SECRET = os.getenv("WORDPRESS_CLIENT_SECRET")
 
 if not CLIENT_ID or not CLIENT_SECRET:
     print("❌ Error: WordPress OAuth credentials not found in .env.wordpress")
@@ -28,7 +28,7 @@ if not site_url:
     sys.exit(1)
 
 # Remove protocol if present
-site_url = site_url.replace('https://', '').replace('http://', '').rstrip('/')
+site_url = site_url.replace("https://", "").replace("http://", "").rstrip("/")
 
 print(f"\n🚀 Deploying SkyyRose theme to {site_url}")
 print("=" * 60)
@@ -36,7 +36,9 @@ print("=" * 60)
 # Step 1: Get OAuth token
 print("\n1️⃣  Authenticating with WordPress.com...")
 print(f"   Please visit this URL to authorize:")
-print(f"   https://public-api.wordpress.com/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri=urn:ietf:wg:oauth:2.0:oob&response_type=code")
+print(
+    f"   https://public-api.wordpress.com/oauth2/authorize?client_id={CLIENT_ID}&redirect_uri=urn:ietf:wg:oauth:2.0:oob&response_type=code"
+)
 print()
 
 auth_code = input("   Enter authorization code: ").strip()
@@ -47,14 +49,14 @@ if not auth_code:
 
 # Exchange code for token
 token_response = requests.post(
-    'https://public-api.wordpress.com/oauth2/token',
+    "https://public-api.wordpress.com/oauth2/token",
     data={
-        'client_id': CLIENT_ID,
-        'client_secret': CLIENT_SECRET,
-        'grant_type': 'authorization_code',
-        'code': auth_code,
-        'redirect_uri': 'urn:ietf:wg:oauth:2.0:oob'
-    }
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "grant_type": "authorization_code",
+        "code": auth_code,
+        "redirect_uri": "urn:ietf:wg:oauth:2.0:oob",
+    },
 )
 
 if token_response.status_code != 200:
@@ -62,7 +64,7 @@ if token_response.status_code != 200:
     sys.exit(1)
 
 token_data = token_response.json()
-access_token = token_data.get('access_token')
+access_token = token_data.get("access_token")
 
 print("✅ Authentication successful!")
 
@@ -75,9 +77,7 @@ if not theme_zip.exists():
     print(f"❌ Error: Theme ZIP not found at {theme_zip}")
     sys.exit(1)
 
-headers = {
-    'Authorization': f'Bearer {access_token}'
-}
+headers = {"Authorization": f"Bearer {access_token}"}
 
 # Upload theme using WordPress.com REST API
 # Note: WordPress.com uses index.php?rest_route= format
@@ -107,85 +107,48 @@ print()
 # However, we can create pages via API
 create_pages = input("Would you like to create pages automatically? (y/n): ").strip().lower()
 
-if create_pages == 'y':
+if create_pages == "y":
     print("\n3️⃣  Creating WordPress pages...")
 
     pages_to_create = [
+        {"title": "Home", "status": "publish", "type": "page", "slug": "home"},
+        {"title": "The Vault", "status": "publish", "type": "page", "slug": "vault"},
+        {"title": "Black Rose", "status": "publish", "type": "page", "slug": "black-rose"},
         {
-            'title': 'Home',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'home'
+            "title": "Black Rose Experience",
+            "status": "publish",
+            "type": "page",
+            "slug": "black-rose-experience",
         },
+        {"title": "Love Hurts", "status": "publish", "type": "page", "slug": "love-hurts"},
         {
-            'title': 'The Vault',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'vault'
+            "title": "Love Hurts Experience",
+            "status": "publish",
+            "type": "page",
+            "slug": "love-hurts-experience",
         },
+        {"title": "Signature", "status": "publish", "type": "page", "slug": "signature"},
         {
-            'title': 'Black Rose',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'black-rose'
+            "title": "Signature Experience",
+            "status": "publish",
+            "type": "page",
+            "slug": "signature-experience",
         },
-        {
-            'title': 'Black Rose Experience',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'black-rose-experience'
-        },
-        {
-            'title': 'Love Hurts',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'love-hurts'
-        },
-        {
-            'title': 'Love Hurts Experience',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'love-hurts-experience'
-        },
-        {
-            'title': 'Signature',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'signature'
-        },
-        {
-            'title': 'Signature Experience',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'signature-experience'
-        },
-        {
-            'title': 'About',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'about'
-        },
-        {
-            'title': 'Contact',
-            'status': 'publish',
-            'type': 'page',
-            'slug': 'contact'
-        }
+        {"title": "About", "status": "publish", "type": "page", "slug": "about"},
+        {"title": "Contact", "status": "publish", "type": "page", "slug": "contact"},
     ]
 
     created_count = 0
     for page_data in pages_to_create:
-        response = requests.post(
-            f"{base_url}/posts/new",
-            headers=headers,
-            json=page_data
-        )
+        response = requests.post(f"{base_url}/posts/new", headers=headers, json=page_data)
 
         if response.status_code in [200, 201]:
             print(f"   ✅ Created: {page_data['title']}")
             created_count += 1
         else:
-            print(f"   ⚠️  {page_data['title']}: {response.json().get('message', 'May already exist')}")
+            print(
+                f"   ⚠️  {page_data['title']}: {response.json().get('message', 'May already exist')}"
+            )
 
     print(f"\n✅ Created {created_count} pages")
 
@@ -204,4 +167,6 @@ print("   3. Assign templates to pages")
 print("   4. Import products from CSV")
 print("   5. Set up navigation menu")
 print()
-print(f"📖 Full guide: /Users/coreyfoster/DevSkyy/wordpress-theme/skyyrose-2025/DEPLOYMENT_READY.md")
+print(
+    f"📖 Full guide: /Users/coreyfoster/DevSkyy/wordpress-theme/skyyrose-2025/DEPLOYMENT_READY.md"
+)

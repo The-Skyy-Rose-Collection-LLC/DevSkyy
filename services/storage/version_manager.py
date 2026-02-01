@@ -271,7 +271,8 @@ class AssetVersionManager:
         # Filter out deleted versions unless requested
         if not include_deleted:
             versions = [
-                v for v in versions
+                v
+                for v in versions
                 if v.status not in (VersionStatus.DELETED, VersionStatus.PENDING_DELETE)
             ]
 

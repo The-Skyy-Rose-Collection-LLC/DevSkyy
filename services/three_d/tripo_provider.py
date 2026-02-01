@@ -41,8 +41,7 @@ class TripoProviderConfig:
     """Tripo3D provider configuration."""
 
     api_key: str = field(
-        default_factory=lambda: os.getenv("TRIPO_API_KEY", "")
-        or os.getenv("TRIPO3D_API_KEY", "")
+        default_factory=lambda: os.getenv("TRIPO_API_KEY", "") or os.getenv("TRIPO3D_API_KEY", "")
     )
     output_dir: str = field(
         default_factory=lambda: os.getenv("THREE_D_OUTPUT_DIR", "./assets/3d-models-generated")

@@ -415,9 +415,7 @@ class PrometheusExporter:
         result = "hit" if hit else "miss"
         cache_lookup_duration_seconds.labels(cache_type=cache_type, result=result).observe(duration)
 
-    def record_embedding_generation(
-        self, duration: float, provider: str, batch_size: int
-    ) -> None:
+    def record_embedding_generation(self, duration: float, provider: str, batch_size: int) -> None:
         """
         Record embedding generation metrics.
 

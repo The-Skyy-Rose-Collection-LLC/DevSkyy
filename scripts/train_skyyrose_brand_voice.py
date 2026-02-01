@@ -7,19 +7,18 @@ Optimizations: Gradient checkpointing, small batch size
 """
 
 import json
-import os
-from pathlib import Path
 
 import torch
-from datasets import Dataset
 from peft import LoraConfig, get_peft_model
 from transformers import (
     AutoModelForCausalLM,
     AutoTokenizer,
-    TrainingArguments,
-    Trainer,
     DataCollatorForLanguageModeling,
+    Trainer,
+    TrainingArguments,
 )
+
+from datasets import Dataset
 
 # Configuration
 MODEL_NAME = "Qwen/Qwen2.5-0.5B-Instruct"
@@ -189,6 +188,7 @@ def main():
     except Exception as e:
         print(f"\n✗ Training failed: {e}")
         import traceback
+
         traceback.print_exc()
 
     print("\n" + "=" * 70)
@@ -196,7 +196,9 @@ def main():
     print("=" * 70)
     print(f"\nModel saved to: {OUTPUT_DIR}")
     print("\nTest the model:")
-    print(f"  python -c \"from transformers import pipeline; p = pipeline('text-generation', '{OUTPUT_DIR}'); print(p('Write a product description for'))\"")
+    print(
+        f"  python -c \"from transformers import pipeline; p = pipeline('text-generation', '{OUTPUT_DIR}'); print(p('Write a product description for'))\""
+    )
 
 
 if __name__ == "__main__":

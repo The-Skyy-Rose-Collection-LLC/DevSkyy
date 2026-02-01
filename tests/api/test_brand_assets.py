@@ -115,8 +115,7 @@ class TestBulkIngestion:
     def test_bulk_ingest_max_100_assets(self, client: TestClient) -> None:
         """Should accept up to 100 assets."""
         assets = [
-            {"url": f"https://example.com/img{i}.jpg", "category": "product"}
-            for i in range(100)
+            {"url": f"https://example.com/img{i}.jpg", "category": "product"} for i in range(100)
         ]
 
         response = client.post(
@@ -130,8 +129,7 @@ class TestBulkIngestion:
     def test_bulk_ingest_over_limit(self, client: TestClient) -> None:
         """Should reject over 100 assets."""
         assets = [
-            {"url": f"https://example.com/img{i}.jpg", "category": "product"}
-            for i in range(101)
+            {"url": f"https://example.com/img{i}.jpg", "category": "product"} for i in range(101)
         ]
 
         response = client.post(
@@ -146,9 +144,7 @@ class TestBulkIngestion:
         response = client.post(
             "/brand-assets/ingest/bulk",
             json={
-                "assets": [
-                    {"url": "https://example.com/img.jpg", "category": "product"}
-                ],
+                "assets": [{"url": "https://example.com/img.jpg", "category": "product"}],
                 "auto_approve": True,
             },
         )
@@ -161,9 +157,7 @@ class TestBulkIngestion:
         create_response = client.post(
             "/brand-assets/ingest/bulk",
             json={
-                "assets": [
-                    {"url": "https://example.com/img.jpg", "category": "product"}
-                ],
+                "assets": [{"url": "https://example.com/img.jpg", "category": "product"}],
             },
         )
         job_id = create_response.json()["id"]
@@ -432,15 +426,19 @@ class TestStatistics:
         from api.v1.brand_assets import BrandAsset, ColorPalette, VisualFeatures
 
         # Create assets with different categories and statuses
-        for i, cat in enumerate([
-            BrandAssetCategory.PRODUCT,
-            BrandAssetCategory.LIFESTYLE,
-            BrandAssetCategory.CAMPAIGN,
-        ]):
+        for i, cat in enumerate(
+            [
+                BrandAssetCategory.PRODUCT,
+                BrandAssetCategory.LIFESTYLE,
+                BrandAssetCategory.CAMPAIGN,
+            ]
+        ):
             asset = BrandAsset(
                 url=f"https://example.com/{cat.value}.jpg",
                 category=cat,
-                approval_status=AssetApprovalStatus.APPROVED if i % 2 == 0 else AssetApprovalStatus.PENDING,
+                approval_status=(
+                    AssetApprovalStatus.APPROVED if i % 2 == 0 else AssetApprovalStatus.PENDING
+                ),
                 visual_features=VisualFeatures(
                     color_palette=ColorPalette(primary="#000"),
                     quality_score=0.8,

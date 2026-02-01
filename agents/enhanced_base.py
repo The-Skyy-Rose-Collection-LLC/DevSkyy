@@ -22,13 +22,6 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel, Field, field_validator
 
-from agents.errors import (
-    AgentError,
-    ExecutionError,
-    TimeoutError,
-    ValidationError,
-    wrap_exception,
-)
 from agents.base_legacy import (
     AgentCapability,
     AgentConfig,
@@ -37,6 +30,13 @@ from agents.base_legacy import (
     RetrievalContext,
     SuperAgent,
     ValidationResult,
+)
+from agents.errors import (
+    AgentError,
+    ExecutionError,
+    TimeoutError,
+    ValidationError,
+    wrap_exception,
 )
 from core.runtime.tool_registry import ToolCallContext, ToolRegistry
 

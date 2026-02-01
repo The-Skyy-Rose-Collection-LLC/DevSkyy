@@ -390,14 +390,12 @@ def create_app() -> gr.Blocks:
         ),
     ) as app:
         # Header
-        gr.HTML(
-            """
+        gr.HTML("""
         <div class="skyyrose-header">
             <h1>🌹 SkyyRose 3D Model Studio</h1>
             <p>Where Love Meets Luxury | AI-Powered 3D Generation with 95% Fidelity</p>
         </div>
-        """
-        )
+        """)
 
         # Provider Status
         with gr.Accordion("🔌 Provider Status", open=False):
@@ -407,13 +405,11 @@ def create_app() -> gr.Blocks:
         with gr.Tabs():
             # Tab 1: Generate from Image
             with gr.TabItem("📸 Image to 3D"):
-                gr.Markdown(
-                    """
+                gr.Markdown("""
                 ### Generate 3D Models from Product Images
                 Upload a product image to create a production-ready 3D model.
                 All models are validated against the **95% fidelity threshold**.
-                """
-                )
+                """)
 
                 with gr.Row():
                     with gr.Column(scale=1):
@@ -484,12 +480,10 @@ def create_app() -> gr.Blocks:
 
             # Tab 2: Enhance Model
             with gr.TabItem("✨ Enhance Model"):
-                gr.Markdown(
-                    """
+                gr.Markdown("""
                 ### Improve Existing 3D Models
                 Upload a 3D model to enhance its quality and meet the 95% fidelity threshold.
-                """
-                )
+                """)
 
                 with gr.Row():
                     with gr.Column(scale=1):
@@ -548,12 +542,10 @@ def create_app() -> gr.Blocks:
 
             # Tab 3: Validate Model
             with gr.TabItem("🔍 Validate Model"):
-                gr.Markdown(
-                    """
+                gr.Markdown("""
                 ### Validate 3D Model Fidelity
                 Check if your 3D model meets the SkyyRose 95% fidelity standard.
-                """
-                )
+                """)
 
                 with gr.Row():
                     with gr.Column(scale=1):
@@ -581,14 +573,12 @@ def create_app() -> gr.Blocks:
 
             # Tab 4: Batch Processing
             with gr.TabItem("📦 Batch Processing"):
-                gr.Markdown(
-                    """
+                gr.Markdown("""
                 ### Batch 3D Model Generation
                 Upload multiple images to generate 3D models in batch.
 
                 *Coming soon...*
-                """
-                )
+                """)
 
                 gr.File(
                     label="Upload Images",
@@ -596,24 +586,20 @@ def create_app() -> gr.Blocks:
                     file_types=["image"],
                 )
 
-                gr.Markdown(
-                    """
+                gr.Markdown("""
                 **Batch processing will:**
                 1. Process all uploaded images
                 2. Generate 3D models with 95% fidelity enforcement
                 3. Provide a downloadable ZIP with all models
-                """
-                )
+                """)
 
         # Footer
-        gr.HTML(
-            """
+        gr.HTML("""
         <div style="text-align: center; padding: 20px; color: #666; margin-top: 20px;">
             <p>🌹 <strong>SkyyRose 3D Model Studio</strong> | Powered by AI | 95% Fidelity Standard</p>
             <p style="font-size: 0.9em;">© 2024 SkyyRose LLC - Where Love Meets Luxury</p>
         </div>
-        """
-        )
+        """)
 
     return app
 

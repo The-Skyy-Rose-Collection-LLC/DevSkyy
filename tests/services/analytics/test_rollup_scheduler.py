@@ -13,7 +13,6 @@ Tests cover:
 from __future__ import annotations
 
 import asyncio
-import uuid
 from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from typing import Any
@@ -27,7 +26,6 @@ from services.analytics.rollup_scheduler import (
     RollupScheduler,
     RollupSchedulerError,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -43,7 +41,7 @@ class MockSession:
         self.rowcount = 0
         self._results: list[Any] = []
 
-    async def execute(self, query: Any, params: Any = None) -> "MockResult":
+    async def execute(self, query: Any, params: Any = None) -> MockResult:
         self.executed.append((query, params))
         return MockResult(self._results, self.rowcount)
 
@@ -103,7 +101,7 @@ class MockSessionFactory:
         self.session = session or MockSession()
         self.call_count = 0
 
-    def __call__(self) -> "MockSessionContextManager":
+    def __call__(self) -> MockSessionContextManager:
         self.call_count += 1
         return MockSessionContextManager(self.session)
 
