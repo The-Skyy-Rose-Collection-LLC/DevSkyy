@@ -297,8 +297,7 @@ def print_summary(info: dict):
     print("\n" + "=" * 60)
     print("V3 DATASET SUMMARY")
     print("=" * 60)
-    print(
-        f"""
+    print(f"""
     Name: {info["name"]}
     Version: {info["version"]}
     Total Images: {info["total_images"]}
@@ -313,8 +312,7 @@ def print_summary(info: dict):
     Collections: {", ".join(info["collections"])}
     Product Types: {", ".join(info["product_types"])}
     Brand Trigger: {info["brand_trigger"]}
-    """
-    )
+    """)
 
 
 def main():

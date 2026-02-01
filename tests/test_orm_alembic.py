@@ -97,9 +97,9 @@ def test_model_schema():
         "metadata",
     }
 
-    assert user_columns == expected_user_cols, (
-        f"User model schema mismatch. Expected: {expected_user_cols}, Actual: {user_columns}"
-    )
+    assert (
+        user_columns == expected_user_cols
+    ), f"User model schema mismatch. Expected: {expected_user_cols}, Actual: {user_columns}"
     print("✅ User model schema matches expected structure")
 
     # Check Product model
@@ -119,9 +119,9 @@ def test_model_schema():
         "metadata",
     }
 
-    assert product_columns == expected_product_cols, (
-        f"Product model schema mismatch. Expected: {expected_product_cols}, Actual: {product_columns}"
-    )
+    assert (
+        product_columns == expected_product_cols
+    ), f"Product model schema mismatch. Expected: {expected_product_cols}, Actual: {product_columns}"
     print("✅ Product model schema matches expected structure")
 
     # Check Order model
@@ -138,9 +138,9 @@ def test_model_schema():
         "metadata",
     }
 
-    assert order_columns == expected_order_cols, (
-        f"Order model schema mismatch. Expected: {expected_order_cols}, Actual: {order_columns}"
-    )
+    assert (
+        order_columns == expected_order_cols
+    ), f"Order model schema mismatch. Expected: {expected_order_cols}, Actual: {order_columns}"
     print("✅ Order model schema matches expected structure")
 
 
@@ -154,22 +154,30 @@ def test_relationships():
     user_mapper = inspect(User)
     user_relationships = {rel.key for rel in user_mapper.relationships}
 
-    assert "orders" in user_relationships, f"User missing 'orders' relationship. Found: {user_relationships}"
-    assert "tool_executions" in user_relationships, f"User missing 'tool_executions' relationship. Found: {user_relationships}"
+    assert (
+        "orders" in user_relationships
+    ), f"User missing 'orders' relationship. Found: {user_relationships}"
+    assert (
+        "tool_executions" in user_relationships
+    ), f"User missing 'tool_executions' relationship. Found: {user_relationships}"
     print("✅ User model relationships are properly defined")
 
     # Check Order -> User relationship
     order_mapper = inspect(Order)
     order_relationships = {rel.key for rel in order_mapper.relationships}
 
-    assert "user" in order_relationships, f"Order missing 'user' relationship. Found: {order_relationships}"
+    assert (
+        "user" in order_relationships
+    ), f"Order missing 'user' relationship. Found: {order_relationships}"
     print("✅ Order model relationships are properly defined")
 
     # Check ToolExecution -> User relationship
     tool_mapper = inspect(ToolExecution)
     tool_relationships = {rel.key for rel in tool_mapper.relationships}
 
-    assert "user" in tool_relationships, f"ToolExecution missing 'user' relationship. Found: {tool_relationships}"
+    assert (
+        "user" in tool_relationships
+    ), f"ToolExecution missing 'user' relationship. Found: {tool_relationships}"
     print("✅ ToolExecution model relationships are properly defined")
 
 

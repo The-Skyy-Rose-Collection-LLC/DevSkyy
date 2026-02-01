@@ -402,8 +402,7 @@ class RoundTableDatabase:
 
         try:
             async with self._pool.acquire() as conn:
-                rows = await conn.fetch(
-                    """
+                rows = await conn.fetch("""
                     SELECT
                         winner_provider,
                         COUNT(*) as wins,
@@ -413,8 +412,7 @@ class RoundTableDatabase:
                     FROM round_table_results
                     WHERE status = 'completed'
                     GROUP BY winner_provider
-                    ORDER BY wins DESC."""
-                )
+                    ORDER BY wins DESC.""")
 
                 return {
                     row["winner_provider"]: {
@@ -1602,9 +1600,7 @@ async def _auto_register_providers(rt: LLMRoundTable) -> None:
                 logger.warning(f"Failed to register {provider.value}: {e}")
 
 
-def _create_provider_generator(
-    provider: LLMProvider, model: str, api_key: str
-) -> Callable:
+def _create_provider_generator(provider: LLMProvider, model: str, api_key: str) -> Callable:
     """Create a generator function for a provider."""
 
     async def generator(prompt: str, context: dict | None = None) -> LLMResponse:
@@ -1636,7 +1632,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.choices[0].message.content or ""
-                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.prompt_tokens + response.usage.completion_tokens)
+                    if response.usage
+                    else 0
+                )
 
             elif provider == LLMProvider.GEMINI:
                 from google import genai
@@ -1659,7 +1659,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.choices[0].message.content or ""
-                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.prompt_tokens + response.usage.completion_tokens)
+                    if response.usage
+                    else 0
+                )
 
             elif provider == LLMProvider.MISTRAL:
                 from mistralai import Mistral
@@ -1670,7 +1674,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.choices[0].message.content or ""
-                tokens = (response.usage.prompt_tokens + response.usage.completion_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.prompt_tokens + response.usage.completion_tokens)
+                    if response.usage
+                    else 0
+                )
 
             elif provider == LLMProvider.COHERE:
                 import cohere
@@ -1681,7 +1689,11 @@ def _create_provider_generator(
                     messages=[{"role": "user", "content": prompt}],
                 )
                 content = response.message.content[0].text if response.message.content else ""
-                tokens = (response.usage.tokens.input_tokens + response.usage.tokens.output_tokens) if response.usage else 0
+                tokens = (
+                    (response.usage.tokens.input_tokens + response.usage.tokens.output_tokens)
+                    if response.usage
+                    else 0
+                )
 
             else:
                 raise ValueError(f"Unknown provider: {provider}")

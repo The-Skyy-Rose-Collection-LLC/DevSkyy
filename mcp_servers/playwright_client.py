@@ -258,11 +258,9 @@ class PlaywrightMCPClient:
             results["tests_failed"] += 1
 
         # Test 4: Check loading completes
-        loading_hidden = await self.evaluate(
-            """
+        loading_hidden = await self.evaluate("""
             document.querySelector('.skyyrose-3d-loading')?.style.display === 'none'
-        """
-        )
+        """)
         results["details"].append(
             {
                 "test": "Loading completes",
@@ -275,12 +273,10 @@ class PlaywrightMCPClient:
             results["tests_failed"] += 1
 
         # Test 5: Check WebGL context
-        has_webgl = await self.evaluate(
-            """
+        has_webgl = await self.evaluate("""
             !!document.querySelector('.skyyrose-3d-canvas')?.getContext('webgl2') ||
             !!document.querySelector('.skyyrose-3d-canvas')?.getContext('webgl')
-        """
-        )
+        """)
         results["details"].append(
             {
                 "test": "WebGL context available",
@@ -337,11 +333,9 @@ class PlaywrightMCPClient:
             results["tests_failed"] += 1
 
         # Test 2: No JavaScript errors
-        errors = await self.evaluate(
-            """
+        errors = await self.evaluate("""
             window.__jsErrors || []
-        """
-        )
+        """)
         no_js_errors = not errors or len(errors) == 0
         results["details"].append(
             {
@@ -356,11 +350,9 @@ class PlaywrightMCPClient:
             results["tests_failed"] += 1
 
         # Test 3: Check for Elementor
-        has_elementor = await self.evaluate(
-            """
+        has_elementor = await self.evaluate("""
             !!document.querySelector('.elementor')
-        """
-        )
+        """)
         results["details"].append(
             {
                 "test": "Elementor content present",

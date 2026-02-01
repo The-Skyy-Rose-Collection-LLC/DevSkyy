@@ -740,11 +740,7 @@ class ApprovalQueueManager:
         expired_count = 0
 
         for item in self._items.values():
-            if (
-                item.status == ApprovalStatus.PENDING
-                and item.expires_at
-                and item.expires_at < now
-            ):
+            if item.status == ApprovalStatus.PENDING and item.expires_at and item.expires_at < now:
                 item.status = ApprovalStatus.EXPIRED
                 expired_count += 1
 

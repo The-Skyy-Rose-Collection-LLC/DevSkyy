@@ -23,10 +23,10 @@ from typing import Any
 
 import httpx
 from PIL import Image
+from sync.woocommerce_sync import Product, WooCommerceSyncClient
 
 from imagery.lora_trainer import TrainingDataset, TrainingImage
 from orchestration.brand_context import COLLECTION_CONTEXT
-from sync.woocommerce_sync import Product, WooCommerceSyncClient
 
 logger = logging.getLogger(__name__)
 

@@ -258,8 +258,7 @@ def main():
             print("\n" + "=" * 70)
             print("SUCCESS! LoRA training complete")
             print("=" * 70)
-            print(
-                f"""
+            print(f"""
 Model: https://replicate.com/dambruh/skyyrose-lora-v3
 Weights: {output}
 
@@ -267,8 +266,7 @@ Next Steps:
 1. Test generation: python scripts/demo_image_generation.py
 2. Use prompt: "skyyrose luxury streetwear, [product description]"
 3. Deploy to production image pipeline
-"""
-            )
+""")
 
             # Save training info
             info_path = project_root / "models" / "skyyrose-lora-v3-info.json"

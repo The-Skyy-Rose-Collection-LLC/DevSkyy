@@ -147,9 +147,7 @@ class CompetitorAnalysisService:
 
         del _competitors[competitor_id]
 
-        logger.info(
-            f"Deleted competitor {competitor_id} and {len(asset_ids_to_delete)} assets"
-        )
+        logger.info(f"Deleted competitor {competitor_id} and {len(asset_ids_to_delete)} assets")
         return True
 
     # =========================================================================
@@ -198,8 +196,7 @@ class CompetitorAnalysisService:
         _competitor_assets[asset.id] = asset
 
         logger.info(
-            f"Uploaded competitor asset: {asset.id} "
-            f"(competitor: {request.competitor_id})"
+            f"Uploaded competitor asset: {asset.id} " f"(competitor: {request.competitor_id})"
         )
         return asset
 
@@ -236,43 +233,43 @@ class CompetitorAnalysisService:
         # Apply filters
         if filter_params:
             if filter_params.competitor_id:
-                assets = [
-                    a for a in assets
-                    if a.competitor_id == filter_params.competitor_id
-                ]
+                assets = [a for a in assets if a.competitor_id == filter_params.competitor_id]
 
             if filter_params.competitor_category:
                 competitor_ids = {
-                    c.id for c in _competitors.values()
+                    c.id
+                    for c in _competitors.values()
                     if c.category == filter_params.competitor_category
                 }
                 assets = [a for a in assets if a.competitor_id in competitor_ids]
 
             if filter_params.price_positioning:
                 competitor_ids = {
-                    c.id for c in _competitors.values()
+                    c.id
+                    for c in _competitors.values()
                     if c.price_positioning == filter_params.price_positioning
                 }
                 assets = [a for a in assets if a.competitor_id in competitor_ids]
 
             if filter_params.composition_type:
                 assets = [
-                    a for a in assets
+                    a
+                    for a in assets
                     if a.extracted_attributes
                     and a.extracted_attributes.composition_type == filter_params.composition_type
                 ]
 
             if filter_params.style_category:
                 assets = [
-                    a for a in assets
+                    a
+                    for a in assets
                     if a.extracted_attributes
                     and a.extracted_attributes.style_category == filter_params.style_category
                 ]
 
             if filter_params.tags:
                 assets = [
-                    a for a in assets
-                    if any(tag in a.manual_tags for tag in filter_params.tags)
+                    a for a in assets if any(tag in a.manual_tags for tag in filter_params.tags)
                 ]
 
         total = len(assets)
@@ -401,14 +398,12 @@ class CompetitorAnalysisService:
         # Top colors and materials
         color_counts = Counter(all_colors)
         top_colors = [
-            {"color": color, "count": count}
-            for color, count in color_counts.most_common(10)
+            {"color": color, "count": count} for color, count in color_counts.most_common(10)
         ]
 
         material_counts = Counter(all_materials)
         top_materials = [
-            {"material": mat, "count": count}
-            for mat, count in material_counts.most_common(10)
+            {"material": mat, "count": count} for mat, count in material_counts.most_common(10)
         ]
 
         # Price analytics by competitor

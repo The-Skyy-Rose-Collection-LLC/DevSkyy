@@ -269,7 +269,9 @@ def extract_counter_value(counter_metric: Any, labels: dict[str, str] | None = N
                 total = 0
                 for sample in metric_family.samples:
                     if sample.name.endswith("_total") or sample.name == metric_family.name:
-                        if labels is None or all(sample.labels.get(k) == v for k, v in labels.items()):
+                        if labels is None or all(
+                            sample.labels.get(k) == v for k, v in labels.items()
+                        ):
                             total += int(sample.value)
                 return total
     except Exception as e:

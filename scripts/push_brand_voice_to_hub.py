@@ -1,14 +1,15 @@
 """Push trained SkyyRose brand voice model to HuggingFace Hub."""
 
 import os
-from pathlib import Path
 
-from huggingface_hub import HfApi, create_repo, upload_folder
 from dotenv import load_dotenv
+from huggingface_hub import HfApi, create_repo
 
 load_dotenv()
 
-HF_TOKEN = os.getenv("HUGGINGFACE_TOKEN") or os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_ACCESS_TOKEN")
+HF_TOKEN = (
+    os.getenv("HUGGINGFACE_TOKEN") or os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACE_ACCESS_TOKEN")
+)
 HF_USERNAME = "damBruh"
 REPO_NAME = "skyyrose-brand-voice-llm"
 LOCAL_MODEL_PATH = "skyyrose-brand-voice-lora"

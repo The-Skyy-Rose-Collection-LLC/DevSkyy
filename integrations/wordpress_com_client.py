@@ -6,9 +6,7 @@ Supports WooCommerce REST API v3.
 
 from __future__ import annotations
 
-import asyncio
 from typing import Any, TypedDict
-from urllib.parse import urljoin
 
 import httpx
 from pydantic import BaseModel, Field
@@ -19,9 +17,15 @@ class WordPressConfig(BaseModel):
     """WordPress.com site configuration."""
 
     site_url: str = Field(..., description="WordPress.com site URL (e.g., https://skyyrose.co)")
-    api_token: str | None = Field(default=None, description="WordPress.com OAuth2 access token (Bearer auth)")
-    username: str | None = Field(default=None, description="WordPress username (for Application Password auth)")
-    app_password: str | None = Field(default=None, description="WordPress Application Password (Basic auth)")
+    api_token: str | None = Field(
+        default=None, description="WordPress.com OAuth2 access token (Bearer auth)"
+    )
+    username: str | None = Field(
+        default=None, description="WordPress username (for Application Password auth)"
+    )
+    app_password: str | None = Field(
+        default=None, description="WordPress Application Password (Basic auth)"
+    )
     timeout: int = Field(default=30, description="Request timeout in seconds")
 
     def model_post_init(self, __context: Any) -> None:

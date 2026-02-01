@@ -14,7 +14,7 @@ from datetime import UTC, datetime
 
 from pydantic import BaseModel, EmailStr, Field, field_validator
 
-from .types import AuthErrorCode, AuthStatus, SubscriptionTier, TokenType, UserRole
+from .types import AuthErrorCode, AuthStatus, SubscriptionTier, UserRole
 
 
 class AuthCredentials(BaseModel):

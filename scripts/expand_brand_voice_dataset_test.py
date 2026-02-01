@@ -79,13 +79,15 @@ async def main():
         for i, prompt in enumerate(TEST_PROMPTS, 1):
             print(f"[{i}/{len(TEST_PROMPTS)}] {prompt[:50]}...")
             response = await generate_response(prompt, client)
-            examples.append({
-                "messages": [
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt},
-                    {"role": "assistant", "content": response},
-                ]
-            })
+            examples.append(
+                {
+                    "messages": [
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": prompt},
+                        {"role": "assistant", "content": response},
+                    ]
+                }
+            )
             await asyncio.sleep(0.5)
 
     output_path = Path("datasets/skyyrose_brand_voice/train_test.jsonl")

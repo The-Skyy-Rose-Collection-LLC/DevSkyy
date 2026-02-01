@@ -1654,8 +1654,9 @@ class TestSyncIntegration:
     @pytest.mark.asyncio
     async def test_media_woo_sync_workflow(self, tmp_path: Path) -> None:
         """Test complete workflow of uploading media and syncing to WooCommerce."""
-        from sync.media_sync import MediaSyncManager
         from sync.woocommerce_sync import ProductSyncData, WooCommerceSyncClient
+
+        from sync.media_sync import MediaSyncManager
 
         # Create test image
         image_path = tmp_path / "product.jpg"

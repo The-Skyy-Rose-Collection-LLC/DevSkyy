@@ -31,35 +31,37 @@ from services.ml.visual_feature_extractor import (
 @pytest.fixture
 def mock_gemini_response() -> str:
     """Mock Gemini vision response with valid JSON."""
-    return json.dumps({
-        "color_palette": {
-            "primary": "#1A1A1A",
-            "secondary": ["#B76E79", "#FFFFFF"],
-            "accent": "#B76E79",
-            "all_colors": [
-                {"hex": "#1A1A1A", "name": "charcoal black", "prominence": 0.6},
-                {"hex": "#B76E79", "name": "rose gold", "prominence": 0.3},
-            ],
-        },
-        "composition": {
-            "type": "centered",
-            "focal_point": "center",
-            "balance": "balanced",
-            "depth": "shallow",
-            "framing": "medium",
-        },
-        "lighting": {
-            "type": "studio",
-            "direction": "front",
-            "mood": "dramatic",
-            "quality": "soft",
-            "color_temperature": "neutral",
-        },
-        "style_tags": ["luxury", "minimal", "sophisticated", "elegant"],
-        "quality_score": 0.92,
-        "detected_objects": ["handbag", "leather", "gold hardware"],
-        "brand_alignment_score": 0.88,
-    })
+    return json.dumps(
+        {
+            "color_palette": {
+                "primary": "#1A1A1A",
+                "secondary": ["#B76E79", "#FFFFFF"],
+                "accent": "#B76E79",
+                "all_colors": [
+                    {"hex": "#1A1A1A", "name": "charcoal black", "prominence": 0.6},
+                    {"hex": "#B76E79", "name": "rose gold", "prominence": 0.3},
+                ],
+            },
+            "composition": {
+                "type": "centered",
+                "focal_point": "center",
+                "balance": "balanced",
+                "depth": "shallow",
+                "framing": "medium",
+            },
+            "lighting": {
+                "type": "studio",
+                "direction": "front",
+                "mood": "dramatic",
+                "quality": "soft",
+                "color_temperature": "neutral",
+            },
+            "style_tags": ["luxury", "minimal", "sophisticated", "elegant"],
+            "quality_score": 0.92,
+            "detected_objects": ["handbag", "leather", "gold hardware"],
+            "brand_alignment_score": 0.88,
+        }
+    )
 
 
 @pytest.fixture

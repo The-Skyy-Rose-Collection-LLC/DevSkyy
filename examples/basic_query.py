@@ -7,9 +7,8 @@ Demonstrates simple single-query usage of the Agent SDK.
 import asyncio
 import os
 
-from dotenv import load_dotenv
-
 from agent_sdk.main import DevSkyy
+from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()

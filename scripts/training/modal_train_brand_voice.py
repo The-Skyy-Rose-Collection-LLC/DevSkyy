@@ -3,6 +3,7 @@ SkyyRose Brand Voice LLM Training on Modal.
 
 Run with: modal run scripts/training/modal_train_brand_voice.py
 """
+
 import modal
 
 # Define the Modal app
@@ -20,6 +21,7 @@ training_image = modal.Image.debian_slim(python_version="3.11").pip_install(
     "huggingface_hub",
 )
 
+
 @app.function(
     image=training_image,
     gpu="A10G",  # A10G GPU with 24GB VRAM
@@ -29,12 +31,14 @@ training_image = modal.Image.debian_slim(python_version="3.11").pip_install(
 def train_brand_voice():
     """Train SkyyRose brand voice model."""
     import os
+
     import torch
-    from datasets import load_dataset
+    from huggingface_hub import login
     from peft import LoraConfig
     from transformers import AutoModelForCausalLM, AutoTokenizer, BitsAndBytesConfig
-    from trl import SFTTrainer, SFTConfig
-    from huggingface_hub import login
+    from trl import SFTConfig, SFTTrainer
+
+    from datasets import load_dataset
 
     # Configuration
     MODEL_NAME = "Qwen/Qwen2.5-1.5B-Instruct"
@@ -80,7 +84,15 @@ def train_brand_voice():
         r=16,
         lora_alpha=32,
         lora_dropout=0.05,
-        target_modules=["q_proj", "k_proj", "v_proj", "o_proj", "gate_proj", "up_proj", "down_proj"],
+        target_modules=[
+            "q_proj",
+            "k_proj",
+            "v_proj",
+            "o_proj",
+            "gate_proj",
+            "up_proj",
+            "down_proj",
+        ],
         bias="none",
         task_type="CAUSAL_LM",
     )
