@@ -133,7 +133,9 @@ class SecurityHardening:
                 results.append("✅ All required environment variables present")
 
             if weak_vars:
-                results.append(f"⚠️ Weak environment variables (< 32 chars): {', '.join(weak_vars)}")
+                results.append(
+                    f"⚠️ Weak environment variables (< 32 chars): {', '.join(weak_vars)}"
+                )
             else:
                 results.append("✅ All environment variables meet minimum length requirements")
 

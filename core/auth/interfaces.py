@@ -40,8 +40,8 @@ class ITokenValidator(ABC):
     def validate_token(
         self,
         token: str,
-        expected_type: "TokenType | None" = None,
-    ) -> "TokenPayload":
+        expected_type: TokenType | None = None,
+    ) -> TokenPayload:
         """
         Validate a token and return the decoded payload.
 
@@ -88,10 +88,10 @@ class IAuthProvider(ABC):
     @abstractmethod
     async def authenticate(
         self,
-        credentials: "AuthCredentials",
+        credentials: AuthCredentials,
         *,
         correlation_id: str | None = None,
-    ) -> "AuthResult":
+    ) -> AuthResult:
         """
         Authenticate user with credentials.
 
@@ -110,7 +110,7 @@ class IAuthProvider(ABC):
         refresh_token: str,
         *,
         correlation_id: str | None = None,
-    ) -> "TokenResponse":
+    ) -> TokenResponse:
         """
         Refresh access token using refresh token.
 

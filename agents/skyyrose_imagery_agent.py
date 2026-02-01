@@ -13,13 +13,12 @@ from __future__ import annotations
 import logging
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from adk.base import AgentResult, AgentStatus, ADKProvider
+from adk.base import ADKProvider, AgentResult, AgentStatus
 from agents.base_super_agent import EnhancedSuperAgent, SuperAgentType
-from llm.base import Message
 from orchestration.brand_context import BrandContextInjector, Collection
 from services.three_d.gemini_provider import GeminiImageProvider
 from services.three_d.provider_factory import ThreeDProviderFactory, get_provider_factory
@@ -89,7 +88,7 @@ class ImageryBatch:
 
     batch_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     images: list[GeneratedImage] = field(default_factory=list)
-    started_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    started_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     completed_at: datetime | None = None
     errors: list[str] = field(default_factory=list)
 
@@ -218,7 +217,8 @@ Rules:
 
     def __init__(self, config: Any = None, **kwargs: Any) -> None:
         """Initialize SkyyRose Imagery Agent."""
-        from adk.base import AgentConfig as _AgentConfig, ADKProvider as _ADKProvider
+        from adk.base import ADKProvider as _ADKProvider
+        from adk.base import AgentConfig as _AgentConfig
 
         if config is None:
             config = _AgentConfig(
@@ -383,7 +383,9 @@ Rules:
             )
 
             self._generation_log.append(image)
-            logger.info(f"{self.AGENT_NAME}: Generated image via Gemini [corr={request.correlation_id}]")
+            logger.info(
+                f"{self.AGENT_NAME}: Generated image via Gemini [corr={request.correlation_id}]"
+            )
             return image
 
         except Exception as e:
@@ -398,7 +400,9 @@ Rules:
                 collection=request.collection.value,
                 correlation_id=request.correlation_id,
             )
-            response = await factory.generate(three_d_request, correlation_id=request.correlation_id)
+            response = await factory.generate(
+                three_d_request, correlation_id=request.correlation_id
+            )
 
             image = GeneratedImage(
                 url=response.thumbnail_url or response.model_url or "",
@@ -411,11 +415,15 @@ Rules:
             )
 
             self._generation_log.append(image)
-            logger.info(f"{self.AGENT_NAME}: Generated image via fallback [corr={request.correlation_id}]")
+            logger.info(
+                f"{self.AGENT_NAME}: Generated image via fallback [corr={request.correlation_id}]"
+            )
             return image
 
         except Exception as e:
-            logger.error(f"{self.AGENT_NAME}: All providers failed [corr={request.correlation_id}]: {e}")
+            logger.error(
+                f"{self.AGENT_NAME}: All providers failed [corr={request.correlation_id}]: {e}"
+            )
             raise
 
     async def generate_batch(
@@ -434,19 +442,19 @@ Rules:
             ImageryBatch with all results and any errors
         """
         batch = ImageryBatch()
-        logger.info(f"{self.AGENT_NAME}: Starting batch of {len(requests)} images [batch={batch.batch_id}]")
+        logger.info(
+            f"{self.AGENT_NAME}: Starting batch of {len(requests)} images [batch={batch.batch_id}]"
+        )
 
         for request in requests:
             try:
                 image = await self.generate_image(request)
                 batch.images.append(image)
             except Exception as e:
-                batch.errors.append(
-                    f"[{request.collection.value}/{request.purpose.value}] {e}"
-                )
+                batch.errors.append(f"[{request.collection.value}/{request.purpose.value}] {e}")
                 logger.warning(f"{self.AGENT_NAME}: Batch item failed: {e}")
 
-        batch.completed_at = datetime.now(timezone.utc)
+        batch.completed_at = datetime.now(UTC)
         logger.info(
             f"{self.AGENT_NAME}: Batch complete. "
             f"Success: {len(batch.images)}, Errors: {len(batch.errors)}"
@@ -476,9 +484,10 @@ Rules:
         Returns:
             Updated GeneratedImage with wp_media_id
         """
-        import httpx
-        import tempfile
         import os
+        import tempfile
+
+        import httpx
 
         logger.info(
             f"{self.AGENT_NAME}: Uploading {image.purpose.value} to WordPress "
@@ -525,12 +534,10 @@ Rules:
 
             # Update image record
             image.wp_media_id = media_response.get("id")
-            image.uploaded_at = datetime.now(timezone.utc)
+            image.uploaded_at = datetime.now(UTC)
             image.metadata["wp_media"] = media_response
 
-            logger.info(
-                f"{self.AGENT_NAME}: Uploaded to WP media ID {image.wp_media_id}"
-            )
+            logger.info(f"{self.AGENT_NAME}: Uploaded to WP media ID {image.wp_media_id}")
 
             return image
 
@@ -568,35 +575,45 @@ Rules:
 
         for collection in collections:
             # Hero banner for collection page
-            requests.append(ImageryRequest(
-                purpose=ImageryPurpose.HERO_BANNER,
-                collection=collection,
-                model_pose=ModelPose.EDITORIAL,
-            ))
+            requests.append(
+                ImageryRequest(
+                    purpose=ImageryPurpose.HERO_BANNER,
+                    collection=collection,
+                    model_pose=ModelPose.EDITORIAL,
+                )
+            )
             # Collection showcase
-            requests.append(ImageryRequest(
-                purpose=ImageryPurpose.COLLECTION_SHOWCASE,
-                collection=collection,
-                model_pose=ModelPose.RUNWAY,
-            ))
+            requests.append(
+                ImageryRequest(
+                    purpose=ImageryPurpose.COLLECTION_SHOWCASE,
+                    collection=collection,
+                    model_pose=ModelPose.RUNWAY,
+                )
+            )
             # Product model shot
-            requests.append(ImageryRequest(
-                purpose=ImageryPurpose.PRODUCT_MODEL,
-                collection=collection,
-                model_pose=ModelPose.CASUAL_ELEGANT,
-            ))
+            requests.append(
+                ImageryRequest(
+                    purpose=ImageryPurpose.PRODUCT_MODEL,
+                    collection=collection,
+                    model_pose=ModelPose.CASUAL_ELEGANT,
+                )
+            )
             # Lifestyle
-            requests.append(ImageryRequest(
-                purpose=ImageryPurpose.LIFESTYLE,
-                collection=collection,
-                model_pose=ModelPose.CASUAL_ELEGANT,
-            ))
+            requests.append(
+                ImageryRequest(
+                    purpose=ImageryPurpose.LIFESTYLE,
+                    collection=collection,
+                    model_pose=ModelPose.CASUAL_ELEGANT,
+                )
+            )
             # Campaign hero
-            requests.append(ImageryRequest(
-                purpose=ImageryPurpose.CAMPAIGN,
-                collection=collection,
-                model_pose=ModelPose.DRAMATIC,
-            ))
+            requests.append(
+                ImageryRequest(
+                    purpose=ImageryPurpose.CAMPAIGN,
+                    collection=collection,
+                    model_pose=ModelPose.DRAMATIC,
+                )
+            )
 
         logger.info(
             f"{self.AGENT_NAME}: Generating {len(requests)} theme assets "

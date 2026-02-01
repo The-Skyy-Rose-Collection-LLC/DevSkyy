@@ -223,6 +223,7 @@ async def lifespan(app: FastAPI):
     log.info("registering_services_for_di")
     try:
         from core.registry.registrations import register_all_services
+
         register_all_services()
         log.info("services_registered_successfully")
     except Exception as e:
@@ -551,6 +552,7 @@ async def lifespan(app: FastAPI):
     log.info("registering_services_for_di")
     try:
         from core.registry.registrations import register_all_services
+
         register_all_services()
         log.info("services_registered_successfully")
     except Exception as e:
@@ -821,6 +823,7 @@ async def tier_rate_limit_middleware(request: Request, call_next):
         if environment == "production":
             # Fail secure: block request on rate limiter failure in production
             from fastapi import HTTPException, status
+
             raise HTTPException(
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Rate limiting service temporarily unavailable",
@@ -1046,10 +1049,12 @@ app.include_router(woocommerce_webhooks_router, prefix="/api/v1")
 
 # Dashboard summary API (US-011: unified dashboard data)
 from api.v1.analytics.dashboard import router as analytics_dashboard_router
+
 app.include_router(analytics_dashboard_router, prefix="/api/v1")
 
 # 3D Generation Pipeline (DevSkyy Imagery Pipeline)
 from api.v1.pipeline import router as pipeline_router
+
 app.include_router(pipeline_router, prefix="/api/v1")
 
 

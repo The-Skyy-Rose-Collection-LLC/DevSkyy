@@ -83,10 +83,7 @@ class CollectionDesignTemplates:
     @staticmethod
     def get_all_templates() -> dict[str, dict[str, Any]]:
         """Get all available collection templates."""
-        return {
-            ct.value: template
-            for ct, template in _COLLECTION_TEMPLATES.items()
-        }
+        return {ct.value: template for ct, template in _COLLECTION_TEMPLATES.items()}
 
     @staticmethod
     def to_agent_reference(collection_type: CollectionType) -> dict[str, Any]:

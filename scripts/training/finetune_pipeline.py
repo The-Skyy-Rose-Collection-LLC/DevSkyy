@@ -29,7 +29,6 @@ import json
 import logging
 import os
 import sys
-import time
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
@@ -68,12 +67,14 @@ logger = logging.getLogger(__name__)
 
 class TrainingProvider(str, Enum):
     """Training providers."""
+
     REPLICATE = "replicate"
     HUGGINGFACE = "huggingface"
 
 
 class ModelType(str, Enum):
     """Model types for fine-tuning."""
+
     IMAGE_LORA = "image_lora"
     LLM = "llm"
 
@@ -107,6 +108,7 @@ class TrainingConfig:
 @dataclass
 class TrainingResult:
     """Result from a training run."""
+
     success: bool
     model_type: ModelType
     provider: TrainingProvider
@@ -137,7 +139,7 @@ Features:
 
 Where Love Meets Luxury. This isn't just clothing - it's a statement of refined rebellion, a testament to those who dare to stand out while standing tall.
 
-Limited pieces. Timeless style. Exclusively SkyyRose."""
+Limited pieces. Timeless style. Exclusively SkyyRose.""",
     },
     {
         "input": "Describe the Black Rose collection aesthetic.",
@@ -153,7 +155,7 @@ The collection features:
 
 For those who find beauty in darkness and luxury in the unconventional. The Black Rose Collection speaks to the bold souls who wear their complexity with pride.
 
-Oakland born. Luxury refined. Unmistakably SkyyRose."""
+Oakland born. Luxury refined. Unmistakably SkyyRose.""",
     },
     {
         "input": "Create marketing copy for Love Hurts windbreaker.",
@@ -171,7 +173,7 @@ This piece doesn't just protect you from the elements - it announces your arriva
 
 Wear your heart on your sleeve. Literally.
 
-SkyyRose. Where Love Meets Luxury."""
+SkyyRose. Where Love Meets Luxury.""",
     },
     {
         "input": "Write Instagram caption for new collection drop.",
@@ -183,7 +185,7 @@ Limited pieces. Unlimited confidence.
 
 Link in bio. Don't sleep on this.
 
-#SkyyRose #WhereLoveMeetsLuxury #OaklandFashion #LuxuryStreetwear #SignatureCollection"""
+#SkyyRose #WhereLoveMeetsLuxury #OaklandFashion #LuxuryStreetwear #SignatureCollection""",
     },
     {
         "input": "Describe SkyyRose brand values.",
@@ -201,7 +203,7 @@ ELEVATION - We take the familiar and make it extraordinary. Street roots, luxury
 
 LOVE - At our core, we believe fashion should feel like coming home. Comfortable. Confident. Complete.
 
-Where Love Meets Luxury. That's not just a tagline - it's our promise."""
+Where Love Meets Luxury. That's not just a tagline - it's our promise.""",
     },
 ]
 
@@ -248,6 +250,7 @@ class ReplicateTrainer:
         """Prepare and upload training dataset to HuggingFace."""
         import shutil
         import zipfile
+
         from PIL import Image
 
         dataset_dir = PROJECT_ROOT / "datasets" / "skyyrose_lora_v3"
@@ -290,7 +293,10 @@ class ReplicateTrainer:
                     # Pad to square
                     if img.size != (target_size, target_size):
                         new_img = Image.new("RGB", (target_size, target_size), (255, 255, 255))
-                        offset = ((target_size - img.size[0]) // 2, (target_size - img.size[1]) // 2)
+                        offset = (
+                            (target_size - img.size[0]) // 2,
+                            (target_size - img.size[1]) // 2,
+                        )
                         new_img.paste(img, offset)
                         img = new_img
 
@@ -298,7 +304,9 @@ class ReplicateTrainer:
                     img.save(temp_dir / output_name, "JPEG", quality=85, optimize=True)
 
                     # Caption file
-                    caption = captions.get(img_path.name, f"{self.config.image_trigger_word} luxury streetwear product")
+                    caption = captions.get(
+                        img_path.name, f"{self.config.image_trigger_word} luxury streetwear product"
+                    )
                     with open(temp_dir / f"{img_path.stem}.txt", "w") as f:
                         f.write(caption)
 
@@ -417,19 +425,21 @@ class HuggingFaceTrainer:
 
     def prepare_dataset(self) -> str:
         """Prepare training dataset in chat format."""
+
         from datasets import Dataset
-        from huggingface_hub import HfApi
 
         # Format as chat conversations
         conversations = []
         for example in SKYYROSE_BRAND_EXAMPLES:
-            conversations.append({
-                "messages": [
-                    {"role": "system", "content": SKYYROSE_SYSTEM_PROMPT},
-                    {"role": "user", "content": example["input"]},
-                    {"role": "assistant", "content": example["output"]},
-                ]
-            })
+            conversations.append(
+                {
+                    "messages": [
+                        {"role": "system", "content": SKYYROSE_SYSTEM_PROMPT},
+                        {"role": "user", "content": example["input"]},
+                        {"role": "assistant", "content": example["output"]},
+                    ]
+                }
+            )
 
         # Create HuggingFace dataset
         dataset = Dataset.from_list(conversations)
@@ -481,6 +491,7 @@ class HuggingFaceTrainer:
         # Save config
         config_path = PROJECT_ROOT / "autotrain_config.yaml"
         import yaml
+
         with open(config_path, "w") as f:
             yaml.dump(autotrain_config, f, default_flow_style=False)
 

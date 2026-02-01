@@ -213,8 +213,7 @@ def upgrade() -> None:
     op.create_index("idx_rag_documents_source", "rag_documents", ["source_path"])
 
     # Create auto-update trigger function
-    op.execute(
-        """
+    op.execute("""
         CREATE OR REPLACE FUNCTION update_updated_at_column()
         RETURNS TRIGGER AS $$
         BEGIN
@@ -222,8 +221,7 @@ def upgrade() -> None:
             RETURN NEW;
         END;
         $$ LANGUAGE plpgsql;
-    """
-    )
+    """)
 
     # Apply triggers
     op.execute(

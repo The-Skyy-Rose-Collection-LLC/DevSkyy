@@ -196,28 +196,18 @@ class TestGeminiClient:
     async def test_analyze_image_success(self, client: GeminiClient) -> None:
         """Test successful image analysis."""
         mock_response = {
-            "candidates": [
-                {
-                    "content": {
-                        "parts": [{"text": "A luxury handbag"}]
-                    }
-                }
-            ],
-            "usageMetadata": {"candidatesTokenCount": 5}
+            "candidates": [{"content": {"parts": [{"text": "A luxury handbag"}]}}],
+            "usageMetadata": {"candidatesTokenCount": 5},
         }
 
         with patch.object(client, "_request", new_callable=AsyncMock) as mock_request:
             mock_request.return_value = mock_response
 
             with patch.object(ImageInput, "from_url", new_callable=AsyncMock) as mock_from_url:
-                mock_from_url.return_value = ImageInput(
-                    base64_data="test",
-                    mime_type="image/png"
-                )
+                mock_from_url.return_value = ImageInput(base64_data="test", mime_type="image/png")
 
                 result = await client.analyze_image(
-                    "https://example.com/image.jpg",
-                    "Describe this product"
+                    "https://example.com/image.jpg", "Describe this product"
                 )
 
                 assert result.success is True
@@ -232,15 +222,10 @@ class TestGeminiClient:
                 {
                     "content": {
                         "parts": [
-                            {
-                                "inlineData": {
-                                    "mimeType": "image/png",
-                                    "data": "base64imagedata"
-                                }
-                            }
+                            {"inlineData": {"mimeType": "image/png", "data": "base64imagedata"}}
                         ]
                     },
-                    "safetyRatings": []
+                    "safetyRatings": [],
                 }
             ]
         }
@@ -262,9 +247,7 @@ class TestGeminiClient:
     async def test_rate_limit_error(self, client: GeminiClient) -> None:
         """Test rate limit handling."""
         with patch.object(client, "_request", new_callable=AsyncMock) as mock_request:
-            mock_request.side_effect = GeminiRateLimitError(
-                retry_after_seconds=60
-            )
+            mock_request.side_effect = GeminiRateLimitError(retry_after_seconds=60)
 
             request = ImageGenerationRequest(prompt="test")
 
@@ -276,11 +259,7 @@ class TestGeminiClient:
     @pytest.mark.asyncio
     async def test_content_filter_error(self, client: GeminiClient) -> None:
         """Test content filter handling."""
-        mock_response = {
-            "promptFeedback": {
-                "blockReason": "SAFETY"
-            }
-        }
+        mock_response = {"promptFeedback": {"blockReason": "SAFETY"}}
 
         with patch.object(client, "_request", new_callable=AsyncMock) as mock_request:
             mock_request.return_value = mock_response
@@ -293,9 +272,7 @@ class TestGeminiClient:
     @pytest.mark.asyncio
     async def test_health_check_healthy(self, client: GeminiClient) -> None:
         """Test healthy health check."""
-        mock_response = {
-            "candidates": [{"content": {"parts": [{"text": "Hi"}]}}]
-        }
+        mock_response = {"candidates": [{"content": {"parts": [{"text": "Hi"}]}}]}
 
         with patch.object(client, "_request", new_callable=AsyncMock) as mock_request:
             mock_request.return_value = mock_response
@@ -339,12 +316,7 @@ class TestMultiTurnConversation:
                     "content": {
                         "parts": [
                             {"text": "I made the changes"},
-                            {
-                                "inlineData": {
-                                    "mimeType": "image/png",
-                                    "data": "edited"
-                                }
-                            }
+                            {"inlineData": {"mimeType": "image/png", "data": "edited"}},
                         ]
                     }
                 }

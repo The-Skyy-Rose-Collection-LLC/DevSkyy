@@ -275,9 +275,7 @@ class VisionAnalysisResponse(BaseModel):
 class GeminiConfig:
     """Gemini API configuration."""
 
-    api_key: str = field(
-        default_factory=lambda: os.getenv("GOOGLE_AI_API_KEY", "")
-    )
+    api_key: str = field(default_factory=lambda: os.getenv("GOOGLE_AI_API_KEY", ""))
     base_url: str = GEMINI_API_BASE
     timeout: float = DEFAULT_TIMEOUT
     max_retries: int = 3
@@ -352,10 +350,7 @@ class GeminiClient:
 
     def _build_url(self, model: str, action: str = "generateContent") -> str:
         """Build API URL."""
-        return (
-            f"{self.config.base_url}/models/{model}:{action}"
-            f"?key={self.config.api_key}"
-        )
+        return f"{self.config.base_url}/models/{model}:{action}" f"?key={self.config.api_key}"
 
     async def _request(
         self,
@@ -593,12 +588,14 @@ Do NOT mention any prices or sizing."""
         max_refs = 14 if "pro" in model.value.lower() else 2
         for i, ref_image in enumerate(request.reference_images[:max_refs]):
             if ref_image.base64_data:
-                parts.append({
-                    "inlineData": {
-                        "mimeType": ref_image.mime_type,
-                        "data": ref_image.base64_data,
+                parts.append(
+                    {
+                        "inlineData": {
+                            "mimeType": ref_image.mime_type,
+                            "data": ref_image.base64_data,
+                        }
                     }
-                })
+                )
 
         # Add text prompt
         prompt = request.prompt
@@ -657,9 +654,7 @@ Do NOT mention any prices or sizing."""
         if "promptFeedback" in response:
             feedback = response["promptFeedback"]
             if feedback.get("blockReason"):
-                raise GeminiContentFilterError(
-                    f"Prompt blocked: {feedback.get('blockReason')}"
-                )
+                raise GeminiContentFilterError(f"Prompt blocked: {feedback.get('blockReason')}")
             prompt_feedback = str(feedback)
 
         candidates = response.get("candidates", [])
@@ -683,9 +678,7 @@ Do NOT mention any prices or sizing."""
         safety_ratings: dict[str, str] = {}
         if candidates and "safetyRatings" in candidates[0]:
             for rating in candidates[0]["safetyRatings"]:
-                safety_ratings[rating.get("category", "")] = rating.get(
-                    "probability", ""
-                )
+                safety_ratings[rating.get("category", "")] = rating.get("probability", "")
 
         duration_ms = int((time.time() - start_time) * 1000)
 
@@ -774,20 +767,24 @@ Only modify: {edit_instruction}"""
         parts: list[dict[str, Any]] = []
 
         if image and image.base64_data:
-            parts.append({
-                "inlineData": {
-                    "mimeType": image.mime_type,
-                    "data": image.base64_data,
+            parts.append(
+                {
+                    "inlineData": {
+                        "mimeType": image.mime_type,
+                        "data": image.base64_data,
+                    }
                 }
-            })
+            )
 
         parts.append({"text": prompt})
 
         # Add to history
-        self._conversation_history.append({
-            "role": "user",
-            "parts": parts,
-        })
+        self._conversation_history.append(
+            {
+                "role": "user",
+                "parts": parts,
+            }
+        )
 
         # Make request with full history
         response = await self._request(
@@ -821,10 +818,12 @@ Only modify: {edit_instruction}"""
 
         # Store assistant response in history
         if assistant_parts:
-            self._conversation_history.append({
-                "role": "model",
-                "parts": assistant_parts,
-            })
+            self._conversation_history.append(
+                {
+                    "role": "model",
+                    "parts": assistant_parts,
+                }
+            )
 
         return ImageGenerationResponse(
             success=len(images) > 0,

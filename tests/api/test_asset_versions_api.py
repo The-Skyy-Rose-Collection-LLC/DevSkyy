@@ -196,9 +196,7 @@ class TestListVersions:
 class TestGetVersion:
     """Tests for GET /assets/{asset_id}/versions/{n}."""
 
-    def test_get_version_success(
-        self, client: TestClient, mock_version_manager: MagicMock
-    ) -> None:
+    def test_get_version_success(self, client: TestClient, mock_version_manager: MagicMock) -> None:
         """Should return specific version."""
         response = client.get("/assets/asset_123/versions/1")
 
@@ -215,9 +213,7 @@ class TestGetVersion:
         self, client: TestClient, mock_version_manager: MagicMock
     ) -> None:
         """Should return 404 for nonexistent version."""
-        mock_version_manager.get_version.side_effect = VersionNotFoundError(
-            "asset_123", 99
-        )
+        mock_version_manager.get_version.side_effect = VersionNotFoundError("asset_123", 99)
 
         response = client.get("/assets/asset_123/versions/99")
 
@@ -246,9 +242,7 @@ class TestRevertVersion:
         self, client: TestClient, mock_version_manager: MagicMock
     ) -> None:
         """Should return 404 for nonexistent version."""
-        mock_version_manager.revert_version.side_effect = VersionNotFoundError(
-            "asset_123", 99
-        )
+        mock_version_manager.revert_version.side_effect = VersionNotFoundError("asset_123", 99)
 
         response = client.post(
             "/assets/asset_123/revert",
@@ -257,9 +251,7 @@ class TestRevertVersion:
 
         assert response.status_code == 404
 
-    def test_revert_invalid_version(
-        self, client: TestClient
-    ) -> None:
+    def test_revert_invalid_version(self, client: TestClient) -> None:
         """Should return 422 for invalid version number."""
         response = client.post(
             "/assets/asset_123/revert",
@@ -310,9 +302,7 @@ class TestUpdateRetention:
 
         assert response.status_code == 200
 
-    def test_update_retention_requires_value(
-        self, client: TestClient
-    ) -> None:
+    def test_update_retention_requires_value(self, client: TestClient) -> None:
         """Should require value for KEEP_LAST_N policy."""
         response = client.put(
             "/assets/asset_123/retention",
@@ -326,9 +316,7 @@ class TestUpdateRetention:
         self, client: TestClient, mock_version_manager: MagicMock
     ) -> None:
         """Should return 404 for nonexistent asset."""
-        mock_version_manager.update_retention.side_effect = AssetNotFoundError(
-            "nonexistent"
-        )
+        mock_version_manager.update_retention.side_effect = AssetNotFoundError("nonexistent")
 
         response = client.put(
             "/assets/nonexistent/retention",
@@ -353,9 +341,7 @@ class TestDeleteVersion:
             version_number=2,
         )
 
-    def test_delete_original_version_blocked(
-        self, client: TestClient
-    ) -> None:
+    def test_delete_original_version_blocked(self, client: TestClient) -> None:
         """Should not allow deleting original version."""
         response = client.delete("/assets/asset_123/versions/1")
 
@@ -366,9 +352,7 @@ class TestDeleteVersion:
         self, client: TestClient, mock_version_manager: MagicMock
     ) -> None:
         """Should return 404 for nonexistent version."""
-        mock_version_manager.delete_version.side_effect = VersionNotFoundError(
-            "asset_123", 99
-        )
+        mock_version_manager.delete_version.side_effect = VersionNotFoundError("asset_123", 99)
 
         response = client.delete("/assets/asset_123/versions/99")
 

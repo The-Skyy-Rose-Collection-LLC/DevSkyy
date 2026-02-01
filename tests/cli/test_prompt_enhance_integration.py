@@ -327,16 +327,14 @@ class TestContextInjection:
         """Test enhancement includes injected context."""
         # Create a context file
         context_file = tmp_path / "example.py"
-        context_file.write_text(
-            '''
+        context_file.write_text('''
 def authenticate(username: str, password: str) -> bool:
     """Authenticate a user."""
     if not username or not password:
         return False
     # TODO: implement actual authentication
     return True
-'''
-        )
+''')
 
         result = runner.invoke(
             main,

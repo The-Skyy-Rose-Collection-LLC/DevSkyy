@@ -40,6 +40,7 @@ def register_core_services() -> None:
         if cache_type == "redis":
             try:
                 from core.cache_manager import CacheManager
+
                 return CacheManager()
             except ImportError:
                 logger.warning("Redis not available, falling back to memory cache")
@@ -64,6 +65,7 @@ def register_ml_services() -> None:
         """Create ML pipeline instance."""
         try:
             from services.ml.pipeline_orchestrator import PipelineOrchestrator
+
             return PipelineOrchestrator()
         except ImportError:
             logger.warning("ML pipeline not available, using mock")
@@ -86,6 +88,7 @@ def register_rag_services() -> None:
         """Create RAG manager instance."""
         try:
             from orchestration.rag_context_manager import RAGContextManager
+
             return RAGContextManager()
         except ImportError:
             logger.warning("RAG manager not available, using mock")
@@ -108,6 +111,7 @@ def register_llm_services() -> None:
         """Create LLM router instance."""
         try:
             from llm.router import LLMRouter
+
             return LLMRouter()
         except ImportError:
             logger.warning("LLM router not available")
@@ -150,6 +154,7 @@ def register_external_clients() -> None:
         """Create WordPress client."""
         try:
             from integrations.wordpress_client import WordPressClient
+
             return WordPressClient.from_env()
         except ImportError:
             logger.warning("WordPress client not available")

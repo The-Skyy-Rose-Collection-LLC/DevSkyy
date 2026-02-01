@@ -68,12 +68,7 @@ class EmailConfig:
     @property
     def is_configured(self) -> bool:
         """Check if email is properly configured."""
-        return bool(
-            self.smtp_host
-            and self.smtp_user
-            and self.smtp_password
-            and self.from_email
-        )
+        return bool(self.smtp_host and self.smtp_user and self.smtp_password and self.from_email)
 
 
 # =============================================================================

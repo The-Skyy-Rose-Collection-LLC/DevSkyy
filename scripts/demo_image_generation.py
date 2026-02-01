@@ -31,8 +31,7 @@ async def demo_replicate():
     if not client.api_token:
         print("⚠️  REPLICATE_API_TOKEN not set - showing capabilities only")
         print("\nCapabilities available:")
-        print(
-            """
+        print("""
     1. IMAGE GENERATION (SDXL, Flux)
        ─────────────────────────────
        • Generate product renders from text descriptions
@@ -87,14 +86,12 @@ async def demo_replicate():
        • Create rotating product videos
        • Marketing content from static images
        • Social media ready output
-"""
-        )
+""")
         return
 
     print("\n✅ API Key configured - ready to generate!")
     print("\nTo generate images, use:")
-    print(
-        """
+    print("""
     from llm.providers.replicate import ReplicateClient
 
     client = ReplicateClient()
@@ -119,8 +116,7 @@ async def demo_replicate():
         control_image="pose_reference.jpg",
         control_type="pose"
     )
-    """
-    )
+    """)
 
 
 async def demo_stability():
@@ -134,8 +130,7 @@ async def demo_stability():
     if not client.api_key:
         print("⚠️  STABILITY_API_KEY not set - showing capabilities only")
         print("\nCapabilities available:")
-        print(
-            """
+        print("""
     1. TEXT-TO-IMAGE (SDXL, SD3, Core, Ultra)
        ──────────────────────────────────────
        • Highest quality product renders
@@ -216,8 +211,7 @@ async def demo_stability():
            search_prompt="black hoodie",
            prompt="lavender purple hoodie with rose embroidery"
        )
-"""
-        )
+""")
         return
 
     # Check balance if API key is set
@@ -228,8 +222,7 @@ async def demo_stability():
         print(f"\n✅ API Key configured (balance check failed: {e})")
 
     print("\nTo generate images, use:")
-    print(
-        """
+    print("""
     from llm.providers.stability import StabilityClient
 
     client = StabilityClient()
@@ -245,8 +238,7 @@ async def demo_stability():
     for i, img_bytes in enumerate(images):
         with open(f"output_{i}.png", "wb") as f:
             f.write(img_bytes)
-    """
-    )
+    """)
 
 
 async def compare_providers():
@@ -254,8 +246,7 @@ async def compare_providers():
     print("\n" + "=" * 60)
     print("📊 PROVIDER COMPARISON FOR SKYYROSE USE CASES")
     print("=" * 60)
-    print(
-        """
+    print("""
     ┌─────────────────────────┬──────────────────┬──────────────────┐
     │ USE CASE                │ REPLICATE        │ STABILITY AI     │
     ├─────────────────────────┼──────────────────┼──────────────────┤
@@ -295,8 +286,7 @@ async def compare_providers():
        3. Run through YOUR LoRA on Replicate for brand consistency
        4. Upscale final with Stability Creative Upscaler
        5. Generate product video with Replicate SVD
-"""
-    )
+""")
 
 
 async def main():
@@ -312,8 +302,7 @@ async def main():
     print("\n" + "=" * 60)
     print("🚀 QUICK START")
     print("=" * 60)
-    print(
-        """
+    print("""
     # Set your API keys in .env.hf:
     REPLICATE_API_TOKEN=r8_xxxxx
     STABILITY_API_KEY=sk-xxxxx
@@ -333,8 +322,7 @@ async def main():
 
     asyncio.run(gen())
     "
-    """
-    )
+    """)
 
 
 if __name__ == "__main__":

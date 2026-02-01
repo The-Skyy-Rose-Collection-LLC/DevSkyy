@@ -17,11 +17,11 @@ import logging
 import os
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from adk.base import AgentResult, AgentStatus, ADKProvider
+from adk.base import ADKProvider, AgentResult, AgentStatus
 from agents.base_super_agent import EnhancedSuperAgent, LearningRecord, SuperAgentType
 from llm.base import CompletionResponse, Message
 from llm.providers.google import GoogleClient
@@ -60,14 +60,14 @@ class ContentStatus(str, Enum):
 
 def _safe_collection_value(collection: Collection | str | None) -> str:
     """Safely extract collection string value from enum or string.
-    
+
     Args:
         collection: Collection enum, string representation, or None
-        
+
     Returns:
         Lowercase hyphenated collection string (e.g., "signature", "black-rose")
         Empty string if collection is None
-        
+
     Examples:
         >>> _safe_collection_value(Collection.SIGNATURE)
         'signature'
@@ -80,20 +80,20 @@ def _safe_collection_value(collection: Collection | str | None) -> str:
     """
     if collection is None:
         return ""
-    
+
     if isinstance(collection, Collection):
         return collection.value
-    
+
     if isinstance(collection, str):
         # Handle both formats: "SIGNATURE" (enum name) or "signature" (enum value)
         # First try to convert to enum
         try:
-            normalized = collection.upper().replace('-', '_')
+            normalized = collection.upper().replace("-", "_")
             return Collection[normalized].value
         except (KeyError, AttributeError):
             # If it's already in value format (lowercase with hyphens), return as-is
-            return collection.lower().replace('_', '-')
-    
+            return collection.lower().replace("_", "-")
+
     return ""
 
 
@@ -137,29 +137,31 @@ class BrandDNA:
     )
 
     # Collections
-    collections: dict[str, dict[str, Any]] = field(default_factory=lambda: {
-        "signature": {
-            "name": "Signature Collection",
-            "mood": "Regal, timeless, commanding",
-            "metal": "18k Gold",
-            "color": "#C9A962",
-            "tagline": "Define a generation of discerning taste",
-        },
-        "black-rose": {
-            "name": "Black Rose Collection",
-            "mood": "Gothic elegance, mysterious, shadow and light",
-            "metal": "925 Sterling Silver",
-            "color": "#C0C0C0",
-            "tagline": "Where shadow dances with silver",
-        },
-        "love-hurts": {
-            "name": "Love Hurts Collection",
-            "mood": "Passionate vulnerability, tender romance",
-            "metal": "Rose Gold",
-            "color": "#B76E79",
-            "tagline": "Where passion meets fragility",
-        },
-    })
+    collections: dict[str, dict[str, Any]] = field(
+        default_factory=lambda: {
+            "signature": {
+                "name": "Signature Collection",
+                "mood": "Regal, timeless, commanding",
+                "metal": "18k Gold",
+                "color": "#C9A962",
+                "tagline": "Define a generation of discerning taste",
+            },
+            "black-rose": {
+                "name": "Black Rose Collection",
+                "mood": "Gothic elegance, mysterious, shadow and light",
+                "metal": "925 Sterling Silver",
+                "color": "#C0C0C0",
+                "tagline": "Where shadow dances with silver",
+            },
+            "love-hurts": {
+                "name": "Love Hurts Collection",
+                "mood": "Passionate vulnerability, tender romance",
+                "metal": "Rose Gold",
+                "color": "#B76E79",
+                "tagline": "Where passion meets fragility",
+            },
+        }
+    )
 
     # Existing site context (gathered from live site)
     existing_pages: list[str] = field(default_factory=list)
@@ -175,7 +177,7 @@ class BrandDNA:
     top_performing_themes: list[str] = field(default_factory=list)
     content_feedback_scores: dict[str, float] = field(default_factory=dict)
 
-    gathered_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    gathered_at: datetime = field(default_factory=lambda: datetime.now(UTC))
 
     def to_prompt_context(self) -> str:
         """Convert brand DNA to a comprehensive prompt context block."""
@@ -188,13 +190,12 @@ class BrandDNA:
         learning_context = ""
         if self.top_performing_headlines:
             learning_context += (
-                f"\nPREVIOUS HIGH-PERFORMING HEADLINES (learn from these patterns):\n"
+                "\nPREVIOUS HIGH-PERFORMING HEADLINES (learn from these patterns):\n"
                 + "\n".join(f"  - {h}" for h in self.top_performing_headlines[:5])
             )
         if self.top_performing_themes:
-            learning_context += (
-                f"\nRECURRING SUCCESSFUL THEMES:\n"
-                + "\n".join(f"  - {t}" for t in self.top_performing_themes[:5])
+            learning_context += "\nRECURRING SUCCESSFUL THEMES:\n" + "\n".join(
+                f"  - {t}" for t in self.top_performing_themes[:5]
             )
 
         return f"""
@@ -257,7 +258,7 @@ class GeneratedContent:
     prompt_hash: str = ""
     gemini_tokens_used: int = 0
     feedback_score: float | None = None
-    created_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = field(default_factory=lambda: datetime.now(UTC))
     metadata: dict[str, Any] = field(default_factory=dict)
 
 
@@ -335,7 +336,8 @@ SEO Rules:
 
     def __init__(self, config: Any = None, **kwargs: Any) -> None:
         """Initialize SkyyRose Content Agent."""
-        from adk.base import AgentConfig as _AgentConfig, ADKProvider as _ADKProvider
+        from adk.base import ADKProvider as _ADKProvider
+        from adk.base import AgentConfig as _AgentConfig
 
         # Extract agent-specific kwargs before passing to super
         self._default_wp_client: Any = kwargs.pop("wp_client", None)
@@ -443,8 +445,7 @@ SEO Rules:
                 )
                 if existing:
                     dna.existing_pages = [
-                        p.get("title", {}).get("rendered", "") for p in existing
-                        if p.get("title")
+                        p.get("title", {}).get("rendered", "") for p in existing if p.get("title")
                     ]
                     dna.site_navigation_structure = {
                         p.get("slug", ""): p.get("link", "") for p in existing
@@ -548,16 +549,14 @@ SEO Rules:
 
         # System message: brand DNA as context
         system_content = (
-            f"{self.SYSTEM_PROMPT}\n\n"
-            f"{'=' * 60}\n"
-            f"{dna.to_prompt_context()}\n"
-            f"{'=' * 60}"
+            f"{self.SYSTEM_PROMPT}\n\n" f"{'=' * 60}\n" f"{dna.to_prompt_context()}\n" f"{'=' * 60}"
         )
 
         # Collection-specific brand context
         if request.collection:
             collection_context = self.brand_context.get_product_context(
-                product_name=request.title or f"{_safe_collection_value(request.collection).replace('-', ' ').title()} Content",
+                product_name=request.title
+                or f"{_safe_collection_value(request.collection).replace('-', ' ').title()} Content",
                 product_type=request.content_type.value,
                 collection=request.collection,
             )
@@ -589,16 +588,16 @@ SEO Rules:
             user_content += f"\nAdditional Direction: {request.additional_direction}\n"
 
         user_content += (
-            f"\n\nPLEASE GENERATE:\n"
-            f"1. A compelling H1 title\n"
-            f"2. Full HTML body content with proper heading hierarchy\n"
-            f"3. A short excerpt (2-3 sentences)\n"
-            f"4. SEO title (under 60 chars)\n"
-            f"5. SEO meta description (under 160 chars)\n"
-            f"6. Suggested SEO keywords (5-7 terms)\n\n"
-            f"Format your response as JSON with this structure:\n"
-            f'{{"title": "...", "body_html": "...", "excerpt": "...", '
-            f'"seo_title": "...", "seo_description": "...", "seo_keywords": [...]}}\n'
+            "\n\nPLEASE GENERATE:\n"
+            "1. A compelling H1 title\n"
+            "2. Full HTML body content with proper heading hierarchy\n"
+            "3. A short excerpt (2-3 sentences)\n"
+            "4. SEO title (under 60 chars)\n"
+            "5. SEO meta description (under 160 chars)\n"
+            "6. Suggested SEO keywords (5-7 terms)\n\n"
+            "Format your response as JSON with this structure:\n"
+            '{"title": "...", "body_html": "...", "excerpt": "...", '
+            '"seo_title": "...", "seo_description": "...", "seo_keywords": [...]}\n'
         )
 
         messages = [
@@ -652,7 +651,9 @@ SEO Rules:
 
         # Build prompt hash for learning tracking
         prompt_hash = hashlib.sha256(
-            json.dumps({"type": request.content_type.value, "collection": str(request.collection)}).encode()
+            json.dumps(
+                {"type": request.content_type.value, "collection": str(request.collection)}
+            ).encode()
         ).hexdigest()[:16]
 
         return GeneratedContent(
@@ -699,9 +700,7 @@ SEO Rules:
         Returns:
             Updated content with wp_post_id
         """
-        logger.info(
-            f"{self.AGENT_NAME}: Publishing '{content.title}' to WordPress as {status}"
-        )
+        logger.info(f"{self.AGENT_NAME}: Publishing '{content.title}' to WordPress as {status}")
 
         try:
             # Build WordPress post payload with brand meta
@@ -722,11 +721,11 @@ SEO Rules:
             )
 
             content.wp_post_id = wp_response.get("id")
-            content.status = ContentStatus.PUBLISHED if status == "publish" else ContentStatus.DRAFTED
-
-            logger.info(
-                f"{self.AGENT_NAME}: Published to WP post ID {content.wp_post_id}"
+            content.status = (
+                ContentStatus.PUBLISHED if status == "publish" else ContentStatus.DRAFTED
             )
+
+            logger.info(f"{self.AGENT_NAME}: Published to WP post ID {content.wp_post_id}")
 
             return content
 
@@ -800,7 +799,10 @@ SEO Rules:
             # Find the content
             for content in self._content_log:
                 if content.content_id == content_id:
-                    if content.title and content.title not in self._brand_dna.top_performing_headlines:
+                    if (
+                        content.title
+                        and content.title not in self._brand_dna.top_performing_headlines
+                    ):
                         self._brand_dna.top_performing_headlines.append(content.title)
                         # Keep top 20
                         self._brand_dna.top_performing_headlines = (
@@ -829,7 +831,7 @@ SEO Rules:
                 if c.feedback_score is not None
             },
             "generation_count": len(self._content_log),
-            "last_updated": datetime.now(timezone.utc).isoformat(),
+            "last_updated": datetime.now(UTC).isoformat(),
             "learning_records": [
                 {
                     "task_id": r.task_id,
@@ -910,9 +912,7 @@ SEO Rules:
         content = await self.generate_content(request, wp_client=wp_client)
 
         if publish and wp_client:
-            content = await self.publish_to_wordpress(
-                content, wp_client, status="draft"
-            )
+            content = await self.publish_to_wordpress(content, wp_client, status="draft")
 
         return content
 
@@ -966,7 +966,9 @@ SEO Rules:
             "total_feedback_records": len(
                 [r for r in self._learning_records if r.user_feedback is not None]
             ),
-            "top_headlines": self._brand_dna.top_performing_headlines[:5] if self._brand_dna else [],
+            "top_headlines": (
+                self._brand_dna.top_performing_headlines[:5] if self._brand_dna else []
+            ),
             "top_themes": self._brand_dna.top_performing_themes if self._brand_dna else [],
             "avg_feedback_score": (
                 sum(r.user_feedback for r in self._learning_records if r.user_feedback)

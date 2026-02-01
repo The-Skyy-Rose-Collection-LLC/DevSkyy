@@ -178,9 +178,7 @@ def test_is_expired_expired(mock_client):
     """Test that an old session is expired."""
     session = ChatSession("test-session", mock_client)
     # Set last_accessed to be older than SESSION_TIMEOUT_MINUTES
-    session.last_accessed = datetime.now(UTC) - timedelta(
-        minutes=SESSION_TIMEOUT_MINUTES + 1
-    )
+    session.last_accessed = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
     assert session.is_expired()
 
 
@@ -227,14 +225,10 @@ async def test_start_session_with_prompt(mock_image: Image.Image):
 
     # Patch the client methods to avoid real I/O
     with patch("uuid.uuid4") as mock_uuid:
-        mock_uuid.return_value = MagicMock(
-            __str__=MagicMock(return_value="test-uuid-12345")
-        )
+        mock_uuid.return_value = MagicMock(__str__=MagicMock(return_value="test-uuid-12345"))
 
         # Patch the client creation to return a proper mock
-        with patch.object(
-            editor, "_create_client", return_value=AsyncMock()
-        ) as mock_create_client:
+        with patch.object(editor, "_create_client", return_value=AsyncMock()) as mock_create_client:
             mock_client = AsyncMock()
             mock_client.generate = AsyncMock(return_value={"text": "Generated response"})
             mock_client.close = AsyncMock()
@@ -266,9 +260,7 @@ async def test_continue_session_expired(mock_client):
     """Test continuing an expired session raises ChatSessionExpiredError."""
     editor = ConversationEditor()
     session = ChatSession("expired-session", mock_client)
-    session.last_accessed = datetime.now(UTC) - timedelta(
-        minutes=SESSION_TIMEOUT_MINUTES + 1
-    )
+    session.last_accessed = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
     editor._sessions["expired-session"] = session
 
     with pytest.raises(ChatSessionExpiredError):
@@ -341,13 +333,9 @@ async def test_cleanup_expired_sessions(mock_client):
     # Create active and expired sessions
     active = ChatSession("active", mock_client)
     expired1 = ChatSession("expired1", mock_client)
-    expired1.last_accessed = datetime.now(UTC) - timedelta(
-        minutes=SESSION_TIMEOUT_MINUTES + 1
-    )
+    expired1.last_accessed = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 1)
     expired2 = ChatSession("expired2", mock_client)
-    expired2.last_accessed = datetime.now(UTC) - timedelta(
-        minutes=SESSION_TIMEOUT_MINUTES + 5
-    )
+    expired2.last_accessed = datetime.now(UTC) - timedelta(minutes=SESSION_TIMEOUT_MINUTES + 5)
 
     editor._sessions["active"] = active
     editor._sessions["expired1"] = expired1

@@ -388,7 +388,9 @@ class BrandAsset(Base):
     updated_at = Column(TIMESTAMP(timezone=True), server_default=text("CURRENT_TIMESTAMP"))
 
     def __repr__(self) -> str:
-        return f"<BrandAsset(id={self.id}, category={self.category}, status={self.approval_status})>"
+        return (
+            f"<BrandAsset(id={self.id}, category={self.category}, status={self.approval_status})>"
+        )
 
 
 class BrandAssetIngestionJob(Base):

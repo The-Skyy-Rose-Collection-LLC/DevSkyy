@@ -11,11 +11,9 @@ Author: DevSkyy Platform Team
 
 from __future__ import annotations
 
-import os
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import httpx
@@ -29,10 +27,8 @@ from services.three_d.provider_interface import (
     ThreeDGenerationError,
     ThreeDProviderError,
     ThreeDRequest,
-    ThreeDResponse,
     ThreeDTimeoutError,
 )
-
 
 # =============================================================================
 # Fixtures
@@ -342,9 +338,7 @@ class TestTripoProvider:
         assert exc_info.value.retryable is False
 
     @pytest.mark.asyncio
-    async def test_generate_from_image_connection_error(
-        self, mock_tripo_config, image_request
-    ):
+    async def test_generate_from_image_connection_error(self, mock_tripo_config, image_request):
         """Test connection error is marked as retryable."""
         from services.three_d.tripo_provider import TripoProvider
 
@@ -387,18 +381,18 @@ class TestTripoProvider:
 
         provider = TripoProvider(mock_tripo_config)
 
-        with patch.dict("sys.modules", {"tripo3d": None}):
-            with patch(
-                "services.three_d.tripo_provider.TripoProvider.health_check"
-            ) as mock_health:
-                mock_health.return_value = ProviderHealth(
-                    provider="tripo",
-                    status=ProviderStatus.UNAVAILABLE,
-                    capabilities=provider.capabilities,
-                    last_check=datetime.now(UTC),
-                    error_message="tripo3d SDK not installed",
-                )
-                health = await provider.health_check()
+        with (
+            patch.dict("sys.modules", {"tripo3d": None}),
+            patch("services.three_d.tripo_provider.TripoProvider.health_check") as mock_health,
+        ):
+            mock_health.return_value = ProviderHealth(
+                provider="tripo",
+                status=ProviderStatus.UNAVAILABLE,
+                capabilities=provider.capabilities,
+                last_check=datetime.now(UTC),
+                error_message="tripo3d SDK not installed",
+            )
+            health = await provider.health_check()
 
         assert health.status == ProviderStatus.UNAVAILABLE
 
@@ -528,9 +522,7 @@ class TestReplicateProvider:
         assert response.model_url == "https://replicate.com/output/model.glb"
 
     @pytest.mark.asyncio
-    async def test_generate_from_text_prediction_failed(
-        self, mock_replicate_config, text_request
-    ):
+    async def test_generate_from_text_prediction_failed(self, mock_replicate_config, text_request):
         """Test handling of failed prediction."""
         from services.ml.replicate_client import (
             ReplicatePrediction,
@@ -556,9 +548,7 @@ class TestReplicateProvider:
         assert "failed" in str(exc_info.value).lower()
 
     @pytest.mark.asyncio
-    async def test_generate_from_text_no_output(
-        self, mock_replicate_config, text_request
-    ):
+    async def test_generate_from_text_no_output(self, mock_replicate_config, text_request):
         """Test handling when prediction returns no output URL."""
         from services.ml.replicate_client import (
             ReplicatePrediction,
@@ -584,9 +574,7 @@ class TestReplicateProvider:
         assert "No model URL" in str(exc_info.value)
 
     @pytest.mark.asyncio
-    async def test_generate_from_text_timeout(
-        self, mock_replicate_config, text_request
-    ):
+    async def test_generate_from_text_timeout(self, mock_replicate_config, text_request):
         """Test timeout handling in text-to-3D generation."""
         from services.ml.replicate_client import ReplicateTimeoutError
         from services.three_d.replicate_provider import ReplicateProvider
@@ -937,17 +925,19 @@ class TestHuggingFaceProvider:
 
         provider = HuggingFaceProvider(mock_huggingface_config)
 
-        with patch.dict("sys.modules", {"gradio_client": None}):
-            with patch(
+        with (
+            patch.dict("sys.modules", {"gradio_client": None}),
+            patch(
                 "services.three_d.huggingface_provider.HuggingFaceProvider._run_shap_e"
-            ) as mock_run:
-                mock_run.side_effect = ThreeDProviderError(
-                    "gradio_client not installed",
-                    provider="huggingface",
-                    correlation_id=text_request.correlation_id,
-                )
-                with pytest.raises(ThreeDProviderError) as exc_info:
-                    await provider.generate_from_text(text_request)
+            ) as mock_run,
+        ):
+            mock_run.side_effect = ThreeDProviderError(
+                "gradio_client not installed",
+                provider="huggingface",
+                correlation_id=text_request.correlation_id,
+            )
+            with pytest.raises(ThreeDProviderError) as exc_info:
+                await provider.generate_from_text(text_request)
 
         assert "gradio_client" in str(exc_info.value)
 
@@ -976,21 +966,21 @@ class TestHuggingFaceProvider:
         assert response.output_format == OutputFormat.GLB
 
     @pytest.mark.asyncio
-    async def test_generate_from_text_timeout(
-        self, mock_huggingface_config, text_request
-    ):
+    async def test_generate_from_text_timeout(self, mock_huggingface_config, text_request):
         """Test timeout handling in text-to-3D generation."""
         from services.three_d.huggingface_provider import HuggingFaceProvider
 
         provider = HuggingFaceProvider(mock_huggingface_config)
 
-        with patch.object(
-            provider,
-            "_run_shap_e",
-            side_effect=TimeoutError("Generation timed out"),
+        with (
+            patch.object(
+                provider,
+                "_run_shap_e",
+                side_effect=TimeoutError("Generation timed out"),
+            ),
+            pytest.raises(ThreeDTimeoutError),
         ):
-            with pytest.raises(ThreeDTimeoutError):
-                await provider.generate_from_text(text_request)
+            await provider.generate_from_text(text_request)
 
     @pytest.mark.asyncio
     async def test_generate_from_image_missing_source(self, mock_huggingface_config):
@@ -1105,18 +1095,20 @@ class TestHuggingFaceProvider:
 
         provider = HuggingFaceProvider(mock_huggingface_config)
 
-        with patch.dict("sys.modules", {"gradio_client": None}):
-            with patch(
+        with (
+            patch.dict("sys.modules", {"gradio_client": None}),
+            patch(
                 "services.three_d.huggingface_provider.HuggingFaceProvider.health_check"
-            ) as mock_health:
-                mock_health.return_value = ProviderHealth(
-                    provider="huggingface",
-                    status=ProviderStatus.UNAVAILABLE,
-                    capabilities=provider.capabilities,
-                    last_check=datetime.now(UTC),
-                    error_message="gradio_client not installed",
-                )
-                health = await provider.health_check()
+            ) as mock_health,
+        ):
+            mock_health.return_value = ProviderHealth(
+                provider="huggingface",
+                status=ProviderStatus.UNAVAILABLE,
+                capabilities=provider.capabilities,
+                last_check=datetime.now(UTC),
+                error_message="gradio_client not installed",
+            )
+            health = await provider.health_check()
 
         assert health.status == ProviderStatus.UNAVAILABLE
 
@@ -1248,13 +1240,15 @@ class TestHuggingFaceProvider:
 
         provider = HuggingFaceProvider(mock_huggingface_config)
 
-        with patch.object(
-            provider,
-            "_run_trellis",
-            side_effect=RuntimeError("Unexpected error"),
+        with (
+            patch.object(
+                provider,
+                "_run_trellis",
+                side_effect=RuntimeError("Unexpected error"),
+            ),
+            pytest.raises(ThreeDGenerationError) as exc_info,
         ):
-            with pytest.raises(ThreeDGenerationError) as exc_info:
-                await provider.generate_from_image(image_request)
+            await provider.generate_from_image(image_request)
 
         assert "Unexpected error" in str(exc_info.value)
 
@@ -1267,13 +1261,15 @@ class TestHuggingFaceProvider:
 
         provider = HuggingFaceProvider(mock_huggingface_config)
 
-        with patch.object(
-            provider,
-            "_run_shap_e",
-            side_effect=RuntimeError("Unexpected error"),
+        with (
+            patch.object(
+                provider,
+                "_run_shap_e",
+                side_effect=RuntimeError("Unexpected error"),
+            ),
+            pytest.raises(ThreeDGenerationError) as exc_info,
         ):
-            with pytest.raises(ThreeDGenerationError) as exc_info:
-                await provider.generate_from_text(text_request)
+            await provider.generate_from_text(text_request)
 
         assert "Unexpected error" in str(exc_info.value)
 
@@ -1353,9 +1349,7 @@ class TestProviderCommonPatterns:
             assert corr_id is not None
             assert len(corr_id) == 36  # UUID format
 
-    def test_output_directory_created(
-        self, mock_replicate_config, mock_huggingface_config
-    ):
+    def test_output_directory_created(self, mock_replicate_config, mock_huggingface_config):
         """Test that providers create output directory on initialization."""
         from services.three_d.huggingface_provider import HuggingFaceProvider
         from services.three_d.replicate_provider import ReplicateProvider
