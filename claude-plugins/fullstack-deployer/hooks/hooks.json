@@ -1,0 +1,42 @@
+{
+  "hooks": [
+    {
+      "event": "PreToolUse",
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "If this command is a production deployment (vercel --prod, npm run deploy, etc.), verify that: 1) TypeScript compiles without errors (npx tsc --noEmit), 2) ESLint passes (npm run lint), 3) Unit tests pass (npm test). If any check fails, fix the issues before allowing deployment. Only proceed with deployment if all checks pass."
+        }
+      ]
+    },
+    {
+      "event": "PostToolUse",
+      "matcher": "Bash",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "If a production deployment was just executed (vercel --prod), verify the deployment succeeded by checking if the output contains a deployment URL. If deployment failed, analyze the error and use Context7 to fetch documentation for a solution. Report deployment status to the user."
+        }
+      ]
+    },
+    {
+      "event": "UserPromptSubmit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Check if the user's message mentions deployment (deploy, production, release, ship, vercel, netlify), Next.js, WordPress, or WooCommerce. If detected, proactively coordinate the deployment workflow and trigger the appropriate agent."
+        }
+      ]
+    },
+    {
+      "event": "SessionStart",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "FULLSTACK DEPLOYER ACTIVE\n\nThis plugin handles deployment for Vercel, Next.js, WordPress, and WooCommerce applications.\n\nPrinciples:\n- Autonomous operation until deployment succeeds\n- Automatic error recovery using Context7 documentation\n- Full validation before deployment (TypeScript, lint, tests, build)\n- Post-deployment verification\n\nAvailable commands: /deploy, /rollback, /env-manage, /wp-sync, /deploy-status, /validate, /lint"
+        }
+      ]
+    }
+  ]
+}
