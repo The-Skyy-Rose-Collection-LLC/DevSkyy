@@ -15,6 +15,18 @@ define('SKYYROSE_THEME_DIR', get_template_directory());
 define('SKYYROSE_THEME_URL', get_template_directory_uri());
 
 /**
+ * Load Core Functionality
+ */
+require_once SKYYROSE_THEME_DIR . '/inc/theme-customizer.php';
+require_once SKYYROSE_THEME_DIR . '/inc/woocommerce-config.php';
+require_once SKYYROSE_THEME_DIR . '/inc/performance.php';
+
+// Load Elementor widgets if Elementor is active
+if (did_action('elementor/loaded')) {
+    require_once SKYYROSE_THEME_DIR . '/inc/elementor-widgets.php';
+}
+
+/**
  * Theme Setup
  */
 function skyyrose_setup() {
