@@ -46,6 +46,16 @@ adk/                      # Agent Development Kit (symlink to sdk/python/adk)
 llm/                      # 6 providers, router, round_table
 security/                 # AES-256-GCM, JWT, audit_log (uses core.auth)
 api/v1/                   # REST, gdpr, webhooks
+wordpress-theme/          # SkyyRose WordPress theme (108 new packages)
+├── skyyrose-2025/        # Main theme directory
+│   ├── template-collection.php  # Collection pages (immersive)
+│   ├── elementor-widgets/       # Custom widgets (3D, pre-order)
+│   └── inc/                     # Theme functions
+frontend/
+├── components/3d/        # LuxuryProductViewer (React Three Fiber)
+└── lib/animations/       # luxury-transitions.ts (Framer Motion)
+services/
+└── ai_image_enhancement.py  # AI image processing (FLUX, SD3, RemBG)
 tests/
 ├── integration/          # Integration tests (moved from root)
 └── ...                   # 1200+ tests
@@ -72,17 +82,33 @@ SkyyRose: `#B76E79` primary | "Where Love Meets Luxury" | Use `BrandKit.from_con
 ## Gotchas
 - **WP.com API**: `index.php?rest_route=` NOT `/wp-json/`
 - **3D CDNs**: VERIFY URLs exist | **Correlation IDs**: ALWAYS propagate
+- **WordPress Theme**: Use Serena for all WordPress file operations
+- **Context7**: ALWAYS query WordPress/Elementor/WooCommerce docs BEFORE coding
+- **Collection Pages**: BLACK ROSE (gothic), LOVE HURTS (castle), SIGNATURE (Oakland/SF)
+- **Immersive**: React Three Fiber + Framer Motion + luxury animations (#B76E79 rose gold)
+- **Ralph Loop**: Use for complex multi-step immersive page builds
 
 ## Health
 `/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
 
 ## Dependencies
-**Single Source**: `pyproject.toml` only (use `pip install -e ".[all]"`)
+**Single Source**: `pyproject.toml` + `package.json` (108 new packages installed)
+
+### Python
 - **Core**: FastAPI, Pydantic, SQLAlchemy, PyJWT, Sentry
 - **ML**: torch, transformers, diffusers, chromadb, llama-index
 - **Worker**: celery, kombu, flower
 - **Deploy**: gunicorn, uvicorn
 - **MCP**: 13 MCP tools + 6 LLM providers
+- **AI Image**: fal-client, stability-sdk, rembg, clip-interrogator
+
+### JavaScript/TypeScript (39 new packages)
+- **3D**: @react-three/fiber, @react-three/drei, postprocessing, three
+- **Animation**: framer-motion, react-spring, gsap, lottie-web
+- **Image**: sharp, pica, blurhash, @vercel/og
+- **WordPress**: @wordpress/scripts (31.4.0), @wordpress/block-editor, @wordpress/components
+- **WooCommerce**: @woocommerce/components, @woocommerce/data
+- **Elementor**: swiper, aos, isotope-layout, typed.js
 
 ## Architecture (NEW - v1.3.1)
 **Dependency Flow** (one-way, no cycles):
@@ -104,4 +130,13 @@ api, services
 - ✅ Service registry: core/registry/ for dependency injection
 - ✅ Updated imports: agents use base_legacy until ADK migration
 
-**v1.3.1** | SkyyRose LLC | Phase 2: Structural Reorganization
+**Phase 5 Active** (v3.0.0 - WordPress Enhancement):
+- ✅ 108 packages installed (39 JS/TS + 69 WordPress)
+- ✅ LuxuryProductViewer component (React Three Fiber)
+- ✅ Luxury animations library (Framer Motion)
+- ✅ AI image enhancement (FLUX, SD3, RemBG)
+- 🔄 Immersive collection pages (Ralph Loop in progress)
+- 🔄 WooCommerce integration with 3D viewers
+- 🔄 Pre-order forms with checkout
+
+**v3.0.0** | SkyyRose LLC | Immersive WordPress Experience
