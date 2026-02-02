@@ -87,6 +87,7 @@ function skyyrose_enqueue_assets() {
 
         // Collection scene scripts
         wp_enqueue_script('black-rose-scene', SKYYROSE_THEME_URL . '/assets/js/black-rose-scene.js', ['three', 'three-orbit', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
+        wp_enqueue_script('love-hurts-scene', SKYYROSE_THEME_URL . '/assets/js/love-hurts-scene.js', ['three', 'three-orbit'], SKYYROSE_VERSION, true);
     }
 
     // Localize script
