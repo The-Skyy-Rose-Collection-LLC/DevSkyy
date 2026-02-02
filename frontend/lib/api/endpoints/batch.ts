@@ -37,7 +37,6 @@ export const batch = {
         const res = await fetchWithTimeout(`${API_URL}/api/v1/batch/${id}/pause`, {
             method: 'POST',
             headers: await getAuthHeaders(),
-            body: JSON.stringify(data),
         });
         return handleResponse(res, BatchJobSchema);
     },
@@ -49,7 +48,6 @@ export const batch = {
         const res = await fetchWithTimeout(`${API_URL}/api/v1/batch/${id}/resume`, {
             method: 'POST',
             headers: await getAuthHeaders(),
-            body: JSON.stringify(data),
         });
         return handleResponse(res, BatchJobSchema);
     },
@@ -61,7 +59,6 @@ export const batch = {
         const res = await fetchWithTimeout(`${API_URL}/api/v1/batch/${id}/cancel`, {
             method: 'POST',
             headers: await getAuthHeaders(),
-            body: JSON.stringify(data),
         });
         return handleResponse(res, BatchJobSchema);
     },
