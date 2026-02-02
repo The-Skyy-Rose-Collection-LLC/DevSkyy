@@ -345,6 +345,57 @@ header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-i
 
 ---
 
+## VAULT (PRE-ORDER) PAGE REQUIREMENTS
+
+### Vault Page Concept
+**Theme**: Exclusive Pre-Order Experience
+**Purpose**: Allow customers to pre-order upcoming collections before public release
+
+### Features Required
+1. **Hero Section**
+   - Countdown timer to collection launch
+   - Exclusive messaging ("Be The First", "Limited Access")
+   - Dramatic entrance animation
+
+2. **Product Gallery**
+   - 3D product viewer for each pre-order item
+   - Hover to rotate/zoom
+   - "Coming Soon" badges
+   - Price with pre-order discount indicator
+
+3. **Pre-Order Form**
+   - WooCommerce checkout integration
+   - Email capture for notifications
+   - Size/color selection (variable products)
+   - Payment processing (deposit or full payment)
+   - Terms & conditions checkbox
+
+4. **Exclusivity Indicators**
+   - Limited quantity counters
+   - "X people viewing" live counter
+   - Early access benefits list
+   - VIP customer testimonials
+
+5. **Technical Integration**
+   - WooCommerce pre-order plugin or custom implementation
+   - Inventory management for pre-orders
+   - Automated email notifications (order confirmation, shipping updates)
+   - Admin dashboard for pre-order management
+
+### Visual Design
+- **Colors**: #B76E79 (rose gold), #1a1a1a (black), gold accents
+- **Typography**: Luxury serif headings, clean sans-serif body
+- **Animations**: Framer Motion entrance effects, countdown ticker
+- **3D**: React Three Fiber product viewers with luxury lighting
+
+### WordPress Template
+**File**: `wordpress-theme/skyyrose-2025/template-vault.php` (already exists, needs enhancement)
+
+### Elementor Widget
+**File**: `wordpress-theme/skyyrose-2025/elementor-widgets/pre-order-form.php` (already exists, needs WooCommerce integration)
+
+---
+
 ## NEXT ACTIONS
 
 Ralph Loop will orchestrate:
