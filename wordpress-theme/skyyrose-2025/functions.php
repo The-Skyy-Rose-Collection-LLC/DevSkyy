@@ -89,9 +89,23 @@ function skyyrose_enqueue_assets() {
         wp_enqueue_script('black-rose-scene', SKYYROSE_THEME_URL . '/assets/js/black-rose-scene.js', ['three', 'three-orbit', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
         wp_enqueue_script('love-hurts-scene', SKYYROSE_THEME_URL . '/assets/js/love-hurts-scene.js', ['three', 'three-orbit'], SKYYROSE_VERSION, true);
         wp_enqueue_script('signature-scene', SKYYROSE_THEME_URL . '/assets/js/signature-scene.js', ['three', 'three-orbit'], SKYYROSE_VERSION, true);
-        
+
         // TWEEN.js for camera animations
         wp_enqueue_script('tween', 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@18.6.4/dist/tween.umd.js', [], '18.6.4', true);
+    }
+
+    // LuxuryProductViewer (single product pages, Vault, Elementor widgets)
+    if (is_singular('product') || is_page_template('template-vault.php') || (function_exists('elementor_is_edit_mode') && elementor_is_edit_mode())) {
+        // Add Three.js post-processing dependencies
+        wp_enqueue_script('three-effectcomposer', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js', ['three'], '0.160.0', true);
+        wp_enqueue_script('three-renderpass', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js', ['three-effectcomposer'], '0.160.0', true);
+        wp_enqueue_script('three-bloom', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js', ['three-effectcomposer'], '0.160.0', true);
+
+        // DRACO loader for compressed models
+        wp_enqueue_script('three-draco', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/DRACOLoader.js', ['three'], '0.160.0', true);
+
+        // Luxury Product Viewer
+        wp_enqueue_script('luxury-product-viewer', SKYYROSE_THEME_URL . '/assets/js/luxury-product-viewer.js', ['three', 'three-orbit', 'three-gltf', 'three-draco', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
     }
 
     // Localize script
