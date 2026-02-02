@@ -299,6 +299,73 @@ $theme = $themes[$collection_meta] ?? $themes['signature'];
 </style>
 
 <div class="collection-page">
+    <?php if ($collection_meta === 'black-rose') : ?>
+    <!-- BLACK ROSE Immersive 3D Experience -->
+    <div id="black-rose-immersive" class="immersive-3d-container" style="height: 100vh; width: 100%; position: relative;">
+        <div class="immersive-loading" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #c0c0c0;
+            font-size: 1.2rem;
+            z-index: 100;
+        ">
+            Loading BLACK ROSE experience...
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('black-rose-immersive');
+        const loading = container.querySelector('.immersive-loading');
+        
+        if (typeof BlackRoseExperience !== 'undefined') {
+            // Initialize BLACK ROSE experience
+            const experience = new BlackRoseExperience(container, {
+                backgroundColor: 0x0d0d0d,
+                fogDensity: 0.03,
+                petalCount: 50,
+                enableBloom: true
+            });
+
+            // Fetch products from WooCommerce
+            fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>?action=get_collection_products&collection=black-rose')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        // Load products into scene
+                        experience.loadProducts(data.data);
+                        loading.style.display = 'none';
+                        experience.start();
+
+                        // Handle product clicks
+                        experience.setOnProductClick(function(product) {
+                            // Redirect to product page or show modal
+                            window.location.href = product.url;
+                        });
+
+                        // Handle product hover
+                        experience.setOnProductHover(function(product) {
+                            if (product) {
+                                console.log('Hovering:', product.name);
+                            }
+                        });
+                    } else {
+                        loading.textContent = 'Failed to load products';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading products:', error);
+                    loading.textContent = 'Error loading experience';
+                });
+        } else {
+            loading.textContent = 'THREE.js not loaded';
+        }
+    });
+    </script>
+    <?php endif; ?>
+
     <section class="collection-hero">
         <h1>
             <?php

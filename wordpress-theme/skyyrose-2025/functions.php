@@ -78,6 +78,17 @@ function skyyrose_enqueue_assets() {
     wp_enqueue_script('skyyrose-3d-viewer', SKYYROSE_THEME_URL . '/assets/js/3d-viewer.js', ['three'], SKYYROSE_VERSION, true);
     wp_enqueue_script('skyyrose-main', SKYYROSE_THEME_URL . '/assets/js/main.js', ['jquery'], SKYYROSE_VERSION, true);
 
+    // Collection-specific immersive scenes (only on collection pages)
+    if (is_page_template('template-collection.php')) {
+        // Add Three.js post-processing dependencies
+        wp_enqueue_script('three-effectcomposer', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/EffectComposer.js', ['three'], '0.160.0', true);
+        wp_enqueue_script('three-renderpass', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/RenderPass.js', ['three-effectcomposer'], '0.160.0', true);
+        wp_enqueue_script('three-bloom', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js', ['three-effectcomposer'], '0.160.0', true);
+
+        // Collection scene scripts
+        wp_enqueue_script('black-rose-scene', SKYYROSE_THEME_URL . '/assets/js/black-rose-scene.js', ['three', 'three-orbit', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
+    }
+
     // Localize script
     wp_localize_script('skyyrose-main', 'skyyrose', [
         'ajaxUrl' => admin_url('admin-ajax.php'),
@@ -321,6 +332,67 @@ function skyyrose_ajax_add_to_cart() {
     } else {
         wp_send_json_error('Invalid product or quantity');
     }
+}
+
+/**
+ * AJAX Get Collection Products for 3D Scene
+ */
+add_action('wp_ajax_get_collection_products', 'skyyrose_get_collection_products');
+add_action('wp_ajax_nopriv_get_collection_products', 'skyyrose_get_collection_products');
+
+function skyyrose_get_collection_products() {
+    $collection = sanitize_text_field($_GET['collection'] ?? '');
+    
+    if (empty($collection)) {
+        wp_send_json_error('Collection not specified');
+    }
+
+    // Query products for this collection
+    $args = [
+        'post_type' => 'product',
+        'posts_per_page' => -1,
+        'meta_query' => [
+            [
+                'key' => '_skyyrose_collection',
+                'value' => $collection,
+                'compare' => '='
+            ]
+        ],
+        'orderby' => 'menu_order',
+        'order' => 'ASC'
+    ];
+
+    $products = new WP_Query($args);
+    $product_data = [];
+
+    if ($products->have_posts()) {
+        $index = 0;
+        while ($products->have_posts()) {
+            $products->the_post();
+            global $product;
+
+            // Calculate position in a circular garden layout
+            $radius = 8;
+            $angle = ($index / $products->post_count) * 2 * M_PI;
+            $x = $radius * cos($angle);
+            $z = $radius * sin($angle);
+
+            $product_data[] = [
+                'id' => get_the_ID(),
+                'name' => get_the_title(),
+                'price' => $product->get_price(),
+                'url' => get_permalink(),
+                'thumbnailUrl' => get_the_post_thumbnail_url(get_the_ID(), 'thumbnail') ?: '',
+                'position' => [$x, 0, $z],
+                'isEasterEgg' => false
+            ];
+
+            $index++;
+        }
+        wp_reset_postdata();
+    }
+
+    wp_send_json_success($product_data);
 }
 
 /**
