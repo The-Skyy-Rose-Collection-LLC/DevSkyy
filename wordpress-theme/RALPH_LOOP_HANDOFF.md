@@ -243,22 +243,35 @@ Ralph Loop should execute these tasks using the specified tools AND drakerelated
 #### **Task #4: Vault Pre-Order Page**
 **Location**: `wordpress-theme/skyyrose-2025/template-vault.php`
 
+**CRITICAL**: Vault combines ALL 3 COLLECTIONS for premier pre-order experience!
+
 **Instructions**:
 1. Hero section with countdown timer (JavaScript)
-2. Exclusive messaging UI
-3. 3D product gallery using LuxuryProductViewer
-4. Pre-order form integration with WooCommerce:
+2. Exclusive messaging UI emphasizing "All Collections in One Place"
+3. **Collection Showcase** (NEW):
+   - Unified 3D gallery showing products from BLACK ROSE, LOVE HURTS, and SIGNATURE
+   - Collection tabs or sections to highlight each collection's theme
+   - Seamless transitions between collection aesthetics
+   - Product cards maintain collection branding (colors, styling)
+4. 3D product gallery using LuxuryProductViewer:
+   - Query products from ALL 3 collections via WooCommerce
+   - Filter: `meta_query` with `_skyyrose_collection` IN ['black-rose', 'love-hurts', 'signature']
+   - Display collection badges on each product
+5. Pre-order form integration with WooCommerce:
    - Modify `wordpress-theme/skyyrose-2025/elementor-widgets/pre-order-form.php`
-   - Add WooCommerce checkout flow
-   - Email capture
+   - Multi-collection cart support
+   - Collection selector dropdown
    - Variable product selection (size/color)
    - Payment processing (Stripe/PayPal)
-5. Exclusivity indicators:
-   - Limited quantity counter (from WooCommerce stock)
+6. Exclusivity indicators:
+   - Limited quantity counter (from WooCommerce stock across all collections)
    - Live "X viewing" counter (WebSocket or polling)
-   - Benefits list
+   - Benefits list: "Exclusive access to ALL SkyyRose collections"
    - Testimonials section
-6. Email automation (WooCommerce hooks)
+7. Email automation (WooCommerce hooks):
+   - Pre-order confirmation email with all collections
+   - Launch notification when collections go live
+   - Early access codes for Vault members
 
 **Files to Modify**:
 - `wordpress-theme/skyyrose-2025/template-vault.php`
