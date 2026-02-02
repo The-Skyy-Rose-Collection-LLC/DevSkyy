@@ -366,6 +366,64 @@ $theme = $themes[$collection_meta] ?? $themes['signature'];
     </script>
     <?php endif; ?>
 
+    <?php if ($collection_meta === 'love-hurts') : ?>
+    <!-- LOVE HURTS Interactive Castle Experience -->
+    <div id="love-hurts-immersive" class="immersive-3d-container" style="height: 100vh; width: 100%; position: relative;">
+        <div class="immersive-loading" style="
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #b76e79;
+            font-size: 1.2rem;
+            z-index: 100;
+        ">
+            Loading LOVE HURTS castle...
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const container = document.getElementById('love-hurts-immersive');
+        const loading = container.querySelector('.immersive-loading');
+        
+        if (typeof LoveHurtsCastleExperience !== 'undefined') {
+            const experience = new LoveHurtsCastleExperience(container, {
+                backgroundColor: 0x1a0a0a,
+                fogDensity: 0.02,
+                enableBloom: true
+            });
+
+            fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>?action=get_collection_products&collection=love-hurts')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.data) {
+                        experience.loadProducts(data.data);
+                        loading.style.display = 'none';
+                        experience.start();
+
+                        experience.setOnProductClick(function(product) {
+                            window.location.href = product.url;
+                        });
+
+                        experience.setOnRoomChange(function(roomName) {
+                            console.log('Entered room:', roomName);
+                        });
+                    } else {
+                        loading.textContent = 'Failed to load products';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    loading.textContent = 'Error loading castle';
+                });
+        } else {
+            loading.textContent = 'THREE.js not loaded';
+        }
+    });
+    </script>
+    <?php endif; ?>
+
     <section class="collection-hero">
         <h1>
             <?php
