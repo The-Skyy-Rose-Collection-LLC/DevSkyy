@@ -33,7 +33,7 @@ add_action('elementor/elements/categories_registered', 'skyyrose_add_elementor_w
 /**
  * Register custom widgets
  */
-function skyyrose_register_elementor_widgets($widgets_manager) {
+function skyyrose_register_custom_elementor_widgets($widgets_manager) {
     // Immersive Scene Widget
     require_once(get_template_directory() . '/elementor-widgets/immersive-scene.php');
     $widgets_manager->register(new \SkyyRose\Elementor\Immersive_Scene_Widget());
@@ -50,7 +50,7 @@ function skyyrose_register_elementor_widgets($widgets_manager) {
     require_once(get_template_directory() . '/elementor-widgets/pre-order-form.php');
     $widgets_manager->register(new \SkyyRose\Elementor\PreOrder_Form_Widget());
 }
-add_action('elementor/widgets/register', 'skyyrose_register_elementor_widgets');
+add_action('elementor/widgets/register', 'skyyrose_register_custom_elementor_widgets');
 
 /**
  * Enqueue Elementor widget scripts and styles
