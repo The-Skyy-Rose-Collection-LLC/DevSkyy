@@ -17,6 +17,9 @@ define('SKYYROSE_THEME_URL', get_template_directory_uri());
 /**
  * Load Core Functionality
  */
+// Security must be loaded FIRST
+require_once SKYYROSE_THEME_DIR . '/inc/security-hardening.php';
+
 require_once SKYYROSE_THEME_DIR . '/inc/theme-customizer.php';
 require_once SKYYROSE_THEME_DIR . '/inc/woocommerce-config.php';
 require_once SKYYROSE_THEME_DIR . '/inc/performance.php';
@@ -347,22 +350,39 @@ add_action('wp_ajax_woocommerce_ajax_add_to_cart', 'skyyrose_ajax_add_to_cart');
 add_action('wp_ajax_nopriv_woocommerce_ajax_add_to_cart', 'skyyrose_ajax_add_to_cart');
 
 function skyyrose_ajax_add_to_cart() {
+    // CSRF protection
+    check_ajax_referer('skyyrose_cart_nonce', 'nonce');
+
+    // Rate limiting
+    if (!skyyrose_check_rate_limit('add_to_cart', 10, 60)) {
+        wp_send_json_error('Too many requests. Please slow down.');
+        return;
+    }
+
     $product_id = absint($_POST['product_id'] ?? 0);
     $quantity = absint($_POST['quantity'] ?? 1);
 
-    if ($product_id && $quantity) {
-        $added = WC()->cart->add_to_cart($product_id, $quantity);
-
-        if ($added) {
-            wp_send_json_success(array(
-                'message' => 'Product added to cart',
-                'cart_count' => WC()->cart->get_cart_contents_count(),
-            ));
-        } else {
-            wp_send_json_error('Failed to add product to cart');
-        }
-    } else {
+    if ($product_id <=0 || $quantity <= 0) {
         wp_send_json_error('Invalid product or quantity');
+        return;
+    }
+
+    // Verify product exists
+    $product = wc_get_product($product_id);
+    if (!$product) {
+        wp_send_json_error('Product not found');
+        return;
+    }
+
+    $added = WC()->cart->add_to_cart($product_id, $quantity);
+
+    if ($added) {
+        wp_send_json_success(array(
+            'message' => 'Product added to cart',
+            'cart_count' => WC()->cart->get_cart_contents_count(),
+        ));
+    } else {
+        wp_send_json_error('Failed to add product to cart');
     }
 }
 
@@ -373,10 +393,21 @@ add_action('wp_ajax_get_collection_products', 'skyyrose_get_collection_products'
 add_action('wp_ajax_nopriv_get_collection_products', 'skyyrose_get_collection_products');
 
 function skyyrose_get_collection_products() {
+    // CSRF protection
+    check_ajax_referer('skyyrose_collection_nonce', 'nonce');
+
+    // Rate limiting
+    if (!skyyrose_check_rate_limit('collection_products', 20, 60)) {
+        wp_send_json_error('Too many requests. Please slow down.');
+        return;
+    }
+
     $collection = sanitize_text_field($_GET['collection'] ?? '');
-    
-    if (empty($collection)) {
-        wp_send_json_error('Collection not specified');
+    $allowed_collections = ['black-rose', 'love-hurts', 'signature'];
+
+    if (empty($collection) || !in_array($collection, $allowed_collections)) {
+        wp_send_json_error('Invalid collection specified');
+        return;
     }
 
     // Query products for this collection

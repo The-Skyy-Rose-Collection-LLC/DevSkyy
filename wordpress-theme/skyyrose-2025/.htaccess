@@ -90,12 +90,22 @@
         Header set Expires "0"
     </FilesMatch>
 
-    # Security headers
+    # Enhanced Security headers
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
-    Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+    Header set Permissions-Policy "geolocation=(), microphone=(), camera=(), payment=()"
+
+    # Strict Transport Security (HTTPS enforcement - 1 year)
+    Header set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+
+    # Expect-CT (Certificate Transparency)
+    Header set Expect-CT "max-age=86400, enforce"
+
+    # Content Security Policy (Report-Only mode for testing)
+    # Uncomment and customize after testing:
+    # Header set Content-Security-Policy-Report-Only "default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' https://fonts.googleapis.com; img-src 'self' data: https:; font-src 'self' https://fonts.gstatic.com;"
 
     # Remove server signature
     Header unset Server

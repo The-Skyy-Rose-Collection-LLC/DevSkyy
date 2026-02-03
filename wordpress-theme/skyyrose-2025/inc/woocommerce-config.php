@@ -147,17 +147,46 @@ add_action('wp_enqueue_scripts', 'skyyrose_enqueue_vault_selector');
  * Handle vault pre-order AJAX submission
  */
 function skyyrose_handle_vault_preorder() {
-    // Verify nonce if implementing nonce validation
-    // check_ajax_referer('skyyrose_vault_nonce', 'nonce');
+    // CSRF protection
+    check_ajax_referer('skyyrose_vault_nonce', 'nonce');
 
-    $email = sanitize_email($_POST['email'] ?? '');
-    $collections = json_decode(stripslashes($_POST['collections'] ?? '[]'), true);
-    $products = json_decode(stripslashes($_POST['products'] ?? '[]'), true);
-
-    if (empty($email) || !is_email($email)) {
-        wp_send_json_error(['message' => 'Invalid email address']);
+    // Rate limiting
+    if (!skyyrose_check_rate_limit('vault_preorder', 5, 300)) {
+        wp_send_json_error(['message' => 'Too many requests. Please try again later.']);
         return;
     }
+
+    // Validate and sanitize email
+    $email = skyyrose_validate_email($_POST['email'] ?? '', true);
+    if (false === $email) {
+        wp_send_json_error(['message' => 'Invalid or disposable email address']);
+        return;
+    }
+
+    // Validate and sanitize collections
+    $collections = json_decode(stripslashes($_POST['collections'] ?? '[]'), true);
+    if (!is_array($collections) || empty($collections)) {
+        wp_send_json_error(['message' => 'Invalid collections data']);
+        return;
+    }
+
+    $allowed_collections = ['black-rose', 'love-hurts', 'signature'];
+    $collections = array_intersect(array_map('sanitize_text_field', $collections), $allowed_collections);
+
+    if (empty($collections)) {
+        wp_send_json_error(['message' => 'No valid collections selected']);
+        return;
+    }
+
+    // Validate and sanitize products
+    $products = json_decode(stripslashes($_POST['products'] ?? '[]'), true);
+    if (!is_array($products)) {
+        wp_send_json_error(['message' => 'Invalid products data']);
+        return;
+    }
+
+    $products = array_map('absint', $products);
+    $products = array_filter($products, function($id) { return $id > 0; });
 
     // Save to database or send to email service (Mailchimp/Klaviyo)
     // For now, just return success
