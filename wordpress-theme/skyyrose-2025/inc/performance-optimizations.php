@@ -271,13 +271,28 @@ class SkyyRose_Performance_Optimizer {
             return;
         }
 
-        // Clear all transients
+        // Clear all transients - using prepared statement
         global $wpdb;
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_skyyrose_%'");
-        $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_skyyrose_%'");
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                $wpdb->esc_like('_transient_skyyrose_') . '%'
+            )
+        );
+        $wpdb->query(
+            $wpdb->prepare(
+                "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+                $wpdb->esc_like('_transient_timeout_skyyrose_') . '%'
+            )
+        );
 
         // Clear object cache
         wp_cache_flush();
+
+        // Log cache clear event
+        skyyrose_log_security_event('cache_cleared', [
+            'user_id' => get_current_user_id(),
+        ]);
 
         wp_send_json_success(['message' => 'Cache cleared successfully']);
     }
@@ -494,11 +509,28 @@ SkyyRose_Performance_Optimizer::get_instance();
  * Helper function to clear theme cache
  */
 function skyyrose_clear_theme_cache() {
+    // Require admin capability (unless WP-CLI)
+    if (!current_user_can('manage_options')) {
+        if (!(defined('WP_CLI') && WP_CLI)) {
+            return false;
+        }
+    }
+
     global $wpdb;
 
-    // Clear transients
-    $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_skyyrose_%'");
-    $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_skyyrose_%'");
+    // Clear transients - using prepared statement
+    $wpdb->query(
+        $wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+            $wpdb->esc_like('_transient_skyyrose_') . '%'
+        )
+    );
+    $wpdb->query(
+        $wpdb->prepare(
+            "DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+            $wpdb->esc_like('_transient_timeout_skyyrose_') . '%'
+        )
+    );
 
     // Clear object cache
     wp_cache_flush();
