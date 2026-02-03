@@ -84,6 +84,79 @@ while (have_posts()) : the_post();
     height: fit-content;
 }
 
+/* View Toggle */
+.view-toggle {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px;
+    border-radius: 8px;
+}
+
+.toggle-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.toggle-btn.active {
+    background: var(--product-color);
+    color: #FFFFFF;
+}
+
+.view-container.hidden {
+    display: none;
+}
+
+.luxury-3d-canvas {
+    width: 100%;
+    height: 600px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: radial-gradient(circle, rgba(183, 110, 121, 0.1) 0%, rgba(0, 0, 0, 0.9) 100%);
+}
+
+.viewer-loading {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: var(--product-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
 .main-image {
     width: 100%;
     aspect-ratio: 1 / 1;
@@ -415,15 +488,57 @@ while (have_posts()) : the_post();
         <div class="product-grid">
             <!-- Product Gallery -->
             <div class="product-gallery">
-                <div class="main-image" id="mainImage">
-                    <?php
-                    if (has_post_thumbnail()) {
-                        the_post_thumbnail('skyyrose-hero');
-                    } else {
-                        echo '<div class="placeholder-icon">✦</div>';
-                    }
-                    ?>
+                <!-- View Toggle (2D/3D) -->
+                <?php
+                $model_url = get_post_meta(get_the_ID(), '_product_3d_model', true);
+                if ($model_url):
+                ?>
+                <div class="view-toggle">
+                    <button class="toggle-btn active" data-view="2d">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <rect x="3" y="3" width="18" height="18" stroke="currentColor" stroke-width="2" rx="2"/>
+                        </svg>
+                        Photos
+                    </button>
+                    <button class="toggle-btn" data-view="3d">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2"/>
+                            <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2"/>
+                            <path d="M2 12L12 17L12 22" stroke="currentColor" stroke-width="2"/>
+                            <path d="M22 12L12 17" stroke="currentColor" stroke-width="2"/>
+                        </svg>
+                        3D View
+                    </button>
                 </div>
+                <?php endif; ?>
+
+                <!-- 2D Images View -->
+                <div class="view-container" id="view2d">
+                    <div class="main-image" id="mainImage">
+                        <?php
+                        if (has_post_thumbnail()) {
+                            the_post_thumbnail('skyyrose-hero');
+                        } else {
+                            echo '<div class="placeholder-icon">✦</div>';
+                        }
+                        ?>
+                    </div>
+                </div>
+
+                <!-- 3D Viewer Container -->
+                <?php if ($model_url): ?>
+                <div class="view-container hidden" id="view3d">
+                    <div id="luxury-3d-viewer" class="luxury-3d-canvas"
+                         data-model-url="<?php echo esc_url($model_url); ?>"
+                         data-product-name="<?php echo esc_attr(get_the_title()); ?>"
+                         data-collection="<?php echo esc_attr($collection); ?>">
+                        <div class="viewer-loading">
+                            <div class="loading-spinner"></div>
+                            <p>Loading 3D Model...</p>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
 
                 <?php
                 $attachment_ids = $product->get_gallery_image_ids();
@@ -634,7 +749,77 @@ function addToCart() {
         button.textContent = 'Add to Cart';
     });
 }
+
+// 3D Viewer Initialization
+document.addEventListener('DOMContentLoaded', function() {
+    const viewerContainer = document.getElementById('luxury-3d-viewer');
+    if (!viewerContainer) return;
+
+    const modelUrl = viewerContainer.dataset.modelUrl;
+    const productName = viewerContainer.dataset.productName;
+    const collection = viewerContainer.dataset.collection;
+
+    // View toggle functionality
+    const toggleButtons = document.querySelectorAll('.toggle-btn');
+    const view2d = document.getElementById('view2d');
+    const view3d = document.getElementById('view3d');
+    let viewer3d = null;
+
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const view = this.dataset.view;
+
+            // Update active state
+            toggleButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+
+            // Toggle views
+            if (view === '2d') {
+                view2d.classList.remove('hidden');
+                view3d.classList.add('hidden');
+            } else if (view === '3d') {
+                view2d.classList.add('hidden');
+                view3d.classList.remove('hidden');
+
+                // Initialize 3D viewer on first load
+                if (!viewer3d && typeof LuxuryProductViewer !== 'undefined') {
+                    viewer3d = new LuxuryProductViewer(viewerContainer, {
+                        modelUrl: modelUrl,
+                        productName: productName,
+                        environment: 'studio',
+                        autoRotate: true,
+                        showEffects: true,
+                        enableAR: true
+                    });
+                }
+            }
+        });
+    });
+
+    // Preload 3D model in background
+    if (modelUrl && typeof LuxuryProductViewer !== 'undefined') {
+        setTimeout(() => {
+            viewer3d = new LuxuryProductViewer(viewerContainer, {
+                modelUrl: modelUrl,
+                productName: productName,
+                environment: 'studio',
+                autoRotate: true,
+                showEffects: true,
+                enableAR: true,
+                startHidden: true
+            });
+        }, 2000);
+    }
+});
 </script>
+
+<?php
+// Enqueue 3D viewer script if product has 3D model
+$model_url = get_post_meta(get_the_ID(), '_product_3d_model', true);
+if ($model_url) {
+    wp_enqueue_script('luxury-product-viewer', get_template_directory_uri() . '/assets/js/luxury-product-viewer.js', array('three', 'three-gltf', 'three-orbit'), '1.0.0', true);
+}
+?>
 
 <?php
 endwhile;
