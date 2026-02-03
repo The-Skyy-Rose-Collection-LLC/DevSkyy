@@ -67,6 +67,7 @@ function skyyrose_enqueue_assets() {
     // Styles
     wp_enqueue_style('skyyrose-style', get_stylesheet_uri(), [], SKYYROSE_VERSION);
     wp_enqueue_style('skyyrose-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap', [], null);
+    wp_enqueue_style('skyyrose-animations', SKYYROSE_THEME_URL . '/assets/css/animations.css', [], SKYYROSE_VERSION);
 
     // Scripts
     wp_enqueue_script('gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', [], '3.12.5', true);
