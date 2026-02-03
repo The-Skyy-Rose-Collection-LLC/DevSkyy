@@ -82,7 +82,6 @@
       this.createUI();
       this.setupEventListeners();
 
-      console.log('BLACK ROSE experience initialized');
     }
 
     createScene() {
@@ -635,7 +634,6 @@
       // Update progress indicator
       this.progressIndicator.textContent = `0 of ${products.length} discovered`;
       
-      console.log(`Loaded ${products.length} products`);
     }
 
     async createRoseBush(product) {
@@ -768,7 +766,6 @@
       };
       
       animate();
-      console.log('BLACK ROSE animation started');
     }
 
     stop() {
@@ -808,7 +805,6 @@
       if (this.exploreToggle) this.exploreToggle.remove();
       if (this.muteToggle) this.muteToggle.remove();
 
-      console.log('BLACK ROSE experience disposed');
     }
   }
 

@@ -61,7 +61,6 @@
 
         // Skip animations if reduced motion preferred
         if (isReducedMotion()) {
-            console.log('Reduced motion preferred - animations disabled');
             return;
         }
 
