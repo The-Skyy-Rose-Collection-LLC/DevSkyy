@@ -1,551 +1,999 @@
 <?php
 /**
- * Template Name: Immersive Experience
- * Description: Immersive collection experience with CSS effects and product hotspots
+ * Template Name: Immersive Full-Screen Experience
+ * Description: Full-screen immersive canvas with 3D scenes, minimal UI, and luxury interactions
+ *
+ * Features:
+ * - 100vh full-screen canvas (no header/footer)
+ * - Progressive page loader with rose gold spinner
+ * - Embed any collection immersive scene or LuxuryProductViewer
+ * - Glassmorphism navigation overlay
+ * - Call-to-action overlays
+ * - Mobile detection and optimization
+ * - Accessibility features (keyboard nav, screen reader)
  *
  * @package SkyyRose_2025
- * @version 2.0.0
+ * @version 3.0.0
  */
 
-get_header();
+// Get immersive mode configuration
+$immersive_mode = get_post_meta(get_the_ID(), '_immersive_mode', true) ?: 'collection';
+$scene_type = get_post_meta(get_the_ID(), '_scene_type', true) ?: 'black-rose';
+$show_cta = get_post_meta(get_the_ID(), '_show_cta', true) !== 'no';
+$show_nav = get_post_meta(get_the_ID(), '_show_nav', true) !== 'no';
+$product_id = get_post_meta(get_the_ID(), '_featured_product_id', true);
 
-// Get collection type from page meta or URL
-$collection = get_post_meta(get_the_ID(), '_collection_type', true) ?: 'signature';
-
-// Collection configurations
-$collections = [
+// Scene configurations
+$scene_configs = [
     'black-rose' => [
-        'name' => 'Black Rose',
+        'title' => 'Black Rose',
         'tagline' => 'Gothic Elegance',
-        'description' => 'Dark, mysterious, and unapologetically bold. The Black Rose collection embodies strength through vulnerability, beauty through darkness.',
         'color' => '#8B0000',
-        'gradient' => 'radial-gradient(circle at 30% 40%, rgba(139, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.8) 50%, #000 100%)',
-        'shop_url' => '/black-rose',
+        'collection' => 'black-rose',
+        'class' => 'BlackRoseExperience',
+        'script' => 'black-rose-scene.js',
     ],
     'love-hurts' => [
-        'name' => 'Love Hurts',
+        'title' => 'Love Hurts',
         'tagline' => 'Romantic Rebellion',
-        'description' => 'For those who dare to feel. Soft hearts meet sharp edges in a collection that celebrates emotional depth and vulnerability as strength.',
         'color' => '#B76E79',
-        'gradient' => 'radial-gradient(circle at 70% 30%, rgba(183, 110, 121, 0.3) 0%, rgba(50, 20, 30, 0.7) 50%, #000 100%)',
-        'shop_url' => '/love-hurts',
+        'collection' => 'love-hurts',
+        'class' => 'LoveHurtsCastleExperience',
+        'script' => 'love-hurts-scene.js',
     ],
     'signature' => [
-        'name' => 'Signature',
-        'tagline' => 'Timeless Luxury',
-        'description' => 'The foundation of SkyyRose. Premium cuts, gold accents, and architectural tailoring that transcends trends and defines personal style.',
+        'title' => 'Signature',
+        'tagline' => 'Oakland Pride',
         'color' => '#D4AF37',
-        'gradient' => 'radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.2) 0%, rgba(40, 35, 20, 0.6) 50%, #000 100%)',
-        'shop_url' => '/signature',
+        'collection' => 'signature',
+        'class' => 'SignatureLandmarksTour',
+        'script' => 'signature-scene.js',
     ],
 ];
 
-$config = $collections[$collection] ?? $collections['signature'];
+$config = $scene_configs[$scene_type] ?? $scene_configs['black-rose'];
 
-// Get featured products for this collection
-$products_query = new WP_Query([
-    'post_type' => 'product',
-    'posts_per_page' => 6,
-    'meta_query' => [
-        [
-            'key' => '_skyyrose_collection',
-            'value' => $collection,
-            'compare' => '='
-        ]
-    ],
-    'orderby' => 'menu_order',
-    'order' => 'ASC'
-]);
+// Check for mobile
+$is_mobile = wp_is_mobile();
 ?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo('charset'); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="<?php echo esc_attr($config['color']); ?>">
+    <title><?php echo esc_html($config['title']); ?> | <?php bloginfo('name'); ?></title>
+    <?php wp_head(); ?>
+</head>
+<body <?php body_class('immersive-body'); ?>>
+
+<!-- Skip to Content (Accessibility) -->
+<a href="#main-content" class="skip-to-content sr-only sr-only-focusable">
+    Skip to main content
+</a>
+
+<!-- Progressive Page Loader -->
+<div id="immersive-loader" class="immersive-loader" role="status" aria-live="polite">
+    <div class="loader-container">
+        <div class="rose-gold-spinner" aria-hidden="true"></div>
+        <div class="loader-text" id="loaderText">Loading Experience...</div>
+        <div class="loader-progress">
+            <div class="loader-progress-bar" id="loaderProgressBar"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Navigation Overlay (Glassmorphism) -->
+<?php if ($show_nav) : ?>
+<nav id="immersive-nav" class="immersive-nav" role="navigation" aria-label="Main Navigation">
+    <button
+        id="navToggle"
+        class="nav-hamburger"
+        aria-label="Toggle Navigation Menu"
+        aria-expanded="false"
+        aria-controls="navMenu"
+    >
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+        <span class="hamburger-line"></span>
+    </button>
+
+    <div id="navMenu" class="nav-menu" role="menu" hidden>
+        <div class="nav-menu-header">
+            <a href="<?php echo esc_url(home_url('/')); ?>" class="nav-logo" aria-label="SkyyRose Home">
+                SkyyRose
+            </a>
+            <button
+                id="navClose"
+                class="nav-close"
+                aria-label="Close Navigation Menu"
+            >
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+
+        <ul class="nav-links" role="none">
+            <li role="menuitem">
+                <a href="<?php echo esc_url(home_url('/black-rose')); ?>">Black Rose</a>
+            </li>
+            <li role="menuitem">
+                <a href="<?php echo esc_url(home_url('/love-hurts')); ?>">Love Hurts</a>
+            </li>
+            <li role="menuitem">
+                <a href="<?php echo esc_url(home_url('/signature')); ?>">Signature</a>
+            </li>
+            <li role="menuitem">
+                <a href="<?php echo esc_url(home_url('/vault')); ?>">Vault</a>
+            </li>
+            <li role="menuitem">
+                <a href="<?php echo esc_url(wc_get_cart_url()); ?>">Cart</a>
+            </li>
+        </ul>
+
+        <div class="nav-cta">
+            <a href="<?php echo esc_url(home_url('/vault')); ?>" class="btn-nav-primary">
+                Pre-Order Vault
+            </a>
+        </div>
+    </div>
+</nav>
+<?php endif; ?>
+
+<!-- Full-Screen Canvas Container -->
+<main id="main-content" class="immersive-canvas-container" role="main">
+    <?php if ($is_mobile) : ?>
+        <!-- Mobile Fallback or Simplified Version -->
+        <div class="mobile-fallback" role="alert">
+            <div class="mobile-fallback-content">
+                <h1><?php echo esc_html($config['title']); ?></h1>
+                <p>For the best immersive experience, please visit us on desktop.</p>
+                <a href="<?php echo esc_url(home_url('/' . $config['collection'])); ?>" class="btn-mobile">
+                    View Collection
+                </a>
+            </div>
+        </div>
+    <?php else : ?>
+        <!-- Desktop: Full 3D Canvas -->
+        <div id="immersive-scene" class="immersive-scene" data-scene="<?php echo esc_attr($scene_type); ?>"></div>
+
+        <!-- Call-to-Action Overlays -->
+        <?php if ($show_cta) : ?>
+        <div class="cta-overlay cta-bottom-left">
+            <a
+                href="<?php echo esc_url(home_url('/' . $config['collection'])); ?>"
+                class="btn-cta btn-cta-primary"
+                aria-label="Shop <?php echo esc_attr($config['title']); ?> Collection"
+            >
+                Shop Collection
+            </a>
+        </div>
+
+        <div class="cta-overlay cta-bottom-right">
+            <a
+                href="<?php echo esc_url(home_url('/vault')); ?>"
+                class="btn-cta btn-cta-vault"
+                aria-label="Access Pre-Order Vault"
+            >
+                Pre-Order Vault
+            </a>
+        </div>
+        <?php endif; ?>
+
+        <!-- Product Quick-View Modal -->
+        <div id="quickViewModal" class="quick-view-modal" role="dialog" aria-labelledby="quickViewTitle" aria-modal="true" hidden>
+            <div class="quick-view-content">
+                <button
+                    id="quickViewClose"
+                    class="quick-view-close"
+                    aria-label="Close Quick View"
+                >
+                    <span aria-hidden="true">&times;</span>
+                </button>
+
+                <div id="quickViewBody" class="quick-view-body">
+                    <!-- Dynamically populated by JS -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls Hint (Fades after 5s) -->
+        <div id="controlsHint" class="controls-hint" role="status" aria-live="polite">
+            <p>
+                <kbd>Drag</kbd> to explore &nbsp;|&nbsp; <kbd>Scroll</kbd> to zoom &nbsp;|&nbsp;
+                <kbd>Click</kbd> products for details
+            </p>
+        </div>
+    <?php endif; ?>
+</main>
+
+<!-- Screen Reader Announcements -->
+<div class="sr-only" role="status" aria-live="polite" aria-atomic="true" id="srAnnouncements"></div>
 
 <style>
+/* Immersive Template Styles */
 :root {
-    --collection-color: <?php echo esc_attr($config['color']); ?>;
-    --bg-dark: #000000;
+    --immersive-color: <?php echo esc_attr($config['color']); ?>;
+    --rose-gold: #B76E79;
+    --dark-slate: #1a1a1a;
+    --gold: #D4AF37;
+    --glass-bg: rgba(26, 26, 26, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(20px);
 }
 
-.immersive-experience {
-    min-height: 100vh;
-    background: var(--bg-dark);
-    color: #fff;
-    position: relative;
+/* Reset body/html for full immersion */
+.immersive-body {
+    margin: 0;
+    padding: 0;
     overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+    background: #000;
+    color: #fff;
 }
 
-/* Ambient Background */
-.immersive-bg {
+.immersive-body #wpadminbar {
+    display: none !important;
+}
+
+/* Skip to Content */
+.skip-to-content {
+    position: fixed;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--immersive-color);
+    color: #000;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    z-index: 10000;
+    transition: top 0.3s ease;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.skip-to-content:focus {
+    top: 20px;
+    outline: 3px solid #fff;
+    outline-offset: 2px;
+}
+
+/* Screen Reader Only */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+}
+
+.sr-only-focusable:focus {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* Progressive Loader */
+.immersive-loader {
     position: fixed;
     inset: 0;
-    background: <?php echo esc_attr($config['gradient']); ?>;
-    z-index: -2;
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 
-/* Animated Particles */
-.immersive-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image:
-        radial-gradient(2px 2px at 20% 30%, rgba(255, 255, 255, 0.3), transparent),
-        radial-gradient(2px 2px at 60% 70%, rgba(255, 255, 255, 0.2), transparent),
-        radial-gradient(1px 1px at 50% 50%, rgba(255, 255, 255, 0.1), transparent),
-        radial-gradient(1px 1px at 80% 10%, rgba(255, 255, 255, 0.2), transparent);
-    background-size: 200px 200px, 300px 300px, 150px 150px, 250px 250px;
-    background-position: 0 0, 40px 60px, 130px 270px, 70px 100px;
-    animation: float-particles 20s linear infinite;
+.immersive-loader.fade-out {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
 }
 
-@keyframes float-particles {
-    0% { background-position: 0 0, 40px 60px, 130px 270px, 70px 100px; }
-    100% { background-position: 0 -200px, 40px -240px, 130px 70px, 70px -100px; }
+.loader-container {
+    text-align: center;
 }
 
-/* Noise Texture */
-.immersive-bg::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%' height='100%' filter='url(%23noise)'/%3E%3C/svg%3E");
-    opacity: 0.05;
-    mix-blend-mode: overlay;
+.rose-gold-spinner {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 2rem;
+    border: 4px solid rgba(183, 110, 121, 0.2);
+    border-top-color: var(--rose-gold);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
 }
 
-/* Hero Section */
-.immersive-hero {
-    min-height: 100vh;
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.loader-text {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.8);
+    margin-bottom: 1rem;
+    letter-spacing: 2px;
+}
+
+.loader-progress {
+    width: 200px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+    margin: 0 auto;
+}
+
+.loader-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--rose-gold), var(--gold));
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+/* Navigation Overlay (Glassmorphism) */
+.immersive-nav {
+    position: fixed;
+    top: 2rem;
+    left: 2rem;
+    z-index: 1000;
+}
+
+.nav-hamburger {
+    width: 50px;
+    height: 50px;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 50%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    padding: 120px 2rem 80px;
-    position: relative;
+    gap: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
 }
 
-.collection-badge {
-    display: inline-block;
-    padding: 0.6rem 1.5rem;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    border-radius: 50px;
-    font-size: 0.7rem;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--collection-color);
-    margin-bottom: 2rem;
-    background: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
-    animation: fadeUp 1s ease-out;
+.nav-hamburger:hover,
+.nav-hamburger:focus {
+    background: rgba(183, 110, 121, 0.3);
+    border-color: var(--rose-gold);
+    outline: none;
+    transform: scale(1.05);
 }
 
-.immersive-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(4rem, 12vw, 8rem);
-    font-weight: 400;
-    margin-bottom: 1rem;
-    color: var(--collection-color);
-    text-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
-    animation: fadeUp 1s ease-out 0.2s backwards;
+.hamburger-line {
+    width: 24px;
+    height: 2px;
+    background: #fff;
+    transition: all 0.3s ease;
 }
 
-.immersive-tagline {
-    font-size: 1.5rem;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.5);
-    margin-bottom: 2rem;
-    animation: fadeUp 1s ease-out 0.4s backwards;
+.nav-hamburger:hover .hamburger-line {
+    background: var(--rose-gold);
 }
 
-.immersive-description {
-    max-width: 700px;
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0 auto 3rem;
-    animation: fadeUp 1s ease-out 0.6s backwards;
+.nav-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 350px;
+    height: 100vh;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border-right: 1px solid var(--glass-border);
+    transform: translateX(-100%);
+    transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    padding: 2rem;
+    overflow-y: auto;
 }
 
-.cta-group {
+.nav-menu.open {
+    transform: translateX(0);
+}
+
+.nav-menu-header {
     display: flex;
-    gap: 1.5rem;
-    justify-content: center;
-    flex-wrap: wrap;
-    animation: fadeUp 1s ease-out 0.8s backwards;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 3rem;
 }
 
-.btn {
-    padding: 1.2rem 3rem;
-    font-size: 0.8rem;
+.nav-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--rose-gold);
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.nav-close {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 3rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.nav-close:hover,
+.nav-close:focus {
+    color: var(--rose-gold);
+    outline: none;
+}
+
+.nav-links {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 3rem 0;
+}
+
+.nav-links li {
+    margin-bottom: 1.5rem;
+}
+
+.nav-links a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    transition: all 0.3s ease;
+    display: block;
+    padding: 0.5rem 0;
+    border-left: 3px solid transparent;
+    padding-left: 1rem;
+}
+
+.nav-links a:hover,
+.nav-links a:focus {
+    color: var(--rose-gold);
+    border-left-color: var(--rose-gold);
+    transform: translateX(5px);
+    outline: none;
+}
+
+.nav-cta {
+    margin-top: auto;
+}
+
+.btn-nav-primary {
+    display: block;
+    text-align: center;
+    background: linear-gradient(135deg, var(--rose-gold), var(--gold));
+    color: #000;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
     font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
-    text-decoration: none;
-    border-radius: 2px;
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-    transform: translateX(-100%);
-    transition: transform 0.5s ease;
-}
-
-.btn:hover::before {
-    transform: translateX(100%);
-}
-
-.btn-primary {
-    background: var(--collection-color);
-    color: #000;
-    border: 1px solid var(--collection-color);
-}
-
-.btn-primary:hover {
-    box-shadow: 0 0 30px var(--collection-color);
-    transform: translateY(-3px);
-}
-
-.btn-ghost {
-    background: transparent;
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-}
-
-.btn-ghost:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: #fff;
-}
-
-/* Product Hotspots Section */
-.hotspots-section {
-    padding: 8rem 2rem;
-    position: relative;
-}
-
-.section-title {
-    text-align: center;
-    font-family: 'Playfair Display', serif;
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: var(--collection-color);
-}
-
-.section-subtitle {
-    text-align: center;
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 5rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    font-size: 0.9rem;
-}
-
-.products-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 3rem;
-    max-width: 1400px;
-    margin: 0 auto;
-}
-
-.product-hotspot {
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 2rem;
-    transition: all 0.4s ease;
-    cursor: pointer;
-    position: relative;
-    overflow: hidden;
-}
-
-.product-hotspot::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(circle at 50% 50%, var(--collection-color), transparent);
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.product-hotspot:hover {
-    transform: translateY(-10px);
-    border-color: var(--collection-color);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
-}
-
-.product-hotspot:hover::before {
-    opacity: 0.05;
-}
-
-.hotspot-image {
-    width: 100%;
-    height: 300px;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 4px;
-    margin-bottom: 1.5rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-}
-
-.hotspot-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-}
-
-.product-hotspot:hover .hotspot-image img {
-    transform: scale(1.1);
-}
-
-.hotspot-placeholder {
-    font-size: 4rem;
-    opacity: 0.3;
-}
-
-.hotspot-info {
-    position: relative;
-    z-index: 1;
-}
-
-.hotspot-title {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    margin-bottom: 0.5rem;
-    color: #fff;
-}
-
-.hotspot-price {
-    font-size: 1.2rem;
-    color: var(--collection-color);
-    margin-bottom: 1rem;
-    letter-spacing: 1px;
-}
-
-.hotspot-description {
-    font-size: 0.9rem;
-    color: rgba(255, 255, 255, 0.6);
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.view-product-btn {
-    width: 100%;
-    padding: 0.8rem;
-    background: transparent;
-    border: 1px solid var(--collection-color);
-    color: var(--collection-color);
-    font-size: 0.8rem;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: pointer;
     transition: all 0.3s ease;
 }
 
-.view-product-btn:hover {
-    background: var(--collection-color);
-    color: #000;
+.btn-nav-primary:hover,
+.btn-nav-primary:focus {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px rgba(183, 110, 121, 0.5);
+    outline: none;
 }
 
-/* View Switcher */
-.view-switcher {
+/* Full-Screen Canvas */
+.immersive-canvas-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+.immersive-scene {
+    width: 100%;
+    height: 100%;
+    background: #000;
+}
+
+/* Call-to-Action Overlays */
+.cta-overlay {
     position: fixed;
-    bottom: 3rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50px;
-    padding: 1rem 2rem;
-    display: flex;
-    gap: 1rem;
     z-index: 100;
 }
 
-.view-btn {
-    padding: 0.6rem 1.5rem;
-    background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.7);
-    border-radius: 30px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
+.cta-bottom-left {
+    bottom: 3rem;
+    left: 3rem;
 }
 
-.view-btn.active,
-.view-btn:hover {
-    background: var(--collection-color);
-    border-color: var(--collection-color);
+.cta-bottom-right {
+    bottom: 3rem;
+    right: 3rem;
+}
+
+.btn-cta {
+    display: inline-block;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.4s ease;
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    font-size: 0.9rem;
+}
+
+.btn-cta-primary {
+    border-color: var(--immersive-color);
+    color: var(--immersive-color);
+}
+
+.btn-cta-primary:hover,
+.btn-cta-primary:focus {
+    background: var(--immersive-color);
     color: #000;
+    box-shadow: 0 0 30px var(--immersive-color);
+    transform: translateY(-3px);
+    outline: 3px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
 }
 
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.btn-cta-vault {
+    border-color: var(--rose-gold);
+    color: var(--rose-gold);
+}
+
+.btn-cta-vault:hover,
+.btn-cta-vault:focus {
+    background: var(--rose-gold);
+    color: #000;
+    box-shadow: 0 0 30px var(--rose-gold);
+    transform: translateY(-3px);
+    outline: 3px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
+}
+
+/* Quick View Modal */
+.quick-view-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.9);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.quick-view-modal.active {
+    opacity: 1;
+}
+
+.quick-view-content {
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    padding: 3rem;
+    max-width: 800px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    position: relative;
+    transform: scale(0.9);
+    transition: transform 0.3s ease;
+}
+
+.quick-view-modal.active .quick-view-content {
+    transform: scale(1);
+}
+
+.quick-view-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 2.5rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.3s ease;
+}
+
+.quick-view-close:hover,
+.quick-view-close:focus {
+    color: var(--rose-gold);
+    outline: none;
+}
+
+.quick-view-body {
+    color: #fff;
+}
+
+/* Controls Hint */
+.controls-hint {
+    position: fixed;
+    bottom: 8rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass-bg);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: 30px;
+    padding: 1rem 2rem;
+    z-index: 99;
+    animation: fadeInOut 5s ease-in-out forwards;
+}
+
+.controls-hint p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+}
+
+.controls-hint kbd {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-family: monospace;
+    color: var(--rose-gold);
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    10%, 90% { opacity: 1; }
+}
+
+/* Mobile Fallback */
+.mobile-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+    padding: 2rem;
+}
+
+.mobile-fallback-content {
+    text-align: center;
+    max-width: 400px;
+}
+
+.mobile-fallback h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    color: var(--immersive-color);
+    margin-bottom: 1rem;
+}
+
+.mobile-fallback p {
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+}
+
+.btn-mobile {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: var(--immersive-color);
+    color: #000;
+    text-decoration: none;
+    border-radius: 4px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+}
+
+.btn-mobile:hover,
+.btn-mobile:focus {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 30px var(--immersive-color);
+    outline: 3px solid rgba(255, 255, 255, 0.3);
+    outline-offset: 2px;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
-    .immersive-title {
-        font-size: 4rem;
-    }
-
-    .cta-group {
-        flex-direction: column;
+    .nav-menu {
         width: 100%;
-        max-width: 320px;
-        margin: 0 auto;
+        border-right: none;
     }
 
-    .btn {
-        width: 100%;
-    }
-
-    .products-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .view-switcher {
+    .cta-overlay {
         bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+    }
+
+    .cta-bottom-left,
+    .cta-bottom-right {
+        position: static;
+        margin-bottom: 1rem;
+    }
+
+    .btn-cta {
+        font-size: 0.8rem;
         padding: 0.8rem 1.5rem;
     }
 
-    .view-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.7rem;
+    .controls-hint {
+        display: none;
     }
 }
 </style>
 
-<div class="immersive-experience">
-    <div class="immersive-bg"></div>
-
-    <!-- Hero Section -->
-    <section class="immersive-hero">
-        <div class="collection-badge"><?php echo esc_html($config['tagline']); ?></div>
-        <h1 class="immersive-title"><?php echo esc_html($config['name']); ?></h1>
-        <p class="immersive-tagline">Collection Experience</p>
-        <p class="immersive-description">
-            <?php echo esc_html($config['description']); ?>
-        </p>
-        <div class="cta-group">
-            <a href="<?php echo esc_url($config['shop_url']); ?>" class="btn btn-primary">
-                Shop Collection
-                <span>→</span>
-            </a>
-            <a href="#products" class="btn btn-ghost">
-                Explore Featured
-                <span>↓</span>
-            </a>
-        </div>
-    </section>
-
-    <!-- Product Hotspots -->
-    <section id="products" class="hotspots-section">
-        <h2 class="section-title">Featured Pieces</h2>
-        <p class="section-subtitle">Discover the Collection</p>
-
-        <div class="products-grid">
-            <?php
-            if ($products_query->have_posts()) :
-                while ($products_query->have_posts()) : $products_query->the_post();
-                    global $product;
-                    $short_desc = get_post_meta(get_the_ID(), '_short_description', true);
-                    if (!$short_desc) {
-                        $short_desc = wp_trim_words(get_the_excerpt(), 15, '...');
-                    }
-            ?>
-                <div class="product-hotspot" onclick="window.location.href='<?php echo esc_url(get_permalink()); ?>'">
-                    <div class="hotspot-image">
-                        <?php
-                        if (has_post_thumbnail()) {
-                            the_post_thumbnail('skyyrose-product');
-                        } else {
-                            echo '<span class="hotspot-placeholder">✦</span>';
-                        }
-                        ?>
-                    </div>
-                    <div class="hotspot-info">
-                        <h3 class="hotspot-title"><?php the_title(); ?></h3>
-                        <div class="hotspot-price"><?php echo $product->get_price_html(); ?></div>
-                        <p class="hotspot-description"><?php echo esc_html($short_desc); ?></p>
-                        <button class="view-product-btn" onclick="event.stopPropagation(); window.location.href='<?php echo esc_url(get_permalink()); ?>'">
-                            View Details
-                        </button>
-                    </div>
-                </div>
-            <?php
-                endwhile;
-                wp_reset_postdata();
-            else :
-            ?>
-                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem;">
-                    <p style="color: rgba(255, 255, 255, 0.5);">Coming Soon</p>
-                </div>
-            <?php endif; ?>
-        </div>
-    </section>
-
-    <!-- View Switcher -->
-    <div class="view-switcher">
-        <button class="view-btn active">Experience</button>
-        <a href="<?php echo esc_url($config['shop_url']); ?>" class="view-btn">Shop View</a>
-    </div>
-</div>
-
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-    // Smooth scroll for anchor links
-    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-        anchor.addEventListener('click', function (e) {
-            e.preventDefault();
-            const target = document.querySelector(this.getAttribute('href'));
-            if (target) {
-                target.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+// Immersive Template JavaScript
+(function() {
+    'use strict';
+
+    // DOM Elements
+    const loader = document.getElementById('immersive-loader');
+    const loaderText = document.getElementById('loaderText');
+    const loaderProgressBar = document.getElementById('loaderProgressBar');
+    const navToggle = document.getElementById('navToggle');
+    const navClose = document.getElementById('navClose');
+    const navMenu = document.getElementById('navMenu');
+    const sceneContainer = document.getElementById('immersive-scene');
+    const quickViewModal = document.getElementById('quickViewModal');
+    const quickViewClose = document.getElementById('quickViewClose');
+    const srAnnouncements = document.getElementById('srAnnouncements');
+
+    let experience = null;
+    let progress = 0;
+
+    // Screen reader announcement
+    function announce(message) {
+        if (srAnnouncements) {
+            srAnnouncements.textContent = message;
+        }
+    }
+
+    // Progressive loader
+    function updateLoader(percent, message) {
+        progress = Math.min(percent, 100);
+        if (loaderProgressBar) loaderProgressBar.style.width = progress + '%';
+        if (loaderText && message) loaderText.textContent = message;
+    }
+
+    function hideLoader() {
+        if (loader) {
+            loader.classList.add('fade-out');
+            setTimeout(() => {
+                loader.remove();
+                announce('Experience loaded');
+            }, 800);
+        }
+    }
+
+    // Navigation
+    if (navToggle && navMenu) {
+        navToggle.addEventListener('click', () => {
+            navMenu.classList.add('open');
+            navMenu.hidden = false;
+            navToggle.setAttribute('aria-expanded', 'true');
+            announce('Navigation menu opened');
+        });
+    }
+
+    if (navClose && navMenu) {
+        navClose.addEventListener('click', () => {
+            navMenu.classList.remove('open');
+            navMenu.hidden = true;
+            if (navToggle) navToggle.setAttribute('aria-expanded', 'false');
+            announce('Navigation menu closed');
+        });
+    }
+
+    // Keyboard navigation
+    if (navMenu) {
+        navMenu.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                navClose.click();
             }
         });
+    }
+
+    // Quick View Modal
+    if (quickViewClose && quickViewModal) {
+        quickViewClose.addEventListener('click', () => {
+            quickViewModal.classList.remove('active');
+            quickViewModal.hidden = true;
+            announce('Product quick view closed');
+        });
+    }
+
+    if (quickViewModal) {
+        quickViewModal.addEventListener('click', (e) => {
+            if (e.target === quickViewModal) {
+                quickViewClose.click();
+            }
+        });
+
+        quickViewModal.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                quickViewClose.click();
+            }
+        });
+    }
+
+    // Load and initialize 3D scene
+    function initializeScene() {
+        if (!sceneContainer) return;
+
+        const sceneType = sceneContainer.dataset.scene;
+        updateLoader(10, 'Loading assets...');
+
+        <?php if ($immersive_mode === 'product' && $product_id) : ?>
+        // Single product viewer mode
+        <?php
+        $product = wc_get_product($product_id);
+        $model_url = get_post_meta($product_id, '_3d_model_url', true);
+        ?>
+        updateLoader(30, 'Loading product model...');
+
+        if (typeof LuxuryProductViewer !== 'undefined') {
+            experience = new LuxuryProductViewer(sceneContainer, {
+                modelUrl: <?php echo json_encode($model_url); ?>,
+                productName: <?php echo json_encode($product->get_name()); ?>,
+                autoRotate: true,
+                showEffects: true,
+                enableAR: true,
+                onProgress: (percent) => {
+                    updateLoader(30 + (percent * 0.6), 'Loading product model...');
+                },
+                onLoad: () => {
+                    updateLoader(100, 'Ready!');
+                    setTimeout(hideLoader, 500);
+                }
+            });
+        } else {
+            console.error('LuxuryProductViewer not loaded');
+            updateLoader(100, 'Error loading viewer');
+        }
+
+        <?php else : ?>
+        // Collection scene mode
+        updateLoader(20, 'Loading scene...');
+
+        const sceneClass = <?php echo json_encode($config['class']); ?>;
+        const collection = <?php echo json_encode($config['collection']); ?>;
+
+        if (typeof window[sceneClass] !== 'undefined') {
+            const SceneClass = window[sceneClass];
+            experience = new SceneClass(sceneContainer, {
+                <?php if ($scene_type === 'black-rose') : ?>
+                backgroundColor: 0x0d0d0d,
+                fogDensity: 0.03,
+                petalCount: 50,
+                enableBloom: true,
+                <?php elseif ($scene_type === 'love-hurts') : ?>
+                backgroundColor: 0x1a0a0a,
+                fogDensity: 0.02,
+                enableBloom: true,
+                <?php else : ?>
+                backgroundColor: 0xf5f5f0,
+                fogNear: 10,
+                fogFar: 200,
+                timeOfDay: 'golden-hour',
+                <?php endif; ?>
+                onProgress: (percent) => {
+                    updateLoader(20 + (percent * 0.4), 'Loading scene...');
+                }
+            });
+
+            updateLoader(60, 'Loading products...');
+
+            // Fetch products from WooCommerce
+            fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>?action=get_collection_products&collection=' + collection)
+                .then(response => response.json())
+                .then(data => {
+                    updateLoader(80, 'Initializing...');
+
+                    if (data.success && data.data) {
+                        experience.loadProducts(data.data);
+                        experience.start();
+
+                        // Product click handler
+                        if (experience.setOnProductClick) {
+                            experience.setOnProductClick(function(product) {
+                                window.location.href = product.url;
+                            });
+                        }
+
+                        // Product hover handler
+                        if (experience.setOnProductHover) {
+                            experience.setOnProductHover(function(product) {
+                                if (product) {
+                                    announce('Hovering over ' + product.name);
+                                }
+                            });
+                        }
+
+                        updateLoader(100, 'Ready!');
+                        setTimeout(hideLoader, 500);
+                    } else {
+                        console.error('Failed to load products');
+                        updateLoader(100, 'Error loading products');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    updateLoader(100, 'Error loading experience');
+                });
+        } else {
+            console.error('Scene class not loaded:', sceneClass);
+            updateLoader(100, 'Error: Scene not available');
+        }
+        <?php endif; ?>
+    }
+
+    // Preload critical assets
+    function preloadAssets() {
+        const assets = [
+            <?php echo json_encode(get_template_directory_uri() . '/assets/js/' . $config['script']); ?>,
+        ];
+
+        let loaded = 0;
+        assets.forEach(src => {
+            const script = document.createElement('script');
+            script.src = src;
+            script.onload = () => {
+                loaded++;
+                updateLoader((loaded / assets.length) * 10, 'Preloading...');
+                if (loaded === assets.length) {
+                    initializeScene();
+                }
+            };
+            script.onerror = () => {
+                console.error('Failed to load:', src);
+                initializeScene(); // Continue anyway
+            };
+            document.head.appendChild(script);
+        });
+    }
+
+    // Start loading
+    document.addEventListener('DOMContentLoaded', () => {
+        updateLoader(5, 'Initializing...');
+        setTimeout(preloadAssets, 100);
     });
 
-    // Parallax effect on scroll
-    let ticking = false;
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            window.requestAnimationFrame(() => {
-                const scrolled = window.pageYOffset;
-                const bg = document.querySelector('.immersive-bg');
-                if (bg) {
-                    bg.style.transform = `translateY(${scrolled * 0.5}px)`;
-                }
-                ticking = false;
-            });
-            ticking = true;
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        // ESC to close modal
+        if (e.key === 'Escape' && quickViewModal && !quickViewModal.hidden) {
+            quickViewClose.click();
+        }
+
+        // M to toggle menu
+        if (e.key === 'm' && navToggle) {
+            navToggle.click();
         }
     });
-});
+
+    // Cleanup on unload
+    window.addEventListener('beforeunload', () => {
+        if (experience && experience.dispose) {
+            experience.dispose();
+        }
+    });
+})();
 </script>
 
-<?php get_footer(); ?>
+<?php wp_footer(); ?>
+</body>
+</html>
