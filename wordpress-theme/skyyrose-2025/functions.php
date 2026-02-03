@@ -65,14 +65,23 @@ function skyyrose_setup() {
 add_action('after_setup_theme', 'skyyrose_setup');
 
 /**
+ * Get asset suffix (.min for production, empty for development)
+ */
+function skyyrose_asset_suffix() {
+    return (defined('WP_DEBUG') && WP_DEBUG) ? '' : '.min';
+}
+
+/**
  * Enqueue Scripts & Styles
  */
 function skyyrose_enqueue_assets() {
+    $suffix = skyyrose_asset_suffix();
+
     // Styles
     wp_enqueue_style('skyyrose-style', get_stylesheet_uri(), [], SKYYROSE_VERSION);
     wp_enqueue_style('skyyrose-fonts', 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;700&display=swap', [], null);
-    wp_enqueue_style('skyyrose-animations', SKYYROSE_THEME_URL . '/assets/css/animations.css', [], SKYYROSE_VERSION);
-    wp_enqueue_style('skyyrose-templates', SKYYROSE_THEME_URL . '/assets/css/templates-luxury.css', [], SKYYROSE_VERSION);
+    wp_enqueue_style('skyyrose-animations', SKYYROSE_THEME_URL . "/assets/css/animations{$suffix}.css", [], SKYYROSE_VERSION);
+    wp_enqueue_style('skyyrose-templates', SKYYROSE_THEME_URL . "/assets/css/templates-luxury{$suffix}.css", [], SKYYROSE_VERSION);
 
     // Scripts
     wp_enqueue_script('gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js', [], '3.12.5', true);
@@ -82,9 +91,7 @@ function skyyrose_enqueue_assets() {
     wp_enqueue_script('three-orbit', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/OrbitControls.js', ['three'], '0.160.0', true);
 
     // Theme scripts
-    wp_enqueue_script('skyyrose-animations', SKYYROSE_THEME_URL . '/assets/js/animations.js', ['gsap', 'gsap-scrolltrigger'], SKYYROSE_VERSION, true);
-    wp_enqueue_script('skyyrose-3d-viewer', SKYYROSE_THEME_URL . '/assets/js/3d-viewer.js', ['three'], SKYYROSE_VERSION, true);
-    wp_enqueue_script('skyyrose-main', SKYYROSE_THEME_URL . '/assets/js/main.js', ['jquery'], SKYYROSE_VERSION, true);
+    wp_enqueue_script('skyyrose-animations', SKYYROSE_THEME_URL . "/assets/js/animations{$suffix}.js", ['gsap', 'gsap-scrolltrigger'], SKYYROSE_VERSION, true);
 
     // Collection-specific immersive scenes (only on collection pages)
     if (is_page_template('template-collection.php')) {
@@ -94,9 +101,9 @@ function skyyrose_enqueue_assets() {
         wp_enqueue_script('three-bloom', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/postprocessing/UnrealBloomPass.js', ['three-effectcomposer'], '0.160.0', true);
 
         // Collection scene scripts
-        wp_enqueue_script('black-rose-scene', SKYYROSE_THEME_URL . '/assets/js/black-rose-scene.js', ['three', 'three-orbit', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
-        wp_enqueue_script('love-hurts-scene', SKYYROSE_THEME_URL . '/assets/js/love-hurts-scene.js', ['three', 'three-orbit'], SKYYROSE_VERSION, true);
-        wp_enqueue_script('signature-scene', SKYYROSE_THEME_URL . '/assets/js/signature-scene.js', ['three', 'three-orbit'], SKYYROSE_VERSION, true);
+        wp_enqueue_script('black-rose-scene', SKYYROSE_THEME_URL . "/assets/js/black-rose-scene{$suffix}.js", ['three', 'three-orbit', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
+        wp_enqueue_script('love-hurts-scene', SKYYROSE_THEME_URL . "/assets/js/love-hurts-scene{$suffix}.js", ['three', 'three-orbit'], SKYYROSE_VERSION, true);
+        wp_enqueue_script('signature-scene', SKYYROSE_THEME_URL . "/assets/js/signature-scene{$suffix}.js", ['three', 'three-orbit'], SKYYROSE_VERSION, true);
 
         // TWEEN.js for camera animations
         wp_enqueue_script('tween', 'https://cdn.jsdelivr.net/npm/@tweenjs/tween.js@18.6.4/dist/tween.umd.js', [], '18.6.4', true);
@@ -113,7 +120,7 @@ function skyyrose_enqueue_assets() {
         wp_enqueue_script('three-draco', 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/loaders/DRACOLoader.js', ['three'], '0.160.0', true);
 
         // Luxury Product Viewer
-        wp_enqueue_script('luxury-product-viewer', SKYYROSE_THEME_URL . '/assets/js/luxury-product-viewer.js', ['three', 'three-orbit', 'three-gltf', 'three-draco', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
+        wp_enqueue_script('luxury-product-viewer', SKYYROSE_THEME_URL . "/assets/js/luxury-product-viewer{$suffix}.js", ['three', 'three-orbit', 'three-gltf', 'three-draco', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
     }
 
     // Vault Enhanced (only on Vault page)

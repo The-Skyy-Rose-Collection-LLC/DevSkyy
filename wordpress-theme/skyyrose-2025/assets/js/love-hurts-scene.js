@@ -81,7 +81,6 @@
       this.createUI();
       this.setupEventListeners();
 
-      console.log('LOVE HURTS castle experience initialized');
     }
 
     createScene() {
@@ -737,7 +736,6 @@
         this.roomTransitioning = false;
       }, 500);
 
-      console.log('Teleported to:', roomName);
     }
 
     toggleCandelabra(candelabra) {
@@ -752,7 +750,6 @@
         candelabra.userData.lit = true;
       }
 
-      console.log('Candelabra', isLit ? 'extinguished' : 'lit');
     }
 
     triggerRosePetalAnimation() {
@@ -771,7 +768,6 @@
         }, i * 500);
       }
 
-      console.log('Enchanted rose activated - petals falling');
     }
 
     createFallingPetal() {
@@ -839,7 +835,6 @@
         this.createProductPedestal(product);
       });
       
-      console.log(`Loaded ${products.length} products`);
     }
 
     createProductPedestal(product) {
@@ -931,7 +926,6 @@
       };
       
       animate();
-      console.log('LOVE HURTS animation started');
     }
 
     stop() {
@@ -964,7 +958,6 @@
       if (this.navigationArrows) this.navigationArrows.remove();
       if (this.audioToggle) this.audioToggle.remove();
 
-      console.log('LOVE HURTS castle experience disposed');
     }
   }
 

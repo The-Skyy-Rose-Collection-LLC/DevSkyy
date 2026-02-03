@@ -94,7 +94,6 @@
       this.createUI();
       this.setupEventListeners();
 
-      console.log('SIGNATURE landmarks tour initialized');
     }
 
     createScene() {
@@ -239,7 +238,6 @@
         this.scene.add(landmark);
       });
 
-      console.log(`Created ${this.landmarks.size} landmarks`);
     }
 
     createLandmark(data) {
@@ -612,7 +610,6 @@
         })
         .start();
 
-      console.log('Teleporting to:', landmarkName);
     }
 
     showLandmarkInfo(landmarkName) {
@@ -665,7 +662,6 @@
       this.sunLight.intensity = settings.sunIntensity;
       this.ambientLight.intensity = settings.ambientIntensity;
 
-      console.log('Time of day:', time);
     }
 
     toggleTourMode() {
@@ -674,7 +670,6 @@
       
       if (isGuidedTour) {
         // Start guided tour (auto-play through landmarks)
-        console.log('Starting guided tour...');
       }
     }
 
@@ -697,7 +692,6 @@
         this.createProductBillboard(product);
       });
       
-      console.log(`Loaded ${products.length} products`);
     }
 
     createProductBillboard(product) {
@@ -760,7 +754,6 @@
       };
       
       animate();
-      console.log('SIGNATURE landmarks tour started');
     }
 
     stop() {
@@ -795,7 +788,6 @@
       if (this.tourModeToggle) this.tourModeToggle.remove();
       if (this.landmarkInfo) this.landmarkInfo.remove();
 
-      console.log('SIGNATURE landmarks tour disposed');
     }
   }
 
