@@ -322,7 +322,7 @@ class Immersive_Scene_Widget extends \Elementor\Widget_Base {
 
         ?>
         <div class="skyyrose-immersive-scene"
-             data-scene-config='<?php echo wp_json_encode($scene_config); ?>'>
+             data-scene-config='<?php echo esc_attr(wp_json_encode($scene_config)); ?>'>
             <canvas class="scene-canvas"></canvas>
             <div class="scene-loading">
                 <div class="loading-spinner"></div>
