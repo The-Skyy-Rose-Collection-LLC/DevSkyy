@@ -20,6 +20,8 @@ define('SKYYROSE_THEME_URL', get_template_directory_uri());
 require_once SKYYROSE_THEME_DIR . '/inc/theme-customizer.php';
 require_once SKYYROSE_THEME_DIR . '/inc/woocommerce-config.php';
 require_once SKYYROSE_THEME_DIR . '/inc/performance.php';
+require_once SKYYROSE_THEME_DIR . '/inc/ai-image-enhancement.php';
+require_once SKYYROSE_THEME_DIR . '/inc/pre-order-functions.php';
 
 // Load Elementor widgets if Elementor is active
 if (did_action('elementor/loaded')) {
@@ -106,6 +108,15 @@ function skyyrose_enqueue_assets() {
 
         // Luxury Product Viewer
         wp_enqueue_script('luxury-product-viewer', SKYYROSE_THEME_URL . '/assets/js/luxury-product-viewer.js', ['three', 'three-orbit', 'three-gltf', 'three-draco', 'three-effectcomposer', 'three-renderpass', 'three-bloom'], SKYYROSE_VERSION, true);
+    }
+
+    // Vault Enhanced (only on Vault page)
+    if (is_page_template('template-vault.php')) {
+        // Enqueue Vault CSS (inline in template, but could be separate)
+        // wp_enqueue_style('vault-enhanced', SKYYROSE_THEME_URL . '/assets/css/vault-enhanced.css', [], SKYYROSE_VERSION);
+
+        // Vault JavaScript (NOT enqueued - loaded inline in template with vaultData)
+        // This is intentional to allow vaultData to be defined before the script runs
     }
 
     // Localize script
