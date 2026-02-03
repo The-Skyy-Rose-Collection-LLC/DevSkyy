@@ -77,6 +77,7 @@ from api.v1 import (
     training_router,
     wordpress_theme_router,
 )
+from api.v1.ai_enhancement import router as ai_enhancement_router
 from api.v1.wordpress_integration import router as wordpress_router
 
 # API modules
@@ -994,6 +995,9 @@ app.include_router(elementor_3d_router, prefix="/api/v1")
 
 # Code scanning and fixing
 app.include_router(code_router, prefix="/api/v1")
+
+# AI Image Enhancement
+app.include_router(ai_enhancement_router, prefix="/api/v1")
 
 # HuggingFace Spaces management
 app.include_router(hf_spaces_router, prefix="/api/v1")

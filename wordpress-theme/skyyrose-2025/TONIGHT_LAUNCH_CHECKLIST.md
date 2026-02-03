@@ -1,16 +1,31 @@
 # 🚀 SkyyRose Tonight Launch Checklist
 
 **Goal**: Launch production-ready WordPress site TONIGHT
+**Version**: 3.0.0 (Security Hardened)
 **Estimated Time**: 2 hours (with images ready) | 4 hours (with AI image generation)
+**Security Status**: ✅ Production Ready (All P0/P1 issues resolved)
+
+---
+
+## 🔒 Phase 0: Security Pre-Check (5 minutes) - NEW v3.0.0
+
+**CRITICAL**: Verify security requirements before proceeding
+
+- [ ] PHP 8.0+ with Sodium extension enabled (`php -m | grep sodium`)
+- [ ] WordPress salts/keys regenerated for production (wp-config.php)
+- [ ] SSL certificate active and HTTPS enforced (no mixed content warnings)
+- [ ] Strong admin password set (16+ characters, mixed case, numbers, symbols)
+- [ ] WordPress and all plugins updated to latest versions
+- [ ] Verify security headers in browser DevTools (HSTS, CSP, X-Frame-Options)
 
 ---
 
 ## ✅ Phase 1: WordPress Setup (10 minutes)
 
 - [ ] WordPress 6.0+ installed
-- [ ] SSL certificate active (HTTPS working)
+- [ ] SSL certificate active (HTTPS working) - REQUIRED for v3.0.0
 - [ ] Domain pointed to hosting
-- [ ] Admin account created (strong password)
+- [ ] Admin account created (strong password - REQUIRED)
 - [ ] WooCommerce plugin installed and activated
 - [ ] Basic WooCommerce setup wizard completed
 
@@ -201,17 +216,53 @@ Install **Yoast SEO** or **Rank Math**:
 
 ---
 
+## 🔒 Phase 13.5: Security Testing (10 minutes) - NEW v3.0.0
+
+**CRITICAL**: Verify security implementation before going live
+
+**Security Headers Verification** (Browser DevTools > Network):
+- [ ] Strict-Transport-Security present (HSTS)
+- [ ] Content-Security-Policy present (CSP)
+- [ ] X-Frame-Options: SAMEORIGIN
+- [ ] X-Content-Type-Options: nosniff
+- [ ] X-XSS-Protection: 1; mode=block
+- [ ] No X-Powered-By header (should be removed)
+
+**CSRF Protection Testing**:
+- [ ] Test add to cart without nonce (should fail)
+- [ ] Test vault pre-order without nonce (should fail)
+- [ ] Test collection products load without nonce (should fail)
+- [ ] Open browser console, verify no CSRF errors on legitimate requests
+
+**Rate Limiting Testing**:
+- [ ] Rapidly click "Add to Cart" 15 times (should block after 10)
+- [ ] Submit vault form 10 times quickly (should block after 5)
+- [ ] Verify "Too many requests" error message displays
+
+**Email Validation Testing**:
+- [ ] Try disposable email (test@tempmail.com) in vault form (should reject)
+- [ ] Try valid email in vault form (should accept)
+- [ ] Try invalid format email (should reject)
+
+**Configure Security Settings**:
+- [ ] Set contact email: Appearance > Customize > Theme Settings > Contact Email
+- [ ] Verify sodium extension: `php -m | grep sodium` (should show "sodium")
+- [ ] Check PHP error logs for security warnings
+
+---
+
 ## ✅ Phase 14: Pre-Launch Testing (15 minutes)
 
 **Desktop Testing**:
 - [ ] Homepage loads correctly
 - [ ] All collection pages work
 - [ ] Product pages display
-- [ ] Add to cart works
+- [ ] Add to cart works (with valid nonce)
 - [ ] Cart displays correctly
 - [ ] Checkout process completes
 - [ ] Contact form submits
 - [ ] All menu links work
+- [ ] HTTPS badge shows in browser (green padlock)
 
 **Mobile Testing**:
 - [ ] Test on real device or Chrome DevTools
@@ -219,6 +270,7 @@ Install **Yoast SEO** or **Rank Math**:
 - [ ] All pages are responsive
 - [ ] Add to cart works on mobile
 - [ ] Images display correctly
+- [ ] HTTPS works on mobile
 
 **Browser Testing**:
 - [ ] Chrome

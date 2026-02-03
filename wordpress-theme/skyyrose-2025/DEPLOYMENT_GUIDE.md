@@ -8,12 +8,22 @@ This guide will take you from zero to live website in under 2 hours.
 
 ## ✅ Pre-Deployment Checklist
 
+### System Requirements
 - [ ] WordPress 6.0+ installed
 - [ ] WooCommerce 8.0+ installed and activated
-- [ ] PHP 8.0+ running
+- [ ] PHP 8.0+ running with Sodium extension enabled
 - [ ] MySQL 5.7+ or MariaDB 10.3+
-- [ ] SSL certificate configured (HTTPS)
+- [ ] SSL certificate configured (HTTPS) - REQUIRED
 - [ ] Domain pointed to hosting
+
+### Security Requirements (v3.0.0)
+- [ ] HTTPS enabled and enforced
+- [ ] PHP Sodium extension available (for encryption)
+- [ ] WordPress salts/keys regenerated for production
+- [ ] Contact email configured in theme settings
+- [ ] Rate limiting tested on AJAX endpoints
+- [ ] CSRF tokens verified on all forms
+- [ ] Security headers verified (see SECURITY_HARDENING_COMPLETE.md)
 
 ---
 
