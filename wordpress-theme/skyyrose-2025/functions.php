@@ -20,6 +20,7 @@ define('SKYYROSE_THEME_URL', get_template_directory_uri());
 require_once SKYYROSE_THEME_DIR . '/inc/theme-customizer.php';
 require_once SKYYROSE_THEME_DIR . '/inc/woocommerce-config.php';
 require_once SKYYROSE_THEME_DIR . '/inc/performance.php';
+require_once SKYYROSE_THEME_DIR . '/inc/performance-optimizations.php';
 require_once SKYYROSE_THEME_DIR . '/inc/ai-image-enhancement.php';
 require_once SKYYROSE_THEME_DIR . '/inc/pre-order-functions.php';
 
