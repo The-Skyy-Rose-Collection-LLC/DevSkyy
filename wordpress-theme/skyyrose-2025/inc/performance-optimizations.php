@@ -313,8 +313,19 @@ class SkyyRose_Performance_Optimizer {
         header('X-Frame-Options: SAMEORIGIN');
         header('X-XSS-Protection: 1; mode=block');
 
-        // Enable Content Security Policy
-        header("Content-Security-Policy: default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; img-src 'self' data: https:; font-src 'self' data: https://fonts.gstatic.com;");
+        // Enable Content Security Policy with nonce-based protection
+        $csp_nonce = wp_create_nonce('csp-' . get_current_blog_id());
+
+        header(sprintf(
+            "Content-Security-Policy: default-src 'self'; " .
+            "script-src 'self' 'nonce-%s' https://cdn.jsdelivr.net https://fonts.googleapis.com; " .
+            "style-src 'self' 'nonce-%s' https://fonts.googleapis.com; " .
+            "img-src 'self' data: https:; " .
+            "font-src 'self' https://fonts.gstatic.com; " .
+            "connect-src 'self' https://api.skyyrose.co;",
+            esc_attr($csp_nonce),
+            esc_attr($csp_nonce)
+        ));
     }
 
     /**
