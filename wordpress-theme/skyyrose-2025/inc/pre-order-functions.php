@@ -404,6 +404,8 @@ add_action('wp_ajax_nopriv_skyyrose_get_viewer_count', 'skyyrose_ajax_get_viewer
  * AJAX: Register viewer
  */
 function skyyrose_ajax_register_viewer() {
+    check_ajax_referer('skyyrose_vault', 'nonce');
+
     $session_id = sanitize_text_field($_POST['session_id'] ?? '');
 
     if (empty($session_id)) {

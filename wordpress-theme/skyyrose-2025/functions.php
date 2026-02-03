@@ -325,7 +325,7 @@ function skyyrose_handle_contact_form() {
     }
 
     // Send email
-    $to = 'hello@skyyrose.co';
+    $to = get_option('skyyrose_contact_email', get_option('admin_email'));
     $email_subject = "SkyyRose Contact Form: $subject";
     $email_message = "Name: $name\n";
     $email_message .= "Email: $email\n";
