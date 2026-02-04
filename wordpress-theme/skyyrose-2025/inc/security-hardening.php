@@ -124,7 +124,7 @@ class SkyyRose_Security_Hardening {
             'collection' => wp_create_nonce('skyyrose_collection_nonce'),
         ];
 
-        wp_localize_script('skyyrose-main', 'skyyrose_security', [
+        wp_localize_script('skyyrose-animations', 'skyyrose_security', [
             'nonces' => $nonces,
             'ajax_url' => admin_url('admin-ajax.php'),
             'site_url' => home_url(),
@@ -133,26 +133,15 @@ class SkyyRose_Security_Hardening {
 
     /**
      * Secure session management
+     *
+     * DISABLED for WordPress.com compatibility
+     * WordPress.com manages sessions at platform level
      */
     public function secure_sessions() {
-        // Don't start sessions in admin or AJAX requests
-        if (is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
-            return;
-        }
-
-        // Configure secure session settings
-        if (!session_id()) {
-            ini_set('session.cookie_httponly', '1');
-            ini_set('session.cookie_secure', is_ssl() ? '1' : '0');
-            ini_set('session.cookie_samesite', 'Strict');
-            ini_set('session.use_only_cookies', '1');
-            ini_set('session.use_strict_mode', '1');
-
-            // Generate cryptographically secure session ID
-            if (function_exists('random_bytes')) {
-                session_id(bin2hex(random_bytes(32)));
-            }
-        }
+        // Session management causes fatal errors on WordPress.com
+        // WordPress.com handles sessions at the platform level
+        // Disabling to prevent "headers already sent" errors
+        return;
     }
 
     /**
