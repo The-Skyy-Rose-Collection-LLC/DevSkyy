@@ -116,6 +116,12 @@ class SkyyRose_Security_Hardening {
      * Localize security nonces for JavaScript
      */
     public function localize_security_nonces() {
+        // Only localize if script is enqueued (defensive error handling)
+        if (!wp_script_is('skyyrose-animations', 'enqueued') &&
+            !wp_script_is('skyyrose-animations', 'registered')) {
+            return;
+        }
+
         // Generate nonces for AJAX endpoints
         $nonces = [
             'ajax' => wp_create_nonce('skyyrose_nonce'),
