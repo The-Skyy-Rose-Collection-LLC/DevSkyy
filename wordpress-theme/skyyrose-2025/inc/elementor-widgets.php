@@ -34,21 +34,59 @@ add_action('elementor/elements/categories_registered', 'skyyrose_add_elementor_w
  * Register custom widgets
  */
 function skyyrose_register_custom_elementor_widgets($widgets_manager) {
+    $template_dir = get_template_directory();
+
     // Immersive Scene Widget
-    require_once(get_template_directory() . '/elementor-widgets/immersive-scene.php');
-    $widgets_manager->register(new \SkyyRose\Elementor\Immersive_Scene_Widget());
+    $immersive_scene_file = $template_dir . '/elementor-widgets/immersive-scene.php';
+    if (file_exists($immersive_scene_file)) {
+        require_once($immersive_scene_file);
+        if (class_exists('\\SkyyRose\\Elementor\\Immersive_Scene_Widget')) {
+            $widgets_manager->register(new \SkyyRose\Elementor\Immersive_Scene_Widget());
+        } else {
+            error_log('SkyyRose Theme: Immersive_Scene_Widget class not found after loading file');
+        }
+    } else {
+        error_log('SkyyRose Theme: Missing widget file: /elementor-widgets/immersive-scene.php');
+    }
 
     // Product Hotspot Widget
-    require_once(get_template_directory() . '/elementor-widgets/product-hotspot.php');
-    $widgets_manager->register(new \SkyyRose\Elementor\Product_Hotspot_Widget());
+    $hotspot_file = $template_dir . '/elementor-widgets/product-hotspot.php';
+    if (file_exists($hotspot_file)) {
+        require_once($hotspot_file);
+        if (class_exists('\\SkyyRose\\Elementor\\Product_Hotspot_Widget')) {
+            $widgets_manager->register(new \SkyyRose\Elementor\Product_Hotspot_Widget());
+        } else {
+            error_log('SkyyRose Theme: Product_Hotspot_Widget class not found after loading file');
+        }
+    } else {
+        error_log('SkyyRose Theme: Missing widget file: /elementor-widgets/product-hotspot.php');
+    }
 
     // Collection Card Widget
-    require_once(get_template_directory() . '/elementor-widgets/collection-card.php');
-    $widgets_manager->register(new \SkyyRose\Elementor\Collection_Card_Widget());
+    $collection_card_file = $template_dir . '/elementor-widgets/collection-card.php';
+    if (file_exists($collection_card_file)) {
+        require_once($collection_card_file);
+        if (class_exists('\\SkyyRose\\Elementor\\Collection_Card_Widget')) {
+            $widgets_manager->register(new \SkyyRose\Elementor\Collection_Card_Widget());
+        } else {
+            error_log('SkyyRose Theme: Collection_Card_Widget class not found after loading file');
+        }
+    } else {
+        error_log('SkyyRose Theme: Missing widget file: /elementor-widgets/collection-card.php');
+    }
 
     // Pre-Order Form Widget
-    require_once(get_template_directory() . '/elementor-widgets/pre-order-form.php');
-    $widgets_manager->register(new \SkyyRose\Elementor\PreOrder_Form_Widget());
+    $preorder_form_file = $template_dir . '/elementor-widgets/pre-order-form.php';
+    if (file_exists($preorder_form_file)) {
+        require_once($preorder_form_file);
+        if (class_exists('\\SkyyRose\\Elementor\\PreOrder_Form_Widget')) {
+            $widgets_manager->register(new \SkyyRose\Elementor\PreOrder_Form_Widget());
+        } else {
+            error_log('SkyyRose Theme: PreOrder_Form_Widget class not found after loading file');
+        }
+    } else {
+        error_log('SkyyRose Theme: Missing widget file: /elementor-widgets/pre-order-form.php');
+    }
 }
 add_action('elementor/widgets/register', 'skyyrose_register_custom_elementor_widgets');
 
