@@ -31,6 +31,21 @@
 | RAG optimization | `/mnt/skills/user/rag-query-rewriter/SKILL.md` |
 | Production checks | `/mnt/skills/user/production-readiness-checker/SKILL.md` |
 
+## WordPress Theme Documentation (REQUIRED READING)
+**IMPORTANT**: All agents MUST read these files before working on WordPress site:
+
+| File | Purpose | When to Read |
+|------|---------|--------------|
+| `PAGES-DOCUMENTATION.md` | Complete page reference (static, interactive, catalog) | Before modifying ANY page templates |
+| `THEME-AUDIT.md` | Security audit, file verification, hardening patterns | Before deployment or security changes |
+| `SECURITY_HARDENING_COMPLETE.md` | OWASP compliance, defensive patterns | Before adding new features |
+| `CONTEXT7_VERIFICATION.md` | WordPress best practices verification | Before writing WordPress code |
+
+**Key Distinction (CRITICAL)**:
+- **Immersive Pages** (`template-collection.php`): 3D storytelling, NOT shopping
+- **Catalog Pages** (`page-collection-*.php`): Product grids, FOR shopping
+- ALWAYS check documentation before assuming page purpose
+
 ## Codebase
 ```
 main_enterprise.py        # FastAPI (47+ endpoints)
@@ -84,9 +99,13 @@ SkyyRose: `#B76E79` primary | "Where Love Meets Luxury" | Use `BrandKit.from_con
 - **3D CDNs**: VERIFY URLs exist | **Correlation IDs**: ALWAYS propagate
 - **WordPress Theme**: Use Serena for all WordPress file operations
 - **Context7**: ALWAYS query WordPress/Elementor/WooCommerce docs BEFORE coding
-- **Collection Pages**: BLACK ROSE (gothic), LOVE HURTS (castle), SIGNATURE (Oakland/SF)
+- **Collection Pages**:
+  - IMMERSIVE (3D): BLACK ROSE (gothic cathedral), LOVE HURTS (romantic castle), SIGNATURE (Oakland/SF tour)
+  - CATALOG (products): page-collection-black-rose.php, page-collection-love-hurts.php, page-collection-signature.php
 - **Immersive**: React Three Fiber + Framer Motion + luxury animations (#B76E79 rose gold)
 - **Ralph Loop**: Use for complex multi-step immersive page builds
+- **WordPress Docs**: ALWAYS read `wordpress-theme/skyyrose-2025/PAGES-DOCUMENTATION.md` before modifying pages
+- **Security**: ALWAYS read `wordpress-theme/skyyrose-2025/THEME-AUDIT.md` before deployment changes
 
 ## Health
 `/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
