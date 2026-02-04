@@ -10,6 +10,21 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
+// Enable debug logging for WordPress.com
+if (!defined('WP_DEBUG')) {
+    define('WP_DEBUG', true);
+    define('WP_DEBUG_DISPLAY', false);
+    define('WP_DEBUG_LOG', true);
+}
+
+// Custom error handler to log fatal errors
+register_shutdown_function(function() {
+    $error = error_get_last();
+    if ($error && in_array($error['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+        error_log('SKYYROSE FATAL ERROR: ' . print_r($error, true));
+    }
+});
+
 define('SKYYROSE_VERSION', '2.0.0');
 define('SKYYROSE_THEME_DIR', get_template_directory());
 define('SKYYROSE_THEME_URL', get_template_directory_uri());
@@ -176,8 +191,9 @@ add_shortcode('skyyrose_3d', 'skyyrose_3d_viewer_shortcode');
  */
 function skyyrose_register_elementor_widgets() {
     if (did_action('elementor/loaded')) {
-        require_once SKYYROSE_THEME_DIR . '/inc/elementor/3d-viewer-widget.php';
-        \Elementor\Plugin::instance()->widgets_manager->register(new \SkyyRose\Elementor\ThreeDViewer());
+        // Elementor widgets are in elementor-widgets directory, not inc/elementor
+        // Note: Individual widget files don't exist, they're loaded via inc/elementor-widgets.php
+        // which is already loaded at the top of this file
     }
 }
 add_action('elementor/widgets/register', 'skyyrose_register_elementor_widgets');
