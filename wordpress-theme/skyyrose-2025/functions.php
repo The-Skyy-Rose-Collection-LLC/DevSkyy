@@ -30,21 +30,36 @@ define('SKYYROSE_THEME_DIR', get_template_directory());
 define('SKYYROSE_THEME_URL', get_template_directory_uri());
 
 /**
- * Load Core Functionality
+ * Load Core Functionality with Error Handling
  */
-// Security must be loaded FIRST
-require_once SKYYROSE_THEME_DIR . '/inc/security-hardening.php';
+// Helper function to safely require files
+function skyyrose_safe_require($file, $required = true) {
+    $path = SKYYROSE_THEME_DIR . $file;
+    if (file_exists($path)) {
+        require_once $path;
+        return true;
+    } else {
+        $message = "SkyyRose Theme: Missing required file: {$file}";
+        error_log($message);
+        if ($required) {
+            wp_die($message, 'Theme Error');
+        }
+        return false;
+    }
+}
 
-require_once SKYYROSE_THEME_DIR . '/inc/theme-customizer.php';
-require_once SKYYROSE_THEME_DIR . '/inc/woocommerce-config.php';
-require_once SKYYROSE_THEME_DIR . '/inc/performance.php';
-require_once SKYYROSE_THEME_DIR . '/inc/performance-optimizations.php';
-require_once SKYYROSE_THEME_DIR . '/inc/ai-image-enhancement.php';
-require_once SKYYROSE_THEME_DIR . '/inc/pre-order-functions.php';
+// Security must be loaded FIRST
+skyyrose_safe_require('/inc/security-hardening.php');
+skyyrose_safe_require('/inc/theme-customizer.php');
+skyyrose_safe_require('/inc/woocommerce-config.php');
+skyyrose_safe_require('/inc/performance.php');
+skyyrose_safe_require('/inc/performance-optimizations.php');
+skyyrose_safe_require('/inc/ai-image-enhancement.php');
+skyyrose_safe_require('/inc/pre-order-functions.php');
 
 // Load Elementor widgets if Elementor is active
 if (did_action('elementor/loaded')) {
-    require_once SKYYROSE_THEME_DIR . '/inc/elementor-widgets.php';
+    skyyrose_safe_require('/inc/elementor-widgets.php', false);
 }
 
 /**
@@ -147,13 +162,15 @@ function skyyrose_enqueue_assets() {
         // This is intentional to allow vaultData to be defined before the script runs
     }
 
-    // Localize script
-    wp_localize_script('skyyrose-animations', 'skyyrose', [
-        'ajaxUrl' => admin_url('admin-ajax.php'),
-        'nonce' => wp_create_nonce('skyyrose_nonce'),
-        'apiUrl' => get_rest_url(),
-        'themeUrl' => SKYYROSE_THEME_URL,
-    ]);
+    // Localize script (only if script was enqueued)
+    if (wp_script_is('skyyrose-animations', 'enqueued') || wp_script_is('skyyrose-animations', 'registered')) {
+        wp_localize_script('skyyrose-animations', 'skyyrose', [
+            'ajaxUrl' => admin_url('admin-ajax.php'),
+            'nonce' => wp_create_nonce('skyyrose_nonce'),
+            'apiUrl' => get_rest_url(),
+            'themeUrl' => SKYYROSE_THEME_URL,
+        ]);
+    }
 }
 add_action('wp_enqueue_scripts', 'skyyrose_enqueue_assets');
 
