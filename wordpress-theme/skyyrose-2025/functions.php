@@ -133,7 +133,7 @@ function skyyrose_enqueue_assets() {
     }
 
     // Localize script
-    wp_localize_script('skyyrose-main', 'skyyrose', [
+    wp_localize_script('skyyrose-animations', 'skyyrose', [
         'ajaxUrl' => admin_url('admin-ajax.php'),
         'nonce' => wp_create_nonce('skyyrose_nonce'),
         'apiUrl' => get_rest_url(),
