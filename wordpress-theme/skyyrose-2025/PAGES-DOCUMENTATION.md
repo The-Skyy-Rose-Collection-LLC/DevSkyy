@@ -71,29 +71,44 @@
 
 ## Interactive Pages
 
-### 1. Collection Browser (`template-collection.php`)
+### 1. Immersive Collection Experience (`template-collection.php`)
 **Template:** Collection Template
-**Purpose:** Immersive collection showcase with 3D elements
+**Purpose:** Interactive 3D storytelling experience for each collection (NOT a product catalog)
+**Type:** IMMERSIVE EXPERIENCE (exploration, not shopping)
+
 **Features:**
-- **Collection-Specific Scenes:**
-  - BLACK ROSE: Gothic cathedral with rose petals, dark ambient
-  - LOVE HURTS: Romantic castle with heart particles, warm glow
-  - SIGNATURE: Oakland/San Francisco cityscape, golden hour
+- **Collection-Specific 3D Scenes:**
+  - BLACK ROSE: Gothic cathedral with falling rose petals, dark ambient lighting
+  - LOVE HURTS: Romantic castle with heart particles, warm glow, multiple rooms
+  - SIGNATURE: Oakland/San Francisco cityscape tour, golden hour lighting
 
 - **Interactive Elements:**
   - Three.js 3D environments
   - GSAP scroll-triggered animations
   - Particle effects (rose petals, hearts, light rays)
-  - Camera movement on scroll
-  - Product hotspots in 3D space
+  - Camera movement on scroll/navigation
+  - Product hotspots in 3D space (clickable to product pages)
+  - Spatial audio (optional)
+  - Navigation controls (WASD, mouse)
 
 - **Technical Stack:**
   - React Three Fiber
+  - Babylon.js (physics)
   - Framer Motion
   - GSAP ScrollTrigger
   - Custom luxury transitions
 
-**Usage:** Create page → Select "Collection" template → Set collection slug in page meta
+**Usage:**
+1. Create page → Select "Collection" template
+2. Set `_collection_type` meta: `black-rose`, `love-hurts`, or `signature`
+3. Users explore the scene, click hotspots to view products
+
+**Key Difference from Catalog Pages:**
+- ❌ NOT a product grid
+- ❌ NOT for browsing all products
+- ✅ Immersive brand storytelling
+- ✅ Product discovery through exploration
+- ✅ Emotional connection to collection theme
 
 **Brand Colors:**
 - Black Rose: `#8B0000` (dark red)
@@ -102,7 +117,73 @@
 
 ---
 
-### 2. Immersive Experience (`template-immersive.php`)
+### 2. Collection Product Catalogs (NEW - 3 Dedicated Pages)
+**Templates:**
+- `page-collection-black-rose.php`
+- `page-collection-love-hurts.php`
+- `page-collection-signature.php`
+
+**Purpose:** Full product catalog display for each collection (SHOPPING EXPERIENCE)
+**Type:** PRODUCT CATALOG (browse, filter, add to cart)
+
+**Features:**
+- **Full Product Grid:** All products in collection displayed at once
+- **Category Filtering:** Filter by product type (dresses, coats, etc.)
+- **Product Count:** Live count of visible products
+- **Quick Add to Cart:** Direct add-to-cart from grid
+- **Product Cards:**
+  - Product image (or emoji placeholder)
+  - Product title
+  - Price (WooCommerce formatted)
+  - Badge (New, Pre-Order, Limited, etc.)
+  - Add to Cart button
+
+- **Filtering System:**
+  - Client-side JavaScript filtering (instant)
+  - Category buttons (All, Dresses, Coats, Blazers, etc.)
+  - Product count updates dynamically
+  - Hover effects with collection colors
+
+**Usage:**
+1. Create 3 pages:
+   - "Black Rose Collection" → Template: Collection - Black Rose
+   - "Love Hurts Collection" → Template: Collection - Love Hurts
+   - "Signature Collection" → Template: Collection - Signature
+2. Products must have `_skyyrose_collection` meta field set
+3. Add to menu: Shop → [Collection Name]
+
+**Key Difference from Immersive Pages:**
+- ✅ Product grid layout (not 3D scene)
+- ✅ Filter by category
+- ✅ Add to cart directly
+- ✅ SEO-optimized URLs (`/collection-black-rose`, `/collection-love-hurts`, `/collection-signature`)
+- ❌ No 3D navigation
+- ❌ No immersive storytelling
+
+**Page URLs:**
+- Black Rose Catalog: `/collection-black-rose/`
+- Love Hurts Catalog: `/collection-love-hurts/`
+- Signature Catalog: `/collection-signature/`
+
+**WooCommerce Integration:**
+```php
+// Query products by collection meta
+$args = [
+    'post_type' => 'product',
+    'posts_per_page' => -1,
+    'meta_query' => [
+        [
+            'key' => '_skyyrose_collection',
+            'value' => 'black-rose', // or 'love-hurts', 'signature'
+            'compare' => '='
+        ]
+    ]
+];
+```
+
+---
+
+### 3. Immersive Experience (`template-immersive.php`)
 **Template:** Immersive Template
 **Purpose:** Full-screen immersive brand experiences
 **Features:**
@@ -129,7 +210,7 @@
 
 ---
 
-### 3. Vault (VIP Access) (`template-vault.php`)
+### 4. Vault (VIP Access) (`template-vault.php`)
 **Template:** Vault Template
 **Purpose:** Exclusive content for VIP customers
 **Features:**
@@ -359,12 +440,15 @@ skyyrose-2025/
 ├── footer.php                 # Site footer
 ├── footer-backup.php          # Backup footer (unused, can delete)
 │
-├── template-home.php          # Home page template
-├── page-about.php             # About page template
-├── page-contact.php           # Contact page template
-├── template-collection.php    # Collection browser (interactive)
-├── template-immersive.php     # Immersive experience (interactive)
-├── template-vault.php         # VIP vault (restricted)
+├── template-home.php                 # Home page template
+├── page-about.php                    # About page template
+├── page-contact.php                  # Contact page template
+├── template-collection.php           # Immersive 3D collection experience (interactive)
+├── page-collection-black-rose.php    # Black Rose product catalog (shopping)
+├── page-collection-love-hurts.php    # Love Hurts product catalog (shopping)
+├── page-collection-signature.php     # Signature product catalog (shopping)
+├── template-immersive.php            # Immersive experience (interactive)
+├── template-vault.php                # VIP vault (restricted)
 │
 ├── woocommerce.php            # WooCommerce archive
 ├── single-product.php         # Product detail page
@@ -402,6 +486,47 @@ skyyrose-2025/
 
 ---
 
+## Navigation Structure Recommendation
+
+### Recommended Menu Structure
+```
+Home
+Shop
+├── All Products (WooCommerce shop page)
+├── Collections (submenu)
+│   ├── Black Rose Catalog (/collection-black-rose)
+│   ├── Love Hurts Catalog (/collection-love-hurts)
+│   └── Signature Catalog (/collection-signature)
+Experience (submenu)
+├── Black Rose Immersive (/black-rose-experience)
+├── Love Hurts Immersive (/love-hurts-experience)
+└── Signature Immersive (/signature-experience)
+About
+Contact
+VIP Vault (logged-in only)
+```
+
+### User Journey
+
+**Discovery Flow:**
+1. User visits "Black Rose Immersive" → Explores 3D gothic cathedral
+2. Clicks product hotspot in scene → Redirects to single product page
+3. OR clicks "View Full Collection" CTA → Goes to "Black Rose Catalog"
+4. Browses grid, filters by category, adds to cart
+
+**Shopping Flow:**
+1. User visits "Love Hurts Catalog" → Sees all Love Hurts products
+2. Filters by "Dresses" → Grid updates to show only dresses
+3. Clicks product card → Goes to single product page
+4. Adds to cart, continues shopping
+
+**Key Insight:**
+- Immersive pages = **Emotional engagement** (explore brand story)
+- Catalog pages = **Transactional** (find product, buy now)
+- Both needed for complete luxury e-commerce experience
+
+---
+
 ## Page Assignment Guide
 
 ### Homepage Setup
@@ -410,14 +535,27 @@ skyyrose-2025/
 3. Homepage: Select page with "Home Page" template
 4. Posts page: Create "Blog" page
 
-### Collection Pages
-1. Create page: "Black Rose Collection"
+### Immersive Collection Pages (3D Experiences)
+1. Create page: "Black Rose Experience"
 2. Template: Collection
-3. Page meta: `collection_slug = black-rose`
-4. Featured image: Collection hero image
+3. Page meta: `_collection_type = black-rose`
+4. Featured image: Gothic cathedral scene preview
 5. Publish
 
-Repeat for "Love Hurts Collection" and "Signature Collection"
+Repeat for:
+- "Love Hurts Experience" (`_collection_type = love-hurts`)
+- "Signature Experience" (`_collection_type = signature`)
+
+### Catalog Collection Pages (Product Grids)
+1. Create page: "Black Rose Collection"
+2. Template: Collection - Black Rose
+3. Slug: `collection-black-rose`
+4. Featured image: Collection banner
+5. Publish
+
+Repeat for:
+- "Love Hurts Collection" (Template: Collection - Love Hurts, Slug: `collection-love-hurts`)
+- "Signature Collection" (Template: Collection - Signature, Slug: `collection-signature`)
 
 ### Immersive Experience
 1. Create page: "Experience SkyyRose"
