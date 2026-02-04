@@ -433,20 +433,39 @@ wp_enqueue_script('threejs', 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/t
 ## Documentation
 
 ### Created Documentation Files
+
+**IMPORTANT FOR ALL AGENTS**: Read these files BEFORE working on WordPress theme:
+
 1. **PAGES-DOCUMENTATION.md** - Complete page reference
    - Static pages (Home, About, Contact)
-   - Interactive pages (Collection, Immersive, Vault)
+   - Interactive pages:
+     - Immersive 3D experiences (`template-collection.php`) - NOT for shopping
+     - Product catalogs (`page-collection-*.php`) - FOR shopping
    - WooCommerce templates
    - Elementor widgets
    - Brand guidelines
    - Testing checklist
+   - Navigation structure
+   - User journey flows
 
 2. **THEME-AUDIT.md** - This security audit report
    - Security hardening details
    - Defensive error handling
-   - File verification
+   - File verification (36 PHP files)
    - Cleanup summary
    - Performance optimization
+
+3. **CONTEXT7_VERIFICATION.md** - WordPress best practices
+   - Context7 verification results
+   - WordPress coding standards
+   - WooCommerce patterns
+
+**Agent Instructions**:
+- ✅ ALWAYS read `PAGES-DOCUMENTATION.md` before modifying templates
+- ✅ ALWAYS read `THEME-AUDIT.md` before deployment changes
+- ✅ Use Context7 + Serena for all WordPress work
+- ✅ Understand immersive vs catalog page distinction
+- ⚠️ NEVER assume page purpose without checking docs
 
 ---
 
