@@ -251,7 +251,7 @@ ml = [
     "sqlalchemy==2.0.45",
     "pymongo==4.10.1",
     # Compatibility constraints for dependency resolution
-    "protobuf>=5.26.1,<6.0",  # Required by google-ai-generativelanguage and grpcio-status
+    "protobuf>=6.33.5",  # CVE-2026-0994 fix: JSON recursion depth bypass vulnerability
     "fsspec<=2024.9.0",  # Required by datasets
     # LlamaIndex multimodal capabilities
     "llama-index>=0.12.0",
