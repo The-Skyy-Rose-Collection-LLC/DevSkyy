@@ -17,6 +17,7 @@ Specialized Agents:
 - FashnTryOnAgent: Virtual try-on using FASHN API
 - TripoAssetAgent: 3D model generation using Tripo3D API
 - WordPressAssetAgent: WordPress media upload and management
+- SecurityOpsAgent: Vulnerability scanning, auto-remediation, compliance reporting
 
 All agents extend EnhancedSuperAgent and include:
 - 17 prompt engineering techniques
@@ -73,6 +74,7 @@ from .fashn_agent import (
 )
 from .marketing_agent import MarketingAgent
 from .operations_agent import OperationsAgent
+from .security_ops_agent import SecurityOpsAgent
 from .skyyrose_content_agent import (
     BrandDNA,
     ContentStatus,
@@ -153,6 +155,7 @@ __all__ = [
     "SupportAgent",
     "OperationsAgent",
     "AnalyticsAgent",
+    "SecurityOpsAgent",
     # Coding Doctor Agent
     "CodingDoctorAgent",
     "create_coding_doctor",
