@@ -220,7 +220,7 @@ ml = [
     "textblob>=0.18.0.post0",
     "mlflow>=3.5.0",
     "bentoml>=1.4.34",
-    "wandb==0.18.7",
+    "wandb>=0.24.2",  # Updated for protobuf 6.x compatibility
     "tensorboard==2.20.0",
     "matplotlib==3.9.2",
     "seaborn==0.13.2",
@@ -252,7 +252,7 @@ ml = [
     "pymongo==4.10.1",
     # Compatibility constraints for dependency resolution
     "protobuf>=6.33.5",  # CVE-2026-0994 fix: JSON recursion depth bypass vulnerability
-    "fsspec<=2024.9.0",  # Required by datasets
+    "fsspec>=2025.7.0",  # Required by bentoml>=1.4.34
     # LlamaIndex multimodal capabilities
     "llama-index>=0.12.0",
     "llama-index-llms-openai>=0.3.0",
