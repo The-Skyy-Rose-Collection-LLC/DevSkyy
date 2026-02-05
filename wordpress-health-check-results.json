@@ -1,0 +1,264 @@
+{
+  "timestamp": "2026-02-05T07:10:41.628177",
+  "site_url": "https://skyyrose.co",
+  "summary": {
+    "total_checks": 7,
+    "critical_issues": 0,
+    "high_issues": 1
+  },
+  "results": [
+    {
+      "component": "WordPress Core",
+      "status": "\u26a0\ufe0f",
+      "message": "REST API returned 500",
+      "priority": "HIGH",
+      "details": {}
+    },
+    {
+      "component": "SkyyRose Theme",
+      "status": "\u2705",
+      "message": "Local theme version: 2.0.0",
+      "priority": "HIGH",
+      "details": {
+        "version": "2.0.0",
+        "php_files": 35
+      }
+    },
+    {
+      "component": "Page Functionality",
+      "status": "\u26a0\ufe0f",
+      "message": "11/13 pages accessible",
+      "priority": "CRITICAL",
+      "details": {
+        "pages": [
+          {
+            "url": "https://skyyrose.co/",
+            "type": "static",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "0.16s"
+          },
+          {
+            "url": "https://skyyrose.co/about/",
+            "type": "static",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.59s"
+          },
+          {
+            "url": "https://skyyrose.co/contact/",
+            "type": "static",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.57s"
+          },
+          {
+            "url": "https://skyyrose.co/black-rose-experience/",
+            "type": "interactive",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.57s"
+          },
+          {
+            "url": "https://skyyrose.co/love-hurts-experience/",
+            "type": "interactive",
+            "status": "\u274c",
+            "status_code": 429,
+            "load_time": "0.13s"
+          },
+          {
+            "url": "https://skyyrose.co/signature-experience/",
+            "type": "interactive",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.57s"
+          },
+          {
+            "url": "https://skyyrose.co/collection-black-rose/",
+            "type": "catalog",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.59s"
+          },
+          {
+            "url": "https://skyyrose.co/collection-love-hurts/",
+            "type": "catalog",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.72s"
+          },
+          {
+            "url": "https://skyyrose.co/collection-signature/",
+            "type": "catalog",
+            "status": "\u274c",
+            "status_code": 429,
+            "load_time": "0.13s"
+          },
+          {
+            "url": "https://skyyrose.co/shop/",
+            "type": "woocommerce",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.68s"
+          },
+          {
+            "url": "https://skyyrose.co/cart/",
+            "type": "woocommerce",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.73s"
+          },
+          {
+            "url": "https://skyyrose.co/checkout/",
+            "type": "woocommerce",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.58s"
+          },
+          {
+            "url": "https://skyyrose.co/my-account/",
+            "type": "woocommerce",
+            "status": "\u2705",
+            "status_code": 200,
+            "load_time": "1.57s"
+          }
+        ]
+      }
+    },
+    {
+      "component": "Custom Templates",
+      "status": "\u2705",
+      "message": "All 6 custom templates present",
+      "priority": "MEDIUM",
+      "details": {}
+    },
+    {
+      "component": "Elementor Widgets",
+      "status": "\u2705",
+      "message": "Found 4 custom widgets",
+      "priority": "MEDIUM",
+      "details": {
+        "widgets": [
+          "collection-card.php",
+          "immersive-scene.php",
+          "product-hotspot.php",
+          "pre-order-form.php"
+        ]
+      }
+    },
+    {
+      "component": "Custom CSS",
+      "status": "\u2705",
+      "message": "Found 12 custom CSS files",
+      "priority": "LOW",
+      "details": {}
+    },
+    {
+      "component": "CDN Links",
+      "status": "\u2705",
+      "message": "4/4 CDN links accessible",
+      "priority": "MEDIUM",
+      "details": {
+        "links": [
+          "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js",
+          "https://cdn.babylonjs.com/babylon.js",
+          "https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js",
+          "https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap"
+        ]
+      }
+    }
+  ],
+  "pages": [
+    {
+      "url": "https://skyyrose.co/",
+      "type": "static",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 0.15922750000027008
+    },
+    {
+      "url": "https://skyyrose.co/about/",
+      "type": "static",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.5867564579821192
+    },
+    {
+      "url": "https://skyyrose.co/contact/",
+      "type": "static",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.5698564579943195
+    },
+    {
+      "url": "https://skyyrose.co/black-rose-experience/",
+      "type": "interactive",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.5730150000017602
+    },
+    {
+      "url": "https://skyyrose.co/love-hurts-experience/",
+      "type": "interactive",
+      "status": "\u274c",
+      "status_code": 429,
+      "load_time": 0.12880287499865517
+    },
+    {
+      "url": "https://skyyrose.co/signature-experience/",
+      "type": "interactive",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.5663775409921072
+    },
+    {
+      "url": "https://skyyrose.co/collection-black-rose/",
+      "type": "catalog",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.5917574999912176
+    },
+    {
+      "url": "https://skyyrose.co/collection-love-hurts/",
+      "type": "catalog",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.7190182500053197
+    },
+    {
+      "url": "https://skyyrose.co/collection-signature/",
+      "type": "catalog",
+      "status": "\u274c",
+      "status_code": 429,
+      "load_time": 0.12719141598790884
+    },
+    {
+      "url": "https://skyyrose.co/shop/",
+      "type": "woocommerce",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.680089000001317
+    },
+    {
+      "url": "https://skyyrose.co/cart/",
+      "type": "woocommerce",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.7267198329791427
+    },
+    {
+      "url": "https://skyyrose.co/checkout/",
+      "type": "woocommerce",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.576521666982444
+    },
+    {
+      "url": "https://skyyrose.co/my-account/",
+      "type": "woocommerce",
+      "status": "\u2705",
+      "status_code": 200,
+      "load_time": 1.5741197089955676
+    }
+  ]
+}
