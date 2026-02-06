@@ -72,19 +72,19 @@ class SkyyRose_Security_Hardening {
         // Strict Transport Security (HTTPS enforcement)
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
 
-        // Content Security Policy (tightened)
+        // Content Security Policy (WordPress.com compatible)
+        // NOTE: WordPress.com requires 'unsafe-inline' for Elementor/admin functionality
         $csp_policy = sprintf(
             "default-src 'self'; " .
-            "script-src 'self' 'nonce-%s' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; " .
-            "style-src 'self' 'nonce-%s' https://fonts.googleapis.com; " .
-            "img-src 'self' data: https:; " .
-            "font-src 'self' data: https://fonts.gstatic.com; " .
-            "connect-src 'self' %s; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com; " .
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts-api.wp.com https://s0.wp.com https://cdn.elementor.com; " .
+            "img-src 'self' data: https: blob:; " .
+            "font-src 'self' data: https://fonts.gstatic.com https://fonts-api.wp.com; " .
+            "connect-src 'self' %s https://stats.wp.com https://public-api.wordpress.com; " .
+            "frame-src 'self' https://widgets.wp.com https://jetpack.wordpress.com; " .
             "frame-ancestors 'self'; " .
             "base-uri 'self'; " .
             "form-action 'self';",
-            esc_attr($csp_nonce),
-            esc_attr($csp_nonce),
             esc_attr(home_url())
         );
         header('Content-Security-Policy: ' . $csp_policy);

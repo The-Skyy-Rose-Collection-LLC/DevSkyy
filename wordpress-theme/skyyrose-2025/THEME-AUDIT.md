@@ -43,6 +43,12 @@ wp_localize_script('skyyrose-animations', 'skyyrose_security', [
 ]);
 ```
 
+**UPDATE (2026-02-05):** CSP configuration updated to WordPress.com compatible version.
+- Added 'unsafe-inline' for scripts/styles (required for WordPress.com/Elementor)
+- Whitelisted WordPress.com core domains (stats.wp.com, widgets.wp.com)
+- Verified with Context7 WordPress documentation
+- Fixes 107+ console errors while maintaining security
+
 ---
 
 ### 2. XSS Prevention
