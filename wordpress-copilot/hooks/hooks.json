@@ -1,0 +1,25 @@
+{
+  "PreToolUse": [
+    {
+      "matcher": "Write|Edit",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "CRITICAL: Before using Write or Edit tool for WordPress/Elementor/WooCommerce code:\n\n1. Have you called Context7 MCP to verify current documentation?\n   - Call: resolve-library-id (library name)\n   - Call: query-docs (with specific query)\n\n2. Are you implementing based on VERIFIED current docs (not memory)?\n\n3. Which WordPress/Elementor/WooCommerce version are you targeting?\n\nIF YOU HAVE NOT VERIFIED WITH CONTEXT7, STOP AND DO THAT FIRST.\n\nOnly proceed with code generation after Context7 verification.\n\nContext7 check completed? (You must verify before continuing)",
+          "blocking": true
+        }
+      ]
+    }
+  ],
+  "UserPromptSubmit": [
+    {
+      "matcher": "*",
+      "hooks": [
+        {
+          "type": "prompt",
+          "prompt": "Check if user message contains WordPress/Elementor/WooCommerce keywords. If detected, remind: 'I'll verify current documentation with Context7 before generating any code.' Then proceed to use Context7 MCP."
+        }
+      ]
+    }
+  ]
+}

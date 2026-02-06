@@ -1,0 +1,26 @@
+{
+  "name": "wordpress-copilot",
+  "version": "0.1.0",
+  "description": "Comprehensive WordPress development copilot with professor-grade web development, immersive 3D, and open-source intelligence. Auto-triggers on WordPress tasks, integrates Context7 docs, Serena memory, and provides deployment automation for skyyrose.co",
+  "author": {
+    "name": "SkyyRose Development Team",
+    "email": "dev@skyyrose.co"
+  },
+  "keywords": [
+    "wordpress",
+    "elementor",
+    "woocommerce",
+    "web-development",
+    "3d",
+    "threejs",
+    "react",
+    "performance",
+    "accessibility",
+    "deployment",
+    "automation",
+    "open-source"
+  ],
+  "license": "MIT",
+  "repository": "https://github.com/The-Skyy-Rose-Collection-LLC/DevSkyy",
+  "homepage": "https://skyyrose.co"
+}
