@@ -8,6 +8,4 @@
 | ID | Time | T | Title | Read |
 |----|------|---|-------|------|
 | #60 | 2:30 PM | ✅ | WordPress-Copilot Plugin Complete Structure Staged for Commit | ~527 |
-| #59 | " | ✅ | Git Configuration Added with Local Settings Protection | ~358 |
-| #50 | 2:25 PM | ⚖️ | Mandatory Context7 Verification Policy Enforced for Code Generation | ~559 |
 </claude-mem-context>

@@ -44,13 +44,8 @@ class SkyyRose_Security_Hardening {
      * Initialize WordPress hooks
      */
     private function init_hooks() {
-        // Enhanced security headers (NOTE: CSP removed - managed by WordPress.com)
+        // Enhanced security headers
         add_action('send_headers', [$this, 'add_security_headers']);
-
-        // Extract and expose WordPress.com's CSP nonce for inline scripts/styles
-        add_action('wp_head', [$this, 'expose_csp_nonce'], 1);
-        add_filter('style_loader_tag', [$this, 'add_nonce_to_inline_style'], 10, 2);
-        add_filter('script_loader_tag', [$this, 'add_nonce_to_inline_script'], 10, 2);
 
         // Secure AJAX nonce generation
         add_action('wp_enqueue_scripts', [$this, 'localize_security_nonces']);
@@ -65,15 +60,34 @@ class SkyyRose_Security_Hardening {
 
     /**
      * Add comprehensive security headers
-     * NOTE: CSP is managed by WordPress.com at platform level
      */
     public function add_security_headers() {
         if (is_admin()) {
             return;
         }
 
+        // Generate CSP nonce
+        $csp_nonce = wp_create_nonce('csp-' . get_current_blog_id());
+
         // Strict Transport Security (HTTPS enforcement)
         header('Strict-Transport-Security: max-age=31536000; includeSubDomains; preload');
+
+        // Content Security Policy (WordPress.com compatible)
+        // NOTE: WordPress.com requires 'unsafe-inline' for Elementor/admin functionality
+        $csp_policy = sprintf(
+            "default-src 'self'; " .
+            "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com; " .
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts-api.wp.com https://s0.wp.com https://cdn.elementor.com; " .
+            "img-src 'self' data: https: blob:; " .
+            "font-src 'self' data: https://fonts.gstatic.com https://fonts-api.wp.com; " .
+            "connect-src 'self' %s https://stats.wp.com https://public-api.wordpress.com; " .
+            "frame-src 'self' https://widgets.wp.com https://jetpack.wordpress.com; " .
+            "frame-ancestors 'self'; " .
+            "base-uri 'self'; " .
+            "form-action 'self';",
+            esc_attr(home_url())
+        );
+// DISABLED:         header('Content-Security-Policy: ' . $csp_policy);
 
         // X-Frame-Options (clickjacking protection)
         header('X-Frame-Options: SAMEORIGIN');
@@ -96,69 +110,6 @@ class SkyyRose_Security_Hardening {
         // Remove server signature
         header_remove('X-Powered-By');
         header_remove('Server');
-    }
-
-    /**
-     * Extract WordPress.com's CSP nonce and expose it globally
-     * WordPress.com injects nonce-based CSP at platform level
-     */
-    public function expose_csp_nonce() {
-        // Extract nonce from WordPress.com's CSP header
-        $headers = headers_list();
-        $nonce = null;
-
-        foreach ($headers as $header) {
-            if (stripos($header, 'content-security-policy:') !== false) {
-                // Extract nonce value: 'nonce-XXXXXX'
-                if (preg_match("/'nonce-([^']+)'/", $header, $matches)) {
-                    $nonce = $matches[1];
-                    break;
-                }
-            }
-        }
-
-        // Fallback: try to get from Jetpack
-        if (!$nonce && function_exists('jetpack_csp_get_nonce')) {
-            $nonce = jetpack_csp_get_nonce();
-        }
-
-        if ($nonce) {
-            // Store in global for use by other functions
-            $GLOBALS['wpcom_csp_nonce'] = $nonce;
-
-            // Expose to JavaScript
-            echo '<script nonce="' . esc_attr($nonce) . '">';
-            echo 'window.wpcomCSPNonce = "' . esc_js($nonce) . '";';
-            echo '</script>';
-        }
-    }
-
-    /**
-     * Add nonce attribute to inline styles
-     */
-    public function add_nonce_to_inline_style($html, $handle) {
-        if (isset($GLOBALS['wpcom_csp_nonce'])) {
-            $nonce = $GLOBALS['wpcom_csp_nonce'];
-            // Add nonce to style tags that don't have it
-            if (strpos($html, '<style') !== false && strpos($html, 'nonce=') === false) {
-                $html = str_replace('<style', '<style nonce="' . esc_attr($nonce) . '"', $html);
-            }
-        }
-        return $html;
-    }
-
-    /**
-     * Add nonce attribute to inline scripts
-     */
-    public function add_nonce_to_inline_script($html, $handle) {
-        if (isset($GLOBALS['wpcom_csp_nonce'])) {
-            $nonce = $GLOBALS['wpcom_csp_nonce'];
-            // Add nonce to script tags that don't have it
-            if (strpos($html, '<script') !== false && strpos($html, 'nonce=') === false) {
-                $html = str_replace('<script', '<script nonce="' . esc_attr($nonce) . '"', $html);
-            }
-        }
-        return $html;
     }
 
     /**
