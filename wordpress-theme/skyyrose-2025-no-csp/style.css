@@ -1,0 +1,195 @@
+/*
+Theme Name: SkyyRose 2025
+Theme URI: https://skyyrose.co
+Description: Luxury streetwear theme with 2025 interactive features - GSAP animations, View Transitions API, glassmorphism, and 3D product viewer integration
+Version: 2.0.0
+Author: SkyyRose LLC
+Author URI: https://skyyrose.co
+Text Domain: skyyrose-2025
+Requires at least: 6.4
+Tested up to: 6.7
+Requires PHP: 8.1
+License: Proprietary
+License URI: https://skyyrose.co/license
+
+Tags: ecommerce, luxury, streetwear, woocommerce, elementor, 3d-viewer, interactive, gsap, view-transitions
+
+SkyyRose 2025 - Where Love Meets Luxury
+*/
+
+:root {
+  /* Brand Colors - Rose Gold Palette */
+  --sr-rose-gold: #B76E79;
+  --sr-black: #1A1A1A;
+  --sr-white: #FAFAFA;
+  --sr-gray-dark: #2A2A2A;
+  --sr-gray-light: #E5E5E5;
+
+  /* Collection Colors */
+  --sr-black-rose: #1F1F1F;
+  --sr-signature: #D4A574;
+  --sr-love-hurts: #8B2635;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-blur: 20px;
+
+  /* Typography */
+  --font-primary: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Playfair Display', Georgia, serif;
+
+  /* Spacing */
+  --spacing-xs: 0.5rem;
+  --spacing-sm: 1rem;
+  --spacing-md: 2rem;
+  --spacing-lg: 4rem;
+  --spacing-xl: 6rem;
+
+  /* Animations */
+  --transition-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* View Transitions API Support */
+@view-transition {
+  navigation: auto;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.5s;
+  animation-timing-function: var(--transition-smooth);
+}
+
+/* Glassmorphism Base */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+  border-radius: 1rem;
+}
+
+/* GSAP Animation Classes */
+.gsap-fade-in {
+  opacity: 0;
+  transform: translateY(30px);
+}
+
+.gsap-slide-in {
+  opacity: 0;
+  transform: translateX(-50px);
+}
+
+.gsap-scale-in {
+  opacity: 0;
+  transform: scale(0.8);
+}
+
+/* 3D Product Viewer Container */
+.skyyrose-3d-viewer {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--sr-black) 0%, var(--sr-gray-dark) 100%);
+}
+
+.skyyrose-3d-viewer canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-primary);
+  background: var(--sr-white);
+  color: var(--sr-black);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.2;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Interactive Hover States */
+.interactive-card {
+  transition: transform 0.3s var(--transition-smooth),
+              box-shadow 0.3s var(--transition-smooth);
+}
+
+.interactive-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 40px rgba(183, 110, 121, 0.2);
+}
+
+/* Parallax Section */
+.parallax-section {
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Loading States */
+.loading-skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--sr-gray-light) 25%,
+    var(--sr-white) 50%,
+    var(--sr-gray-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Print Styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}

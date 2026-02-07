@@ -1,0 +1,30 @@
+Subject: Request CSP Domain Whitelist for Business Plan Site
+
+Site: https://skyyrose.co
+Plan: Business
+Username: skyyroseco
+
+Issue:
+Platform-level Content Security Policy is blocking essential CDNs required for our luxury fashion e-commerce theme, causing 109 console errors on every page load.
+
+Required CSP Domains:
+- script-src: cdn.babylonjs.com, cdn.elementor.com, cdnjs.cloudflare.com, stats.wp.com, widgets.wp.com, s0.wp.com
+- style-src: fonts-api.wp.com, s0.wp.com, cdn.elementor.com
+- font-src: fonts-api.wp.com
+
+Business Impact:
+- 3D product viewer (core luxury feature) completely non-functional
+- Elementor page builder broken
+- WordPress.com's own domains blocked (stats.wp.com, widgets.wp.com, fonts-api.wp.com)
+- Poor user experience, potential revenue loss
+
+Technical Details:
+Current CSP blocks these domains at platform level. We've confirmed header() calls, custom-redirects.php, and filters cannot override this. Request platform team add these domains to CSP whitelist for skyyrose.co.
+
+Evidence:
+curl -sI https://skyyrose.co/ shows platform CSP lacking these domains.
+
+Request:
+Please escalate to platform engineering to add domains to CSP or provide alternative solution.
+
+Thank you!

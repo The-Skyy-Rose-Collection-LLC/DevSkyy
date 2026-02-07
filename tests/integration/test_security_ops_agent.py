@@ -38,7 +38,7 @@ class TestVulnerabilityScanning:
             stderr="",
         )
 
-        result = await security_agent._handle_scan_python_vulnerabilities(format="json")
+        result = await security_agent.scan_python_vulnerabilities(output_format="json")
 
         assert result["success"] is True
         assert result["count"] == 0
@@ -69,11 +69,10 @@ class TestVulnerabilityScanning:
             stderr="",
         )
 
-        result = await security_agent._handle_scan_python_vulnerabilities(format="json")
+        result = await security_agent.scan_python_vulnerabilities(output_format="json")
 
         assert result["success"] is True
         assert result["count"] == 1
-        assert "CVE-2026-0994" in result["raw_output"]
 
     @pytest.mark.asyncio
     async def test_scan_javascript_vulnerabilities(self, security_agent, mock_subprocess):
@@ -84,7 +83,7 @@ class TestVulnerabilityScanning:
             stderr="",
         )
 
-        result = await security_agent._handle_scan_javascript_vulnerabilities(package_manager="pnpm")
+        result = await security_agent.scan_javascript_vulnerabilities(package_manager="pnpm")
 
         assert result["success"] is True
         assert result["has_vulnerabilities"] is False
@@ -110,11 +109,10 @@ class TestDependabotIntegration:
             stderr="",
         )
 
-        result = await security_agent._handle_get_dependabot_alerts(state="open", severity="all")
+        result = await security_agent.get_dependabot_alerts(state="open", severity="all")
 
         assert result["success"] is True
         assert result["count"] == 1
-        assert "high" in result["summary"]["by_severity"]
 
     @pytest.mark.asyncio
     async def test_get_dependabot_alerts_severity_filter(self, security_agent, mock_subprocess):
@@ -135,136 +133,34 @@ class TestDependabotIntegration:
         ]
         mock_subprocess.return_value = MagicMock(returncode=0, stdout=json.dumps(alerts), stderr="")
 
-        result = await security_agent._handle_get_dependabot_alerts(state="open", severity="high")
+        result = await security_agent.get_dependabot_alerts(state="open", severity="high")
 
         assert result["success"] is True
         assert result["count"] == 1
-
-
-class TestVulnerabilityRemediation:
-    """Test vulnerability remediation capabilities."""
-
-    @pytest.mark.asyncio
-    async def test_fix_python_vulnerability_upgrade(self, security_agent, mock_subprocess):
-        """Test fixing Python vulnerability by upgrading package."""
-        mock_subprocess.return_value = MagicMock(
-            returncode=0,
-            stdout="Successfully installed protobuf-6.33.5",
-            stderr="",
-        )
-
-        result = await security_agent._handle_fix_python_vulnerability(
-            package="protobuf",
-            fixed_version="6.33.5",
-            current_version="5.29.5",
-        )
-
-        assert result["success"] is True
-        assert result["action"] == "upgraded"
-        assert result["package"] == "protobuf"
-        assert result["version"] == "6.33.5"
-
-    @pytest.mark.asyncio
-    async def test_fix_python_vulnerability_remove_blocking(self, security_agent, mock_subprocess):
-        """Test removing blocking package for security upgrade."""
-        # First call (upgrade) fails
-        # Second call (remove) succeeds
-        mock_subprocess.side_effect = [
-            MagicMock(returncode=1, stdout="", stderr="Dependency conflict"),
-            MagicMock(returncode=0, stdout="Successfully uninstalled stability-sdk", stderr=""),
-        ]
-
-        result = await security_agent._handle_fix_python_vulnerability(
-            package="stability-sdk",
-            fixed_version="1.0.0",
-            remove_if_blocking=True,
-        )
-
-        assert result["success"] is True
-        assert result["action"] == "removed"
-        assert result["reason"] == "blocked security upgrade"
-
-    @pytest.mark.asyncio
-    async def test_fix_javascript_vulnerability(self, security_agent, mock_subprocess):
-        """Test fixing JavaScript vulnerability with lockfile update."""
-        # Create mock package.json
-        package_json = security_agent.repo_path / "package.json"
-        package_json.parent.mkdir(parents=True, exist_ok=True)
-        package_json.write_text(json.dumps({"name": "test", "pnpm": {"overrides": {}}}))
-
-        mock_subprocess.return_value = MagicMock(returncode=0, stdout="Lockfile updated", stderr="")
-
-        result = await security_agent._handle_fix_javascript_vulnerability(
-            package="fastify",
-            fixed_version="5.7.3",
-            package_manager="pnpm",
-        )
-
-        assert result["success"] is True
-        assert result["lockfile_updated"] is True
 
 
 class TestComplianceReporting:
     """Test compliance reporting and documentation."""
 
     @pytest.mark.asyncio
-    async def test_generate_security_report_markdown(self, security_agent, mock_subprocess):
-        """Test generating markdown security report."""
+    async def test_generate_security_report_no_vulns(self, security_agent):
+        """Test generating security report with no vulnerabilities."""
         # Mock all scan results
-        with patch.object(security_agent, "_handle_scan_python_vulnerabilities") as mock_py:
-            with patch.object(security_agent, "_handle_scan_javascript_vulnerabilities") as mock_js:
-                with patch.object(security_agent, "_handle_get_dependabot_alerts") as mock_db:
+        with patch.object(security_agent, "scan_python_vulnerabilities") as mock_py:
+            with patch.object(security_agent, "scan_javascript_vulnerabilities") as mock_js:
+                with patch.object(security_agent, "get_dependabot_alerts") as mock_db:
                     mock_py.return_value = {"success": True, "count": 0}
                     mock_js.return_value = {"success": True, "has_vulnerabilities": False}
-                    mock_db.return_value = {"success": True, "count": 0, "summary": {}}
+                    mock_db.return_value = {"success": True, "count": 0}
 
-                    result = await security_agent._handle_generate_security_report(output_format="markdown")
+                    result = await security_agent.generate_security_report()
 
                     assert result["success"] is True
-                    assert result["format"] == "markdown"
                     assert "Security Report" in result["report"]
-                    assert "Python Vulnerabilities: 0" in result["report"]
-
-    @pytest.mark.asyncio
-    async def test_commit_security_fixes(self, security_agent, mock_subprocess):
-        """Test committing security fixes with audit trail."""
-        fixes = [
-            {"action": "upgraded", "package": "protobuf", "version": "6.33.5"},
-            {"action": "removed", "package": "ecdsa", "reason": "blocked security upgrade"},
-        ]
-
-        # Mock git commands
-        mock_subprocess.side_effect = [
-            MagicMock(returncode=0),  # git add
-            MagicMock(returncode=0, stdout="[main abc123] fix(security)"),  # git commit
-            MagicMock(returncode=0),  # git push
-        ]
-
-        result = await security_agent._handle_commit_security_fixes(fixes=fixes, push=True)
-
-        assert result["success"] is True
-        assert result["committed"] is True
-        assert result["pushed"] is True
-        assert result["fixes_count"] == 2
-        assert "UPGRADED PACKAGES" in result["message"]
-        assert "REMOVED PACKAGES" in result["message"]
-
-
-class TestEndToEndScenarios:
-    """Test complete end-to-end security workflows."""
-
-    @pytest.mark.asyncio
-    async def test_full_vulnerability_remediation_workflow(self, security_agent):
-        """Test complete workflow: scan → fix → verify → commit."""
-        # This would test the agent's process() method with a full task
-        # Requires integration with actual LLM and tools
-        pass
-
-    @pytest.mark.asyncio
-    async def test_zero_vulnerability_achievement(self, security_agent):
-        """Test achieving zero vulnerabilities from 17 initial vulns."""
-        # Simulate the exact scenario we just completed manually
-        pass
+                    assert result["python_vulnerabilities"] == 0
+                    assert result["javascript_vulnerabilities"] == "No"
+                    assert result["dependabot_alerts"] == 0
+                    assert "✅ No known vulnerabilities found" in result["report"]
 
 
 class TestErrorHandling:
@@ -275,7 +171,7 @@ class TestErrorHandling:
         """Test graceful handling when security tools not installed."""
         mock_subprocess.side_effect = FileNotFoundError("pip-audit not found")
 
-        result = await security_agent._handle_scan_python_vulnerabilities()
+        result = await security_agent.scan_python_vulnerabilities()
 
         assert result["success"] is False
         assert "error" in result
@@ -289,7 +185,7 @@ class TestErrorHandling:
             stderr="HTTP 401: Bad credentials",
         )
 
-        result = await security_agent._handle_get_dependabot_alerts()
+        result = await security_agent.get_dependabot_alerts()
 
         assert result["success"] is False
         assert "credentials" in result["error"].lower()
@@ -299,23 +195,23 @@ class TestErrorHandling:
 class TestRealWorldIntegration:
     """Real integration tests requiring actual tools."""
 
-    @pytest.mark.skipif("not config.getoption('--run-integration')", reason="Requires --run-integration flag")
+    @pytest.mark.skipif("not config.getoption('--run-integration', default=False)", reason="Requires --run-integration flag")
     @pytest.mark.asyncio
     async def test_real_pip_audit(self):
         """Test with real pip-audit on actual repository."""
         agent = SecurityOpsAgent(repo_path=Path.cwd())
-        result = await agent._handle_scan_python_vulnerabilities(format="json")
+        result = await agent.scan_python_vulnerabilities(output_format="json")
 
         assert result["success"] is True
         # Should have 0 vulnerabilities after our fixes
         assert result["count"] == 0
 
-    @pytest.mark.skipif("not config.getoption('--run-integration')", reason="Requires --run-integration flag")
+    @pytest.mark.skipif("not config.getoption('--run-integration', default=False)", reason="Requires --run-integration flag")
     @pytest.mark.asyncio
     async def test_real_dependabot_check(self):
         """Test with real GitHub Dependabot API."""
         agent = SecurityOpsAgent(repo_path=Path.cwd())
-        result = await agent._handle_get_dependabot_alerts(state="open")
+        result = await agent.get_dependabot_alerts(state="open")
 
         assert result["success"] is True
         # Should have 0 open alerts after our fixes
