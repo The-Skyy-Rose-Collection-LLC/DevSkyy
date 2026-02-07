@@ -7,6 +7,10 @@
   "directories": {
     "test": "tests"
   },
+  "engines": {
+    "node": ">=22.0.0",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "@ai-sdk/huggingface": "^0.0.12",
     "@anthropic-ai/sdk": "^0.57.0",
