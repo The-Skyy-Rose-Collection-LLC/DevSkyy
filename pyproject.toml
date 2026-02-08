@@ -222,7 +222,7 @@ ml = [
     "bentoml>=1.4.34",
     "wandb>=0.24.2",  # Updated for protobuf 6.x compatibility
     "tensorboard==2.20.0",
-    "matplotlib==3.9.2",
+    "matplotlib==3.10.8",
     "seaborn==0.13.2",
     "plotly==5.24.1",
     "feature-engine==1.9.3",
