@@ -170,7 +170,7 @@ mcp = [
     "aioredis==2.0.1",
     "pyyaml==6.0.2",
     "toml==0.10.2",
-    "typing-extensions==4.12.2",
+    "typing-extensions==4.15.0",
     "python-dateutil==2.9.0.post0",
     "tiktoken>=0.8.0",
     "transformers>=4.53.0",

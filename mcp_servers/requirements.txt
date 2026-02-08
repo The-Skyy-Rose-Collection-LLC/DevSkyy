@@ -60,7 +60,7 @@ pyyaml==6.0.2
 toml==0.10.2
 
 # Type checking support
-typing-extensions==4.12.2
+typing-extensions==4.15.0
 
 # Date/time handling
 python-dateutil==2.9.0.post0
