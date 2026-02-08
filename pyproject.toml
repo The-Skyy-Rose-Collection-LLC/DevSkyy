@@ -249,7 +249,7 @@ ml = [
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
     "sqlalchemy==2.0.45",
-    "pymongo==4.10.1",
+    "pymongo==4.16.0",
     # Compatibility constraints for dependency resolution
     "protobuf>=6.33.5",  # CVE-2026-0994 fix: JSON recursion depth bypass vulnerability
     "fsspec>=2025.7.0",  # Required by bentoml>=1.4.34
