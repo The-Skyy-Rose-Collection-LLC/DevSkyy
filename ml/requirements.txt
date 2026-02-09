@@ -2,7 +2,7 @@
 # Isolated requirements for ML/AI functionality
 
 # Core ML frameworks
-torch==2.9.1
+torch==2.10.0
 torchvision==0.24.1
 torchaudio==2.9.1
 transformers>=4.53.0  # Fixed: CVE-2024-11392, CVE-2024-11393, CVE-2024-11394, CVE-2025-3933, CVE-2025-5197, CVE-2025-6051, CVE-2025-6638, CVE-2025-6921
