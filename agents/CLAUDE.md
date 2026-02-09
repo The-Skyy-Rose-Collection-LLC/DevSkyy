@@ -1,40 +1,91 @@
 # DevSkyy Agents
 
-> Deterministic, traceable execution | 28 files
+> AI Agents & Orchestration | 54 agents | Use ADK base classes
 
-## Architecture
+---
+
+## Learnings (Update When Claude Makes Mistakes)
+
+### Agent Base Classes
+
+- ❌ **Mistake**: Using `base_legacy.py` or `operations_legacy.py`
+  - ✅ **Correct**: Use `adk/base_super_agent.py` (17 reasoning techniques, ADK-based)
+
+- ❌ **Mistake**: Creating agent without proper __init__ signature
+  - ✅ **Correct**: Always accept `correlation_id` as keyword-only arg
+
+- ❌ **Mistake**: Not propagating correlation_id through agent calls
+  - ✅ **Correct**: Pass `correlation_id=correlation_id` to all sub-calls
+
+### Agent Orchestration
+
+- ❌ **Mistake**: Creating tight coupling between agents
+  - ✅ **Correct**: Agents communicate via messages, not direct method calls
+
+- ❌ **Mistake**: Not handling agent failures gracefully
+  - ✅ **Correct**: Use `try/except` with fallback strategies
+
+- ❌ **Mistake**: Forgetting to register agent in registry
+  - ✅ **Correct**: Add to `core/registry/` after creation
+
+### Round Table
+
+- ❌ **Mistake**: Using round table for simple tasks
+  - ✅ **Correct**: Round table is for complex multi-perspective analysis only (3+ agents)
+
+- ❌ **Mistake**: Not setting proper voting thresholds
+  - ✅ **Correct**: Use 66% consensus threshold (configurable)
+
+---
+
+## Structure
+
 ```
 agents/
-├── base_super_agent.py      # Enhanced base (17 prompt techniques)
-├── commerce_agent.py        # E-commerce operations
-├── creative_agent.py        # Content generation
-├── marketing_agent.py       # Campaign automation
-├── support_agent.py         # Customer service
-├── analytics_agent.py       # Data analysis
-├── fashn_agent.py           # Virtual try-on
-├── tripo_agent.py           # 3D generation
-└── visual_generation/       # Visual AI package
+├── base_super_agent.py       # ✅ USE THIS (17 techniques, ADK-based)
+├── base_legacy.py            # ❌ DEPRECATED
+├── operations_legacy.py      # ❌ DEPRECATED
+├── orchestrator.py           # Multi-agent orchestration
+└── round_table.py            # Consensus mechanism
 ```
 
-## Pattern
+---
+
+## Usage Pattern
+
 ```python
-class SuperAgent(EnhancedSuperAgent):
-    """Plan → Retrieve → Execute → Validate → Emit"""
-    async def execute_auto(self, prompt: str, *, correlation_id: str | None = None) -> AgentResult:
-        technique = await self._select_technique(prompt)
-        context = await self.rag_manager.get_context(prompt)
-        result = await self._execute_technique(technique, prompt, context)
-        await self._validate_result(result)
-        return result
+# ✅ CORRECT: Use ADK base
+from adk.base import SuperAgent
+
+class MyAgent(SuperAgent):
+    async def execute(
+        self,
+        task: str,
+        *,
+        correlation_id: str | None = None
+    ) -> Result:
+        try:
+            result = await self.process(task)
+            return Result(success=True, data=result)
+        except Exception as e:
+            raise AgentError(
+                f"Agent failed: {task}",
+                correlation_id=correlation_id
+            ) from e
 ```
 
-## BEFORE CODING (MANDATORY)
-1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
-2. **Serena**: Use for codebase navigation and symbol lookup
-3. **Verify**: `pytest -v` after EVERY change
+---
 
-## USE THESE TOOLS
-- **MCP**: `agent_orchestrator` for routing
-- **Skill**: `~/.claude/agents/` for Claude Code agents
+## Verification
 
-**"Agents don't guess. They plan, execute, and verify."**
+```bash
+# Check no legacy imports
+rg "from.*base_legacy|operations_legacy" agents/ && echo "❌ Found legacy imports!" || echo "✅ No legacy imports"
+
+# Run agent tests
+pytest tests/unit/test_agents.py -v
+```
+
+---
+
+**"17 reasoning techniques. Zero legacy dependencies."**
