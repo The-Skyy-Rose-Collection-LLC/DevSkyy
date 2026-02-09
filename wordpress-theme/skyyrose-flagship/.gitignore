@@ -1,0 +1,101 @@
+# WordPress
+wp-config.php
+wp-content/uploads/
+wp-content/blogs.dir/
+wp-content/upgrade/
+wp-content/backup-db/
+wp-content/advanced-cache.php
+wp-content/wp-cache-config.php
+sitemap.xml
+*.log
+
+# WP-CLI
+wp-cli.local.yml
+
+# Dependencies
+node_modules/
+vendor/
+bower_components/
+
+# Test Coverage and Reports
+tests/coverage/
+*.coverage
+.phpunit.result.cache
+playwright-report/
+test-results/
+
+# Build Files
+*.map
+*.min.js
+*.min.css
+dist/
+build/
+
+# IDE
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+error.log
+debug.log
+
+# Temporary Files
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Package Manager
+package-lock.json
+composer.lock
+yarn.lock
+
+# Compiled Files
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# Backup Files
+*.bak
+*.backup
+*~
+
+# Cache
+.cache/
+.sass-cache/
+*.cache
+
+# Screenshots (from tests)
+screenshots/
+*.png
+!screenshot.png
+
+# Misc
+.htaccess.bak
+error_log
+access_log

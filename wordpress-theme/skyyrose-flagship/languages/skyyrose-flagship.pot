@@ -1,0 +1,869 @@
+# Copyright (C) 2026 SkyyRose Team
+# This file is distributed under the GNU General Public License v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: SkyyRose Flagship 1.0.0\n"
+"Report-Msgid-Bugs-To: support@skyyrose.com\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-02-08T21:00:21+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: skyyrose-flagship\n"
+
+#. Theme Name of the theme
+#: style.css
+msgid "SkyyRose Flagship"
+msgstr ""
+
+#. Theme URI of the theme
+#. Author URI of the theme
+#: style.css
+msgid "https://skyyrose.com"
+msgstr ""
+
+#. Description of the theme
+#: style.css
+msgid "Premium flagship WordPress theme for SkyyRose featuring Three.js 3D integration, WooCommerce support, and Elementor Pro compatibility. Built with modern web standards and optimized for performance."
+msgstr ""
+
+#. Author of the theme
+#: style.css
+msgid "SkyyRose Team"
+msgstr ""
+
+#: 404.php:16
+msgid "Oops! That page can&rsquo;t be found."
+msgstr ""
+
+#: 404.php:20
+msgid "It looks like nothing was found at this location. Maybe try one of the links below or a search?"
+msgstr ""
+
+#: 404.php:29
+msgid "Most Used Categories"
+msgstr ""
+
+#. translators: %1$s: smiley
+#: 404.php:47
+#, php-format
+msgid "Try looking in the monthly archives. %1$s"
+msgstr ""
+
+#. translators: 1: title.
+#: comments.php:31
+#, php-format
+msgid "One thought on &ldquo;%1$s&rdquo;"
+msgstr ""
+
+#. translators: 1: comment count number, 2: title.
+#: comments.php:37
+#, php-format
+msgctxt "comments title"
+msgid "%1$s thought on &ldquo;%2$s&rdquo;"
+msgid_plural "%1$s thoughts on &ldquo;%2$s&rdquo;"
+msgstr[0] ""
+msgstr[1] ""
+
+#: comments.php:64
+msgid "Comments are closed."
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:36
+msgid "3D Model Viewer"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:69
+msgid "Content"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:77
+msgid "Model URL"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:80
+msgid "https://your-domain.com/model.glb"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:81
+msgid "Enter the URL of your GLB or GLTF model file."
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:88
+msgid "Viewer Height"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:111
+msgid "Auto Rotate"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:113
+msgid "Yes"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:114
+msgid "No"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:125
+msgid "Style"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:133
+msgid "Background Color"
+msgstr ""
+
+#: elementor/widgets/three-viewer.php:154
+msgid "Please add a model URL."
+msgstr ""
+
+#. translators: %s: Site name
+#: footer.php:65
+#, php-format
+msgid "&copy; %1$s %2$s. All rights reserved."
+msgstr ""
+
+#. translators: %s: Theme name
+#: footer.php:70
+#, php-format
+msgid "Powered by %s"
+msgstr ""
+
+#: front-page.php:40
+#: template-parts/content/content-page.php:28
+#: template-parts/content/content.php:60
+msgid "Pages:"
+msgstr ""
+
+#. translators: %s: Name of current post. Only visible to screen readers
+#: front-page.php:54
+#: inc/template-functions.php:263
+#: template-parts/content/content-page.php:42
+#, php-format
+msgid "Edit <span class=\"screen-reader-text\">%s</span>"
+msgstr ""
+
+#: functions.php:62
+msgid "Primary Menu"
+msgstr ""
+
+#: functions.php:63
+msgid "Footer Menu"
+msgstr ""
+
+#: functions.php:64
+msgid "Mobile Menu"
+msgstr ""
+
+#: functions.php:65
+msgid "Top Bar Menu"
+msgstr ""
+
+#: functions.php:186
+msgid "Primary Sidebar"
+msgstr ""
+
+#: functions.php:188
+msgid "Add widgets here to appear in your sidebar."
+msgstr ""
+
+#: functions.php:198
+msgid "Footer Area 1"
+msgstr ""
+
+#: functions.php:200
+#: functions.php:212
+#: functions.php:224
+#: functions.php:236
+msgid "Add widgets here to appear in your footer."
+msgstr ""
+
+#: functions.php:210
+msgid "Footer Area 2"
+msgstr ""
+
+#: functions.php:222
+msgid "Footer Area 3"
+msgstr ""
+
+#: functions.php:234
+msgid "Footer Area 4"
+msgstr ""
+
+#: functions.php:248
+msgid "Shop Sidebar"
+msgstr ""
+
+#: functions.php:250
+msgid "Add widgets here to appear in your shop pages."
+msgstr ""
+
+#: functions.php:507
+msgid "Wishlists"
+msgstr ""
+
+#. Template Name of the theme
+#: functions.php:508
+msgid "Wishlist"
+msgstr ""
+
+#: header.php:22
+msgid "Skip to content"
+msgstr ""
+
+#: header.php:48
+msgid "Menu"
+msgstr ""
+
+#: inc/accessibility-seo.php:48
+msgid "Primary Navigation"
+msgstr ""
+
+#: inc/accessibility-seo.php:50
+msgid "Footer Navigation"
+msgstr ""
+
+#: inc/accessibility-seo.php:52
+msgid "Mobile Navigation"
+msgstr ""
+
+#: inc/accessibility-seo.php:322
+#: inc/template-functions.php:72
+msgid "Home"
+msgstr ""
+
+#: inc/accessibility-seo.php:329
+#: inc/accessibility-seo.php:348
+#: inc/accessibility-seo.php:353
+msgid "Shop"
+msgstr ""
+
+#. translators: %s: search query.
+#: inc/accessibility-seo.php:388
+#: search.php:20
+#, php-format
+msgid "Search Results for: %s"
+msgstr ""
+
+#: inc/accessibility-seo.php:412
+msgid "Breadcrumb"
+msgstr ""
+
+#: inc/accessibility-seo.php:597
+#, php-format
+msgid "Page %s"
+msgstr ""
+
+#: inc/accessibility-seo.php:689
+#, php-format
+msgid "Add %s to your cart"
+msgstr ""
+
+#: inc/accessibility-seo.php:694
+msgid "Product quantity"
+msgstr ""
+
+#: inc/accessibility-seo.php:702
+#, php-format
+msgid "Remove %s from cart"
+msgstr ""
+
+#: inc/accessibility-seo.php:784
+msgid "Products"
+msgstr ""
+
+#: inc/accessibility-seo.php:806
+#: inc/accessibility-seo.php:823
+msgid "Accessibility & SEO Tools"
+msgstr ""
+
+#: inc/accessibility-seo.php:807
+msgid "A11y & SEO"
+msgstr ""
+
+#: inc/accessibility-seo.php:826
+msgid "WCAG 2.1 AA Compliance Checklist"
+msgstr ""
+
+#: inc/accessibility-seo.php:845
+msgid "SEO Features Checklist"
+msgstr ""
+
+#: inc/accessibility-seo.php:864
+msgid "Recommended Testing Tools"
+msgstr ""
+
+#: inc/accessibility-seo.php:865
+msgid "Accessibility Testing"
+msgstr ""
+
+#: inc/accessibility-seo.php:875
+msgid "SEO Testing"
+msgstr ""
+
+#: inc/accessibility-seo.php:888
+msgid "Manual Testing Checklist"
+msgstr ""
+
+#: inc/accessibility-seo.php:889
+msgid "Keyboard Navigation"
+msgstr ""
+
+#: inc/accessibility-seo.php:899
+msgid "Screen Reader Testing"
+msgstr ""
+
+#: inc/accessibility-seo.php:909
+msgid "SEO Validation"
+msgstr ""
+
+#: inc/accessibility-seo.php:922
+msgid "Quick Tests"
+msgstr ""
+
+#: inc/accessibility-seo.php:923
+msgid "Test Page URL:"
+msgstr ""
+
+#: inc/accessibility-seo.php:928
+msgid "Test with WAVE"
+msgstr ""
+
+#: inc/accessibility-seo.php:931
+msgid "Test Rich Results"
+msgstr ""
+
+#: inc/accessibility-seo.php:934
+msgid "Test PageSpeed"
+msgstr ""
+
+#: inc/accessibility-seo.php:940
+msgid "Customizer Settings"
+msgstr ""
+
+#: inc/accessibility-seo.php:941
+msgid "Configure social media profiles and contact information for enhanced SEO:"
+msgstr ""
+
+#: inc/accessibility-seo.php:953
+msgid "Open Customizer"
+msgstr ""
+
+#: inc/class-wishlist-widget.php:25
+msgid "SkyyRose Wishlist"
+msgstr ""
+
+#: inc/class-wishlist-widget.php:27
+msgid "Display wishlist items in the sidebar."
+msgstr ""
+
+#: inc/class-wishlist-widget.php:39
+#: inc/class-wishlist-widget.php:107
+#: page-wishlist.php:16
+msgid "My Wishlist"
+msgstr ""
+
+#: inc/class-wishlist-widget.php:85
+msgid "View All"
+msgstr ""
+
+#: inc/class-wishlist-widget.php:93
+msgid "Your wishlist is empty."
+msgstr ""
+
+#: inc/class-wishlist-widget.php:113
+msgid "Title:"
+msgstr ""
+
+#: inc/class-wishlist-widget.php:126
+msgid "Number of items to show:"
+msgstr ""
+
+#: inc/class-wishlist-widget.php:150
+msgid "Show \"View All\" button"
+msgstr ""
+
+#: inc/elementor.php:68
+msgid "SkyyRose Widgets"
+msgstr ""
+
+#: inc/elementor.php:76
+msgid "SkyyRose 3D"
+msgstr ""
+
+#: inc/template-functions.php:89
+msgid "Search Results"
+msgstr ""
+
+#: inc/template-functions.php:95
+msgid "404 Not Found"
+msgstr ""
+
+#. translators: %s: Reading time in minutes
+#: inc/template-functions.php:171
+#, php-format
+msgid "%s min read"
+msgstr ""
+
+#. translators: %s: post date.
+#: inc/template-functions.php:195
+#, php-format
+msgctxt "post date"
+msgid "Posted on %s"
+msgstr ""
+
+#. translators: %s: post author.
+#: inc/template-functions.php:210
+#, php-format
+msgctxt "post author"
+msgid "by %s"
+msgstr ""
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-functions.php:226
+msgid ", "
+msgstr ""
+
+#. translators: 1: list of categories.
+#: inc/template-functions.php:229
+#, php-format
+msgid "Posted in %1$s"
+msgstr ""
+
+#. translators: used between list items, there is a space after the comma
+#: inc/template-functions.php:233
+msgctxt "list item separator"
+msgid ", "
+msgstr ""
+
+#. translators: 1: list of tags.
+#: inc/template-functions.php:236
+#, php-format
+msgid "Tagged %1$s"
+msgstr ""
+
+#. translators: %s: post title
+#: inc/template-functions.php:246
+#, php-format
+msgid "Leave a Comment<span class=\"screen-reader-text\"> on %s</span>"
+msgstr ""
+
+#: inc/wishlist-functions.php:236
+#: inc/wishlist-functions.php:274
+#: inc/wishlist-functions.php:312
+msgid "Invalid product ID."
+msgstr ""
+
+#: inc/wishlist-functions.php:246
+#: inc/wishlist-functions.php:511
+msgid "Product added to wishlist."
+msgstr ""
+
+#: inc/wishlist-functions.php:253
+#: inc/wishlist-functions.php:521
+msgid "Product already in wishlist."
+msgstr ""
+
+#: inc/wishlist-functions.php:284
+#: inc/wishlist-functions.php:542
+msgid "Product removed from wishlist."
+msgstr ""
+
+#: inc/wishlist-functions.php:291
+#: inc/wishlist-functions.php:552
+msgid "Product not in wishlist."
+msgstr ""
+
+#: inc/wishlist-functions.php:322
+msgid "Product moved to cart."
+msgstr ""
+
+#: inc/wishlist-functions.php:330
+msgid "Failed to add product to cart."
+msgstr ""
+
+#: inc/wishlist-functions.php:351
+#: inc/wishlist-functions.php:572
+msgid "Wishlist cleared."
+msgstr ""
+
+#: inc/wishlist-functions.php:358
+#: inc/wishlist-functions.php:582
+msgid "Failed to clear wishlist."
+msgstr ""
+
+#. translators: %d: Number of products moved
+#: inc/wishlist-functions.php:381
+#, php-format
+msgid "%d products moved to cart."
+msgstr ""
+
+#: inc/wishlist-functions.php:391
+msgid "Failed to move products to cart."
+msgstr ""
+
+#: inc/wishlist-functions.php:621
+msgid "Added to wishlist"
+msgstr ""
+
+#: inc/wishlist-functions.php:622
+msgid "Removed from wishlist"
+msgstr ""
+
+#: inc/wishlist-functions.php:623
+msgid "Moved to cart"
+msgstr ""
+
+#: inc/wishlist-functions.php:624
+msgid "An error occurred"
+msgstr ""
+
+#: inc/woocommerce.php:64
+msgid "Added to cart"
+msgstr ""
+
+#: inc/woocommerce.php:203
+msgid "View in 3D"
+msgstr ""
+
+#: inc/woocommerce.php:218
+msgid "3D Model"
+msgstr ""
+
+#: inc/woocommerce.php:241
+msgid "3D Model File URL (GLB/GLTF)"
+msgstr ""
+
+#: inc/woocommerce.php:252
+msgid "Enter the URL of the 3D model file (GLB or GLTF format)."
+msgstr ""
+
+#: inc/woocommerce.php:303
+msgid "Search for:"
+msgstr ""
+
+#: inc/woocommerce.php:309
+msgid "Search products&hellip;"
+msgstr ""
+
+#: inc/woocommerce.php:313
+#: inc/woocommerce.php:314
+#: searchform.php:23
+msgctxt "submit button"
+msgid "Search"
+msgstr ""
+
+#: inc/woocommerce.php:331
+msgid "Previous"
+msgstr ""
+
+#: inc/woocommerce.php:332
+msgid "Next"
+msgstr ""
+
+#: page-wishlist.php:27
+msgid "Move All to Cart"
+msgstr ""
+
+#: page-wishlist.php:30
+msgid "Clear Wishlist"
+msgstr ""
+
+#: page-wishlist.php:36
+msgid "Share Wishlist"
+msgstr ""
+
+#: page-wishlist.php:55
+#: template-parts/wishlist-button.php:23
+msgid "Remove from wishlist"
+msgstr ""
+
+#: page-wishlist.php:81
+msgid "In Stock"
+msgstr ""
+
+#: page-wishlist.php:83
+msgid "Out of Stock"
+msgstr ""
+
+#: page-wishlist.php:90
+msgid "Move to Cart"
+msgstr ""
+
+#: page-wishlist.php:94
+msgid "View Product"
+msgstr ""
+
+#: page-wishlist.php:115
+msgid "Your Wishlist is Empty"
+msgstr ""
+
+#: page-wishlist.php:117
+msgid "Save your favorite items here to purchase later or keep track of items you love."
+msgstr ""
+
+#: page-wishlist.php:121
+msgid "Start Shopping"
+msgstr ""
+
+#: searchform.php:13
+msgctxt "label"
+msgid "Search for:"
+msgstr ""
+
+#: searchform.php:17
+msgctxt "placeholder"
+msgid "Search &hellip;"
+msgstr ""
+
+#: single.php:22
+msgid "Previous:"
+msgstr ""
+
+#: single.php:23
+msgid "Next:"
+msgstr ""
+
+#. Template Name of the theme
+msgid "Love Hurts Collection - Enchanted Ballroom"
+msgstr ""
+
+#: template-parts/content/content-none.php:13
+msgid "Nothing Found"
+msgstr ""
+
+#. translators: 1: link to WP admin new post page.
+#: template-parts/content/content-none.php:23
+#, php-format
+msgid "Ready to publish your first post? <a href=\"%1$s\">Get started here</a>."
+msgstr ""
+
+#: template-parts/content/content-none.php:36
+msgid "Sorry, but nothing matched your search terms. Please try again with some different keywords."
+msgstr ""
+
+#: template-parts/content/content-none.php:43
+msgid "It seems we can&rsquo;t find what you&rsquo;re looking for. Perhaps searching can help."
+msgstr ""
+
+#. translators: %s: Name of current post. Only visible to screen readers
+#: template-parts/content/content.php:47
+#, php-format
+msgid "Continue reading<span class=\"screen-reader-text\"> \"%s\"</span>"
+msgstr ""
+
+#: template-parts/content/content.php:68
+msgid "Read More"
+msgstr ""
+
+#: template-parts/wishlist-button.php:23
+msgid "Add to wishlist"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Black"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "White"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Gold"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Rose"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Deep Purple"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Crimson"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Light Gray"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Dark Gray"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Black to Gold"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Purple to Rose"
+msgstr ""
+
+#: theme.json
+msgctxt "Gradient name"
+msgid "Crimson to Gold"
+msgstr ""
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Black and Gold"
+msgstr ""
+
+#: theme.json
+msgctxt "Duotone name"
+msgid "Purple and Rose"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Medium"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Extra Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "Huge"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "System Font"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Serif"
+msgstr ""
+
+#: theme.json
+msgctxt "Font family name"
+msgid "Monospace"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "Extra Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "Small"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "Medium"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "Extra Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Space size name"
+msgid "2X Large"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Primary Button"
+msgstr ""
+
+#: theme.json
+msgctxt "Color name"
+msgid "Secondary Button"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "H1"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "H2"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "H3"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "H4"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "H5"
+msgstr ""
+
+#: theme.json
+msgctxt "Font size name"
+msgid "H6"
+msgstr ""
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Header"
+msgstr ""
+
+#: theme.json
+msgctxt "Template part name"
+msgid "Footer"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Love Hurts Collection - Enchanted Ballroom"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Signature Collection - Luxury Runway"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Black Rose Collection - Gothic Garden"
+msgstr ""
+
+#: theme.json
+msgctxt "Custom template name"
+msgid "Preorder Gateway - Portal Entrance"
+msgstr ""
