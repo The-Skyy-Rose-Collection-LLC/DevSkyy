@@ -34,7 +34,7 @@ mlflow>=3.5.0
 bentoml>=1.4.8  # Fixed: CVE-2025-27520, CVE-2025-32375 (Critical RCE vulnerabilities)
 
 # Experiment tracking
-wandb==0.23.1
+wandb==0.24.2
 tensorboard==2.20.0
 
 # Data visualization
