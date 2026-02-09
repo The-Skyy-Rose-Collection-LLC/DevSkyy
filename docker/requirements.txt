@@ -16,8 +16,8 @@ redis==7.1.0
 aioredis==2.0.1
 
 # Security
-cryptography==46.0.3
-pyjwt==2.10.1
+cryptography==46.0.4
+pyjwt==2.11.0
 passlib[bcrypt]==1.7.4
 argon2-cffi==25.1.0
 
