@@ -61,8 +61,8 @@ adk/                      # Agent Development Kit (symlink to sdk/python/adk)
 llm/                      # 6 providers, router, round_table
 security/                 # AES-256-GCM, JWT, audit_log (uses core.auth)
 api/v1/                   # REST, gdpr, webhooks
-wordpress-theme/          # SkyyRose WordPress theme (108 new packages)
-├── skyyrose-2025/        # Main theme directory
+wordpress-theme/          # SkyyRose WordPress theme
+├── skyyrose-flagship/    # Production theme directory
 │   ├── template-collection.php  # Collection pages (immersive)
 │   ├── elementor-widgets/       # Custom widgets (3D, pre-order)
 │   └── inc/                     # Theme functions
@@ -104,8 +104,8 @@ SkyyRose: `#B76E79` primary | "Where Love Meets Luxury" | Use `BrandKit.from_con
   - CATALOG (products): page-collection-black-rose.php, page-collection-love-hurts.php, page-collection-signature.php
 - **Immersive**: React Three Fiber + Framer Motion + luxury animations (#B76E79 rose gold)
 - **Ralph Loop**: Use for complex multi-step immersive page builds
-- **WordPress Docs**: ALWAYS read `wordpress-theme/skyyrose-2025/PAGES-DOCUMENTATION.md` before modifying pages
-- **Security**: ALWAYS read `wordpress-theme/skyyrose-2025/THEME-AUDIT.md` before deployment changes
+- **WordPress Docs**: ALWAYS read `wordpress-theme/skyyrose-flagship/PAGES-DOCUMENTATION.md` before modifying pages (if exists)
+- **Security**: ALWAYS read `wordpress-theme/skyyrose-flagship/THEME-AUDIT.md` before deployment changes (if exists)
 
 ## Health
 `/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
