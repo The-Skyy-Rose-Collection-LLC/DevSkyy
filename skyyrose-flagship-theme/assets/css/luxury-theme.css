@@ -1,0 +1,236 @@
+/**
+ * SkyyRose Luxury Theme Styles
+ * Applies brand colors throughout the theme
+ */
+
+/* Import Brand Variables */
+@import url('brand-variables.css');
+
+/* Base Typography */
+body {
+	font-family: var(--font-body);
+	color: var(--skyy-black);
+	background-color: var(--skyy-white);
+	line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--font-heading);
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	color: var(--skyy-black);
+	margin-bottom: 1rem;
+}
+
+h1 { font-size: 3rem; }
+h2 { font-size: 2.5rem; }
+h3 { font-size: 2rem; }
+h4 { font-size: 1.5rem; }
+
+/* Links */
+a {
+	color: var(--skyy-rose-gold);
+	text-decoration: none;
+	transition: var(--transition-luxury);
+}
+
+a:hover, a:focus {
+	color: var(--skyy-gold);
+}
+
+/* Buttons */
+.btn,
+button:not(.wp-block-button__link),
+input[type="submit"],
+input[type="button"],
+.button {
+	background: var(--gradient-rose-gold);
+	color: var(--skyy-white);
+	border: 2px solid var(--skyy-rose-gold);
+	padding: 14px 36px;
+	font-family: var(--font-body);
+	font-weight: 600;
+	letter-spacing: 0.05em;
+	cursor: pointer;
+	transition: var(--transition-luxury);
+	box-shadow: var(--shadow-rose);
+	border-radius: 0;
+	text-transform: uppercase;
+	font-size: 14px;
+}
+
+.btn:hover,
+button:hover,
+input[type="submit"]:hover,
+.button:hover {
+	background: var(--gradient-silver-gold);
+	border-color: var(--skyy-gold);
+	box-shadow: var(--shadow-gold);
+	transform: translateY(-2px);
+	color: var(--skyy-white);
+}
+
+/* Header Styles */
+.site-header {
+	background: linear-gradient(135deg, var(--skyy-white) 0%, rgba(183, 110, 121, 0.05) 100%);
+	border-bottom: 2px solid var(--skyy-rose-gold);
+}
+
+.site-title a {
+	color: var(--skyy-rose-gold);
+	font-family: var(--font-heading);
+	font-size: 2rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+}
+
+.site-title a:hover {
+	color: var(--skyy-gold);
+}
+
+/* Navigation */
+.main-navigation a {
+	color: var(--skyy-black);
+	font-family: var(--font-body);
+	font-weight: 500;
+	letter-spacing: 0.05em;
+	text-transform: uppercase;
+	font-size: 14px;
+	padding: 12px 20px;
+	transition: var(--transition-luxury);
+}
+
+.main-navigation a:hover,
+.main-navigation .current-menu-item > a {
+	color: var(--skyy-rose-gold);
+	background: rgba(183, 110, 121, 0.05);
+}
+
+/* Footer */
+.site-footer {
+	background: var(--skyy-black);
+	color: var(--skyy-white);
+	padding: 60px 0 30px;
+	border-top: 3px solid var(--skyy-rose-gold);
+}
+
+.site-footer a {
+	color: var(--skyy-mauve);
+}
+
+.site-footer a:hover {
+	color: var(--skyy-gold);
+}
+
+/* WooCommerce Styles */
+.woocommerce .woocommerce-Price-amount {
+	color: var(--skyy-rose-gold);
+	font-weight: 700;
+	font-size: 1.25rem;
+}
+
+.woocommerce .button.alt {
+	background: var(--gradient-rose-gold);
+	border-color: var(--skyy-rose-gold);
+}
+
+.woocommerce .button.alt:hover {
+	background: var(--gradient-silver-gold);
+	border-color: var(--skyy-gold);
+}
+
+.woocommerce .star-rating span:before {
+	color: var(--skyy-gold);
+}
+
+.woocommerce-message,
+.woocommerce-info {
+	border-top-color: var(--skyy-rose-gold);
+}
+
+.woocommerce-message:before,
+.woocommerce-info:before {
+	color: var(--skyy-rose-gold);
+}
+
+/* Product Cards */
+.product {
+	transition: var(--transition-luxury);
+}
+
+.product:hover {
+	box-shadow: var(--shadow-rose);
+	transform: translateY(-4px);
+}
+
+.product .product-title {
+	font-family: var(--font-heading);
+	color: var(--skyy-black);
+}
+
+.product .add_to_cart_button {
+	background: var(--gradient-rose-gold);
+	border-color: var(--skyy-rose-gold);
+}
+
+/* Cart & Checkout */
+.woocommerce-cart .cart-collaterals {
+	background: rgba(183, 110, 121, 0.03);
+	border: 2px solid var(--skyy-rose-gold);
+	padding: 30px;
+}
+
+.woocommerce-checkout #payment {
+	background: rgba(183, 110, 121, 0.03);
+	border: 2px solid var(--skyy-rose-gold);
+}
+
+/* Loading States */
+.loader {
+	border: 3px solid rgba(183, 110, 121, 0.1);
+	border-top: 3px solid var(--skyy-rose-gold);
+	border-radius: 50%;
+	width: 40px;
+	height: 40px;
+	animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+	0% { transform: rotate(0deg); }
+	100% { transform: rotate(360deg); }
+}
+
+/* Luxury Accents */
+.luxury-accent {
+	background: var(--gradient-rose-gold);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	font-family: var(--font-heading);
+	font-weight: 700;
+}
+
+.metallic-text {
+	color: var(--skyy-metallic-silver);
+	text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* Section Dividers */
+.section-divider {
+	height: 2px;
+	background: var(--gradient-rose-gold);
+	margin: 60px auto;
+	width: 100px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+	h1 { font-size: 2rem; }
+	h2 { font-size: 1.75rem; }
+	h3 { font-size: 1.5rem; }
+	
+	.btn, button, input[type="submit"] {
+		padding: 12px 24px;
+		font-size: 13px;
+	}
+}

@@ -1,0 +1,35 @@
+/**
+ * SkyyRose Brand Variables
+ *
+ * Official brand colors and design system
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+:root {
+	/* BRAND COLORS */
+	--skyy-rose-gold: #B76E79;
+	--skyy-gold: #D4AF37;
+	--skyy-metallic-silver: #C0C0C0;
+	--skyy-mauve: #D8A7B1;
+	--skyy-red: #DC143C;
+	--skyy-white: #FFFFFF;
+	--skyy-black: #000000;
+
+	/* Luxury Gradients */
+	--gradient-rose-gold: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+	--gradient-silver-gold: linear-gradient(135deg, #C0C0C0 0%, #D4AF37 100%);
+	--gradient-mauve-rose: linear-gradient(135deg, #D8A7B1 0%, #B76E79 100%);
+
+	/* Typography */
+	--font-heading: 'Playfair Display', Georgia, serif;
+	--font-body: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+	--font-accent: 'Cormorant Garamond', serif;
+
+	/* Shadows */
+	--shadow-gold: 0 4px 16px rgba(212, 175, 55, 0.3);
+	--shadow-rose: 0 4px 16px rgba(183, 110, 121, 0.3);
+	
+	/* Transitions */
+	--transition-luxury: 600ms cubic-bezier(0.4, 0, 0.2, 1);
+}

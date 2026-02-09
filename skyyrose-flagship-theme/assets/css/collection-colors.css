@@ -1,0 +1,213 @@
+/**
+ * SkyyRose Collection-Specific Colors
+ * Each collection has its own color palette
+ */
+
+/* ==========================================================================
+   BRAND FLAGSHIP - Rose Gold + Gold
+   ========================================================================== */
+
+.brand-flagship,
+.page-template-default {
+	--primary-color: #B76E79;
+	--secondary-color: #D4AF37;
+	--accent-gradient: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+}
+
+/* ==========================================================================
+   BLACK ROSE COLLECTION - Metallic Silver + Black + White
+   ========================================================================== */
+
+.black-rose-collection,
+.template-black-rose,
+.product-category-black-rose {
+	--primary-color: #C0C0C0;
+	--secondary-color: #000000;
+	--tertiary-color: #FFFFFF;
+	--accent-gradient: linear-gradient(135deg, #C0C0C0 0%, #696969 100%);
+}
+
+.black-rose-collection .scene-wrapper {
+	background: linear-gradient(135deg, #1a1a1a 0%, #000000 100%);
+}
+
+.black-rose-collection h1,
+.black-rose-collection h2,
+.black-rose-collection h3 {
+	color: var(--primary-color);
+	text-shadow: 0 0 20px rgba(192, 192, 192, 0.5);
+}
+
+.black-rose-collection .btn,
+.black-rose-collection button {
+	background: var(--accent-gradient);
+	border-color: var(--primary-color);
+	color: var(--secondary-color);
+}
+
+.black-rose-collection .product-hotspot {
+	background: radial-gradient(circle, rgba(192, 192, 192, 0.8), rgba(192, 192, 192, 0.3));
+	box-shadow: 0 0 30px rgba(192, 192, 192, 0.6);
+}
+
+/* ==========================================================================
+   SIGNATURE COLLECTION - Gold + Rose Gold
+   ========================================================================== */
+
+.signature-collection,
+.template-signature-collection,
+.product-category-signature-collection {
+	--primary-color: #D4AF37;
+	--secondary-color: #B76E79;
+	--accent-gradient: linear-gradient(135deg, #D4AF37 0%, #B76E79 100%);
+}
+
+.signature-collection .scene-wrapper {
+	background: linear-gradient(135deg, #fff5e6 0%, #ffd9a6 100%);
+}
+
+.signature-collection h1,
+.signature-collection h2,
+.signature-collection h3 {
+	color: #8b4513;
+	text-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+}
+
+.signature-collection .btn,
+.signature-collection button {
+	background: var(--accent-gradient);
+	border-color: var(--primary-color);
+	color: #FFFFFF;
+	box-shadow: 0 4px 16px rgba(212, 175, 55, 0.3);
+}
+
+.signature-collection .product-hotspot {
+	background: radial-gradient(circle, rgba(212, 175, 55, 0.8), rgba(212, 175, 55, 0.3));
+	box-shadow: 0 0 30px rgba(212, 175, 55, 0.6);
+}
+
+/* ==========================================================================
+   LOVE HURTS COLLECTION - Red + Black + White
+   ========================================================================== */
+
+.love-hurts-collection,
+.template-love-hurts,
+.product-category-love-hurts {
+	--primary-color: #DC143C;
+	--secondary-color: #000000;
+	--tertiary-color: #FFFFFF;
+	--accent-gradient: linear-gradient(135deg, #DC143C 0%, #8B0000 100%);
+}
+
+.love-hurts-collection .scene-wrapper {
+	background: linear-gradient(135deg, #1a0000 0%, #000000 100%);
+}
+
+.love-hurts-collection h1,
+.love-hurts-collection h2,
+.love-hurts-collection h3 {
+	color: var(--primary-color);
+	text-shadow: 0 0 20px rgba(220, 20, 60, 0.6);
+}
+
+.love-hurts-collection .btn,
+.love-hurts-collection button {
+	background: var(--accent-gradient);
+	border-color: var(--primary-color);
+	color: var(--tertiary-color);
+	box-shadow: 0 4px 16px rgba(220, 20, 60, 0.4);
+}
+
+.love-hurts-collection .product-hotspot {
+	background: radial-gradient(circle, rgba(220, 20, 60, 0.8), rgba(220, 20, 60, 0.3));
+	box-shadow: 0 0 30px rgba(220, 20, 60, 0.7);
+}
+
+.love-hurts-collection .rose-petal {
+	background: radial-gradient(ellipse, #DC143C, #8B0000);
+	box-shadow: 0 2px 8px rgba(220, 20, 60, 0.5);
+}
+
+/* ==========================================================================
+   PREORDER GATEWAY - Purple/Mauve + Rose Gold
+   ========================================================================== */
+
+.preorder-gateway,
+.template-preorder-gateway,
+.product-category-preorder {
+	--primary-color: #D8A7B1;
+	--secondary-color: #B76E79;
+	--accent-gradient: linear-gradient(135deg, #D8A7B1 0%, #B76E79 100%);
+}
+
+.preorder-gateway .scene-wrapper {
+	background: linear-gradient(135deg, #1a0a2e 0%, #16213e 100%);
+}
+
+.preorder-gateway h1,
+.preorder-gateway h2,
+.preorder-gateway h3 {
+	color: var(--primary-color);
+	text-shadow: 0 0 20px rgba(216, 167, 177, 0.6);
+}
+
+.preorder-gateway .btn,
+.preorder-gateway button {
+	background: var(--accent-gradient);
+	border-color: var(--primary-color);
+	color: #FFFFFF;
+}
+
+.preorder-gateway .product-hotspot {
+	background: radial-gradient(circle, rgba(216, 167, 177, 0.8), rgba(216, 167, 177, 0.3));
+	box-shadow: 0 0 30px rgba(216, 167, 177, 0.6);
+}
+
+/* ==========================================================================
+   GLOBAL OVERRIDES PER COLLECTION
+   ========================================================================== */
+
+/* Navigation color adaptations */
+.black-rose-collection .main-navigation a,
+.love-hurts-collection .main-navigation a {
+	color: #FFFFFF;
+}
+
+.black-rose-collection .main-navigation a:hover,
+.love-hurts-collection .main-navigation a:hover {
+	color: var(--primary-color);
+}
+
+/* Modal adaptations */
+.black-rose-collection .modal-content,
+.love-hurts-collection .modal-content {
+	background: rgba(0, 0, 0, 0.95);
+	color: #FFFFFF;
+	border-color: var(--primary-color);
+}
+
+.signature-collection .modal-content {
+	background: linear-gradient(135deg, #fff 0%, #fff5e6 100%);
+	border-color: var(--primary-color);
+}
+
+/* Loading overlays */
+.black-rose-collection .loading-overlay {
+	background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+	color: var(--primary-color);
+}
+
+.signature-collection .loading-overlay {
+	background: linear-gradient(135deg, #fff5e6 0%, #ffd9a6 100%);
+	color: #8b4513;
+}
+
+.love-hurts-collection .loading-overlay {
+	background: linear-gradient(135deg, #000000 0%, #1a0000 100%);
+	color: var(--primary-color);
+}
+
+.preorder-gateway .loading-overlay {
+	background: linear-gradient(135deg, #1a0a2e 0%, #16213e 100%);
+	color: var(--primary-color);
+}

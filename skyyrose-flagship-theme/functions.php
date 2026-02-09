@@ -532,3 +532,8 @@ function skyyrose_register_wishlist_cpt() {
 	register_post_type( 'wishlist', $args );
 }
 add_action( 'init', 'skyyrose_register_wishlist_cpt' );
+
+/**
+ * Enqueue brand-specific styles
+ */
+require get_template_directory() . '/inc/enqueue-brand-styles.php';
