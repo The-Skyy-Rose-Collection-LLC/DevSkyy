@@ -156,9 +156,9 @@ mcp = [
     "asyncio==3.4.3",
     "aiofiles==25.1.0",
     "orjson==3.11.5",
-    "python-dotenv==1.0.1",
+    "python-dotenv==1.2.1",
     "structlog==25.5.0",
-    "loguru==0.7.2",
+    "loguru==0.7.3",
     "tenacity==9.1.2",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
@@ -170,7 +170,7 @@ mcp = [
     "aioredis==2.0.1",
     "pyyaml==6.0.2",
     "toml==0.10.2",
-    "typing-extensions==4.12.2",
+    "typing-extensions==4.15.0",
     "python-dateutil==2.9.0.post0",
     "tiktoken>=0.8.0",
     "transformers>=4.53.0",
@@ -222,7 +222,7 @@ ml = [
     "bentoml>=1.4.34",
     "wandb>=0.24.2",  # Updated for protobuf 6.x compatibility
     "tensorboard==2.20.0",
-    "matplotlib==3.9.2",
+    "matplotlib==3.10.8",
     "seaborn==0.13.2",
     "plotly==5.24.1",
     "feature-engine==1.9.3",
@@ -235,7 +235,7 @@ ml = [
     "prophet==1.2.1",
     "gymnasium>=1.0.0",
     "stable-baselines3>=2.5.0",
-    "shap==0.46.0",
+    "shap==0.50.0",
     "lime==0.2.0.1",
     "polars==1.15.0",
     "pyarrow==22.0.0",
@@ -249,7 +249,7 @@ ml = [
     "uvicorn>=0.32.1",
     "pydantic>=2.10.3",
     "sqlalchemy==2.0.45",
-    "pymongo==4.10.1",
+    "pymongo==4.16.0",
     # Compatibility constraints for dependency resolution
     "protobuf>=6.33.5",  # CVE-2026-0994 fix: JSON recursion depth bypass vulnerability
     "fsspec>=2025.7.0",  # Required by bentoml>=1.4.34
