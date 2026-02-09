@@ -202,7 +202,7 @@ mcp = [
 ml = [
     "torch==2.9.1",
     "torchvision==0.24.1",
-    "torchaudio==2.9.1",
+    "torchaudio==2.10.0",
     "transformers>=4.53.0",
     "huggingface-hub>=0.27.0",
     "numpy>=2.1.3",
