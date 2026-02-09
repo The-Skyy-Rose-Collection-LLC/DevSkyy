@@ -1,6 +1,6 @@
 {
   "name": "skyyrose-flagship-theme",
-  "version": "1.0.0",
+  "version": "1.0.0-r182",
   "description": "SkyyRose flagship WordPress theme with WooCommerce and 3D capabilities",
   "scripts": {
     "build": "npm run build:js && npm run build:css",
@@ -51,8 +51,8 @@
     "identity-obj-proxy": "^3.0.0",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
-    "lighthouse": "^11.4.0",
-    "pa11y": "^7.0.0",
+    "lighthouse": "^13.0.2",
+    "pa11y": "^9.1.0",
     "prettier": "^3.0.3",
     "terser-webpack-plugin": "^5.3.16",
     "three-gltf-exporter": "^0.0.1",
@@ -61,9 +61,12 @@
   },
   "dependencies": {
     "@studio-freight/lenis": "^1.0.42",
+    "@tweenjs/tween.js": "^25.0.0",
     "cannon-es": "^0.20.0",
     "gsap": "^3.12.5",
-    "three": "^0.159.0"
+    "lil-gui": "^0.21.0",
+    "postprocessing": "^6.38.2",
+    "three": "^0.182.0"
   },
   "jest": {
     "testEnvironment": "jsdom",

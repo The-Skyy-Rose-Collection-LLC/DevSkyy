@@ -18,7 +18,7 @@ function skyyrose_enqueue_brand_styles() {
 		'skyyrose-brand-variables',
 		get_template_directory_uri() . '/assets/css/brand-variables.css',
 		array(),
-		'1.0.0'
+		SKYYROSE_VERSION
 	);
 
 	// Collection-specific colors
@@ -26,7 +26,7 @@ function skyyrose_enqueue_brand_styles() {
 		'skyyrose-collection-colors',
 		get_template_directory_uri() . '/assets/css/collection-colors.css',
 		array( 'skyyrose-brand-variables' ),
-		'1.0.0'
+		SKYYROSE_VERSION
 	);
 
 	// Luxury theme styles
@@ -34,7 +34,7 @@ function skyyrose_enqueue_brand_styles() {
 		'skyyrose-luxury-theme',
 		get_template_directory_uri() . '/assets/css/luxury-theme.css',
 		array( 'skyyrose-brand-variables' ),
-		'1.0.0'
+		SKYYROSE_VERSION
 	);
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_brand_styles', 5 );

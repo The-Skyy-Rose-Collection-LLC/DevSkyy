@@ -285,7 +285,7 @@ function skyyrose_scripts() {
 		'threejs',
 		SKYYROSE_ASSETS_URI . '/three/three.min.js',
 		array(),
-		'r150',
+		'r182',
 		true
 	);
 
