@@ -1,0 +1,41 @@
+{
+    "name": "skyyrose/flagship-theme",
+    "description": "SkyyRose flagship WordPress theme with WooCommerce and 3D capabilities",
+    "type": "wordpress-theme",
+    "license": "GPL-2.0-or-later",
+    "authors": [
+        {
+            "name": "SkyyRose",
+            "email": "dev@skyyrose.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.4"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9.5",
+        "yoast/phpunit-polyfills": "^1.0",
+        "wp-coding-standards/wpcs": "^3.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "phpcompatibility/php-compatibility": "^9.3",
+        "wp-cli/wp-cli-bundle": "^2.8"
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-html tests/coverage/php",
+        "phpcs": "phpcs --standard=WordPress .",
+        "phpcs:fix": "phpcbf --standard=WordPress .",
+        "lint": "phpcs --standard=WordPress --extensions=php .",
+        "lint:fix": "phpcbf --standard=WordPress --extensions=php ."
+    },
+    "autoload": {
+        "psr-4": {
+            "SkyyRose\\": "inc/"
+        }
+    },
+    "config": {
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
+    }
+}
