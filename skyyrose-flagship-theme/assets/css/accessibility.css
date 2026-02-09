@@ -1,0 +1,551 @@
+/**
+ * Accessibility Styles
+ *
+ * WCAG 2.1 AA compliant styles for the SkyyRose Flagship Theme
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+/* ============================================================================
+   Screen Reader & Skip Links
+   ========================================================================== */
+
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute !important;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.screen-reader-text:focus {
+	background-color: #f1f1f1;
+	border-radius: 3px;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+	clip: auto !important;
+	clip-path: none;
+	color: #21759b;
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 700;
+	height: auto;
+	left: 5px;
+	line-height: normal;
+	padding: 15px 23px 14px;
+	text-decoration: none;
+	top: 5px;
+	width: auto;
+	z-index: 100000;
+}
+
+.skip-link {
+	background-color: #21759b;
+	color: #fff;
+	font-weight: 700;
+	padding: 15px 23px 14px;
+	text-decoration: none;
+	text-align: center;
+	transition: background-color 0.2s ease;
+}
+
+.skip-link:hover,
+.skip-link:focus {
+	background-color: #191e23;
+	color: #fff;
+	outline: 2px solid #fff;
+	outline-offset: -2px;
+}
+
+/* ============================================================================
+   Focus Indicators - WCAG 2.1 AA Compliant
+   ========================================================================== */
+
+a:focus,
+button:focus,
+input:focus,
+select:focus,
+textarea:focus,
+.menu-toggle:focus,
+.cart-contents:focus,
+.product a:focus,
+.woocommerce-loop-product__link:focus {
+	outline: 2px solid #0073aa;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0073aa;
+}
+
+/* Focus-visible polyfill support */
+.js-focus-visible :focus:not(.focus-visible) {
+	outline: none;
+	box-shadow: none;
+}
+
+.js-focus-visible .focus-visible {
+	outline: 2px solid #0073aa;
+	outline-offset: 2px;
+	box-shadow: 0 0 0 2px #fff, 0 0 0 4px #0073aa;
+}
+
+/* ============================================================================
+   High Contrast Mode Support
+   ========================================================================== */
+
+@media (prefers-contrast: high) {
+	a:focus,
+	button:focus,
+	input:focus,
+	select:focus,
+	textarea:focus {
+		outline-width: 3px;
+		outline-color: currentColor;
+	}
+
+	.button,
+	.btn,
+	input[type='submit'],
+	input[type='button'],
+	.add_to_cart_button {
+		border: 2px solid currentColor;
+	}
+}
+
+/* ============================================================================
+   Reduced Motion Support
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	/* Maintain critical animations with reduced duration */
+	.loading-spinner,
+	.skeleton-loader {
+		animation-duration: 0.5s !important;
+	}
+}
+
+/* ============================================================================
+   ARIA Live Regions
+   ========================================================================== */
+
+.aria-live-region,
+[aria-live] {
+	position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+/* Polite announcements */
+[aria-live="polite"] {
+	position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+/* Assertive announcements */
+[aria-live="assertive"] {
+	position: absolute;
+	left: -10000px;
+	width: 1px;
+	height: 1px;
+	overflow: hidden;
+}
+
+/* ============================================================================
+   Form Accessibility
+   ========================================================================== */
+
+/* Form labels */
+label {
+	display: block;
+	margin-bottom: 0.5rem;
+	font-weight: 600;
+	color: #333;
+}
+
+/* Required field indicator */
+.required,
+abbr[title] {
+	color: #d63638;
+	text-decoration: none;
+	border: 0;
+}
+
+/* Form error messages */
+.form-error,
+.woocommerce-error,
+.woocommerce-invalid {
+	color: #d63638;
+	font-size: 0.875rem;
+	margin-top: 0.25rem;
+	display: block;
+	font-weight: 500;
+}
+
+.form-field.has-error input,
+.form-field.has-error select,
+.form-field.has-error textarea,
+.woocommerce-invalid input {
+	border-color: #d63638;
+	border-width: 2px;
+}
+
+/* Form success messages */
+.form-success,
+.woocommerce-message {
+	color: #00a32a;
+	font-size: 0.875rem;
+	margin-top: 0.25rem;
+	display: block;
+	font-weight: 500;
+}
+
+/* Input focus states */
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+input[type="search"]:focus,
+input[type="number"]:focus,
+input[type="tel"]:focus,
+input[type="date"]:focus,
+select:focus,
+textarea:focus {
+	border-color: #0073aa;
+	box-shadow: 0 0 0 1px #0073aa;
+	outline: 2px solid transparent;
+}
+
+/* ============================================================================
+   Modal Accessibility
+   ========================================================================== */
+
+.modal-overlay {
+	background-color: rgba(0, 0, 0, 0.7);
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9998;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.modal-dialog {
+	position: relative;
+	background: #fff;
+	padding: 2rem;
+	max-width: 600px;
+	width: 90%;
+	max-height: 90vh;
+	overflow-y: auto;
+	z-index: 9999;
+	border-radius: 4px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	background: transparent;
+	border: none;
+	font-size: 1.5rem;
+	cursor: pointer;
+	padding: 0.5rem;
+	line-height: 1;
+	min-width: 44px;
+	min-height: 44px;
+}
+
+.modal-close:hover,
+.modal-close:focus {
+	background: #f0f0f0;
+	border-radius: 4px;
+}
+
+/* ============================================================================
+   Button & Interactive Element Sizing (Touch Target 44x44px minimum)
+   ========================================================================== */
+
+.button,
+.btn,
+input[type='submit'],
+input[type='button'],
+.add_to_cart_button,
+.single_add_to_cart_button,
+.checkout-button,
+.menu-toggle {
+	min-height: 44px;
+	min-width: 44px;
+	padding: 12px 24px;
+	cursor: pointer;
+}
+
+/* WooCommerce specific buttons */
+.woocommerce-button,
+.wc-forward,
+.button.alt {
+	min-height: 44px;
+	min-width: 44px;
+	padding: 12px 24px;
+}
+
+/* Quantity buttons */
+.quantity .qty {
+	min-height: 44px;
+	padding: 8px 12px;
+}
+
+/* ============================================================================
+   Breadcrumb Navigation
+   ========================================================================== */
+
+.breadcrumb-navigation {
+	padding: 1rem 0;
+	font-size: 0.875rem;
+}
+
+.breadcrumbs {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+}
+
+.breadcrumbs li {
+	display: flex;
+	align-items: center;
+}
+
+.breadcrumbs li:not(:last-child)::after {
+	content: "›";
+	margin: 0 0.5rem;
+	color: #666;
+}
+
+.breadcrumbs a {
+	color: #0073aa;
+	text-decoration: none;
+}
+
+.breadcrumbs a:hover,
+.breadcrumbs a:focus {
+	text-decoration: underline;
+}
+
+.breadcrumbs [aria-current="page"] {
+	color: #666;
+	font-weight: 500;
+}
+
+/* ============================================================================
+   Color Contrast Utilities
+   ========================================================================== */
+
+/* Ensure text meets 4.5:1 ratio */
+.text-primary {
+	color: #000;
+}
+
+.text-secondary {
+	color: #333;
+}
+
+.text-muted {
+	color: #666;
+}
+
+/* Ensure UI elements meet 3:1 ratio */
+.border-primary {
+	border-color: #666;
+}
+
+/* ============================================================================
+   Keyboard Navigation Indicators
+   ========================================================================== */
+
+/* Menu keyboard navigation */
+.menu-item-has-children > a[aria-expanded="true"] {
+	background-color: #f0f0f0;
+}
+
+.menu-item-has-children.open > .sub-menu {
+	display: block;
+}
+
+/* Tab navigation */
+[role="tablist"] {
+	border-bottom: 2px solid #ddd;
+}
+
+[role="tab"] {
+	padding: 12px 24px;
+	min-height: 44px;
+	border: none;
+	background: transparent;
+	cursor: pointer;
+}
+
+[role="tab"][aria-selected="true"] {
+	border-bottom: 3px solid #0073aa;
+	font-weight: 700;
+}
+
+[role="tab"]:focus {
+	outline: 2px solid #0073aa;
+	outline-offset: -2px;
+}
+
+/* ============================================================================
+   WooCommerce Accessibility Enhancements
+   ========================================================================== */
+
+/* Product quantity label */
+.quantity label {
+	display: block;
+	margin-bottom: 0.5rem;
+}
+
+/* Cart item remove link */
+.product-remove a {
+	min-width: 44px;
+	min-height: 44px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Product rating */
+.star-rating {
+	position: relative;
+}
+
+.star-rating::before {
+	content: "★★★★★";
+	color: #ddd;
+}
+
+.star-rating span {
+	position: absolute;
+	left: 0;
+	overflow: hidden;
+	color: #ffc107;
+}
+
+/* Ensure product images have proper contrast border */
+.woocommerce-product-gallery__image img {
+	border: 1px solid #e0e0e0;
+}
+
+/* ============================================================================
+   Print Styles (Accessibility)
+   ========================================================================== */
+
+@media print {
+	.skip-link,
+	.menu-toggle,
+	.screen-reader-text,
+	[aria-hidden="true"] {
+		display: none;
+	}
+
+	a[href]::after {
+		content: " (" attr(href) ")";
+	}
+
+	abbr[title]::after {
+		content: " (" attr(title) ")";
+	}
+}
+
+/* ============================================================================
+   Dark Mode Support (Respects user preference)
+   ========================================================================== */
+
+@media (prefers-color-scheme: dark) {
+	/* These are suggestions - implement based on theme design */
+	.modal-dialog {
+		background: #1e1e1e;
+		color: #fff;
+	}
+
+	.screen-reader-text:focus {
+		background-color: #1e1e1e;
+		color: #fff;
+	}
+
+	.modal-close:hover,
+	.modal-close:focus {
+		background: #333;
+	}
+}
+
+/* ============================================================================
+   Mobile & Responsive Accessibility
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	/* Ensure touch targets remain 44px minimum on mobile */
+	.button,
+	.btn,
+	input[type='submit'],
+	input[type='button'],
+	.menu-toggle {
+		min-height: 48px;
+		padding: 14px 24px;
+	}
+
+	/* Increase font size for readability */
+	body {
+		font-size: 16px;
+	}
+
+	/* Ensure modal is accessible on mobile */
+	.modal-dialog {
+		width: 95%;
+		max-height: 95vh;
+		padding: 1.5rem;
+	}
+}
+
+/* ============================================================================
+   Focus Management
+   ========================================================================== */
+
+/* When using keyboard navigation, show focus clearly */
+body.using-keyboard *:focus {
+	outline: 2px solid #0073aa;
+	outline-offset: 2px;
+}
+
+/* When using mouse, hide focus outline */
+body.using-mouse *:focus {
+	outline: none;
+}
+
+/* But always show focus on skip link */
+.skip-link:focus {
+	outline: 2px solid #fff !important;
+	outline-offset: -2px !important;
+}

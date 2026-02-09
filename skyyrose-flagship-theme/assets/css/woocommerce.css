@@ -1,0 +1,284 @@
+/**
+ * SkyyRose WooCommerce Styles
+ *
+ * Custom WooCommerce styling for the SkyyRose theme.
+ * Includes product layouts, cart styling, and checkout enhancements.
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+/* ==========================================================================
+   WooCommerce General Styles
+   ========================================================================== */
+
+.woocommerce,
+.woocommerce-page {
+	font-family: inherit;
+}
+
+/* Product Grid */
+.woocommerce ul.products {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 2rem;
+	margin: 0;
+	padding: 0;
+}
+
+.woocommerce ul.products li.product {
+	list-style: none;
+	position: relative;
+	background: #fff;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.woocommerce ul.products li.product:hover {
+	transform: translateY(-4px);
+	box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Product Images */
+.woocommerce ul.products li.product img,
+.woocommerce-product-gallery img {
+	border-radius: 8px;
+	transition: opacity 0.3s ease;
+}
+
+.woocommerce ul.products li.product:hover img {
+	opacity: 0.9;
+}
+
+/* Product Titles */
+.woocommerce ul.products li.product .woocommerce-loop-product__title {
+	font-size: 1.125rem;
+	font-weight: 600;
+	margin: 1rem 0 0.5rem;
+	line-height: 1.4;
+}
+
+/* Product Prices */
+.woocommerce ul.products li.product .price,
+.woocommerce div.product p.price {
+	color: #2c3e50;
+	font-size: 1.25rem;
+	font-weight: 700;
+}
+
+.woocommerce ul.products li.product .price del,
+.woocommerce div.product p.price del {
+	color: #95a5a6;
+	font-weight: 400;
+}
+
+.woocommerce ul.products li.product .price ins,
+.woocommerce div.product p.price ins {
+	text-decoration: none;
+	color: #e74c3c;
+}
+
+/* Add to Cart Buttons */
+.woocommerce a.button,
+.woocommerce button.button,
+.woocommerce input.button,
+.woocommerce #respond input#submit {
+	background-color: #2c3e50;
+	color: #fff;
+	border: none;
+	border-radius: 4px;
+	padding: 0.75rem 1.5rem;
+	font-weight: 600;
+	transition: background-color 0.3s ease;
+	cursor: pointer;
+}
+
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover,
+.woocommerce #respond input#submit:hover {
+	background-color: #34495e;
+}
+
+.woocommerce a.button.loading::after {
+	content: "...";
+	animation: loading 1.5s infinite;
+}
+
+@keyframes loading {
+	0%, 100% { opacity: 0; }
+	50% { opacity: 1; }
+}
+
+/* ==========================================================================
+   Cart Page
+   ========================================================================== */
+
+.woocommerce table.shop_table {
+	border: 1px solid #e1e8ed;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.woocommerce table.shop_table th {
+	background-color: #f8f9fa;
+	font-weight: 600;
+	text-transform: uppercase;
+	font-size: 0.875rem;
+	letter-spacing: 0.5px;
+}
+
+.woocommerce table.shop_table td {
+	padding: 1rem;
+	vertical-align: middle;
+}
+
+/* Quantity Inputs */
+.woocommerce .quantity {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.woocommerce .quantity input.qty {
+	width: 60px;
+	text-align: center;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 0.5rem;
+}
+
+.woocommerce .quantity .qty-btn {
+	background-color: #f8f9fa;
+	border: 1px solid #ddd;
+	border-radius: 4px;
+	padding: 0.5rem 0.75rem;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.woocommerce .quantity .qty-btn:hover {
+	background-color: #e9ecef;
+}
+
+/* Cart Totals */
+.woocommerce .cart-collaterals .cart_totals {
+	background: #f8f9fa;
+	border-radius: 8px;
+	padding: 1.5rem;
+}
+
+.woocommerce .cart-collaterals .cart_totals h2 {
+	margin-top: 0;
+}
+
+/* ==========================================================================
+   Checkout Page
+   ========================================================================== */
+
+.woocommerce-checkout #payment {
+	background: #f8f9fa;
+	border-radius: 8px;
+	padding: 1.5rem;
+}
+
+.woocommerce-checkout #payment ul.payment_methods {
+	border: none;
+	padding: 0;
+}
+
+.woocommerce-checkout #payment div.payment_box {
+	background-color: #fff;
+	border-radius: 4px;
+	margin: 1rem 0;
+}
+
+/* ==========================================================================
+   Single Product Page
+   ========================================================================== */
+
+.woocommerce div.product div.summary {
+	padding: 2rem;
+}
+
+.woocommerce div.product .product_title {
+	font-size: 2rem;
+	margin-bottom: 1rem;
+}
+
+.woocommerce div.product .woocommerce-product-rating {
+	margin-bottom: 1.5rem;
+}
+
+/* Product Tabs */
+.woocommerce div.product .woocommerce-tabs ul.tabs {
+	border-bottom: 2px solid #e1e8ed;
+	padding: 0;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li {
+	border: none;
+	background: transparent;
+}
+
+.woocommerce div.product .woocommerce-tabs ul.tabs li.active {
+	border-bottom: 3px solid #2c3e50;
+}
+
+/* ==========================================================================
+   Notification Messages
+   ========================================================================== */
+
+.skyyrose-notification {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	background: #fff;
+	padding: 1rem 1.5rem;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	z-index: 9999;
+	opacity: 0;
+	transform: translateX(100%);
+	transition: all 0.3s ease;
+}
+
+.skyyrose-notification.show {
+	opacity: 1;
+	transform: translateX(0);
+}
+
+.skyyrose-notification.success {
+	border-left: 4px solid #27ae60;
+}
+
+.skyyrose-notification.error {
+	border-left: 4px solid #e74c3c;
+}
+
+.skyyrose-notification.info {
+	border-left: 4px solid #3498db;
+}
+
+/* ==========================================================================
+   Responsive Design
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	.woocommerce ul.products {
+		grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+		gap: 1rem;
+	}
+
+	.woocommerce div.product div.summary {
+		padding: 1rem;
+	}
+
+	.skyyrose-notification {
+		top: 10px;
+		right: 10px;
+		left: 10px;
+		max-width: calc(100% - 20px);
+	}
+}

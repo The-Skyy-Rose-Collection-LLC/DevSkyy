@@ -1,0 +1,25 @@
+/**
+ * Admin Styles
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+/* Wishlist Admin Styles */
+
+.post-type-wishlist .wrap h1 {
+	margin-bottom: 20px;
+}
+
+.post-type-wishlist .tablenav {
+	margin-top: 10px;
+}
+
+/* Widget Styles */
+
+.widget-content .wishlist-widget-preview {
+	padding: 15px;
+	background: #f8f8f8;
+	border-radius: 4px;
+	margin-top: 10px;
+}

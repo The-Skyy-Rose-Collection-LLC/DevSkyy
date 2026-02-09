@@ -1,0 +1,72 @@
+/**
+ * SkyyRose Elementor Editor Styles
+ *
+ * Custom styles for the Elementor editor interface.
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+/* ==========================================================================
+   Custom Widget Icons
+   ========================================================================== */
+
+.elementor-element .icon-skyyrose-3d::before {
+	content: "\f1b2";
+	font-family: "Font Awesome 5 Free";
+}
+
+/* ==========================================================================
+   Custom Widget Panels
+   ========================================================================== */
+
+.elementor-panel .elementor-control-skyyrose-notice {
+	background-color: #f0f8ff;
+	border-left: 4px solid #2c3e50;
+	padding: 12px 15px;
+	margin-bottom: 15px;
+}
+
+.elementor-panel .elementor-control-skyyrose-notice .elementor-control-field-description {
+	color: #2c3e50;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+/* ==========================================================================
+   Widget Preview Enhancements
+   ========================================================================== */
+
+.elementor-widget-skyyrose-3d-viewer {
+	border: 2px dashed #e1e8ed;
+	min-height: 400px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: #f8f9fa;
+}
+
+.elementor-widget-skyyrose-3d-viewer::before {
+	content: "3D Viewer Widget";
+	font-size: 16px;
+	color: #95a5a6;
+	font-weight: 600;
+}
+
+/* ==========================================================================
+   Custom Control Styles
+   ========================================================================== */
+
+.elementor-control-type-skyyrose-color-picker .elementor-control-input-wrapper {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+}
+
+/* ==========================================================================
+   Category Icons
+   ========================================================================== */
+
+.elementor-element .icon.eicon-skyyrose::before {
+	color: #2c3e50;
+}

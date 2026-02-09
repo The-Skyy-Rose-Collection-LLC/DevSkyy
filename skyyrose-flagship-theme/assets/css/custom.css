@@ -1,0 +1,237 @@
+/**
+ * Custom Styles
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+/* ==========================================================================
+   Header Styles
+   ========================================================================== */
+
+.site-header {
+	background: #fff;
+	border-bottom: 1px solid #e5e5e5;
+	padding: 20px 0;
+	position: sticky;
+	top: 0;
+	z-index: 999;
+}
+
+.header-container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+
+.site-branding {
+	display: flex;
+	align-items: center;
+}
+
+.site-title {
+	margin: 0;
+	font-size: 24px;
+	font-weight: 700;
+}
+
+.site-title a {
+	color: #1a1a1a;
+	text-decoration: none;
+}
+
+.site-description {
+	display: none;
+}
+
+/* Navigation
+   ========================================================================== */
+
+.main-navigation {
+	flex: 1;
+	margin: 0 40px;
+}
+
+.primary-menu-container {
+	display: flex;
+	justify-content: center;
+}
+
+.primary-menu-container ul {
+	list-style: none;
+	padding: 0;
+	margin: 0;
+	display: flex;
+	gap: 30px;
+}
+
+.primary-menu-container a {
+	color: #1a1a1a;
+	text-decoration: none;
+	font-weight: 500;
+	transition: color 0.3s ease;
+}
+
+.primary-menu-container a:hover {
+	color: #d4af37;
+}
+
+.menu-toggle {
+	display: none;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	padding: 10px;
+}
+
+/* Header Actions
+   ========================================================================== */
+
+.header-actions {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+
+.header-wishlist,
+.header-cart {
+	position: relative;
+}
+
+.header-wishlist a,
+.header-cart a {
+	display: flex;
+	align-items: center;
+	color: #1a1a1a;
+	text-decoration: none;
+	transition: color 0.3s ease;
+}
+
+.header-wishlist a:hover,
+.header-cart a:hover {
+	color: #d4af37;
+}
+
+.wishlist-icon,
+.cart-icon {
+	width: 24px;
+	height: 24px;
+}
+
+/* Mobile Styles
+   ========================================================================== */
+
+@media (max-width: 768px) {
+	.header-container {
+		flex-wrap: wrap;
+	}
+
+	.menu-toggle {
+		display: block;
+		order: -1;
+	}
+
+	.site-branding {
+		flex: 1;
+		justify-content: center;
+	}
+
+	.main-navigation {
+		width: 100%;
+		margin: 20px 0 0;
+		order: 3;
+	}
+
+	.primary-menu-container ul {
+		flex-direction: column;
+		gap: 0;
+	}
+
+	.primary-menu-container li {
+		border-top: 1px solid #e5e5e5;
+	}
+
+	.primary-menu-container a {
+		display: block;
+		padding: 15px 0;
+	}
+
+	.main-navigation {
+		display: none;
+	}
+
+	.main-navigation.active {
+		display: block;
+	}
+}
+
+/* Container
+   ========================================================================== */
+
+.container {
+	max-width: 1200px;
+	margin: 0 auto;
+	padding: 0 20px;
+}
+
+/* Buttons
+   ========================================================================== */
+
+.button {
+	display: inline-block;
+	padding: 12px 24px;
+	background: #1a1a1a;
+	color: #fff;
+	text-decoration: none;
+	border: none;
+	border-radius: 4px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.3s ease;
+}
+
+.button:hover {
+	background: #333;
+}
+
+.button.alt {
+	background: #d4af37;
+	color: #fff;
+}
+
+.button.alt:hover {
+	background: #c09b2f;
+}
+
+/* Product Grid
+   ========================================================================== */
+
+.products {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 30px;
+}
+
+@media (max-width: 768px) {
+	.products {
+		grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+		gap: 20px;
+	}
+}
+
+.product-card {
+	background: #fff;
+	border: 1px solid #e5e5e5;
+	border-radius: 8px;
+	overflow: hidden;
+	transition: all 0.3s ease;
+	position: relative;
+}
+
+.product-card:hover {
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+	transform: translateY(-4px);
+}
