@@ -1,0 +1,142 @@
+{
+  "name": "skyyrose-flagship-theme",
+  "version": "1.0.0",
+  "description": "SkyyRose flagship WordPress theme with WooCommerce and 3D capabilities",
+  "scripts": {
+    "build": "npm run build:js && npm run build:css",
+    "build:js": "webpack --mode production",
+    "build:css": "cleancss -o style.min.css style.css && cleancss -o assets/css/woocommerce.min.css assets/css/woocommerce.css && cleancss -o assets/css/accessibility.min.css assets/css/accessibility.css",
+    "test": "npm run test:js && npm run test:e2e",
+    "test:js": "jest",
+    "test:js:watch": "jest --watch",
+    "test:js:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:headed": "playwright test --headed",
+    "test:validate": "bash scripts/validate-theme.sh",
+    "test:performance": "bash scripts/test-performance.sh",
+    "test:accessibility": "bash scripts/check-accessibility.sh",
+    "test:browsers": "bash scripts/test-browsers.sh",
+    "test:3d": "bash scripts/validate-3d.sh",
+    "test:all": "npm run test:validate && npm run test:js && npm run test:e2e",
+    "test:coverage": "npm run test:js:coverage && npm run test:e2e",
+    "lint:js": "eslint assets/js/**/*.js",
+    "lint:js:fix": "eslint assets/js/**/*.js --fix",
+    "format": "prettier --write \"**/*.{js,json,md}\"",
+    "prepare": "husky install"
+  },
+  "keywords": [
+    "wordpress",
+    "woocommerce",
+    "theme",
+    "three.js",
+    "3d",
+    "ecommerce"
+  ],
+  "author": "SkyyRose",
+  "license": "GPL-2.0-or-later",
+  "devDependencies": {
+    "@axe-core/cli": "^4.8.0",
+    "@babel/core": "^7.23.0",
+    "@babel/preset-env": "^7.23.0",
+    "@playwright/test": "^1.40.0",
+    "@testing-library/dom": "^9.3.0",
+    "@testing-library/jest-dom": "^6.1.0",
+    "babel-jest": "^29.7.0",
+    "clean-css-cli": "^5.6.3",
+    "eslint": "^8.50.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-jest": "^27.4.0",
+    "husky": "^8.0.3",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "lighthouse": "^11.4.0",
+    "pa11y": "^7.0.0",
+    "prettier": "^3.0.3",
+    "terser-webpack-plugin": "^5.3.16",
+    "three-gltf-exporter": "^0.0.1",
+    "webpack": "^5.105.0",
+    "webpack-cli": "^6.0.1"
+  },
+  "dependencies": {
+    "three": "^0.159.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/tests/e2e/"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/jest.setup.js"
+    ],
+    "moduleNameMapper": {
+      "\\.(css|less|scss|sass)$": "identity-obj-proxy"
+    },
+    "collectCoverageFrom": [
+      "assets/js/**/*.js",
+      "!assets/js/**/*.min.js",
+      "!assets/js/vendor/**"
+    ],
+    "coverageDirectory": "tests/coverage/js",
+    "coverageReporters": [
+      "html",
+      "text",
+      "lcov"
+    ]
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env",
+        {
+          "targets": {
+            "node": "current"
+          }
+        }
+      ]
+    ]
+  },
+  "eslintConfig": {
+    "env": {
+      "browser": true,
+      "es2021": true,
+      "jest": true,
+      "node": true
+    },
+    "extends": [
+      "eslint:recommended",
+      "prettier"
+    ],
+    "parserOptions": {
+      "ecmaVersion": "latest",
+      "sourceType": "module"
+    },
+    "globals": {
+      "THREE": "readonly",
+      "wp": "readonly",
+      "jQuery": "readonly",
+      "$": "readonly"
+    },
+    "rules": {
+      "no-unused-vars": "warn",
+      "no-console": "off"
+    }
+  },
+  "prettier": {
+    "semi": true,
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 100,
+    "tabWidth": 2,
+    "useTabs": false
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint:js && npm run test:js",
+      "pre-push": "npm run test:all"
+    }
+  }
+}
