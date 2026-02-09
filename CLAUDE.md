@@ -1,161 +1,147 @@
 # DevSkyy — Claude Config
 
-> Enterprise AI | SkyyRose Luxury Fashion | 54 Agents | **pytest AFTER EVERY CHANGE**
+> Enterprise AI | SkyyRose Luxury Fashion | 54 Agents | **Self-Correcting System**
 
-## Protocol
-1. **Context7** → `resolve-library-id` → `get-library-docs` (BEFORE library code)
+---
+
+## Protocol (Do This Every Time)
+
+1. **Context7** → `resolve-library-id` → `query-docs` (BEFORE library code)
 2. **Serena** → Codebase navigation and symbol lookup
 3. **Navigate** → Read first, understand, NO code until clear
-4. **Implement** → `str_replace` (targeted) | `create_file` (new only)
+4. **Implement** → `Edit` tool (targeted) | `Write` (new only)
 5. **Test** → `pytest -v` (MANDATORY after EVERY file touch)
 6. **Format** → `isort . && ruff check --fix && black .`
+7. **Learn** → After any correction, update this CLAUDE.md ⭐
 
-## MCP Tools
-**DevSkyy** (`devskyy_mcp.py`): `agent_orchestrator` `rag_query` `rag_ingest` `brand_context` `product_search` `order_management` `wordpress_sync` `3d_generate` `analytics_query` `cache_ops` `health_check` `tool_catalog` `llm_route`
+---
 
-| Service | Key Tools |
-|---------|-----------|
-| **Figma** | `get_design_context` `get_screenshot` `get_metadata` `get_code_connect_map` |
-| **Notion** | `notion-search` `notion-fetch` `notion-create-pages` `notion-update-page` |
-| **HuggingFace** | `model_search` `dataset_search` `paper_search` `hf_doc_search` |
-| **WordPress.com** | `wpcom-mcp-posts-search` `wpcom-mcp-post-get` `wpcom-mcp-site-settings` |
-| **Vercel** | `deploy_to_vercel` `list_deployments` `get_deployment_build_logs` |
+## Verification Commands (Run After Changes)
 
-## Skills (Read BEFORE Complex Tasks)
-| Task | Path |
-|------|------|
-| SkyyRose brand | `/mnt/skills/user/skyyrose-brand-dna/SKILL.md` |
-| WordPress/WooCommerce | `/mnt/skills/user/wordpress-woocommerce-automation/SKILL.md` |
-| Agent building | `/mnt/skills/user/devskyy-agent-builder/SKILL.md` |
-| MCP debugging | `/mnt/skills/user/mcp-server-debugger/SKILL.md` |
-| RAG optimization | `/mnt/skills/user/rag-query-rewriter/SKILL.md` |
-| Production checks | `/mnt/skills/user/production-readiness-checker/SKILL.md` |
+```bash
+# Python
+pytest -v && mypy . --ignore-missing-imports && ruff check
 
-## WordPress Theme Documentation (REQUIRED READING)
-**IMPORTANT**: All agents MUST read these files before working on WordPress site:
+# JavaScript
+npm test && npm run type-check && npm run lint
 
-| File | Purpose | When to Read |
-|------|---------|--------------|
-| `PAGES-DOCUMENTATION.md` | Complete page reference (static, interactive, catalog) | Before modifying ANY page templates |
-| `THEME-AUDIT.md` | Security audit, file verification, hardening patterns | Before deployment or security changes |
-| `SECURITY_HARDENING_COMPLETE.md` | OWASP compliance, defensive patterns | Before adding new features |
-| `CONTEXT7_VERIFICATION.md` | WordPress best practices verification | Before writing WordPress code |
+# WordPress
+wp theme list && curl -I https://skyyrose.co | grep -i content-security-policy
 
-**Key Distinction (CRITICAL)**:
-- **Immersive Pages** (`template-collection.php`): 3D storytelling, NOT shopping
-- **Catalog Pages** (`page-collection-*.php`): Product grids, FOR shopping
-- ALWAYS check documentation before assuming page purpose
-
-## Codebase
-```
-main_enterprise.py        # FastAPI (47+ endpoints)
-devskyy_mcp.py            # MCP server (13 tools)
-core/
-├── auth/                 # Auth types, models, interfaces (zero deps)
-└── registry/             # Service registry for dependency injection
-agents/
-├── base_super_agent.py   # Enhanced base (17 techniques, ADK-based)
-├── base_legacy.py        # Legacy base classes (deprecated, use ADK)
-└── operations_legacy.py  # Legacy operations agent (deprecated)
-adk/                      # Agent Development Kit (symlink to sdk/python/adk)
-llm/                      # 6 providers, router, round_table
-security/                 # AES-256-GCM, JWT, audit_log (uses core.auth)
-api/v1/                   # REST, gdpr, webhooks
-wordpress-theme/          # SkyyRose WordPress theme
-├── skyyrose-flagship/    # Production theme directory
-│   ├── template-collection.php  # Collection pages (immersive)
-│   ├── elementor-widgets/       # Custom widgets (3D, pre-order)
-│   └── inc/                     # Theme functions
-frontend/
-├── components/3d/        # LuxuryProductViewer (React Three Fiber)
-└── lib/animations/       # luxury-transitions.ts (Framer Motion)
-services/
-└── ai_image_enhancement.py  # AI image processing (FLUX, SD3, RemBG)
-tests/
-├── integration/          # Integration tests (moved from root)
-└── ...                   # 1200+ tests
+# Full System
+pytest -v && npm test && curl http://localhost:8000/health
 ```
 
-## Rules
-- Correctness > Elegance > Performance | No deletions, refactor only
-- Pydantic in, typed out | Update ALL sites+tests+docs on interface change
-- `pytest -v` after EVERY change | 90%+ coverage
+---
 
-## Patterns
-```python
-class ToolError(DevSkyError):
-    def __init__(self, tool: str, reason: str, *, correlation_id: str | None = None): ...
-async def process(data: InputModel, *, correlation_id: str | None = None) -> OutputModel: ...
-```
+## Learnings (Updated Weekly When Claude Makes Mistakes) ⭐
 
-## Security
-AES-256-GCM encryption | JWT + OAuth2 | GDPR endpoints | Audit logging | `.env` local, AWS Secrets prod
+### WordPress
 
-## Brand
-SkyyRose: `#B76E79` primary | "Where Love Meets Luxury" | Use `BrandKit.from_config()`
+- ❌ **Mistake**: Using `/wp-json/` for WordPress.com API
+  - ✅ **Correct**: Use `index.php?rest_route=` instead (WordPress.com requirement)
 
-## Gotchas
-- **WP.com API**: `index.php?rest_route=` NOT `/wp-json/`
-- **3D CDNs**: VERIFY URLs exist | **Correlation IDs**: ALWAYS propagate
-- **WordPress Theme**: Use Serena for all WordPress file operations
-- **Context7**: ALWAYS query WordPress/Elementor/WooCommerce docs BEFORE coding
-- **Collection Pages**:
-  - IMMERSIVE (3D): BLACK ROSE (gothic cathedral), LOVE HURTS (romantic castle), SIGNATURE (Oakland/SF tour)
-  - CATALOG (products): page-collection-black-rose.php, page-collection-love-hurts.php, page-collection-signature.php
-- **Immersive**: React Three Fiber + Framer Motion + luxury animations (#B76E79 rose gold)
-- **Ralph Loop**: Use for complex multi-step immersive page builds
-- **WordPress Docs**: ALWAYS read `wordpress-theme/skyyrose-flagship/PAGES-DOCUMENTATION.md` before modifying pages (if exists)
-- **Security**: ALWAYS read `wordpress-theme/skyyrose-flagship/THEME-AUDIT.md` before deployment changes (if exists)
+- ❌ **Mistake**: Assuming page purpose from name
+  - ✅ **Correct**: ALWAYS read `wordpress-theme/skyyrose-flagship/PAGES-DOCUMENTATION.md` first
 
-## Health
-`/health` `/health/ready` `/health/live` `/metrics` (Prometheus)
+- ❌ **Mistake**: Thinking immersive pages = product catalog
+  - ✅ **Correct**: Immersive = 3D storytelling (NOT shopping), Catalog = product grids (FOR shopping)
 
-## Dependencies
-**Single Source**: `pyproject.toml` + `package.json` (108 new packages installed)
+- ❌ **Mistake**: Editing WordPress files without Serena
+  - ✅ **Correct**: Use Serena MCP tools for all WordPress file operations
 
-### Python
-- **Core**: FastAPI, Pydantic, SQLAlchemy, PyJWT, Sentry
-- **ML**: torch, transformers, diffusers, chromadb, llama-index
-- **Worker**: celery, kombu, flower
-- **Deploy**: gunicorn, uvicorn
-- **MCP**: 13 MCP tools + 6 LLM providers
-- **AI Image**: fal-client, stability-sdk, rembg, clip-interrogator
+- ❌ **Mistake**: Referencing skyyrose-2025 theme
+  - ✅ **Correct**: Only `skyyrose-flagship` exists (production theme)
 
-### JavaScript/TypeScript (39 new packages)
-- **3D**: @react-three/fiber, @react-three/drei, postprocessing, three
-- **Animation**: framer-motion, react-spring, gsap, lottie-web
-- **Image**: sharp, pica, blurhash, @vercel/og
-- **WordPress**: @wordpress/scripts (31.4.0), @wordpress/block-editor, @wordpress/components
-- **WooCommerce**: @woocommerce/components, @woocommerce/data
-- **Elementor**: swiper, aos, isotope-layout, typed.js
+### Testing
 
-## Architecture (NEW - v1.3.1)
-**Dependency Flow** (one-way, no cycles):
-```
-core/ (auth + registry) ← ZERO dependencies on outer layers
-    ↓
-adk/ (Agent Development Kit)
-    ↓
-security (implementations)
-    ↓
-agents (use adk.base, not legacy base.py)
-    ↓
-api, services
-```
+- ❌ **Mistake**: Skipping tests "just this once"
+  - ✅ **Correct**: `pytest -v` after EVERY file touch, no exceptions
 
-**Phase 2 Complete** (v1.3.1):
-- ✅ Root cleanup: base.py, operations.py → agents/
-- ✅ Test organization: test files → tests/integration/
-- ✅ Service registry: core/registry/ for dependency injection
-- ✅ Updated imports: agents use base_legacy until ADK migration
+- ❌ **Mistake**: Coverage <80%
+  - ✅ **Correct**: 90%+ coverage required (use `pytest --cov`)
 
-**Phase 5 Active** (v3.0.0 - WordPress Enhancement):
-- ✅ 108 packages installed (39 JS/TS + 69 WordPress)
-- ✅ LuxuryProductViewer component (React Three Fiber)
-- ✅ Luxury animations library (Framer Motion)
-- ✅ AI image enhancement (FLUX, SD3, RemBG)
-- 🔄 Immersive collection pages (Ralph Loop in progress)
-- 🔄 WooCommerce integration with 3D viewers
-- 🔄 Pre-order forms with checkout
+- ❌ **Mistake**: Writing implementation before tests
+  - ✅ **Correct**: TDD workflow: RED (write failing test) → GREEN (minimal impl) → IMPROVE (refactor)
 
-**v3.0.0** | SkyyRose LLC | Immersive WordPress Experience
+### Architecture
+
+- ❌ **Mistake**: Circular dependencies (api imports core, core imports api)
+  - ✅ **Correct**: One-way flow only: `core → adk → security → agents → api`
+
+- ❌ **Mistake**: Using `base_legacy.py` or `operations_legacy.py`
+  - ✅ **Correct**: Use `adk/base_super_agent.py` (17 techniques, ADK-based)
+
+- ❌ **Mistake**: Importing from outer layers into inner layers
+  - ✅ **Correct**: Inner layers (core, adk) have ZERO dependencies on outer layers
+
+### 3D Development
+
+- ❌ **Mistake**: Using CDN URLs without verification
+  - ✅ **Correct**: VERIFY URLs exist first (`curl -I <url>`)
+
+- ❌ **Mistake**: Forgetting to propagate correlation_id
+  - ✅ **Correct**: ALWAYS accept `correlation_id` as keyword-only arg and propagate
+
+- ❌ **Mistake**: Hardcoding 3D library versions
+  - ✅ **Correct**: Three.js v0.160.0, Babylon.js latest (via CDN)
+
+### Context7
+
+- ❌ **Mistake**: Writing library code before checking docs
+  - ✅ **Correct**: ALWAYS `resolve-library-id` → `query-docs` first
+
+- ❌ **Mistake**: Assuming WordPress/Elementor/WooCommerce APIs haven't changed
+  - ✅ **Correct**: Query Context7 for up-to-date docs every time
+
+### Code Quality
+
+- ❌ **Mistake**: Mutating objects directly
+  - ✅ **Correct**: Immutability always (use spread: `{...obj, newKey}` not `obj.key = val`)
+
+- ❌ **Mistake**: Using `console.log` or debug statements
+  - ✅ **Correct**: Remove all debug output before committing
+
+- ❌ **Mistake**: Hardcoding values (API keys, URLs)
+  - ✅ **Correct**: Use environment variables (see `docs/ENV_VARS_REFERENCE.md`)
+
+---
+
+## Critical Rules (Never Break These)
+
+- **NO deletions**, refactor only (preserve git history)
+- **Context7 BEFORE any library code** (WordPress, Elementor, WooCommerce, Three.js)
+- **Serena for WordPress** file operations (NOT direct file access)
+- **pytest AFTER EVERY CHANGE** (no exceptions)
+- **90%+ coverage** required (use `pytest --cov`)
+- **Update CLAUDE.md** after every correction (self-correcting system)
+
+---
+
+## Quick Reference
+
+### Brand & Health
+- **Brand**: `#B76E79` (rose gold) | "Where Love Meets Luxury" | `BrandKit.from_config()`
+- **Health**: `/health` `/health/ready` `/health/live` `/metrics`
+
+### Collections & Docs
+- **Immersive** (3D): Black Rose (cathedral), Love Hurts (castle), Signature (city tour)
+- **Catalog** (shopping): `page-collection-{black-rose,love-hurts,signature}.php`
+- **Docs**: `docs/` → CONTRIB, RUNBOOK, ENV_VARS_REFERENCE, MCP_TOOLS, DEPENDENCIES, ARCHITECTURE
+
+---
+
+## When Claude Does Something Wrong
+
+**Self-Correcting Protocol** (Boris Cherny's approach):
+
+1. **Fix the issue** (correct the code, tests, docs)
+2. **Add to Learnings** (update this file with ❌ Mistake → ✅ Correct)
+3. **Commit both** (code fix + CLAUDE.md update together)
+4. **Update multiple times weekly** (living document, not static)
+
+This transforms our codebase into a **self-correcting organism** where mistakes become rules.
+
+---
+
+**v3.1.0** | SkyyRose LLC | Self-Correcting AI System
