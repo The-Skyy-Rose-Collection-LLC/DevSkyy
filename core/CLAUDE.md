@@ -1,61 +1,75 @@
 # DevSkyy Core
 
-> Zero dependencies on outer layers | 22 files
+> Zero dependencies on outer layers | Auth types, models, interfaces
 
-## Architecture
+---
+
+## Critical Rule
+
+**ZERO dependencies on outer layers**: core/ must NEVER import from adk/, security/, agents/, api/, or services/.
+
+---
+
+## Learnings (Update When Claude Makes Mistakes)
+
+### Architecture
+
+- ❌ **Mistake**: Importing from security/ or agents/ into core/
+  - ✅ **Correct**: core/ has ZERO dependencies. Define types/interfaces here, implement in outer layers.
+
+- ❌ **Mistake**: Putting implementations in core/auth/
+  - ✅ **Correct**: core/auth/ = types/models/interfaces only. Implementations go in security/.
+
+- ❌ **Mistake**: Adding new dependencies to core/
+  - ✅ **Correct**: core/ depends ONLY on stdlib + pydantic. Use `architect` agent before adding deps.
+
+### Patterns
+
+- ❌ **Mistake**: Creating concrete classes in core/auth/interfaces.py
+  - ✅ **Correct**: Use ABC (Abstract Base Class) only. Implementations go in security/.
+
+---
+
+## Structure
+
 ```
 core/
-├── auth/                     # AUTHENTICATION TYPES (NEW - v1.3.0)
-│   ├── types.py             # UserRole, TokenType, AuthStatus (6 enums)
-│   ├── models.py            # TokenResponse, UserCreate, UserInDB (8 models)
-│   ├── interfaces.py        # IAuthProvider, ITokenValidator (5 ABCs)
+├── auth/                     # Authentication (types, models, interfaces)
+│   ├── types.py             # Enums: UserRole, TokenType, AuthStatus
+│   ├── models.py            # Pydantic models: TokenResponse, UserCreate
+│   ├── interfaces.py        # ABCs: IAuthProvider, ITokenValidator
 │   ├── token_payload.py     # TokenPayload dataclass
 │   └── role_hierarchy.py    # ROLE_HIERARCHY + utilities
-├── runtime/
-│   ├── input_validator.py    # Pydantic validation
-│   └── tools.py              # ToolSpec, ToolRegistry
-├── llm/infrastructure/       # Provider abstraction
+├── registry/                 # Service registry for dependency injection
+├── runtime/                  # Tool registry, input validation
 └── errors.py                 # Exception hierarchy
 ```
 
-## Patterns
+---
 
-### Auth Types (Zero Dependencies)
+## Usage Pattern
+
 ```python
+# ✅ CORRECT: Import types from core, use implementations from security
 from core.auth import UserRole, TokenPayload, IAuthProvider
+from security.jwt import JWTAuthProvider  # Implementation
 
-# Types are defined in core, implementations in security/
-payload = token_validator.validate_token(token)
-if payload.has_role(UserRole.ADMIN):
-    # Admin-specific logic
-    pass
+provider: IAuthProvider = JWTAuthProvider()
+token = await provider.generate_token(user_id="123")
 ```
 
-### Tool Registry
-```python
-class ToolSpec(BaseModel, Generic[T, R]):
-    name: str
-    input_schema: type[T]
-    output_schema: type[R]
+---
 
-class BaseTool(ABC, Generic[T, R]):
-    spec: ToolSpec[T, R]
-    async def execute(self, input: T, *, correlation_id: str | None = None) -> R: ...
+## Verification
 
-class ToolRegistry:
-    def register(self, tool: BaseTool) -> None: self._tools[tool.spec.name] = tool
-    def get(self, name: str) -> BaseTool | None: return self._tools.get(name)
+```bash
+# Verify zero dependencies
+rg "^from (adk|security|agents|api|services)" core/ && echo "❌ Found outer layer imports!" || echo "✅ Zero dependencies verified"
+
+# Run tests
+pytest tests/unit/test_core.py -v
 ```
 
-## BEFORE CODING (MANDATORY)
-1. **Context7**: `resolve-library-id` → `get-library-docs` for up-to-date docs
-2. **Serena**: Use for codebase navigation and symbol lookup
-3. **Verify**: `pytest -v` after EVERY change
-
-## USE THESE TOOLS
-| Task | Tool |
-|------|------|
-| Tool debugging | **MCP**: `tool_catalog`, `health_check` |
-| Core changes | **Agent**: `architect` for design review |
+---
 
 **"The core serves everyone. It depends on no one."**
