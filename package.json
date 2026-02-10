@@ -16,7 +16,7 @@
     "@anthropic-ai/sdk": "^0.73.0",
     "@apollo/server": "^5.4.0",
     "@copilotkit/react-core": "^1.51.2",
-    "@copilotkit/react-ui": "^1.51.2",
+    "@copilotkit/react-ui": "^1.51.3",
     "@copilotkit/runtime": "^1.51.2",
     "@fastify/cors": "^11.2.0",
     "@fastify/helmet": "^13.0.2",
