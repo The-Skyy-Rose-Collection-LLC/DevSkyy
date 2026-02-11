@@ -38,13 +38,13 @@ function skyyrose_signature_3d_enqueue() {
 
     // Signature Collection 3D JavaScript
     wp_enqueue_script(
-    wp_script_add_data( 'signature-3d-js', 'strategy', 'defer' );
         'signature-3d-js',
         get_template_directory_uri() . '/assets/js/signature-collection-3d.min.js',
         array(),
         '1.0.0-r182',
         true
     );
+    wp_script_add_data( 'signature-3d-js', 'strategy', 'defer' );
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_signature_3d_enqueue' );
 

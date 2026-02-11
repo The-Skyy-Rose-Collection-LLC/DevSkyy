@@ -537,7 +537,6 @@ add_action( 'init', 'skyyrose_register_wishlist_cpt' );
  * Enqueue brand-specific styles
  */
 require get_template_directory() . '/inc/enqueue-brand-styles.php';
-<?php
 /**
  * Advanced Performance & Security Fixes
  * Solutions verified via deep research (Context7 + Web Search 2026)
