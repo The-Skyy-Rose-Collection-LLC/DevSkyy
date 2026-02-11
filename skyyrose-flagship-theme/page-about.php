@@ -1,0 +1,68 @@
+<?php
+/**
+ * Template Name: About Page
+ * Description: About page with brand story and team
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+function skyyrose_about_enqueue() {
+    wp_enqueue_style( 'about-css', get_template_directory_uri() . '/assets/css/about.css', array(), '1.0.0' );
+    wp_enqueue_script( 'about-js', get_template_directory_uri() . '/assets/js/about.js', array(), '1.0.0', true );
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_about_enqueue' );
+
+get_header();
+
+// Check if built with Elementor
+if ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->documents->get( get_the_ID() )->is_built_with_elementor() ) {
+    // Render Elementor content
+    the_content();
+} else {
+    // Show custom template HTML
+    ?>
+
+<main class="about-page">
+    <div class="page-header">
+        <h1><?php the_title(); ?></h1>
+        <p>Born in Oakland, crafted with love. This is our story.</p>
+    </div>
+
+    <div class="brand-story-section">
+        <div class="story-content">
+            <h2>Where Love Meets Luxury</h2>
+            <p>
+                SkyyRose emerged from the vibrant streets of Oakland, where authenticity isn't just valued—it's essential. 
+                Founded with a vision to bridge the gap between street culture and luxury fashion, we create pieces that tell stories.
+            </p>
+            <p>
+                The name "Love Hurts" carries deep meaning—it's our founder's family name, Hurts, woven into the fabric of every piece. 
+                This personal connection infuses each collection with genuine emotion and uncompromising quality.
+            </p>
+        </div>
+
+        <div class="collections-story">
+            <h2>Three Collections, One Vision</h2>
+            <div class="collection-item">
+                <h3>BLACK ROSE</h3>
+                <p>Dark elegance for the bold. This collection embodies strength, mystery, and unapologetic style.</p>
+            </div>
+            <div class="collection-item">
+                <h3>LOVE HURTS</h3>
+                <p>Where emotion meets fashion. Inspired by raw feelings and authentic expression.</p>
+            </div>
+            <div class="collection-item">
+                <h3>SIGNATURE</h3>
+                <p>Timeless luxury essentials. The foundation pieces that define your wardrobe.</p>
+            </div>
+        </div>
+    </div>
+</main>
+
+<?php
+} // End Elementor check
+
+get_footer();

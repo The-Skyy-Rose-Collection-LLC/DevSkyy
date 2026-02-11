@@ -1,0 +1,60 @@
+<?php
+/**
+ * Template Name: Contact Page
+ * Description: Contact page with form and information
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+function skyyrose_contact_enqueue() {
+    wp_enqueue_style( 'contact-css', get_template_directory_uri() . '/assets/css/contact.css', array(), '1.0.0' );
+    wp_enqueue_script( 'contact-js', get_template_directory_uri() . '/assets/js/contact.js', array(), '1.0.0', true );
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_contact_enqueue' );
+
+get_header();
+?>
+
+<main class="contact-page">
+    <div class="page-header">
+        <h1><?php the_title(); ?></h1>
+        <p>We'd love to hear from you. Reach out with questions, feedback, or collaboration inquiries.</p>
+    </div>
+
+    <div class="contact-section">
+        <div class="contact-info">
+            <h2>Get in Touch</h2>
+            <div class="contact-item">
+                <div class="contact-icon">📧</div>
+                <div>
+                    <h3>Email</h3>
+                    <p>contact@skyyrose.com</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">📍</div>
+                <div>
+                    <h3>Location</h3>
+                    <p>Oakland, CA</p>
+                </div>
+            </div>
+            <div class="contact-item">
+                <div class="contact-icon">🕒</div>
+                <div>
+                    <h3>Hours</h3>
+                    <p>Mon-Fri: 9AM - 6PM PST</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="contact-form-wrapper">
+            <h2>Send a Message</h2>
+            <?php echo do_shortcode( '[contact-form-7 id="contact-form"]' ); ?>
+        </div>
+    </div>
+</main>
+
+<?php get_footer(); ?>

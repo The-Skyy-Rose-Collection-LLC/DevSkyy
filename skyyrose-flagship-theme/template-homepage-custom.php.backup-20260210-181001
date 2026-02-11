@@ -1,0 +1,301 @@
+<?php
+/**
+ * Template Name: Custom Homepage (Full Design)
+ * Description: Complete custom homepage with animations and full design
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+// Enqueue homepage assets
+function skyyrose_homepage_custom_enqueue() {
+    wp_enqueue_style( 'homepage-css', get_template_directory_uri() . '/assets/css/homepage.css', array(), '1.0.0' );
+    wp_enqueue_script( 'homepage-js', get_template_directory_uri() . '/assets/js/homepage.js', array(), '1.0.0', true );
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_homepage_custom_enqueue' );
+?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo( 'charset' ); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php bloginfo( 'name' ); ?> | Where Love Meets Luxury</title>
+    <?php wp_head(); ?>
+</head>
+<body <?php body_class( 'custom-homepage' ); ?>>
+    <?php
+    if ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->documents->get( get_the_ID() )->is_built_with_elementor() ) {
+        the_content();
+    } else {
+        ?>
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo">SKYYROSE</a>
+        <ul class="nav-links">
+            <li><a href="<?php echo esc_url( get_term_link( 'black-rose', 'product_cat' ) ); ?>">Black Rose</a></li>
+            <li><a href="<?php echo esc_url( get_term_link( 'love-hurts', 'product_cat' ) ); ?>">Love Hurts</a></li>
+            <li><a href="<?php echo esc_url( get_term_link( 'signature-collection', 'product_cat' ) ); ?>">Signature</a></li>
+            <li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About</a></li>
+            <li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>">Journal</a></li>
+        </ul>
+        <div class="nav-actions">
+            <span class="nav-icon">🔍</span>
+            <span class="nav-icon">♡</span>
+            <span class="nav-icon" style="position: relative;">
+                🛒
+                <span class="cart-count" id="cartCount">0</span>
+            </span>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <div class="orb orb-1"></div>
+            <div class="orb orb-2"></div>
+            <div class="orb orb-3"></div>
+        </div>
+        <div class="hero-content">
+            <span class="hero-badge">Oakland Luxury Streetwear</span>
+            <h1 class="hero-title">
+                <span>Where Love</span>
+                <span>Meets Luxury</span>
+            </h1>
+            <p class="hero-subtitle">
+                Three distinct collections, one unified vision. Born in Oakland, crafted with passion,
+                designed for those who wear their heart on their sleeve.
+            </p>
+            <div class="hero-cta">
+                <a href="<?php echo esc_url( home_url( '/preorder-gateway/' ) ); ?>" class="btn btn-primary">Pre-Order Now</a>
+                <a href="#collections" class="btn btn-outline">Explore Collections</a>
+            </div>
+        </div>
+        <div class="scroll-indicator">
+            <span>Scroll</span>
+        </div>
+    </section>
+    <!-- Collections Section -->
+    <section class="collections" id="collections">
+        <div class="section-header">
+            <span class="section-label">The Collections</span>
+            <h2 class="section-title">Three Stories, One Vision</h2>
+            <p class="section-subtitle">
+                Each collection represents a chapter in our story—from dark elegance to emotional depth to timeless luxury.
+            </p>
+        </div>
+        <div class="collections-grid">
+            <div class="collection-card black-rose">
+                <div class="collection-bg"></div>
+                <div class="collection-content">
+                    <h3 class="collection-name">BLACK ROSE</h3>
+                    <p class="collection-tagline">Dark elegance for the bold</p>
+                    <a href="<?php echo esc_url( get_term_link( 'black-rose', 'product_cat' ) ); ?>" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="collection-card love-hurts">
+                <div class="collection-bg"></div>
+                <div class="collection-content">
+                    <h3 class="collection-name">LOVE HURTS</h3>
+                    <p class="collection-tagline">Where emotion meets fashion</p>
+                    <a href="<?php echo esc_url( get_term_link( 'love-hurts', 'product_cat' ) ); ?>" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            <div class="collection-card signature">
+                <div class="collection-bg"></div>
+                <div class="collection-content">
+                    <h3 class="collection-name">SIGNATURE</h3>
+                    <p class="collection-tagline">Timeless luxury essentials</p>
+                    <a href="<?php echo esc_url( get_term_link( 'signature-collection', 'product_cat' ) ); ?>" class="collection-link">
+                        Explore Collection
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Featured Products -->
+    <section class="featured">
+        <div class="section-header">
+            <span class="section-label">Featured</span>
+            <h2 class="section-title">New Arrivals</h2>
+            <p class="section-subtitle">
+                The latest additions to our collections, each piece crafted with intention.
+            </p>
+        </div>
+        <div class="products-grid">
+            <div class="product-card">
+                <span class="product-badge new">New</span>
+                <div class="product-image">
+                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #2a0a0a, #1a0505); border-radius: 8px;"></div>
+                </div>
+                <div class="product-actions">
+                    <button class="product-action-btn" title="Quick View">👁️</button>
+                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
+                    <button class="product-action-btn" title="Add to Cart">🛒</button>
+                </div>
+                <div class="product-info">
+                    <p class="product-collection">Black Rose</p>
+                    <h3 class="product-name">Thorn Hoodie</h3>
+                    <p class="product-price">$185</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <span class="product-badge limited">Limited</span>
+                <div class="product-image">
+                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #3d1a20, #2a1015); border-radius: 8px;"></div>
+                </div>
+                <div class="product-actions">
+                    <button class="product-action-btn" title="Quick View">👁️</button>
+                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
+                    <button class="product-action-btn" title="Add to Cart">🛒</button>
+                </div>
+                <div class="product-info">
+                    <p class="product-collection">Love Hurts</p>
+                    <h3 class="product-name">Heartbreak Hoodie</h3>
+                    <p class="product-price">$195</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <div class="product-image">
+                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #2d2820, #1a1810); border-radius: 8px;"></div>
+                </div>
+                <div class="product-actions">
+                    <button class="product-action-btn" title="Quick View">👁️</button>
+                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
+                    <button class="product-action-btn" title="Add to Cart">🛒</button>
+                </div>
+                <div class="product-info">
+                    <p class="product-collection">Signature</p>
+                    <h3 class="product-name">Foundation Blazer</h3>
+                    <p class="product-price">$425</p>
+                </div>
+            </div>
+            <div class="product-card">
+                <span class="product-badge new">New</span>
+                <div class="product-image">
+                    <div style="width: 200px; height: 250px; background: linear-gradient(135deg, #1a0808, #0a0303); border-radius: 8px;"></div>
+                </div>
+                <div class="product-actions">
+                    <button class="product-action-btn" title="Quick View">👁️</button>
+                    <button class="product-action-btn" title="Add to Wishlist">♡</button>
+                    <button class="product-action-btn" title="Add to Cart">🛒</button>
+                </div>
+                <div class="product-info">
+                    <p class="product-collection">Black Rose</p>
+                    <h3 class="product-name">Midnight Jacket</h3>
+                    <p class="product-price">$295</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Brand Story -->
+    <section class="brand-story">
+        <div class="brand-story-bg"></div>
+        <div class="brand-story-content">
+            <div class="brand-story-text">
+                <span class="section-label">Our Story</span>
+                <h2>Born in Oakland,<br>Crafted with Love</h2>
+                <p>
+                    SkyyRose emerged from the vibrant streets of Oakland, where authenticity isn't just valued—it's essential.
+                    Founded with a vision to bridge the gap between street culture and luxury fashion, we create pieces that
+                    tell stories.
+                </p>
+                <p>
+                    The name "Love Hurts" carries deep meaning—it's our founder's family name, Hurts, woven into the
+                    fabric of every piece. This personal connection infuses each collection with genuine emotion and
+                    uncompromising quality.
+                </p>
+                <a href="<?php echo esc_url( home_url( '/about/' ) ); ?>" class="btn btn-outline">Learn More</a>
+            </div>
+            <div class="brand-story-visual"></div>
+        </div>
+    </section>
+    <!-- Newsletter -->
+    <section class="newsletter">
+        <div class="newsletter-content">
+            <span class="section-label">Stay Connected</span>
+            <h2>Join the SkyyRose Family</h2>
+            <p>Be the first to know about new drops, exclusive offers, and behind-the-scenes content.</p>
+            <form class="newsletter-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+                <input type="hidden" name="action" value="skyyrose_newsletter_signup">
+                <?php wp_nonce_field( 'skyyrose_newsletter', 'newsletter_nonce' ); ?>
+                <input type="email" name="email" placeholder="Enter your email" required>
+                <button type="submit" class="btn btn-primary">Subscribe</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="logo">SKYYROSE</a>
+                <p>Where love meets luxury. Oakland-born streetwear for those who wear their heart on their sleeve.</p>
+            </div>
+            <div class="footer-column">
+                <h4 class="footer-title">Shop</h4>
+                <ul class="footer-links">
+                    <li><a href="<?php echo esc_url( get_term_link( 'black-rose', 'product_cat' ) ); ?>">Black Rose</a></li>
+                    <li><a href="<?php echo esc_url( get_term_link( 'love-hurts', 'product_cat' ) ); ?>">Love Hurts</a></li>
+                    <li><a href="<?php echo esc_url( get_term_link( 'signature-collection', 'product_cat' ) ); ?>">Signature</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/preorder-gateway/' ) ); ?>">Pre-Order</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 class="footer-title">Company</h4>
+                <ul class="footer-links">
+                    <li><a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About Us</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/blog/' ) ); ?>">Journal</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/careers/' ) ); ?>">Careers</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 class="footer-title">Support</h4>
+                <ul class="footer-links">
+                    <li><a href="<?php echo esc_url( home_url( '/shipping-returns/' ) ); ?>">Shipping & Returns</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/size-guide/' ) ); ?>">Size Guide</a></li>
+                    <li><a href="<?php echo esc_url( home_url( '/faq/' ) ); ?>">FAQ</a></li>
+                    <li><a href="<?php echo esc_url( wc_get_page_permalink( 'myaccount' ) ); ?>">Track Order</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4 class="footer-title">Connect</h4>
+                <ul class="footer-links">
+                    <li><a href="https://instagram.com/skyyrose" target="_blank" rel="noopener">Instagram</a></li>
+                    <li><a href="https://tiktok.com/@skyyrose" target="_blank" rel="noopener">TikTok</a></li>
+                    <li><a href="https://twitter.com/skyyrose" target="_blank" rel="noopener">Twitter</a></li>
+                    <li><a href="https://pinterest.com/skyyrose" target="_blank" rel="noopener">Pinterest</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; <?php echo date( 'Y' ); ?> <?php bloginfo( 'name' ); ?>. All rights reserved.</p>
+            <div class="social-links">
+                <a href="<?php echo esc_url( home_url( '/privacy-policy/' ) ); ?>">Privacy Policy</a>
+                <a href="<?php echo esc_url( home_url( '/terms-of-service/' ) ); ?>">Terms of Service</a>
+            </div>
+        </div>
+    </footer>
+
+    <?php
+    } // End Elementor check
+    ?>
+    <?php wp_footer(); ?>
+</body>
+</html>
