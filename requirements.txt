@@ -60,7 +60,7 @@ httpx~=0.28.1  # Modern async HTTP client
 passlib[bcrypt]>=1.7.4,<2.0.0  # SECURITY: Password hashing
 paramiko>=3.5.0,<4.0.0  # SECURITY: SSH protocol
 certifi>=2024.12.14,<2025.0.0  # SECURITY: SSL certificates
-cryptography>=46.0.3,<47.0.0  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns
+cryptography>=46.0.5,<47.0.0  # SECURITY: Fix CVE-2024-26130, CVE-2023-50782, CVE-2024-0727, OpenSSL vulns + Subgroup attack on SECT curves
 PyJWT~=2.10.1  # JWT authentication per RFC 7519
 bcrypt>=4.2.1,<5.0.0  # SECURITY: bcrypt password hashing
 argon2-cffi>=23.1.0,<24.0.0  # SECURITY: Argon2 password hashing
@@ -112,7 +112,7 @@ lightgbm~=4.6.0  # Updated to fix PYSEC-2024-231 vulnerability
 
 # Computer Vision & Image Processing
 opencv-python~=4.11.0.86  # Updated
-pillow~=12.0.0  # Latest version - Updated 2025-11-10
+pillow>=12.1.1,<13.0.0  # SECURITY: Fix CVE out-of-bounds write in PSD images - Updated 2026-02-10
 imagehash~=4.3.2
 
 # Video Processing & Generation
