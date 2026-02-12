@@ -1,0 +1,151 @@
+<?php
+/**
+ * Template Name: Love Hurts 3D (Converted from HTML)
+ * Description: Enchanted castle 3D experience - Beauty & the Beast inspired
+ * Version: 1.0.0-r182
+ *
+ * @package SkyyRose_Flagship
+ * @since 1.0.0
+ */
+
+if ( ! defined( 'ABSPATH' ) ) exit;
+
+// Enqueue assets
+function skyyrose_love_hurts_3d_enqueue() {
+    // Enqueue styles
+    wp_enqueue_style( 'love-hurts-3d-css', get_template_directory_uri() . '/assets/css/love-hurts-3d.css', array(), '1.0.0-r182' );
+
+    // Enqueue minified JavaScript with defer strategy (per WordPress performance best practices)
+    $script_handle = 'love-hurts-3d-js';
+    wp_enqueue_script( $script_handle, get_template_directory_uri() . '/assets/js/love-hurts-3d.min.js', array(), '1.0.0-r182', true );
+    wp_script_add_data( $script_handle, 'strategy', 'defer' );
+}
+add_action( 'wp_enqueue_scripts', 'skyyrose_love_hurts_3d_enqueue' );
+?>
+<!DOCTYPE html>
+<html <?php language_attributes(); ?>>
+<head>
+    <meta charset="<?php bloginfo( 'charset' ); ?>">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LOVE HURTS Collection | <?php bloginfo( 'name' ); ?> — Enter the Castle</title>
+    <?php wp_head(); ?>
+
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="LOVE HURTS Collection: Beauty & the Beast inspired 3D castle experience. Enchanted rose petals, romantic red and black luxury fashion pieces.">
+    <meta name="keywords" content="love hurts collection, beauty beast fashion, castle 3d, luxury romance, skyyrose">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="LOVE HURTS Collection 3D | SkyyRose Flagship">
+    <meta property="og:description" content="Step into an enchanted castle. Beauty & the Beast inspired luxury fashion in immersive 3D.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://skyyrose.co/love-hurts-3d/">
+    <meta property="og:image" content="https://skyyrose.co/wp-content/themes/skyyrose-flagship/screenshot.png">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="LOVE HURTS Collection 3D">
+    <meta name="twitter:description" content="Enchanted castle luxury fashion experience">
+    
+    <!-- Schema.org JSON-LD -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "CollectionPage",
+      "name": "LOVE HURTS Collection",
+      "description": "Beauty & the Beast inspired luxury fashion collection",
+      "url": "https://skyyrose.co/love-hurts-3d/"
+    }
+    </script>
+</head>
+<body <?php body_class( 'love-hurts-3d immersive' ); ?>>
+<?php
+if ( class_exists( '\Elementor\Plugin' ) && \Elementor\Plugin::$instance->documents->get( get_the_ID() )->is_built_with_elementor() ) {
+    the_content();
+} else {
+    ?>
+
+<div id="loader">
+  <img class="logo" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/skyyrose-logo.png' ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+  <div class="load-bar"><div class="load-fill" id="loadFill"></div></div>
+  <div class="load-txt">Loading Castle</div>
+  <div class="load-sub">Love Hurts Collection</div>
+</div>
+
+<canvas id="scene"></canvas>
+<canvas id="grain"></canvas>
+<div id="vig"></div>
+
+<nav id="nav">
+  <a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand">
+    <img class="brand-mark" src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/skyyrose-icon.png' ); ?>" alt="<?php bloginfo( 'name' ); ?>">
+    <div class="brand-text">SkyyRose<span>Flagship</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="<?php echo esc_url( home_url( '/' ) ); ?>">Home</a>
+    <a href="<?php echo esc_url( home_url( '/collections/' ) ); ?>">Collections</a>
+    <a href="<?php echo esc_url( home_url( '/about/' ) ); ?>">About</a>
+    <a href="<?php echo esc_url( home_url( '/contact/' ) ); ?>">Contact</a>
+  </div>
+  <button class="cart-btn" onclick="toggleCart()">Cart<span id="cartCount" class="cart-count">0</span></button>
+</nav>
+
+<div id="rooms">
+  <button class="room-btn active" onclick="showView(0)">Castle Gate<span class="room-sub">entrance</span></button>
+  <button class="room-btn" onclick="showView(1)">Grand Hall<span class="room-sub">main gallery</span></button>
+  <button class="room-btn" onclick="showView(2)">Rose Garden<span class="room-sub">courtyard</span></button>
+  <button class="room-btn" onclick="showView(3)">Tower View<span class="room-sub">aerial</span></button>
+</div>
+
+<div id="hotspots"></div>
+
+<div id="info">
+  <div class="info-title">LOVE HURTS</div>
+  <div class="info-tag">Enchanted Castle Collection</div>
+  <div class="info-count">6 pieces — 2025</div>
+</div>
+
+<div id="cta"><div class="cta-text">Explore the Castle</div></div>
+
+<div id="modal">
+  <div class="modal-bg" onclick="closeModal()"></div>
+  <div class="modal-card">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div class="modal-image"></div>
+    <div class="modal-body">
+      <div class="modal-tag">LOVE HURTS COLLECTION</div>
+      <h2 class="modal-name" id="modalName"></h2>
+      <div class="modal-price" id="modalPrice"></div>
+      <p class="modal-desc" id="modalDesc"></p>
+      <div class="modal-size" id="modalSizes"></div>
+      <div class="modal-actions">
+        <button class="btn-primary" onclick="addFromModal()">Add to Cart</button>
+        <button class="btn-secondary" onclick="closeModal()">Continue</button>
+      </div>
+      <button class="btn-ar" onclick="launchAR()">View in AR ↗</button>
+    </div>
+  </div>
+</div>
+
+<div id="cart">
+  <div class="cart-header"><div class="cart-title">Your Selection</div><button class="cart-close" onclick="toggleCart()">✕</button></div>
+  <div class="cart-items" id="cartItems"><div class="cart-empty">Your castle awaits</div></div>
+  <div class="cart-footer">
+    <div class="cart-total"><span>Total</span><span id="cartTotal">$0</span></div>
+    <button class="checkout-btn" onclick="checkout()">Checkout</button>
+  </div>
+</div>
+
+<script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.182.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.182.0/examples/jsm/"}}</script>
+<script type="module" src="<?php echo esc_url( get_template_directory_uri() . '/assets/js/love-hurts-3d.js' ); ?>"></script>
+
+<div class="view-collection-cta">
+  <a href="<?php echo esc_url( get_term_link( 'love-hurts', 'product_cat' ) ); ?>" class="btn-view-collection">
+    <span class="icon">📱</span> View Collection
+  </a>
+</div>
+<?php
+} // End Elementor check
+?>
+<?php wp_footer(); ?>
+</body>
+</html>

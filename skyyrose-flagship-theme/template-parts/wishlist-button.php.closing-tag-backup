@@ -21,8 +21,8 @@ $product_id   = $product->get_id();
 $in_wishlist  = skyyrose_is_in_wishlist( $product_id );
 $button_class = $in_wishlist ? 'wishlist-button in-wishlist' : 'wishlist-button';
 $button_title = $in_wishlist ? esc_attr__( 'Remove from wishlist', 'skyyrose-flagship' ) : esc_attr__( 'Add to wishlist', 'skyyrose-flagship' );
-
 ?>
+
 <button
 	type="button"
 	class="<?php echo esc_attr( $button_class ); ?>"

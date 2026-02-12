@@ -1,9 +1,9 @@
 <?php
 /**
- * Black Rose Collection Archive Template
+ * Preorder Collection Archive Template
  *
- * WooCommerce taxonomy template for Black Rose Collection category.
- * Gothic cathedral inspired with mysterious, dark elegance theme.
+ * WooCommerce taxonomy template for Preorder Collection category.
+ * Futuristic portal hub inspired with sci-fi energy theme.
  *
  * @package SkyyRose_Flagship
  * @since 1.0.0
@@ -17,44 +17,43 @@ get_header( 'shop' );
 
 $term = get_queried_object();
 $category_id = $term->term_id;
-$immersive_page_url = home_url( '/black-rose-3d/' );
+$immersive_page_url = home_url( '/preorder-gateway-3d/' );
 
 // Schema.org CollectionPage markup
 $schema_markup = array(
 	'@context' => 'https://schema.org',
 	'@type' => 'CollectionPage',
-	'name' => 'Black Rose Collection',
-	'description' => 'Gothic cathedral collection with dark mystery and elegance',
+	'name' => 'Preorder Collection',
+	'description' => 'Futuristic portal hub collection with exclusive preorders',
 	'url' => get_term_link( $term ),
 );
 
-?>
 <script type="application/ld+json">
 <?php echo wp_json_encode( $schema_markup ); ?>
 </script>
 
-<div class="black-rose-collection-archive">
+<div class="preorder-collection-archive">
 	<!-- Hero Banner -->
 	<div class="collection-hero">
 		<div class="hero-overlay"></div>
 		<div class="hero-content">
 			<div class="hero-inner">
-				<span class="hero-badge">🌑 Gothic Elegance</span>
+				<span class="hero-badge">⚡ Future Collection</span>
 				<h1 class="hero-title">
-					<span class="title-icon" aria-hidden="true">🥀</span>
-					Black Rose Collection
+					<span class="title-icon" aria-hidden="true">🌌</span>
+					Preorder Gateway
 				</h1>
-				<p class="hero-subtitle">Gothic Cathedral Inspired</p>
+				<p class="hero-subtitle">Portal Hub Collection</p>
 				<p class="hero-description">
-					Step into moonlit cathedral ruins with ethereal fog, 50,000 fireflies dancing through ancient arches,
-					and dramatic god rays piercing through stained glass. Experience dark elegance.
+					Step into a futuristic portal hub with 262,144 particle systems, custom GLSL energy shaders,
+					and Lenis smooth scroll. Explore exclusive preorder collections in our most advanced 3D experience.
 				</p>
 
 				<div class="hero-actions">
 					<a href="<?php echo esc_url( $immersive_page_url ); ?>" class="btn-explore-3d">
-						<span class="btn-icon" aria-hidden="true">🏰</span>
+						<span class="btn-icon" aria-hidden="true">⚡</span>
 						<span class="btn-text">
-							<span class="btn-main">Enter the Cathedral</span>
+							<span class="btn-main">Enter the Portal</span>
 							<span class="btn-sub">3D Immersive Experience</span>
 						</span>
 						<span class="btn-arrow" aria-hidden="true">→</span>
@@ -69,16 +68,16 @@ $schema_markup = array(
 				<!-- Features -->
 				<div class="collection-features">
 					<div class="feature-item">
-						<span class="feature-icon">🌫️</span>
-						<span class="feature-label">Volumetric Fog</span>
+						<span class="feature-icon">🌀</span>
+						<span class="feature-label">GLSL Shaders</span>
 					</div>
 					<div class="feature-item">
 						<span class="feature-icon">✨</span>
-						<span class="feature-label">50k Fireflies</span>
+						<span class="feature-label">262k Particles</span>
 					</div>
 					<div class="feature-item">
-						<span class="feature-icon">☀️</span>
-						<span class="feature-label">God Rays</span>
+						<span class="feature-icon">🎯</span>
+						<span class="feature-label">Smooth Scroll</span>
 					</div>
 				</div>
 			</div>
@@ -136,9 +135,9 @@ $schema_markup = array(
 			<?php else : ?>
 
 				<div class="no-products-found">
-					<div class="no-products-icon">🥀</div>
+					<div class="no-products-icon">⚡</div>
 					<h2>No products found</h2>
-					<p>Our mysterious collection is being unveiled. Check back soon!</p>
+					<p>Portal is initializing. Check back soon for exclusive preorders!</p>
 					<a href="<?php echo esc_url( home_url( '/shop/' ) ); ?>" class="btn-back-shop">
 						Back to Shop
 					</a>
@@ -149,14 +148,14 @@ $schema_markup = array(
 			<!-- Bottom CTA -->
 			<div class="bottom-cta">
 				<div class="cta-content">
-					<h2 class="cta-title">Experience the Mystery</h2>
+					<h2 class="cta-title">Experience the Future</h2>
 					<p class="cta-description">
-						Step into our virtual Gothic cathedral with realistic volumetric fog, 50,000 firefly particles,
-						and dramatic god rays. Explore our darkest and most elegant collection.
+						Step into our virtual portal hub with custom GLSL shaders, 262,144 particle systems,
+						and Lenis smooth scroll. Explore the most advanced 3D collection experience.
 					</p>
 					<a href="<?php echo esc_url( $immersive_page_url ); ?>" class="btn-cta-3d">
-						<span class="btn-icon" aria-hidden="true">🥀</span>
-						Enter 3D Cathedral
+						<span class="btn-icon" aria-hidden="true">🌌</span>
+						Enter 3D Portal
 					</a>
 				</div>
 			</div>
@@ -165,9 +164,9 @@ $schema_markup = array(
 </div>
 
 <style>
-/* Black Rose Collection Archive */
-.black-rose-collection-archive {
-	background: #000;
+/* Preorder Collection Archive */
+.preorder-collection-archive {
+	background: #000510;
 }
 
 /* Hero Banner */
@@ -177,7 +176,7 @@ $schema_markup = array(
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #2a1a2a 100%);
+	background: linear-gradient(135deg, #000510 0%, #0a1a2a 50%, #001a33 100%);
 	overflow: hidden;
 }
 
@@ -189,8 +188,8 @@ $schema_markup = array(
 	right: 0;
 	bottom: 0;
 	background:
-		radial-gradient(circle at 20% 50%, rgba(75, 0, 130, 0.3) 0%, transparent 50%),
-		radial-gradient(circle at 80% 50%, rgba(139, 0, 139, 0.3) 0%, transparent 50%);
+		radial-gradient(circle at 20% 50%, rgba(0, 255, 255, 0.2) 0%, transparent 50%),
+		radial-gradient(circle at 80% 50%, rgba(255, 0, 255, 0.2) 0%, transparent 50%);
 }
 
 .hero-overlay {
@@ -199,7 +198,7 @@ $schema_markup = array(
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.5) 100%);
+	background: radial-gradient(circle at center, transparent 0%, rgba(0, 5, 16, 0.5) 100%);
 }
 
 .hero-content {
@@ -213,8 +212,8 @@ $schema_markup = array(
 
 .hero-badge {
 	display: inline-block;
-	background: rgba(75, 0, 130, 0.2);
-	color: #9370db;
+	background: rgba(0, 255, 255, 0.2);
+	color: #00ffff;
 	padding: 8px 20px;
 	border-radius: 30px;
 	font-size: 0.85rem;
@@ -222,48 +221,52 @@ $schema_markup = array(
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	margin-bottom: 20px;
-	border: 2px solid rgba(147, 112, 219, 0.3);
+	border: 2px solid rgba(0, 255, 255, 0.5);
 	backdrop-filter: blur(10px);
+	font-family: 'Orbitron', monospace;
 }
 
 .hero-title {
-	font-family: 'Cinzel', serif;
+	font-family: 'Orbitron', monospace;
 	font-size: 3.5rem;
-	color: #9370db;
+	color: #00ffff;
 	margin: 0 0 10px 0;
-	text-shadow: 0 0 20px rgba(147, 112, 219, 0.5);
+	text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
 	line-height: 1.2;
+	text-transform: uppercase;
+	letter-spacing: 3px;
 }
 
 .title-icon {
 	font-size: 3rem;
 	display: inline-block;
 	margin-right: 15px;
-	animation: fadeGlow 3s ease-in-out infinite;
+	animation: portalPulse 2s ease-in-out infinite;
 }
 
-@keyframes fadeGlow {
+@keyframes portalPulse {
 	0%, 100% {
-		filter: drop-shadow(0 0 5px rgba(139, 0, 139, 0.8));
-		opacity: 0.8;
+		filter: drop-shadow(0 0 5px rgba(0, 255, 255, 0.8));
+		transform: rotate(0deg);
 	}
 	50% {
-		filter: drop-shadow(0 0 20px rgba(147, 112, 219, 1));
-		opacity: 1;
+		filter: drop-shadow(0 0 20px rgba(255, 0, 255, 1));
+		transform: rotate(180deg);
 	}
 }
 
 .hero-subtitle {
 	font-size: 1.4rem;
-	color: #b19cd9;
+	color: #ff00ff;
 	margin: 0 0 20px 0;
-	font-style: italic;
-	font-weight: 300;
+	font-family: 'Orbitron', monospace;
+	text-transform: uppercase;
+	letter-spacing: 2px;
 }
 
 .hero-description {
 	font-size: 1.1rem;
-	color: #d0c0e0;
+	color: #00ddff;
 	margin: 0 0 40px 0;
 	line-height: 1.8;
 	max-width: 700px;
@@ -284,19 +287,20 @@ $schema_markup = array(
 	display: inline-flex;
 	align-items: center;
 	gap: 15px;
-	background: linear-gradient(135deg, #4b0082 0%, #2a1a2a 100%);
-	color: #fff;
+	background: linear-gradient(90deg, #00ffff 0%, #ff00ff 100%);
+	color: #000;
 	padding: 20px 40px;
 	border-radius: 50px;
-	font-family: 'Cinzel', serif;
+	font-family: 'Orbitron', monospace;
 	font-size: 1.1rem;
 	font-weight: 700;
 	text-decoration: none;
-	box-shadow: 0 10px 30px rgba(75, 0, 130, 0.4);
+	box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
 	transition: all 0.3s ease;
-	border: 3px solid rgba(147, 112, 219, 0.3);
+	border: 3px solid rgba(0, 255, 255, 0.5);
 	position: relative;
 	overflow: hidden;
+	text-transform: uppercase;
 }
 
 .btn-explore-3d::before {
@@ -306,7 +310,7 @@ $schema_markup = array(
 	left: -100%;
 	width: 100%;
 	height: 100%;
-	background: linear-gradient(90deg, transparent, rgba(147, 112, 219, 0.3), transparent);
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
 	transition: left 0.5s ease;
 }
 
@@ -316,7 +320,7 @@ $schema_markup = array(
 
 .btn-explore-3d:hover {
 	transform: translateY(-3px);
-	box-shadow: 0 15px 40px rgba(75, 0, 130, 0.6);
+	box-shadow: 0 15px 40px rgba(0, 255, 255, 0.7);
 }
 
 .btn-text {
@@ -355,23 +359,25 @@ $schema_markup = array(
 	display: inline-flex;
 	align-items: center;
 	gap: 10px;
-	background: rgba(147, 112, 219, 0.1);
+	background: rgba(0, 255, 255, 0.1);
 	backdrop-filter: blur(10px);
-	color: #9370db;
+	color: #00ffff;
 	padding: 18px 35px;
 	border-radius: 50px;
 	font-size: 1rem;
 	font-weight: 600;
-	border: 2px solid rgba(147, 112, 219, 0.3);
+	border: 2px solid rgba(0, 255, 255, 0.5);
 	cursor: pointer;
 	transition: all 0.3s ease;
+	font-family: 'Orbitron', monospace;
+	text-transform: uppercase;
 }
 
 .btn-scroll-products:hover {
-	background: rgba(147, 112, 219, 0.2);
-	border-color: #9370db;
+	background: rgba(0, 255, 255, 0.2);
+	border-color: #00ffff;
 	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgba(75, 0, 130, 0.3);
+	box-shadow: 0 8px 20px rgba(0, 255, 255, 0.3);
 }
 
 /* Collection Features */
@@ -380,7 +386,7 @@ $schema_markup = array(
 	gap: 30px;
 	justify-content: center;
 	padding-top: 30px;
-	border-top: 1px solid rgba(147, 112, 219, 0.2);
+	border-top: 1px solid rgba(0, 255, 255, 0.3);
 }
 
 .feature-item {
@@ -396,15 +402,16 @@ $schema_markup = array(
 
 .feature-label {
 	font-size: 0.85rem;
-	color: #b19cd9;
+	color: #00ddff;
 	text-transform: uppercase;
 	letter-spacing: 1px;
+	font-family: 'Orbitron', monospace;
 }
 
 /* Products Section */
 .products-section {
 	padding: 80px 0;
-	background: #0a0a0a;
+	background: #000510;
 }
 
 .container {
@@ -419,7 +426,7 @@ $schema_markup = array(
 	margin: 0 auto 60px;
 	font-size: 1.1rem;
 	line-height: 1.8;
-	color: #d0c0e0;
+	color: #00ddff;
 }
 
 /* Toolbar */
@@ -429,14 +436,15 @@ $schema_markup = array(
 	align-items: center;
 	margin-bottom: 40px;
 	padding: 20px;
-	background: rgba(75, 0, 130, 0.1);
+	background: rgba(0, 255, 255, 0.05);
 	border-radius: 12px;
-	border: 1px solid rgba(147, 112, 219, 0.2);
+	border: 1px solid rgba(0, 255, 255, 0.2);
 }
 
 .result-count {
-	color: #9370db;
+	color: #00ffff;
 	font-weight: 600;
+	font-family: 'Orbitron', monospace;
 }
 
 /* Products Grid */
@@ -456,62 +464,65 @@ $schema_markup = array(
 .no-products-icon {
 	font-size: 4rem;
 	margin-bottom: 20px;
-	animation: fadeGlow 3s ease-in-out infinite;
+	animation: portalPulse 2s ease-in-out infinite;
 }
 
 .no-products-found h2 {
-	font-family: 'Cinzel', serif;
+	font-family: 'Orbitron', monospace;
 	font-size: 2rem;
-	color: #9370db;
+	color: #00ffff;
 	margin-bottom: 15px;
+	text-transform: uppercase;
 }
 
 .no-products-found p {
-	color: #b19cd9;
+	color: #00ddff;
 	font-size: 1.1rem;
 	margin-bottom: 30px;
 }
 
 .btn-back-shop {
 	display: inline-block;
-	background: linear-gradient(135deg, #4b0082, #2a1a2a);
-	color: #fff;
+	background: linear-gradient(90deg, #00ffff, #ff00ff);
+	color: #000;
 	padding: 15px 40px;
 	border-radius: 30px;
 	text-decoration: none;
 	font-weight: 600;
 	transition: all 0.3s ease;
-	border: 2px solid rgba(147, 112, 219, 0.3);
+	border: 2px solid rgba(0, 255, 255, 0.5);
+	font-family: 'Orbitron', monospace;
+	text-transform: uppercase;
 }
 
 .btn-back-shop:hover {
 	transform: translateY(-2px);
-	box-shadow: 0 8px 20px rgba(75, 0, 130, 0.4);
-	border-color: #9370db;
+	box-shadow: 0 8px 20px rgba(0, 255, 255, 0.5);
 }
 
 /* Bottom CTA */
 .bottom-cta {
-	background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 100%);
+	background: linear-gradient(135deg, #000510 0%, #0a1a2a 100%);
 	border-radius: 20px;
 	padding: 60px 40px;
 	text-align: center;
 	margin-top: 80px;
-	border: 3px solid rgba(147, 112, 219, 0.3);
-	box-shadow: 0 10px 40px rgba(75, 0, 130, 0.3);
+	border: 3px solid rgba(0, 255, 255, 0.5);
+	box-shadow: 0 10px 40px rgba(0, 255, 255, 0.3);
 }
 
 .cta-title {
-	font-family: 'Cinzel', serif;
+	font-family: 'Orbitron', monospace;
 	font-size: 2.5rem;
-	color: #9370db;
+	color: #00ffff;
 	margin: 0 0 15px 0;
-	text-shadow: 0 0 10px rgba(147, 112, 219, 0.5);
+	text-shadow: 0 0 10px rgba(0, 255, 255, 0.8);
+	text-transform: uppercase;
 }
 
 .cta-description {
 	font-size: 1.2rem;
-	color: #b19cd9;
+	color: #00ddff;
 	margin: 0 0 35px 0;
 	max-width: 600px;
 	margin-left: auto;
@@ -523,22 +534,23 @@ $schema_markup = array(
 	display: inline-flex;
 	align-items: center;
 	gap: 12px;
-	background: linear-gradient(135deg, #4b0082 0%, #2a1a2a 100%);
-	color: #fff;
+	background: linear-gradient(90deg, #00ffff 0%, #ff00ff 100%);
+	color: #000;
 	padding: 20px 50px;
 	border-radius: 50px;
-	font-family: 'Cinzel', serif;
+	font-family: 'Orbitron', monospace;
 	font-size: 1.2rem;
 	font-weight: 700;
 	text-decoration: none;
-	box-shadow: 0 10px 30px rgba(75, 0, 130, 0.4);
+	box-shadow: 0 10px 30px rgba(0, 255, 255, 0.5);
 	transition: all 0.3s ease;
-	border: 3px solid rgba(147, 112, 219, 0.3);
+	border: 3px solid rgba(0, 255, 255, 0.5);
+	text-transform: uppercase;
 }
 
 .btn-cta-3d:hover {
 	transform: translateY(-3px);
-	box-shadow: 0 15px 40px rgba(75, 0, 130, 0.6);
+	box-shadow: 0 15px 40px rgba(0, 255, 255, 0.7);
 }
 
 /* Responsive */

@@ -14,9 +14,9 @@ function skyyrose_love_hurts_archive_enqueue() {
     wp_enqueue_script( 'collection-love-hurts-js', get_template_directory_uri() . '/assets/js/collection-love-hurts.js', array(), '1.0.0-r182', true );
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_love_hurts_archive_enqueue' );
-?>
 
 get_header();
+?>
 
 <div class="collection-archive love-hurts-collection">
     <div class="collection-hero">

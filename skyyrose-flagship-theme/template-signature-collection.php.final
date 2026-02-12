@@ -14,7 +14,6 @@
 
 get_header();
 
-?>
 <div id="signature-collection-experience" class="three-scene-wrapper signature-collection">
 	<!-- Loading Screen -->
 	<div id="loading-screen" class="loading-overlay">

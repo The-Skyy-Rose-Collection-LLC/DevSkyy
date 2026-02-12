@@ -27,8 +27,8 @@ $schema_markup = array(
 	'description' => 'Gothic cathedral collection with dark mystery and elegance',
 	'url' => get_term_link( $term ),
 );
-
 ?>
+
 <script type="application/ld+json">
 <?php echo wp_json_encode( $schema_markup ); ?>
 </script>

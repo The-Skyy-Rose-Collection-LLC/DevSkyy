@@ -503,6 +503,35 @@ function skyyrose_performance_optimizations() {
 }
 add_action( 'init', 'skyyrose_performance_optimizations' );
 
+/**
+ * Register Wishlist Custom Post Type.
+ *
+ * @since 1.0.0
+ */
+function skyyrose_register_wishlist_cpt() {
+	$args = array(
+		'labels'              => array(
+			'name'          => esc_html__( 'Wishlists', 'skyyrose-flagship' ),
+			'singular_name' => esc_html__( 'Wishlist', 'skyyrose-flagship' ),
+		),
+		'public'              => false,
+		'has_archive'         => false,
+		'publicly_queryable'  => false,
+		'show_ui'             => true,
+		'show_in_menu'        => true,
+		'show_in_nav_menus'   => false,
+		'show_in_rest'        => true,
+		'exclude_from_search' => true,
+		'capability_type'     => 'post',
+		'hierarchical'        => false,
+		'rewrite'             => false,
+		'supports'            => array( 'title', 'author' ),
+		'menu_icon'           => 'dashicons-heart',
+	);
+
+	register_post_type( 'wishlist', $args );
+}
+add_action( 'init', 'skyyrose_register_wishlist_cpt' );
 
 /**
  * Enqueue brand-specific styles

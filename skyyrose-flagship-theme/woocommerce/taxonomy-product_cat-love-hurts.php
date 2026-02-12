@@ -27,8 +27,8 @@ $schema_markup = array(
 	'description' => 'Enchanted ballroom collection inspired by Beauty and the Beast',
 	'url' => get_term_link( $term ),
 );
-?>
 
+?>
 <script type="application/ld+json">
 <?php echo wp_json_encode( $schema_markup ); ?>
 </script>

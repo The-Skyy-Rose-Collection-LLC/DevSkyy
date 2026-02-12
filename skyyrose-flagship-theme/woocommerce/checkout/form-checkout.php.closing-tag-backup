@@ -14,7 +14,6 @@ function skyyrose_checkout_enqueue() {
     wp_enqueue_script( 'checkout-js', get_template_directory_uri() . '/assets/js/checkout.js', array( 'jquery', 'wc-checkout' ), '1.0.0', true );
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_checkout_enqueue' );
-?>
 
 do_action( 'woocommerce_before_checkout_form', $checkout );
 
@@ -23,6 +22,7 @@ if ( ! $checkout->is_registration_enabled() && $checkout->is_registration_requir
     return;
 }
 
+?>
 
 <form name="checkout" method="post" class="checkout woocommerce-checkout" action="<?php echo esc_url( wc_get_checkout_url() ); ?>" enctype="multipart/form-data">
 

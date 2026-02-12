@@ -27,8 +27,8 @@ $schema_markup = array(
 	'description' => 'Futuristic portal hub collection with exclusive preorders',
 	'url' => get_term_link( $term ),
 );
-?>
 
+?>
 <script type="application/ld+json">
 <?php echo wp_json_encode( $schema_markup ); ?>
 </script>

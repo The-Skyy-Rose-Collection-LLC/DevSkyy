@@ -14,9 +14,9 @@ function skyyrose_signature_archive_enqueue() {
     wp_enqueue_script( 'collection-signature-js', get_template_directory_uri() . '/assets/js/collection-signature.js', array(), '1.0.0-r182', true );
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_signature_archive_enqueue' );
-?>
 
 get_header();
+?>
 
 <div class="collection-archive signature-collection">
     <!-- Hero Section with 3D Link -->
