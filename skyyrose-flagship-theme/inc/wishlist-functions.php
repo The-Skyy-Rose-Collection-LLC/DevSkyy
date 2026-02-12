@@ -11,6 +11,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+// Only load wishlist functions if WooCommerce is active
+if ( ! class_exists( 'WooCommerce' ) || ! function_exists( 'WC' ) ) {
+treturn;
+}
+
 /**
  * Initialize wishlist session for non-logged-in users.
  *

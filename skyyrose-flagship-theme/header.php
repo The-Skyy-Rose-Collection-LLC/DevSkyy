@@ -70,12 +70,14 @@
 							<span class="wishlist-count <?php echo skyyrose_get_wishlist_count() > 0 ? 'has-items' : ''; ?>"><?php echo esc_html( skyyrose_get_wishlist_count() ); ?></span>
 						</a>
 					</div>
+					<?php if ( class_exists( 'WooCommerce' ) && function_exists( 'WC' ) && WC()->cart ) : ?>
 					<div class="header-cart">
 						<a href="<?php echo esc_url( wc_get_cart_url() ); ?>" class="cart-contents">
 							<span class="cart-icon"></span>
 							<span class="cart-count"><?php echo wp_kses_data( WC()->cart->get_cart_contents_count() ); ?></span>
 						</a>
 					</div>
+					<?php endif; ?>
 				</div>
 			<?php endif; ?>
 
