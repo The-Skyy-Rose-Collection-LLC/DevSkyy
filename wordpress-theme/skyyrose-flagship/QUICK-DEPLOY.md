@@ -1,8 +1,9 @@
-# SkyyRose Flagship - Quick Deployment Guide
+# THE FLAGSHIP - Quick Deployment Guide
 
-**Status**: Ready for deployment
+**Status**: Ready for deployment (v2.0.1 - Critical WooCommerce fix)
 **Package**: `~/Desktop/skyyrose-flagship-2.0.0-wpcom.zip` (176KB)
 **Target**: https://www.skyyrose.co
+**Theme Name**: THE FLAGSHIP (renamed from "THE FLAGSHIP")
 **Credentials**: Available (Client ID: 123138)
 
 ---
@@ -72,7 +73,7 @@ cd /Users/coreyfoster/Documents/GitHub/DevSkyy/wordpress-theme/skyyrose-flagship
 ✓ custom.css loads correctly
 ✓ Rose Gold color (#B76E79) found in page source
 ✓ Playfair Display font referenced
-✓ SkyyRose Flagship theme detected
+✓ THE FLAGSHIP theme detected
 ```
 
 ---
