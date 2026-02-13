@@ -1,0 +1,448 @@
+/**
+ * SkyyRose Luxury Theme Styles
+ *
+ * Main theme styling applying brand variables.
+ * CRITICAL: NO @import statements (WordPress.com CDN breaks them)
+ *
+ * @package SkyyRose_Flagship
+ * @since 2.0.0
+ */
+
+/* ==================================================
+   TYPOGRAPHY
+   ================================================== */
+
+body {
+	font-family: var(--font-body);
+	font-size: var(--text-base);
+	font-weight: var(--weight-regular);
+	line-height: 1.6;
+	color: var(--dark-gray);
+	background-color: var(--off-white);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	font-family: var(--font-heading);
+	font-weight: var(--weight-bold);
+	line-height: 1.2;
+	margin-bottom: var(--space-md);
+	color: var(--black);
+}
+
+h1 {
+	font-size: var(--text-4xl);
+	margin-bottom: var(--space-xl);
+}
+
+h2 {
+	font-size: var(--text-3xl);
+	margin-bottom: var(--space-lg);
+}
+
+h3 {
+	font-size: var(--text-2xl);
+}
+
+h4 {
+	font-size: var(--text-xl);
+}
+
+h5 {
+	font-size: var(--text-lg);
+}
+
+h6 {
+	font-size: var(--text-base);
+	font-weight: var(--weight-semibold);
+}
+
+p {
+	margin-bottom: var(--space-md);
+}
+
+a {
+	color: var(--rose-gold);
+	text-decoration: none;
+	transition: color var(--transition-base);
+}
+
+a:hover {
+	color: var(--gold);
+}
+
+a:focus {
+	outline: 2px solid var(--rose-gold);
+	outline-offset: 2px;
+}
+
+/* ==================================================
+   BUTTONS
+   ================================================== */
+
+.btn,
+button[type="submit"],
+input[type="submit"],
+.wp-block-button__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: var(--space-md) var(--space-xl);
+	font-family: var(--font-body);
+	font-size: var(--text-base);
+	font-weight: var(--weight-semibold);
+	text-align: center;
+	text-decoration: none;
+	border: none;
+	border-radius: var(--radius-md);
+	cursor: pointer;
+	transition: all var(--transition-luxury);
+	background: var(--gradient-rose-gold);
+	color: var(--white);
+	box-shadow: var(--shadow-md);
+}
+
+.btn:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover,
+.wp-block-button__link:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-xl), var(--shadow-rose-glow);
+	color: var(--white);
+}
+
+.btn:active {
+	transform: translateY(0);
+}
+
+.btn-primary {
+	background: var(--gradient-rose-gold);
+}
+
+.btn-secondary {
+	background: var(--gradient-signature);
+}
+
+.btn-outline {
+	background: transparent;
+	border: 2px solid var(--rose-gold);
+	color: var(--rose-gold);
+}
+
+.btn-outline:hover {
+	background: var(--rose-gold);
+	color: var(--white);
+}
+
+/* ==================================================
+   FORMS
+   ================================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select {
+	width: 100%;
+	padding: var(--space-md);
+	font-family: var(--font-body);
+	font-size: var(--text-base);
+	border: 1px solid var(--mid-gray);
+	border-radius: var(--radius-md);
+	background-color: var(--white);
+	transition: all var(--transition-base);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+	border-color: var(--rose-gold);
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.1);
+}
+
+label {
+	display: block;
+	margin-bottom: var(--space-sm);
+	font-weight: var(--weight-medium);
+	color: var(--dark-gray);
+}
+
+/* ==================================================
+   CONTAINERS & LAYOUT
+   ================================================== */
+
+.container {
+	max-width: var(--container-xl);
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: var(--space-lg);
+	padding-right: var(--space-lg);
+}
+
+.section {
+	padding-top: var(--space-4xl);
+	padding-bottom: var(--space-4xl);
+}
+
+.section-title {
+	text-align: center;
+	margin-bottom: var(--space-2xl);
+}
+
+.section-subtitle {
+	font-family: var(--font-accent);
+	font-size: var(--text-lg);
+	color: var(--rose-gold);
+	margin-bottom: var(--space-sm);
+}
+
+/* ==================================================
+   CARDS
+   ================================================== */
+
+.card {
+	background: var(--white);
+	border-radius: var(--radius-lg);
+	padding: var(--space-xl);
+	box-shadow: var(--shadow-elegant);
+	transition: all var(--transition-luxury);
+}
+
+.card:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-xl), var(--shadow-rose-glow);
+}
+
+.card-image {
+	width: 100%;
+	height: auto;
+	border-radius: var(--radius-md);
+	margin-bottom: var(--space-md);
+}
+
+.card-title {
+	font-size: var(--text-xl);
+	margin-bottom: var(--space-sm);
+}
+
+.card-description {
+	color: var(--mid-gray);
+	margin-bottom: var(--space-lg);
+}
+
+/* ==================================================
+   NAVIGATION
+   ================================================== */
+
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: var(--z-sticky);
+	background: rgba(255, 255, 255, 0.95);
+	backdrop-filter: var(--blur-sm);
+	box-shadow: var(--shadow-sm);
+}
+
+.main-navigation a {
+	font-weight: var(--weight-medium);
+	padding: var(--space-sm) var(--space-md);
+	transition: color var(--transition-base);
+}
+
+.main-navigation a:hover {
+	color: var(--rose-gold);
+}
+
+/* ==================================================
+   HERO SECTIONS
+   ================================================== */
+
+.hero {
+	position: relative;
+	min-height: 60vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	overflow: hidden;
+}
+
+.hero::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--gradient-overlay);
+	z-index: 1;
+}
+
+.hero-content {
+	position: relative;
+	z-index: 2;
+	color: var(--white);
+}
+
+.hero-title {
+	font-size: var(--text-4xl);
+	margin-bottom: var(--space-lg);
+	color: var(--white);
+}
+
+.hero-subtitle {
+	font-size: var(--text-xl);
+	font-family: var(--font-accent);
+	margin-bottom: var(--space-2xl);
+	color: var(--off-white);
+}
+
+/* ==================================================
+   FOOTER
+   ================================================== */
+
+.site-footer {
+	background: var(--dark-gray);
+	color: var(--light-gray);
+	padding: var(--space-3xl) 0 var(--space-xl);
+}
+
+.site-footer a {
+	color: var(--light-gray);
+}
+
+.site-footer a:hover {
+	color: var(--rose-gold);
+}
+
+.footer-branding {
+	margin-bottom: var(--space-xl);
+	text-align: center;
+}
+
+/* ==================================================
+   UTILITY CLASSES
+   ================================================== */
+
+.text-center {
+	text-align: center;
+}
+
+.text-rose-gold {
+	color: var(--rose-gold);
+}
+
+.text-gold {
+	color: var(--gold);
+}
+
+.bg-rose-gold {
+	background-color: var(--rose-gold);
+}
+
+.gradient-rose-gold {
+	background: var(--gradient-rose-gold);
+}
+
+.shadow-elegant {
+	box-shadow: var(--shadow-elegant);
+}
+
+/* ==================================================
+   ACCESSIBILITY
+   ================================================== */
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border-width: 0;
+}
+
+.skip-link {
+	position: absolute;
+	top: -40px;
+	left: 0;
+	background: var(--rose-gold);
+	color: var(--white);
+	padding: var(--space-sm) var(--space-md);
+	text-decoration: none;
+	z-index: var(--z-tooltip);
+}
+
+.skip-link:focus {
+	top: 0;
+}
+
+/* ==================================================
+   RESPONSIVE DESIGN
+   ================================================== */
+
+@media (max-width: 768px) {
+	.hero-title {
+		font-size: var(--text-3xl);
+	}
+
+	.section {
+		padding-top: var(--space-2xl);
+		padding-bottom: var(--space-2xl);
+	}
+
+	.container {
+		padding-left: var(--space-md);
+		padding-right: var(--space-md);
+	}
+}
+
+/* ==================================================
+   ANIMATION
+   ================================================== */
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.fade-in {
+	animation: fadeIn var(--transition-luxury) ease-out;
+}
+
+/* ==================================================
+   PRINT STYLES
+   ================================================== */
+
+@media print {
+	.site-header,
+	.site-footer,
+	.btn,
+	button {
+		display: none;
+	}
+
+	body {
+		background: white;
+		color: black;
+	}
+
+	a {
+		text-decoration: underline;
+		color: black;
+	}
+}
