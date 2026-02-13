@@ -1,0 +1,252 @@
+/**
+ * SkyyRose Collection Color Themes
+ *
+ * Collection-specific color schemes and styling.
+ *
+ * @package SkyyRose_Flagship
+ * @since 2.0.0
+ */
+
+/* ==================================================
+   SIGNATURE COLLECTION
+   Rose Gold + Gold + Silver
+   ================================================== */
+
+.collection-signature,
+body.page-template-template-signature-collection {
+	--collection-primary: var(--rose-gold);
+	--collection-secondary: var(--gold);
+	--collection-accent: var(--silver);
+	--collection-gradient: var(--gradient-signature);
+}
+
+.collection-signature .hero {
+	background: var(--gradient-signature);
+}
+
+.collection-signature .btn-primary {
+	background: var(--gradient-signature);
+}
+
+.collection-signature .section-subtitle {
+	color: var(--rose-gold);
+}
+
+.collection-signature .card:hover {
+	box-shadow: var(--shadow-xl), var(--shadow-rose-glow);
+}
+
+/* ==================================================
+   LOVE HURTS COLLECTION
+   Crimson + Rose Gold
+   ================================================== */
+
+.collection-love-hurts,
+body.page-template-template-love-hurts {
+	--collection-primary: var(--crimson);
+	--collection-secondary: var(--rose-gold);
+	--collection-accent: var(--mauve);
+	--collection-gradient: var(--gradient-love-hurts);
+}
+
+.collection-love-hurts .hero {
+	background: var(--gradient-love-hurts);
+}
+
+.collection-love-hurts .btn-primary {
+	background: linear-gradient(135deg, var(--crimson) 0%, var(--rose-gold) 100%);
+}
+
+.collection-love-hurts .section-subtitle {
+	color: var(--crimson);
+}
+
+.collection-love-hurts .card:hover {
+	box-shadow: var(--shadow-xl), 0 0 20px rgba(220, 20, 60, 0.3);
+}
+
+.collection-love-hurts a {
+	color: var(--crimson);
+}
+
+.collection-love-hurts a:hover {
+	color: var(--rose-gold);
+}
+
+/* ==================================================
+   BLACK ROSE COLLECTION
+   Silver + Black
+   ================================================== */
+
+.collection-black-rose,
+body.page-template-template-black-rose {
+	--collection-primary: var(--black);
+	--collection-secondary: var(--silver);
+	--collection-accent: var(--mid-gray);
+	--collection-gradient: var(--gradient-black-rose);
+}
+
+.collection-black-rose .hero {
+	background: var(--gradient-black-rose);
+}
+
+.collection-black-rose .btn-primary {
+	background: linear-gradient(135deg, var(--black) 0%, var(--silver) 100%);
+}
+
+.collection-black-rose .section-subtitle {
+	color: var(--silver);
+}
+
+.collection-black-rose .card:hover {
+	box-shadow: var(--shadow-xl), 0 0 20px rgba(192, 192, 192, 0.3);
+}
+
+.collection-black-rose a {
+	color: var(--black);
+}
+
+.collection-black-rose a:hover {
+	color: var(--silver);
+}
+
+.collection-black-rose h1,
+.collection-black-rose h2,
+.collection-black-rose h3 {
+	color: var(--black);
+}
+
+/* ==================================================
+   PREORDER COLLECTION
+   Mauve + Rose Gold
+   ================================================== */
+
+.collection-preorder {
+	--collection-primary: var(--mauve);
+	--collection-secondary: var(--rose-gold);
+	--collection-accent: var(--gold);
+	--collection-gradient: linear-gradient(135deg, var(--mauve) 0%, var(--rose-gold) 100%);
+}
+
+.collection-preorder .hero {
+	background: linear-gradient(135deg, var(--mauve) 0%, var(--rose-gold) 100%);
+}
+
+.collection-preorder .btn-primary {
+	background: linear-gradient(135deg, var(--mauve) 0%, var(--rose-gold) 100%);
+}
+
+.collection-preorder .section-subtitle {
+	color: var(--mauve);
+}
+
+.collection-preorder .card:hover {
+	box-shadow: var(--shadow-xl), 0 0 20px rgba(216, 167, 177, 0.3);
+}
+
+/* ==================================================
+   SHARED COLLECTION STYLES
+   ================================================== */
+
+[class*="collection-"] .collection-badge {
+	display: inline-block;
+	padding: var(--space-xs) var(--space-md);
+	font-size: var(--text-sm);
+	font-weight: var(--weight-semibold);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	border-radius: var(--radius-full);
+	background: var(--collection-gradient);
+	color: var(--white);
+}
+
+[class*="collection-"] .collection-title {
+	font-size: var(--text-3xl);
+	margin-bottom: var(--space-lg);
+	background: var(--collection-gradient);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+}
+
+[class*="collection-"] .collection-card {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--radius-lg);
+}
+
+[class*="collection-"] .collection-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--collection-gradient);
+	opacity: 0;
+	transition: opacity var(--transition-luxury);
+	z-index: 1;
+}
+
+[class*="collection-"] .collection-card:hover::before {
+	opacity: 0.1;
+}
+
+/* ==================================================
+   PRODUCT CARDS BY COLLECTION
+   ================================================== */
+
+.collection-signature .product-card {
+	border-top: 3px solid var(--rose-gold);
+}
+
+.collection-love-hurts .product-card {
+	border-top: 3px solid var(--crimson);
+}
+
+.collection-black-rose .product-card {
+	border-top: 3px solid var(--black);
+}
+
+.collection-preorder .product-card {
+	border-top: 3px solid var(--mauve);
+}
+
+/* ==================================================
+   PRICE STYLING BY COLLECTION
+   ================================================== */
+
+.collection-signature .price {
+	color: var(--rose-gold);
+	font-weight: var(--weight-bold);
+}
+
+.collection-love-hurts .price {
+	color: var(--crimson);
+	font-weight: var(--weight-bold);
+}
+
+.collection-black-rose .price {
+	color: var(--black);
+	font-weight: var(--weight-bold);
+}
+
+.collection-preorder .price {
+	color: var(--mauve);
+	font-weight: var(--weight-bold);
+}
+
+/* ==================================================
+   RESPONSIVE ADJUSTMENTS
+   ================================================== */
+
+@media (max-width: 768px) {
+	[class*="collection-"] .collection-title {
+		font-size: var(--text-2xl);
+	}
+
+	[class*="collection-"] .collection-badge {
+		font-size: var(--text-xs);
+		padding: var(--space-xs) var(--space-sm);
+	}
+}

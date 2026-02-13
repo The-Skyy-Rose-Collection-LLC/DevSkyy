@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Theme Constants
  */
-define( 'SKYYROSE_VERSION', '1.0.0' );
+define( 'SKYYROSE_VERSION', '2.0.0' );
 define( 'SKYYROSE_THEME_DIR', get_template_directory() );
 define( 'SKYYROSE_THEME_URI', get_template_directory_uri() );
 define( 'SKYYROSE_ASSETS_URI', SKYYROSE_THEME_URI . '/assets' );
@@ -367,6 +367,7 @@ $core_includes = array(
 	'/inc/template-functions.php',
 	'/inc/customizer.php',
 	'/inc/accessibility-seo.php',
+	'/inc/enqueue-brand-styles.php',
 );
 
 foreach ( $core_includes as $file ) {

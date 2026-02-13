@@ -7,7 +7,7 @@
 THEME_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="$HOME/Desktop/skyyrose-flagship-wpcom"
 DIST_DIR="$HOME/Desktop"
-VERSION="1.0.0"
+VERSION="2.0.0"
 THEME_NAME="skyyrose-flagship"
 
 echo "=== Packaging SkyyRose Flagship for WordPress.com ==="
@@ -43,6 +43,7 @@ rsync -av "$THEME_DIR/" "$BUILD_DIR/$THEME_NAME/" \
 # Keep essential docs
 cp "$THEME_DIR/README.md" "$BUILD_DIR/$THEME_NAME/" 2>/dev/null || true
 cp "$THEME_DIR/readme.txt" "$BUILD_DIR/$THEME_NAME/"
+cp "$THEME_DIR/REBUILD-COMPLETION-REPORT.md" "$BUILD_DIR/$THEME_NAME/" 2>/dev/null || true
 
 echo "✓ Files copied"
 
