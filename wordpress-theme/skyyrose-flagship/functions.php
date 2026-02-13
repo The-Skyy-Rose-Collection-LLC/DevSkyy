@@ -20,6 +20,19 @@ define( 'SKYYROSE_THEME_URI', get_template_directory_uri() );
 define( 'SKYYROSE_ASSETS_URI', SKYYROSE_THEME_URI . '/assets' );
 
 /**
+ * Disable WordPress.com CSS/JS Concatenation
+ *
+ * WordPress.com's concatenation service (_jb_static) can cause MIME type errors
+ * and 404s. Disable it to serve files directly.
+ *
+ * @since 2.0.0
+ */
+if ( ! defined( 'CONCATENATE_SCRIPTS' ) ) {
+	define( 'CONCATENATE_SCRIPTS', false );
+}
+$GLOBALS['concatenate_scripts'] = false;
+
+/**
  * Theme Setup
  *
  * Sets up theme defaults and registers support for various WordPress features.
@@ -533,3 +546,52 @@ function skyyrose_register_wishlist_cpt() {
 	register_post_type( 'wishlist', $args );
 }
 add_action( 'init', 'skyyrose_register_wishlist_cpt' );
+
+/**
+ * Add Content Security Policy Headers
+ *
+ * Fixes CSP violations for WordPress.com analytics and web workers.
+ *
+ * @since 2.0.0
+ */
+function skyyrose_add_csp_headers() {
+	// Only add CSP headers on front-end
+	if ( is_admin() ) {
+		return;
+	}
+
+	// Build CSP policy
+	$csp_directives = array(
+		"default-src 'self'",
+		"script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cdn.babylonjs.com https://stats.wp.com https://widgets.wp.com https://s0.wp.com https://cdn.elementor.com https://fonts.googleapis.com https://unpkg.com blob:",
+		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+		"img-src 'self' data: https: blob:",
+		"font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
+		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com",
+		"frame-src 'self' https://www.youtube.com https://player.vimeo.com",
+		"worker-src 'self' blob:",
+		"child-src 'self' blob:"
+	);
+
+	$csp_policy = implode( '; ', $csp_directives );
+	header( "Content-Security-Policy: " . $csp_policy );
+}
+add_action( 'send_headers', 'skyyrose_add_csp_headers' );
+
+/**
+ * Disable WordPress.com asset optimization that causes MIME errors
+ *
+ * @since 2.0.0
+ */
+function skyyrose_disable_wpcom_optimization() {
+	// Disable WordPress.com Photon
+	add_filter( 'jetpack_photon_skip_image', '__return_true', 999 );
+
+	// Disable asset minification
+	add_filter( 'jetpack_implode_frontend_css', '__return_false', 999 );
+
+	// Disable concatenation
+	add_filter( 'js_do_concat', '__return_false', 999 );
+	add_filter( 'css_do_concat', '__return_false', 999 );
+}
+add_action( 'init', 'skyyrose_disable_wpcom_optimization', 1 );
