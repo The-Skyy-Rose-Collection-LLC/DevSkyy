@@ -121,24 +121,37 @@ Created `template-homepage-luxury.php` with:
 ---
 
 ### Task 6: Test and validate all fixes on live site 🔄
-**Status**: IN PROGRESS (Blocked - awaiting WordPress.com upload)
+**Status**: READY FOR DEPLOYMENT (Theme packaged, awaiting manual upload)
 
-**Next Steps**:
-1. Upload theme package to WordPress.com
-2. Activate SkyyRose Flagship v2.0.0
-3. Set homepage template to "Luxury Homepage"
-4. Configure static front page
-5. Clear WordPress.com cache
-6. Verify on www.skyyrose.co:
-   - Brand colors display
-   - Custom fonts load
-   - No console errors
-   - Collections showcase works
-   - Mobile responsive
-7. Test all links and CTAs
-8. Replace placeholder images with real jewelry photos
+**Package Details**:
+- Filename: `skyyrose-flagship-2.0.1-wpcom.zip`
+- Size: 167KB
+- Location: `/tmp/skyyrose-flagship-2.0.1-wpcom.zip`
+- Version: THE FLAGSHIP v2.0.1 (renamed from "SkyyRose Flagship")
+- Includes: All iteration 1 templates + WooCommerce fixes
 
-**Blocking**: Requires WordPress.com admin access to upload theme
+**Deployment Instructions**:
+1. Open: https://wordpress.com/themes/skyyrose.co
+2. Click: "Add New Theme" → "Upload Theme"
+3. Upload: `/tmp/skyyrose-flagship-2.0.1-wpcom.zip`
+4. Click: "Install Now" → "Activate"
+5. Configure homepage: Settings > Reading > Static page
+6. Clear cache: Jetpack > Settings > Performance > Clear all caches
+7. Verify: Open incognito window at https://www.skyyrose.co
+
+**Verification Script**:
+After deployment, run: `bash /tmp/verify-flagship-deployment.sh`
+
+**Expected Results**:
+- ✅ Rose gold gradient hero section
+- ✅ "Where Love Meets Luxury" heading
+- ✅ 3 collection cards (Signature, Love Hurts, Black Rose)
+- ✅ Theme name: "THE FLAGSHIP" in footer
+- ✅ All CSS files loading (no 404s)
+- ✅ No console errors (F12)
+- ✅ No fatal WooCommerce errors
+
+**Blocking**: Requires user to upload theme via WordPress.com admin (API upload not supported)
 
 ---
 
