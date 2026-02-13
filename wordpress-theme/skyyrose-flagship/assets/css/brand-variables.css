@@ -1,0 +1,141 @@
+/**
+ * SkyyRose Brand Variables
+ *
+ * Defines the luxury brand color palette and design tokens.
+ * Where Love Meets Luxury™
+ *
+ * @package SkyyRose_Flagship
+ * @since 2.0.0
+ */
+
+:root {
+	/* Brand Colors - Core Palette */
+	--rose-gold: #B76E79;
+	--gold: #D4AF37;
+	--silver: #C0C0C0;
+	--mauve: #D8A7B1;
+	--crimson: #DC143C;
+
+	/* Collection-Specific Colors */
+	--black-rose-primary: #000000;
+	--black-rose-accent: #C0C0C0;
+	--love-hurts-primary: #DC143C;
+	--love-hurts-accent: #B76E79;
+	--signature-primary: #B76E79;
+	--signature-accent: #D4AF37;
+
+	/* Neutral Palette */
+	--white: #FFFFFF;
+	--off-white: #FAF9F6;
+	--light-gray: #F5F5F5;
+	--mid-gray: #999999;
+	--dark-gray: #333333;
+	--black: #000000;
+
+	/* Typography */
+	--font-heading: 'Playfair Display', Georgia, serif;
+	--font-body: 'Montserrat', 'Helvetica Neue', Arial, sans-serif;
+	--font-accent: 'Cormorant Garamond', Georgia, serif;
+
+	/* Font Weights */
+	--weight-light: 300;
+	--weight-regular: 400;
+	--weight-medium: 500;
+	--weight-semibold: 600;
+	--weight-bold: 700;
+
+	/* Font Sizes (Fluid Typography) */
+	--text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+	--text-sm: clamp(0.875rem, 0.8rem + 0.375vw, 1rem);
+	--text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+	--text-lg: clamp(1.125rem, 1rem + 0.625vw, 1.5rem);
+	--text-xl: clamp(1.25rem, 1.1rem + 0.75vw, 1.75rem);
+	--text-2xl: clamp(1.5rem, 1.3rem + 1vw, 2.25rem);
+	--text-3xl: clamp(1.875rem, 1.6rem + 1.375vw, 3rem);
+	--text-4xl: clamp(2.25rem, 1.9rem + 1.75vw, 3.75rem);
+
+	/* Spacing Scale */
+	--space-xs: 0.25rem;
+	--space-sm: 0.5rem;
+	--space-md: 1rem;
+	--space-lg: 1.5rem;
+	--space-xl: 2rem;
+	--space-2xl: 3rem;
+	--space-3xl: 4rem;
+	--space-4xl: 6rem;
+
+	/* Gradients */
+	--gradient-rose-gold: linear-gradient(135deg, #B76E79 0%, #D4AF37 100%);
+	--gradient-signature: linear-gradient(135deg, #B76E79 0%, #D4AF37 50%, #C0C0C0 100%);
+	--gradient-love-hurts: linear-gradient(135deg, #DC143C 0%, #B76E79 100%);
+	--gradient-black-rose: linear-gradient(135deg, #000000 0%, #C0C0C0 100%);
+	--gradient-overlay: linear-gradient(180deg, rgba(0,0,0,0) 0%, rgba(0,0,0,0.7) 100%);
+
+	/* Shadows */
+	--shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+	--shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+	--shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+	--shadow-xl: 0 12px 24px rgba(0, 0, 0, 0.12);
+	--shadow-elegant: 0 10px 40px rgba(10, 10, 10, 0.15);
+	--shadow-rose-glow: 0 0 20px rgba(183, 110, 121, 0.3);
+	--shadow-gold-glow: 0 0 20px rgba(212, 175, 55, 0.3);
+
+	/* Border Radius */
+	--radius-sm: 0.25rem;
+	--radius-md: 0.5rem;
+	--radius-lg: 1rem;
+	--radius-xl: 1.5rem;
+	--radius-full: 9999px;
+
+	/* Transitions */
+	--transition-fast: 0.15s ease-in-out;
+	--transition-base: 0.3s ease-in-out;
+	--transition-slow: 0.5s ease-in-out;
+	--transition-luxury: 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+
+	/* Z-Index Scale */
+	--z-dropdown: 1000;
+	--z-sticky: 1020;
+	--z-fixed: 1030;
+	--z-modal-backdrop: 1040;
+	--z-modal: 1050;
+	--z-popover: 1060;
+	--z-tooltip: 1070;
+
+	/* Container Widths */
+	--container-sm: 640px;
+	--container-md: 768px;
+	--container-lg: 1024px;
+	--container-xl: 1280px;
+	--container-2xl: 1536px;
+
+	/* Effects */
+	--blur-sm: blur(4px);
+	--blur-md: blur(8px);
+	--blur-lg: blur(16px);
+}
+
+/**
+ * Dark Mode Support (Optional)
+ */
+@media (prefers-color-scheme: dark) {
+	:root {
+		--off-white: #1A1A1A;
+		--light-gray: #2A2A2A;
+		--mid-gray: #CCCCCC;
+		--dark-gray: #E5E5E5;
+	}
+}
+
+/**
+ * Print Styles
+ */
+@media print {
+	:root {
+		--shadow-sm: none;
+		--shadow-md: none;
+		--shadow-lg: none;
+		--shadow-xl: none;
+		--shadow-elegant: none;
+	}
+}
