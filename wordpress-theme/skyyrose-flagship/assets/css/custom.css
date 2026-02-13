@@ -1,11 +1,599 @@
 /**
  * SkyyRose Custom Styles
  *
- * Additional custom styles and overrides.
- * This file is intentionally minimal - main styles are in luxury-theme.css
+ * Comprehensive page-specific styles for all templates.
+ * Extends the luxury-theme.css foundation with template-specific refinements.
  *
  * @package SkyyRose_Flagship
  * @since 2.0.0
  */
 
-/* Custom styles can be added here as needed */
+/* ==========================================================================
+   Table of Contents
+   ========================================================================== */
+
+/*
+ * 1. Homepage Enhancements
+ * 2. Collection Pages (Signature, Love Hurts, Black Rose, Preorder)
+ * 3. About Page
+ * 4. Contact Page
+ * 5. WooCommerce Shop
+ * 6. WooCommerce Product Pages
+ * 7. Utility Classes
+ * 8. Responsive Overrides
+ */
+
+/* ==========================================================================
+   1. Homepage Enhancements
+   ========================================================================== */
+
+.luxury-homepage .collections-showcase {
+	background: linear-gradient(to bottom, var(--white) 0%, var(--off-white) 100%);
+}
+
+.luxury-homepage .collection-card {
+	position: relative;
+	isolation: isolate;
+}
+
+.luxury-homepage .collection-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--gradient-rose-gold);
+	opacity: 0;
+	transition: opacity var(--transition-luxury);
+	border-radius: var(--radius-lg);
+	z-index: -1;
+}
+
+.luxury-homepage .collection-card:hover::before {
+	opacity: 0.05;
+}
+
+.luxury-homepage .features-section {
+	background: var(--white);
+}
+
+.luxury-homepage .cta-section {
+	position: relative;
+	overflow: hidden;
+}
+
+.luxury-homepage .cta-section::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	right: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+	animation: subtlePulse 8s ease-in-out infinite;
+}
+
+@keyframes subtlePulse {
+	0%, 100% { transform: scale(1); opacity: 0.3; }
+	50% { transform: scale(1.1); opacity: 0.5; }
+}
+
+/* ==========================================================================
+   2. Collection Pages
+   ========================================================================== */
+
+/* Shared Collection Styles */
+.collection-page .hero-content {
+	animation: fadeInUp var(--transition-luxury) ease-out;
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+.collection-page .products-grid {
+	animation: fadeIn var(--transition-luxury) ease-out 0.3s;
+}
+
+/* Signature Collection */
+.collection-signature .product-badge {
+	background: linear-gradient(135deg, var(--rose-gold) 0%, var(--gold) 100%);
+}
+
+.collection-signature .story-stats {
+	background: rgba(183, 110, 121, 0.05);
+	padding: var(--space-xl);
+	border-radius: var(--radius-md);
+}
+
+/* Love Hurts Collection */
+.collection-love-hurts .highlight-card:hover {
+	border-color: var(--crimson);
+	background: linear-gradient(135deg, rgba(220, 20, 60, 0.05) 0%, rgba(183, 110, 121, 0.08) 100%);
+}
+
+.collection-love-hurts .product-card:hover {
+	border: 1px solid rgba(220, 20, 60, 0.2);
+}
+
+/* Black Rose Collection */
+.collection-black-rose .products-showcase {
+	background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+	color: var(--white);
+}
+
+.collection-black-rose .section-title,
+.collection-black-rose .section-subtitle {
+	color: var(--white);
+}
+
+.collection-black-rose .product-card {
+	background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+}
+
+/* Preorder Gateway */
+.preorder-gateway .countdown-block {
+	animation: float 3s ease-in-out infinite;
+}
+
+.preorder-gateway .countdown-block:nth-child(2) {
+	animation-delay: 0.2s;
+}
+
+.preorder-gateway .countdown-block:nth-child(3) {
+	animation-delay: 0.4s;
+}
+
+.preorder-gateway .countdown-block:nth-child(4) {
+	animation-delay: 0.6s;
+}
+
+@keyframes float {
+	0%, 100% { transform: translateY(0); }
+	50% { transform: translateY(-10px); }
+}
+
+.preorder-gateway .email-capture {
+	animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+	from { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+	to { box-shadow: 0 0 40px rgba(255, 255, 255, 0.2); }
+}
+
+/* ==========================================================================
+   3. About Page
+   ========================================================================== */
+
+.about-page .our-story {
+	background: var(--white);
+}
+
+.about-page .story-image {
+	position: relative;
+}
+
+.about-page .story-image::after {
+	content: '';
+	position: absolute;
+	top: 20px;
+	right: -20px;
+	width: 100%;
+	height: 100%;
+	border: 3px solid var(--rose-gold);
+	border-radius: var(--radius-lg);
+	z-index: -1;
+	opacity: 0.3;
+}
+
+.about-page .process-step {
+	animation: fadeInLeft var(--transition-luxury) ease-out;
+	animation-fill-mode: both;
+}
+
+.about-page .process-step:nth-child(1) { animation-delay: 0.1s; }
+.about-page .process-step:nth-child(2) { animation-delay: 0.2s; }
+.about-page .process-step:nth-child(3) { animation-delay: 0.3s; }
+.about-page .process-step:nth-child(4) { animation-delay: 0.4s; }
+.about-page .process-step:nth-child(5) { animation-delay: 0.5s; }
+
+@keyframes fadeInLeft {
+	from {
+		opacity: 0;
+		transform: translateX(-30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+.about-page .team-card {
+	position: relative;
+	overflow: hidden;
+}
+
+.about-page .team-card::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(183, 110, 121, 0.1), transparent);
+	transition: left 0.5s;
+}
+
+.about-page .team-card:hover::before {
+	left: 100%;
+}
+
+/* ==========================================================================
+   4. Contact Page
+   ========================================================================== */
+
+.contact-page .contact-hero {
+	position: relative;
+	overflow: hidden;
+}
+
+.contact-page .contact-hero::before {
+	content: '';
+	position: absolute;
+	top: -50%;
+	left: -50%;
+	width: 200%;
+	height: 200%;
+	background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+	animation: rotate 20s linear infinite;
+}
+
+@keyframes rotate {
+	from { transform: rotate(0deg); }
+	to { transform: rotate(360deg); }
+}
+
+.contact-page .option-card {
+	cursor: pointer;
+}
+
+.contact-page .option-card:hover {
+	background: linear-gradient(135deg, rgba(183, 110, 121, 0.05) 0%, rgba(212, 175, 55, 0.03) 100%);
+}
+
+.contact-page .form-control:focus {
+	transform: translateY(-2px);
+}
+
+.contact-page .faq-item {
+	cursor: pointer;
+	transition: all var(--transition-luxury);
+}
+
+.contact-page .faq-item:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-md);
+}
+
+/* ==========================================================================
+   5. WooCommerce Shop
+   ========================================================================== */
+
+.woocommerce-products-header {
+	text-align: center;
+	padding: var(--space-4xl) 0;
+	background: var(--gradient-rose-gold);
+	color: var(--white);
+	margin-bottom: var(--space-3xl);
+}
+
+.woocommerce-products-header__title {
+	font-size: var(--text-4xl);
+	margin-bottom: var(--space-md);
+}
+
+.woocommerce-result-count,
+.woocommerce-ordering {
+	color: var(--medium-gray);
+	font-size: var(--text-sm);
+}
+
+.woocommerce-ordering select {
+	padding: var(--space-sm) var(--space-md);
+	border: 2px solid var(--light-gray);
+	border-radius: var(--radius-md);
+	background: var(--white);
+	cursor: pointer;
+	transition: all var(--transition-base);
+}
+
+.woocommerce-ordering select:focus {
+	outline: none;
+	border-color: var(--rose-gold);
+}
+
+.woocommerce-pagination {
+	display: flex;
+	justify-content: center;
+	gap: var(--space-sm);
+	margin-top: var(--space-3xl);
+}
+
+.woocommerce-pagination .page-numbers {
+	padding: var(--space-sm) var(--space-md);
+	background: var(--white);
+	border: 2px solid var(--light-gray);
+	border-radius: var(--radius-md);
+	color: var(--dark-gray);
+	text-decoration: none;
+	transition: all var(--transition-base);
+}
+
+.woocommerce-pagination .page-numbers:hover,
+.woocommerce-pagination .page-numbers.current {
+	background: var(--gradient-rose-gold);
+	color: var(--white);
+	border-color: transparent;
+}
+
+/* ==========================================================================
+   6. WooCommerce Product Pages
+   ========================================================================== */
+
+.single-product .product {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--space-4xl);
+	margin-bottom: var(--space-4xl);
+}
+
+.single-product .woocommerce-product-gallery {
+	position: sticky;
+	top: var(--space-xl);
+}
+
+.single-product .woocommerce-product-gallery__image {
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	box-shadow: var(--shadow-xl);
+}
+
+.single-product .summary {
+	padding: var(--space-xl);
+}
+
+.single-product .product_title {
+	font-size: var(--text-4xl);
+	color: var(--dark-gray);
+	margin-bottom: var(--space-md);
+}
+
+.single-product .price {
+	font-size: var(--text-3xl);
+	color: var(--rose-gold);
+	font-weight: var(--weight-bold);
+	margin-bottom: var(--space-xl);
+}
+
+.single-product .woocommerce-product-details__short-description {
+	font-size: var(--text-lg);
+	line-height: 1.8;
+	color: var(--medium-gray);
+	margin-bottom: var(--space-2xl);
+}
+
+.single-product .cart .quantity input {
+	padding: var(--space-md);
+	border: 2px solid var(--light-gray);
+	border-radius: var(--radius-md);
+	text-align: center;
+}
+
+.single-product .single_add_to_cart_button {
+	background: var(--gradient-rose-gold);
+	color: var(--white);
+	padding: var(--space-md) var(--space-3xl);
+	border: none;
+	border-radius: var(--radius-md);
+	font-size: var(--text-lg);
+	font-weight: var(--weight-semibold);
+	cursor: pointer;
+	transition: all var(--transition-luxury);
+}
+
+.single-product .single_add_to_cart_button:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-xl), var(--shadow-rose-glow);
+}
+
+.single-product .woocommerce-tabs {
+	margin-top: var(--space-4xl);
+	border-top: 2px solid var(--light-gray);
+	padding-top: var(--space-2xl);
+}
+
+.single-product .woocommerce-tabs .tabs {
+	display: flex;
+	gap: var(--space-lg);
+	border-bottom: 2px solid var(--light-gray);
+	margin-bottom: var(--space-2xl);
+}
+
+.single-product .woocommerce-tabs .tabs li {
+	list-style: none;
+}
+
+.single-product .woocommerce-tabs .tabs li a {
+	display: block;
+	padding: var(--space-md) var(--space-lg);
+	color: var(--medium-gray);
+	text-decoration: none;
+	border-bottom: 3px solid transparent;
+	transition: all var(--transition-base);
+}
+
+.single-product .woocommerce-tabs .tabs li.active a {
+	color: var(--rose-gold);
+	border-bottom-color: var(--rose-gold);
+}
+
+/* ==========================================================================
+   7. Utility Classes
+   ========================================================================== */
+
+.text-center {
+	text-align: center;
+}
+
+.text-rose-gold {
+	color: var(--rose-gold);
+}
+
+.text-gold {
+	color: var(--gold);
+}
+
+.text-silver {
+	color: var(--silver);
+}
+
+.text-crimson {
+	color: var(--crimson);
+}
+
+.bg-rose-gold {
+	background: var(--rose-gold);
+}
+
+.bg-gradient {
+	background: var(--gradient-rose-gold);
+}
+
+.shadow-glow {
+	box-shadow: var(--shadow-rose-glow);
+}
+
+.smooth-scroll {
+	scroll-behavior: smooth;
+}
+
+.fade-in {
+	animation: fadeIn var(--transition-luxury) ease-out;
+}
+
+.slide-up {
+	animation: slideUp var(--transition-luxury) ease-out;
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(40px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ==========================================================================
+   8. Responsive Overrides
+   ========================================================================== */
+
+@media (max-width: 1200px) {
+	.single-product .product {
+		grid-template-columns: 1fr;
+	}
+
+	.single-product .woocommerce-product-gallery {
+		position: static;
+	}
+}
+
+@media (max-width: 768px) {
+	.woocommerce-products-header__title {
+		font-size: var(--text-3xl);
+	}
+
+	.single-product .product_title {
+		font-size: var(--text-2xl);
+	}
+
+	.single-product .price {
+		font-size: var(--text-2xl);
+	}
+
+	.woocommerce-pagination {
+		flex-wrap: wrap;
+	}
+
+	.about-page .story-image::after {
+		display: none;
+	}
+
+	.contact-page .contact-hero::before {
+		animation: none;
+	}
+}
+
+@media (max-width: 480px) {
+	.preorder-gateway .countdown-timer {
+		gap: var(--space-sm);
+	}
+
+	.preorder-gateway .countdown-block {
+		min-width: 60px;
+		padding: var(--space-sm) var(--space-md);
+	}
+
+	.preorder-gateway .countdown-number {
+		font-size: var(--text-2xl);
+	}
+}
+
+/* ==========================================================================
+   Print Styles
+   ========================================================================== */
+
+@media print {
+	.collection-hero,
+	.preorder-hero,
+	.contact-hero,
+	.about-hero {
+		height: auto;
+		min-height: auto;
+	}
+
+	.hero-background,
+	.hero-overlay,
+	.hero-particles,
+	.hero-smoke {
+		display: none;
+	}
+
+	.btn,
+	.product-card-actions,
+	.cta-section,
+	.contact-form {
+		display: none;
+	}
+
+	body {
+		font-size: 12pt;
+		line-height: 1.6;
+	}
+
+	h1 { font-size: 24pt; }
+	h2 { font-size: 20pt; }
+	h3 { font-size: 16pt; }
+	h4 { font-size: 14pt; }
+}
