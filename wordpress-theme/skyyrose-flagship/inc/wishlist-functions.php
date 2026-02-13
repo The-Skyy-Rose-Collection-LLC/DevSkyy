@@ -17,6 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function skyyrose_init_wishlist_session() {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return;
+	}
+
 	if ( ! is_user_logged_in() && ! WC()->session->has_session() ) {
 		WC()->session->set_customer_session_cookie( true );
 	}
@@ -35,7 +39,19 @@ function skyyrose_get_wishlist_key() {
 	}
 
 	// Use session for non-logged-in users.
-	$session_key = WC()->session->get_customer_id();
+	if ( class_exists( 'WooCommerce' ) && WC()->session ) {
+		$session_key = WC()->session->get_customer_id();
+		return 'wishlist_session_' . $session_key;
+	}
+
+	// Fallback to cookie-based session key.
+	if ( isset( $_COOKIE['skyyrose_wishlist_session'] ) ) {
+		return 'wishlist_session_' . sanitize_text_field( wp_unslash( $_COOKIE['skyyrose_wishlist_session'] ) );
+	}
+
+	// Generate new session key.
+	$session_key = wp_generate_password( 32, false );
+	setcookie( 'skyyrose_wishlist_session', $session_key, time() + ( 30 * DAY_IN_SECONDS ), COOKIEPATH, COOKIE_DOMAIN );
 	return 'wishlist_session_' . $session_key;
 }
 
@@ -144,6 +160,10 @@ function skyyrose_is_in_wishlist( $product_id ) {
  * @return bool True on success, false on failure.
  */
 function skyyrose_move_to_cart( $product_id ) {
+	if ( ! class_exists( 'WooCommerce' ) ) {
+		return false;
+	}
+
 	$product_id = absint( $product_id );
 	$product    = wc_get_product( $product_id );
 
@@ -317,11 +337,16 @@ function skyyrose_ajax_move_to_cart() {
 	$result = skyyrose_move_to_cart( $product_id );
 
 	if ( $result ) {
+		$cart_count = 0;
+		if ( class_exists( 'WooCommerce' ) && WC()->cart ) {
+			$cart_count = WC()->cart->get_cart_contents_count();
+		}
+
 		wp_send_json_success(
 			array(
 				'message'    => esc_html__( 'Product moved to cart.', 'skyyrose-flagship' ),
 				'count'      => skyyrose_get_wishlist_count(),
-				'cart_count' => WC()->cart->get_cart_contents_count(),
+				'cart_count' => $cart_count,
 			)
 		);
 	} else {
@@ -374,6 +399,11 @@ function skyyrose_ajax_move_all_to_cart() {
 	$result = skyyrose_move_all_to_cart();
 
 	if ( $result['success'] > 0 ) {
+		$cart_count = 0;
+		if ( class_exists( 'WooCommerce' ) && WC()->cart ) {
+			$cart_count = WC()->cart->get_cart_contents_count();
+		}
+
 		wp_send_json_success(
 			array(
 				'message'    => sprintf(
@@ -382,7 +412,7 @@ function skyyrose_ajax_move_all_to_cart() {
 					$result['success']
 				),
 				'count'      => skyyrose_get_wishlist_count(),
-				'cart_count' => WC()->cart->get_cart_contents_count(),
+				'cart_count' => $cart_count,
 			)
 		);
 	} else {
@@ -652,7 +682,6 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_wishlist_assets' );
 function skyyrose_add_wishlist_button_to_loop() {
 	get_template_part( 'template-parts/wishlist-button' );
 }
-add_action( 'woocommerce_after_shop_loop_item', 'skyyrose_add_wishlist_button_to_loop', 15 );
 
 /**
  * Add wishlist button to single product page.
@@ -662,4 +691,9 @@ add_action( 'woocommerce_after_shop_loop_item', 'skyyrose_add_wishlist_button_to
 function skyyrose_add_wishlist_button_to_single() {
 	get_template_part( 'template-parts/wishlist-button' );
 }
-add_action( 'woocommerce_single_product_summary', 'skyyrose_add_wishlist_button_to_single', 35 );
+
+// Only register WooCommerce hooks if WooCommerce is active.
+if ( class_exists( 'WooCommerce' ) ) {
+	add_action( 'woocommerce_after_shop_loop_item', 'skyyrose_add_wishlist_button_to_loop', 15 );
+	add_action( 'woocommerce_single_product_summary', 'skyyrose_add_wishlist_button_to_single', 35 );
+}
