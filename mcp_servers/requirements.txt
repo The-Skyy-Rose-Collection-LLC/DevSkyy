@@ -89,7 +89,7 @@ python-docx>=1.1.2
 python-pptx>=1.0.2
 
 # Image processing (for vision models)
-pillow==11.0.0
+pillow==12.1.1
 
 # Audio processing (for audio models)
 soundfile==0.12.1
