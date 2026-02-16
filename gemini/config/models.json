@@ -1,0 +1,232 @@
+{
+  "models": [
+    {
+      "id": "gemini-3-pro-preview",
+      "name": "Gemini 3 Pro Preview",
+      "type": "multimodal",
+      "description": "Latest Gemini 3 model with 1M tokens, complex reasoning, coding, and research",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 8192,
+      "inputPricing": {
+        "per1MTokens": 0,
+        "note": "Pricing TBD"
+      },
+      "outputPricing": {
+        "per1MTokens": 0,
+        "note": "Pricing TBD"
+      },
+      "capabilities": [
+        "text-generation",
+        "chat",
+        "code-generation",
+        "reasoning",
+        "function-calling",
+        "streaming",
+        "multimodal"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "gemini-3-flash-preview",
+      "name": "Gemini 3 Flash Preview",
+      "type": "multimodal",
+      "description": "Latest Gemini 3 fast model with 1M tokens and balanced performance",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 8192,
+      "inputPricing": {
+        "per1MTokens": 0,
+        "note": "Pricing TBD"
+      },
+      "outputPricing": {
+        "per1MTokens": 0,
+        "note": "Pricing TBD"
+      },
+      "capabilities": [
+        "text-generation",
+        "chat",
+        "code-generation",
+        "function-calling",
+        "streaming",
+        "multimodal",
+        "fast-inference"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "gemini-3-pro-image-preview",
+      "name": "Gemini 3 Pro Image (Nano Banana Pro)",
+      "type": "multimodal",
+      "description": "Latest Gemini 3 image generation and editing model",
+      "contextWindow": 65536,
+      "maxOutputTokens": 32768,
+      "inputPricing": {
+        "per1MTokens": 0,
+        "note": "Pricing TBD"
+      },
+      "outputPricing": {
+        "per1MTokens": 0,
+        "note": "Pricing TBD"
+      },
+      "capabilities": [
+        "image-generation",
+        "image-editing",
+        "text-generation",
+        "multimodal"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "gemini-2.0-flash-exp",
+      "name": "Gemini 2.0 Flash (Experimental)",
+      "type": "text",
+      "description": "Fastest model with experimental features",
+      "contextWindow": 1048576,
+      "maxOutputTokens": 8192,
+      "inputPricing": {
+        "per1MTokens": 0,
+        "note": "Free during experimental phase"
+      },
+      "outputPricing": {
+        "per1MTokens": 0,
+        "note": "Free during experimental phase"
+      },
+      "capabilities": [
+        "text-generation",
+        "chat",
+        "code-generation",
+        "function-calling",
+        "streaming"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "gemini-pro",
+      "name": "Gemini Pro",
+      "type": "text",
+      "description": "Stable production model for complex tasks",
+      "contextWindow": 32768,
+      "maxOutputTokens": 2048,
+      "inputPricing": {
+        "per1MTokens": 0.50
+      },
+      "outputPricing": {
+        "per1MTokens": 1.50
+      },
+      "capabilities": [
+        "text-generation",
+        "chat",
+        "code-generation",
+        "reasoning",
+        "function-calling"
+      ]
+    },
+    {
+      "id": "gemini-pro-vision",
+      "name": "Gemini Pro Vision",
+      "type": "multimodal",
+      "description": "Multimodal model for image and text",
+      "contextWindow": 16384,
+      "maxOutputTokens": 2048,
+      "inputPricing": {
+        "per1MTokens": 0.25,
+        "perImage": 0.0025
+      },
+      "outputPricing": {
+        "per1MTokens": 0.50
+      },
+      "capabilities": [
+        "text-generation",
+        "image-analysis",
+        "vision",
+        "ocr",
+        "object-detection"
+      ],
+      "supportedImageFormats": [
+        "PNG",
+        "JPEG",
+        "WEBP",
+        "HEIC",
+        "HEIF"
+      ],
+      "maxImages": 16
+    },
+    {
+      "id": "gemini-ultra",
+      "name": "Gemini Ultra",
+      "type": "text",
+      "description": "Most capable model for complex reasoning",
+      "contextWindow": 65536,
+      "maxOutputTokens": 4096,
+      "inputPricing": {
+        "per1MTokens": 2.00
+      },
+      "outputPricing": {
+        "per1MTokens": 6.00
+      },
+      "capabilities": [
+        "text-generation",
+        "advanced-reasoning",
+        "complex-tasks",
+        "code-generation",
+        "function-calling"
+      ],
+      "availability": "limited-preview"
+    },
+    {
+      "id": "gemini-1.5-pro",
+      "name": "Gemini 1.5 Pro",
+      "type": "multimodal",
+      "description": "Mid-size model with long context",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 8192,
+      "inputPricing": {
+        "per1MTokens": 0.875
+      },
+      "outputPricing": {
+        "per1MTokens": 2.625
+      },
+      "capabilities": [
+        "text-generation",
+        "image-analysis",
+        "video-analysis",
+        "long-context",
+        "function-calling"
+      ]
+    },
+    {
+      "id": "gemini-1.5-flash",
+      "name": "Gemini 1.5 Flash",
+      "type": "multimodal",
+      "description": "Fast and efficient multimodal model",
+      "contextWindow": 1000000,
+      "maxOutputTokens": 8192,
+      "inputPricing": {
+        "per1MTokens": 0.15
+      },
+      "outputPricing": {
+        "per1MTokens": 0.60
+      },
+      "capabilities": [
+        "text-generation",
+        "image-analysis",
+        "fast-inference",
+        "streaming"
+      ]
+    }
+  ],
+  "modelSelection": {
+    "fastTasks": "gemini-3-flash-preview",
+    "complexReasoning": "gemini-3-pro-preview",
+    "visionTasks": "gemini-pro-vision",
+    "longContext": "gemini-3-pro-preview",
+    "production": "gemini-3-pro-preview",
+    "imageGeneration": "gemini-3-pro-image-preview"
+  },
+  "experimentalFeatures": {
+    "gemini-2.0-flash-exp": [
+      "multimodal-live",
+      "spatial-understanding",
+      "native-tool-use"
+    ]
+  }
+}
