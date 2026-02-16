@@ -1,0 +1,31 @@
+{
+  "name": "@devskyy/gemini-client",
+  "version": "1.0.0",
+  "description": "Google Gemini AI client for DevSkyy projects",
+  "main": "gemini-client.js",
+  "scripts": {
+    "test": "node test-connection.js",
+    "example:chat": "node ../../examples/chat-basic.js",
+    "example:stream": "node ../../examples/chat-streaming.js",
+    "example:vision": "node ../../examples/vision-analysis.js"
+  },
+  "keywords": [
+    "gemini",
+    "google-ai",
+    "generative-ai",
+    "llm",
+    "ai"
+  ],
+  "author": "DevSkyy Team",
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^1.41.0",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
