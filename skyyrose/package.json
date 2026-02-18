@@ -14,7 +14,8 @@
     "generate:ai-all": "node build/nanobanana-brand-system.js",
     "build": "npm run build:scenes && npm run build:images && npm run build:logos",
     "dev": "npx serve .",
-    "generate:alts": "node build/generate-alt-text.js"
+    "generate:alts": "node build/generate-alt-text.js",
+    "verify": "node build/verify.js"
   },
   "keywords": [
     "skyyrose",
