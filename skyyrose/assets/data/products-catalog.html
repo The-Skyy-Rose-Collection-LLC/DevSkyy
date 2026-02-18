@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SkyyRose — Product Catalog</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#080808;color:#fff;font-family:'Helvetica Neue',sans-serif;padding:32px 24px}
+h1{font-size:22px;color:#B76E79;letter-spacing:4px;text-transform:uppercase;margin-bottom:4px}
+.subtitle{font-size:12px;color:#555;margin-bottom:32px;letter-spacing:1px}
+.actions{margin-bottom:24px;display:flex;gap:12px;align-items:center}
+.dl-btn{background:#B76E79;color:#fff;border:none;padding:10px 24px;border-radius:6px;cursor:pointer;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase}
+.dl-btn:hover{background:#a05668}
+.stat{font-size:12px;color:#555}
+
+.collection-title{
+  font-size:10px;letter-spacing:5px;text-transform:uppercase;
+  color:#B76E79;padding:12px 0 8px;border-top:1px solid #1a1a1a;margin-top:32px;margin-bottom:16px;
+}
+
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{background:#111;color:#555;font-size:9px;letter-spacing:3px;text-transform:uppercase;
+  padding:10px 12px;text-align:left;border-bottom:1px solid #1e1e1e;white-space:nowrap}
+td{padding:12px;border-bottom:1px solid #111;vertical-align:top}
+tr:hover td{background:#0f0f0f}
+
+.pid{display:inline-block;font-size:9px;font-weight:700;letter-spacing:2px;padding:3px 8px;border-radius:4px;margin-bottom:4px}
+.br .pid{background:#B76E79;color:#fff}
+.lh .pid{background:#8B0000;color:#fff}
+.sg .pid{background:#D4AF37;color:#000}
+
+.product-name{font-size:14px;font-weight:600;color:#eee;margin-bottom:3px}
+.colorway{font-size:11px;color:#888;font-style:italic}
+.status-badge{display:inline-block;font-size:9px;letter-spacing:2px;padding:2px 8px;border-radius:3px;margin-top:4px;text-transform:uppercase}
+.status-preorder{background:rgba(183,110,121,0.15);color:#B76E79;border:1px solid rgba(183,110,121,0.3)}
+.status-available{background:rgba(30,120,50,0.15);color:#44cc77;border:1px solid rgba(30,120,50,0.3)}
+
+.photos{display:flex;gap:6px;flex-wrap:wrap}
+.photo-wrap{position:relative;flex-shrink:0}
+.photo-wrap img{width:90px;height:90px;object-fit:contain;background:#141414;border-radius:4px;border:1px solid #222;display:block}
+.photo-wrap .view-tag{
+  position:absolute;bottom:3px;left:3px;
+  font-size:8px;letter-spacing:1px;text-transform:uppercase;
+  background:rgba(0,0,0,0.7);color:#aaa;padding:1px 4px;border-radius:2px;
+}
+.photo-wrap .color-tag{
+  position:absolute;top:3px;right:3px;
+  font-size:8px;background:rgba(183,110,121,0.8);color:#fff;padding:1px 5px;border-radius:2px;
+  white-space:nowrap;max-width:70px;overflow:hidden;text-overflow:ellipsis;
+}
+.notes{font-size:10px;color:#666;max-width:200px;line-height:1.5}
+</style>
+</head>
+<body>
+
+<h1>SkyyRose — Product Catalog</h1>
+<p class="subtitle">Source photography mapped · Organized by collection</p>
+
+<div class="actions">
+  <button class="dl-btn" onclick="downloadCSV()">Download CSV</button>
+  <span class="stat" id="stat"></span>
+</div>
+
+<div id="catalog"></div>
+
+<script>
+const BASE = '../source-products';
+
+const PRODUCTS = [
+  // ── BLACK ROSE ────────────────────────────────────────────────────────────
+  {
+    id:'BR-001', col:'black-rose', colClass:'br',
+    name:'BLACK Rose Crewneck', status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'PhotoRoom_011_20230616_170635.png', view:'Front'},
+      {file:'PhotoRoom_001_20230616_170635.PNG',  view:'Back'},
+    ],
+    notes:'The Crew'
+  },
+  {
+    id:'BR-002', col:'black-rose', colClass:'br',
+    name:'BLACK Rose Joggers', status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'PhotoRoom_010_20231221_160237.jpeg', view:''},
+    ],
+    notes:'The Joggers'
+  },
+  {
+    id:'BR-003', col:'black-rose', colClass:'br',
+    name:'BLACK is Beautiful Jersey', status:'Pre-Order', colorway:'Last Oakland / Giants',
+    photos:[
+      {file:'266AD7B0-88A6-4489-AA58-AB72A575BD33 3.JPG', view:'Back', color:'Last Oakland'},
+      {file:'5A8946B1-B51F-4144-BCBB-F028462077A0.jpg',   view:'Front', color:'Last Oakland'},
+      {file:'PhotoRoom_003_20230616_170635 (1).png',       view:'Back', color:'Giants'},
+      {file:'BLACK is Beautiful Giants Front.jpg',          view:'Front', color:'Giants'},
+      {file:'PhotoRoom_000_20230616_170635.png',            view:''},
+      {file:'The BLACK Jersey (BLACK Rose Collection).jpg', view:'Front'},
+    ],
+    notes:'2 colorways: Last Oakland + Giants'
+  },
+  {
+    id:'BR-004', col:'black-rose', colClass:'br',
+    name:'BLACK Rose Hoodie', status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'PhotoRoom_001_20230523_204834.PNG', view:'Front'},
+    ],
+    notes:''
+  },
+  {
+    id:'BR-005', col:'black-rose', colClass:'br',
+    name:'BLACK Rose Hoodie — Signature Edition', status:'Available', colorway:'',
+    photos:[
+      {file:'PhotoRoom_008_20221210_093149.PNG', view:'Front'},
+    ],
+    notes:''
+  },
+  {
+    id:'BR-006', col:'black-rose', colClass:'br',
+    name:'BLACK Rose Sherpa Jacket', status:'Pre-Order', colorway:'Sherpa',
+    photos:[
+      {file:'The BLACK Rose Sherpa Front.jpg', view:'Front'},
+      {file:'The BLACK Rose Sherpa Back.jpg',  view:'Back'},
+    ],
+    notes:'Also called Bomber'
+  },
+  {
+    id:'BR-007', col:'black-rose', colClass:'br',
+    name:'BLACK Rose × Love Hurts Basketball Shorts', status:'Available', colorway:'',
+    photos:[
+      {file:'PhotoRoom_20221110_201933.PNG', view:'Front'},
+      {file:'PhotoRoom_20221110_202133.PNG', view:'Side'},
+      {file:'IMG_1733.jpeg',                view:''},
+    ],
+    notes:'Collab piece'
+  },
+  {
+    id:'BR-008', col:'black-rose', colClass:'br',
+    name:"Women's BLACK Rose Hooded Dress", status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'Womens Black Rose Hooded Dress.jpeg', view:'Front'},
+    ],
+    notes:''
+  },
+
+  // ── LOVE HURTS ───────────────────────────────────────────────────────────
+  {
+    id:'LH-001', col:'love-hurts', colClass:'lh',
+    name:'The Fannie', status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'IMG_0117.jpeg',                                view:'Front-1'},
+      {file:'4074E988-4DAF-4221-8446-4B93422AF437.jpg',    view:'Front-2'},
+    ],
+    notes:'Fanny pack / waist bag'
+  },
+  {
+    id:'LH-002', col:'love-hurts', colClass:'lh',
+    name:'Love Hurts Joggers', status:'Available', colorway:'Black / White',
+    photos:[
+      {file:'IMG_2102.png', view:'', color:'Black'},
+      {file:'IMG_2103.png', view:'', color:'White'},
+      {file:'IMG_2105.png', view:'', color:'White'},
+    ],
+    notes:'2 colorways'
+  },
+  {
+    id:'LH-003', col:'love-hurts', colClass:'lh',
+    name:'Love Hurts Basketball Shorts', status:'Available', colorway:'',
+    photos:[
+      {file:'PhotoRoom_004_20221110_200039.png', view:'Side'},
+      {file:'PhotoRoom_003_20221110_200039.png', view:'Side-2'},
+      {file:'PhotoRoom_018_20231221_160237.jpeg',view:'Front'},
+    ],
+    notes:''
+  },
+
+  // ── SIGNATURE ────────────────────────────────────────────────────────────
+  {
+    id:'SG-001', col:'signature', colClass:'sg',
+    name:'The Bay Set', status:'Pre-Order', colorway:'Bay',
+    photos:[
+      {file:'0F85F48C-364B-43CB-8297-E90BB7B8BB51 2.jpg', view:'1'},
+      {file:'24661692-0F81-43F4-AA69-7E026552914A.jpg',   view:'2'},
+    ],
+    notes:'Full set'
+  },
+  {
+    id:'SG-002', col:'signature', colClass:'sg',
+    name:'Stay Golden Set', status:'Pre-Order', colorway:'Golden',
+    photos:[
+      {file:'562143CF-4A77-42B8-A58C-C77ED21E9B5E.jpg', view:'1'},
+    ],
+    notes:'Full set'
+  },
+  {
+    id:'SG-003', col:'signature', colClass:'sg',
+    name:'The Signature Tee', status:'Available', colorway:'Orchid',
+    photos:[
+      {file:'IMG_0553.JPG',           view:'Front'},
+      {file:'Signature T \u201cOrchard\u201d.jpeg', view:''},
+    ],
+    notes:''
+  },
+  {
+    id:'SG-004', col:'signature', colClass:'sg',
+    name:'The Signature Tee', status:'Available', colorway:'White',
+    photos:[
+      {file:'IMG_0554.JPG',           view:'Front'},
+      {file:'Signature T \u201cWhite\u201d.jpeg',  view:''},
+    ],
+    notes:''
+  },
+  {
+    id:'SG-005', col:'signature', colClass:'sg',
+    name:'Stay Golden Tee', status:'Available', colorway:'Golden',
+    photos:[
+      {file:'Photo Dec 18 2023, 6 09 21 PM.jpg', view:''},
+    ],
+    notes:''
+  },
+  {
+    id:'SG-006', col:'signature', colClass:'sg',
+    name:'Mint & Lavender Hoodie', status:'Available', colorway:'Mint / Lavender',
+    photos:[
+      {file:'PhotoRoom_004_20231221_160237.jpeg',         view:'Front'},
+      {file:'Mint & Lavender Set (Sold Separately) .jpeg',view:'Set'},
+      {file:'MINT & Lavender Set 2 .jpeg',                view:'Set 2'},
+    ],
+    notes:'Signature Collection hoodie'
+  },
+  {
+    id:'SG-007', col:'signature', colClass:'sg',
+    name:'The Signature Beanie', status:'Available', colorway:'Red',
+    photos:[
+      {file:'Photoroom_010_20240926_104051.jpg', view:''},
+    ],
+    notes:''
+  },
+  {
+    id:'SG-008', col:'signature', colClass:'sg',
+    name:'The Signature Beanie', status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'PhotoRoom_000_20221210_093149.png', view:''},
+    ],
+    notes:'Moved from Love Hurts'
+  },
+  {
+    id:'SG-009', col:'signature', colClass:'sg',
+    name:'The Sherpa Jacket', status:'Pre-Order', colorway:'',
+    photos:[
+      {file:'PhotoRoom_002_20231221_072338.jpg', view:'Front'},
+      {file:'PhotoRoom_003_20231221_072338.jpg', view:'Back'},
+    ],
+    notes:'Moved from Love Hurts'
+  },
+];
+
+function imgPath(col, file) {
+  return `${BASE}/${col}/${file}`;
+}
+
+function buildCatalog() {
+  const container = document.getElementById('catalog');
+  const colGroups = [
+    { key: 'black-rose', label: '⚫ BLACK ROSE COLLECTION' },
+    { key: 'love-hurts', label: '❤️ LOVE HURTS COLLECTION' },
+    { key: 'signature',  label: '✨ SIGNATURE COLLECTION' },
+  ];
+
+  for (const grp of colGroups) {
+    const items = PRODUCTS.filter(p => p.col === grp.key);
+    const div = document.createElement('div');
+    div.innerHTML = `<div class="collection-title">${grp.label} — ${items.length} products</div>`;
+
+    const table = document.createElement('table');
+    table.innerHTML = `<thead><tr>
+      <th>Product</th>
+      <th>Status</th>
+      <th>Photos</th>
+      <th>Notes</th>
+    </tr></thead>`;
+    const tbody = document.createElement('tbody');
+
+    for (const p of items) {
+      const tr = document.createElement('tr');
+      tr.className = p.colClass;
+      const photosHtml = p.photos.map(ph => `
+        <div class="photo-wrap">
+          <img src="${imgPath(p.col, ph.file)}" alt="${ph.file}"
+            onerror="this.style.background='#222';this.style.opacity='0.3'">
+          ${ph.view  ? `<span class="view-tag">${ph.view}</span>` : ''}
+          ${ph.color ? `<span class="color-tag">${ph.color}</span>` : ''}
+        </div>`).join('');
+
+      tr.innerHTML = `
+        <td>
+          <span class="pid">${p.id}</span><br>
+          <span class="product-name">${p.name}</span><br>
+          ${p.colorway ? `<span class="colorway">${p.colorway}</span>` : ''}
+        </td>
+        <td>
+          <span class="status-badge ${p.status === 'Pre-Order' ? 'status-preorder' : 'status-available'}">${p.status}</span>
+        </td>
+        <td><div class="photos">${photosHtml}</div></td>
+        <td><span class="notes">${p.notes}</span></td>
+      `;
+      tbody.appendChild(tr);
+    }
+    table.appendChild(tbody);
+    div.appendChild(table);
+    container.appendChild(div);
+  }
+
+  document.getElementById('stat').textContent = `${PRODUCTS.length} products · ${PRODUCTS.reduce((s,p) => s + p.photos.length, 0)} photos`;
+}
+
+function downloadCSV() {
+  const rows = [
+    ['Product ID','Product Name','Collection','Status','Colorway','File 1','View 1','Color 1','File 2','View 2','Color 2','File 3','View 3','Color 3','Notes']
+  ];
+  for (const p of PRODUCTS) {
+    const colLabel = p.col === 'black-rose' ? 'Black Rose' : p.col === 'love-hurts' ? 'Love Hurts' : 'Signature';
+    const refs = [0,1,2].map(i => p.photos[i]
+      ? [p.photos[i].file, p.photos[i].view || '', p.photos[i].color || '']
+      : ['','','']);
+    rows.push([
+      p.id, p.name, colLabel, p.status, p.colorway,
+      refs[0][0], refs[0][1], refs[0][2],
+      refs[1][0], refs[1][1], refs[1][2],
+      refs[2][0], refs[2][1], refs[2][2],
+      p.notes
+    ]);
+  }
+  const csv = rows.map(r => r.map(v => `"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = 'skyyrose-products.csv';
+  a.click();
+}
+
+buildCatalog();
+</script>
+</body>
+</html>
