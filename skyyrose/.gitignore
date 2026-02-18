@@ -11,10 +11,12 @@ node_modules/
 .DS_Store
 **/.DS_Store
 
-# Build artifacts (large generated files — tracked separately or excluded)
+# Large image assets — host on Cloudflare R2 / CDN (not in git)
+assets/images/scenes/
+assets/images/products/
+assets/images/products-ecom/
+assets/images/collection-bgs/
 assets/images/source-products/
-assets/images/products-ecom/*/srcset/
-assets/images/products-ecom/*/social/
 
 # Python
 __pycache__/
