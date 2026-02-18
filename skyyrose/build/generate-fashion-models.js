@@ -5,6 +5,13 @@
  * Generates professional fashion model photography for all 20 products.
  * All reference images renamed to descriptive format (Feb 2026).
  * Usage: node build/generate-fashion-models.js [product-id ...]
+ *
+ * ⚠️  DISCLAIMER
+ * AI-generated model images are artistic interpretations for visualization purposes.
+ * Graphics, text, colorways, and design details may not be 100% accurate replicas
+ * of actual SkyyRose products. Always reference the original source photos in
+ * source-products/ as the definitive record of each garment's true appearance.
+ * Do NOT use generated images as final product listings without manual review.
  */
 
 const path = require('path');
@@ -551,6 +558,7 @@ async function generateAllFashionModels(productIds = null) {
     model: 'gemini-2.5-flash-image',
     quality: 'Editorial (Vogue/Harper\'s Bazaar)',
     referenceImages: true,
+    disclaimer: 'AI-generated images are artistic interpretations. Graphics, colorways, and design details may not be 100% accurate replicas of actual SkyyRose products. Always verify against source-products/ originals before using in product listings.',
     results
   }, null, 2));
 
