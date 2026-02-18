@@ -71,13 +71,8 @@ credentials/
 *.crt
 .secrets/
 
-# Claude Code Plugin Secrets
-.claude/*.local.md
-.claude/claude-intelligence-core.local.md
-.claude/plugins/*/data/
-.claude/chroma_data/
-*.duckdb
-*.duckdb.wal
+# Claude Code (local settings — contains keys/prefs, never commit)
+.claude/
 
 # Database
 *.db
@@ -162,6 +157,7 @@ secrets/
 staging/
 backups/
 legacy/
+
 # Large archive files
 assets/_other/*.zip
 
@@ -173,7 +169,6 @@ assets/_other/*.zip
 **/secrets/**
 **/*.secret
 **/*.secrets
-
 
 # Generated 3D assets (large binary files)
 assets/3d-models-generated/
@@ -212,13 +207,12 @@ wordpress/skyyrose-immersive/
 wordpress/skyyrose-immersive.zip
 wordpress/shoptimizer-child-theme/
 wordpress/plugins/
+
 # 3D Models (large binary files)
 generated_3d_models/
 
 # Large files moved to HuggingFace Hub
 # https://huggingface.co/datasets/damBruh/skyyrose-assets
-# https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v1
-# https://huggingface.co/datasets/damBruh/skyyrose-lora-dataset-v2
 assets/
 datasets/
 generated_3d_models_color_accurate/

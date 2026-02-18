@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" data-experience="3d-immersive" data-collection="black-rose">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Explore the BLACK ROSE Collection through an immersive 3D virtual showroom. Discover gothic luxury fashion through interactive product hotspots.">
+  <meta name="theme-color" content="#B76E79">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Explore BLACK ROSE in 3D | SkyyRose">
+  <meta property="og:description" content="Immersive 3D showroom experience for the BLACK ROSE Collection. Click product hotspots to discover gothic luxury.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="../assets/images/scenes/black-rose-garden-desktop.jpg">
+
+  <!-- Canonical -->
+  <link rel="canonical" href="https://skyyrose.co/collections/black-rose.html">
+  <link rel="alternate" href="../collections/black-rose.html" title="Traditional Grid View">
+
+  <title>Explore BLACK ROSE in 3D | SkyyRose Immersive Experience</title>
+
+  <!-- Preload critical assets for instant perceived load -->
+  <link rel="preload" as="image" href="../assets/images/scenes/black-rose-garden-desktop.avif" type="image/avif">
+  <link rel="preload" href="../assets/css/base-v2.css" as="style">
+  <link rel="preload" href="../assets/css/3d-experience.css" as="style">
+
+  <!-- Luxury Fonts (preload display font for hero text) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Montserrat:wght@300;400;500;600;700&family=Great+Vibes&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="../assets/css/base-v2.css">
+  <link rel="stylesheet" href="../assets/css/3d-experience.css">
+  <link rel="stylesheet" href="../assets/css/collections/black-rose.css">
+</head>
+<body class="immersive-experience loading">
+
+  <!-- Skip Links (Accessibility) -->
+  <a href="../collections/black-rose.html" class="skip-link">
+    Skip to Traditional Grid View
+  </a>
+  <a href="#hotspots" class="skip-link">
+    Skip to Products
+  </a>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar immersive-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-container">
+      <a href="../index-v2.html" class="nav-brand">
+        <span class="brand-sky">SKY</span><span class="brand-rose">Y</span><span class="brand-sky">ROSE</span>
+      </a>
+
+      <div class="nav-experience-info">
+        <span class="experience-mode">3D Experience</span>
+        <span class="collection-name">BLACK ROSE</span>
+      </div>
+
+      <button class="exit-experience-btn" onclick="window.location.href='../collections/black-rose.html'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+          <polyline points="9 22 9 12 15 12 15 22"/>
+        </svg>
+        <span>View Grid</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- Loading Screen (drakerelated.com-style) -->
+  <div id="loading-screen" class="loading-screen" aria-live="polite" aria-atomic="true">
+    <div class="loading-content">
+      <div class="loading-logo">
+        <span class="loading-text">SKYYROSE</span>
+        <span class="loading-collection">BLACK ROSE</span>
+      </div>
+      <div class="loading-progress">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <span class="progress-text" id="progress-text">Loading experience...</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3D Scene Container -->
+  <main id="scene-container" class="scene-container" role="main">
+
+    <!-- Progressive Image Loading (blur-up technique) -->
+    <picture class="scene-image">
+      <!-- Blur-up placeholder (instant load) -->
+      <div class="scene-placeholder" style="background-image: url('../assets/images/scenes/black-rose-garden-placeholder.jpg')" aria-hidden="true"></div>
+
+      <!-- Progressive enhancement: AVIF → WebP → JPEG -->
+
+      <!-- 4K displays -->
+      <source
+        media="(min-width: 2560px)"
+        srcset="../assets/images/scenes/black-rose-garden-4k.avif"
+        type="image/avif"
+      />
+      <source
+        media="(min-width: 2560px)"
+        srcset="../assets/images/scenes/black-rose-garden-4k.webp"
+        type="image/webp"
+      />
+
+      <!-- Desktop -->
+      <source
+        media="(min-width: 1280px)"
+        srcset="../assets/images/scenes/black-rose-garden-desktop.avif"
+        type="image/avif"
+      />
+      <source
+        media="(min-width: 1280px)"
+        srcset="../assets/images/scenes/black-rose-garden-desktop.webp"
+        type="image/webp"
+      />
+
+      <!-- Tablet -->
+      <source
+        media="(min-width: 768px)"
+        srcset="../assets/images/scenes/black-rose-garden-tablet.avif"
+        type="image/avif"
+      />
+      <source
+        media="(min-width: 768px)"
+        srcset="../assets/images/scenes/black-rose-garden-tablet.webp"
+        type="image/webp"
+      />
+
+      <!-- Mobile (default) -->
+      <source
+        srcset="../assets/images/scenes/black-rose-garden-mobile.avif"
+        type="image/avif"
+      />
+      <source
+        srcset="../assets/images/scenes/black-rose-garden-mobile.webp"
+        type="image/webp"
+      />
+
+      <!-- Fallback -->
+      <img
+        id="scene-image"
+        src="../assets/images/scenes/black-rose-garden-desktop.jpg"
+        alt="BLACK ROSE Collection - Gothic garden showroom with dark roses and elegant atmosphere"
+        class="scene-main"
+        loading="eager"
+        decoding="async"
+      />
+    </picture>
+
+    <!-- Product Hotspots -->
+    <div id="hotspots" class="hotspots-container" role="region" aria-label="Interactive product hotspots">
+
+      <!-- Hotspot 1: Black Rose Tee -->
+      <button
+        class="hotspot"
+        data-product="br-001"
+        style="left: 35%; top: 45%;"
+        aria-label="Discover Black Rose Tee"
+      >
+        <span class="hotspot-pulse"></span>
+        <span class="hotspot-number">1</span>
+        <span class="hotspot-label">Black Rose Tee</span>
+      </button>
+
+      <!-- Hotspot 2: Rose Garden Dress -->
+      <button
+        class="hotspot"
+        data-product="br-002"
+        style="left: 55%; top: 35%;"
+        aria-label="Discover Rose Garden Dress"
+      >
+        <span class="hotspot-pulse"></span>
+        <span class="hotspot-number">2</span>
+        <span class="hotspot-label">Rose Garden Dress</span>
+      </button>
+
+      <!-- Hotspot 3: Thorn Leather Jacket -->
+      <button
+        class="hotspot"
+        data-product="br-003"
+        style="left: 70%; top: 50%;"
+        aria-label="Discover Thorn Leather Jacket"
+      >
+        <span class="hotspot-pulse"></span>
+        <span class="hotspot-number">3</span>
+        <span class="hotspot-label">Thorn Leather Jacket</span>
+      </button>
+
+      <!-- Hotspot 4: Midnight Bloom Pants -->
+      <button
+        class="hotspot"
+        data-product="br-004"
+        style="left: 25%; top: 65%;"
+        aria-label="Discover Midnight Bloom Pants"
+      >
+        <span class="hotspot-pulse"></span>
+        <span class="hotspot-number">4</span>
+        <span class="hotspot-label">Midnight Bloom Pants</span>
+      </button>
+
+      <!-- Hotspot 5: Gothic Rose Boots -->
+      <button
+        class="hotspot"
+        data-product="br-005"
+        style="left: 60%; top: 70%;"
+        aria-label="Discover Gothic Rose Boots"
+      >
+        <span class="hotspot-pulse"></span>
+        <span class="hotspot-number">5</span>
+        <span class="hotspot-label">Gothic Rose Boots</span>
+      </button>
+
+      <!-- Hotspot 6: Rose Petal Scarf -->
+      <button
+        class="hotspot"
+        data-product="br-006"
+        style="left: 45%; top: 25%;"
+        aria-label="Discover Rose Petal Scarf"
+      >
+        <span class="hotspot-pulse"></span>
+        <span class="hotspot-number">6</span>
+        <span class="hotspot-label">Rose Petal Scarf</span>
+      </button>
+
+    </div>
+
+  </main>
+
+  <!-- Scene Navigation (Bottom Bar) -->
+  <nav class="scene-nav" aria-label="Collection navigation">
+    <button class="scene-nav-prev" aria-label="Previous collection">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <div class="scene-nav-dots">
+      <a href="signature.html" class="nav-dot" data-collection="signature" aria-label="SIGNATURE Collection">
+        <span class="dot-label">SIGNATURE</span>
+      </a>
+      <a href="black-rose.html" class="nav-dot active" data-collection="black-rose" aria-label="BLACK ROSE Collection" aria-current="page">
+        <span class="dot-label">BLACK ROSE</span>
+      </a>
+      <a href="love-hurts.html" class="nav-dot" data-collection="love-hurts" aria-label="LOVE HURTS Collection">
+        <span class="dot-label">LOVE HURTS</span>
+      </a>
+    </div>
+
+    <button class="scene-nav-next" aria-label="Next collection">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  </nav>
+
+  <!-- View Grid CTA (Fixed Button) -->
+  <a href="../collections/black-rose.html" class="view-grid-cta" aria-label="View full collection grid">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7"/>
+      <rect x="14" y="3" width="7" height="7"/>
+      <rect x="14" y="14" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/>
+    </svg>
+    <span>View Grid</span>
+  </a>
+
+  <!-- Product Modal (Shared Component) -->
+  <div id="product-modal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal-backdrop" aria-hidden="true"></div>
+    <div class="modal-container">
+      <div class="modal-content">
+
+        <!-- Close Button -->
+        <button class="modal-close" aria-label="Close modal">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18"/>
+            <line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
+        </button>
+
+        <!-- Product Details (dynamically populated) -->
+        <div class="modal-body" id="modal-body">
+          <!-- Populated by JavaScript -->
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="../assets/js/config.js"></script>
+  <script src="../assets/js/3d-experience.js"></script>
+
+  <!-- Screen Reader Announcements -->
+  <div class="sr-only" aria-live="polite" aria-atomic="true" id="sr-announcements"></div>
+
+</body>
+</html>

@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SkyyRose — Product Reference Image Check</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0a; color: #fff; font-family: 'Helvetica Neue', sans-serif; padding: 40px 20px; }
+  h1 { color: #B76E79; font-size: 28px; margin-bottom: 8px; }
+  .subtitle { color: #888; margin-bottom: 40px; font-size: 14px; }
+  .collection { margin-bottom: 60px; }
+  .collection-title {
+    font-size: 13px; letter-spacing: 4px; text-transform: uppercase;
+    color: #B76E79; border-bottom: 1px solid #222; padding-bottom: 12px; margin-bottom: 28px;
+  }
+  .products { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 24px; }
+  .product-card {
+    background: #111; border: 1px solid #222; border-radius: 12px; overflow: hidden;
+  }
+  .product-id {
+    background: #B76E79; color: #fff; font-size: 11px; letter-spacing: 2px;
+    padding: 6px 12px; font-weight: 600;
+  }
+  .lh .product-id { background: #8B0000; }
+  .sg .product-id { background: #D4AF37; color: #000; }
+  .images { display: flex; gap: 4px; background: #000; padding: 4px; }
+  .images img {
+    flex: 1; width: 0; min-width: 0; height: 220px; object-fit: contain;
+    background: #1a1a1a; border-radius: 4px;
+  }
+  .info { padding: 16px; }
+  .product-name { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+  .ref-file { font-size: 11px; color: #666; font-family: monospace; margin-bottom: 2px; }
+  .ref-file.missing { color: #ff4444; }
+  .ref-file.ok::before { content: '✓ '; color: #44ff88; }
+  .ref-file.missing::before { content: '✗ '; }
+  .prompt-label { font-size: 11px; color: #555; margin-top: 10px; }
+  .prompt-text { font-size: 11px; color: #888; line-height: 1.4; }
+  footer { margin-top: 60px; color: #444; font-size: 12px; }
+  footer a { color: #B76E79; }
+</style>
+</head>
+<body>
+<h1>SkyyRose — Product Reference Image Check</h1>
+<p class="subtitle">Verify each product is mapped to the correct source photo before AI model generation</p>
+
+<div class="collection">
+  <div class="collection-title">⚫ BLACK ROSE Collection</div>
+  <div class="products">
+
+    <div class="product-card br">
+      <div class="product-id">BR-001</div>
+      <div class="images">
+        <img src="assets/images/products/br-001/br-001-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/br-001/br-001-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">Black Rose Crewneck</div>
+        <div class="ref-file ok">PhotoRoom_001_20230616_170635.PNG</div>
+        <div class="ref-file ok">PhotoRoom_003_20230616_170635.PNG</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">Black crewneck, white ribbed collar/cuffs, large rose mushroom cloud graphic center chest (grey/silver on black)</div>
+      </div>
+    </div>
+
+    <div class="product-card br">
+      <div class="product-id">BR-002</div>
+      <div class="images">
+        <img src="assets/images/products/br-002/br-002-product.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">Black Rose Joggers</div>
+        <div class="ref-file ok">PhotoRoom_007_20230616_170635.PNG</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">Black jogger pants, white ribbed waistband & ankle cuffs, small rose logo upper left leg</div>
+      </div>
+    </div>
+
+    <div class="product-card br">
+      <div class="product-id">BR-003</div>
+      <div class="images">
+        <img src="assets/images/products/br-003/br-003-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/br-003/br-003-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">"Black Is Beautiful" Baseball Jersey</div>
+        <div class="ref-file ok">The BLACK Jersey (BLACK Rose Collection).jpg</div>
+        <div class="ref-file ok">BLACK is Beautiful Giants Front.jpg</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">Forest green jersey, gold varsity lettering "BLACK IS BEAUTIFUL", black rose replacing the O, gold/white stripe trim</div>
+      </div>
+    </div>
+
+    <div class="product-card br">
+      <div class="product-id">BR-004</div>
+      <div class="images">
+        <img src="assets/images/products/br-004/br-004-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/br-004/br-004-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">Black Rose Beanie</div>
+        <div class="ref-file ok">IMG_7852.JPG</div>
+        <div class="ref-file ok">PhotoRoom_010_20231221_160237.jpeg</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">Black ribbed beanie with fold-up cuff, PVC patch on cuff with black rose mushroom cloud graphic</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="collection">
+  <div class="collection-title">❤️ LOVE HURTS Collection</div>
+  <div class="products">
+
+    <div class="product-card lh">
+      <div class="product-id">LH-001</div>
+      <div class="images">
+        <img src="assets/images/products/lh-001/lh-001-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/lh-001/lh-001-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">Love Hurts Track Pants — Black</div>
+        <div class="ref-file ok">joggers.png</div>
+        <div class="ref-file ok">IMG_2102.png</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">BLACK track pants, white side stripe, ankle zip, left-leg embroidery: red rose bouquet with heart & arrow (tattoo flash style)</div>
+      </div>
+    </div>
+
+    <div class="product-card lh">
+      <div class="product-id">LH-002</div>
+      <div class="images">
+        <img src="assets/images/products/lh-002/lh-002-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/lh-002/lh-002-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">Love Hurts Track Pants — White</div>
+        <div class="ref-file ok">IMG_2105.png</div>
+        <div class="ref-file ok">IMG_2103.png</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">WHITE track pants, black side stripe, ankle zip, identical red rose bouquet embroidery on left leg</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="collection">
+  <div class="collection-title">✨ SIGNATURE Collection</div>
+  <div class="products">
+
+    <div class="product-card sg">
+      <div class="product-id">SG-001</div>
+      <div class="images">
+        <img src="assets/images/products/sg-001/sg-001-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/sg-001/sg-001-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">Golden Gate Mesh Shorts</div>
+        <div class="ref-file ok">The Bridge Series Set "Golden Gate Bridge".jpeg</div>
+        <div class="ref-file ok">The Yay Bridge Set.jpg</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">All-over print mesh shorts: Golden Gate Bridge at night (purple sky, orange bridge, neon reflections), rose mushroom cloud logo lower right</div>
+      </div>
+    </div>
+
+    <div class="product-card sg">
+      <div class="product-id">SG-002</div>
+      <div class="images">
+        <img src="assets/images/products/sg-002/sg-002-product.jpg" onerror="this.style.background='#333'">
+        <img src="assets/images/products/sg-002/sg-002-product-2.jpg" onerror="this.style.background='#333'">
+      </div>
+      <div class="info">
+        <div class="product-name">SF Rose White Tee</div>
+        <div class="ref-file ok">Signature T "White".jpeg</div>
+        <div class="ref-file ok">The Bridge Series Set T-Shirt "Golden Gate".jpeg</div>
+        <div class="prompt-label">Expected:</div>
+        <div class="prompt-text">White crew-neck tee, center chest graphic: rose mushroom cloud with Golden Gate scene inside roses (purple sky, orange bridge), SR monogram at collar</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer>
+  <p>✅ = reference image found &nbsp;|&nbsp; ✗ = missing &nbsp;|&nbsp; Once confirmed, run: <code>npm run generate:ai-products</code></p>
+</footer>
+
+</body>
+</html>
