@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="description" content="SkyyRose - Immersive luxury fashion experience. Explore exclusive collections in our virtual showroom.">
+  <meta name="theme-color" content="#0A0A0A">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="SkyyRose - Luxury Fashion Experience">
+  <meta property="og:description" content="Explore our exclusive collections in an immersive virtual showroom.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/assets/images/og-image.jpg">
+
+  <title>SkyyRose - Luxury Fashion Experience</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loader" class="loader">
+    <div class="loader-content">
+      <h1 class="loader-logo">SKYYROSE</h1>
+      <div class="loader-progress">
+        <div class="loader-bar" id="loaderBar"></div>
+      </div>
+      <p class="loader-text" id="loaderText">Loading experience...</p>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="navbar" role="navigation" aria-label="Main navigation">
+    <div class="nav-brand">
+      <a href="/" class="nav-logo" aria-label="SkyyRose home">SKYYROSE</a>
+    </div>
+    <div class="nav-links">
+      <a href="collections.html" class="nav-link">Shop</a>
+      <button class="nav-btn explore-btn" id="exploreBtn" aria-label="Explore collections" aria-expanded="false" aria-controls="exploreSidebar">
+        Explore
+      </button>
+    </div>
+  </nav>
+
+  <!-- Explore Sidebar -->
+  <aside id="exploreSidebar" class="explore-sidebar" role="complementary" aria-label="Collection explorer">
+    <div class="explore-header">
+      <h2>Collections</h2>
+      <button class="explore-close" id="exploreClose" aria-label="Close explore panel">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <nav class="explore-list" role="navigation" aria-label="Collection navigation">
+      <!-- Populated dynamically -->
+    </nav>
+  </aside>
+
+  <!-- Main Viewport -->
+  <main class="viewport" role="main">
+    <!-- Scene Images (dual-buffer for crossfade) -->
+    <picture class="scene scene-a">
+      <source type="image/webp" srcset="" id="sceneAWebp">
+      <img src="" alt="" id="sceneAImg" class="scene-img">
+    </picture>
+    <picture class="scene scene-b out">
+      <source type="image/webp" srcset="" id="sceneBWebp">
+      <img src="" alt="" id="sceneBImg" class="scene-img">
+    </picture>
+
+    <!-- Hotspot Container -->
+    <div class="hotspots" id="hotspots" role="list" aria-label="Products in this room">
+      <!-- Populated dynamically -->
+    </div>
+
+    <!-- Navigation Arrows -->
+    <button class="nav-arrow nav-arrow-left" id="prevBtn" aria-label="Previous room">
+      <span class="arrow-icon" aria-hidden="true">&larr;</span>
+      <span class="arrow-label" id="prevLabel"></span>
+    </button>
+    <button class="nav-arrow nav-arrow-right" id="nextBtn" aria-label="Next room">
+      <span class="arrow-label" id="nextLabel"></span>
+      <span class="arrow-icon" aria-hidden="true">&rarr;</span>
+    </button>
+  </main>
+
+  <!-- Bottom Navigation Bar -->
+  <nav class="bottom-bar" role="navigation" aria-label="Room navigation">
+    <div class="pip-nav" id="pipNav">
+      <!-- Populated dynamically -->
+    </div>
+  </nav>
+
+  <!-- Product Modal -->
+  <div id="productModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-backdrop" id="modalBackdrop"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modalClose" aria-label="Close product details">
+        <span aria-hidden="true">&times;</span>
+      </button>
+
+      <div class="modal-body">
+        <div class="modal-image">
+          <img src="" alt="" id="modalImage">
+        </div>
+        <div class="modal-details">
+          <div class="modal-badge" id="modalBadge"></div>
+          <p class="modal-collection" id="modalCollection"></p>
+          <h2 class="modal-title" id="modalTitle"></h2>
+          <p class="modal-tagline" id="modalTagline"></p>
+          <p class="modal-description" id="modalDescription"></p>
+          <p class="modal-spec" id="modalSpec"></p>
+          <div class="modal-price" id="modalPrice"></div>
+
+          <!-- Product Variants -->
+          <div class="modal-variants" id="modalVariants" hidden>
+            <div class="variant-group">
+              <label for="sizeSelect">Size</label>
+              <select id="sizeSelect" class="variant-select">
+                <option value="">Select size</option>
+              </select>
+            </div>
+            <div class="variant-group">
+              <label for="colorSelect">Color</label>
+              <div id="colorSwatches" class="color-swatches"></div>
+            </div>
+          </div>
+
+          <div class="modal-actions">
+            <button class="btn btn-secondary" id="addToCartBtn">Add to Cart</button>
+            <button class="btn btn-primary" id="preOrderBtn">Pre-Order</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Screen Reader Announcements -->
+  <div class="sr-only" role="status" aria-live="polite" aria-atomic="true" id="announcements"></div>
+
+  <!-- Scripts — load order matters: config → search → modules → app -->
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/semantic-search.js"></script>
+  <script src="assets/js/wordpress-client.js"></script>
+  <script src="assets/js/accessibility.js"></script>
+  <script src="assets/js/gestures.js"></script>
+  <script src="assets/js/wishlist.js"></script>
+  <script src="assets/js/analytics.js"></script>
+  <script src="assets/js/sharing.js"></script>
+  <script src="assets/js/avatar-assistant.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
