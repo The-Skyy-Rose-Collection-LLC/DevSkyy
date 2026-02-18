@@ -2,7 +2,9 @@
  * SkyyRose - Fashion Model Generation with Gemini 2.5 Flash Image
  * Uses REAL product photos as reference images for accurate AI generation
  *
- * Generates professional fashion model photography for all 8 current products
+ * Generates professional fashion model photography for all 20 products.
+ * All reference images renamed to descriptive format (Feb 2026).
+ * Usage: node build/generate-fashion-models.js [product-id ...]
  */
 
 const path = require('path');
@@ -33,21 +35,20 @@ const BRAND_DNA = {
   }
 };
 
-// Product catalog with reference image paths
-// NOTE: Check/update referenceImage paths if needed before running
+// All 20 products — each entry uses the renamed reference images from source-products/
 const PRODUCTS = [
 
-  // ── BLACK ROSE Collection ──────────────────────────────────────────────────
+  // ── BLACK ROSE Collection (8 products) ────────────────────────────────────
   {
     id: 'br-001',
     collection: 'BLACK ROSE',
-    available: true,
     name: 'Black Rose Crewneck',
-    referenceImage: path.join(SOURCE_DIR, 'black-rose/PhotoRoom_001_20230616_170635.PNG'),
+    referenceImage:  path.join(SOURCE_DIR, 'black-rose/br-001-crewneck-front.png'),
+    referenceImage2: path.join(SOURCE_DIR, 'black-rose/br-001-crewneck-back.png'),
     description: {
       garment: 'Black crewneck sweatshirt, white ribbed collar and cuffs',
       fit: 'Relaxed, slightly oversized streetwear fit',
-      details: 'Large center-chest graphic: two BLACK roses erupting from storm clouds like a mushroom cloud — grey/silver graphic on black fabric, tattoo-art style'
+      details: 'Large center-chest graphic: two BLACK roses erupting from storm clouds like a mushroom cloud — grey/silver on black, tattoo-art style'
     },
     modelPose: 'Standing confidently, one hand in pocket, showing the full front graphic',
     setting: 'Moonlit gothic garden, wrought-iron gates, fog rolling through dark roses'
@@ -55,13 +56,12 @@ const PRODUCTS = [
   {
     id: 'br-002',
     collection: 'BLACK ROSE',
-    available: true,
     name: 'Black Rose Joggers',
-    referenceImage: path.join(SOURCE_DIR, 'black-rose/PhotoRoom_007_20230616_170635.PNG'),
+    referenceImage: path.join(SOURCE_DIR, 'black-rose/br-002-joggers.jpeg'),
     description: {
       garment: 'Black jogger pants, white ribbed waistband and ankle cuffs, black drawstring',
-      fit: 'Tapered jogger fit, relaxed through the thigh, tapered at ankle',
-      details: 'Small BLACK rose mushroom cloud graphic on upper left leg — grey/silver on black, matching the crewneck graphic style'
+      fit: 'Tapered jogger fit, relaxed through thigh, tapered at ankle',
+      details: 'Small BLACK rose mushroom cloud graphic on upper left leg — grey/silver on black, matching crewneck graphic family'
     },
     modelPose: 'Casual stance, hands in pockets, showing full length of pants and left-leg graphic',
     setting: 'Gothic corridor with dark stone arches and moonlight'
@@ -69,14 +69,13 @@ const PRODUCTS = [
   {
     id: 'br-003',
     collection: 'BLACK ROSE',
-    available: true,
     name: '"Black Is Beautiful" Baseball Jersey',
-    referenceImage: path.join(SOURCE_DIR, 'black-rose/The BLACK Jersey (BLACK Rose Collection).jpg'),
-    referenceImage2: path.join(SOURCE_DIR, 'black-rose/BLACK is Beautiful Giants Front.jpg'),
+    referenceImage:  path.join(SOURCE_DIR, 'black-rose/br-003-jersey-black-front.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'black-rose/br-003-jersey-giants-front.jpg'),
     description: {
       garment: 'Forest green baseball jersey with gold/yellow and white stripe trim',
       fit: 'Classic button-down baseball jersey, relaxed fit',
-      details: 'Arched "BLACK IS BEAUTIFUL" text in gold/yellow varsity lettering across the chest — the O in BLACK replaced by a black rose graphic. "Black Rose Collection" authentic patch on lower right front. SkyyRose tag at collar.'
+      details: '"BLACK IS BEAUTIFUL" varsity lettering across chest in gold/yellow — O in BLACK replaced by black rose graphic. Authentic patch lower right front. Two colorways: Last Oakland and Giants.'
     },
     modelPose: 'Open jersey over fitted base layer, one hand gesturing outward, proud confident stance',
     setting: 'Dramatic urban skyline at golden hour, golden light casting warmth'
@@ -84,81 +83,238 @@ const PRODUCTS = [
   {
     id: 'br-004',
     collection: 'BLACK ROSE',
-    available: true,
-    name: 'Black Rose Beanie',
-    referenceImage: path.join(SOURCE_DIR, 'black-rose/IMG_7852.JPG'),
+    name: 'Black Rose Hoodie',
+    referenceImage: path.join(SOURCE_DIR, 'black-rose/br-004-hoodie-front.png'),
     description: {
-      garment: 'Black ribbed knit beanie with fold-up cuff',
-      fit: 'Classic fitted beanie with wide cuff fold',
-      details: 'Square PVC/rubber patch on cuff: black rose mushroom cloud graphic in grey/silver on light background, stitched border'
+      garment: 'Black pullover hoodie with drawstring hood, kangaroo pocket',
+      fit: 'Relaxed, slightly oversized streetwear fit',
+      details: 'BLACK rose mushroom cloud graphic on chest — grey/silver on black, matching crewneck graphic family. Ribbed cuffs and hem.'
     },
-    modelPose: 'Head and shoulders portrait, slight head tilt showing the patch clearly, intense gaze',
-    setting: 'Dark gothic background with soft rose-gold rim lighting'
+    modelPose: 'Hood down, hands in kangaroo pocket, confident relaxed stance showing full chest graphic',
+    setting: 'Moonlit gothic garden, rose bushes in background, atmospheric fog'
+  },
+  {
+    id: 'br-005',
+    collection: 'BLACK ROSE',
+    name: 'Black Rose Hoodie — Signature Edition',
+    referenceImage: path.join(SOURCE_DIR, 'black-rose/br-005-hoodie-signature-front.png'),
+    description: {
+      garment: 'Black pullover hoodie, elevated Signature Edition fabrication',
+      fit: 'Premium relaxed fit with refined tailoring details',
+      details: 'Signature Edition of the BLACK Rose Hoodie — upgraded materials, refined branding, collector collab piece'
+    },
+    modelPose: 'Editorial stance showing full garment, one hand raised slightly, intense gaze',
+    setting: 'Cathedral interior, gothic stone columns, dramatic candlelight and shadow'
+  },
+  {
+    id: 'br-006',
+    collection: 'BLACK ROSE',
+    name: 'Black Rose Sherpa Jacket',
+    referenceImage:  path.join(SOURCE_DIR, 'black-rose/br-006-sherpa-front.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'black-rose/br-006-sherpa-back.jpg'),
+    description: {
+      garment: 'Black sherpa / bomber jacket with plush lining',
+      fit: 'Structured outerwear fit, slightly relaxed through body',
+      details: 'BLACK Rose collection branding, rich sherpa texture, quality hardware. Front and back both feature strong design elements.'
+    },
+    modelPose: 'Jacket fully buttoned, collar turned up, commanding editorial presence showing both front and silhouette',
+    setting: 'Moonlit rooftop at night, city lights below, gothic rose gold bokeh'
+  },
+  {
+    id: 'br-007',
+    collection: 'BLACK ROSE',
+    name: 'BLACK Rose × Love Hurts Basketball Shorts',
+    referenceImage:  path.join(SOURCE_DIR, 'black-rose/br-007-shorts-front.png'),
+    referenceImage2: path.join(SOURCE_DIR, 'black-rose/br-007-shorts-side.png'),
+    description: {
+      garment: 'Basketball shorts — BLACK Rose × Love Hurts collab piece',
+      fit: 'Athletic mid-thigh length, relaxed athletic fit',
+      details: 'Dual-collection branding collab — BLACK Rose mushroom cloud meets Love Hurts rose heart motif. Premium mesh fabric with quality waistband.'
+    },
+    modelPose: 'Athletic stance, one leg forward showing side graphic, confident sports editorial energy',
+    setting: 'Dark gothic gymnasium meets baroque theater — dramatic mixed-world setting'
+  },
+  {
+    id: 'br-008',
+    collection: 'BLACK ROSE',
+    name: "Women's BLACK Rose Hooded Dress",
+    referenceImage: path.join(SOURCE_DIR, 'black-rose/br-008-hooded-dress-front.jpeg'),
+    description: {
+      garment: "Black hooded dress, women's fit, attached hood",
+      fit: "Fitted through body with flared or flowing skirt, feminine silhouette",
+      details: "BLACK Rose collection branding on dress — rose graphics, premium fabrication, dramatic hooded silhouette"
+    },
+    modelPose: "Hood up for dramatic silhouette, hand on hip, full-length showing the dress silhouette",
+    setting: "Gothic cathedral garden, moonlight filtering through stone arches, dark florals"
   },
 
-  // ── LOVE HURTS Collection ─────────────────────────────────────────────────
+  // ── LOVE HURTS Collection (3 products) ───────────────────────────────────
   {
     id: 'lh-001',
     collection: 'LOVE HURTS',
-    available: false,
-    preorder: true,
-    name: 'Love Hurts Track Pants — Black',
-    referenceImage: path.join(SOURCE_DIR, 'love-hurts/joggers.png'),
+    name: 'The Fannie',
+    referenceImage:  path.join(SOURCE_DIR, 'love-hurts/lh-001-fannie-front-1.jpeg'),
+    referenceImage2: path.join(SOURCE_DIR, 'love-hurts/lh-001-fannie-front-2.jpg'),
     description: {
-      garment: 'Black track pants with white side stripe, ankle zip hem',
-      fit: 'Athletic track fit, tapered leg with zip ankles',
-      details: 'Left-leg embroidery: red rose bouquet with a heart and arrow/banner through it — classic tattoo flash style in red, green leaves. White drawstring, white stripe down each leg.'
+      garment: 'Love Hurts fanny pack / waist bag with adjustable strap',
+      fit: 'Worn cross-body or around the waist',
+      details: 'Love Hurts tattoo flash rose heart branding, quality zipper hardware, compact premium fabrication'
     },
-    modelPose: 'Dynamic athletic stance, one leg slightly forward showing the embroidery, hands relaxed at sides',
-    setting: 'Dramatic baroque theater stage, red velvet curtains, moody dramatic lighting'
+    modelPose: 'Worn cross-body across chest, one hand resting on it, bold fashion-forward editorial pose',
+    setting: 'Dramatic baroque theater stage, deep red velvet curtains, moody dramatic lighting'
   },
   {
     id: 'lh-002',
     collection: 'LOVE HURTS',
-    available: false,
-    preorder: true,
-    name: 'Love Hurts Track Pants — White',
-    referenceImage: path.join(SOURCE_DIR, 'love-hurts/IMG_2105.png'),
+    name: 'Love Hurts Joggers',
+    referenceImage:  path.join(SOURCE_DIR, 'love-hurts/lh-002-joggers-black.png'),
+    referenceImage2: path.join(SOURCE_DIR, 'love-hurts/lh-002-joggers-white-1.png'),
     description: {
-      garment: 'White track pants with black side stripe, ankle zip hem',
-      fit: 'Athletic track fit, tapered leg with zip ankles',
-      details: 'Left-leg embroidery: same red rose bouquet with a heart and arrow/banner — identical tattoo flash style to the black version. Black drawstring, black stripe down each leg.'
+      garment: 'Jogger pants in two colorways: Black and White',
+      fit: 'Athletic-to-streetwear tapered jogger fit, elastic waistband with drawstring',
+      details: 'Love Hurts rose heart motif on leg, contrasting stripe, matching colorway hardware. Available in Black and White versions.'
     },
-    modelPose: 'Confident walking pose, full leg visible, left-leg embroidery facing camera',
-    setting: 'Candlelit baroque ballroom, crystal chandeliers, dramatic shadows'
+    modelPose: 'Dynamic stance showing full leg length, both colorways visible in composite or alternating',
+    setting: 'Candlelit baroque ballroom, crystal chandeliers, dramatic blood-red shadows'
+  },
+  {
+    id: 'lh-003',
+    collection: 'LOVE HURTS',
+    name: 'Love Hurts Basketball Shorts',
+    referenceImage:  path.join(SOURCE_DIR, 'love-hurts/lh-003-shorts-front.jpeg'),
+    referenceImage2: path.join(SOURCE_DIR, 'love-hurts/lh-003-shorts-side.png'),
+    description: {
+      garment: 'Love Hurts basketball shorts, athletic cut',
+      fit: 'Relaxed athletic mid-thigh length',
+      details: 'Love Hurts collection branding, rose heart tattoo flash graphic, quality mesh fabric, premium waistband'
+    },
+    modelPose: 'Athletic editorial stance, showing front and side graphic, powerful energy',
+    setting: 'Baroque theater stage lit with dramatic crimson spots, dark grandeur'
   },
 
-  // ── SIGNATURE Collection ──────────────────────────────────────────────────
+  // ── SIGNATURE Collection (9 products) ────────────────────────────────────
   {
     id: 'sg-001',
     collection: 'SIGNATURE',
-    available: false,
-    preorder: true,
-    name: 'Golden Gate Mesh Shorts',
-    referenceImage: path.join(SOURCE_DIR, 'signature/The Bridge Series Set \u201cGolden Gate Bridge\u201d.jpeg'),
+    name: 'The Bay Set',
+    referenceImage:  path.join(SOURCE_DIR, 'signature/sg-001-bay-set-1.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'signature/sg-001-bay-set-2.jpg'),
     description: {
-      garment: 'All-over print mesh athletic shorts, white drawstring',
-      fit: 'Relaxed mid-thigh length, athletic mesh fabric',
-      details: 'Full sublimation print: Golden Gate Bridge at night — deep purple/violet sky, bridge in orange, city reflections in water with streaked neon lights. Small purple/violet rose mushroom cloud logo on lower right front. Black mesh side pockets.'
+      garment: 'Full coordinated set — Bay Area / Bay Bridge Signature Collection',
+      fit: 'Matching set, relaxed luxe street editorial fit',
+      details: 'Bay Bridge night-scene graphics, SR monogram branding, premium fabrication — top and bottom shown together as full set'
     },
-    modelPose: 'Laid-back confident stance, hands in pockets or one hand lifted, showing the full print',
-    setting: 'San Francisco waterfront at night, Golden Gate Bridge lit up in background'
+    modelPose: 'Full outfit visible, confident editorial stance showing complete coordinated set',
+    setting: 'San Francisco waterfront at night, Bay Bridge illuminated in background, champagne gold light'
   },
   {
     id: 'sg-002',
     collection: 'SIGNATURE',
-    available: false,
-    preorder: true,
-    name: 'SF Rose White Tee',
-    referenceImage: path.join(SOURCE_DIR, 'signature/Signature T \u201cWhite\u201d.jpeg'),
+    name: 'Stay Golden Set',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-002-stay-golden-set.jpg'),
     description: {
-      garment: 'White crew-neck t-shirt, SR monogram logo at collar',
-      fit: 'Clean, slightly relaxed fit',
-      details: 'Center chest graphic: multi-colored rose mushroom cloud — roses contain the Golden Gate Bridge night scene inside them (purple sky, orange bridge, city lights), emerging from dark black clouds. Silver/grey rose outline and stem. Small SR monogram at collar.'
+      garment: 'Full coordinated set — Stay Golden Signature Collection',
+      fit: 'Matching set, elevated street luxury editorial fit',
+      details: '"Stay Golden" theme, gold colorway throughout, SR monogram branding, premium quality fabrication'
     },
-    modelPose: 'Standing tall, arms relaxed, chest forward showing the full graphic clearly',
-    setting: 'Clean minimal white studio with subtle SF city skyline silhouette in the distance'
-  }
+    modelPose: 'Standing tall showing full set, editorial confidence, bathed in champagne gold light',
+    setting: 'Minimalist marble penthouse, floor-to-ceiling windows, golden afternoon light'
+  },
+  {
+    id: 'sg-003',
+    collection: 'SIGNATURE',
+    name: 'The Signature Tee — Orchid',
+    referenceImage:  path.join(SOURCE_DIR, 'signature/sg-003-tee-orchid-front.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'signature/sg-003-tee-orchid.jpeg'),
+    description: {
+      garment: 'Crew-neck tee in Orchid colorway, Signature Collection',
+      fit: 'Clean slightly relaxed fit',
+      details: 'Orchid / purple colorway, SR monogram at collar, Signature Collection branding. Soft premium fabric.'
+    },
+    modelPose: 'Standing tall, arms relaxed, chest forward showing tee and its graphic or colorway clearly',
+    setting: 'Minimalist modern art gallery, clean white walls, gallery track lighting'
+  },
+  {
+    id: 'sg-004',
+    collection: 'SIGNATURE',
+    name: 'The Signature Tee — White',
+    referenceImage:  path.join(SOURCE_DIR, 'signature/sg-004-tee-white-front.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'signature/sg-004-tee-white.jpeg'),
+    description: {
+      garment: 'White crew-neck tee, Signature Collection',
+      fit: 'Clean, slightly relaxed fit',
+      details: 'Clean white, SR monogram at collar, center chest graphic — multi-colored rose with Golden Gate Bridge scene inside, emerging from dark clouds'
+    },
+    modelPose: 'Standing tall, arms relaxed, chest forward, graphic clearly visible',
+    setting: 'Clean minimal white studio, SF city skyline silhouette in distance through windows'
+  },
+  {
+    id: 'sg-005',
+    collection: 'SIGNATURE',
+    name: 'Stay Golden Tee',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-005-stay-golden-tee.jpg'),
+    description: {
+      garment: 'Stay Golden tee — Signature Collection',
+      fit: 'Clean relaxed fit',
+      details: '"Stay Golden" theme tee, gold accents, SR monogram branding, premium fabric'
+    },
+    modelPose: 'Confident relaxed pose, tee fully visible, golden hour editorial energy',
+    setting: 'Marble penthouse terrace at golden hour, warm champagne sunlight'
+  },
+  {
+    id: 'sg-006',
+    collection: 'SIGNATURE',
+    name: 'Mint & Lavender Hoodie',
+    referenceImage:  path.join(SOURCE_DIR, 'signature/sg-006-mint-lavender-hoodie-front.jpeg'),
+    referenceImage2: path.join(SOURCE_DIR, 'signature/sg-006-mint-lavender-set-1.jpeg'),
+    description: {
+      garment: 'Signature Collection hoodie in Mint and Lavender colorway, sold separately from set',
+      fit: 'Premium relaxed hoodie fit',
+      details: 'Mint green and lavender / purple colorway combination, Signature Collection SR branding, part of a coordinated set (sold separately)'
+    },
+    modelPose: 'Hood down, hands in pocket or one arm raised, editorial stance showing full colorway',
+    setting: 'Modern art gallery with pastel wall and gallery lighting, airy luxury feel'
+  },
+  {
+    id: 'sg-007',
+    collection: 'SIGNATURE',
+    name: 'The Signature Beanie — Red',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-007-beanie-red.jpg'),
+    description: {
+      garment: 'Signature Collection knit beanie in Red colorway',
+      fit: 'Classic fitted beanie, fold-up cuff',
+      details: 'Red ribbed knit, Signature Collection patch or embroidery on cuff, premium quality'
+    },
+    modelPose: 'Head and shoulders portrait, slight head tilt showing beanie detail, intense editorial gaze',
+    setting: 'Dark luxury background with gold and champagne rim lighting'
+  },
+  {
+    id: 'sg-008',
+    collection: 'SIGNATURE',
+    name: 'The Signature Beanie',
+    referenceImage: path.join(SOURCE_DIR, 'signature/sg-008-beanie.png'),
+    description: {
+      garment: 'Signature Collection knit beanie, original colorway',
+      fit: 'Classic fitted beanie with wide cuff fold',
+      details: 'Signature Collection branding on cuff patch/embroidery, premium knit construction'
+    },
+    modelPose: 'Head and shoulders editorial portrait, beanie cuff detail clearly visible, confident gaze',
+    setting: 'Minimalist dark luxury studio, subtle gold accent lighting'
+  },
+  {
+    id: 'sg-009',
+    collection: 'SIGNATURE',
+    name: 'The Sherpa Jacket',
+    referenceImage:  path.join(SOURCE_DIR, 'signature/sg-009-sherpa-front.jpg'),
+    referenceImage2: path.join(SOURCE_DIR, 'signature/sg-009-sherpa-back.jpg'),
+    description: {
+      garment: 'Signature Collection sherpa jacket, premium outerwear',
+      fit: 'Structured outerwear fit, relaxed through body',
+      details: 'Sherpa texture, Signature Collection SR branding, quality hardware — front and back both feature collection design elements. Moved from Love Hurts to Signature collection.'
+    },
+    modelPose: 'Jacket fully buttoned, one hand in pocket, showing both front and hinting at back — powerful editorial presence',
+    setting: 'Marble penthouse lobby, floor-to-ceiling windows, champagne gold winter light'
+  },
 ];
 
 /**
