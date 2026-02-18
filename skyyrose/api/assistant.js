@@ -35,6 +35,56 @@ const anthropic = new Anthropic({
 const MODEL = 'claude-sonnet-4-5-20250929';
 
 // ---------------------------------------------------------------------------
+// Semantic search (pre-computed embeddings)
+// ---------------------------------------------------------------------------
+
+let SemanticSearch = null;
+let semanticSearchInstance = null;
+
+try {
+  SemanticSearch = require('../assets/js/semantic-search');
+  semanticSearchInstance = new SemanticSearch();
+  semanticSearchInstance.init().then(() => {
+    console.log('[assistant] SemanticSearch initialised with', semanticSearchInstance.products.length, 'products');
+  }).catch(err => {
+    console.warn('[assistant] SemanticSearch init error:', err.message);
+  });
+} catch (err) {
+  if (err.code !== 'MODULE_NOT_FOUND') {
+    console.warn('[assistant] SemanticSearch load warning:', err.message);
+  }
+}
+
+/**
+ * Run a semantic search against stored embeddings and return a compact
+ * markdown snippet listing the top matching products.
+ * Falls back to keyword search when full vector embeddings are unavailable.
+ *
+ * @param {string} query
+ * @returns {Promise<string>}  e.g. "Relevant products:
+- [br-001] BLACK Rose Crewneck (score: 0.87)
+..."
+ */
+async function getSemanticContext(query) {
+  if (!semanticSearchInstance || !query) return '';
+  try {
+    const results = await semanticSearchInstance.search(query, {
+      maxResults: 3,
+      minScore:   0.2,
+    });
+    if (!results.length) return '';
+    const lines = results.map(r =>
+      `- [${r.id}] ${r.name} (collection: ${r.collection}, score: ${r.score.toFixed(2)})`
+    );
+    return 'Relevant products for this query:\n' + lines.join('\n');
+  } catch (err) {
+    console.warn('[assistant] getSemanticContext error:', err.message);
+    return '';
+  }
+}
+
+
+// ---------------------------------------------------------------------------
 // Product catalog (loaded once at startup)
 // ---------------------------------------------------------------------------
 
@@ -83,7 +133,7 @@ const FALLBACK_CATALOG = {
 // Build system prompt
 // ---------------------------------------------------------------------------
 
-function buildSystemPrompt(collection, productContext) {
+function buildSystemPrompt(collection, productContext, semanticContext) {
   const catalog = loadCatalog();
 
   // Build a compact product list for the prompt
@@ -130,7 +180,7 @@ Rules:
 - Never fabricate prices unless you know them from the catalog
 - Keep responses elegant and on-brand
 - If you don't know something, say so gracefully and offer to help with what you know
-- NEVER break character or discuss anything outside of fashion and the SkyyRose brand`;
+- NEVER break character or discuss anything outside of fashion and the SkyyRose brand${semanticContext ? '\n\n' + semanticContext : ''}`;
 }
 
 // ---------------------------------------------------------------------------
@@ -284,7 +334,10 @@ async function handleChat(req, res) {
   }
 
   // Build messages array (cap history at 40 to control token usage)
-  const systemPrompt = buildSystemPrompt(collection, productContext);
+  // Semantic enrichment: find closely related products before building the prompt
+  const semanticContext = await getSemanticContext(message);
+
+  const systemPrompt = buildSystemPrompt(collection, productContext, semanticContext);
 
   const messages = [
     ...history.slice(-40).map(h => ({
@@ -453,7 +506,10 @@ try {
       return c.json({ error: 'message is required' }, 400);
     }
 
-    const systemPrompt = buildSystemPrompt(collection, productContext);
+    // Semantic enrichment for Hono path
+    const semanticContextHono = await getSemanticContext(message);
+
+    const systemPrompt = buildSystemPrompt(collection, productContext, semanticContextHono);
 
     const messages = [
       ...history.slice(-40).map(h => ({
@@ -525,9 +581,10 @@ if (require.main === module) {
 
 module.exports = {
   assistantHandler,
-  router,         // Hono router (or null if hono unavailable)
+  router,              // Hono router (or null if hono unavailable)
   loadCatalog,
   buildSystemPrompt,
+  getSemanticContext,
   isRateLimited,
   MODEL,
 };

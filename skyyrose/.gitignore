@@ -1,0 +1,26 @@
+# Environment — NEVER commit secrets
+.env
+.env.local
+.env.staging
+.env.production
+
+# Dependencies
+node_modules/
+
+# macOS
+.DS_Store
+**/.DS_Store
+
+# Build artifacts (large generated files — tracked separately or excluded)
+assets/images/source-products/
+assets/images/products-ecom/*/srcset/
+assets/images/products-ecom/*/social/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+build/pipeline.log
+
+# Logs
+*.log
