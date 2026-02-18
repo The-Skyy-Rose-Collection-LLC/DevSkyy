@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SkyyRose — Product Photo Mapper</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0a0a; color: #fff; font-family: 'Helvetica Neue', sans-serif; }
+
+header {
+  position: sticky; top: 0; z-index: 100;
+  background: #0a0a0a; border-bottom: 1px solid #1e1e1e;
+  padding: 16px 24px; display: flex; align-items: center; gap: 20px;
+}
+header h1 { font-size: 18px; color: #B76E79; flex: 1; }
+#status { font-size: 13px; color: #666; }
+#export-btn {
+  background: #B76E79; color: #fff; border: none; padding: 8px 20px;
+  border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600;
+}
+#export-btn:hover { background: #a05668; }
+
+.section { padding: 32px 24px 0; }
+.section-title {
+  font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+  color: #555; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 1px solid #1a1a1a;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding-bottom: 32px;
+}
+
+.card {
+  background: #111; border: 2px solid #1e1e1e; border-radius: 8px;
+  overflow: hidden; cursor: pointer; transition: border-color 0.2s;
+  position: relative;
+}
+.card:hover { border-color: #444; }
+.card.assigned { border-color: #B76E79; }
+.card.assigned .badge { display: block; }
+
+.badge {
+  display: none; position: absolute; top: 6px; left: 6px;
+  background: #B76E79; color: #fff; font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 4px; letter-spacing: 1px; z-index: 2;
+}
+.card[data-col="love-hurts"].assigned { border-color: #8B0000; }
+.card[data-col="love-hurts"] .badge { background: #8B0000; }
+.card[data-col="signature"].assigned { border-color: #D4AF37; }
+.card[data-col="signature"] .badge { background: #D4AF37; color: #000; }
+
+.thumb { width: 100%; aspect-ratio: 1; object-fit: contain; background: #1a1a1a; display: block; }
+.filename {
+  font-size: 10px; color: #555; padding: 6px 8px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.assigned-label { font-size: 11px; color: #B76E79; padding: 0 8px 6px; font-weight: 600; }
+.card[data-col="love-hurts"] .assigned-label { color: #ff4444; }
+.card[data-col="signature"] .assigned-label { color: #D4AF37; }
+
+/* Modal */
+#modal {
+  display: none; position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.85); align-items: center; justify-content: center;
+}
+#modal.open { display: flex; }
+#modal-inner {
+  background: #111; border: 1px solid #333; border-radius: 12px;
+  width: 560px; max-width: 95vw; overflow: hidden;
+}
+#modal-img { width: 100%; max-height: 360px; object-fit: contain; background: #000; display: block; }
+#modal-name { font-size: 11px; color: #555; padding: 10px 16px 0; font-family: monospace; }
+#modal-body { padding: 16px; }
+#modal-body h3 { font-size: 14px; margin-bottom: 12px; color: #ccc; }
+.product-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.prod-btn {
+  background: #1a1a1a; border: 1px solid #333; color: #ccc;
+  padding: 10px 12px; border-radius: 6px; cursor: pointer; font-size: 12px;
+  text-align: left; transition: all 0.15s;
+}
+.prod-btn:hover { background: #252525; border-color: #555; color: #fff; }
+.prod-btn.active { background: #B76E79; border-color: #B76E79; color: #fff; }
+.prod-btn .pid { font-size: 10px; opacity: 0.7; display: block; }
+.modal-actions { display: flex; gap: 8px; margin-top: 12px; }
+#clear-btn {
+  flex: 1; background: transparent; border: 1px solid #444; color: #888;
+  padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+#close-btn {
+  flex: 1; background: #222; border: 1px solid #444; color: #ccc;
+  padding: 8px; border-radius: 6px; cursor: pointer; font-size: 12px;
+}
+
+#output-modal {
+  display: none; position: fixed; inset: 0; z-index: 300;
+  background: rgba(0,0,0,0.9); align-items: flex-start; justify-content: center;
+  padding-top: 60px; overflow-y: auto;
+}
+#output-modal.open { display: flex; }
+#output-inner {
+  background: #111; border: 1px solid #333; border-radius: 12px;
+  width: 700px; max-width: 95vw; padding: 24px; margin-bottom: 40px;
+}
+#output-inner h2 { color: #B76E79; margin-bottom: 16px; }
+#output-pre {
+  background: #0a0a0a; padding: 16px; border-radius: 8px;
+  font-family: monospace; font-size: 12px; color: #88ff88;
+  overflow-x: auto; white-space: pre; margin-bottom: 16px;
+  max-height: 500px; overflow-y: auto;
+}
+#copy-btn {
+  background: #B76E79; color: #fff; border: none; padding: 8px 20px;
+  border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; margin-right: 8px;
+}
+#close-output {
+  background: #222; color: #ccc; border: 1px solid #444; padding: 8px 20px;
+  border-radius: 6px; cursor: pointer; font-size: 13px;
+}
+
+/* Per-card name input */
+.card-name-input {
+  width: 100%; background: #161616; border: none; border-top: 1px solid #1e1e1e;
+  color: #ccc; font-size: 12px; padding: 7px 8px; outline: none;
+  font-family: 'Helvetica Neue', sans-serif;
+}
+.card-name-input:focus { background: #1d1d1d; color: #fff; border-top-color: #B76E79; }
+.card-name-input::placeholder { color: #3a3a3a; font-style: italic; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>SkyyRose — Product Photo Mapper</h1>
+  <span id="status">0 photos assigned</span>
+  <button id="export-btn" onclick="exportMapping()">Export Mapping →</button>
+</header>
+
+<div id="sections"></div>
+
+<!-- Image assignment modal -->
+<div id="modal">
+  <div id="modal-inner">
+    <img id="modal-img" src="" alt="">
+    <div id="modal-name"></div>
+    <div id="modal-body">
+      <h3>What product is this?</h3>
+      <div class="product-btns" id="product-btns"></div>
+      <div class="modal-actions">
+        <button id="clear-btn" onclick="clearAssignment()">Remove Assignment</button>
+        <button id="close-btn" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Output modal -->
+<div id="output-modal">
+  <div id="output-inner">
+    <h2>Product Mapping — Paste to Claude</h2>
+    <pre id="output-pre"></pre>
+    <button id="copy-btn" onclick="copyOutput()">Copy to Clipboard</button>
+    <button id="close-output" onclick="document.getElementById('output-modal').classList.remove('open')">Close</button>
+  </div>
+</div>
+
+<script>
+const PRODUCTS = [
+  { id: 'br-001', name: 'Black Rose Crewneck', col: 'black-rose', available: true },
+  { id: 'br-002', name: 'Black Rose Joggers', col: 'black-rose', available: true },
+  { id: 'br-003', name: '"Black Is Beautiful" Jersey', col: 'black-rose', available: true },
+  { id: 'br-004', name: 'Black Rose Beanie', col: 'black-rose', available: true },
+  { id: 'lh-001', name: 'Love Hurts Track Pants — Black', col: 'love-hurts', available: false, preorder: true },
+  { id: 'lh-002', name: 'Love Hurts Track Pants — White', col: 'love-hurts', available: false, preorder: true },
+  { id: 'sg-001', name: 'Golden Gate Mesh Shorts', col: 'signature', available: false, preorder: true },
+  { id: 'sg-002', name: 'SF Rose White Tee', col: 'signature', available: false, preorder: true },
+];
+
+const SOURCES = {
+  'black-rose': [
+    '266AD7B0-88A6-4489-AA58-AB72A575BD33 3.JPG',
+    '5A8946B1-B51F-4144-BCBB-F028462077A0.jpg',
+    'BLACK is Beautiful Giants Front.jpg',
+    'IMG_7852.JPG',
+    'Photo Dec 18 2023, 6 09 21 PM (10).png',
+    'Photo Dec 18 2023, 6 09 21 PM (11).png',
+    'Photo Dec 18 2023, 6 09 21 PM (2).png',
+    'Photo Dec 18 2023, 6 09 21 PM (3).png',
+    'Photo Dec 18 2023, 6 09 21 PM (8).png',
+    'Photo Dec 18 2023, 6 09 21 PM (9).png',
+    'PhotoRoom_000_20230616_170635.png',
+    'PhotoRoom_001_20230523_204834.PNG',
+    'PhotoRoom_001_20230616_170635.PNG',
+    'PhotoRoom_003_20230616_170635 (1).png',
+    'PhotoRoom_003_20230616_170635.PNG',
+    'PhotoRoom_003_20230616_170635.jpg',
+    'PhotoRoom_004_20230616_170635.PNG',
+    'PhotoRoom_007_20230616_170635 (1).png',
+    'PhotoRoom_007_20230616_170635 copy.PNG',
+    'PhotoRoom_007_20230616_170635.PNG',
+    'PhotoRoom_008_20221210_093149.PNG',
+    'PhotoRoom_010_20231221_160237.jpeg',
+    'PhotoRoom_011_20221210_093149.PNG',
+    'PhotoRoom_011_20230616_170635.png',
+    'PhotoRoom_015_20221210_093149.PNG',
+    'PhotoRoom_016_20221210_093149.PNG',
+    'PhotoRoom_017_20221210_093149.PNG',
+    'PhotoRoom_018_20221210_093149.PNG',
+    'PhotoRoom_20221110_201933.PNG',
+    'PhotoRoom_20221110_202133.PNG',
+    'The BLACK Jersey (BLACK Rose Collection).jpg',
+    'The BLACK Rose Sherpa Back.jpg',
+    'The BLACK Rose Sherpa Front.jpg',
+    'Womens Black Rose Hooded Dress.jpeg',
+  ],
+  'love-hurts': [
+    '4074E988-4DAF-4221-8446-4B93422AF437.jpg',
+    '44185D7C-5AD3-48AE-A5CB-D47780FB017C.jpeg',
+    'IMG_0114.jpeg',
+    'IMG_0115.jpeg',
+    'IMG_0117.jpeg',
+    'IMG_1733.jpeg',
+    'IMG_2102.png',
+    'IMG_2103.png',
+    'IMG_2105.png',
+    'IMG_3267.jpeg',
+    'joggers.png',
+    'Men windbreaker jacket (1).png',
+    'mens Windbreaker shorts.png',
+    'PhotoRoom_000_20221210_093149.png',
+    'PhotoRoom_000_20231221_072338.jpg',
+    'PhotoRoom_000_20231221_160237.jpeg',
+    'PhotoRoom_001_20231221_072338.jpg',
+    'PhotoRoom_001_20231221_160237.jpeg',
+    'PhotoRoom_002_20221110_201626.png',
+    'PhotoRoom_002_20231221_072338.jpg',
+    'PhotoRoom_002_20231221_160237.jpeg',
+    'PhotoRoom_003_20221110_200039.png',
+    'PhotoRoom_003_20231221_072338.jpg',
+    'PhotoRoom_003_20231221_160237.jpeg',
+    'PhotoRoom_004_20221110_200039.png',
+    'PhotoRoom_015_20231221_160237.jpeg',
+    'PhotoRoom_016_20231221_160237.jpeg',
+    'PhotoRoom_017_20231221_160237.jpeg',
+    'PhotoRoom_018_20231221_160237.jpeg',
+    'PhotoRoom_019_20231221_160237.jpeg',
+    'PhotoRoom_021_20231221_160237.jpeg',
+    'PhotoRoom_022_20231221_160237.jpeg',
+    'PhotoRoom_023_20231221_160237.jpeg',
+    'PhotoRoom_20221110_201933.png',
+    'PhotoRoom_20221110_202007.png',
+    'PhotoRoom_20221110_202133.png',
+    'PhotoRoom_20230130_001050.png',
+    'Womens windbreaker jackets.png',
+    'joggers.png',
+    'mens Windbreaker shorts.png',
+  ],
+  'signature': [
+    '0F85F48C-364B-43CB-8297-E90BB7B8BB51 2.jpg',
+    '24661692-0F81-43F4-AA69-7E026552914A.jpg',
+    '562143CF-4A77-42B8-A58C-C77ED21E9B5E.jpg',
+    'Ad Promo 1.jpeg',
+    'Ad Promo 2.jpeg',
+    'IMG_0553.JPG',
+    'IMG_0554.JPG',
+    'IMG_4086E69D749C-1.JPG',
+    'Mint & Lavender Set (Sold Separately) .jpeg',
+    'MINT & Lavender Set 2 .jpeg',
+    'Photo Dec 18 2023, 6 09 21 PM (2).jpg',
+    'Photo Dec 18 2023, 6 09 21 PM (4).jpg',
+    'Photo Dec 18 2023, 6 09 21 PM.jpg',
+    'Photo Sep 20 2022, 7 56 54 PM.jpg',
+    'PhotoRoom_000_20231221_222005.jpeg',
+    'PhotoRoom_001_20231221_222005.jpeg',
+    'PhotoRoom_002_20231221_222005.jpeg',
+    'PhotoRoom_004_20231221_160237.jpeg',
+    'PhotoRoom_004_20231221_222005.jpeg',
+    'PhotoRoom_005_20231221_160237.jpeg',
+    'PhotoRoom_005_20231221_222005.jpeg',
+    'PhotoRoom_006_20231221_160237.jpeg',
+    'PhotoRoom_007_20231221_160237.jpeg',
+    'PhotoRoom_008_20231221_160237.jpeg',
+    'PhotoRoom_009_20231221_160237.jpeg',
+    'PhotoRoom_011_20231221_160237.jpeg',
+    'PhotoRoom_012_20231221_160237.jpeg',
+    'PhotoRoom_013_20231221_160237.jpeg',
+    'Photoroom_000_20240926_104051.jpg',
+    'Photoroom_001_20240926_104051.jpg',
+    'Photoroom_002_20240926_104051.jpg',
+    'Photoroom_003_20240926_104051.jpg',
+    'Photoroom_004_20240926_104051.jpg',
+    'Photoroom_005_20240926_104051.jpg',
+    'Photoroom_006_20240926_104051.jpg',
+    'Photoroom_007_20240926_104051.jpg',
+    'Photoroom_008_20240926_104051.jpg',
+    'Photoroom_009_20240926_104051.jpg',
+    'Photoroom_010_20240926_104051.jpg',
+    'Photoroom_011_20240926_104051.jpg',
+    'Photoroom_012_20240926_104051.jpg',
+    'Photoroom_013_20240926_104051.jpg',
+    'Photoroom_014_20240926_104051.jpg',
+    'Photoroom_015_20240926_104051.jpg',
+    'Photoroom_016_20240926_104051.jpg',
+    'Photoroom_017_20240926_104051.jpg',
+    'Photoroom_018_20240926_104051.jpg',
+    'Photoroom_019_20240926_104051.jpg',
+    'Photoroom_020_20240926_104051.jpg',
+    'Photoroom_021_20240926_104051.jpg',
+    'Photoroom_022_20240926_104051.jpg',
+    'Photoroom_023_20240926_104051.jpg',
+    'Photoroom_024_20240926_104051.jpg',
+    'Photoroom_025_20240926_104051.jpg',
+    'Photoroom_026_20240926_104051.jpg',
+    'Photoroom_027_20240926_104051.jpg',
+    'Photoroom_028_20240926_104051.jpg',
+    'Photoroom_029_20240926_104051.jpg',
+    'Photoroom_030_20240926_104051.jpg',
+    'Photoroom_031_20240926_104051.jpg',
+    'Photoroom_032_20240926_104051.jpg',
+    'Photoroom_033_20240926_104051.jpg',
+    'Photoroom_034_20240926_104051.jpg',
+    'Signature T \u201cOrchard\u201d.jpeg',
+    'Signature T \u201cWhite\u201d.jpeg',
+    'Smoke In Pink CrewNeck.JPG',
+    'The Bridge Series Set T-Shirt \u201cGolden Gate\u201d.jpeg',
+    'The Bridge Series Set \u201cBay Bridge\u201d 2 .jpeg',
+    'The Bridge Series Set \u201cBay Bridge\u201d.jpeg',
+    'The Bridge Series Set \u201cGolden Gate Bridge\u201d.jpeg',
+    'The Signature Beanie.jpeg',
+    'The Signature Crew \u201cClouded Pink\u201d.jpeg',
+    'The Signature T \u201cCotton Candy\u201d.jpeg',
+    'The Yay Bridge Set.jpg',
+    'Wmns Peach Crop Hoodie.jpeg',
+  ],
+};
+
+// De-dupe
+for (const col in SOURCES) {
+  SOURCES[col] = [...new Set(SOURCES[col])];
+}
+
+// State: { "col/filename": "product-id" }
+let assignments = JSON.parse(localStorage.getItem('skyyrose-mapping') || '{}');
+
+// Per-photo labels: { "col/filename": "user typed name" }
+let photoNames = JSON.parse(localStorage.getItem('skyyrose-photo-names') || '{}');
+
+function getProductName(p) { return p.name; }
+
+
+function thumbPath(col, file) {
+  const safe = (col + '_' + file).replace(/[^a-zA-Z0-9._-]/g, '_');
+  return `assets/images/source-products/_thumbs/${safe}.jpg`;
+}
+
+function srcPath(col, file) {
+  return `assets/images/source-products/${col}/${file}`;
+}
+
+function key(col, file) { return col + '/' + file; }
+
+function getProductForKey(k) {
+  return assignments[k] || null;
+}
+
+function buildUI() {
+  const container = document.getElementById('sections');
+  container.innerHTML = '';
+
+  const COL_LABELS = {
+    'black-rose': '⚫ BLACK ROSE — All source photos',
+    'love-hurts': '❤️ LOVE HURTS — All source photos',
+    'signature': '✨ SIGNATURE — All source photos',
+  };
+
+  for (const [col, files] of Object.entries(SOURCES)) {
+    const sec = document.createElement('div');
+    sec.className = 'section';
+    sec.innerHTML = `<div class="section-title">${COL_LABELS[col]}</div>`;
+
+    const grid = document.createElement('div');
+    grid.className = 'grid';
+
+    for (const file of files) {
+      const k = key(col, file);
+      const pid = assignments[k];
+      const prod = pid ? PRODUCTS.find(p => p.id === pid) : null;
+
+      const card = document.createElement('div');
+      card.className = 'card' + (prod ? ' assigned' : '');
+      card.dataset.col = col;
+      card.dataset.file = file;
+      card.onclick = () => openModal(col, file);
+
+      const savedName = photoNames[k] || '';
+      card.innerHTML = `
+        <div class="badge">${prod ? prod.id.toUpperCase() : ''}</div>
+        <img class="thumb" src="${thumbPath(col, file)}" loading="lazy"
+          onerror="this.src='${srcPath(col, file)}'" alt="${file}">
+        <div class="filename">${file}</div>
+        ${prod ? `<div class="assigned-label">${getProductName(prod)}</div>` : ''}
+        <input class="card-name-input" type="text"
+          value="${savedName.replace(/"/g, '&quot;')}"
+          placeholder="Enter product name…"
+          data-key="${k}">
+      `;
+      // Stop click-through to modal when typing
+      const input = card.querySelector('.card-name-input');
+      input.addEventListener('click', e => e.stopPropagation());
+      input.addEventListener('input', () => {
+        const val = input.value.trim();
+        if (val) photoNames[k] = val;
+        else delete photoNames[k];
+        localStorage.setItem('skyyrose-photo-names', JSON.stringify(photoNames));
+      });
+
+      grid.appendChild(card);
+    }
+
+    sec.appendChild(grid);
+    container.appendChild(sec);
+  }
+
+  updateStatus();
+}
+
+let currentKey = null;
+
+function openModal(col, file) {
+  currentKey = key(col, file);
+  const modal = document.getElementById('modal');
+  document.getElementById('modal-img').src = srcPath(col, file);
+  document.getElementById('modal-name').textContent = file;
+
+  // Build product buttons
+  const btns = document.getElementById('product-btns');
+  btns.innerHTML = '';
+  const current = assignments[currentKey];
+  for (const p of PRODUCTS) {
+    const btn = document.createElement('button');
+    btn.className = 'prod-btn' + (current === p.id ? ' active' : '');
+    btn.innerHTML = `<span class="pid">${p.id}${p.preorder ? ' · PRE-ORDER' : ' · AVAILABLE'}</span>${getProductName(p)}`;
+    btn.onclick = () => assignProduct(p.id);
+    btns.appendChild(btn);
+  }
+
+  modal.classList.add('open');
+}
+
+function assignProduct(pid) {
+  assignments[currentKey] = pid;
+  localStorage.setItem('skyyrose-mapping', JSON.stringify(assignments));
+  // Update button states
+  document.querySelectorAll('.prod-btn').forEach(b => b.classList.remove('active'));
+  event.target.closest('.prod-btn').classList.add('active');
+  buildUI();
+}
+
+function clearAssignment() {
+  delete assignments[currentKey];
+  localStorage.setItem('skyyrose-mapping', JSON.stringify(assignments));
+  buildUI();
+  closeModal();
+}
+
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+  currentKey = null;
+}
+
+function updateStatus() {
+  const named = Object.keys(photoNames).length;
+  const assigned = Object.keys(assignments).length;
+  document.getElementById('status').textContent =
+    `${named} photo${named !== 1 ? 's' : ''} named · ${assigned} assigned`;
+}
+
+// ── Label parser ─────────────────────────────────────────────────────────────
+// Conventions:
+//   Duplicate                 → /mis folder, exclude from CSV
+//   logo (keyword)            → /logos folder
+//   promo / ad / web copy     → /promos folder
+//   * prefix                  → Pre-Order item
+//   ' prefix                  → canonical product name identifier
+//   Name 'Color               → product + color variant
+//   Name (Front/Back/Side)    → product + view angle
+function parseLabel(raw) {
+  if (!raw) return null;
+  const l = raw.trim();
+
+  if (l.toLowerCase() === 'duplicate') return { type: 'duplicate' };
+  if (/logo/i.test(l))                 return { type: 'logo',  label: l };
+  if (/promo|(?:^|\s)ad(?:\s|$)|web[\s-]?copy/i.test(l))
+                                       return { type: 'promo', label: l };
+
+  let rest = l;
+  let isPreOrder = false;
+  let isCanonical = false;
+
+  if (rest.startsWith('*'))  { isPreOrder  = true; rest = rest.slice(1).trim(); }
+  if (rest.startsWith("'"))  { isCanonical = true; rest = rest.slice(1).trim(); }
+
+  const viewMatch = rest.match(/\(([^)]+)\)/);
+  const view = viewMatch ? viewMatch[1] : null;
+  rest = rest.replace(/\([^)]+\)/, '').trim();
+
+  const colorMatch = rest.match(/^(.+?)\s+'(.+)$/);
+  const productName = colorMatch ? colorMatch[1].trim() : rest;
+  const color       = colorMatch ? colorMatch[2].trim() : null;
+
+  return { type: 'product', productName, color, view, isPreOrder, isCanonical };
+}
+
+function q(s) { return '"' + (s||'').replace(/"/g, '""') + '"'; }
+
+function exportMapping() {
+  const BASE = 'assets/images/source-products';
+
+  // Categorise every named photo
+  const products = [];   // { file, col, parsed }
+  const promos   = [];
+  const logos    = [];
+  const dupes    = [];
+  const unnamed  = [];
+
+  for (const col of Object.keys(SOURCES)) {
+    for (const file of SOURCES[col]) {
+      const k   = key(col, file);
+      const raw = photoNames[k];
+      if (!raw) { unnamed.push({ col, file }); continue; }
+
+      const parsed = parseLabel(raw);
+      if (!parsed)                       continue;
+      if (parsed.type === 'duplicate')   { dupes.push({ col, file }); continue; }
+      if (parsed.type === 'logo')        { logos.push({ col, file, label: parsed.label }); continue; }
+      if (parsed.type === 'promo')       { promos.push({ col, file, label: parsed.label }); continue; }
+      products.push({ col, file, parsed });
+    }
+  }
+
+  // Group product photos by canonical product name
+  const byProduct = {};
+  for (const item of products) {
+    const name = item.parsed.productName;
+    if (!byProduct[name]) byProduct[name] = [];
+    byProduct[name].push(item);
+  }
+
+  const lines = [];
+
+  // ── PRODUCTS CSV ─────────────────────────────────────────────────────────
+  lines.push('PRODUCTS CSV');
+  lines.push('============');
+  const csvHeader = [
+    'Product Name','Collection','Status',
+    'File 1','View 1','Color 1',
+    'File 2','View 2','Color 2',
+    'File 3','View 3','Color 3'
+  ].map(q).join(',');
+  lines.push(csvHeader);
+
+  for (const [name, items] of Object.entries(byProduct)) {
+    const first = items[0].parsed;
+    const col   = items[0].col;
+    const colLabel = col === 'black-rose' ? 'Black Rose'
+                   : col === 'love-hurts' ? 'Love Hurts' : 'Signature';
+    const status = first.isPreOrder ? 'Pre-Order' : 'Available';
+
+    const refs = [0, 1, 2].map(i => items[i]
+      ? [items[i].file, items[i].parsed.view || '', items[i].parsed.color || '']
+      : ['', '', '']
+    );
+    lines.push([
+      q(name), q(colLabel), q(status),
+      q(refs[0][0]), q(refs[0][1]), q(refs[0][2]),
+      q(refs[1][0]), q(refs[1][1]), q(refs[1][2]),
+      q(refs[2][0]), q(refs[2][1]), q(refs[2][2]),
+    ].join(','));
+  }
+
+  // ── PROMOS ───────────────────────────────────────────────────────────────
+  lines.push('\nPROMOS / ADS / WEB COPY');
+  lines.push('========================');
+  if (promos.length) promos.forEach(p => lines.push(`  ${p.col}/${p.file}  [${p.label}]`));
+  else lines.push('  (none)');
+
+  // ── LOGOS ────────────────────────────────────────────────────────────────
+  lines.push('\nLOGOS');
+  lines.push('=====');
+  if (logos.length) logos.forEach(l => lines.push(`  ${l.col}/${l.file}  [${l.label}]`));
+  else lines.push('  (none)');
+
+  // ── DUPLICATES → /mis ────────────────────────────────────────────────────
+  lines.push('\nDUPLICATES (→ /mis)');
+  lines.push('===================');
+  if (dupes.length) dupes.forEach(d => lines.push(`  ${d.col}/${d.file}`));
+  else lines.push('  (none)');
+
+  // ── UNNAMED ──────────────────────────────────────────────────────────────
+  lines.push(`\nUNNAMED (${unnamed.length} photos — no label entered)`);
+  lines.push('=======');
+  if (unnamed.length <= 30) unnamed.forEach(u => lines.push(`  ${u.col}/${u.file}`));
+  else lines.push(`  (${unnamed.length} files — not shown)`);
+
+  // ── SHELL SCRIPT to organise files ──────────────────────────────────────
+  lines.push('\n\n── BASH: organise files ──────────────────────────────────────');
+  lines.push(`mkdir -p ${BASE}/mis ${BASE}/promos ${BASE}/logos`);
+  dupes.forEach( d => lines.push(`mv "${BASE}/${d.col}/${d.file}" "${BASE}/mis/"`));
+  promos.forEach(p => lines.push(`mv "${BASE}/${p.col}/${p.file}" "${BASE}/promos/"`));
+  logos.forEach( l => lines.push(`mv "${BASE}/${l.col}/${l.file}" "${BASE}/logos/"`));
+
+  document.getElementById('output-pre').textContent = lines.join('\n');
+  document.getElementById('output-modal').classList.add('open');
+}
+
+function copyOutput() {
+  navigator.clipboard.writeText(document.getElementById('output-pre').textContent)
+    .then(() => { document.getElementById('copy-btn').textContent = 'Copied!'; setTimeout(() => { document.getElementById('copy-btn').textContent = 'Copy to Clipboard'; }, 2000); });
+}
+
+// Close modal on backdrop click
+document.getElementById('modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+buildUI();
+</script>
+</body>
+</html>
