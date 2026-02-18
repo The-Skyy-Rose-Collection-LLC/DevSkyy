@@ -22,7 +22,8 @@ const path = require('path');
 const fs   = require('fs').promises;
 const { GoogleGenAI } = require('@google/genai');
 
-const API_KEY = 'AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc';
+const API_KEY = process.env.GEMINI_API_KEY;
+if (!API_KEY) { console.error('[gemini-content] Error: GEMINI_API_KEY not set.'); process.exit(1); }
 const ai = new GoogleGenAI({ apiKey: API_KEY });
 
 const ROOT       = path.join(__dirname, '..');

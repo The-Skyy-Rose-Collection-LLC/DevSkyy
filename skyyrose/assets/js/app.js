@@ -284,6 +284,11 @@ function renderRoom(index) {
 
   // Announce to screen readers
   announce(`Now viewing ${room.name}. ${room.collection} collection. ${room.hotspots.length} products available.`);
+
+  // Notify avatar of room change on initial render too
+  if (window.avatar) {
+    window.avatar.onRoomChange(room.id);
+  }
 }
 
 /**
@@ -367,6 +372,10 @@ function goToRoom(index) {
 
   currentRoomIndex = index;
   renderRoom(currentRoomIndex);
+
+  if (window.avatar) {
+    window.avatar.onRoomChange(CONFIG.rooms[currentRoomIndex].id);
+  }
 }
 
 /**
@@ -468,6 +477,11 @@ function openModal(product, room) {
     modalClose.focus();
   }, 100);
 
+  // Notify avatar of product view
+  if (window.avatar) {
+    window.avatar.onProductView(product);
+  }
+
   // Announce to screen readers
   announce(`Product details for ${product.name}. ${product.price}. ${product.description}`);
 }
@@ -523,6 +537,11 @@ function handleAddToCart(type) {
   // TODO: Phase 3 - Integrate with WooCommerce API
   // For now, just show success message
   announce(`${modalTitle.textContent} added to ${type === 'cart' ? 'cart' : 'pre-order'}`);
+
+  // Notify avatar of cart add
+  if (window.avatar) {
+    window.avatar.onCartAdd({ name: modalTitle.textContent });
+  }
 
   // Close modal after short delay
   setTimeout(closeModal, 1000);
