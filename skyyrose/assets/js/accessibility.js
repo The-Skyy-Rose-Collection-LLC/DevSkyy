@@ -75,6 +75,7 @@ class AccessibilityManager {
   // Reduced motion
   // ---------------------------------------------------------------------------
   _setupReducedMotion() {
+    if (typeof window.matchMedia !== 'function') return;
     const mq = window.matchMedia('(prefers-reduced-motion: reduce)');
 
     const apply = (matches) => {
