@@ -1,14 +1,14 @@
 /**
- * SkyyRose — OpenAI Embeddings Generator
+ * SkyyRose — Gemini Embeddings Generator
  *
- * Generates text-embedding-3-small embeddings for all 20 SkyyRose products
+ * Generates text-embedding-004 embeddings (768-dim) for all 20 SkyyRose products
  * and saves them to assets/data/product-embeddings.json for semantic search.
  *
  * Usage:
  *   node build/generate-embeddings.js           # embed all products
  *   node build/generate-embeddings.js br-001    # embed a single product
  *
- * Requires: OPENAI_API_KEY env var
+ * Requires: GEMINI_API_KEY env var
  */
 
 'use strict';
@@ -17,16 +17,14 @@ const fs   = require('fs');
 const path = require('path');
 
 // ---------------------------------------------------------------------------
-// OpenAI client (openai@6.22.0 — CommonJS)
+// Gemini client (@google/genai)
 // ---------------------------------------------------------------------------
 
-const OpenAI = require('openai');
+const { GoogleGenAI } = require('@google/genai');
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+const genai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
-const EMBEDDING_MODEL = 'text-embedding-3-small';
+const EMBEDDING_MODEL = 'gemini-embedding-001';
 
 // ---------------------------------------------------------------------------
 // File paths
@@ -81,17 +79,17 @@ function sleep(ms) {
 }
 
 /**
- * Call the OpenAI embeddings API with one retry on rate-limit (429).
+ * Call the Gemini embeddings API with one retry on rate-limit (429).
  * @param {string} text
- * @returns {Promise<number[]>} 1536-dimensional vector
+ * @returns {Promise<number[]>} 768-dimensional vector
  */
 async function createEmbedding(text) {
   const call = async () => {
-    const response = await openai.embeddings.create({
+    const result = await genai.models.embedContent({
       model: EMBEDDING_MODEL,
-      input: text,
+      contents: text,
     });
-    return response.data[0].embedding;
+    return result.embeddings[0].values;
   };
 
   try {
@@ -140,8 +138,8 @@ function saveEmbeddings(data) {
 // ---------------------------------------------------------------------------
 
 async function main() {
-  if (!process.env.OPENAI_API_KEY) {
-    console.error('[generate-embeddings] Error: OPENAI_API_KEY environment variable is not set.');
+  if (!process.env.GEMINI_API_KEY) {
+    console.error('[generate-embeddings] Error: GEMINI_API_KEY environment variable is not set.');
     process.exit(1);
   }
 
