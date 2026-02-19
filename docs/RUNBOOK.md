@@ -1,8 +1,9 @@
 # DevSkyy Production Deployment Runbook
 
-**Version**: 3.1.0
-**Last Updated**: 2026-02-08
+**Version**: 3.0.0
+**Last Updated**: 2026-02-19
 **Status**: Production Ready
+**Source of Truth**: `package.json`, `.env.example`
 
 This runbook provides copy/paste ready instructions for deploying DevSkyy to production, including WordPress.com deployment, health checks, and incident response procedures.
 
@@ -55,10 +56,15 @@ isort . && ruff check --fix . && black .
 mypy . --ignore-missing-imports
 pytest -v --cov
 
-# JavaScript
-npm run lint:fix
-npm run type-check
-npm run test:ci
+# JavaScript (from package.json scripts)
+npm run precommit    # Runs: lint + type-check + test:ci
+# Or individually:
+npm run lint:fix     # eslint src/**/*.{ts,tsx,js,jsx} --fix
+npm run type-check   # tsc --project config/typescript/tsconfig.json --noEmit
+npm run test:ci      # jest --ci --coverage --watchAll=false
+
+# Security
+npm run security:audit  # npm audit
 ```
 
 ---
@@ -171,7 +177,7 @@ curl -X POST "$RENDER_DEPLOY_HOOK"
 curl https://api.devskyy.app/health
 
 # Expected response:
-# {"status": "healthy", "version": "3.1.0", "timestamp": "..."}
+# {"status": "healthy", "version": "3.0.0", "timestamp": "..."}
 
 # API docs
 open https://api.devskyy.app/docs
@@ -545,7 +551,7 @@ curl https://api.devskyy.app/metrics
 
 | Endpoint | Purpose | Expected Response |
 |----------|---------|-------------------|
-| `/health` | Overall health | `{"status": "healthy", "version": "3.1.0"}` |
+| `/health` | Overall health | `{"status": "healthy", "version": "3.0.0"}` |
 | `/health/ready` | Readiness probe | `{"ready": true}` |
 | `/health/live` | Liveness probe | `{"alive": true}` |
 | `/metrics` | Prometheus metrics | Metrics in Prometheus format |
@@ -956,4 +962,4 @@ curl -I https://skyyrose.co | grep -i content-security-policy | grep -o "cdn.jsd
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: After each major deployment
-**Last Updated**: 2026-02-08
+**Last Updated**: 2026-02-19
