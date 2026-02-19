@@ -1,0 +1,18 @@
+{
+  "productId": "br-002",
+  "name": "Black Rose Joggers",
+  "collection": "black-rose",
+  "referenceImages": [
+    "black-rose/br-002-joggers.jpeg"
+  ],
+  "garmentTypeLock": "JOGGER PANTS — lower body only. NOT a hoodie, NOT a sweatshirt, NOT a jacket. Show FULL LENGTH of pants from waist to ankle. Both legs must be visible. Tapered at ankle with ribbed cuffs. The logo is a SILICONE CUT-OUT APPLIQUÉ — three-dimensional raised silicone piece adhered to the fabric, NOT a print, NOT embroidery, NOT a patch.",
+  "brandingTech": {
+    "logo": "3D raised silicone cut-out appliqué on upper left leg — slight gloss contrast against matte fabric, physically adhered piece with real depth",
+    "technique": "silicone",
+    "notTechniques": ["printed", "embroidered", "embossed", "heat-transfer", "patch", "woven"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: SILICONE CUT-OUT APPLIQUÉ\n- Logo is a 3D raised silicone piece physically adhered to the fabric\n- Slight glossy sheen contrast against the matte black fabric\n- Physically dimensional — has real depth and edge shadow\n- MUST NOT render as: printed graphic, embroidered thread, embossed impression, heat-transfer, woven label\n- This is a legally meaningful product specification"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Full-length stance showing BOTH LEGS completely from waist to ankle — left-leg silicone logo clearly visible and catching light",
+  "setting": "Gothic corridor with dark stone arches and moonlight"
+}

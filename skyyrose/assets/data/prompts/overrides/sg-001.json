@@ -1,0 +1,19 @@
+{
+  "productId": "sg-001",
+  "name": "The Bay Set",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-001-bay-set-1.jpg",
+    "signature/sg-001-bay-set-2.jpg"
+  ],
+  "garmentTypeLock": "MATCHING COORDINATED SET — both top AND bottom pieces shown together as a complete outfit. Reproduce EXACTLY the top and bottom pieces shown in the reference images — same colors, same graphics, same fabric. NOT separate individual pieces.",
+  "brandingTech": {
+    "logo": "Bay Bridge night-scene graphics and SR monogram — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-001"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Full-length shot showing BOTH top and bottom of the matching set — complete coordinated outfit",
+  "setting": "San Francisco waterfront at night, Bay Bridge illuminated in background, champagne gold light"
+}

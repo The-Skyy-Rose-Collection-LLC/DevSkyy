@@ -1,0 +1,58 @@
+{
+  "_templateId": "fashion-model",
+  "_version": "1.0.0",
+  "_description": "Editorial fashion model photography template. Used by generate-fashion-models.js.",
+
+  "header": "PROFESSIONAL LUXURY FASHION EDITORIAL PHOTOGRAPHY",
+  "brandLine": "BRAND: SkyyRose {collectionName} Collection",
+  "productLine": "PRODUCT: {productName}",
+  "styleLine": "Vogue, Harper's Bazaar, Elle editorial quality",
+
+  "subject": {
+    "description": "Professional fashion model wearing {garment}",
+    "expression": "Confident, powerful, sophisticated intensity",
+    "diversity": "Ethnically diverse representation (vary across generations)"
+  },
+
+  "garmentBlock": {
+    "header": "GARMENT DETAILS (CRITICAL - MUST MATCH REFERENCE EXACTLY):",
+    "reproduce": "REPRODUCE EVERY GRAPHIC, TEXT, AND DESIGN ELEMENT FROM THE REFERENCE IMAGE",
+    "visibility": "PRODUCT MUST BE CLEARLY VISIBLE AND RECOGNIZABLE"
+  },
+
+  "photography": {
+    "style": "Professional editorial fashion photography",
+    "camera": "Shot with medium format camera (Hasselblad quality)",
+    "casting": "Professional model casting",
+    "standard": "High-end fashion magazine standard"
+  },
+
+  "lighting": {
+    "style": "Professional editorial lighting setup",
+    "shadows": "Dramatic shadows creating depth and dimension",
+    "keyLight": "Soft key light, dramatic rim lighting"
+  },
+
+  "composition": {
+    "framing": "Full-body or 3/4 body shot showing entire garment",
+    "rule": "Rule of thirds composition",
+    "space": "Negative space for product focus",
+    "positioning": "Model positioned to showcase garment details"
+  },
+
+  "technical": {
+    "aspectRatio": "Portrait 2:3 (fashion editorial standard)",
+    "quality": "Magazine editorial standard",
+    "sharpness": "Crystal clear, professionally retouched"
+  },
+
+  "criticalRequirements": [
+    "Model must be wearing EXACTLY the product shown",
+    "All graphics, text, logos must be faithfully reproduced from the reference",
+    "Professional editorial quality throughout",
+    "Expression and pose match collection identity",
+    "Lighting complements product and brand colors"
+  ],
+
+  "closingLine": "Generate an ultra-luxury fashion editorial photograph that exceeds Vogue quality standards."
+}

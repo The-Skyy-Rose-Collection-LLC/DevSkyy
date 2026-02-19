@@ -1,0 +1,16 @@
+{
+  "productId": "br-005",
+  "name": "Black Rose Hoodie — Signature Edition",
+  "collection": "black-rose",
+  "referenceImages": ["black-rose/br-005-hoodie-signature-front.png"],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "BLACK Rose Signature Edition — rose embroidery on chest + sleeve cascade — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint br-005"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Editorial stance showing full garment, one hand raised slightly, intense gaze",
+  "setting": "Cathedral interior, gothic stone columns, dramatic candlelight and shadow"
+}

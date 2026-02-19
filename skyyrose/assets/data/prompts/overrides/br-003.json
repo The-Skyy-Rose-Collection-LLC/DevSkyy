@@ -1,0 +1,27 @@
+{
+  "productId": "br-003",
+  "name": "\"Black Is Beautiful\" Baseball Jersey",
+  "collection": "black-rose",
+  "referenceImages": [
+    "black-rose/br-003-jersey-black-front.jpg",
+    "black-rose/br-003-jersey-giants-front.jpg",
+    "black-rose/br-003-jersey-patch-detail.jpeg"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "Mixed techniques: body lettering and graphics likely sublimation or tackle-twill; Authentic Collection patch is a woven/printed sewn-on badge",
+    "technique": "TBD",
+    "patchDetail": {
+      "technique": "woven-label-patch",
+      "location": "Lower right front",
+      "description": "Rectangular authenticity patch — upper gold rectangle with 'BLACK ROSE', MLB batter silhouette, 'AUTHENTIC', 'COLLECTION' in navy serif; lower white section with red diamonds, 'Members only', crescent moon + rose, 'Yay Area, Ca', SkyyRose Collection script logo, 'Made for Kings and Queens'",
+      "size": "approx 2.5\" × 3.5\"",
+      "notTechniques": ["embroidered", "embossed", "silicone"]
+    },
+    "notTechniques": ["embossed", "silicone"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nAuthentic Collection Patch (lower right front): WOVEN/PRINTED SEWN-ON BADGE\n- Full-color rectangular patch, approximately 2.5\" × 3.5\"\n- Upper section (gold/yellow): 'BLACK ROSE' arched text + MLB batter logo + 'AUTHENTIC' banner + 'COLLECTION'\n- Lower section (white): red diamonds row + 'Members only' + crescent moon/rose + 'Yay Area, Ca' + SkyyRose Collection script logo + 'Made for Kings and Queens'\n- MUST appear on lower right front of jersey in every generated image\n- This patch is a key brand asset and product differentiator"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Open jersey over fitted base layer, one hand gesturing outward, proud confident stance",
+  "setting": "Dramatic urban skyline at golden hour, golden light casting warmth"
+}

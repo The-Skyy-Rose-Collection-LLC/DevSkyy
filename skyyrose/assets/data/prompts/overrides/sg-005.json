@@ -1,0 +1,18 @@
+{
+  "productId": "sg-005",
+  "name": "Stay Golden Tee",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-005-stay-golden-tee.jpg"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "'Stay Golden' theme with SR monogram branding — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-005"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Confident relaxed pose, tee fully visible, golden hour editorial energy",
+  "setting": "Marble penthouse terrace at golden hour, warm champagne sunlight"
+}

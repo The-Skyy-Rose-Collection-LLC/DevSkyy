@@ -1,0 +1,26 @@
+{
+  "productId": "sg-012",
+  "name": "The Signature Beanie — Orange",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-012-beanie-orange.jpeg"
+  ],
+  "garmentTypeLock": "ORANGE KNIT BEANIE — bright orange/coral (warm salmon-orange) colorway. Classic vertical ribbed knit. Small square woven patch/label on cuff — white background, rose graphic in matching pink/coral, sewn onto cuff.",
+  "brandingTech": {
+    "logo": "Small square woven patch/label on cuff — jacquard-woven label with rose graphic, sewn onto the cuff",
+    "technique": "woven-label-patch",
+    "locations": [
+      {
+        "location": "Cuff",
+        "description": "Small square woven label — white background, rose graphic in matching pink/coral",
+        "technique": "woven-label-patch",
+        "notTechniques": ["embroidered-thread", "leather", "printed", "laser-engraved"]
+      }
+    ],
+    "notTechniques": ["embroidered-thread", "leather", "printed", "laser-engraved"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: WOVEN LABEL PATCH\n- Small square jacquard-woven label sewn onto the cuff\n- White woven background with rose graphic in matching pink/coral thread\n- NOT embroidered thread stitching, NOT leather, NOT printed ink\n- Beanie colorway: bright orange/coral (warm salmon-orange)\n- Knit style: classic vertical ribbed (NOT chunky open knit)"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Head and shoulders editorial portrait, cuff visible showing woven patch, warm confident gaze",
+  "setting": "Modern art gallery with warm accent lighting, editorial portrait setup"
+}

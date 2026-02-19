@@ -1,0 +1,34 @@
+{
+  "productId": "sg-006",
+  "name": "Mint & Lavender Hoodie",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-006-mint-lavender-hoodie-front.jpeg",
+    "signature/sg-006-mint-lavender-hoodie-confirmed.jpeg",
+    "signature/sg-006-mint-lavender-set-1.jpeg"
+  ],
+  "garmentTypeLock": "PULLOVER HOODIE — large attached hood with cream/off-white drawstring. Kangaroo front pocket. Mint green colorway. The front graphic is a large lavender/purple rose mushroom cloud — EMBROIDERED (dimensional raised thread). NOT a crewneck.",
+  "brandingTech": {
+    "logo": "Large lavender/purple rose mushroom cloud — EMBROIDERED center chest, detailed raised thread",
+    "technique": "embroidered",
+    "locations": [
+      {
+        "location": "Center chest",
+        "description": "Large lavender/purple rose mushroom cloud erupting from grey clouds",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"]
+      },
+      {
+        "location": "Left cuff",
+        "description": "Small square patch — quality/brand woven label (red-orange square)",
+        "technique": "woven-label-patch"
+      }
+    ],
+    "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBROIDERED\n- Large lavender/purple rose mushroom cloud is thread-stitched center chest\n- Dimensional raised thread — NOT flat print, NOT silicone\n- Highly detailed embroidery with color depth\n- Left cuff small square patch: woven label (separate decoration)\n- MUST NOT render as: printed graphic, silicone appliqué, sublimation print, heat-transfer"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Hood down, hands in pocket or one arm raised, editorial stance showing full colorway and chest embroidery",
+  "setting": "Modern art gallery with pastel wall and gallery lighting, airy luxury feel",
+  "note": "CONFIRMED as HOODIE (has attached hood). sg-013 is a separate CREWNECK SET product."
+}
