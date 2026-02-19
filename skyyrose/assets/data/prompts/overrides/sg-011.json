@@ -14,7 +14,12 @@
         "location": "Cuff center",
         "description": "Circular leather patch — black rose debossed/burned into tan/caramel genuine or faux leather circle",
         "technique": "laser-engraved",
-        "notTechniques": ["embroidered", "printed", "woven", "sublimation"]
+        "notTechniques": [
+          "embroidered",
+          "printed",
+          "woven",
+          "sublimation"
+        ]
       },
       {
         "location": "Cuff side",
@@ -22,10 +27,48 @@
         "technique": "laser-engraved"
       }
     ],
-    "notTechniques": ["embroidered", "printed", "woven", "sublimation"],
+    "notTechniques": [
+      "embroidered",
+      "printed",
+      "woven",
+      "sublimation"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: LASER-ENGRAVED LEATHER PATCH\n- Circular leather patch on cuff — tan/caramel colored genuine or faux leather\n- Black rose design is burned/debossed into the leather surface via laser engraving\n- NOT embroidered thread, NOT printed ink, NOT woven pattern\n- Knit texture: chunky open knit (NOT ribbed) — heathered grey/charcoal colorway\n- Second small square leather tag on cuff side"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "front, center of folded cuff",
+        "description": "Circular leatherette patch with a rose graphic",
+        "technique": "laser-engraved",
+        "color": "Patch: tan/light brown; Rose graphic: dark brown/black",
+        "size": "Approximately 1.75 inches (4.5 cm) in diameter",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "printed"
+        ]
+      },
+      {
+        "location": "front, right side of folded cuff",
+        "description": "Small square leatherette patch with a stylized initial 'S' or symbol",
+        "technique": "laser-engraved",
+        "color": "Patch: tan/light brown; Graphic: dark brown/black",
+        "size": "Approximately 0.9 inches (2.3 cm) square",
+        "notTechniques": [
+          "embossed",
+          "sublimation",
+          "heat-transfer"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "Both branding elements are created using laser engraving on separate leatherette patches, which are then sewn onto the beanie. The specific details of the smaller graphic are slightly blurred, but the technique is clear.",
+    "analyzedAt": "2026-02-19T22:27:04.673Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-011",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Head and shoulders editorial portrait, cuff folded to show leather patch clearly, confident gaze",
   "setting": "Minimalist dark luxury studio, champagne gold rim lighting"
 }

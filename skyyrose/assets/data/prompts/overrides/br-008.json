@@ -9,10 +9,49 @@
   "brandingTech": {
     "logo": "BLACK Rose logo embroidered on chest — thread-stitched with slight texture raise",
     "technique": "embroidered",
-    "notTechniques": ["printed", "silicone", "embossed", "heat-transfer", "sublimation"],
+    "notTechniques": [
+      "printed",
+      "silicone",
+      "embossed",
+      "heat-transfer",
+      "sublimation"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBROIDERED\n- Logo is thread-stitched directly into the fabric\n- Slight raised texture from thread buildup — visible in raking light\n- Thread has subtle sheen difference from surrounding fabric\n- MUST NOT render as: printed graphic, silicone appliqué, embossed impression, heat-transfer\n- This is a legally meaningful product specification"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "A stylized graphic featuring two blooming roses with intricate thorny stems, appearing to emerge from a mushroom cloud-like base composed of swirling clouds. The design has a detailed, illustrative quality.",
+        "technique": "embroidered",
+        "color": "Outlines and some fill in white/light grey. Inner rose details in black/dark grey and subtle light pink/mauve. Stems in black/dark grey. Cloud base in light grey with darker grey accents and outlines.",
+        "size": "Approximately 10 inches tall by 8 inches wide.",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "outer left sleeve cuff",
+        "description": "A small, square woven label with a white background featuring a distinct red graphic or symbol.",
+        "technique": "woven-label-patch",
+        "color": "White background with a red graphic.",
+        "size": "Approximately 0.75 inches by 0.75 inches.",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "embossed"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The primary graphic clearly exhibits the raised texture, distinct thread patterns, and individual stitch visibility characteristic of direct embroidery. Multiple thread colors are used to create depth and detail. The cuff element is a small, cleanly finished label sewn onto the garment, consistent with a woven-label-patch. The dark color of the hoodie is a charcoal or dark heather grey.",
+    "analyzedAt": "2026-02-19T22:22:32.855Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-008",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "FEMALE model, hood up or down, full-length shot clearly showing: (1) the hoodie construction at top, (2) the extra-long extended hem — embroidered logo on chest visible",
   "setting": "Gothic cathedral garden, moonlight filtering through stone arches, dark florals"
 }

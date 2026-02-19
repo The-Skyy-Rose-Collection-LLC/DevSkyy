@@ -2,15 +2,50 @@
   "productId": "br-004",
   "name": "Black Rose Hoodie",
   "collection": "black-rose",
-  "referenceImages": ["black-rose/br-004-hoodie-front.png"],
+  "referenceImages": [
+    "black-rose/br-004-hoodie-front.png"
+  ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "BLACK rose mushroom cloud graphic on chest — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "center chest: Stylized graphic depicting two roses with thorny stems, appearing to grow from a stylized cloud or mushroom cloud base.; outer side of left sleeve cuff: Small rectangular woven label with a graphic.",
+    "technique": "embroidered",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint br-004"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Graphic depicting two intertwined roses with thorny stems, rising from a cloud or stylized smoke base.",
+        "technique": "embroidered",
+        "color": "Rose outlines: iridescent silver/light grey with subtle pink/purple sheen; Stems and thorns: dark grey/black; Cloud base: light blue, white, and light grey.",
+        "size": "approx 9 inches tall x 7 inches wide",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      },
+      {
+        "location": "left sleeve cuff",
+        "description": "Small rectangular woven label patch with a stylized rose logo.",
+        "technique": "woven-label-patch",
+        "color": "Red background with a white/light outline of a rose.",
+        "size": "approx 0.75 inches wide x 0.5 inches tall",
+        "notTechniques": [
+          "embroidered",
+          "printed",
+          "heat-transfer"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The main graphic on the chest exhibits the distinct raised texture and visible thread pattern characteristic of embroidery, with a noticeable sheen on the rose outlines suggesting a specialty thread. The element on the left cuff is clearly a separate woven label sewn onto the garment.",
+    "analyzedAt": "2026-02-19T22:21:24.018Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-004",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Hood down, hands in kangaroo pocket, confident relaxed stance showing full chest graphic",
   "setting": "Moonlit gothic garden, rose bushes in background, atmospheric fog"
 }

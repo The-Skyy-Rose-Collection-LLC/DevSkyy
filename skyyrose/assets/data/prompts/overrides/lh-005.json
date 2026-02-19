@@ -16,20 +16,32 @@
         "location": "Front — 'Love Hurts' script text",
         "description": "Large 'Love Hurts' script in RED with dark shadow/black outline",
         "technique": "embroidered",
-        "notTechniques": ["screen-print", "sublimation", "heat-transfer", "silicone"]
+        "notTechniques": [
+          "screen-print",
+          "sublimation",
+          "heat-transfer",
+          "silicone"
+        ]
       },
       {
         "location": "Back — tattoo-art sacred heart graphic",
         "description": "Sacred heart with thorns bleeding + red roses — back of jacket",
         "technique": "embroidered",
-        "notTechniques": ["sublimation", "printed", "silicone"],
+        "notTechniques": [
+          "sublimation",
+          "printed",
+          "silicone"
+        ],
         "note": "CONFIRMED: NOT sublimation. Raised thread stitching."
       },
       {
         "location": "Hood lining",
         "description": "Allover floral print — orange/tan roses on white satin",
         "technique": "sublimation",
-        "notTechniques": ["embroidered", "printed-separate"],
+        "notTechniques": [
+          "embroidered",
+          "printed-separate"
+        ],
         "note": "SUBLIMATION — allover print dyed into lining fabric (lining only)"
       },
       {
@@ -40,7 +52,64 @@
     ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — MULTI-TECHNIQUE PRODUCT (NO FALSE ADVERTISING):\nFront 'Love Hurts' script: EMBROIDERED — raised thread stitching, NOT screen print\nBack heart/rose graphic: EMBROIDERED — raised thread stitching (CONFIRMED NOT sublimation)\nHood lining floral: SUBLIMATION — allover print dyed into lining fabric (lining only)\nSmall chest patch: EMBROIDERED PATCH — sewn-on circular badge\nCuffs/hem trim: Ribbed stripe (knit construction — red + white + black)\nClosure: Snap buttons (classic varsity snap closure)"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Stylized text 'Love Hurts' with an outline.",
+        "technique": "embroidered",
+        "color": "red fill with white outline",
+        "size": "approx 10 inches wide, 4 inches high",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "center back",
+        "description": "Graphic of an anatomical heart wrapped in thorns, with two roses and leaves growing from the top, and blood-like drips below.",
+        "technique": "embroidered",
+        "color": "red (heart, roses, blood), various greens (leaves/stems), dark brown/black (thorns)",
+        "size": "approx 12 inches high, 10 inches wide",
+        "notTechniques": [
+          "sublimation",
+          "printed",
+          "silicone"
+        ]
+      },
+      {
+        "location": "inside hood lining",
+        "description": "Repeating floral pattern featuring orange/peach roses with green stems and leaves, on a white/off-white background.",
+        "technique": "sublimation",
+        "color": "orange/peach (roses), various greens (leaves/stems), white/off-white (background)",
+        "size": "full coverage of inside hood lining",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "inside hood / neck area",
+        "description": "Small rectangular brand label, partially obscured, appears to have text like 'Stay Rich' or similar with a small graphic.",
+        "technique": "woven-label-patch",
+        "color": "pink background with black text/logo",
+        "size": "approx 2 inches wide, 1 inch high",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "printed"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The garment appears to be made of a satin-like material, which lends itself well to both the detailed embroidery and the smooth, vibrant sublimation on the hood lining. The contrasting textures of the decoration techniques add to the garment's appeal.",
+    "analyzedAt": "2026-02-19T22:24:19.519Z",
+    "model": "gemini-2.5-flash",
+    "productId": "lh-005",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Jacket snapped, showing both front script and silhouette — one arm raised to show sleeve detail. Hood up optional.",
   "setting": "Grand baroque staircase, deep crimson carpet, dramatic golden candlelight — street meets luxury"
 }

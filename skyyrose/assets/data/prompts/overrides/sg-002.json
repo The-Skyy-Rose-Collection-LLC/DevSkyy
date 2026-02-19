@@ -7,12 +7,69 @@
   ],
   "garmentTypeLock": "MATCHING COORDINATED SET — both top AND bottom pieces shown together as a complete outfit. Reproduce the EXACT garments in the reference image — same colors, same cut, same graphics. NOT a single tee or single pant — the full set together.",
   "brandingTech": {
-    "logo": "'Stay Golden' theme, gold colorway, SR monogram — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "inside back collar: Stylized 'JB' or 'B' monogram logo; center chest: Graphic of three multi-colored roses with leaves and stem, emerging from a dark cloud/ground base. Roses feature abstract patterns.; entire shorts garment: Abstract, vibrant, multi-colored pattern resembling a cityscape or lights at night, visible through the mesh fabric.; right thigh (wearer's right): Small embroidered patch of a stylized purple rose with white/silver leaves and stem.",
+    "technique": "printed",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-002"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "inside collar, below neckband",
+        "description": "stylized 'JB' monogram logo",
+        "technique": "heat-transfer",
+        "color": "black",
+        "size": "approx 1 inch wide, 0.75 inches tall",
+        "notTechniques": [
+          "embroidered",
+          "woven-label-patch",
+          "silicone"
+        ]
+      },
+      {
+        "location": "center chest",
+        "description": "graphic of three abstract, colorful roses with leaves and stems, rising from a dark cloud base, featuring a 'glitch' or distressed aesthetic",
+        "technique": "heat-transfer",
+        "color": "multi-color (predominantly purple, dark blue, black, red, orange, yellow, green, with white/grey accents for stems/leaves)",
+        "size": "approx 9 inches tall by 7 inches wide",
+        "notTechniques": [
+          "embroidered",
+          "embossed",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "entire shorts fabric",
+        "description": "abstract, multi-color pattern resembling city lights or digital distortion, integrated into the mesh fabric",
+        "technique": "sublimation",
+        "color": "multi-color (purple, dark blue, black, orange, red, yellow, hints of green)",
+        "size": "full garment coverage",
+        "notTechniques": [
+          "printed",
+          "heat-transfer",
+          "embroidered"
+        ]
+      },
+      {
+        "location": "wearer's right thigh (left side of image)",
+        "description": "small embroidered patch in the shape of a stylized rose with stems",
+        "technique": "embroidered-patch",
+        "color": "purple/blue for the rose, white/light grey for stems/leaves",
+        "size": "approx 1.75 inches tall by 1 inch wide",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "sublimation"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The white flat drawcord at the shorts' waistband is a functional garment component and is not considered a decoration technique for this analysis, as it is not a logo, graphic, or branding element applied using the specified decoration methods.",
+    "analyzedAt": "2026-02-19T22:25:10.430Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-002",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Full-length shot showing BOTH pieces of the complete matching set clearly",
   "setting": "Minimalist marble penthouse, floor-to-ceiling windows, golden afternoon light"
 }

@@ -12,14 +12,18 @@
   ],
   "garmentTypeLock": "BASKETBALL SHORTS — 'Just Don' style, mid-thigh length. Dual-collection collab: Love Hurts × Black Rose. Black mesh body with allover rose/cloud pattern.",
   "brandingTech": {
-    "logo": "Complex multi-technique: body allover pattern is sublimation, 'OAKLAND' and 'Love Hurts' scripts are sublimation, front pentagon inset graphic is sublimation, back pentagon Black Rose logo is EMBROIDERED",
-    "technique": "TBD",
+    "logo": "center front, mid-thigh: Uppercase text 'OAKLAND'; throughout main black mesh body (front and back): Repeating pattern of roses and clouds; right front upper thigh/hip area: Stylized cursive text 'Love Huns' with a shadow effect; left front lower white mesh panel: Graphic of a cluster of roses with leaves, growing from a cloud base; right front lower white mesh panel: Stylized cursive text 'Love Huns' with a heart graphic encircled by thorns; center back, upper area, spanning across the upper thighs: Large, stylized 'Love Huns' text integrated with a map or topographical graphic; center back lower white mesh panel: Stylized cursive text 'Love Huns' with a heart graphic encircled by thorns",
+    "technique": "heat-transfer",
     "locations": [
       {
         "location": "Body allover pattern",
         "description": "Dark grey rose + cloud pattern across full black mesh",
         "technique": "sublimation",
-        "notTechniques": ["embroidered", "printed-ink", "silicone"]
+        "notTechniques": [
+          "embroidered",
+          "printed-ink",
+          "silicone"
+        ]
       },
       {
         "location": "Front — 'OAKLAND' large text",
@@ -41,7 +45,11 @@
         "location": "Back pentagon inset panel",
         "description": "White pentagon/star inset at back — BLACK ROSE logo: black rose with green stem from grey/white clouds",
         "technique": "embroidered",
-        "notTechniques": ["sublimation", "printed", "silicone"],
+        "notTechniques": [
+          "sublimation",
+          "printed",
+          "silicone"
+        ],
         "note": "The dual-collab signature mark — dimensional stitched embroidery"
       },
       {
@@ -57,7 +65,88 @@
     ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — MULTI-TECHNIQUE PRODUCT (NO FALSE ADVERTISING):\nBody allover rose/cloud pattern: SUBLIMATION — dye-printed into mesh fabric\nLove Hurts scripts (front, back, sides): SUBLIMATION\nFront pentagon 'Love Hurts' + heart graphic: SUBLIMATION\nBack pentagon BLACK ROSE logo: EMBROIDERED — dimensional stitched, NOT sublimation\n- The back pentagon embroidery is the dual-collab signature mark\n- It has physical thread depth, NOT flat print\n- Run Flash fingerprint to confirm OAKLAND technique (sublimation vs chenille)"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "entire body (black mesh areas)",
+        "description": "repeating pattern of roses and cloud-like shapes",
+        "technique": "sublimation",
+        "color": "dark grey roses, light grey clouds on black",
+        "size": "each rose approx 1-1.5 inches",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "center front (mid-thigh)",
+        "description": "bold 'OAKLAND' text",
+        "technique": "heat-transfer",
+        "color": "white",
+        "size": "approx 9 inches wide, 2.5 inches high",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "embossed"
+        ]
+      },
+      {
+        "location": "front right side (wrapping slightly)",
+        "description": "large stylized 'Love Hurts' script logo",
+        "technique": "silicone",
+        "color": "light grey with subtle sheen",
+        "size": "approx 11 inches wide, 4.5 inches high",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "lower left leg (on white star-shaped mesh panel)",
+        "description": "detailed black rose with leaves and cloud base graphic",
+        "technique": "embroidered",
+        "color": "black rose, dark grey/green leaves, light blue/white cloud",
+        "size": "approx 3.5 inches high, 3 inches wide",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "back right side (wrapping slightly)",
+        "description": "large stylized 'Love Hurts' script logo",
+        "technique": "silicone",
+        "color": "light grey with subtle sheen",
+        "size": "approx 11 inches wide, 4.5 inches high",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "back center lower panel (on white star-shaped mesh section)",
+        "description": "heart with thorns and 'Love Hurts' script logo patch",
+        "technique": "embroidered-patch",
+        "color": "black heart/thorns/text, white patch background with grey accents",
+        "size": "approx 4.5 inches high, 3.5 inches wide",
+        "notTechniques": [
+          "silicone",
+          "sublimation",
+          "embossed"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The shorts feature a blend of decoration techniques, combining full-garment sublimation for the base pattern, heat-transfer for crisp text, raised silicone for prominent script logos, and both direct embroidery and an embroidered patch for detailed graphics on different panels. The garment construction utilizes mesh fabric for breathability and layered panels for aesthetic detailing, typical of premium athletic and streetwear shorts.",
+    "analyzedAt": "2026-02-19T22:22:21.675Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-007",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Athletic stance, one leg forward showing side graphic, confident sports editorial energy",
   "setting": "Dark gothic gymnasium meets baroque theater — dramatic mixed-world setting"
 }
