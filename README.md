@@ -58,7 +58,7 @@ make demo-runway        # Fashion runway
   - ⚠️ Python 3.14+ has compatibility issues with some dependencies (Cohere SDK, Pydantic V1)
 - **PostgreSQL**: 15+ (for Round Table persistence)
 - **Redis**: 7+ (optional, for caching)
-- **Node.js**: 18+ (for frontend dashboard)
+- **Node.js**: 22+ (required by package.json engines)
 
 ## Installation
 

@@ -1,8 +1,8 @@
 # NPM Scripts Reference
 
 **Total Scripts**: 28
-**Last Updated**: 2026-02-08
-**Source**: `package.json`
+**Last Updated**: 2026-02-19
+**Source**: `package.json` (v3.0.0)
 
 This document provides comprehensive reference for all npm scripts available in the DevSkyy platform.
 
