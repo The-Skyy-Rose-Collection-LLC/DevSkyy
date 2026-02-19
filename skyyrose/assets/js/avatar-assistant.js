@@ -95,10 +95,18 @@
       this._cacheRefs();
       this._bindEvents();
 
+      // Walk-in entrance: slide up from bottom after a beat
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (this._root) this._root.classList.add('avatar-entered');
+        }, 120);
+      });
+
       if (this.config.autoGreet) {
+        // After walk-in settles (~1.1s), open chat and greet
         setTimeout(() => {
           if (!this._chatOpen) {
-            this._showBubble('Welcome to SkyyRose ✦ I\'m here to help you discover your perfect piece. What collection speaks to you?', 2500);
+            this._openChat();
           }
         }, this.config.greetDelay);
       }
@@ -380,113 +388,22 @@
      role="complementary"
      tabindex="0">
 
-  <!-- Floating figure -->
+  <!-- Floating figure — Skyy mascot -->
   <div class="avatar-figure" aria-hidden="true">
-    <svg class="avatar-svg" viewBox="0 0 80 140" xmlns="http://www.w3.org/2000/svg"
-         role="img" aria-label="SkyyRose assistant character">
+    <img class="avatar-img"
+         src="assets/images/avatar/skyy.png"
+         alt="Skyy — SkyyRose mascot"
+         draggable="false">
 
-      <!-- ── HAIR (curly silhouette) ── -->
-      <g class="hair-group">
-        <!-- Main hair mass -->
-        <ellipse cx="40" cy="28" rx="22" ry="20" fill="var(--avatar-hair, #1a0a00)"/>
-        <!-- Curly tendrils left -->
-        <path d="M18 30 Q10 22 14 14 Q18 6 24 12 Q20 18 22 26 Z"
-              fill="var(--avatar-hair, #1a0a00)"/>
-        <path d="M20 40 Q8 34 10 24 Q13 16 19 20 Q16 28 20 36 Z"
-              fill="var(--avatar-hair, #1a0a00)"/>
-        <!-- Curly tendrils right -->
-        <path d="M62 30 Q70 22 66 14 Q62 6 56 12 Q60 18 58 26 Z"
-              fill="var(--avatar-hair, #1a0a00)"/>
-        <path d="M60 40 Q72 34 70 24 Q67 16 61 20 Q64 28 60 36 Z"
-              fill="var(--avatar-hair, #1a0a00)"/>
-        <!-- Rose hair accent -->
-        <circle cx="58" cy="18" r="5" fill="var(--avatar-accent, #c9a96e)"/>
-        <path d="M58 13 Q60 15 58 18 Q56 15 58 13 Z" fill="#fff" opacity="0.6"/>
-        <path d="M63 16 Q61 18 58 18 Q61 16 63 16 Z" fill="#fff" opacity="0.6"/>
-        <path d="M53 16 Q55 18 58 18 Q55 16 53 16 Z" fill="#fff" opacity="0.6"/>
-      </g>
-
-      <!-- ── FACE ── -->
-      <g class="face-group">
-        <!-- Skin -->
-        <ellipse cx="40" cy="36" rx="16" ry="18" fill="var(--avatar-skin, #f5cba7)"/>
-        <!-- Eyes -->
-        <ellipse cx="33" cy="33" rx="3" ry="3.5" fill="#1a0a00"/>
-        <ellipse cx="47" cy="33" rx="3" ry="3.5" fill="#1a0a00"/>
-        <!-- Eye shine -->
-        <circle cx="34.5" cy="32" r="1" fill="#fff" opacity="0.8"/>
-        <circle cx="48.5" cy="32" r="1" fill="#fff" opacity="0.8"/>
-        <!-- Brows -->
-        <path d="M30 28 Q33 26 36 28" stroke="#1a0a00" stroke-width="1.5"
-              fill="none" stroke-linecap="round"/>
-        <path d="M44 28 Q47 26 50 28" stroke="#1a0a00" stroke-width="1.5"
-              fill="none" stroke-linecap="round"/>
-        <!-- Mouth (animated) -->
-        <g class="mouth-group">
-          <ellipse class="avatar-mouth" cx="40" cy="43" rx="5" ry="2.5"
-                   fill="var(--avatar-accent, #c9a96e)" opacity="0.9"/>
-          <path d="M35 43 Q40 46 45 43" stroke="var(--avatar-accent, #c9a96e)"
-                stroke-width="1" fill="none"/>
-        </g>
-        <!-- Cheek blush -->
-        <ellipse cx="29" cy="39" rx="4" ry="2.5" fill="var(--avatar-accent, #c9a96e)" opacity="0.3"/>
-        <ellipse cx="51" cy="39" rx="4" ry="2.5" fill="var(--avatar-accent, #c9a96e)" opacity="0.3"/>
-      </g>
-
-      <!-- ── NECK ── -->
-      <rect x="36" y="52" width="8" height="8" fill="var(--avatar-skin, #f5cba7)" rx="2"/>
-
-      <!-- ── BODY (fashionable outfit) ── -->
-      <g class="body-group">
-        <!-- Main torso -->
-        <path d="M22 62 Q22 56 40 56 Q58 56 58 62 L62 95 Q62 98 40 98 Q18 98 18 95 Z"
-              fill="var(--avatar-outfit-base, #2c2c2c)"/>
-        <!-- Collar / neckline detail -->
-        <path d="M32 57 Q40 64 48 57" fill="var(--avatar-accent, #c9a96e)" opacity="0.8"/>
-        <!-- Logo/monogram area -->
-        <text x="40" y="78" text-anchor="middle" font-size="7"
-              fill="var(--avatar-accent, #c9a96e)" font-family="serif"
-              letter-spacing="1">SR</text>
-        <!-- Belt / waist line -->
-        <rect x="22" y="90" width="36" height="4"
-              fill="var(--avatar-accent, #c9a96e)" rx="2"/>
-      </g>
-
-      <!-- ── SKIRT / PANTS lower ── -->
-      <path d="M22 94 Q20 115 26 130 L34 130 L34 115 L40 110 L46 115 L46 130 L54 130 Q60 115 58 94 Z"
-            fill="var(--avatar-outfit-lower, #1a1a1a)"/>
-
-      <!-- ── ARM (right — rotatable for pointing) ── -->
-      <g class="arm-group" style="transform-origin: 55px 66px;">
-        <path d="M55 62 Q68 65 72 80" stroke="var(--avatar-outfit-base, #2c2c2c)"
-              stroke-width="8" fill="none" stroke-linecap="round"/>
-        <!-- Hand -->
-        <circle cx="72" cy="81" r="5" fill="var(--avatar-skin, #f5cba7)"/>
-        <!-- Finger pointing -->
-        <path d="M74 77 Q78 74 76 78" stroke="var(--avatar-skin, #f5cba7)"
-              stroke-width="3" fill="none" stroke-linecap="round"/>
-      </g>
-
-      <!-- ── LEFT ARM (passive) ── -->
-      <path d="M25 62 Q12 65 10 80" stroke="var(--avatar-outfit-base, #2c2c2c)"
-            stroke-width="8" fill="none" stroke-linecap="round"/>
-      <circle cx="10" cy="81" r="5" fill="var(--avatar-skin, #f5cba7)"/>
-
-      <!-- ── SHOES ── -->
-      <ellipse cx="30" cy="132" rx="7" ry="3" fill="var(--avatar-accent, #c9a96e)"/>
-      <ellipse cx="50" cy="132" rx="7" ry="3" fill="var(--avatar-accent, #c9a96e)"/>
-      <!-- Heel detail -->
-      <rect x="24" y="129" width="3" height="5" fill="var(--avatar-accent, #c9a96e)" rx="1"/>
-      <rect x="44" y="129" width="3" height="5" fill="var(--avatar-accent, #c9a96e)" rx="1"/>
-
-      <!-- ── THINKING SPINNER (hidden unless thinking) ── -->
-      <g class="think-spinner" opacity="0">
-        <circle cx="40" cy="10" r="6" fill="none"
-                stroke="var(--avatar-accent, #c9a96e)" stroke-width="2"
-                stroke-dasharray="28" stroke-dashoffset="10"/>
-        <circle cx="40" cy="10" r="3" fill="var(--avatar-accent, #c9a96e)" opacity="0.6"/>
-      </g>
-    </svg>
+    <!-- Thinking spinner overlay -->
+    <div class="skyy-spinner" aria-hidden="true">
+      <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="32" cy="32" r="26" fill="none"
+                stroke="var(--avatar-accent, #c9a96e)" stroke-width="3"
+                stroke-dasharray="120" stroke-dashoffset="40"
+                stroke-linecap="round"/>
+      </svg>
+    </div>
 
     <!-- Collection badge -->
     <div class="avatar-outfit-badge" aria-hidden="true"></div>
@@ -500,7 +417,10 @@
         <span class="chat-rose-icon" aria-hidden="true">🌹</span>
         <span class="chat-title">SkyyRose Assistant</span>
       </div>
-      <button class="chat-close" aria-label="Close assistant chat" type="button">×</button>
+      <div class="chat-header-actions">
+        <button class="chat-minimize" aria-label="Minimize assistant" type="button" title="Minimize">—</button>
+        <button class="chat-close" aria-label="Close assistant chat" type="button">×</button>
+      </div>
     </div>
     <div class="chat-messages" aria-live="polite" aria-atomic="false" role="log"></div>
     <div class="chat-input-row">
@@ -516,16 +436,14 @@
   <!-- Mini bubble (proactive messages) -->
   <div class="avatar-bubble" role="status" aria-live="polite" aria-hidden="true"></div>
 
-  <!-- Toggle button -->
+  <!-- Toggle button — Skyy face -->
   <button class="avatar-toggle"
           aria-label="Open SkyyRose fashion assistant"
           aria-expanded="false"
           type="button">
-    <svg viewBox="0 0 36 36" width="36" height="36" aria-hidden="true">
-      <circle cx="18" cy="18" r="16" fill="var(--avatar-accent, #c9a96e)"/>
-      <text x="18" y="23" text-anchor="middle" font-size="14" fill="#fff"
-            font-family="serif">🌹</text>
-    </svg>
+    <img class="avatar-toggle-face"
+         src="assets/images/avatar/skyy.png"
+         alt="" draggable="false">
   </button>
 
   <!-- Screen reader live region -->
@@ -559,6 +477,17 @@
   align-items: flex-end;
   gap: 8px;
   font-family: 'Georgia', 'Times New Roman', serif;
+  /* Walk-in start state */
+  transform: translateY(110%);
+  opacity: 0;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.6s ease;
+}
+
+/* Walk-in complete */
+#skyyrose-avatar.avatar-entered {
+  transform: translateY(0);
+  opacity: 1;
 }
 
 #skyyrose-avatar.avatar-hidden {
@@ -568,11 +497,11 @@
 /* ── Figure ── */
 .avatar-figure {
   position: relative;
-  width: 80px;
+  width: 160px;
   cursor: pointer;
-  opacity: 0.82;
+  opacity: 0.92;
   transition: opacity 0.3s ease;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+  filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5));
 }
 
 .avatar-figure:hover,
@@ -580,10 +509,32 @@
   opacity: 1;
 }
 
-.avatar-svg {
-  width: 80px;
-  height: 140px;
+/* Real Skyy mascot image */
+.avatar-img {
+  width: 100%;
+  height: auto;
   display: block;
+  mix-blend-mode: multiply;   /* white bg vanishes on dark room backgrounds */
+  border-radius: 0;
+  transition: filter 0.3s ease;
+}
+
+/* Thinking spinner overlay */
+.skyy-spinner {
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 64px;
+  height: 64px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+
+.skyy-spinner svg {
+  width: 100%;
+  height: 100%;
 }
 
 /* ── Outfit badge ── */
@@ -600,25 +551,36 @@
   text-shadow: 0 1px 4px rgba(0,0,0,0.7);
 }
 
-/* ── Toggle button ── */
+/* ── Toggle button — Skyy face (only shown when minimized) ── */
 .avatar-toggle {
-  width: 52px;
-  height: 52px;
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
-  border: 2px solid var(--avatar-accent);
-  background: rgba(20,10,5,0.92);
+  border: 2.5px solid var(--avatar-accent);
+  background: #1a0a00;
   cursor: pointer;
-  display: flex;
+  display: none;  /* hidden by default — full body is the click target */
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 20px rgba(201,169,110,0.3);
+  box-shadow: 0 4px 20px rgba(201,169,110,0.35);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   padding: 0;
+  overflow: hidden;
+}
+
+/* Show toggle only in minimized state */
+#skyyrose-avatar.avatar-minimized .avatar-toggle {
+  display: flex;
+}
+
+/* Hide full body when minimized */
+#skyyrose-avatar.avatar-minimized .avatar-figure {
+  display: none;
 }
 
 .avatar-toggle:hover {
   transform: scale(1.08);
-  box-shadow: 0 6px 28px rgba(201,169,110,0.5);
+  box-shadow: 0 6px 28px rgba(201,169,110,0.55);
 }
 
 .avatar-toggle:focus-visible {
@@ -626,10 +588,21 @@
   outline-offset: 3px;
 }
 
+/* Circular face crop — shows Skyy's face in the toggle button */
+.avatar-toggle-face {
+  width: 200%;
+  height: 200%;
+  object-fit: cover;
+  object-position: 40% 12%;
+  mix-blend-mode: multiply;
+  margin-left: -50%;
+  margin-top: -40%;
+}
+
 /* ── Mini bubble ── */
 .avatar-bubble {
   position: absolute;
-  bottom: 160px;
+  bottom: 240px;
   right: 0;
   background: rgba(20,10,5,0.95);
   border: 1px solid var(--avatar-accent);
@@ -703,17 +676,25 @@
   text-transform: uppercase;
 }
 
+.chat-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.chat-minimize,
 .chat-close {
   background: none;
   border: none;
   color: rgba(201,169,110,0.6);
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
-  padding: 0 4px;
+  padding: 0 5px;
   line-height: 1;
   transition: color 0.2s;
 }
 
+.chat-minimize:hover,
 .chat-close:hover { color: var(--avatar-accent); }
 
 .chat-messages {
@@ -832,44 +813,40 @@
   animation: breathe 3s ease-in-out infinite;
 }
 
-/* -- Thinking: spin-pulse spinner -- */
+/* -- Thinking: spinner overlay -- */
 @keyframes spin-pulse {
-  0%   { transform: rotate(0deg)   scale(1);   opacity: 0.5; }
-  50%  { transform: rotate(180deg) scale(1.15); opacity: 1; }
-  100% { transform: rotate(360deg) scale(1);   opacity: 0.5; }
+  0%   { transform: translateX(-50%) rotate(0deg)   scale(1);    opacity: 0.6; }
+  50%  { transform: translateX(-50%) rotate(180deg) scale(1.1);  opacity: 1; }
+  100% { transform: translateX(-50%) rotate(360deg) scale(1);    opacity: 0.6; }
 }
 
-#skyyrose-avatar.thinking .think-spinner {
-  opacity: 1 !important;
+#skyyrose-avatar.thinking .skyy-spinner {
+  opacity: 1;
   animation: spin-pulse 1.2s ease-in-out infinite;
-  transform-origin: 40px 10px;
 }
 
 #skyyrose-avatar.thinking .avatar-figure {
   animation: none;
 }
 
-/* -- Talking: mouth movement -- */
-@keyframes mouth-talk {
-  0%,100% { transform: scaleY(1); }
-  40%     { transform: scaleY(0.3); }
-  70%     { transform: scaleY(0.8); }
+/* -- Talking: subtle glow pulse on image -- */
+@keyframes skyy-talk {
+  0%,100% { filter: drop-shadow(0 6px 18px rgba(0,0,0,0.5)); }
+  50%     { filter: drop-shadow(0 6px 24px rgba(201,169,110,0.45)); }
 }
 
-#skyyrose-avatar.talking .avatar-mouth {
-  animation: mouth-talk 0.4s ease-in-out infinite;
-  transform-origin: 40px 43px;
+#skyyrose-avatar.talking .avatar-figure {
+  animation: skyy-talk 0.5s ease-in-out infinite;
 }
 
-/* -- Pointing: arm extends -- */
-@keyframes arm-point {
-  0%  { transform: rotate(0deg); }
-  30% { transform: rotate(-30deg) translateX(4px); }
-  100%{ transform: rotate(-30deg) translateX(4px); }
+/* -- Pointing: Skyy is already in presenting pose — gentle pulse -- */
+@keyframes skyy-point {
+  0%,100% { transform: scale(1); }
+  50%     { transform: scale(1.02) translateX(-2px); }
 }
 
-#skyyrose-avatar.pointing .arm-group {
-  animation: arm-point 0.4s ease forwards;
+#skyyrose-avatar.pointing .avatar-figure {
+  animation: skyy-point 0.6s ease-in-out infinite;
 }
 
 /* -- Celebrating: bounce -- */
@@ -960,6 +937,9 @@
       this._toggleBtn.addEventListener('click', () => this._toggleChat());
       this._figure.addEventListener('click', () => this._toggleChat());
 
+      // Minimize button — collapses to circle toggle
+      this._root.querySelector('.chat-minimize').addEventListener('click', () => this._minimizeAvatar());
+
       // Close button
       this._root.querySelector('.chat-close').addEventListener('click', () => this._closeChat());
 
@@ -1028,7 +1008,27 @@
     }
 
     _toggleChat() {
+      if (this._root && this._root.classList.contains('avatar-minimized')) {
+        this._restoreAvatar();
+        return;
+      }
       this._chatOpen ? this._closeChat() : this._openChat();
+    }
+
+    _minimizeAvatar() {
+      this._closeChat();
+      if (this._root) {
+        this._root.classList.add('avatar-minimized');
+        this._toggleBtn.setAttribute('aria-label', 'Restore SkyyRose assistant');
+      }
+    }
+
+    _restoreAvatar() {
+      if (this._root) {
+        this._root.classList.remove('avatar-minimized');
+        this._toggleBtn.setAttribute('aria-label', 'Open SkyyRose fashion assistant');
+      }
+      this._openChat();
     }
 
     // -------------------------------------------------------------------------
