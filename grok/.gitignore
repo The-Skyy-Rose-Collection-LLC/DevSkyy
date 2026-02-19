@@ -1,0 +1,8 @@
+node_modules/
+__pycache__/
+*.pyc
+.env
+*.log
+generated-image.png
+dist/
+.venv/

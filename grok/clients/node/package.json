@@ -1,0 +1,23 @@
+{
+  "name": "@devskyy/grok-client",
+  "version": "1.0.0",
+  "description": "xAI Grok client for DevSkyy — OpenAI-compatible SDK with xAI extensions",
+  "main": "grok-client.js",
+  "scripts": {
+    "test": "node test-connection.js",
+    "list-models": "node list-models.js",
+    "example:chat": "node ../../examples/chat-basic.js",
+    "example:stream": "node ../../examples/chat-streaming.js",
+    "example:vision": "node ../../examples/vision-analysis.js",
+    "example:search": "node ../../examples/live-search.js"
+  },
+  "keywords": ["grok", "xai", "generative-ai", "llm", "ai"],
+  "author": "DevSkyy Team",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.98.0",
+    "dotenv": "^16.4.5"
+  },
+  "engines": { "node": ">=18.0.0" },
+  "overrides": { "minimatch": ">=10.2.1" }
+}
