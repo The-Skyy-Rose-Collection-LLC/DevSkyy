@@ -1,8 +1,9 @@
 # DevSkyy Contributor Guide
 
-**Version**: 3.1.0
-**Last Updated**: 2026-02-08
+**Version**: 3.0.0
+**Last Updated**: 2026-02-19
 **Status**: Complete
+**Source of Truth**: `package.json`, `.env.example`
 
 Welcome to the DevSkyy platform! This guide will help you set up your development environment, understand our workflow, and contribute effectively to the codebase.
 
@@ -27,8 +28,8 @@ Welcome to the DevSkyy platform! This guide will help you set up your developmen
 
 **Required Software:**
 - **Python**: 3.11-3.12 (3.13-3.14 supported, 3.15+ not yet tested)
-- **Node.js**: 22.0.0+
-- **npm**: 10.0.0+
+- **Node.js**: 22.0.0+ (required by package.json engines)
+- **npm**: 10.0.0+ (required by package.json engines)
 - **PostgreSQL**: 15+ (production), SQLite works for development
 - **Redis**: 7+ (optional but recommended for caching)
 - **Git**: 2.30+
@@ -1074,36 +1075,68 @@ npm run type-check                # TypeScript
 - [ ] Environment variables used (no hardcoded values)
 - [ ] Documentation updated
 
-### NPM Scripts Quick Reference
+### NPM Scripts Quick Reference (28 scripts, from package.json)
 
 See [SCRIPTS_REFERENCE.md](SCRIPTS_REFERENCE.md) for complete documentation.
 
-**Most Used:**
-```bash
-npm run dev              # Start development server
-npm test                 # Run all tests
-npm run test:watch       # TDD watch mode
-npm run lint:fix         # Fix linting issues
-npm run type-check       # TypeScript type checking
-npm run precommit        # All pre-commit checks
-npm run demo:black-rose  # Run 3D demo
-```
+| Category | Script | Purpose |
+|----------|--------|---------|
+| **Development** | `npm run dev` | Start dev server with hot reload (nodemon + ts-node) |
+| | `npm run build` | Compile TypeScript (`tsc --project config/typescript/tsconfig.json`) |
+| | `npm run build:watch` | Compile TypeScript in watch mode |
+| | `npm run start` | Run compiled production build (`node dist/index.js`) |
+| **Testing** | `npm test` | Run all tests (`jest --config config/testing/jest.config.cjs`) |
+| | `npm run test:watch` | TDD watch mode |
+| | `npm run test:coverage` | Tests with coverage report |
+| | `npm run test:ci` | CI mode (coverage, no watch) |
+| | `npm run test:collections` | Test 3D collection components only |
+| **Quality** | `npm run lint` | Check linting errors (ESLint) |
+| | `npm run lint:fix` | Auto-fix linting errors |
+| | `npm run format` | Format code (Prettier) |
+| | `npm run format:check` | Verify formatting |
+| | `npm run type-check` | TypeScript type checking (`tsc --noEmit`) |
+| **Pre-commit** | `npm run precommit` | Run lint + type-check + test:ci |
+| **Demos** | `npm run demo:collections` | List available 3D demos |
+| | `npm run demo:black-rose` | Gothic rose garden 3D experience |
+| | `npm run demo:signature` | Luxury outdoor 3D experience |
+| | `npm run demo:love-hurts` | Gothic castle 3D experience |
+| | `npm run demo:showroom` | Virtual showroom 3D experience |
+| | `npm run demo:runway` | Fashion runway 3D experience |
+| **Maintenance** | `npm run clean` | Remove dist/ and coverage/ |
+| | `npm run prepare` | Auto-build after npm install |
+| | `npm run security:audit` | Check for security vulnerabilities |
+| | `npm run security:fix` | Auto-fix security vulnerabilities |
+| | `npm run deps:update` | Update dependencies |
+| | `npm run deps:check` | Check for outdated packages |
 
-### Environment Variables Quick Reference
+### Environment Variables Quick Reference (from .env.example)
 
 See [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) for complete documentation.
 
-**Critical Variables:**
-- `JWT_SECRET_KEY` - JWT signing (generate with script)
-- `ENCRYPTION_MASTER_KEY` - AES-256-GCM encryption
-- `DATABASE_URL` - Database connection
-- `ANTHROPIC_API_KEY` (or `OPENAI_API_KEY`) - At least one required
+| Category | Variable | Required | Purpose |
+|----------|----------|----------|---------|
+| **Security** | `JWT_SECRET_KEY` | Production | JWT signing (64+ chars, generate with script) |
+| | `ENCRYPTION_MASTER_KEY` | Production | AES-256-GCM encryption (base64 32-byte key) |
+| **Database** | `DATABASE_URL` | Yes | DB connection (SQLite dev, PostgreSQL prod) |
+| **AI/ML** | `OPENAI_API_KEY` | 1 required | OpenAI provider |
+| | `ANTHROPIC_API_KEY` | 1 required | Anthropic provider |
+| | `GOOGLE_AI_API_KEY` | Optional | Google AI provider |
+| **Payments** | `STRIPE_API_KEY` | E-commerce | Stripe secret key |
+| | `STRIPE_WEBHOOK_SECRET` | E-commerce | Stripe webhook verification |
+| **WordPress** | `WORDPRESS_URL` | WP features | WordPress site URL |
+| | `WOOCOMMERCE_KEY` | WP features | WooCommerce API key |
+| **3D Pipeline** | `HF_TOKEN` | 3D features | HuggingFace token |
+| | `TRIPO_API_KEY` | 3D fallback | Tripo3D API key |
+| | `FASHN_API_KEY` | Try-on | FASHN virtual try-on |
+| **Infra** | `REDIS_URL` | Optional | Redis caching |
+| | `SENTRY_DSN` | Optional | Error tracking |
+| | `CORS_ORIGINS` | Production | Allowed CORS origins |
 
 ---
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: When workflow or tools change
-**Last Updated**: 2026-02-08
+**Last Updated**: 2026-02-19
 
 ---
 
