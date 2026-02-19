@@ -390,8 +390,10 @@ def run_turn(
         new_message=content,
     ):
         if event.is_final_response():
+            # Agent may end on a tool call with no text part — scan all parts
             if event.content and event.content.parts:
-                response_text = event.content.parts[0].text
+                texts = [p.text for p in event.content.parts if hasattr(p, "text") and p.text]
+                response_text = "\n".join(texts)
             break
     return response_text
 
@@ -483,7 +485,7 @@ def cmd_generate_social(sku: str, platform: str) -> None:
         f"Call get_brand_guidelines() and get_product('{sku}') first. "
         f"Write platform-native copy that fits the collection's brand voice, "
         f"then save it with update_product_field('{sku}', '{platform}', <content>). "
-        f"Show me the final copy after saving."
+        f"After saving, reply with the final saved copy in full so I can read it."
     )
     response = run_turn(runner, session_svc, message, session_id)
     print(response)

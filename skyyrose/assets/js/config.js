@@ -2,30 +2,30 @@
 // This will be replaced with WordPress REST API calls in Phase 3
 
 const CONFIG = {
-  // Scene images (placeholder paths - will be optimized in build step)
+  // Scene images
   images: {
     'black-rose': {
-      webp: 'assets/images/scenes/black-rose.webp',
-      jpeg: 'assets/images/scenes/black-rose.jpg',
+      webp: 'assets/images/scenes/black-rose-garden-desktop.webp',
+      jpeg: 'assets/images/scenes/black-rose-garden-desktop.jpg',
       mobile: {
-        webp: 'assets/images/scenes/black-rose-mobile.webp',
-        jpeg: 'assets/images/scenes/black-rose-mobile.jpg'
+        webp: 'assets/images/scenes/black-rose-garden-mobile.webp',
+        jpeg: 'assets/images/scenes/black-rose-garden-mobile.jpg'
       }
     },
     'love-hurts': {
-      webp: 'assets/images/scenes/love-hurts.webp',
-      jpeg: 'assets/images/scenes/love-hurts.jpg',
+      webp: 'assets/images/scenes/love-hurts-ballroom-desktop.webp',
+      jpeg: 'assets/images/scenes/love-hurts-ballroom-desktop.jpg',
       mobile: {
-        webp: 'assets/images/scenes/love-hurts-mobile.webp',
-        jpeg: 'assets/images/scenes/love-hurts-mobile.jpg'
+        webp: 'assets/images/scenes/love-hurts-ballroom-mobile.webp',
+        jpeg: 'assets/images/scenes/love-hurts-ballroom-mobile.jpg'
       }
     },
     'signature': {
-      webp: 'assets/images/scenes/signature.webp',
-      jpeg: 'assets/images/scenes/signature.jpg',
+      webp: 'assets/images/scenes/signature-runway-dark-desktop.webp',
+      jpeg: 'assets/images/scenes/signature-runway-dark-desktop.jpg',
       mobile: {
-        webp: 'assets/images/scenes/signature-mobile.webp',
-        jpeg: 'assets/images/scenes/signature-mobile.jpg'
+        webp: 'assets/images/scenes/signature-runway-dark-mobile.webp',
+        jpeg: 'assets/images/scenes/signature-runway-dark-mobile.jpg'
       }
     }
   },
