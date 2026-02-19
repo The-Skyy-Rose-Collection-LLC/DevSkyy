@@ -1,0 +1,33 @@
+{
+  "defaultModel": "grok-3",
+  "fallbackModel": "grok-3-mini",
+  "baseURL": "https://api.x.ai/v1",
+  "generationConfig": {
+    "temperature": 0.7,
+    "top_p": 0.95,
+    "max_tokens": 2048,
+    "frequency_penalty": 0,
+    "presence_penalty": 0
+  },
+  "rateLimit": {
+    "requestsPerMinute": 60,
+    "retryAttempts": 3,
+    "retryDelayMs": 1000,
+    "exponentialBackoff": true
+  },
+  "cache": {
+    "enabled": true,
+    "ttlSeconds": 3600,
+    "maxSize": 1000
+  },
+  "logging": {
+    "level": "info",
+    "logRequests": false,
+    "logResponses": false,
+    "logTokenUsage": true
+  },
+  "streaming": {
+    "enabled": true,
+    "chunkSize": 512
+  }
+}

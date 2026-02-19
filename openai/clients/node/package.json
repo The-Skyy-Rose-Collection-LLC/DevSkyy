@@ -1,0 +1,35 @@
+{
+  "name": "@devskyy/openai-client",
+  "version": "1.0.0",
+  "description": "OpenAI client for DevSkyy — SDK, Agents SDK, Assistants, Realtime, Embeddings",
+  "main": "openai-client.js",
+  "scripts": {
+    "test": "node test-connection.js",
+    "example:chat": "node ../../examples/chat-basic.js",
+    "example:stream": "node ../../examples/chat-streaming.js",
+    "example:vision": "node ../../examples/vision-analysis.js",
+    "example:embeddings": "node ../../examples/embeddings.js",
+    "example:image": "node ../../examples/image-generation.js",
+    "example:agents": "node ../../examples/agents-basic.js",
+    "example:assistants": "node ../../examples/assistants.js",
+    "list-models": "node list-models.js"
+  },
+  "keywords": ["openai", "gpt", "agents", "assistants", "generative-ai", "llm", "ai"],
+  "author": "DevSkyy Team",
+  "license": "MIT",
+  "dependencies": {
+    "openai": "^4.98.0",
+    "@openai/agents": "^0.0.11",
+    "@ai-sdk/openai": "^3.0.29",
+    "ai": "^5.0.52",
+    "zod": "^3.25.71",
+    "dotenv": "^16.4.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "overrides": {
+    "minimatch": ">=10.2.1",
+    "jsondiffpatch": ">=0.7.2"
+  }
+}
