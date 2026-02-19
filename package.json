@@ -184,6 +184,7 @@
       "esbuild",
       "fs-ext",
       "prisma",
+      "protobufjs",
       "sharp",
       "unrs-resolver"
     ],
