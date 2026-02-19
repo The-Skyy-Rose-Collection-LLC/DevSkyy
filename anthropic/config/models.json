@@ -1,0 +1,65 @@
+{
+  "models": [
+    {
+      "id": "claude-opus-4-6",
+      "type": "chat",
+      "description": "Most intelligent model for agents and coding",
+      "contextWindow": 200000,
+      "maxOutput": 128000,
+      "costPer1MTok": { "input": 5.0, "output": 25.0 },
+      "recommended": false
+    },
+    {
+      "id": "claude-sonnet-4-6",
+      "type": "chat",
+      "description": "Best combination of speed and intelligence (recommended)",
+      "contextWindow": 200000,
+      "maxOutput": 64000,
+      "costPer1MTok": { "input": 3.0, "output": 15.0 },
+      "recommended": true
+    },
+    {
+      "id": "claude-haiku-4-5",
+      "type": "chat",
+      "description": "Fastest model with near-frontier intelligence",
+      "contextWindow": 200000,
+      "maxOutput": 64000,
+      "costPer1MTok": { "input": 1.0, "output": 5.0 },
+      "recommended": false
+    },
+    {
+      "id": "claude-sonnet-4-5-20250929",
+      "type": "chat",
+      "description": "Legacy Sonnet 4.5",
+      "contextWindow": 200000,
+      "maxOutput": 64000,
+      "costPer1MTok": { "input": 3.0, "output": 15.0 },
+      "recommended": false
+    },
+    {
+      "id": "claude-opus-4-5-20251101",
+      "type": "chat",
+      "description": "Legacy Opus 4.5",
+      "contextWindow": 200000,
+      "maxOutput": 64000,
+      "costPer1MTok": { "input": 5.0, "output": 25.0 },
+      "recommended": false
+    },
+    {
+      "id": "claude-3-haiku-20240307",
+      "type": "chat",
+      "description": "Deprecated (retired April 19, 2026)",
+      "contextWindow": 200000,
+      "maxOutput": 4096,
+      "costPer1MTok": { "input": 0.25, "output": 1.25 },
+      "recommended": false
+    }
+  ],
+  "modelSelection": {
+    "chat": "claude-sonnet-4-6",
+    "coding": "claude-sonnet-4-6",
+    "analysis": "claude-opus-4-6",
+    "simple": "claude-haiku-4-5",
+    "fast": "claude-haiku-4-5"
+  }
+}
