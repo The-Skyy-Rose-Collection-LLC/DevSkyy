@@ -9,19 +9,83 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Mixed techniques: body lettering and graphics likely sublimation or tackle-twill; Authentic Collection patch is a woven/printed sewn-on badge",
-    "technique": "TBD",
+    "logo": "center chest: Arched 'BLACK IS BEAUTIFUL' text; center chest: Arched 'BLACK IS BEAUTIFUL' text; inside back neck: Small rectangular woven label with 'BLACK ROSS' (partially visible) text and a logo; lower left front: Rectangular woven label patch with 'BLACK ROSE AUTHENTIC COLLECTION' text, an MLB-style silhouette graphic, 'Members only Yay Area, Ca', 'Skky Rose COLLECTION' logo, and 'Made for Kings and Queens'",
+    "technique": "printed",
     "patchDetail": {
       "technique": "woven-label-patch",
       "location": "Lower right front",
       "description": "Rectangular authenticity patch — upper gold rectangle with 'BLACK ROSE', MLB batter silhouette, 'AUTHENTIC', 'COLLECTION' in navy serif; lower white section with red diamonds, 'Members only', crescent moon + rose, 'Yay Area, Ca', SkyyRose Collection script logo, 'Made for Kings and Queens'",
       "size": "approx 2.5\" × 3.5\"",
-      "notTechniques": ["embroidered", "embossed", "silicone"]
+      "notTechniques": [
+        "embroidered",
+        "embossed",
+        "silicone"
+      ]
     },
-    "notTechniques": ["embossed", "silicone"],
+    "notTechniques": [
+      "embossed",
+      "silicone"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nAuthentic Collection Patch (lower right front): WOVEN/PRINTED SEWN-ON BADGE\n- Full-color rectangular patch, approximately 2.5\" × 3.5\"\n- Upper section (gold/yellow): 'BLACK ROSE' arched text + MLB batter logo + 'AUTHENTIC' banner + 'COLLECTION'\n- Lower section (white): red diamonds row + 'Members only' + crescent moon/rose + 'Yay Area, Ca' + SkyyRose Collection script logo + 'Made for Kings and Queens'\n- MUST appear on lower right front of jersey in every generated image\n- This patch is a key brand asset and product differentiator"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Arched text 'BLACK IS BEAUTIFUL'",
+        "technique": "heat-transfer",
+        "color": "White",
+        "size": "Approximately 10-12 inches wide, letters 2-3 inches tall",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "embossed"
+        ]
+      },
+      {
+        "location": "center chest",
+        "description": "Arched text 'BLACK IS BEAUTIFUL'",
+        "technique": "heat-transfer",
+        "color": "Orange",
+        "size": "Approximately 10-12 inches wide, letters 2-3 inches tall",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "embossed"
+        ]
+      },
+      {
+        "location": "back neck (interior)",
+        "description": "Small woven label featuring a purple and yellow graphic with black text (appears to be a brand logo or size label)",
+        "technique": "woven-label-patch",
+        "color": "Purple, yellow, and black on a white background",
+        "size": "Approximately 1.5 inches wide, 2 inches tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "lower front right (worn side)",
+        "description": "Rectangular woven-label-patch featuring 'BLACK ROSE COLLECTION', an MLB-style logo with an 'AUTHENTIC' banner, and smaller text including 'Members only...', 'Yay Area. Ca', 'Skyy Rose Collection', and 'Made for Kings and Queens'",
+        "technique": "woven-label-patch",
+        "color": "Yellow background, blue main text, black outlines, red and black MLB-style badge, white 'AUTHENTIC' banner",
+        "size": "Approximately 4.5 inches tall, 3 inches wide",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "silicone"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The neck label and the lower front right patch are identical across both the black/white and black/orange jerseys. The 'BLACK IS BEAUTIFUL' text on both jerseys exhibits a smooth, flat finish with very crisp edges, which is characteristic of heat-transfer vinyl commonly used in sportswear for its clean appearance and durability on mesh fabrics. This distinguishes it from typical screen print that might show more fabric texture, or raised embroidery.",
+    "analyzedAt": "2026-02-19T22:21:12.917Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-003",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Open jersey over fitted base layer, one hand gesturing outward, proud confident stance",
   "setting": "Dramatic urban skyline at golden hour, golden light casting warmth"
 }

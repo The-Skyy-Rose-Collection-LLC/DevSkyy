@@ -7,12 +7,33 @@
   ],
   "garmentTypeLock": "RED KNIT BEANIE — headwear accessory only. The defining characteristic is BRIGHT RED color — NOT dark, NOT olive, NOT black, NOT green. A classic ribbed knit beanie worn on the head. The model wears their own outfit; the beanie is the featured accessory on their head.",
   "brandingTech": {
-    "logo": "Signature Collection branding on cuff — technique TBD via Flash fingerprint (likely patch or embroidery)",
-    "technique": "TBD",
+    "logo": "Front, lower right side of the cuff: Rectangular patch featuring a graphic of three red roses with green stems and leaves, rooted in white cloud-like shapes, all set against a dark grey/black background. The patch has a visible stitched border around its perimeter.",
+    "technique": "silicone",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-007\nNOTE: RED colorway is the critical spec — the beanie MUST be bright vivid red"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "Front of beanie, on the folded cuff, positioned towards the right side.",
+        "description": "Rectangular silicone patch featuring a raised, multi-color graphic of three red roses with green stems and leaves, rooted in white cloud-like elements. The entire patch appears to be a single molded silicone piece.",
+        "technique": "silicone",
+        "color": "Red (roses), Green (stems and leaves), White (cloud elements), Dark Grey/Black (patch background).",
+        "size": "Approximately 2.5 inches (height) x 1.75 inches (width).",
+        "notTechniques": [
+          "embroidered",
+          "sublimation",
+          "laser-engraved"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The branding element is a standalone patch, manufactured entirely from silicone, with the graphic elements molded in 3D relief. This silicone patch is then presumably sewn onto the beanie, though the exact attachment method of the patch to the beanie is not clearly visible.",
+    "analyzedAt": "2026-02-19T22:26:22.687Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-007",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Head and shoulders portrait, slight head tilt showing beanie detail, intense editorial gaze — RED beanie clearly visible on head",
   "setting": "Dark luxury background with gold and champagne rim lighting"
 }

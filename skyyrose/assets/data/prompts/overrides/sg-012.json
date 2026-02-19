@@ -14,13 +14,44 @@
         "location": "Cuff",
         "description": "Small square woven label — white background, rose graphic in matching pink/coral",
         "technique": "woven-label-patch",
-        "notTechniques": ["embroidered-thread", "leather", "printed", "laser-engraved"]
+        "notTechniques": [
+          "embroidered-thread",
+          "leather",
+          "printed",
+          "laser-engraved"
+        ]
       }
     ],
-    "notTechniques": ["embroidered-thread", "leather", "printed", "laser-engraved"],
+    "notTechniques": [
+      "embroidered-thread",
+      "leather",
+      "printed",
+      "laser-engraved"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: WOVEN LABEL PATCH\n- Small square jacquard-woven label sewn onto the cuff\n- White woven background with rose graphic in matching pink/coral thread\n- NOT embroidered thread stitching, NOT leather, NOT printed ink\n- Beanie colorway: bright orange/coral (warm salmon-orange)\n- Knit style: classic vertical ribbed (NOT chunky open knit)"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "wearer's right lower cuff",
+        "description": "Small rectangular woven label patch featuring a rose graphic.",
+        "technique": "woven-label-patch",
+        "color": "Pink rose graphic on a white label background",
+        "size": "approx 1 inch by 1 inch (2.5cm x 2.5cm)",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "silicone"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The texture and integration of the rose graphic into the label fabric indicate a jacquard-woven process for the label itself, which is then sewn onto the beanie's cuff. It is not an embroidered design on the patch, nor is the patch itself embroidered.",
+    "analyzedAt": "2026-02-19T22:27:15.345Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-012",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Head and shoulders editorial portrait, cuff visible showing woven patch, warm confident gaze",
   "setting": "Modern art gallery with warm accent lighting, editorial portrait setup"
 }

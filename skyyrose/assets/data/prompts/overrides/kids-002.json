@@ -14,13 +14,21 @@
         "location": "Left chest — circular logo",
         "description": "Three-part circular badge in white: top arc 'Skyy Rose', center: Black Rose graphic, bottom: 'Collection' text",
         "technique": "embroidered",
-        "notTechniques": ["printed", "silicone", "heat-transfer"]
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer"
+        ]
       },
       {
         "location": "Right chest — rose mushroom cloud",
         "description": "Small rose mushroom cloud in white on black section",
         "technique": "embroidered",
-        "notTechniques": ["printed", "silicone", "heat-transfer"]
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer"
+        ]
       },
       {
         "location": "Pant left thigh",
@@ -28,10 +36,60 @@
         "technique": "embroidered"
       }
     ],
-    "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"],
+    "notTechniques": [
+      "printed",
+      "silicone",
+      "heat-transfer",
+      "sublimation"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nAll logos: EMBROIDERED — thread-stitched in white\nLeft chest circular badge: white embroidered 'Skyy Rose' + Black Rose + 'Collection'\nRight chest rose cloud: white embroidered on black fabric\nPant thigh: small white embroidered logo on black pants\nSPECIAL INSTRUCTION: Make this look SPECIAL — bold, energetic but PREMIUM kids editorial.\nThis is the introduction to the Kids Capsule collection."
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "left sleeve (hoodie)",
+        "description": "Circular patch with a white background and a black stylized illustration/logo (depicting a central figure/object surrounded by text or symbols).",
+        "technique": "embroidered-patch",
+        "color": "white background, black illustration/text",
+        "size": "approx 1.75 inches diameter",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "embossed"
+        ]
+      },
+      {
+        "location": "upper front (hoodie)",
+        "description": "Stylized graphic depicting a skull with roots or tendrils extending upwards, forming a tree-like structure, perched on a cloud, with unreadable text below.",
+        "technique": "embroidered",
+        "color": "white, light grey, black (outlines/details), light blue (for cloud)",
+        "size": "approx 4.5 inches tall x 3.5 inches wide",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      },
+      {
+        "location": "left thigh (sweatpants)",
+        "description": "Stylized graphic depicting a skull with roots or tendrils extending upwards, forming a tree-like structure, perched on a cloud, with unreadable text below (identical design to the hoodie graphic).",
+        "technique": "embroidered",
+        "color": "white, light grey, black (outlines/details), light blue (for cloud)",
+        "size": "approx 4.5 inches tall x 3.5 inches wide",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "All identified branding elements exhibit clear raised texture indicative of embroidery. The graphic on the hoodie and sweatpants is identical in design, color, and technique. The circular element on the hoodie's left sleeve is a pre-made embroidered patch sewn onto the garment. The image resolution is sufficient to discern thread texture, ruling out flat printing, sublimation, or smooth silicone techniques.",
+    "analyzedAt": "2026-02-19T22:23:05.064Z",
+    "model": "gemini-2.5-flash",
+    "productId": "kids-002",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Fun, bold kids editorial — full body showing tri-color black/red/white colorblock set. Energetic, confident, premium.",
   "setting": "Bold luxury kids editorial — high contrast environment matching the tri-color palette",
   "specialInstruction": "Make these look SPECIAL — bold luxury, not generic. Premium kids editorial."

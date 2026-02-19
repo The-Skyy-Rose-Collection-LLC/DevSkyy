@@ -2,15 +2,62 @@
   "productId": "br-005",
   "name": "Black Rose Hoodie — Signature Edition",
   "collection": "black-rose",
-  "referenceImages": ["black-rose/br-005-hoodie-signature-front.png"],
+  "referenceImages": [
+    "black-rose/br-005-hoodie-signature-front.png"
+  ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "BLACK Rose Signature Edition — rose embroidery on chest + sleeve cascade — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "left chest: Rose and cloud graphic patch; right sleeve: Large rose, thorn, and cloud graphic; hood lining interior: Repeating rose floral pattern",
+    "technique": "embroidered-patch",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint br-005"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "interior hood lining",
+        "description": "Repeating floral graphic pattern featuring roses and leaves.",
+        "technique": "sublimation",
+        "color": "Dark charcoal grey outlines and partial fills on a light grey/off-white base fabric.",
+        "size": "Individual rose motifs are approximately 2-3 inches in diameter, repeating across the entire lining fabric.",
+        "notTechniques": [
+          "embroidered",
+          "heat-transfer",
+          "silicone"
+        ]
+      },
+      {
+        "location": "upper left chest",
+        "description": "An embroidered patch depicting two roses with leaves and thorns, stemming from a small cloud-like base.",
+        "technique": "embroidered-patch",
+        "color": "White and light grey embroidery threads on a white fabric base, with a white merrowed edge stitch.",
+        "size": "Approximately 4.5 inches tall by 3 inches wide.",
+        "notTechniques": [
+          "printed",
+          "embossed",
+          "silicone"
+        ]
+      },
+      {
+        "location": "outer side of the left sleeve",
+        "description": "A large embroidered graphic featuring multiple roses, leaves, and thorny stems, with a cloud base at the bottom.",
+        "technique": "embroidered",
+        "color": "White and light grey embroidery threads.",
+        "size": "Approximately 12-14 inches in height, with a maximum width of about 5 inches, extending from near the shoulder to the forearm.",
+        "notTechniques": [
+          "sublimation",
+          "heat-transfer",
+          "printed"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The hoodie is a dark green/grey color. All identified elements exhibit distinct characteristics aligning with the specified decoration techniques. The hood lining pattern appears to be integrated into the fabric fibers, consistent with sublimation, rather than a surface print. The chest item is clearly a separate, embroidered badge sewn on, while the sleeve item is embroidery directly onto the garment fabric.",
+    "analyzedAt": "2026-02-19T22:21:42.414Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-005",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Editorial stance showing full garment, one hand raised slightly, intense gaze",
   "setting": "Cathedral interior, gothic stone columns, dramatic candlelight and shadow"
 }

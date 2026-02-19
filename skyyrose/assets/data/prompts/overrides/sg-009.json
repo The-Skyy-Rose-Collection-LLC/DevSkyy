@@ -8,12 +8,45 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Signature Collection SR branding on sherpa jacket — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "back upper: Graphic depicting two red roses with green stems and leaves, rooted in a base of blue and white clouds.; interior, back neck: Small rectangular woven brand label with illegible white/light-colored text or logo on a black background.",
+    "technique": "embroidered",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-009"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "upper left chest",
+        "description": "Embroidered graphic featuring two red roses with green stems and leaves, emerging from a white and light blue cloud base.",
+        "technique": "embroidered",
+        "color": "Red, Green, White, Light Blue",
+        "size": "approx 4 inches (10 cm) tall by 3 inches (7.5 cm) wide",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "embossed"
+        ]
+      },
+      {
+        "location": "interior upper back neck",
+        "description": "Small rectangular brand label with text and a small graphic on a black background.",
+        "technique": "woven-label-patch",
+        "color": "Black background with light (appears white/light grey) text/graphic",
+        "size": "approx 1.5 inches (3.8 cm) wide by 0.75 inches (1.9 cm) tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "heat-transfer"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The garment appears to be a black jacket with a white sherpa/fleece lining. The rose graphic is applied directly to the outer shell fabric. The brand label is sewn into the interior lining at the neck.",
+    "analyzedAt": "2026-02-19T22:26:52.449Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-009",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Jacket fully buttoned, one hand in pocket, showing both front and hinting at back — powerful editorial presence",
   "setting": "Marble penthouse lobby, floor-to-ceiling windows, champagne gold winter light"
 }

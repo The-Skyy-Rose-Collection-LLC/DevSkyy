@@ -8,12 +8,45 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "BLACK Rose collection branding on sherpa jacket — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "right chest: Stylized intricate graphic featuring organic forms and a cloud-like base; center back: Graphic of two stylized roses on a stem emerging from a cloud-like base",
+    "technique": "embroidered",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint br-006"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "left chest",
+        "description": "Intricate graphic depicting a stylized skull-like motif with organic and scrollwork elements, set atop a cloud-like base.",
+        "technique": "embroidered",
+        "color": "white, light grey, and black",
+        "size": "approx 5 inches wide x 5 inches tall",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      },
+      {
+        "location": "upper back",
+        "description": "Large graphic depicting two fully bloomed roses with intricate petals, stems, and leaves, emerging from a stylized cloud or plume of smoke at the base.",
+        "technique": "embroidered",
+        "color": "white, light grey, medium grey, and black",
+        "size": "approx 12 inches wide x 12 inches tall",
+        "notTechniques": [
+          "heat-transfer",
+          "embossed",
+          "woven-label-patch"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "Both the left chest and upper back graphics exhibit distinct raised texture and visible thread patterns, which are definitive characteristics of embroidery. The intricate detailing and multi-tonal shading are expertly achieved through thread work on the black satin fabric of the bomber jacket. No other branding elements, such as on buttons or zippers, are visible.",
+    "analyzedAt": "2026-02-19T22:21:58.062Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-006",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Jacket fully buttoned, collar turned up, commanding editorial presence showing both front and silhouette",
   "setting": "Moonlit rooftop at night, city lights below, gothic rose gold bokeh"
 }

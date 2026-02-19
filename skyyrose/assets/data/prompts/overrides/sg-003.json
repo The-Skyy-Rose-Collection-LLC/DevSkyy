@@ -8,12 +8,45 @@
   ],
   "garmentTypeLock": "T-SHIRT — short sleeve crew-neck tee. NOT a plain tee — it has a GRAPHIC on the front. Reproduce the exact graphic from the reference image. The orchid/purple colorway shirt with its specific print design.",
   "brandingTech": {
-    "logo": "Front graphic print on orchid/purple tee — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "inner back neck: Rectangular woven label with 'Stay Rise' text and a graphic design (possibly a crown or abstract symbol) above it.; left sleeve, approximately 1 inch above cuff: Small square woven label patch featuring a stylized 'SR' initialism logo.",
+    "technique": "woven-label-patch",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-003"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "Inside back neck",
+        "description": "Rectangular woven label with 'Stay Rise' text and a crown/stylized logo graphic.",
+        "technique": "woven-label-patch",
+        "color": "Black background with gold/yellow text and graphic",
+        "size": "Approx 1.5 inches wide x 0.5 inches tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "silicone"
+        ]
+      },
+      {
+        "location": "Left sleeve, near cuff",
+        "description": "Small square woven label with a stylized 'SR' or abstract logo graphic.",
+        "technique": "woven-label-patch",
+        "color": "Black background with gold/yellow graphic",
+        "size": "Approx 0.8 inches x 0.8 inches",
+        "notTechniques": [
+          "embossed",
+          "sublimation",
+          "heat-transfer"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The 'M FRONT' graphic in the bottom left corner is an annotation for the image and not a branding element or decoration applied to the garment itself.",
+    "analyzedAt": "2026-02-19T22:25:22.477Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-003",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Standing facing forward, arms relaxed, chest forward — front graphic fully visible and sharp",
   "setting": "Minimalist modern art gallery, clean white walls, gallery track lighting"
 }

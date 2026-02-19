@@ -10,10 +10,86 @@
   "brandingTech": {
     "logo": "Black rose logo physically embossed/debossed into the fabric surface — tonal raised relief, black-on-black, NOT contrasting color",
     "technique": "embossed",
-    "notTechniques": ["printed", "embroidered", "silicone", "heat-transfer", "patch", "sublimation"],
+    "notTechniques": [
+      "printed",
+      "embroidered",
+      "silicone",
+      "heat-transfer",
+      "patch",
+      "sublimation"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBOSSED IMPRESSION\n- Logo is physically debossed/raised into the fabric surface\n- Tonal: matches fabric color (black-on-black), NOT contrasting color\n- Subtle 3D texture visible in directional/raking light\n- MUST NOT render as: printed graphic, screen print, embroidered thread, applied patch, silicone appliqué, or heat-transfer vinyl\n- This is a legally meaningful product specification"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Arched text 'BLACK IS BEAUTIFUL'",
+        "technique": "printed",
+        "color": "black",
+        "size": "Approximately 11 inches wide by 3.5 inches tall",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "embossed"
+        ]
+      },
+      {
+        "location": "inside back collar",
+        "description": "Small rectangular brand logo label (appearing to be 'Black Rose' with stylized graphics)",
+        "technique": "woven-label-patch",
+        "color": "black, red, yellow, white",
+        "size": "Approximately 1.75 inches wide by 0.75 inches tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "lower right front",
+        "description": "Rectangular embroidered patch with 'BLACK ROSE COLLECTION' text, a baseball player graphic, and additional text.",
+        "technique": "embroidered-patch",
+        "color": "black, white, red, yellow, gold, brown",
+        "size": "Approximately 3.25 inches wide by 4 inches tall",
+        "notTechniques": [
+          "sublimation",
+          "printed",
+          "silicone"
+        ]
+      },
+      {
+        "location": "upper back",
+        "description": "Stylized 'SR' monogram logo",
+        "technique": "embroidered",
+        "color": "light pink",
+        "size": "Approximately 2.5 inches wide by 1.75 inches tall",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      },
+      {
+        "location": "mid back",
+        "description": "Graphic of two roses with stems and thorns, emerging from a cloud base.",
+        "technique": "embroidered",
+        "color": "white, grey, black",
+        "size": "Approximately 11 inches tall by 7 inches wide",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "All visible branding elements have been identified and analyzed based on the provided definitions. The techniques selected are consistent with the visual evidence and descriptions given for each method.",
+    "analyzedAt": "2026-02-19T22:20:35.965Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-001",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Standing confidently facing FORWARD, one hand in pocket, chest area clearly lit to show embossed logo texture — FRONT VIEW",
   "setting": "Moonlit gothic garden, wrought-iron gates, fog rolling through dark roses"
 }

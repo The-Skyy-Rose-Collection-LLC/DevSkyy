@@ -8,12 +8,69 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Love Hurts collection branding, rose heart tattoo flash graphic — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "main body panels (front and back): Repeating graphic of an orange rose on a white cloud motif; right front thigh: Large cursive text 'Love Of'; lower left front side panel: Detailed embroidered graphic of a single rose with stem and leaves on a cloud; center of back bottom pentagon panel: Detailed embroidered graphic of a cluster of roses with stem and leaves on a light blue cloud/water element; side panels and back bottom pentagon panel background: Black mesh fabric with a repeating pattern of small white dots; borders of side panels and back bottom pentagon panel: Decorative trim featuring two thin red stripes flanking a white stripe, bordered by black",
+    "technique": "sublimation",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint lh-003"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "main body (front and back)",
+        "description": "Repeating graphic of an orange rose with green leaves on a white cloud background.",
+        "technique": "sublimation",
+        "color": "Orange, Green, White",
+        "size": "Each rose graphic approx. 3-4 inches tall/wide",
+        "notTechniques": [
+          "embroidered",
+          "printed",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "right side panel (mid-thigh area)",
+        "description": "Stylized script text 'Love' with a black dotted pattern inside the 'L'.",
+        "technique": "silicone",
+        "color": "Red with black dots",
+        "size": "Approx. 7 inches wide, 3 inches tall",
+        "notTechniques": [
+          "embroidered",
+          "sublimation",
+          "printed"
+        ]
+      },
+      {
+        "location": "center back, lower half",
+        "description": "Black pentagonal-shaped panel outlined with a thick red border, featuring a graphic of three red roses with green leaves and light blue water/mist.",
+        "technique": "embroidered",
+        "color": "Red (border and roses), Green (leaves), Light Blue (water/mist), Black (panel background)",
+        "size": "Pentagon approx. 8 inches tall/wide; Roses graphic approx. 4 inches tall/wide",
+        "notTechniques": [
+          "sublimation",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "front left thigh",
+        "description": "Black pentagonal/star-shaped panel outlined with a thick red border, featuring a single orange/red rose with green leaves.",
+        "technique": "embroidered",
+        "color": "Red (border), Orange/Red (rose), Green (leaves), Black (panel background)",
+        "size": "Pentagon/star approx. 5 inches tall/wide; Rose graphic approx. 2.5 inches tall/wide",
+        "notTechniques": [
+          "sublimation",
+          "silicone",
+          "printed"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The black mesh panels (side and pentagonal) are cut and sewn fabric elements, not decoration techniques. The black waistband and striped hems are knitted trims, part of garment construction and do not feature additional applied branding elements in the visible areas.",
+    "analyzedAt": "2026-02-19T22:23:54.398Z",
+    "model": "gemini-2.5-flash",
+    "productId": "lh-003",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Athletic editorial stance, showing front and side graphic, powerful energy",
   "setting": "Baroque theater stage lit with dramatic crimson spots, dark grandeur"
 }

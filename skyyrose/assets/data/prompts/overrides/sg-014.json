@@ -14,13 +14,21 @@
         "location": "Front chest — rose graphic",
         "description": "Small rose graphic where chevron stripes converge",
         "technique": "sublimation",
-        "notTechniques": ["embroidered", "silicone", "heat-transfer"]
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "heat-transfer"
+        ]
       },
       {
         "location": "Back — 'SR' script/cursive monogram",
         "description": "SR monogram between shoulder blades",
         "technique": "embroidered",
-        "notTechniques": ["printed", "sublimation", "silicone"]
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
       },
       {
         "location": "Chevron stripe panels",
@@ -32,7 +40,112 @@
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRE-ORDER ITEM FROM TECH FLAT:\nThis is a PRE-ORDER. Render as luxury fashion editorial visualization.\nFront rose graphic: SUBLIMATION PRINT\nBack 'SR' monogram (jacket only): EMBROIDERED\nStripes: Cut-and-sew colorblock panels — lavender + yellow/lime + mint + pink diagonal chevron\nBase: White body, pink hood\nIMPORTANT: Make this look ASPIRATIONAL and PREMIUM — pre-order announcement piece"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "hoodie front, wearer's right chest",
+        "description": "Stylized rose graphic with leaves",
+        "technique": "sublimation",
+        "color": "Multi-color (shades of pink, red, orange, light green, yellow)",
+        "size": "Approx 3.5 inches in height",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "sweatpants front, wearer's right thigh",
+        "description": "Stylized rose graphic with leaves",
+        "technique": "sublimation",
+        "color": "Multi-color (shades of pink, red, orange, light green, yellow)",
+        "size": "Approx 3.5 inches in height",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "hoodie back, upper center below neckline",
+        "description": "Stylized script letter 'R'",
+        "technique": "embroidered",
+        "color": "Black",
+        "size": "Approx 1.8 inches wide",
+        "notTechniques": [
+          "sublimation",
+          "silicone",
+          "printed"
+        ]
+      },
+      {
+        "location": "hoodie front, radiating from center chest across torso and upper sleeves",
+        "description": "Multi-color diagonal stripe graphic (sunburst effect)",
+        "technique": "sublimation",
+        "color": "Multi-color (pink, light green, light purple, yellow)",
+        "size": "Covers significant portion of front torso and upper sleeves",
+        "notTechniques": [
+          "embroidered",
+          "heat-transfer",
+          "silicone"
+        ]
+      },
+      {
+        "location": "sweatpants front, radiating from center crotch across thighs",
+        "description": "Multi-color diagonal stripe graphic",
+        "technique": "sublimation",
+        "color": "Multi-color (pink, light green, light purple, yellow)",
+        "size": "Covers significant portion of front thighs",
+        "notTechniques": [
+          "embroidered",
+          "heat-transfer",
+          "silicone"
+        ]
+      },
+      {
+        "location": "hoodie sleeves, outer side from mid-arm to cuff",
+        "description": "Vertical stripe pattern",
+        "technique": "sublimation",
+        "color": "Multi-color (light green, light purple, pink)",
+        "size": "Approx 2-3 inches wide, extending from mid-arm to cuff",
+        "notTechniques": [
+          "embroidered",
+          "woven-label-patch",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "hoodie, ribbed cuffs and bottom hem",
+        "description": "Multiple thin horizontal stripes",
+        "technique": "sublimation",
+        "color": "Multi-color (yellow, pink, light purple, light grey/white)",
+        "size": "Covers entire width of ribbed sections",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "laser-engraved"
+        ]
+      },
+      {
+        "location": "sweatpants, ribbed waistband and cuffs",
+        "description": "Multiple thin horizontal stripes",
+        "technique": "sublimation",
+        "color": "Multi-color (yellow, pink, light purple, light grey/white)",
+        "size": "Covers entire width of ribbed sections",
+        "notTechniques": [
+          "embroidered",
+          "silicone",
+          "laser-engraved"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The large, multi-color graphic elements and the rose logos exhibit characteristics consistent with sublimation printing, where the dye permeates the fabric fibers, resulting in a smooth, flat surface with vibrant colors that are integrated into the material rather than sitting on top. The 'R' logo on the back shows clear stitch definition and raised texture indicative of embroidery. The horizontal stripes on the ribbing are also consistent with sublimation on the ribbed fabric, maintaining the flat, integrated color look of the rest of the design.",
+    "analyzedAt": "2026-02-19T22:27:52.815Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-014",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Full-length editorial showing complete set — the chevron colorblock design is the hero visual element",
   "setting": "Clean minimalist white studio with champagne gold accent — Spring/Summer energy",
   "preOrder": true,
