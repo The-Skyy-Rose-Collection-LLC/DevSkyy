@@ -1,0 +1,19 @@
+# OpenAI core SDK
+openai>=1.84.0
+
+# OpenAI Agents SDK
+openai-agents>=0.0.16
+
+# LangChain OpenAI integration
+langchain-openai>=0.3.18
+langchain>=0.3.25
+
+# Vercel AI SDK (Python)
+# (no Python equivalent — use openai directly)
+
+# Utilities
+python-dotenv>=1.1.0
+pydantic>=2.11.5
+httpx>=0.28.1
+tiktoken>=0.9.0
+numpy>=1.26.0

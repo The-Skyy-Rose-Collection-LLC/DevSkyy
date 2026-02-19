@@ -1,0 +1,92 @@
+{
+  "models": [
+    {
+      "id": "grok-3",
+      "name": "Grok 3",
+      "type": "text",
+      "description": "Most capable Grok model — reasoning, coding, analysis",
+      "contextWindow": 131072,
+      "maxOutputTokens": 131072,
+      "inputPricing": { "per1MTokens": 3.00 },
+      "outputPricing": { "per1MTokens": 15.00 },
+      "capabilities": [
+        "text-generation", "chat", "code-generation", "reasoning",
+        "function-calling", "streaming"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "grok-3-fast",
+      "name": "Grok 3 Fast",
+      "type": "text",
+      "description": "Fast Grok 3 variant — speed optimized",
+      "contextWindow": 131072,
+      "maxOutputTokens": 131072,
+      "inputPricing": { "per1MTokens": 5.00 },
+      "outputPricing": { "per1MTokens": 25.00 },
+      "capabilities": [
+        "text-generation", "chat", "code-generation", "function-calling", "streaming"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "grok-3-mini",
+      "name": "Grok 3 Mini",
+      "type": "reasoning",
+      "description": "Lightweight reasoning model — affordable",
+      "contextWindow": 131072,
+      "maxOutputTokens": 131072,
+      "inputPricing": { "per1MTokens": 0.30 },
+      "outputPricing": { "per1MTokens": 0.50 },
+      "capabilities": [
+        "text-generation", "chat", "reasoning", "function-calling", "streaming"
+      ],
+      "recommended": true
+    },
+    {
+      "id": "grok-3-mini-fast",
+      "name": "Grok 3 Mini Fast",
+      "type": "reasoning",
+      "description": "Fastest Grok mini — lowest latency",
+      "contextWindow": 131072,
+      "maxOutputTokens": 131072,
+      "inputPricing": { "per1MTokens": 0.60 },
+      "outputPricing": { "per1MTokens": 4.00 },
+      "capabilities": [
+        "text-generation", "chat", "reasoning", "function-calling", "streaming"
+      ]
+    },
+    {
+      "id": "grok-2-vision-1212",
+      "name": "Grok 2 Vision",
+      "type": "multimodal",
+      "description": "Vision-capable Grok 2 — image understanding",
+      "contextWindow": 32768,
+      "maxOutputTokens": 32768,
+      "inputPricing": { "per1MTokens": 2.00 },
+      "outputPricing": { "per1MTokens": 10.00 },
+      "capabilities": [
+        "text-generation", "vision", "image-analysis", "chat", "streaming"
+      ]
+    },
+    {
+      "id": "aurora",
+      "name": "Aurora (Grok Image Gen)",
+      "type": "image-generation",
+      "description": "xAI's Aurora image generation model",
+      "contextWindow": 32000,
+      "inputPricing": { "per1MTokens": 0 },
+      "outputPricing": { "perImage": 0.07 },
+      "capabilities": ["image-generation", "multimodal"]
+    }
+  ],
+  "modelSelection": {
+    "fastTasks": "grok-3-mini",
+    "complexReasoning": "grok-3",
+    "visionTasks": "grok-2-vision-1212",
+    "longContext": "grok-3",
+    "production": "grok-3",
+    "imageGeneration": "aurora",
+    "realtimeSearch": "grok-3"
+  }
+}
