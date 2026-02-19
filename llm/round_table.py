@@ -1580,13 +1580,12 @@ async def _auto_register_providers(rt: LLMRoundTable) -> None:
     import os
 
     # Provider configurations: (env_var, provider_enum, model_name)
+    # Updated 2026-02-19: Latest model IDs for all 4 integrated providers
     provider_configs = [
-        ("ANTHROPIC_API_KEY", LLMProvider.CLAUDE, "claude-sonnet-4-20250514"),
+        ("ANTHROPIC_API_KEY", LLMProvider.CLAUDE, "claude-sonnet-4-6"),
         ("OPENAI_API_KEY", LLMProvider.GPT4, "gpt-4o"),
-        ("GOOGLE_API_KEY", LLMProvider.GEMINI, "gemini-2.0-flash"),
-        ("GROQ_API_KEY", LLMProvider.LLAMA, "llama-3.3-70b-versatile"),
-        ("MISTRAL_API_KEY", LLMProvider.MISTRAL, "mistral-small-latest"),
-        ("COHERE_API_KEY", LLMProvider.COHERE, "command-a-03-2025"),
+        ("GEMINI_API_KEY", LLMProvider.GEMINI, "gemini-3-flash-preview"),
+        ("XAI_API_KEY", LLMProvider.LLAMA, "grok-3-mini"),  # Using LLAMA enum for Grok
     ]
 
     for env_var, provider, model in provider_configs:
@@ -1650,9 +1649,13 @@ def _create_provider_generator(provider: LLMProvider, model: str, api_key: str) 
                 tokens = response.usage_metadata.total_token_count if response.usage_metadata else 0
 
             elif provider == LLMProvider.LLAMA:
-                import groq
+                # Using LLAMA enum for Grok (XAI) - OpenAI-compatible API
+                import openai
 
-                client = groq.AsyncGroq(api_key=api_key)
+                client = openai.AsyncOpenAI(
+                    api_key=api_key,
+                    base_url="https://api.x.ai/v1"
+                )
                 response = await client.chat.completions.create(
                     model=model,
                     max_tokens=2048,
@@ -1718,15 +1721,13 @@ def _create_provider_generator(provider: LLMProvider, model: str, api_key: str) 
 
 
 def _estimate_cost(provider: LLMProvider, tokens: int) -> float:
-    """Estimate cost based on provider and tokens."""
+    """Estimate cost based on provider and tokens (updated 2026-02-19)."""
     # Approximate costs per 1K tokens (blended input/output)
     costs_per_1k = {
-        LLMProvider.CLAUDE: 0.006,
-        LLMProvider.GPT4: 0.01,
-        LLMProvider.GEMINI: 0.0005,
-        LLMProvider.LLAMA: 0.0008,
-        LLMProvider.MISTRAL: 0.002,
-        LLMProvider.COHERE: 0.003,
+        LLMProvider.CLAUDE: 0.009,      # claude-sonnet-4-6: $3/$15 per 1M tokens
+        LLMProvider.GPT4: 0.01,          # gpt-4o: $2.50/$10 per 1M tokens
+        LLMProvider.GEMINI: 0.0001,      # gemini-3-flash-preview: free tier / very low cost
+        LLMProvider.LLAMA: 0.002,        # grok-3-mini: ~$2 per 1M tokens
     }
     return (tokens / 1000) * costs_per_1k.get(provider, 0.005)
 
