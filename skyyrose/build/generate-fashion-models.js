@@ -52,13 +52,13 @@ const PRODUCTS = [
     name: 'Black Rose Crewneck',
     referenceImage:  path.join(SOURCE_DIR, 'black-rose/br-001-crewneck-front.png'),
     referenceImage2: path.join(SOURCE_DIR, 'black-rose/br-001-crewneck-back.png'),
-    garmentTypeLock: 'CREWNECK SWEATSHIRT — upper body only. NOT a jersey, NOT a hoodie, NOT a jacket. Round neckline, no buttons, no hood. FRONT VIEW showing chest graphic. Show FRONT not back.',
+    garmentTypeLock: 'CREWNECK SWEATSHIRT — upper body only. NOT a jersey, NOT a hoodie, NOT a jacket. Round neckline, no buttons, no hood. FRONT VIEW. The logo is an EMBOSSED IMPRESSION — tonal, tone-on-tone, raised/recessed into the fabric — NOT a printed graphic, NOT a patch, NOT embroidered thread.',
     description: {
       garment: 'Black crewneck sweatshirt, white ribbed collar and cuffs',
       fit: 'Relaxed, slightly oversized streetwear fit',
-      details: 'Large center-chest graphic: two BLACK roses erupting from storm clouds like a mushroom cloud — grey/silver on black, tattoo-art style'
+      details: 'Center-chest BLACK Rose logo as an EMBOSSED IMPRESSION — tonal raised/debossed design pressed into the fabric itself, same black-on-black color, subtle 3D texture. No printed ink, no thread, no patch — the logo exists as a physical impression in the material.'
     },
-    modelPose: 'Standing confidently facing FORWARD, one hand in pocket, chest graphic fully visible — FRONT VIEW',
+    modelPose: 'Standing confidently facing FORWARD, one hand in pocket, chest area clearly lit to show embossed logo texture — FRONT VIEW',
     setting: 'Moonlit gothic garden, wrought-iron gates, fog rolling through dark roses'
   },
   {
@@ -66,13 +66,13 @@ const PRODUCTS = [
     collection: 'BLACK ROSE',
     name: 'Black Rose Joggers',
     referenceImage: path.join(SOURCE_DIR, 'black-rose/br-002-joggers.jpeg'),
-    garmentTypeLock: 'JOGGER PANTS — lower body only. NOT a hoodie, NOT a sweatshirt, NOT a jacket. Show FULL LENGTH of pants from waist to ankle. Both legs must be visible. Tapered at ankle with ribbed cuffs.',
+    garmentTypeLock: 'JOGGER PANTS — lower body only. NOT a hoodie, NOT a sweatshirt, NOT a jacket. Show FULL LENGTH of pants from waist to ankle. Both legs must be visible. Tapered at ankle with ribbed cuffs. The logo is a SILICONE CUT-OUT APPLIQUÉ — three-dimensional raised silicone piece adhered to the fabric, NOT a print, NOT embroidery, NOT a patch.',
     description: {
       garment: 'Black jogger pants, white ribbed waistband and ankle cuffs, black drawstring',
       fit: 'Tapered jogger fit, relaxed through thigh, tapered at ankle',
-      details: 'Small BLACK rose mushroom cloud graphic on upper left leg — grey/silver on black, matching crewneck graphic family'
+      details: 'BLACK Rose logo on upper left leg as a SILICONE CUT-OUT APPLIQUÉ — a three-dimensional raised silicone piece, slightly glossy, adhered directly onto the matte fabric. The logo has physical depth and a subtle sheen contrast against the flat black fabric. NOT a printed graphic, NOT embroidery.'
     },
-    modelPose: 'Full-length stance showing BOTH LEGS completely from waist to ankle, left-leg graphic visible',
+    modelPose: 'Full-length stance showing BOTH LEGS completely from waist to ankle — left-leg silicone logo clearly visible and catching light',
     setting: 'Gothic corridor with dark stone arches and moonlight'
   },
   {
@@ -148,13 +148,13 @@ const PRODUCTS = [
     collection: 'BLACK ROSE',
     name: "Women's BLACK Rose Hooded Dress",
     referenceImage: path.join(SOURCE_DIR, 'black-rose/br-008-hooded-dress-front.jpeg'),
-    garmentTypeLock: "DRESS — a full DRESS with skirt, NOT a hoodie, NOT a sweatshirt. FEMALE MODEL only. Full-length garment shown from hood to hem. The skirt/dress portion must be clearly visible below the waist.",
+    garmentTypeLock: "EXTENDED-LENGTH HOODIE — this is a HOODIE (with kangaroo pocket, drawstring hood, ribbed cuffs) that has been cut extra long, falling past the hips like a dress silhouette. It is NOT a traditional dress, NOT a skirt-based garment. FEMALE MODEL only. The garment looks like a hoodie from the top half but extends into a long hemline. Logo is EMBROIDERED — thread-stitched into the fabric.",
     description: {
-      garment: "Black hooded dress, women's fit, attached hood, dress extends below waist into skirt",
-      fit: "Fitted through body with flared or flowing skirt, feminine silhouette, full-length dress",
-      details: "BLACK Rose collection branding on dress — rose graphics, premium fabrication, dramatic hooded silhouette"
+      garment: "Black extended-length hoodie, women's cut — hoodie silhouette elongated to dress length. Drawstring hood, kangaroo pocket, ribbed cuffs and extra-long hem.",
+      fit: "Oversized hoodie proportions extended long — relaxed through body, hemline falls mid-thigh to knee, distinctly hoodie construction (not dress construction)",
+      details: "BLACK Rose logo EMBROIDERED on the chest — thread-stitched embroidery with slight texture raise. NOT a printed graphic, NOT silicone, NOT an impression. The extended hem length gives it a dress-like silhouette while remaining a hoodie in structure."
     },
-    modelPose: "FEMALE model, hood up, full-length shot showing dress from hood to hem — skirt clearly visible",
+    modelPose: "FEMALE model, hood up or down, full-length shot clearly showing: (1) the hoodie construction at top, (2) the extra-long extended hem — embroidered logo on chest visible",
     setting: "Gothic cathedral garden, moonlight filtering through stone arches, dark florals"
   },
 
