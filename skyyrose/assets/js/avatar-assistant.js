@@ -23,6 +23,18 @@
 
   const STATES = ['idle', 'thinking', 'talking', 'pointing', 'celebrating'];
 
+  // Default SKU shown per room when no product is active
+  const ROOM_DEFAULT_SKU = {
+    'black-rose': 'br-001',
+    'love-hurts': 'lh-001',
+    'signature':  'sg-001',
+    'default':    null,       // use base skyy.png
+  };
+
+  // Pose image base path (relative to index.html)
+  const POSE_BASE = 'assets/images/avatar/poses';
+  const SKYY_BASE = 'assets/images/avatar/skyy.png';
+
   const DEFAULT_CONFIG = {
     model:         'claude-sonnet-4-5-20250929',
     apiEndpoint:   '/api/assistant',
@@ -72,6 +84,9 @@
       this._outfitBadge   = null;
       this._armEl         = null;
       this._mouthEl       = null;
+      this._imgEl         = null;   // .avatar-img — Skyy character image
+      this._toggleImgEl   = null;   // .avatar-toggle-face
+      this._currentSku    = null;   // currently displayed product SKU
 
       // Reduced motion
       this._reducedMotion = this._detectReducedMotion();
@@ -191,6 +206,8 @@
           let assistantMsgEl = null;
 
           this.setState('talking');
+          // Walk pose while talking — returns to idle after response
+          this._swapPose(this._currentSku, 'walk');
 
           while (true) {
             const { done, value } = await reader.read();
@@ -240,7 +257,10 @@
         this.displayMessage('I\'m having a moment — please try again shortly. 🌹', 'assistant');
       } finally {
         this._streamController = null;
-        setTimeout(() => this.setState('idle'), 1200);
+        setTimeout(() => {
+          this.setState('idle');
+          this._swapPose(this._currentSku, 'idle');
+        }, 1200);
       }
     }
 
@@ -335,10 +355,21 @@
      */
     onProductView(product) {
       if (this._productTimer) clearTimeout(this._productTimer);
+
+      // Immediately swap Skyy to wear this product
+      if (product && product.id) {
+        this._swapPose(product.id, 'idle');
+      }
+
       this._productTimer = setTimeout(() => {
         if (!this._chatOpen) {
           const msg = `Loving the look of the ${product.name}? I can tell you everything about it — or help you find something that pairs perfectly. 🌹`;
           this._showBubble(msg, 3000);
+        }
+        // Swap to pointing pose to highlight the product
+        if (product && product.id) {
+          this._swapPose(product.id, 'point');
+          setTimeout(() => this._swapPose(product.id, 'idle'), 4000);
         }
       }, this.config.productViewDelay);
     }
@@ -374,6 +405,43 @@
       if (this._outfitBadge) {
         this._outfitBadge.textContent = this._roomLabel(room);
       }
+
+      // Swap Skyy to the room's default product outfit
+      const defaultSku = ROOM_DEFAULT_SKU[room] || null;
+      this._swapPose(defaultSku, 'idle');
+    }
+
+    // -------------------------------------------------------------------------
+    // Private: pose image swapping
+    // -------------------------------------------------------------------------
+
+    /**
+     * Swap Skyy's character image to the pose for the given SKU.
+     * Falls back gracefully: pose file → base skyy.png.
+     * @param {string|null} sku   — product ID e.g. 'br-001', or null for base image
+     * @param {'idle'|'point'|'walk'} pose
+     */
+    _swapPose(sku, pose = 'idle') {
+      if (!this._imgEl) return;
+
+      this._currentSku = sku;
+
+      const src = sku
+        ? `${POSE_BASE}/skyy-${pose}-${sku}.png`
+        : SKYY_BASE;
+
+      // Test image existence before committing (avoid broken img flash)
+      const test = new Image();
+      test.onload = () => {
+        if (this._imgEl)       this._imgEl.src       = src;
+        if (this._toggleImgEl) this._toggleImgEl.src = src;
+      };
+      // On error fall back to base skyy.png (pose image not yet generated)
+      test.onerror = () => {
+        if (this._imgEl       && this._imgEl.src       !== SKYY_BASE) this._imgEl.src       = SKYY_BASE;
+        if (this._toggleImgEl && this._toggleImgEl.src !== SKYY_BASE) this._toggleImgEl.src = SKYY_BASE;
+      };
+      test.src = src;
     }
 
     // -------------------------------------------------------------------------
@@ -922,6 +990,8 @@
       this._inputEl     = this._root.querySelector('.chat-input');
       this._toggleBtn   = this._root.querySelector('.avatar-toggle');
       this._outfitBadge = this._root.querySelector('.avatar-outfit-badge');
+      this._imgEl       = this._root.querySelector('.avatar-img');
+      this._toggleImgEl = this._root.querySelector('.avatar-toggle-face');
       this._armEl       = this._root.querySelector('.arm-group');
       this._mouthEl     = this._root.querySelector('.avatar-mouth');
       this._bubbleEl    = this._root.querySelector('.avatar-bubble');
