@@ -86,6 +86,26 @@ pytest -v && npm test && curl http://localhost:8000/health
 - ❌ **Mistake**: Hardcoding 3D library versions
   - ✅ **Correct**: Three.js v0.160.0, Babylon.js latest (via CDN)
 
+### Google ADK
+
+- ❌ **Mistake**: Using hyphens in `LlmAgent(name=...)`
+  - ✅ **Correct**: Agent names must be valid Python identifiers — use underscores: `skyyrose_content_director`
+
+- ❌ **Mistake**: Asking agent to process a whole collection in one turn
+  - ✅ **Correct**: Loop product-by-product with `time.sleep(8)` between calls to avoid 429 rate limits
+
+- ❌ **Mistake**: Writing audit prompts without read-only guard
+  - ✅ **Correct**: Prepend `"READ-ONLY AUDIT — do NOT call update_product_field()."` to any audit prompt
+
+- ❌ **Mistake**: Loading multiple `.env` files with `override=False` when one has a placeholder key
+  - ✅ **Correct**: Load the authoritative keys file LAST with `override=True` so real keys win
+
+- ❌ **Mistake**: Calling `runner.run()` without pre-creating session
+  - ✅ **Correct**: Always call `session_svc.create_session_sync()` before `runner.run()`
+
+- ❌ **Mistake**: Installing ADK deps into the image pipeline venv
+  - ✅ **Correct**: Use isolated `.venv-agents/` — ADK drags cloud deps that conflict with `numpy==2.3.5`
+
 ### Context7
 
 - ❌ **Mistake**: Writing library code before checking docs
