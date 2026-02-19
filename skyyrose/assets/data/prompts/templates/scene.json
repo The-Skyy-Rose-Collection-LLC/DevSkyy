@@ -1,0 +1,74 @@
+{
+  "_templateId": "scene",
+  "_version": "1.0.0",
+  "_description": "Room scene background template. Used by generate-scenes-gemini.js.",
+
+  "header": "LUXURY FASHION BRAND ENVIRONMENT — IMMERSIVE SCENE BACKGROUND",
+
+  "rooms": {
+    "black-rose": {
+      "name": "The Garden",
+      "concept": "Gothic cathedral garden at twilight — where darkness blooms",
+      "elements": [
+        "Gothic stone arches and cathedral architecture",
+        "Wrought-iron gates with rose vine motifs",
+        "Dark blooming roses in deep shadow and moonlight",
+        "Atmospheric ground fog rolling between stone pillars",
+        "Stained glass windows casting rose-gold light fragments",
+        "Moonlit cobblestone pathways"
+      ],
+      "lighting": "Moonlight as primary source — silver-blue cool cast with warm rose-gold accent from candles/stained glass",
+      "palette": "Deep charcoal, obsidian black, moonlit silver, rose gold warmth",
+      "mood": "Mysterious, ethereal, gothic romance",
+      "timeOfDay": "Twilight to midnight"
+    },
+    "love-hurts": {
+      "name": "The Ballroom",
+      "concept": "Baroque theater and grand ballroom — dramatic passion in red and gold",
+      "elements": [
+        "Ornate baroque theater with gilded moldings",
+        "Deep crimson velvet curtains and draping fabric",
+        "Crystal chandeliers with candlelight",
+        "Grand marble columns with baroque detail",
+        "Dark hardwood stage floor reflecting candlelight",
+        "Dramatic shadow arches and depth"
+      ],
+      "lighting": "Candlelight warmth, crimson theatrical spotlights, gold accent on gilded surfaces",
+      "palette": "Blood crimson, deep black, antique gold, candlelight amber",
+      "mood": "Dramatic, passionate, baroque grandeur",
+      "timeOfDay": "Eternal night inside — no windows"
+    },
+    "signature": {
+      "name": "The Runway",
+      "concept": "Minimalist luxury — marble penthouses, modern art galleries, SF skyline",
+      "elements": [
+        "Pristine white marble floors with subtle veining",
+        "Floor-to-ceiling windows with San Francisco skyline",
+        "Bay Bridge illuminated at golden hour",
+        "Minimalist art gallery white walls",
+        "Champagne gold accent fixtures and sculpture",
+        "Modern luxury furniture pieces as negative space"
+      ],
+      "lighting": "Golden hour sunlight through floor-to-ceiling windows, gallery track spotlights",
+      "palette": "Pure white, champagne gold, cool grey marble, warm afternoon sun",
+      "mood": "Elevated, prestige, Bay Area luxury editorial",
+      "timeOfDay": "Golden hour afternoon"
+    }
+  },
+
+  "technical": {
+    "aspectRatio": "16:9 (widescreen immersive)",
+    "quality": "Photorealistic luxury interior/exterior photography quality",
+    "depth": "Strong depth of field — foreground, midground, background layers",
+    "empty": "Scene must be EMPTY — no people, no products in frame. Pure environment.",
+    "resolution": "Ultra-high detail for hero background use"
+  },
+
+  "criticalRules": [
+    "NO people or characters in the scene",
+    "NO products or clothing visible",
+    "Environment must feel real enough to place fashion content in front of",
+    "Lighting must complement the collection's color palette",
+    "Atmosphere must match the collection's emotional identity"
+  ]
+}

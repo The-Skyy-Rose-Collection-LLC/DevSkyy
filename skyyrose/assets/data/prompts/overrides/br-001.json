@@ -1,0 +1,19 @@
+{
+  "productId": "br-001",
+  "name": "Black Rose Crewneck",
+  "collection": "black-rose",
+  "referenceImages": [
+    "black-rose/br-001-crewneck-front.png",
+    "black-rose/br-001-crewneck-back.png"
+  ],
+  "garmentTypeLock": "CREWNECK SWEATSHIRT — upper body only. NOT a jersey, NOT a hoodie, NOT a jacket. Round neckline, no buttons, no hood. FRONT VIEW. The logo is an EMBOSSED IMPRESSION — tonal, tone-on-tone, raised/recessed into the fabric — NOT a printed graphic, NOT a patch, NOT embroidered thread.",
+  "brandingTech": {
+    "logo": "Black rose logo physically embossed/debossed into the fabric surface — tonal raised relief, black-on-black, NOT contrasting color",
+    "technique": "embossed",
+    "notTechniques": ["printed", "embroidered", "silicone", "heat-transfer", "patch", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBOSSED IMPRESSION\n- Logo is physically debossed/raised into the fabric surface\n- Tonal: matches fabric color (black-on-black), NOT contrasting color\n- Subtle 3D texture visible in directional/raking light\n- MUST NOT render as: printed graphic, screen print, embroidered thread, applied patch, silicone appliqué, or heat-transfer vinyl\n- This is a legally meaningful product specification"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Standing confidently facing FORWARD, one hand in pocket, chest area clearly lit to show embossed logo texture — FRONT VIEW",
+  "setting": "Moonlit gothic garden, wrought-iron gates, fog rolling through dark roses"
+}

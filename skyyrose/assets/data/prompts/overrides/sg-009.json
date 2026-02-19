@@ -1,0 +1,19 @@
+{
+  "productId": "sg-009",
+  "name": "The Sherpa Jacket",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-009-sherpa-front.jpg",
+    "signature/sg-009-sherpa-back.jpg"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "Signature Collection SR branding on sherpa jacket — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-009"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Jacket fully buttoned, one hand in pocket, showing both front and hinting at back — powerful editorial presence",
+  "setting": "Marble penthouse lobby, floor-to-ceiling windows, champagne gold winter light"
+}

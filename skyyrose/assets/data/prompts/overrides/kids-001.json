@@ -1,0 +1,38 @@
+{
+  "productId": "kids-001",
+  "name": "Kids Colorblock Hoodie Set — Purple/Pink",
+  "collection": "kids-capsule",
+  "referenceImages": [
+    "kids-capsule/kids-001-hoodie-set-purple.jpeg"
+  ],
+  "garmentTypeLock": "KIDS COLORBLOCK HOODIE + JOGGER SET — children's sizing. Pullover colorblock hoodie with kangaroo pocket and drawstring hood. Purple/pink colorway: pink body panels + lavender/purple hood, sleeves, side panels — diagonal chevron split. Deep purple/violet matching jogger pants.",
+  "brandingTech": {
+    "logo": "Two chest logos (left: circular brand badge, right: rose mushroom cloud) + pant thigh logo — all EMBROIDERED",
+    "technique": "embroidered",
+    "locations": [
+      {
+        "location": "Left chest — circular logo",
+        "description": "Three-part circular badge: top arc 'Skyy Rose', center: Black Rose graphic, bottom: 'Collection' text",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer", "woven-separate"]
+      },
+      {
+        "location": "Right chest — rose mushroom cloud",
+        "description": "Small rose mushroom cloud graphic in white/grey",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer"]
+      },
+      {
+        "location": "Pant left thigh",
+        "description": "Small rose mushroom cloud logo",
+        "technique": "embroidered"
+      }
+    ],
+    "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nAll logos: EMBROIDERED — thread-stitched\nLeft chest circular badge: 'Skyy Rose' top + Black Rose graphic center + 'Collection' bottom\nRight chest rose cloud: white/grey embroidered\nPant thigh: small embroidered logo\nSPECIAL INSTRUCTION: Make this look SPECIAL — elevated kids editorial, joyful luxury, premium feel.\nThis is the introduction to the Kids Capsule collection."
+  },
+  "logoFingerprint": null,
+  "modelPose": "Fun, energetic kids editorial — full body showing complete colorblock set. Joyful, playful but premium pose.",
+  "setting": "Bright, vibrant luxury kids editorial space — colorful but elevated, not generic",
+  "specialInstruction": "Make these look SPECIAL — joyful luxury, not generic. Elevated premium kids editorial."
+}

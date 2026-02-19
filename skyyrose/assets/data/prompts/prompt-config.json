@@ -1,0 +1,105 @@
+{
+  "_comment": "SkyyRose Prompt Studio — Brand DNA, Collection DNA, Model routing config. Single source of truth for all generation pipelines.",
+  "_version": "1.0.0",
+  "_updated": "2026-02-19",
+
+  "brand": {
+    "name": "SkyyRose",
+    "tagline": "Where Love Meets Luxury",
+    "accentColor": "#B76E79",
+    "qualityStandard": "Vogue / Harper's Bazaar editorial quality",
+    "cameraGrade": "Medium format, Hasselblad quality",
+    "photographyStyle": "Professional luxury fashion editorial",
+    "disclaimer": "AI-generated images are artistic interpretations for visualization purposes. Always reference source-products/ as definitive record of true appearance."
+  },
+
+  "collections": {
+    "black-rose": {
+      "displayName": "BLACK ROSE",
+      "accentColor": "#B76E79",
+      "mood": "Gothic romance, mysterious elegance, dark florals",
+      "palette": "Deep blacks, rose gold accents, burgundy shadows, moonlight silver",
+      "settings": ["Gothic gardens", "cathedral interiors", "moonlit terraces", "wrought-iron gates", "stone arches"],
+      "voice": "Mysterious, editorial, gothic luxury",
+      "lighting": "Raking moonlight, dramatic shadows, rose gold rim lighting",
+      "adIdentity": {
+        "platformVoice": "Mysterious, editorial, gothic luxury",
+        "colorEmphasis": "#B76E79 rose gold highlights, deep blacks",
+        "style": "Dark, moody, cinematic"
+      }
+    },
+    "love-hurts": {
+      "displayName": "LOVE HURTS",
+      "accentColor": "#8B0000",
+      "mood": "Dramatic passion, edgy sophistication, bold intensity",
+      "palette": "Blood red, deep crimson, black leather, gold hardware",
+      "settings": ["Dramatic ballrooms", "baroque theaters", "candlelit chambers", "crimson velvet stages"],
+      "voice": "Bold, passionate, street-heat",
+      "lighting": "Candlelit drama, crimson spotlights, high-contrast shadows",
+      "adIdentity": {
+        "platformVoice": "Bold, passionate, street-heat",
+        "colorEmphasis": "#8B0000 crimson, leather black",
+        "style": "Dramatic, high-contrast, raw"
+      }
+    },
+    "signature": {
+      "displayName": "SIGNATURE",
+      "accentColor": "#D4AF37",
+      "mood": "High fashion prestige, editorial excellence, luxury power",
+      "palette": "Champagne gold, pure white, marble textures, crystal clarity",
+      "settings": ["Minimalist runways", "marble penthouses", "modern art galleries", "SF waterfront", "Bay Bridge backdrop"],
+      "voice": "High fashion, prestige, Bay Area pride",
+      "lighting": "Clean editorial, golden hour, gallery track lighting",
+      "adIdentity": {
+        "platformVoice": "High fashion, prestige, Bay Area pride",
+        "colorEmphasis": "#D4AF37 champagne gold, white marble",
+        "style": "Clean, elevated, editorial"
+      }
+    },
+    "kids-capsule": {
+      "displayName": "KIDS CAPSULE",
+      "accentColor": "#FF6B9D",
+      "mood": "Joyful luxury, aspirational, premium kids streetwear",
+      "palette": "Vibrant colorblock palette — pink, lavender, black/red/white",
+      "settings": ["Bright studio", "colorful playground luxury", "editorial kids space"],
+      "voice": "Joyful luxury, aspirational, SPECIAL",
+      "lighting": "Bright, warm, vibrant editorial",
+      "specialInstruction": "Make these look SPECIAL — this is the intro to the kids collection. Elevated kids editorial, joyful luxury, not generic.",
+      "adIdentity": {
+        "platformVoice": "Joyful luxury, aspirational",
+        "colorEmphasis": "Vibrant colorblock palette",
+        "style": "Bright, energetic, premium"
+      }
+    }
+  },
+
+  "modelRouting": {
+    "fashionModel": {
+      "stage1Vision": "gemini-2.5-flash",
+      "stage2Generation": "gemini-2.5-flash-image"
+    },
+    "skyyPose": {
+      "stage1Vision": "gemini-2.5-flash",
+      "stage2FlashImage": "gemini-2.5-flash-image",
+      "stage2Imagen": "imagen-4.0-generate-001"
+    },
+    "scene": {
+      "generation": "gemini-2.5-flash-image"
+    },
+    "adCreative": {
+      "primary": "gemini-2.5-flash-image",
+      "alternate": "imagen-4.0-generate-001"
+    },
+    "fingerprint": {
+      "vision": "gemini-2.5-flash"
+    }
+  },
+
+  "outputFormats": {
+    "instagram": { "ratio": "1:1", "description": "Square post" },
+    "stories": { "ratio": "9:16", "description": "TikTok / Stories / Reels" },
+    "tiktok-cover": { "ratio": "9:16", "description": "TikTok cover" },
+    "launch-banner": { "ratio": "16:9", "description": "Banner / YouTube thumbnail" },
+    "editorial": { "ratio": "2:3", "description": "Fashion editorial portrait standard" }
+  }
+}

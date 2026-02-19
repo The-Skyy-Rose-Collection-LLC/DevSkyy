@@ -1,0 +1,16 @@
+{
+  "productId": "br-004",
+  "name": "Black Rose Hoodie",
+  "collection": "black-rose",
+  "referenceImages": ["black-rose/br-004-hoodie-front.png"],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "BLACK rose mushroom cloud graphic on chest — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint br-004"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Hood down, hands in kangaroo pocket, confident relaxed stance showing full chest graphic",
+  "setting": "Moonlit gothic garden, rose bushes in background, atmospheric fog"
+}

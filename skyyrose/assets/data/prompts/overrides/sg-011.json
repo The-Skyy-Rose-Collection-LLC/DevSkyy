@@ -1,0 +1,31 @@
+{
+  "productId": "sg-011",
+  "name": "The Signature Beanie — Grey",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-011-beanie-grey.jpeg"
+  ],
+  "garmentTypeLock": "GREY KNIT BEANIE — heathered grey/charcoal colorway with chunky open knit texture (NOT ribbed). Wide fold-up cuff. Laser-engraved leather patch on cuff center — circular black rose debossed into tan/caramel leather circle. Small square leather tag on cuff side.",
+  "brandingTech": {
+    "logo": "Circular laser-engraved leather patch on cuff center — black rose debossed into tan/caramel leather",
+    "technique": "laser-engraved leather patch",
+    "locations": [
+      {
+        "location": "Cuff center",
+        "description": "Circular leather patch — black rose debossed/burned into tan/caramel genuine or faux leather circle",
+        "technique": "laser-engraved",
+        "notTechniques": ["embroidered", "printed", "woven", "sublimation"]
+      },
+      {
+        "location": "Cuff side",
+        "description": "Small square leather tag — tan/caramel leather with brand mark",
+        "technique": "laser-engraved"
+      }
+    ],
+    "notTechniques": ["embroidered", "printed", "woven", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: LASER-ENGRAVED LEATHER PATCH\n- Circular leather patch on cuff — tan/caramel colored genuine or faux leather\n- Black rose design is burned/debossed into the leather surface via laser engraving\n- NOT embroidered thread, NOT printed ink, NOT woven pattern\n- Knit texture: chunky open knit (NOT ribbed) — heathered grey/charcoal colorway\n- Second small square leather tag on cuff side"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Head and shoulders editorial portrait, cuff folded to show leather patch clearly, confident gaze",
+  "setting": "Minimalist dark luxury studio, champagne gold rim lighting"
+}

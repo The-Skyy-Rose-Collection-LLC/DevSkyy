@@ -1,0 +1,38 @@
+{
+  "productId": "kids-002",
+  "name": "Kids Colorblock Hoodie Set — Black/Red/White",
+  "collection": "kids-capsule",
+  "referenceImages": [
+    "kids-capsule/kids-002-hoodie-set-black-red.jpeg"
+  ],
+  "garmentTypeLock": "KIDS COLORBLOCK HOODIE + JOGGER SET — children's sizing. Same cut as kids-001. Tri-color split: Black body + Red hood/top section + White diagonal chevron panel. Bold tri-color with high contrast. Black matching jogger pants.",
+  "brandingTech": {
+    "logo": "Two chest logos (left: circular brand badge, right: rose mushroom cloud) + pant thigh logo — all EMBROIDERED in white",
+    "technique": "embroidered",
+    "locations": [
+      {
+        "location": "Left chest — circular logo",
+        "description": "Three-part circular badge in white: top arc 'Skyy Rose', center: Black Rose graphic, bottom: 'Collection' text",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer"]
+      },
+      {
+        "location": "Right chest — rose mushroom cloud",
+        "description": "Small rose mushroom cloud in white on black section",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer"]
+      },
+      {
+        "location": "Pant left thigh",
+        "description": "Small white logo on black pants",
+        "technique": "embroidered"
+      }
+    ],
+    "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nAll logos: EMBROIDERED — thread-stitched in white\nLeft chest circular badge: white embroidered 'Skyy Rose' + Black Rose + 'Collection'\nRight chest rose cloud: white embroidered on black fabric\nPant thigh: small white embroidered logo on black pants\nSPECIAL INSTRUCTION: Make this look SPECIAL — bold, energetic but PREMIUM kids editorial.\nThis is the introduction to the Kids Capsule collection."
+  },
+  "logoFingerprint": null,
+  "modelPose": "Fun, bold kids editorial — full body showing tri-color black/red/white colorblock set. Energetic, confident, premium.",
+  "setting": "Bold luxury kids editorial — high contrast environment matching the tri-color palette",
+  "specialInstruction": "Make these look SPECIAL — bold luxury, not generic. Premium kids editorial."
+}

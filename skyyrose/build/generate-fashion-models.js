@@ -17,6 +17,7 @@
 const path = require('path');
 const fs = require('fs').promises;
 const { GoogleGenAI } = require('@google/genai');
+const { PromptEngine } = require('./prompt-engine');
 
 const SOURCE_DIR = path.join(__dirname, '../assets/images/source-products');
 
@@ -417,32 +418,39 @@ async function loadReferenceImage(imagePath) {
   }
 }
 
+// Lazy-initialized PromptEngine instance — shared across all calls
+let _promptEngine = null;
+function getPromptEngine() {
+  if (!_promptEngine) _promptEngine = new PromptEngine();
+  return _promptEngine;
+}
+
 /**
- * Create professional fashion editorial prompt.
+ * Create professional fashion editorial prompt via PromptEngine.
+ * Falls back to the hardcoded prompt if the engine override is missing.
  * @param {object} product - Product config with description, setting, etc.
  * @param {string|null} garmentAnalysis - Flash Stage-1 technical spec (may be null)
  */
 function createFashionPrompt(product, garmentAnalysis = null) {
-  const brandDNA = BRAND_DNA[product.collection];
-
-  const garmentLockBlock = product.garmentTypeLock
-    ? `\n⚠️  GARMENT TYPE LOCK (READ FIRST):\n${product.garmentTypeLock}\nDo NOT substitute any other garment type. Generate EXACTLY this.\n`
-    : '';
-
-  const analysisBlock = garmentAnalysis
-    ? `\n🔬 FLASH VISION ANALYSIS — TECHNICAL SPEC (highest priority reference):\n${garmentAnalysis}\n`
-    : '';
-
-  return `
+  const engine = getPromptEngine();
+  try {
+    return engine.resolve(product.id, 'fashion-model', { garmentAnalysis });
+  } catch {
+    // Fallback: engine couldn't resolve (e.g. override missing) — build inline
+    const brandDNA = BRAND_DNA[product.collection];
+    const garmentLockBlock = product.garmentTypeLock
+      ? `\n⚠️  GARMENT TYPE LOCK (READ FIRST):\n${product.garmentTypeLock}\nDo NOT substitute any other garment type. Generate EXACTLY this.\n`
+      : '';
+    const analysisBlock = garmentAnalysis
+      ? `\n🔬 FLASH VISION ANALYSIS — TECHNICAL SPEC (highest priority reference):\n${garmentAnalysis}\n`
+      : '';
+    return `
 PROFESSIONAL LUXURY FASHION EDITORIAL PHOTOGRAPHY
 
 BRAND: SkyyRose ${product.collection} Collection
 PRODUCT: ${product.name}
 STYLE: Vogue, Harper's Bazaar, Elle editorial quality
-${garmentLockBlock}${product.referenceImage ? `REFERENCE IMAGES PROVIDED ABOVE:
-The images above show the ACTUAL product. Use them as your exact reference — replicate every color, graphic, text, logo, and design detail precisely on the model.
-
-` : ''}${analysisBlock}SUBJECT - FASHION MODEL:
+${garmentLockBlock}${analysisBlock}SUBJECT - FASHION MODEL:
 - Professional fashion model wearing ${product.description.garment}
 - Expression: Confident, powerful, sophisticated intensity
 - Pose: ${product.modelPose}
@@ -453,7 +461,6 @@ GARMENT DETAILS (CRITICAL - MUST MATCH REFERENCE EXACTLY):
 - Fit: ${product.description.fit}
 - Details: ${product.description.details}
 - REPRODUCE EVERY GRAPHIC, TEXT, AND DESIGN ELEMENT FROM THE REFERENCE IMAGE
-- PRODUCT MUST BE CLEARLY VISIBLE AND RECOGNIZABLE
 
 SETTING & ENVIRONMENT:
 ${product.setting}
@@ -463,41 +470,27 @@ ${product.setting}
 PHOTOGRAPHY STYLE:
 - Professional editorial fashion photography
 - Shot with medium format camera (Hasselblad quality)
-- Professional model casting
-- High-end fashion magazine standard
 
 LIGHTING:
 - Professional editorial lighting setup
 - ${brandDNA.color} accent lighting throughout
 - Dramatic shadows creating depth and dimension
-- Soft key light, dramatic rim lighting
 
 COLOR PALETTE:
 - Primary colors: ${brandDNA.palette}
 - Brand accent color: ${brandDNA.color} prominently featured
-- Rich, saturated colors with luxury depth
-- Editorial color grading (Vogue/Harper's Bazaar quality)
 
 COMPOSITION:
 - Full-body or 3/4 body shot showing entire garment
 - Rule of thirds composition
-- Negative space for product focus
-- Model positioned to showcase garment details
 
-TECHNICAL SPECIFICATIONS:
-- Aspect ratio: Portrait 2:3 (fashion editorial standard)
-- Quality: Magazine editorial standard
-- Sharpness: Crystal clear, professionally retouched
+TECHNICAL:
+- Portrait 2:3 aspect ratio
+- Magazine editorial standard quality
 
-CRITICAL REQUIREMENTS:
-1. Model must be wearing EXACTLY the product shown — ${product.garmentTypeLock || product.description.garment}
-2. All graphics, text, logos must be faithfully reproduced from the reference
-3. Professional editorial quality throughout
-4. Expression and pose match collection identity
-5. Lighting complements product and brand colors
-
-Generate a ultra-luxury fashion editorial photograph that exceeds Vogue quality standards.
-  `.trim();
+Generate an ultra-luxury fashion editorial photograph that exceeds Vogue quality standards.
+    `.trim();
+  }
 }
 
 /**

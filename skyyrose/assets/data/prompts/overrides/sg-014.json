@@ -1,0 +1,40 @@
+{
+  "productId": "sg-014",
+  "name": "Pastel Chevron Tracksuit Set",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-014-pastel-tracksuit-flat.jpeg"
+  ],
+  "garmentTypeLock": "FULL-ZIP HOODIE JACKET + SLIM JOGGER PANTS — matching pastel chevron tracksuit set. PRE-ORDER ITEM — source is a TECH FLAT (design drawing), NOT a product photo. Render as luxury fashion editorial visualization from the design spec.",
+  "brandingTech": {
+    "logo": "Front chest rose graphic: SUBLIMATION PRINT; Back 'SR' script monogram: EMBROIDERED; Colorblock chevron stripes: cut-and-sew panels or sublimation",
+    "technique": "mixed",
+    "locations": [
+      {
+        "location": "Front chest — rose graphic",
+        "description": "Small rose graphic where chevron stripes converge",
+        "technique": "sublimation",
+        "notTechniques": ["embroidered", "silicone", "heat-transfer"]
+      },
+      {
+        "location": "Back — 'SR' script/cursive monogram",
+        "description": "SR monogram between shoulder blades",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "sublimation", "silicone"]
+      },
+      {
+        "location": "Chevron stripe panels",
+        "description": "Diagonal chevron stripes: Lavender + Yellow/lime + Mint green + Pink — symmetrical V-shape",
+        "technique": "cut-and-sew panels",
+        "note": "Colorblock construction — multi-stripe diagonal chevron with sawtooth/zigzag edge"
+      }
+    ],
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRE-ORDER ITEM FROM TECH FLAT:\nThis is a PRE-ORDER. Render as luxury fashion editorial visualization.\nFront rose graphic: SUBLIMATION PRINT\nBack 'SR' monogram (jacket only): EMBROIDERED\nStripes: Cut-and-sew colorblock panels — lavender + yellow/lime + mint + pink diagonal chevron\nBase: White body, pink hood\nIMPORTANT: Make this look ASPIRATIONAL and PREMIUM — pre-order announcement piece"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Full-length editorial showing complete set — the chevron colorblock design is the hero visual element",
+  "setting": "Clean minimalist white studio with champagne gold accent — Spring/Summer energy",
+  "preOrder": true,
+  "note": "SOURCE IS TECH FLAT — no manufactured product yet. Flash fingerprint not applicable until product exists."
+}

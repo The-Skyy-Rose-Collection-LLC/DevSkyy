@@ -1,0 +1,18 @@
+{
+  "productId": "br-008",
+  "name": "Women's BLACK Rose Hooded Dress",
+  "collection": "black-rose",
+  "referenceImages": [
+    "black-rose/br-008-hooded-dress-front.jpeg"
+  ],
+  "garmentTypeLock": "EXTENDED-LENGTH HOODIE — this is a HOODIE (with kangaroo pocket, drawstring hood, ribbed cuffs) that has been cut extra long, falling past the hips like a dress silhouette. It is NOT a traditional dress, NOT a skirt-based garment. FEMALE MODEL only. The garment looks like a hoodie from the top half but extends into a long hemline. Logo is EMBROIDERED — thread-stitched into the fabric.",
+  "brandingTech": {
+    "logo": "BLACK Rose logo embroidered on chest — thread-stitched with slight texture raise",
+    "technique": "embroidered",
+    "notTechniques": ["printed", "silicone", "embossed", "heat-transfer", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBROIDERED\n- Logo is thread-stitched directly into the fabric\n- Slight raised texture from thread buildup — visible in raking light\n- Thread has subtle sheen difference from surrounding fabric\n- MUST NOT render as: printed graphic, silicone appliqué, embossed impression, heat-transfer\n- This is a legally meaningful product specification"
+  },
+  "logoFingerprint": null,
+  "modelPose": "FEMALE model, hood up or down, full-length shot clearly showing: (1) the hoodie construction at top, (2) the extra-long extended hem — embroidered logo on chest visible",
+  "setting": "Gothic cathedral garden, moonlight filtering through stone arches, dark florals"
+}

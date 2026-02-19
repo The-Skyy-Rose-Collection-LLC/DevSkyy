@@ -1,0 +1,46 @@
+{
+  "productId": "lh-005",
+  "name": "Love Hurts Bomber Jacket",
+  "collection": "love-hurts",
+  "referenceImages": [
+    "love-hurts/lh-005-bomber-flat.jpeg",
+    "love-hurts/lh-005-bomber-hood-detail.jpeg",
+    "love-hurts/lh-005-bomber-worn.jpeg"
+  ],
+  "garmentTypeLock": "HOODED VARSITY/BOMBER JACKET — satin shell, two-tone colorway. White body + black sleeves/back side panels. Snap buttons down front. Classic varsity silhouette with hood. NOT a crewneck, NOT a plain jacket, NOT a hoodie sweatshirt.",
+  "brandingTech": {
+    "logo": "Multi-technique: front 'Love Hurts' script is EMBROIDERED raised thread; back heart/rose graphic is EMBROIDERED; hood lining floral is SUBLIMATION; small chest patch is EMBROIDERED patch",
+    "technique": "mixed",
+    "locations": [
+      {
+        "location": "Front — 'Love Hurts' script text",
+        "description": "Large 'Love Hurts' script in RED with dark shadow/black outline",
+        "technique": "embroidered",
+        "notTechniques": ["screen-print", "sublimation", "heat-transfer", "silicone"]
+      },
+      {
+        "location": "Back — tattoo-art sacred heart graphic",
+        "description": "Sacred heart with thorns bleeding + red roses — back of jacket",
+        "technique": "embroidered",
+        "notTechniques": ["sublimation", "printed", "silicone"],
+        "note": "CONFIRMED: NOT sublimation. Raised thread stitching."
+      },
+      {
+        "location": "Hood lining",
+        "description": "Allover floral print — orange/tan roses on white satin",
+        "technique": "sublimation",
+        "notTechniques": ["embroidered", "printed-separate"],
+        "note": "SUBLIMATION — allover print dyed into lining fabric (lining only)"
+      },
+      {
+        "location": "Small chest patch near collar",
+        "description": "Circular embroidered logo/patch",
+        "technique": "embroidered-patch"
+      }
+    ],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — MULTI-TECHNIQUE PRODUCT (NO FALSE ADVERTISING):\nFront 'Love Hurts' script: EMBROIDERED — raised thread stitching, NOT screen print\nBack heart/rose graphic: EMBROIDERED — raised thread stitching (CONFIRMED NOT sublimation)\nHood lining floral: SUBLIMATION — allover print dyed into lining fabric (lining only)\nSmall chest patch: EMBROIDERED PATCH — sewn-on circular badge\nCuffs/hem trim: Ribbed stripe (knit construction — red + white + black)\nClosure: Snap buttons (classic varsity snap closure)"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Jacket snapped, showing both front script and silhouette — one arm raised to show sleeve detail. Hood up optional.",
+  "setting": "Grand baroque staircase, deep crimson carpet, dramatic golden candlelight — street meets luxury"
+}

@@ -1,0 +1,68 @@
+{
+  "_templateId": "skyy-pose",
+  "_version": "1.0.0",
+  "_description": "Skyy mascot character pose template. Used by generate-skyy-poses.js.",
+
+  "header": "3D CGI ANIMATED CHARACTER IMAGE — PIXAR QUALITY",
+  "referenceInstruction": "FIRST IMAGE = CHARACTER REFERENCE (Skyy). REMAINING IMAGES = PRODUCT REFERENCE (garment to replicate).",
+
+  "artStyle": {
+    "block": "ART STYLE — NON-NEGOTIABLE",
+    "style": "3D CGI animated. Pixar / Disney movie quality.",
+    "tone": "Stylized, warm, NOT photorealistic.",
+    "instruction": "MATCH THE ART STYLE OF THE FIRST REFERENCE IMAGE EXACTLY."
+  },
+
+  "character": {
+    "name": "Skyy",
+    "block": "CHARACTER IDENTITY — MATCH THE REFERENCE IMAGE EXACTLY",
+    "ageAppearance": "Young girl character, approximately 8-10 years old appearance",
+    "build": "Petite, compact, childlike proportions — shorter stature, round cute body shape. NOT an adult — NOT tall fashion-model proportions.",
+    "hair": "Large, voluminous, fluffy natural afro. Pure dark brown/black color ONLY — no red tint, no colored glow. Big, round, cloud-like. Soft curly texture — individual curls visible within the puff. Hair color must remain true dark brown/black.",
+    "skin": "Warm medium-brown complexion. Smooth, even 3D CGI skin tone (not photorealistic texture).",
+    "face": "Large, wide-set expressive eyes with long lashes. Small round nose. Warm friendly smile. Round chubby cheeks. Childlike, sweet, approachable.",
+    "expression": "Friendly, warm, confident — the little ambassador of the brand",
+    "criticalRules": [
+      "Art style MUST be 3D CGI animated — Pixar/Disney quality",
+      "Large natural afro is non-negotiable — this is her defining feature",
+      "Young girl proportions — petite and cute, NOT adult model",
+      "Match the reference character image attached as the first image"
+    ]
+  },
+
+  "poses": {
+    "idle": {
+      "label": "Presenting — arms slightly open, welcoming pose",
+      "description": "Standing tall facing forward, arms slightly extended at sides in a welcoming open gesture — like she's presenting the collection. Weight slightly on one hip. Confident, warm, editorial. Full body visible from head to toe.",
+      "cameraAngle": "Full body shot, slight low angle (3/4 height), head at upper third"
+    },
+    "point": {
+      "label": "Pointing — hand extended toward product/collection",
+      "description": "One arm extended forward pointing toward camera-left, fingers elegant and deliberate. Other hand resting on hip. Engaging gaze. Body turned 3/4 toward camera. Full body visible.",
+      "cameraAngle": "Full body 3/4 angle, head and pointing hand in upper quadrant"
+    },
+    "walk": {
+      "label": "Walking — confident runway stride",
+      "description": "Mid-stride walking pose — one leg forward, slight arm swing, head high, shoulder back. Runway walk energy. The garment moves naturally with the stride. Full body from head to foot.",
+      "cameraAngle": "Full body slight diagonal, mid-stride captured at peak motion"
+    }
+  },
+
+  "clothingRules": [
+    "IDENTICAL reproduction of every graphic, text, logo, color, hardware detail",
+    "If the garment has text — the EXACT same text, same font style, same placement",
+    "No artistic simplification — reproduce EVERY detail from the product reference images"
+  ],
+
+  "background": {
+    "style": "Clean studio background appropriate to the collection",
+    "instruction": "Transparent or solid color — character must be the focus. NO busy backgrounds unless specified in product override."
+  },
+
+  "criticalRules": [
+    "Character identity = Skyy from reference. Non-negotiable.",
+    "Clothing = exact product from reference photos. Non-negotiable.",
+    "Art style = 3D CGI Pixar/Disney. Non-negotiable.",
+    "Full body visible — head to toe"
+  ]
+}

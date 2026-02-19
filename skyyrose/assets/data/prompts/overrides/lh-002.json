@@ -1,0 +1,19 @@
+{
+  "productId": "lh-002",
+  "name": "Love Hurts Joggers",
+  "collection": "love-hurts",
+  "referenceImages": [
+    "love-hurts/lh-002-joggers-black.png",
+    "love-hurts/lh-002-joggers-white-1.png"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "Love Hurts rose heart motif on leg — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint lh-002"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Dynamic stance showing full leg length, both colorways visible in composite or alternating",
+  "setting": "Candlelit baroque ballroom, crystal chandeliers, dramatic blood-red shadows"
+}
