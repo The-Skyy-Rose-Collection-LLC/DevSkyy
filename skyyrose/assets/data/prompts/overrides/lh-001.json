@@ -1,0 +1,19 @@
+{
+  "productId": "lh-001",
+  "name": "The Fannie",
+  "collection": "love-hurts",
+  "referenceImages": [
+    "love-hurts/lh-001-fannie-front-1.jpeg",
+    "love-hurts/lh-001-fannie-front-2.jpg"
+  ],
+  "garmentTypeLock": "FANNY PACK / WAIST BAG — a small accessory bag worn on the body. NOT a dress, NOT a gown, NOT clothing. The model wears their own outfit underneath and the fanny pack is the ACCESSORY being featured, worn cross-body across the chest or around the waist. The bag must be the clear focal point.",
+  "brandingTech": {
+    "logo": "Love Hurts tattoo flash rose heart branding on fanny pack — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint lh-001"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Model wearing a simple fitted outfit, fanny pack worn cross-body as the hero accessory — bag clearly visible and in focus",
+  "setting": "Dramatic baroque theater stage, deep red velvet curtains, moody dramatic lighting"
+}

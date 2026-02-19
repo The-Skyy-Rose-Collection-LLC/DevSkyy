@@ -1,0 +1,19 @@
+{
+  "productId": "sg-003",
+  "name": "The Signature Tee — Orchid",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-003-tee-orchid-front.jpg",
+    "signature/sg-003-tee-orchid.jpeg"
+  ],
+  "garmentTypeLock": "T-SHIRT — short sleeve crew-neck tee. NOT a plain tee — it has a GRAPHIC on the front. Reproduce the exact graphic from the reference image. The orchid/purple colorway shirt with its specific print design.",
+  "brandingTech": {
+    "logo": "Front graphic print on orchid/purple tee — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-003"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Standing facing forward, arms relaxed, chest forward — front graphic fully visible and sharp",
+  "setting": "Minimalist modern art gallery, clean white walls, gallery track lighting"
+}

@@ -1,0 +1,44 @@
+{
+  "productId": "sg-013",
+  "name": "Mint & Lavender Crewneck Set",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-013-mint-crewneck-set-front.jpeg",
+    "signature/sg-013-mint-crewneck-set-back.jpeg"
+  ],
+  "garmentTypeLock": "CREWNECK SET — matching crewneck sweatshirt (NO hood, round neckline) + jogger pants, both mint green. DIFFERENT PRODUCT from sg-006 hoodie. Logo appears on FOUR locations: crewneck front, crewneck back, pant front left thigh, pant back left thigh — all EMBROIDERED.",
+  "brandingTech": {
+    "logo": "Large lavender/purple rose mushroom cloud — EMBROIDERED on front AND back of crewneck, and both thighs of joggers",
+    "technique": "embroidered",
+    "locations": [
+      {
+        "location": "Crewneck front center",
+        "description": "Large lavender/purple rose mushroom cloud erupting from grey clouds",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"]
+      },
+      {
+        "location": "Crewneck back upper",
+        "description": "Same large lavender/purple rose mushroom cloud — between shoulder blades",
+        "technique": "embroidered",
+        "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"]
+      },
+      {
+        "location": "Pant front left thigh",
+        "description": "Smaller lavender/purple rose mushroom cloud — same design, smaller scale",
+        "technique": "embroidered"
+      },
+      {
+        "location": "Pant back left thigh",
+        "description": "Same small lavender/purple logo",
+        "technique": "embroidered"
+      }
+    ],
+    "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBROIDERED (all four logo placements)\n- Large rose mushroom cloud: thread-stitched both front and back of crewneck\n- Small rose mushroom cloud: thread-stitched both thighs of joggers\n- All logos: dimensional raised thread — NOT flat print, NOT silicone\n- Neckline: round crew neck with white/natural ribbed trim (NO hood)\n- Pants: mint green joggers with cream/off-white drawstring"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Full-length shot showing complete set — crewneck front clearly visible (front embroidery) OR turned to show back embroidery",
+  "setting": "Modern art gallery with pastel accent wall, airy luxury editorial",
+  "note": "SEPARATE SKU from sg-006. sg-006 is the hoodie. sg-013 is the crewneck set. The lavender mushroom cloud appears on FOUR locations total."
+}

@@ -1,0 +1,19 @@
+{
+  "productId": "sg-004",
+  "name": "The Signature Tee — White",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-004-tee-white-front.jpg",
+    "signature/sg-004-tee-white.jpeg"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "Center chest graphic — multi-colored rose with Golden Gate Bridge scene inside, emerging from dark clouds — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-004"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Standing tall, arms relaxed, chest forward, graphic clearly visible",
+  "setting": "Clean minimal white studio, SF city skyline silhouette in distance through windows"
+}

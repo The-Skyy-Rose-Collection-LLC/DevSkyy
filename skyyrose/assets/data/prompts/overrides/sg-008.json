@@ -1,0 +1,18 @@
+{
+  "productId": "sg-008",
+  "name": "The Signature Beanie",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-008-beanie.png"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "Signature Collection branding on cuff — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-008"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Head and shoulders editorial portrait, beanie cuff detail clearly visible, confident gaze",
+  "setting": "Minimalist dark luxury studio, subtle gold accent lighting"
+}

@@ -1,0 +1,18 @@
+{
+  "productId": "sg-002",
+  "name": "Stay Golden Set",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-002-stay-golden-set.jpg"
+  ],
+  "garmentTypeLock": "MATCHING COORDINATED SET — both top AND bottom pieces shown together as a complete outfit. Reproduce the EXACT garments in the reference image — same colors, same cut, same graphics. NOT a single tee or single pant — the full set together.",
+  "brandingTech": {
+    "logo": "'Stay Golden' theme, gold colorway, SR monogram — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-002"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Full-length shot showing BOTH pieces of the complete matching set clearly",
+  "setting": "Minimalist marble penthouse, floor-to-ceiling windows, golden afternoon light"
+}

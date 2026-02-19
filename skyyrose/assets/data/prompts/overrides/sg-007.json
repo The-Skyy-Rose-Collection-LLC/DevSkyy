@@ -1,0 +1,18 @@
+{
+  "productId": "sg-007",
+  "name": "The Signature Beanie — Red",
+  "collection": "signature",
+  "referenceImages": [
+    "signature/sg-007-beanie-red.jpg"
+  ],
+  "garmentTypeLock": "RED KNIT BEANIE — headwear accessory only. The defining characteristic is BRIGHT RED color — NOT dark, NOT olive, NOT black, NOT green. A classic ribbed knit beanie worn on the head. The model wears their own outfit; the beanie is the featured accessory on their head.",
+  "brandingTech": {
+    "logo": "Signature Collection branding on cuff — technique TBD via Flash fingerprint (likely patch or embroidery)",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-007\nNOTE: RED colorway is the critical spec — the beanie MUST be bright vivid red"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Head and shoulders portrait, slight head tilt showing beanie detail, intense editorial gaze — RED beanie clearly visible on head",
+  "setting": "Dark luxury background with gold and champagne rim lighting"
+}

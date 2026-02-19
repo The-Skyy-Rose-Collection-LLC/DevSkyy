@@ -1,0 +1,63 @@
+{
+  "productId": "br-007",
+  "name": "BLACK Rose × Love Hurts Basketball Shorts",
+  "collection": "black-rose",
+  "referenceImages": [
+    "black-rose/br-007-shorts-front.png",
+    "black-rose/br-007-shorts-side.png",
+    "black-rose/br-007-shorts-detail-front.jpeg",
+    "black-rose/br-007-shorts-detail-back.jpeg",
+    "black-rose/br-007-shorts-inset-front.jpeg",
+    "black-rose/br-007-shorts-inset-back.jpeg"
+  ],
+  "garmentTypeLock": "BASKETBALL SHORTS — 'Just Don' style, mid-thigh length. Dual-collection collab: Love Hurts × Black Rose. Black mesh body with allover rose/cloud pattern.",
+  "brandingTech": {
+    "logo": "Complex multi-technique: body allover pattern is sublimation, 'OAKLAND' and 'Love Hurts' scripts are sublimation, front pentagon inset graphic is sublimation, back pentagon Black Rose logo is EMBROIDERED",
+    "technique": "TBD",
+    "locations": [
+      {
+        "location": "Body allover pattern",
+        "description": "Dark grey rose + cloud pattern across full black mesh",
+        "technique": "sublimation",
+        "notTechniques": ["embroidered", "printed-ink", "silicone"]
+      },
+      {
+        "location": "Front — 'OAKLAND' large text",
+        "description": "Large varsity block letters across front",
+        "technique": "TBD",
+        "note": "Flash fingerprint will confirm sublimation vs chenille"
+      },
+      {
+        "location": "Front — 'Love Hurts' script overlay",
+        "description": "Grey/silver script overlapping OAKLAND on right side",
+        "technique": "sublimation"
+      },
+      {
+        "location": "Front pentagon inset panel",
+        "description": "White pentagon/star inset at front — 'Love Hurts' script + wilting rose/broken heart graphic",
+        "technique": "sublimation"
+      },
+      {
+        "location": "Back pentagon inset panel",
+        "description": "White pentagon/star inset at back — BLACK ROSE logo: black rose with green stem from grey/white clouds",
+        "technique": "embroidered",
+        "notTechniques": ["sublimation", "printed", "silicone"],
+        "note": "The dual-collab signature mark — dimensional stitched embroidery"
+      },
+      {
+        "location": "Side panels 'Love Hurts' script",
+        "description": "White mesh V-chevron side panels with 'Love Hurts' smaller script",
+        "technique": "sublimation"
+      },
+      {
+        "location": "Back face",
+        "description": "'Love Hurts' large script across full back",
+        "technique": "sublimation"
+      }
+    ],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — MULTI-TECHNIQUE PRODUCT (NO FALSE ADVERTISING):\nBody allover rose/cloud pattern: SUBLIMATION — dye-printed into mesh fabric\nLove Hurts scripts (front, back, sides): SUBLIMATION\nFront pentagon 'Love Hurts' + heart graphic: SUBLIMATION\nBack pentagon BLACK ROSE logo: EMBROIDERED — dimensional stitched, NOT sublimation\n- The back pentagon embroidery is the dual-collab signature mark\n- It has physical thread depth, NOT flat print\n- Run Flash fingerprint to confirm OAKLAND technique (sublimation vs chenille)"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Athletic stance, one leg forward showing side graphic, confident sports editorial energy",
+  "setting": "Dark gothic gymnasium meets baroque theater — dramatic mixed-world setting"
+}

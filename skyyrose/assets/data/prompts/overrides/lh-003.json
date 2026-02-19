@@ -1,0 +1,19 @@
+{
+  "productId": "lh-003",
+  "name": "Love Hurts Basketball Shorts",
+  "collection": "love-hurts",
+  "referenceImages": [
+    "love-hurts/lh-003-shorts-front.jpeg",
+    "love-hurts/lh-003-shorts-side.png"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "Love Hurts collection branding, rose heart tattoo flash graphic — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint lh-003"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Athletic editorial stance, showing front and side graphic, powerful energy",
+  "setting": "Baroque theater stage lit with dramatic crimson spots, dark grandeur"
+}

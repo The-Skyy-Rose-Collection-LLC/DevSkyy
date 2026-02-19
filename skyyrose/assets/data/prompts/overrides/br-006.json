@@ -1,0 +1,19 @@
+{
+  "productId": "br-006",
+  "name": "Black Rose Sherpa Jacket",
+  "collection": "black-rose",
+  "referenceImages": [
+    "black-rose/br-006-sherpa-front.jpg",
+    "black-rose/br-006-sherpa-back.jpg"
+  ],
+  "garmentTypeLock": null,
+  "brandingTech": {
+    "logo": "BLACK Rose collection branding on sherpa jacket — technique TBD via Flash fingerprint",
+    "technique": "TBD",
+    "notTechniques": [],
+    "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint br-006"
+  },
+  "logoFingerprint": null,
+  "modelPose": "Jacket fully buttoned, collar turned up, commanding editorial presence showing both front and silhouette",
+  "setting": "Moonlit rooftop at night, city lights below, gothic rose gold bokeh"
+}
