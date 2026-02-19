@@ -7,12 +7,45 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "'Stay Golden' theme with SR monogram branding — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "inside back neck: Stylized monogram logo, appearing as an intertwined 'DB' or 'B' with a loop; center chest: Graphic depicting three stylized roses with prominent thorns, rising from a bed of black clouds/smoke. The roses feature a vibrant multi-color, fractured or stained-glass effect within their petals. The rose outlines, leaves, and thorns are in grey/silver. The entire graphic has a distinct raised white outline around its perimeter.",
+    "technique": "printed",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-005"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "inside back neck",
+        "description": "stylized 'JB' or 'B' monogram logo",
+        "technique": "printed",
+        "color": "black",
+        "size": "approx 1.25 inches wide x 1.5 inches tall",
+        "notTechniques": [
+          "embossed",
+          "silicone",
+          "embroidered"
+        ]
+      },
+      {
+        "location": "center chest",
+        "description": "graphic of two multi-colored roses on a thorny stem, emerging from dark clouds, with a white outline border",
+        "technique": "silicone",
+        "color": "multi-colored (purple, orange, yellow, red, green, blue within roses, black outlines, grey/silver thorns/leaves, dark grey/black clouds) with a white outline",
+        "size": "approx 8.5 inches wide x 10.5 inches tall",
+        "notTechniques": [
+          "embossed",
+          "sublimation",
+          "printed"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The main graphic on the center chest appears to be a multi-layered silicone application. The black outlines and cloud base exhibit the raised, slightly glossy characteristic of silicone. The vibrant, smooth, multi-colored areas within the roses are likely printed directly onto the silicone material or a base material integrated within the silicone patch.",
+    "analyzedAt": "2026-02-19T22:25:48.400Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-005",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Confident relaxed pose, tee fully visible, golden hour editorial energy",
   "setting": "Marble penthouse terrace at golden hour, warm champagne sunlight"
 }

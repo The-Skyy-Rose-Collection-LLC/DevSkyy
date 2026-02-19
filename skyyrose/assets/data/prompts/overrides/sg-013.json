@@ -15,13 +15,23 @@
         "location": "Crewneck front center",
         "description": "Large lavender/purple rose mushroom cloud erupting from grey clouds",
         "technique": "embroidered",
-        "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"]
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer",
+          "sublimation"
+        ]
       },
       {
         "location": "Crewneck back upper",
         "description": "Same large lavender/purple rose mushroom cloud — between shoulder blades",
         "technique": "embroidered",
-        "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"]
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer",
+          "sublimation"
+        ]
       },
       {
         "location": "Pant front left thigh",
@@ -34,10 +44,84 @@
         "technique": "embroidered"
       }
     ],
-    "notTechniques": ["printed", "silicone", "heat-transfer", "sublimation"],
+    "notTechniques": [
+      "printed",
+      "silicone",
+      "heat-transfer",
+      "sublimation"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: EMBROIDERED (all four logo placements)\n- Large rose mushroom cloud: thread-stitched both front and back of crewneck\n- Small rose mushroom cloud: thread-stitched both thighs of joggers\n- All logos: dimensional raised thread — NOT flat print, NOT silicone\n- Neckline: round crew neck with white/natural ribbed trim (NO hood)\n- Pants: mint green joggers with cream/off-white drawstring"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Stylized graphic of a blooming purple rose with green leaves and a white/grey cloud-like base.",
+        "technique": "embroidered",
+        "color": "lavender, violet, light green, white, light grey",
+        "size": "approx 9 inches wide by 7.5 inches tall",
+        "notTechniques": [
+          "printed",
+          "sublimation",
+          "silicone"
+        ]
+      },
+      {
+        "location": "wearer's left bottom hem",
+        "description": "Small square woven label patch with a white A Bathing Ape (BAPE) head logo on a red background.",
+        "technique": "woven-label-patch",
+        "color": "white (logo), red (background)",
+        "size": "approx 1 inch wide by 0.75 inch tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "inside back neck",
+        "description": "Rectangular woven label with white brand text 'BLOOM' (or similar) on a black background.",
+        "technique": "woven-label-patch",
+        "color": "white (text), black (background)",
+        "size": "approx 1 inch wide by 0.5 inch tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "wearer's left thigh",
+        "description": "Small stylized graphic of a blooming purple rose with green leaves and a white/grey cloud-like base.",
+        "technique": "embroidered",
+        "color": "lavender, violet, light green, white, light grey",
+        "size": "approx 3.5 inches wide by 3 inches tall",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "heat-transfer"
+        ]
+      },
+      {
+        "location": "upper back (center)",
+        "description": "Small stylized graphic of a blooming purple rose with green leaves and a white/grey cloud-like base.",
+        "technique": "embroidered",
+        "color": "lavender, violet, light green, white, light grey",
+        "size": "approx 3.5 inches wide by 3 inches tall",
+        "notTechniques": [
+          "sublimation",
+          "embossed",
+          "laser-engraved"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The primary graphic on both the sweatshirt and sweatpants, as well as the upper back of the sweatshirt, are executed with high-quality embroidery, showcasing detailed thread work and a distinct raised texture. The brand labels are standard woven-label-patches, commonly used for durability and brand consistency.",
+    "analyzedAt": "2026-02-19T22:27:31.269Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-013",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Full-length shot showing complete set — crewneck front clearly visible (front embroidery) OR turned to show back embroidery",
   "setting": "Modern art gallery with pastel accent wall, airy luxury editorial",
   "note": "SEPARATE SKU from sg-006. sg-006 is the hoodie. sg-013 is the crewneck set. The lavender mushroom cloud appears on FOUR locations total."

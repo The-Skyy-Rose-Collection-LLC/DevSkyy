@@ -7,12 +7,45 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Varsity jacket branding — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "center chest: Stylized text graphic 'Love Hurts' in a script font with a small heart or crown detail above the 't' in 'Hurts', and smaller, illegible text underneath. The main text is red with a white/silver outline.; inside hood lining: Repeating pattern of stylized roses and leaves.",
+    "technique": "silicone",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint lh-004"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Stylized script text 'Love Hurts' with 'EST. MMXXIV' underneath",
+        "technique": "silicone",
+        "color": "red with white outline/shadow for 'Love Hurts', white for 'EST. MMXXIV'",
+        "size": "approx 10-12 inches wide, 4-5 inches tall (combined)",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "inside hood lining",
+        "description": "Repeating floral pattern of roses and leaves",
+        "technique": "sublimation",
+        "color": "orange/brown roses, green leaves, white background",
+        "size": "full coverage of the inside hood lining, individual roses approx 1-2 inches in diameter",
+        "notTechniques": [
+          "embroidered",
+          "heat-transfer",
+          "silicone"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The main text 'Love Hurts' exhibits a raised, smooth, and slightly glossy texture consistent with a silicone application. The hood lining pattern shows no surface texture and appears integrated into the fabric, characteristic of sublimation printing. The ribbed cuffs and hem are structural elements with striped patterns inherent to their knit, not applied branding.",
+    "analyzedAt": "2026-02-19T22:24:07.148Z",
+    "model": "gemini-2.5-flash",
+    "productId": "lh-004",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Jacket fully zipped/snapped, commanding stance showing front — dramatic editorial",
   "setting": "Grand baroque staircase, crimson carpet, dramatic shadows and candlelight"
 }

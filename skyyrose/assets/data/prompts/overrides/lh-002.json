@@ -8,12 +8,33 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Love Hurts rose heart motif on leg — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "right thigh, upper area: Graphic depicting a heart or similar shape with multiple red roses, green leaves, and a white dagger or key element piercing through it, outlined in black.",
+    "technique": "embroidered",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint lh-002"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "right upper thigh",
+        "description": "stylized graphic of a cluster of red roses with green leaves, accented by a red splash/splatter effect and subtle black outlining.",
+        "technique": "embroidered",
+        "color": "multiple shades of red, green, and black",
+        "size": "approx. 4.5 inches (height) x 3.5 inches (width)",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "sublimation"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The exact same embroidered graphic is present on the right upper thigh of both the black and white versions of the track pants. The embroidery shows clear thread definition and a raised texture typical of direct embroidery, not a patch or print.",
+    "analyzedAt": "2026-02-19T22:23:26.466Z",
+    "model": "gemini-2.5-flash",
+    "productId": "lh-002",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Dynamic stance showing full leg length, both colorways visible in composite or alternating",
   "setting": "Candlelit baroque ballroom, crystal chandeliers, dramatic blood-red shadows"
 }

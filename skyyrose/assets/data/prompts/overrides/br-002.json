@@ -9,10 +9,50 @@
   "brandingTech": {
     "logo": "3D raised silicone cut-out appliqué on upper left leg — slight gloss contrast against matte fabric, physically adhered piece with real depth",
     "technique": "silicone",
-    "notTechniques": ["printed", "embroidered", "embossed", "heat-transfer", "patch", "woven"],
+    "notTechniques": [
+      "printed",
+      "embroidered",
+      "embossed",
+      "heat-transfer",
+      "patch",
+      "woven"
+    ],
     "promptBlock": "🔒 BRANDING TECHNIQUE — PRODUCT SPECIFICATION (NO FALSE ADVERTISING):\nDecoration technique: SILICONE CUT-OUT APPLIQUÉ\n- Logo is a 3D raised silicone piece physically adhered to the fabric\n- Slight glossy sheen contrast against the matte black fabric\n- Physically dimensional — has real depth and edge shadow\n- MUST NOT render as: printed graphic, embroidered thread, embossed impression, heat-transfer, woven label\n- This is a legally meaningful product specification"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "center chest",
+        "description": "Graphic depicting two stylized roses with multiple leaves and thorns, emerging from a cloud formation.",
+        "technique": "embroidered",
+        "color": "White and light grey outlines, with subtle pink/lilac fill within the rose petals, grey leaves, and white/light grey cloud details.",
+        "size": "Approximately 9 inches tall x 7 inches wide",
+        "notTechniques": [
+          "printed",
+          "silicone",
+          "sublimation"
+        ]
+      },
+      {
+        "location": "left sleeve cuff",
+        "description": "Small rectangular woven tag featuring a rose graphic.",
+        "technique": "woven-label-patch",
+        "color": "Red rose on a white background, with a red border.",
+        "size": "Approximately 0.75 inches wide x 0.5 inches tall (visible portion)",
+        "notTechniques": [
+          "embroidered",
+          "printed",
+          "heat-transfer"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The embroidery on the center chest graphic shows fine detail and clear thread texture. The colors, especially the pink/lilac, are subtle and blend well with the white/light grey. The woven label on the cuff is a standard flag label type, sewn into the seam.",
+    "analyzedAt": "2026-02-19T22:20:48.534Z",
+    "model": "gemini-2.5-flash",
+    "productId": "br-002",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Full-length stance showing BOTH LEGS completely from waist to ankle — left-leg silicone logo clearly visible and catching light",
   "setting": "Gothic corridor with dark stone arches and moonlight"
 }

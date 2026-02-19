@@ -8,12 +8,69 @@
   ],
   "garmentTypeLock": "MATCHING COORDINATED SET — both top AND bottom pieces shown together as a complete outfit. Reproduce EXACTLY the top and bottom pieces shown in the reference images — same colors, same graphics, same fabric. NOT separate individual pieces.",
   "brandingTech": {
-    "logo": "Bay Bridge night-scene graphics and SR monogram — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "inside back neck: Stylized 'PR' monogram logo (likely brand's primary logo); center chest: Elaborate graphic depicting a thorny rose with blue/teal petals, emerging from a cracked, skull-like base with roots extending into a dark cloud or water pool.; entire shorts surface: Full-bleed graphic of a cityscape featuring a large bridge over water (e.g., Brooklyn Bridge/NYC skyline) with a blue sky and greenish-blue water.; lower right thigh (on shorts), integrated into background graphic: Small version of the thorny blue/teal rose graphic, consistent with the t-shirt's main graphic.",
+    "technique": "printed",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-001"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "inside back collar",
+        "description": "Stylized 'PB' or similar monogram logo",
+        "technique": "printed",
+        "color": "black",
+        "size": "approx 1.5 inches wide",
+        "notTechniques": [
+          "embroidered",
+          "woven-label-patch",
+          "silicone"
+        ]
+      },
+      {
+        "location": "center chest",
+        "description": "Detailed graphic of a blue rose with metallic-effect thorns, growing from a cracked base/cloud. The graphic has a distinct raised texture.",
+        "technique": "heat-transfer",
+        "color": "multiple shades of blue, grey, silver, black",
+        "size": "approx 9 inches tall",
+        "notTechniques": [
+          "sublimation",
+          "embroidered",
+          "embossed"
+        ]
+      },
+      {
+        "location": "entire garment (all-over print)",
+        "description": "Cityscape graphic featuring a bridge, buildings, and water under a blue sky.",
+        "technique": "sublimation",
+        "color": "various shades of blue, green, grey, black, white",
+        "size": "full garment coverage",
+        "notTechniques": [
+          "printed",
+          "heat-transfer",
+          "embroidered"
+        ]
+      },
+      {
+        "location": "left thigh (wearer's left)",
+        "description": "Smaller version of the blue rose logo with metallic-effect thorns and a base. Appears to have a slightly raised texture on top of the sublimated shorts fabric.",
+        "technique": "heat-transfer",
+        "color": "multiple shades of blue, grey, silver, black",
+        "size": "approx 2.5 inches tall",
+        "notTechniques": [
+          "sublimation",
+          "embroidered",
+          "embossed"
+        ]
+      }
+    ],
+    "accuracyScore": 0.98,
+    "notes": "The primary challenge was discerning between 'printed' and 'heat-transfer' for the textured rose graphics. Given the explicit definition of 'printed' as 'flat' and 'heat-transfer' allowing for 'different texture than fabric' and 'slight edge visible', the prominent raised texture on the rose graphics strongly points towards a sophisticated heat-transfer application rather than a flat print. The sublimated all-over print on the shorts is clearly distinct due to its dye-into-fabric nature with no surface texture.",
+    "analyzedAt": "2026-02-19T22:24:43.996Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-001",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Full-length shot showing BOTH top and bottom of the matching set — complete coordinated outfit",
   "setting": "San Francisco waterfront at night, Bay Bridge illuminated in background, champagne gold light"
 }

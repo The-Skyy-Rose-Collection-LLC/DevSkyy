@@ -8,12 +8,45 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Center chest graphic — multi-colored rose with Golden Gate Bridge scene inside, emerging from dark clouds — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "back upper, interior neckline: Brand neck label, rectangular, with 'Stay Rase' script text and a small crown/rose graphic.; left sleeve, near cuff: Small square patch/appliqué with a gold stylized rose/crown logo on a black background.",
+    "technique": "woven-label-patch",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-004"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "inside back neck",
+        "description": "Woven label with 'Stray Rats' text logo and a graphic (possibly a rat) on a black background with a gold border.",
+        "technique": "woven-label-patch",
+        "color": "gold text and graphic on black background with a gold border",
+        "size": "approx 2.5 inches wide, 1 inch tall",
+        "notTechniques": [
+          "printed",
+          "embroidered",
+          "silicone"
+        ]
+      },
+      {
+        "location": "upper left sleeve",
+        "description": "Small square woven patch with a gold stylized graphic/logo (possibly a head or crown) and possibly an 'M' or similar detail on a black background, with a gold border.",
+        "technique": "woven-label-patch",
+        "color": "gold graphic and border on a black background",
+        "size": "approx 0.8 inch (2 cm) square",
+        "notTechniques": [
+          "printed",
+          "embossed",
+          "sublimation"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The large 'M' in a circle with 'FRONT' text at the bottom left of the image is an overlay graphic for product display/sizing information and not a decoration element on the garment itself.",
+    "analyzedAt": "2026-02-19T22:25:32.071Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-004",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Standing tall, arms relaxed, chest forward, graphic clearly visible",
   "setting": "Clean minimal white studio, SF city skyline silhouette in distance through windows"
 }

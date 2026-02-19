@@ -7,12 +7,33 @@
   ],
   "garmentTypeLock": null,
   "brandingTech": {
-    "logo": "Signature Collection branding on cuff — technique TBD via Flash fingerprint",
-    "technique": "TBD",
+    "logo": "front, lower right side of the folded brim: Rectangular patch featuring three red roses with green stems and leaves, and white root/cloud-like elements at the base, on a dark grey background.",
+    "technique": "silicone",
     "notTechniques": [],
     "promptBlock": "🔒 BRANDING TECHNIQUE — RUN fingerprint TO POPULATE:\nnode build/prompt-studio.js fingerprint sg-008"
   },
-  "logoFingerprint": null,
+  "logoFingerprint": {
+    "logos": [
+      {
+        "location": "front, right side of folded cuff",
+        "description": "Rectangular patch featuring a molded graphic depicting three red roses with green stems and white cloud-like elements at the base, on a dark grey/black background.",
+        "technique": "silicone",
+        "color": "Red (roses), Green (stems/leaves), White (clouds), Dark Grey/Black (patch background)",
+        "size": "approx 2.5 inches (height) by 1.75 inches (width)",
+        "notTechniques": [
+          "embroidered",
+          "printed",
+          "woven-label-patch"
+        ]
+      }
+    ],
+    "accuracyScore": 1,
+    "notes": "The branding element is a pre-made patch that is likely sewn onto the beanie. The design on the patch features distinct 3D raised elements with a smooth, slightly glossy, rubbery texture, which aligns with the characteristics of a molded silicone (or PVC) application. Given the provided options, 'silicone' is the most accurate description for this type of molded, raised graphic on a patch.",
+    "analyzedAt": "2026-02-19T22:26:41.334Z",
+    "model": "gemini-2.5-flash",
+    "productId": "sg-008",
+    "verifiedBy": "Flash vision fingerprint"
+  },
   "modelPose": "Head and shoulders editorial portrait, beanie cuff detail clearly visible, confident gaze",
   "setting": "Minimalist dark luxury studio, subtle gold accent lighting"
 }

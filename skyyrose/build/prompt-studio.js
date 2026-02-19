@@ -323,12 +323,12 @@ Be precise. This data becomes a legally-meaningful product specification used in
   if (fingerprintData.notes) console.log(`  Notes: ${fingerprintData.notes}`);
 }
 
-async function cmdFingerprintAll() {
+async function cmdFingerprintAll(force = false) {
   const engine = new PromptEngine();
   const report = engine.auditBranding();
-  const todo   = report.filter(r => !r.fingerprinted);
+  const todo   = force ? report : report.filter(r => !r.fingerprinted);
 
-  console.log(`\n🔍 Fingerprinting all unfingerprinted products (${todo.length}/${report.length})`);
+  console.log(`\n🔍 Fingerprinting ${force ? 'ALL' : 'unfingerprinted'} products (${todo.length}/${report.length})`);
 
   for (const item of todo) {
     try {
@@ -684,7 +684,7 @@ async function main() {
     'audit-branding':  () => cmdAuditBranding(),
     override:          () => cmdOverride(args[0], args[1], args[2]),
     fingerprint:       () => cmdFingerprint(args[0]),
-    'fingerprint-all': () => cmdFingerprintAll(),
+    'fingerprint-all': () => cmdFingerprintAll(args.includes('--force')),
     'verify-output':   () => cmdVerifyOutput(args[0], args[1]),
     'accuracy-report': () => cmdAccuracyReport(),
     'save-version':    () => cmdSaveVersion(args[0], args[1]),
@@ -703,7 +703,7 @@ async function main() {
     console.log('  audit-branding                    Products missing/incomplete brandingTech');
     console.log('  override <sku> <field> <value>    Set a field on a product override');
     console.log('  fingerprint <sku>                 Flash vision → writes logoFingerprint');
-    console.log('  fingerprint-all                   Fingerprint all products');
+    console.log('  fingerprint-all [--force]         Fingerprint all (or use --force to re-fingerprint)');
     console.log('  verify-output <sku> <image>       Post-generation accuracy check');
     console.log('  accuracy-report                   Aggregate accuracy status');
     console.log('  save-version <template> <label>   Snapshot current template');
