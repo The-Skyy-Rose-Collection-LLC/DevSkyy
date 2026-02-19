@@ -173,6 +173,20 @@
     "wp-pot-cli": "^1.5.0"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "@apollo/protobufjs",
+      "@parcel/watcher",
+      "@prisma/engines",
+      "@sentry/cli",
+      "canvas",
+      "core-js",
+      "core-js-pure",
+      "esbuild",
+      "fs-ext",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ],
     "overrides": {
       "hono": ">=4.11.7",
       "prismjs": ">=1.30.0",
