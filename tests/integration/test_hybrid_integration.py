@@ -304,10 +304,11 @@ async def test_file_syntax():
     import os
     import py_compile
 
+    project_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
     files_to_check = [
-        "/Users/coreyfoster/DevSkyy/agent_sdk/task_queue.py",
-        "/Users/coreyfoster/DevSkyy/agent_sdk/worker.py",
-        "/Users/coreyfoster/DevSkyy/agent_sdk/custom_tools.py",
+        os.path.join(project_root, "sdk", "python", "agent_sdk", "task_queue.py"),
+        os.path.join(project_root, "sdk", "python", "agent_sdk", "worker.py"),
+        os.path.join(project_root, "sdk", "python", "agent_sdk", "custom_tools.py"),
     ]
 
     all_valid = True
