@@ -330,6 +330,11 @@ def build_vision_analyst() -> LlmAgent:
         generate_content_config=genai_types.GenerateContentConfig(
             temperature=0.4,
             max_output_tokens=3000,
+            tool_config=genai_types.ToolConfig(
+                function_calling_config=genai_types.FunctionCallingConfig(
+                    mode='ANY'  # FORCE tool calling
+                )
+            ),
         ),
     )
 
@@ -456,6 +461,11 @@ def build_generator() -> LlmAgent:
         generate_content_config=genai_types.GenerateContentConfig(
             temperature=0.3,
             max_output_tokens=1000,
+            tool_config=genai_types.ToolConfig(
+                function_calling_config=genai_types.FunctionCallingConfig(
+                    mode='ANY'  # FORCE tool calling
+                )
+            ),
         ),
     )
 
@@ -580,6 +590,11 @@ def build_quality_agent() -> LlmAgent:
         generate_content_config=genai_types.GenerateContentConfig(
             temperature=0.2,
             max_output_tokens=1000,
+            tool_config=genai_types.ToolConfig(
+                function_calling_config=genai_types.FunctionCallingConfig(
+                    mode='ANY'  # FORCE tool calling
+                )
+            ),
         ),
     )
 
@@ -592,6 +607,7 @@ def tool_delegate_to_vision_analyst(sku: str, view: str) -> dict[str, Any]:
     """Delegate vision analysis to Vision Analyst sub-agent."""
     try:
         print(f"\n🔬 Delegating to Vision Analyst...")
+        print(f"   SKU: {sku}, View: {view}")
 
         agent = build_vision_analyst()
         session_svc = InMemorySessionService()
@@ -606,6 +622,7 @@ def tool_delegate_to_vision_analyst(sku: str, view: str) -> dict[str, Any]:
         )
 
         task_msg = f"Analyze product {sku}, {view} view. Use all providers and synthesize unified specification."
+        print(f"   Task: {task_msg}")
 
         content = genai_types.Content(
             role="user",
@@ -614,26 +631,43 @@ def tool_delegate_to_vision_analyst(sku: str, view: str) -> dict[str, Any]:
 
         # Extract final response
         final_response = ""
+        event_count = 0
+        print(f"   Running Vision Analyst agent...")
+
         for event in runner.run(
             user_id="coordinator",
             session_id=session_id,
             new_message=content
         ):
+            event_count += 1
+            print(f"   Event {event_count}: {type(event).__name__}")
+
             if event.is_final_response():
+                print(f"   ✓ Final response received")
                 if event.content and event.content.parts:
                     texts = [p.text for p in event.content.parts if hasattr(p, "text") and p.text]
                     final_response = "\n".join(texts)
+                    print(f"   ✓ Extracted {len(final_response)} chars")
+                break
+
+        if not final_response:
+            print(f"   ⚠️  No response text extracted after {event_count} events")
+            return {"success": False, "error": "No response from Vision Analyst"}
 
         # Store in shared state
         _shared_state[f"{sku}_{view}_spec"] = final_response
+        print(f"   ✓ Stored specification in shared state")
 
         return {
             "success": True,
             "agent": "vision_analyst",
-            "specification": final_response
+            "specification": final_response[:200] + "..." if len(final_response) > 200 else final_response
         }
 
     except Exception as exc:
+        print(f"   ❌ Error: {exc}")
+        import traceback
+        traceback.print_exc()
         return {"success": False, "error": str(exc)}
 
 
@@ -749,25 +783,26 @@ def tool_delegate_to_quality(sku: str, view: str) -> dict[str, Any]:
 
 COORDINATOR_SYSTEM = """You are the PRODUCTION COORDINATOR for SkyyRose Elite Studio.
 
-You orchestrate a team of specialized sub-agents to create perfect fashion photography.
+CRITICAL: You MUST actually CALL the delegation tools using function calling.
+DO NOT just write out tool names - INVOKE them.
 
-YOUR SUB-AGENTS:
-1. Vision Analyst - Analyzes reference photos using GPT-4o, Gemini, Claude
-2. Generator - Creates 4K images using Gemini 3 Pro Image
-3. Quality Control - Verifies accuracy and approves/rejects
+YOUR WORKFLOW (EXECUTE THESE TOOL CALLS):
 
-YOUR TOOLS (delegation only):
-- tool_delegate_to_vision_analyst(sku, view) - Get unified specification
-- tool_delegate_to_generator(sku, view) - Generate image from spec
-- tool_delegate_to_quality(sku, view) - Verify quality and approve
+Step 1: CALL tool_delegate_to_vision_analyst(sku, view)
+  → This runs multi-provider vision analysis
+  → Returns unified specification
 
-WORKFLOW:
-1. Delegate to Vision Analyst → get unified spec
-2. Delegate to Generator → create image
-3. Delegate to Quality Control → verify and approve
-4. Report final results
+Step 2: CALL tool_delegate_to_generator(sku, view)
+  → This generates the 4K fashion model image
+  → Returns output path
 
-You don't do the work - you coordinate specialists. Keep coordination brief."""
+Step 3: CALL tool_delegate_to_quality(sku, view)
+  → This verifies image quality
+  → Returns approval decision
+
+Step 4: Report results to user
+
+IMPORTANT: Use function calling - don't describe tools, CALL them."""
 
 
 def build_coordinator() -> LlmAgent:
@@ -784,6 +819,11 @@ def build_coordinator() -> LlmAgent:
         generate_content_config=genai_types.GenerateContentConfig(
             temperature=0.5,
             max_output_tokens=2000,
+            tool_config=genai_types.ToolConfig(
+                function_calling_config=genai_types.FunctionCallingConfig(
+                    mode='ANY'  # FORCE tool calling - don't just describe tools
+                )
+            ),
         ),
     )
 
