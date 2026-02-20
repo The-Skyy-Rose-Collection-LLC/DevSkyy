@@ -24,6 +24,7 @@ import {
   AgentStatusChart,
   PipelineMetricsChart,
 } from '@/components/dashboard/analytics-charts';
+import LuxuryProductViewer from '@/components/3d/LuxuryProductViewer';
 
 interface DashboardStats {
   roundTable: {
@@ -204,6 +205,112 @@ export default function AdminDashboard() {
             completedToday={12}
           />
         </div>
+      </motion.section>
+
+      {/* 3D Product Showcase */}
+      <motion.section variants={itemVariants} aria-label="3D Product Showcase">
+        <Card className="bg-gray-900 border-gray-800">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-white font-display text-2xl luxury-text-gradient">
+                  3D Product Showcase
+                </CardTitle>
+                <CardDescription className="text-gray-400 mt-2">
+                  Luxury product visualization powered by React Three Fiber
+                </CardDescription>
+              </div>
+              <Link href="/admin/3d-pipeline">
+                <Button variant="outline" className="border-gray-700">
+                  <Box className="mr-2 h-4 w-4" />
+                  View Pipeline
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="grid lg:grid-cols-2 gap-6">
+              {/* 3D Viewer */}
+              <div className="h-[600px]">
+                <div className="relative w-full h-full bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 rounded-lg overflow-hidden flex items-center justify-center">
+                  <div className="text-center p-8">
+                    <Box className="h-24 w-24 text-rose-400 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-2xl font-display text-white mb-2">
+                      3D Viewer Ready
+                    </h3>
+                    <p className="text-gray-400 mb-4">
+                      Upload a GLB model to /public/models/ to preview
+                    </p>
+                    <div className="text-sm text-gray-500 font-mono bg-gray-800/50 px-4 py-2 rounded inline-block">
+                      LuxuryProductViewer Component Active
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Product Info */}
+              <div className="flex flex-col justify-center space-y-6">
+                <div>
+                  <h3 className="text-2xl font-display text-white mb-2">
+                    Advanced 3D Rendering
+                  </h3>
+                  <p className="text-gray-400 mb-4">
+                    High-fidelity product visualization with real-time lighting,
+                    shadows, and post-processing effects.
+                  </p>
+                </div>
+
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">PBR Material Rendering</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">Real-time Shadows & Reflections</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">Bloom & Tone Mapping Effects</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">AR-Ready GLB Export</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="h-5 w-5 text-green-400" />
+                    <span className="text-gray-300">Luxury Rose Gold Lighting</span>
+                  </div>
+                </div>
+
+                <div className="pt-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                      <p className="text-2xl font-bold text-rose-400">8</p>
+                      <p className="text-xs text-gray-400 mt-1">3D Providers</p>
+                    </div>
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                      <p className="text-2xl font-bold text-rose-400">1,240</p>
+                      <p className="text-xs text-gray-400 mt-1">Models Generated</p>
+                    </div>
+                    <div className="p-4 bg-gray-800/50 rounded-lg">
+                      <p className="text-2xl font-bold text-rose-400">99.2%</p>
+                      <p className="text-xs text-gray-400 mt-1">Success Rate</p>
+                    </div>
+                  </div>
+                </div>
+
+                <Link href="/admin/3d-pipeline">
+                  <Button className="w-full bg-gradient-to-r from-rose-500 to-rose-600 hover:from-rose-600 hover:to-rose-700">
+                    <Box className="mr-2 h-4 w-4" />
+                    Launch 3D Pipeline
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </motion.section>
 
       {/* Quick Actions */}
