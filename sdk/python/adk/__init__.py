@@ -69,6 +69,20 @@ from adk.pydantic_adk import (
     create_structured_agent,
 )
 
+# ADK Workflow Agents (zero-overhead orchestration)
+from adk.workflow_agents import (
+    PipelineType,
+    TokenSavings,
+    WorkflowPipelineAgent,
+    create_campaign_blitz_pipeline,
+    create_content_creation_pipeline,
+    create_customer_journey_pipeline,
+    create_product_launch_pipeline,
+    create_quality_assurance_pipeline,
+    estimate_pipeline_savings,
+    get_pipeline,
+)
+
 # Super Agents (consolidated 6-agent architecture)
 from adk.super_agents import (
     AnalyticsAgent,
@@ -133,6 +147,17 @@ __all__ = [
     "GoogleADKAgent",
     "GoogleMultiAgent",
     "create_google_agent",
+    # ADK Workflow Agents
+    "PipelineType",
+    "TokenSavings",
+    "WorkflowPipelineAgent",
+    "create_product_launch_pipeline",
+    "create_content_creation_pipeline",
+    "create_customer_journey_pipeline",
+    "create_quality_assurance_pipeline",
+    "create_campaign_blitz_pipeline",
+    "get_pipeline",
+    "estimate_pipeline_savings",
 ]
 
 __version__ = "1.0.0"
