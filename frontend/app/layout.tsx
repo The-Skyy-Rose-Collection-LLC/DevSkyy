@@ -1,5 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
+import { playfair, cormorant, spaceMono } from '@/lib/fonts'
+import { SyncStatusToast } from '@/components/wordpress/sync-status-toast'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -15,8 +19,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" className="dark">
-      <body className={inter.className}>{children}</body>
+    <html
+      lang="en"
+      className={`dark ${playfair.variable} ${cormorant.variable} ${spaceMono.variable}`}
+    >
+      <body className={inter.className}>
+        {children}
+        <SyncStatusToast />
+        <Analytics />
+        <SpeedInsights />
+      </body>
     </html>
   )
 }

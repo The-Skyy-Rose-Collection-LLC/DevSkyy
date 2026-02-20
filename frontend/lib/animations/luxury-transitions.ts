@@ -404,7 +404,7 @@ export function createSpring(
 // Utility: Create custom ease transition
 export function createEase(
   duration: number = 0.5,
-  ease: number[] = luxuryEasing.smooth
+  ease: readonly number[] = luxuryEasing.smooth
 ): Transition {
   return {
     duration,
