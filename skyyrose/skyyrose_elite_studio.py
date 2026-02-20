@@ -1,23 +1,22 @@
 #!/usr/bin/env python3
 """
-SkyyRose Elite Production Studio — Programmatic Tool-Calling Multi-Agent System
+SkyyRose Elite Production Studio — Hierarchical Multi-Agent System
 
-A sophisticated multi-provider agent team where each agent intelligently uses
-tools through programmatic reasoning rather than hard-coded workflows.
+Solves context window limits by using specialized sub-agents instead of
+a single coordinator with all tools.
 
 Architecture:
-- Coordinator Agent (Claude Opus) - Strategic orchestration with tool delegation
-- Vision Agents (GPT-4o, Gemini, Claude) - Each with specialized vision tools
-- Generator Agents (Gemini Pro Image, DALL-E) - Generation tools
-- Quality Agents (All providers) - Verification tools
+- Lightweight Coordinator (orchestration only)
+- Vision Analyst Sub-Agent (GPT-4o + Gemini + Claude vision)
+- Generator Sub-Agent (Gemini 3 Pro Image generation)
+- Quality Sub-Agent (multi-provider verification)
 
-Each agent can reason about which tools to use and when, creating emergent
-intelligent behavior through tool composition.
+Each sub-agent operates independently with its own context window.
+Coordinator delegates tasks and synthesizes results.
 
 Usage:
-    python skyyrose_elite_studio.py produce lh-001
+    python skyyrose_elite_studio.py produce br-001
     python skyyrose_elite_studio.py produce-batch --all
-    python skyyrose_elite_studio.py interactive
 """
 
 import argparse
@@ -27,7 +26,7 @@ import os
 import sys
 import time
 from pathlib import Path
-from typing import Any, Callable
+from typing import Any
 from dataclasses import dataclass
 
 # Load environment
@@ -73,325 +72,321 @@ gemini_client = google_genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 openai_client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
+# Shared state for sub-agents to communicate results
+_shared_state = {}
+
 # ---------------------------------------------------------------------------
-# Tool Registry - All tools available to agents
+# Utility Functions (used by sub-agents)
 # ---------------------------------------------------------------------------
 
-@dataclass
-class ToolResult:
-    """Standardized tool result format."""
-    success: bool
-    provider: str
-    data: dict[str, Any]
-    error: str | None = None
+def load_product_data(sku: str) -> dict[str, Any]:
+    """Load product override data including logoFingerprint."""
+    sku = sku.strip().lower()
+    override_path = OVERRIDES_DIR / f"{sku}.json"
+
+    if not override_path.exists():
+        return {"error": f"Product {sku} not found"}
+
+    with open(override_path, 'r') as f:
+        data = json.load(f)
+
+    return {
+        "sku": sku,
+        "collection": data.get("collection", "unknown"),
+        "garmentTypeLock": data.get("garmentTypeLock", ""),
+        "logoFingerprint": data.get("logoFingerprint", {}),
+        "brandingTech": data.get("brandingTech", {})
+    }
 
 
-# --- Product Intelligence Tools ---
+def get_reference_image_path(sku: str, view: str) -> str:
+    """Get path to reference product image."""
+    sku = sku.strip().lower()
+    product_data = load_product_data(sku)
+    collection = product_data.get("collection", "")
 
-def tool_load_product_data(sku: str) -> dict[str, Any]:
+    # Try multiple naming patterns
+    patterns = [
+        SOURCE_DIR / collection / f"{sku}-{view}.jpg",
+        SOURCE_DIR / collection / f"{sku}-{view}.jpeg",
+        SOURCE_DIR / collection / f"{sku}-{view}.png",
+    ]
+
+    for path in patterns:
+        if path.exists():
+            return str(path)
+
+    return ""
+
+
+def image_to_base64(image_path: str) -> str:
+    """Convert image file to base64 string."""
+    with open(image_path, 'rb') as f:
+        return base64.b64encode(f.read()).decode('utf-8')
+
+
+# ---------------------------------------------------------------------------
+# Vision Analyst Sub-Agent (GPT-4o, Gemini, Claude)
+# ---------------------------------------------------------------------------
+
+def tool_analyze_vision(sku: str, view: str, providers: str = "all") -> dict[str, Any]:
     """
-    Load product override data including logoFingerprint and reference images.
+    Analyze product reference image using multiple vision providers.
 
-    Returns product metadata, collection info, and ML-verified logo specifications.
+    Args:
+        sku: Product SKU (e.g., 'br-001')
+        view: Image view ('front', 'back')
+        providers: Which providers to use ('gpt4', 'gemini', 'claude', 'all')
+
+    Returns:
+        Combined analysis from all requested providers
     """
     try:
-        sku = sku.strip().lower()
-        override_path = OVERRIDES_DIR / f"{sku}.json"
+        product_data = load_product_data(sku)
+        image_path = get_reference_image_path(sku, view)
 
-        if not override_path.exists():
-            return {
-                "success": False,
-                "error": f"No override found for {sku}",
-                "available_products": [f.stem for f in OVERRIDES_DIR.glob("*.json")]
+        if not image_path:
+            return {"success": False, "error": f"No reference image found for {sku} {view}"}
+
+        image_base64 = image_to_base64(image_path)
+        results = {}
+
+        # GPT-4o Vision - Ultra-detailed specs
+        if providers in ("all", "gpt4"):
+            prompt = f"""Analyze this SkyyRose product photo in extreme detail.
+
+PRODUCT: {product_data.get('garmentTypeLock', sku.upper())}
+COLLECTION: {product_data.get('collection', 'unknown')}
+
+Provide ultra-detailed garment specifications:
+1. Construction details (silhouette, fit, cut, length, sleeves, neckline)
+2. Fabric analysis (material, texture, weight, finish)
+3. Color palette (exact shades, blocking patterns)
+4. Branding & logos (location, size, technique, colors)
+5. Hardware & details (ribbing, drawstrings, pockets, zippers, trim)
+6. Fit & drape prediction
+
+Be extremely detailed - this drives AI generation accuracy."""
+
+            response = openai_client.chat.completions.create(
+                model="gpt-4o",
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:image/jpeg;base64,{image_base64}",
+                                "detail": "high"
+                            }
+                        }
+                    ]
+                }],
+                max_tokens=2000,
+                temperature=0.2
+            )
+
+            results["gpt4"] = {
+                "provider": "openai",
+                "model": "gpt-4o",
+                "analysis": response.choices[0].message.content
             }
 
-        data = json.loads(override_path.read_text(encoding="utf-8"))
+        # Gemini Flash Vision - Brand consistency
+        if providers in ("all", "gemini"):
+            prompt = f"""Verify this SkyyRose product matches brand standards.
 
-        return {
-            "success": True,
-            "sku": sku,
-            "name": data.get("name", ""),
-            "collection": data.get("collection", ""),
-            "reference_images": data.get("referenceImages", []),
-            "logo_fingerprint": data.get("logoFingerprint", {}),
-            "branding_tech": data.get("brandingTech", {}),
-            "model_pose": data.get("modelPose", ""),
-            "setting": data.get("setting", "")
-        }
-    except Exception as exc:
-        return {"success": False, "error": str(exc)}
+PRODUCT: {product_data.get('garmentTypeLock', sku.upper())}
+COLLECTION: {product_data.get('collection', 'unknown')}
 
+Check:
+1. Brand consistency - Does it match SkyyRose aesthetic?
+2. Collection alignment - Fits {product_data.get('collection')} theme?
+3. Logo/branding technique - What method? (embroidered, silicone, printed, etc.)
+4. Quality markers - Premium construction indicators
+5. Critical elements for AI replication
 
-def tool_get_reference_image(sku: str, view: str = "front") -> dict[str, Any]:
-    """
-    Get base64-encoded reference image for a product view.
+Be specific about branding techniques."""
 
-    Returns image data ready for vision model analysis.
-    """
-    try:
-        product_data = tool_load_product_data(sku)
-        if not product_data["success"]:
-            return product_data
+            response = gemini_client.models.generate_content(
+                model="gemini-3-flash-preview",
+                contents=[
+                    prompt,
+                    genai_types.Part(
+                        inline_data=genai_types.Blob(
+                            mime_type="image/jpeg",
+                            data=base64.b64decode(image_base64)
+                        )
+                    )
+                ]
+            )
 
-        ref_images = product_data["reference_images"]
-        if not ref_images:
-            return {"success": False, "error": f"No reference images for {sku}"}
+            results["gemini"] = {
+                "provider": "google",
+                "model": "gemini-3-flash-preview",
+                "analysis": response.text
+            }
 
-        # Select image based on view
-        if view == "back" and len(ref_images) > 1 and "back" in ref_images[1]:
-            image_file = ref_images[1]
-        else:
-            image_file = ref_images[0]
+        # Claude Sonnet Vision - Critical reasoning
+        if providers in ("all", "claude"):
+            # Resize image for Claude (max 1568px, optimize)
+            img = Image.open(image_path)
+            if img.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                background.paste(img, mask=img.split()[-1] if img.mode in ('RGBA', 'LA') else None)
+                img = background
 
-        image_path = SOURCE_DIR / image_file
-        if not image_path.exists():
-            return {"success": False, "error": f"Image not found: {image_file}"}
+            max_size = 1568
+            if max(img.size) > max_size:
+                ratio = max_size / max(img.size)
+                new_size = tuple(int(dim * ratio) for dim in img.size)
+                img = img.resize(new_size, Image.Resampling.LANCZOS)
 
-        image_data = base64.b64encode(image_path.read_bytes()).decode("utf-8")
+            img_buffer = io.BytesIO()
+            img.save(img_buffer, format='JPEG', quality=85, optimize=True)
+            img_buffer.seek(0)
+            claude_image_data = base64.b64encode(img_buffer.read()).decode("utf-8")
+
+            prompt = f"""Critically analyze this SkyyRose product photo.
+
+PRODUCT: {product_data.get('garmentTypeLock', sku.upper())}
+
+Provide:
+1. Critical assessment - Any issues for AI replication?
+2. Accuracy verification - Do visible details match expectations?
+3. Improvement suggestions - Better angles needed?
+4. Risk factors - What could go wrong in generation?
+
+Use detailed reasoning."""
+
+            response = anthropic_client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1500,
+                temperature=0.3,
+                messages=[{
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "image",
+                            "source": {
+                                "type": "base64",
+                                "media_type": "image/jpeg",
+                                "data": claude_image_data
+                            }
+                        },
+                        {"type": "text", "text": prompt}
+                    ]
+                }]
+            )
+
+            results["claude"] = {
+                "provider": "anthropic",
+                "model": "claude-sonnet-4",
+                "analysis": response.content[0].text
+            }
 
         return {
             "success": True,
             "sku": sku,
             "view": view,
-            "image_file": image_file,
-            "image_base64": image_data,
-            "mime_type": "image/jpeg"
+            "analyses": results
         }
+
     except Exception as exc:
         return {"success": False, "error": str(exc)}
 
 
-# --- Vision Analysis Tools ---
+VISION_ANALYST_SYSTEM = """You are the VISION ANALYST for SkyyRose production.
 
-def tool_analyze_with_gpt4_vision(
-    image_base64: str,
-    product_name: str,
-    collection: str,
-    focus: str = "comprehensive"
-) -> dict[str, Any]:
-    """
-    Analyze product photo using GPT-4o Vision.
+Your job: Analyze product reference photos using multiple AI vision providers
+and synthesize their analyses into a unified specification for generation.
 
-    Focus options: comprehensive, logos_only, colors_only, construction_only
-    Returns ultra-detailed garment specifications.
-    """
-    try:
-        focus_prompts = {
-            "comprehensive": "Provide complete analysis of all aspects",
-            "logos_only": "Focus ONLY on branding, logos, and graphics - location, technique, colors",
-            "colors_only": "Focus ONLY on color palette - exact shades, blocking patterns",
-            "construction_only": "Focus ONLY on garment construction - cut, fit, hardware"
-        }
+YOU HAVE ONE TOOL:
+- tool_analyze_vision(sku, view, providers) - Runs vision analysis
 
-        prompt = f"""You are GPT-4o Vision analyzing a SkyyRose product.
+WORKFLOW:
+1. When given a product SKU and view, call tool_analyze_vision
+2. Review all provider analyses (GPT-4o, Gemini, Claude)
+3. Synthesize into unified specification highlighting:
+   - Critical accuracy points (logos, branding technique)
+   - Garment construction details
+   - Color specifications
+   - Quality markers
+   - Generation warnings
 
-PRODUCT: {product_name}
-COLLECTION: {collection}
-ANALYSIS FOCUS: {focus_prompts.get(focus, focus_prompts["comprehensive"])}
-
-Analyze this product photo with extreme precision. Return technical specifications
-in clear, structured format."""
-
-        response = openai_client.chat.completions.create(
-            model="gpt-4o",
-            messages=[{
-                "role": "user",
-                "content": [
-                    {"type": "text", "text": prompt},
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            "url": f"data:image/jpeg;base64,{image_base64}",
-                            "detail": "high"
-                        }
-                    }
-                ]
-            }],
-            max_tokens=1500,
-            temperature=0.2
-        )
-
-        analysis = response.choices[0].message.content
-
-        return {
-            "success": True,
-            "provider": "openai",
-            "model": "gpt-4o",
-            "focus": focus,
-            "analysis": analysis,
-            "char_count": len(analysis)
-        }
-    except Exception as exc:
-        return {"success": False, "provider": "openai", "error": str(exc)}
+Return a concise unified spec that will drive perfect AI generation."""
 
 
-def tool_analyze_with_gemini_vision(
-    image_base64: str,
-    product_name: str,
-    collection: str,
-    check_type: str = "brand_consistency"
-) -> dict[str, Any]:
-    """
-    Analyze product photo using Gemini 3 Flash Vision.
-
-    Check types: brand_consistency, quality_markers, generation_guidance
-    Returns brand-focused technical assessment.
-    """
-    try:
-        check_prompts = {
-            "brand_consistency": "Verify this matches SkyyRose brand standards and collection aesthetic",
-            "quality_markers": "Identify all quality indicators visible in construction and materials",
-            "generation_guidance": "List critical elements that MUST be replicated in AI generation"
-        }
-
-        prompt = f"""You are Gemini 3 Flash analyzing a SkyyRose product.
-
-PRODUCT: {product_name}
-COLLECTION: {collection}
-CHECK TYPE: {check_prompts.get(check_type, check_type)}
-
-Provide concise technical assessment focused on the check type."""
-
-        response = gemini_client.models.generate_content(
-            model="gemini-3-flash-preview",
-            contents=[
-                prompt,
-                genai_types.Part(
-                    inline_data=genai_types.Blob(
-                        mime_type="image/jpeg",
-                        data=image_base64
-                    )
-                )
-            ]
-        )
-
-        analysis = response.text
-
-        return {
-            "success": True,
-            "provider": "google",
-            "model": "gemini-3-flash-preview",
-            "check_type": check_type,
-            "analysis": analysis,
-            "char_count": len(analysis)
-        }
-    except Exception as exc:
-        return {"success": False, "provider": "google", "error": str(exc)}
+def build_vision_analyst() -> LlmAgent:
+    """Build Vision Analyst sub-agent."""
+    return LlmAgent(
+        name="vision_analyst",
+        model="gemini-2.0-flash",
+        instruction=VISION_ANALYST_SYSTEM,
+        tools=[FunctionTool(tool_analyze_vision)],
+        generate_content_config=genai_types.GenerateContentConfig(
+            temperature=0.4,
+            max_output_tokens=3000,
+        ),
+    )
 
 
-def tool_analyze_with_claude_vision(
-    image_base64: str,
-    product_name: str,
-    task: str = "critique_analysis"
-) -> dict[str, Any]:
-    """
-    Analyze product photo using Claude Sonnet Vision.
+# ---------------------------------------------------------------------------
+# Generator Sub-Agent (Gemini 3 Pro Image)
+# ---------------------------------------------------------------------------
 
-    Tasks: critique_analysis, verify_accuracy, suggest_improvements
-    Returns reasoning-focused assessment.
-    """
-    try:
-        task_prompts = {
-            "critique_analysis": "Critically review the product and identify any potential issues for AI replication",
-            "verify_accuracy": "Verify all visible details match what's expected for this product type",
-            "suggest_improvements": "Suggest how to improve the reference photo or what angles would be helpful"
-        }
-
-        prompt = f"""You are Claude Sonnet analyzing a SkyyRose product photo.
-
-PRODUCT: {product_name}
-TASK: {task_prompts.get(task, task)}
-
-Provide detailed reasoning-based assessment."""
-
-        response = anthropic_client.messages.create(
-            model="claude-sonnet-4-20250514",
-            max_tokens=1500,
-            temperature=0.3,
-            messages=[{
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image",
-                        "source": {
-                            "type": "base64",
-                            "media_type": "image/jpeg",
-                            "data": image_base64
-                        }
-                    },
-                    {
-                        "type": "text",
-                        "text": prompt
-                    }
-                ]
-            }]
-        )
-
-        analysis = response.content[0].text
-
-        return {
-            "success": True,
-            "provider": "anthropic",
-            "model": "claude-sonnet-4",
-            "task": task,
-            "analysis": analysis,
-            "char_count": len(analysis)
-        }
-    except Exception as exc:
-        return {"success": False, "provider": "anthropic", "error": str(exc)}
-
-
-# --- Generation Tools ---
-
-def tool_generate_with_gemini_pro_image(
+def tool_generate_image(
     sku: str,
+    view: str,
     generation_spec: str,
-    reference_image_base64: str,
-    view: str = "front",
     resolution: str = "4K"
 ) -> dict[str, Any]:
     """
     Generate fashion model image using Gemini 3 Pro Image.
 
-    Resolution options: 4K, 2K, 1K
-    Returns path to generated 4K editorial fashion photo.
+    Args:
+        sku: Product SKU
+        view: View angle (front, back)
+        generation_spec: Detailed specification from vision analysis
+        resolution: Output resolution (4K, HD)
+
+    Returns:
+        Path to generated image
     """
     try:
-        product_data = tool_load_product_data(sku)
-        if not product_data["success"]:
-            return product_data
+        # Get reference image
+        image_path = get_reference_image_path(sku, view)
+        if not image_path:
+            return {"success": False, "error": f"No reference image for {sku} {view}"}
 
-        collection = product_data["collection"]
-        is_kids = collection == "kids-capsule"
+        ref_image_base64 = image_to_base64(image_path)
 
-        collection_moods = {
-            "black-rose": "Gothic romance, mysterious elegance",
-            "love-hurts": "Raw street intensity, Oakland pride",
-            "signature": "Editorial prestige, champagne gold luxury",
-            "kids-capsule": "Joyful luxury, SPECIAL premium quality"
-        }
+        # Build generation prompt
+        prompt = f"""Generate a professional editorial fashion photograph.
 
-        view_instructions = (
-            "Model facing AWAY, showing BACK of garment"
-            if view == "back" else
-            "Model facing FORWARD, showing FRONT of garment"
-        )
-
-        prompt = f"""Create professional editorial fashion photograph for SkyyRose.
-
-GARMENT SPECIFICATIONS:
+REFERENCE PRODUCT:
 {generation_spec}
 
-CRITICAL: 100% exact replica - every logo, graphic, color must match.
+REQUIREMENTS:
+- Professional fashion model wearing this exact product
+- Editorial lighting (soft, directional, high-end fashion aesthetic)
+- Clean neutral background (studio white or subtle gradient)
+- Model pose: natural, confident, fashion editorial style
+- View: {view} angle
+- Focus on garment details and branding
+- {resolution} resolution, high quality
 
-MODEL: {"Child (8-10 years)" if is_kids else "Professional adult model"}
-VIEW: {view_instructions}
-STYLE: Vogue editorial, Hasselblad aesthetic
-SETTING: {collection_moods.get(collection, "")}
-FORMAT: 3:4 portrait, {resolution}
+CRITICAL:
+- Logo and branding must match the reference EXACTLY
+- All garment details must be accurate to the specification
+- No hallucinations - only what's specified
 
-Generate now."""
+Generate the image."""
 
+        # Call Gemini 3 Pro Image
         response = gemini_client.models.generate_content(
             model="gemini-3-pro-image-preview",
             contents=[
@@ -399,7 +394,7 @@ Generate now."""
                 genai_types.Part(
                     inline_data=genai_types.Blob(
                         mime_type="image/jpeg",
-                        data=reference_image_base64
+                        data=base64.b64decode(ref_image_base64)
                     )
                 )
             ],
@@ -412,48 +407,81 @@ Generate now."""
             )
         )
 
-        # Extract image
-        if not response.candidates or not response.candidates[0].content.parts:
-            return {"success": False, "error": "No image generated"}
+        # Extract generated image
+        output_path = OUTPUT_DIR / sku / f"{sku}-model-{view}-gemini.jpg"
+        output_path.parent.mkdir(parents=True, exist_ok=True)
 
         for part in response.candidates[0].content.parts:
-            if part.inline_data:
-                output_dir = OUTPUT_DIR / sku
-                output_dir.mkdir(parents=True, exist_ok=True)
-
-                output_path = output_dir / f"{sku}-model-{view}-elite.jpg"
-                output_path.write_bytes(base64.b64decode(part.inline_data.data))
+            if hasattr(part, 'inline_data') and part.inline_data:
+                image_data = part.inline_data.data
+                with open(output_path, 'wb') as f:
+                    f.write(image_data)
 
                 return {
                     "success": True,
                     "provider": "google",
-                    "model": "gemini-3-pro-image",
-                    "sku": sku,
-                    "view": view,
+                    "model": "gemini-3-pro-image-preview",
                     "output_path": str(output_path),
                     "resolution": resolution
                 }
 
-        return {"success": False, "error": "No image data in response"}
+        return {"success": False, "error": "No image in response"}
+
     except Exception as exc:
-        return {"success": False, "provider": "google", "error": str(exc)}
+        return {"success": False, "error": str(exc)}
 
 
-# --- Verification Tools ---
+GENERATOR_SYSTEM = """You are the GENERATOR for SkyyRose production.
 
-def tool_verify_image_quality(
+Your job: Generate 4K editorial fashion model images using Gemini 3 Pro Image.
+
+YOU HAVE ONE TOOL:
+- tool_generate_image(sku, view, generation_spec, resolution)
+
+WORKFLOW:
+1. Receive unified specification from Vision Analyst
+2. Call tool_generate_image with the spec
+3. Return the output path
+
+Keep it simple - just generate the image as specified."""
+
+
+def build_generator() -> LlmAgent:
+    """Build Generator sub-agent."""
+    return LlmAgent(
+        name="generator",
+        model="gemini-2.0-flash",
+        instruction=GENERATOR_SYSTEM,
+        tools=[FunctionTool(tool_generate_image)],
+        generate_content_config=genai_types.GenerateContentConfig(
+            temperature=0.3,
+            max_output_tokens=1000,
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Quality Sub-Agent (Multi-provider verification)
+# ---------------------------------------------------------------------------
+
+def tool_verify_quality(
     image_path: str,
-    expected_specs: str,
+    expected_spec: str,
     verifier: str = "claude"
 ) -> dict[str, Any]:
     """
-    Verify generated image matches specifications.
+    Verify generated image quality and accuracy.
 
-    Verifiers: claude, gpt4, gemini, all (consensus)
-    Returns quality assessment with pass/warn/fail status.
+    Args:
+        image_path: Path to generated image
+        expected_spec: What the image should contain
+        verifier: Which provider ('claude', 'gpt4', 'gemini')
+
+    Returns:
+        Quality assessment with pass/warn/fail status
     """
     try:
-        # Prepare image
+        # Prepare image for verification
         img = Image.open(image_path)
         if img.mode in ('RGBA', 'LA', 'P'):
             background = Image.new('RGB', img.size, (255, 255, 255))
@@ -474,12 +502,12 @@ def tool_verify_image_quality(
         image_data = base64.b64encode(img_buffer.read()).decode("utf-8")
 
         if verifier == "claude":
-            prompt = f"""You are Quality Control verifying an AI-generated fashion photo.
+            prompt = f"""Quality Control: Verify this AI-generated fashion photo.
 
 EXPECTED SPECIFICATIONS:
-{expected_specs}
+{expected_spec}
 
-Inspect this image and return JSON:
+Inspect the image and return JSON:
 {{
   "overall_status": "pass|warn|fail",
   "logo_accuracy": {{"status": "pass|warn|fail", "notes": "..."}},
@@ -521,99 +549,241 @@ Inspect this image and return JSON:
             }
 
         return {"success": False, "error": f"Unknown verifier: {verifier}"}
+
     except Exception as exc:
         return {"success": False, "error": str(exc)}
 
 
-# ---------------------------------------------------------------------------
-# Tool Registration for ADK Agents
-# ---------------------------------------------------------------------------
+QUALITY_SYSTEM = """You are QUALITY CONTROL for SkyyRose production.
 
-ALL_TOOLS = [
-    tool_load_product_data,
-    tool_get_reference_image,
-    tool_analyze_with_gpt4_vision,
-    tool_analyze_with_gemini_vision,
-    tool_analyze_with_claude_vision,
-    tool_generate_with_gemini_pro_image,
-    tool_verify_image_quality,
-]
+Your job: Verify generated images match specifications and approve/reject.
 
-# ---------------------------------------------------------------------------
-# Elite Coordinator Agent (Claude Opus with all tools)
-# ---------------------------------------------------------------------------
+YOU HAVE ONE TOOL:
+- tool_verify_quality(image_path, expected_spec, verifier)
 
-COORDINATOR_SYSTEM = """You are the ELITE PRODUCTION COORDINATOR for SkyyRose.
+WORKFLOW:
+1. Receive image path and specification
+2. Call tool_verify_quality
+3. Review the verification results
+4. Make final decision: APPROVE, REGENERATE, or MANUAL_REVIEW
 
-You orchestrate a multi-provider team of AI specialists to create perfect fashion photography.
-
-## YOUR TEAM:
-- GPT-4o Vision (OpenAI) - Ultra-detailed product analysis
-- Gemini 3 Flash (Google) - Brand consistency verification
-- Claude Sonnet (Anthropic) - Quality critique & reasoning
-- Gemini 3 Pro Image (Google) - 4K editorial generation
-- DALL-E 3 (OpenAI) - Alternative generation
-
-## YOUR TOOLS (USE INTELLIGENTLY):
-
-**Product Intelligence:**
-- tool_load_product_data(sku) - Get product metadata, logoFingerprint
-- tool_get_reference_image(sku, view) - Get base64 reference photo
-
-**Vision Analysis (DELEGATE TO SPECIALISTS):**
-- tool_analyze_with_gpt4_vision(image, name, collection, focus) - Ultra-detailed
-- tool_analyze_with_gemini_vision(image, name, collection, check_type) - Brand check
-- tool_analyze_with_claude_vision(image, name, task) - Critical reasoning
-
-**Generation:**
-- tool_generate_with_gemini_pro_image(sku, spec, ref_image, view, resolution)
-
-**Quality Control:**
-- tool_verify_image_quality(image_path, specs, verifier)
-
-## YOUR WORKFLOW (REASON ABOUT THIS):
-
-1. INTELLIGENCE GATHERING
-   - Load product data to understand what you're working with
-   - Get reference image for analysis
-
-2. MULTI-ANGLE VISION ANALYSIS
-   - Delegate to GPT-4o for ultra-detailed specs
-   - Delegate to Gemini for brand consistency
-   - Optionally delegate to Claude for critical review
-   - SYNTHESIZE results into unified specification
-
-3. GENERATION
-   - Use unified spec to generate with Gemini 3 Pro Image
-   - Save output path for verification
-
-4. QUALITY VERIFICATION
-   - Verify generated image matches specs
-   - Make quality decision: approve, regenerate, or escalate
-
-5. REPORT & DELIVER
-   - Provide clear summary of what was created
-   - Report any issues or deviations
-
-## DECISION MAKING:
-- You have FULL AUTONOMY to decide which tools to use
-- Think strategically about which specialists to consult
-- Balance thoroughness with efficiency
-- Always prioritize 100% accuracy over speed
-
-Be professional, thorough, and decisive."""
+Return clear decision with reasoning."""
 
 
-def build_coordinator_agent() -> LlmAgent:
-    """Build the Elite Coordinator Agent with all tools."""
+def build_quality_agent() -> LlmAgent:
+    """Build Quality sub-agent."""
     return LlmAgent(
-        name="elite_coordinator",
-        model="gemini-3-flash-preview",  # Using Gemini 3 Flash (2M context)
-        instruction=COORDINATOR_SYSTEM,
-        tools=[FunctionTool(fn) for fn in ALL_TOOLS],
+        name="quality_control",
+        model="gemini-2.0-flash",
+        instruction=QUALITY_SYSTEM,
+        tools=[FunctionTool(tool_verify_quality)],
         generate_content_config=genai_types.GenerateContentConfig(
-            temperature=0.6,
-            max_output_tokens=4096,
+            temperature=0.2,
+            max_output_tokens=1000,
+        ),
+    )
+
+
+# ---------------------------------------------------------------------------
+# Coordinator Agent (Lightweight orchestration)
+# ---------------------------------------------------------------------------
+
+def tool_delegate_to_vision_analyst(sku: str, view: str) -> dict[str, Any]:
+    """Delegate vision analysis to Vision Analyst sub-agent."""
+    try:
+        print(f"\n🔬 Delegating to Vision Analyst...")
+
+        agent = build_vision_analyst()
+        session_svc = InMemorySessionService()
+        runner = Runner(agent=agent, app_name=f"{APP_NAME}_vision", session_service=session_svc)
+
+        import uuid
+        session_id = str(uuid.uuid4())
+        session_svc.create_session_sync(
+            app_name=f"{APP_NAME}_vision",
+            user_id="coordinator",
+            session_id=session_id,
+        )
+
+        task_msg = f"Analyze product {sku}, {view} view. Use all providers and synthesize unified specification."
+
+        content = genai_types.Content(
+            role="user",
+            parts=[genai_types.Part(text=task_msg)],
+        )
+
+        # Extract final response
+        final_response = ""
+        for event in runner.run(
+            user_id="coordinator",
+            session_id=session_id,
+            new_message=content
+        ):
+            if event.is_final_response():
+                if event.content and event.content.parts:
+                    texts = [p.text for p in event.content.parts if hasattr(p, "text") and p.text]
+                    final_response = "\n".join(texts)
+
+        # Store in shared state
+        _shared_state[f"{sku}_{view}_spec"] = final_response
+
+        return {
+            "success": True,
+            "agent": "vision_analyst",
+            "specification": final_response
+        }
+
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
+def tool_delegate_to_generator(sku: str, view: str) -> dict[str, Any]:
+    """Delegate image generation to Generator sub-agent."""
+    try:
+        print(f"\n🎨 Delegating to Generator...")
+
+        # Get spec from shared state
+        spec = _shared_state.get(f"{sku}_{view}_spec", "")
+        if not spec:
+            return {"success": False, "error": "No specification available - run vision analysis first"}
+
+        agent = build_generator()
+        session_svc = InMemorySessionService()
+        runner = Runner(agent=agent, app_name=f"{APP_NAME}_generator", session_service=session_svc)
+
+        import uuid
+        session_id = str(uuid.uuid4())
+        session_svc.create_session_sync(
+            app_name=f"{APP_NAME}_generator",
+            user_id="coordinator",
+            session_id=session_id,
+        )
+
+        task_msg = f"Generate image for {sku}, {view} view using this specification:\n\n{spec}"
+
+        content = genai_types.Content(
+            role="user",
+            parts=[genai_types.Part(text=task_msg)],
+        )
+
+        # Extract output path from tool results
+        output_path = ""
+        for event in runner.run(
+            user_id="coordinator",
+            session_id=session_id,
+            new_message=content
+        ):
+            if event.content and event.content.parts:
+                for part in event.content.parts:
+                    if hasattr(part, 'function_response'):
+                        response_data = part.function_response.response
+                        if isinstance(response_data, dict) and 'output_path' in response_data:
+                            output_path = response_data['output_path']
+
+        if output_path:
+            _shared_state[f"{sku}_{view}_image"] = output_path
+            return {
+                "success": True,
+                "agent": "generator",
+                "output_path": output_path
+            }
+
+        return {"success": False, "error": "No output path in generator response"}
+
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
+def tool_delegate_to_quality(sku: str, view: str) -> dict[str, Any]:
+    """Delegate quality verification to Quality sub-agent."""
+    try:
+        print(f"\n✅ Delegating to Quality Control...")
+
+        # Get image path and spec from shared state
+        image_path = _shared_state.get(f"{sku}_{view}_image", "")
+        spec = _shared_state.get(f"{sku}_{view}_spec", "")
+
+        if not image_path or not spec:
+            return {"success": False, "error": "Missing image or spec"}
+
+        agent = build_quality_agent()
+        session_svc = InMemorySessionService()
+        runner = Runner(agent=agent, app_name=f"{APP_NAME}_quality", session_service=session_svc)
+
+        import uuid
+        session_id = str(uuid.uuid4())
+        session_svc.create_session_sync(
+            app_name=f"{APP_NAME}_quality",
+            user_id="coordinator",
+            session_id=session_id,
+        )
+
+        task_msg = f"Verify quality of generated image at {image_path} against specification:\n\n{spec}"
+
+        content = genai_types.Content(
+            role="user",
+            parts=[genai_types.Part(text=task_msg)],
+        )
+
+        # Extract final decision
+        final_response = ""
+        for event in runner.run(
+            user_id="coordinator",
+            session_id=session_id,
+            new_message=content
+        ):
+            if event.is_final_response():
+                if event.content and event.content.parts:
+                    texts = [p.text for p in event.content.parts if hasattr(p, "text") and p.text]
+                    final_response = "\n".join(texts)
+
+        return {
+            "success": True,
+            "agent": "quality_control",
+            "decision": final_response
+        }
+
+    except Exception as exc:
+        return {"success": False, "error": str(exc)}
+
+
+COORDINATOR_SYSTEM = """You are the PRODUCTION COORDINATOR for SkyyRose Elite Studio.
+
+You orchestrate a team of specialized sub-agents to create perfect fashion photography.
+
+YOUR SUB-AGENTS:
+1. Vision Analyst - Analyzes reference photos using GPT-4o, Gemini, Claude
+2. Generator - Creates 4K images using Gemini 3 Pro Image
+3. Quality Control - Verifies accuracy and approves/rejects
+
+YOUR TOOLS (delegation only):
+- tool_delegate_to_vision_analyst(sku, view) - Get unified specification
+- tool_delegate_to_generator(sku, view) - Generate image from spec
+- tool_delegate_to_quality(sku, view) - Verify quality and approve
+
+WORKFLOW:
+1. Delegate to Vision Analyst → get unified spec
+2. Delegate to Generator → create image
+3. Delegate to Quality Control → verify and approve
+4. Report final results
+
+You don't do the work - you coordinate specialists. Keep coordination brief."""
+
+
+def build_coordinator() -> LlmAgent:
+    """Build lightweight Coordinator agent."""
+    return LlmAgent(
+        name="production_coordinator",
+        model="gemini-2.0-flash",
+        instruction=COORDINATOR_SYSTEM,
+        tools=[
+            FunctionTool(tool_delegate_to_vision_analyst),
+            FunctionTool(tool_delegate_to_generator),
+            FunctionTool(tool_delegate_to_quality),
+        ],
+        generate_content_config=genai_types.GenerateContentConfig(
+            temperature=0.5,
+            max_output_tokens=2000,
         ),
     )
 
@@ -623,17 +793,20 @@ def build_coordinator_agent() -> LlmAgent:
 # ---------------------------------------------------------------------------
 
 def run_elite_production(sku: str, view: str = "front") -> dict[str, Any]:
-    """Run elite production using coordin agent with programmatic tool calling."""
-    print(f"\n🎬 Elite Production Studio")
+    """Run elite production using hierarchical multi-agent system."""
+    print(f"\n🎬 Elite Production Studio - Hierarchical Architecture")
     print(f"{'='*60}")
     print(f"📦 Product: {sku.upper()}")
     print(f"👁️  View: {view}")
     print('='*60)
 
-    # Build agent and runner
-    agent = build_coordinator_agent()
+    # Clear shared state
+    _shared_state.clear()
+
+    # Build coordinator and runner
+    coordinator = build_coordinator()
     session_svc = InMemorySessionService()
-    runner = Runner(agent=agent, app_name=APP_NAME, session_service=session_svc)
+    runner = Runner(agent=coordinator, app_name=APP_NAME, session_service=session_svc)
 
     # Create session
     import uuid
@@ -645,63 +818,76 @@ def run_elite_production(sku: str, view: str = "front") -> dict[str, Any]:
     )
 
     # Send task to coordinator
-    task_message = f"""Execute complete production workflow for product SKU '{sku}', {view} view.
+    task_message = f"Execute complete production workflow for product {sku}, {view} view."
 
-Use your tools intelligently to:
-1. Gather product intelligence
-2. Conduct multi-provider vision analysis
-3. Generate 4K editorial fashion photo
-4. Verify quality
-5. Report results
+    print(f"\n🎯 Coordinator orchestrating sub-agents...")
 
-Think step-by-step and use the right specialists for each task."""
+    try:
+        # Wrap message
+        content = genai_types.Content(
+            role="user",
+            parts=[genai_types.Part(text=task_message)],
+        )
 
-    content = genai_types.Content(
-        role="user",
-        parts=[genai_types.Part(text=task_message)],
-    )
+        # Extract final report
+        print(f"\n{'='*60}")
+        print(f"📊 Production Report:")
+        print(f"{'='*60}")
 
-    print("\n🤖 Coordinator Agent thinking...\n")
+        for event in runner.run(
+            user_id="cli-user",
+            session_id=session_id,
+            new_message=content
+        ):
+            if event.is_final_response():
+                if event.content and event.content.parts:
+                    for part in event.content.parts:
+                        if hasattr(part, 'text') and part.text:
+                            print(part.text)
 
-    response_text = ""
-    for event in runner.run(user_id="cli-user", session_id=session_id, new_message=content):
-        if event.is_final_response():
-            if event.content and event.content.parts:
-                texts = [p.text for p in event.content.parts if hasattr(p, "text") and p.text]
-                response_text = "\n".join(texts)
-            break
+        # Get final output
+        output_path = _shared_state.get(f"{sku}_{view}_image", "")
 
-    print(f"\n{'='*60}")
-    print("📊 Coordinator Report:")
-    print('='*60)
-    print(response_text)
+        return {
+            "status": "success",
+            "sku": sku,
+            "view": view,
+            "output_path": output_path,
+            "shared_state": dict(_shared_state)
+        }
 
-    return {"status": "success", "sku": sku, "view": view, "report": response_text}
+    except Exception as exc:
+        print(f"\n❌ Error: {exc}")
+        return {
+            "status": "error",
+            "error": str(exc)
+        }
 
 
 # ---------------------------------------------------------------------------
 # CLI
 # ---------------------------------------------------------------------------
 
-def main() -> None:
+def main():
     parser = argparse.ArgumentParser(description="SkyyRose Elite Production Studio")
-    subparsers = parser.add_subparsers(dest="command", required=True)
-
-    p_produce = subparsers.add_parser("produce", help="Produce one image")
-    p_produce.add_argument("sku", help="Product SKU")
-    p_produce.add_argument("--view", default="front", help="View (front|back)")
+    parser.add_argument("command", choices=["produce", "produce-batch"], help="Command to run")
+    parser.add_argument("sku", nargs="?", help="Product SKU (e.g., br-001)")
+    parser.add_argument("--view", default="front", choices=["front", "back"], help="View angle")
+    parser.add_argument("--all", action="store_true", help="Process all products (for produce-batch)")
 
     args = parser.parse_args()
 
-    # Validate keys
-    required_keys = ["GEMINI_API_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY"]
-    missing = [k for k in required_keys if not os.getenv(k)]
-    if missing:
-        print(f"❌ Missing: {', '.join(missing)}", file=sys.stderr)
-        sys.exit(1)
-
     if args.command == "produce":
-        run_elite_production(args.sku, args.view)
+        if not args.sku:
+            print("Error: SKU required for 'produce' command")
+            sys.exit(1)
+
+        result = run_elite_production(args.sku, args.view)
+        print(f"\n✨ Result: {result}")
+
+    elif args.command == "produce-batch":
+        print("Batch production not yet implemented")
+        sys.exit(1)
 
 
 if __name__ == "__main__":
