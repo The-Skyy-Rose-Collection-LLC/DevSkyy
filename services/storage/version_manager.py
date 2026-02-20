@@ -332,7 +332,7 @@ class AssetVersionManager:
             f"Created asset {asset_id}",
             extra={
                 "asset_id": asset_id,
-                "name": name,
+                "asset_name": name,
                 "correlation_id": correlation_id,
             },
         )
