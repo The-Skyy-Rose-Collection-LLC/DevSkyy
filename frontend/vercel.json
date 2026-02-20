@@ -1,0 +1,16 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "name": "devskyy",
+  "buildCommand": "pnpm build",
+  "devCommand": "pnpm dev",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "regions": ["iad1"],
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://api.devskyy.app",
+    "NEXT_PUBLIC_WS_URL": "wss://api.devskyy.app",
+    "NEXT_PUBLIC_SITE_NAME": "DevSkyy Dashboard",
+    "NEXT_PUBLIC_ENABLE_ROUND_TABLE": "true"
+  }
+}
