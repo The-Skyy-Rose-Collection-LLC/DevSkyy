@@ -10,7 +10,18 @@ from pathlib import Path
 
 
 def _build_spec() -> dict:
-    """Build the design_system agent specification."""
+    """
+    Constructs the Design System agent specification used by the application.
+    
+    Returns:
+        spec (dict): A dictionary defining the agent specification with keys:
+            - role: agent role identifier (str)
+            - name: agent name (str)
+            - system_prompt: detailed system prompt for the design system specialist (str)
+            - capabilities: list of capability entries, each with `name`, `description`, and `tags` (list)
+            - knowledge_files: list of paths to knowledge resources (list of str)
+            - preferred_model: preferred model specification with `provider` and `model` (dict)
+    """
     return {
         "role": "design_system",
         "name": "design_system",

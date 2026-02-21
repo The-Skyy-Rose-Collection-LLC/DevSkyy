@@ -41,7 +41,24 @@ def _make_planning_json(
     num_stories: int = 3,
     roles: list[str] | None = None,
 ) -> str:
-    """Generate valid planning JSON with given number of stories."""
+    """
+    Create a planning JSON string containing a list of user stories and their dependency order.
+    
+    Parameters:
+        num_stories (int): Number of user stories to generate.
+        roles (list[str] | None): List of agent role names to assign to stories; roles are assigned cyclically. If None, defaults to ["design_system", "frontend_dev", "backend_dev"].
+    
+    Returns:
+        str: JSON-formatted string with two keys:
+            - "stories": list of story objects, each containing:
+                - "id": story id in the form "US-###" (zero-padded).
+                - "title": story title.
+                - "description": story description.
+                - "agent_role": assigned role name.
+                - "depends_on": list of prerequisite story ids.
+                - "acceptance_criteria": list of acceptance criteria strings.
+            - "dependency_order": list of story ids in the generated order.
+    """
     roles = roles or ["design_system", "frontend_dev", "backend_dev"]
     stories = []
     order = []
@@ -62,7 +79,15 @@ def _make_planning_json(
 
 
 def _make_fake_adapter(content: str = "OK") -> AsyncMock:
-    """Create a fake provider adapter returning given content."""
+    """
+    Create an asynchronous mock adapter whose `generate` method returns an LLMResponse containing the provided content.
+    
+    Parameters:
+    	content (str): The content to put in the mocked LLMResponse.
+    
+    Returns:
+    	AsyncMock: An AsyncMock adapter with a `generate` coroutine that returns an LLMResponse whose `content` equals `content`.
+    """
     adapter = AsyncMock()
     adapter.generate = AsyncMock(
         return_value=LLMResponse(
@@ -76,7 +101,18 @@ def _make_fake_adapter(content: str = "OK") -> AsyncMock:
 
 
 def _make_director_with_mock(planning_response: str = "", story_response: str = "OK") -> Director:
-    """Create a Director with mocked router."""
+    """
+    Create a Director whose ModelRouter is populated with a single test adapter that returns controlled responses.
+    
+    The returned Director uses a router with route entries for the director and common agent roles all pointing to the "test" provider. The test adapter's generate method is mocked so that the first invocation returns the provided planning_response content and all subsequent invocations return the provided story_response content.
+    
+    Parameters:
+        planning_response (str): JSON or text to return on the first generate call (planning phase).
+        story_response (str): Text to return on subsequent generate calls (per-story responses).
+    
+    Returns:
+        Director: A Director instance wired to the mocked ModelRouter and test adapter.
+    """
     router = ModelRouter(
         routing={
             "director": {"provider": "test", "model": "test"},
@@ -96,6 +132,22 @@ def _make_director_with_mock(planning_response: str = "", story_response: str = 
     original_content = planning_response
 
     async def mock_generate(prompt, *, system_prompt="", model="", temperature=0.7, max_tokens=4096):
+        """
+        Mock async generate function that returns a planning response on the first call and story responses on subsequent calls.
+        
+        Parameters:
+        	prompt (str): The prompt sent to the model.
+        	system_prompt (str): Optional system prompt (accepted but not used by the mock).
+        	model (str): Optional model identifier (accepted but not used by the mock).
+        	temperature (float): Optional sampling temperature (accepted but not used by the mock).
+        	max_tokens (int): Optional token limit (accepted but not used by the mock).
+        
+        Returns:
+        	LLMResponse: An LLMResponse containing `original_content` on the first invocation and `story_response` on subsequent invocations.
+        
+        Notes:
+        	Increments the enclosing `call_count` nonlocal variable on each invocation.
+        """
         nonlocal call_count
         call_count += 1
         if call_count == 1:
@@ -297,6 +349,16 @@ class TestPlanStories:
         captured_prompt = None
 
         async def capture_generate(prompt, **kwargs):
+            """
+            Capture the provided prompt into the enclosing scope and return a canned planning LLMResponse.
+            
+            Parameters:
+                prompt (str): The prompt text passed to the model; stored into the outer-scope variable `captured_prompt`.
+                **kwargs: Additional keyword arguments accepted by the call and ignored by this test helper.
+            
+            Returns:
+                LLMResponse: A fabricated response with content set to `planning_json`, provider `"test"`, model `"test"`, and latency_ms `50`.
+            """
             nonlocal captured_prompt
             captured_prompt = prompt
             return LLMResponse(content=planning_json, provider="test", model="test", latency_ms=50)
@@ -320,6 +382,17 @@ class TestPlanStories:
         captured_system_prompt = None
 
         async def capture_generate(prompt, *, system_prompt="", **kwargs):
+            """
+            Capture the provided system prompt and return a canned LLMResponse for testing.
+            
+            Parameters:
+                prompt (str): The user prompt passed to the generator.
+                system_prompt (str): The system-level prompt; its value is saved to the outer-scope variable `captured_system_prompt`.
+                **kwargs: Additional keyword arguments are accepted and ignored.
+            
+            Returns:
+                LLMResponse: A response with `content` set to the test planning JSON, `provider` and `model` set to "test", and `latency_ms` equal to 50.
+            """
             nonlocal captured_system_prompt
             captured_system_prompt = system_prompt
             return LLMResponse(content=planning_json, provider="test", model="test", latency_ms=50)
@@ -388,6 +461,19 @@ class TestExecutePrd:
         call_count = 0
 
         async def mock_generate(prompt, **kwargs):
+            """
+            Return a canned LLMResponse that yields a planning JSON on the first invocation and "OK" on subsequent invocations.
+            
+            Parameters:
+            	prompt (Any): The prompt passed to the mock; its value is not inspected by the mock.
+            	**kwargs: Ignored; present for compatibility with the real adapter signature.
+            
+            Returns:
+            	LLMResponse: On the first call, an LLMResponse whose `content` is the `planning_json` variable; on later calls, an LLMResponse whose `content` is "OK". In both cases `provider` is "test", `model` is "test", and `latency_ms` is 50.
+            
+            Side effects:
+            	Increments the outer-scope `call_count` on each invocation to track call order.
+            """
             nonlocal call_count
             call_count += 1
             if call_count == 1:
@@ -449,6 +535,18 @@ class TestExecutePrd:
         original_generate = adapter.generate
 
         async def counting_generate(prompt, **kwargs):
+            """
+            Simulates an async model generate that returns a planning response on the first call and a generic "OK" response thereafter.
+            
+            Increments the surrounding `call_count` each time it is invoked to track number of calls.
+            
+            Parameters:
+                prompt (str): The prompt passed to the model.
+                **kwargs: Additional generation options (ignored by this mock).
+            
+            Returns:
+                LLMResponse: On the first invocation, an LLMResponse whose `content` is the planning JSON; on subsequent invocations, an LLMResponse whose `content` is "OK". Both responses have `provider="test"`, `model="test"`, and `latency_ms=50`.
+            """
             nonlocal call_count
             call_count += 1
             if call_count == 1:

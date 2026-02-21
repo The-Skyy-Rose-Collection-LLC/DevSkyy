@@ -28,6 +28,14 @@ class RalphExecutor:
         base_delay: float = 2.0,
         max_delay: float = 30.0,
     ) -> None:
+        """
+        Initialize the executor's retry and exponential-backoff configuration.
+        
+        Parameters:
+            max_attempts (int): Maximum number of attempts for the primary operation.
+            base_delay (float): Base delay in seconds used to compute exponential backoff between retries.
+            max_delay (float): Maximum delay in seconds to cap the backoff.
+        """
         self._max_attempts = max_attempts
         self._base_delay = base_delay
         self._max_delay = max_delay
@@ -39,7 +47,21 @@ class RalphExecutor:
         fallbacks: list[Callable[..., Awaitable[T]]] | None = None,
         **kwargs: object,
     ) -> T:
-        """Execute with retry and optional fallback chain."""
+        """
+        Execute an async callable with retry attempts using exponential backoff and optional fallbacks.
+        
+        Parameters:
+            func (Callable[..., Awaitable[T]]): Primary asynchronous callable to execute.
+            *args: Positional arguments forwarded to `func` and any fallbacks.
+            fallbacks (list[Callable[..., Awaitable[T]]] | None): Optional sequence of asynchronous callables to try in order if all primary attempts fail.
+            **kwargs: Keyword arguments forwarded to `func` and any fallbacks.
+        
+        Returns:
+            T: The value returned by the primary `func` or by the first fallback that succeeds.
+        
+        Raises:
+            RuntimeError: If all retry attempts and all provided fallbacks fail; the last encountered exception is set as the exception cause.
+        """
         last_error: Exception | None = None
 
         # Try primary function

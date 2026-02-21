@@ -35,6 +35,18 @@ def _make_story(
     role: AgentRole = AgentRole.DESIGN_SYSTEM,
     deps: list[str] | None = None,
 ) -> UserStory:
+    """
+    Create a test UserStory with sensible defaults for unit tests.
+    
+    Parameters:
+        sid: Story identifier to assign to the UserStory.
+        title: Title to assign; the returned story's description will be "Description for {title}".
+        role: AgentRole to assign as the story's agent_role.
+        deps: Optional list of story ids this story depends on; defaults to an empty list when omitted.
+    
+    Returns:
+        A UserStory initialized with the given id, title, description, agent_role, and depends_on.
+    """
     return UserStory(
         id=sid,
         title=title,
@@ -45,6 +57,16 @@ def _make_story(
 
 
 def _make_router_with_mock(content: str = "OK") -> ModelRouter:
+    """
+    Create a ModelRouter configured with a mocked adapter that returns a preset LLMResponse.
+    
+    Parameters:
+        content (str): The text content the mock adapter's LLMResponse will contain.
+    
+    Returns:
+        ModelRouter: A router with an AsyncMock adapter registered for providers
+        "anthropic", "google", "openai", and "xai" that yields an LLMResponse with the given content.
+    """
     router = ModelRouter(
         routing=_DEFAULT_ROUTING["routing"],
         fallbacks=_DEFAULT_ROUTING["fallbacks"],

@@ -82,6 +82,12 @@ class TestFileCompleteness:
 
     @pytest.mark.parametrize("path", EXPECTED_AGENT_FILES)
     def test_agent_file_exists(self, path):
+        """
+        Asserts that the specified agent file exists under the package root.
+        
+        Parameters:
+            path (str | pathlib.Path): Relative path to the expected agent file within the package.
+        """
         assert (PACKAGE_ROOT / path).exists(), f"Missing agent file: {path}"
 
     @pytest.mark.parametrize("path", EXPECTED_CORE_FILES)
@@ -94,6 +100,12 @@ class TestFileCompleteness:
 
     @pytest.mark.parametrize("path", EXPECTED_CONFIG_FILES)
     def test_config_file_exists(self, path):
+        """
+        Asserts that a configuration file exists at the given relative path within the package root.
+        
+        Parameters:
+            path (str | pathlib.Path): Relative path to the expected config file under PACKAGE_ROOT.
+        """
         assert (PACKAGE_ROOT / path).exists(), f"Missing config file: {path}"
 
     def test_no_file_exceeds_max_lines(self):
@@ -247,6 +259,11 @@ class TestInterfaceContracts:
         assert err.raw_response == "raw"
 
     def test_all_7_agents_in_spec_registry(self):
+        """
+        Verifies that spec_registry contains exactly the seven expected AgentRole entries.
+        
+        Asserts the registry keys equal: DESIGN_SYSTEM, FRONTEND_DEV, BACKEND_DEV, ACCESSIBILITY, PERFORMANCE, SEO_CONTENT, and QA.
+        """
         from elite_web_builder.director import AgentRole, spec_registry
         expected_roles = {
             AgentRole.DESIGN_SYSTEM,
@@ -313,7 +330,11 @@ class TestEndToEndSmoke:
 
     @pytest.mark.asyncio
     async def test_minimal_3_story_prd(self):
-        """Feed a minimal 3-story PRD (mocked LLM) and verify all stories execute."""
+        """
+        Execute a minimal three-story PRD through the Director using a mocked model router and assert successful end-to-end behavior.
+        
+        The test supplies a PRD that defines three dependent stories and registers a mock LLM adapter that returns planning JSON on the first call and successful completion text on subsequent calls. It asserts the resulting ProjectReport contains three stories, all_green is True, the green count equals 3, elapsed_ms is positive, and there are no failures.
+        """
         from elite_web_builder.director import Director, DirectorConfig
         from elite_web_builder.core.model_router import LLMResponse, ModelRouter
 
@@ -364,6 +385,17 @@ class TestEndToEndSmoke:
         call_count = 0
 
         async def mock_generate(prompt, **kwargs):
+            """
+            Mock LLM generator used by tests that simulates multi-stage responses.
+            
+            Increments the outer `call_count` each invocation. On the first call it returns an LLMResponse containing the planning JSON; on subsequent calls it returns an LLMResponse containing a completion message.
+            
+            Parameters:
+                prompt (str): The prompt passed to the mock generator.
+            
+            Returns:
+                LLMResponse: The simulated LLM response (planning JSON on first call, completion text thereafter).
+            """
             nonlocal call_count
             call_count += 1
             if call_count == 1:

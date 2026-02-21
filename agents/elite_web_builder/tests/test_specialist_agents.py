@@ -36,6 +36,13 @@ class TestSpecStructure:
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_role(self, name, spec):
+        """
+        Verify that the spec dictionary contains a "role" key and that its value equals the spec's expected name.
+        
+        Parameters:
+            name (str): Expected role/name key for the spec.
+            spec (dict): Agent specification to validate.
+        """
         assert "role" in spec, f"{name} missing role"
         assert spec["role"] == name
 
@@ -46,6 +53,15 @@ class TestSpecStructure:
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_system_prompt(self, name, spec):
+        """
+        Verify that the agent spec includes a non-trivial system prompt.
+        
+        Asserts that the spec contains the "system_prompt" key and that its value is longer than 50 characters.
+        
+        Parameters:
+            name (str): The spec identifier (e.g., "design_system").
+            spec (dict): The agent specification dictionary under test.
+        """
         assert "system_prompt" in spec
         assert len(spec["system_prompt"]) > 50  # Non-trivial prompt
 
@@ -98,10 +114,20 @@ class TestKnowledgeFileReferences:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
 
     def test_backend_dev_knowledge_files_exist(self):
+        """
+        Verify that every path listed in BACKEND_DEV_SPEC["knowledge_files"] exists under PACKAGE_ROOT.
+        
+        If any referenced file is missing, the test fails with an AssertionError naming the missing path.
+        """
         for kf in BACKEND_DEV_SPEC["knowledge_files"]:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
 
     def test_seo_content_has_knowledge_files(self):
+        """
+        Validate that the SEO content agent specification references at least two knowledge files and that each referenced file exists under PACKAGE_ROOT.
+        
+        This test asserts the spec contains two or more entries in "knowledge_files" and that every referenced path resolves to an existing file relative to PACKAGE_ROOT.
+        """
         assert len(SEO_CONTENT_SPEC["knowledge_files"]) >= 2
         for kf in SEO_CONTENT_SPEC["knowledge_files"]:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
