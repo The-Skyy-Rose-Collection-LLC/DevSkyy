@@ -109,6 +109,13 @@ class PlanningError(RuntimeError):
     """Raised when the Director cannot parse a valid PRDBreakdown from LLM output."""
 
     def __init__(self, message: str, raw_response: str = "") -> None:
+        """
+        Initialize the PlanningError with an error message and the raw planning response.
+        
+        Parameters:
+            message (str): Human-readable error message describing the parsing failure.
+            raw_response (str): The original raw response text from the planner (may contain malformed JSON); stored for debugging.
+        """
         super().__init__(message)
         self.raw_response = raw_response
 
@@ -150,6 +157,9 @@ class AgentRuntime:
     """Executes agent tasks through the model router."""
 
     def __init__(self, router: ModelRouter) -> None:
+        """
+        Create an AgentRuntime that uses the provided ModelRouter to route and execute agent requests.
+        """
         self._router = router
 
     async def execute(
@@ -159,7 +169,12 @@ class AgentRuntime:
         *,
         story_id: str = "",
     ) -> LLMResponse:
-        """Execute a task using the appropriate agent and model."""
+        """
+        Route the given task to the agent described by `spec` and return the model's response.
+        
+        Returns:
+            LLMResponse: Response produced by the routed model.
+        """
         role = spec.role.value if isinstance(spec.role, AgentRole) else spec.role
         return await self._router.route(
             role=role,
@@ -269,6 +284,16 @@ class Director:
         healer: SelfHealer | None = None,
         verifier: VerificationLoop | None = None,
     ) -> None:
+        """
+        Initialize a Director coordinating PRD decomposition, story execution, verification, self-healing, and learning journaling.
+        
+        Parameters:
+            config (DirectorConfig | None): Director settings; when None a default DirectorConfig is created.
+            router (ModelRouter | None): ModelRouter used for agent routing; when None a ModelRouter is constructed using the module's default routing and fallbacks.
+            journal (LearningJournal | None): LearningJournal used to record instincts/observations; when None a new LearningJournal is created.
+            healer (SelfHealer | None): Self-healing component used to diagnose and attempt repairs on failed story outputs; when None a SelfHealer is created using `config.max_heal_attempts`.
+            verifier (VerificationLoop | None): Verification component used to validate agent outputs; when None a default VerificationLoop is created.
+        """
         self._config = config or DirectorConfig()
         self._router = router or ModelRouter(
             routing=_DEFAULT_ROUTING["routing"],
@@ -284,12 +309,22 @@ class Director:
 
     @property
     def stories(self) -> dict[str, UserStory]:
-        """Read-only access to stories."""
+        """
+        Return a read-only copy of the director's story mapping keyed by story ID.
+        
+        Returns:
+            dict[str, UserStory]: A shallow copy of the internal stories mapping where keys are story IDs and values are UserStory instances.
+        """
         return dict(self._stories)
 
     @property
     def router(self) -> ModelRouter:
-        """Access the model router."""
+        """
+        Expose the Director's ModelRouter instance.
+        
+        Returns:
+            model_router (ModelRouter): The underlying ModelRouter used to route model requests.
+        """
         return self._router
 
     # -----------------------------------------------------------------
@@ -303,10 +338,13 @@ class Director:
             logger.info("Registered story %s: %s", story.id, story.title)
 
     def get_ready_stories(self) -> list[UserStory]:
-        """Get stories whose dependencies are all GREEN (topological sort).
-
-        Returns stories that are PENDING and have all depends_on stories
-        in GREEN status. This IS the topological execution order.
+        """
+        Selects PENDING user stories whose dependencies are all marked GREEN.
+        
+        Returns:
+            ready_stories (list[UserStory]): List of UserStory objects that currently have status
+            StoryStatus.PENDING and whose every dependency ID in `depends_on` refers to a story
+            with status StoryStatus.GREEN.
         """
         ready = []
         for story in self._stories.values():
@@ -322,7 +360,12 @@ class Director:
         return ready
 
     def get_status_summary(self) -> dict[str, int]:
-        """Count stories by status."""
+        """
+        Return a mapping of story status values to their counts.
+        
+        Returns:
+            dict[str, int]: A dictionary where each key is a StoryStatus enum value string and each value is the number of stories with that status.
+        """
         summary: dict[str, int] = {}
         for story in self._stories.values():
             key = story.status.value
@@ -334,13 +377,13 @@ class Director:
     # -----------------------------------------------------------------
 
     async def run_story(self, story: UserStory) -> UserStory:
-        """Execute a single story through its assigned agent.
-
-        1. Mark IN_PROGRESS
-        2. Get agent spec from registry
-        3. Execute via runtime
-        4. Verify output (if enabled)
-        5. Mark GREEN or FAILED
+        """
+        Execute a UserStory by dispatching its task to the appropriate agent and updating the story's lifecycle.
+        
+        This will set the story's status to IN_PROGRESS, run the task through the configured agent runtime, optionally run verification and attempt self-healing if verification fails, and then set the story's final status to GREEN or FAILED while populating `output` and `error` as applicable.
+        
+        Returns:
+            The same UserStory instance updated with final `status`, `output`, and `error`.
         """
         story.status = StoryStatus.IN_PROGRESS
         logger.info("Executing story %s: %s (agent=%s)", story.id, story.title, story.agent_role.value)
@@ -398,9 +441,19 @@ class Director:
 
     @staticmethod
     def _parse_planning_response(raw: str) -> dict:
-        """Parse JSON from LLM planning response.
-
-        Handles both raw JSON and markdown-fenced JSON.
+        """
+        Parse an LLM planning response and return the decoded JSON object.
+        
+        Accepts either raw JSON or JSON enclosed in markdown code fences; strips common fence markers before attempting to parse.
+        
+        Parameters:
+            raw (str): The raw text returned by the planning LLM (may include markdown code fences).
+        
+        Returns:
+            dict: The parsed JSON object.
+        
+        Raises:
+            PlanningError: If the input cannot be parsed as JSON; the original raw response is attached to the error.
         """
         # Try direct parse
         try:
@@ -424,9 +477,18 @@ class Director:
     def _build_breakdown(
         data: dict, *, max_stories: int = 50
     ) -> PRDBreakdown:
-        """Convert parsed dict into a PRDBreakdown.
-
-        Validates required fields and maps role strings to AgentRole enum.
+        """
+        Builds a PRDBreakdown from a parsed planning response dictionary.
+        
+        Parameters:
+            data (dict): Parsed planning response expected to contain a "stories" key with a list of story objects. Each story object must include the keys: "id", "title", "description", and "agent_role". May optionally include "depends_on" (list) and "acceptance_criteria" (list). The top-level "dependency_order" may be provided as a list of story IDs; if omitted, the returned dependency_order preserves the story list order.
+            max_stories (int): Maximum number of stories to process from `data["stories"]`. Stories beyond this count are ignored.
+        
+        Returns:
+            PRDBreakdown: Container with `stories` converted to UserStory instances and `dependency_order` as a list of story IDs.
+        
+        Raises:
+            PlanningError: If required top-level or per-story fields are missing, or if a story's `agent_role` is not a recognized AgentRole. The raised error includes the raw planning response for debugging.
         """
         if "stories" not in data:
             raise PlanningError(
@@ -471,7 +533,15 @@ class Director:
         return PRDBreakdown(stories=stories, dependency_order=dependency_order)
 
     async def _plan_stories(self, prd_text: str) -> PRDBreakdown:
-        """Use the LLM to decompose a PRD into user stories."""
+        """
+        Decompose a product requirements document (PRD) into a PRDBreakdown of user stories.
+        
+        Parameters:
+            prd_text (str): The PRD content to decompose.
+        
+        Returns:
+            PRDBreakdown: Parsed and validated breakdown containing the list of user stories and their dependency order.
+        """
         prompt = _PLANNING_PROMPT_TEMPLATE.format(
             max_stories=self._config.max_stories,
             prd_text=prd_text,
@@ -489,14 +559,13 @@ class Director:
     # -----------------------------------------------------------------
 
     async def execute_prd(self, prd_text: str) -> ProjectReport:
-        """Execute a complete PRD lifecycle.
-
-        1. Plan — LLM decomposes PRD into stories
-        2. Register stories
-        3. Execute in dependency order (topological via get_ready_stories)
-        4. Build frozen ProjectReport
-
-        Planning failure returns a report (not exception) for clean CLI display.
+        """
+        Run a full PRD lifecycle: decompose the PRD into user stories, register them, execute stories in dependency order, and produce a final ProjectReport.
+        
+        On planning failures the function returns a ProjectReport describing the failure instead of raising.
+        
+        Returns:
+            ProjectReport: Immutable report containing all executed stories, a status summary, whether all stories are green, elapsed time in milliseconds, any failures encountered, and the number of learning journal entries added during execution.
         """
         start = time.time()
         failures: list[str] = []

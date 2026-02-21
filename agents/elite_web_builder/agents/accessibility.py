@@ -8,7 +8,18 @@ from __future__ import annotations
 
 
 def _build_spec() -> dict:
-    """Build the accessibility agent specification."""
+    """
+    Constructs the accessibility agent specification for the Elite Web Builder.
+    
+    Returns:
+        spec (dict): A dictionary describing the accessibility agent, containing:
+            - role (str): Agent role identifier ("accessibility").
+            - name (str): Agent name ("accessibility").
+            - system_prompt (str): Instructional prompt detailing auditing responsibilities (WCAG 2.2 AA/AAA, contrast, ARIA, keyboard navigation, focus management, screen reader compatibility, alt text, form labels, heading hierarchy, and zero tolerance for critical/serious violations).
+            - capabilities (list[dict]): Capability entries, each with 'name', 'description', and 'tags'.
+            - knowledge_files (list[str]): Paths to reference knowledge files (e.g., "knowledge/wcag_checklist.md").
+            - preferred_model (dict): Preferred model descriptor with 'provider' and 'model' keys.
+    """
     return {
         "role": "accessibility",
         "name": "accessibility",

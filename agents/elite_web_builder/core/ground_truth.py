@@ -32,10 +32,24 @@ class GroundTruthValidator:
     }
 
     def __init__(self, project_root: Path | None = None) -> None:
+        """
+        Initialize the validator with an optional project root used for path-based checks.
+        
+        Parameters:
+            project_root (Path | None): Root directory to resolve file paths against. If None, defaults to the current working directory (Path(".")).
+        """
         self._root = project_root or Path(".")
 
     def validate_file_reference(self, path: str) -> bool:
-        """Check if a file reference actually exists."""
+        """
+        Determine whether a file path exists under the validator's project root.
+        
+        Parameters:
+            path (str): File path to check, interpreted relative to the validator's project root.
+        
+        Returns:
+            bool: True if the resolved path exists on disk, False otherwise.
+        """
         full_path = self._root / path
         exists = full_path.exists()
         if not exists:
@@ -43,7 +57,12 @@ class GroundTruthValidator:
         return exists
 
     def validate_json(self, content: str) -> bool:
-        """Check if content is valid JSON."""
+        """
+        Determine whether a string contains valid JSON.
+        
+        Returns:
+            True if content is valid JSON, False otherwise.
+        """
         try:
             json.loads(content)
             return True
@@ -51,7 +70,24 @@ class GroundTruthValidator:
             return False
 
     def validate_theme_json(self, content: str) -> tuple[bool, list[str]]:
-        """Validate theme.json structure."""
+        """
+        Validate the structure and key contents of a WordPress theme.json string.
+        
+        Parameters:
+            content (str): The theme.json content to validate as a raw JSON string.
+        
+        Returns:
+            tuple[bool, list[str]]: A tuple where the first element is True if the content is a valid theme.json according to the checks below, False otherwise; the second element is a list of validation error messages.
+        
+        Checks performed:
+            - The content is valid JSON.
+            - Presence of required top-level field "version".
+            - Presence of recommended top-level field "$schema".
+            - If a "settings" -> "color" -> "palette" array exists:
+                - Each palette item must include a "slug".
+                - Palette "slug" values must be unique.
+                - Each palette item's "color" value, if present, must be a valid hex color matching ^#[0-9a-fA-F]{3,8}$.
+        """
         errors: list[str] = []
         try:
             data = json.loads(content)
@@ -82,7 +118,15 @@ class GroundTruthValidator:
         return len(errors) == 0, errors
 
     def validate_liquid_syntax(self, content: str) -> tuple[bool, list[str]]:
-        """Basic Liquid template syntax validation."""
+        """
+        Checks whether Liquid template tags and output tags are balanced.
+        
+        Parameters:
+            content (str): The Liquid template text to validate.
+        
+        Returns:
+            tuple[bool, list[str]]: True if all tag pairs are balanced, False otherwise; the list contains human-readable error messages describing any unbalanced tags.
+        """
         errors: list[str] = []
         # Check balanced tags
         opens = len(re.findall(r"\{%", content))
@@ -100,5 +144,10 @@ class GroundTruthValidator:
         return len(errors) == 0, errors
 
     def validate_color_hex(self, color: str) -> bool:
-        """Check if a color value is a valid hex color."""
+        """
+        Determine whether a string is a valid hex color.
+        
+        Returns:
+            `true` if the string is a hex color in the form `#` followed by 3–8 hexadecimal digits, `false` otherwise.
+        """
         return bool(re.match(r"^#[0-9a-fA-F]{3,8}$", color))

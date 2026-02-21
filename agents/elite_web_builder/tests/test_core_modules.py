@@ -149,6 +149,11 @@ class TestSelfHealer:
 
     @pytest.mark.asyncio
     async def test_diagnose_wrong_approach(self):
+        """
+        Verifies that SelfHealer.diagnose classifies a message indicating an incorrect approach as WRONG_APPROACH.
+        
+        This test creates a SelfHealer instance, diagnoses the string "This approach does not work", and asserts the returned diagnosis category is FailureCategory.WRONG_APPROACH.
+        """
         healer = SelfHealer()
         diagnosis = await healer.diagnose("This approach does not work")
         assert diagnosis.category == FailureCategory.WRONG_APPROACH
@@ -497,6 +502,12 @@ class TestRalphExecutor:
         executor = RalphExecutor()
 
         async def success():
+            """
+            Return a successful result indicator.
+            
+            Returns:
+                'result' — a success indicator string.
+            """
             return "result"
 
         result = await executor.execute(success)
@@ -508,6 +519,15 @@ class TestRalphExecutor:
         call_count = 0
 
         async def flaky():
+            """
+            Simulates a flaky operation that fails on the first two invocations and succeeds thereafter.
+            
+            Returns:
+                str: "'success' once the function has been called three or more times."
+            
+            Raises:
+                RuntimeError: If called fewer than three times.
+            """
             nonlocal call_count
             call_count += 1
             if call_count < 3:
@@ -523,6 +543,12 @@ class TestRalphExecutor:
         executor = RalphExecutor(max_attempts=2, base_delay=0.01)
 
         async def always_fail():
+            """
+            Always raises a RuntimeError.
+            
+            Raises:
+                RuntimeError: Always raised with the message "always fails".
+            """
             raise RuntimeError("always fails")
 
         with pytest.raises(RuntimeError, match="All attempts exhausted"):
@@ -533,9 +559,21 @@ class TestRalphExecutor:
         executor = RalphExecutor(max_attempts=1, base_delay=0.01)
 
         async def primary():
+            """
+            Coroutine that always raises a RuntimeError.
+            
+            Raises:
+                RuntimeError: Always raised with the message "primary fails".
+            """
             raise RuntimeError("primary fails")
 
         async def fallback():
+            """
+            Provide a fallback result string.
+            
+            Returns:
+                str: The fallback result string "fallback result".
+            """
             return "fallback result"
 
         result = await executor.execute(primary, fallbacks=[fallback])

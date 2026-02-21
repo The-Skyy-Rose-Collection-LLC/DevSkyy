@@ -20,7 +20,18 @@ from .director import Director, DirectorConfig, StoryStatus
 
 
 def _build_parser() -> argparse.ArgumentParser:
-    """Build the argument parser."""
+    """
+    Create an ArgumentParser configured for the elite_web_builder command-line interface.
+    
+    The parser enforces a required mutually exclusive PRD input (either an inline positional `prd` or `--file` path).
+    It also defines:
+    - `--dry-run`: plan stories only without executing.
+    - `--config`: path to a JSON routing override.
+    - `--max-stories`: maximum number of stories to generate (default 50).
+    
+    Returns:
+        argparse.ArgumentParser: Configured parser for the CLI.
+    """
     parser = argparse.ArgumentParser(
         prog="elite_web_builder",
         description="Elite Web Builder — Full-stack AI web development agency",
@@ -63,7 +74,19 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def _load_prd(args: argparse.Namespace) -> str:
-    """Load PRD text from args."""
+    """
+    Load and return the product requirements document (PRD) text from parsed CLI arguments.
+    
+    If args.file is provided, the function reads and returns the file's contents; otherwise it returns the inline PRD string from args.prd.
+    
+    Parameters:
+        args (argparse.Namespace): Parsed CLI arguments. Expected attributes:
+            - file (pathlib.Path | None): Optional path to a PRD file.
+            - prd (str): Inline PRD text provided on the command line.
+    
+    Returns:
+        str: The PRD text to be processed.
+    """
     if args.file:
         if not args.file.exists():
             print(f"Error: PRD file not found: {args.file}", file=sys.stderr)
@@ -73,7 +96,20 @@ def _load_prd(args: argparse.Namespace) -> str:
 
 
 def _print_report(report: object) -> None:
-    """Print a ProjectReport to stdout."""
+    """
+    Print a human-readable project report to stdout.
+    
+    Prints a header, a summary (stories count, status summary, `all_green`, elapsed milliseconds, and instincts learned), an optional failures list, and detailed lines for each story showing a status icon, story id, title, and status value.
+    
+    Parameters:
+        report (object): Project report object expected to provide:
+            - stories: iterable of story objects with `id`, `title`, and `status` (enum with a `value`).
+            - status_summary: str
+            - all_green: bool
+            - elapsed_ms: number (milliseconds)
+            - instincts_learned: int
+            - failures: iterable of failure messages (may be empty)
+    """
     print("\n" + "=" * 60)
     print("ELITE WEB BUILDER — PROJECT REPORT")
     print("=" * 60)
@@ -99,7 +135,14 @@ def _print_report(report: object) -> None:
 
 
 async def _run(args: argparse.Namespace) -> int:
-    """Main async entry point."""
+    """
+    Orchestrates the CLI workflow: load PRD text, construct the Director, and perform either a dry-run planning pass or full execution.
+    
+    When args.dry_run is set, prints a planned story breakdown and returns 0 on success or 1 if planning fails. In full execution mode, runs the director, prints the resulting report, and returns 0 if the report indicates all stories succeeded, otherwise 1.
+    
+    Returns:
+        int: Exit code (0 for success, 1 for failure).
+    """
     prd_text = _load_prd(args)
 
     # Build config
