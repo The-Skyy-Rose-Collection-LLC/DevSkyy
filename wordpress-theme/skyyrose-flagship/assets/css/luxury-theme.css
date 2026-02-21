@@ -295,10 +295,33 @@ label {
 	max-width: var(--container-xl);
 	margin: 0 auto;
 	padding: var(--space-md) var(--space-lg);
-	display: flex;
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
 	align-items: center;
-	justify-content: space-between;
-	gap: var(--space-xl);
+	gap: var(--space-lg);
+}
+
+/* Logo / brand — centered in the middle column */
+.site-branding {
+	grid-column: 2;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+}
+
+/* Nav — left column */
+.main-navigation {
+	grid-column: 1;
+	grid-row: 1;
+}
+
+/* Actions — right column, aligned right */
+.header-actions {
+	grid-column: 3;
+	grid-row: 1;
+	justify-self: end;
 }
 
 .site-branding .site-title {
@@ -472,9 +495,8 @@ label {
 }
 
 .main-navigation {
-	flex: 1;
 	display: flex;
-	justify-content: center;
+	justify-content: flex-start;
 }
 
 .primary-menu-container .menu {
@@ -562,7 +584,7 @@ label {
 	transition: all var(--transition-base);
 }
 
-/* Header Actions */
+/* Header Actions (grid placement in .header-container above) */
 .header-actions {
 	display: flex;
 	align-items: center;
@@ -597,6 +619,25 @@ label {
 @media (max-width: 768px) {
 	.top-bar-message { font-size: 10px; }
 	.top-bar-nav { display: none; }
+
+	/* Mobile: hamburger left, logo center, actions right */
+	.header-container {
+		grid-template-columns: auto 1fr auto;
+		gap: var(--space-sm);
+	}
+
+	.main-navigation {
+		grid-column: 1;
+		justify-self: start;
+	}
+
+	.site-branding {
+		grid-column: 2;
+	}
+
+	.header-actions {
+		grid-column: 3;
+	}
 
 	.menu-toggle {
 		display: flex;
