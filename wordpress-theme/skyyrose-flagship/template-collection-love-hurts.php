@@ -21,23 +21,90 @@ get_header();
 		<div class="cl-hero-content">
 			<span class="cl-hero-label">Collection 02</span>
 
-			<!-- Collection Logo -->
+			<!-- Collection Logo — Cracked Heart with Thorns & Roses -->
 			<div class="cl-logo" aria-hidden="true">
-				<svg viewBox="0 0 400 90" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
+				<svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
 					<defs>
-						<linearGradient id="lh-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+						<linearGradient id="lh-grad" x1="0%" y1="0%" x2="100%" y2="100%">
 							<stop offset="0%" style="stop-color:#DC143C"/>
 							<stop offset="50%" style="stop-color:#FF4D6A"/>
 							<stop offset="100%" style="stop-color:#DC143C"/>
 						</linearGradient>
+						<linearGradient id="lh-rose-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+							<stop offset="0%" style="stop-color:#E84060"/>
+							<stop offset="100%" style="stop-color:#B01030"/>
+						</linearGradient>
+						<filter id="lh-glow">
+							<feGaussianBlur stdDeviation="2" result="blur"/>
+							<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+						</filter>
 					</defs>
-					<text x="200" y="42" text-anchor="middle" fill="url(#lh-grad)" font-family="'Playfair Display', Georgia, serif" font-size="46" font-weight="700" letter-spacing="4">LOVE</text>
-					<text x="200" y="80" text-anchor="middle" fill="#D8A7B1" font-family="'Playfair Display', Georgia, serif" font-size="46" font-weight="700" letter-spacing="4">HURTS</text>
-					<!-- Heart accent -->
-					<path d="M200 52 L196 48 Q192 44 196 40 Q200 36 200 40 Q200 36 204 40 Q208 44 204 48 Z" fill="#DC143C" opacity="0.7"/>
-					<!-- Thorn lines -->
-					<line x1="60" y1="50" x2="140" y2="50" stroke="#DC143C" stroke-width="0.5" opacity="0.3"/>
-					<line x1="260" y1="50" x2="340" y2="50" stroke="#DC143C" stroke-width="0.5" opacity="0.3"/>
+
+					<!-- Cracked Heart -->
+					<g transform="translate(210,45)" filter="url(#lh-glow)">
+						<!-- Heart shape -->
+						<path d="M0 15 C0-10 -30-15 -30 5 C-30 25 0 45 0 55 C0 45 30 25 30 5 C30-15 0-10 0 15Z" fill="url(#lh-grad)" opacity="0.9"/>
+						<!-- Crack line -->
+						<path d="M-2-8 L3 5 L-3 15 L2 28 L-1 40" fill="none" stroke="#1a0505" stroke-width="2.5" stroke-linecap="round"/>
+						<path d="M-2-8 L3 5 L-3 15 L2 28 L-1 40" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="1" stroke-linecap="round"/>
+					</g>
+
+					<!-- Thorn vine wrapping heart -->
+					<g transform="translate(210,45)" opacity="0.8">
+						<path d="M-35 10 Q-25-5 -10-10 Q5-15 15-5 Q25 5 35 15" fill="none" stroke="#5a2020" stroke-width="2.5" stroke-linecap="round"/>
+						<!-- Thorns -->
+						<polygon points="-22,2 -20,-4 -18,2" fill="#5a2020"/>
+						<polygon points="-5,-12 -3,-18 -1,-12" fill="#5a2020"/>
+						<polygon points="12,-4 14,-10 16,-4" fill="#5a2020"/>
+						<polygon points="28,10 30,4 32,10" fill="#5a2020"/>
+					</g>
+
+					<!-- Roses blooming from top of heart -->
+					<g transform="translate(195,12)" opacity="0.85">
+						<!-- Rose 1 (left) -->
+						<circle cx="0" cy="0" r="8" fill="#E84060"/>
+						<path d="M-4-2 Q0-8 4-2 Q8 2 4 6 Q0 10 -4 6 Q-8 2 -4-2" fill="#D03050" opacity="0.8"/>
+						<circle cx="0" cy="0" r="3" fill="#C02040"/>
+						<!-- Leaf -->
+						<ellipse cx="-10" cy="5" rx="6" ry="3" fill="#2d6b2d" transform="rotate(-30,-10,5)"/>
+					</g>
+					<g transform="translate(215,5)" opacity="0.9">
+						<!-- Rose 2 (center, larger) -->
+						<circle cx="0" cy="0" r="10" fill="#DC143C"/>
+						<path d="M-5-3 Q0-10 5-3 Q10 3 5 8 Q0 13 -5 8 Q-10 3 -5-3" fill="#C01030" opacity="0.8"/>
+						<circle cx="0" cy="0" r="4" fill="#A01025"/>
+						<!-- Leaf -->
+						<ellipse cx="12" cy="4" rx="6" ry="3" fill="#2d6b2d" transform="rotate(25,12,4)"/>
+					</g>
+					<g transform="translate(232,15)" opacity="0.8">
+						<!-- Rose 3 (right, small) -->
+						<circle cx="0" cy="0" r="7" fill="#E84060"/>
+						<path d="M-3-2 Q0-7 3-2 Q6 2 3 5 Q0 8 -3 5 Q-6 2 -3-2" fill="#D03050" opacity="0.8"/>
+						<circle cx="0" cy="0" r="2.5" fill="#C02040"/>
+					</g>
+
+					<!-- "Love Hurts" script text — dripping crimson style -->
+					<text x="210" y="125" text-anchor="middle" fill="url(#lh-grad)" font-family="'Playfair Display', Georgia, serif" font-size="44" font-weight="700" font-style="italic" letter-spacing="2" filter="url(#lh-glow)">Love Hurts</text>
+
+					<!-- Drip accents below text -->
+					<g opacity="0.5">
+						<path d="M148 130 Q148 140 150 148 Q152 140 152 130" fill="#DC143C"/>
+						<path d="M238 132 Q238 144 240 155 Q242 144 242 132" fill="#DC143C"/>
+						<path d="M275 130 Q275 138 277 143 Q279 138 279 130" fill="#DC143C"/>
+						<circle cx="150" cy="150" r="2" fill="#DC143C" opacity="0.6"/>
+						<circle cx="240" cy="157" r="2.5" fill="#DC143C" opacity="0.6"/>
+						<circle cx="277" cy="145" r="1.8" fill="#DC143C" opacity="0.6"/>
+					</g>
+
+					<!-- Splash accents (left and right) -->
+					<g opacity="0.4">
+						<circle cx="120" cy="55" r="2" fill="#DC143C"/>
+						<circle cx="115" cy="48" r="1.5" fill="#DC143C"/>
+						<circle cx="125" cy="62" r="1" fill="#DC143C"/>
+						<circle cx="300" cy="50" r="2" fill="#DC143C"/>
+						<circle cx="305" cy="58" r="1.5" fill="#DC143C"/>
+						<circle cx="295" cy="42" r="1" fill="#DC143C"/>
+					</g>
 				</svg>
 			</div>
 

@@ -45,18 +45,28 @@
 		<div class="header-container">
 			<!-- Logo / Brand -->
 			<div class="site-branding">
+				<?php if ( has_custom_logo() ) : ?>
+					<?php the_custom_logo(); ?>
+				<?php else : ?>
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-logo-link" rel="home">
+						<?php
+						$logo_path = SKYYROSE_THEME_DIR . '/assets/images/brand/skyyrose-logo.png';
+						if ( file_exists( $logo_path ) ) :
+						?>
+							<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-logo.png' ); ?>" alt="<?php bloginfo( 'name' ); ?>" class="brand-logo-img" width="180" height="auto">
+						<?php else : ?>
+							<!-- SVG fallback matching "The Skyy Rose Collection" gold script style -->
+							<span class="brand-logo-text">
+								<span class="brand-the">The</span>
+								<span class="brand-name">Skyy<span class="brand-rose-icon" aria-hidden="true">&#x1F339;</span>Rose</span>
+							</span>
+						<?php endif; ?>
+					</a>
+				<?php endif; ?>
 				<?php
-				the_custom_logo();
-				if ( is_front_page() && is_home() ) :
-					?>
-					<h1 class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></h1>
-					<?php
-				else :
-					?>
-					<p class="site-title"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></p>
-					<?php
-				endif;
+				$tag = ( is_front_page() && is_home() ) ? 'h1' : 'p';
 				?>
+				<<?php echo $tag; ?> class="site-title sr-only"><a href="<?php echo esc_url( home_url( '/' ) ); ?>" rel="home"><?php bloginfo( 'name' ); ?></a></<?php echo $tag; ?>>
 			</div>
 
 			<!-- Primary Navigation -->

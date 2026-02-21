@@ -318,6 +318,64 @@ label {
 	display: none;
 }
 
+/* Brand Logo */
+.brand-logo-link {
+	display: flex;
+	align-items: center;
+	text-decoration: none;
+}
+
+.brand-logo-img {
+	height: 40px;
+	width: auto;
+	object-fit: contain;
+}
+
+.brand-logo-text {
+	display: flex;
+	flex-direction: column;
+	line-height: 1;
+}
+
+.brand-the {
+	font-family: var(--font-heading);
+	font-size: 10px;
+	font-weight: var(--weight-medium);
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--gold);
+	margin-bottom: 2px;
+}
+
+.brand-name {
+	font-family: var(--font-heading);
+	font-size: var(--text-xl);
+	font-weight: var(--weight-bold);
+	background: linear-gradient(135deg, var(--gold) 0%, #E8C547 40%, var(--gold) 100%);
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	letter-spacing: 0.04em;
+}
+
+.brand-rose-icon {
+	font-size: 0.8em;
+	-webkit-text-fill-color: initial;
+	color: var(--rose-gold);
+}
+
+/* Footer Brand Logo with Rose Mark */
+.footer-logo {
+	display: flex;
+	align-items: center;
+	gap: var(--space-sm);
+}
+
+.footer-rose-mark {
+	display: block;
+	filter: brightness(0.9);
+}
+
 .main-navigation {
 	flex: 1;
 	display: flex;
@@ -1112,6 +1170,407 @@ label {
 		padding-left: var(--space-md);
 		padding-right: var(--space-md);
 	}
+}
+
+/* ==================================================
+   HAMBURGER ANIMATION
+   ================================================== */
+
+.menu-toggle.is-active .hamburger-line:nth-child(1) {
+	transform: translateY(7px) rotate(45deg);
+}
+
+.menu-toggle.is-active .hamburger-line:nth-child(2) {
+	opacity: 0;
+}
+
+.menu-toggle.is-active .hamburger-line:nth-child(3) {
+	transform: translateY(-7px) rotate(-45deg);
+}
+
+/* Mobile dropdown open state */
+.sub-open > .sub-menu {
+	display: block !important;
+	opacity: 1 !important;
+	visibility: visible !important;
+}
+
+/* Header scrolled state */
+.header-scrolled {
+	box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+.header-scrolled .header-container {
+	padding-top: var(--space-sm);
+	padding-bottom: var(--space-sm);
+}
+
+/* Prevent body scroll when menu open */
+body.menu-open {
+	overflow: hidden;
+}
+
+/* ==================================================
+   SCROLL-REVEAL ANIMATIONS
+   ================================================== */
+
+.reveal-on-scroll {
+	opacity: 0;
+	transform: translateY(30px);
+	transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+	            transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-on-scroll.revealed {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Stagger children in grid */
+.cl-products-grid .reveal-on-scroll:nth-child(2) { transition-delay: 0.1s; }
+.cl-products-grid .reveal-on-scroll:nth-child(3) { transition-delay: 0.2s; }
+.cl-products-grid .reveal-on-scroll:nth-child(4) { transition-delay: 0.3s; }
+.cl-products-grid .reveal-on-scroll:nth-child(5) { transition-delay: 0.4s; }
+.cl-products-grid .reveal-on-scroll:nth-child(6) { transition-delay: 0.5s; }
+
+/* ==================================================
+   COLLECTION LANDING SHARED
+   ================================================== */
+
+/* Lookbook Grid */
+.cl-lookbook-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--space-lg);
+}
+
+.cl-lookbook-tall {
+	grid-row: span 2;
+}
+
+.cl-lookbook-item {
+	position: relative;
+	overflow: hidden;
+	border-radius: var(--radius-lg);
+}
+
+.cl-lookbook-item img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cl-lookbook-item:hover img {
+	transform: scale(1.05);
+}
+
+.cl-lookbook-caption {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	padding: var(--space-lg);
+	background: linear-gradient(transparent, rgba(0,0,0,0.7));
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+}
+
+.cl-lookbook-piece {
+	font-family: var(--font-heading);
+	font-size: var(--text-lg);
+	color: #fff;
+}
+
+.cl-lookbook-price {
+	font-weight: var(--weight-semibold);
+}
+
+/* Story Grid */
+.cl-story-grid {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: var(--space-4xl);
+	align-items: center;
+}
+
+.cl-story-stats {
+	display: flex;
+	gap: var(--space-2xl);
+	margin-top: var(--space-2xl);
+	padding-top: var(--space-xl);
+	border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.cl-stat {
+	text-align: center;
+}
+
+.cl-stat-value {
+	font-family: var(--font-heading);
+	font-size: var(--text-2xl);
+	font-weight: var(--weight-bold);
+	display: block;
+}
+
+.cl-stat-label {
+	font-size: var(--text-sm);
+	margin-top: var(--space-xs);
+}
+
+/* Products Grid */
+.cl-products-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: var(--space-xl);
+}
+
+.cl-product-card {
+	position: relative;
+	border-radius: var(--radius-lg);
+	padding: var(--space-lg);
+	text-align: center;
+	transition: all var(--transition-luxury);
+}
+
+.cl-product-badge {
+	position: absolute;
+	top: var(--space-md);
+	left: var(--space-md);
+	padding: 4px 12px;
+	border-radius: var(--radius-full);
+	font-size: var(--text-xs);
+	font-weight: var(--weight-semibold);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+
+.cl-product-image {
+	aspect-ratio: 1;
+	overflow: hidden;
+	border-radius: var(--radius-md);
+	margin-bottom: var(--space-md);
+}
+
+.cl-product-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform 0.6s ease;
+}
+
+.cl-product-card:hover .cl-product-image img {
+	transform: scale(1.06);
+}
+
+.cl-product-info {
+	margin-bottom: var(--space-md);
+}
+
+.cl-product-name {
+	font-size: var(--text-lg);
+	margin-bottom: var(--space-xs);
+}
+
+.cl-product-price {
+	font-weight: var(--weight-semibold);
+	font-size: var(--text-lg);
+}
+
+.cl-product-btn {
+	width: 100%;
+}
+
+/* Cross-sell Links */
+.cl-crosssell-links {
+	display: flex;
+	gap: var(--space-xl);
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.cl-crosssell-card {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: var(--space-2xl) var(--space-3xl);
+	border: 1px solid;
+	border-radius: var(--radius-lg);
+	transition: all var(--transition-luxury);
+	text-decoration: none;
+}
+
+.cl-crosssell-card:hover {
+	transform: translateY(-4px);
+	box-shadow: var(--shadow-xl);
+}
+
+.cl-crosssell-name {
+	font-family: var(--font-heading);
+	font-size: var(--text-xl);
+	font-weight: var(--weight-bold);
+}
+
+.cl-crosssell-hint {
+	font-size: var(--text-sm);
+	margin-top: var(--space-xs);
+}
+
+/* Collection Logo */
+.cl-logo {
+	margin-bottom: var(--space-xl);
+}
+
+.cl-logo-svg {
+	width: 100%;
+	max-width: 420px;
+	height: auto;
+}
+
+/* Hero shared */
+.cl-hero-label {
+	display: block;
+	font-size: var(--text-sm);
+	font-weight: var(--weight-semibold);
+	text-transform: uppercase;
+	letter-spacing: 0.25em;
+	margin-bottom: var(--space-lg);
+}
+
+.cl-hero-actions {
+	display: flex;
+	gap: var(--space-lg);
+	justify-content: center;
+	flex-wrap: wrap;
+	margin-bottom: var(--space-lg);
+}
+
+.cl-hero-price-hint {
+	font-size: var(--text-sm);
+	margin-top: var(--space-md);
+}
+
+/* Section Header */
+.section-header {
+	margin-bottom: var(--space-3xl);
+}
+
+.section-header .section-subtitle {
+	display: block;
+	margin-bottom: var(--space-sm);
+}
+
+@media (max-width: 768px) {
+	.cl-lookbook-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.cl-lookbook-tall {
+		grid-row: span 1;
+	}
+
+	.cl-story-grid {
+		grid-template-columns: 1fr;
+		gap: var(--space-2xl);
+	}
+
+	.cl-products-grid {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.cl-crosssell-links {
+		flex-direction: column;
+		align-items: stretch;
+	}
+}
+
+@media (max-width: 480px) {
+	.cl-products-grid {
+		grid-template-columns: 1fr;
+	}
+}
+
+/* ==================================================
+   PRE-ORDER PAGE
+   ================================================== */
+
+.po-countdown {
+	display: flex;
+	gap: var(--space-xl);
+	justify-content: center;
+	flex-wrap: wrap;
+}
+
+.po-countdown-block {
+	text-align: center;
+}
+
+.po-countdown-value {
+	display: block;
+	font-family: var(--font-heading);
+	font-size: var(--text-3xl);
+	font-weight: var(--weight-bold);
+	line-height: 1;
+}
+
+.po-countdown-unit {
+	font-size: var(--text-xs);
+	text-transform: uppercase;
+	letter-spacing: 0.1em;
+	opacity: 0.6;
+}
+
+/* ==================================================
+   IMMERSIVE 3D PAGES
+   ================================================== */
+
+.three-scene-wrapper {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+	overflow: hidden;
+}
+
+.scene-container {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+}
+
+.scene-container canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.scene-ui-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 10;
+	pointer-events: none;
+}
+
+.scene-ui-overlay button,
+.scene-ui-overlay a,
+.scene-ui-overlay nav {
+	pointer-events: auto;
+}
+
+.loading-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.loading-overlay.hidden {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
 }
 
 /* ==================================================

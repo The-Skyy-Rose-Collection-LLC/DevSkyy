@@ -293,41 +293,38 @@ function skyyrose_scripts() {
 		SKYYROSE_VERSION
 	);
 
-	// Three.js library.
-	wp_enqueue_script(
-		'threejs',
-		SKYYROSE_ASSETS_URI . '/three/three.min.js',
-		array(),
-		'r150',
-		true
-	);
-
-	// Main theme JavaScript.
-	wp_enqueue_script(
-		'skyyrose-main',
-		SKYYROSE_ASSETS_URI . '/js/main.js',
-		array( 'jquery' ),
-		SKYYROSE_VERSION,
-		true
-	);
-
-	// Three.js initialization script.
-	wp_enqueue_script(
-		'skyyrose-three-init',
-		SKYYROSE_ASSETS_URI . '/js/three-init.js',
-		array( 'threejs' ),
-		SKYYROSE_VERSION,
-		true
-	);
-
-	// Navigation script.
+	// Navigation script (no jQuery dependency — vanilla JS).
 	wp_enqueue_script(
 		'skyyrose-navigation',
 		SKYYROSE_ASSETS_URI . '/js/navigation.js',
-		array( 'jquery' ),
+		array(),
 		SKYYROSE_VERSION,
 		true
 	);
+
+	// Main theme JavaScript (no jQuery dependency — vanilla JS).
+	wp_enqueue_script(
+		'skyyrose-main',
+		SKYYROSE_ASSETS_URI . '/js/main.js',
+		array(),
+		SKYYROSE_VERSION,
+		true
+	);
+
+	// Three.js — only enqueue on immersive 3D experience pages.
+	if ( is_page_template( array(
+		'template-immersive-black-rose.php',
+		'template-love-hurts.php',
+		'template-immersive-signature.php',
+	) ) ) {
+		wp_enqueue_script(
+			'skyyrose-three-init',
+			SKYYROSE_ASSETS_URI . '/js/three-init.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
 
 	// Comment reply script.
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
@@ -495,7 +492,7 @@ function skyyrose_performance_optimizations() {
 	add_filter(
 		'script_loader_tag',
 		function( $tag, $handle ) {
-			$defer_scripts = array( 'skyyrose-main', 'skyyrose-navigation', 'skyyrose-three-init' );
+			$defer_scripts = array( 'skyyrose-main', 'skyyrose-navigation' );
 			if ( in_array( $handle, $defer_scripts, true ) ) {
 				return str_replace( ' src', ' defer src', $tag );
 			}

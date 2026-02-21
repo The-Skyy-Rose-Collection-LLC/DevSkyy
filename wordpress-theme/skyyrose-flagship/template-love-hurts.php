@@ -1,621 +1,241 @@
 <?php
 /**
- * Template Name: Love Hurts Collection - Enchanted Ballroom
- * Description: Beauty and the Beast inspired 3D shopping experience
+ * Template Name: Love Hurts — 3D Castle Experience
+ * Template Post Type: page
  *
- * @package SkyyroseTheme
+ * Immersive Three.js castle courtyard with rain, lightning,
+ * product hotspots, and atmospheric dark romance.
+ *
+ * @package SkyyRose_Flagship
+ * @since 2.0.0
  */
 
 get_header();
 ?>
 
 <div id="love-hurts-experience" class="three-scene-wrapper">
-    <!-- Loading Screen -->
-    <div id="loading-screen" class="loading-overlay">
-        <div class="loading-content">
-            <div class="enchanted-rose-loader">
-                <div class="rose-spinner"></div>
-                <p class="loading-text">Preparing the enchanted ballroom...</p>
-                <div class="loading-progress">
-                    <div class="progress-bar"></div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- 3D Scene Container -->
-    <div id="love-hurts-scene-container" class="scene-container"></div>
+	<!-- Loading Screen -->
+	<div id="lh-loader" class="loading-overlay" style="background:#050510;z-index:1000">
+		<div style="text-align:center">
+			<div style="font-family:'Playfair Display',Georgia,serif;font-size:2rem;background:linear-gradient(180deg,#fff,#D4A5AD);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;animation:lhPulse 2s infinite">ENTERING CASTLE...</div>
+		</div>
+	</div>
 
-    <!-- UI Overlay -->
-    <div class="scene-ui-overlay">
-        <!-- Navigation Menu -->
-        <nav class="ballroom-navigation">
-            <h1 class="collection-title">Love Hurts Collection</h1>
-            <ul class="scene-nav-menu">
-                <li><button class="nav-btn" data-section="ballroom">Grand Ballroom</button></li>
-                <li><button class="nav-btn" data-section="rose">Enchanted Rose</button></li>
-                <li><button class="nav-btn" data-section="mirror">Magic Mirror</button></li>
-                <li><button class="nav-btn" data-section="windows">Stained Glass</button></li>
-            </ul>
-        </nav>
+	<!-- 3D Canvas Container -->
+	<div id="lh-canvas-container" class="scene-container"></div>
 
-        <!-- Instructions -->
-        <div class="scene-instructions">
-            <p>
-                <span class="instruction-icon">🖱️</span> Click and drag to explore
-            </p>
-            <p>
-                <span class="instruction-icon">✨</span> Click glowing products to view
-            </p>
-            <p>
-                <span class="instruction-icon">🌹</span> Discover Beauty & Beast Easter eggs
-            </p>
-        </div>
+	<!-- UI Overlay -->
+	<div class="scene-ui-overlay">
 
-        <!-- Audio Controls -->
-        <div class="audio-controls">
-            <button id="toggle-audio" class="audio-btn" aria-label="Toggle Music">
-                <span class="audio-icon">🔊</span>
-            </button>
-        </div>
+		<!-- Collection Header -->
+		<div style="position:absolute;top:2rem;left:50%;transform:translateX(-50%);text-align:center;pointer-events:none">
+			<h1 style="font-family:'Playfair Display',Georgia,serif;font-size:3rem;background:linear-gradient(180deg,#fff,#D4A5AD);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin:0">Love Hurts</h1>
+			<p style="letter-spacing:.3em;text-transform:uppercase;color:#D4A5AD;font-size:.8rem;margin-top:.5rem">Emotional &bull; Raw &bull; Broken</p>
+		</div>
 
-        <!-- Easter Egg Counter -->
-        <div class="easter-egg-tracker">
-            <h3>Enchanted Objects Found</h3>
-            <div class="egg-counter">
-                <span id="eggs-found">0</span> / <span id="total-eggs">6</span>
-            </div>
-            <ul class="egg-list">
-                <li data-egg="lumiere">🕯️ Lumière</li>
-                <li data-egg="cogsworth">🕐 Cogsworth</li>
-                <li data-egg="potts">🫖 Mrs. Potts & Chip</li>
-                <li data-egg="mirror">🪞 Magic Mirror</li>
-                <li data-egg="wardrobe">🚪 Wardrobe</li>
-                <li data-egg="book">📖 Enchanted Book</li>
-            </ul>
-        </div>
-    </div>
+		<!-- Product Card (slides in from right) -->
+		<div id="lh-product-card" style="position:fixed;right:-400px;top:50%;transform:translateY(-50%);width:350px;background:rgba(10,10,25,.9);border-left:1px solid #D4A5AD;padding:2rem;z-index:200;transition:right .5s ease;backdrop-filter:blur(15px)">
+			<button onclick="document.getElementById('lh-product-card').style.right='-400px'" style="position:absolute;top:1rem;right:1rem;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer">&times;</button>
+			<h2 id="lh-p-title" style="font-family:'Playfair Display',Georgia,serif;font-size:1.8rem;margin:0 0 .5rem;color:#fff">Product Name</h2>
+			<div id="lh-p-price" style="color:#D4A5AD;font-size:1.2rem;margin-bottom:1rem">$0.00</div>
+			<p id="lh-p-desc" style="font-size:.9rem;line-height:1.6;color:#ccc;margin-bottom:2rem">Description goes here.</p>
+			<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" style="display:block;width:100%;padding:1rem;background:#4B0082;border:none;color:#fff;text-transform:uppercase;letter-spacing:.2em;text-align:center;text-decoration:none;cursor:pointer">Pre-Order Now</a>
+		</div>
 
-    <!-- Product Modal -->
-    <div id="product-modal" class="enchanted-modal" style="display: none;">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <button class="modal-close" aria-label="Close">&times;</button>
+		<!-- Navigation Controls -->
+		<div style="position:absolute;bottom:3rem;left:50%;transform:translateX(-50%);display:flex;gap:1rem;pointer-events:auto">
+			<button class="lh-nav-btn active" onclick="window.lhSetView('courtyard')" style="background:rgba(10,10,30,.6);border:1px solid rgba(255,255,255,.2);color:#ccc;padding:.8rem 1.5rem;cursor:pointer;text-transform:uppercase;letter-spacing:.1em;backdrop-filter:blur(5px);transition:all .3s">Courtyard</button>
+			<button class="lh-nav-btn" onclick="window.lhSetView('hall')" style="background:rgba(10,10,30,.6);border:1px solid rgba(255,255,255,.2);color:#ccc;padding:.8rem 1.5rem;cursor:pointer;text-transform:uppercase;letter-spacing:.1em;backdrop-filter:blur(5px);transition:all .3s">Great Hall</button>
+			<button class="lh-nav-btn" onclick="window.lhSetView('balcony')" style="background:rgba(10,10,30,.6);border:1px solid rgba(255,255,255,.2);color:#ccc;padding:.8rem 1.5rem;cursor:pointer;text-transform:uppercase;letter-spacing:.1em;backdrop-filter:blur(5px);transition:all .3s">Balcony</button>
+		</div>
 
-            <div class="modal-inner">
-                <!-- Magic Mirror Frame -->
-                <div class="mirror-frame">
-                    <div class="mirror-glow"></div>
+		<!-- Exit to Shop -->
+		<a href="<?php echo esc_url( home_url( '/love-hurts-collection/' ) ); ?>" style="position:fixed;top:2rem;right:2rem;color:#fff;text-decoration:none;text-transform:uppercase;font-size:.8rem;letter-spacing:.1em;pointer-events:auto;z-index:100">Exit to Shop</a>
 
-                    <div class="product-display">
-                        <div id="product-image" class="product-image-container">
-                            <!-- Product image loaded dynamically -->
-                        </div>
+		<!-- Brand Logo -->
+		<a href="<?php echo esc_url( home_url( '/' ) ); ?>" style="position:fixed;bottom:2rem;right:2rem;font-family:'Playfair Display',Georgia,serif;font-size:1rem;letter-spacing:.3em;color:#D4A5AD;opacity:.6;z-index:100;text-decoration:none;pointer-events:auto">SKYYROSE</a>
 
-                        <div class="product-info">
-                            <h2 id="product-title" class="product-title"></h2>
-                            <div id="product-price" class="product-price"></div>
-                            <div id="product-description" class="product-description"></div>
-
-                            <div class="product-meta">
-                                <div class="product-sku"></div>
-                                <div class="product-availability"></div>
-                            </div>
-
-                            <div class="product-actions">
-                                <button id="add-to-cart-btn" class="btn-enchanted btn-add-cart">
-                                    <span class="btn-icon">🌹</span>
-                                    Add to Cart
-                                </button>
-                                <button class="btn-enchanted btn-view-details">
-                                    View Full Details
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+	</div>
 </div>
 
 <style>
-/* Love Hurts Collection Styles */
-.three-scene-wrapper {
-    position: relative;
-    width: 100vw;
-    height: 100vh;
-    overflow: hidden;
-    background: #0a0a0a;
-}
-
-/* Loading Screen */
-.loading-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #0a0a0a 0%, #1a0a0a 50%, #0a0a1a 100%);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    transition: opacity 0.5s ease-out;
-}
-
-.loading-overlay.fade-out {
-    opacity: 0;
-    pointer-events: none;
-}
-
-.loading-content {
-    text-align: center;
-    color: #FFD700;
-}
-
-.rose-spinner {
-    width: 80px;
-    height: 80px;
-    margin: 0 auto 20px;
-    border: 4px solid rgba(255, 215, 0, 0.2);
-    border-top: 4px solid #FFD700;
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.loading-text {
-    font-family: 'Cinzel', serif;
-    font-size: 1.2rem;
-    margin: 20px 0;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.loading-progress {
-    width: 300px;
-    height: 4px;
-    background: rgba(255, 215, 0, 0.2);
-    border-radius: 2px;
-    overflow: hidden;
-    margin: 20px auto 0;
-}
-
-.progress-bar {
-    width: 0%;
-    height: 100%;
-    background: linear-gradient(90deg, #FFD700, #FF69B4);
-    animation: loadProgress 3s ease-out forwards;
-}
-
-@keyframes loadProgress {
-    to { width: 100%; }
-}
-
-/* Scene Container */
-.scene-container {
-    width: 100%;
-    height: 100%;
-}
-
-/* UI Overlay */
-.scene-ui-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
-    z-index: 10;
-}
-
-.scene-ui-overlay > * {
-    pointer-events: auto;
-}
-
-/* Navigation */
-.ballroom-navigation {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    border-radius: 10px;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-    box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
-}
-
-.collection-title {
-    font-family: 'Cinzel', serif;
-    font-size: 1.5rem;
-    color: #FFD700;
-    margin: 0 0 15px 0;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.scene-nav-menu {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.scene-nav-menu li {
-    margin-bottom: 10px;
-}
-
-.nav-btn {
-    background: linear-gradient(135deg, rgba(139, 0, 0, 0.3), rgba(75, 0, 130, 0.3));
-    border: 1px solid rgba(255, 215, 0, 0.5);
-    color: #FFD700;
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-size: 0.9rem;
-    width: 100%;
-    text-align: left;
-    transition: all 0.3s ease;
-}
-
-.nav-btn:hover {
-    background: linear-gradient(135deg, rgba(139, 0, 0, 0.5), rgba(75, 0, 130, 0.5));
-    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
-    transform: translateX(5px);
-}
-
-/* Instructions */
-.scene-instructions {
-    position: absolute;
-    bottom: 20px;
-    left: 20px;
-    background: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(10px);
-    padding: 15px;
-    border-radius: 10px;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-    color: #FFD700;
-    font-size: 0.9rem;
-}
-
-.scene-instructions p {
-    margin: 5px 0;
-}
-
-.instruction-icon {
-    margin-right: 8px;
-}
-
-/* Audio Controls */
-.audio-controls {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-}
-
-.audio-btn {
-    background: rgba(10, 10, 10, 0.8);
-    border: 2px solid rgba(255, 215, 0, 0.5);
-    color: #FFD700;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 1.5rem;
-    transition: all 0.3s ease;
-}
-
-.audio-btn:hover {
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    transform: scale(1.1);
-}
-
-/* Easter Egg Tracker */
-.easter-egg-tracker {
-    position: absolute;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(10px);
-    padding: 15px;
-    border-radius: 10px;
-    border: 2px solid rgba(255, 215, 0, 0.3);
-    color: #FFD700;
-    max-width: 250px;
-}
-
-.easter-egg-tracker h3 {
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    margin: 0 0 10px 0;
-}
-
-.egg-counter {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 10px;
-    text-align: center;
-}
-
-.egg-list {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    font-size: 0.9rem;
-}
-
-.egg-list li {
-    padding: 5px 0;
-    opacity: 0.5;
-    transition: opacity 0.3s ease;
-}
-
-.egg-list li.found {
-    opacity: 1;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-/* Product Modal (Magic Mirror) */
-.enchanted-modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 10000;
-}
-
-.modal-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(5px);
-}
-
-.modal-content {
-    position: relative;
-    width: 90%;
-    max-width: 900px;
-    height: 80%;
-    margin: 5% auto;
-    z-index: 10001;
-}
-
-.modal-close {
-    position: absolute;
-    top: -40px;
-    right: 0;
-    background: transparent;
-    border: none;
-    color: #FFD700;
-    font-size: 2rem;
-    cursor: pointer;
-    z-index: 10002;
-    transition: transform 0.3s ease;
-}
-
-.modal-close:hover {
-    transform: scale(1.2) rotate(90deg);
-}
-
-.mirror-frame {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(135deg, #1a1a1a, #2a2a1a);
-    border: 10px solid #FFD700;
-    border-radius: 20px;
-    box-shadow:
-        0 0 50px rgba(255, 215, 0, 0.5),
-        inset 0 0 50px rgba(255, 215, 0, 0.1);
-    padding: 30px;
-    overflow: auto;
-}
-
-.mirror-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle at center, rgba(255, 215, 0, 0.1), transparent);
-    pointer-events: none;
-    animation: mirrorPulse 3s ease-in-out infinite;
-}
-
-@keyframes mirrorPulse {
-    0%, 100% { opacity: 0.5; }
-    50% { opacity: 1; }
-}
-
-.product-display {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 30px;
-    height: 100%;
-}
-
-.product-image-container {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(0, 0, 0, 0.3);
-    border-radius: 10px;
-    overflow: hidden;
-}
-
-.product-image-container img {
-    max-width: 100%;
-    max-height: 100%;
-    object-fit: contain;
-}
-
-.product-info {
-    color: #FFD700;
-}
-
-.product-title {
-    font-family: 'Cinzel', serif;
-    font-size: 2rem;
-    margin-bottom: 20px;
-    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
-}
-
-.product-price {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 20px;
-    color: #FF69B4;
-}
-
-.product-description {
-    font-size: 1rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
-    color: #e0e0e0;
-}
-
-.product-actions {
-    display: flex;
-    gap: 15px;
-    margin-top: 30px;
-}
-
-.btn-enchanted {
-    padding: 15px 30px;
-    border-radius: 8px;
-    font-family: 'Cinzel', serif;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    border: 2px solid;
-}
-
-.btn-add-cart {
-    background: linear-gradient(135deg, #8B0000, #4B0082);
-    border-color: #FFD700;
-    color: #FFD700;
-}
-
-.btn-add-cart:hover {
-    background: linear-gradient(135deg, #B00000, #6B00B2);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-    transform: translateY(-2px);
-}
-
-.btn-view-details {
-    background: transparent;
-    border-color: #FFD700;
-    color: #FFD700;
-}
-
-.btn-view-details:hover {
-    background: rgba(255, 215, 0, 0.1);
-    box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .product-display {
-        grid-template-columns: 1fr;
-    }
-
-    .ballroom-navigation,
-    .easter-egg-tracker {
-        font-size: 0.8rem;
-        padding: 10px;
-    }
-
-    .collection-title {
-        font-size: 1.2rem;
-    }
-}
+@keyframes lhPulse{0%,100%{opacity:.6}50%{opacity:1}}
+.lh-nav-btn:hover,.lh-nav-btn.active{border-color:#D4A5AD!important;color:#fff!important;box-shadow:0 0 15px rgba(212,165,173,.3)}
 </style>
 
+<script>
+(function(){
+	var im = document.createElement('script');
+	im.type = 'importmap';
+	im.textContent = JSON.stringify({imports:{"three":"https://unpkg.com/three@0.160.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.160.0/examples/jsm/"}});
+	document.currentScript.parentElement.insertBefore(im, document.currentScript);
+})();
+</script>
+
 <script type="module">
-import LoveHurtsScene from '<?php echo get_template_directory_uri(); ?>/assets/js/three/love-hurts-scene.js';
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-document.addEventListener('DOMContentLoaded', () => {
-    const container = document.getElementById('love-hurts-scene-container');
-    const loadingScreen = document.getElementById('loading-screen');
+let scene, camera, renderer, controls;
+let rainGeo, rainCount = 15000;
+let flash, rain;
+const hotspots = [];
 
-    // Initialize scene
-    const scene = new LoveHurtsScene(container);
+const products = [
+	{ id:1, name:'Heartbreak Hoodie', price:'$195', desc:'Distressed cotton with hand-stitched broken heart patches.', pos:new THREE.Vector3(-3,2,0) },
+	{ id:2, name:'Tears Tee', price:'$85', desc:'Oversized tee featuring puff-print tear graphics.', pos:new THREE.Vector3(3,2,0) },
+	{ id:3, name:'Vow Ring', price:'$120', desc:'Sterling silver ring with a crack running through the band.', pos:new THREE.Vector3(0,1.5,4) }
+];
 
-    // Hide loading screen after initialization
-    setTimeout(() => {
-        loadingScreen.classList.add('fade-out');
-        setTimeout(() => {
-            loadingScreen.style.display = 'none';
-        }, 500);
-    }, 3000);
+init();
+animate();
 
-    // Navigation buttons
-    document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const section = e.target.dataset.section;
-            scene.navigateToSection(section);
-        });
-    });
+function init() {
+	scene = new THREE.Scene();
+	scene.fog = new THREE.FogExp2(0x050510, 0.03);
 
-    // Product hotspot click handler
-    window.addEventListener('productHotspotClick', (e) => {
-        const { productId, productName } = e.detail;
-        openProductModal(productId, productName);
-    });
+	camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 1000);
+	camera.position.set(0,5,15);
 
-    // Modal controls
-    const modal = document.getElementById('product-modal');
-    const modalClose = modal.querySelector('.modal-close');
-    const modalOverlay = modal.querySelector('.modal-overlay');
+	renderer = new THREE.WebGLRenderer({ antialias:true });
+	renderer.setSize(window.innerWidth, window.innerHeight);
+	renderer.setClearColor(0x050510);
+	document.getElementById('lh-canvas-container').appendChild(renderer.domElement);
 
-    modalClose.addEventListener('click', closeProductModal);
-    modalOverlay.addEventListener('click', closeProductModal);
+	// Lighting
+	scene.add(new THREE.AmbientLight(0x555555));
+	const dir = new THREE.DirectionalLight(0x4B0082, 0.5);
+	dir.position.set(0,20,10);
+	scene.add(dir);
+	flash = new THREE.PointLight(0x062d89, 30, 500, 1.7);
+	flash.position.set(200,300,100);
+	scene.add(flash);
 
-    function openProductModal(productId, productName) {
-        // Fetch product data via AJAX
-        fetch(`<?php echo admin_url('admin-ajax.php'); ?>?action=get_product_data&product_id=${productId}`)
-            .then(res => res.json())
-            .then(data => {
-                // Safely set text content
-                document.getElementById('product-title').textContent = data.title || productName;
-                document.getElementById('product-price').textContent = data.price || '';
-                document.getElementById('product-description').textContent = data.description || '';
+	// Ground (wet pavement)
+	const plane = new THREE.Mesh(
+		new THREE.PlaneGeometry(100,100),
+		new THREE.MeshStandardMaterial({ color:0x111111, roughness:0.1, metalness:0.8 })
+	);
+	plane.rotation.x = -Math.PI/2;
+	scene.add(plane);
 
-                // Safely create image element
-                const productImage = document.getElementById('product-image');
-                productImage.textContent = ''; // Clear previous content
-                if (data.image) {
-                    const img = document.createElement('img');
-                    img.src = data.image;
-                    img.alt = data.title || productName;
-                    productImage.appendChild(img);
-                }
+	// Castle Pillars
+	const pillarGeo = new THREE.BoxGeometry(2,15,2);
+	const pillarMat = new THREE.MeshStandardMaterial({ color:0x222222, roughness:0.9 });
+	[[-10,-5],[10,-5],[-10,5],[10,5],[-5,-10],[5,-10]].forEach(p => {
+		const pillar = new THREE.Mesh(pillarGeo, pillarMat);
+		pillar.position.set(p[0], 7.5, p[1]);
+		scene.add(pillar);
+	});
 
-                modal.style.display = 'block';
-            })
-            .catch(error => {
-                console.error('Error loading product:', error);
-            });
-    }
+	// Rain System
+	rainGeo = new THREE.BufferGeometry();
+	const rainPos = [];
+	for (let i=0; i<rainCount; i++) {
+		rainPos.push(Math.random()*400-200, Math.random()*500-250, Math.random()*400-200);
+	}
+	rainGeo.setAttribute('position', new THREE.Float32BufferAttribute(rainPos, 3));
+	rain = new THREE.Points(rainGeo, new THREE.PointsMaterial({ color:0xaaaaaa, size:0.2, transparent:true, opacity:0.6 }));
+	scene.add(rain);
 
-    function closeProductModal() {
-        modal.style.display = 'none';
-    }
+	// Product Hotspots
+	products.forEach(p => {
+		const mesh = new THREE.Mesh(
+			new THREE.SphereGeometry(0.3,16,16),
+			new THREE.MeshBasicMaterial({ color:0xD4A5AD })
+		);
+		mesh.position.copy(p.pos);
+		mesh.userData = { product:p };
+		scene.add(mesh);
+		hotspots.push(mesh);
+		const ring = new THREE.Mesh(
+			new THREE.RingGeometry(0.4,0.45,32),
+			new THREE.MeshBasicMaterial({ color:0xD4A5AD, side:THREE.DoubleSide, transparent:true, opacity:0.5 })
+		);
+		ring.position.copy(p.pos);
+		ring.lookAt(camera.position);
+		scene.add(ring);
+	});
 
-    // Audio toggle (placeholder)
-    document.getElementById('toggle-audio').addEventListener('click', function() {
-        console.log('Audio toggle - implement audio manager');
-        this.querySelector('.audio-icon').textContent =
-            this.querySelector('.audio-icon').textContent === '🔊' ? '🔇' : '🔊';
-    });
-});
+	// Controls
+	controls = new OrbitControls(camera, renderer.domElement);
+	controls.enableDamping = true;
+	controls.maxPolarAngle = Math.PI/2 - 0.1;
+	controls.minDistance = 5;
+	controls.maxDistance = 30;
+
+	window.addEventListener('resize', onResize);
+	window.addEventListener('click', onClick);
+
+	// Remove loader
+	setTimeout(() => {
+		const loader = document.getElementById('lh-loader');
+		loader.style.opacity = '0';
+		loader.style.transition = 'opacity 1s';
+		setTimeout(() => loader.remove(), 1000);
+	}, 1000);
+}
+
+function onResize() {
+	camera.aspect = window.innerWidth/window.innerHeight;
+	camera.updateProjectionMatrix();
+	renderer.setSize(window.innerWidth, window.innerHeight);
+}
+
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+
+function onClick(e) {
+	if (e.target.closest('.lh-nav-btn') || e.target.closest('#lh-product-card') || e.target.closest('a')) return;
+	mouse.x = (e.clientX/window.innerWidth)*2-1;
+	mouse.y = -(e.clientY/window.innerHeight)*2+1;
+	raycaster.setFromCamera(mouse, camera);
+	const intersects = raycaster.intersectObjects(hotspots);
+	if (intersects.length > 0) {
+		const p = intersects[0].object.userData.product;
+		document.getElementById('lh-p-title').textContent = p.name;
+		document.getElementById('lh-p-price').textContent = p.price;
+		document.getElementById('lh-p-desc').textContent = p.desc;
+		document.getElementById('lh-product-card').style.right = '0';
+	} else {
+		document.getElementById('lh-product-card').style.right = '-400px';
+	}
+}
+
+window.lhSetView = function(type) {
+	const targets = {
+		courtyard: { pos:new THREE.Vector3(0,5,15), look:new THREE.Vector3(0,0,0) },
+		hall: { pos:new THREE.Vector3(0,3,-5), look:new THREE.Vector3(0,5,-20) },
+		balcony: { pos:new THREE.Vector3(15,10,0), look:new THREE.Vector3(0,0,0) }
+	};
+	const t = targets[type];
+	if (t) { camera.position.copy(t.pos); controls.target.copy(t.look); }
+	document.querySelectorAll('.lh-nav-btn').forEach(b => b.classList.remove('active'));
+	event.target.classList.add('active');
+};
+
+function animate() {
+	// Rain
+	const positions = rain.geometry.attributes.position.array;
+	for (let i=1; i<rainCount*3; i+=3) {
+		positions[i] -= 0.5 + Math.random()*0.5;
+		if (positions[i] < -100) positions[i] = 100;
+	}
+	rain.geometry.attributes.position.needsUpdate = true;
+
+	// Lightning
+	if (Math.random() > 0.97 || flash.power > 100) {
+		if (flash.power < 100) flash.position.set(Math.random()*400, 300+Math.random()*200, 100);
+		flash.power = 50 + Math.random()*500;
+	} else {
+		flash.power = Math.max(0, flash.power*0.95);
+	}
+
+	controls.update();
+	renderer.render(scene, camera);
+	requestAnimationFrame(animate);
+}
 </script>
 
 <?php get_footer(); ?>

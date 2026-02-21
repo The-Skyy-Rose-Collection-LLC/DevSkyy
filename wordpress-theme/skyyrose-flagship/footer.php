@@ -16,6 +16,12 @@
 				<!-- Brand Column -->
 				<div class="footer-col footer-brand">
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="footer-logo" rel="home">
+						<?php
+						$rose_mark = SKYYROSE_THEME_DIR . '/assets/images/brand/skyyrose-rose-mark.png';
+						if ( file_exists( $rose_mark ) ) :
+						?>
+							<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-rose-mark.png' ); ?>" alt="" class="footer-rose-mark" width="40" height="40" aria-hidden="true">
+						<?php endif; ?>
 						<?php bloginfo( 'name' ); ?>
 					</a>
 					<p class="footer-tagline">Where Love Meets Luxury&trade;</p>
