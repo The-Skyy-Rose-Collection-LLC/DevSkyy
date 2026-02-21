@@ -1,0 +1,18 @@
+{
+  "routing": {
+    "director":       { "provider": "anthropic", "model": "claude-opus-4-6" },
+    "design_system":  { "provider": "google",    "model": "gemini-3-pro-preview" },
+    "frontend_dev":   { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "backend_dev":    { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "accessibility":  { "provider": "anthropic", "model": "claude-haiku-4-5" },
+    "performance":    { "provider": "google",    "model": "gemini-3-flash-preview" },
+    "seo_content":    { "provider": "openai",    "model": "gpt-4o" },
+    "qa":             { "provider": "xai",       "model": "grok-3" }
+  },
+  "fallbacks": {
+    "anthropic": { "provider": "google",    "model": "gemini-3-pro-preview" },
+    "google":    { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "openai":    { "provider": "anthropic", "model": "claude-sonnet-4-6" },
+    "xai":       { "provider": "google",    "model": "gemini-3-flash-preview" }
+  }
+}
