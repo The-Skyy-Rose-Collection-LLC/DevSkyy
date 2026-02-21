@@ -50,11 +50,14 @@
 				<?php else : ?>
 					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="brand-logo-link" rel="home">
 						<?php
-						// Check for optimized PNG/WebP logo first, then original
+						// Priority: GIF (animated rotating) → WebP → PNG → SVG fallback
+						$logo_gif  = SKYYROSE_THEME_DIR . '/assets/images/brand/skyyrose-logo.gif';
 						$logo_webp = SKYYROSE_THEME_DIR . '/assets/images/brand/skyyrose-logo.webp';
 						$logo_png  = SKYYROSE_THEME_DIR . '/assets/images/brand/skyyrose-logo.png';
-						if ( file_exists( $logo_webp ) ) :
+						if ( file_exists( $logo_gif ) ) :
 						?>
+							<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-logo.gif' ); ?>" alt="<?php bloginfo( 'name' ); ?>" class="brand-logo-img brand-logo-gif" loading="eager" fetchpriority="high">
+						<?php elseif ( file_exists( $logo_webp ) ) : ?>
 							<picture>
 								<source srcset="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-logo.webp' ); ?>" type="image/webp">
 								<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-logo.png' ); ?>" alt="<?php bloginfo( 'name' ); ?>" class="brand-logo-img" loading="eager" fetchpriority="high">

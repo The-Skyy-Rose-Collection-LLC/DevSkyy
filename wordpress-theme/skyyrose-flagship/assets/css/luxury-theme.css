@@ -349,6 +349,20 @@ label {
 	transition: height 0.3s ease, filter 0.4s ease;
 }
 
+/* Animated GIF logo — rotating continuously */
+.brand-logo-gif {
+	height: 52px;
+	width: 52px;
+	max-height: 52px;
+	object-fit: contain;
+	border-radius: 50%;
+	filter: drop-shadow(0 2px 8px rgba(183,110,121,0.3));
+}
+
+.brand-logo-link:hover .brand-logo-gif {
+	filter: drop-shadow(0 2px 16px rgba(183,110,121,0.5));
+}
+
 .brand-monogram-svg {
 	display: block;
 	height: 48px;
@@ -360,6 +374,12 @@ label {
 /* Compact header on scroll */
 .header-scrolled .brand-logo-img {
 	height: 38px;
+	max-height: 38px;
+}
+
+.header-scrolled .brand-logo-gif {
+	height: 38px;
+	width: 38px;
 	max-height: 38px;
 }
 
@@ -1588,6 +1608,11 @@ body.menu-open {
 		height: 42px;
 		max-height: 42px;
 	}
+	.brand-logo-gif {
+		height: 44px;
+		width: 44px;
+		max-height: 44px;
+	}
 }
 @media (max-width: 480px) {
 	.cl-logo-svg {
@@ -1604,6 +1629,11 @@ body.menu-open {
 	}
 	.brand-logo-img {
 		height: 36px;
+		max-height: 36px;
+	}
+	.brand-logo-gif {
+		height: 36px;
+		width: 36px;
 		max-height: 36px;
 	}
 }
