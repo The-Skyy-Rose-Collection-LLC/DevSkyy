@@ -168,6 +168,8 @@ class TestImportIntegrity:
             RalphExecutor,
             FailureCategory,
             SelfHealer,
+            GateConfig,
+            GateName,
             GateResult,
             GateStatus,
             VerificationLoop,
@@ -366,7 +368,7 @@ class TestEndToEndSmoke:
             call_count += 1
             if call_count == 1:
                 return LLMResponse(content=planning_json, provider="mock", model="test", latency_ms=10)
-            return LLMResponse(content="Story output", provider="mock", model="test", latency_ms=10)
+            return LLMResponse(content="Story output completed successfully with all checks passing.", provider="mock", model="test", latency_ms=10)
 
         adapter = AsyncMock()
         adapter.generate = mock_generate
