@@ -226,6 +226,34 @@ class AgentTask(Base, TimestampMixin):
     __table_args__ = (Index("ix_agent_tasks_status_created", "status", "created_at"),)
 
 
+class EventRecord(Base):
+    """
+    Event Store — immutable append-only log for event sourcing.
+
+    NEVER update or delete rows. Events are facts that happened.
+    State is rebuilt by replaying events in timestamp order.
+    """
+
+    __tablename__ = "event_store"
+
+    event_id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    event_type: Mapped[str] = mapped_column(String(100), index=True)
+    aggregate_id: Mapped[str] = mapped_column(String(36), index=True)
+    aggregate_type: Mapped[str] = mapped_column(String(100), default="unknown")
+    data_json: Mapped[str] = mapped_column(Text, default="{}")
+    timestamp: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), default=lambda: datetime.now(UTC), index=True
+    )
+    version: Mapped[int] = mapped_column(Integer, default=1)
+    user_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+    correlation_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
+
+    __table_args__ = (
+        Index("ix_event_store_aggregate_ts", "aggregate_id", "timestamp"),
+        Index("ix_event_store_type_ts", "event_type", "timestamp"),
+    )
+
+
 # =============================================================================
 # Database Manager
 # =============================================================================
@@ -668,6 +696,7 @@ __all__ = [
     "OrderItem",
     "AuditLog",
     "AgentTask",
+    "EventRecord",
     # Repositories
     "BaseRepository",
     "UserRepository",

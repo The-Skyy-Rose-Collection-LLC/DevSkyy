@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package devskyy.products;
+
+// ProductService provides high-performance inter-service access to product data.
+// Faster than REST for internal service-to-service calls due to binary encoding
+// and HTTP/2 multiplexing.
+service ProductService {
+  rpc GetProduct (GetProductRequest) returns (ProductResponse);
+  rpc ListProducts (ListProductsRequest) returns (ListProductsResponse);
+  rpc CreateProduct (CreateProductRequest) returns (ProductResponse);
+  rpc UpdateProductPrice (UpdateProductPriceRequest) returns (ProductResponse);
+}
+
+// Core product message — mirrors the Product ORM model
+message ProductResponse {
+  string id = 1;
+  string sku = 2;
+  string name = 3;
+  string description = 4;
+  double price = 5;
+  double compare_price = 6;
+  string collection = 7;
+  bool is_active = 8;
+  repeated string images = 9;
+}
+
+message GetProductRequest {
+  string sku = 1;
+}
+
+message ListProductsRequest {
+  string collection = 1;  // Empty string means "all collections"
+  int32 limit = 2;
+  int32 offset = 3;
+}
+
+message ListProductsResponse {
+  repeated ProductResponse products = 1;
+  int32 total = 2;
+}
+
+message CreateProductRequest {
+  string sku = 1;
+  string name = 2;
+  string description = 3;
+  double price = 4;
+  double compare_price = 5;
+  string collection = 6;
+  repeated string images = 7;
+}
+
+message UpdateProductPriceRequest {
+  string sku = 1;
+  double new_price = 2;
+  string user_id = 3;  // For audit trail via event sourcing
+}
