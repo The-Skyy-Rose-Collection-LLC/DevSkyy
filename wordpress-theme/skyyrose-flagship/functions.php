@@ -314,7 +314,7 @@ function skyyrose_scripts() {
 	// Three.js — only enqueue on immersive 3D experience pages.
 	if ( is_page_template( array(
 		'template-immersive-black-rose.php',
-		'template-love-hurts.php',
+		'template-immersive-love-hurts.php',
 		'template-immersive-signature.php',
 	) ) ) {
 		wp_enqueue_script(
