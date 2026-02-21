@@ -37,14 +37,13 @@ def _build_parser() -> argparse.ArgumentParser:
         description="Elite Web Builder — Full-stack AI web development agency",
     )
 
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument(
+    parser.add_argument(
         "prd",
         nargs="?",
         default=None,
         help="Inline PRD text",
     )
-    group.add_argument(
+    parser.add_argument(
         "--file",
         type=Path,
         default=None,
