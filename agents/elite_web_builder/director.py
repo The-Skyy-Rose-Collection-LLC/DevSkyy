@@ -407,16 +407,17 @@ class Director:
             if self._config.verification_enabled:
                 vresult = await self._verifier.run(result.content)
                 if not vresult.all_green:
-                    # Attempt self-healing
+                    # Attempt self-healing with fresh failures each iteration
                     healed = False
+                    current_content = result.content
                     for _attempt in range(self._config.max_heal_attempts):
                         diagnosis = await self._healer.diagnose(
                             str(vresult.failures)
                         )
-                        fixed = await self._healer.heal(result.content, diagnosis)
-                        re_verify = await self._verifier.run(fixed)
-                        if re_verify.all_green:
-                            story.output = fixed
+                        current_content = await self._healer.heal(current_content, diagnosis)
+                        vresult = await self._verifier.run(current_content)
+                        if vresult.all_green:
+                            story.output = current_content
                             healed = True
                             break
 
