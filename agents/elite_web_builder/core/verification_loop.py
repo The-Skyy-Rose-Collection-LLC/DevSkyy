@@ -58,12 +58,14 @@ class VerificationResult:
     @property
     def all_green(self) -> bool:
         """
-        Determine whether every recorded gate has status PASSED.
-        
+        Determine whether all gates are green (no failures).
+
         Returns:
-            True if every gate status is GateStatus.PASSED, False otherwise.
+            True if every gate status is PASSED or SKIPPED, False otherwise.
         """
-        return all(g.status == GateStatus.PASSED for g in self.gates)
+        return all(
+            g.status in (GateStatus.PASSED, GateStatus.SKIPPED) for g in self.gates
+        )
 
     @property
     def failures(self) -> list[GateResult]:

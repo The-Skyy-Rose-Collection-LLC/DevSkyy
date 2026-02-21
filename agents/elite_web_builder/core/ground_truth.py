@@ -111,7 +111,7 @@ class GroundTruthValidator:
                 else:
                     slugs.add(item["slug"])
                 if "color" in item and not re.match(
-                    r"^#[0-9a-fA-F]{3,8}$", item["color"]
+                    r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$", item["color"]
                 ):
                     errors.append(f"Invalid hex color: {item['color']}")
 
@@ -146,8 +146,8 @@ class GroundTruthValidator:
     def validate_color_hex(self, color: str) -> bool:
         """
         Determine whether a string is a valid hex color.
-        
+
         Returns:
-            `true` if the string is a hex color in the form `#` followed by 3–8 hexadecimal digits, `false` otherwise.
+            True if the string is a hex color (#RGB, #RGBA, #RRGGBB, or #RRGGBBAA), False otherwise.
         """
-        return bool(re.match(r"^#[0-9a-fA-F]{3,8}$", color))
+        return bool(re.match(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$", color))
