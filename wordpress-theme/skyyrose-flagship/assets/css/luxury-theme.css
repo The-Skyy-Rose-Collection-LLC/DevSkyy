@@ -318,62 +318,137 @@ label {
 	display: none;
 }
 
-/* Brand Logo */
+/* ==================================================
+   BRAND LOGOS — Primary SR Monogram
+   ================================================== */
+
+@keyframes logoShimmer {
+	0% { filter: drop-shadow(0 0 0 transparent); }
+	50% { filter: drop-shadow(0 2px 8px rgba(183,110,121,0.3)); }
+	100% { filter: drop-shadow(0 0 0 transparent); }
+}
+
 .brand-logo-link {
 	display: flex;
 	align-items: center;
 	text-decoration: none;
+	transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), filter 0.4s ease;
+}
+
+.brand-logo-link:hover {
+	transform: scale(1.04);
+	filter: drop-shadow(0 2px 12px rgba(183,110,121,0.35));
 }
 
 .brand-logo-img {
-	height: 40px;
+	display: block;
+	height: 52px;
 	width: auto;
+	max-height: 52px;
 	object-fit: contain;
+	transition: height 0.3s ease, filter 0.4s ease;
 }
 
-.brand-logo-text {
-	display: flex;
-	flex-direction: column;
-	line-height: 1;
+.brand-monogram-svg {
+	display: block;
+	height: 48px;
+	width: auto;
+	max-width: 140px;
+	transition: height 0.3s ease, filter 0.4s ease;
 }
 
-.brand-the {
-	font-family: var(--font-heading);
-	font-size: 10px;
-	font-weight: var(--weight-medium);
-	letter-spacing: 0.2em;
-	text-transform: uppercase;
-	color: var(--gold);
-	margin-bottom: 2px;
+/* Compact header on scroll */
+.header-scrolled .brand-logo-img {
+	height: 38px;
+	max-height: 38px;
 }
 
-.brand-name {
-	font-family: var(--font-heading);
-	font-size: var(--text-xl);
-	font-weight: var(--weight-bold);
-	background: linear-gradient(135deg, var(--gold) 0%, #E8C547 40%, var(--gold) 100%);
-	-webkit-background-clip: text;
-	-webkit-text-fill-color: transparent;
-	background-clip: text;
-	letter-spacing: 0.04em;
+.header-scrolled .brand-monogram-svg {
+	height: 36px;
 }
 
-.brand-rose-icon {
-	font-size: 0.8em;
-	-webkit-text-fill-color: initial;
-	color: var(--rose-gold);
-}
+/* ==================================================
+   FOOTER LOGO — SR Monogram Mini + Rose Mark
+   ================================================== */
 
-/* Footer Brand Logo with Rose Mark */
 .footer-logo {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	gap: var(--space-sm);
+	text-decoration: none;
+	color: var(--rose-gold);
+	font-family: var(--font-heading);
+	font-size: var(--text-lg);
+	font-weight: var(--weight-semibold);
+	transition: opacity 0.3s ease;
+}
+
+.footer-logo:hover {
+	opacity: 0.85;
 }
 
 .footer-rose-mark {
 	display: block;
-	filter: brightness(0.9);
+	width: 36px;
+	height: 36px;
+	object-fit: contain;
+	filter: brightness(0.95) drop-shadow(0 1px 3px rgba(183,110,121,0.2));
+}
+
+.footer-monogram-svg {
+	display: block;
+	height: 32px;
+	width: auto;
+	opacity: 0.9;
+}
+
+.footer-brand-name {
+	font-family: var(--font-heading);
+	font-weight: var(--weight-semibold);
+	letter-spacing: 0.02em;
+}
+
+/* ==================================================
+   COLLECTION LOGOS — Shared Styles
+   ================================================== */
+
+@keyframes logoFadeIn {
+	from { opacity: 0; transform: translateY(12px); }
+	to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes logoPulseGlow {
+	0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+	50% { filter: drop-shadow(0 4px 20px var(--logo-glow-color, rgba(183,110,121,0.25))); }
+}
+
+.cl-logo-img {
+	display: block;
+	margin: 0 auto;
+	max-width: 340px;
+	height: auto;
+	object-fit: contain;
+	animation: logoFadeIn 0.8s ease-out both;
+	filter: drop-shadow(0 4px 16px rgba(0,0,0,0.3));
+	transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease;
+}
+
+.cl-logo-img:hover {
+	transform: scale(1.03);
+}
+
+/* Collection-specific glow colors */
+.collection-black-rose .cl-logo-img {
+	filter: drop-shadow(0 4px 20px rgba(192,192,192,0.2));
+	--logo-glow-color: rgba(192,192,192,0.3);
+}
+.collection-love-hurts .cl-logo-img {
+	filter: drop-shadow(0 4px 20px rgba(220,20,60,0.2));
+	--logo-glow-color: rgba(220,20,60,0.3);
+}
+.collection-signature .cl-logo-img {
+	filter: drop-shadow(0 4px 20px rgba(212,175,55,0.2));
+	--logo-glow-color: rgba(212,175,55,0.3);
 }
 
 .main-navigation {
@@ -743,6 +818,50 @@ label {
 	opacity: 0.3;
 	display: block;
 	margin-bottom: var(--space-sm);
+}
+
+/* Front Page Collection Logos (mini) */
+.fp-collection-logo {
+	margin-bottom: var(--space-md);
+	max-width: 200px;
+}
+
+.fp-cl-logo-img {
+	display: block;
+	max-width: 180px;
+	height: auto;
+	object-fit: contain;
+	filter: drop-shadow(0 2px 8px rgba(0,0,0,0.15));
+	transition: transform 0.4s ease;
+}
+
+.fp-cl-logo-svg {
+	display: block;
+	width: 100%;
+	max-width: 180px;
+	height: auto;
+}
+
+.fp-logo-black-rose .fp-cl-logo-svg {
+	max-width: 160px;
+}
+
+.fp-logo-love-hurts .fp-cl-logo-svg {
+	max-width: 160px;
+}
+
+.fp-logo-signature .fp-cl-logo-svg {
+	max-width: 200px;
+}
+
+@media (max-width: 768px) {
+	.fp-collection-logo {
+		margin: 0 auto var(--space-md);
+	}
+	.fp-cl-logo-img,
+	.fp-cl-logo-svg {
+		max-width: 140px;
+	}
 }
 
 .fp-collection-name {
@@ -1417,15 +1536,76 @@ body.menu-open {
 	margin-top: var(--space-xs);
 }
 
-/* Collection Logo */
+/* Collection Logo Container */
 .cl-logo {
 	margin-bottom: var(--space-xl);
+	display: flex;
+	justify-content: center;
+	animation: logoFadeIn 1s ease-out 0.3s both;
 }
 
 .cl-logo-svg {
 	width: 100%;
-	max-width: 420px;
+	max-width: 380px;
 	height: auto;
+	filter: drop-shadow(0 2px 12px var(--logo-glow-color, rgba(0,0,0,0.15)));
+	transition: transform 0.6s cubic-bezier(0.22,1,0.36,1), filter 0.6s ease;
+}
+
+.cl-logo-svg:hover {
+	transform: scale(1.03);
+}
+
+/* Collection-specific SVG glow */
+.collection-black-rose .cl-logo-svg {
+	--logo-glow-color: rgba(192,192,192,0.2);
+	max-width: 380px;
+}
+.collection-love-hurts .cl-logo-svg {
+	--logo-glow-color: rgba(220,20,60,0.2);
+	max-width: 380px;
+}
+.collection-signature .cl-logo-svg {
+	--logo-glow-color: rgba(212,175,55,0.2);
+	max-width: 480px;
+}
+
+/* Responsive logo sizing */
+@media (max-width: 768px) {
+	.cl-logo-svg {
+		max-width: 280px;
+	}
+	.cl-logo-img {
+		max-width: 260px;
+	}
+	.collection-signature .cl-logo-svg {
+		max-width: 340px;
+	}
+	.brand-monogram-svg {
+		height: 40px;
+	}
+	.brand-logo-img {
+		height: 42px;
+		max-height: 42px;
+	}
+}
+@media (max-width: 480px) {
+	.cl-logo-svg {
+		max-width: 220px;
+	}
+	.cl-logo-img {
+		max-width: 200px;
+	}
+	.collection-signature .cl-logo-svg {
+		max-width: 280px;
+	}
+	.brand-monogram-svg {
+		height: 34px;
+	}
+	.brand-logo-img {
+		height: 36px;
+		max-height: 36px;
+	}
 }
 
 /* Hero shared */

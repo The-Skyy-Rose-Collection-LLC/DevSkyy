@@ -21,25 +21,55 @@ get_header();
 		<div class="cl-hero-content">
 			<span class="cl-hero-label">Collection 03</span>
 
-			<!-- Collection Logo -->
+			<!-- Collection Logo — "The Skyy Rose Collection" Gold Script + Rose Mark -->
 			<div class="cl-logo" aria-hidden="true">
-				<svg viewBox="0 0 420 80" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
-					<defs>
-						<linearGradient id="sig-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-							<stop offset="0%" style="stop-color:#D4AF37"/>
-							<stop offset="30%" style="stop-color:#B76E79"/>
-							<stop offset="70%" style="stop-color:#B76E79"/>
-							<stop offset="100%" style="stop-color:#D4AF37"/>
-						</linearGradient>
-					</defs>
-					<text x="210" y="52" text-anchor="middle" fill="url(#sig-grad)" font-family="'Playfair Display', Georgia, serif" font-size="52" font-weight="700" font-style="italic" letter-spacing="6">Signature</text>
-					<!-- Elegant underline with diamond -->
-					<line x1="80" y1="66" x2="175" y2="66" stroke="url(#sig-grad)" stroke-width="0.8" opacity="0.5"/>
-					<line x1="245" y1="66" x2="340" y2="66" stroke="url(#sig-grad)" stroke-width="0.8" opacity="0.5"/>
-					<!-- Diamond shape -->
-					<polygon points="210,60 215,66 210,72 205,66" fill="#D4AF37" opacity="0.7"/>
-					<text x="210" y="78" text-anchor="middle" fill="rgba(255,255,255,0.5)" font-family="'Cormorant Garamond', Georgia, serif" font-size="11" font-weight="300" letter-spacing="12">BY SKYYROSE</text>
-				</svg>
+				<?php
+				$sig_logo = SKYYROSE_THEME_DIR . '/assets/images/brand/signature-collection-logo.png';
+				if ( file_exists( $sig_logo ) ) :
+				?>
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/signature-collection-logo.png' ); ?>" alt="The Skyy Rose Collection" class="cl-logo-img" style="max-width:480px;height:auto">
+				<?php else : ?>
+					<svg viewBox="0 0 560 120" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
+						<defs>
+							<linearGradient id="sig-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+								<stop offset="0%" style="stop-color:#D4AF37"/>
+								<stop offset="25%" style="stop-color:#E8C547"/>
+								<stop offset="50%" style="stop-color:#D4AF37"/>
+								<stop offset="75%" style="stop-color:#C49B30"/>
+								<stop offset="100%" style="stop-color:#D4AF37"/>
+							</linearGradient>
+							<linearGradient id="sig-rosegold" x1="0%" y1="0%" x2="100%" y2="100%">
+								<stop offset="0%" style="stop-color:#D8A7B1"/>
+								<stop offset="50%" style="stop-color:#B76E79"/>
+								<stop offset="100%" style="stop-color:#D8A7B1"/>
+							</linearGradient>
+							<filter id="sig-glow">
+								<feGaussianBlur stdDeviation="1" result="blur"/>
+								<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+							</filter>
+						</defs>
+						<!-- "THE" -->
+						<text x="130" y="28" text-anchor="middle" fill="url(#sig-gold)" font-family="'Playfair Display', Georgia, serif" font-size="16" font-weight="600" letter-spacing="8" opacity="0.8">THE</text>
+						<!-- "Skyy" in elegant script -->
+						<text x="200" y="72" text-anchor="middle" fill="url(#sig-gold)" font-family="'Playfair Display', Georgia, serif" font-size="58" font-weight="700" font-style="italic" letter-spacing="3" filter="url(#sig-glow)">Skyy</text>
+						<!-- Rose gold rose icon (between Skyy and Rose) -->
+						<g transform="translate(345,32) scale(0.55)" opacity="0.9">
+							<!-- Stylized rose petals -->
+							<path d="M20 0 C25-8 35-5 30 5 C25 15 15 18 10 10 C5 2 15 8 20 0Z" fill="url(#sig-rosegold)"/>
+							<path d="M25 5 C30-3 40 0 35 10 C30 20 20 22 15 15 C10 8 20 13 25 5Z" fill="url(#sig-rosegold)" opacity="0.8"/>
+							<path d="M15 5 C20-3 10-5 5 2 C0 10 8 18 15 12 C22 6 10 13 15 5Z" fill="url(#sig-rosegold)" opacity="0.85"/>
+							<circle cx="20" cy="10" r="4" fill="url(#sig-rosegold)" opacity="0.7"/>
+							<!-- Stem and leaf -->
+							<path d="M20 18 Q18 30 20 45" fill="none" stroke="url(#sig-rosegold)" stroke-width="2" stroke-linecap="round"/>
+							<ellipse cx="28" cy="32" rx="8" ry="4" fill="url(#sig-rosegold)" opacity="0.6" transform="rotate(-30,28,32)"/>
+							<ellipse cx="12" cy="38" rx="6" ry="3" fill="url(#sig-rosegold)" opacity="0.5" transform="rotate(25,12,38)"/>
+						</g>
+						<!-- "Rose" in elegant script -->
+						<text x="420" y="72" text-anchor="middle" fill="url(#sig-gold)" font-family="'Playfair Display', Georgia, serif" font-size="58" font-weight="700" font-style="italic" letter-spacing="3" filter="url(#sig-glow)">Rose</text>
+						<!-- "COLLECTION" -->
+						<text x="420" y="105" text-anchor="middle" fill="url(#sig-gold)" font-family="'Playfair Display', Georgia, serif" font-size="20" font-weight="600" letter-spacing="10" opacity="0.7">COLLECTION</text>
+					</svg>
+				<?php endif; ?>
 			</div>
 
 			<h1 class="cl-hero-title sr-only">Signature</h1>

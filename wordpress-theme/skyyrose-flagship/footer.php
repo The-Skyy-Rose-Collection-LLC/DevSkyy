@@ -20,9 +20,28 @@
 						$rose_mark = SKYYROSE_THEME_DIR . '/assets/images/brand/skyyrose-rose-mark.png';
 						if ( file_exists( $rose_mark ) ) :
 						?>
-							<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-rose-mark.png' ); ?>" alt="" class="footer-rose-mark" width="40" height="40" aria-hidden="true">
+							<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/skyyrose-rose-mark.png' ); ?>" alt="" class="footer-rose-mark" width="36" height="36" aria-hidden="true">
+						<?php else : ?>
+							<!-- SVG fallback: SR monogram mini -->
+							<svg viewBox="0 0 100 44" xmlns="http://www.w3.org/2000/svg" class="footer-monogram-svg" width="80" height="36" aria-hidden="true">
+								<defs>
+									<linearGradient id="ft-rg" x1="0%" y1="0%" x2="100%" y2="100%">
+										<stop offset="0%" style="stop-color:#D8A7B1"/>
+										<stop offset="50%" style="stop-color:#B76E79"/>
+										<stop offset="100%" style="stop-color:#C48A93"/>
+									</linearGradient>
+								</defs>
+								<text x="2" y="34" fill="url(#ft-rg)" font-family="'Playfair Display', Georgia, serif" font-size="38" font-weight="700" font-style="italic">S</text>
+								<text x="24" y="34" fill="url(#ft-rg)" font-family="'Playfair Display', Georgia, serif" font-size="38" font-weight="700" font-style="italic">R</text>
+								<g transform="translate(62,2) scale(0.3)">
+									<path d="M20 0 C26-9 38-6 32 6 C26 18 14 20 8 12 C2 4 14 9 20 0Z" fill="url(#ft-rg)"/>
+									<path d="M26 5 C32-4 42 0 36 12 C30 22 18 24 12 16 C6 8 20 14 26 5Z" fill="url(#ft-rg)" opacity="0.8"/>
+									<circle cx="20" cy="10" r="3.5" fill="url(#ft-rg)" opacity="0.7"/>
+									<path d="M20 18 Q18 28 20 40" fill="none" stroke="url(#ft-rg)" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+								</g>
+							</svg>
 						<?php endif; ?>
-						<?php bloginfo( 'name' ); ?>
+						<span class="footer-brand-name"><?php bloginfo( 'name' ); ?></span>
 					</a>
 					<p class="footer-tagline">Where Love Meets Luxury&trade;</p>
 					<p class="footer-description">Handcrafted luxury jewelry for those who dare to stand out. Each piece tells a story of passion, artistry, and timeless elegance.</p>

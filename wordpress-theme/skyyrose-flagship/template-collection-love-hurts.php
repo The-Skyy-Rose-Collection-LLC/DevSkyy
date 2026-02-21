@@ -23,6 +23,12 @@ get_header();
 
 			<!-- Collection Logo — Cracked Heart with Thorns & Roses -->
 			<div class="cl-logo" aria-hidden="true">
+				<?php
+				$lh_logo = SKYYROSE_THEME_DIR . '/assets/images/brand/love-hurts-collection-logo.png';
+				if ( file_exists( $lh_logo ) ) :
+				?>
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/love-hurts-collection-logo.png' ); ?>" alt="Love Hurts Collection" class="cl-logo-img" width="360" height="auto">
+				<?php else : ?>
 				<svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
 					<defs>
 						<linearGradient id="lh-grad" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -106,6 +112,7 @@ get_header();
 						<circle cx="295" cy="42" r="1" fill="#DC143C"/>
 					</g>
 				</svg>
+				<?php endif; ?>
 			</div>
 
 			<h1 class="cl-hero-title sr-only">Love Hurts</h1>

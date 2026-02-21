@@ -21,23 +21,92 @@ get_header();
 		<div class="cl-hero-content">
 			<span class="cl-hero-label">Collection 01</span>
 
-			<!-- Collection Logo -->
+			<!-- Collection Logo — Crystal Star with Black Rose -->
 			<div class="cl-logo" aria-hidden="true">
-				<svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
-					<defs>
-						<linearGradient id="br-grad" x1="0%" y1="0%" x2="100%" y2="0%">
-							<stop offset="0%" style="stop-color:#C0C0C0"/>
-							<stop offset="50%" style="stop-color:#E8E8E8"/>
-							<stop offset="100%" style="stop-color:#C0C0C0"/>
-						</linearGradient>
-					</defs>
-					<text x="200" y="55" text-anchor="middle" fill="url(#br-grad)" font-family="'Playfair Display', Georgia, serif" font-size="58" font-weight="700" letter-spacing="8">BLACK</text>
-					<text x="200" y="78" text-anchor="middle" fill="#C0C0C0" font-family="'Cormorant Garamond', Georgia, serif" font-size="22" font-weight="300" letter-spacing="18">R O S E</text>
-					<!-- Decorative thorn lines -->
-					<line x1="50" y1="62" x2="120" y2="62" stroke="#C0C0C0" stroke-width="0.5" opacity="0.4"/>
-					<line x1="280" y1="62" x2="350" y2="62" stroke="#C0C0C0" stroke-width="0.5" opacity="0.4"/>
-					<circle cx="200" cy="62" r="2" fill="#C0C0C0" opacity="0.6"/>
-				</svg>
+				<?php
+				$br_logo = SKYYROSE_THEME_DIR . '/assets/images/brand/black-rose-collection-logo.png';
+				if ( file_exists( $br_logo ) ) :
+				?>
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/black-rose-collection-logo.png' ); ?>" alt="Black Rose Collection" class="cl-logo-img" style="max-width:300px;height:auto">
+				<?php else : ?>
+					<svg viewBox="0 0 420 180" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
+						<defs>
+							<linearGradient id="br-silver" x1="0%" y1="0%" x2="100%" y2="100%">
+								<stop offset="0%" style="stop-color:#A0A0A0"/>
+								<stop offset="30%" style="stop-color:#E8E8E8"/>
+								<stop offset="50%" style="stop-color:#FFFFFF"/>
+								<stop offset="70%" style="stop-color:#E8E8E8"/>
+								<stop offset="100%" style="stop-color:#A0A0A0"/>
+							</linearGradient>
+							<linearGradient id="br-crystal" x1="0%" y1="0%" x2="100%" y2="100%">
+								<stop offset="0%" style="stop-color:rgba(255,255,255,0.1)"/>
+								<stop offset="40%" style="stop-color:rgba(255,255,255,0.25)"/>
+								<stop offset="60%" style="stop-color:rgba(200,200,220,0.15)"/>
+								<stop offset="100%" style="stop-color:rgba(255,255,255,0.05)"/>
+							</linearGradient>
+							<filter id="br-glow">
+								<feGaussianBlur stdDeviation="2" result="blur"/>
+								<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+							</filter>
+							<filter id="br-sparkle">
+								<feGaussianBlur stdDeviation="1.5" result="blur"/>
+								<feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+							</filter>
+						</defs>
+
+						<!-- Crystal Star Frame -->
+						<g transform="translate(210,58)">
+							<!-- Star outline (5-pointed) -->
+							<polygon points="0,-48 11,-15 46,-15 18,6 29,39 0,20 -29,39 -18,6 -46,-15 -11,-15" fill="url(#br-crystal)" stroke="url(#br-silver)" stroke-width="1.5"/>
+							<!-- Inner star edge highlight -->
+							<polygon points="0,-38 9,-12 37,-12 15,5 23,31 0,16 -23,31 -15,5 -37,-12 -9,-12" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="0.5"/>
+
+							<!-- Black Rose inside star -->
+							<g transform="translate(0,-5)">
+								<!-- Rose petals (dark) -->
+								<path d="M0-12 C6-18 14-12 10-4 C6 4 -6 4 -10-4 C-14-12 -6-18 0-12Z" fill="#1a1a1a" stroke="#333" stroke-width="0.5"/>
+								<path d="M0-8 C4-14 12-8 8-2 C4 6 -4 6 -8-2 C-12-8 -4-14 0-8Z" fill="#222" stroke="#3a3a3a" stroke-width="0.3"/>
+								<path d="M0-5 C3-10 8-5 5 0 C2 5 -2 5 -5 0 C-8-5 -3-10 0-5Z" fill="#2a2a2a"/>
+								<!-- Rose center spiral -->
+								<circle cx="0" cy="-2" r="2.5" fill="#1a1a1a" stroke="#333" stroke-width="0.3"/>
+								<!-- Stem -->
+								<path d="M0 4 Q-1 14 0 24" fill="none" stroke="#1a3a1a" stroke-width="1.5" stroke-linecap="round"/>
+								<!-- Leaves -->
+								<ellipse cx="-6" cy="14" rx="5" ry="2.5" fill="#1a3a1a" transform="rotate(-35,-6,14)"/>
+								<ellipse cx="5" cy="18" rx="4" ry="2" fill="#1a3a1a" transform="rotate(30,5,18)"/>
+							</g>
+
+							<!-- Sparkle accents -->
+							<g filter="url(#br-sparkle)" opacity="0.8">
+								<polygon points="-30,-30 -28,-28 -30,-26 -32,-28" fill="#fff"/>
+								<polygon points="25,-25 27,-23 25,-21 23,-23" fill="#fff" opacity="0.6"/>
+								<polygon points="-15,20 -13,22 -15,24 -17,22" fill="#fff" opacity="0.5"/>
+								<polygon points="20,15 22,17 20,19 18,17" fill="#fff" opacity="0.4"/>
+								<circle cx="-25" cy="5" r="1" fill="#fff" opacity="0.5"/>
+								<circle cx="30" cy="-10" r="0.8" fill="#fff" opacity="0.6"/>
+								<circle cx="10" cy="-35" r="0.8" fill="#fff" opacity="0.7"/>
+							</g>
+						</g>
+
+						<!-- Heart-shaped base hint -->
+						<path d="M190 100 Q200 95 210 100 Q220 95 230 100 L210 112 Z" fill="#3a2520" opacity="0.6"/>
+
+						<!-- "Black Rose" in Gothic Blackletter Script -->
+						<text x="210" y="148" text-anchor="middle" fill="url(#br-silver)" font-family="'UnifrakturMaguntia', 'Old English Text MT', 'Playfair Display', serif" font-size="40" letter-spacing="4" filter="url(#br-glow)">Black Rose</text>
+
+						<!-- "COLLECTION" spaced subtitle -->
+						<text x="210" y="172" text-anchor="middle" fill="#C0C0C0" font-family="'Cormorant Garamond', Georgia, serif" font-size="13" font-weight="300" letter-spacing="12" opacity="0.5">COLLECTION</text>
+
+						<!-- Decorative crystal shards flanking text -->
+						<g opacity="0.3">
+							<line x1="70" y1="140" x2="110" y2="140" stroke="url(#br-silver)" stroke-width="0.8"/>
+							<line x1="310" y1="140" x2="350" y2="140" stroke="url(#br-silver)" stroke-width="0.8"/>
+							<!-- Small diamond shapes -->
+							<polygon points="60,140 63,137 66,140 63,143" fill="#C0C0C0"/>
+							<polygon points="354,140 357,137 360,140 357,143" fill="#C0C0C0"/>
+						</g>
+					</svg>
+				<?php endif; ?>
 			</div>
 
 			<h1 class="cl-hero-title sr-only">Black Rose</h1>
@@ -201,13 +270,9 @@ get_header();
 
 </main>
 
-<style>
-/* === COLLECTION LOGO (shared) === */
-.cl-logo{margin-bottom:var(--space-xl);display:flex;justify-content:center}
-.cl-logo-svg{width:100%;max-width:400px;height:auto}
-.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
-@media(max-width:768px){.cl-logo-svg{max-width:280px}}
+<link href="https://fonts.googleapis.com/css2?family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 
+<style>
 /* === BLACK ROSE SCOPED === */
 .collection-black-rose{background:#0a0a0a;color:#e5e5e5}
 
