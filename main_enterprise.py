@@ -52,6 +52,7 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from api.admin_dashboard import admin_dashboard_router
+from api.graphql_server import graphql_router
 from api.agents import agents_router
 from api.ar_sessions import ar_sessions_router
 from api.brand import brand_router
@@ -1443,6 +1444,9 @@ async def demo_mask(data: dict[str, str], user: TokenPayload = Depends(get_curre
 
 # Include v1 router
 app.include_router(v1_router)
+
+# GraphQL endpoint with DataLoader (N+1 prevention) and GraphiQL playground
+app.include_router(graphql_router, prefix="/graphql", tags=["GraphQL"])
 
 
 # =============================================================================
