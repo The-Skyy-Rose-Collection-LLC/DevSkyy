@@ -9,16 +9,18 @@ from __future__ import annotations
 
 def _build_spec() -> dict:
     """
-    Constructs the QA agent specification used by the Elite Web Builder.
+    Construct the QA agent specification dictionary for the Elite Web Builder.
+    
+    The returned specification contains the agent's role and name, a detailed system prompt describing QA responsibilities and targets, a list of capability descriptors, referenced knowledge files, and the preferred model configuration.
     
     Returns:
-        spec (dict): Specification dictionary with the following keys:
-            - role (str): Agent role identifier, e.g., "qa".
-            - name (str): Agent name.
-            - system_prompt (str): Detailed system prompt describing QA responsibilities and targets.
-            - capabilities (list[dict]): Capability entries each containing `name`, `description`, and `tags`.
-            - knowledge_files (list[str]): Paths to knowledge/reference files.
-            - preferred_model (dict): Preferred model info with `provider` and `model` keys.
+        spec (dict): Mapping with keys:
+            - "role": agent role identifier
+            - "name": agent name
+            - "system_prompt": prompt describing QA responsibilities and targets
+            - "capabilities": list of capability dictionaries (name, description, tags)
+            - "knowledge_files": list of knowledge file paths
+            - "preferred_model": preferred provider/model information
     """
     return {
         "role": "qa",

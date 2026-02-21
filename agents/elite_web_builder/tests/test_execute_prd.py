@@ -42,22 +42,16 @@ def _make_planning_json(
     roles: list[str] | None = None,
 ) -> str:
     """
-    Create a planning JSON string containing a list of user stories and their dependency order.
+    Create a JSON string representing a planning response containing a list of user stories and their dependency order.
     
     Parameters:
-        num_stories (int): Number of user stories to generate.
-        roles (list[str] | None): List of agent role names to assign to stories; roles are assigned cyclically. If None, defaults to ["design_system", "frontend_dev", "backend_dev"].
+        num_stories (int): Number of user stories to include.
+        roles (list[str] | None): Sequence of agent role identifiers used round-robin to assign `agent_role` for each story. If None, defaults to ["design_system", "frontend_dev", "backend_dev"].
     
     Returns:
-        str: JSON-formatted string with two keys:
-            - "stories": list of story objects, each containing:
-                - "id": story id in the form "US-###" (zero-padded).
-                - "title": story title.
-                - "description": story description.
-                - "agent_role": assigned role name.
-                - "depends_on": list of prerequisite story ids.
-                - "acceptance_criteria": list of acceptance criteria strings.
-            - "dependency_order": list of story ids in the generated order.
+        str: JSON string with two top-level keys:
+            - "stories": list of story objects, each containing `id`, `title`, `description`, `agent_role`, `depends_on`, and `acceptance_criteria`.
+            - "dependency_order": list of story `id` values in dependency order.
     """
     roles = roles or ["design_system", "frontend_dev", "backend_dev"]
     stories = []
@@ -80,13 +74,13 @@ def _make_planning_json(
 
 def _make_fake_adapter(content: str = "OK") -> AsyncMock:
     """
-    Create an asynchronous mock adapter whose `generate` method returns an LLMResponse containing the provided content.
+    Create an AsyncMock adapter whose `generate` method returns an LLMResponse containing the provided content.
     
     Parameters:
-    	content (str): The content to put in the mocked LLMResponse.
+        content (str): The text to include in the returned LLMResponse.
     
     Returns:
-    	AsyncMock: An AsyncMock adapter with a `generate` coroutine that returns an LLMResponse whose `content` equals `content`.
+        AsyncMock: A mock adapter with a `generate` coroutine that yields an LLMResponse with `content`, and test provider/model metadata.
     """
     adapter = AsyncMock()
     adapter.generate = AsyncMock(
@@ -102,16 +96,14 @@ def _make_fake_adapter(content: str = "OK") -> AsyncMock:
 
 def _make_director_with_mock(planning_response: str = "", story_response: str = "OK") -> Director:
     """
-    Create a Director whose ModelRouter is populated with a single test adapter that returns controlled responses.
-    
-    The returned Director uses a router with route entries for the director and common agent roles all pointing to the "test" provider. The test adapter's generate method is mocked so that the first invocation returns the provided planning_response content and all subsequent invocations return the provided story_response content.
+    Builds a Director wired to a mocked ModelRouter for tests.
     
     Parameters:
-        planning_response (str): JSON or text to return on the first generate call (planning phase).
-        story_response (str): Text to return on subsequent generate calls (per-story responses).
+    	planning_response (str): Content returned by the first call to the mocked adapter (used to simulate the planning step).
+    	story_response (str): Content returned by subsequent calls to the mocked adapter (used to simulate per-story LLM responses).
     
     Returns:
-        Director: A Director instance wired to the mocked ModelRouter and test adapter.
+    	Director: A Director instance whose router uses a mocked adapter that returns `planning_response` on its first `generate` call and `story_response` on subsequent calls.
     """
     router = ModelRouter(
         routing={
@@ -133,20 +125,12 @@ def _make_director_with_mock(planning_response: str = "", story_response: str = 
 
     async def mock_generate(prompt, *, system_prompt="", model="", temperature=0.7, max_tokens=4096):
         """
-        Mock async generate function that returns a planning response on the first call and story responses on subsequent calls.
+        Test mock for LLM generation that returns a preset planning response on the first call and a story response thereafter.
         
-        Parameters:
-        	prompt (str): The prompt sent to the model.
-        	system_prompt (str): Optional system prompt (accepted but not used by the mock).
-        	model (str): Optional model identifier (accepted but not used by the mock).
-        	temperature (float): Optional sampling temperature (accepted but not used by the mock).
-        	max_tokens (int): Optional token limit (accepted but not used by the mock).
+        Increments the captured `call_count` on each invocation. On the first invocation, returns an `LLMResponse` with `content` taken from the surrounding `original_content`; on subsequent invocations returns an `LLMResponse` with `content` taken from the surrounding `story_response`. Provider and model fields are set to `"test"` and `latency_ms` is 50.0.
         
         Returns:
-        	LLMResponse: An LLMResponse containing `original_content` on the first invocation and `story_response` on subsequent invocations.
-        
-        Notes:
-        	Increments the enclosing `call_count` nonlocal variable on each invocation.
+            LLMResponse: `content` is `original_content` for the first call, `story_response` for later calls; `provider` and `model` are `"test"`, `latency_ms` is 50.0.
         """
         nonlocal call_count
         call_count += 1
@@ -350,14 +334,14 @@ class TestPlanStories:
 
         async def capture_generate(prompt, **kwargs):
             """
-            Capture the provided prompt into the enclosing scope and return a canned planning LLMResponse.
+            Capture the provided prompt in the surrounding scope and return a canned LLMResponse for testing.
             
             Parameters:
-                prompt (str): The prompt text passed to the model; stored into the outer-scope variable `captured_prompt`.
-                **kwargs: Additional keyword arguments accepted by the call and ignored by this test helper.
+                prompt (str): The prompt text to capture; assigned to the nonlocal `captured_prompt`.
+                **kwargs: Ignored additional generation parameters.
             
             Returns:
-                LLMResponse: A fabricated response with content set to `planning_json`, provider `"test"`, model `"test"`, and latency_ms `50`.
+                LLMResponse: A response with `content` set to `planning_json`, `provider` "test", `model` "test", and `latency_ms` 50.
             """
             nonlocal captured_prompt
             captured_prompt = prompt
@@ -383,15 +367,15 @@ class TestPlanStories:
 
         async def capture_generate(prompt, *, system_prompt="", **kwargs):
             """
-            Capture the provided system prompt and return a canned LLMResponse for testing.
+            Capture the provided system prompt into the outer `captured_system_prompt` variable and return a canned LLMResponse containing the test planning JSON.
             
             Parameters:
-                prompt (str): The user prompt passed to the generator.
-                system_prompt (str): The system-level prompt; its value is saved to the outer-scope variable `captured_system_prompt`.
-                **kwargs: Additional keyword arguments are accepted and ignored.
+                prompt (str): The prompt passed to the generate call.
+                system_prompt (str): The system prompt to capture.
+                **kwargs: Additional keyword arguments passed to the generate call (ignored).
             
             Returns:
-                LLMResponse: A response with `content` set to the test planning JSON, `provider` and `model` set to "test", and `latency_ms` equal to 50.
+                LLMResponse: A response whose `content` is the test planning JSON, `provider` is "test", `model` is "test", and `latency_ms` is 50.
             """
             nonlocal captured_system_prompt
             captured_system_prompt = system_prompt
@@ -462,17 +446,16 @@ class TestExecutePrd:
 
         async def mock_generate(prompt, **kwargs):
             """
-            Return a canned LLMResponse that yields a planning JSON on the first invocation and "OK" on subsequent invocations.
+            Mock async generate function used in tests.
+            
+            Returns a planning response on the first invocation and a generic "OK" response on subsequent invocations.
             
             Parameters:
-            	prompt (Any): The prompt passed to the mock; its value is not inspected by the mock.
-            	**kwargs: Ignored; present for compatibility with the real adapter signature.
+                prompt (str): The input prompt passed to the generator.
+                **kwargs: Ignored additional keyword arguments.
             
             Returns:
-            	LLMResponse: On the first call, an LLMResponse whose `content` is the `planning_json` variable; on later calls, an LLMResponse whose `content` is "OK". In both cases `provider` is "test", `model` is "test", and `latency_ms` is 50.
-            
-            Side effects:
-            	Increments the outer-scope `call_count` on each invocation to track call order.
+                LLMResponse: On first call, contains `planning_json` as `content`, `provider="test"`, `model="test"`, and `latency_ms=50`. On later calls, contains `"OK"` as `content` with the same provider, model, and latency.
             """
             nonlocal call_count
             call_count += 1
@@ -536,16 +519,12 @@ class TestExecutePrd:
 
         async def counting_generate(prompt, **kwargs):
             """
-            Simulates an async model generate that returns a planning response on the first call and a generic "OK" response thereafter.
+            Async mock generate function that returns planning JSON on its first invocation and "OK" on subsequent calls.
             
-            Increments the surrounding `call_count` each time it is invoked to track number of calls.
-            
-            Parameters:
-                prompt (str): The prompt passed to the model.
-                **kwargs: Additional generation options (ignored by this mock).
+            Increments a nonlocal `call_count` each time it is invoked.
             
             Returns:
-                LLMResponse: On the first invocation, an LLMResponse whose `content` is the planning JSON; on subsequent invocations, an LLMResponse whose `content` is "OK". Both responses have `provider="test"`, `model="test"`, and `latency_ms=50`.
+                LLMResponse: On the first call the response content is the configured `planning_json`; on later calls the content is `"OK"`. The response has provider `"test"`, model `"test"`, and latency_ms `50`.
             """
             nonlocal call_count
             call_count += 1

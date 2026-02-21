@@ -36,32 +36,23 @@ class TestSpecStructure:
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_role(self, name, spec):
-        """
-        Verify that the spec dictionary contains a "role" key and that its value equals the spec's expected name.
-        
-        Parameters:
-            name (str): Expected role/name key for the spec.
-            spec (dict): Agent specification to validate.
-        """
         assert "role" in spec, f"{name} missing role"
         assert spec["role"] == name
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_name(self, name, spec):
+        """
+        Validate that the specification contains a "name" entry equal to the expected name.
+        
+        Parameters:
+            name (str): Expected name value for the spec.
+            spec (dict): Agent specification dictionary to validate.
+        """
         assert "name" in spec
         assert spec["name"] == name
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_system_prompt(self, name, spec):
-        """
-        Verify that the agent spec includes a non-trivial system prompt.
-        
-        Asserts that the spec contains the "system_prompt" key and that its value is longer than 50 characters.
-        
-        Parameters:
-            name (str): The spec identifier (e.g., "design_system").
-            spec (dict): The agent specification dictionary under test.
-        """
         assert "system_prompt" in spec
         assert len(spec["system_prompt"]) > 50  # Non-trivial prompt
 
@@ -72,6 +63,13 @@ class TestSpecStructure:
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_capabilities_have_required_fields(self, name, spec):
+        """
+        Assert every capability in the given spec includes the required fields: `name`, `description`, and `tags`.
+        
+        Parameters:
+            name (str): The identifier for the spec used in failure messages.
+            spec (dict): Specification object containing a `capabilities` iterable of capability dictionaries.
+        """
         for cap in spec["capabilities"]:
             assert "name" in cap, f"{name} capability missing name"
             assert "description" in cap, f"{name} capability missing description"
@@ -79,6 +77,13 @@ class TestSpecStructure:
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_knowledge_files(self, name, spec):
+        """
+        Ensure the agent spec declares a "knowledge_files" entry.
+        
+        Parameters:
+            name (str): The expected role/name of the agent spec used for test identification.
+            spec (dict): The agent specification dictionary; must include the "knowledge_files" key.
+        """
         assert "knowledge_files" in spec
 
 
@@ -106,27 +111,32 @@ class TestKnowledgeFileReferences:
     """Knowledge files referenced by agents exist."""
 
     def test_design_system_knowledge_files_exist(self):
+        """
+        Check that every file path listed in DESIGN_SYSTEM_SPEC["knowledge_files"] exists under PACKAGE_ROOT.
+        
+        Asserts existence of each knowledge file and fails with an AssertionError containing "Missing: <path>" if any file is absent.
+        """
         for kf in DESIGN_SYSTEM_SPEC["knowledge_files"]:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
 
     def test_frontend_dev_knowledge_files_exist(self):
+        """
+        Verify that every knowledge file referenced by the frontend developer spec exists under the repository root.
+        
+        Resolves each path in FRONTEND_DEV_SPEC["knowledge_files"] relative to PACKAGE_ROOT and asserts the file exists; raises an AssertionError with the missing path if any file is not found.
+        """
         for kf in FRONTEND_DEV_SPEC["knowledge_files"]:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
 
     def test_backend_dev_knowledge_files_exist(self):
-        """
-        Verify that every path listed in BACKEND_DEV_SPEC["knowledge_files"] exists under PACKAGE_ROOT.
-        
-        If any referenced file is missing, the test fails with an AssertionError naming the missing path.
-        """
         for kf in BACKEND_DEV_SPEC["knowledge_files"]:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
 
     def test_seo_content_has_knowledge_files(self):
         """
-        Validate that the SEO content agent specification references at least two knowledge files and that each referenced file exists under PACKAGE_ROOT.
+        Verify the SEO content spec declares at least two knowledge files and that each referenced file exists under the repository root.
         
-        This test asserts the spec contains two or more entries in "knowledge_files" and that every referenced path resolves to an existing file relative to PACKAGE_ROOT.
+        This test asserts that SEO_CONTENT_SPEC["knowledge_files"] contains two or more entries and that every path listed exists relative to PACKAGE_ROOT.
         """
         assert len(SEO_CONTENT_SPEC["knowledge_files"]) >= 2
         for kf in SEO_CONTENT_SPEC["knowledge_files"]:

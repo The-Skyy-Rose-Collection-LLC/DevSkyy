@@ -82,12 +82,6 @@ class TestFileCompleteness:
 
     @pytest.mark.parametrize("path", EXPECTED_AGENT_FILES)
     def test_agent_file_exists(self, path):
-        """
-        Asserts that the specified agent file exists under the package root.
-        
-        Parameters:
-            path (str | pathlib.Path): Relative path to the expected agent file within the package.
-        """
         assert (PACKAGE_ROOT / path).exists(), f"Missing agent file: {path}"
 
     @pytest.mark.parametrize("path", EXPECTED_CORE_FILES)
@@ -101,10 +95,13 @@ class TestFileCompleteness:
     @pytest.mark.parametrize("path", EXPECTED_CONFIG_FILES)
     def test_config_file_exists(self, path):
         """
-        Asserts that a configuration file exists at the given relative path within the package root.
+        Assert that a configuration file exists at PACKAGE_ROOT for the given relative path.
         
         Parameters:
-            path (str | pathlib.Path): Relative path to the expected config file under PACKAGE_ROOT.
+            path (str | pathlib.Path): Relative path (from PACKAGE_ROOT) to the expected config file.
+        
+        Raises:
+            AssertionError: If the file does not exist.
         """
         assert (PACKAGE_ROOT / path).exists(), f"Missing config file: {path}"
 
@@ -120,7 +117,11 @@ class TestFileCompleteness:
         assert not violations, f"Files exceeding {MAX_FILE_LINES} lines: {violations}"
 
     def test_no_legacy_imports(self):
-        """No production files import from base_legacy or operations_legacy."""
+        """
+        Verify that no production Python files import from `base_legacy` or `operations_legacy`.
+        
+        Scans all .py files under PACKAGE_ROOT (excluding files in __pycache__ and test files) and fails the test if any file contains an `import base_legacy`, `import operations_legacy`, `from base_legacy`, or `from operations_legacy` statement.
+        """
         for py_file in PACKAGE_ROOT.rglob("*.py"):
             if "__pycache__" in str(py_file):
                 continue
@@ -143,6 +144,11 @@ class TestImportIntegrity:
     """All imports resolve without errors."""
 
     def test_director_imports(self):
+        """
+        Ensure core Director-related symbols are importable from elite_web_builder.director.
+        
+        This test imports the public types, constants, templates, and registries expected to be exposed by the director module to verify import integrity and public API stability.
+        """
         from elite_web_builder.director import (
             AgentRole,
             AgentRuntime,
@@ -260,9 +266,7 @@ class TestInterfaceContracts:
 
     def test_all_7_agents_in_spec_registry(self):
         """
-        Verifies that spec_registry contains exactly the seven expected AgentRole entries.
-        
-        Asserts the registry keys equal: DESIGN_SYSTEM, FRONTEND_DEV, BACKEND_DEV, ACCESSIBILITY, PERFORMANCE, SEO_CONTENT, and QA.
+        Verify that spec_registry contains exactly the seven expected AgentRole members: DESIGN_SYSTEM, FRONTEND_DEV, BACKEND_DEV, ACCESSIBILITY, PERFORMANCE, SEO_CONTENT, and QA.
         """
         from elite_web_builder.director import AgentRole, spec_registry
         expected_roles = {
@@ -331,9 +335,9 @@ class TestEndToEndSmoke:
     @pytest.mark.asyncio
     async def test_minimal_3_story_prd(self):
         """
-        Execute a minimal three-story PRD through the Director using a mocked model router and assert successful end-to-end behavior.
+        Run an end-to-end smoke test using a mocked LLM to verify Director produces a successful 3-story report.
         
-        The test supplies a PRD that defines three dependent stories and registers a mock LLM adapter that returns planning JSON on the first call and successful completion text on subsequent calls. It asserts the resulting ProjectReport contains three stories, all_green is True, the green count equals 3, elapsed_ms is positive, and there are no failures.
+        Executes a minimal product requirements document (PRD) that defines three dependent stories via a ModelRouter backed by a mocked adapter. Asserts the produced ProjectReport contains exactly three stories, reports all_green as `True`, has a green count of 3, records a positive elapsed time, and contains no failures.
         """
         from elite_web_builder.director import Director, DirectorConfig
         from elite_web_builder.core.model_router import LLMResponse, ModelRouter
@@ -386,15 +390,13 @@ class TestEndToEndSmoke:
 
         async def mock_generate(prompt, **kwargs):
             """
-            Mock LLM generator used by tests that simulates multi-stage responses.
-            
-            Increments the outer `call_count` each invocation. On the first call it returns an LLMResponse containing the planning JSON; on subsequent calls it returns an LLMResponse containing a completion message.
+            Mock LLM generate function that returns a planning JSON on its first invocation and a success message on subsequent invocations.
             
             Parameters:
-                prompt (str): The prompt passed to the mock generator.
+                prompt (str): The input prompt sent to the mock LLM.
             
             Returns:
-                LLMResponse: The simulated LLM response (planning JSON on first call, completion text thereafter).
+                LLMResponse: An LLMResponse whose `content` is the planning JSON for the first call and a success message thereafter. The response uses provider "mock", model "test", and latency_ms 10.
             """
             nonlocal call_count
             call_count += 1

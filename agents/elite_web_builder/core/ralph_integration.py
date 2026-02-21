@@ -29,12 +29,12 @@ class RalphExecutor:
         max_delay: float = 30.0,
     ) -> None:
         """
-        Initialize the executor's retry and exponential-backoff configuration.
+        Initialize the executor's retry and backoff configuration.
         
         Parameters:
-            max_attempts (int): Maximum number of attempts for the primary operation.
-            base_delay (float): Base delay in seconds used to compute exponential backoff between retries.
-            max_delay (float): Maximum delay in seconds to cap the backoff.
+            max_attempts (int): Maximum number of primary attempts before trying fallbacks.
+            base_delay (float): Initial exponential backoff delay in seconds.
+            max_delay (float): Maximum backoff delay in seconds (ceiling for computed delays).
         """
         self._max_attempts = max_attempts
         self._base_delay = base_delay
@@ -48,19 +48,19 @@ class RalphExecutor:
         **kwargs: object,
     ) -> T:
         """
-        Execute an async callable with retry attempts using exponential backoff and optional fallbacks.
+        Execute the primary async callable with retry and, if those attempts fail, try an ordered chain of fallback callables.
         
         Parameters:
-            func (Callable[..., Awaitable[T]]): Primary asynchronous callable to execute.
+            func (Callable[..., Awaitable[T]]): Primary asynchronous callable invoked with the supplied positional and keyword arguments.
             *args: Positional arguments forwarded to `func` and any fallbacks.
-            fallbacks (list[Callable[..., Awaitable[T]]] | None): Optional sequence of asynchronous callables to try in order if all primary attempts fail.
+            fallbacks (list[Callable[..., Awaitable[T]]] | None): Optional list of asynchronous callables to invoke sequentially if all primary attempts fail.
             **kwargs: Keyword arguments forwarded to `func` and any fallbacks.
         
         Returns:
-            T: The value returned by the primary `func` or by the first fallback that succeeds.
+            T: The result returned by the first successful call (from the primary function or a fallback).
         
         Raises:
-            RuntimeError: If all retry attempts and all provided fallbacks fail; the last encountered exception is set as the exception cause.
+            RuntimeError: If all primary attempts and all provided fallbacks fail. The raised exception is chained from the last encountered exception.
         """
         last_error: Exception | None = None
 

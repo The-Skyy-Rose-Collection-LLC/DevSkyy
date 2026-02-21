@@ -8,7 +8,20 @@ from __future__ import annotations
 
 
 def _build_spec() -> dict:
-    """Build the backend_dev agent specification."""
+    """
+    Constructs the backend_dev agent specification dictionary.
+    
+    The returned dictionary defines the agent's role, name, detailed system prompt, declared capabilities (each with name, description, and tags), referenced knowledge files, and the preferred model configuration.
+    
+    Returns:
+        spec (dict): Dictionary with keys:
+            - role (str)
+            - name (str)
+            - system_prompt (str)
+            - capabilities (list[dict])
+            - knowledge_files (list[str])
+            - preferred_model (dict)
+    """
     return {
         "role": "backend_dev",
         "name": "backend_dev",

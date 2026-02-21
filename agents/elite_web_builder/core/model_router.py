@@ -50,9 +50,9 @@ class ProviderHealth:
 
     def record_success(self) -> None:
         """
-        Mark the provider health as a successful request and reset failure tracking.
+        Record a successful request for this provider, updating health metrics accordingly.
         
-        Updates the provider's last success timestamp, clears consecutive failure count, increments the total request counter, and sets the provider status to HEALTHY.
+        Resets the consecutive failure count to zero, sets the last_success timestamp to the current time, increments total_requests, and sets status to ProviderStatus.HEALTHY.
         """
         self.consecutive_failures = 0
         self.last_success = time.time()
@@ -61,9 +61,9 @@ class ProviderHealth:
 
     def record_failure(self) -> None:
         """
-        Record a failure occurrence for this provider and update its health metrics.
+        Record a failed request for this provider and update its health metrics.
         
-        Increments consecutive failure and total request/failure counters, updates the last failure timestamp, and sets the provider status to `DEGRADED` when there is at least one consecutive failure or to `DOWN` when there are three or more consecutive failures.
+        Increments consecutive failure count, total requests, and total failures; sets the last failure timestamp to the current time; updates the provider status to `DEGRADED` when there is at least one consecutive failure and to `DOWN` when there are three or more consecutive failures.
         """
         self.consecutive_failures += 1
         self.last_failure = time.time()
@@ -87,17 +87,17 @@ class ProviderAdapter(Protocol):
         temperature: float = 0.7,
         max_tokens: int = 4096,
     ) -> LLMResponse: """
-        Generate a response from the adapter's provider for the given prompt.
+        Produce a provider response for a given prompt.
         
         Parameters:
-            prompt (str): User-facing input text to generate a response for.
-            system_prompt (str): Optional system-level prompt or instructions to influence the response.
-            model (str): Provider-specific model identifier to use for generation.
-            temperature (float): Sampling temperature controlling randomness (higher is more random).
+            prompt (str): The user or task prompt to generate a response for.
+            system_prompt (str): Optional system-level instruction to influence generation.
+            model (str): Identifier of the model to use on the provider.
+            temperature (float): Sampling temperature controlling randomness (higher = more random).
             max_tokens (int): Maximum number of tokens the provider should generate.
         
         Returns:
-            LLMResponse: The provider's response including content, provider identifier, model used, latency_ms, tokens_used, and optional metadata.
+            LLMResponse: The provider's response, including content, provider id, model used, latency in milliseconds, token usage, and optional metadata.
         """
         ...
 
@@ -111,16 +111,15 @@ class ModelRouter:
         fallbacks: dict[str, dict[str, str]] | None = None,
     ) -> None:
         """
-        Initialize the router with optional routing and fallback configurations and create internal registries.
+        Initialize the router with optional role routing and provider fallback configurations.
         
         Parameters:
-            routing (dict[str, dict[str, str]] | None): Mapping from agent role to routing info (e.g., {'provider': 'openai', 'model': 'gpt-4'}). If None, an empty routing map is used.
-            fallbacks (dict[str, dict[str, str]] | None): Mapping from a primary provider to its fallback info (e.g., {'provider': 'anthropic', 'model': 'claude'}). If None, an empty fallback map is used.
+            routing (dict[str, dict[str, str]] | None): Mapping from agent role to routing config, where each config
+                should include keys like `"provider"` and `"model"`. If omitted, no routes are configured.
+            fallbacks (dict[str, dict[str, str]] | None): Mapping from a primary provider to its fallback config,
+                where each config should include keys like `"provider"` and `"model"`. If omitted, no fallbacks are configured.
         
-        Side effects:
-            Creates empty internal registries:
-              - _adapters: maps provider names to their registered ProviderAdapter
-              - _health: maps provider names to their ProviderHealth trackers
+        The initializer also prepares empty registries for provider adapters and provider health tracking.
         """
         self._routing = routing or {}
         self._fallbacks = fallbacks or {}
@@ -132,59 +131,48 @@ class ModelRouter:
         Register an adapter for a provider and initialize its health tracking.
         
         Parameters:
-            provider (str): Provider identifier to register.
-            adapter (ProviderAdapter): Adapter instance that implements the provider's generate interface.
+            provider (str): Identifier of the provider to register.
+            adapter (ProviderAdapter): Adapter instance that implements the provider's `generate` interface.
         """
         self._adapters[provider] = adapter
         self._health[provider] = ProviderHealth(provider=provider)
 
     def get_adapter(self, provider: str) -> ProviderAdapter | None:
         """
-        Retrieve the registered adapter for the given provider.
-        
-        Parameters:
-            provider (str): Provider identifier to look up.
+        Retrieve the registered adapter for a provider.
         
         Returns:
-            adapter (ProviderAdapter | None): The registered adapter for the provider, or `None` if no adapter is registered.
+            The registered ProviderAdapter for the provider, or `None` if no adapter is registered.
         """
         return self._adapters.get(provider)
 
     def get_route(self, role: str) -> dict[str, str]:
         """
-        Retrieve the routing configuration for the given agent role.
+        Retrieve the routing configuration for a given agent role.
         
         Parameters:
-            role (str): Agent role identifier to look up in the router configuration.
+        	role (str): The agent role to look up.
         
         Returns:
-            dict[str, str]: Mapping with routing keys (e.g., "provider", "model") for the role, or an empty dict if no route is configured.
+        	dict[str, str]: Routing map for the role (commonly contains keys like 'provider' and 'model'); an empty dict if no route is configured.
         """
         return self._routing.get(role, {})
 
     def get_fallback(self, provider: str) -> dict[str, str]:
         """
-        Retrieve the configured fallback mapping for a provider.
-        
-        Parameters:
-            provider (str): Provider identifier to look up.
+        Retrieve the fallback routing configuration for a provider.
         
         Returns:
-            dict: Fallback mapping containing keys 'provider' and 'model' when configured, or an empty dict if no fallback is defined.
+            dict[str, str]: Fallback config with keys 'provider' and 'model' when configured, otherwise an empty dict.
         """
         return self._fallbacks.get(provider, {})
 
     def get_health(self, provider: str) -> ProviderHealth:
         """
-        Retrieve the health tracker for the named provider, creating and storing one if it does not exist.
-        
-        If the provider has no existing health entry, a new ProviderHealth is initialized, stored in the router's registry, and returned.
-        
-        Parameters:
-            provider (str): Provider identifier.
+        Retrieve the ProviderHealth entry for a provider, creating a default entry if none exists.
         
         Returns:
-            ProviderHealth: The health record for the specified provider.
+            ProviderHealth: The health record for the given provider.
         """
         if provider not in self._health:
             self._health[provider] = ProviderHealth(provider=provider)
@@ -200,21 +188,23 @@ class ModelRouter:
         max_tokens: int = 4096,
     ) -> LLMResponse:
         """
-        Route a request for the given agent role to the best available LLM provider, using the configured primary provider and an optional fallback.
+        Selects the best available provider for a role and returns its LLM response, falling back to a configured provider if the primary fails.
+        
+        Attempts the primary provider configured for the given role unless that provider's health status is DOWN. On a successful response the provider's health is recorded as success and the LLMResponse is returned. If the primary provider is unavailable or raises an error, a configured fallback provider is attempted and its health is recorded accordingly. If no route exists for the role, or if both primary and fallback providers fail, an exception is raised.
         
         Parameters:
-            role (str): Agent role used to look up routing configuration.
-            prompt (str): Prompt to send to the provider.
-            system_prompt (str): System prompt to include with the request.
-            temperature (float): Sampling temperature for the model.
-            max_tokens (int): Maximum number of tokens to generate.
+        	role (str): Agent role to route for.
+        	prompt (str): User-facing prompt to send to the provider.
+        	system_prompt (str): Optional system-level prompt to include.
+        	temperature (float): Sampling temperature for generation.
+        	max_tokens (int): Maximum number of tokens to generate.
         
         Returns:
-            LLMResponse: Response returned by the selected provider, including content, provider id, model, latency, and metadata.
+        	LLMResponse: The response produced by the chosen provider.
         
         Raises:
-            ValueError: If no routing is configured for the given role.
-            RuntimeError: If both the primary provider and its configured fallback fail or are unavailable.
+        	ValueError: If no routing is configured for the provided role.
+        	RuntimeError: If all available providers (primary and configured fallback) fail.
         """
         route = self.get_route(role)
         if not route:

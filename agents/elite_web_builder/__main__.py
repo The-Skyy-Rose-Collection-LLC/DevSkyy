@@ -21,16 +21,17 @@ from .director import Director, DirectorConfig, StoryStatus
 
 def _build_parser() -> argparse.ArgumentParser:
     """
-    Create an ArgumentParser configured for the elite_web_builder command-line interface.
+    Create and configure the command-line argument parser for the elite_web_builder tool.
     
-    The parser enforces a required mutually exclusive PRD input (either an inline positional `prd` or `--file` path).
-    It also defines:
-    - `--dry-run`: plan stories only without executing.
-    - `--config`: path to a JSON routing override.
-    - `--max-stories`: maximum number of stories to generate (default 50).
+    The parser enforces that either inline PRD text or a PRD file is provided (mutually exclusive). It also exposes flags to control planning vs execution, routing configuration, and the maximum number of stories to generate.
     
     Returns:
-        argparse.ArgumentParser: Configured parser for the CLI.
+        argparse.ArgumentParser: Parser configured with:
+          - positional `prd` (optional): inline PRD text.
+          - `--file` (Path): path to a PRD file (.md or .txt).
+          - `--dry-run` (flag): plan stories only; do not execute.
+          - `--config` (Path): path to a provider routing JSON override.
+          - `--max-stories` (int): maximum number of stories to generate (default 50).
     """
     parser = argparse.ArgumentParser(
         prog="elite_web_builder",
@@ -75,17 +76,19 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _load_prd(args: argparse.Namespace) -> str:
     """
-    Load and return the product requirements document (PRD) text from parsed CLI arguments.
+    Load the product requirements document (PRD) text from parsed CLI arguments.
     
-    If args.file is provided, the function reads and returns the file's contents; otherwise it returns the inline PRD string from args.prd.
+    If a file path is provided in args.file, validate the path exists and return its contents.
+    If the file is missing, print an error to stderr and exit the process with code 1.
+    If no file is provided, return the inline PRD text from args.prd.
     
     Parameters:
-        args (argparse.Namespace): Parsed CLI arguments. Expected attributes:
+        args (argparse.Namespace): Parsed command-line arguments. Expected attributes:
             - file (pathlib.Path | None): Optional path to a PRD file.
-            - prd (str): Inline PRD text provided on the command line.
+            - prd (str): Inline PRD text.
     
     Returns:
-        str: The PRD text to be processed.
+        prd_text (str): The PRD content loaded from the file or from args.prd.
     """
     if args.file:
         if not args.file.exists():
@@ -97,18 +100,19 @@ def _load_prd(args: argparse.Namespace) -> str:
 
 def _print_report(report: object) -> None:
     """
-    Print a human-readable project report to stdout.
-    
-    Prints a header, a summary (stories count, status summary, `all_green`, elapsed milliseconds, and instincts learned), an optional failures list, and detailed lines for each story showing a status icon, story id, title, and status value.
+    Prints a formatted project report for an executed PRD to stdout.
     
     Parameters:
-        report (object): Project report object expected to provide:
-            - stories: iterable of story objects with `id`, `title`, and `status` (enum with a `value`).
-            - status_summary: str
-            - all_green: bool
-            - elapsed_ms: number (milliseconds)
-            - instincts_learned: int
-            - failures: iterable of failure messages (may be empty)
+        report (object): A project report with these attributes used for output:
+            - stories (Sequence): list of story objects; each must have `id`, `title`, and `status`.
+            - status_summary (str): summary string of overall status.
+            - all_green (bool): True if all stories succeeded.
+            - elapsed_ms (float|int): elapsed execution time in milliseconds.
+            - instincts_learned (int): count of "instincts" learned.
+            - failures (Sequence[str]): optional list of failure messages.
+    
+    The function prints counts, overall status, elapsed time, learned instincts, any failures,
+    and a per-story line showing a check or cross, story id, title, and status value.
     """
     print("\n" + "=" * 60)
     print("ELITE WEB BUILDER — PROJECT REPORT")
@@ -136,12 +140,17 @@ def _print_report(report: object) -> None:
 
 async def _run(args: argparse.Namespace) -> int:
     """
-    Orchestrates the CLI workflow: load PRD text, construct the Director, and perform either a dry-run planning pass or full execution.
+    Run the CLI workflow to plan or execute a PRD and return the process exit code.
     
-    When args.dry_run is set, prints a planned story breakdown and returns 0 on success or 1 if planning fails. In full execution mode, runs the director, prints the resulting report, and returns 0 if the report indicates all stories succeeded, otherwise 1.
+    Parameters:
+        args (argparse.Namespace): Parsed command-line arguments. Expected attributes:
+            - prd or file: PRD text or path used to load the PRD.
+            - dry_run (bool): If true, plan stories without executing them.
+            - config (Optional[str]): Optional routing configuration path.
+            - max_stories (int): Maximum number of stories to consider.
     
     Returns:
-        int: Exit code (0 for success, 1 for failure).
+        int: Process exit code — `0` on success (or successful dry run), `1` on failure or when execution completes with any non-green story.
     """
     prd_text = _load_prd(args)
 
@@ -180,7 +189,11 @@ async def _run(args: argparse.Namespace) -> int:
 
 
 def main() -> None:
-    """CLI entry point."""
+    """
+    Run the command-line interface: parse command-line arguments, execute the asynchronous CLI workflow, and exit with its status code.
+    
+    Parses arguments from sys.argv, invokes the async runner `_run` with the parsed arguments, and terminates the process using the integer exit code returned by `_run`.
+    """
     parser = _build_parser()
     args = parser.parse_args()
     exit_code = asyncio.run(_run(args))

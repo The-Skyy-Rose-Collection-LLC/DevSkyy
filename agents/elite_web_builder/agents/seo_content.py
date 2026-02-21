@@ -9,16 +9,10 @@ from __future__ import annotations
 
 def _build_spec() -> dict:
     """
-    Build the seo_content agent specification.
+    Builds the SEO & Content agent specification used by Elite Web Builder.
     
     Returns:
-        spec (dict): Specification dictionary with keys:
-            - role: agent role identifier ("seo_content")
-            - name: agent name ("seo_content")
-            - system_prompt: agent system prompt describing responsibilities and constraints
-            - capabilities: list of capability dicts with `name`, `description`, and `tags`
-            - knowledge_files: list of knowledge resource file paths
-            - preferred_model: dict specifying `provider` and `model`
+        spec (dict): Specification dictionary containing the keys "role", "name", "system_prompt", "capabilities", "knowledge_files", and "preferred_model".
     """
     return {
         "role": "seo_content",

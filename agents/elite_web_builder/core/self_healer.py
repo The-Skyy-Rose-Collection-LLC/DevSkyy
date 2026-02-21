@@ -44,10 +44,10 @@ class SelfHealer:
 
     def __init__(self, max_attempts: int = 3) -> None:
         """
-        Initialize the SelfHealer with a maximum number of healing attempts.
+        Initialize the SelfHealer with its attempt limit.
         
         Parameters:
-            max_attempts (int): Maximum number of diagnose/heal attempts the self-healing cycle will perform before giving up. The instance also initializes an internal, empty diagnosis history list.
+            max_attempts (int): Maximum number of diagnose–heal attempts the instance will perform before giving up.
         """
         self._max_attempts = max_attempts
         self._history: list[Diagnosis] = []
@@ -55,21 +55,24 @@ class SelfHealer:
     @property
     def history(self) -> list[Diagnosis]:
         """
-        Return a shallow copy of the recorded diagnosis history.
+        Get a shallow copy of the recorded diagnosis history.
         
         Returns:
-            list[Diagnosis]: A new list containing the Diagnosis objects previously recorded by the SelfHealer, preserving insertion order.
+            list[Diagnosis]: A shallow copy of past Diagnosis entries in chronological order.
         """
         return list(self._history)
 
     async def diagnose(self, failure_report: str) -> Diagnosis:
         """
-        Create a Diagnosis from a textual failure report and record it in the healer's history.
+        Produce a Diagnosis for a given failure report using gate-aware categorization.
         
-        Classifies the report into a FailureCategory, assigns a suggested fix and a `fixable` flag, and attempts to extract the failing gate name. The resulting Diagnosis is appended to the instance's internal history before being returned.
+        Analyzes the provided failure_report to determine a failure category (security, lint, a11y, code bug, config, external, or wrong approach), selects a suggested fix and fixable flag, extracts an associated gate name, appends the resulting Diagnosis to the healer's history, and logs a brief summary.
+        
+        Parameters:
+            failure_report (str): Raw failure message or output to analyze.
         
         Returns:
-            Diagnosis: A Diagnosis populated with category, error_details (the original report), suggested_fix, gate_name, and fixable.
+            Diagnosis: Contains the determined category, original error details, a suggested fix, the extracted gate name, confidence, and whether the issue is considered fixable.
         """
         lower = failure_report.lower()
 
@@ -117,10 +120,14 @@ class SelfHealer:
 
     async def heal(self, content: str, diagnosis: Diagnosis) -> str:
         """
-        Apply a category-specific repair to the provided content based on the given Diagnosis.
+        Apply a diagnosis-guided repair to the given content.
+        
+        Parameters:
+            content (str): The source content to modify (e.g., code or markup).
+            diagnosis (Diagnosis): Diagnosis that determines which healer to apply.
         
         Returns:
-        	The transformed content if a category-specific healer was applied and the diagnosis was marked fixable; otherwise the original content.
+            healed_content (str): The content after applying the appropriate healer; returns the original `content` if the diagnosis is not fixable or no matching healer is available.
         """
         logger.info(
             "Healing attempt for %s (gate=%s): %s",
@@ -149,13 +156,13 @@ class SelfHealer:
 
 def _suggest_security_fix(report: str) -> str:
     """
-    Suggest a concise security remediation based on the failure report.
+    Suggest a concise security remediation based on keywords found in a failure report.
     
     Parameters:
-    	report (str): Failure report or security finding text to analyze.
+        report (str): Text of the failure report to scan for security indicators.
     
     Returns:
-    	suggestion (str): A short, actionable remediation suggestion inferred from keywords in `report`.
+        str: A suggested security fix message tailored to the detected issue.
     """
     if "innerhtml" in report.lower():
         return "Replace innerHTML with textContent or sanitized insertion"
@@ -166,10 +173,13 @@ def _suggest_security_fix(report: str) -> str:
 
 def _suggest_lint_fix(report: str) -> str:
     """
-    Suggests a lint-focused remediation based on the provided failure report.
+    Suggests a lint remediation message by inspecting a failure report for common lint-related keywords.
+    
+    Parameters:
+        report (str): The failure report text to check for lint indicators such as `console.log`, `debugger`, or `var`.
     
     Returns:
-    	A short human-readable fix suggestion (e.g. "Remove console.log statements", "Remove debugger statements", "Replace var with const or let"), or a generic "Fix lint warnings" if no specific pattern is detected.
+        str: A suggested lint fix message (e.g., "Remove console.log statements", "Remove debugger statements", "Replace var with const or let", or a generic "Fix lint warnings").
     """
     if "console.log" in report.lower():
         return "Remove console.log statements"
@@ -182,13 +192,16 @@ def _suggest_lint_fix(report: str) -> str:
 
 def _suggest_a11y_fix(report: str) -> str:
     """
-    Suggests an accessibility remediation based on the provided failure report.
+    Suggests an accessibility-focused fix message based on keywords found in a failure report.
     
     Parameters:
-        report (str): Accessibility failure message or linter output used to determine a targeted suggestion.
+    	report (str): Failure report text to analyze for accessibility hints.
     
     Returns:
-        str: A short, actionable suggestion — recommends adding `alt` text if `alt` is mentioned, `aria-label` if `aria` is mentioned, or a generic accessibility fix otherwise.
+    	suggestion (str): A suggested fix message:
+    	- "Add descriptive alt attributes to all img tags" if the report mentions "alt".
+    	- "Add appropriate aria-label attributes" if the report mentions "aria".
+    	- "Fix accessibility violations" otherwise.
     """
     if "alt" in report.lower():
         return "Add descriptive alt attributes to all img tags"
@@ -199,15 +212,15 @@ def _suggest_a11y_fix(report: str) -> str:
 
 def _extract_gate_name(report: str) -> str:
     """
-    Identify a likely failing gate name mentioned in a failure report.
+    Identify the first pipeline gate keyword mentioned in a failure report.
     
-    Scans the provided report for known gate keywords and returns the first matched gate name.
+    Searches the provided report text for known gate names and returns the first match found.
     
     Parameters:
-        report (str): The failure report text to inspect.
+        report (str): The failure report text to search.
     
     Returns:
-        str: The matched gate name (one of "build", "types", "lint", "tests", "security", "a11y", "perf", "diff"), or an empty string if no gate name is found.
+        str: The matching gate name (one of "build", "types", "lint", "tests", "security", "a11y", "perf", "diff") if present, otherwise an empty string.
     """
     lower = report.lower()
     for name in ("build", "types", "lint", "tests", "security", "a11y", "perf", "diff"):
@@ -221,18 +234,10 @@ def _extract_gate_name(report: str) -> str:
 
 def _heal_lint(content: str, diagnosis: Diagnosis) -> str:
     """
-    Apply simple lint-focused transformations to the provided source text.
-    
-    Performs non-destructive, pattern-based fixes commonly flagged by linters:
-    - removes top-level `console.log(...)` statements and `debugger` statements
-    - replaces `var` declarations with `const`
-    
-    Parameters:
-        content (str): Source text to transform.
-        diagnosis (Diagnosis): Diagnostic context for the lint issue (not required for the transformations performed).
+    Remove common lint issues from the given source content.
     
     Returns:
-        str: The transformed source text with the lint fixes applied.
+        The input content with `console.log` and `debugger` statements removed and `var` declarations replaced with `const`.
     """
     result = re.sub(r"^\s*console\.log\([^)]*\);?\s*\n?", "", content, flags=re.MULTILINE)
     result = re.sub(r"^\s*debugger;?\s*\n?", "", result, flags=re.MULTILINE)
@@ -242,10 +247,14 @@ def _heal_lint(content: str, diagnosis: Diagnosis) -> str:
 
 def _heal_security(content: str, diagnosis: Diagnosis) -> str:
     """
-    Replace DOM `innerHTML` assignments with `textContent` to reduce XSS risk in the provided content.
+    Replace insecure `.innerHTML` assignments with `.textContent` assignments in the provided content.
+    
+    Parameters:
+    	content (str): The source text or code to be healed.
+    	diagnosis (Diagnosis): The diagnosis that motivated this healing attempt; may provide context for the transformation.
     
     Returns:
-    	Transformed content with occurrences of `.innerHTML =` replaced by `.textContent =`.
+    	str: The transformed content with `.innerHTML =` replaced by `.textContent =`.
     """
     result = re.sub(
         r"\.innerHTML\s*=\s*",
@@ -257,14 +266,14 @@ def _heal_security(content: str, diagnosis: Diagnosis) -> str:
 
 def _heal_a11y(content: str, diagnosis: Diagnosis) -> str:
     """
-    Ensure <img> elements include an `alt` attribute by adding `alt=""` to images that lack one.
+    Ensure all <img> tags include an `alt` attribute by injecting `alt=""` when missing.
     
     Parameters:
-        content (str): HTML content to transform.
-        diagnosis (Diagnosis): Diagnosis context for the healing operation.
+        content (str): HTML or template text to process.
+        diagnosis (Diagnosis): Diagnosis metadata associated with the issue (may be used by healers).
     
     Returns:
-        str: HTML content with `alt` attributes injected for `img` tags that were missing them.
+        str: The input content with any <img> tags that lacked an `alt` attribute updated to include `alt=""`; existing `alt` attributes are preserved.
     """
     result = re.sub(
         r"<img\b((?![^>]*\balt\s*=)[^>]*)>",

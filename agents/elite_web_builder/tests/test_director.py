@@ -36,16 +36,16 @@ def _make_story(
     deps: list[str] | None = None,
 ) -> UserStory:
     """
-    Create a test UserStory with sensible defaults for unit tests.
+    Create a UserStory test fixture with the given id, title, agent role, and dependencies.
     
     Parameters:
-        sid: Story identifier to assign to the UserStory.
-        title: Title to assign; the returned story's description will be "Description for {title}".
-        role: AgentRole to assign as the story's agent_role.
-        deps: Optional list of story ids this story depends on; defaults to an empty list when omitted.
+        sid (str): Story identifier (e.g., "US-001").
+        title (str): Human-readable title for the story.
+        role (AgentRole): Agent role responsible for the story.
+        deps (list[str] | None): List of story IDs this story depends on; treated as empty list if None.
     
     Returns:
-        A UserStory initialized with the given id, title, description, agent_role, and depends_on.
+        UserStory: A UserStory instance with `description` set to "Description for {title}" and `depends_on` set to `deps` or an empty list.
     """
     return UserStory(
         id=sid,
@@ -58,14 +58,13 @@ def _make_story(
 
 def _make_router_with_mock(content: str = "OK") -> ModelRouter:
     """
-    Create a ModelRouter configured with a mocked adapter that returns a preset LLMResponse.
+    Create a ModelRouter configured with a mocked async adapter that returns a canned LLMResponse.
     
     Parameters:
-        content (str): The text content the mock adapter's LLMResponse will contain.
+        content (str): The text content the mocked adapter will return in its LLMResponse.
     
     Returns:
-        ModelRouter: A router with an AsyncMock adapter registered for providers
-        "anthropic", "google", "openai", and "xai" that yields an LLMResponse with the given content.
+        router (ModelRouter): A router whose adapters for providers ("anthropic", "google", "openai", "xai") are mocked to produce an LLMResponse containing `content`.
     """
     router = ModelRouter(
         routing=_DEFAULT_ROUTING["routing"],
@@ -285,6 +284,9 @@ class TestDirectorRunStory:
 
 class TestPRDBreakdown:
     def test_create(self):
+        """
+        Constructs a PRDBreakdown with two stories in a given dependency order and verifies the breakdown contains both stories.
+        """
         stories = [_make_story("US-001"), _make_story("US-002")]
         breakdown = PRDBreakdown(stories=stories, dependency_order=["US-001", "US-002"])
         assert len(breakdown.stories) == 2

@@ -9,16 +9,10 @@ from __future__ import annotations
 
 def _build_spec() -> dict:
     """
-    Constructs the performance agent specification for Core Web Vitals, asset optimization, and caching.
+    Constructs the performance agent specification used by the Elite Web Builder.
     
     Returns:
-        spec (dict): A dictionary containing the agent configuration with keys:
-            - role: agent role identifier (e.g., "performance")
-            - name: agent name
-            - system_prompt: human-readable prompt describing optimization goals and targets
-            - capabilities: list of capability dictionaries (each with `name`, `description`, and `tags`)
-            - knowledge_files: list of related knowledge file paths
-            - preferred_model: dictionary specifying `provider` and `model`
+        spec (dict): Dictionary containing agent metadata including `role`, `name`, `system_prompt`, `capabilities`, `knowledge_files`, and `preferred_model`.
     """
     return {
         "role": "performance",

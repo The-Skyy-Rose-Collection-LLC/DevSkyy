@@ -48,6 +48,11 @@ class TestGroundTruthValidator:
         assert v.validate_json('{"key": "value"}') is True
 
     def test_validate_invalid_json(self):
+        """
+        Verify that validate_json rejects invalid JSON strings.
+        
+        Asserts that GroundTruthValidator.validate_json returns False when given a non-JSON input like "not json".
+        """
         v = GroundTruthValidator()
         assert v.validate_json("not json") is False
 
@@ -149,11 +154,6 @@ class TestSelfHealer:
 
     @pytest.mark.asyncio
     async def test_diagnose_wrong_approach(self):
-        """
-        Verifies that SelfHealer.diagnose classifies a message indicating an incorrect approach as WRONG_APPROACH.
-        
-        This test creates a SelfHealer instance, diagnoses the string "This approach does not work", and asserts the returned diagnosis category is FailureCategory.WRONG_APPROACH.
-        """
         healer = SelfHealer()
         diagnosis = await healer.diagnose("This approach does not work")
         assert diagnosis.category == FailureCategory.WRONG_APPROACH
@@ -503,10 +503,10 @@ class TestRalphExecutor:
 
         async def success():
             """
-            Return a successful result indicator.
+            Provide a successful result.
             
             Returns:
-                'result' — a success indicator string.
+                The constant string "result".
             """
             return "result"
 
@@ -520,13 +520,13 @@ class TestRalphExecutor:
 
         async def flaky():
             """
-            Simulates a flaky operation that fails on the first two invocations and succeeds thereafter.
+            Simulates a flaky async operation that fails on the first two invocations and succeeds thereafter.
             
             Returns:
-                str: "'success' once the function has been called three or more times."
+            	(str): The string "success" once the operation succeeds (on the third and subsequent calls).
             
             Raises:
-                RuntimeError: If called fewer than three times.
+            	RuntimeError: If called fewer than three times, raises with message "flaky".
             """
             nonlocal call_count
             call_count += 1
@@ -547,7 +547,7 @@ class TestRalphExecutor:
             Always raises a RuntimeError.
             
             Raises:
-                RuntimeError: Always raised with the message "always fails".
+                RuntimeError: Always raised with message "always fails".
             """
             raise RuntimeError("always fails")
 
@@ -560,7 +560,7 @@ class TestRalphExecutor:
 
         async def primary():
             """
-            Coroutine that always raises a RuntimeError.
+            Helper that always raises a RuntimeError.
             
             Raises:
                 RuntimeError: Always raised with the message "primary fails".
@@ -569,7 +569,7 @@ class TestRalphExecutor:
 
         async def fallback():
             """
-            Provide a fallback result string.
+            Provide a fallback result used when the primary operation fails.
             
             Returns:
                 str: The fallback result string "fallback result".
