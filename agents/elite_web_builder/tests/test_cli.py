@@ -62,10 +62,12 @@ class TestBuildParser:
         args = parser.parse_args(["--max-stories", "10", "Build it"])
         assert args.max_stories == 10
 
-    def test_prd_and_file_mutually_exclusive(self):
+    def test_prd_and_file_both_provided(self):
+        """When both inline PRD and --file are given, file takes precedence."""
         parser = _build_parser()
-        with pytest.raises(SystemExit):
-            parser.parse_args(["--file", "prd.md", "Also inline"])
+        args = parser.parse_args(["--file", "prd.md", "Also inline"])
+        assert args.file == Path("prd.md")
+        assert args.prd == "Also inline"
 
 
 # =============================================================================
