@@ -5,7 +5,7 @@ from .learning_journal import LearningEntry, LearningJournal
 from .model_router import LLMResponse, ModelRouter, ProviderAdapter
 from .ralph_integration import RalphExecutor
 from .self_healer import FailureCategory, SelfHealer
-from .verification_loop import GateResult, GateStatus, VerificationLoop
+from .verification_loop import GateConfig, GateName, GateResult, GateStatus, VerificationLoop
 
 __all__ = [
     "GroundTruthValidator",
@@ -17,6 +17,8 @@ __all__ = [
     "RalphExecutor",
     "FailureCategory",
     "SelfHealer",
+    "GateConfig",
+    "GateName",
     "GateResult",
     "GateStatus",
     "VerificationLoop",
