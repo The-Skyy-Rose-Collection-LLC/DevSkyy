@@ -1,9 +1,10 @@
 <?php
 /**
  * Template Name: Black Rose Collection
+ * Template Post Type: page
  *
- * Mysterious and elegant. Silver and black pieces that make
- * a powerful statement of refined luxury.
+ * Dark elegance. Sterling silver. Gothic luxury.
+ * Landing page with AI model imagery and product showcase.
  *
  * @package SkyyRose_Flagship
  * @since 2.0.0
@@ -12,563 +13,286 @@
 get_header();
 ?>
 
-<main id="primary" class="site-main collection-page collection-black-rose">
+<main id="primary" class="site-main collection-landing collection-black-rose">
 
-	<!-- Collection Hero -->
-	<section class="collection-hero">
-		<div class="hero-overlay"></div>
-		<div class="hero-content">
-			<span class="collection-badge">Black Rose Collection</span>
-			<h1 class="hero-title">Dark Elegance</h1>
-			<p class="hero-subtitle">Where mystery meets sophistication. Sterling silver and onyx unite in timeless luxury.</p>
-			<div class="hero-actions">
-				<a href="#products" class="btn btn-primary">Explore Collection</a>
-				<a href="#story" class="btn btn-outline">Discover More</a>
-			</div>
-		</div>
-		<div class="hero-background">
-			<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/black-rose-hero.jpg' ); ?>" alt="Black Rose Collection Hero">
-		</div>
-		<div class="hero-smoke"></div>
-	</section>
+	<!-- ========== HERO ========== -->
+	<section class="cl-hero cl-hero-black-rose">
+		<div class="cl-hero-bg"></div>
+		<div class="cl-hero-content">
+			<span class="cl-hero-label">Collection 01</span>
 
-	<!-- Collection Highlights -->
-	<section class="section collection-highlights">
-		<div class="container">
-			<div class="highlights-grid">
-				<div class="highlight-card">
-					<div class="highlight-icon">🌙</div>
-					<h3>Sterling Silver</h3>
-					<p>Premium .925 sterling silver with moonlit brilliance</p>
-				</div>
-				<div class="highlight-card">
-					<div class="highlight-icon">⚫</div>
-					<h3>Onyx & Obsidian</h3>
-					<p>Deep black gemstones with captivating depth</p>
-				</div>
-				<div class="highlight-card">
-					<div class="highlight-icon">🖤</div>
-					<h3>Gothic Luxury</h3>
-					<p>Dramatic designs with timeless sophistication</p>
-				</div>
-				<div class="highlight-card">
-					<div class="highlight-icon">✨</div>
-					<h3>Statement Elegance</h3>
-					<p>Pieces that command attention with quiet power</p>
-				</div>
+			<!-- Collection Logo -->
+			<div class="cl-logo" aria-hidden="true">
+				<svg viewBox="0 0 400 80" xmlns="http://www.w3.org/2000/svg" class="cl-logo-svg">
+					<defs>
+						<linearGradient id="br-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+							<stop offset="0%" style="stop-color:#C0C0C0"/>
+							<stop offset="50%" style="stop-color:#E8E8E8"/>
+							<stop offset="100%" style="stop-color:#C0C0C0"/>
+						</linearGradient>
+					</defs>
+					<text x="200" y="55" text-anchor="middle" fill="url(#br-grad)" font-family="'Playfair Display', Georgia, serif" font-size="58" font-weight="700" letter-spacing="8">BLACK</text>
+					<text x="200" y="78" text-anchor="middle" fill="#C0C0C0" font-family="'Cormorant Garamond', Georgia, serif" font-size="22" font-weight="300" letter-spacing="18">R O S E</text>
+					<!-- Decorative thorn lines -->
+					<line x1="50" y1="62" x2="120" y2="62" stroke="#C0C0C0" stroke-width="0.5" opacity="0.4"/>
+					<line x1="280" y1="62" x2="350" y2="62" stroke="#C0C0C0" stroke-width="0.5" opacity="0.4"/>
+					<circle cx="200" cy="62" r="2" fill="#C0C0C0" opacity="0.6"/>
+				</svg>
 			</div>
+
+			<h1 class="cl-hero-title sr-only">Black Rose</h1>
+			<p class="cl-hero-tagline">Dark Elegance. Sterling Silver. Gothic Luxury.</p>
+			<p class="cl-hero-desc">Sterling silver masterpieces adorned with onyx and obsidian. Cathedral-inspired designs for those who find beauty in the shadows.</p>
+			<div class="cl-hero-actions">
+				<a href="#cl-products" class="btn btn-primary">Shop the Collection</a>
+				<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="btn btn-outline">Pre-Order</a>
+			</div>
+			<div class="cl-hero-price-hint">Starting at <strong>$1,599</strong></div>
 		</div>
 	</section>
 
-	<!-- Product Showcase -->
-	<section id="products" class="section products-showcase">
+	<!-- ========== AI MODEL LOOKBOOK ========== -->
+	<section class="cl-lookbook">
 		<div class="container">
 			<div class="section-header text-center">
-				<span class="section-subtitle text-silver">Featured Pieces</span>
-				<h2 class="section-title">Black Rose Collection</h2>
+				<span class="section-subtitle" style="color:#C0C0C0">The Lookbook</span>
+				<h2 class="section-title">Worn in Darkness, Forged in Silver</h2>
 			</div>
-
-			<?php
-			// Query WooCommerce products if available
-			if ( class_exists( 'WooCommerce' ) ) :
-				$args = array(
-					'post_type'      => 'product',
-					'posts_per_page' => 12,
-					'tax_query'      => array(
-						array(
-							'taxonomy' => 'product_cat',
-							'field'    => 'slug',
-							'terms'    => 'black-rose-collection',
-						),
-					),
-				);
-				$products = new WP_Query( $args );
-
-				if ( $products->have_posts() ) :
-			?>
-				<div class="products-grid">
-					<?php while ( $products->have_posts() ) : $products->the_post(); ?>
-						<?php wc_get_template_part( 'content', 'product' ); ?>
-					<?php endwhile; ?>
+			<div class="cl-lookbook-grid">
+				<div class="cl-lookbook-item cl-lookbook-tall">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/models/black-rose-model-1.jpg' ); ?>" alt="Model wearing Black Rose sterling silver statement necklace with onyx pendant" loading="lazy">
+					<div class="cl-lookbook-caption">
+						<span class="cl-lookbook-piece">Midnight Throne Necklace</span>
+						<span class="cl-lookbook-price">$1,899</span>
+					</div>
 				</div>
-			<?php
-				wp_reset_postdata();
-				else :
-			?>
-				<!-- Placeholder Product Grid -->
-				<div class="products-grid">
-					<?php for ( $i = 1; $i <= 6; $i++ ) : ?>
-						<article class="product-card">
-							<div class="product-image">
-								<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="Black Rose Product <?php echo $i; ?>">
-								<span class="product-badge">Exclusive</span>
-							</div>
-							<div class="product-content">
-								<h3 class="product-title">Midnight Silver <?php echo $i; ?></h3>
-								<p class="product-price">$1,599</p>
-								<a href="/shop" class="btn btn-secondary">View Details</a>
-							</div>
-						</article>
-					<?php endfor; ?>
+				<div class="cl-lookbook-item">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/models/black-rose-model-2.jpg' ); ?>" alt="Model wearing Black Rose obsidian drop earrings against dark velvet" loading="lazy">
+					<div class="cl-lookbook-caption">
+						<span class="cl-lookbook-piece">Obsidian Veil Earrings</span>
+						<span class="cl-lookbook-price">$1,599</span>
+					</div>
 				</div>
-			<?php
-				endif;
-			else :
-				// No WooCommerce - show static grid
-			?>
-				<div class="products-grid">
-					<?php for ( $i = 1; $i <= 6; $i++ ) : ?>
-						<article class="product-card">
-							<div class="product-image">
-								<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="Black Rose Product <?php echo $i; ?>">
-								<span class="product-badge">Exclusive</span>
-							</div>
-							<div class="product-content">
-								<h3 class="product-title">Midnight Silver Piece <?php echo $i; ?></h3>
-								<p class="product-price">$1,599</p>
-								<a href="/shop" class="btn btn-secondary">View Details</a>
-							</div>
-						</article>
-					<?php endfor; ?>
+				<div class="cl-lookbook-item">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/models/black-rose-model-3.jpg' ); ?>" alt="Model wearing Black Rose gothic cuff bracelet with silver thorns" loading="lazy">
+					<div class="cl-lookbook-caption">
+						<span class="cl-lookbook-piece">Thorn Crown Cuff</span>
+						<span class="cl-lookbook-price">$2,199</span>
+					</div>
 				</div>
-			<?php endif; ?>
-
-			<div class="text-center" style="margin-top: var(--space-3xl);">
-				<a href="/shop?collection=black-rose" class="btn btn-primary btn-large">View All Black Rose Pieces</a>
 			</div>
 		</div>
 	</section>
 
-	<!-- Collection Story -->
-	<section id="story" class="section collection-story bg-dark">
+	<!-- ========== COLLECTION STORY ========== -->
+	<section class="cl-story">
 		<div class="container">
-			<div class="story-grid">
-				<div class="story-content">
-					<span class="section-subtitle text-silver">The Black Rose Legend</span>
-					<h2 class="section-title">Embracing the Shadows</h2>
-					<p>Born from the allure of darkness and elegance, the Black Rose Collection celebrates the beauty found in mystery and sophistication.</p>
-					<p>Each piece combines sterling silver's moonlit gleam with the deep, captivating darkness of onyx and obsidian. These aren't just accessories—they're expressions of refined power and timeless grace.</p>
-					<div class="story-features">
-						<div class="feature">
-							<h4>.925 Sterling Silver</h4>
-							<p>Premium quality with lasting brilliance</p>
+			<div class="cl-story-grid">
+				<div class="cl-story-content">
+					<span class="section-subtitle" style="color:#C0C0C0">The Story</span>
+					<h2>Beauty Born From Shadows</h2>
+					<p>The Black Rose Collection draws inspiration from gothic cathedrals, midnight gardens, and the raw elegance of darkness. Each piece is hand-forged in sterling silver, set with ethically sourced onyx and obsidian stones.</p>
+					<p>This isn&rsquo;t jewelry that whispers&mdash;it commands. Statement pieces for those who walk into a room and own it.</p>
+					<div class="cl-story-stats">
+						<div class="cl-stat">
+							<span class="cl-stat-value">.925</span>
+							<span class="cl-stat-label">Sterling Silver</span>
 						</div>
-						<div class="feature">
-							<h4>Natural Onyx</h4>
-							<p>Hand-selected black gemstones</p>
+						<div class="cl-stat">
+							<span class="cl-stat-value">Hand</span>
+							<span class="cl-stat-label">Forged &amp; Polished</span>
 						</div>
-						<div class="feature">
-							<h4>Gothic Romance</h4>
-							<p>Timeless designs with modern edge</p>
+						<div class="cl-stat">
+							<span class="cl-stat-value">Ltd</span>
+							<span class="cl-stat-label">Edition of 100</span>
 						</div>
 					</div>
 				</div>
-				<div class="story-image">
-					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/black-rose-crafting.jpg' ); ?>" alt="Black Rose Collection Crafting">
+				<div class="cl-story-image">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/brand/black-rose-crafting.jpg' ); ?>" alt="Artisan hand-finishing a Black Rose sterling silver piece" loading="lazy">
 				</div>
 			</div>
 		</div>
 	</section>
 
-	<!-- 3D Experience -->
-	<section class="section three-d-experience">
-		<div class="container text-center">
-			<div class="section-header">
-				<span class="section-subtitle text-silver">Immersive Experience</span>
-				<h2 class="section-title">Explore in 3D</h2>
-				<p>Discover the intricate details of Black Rose in stunning 3D</p>
-			</div>
-			<div id="black-rose-3d-viewer" class="three-d-viewer" data-model="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/models/black-rose-collection.glb' ); ?>">
-				<div class="viewer-placeholder">
-					<p>Loading 3D experience...</p>
-				</div>
-			</div>
-		</div>
-	</section>
-
-	<!-- Craftsmanship -->
-	<section class="section craftsmanship">
+	<!-- ========== PRODUCTS ========== -->
+	<section id="cl-products" class="cl-products">
 		<div class="container">
 			<div class="section-header text-center">
-				<h2 class="section-title">Artisan Craftsmanship</h2>
+				<span class="section-subtitle" style="color:#C0C0C0">Shop</span>
+				<h2 class="section-title">The Black Rose Pieces</h2>
+				<p class="section-desc">Each piece is numbered and comes with a certificate of authenticity.</p>
 			</div>
-			<div class="craft-grid">
-				<div class="craft-card">
-					<h3>Sterling Silver Excellence</h3>
-					<p>Each piece begins with premium .925 sterling silver, hand-polished to achieve our signature moonlit finish. The metal is carefully shaped to complement the dark gemstones.</p>
-				</div>
-				<div class="craft-card">
-					<h3>Gemstone Selection</h3>
-					<p>We source only the finest natural onyx and obsidian, selecting stones with perfect depth and opacity. Each gem is inspected for quality and consistency.</p>
-				</div>
-				<div class="craft-card">
-					<h3>Gothic Architecture</h3>
-					<p>Inspired by gothic cathedrals and Art Deco design, our pieces feature intricate details—filigree work, geometric patterns, and architectural elements.</p>
-				</div>
-				<div class="craft-card">
-					<h3>Oxidized Detailing</h3>
-					<p>Strategic oxidation techniques create dramatic contrast, highlighting details and adding depth to the silver while enhancing the mysterious aesthetic.</p>
-				</div>
-			</div>
+
+			<?php if ( class_exists( 'WooCommerce' ) ) :
+				$args = array(
+					'post_type'      => 'product',
+					'posts_per_page' => 12,
+					'tax_query'      => array( array(
+						'taxonomy' => 'product_cat',
+						'field'    => 'slug',
+						'terms'    => 'black-rose-collection',
+					) ),
+				);
+				$products = new WP_Query( $args );
+				if ( $products->have_posts() ) : ?>
+					<div class="cl-products-grid">
+						<?php while ( $products->have_posts() ) : $products->the_post();
+							wc_get_template_part( 'content', 'product' );
+						endwhile; ?>
+					</div>
+					<?php wp_reset_postdata();
+				else : ?>
+					<div class="cl-products-grid">
+						<?php
+						$pieces = array(
+							array( 'name' => 'Midnight Throne Necklace', 'price' => '$1,899', 'badge' => 'Signature' ),
+							array( 'name' => 'Obsidian Veil Earrings', 'price' => '$1,599', 'badge' => 'New' ),
+							array( 'name' => 'Thorn Crown Cuff', 'price' => '$2,199', 'badge' => 'Limited' ),
+							array( 'name' => 'Shadow Cathedral Ring', 'price' => '$1,799', 'badge' => 'Exclusive' ),
+							array( 'name' => 'Dark Petal Pendant', 'price' => '$1,499', 'badge' => 'New' ),
+							array( 'name' => 'Sterling Serpent Chain', 'price' => '$1,699', 'badge' => 'Exclusive' ),
+						);
+						foreach ( $pieces as $piece ) : ?>
+							<div class="cl-product-card">
+								<div class="cl-product-badge"><?php echo esc_html( $piece['badge'] ); ?></div>
+								<div class="cl-product-image">
+									<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php echo esc_attr( $piece['name'] ); ?>" loading="lazy">
+								</div>
+								<div class="cl-product-info">
+									<h3 class="cl-product-name"><?php echo esc_html( $piece['name'] ); ?></h3>
+									<span class="cl-product-price"><?php echo esc_html( $piece['price'] ); ?></span>
+								</div>
+								<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>" class="btn btn-outline cl-product-btn">Pre-Order</a>
+							</div>
+						<?php endforeach; ?>
+					</div>
+				<?php endif;
+			endif; ?>
 		</div>
 	</section>
 
-	<!-- CTA Section -->
-	<section class="section cta-section gradient-black-silver">
+	<!-- ========== 3D EXPERIENCE CTA ========== -->
+	<section class="cl-experience">
 		<div class="container text-center">
-			<h2 class="section-title">Embrace Dark Elegance</h2>
-			<p class="section-subtitle">Discover pieces as mysterious as the night</p>
-			<div class="cta-actions">
-				<a href="/shop?collection=black-rose" class="btn btn-primary btn-large">Shop Black Rose</a>
-				<a href="/contact" class="btn btn-outline btn-large">Private Viewing</a>
+			<span class="section-subtitle" style="color:#C0C0C0">3D Experience</span>
+			<h2 class="cl-experience-title">Enter the Virtual Garden</h2>
+			<p class="cl-experience-desc">Step into an immersive 3D gothic garden. Explore each piece up close, interact with hidden details, and discover the Black Rose world.</p>
+			<a href="<?php echo esc_url( home_url( '/explore-black-rose/' ) ); ?>" class="btn btn-primary btn-large">Launch 3D Experience</a>
+		</div>
+	</section>
+
+	<!-- ========== CROSS-SELL ========== -->
+	<section class="cl-crosssell">
+		<div class="container text-center">
+			<h2>Explore Other Collections</h2>
+			<div class="cl-crosssell-links">
+				<a href="<?php echo esc_url( home_url( '/love-hurts-collection/' ) ); ?>" class="cl-crosssell-card cl-crosssell-love-hurts">
+					<span class="cl-crosssell-name">Love Hurts</span>
+					<span class="cl-crosssell-hint">Crimson &amp; Rose Gold</span>
+				</a>
+				<a href="<?php echo esc_url( home_url( '/signature-collection/' ) ); ?>" class="cl-crosssell-card cl-crosssell-signature">
+					<span class="cl-crosssell-name">Signature</span>
+					<span class="cl-crosssell-hint">Rose Gold &amp; Diamonds</span>
+				</a>
 			</div>
 		</div>
 	</section>
 
-</main><!-- #primary -->
+</main>
 
 <style>
-/* Black Rose Collection Specific Styles */
-.collection-black-rose .collection-hero {
-	position: relative;
-	min-height: 90vh;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	text-align: center;
-	color: var(--white);
-	overflow: hidden;
-}
+/* === COLLECTION LOGO (shared) === */
+.cl-logo{margin-bottom:var(--space-xl);display:flex;justify-content:center}
+.cl-logo-svg{width:100%;max-width:400px;height:auto}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border-width:0}
+@media(max-width:768px){.cl-logo-svg{max-width:280px}}
 
-.collection-hero .hero-background {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	z-index: 1;
-}
+/* === BLACK ROSE SCOPED === */
+.collection-black-rose{background:#0a0a0a;color:#e5e5e5}
 
-.collection-hero .hero-background img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	object-position: center;
-	filter: brightness(0.4);
-}
+/* Hero */
+.cl-hero-black-rose{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
+.cl-hero-black-rose .cl-hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#0a0505 0%,#1a1a1a 40%,#0a0a0a 100%)}
+.cl-hero-black-rose .cl-hero-bg::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(192,192,192,.08) 0%,transparent 70%)}
+.cl-hero-black-rose .cl-hero-content{position:relative;z-index:2;max-width:800px;padding:var(--space-xl)}
+.cl-hero-label{display:inline-block;font-size:var(--text-sm);font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:.3em;color:#C0C0C0;margin-bottom:var(--space-lg)}
+.cl-hero-black-rose .cl-hero-title{font-family:var(--font-heading);font-size:clamp(3rem,5vw + 1rem,6rem);font-weight:var(--weight-bold);color:#fff;margin-bottom:var(--space-lg);line-height:1}
+.cl-hero-black-rose .cl-hero-tagline{font-family:var(--font-accent);font-size:var(--text-xl);color:#C0C0C0;margin-bottom:var(--space-lg)}
+.cl-hero-black-rose .cl-hero-desc{font-size:var(--text-lg);color:rgba(255,255,255,.7);max-width:600px;margin:0 auto var(--space-2xl);line-height:1.7}
+.cl-hero-actions{display:flex;gap:var(--space-lg);justify-content:center;flex-wrap:wrap;margin-bottom:var(--space-xl)}
+.cl-hero-black-rose .btn-primary{background:linear-gradient(135deg,#C0C0C0,#808080);color:#0a0a0a}
+.cl-hero-black-rose .btn-outline{border-color:#C0C0C0;color:#C0C0C0}
+.cl-hero-black-rose .btn-outline:hover{background:#C0C0C0;color:#0a0a0a}
+.cl-hero-price-hint{font-size:var(--text-sm);color:rgba(255,255,255,.5)}
+.cl-hero-price-hint strong{color:#C0C0C0}
 
-.collection-hero .hero-overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(192, 192, 192, 0.3) 100%);
-	z-index: 2;
-}
+/* Lookbook */
+.collection-black-rose .cl-lookbook{padding:var(--space-4xl) 0;background:#0f0f0f}
+.collection-black-rose .section-title{color:#fff}
+.cl-lookbook-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-lg);margin-top:var(--space-2xl)}
+.cl-lookbook-tall{grid-row:span 2}
+.cl-lookbook-item{position:relative;overflow:hidden;border-radius:var(--radius-lg)}
+.cl-lookbook-tall{aspect-ratio:3/4}
+.cl-lookbook-item:not(.cl-lookbook-tall){aspect-ratio:4/3}
+.cl-lookbook-item img{width:100%;height:100%;object-fit:cover;transition:transform .8s cubic-bezier(.22,1,.36,1)}
+.cl-lookbook-item:hover img{transform:scale(1.05)}
+.cl-lookbook-caption{position:absolute;bottom:0;left:0;right:0;padding:var(--space-xl) var(--space-lg);background:linear-gradient(transparent,rgba(0,0,0,.85));display:flex;justify-content:space-between;align-items:flex-end}
+.cl-lookbook-piece{font-family:var(--font-heading);font-size:var(--text-lg);color:#fff}
+.cl-lookbook-price{font-weight:var(--weight-semibold);color:#C0C0C0}
 
-.collection-hero .hero-smoke {
-	position: absolute;
-	bottom: 0;
-	left: 0;
-	width: 100%;
-	height: 300px;
-	background: linear-gradient(to top, rgba(20, 20, 20, 0.8), transparent);
-	z-index: 2;
-}
+/* Story */
+.collection-black-rose .cl-story{padding:var(--space-4xl) 0;background:#0a0a0a}
+.cl-story-grid{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4xl);align-items:center}
+.cl-story-content h2{font-size:var(--text-3xl);color:#fff;margin-bottom:var(--space-xl)}
+.cl-story-content p{color:rgba(255,255,255,.7);line-height:1.8;margin-bottom:var(--space-lg)}
+.cl-story-stats{display:flex;gap:var(--space-2xl);margin-top:var(--space-2xl);padding-top:var(--space-xl);border-top:1px solid rgba(192,192,192,.2)}
+.cl-stat{display:flex;flex-direction:column}
+.cl-stat-value{font-family:var(--font-heading);font-size:var(--text-2xl);font-weight:var(--weight-bold);color:#C0C0C0}
+.cl-stat-label{font-size:var(--text-sm);color:rgba(255,255,255,.5);margin-top:var(--space-xs)}
+.cl-story-image{border-radius:var(--radius-lg);overflow:hidden}
+.cl-story-image img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/5}
 
-.collection-hero .hero-content {
-	position: relative;
-	z-index: 3;
-	max-width: 800px;
-	padding: var(--space-xl);
-}
+/* Products */
+.collection-black-rose .cl-products{padding:var(--space-4xl) 0;background:#111}
+.collection-black-rose .section-desc{color:rgba(255,255,255,.6)}
+.cl-products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:var(--space-xl);margin-top:var(--space-2xl)}
+.cl-product-card{position:relative;background:#1a1a1a;border-radius:var(--radius-lg);overflow:hidden;transition:all var(--transition-luxury);border:1px solid rgba(192,192,192,.1)}
+.cl-product-card:hover{transform:translateY(-6px);box-shadow:0 16px 40px rgba(0,0,0,.4),0 0 20px rgba(192,192,192,.08);border-color:rgba(192,192,192,.3)}
+.cl-product-badge{position:absolute;top:var(--space-md);left:var(--space-md);padding:4px 12px;font-size:11px;font-weight:var(--weight-semibold);text-transform:uppercase;letter-spacing:.1em;background:#C0C0C0;color:#0a0a0a;border-radius:var(--radius-sm);z-index:2}
+.cl-product-image{aspect-ratio:1;overflow:hidden}
+.cl-product-image img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.cl-product-card:hover .cl-product-image img{transform:scale(1.08)}
+.cl-product-info{padding:var(--space-lg)}
+.cl-product-name{font-family:var(--font-heading);font-size:var(--text-lg);color:#fff;margin-bottom:var(--space-sm)}
+.cl-product-price{font-weight:var(--weight-semibold);color:#C0C0C0}
+.cl-product-btn{display:block;margin:0 var(--space-lg) var(--space-lg);text-align:center;border-color:#C0C0C0;color:#C0C0C0}
+.cl-product-btn:hover{background:#C0C0C0;color:#0a0a0a}
 
-.collection-hero .collection-badge {
-	display: inline-block;
-	padding: var(--space-sm) var(--space-lg);
-	font-size: var(--text-sm);
-	font-weight: var(--weight-bold);
-	text-transform: uppercase;
-	letter-spacing: 0.15em;
-	background: rgba(20, 20, 20, 0.7);
-	border: 2px solid var(--silver);
-	border-radius: var(--radius-full);
-	margin-bottom: var(--space-lg);
-	backdrop-filter: blur(10px);
-}
+/* Experience */
+.collection-black-rose .cl-experience{padding:var(--space-4xl) 0;background:linear-gradient(135deg,#0a0505,#141414,#0a0a0a);border-top:1px solid rgba(192,192,192,.1);border-bottom:1px solid rgba(192,192,192,.1)}
+.cl-experience-title{font-size:var(--text-3xl);color:#fff;margin-bottom:var(--space-lg)}
+.cl-experience-desc{max-width:600px;margin:0 auto var(--space-2xl);color:rgba(255,255,255,.7);line-height:1.7}
 
-.collection-hero .hero-title {
-	font-size: var(--text-6xl);
-	margin-bottom: var(--space-md);
-	text-shadow: 0 4px 30px rgba(0, 0, 0, 0.7);
-	animation: fadeIn var(--transition-luxury) ease-out;
-	letter-spacing: 0.05em;
-}
+/* Cross-sell */
+.collection-black-rose .cl-crosssell{padding:var(--space-4xl) 0;background:#0a0a0a}
+.cl-crosssell h2{color:#fff;margin-bottom:var(--space-2xl)}
+.cl-crosssell-links{display:flex;gap:var(--space-xl);justify-content:center;flex-wrap:wrap}
+.cl-crosssell-card{display:flex;flex-direction:column;align-items:center;padding:var(--space-2xl) var(--space-3xl);border:1px solid rgba(255,255,255,.15);border-radius:var(--radius-lg);transition:all var(--transition-luxury);text-decoration:none}
+.cl-crosssell-card:hover{transform:translateY(-4px)}
+.cl-crosssell-love-hurts:hover{border-color:#DC143C;box-shadow:0 0 30px rgba(220,20,60,.15)}
+.cl-crosssell-signature:hover{border-color:#B76E79;box-shadow:0 0 30px rgba(183,110,121,.15)}
+.cl-crosssell-name{font-family:var(--font-heading);font-size:var(--text-xl);color:#fff;margin-bottom:var(--space-xs)}
+.cl-crosssell-hint{font-size:var(--text-sm);color:rgba(255,255,255,.5)}
 
-.collection-hero .hero-subtitle {
-	font-size: var(--text-xl);
-	font-family: var(--font-accent);
-	margin-bottom: var(--space-2xl);
-	opacity: 0.9;
-	line-height: 1.6;
-	color: var(--silver);
-}
-
-.hero-actions {
-	display: flex;
-	gap: var(--space-md);
-	justify-content: center;
-	flex-wrap: wrap;
-}
-
-.collection-highlights {
-	padding: var(--space-4xl) 0;
-	background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-	color: var(--white);
-}
-
-.highlights-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-	gap: var(--space-2xl);
-}
-
-.highlight-card {
-	text-align: center;
-	padding: var(--space-xl);
-	background: rgba(255, 255, 255, 0.03);
-	border-radius: var(--radius-lg);
-	border: 1px solid rgba(192, 192, 192, 0.2);
-	transition: all var(--transition-luxury);
-}
-
-.highlight-card:hover {
-	transform: translateY(-8px);
-	background: rgba(255, 255, 255, 0.05);
-	border-color: var(--silver);
-	box-shadow: 0 10px 40px rgba(192, 192, 192, 0.1);
-}
-
-.highlight-icon {
-	font-size: 3rem;
-	margin-bottom: var(--space-md);
-}
-
-.highlight-card h3 {
-	color: var(--silver);
-	margin-bottom: var(--space-sm);
-}
-
-.highlight-card p {
-	color: rgba(255, 255, 255, 0.7);
-}
-
-.products-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-	gap: var(--space-2xl);
-	margin-top: var(--space-3xl);
-}
-
-.product-card {
-	background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-	border-radius: var(--radius-lg);
-	overflow: hidden;
-	transition: all var(--transition-luxury);
-	box-shadow: var(--shadow-md);
-	border: 1px solid rgba(192, 192, 192, 0.1);
-}
-
-.product-card:hover {
-	transform: translateY(-12px);
-	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 40px rgba(192, 192, 192, 0.1);
-	border-color: var(--silver);
-}
-
-.product-image {
-	position: relative;
-	width: 100%;
-	height: 350px;
-	overflow: hidden;
-	background: linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 100%);
-}
-
-.product-image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	transition: transform var(--transition-luxury);
-}
-
-.product-card:hover .product-image img {
-	transform: scale(1.1);
-}
-
-.product-badge {
-	position: absolute;
-	top: var(--space-md);
-	right: var(--space-md);
-	padding: var(--space-xs) var(--space-md);
-	background: linear-gradient(135deg, #0a0a0a 0%, var(--silver) 100%);
-	color: var(--white);
-	font-size: var(--text-xs);
-	font-weight: var(--weight-bold);
-	text-transform: uppercase;
-	letter-spacing: 0.1em;
-	border-radius: var(--radius-full);
-	border: 1px solid var(--silver);
-}
-
-.product-content {
-	padding: var(--space-xl);
-	color: var(--white);
-}
-
-.product-title {
-	font-size: var(--text-lg);
-	color: var(--silver);
-	margin-bottom: var(--space-sm);
-}
-
-.product-price {
-	font-size: var(--text-2xl);
-	color: var(--white);
-	font-weight: var(--weight-bold);
-	margin-bottom: var(--space-md);
-}
-
-.text-silver {
-	color: var(--silver);
-}
-
-.bg-dark {
-	background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
-	color: var(--white);
-}
-
-.story-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-	gap: var(--space-4xl);
-	align-items: center;
-}
-
-.story-content .section-title {
-	color: var(--white);
-}
-
-.story-content p {
-	color: rgba(255, 255, 255, 0.8);
-}
-
-.story-features {
-	margin-top: var(--space-2xl);
-	display: grid;
-	gap: var(--space-lg);
-}
-
-.story-features .feature {
-	padding: var(--space-lg);
-	background: rgba(255, 255, 255, 0.03);
-	border-left: 4px solid var(--silver);
-	border-radius: var(--radius-md);
-}
-
-.story-features h4 {
-	color: var(--silver);
-	margin-bottom: var(--space-xs);
-}
-
-.story-features p {
-	color: rgba(255, 255, 255, 0.7);
-	font-size: var(--text-sm);
-}
-
-.three-d-viewer {
-	width: 100%;
-	height: 600px;
-	background: linear-gradient(135deg, #0a0a0a 0%, #2a2a2a 100%);
-	border-radius: var(--radius-lg);
-	margin-top: var(--space-2xl);
-	box-shadow: var(--shadow-xl);
-	border: 2px solid rgba(192, 192, 192, 0.2);
-}
-
-.viewer-placeholder {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	height: 100%;
-	color: var(--silver);
-}
-
-.craft-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-	gap: var(--space-2xl);
-	margin-top: var(--space-2xl);
-}
-
-.craft-card {
-	padding: var(--space-2xl);
-	background: var(--white);
-	border-radius: var(--radius-lg);
-	box-shadow: var(--shadow-md);
-	border-top: 4px solid #0a0a0a;
-	transition: all var(--transition-luxury);
-}
-
-.craft-card:hover {
-	transform: translateY(-8px);
-	box-shadow: var(--shadow-xl);
-}
-
-.craft-card h3 {
-	color: #0a0a0a;
-	margin-bottom: var(--space-md);
-}
-
-.gradient-black-silver {
-	background: linear-gradient(135deg, #0a0a0a 0%, var(--silver) 100%);
-}
-
-.cta-section {
-	padding: var(--space-4xl) var(--space-xl);
-	color: var(--white);
-}
-
-.cta-section .section-title,
-.cta-section .section-subtitle {
-	color: var(--white);
-}
-
-.cta-actions {
-	display: flex;
-	gap: var(--space-lg);
-	justify-content: center;
-	flex-wrap: wrap;
-	margin-top: var(--space-xl);
-}
-
-@media (max-width: 768px) {
-	.collection-hero .hero-title {
-		font-size: var(--text-4xl);
-	}
-
-	.products-grid {
-		grid-template-columns: 1fr;
-	}
-
-	.story-grid {
-		grid-template-columns: 1fr;
-	}
-
-	.three-d-viewer {
-		height: 400px;
-	}
+@media(max-width:768px){
+	.cl-lookbook-grid{grid-template-columns:1fr}
+	.cl-lookbook-tall{grid-row:span 1}
+	.cl-story-grid{grid-template-columns:1fr;gap:var(--space-2xl)}
+	.cl-story-stats{flex-wrap:wrap;gap:var(--space-xl)}
+	.cl-products-grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr))}
+	.cl-crosssell-links{flex-direction:column;align-items:center}
 }
 </style>
 
-<?php
-get_footer();
+<?php get_footer(); ?>
