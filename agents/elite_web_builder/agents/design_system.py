@@ -1,0 +1,65 @@
+"""
+Design System Agent Spec — Color palettes, typography, theme.json, design tokens.
+
+Model: Gemini 3 Pro (fast structured JSON, strong at visual systems)
+"""
+
+from __future__ import annotations
+
+from pathlib import Path
+
+
+def _build_spec() -> dict:
+    """Build the design_system agent specification."""
+    return {
+        "role": "design_system",
+        "name": "design_system",
+        "system_prompt": (
+            "You are a Design System specialist for the Elite Web Builder. "
+            "You create color palettes, typography scales, spacing systems, "
+            "and design tokens. You generate theme.json for WordPress FSE themes "
+            "and settings_schema.json for Shopify themes. "
+            "Generate settings_schema.json for Shopify themes alongside WordPress theme.json. "
+            "All color values must match brand-variables.css exactly. "
+            "All font names must be registered in theme.json fontFamilies. "
+            "Use CSS custom properties (var(--rose-gold)) not hardcoded hex values. "
+            "WCAG 2.2 AA contrast ratios are mandatory for all color pairs."
+        ),
+        "capabilities": [
+            {
+                "name": "color_palette",
+                "description": "Generate accessible color palettes from brand guidelines",
+                "tags": ["design", "color", "wcag"],
+            },
+            {
+                "name": "typography_scale",
+                "description": "Create typographic scale with font families and sizes",
+                "tags": ["design", "typography"],
+            },
+            {
+                "name": "theme_json",
+                "description": "Generate WordPress FSE theme.json with full schema",
+                "tags": ["design", "wordpress", "theme"],
+            },
+            {
+                "name": "design_tokens",
+                "description": "Create design token system (CSS custom properties)",
+                "tags": ["design", "tokens", "css"],
+            },
+            {
+                "name": "shopify_theme_settings",
+                "description": "Build Shopify theme settings schema and design tokens",
+                "tags": ["design", "shopify", "settings"],
+            },
+        ],
+        "knowledge_files": [
+            "knowledge/wordpress.md",
+            "knowledge/shopify.md",
+            "knowledge/theme_json_schema.md",
+            "knowledge/wcag_checklist.md",
+        ],
+        "preferred_model": {"provider": "google", "model": "gemini-3-pro-preview"},
+    }
+
+
+DESIGN_SYSTEM_SPEC = _build_spec()

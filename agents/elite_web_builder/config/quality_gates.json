@@ -1,0 +1,24 @@
+{
+  "gates": {
+    "build":    { "enabled": true, "required": true },
+    "types":    { "enabled": true, "required": true },
+    "lint":     { "enabled": true, "required": true },
+    "tests":    { "enabled": true, "required": true, "min_coverage": 80 },
+    "security": { "enabled": true, "required": true },
+    "a11y":     { "enabled": true, "required": true, "max_violations": 0 },
+    "perf":     { "enabled": true, "required": true, "min_score": 80 },
+    "diff":     { "enabled": true, "required": true }
+  },
+  "self_heal": {
+    "max_attempts": 3,
+    "base_delay_seconds": 2.0
+  },
+  "thresholds": {
+    "contrast_ratio_normal": 4.5,
+    "contrast_ratio_large": 3.0,
+    "pagespeed_mobile": 80,
+    "pagespeed_desktop": 90,
+    "max_file_lines": 800,
+    "min_test_coverage": 80
+  }
+}
