@@ -55,10 +55,10 @@ class SelfHealer:
     @property
     def history(self) -> list[Diagnosis]:
         """
-        Return a shallow copy of the recorded diagnosis history.
+        Shallow copy of the recorded diagnosis history.
         
         Returns:
-            list[Diagnosis]: A new list containing the Diagnosis objects previously recorded by the SelfHealer, preserving insertion order.
+            list[Diagnosis]: A new list containing the recorded Diagnosis objects in insertion order.
         """
         return list(self._history)
 
@@ -117,10 +117,12 @@ class SelfHealer:
 
     async def heal(self, content: str, diagnosis: Diagnosis) -> str:
         """
-        Apply a category-specific repair to the provided content based on the given Diagnosis.
+        Perform a category-specific repair on the provided content according to the given Diagnosis.
+        
+        If the diagnosis is not marked fixable or no healer exists for the diagnosis category, returns the original content unchanged.
         
         Returns:
-        	The transformed content if a category-specific healer was applied and the diagnosis was marked fixable; otherwise the original content.
+            str: The transformed content when a category-specific healer is applied; otherwise the original content.
         """
         logger.info(
             "Healing attempt for %s (gate=%s): %s",
@@ -182,13 +184,13 @@ def _suggest_lint_fix(report: str) -> str:
 
 def _suggest_a11y_fix(report: str) -> str:
     """
-    Suggests an accessibility remediation based on the provided failure report.
+    Produce a short, actionable accessibility suggestion based on a failure report.
     
     Parameters:
-        report (str): Accessibility failure message or linter output used to determine a targeted suggestion.
+        report (str): Accessibility failure message or linter output used to determine the suggestion.
     
     Returns:
-        str: A short, actionable suggestion — recommends adding `alt` text if `alt` is mentioned, `aria-label` if `aria` is mentioned, or a generic accessibility fix otherwise.
+        str: A short, actionable remediation message — e.g., recommending descriptive `alt` attributes, appropriate `aria-label` attributes, or a generic accessibility fix.
     """
     if "alt" in report.lower():
         return "Add descriptive alt attributes to all img tags"
@@ -221,18 +223,18 @@ def _extract_gate_name(report: str) -> str:
 
 def _heal_lint(content: str, diagnosis: Diagnosis) -> str:
     """
-    Apply simple lint-focused transformations to the provided source text.
+    Apply simple lint-focused transformations to the given source text.
     
     Performs non-destructive, pattern-based fixes commonly flagged by linters:
-    - removes top-level `console.log(...)` statements and `debugger` statements
+    - removes top-level `console.log(...)` and `debugger` statements
     - replaces `var` declarations with `const`
     
     Parameters:
         content (str): Source text to transform.
-        diagnosis (Diagnosis): Diagnostic context for the lint issue (not required for the transformations performed).
+        diagnosis (Diagnosis): Diagnostic context related to the lint issue; not required for the transformations.
     
     Returns:
-        str: The transformed source text with the lint fixes applied.
+        str: Transformed source text with the lint fixes applied.
     """
     result = re.sub(r"^\s*console\.log\([^)]*\);?\s*\n?", "", content, flags=re.MULTILINE)
     result = re.sub(r"^\s*debugger;?\s*\n?", "", result, flags=re.MULTILINE)
@@ -242,10 +244,14 @@ def _heal_lint(content: str, diagnosis: Diagnosis) -> str:
 
 def _heal_security(content: str, diagnosis: Diagnosis) -> str:
     """
-    Replace DOM `innerHTML` assignments with `textContent` to reduce XSS risk in the provided content.
+    Replace DOM `innerHTML` assignments with `textContent` to reduce XSS risk.
+    
+    Parameters:
+        content (str): Source text to transform.
+        diagnosis (Diagnosis): Diagnosis that prompted the repair (may be unused).
     
     Returns:
-    	Transformed content with occurrences of `.innerHTML =` replaced by `.textContent =`.
+        str: Content with occurrences of `.innerHTML =` replaced by `.textContent =`.
     """
     result = re.sub(
         r"\.innerHTML\s*=\s*",

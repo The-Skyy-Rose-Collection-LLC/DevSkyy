@@ -37,17 +37,24 @@ class TestSpecStructure:
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_role(self, name, spec):
         """
-        Verify that the spec dictionary contains a "role" key and that its value equals the spec's expected name.
+        Check that the spec defines a "role" field whose value matches the expected name.
         
         Parameters:
-            name (str): Expected role/name key for the spec.
-            spec (dict): Agent specification to validate.
+            name (str): Expected role identifier for the spec.
+            spec (dict): Agent specification dictionary to validate.
         """
         assert "role" in spec, f"{name} missing role"
         assert spec["role"] == name
 
     @pytest.mark.parametrize("name,spec", ALL_SPECS)
     def test_has_name(self, name, spec):
+        """
+        Asserts that the spec contains a "name" field and that it equals the expected name.
+        
+        Parameters:
+            name: The expected name value for the spec.
+            spec: The specification dictionary to validate.
+        """
         assert "name" in spec
         assert spec["name"] == name
 
@@ -106,6 +113,11 @@ class TestKnowledgeFileReferences:
     """Knowledge files referenced by agents exist."""
 
     def test_design_system_knowledge_files_exist(self):
+        """
+        Verify every path listed in DESIGN_SYSTEM_SPEC["knowledge_files"] exists under PACKAGE_ROOT.
+        
+        Asserts that (PACKAGE_ROOT / path).exists() for each listed knowledge file; on failure raises an AssertionError with message "Missing: <path>".
+        """
         for kf in DESIGN_SYSTEM_SPEC["knowledge_files"]:
             assert (PACKAGE_ROOT / kf).exists(), f"Missing: {kf}"
 
@@ -124,9 +136,9 @@ class TestKnowledgeFileReferences:
 
     def test_seo_content_has_knowledge_files(self):
         """
-        Validate that the SEO content agent specification references at least two knowledge files and that each referenced file exists under PACKAGE_ROOT.
+        Ensure the SEO content agent spec lists at least two knowledge files and that each referenced file exists under PACKAGE_ROOT.
         
-        This test asserts the spec contains two or more entries in "knowledge_files" and that every referenced path resolves to an existing file relative to PACKAGE_ROOT.
+        Asserts that SEO_CONTENT_SPEC["knowledge_files"] contains two or more entries and that each path resolves to an existing file relative to PACKAGE_ROOT.
         """
         assert len(SEO_CONTENT_SPEC["knowledge_files"]) >= 2
         for kf in SEO_CONTENT_SPEC["knowledge_files"]:

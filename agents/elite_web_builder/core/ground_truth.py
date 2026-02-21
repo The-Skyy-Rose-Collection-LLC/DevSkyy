@@ -119,13 +119,10 @@ class GroundTruthValidator:
 
     def validate_liquid_syntax(self, content: str) -> tuple[bool, list[str]]:
         """
-        Checks whether Liquid template tags and output tags are balanced.
-        
-        Parameters:
-            content (str): The Liquid template text to validate.
+        Verify that Liquid control tags ({% ... %}) and output tags ({{ ... }}) are balanced in the provided template content.
         
         Returns:
-            tuple[bool, list[str]]: True if all tag pairs are balanced, False otherwise; the list contains human-readable error messages describing any unbalanced tags.
+            tuple[bool, list[str]]: `True` if both control and output tag pairs are balanced, `False` otherwise; the second element is a list of human-readable error messages describing any imbalances.
         """
         errors: list[str] = []
         # Check balanced tags
@@ -145,9 +142,9 @@ class GroundTruthValidator:
 
     def validate_color_hex(self, color: str) -> bool:
         """
-        Determine whether a string is a valid hex color.
+        Check whether a string is a hex color beginning with '#' followed by 3 to 8 hexadecimal digits.
         
         Returns:
-            `true` if the string is a hex color in the form `#` followed by 3–8 hexadecimal digits, `false` otherwise.
+            `true` if the string matches the pattern `#` followed by 3–8 hexadecimal digits, `false` otherwise.
         """
         return bool(re.match(r"^#[0-9a-fA-F]{3,8}$", color))

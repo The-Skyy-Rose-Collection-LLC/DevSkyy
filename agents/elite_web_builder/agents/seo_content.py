@@ -9,16 +9,16 @@ from __future__ import annotations
 
 def _build_spec() -> dict:
     """
-    Build the seo_content agent specification.
+    Builds the SEO content agent specification.
     
     Returns:
-        spec (dict): Specification dictionary with keys:
-            - role: agent role identifier ("seo_content")
-            - name: agent name ("seo_content")
-            - system_prompt: agent system prompt describing responsibilities and constraints
-            - capabilities: list of capability dicts with `name`, `description`, and `tags`
-            - knowledge_files: list of knowledge resource file paths
-            - preferred_model: dict specifying `provider` and `model`
+        spec (dict): Specification dictionary with the following top-level keys:
+            - role (str): Agent role identifier, e.g. "seo_content".
+            - name (str): Agent name, e.g. "seo_content".
+            - system_prompt (str): System prompt describing responsibilities and constraints for the agent.
+            - capabilities (list): List of capability dicts, each containing `name` (str), `description` (str), and `tags` (list of str).
+            - knowledge_files (list): List of knowledge resource file paths (str).
+            - preferred_model (dict): Dict specifying `provider` (str) and `model` (str).
     """
     return {
         "role": "seo_content",

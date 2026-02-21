@@ -61,9 +61,9 @@ class ProviderHealth:
 
     def record_failure(self) -> None:
         """
-        Record a failure occurrence for this provider and update its health metrics.
+        Record a failed request for this provider and update its health metrics.
         
-        Increments consecutive failure and total request/failure counters, updates the last failure timestamp, and sets the provider status to `DEGRADED` when there is at least one consecutive failure or to `DOWN` when there are three or more consecutive failures.
+        Increments `consecutive_failures`, `total_requests`, and `total_failures`, sets `last_failure` to the current timestamp, and updates `status` to `ProviderStatus.DOWN` when `consecutive_failures >= 3` or to `ProviderStatus.DEGRADED` when `consecutive_failures >= 1`.
         """
         self.consecutive_failures += 1
         self.last_failure = time.time()
@@ -111,14 +111,14 @@ class ModelRouter:
         fallbacks: dict[str, dict[str, str]] | None = None,
     ) -> None:
         """
-        Initialize the router with optional routing and fallback configurations and create internal registries.
+        Create a ModelRouter with optional routing and fallback configurations.
         
         Parameters:
-            routing (dict[str, dict[str, str]] | None): Mapping from agent role to routing info (e.g., {'provider': 'openai', 'model': 'gpt-4'}). If None, an empty routing map is used.
-            fallbacks (dict[str, dict[str, str]] | None): Mapping from a primary provider to its fallback info (e.g., {'provider': 'anthropic', 'model': 'claude'}). If None, an empty fallback map is used.
+            routing (dict[str, dict[str, str]] | None): Mapping from agent role to routing info (for example {'provider': 'openai', 'model': 'gpt-4'}). If None, an empty routing map is used.
+            fallbacks (dict[str, dict[str, str]] | None): Mapping from a primary provider to its fallback info (for example {'provider': 'anthropic', 'model': 'claude'}). If None, an empty fallback map is used.
         
         Side effects:
-            Creates empty internal registries:
+            Initializes internal registries:
               - _adapters: maps provider names to their registered ProviderAdapter
               - _health: maps provider names to their ProviderHealth trackers
         """
@@ -140,13 +140,10 @@ class ModelRouter:
 
     def get_adapter(self, provider: str) -> ProviderAdapter | None:
         """
-        Retrieve the registered adapter for the given provider.
-        
-        Parameters:
-            provider (str): Provider identifier to look up.
+        Return the registered adapter for a provider.
         
         Returns:
-            adapter (ProviderAdapter | None): The registered adapter for the provider, or `None` if no adapter is registered.
+            The registered ProviderAdapter for the given provider, or None if no adapter is registered.
         """
         return self._adapters.get(provider)
 
@@ -176,15 +173,10 @@ class ModelRouter:
 
     def get_health(self, provider: str) -> ProviderHealth:
         """
-        Retrieve the health tracker for the named provider, creating and storing one if it does not exist.
-        
-        If the provider has no existing health entry, a new ProviderHealth is initialized, stored in the router's registry, and returned.
-        
-        Parameters:
-            provider (str): Provider identifier.
+        Get the ProviderHealth for the given provider, creating and registering a new ProviderHealth if none exists.
         
         Returns:
-            ProviderHealth: The health record for the specified provider.
+            ProviderHealth: The health tracker registered for the provider.
         """
         if provider not in self._health:
             self._health[provider] = ProviderHealth(provider=provider)
@@ -200,17 +192,17 @@ class ModelRouter:
         max_tokens: int = 4096,
     ) -> LLMResponse:
         """
-        Route a request for the given agent role to the best available LLM provider, using the configured primary provider and an optional fallback.
+        Selects the configured provider for a role and returns its LLM response, falling back to a configured alternative if the primary provider is unavailable or fails.
         
         Parameters:
             role (str): Agent role used to look up routing configuration.
-            prompt (str): Prompt to send to the provider.
-            system_prompt (str): System prompt to include with the request.
+            prompt (str): Prompt text to send to the provider.
+            system_prompt (str): System-level prompt to include with the request.
             temperature (float): Sampling temperature for the model.
             max_tokens (int): Maximum number of tokens to generate.
         
         Returns:
-            LLMResponse: Response returned by the selected provider, including content, provider id, model, latency, and metadata.
+            LLMResponse: The response produced by the selected provider, including content, provider id, model, latency, and metadata.
         
         Raises:
             ValueError: If no routing is configured for the given role.
