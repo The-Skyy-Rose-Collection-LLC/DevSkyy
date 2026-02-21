@@ -86,16 +86,17 @@ class ProviderAdapter(Protocol):
         model: str = "",
         temperature: float = 0.7,
         max_tokens: int = 4096,
-    ) -> LLMResponse: """
+    ) -> LLMResponse:
+        """
         Generate a response from the adapter's provider for the given prompt.
-        
+
         Parameters:
             prompt (str): User-facing input text to generate a response for.
             system_prompt (str): Optional system-level prompt or instructions to influence the response.
             model (str): Provider-specific model identifier to use for generation.
             temperature (float): Sampling temperature controlling randomness (higher is more random).
             max_tokens (int): Maximum number of tokens the provider should generate.
-        
+
         Returns:
             LLMResponse: The provider's response including content, provider identifier, model used, latency_ms, tokens_used, and optional metadata.
         """
