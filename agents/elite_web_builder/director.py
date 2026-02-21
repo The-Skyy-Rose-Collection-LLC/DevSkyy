@@ -110,11 +110,11 @@ class PlanningError(RuntimeError):
 
     def __init__(self, message: str, raw_response: str = "") -> None:
         """
-        Initialize the PlanningError with an error message and the raw planning response.
+        Create a PlanningError that records an error message and the planner's raw response for debugging.
         
         Parameters:
-            message (str): Human-readable error message describing the parsing failure.
-            raw_response (str): The original raw response text from the planner (may contain malformed JSON); stored for debugging.
+            message (str): Human-readable description of the parsing or planning failure.
+            raw_response (str): The original planner output (may contain malformed JSON); stored for debugging.
         """
         super().__init__(message)
         self.raw_response = raw_response
@@ -158,7 +158,10 @@ class AgentRuntime:
 
     def __init__(self, router: ModelRouter) -> None:
         """
-        Create an AgentRuntime that uses the provided ModelRouter to route and execute agent requests.
+        Create an AgentRuntime that routes agent tasks through the provided ModelRouter.
+        
+        Parameters:
+            router (ModelRouter): Router responsible for selecting providers, applying fallbacks, and executing model requests for agent tasks.
         """
         self._router = router
 
@@ -170,10 +173,10 @@ class AgentRuntime:
         story_id: str = "",
     ) -> LLMResponse:
         """
-        Route the given task to the agent described by `spec` and return the model's response.
+        Route the task to the model identified by `spec` and return the model's response.
         
         Returns:
-            LLMResponse: Response produced by the routed model.
+            LLMResponse: The model's response to the routed task.
         """
         role = spec.role.value if isinstance(spec.role, AgentRole) else spec.role
         return await self._router.route(
@@ -310,10 +313,10 @@ class Director:
     @property
     def stories(self) -> dict[str, UserStory]:
         """
-        Return a read-only copy of the director's story mapping keyed by story ID.
+        Get a read-only copy of the director's stories mapping keyed by story ID.
         
         Returns:
-            dict[str, UserStory]: A shallow copy of the internal stories mapping where keys are story IDs and values are UserStory instances.
+            stories (dict[str, UserStory]): A shallow copy of the internal story mapping where keys are story IDs and values are UserStory instances.
         """
         return dict(self._stories)
 
@@ -332,7 +335,14 @@ class Director:
     # -----------------------------------------------------------------
 
     def add_stories(self, stories: list[UserStory]) -> None:
-        """Register stories for execution."""
+        """
+        Register multiple user stories into the director's internal store.
+        
+        Each provided UserStory is stored keyed by its `id` and recorded for later execution.
+        
+        Parameters:
+            stories (list[UserStory]): List of user stories to register.
+        """
         for story in stories:
             self._stories[story.id] = story
             logger.info("Registered story %s: %s", story.id, story.title)
@@ -361,10 +371,10 @@ class Director:
 
     def get_status_summary(self) -> dict[str, int]:
         """
-        Return a mapping of story status values to their counts.
+        Return a count of stories grouped by their status.
         
         Returns:
-            dict[str, int]: A dictionary where each key is a StoryStatus enum value string and each value is the number of stories with that status.
+            dict[str, int]: Mapping from StoryStatus value (string) to the number of stories in that status.
         """
         summary: dict[str, int] = {}
         for story in self._stories.values():
@@ -380,7 +390,10 @@ class Director:
         """
         Execute a UserStory by dispatching its task to the appropriate agent and updating the story's lifecycle.
         
-        This will set the story's status to IN_PROGRESS, run the task through the configured agent runtime, optionally run verification and attempt self-healing if verification fails, and then set the story's final status to GREEN or FAILED while populating `output` and `error` as applicable.
+        May run verification and, if enabled, attempt self-healing; on success the story is marked GREEN, on unrecoverable failures it is marked FAILED. The function mutates the provided story in-place.
+        
+        Parameters:
+            story (UserStory): The story to execute; its `status`, `output`, and `error` fields are updated.
         
         Returns:
             The same UserStory instance updated with final `status`, `output`, and `error`.
@@ -534,13 +547,16 @@ class Director:
 
     async def _plan_stories(self, prd_text: str) -> PRDBreakdown:
         """
-        Decompose a product requirements document (PRD) into a PRDBreakdown of user stories.
+        Decompose a product requirements document (PRD) into a PRDBreakdown of validated user stories and their dependency order.
         
         Parameters:
             prd_text (str): The PRD content to decompose.
         
         Returns:
-            PRDBreakdown: Parsed and validated breakdown containing the list of user stories and their dependency order.
+            PRDBreakdown: Parsed and validated breakdown containing the list of user stories and the dependency_order.
+        
+        Raises:
+            PlanningError: If the planner's response cannot be parsed or the breakdown is invalid.
         """
         prompt = _PLANNING_PROMPT_TEMPLATE.format(
             max_stories=self._config.max_stories,
@@ -560,12 +576,15 @@ class Director:
 
     async def execute_prd(self, prd_text: str) -> ProjectReport:
         """
-        Run a full PRD lifecycle: decompose the PRD into user stories, register them, execute stories in dependency order, and produce a final ProjectReport.
+        Execute a full PRD lifecycle and produce a ProjectReport.
         
-        On planning failures the function returns a ProjectReport describing the failure instead of raising.
+        Decomposes the provided PRD text into user stories, registers them, executes stories in dependency order, and aggregates results into a final report. If planning fails, the method returns a ProjectReport describing the failure instead of raising.
+        
+        Parameters:
+            prd_text (str): PRD content to decompose into user stories.
         
         Returns:
-            ProjectReport: Immutable report containing all executed stories, a status summary, whether all stories are green, elapsed time in milliseconds, any failures encountered, and the number of learning journal entries added during execution.
+            ProjectReport: Immutable report summarizing all registered stories, a status summary, an `all_green` flag indicating whether every story reached GREEN, elapsed time in milliseconds, any failures encountered, and the number of new learning-journal entries created during execution.
         """
         start = time.time()
         failures: list[str] = []

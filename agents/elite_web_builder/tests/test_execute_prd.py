@@ -42,22 +42,18 @@ def _make_planning_json(
     roles: list[str] | None = None,
 ) -> str:
     """
-    Create a planning JSON string containing a list of user stories and their dependency order.
+    Generate a JSON string describing a set of user stories and their dependency order.
+    
+    Each story object contains id, title, description, agent_role, depends_on, and acceptance_criteria.
     
     Parameters:
-        num_stories (int): Number of user stories to generate.
-        roles (list[str] | None): List of agent role names to assign to stories; roles are assigned cyclically. If None, defaults to ["design_system", "frontend_dev", "backend_dev"].
+        num_stories (int): Number of stories to generate (default 3).
+        roles (list[str] | None): Role names assigned cyclically to stories. If None, defaults to ["design_system", "frontend_dev", "backend_dev"].
     
     Returns:
-        str: JSON-formatted string with two keys:
-            - "stories": list of story objects, each containing:
-                - "id": story id in the form "US-###" (zero-padded).
-                - "title": story title.
-                - "description": story description.
-                - "agent_role": assigned role name.
-                - "depends_on": list of prerequisite story ids.
-                - "acceptance_criteria": list of acceptance criteria strings.
-            - "dependency_order": list of story ids in the generated order.
+        str: JSON string with two keys:
+            - "stories": list of story objects as described above.
+            - "dependency_order": list of story ids in generation order.
     """
     roles = roles or ["design_system", "frontend_dev", "backend_dev"]
     stories = []
@@ -133,17 +129,17 @@ def _make_director_with_mock(planning_response: str = "", story_response: str = 
 
     async def mock_generate(prompt, *, system_prompt="", model="", temperature=0.7, max_tokens=4096):
         """
-        Mock async generate function that returns a planning response on the first call and story responses on subsequent calls.
+        Return a mocked LLM response: the first invocation returns the planning response and subsequent invocations return the per-story response.
         
         Parameters:
         	prompt (str): The prompt sent to the model.
-        	system_prompt (str): Optional system prompt (accepted but not used by the mock).
-        	model (str): Optional model identifier (accepted but not used by the mock).
-        	temperature (float): Optional sampling temperature (accepted but not used by the mock).
-        	max_tokens (int): Optional token limit (accepted but not used by the mock).
+        	system_prompt (str): Accepted but ignored by the mock.
+        	model (str): Accepted but ignored by the mock.
+        	temperature (float): Accepted but ignored by the mock.
+        	max_tokens (int): Accepted but ignored by the mock.
         
         Returns:
-        	LLMResponse: An LLMResponse containing `original_content` on the first invocation and `story_response` on subsequent invocations.
+        	LLMResponse: The planning response on the first call, the story response on subsequent calls.
         
         Notes:
         	Increments the enclosing `call_count` nonlocal variable on each invocation.
@@ -350,14 +346,14 @@ class TestPlanStories:
 
         async def capture_generate(prompt, **kwargs):
             """
-            Capture the provided prompt into the enclosing scope and return a canned planning LLMResponse.
+            Capture the prompt in the enclosing scope and produce a canned planning LLMResponse.
             
             Parameters:
-                prompt (str): The prompt text passed to the model; stored into the outer-scope variable `captured_prompt`.
-                **kwargs: Additional keyword arguments accepted by the call and ignored by this test helper.
+                prompt (str): Prompt text passed to the model; stored into the outer-scope variable `captured_prompt`.
+                **kwargs: Additional keyword arguments accepted and ignored by this test helper.
             
             Returns:
-                LLMResponse: A fabricated response with content set to `planning_json`, provider `"test"`, model `"test"`, and latency_ms `50`.
+                LLMResponse: Response whose `content` is `planning_json`, `provider` is "test", `model` is "test", and `latency_ms` is 50.
             """
             nonlocal captured_prompt
             captured_prompt = prompt
@@ -373,6 +369,17 @@ class TestPlanStories:
 
     @pytest.mark.asyncio
     async def test_uses_director_spec(self):
+        """
+        Capture the system-level prompt and return a canned LLMResponse containing the provided planning JSON.
+        
+        Parameters:
+            prompt (str): The user prompt passed to the generator.
+            system_prompt (str): The system-level prompt; its value is saved to the outer-scope variable `captured_system_prompt`.
+            **kwargs: Additional keyword arguments are accepted and ignored.
+        
+        Returns:
+            LLMResponse: Response with `content` equal to the planning JSON, `provider` and `model` set to "test", and `latency_ms` set to 50.
+        """
         planning_json = _make_planning_json(1, roles=["qa"])
         router = ModelRouter(
             routing={"director": {"provider": "test", "model": "test"}},
@@ -383,15 +390,15 @@ class TestPlanStories:
 
         async def capture_generate(prompt, *, system_prompt="", **kwargs):
             """
-            Capture the provided system prompt and return a canned LLMResponse for testing.
+            Capture the provided system prompt into an outer-scope variable and return a canned planning response for tests.
             
             Parameters:
-                prompt (str): The user prompt passed to the generator.
-                system_prompt (str): The system-level prompt; its value is saved to the outer-scope variable `captured_system_prompt`.
+                prompt (str): The user prompt passed to the generator (not used by this helper).
+                system_prompt (str): The system-level prompt to capture into the outer-scope variable `captured_system_prompt`.
                 **kwargs: Additional keyword arguments are accepted and ignored.
             
             Returns:
-                LLMResponse: A response with `content` set to the test planning JSON, `provider` and `model` set to "test", and `latency_ms` equal to 50.
+                LLMResponse: An LLMResponse whose `content` is the test planning JSON, `provider` and `model` are "test", and `latency_ms` is 50.
             """
             nonlocal captured_system_prompt
             captured_system_prompt = system_prompt
@@ -462,17 +469,17 @@ class TestExecutePrd:
 
         async def mock_generate(prompt, **kwargs):
             """
-            Return a canned LLMResponse that yields a planning JSON on the first invocation and "OK" on subsequent invocations.
+            Provide canned LLMResponse values: on first invocation return the planning JSON, on subsequent invocations return "OK".
             
             Parameters:
-            	prompt (Any): The prompt passed to the mock; its value is not inspected by the mock.
-            	**kwargs: Ignored; present for compatibility with the real adapter signature.
+                prompt (Any): Ignored input prompt.
+                **kwargs: Ignored; present for compatibility with the adapter signature.
             
             Returns:
-            	LLMResponse: On the first call, an LLMResponse whose `content` is the `planning_json` variable; on later calls, an LLMResponse whose `content` is "OK". In both cases `provider` is "test", `model` is "test", and `latency_ms` is 50.
+                LLMResponse: On the first call `content` equals the outer-scope `planning_json`; on later calls `content` is "OK". In both cases `provider` is "test", `model` is "test", and `latency_ms` is 50.
             
-            Side effects:
-            	Increments the outer-scope `call_count` on each invocation to track call order.
+            Notes:
+                Increments the outer-scope `call_count` on each invocation to track call order.
             """
             nonlocal call_count
             call_count += 1
@@ -520,6 +527,11 @@ class TestExecutePrd:
 
     @pytest.mark.asyncio
     async def test_instincts_count(self):
+        """
+        Verifies that executing a PRD with a LearningJournal and mocked model responses records zero instincts learned.
+        
+        Sets up a Director with a test ModelRouter and an adapter that returns a planning JSON on the first call and a generic success thereafter, then runs execute_prd and asserts report.instincts_learned == 0.
+        """
         planning_json = _make_planning_json(1, roles=["qa"])
         journal = LearningJournal()
         router = ModelRouter(

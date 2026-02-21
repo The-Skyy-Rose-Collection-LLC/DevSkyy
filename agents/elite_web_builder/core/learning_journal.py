@@ -29,10 +29,10 @@ class LearningEntry:
 
     def to_rule(self) -> str:
         """
-        Create a single-line rule string encoding the mistake and its correction for agent prompt injection.
+        Encode the entry as a single-line rule string for prompt injection.
         
         Returns:
-            rule (str): A formatted rule in the form "RULE: Do NOT {mistake}. INSTEAD: {correct}".
+            A single-line rule string in the format "RULE: Do NOT {mistake}. INSTEAD: {correct}".
         """
         return f"RULE: Do NOT {self.mistake}. INSTEAD: {self.correct}"
 
@@ -42,10 +42,10 @@ class LearningJournal:
 
     def __init__(self, path: Path | None = None) -> None:
         """
-        Initialize the LearningJournal and optionally load existing entries from disk.
+        Create a LearningJournal and optionally load persisted entries from a JSON file.
         
         Parameters:
-            path (Path | None): Filesystem path for persisting and loading journal data. If provided and the file exists, entries are loaded from that JSON file; if None, the journal operates in-memory only.
+            path (Path | None): Filesystem path used for persistence. If provided and the file exists, entries are loaded from that JSON file; if None, the journal remains in-memory only.
         """
         self._path = path
         self._entries: list[LearningEntry] = []
@@ -55,10 +55,10 @@ class LearningJournal:
     @property
     def entries(self) -> list[LearningEntry]:
         """
-        Provide a read-only copy of the stored learning entries.
+        Return a shallow copy of the journal's stored LearningEntry objects.
         
         Returns:
-            list[LearningEntry]: A new list containing the current LearningEntry objects; modifying this list does not alter the journal's internal entries.
+            list[LearningEntry]: A new list containing the current entries; modifying the returned list does not affect the journal's internal entries.
         """
         return list(self._entries)
 
@@ -112,9 +112,9 @@ class LearningJournal:
 
     def _save(self) -> None:
         """
-        Persist current entries to the configured JSON file path.
+        Persist the journal's entries to the configured JSON file.
         
-        Serializes the internal entries list to a JSON object with an "entries" key (each entry converted via dataclass asdict), ensures parent directories exist, and writes formatted JSON to the configured path, overwriting any existing file.
+        Serializes the journal's entries into a JSON object under the "entries" key and writes it to the configured path, creating parent directories as needed and replacing any existing file.
         """
         data = {"entries": [asdict(e) for e in self._entries]}
         self._path.parent.mkdir(parents=True, exist_ok=True)

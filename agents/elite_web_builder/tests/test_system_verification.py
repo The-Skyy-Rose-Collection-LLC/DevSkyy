@@ -72,6 +72,11 @@ class TestFileCompleteness:
     """All expected files exist and meet size constraints."""
 
     def test_director_exists(self):
+        """
+        Checks that director.py exists at the repository root.
+        
+        Asserts that PACKAGE_ROOT contains a file named "director.py".
+        """
         assert (PACKAGE_ROOT / "director.py").exists()
 
     def test_main_exists(self):
@@ -96,6 +101,15 @@ class TestFileCompleteness:
 
     @pytest.mark.parametrize("path", EXPECTED_KNOWLEDGE_FILES)
     def test_knowledge_file_exists(self, path):
+        """
+        Verify that a knowledge file exists at PACKAGE_ROOT joined with the given relative path.
+        
+        Parameters:
+            path (str | pathlib.Path): Relative path to the knowledge file within the package.
+        
+        Raises:
+            AssertionError: If the resolved file does not exist.
+        """
         assert (PACKAGE_ROOT / path).exists(), f"Missing knowledge file: {path}"
 
     @pytest.mark.parametrize("path", EXPECTED_CONFIG_FILES)
@@ -109,7 +123,11 @@ class TestFileCompleteness:
         assert (PACKAGE_ROOT / path).exists(), f"Missing config file: {path}"
 
     def test_no_file_exceeds_max_lines(self):
-        """No Python file exceeds the 800-line limit."""
+        """
+        Assert that no Python file under PACKAGE_ROOT (recursively) exceeds MAX_FILE_LINES.
+        
+        Scans all `.py` files under PACKAGE_ROOT (excluding paths containing `__pycache__`) and fails with a list of files and their line counts if any file has more than MAX_FILE_LINES lines.
+        """
         violations = []
         for py_file in PACKAGE_ROOT.rglob("*.py"):
             if "__pycache__" in str(py_file):
@@ -143,6 +161,9 @@ class TestImportIntegrity:
     """All imports resolve without errors."""
 
     def test_director_imports(self):
+        """
+        Verify that the elite_web_builder.director module exports the expected public types and symbols and that they are importable.
+        """
         from elite_web_builder.director import (
             AgentRole,
             AgentRuntime,
@@ -233,6 +254,12 @@ class TestInterfaceContracts:
         assert inspect.iscoroutinefunction(Director.run_story)
 
     def test_project_report_is_frozen(self):
+        """
+        Assert that ProjectReport instances are immutable (frozen); attempting to modify any field raises a FrozenInstanceError.
+        
+        Raises:
+            FrozenInstanceError: when assigning to a field on a frozen ProjectReport instance.
+        """
         from elite_web_builder.director import ProjectReport
         report = ProjectReport(
             stories=(),
@@ -246,6 +273,11 @@ class TestInterfaceContracts:
             report.all_green = False  # type: ignore[misc]
 
     def test_project_report_has_all_fields(self):
+        """
+        Verify that the ProjectReport dataclass defines the exact set of expected fields.
+        
+        Asserts that the dataclass fields are exactly: "stories", "status_summary", "all_green", "elapsed_ms", "failures", and "instincts_learned".
+        """
         from elite_web_builder.director import ProjectReport
         import dataclasses
         fields = {f.name for f in dataclasses.fields(ProjectReport)}
@@ -286,6 +318,11 @@ class TestInterfaceContracts:
         assert set(routing.keys()) == expected_roles
 
     def test_default_routing_has_4_fallbacks(self):
+        """
+        Verify the default routing configuration defines exactly four fallback providers: "anthropic", "google", "openai", and "xai".
+        
+        Asserts that the "_DEFAULT_ROUTING" value for "fallbacks" has length 4 and its keys match the expected provider set.
+        """
         from elite_web_builder.director import _DEFAULT_ROUTING
         fallbacks = _DEFAULT_ROUTING["fallbacks"]
         assert len(fallbacks) == 4
@@ -331,9 +368,9 @@ class TestEndToEndSmoke:
     @pytest.mark.asyncio
     async def test_minimal_3_story_prd(self):
         """
-        Execute a minimal three-story PRD through the Director using a mocked model router and assert successful end-to-end behavior.
+        Run a minimal three-story PRD through Director with a mocked ModelRouter and verify successful end-to-end execution.
         
-        The test supplies a PRD that defines three dependent stories and registers a mock LLM adapter that returns planning JSON on the first call and successful completion text on subsequent calls. It asserts the resulting ProjectReport contains three stories, all_green is True, the green count equals 3, elapsed_ms is positive, and there are no failures.
+        Provides a PRD containing three dependent stories, registers a mock LLM adapter that returns planning JSON on the first call and completion text on subsequent calls, executes the PRD, and asserts the resulting ProjectReport contains three stories, all are green (green count == 3), elapsed_ms is greater than zero, and there are no failures.
         """
         from elite_web_builder.director import Director, DirectorConfig
         from elite_web_builder.core.model_router import LLMResponse, ModelRouter

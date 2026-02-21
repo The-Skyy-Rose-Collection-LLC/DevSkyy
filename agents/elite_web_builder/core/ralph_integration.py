@@ -29,12 +29,12 @@ class RalphExecutor:
         max_delay: float = 30.0,
     ) -> None:
         """
-        Initialize the executor's retry and exponential-backoff configuration.
+        Configure retry and exponential-backoff behavior for the executor.
         
         Parameters:
-            max_attempts (int): Maximum number of attempts for the primary operation.
-            base_delay (float): Base delay in seconds used to compute exponential backoff between retries.
-            max_delay (float): Maximum delay in seconds to cap the backoff.
+            max_attempts (int): Maximum number of attempts to try the primary operation before trying fallbacks or failing.
+            base_delay (float): Base delay in seconds used to compute exponential backoff between retry attempts.
+            max_delay (float): Maximum delay in seconds to cap the computed backoff.
         """
         self._max_attempts = max_attempts
         self._base_delay = base_delay

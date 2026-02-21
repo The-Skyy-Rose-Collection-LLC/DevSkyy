@@ -58,25 +58,30 @@ class VerificationResult:
     @property
     def all_green(self) -> bool:
         """
-        Determine whether every recorded gate has status PASSED.
+        Check whether all recorded gates have status PASSED.
         
         Returns:
-            True if every gate status is GateStatus.PASSED, False otherwise.
+            `true` if every gate has status `GateStatus.PASSED`, `false` otherwise.
         """
         return all(g.status == GateStatus.PASSED for g in self.gates)
 
     @property
     def failures(self) -> list[GateResult]:
-        """List of failed gates."""
+        """
+        List GateResult entries whose status is GateStatus.FAILED.
+        
+        Returns:
+            list[GateResult]: Failed gate results, empty if there are none.
+        """
         return [g for g in self.gates if g.status == GateStatus.FAILED]
 
     @property
     def summary(self) -> dict[str, int]:
         """
-        Produce a mapping from gate status names to their occurrence counts.
+        Map gate status names to counts of gates with each status.
         
         Returns:
-            summary (dict[str, int]): Mapping where keys are gate status strings (e.g., "passed", "failed", "skipped") and values are the number of gates with that status.
+            summary (dict[str, int]): Mapping from status string (e.g., "passed", "failed", "skipped") to the number of gates with that status.
         """
         result: dict[str, int] = {}
         for gate in self.gates:
@@ -114,9 +119,14 @@ def _extract_code_blocks(content: str) -> list[tuple[str, str]]:
 
 def _check_build(content: str, context: dict) -> GateResult:
     """
-    Validate that fenced code blocks parse without syntax or basic structural errors.
+    Validate fenced code blocks for basic syntax and structural correctness.
     
-    Checks Python (python/py/empty), JSON, and HTML-like (html/liquid/php) fenced blocks. Returns a GateResult with status `FAILED` and `details` listing errors when parsing or structural issues are found; returns a `PASSED` GateResult with a summary message when all checked blocks are valid. If no code blocks are present, returns a `PASSED` GateResult with message "No code blocks to validate".
+    Parameters:
+        content (str): Markdown-like text containing fenced code blocks to validate.
+        context (dict): Optional context used by the verification pipeline (not required for this check).
+    
+    Returns:
+        GateResult: A result for the BUILD gate. `status` is `PASSED` when no parse or structural errors are found (or when no code blocks are present), and `FAILED` when one or more errors are detected; on failure `details["errors"]` lists the detected issues.
     """
     blocks = _extract_code_blocks(content)
     if not blocks:
@@ -264,14 +274,16 @@ def _check_lint(content: str, context: dict) -> GateResult:
 
 def _check_tests(content: str, context: dict) -> GateResult:
     """
-    Check for the presence of test code when implementation code appears in fenced code blocks.
+    Detects whether implementation code appears in fenced code blocks without accompanying tests.
+    
+    Scans extracted code blocks for implementation indicators (function or class definitions) and for common test indicators; treats Python and JavaScript/TypeScript blocks specially.
     
     Parameters:
         content (str): Text containing fenced code blocks to analyze.
-        context (dict): Optional runtime/contextual data (not used by this check).
+        context (dict): Optional runtime/contextual data (ignored by this check).
     
     Returns:
-        GateResult: Result for the TESTS gate — `status` is `FAILED` if implementation code is detected without accompanying tests, otherwise `PASSED`. 
+        GateResult: Result for the TESTS gate — `status` is `FAILED` if implementation code is detected without accompanying tests, `PASSED` otherwise.
     """
     blocks = _extract_code_blocks(content)
     if not blocks:
@@ -329,9 +341,9 @@ _INJECTION_PATTERNS: list[tuple[str, str]] = [
 
 def _check_security(content: str, context: dict) -> GateResult:
     """
-    Scan content for exposed secrets and injection vulnerabilities.
+    Scan the content for exposed secrets and code injection risks.
     
-    Searches the full content for secret patterns and inspects fenced code blocks for injection patterns. Each finding is reported as a string prefixed with `SECRET:` or `INJECTION:` and collected in the result details.
+    Searches the entire content for secret patterns and inspects fenced code blocks for injection patterns. Findings are collected in details["findings"] as strings prefixed with "SECRET:" or "INJECTION:".
     
     Returns:
         GateResult: `FAILED` with details {"findings": [...]} when any issues are found, `PASSED` with message "Security scan clean" otherwise.
@@ -428,12 +440,12 @@ _PERF_PATTERNS: list[tuple[str, str]] = [
 
 def _check_perf(content: str, context: dict) -> GateResult:
     """
-    Scan extracted fenced code blocks for known performance anti-patterns and report any findings for the PERF gate.
+    Detects performance anti-patterns in fenced code blocks and reports results for the PERF gate.
     
-    If no fenced code blocks are present, the gate passes with message "No code blocks to check". If pattern matches are found, the gate fails and includes a details dict with an "issues" list describing each matched anti-pattern; otherwise the gate passes with "Performance checks passed".
+    If no fenced code blocks are present the gate passes with the message "No code blocks to check". If any configured performance patterns are matched the gate fails and the result's details contain an "issues" list with human-readable descriptions of each finding; otherwise the gate passes with the message "Performance checks passed".
     
     Returns:
-        GateResult: Result for the PERF gate. `status` is `GateStatus.FAILED` if any issues were found (details contains "issues"), otherwise `GateStatus.PASSED`.
+        GateResult: Result for the PERF gate. `status` is `GateStatus.FAILED` if any issues were found (details contains an "issues" list), otherwise `GateStatus.PASSED`.
     """
     blocks = _extract_code_blocks(content)
     if not blocks:
@@ -545,7 +557,13 @@ class VerificationLoop:
         self._load_config()
 
     def _load_config(self) -> None:
-        """Load per-gate config from the config dict."""
+        """
+        Populate internal per-gate configurations from the instance config.
+        
+        Reads the "gates" mapping from self._config (if present) and sets self._gate_configs[gate_name]
+        for every GateName value. For each gate, uses the provided "enabled" and "required" boolean flags
+        when present; defaults to True for either flag if omitted.
+        """
         gates_raw = self._config.get("gates", {})
         for gate_name in GateName:
             raw = gates_raw.get(gate_name.value, {})
@@ -556,13 +574,13 @@ class VerificationLoop:
 
     def get_gate_config(self, gate: str) -> GateConfig:
         """
-        Retrieve configuration for a named gate.
+        Retrieve the configuration for a specified gate.
         
         Parameters:
-        	gate (str): Gate name (for example "build", "lint", "security").
+        	gate (str): Gate identifier (should match a GateName value or the key used in the configuration).
         
         Returns:
-        	GateConfig: The configuration for the requested gate; returns a default GateConfig with enabled=True and required=True when no specific configuration exists.
+        	GateConfig: The configuration for the requested gate. If no specific configuration exists, returns a default GateConfig(enabled=True, required=True).
         """
         return self._gate_configs.get(gate, GateConfig())
 

@@ -75,14 +75,14 @@ def _build_parser() -> argparse.ArgumentParser:
 
 def _load_prd(args: argparse.Namespace) -> str:
     """
-    Load and return the product requirements document (PRD) text from parsed CLI arguments.
+    Retrieve the product requirements document (PRD) text from parsed CLI arguments.
     
-    If args.file is provided, the function reads and returns the file's contents; otherwise it returns the inline PRD string from args.prd.
+    If args.file is provided, read and return its contents; if the file does not exist, print an error to stderr and exit with code 1. Otherwise return the inline PRD string from args.prd.
     
     Parameters:
         args (argparse.Namespace): Parsed CLI arguments. Expected attributes:
-            - file (pathlib.Path | None): Optional path to a PRD file.
-            - prd (str): Inline PRD text provided on the command line.
+            file (pathlib.Path | None): Optional path to a PRD file.
+            prd (str): Inline PRD text provided on the command line.
     
     Returns:
         str: The PRD text to be processed.
@@ -136,12 +136,23 @@ def _print_report(report: object) -> None:
 
 async def _run(args: argparse.Namespace) -> int:
     """
-    Orchestrates the CLI workflow: load PRD text, construct the Director, and perform either a dry-run planning pass or full execution.
+    Orchestrates the CLI workflow to plan or execute a product requirement document (PRD).
     
-    When args.dry_run is set, prints a planned story breakdown and returns 0 on success or 1 if planning fails. In full execution mode, runs the director, prints the resulting report, and returns 0 if the report indicates all stories succeeded, otherwise 1.
+    Performs these high-level steps based on the parsed CLI arguments:
+    - Loads PRD text from args (inline or file).
+    - Constructs a Director configured with args.max_stories and optional routing config.
+    - If args.dry_run is true, produces and prints a planned story breakdown; on planning failure prints an error to stderr and returns a failure code.
+    - If not a dry run, executes the PRD via the Director and prints a human-readable report.
+    
+    Parameters:
+        args (argparse.Namespace): Parsed CLI arguments. Expected attributes include:
+            - prd or file: PRD text or path to a PRD file.
+            - dry_run (bool): If true, perform planning only.
+            - config (Path|str|None): Optional routing config path.
+            - max_stories (int): Maximum number of stories to generate.
     
     Returns:
-        int: Exit code (0 for success, 1 for failure).
+        int: Exit code — `0` when planning succeeds (dry run) or when execution completes with all stories succeeded; `1` otherwise.
     """
     prd_text = _load_prd(args)
 
@@ -180,7 +191,11 @@ async def _run(args: argparse.Namespace) -> int:
 
 
 def main() -> None:
-    """CLI entry point."""
+    """
+    Start the CLI: parse command-line arguments, run the async workflow, and exit with its result code.
+    
+    Parses argv using the module parser, executes the coroutine that plans or runs the PRD, and terminates the process with the returned exit code.
+    """
     parser = _build_parser()
     args = parser.parse_args()
     exit_code = asyncio.run(_run(args))

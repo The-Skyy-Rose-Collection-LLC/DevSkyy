@@ -58,14 +58,15 @@ def _make_story(
 
 def _make_router_with_mock(content: str = "OK") -> ModelRouter:
     """
-    Create a ModelRouter configured with a mocked adapter that returns a preset LLMResponse.
+    Builds a ModelRouter with a mocked adapter that returns a preset LLMResponse.
     
     Parameters:
-        content (str): The text content the mock adapter's LLMResponse will contain.
+        content (str): Text to use as the `content` field of the mocked LLMResponse.
     
     Returns:
-        ModelRouter: A router with an AsyncMock adapter registered for providers
-        "anthropic", "google", "openai", and "xai" that yields an LLMResponse with the given content.
+        ModelRouter: A router configured with the default routing and fallbacks and an AsyncMock adapter
+        registered for providers "anthropic", "google", "openai", and "xai" whose `generate` method
+        yields an LLMResponse containing `content`.
     """
     router = ModelRouter(
         routing=_DEFAULT_ROUTING["routing"],

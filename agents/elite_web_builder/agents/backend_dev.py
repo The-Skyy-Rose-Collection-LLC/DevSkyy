@@ -8,7 +8,18 @@ from __future__ import annotations
 
 
 def _build_spec() -> dict:
-    """Build the backend_dev agent specification."""
+    """
+    Constructs the backend_dev agent specification used by the Elite Web Builder.
+    
+    Returns:
+        spec (dict): A mapping containing the agent specification with the following top-level keys:
+            - role (str): Agent role identifier.
+            - name (str): Agent name.
+            - system_prompt (str): System prompt describing capabilities, constraints, and integration notes.
+            - capabilities (List[dict]): Capability entries, each with `name` (str), `description` (str), and `tags` (List[str]).
+            - knowledge_files (List[str]): Paths to knowledge resources the agent may reference.
+            - preferred_model (dict): Model preference with `provider` (str) and `model` (str).
+    """
     return {
         "role": "backend_dev",
         "name": "backend_dev",

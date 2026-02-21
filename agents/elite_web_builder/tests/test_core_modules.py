@@ -503,10 +503,10 @@ class TestRalphExecutor:
 
         async def success():
             """
-            Return a successful result indicator.
+            Return a success indicator.
             
             Returns:
-                'result' — a success indicator string.
+                str: The literal string 'result' indicating success.
             """
             return "result"
 
@@ -520,13 +520,13 @@ class TestRalphExecutor:
 
         async def flaky():
             """
-            Simulates a flaky operation that fails on the first two invocations and succeeds thereafter.
+            Simulate a flaky operation that fails twice before succeeding.
             
             Returns:
-                str: "'success' once the function has been called three or more times."
+                str: "success" once the function has been called three or more times.
             
             Raises:
-                RuntimeError: If called fewer than three times.
+                RuntimeError: If invoked fewer than three times.
             """
             nonlocal call_count
             call_count += 1
@@ -569,10 +569,10 @@ class TestRalphExecutor:
 
         async def fallback():
             """
-            Provide a fallback result string.
+            Provide a default fallback result string.
             
             Returns:
-                str: The fallback result string "fallback result".
+                The string "fallback result".
             """
             return "fallback result"
 
@@ -587,6 +587,13 @@ class TestRalphExecutor:
 
 class TestProviderHealth:
     def test_initial_healthy(self):
+        """
+        Verifies that a newly created ProviderHealth has status ProviderStatus.HEALTHY and zero consecutive failures.
+        
+        Asserts that:
+        - `status` equals `ProviderStatus.HEALTHY`
+        - `consecutive_failures` equals 0
+        """
         health = ProviderHealth(provider="test")
         assert health.status == ProviderStatus.HEALTHY
         assert health.consecutive_failures == 0
