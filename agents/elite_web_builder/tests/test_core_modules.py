@@ -61,6 +61,8 @@ class TestGroundTruthValidator:
         v = GroundTruthValidator()
         assert v.validate_color_hex("B76E79") is False  # Missing #
         assert v.validate_color_hex("#GGG") is False  # Invalid chars
+        assert v.validate_color_hex("#12345") is False  # 5 digits — invalid length
+        assert v.validate_color_hex("#1234567") is False  # 7 digits — invalid length
 
     def test_validate_theme_json_valid(self):
         v = GroundTruthValidator()
@@ -340,6 +342,21 @@ class TestVerificationLoop:
         assert result.all_green is False
         assert len(result.failures) == 1
         assert result.summary == {"passed": 1, "failed": 1}
+
+    def test_all_green_with_skipped_gates(self):
+        result = VerificationResult(gates=[
+            GateResult(gate="build", status=GateStatus.PASSED),
+            GateResult(gate="lint", status=GateStatus.SKIPPED),
+            GateResult(gate="tests", status=GateStatus.PASSED),
+        ])
+        assert result.all_green is True
+
+    def test_all_green_false_with_failed_and_skipped(self):
+        result = VerificationResult(gates=[
+            GateResult(gate="build", status=GateStatus.FAILED),
+            GateResult(gate="lint", status=GateStatus.SKIPPED),
+        ])
+        assert result.all_green is False
 
     # ── BUILD gate ──
 
