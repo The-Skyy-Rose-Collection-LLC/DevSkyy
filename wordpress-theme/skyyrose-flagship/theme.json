@@ -400,7 +400,7 @@
 	],
 	"customTemplates": [
 		{
-			"name": "template-love-hurts",
+			"name": "template-immersive-love-hurts",
 			"title": "Love Hurts Collection - Enchanted Ballroom",
 			"postTypes": ["page"]
 		},
