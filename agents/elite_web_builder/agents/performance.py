@@ -8,7 +8,18 @@ from __future__ import annotations
 
 
 def _build_spec() -> dict:
-    """Build the performance agent specification."""
+    """
+    Constructs the performance agent specification for Core Web Vitals, asset optimization, and caching.
+    
+    Returns:
+        spec (dict): A dictionary containing the agent configuration with keys:
+            - role: agent role identifier (e.g., "performance")
+            - name: agent name
+            - system_prompt: human-readable prompt describing optimization goals and targets
+            - capabilities: list of capability dictionaries (each with `name`, `description`, and `tags`)
+            - knowledge_files: list of related knowledge file paths
+            - preferred_model: dictionary specifying `provider` and `model`
+    """
     return {
         "role": "performance",
         "name": "performance",

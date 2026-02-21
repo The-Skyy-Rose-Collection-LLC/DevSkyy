@@ -28,7 +28,12 @@ class LearningEntry:
     confidence: float = 0.9
 
     def to_rule(self) -> str:
-        """Format as a rule string for injection into agent prompts."""
+        """
+        Create a single-line rule string encoding the mistake and its correction for agent prompt injection.
+        
+        Returns:
+            rule (str): A formatted rule in the form "RULE: Do NOT {mistake}. INSTEAD: {correct}".
+        """
         return f"RULE: Do NOT {self.mistake}. INSTEAD: {self.correct}"
 
 
@@ -36,6 +41,12 @@ class LearningJournal:
     """Accumulates mistake→rule pairs and persists to JSON."""
 
     def __init__(self, path: Path | None = None) -> None:
+        """
+        Initialize the LearningJournal and optionally load existing entries from disk.
+        
+        Parameters:
+            path (Path | None): Filesystem path for persisting and loading journal data. If provided and the file exists, entries are loaded from that JSON file; if None, the journal operates in-memory only.
+        """
         self._path = path
         self._entries: list[LearningEntry] = []
         if self._path and self._path.exists():
@@ -43,11 +54,23 @@ class LearningJournal:
 
     @property
     def entries(self) -> list[LearningEntry]:
-        """Read-only access to entries."""
+        """
+        Provide a read-only copy of the stored learning entries.
+        
+        Returns:
+            list[LearningEntry]: A new list containing the current LearningEntry objects; modifying this list does not alter the journal's internal entries.
+        """
         return list(self._entries)
 
     def add_entry(self, entry: LearningEntry) -> None:
-        """Add a new learning entry."""
+        """
+        Add a learning entry to the journal.
+        
+        Appends the provided LearningEntry to the journal's entries and, if a persistence path was configured, writes the updated entries to disk.
+        
+        Parameters:
+            entry (LearningEntry): The learning entry describing a mistake and its correction.
+        """
         self._entries.append(entry)
         logger.info(
             "Learning journal: %s → %s (agent=%s, story=%s)",
@@ -60,7 +83,15 @@ class LearningJournal:
             self._save()
 
     def get_rules_for_agent(self, agent: str) -> list[str]:
-        """Get all rules applicable to an agent."""
+        """
+        Collects injection rules applicable to the specified agent.
+        
+        Parameters:
+            agent (str): Identifier of the target agent to filter rules for.
+        
+        Returns:
+            list[str]: Rule strings for entries whose `agent` matches the given agent or is "all".
+        """
         rules = []
         for entry in self._entries:
             if entry.agent == agent or entry.agent == "all":
@@ -68,7 +99,11 @@ class LearningJournal:
         return rules
 
     def _load(self) -> None:
-        """Load entries from JSON file."""
+        """
+        Load stored learning entries from the configured JSON file into the journal's internal entries list.
+        
+        If the file contains a top-level "entries" list, each item is used to construct a LearningEntry and replace the current entries. If JSON parsing fails or the expected structure is missing, a warning is logged and existing entries are left unchanged.
+        """
         try:
             data = json.loads(self._path.read_text())
             self._entries = [LearningEntry(**e) for e in data.get("entries", [])]
@@ -76,7 +111,11 @@ class LearningJournal:
             logger.warning("Failed to load learning journal: %s", exc)
 
     def _save(self) -> None:
-        """Save entries to JSON file."""
+        """
+        Persist current entries to the configured JSON file path.
+        
+        Serializes the internal entries list to a JSON object with an "entries" key (each entry converted via dataclass asdict), ensures parent directories exist, and writes formatted JSON to the configured path, overwriting any existing file.
+        """
         data = {"entries": [asdict(e) for e in self._entries]}
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._path.write_text(json.dumps(data, indent=2))

@@ -179,7 +179,9 @@ class TestRunAsync:
 
     @pytest.mark.asyncio
     async def test_full_execution_returns_0_on_success(self):
-        """Full (non-dry-run) execution with mock director returns 0."""
+        """
+        Verify non-dry-run execution completes successfully when Director.execute_prd returns an all-green ProjectReport.
+        """
         from elite_web_builder.director import ProjectReport
 
         mock_report = ProjectReport(
