@@ -335,9 +335,9 @@ get_header();
 			<button class="signin-close" type="button" aria-label="<?php esc_attr_e( 'Close sign-in', 'skyyrose-flagship' ); ?>">&times;</button>
 		</div>
 		<div class="signin-body">
-			<form class="signin-form" method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<form class="signin-form" method="post" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
 				<input type="hidden" name="action" value="skyyrose_signin">
-				<?php wp_nonce_field( 'skyyrose_signin_nonce', 'signin_nonce' ); ?>
+				<?php wp_nonce_field( 'skyyrose_signin', 'skyyrose_signin_nonce' ); ?>
 
 				<div class="signin-form-group">
 					<label class="signin-label" for="signin-email"><?php echo esc_html__( 'Email', 'skyyrose-flagship' ); ?></label>

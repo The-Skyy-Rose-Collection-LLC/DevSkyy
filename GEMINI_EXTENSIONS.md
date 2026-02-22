@@ -239,7 +239,7 @@ async function createContentWithResearch() {
 # ~/.zshrc or ~/.bashrc
 
 # Gemini API (Required)
-export GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc
+export GEMINI_API_KEY=YOUR_GOOGLE_API_KEY
 
 # Exa API (Optional - for web search)
 export EXA_API_KEY=your_exa_key_here

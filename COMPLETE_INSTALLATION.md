@@ -21,7 +21,7 @@
 - Token counting utilities
 - 4 working examples
 
-**API Key:** ✅ Configured (`AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc`)
+**API Key:** ✅ Configured (`YOUR_GOOGLE_API_KEY`)
 **Default Model:** `gemini-2.5-flash`
 
 ---
@@ -234,7 +234,7 @@ console.log('Image models:', models.filter(m => m.id.includes('image')));
 ### Main Configuration
 ```env
 # ~/DevSkyy/gemini/.env
-GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc
+GEMINI_API_KEY=YOUR_GOOGLE_API_KEY
 GEMINI_DEFAULT_MODEL=gemini-2.5-flash
 GOOGLE_ACCOUNT_EMAIL=info@shopskyyrose.com
 ```
@@ -249,7 +249,7 @@ ENABLED_TOOLS=web_search_exa,get_code_context_exa,company_research_exa
 ### Nanobanana Configuration
 ```bash
 # Optional overrides
-export NANOBANANA_GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc
+export NANOBANANA_GEMINI_API_KEY=YOUR_GOOGLE_API_KEY
 export NANOBANANA_MODEL=gemini-2.5-flash-image
 ```
 

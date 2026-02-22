@@ -63,7 +63,7 @@ const response = await client.generateContent({
 ```bash
 # API key uses your existing GEMINI_API_KEY
 # Optionally set specific key:
-export NANOBANANA_GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc
+export NANOBANANA_GEMINI_API_KEY=YOUR_GOOGLE_API_KEY
 
 # To use Nano Banana Pro model:
 export NANOBANANA_MODEL=gemini-3-pro-image-preview
@@ -143,7 +143,7 @@ nano /Users/coreyfoster/DevSkyy/gemini/exa-mcp-server/.env
 **Environment Variables:**
 ```bash
 # Add to ~/.zshrc or ~/.bashrc
-export GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc
+export GEMINI_API_KEY=YOUR_GOOGLE_API_KEY
 export EXA_API_KEY=your_exa_key_here
 export NANOBANANA_MODEL=gemini-2.5-flash-image
 ```
@@ -255,7 +255,7 @@ gemini/
 
 **Main Gemini Config:** `/Users/coreyfoster/DevSkyy/gemini/.env`
 ```env
-GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc
+GEMINI_API_KEY=YOUR_GOOGLE_API_KEY
 GEMINI_DEFAULT_MODEL=gemini-2.5-flash
 ```
 

@@ -88,7 +88,7 @@ Access the application:
 #### 1.1 Install Required Packages
 
 ```bash
-pip install PyJWT==2.10.1 python-jose[cryptography]==3.3.0 passlib[bcrypt]==1.7.4 python-multipart==0.0.9
+pip install PyJWT==2.10.1 passlib[bcrypt]==1.7.4 python-multipart==0.0.9
 ```
 
 #### 1.2 Create JWT Authentication Module
