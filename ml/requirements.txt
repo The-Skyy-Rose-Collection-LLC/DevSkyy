@@ -31,7 +31,7 @@ textblob>=0.18.0.post0
 
 # Model serving
 mlflow>=3.5.0
-bentoml>=1.4.8  # Fixed: CVE-2025-27520, CVE-2025-32375 (Critical RCE vulnerabilities)
+bentoml>=1.4.34  # Fixed: CVE-2025-27520, CVE-2025-32375 (Critical RCE vulnerabilities)
 
 # Experiment tracking
 wandb==0.23.1
@@ -62,7 +62,7 @@ statsmodels==0.14.6
 prophet==1.2.1
 
 # Reinforcement learning
-gym==0.26.2
+gymnasium>=1.0.0
 stable-baselines3==2.7.1
 
 # Model interpretability

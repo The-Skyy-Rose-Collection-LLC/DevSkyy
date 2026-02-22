@@ -8,8 +8,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql://devskyy:password@postgres:5432/devskyy
-      - REDIS_URL=redis://:redispassword@redis:6379/0
+      - DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD:-changeme}@postgres:5432/devskyy
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
       - ENVIRONMENT=production
     depends_on:
       - postgres
@@ -34,7 +34,7 @@ services:
     environment:
       - POSTGRES_DB=devskyy
       - POSTGRES_USER=devskyy
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-changeme}
       - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -52,7 +52,7 @@ services:
   redis:
     image: redis:7-alpine
     container_name: devskyy-redis
-    command: redis-server --appendonly yes --requirepass redispassword
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-changeme}
     volumes:
       - redis_data:/data
     networks:
@@ -73,8 +73,8 @@ services:
     command: python -m agent_sdk.worker
     environment:
       # Core services
-      - REDIS_URL=redis://:redispassword@redis:6379/0
-      - DATABASE_URL=postgresql://devskyy:password@postgres:5432/devskyy
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
+      - DATABASE_URL=postgresql://devskyy:${POSTGRES_PASSWORD:-changeme}@postgres:5432/devskyy
       - ENVIRONMENT=production
 
       # 3D Generation APIs
@@ -130,7 +130,7 @@ services:
     ports:
       - "5555:5555"
     environment:
-      - REDIS_URL=redis://:redispassword@redis:6379/0
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-changeme}@redis:6379/0
     depends_on:
       - celery-worker
     networks:
@@ -185,7 +185,7 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
     volumes:
       - grafana_data:/var/lib/grafana
     networks:

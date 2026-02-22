@@ -1,12 +1,12 @@
 # Visual Product Recognition Dependencies
 
 # Core ML/AI
-torch>=2.0.0
+torch>=2.6.0
 torchvision>=0.15.0
-transformers>=4.30.0
+transformers>=4.53.0
 
 # Image processing
-Pillow>=9.5.0
+Pillow>=11.0.0
 
 # Numerical computing
 numpy>=1.24.0

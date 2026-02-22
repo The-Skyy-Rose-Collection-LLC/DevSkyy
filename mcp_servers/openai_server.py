@@ -28,7 +28,7 @@ Python: 3.11+
 Framework: FastMCP
 
 Installation:
-    pip install fastmcp httpx pydantic openai python-jose[cryptography]
+    pip install fastmcp httpx pydantic openai pyjwt[cryptography]
 
 Usage:
     # Run the server
@@ -61,7 +61,7 @@ try:
     from pydantic import BaseModel, ConfigDict, Field
 except ImportError as e:
     print(f"❌ Missing required package: {e}")
-    print("Install with: pip install fastmcp httpx pydantic openai python-jose[cryptography]")
+    print("Install with: pip install fastmcp httpx pydantic openai pyjwt[cryptography]")
     exit(1)
 
 # =============================================================================

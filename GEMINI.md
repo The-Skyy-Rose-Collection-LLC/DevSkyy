@@ -121,7 +121,7 @@ node ../../examples/function-calling.js
 
 ### Current Settings (.env)
 ```env
-GEMINI_API_KEY=AIzaSyCYSqK5iqa0vg-BysCkU3GH7Fo-skop7qc ✅
+GEMINI_API_KEY=YOUR_GOOGLE_API_KEY ✅
 GEMINI_DEFAULT_MODEL=gemini-2.5-flash ✅
 GOOGLE_ACCOUNT_EMAIL=info@shopskyyrose.com
 ```
