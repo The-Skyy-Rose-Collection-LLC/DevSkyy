@@ -173,7 +173,7 @@ DevSkyy/                           # Backend (Python 3.11+)
 
 | Endpoint | Purpose | Expected Response |
 |----------|---------|-------------------|
-| `GET /health` | Overall system health | `{"status": "healthy", "version": "3.1.0"}` |
+| `GET /health` | Overall system health | `{"status": "healthy", "version": "3.2.0"}` |
 | `GET /health/ready` | Readiness probe (DB, services) | `{"ready": true}` |
 | `GET /health/live` | Liveness probe (process alive) | `{"alive": true}` |
 | `GET /metrics` | Prometheus metrics | Prometheus text format |

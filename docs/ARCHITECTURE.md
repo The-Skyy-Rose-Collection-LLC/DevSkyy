@@ -1,7 +1,7 @@
 # Architecture Reference
 
-**Version**: 3.1.0
-**Last Updated**: 2026-02-08
+**Version**: 3.2.0
+**Last Updated**: 2026-02-22
 
 Complete architectural reference for the DevSkyy platform including dependency flow, codebase structure, and project phases.
 
@@ -74,15 +74,18 @@ DevSkyy/
 │   └── round_table.py          # Multi-agent consensus
 │
 ├── wordpress-theme/            # WordPress Theme
-│   └── skyyrose-flagship/      # Production theme
-│       ├── template-collection.php    # Immersive 3D experiences
-│       ├── elementor-widgets/         # Custom widgets (3D, pre-order)
-│       ├── inc/                       # Theme functions
+│   └── skyyrose-flagship/      # Production theme (v3.2.0)
+│       ├── template-immersive-*.php   # Immersive 3D storytelling pages
+│       ├── template-collection-*.php  # Collection catalog pages (shopping)
+│       ├── template-preorder-gateway.php # Pre-order gateway
+│       ├── elementor/widgets/         # Custom Elementor widgets
+│       ├── inc/                       # Theme modules (enqueue, security, etc.)
 │       └── woocommerce/               # WooCommerce templates
 │
-├── frontend/                   # Frontend Assets
+├── frontend/                   # Frontend Dashboard (Next.js)
 │   ├── components/3d/          # LuxuryProductViewer (React Three Fiber)
-│   └── lib/animations/         # luxury-transitions.ts (Framer Motion)
+│   ├── lib/animations/         # luxury-transitions.ts (Framer Motion)
+│   └── app/                    # Next.js App Router
 │
 ├── tests/                      # Test Suite
 │   ├── unit/                   # Unit tests
@@ -139,14 +142,15 @@ DevSkyy/
 - AI image enhancement (FLUX, SD3, RemBG)
 - WordPress theme: `skyyrose-flagship`
 
-### Phase 6: Immersive Experiences (v3.1.0) 🔄 In Progress
-- Immersive collection pages:
-  - **Black Rose**: Gothic cathedral 3D experience
-  - **Love Hurts**: Romantic castle experience
-  - **Signature**: Oakland/San Francisco city tour
-- WooCommerce integration with 3D viewers
-- Pre-order forms with checkout
-- Ralph Loop automation for complex builds
+### Phase 6: Production Theme Build (v3.2.0) ✅ Complete
+- Full theme rebuild: 30,000+ lines of production code
+- 4 collections: Black Rose, Love Hurts, Signature, Kids Capsule
+- 3 immersive storytelling scenes (cathedral, castle, city tour)
+- Pre-order gateway with checkout integration
+- Full WooCommerce template overrides (archive, single, cart, checkout)
+- Design system: Inter + Playfair Display, dark luxury palette
+- Luxury Cursor, Cinematic Mode, Wishlist, Toast notifications
+- Backend modules: enqueue, theme-setup, customizer, woocommerce, security, template-functions, ajax-handlers
 
 ---
 
@@ -278,44 +282,93 @@ class ProductOutput(BaseModel):
 
 ## WordPress Theme Architecture
 
-### Theme Structure
+### Theme Structure (skyyrose-flagship v3.2.0)
 
 ```
 skyyrose-flagship/
-├── style.css                   # Theme header
-├── functions.php               # Core functions
-├── inc/                        # Includes
-│   ├── customizer.php          # Theme Customizer
-│   ├── template-functions.php  # Helper functions
-│   ├── woocommerce.php         # WooCommerce integration
-│   ├── elementor.php           # Elementor integration
-│   └── security-hardening.php  # Security hardening
-├── template-collection.php     # Immersive 3D pages
-├── page-collection-*.php       # Catalog pages (shopping)
-├── elementor-widgets/          # Custom Elementor widgets
-│   ├── 3d-viewer/              # 3D model viewer
-│   └── pre-order-form/         # Pre-order form
-└── woocommerce/                # WooCommerce templates
-    ├── cart/                   # Cart templates
-    ├── checkout/               # Checkout templates
-    └── single-product/         # Product templates
+├── style.css                          # Theme header (v3.2.0)
+├── functions.php                      # Bootstrap: constants + inc/ loader
+├── inc/                               # Modular backend
+│   ├── theme-setup.php                # Theme supports, menus, sidebars
+│   ├── enqueue.php                    # Script/style registration
+│   ├── enqueue-brand-styles.php       # Brand identity styles
+│   ├── customizer.php                 # Live Preview Customizer
+│   ├── template-functions.php         # Collection/product helpers
+│   ├── woocommerce.php                # WooCommerce integration
+│   ├── elementor.php                  # Elementor integration
+│   ├── security.php                   # CSP headers, nonce helpers
+│   ├── accessibility-seo.php          # A11y + SEO enhancements
+│   ├── ajax-handlers.php              # AJAX endpoints
+│   ├── wishlist-functions.php         # Wishlist functionality
+│   └── class-wishlist-widget.php      # Wishlist sidebar widget
+├── front-page.php                     # Homepage
+├── template-homepage-luxury.php       # Luxury homepage template
+├── template-immersive-black-rose.php  # Immersive: Gothic cathedral
+├── template-immersive-love-hurts.php  # Immersive: Romantic castle
+├── template-immersive-signature.php   # Immersive: Oakland/SF city tour
+├── template-collection-black-rose.php # Catalog: Black Rose products
+├── template-collection-love-hurts.php # Catalog: Love Hurts products
+├── template-collection-signature.php  # Catalog: Signature products
+├── template-collection-kids-capsule.php # Catalog: Kids Capsule products
+├── template-preorder-gateway.php      # Pre-order gateway page
+├── template-about.php                 # About page
+├── template-contact.php               # Contact page
+├── template-parts/                    # Reusable template parts
+│   ├── cinematic-toggle.php           # Cinematic mode toggle
+│   ├── product-card.php               # Product card component
+│   ├── toast-notification.php         # Toast notification
+│   └── wishlist-button.php            # Wishlist button
+├── elementor/widgets/                 # Custom Elementor widgets
+│   └── three-viewer.php              # Three.js 3D viewer widget
+├── woocommerce/                       # WooCommerce template overrides
+│   ├── archive-product.php            # Product archive
+│   ├── content-product.php            # Product loop item
+│   ├── single-product.php             # Single product page
+│   ├── cart/cart.php                   # Cart page
+│   └── checkout/form-checkout.php     # Checkout form
+├── assets/css/                        # Stylesheets
+│   ├── design-tokens.css              # CSS custom properties
+│   ├── brand-variables.css            # Brand color system
+│   ├── luxury-theme.css               # Base luxury styling
+│   ├── luxury-cursor.css              # Custom cursor
+│   ├── cinematic-mode.css             # Cinematic mode
+│   ├── collections.css                # Collection pages
+│   ├── immersive.css                  # Immersive pages
+│   ├── front-page.css                 # Homepage
+│   ├── woocommerce.css                # WooCommerce overrides
+│   └── preorder-gateway.css           # Pre-order page
+├── assets/js/                         # JavaScript
+│   ├── navigation.js                  # Nav + mobile menu
+│   ├── luxury-cursor.js               # Custom cursor effect
+│   ├── cinematic-mode.js              # Cinematic mode toggle
+│   ├── collections.js                 # Collection interactions
+│   ├── immersive.js                   # Immersive page logic
+│   ├── front-page.js                  # Homepage scripts
+│   ├── preorder-gateway.js            # Pre-order form
+│   ├── woocommerce.js                 # WooCommerce enhancements
+│   └── contact.js                     # Contact form
+└── theme.json                         # Block editor configuration
 ```
 
 ### Key Distinction
 
-- **Immersive Pages** (`template-collection.php`): 3D storytelling, NOT shopping
-- **Catalog Pages** (`page-collection-*.php`): Product grids, FOR shopping
+- **Immersive Pages** (`template-immersive-*.php`): 3D storytelling, NOT shopping
+- **Catalog Pages** (`template-collection-*.php`): Product grids, FOR shopping
 
 ### Collections
 
-| Collection | Type | Description |
-|-----------|------|-------------|
-| **Black Rose** | Immersive | Gothic cathedral 3D experience |
-| **Love Hurts** | Immersive | Romantic castle experience |
-| **Signature** | Immersive | Oakland/SF city tour |
-| **Black Rose** | Catalog | `page-collection-black-rose.php` |
-| **Love Hurts** | Catalog | `page-collection-love-hurts.php` |
-| **Signature** | Catalog | `page-collection-signature.php` |
+| Collection | Immersive Template | Catalog Template |
+|-----------|-------------------|------------------|
+| **Black Rose** | `template-immersive-black-rose.php` (Gothic cathedral) | `template-collection-black-rose.php` |
+| **Love Hurts** | `template-immersive-love-hurts.php` (Romantic castle) | `template-collection-love-hurts.php` |
+| **Signature** | `template-immersive-signature.php` (Oakland/SF tour) | `template-collection-signature.php` |
+| **Kids Capsule** | -- | `template-collection-kids-capsule.php` |
+
+### Design System
+
+- **Fonts**: Inter (body) + Playfair Display (headings)
+- **Colors**: `#0A0A0A` (background), `#111111` (cards), `#B76E79` (rose gold), `#D4AF37` (gold)
+- **Features**: Luxury Cursor, Cinematic Mode, Pre-order Gateway, Wishlist
 
 ---
 

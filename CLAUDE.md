@@ -42,7 +42,7 @@ pytest -v && npm test && curl http://localhost:8000/health
   - ✅ **Correct**: Use `index.php?rest_route=` instead (WordPress.com requirement)
 
 - ❌ **Mistake**: Assuming page purpose from name
-  - ✅ **Correct**: ALWAYS read `wordpress-theme/skyyrose-flagship/PAGES-DOCUMENTATION.md` first
+  - ✅ **Correct**: ALWAYS read the actual template files in `wordpress-theme/skyyrose-flagship/` first
 
 - ❌ **Mistake**: Thinking immersive pages = product catalog
   - ✅ **Correct**: Immersive = 3D storytelling (NOT shopping), Catalog = product grids (FOR shopping)
@@ -174,9 +174,6 @@ pytest -v && npm test && curl http://localhost:8000/health
 - ❌ **Mistake**: Forgetting to propagate correlation_id
   - ✅ **Correct**: ALWAYS accept `correlation_id` as keyword-only arg and propagate
 
-- ❌ **Mistake**: Hardcoding 3D library versions
-  - ✅ **Correct**: Three.js v0.160.0, Babylon.js latest (via CDN)
-
 ### Google ADK
 
 - ❌ **Mistake**: Using hyphens in `LlmAgent(name=...)`
@@ -237,7 +234,7 @@ pytest -v && npm test && curl http://localhost:8000/health
 
 ### Collections & Docs
 - **Immersive** (3D): Black Rose (cathedral), Love Hurts (castle), Signature (city tour)
-- **Catalog** (shopping): `page-collection-{black-rose,love-hurts,signature}.php`
+- **Catalog** (shopping): `template-collection-{black-rose,love-hurts,signature,kids-capsule}.php`
 - **Docs**: `docs/` → CONTRIB, RUNBOOK, ENV_VARS_REFERENCE, MCP_TOOLS, DEPENDENCIES, ARCHITECTURE
 
 ---
@@ -255,4 +252,4 @@ This transforms our codebase into a **self-correcting organism** where mistakes 
 
 ---
 
-**v3.1.0** | SkyyRose LLC | Self-Correcting AI System
+**v3.2.0** | SkyyRose LLC | Self-Correcting AI System

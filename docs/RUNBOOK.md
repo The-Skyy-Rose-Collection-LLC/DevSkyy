@@ -1,7 +1,7 @@
 # DevSkyy Production Deployment Runbook
 
-**Version**: 3.0.0
-**Last Updated**: 2026-02-19
+**Version**: 3.2.0
+**Last Updated**: 2026-02-22
 **Status**: Production Ready
 **Source of Truth**: `package.json`, `.env.example`
 
@@ -177,7 +177,7 @@ curl -X POST "$RENDER_DEPLOY_HOOK"
 curl https://api.devskyy.app/health
 
 # Expected response:
-# {"status": "healthy", "version": "3.0.0", "timestamp": "..."}
+# {"status": "healthy", "version": "3.2.0", "timestamp": "..."}
 
 # API docs
 open https://api.devskyy.app/docs
@@ -397,7 +397,7 @@ fi
 
 # 4. Check 3D library CDNs
 echo "4. Checking 3D library CDNs..."
-THREE_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js")
+THREE_CODE=$(curl -s -o /dev/null -w "%{http_code}" "https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js")
 if [ "$THREE_CODE" = "200" ]; then
   echo "✅ Three.js CDN accessible (HTTP $THREE_CODE)"
 else
@@ -551,7 +551,7 @@ curl https://api.devskyy.app/metrics
 
 | Endpoint | Purpose | Expected Response |
 |----------|---------|-------------------|
-| `/health` | Overall health | `{"status": "healthy", "version": "3.0.0"}` |
+| `/health` | Overall health | `{"status": "healthy", "version": "3.2.0"}` |
 | `/health/ready` | Readiness probe | `{"ready": true}` |
 | `/health/live` | Liveness probe | `{"alive": true}` |
 | `/metrics` | Prometheus metrics | Metrics in Prometheus format |
@@ -893,8 +893,8 @@ curl -I https://skyyrose.co | grep -i content-security-policy
 # - script-src https://cdn.jsdelivr.net https://cdn.babylonjs.com
 # - connect-src https://stats.wp.com
 
-# Verify in theme security-hardening.php
-grep -A 10 "Content-Security-Policy" wordpress-theme/skyyrose-flagship/inc/security-hardening.php
+# Verify in theme security.php
+grep -A 10 "Content-Security-Policy" wordpress-theme/skyyrose-flagship/inc/security.php
 ```
 
 **Theme Activation Issues**
@@ -918,7 +918,7 @@ head -20 wordpress-theme/skyyrose-flagship/style.css
 # Open: https://skyyrose.co (F12 for console)
 
 # Verify CDN URLs are accessible
-curl -I https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js
+curl -I https://cdn.jsdelivr.net/npm/three@0.182.0/build/three.module.js
 curl -I https://cdn.babylonjs.com/babylon.js
 
 # Check CSP allows CDNs
@@ -962,4 +962,4 @@ curl -I https://skyyrose.co | grep -i content-security-policy | grep -o "cdn.jsd
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: After each major deployment
-**Last Updated**: 2026-02-19
+**Last Updated**: 2026-02-22
