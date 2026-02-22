@@ -34,7 +34,7 @@ POST /api/assistant
   -> rate limit check (10 req/min/IP, in-memory)
   -> getSemanticContext(message) -- top-3 product matches from embeddings
   -> buildSystemPrompt(collection, product, semanticContext)
-  -> anthropic.messages.stream() with claude-sonnet-4-5-20250929
+  -> anthropic.messages.stream() with claude-sonnet-4-6
   -> pipe SSE deltas to response
 ```
 

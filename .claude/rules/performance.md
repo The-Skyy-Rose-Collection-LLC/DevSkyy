@@ -7,12 +7,12 @@
 - Pair programming and code generation
 - Worker agents in multi-agent systems
 
-**Sonnet 4.5** (Best coding model):
+**Sonnet 4.6** (Best coding model):
 - Main development work
 - Orchestrating multi-agent workflows
 - Complex coding tasks
 
-**Opus 4.5** (Deepest reasoning):
+**Opus 4.6** (Deepest reasoning):
 - Complex architectural decisions
 - Maximum reasoning requirements
 - Research and analysis tasks
@@ -30,13 +30,13 @@ Lower context sensitivity tasks:
 - Documentation updates
 - Simple bug fixes
 
-## Ultrathink + Plan Mode
+## Extended Thinking + Plan Mode
 
 For complex tasks requiring deep reasoning:
-1. Use `ultrathink` for enhanced thinking
+1. Ensure extended thinking is enabled (on by default)
 2. Enable **Plan Mode** for structured approach
-3. "Rev the engine" with multiple critique rounds
-4. Use split role sub-agents for diverse analysis
+3. Use multiple critique rounds for thorough analysis
+4. Use split role sub-agents for diverse perspectives
 
 ## Build Troubleshooting
 

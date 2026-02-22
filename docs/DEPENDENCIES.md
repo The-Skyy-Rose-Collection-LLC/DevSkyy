@@ -1,7 +1,7 @@
 # Dependencies Reference
 
-**Version**: 3.1.0
-**Last Updated**: 2026-02-08
+**Version**: 3.2.0
+**Last Updated**: 2026-02-22
 
 Complete reference for all Python and JavaScript/TypeScript dependencies used in the DevSkyy platform.
 

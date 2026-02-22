@@ -17,7 +17,7 @@ Codemaps provide navigable, high-level overviews of each major area of the DevSk
 ## Repository Overview
 
 ```
-DevSkyy/                         # v3.0.0 - AI orchestration platform
+DevSkyy/                         # v3.2.0 - AI orchestration platform
 |-- main_enterprise.py           # FastAPI entry point (47+ endpoints)
 |-- devskyy_mcp.py               # MCP server (13 tools, 54 agents)
 |-- package.json                 # Node.js config (28 scripts)

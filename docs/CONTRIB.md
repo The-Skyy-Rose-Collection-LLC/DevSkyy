@@ -1,7 +1,7 @@
 # DevSkyy Contributor Guide
 
-**Version**: 3.0.0
-**Last Updated**: 2026-02-19
+**Version**: 3.2.0
+**Last Updated**: 2026-02-22
 **Status**: Complete
 **Source of Truth**: `package.json`, `.env.example`
 
@@ -118,7 +118,7 @@ git --version       # Should be 2.30.x or higher
    ```bash
    # Check backend health
    curl http://localhost:8000/health
-   # Expected: {"status": "healthy", "version": "3.1.0", ...}
+   # Expected: {"status": "healthy", "version": "3.2.0", ...}
 
    # Check API docs
    open http://localhost:8000/docs
@@ -655,12 +655,12 @@ The production WordPress theme is **skyyrose-flagship** (located at `wordpress-t
 
 ### Required Reading
 
-Before working on WordPress theme, read these documentation files:
+Before working on WordPress theme, review these files:
 
-1. **wordpress-theme/skyyrose-flagship/README.md** - Theme overview and features
-2. **wordpress-theme/skyyrose-flagship/INSTALLATION-GUIDE.md** - Setup instructions
-3. **wordpress-theme/skyyrose-flagship/THEME-STRUCTURE.md** - Architecture and file organization
-4. **wordpress-theme/skyyrose-flagship/TESTING.md** - Theme testing procedures
+1. **wordpress-theme/skyyrose-flagship/style.css** - Theme header (version, requirements)
+2. **wordpress-theme/skyyrose-flagship/functions.php** - Bootstrap and inc/ loader
+3. **wordpress-theme/skyyrose-flagship/inc/** - Backend modules (enqueue, security, woocommerce, etc.)
+4. **docs/ARCHITECTURE.md** - WordPress Theme Architecture section
 
 ### Development Workflow
 
@@ -680,10 +680,11 @@ Before working on WordPress theme, read these documentation files:
 
 3. **Make Changes**
    - Edit PHP templates in `wordpress-theme/skyyrose-flagship/`
-   - Edit CSS in `assets/css/`
-   - Edit JavaScript in `assets/js/`
-   - Custom widgets in `elementor/widgets/`
-   - WooCommerce templates in `woocommerce/`
+   - Edit CSS in `wordpress-theme/skyyrose-flagship/assets/css/`
+   - Edit JavaScript in `wordpress-theme/skyyrose-flagship/assets/js/`
+   - Backend modules in `wordpress-theme/skyyrose-flagship/inc/`
+   - Elementor widgets in `wordpress-theme/skyyrose-flagship/elementor/widgets/`
+   - WooCommerce templates in `wordpress-theme/skyyrose-flagship/woocommerce/`
 
 4. **Test Changes**
    ```bash
@@ -730,43 +731,39 @@ Before working on WordPress theme, read these documentation files:
    - Verify 3D models load correctly
    - Check console for errors (should be <10)
 
-### Theme Features
+### Theme Features (v3.2.0)
 
-- **Three.js 3D Integration**: Built-in 3D model viewer
-- **WooCommerce Compatible**: Custom product templates
-- **Elementor Pro Ready**: Custom widgets
+- **4 Collections**: Black Rose, Love Hurts, Signature, Kids Capsule
+- **3 Immersive Scenes**: Gothic cathedral, romantic castle, Oakland/SF city tour
+- **Pre-order Gateway**: Integrated pre-order checkout flow
+- **WooCommerce Compatible**: Full template overrides (archive, single, cart, checkout)
+- **Elementor Widget**: Three.js 3D viewer
+- **Luxury UX**: Custom cursor, cinematic mode, wishlist, toast notifications
+- **Design System**: Inter + Playfair Display fonts, dark luxury palette
 - **Responsive Design**: Mobile-first approach
 - **Performance Optimized**: Lazy loading, deferred scripts
-- **Accessibility Ready**: WCAG compliant
-- **Security Enhanced**: OWASP best practices
+- **Accessibility Ready**: WCAG compliant (accessibility-seo.php module)
+- **Security Enhanced**: CSP headers, nonce helpers (security.php module)
 
 ### Common Theme Tasks
 
 **Add New Elementor Widget:**
 ```php
 // elementor/widgets/my-widget.php
-namespace SkyyRose\Elementor\Widgets;
-
-class My_Widget extends \Elementor\Widget_Base {
-    public function get_name() {
-        return 'skyyrose-my-widget';
-    }
-
-    // ... widget implementation
-}
+// See existing: elementor/widgets/three-viewer.php
 ```
 
 **Add Custom WooCommerce Template:**
 ```php
-// woocommerce/single-product/my-template.php
+// woocommerce/single-product.php (override WooCommerce default)
 // Copy from WooCommerce plugin and customize
 ```
 
-**Add 3D Model to Product:**
-1. Edit product in WP Admin
-2. Find "3D Model" meta box
-3. Enter GLB/GLTF model URL
-4. "View in 3D" button appears on product page
+**Add New Collection Catalog Page:**
+```php
+// Create template-collection-{name}.php at theme root
+// Follow pattern in template-collection-black-rose.php
+```
 
 ---
 
@@ -1013,14 +1010,13 @@ tail -f /path/to/wordpress/wp-content/debug.log
 chmod -R 755 wordpress-theme/skyyrose-flagship
 ```
 
-**3D Models Not Loading**
+**Theme Assets Not Loading**
 ```bash
 # Check CSP headers
 curl -I https://skyyrose.co | grep -i content-security-policy
 
-# Verify CDN URLs
-curl -I https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js
-curl -I https://cdn.babylonjs.com/babylon.js
+# Check theme stylesheet
+curl -I https://skyyrose.co/wp-content/themes/skyyrose-flagship/style.css
 
 # Check browser console for errors
 # Should be <10 errors after deployment
@@ -1136,7 +1132,7 @@ See [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) for complete documentation.
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: When workflow or tools change
-**Last Updated**: 2026-02-19
+**Last Updated**: 2026-02-22
 
 ---
 
@@ -1147,6 +1143,6 @@ See [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) for complete documentation.
 - **SCRIPTS_REFERENCE.md** - NPM scripts documentation
 - **CLAUDE.md** - Project-specific Claude Code instructions
 - **.claude/rules/** - Coding standards, testing, git workflow, etc.
-- **WordPress Theme Docs** - wordpress-theme/skyyrose-flagship/README.md
+- **WordPress Theme** - wordpress-theme/skyyrose-flagship/ (see style.css, functions.php)
 
 Welcome to the team! Happy coding! 🚀

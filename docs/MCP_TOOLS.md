@@ -1,7 +1,7 @@
 # MCP Tools Reference
 
-**Version**: 3.1.0
-**Last Updated**: 2026-02-08
+**Version**: 3.2.0
+**Last Updated**: 2026-02-22
 
 Complete reference for all MCP (Model Context Protocol) tools available in the DevSkyy platform.
 
