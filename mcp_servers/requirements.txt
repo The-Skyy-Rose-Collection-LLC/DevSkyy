@@ -37,7 +37,7 @@ structlog==25.5.0
 loguru==0.7.3
 
 # Error handling and retries
-tenacity==9.1.2
+tenacity==9.1.4
 backoff==2.2.1
 
 # Rate limiting
