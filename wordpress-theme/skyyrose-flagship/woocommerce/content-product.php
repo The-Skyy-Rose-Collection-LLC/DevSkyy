@@ -1,33 +1,81 @@
 <?php
 /**
- * The template for displaying product content within loops
+ * WooCommerce Product Loop Card - Dark Luxury Design
  *
- * This template can be overridden by copying it to yourtheme/woocommerce/content-product.php.
+ * Overrides WooCommerce templates/content-product.php.
+ * Used in shop archives and related products grids.
  *
  * @package SkyyRose_Flagship
- * @since 2.0.0
+ * @since   2.0.0
+ * @version 9.5.0
  */
 
 defined( 'ABSPATH' ) || exit;
 
 global $product;
 
-// Ensure visibility.
 if ( empty( $product ) || ! $product->is_visible() ) {
 	return;
 }
+
+$product_id    = $product->get_id();
+$product_link  = get_permalink( $product_id );
+$product_title = $product->get_name();
+$product_price = $product->get_price_html();
+$on_sale       = $product->is_on_sale();
+$in_stock      = $product->is_in_stock();
+
+// Determine collection from product categories for accent colors.
+$collection_class = 'collection-signature';
+$terms            = get_the_terms( $product_id, 'product_cat' );
+if ( $terms && ! is_wp_error( $terms ) ) {
+	foreach ( $terms as $term ) {
+		$slug = $term->slug;
+		if ( false !== strpos( $slug, 'black-rose' ) ) {
+			$collection_class = 'collection-black-rose';
+			break;
+		}
+		if ( false !== strpos( $slug, 'love-hurts' ) ) {
+			$collection_class = 'collection-love-hurts';
+			break;
+		}
+		if ( false !== strpos( $slug, 'signature' ) ) {
+			$collection_class = 'collection-signature';
+			break;
+		}
+	}
+}
 ?>
-<li <?php wc_product_class( 'skyyrose-product-card', $product ); ?>>
-	<div class="product-card-inner">
+
+<li <?php wc_product_class( 'skyy-product-card ' . esc_attr( $collection_class ), $product ); ?>>
+	<div class="skyy-product-card__inner">
+
 		<?php
 		/**
 		 * Hook: woocommerce_before_shop_loop_item.
+		 *
+		 * @hooked woocommerce_template_loop_product_link_open - 10
 		 */
 		do_action( 'woocommerce_before_shop_loop_item' );
 		?>
 
-		<div class="product-card-image">
-			<a href="<?php the_permalink(); ?>">
+		<div class="skyy-product-card__image-wrap">
+			<a href="<?php echo esc_url( $product_link ); ?>"
+			   class="skyy-product-card__image-link"
+			   aria-label="<?php echo esc_attr( $product_title ); ?>">
+
+				<?php if ( $on_sale ) : ?>
+					<span class="skyy-product-card__badge skyy-product-card__badge--sale">
+						<?php esc_html_e( 'Sale', 'skyyrose-flagship' ); ?>
+					</span>
+				<?php endif; ?>
+
+				<?php if ( ! $in_stock ) : ?>
+					<span class="skyy-product-card__badge skyy-product-card__badge--soldout">
+						<?php esc_html_e( 'Sold Out', 'skyyrose-flagship' ); ?>
+					</span>
+				<?php endif; ?>
+
 				<?php
 				/**
 				 * Hook: woocommerce_before_shop_loop_item_title.
@@ -37,157 +85,59 @@ if ( empty( $product ) || ! $product->is_visible() ) {
 				 */
 				do_action( 'woocommerce_before_shop_loop_item_title' );
 				?>
+
+				<div class="skyy-product-card__overlay">
+					<span class="skyy-product-card__quick-view">
+						<?php esc_html_e( 'Quick View', 'skyyrose-flagship' ); ?>
+					</span>
+				</div>
 			</a>
 
-			<?php
-			// Add to cart button overlay
-			if ( $product->is_purchasable() && $product->is_in_stock() ) {
-				echo '<div class="product-card-actions">';
-				woocommerce_template_loop_add_to_cart();
-				echo '</div>';
-			}
-			?>
+			<?php if ( $product->is_purchasable() && $in_stock ) : ?>
+				<div class="skyy-product-card__actions">
+					<?php woocommerce_template_loop_add_to_cart(); ?>
+				</div>
+			<?php endif; ?>
 		</div>
 
-		<div class="product-card-content">
-			<?php
-			/**
-			 * Hook: woocommerce_shop_loop_item_title.
-			 *
-			 * @hooked woocommerce_template_loop_product_title - 10
-			 */
-			do_action( 'woocommerce_shop_loop_item_title' );
+		<div class="skyy-product-card__content">
+			<a href="<?php echo esc_url( $product_link ); ?>" class="skyy-product-card__content-link">
+				<?php
+				/**
+				 * Hook: woocommerce_shop_loop_item_title.
+				 *
+				 * @hooked woocommerce_template_loop_product_title - 10
+				 */
+				do_action( 'woocommerce_shop_loop_item_title' );
+				?>
 
-			/**
-			 * Hook: woocommerce_after_shop_loop_item_title.
-			 *
-			 * @hooked woocommerce_template_loop_rating - 5
-			 * @hooked woocommerce_template_loop_price - 10
-			 */
-			do_action( 'woocommerce_after_shop_loop_item_title' );
-			?>
+				<?php
+				/**
+				 * Hook: woocommerce_after_shop_loop_item_title.
+				 *
+				 * @hooked woocommerce_template_loop_rating - 5
+				 * @hooked woocommerce_template_loop_price - 10
+				 */
+				do_action( 'woocommerce_after_shop_loop_item_title' );
+				?>
+
+				<?php if ( $product_price ) : ?>
+					<div class="skyy-product-card__price">
+						<?php echo $product_price; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WC handles escaping. ?>
+					</div>
+				<?php endif; ?>
+			</a>
 		</div>
 
 		<?php
 		/**
 		 * Hook: woocommerce_after_shop_loop_item.
+		 *
+		 * @hooked woocommerce_template_loop_product_link_close - 5
+		 * @hooked woocommerce_template_loop_add_to_cart - 10
 		 */
 		do_action( 'woocommerce_after_shop_loop_item' );
 		?>
+
 	</div>
 </li>
-
-<style>
-/* SkyyRose Product Card Styling */
-.skyyrose-product-card {
-	background: var(--white);
-	border-radius: var(--radius-lg);
-	overflow: hidden;
-	transition: all var(--transition-luxury);
-	box-shadow: var(--shadow-md);
-	list-style: none;
-}
-
-.skyyrose-product-card:hover {
-	transform: translateY(-12px);
-	box-shadow: var(--shadow-xl), var(--shadow-rose-glow);
-}
-
-.product-card-inner {
-	position: relative;
-}
-
-.product-card-image {
-	position: relative;
-	width: 100%;
-	height: 350px;
-	overflow: hidden;
-	background: var(--off-white);
-}
-
-.product-card-image img {
-	width: 100%;
-	height: 100%;
-	object-fit: cover;
-	transition: transform var(--transition-luxury);
-}
-
-.skyyrose-product-card:hover .product-card-image img {
-	transform: scale(1.1);
-}
-
-.product-card-actions {
-	position: absolute;
-	bottom: var(--space-md);
-	left: var(--space-md);
-	right: var(--space-md);
-	opacity: 0;
-	transform: translateY(10px);
-	transition: all var(--transition-luxury);
-}
-
-.skyyrose-product-card:hover .product-card-actions {
-	opacity: 1;
-	transform: translateY(0);
-}
-
-.product-card-actions .button {
-	width: 100%;
-	background: var(--gradient-rose-gold);
-	color: var(--white);
-	border: none;
-	padding: var(--space-md) var(--space-lg);
-	font-weight: var(--weight-semibold);
-	border-radius: var(--radius-md);
-	cursor: pointer;
-	transition: all var(--transition-base);
-}
-
-.product-card-actions .button:hover {
-	transform: translateY(-2px);
-	box-shadow: var(--shadow-lg);
-}
-
-.product-card-content {
-	padding: var(--space-xl);
-}
-
-.product-card-content .woocommerce-loop-product__title {
-	font-size: var(--text-lg);
-	color: var(--dark-gray);
-	margin-bottom: var(--space-sm);
-	transition: color var(--transition-base);
-}
-
-.skyyrose-product-card:hover .woocommerce-loop-product__title {
-	color: var(--rose-gold);
-}
-
-.product-card-content .price {
-	font-size: var(--text-2xl);
-	color: var(--rose-gold);
-	font-weight: var(--weight-bold);
-	margin-top: var(--space-md);
-}
-
-.product-card-content .price del {
-	font-size: var(--text-lg);
-	color: var(--medium-gray);
-	opacity: 0.7;
-	margin-right: var(--space-sm);
-}
-
-.onsale {
-	position: absolute;
-	top: var(--space-md);
-	right: var(--space-md);
-	background: var(--gradient-rose-gold);
-	color: var(--white);
-	padding: var(--space-xs) var(--space-md);
-	font-size: var(--text-xs);
-	font-weight: var(--weight-bold);
-	text-transform: uppercase;
-	border-radius: var(--radius-full);
-	z-index: 1;
-}
-</style>
