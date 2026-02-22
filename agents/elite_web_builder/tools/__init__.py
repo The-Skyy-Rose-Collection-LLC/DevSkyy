@@ -1,1 +1,1 @@
-"""Tools for Elite Web Builder agents."""
+"""Verification and utility tools for Elite Web Builder."""

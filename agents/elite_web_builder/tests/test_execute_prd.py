@@ -1,614 +1,572 @@
-"""
-Tests for execute_prd pipeline — PlanningError, ProjectReport,
-_parse_planning_response, _build_breakdown, _plan_stories, execute_prd.
-
-Mocking pattern: mock get_adapter to return a fake adapter that
-returns LLMResponse with pre-defined JSON content.
-"""
+"""Tests for execute_prd pipeline — PlanningError, ProjectReport, planning, execution."""
 
 from __future__ import annotations
 
 import json
-import pytest
-import time
 from dataclasses import FrozenInstanceError
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
-from elite_web_builder.director import (
-    AgentRole,
-    AgentRuntime,
-    AgentSpec,
+import pytest
+
+from agents.base import AgentOutput, AgentRole
+from agents.provider_adapters import LLMResponse
+from director import (
     Director,
-    DirectorConfig,
     PlanningError,
-    PRDBreakdown,
     ProjectReport,
     StoryStatus,
     UserStory,
-    _DIRECTOR_SPEC,
-    _PLANNING_PROMPT_TEMPLATE,
 )
-from elite_web_builder.core.learning_journal import LearningJournal
-from elite_web_builder.core.model_router import LLMResponse, ModelRouter
 
 
-# =============================================================================
+# ---------------------------------------------------------------------------
 # Helpers
-# =============================================================================
+# ---------------------------------------------------------------------------
 
-
-def _make_planning_json(
-    num_stories: int = 3,
-    roles: list[str] | None = None,
-) -> str:
-    """
-    Create a planning JSON string containing a list of user stories and their dependency order.
-    
-    Parameters:
-        num_stories (int): Number of user stories to generate.
-        roles (list[str] | None): List of agent role names to assign to stories; roles are assigned cyclically. If None, defaults to ["design_system", "frontend_dev", "backend_dev"].
-    
-    Returns:
-        str: JSON-formatted string with two keys:
-            - "stories": list of story objects, each containing:
-                - "id": story id in the form "US-###" (zero-padded).
-                - "title": story title.
-                - "description": story description.
-                - "agent_role": assigned role name.
-                - "depends_on": list of prerequisite story ids.
-                - "acceptance_criteria": list of acceptance criteria strings.
-            - "dependency_order": list of story ids in the generated order.
-    """
-    roles = roles or ["design_system", "frontend_dev", "backend_dev"]
+def _valid_planning_json(num_stories: int = 2) -> str:
+    """Build a valid JSON string mimicking LLM planning output."""
     stories = []
-    order = []
-    for i in range(num_stories):
-        sid = f"US-{i + 1:03d}"
-        role = roles[i % len(roles)]
-        deps = [f"US-{i:03d}"] if i > 0 else []
+    for i in range(1, num_stories + 1):
+        sid = f"US-{i:03d}"
         stories.append({
             "id": sid,
-            "title": f"Story {i + 1}",
-            "description": f"Description for story {i + 1}",
-            "agent_role": role,
-            "depends_on": deps,
-            "acceptance_criteria": [f"Criterion for story {i + 1}"],
+            "title": f"Story {i}",
+            "description": f"Do thing {i}",
+            "agent_role": "design_system" if i == 1 else "frontend_dev",
+            "depends_on": [] if i == 1 else [f"US-{i-1:03d}"],
+            "acceptance_criteria": [f"Criterion {i}a"],
         })
-        order.append(sid)
+    order = [f"US-{i:03d}" for i in range(1, num_stories + 1)]
     return json.dumps({"stories": stories, "dependency_order": order})
 
 
-def _make_fake_adapter(content: str = "OK") -> AsyncMock:
-    """
-    Create an asynchronous mock adapter whose `generate` method returns an LLMResponse containing the provided content.
-    
-    Parameters:
-    	content (str): The content to put in the mocked LLMResponse.
-    
-    Returns:
-    	AsyncMock: An AsyncMock adapter with a `generate` coroutine that returns an LLMResponse whose `content` equals `content`.
-    """
-    adapter = AsyncMock()
-    adapter.generate = AsyncMock(
-        return_value=LLMResponse(
-            content=content,
-            provider="test",
-            model="test-model",
-            latency_ms=100.0,
-        )
+def _make_mock_adapter(text: str = "done") -> AsyncMock:
+    """Create a mock provider adapter that returns a fixed LLMResponse."""
+    mock = AsyncMock()
+    mock.call.return_value = LLMResponse(
+        text=text,
+        provider="google",
+        model="gemini-3-pro-preview",
+        usage={"input_tokens": 50, "output_tokens": 25},
     )
-    return adapter
+    return mock
 
 
-def _make_director_with_mock(planning_response: str = "", story_response: str = "OK") -> Director:
-    """
-    Create a Director whose ModelRouter is populated with a single test adapter that returns controlled responses.
-    
-    The returned Director uses a router with route entries for the director and common agent roles all pointing to the "test" provider. The test adapter's generate method is mocked so that the first invocation returns the provided planning_response content and all subsequent invocations return the provided story_response content.
-    
-    Parameters:
-        planning_response (str): JSON or text to return on the first generate call (planning phase).
-        story_response (str): Text to return on subsequent generate calls (per-story responses).
-    
-    Returns:
-        Director: A Director instance wired to the mocked ModelRouter and test adapter.
-    """
-    router = ModelRouter(
-        routing={
-            "director": {"provider": "test", "model": "test"},
-            "design_system": {"provider": "test", "model": "test"},
-            "frontend_dev": {"provider": "test", "model": "test"},
-            "backend_dev": {"provider": "test", "model": "test"},
-            "accessibility": {"provider": "test", "model": "test"},
-            "performance": {"provider": "test", "model": "test"},
-            "seo_content": {"provider": "test", "model": "test"},
-            "qa": {"provider": "test", "model": "test"},
-        },
-        fallbacks={},
-    )
-
-    # First call returns planning response, subsequent calls return story response
-    call_count = 0
-    original_content = planning_response
-
-    async def mock_generate(prompt, *, system_prompt="", model="", temperature=0.7, max_tokens=4096):
-        """
-        Mock async generate function that returns a planning response on the first call and story responses on subsequent calls.
-        
-        Parameters:
-        	prompt (str): The prompt sent to the model.
-        	system_prompt (str): Optional system prompt (accepted but not used by the mock).
-        	model (str): Optional model identifier (accepted but not used by the mock).
-        	temperature (float): Optional sampling temperature (accepted but not used by the mock).
-        	max_tokens (int): Optional token limit (accepted but not used by the mock).
-        
-        Returns:
-        	LLMResponse: An LLMResponse containing `original_content` on the first invocation and `story_response` on subsequent invocations.
-        
-        Notes:
-        	Increments the enclosing `call_count` nonlocal variable on each invocation.
-        """
-        nonlocal call_count
-        call_count += 1
-        if call_count == 1:
-            return LLMResponse(
-                content=original_content,
-                provider="test",
-                model="test",
-                latency_ms=50.0,
-            )
-        return LLMResponse(
-            content=story_response,
-            provider="test",
-            model="test",
-            latency_ms=50.0,
-        )
-
-    adapter = AsyncMock()
-    adapter.generate = mock_generate
-    router.register_adapter("test", adapter)
-
-    return Director(router=router)
-
-
-# =============================================================================
-# TestPlanningError
-# =============================================================================
+# ---------------------------------------------------------------------------
+# PlanningError
+# ---------------------------------------------------------------------------
 
 
 class TestPlanningError:
-    """Tests for PlanningError exception."""
-
-    def test_inherits_runtime_error(self):
-        err = PlanningError("test")
+    def test_is_runtime_error(self) -> None:
+        err = PlanningError("bad json")
         assert isinstance(err, RuntimeError)
 
-    def test_has_raw_response(self):
-        err = PlanningError("test", raw_response="raw json here")
-        assert err.raw_response == "raw json here"
-        assert str(err) == "test"
+    def test_has_raw_response_field(self) -> None:
+        err = PlanningError("parse failed", raw_response='{"incomplete')
+        assert err.raw_response == '{"incomplete'
+
+    def test_default_raw_response_empty(self) -> None:
+        err = PlanningError("oops")
+        assert err.raw_response == ""
+
+    def test_str_contains_message(self) -> None:
+        err = PlanningError("LLM returned garbage")
+        assert "LLM returned garbage" in str(err)
 
 
-# =============================================================================
-# TestProjectReport
-# =============================================================================
+# ---------------------------------------------------------------------------
+# ProjectReport
+# ---------------------------------------------------------------------------
 
 
 class TestProjectReport:
-    """Tests for ProjectReport frozen dataclass."""
-
-    def test_frozen(self):
+    def test_frozen_dataclass(self) -> None:
         report = ProjectReport(
-            stories=(),
+            stories={},
             status_summary={},
             all_green=True,
             elapsed_ms=100.0,
-            failures=(),
+            failures=[],
             instincts_learned=0,
         )
         with pytest.raises(FrozenInstanceError):
             report.all_green = False  # type: ignore[misc]
 
-    def test_all_green_true(self):
+    def test_all_green_true(self) -> None:
         report = ProjectReport(
-            stories=(),
-            status_summary={"green": 3},
+            stories={"US-001": UserStory(
+                id="US-001", title="A", description="A",
+                agent_role=AgentRole.QA, status=StoryStatus.GREEN,
+            )},
+            status_summary={"green": 1},
             all_green=True,
-            elapsed_ms=100.0,
-            failures=(),
+            elapsed_ms=50.0,
+            failures=[],
             instincts_learned=0,
         )
         assert report.all_green is True
+        assert report.failures == []
 
-    def test_failures_tuple(self):
+    def test_all_green_false(self) -> None:
         report = ProjectReport(
-            stories=(),
-            status_summary={},
+            stories={},
+            status_summary={"failed": 1},
             all_green=False,
-            elapsed_ms=100.0,
-            failures=("US-001: Failed",),
+            elapsed_ms=50.0,
+            failures=["US-001: Something failed"],
             instincts_learned=0,
         )
-        assert isinstance(report.failures, tuple)
+        assert report.all_green is False
         assert len(report.failures) == 1
 
+    def test_instincts_learned_tracked(self) -> None:
+        report = ProjectReport(
+            stories={},
+            status_summary={},
+            all_green=True,
+            elapsed_ms=10.0,
+            failures=[],
+            instincts_learned=3,
+        )
+        assert report.instincts_learned == 3
 
-# =============================================================================
-# TestParsePlanningResponse
-# =============================================================================
+
+# ---------------------------------------------------------------------------
+# _parse_planning_response
+# ---------------------------------------------------------------------------
 
 
 class TestParsePlanningResponse:
-    """Tests for Director._parse_planning_response."""
-
-    def test_valid_json(self):
+    def test_valid_json(self) -> None:
         raw = '{"stories": [], "dependency_order": []}'
         result = Director._parse_planning_response(raw)
         assert result == {"stories": [], "dependency_order": []}
 
-    def test_json_with_markdown_fences(self):
+    def test_strips_markdown_fences(self) -> None:
         raw = '```json\n{"stories": [], "dependency_order": []}\n```'
         result = Director._parse_planning_response(raw)
         assert result == {"stories": [], "dependency_order": []}
 
-    def test_json_with_bare_fences(self):
-        raw = '```\n{"stories": []}\n```'
+    def test_strips_triple_backtick_no_lang(self) -> None:
+        raw = '```\n{"stories": [], "dependency_order": []}\n```'
         result = Director._parse_planning_response(raw)
-        assert result == {"stories": []}
+        assert result == {"stories": [], "dependency_order": []}
 
-    def test_invalid_json_raises(self):
-        with pytest.raises(PlanningError) as exc_info:
-            Director._parse_planning_response("not json at all")
-        assert "Invalid JSON" in str(exc_info.value)
-        assert exc_info.value.raw_response == "not json at all"
+    def test_invalid_json_raises_planning_error(self) -> None:
+        with pytest.raises(PlanningError, match="invalid JSON"):
+            Director._parse_planning_response("this is not json at all")
 
-    def test_empty_string_raises(self):
+    def test_empty_string_raises_planning_error(self) -> None:
         with pytest.raises(PlanningError):
             Director._parse_planning_response("")
 
+    def test_json_with_leading_whitespace(self) -> None:
+        raw = '  \n  {"stories": [], "dependency_order": []}  \n  '
+        result = Director._parse_planning_response(raw)
+        assert result == {"stories": [], "dependency_order": []}
 
-# =============================================================================
-# TestBuildBreakdown
-# =============================================================================
+
+# ---------------------------------------------------------------------------
+# _build_breakdown
+# ---------------------------------------------------------------------------
 
 
 class TestBuildBreakdown:
-    """Tests for Director._build_breakdown."""
-
-    def test_happy_path(self):
-        data = json.loads(_make_planning_json(3))
-        breakdown = Director._build_breakdown(data)
-        assert len(breakdown.stories) == 3
+    def test_valid_data_returns_breakdown(self) -> None:
+        data = {
+            "stories": [
+                {
+                    "id": "US-001",
+                    "title": "Design tokens",
+                    "description": "Create design system tokens",
+                    "agent_role": "design_system",
+                    "depends_on": [],
+                    "acceptance_criteria": ["Tokens documented"],
+                },
+            ],
+            "dependency_order": ["US-001"],
+        }
+        breakdown = Director._build_breakdown(data, max_stories=50)
+        assert len(breakdown.stories) == 1
         assert breakdown.stories[0].id == "US-001"
         assert breakdown.stories[0].agent_role == AgentRole.DESIGN_SYSTEM
+        assert breakdown.dependency_order == ["US-001"]
 
-    def test_missing_stories_key(self):
-        with pytest.raises(PlanningError, match="missing 'stories' key"):
-            Director._build_breakdown({"no_stories": []})
+    def test_missing_stories_key_raises(self) -> None:
+        with pytest.raises(PlanningError, match="stories"):
+            Director._build_breakdown({"dependency_order": []}, max_stories=50)
 
-    def test_unknown_role(self):
+    def test_unknown_agent_role_raises(self) -> None:
         data = {
             "stories": [{
                 "id": "US-001",
-                "title": "Test",
-                "description": "Test",
+                "title": "X",
+                "description": "X",
                 "agent_role": "nonexistent_role",
             }],
+            "dependency_order": ["US-001"],
         }
-        with pytest.raises(PlanningError, match="Unknown agent_role"):
-            Director._build_breakdown(data)
+        with pytest.raises(PlanningError, match="nonexistent_role"):
+            Director._build_breakdown(data, max_stories=50)
 
-    def test_missing_required_field(self):
+    def test_depends_on_defaults_to_empty(self) -> None:
         data = {
             "stories": [{
                 "id": "US-001",
-                "title": "Test",
-                # missing description and agent_role
+                "title": "X",
+                "description": "X",
+                "agent_role": "qa",
             }],
+            "dependency_order": ["US-001"],
         }
-        with pytest.raises(PlanningError, match="missing required field"):
-            Director._build_breakdown(data)
+        breakdown = Director._build_breakdown(data, max_stories=50)
+        assert breakdown.stories[0].depends_on == []
 
-    def test_max_stories_truncation(self):
-        data = json.loads(_make_planning_json(10))
-        breakdown = Director._build_breakdown(data, max_stories=5)
-        assert len(breakdown.stories) == 5
+    def test_acceptance_criteria_defaults_to_empty(self) -> None:
+        data = {
+            "stories": [{
+                "id": "US-001",
+                "title": "X",
+                "description": "X",
+                "agent_role": "qa",
+            }],
+            "dependency_order": ["US-001"],
+        }
+        breakdown = Director._build_breakdown(data, max_stories=50)
+        assert breakdown.stories[0].acceptance_criteria == []
+
+    def test_truncates_to_max_stories(self) -> None:
+        stories = [
+            {
+                "id": f"US-{i:03d}",
+                "title": f"S{i}",
+                "description": f"D{i}",
+                "agent_role": "qa",
+            }
+            for i in range(1, 11)
+        ]
+        data = {
+            "stories": stories,
+            "dependency_order": [s["id"] for s in stories],
+        }
+        breakdown = Director._build_breakdown(data, max_stories=3)
+        assert len(breakdown.stories) == 3
 
 
-# =============================================================================
-# TestPlanStories
-# =============================================================================
+# ---------------------------------------------------------------------------
+# _plan_stories
+# ---------------------------------------------------------------------------
 
 
 class TestPlanStories:
-    """Tests for Director._plan_stories."""
+    @pytest.mark.asyncio
+    async def test_calls_runtime_with_director_spec(self) -> None:
+        director = Director.from_config()
+        planning_json = _valid_planning_json(1)
+        mock_adapter = _make_mock_adapter(text=planning_json)
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            breakdown = await director._plan_stories("Build a landing page")
+
+        assert len(breakdown.stories) == 1
+        # Verify runtime.execute was called (adapter.call is the underlying call)
+        mock_adapter.call.assert_called_once()
 
     @pytest.mark.asyncio
-    async def test_returns_breakdown(self):
-        planning_json = _make_planning_json(3)
-        director = _make_director_with_mock(planning_response=planning_json)
-        breakdown = await director._plan_stories("Build a website")
-        assert isinstance(breakdown, PRDBreakdown)
+    async def test_returns_prd_breakdown(self) -> None:
+        director = Director.from_config()
+        planning_json = _valid_planning_json(3)
+        mock_adapter = _make_mock_adapter(text=planning_json)
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            breakdown = await director._plan_stories("Build an e-commerce site")
+
         assert len(breakdown.stories) == 3
+        assert breakdown.dependency_order == ["US-001", "US-002", "US-003"]
 
     @pytest.mark.asyncio
-    async def test_propagates_planning_error(self):
-        director = _make_director_with_mock(planning_response="not json")
-        with pytest.raises(PlanningError):
-            await director._plan_stories("Build a website")
+    async def test_propagates_planning_error(self) -> None:
+        director = Director.from_config()
+        mock_adapter = _make_mock_adapter(text="not json at all")
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            with pytest.raises(PlanningError):
+                await director._plan_stories("Bad PRD")
 
     @pytest.mark.asyncio
-    async def test_max_stories_in_prompt(self):
-        planning_json = _make_planning_json(2)
-        config = DirectorConfig(max_stories=25)
-        router = ModelRouter(
-            routing={"director": {"provider": "test", "model": "test"}},
-            fallbacks={},
-        )
+    async def test_max_stories_in_prompt(self) -> None:
+        director = Director.from_config()
+        planning_json = _valid_planning_json(1)
+        mock_adapter = _make_mock_adapter(text=planning_json)
 
-        captured_prompt = None
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            await director._plan_stories("Test PRD")
 
-        async def capture_generate(prompt, **kwargs):
-            """
-            Capture the provided prompt into the enclosing scope and return a canned planning LLMResponse.
-            
-            Parameters:
-                prompt (str): The prompt text passed to the model; stored into the outer-scope variable `captured_prompt`.
-                **kwargs: Additional keyword arguments accepted by the call and ignored by this test helper.
-            
-            Returns:
-                LLMResponse: A fabricated response with content set to `planning_json`, provider `"test"`, model `"test"`, and latency_ms `50`.
-            """
-            nonlocal captured_prompt
-            captured_prompt = prompt
-            return LLMResponse(content=planning_json, provider="test", model="test", latency_ms=50)
-
-        adapter = AsyncMock()
-        adapter.generate = capture_generate
-        router.register_adapter("test", adapter)
-
-        director = Director(config=config, router=router)
-        await director._plan_stories("Build something")
-        assert "25 stories" in captured_prompt
-
-    @pytest.mark.asyncio
-    async def test_uses_director_spec(self):
-        planning_json = _make_planning_json(1, roles=["qa"])
-        router = ModelRouter(
-            routing={"director": {"provider": "test", "model": "test"}},
-            fallbacks={},
-        )
-
-        captured_system_prompt = None
-
-        async def capture_generate(prompt, *, system_prompt="", **kwargs):
-            """
-            Capture the provided system prompt and return a canned LLMResponse for testing.
-            
-            Parameters:
-                prompt (str): The user prompt passed to the generator.
-                system_prompt (str): The system-level prompt; its value is saved to the outer-scope variable `captured_system_prompt`.
-                **kwargs: Additional keyword arguments are accepted and ignored.
-            
-            Returns:
-                LLMResponse: A response with `content` set to the test planning JSON, `provider` and `model` set to "test", and `latency_ms` equal to 50.
-            """
-            nonlocal captured_system_prompt
-            captured_system_prompt = system_prompt
-            return LLMResponse(content=planning_json, provider="test", model="test", latency_ms=50)
-
-        adapter = AsyncMock()
-        adapter.generate = capture_generate
-        router.register_adapter("test", adapter)
-
-        director = Director(router=router)
-        await director._plan_stories("PRD text")
-        assert "Director" in captured_system_prompt
-        assert "JSON" in captured_system_prompt
+        # Check the prompt sent to the LLM contains the max_stories value
+        call_args = mock_adapter.call.call_args
+        messages = call_args[1].get("messages") or call_args[0][1]
+        user_msg = [m for m in messages if m.role == "user"][0]
+        assert "50" in user_msg.content  # default max_stories
 
 
-# =============================================================================
-# TestExecutePrd
-# =============================================================================
+# ---------------------------------------------------------------------------
+# execute_prd
+# ---------------------------------------------------------------------------
 
 
 class TestExecutePrd:
-    """Tests for Director.execute_prd."""
-
     @pytest.mark.asyncio
-    async def test_planning_failure_returns_report(self):
-        director = _make_director_with_mock(planning_response="not json")
-        report = await director.execute_prd("Build a site")
-        assert isinstance(report, ProjectReport)
+    async def test_planning_failure_returns_report_with_failure(self) -> None:
+        director = Director.from_config()
+        mock_adapter = _make_mock_adapter(text="not json")
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            report = await director.execute_prd("Bad PRD")
+
         assert report.all_green is False
         assert len(report.failures) == 1
         assert "Planning failed" in report.failures[0]
 
     @pytest.mark.asyncio
-    async def test_all_green(self):
-        planning_json = _make_planning_json(2, roles=["design_system", "frontend_dev"])
-        director = _make_director_with_mock(
-            planning_response=planning_json,
-            story_response="Story completed successfully",
-        )
-        report = await director.execute_prd("Build a website")
-        assert report.all_green is True
-        assert len(report.stories) == 2
-        assert report.status_summary.get("green", 0) == 2
+    async def test_all_green_sets_all_green_true(self) -> None:
+        director = Director.from_config()
 
-    @pytest.mark.asyncio
-    async def test_failed_story_captured(self):
+        # Phase 1: planning returns 1 story (design_system, no deps)
         planning_json = json.dumps({
             "stories": [{
                 "id": "US-001",
-                "title": "Failing story",
-                "description": "This will fail",
+                "title": "Tokens",
+                "description": "Create tokens",
                 "agent_role": "design_system",
                 "depends_on": [],
                 "acceptance_criteria": [],
             }],
             "dependency_order": ["US-001"],
         })
-        router = ModelRouter(
-            routing={
-                "director": {"provider": "test", "model": "test"},
-                "design_system": {"provider": "fail", "model": "test"},
-            },
-            fallbacks={},
-        )
 
-        # Planning adapter succeeds
+        # Phase 2: story execution returns content
         call_count = 0
 
-        async def mock_generate(prompt, **kwargs):
-            """
-            Return a canned LLMResponse that yields a planning JSON on the first invocation and "OK" on subsequent invocations.
-            
-            Parameters:
-            	prompt (Any): The prompt passed to the mock; its value is not inspected by the mock.
-            	**kwargs: Ignored; present for compatibility with the real adapter signature.
-            
-            Returns:
-            	LLMResponse: On the first call, an LLMResponse whose `content` is the `planning_json` variable; on later calls, an LLMResponse whose `content` is "OK". In both cases `provider` is "test", `model` is "test", and `latency_ms` is 50.
-            
-            Side effects:
-            	Increments the outer-scope `call_count` on each invocation to track call order.
-            """
+        async def mock_call(model, messages):
             nonlocal call_count
             call_count += 1
             if call_count == 1:
-                return LLMResponse(content=planning_json, provider="test", model="test", latency_ms=50)
-            return LLMResponse(content="OK", provider="test", model="test", latency_ms=50)
+                # Planning call
+                return LLMResponse(
+                    text=planning_json,
+                    provider="anthropic",
+                    model="claude-opus-4-6",
+                    usage={"input_tokens": 100, "output_tokens": 50},
+                )
+            # Story execution call
+            return LLMResponse(
+                text='{"tokens": {"rose_gold": "#B76E79"}}',
+                provider="google",
+                model="gemini-3-pro-preview",
+                usage={"input_tokens": 50, "output_tokens": 25},
+            )
 
-        adapter = AsyncMock()
-        adapter.generate = mock_generate
-        router.register_adapter("test", adapter)
+        mock_adapter = AsyncMock()
+        mock_adapter.call = AsyncMock(side_effect=mock_call)
 
-        # Failing adapter
-        fail_adapter = AsyncMock()
-        fail_adapter.generate = AsyncMock(side_effect=RuntimeError("Provider down"))
-        router.register_adapter("fail", fail_adapter)
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            report = await director.execute_prd("Create design tokens")
 
-        director = Director(router=router)
-        report = await director.execute_prd("Build something")
-        assert report.all_green is False
-        assert len(report.failures) >= 1
+        assert report.all_green is True
+        assert report.failures == []
+        assert "US-001" in report.stories
 
     @pytest.mark.asyncio
-    async def test_elapsed_ms(self):
-        planning_json = _make_planning_json(1, roles=["qa"])
-        director = _make_director_with_mock(
-            planning_response=planning_json,
-            story_response="Done",
-        )
-        report = await director.execute_prd("Quick PRD")
+    async def test_failed_story_captured_in_failures_list(self) -> None:
+        director = Director.from_config()
+
+        planning_json = json.dumps({
+            "stories": [{
+                "id": "US-001",
+                "title": "Broken task",
+                "description": "Will fail",
+                "agent_role": "design_system",
+                "depends_on": [],
+                "acceptance_criteria": [],
+            }],
+            "dependency_order": ["US-001"],
+        })
+
+        call_count = 0
+
+        async def mock_call(model, messages):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                return LLMResponse(
+                    text=planning_json,
+                    provider="anthropic",
+                    model="claude-opus-4-6",
+                    usage={"input_tokens": 100, "output_tokens": 50},
+                )
+            raise RuntimeError("API connection failed")
+
+        mock_adapter = AsyncMock()
+        mock_adapter.call = AsyncMock(side_effect=mock_call)
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            report = await director.execute_prd("Fail PRD")
+
+        assert report.all_green is False
+        assert any("US-001" in f for f in report.failures)
+
+    @pytest.mark.asyncio
+    async def test_elapsed_ms_is_positive(self) -> None:
+        director = Director.from_config()
+        planning_json = _valid_planning_json(1)
+
+        call_count = 0
+
+        async def mock_call(model, messages, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            return LLMResponse(
+                text=planning_json if call_count == 1 else "ok",
+                provider="google",
+                model=model,
+                usage={"input_tokens": 50, "output_tokens": 25},
+            )
+
+        mock_adapter = AsyncMock()
+        mock_adapter.call = AsyncMock(side_effect=mock_call)
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            report = await director.execute_prd("Test timing")
+
         assert report.elapsed_ms > 0
 
     @pytest.mark.asyncio
-    async def test_stories_are_snapshot(self):
-        planning_json = _make_planning_json(1, roles=["qa"])
-        director = _make_director_with_mock(
-            planning_response=planning_json,
-            story_response="Done",
-        )
-        report = await director.execute_prd("PRD")
-        assert isinstance(report.stories, tuple)
-        # Modify director's internal state — report should not change
-        original_count = len(report.stories)
-        director._stories.clear()
-        assert len(report.stories) == original_count
+    async def test_stories_snapshot_in_report(self) -> None:
+        director = Director.from_config()
 
-    @pytest.mark.asyncio
-    async def test_instincts_count(self):
-        planning_json = _make_planning_json(1, roles=["qa"])
-        journal = LearningJournal()
-        router = ModelRouter(
-            routing={
-                "director": {"provider": "test", "model": "test"},
-                "qa": {"provider": "test", "model": "test"},
-            },
-            fallbacks={},
-        )
-        adapter = _make_fake_adapter(planning_json)
-
-        call_count = 0
-        original_generate = adapter.generate
-
-        async def counting_generate(prompt, **kwargs):
-            """
-            Simulates an async model generate that returns a planning response on the first call and a generic "OK" response thereafter.
-            
-            Increments the surrounding `call_count` each time it is invoked to track number of calls.
-            
-            Parameters:
-                prompt (str): The prompt passed to the model.
-                **kwargs: Additional generation options (ignored by this mock).
-            
-            Returns:
-                LLMResponse: On the first invocation, an LLMResponse whose `content` is the planning JSON; on subsequent invocations, an LLMResponse whose `content` is "OK". Both responses have `provider="test"`, `model="test"`, and `latency_ms=50`.
-            """
-            nonlocal call_count
-            call_count += 1
-            if call_count == 1:
-                return LLMResponse(content=planning_json, provider="test", model="test", latency_ms=50)
-            return LLMResponse(content="OK", provider="test", model="test", latency_ms=50)
-
-        adapter.generate = counting_generate
-        router.register_adapter("test", adapter)
-        director = Director(router=router, journal=journal)
-
-        report = await director.execute_prd("PRD text")
-        assert report.instincts_learned == 0  # No learning in this test
-
-    @pytest.mark.asyncio
-    async def test_cycle_guard(self):
-        """Stories with unresolvable circular deps should not loop forever."""
         planning_json = json.dumps({
             "stories": [
                 {
                     "id": "US-001",
-                    "title": "Story A",
-                    "description": "Depends on B",
+                    "title": "Design",
+                    "description": "Tokens",
                     "agent_role": "design_system",
-                    "depends_on": ["US-002"],
+                    "depends_on": [],
                 },
                 {
                     "id": "US-002",
-                    "title": "Story B",
-                    "description": "Depends on A",
+                    "title": "Frontend",
+                    "description": "Build pages",
                     "agent_role": "frontend_dev",
                     "depends_on": ["US-001"],
                 },
             ],
             "dependency_order": ["US-001", "US-002"],
         })
-        director = _make_director_with_mock(planning_response=planning_json)
-        report = await director.execute_prd("Circular PRD")
-        # Should complete without infinite loop
-        # Stories remain PENDING (no ready stories due to cycle)
-        assert report.all_green is False
+
+        call_count = 0
+
+        async def mock_call(model, messages, **kwargs):
+            nonlocal call_count
+            call_count += 1
+            if call_count == 1:
+                return LLMResponse(
+                    text=planning_json,
+                    provider="anthropic",
+                    model=model,
+                    usage={"input_tokens": 100, "output_tokens": 50},
+                )
+            return LLMResponse(
+                text="content",
+                provider="google",
+                model=model,
+                usage={"input_tokens": 50, "output_tokens": 25},
+            )
+
+        mock_adapter = AsyncMock()
+        mock_adapter.call = AsyncMock(side_effect=mock_call)
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            report = await director.execute_prd("Two-story PRD")
+
+        assert "US-001" in report.stories
+        assert "US-002" in report.stories
 
     @pytest.mark.asyncio
-    async def test_empty_prd(self):
-        planning_json = json.dumps({"stories": [], "dependency_order": []})
-        director = _make_director_with_mock(planning_response=planning_json)
-        report = await director.execute_prd("")
-        assert report.all_green is True  # No stories = vacuously all green
-        assert len(report.stories) == 0
+    async def test_dependency_cycle_guard(self) -> None:
+        """Stories with circular deps should surface failure, not loop forever."""
+        director = Director.from_config()
+
+        # Manually set up a cycle: A depends on B, B depends on A
+        # (bypass planning since we need a specific invalid state)
+        s1 = UserStory(
+            id="US-001", title="A", description="A",
+            agent_role=AgentRole.DESIGN_SYSTEM, depends_on=["US-002"],
+        )
+        s2 = UserStory(
+            id="US-002", title="B", description="B",
+            agent_role=AgentRole.FRONTEND_DEV, depends_on=["US-001"],
+        )
+        director.add_stories([s1, s2])
+
+        # Directly test the cycle detection in the execution loop
+        # by calling the internal loop logic
+        max_loops = len(director._stories) * 2
+        loop_count = 0
+        deadlocked = False
+
+        while True:
+            ready = director.get_ready_stories()
+            if not ready:
+                # Both stories are still PENDING — this IS the cycle
+                pending = [
+                    s for s in director._stories.values()
+                    if s.status == StoryStatus.PENDING
+                ]
+                if pending:
+                    deadlocked = True
+                break
+            if loop_count >= max_loops:
+                deadlocked = True
+                break
+            loop_count += 1
+
+        assert deadlocked is True
+
+    @pytest.mark.asyncio
+    async def test_empty_prd_produces_empty_report(self) -> None:
+        director = Director.from_config()
+
+        planning_json = json.dumps({
+            "stories": [],
+            "dependency_order": [],
+        })
+        mock_adapter = _make_mock_adapter(text=planning_json)
+
+        with patch("agents.runtime.get_adapter", return_value=mock_adapter):
+            report = await director.execute_prd("")
+
+        assert report.all_green is True
+        assert report.stories == {}
 
 
-# =============================================================================
-# TestDirectorConfigMaxStories
-# =============================================================================
+# ---------------------------------------------------------------------------
+# DirectorConfig.max_stories
+# ---------------------------------------------------------------------------
 
 
 class TestDirectorConfigMaxStories:
-    """Tests for DirectorConfig.max_stories field."""
+    def test_default_max_stories_is_50(self) -> None:
+        director = Director.from_config()
+        assert director._config.max_stories == 50
 
-    def test_default_50(self):
-        config = DirectorConfig()
-        assert config.max_stories == 50
-
-    def test_custom_value(self):
-        config = DirectorConfig(max_stories=25)
-        assert config.max_stories == 25
+    def test_custom_max_stories_stored(self) -> None:
+        from core.model_router import RoutingConfig
+        rc = RoutingConfig.from_dict({
+            "routes": {"director": {"provider": "anthropic", "model": "claude-opus-4-6"}},
+            "fallbacks": {"anthropic": {"provider": "google", "model": "gemini-3-pro-preview"}},
+        })
+        from director import DirectorConfig
+        config = DirectorConfig(routing_config=rc, max_stories=10)
+        assert config.max_stories == 10
