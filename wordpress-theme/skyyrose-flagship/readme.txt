@@ -1,94 +1,46 @@
 === SkyyRose Flagship ===
 Contributors: skyyrose
 Requires at least: 6.0
-Tested up to: 6.9
+Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 2.0.0
-License: GPLv2 or later
+Stable tag: 3.2.0
+License: GPL-2.0-or-later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
-Tags: e-commerce, woocommerce, elementor, three-js, 3d, luxury, fashion, block-patterns, custom-colors, custom-menu, featured-images, threaded-comments, translation-ready, accessibility-ready
+Tags: e-commerce, woocommerce, dark-theme, luxury, fashion, streetwear, glassmorphism, custom-colors, custom-menu, featured-images, threaded-comments, accessibility-ready
 
-Premium flagship WordPress theme featuring immersive 3D shopping experiences, WooCommerce integration, and Elementor Pro compatibility.
+A premium dark luxury WordPress theme for SkyyRose, an Oakland-based luxury streetwear brand. Features a complete WooCommerce integration, immersive product experiences inspired by drakerelated.com, and a dark aesthetic with glassmorphism, film grain overlays, and rose gold/gold accent colors.
 
 == Description ==
 
-SkyyRose Flagship is a cutting-edge WordPress theme that revolutionizes e-commerce by combining immersive 3D experiences with professional online shopping functionality. Designed for luxury fashion brands, this theme transforms your website into an interactive showroom where customers can explore products in stunning 3D environments.
+SkyyRose Flagship is a premium dark luxury WordPress theme designed for SkyyRose, an Oakland-based luxury streetwear brand. The theme delivers immersive product experiences with a dark aesthetic, glassmorphism effects, film grain overlays, and rose gold/gold accent colors throughout.
 
-= Key Features =
+= Features =
 
-* **4 Immersive 3D Experiences**: Interactive Three.js-powered shopping environments
-  - Signature Collection: Luxury runway with golden hour ambiance
-  - Love Hurts Collection: Beauty & the Beast-inspired enchanted ballroom
-  - Black Rose Collection: Gothic moonlit rose garden
-  - Preorder Gateway: Magical portal entrance with custom shaders
-
-* **Complete WooCommerce Integration**:
-  - Interactive 360° product viewer
-  - AR try-on capability (WebXR)
-  - AJAX-powered cart and checkout
-  - Advanced wishlist system with session storage
-  - Size selector with inventory tracking
-  - Quick view product modals
-  - WooCommerce 8.5+ HPOS compatible
-
-* **Elementor Pro Compatible**:
-  - 6 custom Elementor widgets
-  - 3D Scene Launcher widget
-  - Product Grid with AJAX filtering
-  - Collection Card widget
-  - AR Try-On Button
-  - Product Hotspot widget
-  - Pre-Order Form widget
-
-* **Performance Optimized**:
-  - PageSpeed 90+ target
-  - Service Worker for offline support
-  - Draco compression for 3D models
-  - KTX2 texture optimization
-  - LOD (Level of Detail) system
-  - Lazy loading assets
-  - Core Web Vitals optimized
-
-* **Security & Compliance**:
-  - OWASP 90% compliant
-  - CSRF protection on all forms
-  - Rate limiting on public endpoints
-  - Content Security Policy
-  - Zero security vulnerabilities (QA validated)
-
-* **Accessibility**:
-  - WCAG 2.1 AA compliant
-  - Semantic HTML5 structure
-  - Complete ARIA implementation
-  - Keyboard navigation support
-  - Screen reader optimized
-  - Focus indicators
-
-* **SEO Optimized**:
-  - Schema.org structured data (Product, Organization, Breadcrumb, Review)
-  - Open Graph tags
-  - Twitter Cards
-  - Canonical URLs
-  - XML sitemap ready
-  - Fast page load times
-
-* **Professional Features**:
-  - Fully responsive design
-  - Mobile-first approach
-  - Translation-ready (i18n)
-  - RTL language support
-  - 4 navigation menus
-  - 6 widget areas
-  - Child theme support
-  - Custom page templates
+* **Dark Luxury Design System** — #0A0A0A page background with #111111 card surfaces for a rich, cinematic feel
+* **4 Collection Pages** — Black Rose, Love Hurts, Signature, and Kids Capsule, each with unique color schemes and particle animations
+* **3 Immersive Scene Experiences** — Hotspot-based product discovery within cinematic environments
+* **Pre-Order Gateway** — Product modal, cart sidebar, and sign-in panel for upcoming releases
+* **Full WooCommerce Integration** — Product pages, cart, and a 4-step checkout flow
+* **Luxury Cursor** — Rose gold ring with sparkle trail on desktop
+* **Cinematic Mode Toggle** — Immersive viewing mode for product and scene pages
+* **Glassmorphism Navigation** — Frosted-glass header with scroll-triggered effects
+* **Film Grain SVG Overlay** — Subtle texture applied to all pages
+* **Inter + Playfair Display Typography** — Loaded via Google Fonts for a luxury editorial feel
+* **Responsive Design** — Breakpoints at 1200px, 768px, and 480px
+* **WCAG 2.2 AA Accessibility** — Full prefers-reduced-motion support for animations and transitions
+* **Security Hardened** — Content Security Policy, HSTS headers, XML-RPC disabled, nonce protection on all forms
+* **Conditional Asset Loading** — Scripts and styles loaded per template for optimal performance
+* **WordPress Customizer Integration** — Brand colors, social media URLs, and logo configurable from the Customizer
+* **Toast Notification System** — Non-intrusive feedback for user actions (add to cart, form submission, errors)
+* **Newsletter Subscription** — AJAX-powered email signup with validation
+* **Contact Form** — Honeypot anti-spam field with AJAX submission
 
 = Requirements =
 
 * WordPress 6.0 or higher
-* WooCommerce 8.0 or higher
-* Elementor Pro 3.14 or higher (optional, but recommended)
+* WooCommerce (required for e-commerce functionality)
 * PHP 7.4 or higher (8.0+ recommended)
-* Modern browser with WebGL support for 3D features
+* Modern browser with CSS backdrop-filter support for glassmorphism effects
 
 = Browser Support =
 
@@ -99,184 +51,119 @@ SkyyRose Flagship is a cutting-edge WordPress theme that revolutionizes e-commer
 * Mobile Safari (iOS 14+)
 * Chrome Mobile (Android 10+)
 
-= Demo Content =
-
-The theme includes demo content to help you get started:
-* 30 sample products (10 per collection)
-* 8 sample pages with templates
-* Pre-configured navigation menus
-* Widget area examples
-* Placeholder images
-
-= Documentation =
-
-Comprehensive documentation is included:
-* User Guide (150+ pages)
-* Developer Guide (200+ pages)
-* Installation instructions
-* Customization guide
-* Troubleshooting section
-* FAQ
-
-= Support =
-
-* Documentation: https://docs.skyyrose.com
-* Support Forum: https://support.skyyrose.com
-* Email: support@skyyrose.com
-
 == Installation ==
 
-= Automatic Installation =
+1. Upload the `skyyrose-flagship` folder to `/wp-content/themes/`
+2. Activate through Appearance > Themes in the WordPress admin
+3. Install and activate WooCommerce for full e-commerce functionality
+4. Set up navigation menus (Primary, Footer Shop, Footer Help, Footer Legal)
+5. Create pages and assign templates via Page Attributes
 
-1. Log in to your WordPress admin panel
-2. Navigate to Appearance > Themes
-3. Click "Add New"
-4. Click "Upload Theme"
-5. Choose the skyyrose-flagship.zip file
-6. Click "Install Now"
-7. Click "Activate"
+= After Activation =
 
-= Manual Installation =
+1. Navigate to Appearance > Customize to configure:
+   - Brand colors (rose gold, gold accents)
+   - Social media URLs
+   - Site logo and identity
 
-1. Download the theme ZIP file
-2. Extract the ZIP file
-3. Upload the 'skyyrose-flagship' folder to /wp-content/themes/
-4. Log in to WordPress admin
-5. Navigate to Appearance > Themes
-6. Click "Activate" on SkyyRose Flagship
+2. Create WooCommerce pages:
+   - Shop, Cart, Checkout, My Account
 
-= After Installation =
+3. Assign page templates:
+   - Collection pages (Black Rose, Love Hurts, Signature, Kids Capsule)
+   - Immersive scene pages
+   - Pre-order gateway
 
-1. Install required plugins:
-   - WooCommerce (required)
-   - Elementor Pro (recommended)
-
-2. Import demo content (optional):
-   - Navigate to Tools > Import
-   - Install WordPress Importer
-   - Import demo-content/demo-products.xml
-   - Import demo-content/demo-pages.xml
-   - Import demo-content/demo-menus.xml
-
-3. Configure theme settings:
-   - Navigate to Appearance > Customize
-   - Set colors, fonts, and layout options
-   - Configure WooCommerce settings
-   - Set up navigation menus
-   - Add widgets to widget areas
-
-4. Create pages using page templates:
-   - Love Hurts Collection - Enchanted Ballroom
-   - Signature Collection - Luxury Runway
-   - Black Rose Collection - Gothic Garden
-   - Preorder Gateway - Portal Entrance
+4. Configure menus under Appearance > Menus:
+   - Primary Navigation
+   - Footer Shop
+   - Footer Help
+   - Footer Legal
 
 == Frequently Asked Questions ==
 
-= Do I need Elementor Pro? =
-
-Elementor Pro is optional but recommended for the best experience. The theme works perfectly without it, but the 6 custom Elementor widgets require Elementor Pro.
-
 = Is WooCommerce required? =
 
-Yes, WooCommerce is required for the e-commerce functionality. The theme is specifically designed to integrate with WooCommerce 8.0+.
+Yes. WooCommerce is required for the product pages, cart, and checkout functionality. The theme is built around WooCommerce integration.
 
-= Will the 3D experiences work on mobile? =
+= Does the theme work without JavaScript? =
 
-Yes! The 3D experiences are fully responsive and optimized for mobile devices. They automatically reduce particle counts and effects on lower-powered devices for optimal performance.
+Core content and navigation are accessible without JavaScript. Enhanced features like the luxury cursor, cinematic mode, particle animations, and AJAX form submissions require JavaScript.
 
-= What about browser compatibility? =
+= Can I customize the brand colors? =
 
-The theme supports all modern browsers (Chrome, Firefox, Safari, Edge). The 3D features require WebGL support, which is available in all browsers from 2020 onwards.
+Yes. The WordPress Customizer includes settings for brand colors, social media URLs, and the site logo. The dark luxury palette (#0A0A0A backgrounds, rose gold accents) can be adjusted to match your brand.
 
-= Is the theme translation-ready? =
+= Is the theme accessible? =
 
-Yes! The theme is fully translation-ready with i18n/l10n support. All strings are properly wrapped for translation using WordPress standards.
+Yes. The theme targets WCAG 2.2 AA compliance with semantic HTML, ARIA labels, keyboard navigation, focus indicators, and full prefers-reduced-motion support for users who disable animations.
 
-= Does it support RTL languages? =
+= What about the luxury cursor on mobile? =
 
-Yes, the theme fully supports RTL (right-to-left) languages like Arabic and Hebrew.
+The luxury cursor (rose gold ring with sparkle trail) is desktop-only. It is automatically disabled on touch devices.
 
-= Can I customize the colors? =
+= How does conditional asset loading work? =
 
-Absolutely! The theme includes 40+ customization options in the WordPress Customizer, including colors, fonts, layout settings, and more.
-
-= Is it accessible? =
-
-Yes! The theme is WCAG 2.1 AA compliant with semantic HTML5, ARIA labels, keyboard navigation, and screen reader support.
-
-= What about performance? =
-
-The theme is highly optimized with PageSpeed 90+ targets, lazy loading, service worker caching, optimized 3D assets, and Core Web Vitals optimization.
-
-= Can I create a child theme? =
-
-Yes! The theme is fully compatible with WordPress child themes. Follow standard WordPress child theme practices.
+Each page template only loads the CSS and JavaScript it needs. Collection pages load particle animation scripts, immersive pages load scene scripts, and WooCommerce pages load cart/checkout scripts. This reduces page weight across the site.
 
 == Screenshots ==
 
-1. Homepage with featured collections
-2. Signature Collection - 3D luxury runway experience
-3. Love Hurts Collection - Beauty & the Beast ballroom
-4. Black Rose Collection - Gothic rose garden
-5. Product page with 360° viewer
-6. Shopping cart with AJAX functionality
-7. Multi-step checkout process
-8. Elementor widget library
+1. Homepage with dark luxury design system
+2. Black Rose Collection page with particle effects
+3. Immersive scene experience with product hotspots
+4. Pre-order gateway with product modal
+5. WooCommerce product page
+6. 4-step checkout flow
+7. Glassmorphism navigation with scroll effects
+8. Luxury cursor with sparkle trail
 9. WordPress Customizer panel
-10. Mobile responsive design
+10. Mobile responsive layout
 
 == Changelog ==
 
-= 1.0.0 - February 8, 2026 =
-* Initial release
-* 4 immersive 3D shopping experiences
-* Complete WooCommerce integration
-* 6 custom Elementor widgets
-* WCAG 2.1 AA accessibility compliance
-* OWASP 90% security compliance
-* WooCommerce HPOS support
-* WordPress 6.4 theme.json support
-* PageSpeed 90+ optimization
-* Comprehensive documentation (250+ pages)
-* 100+ automated tests
-* QA validated (92/100 - EXCELLENT)
+= 3.2.0 =
+* Complete theme rebuild from PRD
+* Full dark luxury design system (#0A0A0A backgrounds, glassmorphism, film grain)
+* 4 collection pages with unique color schemes and particle effects
+* 3 immersive scene experiences with hotspot product discovery
+* WooCommerce cart and 4-step checkout integration
+* Luxury Cursor and Cinematic Mode specialty features
+* Security hardened (12 vulnerability fixes — CSP, HSTS, XML-RPC, nonces)
+* AJAX form handlers for contact, newsletter, and sign-in
 
 == Upgrade Notice ==
 
-= 1.0.0 =
-Initial release of SkyyRose Flagship theme. A revolutionary e-commerce experience combining immersive 3D environments with professional online shopping functionality.
+= 3.2.0 =
+Complete rebuild. Back up your site before upgrading. This version replaces the previous theme architecture with a new dark luxury design system, WooCommerce checkout flow, and security hardening.
 
 == Credits ==
 
-* Three.js - https://threejs.org/ (MIT License)
-* GSAP - https://greensock.com/gsap/ (Standard License)
-* WooCommerce - https://woocommerce.com/ (GPL)
-* Elementor - https://elementor.com/ (GPL)
+* Inter typeface — https://rsms.me/inter/ (SIL Open Font License)
+* Playfair Display typeface — https://github.com/clauseggers/Playfair-Display (SIL Open Font License)
+* WooCommerce — https://woocommerce.com/ (GPL)
 
 == Privacy Policy ==
 
-SkyyRose Flagship theme does not collect any personal data from your website visitors. All data handling is managed by WordPress, WooCommerce, and any plugins you choose to install.
+SkyyRose Flagship does not collect personal data from website visitors beyond what WordPress and WooCommerce handle natively.
 
 The theme includes:
-* Session storage for guest wishlists (client-side only, not sent to servers)
 * Local storage for user preferences (client-side only)
 * No tracking cookies
-* No external API calls (except for optional features like payment gateways configured through WooCommerce)
+* No external API calls beyond Google Fonts and WooCommerce payment gateways
 
 == Theme URI ==
 
-https://skyyrose.com/themes/flagship
+https://skyyrose.co
 
 == Author ==
 
-SkyyRose Team
-https://skyyrose.com
+The Skyy Rose Collection LLC
+https://skyyrose.co
 
 == Copyright ==
 
-SkyyRose Flagship Theme, Copyright 2026 SkyyRose LLC
-SkyyRose Flagship is distributed under the terms of the GNU GPL v2 or later
+SkyyRose Flagship Theme, Copyright 2026 The Skyy Rose Collection LLC
+SkyyRose Flagship is distributed under the terms of the GNU GPL v2 or later.
 
 This program is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
