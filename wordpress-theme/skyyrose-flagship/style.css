@@ -1,60 +1,48 @@
-/*!
+/*
 Theme Name: SkyyRose Flagship
-Theme URI: https://skyyrose.com
-Author: SkyyRose Team
-Author URI: https://skyyrose.com
-Description: Premium flagship WordPress theme for SkyyRose featuring Three.js 3D integration, WooCommerce support, and Elementor Pro compatibility. Built with modern web standards and optimized for performance.
-Version: 2.0.0
-Requires at least: 6.0
-Tested up to: 6.9
-Requires PHP: 7.4
-License: GNU General Public License v2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Theme URI: https://skyyrose.co
+Author: The Skyy Rose Collection LLC
+Author URI: https://skyyrose.co
+Description: Where Love Meets Luxury — Oakland's premier luxury streetwear WordPress theme
+Version: 3.2.0
+Requires at least: 6.4
+Tested up to: 6.7
+Requires PHP: 8.0
+License: GPL-2.0-or-later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: skyyrose-flagship
-Domain Path: /languages
-Tags: e-commerce, flexible-header, custom-colors, custom-menu, featured-images, threaded-comments, translation-ready, block-patterns, full-site-editing
-
-SkyyRose Flagship Theme, Copyright 2026 SkyyRose Team
-SkyyRose Flagship is distributed under the terms of the GNU GPL
+Tags: dark, e-commerce, woocommerce, luxury, streetwear, full-site-editing
 */
 
-/*--------------------------------------------------------------
->>> TABLE OF CONTENTS:
-----------------------------------------------------------------
-# Generic
-	- Normalize
-	- Box sizing
-# Base
-	- Typography
-	- Elements
-	- Links
-	- Forms
-## Layouts
-# Components
-	- Navigation
-	- Posts and pages
-	- Comments
-	- Widgets
-	- Media
-	- Captions
-	- Galleries
-# WooCommerce
-	- Products
-	- Cart
-	- Checkout
-# Elementor
-# Three.js Integration
-# Utilities
-	- Accessibility
-	- Alignments
---------------------------------------------------------------*/
+/* ==================================================
+   TABLE OF CONTENTS
+   ==================================================
+   # Reset & Normalize
+   # Base Typography
+   # Body & Page Background
+   # Links
+   # Headings
+   # Buttons
+   # Forms
+   # Layout & Containers
+   # Navigation — Glassmorphism Navbar
+   # Logo Gradient
+   # Hero Sections
+   # Cards — Dark Theme
+   # Footer
+   # WooCommerce
+   # Three.js Integration
+   # Accessibility
+   # Alignments
+   # Animations
+   # Responsive — 1200px / 768px / 480px
+   # Print
+   ================================================== */
 
-/*--------------------------------------------------------------
-# Generic
---------------------------------------------------------------*/
+/* ==================================================
+   # Reset & Normalize
+   ================================================== */
 
-/* Normalize
---------------------------------------------- */
 *,
 *::before,
 *::after {
@@ -64,6 +52,7 @@ SkyyRose Flagship is distributed under the terms of the GNU GPL
 html {
 	line-height: 1.15;
 	-webkit-text-size-adjust: 100%;
+	scroll-behavior: smooth;
 }
 
 body {
@@ -78,6 +67,8 @@ hr {
 	box-sizing: content-box;
 	height: 0;
 	overflow: visible;
+	border: 0;
+	border-top: 1px solid var(--color-border, #2A2A2A);
 }
 
 pre {
@@ -169,13 +160,6 @@ button::-moz-focus-inner,
 	padding: 0;
 }
 
-button:-moz-focusring,
-[type="button"]:-moz-focusring,
-[type="reset"]:-moz-focusring,
-[type="submit"]:-moz-focusring {
-	outline: 1px dotted ButtonText;
-}
-
 fieldset {
 	padding: 0.35em 0.75em 0.625em;
 }
@@ -238,23 +222,111 @@ template {
 	display: none;
 }
 
-/*--------------------------------------------------------------
-# Base
---------------------------------------------------------------*/
+/* ==================================================
+   # Body & Page Background
+   Dark luxury theme: #0A0A0A
+   ================================================== */
 
-/* Typography
---------------------------------------------- */
+body {
+	font-family: var(--font-body, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
+	font-size: var(--text-base, 1rem);
+	font-weight: var(--weight-regular, 400);
+	line-height: var(--leading-normal, 1.6);
+	color: var(--color-text-primary, #FFFFFF);
+	background-color: var(--color-page-bg, #0A0A0A);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	text-rendering: optimizeLegibility;
+}
+
+/* ==================================================
+   # Base Typography
+   ================================================== */
+
 body,
 button,
 input,
 select,
 optgroup,
 textarea {
-	color: #404040;
-	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
-	font-size: 1rem;
-	line-height: 1.5;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	color: var(--color-text-primary, #FFFFFF);
 }
+
+p {
+	margin-bottom: var(--space-sm, 1rem);
+	color: var(--color-text-secondary, #CCCCCC);
+	line-height: var(--leading-normal, 1.6);
+}
+
+blockquote {
+	margin: 0 0 var(--space-md, 1.5rem);
+	padding: var(--space-sm, 1rem) var(--space-md, 1.5rem);
+	border-left: 4px solid var(--color-rose-gold, #B76E79);
+	color: var(--color-text-secondary, #CCCCCC);
+	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-style: italic;
+}
+
+address {
+	margin: 0 0 var(--space-md, 1.5rem);
+}
+
+pre {
+	background: var(--color-card-bg, #111111);
+	font-family: "Courier 10 Pitch", courier, monospace;
+	line-height: 1.6;
+	margin-bottom: 1.6em;
+	max-width: 100%;
+	overflow: auto;
+	padding: 1.6em;
+	border: 1px solid var(--color-border, #2A2A2A);
+	border-radius: var(--radius-md, 8px);
+	color: var(--color-text-secondary, #CCCCCC);
+}
+
+code,
+kbd,
+tt,
+var {
+	font-family: monaco, consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+	background: var(--color-card-bg, #111111);
+	padding: 0.15em 0.4em;
+	border-radius: var(--radius-sm, 4px);
+	font-size: 0.9em;
+}
+
+mark,
+ins {
+	background: rgba(212, 175, 55, 0.2);
+	color: var(--color-gold, #D4AF37);
+	text-decoration: none;
+}
+
+/* ==================================================
+   # Links
+   ================================================== */
+
+a {
+	color: var(--color-rose-gold, #B76E79);
+	text-decoration: none;
+	transition: var(--transition-smooth, all 0.3s ease);
+}
+
+a:hover {
+	color: var(--color-gold, #D4AF37);
+}
+
+a:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
+	border-radius: var(--radius-xs, 2px);
+}
+
+/* ==================================================
+   # Headings
+   Playfair Display on all headings, white text
+   ================================================== */
 
 h1,
 h2,
@@ -263,93 +335,234 @@ h4,
 h5,
 h6 {
 	clear: both;
-	font-weight: 700;
-	line-height: 1.3;
-	margin: 0 0 1.5rem;
+	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-weight: var(--weight-bold, 700);
+	line-height: var(--leading-snug, 1.3);
+	margin: 0 0 var(--space-sm, 1rem);
+	color: var(--color-text-primary, #FFFFFF);
 }
 
-p {
-	margin-bottom: 1.5em;
+h1 {
+	font-size: var(--text-4xl);
+	line-height: var(--leading-tight, 1.15);
+	letter-spacing: var(--tracking-tight, -0.025em);
+	margin-bottom: var(--space-lg, 2rem);
 }
 
-dfn,
-cite,
-em,
-i {
-	font-style: italic;
+h2 {
+	font-size: var(--text-3xl);
+	line-height: 1.2;
+	letter-spacing: var(--tracking-tight, -0.025em);
+	margin-bottom: var(--space-md, 1.5rem);
 }
 
-blockquote {
-	margin: 0 1.5em;
-	padding: 1em;
-	border-left: 4px solid #ddd;
+h3 {
+	font-size: var(--text-2xl);
 }
 
-address {
-	margin: 0 0 1.5em;
+h4 {
+	font-size: var(--text-xl);
 }
 
-pre {
-	background: #eee;
-	font-family: "Courier 10 Pitch", courier, monospace;
-	line-height: 1.6;
-	margin-bottom: 1.6em;
-	max-width: 100%;
-	overflow: auto;
-	padding: 1.6em;
+h5 {
+	font-size: var(--text-lg);
 }
 
-code,
-kbd,
-tt,
-var {
-	font-family: monaco, consolas, "Andale Mono", "DejaVu Sans Mono", monospace;
+h6 {
+	font-size: var(--text-base);
+	font-weight: var(--weight-semibold, 600);
+	color: var(--color-text-secondary, #CCCCCC);
 }
 
-abbr,
-acronym {
-	border-bottom: 1px dotted #666;
-	cursor: help;
-}
+/* ==================================================
+   # Buttons
+   ================================================== */
 
-mark,
-ins {
-	background: #fff9c0;
+.btn,
+button[type="submit"],
+input[type="submit"],
+.wp-block-button__link {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 14px 28px;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: var(--text-sm);
+	font-weight: var(--weight-semibold, 600);
+	letter-spacing: var(--tracking-wide, 0.05em);
+	text-transform: uppercase;
+	text-align: center;
 	text-decoration: none;
+	border: none;
+	border-radius: var(--radius-sm, 4px);
+	cursor: pointer;
+	transition: var(--transition-spring, all 0.6s cubic-bezier(0.16, 1, 0.3, 1));
+	background: var(--color-rose-gold, #B76E79);
+	color: var(--color-white, #FFFFFF);
+	box-shadow: var(--shadow-md);
 }
 
-big {
-	font-size: 125%;
+.btn:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover,
+.wp-block-button__link:hover {
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-lg), var(--shadow-rose-glow);
+	color: var(--color-white, #FFFFFF);
+	background: var(--color-gold, #D4AF37);
 }
 
-/*--------------------------------------------------------------
-# Layouts
---------------------------------------------------------------*/
+.btn:active {
+	transform: translateY(0);
+}
+
+.btn:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+.btn-primary {
+	background: var(--gradient-rose-gold);
+}
+
+.btn-secondary {
+	background: transparent;
+	border: 2px solid var(--color-rose-gold, #B76E79);
+	color: var(--color-rose-gold, #B76E79);
+}
+
+.btn-secondary:hover {
+	background: var(--color-rose-gold, #B76E79);
+	color: var(--color-white, #FFFFFF);
+}
+
+.btn-crimson {
+	background: var(--color-crimson, #DC143C);
+}
+
+.btn-crimson:hover {
+	background: var(--color-red, #FF0000);
+	box-shadow: var(--shadow-lg), var(--shadow-crimson-glow);
+}
+
+/* ==================================================
+   # Forms — Dark Theme
+   ================================================== */
+
+input[type="text"],
+input[type="email"],
+input[type="url"],
+input[type="password"],
+input[type="search"],
+input[type="number"],
+input[type="tel"],
+textarea,
+select {
+	width: 100%;
+	padding: var(--space-sm, 1rem);
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: var(--text-base);
+	color: var(--color-text-primary, #FFFFFF);
+	background-color: var(--color-card-bg, #111111);
+	border: 1px solid var(--color-border, #2A2A2A);
+	border-radius: var(--radius-md, 8px);
+	transition: var(--transition-smooth, all 0.3s ease);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+	border-color: var(--color-rose-gold, #B76E79);
+	outline: none;
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.15);
+}
+
+label {
+	display: block;
+	margin-bottom: var(--space-xs, 0.5rem);
+	font-weight: var(--weight-medium, 500);
+	color: var(--color-text-secondary, #CCCCCC);
+	font-size: var(--text-sm);
+}
+
+::placeholder {
+	color: var(--color-text-dim, #666666);
+}
+
+/* ==================================================
+   # Layout & Containers
+   ================================================== */
+
 .site {
 	max-width: 100%;
 	margin: 0 auto;
 }
 
 .site-content {
-	padding: 2rem 0;
+	padding: var(--space-lg, 2rem) 0;
 }
 
 .content-area {
 	width: 100%;
 }
 
-@media screen and (min-width: 768px) {
-	.site-content {
-		padding: 3rem 0;
-	}
+.container {
+	max-width: var(--container-content, 1200px);
+	margin-left: auto;
+	margin-right: auto;
+	padding-left: var(--space-md, 1.5rem);
+	padding-right: var(--space-md, 1.5rem);
 }
 
-/*--------------------------------------------------------------
-# Components
---------------------------------------------------------------*/
+.container--wide {
+	max-width: var(--container-wide, 1400px);
+}
 
-/* Navigation
---------------------------------------------- */
+.container--narrow {
+	max-width: var(--container-narrow, 800px);
+}
+
+.section {
+	padding-top: var(--space-3xl, 6rem);
+	padding-bottom: var(--space-3xl, 6rem);
+}
+
+.section-title {
+	text-align: center;
+	margin-bottom: var(--space-xl, 3rem);
+}
+
+.section-subtitle {
+	font-size: var(--text-lg);
+	color: var(--color-rose-gold, #B76E79);
+	margin-bottom: var(--space-xs, 0.5rem);
+	text-transform: uppercase;
+	letter-spacing: var(--tracking-wider, 0.1em);
+	font-weight: var(--weight-medium, 500);
+}
+
+/* ==================================================
+   # Navigation — Glassmorphism Navbar
+   ================================================== */
+
+.site-header {
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	z-index: var(--z-sticky, 200);
+	background: var(--glass-bg, rgba(17, 17, 17, 0.95));
+	backdrop-filter: var(--glass-blur, blur(20px));
+	-webkit-backdrop-filter: var(--glass-blur, blur(20px));
+	border-bottom: var(--glass-border, 1px solid rgba(255, 255, 255, 0.06));
+	transition: var(--transition-smooth, all 0.3s ease);
+}
+
+.site-header.scrolled {
+	background: var(--glass-bg-dark, rgba(10, 10, 10, 0.98));
+	box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+}
+
 .main-navigation {
 	display: block;
 	width: 100%;
@@ -363,12 +576,18 @@ big {
 }
 
 .main-navigation ul ul {
-	box-shadow: 0 3px 3px rgba(0, 0, 0, 0.2);
+	box-shadow: var(--shadow-lg);
 	float: left;
 	position: absolute;
 	top: 100%;
 	left: -999em;
 	z-index: 99999;
+	background: var(--glass-bg, rgba(17, 17, 17, 0.95));
+	backdrop-filter: var(--glass-blur, blur(20px));
+	-webkit-backdrop-filter: var(--glass-blur, blur(20px));
+	border: var(--glass-border, 1px solid rgba(255, 255, 255, 0.06));
+	border-radius: var(--radius-md, 8px);
+	padding: var(--space-xs, 0.5rem) 0;
 }
 
 .main-navigation ul ul ul {
@@ -384,7 +603,8 @@ big {
 }
 
 .main-navigation ul ul a {
-	width: 200px;
+	width: 220px;
+	padding: var(--space-xs, 0.5rem) var(--space-sm, 1rem);
 }
 
 .main-navigation ul li:hover > ul,
@@ -399,29 +619,179 @@ big {
 .main-navigation a {
 	display: block;
 	text-decoration: none;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-weight: var(--weight-medium, 500);
+	font-size: var(--text-sm);
+	letter-spacing: var(--tracking-wide, 0.05em);
+	text-transform: uppercase;
+	padding: var(--space-xs, 0.5rem) var(--space-sm, 1rem);
+	color: var(--color-text-secondary, #CCCCCC);
+	transition: var(--transition-smooth, all 0.3s ease);
 }
 
-/* Small menu. */
+.main-navigation a:hover {
+	color: var(--color-rose-gold, #B76E79);
+}
+
+.main-navigation .current-menu-item > a,
+.main-navigation .current_page_item > a {
+	color: var(--color-rose-gold, #B76E79);
+}
+
+/* Mobile menu toggle */
 .menu-toggle,
 .main-navigation.toggled ul {
 	display: block;
 }
 
-@media screen and (min-width: 768px) {
-	.menu-toggle {
-		display: none;
-	}
-
-	.main-navigation ul {
-		display: flex;
-	}
+.menu-toggle {
+	background: transparent;
+	border: 1px solid var(--color-border, #2A2A2A);
+	color: var(--color-text-primary, #FFFFFF);
+	padding: var(--space-xs, 0.5rem) var(--space-sm, 1rem);
+	border-radius: var(--radius-sm, 4px);
 }
 
-/*--------------------------------------------------------------
-# WooCommerce
---------------------------------------------------------------*/
+/* ==================================================
+   # Logo Gradient
+   Rose Gold -> Gold -> Silver
+   ================================================== */
+
+.site-title a,
+.logo-text {
+	background: var(--gradient-logo, linear-gradient(135deg, #B76E79 0%, #D4AF37 50%, #C0C0C0 100%));
+	-webkit-background-clip: text;
+	-webkit-text-fill-color: transparent;
+	background-clip: text;
+	font-family: var(--font-heading, 'Playfair Display', serif);
+	font-weight: var(--weight-bold, 700);
+	letter-spacing: var(--tracking-wide, 0.05em);
+}
+
+.site-title a:hover,
+.logo-text:hover {
+	opacity: 0.85;
+}
+
+/* ==================================================
+   # Hero Sections
+   ================================================== */
+
+.hero {
+	position: relative;
+	min-height: 80vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	overflow: hidden;
+	background-color: var(--color-page-bg, #0A0A0A);
+}
+
+.hero::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: var(--gradient-overlay);
+	z-index: 1;
+}
+
+.hero-content {
+	position: relative;
+	z-index: 2;
+	color: var(--color-white, #FFFFFF);
+	max-width: var(--container-narrow, 800px);
+	padding: var(--space-lg, 2rem);
+}
+
+.hero-title {
+	font-size: var(--text-5xl);
+	margin-bottom: var(--space-md, 1.5rem);
+	color: var(--color-white, #FFFFFF);
+}
+
+.hero-subtitle {
+	font-size: var(--text-xl);
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-weight: var(--weight-light, 300);
+	margin-bottom: var(--space-xl, 3rem);
+	color: var(--color-text-secondary, #CCCCCC);
+	letter-spacing: var(--tracking-wide, 0.05em);
+}
+
+/* ==================================================
+   # Cards — Dark Theme
+   ================================================== */
+
+.card {
+	background: var(--color-card-bg, #111111);
+	border: 1px solid var(--color-border, #2A2A2A);
+	border-radius: var(--radius-lg, 12px);
+	padding: var(--space-lg, 2rem);
+	transition: var(--transition-spring, all 0.6s cubic-bezier(0.16, 1, 0.3, 1));
+}
+
+.card:hover {
+	transform: translateY(-4px);
+	border-color: rgba(183, 110, 121, 0.3);
+	box-shadow: var(--shadow-lg), var(--shadow-rose-glow);
+}
+
+.card-image {
+	width: 100%;
+	height: auto;
+	border-radius: var(--radius-md, 8px);
+	margin-bottom: var(--space-sm, 1rem);
+}
+
+.card-title {
+	font-size: var(--text-xl);
+	margin-bottom: var(--space-xs, 0.5rem);
+	color: var(--color-text-primary, #FFFFFF);
+}
+
+.card-description {
+	color: var(--color-text-muted, #999999);
+	margin-bottom: var(--space-md, 1.5rem);
+	font-size: var(--text-sm);
+	line-height: var(--leading-relaxed, 1.75);
+}
+
+/* ==================================================
+   # Footer — Dark
+   ================================================== */
+
+.site-footer {
+	background: var(--color-black, #000000);
+	color: var(--color-text-muted, #999999);
+	padding: var(--space-3xl, 6rem) 0 var(--space-lg, 2rem);
+	border-top: 1px solid var(--color-border, #2A2A2A);
+}
+
+.site-footer a {
+	color: var(--color-text-secondary, #CCCCCC);
+	transition: var(--transition-smooth, all 0.3s ease);
+}
+
+.site-footer a:hover {
+	color: var(--color-rose-gold, #B76E79);
+}
+
+.footer-branding {
+	margin-bottom: var(--space-lg, 2rem);
+	text-align: center;
+}
+
+/* ==================================================
+   # WooCommerce — Dark Theme
+   ================================================== */
+
 .woocommerce-breadcrumb {
-	margin-bottom: 2rem;
+	margin-bottom: var(--space-lg, 2rem);
+	color: var(--color-text-muted, #999999);
 }
 
 .woocommerce div.product {
@@ -433,34 +803,50 @@ big {
 .woocommerce a.button,
 .woocommerce button.button,
 .woocommerce input.button {
-	font-size: 100%;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: var(--text-sm);
+	font-weight: var(--weight-semibold, 600);
+	letter-spacing: var(--tracking-wide, 0.05em);
+	text-transform: uppercase;
 	margin: 0;
 	line-height: 1;
 	cursor: pointer;
 	position: relative;
 	text-decoration: none;
 	overflow: visible;
-	padding: 0.618em 1em;
-	font-weight: 700;
-	border-radius: 3px;
+	padding: 14px 28px;
+	border-radius: var(--radius-sm, 4px);
 	left: auto;
-	color: #fff;
-	background-color: #000;
+	color: var(--color-white, #FFFFFF);
+	background: var(--color-rose-gold, #B76E79);
 	border: 0;
 	display: inline-block;
 	background-image: none;
 	box-shadow: none;
 	text-shadow: none;
+	transition: var(--transition-spring, all 0.6s cubic-bezier(0.16, 1, 0.3, 1));
 }
 
-/*--------------------------------------------------------------
-# Three.js Integration
---------------------------------------------------------------*/
+.woocommerce #respond input#submit:hover,
+.woocommerce a.button:hover,
+.woocommerce button.button:hover,
+.woocommerce input.button:hover {
+	background: var(--color-gold, #D4AF37);
+	color: var(--color-black, #000000);
+	transform: translateY(-2px);
+	box-shadow: var(--shadow-lg), var(--shadow-gold-glow);
+}
+
+/* ==================================================
+   # Three.js Integration
+   ================================================== */
+
 .three-container {
 	width: 100%;
 	height: 100vh;
 	position: relative;
 	overflow: hidden;
+	background-color: var(--color-page-bg, #0A0A0A);
 }
 
 .three-canvas {
@@ -469,13 +855,12 @@ big {
 	height: 100%;
 }
 
-/*--------------------------------------------------------------
-# Utilities
---------------------------------------------------------------*/
+/* ==================================================
+   # Accessibility
+   ================================================== */
 
-/* Accessibility
---------------------------------------------- */
-.screen-reader-text {
+.screen-reader-text,
+.sr-only {
 	border: 0;
 	clip: rect(1px, 1px, 1px, 1px);
 	clip-path: inset(50%);
@@ -489,15 +874,15 @@ big {
 }
 
 .screen-reader-text:focus {
-	background-color: #f1f1f1;
-	border-radius: 3px;
-	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+	background-color: var(--color-card-bg, #111111);
+	border-radius: var(--radius-sm, 4px);
+	box-shadow: 0 0 2px 2px rgba(183, 110, 121, 0.6);
 	clip: auto !important;
 	clip-path: none;
-	color: #21759b;
+	color: var(--color-rose-gold, #B76E79);
 	display: block;
-	font-size: 0.875rem;
-	font-weight: 700;
+	font-size: var(--text-sm);
+	font-weight: var(--weight-bold, 700);
 	height: auto;
 	left: 5px;
 	line-height: normal;
@@ -508,18 +893,42 @@ big {
 	z-index: 100000;
 }
 
-/* Alignments
---------------------------------------------- */
+.skip-link {
+	position: absolute;
+	top: -40px;
+	left: 0;
+	background: var(--color-rose-gold, #B76E79);
+	color: var(--color-white, #FFFFFF);
+	padding: var(--space-xs, 0.5rem) var(--space-sm, 1rem);
+	text-decoration: none;
+	z-index: var(--z-tooltip, 600);
+	transition: var(--transition-smooth, all 0.3s ease);
+}
+
+.skip-link:focus {
+	top: 0;
+}
+
+/* Ensure focus outlines for keyboard navigation */
+:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* ==================================================
+   # Alignments
+   ================================================== */
+
 .alignleft {
 	float: left;
-	margin-right: 1.5em;
-	margin-bottom: 1.5em;
+	margin-right: var(--space-md, 1.5rem);
+	margin-bottom: var(--space-md, 1.5rem);
 }
 
 .alignright {
 	float: right;
-	margin-left: 1.5em;
-	margin-bottom: 1.5em;
+	margin-left: var(--space-md, 1.5rem);
+	margin-bottom: var(--space-md, 1.5rem);
 }
 
 .aligncenter {
@@ -527,5 +936,209 @@ big {
 	display: block;
 	margin-left: auto;
 	margin-right: auto;
-	margin-bottom: 1.5em;
+	margin-bottom: var(--space-md, 1.5rem);
+}
+
+/* ==================================================
+   # Animations
+   ================================================== */
+
+@keyframes fadeIn {
+	from {
+		opacity: 0;
+		transform: translateY(20px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes fadeInUp {
+	from {
+		opacity: 0;
+		transform: translateY(30px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slideUp {
+	from {
+		opacity: 0;
+		transform: translateY(40px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes subtleGlow {
+	0%,
+	100% {
+		opacity: 0.6;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+.fade-in {
+	animation: fadeIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.fade-in-up {
+	animation: fadeInUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.slide-up {
+	animation: slideUp 0.6s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+
+	body::after {
+		display: none;
+	}
+}
+
+/* ==================================================
+   # Responsive — Tablet Landscape (1200px)
+   ================================================== */
+
+@media screen and (min-width: 768px) {
+	.menu-toggle {
+		display: none;
+	}
+
+	.main-navigation ul {
+		display: flex;
+	}
+
+	.site-content {
+		padding: var(--space-xl, 3rem) 0;
+	}
+}
+
+@media screen and (max-width: 1200px) {
+	.container {
+		max-width: 100%;
+	}
+
+	.hero-title {
+		font-size: var(--text-4xl);
+	}
+}
+
+/* ==================================================
+   # Responsive — Tablet (768px)
+   ================================================== */
+
+@media screen and (max-width: 768px) {
+	.hero {
+		min-height: 60vh;
+	}
+
+	.hero-title {
+		font-size: var(--text-3xl);
+	}
+
+	.hero-subtitle {
+		font-size: var(--text-base);
+	}
+
+	.section {
+		padding-top: var(--space-xl, 3rem);
+		padding-bottom: var(--space-xl, 3rem);
+	}
+
+	.container {
+		padding-left: var(--space-sm, 1rem);
+		padding-right: var(--space-sm, 1rem);
+	}
+
+	h1 {
+		font-size: var(--text-3xl);
+	}
+
+	h2 {
+		font-size: var(--text-2xl);
+	}
+}
+
+/* ==================================================
+   # Responsive — Mobile (480px)
+   ================================================== */
+
+@media screen and (max-width: 480px) {
+	.hero {
+		min-height: 50vh;
+	}
+
+	.hero-title {
+		font-size: var(--text-2xl);
+	}
+
+	.hero-content {
+		padding: var(--space-sm, 1rem);
+	}
+
+	.card {
+		padding: var(--space-sm, 1rem);
+	}
+
+	.btn,
+	button[type="submit"],
+	input[type="submit"],
+	.wp-block-button__link {
+		padding: 12px 20px;
+		font-size: var(--text-xs);
+	}
+}
+
+/* ==================================================
+   # Print Styles
+   ================================================== */
+
+@media print {
+	.site-header,
+	.site-footer,
+	.btn,
+	button,
+	.skip-link {
+		display: none;
+	}
+
+	body {
+		background: white;
+		color: black;
+		font-size: 12pt;
+		line-height: 1.6;
+	}
+
+	body::after {
+		display: none;
+	}
+
+	a {
+		text-decoration: underline;
+		color: black;
+	}
+
+	h1 { font-size: 24pt; }
+	h2 { font-size: 20pt; }
+	h3 { font-size: 16pt; }
+	h4 { font-size: 14pt; }
 }
