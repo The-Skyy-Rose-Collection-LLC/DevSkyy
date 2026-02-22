@@ -1,9 +1,9 @@
 <?php
 /**
- * Template Name: Collection - Love Hurts
+ * Template Name: Collection - Kids Capsule
  *
- * LOVE HURTS collection page — Passionate drama mood with floating hearts,
- * pulsing badge, and crimson (#DC143C) accents on deep black.
+ * KIDS CAPSULE collection page — Playful energy with floating stars/bubbles,
+ * pink (#FFB6C1) and lavender (#E6E6FA) palette, rounded cards.
  *
  * @package SkyyRose_Flagship
  * @since   3.0.0
@@ -14,49 +14,28 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 
 /**
- * Build the LOVE HURTS product catalog.
+ * Build the KIDS CAPSULE product catalog.
  *
  * Attempts a WooCommerce query first; falls back to the static catalog
  * defined in the PRD so the page is never empty.
  *
  * @return array<int, array{sku:string, name:string, price:string, desc:string, badge:string, url:string, image:string}>
  */
-function skyyrose_get_love_hurts_products() {
+function skyyrose_get_kids_capsule_products() {
 
 	$static_products = array(
 		array(
-			'sku'   => 'lh-001',
-			'name'  => 'The Fannie',
-			'price' => '$90.00',
-			'desc'  => 'Signature fanny pack in crimson red',
-			'badge' => 'Iconic',
+			'sku'   => 'kids-001',
+			'name'  => 'Kids Colorblock Hoodie Set — Purple/Pink',
+			'price' => '$65.00',
+			'desc'  => 'Cozy colorblock hoodie and jogger set in playful purple and pink',
+			'badge' => 'New',
 		),
 		array(
-			'sku'   => 'lh-002',
-			'name'  => 'Love Hurts Joggers',
-			'price' => '$80.00',
-			'desc'  => 'Premium joggers with heartbreak detailing',
-			'badge' => '',
-		),
-		array(
-			'sku'   => 'lh-003',
-			'name'  => 'Love Hurts Basketball Shorts',
-			'price' => '$55.00',
-			'desc'  => 'Athletic shorts with bold crimson accents',
-			'badge' => '',
-		),
-		array(
-			'sku'   => 'lh-004',
-			'name'  => 'Love Hurts Varsity Jacket',
-			'price' => '$175.00',
-			'desc'  => 'Classic varsity silhouette, heartbreak edition',
-			'badge' => 'Best Seller',
-		),
-		array(
-			'sku'   => 'lh-005',
-			'name'  => 'Love Hurts Bomber Jacket',
-			'price' => '$165.00',
-			'desc'  => 'Premium bomber with embroidered heart motifs',
+			'sku'   => 'kids-002',
+			'name'  => 'Kids Colorblock Hoodie Set — Black/Red/White',
+			'price' => '$65.00',
+			'desc'  => 'Bold colorblock hoodie and jogger set in classic black, red, and white',
 			'badge' => 'New',
 		),
 	);
@@ -67,8 +46,8 @@ function skyyrose_get_love_hurts_products() {
 
 	$wc_products = wc_get_products(
 		array(
-			'limit'    => 5,
-			'category' => array( 'love-hurts' ),
+			'limit'    => 10,
+			'category' => array( 'kids-capsule' ),
 			'status'   => 'publish',
 			'orderby'  => 'menu_order',
 			'order'    => 'ASC',
@@ -95,12 +74,12 @@ function skyyrose_get_love_hurts_products() {
 	return $products;
 }
 
-$skyyrose_lh_products   = skyyrose_get_love_hurts_products();
-$skyyrose_lh_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
-$skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
+$skyyrose_kc_products   = skyyrose_get_kids_capsule_products();
+$skyyrose_kc_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
+$skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
 ?>
 
-<div class="collection--love-hurts" data-collection="love-hurts">
+<div class="collection--kids-capsule" data-collection="kids-capsule">
 
 	<!-- ============================================================
 	     HERO SECTION
@@ -114,23 +93,23 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 			</span>
 
 			<h1 class="collection-hero__title">
-				<?php echo esc_html__( 'LOVE HURTS', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'KIDS CAPSULE', 'skyyrose-flagship' ); ?>
 			</h1>
 
 			<p class="collection-hero__subtitle">
-				<?php echo esc_html__( 'Wear Your Heart on Your Sleeve', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Little Legends, Big Style', 'skyyrose-flagship' ); ?>
 			</p>
 
 			<p class="collection-hero__tagline">
-				<?php echo esc_html__( 'Passionate Drama Collection', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Playful Luxury for Growing Stars', 'skyyrose-flagship' ); ?>
 			</p>
 
 			<a href="#products" class="collection-hero__cta">
-				<?php echo esc_html__( 'Shop the Pain', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Shop for Kids', 'skyyrose-flagship' ); ?>
 			</a>
 		</div>
 
-		<!-- Floating hearts injected by collections.js (15 hearts) -->
+		<!-- Floating stars and bubbles injected by collections.js -->
 	</section>
 
 	<!-- ============================================================
@@ -143,15 +122,15 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 			</span>
 
 			<h2 class="collection-story__heading">
-				<?php echo esc_html__( 'Love That Leaves a Mark', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Where Fun Meets Fashion', 'skyyrose-flagship' ); ?>
 			</h2>
 
 			<p class="collection-story__text">
-				<?php echo esc_html__( 'The LOVE HURTS collection is born from the raw, unfiltered intensity of real love. It celebrates those who love fiercely, who wear their scars as badges of honor, and who know that the deepest connections always come with a cost.', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'The KIDS CAPSULE brings the SKyyRose spirit to the youngest members of the family. We believe great style starts early — and comfort should never be compromised. These pieces are designed to keep up with the energy, imagination, and joy of growing up.', 'skyyrose-flagship' ); ?>
 			</p>
 
 			<p class="collection-story__text">
-				<?php echo esc_html__( 'Crimson reds bleed into midnight blacks. Every stitch tells a story of passion, heartbreak, and the courage to love again. This is not for the faint of heart.', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Soft fabrics, vibrant colors, and playful designs that make getting dressed the best part of the day. Because every kid deserves to feel like a star.', 'skyyrose-flagship' ); ?>
 			</p>
 
 			<div class="collection-story__divider" aria-hidden="true"></div>
@@ -168,13 +147,13 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 			</span>
 
 			<h2 class="collection-products__title">
-				<?php echo esc_html__( 'LOVE HURTS Pieces', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'KIDS CAPSULE Pieces', 'skyyrose-flagship' ); ?>
 			</h2>
 
 			<p class="collection-products__count">
 				<?php
 				/* translators: %d: number of products in the collection */
-				printf( esc_html__( '%d Pieces', 'skyyrose-flagship' ), count( $skyyrose_lh_products ) );
+				printf( esc_html__( '%d Pieces', 'skyyrose-flagship' ), count( $skyyrose_kc_products ) );
 				?>
 			</p>
 		</div>
@@ -182,12 +161,12 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 		<div class="collection-products__grid">
 			<?php
 			$skyyrose_delay = 0;
-			foreach ( $skyyrose_lh_products as $skyyrose_product ) :
-				$skyyrose_delay_class = 'delay-' . ( ( $skyyrose_delay % 5 ) + 1 );
+			foreach ( $skyyrose_kc_products as $skyyrose_product ) :
+				$skyyrose_delay_class = 'delay-' . ( ( $skyyrose_delay % 4 ) + 1 );
 				$skyyrose_delay++;
 
 				$skyyrose_p_url   = isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#';
-				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_lh_placeholder;
+				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_kc_placeholder;
 				?>
 				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
 				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>"
@@ -241,16 +220,16 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<section class="collection-cta">
 		<div class="collection-cta__inner fade-in-up">
 			<h2 class="collection-cta__heading">
-				<?php echo esc_html__( 'Feel Everything', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Dress Them Like Stars', 'skyyrose-flagship' ); ?>
 			</h2>
 
 			<p class="collection-cta__text">
-				<?php echo esc_html__( 'Love hurts. But it also heals, inspires, and transforms. Wear the journey. Every piece is a chapter in a story only you can tell.', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Our Kids Capsule is just getting started. More colorways and styles are on the way. Sign up to be the first to know when new pieces drop.', 'skyyrose-flagship' ); ?>
 			</p>
 
-			<a href="<?php echo esc_url( $skyyrose_lh_shop_url ); ?>"
+			<a href="<?php echo esc_url( $skyyrose_kc_shop_url ); ?>"
 			   class="collection-cta__button">
-				<?php echo esc_html__( 'Shop LOVE HURTS', 'skyyrose-flagship' ); ?>
+				<?php echo esc_html__( 'Shop KIDS CAPSULE', 'skyyrose-flagship' ); ?>
 			</a>
 		</div>
 	</section>
@@ -272,14 +251,14 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 					'desc' => __( 'Gothic Garden', 'skyyrose-flagship' ),
 				),
 				array(
+					'slug' => 'collection-love-hurts',
+					'name' => __( 'Love Hurts', 'skyyrose-flagship' ),
+					'desc' => __( 'Passionate Drama', 'skyyrose-flagship' ),
+				),
+				array(
 					'slug' => 'collection-signature',
 					'name' => __( 'Signature', 'skyyrose-flagship' ),
 					'desc' => __( 'Elevated Luxury', 'skyyrose-flagship' ),
-				),
-				array(
-					'slug' => 'collection-kids-capsule',
-					'name' => __( 'Kids Capsule', 'skyyrose-flagship' ),
-					'desc' => __( 'Playful Energy', 'skyyrose-flagship' ),
 				),
 			);
 
@@ -300,6 +279,6 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 		</div>
 	</section>
 
-</div><!-- .collection--love-hurts -->
+</div><!-- .collection--kids-capsule -->
 
 <?php get_footer(); ?>

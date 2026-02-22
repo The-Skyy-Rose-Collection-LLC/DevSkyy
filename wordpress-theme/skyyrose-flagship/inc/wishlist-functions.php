@@ -402,14 +402,18 @@ add_action( 'wp_ajax_nopriv_skyyrose_move_all_to_cart', 'skyyrose_ajax_move_all_
  * @since 1.0.0
  */
 function skyyrose_register_wishlist_rest_routes() {
-	// Permission callback using nonce verification for security.
-	$permission_callback = function() {
+	// Permission callback using WP_REST_Request for security.
+	$permission_callback = function( WP_REST_Request $request ) {
 		// Allow GET requests without authentication (for public wishlist viewing).
-		if ( 'GET' === $_SERVER['REQUEST_METHOD'] ) {
+		if ( 'GET' === $request->get_method() ) {
 			return true;
 		}
-		// POST requests require nonce verification.
-		return isset( $_REQUEST['_wpnonce'] ) && wp_verify_nonce( $_REQUEST['_wpnonce'], 'skyyrose_wishlist_nonce' );
+		// Write operations require authenticated user and valid nonce.
+		if ( ! is_user_logged_in() ) {
+			return false;
+		}
+		$nonce = $request->get_header( 'X-WP-Nonce' );
+		return $nonce && wp_verify_nonce( $nonce, 'wp_rest' );
 	};
 
 	// Get wishlist items.
