@@ -1,0 +1,37 @@
+# Elite Web Builder — Isolated venv dependencies
+# Install: python3 -m venv .venv-elite-builder && source .venv-elite-builder/bin/activate && pip install -r requirements.txt
+
+# Google ADK (orchestration backbone)
+google-adk>=1.25.0
+google-genai>=1.50.0
+
+# LLM Provider SDKs
+anthropic>=0.75.0
+openai>=1.6
+# xai/grok uses OpenAI-compatible SDK
+
+# Core
+pydantic>=2.5
+pydantic-settings>=2.1
+python-dotenv>=1.0
+
+# Async
+aiohttp>=3.9
+aiofiles>=24.1.0
+httpx>=0.25
+
+# Validation tools
+cssutils>=2.9.0
+py-w3c>=0.3.1
+
+# Testing
+pytest>=7.4
+pytest-asyncio>=0.23
+pytest-cov>=4.1
+pytest-mock>=3.12
+
+# Utilities
+structlog>=25.5.0
+orjson>=3.9
+pyyaml>=6.0
+tenacity>=8.2

@@ -1,65 +1,56 @@
-"""
-Accessibility Agent Spec — WCAG 2.2 AA/AAA, contrast, ARIA, keyboard nav.
+"""Accessibility Agent — WCAG 2.2 AA/AAA, contrast, ARIA, keyboard nav.
 
 Model: Claude Haiku 4.5 (fast checker, runs on EVERY output)
 """
 
 from __future__ import annotations
 
+from agents.base import AgentCapability, AgentRole, AgentSpec
 
-def _build_spec() -> dict:
-    """
-    Constructs the accessibility agent specification for the Elite Web Builder.
-    
-    Returns:
-        spec (dict): A dictionary describing the accessibility agent, containing:
-            - role (str): Agent role identifier ("accessibility").
-            - name (str): Agent name ("accessibility").
-            - system_prompt (str): Instructional prompt detailing auditing responsibilities (WCAG 2.2 AA/AAA, contrast, ARIA, keyboard navigation, focus management, screen reader compatibility, alt text, form labels, heading hierarchy, and zero tolerance for critical/serious violations).
-            - capabilities (list[dict]): Capability entries, each with 'name', 'description', and 'tags'.
-            - knowledge_files (list[str]): Paths to reference knowledge files (e.g., "knowledge/wcag_checklist.md").
-            - preferred_model (dict): Preferred model descriptor with 'provider' and 'model' keys.
-    """
-    return {
-        "role": "accessibility",
-        "name": "accessibility",
-        "system_prompt": (
-            "You are an Accessibility specialist for the Elite Web Builder. "
-            "You audit all output for WCAG 2.2 AA compliance (AAA preferred). "
-            "You check: contrast ratios (4.5:1 normal text, 3:1 large text), "
-            "ARIA attributes, keyboard navigation, focus management, "
-            "screen reader compatibility, alt text, form labels, "
-            "heading hierarchy, and color-independence. "
-            "You run on EVERY agent output before it can be marked GREEN. "
-            "Zero tolerance for critical or serious axe-core violations."
+ACCESSIBILITY_SPEC = AgentSpec(
+    role=AgentRole.ACCESSIBILITY,
+    name="accessibility",
+    system_prompt=(
+        "You are an Accessibility specialist. You ensure all web content "
+        "meets WCAG 2.2 AA standards (AAA where feasible). You review "
+        "EVERY agent output before it ships.\n\n"
+        "Core responsibilities:\n"
+        "- Audit color contrast ratios (4.5:1 normal text, 3:1 large text)\n"
+        "- Verify ARIA attributes and landmark roles\n"
+        "- Check keyboard navigation and focus management\n"
+        "- Validate form labels, error messages, and input associations\n"
+        "- Test screen reader compatibility (NVDA/VoiceOver patterns)\n"
+        "- Verify responsive text sizing (no px-only font sizes)\n\n"
+        "Output rules:\n"
+        "- Report findings as: CRITICAL (blocks ship), SERIOUS (fix before launch), "
+        "MODERATE (fix soon), MINOR (nice to have)\n"
+        "- Every finding includes: element, issue, WCAG criterion, fix suggestion\n"
+        "- Zero tolerance for CRITICAL findings\n"
+        "- Run axe-core rules as baseline, add manual checks on top"
+    ),
+    capabilities=[
+        AgentCapability(
+            name="contrast_audit",
+            description="Check all color pairs against WCAG contrast requirements",
+            tags=("a11y", "color", "wcag"),
         ),
-        "capabilities": [
-            {
-                "name": "contrast_check",
-                "description": "Verify WCAG contrast ratios for all color pairs",
-                "tags": ["a11y", "contrast", "wcag"],
-            },
-            {
-                "name": "aria_audit",
-                "description": "Audit ARIA attributes, roles, and states",
-                "tags": ["a11y", "aria", "screenreader"],
-            },
-            {
-                "name": "keyboard_nav",
-                "description": "Verify keyboard navigation and focus management",
-                "tags": ["a11y", "keyboard", "focus"],
-            },
-            {
-                "name": "axe_core",
-                "description": "Run axe-core automated accessibility testing",
-                "tags": ["a11y", "testing", "automated"],
-            },
-        ],
-        "knowledge_files": [
-            "knowledge/wcag_checklist.md",
-        ],
-        "preferred_model": {"provider": "anthropic", "model": "claude-haiku-4-5"},
-    }
-
-
-ACCESSIBILITY_SPEC = _build_spec()
+        AgentCapability(
+            name="aria_audit",
+            description="Verify ARIA roles, states, and properties",
+            tags=("a11y", "aria", "screen-reader"),
+        ),
+        AgentCapability(
+            name="keyboard_audit",
+            description="Test keyboard navigation and focus management",
+            tags=("a11y", "keyboard", "focus"),
+        ),
+        AgentCapability(
+            name="form_audit",
+            description="Validate form accessibility (labels, errors, associations)",
+            tags=("a11y", "forms"),
+        ),
+    ],
+    knowledge_files=[
+        "knowledge/wcag_checklist.md",
+    ],
+)

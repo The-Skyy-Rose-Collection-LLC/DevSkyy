@@ -1,35 +1,29 @@
-"""Pytest configuration for elite_web_builder.
+"""Root conftest for elite_web_builder — fully isolated from parent packages.
 
-Pre-registers a lightweight 'agents' module stub in sys.modules to prevent
-the heavy parent agents/__init__.py from being imported during test collection.
-The parent package imports 30+ agents with deep dependency chains (pydantic,
-cryptography, google-adk, etc.) that are not needed for elite_web_builder tests.
+Prevents two namespace collisions:
+1. Parent agents/__init__.py (eager imports with missing deps)
+2. DevSkyy root core/ package (auth, services, etc. — heavy deps)
+
+We shim both in sys.modules and keep ONLY elite_web_builder/ on sys.path
+so `from core.model_router import ...` resolves to OUR core/ package.
 """
 
 import sys
 import types
 from pathlib import Path
 
-# Register a lightweight stub BEFORE pytest tries to import the real agents/__init__.py
-if "agents" not in sys.modules:
-    _stub = types.ModuleType("agents")
-    _stub.__path__ = [str(Path(__file__).resolve().parent.parent)]
-    _stub.__package__ = "agents"
-    sys.modules["agents"] = _stub
+# Make elite_web_builder importable as a standalone package
+_ELITE_DIR = Path(__file__).resolve().parent
+if str(_ELITE_DIR) not in sys.path:
+    sys.path.insert(0, str(_ELITE_DIR))
 
-# Ensure agents.elite_web_builder resolves correctly
-_ewb_path = str(Path(__file__).resolve().parent)
-_ewb_module_key = "agents.elite_web_builder"
-if _ewb_module_key not in sys.modules:
-    import importlib
-    spec = importlib.util.spec_from_file_location(
-        _ewb_module_key,
-        str(Path(__file__).resolve().parent / "__init__.py"),
-        submodule_search_locations=[_ewb_path],
-    )
-    if spec and spec.loader:
-        mod = importlib.util.module_from_spec(spec)
-        mod.__path__ = [_ewb_path]
-        mod.__package__ = _ewb_module_key
-        sys.modules[_ewb_module_key] = mod
-        # Don't exec the module yet - let normal imports handle it
+# Shim "agents" as a proper package pointing to OUR local agents/ dir.
+# This prevents the parent DevSkyy agents/__init__.py (with heavy deps)
+# from loading, while still allowing `from agents.base import ...`.
+_agents_mod = types.ModuleType("agents")
+_agents_mod.__path__ = [str(_ELITE_DIR / "agents")]
+_agents_mod.__package__ = "agents"
+sys.modules["agents"] = _agents_mod
+
+# NOTE: DevSkyy root is NOT added here to avoid core/ namespace collision.
+# When ralph_integration tests need utils/, they'll add it selectively.

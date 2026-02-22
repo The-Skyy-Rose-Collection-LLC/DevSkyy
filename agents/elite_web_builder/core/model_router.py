@@ -1,295 +1,360 @@
 """
-Model Router — Multi-provider LLM routing with health-aware fallback.
+Multi-provider model routing with fallback chains and health tracking.
 
-Routes requests to the best available provider based on agent role,
-provider health, and configured fallback chains.
+Routes agent requests to the optimal provider (Anthropic, Google, OpenAI, xAI)
+with automatic fallback when a provider is unhealthy. All operations use
+ralph-wiggums resilience — no blocking, errors loop until pass.
+
+Usage:
+    router = ModelRouter(config=RoutingConfig.from_dict(json_data))
+    result = router.resolve("director")  # → RouteResult(provider, model, is_fallback)
+    response = await router.call_with_fallback("director", my_async_fn)
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
 import time
+from collections import deque
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Protocol
+from typing import Any, Callable, TypeVar
 
 logger = logging.getLogger(__name__)
 
+T = TypeVar("T")
 
-class ProviderStatus(str, Enum):
-    """Health status of an LLM provider."""
+# Default fallback when all else fails
+_ULTIMATE_FALLBACK = ("google", "gemini-2.0-flash")
+
+
+# ---------------------------------------------------------------------------
+# Data models (frozen / immutable)
+# ---------------------------------------------------------------------------
+
+
+class ProviderStatus(Enum):
+    """Health status of a provider."""
 
     HEALTHY = "healthy"
     DEGRADED = "degraded"
-    DOWN = "down"
+    UNHEALTHY = "unhealthy"
 
 
 @dataclass(frozen=True)
-class LLMResponse:
-    """Immutable response from an LLM provider."""
+class ProviderConfig:
+    """Immutable provider + model pair."""
 
-    content: str
     provider: str
     model: str
-    latency_ms: float
-    tokens_used: int = 0
-    metadata: dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(frozen=True)
+class RouteResult:
+    """Result of resolving a route — includes fallback indicator."""
+
+    provider: str
+    model: str
+    is_fallback: bool = False
 
 
 @dataclass
 class ProviderHealth:
-    """Tracks health of a single provider."""
+    """Mutable health tracking for a single provider."""
 
-    provider: str
     status: ProviderStatus = ProviderStatus.HEALTHY
+    failure_count: int = 0
+    success_count: int = 0
     consecutive_failures: int = 0
-    last_success: float = 0.0
-    last_failure: float = 0.0
-    total_requests: int = 0
-    total_failures: int = 0
+    latencies: deque = field(default_factory=lambda: deque(maxlen=50))
+    last_failure_time: float = 0.0
+    last_success_time: float = 0.0
 
-    def record_success(self) -> None:
-        """
-        Mark the provider health as a successful request and reset failure tracking.
-        
-        Updates the provider's last success timestamp, clears consecutive failure count, increments the total request counter, and sets the provider status to HEALTHY.
-        """
-        self.consecutive_failures = 0
-        self.last_success = time.time()
-        self.total_requests += 1
-        self.status = ProviderStatus.HEALTHY
-
-    def record_failure(self) -> None:
-        """
-        Record a failure occurrence for this provider and update its health metrics.
-        
-        Increments consecutive failure and total request/failure counters, updates the last failure timestamp, and sets the provider status to `DEGRADED` when there is at least one consecutive failure or to `DOWN` when there are three or more consecutive failures.
-        """
-        self.consecutive_failures += 1
-        self.last_failure = time.time()
-        self.total_requests += 1
-        self.total_failures += 1
-        if self.consecutive_failures >= 3:
-            self.status = ProviderStatus.DOWN
-        elif self.consecutive_failures >= 1:
-            self.status = ProviderStatus.DEGRADED
+    @property
+    def avg_latency(self) -> float:
+        if not self.latencies:
+            return 0.0
+        return sum(self.latencies) / len(self.latencies)
 
 
-class ProviderAdapter(Protocol):
-    """Protocol for LLM provider adapters."""
+# ---------------------------------------------------------------------------
+# Routing config
+# ---------------------------------------------------------------------------
 
-    async def generate(
-        self,
-        prompt: str,
-        *,
-        system_prompt: str = "",
-        model: str = "",
-        temperature: float = 0.7,
-        max_tokens: int = 4096,
-    ) -> LLMResponse:
-        """
-        Generate a response from the adapter's provider for the given prompt.
+FAILURE_THRESHOLD = 5  # consecutive failures before marking unhealthy
 
-        Parameters:
-            prompt (str): User-facing input text to generate a response for.
-            system_prompt (str): Optional system-level prompt or instructions to influence the response.
-            model (str): Provider-specific model identifier to use for generation.
-            temperature (float): Sampling temperature controlling randomness (higher is more random).
-            max_tokens (int): Maximum number of tokens the provider should generate.
 
-        Returns:
-            LLMResponse: The provider's response including content, provider identifier, model used, latency_ms, tokens_used, and optional metadata.
-        """
-        ...
+@dataclass
+class RoutingConfig:
+    """Routing configuration: agent→provider mapping + fallback chain."""
+
+    routes: dict[str, ProviderConfig] = field(default_factory=dict)
+    fallbacks: dict[str, ProviderConfig] = field(default_factory=dict)
+
+    @staticmethod
+    def from_dict(data: dict[str, Any]) -> RoutingConfig:
+        """Build config from a dictionary (e.g., loaded from JSON)."""
+        routes = {
+            name: ProviderConfig(provider=cfg["provider"], model=cfg["model"])
+            for name, cfg in data.get("routes", {}).items()
+        }
+        fallbacks = {
+            provider: ProviderConfig(provider=cfg["provider"], model=cfg["model"])
+            for provider, cfg in data.get("fallbacks", {}).items()
+        }
+        return RoutingConfig(routes=routes, fallbacks=fallbacks)
+
+    @staticmethod
+    def from_json_file(path: str) -> RoutingConfig:
+        """Load config from a JSON file."""
+        import json
+        from pathlib import Path
+
+        data = json.loads(Path(path).read_text(encoding="utf-8"))
+        return RoutingConfig.from_dict(data)
+
+
+# ---------------------------------------------------------------------------
+# Model Router
+# ---------------------------------------------------------------------------
 
 
 class ModelRouter:
-    """Routes LLM requests to providers with health-aware fallback."""
+    """
+    Multi-provider routing engine with health tracking and fallback chains.
 
-    def __init__(
-        self,
-        routing: dict[str, dict[str, str]] | None = None,
-        fallbacks: dict[str, dict[str, str]] | None = None,
-    ) -> None:
-        """
-        Initialize the router with optional routing and fallback configurations and create internal registries.
-        
-        Parameters:
-            routing (dict[str, dict[str, str]] | None): Mapping from agent role to routing info (e.g., {'provider': 'openai', 'model': 'gpt-4'}). If None, an empty routing map is used.
-            fallbacks (dict[str, dict[str, str]] | None): Mapping from a primary provider to its fallback info (e.g., {'provider': 'anthropic', 'model': 'claude'}). If None, an empty fallback map is used.
-        
-        Side effects:
-            Creates empty internal registries:
-              - _adapters: maps provider names to their registered ProviderAdapter
-              - _health: maps provider names to their ProviderHealth trackers
-        """
-        self._routing = routing or {}
-        self._fallbacks = fallbacks or {}
-        self._adapters: dict[str, ProviderAdapter] = {}
+    Resolves agent names to (provider, model) pairs. Tracks provider health
+    and automatically switches to fallback providers when the primary is down.
+    All external calls use ralph-wiggums retry logic — no blocking.
+    """
+
+    def __init__(self, config: RoutingConfig) -> None:
+        self._config = config
         self._health: dict[str, ProviderHealth] = {}
 
-    def register_adapter(self, provider: str, adapter: ProviderAdapter) -> None:
-        """
-        Register an adapter for a provider and initialize its health tracking.
-        
-        Parameters:
-            provider (str): Provider identifier to register.
-            adapter (ProviderAdapter): Adapter instance that implements the provider's generate interface.
-        """
-        self._adapters[provider] = adapter
-        self._health[provider] = ProviderHealth(provider=provider)
+    # -- Health tracking --
 
-    def get_adapter(self, provider: str) -> ProviderAdapter | None:
-        """
-        Retrieve the registered adapter for the given provider.
-        
-        Parameters:
-            provider (str): Provider identifier to look up.
-        
-        Returns:
-            adapter (ProviderAdapter | None): The registered adapter for the provider, or `None` if no adapter is registered.
-        """
-        return self._adapters.get(provider)
-
-    def get_route(self, role: str) -> dict[str, str]:
-        """
-        Retrieve the routing configuration for the given agent role.
-        
-        Parameters:
-            role (str): Agent role identifier to look up in the router configuration.
-        
-        Returns:
-            dict[str, str]: Mapping with routing keys (e.g., "provider", "model") for the role, or an empty dict if no route is configured.
-        """
-        return self._routing.get(role, {})
-
-    def get_fallback(self, provider: str) -> dict[str, str]:
-        """
-        Retrieve the configured fallback mapping for a provider.
-        
-        Parameters:
-            provider (str): Provider identifier to look up.
-        
-        Returns:
-            dict: Fallback mapping containing keys 'provider' and 'model' when configured, or an empty dict if no fallback is defined.
-        """
-        return self._fallbacks.get(provider, {})
-
-    def get_health(self, provider: str) -> ProviderHealth:
-        """
-        Retrieve the health tracker for the named provider, creating and storing one if it does not exist.
-        
-        If the provider has no existing health entry, a new ProviderHealth is initialized, stored in the router's registry, and returned.
-        
-        Parameters:
-            provider (str): Provider identifier.
-        
-        Returns:
-            ProviderHealth: The health record for the specified provider.
-        """
+    def _ensure_health(self, provider: str) -> ProviderHealth:
+        """Get or create health record for a provider."""
         if provider not in self._health:
-            self._health[provider] = ProviderHealth(provider=provider)
+            self._health[provider] = ProviderHealth()
         return self._health[provider]
 
-    async def route(
+    def get_health(self, provider: str) -> ProviderHealth:
+        """Return health state for a provider."""
+        return self._ensure_health(provider)
+
+    def mark_unhealthy(self, provider: str) -> None:
+        """Mark a provider as unhealthy."""
+        health = self._ensure_health(provider)
+        health.status = ProviderStatus.UNHEALTHY
+        logger.warning("Provider %s marked UNHEALTHY", provider)
+
+    def mark_healthy(self, provider: str) -> None:
+        """Mark a provider as healthy (recovered)."""
+        health = self._ensure_health(provider)
+        health.status = ProviderStatus.HEALTHY
+        health.consecutive_failures = 0
+        logger.info("Provider %s marked HEALTHY", provider)
+
+    def record_latency(self, provider: str, latency_seconds: float) -> None:
+        """Record a successful call latency."""
+        health = self._ensure_health(provider)
+        health.latencies.append(latency_seconds)
+
+    def record_success(self, provider: str) -> None:
+        """Record a successful call."""
+        health = self._ensure_health(provider)
+        health.success_count += 1
+        health.consecutive_failures = 0
+        health.last_success_time = time.time()
+        # Auto-recover if was degraded
+        if health.status == ProviderStatus.DEGRADED:
+            health.status = ProviderStatus.HEALTHY
+
+    def record_failure(self, provider: str) -> None:
+        """Record a failed call. Auto-marks unhealthy after threshold."""
+        health = self._ensure_health(provider)
+        health.failure_count += 1
+        health.consecutive_failures += 1
+        health.last_failure_time = time.time()
+
+        if health.consecutive_failures >= FAILURE_THRESHOLD:
+            health.status = ProviderStatus.UNHEALTHY
+            logger.error(
+                "Provider %s auto-marked UNHEALTHY after %d consecutive failures",
+                provider,
+                health.consecutive_failures,
+            )
+
+    def _is_healthy(self, provider: str) -> bool:
+        """Check if a provider is available for routing."""
+        health = self._ensure_health(provider)
+        return health.status != ProviderStatus.UNHEALTHY
+
+    # -- Routing --
+
+    def get_fallback(self, provider: str) -> ProviderConfig:
+        """Get fallback config for a provider."""
+        fb = self._config.fallbacks.get(provider)
+        if fb is not None:
+            return fb
+        # Ultimate fallback
+        return ProviderConfig(provider=_ULTIMATE_FALLBACK[0], model=_ULTIMATE_FALLBACK[1])
+
+    def resolve(self, agent_name: str) -> RouteResult:
+        """
+        Resolve agent name → (provider, model) with health-aware fallback.
+
+        If the primary provider is unhealthy, returns the fallback.
+        If agent_name is unknown, returns a default route.
+        """
+        primary = self._config.routes.get(agent_name)
+
+        if primary is None:
+            # Unknown agent — use ultimate fallback
+            logger.debug("Unknown agent '%s', using default route", agent_name)
+            return RouteResult(
+                provider=_ULTIMATE_FALLBACK[0],
+                model=_ULTIMATE_FALLBACK[1],
+                is_fallback=True,
+            )
+
+        # Check if primary provider is healthy
+        if self._is_healthy(primary.provider):
+            return RouteResult(
+                provider=primary.provider,
+                model=primary.model,
+                is_fallback=False,
+            )
+
+        # Primary unhealthy — try fallback
+        fallback = self.get_fallback(primary.provider)
+        if self._is_healthy(fallback.provider):
+            logger.info(
+                "Agent '%s': primary %s unhealthy, falling back to %s",
+                agent_name,
+                primary.provider,
+                fallback.provider,
+            )
+            return RouteResult(
+                provider=fallback.provider,
+                model=fallback.model,
+                is_fallback=True,
+            )
+
+        # Both unhealthy — use ultimate fallback
+        logger.warning(
+            "Agent '%s': both %s and %s unhealthy, using ultimate fallback",
+            agent_name,
+            primary.provider,
+            fallback.provider,
+        )
+        return RouteResult(
+            provider=_ULTIMATE_FALLBACK[0],
+            model=_ULTIMATE_FALLBACK[1],
+            is_fallback=True,
+        )
+
+    # -- Async call with ralph-loop resilience --
+
+    async def call_with_fallback(
         self,
-        role: str,
-        prompt: str,
-        *,
-        system_prompt: str = "",
-        temperature: float = 0.7,
-        max_tokens: int = 4096,
-    ) -> LLMResponse:
+        agent_name: str,
+        operation: Callable[..., Any],
+        max_attempts: int = 3,
+        base_delay: float = 1.0,
+    ) -> Any:
         """
-        Route a request for the given agent role to the best available LLM provider, using the configured primary provider and an optional fallback.
-        
-        Parameters:
-            role (str): Agent role used to look up routing configuration.
-            prompt (str): Prompt to send to the provider.
-            system_prompt (str): System prompt to include with the request.
-            temperature (float): Sampling temperature for the model.
-            max_tokens (int): Maximum number of tokens to generate.
-        
+        Call an async operation with automatic provider fallback.
+
+        The operation receives (provider: str, model: str) and should use those
+        to make the actual API call. On failure, the router tries fallback
+        providers with exponential backoff. No blocking — ralph-loop resilience.
+
+        Args:
+            agent_name: Agent role name (e.g., "director")
+            operation: Async callable(provider, model) → result
+            max_attempts: Max retries per provider
+            base_delay: Base delay for exponential backoff
+
         Returns:
-            LLMResponse: Response returned by the selected provider, including content, provider id, model, latency, and metadata.
-        
+            Result from the first successful call
+
         Raises:
-            ValueError: If no routing is configured for the given role.
-            RuntimeError: If both the primary provider and its configured fallback fail or are unavailable.
+            Exception: After all providers and retries exhausted
         """
-        route = self.get_route(role)
-        if not route:
-            raise ValueError(f"No routing configured for role: {role}")
+        # Build provider chain: primary → fallback → ultimate
+        route = self._config.routes.get(agent_name)
+        providers_to_try: list[tuple[str, str]] = []
 
-        provider = route.get("provider", "")
-        model = route.get("model", "")
+        if route:
+            providers_to_try.append((route.provider, route.model))
+            fb = self._config.fallbacks.get(route.provider)
+            if fb:
+                providers_to_try.append((fb.provider, fb.model))
 
-        # Try primary provider
-        adapter = self.get_adapter(provider)
-        health = self.get_health(provider)
+        # Always add ultimate fallback
+        if _ULTIMATE_FALLBACK not in providers_to_try:
+            providers_to_try.append(_ULTIMATE_FALLBACK)
 
-        if adapter and health.status != ProviderStatus.DOWN:
-            try:
-                start = time.time()
-                response = await adapter.generate(
-                    prompt,
-                    system_prompt=system_prompt,
-                    model=model,
-                    temperature=temperature,
-                    max_tokens=max_tokens,
-                )
-                health.record_success()
-                latency = (time.time() - start) * 1000
-                logger.info(
-                    "Routed to %s/%s for %s (%.0fms)",
-                    provider,
-                    model,
-                    role,
-                    latency,
-                )
-                return response
-            except Exception as exc:
-                health.record_failure()
-                logger.warning(
-                    "Primary provider %s failed for %s: %s",
-                    provider,
-                    role,
-                    exc,
-                )
+        last_error: Exception | None = None
 
-        # Try fallback
-        fallback = self.get_fallback(provider)
-        if fallback:
-            fb_provider = fallback.get("provider", "")
-            fb_model = fallback.get("model", "")
-            fb_adapter = self.get_adapter(fb_provider)
-            if fb_adapter:
+        for provider, model in providers_to_try:
+            for attempt in range(max_attempts):
                 try:
-                    response = await fb_adapter.generate(
-                        prompt,
-                        system_prompt=system_prompt,
-                        model=fb_model,
-                        temperature=temperature,
-                        max_tokens=max_tokens,
-                    )
-                    self.get_health(fb_provider).record_success()
-                    logger.info(
-                        "Fallback to %s/%s for %s",
-                        fb_provider,
-                        fb_model,
-                        role,
-                    )
-                    return response
+                    start = time.time()
+                    result = await operation(provider, model)
+                    elapsed = time.time() - start
+
+                    self.record_success(provider)
+                    self.record_latency(provider, elapsed)
+                    return result
+
                 except Exception as exc:
-                    self.get_health(fb_provider).record_failure()
-                    logger.error(
-                        "Fallback provider %s also failed for %s: %s",
-                        fb_provider,
-                        role,
+                    last_error = exc
+                    self.record_failure(provider)
+                    logger.warning(
+                        "call_with_fallback: %s/%s attempt %d/%d failed: %s",
+                        provider,
+                        model,
+                        attempt + 1,
+                        max_attempts,
                         exc,
                     )
 
+                    if attempt < max_attempts - 1:
+                        delay = base_delay * (2**attempt)
+                        await asyncio.sleep(delay)
+
+            logger.error(
+                "call_with_fallback: %s exhausted %d attempts, trying next",
+                provider,
+                max_attempts,
+            )
+
+        # All exhausted
         raise RuntimeError(
-            f"All providers failed for role '{role}'. "
-            f"Primary: {provider}, Fallback: {fallback.get('provider', 'none')}"
-        )
+            f"All providers exhausted for agent '{agent_name}'. "
+            f"Last error: {last_error}"
+        ) from last_error
+
+    # -- Bulk operations --
+
+    def list_routes(self) -> dict[str, RouteResult]:
+        """Return all agent routes with current resolution (health-aware)."""
+        return {name: self.resolve(name) for name in self._config.routes}
+
+    def health_summary(self) -> dict[str, dict[str, Any]]:
+        """Return health summary for all tracked providers."""
+        return {
+            provider: {
+                "status": h.status.value,
+                "failures": h.failure_count,
+                "successes": h.success_count,
+                "consecutive_failures": h.consecutive_failures,
+                "avg_latency_ms": round(h.avg_latency * 1000, 1),
+            }
+            for provider, h in self._health.items()
+        }

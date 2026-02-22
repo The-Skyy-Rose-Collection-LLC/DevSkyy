@@ -1,0 +1,11 @@
+[project]
+name = "elite-web-builder"
+version = "0.1.0"
+description = "Full-stack AI web development agency — self-healing, self-learning, hallucination-free"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "--confcutdir=. --import-mode=importlib"
