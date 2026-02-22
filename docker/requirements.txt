@@ -13,7 +13,6 @@ psycopg2-binary==2.9.11  # PostgreSQL adapter for production
 
 # Caching
 redis==7.1.0
-aioredis==2.0.1
 
 # Security
 cryptography==46.0.5
@@ -69,4 +68,3 @@ starlette-context==0.4.0
 
 # Docker-specific utilities
 docker==7.1.0
-docker-compose==1.29.2

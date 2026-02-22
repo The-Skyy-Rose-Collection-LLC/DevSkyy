@@ -36,7 +36,7 @@
   },
   "homepage": "https://wordpress.com",
   "dependencies": {
-    "@automattic/mcp-wordpress-remote": "latest"
+    "@automattic/mcp-wordpress-remote": "^1.0.0"
   },
   "devDependencies": {
     "@types/node": "^18.19.0",

@@ -64,6 +64,7 @@ coverage/
 .env.critical-fuchsia-ape
 .env.skyyrose-experiences
 .env.staging
+.env.production
 !.env.example
 secrets/
 credentials/

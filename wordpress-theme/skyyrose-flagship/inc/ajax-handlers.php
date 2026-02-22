@@ -36,6 +36,7 @@ function skyyrose_ajax_contact_submit() {
 				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	// Honeypot check: if the hidden 'website' field is filled, silently succeed.
@@ -45,6 +46,7 @@ function skyyrose_ajax_contact_submit() {
 				'message' => esc_html__( 'Thank you for your message. We will be in touch soon.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	// Sanitize input fields.
@@ -61,6 +63,7 @@ function skyyrose_ajax_contact_submit() {
 				'message' => esc_html__( 'Please fill in all required fields.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	if ( ! is_email( $email ) ) {
@@ -69,6 +72,7 @@ function skyyrose_ajax_contact_submit() {
 				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	// Build email.
@@ -98,12 +102,14 @@ function skyyrose_ajax_contact_submit() {
 				'message' => esc_html__( 'Thank you for your message. We will be in touch soon.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	} else {
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Unable to send your message. Please try again later.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 }
 add_action( 'wp_ajax_skyyrose_contact_submit', 'skyyrose_ajax_contact_submit' );
@@ -131,6 +137,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	// Sanitize and validate email.
@@ -142,6 +149,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 				'message' => esc_html__( 'Please enter a valid email address.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	/**
@@ -160,6 +168,7 @@ function skyyrose_ajax_newsletter_subscribe() {
 			'message' => esc_html__( 'Welcome to the SkyyRose family! Check your inbox for your 15% discount code.', 'skyyrose-flagship' ),
 		)
 	);
+	return;
 }
 add_action( 'wp_ajax_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsletter_subscribe' );
 add_action( 'wp_ajax_nopriv_skyyrose_newsletter_subscribe', 'skyyrose_ajax_newsletter_subscribe' );
@@ -186,6 +195,21 @@ function skyyrose_ajax_signin() {
 				'message' => esc_html__( 'Security check failed. Please refresh the page and try again.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
+	}
+
+	// Rate limiting: max 5 attempts per IP per 15 minutes.
+	$ip        = sanitize_text_field( $_SERVER['REMOTE_ADDR'] ?? '' );
+	$cache_key = 'skyyrose_login_attempts_' . md5( $ip );
+	$attempts  = (int) get_transient( $cache_key );
+
+	if ( $attempts >= 5 ) {
+		wp_send_json_error(
+			array(
+				'message' => esc_html__( 'Too many login attempts. Please try again in 15 minutes.', 'skyyrose-flagship' ),
+			)
+		);
+		return;
 	}
 
 	// Sanitize input.
@@ -198,21 +222,28 @@ function skyyrose_ajax_signin() {
 				'message' => esc_html__( 'Please enter both email and password.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
 	// Authenticate user.
 	$user = wp_authenticate( $email, $password );
 
 	if ( is_wp_error( $user ) ) {
+		set_transient( $cache_key, $attempts + 1, 15 * MINUTE_IN_SECONDS );
 		wp_send_json_error(
 			array(
 				'message' => esc_html__( 'Invalid email or password. Please try again.', 'skyyrose-flagship' ),
 			)
 		);
+		return;
 	}
 
+	// Clear rate-limit counter on successful login.
+	delete_transient( $cache_key );
+
 	// Set authentication cookies.
-	wp_set_auth_cookie( $user->ID, true );
+	$remember = ! empty( $_POST['remember'] );
+	wp_set_auth_cookie( $user->ID, $remember );
 
 	wp_send_json_success(
 		array(
@@ -220,5 +251,6 @@ function skyyrose_ajax_signin() {
 			'redirect_url' => home_url( '/' ),
 		)
 	);
+	return;
 }
 add_action( 'wp_ajax_nopriv_skyyrose_signin', 'skyyrose_ajax_signin' );

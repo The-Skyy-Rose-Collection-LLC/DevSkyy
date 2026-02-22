@@ -196,20 +196,20 @@ function skyyrose_product_schema() {
 					'@type'         => 'Review',
 					'author'        => array(
 						'@type' => 'Person',
-						'name'  => $review->comment_author,
+						'name'  => wp_strip_all_tags( $review->comment_author ),
 					),
 					'reviewRating'  => array(
 						'@type'       => 'Rating',
 						'ratingValue' => $rating,
 					),
-					'reviewBody'    => $review->comment_content,
+					'reviewBody'    => wp_strip_all_tags( $review->comment_content ),
 					'datePublished' => $review->comment_date,
 				);
 			}
 		}
 	}
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
 }
 add_action( 'wp_head', 'skyyrose_product_schema' );
 
@@ -268,7 +268,7 @@ function skyyrose_organization_schema() {
 		}
 	}
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
 }
 add_action( 'wp_head', 'skyyrose_organization_schema' );
 
@@ -305,7 +305,7 @@ function skyyrose_breadcrumb_schema() {
 		$position++;
 	}
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
 }
 add_action( 'wp_head', 'skyyrose_breadcrumb_schema' );
 
@@ -786,7 +786,7 @@ function skyyrose_collection_schema() {
 		'url'         => is_tax( 'product_cat' ) ? get_term_link( $term ) : get_post_type_archive_link( 'product' ),
 	);
 
-	echo '<script type="application/ld+json">' . wp_json_encode( $schema, JSON_UNESCAPED_SLASHES ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( $schema ) . '</script>' . "\n";
 }
 add_action( 'wp_head', 'skyyrose_collection_schema' );
 

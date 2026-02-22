@@ -22,7 +22,7 @@ Python: 3.11+
 Framework: FastMCP (MCP Python SDK)
 
 Installation:
-    pip install fastmcp httpx pydantic python-jose[cryptography]
+    pip install fastmcp httpx pydantic pyjwt[cryptography]
 
 Usage:
     # Run the server
@@ -69,7 +69,7 @@ try:
     )
 except ImportError as e:
     print(f"âŒ Missing required package: {e}")
-    print("Install with: pip install fastmcp httpx pydantic python-jose[cryptography]")
+    print("Install with: pip install fastmcp httpx pydantic pyjwt[cryptography]")
     exit(1)
 
 # Security, logging, rate limiting, and deduplication utilities
