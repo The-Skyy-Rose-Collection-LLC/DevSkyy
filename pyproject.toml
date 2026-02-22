@@ -172,7 +172,7 @@ mcp = [
     "python-dotenv==1.2.1",
     "structlog==25.5.0",
     "loguru==0.7.3",
-    "tenacity==9.1.2",
+    "tenacity==9.1.4",
     "backoff==2.2.1",
     "ratelimit==2.2.1",
     "cryptography==46.0.5",
