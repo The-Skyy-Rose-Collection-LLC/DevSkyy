@@ -17,11 +17,15 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 function skyyrose_init_wishlist_session() {
+	if ( ! function_exists( 'WC' ) || ! WC()->session ) {
+		return;
+	}
+
 	if ( ! is_user_logged_in() && ! WC()->session->has_session() ) {
 		WC()->session->set_customer_session_cookie( true );
 	}
 }
-add_action( 'init', 'skyyrose_init_wishlist_session' );
+add_action( 'woocommerce_init', 'skyyrose_init_wishlist_session' );
 
 /**
  * Get the wishlist key for the current user or session.
@@ -35,8 +39,12 @@ function skyyrose_get_wishlist_key() {
 	}
 
 	// Use session for non-logged-in users.
-	$session_key = WC()->session->get_customer_id();
-	return 'wishlist_session_' . $session_key;
+	if ( function_exists( 'WC' ) && WC()->session ) {
+		$session_key = WC()->session->get_customer_id();
+		return 'wishlist_session_' . $session_key;
+	}
+
+	return 'wishlist_session_guest';
 }
 
 /**
