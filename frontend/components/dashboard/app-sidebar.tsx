@@ -18,6 +18,7 @@ import {
   Globe,
   Triangle,
   Brain,
+  TrendingUp,
 } from 'lucide-react';
 
 import {
@@ -69,6 +70,11 @@ const mainNavItems = [
     title: 'Social Media',
     url: '/admin/social-media',
     icon: Megaphone,
+  },
+  {
+    title: 'Conversion Intel',
+    url: '/admin/conversion',
+    icon: TrendingUp,
   },
   {
     title: 'Fidelity QA',
