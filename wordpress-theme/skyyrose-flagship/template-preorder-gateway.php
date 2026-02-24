@@ -237,6 +237,12 @@ get_header();
 			<span class="countdown-pieces"><?php echo esc_html__( 'Limited numbered pieces — each item individually numbered', 'skyyrose-flagship' ); ?></span>
 		</div>
 
+		<!-- Conversion Intelligence: Viewers + Progress -->
+		<div style="display:flex; justify-content:center; padding:0.5rem 0;">
+			<div data-cie-viewers="42"></div>
+		</div>
+		<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:0 2rem 1rem;"></div>
+
 		<!-- Gateway Header -->
 		<header class="gateway-header">
 			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="gateway-logo">
