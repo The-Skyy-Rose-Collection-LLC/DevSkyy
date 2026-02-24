@@ -1,11 +1,17 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "nextjs",
+  "buildCommand": "cd frontend && npm install && npx next build",
+  "installCommand": "echo 'Install handled in buildCommand'",
+  "outputDirectory": "frontend/.next",
   "regions": ["iad1"],
   "env": {
-    "NEXT_PUBLIC_SITE_URL": "https://app.devskyy.app"
+    "NEXT_PUBLIC_SITE_URL": "https://app.devskyy.app",
+    "NEXT_PUBLIC_API_URL": "https://api.devskyy.app",
+    "NEXT_PUBLIC_SITE_NAME": "SkyyRose"
   },
   "functions": {
-    "app/api/**/*.ts": {
+    "frontend/app/api/**/*.ts": {
       "maxDuration": 60
     }
   },
