@@ -33,8 +33,9 @@ from __future__ import annotations
 import logging
 import re
 import uuid
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
-from typing import Any, Callable, Coroutine, Optional
+from typing import Any
 
 # SKU format: 2–5 lowercase letters, hyphen, 3 digits (e.g. br-001, sg-014)
 _SKU_RE = re.compile(r"^[a-z]{2,5}-\d{3}$")

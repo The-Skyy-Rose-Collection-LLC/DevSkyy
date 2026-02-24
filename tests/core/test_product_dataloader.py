@@ -5,9 +5,9 @@ Tests for Product DataLoader - N+1 Query Prevention
 Verifies that ProductDataLoader batches DB queries to prevent N+1 problems.
 """
 
-import pytest
-from typing import List
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from api.graphql.dataloaders.product_loader import ProductDataLoader
 

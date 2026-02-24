@@ -21,9 +21,9 @@ Usage:
 from __future__ import annotations
 
 import logging
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Awaitable, Callable
 
 from core.verification_loop import (
     Gate,

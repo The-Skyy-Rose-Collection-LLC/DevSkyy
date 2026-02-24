@@ -24,7 +24,6 @@ Configuration:
 Version: 1.0.0
 """
 
-import asyncio
 import os
 import sys
 import time
@@ -215,11 +214,11 @@ def start_metrics_server(port: int = METRICS_PORT, host: str = METRICS_HOST):
     """
     server = HTTPServer((host, port), MetricsHandler)
 
-    print(f"🎯 DevSkyy Metrics Server starting...")
+    print("🎯 DevSkyy Metrics Server starting...")
     print(f"📊 Prometheus metrics: http://{host}:{port}/metrics")
     print(f"❤️  Health check: http://{host}:{port}/health")
     print(f"🌐 Status page: http://{host}:{port}/")
-    print(f"\n✅ Server ready! Press Ctrl+C to stop.\n")
+    print("\n✅ Server ready! Press Ctrl+C to stop.\n")
 
     try:
         server.serve_forever()

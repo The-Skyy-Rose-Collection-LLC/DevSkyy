@@ -1,6 +1,7 @@
 """Test OpenAI Python client connection"""
 from openai_client import OpenAIClient
 
+
 def main():
     print('\n🔌 OpenAI Python Connection Test\n')
     client = OpenAIClient()

@@ -1,6 +1,6 @@
 """Tests for core/self_healer.py — Diagnose → categorize → route → retry loop."""
 
-from unittest.mock import AsyncMock, MagicMock
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -17,7 +17,6 @@ from core.verification_loop import (
     GateStatus,
     VerificationReport,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

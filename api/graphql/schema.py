@@ -12,8 +12,6 @@ Usage:
 
 from __future__ import annotations
 
-from typing import List, Optional
-
 import strawberry
 from strawberry.types import Info
 
@@ -31,7 +29,7 @@ class Query:
         self,
         sku: str,
         info: Info,
-    ) -> Optional[ProductType]:
+    ) -> ProductType | None:
         """
         Get single product by SKU using DataLoader for batching.
         Multiple concurrent calls are automatically batched into one DB query.
@@ -45,10 +43,10 @@ class Query:
     @strawberry.field(description="List products with optional collection filter")
     async def products(
         self,
-        collection: Optional[str] = None,
+        collection: str | None = None,
         limit: int = 20,
         offset: int = 0,
-    ) -> List[ProductType]:
+    ) -> list[ProductType]:
         """
         List products with optional collection filter and pagination.
         Results are ordered by newest first.

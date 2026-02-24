@@ -10,9 +10,9 @@ Tier strategy:
   L3: CDN (seconds, static assets only)
 """
 
-import asyncio
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 # Will fail until MultiTierCache is implemented (TDD RED)
 try:

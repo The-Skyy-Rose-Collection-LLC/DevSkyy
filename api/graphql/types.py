@@ -8,7 +8,6 @@ Strawberry type definitions for the DevSkyy GraphQL schema.
 from __future__ import annotations
 
 import json
-from typing import List, Optional
 
 import strawberry
 
@@ -20,17 +19,17 @@ class ProductType:
     id: str
     sku: str
     name: str
-    description: Optional[str]
+    description: str | None
     price: float
-    compare_price: Optional[float]
-    collection: Optional[str]
+    compare_price: float | None
+    collection: str | None
     is_active: bool
-    images: List[str]
+    images: list[str]
 
     @staticmethod
-    def from_db(product: object) -> "ProductType":
+    def from_db(product: object) -> ProductType:
         """Convert database Product model to GraphQL ProductType"""
-        images: List[str] = []
+        images: list[str] = []
         if hasattr(product, "images_json") and product.images_json:  # type: ignore[union-attr]
             try:
                 images = json.loads(product.images_json)  # type: ignore[union-attr]

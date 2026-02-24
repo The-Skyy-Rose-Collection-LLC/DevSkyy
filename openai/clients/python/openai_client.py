@@ -4,14 +4,17 @@ Covers: Chat, Streaming, Vision, Embeddings, Images, Assistants, Agents SDK
 SDK: openai >= 1.84, openai-agents >= 0.0.16
 """
 
-import os
-import json
-import time
 import base64
+import json
+import os
+import time
+from collections.abc import Generator
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Generator
-import openai
+from typing import Any
+
 from dotenv import load_dotenv
+
+import openai
 
 load_dotenv(Path(__file__).parent.parent.parent / '.env')
 
@@ -19,7 +22,7 @@ load_dotenv(Path(__file__).parent.parent.parent / '.env')
 class OpenAIClient:
     """OpenAI client with rate limiting, error handling, and full capability coverage"""
 
-    def __init__(self, api_key: Optional[str] = None, **options):
+    def __init__(self, api_key: str | None = None, **options):
         self.api_key = api_key or os.getenv('OPENAI_API_KEY')
         if not self.api_key:
             raise ValueError('OpenAI API key required. Set OPENAI_API_KEY in .env')
@@ -53,10 +56,10 @@ class OpenAIClient:
     def generate_content(
         self,
         prompt: str,
-        model: Optional[str] = None,
-        system_prompt: Optional[str] = None,
+        model: str | None = None,
+        system_prompt: str | None = None,
         **config
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate content from text prompt"""
         self._rate_limit()
         messages = []
@@ -85,10 +88,10 @@ class OpenAIClient:
     def generate_content_stream(
         self,
         prompt: str,
-        model: Optional[str] = None,
-        system_prompt: Optional[str] = None,
+        model: str | None = None,
+        system_prompt: str | None = None,
         **config
-    ) -> Generator[Dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any], None, None]:
         """Generate content with streaming"""
         self._rate_limit()
         messages = []
@@ -113,8 +116,8 @@ class OpenAIClient:
     def start_chat(
         self,
         system_prompt: str = '',
-        history: Optional[List[Dict]] = None,
-        model: Optional[str] = None
+        history: list[dict] | None = None,
+        model: str | None = None
     ):
         """Start a multi-turn chat session"""
         client = self.client
@@ -124,13 +127,13 @@ class OpenAIClient:
         class ChatSession:
             def __init__(self):
                 self.model = model_name
-                self.history: List[Dict] = []
+                self.history: list[dict] = []
                 if system_prompt:
                     self.history.append({'role': 'system', 'content': system_prompt})
                 if history:
                     self.history.extend(history)
 
-            def send_message(self, message: str) -> Dict[str, Any]:
+            def send_message(self, message: str) -> dict[str, Any]:
                 self.history.append({'role': 'user', 'content': message})
                 response = client.chat.completions.create(
                     model=self.model, messages=self.history, **gen_config
@@ -143,12 +146,12 @@ class OpenAIClient:
 
     def analyze_image(
         self,
-        image_path: Optional[str] = None,
-        image_url: Optional[str] = None,
+        image_path: str | None = None,
+        image_url: str | None = None,
         prompt: str = 'Describe this image',
         model: str = 'gpt-4o',
         detail: str = 'auto'
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze image with GPT-4o vision"""
         self._rate_limit()
 
@@ -181,10 +184,10 @@ class OpenAIClient:
     def generate_with_tools(
         self,
         prompt: str,
-        tools: List[Dict],
-        model: Optional[str] = None,
-        system_prompt: Optional[str] = None
-    ) -> Dict[str, Any]:
+        tools: list[dict],
+        model: str | None = None,
+        system_prompt: str | None = None
+    ) -> dict[str, Any]:
         """Function/tool calling"""
         self._rate_limit()
         messages = []
@@ -244,7 +247,7 @@ class OpenAIClient:
         size: str = '1024x1024',
         quality: str = 'standard',
         n: int = 1
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Generate images with DALL·E or gpt-image-1"""
         self._rate_limit()
         try:
@@ -259,8 +262,8 @@ class OpenAIClient:
         self,
         file_path: str,
         model: str = 'whisper-1',
-        language: Optional[str] = None
-    ) -> Dict[str, Any]:
+        language: str | None = None
+    ) -> dict[str, Any]:
         """Transcribe audio with Whisper"""
         try:
             with open(file_path, 'rb') as f:
@@ -277,7 +280,7 @@ class OpenAIClient:
         text: str,
         voice: str = 'alloy',
         model: str = 'tts-1-hd',
-        output_path: Optional[str] = None
+        output_path: str | None = None
     ) -> bytes:
         """Convert text to speech"""
         try:
@@ -290,7 +293,7 @@ class OpenAIClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def _handle_error(self, error: Exception) -> Dict[str, Any]:
+    def _handle_error(self, error: Exception) -> dict[str, Any]:
         response = {'error': True, 'message': str(error), 'type': type(error).__name__}
 
         msg = str(error).lower()
@@ -306,13 +309,13 @@ class OpenAIClient:
 
         raise Exception(response)
 
-    def get_available_models(self) -> List[Dict[str, Any]]:
+    def get_available_models(self) -> list[dict[str, Any]]:
         return self.model_configs['models']
 
     def get_recommended_model(self, task_type: str) -> str:
         return self.model_configs['modelSelection'].get(task_type, self.default_model)
 
-    def list_models(self) -> List:
+    def list_models(self) -> list:
         try:
             return list(self.client.models.list())
         except Exception as e:

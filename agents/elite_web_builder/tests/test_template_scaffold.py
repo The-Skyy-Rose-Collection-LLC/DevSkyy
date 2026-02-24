@@ -7,7 +7,6 @@ All scaffold functions return frozen dataclasses (immutable).
 from __future__ import annotations
 
 import pytest
-
 from tools.template_scaffold import (
     ScaffoldError,
     ScaffoldFile,
@@ -17,7 +16,6 @@ from tools.template_scaffold import (
     scaffold_shopify_template,
     scaffold_wordpress_template,
 )
-
 
 # ---------------------------------------------------------------------------
 # Data model immutability
