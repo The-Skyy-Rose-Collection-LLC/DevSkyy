@@ -221,6 +221,14 @@ async def lifespan(app: FastAPI):
     else:
         log.info("sentry_disabled", reason="SENTRY_DSN not configured")
 
+    # Initialize OpenTelemetry tracing
+    try:
+        from core.telemetry.tracer import init_telemetry
+        init_telemetry(service_name="devskyy-api")
+        log.info("opentelemetry_initialized")
+    except Exception as e:
+        log.warning("opentelemetry_init_failed", error=str(e))
+
     # Register services for dependency injection (Phase 4)
     log.info("registering_services_for_di")
     try:
