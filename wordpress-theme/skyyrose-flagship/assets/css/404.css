@@ -1,0 +1,584 @@
+/**
+ * 404 Page Styles — SkyyRose Flagship
+ *
+ * Styling for 404.php: animated number, orbs, sparkles, collection cards,
+ * trending products, quick nav, newsletter, film grain overlay.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.1.0
+ */
+
+/* ============================================
+   PAGE LAYOUT
+   ============================================ */
+.error-404-page {
+	position: relative;
+	min-height: 100vh;
+	padding: 120px 24px 80px;
+	overflow: hidden;
+}
+
+.error-404-content {
+	position: relative;
+	z-index: 2;
+	max-width: 900px;
+	margin: 0 auto;
+	text-align: center;
+}
+
+/* ============================================
+   FLOATING ORBS
+   ============================================ */
+.error-404-orbs {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+}
+
+.error-404-orb {
+	position: absolute;
+	border-radius: 50%;
+	filter: blur(80px);
+	opacity: 0.15;
+}
+
+.error-404-orb--1 {
+	width: 300px;
+	height: 300px;
+	background: var(--color-rose-gold, #B76E79);
+	top: 10%;
+	left: 15%;
+	animation: orb-float-1 18s ease-in-out infinite alternate;
+}
+
+.error-404-orb--2 {
+	width: 200px;
+	height: 200px;
+	background: #DC143C;
+	top: 60%;
+	right: 10%;
+	animation: orb-float-2 22s ease-in-out infinite alternate;
+}
+
+.error-404-orb--3 {
+	width: 250px;
+	height: 250px;
+	background: #C0C0C0;
+	bottom: 20%;
+	left: 40%;
+	animation: orb-float-3 15s ease-in-out infinite alternate;
+}
+
+.error-404-orb--4 {
+	width: 180px;
+	height: 180px;
+	background: #FFB6C1;
+	top: 30%;
+	right: 30%;
+	animation: orb-float-1 20s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes orb-float-1 {
+	0% { transform: translate(0, 0); }
+	100% { transform: translate(30px, -40px); }
+}
+
+@keyframes orb-float-2 {
+	0% { transform: translate(0, 0); }
+	100% { transform: translate(-20px, 30px); }
+}
+
+@keyframes orb-float-3 {
+	0% { transform: translate(0, 0); }
+	100% { transform: translate(20px, 20px); }
+}
+
+/* ============================================
+   SPARKLE PARTICLES
+   ============================================ */
+.error-404-sparkles {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.error-404-sparkle {
+	position: absolute;
+	width: 3px;
+	height: 3px;
+	border-radius: 50%;
+	background: rgba(183, 110, 121, 0.6);
+	animation: sparkle-twinkle 3s ease-in-out infinite;
+}
+
+.error-404-sparkle--1 { top: 15%; left: 20%; animation-delay: 0s; }
+.error-404-sparkle--2 { top: 25%; left: 70%; animation-delay: 0.3s; }
+.error-404-sparkle--3 { top: 40%; left: 10%; animation-delay: 0.6s; }
+.error-404-sparkle--4 { top: 55%; left: 85%; animation-delay: 0.9s; }
+.error-404-sparkle--5 { top: 70%; left: 30%; animation-delay: 1.2s; }
+.error-404-sparkle--6 { top: 80%; left: 60%; animation-delay: 1.5s; }
+.error-404-sparkle--7 { top: 10%; left: 45%; animation-delay: 1.8s; }
+.error-404-sparkle--8 { top: 35%; left: 55%; animation-delay: 2.1s; }
+.error-404-sparkle--9 { top: 65%; left: 15%; animation-delay: 2.4s; }
+.error-404-sparkle--10 { top: 20%; left: 90%; animation-delay: 0.5s; }
+.error-404-sparkle--11 { top: 50%; left: 50%; animation-delay: 1.0s; }
+.error-404-sparkle--12 { top: 85%; left: 75%; animation-delay: 2.0s; }
+
+@keyframes sparkle-twinkle {
+	0%, 100% { opacity: 0; transform: scale(0.5); }
+	50% { opacity: 1; transform: scale(1.2); }
+}
+
+/* Film Grain */
+.error-404-grain {
+	position: fixed;
+	inset: 0;
+	pointer-events: none;
+	z-index: 9998;
+	opacity: 0.04;
+	mix-blend-mode: overlay;
+}
+
+/* ============================================
+   404 NUMBER DISPLAY
+   ============================================ */
+.error-404-number {
+	font-family: 'Playfair Display', serif;
+	font-size: clamp(8rem, 20vw, 14rem);
+	font-weight: 800;
+	line-height: 1;
+	margin: 0 0 16px;
+	background: linear-gradient(135deg, var(--color-rose-gold, #B76E79) 0%, #C0C0C0 40%, #DC143C 70%, var(--color-rose-gold, #B76E79) 100%);
+	background-size: 300% 300%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	-webkit-text-fill-color: transparent;
+	animation: gradient-shift 8s ease-in-out infinite;
+}
+
+@keyframes gradient-shift {
+	0% { background-position: 0% 50%; }
+	50% { background-position: 100% 50%; }
+	100% { background-position: 0% 50%; }
+}
+
+.error-404-title {
+	font-family: 'Playfair Display', serif;
+	font-size: clamp(1.5rem, 4vw, 2.5rem);
+	font-weight: 600;
+	color: #fff;
+	margin: 0 0 12px;
+}
+
+.error-404-subtitle {
+	font-family: 'Inter', sans-serif;
+	font-size: 1rem;
+	color: rgba(255, 255, 255, 0.6);
+	margin: 0 0 8px;
+}
+
+.error-404-witty {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.85rem;
+	font-style: italic;
+	color: rgba(255, 255, 255, 0.4);
+	margin: 0 0 40px;
+}
+
+/* ============================================
+   SEARCH BAR
+   ============================================ */
+.error-404-search {
+	max-width: 500px;
+	margin: 0 auto 48px;
+}
+
+.error-404-search-form {
+	display: flex;
+	border-radius: 12px;
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(255, 255, 255, 0.04);
+	transition: border-color 0.2s ease;
+}
+
+.error-404-search-form:focus-within {
+	border-color: var(--color-rose-gold, #B76E79);
+	box-shadow: 0 0 0 3px rgba(183, 110, 121, 0.15);
+}
+
+.error-404-search-input {
+	flex: 1;
+	padding: 14px 18px;
+	border: none;
+	background: transparent;
+	color: #fff;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.9rem;
+	outline: none;
+}
+
+.error-404-search-input::placeholder {
+	color: rgba(255, 255, 255, 0.3);
+}
+
+.error-404-search-btn {
+	padding: 14px 18px;
+	border: none;
+	background: transparent;
+	color: rgba(255, 255, 255, 0.5);
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.error-404-search-btn:hover {
+	color: var(--color-rose-gold, #B76E79);
+}
+
+/* ============================================
+   SECTION HEADING
+   ============================================ */
+.error-404-section-heading {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: #fff;
+	margin: 0 0 24px;
+}
+
+/* ============================================
+   COLLECTION CARDS
+   ============================================ */
+.error-404-collections {
+	margin-bottom: 56px;
+}
+
+.error-404-cards {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 16px;
+	text-align: left;
+}
+
+.error-404-card {
+	position: relative;
+	display: block;
+	padding: 24px 20px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	text-decoration: none;
+	overflow: hidden;
+	transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.error-404-card:hover {
+	transform: translateY(-4px);
+	border-color: var(--card-accent, rgba(183, 110, 121, 0.3));
+}
+
+.error-404-card-border {
+	position: absolute;
+	top: 0;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: linear-gradient(90deg, transparent, var(--card-accent, #B76E79), transparent);
+}
+
+.error-404-card-label {
+	display: block;
+	font-family: 'Playfair Display', serif;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #fff;
+	margin-bottom: 8px;
+}
+
+.error-404-card-description {
+	display: block;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.8rem;
+	color: rgba(255, 255, 255, 0.5);
+	line-height: 1.5;
+	margin-bottom: 12px;
+}
+
+.error-404-card-meta {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.75rem;
+	color: rgba(255, 255, 255, 0.4);
+}
+
+.error-404-card-arrow {
+	position: absolute;
+	bottom: 20px;
+	right: 16px;
+	font-size: 1.2rem;
+	color: rgba(255, 255, 255, 0.2);
+	transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.error-404-card:hover .error-404-card-arrow {
+	color: var(--card-accent, #B76E79);
+	transform: translateX(4px);
+}
+
+/* ============================================
+   TRENDING PRODUCTS
+   ============================================ */
+.error-404-trending {
+	margin-bottom: 56px;
+}
+
+.error-404-trending-grid {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 16px;
+}
+
+.error-404-product-card {
+	text-decoration: none;
+	display: block;
+	border-radius: 12px;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.error-404-product-card:hover {
+	transform: translateY(-4px);
+	border-color: rgba(183, 110, 121, 0.2);
+}
+
+.error-404-product-image {
+	aspect-ratio: 3 / 4;
+	background: rgba(255, 255, 255, 0.02);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.error-404-product-image img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+.error-404-product-placeholder {
+	color: rgba(255, 255, 255, 0.15);
+}
+
+.error-404-product-info {
+	padding: 12px 16px;
+}
+
+.error-404-product-name {
+	display: block;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: #fff;
+	margin-bottom: 4px;
+}
+
+.error-404-product-price {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.8rem;
+	color: var(--color-rose-gold, #B76E79);
+}
+
+/* ============================================
+   QUICK NAVIGATION
+   ============================================ */
+.error-404-quick-nav {
+	margin-bottom: 56px;
+}
+
+.error-404-nav-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	gap: 12px;
+}
+
+.error-404-nav-item {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 8px;
+	padding: 20px 12px;
+	border-radius: 12px;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	text-decoration: none;
+	transition: all 0.2s ease;
+}
+
+.error-404-nav-item:hover {
+	background: rgba(183, 110, 121, 0.08);
+	border-color: rgba(183, 110, 121, 0.2);
+}
+
+.error-404-nav-icon {
+	color: rgba(255, 255, 255, 0.5);
+	transition: color 0.2s ease;
+}
+
+.error-404-nav-item:hover .error-404-nav-icon {
+	color: var(--color-rose-gold, #B76E79);
+}
+
+.error-404-nav-label {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.75rem;
+	font-weight: 500;
+	color: rgba(255, 255, 255, 0.6);
+}
+
+/* ============================================
+   NEWSLETTER CTA
+   ============================================ */
+.error-404-newsletter {
+	padding: 40px 32px;
+	border-radius: 16px;
+	background: rgba(183, 110, 121, 0.06);
+	border: 1px solid rgba(183, 110, 121, 0.1);
+	margin-bottom: 40px;
+}
+
+.error-404-newsletter-heading {
+	font-family: 'Playfair Display', serif;
+	font-size: 1.3rem;
+	font-weight: 600;
+	color: #fff;
+	margin: 0 0 8px;
+}
+
+.error-404-newsletter-text {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.9rem;
+	color: rgba(255, 255, 255, 0.6);
+	margin: 0 0 20px;
+}
+
+.error-404-newsletter-form {
+	display: flex;
+	max-width: 440px;
+	margin: 0 auto;
+	border-radius: 10px;
+	overflow: hidden;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.error-404-newsletter-input {
+	flex: 1;
+	padding: 12px 16px;
+	border: none;
+	background: transparent;
+	color: #fff;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.9rem;
+	outline: none;
+}
+
+.error-404-newsletter-input::placeholder {
+	color: rgba(255, 255, 255, 0.3);
+}
+
+.error-404-newsletter-btn {
+	padding: 12px 24px;
+	border: none;
+	background: var(--color-rose-gold, #B76E79);
+	color: #fff;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.error-404-newsletter-btn:hover {
+	background: #a05a64;
+}
+
+/* ============================================
+   CTA BUTTONS
+   ============================================ */
+.error-404-cta-group {
+	display: flex;
+	justify-content: center;
+	gap: 16px;
+}
+
+.error-404-cta {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 14px 32px;
+	border-radius: 8px;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.9rem;
+	font-weight: 600;
+	text-decoration: none;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.error-404-cta:hover {
+	transform: translateY(-2px);
+}
+
+.error-404-cta--primary {
+	background: linear-gradient(135deg, var(--color-rose-gold, #B76E79), #a05a64);
+	color: #fff;
+}
+
+.error-404-cta--primary:hover {
+	box-shadow: 0 8px 24px rgba(183, 110, 121, 0.3);
+}
+
+.error-404-cta--secondary {
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	color: #fff;
+}
+
+.error-404-cta--secondary:hover {
+	background: rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   RESPONSIVE
+   ============================================ */
+@media (max-width: 768px) {
+	.error-404-cards {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.error-404-trending-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.error-404-nav-grid {
+		grid-template-columns: repeat(3, 1fr);
+	}
+}
+
+@media (max-width: 480px) {
+	.error-404-page {
+		padding: 100px 16px 60px;
+	}
+	.error-404-cards {
+		grid-template-columns: 1fr;
+	}
+	.error-404-trending-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.error-404-nav-grid {
+		grid-template-columns: repeat(2, 1fr);
+	}
+	.error-404-cta-group {
+		flex-direction: column;
+	}
+}
