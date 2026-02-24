@@ -166,6 +166,17 @@ pytest -v && npm test && curl http://localhost:8000/health
 - ❌ **Mistake**: Integration tests placed in `tests/api/` which has encryption-key import errors at collection time
   - ✅ **Correct**: Place in `tests/integration/` to isolate from encryption module issues
 
+### Vercel Deployment
+
+- ❌ **Mistake**: Modifying root `vercel.json` to fix deployment settings
+  - ✅ **Correct**: When `rootDirectory` is set (e.g., `'frontend'`), Vercel reads `frontend/vercel.json` — root vercel.json is ignored
+
+- ❌ **Mistake**: Using pnpm with Vercel (ERR_INVALID_THIS on Node 22.x/24.x)
+  - ✅ **Correct**: Use npm. Remove ALL `pnpm-lock.yaml` files from git (`**/pnpm-lock.yaml` in .gitignore). Track `frontend/package-lock.json` in git.
+
+- ❌ **Mistake**: Expecting dashboard/API `installCommand` to override vercel.json
+  - ✅ **Correct**: `vercel.json` inside `rootDirectory` takes precedence over dashboard settings
+
 ### 3D Development
 
 - ❌ **Mistake**: Using CDN URLs without verification
