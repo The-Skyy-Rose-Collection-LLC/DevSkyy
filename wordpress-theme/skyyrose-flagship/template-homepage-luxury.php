@@ -17,9 +17,9 @@ get_header();
 	<section class="hero luxury-hero">
 		<div class="hero-content">
 			<h1 class="hero-title fade-in">Where Love Meets Luxury</h1>
-			<p class="hero-subtitle fade-in">Exquisite jewelry crafted with passion, designed to last forever</p>
+			<p class="hero-subtitle fade-in">Oakland luxury streetwear crafted with passion, designed to make a statement</p>
 			<div class="hero-actions fade-in">
-				<a href="/shop" class="btn btn-primary">Explore Collections</a>
+				<a href="/collections" class="btn btn-primary">Explore Collections</a>
 				<a href="/about" class="btn btn-outline">Our Story</a>
 			</div>
 		</div>
@@ -30,46 +30,46 @@ get_header();
 		<div class="container">
 			<div class="section-header text-center">
 				<span class="section-subtitle text-rose-gold">Discover Our Collections</span>
-				<h2 class="section-title">Luxury Jewelry Collections</h2>
+				<h2 class="section-title">Luxury Streetwear Collections</h2>
 			</div>
 
 			<div class="collections-grid">
 				<!-- Signature Collection -->
 				<article class="collection-card collection-signature">
 					<div class="collection-image">
-						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="Signature Collection">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Signature Collection', 'skyyrose-flagship' ); ?>">
 					</div>
 					<div class="collection-content">
 						<span class="collection-badge">Signature</span>
-						<h3 class="collection-title">Signature Collection</h3>
-						<p class="collection-description">Timeless elegance in rose gold, gold, and silver. Our flagship collection combines classic design with modern sophistication.</p>
-						<a href="/collection/signature" class="btn btn-secondary">View Collection</a>
+						<h3 class="collection-title"><?php esc_html_e( 'Signature Collection', 'skyyrose-flagship' ); ?></h3>
+						<p class="collection-description"><?php esc_html_e( 'West Coast prestige meets rose gold warmth. Premium hoodies, joggers, and statement pieces for the Bay Area lifestyle.', 'skyyrose-flagship' ); ?></p>
+						<a href="/collection/signature" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
 					</div>
 				</article>
 
 				<!-- Love Hurts Collection -->
 				<article class="collection-card collection-love-hurts">
 					<div class="collection-image">
-						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="Love Hurts Collection">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Love Hurts Collection', 'skyyrose-flagship' ); ?>">
 					</div>
 					<div class="collection-content">
 						<span class="collection-badge">Love Hurts</span>
-						<h3 class="collection-title">Love Hurts Collection</h3>
-						<p class="collection-description">Passionate designs featuring deep crimson and rose gold. Bold pieces for those who wear their heart on their sleeve.</p>
-						<a href="/collection/love-hurts" class="btn btn-secondary">View Collection</a>
+						<h3 class="collection-title"><?php esc_html_e( 'Love Hurts Collection', 'skyyrose-flagship' ); ?></h3>
+						<p class="collection-description"><?php esc_html_e( 'Raw passion in deep crimson. Varsity jackets, bombers, and streetwear for those who wear their heart on their sleeve.', 'skyyrose-flagship' ); ?></p>
+						<a href="/collection/love-hurts" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
 					</div>
 				</article>
 
 				<!-- Black Rose Collection -->
 				<article class="collection-card collection-black-rose">
 					<div class="collection-image">
-						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="Black Rose Collection">
+						<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'Black Rose Collection', 'skyyrose-flagship' ); ?>">
 					</div>
 					<div class="collection-content">
 						<span class="collection-badge">Black Rose</span>
-						<h3 class="collection-title">Black Rose Collection</h3>
-						<p class="collection-description">Mysterious and elegant. Silver and black pieces that make a powerful statement of refined luxury.</p>
-						<a href="/collection/black-rose" class="btn btn-secondary">View Collection</a>
+						<h3 class="collection-title"><?php esc_html_e( 'Black Rose Collection', 'skyyrose-flagship' ); ?></h3>
+						<p class="collection-description"><?php esc_html_e( 'Gothic luxury blooms in midnight. Embroidered hoodies, sherpa jackets, and fleece with defiant elegance.', 'skyyrose-flagship' ); ?></p>
+						<a href="/collection/black-rose" class="btn btn-secondary"><?php esc_html_e( 'View Collection', 'skyyrose-flagship' ); ?></a>
 					</div>
 				</article>
 			</div>
@@ -81,14 +81,14 @@ get_header();
 		<div class="container">
 			<div class="about-grid">
 				<div class="about-content">
-					<span class="section-subtitle">The SkyyRose Story</span>
-					<h2 class="section-title">Crafted with Passion</h2>
-					<p>Since our founding, SkyyRose has been dedicated to creating jewelry that tells a story. Each piece is meticulously crafted to celebrate life's most precious moments.</p>
-					<p>Our collections blend timeless elegance with contemporary design, using only the finest materials to create pieces that will be treasured for generations.</p>
-					<a href="/about" class="btn btn-outline">Learn More</a>
+					<span class="section-subtitle"><?php esc_html_e( 'The SkyyRose Story', 'skyyrose-flagship' ); ?></span>
+					<h2 class="section-title"><?php esc_html_e( 'Crafted with Passion', 'skyyrose-flagship' ); ?></h2>
+					<p><?php esc_html_e( 'Born in Oakland, SkyyRose is luxury streetwear that tells a story. Every stitch is a statement, every drop a declaration of self-expression and defiant elegance.', 'skyyrose-flagship' ); ?></p>
+					<p><?php esc_html_e( 'Our collections blend gothic romance, raw emotion, and West Coast prestige into premium garments designed for those who refuse to blend in.', 'skyyrose-flagship' ); ?></p>
+					<a href="/about" class="btn btn-outline"><?php esc_html_e( 'Learn More', 'skyyrose-flagship' ); ?></a>
 				</div>
 				<div class="about-image">
-					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="SkyyRose Jewelry Crafting">
+					<img src="<?php echo esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder.jpg' ); ?>" alt="<?php esc_attr_e( 'SkyyRose Luxury Streetwear', 'skyyrose-flagship' ); ?>">
 				</div>
 			</div>
 		</div>
@@ -98,32 +98,32 @@ get_header();
 	<section class="section features-section">
 		<div class="container">
 			<div class="section-header text-center">
-				<h2 class="section-title">Why Choose SkyyRose</h2>
+				<h2 class="section-title"><?php esc_html_e( 'Why Choose SkyyRose', 'skyyrose-flagship' ); ?></h2>
 			</div>
 
 			<div class="features-grid">
 				<div class="feature-card card">
-					<div class="feature-icon">✨</div>
-					<h3 class="card-title">Premium Quality</h3>
-					<p class="card-description">Only the finest materials - rose gold, gold, and sterling silver.</p>
+					<div class="feature-icon" aria-hidden="true">&#10024;</div>
+					<h3 class="card-title"><?php esc_html_e( 'Premium Quality', 'skyyrose-flagship' ); ?></h3>
+					<p class="card-description"><?php esc_html_e( 'Heavyweight fabrics, custom embroidery, and meticulous construction.', 'skyyrose-flagship' ); ?></p>
 				</div>
 
 				<div class="feature-card card">
-					<div class="feature-icon">🎨</div>
-					<h3 class="card-title">Unique Designs</h3>
-					<p class="card-description">Each piece is thoughtfully designed to be one-of-a-kind.</p>
+					<div class="feature-icon" aria-hidden="true">&#127912;</div>
+					<h3 class="card-title"><?php esc_html_e( 'Limited Editions', 'skyyrose-flagship' ); ?></h3>
+					<p class="card-description"><?php esc_html_e( 'Each drop is numbered and limited. Once they are gone, they are gone.', 'skyyrose-flagship' ); ?></p>
 				</div>
 
 				<div class="feature-card card">
-					<div class="feature-icon">💎</div>
-					<h3 class="card-title">Lifetime Warranty</h3>
-					<p class="card-description">We stand behind our craftsmanship with a lifetime guarantee.</p>
+					<div class="feature-icon" aria-hidden="true">&#128142;</div>
+					<h3 class="card-title"><?php esc_html_e( 'Immersive Experiences', 'skyyrose-flagship' ); ?></h3>
+					<p class="card-description"><?php esc_html_e( 'Explore collections through 3D immersive rooms before you buy.', 'skyyrose-flagship' ); ?></p>
 				</div>
 
 				<div class="feature-card card">
-					<div class="feature-icon">🚚</div>
-					<h3 class="card-title">Free Shipping</h3>
-					<p class="card-description">Complimentary shipping on all orders over $100.</p>
+					<div class="feature-icon" aria-hidden="true">&#128666;</div>
+					<h3 class="card-title"><?php esc_html_e( 'Free Shipping', 'skyyrose-flagship' ); ?></h3>
+					<p class="card-description"><?php esc_html_e( 'Complimentary shipping on all orders over $100.', 'skyyrose-flagship' ); ?></p>
 				</div>
 			</div>
 		</div>
@@ -132,9 +132,9 @@ get_header();
 	<!-- CTA Section -->
 	<section class="section cta-section gradient-rose-gold">
 		<div class="container text-center">
-			<h2 class="section-title">Ready to Find Your Perfect Piece?</h2>
-			<p class="section-subtitle">Explore our full collection of luxury jewelry</p>
-			<a href="/shop" class="btn btn-primary btn-large">Shop Now</a>
+			<h2 class="section-title"><?php esc_html_e( 'Ready to Make Your Statement?', 'skyyrose-flagship' ); ?></h2>
+			<p class="section-subtitle"><?php esc_html_e( 'Pre-order the latest drops before they sell out', 'skyyrose-flagship' ); ?></p>
+			<a href="/pre-order" class="btn btn-primary btn-large"><?php esc_html_e( 'Pre-Order Now', 'skyyrose-flagship' ); ?></a>
 		</div>
 	</section>
 

@@ -36,7 +36,10 @@ import uuid
 from datetime import UTC, datetime
 from typing import Any
 
+from core.telemetry.tracer import get_tracer
+
 logger = logging.getLogger(__name__)
+_tracer = get_tracer("core.events")
 
 
 class Event:
@@ -150,9 +153,13 @@ class EventStore:
 
         The event is returned unchanged for chaining.
         """
-        await self._persist(event)
-        await self._publish(event)
-        return event
+        with _tracer.start_as_current_span("event_store.append") as span:
+            span.set_attribute("event.type", event.event_type)
+            span.set_attribute("event.aggregate_id", event.aggregate_id)
+            span.set_attribute("event.id", event.event_id)
+            await self._persist(event)
+            await self._publish(event)
+            return event
 
     async def _persist(self, event: Event) -> None:
         """Write event to database. Override in tests to avoid DB calls."""

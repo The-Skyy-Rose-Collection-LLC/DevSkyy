@@ -20,6 +20,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
+from core.telemetry.tracer import get_tracer
+
 from .base import BaseLLMClient, CompletionResponse, Message, ModelProvider
 from .exceptions import LLMError
 from .providers import (
@@ -33,6 +35,7 @@ from .providers import (
 from .providers.deepseek import DeepSeekClient
 
 logger = logging.getLogger(__name__)
+_tracer = get_tracer("llm.router")
 
 
 # =============================================================================
@@ -397,15 +400,23 @@ class LLMRouter:
         config = self.configs[provider]
         model = model or config.default_model
 
-        try:
-            response = await client.complete(messages, model=model, **kwargs)
-            # Record success
-            self.circuit_breaker.record_success(provider)
-            return response
-        except Exception:
-            # Record failure
-            self.circuit_breaker.record_failure(provider)
-            raise
+        with _tracer.start_as_current_span("llm.complete") as span:
+            span.set_attribute("llm.provider", provider.value)
+            span.set_attribute("llm.model", model)
+            span.set_attribute("llm.message_count", len(messages))
+            try:
+                response = await client.complete(messages, model=model, **kwargs)
+                # Record success
+                self.circuit_breaker.record_success(provider)
+                span.set_attribute("llm.input_tokens", response.input_tokens)
+                span.set_attribute("llm.output_tokens", response.output_tokens)
+                span.set_attribute("llm.latency_ms", response.latency_ms)
+                return response
+            except Exception as e:
+                # Record failure
+                self.circuit_breaker.record_failure(provider)
+                span.record_exception(e)
+                raise
 
     async def complete_with_fallback(
         self,

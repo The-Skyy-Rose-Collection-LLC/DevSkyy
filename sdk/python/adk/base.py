@@ -23,7 +23,10 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
+from core.telemetry.tracer import get_tracer
+
 logger = logging.getLogger(__name__)
+_tracer = get_tracer("adk.agent")
 
 
 # =============================================================================
@@ -267,55 +270,66 @@ class BaseDevSkyyAgent(ABC):
         """
         start_time = datetime.now(UTC)
 
-        try:
-            # Initialize if needed
-            if not self._initialized:
-                await self.initialize()
-                self._initialized = True
+        with _tracer.start_as_current_span(f"agent.run.{self.name}") as span:
+            span.set_attribute("agent.name", self.name)
+            span.set_attribute("agent.provider", self.provider)
 
-            self._status = AgentStatus.RUNNING
+            try:
+                # Initialize if needed
+                if not self._initialized:
+                    await self.initialize()
+                    self._initialized = True
 
-            # Execute
-            result = await asyncio.wait_for(
-                self.execute(prompt, **kwargs),
-                timeout=self.config.timeout,
-            )
+                self._status = AgentStatus.RUNNING
 
-            self._status = AgentStatus.COMPLETED
-            result.completed_at = datetime.now(UTC)
-            result.latency_ms = (result.completed_at - start_time).total_seconds() * 1000
+                # Execute
+                result = await asyncio.wait_for(
+                    self.execute(prompt, **kwargs),
+                    timeout=self.config.timeout,
+                )
 
-            # Update memory
-            if self.config.enable_memory:
-                self._update_memory(prompt, result.content)
+                self._status = AgentStatus.COMPLETED
+                result.completed_at = datetime.now(UTC)
+                result.latency_ms = (result.completed_at - start_time).total_seconds() * 1000
 
-            return result
+                # Update memory
+                if self.config.enable_memory:
+                    self._update_memory(prompt, result.content)
 
-        except TimeoutError:
-            self._status = AgentStatus.FAILED
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self.provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=f"Execution timed out after {self.config.timeout}s",
-                error_type="TimeoutError",
-                started_at=start_time,
-                completed_at=datetime.now(UTC),
-            )
-        except Exception as e:
-            self._status = AgentStatus.FAILED
-            logger.error(f"Agent {self.name} failed: {e}", exc_info=True)
-            return AgentResult(
-                agent_name=self.name,
-                agent_provider=self.provider,
-                content="",
-                status=AgentStatus.FAILED,
-                error=str(e),
-                error_type=type(e).__name__,
-                started_at=start_time,
-                completed_at=datetime.now(UTC),
-            )
+                span.set_attribute("agent.status", result.status.value)
+                span.set_attribute("agent.latency_ms", result.latency_ms)
+                return result
+
+            except TimeoutError:
+                self._status = AgentStatus.FAILED
+                span.set_attribute("agent.status", "failed")
+                span.set_attribute("agent.error_type", "TimeoutError")
+                return AgentResult(
+                    agent_name=self.name,
+                    agent_provider=self.provider,
+                    content="",
+                    status=AgentStatus.FAILED,
+                    error=f"Execution timed out after {self.config.timeout}s",
+                    error_type="TimeoutError",
+                    started_at=start_time,
+                    completed_at=datetime.now(UTC),
+                )
+            except Exception as e:
+                self._status = AgentStatus.FAILED
+                span.record_exception(e)
+                span.set_attribute("agent.status", "failed")
+                span.set_attribute("agent.error_type", type(e).__name__)
+                logger.error(f"Agent {self.name} failed: {e}", exc_info=True)
+                return AgentResult(
+                    agent_name=self.name,
+                    agent_provider=self.provider,
+                    content="",
+                    status=AgentStatus.FAILED,
+                    error=str(e),
+                    error_type=type(e).__name__,
+                    started_at=start_time,
+                    completed_at=datetime.now(UTC),
+                )
 
     def _update_memory(self, prompt: str, response: str) -> None:
         """Update conversation memory"""
