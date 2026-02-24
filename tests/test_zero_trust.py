@@ -259,7 +259,10 @@ class TestCertificateAuthority:
         """Test certificate verification with expired certificate"""
         from datetime import timedelta
 
-        from freezegun import freeze_time
+        try:
+            from freezegun import freeze_time
+        except ImportError:
+            pytest.skip("freezegun not installed")
 
         ca_cert, ca_key = root_ca
 

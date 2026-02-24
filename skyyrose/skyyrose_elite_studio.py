@@ -69,20 +69,47 @@ if _GEMINI_ENV.exists():
     load_dotenv(_GEMINI_ENV, override=True)
 
 # ---------------------------------------------------------------------------
-# Google ADK imports
+# Optional heavy imports (Google ADK, provider SDKs, Pillow)
 # ---------------------------------------------------------------------------
 
-from google.adk.agents import LlmAgent
-from google.adk import Runner
-from google.adk.sessions import InMemorySessionService
-from google.adk.tools import FunctionTool
-from google.genai import types as genai_types
+try:
+    from google import genai as google_genai
+    from google.genai import types as genai_types
+except ImportError:
+    google_genai = None  # type: ignore[assignment]
+    genai_types = None  # type: ignore[assignment]
 
-# Provider clients
-from google import genai as google_genai
-import openai
-import anthropic
-from PIL import Image
+try:
+    from google.adk import Runner
+    from google.adk.agents import LlmAgent
+    from google.adk.sessions import InMemorySessionService
+    from google.adk.tools import FunctionTool
+
+    ADK_AVAILABLE = True
+except ImportError:
+    Runner = None  # type: ignore[assignment,misc]
+    LlmAgent = None  # type: ignore[assignment,misc]
+    InMemorySessionService = None  # type: ignore[assignment,misc]
+    FunctionTool = None  # type: ignore[assignment,misc]
+
+    ADK_AVAILABLE = False
+
+try:
+    from PIL import Image
+except ImportError:
+    Image = None  # type: ignore[assignment,misc]
+
+try:
+    import anthropic
+except ImportError:
+    anthropic = None  # type: ignore[assignment]
+
+try:
+    import openai
+except ImportError:
+    openai = None  # type: ignore[assignment]
+
+ELITE_DEPS_AVAILABLE = google_genai is not None
 
 # ---------------------------------------------------------------------------
 # Logging
@@ -285,7 +312,7 @@ def load_product_data(sku: str) -> dict[str, Any]:
     if not override_path.exists():
         return {"error": f"Product {sku} not found"}
 
-    with open(override_path, "r") as f:
+    with open(override_path) as f:
         data = json.load(f)
 
     return {
@@ -1453,8 +1480,13 @@ Report results clearly with status, output paths, and quality decisions.
 ALWAYS use function calling — don't describe tools, CALL them."""
 
 
-def build_elite_coordinator() -> LlmAgent:
+def build_elite_coordinator():  # -> LlmAgent
     """Build the Elite Production Coordinator ADK agent."""
+    if not ADK_AVAILABLE:
+        raise ImportError(
+            "google-adk is required for ADK agent mode. "
+            "Install it with: pip install google-adk"
+        )
     return LlmAgent(
         name="elite_production_coordinator",
         model="gemini-2.0-flash",

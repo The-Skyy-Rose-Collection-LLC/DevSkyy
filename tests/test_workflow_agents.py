@@ -334,15 +334,14 @@ class TestWorkflowPipelineAgent:
 
         assert isinstance(agent, BaseDevSkyyAgent)
 
-    def test_initialize_fails_without_adk(self):
-        import asyncio
-
+    @pytest.mark.asyncio
+    async def test_initialize_fails_without_adk(self):
         from adk.workflow_agents import ADK_WORKFLOW_AVAILABLE, PipelineType, WorkflowPipelineAgent
 
         if not ADK_WORKFLOW_AVAILABLE:
             agent = WorkflowPipelineAgent.from_pipeline(PipelineType.PRODUCT_LAUNCH)
             with pytest.raises(ImportError, match="Google ADK not installed"):
-                asyncio.get_event_loop().run_until_complete(agent.initialize())
+                await agent.initialize()
 
     def test_agent_custom_model(self):
         from adk.workflow_agents import PipelineType, WorkflowPipelineAgent
