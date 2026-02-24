@@ -11,6 +11,7 @@ Tests:
 import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 
 import pytest
@@ -131,7 +132,7 @@ class TestValidateEnvironment:
     def test_validates_missing_file(self):
         """Test validation fails for missing file."""
         result = subprocess.run(
-            ["python3", "scripts/validate_environment.py", "/nonexistent/file"],
+            [sys.executable, "scripts/validate_environment.py", "/nonexistent/file"],
             capture_output=True,
             text=True,
         )
@@ -156,7 +157,7 @@ ENVIRONMENT=production
 
         # Run validation
         result = subprocess.run(
-            ["python3", "scripts/validate_environment.py", str(env_file)],
+            [sys.executable, "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
         )
@@ -185,7 +186,7 @@ REDIS_URL=redis://:pass@localhost:6379/0
         }
 
         result = subprocess.run(
-            ["python3", "scripts/validate_environment.py", str(env_file)],
+            [sys.executable, "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
             env=clean_env,
@@ -212,7 +213,7 @@ OPENAI_API_KEY=sk-test123
 
         # Run validation
         result = subprocess.run(
-            ["python3", "scripts/validate_environment.py", str(env_file)],
+            [sys.executable, "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
         )
@@ -237,7 +238,7 @@ OPENAI_API_KEY=sk-test123
 
         # Run validation
         result = subprocess.run(
-            ["python3", "scripts/validate_environment.py", str(env_file)],
+            [sys.executable, "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
         )
@@ -267,7 +268,7 @@ REDIS_URL=redis://:pass@localhost:6379/0
             if not k.endswith("_API_KEY") and not k.endswith("_API_TOKEN")
         }
         result = subprocess.run(
-            ["python3", "scripts/validate_environment.py", str(env_file)],
+            [sys.executable, "scripts/validate_environment.py", str(env_file)],
             capture_output=True,
             text=True,
             env=clean_env,
