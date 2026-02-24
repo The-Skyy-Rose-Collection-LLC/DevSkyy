@@ -7,9 +7,6 @@ from dataclasses import FrozenInstanceError
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
-from agents.base import AgentOutput, AgentRole
-from agents.provider_adapters import LLMResponse
 from director import (
     Director,
     PlanningError,
@@ -18,6 +15,8 @@ from director import (
     UserStory,
 )
 
+from agents.base import AgentRole
+from agents.provider_adapters import LLMResponse
 
 # ---------------------------------------------------------------------------
 # Helpers

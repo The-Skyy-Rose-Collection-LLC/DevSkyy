@@ -53,7 +53,10 @@ from typing import Any
 import aiohttp
 import certifi
 import structlog
-from gradio_client import Client as GradioClient
+try:
+    from gradio_client import Client as GradioClient
+except ImportError:
+    GradioClient = None  # type: ignore[assignment,misc]
 from pydantic import BaseModel, Field
 
 logger = structlog.get_logger(__name__)
@@ -669,6 +672,11 @@ class HuggingFace3DClient:
 
         try:
             # Connect to TripoSR Gradio Space
+            if GradioClient is None:
+                raise ImportError(
+                    "gradio_client is required for TripoSR integration. "
+                    "Install with: pip install gradio_client"
+                )
             # Connect to TripoSR Gradio Space with token
             gradio_client = GradioClient(
                 f"https://huggingface.co/spaces/{HF_SPACE_TRIPOSR}",

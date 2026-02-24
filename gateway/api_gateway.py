@@ -31,7 +31,6 @@ Usage:
 
 from __future__ import annotations
 
-import asyncio
 import logging
 import posixpath
 import re
@@ -39,7 +38,7 @@ import time
 from collections import OrderedDict, deque
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 from urllib.parse import urlparse
 
 # ---------------------------------------------------------------------------
@@ -99,7 +98,7 @@ class CircuitBreaker:
 
     _state: CircuitState = field(default=CircuitState.CLOSED, init=False)
     _window: deque = field(default_factory=lambda: deque(maxlen=20), init=False)
-    _opened_at: Optional[float] = field(default=None, init=False)
+    _opened_at: float | None = field(default=None, init=False)
 
     def __post_init__(self) -> None:
         self._window = deque(maxlen=self.window_size)
@@ -265,7 +264,7 @@ class APIGateway:
 
     def __init__(
         self,
-        rate_limiter: Optional[RateLimiter] = None,
+        rate_limiter: RateLimiter | None = None,
         default_timeout: float = 30.0,
     ) -> None:
         self._routes: list[RouteConfig] = []
@@ -314,7 +313,7 @@ class APIGateway:
         recovery_timeout: float = 30.0,
         timeout: float = 30.0,
         strip_prefix: bool = False,
-    ) -> "APIGateway":
+    ) -> APIGateway:
         """
         Register a backend route.
 
@@ -342,14 +341,14 @@ class APIGateway:
         logger.info(f"Gateway: registered route {path_prefix!r} → {backend_url!r}")
         return self
 
-    def get_route(self, path: str) -> Optional[RouteConfig]:
+    def get_route(self, path: str) -> RouteConfig | None:
         """
         Find the most specific matching route for a path.
 
         Uses longest-prefix matching — "/api/v1/products/detail" matches
         "/api/v1/products" before "/api/v1".
         """
-        matched: Optional[RouteConfig] = None
+        matched: RouteConfig | None = None
         for route in self._routes:
             if path.startswith(route.path_prefix):
                 if matched is None or len(route.path_prefix) > len(matched.path_prefix):
@@ -360,8 +359,8 @@ class APIGateway:
         self,
         path: str,
         method: str = "GET",
-        headers: Optional[dict[str, str]] = None,
-        body: Optional[bytes] = None,
+        headers: dict[str, str] | None = None,
+        body: bytes | None = None,
         client_id: str = "anonymous",
     ) -> dict[str, Any]:
         """
@@ -445,7 +444,7 @@ class APIGateway:
             route.circuit_breaker.record_success()
             return {**response, "routed_to": route.backend_url}
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             route.circuit_breaker.record_failure()
             logger.error(f"Gateway: timeout forwarding to {target_url!r}")
             return {
@@ -469,7 +468,7 @@ class APIGateway:
         method: str,
         url: str,
         headers: dict[str, str],
-        body: Optional[bytes],
+        body: bytes | None,
         timeout: float,
     ) -> dict[str, Any]:
         """

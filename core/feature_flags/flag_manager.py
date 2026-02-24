@@ -39,7 +39,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -108,10 +108,10 @@ class FlagManager:
         *,
         enabled: bool = True,
         rollout_percentage: int = 100,
-        enabled_for_users: Optional[list[str]] = None,
-        disabled_for_users: Optional[list[str]] = None,
+        enabled_for_users: list[str] | None = None,
+        disabled_for_users: list[str] | None = None,
         description: str = "",
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> FeatureFlag:
         """
         Create or replace a feature flag.
@@ -135,7 +135,7 @@ class FlagManager:
         )
         return flag
 
-    def get_flag(self, name: str) -> Optional[FeatureFlag]:
+    def get_flag(self, name: str) -> FeatureFlag | None:
         """Return a flag by name, or None if not found."""
         return self._flags.get(name)
 
@@ -183,7 +183,7 @@ class FlagManager:
     # Flag Evaluation
     # ---------------------------------------------------------------------------
 
-    def is_enabled(self, flag_name: str, user_id: Optional[str] = None) -> bool:
+    def is_enabled(self, flag_name: str, user_id: str | None = None) -> bool:
         """
         Evaluate whether a flag is enabled for a given user.
 

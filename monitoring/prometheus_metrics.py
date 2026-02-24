@@ -30,9 +30,9 @@ Version: 1.0.0
 """
 
 import time
+from collections.abc import Callable
 from contextlib import contextmanager
 from functools import wraps
-from typing import Any, Callable, Optional
 
 from prometheus_client import (
     Counter,
@@ -226,7 +226,7 @@ def record_error(
     error_type: str,
     tool_name: str,
     reason: str,
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Record an error with detailed context.

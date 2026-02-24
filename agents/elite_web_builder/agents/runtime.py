@@ -23,7 +23,6 @@ from __future__ import annotations
 import logging
 import re
 import time
-from typing import Any
 
 from agents.base import AgentOutput, AgentSpec
 from agents.provider_adapters import LLMMessage, LLMResponse, get_adapter

@@ -32,8 +32,9 @@ from enum import Enum
 from typing import Any
 
 import structlog
-from anthropic import Anthropic
 from pydantic import BaseModel, Field
+
+from anthropic import Anthropic
 
 logger = structlog.get_logger(__name__)
 

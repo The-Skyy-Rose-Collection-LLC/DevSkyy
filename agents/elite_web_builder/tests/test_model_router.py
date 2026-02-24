@@ -1,19 +1,15 @@
 """Tests for core/model_router.py — Multi-provider routing + fallback chain."""
 
-import asyncio
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
 from core.model_router import (
     ModelRouter,
     ProviderConfig,
-    ProviderHealth,
     ProviderStatus,
-    RouteResult,
     RoutingConfig,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

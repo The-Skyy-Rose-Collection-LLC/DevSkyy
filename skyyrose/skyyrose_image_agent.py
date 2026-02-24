@@ -37,12 +37,12 @@ if _GEMINI_ENV.exists():
     load_dotenv(_GEMINI_ENV, override=True)
 
 # ADK imports
-from google.adk.agents import LlmAgent
+from google import genai
 from google.adk import Runner
+from google.adk.agents import LlmAgent
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools import FunctionTool
 from google.genai import types as genai_types
-from google import genai
 
 # OpenAI for vision analysis
 import openai
@@ -612,7 +612,7 @@ def cmd_generate_models(sku: str | None = None, generate_all: bool = False) -> N
         print(response)
 
         if i < len(skus):
-            print(f"\n  ⏸️  Rate limiting (5s)...\n")
+            print("\n  ⏸️  Rate limiting (5s)...\n")
             time.sleep(5)
 
     print(f"\nDone. {len(skus)} products processed.")

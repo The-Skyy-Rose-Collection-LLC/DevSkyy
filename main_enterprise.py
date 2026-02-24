@@ -52,13 +52,13 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from api.admin_dashboard import admin_dashboard_router
-from api.graphql_server import graphql_router
 from api.agents import agents_router
 from api.ar_sessions import ar_sessions_router
 from api.brand import brand_router
 from api.dashboard import dashboard_router
 from api.elementor_3d import elementor_3d_router
 from api.gdpr import gdpr_router
+from api.graphql_server import graphql_router
 from api.round_table import round_table_router
 from api.tasks import tasks_router
 from api.three_d import three_d_router

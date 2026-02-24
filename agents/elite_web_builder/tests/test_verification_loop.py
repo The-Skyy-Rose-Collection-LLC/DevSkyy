@@ -4,7 +4,7 @@ Every story passes through 8 gates: build, types, lint, tests,
 security, a11y, performance, diff. ALL must pass for GREEN.
 """
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
@@ -16,7 +16,6 @@ from core.verification_loop import (
     VerificationLoop,
     VerificationReport,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

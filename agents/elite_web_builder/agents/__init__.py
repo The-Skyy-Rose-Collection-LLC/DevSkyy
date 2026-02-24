@@ -10,12 +10,12 @@ from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec
 from agents.design_system import DESIGN_SYSTEM_SPEC
 from agents.frontend_dev import FRONTEND_DEV_SPEC
 from agents.performance import PERFORMANCE_SPEC
-from agents.qa import QA_SPEC
 from agents.provider_adapters import (
     LLMMessage,
     LLMResponse,
     get_adapter,
 )
+from agents.qa import QA_SPEC
 from agents.runtime import AgentRuntime
 from agents.seo_content import SEO_CONTENT_SPEC
 

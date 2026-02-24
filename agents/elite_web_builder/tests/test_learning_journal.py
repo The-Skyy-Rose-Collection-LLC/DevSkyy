@@ -1,17 +1,13 @@
 """Tests for core/learning_journal.py — Boris Cherny protocol + instinct extraction."""
 
-import json
-import tempfile
 from pathlib import Path
 
 import pytest
 
 from core.learning_journal import (
-    Instinct,
     JournalEntry,
     LearningJournal,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

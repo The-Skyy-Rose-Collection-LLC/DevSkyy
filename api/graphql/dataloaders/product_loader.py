@@ -14,7 +14,7 @@ Example:
     products = await loader.load_many(skus)  # 1 database query!
 """
 
-from typing import Any, List, Optional
+from typing import Any
 
 from aiodataloader import DataLoader
 from sqlalchemy import select
@@ -41,7 +41,7 @@ class ProductDataLoader(DataLoader):
         )
         self.db_manager = DatabaseManager()
 
-    async def _batch_load_fn(self, skus: List[str]) -> List[Optional[Product]]:
+    async def _batch_load_fn(self, skus: list[str]) -> list[Product | None]:
         """
         Batch load products by SKU list
 

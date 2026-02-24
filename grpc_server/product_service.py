@@ -171,7 +171,6 @@ class ProductServicer:
         1. Gets persisted to the event store (immutable audit log)
         2. Updates the read model projection
         """
-        from core.cqrs.command_bus import Command, CommandBus
         from core.events.event_store import Event, EventStore
 
         try:
@@ -319,7 +318,7 @@ async def serve(port: int = GRPC_PORT) -> None:
                 )
                 server.add_secure_port(f"0.0.0.0:{port}", server_credentials)
                 logger.info(f"gRPC server started with TLS on port {port}")
-            except (OSError, IOError) as tls_err:
+            except OSError as tls_err:
                 logger.error(f"Failed to load TLS certificates: {tls_err}")
                 raise
         else:

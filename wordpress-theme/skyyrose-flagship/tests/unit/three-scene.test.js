@@ -1,4 +1,26 @@
 /**
+ * @jest-environment jsdom
+ */
+
+// Override the global THREE with jest.fn()-based mocks for spy assertions
+const mockDomElement = document.createElement('canvas');
+global.THREE = {
+  Scene: jest.fn(() => ({ add: jest.fn(), remove: jest.fn(), children: [] })),
+  PerspectiveCamera: jest.fn((fov, aspect) => ({ fov, aspect, position: { set: jest.fn() }, updateProjectionMatrix: jest.fn(), lookAt: jest.fn() })),
+  WebGLRenderer: jest.fn(() => ({ domElement: mockDomElement, setSize: jest.fn(), setPixelRatio: jest.fn(), render: jest.fn(), dispose: jest.fn(), forceContextLoss: jest.fn(), shadowMap: { enabled: false, type: 0 }, toneMapping: 0, toneMappingExposure: 1 })),
+  AmbientLight: jest.fn((color, intensity) => ({ color, intensity, position: { set: jest.fn() } })),
+  DirectionalLight: jest.fn((color, intensity) => ({ color, intensity, position: { set: jest.fn() }, castShadow: false, shadow: { mapSize: { width: 0, height: 0 }, camera: {} } })),
+  GLTFLoader: jest.fn(() => ({ load: jest.fn((url, onLoad) => { if (onLoad) onLoad({ scene: {}, animations: [] }); }), setDRACOLoader: jest.fn() })),
+  OrbitControls: jest.fn(() => ({ update: jest.fn(), dispose: jest.fn(), enableDamping: true, dampingFactor: 0.05 })),
+  Clock: jest.fn(() => ({ getElapsedTime: jest.fn().mockReturnValue(0), getDelta: jest.fn().mockReturnValue(0.016) })),
+  Vector3: jest.fn(() => ({ set: jest.fn() })),
+};
+
+// Mock requestAnimationFrame for jsdom
+global.requestAnimationFrame = jest.fn((cb) => setTimeout(cb, 0));
+global.cancelAnimationFrame = jest.fn((id) => clearTimeout(id));
+
+/**
  * Three.js Scene Tests
  *
  * Tests for 3D scene initialization and rendering.

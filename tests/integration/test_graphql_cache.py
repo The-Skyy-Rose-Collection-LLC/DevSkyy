@@ -25,12 +25,12 @@ replaced; the DataLoader's dedup and scheduling logic runs for real.
 
 from __future__ import annotations
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from api.graphql.schema import schema
-from api.graphql.resolvers.product_resolver import get_products_from_db
+import pytest
 
+from api.graphql.resolvers.product_resolver import get_products_from_db
+from api.graphql.schema import schema
 
 # ---------------------------------------------------------------------------
 # Helpers

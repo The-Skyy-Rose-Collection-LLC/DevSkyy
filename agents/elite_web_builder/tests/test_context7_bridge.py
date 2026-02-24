@@ -6,20 +6,15 @@ generating code. This bridge provides resolve + query as a tool.
 
 from __future__ import annotations
 
-import json
-from dataclasses import FrozenInstanceError
-from typing import Any
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from tools.context7_bridge import (
     Context7Bridge,
     Context7Error,
-    LibraryInfo,
     DocSnippet,
+    LibraryInfo,
 )
-
 
 # ---------------------------------------------------------------------------
 # Data model tests

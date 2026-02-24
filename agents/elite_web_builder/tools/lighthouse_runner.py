@@ -18,7 +18,7 @@ import json
 import logging
 import subprocess
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 
 logger = logging.getLogger(__name__)
@@ -86,7 +86,7 @@ class LighthouseResult:
 
 def _get_timestamp() -> str:
     """Return current UTC timestamp in ISO 8601 format."""
-    return datetime.now(timezone.utc).isoformat()
+    return datetime.now(UTC).isoformat()
 
 
 def _build_command(
@@ -296,22 +296,22 @@ def format_report(result: LighthouseResult) -> str:
         Markdown-formatted report string.
     """
     lines = [
-        f"# Lighthouse Report",
-        f"",
+        "# Lighthouse Report",
+        "",
         f"**URL:** {result.url}",
         f"**Timestamp:** {result.timestamp}",
-        f"",
-        f"## Scores",
-        f"",
-        f"| Category | Score |",
-        f"|----------|-------|",
+        "",
+        "## Scores",
+        "",
+        "| Category | Score |",
+        "|----------|-------|",
         f"| Performance | {result.performance_score} |",
         f"| Accessibility | {result.accessibility_score} |",
         f"| Best Practices | {result.best_practices_score} |",
         f"| SEO | {result.seo_score} |",
-        f"",
-        f"## Core Web Vitals",
-        f"",
+        "",
+        "## Core Web Vitals",
+        "",
     ]
 
     for key, value in result.metrics.items():

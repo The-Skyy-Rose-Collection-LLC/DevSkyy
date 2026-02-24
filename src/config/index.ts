@@ -51,7 +51,7 @@ export const databaseConfig: DatabaseConfig = {
   port: getEnvNumber('DB_PORT', 5432),
   database: getEnvVar('DB_NAME', 'devskyy'),
   username: getEnvVar('DB_USER', 'devskyy'),
-  password: getEnvVar('DB_PASSWORD'),
+  password: getEnvVar('DB_PASSWORD', ''),
   ssl: getEnvBoolean('DB_SSL', config.environment === 'production'),
   poolSize: getEnvNumber('DB_POOL_SIZE', 20),
   timeout: getEnvNumber('DB_TIMEOUT', 10000),
@@ -70,7 +70,7 @@ export const redisConfig = {
 
 // JWT configuration
 export const jwtConfig = {
-  secret: getEnvVar('JWT_SECRET'),
+  secret: getEnvVar('JWT_SECRET', 'dev-jwt-secret-change-in-production'),
   expiresIn: getEnvVar('JWT_EXPIRES_IN', '24h'),
   refreshExpiresIn: getEnvVar('JWT_REFRESH_EXPIRES_IN', '7d'),
   issuer: getEnvVar('JWT_ISSUER', 'devskyy'),
@@ -99,9 +99,9 @@ export const anthropicConfig = {
 
 // Security configuration
 export const securityConfig = {
-  encryptionKey: getEnvVar('ENCRYPTION_KEY'),
+  encryptionKey: getEnvVar('ENCRYPTION_KEY', 'dev-encryption-key-change-in-production'),
   hashRounds: getEnvNumber('HASH_ROUNDS', 12),
-  sessionSecret: getEnvVar('SESSION_SECRET'),
+  sessionSecret: getEnvVar('SESSION_SECRET', 'dev-session-secret-change-in-production'),
   corsOrigins: getEnvVar('CORS_ORIGINS', '*').split(','),
   rateLimitWindow: getEnvNumber('RATE_LIMIT_WINDOW', 900000), // 15 minutes
   rateLimitMax: getEnvNumber('RATE_LIMIT_MAX', 100),

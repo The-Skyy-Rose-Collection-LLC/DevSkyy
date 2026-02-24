@@ -21,7 +21,6 @@ import re
 from dataclasses import dataclass
 from typing import Any
 
-
 # ---------------------------------------------------------------------------
 # Exceptions
 # ---------------------------------------------------------------------------
@@ -130,23 +129,23 @@ def _wp_archive(name: str, slug: str, options: dict[str, Any]) -> tuple[Scaffold
     """Generate WordPress FSE archive template."""
     title = options.get("title", name)
     html_content = (
-        f'<!-- wp:template-part {{"slug":"header","area":"header"}} /-->\n'
-        f"\n"
-        f'<!-- wp:group {{"tagName":"main","layout":{{"type":"constrained"}}}} -->\n'
-        f'<main class="wp-block-group">\n'
-        f"  <!-- wp:query-title {{\"type\":\"archive\"}} /-->\n"
-        f"  <!-- wp:query -->\n"
-        f"    <!-- wp:post-template -->\n"
-        f"      <!-- wp:post-title {{\"isLink\":true}} /-->\n"
-        f"      <!-- wp:post-excerpt /-->\n"
-        f"      <!-- wp:post-date /-->\n"
-        f"    <!-- /wp:post-template -->\n"
-        f"    <!-- wp:query-pagination /-->\n"
-        f"  <!-- /wp:query -->\n"
-        f"</main>\n"
-        f"<!-- /wp:group -->\n"
-        f"\n"
-        f'<!-- wp:template-part {{"slug":"footer","area":"footer"}} /-->\n'
+        '<!-- wp:template-part {"slug":"header","area":"header"} /-->\n'
+        "\n"
+        '<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->\n'
+        '<main class="wp-block-group">\n'
+        "  <!-- wp:query-title {\"type\":\"archive\"} /-->\n"
+        "  <!-- wp:query -->\n"
+        "    <!-- wp:post-template -->\n"
+        "      <!-- wp:post-title {\"isLink\":true} /-->\n"
+        "      <!-- wp:post-excerpt /-->\n"
+        "      <!-- wp:post-date /-->\n"
+        "    <!-- /wp:post-template -->\n"
+        "    <!-- wp:query-pagination /-->\n"
+        "  <!-- /wp:query -->\n"
+        "</main>\n"
+        "<!-- /wp:group -->\n"
+        "\n"
+        '<!-- wp:template-part {"slug":"footer","area":"footer"} /-->\n'
     )
     return (ScaffoldFile(path=f"templates/archive-{slug}.html", content=html_content),)
 
@@ -154,19 +153,19 @@ def _wp_archive(name: str, slug: str, options: dict[str, Any]) -> tuple[Scaffold
 def _wp_single(name: str, slug: str, options: dict[str, Any]) -> tuple[ScaffoldFile, ...]:
     """Generate WordPress FSE single post template."""
     html_content = (
-        f'<!-- wp:template-part {{"slug":"header","area":"header"}} /-->\n'
-        f"\n"
-        f'<!-- wp:group {{"tagName":"main","layout":{{"type":"constrained"}}}} -->\n'
-        f'<main class="wp-block-group">\n'
-        f"  <!-- wp:post-title /-->\n"
-        f"  <!-- wp:post-featured-image /-->\n"
-        f"  <!-- wp:post-content /-->\n"
-        f"  <!-- wp:post-terms {{\"term\":\"category\"}} /-->\n"
-        f"  <!-- wp:post-terms {{\"term\":\"post_tag\"}} /-->\n"
-        f"</main>\n"
-        f"<!-- /wp:group -->\n"
-        f"\n"
-        f'<!-- wp:template-part {{"slug":"footer","area":"footer"}} /-->\n'
+        '<!-- wp:template-part {"slug":"header","area":"header"} /-->\n'
+        "\n"
+        '<!-- wp:group {"tagName":"main","layout":{"type":"constrained"}} -->\n'
+        '<main class="wp-block-group">\n'
+        "  <!-- wp:post-title /-->\n"
+        "  <!-- wp:post-featured-image /-->\n"
+        "  <!-- wp:post-content /-->\n"
+        "  <!-- wp:post-terms {\"term\":\"category\"} /-->\n"
+        "  <!-- wp:post-terms {\"term\":\"post_tag\"} /-->\n"
+        "</main>\n"
+        "<!-- /wp:group -->\n"
+        "\n"
+        '<!-- wp:template-part {"slug":"footer","area":"footer"} /-->\n'
     )
     return (ScaffoldFile(path=f"templates/single-{slug}.html", content=html_content),)
 

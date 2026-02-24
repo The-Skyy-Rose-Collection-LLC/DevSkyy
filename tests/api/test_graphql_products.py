@@ -5,9 +5,9 @@ Tests for GraphQL Product Schema
 Tests for GraphQL product queries using schema.execute() directly.
 """
 
-import json
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from api.graphql.schema import schema
 

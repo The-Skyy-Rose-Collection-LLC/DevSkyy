@@ -276,8 +276,8 @@ def main():
     if passed_count == total_count:
         print(f"{Colors.GREEN}✓ Environment configuration is valid!{Colors.NC}")
         print(f"\n{Colors.BLUE}Ready URLs:{Colors.NC}")
-        print(f"  • Homepage: http://localhost:8881")
-        print(f"  • Admin: http://localhost:8881/wp-admin/")
+        print("  • Homepage: http://localhost:8881")
+        print("  • Admin: http://localhost:8881/wp-admin/")
         print(f"  • Edit with Elementor: http://localhost:8881/wp-admin/post.php?post={os.getenv('PAGE_ID_HOME', '12')}&action=elementor")
         return 0
     else:

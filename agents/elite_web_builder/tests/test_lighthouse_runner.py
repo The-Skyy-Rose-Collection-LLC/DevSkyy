@@ -10,7 +10,6 @@ import json
 from unittest.mock import MagicMock, patch
 
 import pytest
-
 from tools.lighthouse_runner import (
     LighthouseError,
     LighthouseResult,
@@ -18,7 +17,6 @@ from tools.lighthouse_runner import (
     format_report,
     run_lighthouse,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

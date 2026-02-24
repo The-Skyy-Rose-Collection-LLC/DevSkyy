@@ -6,8 +6,9 @@ TDD RED Phase — Queries hit read-optimized projections, NOT the write DB.
 This separation enables independent scaling of reads vs writes.
 """
 
+from unittest.mock import AsyncMock
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock
 
 from core.cqrs.query_bus import Query, QueryBus
 

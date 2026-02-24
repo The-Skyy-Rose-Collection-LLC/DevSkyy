@@ -36,8 +36,8 @@ if _GEMINI_ENV.exists():
     load_dotenv(_GEMINI_ENV, override=True)  # real keys win over placeholders
 
 # ADK imports (after env is loaded)
-from google.adk.agents import LlmAgent
 from google.adk import Runner
+from google.adk.agents import LlmAgent
 from google.adk.sessions import InMemorySessionService
 from google.adk.tools import FunctionTool
 from google.genai import types as genai_types

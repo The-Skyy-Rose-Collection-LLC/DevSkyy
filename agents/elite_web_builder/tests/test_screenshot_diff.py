@@ -13,14 +13,12 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 from PIL import Image
-
 from tools.screenshot_diff import (
     DiffResult,
     capture_screenshot,
     compare_screenshots,
     run_visual_regression,
 )
-
 
 # ---------------------------------------------------------------------------
 # Helpers — create test images in-memory, save to tmp_path

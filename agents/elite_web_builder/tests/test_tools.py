@@ -4,23 +4,19 @@ import json
 from pathlib import Path
 
 import pytest
-
 from tools.contrast_checker import (
-    ContrastResult,
     check_contrast,
     hex_to_rgb,
     relative_luminance,
     wcag_level,
 )
 from tools.file_validator import (
-    FileValidationResult,
     validate_file_exists,
     validate_json_file,
     validate_no_secrets,
 )
-from tools.type_scale import generate_type_scale
 from tools.spacing_scale import generate_spacing_scale
-
+from tools.type_scale import generate_type_scale
 
 # ---------------------------------------------------------------------------
 # Contrast Checker

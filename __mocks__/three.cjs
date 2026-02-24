@@ -179,7 +179,10 @@ class Clock {
   getDelta() { return 0.016; }
 }
 
-class Texture { constructor() { this.isTexture = true; } dispose() {} }
+class Texture { constructor() { this.isTexture = true; this.needsUpdate = false; } dispose() {} }
+class CanvasTexture extends Texture { constructor(canvas) { super(); this.image = canvas; } }
+class SpriteMaterial extends Material { constructor(params = {}) { super(); this.map = params.map || null; this.transparent = params.transparent || false; } }
+class Sprite extends Object3D { constructor(material) { super(); this.isSprite = true; this.material = material || new SpriteMaterial(); } }
 class TextureLoader {
   load(url, onLoad) { const texture = new Texture(); if (onLoad) setTimeout(() => onLoad(texture), 0); return texture; }
 }
@@ -229,3 +232,28 @@ exports.BufferAttribute = BufferAttribute;
 exports.Float32BufferAttribute = Float32BufferAttribute;
 exports.PCFSoftShadowMap = PCFSoftShadowMap;
 exports.ACESFilmicToneMapping = ACESFilmicToneMapping;
+exports.CanvasTexture = CanvasTexture;
+exports.SpriteMaterial = SpriteMaterial;
+exports.Sprite = Sprite;
+
+// Additional mocks for WordPress theme tests and collection experiences
+// Note: Cannot use jest.fn() here — this file is loaded via moduleNameMapper before jest globals exist
+class GLTFLoader {
+  load(url, onLoad, onProgress, onError) {
+    if (onLoad) onLoad({ scene: new Scene(), animations: [] });
+  }
+  setDRACOLoader() {}
+}
+
+class OrbitControls {
+  constructor() {
+    this.enableDamping = true;
+    this.dampingFactor = 0.05;
+    this.target = new Vector3();
+  }
+  update() {}
+  dispose() {}
+}
+
+exports.GLTFLoader = GLTFLoader;
+exports.OrbitControls = OrbitControls;

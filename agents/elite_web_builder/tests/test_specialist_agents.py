@@ -2,11 +2,9 @@
 
 from __future__ import annotations
 
-import pytest
-
-from agents.base import AgentRole, AgentSpec
 from agents.accessibility import ACCESSIBILITY_SPEC
 from agents.backend_dev import BACKEND_DEV_SPEC
+from agents.base import AgentRole, AgentSpec
 from agents.design_system import DESIGN_SYSTEM_SPEC
 from agents.frontend_dev import FRONTEND_DEV_SPEC
 from agents.performance import PERFORMANCE_SPEC

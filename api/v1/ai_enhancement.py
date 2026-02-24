@@ -3,16 +3,15 @@ AI Image Enhancement API Endpoints
 Provides REST API for WordPress integration
 """
 
-from fastapi import APIRouter, File, UploadFile, Form, HTTPException
-from fastapi.responses import FileResponse, JSONResponse
-from typing import Optional
-from pathlib import Path
 import shutil
 from datetime import datetime
-import blurhash
+from pathlib import Path
 
-from services.ai_image_enhancement import LuxuryImageEnhancer
+import blurhash
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+
 from core.auth.interfaces import requires_api_key
+from services.ai_image_enhancement import LuxuryImageEnhancer
 
 router = APIRouter(prefix="/ai", tags=["AI Enhancement"])
 
@@ -27,7 +26,7 @@ async def enhance_image(
     apply_luxury_filter: bool = Form(True),
     remove_background: bool = Form(False),
     upscale: bool = Form(False),
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Enhance uploaded image with AI processing
@@ -107,7 +106,7 @@ async def enhance_image(
 @requires_api_key
 async def generate_blurhash_endpoint(
     file: UploadFile = File(...),
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Generate blurhash placeholder for image
@@ -160,7 +159,7 @@ async def generate_blurhash_endpoint(
 @requires_api_key
 async def interrogate_image(
     file: UploadFile = File(...),
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Analyze image and generate descriptive prompts (CLIP Interrogator)
@@ -215,7 +214,7 @@ async def generate_product_image(
     prompt: str = Form(...),
     model: str = Form("flux"),
     image_size: str = Form("1024x1024"),
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Generate product image from text prompt
@@ -256,7 +255,7 @@ async def generate_product_image(
 async def create_product_video(
     file: UploadFile = File(...),
     motion_type: str = Form("zoom"),
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Create video from product image (RunwayML Gen-3)
@@ -314,7 +313,7 @@ async def create_product_video(
 @requires_api_key
 async def get_enhancement_status(
     attachment_id: int,
-    correlation_id: Optional[str] = None,
+    correlation_id: str | None = None,
 ):
     """
     Get enhancement status for WordPress attachment

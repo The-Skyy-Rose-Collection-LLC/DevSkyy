@@ -31,13 +31,11 @@ Version: 1.0.0
 
 import argparse
 import asyncio
-import json
 import os
 import sys
 import time
 from dataclasses import dataclass
 from datetime import datetime
-from typing import Dict, List, Optional
 
 import httpx
 
@@ -50,8 +48,8 @@ class HealthStatus:
     """Health status for a component."""
     component: str
     status: str  # healthy, degraded, unhealthy
-    latency_ms: Optional[float] = None
-    error: Optional[str] = None
+    latency_ms: float | None = None
+    error: str | None = None
     timestamp: datetime = None
 
     def __post_init__(self):
@@ -75,7 +73,7 @@ class MCPHealthMonitor:
         self,
         api_url: str = "http://localhost:8000",
         metrics_url: str = "http://localhost:9090",
-        thresholds: Optional[HealthThresholds] = None,
+        thresholds: HealthThresholds | None = None,
     ):
         self.api_url = api_url
         self.metrics_url = metrics_url
@@ -143,13 +141,13 @@ class MCPHealthMonitor:
                 error=str(e),
             )
 
-    async def check_tool_availability(self) -> List[HealthStatus]:
+    async def check_tool_availability(self) -> list[HealthStatus]:
         """Check if all MCP tools are available."""
         # This would require integration with the MCP server
         # For now, return a placeholder
         return []
 
-    async def get_prometheus_metrics(self) -> Optional[Dict]:
+    async def get_prometheus_metrics(self) -> dict | None:
         """Fetch current metrics from Prometheus."""
         try:
             response = await self.client.get(f"{self.metrics_url}/metrics")
@@ -170,7 +168,7 @@ class MCPHealthMonitor:
             print(f"Error fetching metrics: {e}")
             return None
 
-    async def run_health_check(self) -> Dict[str, HealthStatus]:
+    async def run_health_check(self) -> dict[str, HealthStatus]:
         """Run comprehensive health check."""
         results = {}
 
@@ -190,7 +188,7 @@ class MCPHealthMonitor:
     async def monitor_continuously(
         self,
         interval_seconds: int = 300,
-        slack_webhook: Optional[str] = None,
+        slack_webhook: str | None = None,
     ):
         """Monitor health continuously."""
         print(f"🔍 Starting continuous health monitoring (interval: {interval_seconds}s)")
@@ -273,7 +271,7 @@ class MCPHealthMonitor:
         """Send alert via Slack webhook."""
         try:
             message = {
-                "text": f"🚨 DevSkyy MCP Health Alert",
+                "text": "🚨 DevSkyy MCP Health Alert",
                 "blocks": [
                     {
                         "type": "header",

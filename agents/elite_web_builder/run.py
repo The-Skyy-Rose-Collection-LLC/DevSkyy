@@ -58,7 +58,7 @@ if _missing_keys:
     print("\n  Elite Web Builder — missing API keys:\n")
     for line in _missing_keys:
         print(line)
-    print(f"\n  Set them in skyyrose/.env or gemini/.env\n")
+    print("\n  Set them in skyyrose/.env or gemini/.env\n")
     sys.exit(1)
 
 # ---------------------------------------------------------------------------
@@ -313,8 +313,8 @@ async def run(prd_text: str, dry_run: bool = False) -> None:
     print("  ║   ELITE WEB BUILDER — Agent Team Deploy  ║")
     print("  ╠══════════════════════════════════════════╣")
     print(f"  ║   Mode:   {'DRY RUN (plan only)' if dry_run else 'LIVE EXECUTION':<32}║")
-    print(f"  ║   Agents: 7 specialists + Director      ║")
-    print(f"  ║   Keys:   3/3 verified                  ║")
+    print("  ║   Agents: 7 specialists + Director      ║")
+    print("  ║   Keys:   3/3 verified                  ║")
     print("  ╚══════════════════════════════════════════╝")
     print("")
 
@@ -326,7 +326,7 @@ async def run(prd_text: str, dry_run: bool = False) -> None:
         # Planning only — decompose PRD into stories but don't execute
         logger.info("DRY RUN: Planning stories only (no LLM calls for execution)")
         logger.info("PRD length: %d chars", len(prd_text))
-        print(f"\n  PRD Preview (first 500 chars):\n")
+        print("\n  PRD Preview (first 500 chars):\n")
         for line in prd_text[:500].split("\n"):
             print(f"    {line}")
         print(f"\n    ... ({len(prd_text) - 500} more chars)\n")

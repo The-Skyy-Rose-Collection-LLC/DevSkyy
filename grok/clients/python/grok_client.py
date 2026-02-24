@@ -4,14 +4,17 @@ Grok uses OpenAI-compatible API at https://api.x.ai/v1
 Unique features: Live web search, real-time data, X/Twitter access
 """
 
-import os
-import json
-import time
 import base64
+import json
+import os
+import time
+from collections.abc import Generator
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Generator
-import openai
+from typing import Any
+
 from dotenv import load_dotenv
+
+import openai
 
 load_dotenv(Path(__file__).parent.parent.parent / '.env')
 
@@ -19,7 +22,7 @@ load_dotenv(Path(__file__).parent.parent.parent / '.env')
 class GrokClient:
     """xAI Grok client — OpenAI SDK pointed at api.x.ai"""
 
-    def __init__(self, api_key: Optional[str] = None, **options):
+    def __init__(self, api_key: str | None = None, **options):
         self.api_key = api_key or os.getenv('XAI_API_KEY') or os.getenv('GROK_API_KEY')
         if not self.api_key:
             raise ValueError('xAI API key required. Set XAI_API_KEY in .env')
@@ -52,8 +55,8 @@ class GrokClient:
             time.sleep(self.min_request_interval - elapsed)
         self.last_request_time = time.time()
 
-    def generate_content(self, prompt: str, model: Optional[str] = None,
-                         system_prompt: Optional[str] = None, **config) -> Dict[str, Any]:
+    def generate_content(self, prompt: str, model: str | None = None,
+                         system_prompt: str | None = None, **config) -> dict[str, Any]:
         self._rate_limit()
         messages = []
         if system_prompt:
@@ -78,8 +81,8 @@ class GrokClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def generate_content_stream(self, prompt: str, model: Optional[str] = None,
-                                system_prompt: Optional[str] = None, **config) -> Generator:
+    def generate_content_stream(self, prompt: str, model: str | None = None,
+                                system_prompt: str | None = None, **config) -> Generator:
         self._rate_limit()
         messages = []
         if system_prompt:
@@ -101,8 +104,8 @@ class GrokClient:
             raise self._handle_error(e)
 
     def live_search(self, query: str, model: str = 'grok-3',
-                    sources: Optional[List] = None,
-                    system_prompt: str = 'You have access to real-time web and X data.') -> Dict[str, Any]:
+                    sources: list | None = None,
+                    system_prompt: str = 'You have access to real-time web and X data.') -> dict[str, Any]:
         """Grok live search — real-time web + X/Twitter grounding"""
         self._rate_limit()
         if sources is None:
@@ -127,9 +130,9 @@ class GrokClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def analyze_image(self, image_path: Optional[str] = None, image_url: Optional[str] = None,
+    def analyze_image(self, image_path: str | None = None, image_url: str | None = None,
                       prompt: str = 'Describe this image', model: str = 'grok-2-vision-1212',
-                      detail: str = 'auto') -> Dict[str, Any]:
+                      detail: str = 'auto') -> dict[str, Any]:
         self._rate_limit()
         if image_path:
             with open(image_path, 'rb') as f:
@@ -154,7 +157,7 @@ class GrokClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def _handle_error(self, error: Exception) -> Dict[str, Any]:
+    def _handle_error(self, error: Exception) -> dict[str, Any]:
         response = {'error': True, 'message': str(error), 'type': type(error).__name__}
         msg = str(error).lower()
         if '401' in msg or 'authentication' in msg:
@@ -165,7 +168,7 @@ class GrokClient:
             print(f'Grok API Error: {response}')
         raise Exception(response)
 
-    def get_available_models(self) -> List[Dict]:
+    def get_available_models(self) -> list[dict]:
         return self.model_configs['models']
 
     def get_recommended_model(self, task_type: str) -> str:

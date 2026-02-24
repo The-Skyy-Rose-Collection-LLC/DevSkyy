@@ -12,14 +12,14 @@ Requirements:
     - API credentials configured
 """
 
-import asyncio
 import argparse
+import asyncio
+import json
 import sys
 from pathlib import Path
-from typing import Optional, List, Dict
+
 import requests
 from tqdm import tqdm
-import json
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -38,7 +38,7 @@ class WordPressMediaPipeline:
         wp_username: str,
         wp_password: str,
         enhancer: LuxuryImageEnhancer,
-        output_dir: Optional[str] = None,
+        output_dir: str | None = None,
     ):
         self.wp_url = wp_url.rstrip('/')
         self.wp_username = wp_username
@@ -51,7 +51,7 @@ class WordPressMediaPipeline:
         self.api_base = f"{self.wp_url}/wp-json/wp/v2"
         self.media_endpoint = f"{self.api_base}/media"
 
-    def get_all_media(self, per_page: int = 100) -> List[Dict]:
+    def get_all_media(self, per_page: int = 100) -> list[dict]:
         """
         Fetch all media items from WordPress REST API
 
@@ -97,7 +97,7 @@ class WordPressMediaPipeline:
         print(f"Found {len(all_media)} images")
         return all_media
 
-    def download_image(self, url: str, filename: str) -> Optional[str]:
+    def download_image(self, url: str, filename: str) -> str | None:
         """
         Download image from WordPress media library
 
@@ -121,7 +121,7 @@ class WordPressMediaPipeline:
             print(f"Error downloading {url}: {e}")
             return None
 
-    def update_media_metadata(self, media_id: int, metadata: Dict) -> bool:
+    def update_media_metadata(self, media_id: int, metadata: dict) -> bool:
         """
         Update WordPress media metadata
 
@@ -145,7 +145,7 @@ class WordPressMediaPipeline:
             print(f"Error updating metadata for media {media_id}: {e}")
             return False
 
-    async def process_media_item(self, media_item: Dict) -> Dict:
+    async def process_media_item(self, media_item: dict) -> dict:
         """
         Process single media item with AI enhancement
 
@@ -211,7 +211,7 @@ class WordPressMediaPipeline:
         apply_filter: bool = True,
         remove_bg: bool = False,
         upscale: bool = False,
-    ) -> List[Dict]:
+    ) -> list[dict]:
         """
         Process all media items in WordPress library
 
@@ -240,7 +240,7 @@ class WordPressMediaPipeline:
 
         return results
 
-    def generate_report(self, results: List[Dict]) -> None:
+    def generate_report(self, results: list[dict]) -> None:
         """
         Generate processing report
 

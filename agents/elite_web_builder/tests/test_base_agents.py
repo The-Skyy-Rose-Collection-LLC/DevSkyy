@@ -6,7 +6,6 @@ import pytest
 
 from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec
 
-
 # ---------------------------------------------------------------------------
 # AgentRole
 # ---------------------------------------------------------------------------

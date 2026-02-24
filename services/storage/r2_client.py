@@ -27,9 +27,15 @@ from enum import Enum
 from pathlib import Path
 from typing import Any, BinaryIO
 
-import boto3
-from botocore.config import Config as BotoConfig
-from botocore.exceptions import ClientError
+try:
+    import boto3
+    from botocore.config import Config as BotoConfig
+    from botocore.exceptions import ClientError
+except ImportError:
+    boto3 = None  # type: ignore[assignment]
+    BotoConfig = None  # type: ignore[assignment,misc]
+    ClientError = None  # type: ignore[assignment,misc]
+
 from pydantic import BaseModel, Field
 
 from errors.production_errors import (
@@ -242,6 +248,12 @@ class R2Client:
     def _get_client(self) -> Any:
         """Get or create boto3 S3 client configured for R2."""
         if self._client is None:
+            if boto3 is None:
+                raise R2Error(
+                    "boto3 is required for R2 storage. "
+                    "Install with: pip install boto3",
+                    retryable=False,
+                )
             self.config.validate()
             self._client = boto3.client(
                 "s3",

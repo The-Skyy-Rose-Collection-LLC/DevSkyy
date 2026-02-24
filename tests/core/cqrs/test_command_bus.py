@@ -7,8 +7,9 @@ Each Command is handled by exactly one handler, which validates the
 command, performs business logic, and returns domain Events.
 """
 
-import pytest
 from unittest.mock import AsyncMock, MagicMock, patch
+
+import pytest
 
 from core.cqrs.command_bus import Command, CommandBus
 from core.events.event_store import Event
