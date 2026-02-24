@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import Image from 'next/image';
 import type { CollectionProduct } from '@/lib/collections';
+import { useCartStore } from '@/lib/stores/cart-store';
 
 interface ProductQuickViewProps {
   product: CollectionProduct | null;
@@ -61,9 +62,19 @@ export default function ProductQuickView({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [product, onClose]);
 
+  const addItem = useCartStore((state) => state.addItem);
+
   const handleAddToCart = useCallback(() => {
-    // Placeholder for WooCommerce cart integration
-  }, []);
+    if (!product || !selectedSize) return;
+    addItem({
+      productId: product.id,
+      productName: product.name,
+      collection: '',
+      size: selectedSize,
+      price: product.price,
+    });
+    onClose();
+  }, [product, selectedSize, addItem, onClose]);
 
   return (
     <AnimatePresence>

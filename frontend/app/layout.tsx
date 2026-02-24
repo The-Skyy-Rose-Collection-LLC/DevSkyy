@@ -4,6 +4,7 @@ import { playfair, cormorant, spaceMono } from '@/lib/fonts'
 import { SyncStatusToast } from '@/components/wordpress/sync-status-toast'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { QueryProvider } from '@/lib/providers/query-provider'
 import './globals.css'
 
 const inter = Inter({ subsets: ['latin'] })
@@ -24,7 +25,9 @@ export default function RootLayout({
       className={`dark ${playfair.variable} ${cormorant.variable} ${spaceMono.variable}`}
     >
       <body className={inter.className}>
-        {children}
+        <QueryProvider>
+          {children}
+        </QueryProvider>
         <SyncStatusToast />
         <Analytics />
         <SpeedInsights />

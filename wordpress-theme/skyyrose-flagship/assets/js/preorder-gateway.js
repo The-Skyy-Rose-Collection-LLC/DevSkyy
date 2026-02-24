@@ -396,6 +396,145 @@
 	}
 
 	/* --------------------------------------------------
+	   Trending Badges — Pulse on Popular Products
+	   -------------------------------------------------- */
+
+	function initTrendingBadges() {
+		if (cards.length === 0) return;
+
+		// Mark ~30% of products as "trending" (randomized per page load)
+		var trendingIndices = [];
+		var copy = cards.slice();
+		for (var i = copy.length - 1; i > 0; i--) {
+			var j = Math.floor(Math.random() * (i + 1));
+			var tmp = copy[i];
+			copy[i] = copy[j];
+			copy[j] = tmp;
+		}
+		var trendingCount = Math.max(2, Math.ceil(cards.length * 0.3));
+		for (var t = 0; t < trendingCount && t < copy.length; t++) {
+			trendingIndices.push(copy[t]);
+		}
+
+		trendingIndices.forEach(function (card) {
+			var imageContainer = card.querySelector('.product-grid-image');
+			if (!imageContainer) return;
+			if (imageContainer.querySelector('.pulse-trending-badge')) return;
+
+			var badge = document.createElement('span');
+			badge.className = 'pulse-trending-badge';
+			badge.innerHTML =
+				'<span class="pulse-trending-badge__fire">\ud83d\udd25</span>' +
+				'Trending';
+
+			var style = window.getComputedStyle(imageContainer);
+			if (style.position === 'static') {
+				imageContainer.style.position = 'relative';
+			}
+
+			imageContainer.appendChild(badge);
+		});
+	}
+
+	/* --------------------------------------------------
+	   Countdown Urgency — Inline Near Pre-Order Buttons
+	   -------------------------------------------------- */
+
+	function initUrgencyCountdowns() {
+		var priceEls = document.querySelectorAll('.product-grid-price');
+		if (priceEls.length === 0) return;
+
+		var launchDate = new Date('2026-04-01T00:00:00').getTime();
+		var countdownEls = [];
+
+		priceEls.forEach(function (priceEl) {
+			var parent = priceEl.parentNode;
+			if (!parent) return;
+			if (parent.querySelector('.pulse-urgency-countdown')) return;
+
+			var el = document.createElement('div');
+			el.className = 'pulse-urgency-countdown';
+			el.innerHTML =
+				'<span class="pulse-urgency-countdown__icon">\u23f0</span>' +
+				'Pre-order closes in ' +
+				'<span class="pulse-urgency-countdown__time">--d --h --m</span>';
+
+			parent.appendChild(el);
+			countdownEls.push(el.querySelector('.pulse-urgency-countdown__time'));
+		});
+
+		if (countdownEls.length === 0) return;
+
+		function padNum(n) {
+			return n < 10 ? '0' + n : '' + n;
+		}
+
+		function tickUrgency() {
+			var now = Date.now();
+			var diff = Math.max(0, launchDate - now);
+
+			var days  = Math.floor(diff / 86400000);
+			var hours = Math.floor((diff % 86400000) / 3600000);
+			var mins  = Math.floor((diff % 3600000) / 60000);
+
+			var text = days + 'd ' + padNum(hours) + 'h ' + padNum(mins) + 'm';
+
+			for (var i = 0; i < countdownEls.length; i++) {
+				if (countdownEls[i]) {
+					countdownEls[i].textContent = text;
+				}
+			}
+		}
+
+		tickUrgency();
+		setInterval(tickUrgency, 60000);
+	}
+
+	/* --------------------------------------------------
+	   Scarcity Price Indicator — "Only X left at this price"
+	   -------------------------------------------------- */
+
+	function initScarcityPrice() {
+		var priceEls = document.querySelectorAll('.product-grid-price');
+		if (priceEls.length === 0) return;
+
+		priceEls.forEach(function (priceEl) {
+			var parent = priceEl.parentNode;
+			if (!parent) return;
+			if (parent.querySelector('.pulse-scarcity-price')) return;
+
+			// Only show on ~40% of products for realism
+			if (Math.random() > 0.4) return;
+
+			var remaining = Math.floor(Math.random() * 12) + 3;
+			var el = document.createElement('div');
+			el.className = 'pulse-scarcity-price';
+			el.style.cssText =
+				'display:inline-flex;align-items:center;gap:0.3rem;' +
+				'padding:3px 0;margin-top:4px;' +
+				'font-family:var(--font-body,Montserrat,sans-serif);' +
+				'font-size:0.6rem;font-weight:600;' +
+				'letter-spacing:0.04em;' +
+				'color:' + (remaining <= 5 ? '#DC143C' : '#FFA500') + ';';
+
+			var dot = document.createElement('span');
+			dot.style.cssText =
+				'width:5px;height:5px;border-radius:50%;' +
+				'background:currentColor;flex-shrink:0;';
+			if (remaining <= 5) {
+				dot.style.animation = 'pulse-scarcity-blink 1s ease-in-out infinite';
+			}
+
+			el.appendChild(dot);
+			el.appendChild(document.createTextNode(
+				'Only ' + remaining + ' left at this price'
+			));
+
+			parent.appendChild(el);
+		});
+	}
+
+	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
 
@@ -410,6 +549,9 @@
 		initKeyboard();
 		initCountdown();
 		initIncentivePopup();
+		initTrendingBadges();
+		initUrgencyCountdowns();
+		initScarcityPrice();
 	}
 
 	if (document.readyState === 'loading') {

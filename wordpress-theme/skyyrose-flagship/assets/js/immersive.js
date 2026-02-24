@@ -199,6 +199,10 @@
 				e.preventDefault();
 
 				lastFocused = hotspot;
+
+				// Track product ID for add-to-cart.
+				currentProductId = hotspot.dataset.productId || null;
+
 				openPanel({
 					name:       hotspot.dataset.productName,
 					price:      hotspot.dataset.productPrice,
@@ -220,6 +224,12 @@
 		if (isTransitioning || index === currentRoom || index < 0 || index >= totalRooms) return;
 
 		isTransitioning = true;
+
+		// Reset parallax transform on outgoing layer.
+		var outgoingImg = layers[currentRoom].querySelector('img');
+		if (outgoingImg) {
+			outgoingImg.style.transform = '';
+		}
 
 		// Fade layers
 		layers[currentRoom].classList.remove('active');
@@ -348,6 +358,279 @@
 	}
 
 	/* --------------------------------------------------
+	   Enhanced Room Transitions (Crossfade)
+	   -------------------------------------------------- */
+
+	function initEnhancedTransitions() {
+		if (totalRooms <= 1) return;
+
+		// Ensure all layers have GPU-accelerated transitions.
+		layers.forEach(function (layer) {
+			layer.style.willChange = 'opacity';
+		});
+	}
+
+	/* --------------------------------------------------
+	   Parallax Depth Effect (Desktop Only)
+	   -------------------------------------------------- */
+
+	function initParallax() {
+		if (!viewport) return;
+
+		// Detect touch-primary devices and skip parallax.
+		var isTouchDevice = window.matchMedia('(hover: none)').matches;
+		if (isTouchDevice) return;
+
+		var parallaxStrength = 0.025; // 2.5% max shift
+		var ticking = false;
+		var targetX = 0;
+		var targetY = 0;
+		var currentX = 0;
+		var currentY = 0;
+
+		scene.addEventListener('mousemove', function (e) {
+			// Normalize mouse position to -1..1 from center.
+			var rect = scene.getBoundingClientRect();
+			targetX = ((e.clientX - rect.left) / rect.width - 0.5) * 2;
+			targetY = ((e.clientY - rect.top) / rect.height - 0.5) * 2;
+
+			if (!ticking) {
+				ticking = true;
+				requestAnimationFrame(applyParallax);
+			}
+		});
+
+		scene.addEventListener('mouseleave', function () {
+			targetX = 0;
+			targetY = 0;
+			if (!ticking) {
+				ticking = true;
+				requestAnimationFrame(applyParallax);
+			}
+		});
+
+		function applyParallax() {
+			// Smooth lerp toward target for fluid feel.
+			currentX += (targetX - currentX) * 0.08;
+			currentY += (targetY - currentY) * 0.08;
+
+			var shiftX = -(currentX * parallaxStrength * 100);
+			var shiftY = -(currentY * parallaxStrength * 100);
+
+			// Apply subtle translate to the active scene layer image.
+			var activeLayer = viewport.querySelector('.scene-layer.active');
+			if (activeLayer) {
+				var img = activeLayer.querySelector('img');
+				if (img) {
+					img.style.transform = 'scale(1.04) translate(' + shiftX.toFixed(2) + '%, ' + shiftY.toFixed(2) + '%)';
+				}
+			}
+
+			// Continue animation if not at rest.
+			var distX = Math.abs(targetX - currentX);
+			var distY = Math.abs(targetY - currentY);
+			if (distX > 0.001 || distY > 0.001) {
+				requestAnimationFrame(applyParallax);
+			} else {
+				ticking = false;
+			}
+		}
+	}
+
+	/* --------------------------------------------------
+	   Cinematic Mode Integration
+	   -------------------------------------------------- */
+
+	function initCinematicIntegration() {
+		if (!scene) return;
+
+		var cinematicToggle = document.querySelector('.cinematic-toggle');
+		if (!cinematicToggle) return;
+
+		// Sync initial state: if body already has cinematic-mode
+		// (restored from sessionStorage by cinematic-mode.js), apply to scene.
+		if (document.body.classList.contains('cinematic-mode')) {
+			scene.classList.add('cinematic-active');
+		}
+
+		// Listen for clicks on the toggle to mirror the class.
+		cinematicToggle.addEventListener('click', function () {
+			// cinematic-mode.js toggles body class first; read after microtask.
+			setTimeout(function () {
+				if (document.body.classList.contains('cinematic-mode')) {
+					scene.classList.add('cinematic-active');
+				} else {
+					scene.classList.remove('cinematic-active');
+				}
+			}, 0);
+		});
+
+		// Also listen for Escape to exit cinematic mode.
+		document.addEventListener('keydown', function (e) {
+			if (e.key === 'Escape' && scene.classList.contains('cinematic-active')) {
+				scene.classList.remove('cinematic-active');
+				// Sync body state too.
+				document.body.classList.remove('cinematic-mode');
+				cinematicToggle.setAttribute('aria-pressed', 'false');
+				try { sessionStorage.removeItem('skyyrose_cinematic_mode'); } catch (err) { /* quota */ }
+			}
+		});
+	}
+
+	/* --------------------------------------------------
+	   Add-to-Cart (Pre-Order) via WooCommerce AJAX
+	   -------------------------------------------------- */
+
+	var panelAddToCart = panel ? panel.querySelector('.btn-add-to-cart') : null;
+	var currentProductId = null;
+
+	function initAddToCart() {
+		if (!panelAddToCart) return;
+
+		panelAddToCart.addEventListener('click', function () {
+			if (!currentProductId) return;
+
+			// Check if WooCommerce AJAX endpoint is available.
+			var wcAjaxUrl = getWcAjaxUrl();
+			if (!wcAjaxUrl) {
+				showCartNotification('Pre-order unavailable. Please visit the product page.');
+				return;
+			}
+
+			panelAddToCart.disabled = true;
+			var originalText = panelAddToCart.textContent;
+			panelAddToCart.textContent = 'Adding...';
+
+			var xhr = new XMLHttpRequest();
+			xhr.open('POST', wcAjaxUrl + '?wc-ajax=add_to_cart', true);
+			xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+			xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
+			xhr.onload = function () {
+				panelAddToCart.disabled = false;
+				if (xhr.status >= 200 && xhr.status < 300) {
+					try {
+						var response = JSON.parse(xhr.responseText);
+						if (response.error) {
+							showCartNotification('Could not add item. Please try from the product page.');
+						} else {
+							panelAddToCart.textContent = 'Added!';
+							showCartNotification('Added to pre-order cart!');
+							// Trigger WooCommerce cart fragment refresh.
+							if (typeof jQuery !== 'undefined') {
+								jQuery(document.body).trigger('wc_fragment_refresh');
+							}
+							setTimeout(function () {
+								panelAddToCart.textContent = originalText;
+							}, 2000);
+							return;
+						}
+					} catch (e) {
+						showCartNotification('Could not add item. Please try from the product page.');
+					}
+				} else {
+					showCartNotification('Could not add item. Please try from the product page.');
+				}
+				panelAddToCart.textContent = originalText;
+			};
+
+			xhr.onerror = function () {
+				panelAddToCart.disabled = false;
+				panelAddToCart.textContent = originalText;
+				showCartNotification('Network error. Please try again.');
+			};
+
+			// Get selected size if any.
+			var selectedSize = '';
+			if (panelSizes) {
+				var selectedBtn = panelSizes.querySelector('.size-btn.selected');
+				if (selectedBtn) {
+					selectedSize = selectedBtn.textContent;
+				}
+			}
+
+			var postData = 'product_id=' + encodeURIComponent(currentProductId) +
+				'&quantity=1';
+			if (selectedSize) {
+				postData += '&attribute_pa_size=' + encodeURIComponent(selectedSize);
+			}
+			xhr.send(postData);
+		});
+	}
+
+	/**
+	 * Determine the WooCommerce AJAX URL. WordPress.com uses
+	 * index.php?rest_route= but the wc-ajax endpoint is on the
+	 * standard site URL as a query parameter.
+	 */
+	function getWcAjaxUrl() {
+		// wc_add_to_cart_params is localized by WooCommerce when active.
+		if (typeof wc_add_to_cart_params !== 'undefined' && wc_add_to_cart_params.wc_ajax_url) {
+			return wc_add_to_cart_params.wc_ajax_url.toString().replace('%%endpoint%%', 'add_to_cart');
+		}
+		// Fallback: check if WooCommerce is likely active via body class.
+		if (document.body.classList.contains('woocommerce') ||
+			document.body.classList.contains('woocommerce-page')) {
+			return window.location.origin + '/';
+		}
+		return null;
+	}
+
+	function showCartNotification(message) {
+		// Reuse existing notification or create one.
+		var notification = document.querySelector('.immersive-cart-notification');
+		if (!notification) {
+			notification = document.createElement('div');
+			notification.className = 'immersive-cart-notification';
+			notification.setAttribute('role', 'status');
+			notification.setAttribute('aria-live', 'polite');
+			document.body.appendChild(notification);
+		}
+
+		notification.textContent = message;
+		notification.classList.add('visible');
+
+		setTimeout(function () {
+			notification.classList.remove('visible');
+		}, 3000);
+	}
+
+	/* --------------------------------------------------
+	   Hotspot Hover Preview Tooltip
+	   -------------------------------------------------- */
+
+	function initHotspotPreview() {
+		allHotspots.forEach(function (hotspot) {
+			// Skip if this hotspot already has a label element.
+			if (hotspot.querySelector('.hotspot-label')) return;
+
+			var productName = hotspot.dataset.productName;
+			if (!productName) return;
+
+			var tooltip = document.createElement('span');
+			tooltip.className = 'hotspot-label hotspot-label--generated';
+			tooltip.setAttribute('aria-hidden', 'true');
+
+			// Include prop label if available.
+			var propLabel = hotspot.dataset.propLabel || '';
+			if (propLabel) {
+				var nameSpan = document.createElement('span');
+				nameSpan.className = 'hotspot-label-name';
+				nameSpan.textContent = productName;
+				var propSpan = document.createElement('span');
+				propSpan.className = 'hotspot-label-prop';
+				propSpan.textContent = propLabel;
+				tooltip.appendChild(nameSpan);
+				tooltip.appendChild(propSpan);
+			} else {
+				tooltip.textContent = productName;
+			}
+
+			hotspot.appendChild(tooltip);
+		});
+	}
+
+	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
 
@@ -361,6 +644,11 @@
 		initRoomNav();
 		initKeyboard();
 		initSwipe();
+		initEnhancedTransitions();
+		initParallax();
+		initCinematicIntegration();
+		initAddToCart();
+		initHotspotPreview();
 	}
 
 	// Run when DOM is ready.

@@ -32,6 +32,7 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
+import os
 import time
 from collections import OrderedDict
 from collections.abc import Callable
@@ -385,18 +386,44 @@ class StreamProcessor:
     # ---------------------------------------------------------------------------
 
     async def _flush(self) -> None:
-        """
-        Flush in-memory aggregations to persistent storage.
+        """Flush aggregated analytics to Redis for persistence."""
+        redis_url = os.getenv("REDIS_URL", "")
+        if not redis_url:
+            logger.debug("No REDIS_URL configured, skipping analytics flush")
+            return
 
-        In production, writes to Redis sorted sets (for leaderboards) and
-        time-series DB (for revenue charts). Currently logs the flush.
-        """
-        stats = self._state.to_dict()
-        logger.info(
-            f"Analytics flush: "
-            f"processed={stats['events_processed']}, "
-            f"page_views={sum(stats['page_views'].values())}, "
-            f"products_tracked={len(stats['product_interest'])}"
-        )
-        # TODO: await redis_client.hincrby("page_views", page, count)
-        # TODO: await timeseries_db.insert("revenue", revenue_by_hour)
+        try:
+            import redis as redis_lib
+            r = redis_lib.from_url(redis_url, decode_responses=True)
+
+            # Flush page views
+            if self._state.page_views:
+                for page, count in self._state.page_views.items():
+                    r.hincrby("analytics:page_views", page, count)
+
+            # Flush revenue by hour
+            if self._state.revenue_by_hour:
+                for hour_key, amount in self._state.revenue_by_hour.items():
+                    r.hincrbyfloat("analytics:revenue", hour_key, amount)
+
+            # Flush product interest
+            if self._state.product_interest:
+                for product, interactions in self._state.product_interest.items():
+                    for interaction_type, count in interactions.items():
+                        r.hincrby(
+                            f"analytics:product_interest:{product}",
+                            interaction_type,
+                            count,
+                        )
+
+            # Flush search queries
+            if self._state.search_queries:
+                for query, count in self._state.search_queries.items():
+                    r.hincrby("analytics:search_queries", query, count)
+
+            logger.info(
+                f"Analytics flushed: {len(self._state.page_views)} pages, "
+                f"{len(self._state.revenue_by_hour)} revenue buckets"
+            )
+        except Exception as e:
+            logger.warning(f"Analytics flush failed: {e}")

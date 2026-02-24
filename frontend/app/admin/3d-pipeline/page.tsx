@@ -27,6 +27,13 @@ import {
 import { api, type Provider3D, type Job3D, type PipelineStatus } from '@/lib/api';
 import { use3DPipelineWS } from '@/hooks/useWebSocket';
 
+interface MeshyStatus {
+  provider: string;
+  connected: boolean;
+  mode: 'live' | 'dry-run';
+  error: string | null;
+}
+
 export default function Pipeline3DPage() {
   const [status, setStatus] = useState<PipelineStatus | null>(null);
   const [providers, setProviders] = useState<Provider3D[]>([]);
@@ -37,6 +44,7 @@ export default function Pipeline3DPage() {
   const [textPrompt, setTextPrompt] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [selectedProvider, setSelectedProvider] = useState<string>('');
+  const [meshyStatus, setMeshyStatus] = useState<MeshyStatus | null>(null);
 
   const { status: wsStatus, lastMessage } = use3DPipelineWS();
 
@@ -58,6 +66,12 @@ export default function Pipeline3DPage() {
       }
     }
     fetchData();
+
+    // Fetch Meshy connection status independently
+    fetch('/api/pipeline/meshy')
+      .then((res) => res.json())
+      .then((data) => setMeshyStatus(data as MeshyStatus))
+      .catch(() => setMeshyStatus({ provider: 'meshy', connected: false, mode: 'dry-run', error: 'Failed to check Meshy status' }));
   }, []);
 
   useEffect(() => {
@@ -121,6 +135,7 @@ export default function Pipeline3DPage() {
           </div>
           <div className="flex items-center gap-3">
             <StatusBadge status={status?.status || 'down'} />
+            <MeshyBadge status={meshyStatus} />
             <Badge
               variant="outline"
               className={wsStatus === 'connected' ? 'border-green-500 text-green-400' : 'border-yellow-500 text-yellow-400'}
@@ -230,6 +245,9 @@ export default function Pipeline3DPage() {
                     {p.name} {p.status !== 'online' ? `(${p.status})` : ''}
                   </option>
                 ))}
+                <option value="meshy" disabled={meshyStatus !== null && !meshyStatus.connected}>
+                  Meshy {meshyStatus?.connected ? '' : '(dry-run)'}
+                </option>
               </select>
             </div>
           </div>
@@ -331,6 +349,9 @@ export default function Pipeline3DPage() {
                 </CardContent>
               </Card>
             ))}
+
+            {/* Meshy Provider Card */}
+            <MeshyProviderCard status={meshyStatus} />
           </div>
         </TabsContent>
       </Tabs>
@@ -430,6 +451,89 @@ function JobCard({ job }: { job: Job3D }) {
         {job.status === 'failed' && job.error && (
           <p className="text-xs text-red-400 mt-3 truncate">{job.error}</p>
         )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function MeshyBadge({ status }: { status: MeshyStatus | null }) {
+  if (!status) {
+    return (
+      <Badge variant="outline" className="border-gray-600 text-gray-500">
+        <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+        Meshy
+      </Badge>
+    );
+  }
+
+  if (status.connected) {
+    return (
+      <Badge variant="outline" className="border-purple-500 text-purple-400">
+        <div className="h-2 w-2 rounded-full bg-purple-500 animate-pulse mr-2" />
+        Meshy
+      </Badge>
+    );
+  }
+
+  return (
+    <Badge variant="outline" className="border-yellow-600 text-yellow-500">
+      <div className="h-2 w-2 rounded-full bg-yellow-500 mr-2" />
+      Meshy (dry-run)
+    </Badge>
+  );
+}
+
+function MeshyProviderCard({ status }: { status: MeshyStatus | null }) {
+  const isConnected = status?.connected ?? false;
+  const mode = status?.mode ?? 'dry-run';
+
+  return (
+    <Card className="bg-gray-900 border-gray-800 overflow-hidden">
+      <div className={`h-1 ${
+        isConnected
+          ? 'bg-gradient-to-r from-purple-500 to-violet-500'
+          : 'bg-gradient-to-r from-yellow-500 to-amber-500'
+      }`} />
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-lg text-white">Meshy</CardTitle>
+          <Badge
+            variant="outline"
+            className={
+              isConnected
+                ? 'border-purple-500 text-purple-400'
+                : 'border-yellow-500 text-yellow-400'
+            }
+          >
+            {isConnected ? 'online' : mode}
+          </Badge>
+        </div>
+        <CardDescription className="text-gray-500">
+          Commercial provider
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-gray-400">Mode:</span>
+            <span className="text-white capitalize">{mode}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-400">API:</span>
+            <span className="text-white">v2</span>
+          </div>
+          <div className="flex flex-wrap gap-1 mt-3">
+            <Badge variant="secondary" className="bg-gray-800 text-gray-300 text-xs">
+              text-to-3d
+            </Badge>
+            <Badge variant="secondary" className="bg-gray-800 text-gray-300 text-xs">
+              image-to-3d
+            </Badge>
+          </div>
+          {status?.error && (
+            <p className="text-xs text-yellow-500 mt-2">{status.error}</p>
+          )}
+        </div>
       </CardContent>
     </Card>
   );

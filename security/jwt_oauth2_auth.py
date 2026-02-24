@@ -972,7 +972,18 @@ RoleChecker = _create_role_checker_class()
 # Default instances for convenience
 jwt_manager = JWTManager()
 password_manager = PasswordManager()
-token_blacklist = TokenBlacklist()
+
+# Module-level singleton — uses Redis if REDIS_URL is set
+_redis_url = os.getenv("REDIS_URL", "")
+if _redis_url and redis is not None:
+    try:
+        _redis_client = redis.from_url(_redis_url, decode_responses=True)
+        token_blacklist = RedisTokenBlacklist(redis_client=_redis_client)
+    except Exception as _e:
+        logger.warning(f"Failed to initialize Redis token blacklist: {_e}")
+        token_blacklist = TokenBlacklist()
+else:
+    token_blacklist = TokenBlacklist()
 
 
 # =============================================================================

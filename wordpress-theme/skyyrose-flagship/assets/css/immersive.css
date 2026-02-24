@@ -89,12 +89,17 @@
 	position: absolute;
 	inset: 0;
 	opacity: 0;
-	transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	visibility: hidden;
+	transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+	            visibility 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+	z-index: 0;
 }
 
 .scene-layer.active {
 	opacity: 1;
+	visibility: visible;
 	will-change: opacity;
+	z-index: 1;
 }
 
 .scene-layer img {
@@ -104,6 +109,9 @@
 	display: block;
 	user-select: none;
 	-webkit-user-drag: none;
+	/* Parallax: slight oversize for shift room; transition for smooth reset */
+	transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+	transform-origin: center center;
 }
 
 /* ==================================================
@@ -871,6 +879,76 @@
 }
 
 /* ==================================================
+   CINEMATIC-ACTIVE — Scene-Level Integration
+   ================================================== */
+
+.immersive-scene.cinematic-active .scene-film-grain {
+	opacity: 0.08;
+	transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.immersive-scene.cinematic-active .hotspot-container {
+	opacity: 0.6;
+	transition: opacity 0.4s ease;
+}
+
+.immersive-scene.cinematic-active .hotspot-container:hover {
+	opacity: 1;
+}
+
+.immersive-scene.cinematic-active .room-indicators,
+.immersive-scene.cinematic-active .room-name,
+.immersive-scene.cinematic-active .scene-title-overlay {
+	opacity: 0;
+	pointer-events: none;
+	transition: opacity 0.4s ease;
+}
+
+.immersive-scene.cinematic-active .room-nav-btn {
+	opacity: 0.25;
+	transition: opacity 0.3s ease;
+}
+
+.immersive-scene.cinematic-active .room-nav-btn:hover {
+	opacity: 1;
+}
+
+/* ==================================================
+   ADD-TO-CART NOTIFICATION
+   ================================================== */
+
+.immersive-cart-notification {
+	position: fixed;
+	top: 24px;
+	left: 50%;
+	transform: translateX(-50%) translateY(-20px);
+	z-index: 60;
+	padding: 12px 28px;
+	background: rgba(17, 17, 17, 0.92);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	border-radius: 8px;
+	color: #fff;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.8rem;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+	transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+	            transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+	            visibility 0.35s;
+}
+
+.immersive-cart-notification.visible {
+	opacity: 1;
+	visibility: visible;
+	transform: translateX(-50%) translateY(0);
+}
+
+/* ==================================================
    REDUCED MOTION
    ================================================== */
 
@@ -899,5 +977,16 @@
 	.immersive-black-rose .scene-viewport::after {
 		animation: none;
 		opacity: 0;
+	}
+
+	/* Disable parallax shift */
+	.scene-layer img {
+		transition: none !important;
+		transform: none !important;
+	}
+
+	/* Disable cart notification animation */
+	.immersive-cart-notification {
+		transition-duration: 0.01ms;
 	}
 }

@@ -1,7 +1,7 @@
 # Environment Variables Reference
 
-**Version**: 3.2.0
-**Last Updated**: 2026-02-22
+**Version**: 3.3.0
+**Last Updated**: 2026-02-24
 **Status**: Complete
 
 This document provides comprehensive reference for all environment variables used across the DevSkyy platform, including backend services, WordPress integration, MCP servers, and machine learning pipelines.
@@ -17,15 +17,19 @@ This document provides comprehensive reference for all environment variables use
 5. [AI/ML Provider APIs](#aiml-provider-apis)
 6. [3D Asset Generation](#3d-asset-generation)
 7. [Virtual Try-On](#virtual-try-on)
-8. [WordPress/WooCommerce](#wordpresswoocommerce)
-9. [Payments - Stripe](#payments---stripe)
-10. [Email & Marketing](#email--marketing)
-11. [Caching](#caching)
-12. [Monitoring & Logging](#monitoring--logging)
-13. [Rate Limiting](#rate-limiting)
-14. [Performance Optimization](#performance-optimization)
-15. [MCP Server Configuration](#mcp-server-configuration)
-16. [Development Settings](#development-settings)
+8. [Meshy 3D Generation](#meshy-3d-generation)
+9. [Social Media Pipeline](#social-media-pipeline)
+10. [LLM Round Table](#llm-round-table)
+11. [HuggingFace Spaces](#huggingface-spaces)
+12. [WordPress/WooCommerce](#wordpresswoocommerce)
+13. [Payments - Stripe](#payments---stripe)
+14. [Email & Marketing](#email--marketing)
+15. [Caching](#caching)
+16. [Monitoring & Logging](#monitoring--logging)
+17. [Rate Limiting](#rate-limiting)
+18. [Performance Optimization](#performance-optimization)
+19. [MCP Server Configuration](#mcp-server-configuration)
+20. [Development Settings](#development-settings)
 
 ---
 
@@ -165,6 +169,76 @@ API_URL=https://api.devskyy.app
 | `FASHN_API_KEY` | FASHN API key | https://fashn.ai/dashboard | No |
 | `FASHN_API_BASE_URL` | API endpoint | URL | `https://api.fashn.ai/v1` |
 | `FASHN_OUTPUT_DIR` | Output directory | Path | `./generated_assets/tryon` |
+
+---
+
+## Meshy 3D Generation
+
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `MESHY_API_KEY` | Meshy API key | https://www.meshy.ai/settings/api | No |
+
+**Meshy Features:**
+- Text-to-3D: Generate 3D models from text descriptions
+- Image-to-3D: Convert 2D images to 3D models
+- API v2 endpoints with task-based async generation
+
+---
+
+## Social Media Pipeline
+
+### Instagram
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `INSTAGRAM_ACCESS_TOKEN` | Instagram Graph API token | Meta Developer Portal > Instagram Basic Display API | No |
+| `INSTAGRAM_BUSINESS_ACCOUNT_ID` | Business account ID | Instagram Business Settings | No |
+
+### TikTok
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `TIKTOK_ACCESS_TOKEN` | TikTok Marketing API token | https://developers.tiktok.com/ | No |
+
+### X / Twitter
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `TWITTER_API_KEY` | Twitter API key (consumer key) | https://developer.x.com/portal | No |
+| `TWITTER_API_SECRET` | Twitter API secret | https://developer.x.com/portal | No |
+| `TWITTER_ACCESS_TOKEN` | OAuth access token | https://developer.x.com/portal | No |
+| `TWITTER_ACCESS_SECRET` | OAuth access secret | https://developer.x.com/portal | No |
+
+### Facebook
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `FACEBOOK_ACCESS_TOKEN` | Facebook page access token | https://developers.facebook.com/ | No |
+| `FACEBOOK_PAGE_ID` | Facebook Page ID | Facebook Page Settings | No |
+
+---
+
+## LLM Round Table
+
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `ANTHROPIC_API_KEY` | Claude models | https://console.anthropic.com/ | Optional* |
+| `OPENAI_API_KEY` | GPT-4 models | https://platform.openai.com/api-keys | Optional* |
+| `GOOGLE_AI_API_KEY` | Gemini models | https://ai.google.dev/ | Optional* |
+| `GROQ_API_KEY` | Llama via Groq | https://console.groq.com/ | Optional* |
+| `MISTRAL_API_KEY` | Mistral models | https://console.mistral.ai/ | Optional* |
+| `COHERE_API_KEY` | Cohere models | https://dashboard.cohere.com/ | Optional* |
+
+**\*At least one LLM provider is required for the Round Table to function. All 6 are recommended for full competition mode.**
+
+---
+
+## HuggingFace Spaces
+
+| Variable | Purpose | Get From | Required |
+|----------|---------|----------|----------|
+| `HF_TOKEN` | HuggingFace API token | https://huggingface.co/settings/tokens | Yes (for HF features) |
+
+**SkyyRose Spaces:**
+- `skyyrose/3d-converter` - 3D model conversion pipeline
+- `skyyrose/lora-monitor` - LoRA training monitor
+- `skyyrose/virtual-tryon` - Virtual try-on experience
 
 ---
 

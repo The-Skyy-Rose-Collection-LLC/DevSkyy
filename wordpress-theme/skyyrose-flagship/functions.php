@@ -48,6 +48,8 @@ $skyyrose_core_includes = array(
 	'/inc/security.php',
 	'/inc/accessibility-seo.php',
 	'/inc/ajax-handlers.php',
+	'/inc/product-taxonomy.php',
+	'/inc/branded-content.php',
 );
 
 foreach ( $skyyrose_core_includes as $skyyrose_file ) {
