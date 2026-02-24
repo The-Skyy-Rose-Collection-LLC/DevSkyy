@@ -2,9 +2,9 @@
 /**
  * Template Name: Immersive - Love Hurts
  *
- * "The Ballroom" — Baroque ballroom with candlelit manor, chandeliers,
- * and rose petals. Two scene views (ballroom + candlelit manor).
- * drakerelated.com-style immersive experience with hotspot beacons.
+ * "The Ballroom" — Baroque ballroom with crystal chandeliers, crimson
+ * drapery, and rose petals. Single-scene immersive experience.
+ * drakerelated.com-style with hotspot beacons on real products.
  *
  * @package SkyyRose_Flagship
  * @since 2.0.0
@@ -17,9 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Product data for hotspot beacons.
- * Spread across two scene views — Ballroom and Candlelit Manor.
- * Products placed on contextual props: velvet furniture, chandeliers,
- * candelabras, ornate frames — not floating in air.
+ * All 4 Love Hurts products in the Ballroom scene.
+ * Products placed on contextual props: velvet chaise, gold frame,
+ * marble table, dress rack — not floating in air.
  */
 $love_hurts_scenes = array(
 	array(
@@ -28,76 +28,56 @@ $love_hurts_scenes = array(
 		'alt'      => esc_attr__( 'Baroque ballroom with crystal chandeliers, crimson drapery, and rose petals scattered across marble floor', 'skyyrose-flagship' ),
 		'products' => array(
 			array(
-				'id'         => 'lh-001',
-				'name'       => esc_html__( 'Crimson Heart Necklace', 'skyyrose-flagship' ),
-				'price'      => '$2,199',
+				'id'         => 'lh-004',
+				'name'       => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
+				'price'      => '$265',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => '16in,18in,20in',
-				'image'      => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-1.jpg',
-				'url'        => '#',
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
+				'url'        => '/?product_id=lh-004',
 				'left'       => '28',
-				'top'        => '35',
+				'top'        => '40',
 				'prop'       => 'velvet-chaise',
 				'prop_label' => esc_html__( 'Draped on velvet chaise lounge', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'lh-002',
-				'name'       => esc_html__( 'Bleeding Rose Ring', 'skyyrose-flagship' ),
-				'price'      => '$1,599',
+				'name'       => esc_html__( 'Love Hurts Joggers', 'skyyrose-flagship' ),
+				'price'      => '$95',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => '5,6,7,8,9',
-				'image'      => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-2.jpg',
-				'url'        => '#',
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
+				'url'        => '/?product_id=lh-002',
 				'left'       => '55',
-				'top'        => '52',
-				'prop'       => 'ornate-frame',
-				'prop_label' => esc_html__( 'Displayed in ornate gilded frame', 'skyyrose-flagship' ),
+				'top'        => '35',
+				'prop'       => 'gold-frame',
+				'prop_label' => esc_html__( 'Displayed in ornate gold frame', 'skyyrose-flagship' ),
+			),
+			array(
+				'id'         => 'lh-001',
+				'name'       => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
+				'price'      => '$65',
+				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'One Size',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
+				'url'        => '/?product_id=lh-001',
+				'left'       => '42',
+				'top'        => '58',
+				'prop'       => 'marble-table',
+				'prop_label' => esc_html__( 'On marble display table', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'lh-003',
-				'name'       => esc_html__( 'Thorned Embrace Bracelet', 'skyyrose-flagship' ),
-				'price'      => '$1,099',
+				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
+				'price'      => '$75',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L',
-				'image'      => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-3.jpg',
-				'url'        => '#',
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
+				'url'        => '/?product_id=lh-003',
 				'left'       => '75',
-				'top'        => '40',
-				'prop'       => 'candelabra',
-				'prop_label' => esc_html__( 'Hanging from crystal candelabra', 'skyyrose-flagship' ),
-			),
-		),
-	),
-	array(
-		'name'     => esc_html__( 'The Manor', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/images/scenes/love-hurts-manor.jpg',
-		'alt'      => esc_attr__( 'Candlelit gothic manor with velvet chairs, golden pedestals, and flickering candlelight', 'skyyrose-flagship' ),
-		'products' => array(
-			array(
-				'id'         => 'lh-004',
-				'name'       => esc_html__( 'Passion Drop Earrings', 'skyyrose-flagship' ),
-				'price'      => '$899',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'OS',
-				'image'      => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-4.jpg',
-				'url'        => '#',
-				'left'       => '40',
-				'top'        => '45',
-				'prop'       => 'golden-pedestal',
-				'prop_label' => esc_html__( 'On golden pedestal', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'lh-005',
-				'name'       => esc_html__( 'Velvet Flame Pendant', 'skyyrose-flagship' ),
-				'price'      => '$1,799',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => '16in,18in,20in,22in',
-				'image'      => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-5.jpg',
-				'url'        => '#',
-				'left'       => '65',
-				'top'        => '58',
-				'prop'       => 'chandelier',
-				'prop_label' => esc_html__( 'Suspended from chandelier chain', 'skyyrose-flagship' ),
+				'top'        => '42',
+				'prop'       => 'dress-rack',
+				'prop_label' => esc_html__( 'Hanging on ornate dress rack', 'skyyrose-flagship' ),
 			),
 		),
 	),
