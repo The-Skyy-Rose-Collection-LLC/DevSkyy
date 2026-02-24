@@ -117,6 +117,7 @@ COPY runtime/ ./runtime/
 COPY security/ ./security/
 COPY wordpress/ ./wordpress/
 COPY main_enterprise.py ./
+COPY mcp_tools/ ./mcp_tools/
 COPY devskyy_mcp.py ./
 COPY docker-entrypoint.sh /app/
 RUN chmod +x /app/docker-entrypoint.sh
