@@ -165,6 +165,10 @@ add_filter( 'woocommerce_get_image_size_thumbnail', 'skyyrose_woocommerce_thumbn
  */
 function skyyrose_woocommerce_cart_fragments( $fragments ) {
 
+	if ( ! WC()->cart ) {
+		return $fragments;
+	}
+
 	$count = WC()->cart->get_cart_contents_count();
 
 	ob_start();
@@ -454,9 +458,11 @@ function skyyrose_ajax_get_cart_count() {
 
 	check_ajax_referer( 'skyyrose-woo-nonce', 'nonce' );
 
+	$count = ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0;
+
 	wp_send_json_success(
 		array(
-			'count' => WC()->cart->get_cart_contents_count(),
+			'count' => $count,
 		)
 	);
 }

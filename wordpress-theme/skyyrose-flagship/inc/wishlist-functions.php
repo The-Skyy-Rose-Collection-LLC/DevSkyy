@@ -160,6 +160,10 @@ function skyyrose_move_to_cart( $product_id ) {
 	}
 
 	// Add to cart.
+	if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+		return false;
+	}
+
 	$cart_item_key = WC()->cart->add_to_cart( $product_id );
 
 	if ( $cart_item_key ) {
@@ -329,7 +333,7 @@ function skyyrose_ajax_move_to_cart() {
 			array(
 				'message'    => esc_html__( 'Product moved to cart.', 'skyyrose-flagship' ),
 				'count'      => skyyrose_get_wishlist_count(),
-				'cart_count' => WC()->cart->get_cart_contents_count(),
+				'cart_count' => ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0,
 			)
 		);
 	} else {
@@ -390,7 +394,7 @@ function skyyrose_ajax_move_all_to_cart() {
 					$result['success']
 				),
 				'count'      => skyyrose_get_wishlist_count(),
-				'cart_count' => WC()->cart->get_cart_contents_count(),
+				'cart_count' => ( function_exists( 'WC' ) && WC()->cart ) ? WC()->cart->get_cart_contents_count() : 0,
 			)
 		);
 	} else {
