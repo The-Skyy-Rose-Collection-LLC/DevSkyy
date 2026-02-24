@@ -100,8 +100,8 @@ export default function SettingsPage() {
       if (stored) {
         setSettings(JSON.parse(stored));
       }
-    } catch (error) {
-      console.error('Failed to load settings:', error);
+    } catch {
+      // Settings load failed — defaults will be used
     }
   };
 

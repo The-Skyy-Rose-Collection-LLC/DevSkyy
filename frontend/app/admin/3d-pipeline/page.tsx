@@ -59,8 +59,8 @@ export default function Pipeline3DPage() {
         setStatus(statusData);
         setProviders(providersData);
         setJobs(jobsData);
-      } catch (err) {
-        console.error('Failed to load 3D Pipeline data:', err);
+      } catch {
+        // Pipeline data fetch failed — UI shows empty state
       } finally {
         setLoading(false);
       }
@@ -102,8 +102,8 @@ export default function Pipeline3DPage() {
       setJobs((prev) => [job, ...prev]);
       setTextPrompt('');
       setImageUrl('');
-    } catch (err) {
-      console.error('Generation failed:', err);
+    } catch {
+      // Generation failed — button re-enables via finally
     } finally {
       setGenerating(false);
     }
