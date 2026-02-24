@@ -1,0 +1,290 @@
+/**
+ * Collection Rotating 3D Logos
+ *
+ * CSS-only 3D rotating logo animations for collection landing pages.
+ * Each collection has a unique rotation speed and color sheen.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.0.0
+ */
+
+/* ---------------------------------------------------------------
+   3D Logo Container
+   --------------------------------------------------------------- */
+
+.collection-logo-3d {
+	perspective: 800px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 2rem auto;
+}
+
+.collection-logo-3d img {
+	max-width: 280px;
+	height: auto;
+	transform-style: preserve-3d;
+	will-change: transform;
+}
+
+/* ---------------------------------------------------------------
+   Black Rose -- 8s rotation, silver moonlight sheen
+   --------------------------------------------------------------- */
+
+.collection-logo-3d--black-rose img {
+	animation: rotateBlackRose 8s linear infinite;
+	filter: drop-shadow(0 0 30px rgba(192, 192, 192, 0.3));
+}
+
+@keyframes rotateBlackRose {
+	0%   { transform: rotateY(0deg); }
+	100% { transform: rotateY(360deg); }
+}
+
+/* ---------------------------------------------------------------
+   Love Hurts -- 6s rotation, crimson fire sheen
+   --------------------------------------------------------------- */
+
+.collection-logo-3d--love-hurts img {
+	animation: rotateLoveHurts 6s linear infinite;
+	filter: drop-shadow(0 0 30px rgba(220, 20, 60, 0.3));
+}
+
+@keyframes rotateLoveHurts {
+	0%   { transform: rotateY(0deg); }
+	100% { transform: rotateY(360deg); }
+}
+
+/* ---------------------------------------------------------------
+   Signature -- 7s rotation, gold sheen
+   --------------------------------------------------------------- */
+
+.collection-logo-3d--signature img {
+	animation: rotateSignature 7s linear infinite;
+	filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
+}
+
+@keyframes rotateSignature {
+	0%   { transform: rotateY(0deg); }
+	100% { transform: rotateY(360deg); }
+}
+
+/* ---------------------------------------------------------------
+   Collection Hero
+   --------------------------------------------------------------- */
+
+.collection-hero {
+	position: relative;
+	min-height: 60vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 4rem 2rem;
+	overflow: hidden;
+	background: #0a0a0a;
+}
+
+.collection-hero::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: radial-gradient(ellipse at center, transparent 0%, rgba(10, 10, 10, 0.8) 100%);
+	z-index: 1;
+}
+
+.collection-hero > * {
+	position: relative;
+	z-index: 2;
+}
+
+.collection-hero__title {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(2.5rem, 6vw, 5rem);
+	font-weight: 700;
+	color: #fff;
+	margin: 1rem 0 0.5rem;
+	letter-spacing: 0.04em;
+}
+
+.collection-hero__subtitle {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 0.85rem;
+	font-weight: 300;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.5);
+	max-width: 600px;
+}
+
+/* ---------------------------------------------------------------
+   Product Grid
+   --------------------------------------------------------------- */
+
+.collection-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+	gap: 2rem;
+	padding: 4rem 2rem;
+	max-width: 1400px;
+	margin: 0 auto;
+	background: #0a0a0a;
+}
+
+.collection-product-card {
+	position: relative;
+	border-radius: 12px;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	transition: transform 0.35s ease, box-shadow 0.35s ease;
+	text-decoration: none;
+	color: inherit;
+	display: block;
+}
+
+.collection-product-card:hover {
+	transform: translateY(-8px);
+	box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.collection-product-card__image {
+	width: 100%;
+	aspect-ratio: 3/4;
+	object-fit: cover;
+	display: block;
+}
+
+.collection-product-card__info {
+	padding: 1.25rem;
+}
+
+.collection-product-card__name {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #fff;
+	margin: 0 0 0.5rem;
+}
+
+.collection-product-card__price {
+	font-family: 'Montserrat', sans-serif;
+	font-size: 1rem;
+	font-weight: 600;
+	color: var(--rose-gold, #B76E79);
+}
+
+.collection-product-card__badge {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	padding: 4px 12px;
+	border-radius: 20px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #fff;
+	background: rgba(183, 110, 121, 0.85);
+	backdrop-filter: blur(8px);
+}
+
+/* ---------------------------------------------------------------
+   Collection Story Section
+   --------------------------------------------------------------- */
+
+.collection-story {
+	padding: 6rem 2rem;
+	max-width: 800px;
+	margin: 0 auto;
+	text-align: center;
+	background: #0a0a0a;
+}
+
+.collection-story__text {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(1.1rem, 2vw, 1.4rem);
+	font-weight: 400;
+	line-height: 1.8;
+	color: rgba(255, 255, 255, 0.7);
+	font-style: italic;
+}
+
+/* ---------------------------------------------------------------
+   Immersive CTA
+   --------------------------------------------------------------- */
+
+.collection-immersive-cta {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 4rem 2rem;
+	background: linear-gradient(135deg, rgba(183, 110, 121, 0.1), rgba(10, 10, 10, 1));
+}
+
+.collection-immersive-cta__link {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 16px 40px;
+	border: 1px solid var(--rose-gold, #B76E79);
+	border-radius: 8px;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #fff;
+	transition: all 0.3s ease;
+}
+
+.collection-immersive-cta__link:hover {
+	background: var(--rose-gold, #B76E79);
+	color: #0a0a0a;
+}
+
+/* ---------------------------------------------------------------
+   Pre-order CTA
+   --------------------------------------------------------------- */
+
+.collection-preorder-cta {
+	padding: 4rem 2rem;
+	text-align: center;
+	background: #0a0a0a;
+}
+
+.collection-preorder-cta__btn {
+	display: inline-block;
+	padding: 18px 48px;
+	border: none;
+	border-radius: 8px;
+	background: linear-gradient(135deg, #B76E79, #D4AF37);
+	color: #fff;
+	font-family: 'Montserrat', sans-serif;
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity 0.25s ease, transform 0.15s ease;
+}
+
+.collection-preorder-cta__btn:hover {
+	opacity: 0.9;
+	transform: translateY(-2px);
+}
+
+/* ---------------------------------------------------------------
+   Reduced Motion
+   --------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+	.collection-logo-3d img {
+		animation: none;
+	}
+}

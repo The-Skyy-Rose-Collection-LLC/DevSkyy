@@ -2,12 +2,13 @@
 /**
  * Template Name: Immersive - Love Hurts
  *
- * "The Ballroom" — Baroque ballroom with crystal chandeliers, crimson
- * drapery, and rose petals. Single-scene immersive experience.
- * drakerelated.com-style with hotspot beacons on real products.
+ * "The Ballroom" — Baroque ballrooms, gothic cathedrals, enchanted rose
+ * shrines, and crimson throne rooms. drakerelated.com-style immersive
+ * experience: full-viewport rooms, pulsing beacon hotspots, smooth
+ * room-to-room transitions.
  *
  * @package SkyyRose_Flagship
- * @since 2.0.0
+ * @since   3.0.0
  */
 
 // Prevent direct access.
@@ -16,16 +17,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Product data for hotspot beacons.
- * All 4 Love Hurts products in the Ballroom scene.
- * Products placed on contextual props: velvet chaise, gold frame,
- * marble table, dress rack — not floating in air.
+ * Multi-room scene data.
+ * 4 rooms from the Love Hurts collection, each a full-viewport scene.
+ * Products positioned on contextual props within each ballroom/chamber.
  */
-$love_hurts_scenes = array(
+$love_hurts_rooms = array(
+	// Room 1 — Cathedral Rose Chamber
 	array(
-		'name'     => esc_html__( 'The Ballroom', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/images/scenes/love-hurts-ballroom.jpg',
-		'alt'      => esc_attr__( 'Baroque ballroom with crystal chandeliers, crimson drapery, and rose petals scattered across marble floor', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'Cathedral Rose Chamber', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-cathedral-rose-chamber.png',
+		'alt'      => esc_attr__( 'Gothic cathedral with enchanted rose under glass dome, stained glass windows, candelabras, and crimson petals', 'skyyrose-flagship' ),
 		'products' => array(
 			array(
 				'id'         => 'lh-004',
@@ -35,11 +36,19 @@ $love_hurts_scenes = array(
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
 				'url'        => '/?product_id=lh-004',
-				'left'       => '28',
-				'top'        => '40',
-				'prop'       => 'velvet-chaise',
-				'prop_label' => esc_html__( 'Draped on velvet chaise lounge', 'skyyrose-flagship' ),
+				'left'       => '35',
+				'top'        => '42',
+				'prop'       => 'glass-dome',
+				'prop_label' => esc_html__( 'Draped beside enchanted rose dome', 'skyyrose-flagship' ),
 			),
+		),
+	),
+	// Room 2 — Gothic Ballroom
+	array(
+		'name'     => esc_html__( 'Gothic Ballroom', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-gothic-ballroom.png',
+		'alt'      => esc_attr__( 'Gothic chamber with rose under glass dome, purple draped fabrics, pink petals, and candlelit atmosphere', 'skyyrose-flagship' ),
+		'products' => array(
 			array(
 				'id'         => 'lh-002',
 				'name'       => esc_html__( 'Love Hurts Joggers', 'skyyrose-flagship' ),
@@ -49,10 +58,18 @@ $love_hurts_scenes = array(
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
 				'url'        => '/?product_id=lh-002',
 				'left'       => '55',
-				'top'        => '35',
-				'prop'       => 'gold-frame',
-				'prop_label' => esc_html__( 'Displayed in ornate gold frame', 'skyyrose-flagship' ),
+				'top'        => '48',
+				'prop'       => 'velvet-drape',
+				'prop_label' => esc_html__( 'Folded on purple velvet drape', 'skyyrose-flagship' ),
 			),
+		),
+	),
+	// Room 3 — Crimson Throne Room
+	array(
+		'name'     => esc_html__( 'Crimson Throne Room', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-crimson-throne-room.png',
+		'alt'      => esc_attr__( 'Cloaked figure in golden ballroom with crimson cape, ornate throne, scattered rose petals, and dramatic fog', 'skyyrose-flagship' ),
+		'products' => array(
 			array(
 				'id'         => 'lh-001',
 				'name'       => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
@@ -61,11 +78,19 @@ $love_hurts_scenes = array(
 				'sizes'      => 'One Size',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
 				'url'        => '/?product_id=lh-001',
-				'left'       => '42',
-				'top'        => '58',
-				'prop'       => 'marble-table',
-				'prop_label' => esc_html__( 'On marble display table', 'skyyrose-flagship' ),
+				'left'       => '62',
+				'top'        => '55',
+				'prop'       => 'ornate-throne',
+				'prop_label' => esc_html__( 'Resting on ornate golden throne', 'skyyrose-flagship' ),
 			),
+		),
+	),
+	// Room 4 — Enchanted Rose Shrine
+	array(
+		'name'     => esc_html__( 'Enchanted Rose Shrine', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-enchanted-rose-shrine.png',
+		'alt'      => esc_attr__( 'Red-caped figure facing golden shrine with enchanted rose, ornate columns, and warm ethereal light', 'skyyrose-flagship' ),
+		'products' => array(
 			array(
 				'id'         => 'lh-003',
 				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
@@ -74,10 +99,10 @@ $love_hurts_scenes = array(
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
 				'url'        => '/?product_id=lh-003',
-				'left'       => '75',
-				'top'        => '42',
-				'prop'       => 'dress-rack',
-				'prop_label' => esc_html__( 'Hanging on ornate dress rack', 'skyyrose-flagship' ),
+				'left'       => '45',
+				'top'        => '50',
+				'prop'       => 'golden-shrine',
+				'prop_label' => esc_html__( 'Displayed at golden shrine base', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -96,16 +121,16 @@ get_header();
 			<div class="scene-loading-text"><?php echo esc_html__( 'Entering The Ballroom', 'skyyrose-flagship' ); ?></div>
 		</div>
 
-		<!-- Scene Viewport -->
+		<!-- Scene Viewport — Multi-Room Layers -->
 		<div class="scene-viewport">
-			<?php foreach ( $love_hurts_scenes as $index => $scene ) : ?>
+			<?php foreach ( $love_hurts_rooms as $index => $room ) : ?>
 				<div
 					class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
-					data-room-name="<?php echo esc_attr( $scene['name'] ); ?>"
+					data-room-name="<?php echo esc_attr( $room['name'] ); ?>"
 				>
 					<img
-						src="<?php echo esc_url( $scene['image'] ); ?>"
-						alt="<?php echo esc_attr( $scene['alt'] ); ?>"
+						src="<?php echo esc_url( $room['image'] ); ?>"
+						alt="<?php echo esc_attr( $room['alt'] ); ?>"
 						loading="<?php echo 0 === $index ? 'eager' : 'lazy'; ?>"
 						<?php if ( 0 === $index ) : ?>fetchpriority="high"<?php endif; ?>
 					>
@@ -121,32 +146,32 @@ get_header();
 
 		<!-- Room Navigation Arrows -->
 		<div class="room-nav room-nav-prev">
-			<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Previous scene', 'skyyrose-flagship' ); ?>">
+			<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Previous room', 'skyyrose-flagship' ); ?>">
 				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
 			</button>
 		</div>
 		<div class="room-nav room-nav-next">
-			<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Next scene', 'skyyrose-flagship' ); ?>">
+			<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Next room', 'skyyrose-flagship' ); ?>">
 				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
 			</button>
 		</div>
 
 		<!-- Room Indicators -->
-		<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Scene selector', 'skyyrose-flagship' ); ?>">
-			<?php foreach ( $love_hurts_scenes as $index => $scene ) : ?>
+		<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Room selector', 'skyyrose-flagship' ); ?>">
+			<?php foreach ( $love_hurts_rooms as $index => $room ) : ?>
 				<button
 					class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
 					type="button"
-					aria-label="<?php echo esc_attr( $scene['name'] ); ?>"
+					aria-label="<?php echo esc_attr( $room['name'] ); ?>"
 				></button>
 			<?php endforeach; ?>
 		</div>
-		<div class="room-name"><?php echo esc_html( $love_hurts_scenes[0]['name'] ); ?></div>
+		<div class="room-name"><?php echo esc_html( $love_hurts_rooms[0]['name'] ); ?></div>
 
-		<!-- Hotspot Containers — Products placed on contextual props -->
-		<?php foreach ( $love_hurts_scenes as $scene_index => $scene ) : ?>
-			<div class="hotspot-container" <?php echo 0 !== $scene_index ? 'style="display:none;"' : ''; ?>>
-				<?php foreach ( $scene['products'] as $product ) : ?>
+		<!-- Hotspot Containers — One per room -->
+		<?php foreach ( $love_hurts_rooms as $room_index => $room ) : ?>
+			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'style="display:none;"' : ''; ?>>
+				<?php foreach ( $room['products'] as $product ) : ?>
 					<a
 						href="<?php echo esc_url( $product['url'] ); ?>"
 						class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
@@ -195,7 +220,7 @@ get_header();
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">
-					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Add to Cart', 'skyyrose-flagship' ); ?></button>
+					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?></button>
 					<a class="btn-view-details" href="#"><?php echo esc_html__( 'Details', 'skyyrose-flagship' ); ?></a>
 				</div>
 			</div>

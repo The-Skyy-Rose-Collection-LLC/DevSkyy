@@ -2,8 +2,9 @@
 /**
  * Template Name: Collection - Love Hurts
  *
- * LOVE HURTS collection page — Passionate drama mood with floating hearts,
- * pulsing badge, and crimson (#DC143C) accents on deep black.
+ * LOVE HURTS collection page — Passionate drama mood with rotating 3D logo,
+ * product grid, story section, immersive CTA, and pre-order CTA.
+ * Crimson (#DC143C) accents on deep black.
  *
  * @package SkyyRose_Flagship
  * @since   3.0.0
@@ -95,140 +96,84 @@ function skyyrose_get_love_hurts_products() {
 	return $products;
 }
 
-$skyyrose_lh_products   = skyyrose_get_love_hurts_products();
-$skyyrose_lh_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
+$skyyrose_lh_products    = skyyrose_get_love_hurts_products();
+$skyyrose_lh_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
 $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
+$skyyrose_lh_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/love-hurts-logo.jpg' );
+$skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-giant-rose-staircase.png' );
 ?>
 
 <div class="collection--love-hurts" data-collection="love-hurts">
 
 	<!-- ============================================================
-	     HERO SECTION
+	     HERO SECTION — Rotating 3D Logo
 	     ============================================================ -->
-	<section class="collection-hero" role="banner">
-		<div class="collection-hero__overlay" aria-hidden="true"></div>
+	<section class="collection-hero" role="banner"
+		style="background-image: url('<?php echo esc_attr( $skyyrose_lh_scene_url ); ?>'); background-size: cover; background-position: center;">
 
-		<div class="collection-hero__content fade-in-up">
-			<span class="collection-hero__badge">
-				<?php echo esc_html__( 'SKyyRose Flagship', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h1 class="collection-hero__title">
-				<?php echo esc_html__( 'LOVE HURTS', 'skyyrose-flagship' ); ?>
-			</h1>
-
-			<p class="collection-hero__subtitle">
-				<?php echo esc_html__( 'Wear Your Heart on Your Sleeve', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-hero__tagline">
-				<?php echo esc_html__( 'Passionate Drama Collection', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="#products" class="collection-hero__cta">
-				<?php echo esc_html__( 'Shop the Pain', 'skyyrose-flagship' ); ?>
-			</a>
+		<div class="collection-logo-3d collection-logo-3d--love-hurts">
+			<img src="<?php echo esc_url( $skyyrose_lh_logo_url ); ?>"
+			     alt="<?php echo esc_attr__( 'Love Hurts Collection Logo', 'skyyrose-flagship' ); ?>"
+			     width="280"
+			     height="280" />
 		</div>
 
-		<!-- Floating hearts injected by collections.js (15 hearts) -->
+		<h1 class="collection-hero__title">
+			<?php echo esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ); ?>
+		</h1>
+
+		<p class="collection-hero__subtitle">
+			<?php echo esc_html__( 'Passion Forged in Fire', 'skyyrose-flagship' ); ?>
+		</p>
+
+		<a href="#products" class="collection-hero__cta">
+			<?php echo esc_html__( 'Shop the Pain', 'skyyrose-flagship' ); ?>
+		</a>
 	</section>
 
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
 	<section class="collection-story" id="story">
-		<div class="collection-story__inner fade-in-up">
-			<span class="collection-story__label">
-				<?php echo esc_html__( 'The Story', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 class="collection-story__heading">
-				<?php echo esc_html__( 'Love That Leaves a Mark', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'The LOVE HURTS collection is born from the raw, unfiltered intensity of real love. It celebrates those who love fiercely, who wear their scars as badges of honor, and who know that the deepest connections always come with a cost.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'Crimson reds bleed into midnight blacks. Every stitch tells a story of passion, heartbreak, and the courage to love again. This is not for the faint of heart.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<div class="collection-story__divider" aria-hidden="true"></div>
-		</div>
+		<p class="collection-story__text">
+			<?php echo esc_html__( 'The Love Hurts collection is born from the raw, unfiltered intensity of real love. Crimson reds bleed into midnight blacks. Every stitch tells a story of passion, heartbreak, and the courage to love again. This is not for the faint of heart — it is for those who love fiercely, who wear their scars as badges of honor, and who know that the deepest connections always come with a cost.', 'skyyrose-flagship' ); ?>
+		</p>
 	</section>
 
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
 	<section id="products" class="collection-products">
-		<div class="collection-products__header fade-in-up">
-			<span class="collection-products__label">
-				<?php echo esc_html__( 'The Collection', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 class="collection-products__title">
-				<?php echo esc_html__( 'LOVE HURTS Pieces', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-products__count">
-				<?php
-				/* translators: %d: number of products in the collection */
-				printf( esc_html__( '%d Pieces', 'skyyrose-flagship' ), count( $skyyrose_lh_products ) );
-				?>
-			</p>
-		</div>
-
-		<div class="collection-products__grid">
+		<div class="collection-grid">
 			<?php
-			$skyyrose_delay = 0;
 			foreach ( $skyyrose_lh_products as $skyyrose_product ) :
-				$skyyrose_delay_class = 'delay-' . ( ( $skyyrose_delay % 5 ) + 1 );
-				$skyyrose_delay++;
-
 				$skyyrose_p_url   = isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#';
 				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_lh_placeholder;
 				?>
 				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
-				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>"
+				   class="collection-product-card"
 				   aria-label="<?php echo esc_attr( $skyyrose_product['name'] ); ?>">
 
-					<div class="product-card__image-wrap">
-						<img src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-						     loading="lazy"
-						     width="400"
-						     height="480" />
-
-						<div class="product-card__overlay" aria-hidden="true">
-							<span class="product-card__quick-view">
-								<?php echo esc_html__( 'Quick View', 'skyyrose-flagship' ); ?>
-							</span>
-						</div>
-
-						<span class="product-card__sku">
-							<?php echo esc_html( strtoupper( $skyyrose_product['sku'] ) ); ?>
+					<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
+						<span class="collection-product-card__badge">
+							<?php echo esc_html( $skyyrose_product['badge'] ); ?>
 						</span>
+					<?php endif; ?>
 
-						<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
-							<span class="product-card__badge">
-								<?php echo esc_html( $skyyrose_product['badge'] ); ?>
-							</span>
-						<?php endif; ?>
-					</div>
+					<img class="collection-product-card__image"
+					     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
+					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
+					     loading="lazy"
+					     width="400"
+					     height="533" />
 
-					<div class="product-card__info">
-						<h3 class="product-card__name">
+					<div class="collection-product-card__info">
+						<h3 class="collection-product-card__name">
 							<?php echo esc_html( $skyyrose_product['name'] ); ?>
 						</h3>
-						<p class="product-card__price">
+						<p class="collection-product-card__price">
 							<?php echo wp_kses_post( $skyyrose_product['price'] ); ?>
 						</p>
-						<?php if ( ! empty( $skyyrose_product['desc'] ) ) : ?>
-							<p class="product-card__desc">
-								<?php echo esc_html( $skyyrose_product['desc'] ); ?>
-							</p>
-						<?php endif; ?>
 					</div>
 				</a>
 			<?php endforeach; ?>
@@ -236,23 +181,23 @@ $skyyrose_lh_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	</section>
 
 	<!-- ============================================================
-	     CTA BANNER
+	     IMMERSIVE CTA
 	     ============================================================ -->
-	<section class="collection-cta">
-		<div class="collection-cta__inner fade-in-up">
-			<h2 class="collection-cta__heading">
-				<?php echo esc_html__( 'Feel Everything', 'skyyrose-flagship' ); ?>
-			</h2>
+	<section class="collection-immersive-cta">
+		<a href="<?php echo esc_url( home_url( '/immersive/love-hurts/' ) ); ?>"
+		   class="collection-immersive-cta__link">
+			<?php echo esc_html__( 'Enter the 3D Experience', 'skyyrose-flagship' ); ?>
+		</a>
+	</section>
 
-			<p class="collection-cta__text">
-				<?php echo esc_html__( 'Love hurts. But it also heals, inspires, and transforms. Wear the journey. Every piece is a chapter in a story only you can tell.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="<?php echo esc_url( $skyyrose_lh_shop_url ); ?>"
-			   class="collection-cta__button">
-				<?php echo esc_html__( 'Shop LOVE HURTS', 'skyyrose-flagship' ); ?>
-			</a>
-		</div>
+	<!-- ============================================================
+	     PRE-ORDER CTA
+	     ============================================================ -->
+	<section class="collection-preorder-cta">
+		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
+		   class="collection-preorder-cta__btn">
+			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>
+		</a>
 	</section>
 
 	<!-- ============================================================

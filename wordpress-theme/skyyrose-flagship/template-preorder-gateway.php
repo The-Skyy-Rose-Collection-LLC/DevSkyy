@@ -23,157 +23,161 @@ $gateway_products = array(
 	// Black Rose Collection
 	array(
 		'id'              => 'br-001',
-		'name'            => esc_html__( 'Midnight Thorns Necklace', 'skyyrose-flagship' ),
-		'price'           => '$1,899',
+		'name'            => esc_html__( 'BLACK Rose Crewneck', 'skyyrose-flagship' ),
+		'price'           => '$125',
 		'collection'      => 'black-rose',
 		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L',
-		'desc'            => esc_html__( 'Sterling silver chain with hand-crafted thorn pendants and black onyx centerpiece. A statement of dark elegance.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/black-rose-product-1.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Gothic luxury blooms in twilight. Embroidered with defiant elegance, a dark romance woven in every thread.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/br-001-crewneck.jpg',
+		'edition'         => '250',
 	),
 	array(
 		'id'              => 'br-002',
-		'name'            => esc_html__( 'Cathedral Ring', 'skyyrose-flagship' ),
-		'price'           => '$1,299',
+		'name'            => esc_html__( 'BLACK Rose Joggers', 'skyyrose-flagship' ),
+		'price'           => '$95',
 		'collection'      => 'black-rose',
 		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => '5,6,7,8,9',
-		'desc'            => esc_html__( 'Gothic-inspired silver ring with cathedral arch detailing and obsidian stone setting.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/black-rose-product-2.jpg',
-	),
-	array(
-		'id'              => 'br-003',
-		'name'            => esc_html__( 'Iron Garden Bracelet', 'skyyrose-flagship' ),
-		'price'           => '$999',
-		'collection'      => 'black-rose',
-		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L',
-		'desc'            => esc_html__( 'Wrought iron-inspired silver bracelet with intertwining vine motifs and thorned accents.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/black-rose-product-3.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Twilight comfort meets gothic romance. Embroidered black roses bloom on soft fabric.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/br-002-joggers.jpg',
+		'edition'         => '250',
 	),
 	array(
 		'id'              => 'br-004',
-		'name'            => esc_html__( 'Dark Bloom Earrings', 'skyyrose-flagship' ),
-		'price'           => '$799',
+		'name'            => esc_html__( 'BLACK Rose Hoodie', 'skyyrose-flagship' ),
+		'price'           => '$145',
 		'collection'      => 'black-rose',
 		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'OS',
-		'desc'            => esc_html__( 'Dramatic drop earrings featuring oxidized silver petals and midnight-black crystal accents.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/black-rose-product-4.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Gothic luxury in twilight shadows. Intricate embroidery captures the bloom of darkness.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/br-004-hoodie.jpg',
+		'edition'         => '200',
 	),
 	array(
-		'id'              => 'br-005',
-		'name'            => esc_html__( 'Shadow Vine Pendant', 'skyyrose-flagship' ),
-		'price'           => '$1,499',
+		'id'              => 'br-006',
+		'name'            => esc_html__( 'BLACK Rose Sherpa Jacket', 'skyyrose-flagship' ),
+		'price'           => '$295',
 		'collection'      => 'black-rose',
 		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => '16in,18in,20in',
-		'desc'            => esc_html__( 'A cascading vine pendant in sterling silver with black diamond-cut stones.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/black-rose-product-5.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.jpg',
+		'edition'         => '150',
+	),
+	array(
+		'id'              => 'br-008',
+		'name'            => esc_html__( "Women's BLACK Rose Hooded Dress", 'skyyrose-flagship' ),
+		'price'           => '$175',
+		'collection'      => 'black-rose',
+		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
+		'sizes'           => 'XS,S,M,L,XL,2XL',
+		'desc'            => esc_html__( 'Intricate black rose embroidery and a silhouette of gothic mystery. Pre-order now.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/br-008-hooded-dress.jpg',
+		'edition'         => '150',
 	),
 
 	// Love Hurts Collection
 	array(
 		'id'              => 'lh-001',
-		'name'            => esc_html__( 'Crimson Heart Necklace', 'skyyrose-flagship' ),
-		'price'           => '$2,199',
+		'name'            => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
+		'price'           => '$65',
 		'collection'      => 'love-hurts',
 		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => '16in,18in,20in',
-		'desc'            => esc_html__( 'Rose gold heart pendant encrusted with rubies and surrounded by thorned vines.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-1.jpg',
+		'sizes'           => 'One Size',
+		'desc'            => esc_html__( 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
+		'edition'         => '300',
 	),
 	array(
 		'id'              => 'lh-002',
-		'name'            => esc_html__( 'Bleeding Rose Ring', 'skyyrose-flagship' ),
-		'price'           => '$1,599',
+		'name'            => esc_html__( 'Love Hurts Joggers', 'skyyrose-flagship' ),
+		'price'           => '$95',
 		'collection'      => 'love-hurts',
 		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => '5,6,7,8,9',
-		'desc'            => esc_html__( 'A sculpted rose in rose gold with crimson enamel drip detailing and ruby center.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-2.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Oakland grit meets luxury. Feel the fire with the embroidered rose, a symbol of passion.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
+		'edition'         => '250',
 	),
 	array(
 		'id'              => 'lh-003',
-		'name'            => esc_html__( 'Thorned Embrace Bracelet', 'skyyrose-flagship' ),
-		'price'           => '$1,099',
+		'name'            => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
+		'price'           => '$75',
 		'collection'      => 'love-hurts',
 		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L',
-		'desc'            => esc_html__( 'Interlocking thorn cuff in rose gold with garnet cabochons at each junction point.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-3.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
+		'edition'         => '250',
 	),
 	array(
 		'id'              => 'lh-004',
-		'name'            => esc_html__( 'Passion Drop Earrings', 'skyyrose-flagship' ),
-		'price'           => '$899',
+		'name'            => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
+		'price'           => '$265',
 		'collection'      => 'love-hurts',
 		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => 'OS',
-		'desc'            => esc_html__( 'Teardrop earrings in rose gold with crimson crystal drops that catch the light like flame.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-4.jpg',
-	),
-	array(
-		'id'              => 'lh-005',
-		'name'            => esc_html__( 'Velvet Flame Pendant', 'skyyrose-flagship' ),
-		'price'           => '$1,799',
-		'collection'      => 'love-hurts',
-		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => '16in,18in,20in',
-		'desc'            => esc_html__( 'A flame-shaped pendant in polished rose gold with gradient ruby pave setting.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/love-hurts-product-5.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
+		'edition'         => '100',
 	),
 
 	// Signature Collection
 	array(
 		'id'              => 'sg-001',
-		'name'            => esc_html__( 'Rose Gold Statement Necklace', 'skyyrose-flagship' ),
-		'price'           => '$2,499',
+		'name'            => esc_html__( 'The Bay Set', 'skyyrose-flagship' ),
+		'price'           => '$195',
 		'collection'      => 'signature',
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => '16in,18in,20in',
-		'desc'            => esc_html__( 'Our flagship statement piece in 18k rose gold with diamond accents and signature clasp.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/signature-product-1.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Embody West Coast luxury with this exclusive ensemble. Iconic blue rose and vibrant Bay Area skyline.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.jpg',
+		'edition'         => '200',
 	),
 	array(
 		'id'              => 'sg-002',
-		'name'            => esc_html__( 'Bridge View Cuff', 'skyyrose-flagship' ),
-		'price'           => '$1,899',
+		'name'            => esc_html__( 'Stay Golden Set', 'skyyrose-flagship' ),
+		'price'           => '$195',
 		'collection'      => 'signature',
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L',
-		'desc'            => esc_html__( 'Architectural cuff bracelet inspired by the Bay Bridge, in polished rose gold and gold vermeil.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/signature-product-2.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Embrace West Coast prestige. Luxurious statement of Bay Area style featuring signature rose.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-002-stay-golden.jpg',
+		'edition'         => '200',
 	),
 	array(
-		'id'              => 'sg-003',
-		'name'            => esc_html__( 'Golden Hour Earrings', 'skyyrose-flagship' ),
-		'price'           => '$1,299',
+		'id'              => 'sg-006',
+		'name'            => esc_html__( 'Mint & Lavender Hoodie', 'skyyrose-flagship' ),
+		'price'           => '$145',
 		'collection'      => 'signature',
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'OS',
-		'desc'            => esc_html__( 'Gradient earrings that transition from rose gold to warm gold, capturing the magic of golden hour.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/signature-product-3.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Elevated comfort where refreshing mint meets opulent lavender artistry. Bay Area luxury.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-006-mint-lavender.jpg',
+		'edition'         => '200',
 	),
 	array(
-		'id'              => 'sg-004',
-		'name'            => esc_html__( 'Skyline Ring', 'skyyrose-flagship' ),
-		'price'           => '$1,699',
+		'id'              => 'sg-009',
+		'name'            => esc_html__( 'The Sherpa Jacket', 'skyyrose-flagship' ),
+		'price'           => '$295',
 		'collection'      => 'signature',
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => '5,6,7,8,9',
-		'desc'            => esc_html__( 'A skyline silhouette etched into a wide band of 18k rose gold with champagne diamond baguettes.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/signature-product-4.jpg',
+		'sizes'           => 'S,M,L,XL,2XL,3XL',
+		'desc'            => esc_html__( 'Opulent West Coast outerwear featuring signature rose embroidery on plush Sherpa.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-009-sherpa.jpg',
+		'edition'         => '100',
 	),
 	array(
-		'id'              => 'sg-011',
-		'name'            => esc_html__( 'Rose Gold Signature Beanie', 'skyyrose-flagship' ),
-		'price'           => '$149',
+		'id'              => 'sg-010',
+		'name'            => esc_html__( 'The Bridge Series Shorts', 'skyyrose-flagship' ),
+		'price'           => '$85',
 		'collection'      => 'signature',
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S/M,L/XL',
-		'desc'            => esc_html__( 'Premium cashmere-blend beanie with embroidered SR monogram in rose gold thread.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/scenes/signature-beanie-1.jpg',
+		'sizes'           => 'S,M,L,XL,2XL',
+		'desc'            => esc_html__( 'Bay Area iconic spirit in premium streetwear. Breathtaking panorama of bridges and skyline.', 'skyyrose-flagship' ),
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-010-bridge-shorts.jpg',
+		'edition'         => '200',
 	),
 );
 
@@ -204,6 +208,33 @@ get_header();
 			<a href="#" class="member-banner-cta" data-action="open-signin">
 				<?php echo esc_html__( 'Sign In for Access', 'skyyrose-flagship' ); ?>
 			</a>
+		</div>
+
+		<!-- Countdown Timer -->
+		<div class="preorder-countdown" aria-label="<?php esc_attr_e( 'Pre-order countdown', 'skyyrose-flagship' ); ?>">
+			<span class="countdown-label"><?php echo esc_html__( 'Pre-Order Window Closes In', 'skyyrose-flagship' ); ?></span>
+			<div class="countdown-timer" data-launch-date="2026-04-01T00:00:00">
+				<div class="countdown-unit">
+					<span class="countdown-value" data-unit="days">00</span>
+					<span class="countdown-unit-label"><?php echo esc_html__( 'Days', 'skyyrose-flagship' ); ?></span>
+				</div>
+				<span class="countdown-separator">:</span>
+				<div class="countdown-unit">
+					<span class="countdown-value" data-unit="hours">00</span>
+					<span class="countdown-unit-label"><?php echo esc_html__( 'Hours', 'skyyrose-flagship' ); ?></span>
+				</div>
+				<span class="countdown-separator">:</span>
+				<div class="countdown-unit">
+					<span class="countdown-value" data-unit="minutes">00</span>
+					<span class="countdown-unit-label"><?php echo esc_html__( 'Min', 'skyyrose-flagship' ); ?></span>
+				</div>
+				<span class="countdown-separator">:</span>
+				<div class="countdown-unit">
+					<span class="countdown-value" data-unit="seconds">00</span>
+					<span class="countdown-unit-label"><?php echo esc_html__( 'Sec', 'skyyrose-flagship' ); ?></span>
+				</div>
+			</div>
+			<span class="countdown-pieces"><?php echo esc_html__( 'Limited numbered pieces — each item individually numbered', 'skyyrose-flagship' ); ?></span>
 		</div>
 
 		<!-- Gateway Header -->
@@ -272,6 +303,14 @@ get_header();
 							<p class="product-grid-collection-label" data-label="<?php echo esc_attr( $product['collection'] ); ?>">
 								<?php echo esc_html( $product['collection_label'] ); ?>
 							</p>
+							<?php if ( ! empty( $product['edition'] ) ) : ?>
+								<p class="product-grid-edition">
+									<?php
+									/* translators: %s: number of limited pieces */
+									echo esc_html( sprintf( __( 'Limited to %s pieces', 'skyyrose-flagship' ), $product['edition'] ) );
+									?>
+								</p>
+							<?php endif; ?>
 						</div>
 					</article>
 				<?php endforeach; ?>
@@ -399,6 +438,39 @@ get_header();
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</button>
 	</nav>
+
+	<!-- Exclusive Incentive Popup — triggers after 15s or on exit intent -->
+	<div class="incentive-popup-overlay" aria-hidden="true">
+		<div class="incentive-popup" role="dialog" aria-label="<?php esc_attr_e( 'Exclusive early access offer', 'skyyrose-flagship' ); ?>">
+			<button class="incentive-popup-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
+			<div class="incentive-popup-content">
+				<div class="incentive-popup-monogram"><?php echo esc_html__( 'SR', 'skyyrose-flagship' ); ?></div>
+				<h3 class="incentive-popup-title"><?php echo esc_html__( 'Unlock Early Access', 'skyyrose-flagship' ); ?></h3>
+				<p class="incentive-popup-subtitle"><?php echo esc_html__( 'Get 25% off your first pre-order + 48hr early access to every collection drop.', 'skyyrose-flagship' ); ?></p>
+				<form class="incentive-popup-form" method="post" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>">
+					<input type="hidden" name="action" value="skyyrose_incentive_signup">
+					<?php wp_nonce_field( 'skyyrose_incentive', 'skyyrose_incentive_nonce' ); ?>
+					<input
+						class="incentive-popup-input"
+						type="email"
+						name="email"
+						placeholder="<?php esc_attr_e( 'Your email address', 'skyyrose-flagship' ); ?>"
+						required
+						autocomplete="email"
+					>
+					<input
+						class="incentive-popup-input"
+						type="tel"
+						name="phone"
+						placeholder="<?php esc_attr_e( 'Phone for SMS alerts (optional)', 'skyyrose-flagship' ); ?>"
+						autocomplete="tel"
+					>
+					<button class="incentive-popup-submit" type="submit"><?php echo esc_html__( 'Get Early Access', 'skyyrose-flagship' ); ?></button>
+				</form>
+				<p class="incentive-popup-fine"><?php echo esc_html__( 'No spam. Unsubscribe anytime. Numbered pieces sell out fast.', 'skyyrose-flagship' ); ?></p>
+			</div>
+		</div>
+	</div>
 
 </main><!-- #primary -->
 
