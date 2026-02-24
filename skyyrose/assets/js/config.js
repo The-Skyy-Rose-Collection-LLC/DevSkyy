@@ -20,12 +20,20 @@ const CONFIG = {
         jpeg: 'assets/images/scenes/love-hurts-ballroom-mobile.jpg'
       }
     },
-    'signature': {
-      webp: 'assets/images/scenes/signature-runway-dark-desktop.webp',
-      jpeg: 'assets/images/scenes/signature-runway-dark-desktop.jpg',
+    'signature-waterfront': {
+      png: '../assets/scenes/signature/signature-waterfront-runway.png',
+      jpeg: '../assets/scenes/signature/signature-waterfront-runway.png',
       mobile: {
-        webp: 'assets/images/scenes/signature-runway-dark-mobile.webp',
-        jpeg: 'assets/images/scenes/signature-runway-dark-mobile.jpg'
+        png: '../assets/scenes/signature/signature-waterfront-runway.png',
+        jpeg: '../assets/scenes/signature/signature-waterfront-runway.png'
+      }
+    },
+    'signature-showroom': {
+      png: '../assets/scenes/signature/signature-golden-gate-showroom.png',
+      jpeg: '../assets/scenes/signature/signature-golden-gate-showroom.png',
+      mobile: {
+        png: '../assets/scenes/signature/signature-golden-gate-showroom.png',
+        jpeg: '../assets/scenes/signature/signature-golden-gate-showroom.png'
       }
     }
   },
@@ -257,114 +265,364 @@ const CONFIG = {
       ]
     },
     {
-      id: 'signature',
+      id: 'signature-waterfront',
       collection: 'SIGNATURE',
-      name: 'The Runway',
+      name: 'Waterfront Runway',
       accent: '#D4AF37',
-      description: 'High fashion meets editorial excellence',
+      description: 'Bay Bridge waterfront — black marble platform, gold-lit display frames',
       hotspots: [
         {
-          x: 35,
-          y: 40,
+          x: 15, y: 42,
           product: {
-            id: 'sg-001',
-            collection: 'SIGNATURE',
+            id: 'sg-009', collection: 'SIGNATURE',
+            name: 'Red Rose Beanie',
+            tagline: 'Signature warmth, rose-embroidered',
+            description: 'The Signature Collection Red Rose Beanie — fine knit, embroidered rose emblem, West Coast prestige.',
+            price: '$45',
+            spec: 'Fine Knit Yarn • Embroidered Rose • One Size',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-009/sg-009-model.jpg',
+            url: '/?product_id=sg-009',
+            variants: { sizes: ['One Size'], colors: [{ name: 'Red', hex: '#C0392B' }] }
+          }
+        },
+        {
+          x: 20, y: 48,
+          product: {
+            id: 'sg-010', collection: 'SIGNATURE',
+            name: 'Lavender Rose Beanie',
+            tagline: 'Soft lavender, bold statement',
+            description: 'The Signature Collection Lavender Rose Beanie — luxurious knit with embroidered rose in soft lavender.',
+            price: '$45',
+            spec: 'Fine Knit Yarn • Embroidered Rose • One Size',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-010/sg-010-model.jpg',
+            url: '/?product_id=sg-010',
+            variants: { sizes: ['One Size'], colors: [{ name: 'Lavender', hex: '#7D3C98' }] }
+          }
+        },
+        {
+          x: 28, y: 55,
+          product: {
+            id: 'sg-006', collection: 'SIGNATURE',
+            name: 'Cotton Candy Tee',
+            tagline: 'Sweet tones, premium fabric',
+            description: 'The Signature Collection Cotton Candy Tee — pastel luxury in premium cotton with the SR monogram.',
+            price: '$65',
+            spec: 'Premium Cotton • SR Monogram • Relaxed Fit',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-006/sg-006-model.jpg',
+            url: '/?product_id=sg-006',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Cotton Candy', hex: '#F8B4D9' }] }
+          }
+        },
+        {
+          x: 32, y: 62,
+          product: {
+            id: 'sg-007', collection: 'SIGNATURE',
+            name: 'Cotton Candy Shorts',
+            tagline: 'Matching comfort, pastel luxury',
+            description: 'The Signature Collection Cotton Candy Shorts — pair with the Cotton Candy Tee for a complete pastel set.',
+            price: '$55',
+            spec: 'Premium Fabric • Elastic Waistband • Matching Set Available',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-007/sg-007-model.jpg',
+            url: '/?product_id=sg-007',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Cotton Candy', hex: '#F8B4D9' }] }
+          }
+        },
+        {
+          x: 42, y: 35,
+          product: {
+            id: 'sg-002', collection: 'SIGNATURE',
+            name: 'Stay Golden Tee',
+            tagline: 'Golden hour, every hour',
+            description: 'Stay Golden Tee — elevated everyday style with the golden SkyyRose touch. Premium cotton, timeless design.',
+            price: '$65',
+            spec: 'Premium Cotton • Gold Print • Relaxed Fit',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-002/sg-002-model.jpg',
+            url: '/?product_id=sg-002',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'White/Gold', hex: '#F5F5F5' }] }
+          }
+        },
+        {
+          x: 50, y: 38,
+          product: {
+            id: 'sg-004', collection: 'SIGNATURE',
+            name: 'Signature Hoodie',
+            tagline: 'The definitive SkyyRose statement',
+            description: 'The Signature Hoodie — premium cotton fleece with embroidered SkyyRose crest. The centerpiece of the collection.',
+            price: '$145',
+            spec: 'Premium Cotton Fleece • Kangaroo Pocket • Embroidered Crest',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-004/sg-004-model.jpg',
+            url: '/?product_id=sg-004',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'], colors: [{ name: 'Black', hex: '#1A1A1A' }] }
+          }
+        },
+        {
+          x: 62, y: 36,
+          product: {
+            id: 'sg-008', collection: 'SIGNATURE',
+            name: 'Crop Hoodie',
+            tagline: 'Cropped luxury, full statement',
+            description: 'The Signature Crop Hoodie — the same premium cotton fleece in a cropped silhouette for bold Bay Area style.',
+            price: '$125',
+            spec: 'Premium Cotton Fleece • Cropped Cut • Drawstring Hood',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-008/sg-008-model.jpg',
+            url: '/?product_id=sg-008',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL'], colors: [{ name: 'Black', hex: '#1A1A1A' }] }
+          }
+        },
+        {
+          x: 70, y: 55,
+          product: {
+            id: 'sg-005', collection: 'SIGNATURE',
+            name: 'Signature Shorts',
+            tagline: 'Effortless West Coast style',
+            description: 'The Signature Shorts — lightweight premium fabric with the SR monogram. Pairs with any Signature tee.',
+            price: '$55',
+            spec: 'Premium Fabric • Elastic Waistband • SR Monogram',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-005/sg-005-model.jpg',
+            url: '/?product_id=sg-005',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Black', hex: '#1A1A1A' }] }
+          }
+        },
+        {
+          x: 75, y: 60,
+          product: {
+            id: 'sg-001', collection: 'SIGNATURE',
             name: 'The Bay Set',
             tagline: 'West Coast prestige, elevated',
-            description: 'The Bay Set: embody West Coast luxury with this SIGNATURE collection ensemble. Featuring the iconic blue rose and a vibrant Bay Area skyline.',
+            description: 'The Bay Set: embody West Coast luxury with this SIGNATURE collection ensemble. Iconic blue rose and Bay Area skyline.',
             price: '$225',
             spec: 'Premium Fabric • Tee + Shorts Set • Bay Bridge Design',
             badge: 'PRE-ORDER',
             image: 'assets/images/products/sg-001/sg-001-model.jpg',
             url: '/?product_id=sg-001',
-            variants: {
-              sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-              colors: [{ name: 'White/Blue', hex: '#F5F5F5' }]
-            }
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'], colors: [{ name: 'White/Blue', hex: '#F5F5F5' }] }
           }
         },
         {
-          x: 60,
-          y: 35,
+          x: 38, y: 72,
           product: {
-            id: 'sg-006',
-            collection: 'SIGNATURE',
-            name: 'Mint & Lavender Hoodie',
-            tagline: 'Bay Area luxury, effortless comfort',
-            description: 'Experience elevated comfort with the Mint & Lavender Hoodie — where a refreshing mint base meets opulent lavender artistry.',
+            id: 'sg-011', collection: 'SIGNATURE',
+            name: 'Original Label Tee (White)',
+            tagline: 'The original SkyyRose label',
+            description: 'Original Label Tee in White — the foundational piece featuring the original SkyyRose label design.',
+            price: '$55',
+            spec: 'Premium Cotton • Original Label Print • Classic Fit',
+            badge: 'AVAILABLE',
+            image: 'assets/images/products/sg-011/sg-011-model.jpg',
+            url: '/?product_id=sg-011',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'White', hex: '#F5F5F5' }] }
+          }
+        },
+        {
+          x: 58, y: 72,
+          product: {
+            id: 'sg-012', collection: 'SIGNATURE',
+            name: 'Original Label Tee (Orchid)',
+            tagline: 'The original label in orchid',
+            description: 'Original Label Tee in Orchid — the same foundational design in a striking orchid colorway.',
+            price: '$55',
+            spec: 'Premium Cotton • Original Label Print • Classic Fit',
+            badge: 'AVAILABLE',
+            image: 'assets/images/products/sg-012/sg-012-model.jpg',
+            url: '/?product_id=sg-012',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Orchid', hex: '#9B59B6' }] }
+          }
+        }
+      ]
+    },
+    {
+      id: 'signature-showroom',
+      collection: 'SIGNATURE',
+      name: 'Golden Gate Showroom',
+      accent: '#D4AF37',
+      description: 'Golden Gate sunset showroom — panoramic windows, marble interior',
+      hotspots: [
+        {
+          x: 15, y: 35,
+          product: {
+            id: 'sg-004', collection: 'SIGNATURE',
+            name: 'Signature Hoodie',
+            tagline: 'The definitive SkyyRose statement',
+            description: 'The Signature Hoodie — premium cotton fleece with embroidered SkyyRose crest.',
             price: '$145',
-            spec: 'Premium Soft-Touch • Kangaroo Pocket • Ribbed Cuffs',
-            badge: 'AVAILABLE',
-            image: 'assets/images/products/sg-006/sg-006-model.jpg',
-            url: '/?product_id=sg-006',
-            variants: {
-              sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-              colors: [{ name: 'Mint/Lavender', hex: '#B8E0D2' }]
-            }
+            spec: 'Premium Cotton Fleece • Kangaroo Pocket • Embroidered Crest',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-004/sg-004-model.jpg',
+            url: '/?product_id=sg-004',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'], colors: [{ name: 'Black', hex: '#1A1A1A' }] }
           }
         },
         {
-          x: 75,
-          y: 55,
+          x: 22, y: 40,
           product: {
-            id: 'sg-003',
-            collection: 'SIGNATURE',
-            name: 'The Signature Tee — Orchid',
-            tagline: 'Elevated everyday luxury',
-            description: 'The Signature Tee in Orchid: embody elevated style with this premium staple, showcasing SkyyRose\'s commitment to couture-level everyday luxury.',
-            price: '$65',
-            spec: 'Premium Cotton • SR Monogram Label • Orchid Colorway',
-            badge: 'AVAILABLE',
+            id: 'sg-003', collection: 'SIGNATURE',
+            name: 'Pink Smoke Crewneck',
+            tagline: 'Soft smoke, bold luxury',
+            description: 'The Pink Smoke Crewneck — where subtle pink meets premium construction. A Signature Collection essential.',
+            price: '$95',
+            spec: 'Premium Cotton • Crew Neck • Relaxed Oversized Fit',
+            badge: 'PRE-ORDER',
             image: 'assets/images/products/sg-003/sg-003-model.jpg',
             url: '/?product_id=sg-003',
-            variants: {
-              sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'],
-              colors: [{ name: 'Orchid', hex: '#9B59B6' }]
-            }
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'], colors: [{ name: 'Pink Smoke', hex: '#E8B4B8' }] }
           }
         },
         {
-          x: 45,
-          y: 65,
+          x: 50, y: 52,
           product: {
-            id: 'sg-007',
-            collection: 'SIGNATURE',
-            name: 'The Signature Beanie',
-            tagline: 'Elevated style, West Coast prestige',
-            description: 'Elevate your everyday with the SkyyRose Signature Beanie: a luxurious knit, bespoke comfort, and a bold statement of West Coast prestige.',
+            id: 'sg-001', collection: 'SIGNATURE',
+            name: 'The Bay Set',
+            tagline: 'West Coast prestige, elevated',
+            description: 'The Bay Set: embody West Coast luxury with this SIGNATURE collection ensemble. Center stage, featured.',
+            price: '$225',
+            spec: 'Premium Fabric • Tee + Shorts Set • Bay Bridge Design',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-001/sg-001-model.jpg',
+            url: '/?product_id=sg-001',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'], colors: [{ name: 'White/Blue', hex: '#F5F5F5' }] }
+          }
+        },
+        {
+          x: 32, y: 48,
+          product: {
+            id: 'sg-009', collection: 'SIGNATURE',
+            name: 'Red Rose Beanie',
+            tagline: 'Signature warmth, rose-embroidered',
+            description: 'The Signature Collection Red Rose Beanie on the left marble pedestal.',
             price: '$45',
-            spec: 'Fine Knit Yarn • Embroidered Rose Emblem • Available in 3 Colors',
-            badge: 'AVAILABLE',
-            image: 'assets/images/products/sg-007/sg-007-model.jpg',
-            url: '/?product_id=sg-007',
-            variants: {
-              sizes: ['One Size'],
-              colors: [
-                { name: 'Red',    hex: '#C0392B' },
-                { name: 'Purple', hex: '#7D3C98' },
-                { name: 'Black',  hex: '#1A1A1A' }
-              ]
-            }
-          }
-        },
-        {
-          x: 85,
-          y: 45,
-          product: {
-            id: 'sg-009',
-            collection: 'SIGNATURE',
-            name: 'The Sherpa Jacket',
-            tagline: 'Command attention, wear your legacy',
-            description: 'Command attention in the SkyyRose Signature Sherpa Jacket — opulent West Coast outerwear featuring signature rose embroidery. Pre-order your legacy.',
-            price: '$295',
-            spec: 'Premium Shell • Sherpa Interior • Signature Rose Embroidery',
+            spec: 'Fine Knit Yarn • Embroidered Rose • One Size',
             badge: 'PRE-ORDER',
             image: 'assets/images/products/sg-009/sg-009-model.jpg',
             url: '/?product_id=sg-009',
-            variants: {
-              sizes: ['S', 'M', 'L', 'XL', '2XL', '3XL'],
-              colors: [{ name: 'Black', hex: '#000000' }]
-            }
+            variants: { sizes: ['One Size'], colors: [{ name: 'Red', hex: '#C0392B' }] }
+          }
+        },
+        {
+          x: 68, y: 48,
+          product: {
+            id: 'sg-010', collection: 'SIGNATURE',
+            name: 'Lavender Rose Beanie',
+            tagline: 'Soft lavender, bold statement',
+            description: 'The Signature Collection Lavender Rose Beanie on the right marble pedestal.',
+            price: '$45',
+            spec: 'Fine Knit Yarn • Embroidered Rose • One Size',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-010/sg-010-model.jpg',
+            url: '/?product_id=sg-010',
+            variants: { sizes: ['One Size'], colors: [{ name: 'Lavender', hex: '#7D3C98' }] }
+          }
+        },
+        {
+          x: 78, y: 35,
+          product: {
+            id: 'sg-008', collection: 'SIGNATURE',
+            name: 'Crop Hoodie',
+            tagline: 'Cropped luxury, full statement',
+            description: 'The Signature Crop Hoodie hanging on the right wall clothing rack.',
+            price: '$125',
+            spec: 'Premium Cotton Fleece • Cropped Cut • Drawstring Hood',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-008/sg-008-model.jpg',
+            url: '/?product_id=sg-008',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL'], colors: [{ name: 'Black', hex: '#1A1A1A' }] }
+          }
+        },
+        {
+          x: 85, y: 40,
+          product: {
+            id: 'sg-002', collection: 'SIGNATURE',
+            name: 'Stay Golden Tee',
+            tagline: 'Golden hour, every hour',
+            description: 'Stay Golden Tee hanging on the right wall clothing rack in the showroom.',
+            price: '$65',
+            spec: 'Premium Cotton • Gold Print • Relaxed Fit',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-002/sg-002-model.jpg',
+            url: '/?product_id=sg-002',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'White/Gold', hex: '#F5F5F5' }] }
+          }
+        },
+        {
+          x: 18, y: 58,
+          product: {
+            id: 'sg-005', collection: 'SIGNATURE',
+            name: 'Signature Shorts',
+            tagline: 'Effortless West Coast style',
+            description: 'The Signature Shorts folded on the left wall shelf.',
+            price: '$55',
+            spec: 'Premium Fabric • Elastic Waistband • SR Monogram',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-005/sg-005-model.jpg',
+            url: '/?product_id=sg-005',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Black', hex: '#1A1A1A' }] }
+          }
+        },
+        {
+          x: 25, y: 62,
+          product: {
+            id: 'sg-006', collection: 'SIGNATURE',
+            name: 'Cotton Candy Tee',
+            tagline: 'Sweet tones, premium fabric',
+            description: 'Cotton Candy Tee folded on the left wall shelf in the showroom.',
+            price: '$65',
+            spec: 'Premium Cotton • SR Monogram • Relaxed Fit',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-006/sg-006-model.jpg',
+            url: '/?product_id=sg-006',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Cotton Candy', hex: '#F8B4D9' }] }
+          }
+        },
+        {
+          x: 75, y: 58,
+          product: {
+            id: 'sg-007', collection: 'SIGNATURE',
+            name: 'Cotton Candy Shorts',
+            tagline: 'Matching comfort, pastel luxury',
+            description: 'Cotton Candy Shorts on the right wall display in the showroom.',
+            price: '$55',
+            spec: 'Premium Fabric • Elastic Waistband • Matching Set',
+            badge: 'PRE-ORDER',
+            image: 'assets/images/products/sg-007/sg-007-model.jpg',
+            url: '/?product_id=sg-007',
+            variants: { sizes: ['S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Cotton Candy', hex: '#F8B4D9' }] }
+          }
+        },
+        {
+          x: 82, y: 58,
+          product: {
+            id: 'sg-011', collection: 'SIGNATURE',
+            name: 'Original Label Tee (White)',
+            tagline: 'The original SkyyRose label',
+            description: 'Original Label Tee in White on the right wall display.',
+            price: '$55',
+            spec: 'Premium Cotton • Original Label Print • Classic Fit',
+            badge: 'AVAILABLE',
+            image: 'assets/images/products/sg-011/sg-011-model.jpg',
+            url: '/?product_id=sg-011',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'White', hex: '#F5F5F5' }] }
+          }
+        },
+        {
+          x: 88, y: 62,
+          product: {
+            id: 'sg-012', collection: 'SIGNATURE',
+            name: 'Original Label Tee (Orchid)',
+            tagline: 'The original label in orchid',
+            description: 'Original Label Tee in Orchid on the right wall display.',
+            price: '$55',
+            spec: 'Premium Cotton • Original Label Print • Classic Fit',
+            badge: 'AVAILABLE',
+            image: 'assets/images/products/sg-012/sg-012-model.jpg',
+            url: '/?product_id=sg-012',
+            variants: { sizes: ['XS', 'S', 'M', 'L', 'XL', '2XL'], colors: [{ name: 'Orchid', hex: '#9B59B6' }] }
           }
         }
       ]
