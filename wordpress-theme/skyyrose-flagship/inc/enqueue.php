@@ -513,6 +513,45 @@ function skyyrose_enqueue_aurora_engine() {
 }
 
 /**
+ * Enqueue Magnetic Obsidian — Conversion Intelligence Engine.
+ *
+ * Loads magnetic 3D product card effects, immersive hotspot magnetism,
+ * exit-intent capture overlay, A/B variant assignment, and conversion
+ * tracking on all customer-facing pages.
+ *
+ * @since 3.5.0
+ * @return void
+ */
+function skyyrose_enqueue_magnetic_obsidian() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/magnetic-obsidian.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-magnetic-obsidian',
+			SKYYROSE_ASSETS_URI . '/css/magnetic-obsidian.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/magnetic-obsidian.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-magnetic-obsidian',
+			SKYYROSE_ASSETS_URI . '/js/magnetic-obsidian.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -584,6 +623,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-social-proof',
 		'skyyrose-the-pulse',
 		'skyyrose-aurora-engine',
+		'skyyrose-magnetic-obsidian',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -673,6 +713,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_the_pulse', 32 );
 
 // Aurora — Ambient Engagement Engine on customer-facing pages (priority 34, after Pulse).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_aurora_engine', 34 );
+
+// Magnetic Obsidian — Conversion Intelligence Engine (priority 36, after Aurora).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_magnetic_obsidian', 36 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
