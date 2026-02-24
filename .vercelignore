@@ -114,7 +114,8 @@ coverage.xml
 Thumbs.db
 .DS_Store
 
-# Lock files (keep frontend locks for deterministic builds)
+# Lock files — keep frontend/package-lock.json for npm, ignore pnpm
+pnpm-lock.yaml
 yarn.lock
 poetry.lock
 Pipfile.lock
