@@ -4,13 +4,15 @@ Complete integration with Google's Gemini API
 Updated for new google-genai SDK (v1.59.0+)
 """
 
-import os
 import json
+import os
 import time
+from collections.abc import Generator
 from pathlib import Path
-from typing import Optional, List, Dict, Any, Generator
-from google import genai
+from typing import Any
+
 from dotenv import load_dotenv
+from google import genai
 
 # Load environment variables
 load_dotenv(Path(__file__).parent.parent / '.env')
@@ -19,7 +21,7 @@ load_dotenv(Path(__file__).parent.parent / '.env')
 class GeminiClient:
     """Google Gemini AI client with rate limiting and error handling"""
 
-    def __init__(self, api_key: Optional[str] = None, **options):
+    def __init__(self, api_key: str | None = None, **options):
         self.api_key = api_key or os.getenv('GEMINI_API_KEY')
 
         if not self.api_key:
@@ -73,9 +75,9 @@ class GeminiClient:
     def generate_content(
         self,
         prompt: str,
-        model: Optional[str] = None,
+        model: str | None = None,
         **config
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Generate content from text prompt"""
         self._rate_limit()
 
@@ -108,9 +110,9 @@ class GeminiClient:
     def generate_content_stream(
         self,
         prompt: str,
-        model: Optional[str] = None,
+        model: str | None = None,
         **config
-    ) -> Generator[Dict[str, Any], None, None]:
+    ) -> Generator[dict[str, Any], None, None]:
         """Generate content with streaming"""
         self._rate_limit()
 
@@ -143,8 +145,8 @@ class GeminiClient:
 
     def start_chat(
         self,
-        history: Optional[List[Dict[str, str]]] = None,
-        model: Optional[str] = None,
+        history: list[dict[str, str]] | None = None,
+        model: str | None = None,
         **config
     ):
         """Start a chat conversation"""
@@ -196,11 +198,11 @@ class GeminiClient:
 
     def analyze_image(
         self,
-        image_path: Optional[str] = None,
-        image_data: Optional[Any] = None,
+        image_path: str | None = None,
+        image_data: Any | None = None,
         prompt: str = "Describe this image",
         model: str = 'gemini-2.5-flash'
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """Analyze an image"""
         self._rate_limit()
 
@@ -240,7 +242,7 @@ class GeminiClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def count_tokens(self, text: str, model: Optional[str] = None) -> int:
+    def count_tokens(self, text: str, model: str | None = None) -> int:
         """Count tokens in text"""
         model_name = model or self.default_model
 
@@ -253,7 +255,7 @@ class GeminiClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def embed_content(self, text: str, model: str = 'text-embedding-004') -> List[float]:
+    def embed_content(self, text: str, model: str = 'text-embedding-004') -> list[float]:
         """Embed text for semantic search"""
         self._rate_limit()
 
@@ -266,7 +268,7 @@ class GeminiClient:
         except Exception as e:
             return self._handle_error(e)
 
-    def _handle_error(self, error: Exception) -> Dict[str, Any]:
+    def _handle_error(self, error: Exception) -> dict[str, Any]:
         """Handle API errors"""
         error_response = {
             'error': True,
@@ -291,7 +293,7 @@ class GeminiClient:
 
         raise Exception(error_response)
 
-    def get_available_models(self) -> List[Dict[str, Any]]:
+    def get_available_models(self) -> list[dict[str, Any]]:
         """Get available models from config"""
         return self.model_configs['models']
 

@@ -162,6 +162,10 @@ jest.mock('three', () => ({
   AdditiveBlending: 2,
   NormalBlending: 1,
   MathUtils: { lerp: jest.fn((a, b, t) => a + (b - a) * t) },
+  CanvasTexture: jest.fn(() => ({ isTexture: true, needsUpdate: false })),
+  Sprite: jest.fn(() => ({ position: { set: jest.fn(), x: 0, y: 0, z: 0 }, scale: { set: jest.fn(), x: 1, y: 1, z: 1 }, material: { dispose: jest.fn() } })),
+  SpriteMaterial: jest.fn(() => ({ dispose: jest.fn(), clone: jest.fn().mockReturnValue({ dispose: jest.fn() }) })),
+  Object3D: jest.fn(() => ({ position: { set: jest.fn(), x: 0, y: 0, z: 0 }, rotation: { set: jest.fn(), x: 0, y: 0, z: 0 }, scale: { set: jest.fn(), x: 1, y: 1, z: 1 }, add: jest.fn(), remove: jest.fn(), children: [], userData: {}, traverse: jest.fn() })),
 }));
 
 // Mock OrbitControls

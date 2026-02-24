@@ -1,17 +1,15 @@
 """Tests for AgentRuntime — the bridge from AgentSpec to LLM execution."""
 
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 
 from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec
-from agents.provider_adapters import LLMMessage, LLMResponse
+from agents.provider_adapters import LLMResponse
 from agents.runtime import AgentRuntime
 from core.ground_truth import GroundTruthValidator
 from core.learning_journal import LearningJournal
 from core.model_router import ModelRouter, RoutingConfig
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

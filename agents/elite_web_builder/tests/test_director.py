@@ -5,20 +5,17 @@ from __future__ import annotations
 from unittest.mock import AsyncMock, patch
 
 import pytest
-
-from agents.base import AgentOutput, AgentRole
-from agents.provider_adapters import LLMResponse
-from agents.runtime import AgentRuntime
 from director import (
     Director,
-    DirectorConfig,
     PRDBreakdown,
     StoryStatus,
     UserStory,
 )
-from core.model_router import RoutingConfig
-from core.verification_loop import Gate, GateResult, GateStatus
 
+from agents.base import AgentOutput, AgentRole
+from agents.provider_adapters import LLMResponse
+from agents.runtime import AgentRuntime
+from core.verification_loop import Gate, GateResult, GateStatus
 
 # ---------------------------------------------------------------------------
 # StoryStatus

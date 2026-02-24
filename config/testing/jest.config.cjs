@@ -100,6 +100,10 @@ module.exports = {
     '/build/',
     '/.next/',
     '/.nuxt/',
+    '/wordpress-theme/.*/tests/e2e/',
+    '/frontend/e2e/',
+    '/frontend/tests/e2e/',
+    '\\.spec\\.(ts|js)$',
   ],
 
   // Transform node_modules that use ESM (like three.js)

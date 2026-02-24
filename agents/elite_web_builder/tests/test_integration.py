@@ -13,15 +13,19 @@ import json
 from pathlib import Path
 
 import pytest
+from director import (
+    Director,
+    StoryStatus,
+    UserStory,
+)
+from tools.contrast_checker import check_contrast
+from tools.spacing_scale import generate_spacing_scale
+from tools.type_scale import generate_type_scale
 
-from agents.base import AgentCapability, AgentOutput, AgentRole, AgentSpec
+from agents.base import AgentOutput, AgentRole
 from agents.design_system import DESIGN_SYSTEM_SPEC
-from agents.frontend_dev import FRONTEND_DEV_SPEC
-from agents.backend_dev import BACKEND_DEV_SPEC
-from agents.accessibility import ACCESSIBILITY_SPEC
 from core.ground_truth import ClaimType, GroundTruthValidator
 from core.learning_journal import JournalEntry, LearningJournal
-from core.model_router import ModelRouter, RoutingConfig
 from core.ralph_integration import RalphConfig, RalphExecutor
 from core.self_healer import SelfHealer
 from core.verification_loop import (
@@ -31,17 +35,6 @@ from core.verification_loop import (
     VerificationConfig,
     VerificationLoop,
 )
-from director import (
-    Director,
-    DirectorConfig,
-    PRDBreakdown,
-    StoryStatus,
-    UserStory,
-)
-from tools.contrast_checker import check_contrast
-from tools.type_scale import generate_type_scale
-from tools.spacing_scale import generate_spacing_scale
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

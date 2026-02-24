@@ -6,8 +6,9 @@ TDD RED Phase — Handlers consume Events and update denormalized read models.
 Idempotency is critical: replaying the same event twice must produce the same state.
 """
 
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
 
 from core.events.event_handlers import ProductEventHandler
 from core.events.event_store import Event

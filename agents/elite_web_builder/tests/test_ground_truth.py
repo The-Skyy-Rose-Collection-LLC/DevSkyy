@@ -8,10 +8,8 @@ sanitization, and common hallucination patterns.
 """
 
 import json
-import os
-import tempfile
 from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -21,7 +19,6 @@ from core.ground_truth import (
     ValidationResult,
     ValidationSeverity,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

@@ -7,11 +7,6 @@ orchestration without requiring actual API credentials.
 
 import asyncio
 import json
-import os
-import tempfile
-import uuid
-from pathlib import Path
-from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
 
@@ -48,7 +43,7 @@ class TestPydanticModels:
         assert a.latency_ms == 1234.5
 
     def test_vision_spec(self):
-        from skyyrose.skyyrose_elite_studio import ProviderAnalysis, VisionSpec
+        from skyyrose.skyyrose_elite_studio import VisionSpec
 
         spec = VisionSpec(
             sku="br-001",

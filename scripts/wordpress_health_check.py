@@ -12,11 +12,11 @@ Usage:
 import asyncio
 import json
 import sys
-from datetime import datetime
-from typing import Dict, List, Optional
 from dataclasses import dataclass, field
-import httpx
+from datetime import datetime
 from pathlib import Path
+
+import httpx
 
 # Add parent directory to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent))
@@ -28,7 +28,7 @@ class HealthCheckResult:
     component: str
     status: str  # ✅ | ⚠️ | ❌
     message: str
-    details: Dict = field(default_factory=dict)
+    details: dict = field(default_factory=dict)
     priority: str = "MEDIUM"  # CRITICAL | HIGH | MEDIUM | LOW
 
 
@@ -50,11 +50,11 @@ class WordPressHealthCheck:
 
     def __init__(self, site_url: str):
         self.site_url = site_url.rstrip('/')
-        self.results: List[HealthCheckResult] = []
-        self.pages: List[PageCheck] = []
+        self.results: list[HealthCheckResult] = []
+        self.pages: list[PageCheck] = []
         self.theme_dir = Path(__file__).parent.parent / "wordpress-theme" / "skyyrose-2025"
 
-    async def run_full_check(self) -> Dict:
+    async def run_full_check(self) -> dict:
         """Execute full health check."""
         print("🔍 Starting SkyyRose WordPress Health Check")
         print(f"🌐 Site: {self.site_url}")
@@ -91,7 +91,7 @@ class WordPressHealthCheck:
                     self.results.append(HealthCheckResult(
                         component="WordPress Core",
                         status="✅",
-                        message=f"WordPress accessible via REST API",
+                        message="WordPress accessible via REST API",
                         details={"version": wp_version},
                         priority="HIGH"
                     ))
@@ -115,7 +115,7 @@ class WordPressHealthCheck:
         if self.theme_dir.exists():
             style_css = self.theme_dir / "style.css"
             if style_css.exists():
-                with open(style_css, 'r') as f:
+                with open(style_css) as f:
                     content = f.read()
                     version = None
                     for line in content.split('\n'):
@@ -306,7 +306,7 @@ class WordPressHealthCheck:
         except:
             return False
 
-    def generate_report(self) -> Dict:
+    def generate_report(self) -> dict:
         """Generate comprehensive health check report."""
         print("\n" + "=" * 80)
         print("📊 SKYYROSE WORDPRESS HEALTH CHECK REPORT")

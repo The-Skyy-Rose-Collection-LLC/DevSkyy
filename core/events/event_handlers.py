@@ -35,7 +35,7 @@ class ProductEventHandler:
     support schema evolution.
     """
 
-    async def handle(self, event: "Event") -> None:
+    async def handle(self, event: Event) -> None:
         """
         Dispatch event to the appropriate handler method.
 
@@ -56,7 +56,7 @@ class ProductEventHandler:
             return
         await handler(event)
 
-    async def _on_product_created(self, event: "Event") -> None:
+    async def _on_product_created(self, event: Event) -> None:
         """Create denormalized product read view from ProductCreated event."""
         await self._upsert_product_view(
             {
@@ -70,24 +70,24 @@ class ProductEventHandler:
             }
         )
 
-    async def _on_product_price_changed(self, event: "Event") -> None:
+    async def _on_product_price_changed(self, event: Event) -> None:
         """Update price field in read model."""
         new_price = event.data.get("new_price", 0.0)
         await self._update_product_price(event.aggregate_id, new_price)
 
-    async def _on_product_deleted(self, event: "Event") -> None:
+    async def _on_product_deleted(self, event: Event) -> None:
         """Soft-delete product from read model."""
         await self._deactivate_product(event.aggregate_id)
 
-    async def _on_product_activated(self, event: "Event") -> None:
+    async def _on_product_activated(self, event: Event) -> None:
         """Mark product as active in read model."""
         await self._set_product_active(event.aggregate_id, is_active=True)
 
-    async def _on_product_deactivated(self, event: "Event") -> None:
+    async def _on_product_deactivated(self, event: Event) -> None:
         """Mark product as inactive in read model."""
         await self._set_product_active(event.aggregate_id, is_active=False)
 
-    async def _on_product_name_changed(self, event: "Event") -> None:
+    async def _on_product_name_changed(self, event: Event) -> None:
         """Update product name in read model."""
         await self._update_product_field(
             event.aggregate_id, "name", event.data.get("name", "")

@@ -23,15 +23,15 @@ Usage:
 
 from __future__ import annotations
 
-import asyncio
 import functools
 import hashlib
 import json
 import logging
 import os
-from typing import Any, Callable, Optional
+from collections.abc import Callable
+from typing import Any
 
-from cachetools import LRUCache, TTLCache
+from cachetools import TTLCache
 
 logger = logging.getLogger(__name__)
 
@@ -47,7 +47,7 @@ class MultiTierCache:
         self,
         l1_max_size: int = 1000,
         l1_ttl: int = 60,
-        redis_url: Optional[str] = None,
+        redis_url: str | None = None,
     ) -> None:
         # L1: In-memory TTLCache (combines LRU eviction with TTL expiration)
         self._l1: TTLCache = TTLCache(maxsize=l1_max_size, ttl=l1_ttl)
@@ -91,7 +91,7 @@ class MultiTierCache:
             self._redis_connected = False
         return self._redis_connected
 
-    async def _l2_get(self, key: str) -> Optional[Any]:
+    async def _l2_get(self, key: str) -> Any | None:
         """Get value from L2 (Redis)"""
         if not await self._ensure_redis():
             return None
@@ -121,7 +121,7 @@ class MultiTierCache:
         except Exception as e:
             logger.debug(f"L2 delete error: {e}")
 
-    async def get(self, key: str) -> Optional[Any]:
+    async def get(self, key: str) -> Any | None:
         """
         Get value from cache — checks L1 then L2.
 
@@ -228,7 +228,7 @@ class MultiTierCache:
 
 
 # Global shared cache instance (lazy init)
-_default_cache: Optional[MultiTierCache] = None
+_default_cache: MultiTierCache | None = None
 
 
 def get_cache() -> MultiTierCache:

@@ -1,7 +1,6 @@
 """Tests for 3D Generation Pipeline API endpoints."""
 
 import pytest
-from fastapi.testclient import TestClient
 
 pytestmark = pytest.mark.asyncio
 
@@ -140,13 +139,6 @@ class TestJobsList:
 
     async def test_list_jobs(self, client, auth_headers, mock_3d_job):
         """Test listing all jobs."""
-        mock_list.return_value = {
-            "jobs": [mock_3d_job],
-            "total": 1,
-            "page": 1,
-            "page_size": 20,
-        }
-
         response = await client.get("/api/v1/pipeline/jobs")
 
         assert response.status_code == 200
@@ -165,8 +157,6 @@ class TestSingleGeneration:
 
     async def test_generate_single_3d_model(self, client, auth_headers, mock_3d_result):
         """Test generating a single 3D model."""
-        mock_gen.return_value = mock_3d_result
-
         response = await client.post(
             "/api/v1/pipeline/generate",
             json={
@@ -184,8 +174,6 @@ class TestSingleGeneration:
 
     async def test_generate_with_default_quality(self, client, auth_headers):
         """Test generation with default quality settings."""
-        mock_gen.return_value = {"asset_id": "asset-1", "quality": "standard"}
-
         response = await client.post(
             "/api/v1/pipeline/generate",
             json={"asset_id": "asset-1"},
@@ -213,8 +201,6 @@ class TestFidelityQA:
             "approved": True,
         }
 
-        mock_fidelity.return_value = fidelity_data
-
         response = await client.get("/api/v1/pipeline/fidelity/asset-1")
 
         assert response.status_code == 200
@@ -224,8 +210,6 @@ class TestFidelityQA:
 
     async def test_approve_fidelity(self, client, auth_headers):
         """Test approving a 3D model's fidelity."""
-        mock_approve.return_value = {"asset_id": "asset-1", "approved": True}
-
         response = await client.post(
             "/api/v1/pipeline/fidelity/asset-1/approve",
             json={"approved": True},
@@ -235,8 +219,6 @@ class TestFidelityQA:
 
     async def test_reject_fidelity_with_regeneration(self, client, auth_headers):
         """Test rejecting fidelity and requesting regeneration."""
-        mock_reject.return_value = {"asset_id": "asset-1", "regenerate": True}
-
         response = await client.post(
             "/api/v1/pipeline/fidelity/asset-1/reject",
             json={
@@ -275,8 +257,6 @@ class TestProviders:
             ]
         }
 
-        mock_providers.return_value = providers
-
         response = await client.get("/api/v1/pipeline/providers")
 
         assert response.status_code == 200
@@ -285,13 +265,6 @@ class TestProviders:
 
     async def test_get_provider_status(self, client, auth_headers):
         """Test getting individual provider status."""
-        mock_status.return_value = {
-            "id": "tripo",
-            "available": True,
-            "queue_length": 5,
-            "est_wait_time": 300.0,
-        }
-
         response = await client.get("/api/v1/pipeline/providers/tripo")
 
         assert response.status_code == 200
@@ -312,14 +285,6 @@ class TestCostEstimation:
 
     async def test_estimate_batch_cost(self, client, auth_headers):
         """Test estimating cost for batch generation."""
-        mock_cost.return_value = {
-            "total_cost": 15.50,
-            "per_asset_cost": 0.50,
-            "asset_count": 31,
-            "provider": "tripo",
-            "quality": "high",
-        }
-
         response = await client.post(
             "/api/v1/pipeline/estimate",
             json={

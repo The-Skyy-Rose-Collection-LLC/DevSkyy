@@ -4,16 +4,15 @@ This module bridges ralph_wiggums resilience with the Elite Web Builder
 agent execution loop. Every external call goes through ralph-loop.
 """
 
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import AsyncMock
 
 import pytest
 
 from core.ralph_integration import (
+    ExecutionResult,
     RalphConfig,
     RalphExecutor,
-    ExecutionResult,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures

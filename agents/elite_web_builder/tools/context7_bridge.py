@@ -22,7 +22,7 @@ Usage:
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Any
 
 import aiohttp
@@ -98,18 +98,17 @@ class Context7Bridge:
         """Make a GET request to Context7 API."""
         url = f"{self.base_url}{path}"
         try:
-            async with aiohttp.ClientSession() as session:
-                async with session.get(
-                    url,
-                    params=params,
-                    timeout=aiohttp.ClientTimeout(total=self.timeout),
-                ) as resp:
-                    if resp.status != 200:
-                        body = await resp.text()
-                        raise Context7Error(
-                            f"Context7 API error {resp.status}: {body}"
-                        )
-                    return await resp.json()
+            async with aiohttp.ClientSession() as session, session.get(
+                url,
+                params=params,
+                timeout=aiohttp.ClientTimeout(total=self.timeout),
+            ) as resp:
+                if resp.status != 200:
+                    body = await resp.text()
+                    raise Context7Error(
+                        f"Context7 API error {resp.status}: {body}"
+                    )
+                return await resp.json()
         except aiohttp.ClientError as exc:
             raise Context7Error(f"Context7 request failed: {exc}") from exc
 

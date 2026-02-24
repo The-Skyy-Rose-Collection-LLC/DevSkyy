@@ -6,21 +6,19 @@ Resolver functions for product queries using DataLoader for efficient batching.
 List queries use @cached (5 min TTL) to avoid repeated DB calls for the same filters.
 """
 
-from typing import List, Optional
 
 from sqlalchemy import select
 
-from api.graphql.dataloaders.product_loader import ProductDataLoader
 from core.caching.multi_tier_cache import cached
 from database.db import DatabaseManager, Product
 
 
 @cached(ttl=300, key_prefix="products_list")
 async def get_products_from_db(
-    collection: Optional[str] = None,
+    collection: str | None = None,
     limit: int = 20,
     offset: int = 0,
-) -> List[Product]:
+) -> list[Product]:
     """
     Fetch products from database with optional collection filter.
 

@@ -28,9 +28,8 @@ import json
 import os
 import sys
 import time
-import uuid
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any
 
 # Load environment first
 from dotenv import load_dotenv
@@ -50,8 +49,9 @@ if _GEMINI_ENV.exists():
 # Provider imports
 from google import genai as google_genai
 from google.genai import types as genai_types
-import openai
+
 import anthropic
+import openai
 
 # ---------------------------------------------------------------------------
 # Configuration
@@ -562,8 +562,9 @@ def prepare_image_for_verification(image_path: str) -> tuple[bytes, str]:
     Prepare image for verification - resize and optimize for API limits.
     Returns (image_bytes, base64_data)
     """
-    from PIL import Image
     import io
+
+    from PIL import Image
 
     img = Image.open(image_path)
 
@@ -604,8 +605,9 @@ def verify_with_claude(
     """
     try:
         # Read and resize image if needed (Claude has 5MB limit per image)
-        from PIL import Image
         import io
+
+        from PIL import Image
 
         img = Image.open(image_path)
 
@@ -848,7 +850,7 @@ def orchestrate_image_production(
     report["status"] = "success"
     report["primary_output"] = primary_image
 
-    print(f"\n✨ Production complete!")
+    print("\n✨ Production complete!")
     print(f"Primary output: {primary_image}")
 
     return report
@@ -878,7 +880,7 @@ def cmd_generate_batch(product_ids: list[str] | None = None) -> None:
         # Get all products
         product_ids = sorted([f.stem for f in OVERRIDES_DIR.glob("*.json")])
 
-    print(f"\n🎬 SkyyRose Production Studio - Batch Generation")
+    print("\n🎬 SkyyRose Production Studio - Batch Generation")
     print(f"📦 Processing {len(product_ids)} products\n")
 
     results = []
@@ -894,7 +896,7 @@ def cmd_generate_batch(product_ids: list[str] | None = None) -> None:
     # Summary
     successful = sum(1 for r in results if r.get("status") == "success")
     print(f"\n{'='*60}")
-    print(f"✨ Batch Complete!")
+    print("✨ Batch Complete!")
     print(f"✅ Successful: {successful}/{len(product_ids)}")
     print('='*60)
 

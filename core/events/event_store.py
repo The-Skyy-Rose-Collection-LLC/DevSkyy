@@ -34,7 +34,7 @@ import json
 import logging
 import uuid
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -74,8 +74,8 @@ class Event:
         data: dict[str, Any],
         aggregate_type: str = "unknown",
         version: int = 1,
-        user_id: Optional[str] = None,
-        correlation_id: Optional[str] = None,
+        user_id: str | None = None,
+        correlation_id: str | None = None,
     ) -> None:
         self.event_id = str(uuid.uuid4())
         self.event_type = event_type
@@ -179,7 +179,7 @@ class EventStore:
         await self._event_bus.publish(event)
 
     async def _load_records(
-        self, aggregate_id: str, event_type: Optional[str] = None
+        self, aggregate_id: str, event_type: str | None = None
     ) -> list[Any]:
         """Load EventRecords from database. Override in tests."""
         from sqlalchemy import select
@@ -199,7 +199,7 @@ class EventStore:
             return list(result.scalars().all())
 
     async def get_events(
-        self, aggregate_id: str, event_type: Optional[str] = None
+        self, aggregate_id: str, event_type: str | None = None
     ) -> list[Event]:
         """
         Retrieve all events for an aggregate in chronological order.

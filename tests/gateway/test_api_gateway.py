@@ -6,7 +6,6 @@ Tests CircuitBreaker, RateLimiter, and APIGateway routing logic.
 All tests are unit-level — no real HTTP connections made.
 """
 
-import asyncio
 import time
 from unittest.mock import AsyncMock, patch
 
@@ -17,7 +16,6 @@ from gateway.api_gateway import (
     CircuitBreaker,
     CircuitState,
     RateLimiter,
-    RouteConfig,
 )
 
 

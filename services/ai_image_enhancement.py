@@ -4,19 +4,18 @@ Uses: Replicate, FAL, Stability AI, RemBG, Together AI
 """
 
 import asyncio
-from pathlib import Path
-from typing import Optional, Literal
 import base64
 from io import BytesIO
+from pathlib import Path
+from typing import Literal
 
-from PIL import Image
 import fal_client
-from stability_sdk import client as stability_client
 import replicate
+import runwayml
+from clip_interrogator import Config, Interrogator
+from PIL import Image
 from rembg import remove
 from together import Together
-from clip_interrogator import Config, Interrogator
-import runwayml
 
 
 class LuxuryImageEnhancer:
@@ -26,11 +25,11 @@ class LuxuryImageEnhancer:
 
     def __init__(
         self,
-        replicate_api_key: Optional[str] = None,
-        fal_api_key: Optional[str] = None,
-        stability_api_key: Optional[str] = None,
-        together_api_key: Optional[str] = None,
-        runway_api_key: Optional[str] = None,
+        replicate_api_key: str | None = None,
+        fal_api_key: str | None = None,
+        stability_api_key: str | None = None,
+        together_api_key: str | None = None,
+        runway_api_key: str | None = None,
     ):
         self.replicate_api_key = replicate_api_key
         self.fal_api_key = fal_api_key
@@ -45,7 +44,7 @@ class LuxuryImageEnhancer:
             self.together = Together(api_key=together_api_key)
 
     async def remove_background(
-        self, image_path: str, output_path: Optional[str] = None
+        self, image_path: str, output_path: str | None = None
     ) -> Image.Image:
         """
         Remove background from product image using RemBG
@@ -75,7 +74,7 @@ class LuxuryImageEnhancer:
         self,
         image_path: str,
         scale: int = 4,
-        prompt: Optional[str] = None,
+        prompt: str | None = None,
     ) -> str:
         """
         Upscale image using FAL Clarity Upscaler
