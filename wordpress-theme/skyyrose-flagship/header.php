@@ -147,19 +147,19 @@
 								<ul class="sub-menu">
 									<li class="menu-item collection-black-rose">
 										<a href="<?php echo esc_url( home_url( '/black-rose-collection/' ) ); ?>">
-											<span class="collection-dot" style="background:#C0C0C0;"></span>
+											<span class="collection-dot collection-dot--black-rose"></span>
 											Black Rose
 										</a>
 									</li>
 									<li class="menu-item collection-love-hurts">
 										<a href="<?php echo esc_url( home_url( '/love-hurts-collection/' ) ); ?>">
-											<span class="collection-dot" style="background:#DC143C;"></span>
+											<span class="collection-dot collection-dot--love-hurts"></span>
 											Love Hurts
 										</a>
 									</li>
 									<li class="menu-item collection-signature">
 										<a href="<?php echo esc_url( home_url( '/signature-collection/' ) ); ?>">
-											<span class="collection-dot" style="background:#B76E79;"></span>
+											<span class="collection-dot collection-dot--signature"></span>
 											Signature
 										</a>
 									</li>
