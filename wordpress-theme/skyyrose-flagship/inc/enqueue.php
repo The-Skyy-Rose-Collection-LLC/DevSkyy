@@ -713,6 +713,36 @@ function skyyrose_enqueue_journey_gamification() {
 }
 
 /**
+ * Enqueue Analytics Beacon — Unified Event Relay.
+ *
+ * Collects conversion events from all SkyyRose engines (CIE, Aurora,
+ * Pulse, Magnetic Obsidian, Cross-Sell, Journey Gamification, APE)
+ * and batches them to the devskyy.app Conversion Analytics API.
+ * Uses navigator.sendBeacon for reliable page-unload delivery.
+ *
+ * @since 3.9.0
+ * @return void
+ */
+function skyyrose_enqueue_analytics_beacon() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/analytics-beacon.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-analytics-beacon',
+			SKYYROSE_ASSETS_URI . '/js/analytics-beacon.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -789,6 +819,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-cross-sell-engine',
 		'skyyrose-adaptive-personalization',
 		'skyyrose-journey-gamification',
+		'skyyrose-analytics-beacon',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -893,6 +924,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 4
 
 // Journey Gamification Engine — room exploration tracking, rewards, cross-sell (priority 44, after personalization).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_journey_gamification', 44 );
+
+// Analytics Beacon — unified event relay to devskyy.app dashboard (priority 50, after all engines).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_analytics_beacon', 50 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

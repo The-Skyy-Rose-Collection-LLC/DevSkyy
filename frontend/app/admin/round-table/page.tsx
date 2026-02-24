@@ -62,8 +62,8 @@ export default function RoundTablePage() {
       // Invalidate round-table query to refetch providers, stats, and history
       await queryClient.invalidateQueries({ queryKey: ['round-table'] });
       setPrompt(''); // Clear prompt on success
-    } catch (err) {
-      console.error('Competition failed:', err);
+    } catch {
+      // Competition failed — UI will show empty result
     } finally {
       setCompeting(false);
     }

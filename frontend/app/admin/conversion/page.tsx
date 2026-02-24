@@ -156,19 +156,67 @@ const INITIAL_CONTROLS: ControlsState = {
 // Page Component
 // ---------------------------------------------------------------------------
 
+interface LiveMetrics {
+  total_events: number;
+  unique_sessions: number;
+  funnel: {
+    page_views: number;
+    product_views: number;
+    add_to_cart: number;
+    checkout_initiated: number;
+    pre_orders: number;
+  };
+  engagement: {
+    avg_scroll_depth: number;
+    avg_time_on_page: number;
+    hotspot_clicks: number;
+    room_transitions: number;
+    panel_opens: number;
+  };
+  conversion_drivers: {
+    social_proof_shown: number;
+    social_proof_clicks: number;
+    exit_intent_shown: number;
+    exit_intent_converted: number;
+    floating_cta_shown: number;
+    floating_cta_clicked: number;
+    bundle_suggestions_shown: number;
+    bundle_accepted: number;
+    journey_completed: number;
+    reward_claimed: number;
+  };
+}
+
 export default function ConversionIntelligencePage() {
   const [loading, setLoading] = useState(true);
   const [controls, setControls] = useState<ControlsState>(INITIAL_CONTROLS);
   const [saveConfirmed, setSaveConfirmed] = useState(false);
+  const [liveMetrics, setLiveMetrics] = useState<LiveMetrics | null>(null);
+  const [liveConnected, setLiveConnected] = useState(false);
 
-  const simulateLoad = useCallback(async () => {
-    await new Promise((resolve) => setTimeout(resolve, 800));
-    setLoading(false);
+  const fetchLiveMetrics = useCallback(async () => {
+    try {
+      const res = await fetch('/api/conversion');
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && data.metrics) {
+          setLiveMetrics(data.metrics as LiveMetrics);
+          setLiveConnected(true);
+        }
+      }
+    } catch {
+      // Live metrics unavailable — baseline data shown
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
-    simulateLoad();
-  }, [simulateLoad]);
+    fetchLiveMetrics();
+    // Refresh live metrics every 15 seconds
+    const interval = setInterval(fetchLiveMetrics, 15000);
+    return () => clearInterval(interval);
+  }, [fetchLiveMetrics]);
 
   function handleControlChange<K extends keyof ControlsState>(
     key: K,
@@ -210,13 +258,23 @@ export default function ConversionIntelligencePage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <Badge
-              variant="outline"
-              className="border-green-500/50 text-green-400"
-            >
-              <div className="h-2 w-2 rounded-full mr-2 bg-green-400 animate-pulse" />
-              Live
-            </Badge>
+            {liveConnected && liveMetrics && liveMetrics.total_events > 0 ? (
+              <Badge
+                variant="outline"
+                className="border-green-500/50 text-green-400"
+              >
+                <div className="h-2 w-2 rounded-full mr-2 bg-green-400 animate-pulse" />
+                Live ({liveMetrics.total_events.toLocaleString()} events)
+              </Badge>
+            ) : (
+              <Badge
+                variant="outline"
+                className="border-amber-500/50 text-amber-400"
+              >
+                <div className="h-2 w-2 rounded-full mr-2 bg-amber-400" />
+                Baseline Data
+              </Badge>
+            )}
           </div>
         </div>
       </div>
