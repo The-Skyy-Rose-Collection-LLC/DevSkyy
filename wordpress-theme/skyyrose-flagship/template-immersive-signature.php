@@ -21,6 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Multi-room scene data with hotspot products per room.
+ * Products placed on contextual props: industrial racks, neon signs,
+ * concrete pedestals, glass displays, velvet tables — not floating in air.
  */
 $signature_rooms = array(
 	// Room 1 — The Runway
@@ -39,6 +41,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '18',
 				'top'        => '32',
+				'prop'       => 'industrial-rack',
+				'prop_label' => esc_html__( 'Hanging on industrial garment rack', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-002',
@@ -50,6 +54,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '38',
 				'top'        => '48',
+				'prop'       => 'concrete-pedestal',
+				'prop_label' => esc_html__( 'On concrete runway pedestal', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-003',
@@ -61,6 +67,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '62',
 				'top'        => '36',
+				'prop'       => 'neon-display',
+				'prop_label' => esc_html__( 'Beneath neon display sign', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-004',
@@ -72,6 +80,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '80',
 				'top'        => '55',
+				'prop'       => 'glass-display',
+				'prop_label' => esc_html__( 'Inside illuminated glass case', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-005',
@@ -83,6 +93,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '50',
 				'top'        => '68',
+				'prop'       => 'mannequin',
+				'prop_label' => esc_html__( 'On runway mannequin', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -102,6 +114,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '25',
 				'top'        => '40',
+				'prop'       => 'glass-vitrine',
+				'prop_label' => esc_html__( 'In glass vitrine display', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-007',
@@ -113,6 +127,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '45',
 				'top'        => '52',
+				'prop'       => 'marble-plinth',
+				'prop_label' => esc_html__( 'On marble exhibition plinth', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-008',
@@ -124,6 +140,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '68',
 				'top'        => '38',
+				'prop'       => 'velvet-cushion',
+				'prop_label' => esc_html__( 'On velvet display cushion', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-009',
@@ -135,6 +153,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '35',
 				'top'        => '28',
+				'prop'       => 'marble-column',
+				'prop_label' => esc_html__( 'At marble column base', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-010',
@@ -146,6 +166,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '78',
 				'top'        => '60',
+				'prop'       => 'spotlight-pedestal',
+				'prop_label' => esc_html__( 'On spotlight-lit pedestal', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -165,6 +187,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '30',
 				'top'        => '42',
+				'prop'       => 'hat-stand',
+				'prop_label' => esc_html__( 'On vintage hat stand', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-012',
@@ -176,6 +200,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '48',
 				'top'        => '38',
+				'prop'       => 'velvet-table',
+				'prop_label' => esc_html__( 'On velvet display table', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-013',
@@ -187,6 +213,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '65',
 				'top'        => '45',
+				'prop'       => 'mannequin-head',
+				'prop_label' => esc_html__( 'On mannequin head form', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'sg-014',
@@ -198,6 +226,8 @@ $signature_rooms = array(
 				'url'        => '#',
 				'left'       => '52',
 				'top'        => '58',
+				'prop'       => 'mirror-shelf',
+				'prop_label' => esc_html__( 'On mirror shelf ledge', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -263,13 +293,13 @@ get_header();
 		</div>
 		<div class="room-name"><?php echo esc_html( $signature_rooms[0]['name'] ); ?></div>
 
-		<!-- Hotspot Containers (one per room) -->
+		<!-- Hotspot Containers — Products placed on contextual props -->
 		<?php foreach ( $signature_rooms as $room_index => $room ) : ?>
 			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'style="display:none;"' : ''; ?>>
 				<?php foreach ( $room['products'] as $product ) : ?>
 					<a
 						href="<?php echo esc_url( $product['url'] ); ?>"
-						class="hotspot"
+						class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
 						style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -278,10 +308,15 @@ get_header();
 						data-product-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 						data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
 						data-product-url="<?php echo esc_url( $product['url'] ); ?>"
-						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] ); ?>"
+						data-prop="<?php echo esc_attr( $product['prop'] ); ?>"
+						data-prop-label="<?php echo esc_attr( $product['prop_label'] ); ?>"
+						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] . ' — ' . $product['prop_label'] ); ?>"
 					>
 						<span class="hotspot-beacon"></span>
-						<span class="hotspot-label"><?php echo esc_html( $product['name'] ); ?></span>
+						<span class="hotspot-label">
+							<span class="hotspot-label-name"><?php echo esc_html( $product['name'] ); ?></span>
+							<span class="hotspot-label-prop"><?php echo esc_html( $product['prop_label'] ); ?></span>
+						</span>
 					</a>
 				<?php endforeach; ?>
 			</div>
@@ -306,6 +341,7 @@ get_header();
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>
 				<h3 class="product-panel-name"></h3>
+				<p class="product-panel-prop"></p>
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">

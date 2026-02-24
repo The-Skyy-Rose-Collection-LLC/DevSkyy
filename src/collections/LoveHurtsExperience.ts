@@ -111,6 +111,9 @@ export class LoveHurtsExperience {
   private particles: THREE.Points | null = null;
   private stainedGlass: THREE.Group[] = [];
 
+  // Props — natural habitats for products (ballroom theme)
+  private props: THREE.Group[] = [];
+
   // State
   private animationId: number | null = null;
   private clock: THREE.Clock;
@@ -151,6 +154,7 @@ export class LoveHurtsExperience {
     this.setupLighting();
     this.createEnchantedRose();
     this.createMagicParticles();
+    this.createBallroomProps();
 
     // Initialize hotspot system
     this.initializeHotspots();
@@ -484,6 +488,90 @@ export class LoveHurtsExperience {
     this.scene.add(this.particles);
   }
 
+  /**
+   * Create ballroom props — natural habitats for products.
+   * Velvet chaise lounges, golden pedestals, ornate frames, chandelier chains.
+   */
+  private createBallroomProps(): void {
+    const velvetMaterial = new THREE.MeshStandardMaterial({
+      color: 0x8b0000,
+      roughness: 0.85,
+      metalness: 0.05,
+    });
+
+    const goldMaterial = new THREE.MeshStandardMaterial({
+      color: BRAND_COLORS.roseGold,
+      roughness: 0.2,
+      metalness: 0.9,
+    });
+
+    // Velvet chaise lounge (left side of ballroom)
+    const chaise = new THREE.Group();
+    // Seat cushion
+    const cushionGeo = new THREE.BoxGeometry(2, 0.3, 0.9);
+    const cushion = new THREE.Mesh(cushionGeo, velvetMaterial);
+    cushion.position.set(0, 0.55, 0);
+    cushion.receiveShadow = true;
+    chaise.add(cushion);
+    // Back rest (curved)
+    const backGeo = new THREE.BoxGeometry(0.8, 0.7, 0.8);
+    const backRest = new THREE.Mesh(backGeo, velvetMaterial);
+    backRest.position.set(-0.7, 0.95, 0);
+    backRest.rotation.z = 0.15;
+    chaise.add(backRest);
+    // Gold legs
+    const legGeo = new THREE.CylinderGeometry(0.03, 0.04, 0.4, 8);
+    [[-0.8, 0, -0.35], [-0.8, 0, 0.35], [0.8, 0, -0.35], [0.8, 0, 0.35]].forEach(([x, _y, z]) => {
+      const leg = new THREE.Mesh(legGeo, goldMaterial);
+      leg.position.set(x!, 0.2, z!);
+      chaise.add(leg);
+    });
+    chaise.position.set(-7, 0, 2);
+    chaise.rotation.y = Math.PI / 5;
+    chaise.castShadow = true;
+    this.scene.add(chaise);
+    this.props.push(chaise);
+
+    // Golden pedestal (in manor scene area)
+    const pedestal = new THREE.Group();
+    const pBaseGeo = new THREE.CylinderGeometry(0.4, 0.5, 0.3, 16);
+    const pBase = new THREE.Mesh(pBaseGeo, goldMaterial);
+    pBase.position.y = 0.15;
+    pedestal.add(pBase);
+    const pColumnGeo = new THREE.CylinderGeometry(0.2, 0.25, 1.5, 12);
+    const pColumn = new THREE.Mesh(pColumnGeo, goldMaterial);
+    pColumn.position.y = 1.05;
+    pedestal.add(pColumn);
+    const pTopGeo = new THREE.CylinderGeometry(0.35, 0.2, 0.12, 16);
+    const pTop = new THREE.Mesh(pTopGeo, goldMaterial);
+    pTop.position.y = 1.86;
+    pedestal.add(pTop);
+    pedestal.position.set(7, 0, -3);
+    pedestal.castShadow = true;
+    this.scene.add(pedestal);
+    this.props.push(pedestal);
+
+    // Ornate gilded frame (on wall)
+    const frame = new THREE.Group();
+    const outerGeo = new THREE.BoxGeometry(2.4, 3.2, 0.15);
+    const outerFrame = new THREE.Mesh(outerGeo, goldMaterial);
+    outerFrame.position.y = 3;
+    frame.add(outerFrame);
+    const innerGeo = new THREE.BoxGeometry(2, 2.8, 0.08);
+    const innerMat = new THREE.MeshStandardMaterial({
+      color: 0x1a0a10,
+      roughness: 0.9,
+    });
+    const innerPanel = new THREE.Mesh(innerGeo, innerMat);
+    innerPanel.position.set(0, 3, 0.05);
+    frame.add(innerPanel);
+    frame.position.set(0, 0, -16);
+    this.scene.add(frame);
+    this.props.push(frame);
+
+    this.logger.info(`Created ${this.props.length} ballroom props`);
+  }
+
   private async initializeHotspots(): Promise<void> {
     try {
       // Create hotspot manager
@@ -799,6 +887,13 @@ export class LoveHurtsExperience {
       this.scene.remove(s);
     });
     this.stainedGlass = [];
+
+    // Dispose props
+    this.props.forEach((prop) => {
+      prop.traverse(disposeMesh);
+      this.scene.remove(prop);
+    });
+    this.props = [];
 
     // Dispose particles
     if (this.particles) {

@@ -215,7 +215,7 @@ generated_3d_models/
 
 # Large files moved to HuggingFace Hub
 # https://huggingface.co/datasets/damBruh/skyyrose-assets
-assets/
+/assets/
 datasets/
 generated_3d_models_color_accurate/
 

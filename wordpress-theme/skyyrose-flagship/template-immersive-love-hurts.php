@@ -18,6 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product data for hotspot beacons.
  * Spread across two scene views — Ballroom and Candlelit Manor.
+ * Products placed on contextual props: velvet furniture, chandeliers,
+ * candelabras, ornate frames — not floating in air.
  */
 $love_hurts_scenes = array(
 	array(
@@ -35,6 +37,8 @@ $love_hurts_scenes = array(
 				'url'        => '#',
 				'left'       => '28',
 				'top'        => '35',
+				'prop'       => 'velvet-chaise',
+				'prop_label' => esc_html__( 'Draped on velvet chaise lounge', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'lh-002',
@@ -46,6 +50,8 @@ $love_hurts_scenes = array(
 				'url'        => '#',
 				'left'       => '55',
 				'top'        => '52',
+				'prop'       => 'ornate-frame',
+				'prop_label' => esc_html__( 'Displayed in ornate gilded frame', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'lh-003',
@@ -57,6 +63,8 @@ $love_hurts_scenes = array(
 				'url'        => '#',
 				'left'       => '75',
 				'top'        => '40',
+				'prop'       => 'candelabra',
+				'prop_label' => esc_html__( 'Hanging from crystal candelabra', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -75,6 +83,8 @@ $love_hurts_scenes = array(
 				'url'        => '#',
 				'left'       => '40',
 				'top'        => '45',
+				'prop'       => 'golden-pedestal',
+				'prop_label' => esc_html__( 'On golden pedestal', 'skyyrose-flagship' ),
 			),
 			array(
 				'id'         => 'lh-005',
@@ -86,6 +96,8 @@ $love_hurts_scenes = array(
 				'url'        => '#',
 				'left'       => '65',
 				'top'        => '58',
+				'prop'       => 'chandelier',
+				'prop_label' => esc_html__( 'Suspended from chandelier chain', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -151,13 +163,13 @@ get_header();
 		</div>
 		<div class="room-name"><?php echo esc_html( $love_hurts_scenes[0]['name'] ); ?></div>
 
-		<!-- Hotspot Containers (one per scene) -->
+		<!-- Hotspot Containers — Products placed on contextual props -->
 		<?php foreach ( $love_hurts_scenes as $scene_index => $scene ) : ?>
 			<div class="hotspot-container" <?php echo 0 !== $scene_index ? 'style="display:none;"' : ''; ?>>
 				<?php foreach ( $scene['products'] as $product ) : ?>
 					<a
 						href="<?php echo esc_url( $product['url'] ); ?>"
-						class="hotspot"
+						class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
 						style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
 						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -166,10 +178,15 @@ get_header();
 						data-product-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 						data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
 						data-product-url="<?php echo esc_url( $product['url'] ); ?>"
-						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] ); ?>"
+						data-prop="<?php echo esc_attr( $product['prop'] ); ?>"
+						data-prop-label="<?php echo esc_attr( $product['prop_label'] ); ?>"
+						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] . ' — ' . $product['prop_label'] ); ?>"
 					>
 						<span class="hotspot-beacon"></span>
-						<span class="hotspot-label"><?php echo esc_html( $product['name'] ); ?></span>
+						<span class="hotspot-label">
+							<span class="hotspot-label-name"><?php echo esc_html( $product['name'] ); ?></span>
+							<span class="hotspot-label-prop"><?php echo esc_html( $product['prop_label'] ); ?></span>
+						</span>
 					</a>
 				<?php endforeach; ?>
 			</div>
@@ -194,6 +211,7 @@ get_header();
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>
 				<h3 class="product-panel-name"></h3>
+				<p class="product-panel-prop"></p>
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">
