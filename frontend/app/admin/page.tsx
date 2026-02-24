@@ -15,7 +15,7 @@ import {
   ArrowRight,
 } from 'lucide-react';
 import { api, type ProviderStats, type PipelineStatus } from '@/lib/api';
-import { useQuery } from '@/hooks';
+import { useQuery } from '@tanstack/react-query';
 import { ErrorState } from '@/components/shared';
 import { StatsCard, DashboardSkeleton } from '@/components/dashboard';
 import {
@@ -96,11 +96,11 @@ const itemVariants = {
 };
 
 export default function AdminDashboard() {
-  const { data, loading, error, refetch } = useQuery(
-    'dashboard',
-    fetchDashboardData,
-    { refetchInterval: 30000 }
-  );
+  const { data, isLoading: loading, error, refetch } = useQuery({
+    queryKey: ['dashboard'],
+    queryFn: fetchDashboardData,
+    refetchInterval: 30000,
+  });
 
   if (loading) {
     return <DashboardSkeleton />;

@@ -573,6 +573,346 @@
 }
 
 /* ==========================================================================
+   7. SECTION REVEAL — IntersectionObserver Fade-In & Slide-Up
+   ========================================================================== */
+
+.pulse-reveal {
+	opacity: 0;
+	transform: translateY(28px);
+	transition:
+		opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+		transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.pulse-reveal--visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Stagger children for grid items */
+.product-grid .pulse-reveal:nth-child(2) { transition-delay: 0.08s; }
+.product-grid .pulse-reveal:nth-child(3) { transition-delay: 0.16s; }
+.product-grid .pulse-reveal:nth-child(4) { transition-delay: 0.24s; }
+.product-grid .pulse-reveal:nth-child(5) { transition-delay: 0.32s; }
+.product-grid .pulse-reveal:nth-child(6) { transition-delay: 0.40s; }
+.product-grid .pulse-reveal:nth-child(n+7) { transition-delay: 0.48s; }
+
+/* ==========================================================================
+   8. LUXURY 3D TILT — Rose Gold Glow Border on Hover
+   ========================================================================== */
+
+.product-grid-card,
+.product-card {
+	transition:
+		transform 0.4s cubic-bezier(0.22, 1, 0.36, 1),
+		box-shadow 0.4s ease,
+		border-color 0.4s ease;
+	will-change: transform;
+}
+
+.product-grid-card:hover,
+.product-card:hover {
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.4),
+		0 0 0 1px rgba(183, 110, 121, 0.15),
+		0 0 24px rgba(183, 110, 121, 0.08);
+	border-color: rgba(183, 110, 121, 0.3);
+}
+
+/* ==========================================================================
+   9. ROSE GOLD SHIMMER SWEEP — Button Hover Effect
+   ========================================================================== */
+
+.pulse-shimmer-btn {
+	position: relative;
+	overflow: hidden;
+}
+
+.pulse-shimmer-btn::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 60%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.18) 40%,
+		rgba(183, 110, 121, 0.12) 60%,
+		transparent 100%
+	);
+	transition: none;
+	pointer-events: none;
+}
+
+.pulse-shimmer-btn:hover::after {
+	animation: pulse-shimmer-sweep 0.75s ease forwards;
+}
+
+@keyframes pulse-shimmer-sweep {
+	0%   { left: -100%; }
+	100% { left: 150%; }
+}
+
+/* ==========================================================================
+   10. HERO TEXT FLOAT — Subtle translateY Oscillation
+   ========================================================================== */
+
+.pulse-hero-float {
+	animation: pulse-hero-float-anim 6s ease-in-out infinite;
+}
+
+@keyframes pulse-hero-float-anim {
+	0%, 100% { transform: translateY(0); }
+	50%      { transform: translateY(-4px); }
+}
+
+/* ==========================================================================
+   11. COLLECTION LOGO GLOW — Slow Rotation + Rose Gold Halo
+   ========================================================================== */
+
+.pulse-logo-glow {
+	animation: pulse-logo-rotate 20s linear infinite;
+	filter: drop-shadow(0 0 8px rgba(183, 110, 121, 0.3));
+	transition: filter 0.4s ease;
+}
+
+.pulse-logo-glow:hover {
+	filter: drop-shadow(0 0 16px rgba(183, 110, 121, 0.5))
+	        drop-shadow(0 0 32px rgba(183, 110, 121, 0.2));
+}
+
+@keyframes pulse-logo-rotate {
+	from { transform: rotate(0deg); }
+	to   { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   12. SPARKLE PARTICLES — Star Burst on Monogram Hover
+   ========================================================================== */
+
+.pulse-sparkle {
+	position: absolute;
+	color: var(--rose-gold, #B76E79);
+	pointer-events: none;
+	z-index: 10;
+	animation: pulse-sparkle-burst 1s ease-out forwards;
+	text-shadow: 0 0 6px rgba(183, 110, 121, 0.6);
+}
+
+@keyframes pulse-sparkle-burst {
+	0% {
+		opacity: 1;
+		transform: scale(0) translateY(0);
+	}
+	40% {
+		opacity: 1;
+		transform: scale(1.2) translateY(-12px);
+	}
+	100% {
+		opacity: 0;
+		transform: scale(0.6) translateY(-28px);
+	}
+}
+
+/* ==========================================================================
+   13. ROOMS EXPLORED COUNTER — Fixed Bottom-Right Pill
+   ========================================================================== */
+
+.pulse-rooms-counter {
+	position: fixed;
+	bottom: 1.5rem;
+	right: 1.5rem;
+	z-index: 9990;
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 8px 14px;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: rgba(255, 255, 255, 0.8);
+	background: rgba(10, 10, 10, 0.85);
+	backdrop-filter: blur(16px);
+	-webkit-backdrop-filter: blur(16px);
+	border: 1px solid rgba(183, 110, 121, 0.2);
+	border-radius: 100px;
+	transform: translateY(20px);
+	opacity: 0;
+	transition:
+		transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.4s ease;
+	pointer-events: none;
+}
+
+.pulse-rooms-counter.visible {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+.pulse-rooms-counter--complete {
+	border-color: rgba(74, 222, 128, 0.3);
+	color: #4ade80;
+}
+
+.pulse-rooms-counter__icon {
+	font-size: 0.8rem;
+	line-height: 1;
+}
+
+.pulse-rooms-counter__explored {
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	font-variant-numeric: tabular-nums;
+}
+
+.pulse-rooms-counter--complete .pulse-rooms-counter__explored {
+	color: #4ade80;
+}
+
+/* ==========================================================================
+   14. PAGE VIEWER COUNTER — Banner Near Product Section
+   ========================================================================== */
+
+.pulse-page-viewers {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.4rem;
+	padding: 8px 0;
+	margin-bottom: 1.5rem;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.55);
+}
+
+.pulse-page-viewers__dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #4ade80;
+	flex-shrink: 0;
+	animation: pulse-page-viewers-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-page-viewers-dot {
+	0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+	50%      { opacity: 0.7; box-shadow: 0 0 0 5px rgba(74, 222, 128, 0); }
+}
+
+.pulse-page-viewers__count {
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   15. TRENDING BADGE — Pulsing Badge for Pre-Order Products
+   ========================================================================== */
+
+.pulse-trending-badge {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 3px 10px;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #fff;
+	background: linear-gradient(135deg, rgba(183, 110, 121, 0.9) 0%, rgba(212, 175, 55, 0.9) 100%);
+	border-radius: 4px;
+	position: absolute;
+	top: 12px;
+	left: 12px;
+	z-index: 6;
+	animation: pulse-trending-pulse 2s ease-in-out infinite;
+	box-shadow: 0 2px 12px rgba(183, 110, 121, 0.4);
+}
+
+@keyframes pulse-trending-pulse {
+	0%, 100% {
+		box-shadow: 0 2px 12px rgba(183, 110, 121, 0.4);
+		transform: scale(1);
+	}
+	50% {
+		box-shadow: 0 4px 20px rgba(183, 110, 121, 0.6);
+		transform: scale(1.03);
+	}
+}
+
+.pulse-trending-badge__fire {
+	font-size: 0.7rem;
+	line-height: 1;
+}
+
+/* ==========================================================================
+   16. COUNTDOWN URGENCY — Inline Countdown Near Pre-Order Buttons
+   ========================================================================== */
+
+.pulse-urgency-countdown {
+	display: flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 6px 0;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.65rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.55);
+	margin-top: 6px;
+}
+
+.pulse-urgency-countdown__icon {
+	font-size: 0.75rem;
+	line-height: 1;
+	animation: pulse-urgency-tick 1s ease-in-out infinite;
+}
+
+@keyframes pulse-urgency-tick {
+	0%, 100% { transform: scale(1); }
+	50%      { transform: scale(1.15); }
+}
+
+.pulse-urgency-countdown__time {
+	font-weight: 700;
+	color: var(--gold, #D4AF37);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Mobile Adjustments for New Features
+   ========================================================================== */
+
+@media (max-width: 640px) {
+	.pulse-rooms-counter {
+		bottom: 4.5rem;
+		right: 0.5rem;
+		font-size: 0.6rem;
+		padding: 6px 10px;
+	}
+
+	.pulse-page-viewers {
+		font-size: 0.6rem;
+	}
+
+	.pulse-trending-badge {
+		font-size: 0.55rem;
+		padding: 2px 8px;
+	}
+}
+
+/* Immersive page adjustments for rooms counter */
+.immersive-page .pulse-rooms-counter {
+	bottom: calc(var(--tab-bar-height, 48px) + 1rem);
+}
+
+/* ==========================================================================
    REDUCED MOTION — Respect User Preferences
    ========================================================================== */
 
@@ -618,5 +958,42 @@
 	.pulse-heat-high .hotspot-beacon,
 	.pulse-heat-medium .hotspot-beacon {
 		box-shadow: 0 0 8px rgba(183, 110, 121, 0.4);
+	}
+
+	/* New features — disable animations */
+	.pulse-reveal {
+		opacity: 1;
+		transform: none;
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-shimmer-btn::after {
+		animation: none;
+		display: none;
+	}
+
+	.pulse-hero-float {
+		animation: none;
+	}
+
+	.pulse-logo-glow {
+		animation: none;
+	}
+
+	.pulse-sparkle {
+		display: none;
+	}
+
+	.pulse-trending-badge {
+		animation: none;
+	}
+
+	.pulse-urgency-countdown__icon {
+		animation: none;
+	}
+
+	.pulse-page-viewers__dot {
+		animation: none;
+		opacity: 1;
 	}
 }

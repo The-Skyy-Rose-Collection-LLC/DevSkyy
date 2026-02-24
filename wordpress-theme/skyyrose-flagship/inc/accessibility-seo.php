@@ -132,10 +132,18 @@ add_action( 'wp', 'skyyrose_heading_hierarchy' );
 /**
  * Add Schema.org markup for products.
  *
+ * Skips output when Yoast SEO (with WooCommerce SEO add-on) is active
+ * to prevent duplicate product structured data.
+ *
  * @since 1.0.0
  */
 function skyyrose_product_schema() {
 	if ( ! is_singular( 'product' ) ) {
+		return;
+	}
+
+	// Defer to Yoast WooCommerce SEO if active.
+	if ( defined( 'WPSEO_WOO_VERSION' ) ) {
 		return;
 	}
 
@@ -214,7 +222,10 @@ function skyyrose_product_schema() {
 add_action( 'wp_head', 'skyyrose_product_schema' );
 
 /**
- * Add Organization schema markup.
+ * Add Organization schema markup for SkyyRose LLC.
+ *
+ * Outputs JSON-LD Organization structured data on the front page.
+ * Skips output when Yoast SEO is active and handles Organization schema.
  *
  * @since 1.0.0
  */
@@ -223,19 +234,37 @@ function skyyrose_organization_schema() {
 		return;
 	}
 
+	// Defer to Yoast SEO for Organization schema if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
+	$logo_url = '';
+	$logo_id  = get_theme_mod( 'custom_logo' );
+	if ( $logo_id ) {
+		$logo_url = wp_get_attachment_url( $logo_id );
+	}
+
 	$schema = array(
-		'@context' => 'https://schema.org',
-		'@type'    => 'Organization',
-		'name'     => get_bloginfo( 'name' ),
-		'url'      => home_url( '/' ),
-		'logo'     => array(
+		'@context'    => 'https://schema.org',
+		'@type'       => 'Organization',
+		'name'        => 'SkyyRose',
+		'legalName'   => 'SkyyRose LLC',
+		'url'         => home_url( '/' ),
+		'description' => __( 'Where Love Meets Luxury. Premium streetwear and luxury fashion brand.', 'skyyrose-flagship' ),
+		'logo'        => array(
 			'@type' => 'ImageObject',
-			'url'   => get_theme_mod( 'custom_logo' ) ? wp_get_attachment_url( get_theme_mod( 'custom_logo' ) ) : '',
+			'url'   => $logo_url,
 		),
-		'sameAs'   => array(),
+		'brand'       => array(
+			'@type' => 'Brand',
+			'name'  => 'SkyyRose',
+			'slogan' => 'Where Love Meets Luxury',
+		),
+		'sameAs'      => array(),
 	);
 
-	// Add social media profiles
+	// Add social media profiles from Customizer settings.
 	$social_profiles = array(
 		'facebook'  => get_theme_mod( 'facebook_url' ),
 		'twitter'   => get_theme_mod( 'twitter_url' ),
@@ -250,7 +279,7 @@ function skyyrose_organization_schema() {
 		}
 	}
 
-	// Add contact information
+	// Add contact information.
 	$phone = get_theme_mod( 'contact_phone' );
 	$email = get_theme_mod( 'contact_email' );
 
@@ -275,10 +304,17 @@ add_action( 'wp_head', 'skyyrose_organization_schema' );
 /**
  * Add BreadcrumbList schema markup.
  *
+ * Skips output when Yoast SEO is active to prevent duplicate breadcrumb schema.
+ *
  * @since 1.0.0
  */
 function skyyrose_breadcrumb_schema() {
 	if ( is_front_page() ) {
+		return;
+	}
+
+	// Defer to Yoast SEO for breadcrumb schema if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
 		return;
 	}
 
@@ -442,9 +478,16 @@ add_action( 'skyyrose_after_header', 'skyyrose_breadcrumb', 10 );
 /**
  * Add Open Graph tags.
  *
+ * Skips output when Yoast SEO is active to prevent duplicate meta tags.
+ *
  * @since 1.0.0
  */
 function skyyrose_open_graph_tags() {
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
 	if ( is_singular() ) {
 		global $post;
 
@@ -489,9 +532,16 @@ add_action( 'wp_head', 'skyyrose_open_graph_tags' );
 /**
  * Add Twitter Card tags.
  *
+ * Skips output when Yoast SEO is active to prevent duplicate meta tags.
+ *
  * @since 1.0.0
  */
 function skyyrose_twitter_card_tags() {
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
 	echo '<meta name="twitter:card" content="summary_large_image" />' . "\n";
 
 	$twitter_handle = get_theme_mod( 'twitter_handle' );
@@ -523,9 +573,16 @@ add_action( 'wp_head', 'skyyrose_twitter_card_tags' );
 /**
  * Add canonical URL.
  *
+ * Skips output when Yoast SEO is active to prevent duplicate canonical tags.
+ *
  * @since 1.0.0
  */
 function skyyrose_canonical_url() {
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
 	if ( is_singular() ) {
 		echo '<link rel="canonical" href="' . esc_url( get_permalink() ) . '" />' . "\n";
 	} elseif ( is_front_page() ) {
@@ -541,9 +598,16 @@ add_action( 'wp_head', 'skyyrose_canonical_url', 1 );
 /**
  * Add meta descriptions.
  *
+ * Skips output when Yoast SEO is active to prevent duplicate meta descriptions.
+ *
  * @since 1.0.0
  */
 function skyyrose_meta_description() {
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
+		return;
+	}
+
 	$description = '';
 
 	if ( is_singular() ) {
@@ -769,10 +833,17 @@ add_action( 'wp_head', 'skyyrose_preconnect_resources', 1 );
 /**
  * Add Collection schema for product categories.
  *
+ * Skips output when Yoast SEO is active to prevent duplicate structured data.
+ *
  * @since 1.0.0
  */
 function skyyrose_collection_schema() {
 	if ( ! is_tax( 'product_cat' ) && ! is_post_type_archive( 'product' ) ) {
+		return;
+	}
+
+	// Defer to Yoast SEO if active.
+	if ( defined( 'WPSEO_VERSION' ) ) {
 		return;
 	}
 
