@@ -1,8 +1,8 @@
 {
   "active": true,
-  "iteration": 8,
+  "iteration": 9,
   "minIterations": 1,
-  "maxIterations": 10,
+  "maxIterations": 30,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
