@@ -434,6 +434,46 @@ function skyyrose_enqueue_social_proof() {
 }
 
 /**
+ * Enqueue The Pulse — Real-Time Social Proof & Urgency Engine.
+ *
+ * Loads animated purchase notification toasts, live viewer counts, scarcity
+ * badges, VIP countdown banner, and popularity heat on customer-facing pages.
+ * This is the conversion-driving upgrade layer that spans immersive scenes,
+ * collection pages, homepage, and the pre-order gateway.
+ *
+ * @since 3.2.0
+ * @return void
+ */
+function skyyrose_enqueue_the_pulse() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/the-pulse.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-the-pulse',
+			SKYYROSE_ASSETS_URI . '/css/the-pulse.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/the-pulse.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-the-pulse',
+			SKYYROSE_ASSETS_URI . '/js/the-pulse.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -503,6 +543,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-cinematic-mode',
 		'skyyrose-luxury-cursor',
 		'skyyrose-social-proof',
+		'skyyrose-the-pulse',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -586,6 +627,9 @@ add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
 
 // Social Proof + Urgency Engine on customer-facing pages (priority 30, after all template assets).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_social_proof', 30 );
+
+// The Pulse — Real-Time Social Proof & Urgency Engine (priority 32, after social proof base).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_the_pulse', 32 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

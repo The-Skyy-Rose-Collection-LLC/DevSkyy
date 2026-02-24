@@ -115,6 +115,21 @@ PROVIDER_CONFIGS: dict[ModelProvider, ProviderConfig] = {
     ),
 }
 
+# Add LiteLLM as universal fallback if available
+try:
+    from .providers.litellm_provider import LiteLLMClient
+
+    PROVIDER_CONFIGS[ModelProvider.LITELLM] = ProviderConfig(
+        provider=ModelProvider.LITELLM,
+        client_class=LiteLLMClient,
+        default_model="anthropic/claude-sonnet-4-20250514",
+        priority=99,  # Lowest priority — universal fallback only
+        input_price=0.003,
+        output_price=0.015,
+    )
+except ImportError:
+    pass
+
 
 class RoutingStrategy(str, Enum):
     """Routing strategy for provider selection."""
@@ -418,6 +433,14 @@ class LLMRouter:
 
         # Filter out providers with open circuits
         available_providers = [p for p in providers if self.circuit_breaker.is_available(p)]
+
+        # Add LiteLLM as universal last-resort fallback
+        if (
+            ModelProvider.LITELLM in self.configs
+            and ModelProvider.LITELLM not in available_providers
+            and self.circuit_breaker.is_available(ModelProvider.LITELLM)
+        ):
+            available_providers.append(ModelProvider.LITELLM)
 
         if not available_providers:
             raise LLMError(

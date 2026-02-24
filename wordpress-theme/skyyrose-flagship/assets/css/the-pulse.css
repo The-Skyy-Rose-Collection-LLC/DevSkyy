@@ -1,0 +1,622 @@
+/**
+ * The Pulse — Real-Time Social Proof & Urgency Engine
+ *
+ * Social proof toasts, live viewer badges, scarcity indicators,
+ * VIP countdown banner, popularity heat system, and interest counters.
+ * Drives conversion through social validation and time pressure.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.3.0
+ */
+
+/* ==========================================================================
+   1. SOCIAL PROOF TOAST — Bottom-Left Slide-In Notifications
+   ========================================================================== */
+
+.pulse-toast-stack {
+	position: fixed;
+	bottom: 1.5rem;
+	left: 1.5rem;
+	z-index: 9992;
+	display: flex;
+	flex-direction: column-reverse;
+	gap: 0.75rem;
+	pointer-events: none;
+}
+
+.pulse-toast {
+	display: flex;
+	align-items: center;
+	gap: 0.875rem;
+	max-width: 380px;
+	padding: 0.875rem 1.25rem;
+	background: rgba(10, 10, 10, 0.88);
+	backdrop-filter: blur(24px) saturate(1.4);
+	-webkit-backdrop-filter: blur(24px) saturate(1.4);
+	border: 1px solid rgba(183, 110, 121, 0.25);
+	border-left: 3px solid var(--rose-gold, #B76E79);
+	border-radius: 12px;
+	box-shadow:
+		0 8px 32px rgba(0, 0, 0, 0.45),
+		0 0 0 1px rgba(183, 110, 121, 0.08) inset;
+	color: #fff;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	transform: translateX(-120%) scale(0.92);
+	opacity: 0;
+	transition:
+		transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.4s ease;
+	pointer-events: auto;
+	cursor: pointer;
+	position: relative;
+	overflow: hidden;
+}
+
+.pulse-toast::before {
+	content: '';
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	height: 2px;
+	background: var(--rose-gold, #B76E79);
+	transform-origin: left;
+	animation: pulse-toast-timer 5s linear forwards;
+	opacity: 0.5;
+}
+
+@keyframes pulse-toast-timer {
+	from { transform: scaleX(1); }
+	to   { transform: scaleX(0); }
+}
+
+.pulse-toast.visible {
+	transform: translateX(0) scale(1);
+	opacity: 1;
+}
+
+.pulse-toast.exiting {
+	transform: translateX(-120%) scale(0.92);
+	opacity: 0;
+	transition:
+		transform 0.4s cubic-bezier(0.55, 0, 1, 0.45),
+		opacity 0.3s ease;
+}
+
+.pulse-toast__thumb {
+	position: relative;
+	flex-shrink: 0;
+	width: 48px;
+	height: 48px;
+	border-radius: 8px;
+	overflow: hidden;
+	border: 1px solid rgba(183, 110, 121, 0.3);
+	background: rgba(255, 255, 255, 0.04);
+}
+
+.pulse-toast__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+
+.pulse-toast__body {
+	flex: 1;
+	min-width: 0;
+}
+
+.pulse-toast__action {
+	font-size: 0.7rem;
+	font-weight: 600;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--rose-gold, #B76E79);
+	margin-bottom: 2px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pulse-toast__product {
+	font-size: 0.85rem;
+	font-weight: 500;
+	color: #fff;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.pulse-toast__meta {
+	font-size: 0.65rem;
+	color: rgba(255, 255, 255, 0.45);
+	margin-top: 2px;
+	display: flex;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.pulse-toast__meta::before {
+	content: '';
+	display: inline-block;
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: #4ade80;
+	flex-shrink: 0;
+}
+
+.pulse-toast__close {
+	flex-shrink: 0;
+	width: 22px;
+	height: 22px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.06);
+	border: none;
+	border-radius: 50%;
+	color: rgba(255, 255, 255, 0.35);
+	cursor: pointer;
+	font-size: 0.85rem;
+	line-height: 1;
+	padding: 0;
+	transition: color 0.2s ease, background 0.2s ease;
+}
+
+.pulse-toast__close:hover {
+	color: #fff;
+	background: rgba(255, 255, 255, 0.12);
+}
+
+/* ==========================================================================
+   2. LIVE VIEWERS BADGE — Floating Pill on Product Cards / Hotspots
+   ========================================================================== */
+
+.pulse-viewers {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 4px 10px;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.85);
+	background: rgba(10, 10, 10, 0.7);
+	backdrop-filter: blur(12px);
+	-webkit-backdrop-filter: blur(12px);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 100px;
+	white-space: nowrap;
+	z-index: 5;
+	pointer-events: none;
+}
+
+/* Positioned variant for product cards */
+.product-card .pulse-viewers,
+.product-grid-card .pulse-viewers {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+}
+
+/* Positioned variant for hotspot labels */
+.hotspot .pulse-viewers {
+	position: absolute;
+	top: calc(100% + 4px);
+	left: 50%;
+	transform: translateX(-50%);
+}
+
+.pulse-viewers__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: #4ade80;
+	flex-shrink: 0;
+	animation: pulse-viewer-dot 2s ease-in-out infinite;
+}
+
+@keyframes pulse-viewer-dot {
+	0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5); }
+	50%      { opacity: 0.7; box-shadow: 0 0 0 4px rgba(74, 222, 128, 0); }
+}
+
+.pulse-viewers__count {
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   3. SCARCITY INDICATOR — Urgency Badges Below Price
+   ========================================================================== */
+
+.pulse-scarcity {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.3rem;
+	padding: 3px 8px;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	border-radius: 4px;
+	line-height: 1.2;
+	margin-top: 6px;
+}
+
+/* Critical — 1-3 left */
+.pulse-scarcity--critical {
+	background: rgba(220, 20, 60, 0.15);
+	color: #DC143C;
+	border: 1px solid rgba(220, 20, 60, 0.3);
+}
+
+/* Urgent — 4-5 left or "Selling Fast" */
+.pulse-scarcity--urgent {
+	background: rgba(255, 165, 0, 0.12);
+	color: #FFA500;
+	border: 1px solid rgba(255, 165, 0, 0.25);
+}
+
+/* Warm — 6-7 left */
+.pulse-scarcity--warm {
+	background: rgba(212, 175, 55, 0.1);
+	color: var(--gold, #D4AF37);
+	border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.pulse-scarcity__dot {
+	width: 5px;
+	height: 5px;
+	border-radius: 50%;
+	background: currentColor;
+	flex-shrink: 0;
+}
+
+.pulse-scarcity--critical .pulse-scarcity__dot {
+	animation: pulse-scarcity-blink 1s ease-in-out infinite;
+}
+
+@keyframes pulse-scarcity-blink {
+	0%, 100% { opacity: 1; }
+	50%      { opacity: 0.2; }
+}
+
+/* Shimmer effect across the badge */
+.pulse-scarcity::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: -100%;
+	width: 100%;
+	height: 100%;
+	background: linear-gradient(
+		90deg,
+		transparent 0%,
+		rgba(255, 255, 255, 0.08) 50%,
+		transparent 100%
+	);
+	animation: pulse-scarcity-shimmer 3s ease-in-out infinite;
+}
+
+.pulse-scarcity {
+	position: relative;
+	overflow: hidden;
+}
+
+@keyframes pulse-scarcity-shimmer {
+	0%   { left: -100%; }
+	50%  { left: 100%; }
+	100% { left: 100%; }
+}
+
+/* ==========================================================================
+   4. VIP COUNTDOWN BANNER — Fixed Bottom Strip
+   ========================================================================== */
+
+.pulse-countdown-banner {
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	z-index: 9985;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+	padding: 10px 2rem;
+	background: linear-gradient(
+		135deg,
+		rgba(212, 175, 55, 0.12) 0%,
+		rgba(183, 110, 121, 0.12) 50%,
+		rgba(212, 175, 55, 0.12) 100%
+	);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border-top: 1px solid rgba(212, 175, 55, 0.2);
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	transform: translateY(100%);
+	opacity: 0;
+	transition:
+		transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+		opacity 0.5s ease;
+	animation: pulse-banner-glow 4s ease-in-out infinite;
+}
+
+.pulse-countdown-banner.visible {
+	transform: translateY(0);
+	opacity: 1;
+}
+
+@keyframes pulse-banner-glow {
+	0%, 100% { box-shadow: 0 -4px 20px rgba(212, 175, 55, 0.05); }
+	50%      { box-shadow: 0 -4px 30px rgba(183, 110, 121, 0.1); }
+}
+
+.pulse-countdown-banner__label {
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--gold, #D4AF37);
+}
+
+.pulse-countdown-banner__time {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.85rem;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: #fff;
+	font-variant-numeric: tabular-nums;
+}
+
+.pulse-countdown-banner__time span {
+	color: rgba(255, 255, 255, 0.35);
+	font-weight: 400;
+}
+
+.pulse-countdown-banner__cta {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 6px 14px;
+	font-size: 0.6rem;
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #0A0A0A;
+	background: linear-gradient(135deg, var(--gold, #D4AF37) 0%, var(--rose-gold, #B76E79) 100%);
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pulse-countdown-banner__cta:hover {
+	transform: translateY(-1px);
+	box-shadow: 0 4px 16px rgba(212, 175, 55, 0.35);
+}
+
+.pulse-countdown-banner__dismiss {
+	position: absolute;
+	right: 0.75rem;
+	top: 50%;
+	transform: translateY(-50%);
+	background: none;
+	border: none;
+	color: rgba(255, 255, 255, 0.25);
+	cursor: pointer;
+	font-size: 1rem;
+	padding: 4px;
+	line-height: 1;
+	transition: color 0.2s ease;
+}
+
+.pulse-countdown-banner__dismiss:hover {
+	color: rgba(255, 255, 255, 0.6);
+}
+
+/* ==========================================================================
+   5. POPULARITY HEAT — Beacon Speed Modifiers for Immersive Pages
+   ========================================================================== */
+
+/* Low heat — default beacon speed (2.4s, from immersive.css) */
+.pulse-heat-low .hotspot-beacon {
+	animation-duration: 2.4s;
+}
+
+/* Medium heat — 1.5x speed, slightly larger glow */
+.pulse-heat-medium .hotspot-beacon {
+	animation-duration: 1.6s;
+}
+
+.pulse-heat-medium .hotspot-beacon::before {
+	animation-duration: 1.6s;
+}
+
+.pulse-heat-medium .hotspot-beacon {
+	box-shadow: 0 0 10px rgba(183, 110, 121, 0.3);
+}
+
+/* High heat — 2x speed, larger glow, size boost */
+.pulse-heat-high .hotspot-beacon {
+	animation-duration: 1.2s;
+	width: 16px;
+	height: 16px;
+}
+
+.pulse-heat-high .hotspot-beacon::before {
+	animation-duration: 1.2s;
+	inset: -8px;
+}
+
+.pulse-heat-high .hotspot-beacon {
+	box-shadow: 0 0 16px rgba(183, 110, 121, 0.45);
+}
+
+/* Collection-specific heat glow colors */
+.immersive-black-rose .pulse-heat-high .hotspot-beacon {
+	box-shadow: 0 0 16px rgba(192, 192, 192, 0.4);
+}
+
+.immersive-love-hurts .pulse-heat-high .hotspot-beacon {
+	box-shadow: 0 0 16px rgba(220, 20, 60, 0.4);
+}
+
+/* ==========================================================================
+   6. INTEREST COUNTER — Overlay on Product Panels (Immersive)
+   ========================================================================== */
+
+.pulse-interest {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 5px 12px;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: rgba(255, 255, 255, 0.75);
+	background: rgba(255, 255, 255, 0.06);
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	border-radius: 100px;
+	margin-top: 0.75rem;
+}
+
+.pulse-interest__icon {
+	font-size: 0.75rem;
+	line-height: 1;
+}
+
+.pulse-interest__count {
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	font-variant-numeric: tabular-nums;
+}
+
+/* ==========================================================================
+   RESPONSIVE — Mobile Adjustments
+   ========================================================================== */
+
+@media (max-width: 640px) {
+	.pulse-toast-stack {
+		left: 0.5rem;
+		right: 0.5rem;
+		bottom: 4rem;
+	}
+
+	.pulse-toast {
+		max-width: none;
+	}
+
+	.pulse-toast__thumb {
+		width: 40px;
+		height: 40px;
+	}
+
+	.pulse-toast__action {
+		font-size: 0.6rem;
+	}
+
+	.pulse-toast__product {
+		font-size: 0.78rem;
+	}
+
+	.pulse-countdown-banner {
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		padding: 8px 2.5rem 8px 1rem;
+		justify-content: center;
+	}
+
+	.pulse-countdown-banner__label {
+		font-size: 0.55rem;
+	}
+
+	.pulse-countdown-banner__time {
+		font-size: 0.75rem;
+	}
+
+	.pulse-countdown-banner__cta {
+		font-size: 0.55rem;
+		padding: 5px 10px;
+	}
+
+	.pulse-viewers {
+		font-size: 0.55rem;
+		padding: 3px 7px;
+	}
+
+	.pulse-scarcity {
+		font-size: 0.55rem;
+	}
+}
+
+/* Adjust when immersive tab bar is present */
+.immersive-page .pulse-toast-stack {
+	bottom: 5.5rem;
+}
+
+.immersive-page .pulse-countdown-banner {
+	bottom: var(--tab-bar-height, 48px);
+}
+
+/* Adjust when sticky CTA bar is present */
+.pulse-toast-stack.has-sticky-bar {
+	bottom: 5rem;
+}
+
+/* ==========================================================================
+   REDUCED MOTION — Respect User Preferences
+   ========================================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.pulse-toast {
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-toast::before {
+		animation: none;
+	}
+
+	.pulse-toast.exiting {
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-viewers__dot {
+		animation: none;
+		opacity: 1;
+	}
+
+	.pulse-scarcity--critical .pulse-scarcity__dot {
+		animation: none;
+	}
+
+	.pulse-scarcity::after {
+		animation: none;
+		display: none;
+	}
+
+	.pulse-countdown-banner {
+		animation: none;
+		transition-duration: 0.01ms;
+	}
+
+	.pulse-heat-medium .hotspot-beacon,
+	.pulse-heat-high .hotspot-beacon,
+	.pulse-heat-medium .hotspot-beacon::before,
+	.pulse-heat-high .hotspot-beacon::before {
+		animation: none;
+	}
+
+	.pulse-heat-high .hotspot-beacon,
+	.pulse-heat-medium .hotspot-beacon {
+		box-shadow: 0 0 8px rgba(183, 110, 121, 0.4);
+	}
+}

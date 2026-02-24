@@ -207,7 +207,7 @@ export function CompetitionTrendChart({ data }: CompetitionTrendChartProps) {
               strokeWidth={3}
               fill="url(#competitionsGradient)"
             />
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend content={<ChartLegendContent payload={[]} />} />
           </AreaChart>
         </ChartContainer>
       </CardContent>
@@ -271,7 +271,7 @@ export function AgentStatusChart({ active, idle, offline }: AgentStatusChartProp
               ))}
             </Pie>
             <ChartTooltip content={<ChartTooltipContent />} />
-            <ChartLegend content={<ChartLegendContent />} />
+            <ChartLegend content={<ChartLegendContent payload={[]} />} />
           </PieChart>
         </ChartContainer>
         <div className="mt-4 grid grid-cols-3 gap-2 text-center">
