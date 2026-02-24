@@ -256,7 +256,13 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     PRE-ORDER CTA
 	     ============================================================ -->
+	<!-- Conversion Intelligence -->
+	<div data-cie-viewers="35" style="text-align:center; padding:1rem 0;"></div>
+	<div data-cie-confidence></div>
+	<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:1rem 2rem;"></div>
+
 	<section class="collection-preorder-cta">
+		<div data-cie-countdown="auto" data-cie-countdown-label="Pre-Order Window" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 		   class="collection-preorder-cta__btn">
 			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>

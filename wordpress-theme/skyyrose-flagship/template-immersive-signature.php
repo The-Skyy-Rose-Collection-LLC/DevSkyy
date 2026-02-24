@@ -498,6 +498,11 @@ get_header();
 
 	<?php get_template_part( 'template-parts/cinematic-toggle' ); ?>
 
+	<!-- Conversion Intelligence: Urgency Countdown -->
+	<div style="position:absolute; bottom:56px; right:16px; z-index:12;">
+		<div data-cie-countdown="auto" data-cie-countdown-label="Pre-Order Closes"></div>
+	</div>
+
 </main><!-- #primary -->
 
 <?php
