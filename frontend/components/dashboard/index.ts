@@ -12,3 +12,5 @@ export {
 } from './analytics-charts';
 export { ThreeViewer } from '../three-viewer';
 export { AppSidebar } from './app-sidebar';
+export { AuroraAnalytics } from './aurora-analytics';
+export { PulseAnalytics } from './pulse-analytics';

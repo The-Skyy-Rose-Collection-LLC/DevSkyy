@@ -26,6 +26,7 @@ import {
 } from '@/components/dashboard/analytics-charts';
 import LuxuryProductViewer from '@/components/3d/LuxuryProductViewer';
 import PulseAnalytics from '@/components/dashboard/pulse-analytics';
+import AuroraAnalytics from '@/components/dashboard/aurora-analytics';
 
 interface DashboardStats {
   roundTable: {
@@ -316,7 +317,10 @@ export default function AdminDashboard() {
 
       {/* The Pulse — Real-Time Social Proof & Urgency Engine */}
       <motion.section variants={itemVariants} aria-label="The Pulse Analytics">
-        <PulseAnalytics />
+        <div className="grid gap-8 lg:grid-cols-2">
+          <PulseAnalytics />
+          <AuroraAnalytics />
+        </div>
       </motion.section>
 
       {/* Quick Actions */}

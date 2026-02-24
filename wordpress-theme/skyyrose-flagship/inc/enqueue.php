@@ -474,6 +474,45 @@ function skyyrose_enqueue_the_pulse() {
 }
 
 /**
+ * Enqueue Aurora — Ambient Engagement Engine.
+ *
+ * Loads the conversion-driving Aurora layer on all customer-facing pages:
+ * CTA shimmer, engagement depth tracking, scroll reveals, product card
+ * 3D tilt, VIP countdown, and scarcity pulse indicators.
+ *
+ * @since 3.4.0
+ * @return void
+ */
+function skyyrose_enqueue_aurora_engine() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/aurora-engine.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-aurora-engine',
+			SKYYROSE_ASSETS_URI . '/css/aurora-engine.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/aurora-engine.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-aurora-engine',
+			SKYYROSE_ASSETS_URI . '/js/aurora-engine.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -544,6 +583,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-luxury-cursor',
 		'skyyrose-social-proof',
 		'skyyrose-the-pulse',
+		'skyyrose-aurora-engine',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -630,6 +670,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_social_proof', 30 );
 
 // The Pulse — Real-Time Social Proof & Urgency Engine (priority 32, after social proof base).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_the_pulse', 32 );
+
+// Aurora — Ambient Engagement Engine on customer-facing pages (priority 34, after Pulse).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_aurora_engine', 34 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
