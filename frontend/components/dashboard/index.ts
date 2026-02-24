@@ -15,3 +15,4 @@ export { AppSidebar } from './app-sidebar';
 export { AuroraAnalytics } from './aurora-analytics';
 export { PulseAnalytics } from './pulse-analytics';
 export { ConversionPulse } from './conversion-pulse';
+export { PersonalizationAnalytics } from './personalization-analytics';

@@ -28,6 +28,7 @@ import LuxuryProductViewer from '@/components/3d/LuxuryProductViewer';
 import PulseAnalytics from '@/components/dashboard/pulse-analytics';
 import AuroraAnalytics from '@/components/dashboard/aurora-analytics';
 import { ConversionPulse } from '@/components/dashboard/conversion-pulse';
+import { PersonalizationAnalytics } from '@/components/dashboard/personalization-analytics';
 
 interface DashboardStats {
   roundTable: {
@@ -327,6 +328,11 @@ export default function AdminDashboard() {
       {/* Conversion Pulse — Live Sales Feed */}
       <motion.section variants={itemVariants} aria-label="Conversion Pulse Live Feed">
         <ConversionPulse />
+      </motion.section>
+
+      {/* Adaptive Personalization Engine — Behavioral Analytics */}
+      <motion.section variants={itemVariants} aria-label="Adaptive Personalization Analytics">
+        <PersonalizationAnalytics />
       </motion.section>
 
       {/* Quick Actions */}
