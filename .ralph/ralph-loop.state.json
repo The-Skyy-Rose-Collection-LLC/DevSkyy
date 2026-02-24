@@ -1,13 +1,13 @@
 {
   "active": true,
-  "iteration": 3,
+  "iteration": 0,
   "minIterations": 1,
   "maxIterations": 25,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
-  "prompt": "Full stack website upgrade — examine every page, modern UI/UX, seamless flow static to interactive to pre-order, AI fashion models in SkyyRose branding wearing 100% replica products, rotating 3D collection logos, pre-order money page with all 3 collections, exclusive incentive popup, deploy WordPress theme to skyyrose.co and frontend to Vercel",
-  "startedAt": "2026-02-24T17:49:36.108Z",
+  "prompt": "PART A: Build WordPress theme at wordpress-theme/skyyrose-flagship/ for skyyrose.co. Priority: immersive experience pages MUST mimic drakerelated.com — full-viewport rooms, beacon hotspots, room navigation, full-bleed scene backgrounds, product card modals. Then collection pages with rotating 3D logos, homepage, pre-order money page, remaining pages. PART B: Configure admin dashboard at frontend/ for devskyy.app — verify LLM Round Table, add Meshy API to 3D pipeline alongside Tripo, verify imagery pipeline, CREATE social media pipeline from scratch, verify WordPress and HuggingFace deployments. FINAL: One super significant upgrade across static pages + immersive pages + dashboard that is both cosmetically stunning AND measurably proven to drive sales.",
+  "startedAt": "2026-02-24T19:45:00.000Z",
   "model": "",
   "agent": "claude-code"
 }

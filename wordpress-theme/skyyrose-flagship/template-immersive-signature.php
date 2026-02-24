@@ -34,7 +34,7 @@ $signature_rooms = array(
 	// Room 1 — Waterfront Runway
 	array(
 		'name'     => esc_html__( 'Waterfront Runway', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/images/scenes/signature-waterfront-runway.png',
+		'image'    => get_template_directory_uri() . '/assets/scenes/signature/signature-waterfront-runway.png',
 		'alt'      => esc_attr__( 'Bay Bridge waterfront at night with black marble platform floating over water, gold-lit LED display frames with hanging garments, glass orb display case, and stepped marble pedestals', 'skyyrose-flagship' ),
 		'products' => array(
 			// Glass orb display case (left) — beanies
@@ -191,7 +191,7 @@ $signature_rooms = array(
 	// Room 2 — Golden Gate Showroom
 	array(
 		'name'     => esc_html__( 'Golden Gate Showroom', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/images/scenes/signature-golden-gate-showroom.png',
+		'image'    => get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png',
 		'alt'      => esc_attr__( 'Golden Gate Bridge sunset showroom with floor-to-ceiling panoramic windows, black marble interior with gold LED trim, clothing racks, marble pedestals, and dramatic sunset sky', 'skyyrose-flagship' ),
 		'products' => array(
 			// Left wall clothing rack

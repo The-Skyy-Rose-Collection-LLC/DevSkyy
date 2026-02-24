@@ -2,8 +2,9 @@
 /**
  * Template Name: Collection - Signature
  *
- * SIGNATURE collection page — Elevated luxury mood with art deco overlay,
- * pulsing gold ring (600px), and rose gold (#B76E79) / gold (#D4AF37) accents.
+ * SIGNATURE collection page — Elevated luxury mood with rotating 3D logo,
+ * product grid, story section, immersive CTA, and pre-order CTA.
+ * Rose gold (#B76E79) / gold (#D4AF37) accents.
  *
  * @package SkyyRose_Flagship
  * @since   3.0.0
@@ -158,143 +159,84 @@ function skyyrose_get_signature_products() {
 	return $products;
 }
 
-$skyyrose_sg_products   = skyyrose_get_signature_products();
-$skyyrose_sg_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
+$skyyrose_sg_products    = skyyrose_get_signature_products();
+$skyyrose_sg_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
 $skyyrose_sg_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
+$skyyrose_sg_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/signature-logo.jpg' );
+$skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png' );
 ?>
 
 <div class="collection--signature" data-collection="signature">
 
 	<!-- ============================================================
-	     HERO SECTION
+	     HERO SECTION — Rotating 3D Logo
 	     ============================================================ -->
-	<section class="collection-hero" role="banner">
-		<div class="collection-hero__overlay" aria-hidden="true"></div>
+	<section class="collection-hero" role="banner"
+		style="background-image: url('<?php echo esc_attr( $skyyrose_sg_scene_url ); ?>'); background-size: cover; background-position: center;">
 
-		<!-- Pulsing gold ring (600px diameter, CSS-only animation) -->
-		<div class="signature-ring" aria-hidden="true"></div>
-
-		<div class="collection-hero__content fade-in-up">
-			<span class="collection-hero__badge">
-				<?php echo esc_html__( 'SKyyRose Flagship', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h1 class="collection-hero__title">
-				<?php echo esc_html__( 'SIGNATURE', 'skyyrose-flagship' ); ?>
-			</h1>
-
-			<p class="collection-hero__subtitle">
-				<?php echo esc_html__( 'The Art of Being Seen', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-hero__tagline">
-				<?php echo esc_html__( 'Elevated Luxury Collection', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="#products" class="collection-hero__cta">
-				<?php echo esc_html__( 'Discover the Line', 'skyyrose-flagship' ); ?>
-			</a>
+		<div class="collection-logo-3d collection-logo-3d--signature">
+			<img src="<?php echo esc_url( $skyyrose_sg_logo_url ); ?>"
+			     alt="<?php echo esc_attr__( 'Signature Collection Logo', 'skyyrose-flagship' ); ?>"
+			     width="280"
+			     height="280" />
 		</div>
 
-		<!-- Art deco overlay pattern via CSS ::after pseudo-element -->
+		<h1 class="collection-hero__title">
+			<?php echo esc_html__( 'Signature Collection', 'skyyrose-flagship' ); ?>
+		</h1>
+
+		<p class="collection-hero__subtitle">
+			<?php echo esc_html__( 'West Coast Prestige', 'skyyrose-flagship' ); ?>
+		</p>
+
+		<a href="#products" class="collection-hero__cta">
+			<?php echo esc_html__( 'Discover the Line', 'skyyrose-flagship' ); ?>
+		</a>
 	</section>
 
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
 	<section class="collection-story" id="story">
-		<div class="collection-story__inner fade-in-up">
-			<span class="collection-story__label">
-				<?php echo esc_html__( 'The Story', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 class="collection-story__heading">
-				<?php echo esc_html__( 'Heritage Meets Modernity', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'The SIGNATURE collection is the heart of SKyyRose. It is where our story began — rose gold warmth meeting modern streetwear sensibility. Every piece carries the DNA of the brand: quality fabrics, intentional design, and a commitment to self-expression.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'From pastel colorblock sets to essential tees, these are the pieces you build your wardrobe around. Timeless by design, luxurious by nature.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<div class="collection-story__divider" aria-hidden="true"></div>
-		</div>
+		<p class="collection-story__text">
+			<?php echo esc_html__( 'The Signature collection is the heart of SKyyRose. It is where our story began — rose gold warmth meeting modern streetwear sensibility. Every piece carries the DNA of the brand: quality fabrics, intentional design, and a commitment to self-expression. From pastel colorblock sets to essential tees, these are the pieces you build your wardrobe around. Timeless by design, luxurious by nature.', 'skyyrose-flagship' ); ?>
+		</p>
 	</section>
 
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
 	<section id="products" class="collection-products">
-		<div class="collection-products__header fade-in-up">
-			<span class="collection-products__label">
-				<?php echo esc_html__( 'The Collection', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 class="collection-products__title">
-				<?php echo esc_html__( 'SIGNATURE Pieces', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-products__count">
-				<?php
-				/* translators: %d: number of products in the collection */
-				printf( esc_html__( '%d Pieces', 'skyyrose-flagship' ), count( $skyyrose_sg_products ) );
-				?>
-			</p>
-		</div>
-
-		<div class="collection-products__grid">
+		<div class="collection-grid">
 			<?php
-			$skyyrose_delay = 0;
 			foreach ( $skyyrose_sg_products as $skyyrose_product ) :
-				$skyyrose_delay_class = 'delay-' . ( ( $skyyrose_delay % 8 ) + 1 );
-				$skyyrose_delay++;
-
 				$skyyrose_p_url   = isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#';
 				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_sg_placeholder;
 				?>
 				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
-				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>"
+				   class="collection-product-card"
 				   aria-label="<?php echo esc_attr( $skyyrose_product['name'] ); ?>">
 
-					<div class="product-card__image-wrap">
-						<img src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-						     loading="lazy"
-						     width="400"
-						     height="480" />
-
-						<div class="product-card__overlay" aria-hidden="true">
-							<span class="product-card__quick-view">
-								<?php echo esc_html__( 'Quick View', 'skyyrose-flagship' ); ?>
-							</span>
-						</div>
-
-						<span class="product-card__sku">
-							<?php echo esc_html( strtoupper( $skyyrose_product['sku'] ) ); ?>
+					<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
+						<span class="collection-product-card__badge">
+							<?php echo esc_html( $skyyrose_product['badge'] ); ?>
 						</span>
+					<?php endif; ?>
 
-						<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
-							<span class="product-card__badge">
-								<?php echo esc_html( $skyyrose_product['badge'] ); ?>
-							</span>
-						<?php endif; ?>
-					</div>
+					<img class="collection-product-card__image"
+					     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
+					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
+					     loading="lazy"
+					     width="400"
+					     height="533" />
 
-					<div class="product-card__info">
-						<h3 class="product-card__name">
+					<div class="collection-product-card__info">
+						<h3 class="collection-product-card__name">
 							<?php echo esc_html( $skyyrose_product['name'] ); ?>
 						</h3>
-						<p class="product-card__price">
+						<p class="collection-product-card__price">
 							<?php echo wp_kses_post( $skyyrose_product['price'] ); ?>
 						</p>
-						<?php if ( ! empty( $skyyrose_product['desc'] ) ) : ?>
-							<p class="product-card__desc">
-								<?php echo esc_html( $skyyrose_product['desc'] ); ?>
-							</p>
-						<?php endif; ?>
 					</div>
 				</a>
 			<?php endforeach; ?>
@@ -302,23 +244,23 @@ $skyyrose_sg_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	</section>
 
 	<!-- ============================================================
-	     CTA BANNER
+	     IMMERSIVE CTA
 	     ============================================================ -->
-	<section class="collection-cta">
-		<div class="collection-cta__inner fade-in-up">
-			<h2 class="collection-cta__heading">
-				<?php echo esc_html__( 'Stay Golden', 'skyyrose-flagship' ); ?>
-			</h2>
+	<section class="collection-immersive-cta">
+		<a href="<?php echo esc_url( home_url( '/immersive/signature/' ) ); ?>"
+		   class="collection-immersive-cta__link">
+			<?php echo esc_html__( 'Enter the 3D Experience', 'skyyrose-flagship' ); ?>
+		</a>
+	</section>
 
-			<p class="collection-cta__text">
-				<?php echo esc_html__( 'The Signature collection is who we are. Rose gold runs through our veins. Find the piece that tells your story — and wear it like you mean it.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="<?php echo esc_url( $skyyrose_sg_shop_url ); ?>"
-			   class="collection-cta__button">
-				<?php echo esc_html__( 'Shop SIGNATURE', 'skyyrose-flagship' ); ?>
-			</a>
-		</div>
+	<!-- ============================================================
+	     PRE-ORDER CTA
+	     ============================================================ -->
+	<section class="collection-preorder-cta">
+		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
+		   class="collection-preorder-cta__btn">
+			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>
+		</a>
 	</section>
 
 	<!-- ============================================================

@@ -303,6 +303,99 @@
 	}
 
 	/* --------------------------------------------------
+	   Countdown Timer
+	   -------------------------------------------------- */
+
+	function initCountdown() {
+		var timerEl = document.querySelector('.countdown-timer');
+		if (!timerEl) return;
+
+		var launchDate = new Date(timerEl.dataset.launchDate || '2026-04-01T00:00:00').getTime();
+		var daysEl    = timerEl.querySelector('[data-unit="days"]');
+		var hoursEl   = timerEl.querySelector('[data-unit="hours"]');
+		var minutesEl = timerEl.querySelector('[data-unit="minutes"]');
+		var secondsEl = timerEl.querySelector('[data-unit="seconds"]');
+
+		function pad(n) {
+			return n < 10 ? '0' + n : '' + n;
+		}
+
+		function tick() {
+			var now  = Date.now();
+			var diff = Math.max(0, launchDate - now);
+
+			var days    = Math.floor(diff / (1000 * 60 * 60 * 24));
+			var hours   = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+			var minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+			var seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+			if (daysEl)    daysEl.textContent    = pad(days);
+			if (hoursEl)   hoursEl.textContent   = pad(hours);
+			if (minutesEl) minutesEl.textContent  = pad(minutes);
+			if (secondsEl) secondsEl.textContent  = pad(seconds);
+		}
+
+		tick();
+		setInterval(tick, 1000);
+	}
+
+	/* --------------------------------------------------
+	   Incentive Popup
+	   -------------------------------------------------- */
+
+	function initIncentivePopup() {
+		var overlay = document.querySelector('.incentive-popup-overlay');
+		var closeBtn = overlay ? overlay.querySelector('.incentive-popup-close') : null;
+		if (!overlay) return;
+
+		var shown = sessionStorage.getItem('sr_incentive_shown');
+		if (shown) return;
+
+		function showPopup() {
+			overlay.classList.add('open');
+			overlay.setAttribute('aria-hidden', 'false');
+			sessionStorage.setItem('sr_incentive_shown', '1');
+		}
+
+		function hidePopup() {
+			overlay.classList.remove('open');
+			overlay.setAttribute('aria-hidden', 'true');
+		}
+
+		// Show after 15 seconds
+		setTimeout(showPopup, 15000);
+
+		// Exit intent on desktop
+		document.addEventListener('mouseout', function (e) {
+			if (e.clientY < 5 && !shown) {
+				showPopup();
+			}
+		});
+
+		if (closeBtn) {
+			closeBtn.addEventListener('click', hidePopup);
+		}
+
+		overlay.addEventListener('click', function (e) {
+			if (e.target === overlay) hidePopup();
+		});
+
+		// Handle form submission
+		var form = overlay.querySelector('.incentive-popup-form');
+		if (form) {
+			form.addEventListener('submit', function (e) {
+				e.preventDefault();
+				var submitBtn = form.querySelector('.incentive-popup-submit');
+				if (submitBtn) {
+					submitBtn.textContent = 'Welcome to the Inner Circle!';
+					submitBtn.disabled = true;
+				}
+				setTimeout(hidePopup, 2000);
+			});
+		}
+	}
+
+	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
 
@@ -315,6 +408,8 @@
 		initActionBtns();
 		initWishlist();
 		initKeyboard();
+		initCountdown();
+		initIncentivePopup();
 	}
 
 	if (document.readyState === 'loading') {

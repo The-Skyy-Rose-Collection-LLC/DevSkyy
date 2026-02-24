@@ -14,6 +14,7 @@ import {
   FolderOpen,
   Workflow,
   CheckCircle2,
+  Megaphone,
 } from 'lucide-react';
 
 import {
@@ -60,6 +61,11 @@ const mainNavItems = [
     title: 'Generation Queue',
     url: '/admin/pipeline',
     icon: Workflow,
+  },
+  {
+    title: 'Social Media',
+    url: '/admin/social-media',
+    icon: Megaphone,
   },
   {
     title: 'Fidelity QA',

@@ -949,6 +949,241 @@
 	}
 }
 
+/* ==================================================
+   COUNTDOWN TIMER
+   ================================================== */
+
+.preorder-countdown {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 1.5rem 1rem;
+	background: linear-gradient(180deg, rgba(183, 110, 121, 0.08) 0%, rgba(10, 10, 10, 0) 100%);
+	border-bottom: 1px solid rgba(183, 110, 121, 0.1);
+}
+
+.countdown-label {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.65rem;
+	font-weight: 600;
+	letter-spacing: 0.2em;
+	text-transform: uppercase;
+	color: var(--rose-gold, #B76E79);
+}
+
+.countdown-timer {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+.countdown-unit {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	min-width: 52px;
+}
+
+.countdown-value {
+	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-size: clamp(1.5rem, 4vw, 2.2rem);
+	font-weight: 700;
+	color: #fff;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+}
+
+.countdown-unit-label {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.55rem;
+	font-weight: 400;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.35);
+	margin-top: 4px;
+}
+
+.countdown-separator {
+	font-size: 1.5rem;
+	font-weight: 300;
+	color: rgba(255, 255, 255, 0.2);
+	margin-top: -12px;
+}
+
+.countdown-pieces {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 400;
+	letter-spacing: 0.1em;
+	color: rgba(255, 255, 255, 0.35);
+	text-transform: uppercase;
+}
+
+/* ==================================================
+   EDITION BADGE ON PRODUCT CARDS
+   ================================================== */
+
+.product-grid-edition {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 500;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--gold, #D4AF37);
+	margin: 4px 0 0;
+	padding: 0;
+}
+
+/* ==================================================
+   INCENTIVE POPUP
+   ================================================== */
+
+.incentive-popup-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 300;
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.incentive-popup-overlay.open {
+	opacity: 1;
+	visibility: visible;
+}
+
+.incentive-popup {
+	position: relative;
+	width: 90%;
+	max-width: 420px;
+	background: rgba(17, 17, 17, 0.95);
+	backdrop-filter: blur(24px);
+	-webkit-backdrop-filter: blur(24px);
+	border: 1px solid rgba(183, 110, 121, 0.2);
+	border-radius: 20px;
+	padding: 2.5rem 2rem;
+	transform: scale(0.9) translateY(20px);
+	transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.incentive-popup-overlay.open .incentive-popup {
+	transform: scale(1) translateY(0);
+}
+
+.incentive-popup-close {
+	position: absolute;
+	top: 12px;
+	right: 16px;
+	width: 32px;
+	height: 32px;
+	border: none;
+	background: rgba(255, 255, 255, 0.06);
+	color: rgba(255, 255, 255, 0.5);
+	font-size: 1.2rem;
+	border-radius: 50%;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease;
+}
+
+.incentive-popup-close:hover {
+	background: rgba(255, 255, 255, 0.12);
+}
+
+.incentive-popup-content {
+	text-align: center;
+}
+
+.incentive-popup-monogram {
+	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-size: 2rem;
+	font-weight: 700;
+	color: var(--rose-gold, #B76E79);
+	margin-bottom: 1rem;
+	letter-spacing: 0.3em;
+}
+
+.incentive-popup-title {
+	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #fff;
+	margin: 0 0 0.5rem;
+}
+
+.incentive-popup-subtitle {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.85rem;
+	font-weight: 300;
+	color: rgba(255, 255, 255, 0.6);
+	line-height: 1.6;
+	margin: 0 0 1.5rem;
+}
+
+.incentive-popup-form {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+}
+
+.incentive-popup-input {
+	width: 100%;
+	padding: 14px 16px;
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: 8px;
+	background: rgba(255, 255, 255, 0.04);
+	color: #fff;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.85rem;
+	transition: border-color 0.2s ease;
+}
+
+.incentive-popup-input:focus {
+	outline: none;
+	border-color: var(--rose-gold, #B76E79);
+}
+
+.incentive-popup-input::placeholder {
+	color: rgba(255, 255, 255, 0.3);
+}
+
+.incentive-popup-submit {
+	width: 100%;
+	padding: 14px;
+	border: none;
+	border-radius: 8px;
+	background: linear-gradient(135deg, #B76E79, #D4AF37);
+	color: #fff;
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	cursor: pointer;
+	transition: opacity 0.25s ease;
+}
+
+.incentive-popup-submit:hover {
+	opacity: 0.9;
+}
+
+.incentive-popup-fine {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.65rem;
+	font-weight: 300;
+	color: rgba(255, 255, 255, 0.3);
+	margin: 1rem 0 0;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
 	.loading-monogram {

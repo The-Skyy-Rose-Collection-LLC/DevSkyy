@@ -328,6 +328,34 @@ function skyyrose_enqueue_luxury_cursor() {
 }
 
 /**
+ * Conditionally enqueue collection logo 3D rotation styles.
+ *
+ * Loads collection-logos.css only on collection template pages so the
+ * rotating 3D logo animations and collection-specific card styles are available.
+ *
+ * @since 3.0.0
+ * @return void
+ */
+function skyyrose_enqueue_collection_logos() {
+
+	$slug = skyyrose_get_current_template_slug();
+
+	if ( 'collection' !== $slug ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/collection-logos.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-collection-logos',
+			SKYYROSE_ASSETS_URI . '/css/collection-logos.css',
+			array( 'skyyrose-design-tokens' ),
+			'3.0.0'
+		);
+	}
+}
+
+/**
  * Conditionally enqueue Cinematic Mode assets.
  *
  * Loads cinematic-mode.css and cinematic-mode.js only on interactive pages:
@@ -360,6 +388,44 @@ function skyyrose_enqueue_cinematic_mode() {
 		wp_enqueue_script(
 			'skyyrose-cinematic-mode',
 			SKYYROSE_ASSETS_URI . '/js/cinematic-mode.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
+ * Enqueue the Social Proof + Urgency Engine on customer-facing pages.
+ *
+ * Loads purchase notification toasts, live viewer count, scarcity badges,
+ * and a sticky pre-order CTA bar across all non-admin pages.
+ *
+ * @since 3.2.0
+ * @return void
+ */
+function skyyrose_enqueue_social_proof() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/social-proof.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-social-proof',
+			SKYYROSE_ASSETS_URI . '/css/social-proof.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/social-proof.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-social-proof',
+			SKYYROSE_ASSETS_URI . '/js/social-proof.js',
 			array(),
 			SKYYROSE_VERSION,
 			true
@@ -436,6 +502,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-template-preorder-gateway',
 		'skyyrose-cinematic-mode',
 		'skyyrose-luxury-cursor',
+		'skyyrose-social-proof',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -499,6 +566,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_styles', 20 );
 // Template-specific scripts (priority 20).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_template_scripts', 20 );
 
+// Collection logo 3D rotation styles (priority 22, after template styles).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_collection_logos', 22 );
+
 // Cinematic Mode assets on interactive pages (priority 25, after template assets).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cinematic_mode', 25 );
 
@@ -513,6 +583,9 @@ add_filter( 'style_loader_tag', 'skyyrose_add_font_display_swap', 10, 2 );
 
 // Defer non-critical scripts.
 add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
+
+// Social Proof + Urgency Engine on customer-facing pages (priority 30, after all template assets).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_social_proof', 30 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

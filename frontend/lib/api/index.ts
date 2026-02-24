@@ -6,6 +6,7 @@ import { assets } from './endpoints/assets';
 import { qa } from './endpoints/qa';
 import { batch } from './endpoints/batch';
 import { health } from './endpoints/health';
+import { socialMedia } from './endpoints/social-media';
 
 // Re-export types
 export * from './types';
@@ -19,6 +20,7 @@ export const api = {
     qa,
     batch,
     health,
+    socialMedia,
 };
 
 export default api;

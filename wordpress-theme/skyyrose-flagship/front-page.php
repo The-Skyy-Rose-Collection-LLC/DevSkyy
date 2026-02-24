@@ -31,6 +31,18 @@ get_header();
 		<div class="hero__sparkles" aria-hidden="true" id="js-hero-sparkles"></div>
 
 		<div class="hero__content">
+			<!-- Animated SR Logo -->
+			<div class="hero__logo" aria-hidden="true">
+				<img
+					src="<?php echo esc_url( get_template_directory_uri() . '/assets/branding/skyyrose-logo-animated.gif' ); ?>"
+					alt="<?php esc_attr_e( 'SkyyRose', 'skyyrose-flagship' ); ?>"
+					width="180"
+					height="180"
+					loading="eager"
+					class="hero__logo-img"
+				>
+			</div>
+
 			<span class="hero__badge">
 				<svg class="hero__badge-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
 					<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
@@ -201,12 +213,17 @@ get_header();
 						<p class="collections__card-description">
 							<?php echo esc_html( $collection['description'] ); ?>
 						</p>
-						<a href="<?php echo esc_url( $collection_url ); ?>" class="btn btn--collection">
-							<?php esc_html_e( 'Explore Collection', 'skyyrose-flagship' ); ?>
-							<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
-								<path d="M5 12h14M12 5l7 7-7 7"/>
-							</svg>
-						</a>
+						<div class="collections__card-actions">
+							<a href="<?php echo esc_url( $collection_url ); ?>" class="btn btn--collection">
+								<?php esc_html_e( 'Shop Collection', 'skyyrose-flagship' ); ?>
+								<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+									<path d="M5 12h14M12 5l7 7-7 7"/>
+								</svg>
+							</a>
+							<a href="<?php echo esc_url( home_url( '/immersive/' . $collection['slug'] . '/' ) ); ?>" class="btn btn--immersive">
+								<?php esc_html_e( 'Immersive Experience', 'skyyrose-flagship' ); ?>
+							</a>
+						</div>
 					</div>
 				</div>
 			<?php endforeach; ?>

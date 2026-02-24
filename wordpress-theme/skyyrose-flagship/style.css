@@ -1142,3 +1142,65 @@ label {
 	h3 { font-size: 16pt; }
 	h4 { font-size: 14pt; }
 }
+
+/* ==========================================================================
+   Hero Logo
+   ========================================================================== */
+
+.hero__logo {
+	margin-bottom: 1.5rem;
+}
+
+.hero__logo-img {
+	width: 140px;
+	height: 140px;
+	object-fit: contain;
+	filter: drop-shadow(0 0 30px rgba(183, 110, 121, 0.5));
+	animation: hero-logo-float 4s ease-in-out infinite;
+}
+
+@keyframes hero-logo-float {
+	0%, 100% { transform: translateY(0); }
+	50%      { transform: translateY(-10px); }
+}
+
+@media (min-width: 768px) {
+	.hero__logo-img {
+		width: 180px;
+		height: 180px;
+	}
+}
+
+/* ==========================================================================
+   Collection Card Actions (dual buttons)
+   ========================================================================== */
+
+.collections__card-actions {
+	display: flex;
+	gap: 0.75rem;
+	margin-top: 1.25rem;
+	flex-wrap: wrap;
+}
+
+.btn--immersive {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.65rem 1.25rem;
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: var(--color-rose-gold, #B76E79);
+	border: 1px solid var(--color-rose-gold, #B76E79);
+	border-radius: 2px;
+	background: transparent;
+	transition: background 0.3s ease, color 0.3s ease;
+}
+
+.btn--immersive:hover,
+.btn--immersive:focus-visible {
+	background: var(--color-rose-gold, #B76E79);
+	color: #fff;
+}

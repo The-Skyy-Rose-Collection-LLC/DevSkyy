@@ -2,12 +2,13 @@
 /**
  * Template Name: Immersive - Black Rose
  *
- * "The Garden" — Gothic garden scene with wrought-iron racks, roses,
- * and cathedral backdrop. drakerelated.com-style immersive experience
- * with hotspot beacons on products visible in the scene.
+ * "The Garden" — Gothic cathedral garden rooms with wrought-iron racks,
+ * black roses, marble rotundas, and moonlit grottos.
+ * drakerelated.com-style immersive experience: full-viewport rooms,
+ * pulsing beacon hotspots, smooth room-to-room transitions.
  *
  * @package SkyyRose_Flagship
- * @since 2.0.0
+ * @since   3.0.0
  */
 
 // Prevent direct access.
@@ -16,91 +17,146 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Product data for hotspot beacons.
- * Each product is positioned on a contextual prop within the scene —
- * stone benches, iron gates, rose arbors, vintage mirrors, glass bell jars.
- * Products attach TO these props, not floating in air.
- *
- * Will be replaced with WooCommerce product queries in production.
+ * Multi-room scene data.
+ * Each room is a full-viewport scene with its own background image and hotspot products.
+ * Products are positioned on contextual props within each scene.
  */
-$black_rose_products = array(
+$black_rose_rooms = array(
+	// Room 1 — Moonlit Courtyard
 	array(
-		'id'         => 'br-006',
-		'name'       => esc_html__( 'BLACK Rose Sherpa Jacket', 'skyyrose-flagship' ),
-		'price'      => '$295',
-		'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-		'sizes'      => 'S,M,L,XL,2XL,3XL',
-		'image'      => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.jpg',
-		'url'        => '/?product_id=br-006',
-		'left'       => '22',
-		'top'        => '55',
-		'prop'       => 'stone-bench',
-		'prop_label' => esc_html__( 'Draped on stone garden bench', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'Moonlit Courtyard', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-moonlit-courtyard.png',
+		'alt'      => esc_attr__( 'Moonlit garden courtyard with marble statues, black rose topiaries, and ornate fountains', 'skyyrose-flagship' ),
+		'products' => array(
+			array(
+				'id'         => 'br-006',
+				'name'       => esc_html__( 'BLACK Rose Sherpa Jacket', 'skyyrose-flagship' ),
+				'price'      => '$295',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.jpg',
+				'url'        => '/?product_id=br-006',
+				'left'       => '25',
+				'top'        => '52',
+				'prop'       => 'marble-statue',
+				'prop_label' => esc_html__( 'Draped over marble garden statue', 'skyyrose-flagship' ),
+			),
+			array(
+				'id'         => 'br-001',
+				'name'       => esc_html__( 'BLACK Rose Crewneck', 'skyyrose-flagship' ),
+				'price'      => '$125',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-001-crewneck.jpg',
+				'url'        => '/?product_id=br-001',
+				'left'       => '68',
+				'top'        => '40',
+				'prop'       => 'fountain-edge',
+				'prop_label' => esc_html__( 'Folded on fountain edge', 'skyyrose-flagship' ),
+			),
+		),
 	),
+	// Room 2 — Iron Gazebo Garden
 	array(
-		'id'         => 'br-001',
-		'name'       => esc_html__( 'BLACK Rose Crewneck', 'skyyrose-flagship' ),
-		'price'      => '$125',
-		'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-		'sizes'      => 'S,M,L,XL,2XL,3XL',
-		'image'      => get_template_directory_uri() . '/assets/images/products/br-001-crewneck.jpg',
-		'url'        => '/?product_id=br-001',
-		'left'       => '48',
-		'top'        => '38',
-		'prop'       => 'rose-arbor',
-		'prop_label' => esc_html__( 'Hanging from rose arbor gate', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'Iron Gazebo Garden', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-iron-gazebo-garden.png',
+		'alt'      => esc_attr__( 'Aerial view of ornate iron gazebo surrounded by rose hedge maze and cobblestone paths under moonlight', 'skyyrose-flagship' ),
+		'products' => array(
+			array(
+				'id'         => 'br-008',
+				'name'       => esc_html__( "Women's BLACK Rose Hooded Dress", 'skyyrose-flagship' ),
+				'price'      => '$175',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'XS,S,M,L,XL,2XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-008-hooded-dress.jpg',
+				'url'        => '/?product_id=br-008',
+				'left'       => '48',
+				'top'        => '35',
+				'prop'       => 'iron-gazebo',
+				'prop_label' => esc_html__( 'Displayed inside iron gazebo', 'skyyrose-flagship' ),
+			),
+			array(
+				'id'         => 'br-004',
+				'name'       => esc_html__( 'BLACK Rose Hoodie', 'skyyrose-flagship' ),
+				'price'      => '$145',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-004-hoodie.jpg',
+				'url'        => '/?product_id=br-004',
+				'left'       => '72',
+				'top'        => '55',
+				'prop'       => 'hedge-arch',
+				'prop_label' => esc_html__( 'Hanging from rose hedge archway', 'skyyrose-flagship' ),
+			),
+		),
 	),
+	// Room 3 — Marble Rotunda
 	array(
-		'id'         => 'br-008',
-		'name'       => esc_html__( "Women's BLACK Rose Hooded Dress", 'skyyrose-flagship' ),
-		'price'      => '$175',
-		'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-		'sizes'      => 'XS,S,M,L,XL,2XL',
-		'image'      => get_template_directory_uri() . '/assets/images/products/br-008-hooded-dress.jpg',
-		'url'        => '/?product_id=br-008',
-		'left'       => '35',
-		'top'        => '28',
-		'prop'       => 'gothic-mirror',
-		'prop_label' => esc_html__( 'Reflected in gothic vanity mirror', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'Marble Rotunda', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-marble-rotunda.png',
+		'alt'      => esc_attr__( 'Dark marble rotunda with twisted glowing tree, mannequin statue, and dramatic skylight', 'skyyrose-flagship' ),
+		'products' => array(
+			array(
+				'id'         => 'br-005',
+				'name'       => esc_html__( 'BLACK Rose Hoodie — Signature Edition', 'skyyrose-flagship' ),
+				'price'      => '$185',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-005-hoodie-sig.jpg',
+				'url'        => '/?product_id=br-005',
+				'left'       => '38',
+				'top'        => '45',
+				'prop'       => 'mannequin-statue',
+				'prop_label' => esc_html__( 'On mannequin beneath skylight', 'skyyrose-flagship' ),
+			),
+			array(
+				'id'         => 'br-002',
+				'name'       => esc_html__( 'BLACK Rose Joggers', 'skyyrose-flagship' ),
+				'price'      => '$95',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-002-joggers.jpg',
+				'url'        => '/?product_id=br-002',
+				'left'       => '65',
+				'top'        => '60',
+				'prop'       => 'twisted-tree-base',
+				'prop_label' => esc_html__( 'Folded at base of glowing tree', 'skyyrose-flagship' ),
+			),
+		),
 	),
+	// Room 4 — White Rose Grotto
 	array(
-		'id'         => 'br-002',
-		'name'       => esc_html__( 'BLACK Rose Joggers', 'skyyrose-flagship' ),
-		'price'      => '$95',
-		'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-		'sizes'      => 'S,M,L,XL,2XL,3XL',
-		'image'      => get_template_directory_uri() . '/assets/images/products/br-002-joggers.jpg',
-		'url'        => '/?product_id=br-002',
-		'left'       => '72',
-		'top'        => '62',
-		'prop'       => 'stone-steps',
-		'prop_label' => esc_html__( 'Folded on stone garden steps', 'skyyrose-flagship' ),
-	),
-	array(
-		'id'         => 'br-004',
-		'name'       => esc_html__( 'BLACK Rose Hoodie', 'skyyrose-flagship' ),
-		'price'      => '$145',
-		'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-		'sizes'      => 'S,M,L,XL,2XL,3XL',
-		'image'      => get_template_directory_uri() . '/assets/images/products/br-004-hoodie.jpg',
-		'url'        => '/?product_id=br-004',
-		'left'       => '60',
-		'top'        => '42',
-		'prop'       => 'iron-gate',
-		'prop_label' => esc_html__( 'Draped over wrought-iron gate', 'skyyrose-flagship' ),
-	),
-	array(
-		'id'         => 'br-003',
-		'name'       => esc_html__( 'BLACK is Beautiful Jersey', 'skyyrose-flagship' ),
-		'price'      => '$110',
-		'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
-		'sizes'      => 'S,M,L,XL,2XL,3XL',
-		'image'      => get_template_directory_uri() . '/assets/images/products/br-003-jersey.jpg',
-		'url'        => '/?product_id=br-003',
-		'left'       => '85',
-		'top'        => '48',
-		'prop'       => 'stone-pedestal',
-		'prop_label' => esc_html__( 'Displayed on cathedral stone pedestal', 'skyyrose-flagship' ),
+		'name'     => esc_html__( 'White Rose Grotto', 'skyyrose-flagship' ),
+		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-white-rose-grotto.png',
+		'alt'      => esc_attr__( 'Underground grotto with white roses on marble pedestal, ethereal light beams through stone arches', 'skyyrose-flagship' ),
+		'products' => array(
+			array(
+				'id'         => 'br-003',
+				'name'       => esc_html__( 'BLACK is Beautiful Jersey', 'skyyrose-flagship' ),
+				'price'      => '$110',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-003-jersey.jpg',
+				'url'        => '/?product_id=br-003',
+				'left'       => '50',
+				'top'        => '38',
+				'prop'       => 'marble-pedestal',
+				'prop_label' => esc_html__( 'Displayed on marble rose pedestal', 'skyyrose-flagship' ),
+			),
+			array(
+				'id'         => 'br-007',
+				'name'       => esc_html__( 'BLACK Rose × Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
+				'price'      => '$85',
+				'collection' => esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/br-007-shorts.jpg',
+				'url'        => '/?product_id=br-007',
+				'left'       => '30',
+				'top'        => '58',
+				'prop'       => 'stone-arch',
+				'prop_label' => esc_html__( 'Draped over grotto stone arch', 'skyyrose-flagship' ),
+			),
+		),
 	),
 );
 
@@ -117,16 +173,21 @@ get_header();
 			<div class="scene-loading-text"><?php echo esc_html__( 'Entering The Garden', 'skyyrose-flagship' ); ?></div>
 		</div>
 
-		<!-- Scene Viewport -->
+		<!-- Scene Viewport — Multi-Room Layers -->
 		<div class="scene-viewport">
-			<div class="scene-layer active" data-room-name="<?php esc_attr_e( 'The Garden', 'skyyrose-flagship' ); ?>">
-				<img
-					src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/scenes/black-rose-garden.jpg' ); ?>"
-					alt="<?php esc_attr_e( 'Gothic garden with wrought-iron racks draped in black roses, cathedral spires visible through mist', 'skyyrose-flagship' ); ?>"
-					loading="eager"
-					fetchpriority="high"
+			<?php foreach ( $black_rose_rooms as $index => $room ) : ?>
+				<div
+					class="scene-layer<?php echo 0 === $index ? ' active' : ''; ?>"
+					data-room-name="<?php echo esc_attr( $room['name'] ); ?>"
 				>
-			</div>
+					<img
+						src="<?php echo esc_url( $room['image'] ); ?>"
+						alt="<?php echo esc_attr( $room['alt'] ); ?>"
+						loading="<?php echo 0 === $index ? 'eager' : 'lazy'; ?>"
+						<?php if ( 0 === $index ) : ?>fetchpriority="high"<?php endif; ?>
+					>
+				</div>
+			<?php endforeach; ?>
 		</div>
 
 		<!-- Vignette -->
@@ -135,32 +196,58 @@ get_header();
 		<!-- Film Grain -->
 		<div class="scene-film-grain" aria-hidden="true"></div>
 
-		<!-- Hotspot Beacons — Products placed on contextual props -->
-		<div class="hotspot-container">
-			<?php foreach ( $black_rose_products as $product ) : ?>
-				<a
-					href="<?php echo esc_url( $product['url'] ); ?>"
-					class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
-					style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
-					data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
-					data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
-					data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
-					data-product-image="<?php echo esc_url( $product['image'] ); ?>"
-					data-product-collection="<?php echo esc_attr( $product['collection'] ); ?>"
-					data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
-					data-product-url="<?php echo esc_url( $product['url'] ); ?>"
-					data-prop="<?php echo esc_attr( $product['prop'] ); ?>"
-					data-prop-label="<?php echo esc_attr( $product['prop_label'] ); ?>"
-					aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] . ' — ' . $product['prop_label'] ); ?>"
-				>
-					<span class="hotspot-beacon"></span>
-					<span class="hotspot-label">
-						<span class="hotspot-label-name"><?php echo esc_html( $product['name'] ); ?></span>
-						<span class="hotspot-label-prop"><?php echo esc_html( $product['prop_label'] ); ?></span>
-					</span>
-				</a>
+		<!-- Room Navigation Arrows -->
+		<div class="room-nav room-nav-prev">
+			<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Previous room', 'skyyrose-flagship' ); ?>">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+			</button>
+		</div>
+		<div class="room-nav room-nav-next">
+			<button class="room-nav-btn" type="button" aria-label="<?php esc_attr_e( 'Next room', 'skyyrose-flagship' ); ?>">
+				<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+			</button>
+		</div>
+
+		<!-- Room Indicators -->
+		<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Room selector', 'skyyrose-flagship' ); ?>">
+			<?php foreach ( $black_rose_rooms as $index => $room ) : ?>
+				<button
+					class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
+					type="button"
+					aria-label="<?php echo esc_attr( $room['name'] ); ?>"
+				></button>
 			<?php endforeach; ?>
 		</div>
+		<div class="room-name"><?php echo esc_html( $black_rose_rooms[0]['name'] ); ?></div>
+
+		<!-- Hotspot Containers — One per room, products on contextual props -->
+		<?php foreach ( $black_rose_rooms as $room_index => $room ) : ?>
+			<div class="hotspot-container" <?php echo 0 !== $room_index ? 'style="display:none;"' : ''; ?>>
+				<?php foreach ( $room['products'] as $product ) : ?>
+					<a
+						href="<?php echo esc_url( $product['url'] ); ?>"
+						class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
+						style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
+						data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
+						data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
+						data-product-price="<?php echo esc_attr( $product['price'] ); ?>"
+						data-product-image="<?php echo esc_url( $product['image'] ); ?>"
+						data-product-collection="<?php echo esc_attr( $product['collection'] ); ?>"
+						data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
+						data-product-url="<?php echo esc_url( $product['url'] ); ?>"
+						data-prop="<?php echo esc_attr( $product['prop'] ); ?>"
+						data-prop-label="<?php echo esc_attr( $product['prop_label'] ); ?>"
+						aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] . ' — ' . $product['prop_label'] ); ?>"
+					>
+						<span class="hotspot-beacon"></span>
+						<span class="hotspot-label">
+							<span class="hotspot-label-name"><?php echo esc_html( $product['name'] ); ?></span>
+							<span class="hotspot-label-prop"><?php echo esc_html( $product['prop_label'] ); ?></span>
+						</span>
+					</a>
+				<?php endforeach; ?>
+			</div>
+		<?php endforeach; ?>
 
 		<!-- Scene Title -->
 		<div class="scene-title-overlay">
@@ -185,7 +272,7 @@ get_header();
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">
-					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Add to Cart', 'skyyrose-flagship' ); ?></button>
+					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?></button>
 					<a class="btn-view-details" href="#"><?php echo esc_html__( 'Details', 'skyyrose-flagship' ); ?></a>
 				</div>
 			</div>
