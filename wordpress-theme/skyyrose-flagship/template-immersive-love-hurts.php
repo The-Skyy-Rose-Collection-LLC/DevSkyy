@@ -140,7 +140,7 @@ get_header();
 		</div>
 
 		<!-- Room Indicators -->
-		<div class="room-indicators" aria-label="<?php esc_attr_e( 'Scene selector', 'skyyrose-flagship' ); ?>">
+		<div class="room-indicators" role="group" aria-label="<?php esc_attr_e( 'Scene selector', 'skyyrose-flagship' ); ?>">
 			<?php foreach ( $love_hurts_scenes as $index => $scene ) : ?>
 				<button
 					class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
@@ -185,7 +185,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<aside class="product-panel" role="dialog" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
+	<aside class="product-panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
@@ -209,7 +209,7 @@ get_header();
 		<a href="<?php echo esc_url( home_url( '/immersive/black-rose/' ) ); ?>" class="immersive-tab" style="--tab-accent: #C0C0C0;">
 			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
 		</a>
-		<a href="<?php echo esc_url( home_url( '/immersive/love-hurts/' ) ); ?>" class="immersive-tab active" style="--tab-accent: #DC143C;">
+		<a href="<?php echo esc_url( home_url( '/immersive/love-hurts/' ) ); ?>" class="immersive-tab active" aria-current="page" style="--tab-accent: #DC143C;">
 			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
 		</a>
 		<a href="<?php echo esc_url( home_url( '/immersive/signature/' ) ); ?>" class="immersive-tab" style="--tab-accent: #B76E79;">
@@ -220,25 +220,9 @@ get_header();
 		</a>
 	</nav>
 
+	<?php get_template_part( 'template-parts/cinematic-toggle' ); ?>
+
 </main><!-- #primary -->
 
 <?php
-// Enqueue immersive assets.
-wp_enqueue_style(
-	'skyyrose-immersive',
-	get_template_directory_uri() . '/assets/css/immersive.css',
-	array( 'skyyrose-style' ),
-	SKYYROSE_VERSION
-);
-
-wp_enqueue_script(
-	'skyyrose-immersive',
-	get_template_directory_uri() . '/assets/js/immersive.js',
-	array(),
-	SKYYROSE_VERSION,
-	true
-);
-
-get_template_part( 'template-parts/cinematic-toggle' );
-
 get_footer();

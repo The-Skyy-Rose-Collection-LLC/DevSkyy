@@ -1,13 +1,13 @@
 {
   "active": true,
-  "iteration": 10,
+  "iteration": 1,
   "minIterations": 1,
   "maxIterations": 10,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
-  "prompt": "Build the Collections immersive pages",
-  "startedAt": "2026-02-24T05:10:16.450Z",
+  "prompt": "Build the Collections immersive  \n  pages",
+  "startedAt": "2026-02-24T15:28:14.865Z",
   "model": "",
   "agent": "claude-code"
 }
