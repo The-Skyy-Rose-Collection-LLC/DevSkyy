@@ -15,6 +15,7 @@ This package contains all v1 API routers:
 - wordpress_theme: WordPress theme generation
 - training_status: LoRA training progress monitoring
 - sync: Asset synchronization pipeline (HF ↔ DevSkyy ↔ WordPress)
+- social_media: Social media content generation, scheduling, and analytics
 
 Version: 1.0.0
 
@@ -39,6 +40,7 @@ from api.v1.sync import sync_router
 from api.v1.training_status import training_router
 from api.v1.woocommerce_webhooks import router as woocommerce_webhooks_router
 from api.v1.wordpress import router as wordpress_router
+from api.v1.social_media import router as social_media_router
 from api.v1.wordpress_theme import router as wordpress_theme_router
 
 __all__ = [
@@ -57,6 +59,7 @@ __all__ = [
     "ml_router",
     "monitoring_router",
     "orchestration_router",
+    "social_media_router",
     "woocommerce_webhooks_router",
     "wordpress_router",
     "wordpress_theme_router",

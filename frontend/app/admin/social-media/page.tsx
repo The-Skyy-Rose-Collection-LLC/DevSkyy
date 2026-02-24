@@ -31,6 +31,7 @@ import {
 import type {
   SocialPost,
   SocialAnalytics,
+  PlatformAnalytics,
   Campaign,
 } from '@/lib/api/endpoints/social-media';
 
@@ -133,7 +134,7 @@ export default function SocialMediaPage() {
         platforms: {
           instagram: { posts: 24, likes: 1840, comments: 312, shares: 89, reach: 14200 },
           tiktok: { posts: 18, views: 52300, likes: 4100, shares: 620 },
-          twitter: { posts: 31, likes: 892, retweets: 234, impressions: 28400 },
+          twitter: { posts: 31, likes: 892, shares: 234, retweets: 234, impressions: 28400 },
           facebook: { posts: 12, likes: 456, comments: 78, shares: 34, reach: 8900 },
         },
         total_posts: 85,
@@ -798,9 +799,9 @@ function AnalyticsCard({
 }: {
   platform: string;
   color: string;
-  stats: Record<string, number | undefined>;
+  stats: PlatformAnalytics;
 }) {
-  const metrics = Object.entries(stats).filter(
+  const metrics = Object.entries(stats as unknown as Record<string, number | undefined>).filter(
     ([, val]) => val !== undefined && val !== null
   );
 

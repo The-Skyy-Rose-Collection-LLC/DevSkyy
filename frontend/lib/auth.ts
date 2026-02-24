@@ -73,8 +73,8 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       // On initial sign-in, persist backend tokens into the JWT
       if (user) {
-        token.accessToken = user.accessToken;
-        token.refreshToken = user.refreshToken;
+        token.accessToken = (user as { accessToken?: string }).accessToken;
+        token.refreshToken = (user as { refreshToken?: string }).refreshToken;
         token.email = user.email;
       }
       return token;
@@ -82,7 +82,7 @@ export const authOptions: NextAuthOptions = {
 
     async session({ session, token }) {
       // Expose the backend access token to the client session
-      session.accessToken = token.accessToken as string;
+      (session as { accessToken?: string }).accessToken = token.accessToken as string;
       if (session.user) {
         session.user.email = token.email as string;
       }

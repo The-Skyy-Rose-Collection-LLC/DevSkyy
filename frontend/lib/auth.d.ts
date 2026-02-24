@@ -2,27 +2,23 @@
  * NextAuth.js type augmentations for custom JWT fields
  */
 
-import 'next-auth';
-import 'next-auth/jwt';
+import type { DefaultSession, DefaultUser } from 'next-auth';
+import type { DefaultJWT } from 'next-auth/jwt';
 
 declare module 'next-auth' {
-  interface User {
-    accessToken: string;
-    refreshToken: string;
+  interface User extends DefaultUser {
+    accessToken?: string;
+    refreshToken?: string;
   }
 
-  interface Session {
-    accessToken: string;
-    user: {
-      email: string;
-    };
+  interface Session extends DefaultSession {
+    accessToken?: string;
   }
 }
 
 declare module 'next-auth/jwt' {
-  interface JWT {
+  interface JWT extends DefaultJWT {
     accessToken?: string;
     refreshToken?: string;
-    email?: string;
   }
 }
