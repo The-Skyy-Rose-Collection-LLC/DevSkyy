@@ -50,8 +50,8 @@ export default function QAPage() {
         setSelectedReview(response.reviews[0]);
         setCurrentIndex(0);
       }
-    } catch (err) {
-      console.error('Failed to fetch reviews:', err);
+    } catch {
+      // Review fetch failed — UI shows empty state
     } finally {
       setLoading(false);
     }
@@ -90,8 +90,8 @@ export default function QAPage() {
         setSelectedReview(nextPending);
         setCurrentIndex(reviews.indexOf(nextPending));
       }
-    } catch (err) {
-      console.error('Failed to submit review:', err);
+    } catch {
+      // Review submission failed
     } finally {
       setSubmitting(false);
     }
@@ -105,8 +105,8 @@ export default function QAPage() {
     try {
       await api.qa.regenerate(selectedReview.id);
       await fetchReviews();
-    } catch (err) {
-      console.error('Failed to regenerate:', err);
+    } catch {
+      // Regeneration failed
     } finally {
       setSubmitting(false);
     }

@@ -81,8 +81,8 @@ export default function WordPressAdminPage() {
       setCategories(categoriesData)
       setTags(tagsData)
       setMedia(mediaData)
-    } catch (error) {
-      console.error('Failed to load WordPress data:', error)
+    } catch {
+      // WordPress data fetch failed
     }
   }
 
@@ -91,8 +91,8 @@ export default function WordPressAdminPage() {
     try {
       const menusData = await menuManager.getMenus()
       setMenus(menusData)
-    } catch (error) {
-      console.error('Failed to load menus:', error)
+    } catch {
+      // Menu fetch failed
     }
   }
 

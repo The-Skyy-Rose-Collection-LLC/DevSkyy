@@ -78,8 +78,8 @@ export default function PipelinePage() {
         setProviders(providersData);
         setJobs(jobsData);
         setBatchJobs(batchData);
-      } catch (err) {
-        console.error('Failed to load pipeline data:', err);
+      } catch {
+        // Pipeline data fetch failed — UI shows empty state
       } finally {
         setLoading(false);
       }

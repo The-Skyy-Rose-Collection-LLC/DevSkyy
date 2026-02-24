@@ -50,8 +50,8 @@ export default function VercelAdminPage() {
       setDeployments(deploymentsData.deployments || [])
       setProjects(projectsData.projects || [])
       setUser(userData)
-    } catch (error) {
-      console.error('Failed to load Vercel data:', error)
+    } catch {
+      // Vercel data fetch failed — UI shows empty state
     }
     setLoading(false)
   }
@@ -61,8 +61,8 @@ export default function VercelAdminPage() {
     try {
       const envData = await vercelManager.listEnvVariables(projectId)
       setEnvVars(envData.envs || [])
-    } catch (error) {
-      console.error('Failed to load env vars:', error)
+    } catch {
+      // Env vars fetch failed
     }
   }
 
@@ -72,8 +72,8 @@ export default function VercelAdminPage() {
       setLoading(true)
       await vercelManager.promoteToProduction(deploymentId)
       loadData(vercelManager)
-    } catch (error) {
-      console.error('Failed to promote deployment:', error)
+    } catch {
+      // Promotion failed
     }
     setLoading(false)
   }
