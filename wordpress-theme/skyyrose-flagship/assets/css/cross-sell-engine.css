@@ -1,0 +1,421 @@
+/**
+ * Cross-Sell Engine — "Complete the Look" Styles
+ *
+ * Glassmorphism card container, horizontal product scroll track,
+ * rose gold accents, particle celebration keyframes, and a
+ * smooth slide-in entrance animation.
+ *
+ * Naming convention: .cs-* (cross-sell) to avoid collisions with
+ * the existing immersive panel styles.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.7.0
+ */
+
+/* ==================================================
+   SECTION WRAPPER — Glassmorphism Container
+   ================================================== */
+
+.cs-section {
+	/* Slide-in entrance: starts invisible and shifted down */
+	opacity: 0;
+	transform: translateY(12px);
+	transition: opacity 0.42s cubic-bezier(0.22, 1, 0.36, 1),
+	            transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+
+	margin-top: 1.5rem;
+	padding: 1rem 1rem 1.25rem;
+
+	background: rgba(255, 255, 255, 0.045);
+	backdrop-filter: blur(16px) saturate(1.3);
+	-webkit-backdrop-filter: blur(16px) saturate(1.3);
+
+	border: 1px solid rgba(183, 110, 121, 0.18);
+	border-radius: 14px;
+
+	/* Subtle rose-gold glow along the top edge */
+	box-shadow:
+		0 -1px 0 0 rgba(183, 110, 121, 0.25) inset,
+		0 8px 32px rgba(0, 0, 0, 0.25);
+}
+
+/* Triggered by JS after injection to animate in */
+.cs-section.cs-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ==================================================
+   HEADING
+   ================================================== */
+
+.cs-heading {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--rose-gold, #B76E79);
+	margin: 0 0 0.875rem;
+
+	/* Decorative double-line flanking the label */
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.cs-heading::before,
+.cs-heading::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: linear-gradient(
+		to right,
+		rgba(183, 110, 121, 0),
+		rgba(183, 110, 121, 0.35)
+	);
+}
+
+.cs-heading::after {
+	background: linear-gradient(
+		to left,
+		rgba(183, 110, 121, 0),
+		rgba(183, 110, 121, 0.35)
+	);
+}
+
+/* ==================================================
+   HORIZONTAL SCROLL TRACK
+   ================================================== */
+
+.cs-track {
+	display: flex;
+	gap: 0.75rem;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: touch;
+
+	/* Hide scrollbar on webkit while keeping functionality */
+	scrollbar-width: none;        /* Firefox */
+	-ms-overflow-style: none;     /* IE / Edge */
+
+	/* Bleed slightly outside section padding so cards look unclipped */
+	margin-left: -0.25rem;
+	margin-right: -0.25rem;
+	padding: 0 0.25rem 0.5rem;
+}
+
+.cs-track::-webkit-scrollbar {
+	display: none;
+}
+
+/* ==================================================
+   PRODUCT CARD
+   ================================================== */
+
+.cs-card {
+	/* Fixed width keeps cards uniform; flex-shrink prevents collapse */
+	flex: 0 0 118px;
+	scroll-snap-align: start;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.35rem;
+
+	background: rgba(255, 255, 255, 0.035);
+	border: 1px solid rgba(255, 255, 255, 0.07);
+	border-radius: 10px;
+	padding: 0.75rem 0.5rem 0.625rem;
+
+	transition: border-color 0.25s ease,
+	            background   0.25s ease,
+	            transform    0.2s  ease;
+	cursor: pointer;
+}
+
+.cs-card:hover {
+	border-color: rgba(183, 110, 121, 0.35);
+	background: rgba(183, 110, 121, 0.06);
+	transform: translateY(-2px);
+}
+
+/* ==================================================
+   THUMBNAIL
+   ================================================== */
+
+.cs-thumb-link {
+	display: block;
+	width: 72px;
+	height: 72px;
+	border-radius: 8px;
+	overflow: hidden;
+	text-decoration: none;
+	flex-shrink: 0;
+}
+
+.cs-thumb {
+	width: 100%;
+	height: 100%;
+	background: rgba(255, 255, 255, 0.04);
+	border-radius: 8px;
+	overflow: hidden;
+	position: relative;
+}
+
+.cs-thumb-img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cs-card:hover .cs-thumb-img {
+	transform: scale(1.06);
+}
+
+/* Lettered placeholder when no product image is available */
+.cs-thumb-placeholder {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	font-family: var(--font-heading, 'Playfair Display', Georgia, serif);
+	font-size: 1.25rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	color: var(--rose-gold, #B76E79);
+
+	background: linear-gradient(
+		135deg,
+		rgba(183, 110, 121, 0.08),
+		rgba(212, 175, 55, 0.06)
+	);
+}
+
+/* ==================================================
+   CARD TEXT
+   ================================================== */
+
+.cs-name {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.65rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: rgba(255, 255, 255, 0.82);
+	text-align: center;
+	margin: 0;
+	line-height: 1.3;
+
+	/* Clamp to 2 lines to keep cards uniform height */
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+
+.cs-price {
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--rose-gold, #B76E79);
+	margin: 0;
+	text-align: center;
+}
+
+/* ==================================================
+   QUICK ADD BUTTON
+   ================================================== */
+
+.cs-quick-add {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin-top: auto;           /* push to card bottom */
+	padding: 6px 8px;
+
+	border: 1px solid rgba(183, 110, 121, 0.4);
+	border-radius: 6px;
+	background: transparent;
+
+	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-size: 0.58rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--rose-gold, #B76E79);
+
+	cursor: pointer;
+	position: relative;         /* particle origin anchor */
+	overflow: visible;
+
+	transition: background     0.22s ease,
+	            border-color   0.22s ease,
+	            color          0.22s ease,
+	            transform      0.15s ease;
+}
+
+.cs-quick-add:hover {
+	background: linear-gradient(
+		135deg,
+		rgba(183, 110, 121, 0.18),
+		rgba(212, 175, 55, 0.12)
+	);
+	border-color: var(--rose-gold, #B76E79);
+	color: #fff;
+}
+
+.cs-quick-add:active {
+	transform: scale(0.95);
+}
+
+.cs-quick-add:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	transform: none;
+}
+
+/* Confirmed "Added!" state */
+.cs-quick-add--added {
+	background: linear-gradient(
+		135deg,
+		rgba(183, 110, 121, 0.3),
+		rgba(212, 175, 55, 0.2)
+	);
+	border-color: rgba(183, 110, 121, 0.7);
+	color: #fff;
+}
+
+/* ==================================================
+   PARTICLE CELEBRATION
+   ================================================== */
+
+/*
+ * Individual particles are created and keyframed in JS
+ * (srParticleBurst keyframe is injected once by cross-sell-engine.js).
+ * The .sr-particle class exists here as a hook for any global overrides.
+ */
+.sr-particle {
+	/* Base styles applied inline by JS; CSS fallback for safety */
+	pointer-events: none;
+	will-change: transform, opacity;
+}
+
+/* ==================================================
+   SLIDE-IN ENTRANCE
+   ================================================== */
+
+/*
+ * Entry animation is handled via the .cs-visible class added by JS,
+ * using the transition defined on .cs-section above.
+ *
+ * An explicit @keyframes version is provided here so native CSS
+ * animation can be used as a fallback if JS is slow.
+ */
+@keyframes csSectionIn {
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+/* ==================================================
+   RESPONSIVE — Mobile (≤ 480 px)
+   ================================================== */
+
+@media (max-width: 480px) {
+
+	.cs-section {
+		margin-top: 1.25rem;
+		padding: 0.875rem 0.875rem 1rem;
+	}
+
+	.cs-card {
+		flex: 0 0 100px;
+		padding: 0.625rem 0.4rem 0.5rem;
+	}
+
+	.cs-thumb-link {
+		width: 60px;
+		height: 60px;
+	}
+
+	.cs-name {
+		font-size: 0.6rem;
+	}
+
+	.cs-price {
+		font-size: 0.65rem;
+	}
+
+	.cs-quick-add {
+		font-size: 0.54rem;
+		padding: 5px 6px;
+	}
+}
+
+/* ==================================================
+   RESPONSIVE — Tablet and up (≥ 640 px)
+   ================================================== */
+
+@media (min-width: 640px) {
+
+	.cs-card {
+		flex: 0 0 130px;
+	}
+
+	.cs-thumb-link {
+		width: 80px;
+		height: 80px;
+	}
+
+	.cs-name {
+		font-size: 0.68rem;
+	}
+}
+
+/* ==================================================
+   REDUCED MOTION
+   ================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+
+	.cs-section {
+		transition: opacity 0.01ms;
+	}
+
+	.cs-card {
+		transition: none;
+	}
+
+	.cs-card:hover {
+		transform: none;
+	}
+
+	.cs-thumb-img {
+		transition: none;
+	}
+
+	.cs-quick-add {
+		transition: background 0.01ms, border-color 0.01ms, color 0.01ms;
+	}
+
+	.cs-quick-add:active {
+		transform: none;
+	}
+
+	/* Suppress particle animations entirely */
+	.sr-particle {
+		animation: none !important;
+		opacity: 0 !important;
+	}
+}

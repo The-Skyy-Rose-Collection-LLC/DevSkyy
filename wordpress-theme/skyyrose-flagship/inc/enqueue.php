@@ -552,6 +552,48 @@ function skyyrose_enqueue_magnetic_obsidian() {
 }
 
 /**
+ * Enqueue Cross-Sell Engine — "Complete the Look".
+ *
+ * Injects a glassmorphism cross-sell section into the immersive product
+ * panel when a hotspot is opened. Shows 2-3 sibling products from the same
+ * collection with Quick Add buttons and rose-gold particle celebrations.
+ * Loaded only on immersive template pages to keep the payload minimal.
+ *
+ * @since 3.7.0
+ * @return void
+ */
+function skyyrose_enqueue_cross_sell_engine() {
+
+	$slug = skyyrose_get_current_template_slug();
+
+	// Only active on immersive scene pages.
+	if ( 'immersive' !== $slug ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/cross-sell-engine.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-cross-sell-engine',
+			SKYYROSE_ASSETS_URI . '/css/cross-sell-engine.css',
+			array( 'skyyrose-design-tokens', 'skyyrose-template-immersive' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/cross-sell-engine.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-cross-sell-engine',
+			SKYYROSE_ASSETS_URI . '/js/cross-sell-engine.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Enqueue Conversion Intelligence Engine.
  *
  * Real-time social proof toasts, urgency countdown timers, stock scarcity
@@ -664,6 +706,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-aurora-engine',
 		'skyyrose-magnetic-obsidian',
 		'skyyrose-conversion-engine',
+		'skyyrose-cross-sell-engine',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -759,6 +802,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_magnetic_obsidian', 36 );
 
 // Conversion Intelligence Engine on customer-facing pages (priority 38, after Magnetic Obsidian).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_conversion_engine', 38 );
+
+// Cross-Sell Engine — "Complete the Look" on immersive pages only (priority 40, after immersive template script).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
