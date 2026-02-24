@@ -17,8 +17,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Product data for hotspot beacons.
- * Each product is positioned via percentage-based coordinates
- * matching its location in the scene image.
+ * Each product is positioned on a contextual prop within the scene —
+ * stone benches, iron gates, rose arbors, vintage mirrors, glass bell jars.
+ * Products attach TO these props, not floating in air.
  *
  * Will be replaced with WooCommerce product queries in production.
  */
@@ -33,6 +34,8 @@ $black_rose_products = array(
 		'url'        => '#',
 		'left'       => '22',
 		'top'        => '38',
+		'prop'       => 'vintage-mirror',
+		'prop_label' => esc_html__( 'On antique vanity mirror', 'skyyrose-flagship' ),
 	),
 	array(
 		'id'         => 'br-002',
@@ -44,6 +47,8 @@ $black_rose_products = array(
 		'url'        => '#',
 		'left'       => '48',
 		'top'        => '55',
+		'prop'       => 'stone-bench',
+		'prop_label' => esc_html__( 'On wrought-iron garden bench', 'skyyrose-flagship' ),
 	),
 	array(
 		'id'         => 'br-003',
@@ -55,6 +60,8 @@ $black_rose_products = array(
 		'url'        => '#',
 		'left'       => '72',
 		'top'        => '42',
+		'prop'       => 'rose-arbor',
+		'prop_label' => esc_html__( 'Draped over rose arbor gate', 'skyyrose-flagship' ),
 	),
 	array(
 		'id'         => 'br-004',
@@ -66,6 +73,8 @@ $black_rose_products = array(
 		'url'        => '#',
 		'left'       => '35',
 		'top'        => '28',
+		'prop'       => 'glass-bell-jar',
+		'prop_label' => esc_html__( 'Inside glass bell jar', 'skyyrose-flagship' ),
 	),
 	array(
 		'id'         => 'br-005',
@@ -77,6 +86,8 @@ $black_rose_products = array(
 		'url'        => '#',
 		'left'       => '60',
 		'top'        => '65',
+		'prop'       => 'stone-pedestal',
+		'prop_label' => esc_html__( 'On cathedral stone pedestal', 'skyyrose-flagship' ),
 	),
 );
 
@@ -111,12 +122,12 @@ get_header();
 		<!-- Film Grain -->
 		<div class="scene-film-grain" aria-hidden="true"></div>
 
-		<!-- Hotspot Beacons -->
+		<!-- Hotspot Beacons — Products placed on contextual props -->
 		<div class="hotspot-container">
 			<?php foreach ( $black_rose_products as $product ) : ?>
 				<a
 					href="<?php echo esc_url( $product['url'] ); ?>"
-					class="hotspot"
+					class="hotspot hotspot--prop-<?php echo esc_attr( $product['prop'] ); ?>"
 					style="left: <?php echo esc_attr( $product['left'] ); ?>%; top: <?php echo esc_attr( $product['top'] ); ?>%;"
 					data-product-id="<?php echo esc_attr( $product['id'] ); ?>"
 					data-product-name="<?php echo esc_attr( $product['name'] ); ?>"
@@ -125,10 +136,15 @@ get_header();
 					data-product-collection="<?php echo esc_attr( $product['collection'] ); ?>"
 					data-product-sizes="<?php echo esc_attr( $product['sizes'] ); ?>"
 					data-product-url="<?php echo esc_url( $product['url'] ); ?>"
-					aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] ); ?>"
+					data-prop="<?php echo esc_attr( $product['prop'] ); ?>"
+					data-prop-label="<?php echo esc_attr( $product['prop_label'] ); ?>"
+					aria-label="<?php echo esc_attr( $product['name'] . ' — ' . $product['price'] . ' — ' . $product['prop_label'] ); ?>"
 				>
 					<span class="hotspot-beacon"></span>
-					<span class="hotspot-label"><?php echo esc_html( $product['name'] ); ?></span>
+					<span class="hotspot-label">
+						<span class="hotspot-label-name"><?php echo esc_html( $product['name'] ); ?></span>
+						<span class="hotspot-label-prop"><?php echo esc_html( $product['prop_label'] ); ?></span>
+					</span>
 				</a>
 			<?php endforeach; ?>
 		</div>
@@ -152,6 +168,7 @@ get_header();
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>
 				<h3 class="product-panel-name"></h3>
+				<p class="product-panel-prop"></p>
 				<p class="product-panel-price"></p>
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">
