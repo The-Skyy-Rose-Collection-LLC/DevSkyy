@@ -114,9 +114,7 @@ coverage.xml
 Thumbs.db
 .DS_Store
 
-# Lock files (Vercel generates its own)
-package-lock.json
+# Lock files (keep frontend locks for deterministic builds)
 yarn.lock
-pnpm-lock.yaml
 poetry.lock
 Pipfile.lock

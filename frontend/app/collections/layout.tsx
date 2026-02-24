@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import SiteNav from '@/components/navigation/SiteNav';
+import IncentivePopup from '@/components/marketing/IncentivePopup';
 
 export const metadata: Metadata = {
   title: {
@@ -23,7 +25,9 @@ export default function CollectionsLayout({
 }) {
   return (
     <div className="min-h-screen bg-[#0A0A0A]">
+      <SiteNav />
       {children}
+      <IncentivePopup />
     </div>
   );
 }
