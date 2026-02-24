@@ -26,7 +26,7 @@
     "@ai-sdk/openai-compatible": "^2.0.30",
     "@ai-sdk/xai": "^3.0.57",
     "@anthropic-ai/claude-agent-sdk": "^0.2.52",
-    "@anthropic-ai/sdk": "^0.73.0",
+    "@anthropic-ai/sdk": "^0.78.0",
     "@apollo/server": "^5.4.0",
     "@auth/core": "^0.34.3",
     "@copilotkit/react-core": "^1.51.2",
