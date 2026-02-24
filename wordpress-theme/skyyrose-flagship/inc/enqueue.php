@@ -673,6 +673,46 @@ function skyyrose_enqueue_adaptive_personalization() {
 }
 
 /**
+ * Enqueue Journey Gamification Engine.
+ *
+ * Room exploration tracking with progress pill, reward reveal upon full
+ * collection discovery, achievement badges on static pages, and cross-sell
+ * recommendation strip. Gamification increases engagement 48% and conversion
+ * 15-30% (Badgeville / Gigya research).
+ *
+ * @since 3.9.0
+ * @return void
+ */
+function skyyrose_enqueue_journey_gamification() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/journey-gamification.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-journey-gamification',
+			SKYYROSE_ASSETS_URI . '/css/journey-gamification.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/journey-gamification.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-journey-gamification',
+			SKYYROSE_ASSETS_URI . '/js/journey-gamification.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -748,6 +788,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-conversion-engine',
 		'skyyrose-cross-sell-engine',
 		'skyyrose-adaptive-personalization',
+		'skyyrose-journey-gamification',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -849,6 +890,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
 
 // Adaptive Personalization Engine — behavioral scoring, recommendations, mood engine (priority 42, after cross-sell).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 42 );
+
+// Journey Gamification Engine — room exploration tracking, rewards, cross-sell (priority 44, after personalization).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_journey_gamification', 44 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );

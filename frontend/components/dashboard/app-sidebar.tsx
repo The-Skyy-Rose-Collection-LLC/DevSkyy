@@ -23,6 +23,7 @@ import {
   Bot,
   Briefcase,
   Image,
+  Compass,
 } from 'lucide-react';
 
 import {
@@ -99,6 +100,11 @@ const mainNavItems = [
     title: 'Jobs',
     url: '/admin/jobs',
     icon: Briefcase,
+  },
+  {
+    title: 'Journey Analytics',
+    url: '/admin/journey-analytics',
+    icon: Compass,
   },
 ];
 

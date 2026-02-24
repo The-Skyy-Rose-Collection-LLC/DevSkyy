@@ -1,0 +1,819 @@
+/**
+ * Journey Gamification Engine — CSS
+ *
+ * Progress tracking, reward reveals, achievement badges, and
+ * cross-sell recommendation strips that gamify the immersive
+ * collection experience and bridge users to the shopping flow.
+ *
+ * Components:
+ *   1. Journey Progress Pill (immersive pages, top-right)
+ *   2. Reward Reveal Modal (centered overlay after full exploration)
+ *   3. Collection Achievement Badges (static collection pages)
+ *   4. Cross-Sell Recommendation Strip (horizontal scroll)
+ *
+ * Naming convention: .jge-* (Journey Gamification Engine) to avoid
+ * collisions with existing immersive / conversion-engine styles.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.8.0
+ */
+
+/* ==================================================
+   CSS CUSTOM PROPERTIES
+   ================================================== */
+
+:root {
+	--jge-rose-gold: var(--rose-gold, #B76E79);
+	--jge-gold: var(--gold, #D4AF37);
+	--jge-font-body: var(--font-body, 'Montserrat', sans-serif);
+	--jge-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
+	--jge-glass-bg: rgba(10, 10, 10, 0.7);
+	--jge-glass-blur: blur(12px);
+	--jge-transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ==================================================
+   1. JOURNEY PROGRESS PILL
+   Top-right glassmorphism pill showing "Room X of Y"
+   with a mini progress bar inside.
+   ================================================== */
+
+.jge-progress-pill {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	z-index: 12;
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 14px;
+
+	background: var(--jge-glass-bg);
+	backdrop-filter: var(--jge-glass-blur);
+	-webkit-backdrop-filter: var(--jge-glass-blur);
+	border: 1px solid rgba(255, 255, 255, 0.1);
+	border-radius: var(--radius-full, 9999px);
+
+	font-family: var(--jge-font-body);
+	font-size: 0.65rem;
+	font-weight: 500;
+	letter-spacing: 0.06em;
+	color: rgba(255, 255, 255, 0.7);
+	white-space: nowrap;
+
+	opacity: 0;
+	transform: translateY(-6px);
+	transition: opacity var(--jge-transition),
+	            transform var(--jge-transition),
+	            border-color 0.4s ease,
+	            box-shadow 0.4s ease;
+}
+
+.jge-progress-pill.jge-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* Progress bar track inside the pill */
+.jge-progress-pill__bar {
+	position: relative;
+	width: 48px;
+	height: 3px;
+	border-radius: 2px;
+	background: rgba(255, 255, 255, 0.1);
+	overflow: hidden;
+	flex-shrink: 0;
+}
+
+.jge-progress-pill__fill {
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	border-radius: 2px;
+	background: linear-gradient(90deg, var(--jge-rose-gold), var(--jge-gold));
+	transition: width 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jge-progress-pill__label {
+	/* Inherits parent font styles */
+}
+
+/* Completion state: gold glow + checkmark */
+.jge-progress-pill--complete {
+	border-color: rgba(212, 175, 55, 0.5);
+	box-shadow: 0 0 14px rgba(212, 175, 55, 0.25);
+}
+
+.jge-progress-pill__check {
+	display: none;
+	width: 12px;
+	height: 12px;
+	flex-shrink: 0;
+}
+
+.jge-progress-pill--complete .jge-progress-pill__check {
+	display: block;
+}
+
+.jge-progress-pill--complete .jge-progress-pill__bar {
+	display: none;
+}
+
+/* ==================================================
+   2. REWARD REVEAL MODAL
+   Centered overlay shown after all rooms explored.
+   Glass modal with particle animation and promo code.
+   ================================================== */
+
+.jge-reward-overlay {
+	position: fixed;
+	inset: 0;
+	z-index: 2000;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(0, 0, 0, 0.7);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.4s ease, visibility 0.4s;
+}
+
+.jge-reward-overlay.jge-visible {
+	opacity: 1;
+	visibility: visible;
+}
+
+.jge-reward-modal {
+	position: relative;
+	max-width: 460px;
+	width: 90%;
+	padding: 3rem 2.5rem;
+	background: rgba(17, 17, 17, 0.92);
+	backdrop-filter: blur(24px) saturate(1.4);
+	-webkit-backdrop-filter: blur(24px) saturate(1.4);
+	border: 1px solid rgba(183, 110, 121, 0.25);
+	border-radius: 20px;
+	text-align: center;
+	overflow: hidden;
+
+	transform: scale(0.88) translateY(24px);
+	transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jge-reward-overlay.jge-visible .jge-reward-modal {
+	transform: scale(1) translateY(0);
+}
+
+/* Close button */
+.jge-reward-modal__close {
+	position: absolute;
+	top: 16px;
+	right: 16px;
+	width: 32px;
+	height: 32px;
+	border: none;
+	background: rgba(255, 255, 255, 0.08);
+	color: rgba(255, 255, 255, 0.6);
+	border-radius: 50%;
+	font-size: 1.1rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	transition: background 0.2s ease, color 0.2s ease;
+	z-index: 2;
+}
+
+.jge-reward-modal__close:hover {
+	background: rgba(255, 255, 255, 0.15);
+	color: #fff;
+}
+
+/* Confetti particle canvas (positioned behind modal content) */
+.jge-reward-modal__particles {
+	position: absolute;
+	inset: 0;
+	pointer-events: none;
+	z-index: 0;
+	overflow: hidden;
+}
+
+.jge-reward-particle {
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	pointer-events: none;
+	will-change: transform, opacity;
+	animation: jgeConfettiFall var(--jge-fall-duration, 2.5s) cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+	animation-delay: var(--jge-fall-delay, 0s);
+}
+
+@keyframes jgeConfettiFall {
+	0% {
+		transform: translateY(-20px) rotate(0deg) scale(1);
+		opacity: 1;
+	}
+	80% {
+		opacity: 0.8;
+	}
+	100% {
+		transform: translateY(var(--jge-fall-distance, 300px))
+		           rotate(var(--jge-fall-rotate, 360deg))
+		           scale(0.3);
+		opacity: 0;
+	}
+}
+
+/* Modal content (sits above particles) */
+.jge-reward-modal__content {
+	position: relative;
+	z-index: 1;
+}
+
+/* Monogram / trophy icon */
+.jge-reward-modal__icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 56px;
+	height: 56px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, rgba(183, 110, 121, 0.2), rgba(212, 175, 55, 0.15));
+	border: 1px solid rgba(212, 175, 55, 0.3);
+	margin-bottom: 1.25rem;
+	font-size: 1.5rem;
+}
+
+.jge-reward-modal__headline {
+	font-family: var(--jge-font-heading);
+	font-size: clamp(1.3rem, 3vw, 1.75rem);
+	font-weight: 700;
+	color: #fff;
+	margin: 0 0 0.5rem;
+	line-height: 1.2;
+}
+
+.jge-reward-modal__subtext {
+	font-family: var(--jge-font-body);
+	font-size: 0.82rem;
+	font-weight: 400;
+	color: rgba(255, 255, 255, 0.55);
+	line-height: 1.6;
+	margin: 0 0 1.5rem;
+}
+
+/* Promo code box */
+.jge-reward-code {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	margin-bottom: 1.5rem;
+	padding: 12px 20px;
+	background: rgba(255, 255, 255, 0.04);
+	border: 1px dashed rgba(212, 175, 55, 0.4);
+	border-radius: 10px;
+}
+
+.jge-reward-code__value {
+	font-family: var(--jge-font-body);
+	font-size: 1.1rem;
+	font-weight: 700;
+	letter-spacing: 0.2em;
+	color: var(--jge-gold);
+	user-select: all;
+}
+
+.jge-reward-code__copy {
+	border: none;
+	background: rgba(255, 255, 255, 0.08);
+	color: rgba(255, 255, 255, 0.5);
+	font-family: var(--jge-font-body);
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	padding: 5px 10px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.2s ease, color 0.2s ease;
+}
+
+.jge-reward-code__copy:hover {
+	background: rgba(255, 255, 255, 0.14);
+	color: #fff;
+}
+
+.jge-reward-code__copy--copied {
+	background: rgba(16, 185, 129, 0.15);
+	color: #10B981;
+}
+
+/* CTA button */
+.jge-reward-modal__cta {
+	display: inline-block;
+	padding: 14px 36px;
+	border: none;
+	border-radius: 8px;
+	background: linear-gradient(135deg, var(--jge-rose-gold), var(--jge-gold));
+	color: #fff;
+	font-family: var(--jge-font-body);
+	font-size: 0.8rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	text-decoration: none;
+	cursor: pointer;
+	transition: opacity 0.25s ease, transform 0.15s ease;
+}
+
+.jge-reward-modal__cta:hover {
+	opacity: 0.9;
+}
+
+.jge-reward-modal__cta:active {
+	transform: scale(0.97);
+}
+
+/* ==================================================
+   3. COLLECTION ACHIEVEMENT BADGES
+   Small badges on static collection pages showing
+   immersive discovery progress.
+   ================================================== */
+
+.jge-achievement-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 10px 16px;
+	margin-bottom: 1.5rem;
+	background: rgba(255, 255, 255, 0.03);
+	backdrop-filter: blur(8px);
+	-webkit-backdrop-filter: blur(8px);
+	border: 1px solid rgba(183, 110, 121, 0.15);
+	border-radius: 10px;
+
+	opacity: 0;
+	transform: translateY(8px);
+	transition: opacity var(--jge-transition),
+	            transform var(--jge-transition);
+}
+
+.jge-achievement-bar.jge-visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.jge-achievement-bar__icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 28px;
+	height: 28px;
+	border-radius: 50%;
+	background: linear-gradient(135deg, rgba(183, 110, 121, 0.15), rgba(212, 175, 55, 0.1));
+	border: 1px solid rgba(183, 110, 121, 0.25);
+	flex-shrink: 0;
+	font-size: 0.75rem;
+}
+
+.jge-achievement-bar__text {
+	font-family: var(--jge-font-body);
+	font-size: 0.7rem;
+	font-weight: 500;
+	letter-spacing: 0.04em;
+	color: rgba(255, 255, 255, 0.6);
+	flex: 1;
+	min-width: 0;
+}
+
+.jge-achievement-bar__text strong {
+	color: var(--jge-rose-gold);
+	font-weight: 600;
+}
+
+/* Mini progress indicator inside badge */
+.jge-achievement-bar__progress {
+	width: 40px;
+	height: 3px;
+	border-radius: 2px;
+	background: rgba(255, 255, 255, 0.08);
+	overflow: hidden;
+	flex-shrink: 0;
+}
+
+.jge-achievement-bar__fill {
+	height: 100%;
+	border-radius: 2px;
+	background: linear-gradient(90deg, var(--jge-rose-gold), var(--jge-gold));
+	transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Link back to immersive */
+.jge-achievement-bar__link {
+	font-family: var(--jge-font-body);
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--jge-rose-gold);
+	text-decoration: none;
+	white-space: nowrap;
+	flex-shrink: 0;
+	transition: color 0.2s ease;
+}
+
+.jge-achievement-bar__link:hover {
+	color: var(--jge-gold);
+}
+
+/* Complete state */
+.jge-achievement-bar--complete {
+	border-color: rgba(212, 175, 55, 0.3);
+}
+
+.jge-achievement-bar--complete .jge-achievement-bar__icon {
+	border-color: rgba(212, 175, 55, 0.4);
+	background: linear-gradient(135deg, rgba(212, 175, 55, 0.2), rgba(183, 110, 121, 0.15));
+}
+
+/* ==================================================
+   4. CROSS-SELL RECOMMENDATION STRIP
+   Horizontal scroll of "Complete the Look" cards.
+   ================================================== */
+
+.jge-crosssell {
+	padding: 1.25rem 0;
+}
+
+.jge-crosssell__heading {
+	font-family: var(--jge-font-body);
+	font-size: 0.6rem;
+	font-weight: 600;
+	letter-spacing: 0.22em;
+	text-transform: uppercase;
+	color: var(--jge-rose-gold);
+	margin: 0 0 0.875rem;
+
+	display: flex;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.jge-crosssell__heading::before,
+.jge-crosssell__heading::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: linear-gradient(
+		to right,
+		rgba(183, 110, 121, 0),
+		rgba(183, 110, 121, 0.3)
+	);
+}
+
+.jge-crosssell__heading::after {
+	background: linear-gradient(
+		to left,
+		rgba(183, 110, 121, 0),
+		rgba(183, 110, 121, 0.3)
+	);
+}
+
+/* Horizontal scroll track */
+.jge-crosssell__track {
+	display: flex;
+	gap: 0.75rem;
+	overflow-x: auto;
+	overflow-y: hidden;
+	scroll-snap-type: x mandatory;
+	-webkit-overflow-scrolling: touch;
+
+	/* Hide scrollbar */
+	scrollbar-width: none;
+	-ms-overflow-style: none;
+
+	padding: 0.25rem;
+}
+
+.jge-crosssell__track::-webkit-scrollbar {
+	display: none;
+}
+
+/* Product card */
+.jge-crosssell__card {
+	flex: 0 0 120px;
+	scroll-snap-align: start;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.35rem;
+
+	background: rgba(255, 255, 255, 0.035);
+	border: 1px solid rgba(255, 255, 255, 0.07);
+	border-radius: 10px;
+	padding: 0.75rem 0.5rem 0.625rem;
+
+	transition: border-color 0.25s ease,
+	            background 0.25s ease,
+	            transform 0.2s ease;
+	cursor: pointer;
+	text-decoration: none;
+}
+
+.jge-crosssell__card:hover {
+	border-color: rgba(183, 110, 121, 0.35);
+	background: rgba(183, 110, 121, 0.06);
+	transform: translateY(-2px);
+}
+
+/* Thumbnail */
+.jge-crosssell__thumb {
+	width: 72px;
+	height: 72px;
+	border-radius: 8px;
+	overflow: hidden;
+	background: rgba(255, 255, 255, 0.04);
+	flex-shrink: 0;
+}
+
+.jge-crosssell__thumb img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.jge-crosssell__card:hover .jge-crosssell__thumb img {
+	transform: scale(1.06);
+}
+
+/* Placeholder for missing images */
+.jge-crosssell__thumb-placeholder {
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--jge-font-heading);
+	font-size: 1.1rem;
+	font-weight: 700;
+	letter-spacing: 0.05em;
+	color: var(--jge-rose-gold);
+	background: linear-gradient(
+		135deg,
+		rgba(183, 110, 121, 0.08),
+		rgba(212, 175, 55, 0.06)
+	);
+}
+
+/* Card text */
+.jge-crosssell__name {
+	font-family: var(--jge-font-body);
+	font-size: 0.65rem;
+	font-weight: 500;
+	letter-spacing: 0.03em;
+	color: rgba(255, 255, 255, 0.82);
+	text-align: center;
+	margin: 0;
+	line-height: 1.3;
+
+	/* Clamp to 2 lines */
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+
+.jge-crosssell__price {
+	font-family: var(--jge-font-body);
+	font-size: 0.7rem;
+	font-weight: 600;
+	color: var(--jge-rose-gold);
+	margin: 0;
+	text-align: center;
+}
+
+/* Mini "Add" button */
+.jge-crosssell__add {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	margin-top: auto;
+	padding: 5px 8px;
+
+	border: 1px solid rgba(183, 110, 121, 0.4);
+	border-radius: 6px;
+	background: transparent;
+
+	font-family: var(--jge-font-body);
+	font-size: 0.56rem;
+	font-weight: 600;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--jge-rose-gold);
+
+	cursor: pointer;
+	transition: background 0.22s ease,
+	            border-color 0.22s ease,
+	            color 0.22s ease,
+	            transform 0.15s ease;
+}
+
+.jge-crosssell__add:hover {
+	background: linear-gradient(
+		135deg,
+		rgba(183, 110, 121, 0.18),
+		rgba(212, 175, 55, 0.12)
+	);
+	border-color: var(--jge-rose-gold);
+	color: #fff;
+}
+
+.jge-crosssell__add:active {
+	transform: scale(0.95);
+}
+
+.jge-crosssell__add:disabled {
+	opacity: 0.55;
+	cursor: not-allowed;
+	transform: none;
+}
+
+.jge-crosssell__add--added {
+	background: linear-gradient(
+		135deg,
+		rgba(183, 110, 121, 0.3),
+		rgba(212, 175, 55, 0.2)
+	);
+	border-color: rgba(183, 110, 121, 0.7);
+	color: #fff;
+}
+
+/* ==================================================
+   RESPONSIVE — Mobile (max-width: 768px)
+   ================================================== */
+
+@media (max-width: 768px) {
+	/* Progress Pill */
+	.jge-progress-pill {
+		top: 12px;
+		right: 12px;
+		padding: 5px 10px;
+		font-size: 0.6rem;
+	}
+
+	.jge-progress-pill__bar {
+		width: 36px;
+	}
+
+	/* Reward Modal */
+	.jge-reward-modal {
+		padding: 2rem 1.5rem;
+	}
+
+	.jge-reward-modal__headline {
+		font-size: clamp(1.1rem, 4vw, 1.5rem);
+	}
+
+	.jge-reward-modal__subtext {
+		font-size: 0.78rem;
+	}
+
+	.jge-reward-code {
+		padding: 10px 14px;
+		gap: 8px;
+	}
+
+	.jge-reward-code__value {
+		font-size: 0.95rem;
+		letter-spacing: 0.15em;
+	}
+
+	/* Achievement Badge */
+	.jge-achievement-bar {
+		padding: 8px 12px;
+		gap: 8px;
+	}
+
+	.jge-achievement-bar__icon {
+		width: 24px;
+		height: 24px;
+		font-size: 0.65rem;
+	}
+
+	.jge-achievement-bar__text {
+		font-size: 0.65rem;
+	}
+
+	.jge-achievement-bar__link {
+		font-size: 0.55rem;
+	}
+
+	/* Cross-Sell Strip */
+	.jge-crosssell__card {
+		flex: 0 0 104px;
+		padding: 0.625rem 0.4rem 0.5rem;
+	}
+
+	.jge-crosssell__thumb {
+		width: 60px;
+		height: 60px;
+	}
+
+	.jge-crosssell__name {
+		font-size: 0.6rem;
+	}
+
+	.jge-crosssell__price {
+		font-size: 0.65rem;
+	}
+
+	.jge-crosssell__add {
+		font-size: 0.52rem;
+		padding: 4px 6px;
+	}
+}
+
+/* Safe area insets for notched devices */
+@supports (padding-top: env(safe-area-inset-top)) {
+	.jge-progress-pill {
+		top: calc(16px + env(safe-area-inset-top));
+	}
+}
+
+/* ==================================================
+   REDUCED MOTION
+   ================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	.jge-progress-pill {
+		transition: opacity 0.01ms;
+		transform: none;
+	}
+
+	.jge-progress-pill.jge-visible {
+		transform: none;
+	}
+
+	.jge-progress-pill__fill {
+		transition: width 0.01ms;
+	}
+
+	.jge-reward-overlay {
+		transition-duration: 0.01ms;
+	}
+
+	.jge-reward-modal {
+		transition-duration: 0.01ms;
+		transform: none;
+	}
+
+	.jge-reward-overlay.jge-visible .jge-reward-modal {
+		transform: none;
+	}
+
+	.jge-reward-particle {
+		animation: none !important;
+		opacity: 0 !important;
+	}
+
+	.jge-achievement-bar {
+		transition: opacity 0.01ms;
+		transform: none;
+	}
+
+	.jge-achievement-bar.jge-visible {
+		transform: none;
+	}
+
+	.jge-achievement-bar__fill {
+		transition: width 0.01ms;
+	}
+
+	.jge-crosssell__card {
+		transition: none;
+	}
+
+	.jge-crosssell__card:hover {
+		transform: none;
+	}
+
+	.jge-crosssell__thumb img {
+		transition: none;
+	}
+
+	.jge-crosssell__add {
+		transition: background 0.01ms, border-color 0.01ms, color 0.01ms;
+	}
+
+	.jge-crosssell__add:active {
+		transform: none;
+	}
+}
