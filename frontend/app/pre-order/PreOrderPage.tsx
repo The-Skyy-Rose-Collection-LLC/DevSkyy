@@ -14,21 +14,15 @@ import {
   Package,
   Crown,
   Sparkles,
+  ShoppingBag,
 } from 'lucide-react';
 import { getAllCollections, type CollectionConfig } from '@/lib/collections';
-
-interface CartItem {
-  productId: string;
-  productName: string;
-  collection: string;
-  size: string;
-  price: number;
-}
+import { useCartStore, type CartItem } from '@/lib/stores/cart-store';
 
 export default function PreOrderPage() {
   const collections = getAllCollections();
   const [activeCollection, setActiveCollection] = useState<string>('all');
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const { items: cart, addItem, removeItem: removeCartItem, subtotal, itemCount } = useCartStore();
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
 
@@ -37,7 +31,7 @@ export default function PreOrderPage() {
       ? collections
       : collections.filter((c) => c.slug === activeCollection);
 
-  const totalCartValue = cart.reduce((sum, item) => sum + item.price, 0);
+  const totalCartValue = subtotal();
 
   function addToCart(
     productId: string,
@@ -46,14 +40,7 @@ export default function PreOrderPage() {
     price: number,
     size: string
   ) {
-    setCart((prev) => [
-      ...prev,
-      { productId, productName, collection, size, price },
-    ]);
-  }
-
-  function removeFromCart(index: number) {
-    setCart((prev) => prev.filter((_, i) => i !== index));
+    addItem({ productId, productName, collection, size, price });
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -232,9 +219,9 @@ export default function PreOrderPage() {
 
                 {cart.length > 0 && (
                   <div className="space-y-3 mb-8">
-                    {cart.map((item, idx) => (
+                    {cart.map((item) => (
                       <motion.div
-                        key={`${item.productId}-${item.size}-${idx}`}
+                        key={`${item.productId}-${item.size}`}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         className="flex items-center justify-between p-4 rounded-xl border border-white/5 bg-white/[0.02]"
@@ -243,14 +230,15 @@ export default function PreOrderPage() {
                           <p className="text-white text-sm">{item.productName}</p>
                           <p className="text-white/30 text-xs">
                             {item.collection} &middot; Size: {item.size}
+                            {item.quantity > 1 && ` &middot; Qty: ${item.quantity}`}
                           </p>
                         </div>
                         <div className="flex items-center gap-4">
                           <span className="text-white/60 text-sm">
-                            ${item.price}
+                            ${(item.price * item.quantity).toLocaleString()}
                           </span>
                           <button
-                            onClick={() => removeFromCart(idx)}
+                            onClick={() => removeCartItem(item.productId, item.size)}
                             className="text-white/20 hover:text-red-400 transition-colors text-xs"
                           >
                             Remove
@@ -293,6 +281,18 @@ export default function PreOrderPage() {
                     {cart.length > 0 && <ArrowRight size={16} />}
                   </button>
                 </form>
+
+                {/* Proceed to Checkout */}
+                {cart.length > 0 && (
+                  <Link
+                    href="/checkout"
+                    className="w-full mt-4 px-8 py-4 bg-white/[0.05] border border-white/10 text-white text-sm tracking-[0.15em] uppercase rounded-xl hover:bg-white/[0.08] hover:border-white/20 transition-all duration-300 flex items-center justify-center gap-2"
+                  >
+                    <ShoppingBag size={16} />
+                    <span>Proceed to Checkout</span>
+                    <ArrowRight size={16} />
+                  </Link>
+                )}
 
                 {/* Trust signals */}
                 <div className="flex items-center justify-center gap-6 mt-6">

@@ -37,7 +37,9 @@ Architecture note:
 from __future__ import annotations
 
 import hashlib
+import json
 import logging
+import os
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -71,6 +73,7 @@ class FeatureFlag:
     rollout_percentage: int = 100
     enabled_for_users: list[str] = field(default_factory=list)
     disabled_for_users: list[str] = field(default_factory=list)
+    kill_switch: bool = False
     description: str = ""
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -135,9 +138,23 @@ class FlagManager:
         )
         return flag
 
+    def set_flag(self, flag: FeatureFlag) -> None:
+        """Store a flag object directly (used by RedisFlagManager and REST API)."""
+        self._flags[flag.name] = flag
+        logger.debug(f"Flag {flag.name!r} set: enabled={flag.enabled}")
+
     def get_flag(self, name: str) -> FeatureFlag | None:
         """Return a flag by name, or None if not found."""
         return self._flags.get(name)
+
+    def get_all_flags(self) -> dict[str, FeatureFlag]:
+        """Return all flags as a dict keyed by name."""
+        return dict(self._flags)
+
+    def delete_flag(self, flag_name: str) -> None:
+        """Remove a flag from memory."""
+        self._flags.pop(flag_name, None)
+        logger.debug(f"Flag {flag_name!r} deleted")
 
     def enable(self, name: str) -> None:
         """Turn on the global kill switch for a flag."""
@@ -289,9 +306,113 @@ class FlagManager:
 
 
 # ---------------------------------------------------------------------------
+# Redis-Backed Flag Manager
+# ---------------------------------------------------------------------------
+
+
+class RedisFlagManager(FlagManager):
+    """
+    Redis-backed feature flag manager.
+
+    Falls back to in-memory parent if Redis is unavailable.
+    Flags are stored as JSON in Redis hash 'feature_flags'.
+    """
+
+    def __init__(self, redis_url: str | None = None) -> None:
+        super().__init__()
+        self._redis_url = redis_url or os.getenv("REDIS_URL", "")
+        self._redis: Any = None
+
+    def _get_redis(self) -> Any:
+        """Lazy Redis connection."""
+        if self._redis is None and self._redis_url:
+            try:
+                import redis
+                self._redis = redis.from_url(self._redis_url, decode_responses=True)
+            except Exception as e:
+                logger.warning(f"Redis unavailable for feature flags: {e}")
+        return self._redis
+
+    def set_flag(self, flag: FeatureFlag) -> None:
+        """Store flag in Redis and in-memory."""
+        super().set_flag(flag)
+        r = self._get_redis()
+        if r:
+            try:
+                r.hset("feature_flags", flag.name, json.dumps({
+                    "name": flag.name,
+                    "enabled": flag.enabled,
+                    "rollout_percentage": flag.rollout_percentage,
+                    "enabled_for_users": list(flag.enabled_for_users),
+                    "disabled_for_users": list(flag.disabled_for_users),
+                    "kill_switch": flag.kill_switch,
+                }))
+            except Exception as e:
+                logger.warning(f"Failed to persist flag to Redis: {e}")
+
+    def is_enabled(self, flag_name: str, user_id: str | None = None) -> bool:
+        """Check flag, loading from Redis if not in memory."""
+        if flag_name not in self._flags:
+            self._load_from_redis(flag_name)
+        return super().is_enabled(flag_name, user_id)
+
+    def _load_from_redis(self, flag_name: str) -> None:
+        """Load a single flag from Redis into memory."""
+        r = self._get_redis()
+        if not r:
+            return
+        try:
+            raw = r.hget("feature_flags", flag_name)
+            if raw:
+                data = json.loads(raw)
+                flag = FeatureFlag(
+                    name=data["name"],
+                    enabled=data.get("enabled", False),
+                    rollout_percentage=data.get("rollout_percentage", 0),
+                    enabled_for_users=set(data.get("enabled_for_users", [])),
+                    disabled_for_users=set(data.get("disabled_for_users", [])),
+                    kill_switch=data.get("kill_switch", False),
+                )
+                self._flags[flag_name] = flag
+        except Exception as e:
+            logger.warning(f"Failed to load flag from Redis: {e}")
+
+    def get_all_flags(self) -> dict[str, FeatureFlag]:
+        """Load all flags from Redis, merge with in-memory."""
+        r = self._get_redis()
+        if r:
+            try:
+                all_raw = r.hgetall("feature_flags")
+                for name, raw in all_raw.items():
+                    if name not in self._flags:
+                        data = json.loads(raw)
+                        self._flags[name] = FeatureFlag(
+                            name=data["name"],
+                            enabled=data.get("enabled", False),
+                            rollout_percentage=data.get("rollout_percentage", 0),
+                            enabled_for_users=set(data.get("enabled_for_users", [])),
+                            disabled_for_users=set(data.get("disabled_for_users", [])),
+                            kill_switch=data.get("kill_switch", False),
+                        )
+            except Exception as e:
+                logger.warning(f"Failed to load flags from Redis: {e}")
+        return dict(self._flags)
+
+    def delete_flag(self, flag_name: str) -> None:
+        """Remove flag from both Redis and memory."""
+        self._flags.pop(flag_name, None)
+        r = self._get_redis()
+        if r:
+            try:
+                r.hdel("feature_flags", flag_name)
+            except Exception as e:
+                logger.warning(f"Failed to delete flag from Redis: {e}")
+
+
+# ---------------------------------------------------------------------------
 # Singleton (optional — use dependency injection in production)
 # ---------------------------------------------------------------------------
 
-# Module-level singleton for simple use cases.
-# In production, prefer injecting FlagManager via FastAPI's Depends().
-flag_manager = FlagManager()
+# Module-level singleton — uses Redis if REDIS_URL is set
+_redis_url = os.getenv("REDIS_URL", "")
+flag_manager: FlagManager = RedisFlagManager(_redis_url) if _redis_url else FlagManager()

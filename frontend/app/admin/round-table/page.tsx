@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,46 +20,38 @@ import {
   XCircle,
   Sparkles,
 } from 'lucide-react';
-import { api, type ProviderInfo, type ProviderStats, type HistoryEntry, type CompetitionResponse, type CompetitionEntry } from '@/lib/api';
+import { api, type CompetitionResponse } from '@/lib/api';
 import { useRoundTableWS } from '@/hooks/useWebSocket';
 
 export default function RoundTablePage() {
-  const [providers, setProviders] = useState<ProviderInfo[]>([]);
-  const [stats, setStats] = useState<ProviderStats[]>([]);
-  const [history, setHistory] = useState<HistoryEntry[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data: roundTableData, isLoading: loading } = useQuery({
+    queryKey: ['round-table'],
+    queryFn: async () => {
+      const [providersData, statsData, historyData] = await Promise.all([
+        api.roundTable.getProviders(),
+        api.roundTable.getStats(),
+        api.roundTable.getHistory(10),
+      ]);
+      return { providers: providersData, stats: statsData, history: historyData };
+    },
+  });
+
+  const providers = roundTableData?.providers ?? [];
+  const stats = roundTableData?.stats ?? [];
+  const history = roundTableData?.history ?? [];
+
   const [competing, setCompeting] = useState(false);
   const [prompt, setPrompt] = useState('');
   const [lastResult, setLastResult] = useState<CompetitionResponse | null>(null);
 
+  const queryClient = useQueryClient();
   const { status: wsStatus, lastMessage } = useRoundTableWS();
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const [providersData, statsData, historyData] = await Promise.all([
-          api.roundTable.getProviders(),
-          api.roundTable.getStats(),
-          api.roundTable.getHistory(10),
-        ]);
-        setProviders(providersData);
-        setStats(statsData);
-        setHistory(historyData);
-      } catch (err) {
-        console.error('Failed to load Round Table data:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-    fetchData();
-  }, []);
-
-  useEffect(() => {
     if (lastMessage?.data?.event === 'competition_completed') {
-      api.roundTable.getStats().then(setStats);
-      api.roundTable.getHistory(10).then(setHistory);
+      queryClient.invalidateQueries({ queryKey: ['round-table'] });
     }
-  }, [lastMessage]);
+  }, [lastMessage, queryClient]);
 
   async function runCompetition() {
     if (!prompt.trim()) return;
@@ -66,18 +59,8 @@ export default function RoundTablePage() {
     try {
       const result = await api.roundTable.compete({ prompt: prompt.trim() });
       setLastResult(result);
-      // Convert CompetitionResponse to HistoryEntry format
-      const historyEntry: HistoryEntry = {
-        id: result.id,
-        prompt_preview: result.prompt_preview,
-        winner_provider: result.winner?.provider || 'unknown',
-        winner_score: result.winner?.scores.total || 0,
-        total_cost_usd: result.total_cost_usd,
-        created_at: result.created_at,
-      };
-      setHistory((prev) => [historyEntry, ...prev.slice(0, 9)]);
-      const newStats = await api.roundTable.getStats();
-      setStats(newStats);
+      // Invalidate round-table query to refetch providers, stats, and history
+      await queryClient.invalidateQueries({ queryKey: ['round-table'] });
       setPrompt(''); // Clear prompt on success
     } catch (err) {
       console.error('Competition failed:', err);

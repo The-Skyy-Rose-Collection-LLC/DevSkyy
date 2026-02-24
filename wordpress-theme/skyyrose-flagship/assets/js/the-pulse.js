@@ -623,6 +623,336 @@
 	};
 
 	/* --------------------------------------------------
+	   7. Section Reveal — IntersectionObserver Fade-In
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initSectionReveals = function () {
+		if (reducedMotion()) return;
+		if (typeof IntersectionObserver === 'undefined') return;
+
+		var revealTargets = document.querySelectorAll(
+			'.gateway-section-header, .product-grid-card, .product-card, ' +
+			'.preorder-countdown, .collection-tabs, .member-banner, ' +
+			'[data-pulse-reveal]'
+		);
+
+		if (revealTargets.length === 0) return;
+
+		for (var i = 0; i < revealTargets.length; i++) {
+			revealTargets[i].classList.add('pulse-reveal');
+		}
+
+		var observer = new IntersectionObserver(
+			function (entries) {
+				for (var e = 0; e < entries.length; e++) {
+					if (entries[e].isIntersecting) {
+						entries[e].target.classList.add('pulse-reveal--visible');
+						observer.unobserve(entries[e].target);
+					}
+				}
+			},
+			{ threshold: 0.15, rootMargin: '0px 0px -40px 0px' }
+		);
+
+		for (var j = 0; j < revealTargets.length; j++) {
+			observer.observe(revealTargets[j]);
+		}
+
+		this._revealObserver = observer;
+	};
+
+	/* --------------------------------------------------
+	   8. Luxury 3D Tilt on Product Cards
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initCardTilt = function () {
+		if (reducedMotion()) return;
+		if (!('ontouchstart' in window)) {
+			var cardTargets = document.querySelectorAll(
+				'.product-grid-card, .product-card'
+			);
+
+			for (var i = 0; i < cardTargets.length; i++) {
+				(function (card) {
+					card.addEventListener('mousemove', function (e) {
+						var rect = card.getBoundingClientRect();
+						var x = (e.clientX - rect.left) / rect.width;
+						var y = (e.clientY - rect.top) / rect.height;
+
+						var tiltX = (y - 0.5) * -8;
+						var tiltY = (x - 0.5) * 8;
+
+						card.style.transform =
+							'perspective(1000px) rotateX(' + tiltX + 'deg) rotateY(' + tiltY + 'deg) translateY(-2px)';
+						card.style.transition = 'transform 0.1s ease-out';
+					});
+
+					card.addEventListener('mouseleave', function () {
+						card.style.transform = '';
+						card.style.transition = 'transform 0.4s cubic-bezier(0.22, 1, 0.36, 1)';
+					});
+				})(cardTargets[i]);
+			}
+		}
+	};
+
+	/* --------------------------------------------------
+	   9. Rose Gold Shimmer on Buttons
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initButtonShimmer = function () {
+		if (reducedMotion()) return;
+
+		var buttons = document.querySelectorAll(
+			'.modal-add-to-cart, .cart-checkout-btn, ' +
+			'.pulse-countdown-banner__cta, .incentive-popup-submit, ' +
+			'[data-pulse-shimmer]'
+		);
+
+		for (var i = 0; i < buttons.length; i++) {
+			buttons[i].classList.add('pulse-shimmer-btn');
+		}
+	};
+
+	/* --------------------------------------------------
+	   10. Hero Text Float Animation
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initHeroFloat = function () {
+		if (reducedMotion()) return;
+
+		var heroEls = document.querySelectorAll(
+			'.loading-monogram, .gateway-logo, ' +
+			'.gateway-section-header h2, [data-pulse-float]'
+		);
+
+		for (var i = 0; i < heroEls.length; i++) {
+			heroEls[i].classList.add('pulse-hero-float');
+		}
+	};
+
+	/* --------------------------------------------------
+	   11. Collection Logo Glow Rotation
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initLogoGlow = function () {
+		if (reducedMotion()) return;
+
+		var logos = document.querySelectorAll(
+			'.collection-logo, .collection-logo-img, [data-pulse-logo-glow]'
+		);
+
+		for (var i = 0; i < logos.length; i++) {
+			logos[i].classList.add('pulse-logo-glow');
+		}
+	};
+
+	/* --------------------------------------------------
+	   12. Sparkle Particles on Brand Monogram Hover
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initSparkles = function () {
+		if (reducedMotion()) return;
+
+		var monograms = document.querySelectorAll(
+			'.loading-monogram, .gateway-logo, .incentive-popup-monogram, ' +
+			'[data-pulse-sparkle]'
+		);
+
+		var self = this;
+
+		for (var i = 0; i < monograms.length; i++) {
+			(function (el) {
+				var container = el.parentNode;
+				var style = window.getComputedStyle(container);
+				if (style.position === 'static') {
+					container.style.position = 'relative';
+				}
+				container.style.overflow = 'visible';
+
+				el.addEventListener('mouseenter', function () {
+					self._spawnSparkles(container, 6);
+				});
+			})(monograms[i]);
+		}
+	};
+
+	PulseEngine.prototype._spawnSparkles = function (container, count) {
+		var self = this;
+		for (var i = 0; i < count; i++) {
+			(function (index) {
+				var delay = index * 80;
+				var timer = setTimeout(function () {
+					var sparkle = document.createElement('span');
+					sparkle.className = 'pulse-sparkle';
+					sparkle.textContent = '\u2726';
+					sparkle.style.left = Math.random() * 100 + '%';
+					sparkle.style.top = Math.random() * 100 + '%';
+					sparkle.style.animationDelay = (Math.random() * 0.3) + 's';
+					sparkle.style.fontSize = (0.5 + Math.random() * 0.6) + 'rem';
+
+					container.appendChild(sparkle);
+
+					var removeTimer = setTimeout(function () {
+						if (sparkle.parentNode) {
+							sparkle.parentNode.removeChild(sparkle);
+						}
+					}, 1200);
+					self._timers.push(removeTimer);
+				}, delay);
+				self._timers.push(timer);
+			})(i);
+		}
+	};
+
+	/* --------------------------------------------------
+	   13. Rooms Explored Counter (Immersive Pages)
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initRoomsExplored = function () {
+		var immersivePage = document.querySelector('.immersive-page, .skyyrose-immersive');
+		if (!immersivePage) return;
+
+		var rooms = document.querySelectorAll(
+			'.immersive-room, .immersive-scene, [data-room]'
+		);
+		if (rooms.length === 0) return;
+
+		var counter = document.createElement('div');
+		counter.className = 'pulse-rooms-counter';
+		counter.innerHTML =
+			'<span class="pulse-rooms-counter__icon">\ud83c\udfe0</span>' +
+			'<span class="pulse-rooms-counter__explored">0</span>' +
+			' / ' +
+			'<span class="pulse-rooms-counter__total">' + rooms.length + '</span>' +
+			' rooms explored';
+
+		document.body.appendChild(counter);
+		this._roomsCounter = counter;
+
+		var explored = new Set();
+		var exploredEl = counter.querySelector('.pulse-rooms-counter__explored');
+
+		var observer = new IntersectionObserver(
+			function (entries) {
+				for (var e = 0; e < entries.length; e++) {
+					if (entries[e].isIntersecting) {
+						explored.add(entries[e].target);
+						exploredEl.textContent = explored.size;
+
+						if (explored.size === rooms.length) {
+							counter.classList.add('pulse-rooms-counter--complete');
+						}
+					}
+				}
+			},
+			{ threshold: 0.5 }
+		);
+
+		for (var i = 0; i < rooms.length; i++) {
+			observer.observe(rooms[i]);
+		}
+
+		this._roomsObserver = observer;
+
+		var showTimer = setTimeout(function () {
+			counter.classList.add('visible');
+		}, 2000);
+		this._timers.push(showTimer);
+	};
+
+	/* --------------------------------------------------
+	   14. Global Page Viewer Counter (Top Bar)
+	   -------------------------------------------------- */
+
+	PulseEngine.prototype._initPageViewerCounter = function () {
+		var productSection = document.querySelector(
+			'.gateway-product-section, .product-grid, .product-listing'
+		);
+		if (!productSection) return;
+
+		var count = this._currentViewers + randInt(10, 40);
+		var counter = document.createElement('div');
+		counter.className = 'pulse-page-viewers';
+		counter.innerHTML =
+			'<span class="pulse-page-viewers__dot"></span>' +
+			'<span class="pulse-page-viewers__count">' + count + '</span>' +
+			' people are shopping right now';
+
+		var header = document.querySelector('.gateway-section-header');
+		if (header && header.parentNode) {
+			header.parentNode.insertBefore(counter, header.nextSibling);
+		} else {
+			productSection.insertBefore(counter, productSection.firstChild);
+		}
+
+		this._pageViewerCounter = counter;
+
+		var self = this;
+		var updateTimer = setInterval(function () {
+			var delta = randInt(-2, 3);
+			count = Math.max(15, Math.min(130, count + delta));
+			var countEl = counter.querySelector('.pulse-page-viewers__count');
+			if (countEl) countEl.textContent = count;
+		}, randInt(8000, 15000));
+		this._timers.push(updateTimer);
+	};
+
+	/* --------------------------------------------------
+	   Update Init to Include New Features
+	   -------------------------------------------------- */
+
+	var _originalInit = PulseEngine.prototype.init;
+	PulseEngine.prototype.init = function () {
+		_originalInit.call(this);
+
+		this._initSectionReveals();
+		this._initCardTilt();
+		this._initButtonShimmer();
+		this._initHeroFloat();
+		this._initLogoGlow();
+		this._initSparkles();
+		this._initRoomsExplored();
+		this._initPageViewerCounter();
+	};
+
+	/* --------------------------------------------------
+	   Update Destroy to Clean Up New Features
+	   -------------------------------------------------- */
+
+	var _originalDestroy = PulseEngine.prototype.destroy;
+	PulseEngine.prototype.destroy = function () {
+		_originalDestroy.call(this);
+
+		if (this._revealObserver) {
+			this._revealObserver.disconnect();
+			this._revealObserver = null;
+		}
+
+		if (this._roomsObserver) {
+			this._roomsObserver.disconnect();
+			this._roomsObserver = null;
+		}
+
+		if (this._roomsCounter && this._roomsCounter.parentNode) {
+			this._roomsCounter.parentNode.removeChild(this._roomsCounter);
+			this._roomsCounter = null;
+		}
+
+		if (this._pageViewerCounter && this._pageViewerCounter.parentNode) {
+			this._pageViewerCounter.parentNode.removeChild(this._pageViewerCounter);
+			this._pageViewerCounter = null;
+		}
+
+		var sparkles = document.querySelectorAll('.pulse-sparkle');
+		for (var i = 0; i < sparkles.length; i++) {
+			if (sparkles[i].parentNode) {
+				sparkles[i].parentNode.removeChild(sparkles[i]);
+			}
+		}
+	};
+
+	/* --------------------------------------------------
 	   Bootstrap
 	   -------------------------------------------------- */
 
