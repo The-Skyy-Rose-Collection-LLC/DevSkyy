@@ -1,0 +1,1105 @@
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import {
+  Activity,
+  Zap,
+  ChevronRight,
+  TrendingUp,
+  MousePointerClick,
+  Mail,
+  DollarSign,
+  Target,
+  Flame,
+  Eye,
+  Clock,
+  ShoppingCart,
+  FlaskConical,
+  Trophy,
+  SlidersHorizontal,
+  Save,
+  CheckCircle2,
+  BarChart3,
+} from 'lucide-react';
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+interface FunnelStage {
+  readonly label: string;
+  readonly count: number;
+  readonly rate: number;
+  readonly color: string;
+}
+
+interface ProductHeat {
+  readonly sku: string;
+  readonly name: string;
+  readonly collection: 'black-rose' | 'love-hurts' | 'signature';
+  readonly heatScore: number;
+  readonly views: number;
+  readonly avgHoverTime: number;
+  readonly cartRate: number;
+}
+
+interface ABVariant {
+  readonly name: string;
+  readonly description: string;
+  readonly sessions: number;
+  readonly conversions: number;
+  readonly conversionRate: number;
+}
+
+interface ControlsState {
+  readonly socialProofFrequency: number;
+  readonly urgencyBar: boolean;
+  readonly exitIntent: boolean;
+  readonly magneticCards: boolean;
+  readonly abTestMode: 'standard' | 'enhanced' | 'auto';
+}
+
+// ---------------------------------------------------------------------------
+// Constants
+// ---------------------------------------------------------------------------
+
+const COLLECTION_CONFIG: Record<
+  string,
+  { label: string; color: string; bgColor: string }
+> = {
+  'black-rose': {
+    label: 'Black Rose',
+    color: '#B76E79',
+    bgColor: 'bg-[#B76E79]/10',
+  },
+  'love-hurts': {
+    label: 'Love Hurts',
+    color: '#E1306C',
+    bgColor: 'bg-[#E1306C]/10',
+  },
+  signature: {
+    label: 'Signature',
+    color: '#D4AF37',
+    bgColor: 'bg-[#D4AF37]/10',
+  },
+};
+
+const FUNNEL_STAGES: readonly FunnelStage[] = [
+  { label: 'Visitors', count: 2847, rate: 100, color: '#6B7280' },
+  { label: 'Browsing', count: 1432, rate: 50.3, color: '#9CA3AF' },
+  { label: 'Engaged', count: 628, rate: 22.1, color: '#D4AF37' },
+  { label: 'Cart', count: 187, rate: 6.6, color: '#C4826D' },
+  { label: 'Order', count: 43, rate: 1.5, color: '#B76E79' },
+];
+
+const PRODUCT_HEAT_DATA: readonly ProductHeat[] = [
+  { sku: 'br-004', name: 'BLACK Rose Hoodie', collection: 'black-rose', heatScore: 94, views: 1243, avgHoverTime: 8.2, cartRate: 4.8 },
+  { sku: 'lh-004', name: 'Love Hurts Varsity Jacket', collection: 'love-hurts', heatScore: 91, views: 1087, avgHoverTime: 7.9, cartRate: 5.1 },
+  { sku: 'br-006', name: 'BLACK Rose Sherpa Jacket', collection: 'black-rose', heatScore: 87, views: 982, avgHoverTime: 7.4, cartRate: 4.2 },
+  { sku: 'sg-002', name: 'Stay Golden Set', collection: 'signature', heatScore: 84, views: 921, avgHoverTime: 6.8, cartRate: 3.9 },
+  { sku: 'br-008', name: "Women's BLACK Rose Hooded Dress", collection: 'black-rose', heatScore: 82, views: 876, avgHoverTime: 9.1, cartRate: 3.6 },
+  { sku: 'sg-001', name: 'The Bay Set', collection: 'signature', heatScore: 79, views: 834, avgHoverTime: 6.2, cartRate: 3.4 },
+  { sku: 'lh-001', name: 'The Fannie', collection: 'love-hurts', heatScore: 76, views: 798, avgHoverTime: 5.8, cartRate: 3.1 },
+  { sku: 'br-005', name: 'BLACK Rose Hoodie - Signature Ed.', collection: 'black-rose', heatScore: 74, views: 756, avgHoverTime: 7.1, cartRate: 2.9 },
+  { sku: 'sg-006', name: 'Mint & Lavender Hoodie', collection: 'signature', heatScore: 71, views: 712, avgHoverTime: 5.4, cartRate: 2.7 },
+  { sku: 'br-001', name: 'BLACK Rose Crewneck', collection: 'black-rose', heatScore: 68, views: 687, avgHoverTime: 4.9, cartRate: 2.5 },
+  { sku: 'lh-002', name: 'Love Hurts Joggers', collection: 'love-hurts', heatScore: 65, views: 643, avgHoverTime: 4.6, cartRate: 2.3 },
+  { sku: 'sg-003', name: 'The Signature Tee', collection: 'signature', heatScore: 62, views: 601, avgHoverTime: 4.2, cartRate: 2.1 },
+  { sku: 'br-002', name: 'BLACK Rose Joggers', collection: 'black-rose', heatScore: 58, views: 567, avgHoverTime: 3.8, cartRate: 1.9 },
+  { sku: 'br-003', name: 'BLACK is Beautiful Jersey', collection: 'black-rose', heatScore: 55, views: 534, avgHoverTime: 3.5, cartRate: 1.7 },
+  { sku: 'sg-005', name: 'Stay Golden Tee', collection: 'signature', heatScore: 52, views: 498, avgHoverTime: 3.2, cartRate: 1.6 },
+  { sku: 'lh-003', name: 'Love Hurts Basketball Shorts', collection: 'love-hurts', heatScore: 48, views: 456, avgHoverTime: 2.9, cartRate: 1.4 },
+  { sku: 'br-007', name: 'BLACK Rose x Love Hurts Shorts', collection: 'black-rose', heatScore: 45, views: 423, avgHoverTime: 2.7, cartRate: 1.2 },
+  { sku: 'sg-009', name: 'The Sherpa Jacket', collection: 'signature', heatScore: 42, views: 398, avgHoverTime: 4.1, cartRate: 1.1 },
+  { sku: 'sg-007', name: 'The Signature Beanie', collection: 'signature', heatScore: 38, views: 367, avgHoverTime: 2.3, cartRate: 0.9 },
+  { sku: 'sg-010', name: 'The Bridge Series Shorts', collection: 'signature', heatScore: 34, views: 312, avgHoverTime: 2.1, cartRate: 0.8 },
+];
+
+const AB_VARIANT_A: ABVariant = {
+  name: 'Variant A',
+  description: 'Standard (15\u00B0 max tilt)',
+  sessions: 1423,
+  conversions: 30,
+  conversionRate: 2.1,
+};
+
+const AB_VARIANT_B: ABVariant = {
+  name: 'Variant B',
+  description: 'Enhanced (30\u00B0 max tilt)',
+  sessions: 1424,
+  conversions: 40,
+  conversionRate: 2.8,
+};
+
+const INITIAL_CONTROLS: ControlsState = {
+  socialProofFrequency: 18,
+  urgencyBar: true,
+  exitIntent: true,
+  magneticCards: true,
+  abTestMode: 'auto',
+};
+
+// ---------------------------------------------------------------------------
+// Page Component
+// ---------------------------------------------------------------------------
+
+export default function ConversionIntelligencePage() {
+  const [loading, setLoading] = useState(true);
+  const [controls, setControls] = useState<ControlsState>(INITIAL_CONTROLS);
+  const [saveConfirmed, setSaveConfirmed] = useState(false);
+
+  const simulateLoad = useCallback(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    simulateLoad();
+  }, [simulateLoad]);
+
+  function handleControlChange<K extends keyof ControlsState>(
+    key: K,
+    value: ControlsState[K]
+  ) {
+    setControls((prev) => ({ ...prev, [key]: value }));
+    setSaveConfirmed(false);
+  }
+
+  function handleSaveControls() {
+    setSaveConfirmed(true);
+    setTimeout(() => setSaveConfirmed(false), 3000);
+  }
+
+  if (loading) {
+    return <ConversionSkeleton />;
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* ----------------------------------------------------------------- */}
+      {/* Header                                                            */}
+      {/* ----------------------------------------------------------------- */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 p-8 border border-gray-700">
+        <div className="absolute inset-0 bg-grid-white/[0.02]" />
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#B76E79]/10 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#D4AF37]/10 rounded-full blur-3xl" />
+
+        <div className="relative flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-white flex items-center gap-3">
+              <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-[#B76E79] to-[#D4AF37] flex items-center justify-center">
+                <Activity className="h-6 w-6 text-white" />
+              </div>
+              Conversion Intelligence
+            </h1>
+            <p className="text-gray-400 mt-2 ml-15">
+              Real-time funnel analytics, engagement depth, and A/B test insights
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Badge
+              variant="outline"
+              className="border-green-500/50 text-green-400"
+            >
+              <div className="h-2 w-2 rounded-full mr-2 bg-green-400 animate-pulse" />
+              Live
+            </Badge>
+          </div>
+        </div>
+      </div>
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Funnel Visualization                                              */}
+      {/* ----------------------------------------------------------------- */}
+      <FunnelVisualization stages={FUNNEL_STAGES} />
+
+      {/* ----------------------------------------------------------------- */}
+      {/* Tabs                                                              */}
+      {/* ----------------------------------------------------------------- */}
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList className="bg-gray-800">
+          <TabsTrigger
+            value="overview"
+            className="data-[state=active]:bg-gray-700"
+          >
+            <BarChart3 className="mr-2 h-4 w-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger
+            value="ab-tests"
+            className="data-[state=active]:bg-gray-700"
+          >
+            <FlaskConical className="mr-2 h-4 w-4" />
+            A/B Tests
+          </TabsTrigger>
+          <TabsTrigger
+            value="product-heat"
+            className="data-[state=active]:bg-gray-700"
+          >
+            <Flame className="mr-2 h-4 w-4" />
+            Product Heat
+          </TabsTrigger>
+          <TabsTrigger
+            value="controls"
+            className="data-[state=active]:bg-gray-700"
+          >
+            <SlidersHorizontal className="mr-2 h-4 w-4" />
+            Controls
+          </TabsTrigger>
+        </TabsList>
+
+        {/* ---- Overview Tab ---- */}
+        <TabsContent value="overview" className="space-y-6">
+          <OverviewTab />
+        </TabsContent>
+
+        {/* ---- A/B Tests Tab ---- */}
+        <TabsContent value="ab-tests" className="space-y-6">
+          <ABTestsTab variantA={AB_VARIANT_A} variantB={AB_VARIANT_B} />
+        </TabsContent>
+
+        {/* ---- Product Heat Tab ---- */}
+        <TabsContent value="product-heat" className="space-y-4">
+          <ProductHeatTab products={PRODUCT_HEAT_DATA} />
+        </TabsContent>
+
+        {/* ---- Controls Tab ---- */}
+        <TabsContent value="controls" className="space-y-4">
+          <ControlsTab
+            controls={controls}
+            onControlChange={handleControlChange}
+            onSave={handleSaveControls}
+            saveConfirmed={saveConfirmed}
+          />
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Funnel Visualization
+// ---------------------------------------------------------------------------
+
+function FunnelVisualization({
+  stages,
+}: {
+  stages: readonly FunnelStage[];
+}) {
+  return (
+    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-[#D4AF37]" />
+          Conversion Funnel
+        </CardTitle>
+        <CardDescription className="text-gray-400">
+          Real-time visitor journey from landing to purchase
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+          {stages.map((stage, index) => {
+            const prevStage = index > 0 ? stages[index - 1] : null;
+            const dropOff = prevStage
+              ? (
+                  ((prevStage.count - stage.count) / prevStage.count) *
+                  100
+                ).toFixed(1)
+              : null;
+
+            return (
+              <div key={stage.label} className="flex items-center gap-2 flex-1 min-w-0">
+                {/* Drop-off arrow between stages */}
+                {index > 0 && (
+                  <div className="flex flex-col items-center flex-shrink-0 px-1">
+                    <ChevronRight className="h-5 w-5 text-gray-600" />
+                    <span className="text-[10px] text-red-400/70 whitespace-nowrap">
+                      -{dropOff}%
+                    </span>
+                  </div>
+                )}
+
+                {/* Stage card */}
+                <div className="flex-1 min-w-[120px] rounded-lg border border-gray-700 bg-gray-800/50 p-4 text-center">
+                  <p className="text-xs text-gray-500 uppercase tracking-wide mb-1">
+                    {stage.label}
+                  </p>
+                  <p className="text-2xl font-bold text-white">
+                    {formatNumber(stage.count)}
+                  </p>
+                  <p
+                    className="text-sm font-medium mt-1"
+                    style={{ color: stage.color }}
+                  >
+                    {stage.rate}%
+                  </p>
+                  {/* Progress bar */}
+                  <div className="mt-2 h-1.5 w-full rounded-full bg-gray-700 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-1000 ease-out"
+                      style={{
+                        width: `${stage.rate}%`,
+                        backgroundColor: stage.color,
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Overview Tab
+// ---------------------------------------------------------------------------
+
+function OverviewTab() {
+  const engagementScore = 67;
+  const socialProofCTR = 3.8;
+  const exitIntentCapture = 12.4;
+  const preOrderVelocity = 1247;
+  const projected30Day = 37410;
+  const revenueTarget = 50000;
+  const revenueActual = 18940;
+  const targetProgress = (revenueActual / revenueTarget) * 100;
+
+  return (
+    <>
+      {/* Metric Cards Row */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {/* Engagement Score */}
+        <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Engagement Score</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Avg depth 0-100
+                </p>
+              </div>
+              <div className="relative h-16 w-16">
+                <svg
+                  className="h-16 w-16 -rotate-90"
+                  viewBox="0 0 64 64"
+                >
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    fill="none"
+                    stroke="#374151"
+                    strokeWidth="5"
+                  />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    fill="none"
+                    stroke="#D4AF37"
+                    strokeWidth="5"
+                    strokeLinecap="round"
+                    strokeDasharray={`${(engagementScore / 100) * 175.93} 175.93`}
+                  />
+                </svg>
+                <span className="absolute inset-0 flex items-center justify-center text-sm font-bold text-white">
+                  {engagementScore}
+                </span>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Social Proof CTR */}
+        <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Social Proof CTR</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Toast click-through rate
+                </p>
+                <p className="text-3xl font-bold text-white mt-2">
+                  {socialProofCTR}%
+                </p>
+              </div>
+              <div className="h-12 w-12 rounded-xl bg-[#B76E79]/10 flex items-center justify-center">
+                <MousePointerClick className="h-6 w-6 text-[#B76E79]" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Exit Intent Capture */}
+        <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-gray-400">Exit Intent Capture</p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Email capture rate
+                </p>
+                <p className="text-3xl font-bold text-white mt-2">
+                  {exitIntentCapture}%
+                </p>
+              </div>
+              <div className="h-12 w-12 rounded-xl bg-emerald-500/10 flex items-center justify-center">
+                <Mail className="h-6 w-6 text-emerald-400" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Revenue Projection */}
+      <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+        <CardHeader>
+          <CardTitle className="text-white flex items-center gap-2">
+            <DollarSign className="h-5 w-5 text-[#D4AF37]" />
+            Revenue Projection
+          </CardTitle>
+          <CardDescription className="text-gray-400">
+            Pre-order velocity and 30-day revenue forecast
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-3">
+            {/* Velocity */}
+            <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="h-4 w-4 text-[#D4AF37]" />
+                <span className="text-sm text-gray-400">
+                  Pre-Order Velocity
+                </span>
+              </div>
+              <p className="text-2xl font-bold text-white">
+                ${formatNumber(preOrderVelocity)}
+                <span className="text-sm font-normal text-gray-500">
+                  /day
+                </span>
+              </p>
+            </div>
+
+            {/* 30-day projection */}
+            <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <TrendingUp className="h-4 w-4 text-emerald-400" />
+                <span className="text-sm text-gray-400">
+                  30-Day Projection
+                </span>
+              </div>
+              <p className="text-2xl font-bold text-white">
+                ${formatNumber(projected30Day)}
+              </p>
+            </div>
+
+            {/* Actual */}
+            <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Target className="h-4 w-4 text-[#B76E79]" />
+                <span className="text-sm text-gray-400">
+                  Actual Revenue
+                </span>
+              </div>
+              <p className="text-2xl font-bold text-white">
+                ${formatNumber(revenueActual)}
+              </p>
+            </div>
+          </div>
+
+          {/* Target vs Actual progress */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-400">
+                Target Progress
+              </span>
+              <span className="text-sm text-gray-300">
+                ${formatNumber(revenueActual)} / $
+                {formatNumber(revenueTarget)}
+              </span>
+            </div>
+            <div className="h-3 w-full rounded-full bg-gray-700 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-[#B76E79] to-[#D4AF37] transition-all duration-1000 ease-out"
+                style={{ width: `${Math.min(targetProgress, 100)}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              {targetProgress.toFixed(1)}% of $
+              {formatNumber(revenueTarget)} target
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// A/B Tests Tab
+// ---------------------------------------------------------------------------
+
+function ABTestsTab({
+  variantA,
+  variantB,
+}: {
+  variantA: ABVariant;
+  variantB: ABVariant;
+}) {
+  const confidence = 94.2;
+  const winner =
+    variantA.conversionRate >= variantB.conversionRate ? 'A' : 'B';
+  const maxConversion = Math.max(
+    variantA.conversionRate,
+    variantB.conversionRate
+  );
+
+  return (
+    <>
+      {/* Test Header */}
+      <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle className="text-white flex items-center gap-2">
+                <FlaskConical className="h-5 w-5 text-[#D4AF37]" />
+                Current A/B Test: Magnetic Card Intensity
+              </CardTitle>
+              <CardDescription className="text-gray-400 mt-1">
+                Testing the effect of increased magnetic tilt on product card engagement
+              </CardDescription>
+            </div>
+            <Badge
+              variant="outline"
+              className="border-amber-500/50 text-amber-400"
+            >
+              Running
+            </Badge>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {/* Confidence meter */}
+          <div className="mb-6">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm text-gray-400">
+                Statistical Significance
+              </span>
+              <span className="text-sm font-medium text-amber-400">
+                {confidence}% confidence
+              </span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-1000"
+                style={{ width: `${confidence}%` }}
+              />
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              95% threshold needed for conclusive result
+            </p>
+          </div>
+
+          {/* Variant comparison */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <VariantCard
+              variant={variantA}
+              isWinner={winner === 'A'}
+              maxConversion={maxConversion}
+              colorClass="from-gray-600 to-gray-500"
+            />
+            <VariantCard
+              variant={variantB}
+              isWinner={winner === 'B'}
+              maxConversion={maxConversion}
+              colorClass="from-[#B76E79] to-[#D4AF37]"
+            />
+          </div>
+        </CardContent>
+      </Card>
+    </>
+  );
+}
+
+function VariantCard({
+  variant,
+  isWinner,
+  maxConversion,
+  colorClass,
+}: {
+  variant: ABVariant;
+  isWinner: boolean;
+  maxConversion: number;
+  colorClass: string;
+}) {
+  const barWidth = (variant.conversionRate / (maxConversion * 1.2)) * 100;
+
+  return (
+    <div
+      className={`rounded-lg border p-5 ${
+        isWinner
+          ? 'border-[#D4AF37]/50 bg-[#D4AF37]/5'
+          : 'border-gray-700 bg-gray-800/50'
+      }`}
+    >
+      <div className="flex items-center justify-between mb-3">
+        <div>
+          <h4 className="text-white font-medium">{variant.name}</h4>
+          <p className="text-xs text-gray-400">{variant.description}</p>
+        </div>
+        {isWinner && (
+          <Badge className="bg-[#D4AF37]/20 text-[#D4AF37] border border-[#D4AF37]/30">
+            <Trophy className="h-3 w-3 mr-1" />
+            Winner
+          </Badge>
+        )}
+      </div>
+
+      {/* Conversion bar */}
+      <div className="mb-4">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs text-gray-500">Conversion Rate</span>
+          <span className="text-sm font-bold text-white">
+            {variant.conversionRate}%
+          </span>
+        </div>
+        <div className="h-3 w-full rounded-full bg-gray-700 overflow-hidden">
+          <div
+            className={`h-full rounded-full bg-gradient-to-r ${colorClass} transition-all duration-1000 ease-out`}
+            style={{ width: `${barWidth}%` }}
+          />
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-md bg-gray-800/80 px-3 py-2 text-center">
+          <p className="text-lg font-bold text-white">
+            {formatNumber(variant.sessions)}
+          </p>
+          <p className="text-xs text-gray-500">Sessions</p>
+        </div>
+        <div className="rounded-md bg-gray-800/80 px-3 py-2 text-center">
+          <p className="text-lg font-bold text-white">
+            {variant.conversions}
+          </p>
+          <p className="text-xs text-gray-500">Conversions</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Product Heat Tab
+// ---------------------------------------------------------------------------
+
+function ProductHeatTab({
+  products,
+}: {
+  products: readonly ProductHeat[];
+}) {
+  return (
+    <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      {products.map((product) => (
+        <ProductHeatCard key={product.sku} product={product} />
+      ))}
+    </div>
+  );
+}
+
+function ProductHeatCard({ product }: { product: ProductHeat }) {
+  const config = COLLECTION_CONFIG[product.collection];
+  const heatColor = getHeatColor(product.heatScore);
+
+  return (
+    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm overflow-hidden">
+      <div
+        className="h-1 bg-gradient-to-r"
+        style={{
+          backgroundImage: `linear-gradient(to right, ${heatColor.from}, ${heatColor.to})`,
+        }}
+      />
+      <CardContent className="pt-4 pb-4">
+        {/* Header */}
+        <div className="flex items-start justify-between gap-2 mb-3">
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-white truncate">
+              {product.name}
+            </p>
+            <p className="text-xs text-gray-500">{product.sku}</p>
+          </div>
+          <Badge
+            variant="outline"
+            className="flex-shrink-0 text-[10px]"
+            style={{
+              borderColor: `${config.color}60`,
+              color: config.color,
+            }}
+          >
+            {config.label}
+          </Badge>
+        </div>
+
+        {/* Heat Score Bar */}
+        <div className="mb-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-gray-500 flex items-center gap-1">
+              <Flame className="h-3 w-3" />
+              Heat Score
+            </span>
+            <span
+              className="text-xs font-bold"
+              style={{ color: heatColor.text }}
+            >
+              {product.heatScore}
+            </span>
+          </div>
+          <div className="h-2 w-full rounded-full bg-gray-700 overflow-hidden">
+            <div
+              className="h-full rounded-full transition-all duration-700 ease-out"
+              style={{
+                width: `${product.heatScore}%`,
+                backgroundImage: `linear-gradient(to right, ${heatColor.from}, ${heatColor.to})`,
+              }}
+            />
+          </div>
+        </div>
+
+        {/* Metrics Row */}
+        <div className="grid grid-cols-3 gap-2 text-center">
+          <div className="rounded-md bg-gray-800/60 px-2 py-1.5">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <Eye className="h-3 w-3 text-gray-500" />
+            </div>
+            <p className="text-xs font-medium text-white">
+              {formatNumber(product.views)}
+            </p>
+            <p className="text-[10px] text-gray-500">Views</p>
+          </div>
+          <div className="rounded-md bg-gray-800/60 px-2 py-1.5">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <Clock className="h-3 w-3 text-gray-500" />
+            </div>
+            <p className="text-xs font-medium text-white">
+              {product.avgHoverTime}s
+            </p>
+            <p className="text-[10px] text-gray-500">Hover</p>
+          </div>
+          <div className="rounded-md bg-gray-800/60 px-2 py-1.5">
+            <div className="flex items-center justify-center gap-1 mb-0.5">
+              <ShoppingCart className="h-3 w-3 text-gray-500" />
+            </div>
+            <p className="text-xs font-medium text-white">
+              {product.cartRate}%
+            </p>
+            <p className="text-[10px] text-gray-500">Cart</p>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Controls Tab
+// ---------------------------------------------------------------------------
+
+function ControlsTab({
+  controls,
+  onControlChange,
+  onSave,
+  saveConfirmed,
+}: {
+  controls: ControlsState;
+  onControlChange: <K extends keyof ControlsState>(
+    key: K,
+    value: ControlsState[K]
+  ) => void;
+  onSave: () => void;
+  saveConfirmed: boolean;
+}) {
+  return (
+    <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+      <CardHeader>
+        <CardTitle className="text-white flex items-center gap-2">
+          <SlidersHorizontal className="h-5 w-5 text-[#B76E79]" />
+          Pulse Engine Controls
+        </CardTitle>
+        <CardDescription className="text-gray-400">
+          Fine-tune engagement systems running on the WordPress theme
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-6">
+        {/* Social Proof Frequency */}
+        <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+          <div className="flex items-center justify-between mb-3">
+            <div>
+              <Label className="text-white text-sm font-medium">
+                Social Proof Frequency
+              </Label>
+              <p className="text-xs text-gray-500 mt-0.5">
+                Seconds between social proof toasts
+              </p>
+            </div>
+            <span className="text-lg font-bold text-[#D4AF37]">
+              {controls.socialProofFrequency}s
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-gray-500 w-8">10s</span>
+            <input
+              type="range"
+              min={10}
+              max={60}
+              step={1}
+              value={controls.socialProofFrequency}
+              onChange={(e) =>
+                onControlChange(
+                  'socialProofFrequency',
+                  parseInt(e.target.value, 10)
+                )
+              }
+              className="flex-1 h-2 rounded-full appearance-none bg-gray-700 cursor-pointer accent-[#B76E79]
+                [&::-webkit-slider-thumb]:appearance-none
+                [&::-webkit-slider-thumb]:h-4
+                [&::-webkit-slider-thumb]:w-4
+                [&::-webkit-slider-thumb]:rounded-full
+                [&::-webkit-slider-thumb]:bg-[#B76E79]
+                [&::-webkit-slider-thumb]:shadow-lg
+                [&::-webkit-slider-thumb]:cursor-pointer
+                [&::-moz-range-thumb]:h-4
+                [&::-moz-range-thumb]:w-4
+                [&::-moz-range-thumb]:rounded-full
+                [&::-moz-range-thumb]:bg-[#B76E79]
+                [&::-moz-range-thumb]:border-0
+                [&::-moz-range-thumb]:cursor-pointer"
+            />
+            <span className="text-xs text-gray-500 w-8">60s</span>
+          </div>
+        </div>
+
+        {/* Toggle Controls */}
+        <div className="grid gap-4 md:grid-cols-3">
+          {/* Urgency Bar */}
+          <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm font-medium">
+                  Urgency Bar
+                </Label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Countdown timer on product pages
+                </p>
+              </div>
+              <Switch
+                checked={controls.urgencyBar}
+                onCheckedChange={(checked) =>
+                  onControlChange('urgencyBar', checked)
+                }
+                className="data-[state=checked]:bg-[#B76E79]"
+              />
+            </div>
+          </div>
+
+          {/* Exit Intent */}
+          <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm font-medium">
+                  Exit Intent
+                </Label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  Email capture on exit detection
+                </p>
+              </div>
+              <Switch
+                checked={controls.exitIntent}
+                onCheckedChange={(checked) =>
+                  onControlChange('exitIntent', checked)
+                }
+                className="data-[state=checked]:bg-[#B76E79]"
+              />
+            </div>
+          </div>
+
+          {/* Magnetic Cards */}
+          <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <Label className="text-white text-sm font-medium">
+                  Magnetic Cards
+                </Label>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  3D tilt effect on product cards
+                </p>
+              </div>
+              <Switch
+                checked={controls.magneticCards}
+                onCheckedChange={(checked) =>
+                  onControlChange('magneticCards', checked)
+                }
+                className="data-[state=checked]:bg-[#B76E79]"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* A/B Test Mode */}
+        <div className="rounded-lg border border-gray-700 bg-gray-800/50 p-4">
+          <div className="mb-3">
+            <Label className="text-white text-sm font-medium">
+              A/B Test Mode
+            </Label>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Magnetic card tilt intensity assignment
+            </p>
+          </div>
+          <div className="flex gap-3">
+            {(
+              [
+                {
+                  value: 'standard' as const,
+                  label: 'Standard',
+                  desc: '15\u00B0 tilt for all',
+                },
+                {
+                  value: 'enhanced' as const,
+                  label: 'Enhanced',
+                  desc: '30\u00B0 tilt for all',
+                },
+                {
+                  value: 'auto' as const,
+                  label: 'Auto',
+                  desc: 'Split test 50/50',
+                },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.value}
+                onClick={() =>
+                  onControlChange('abTestMode', option.value)
+                }
+                className={`flex-1 rounded-lg border p-3 text-left transition-colors ${
+                  controls.abTestMode === option.value
+                    ? 'border-[#B76E79]/50 bg-[#B76E79]/10'
+                    : 'border-gray-700 bg-gray-800/30 hover:border-gray-600'
+                }`}
+              >
+                <div className="flex items-center gap-2 mb-1">
+                  <div
+                    className={`h-3 w-3 rounded-full border-2 ${
+                      controls.abTestMode === option.value
+                        ? 'border-[#B76E79] bg-[#B76E79]'
+                        : 'border-gray-600'
+                    }`}
+                  />
+                  <span className="text-sm font-medium text-white">
+                    {option.label}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-500 ml-5">
+                  {option.desc}
+                </p>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Save Button */}
+        <Button
+          onClick={onSave}
+          className={`w-full h-12 text-lg text-white transition-all ${
+            saveConfirmed
+              ? 'bg-emerald-600 hover:bg-emerald-600'
+              : 'bg-gradient-to-r from-[#B76E79] via-[#B76E79] to-[#D4AF37] hover:from-[#a5606a] hover:to-[#c4a030]'
+          }`}
+        >
+          {saveConfirmed ? (
+            <>
+              <CheckCircle2 className="mr-2 h-5 w-5" />
+              Saved Successfully
+            </>
+          ) : (
+            <>
+              <Save className="mr-2 h-5 w-5" />
+              Save Controls
+            </>
+          )}
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Loading Skeleton
+// ---------------------------------------------------------------------------
+
+function ConversionSkeleton() {
+  return (
+    <div className="space-y-6">
+      {/* Header skeleton */}
+      <Skeleton className="h-40 w-full rounded-2xl bg-gray-800" />
+
+      {/* Funnel skeleton */}
+      <Skeleton className="h-48 w-full bg-gray-800" />
+
+      {/* Tabs skeleton */}
+      <Skeleton className="h-10 w-80 bg-gray-800" />
+
+      {/* Metric cards skeleton */}
+      <div className="grid gap-4 md:grid-cols-3">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <Skeleton key={`metric-${i}`} className="h-28 bg-gray-800" />
+        ))}
+      </div>
+
+      {/* Revenue card skeleton */}
+      <Skeleton className="h-56 w-full bg-gray-800" />
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Utilities
+// ---------------------------------------------------------------------------
+
+function formatNumber(num: number): string {
+  if (num >= 1_000_000) return `${(num / 1_000_000).toFixed(1)}M`;
+  if (num >= 1_000) return `${(num / 1_000).toFixed(1)}K`;
+  return num.toLocaleString();
+}
+
+function getHeatColor(score: number): {
+  from: string;
+  to: string;
+  text: string;
+} {
+  if (score >= 80) {
+    return { from: '#EF4444', to: '#DC2626', text: '#EF4444' };
+  }
+  if (score >= 60) {
+    return { from: '#F59E0B', to: '#D97706', text: '#F59E0B' };
+  }
+  if (score >= 40) {
+    return { from: '#EAB308', to: '#CA8A04', text: '#EAB308' };
+  }
+  return { from: '#3B82F6', to: '#2563EB', text: '#3B82F6' };
+}

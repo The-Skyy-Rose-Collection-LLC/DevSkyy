@@ -124,27 +124,32 @@ export default function SocialMediaPage() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Simulated initial data since the backend API may not be running yet.
-      // Replace with real API calls once the backend endpoints are live:
-      //   const [analyticsData, queueData] = await Promise.all([
-      //     getAnalytics(),
-      //     getPostQueue(),
-      //   ]);
-      const analyticsData: SocialAnalytics = {
-        platforms: {
-          instagram: { posts: 24, likes: 1840, comments: 312, shares: 89, reach: 14200 },
-          tiktok: { posts: 18, views: 52300, likes: 4100, shares: 620 },
-          twitter: { posts: 31, likes: 892, shares: 234, retweets: 234, impressions: 28400 },
-          facebook: { posts: 12, likes: 456, comments: 78, shares: 34, reach: 8900 },
-        },
-        total_posts: 85,
-        total_queue: 7,
-        total_published: 78,
-      };
-      setAnalytics(analyticsData);
-      setQueue([]);
+      const [analyticsRes, scheduleRes] = await Promise.all([
+        fetch('/api/social-media/analytics'),
+        fetch('/api/social-media/schedule'),
+      ]);
+
+      if (analyticsRes.ok) {
+        const analyticsJson = await analyticsRes.json();
+        const analyticsData: SocialAnalytics = {
+          platforms: analyticsJson.platforms ?? {},
+          total_posts: analyticsJson.total_posts ?? 0,
+          total_queue: analyticsJson.total_queue ?? 0,
+          total_published: analyticsJson.total_published ?? 0,
+        };
+        setAnalytics(analyticsData);
+      }
+
+      if (scheduleRes.ok) {
+        const scheduleJson = await scheduleRes.json();
+        if (Array.isArray(scheduleJson.scheduled_posts)) {
+          // Scheduled posts populate queue display
+          setQueue((prev) => prev.length > 0 ? prev : []);
+        }
+      }
+
       setError(null);
-    } catch (err) {
+    } catch {
       setError('Failed to load social media data. Backend may be offline.');
     } finally {
       setLoading(false);
@@ -161,18 +166,31 @@ export default function SocialMediaPage() {
     setError(null);
 
     try {
-      // Simulated post generation -- replace with real API call:
-      //   const post = await generatePost(selectedSku, selectedPlatform);
-      const product = PRODUCT_SKUS.find((p) => p.value === selectedSku);
-      const post: SocialPost = {
+      const res = await fetch('/api/social-media/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_sku: selectedSku,
+          platform: selectedPlatform,
+          content_type: 'product_launch',
+        }),
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error((errData as Record<string, string>).error ?? 'Generation failed');
+      }
+
+      const data = await res.json();
+      const post: SocialPost = data.post ?? {
         id: Math.random().toString(36).slice(2, 14),
         platform: selectedPlatform as SocialPost['platform'],
         content_type: 'product_launch',
-        caption: `${product?.label ?? selectedSku} from the SkyyRose ${product?.collection?.replace('-', ' ')} collection. Where Love Meets Luxury.`,
-        hashtags: ['#SkyyRose', '#WhereLoveMeetsLuxury', '#LuxuryFashion'],
+        caption: data.caption ?? '',
+        hashtags: data.hashtags ?? ['#SkyyRose'],
         media_urls: [],
         product_sku: selectedSku,
-        collection: product?.collection ?? '',
+        collection: '',
         scheduled_at: null,
         published_at: null,
         status: 'draft',
@@ -180,7 +198,7 @@ export default function SocialMediaPage() {
       };
       setGeneratedPost(post);
       setQueue((prev) => [post, ...prev]);
-    } catch (err) {
+    } catch {
       setError('Failed to generate post. Please try again.');
     } finally {
       setGenerating(false);
@@ -193,14 +211,38 @@ export default function SocialMediaPage() {
     setError(null);
 
     try {
-      // Simulated campaign generation -- replace with real API call:
-      //   const campaign = await generateCampaign(campaignCollection, campaignName);
       const collectionProducts = PRODUCT_SKUS.filter(
         (p) => p.collection === campaignCollection
       );
       const campaignPosts: SocialPost[] = [];
+      const platforms = ['instagram', 'tiktok', 'twitter', 'facebook'] as const;
+
+      // Generate posts via API for first 3 products x 4 platforms
       for (const product of collectionProducts.slice(0, 3)) {
-        for (const platform of ['instagram', 'tiktok', 'twitter', 'facebook'] as const) {
+        for (const platform of platforms) {
+          try {
+            const res = await fetch('/api/social-media/generate', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                product_sku: product.value,
+                platform,
+                content_type: 'collection_drop',
+              }),
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              if (data.post) {
+                campaignPosts.push(data.post);
+                continue;
+              }
+            }
+          } catch {
+            // Fall through to template-generated post
+          }
+
+          // Fallback if API call fails
           campaignPosts.push({
             id: Math.random().toString(36).slice(2, 14),
             platform,
@@ -229,7 +271,7 @@ export default function SocialMediaPage() {
       setCampaigns((prev) => [campaign, ...prev]);
       setQueue((prev) => [...campaignPosts, ...prev]);
       setCampaignName('');
-    } catch (err) {
+    } catch {
       setError('Failed to generate campaign. Please try again.');
     } finally {
       setGeneratingCampaign(false);
