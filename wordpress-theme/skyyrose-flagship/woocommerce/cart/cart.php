@@ -13,6 +13,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Guard against null cart object.
+if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+	return;
+}
+
 /**
  * Hook: woocommerce_before_cart.
  */
