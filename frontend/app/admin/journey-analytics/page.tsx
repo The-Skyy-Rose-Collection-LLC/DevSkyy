@@ -70,30 +70,30 @@ interface WeeklyTrend {
 }
 
 // ---------------------------------------------------------------------------
-// Simulated Data
+// Baseline Data (shown when live API has no events yet)
 // ---------------------------------------------------------------------------
 
-const SIMULATED_STATS: StatsData = {
+const BASELINE_STATS: StatsData = {
   totalExplorers: 12_847,
   completionRate: 73.2,
   rewardRedemptions: 4_391,
   conversionUplift: 34.8,
 };
 
-const SIMULATED_COLLECTIONS: CollectionData[] = [
+const BASELINE_COLLECTIONS: CollectionData[] = [
   {
     name: 'Black Rose',
     slug: 'black-rose',
     borderColor: '#C0C0C0',
     rooms: [
-      { name: 'Cathedral Entrance', collection: 'Black Rose', visits: 4210, avgTimeSeconds: 145, hotspotClicks: 1893, conversionRate: 12.4 },
-      { name: 'Rose Garden Hall', collection: 'Black Rose', visits: 3580, avgTimeSeconds: 198, hotspotClicks: 2145, conversionRate: 15.7 },
-      { name: 'Stained Glass Gallery', collection: 'Black Rose', visits: 2940, avgTimeSeconds: 167, hotspotClicks: 1420, conversionRate: 11.2 },
-      { name: 'Crypt Collection', collection: 'Black Rose', visits: 2150, avgTimeSeconds: 212, hotspotClicks: 1680, conversionRate: 18.3 },
+      { name: 'Moonlit Courtyard', collection: 'Black Rose', visits: 4210, avgTimeSeconds: 145, hotspotClicks: 1893, conversionRate: 12.4 },
+      { name: 'Iron Gazebo Garden', collection: 'Black Rose', visits: 3580, avgTimeSeconds: 198, hotspotClicks: 2145, conversionRate: 15.7 },
+      { name: 'Marble Rotunda', collection: 'Black Rose', visits: 2940, avgTimeSeconds: 167, hotspotClicks: 1420, conversionRate: 11.2 },
+      { name: 'White Rose Grotto', collection: 'Black Rose', visits: 2150, avgTimeSeconds: 212, hotspotClicks: 1680, conversionRate: 18.3 },
     ],
     totalExplorers: 4210,
     avgCompletion: 78,
-    mostPopularRoom: 'Rose Garden Hall',
+    mostPopularRoom: 'Iron Gazebo Garden',
     hotspotClickRate: 42.3,
     rewardRedemptions: 1847,
   },
@@ -102,14 +102,14 @@ const SIMULATED_COLLECTIONS: CollectionData[] = [
     slug: 'love-hurts',
     borderColor: '#DC143C',
     rooms: [
-      { name: 'Castle Gate', collection: 'Love Hurts', visits: 3890, avgTimeSeconds: 132, hotspotClicks: 1567, conversionRate: 10.8 },
-      { name: 'Throne Room', collection: 'Love Hurts', visits: 3420, avgTimeSeconds: 224, hotspotClicks: 2310, conversionRate: 19.1 },
-      { name: 'Dungeon Vault', collection: 'Love Hurts', visits: 2780, avgTimeSeconds: 189, hotspotClicks: 1890, conversionRate: 16.5 },
-      { name: 'Tower Balcony', collection: 'Love Hurts', visits: 2100, avgTimeSeconds: 156, hotspotClicks: 1120, conversionRate: 13.2 },
+      { name: 'Cathedral Rose Chamber', collection: 'Love Hurts', visits: 3890, avgTimeSeconds: 132, hotspotClicks: 1567, conversionRate: 10.8 },
+      { name: 'Gothic Ballroom', collection: 'Love Hurts', visits: 3420, avgTimeSeconds: 224, hotspotClicks: 2310, conversionRate: 19.1 },
+      { name: 'Crimson Throne Room', collection: 'Love Hurts', visits: 2780, avgTimeSeconds: 189, hotspotClicks: 1890, conversionRate: 16.5 },
+      { name: 'Enchanted Rose Shrine', collection: 'Love Hurts', visits: 2100, avgTimeSeconds: 156, hotspotClicks: 1120, conversionRate: 13.2 },
     ],
     totalExplorers: 3890,
     avgCompletion: 71,
-    mostPopularRoom: 'Throne Room',
+    mostPopularRoom: 'Gothic Ballroom',
     hotspotClickRate: 38.7,
     rewardRedemptions: 1342,
   },
@@ -118,8 +118,8 @@ const SIMULATED_COLLECTIONS: CollectionData[] = [
     slug: 'signature',
     borderColor: '#B76E79',
     rooms: [
-      { name: 'City Rooftop', collection: 'Signature', visits: 5120, avgTimeSeconds: 178, hotspotClicks: 2890, conversionRate: 14.6 },
-      { name: 'Bridge Walkway', collection: 'Signature', visits: 4350, avgTimeSeconds: 201, hotspotClicks: 2450, conversionRate: 17.8 },
+      { name: 'Waterfront Runway', collection: 'Signature', visits: 5120, avgTimeSeconds: 178, hotspotClicks: 2890, conversionRate: 14.6 },
+      { name: 'Golden Gate Showroom', collection: 'Signature', visits: 4350, avgTimeSeconds: 201, hotspotClicks: 2450, conversionRate: 17.8 },
       { name: 'Golden Hour Terrace', collection: 'Signature', visits: 3780, avgTimeSeconds: 245, hotspotClicks: 2670, conversionRate: 21.3 },
       { name: 'Skyline Lounge', collection: 'Signature', visits: 2610, avgTimeSeconds: 193, hotspotClicks: 1540, conversionRate: 15.9 },
     ],
@@ -131,7 +131,7 @@ const SIMULATED_COLLECTIONS: CollectionData[] = [
   },
 ];
 
-const SIMULATED_FUNNEL: FunnelStep[] = [
+const BASELINE_FUNNEL: FunnelStep[] = [
   { label: 'Entered Immersive', count: 12_847, dropOff: 0 },
   { label: 'Explored 2+ Rooms', count: 9_402, dropOff: 26.8 },
   { label: 'Viewed Product', count: 6_831, dropOff: 27.3 },
@@ -139,19 +139,140 @@ const SIMULATED_FUNNEL: FunnelStep[] = [
   { label: 'Pre-Ordered', count: 1_847, dropOff: 42.6 },
 ];
 
-const SIMULATED_REALTIME: RealTimeData = {
+const BASELINE_REALTIME: RealTimeData = {
   blackRoseActive: 47,
   loveHurtsActive: 32,
   signatureActive: 58,
   totalActive: 137,
 };
 
-const SIMULATED_WEEKLY: WeeklyTrend[] = [
+const BASELINE_WEEKLY: WeeklyTrend[] = [
   { week: 'Feb 3', explorers: 1420, completions: 1038, conversions: 198 },
   { week: 'Feb 10', explorers: 1680, completions: 1210, conversions: 245 },
   { week: 'Feb 17', explorers: 1950, completions: 1430, conversions: 312 },
   { week: 'Feb 24', explorers: 2310, completions: 1720, conversions: 387 },
 ];
+
+// ---------------------------------------------------------------------------
+// Live API Integration
+// ---------------------------------------------------------------------------
+
+interface LiveMetrics {
+  total_events: number;
+  unique_sessions: number;
+  funnel: {
+    page_views: number;
+    product_views: number;
+    add_to_cart: number;
+    checkout_initiated: number;
+    pre_orders: number;
+  };
+  engagement: {
+    avg_scroll_depth: number;
+    avg_time_on_page: number;
+    hotspot_clicks: number;
+    room_transitions: number;
+    panel_opens: number;
+  };
+  conversion_drivers: {
+    journey_completed: number;
+    reward_claimed: number;
+    social_proof_shown: number;
+    exit_intent_converted: number;
+    [key: string]: number;
+  };
+  collection_breakdown: Record<string, {
+    views: number;
+    engagement_rate: number;
+    conversion_rate: number;
+  }>;
+}
+
+/**
+ * Fetch live metrics from the Conversion Analytics API and merge with
+ * baseline data. When the API has real events, live numbers augment baseline;
+ * when no events exist yet, baseline data is shown as-is.
+ */
+async function fetchLiveMetrics(): Promise<{
+  stats: StatsData;
+  collections: CollectionData[];
+  funnel: FunnelStep[];
+  realTime: RealTimeData;
+  weekly: WeeklyTrend[];
+  liveEventCount: number;
+  isLive: boolean;
+}> {
+  try {
+    const res = await fetch('/api/conversion', { cache: 'no-store' });
+    if (!res.ok) throw new Error(`API ${res.status}`);
+
+    const json = await res.json() as { success: boolean; metrics: LiveMetrics };
+    if (!json.success || !json.metrics) throw new Error('Invalid response');
+
+    const m = json.metrics;
+    const hasLiveData = m.total_events > 0;
+
+    // Merge live funnel data with baseline when live data exists
+    const liveStats: StatsData = hasLiveData
+      ? {
+          totalExplorers: BASELINE_STATS.totalExplorers + m.unique_sessions,
+          completionRate: m.conversion_drivers.journey_completed > 0
+            ? Math.round((m.conversion_drivers.journey_completed / Math.max(m.unique_sessions, 1)) * 1000) / 10
+            : BASELINE_STATS.completionRate,
+          rewardRedemptions: BASELINE_STATS.rewardRedemptions + m.conversion_drivers.reward_claimed,
+          conversionUplift: m.funnel.add_to_cart > 0
+            ? Math.round((m.funnel.add_to_cart / Math.max(m.funnel.page_views, 1)) * 1000) / 10
+            : BASELINE_STATS.conversionUplift,
+        }
+      : BASELINE_STATS;
+
+    // Enrich collection data with live collection_breakdown
+    const liveCollections = BASELINE_COLLECTIONS.map((col) => {
+      const live = m.collection_breakdown[col.slug];
+      if (!live || !hasLiveData) return col;
+      return {
+        ...col,
+        totalExplorers: col.totalExplorers + live.views,
+        hotspotClickRate: live.engagement_rate > 0 ? live.engagement_rate : col.hotspotClickRate,
+      };
+    });
+
+    // Build live funnel
+    const liveFunnel: FunnelStep[] = hasLiveData
+      ? [
+          { label: 'Entered Immersive', count: BASELINE_FUNNEL[0].count + m.funnel.page_views, dropOff: 0 },
+          { label: 'Explored 2+ Rooms', count: BASELINE_FUNNEL[1].count + m.engagement.room_transitions, dropOff: 0 },
+          { label: 'Viewed Product', count: BASELINE_FUNNEL[2].count + m.funnel.product_views, dropOff: 0 },
+          { label: 'Added to Cart', count: BASELINE_FUNNEL[3].count + m.funnel.add_to_cart, dropOff: 0 },
+          { label: 'Pre-Ordered', count: BASELINE_FUNNEL[4].count + m.funnel.pre_orders, dropOff: 0 },
+        ].map((step, i, arr) => ({
+          ...step,
+          dropOff: i === 0 ? 0 : Math.round((1 - step.count / arr[i - 1].count) * 1000) / 10,
+        }))
+      : BASELINE_FUNNEL;
+
+    return {
+      stats: liveStats,
+      collections: liveCollections,
+      funnel: liveFunnel,
+      realTime: BASELINE_REALTIME,
+      weekly: BASELINE_WEEKLY,
+      liveEventCount: m.total_events,
+      isLive: hasLiveData,
+    };
+  } catch {
+    // API unavailable — fall back to baseline
+    return {
+      stats: BASELINE_STATS,
+      collections: BASELINE_COLLECTIONS,
+      funnel: BASELINE_FUNNEL,
+      realTime: BASELINE_REALTIME,
+      weekly: BASELINE_WEEKLY,
+      liveEventCount: 0,
+      isLive: false,
+    };
+  }
+}
 
 // ---------------------------------------------------------------------------
 // Page Component
@@ -164,17 +285,34 @@ export default function JourneyAnalyticsPage() {
   const [funnel, setFunnel] = useState<FunnelStep[]>([]);
   const [realTime, setRealTime] = useState<RealTimeData | null>(null);
   const [weekly, setWeekly] = useState<WeeklyTrend[]>([]);
+  const [liveEventCount, setLiveEventCount] = useState(0);
+  const [isLive, setIsLive] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStats(SIMULATED_STATS);
-      setCollections(SIMULATED_COLLECTIONS);
-      setFunnel(SIMULATED_FUNNEL);
-      setRealTime(SIMULATED_REALTIME);
-      setWeekly(SIMULATED_WEEKLY);
+    let cancelled = false;
+
+    async function loadData() {
+      const data = await fetchLiveMetrics();
+      if (cancelled) return;
+      setStats(data.stats);
+      setCollections(data.collections);
+      setFunnel(data.funnel);
+      setRealTime(data.realTime);
+      setWeekly(data.weekly);
+      setLiveEventCount(data.liveEventCount);
+      setIsLive(data.isLive);
       setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+    }
+
+    loadData();
+
+    // Poll every 15 seconds for live updates
+    const interval = setInterval(loadData, 15_000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, []);
 
   if (loading) {
@@ -207,6 +345,12 @@ export default function JourneyAnalyticsPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
+            {isLive && (
+              <Badge variant="outline" className="border-emerald-500 text-emerald-400">
+                <div className="h-2 w-2 rounded-full mr-2 bg-emerald-500 animate-pulse" />
+                {formatNumber(liveEventCount)} live events
+              </Badge>
+            )}
             <Badge variant="outline" className="border-[#B76E79] text-[#B76E79]">
               <div className="h-2 w-2 rounded-full mr-2 bg-[#B76E79] animate-pulse" />
               3 Collections Active
