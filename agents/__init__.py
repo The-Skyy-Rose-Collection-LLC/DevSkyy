@@ -155,6 +155,22 @@ except ImportError as _e:
     SupportAgent = None  # type: ignore[assignment,misc]
 
 try:
+    from .meshy_agent import (
+        COLLECTION_STYLES,
+        MeshyAgent,
+        MeshyAssetValidation,
+        MeshyConfig,
+        MeshyGenerationResult,
+        MeshyMode,
+        MeshyTask,
+        MeshyTaskStatus,
+        OutputFormat,
+        get_meshy_agent,
+    )
+except ImportError as _e:
+    _logger.debug("MeshyAgent unavailable: %s", _e)
+
+try:
     from .tripo_agent import (
         COLLECTION_PROMPTS,
         GARMENT_TEMPLATES,
@@ -247,6 +263,17 @@ __all__ = [
     "GarmentCategory",
     "TryOnMode",
     "FashnTaskStatus",
+    # Meshy Agent
+    "MeshyAgent",
+    "MeshyConfig",
+    "MeshyTask",
+    "MeshyGenerationResult",
+    "MeshyAssetValidation",
+    "MeshyTaskStatus",
+    "MeshyMode",
+    "OutputFormat",
+    "COLLECTION_STYLES",
+    "get_meshy_agent",
     # Tripo Agent
     "TripoAssetAgent",
     "TripoConfig",

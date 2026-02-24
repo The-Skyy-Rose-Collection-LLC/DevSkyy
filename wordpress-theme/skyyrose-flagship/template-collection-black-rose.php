@@ -2,8 +2,9 @@
 /**
  * Template Name: Collection - Black Rose
  *
- * BLACK ROSE collection page — Gothic garden mood with floating roses
- * and metallic silver (#C0C0C0) accents on deep black.
+ * BLACK ROSE collection page — Gothic garden mood with rotating 3D logo,
+ * product grid, story section, immersive CTA, and pre-order CTA.
+ * Metallic silver (#C0C0C0) accents on deep black.
  *
  * @package SkyyRose_Flagship
  * @since   3.0.0
@@ -116,140 +117,84 @@ function skyyrose_get_black_rose_products() {
 	return $products;
 }
 
-$skyyrose_br_products   = skyyrose_get_black_rose_products();
-$skyyrose_br_shop_url   = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
+$skyyrose_br_products    = skyyrose_get_black_rose_products();
+$skyyrose_br_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
 $skyyrose_br_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-product.jpg' );
+$skyyrose_br_logo_url    = esc_url( get_template_directory_uri() . '/assets/branding/black-rose-logo.png' );
+$skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-marble-rotunda.png' );
 ?>
 
 <div class="collection--black-rose" data-collection="black-rose">
 
 	<!-- ============================================================
-	     HERO SECTION
+	     HERO SECTION — Rotating 3D Logo
 	     ============================================================ -->
-	<section class="collection-hero" role="banner">
-		<div class="collection-hero__overlay" aria-hidden="true"></div>
+	<section class="collection-hero" role="banner"
+		style="background-image: url('<?php echo esc_attr( $skyyrose_br_scene_url ); ?>'); background-size: cover; background-position: center;">
 
-		<div class="collection-hero__content fade-in-up">
-			<span class="collection-hero__badge">
-				<?php echo esc_html__( 'SKyyRose Flagship', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h1 class="collection-hero__title">
-				<?php echo esc_html__( 'BLACK ROSE', 'skyyrose-flagship' ); ?>
-			</h1>
-
-			<p class="collection-hero__subtitle">
-				<?php echo esc_html__( 'Where Darkness Meets Elegance', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-hero__tagline">
-				<?php echo esc_html__( 'Gothic Garden Collection', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="#products" class="collection-hero__cta">
-				<?php echo esc_html__( 'Explore Collection', 'skyyrose-flagship' ); ?>
-			</a>
+		<div class="collection-logo-3d collection-logo-3d--black-rose">
+			<img src="<?php echo esc_url( $skyyrose_br_logo_url ); ?>"
+			     alt="<?php echo esc_attr__( 'Black Rose Collection Logo', 'skyyrose-flagship' ); ?>"
+			     width="280"
+			     height="280" />
 		</div>
 
-		<!-- Floating roses injected by collections.js -->
+		<h1 class="collection-hero__title">
+			<?php echo esc_html__( 'Black Rose Collection', 'skyyrose-flagship' ); ?>
+		</h1>
+
+		<p class="collection-hero__subtitle">
+			<?php echo esc_html__( 'Where Darkness Blooms', 'skyyrose-flagship' ); ?>
+		</p>
+
+		<a href="#products" class="collection-hero__cta">
+			<?php echo esc_html__( 'Explore Collection', 'skyyrose-flagship' ); ?>
+		</a>
 	</section>
 
 	<!-- ============================================================
 	     COLLECTION STORY
 	     ============================================================ -->
 	<section class="collection-story" id="story">
-		<div class="collection-story__inner fade-in-up">
-			<span class="collection-story__label">
-				<?php echo esc_html__( 'The Story', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 class="collection-story__heading">
-				<?php echo esc_html__( 'Beauty in the Shadows', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'The BLACK ROSE collection draws from the duality of beauty and darkness. Like a rose that blooms in moonlight, each piece embodies strength wrapped in elegance — bold silhouettes crafted in deep blacks and illuminated with metallic silver accents.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<p class="collection-story__text">
-				<?php echo esc_html__( 'From heavyweight crewnecks to statement outerwear, this is streetwear rooted in defiance and designed for those who walk their own path.', 'skyyrose-flagship' ); ?>
-			</p>
-
-			<div class="collection-story__divider" aria-hidden="true"></div>
-		</div>
+		<p class="collection-story__text">
+			<?php echo esc_html__( 'Born from moonlit gardens and shadowed cathedrals, the Black Rose collection is an ode to those who find beauty in the dark. Each piece is woven with gothic elegance — deep blacks punctuated by silver moonlight accents, roses that bloom only after midnight. This is not fashion for the faint of heart. It is armor for the bold, the defiant, the eternally romantic.', 'skyyrose-flagship' ); ?>
+		</p>
 	</section>
 
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
 	<section id="products" class="collection-products">
-		<div class="collection-products__header fade-in-up">
-			<span class="collection-products__label">
-				<?php echo esc_html__( 'The Collection', 'skyyrose-flagship' ); ?>
-			</span>
-
-			<h2 class="collection-products__title">
-				<?php echo esc_html__( 'BLACK ROSE Pieces', 'skyyrose-flagship' ); ?>
-			</h2>
-
-			<p class="collection-products__count">
-				<?php
-				/* translators: %d: number of products in the collection */
-				printf( esc_html__( '%d Pieces', 'skyyrose-flagship' ), count( $skyyrose_br_products ) );
-				?>
-			</p>
-		</div>
-
-		<div class="collection-products__grid">
+		<div class="collection-grid">
 			<?php
-			$skyyrose_delay = 0;
 			foreach ( $skyyrose_br_products as $skyyrose_product ) :
-				$skyyrose_delay_class = 'delay-' . ( ( $skyyrose_delay % 8 ) + 1 );
-				$skyyrose_delay++;
-
 				$skyyrose_p_url   = isset( $skyyrose_product['url'] ) ? $skyyrose_product['url'] : '#';
 				$skyyrose_p_image = ! empty( $skyyrose_product['image'] ) ? $skyyrose_product['image'] : $skyyrose_br_placeholder;
 				?>
 				<a href="<?php echo esc_url( $skyyrose_p_url ); ?>"
-				   class="product-card fade-in-up <?php echo esc_attr( $skyyrose_delay_class ); ?>"
+				   class="collection-product-card"
 				   aria-label="<?php echo esc_attr( $skyyrose_product['name'] ); ?>">
 
-					<div class="product-card__image-wrap">
-						<img src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-						     loading="lazy"
-						     width="400"
-						     height="480" />
-
-						<div class="product-card__overlay" aria-hidden="true">
-							<span class="product-card__quick-view">
-								<?php echo esc_html__( 'Quick View', 'skyyrose-flagship' ); ?>
-							</span>
-						</div>
-
-						<span class="product-card__sku">
-							<?php echo esc_html( strtoupper( $skyyrose_product['sku'] ) ); ?>
+					<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
+						<span class="collection-product-card__badge">
+							<?php echo esc_html( $skyyrose_product['badge'] ); ?>
 						</span>
+					<?php endif; ?>
 
-						<?php if ( ! empty( $skyyrose_product['badge'] ) ) : ?>
-							<span class="product-card__badge">
-								<?php echo esc_html( $skyyrose_product['badge'] ); ?>
-							</span>
-						<?php endif; ?>
-					</div>
+					<img class="collection-product-card__image"
+					     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
+					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
+					     loading="lazy"
+					     width="400"
+					     height="533" />
 
-					<div class="product-card__info">
-						<h3 class="product-card__name">
+					<div class="collection-product-card__info">
+						<h3 class="collection-product-card__name">
 							<?php echo esc_html( $skyyrose_product['name'] ); ?>
 						</h3>
-						<p class="product-card__price">
+						<p class="collection-product-card__price">
 							<?php echo wp_kses_post( $skyyrose_product['price'] ); ?>
 						</p>
-						<?php if ( ! empty( $skyyrose_product['desc'] ) ) : ?>
-							<p class="product-card__desc">
-								<?php echo esc_html( $skyyrose_product['desc'] ); ?>
-							</p>
-						<?php endif; ?>
 					</div>
 				</a>
 			<?php endforeach; ?>
@@ -257,23 +202,23 @@ $skyyrose_br_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	</section>
 
 	<!-- ============================================================
-	     CTA BANNER
+	     IMMERSIVE CTA
 	     ============================================================ -->
-	<section class="collection-cta">
-		<div class="collection-cta__inner fade-in-up">
-			<h2 class="collection-cta__heading">
-				<?php echo esc_html__( 'Own the Night', 'skyyrose-flagship' ); ?>
-			</h2>
+	<section class="collection-immersive-cta">
+		<a href="<?php echo esc_url( home_url( '/immersive/black-rose/' ) ); ?>"
+		   class="collection-immersive-cta__link">
+			<?php echo esc_html__( 'Enter the 3D Experience', 'skyyrose-flagship' ); ?>
+		</a>
+	</section>
 
-			<p class="collection-cta__text">
-				<?php echo esc_html__( "Every BLACK ROSE piece is crafted in limited quantities. Once they bloom, they're gone. Don't let the garden close without you.", 'skyyrose-flagship' ); ?>
-			</p>
-
-			<a href="<?php echo esc_url( $skyyrose_br_shop_url ); ?>"
-			   class="collection-cta__button">
-				<?php echo esc_html__( 'Shop BLACK ROSE', 'skyyrose-flagship' ); ?>
-			</a>
-		</div>
+	<!-- ============================================================
+	     PRE-ORDER CTA
+	     ============================================================ -->
+	<section class="collection-preorder-cta">
+		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
+		   class="collection-preorder-cta__btn">
+			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>
+		</a>
 	</section>
 
 	<!-- ============================================================
