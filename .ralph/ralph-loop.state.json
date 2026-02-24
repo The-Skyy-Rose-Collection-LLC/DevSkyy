@@ -1,13 +1,13 @@
 {
   "active": true,
-  "iteration": 10,
+  "iteration": 1,
   "minIterations": 1,
-  "maxIterations": 30,
+  "maxIterations": 25,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
-  "prompt": "Build the Collections immersive  \n  pages",
-  "startedAt": "2026-02-24T15:28:14.865Z",
+  "prompt": "Full stack website upgrade — examine every page, modern UI/UX, seamless flow static to interactive to pre-order, AI fashion models in SkyyRose branding wearing 100% replica products, rotating 3D collection logos, pre-order money page with all 3 collections, exclusive incentive popup, deploy WordPress theme to skyyrose.co and frontend to Vercel",
+  "startedAt": "2026-02-24T17:49:36.108Z",
   "model": "",
   "agent": "claude-code"
 }
