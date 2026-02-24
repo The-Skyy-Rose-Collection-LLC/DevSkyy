@@ -62,6 +62,7 @@ class ModelProvider(str, Enum):
     COHERE = "cohere"
     GROQ = "groq"
     DEEPSEEK = "deepseek"
+    LITELLM = "litellm"
 
 
 class CallerType(str, Enum):
