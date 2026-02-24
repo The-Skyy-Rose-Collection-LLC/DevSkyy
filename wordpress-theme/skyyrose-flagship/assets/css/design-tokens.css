@@ -1,0 +1,28 @@
+/**
+ * SkyyRose Design Tokens
+ *
+ * Canonical design token file referenced by the enqueue system.
+ * Imports brand variables and adds layout/component-level tokens.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.0.0
+ */
+
+@import url("brand-variables.css");
+
+:root {
+	/* Layout */
+	--header-height: 72px;
+	--tab-bar-height: 48px;
+	--sidebar-width: 280px;
+
+	/* Glass Effects */
+	--glass-bg: rgba(17, 17, 17, 0.92);
+	--glass-border: rgba(255, 255, 255, 0.08);
+	--glass-blur: blur(24px) saturate(1.4);
+
+	/* Interactive States */
+	--focus-ring: 0 0 0 2px var(--rose-gold, #B76E79);
+	--hover-lift: translateY(-2px);
+	--active-press: scale(0.97);
+}
