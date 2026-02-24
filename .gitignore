@@ -103,6 +103,7 @@ package-lock.json
 !frontend/package-lock.json
 yarn.lock
 pnpm-lock.yaml
+**/pnpm-lock.yaml
 
 # Docker
 .docker/
