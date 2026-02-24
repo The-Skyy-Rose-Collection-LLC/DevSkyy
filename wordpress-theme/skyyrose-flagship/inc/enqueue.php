@@ -633,6 +633,46 @@ function skyyrose_enqueue_conversion_engine() {
 }
 
 /**
+ * Enqueue Adaptive Personalization Engine.
+ *
+ * Behavioral scoring, personalized "Your Picks" recommendations drawer,
+ * ambient mood transitions on immersive pages, smart bundle suggestions,
+ * and recently-viewed product strip. Research shows personalized
+ * recommendations increase AOV by 10-30% (McKinsey, 2023).
+ *
+ * @since 3.8.0
+ * @return void
+ */
+function skyyrose_enqueue_adaptive_personalization() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/adaptive-personalization.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-adaptive-personalization',
+			SKYYROSE_ASSETS_URI . '/css/adaptive-personalization.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/adaptive-personalization.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-adaptive-personalization',
+			SKYYROSE_ASSETS_URI . '/js/adaptive-personalization.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Dequeue WooCommerce default styles that conflict with theme design.
  *
  * WooCommerce loads 3 default stylesheets. We remove the general and
@@ -707,6 +747,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-magnetic-obsidian',
 		'skyyrose-conversion-engine',
 		'skyyrose-cross-sell-engine',
+		'skyyrose-adaptive-personalization',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) ) {
@@ -805,6 +846,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_conversion_engine', 38 );
 
 // Cross-Sell Engine — "Complete the Look" on immersive pages only (priority 40, after immersive template script).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );
+
+// Adaptive Personalization Engine — behavioral scoring, recommendations, mood engine (priority 42, after cross-sell).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 42 );
 
 // Admin scripts.
 add_action( 'admin_enqueue_scripts', 'skyyrose_admin_scripts' );
