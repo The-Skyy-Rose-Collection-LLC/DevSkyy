@@ -13,6 +13,11 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// Guard against null cart object.
+if ( ! function_exists( 'WC' ) || ! WC()->cart ) {
+	return;
+}
+
 // Bail if cart empty and redirect to shop.
 if ( WC()->cart->is_empty() && ! is_customize_preview() && apply_filters( 'woocommerce_checkout_redirect_empty_cart', true ) ) {
 	return;

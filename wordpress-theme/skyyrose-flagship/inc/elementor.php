@@ -129,6 +129,10 @@ add_action( 'elementor/theme/conditions/register', 'skyyrose_add_elementor_condi
  * @since 1.0.0
  */
 function skyyrose_elementor_canvas_content() {
+	if ( ! class_exists( '\Elementor\Plugin' ) || ! \Elementor\Plugin::$instance || ! \Elementor\Plugin::$instance->preview ) {
+		echo '<div class="elementor-canvas-wrapper">';
+		return;
+	}
 	if ( ! \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 		echo '<div class="elementor-canvas-wrapper">';
 	}
@@ -141,6 +145,10 @@ add_action( 'elementor/page_templates/canvas/before_content', 'skyyrose_elemento
  * @since 1.0.0
  */
 function skyyrose_elementor_canvas_content_close() {
+	if ( ! class_exists( '\Elementor\Plugin' ) || ! \Elementor\Plugin::$instance || ! \Elementor\Plugin::$instance->preview ) {
+		echo '</div>';
+		return;
+	}
 	if ( ! \Elementor\Plugin::$instance->preview->is_preview_mode() ) {
 		echo '</div>';
 	}
