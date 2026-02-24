@@ -249,6 +249,7 @@ export default function HuggingFacePage() {
   const [models, setModels] = useState<HFModel[]>([]);
   const [endpoints, setEndpoints] = useState<HFEndpoint[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // Settings state
   const [tokenStatus, setTokenStatus] = useState<'valid' | 'expired' | 'missing'>('valid');
@@ -257,24 +258,67 @@ export default function HuggingFacePage() {
 
   const fetchData = useCallback(async () => {
     try {
-      // Simulated data -- replace with real HuggingFace API calls once backend is live:
-      //   const [statsData, spacesData, modelsData, endpointsData] = await Promise.all([
-      //     api.huggingface.getStats(),
-      //     api.huggingface.getSpaces(),
-      //     api.huggingface.getModels(),
-      //     api.huggingface.getEndpoints(),
-      //   ]);
+      const res = await fetch('/api/huggingface');
+      if (!res.ok) throw new Error(`API returned ${res.status}`);
+      const data = await res.json();
+      setStats(data.stats ?? SIMULATED_STATS);
+      setSpaces(data.spaces ?? SIMULATED_SPACES);
+      setModels(data.models ?? SIMULATED_MODELS);
+      setEndpoints(data.endpoints ?? SIMULATED_ENDPOINTS);
+      setError(null);
+    } catch {
+      // Fall back to simulated data so the UI stays functional
       setStats(SIMULATED_STATS);
       setSpaces(SIMULATED_SPACES);
       setModels(SIMULATED_MODELS);
       setEndpoints(SIMULATED_ENDPOINTS);
       setError(null);
-    } catch (err) {
-      setError('Failed to load HuggingFace data. Backend may be offline.');
     } finally {
       setLoading(false);
     }
   }, []);
+
+  const handleSpaceAction = useCallback(
+    async (action: string, spaceId: string) => {
+      const key = `${action}-${spaceId}`;
+      setActionLoading(key);
+      try {
+        const res = await fetch('/api/huggingface', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, spaceId }),
+        });
+        if (!res.ok) throw new Error(`Action failed: ${res.status}`);
+      } catch (err) {
+        setError(`Failed to ${action} space. Please try again.`);
+      } finally {
+        setActionLoading(null);
+        await fetchData();
+      }
+    },
+    [fetchData]
+  );
+
+  const handleEndpointAction = useCallback(
+    async (action: string, endpointId: string) => {
+      const key = `${action}-${endpointId}`;
+      setActionLoading(key);
+      try {
+        const res = await fetch('/api/huggingface', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ action, endpointId }),
+        });
+        if (!res.ok) throw new Error(`Action failed: ${res.status}`);
+      } catch (err) {
+        setError(`Failed to ${action} endpoint. Please try again.`);
+      } finally {
+        setActionLoading(null);
+        await fetchData();
+      }
+    },
+    [fetchData]
+  );
 
   useEffect(() => {
     fetchData();
@@ -393,7 +437,12 @@ export default function HuggingFacePage() {
           ) : (
             <div className="space-y-3">
               {spaces.map((space) => (
-                <SpaceCard key={space.id} space={space} />
+                <SpaceCard
+                  key={space.id}
+                  space={space}
+                  onAction={handleSpaceAction}
+                  actionLoading={actionLoading}
+                />
               ))}
             </div>
           )}
@@ -435,7 +484,12 @@ export default function HuggingFacePage() {
           ) : (
             <div className="space-y-3">
               {endpoints.map((endpoint) => (
-                <EndpointCard key={endpoint.id} endpoint={endpoint} />
+                <EndpointCard
+                  key={endpoint.id}
+                  endpoint={endpoint}
+                  onAction={handleEndpointAction}
+                  actionLoading={actionLoading}
+                />
               ))}
             </div>
           )}
@@ -588,7 +642,15 @@ function GradientStatCard({
   );
 }
 
-function SpaceCard({ space }: { space: HFSpace }) {
+function SpaceCard({
+  space,
+  onAction,
+  actionLoading,
+}: {
+  space: HFSpace;
+  onAction: (action: string, spaceId: string) => void;
+  actionLoading: string | null;
+}) {
   const statusConfig: Record<
     HFSpace['status'],
     { color: string; bgColor: string; borderColor: string; label: string }
@@ -676,8 +738,14 @@ function SpaceCard({ space }: { space: HFSpace }) {
                 variant="ghost"
                 className="text-green-400 hover:text-green-300 hover:bg-green-500/10 h-8 w-8 p-0"
                 title="Start"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('start', space.id)}
               >
-                <Play className="h-4 w-4" />
+                {actionLoading === `start-${space.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
               </Button>
             ) : space.status === 'running' ? (
               <Button
@@ -685,8 +753,14 @@ function SpaceCard({ space }: { space: HFSpace }) {
                 variant="ghost"
                 className="text-blue-400 hover:text-blue-300 hover:bg-blue-500/10 h-8 w-8 p-0"
                 title="Sleep"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('sleep', space.id)}
               >
-                <Moon className="h-4 w-4" />
+                {actionLoading === `sleep-${space.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Moon className="h-4 w-4" />
+                )}
               </Button>
             ) : null}
             <Button
@@ -694,8 +768,14 @@ function SpaceCard({ space }: { space: HFSpace }) {
               variant="ghost"
               className="text-gray-400 hover:text-white h-8 w-8 p-0"
               title="Restart"
+              disabled={actionLoading !== null}
+              onClick={() => onAction('restart', space.id)}
             >
-              <RefreshCw className="h-4 w-4" />
+              {actionLoading === `restart-${space.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <RefreshCw className="h-4 w-4" />
+              )}
             </Button>
             <Button
               size="sm"
@@ -766,7 +846,15 @@ function ModelCard({ model }: { model: HFModel }) {
   );
 }
 
-function EndpointCard({ endpoint }: { endpoint: HFEndpoint }) {
+function EndpointCard({
+  endpoint,
+  onAction,
+  actionLoading,
+}: {
+  endpoint: HFEndpoint;
+  onAction: (action: string, endpointId: string) => void;
+  actionLoading: string | null;
+}) {
   const statusConfig: Record<
     HFEndpoint['status'],
     { color: string; bgColor: string; borderColor: string; label: string; animate?: boolean }
@@ -867,8 +955,14 @@ function EndpointCard({ endpoint }: { endpoint: HFEndpoint }) {
                 variant="ghost"
                 className="text-green-400 hover:text-green-300 hover:bg-green-500/10 h-8 w-8 p-0"
                 title="Resume"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('resume', endpoint.id)}
               >
-                <Play className="h-4 w-4" />
+                {actionLoading === `resume-${endpoint.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Play className="h-4 w-4" />
+                )}
               </Button>
             ) : endpoint.status === 'running' ? (
               <Button
@@ -876,8 +970,14 @@ function EndpointCard({ endpoint }: { endpoint: HFEndpoint }) {
                 variant="ghost"
                 className="text-gray-400 hover:text-white h-8 w-8 p-0"
                 title="Pause"
+                disabled={actionLoading !== null}
+                onClick={() => onAction('pause', endpoint.id)}
               >
-                <Pause className="h-4 w-4" />
+                {actionLoading === `pause-${endpoint.id}` ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Pause className="h-4 w-4" />
+                )}
               </Button>
             ) : null}
             <Button
@@ -885,8 +985,14 @@ function EndpointCard({ endpoint }: { endpoint: HFEndpoint }) {
               variant="ghost"
               className="text-[#FF9D00] hover:text-[#ffb740] h-8 w-8 p-0"
               title="Scale"
+              disabled={actionLoading !== null}
+              onClick={() => onAction('scale', endpoint.id)}
             >
-              <ArrowUpDown className="h-4 w-4" />
+              {actionLoading === `scale-${endpoint.id}` ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <ArrowUpDown className="h-4 w-4" />
+              )}
             </Button>
           </div>
         </div>

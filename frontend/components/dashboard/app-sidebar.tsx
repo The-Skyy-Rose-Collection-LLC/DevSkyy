@@ -19,6 +19,10 @@ import {
   Triangle,
   Brain,
   TrendingUp,
+  ListTodo,
+  Bot,
+  Briefcase,
+  Image,
 } from 'lucide-react';
 
 import {
@@ -62,6 +66,11 @@ const mainNavItems = [
     icon: FolderOpen,
   },
   {
+    title: 'Imagery',
+    url: '/admin/imagery',
+    icon: Image,
+  },
+  {
     title: 'Generation Queue',
     url: '/admin/pipeline',
     icon: Workflow,
@@ -80,6 +89,16 @@ const mainNavItems = [
     title: 'Fidelity QA',
     url: '/admin/qa',
     icon: CheckCircle2,
+  },
+  {
+    title: 'Tasks',
+    url: '/admin/tasks',
+    icon: ListTodo,
+  },
+  {
+    title: 'Jobs',
+    url: '/admin/jobs',
+    icon: Briefcase,
   },
 ];
 
@@ -106,6 +125,11 @@ const systemNavItems = [
     title: 'Monitoring',
     url: '/admin/monitoring',
     icon: Activity,
+  },
+  {
+    title: 'Autonomous',
+    url: '/admin/autonomous',
+    icon: Bot,
   },
   {
     title: 'Settings',

@@ -27,6 +27,7 @@ import {
 import LuxuryProductViewer from '@/components/3d/LuxuryProductViewer';
 import PulseAnalytics from '@/components/dashboard/pulse-analytics';
 import AuroraAnalytics from '@/components/dashboard/aurora-analytics';
+import { ConversionPulse } from '@/components/dashboard/conversion-pulse';
 
 interface DashboardStats {
   roundTable: {
@@ -321,6 +322,11 @@ export default function AdminDashboard() {
           <PulseAnalytics />
           <AuroraAnalytics />
         </div>
+      </motion.section>
+
+      {/* Conversion Pulse — Live Sales Feed */}
+      <motion.section variants={itemVariants} aria-label="Conversion Pulse Live Feed">
+        <ConversionPulse />
       </motion.section>
 
       {/* Quick Actions */}
