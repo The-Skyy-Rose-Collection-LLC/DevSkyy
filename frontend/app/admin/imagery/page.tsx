@@ -32,7 +32,7 @@ type ProviderStatus = 'connected' | 'disconnected' | 'checking';
 type GenerationStatus = 'completed' | 'processing' | 'failed' | 'queued';
 type StyleOption = 'product-photo' | 'lifestyle' | 'editorial' | 'flat-lay';
 type AspectRatio = '1:1' | '4:3' | '16:9' | '9:16';
-type Provider = 'gemini' | 'imagen' | 'huggingface-flux';
+type Provider = 'gemini' | 'imagen' | 'flux' | 'replicate';
 
 interface ImageProvider {
   id: Provider;
@@ -42,6 +42,7 @@ interface ImageProvider {
   status: ProviderStatus;
   avgLatencyMs: number;
   generationsToday: number;
+  costPerImage: number;
   gradient: string;
   accentColor: string;
 }
@@ -53,7 +54,8 @@ interface GeneratedImage {
   style: StyleOption;
   aspectRatio: AspectRatio;
   status: GenerationStatus;
-  thumbnailUrl: string | null;
+  imageBase64: string | null;
+  imageUrl: string | null;
   createdAt: string;
   durationMs: number | null;
   error: string | null;
@@ -64,56 +66,20 @@ interface PipelineStats {
   successRate: number;
   avgDurationMs: number;
   providersOnline: number;
+  providersTotal: number;
 }
 
 // ---------------------------------------------------------------------------
-// Simulated Data
+// Provider UI metadata
 // ---------------------------------------------------------------------------
 
-const SIMULATED_PROVIDERS: ImageProvider[] = [
-  {
-    id: 'gemini',
-    name: 'Gemini',
-    description: 'Google DeepMind multimodal image generation',
-    model: 'gemini-2.0-flash-preview-image-generation',
-    status: 'connected',
-    avgLatencyMs: 3_200,
-    generationsToday: 142,
-    gradient: 'from-blue-500 to-cyan-500',
-    accentColor: 'text-blue-400',
-  },
-  {
-    id: 'imagen',
-    name: 'Imagen',
-    description: 'Google Imagen 3 for photorealistic output',
-    model: 'imagen-3.0-generate-002',
-    status: 'connected',
-    avgLatencyMs: 5_800,
-    generationsToday: 87,
-    gradient: 'from-emerald-500 to-teal-500',
-    accentColor: 'text-emerald-400',
-  },
-  {
-    id: 'huggingface-flux',
-    name: 'HuggingFace Flux',
-    description: 'FLUX.1 schnell via HuggingFace Inference',
-    model: 'black-forest-labs/FLUX.1-schnell',
-    status: 'connected',
-    avgLatencyMs: 8_400,
-    generationsToday: 219,
-    gradient: 'from-[#FF9D00] to-[#B76E79]',
-    accentColor: 'text-[#FF9D00]',
-  },
-];
-
-const SIMULATED_STATS: PipelineStats = {
-  totalGenerations: 448,
-  successRate: 97.3,
-  avgDurationMs: 5_800,
-  providersOnline: 3,
+const PROVIDER_GRADIENTS: Record<string, { gradient: string; accentColor: string; description: string }> = {
+  gemini:    { gradient: 'from-blue-500 to-cyan-500', accentColor: 'text-blue-400', description: 'Google DeepMind multimodal image generation' },
+  imagen:    { gradient: 'from-emerald-500 to-teal-500', accentColor: 'text-emerald-400', description: 'Google Imagen 3 for photorealistic output' },
+  flux:      { gradient: 'from-[#FF9D00] to-[#B76E79]', accentColor: 'text-[#FF9D00]', description: 'FLUX.1 schnell via HuggingFace Inference' },
+  replicate: { gradient: 'from-purple-500 to-pink-500', accentColor: 'text-purple-400', description: 'SkyyRose LoRA fine-tuned on product photos' },
 };
 
-// Simulate placeholder thumbnails using gradient backgrounds as stand-ins
 const PLACEHOLDER_GRADIENTS = [
   'from-rose-900/60 to-purple-900/60',
   'from-blue-900/60 to-cyan-900/60',
@@ -121,81 +87,6 @@ const PLACEHOLDER_GRADIENTS = [
   'from-emerald-900/60 to-teal-900/60',
   'from-pink-900/60 to-rose-900/60',
   'from-violet-900/60 to-indigo-900/60',
-];
-
-const SIMULATED_GALLERY: GeneratedImage[] = [
-  {
-    id: 'gen-001',
-    prompt: 'Luxury rose gold handbag with embossed floral pattern, studio lighting, white background',
-    provider: 'gemini',
-    style: 'product-photo',
-    aspectRatio: '1:1',
-    status: 'completed',
-    thumbnailUrl: null,
-    createdAt: '2026-02-24T07:45:00Z',
-    durationMs: 3_100,
-    error: null,
-  },
-  {
-    id: 'gen-002',
-    prompt: 'Black Rose collection evening gown, editorial fashion photography, dramatic lighting',
-    provider: 'imagen',
-    style: 'editorial',
-    aspectRatio: '9:16',
-    status: 'completed',
-    thumbnailUrl: null,
-    createdAt: '2026-02-24T07:30:00Z',
-    durationMs: 5_600,
-    error: null,
-  },
-  {
-    id: 'gen-003',
-    prompt: 'Love Hurts collection accessories flat lay, marble surface, rose petals',
-    provider: 'huggingface-flux',
-    style: 'flat-lay',
-    aspectRatio: '4:3',
-    status: 'completed',
-    thumbnailUrl: null,
-    createdAt: '2026-02-24T07:15:00Z',
-    durationMs: 8_200,
-    error: null,
-  },
-  {
-    id: 'gen-004',
-    prompt: 'Signature collection lifestyle shoot, rooftop setting, golden hour',
-    provider: 'gemini',
-    style: 'lifestyle',
-    aspectRatio: '16:9',
-    status: 'completed',
-    thumbnailUrl: null,
-    createdAt: '2026-02-24T06:55:00Z',
-    durationMs: 3_400,
-    error: null,
-  },
-  {
-    id: 'gen-005',
-    prompt: 'Rose gold silk scarf, product photography, soft diffused light',
-    provider: 'imagen',
-    style: 'product-photo',
-    aspectRatio: '1:1',
-    status: 'processing',
-    thumbnailUrl: null,
-    createdAt: '2026-02-24T08:00:00Z',
-    durationMs: null,
-    error: null,
-  },
-  {
-    id: 'gen-006',
-    prompt: 'Kids Capsule collection playful scene, bright colors, studio backdrop',
-    provider: 'huggingface-flux',
-    style: 'lifestyle',
-    aspectRatio: '4:3',
-    status: 'failed',
-    thumbnailUrl: null,
-    createdAt: '2026-02-24T06:40:00Z',
-    durationMs: null,
-    error: 'Rate limit exceeded. Retry after 60s.',
-  },
 ];
 
 const STYLE_OPTIONS: { value: StyleOption; label: string }[] = [
@@ -216,7 +107,8 @@ const PROVIDER_OPTIONS: { value: Provider | ''; label: string }[] = [
   { value: '', label: 'Auto-select (Best Available)' },
   { value: 'gemini', label: 'Gemini' },
   { value: 'imagen', label: 'Imagen 3' },
-  { value: 'huggingface-flux', label: 'HuggingFace Flux' },
+  { value: 'flux', label: 'HuggingFace Flux' },
+  { value: 'replicate', label: 'Replicate LoRA' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -236,15 +128,57 @@ export default function ImageryPipelinePage() {
   const [selectedStyle, setSelectedStyle] = useState<StyleOption>('product-photo');
   const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>('1:1');
 
-  useEffect(() => {
-    // Simulate API fetch with a small delay
-    const timer = setTimeout(() => {
-      setProviders(SIMULATED_PROVIDERS);
-      setGallery(SIMULATED_GALLERY);
-      setStats(SIMULATED_STATS);
+  async function fetchPipelineStatus() {
+    try {
+      const resp = await fetch('/api/imagery');
+      if (!resp.ok) throw new Error('Failed to fetch pipeline status');
+      const data = await resp.json();
+
+      // Map API providers to UI providers
+      const mappedProviders: ImageProvider[] = (data.providers || []).map((p: { id: string; name: string; model: string; status: string; avgLatencyMs: number; costPerImage: number }) => {
+        const meta = PROVIDER_GRADIENTS[p.id] || { gradient: 'from-gray-500 to-gray-600', accentColor: 'text-gray-400', description: '' };
+        return {
+          id: p.id as Provider,
+          name: p.name,
+          description: meta.description,
+          model: p.model,
+          status: p.status as ProviderStatus,
+          avgLatencyMs: p.avgLatencyMs,
+          generationsToday: 0,
+          costPerImage: p.costPerImage,
+          gradient: meta.gradient,
+          accentColor: meta.accentColor,
+        };
+      });
+
+      setProviders(mappedProviders);
+      setStats(data.stats || null);
+
+      // Map recent generations to gallery format
+      const mappedGallery: GeneratedImage[] = (data.recentGenerations || []).map((g: { id: string; prompt: string; provider: string; style: string; aspectRatio: string; status: string; imageBase64?: string; imageUrl?: string; createdAt: string; durationMs?: number; error?: string }) => ({
+        id: g.id,
+        prompt: g.prompt,
+        provider: g.provider as Provider,
+        style: (g.style || 'product-photo') as StyleOption,
+        aspectRatio: (g.aspectRatio || '1:1') as AspectRatio,
+        status: g.status as GenerationStatus,
+        imageBase64: g.imageBase64 || null,
+        imageUrl: g.imageUrl || null,
+        createdAt: g.createdAt,
+        durationMs: g.durationMs || null,
+        error: g.error || null,
+      }));
+
+      setGallery(mappedGallery);
+    } catch {
+      // On error, keep whatever state we have
+    } finally {
       setLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+    }
+  }
+
+  useEffect(() => {
+    fetchPipelineStatus();
   }, []);
 
   async function handleGenerate() {
@@ -253,14 +187,16 @@ export default function ImageryPipelinePage() {
     setGenerating(true);
 
     // Optimistically add a queued item to the gallery
+    const tempId = `gen-${Date.now()}`;
     const newEntry: GeneratedImage = {
-      id: `gen-${Date.now()}`,
+      id: tempId,
       prompt: prompt.trim(),
-      provider: selectedProvider || 'gemini',
+      provider: (selectedProvider || 'gemini') as Provider,
       style: selectedStyle,
       aspectRatio: selectedAspectRatio,
-      status: 'queued',
-      thumbnailUrl: null,
+      status: 'processing',
+      imageBase64: null,
+      imageUrl: null,
       createdAt: new Date().toISOString(),
       durationMs: null,
       error: null,
@@ -268,31 +204,62 @@ export default function ImageryPipelinePage() {
 
     setGallery((prev) => [newEntry, ...prev]);
 
-    // Simulate async generation (2.5s)
-    await new Promise((resolve) => setTimeout(resolve, 2_500));
+    try {
+      const resp = await fetch('/api/imagery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          provider: selectedProvider || 'auto',
+          style: selectedStyle,
+          aspectRatio: selectedAspectRatio,
+        }),
+      });
 
-    // Move to "processing" then "completed"
-    setGallery((prev) =>
-      prev.map((item) =>
-        item.id === newEntry.id ? { ...item, status: 'processing' } : item
-      )
-    );
+      const result = await resp.json();
 
-    await new Promise((resolve) => setTimeout(resolve, 3_000));
+      if (!resp.ok) {
+        setGallery((prev) =>
+          prev.map((item) =>
+            item.id === tempId
+              ? { ...item, status: 'failed' as GenerationStatus, error: result.error || 'Generation failed' }
+              : item
+          )
+        );
+      } else {
+        // Replace the temp entry with the real result
+        setGallery((prev) =>
+          prev.map((item) =>
+            item.id === tempId
+              ? {
+                  ...item,
+                  id: result.id || tempId,
+                  status: result.status as GenerationStatus,
+                  provider: result.provider as Provider,
+                  imageBase64: result.imageBase64 || null,
+                  imageUrl: result.imageUrl || null,
+                  durationMs: result.durationMs || null,
+                  error: result.error || null,
+                }
+              : item
+          )
+        );
 
-    setGallery((prev) =>
-      prev.map((item) =>
-        item.id === newEntry.id
-          ? { ...item, status: 'completed', durationMs: 3_200 }
-          : item
-      )
-    );
-
-    setStats((prev) =>
-      prev
-        ? { ...prev, totalGenerations: prev.totalGenerations + 1 }
-        : prev
-    );
+        setStats((prev) =>
+          prev
+            ? { ...prev, totalGenerations: prev.totalGenerations + 1 }
+            : prev
+        );
+      }
+    } catch (err) {
+      setGallery((prev) =>
+        prev.map((item) =>
+          item.id === tempId
+            ? { ...item, status: 'failed' as GenerationStatus, error: err instanceof Error ? err.message : 'Network error' }
+            : item
+        )
+      );
+    }
 
     setPrompt('');
     setGenerating(false);
@@ -355,7 +322,7 @@ export default function ImageryPipelinePage() {
         />
         <GradientStatCard
           title="Providers Online"
-          value={`${stats?.providersOnline ?? 0}/3`}
+          value={`${stats?.providersOnline ?? 0}/${stats?.providersTotal ?? providers.length}`}
           icon={Cpu}
           gradient="from-blue-500 to-cyan-500"
         />
@@ -504,6 +471,7 @@ export default function ImageryPipelinePage() {
                 image={image}
                 placeholderGradient={PLACEHOLDER_GRADIENTS[index % PLACEHOLDER_GRADIENTS.length]}
                 providers={providers}
+                onRegenerate={(p) => { setPrompt(p); }}
               />
             ))}
           </div>
@@ -602,8 +570,8 @@ function ProviderCard({ provider }: { provider: ImageProvider }) {
             <span className="text-white">{(provider.avgLatencyMs / 1000).toFixed(1)}s</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-gray-400">Today</span>
-            <span className={provider.accentColor}>{provider.generationsToday} images</span>
+            <span className="text-gray-400">Cost/Image</span>
+            <span className={provider.accentColor}>${provider.costPerImage?.toFixed(3) ?? '—'}</span>
           </div>
         </div>
       </CardContent>
@@ -615,10 +583,12 @@ function GalleryCard({
   image,
   placeholderGradient,
   providers,
+  onRegenerate,
 }: {
   image: GeneratedImage;
   placeholderGradient: string;
   providers: ImageProvider[];
+  onRegenerate?: (prompt: string) => void;
 }) {
   const statusConfig: Record<
     GenerationStatus,
@@ -644,20 +614,35 @@ function GalleryCard({
     <Card className="bg-gray-900 border-gray-800 overflow-hidden">
       {/* Image Thumbnail Area */}
       <div
-        className={`relative h-48 bg-gradient-to-br ${placeholderGradient} flex items-center justify-center`}
+        className={`relative h-48 bg-gradient-to-br ${placeholderGradient} flex items-center justify-center overflow-hidden`}
       >
         {image.status === 'completed' ? (
           <>
-            <div className="absolute inset-0 flex items-center justify-center">
-              <ImageIcon className="h-12 w-12 text-white/20" />
-            </div>
+            {(image.imageBase64 || image.imageUrl) ? (
+              <img
+                src={image.imageBase64 || image.imageUrl || ''}
+                alt={image.prompt}
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+            ) : (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <ImageIcon className="h-12 w-12 text-white/20" />
+              </div>
+            )}
             {/* Overlay controls on hover */}
-            <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors group flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100">
+            <div className="absolute inset-0 bg-black/0 hover:bg-black/40 transition-colors group flex items-center justify-center gap-2">
               <Button
                 size="sm"
                 variant="secondary"
                 className="opacity-0 group-hover:opacity-100 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-opacity"
-                onClick={() => {}}
+                onClick={() => {
+                  const src = image.imageBase64 || image.imageUrl;
+                  if (!src) return;
+                  const link = document.createElement('a');
+                  link.href = src;
+                  link.download = `skyyrose-${image.id}.png`;
+                  link.click();
+                }}
               >
                 <Download className="h-4 w-4" />
               </Button>
@@ -665,7 +650,7 @@ function GalleryCard({
                 size="sm"
                 variant="secondary"
                 className="opacity-0 group-hover:opacity-100 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm transition-opacity"
-                onClick={() => {}}
+                onClick={() => onRegenerate?.(image.prompt)}
               >
                 <RefreshCw className="h-4 w-4" />
               </Button>
@@ -741,6 +726,14 @@ function GalleryCard({
               size="sm"
               variant="ghost"
               className="flex-1 text-[#B76E79] hover:text-rose-300 hover:bg-[#B76E79]/10 text-xs h-8"
+              onClick={() => {
+                const src = image.imageBase64 || image.imageUrl;
+                if (!src) return;
+                const link = document.createElement('a');
+                link.href = src;
+                link.download = `skyyrose-${image.id}.png`;
+                link.click();
+              }}
             >
               <Download className="h-3 w-3 mr-1" />
               Download
@@ -749,6 +742,7 @@ function GalleryCard({
               size="sm"
               variant="ghost"
               className="flex-1 text-gray-400 hover:text-white hover:bg-gray-700 text-xs h-8"
+              onClick={() => onRegenerate?.(image.prompt)}
             >
               <RefreshCw className="h-3 w-3 mr-1" />
               Regenerate
