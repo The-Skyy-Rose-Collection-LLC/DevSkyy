@@ -1,0 +1,67 @@
+Here is an ultra-precise technical description of the garment:
+
+**1. GARMENT TYPE:** Baseball Jersey (short-sleeve, full-button front)
+
+**2. BASE COLOR:** Deep Forest Green (approx. Hex #23502D)
+
+**3. SECONDARY COLORS:**
+    *   Bright Yellow (approx. Hex #FFD700) - prominent on stripes, front text, back neck logo, back graphic
+    *   Bright White (approx. Hex #FFFFFF) - prominent on stripes, buttons, back graphic, hem tag details
+    *   Jet Black (approx. Hex #000000) - prominent on front text outline, back graphic roses, inner neck tag, hem tag text/logo
+    *   Medium Gray (approx. Hex #808080) - used for back graphic leaves, stems, and ground elements
+
+**4. FIT:** Relaxed fit, traditional baseball jersey silhouette.
+    *   **Torso Length:** Hip-length in the front, with a distinctly curved "shirttail" hem that extends longer in the back.
+    *   **Sleeve Length:** Short sleeves, extending to just above the elbow.
+
+**5. GRAPHICS:**
+    *   **Front Chest Graphic:** Stylized text "BLACK IS BEAUTIFUL" in an arched configuration, centered horizontally across the upper chest. The graphic spans approximately 60-70% of the chest width.
+    *   **Back Upper Graphic (Rose Illustration):** A detailed embroidery of a stylized rose bouquet, centered on the upper back, approximately 3-4 inches (7.6-10 cm) below the back neck "R" logo.
+        *   **Dimensions:** Approximately 10-12 inches (25-30 cm) in height and 6-8 inches (15-20 cm) in width.
+        *   **Content:** Features one larger fully bloomed rose in solid Black on the wearer's right, and a slightly smaller rose with gray petals and white highlights on the wearer's left. Both roses have multiple gray leaves and stems. Below the roses, there is an abstract, cloud-like element representing ground or roots, primarily in bright Yellow with some Medium Gray accents, possibly depicting dirt or a bursting effect.
+        *   **Style:** Detailed, multi-layered embroidery with a illustrative quality, using thread to create texture and depth.
+
+**6. TEXT:**
+    *   **Front Chest:** "BLACK IS BEAUTIFUL"
+        *   **Font Style:** Bold, custom serif font with a slightly distressed or textured finish, reminiscent of vintage collegiate athletic typography. The letters are thick.
+        *   **Color:** Bright Yellow for the main body of the letters, with a pronounced Jet Black outline or drop shadow effect providing depth.
+        *   **Placement:** Arched across the chest, with "BLACK" on the left, "IS" centered and slightly elevated, and "BEAUTIFUL" on the right.
+    *   **Front Hem Tag (Right Side):**
+        *   "BLACK ROSE" (Top line, bold uppercase serif/block font, Jet Black)
+        *   "[Small text, likely COLLECTION]" (Below "BLACK ROSE", smaller uppercase block font, Jet Black)
+        *   "[Unreadable small text, likely copyright or brand slogan]" (Very small font at bottom, Jet Black)
+        *   A small star symbol (Jet Black)
+    *   **Inner Neck Tag (Front):** "BLACK ROSE" (Uppercase sans-serif or block font, Bright White print)
+
+**7. LOGOS & BRANDING:**
+    *   **Back Neck Logo:** Stylized cursive capital "R", embroidered in Bright Yellow.
+        *   **Placement:** Centered on the upper back, directly below the collar band.
+        *   **Dimensions:** Approximately 1.5-2 inches (3.8-5 cm) tall.
+    *   **Front Hem Tag:** Woven rectangular patch.
+        *   **Placement:** Sewn onto the wearer's front right lower hem.
+        *   **Dimensions:** Approximately 3 inches (7.6 cm) tall x 2.5 inches (6.3 cm) wide.
+        *   **Content:** Features a small, simplified stylized rose graphic at the top (Jet Black outline on a white or off-white background). Below the rose, "BLACK ROSE" in bold Jet Black text. Below that, "[COLLECTION]" in smaller Jet Black text. Below that, a horizontal line, then very small, unreadable text, and a small Jet Black star symbol. The patch background is an off-white or cream color, with a stitched border in either Deep Forest Green or Bright White.
+    *   **Inner Neck Tag (Front):** Small, rectangular woven label.
+        *   **Placement:** Centered on the interior back neck, attached to the collar seam.
+        *   **Content:** Jet Black background with "BLACK ROSE" and a stylized rose graphic printed in Bright White.
+
+**8. HARDWARE:**
+    *   **Buttons:** Five circular, two-hole buttons are visible on the front placket.
+        *   **Color/Finish:** Silver or Bright White, with a smooth, slightly glossy finish.
+
+**9. FABRIC TEXTURE:**
+    *   **Primary Fabric:** Polyester mesh knit. Characterized by small, evenly distributed perforations throughout the entire garment, creating a textured, breathable surface. The fabric exhibits a slight sheen typical of athletic polyester materials. It appears lightweight with a soft drape.
+
+**10. SPECIAL DETAILS:**
+    *   **Collar:** V-neck opening with a ribbed knit collar band.
+        *   **Stripe Pattern:** The band features a sequence of three horizontal stripes: a narrow Bright White stripe (outer edge), a wider Bright Yellow stripe (center), and another narrow Bright White stripe (inner edge), set against the Deep Forest Green base color of the collar band.
+    *   **Front Placket:** Full-length, button-down placket, running from the V-neck opening to the bottom hem.
+        *   **Stripe Pattern:** Each side of the placket is bordered by a continuous stripe pattern identical to the collar band: narrow Bright White, wider Bright Yellow, narrow Bright White.
+    *   **Sleeves:** Set-in short sleeves.
+    *   **Cuffs:** Ribbed knit cuff bands on each sleeve.
+        *   **Stripe Pattern:** Each cuff band features the same stripe pattern as the collar and placket: narrow Bright White (outer edge), wider Bright Yellow (center), narrow Bright White (inner edge).
+    *   **Hems:**
+        *   **Front Hem:** Relatively straight.
+        *   **Back Hem:** Distinctly curved "shirttail" style, dropping lower than the front hem.
+        *   All hems are finished with clean, double-stitched seams.
+    *   **Construction:** The stripe details on the collar, placket, and cuffs appear to be created using integrated ribbed knit fabric or meticulously applied contrast taping, ensuring a clean and durable finish.
