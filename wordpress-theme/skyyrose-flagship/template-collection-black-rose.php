@@ -15,118 +15,61 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 
 /**
- * Build the BLACK ROSE product catalog.
+ * Build the BLACK ROSE product list for template rendering.
  *
- * Attempts a WooCommerce query first; falls back to the static catalog
- * defined in the PRD so the page is never empty.
- *
- * @return array<int, array{sku:string, name:string, price:string, desc:string, badge:string, url:string, image:string}>
+ * Uses the centralized catalog (inc/product-catalog.php) as source of truth.
+ * Attempts a WooCommerce query first; falls back to the catalog so the page
+ * is never empty.
  */
 if ( ! function_exists( 'skyyrose_get_black_rose_products' ) ) :
 function skyyrose_get_black_rose_products() {
 
-	$img_base = get_template_directory_uri() . '/assets/images/products/';
+	// Try WooCommerce first.
+	if ( function_exists( 'wc_get_products' ) ) {
+		$wc_products = wc_get_products(
+			array(
+				'limit'    => 8,
+				'category' => array( 'black-rose' ),
+				'status'   => 'publish',
+				'orderby'  => 'menu_order',
+				'order'    => 'ASC',
+			)
+		);
 
-	$static_products = array(
-		array(
-			'sku'   => 'br-001',
-			'name'  => 'BLACK Rose Crewneck',
-			'price' => 'Coming Soon',
-			'desc'  => 'Premium heavyweight crewneck with embroidered rose detail',
-			'badge' => 'Draft',
-			'image' => $img_base . 'br-001-crewneck.webp',
-		),
-		array(
-			'sku'   => 'br-002',
-			'name'  => 'BLACK Rose Joggers',
-			'price' => '$50.00',
-			'desc'  => 'Tailored jogger silhouette in deep black',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'br-002-joggers.jpg',
-		),
-		array(
-			'sku'   => 'br-003',
-			'name'  => 'BLACK is Beautiful Jersey',
-			'price' => 'Coming Soon',
-			'desc'  => 'Statement athletic jersey with bold branding',
-			'badge' => 'Draft',
-			'image' => $img_base . 'br-003-jersey.webp',
-		),
-		array(
-			'sku'   => 'br-004',
-			'name'  => 'BLACK Rose Hoodie',
-			'price' => '$40.00',
-			'desc'  => 'Classic pullover hoodie with silver accents',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'br-004-hoodie.jpg',
-		),
-		array(
-			'sku'   => 'br-005',
-			'name'  => 'BLACK Rose Hoodie — Signature Edition',
-			'price' => '$65.00',
-			'desc'  => 'Elevated hoodie with signature detailing',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'br-005-hoodie-sig.jpg',
-		),
-		array(
-			'sku'        => 'br-006',
-			'name'       => 'BLACK Rose Sherpa Jacket',
-			'price'      => '$95.00',
-			'desc'       => 'Luxe sherpa-lined outerwear with embroidered rose',
-			'badge'      => 'Pre-Order',
-			'image'      => $img_base . 'br-006-sherpa.webp',
-			'back_image' => $img_base . 'br-006-sherpa-back.webp',
-		),
-		array(
-			'sku'   => 'br-007',
-			'name'  => 'BLACK Rose × Love Hurts Basketball Shorts',
-			'price' => '$65.00',
-			'desc'  => 'Cross-collection collaboration piece',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'br-007-shorts.jpg',
-		),
-		array(
-			'sku'   => 'br-008',
-			'name'  => "Women's BLACK Rose Hooded Dress",
-			'price' => 'TBD',
-			'desc'  => 'Feminine hooded dress with gothic silhouette',
-			'badge' => 'Draft',
-			'image' => $img_base . 'br-008-hooded-dress.webp',
-		),
-	);
-
-	if ( ! function_exists( 'wc_get_products' ) ) {
-		return $static_products;
+		if ( ! empty( $wc_products ) ) {
+			$products = array();
+			foreach ( $wc_products as $wc_product ) {
+				$products[] = array(
+					'sku'   => $wc_product->get_sku(),
+					'name'  => $wc_product->get_name(),
+					'price' => $wc_product->get_price_html(),
+					'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
+					'badge' => $wc_product->get_meta( '_collection_badge' ),
+					'url'   => get_permalink( $wc_product->get_id() ),
+					'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+				);
+			}
+			return $products;
+		}
 	}
 
-	$wc_products = wc_get_products(
-		array(
-			'limit'    => 8,
-			'category' => array( 'black-rose' ),
-			'status'   => 'publish',
-			'orderby'  => 'menu_order',
-			'order'    => 'ASC',
-		)
-	);
+	// Fallback: centralized product catalog.
+	$catalog_products = skyyrose_get_collection_products( 'black-rose' );
+	$display_products = array();
 
-	if ( empty( $wc_products ) ) {
-		return $static_products;
-	}
-
-	$products = array();
-	foreach ( $wc_products as $wc_product ) {
-		$products[] = array(
-			'sku'   => $wc_product->get_sku(),
-			'name'  => $wc_product->get_name(),
-			'price' => $wc_product->get_price_html(),
-			'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
-			'badge' => $wc_product->get_meta( '_collection_badge' ),
-			'url'   => get_permalink( $wc_product->get_id() ),
-			'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+	foreach ( $catalog_products as $p ) {
+		$display_products[] = array(
+			'sku'        => $p['sku'],
+			'name'       => $p['name'],
+			'price'      => skyyrose_format_price( $p ),
+			'desc'       => $p['description'],
+			'badge'      => $p['badge'],
+			'image'      => skyyrose_product_image_uri( $p['image'] ),
+			'back_image' => ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '',
 		);
 	}
 
-	return $products;
+	return $display_products;
 }
 endif;
 

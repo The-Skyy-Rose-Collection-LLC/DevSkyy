@@ -1,13 +1,14 @@
 {
-  "active": true,
-  "iteration": 3,
+  "active": false,
+  "iteration": 4,
   "minIterations": 1,
   "maxIterations": 0,
   "completionPromise": "COMPLETE",
   "tasksMode": false,
   "taskPromise": "READY_FOR_NEXT_TASK",
-  "prompt": "Read .ralph/ralph-context.md — that is your deployment directive. Every instruction in    \n  that file is non-negotiable. You are Ralph. You are deploying the SkyyRose Flagship WordPress    \n  theme to enterprise-ready, Fortune 500-tier production. The theme already exists at              \n  wordpress-theme/skyyrose-flagship/ — you built it Feb 24-25. Now you're finishing it. PRIORITY 1:\n   WordPress Media Cleanup — the media library has 1,444 images with massive duplication and no    \n  organization. Delete JPG duplicates where WebP exists, delete batch-numbered 0XXX_ files where   \n  main versions exist, update alt text on all canonical images. PRIORITY 2: Product Data Audit — 13\n   local image files are Git LFS pointer stubs (131 bytes), NOT real images. Download real product \n  photos from WordPress media URLs listed in the directive. Fix products.csv — add sg-008 Crop\n  Hoodie, add lh-005 Windbreaker, reconcile sg-006 (CSV says hoodie but image is a mint tee).\n  PRIORITY 3: AI Product Visualization Pipeline — install dependencies (gradio_client, fal-client,\n  @google/model-viewer). Create consistent brand avatar with InstantID + Hunyuan3D-2.1. Run\n  IDM-VTON + Leffa for front+back model shots on ALL products — 100% accurate replicas. Integrate\n  full-body 3D avatar into WordPress via model-viewer. SFTP deploy everything to skyyrose.co. Use\n  elite web developer agents for ALL visualization work. Context7 BEFORE any code — verify at START\n   and END of every iteration. NEVER delete .ralph/ralph-context.md. Update the Progress Log after\n  every iteration. Go.",
+  "prompt": "STOPPED BY USER — session 2026-02-25",
   "startedAt": "2026-02-25T22:11:09.549Z",
+  "stoppedAt": "2026-02-25T23:42:00.000Z",
   "model": "claude-opus-4-6",
   "agent": "claude-code"
 }

@@ -15,166 +15,91 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 
 /**
- * Build the SIGNATURE product catalog.
+ * Build the SIGNATURE product list for template rendering.
  *
- * Attempts a WooCommerce query first; falls back to the static catalog
- * defined in the PRD so the page is never empty.
- *
- * @return array<int, array{sku:string, name:string, price:string, desc:string, badge:string, url:string, image:string}>
+ * Uses the centralized catalog (inc/product-catalog.php) as source of truth.
+ * Splits sg-001 (Bay Set) and sg-002 (Stay Golden) into tee+shorts variants
+ * for the collection display.
  */
 if ( ! function_exists( 'skyyrose_get_signature_products' ) ) :
 function skyyrose_get_signature_products() {
 
-	$img_base = get_template_directory_uri() . '/assets/images/products/';
-
-	$static_products = array(
-		array(
-			'sku'   => 'sg-001-tee',
-			'name'  => 'The Bay Set — Tee',
-			'price' => '$40.00',
-			'desc'  => 'Iconic blue rose and Bay Area skyline on crisp white premium cotton',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'sg-001-bay-set.webp',
-		),
-		array(
-			'sku'   => 'sg-001-shorts',
-			'name'  => 'The Bay Set — Shorts',
-			'price' => '$50.00',
-			'desc'  => 'Bay skyline panorama on premium mesh with signature blue rose',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'sg-001-bay-set.webp',
-		),
-		array(
-			'sku'   => 'sg-002-tee',
-			'name'  => 'Stay Golden Set — Tee',
-			'price' => '$40.00',
-			'desc'  => 'Elevated everyday style with golden SkyyRose touch',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'sg-002-stay-golden-tee.jpg',
-		),
-		array(
-			'sku'   => 'sg-002-shorts',
-			'name'  => 'Stay Golden Set — Shorts',
-			'price' => '$50.00',
-			'desc'  => 'Luxuriously textured mesh with abstract cityscape',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'sg-010-bridge-shorts.webp',
-		),
-		array(
-			'sku'   => 'sg-003',
-			'name'  => 'The Signature Tee (Orchid)',
-			'price' => '$15.00',
-			'desc'  => 'Essential tee with gold SkyyRose label in orchid',
-			'badge' => '',
-			'image' => $img_base . 'sg-003-pink-smoke-crewneck.jpg',
-		),
-		array(
-			'sku'   => 'sg-004',
-			'name'  => 'The Signature Hoodie',
-			'price' => 'Coming Soon',
-			'desc'  => 'The quintessential SkyyRose hoodie in signature colorway with embroidered rose detail',
-			'badge' => 'Draft',
-			'image' => $img_base . 'sg-004-signature-hoodie.webp',
-		),
-		array(
-			'sku'   => 'sg-005',
-			'name'  => 'Stay Golden Tee',
-			'price' => '$40.00',
-			'desc'  => 'Statement tee with opulent rose design symbolizing resilience',
-			'badge' => '',
-			'image' => $img_base . 'sg-005-stay-golden-tee.webp',
-		),
-		array(
-			'sku'   => 'sg-006',
-			'name'  => 'Mint & Lavender Hoodie',
-			'price' => '$45.00',
-			'desc'  => 'Refreshing mint base meets opulent lavender artistry',
-			'badge' => 'New',
-			'image' => $img_base . 'sg-006-mint-lavender-hoodie.jpg',
-		),
-		array(
-			'sku'   => 'sg-007',
-			'name'  => 'The Signature Beanie',
-			'price' => '$25.00',
-			'desc'  => 'Luxurious knit beanie with embroidered rose — Red, Purple, Black',
-			'badge' => '',
-			'image' => $img_base . 'sg-007-signature-beanie.webp',
-		),
-		array(
-			'sku'        => 'sg-008',
-			'name'       => 'Signature Crop Hoodie',
-			'price'      => '$50.00',
-			'desc'       => 'Cropped silhouette meets luxury streetwear. Peach rose-gold front with black rose design on the back',
-			'badge'      => 'Pre-Order',
-			'image'      => $img_base . 'sg-008-crop-hoodie.webp',
-			'back_image' => $img_base . 'sg-008-crop-hoodie-back.webp',
-		),
-		array(
-			'sku'   => 'sg-009',
-			'name'  => 'The Sherpa Jacket',
-			'price' => '$80.00',
-			'desc'  => 'Opulent outerwear with signature rose embroidery and Sherpa lining',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'sg-009-sherpa-jacket.webp',
-		),
-		array(
-			'sku'   => 'sg-010',
-			'name'  => 'The Bridge Series Shorts',
-			'price' => '$25.00',
-			'desc'  => 'Bay Area iconic bridge panorama on premium mesh',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'sg-010-bridge-shorts.webp',
-		),
-		array(
-			'sku'   => 'sg-011',
-			'name'  => 'Original Label Tee (White)',
-			'price' => 'Coming Soon',
-			'desc'  => 'The foundational piece featuring the original SkyyRose label',
-			'badge' => 'Draft',
-			'image' => $img_base . 'sg-011-label-tee-white.webp',
-		),
-		array(
-			'sku'   => 'sg-012',
-			'name'  => 'Original Label Tee (Orchid)',
-			'price' => 'Coming Soon',
-			'desc'  => 'Original SkyyRose label in a striking orchid colorway',
-			'badge' => 'Draft',
-			'image' => $img_base . 'sg-012-label-tee-orchid.webp',
-		),
-	);
-
-	if ( ! function_exists( 'wc_get_products' ) ) {
-		return $static_products;
-	}
-
-	$wc_products = wc_get_products(
-		array(
-			'limit'    => 12,
-			'category' => array( 'signature' ),
-			'status'   => 'publish',
-			'orderby'  => 'menu_order',
-			'order'    => 'ASC',
-		)
-	);
-
-	if ( empty( $wc_products ) ) {
-		return $static_products;
-	}
-
-	$products = array();
-	foreach ( $wc_products as $wc_product ) {
-		$products[] = array(
-			'sku'   => $wc_product->get_sku(),
-			'name'  => $wc_product->get_name(),
-			'price' => $wc_product->get_price_html(),
-			'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
-			'badge' => $wc_product->get_meta( '_collection_badge' ),
-			'url'   => get_permalink( $wc_product->get_id() ),
-			'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+	// Try WooCommerce first.
+	if ( function_exists( 'wc_get_products' ) ) {
+		$wc_products = wc_get_products(
+			array(
+				'limit'    => 15,
+				'category' => array( 'signature' ),
+				'status'   => 'publish',
+				'orderby'  => 'menu_order',
+				'order'    => 'ASC',
+			)
 		);
+
+		if ( ! empty( $wc_products ) ) {
+			$products = array();
+			foreach ( $wc_products as $wc_product ) {
+				$products[] = array(
+					'sku'   => $wc_product->get_sku(),
+					'name'  => $wc_product->get_name(),
+					'price' => $wc_product->get_price_html(),
+					'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
+					'badge' => $wc_product->get_meta( '_collection_badge' ),
+					'url'   => get_permalink( $wc_product->get_id() ),
+					'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+				);
+			}
+			return $products;
+		}
 	}
 
-	return $products;
+	// Fallback: centralized product catalog with set splits.
+	$catalog_products = skyyrose_get_collection_products( 'signature' );
+	$display_products = array();
+
+	// SKUs that represent sets — split into tee + shorts for collection display.
+	$set_skus = array( 'sg-001', 'sg-002' );
+
+	foreach ( $catalog_products as $p ) {
+		$img_uri = skyyrose_product_image_uri( $p['image'] );
+
+		if ( in_array( $p['sku'], $set_skus, true ) ) {
+			// Split set into tee and shorts.
+			$display_products[] = array(
+				'sku'        => $p['sku'] . '-tee',
+				'name'       => $p['name'] . ' — Tee',
+				'price'      => '$40.00',
+				'desc'       => $p['description'],
+				'badge'      => $p['badge'],
+				'image'      => $img_uri,
+				'back_image' => '',
+			);
+			$shorts_img = 'sg-001' === $p['sku']
+				? $img_uri
+				: skyyrose_product_image_uri( 'assets/images/products/sg-010-bridge-shorts.webp' );
+			$display_products[] = array(
+				'sku'        => $p['sku'] . '-shorts',
+				'name'       => $p['name'] . ' — Shorts',
+				'price'      => '$50.00',
+				'desc'       => $p['description'],
+				'badge'      => $p['badge'],
+				'image'      => $shorts_img,
+				'back_image' => '',
+			);
+		} else {
+			$display_products[] = array(
+				'sku'        => $p['sku'],
+				'name'       => $p['name'],
+				'price'      => skyyrose_format_price( $p ),
+				'desc'       => $p['description'],
+				'badge'      => $p['badge'],
+				'image'      => $img_uri,
+				'back_image' => ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '',
+			);
+		}
+	}
+
+	return $display_products;
 }
 endif;
 

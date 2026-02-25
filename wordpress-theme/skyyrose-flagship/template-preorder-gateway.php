@@ -16,214 +16,35 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Product catalog data organized by collection.
- * Will be replaced with WooCommerce product queries in production.
+ * Product catalog data for the pre-order gateway.
+ *
+ * Sourced from the centralized catalog (inc/product-catalog.php).
+ * Only includes products with active pre-orders.
  */
-$gateway_products = array(
-	// Black Rose Collection
-	array(
-		'id'              => 'br-002',
-		'name'            => esc_html__( 'BLACK Rose Joggers', 'skyyrose-flagship' ),
-		'price'           => '$50',
-		'collection'      => 'black-rose',
-		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Twilight comfort meets gothic romance. Embroidered black roses bloom on soft fabric.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/br-002-joggers.jpg',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'br-004',
-		'name'            => esc_html__( 'BLACK Rose Hoodie', 'skyyrose-flagship' ),
-		'price'           => '$40',
-		'collection'      => 'black-rose',
-		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Gothic luxury in twilight shadows. Intricate embroidery captures the bloom of darkness.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/br-004-hoodie.jpg',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'br-005',
-		'name'            => esc_html__( 'BLACK Rose Hoodie — Signature Edition', 'skyyrose-flagship' ),
-		'price'           => '$65',
-		'collection'      => 'black-rose',
-		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'The definitive Black Rose hoodie. Signature edition with premium detailing and numbered tag.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/br-005-hoodie-sig.jpg',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'br-006',
-		'name'            => esc_html__( 'BLACK Rose Sherpa Jacket', 'skyyrose-flagship' ),
-		'price'           => '$95',
-		'collection'      => 'black-rose',
-		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Lustrous black satin with plush Sherpa lining, crowned by an exquisite embroidered rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/br-006-sherpa.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'br-007',
-		'name'            => esc_html__( 'BLACK Rose x Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-		'price'           => '$65',
-		'collection'      => 'black-rose',
-		'collection_label' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Two worlds collide. A cross-collection collaboration merging Black Rose darkness with Love Hurts fire.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/br-007-shorts.jpg',
-		'edition'         => '250',
-	),
-
-	// Love Hurts Collection
-	array(
-		'id'              => 'lh-001',
-		'name'            => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
-		'price'           => '$65',
-		'collection'      => 'love-hurts',
-		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => 'One Size',
-		'desc'            => esc_html__( 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'lh-002',
-		'name'            => esc_html__( 'Love Hurts Joggers', 'skyyrose-flagship' ),
-		'price'           => '$95',
-		'collection'      => 'love-hurts',
-		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Oakland grit meets luxury. Feel the fire with the embroidered rose, a symbol of passion.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'lh-003',
-		'name'            => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-		'price'           => '$75',
-		'collection'      => 'love-hurts',
-		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'lh-004',
-		'name'            => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
-		'price'           => '$265',
-		'collection'      => 'love-hurts',
-		'collection_label' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
-		'edition'         => '250',
-	),
-
-	// Signature Collection
-	array(
-		'id'              => 'sg-001',
-		'name'            => esc_html__( 'The Bay Set', 'skyyrose-flagship' ),
-		'price'           => '$195',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Embody West Coast luxury with this exclusive ensemble. Iconic blue rose and vibrant Bay Area skyline.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-002',
-		'name'            => esc_html__( 'Stay Golden Tee', 'skyyrose-flagship' ),
-		'price'           => '$65',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'XS,S,M,L,XL,2XL',
-		'desc'            => esc_html__( 'Embrace West Coast prestige. Luxurious statement of Bay Area style featuring signature rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-002-stay-golden-tee.jpg',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-003',
-		'name'            => esc_html__( 'The Signature Tee (Orchid)', 'skyyrose-flagship' ),
-		'price'           => '$15',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'The essential SkyyRose tee in a rich orchid colorway. Soft cotton with embroidered rose.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-012-label-tee-orchid.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-006',
-		'name'            => esc_html__( 'Mint & Lavender Hoodie', 'skyyrose-flagship' ),
-		'price'           => '$45',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Sweet pastel vibes meet streetwear luxury. Mint and lavender colorblock with signature rose detail.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-006-mint-lavender-hoodie.jpg',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-005',
-		'name'            => esc_html__( 'Stay Golden Tee (Classic)', 'skyyrose-flagship' ),
-		'price'           => '$40',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'XS,S,M,L,XL,2XL',
-		'desc'            => esc_html__( 'The classic Stay Golden silhouette. Timeless Bay Area luxury in every stitch.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-005-stay-golden-tee.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-007',
-		'name'            => esc_html__( 'The Signature Beanie', 'skyyrose-flagship' ),
-		'price'           => '$25',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'One Size',
-		'desc'            => esc_html__( 'Classic fitted beanie with embroidered signature rose. West Coast luxury meets everyday warmth.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-007-signature-beanie.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-008',
-		'name'            => esc_html__( 'Signature Crop Hoodie', 'skyyrose-flagship' ),
-		'price'           => '$50',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'XS,S,M,L,XL,2XL',
-		'desc'            => esc_html__( 'Cropped silhouette meets luxury streetwear. Peach rose-gold front with black rose design on the back.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-008-crop-hoodie.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-009',
-		'name'            => esc_html__( 'The Sherpa Jacket', 'skyyrose-flagship' ),
-		'price'           => '$80',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL,3XL',
-		'desc'            => esc_html__( 'Plush sherpa warmth in the SkyyRose signature colorway. Luxury outerwear for the West Coast.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-009-sherpa-jacket.webp',
-		'edition'         => '250',
-	),
-	array(
-		'id'              => 'sg-010',
-		'name'            => esc_html__( 'The Bridge Series Shorts', 'skyyrose-flagship' ),
-		'price'           => '$25',
-		'collection'      => 'signature',
-		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
-		'sizes'           => 'S,M,L,XL,2XL',
-		'desc'            => esc_html__( 'From the Bridge Series. Athletic shorts celebrating the iconic Bay Area bridges.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-010-bridge-shorts.webp',
-		'edition'         => '250',
-	),
+$collection_labels = array(
+	'black-rose' => esc_html__( 'Black Rose', 'skyyrose-flagship' ),
+	'love-hurts' => esc_html__( 'Love Hurts', 'skyyrose-flagship' ),
+	'signature'  => esc_html__( 'Signature', 'skyyrose-flagship' ),
 );
+
+$gateway_products = array();
+$preorder_groups  = skyyrose_get_preorder_products();
+
+foreach ( $preorder_groups as $collection_slug => $products ) {
+	foreach ( $products as $p ) {
+		$gateway_products[] = array(
+			'id'               => $p['sku'],
+			'name'             => esc_html( $p['name'] ),
+			'price'            => '$' . number_format( $p['price'], 0 ),
+			'collection'       => $p['collection'],
+			'collection_label' => $collection_labels[ $p['collection'] ],
+			'sizes'            => str_replace( '|', ',', $p['sizes'] ),
+			'desc'             => esc_html( $p['description'] ),
+			'image'            => skyyrose_product_image_uri( $p['image'] ),
+			'edition'          => (string) $p['edition_size'],
+		);
+	}
+}
 
 get_header();
 ?>

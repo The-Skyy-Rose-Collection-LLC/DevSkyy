@@ -59,7 +59,7 @@ function skyyrose_inline_critical_css() {
 			--gold: #D4AF37;
 			--silver: #C0C0C0;
 			--font-heading: "Playfair Display", Georgia, serif;
-			--font-body: "Montserrat", "Helvetica Neue", Arial, sans-serif;
+			--font-body: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 		}
 	';
 
@@ -67,16 +67,4 @@ function skyyrose_inline_critical_css() {
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_inline_critical_css', 6 );
 
-/**
- * Preload brand fonts for performance.
- *
- * @since 2.0.0
- */
-function skyyrose_preload_fonts() {
-	?>
-	<link rel="preconnect" href="https://fonts.googleapis.com">
-	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Montserrat:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-	<?php
-}
-add_action( 'wp_head', 'skyyrose_preload_fonts', 1 );
+// Font preloading moved to inc/enqueue.php (self-hosted fonts, GDPR-compliant).

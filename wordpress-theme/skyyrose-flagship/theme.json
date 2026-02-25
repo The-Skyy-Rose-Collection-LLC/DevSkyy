@@ -205,33 +205,9 @@
 					"fontFace": [
 						{
 							"fontFamily": "Inter",
-							"fontWeight": "300",
+							"fontWeight": "300 700",
 							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuDyfAZ9hjQ.woff2"]
-						},
-						{
-							"fontFamily": "Inter",
-							"fontWeight": "400",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hjQ.woff2"]
-						},
-						{
-							"fontFamily": "Inter",
-							"fontWeight": "500",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuBWfAZ9hjQ.woff2"]
-						},
-						{
-							"fontFamily": "Inter",
-							"fontWeight": "600",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuGKYAZ9hjQ.woff2"]
-						},
-						{
-							"fontFamily": "Inter",
-							"fontWeight": "700",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/inter/v18/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuFuYAZ9hjQ.woff2"]
+							"src": ["file:./assets/fonts/inter-latin.woff2"]
 						}
 					]
 				},
@@ -242,45 +218,9 @@
 					"fontFace": [
 						{
 							"fontFamily": "Playfair Display",
-							"fontWeight": "400",
+							"fontWeight": "400 800",
 							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdFvXDXbtM.woff2"]
-						},
-						{
-							"fontFamily": "Playfair Display",
-							"fontWeight": "600",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKd1snDXbtM.woff2"]
-						},
-						{
-							"fontFamily": "Playfair Display",
-							"fontWeight": "700",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKdMsnDXbtM.woff2"]
-						},
-						{
-							"fontFamily": "Playfair Display",
-							"fontWeight": "800",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKcbsnDXbtM.woff2"]
-						},
-						{
-							"fontFamily": "Playfair Display",
-							"fontWeight": "900",
-							"fontStyle": "normal",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFvD-vYSZviVYUb_rj3ij__anPXJzDwcbmjWBN2PKcysnDXbtM.woff2"]
-						},
-						{
-							"fontFamily": "Playfair Display",
-							"fontWeight": "400",
-							"fontStyle": "italic",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_qiTbtbK-F0.woff2"]
-						},
-						{
-							"fontFamily": "Playfair Display",
-							"fontWeight": "700",
-							"fontStyle": "italic",
-							"src": ["https://fonts.gstatic.com/s/playfairdisplay/v37/nuFRD-vYSZviVYUb_rj3ij__anPXDTnCjmHKM4nYO7KN_pOUbtbK-F0.woff2"]
+							"src": ["file:./assets/fonts/playfair-display-latin.woff2"]
 						}
 					]
 				}
