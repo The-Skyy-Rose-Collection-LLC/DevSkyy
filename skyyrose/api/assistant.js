@@ -105,28 +105,32 @@ function loadCatalog() {
   return PRODUCT_CATALOG;
 }
 
-// Fallback embedded catalog (core 20 products) if file is unavailable
+// Fallback embedded catalog — owner-confirmed prices (2026-02-24)
+// null price = DRAFT (not yet published)
 const FALLBACK_CATALOG = {
-  'br-001': { name: 'BLACK Rose Crewneck',              collection: 'black-rose', price: null },
-  'br-002': { name: 'BLACK Rose Joggers',               collection: 'black-rose', price: null },
-  'br-003': { name: 'BLACK is Beautiful Jersey',        collection: 'black-rose', price: null },
-  'br-004': { name: 'BLACK Rose Hoodie',                collection: 'black-rose', price: null },
-  'br-005': { name: 'BLACK Rose Hoodie — Signature Ed', collection: 'black-rose', price: null },
-  'br-006': { name: 'BLACK Rose Sherpa Jacket',         collection: 'black-rose', price: null },
-  'br-007': { name: 'BLACK Rose × Love Hurts Shorts',   collection: 'black-rose', price: null },
-  'br-008': { name: "Women's BLACK Rose Hooded Dress",  collection: 'black-rose', price: null },
-  'lh-001': { name: 'The Fannie',                       collection: 'love-hurts', price: null },
-  'lh-002': { name: 'Love Hurts Joggers',               collection: 'love-hurts', price: null },
-  'lh-003': { name: 'Love Hurts Basketball Shorts',     collection: 'love-hurts', price: null },
-  'lh-004': { name: 'Love Hurts Hoodie',                collection: 'love-hurts', price: null },
-  'lh-005': { name: 'Love Hurts Crewneck',              collection: 'love-hurts', price: null },
-  'lh-006': { name: 'Love Hurts T-Shirt',               collection: 'love-hurts', price: null },
-  'sg-001': { name: 'Signature Rose Hoodie',            collection: 'signature',  price: null },
-  'sg-002': { name: 'Signature Rose Crewneck',          collection: 'signature',  price: null },
-  'sg-003': { name: 'Signature Joggers',                collection: 'signature',  price: null },
-  'sg-004': { name: 'Signature Tee',                    collection: 'signature',  price: null },
-  'sg-005': { name: 'Signature Cap',                    collection: 'signature',  price: null },
-  'sg-006': { name: 'Signature Zip-Up',                 collection: 'signature',  price: null },
+  'br-001': { name: 'BLACK Rose Crewneck',                         collection: 'black-rose', price: null },
+  'br-002': { name: 'BLACK Rose Joggers',                          collection: 'black-rose', price: 50 },
+  'br-003': { name: 'BLACK is Beautiful Jersey',                   collection: 'black-rose', price: null },
+  'br-004': { name: 'BLACK Rose Hoodie',                           collection: 'black-rose', price: 40 },
+  'br-005': { name: 'BLACK Rose Hoodie — Signature Edition',       collection: 'black-rose', price: 65 },
+  'br-006': { name: 'BLACK Rose Sherpa Jacket',                    collection: 'black-rose', price: 95 },
+  'br-007': { name: 'BLACK Rose × Love Hurts Basketball Shorts',   collection: 'black-rose', price: 65 },
+  'br-008': { name: "Women's BLACK Rose Hooded Dress",             collection: 'black-rose', price: null },
+  'lh-001': { name: 'The Fannie',                                  collection: 'love-hurts', price: 70 },
+  'lh-002': { name: 'Love Hurts Joggers (BLACK)',                  collection: 'love-hurts', price: 67 },
+  'lh-002b': { name: 'Love Hurts Joggers (WHITE)',                 collection: 'love-hurts', price: 67 },
+  'lh-003': { name: 'Love Hurts Basketball Shorts',                collection: 'love-hurts', price: 55 },
+  'lh-004': { name: 'Love Hurts Varsity Jacket',                   collection: 'love-hurts', price: null },
+  'sg-001-tee':    { name: 'The Bay Set — Tee',                    collection: 'signature',  price: 40 },
+  'sg-001-shorts': { name: 'The Bay Set — Shorts',                 collection: 'signature',  price: 50 },
+  'sg-002-tee':    { name: 'Stay Golden Set — Tee',                collection: 'signature',  price: 40 },
+  'sg-002-shorts': { name: 'Stay Golden Set — Shorts',             collection: 'signature',  price: 50 },
+  'sg-003': { name: 'The Signature Tee (Orchid)',                   collection: 'signature',  price: 15 },
+  'sg-005': { name: 'Stay Golden Tee',                             collection: 'signature',  price: 40 },
+  'sg-006': { name: 'Mint & Lavender Hoodie',                      collection: 'signature',  price: 45 },
+  'sg-007': { name: 'The Signature Beanie',                        collection: 'signature',  price: 25 },
+  'sg-009': { name: 'The Sherpa Jacket',                           collection: 'signature',  price: 80 },
+  'sg-010': { name: 'The Bridge Series Shorts',                    collection: 'signature',  price: 25 },
 };
 
 // ---------------------------------------------------------------------------

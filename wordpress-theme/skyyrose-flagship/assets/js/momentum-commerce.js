@@ -57,15 +57,15 @@
 		spotlightDuration: 3000,      // ms the spotlight beam is visible
 		spotlightCooldown: 20000,     // ms before re-triggering in same room
 		spotlightProducts: [          // SKUs ranked by popularity
-			'br-004', 'lh-004', 'sg-001', 'br-006', 'lh-005',
-			'sg-004', 'br-005', 'br-001', 'lh-001', 'sg-002',
+			'br-004', 'br-006', 'br-005', 'lh-001', 'lh-002',
+			'lh-003', 'sg-001-tee', 'sg-009', 'sg-006', 'sg-005',
 		],
 
 		// Static page product glow (best sellers)
 		glowSelectors: [
 			'.product-card[data-sku="br-004"]',
-			'.product-card[data-sku="lh-004"]',
-			'.product-card[data-sku="sg-001"]',
+			'.product-card[data-sku="lh-002"]',
+			'.product-card[data-sku="sg-001-tee"]',
 		],
 	};
 
