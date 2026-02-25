@@ -298,8 +298,7 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 			);
 
 			foreach ( $skyyrose_other_collections as $skyyrose_col ) :
-				$skyyrose_page = get_page_by_path( $skyyrose_col['slug'] );
-				$skyyrose_link = $skyyrose_page ? get_permalink( $skyyrose_page ) : '#';
+				$skyyrose_link = home_url( '/' . $skyyrose_col['slug'] . '/' );
 				?>
 				<a href="<?php echo esc_url( $skyyrose_link ); ?>"
 				   class="collection-explore__link">

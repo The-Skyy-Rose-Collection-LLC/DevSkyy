@@ -323,8 +323,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 			);
 
 			foreach ( $skyyrose_other_collections as $skyyrose_col ) :
-				$skyyrose_page = get_page_by_path( $skyyrose_col['slug'] );
-				$skyyrose_link = $skyyrose_page ? get_permalink( $skyyrose_page ) : '#';
+				$skyyrose_link = home_url( '/' . $skyyrose_col['slug'] . '/' );
 				?>
 				<a href="<?php echo esc_url( $skyyrose_link ); ?>"
 				   class="collection-explore__link">
