@@ -818,16 +818,14 @@ function skyyrose_add_landmark_roles() {
 add_action( 'wp_footer', 'skyyrose_add_landmark_roles' );
 
 /**
- * Add preconnect for external resources.
+ * Add dns-prefetch for external resources used by WooCommerce.
+ *
+ * Google Fonts preconnect is handled in enqueue.php (skyyrose_preconnect_fonts).
  *
  * @since 1.0.0
  */
 function skyyrose_preconnect_resources() {
-	echo '<link rel="preconnect" href="https://fonts.googleapis.com">' . "\n";
-	echo '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>' . "\n";
-
 	if ( class_exists( 'WooCommerce' ) ) {
-		// Preconnect to WooCommerce CDN if using external resources
 		echo '<link rel="dns-prefetch" href="//www.google-analytics.com">' . "\n";
 	}
 }
