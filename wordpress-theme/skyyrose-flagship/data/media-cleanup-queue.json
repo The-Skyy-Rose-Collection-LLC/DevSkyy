@@ -1,0 +1,51 @@
+{
+  "_comment": "WordPress media items queued for deletion. All JPGs have confirmed WebP counterparts. Delete via WP Admin > Media Library or WP-CLI.",
+  "_generated": "2026-02-25 iteration 21",
+  "jpgs_to_delete": {
+    "_reason": "JPG duplicates where WebP canonical version exists",
+    "black_rose": [
+      {"id": 8732, "file": "BR_DEC_18_2023_6_09_21_PM_1_main.jpg", "webp_id": 8615},
+      {"id": 8719, "file": "BR_003_20230616_170635_main.jpg", "webp_id": 8718},
+      {"id": 8736, "file": "BR_THE_BLACK_ROSE_SHERPA_main.jpg", "webp_id": 8878},
+      {"id": 8879, "file": "BR_THE_BLACK_ROSE_SHERPA_main-1.jpg", "webp_id": 8878},
+      {"id": 8735, "file": "BR_THE_BLACK_ROSE_SHERPA_BACK_main.jpg", "webp_id": 8717},
+      {"id": 8737, "file": "BR_WOMENS_BLACK_ROSE_HOODED_DRESS_main.jpg", "webp_id": 8711}
+    ],
+    "love_hurts": [
+      {"id": 8783, "file": "LH_THE_FANNIE_PACK_main.jpg", "webp_id": 8863},
+      {"id": 8864, "file": "LH_THE_FANNIE_PACK_main-1.jpg", "webp_id": 8863},
+      {"id": 8782, "file": "LH_SINCERELY_HEARTED_JOGGERS_BLAC_main.jpg", "webp_id": 8628},
+      {"id": 8843, "file": "LH_SINCERELY_HEARTED_JOGGERS_BLAC_main-1.jpg", "webp_id": 8842},
+      {"id": 8768, "file": "LH_MEN_WINDBREAKER_JACKET_1_main.jpg", "webp_id": 8661},
+      {"id": 8889, "file": "LH_MEN_WINDBREAKER_JACKET_1_main-1.jpg", "webp_id": 8888}
+    ],
+    "signature": [
+      {"id": 8787, "file": "SIG_001_20231221_222005_main.jpg", "webp_id": 8874},
+      {"id": 8789, "file": "SIG_004_20231221_222005_main.jpg", "webp_id": 8831},
+      {"id": 8832, "file": "SIG_004_20231221_222005_main-1.jpg", "webp_id": 8831},
+      {"id": 8794, "file": "SIG_CROP_HOODIE_FRONT_main.jpg", "webp_id": 8666},
+      {"id": 8897, "file": "SIG_CROP_HOODIE_FRONT_main-1.jpg", "webp_id": 8896},
+      {"id": 8793, "file": "SIG_CROP_HOODIE_BACK_main.jpg", "webp_id": 8654},
+      {"id": 8883, "file": "SIG_CROP_HOODIE_BACK_main-1.jpg", "webp_id": 8882},
+      {"id": 8801, "file": "SIG_ORIGINAL_LABEL_TEE_WHITE_main.jpg", "webp_id": 8613},
+      {"id": 8800, "file": "SIG_ORIGINAL_LABEL_TEE_ORCHID_main.jpg", "webp_id": 8707}
+    ]
+  },
+  "duplicate_webp_reuploads": {
+    "_reason": "WebP re-uploads with -1 suffix where original WebP exists. Lower priority cleanup.",
+    "items": [
+      {"id": 8823, "file": "BR_DEC_18_2023_6_09_21_PM_1_main-1.webp", "original_id": 8615},
+      {"id": 8842, "file": "LH_SINCERELY_HEARTED_JOGGERS_BLAC_main-1.webp", "original_id": 8628},
+      {"id": 8888, "file": "LH_MEN_WINDBREAKER_JACKET_1_main-1.webp", "original_id": 8661},
+      {"id": 8896, "file": "SIG_CROP_HOODIE_FRONT_main-1.webp", "original_id": 8666},
+      {"id": 8882, "file": "SIG_CROP_HOODIE_BACK_main-1.webp", "original_id": 8654},
+      {"id": 8821, "file": "SIG_ORIGINAL_LABEL_TEE_WHITE_main-1.webp", "original_id": 8613}
+    ]
+  },
+  "summary": {
+    "total_jpgs_to_delete": 20,
+    "total_duplicate_webps": 6,
+    "total_items_to_clean": 26,
+    "method": "WP Admin bulk select or WP-CLI: wp media delete <id> --force"
+  }
+}

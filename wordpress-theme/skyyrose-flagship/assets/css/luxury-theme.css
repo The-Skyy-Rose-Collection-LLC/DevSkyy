@@ -17,8 +17,8 @@ body {
 	font-size: var(--text-base);
 	font-weight: var(--weight-regular);
 	line-height: 1.6;
-	color: var(--dark-gray);
-	background-color: var(--off-white);
+	color: #FFFFFF;
+	background-color: #0A0A0A;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
 }
@@ -28,7 +28,7 @@ h1, h2, h3, h4, h5, h6 {
 	font-weight: var(--weight-bold);
 	line-height: 1.2;
 	margin-bottom: var(--space-md);
-	color: var(--black);
+	color: #FFFFFF;
 }
 
 h1 {
@@ -152,9 +152,10 @@ select {
 	padding: var(--space-md);
 	font-family: var(--font-body);
 	font-size: var(--text-base);
-	border: 1px solid var(--mid-gray);
+	border: 1px solid rgba(255, 255, 255, 0.12);
 	border-radius: var(--radius-md);
-	background-color: var(--white);
+	background-color: rgba(255, 255, 255, 0.04);
+	color: #FFFFFF;
 	transition: all var(--transition-base);
 }
 
@@ -170,7 +171,7 @@ label {
 	display: block;
 	margin-bottom: var(--space-sm);
 	font-weight: var(--weight-medium);
-	color: var(--dark-gray);
+	color: rgba(255, 255, 255, 0.7);
 }
 
 /* ==================================================
@@ -207,10 +208,11 @@ label {
    ================================================== */
 
 .card {
-	background: var(--white);
+	background: #111111;
+	border: 1px solid rgba(255, 255, 255, 0.06);
 	border-radius: var(--radius-lg);
 	padding: var(--space-xl);
-	box-shadow: var(--shadow-elegant);
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 	transition: all var(--transition-luxury);
 }
 
@@ -232,7 +234,7 @@ label {
 }
 
 .card-description {
-	color: var(--mid-gray);
+	color: rgba(255, 255, 255, 0.5);
 	margin-bottom: var(--space-lg);
 }
 
@@ -244,9 +246,10 @@ label {
 	position: sticky;
 	top: 0;
 	z-index: var(--z-sticky);
-	background: rgba(255, 255, 255, 0.95);
-	backdrop-filter: var(--blur-sm);
-	box-shadow: var(--shadow-sm);
+	background: rgba(10, 10, 10, 0.95);
+	backdrop-filter: blur(20px);
+	-webkit-backdrop-filter: blur(20px);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .main-navigation a {
@@ -308,9 +311,10 @@ label {
    ================================================== */
 
 .site-footer {
-	background: var(--dark-gray);
-	color: var(--light-gray);
+	background: #000000;
+	color: rgba(255, 255, 255, 0.45);
 	padding: var(--space-3xl) 0 var(--space-xl);
+	border-top: 1px solid rgba(255, 255, 255, 0.04);
 }
 
 .site-footer a {

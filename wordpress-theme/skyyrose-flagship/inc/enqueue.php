@@ -76,6 +76,28 @@ function skyyrose_enqueue_global_styles() {
 			SKYYROSE_VERSION
 		);
 	}
+
+	// Header: navbar, search overlay, mobile menu, dropdowns.
+	$header_path = SKYYROSE_DIR . '/assets/css/header.css';
+	if ( file_exists( $header_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-header',
+			SKYYROSE_ASSETS_URI . '/css/header.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Footer: newsletter bar, grid columns, copyright bar, brand column.
+	$footer_path = SKYYROSE_DIR . '/assets/css/footer.css';
+	if ( file_exists( $footer_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-footer',
+			SKYYROSE_ASSETS_URI . '/css/footer.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
 }
 
 /**
@@ -854,6 +876,63 @@ function skyyrose_enqueue_velocity_scroll() {
 }
 
 /**
+ * Enqueue Model Viewer — 3D Brand Avatar.
+ *
+ * Loads Google model-viewer web component and the brand-avatar stylesheet
+ * on pages that include the brand-avatar template part (immersive scenes,
+ * collection pages, and the pre-order gateway).
+ *
+ * @since 3.2.0
+ * @return void
+ */
+function skyyrose_enqueue_model_viewer() {
+
+	$slug              = skyyrose_get_current_template_slug();
+	$model_viewer_slugs = array( 'immersive', 'collection', 'preorder-gateway', 'front-page' );
+
+	if ( ! in_array( $slug, $model_viewer_slugs, true ) ) {
+		return;
+	}
+
+	// Google model-viewer web component (type="module").
+	wp_enqueue_script(
+		'google-model-viewer',
+		'https://ajax.googleapis.com/ajax/libs/model-viewer/4.0/model-viewer.min.js',
+		array(),
+		'4.0',
+		true
+	);
+
+	// Brand avatar styles.
+	$css_path = SKYYROSE_DIR . '/assets/css/model-viewer.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-model-viewer',
+			SKYYROSE_ASSETS_URI . '/css/model-viewer.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+}
+
+/**
+ * Add type="module" to model-viewer script tag.
+ *
+ * model-viewer requires ES module loading via type="module".
+ *
+ * @since  3.2.0
+ * @param  string $tag    Full script tag HTML.
+ * @param  string $handle Script handle.
+ * @return string Modified tag.
+ */
+function skyyrose_model_viewer_module_type( $tag, $handle ) {
+	if ( 'google-model-viewer' === $handle ) {
+		return str_replace( '<script ', '<script type="module" ', $tag );
+	}
+	return $tag;
+}
+
+/**
  * Enqueue Analytics Beacon — Unified Event Relay.
  *
  * Collects conversion events from all SkyyRose engines (CIE, Aurora,
@@ -969,6 +1048,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-velocity-scroll',
 		'skyyrose-analytics-beacon',
 		'skyyrose-immersive-wc-bridge',
+		'google-model-viewer',
 	);
 
 	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
@@ -1057,6 +1137,12 @@ add_filter( 'script_loader_tag', 'skyyrose_defer_scripts', 10, 2 );
  * Re-enable selectively after initial deploy when baseline metrics pass.
  * Each engine has its own is_admin() guard already.
  *--------------------------------------------------------------*/
+
+// Model Viewer — 3D brand avatar on immersive/collection/preorder pages.
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_model_viewer', 28 );
+
+// Model Viewer — type="module" attribute for ES module loading.
+add_filter( 'script_loader_tag', 'skyyrose_model_viewer_module_type', 10, 2 );
 
 // Cross-Sell Engine — only on immersive pages (lightweight, high ROI).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_cross_sell_engine', 40 );

@@ -115,17 +115,7 @@
 	--blur-lg: blur(16px);
 }
 
-/**
- * Dark Mode Support (Optional)
- */
-@media (prefers-color-scheme: dark) {
-	:root {
-		--off-white: #1A1A1A;
-		--light-gray: #2A2A2A;
-		--mid-gray: #CCCCCC;
-		--dark-gray: #E5E5E5;
-	}
-}
+/* Site is always dark theme — no OS-preference switching */
 
 /**
  * Print Styles
