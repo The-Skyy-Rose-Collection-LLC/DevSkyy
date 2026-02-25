@@ -870,6 +870,11 @@ function skyyrose_enqueue_analytics_beacon() {
 			SKYYROSE_VERSION,
 			true
 		);
+
+		wp_localize_script( 'skyyrose-analytics-beacon', 'skyyBeaconConfig', array(
+			'endpoint'      => 'https://devskyy.app/api/conversion',
+			'flushInterval' => 5000,
+		) );
 	}
 }
 

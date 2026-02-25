@@ -25,9 +25,12 @@
 	   Configuration
 	   -------------------------------------------------- */
 
+	// Merge WordPress-localized config (set via wp_localize_script).
+	var wpCfg = window.skyyBeaconConfig || {};
+
 	var CFG = {
-		endpoint:       '/api/conversion',
-		flushInterval:  10000,   // 10s between flushes
+		endpoint:       wpCfg.endpoint || 'https://devskyy.app/api/conversion',
+		flushInterval:  parseInt(wpCfg.flushInterval, 10) || 5000, // 5s between flushes
 		maxBatchSize:   20,      // max events per send
 		maxQueueSize:   200,     // prevent unbounded growth
 		scrollSampleMs: 5000,    // throttle scroll depth reports
@@ -300,6 +303,64 @@
 	}
 
 	/* --------------------------------------------------
+	   Product View Tracking (WooCommerce single product)
+	   -------------------------------------------------- */
+
+	function initProductViewTracking() {
+		var productEl = document.querySelector('.single-product .product');
+		if (!productEl) return;
+
+		enqueue('product_view', {
+			product: (document.querySelector('.product_title') || {}).textContent || '',
+			sku: (document.querySelector('[data-product-sku]') || {}).dataset && document.querySelector('[data-product-sku]').dataset.productSku || '',
+			price: (document.querySelector('.price .amount') || {}).textContent || '',
+		}, 'woocommerce');
+	}
+
+	/* --------------------------------------------------
+	   Exit Intent Tracking
+	   -------------------------------------------------- */
+
+	function initExitIntentTracking() {
+		var fired = false;
+		document.addEventListener('mouseout', function (e) {
+			if (fired) return;
+			if (e.clientY <= 0 && e.relatedTarget === null) {
+				fired = true;
+				enqueue('exit_intent', { triggered: true }, 'beacon');
+			}
+		});
+	}
+
+	/* --------------------------------------------------
+	   Social Proof Click Tracking
+	   -------------------------------------------------- */
+
+	function initSocialProofTracking() {
+		document.addEventListener('click', function (e) {
+			var el = e.target.closest ? e.target.closest('.social-proof-toast, .social-proof-notification, [data-social-proof]') : null;
+			if (!el) return;
+			enqueue('social_proof_click', {
+				type: el.dataset.proofType || 'notification',
+			}, 'social-proof');
+		});
+	}
+
+	/* --------------------------------------------------
+	   Floating CTA Click Tracking
+	   -------------------------------------------------- */
+
+	function initFloatingCtaTracking() {
+		document.addEventListener('click', function (e) {
+			var el = e.target.closest ? e.target.closest('.floating-cta, .sticky-cta, [data-floating-cta]') : null;
+			if (!el) return;
+			enqueue('floating_cta_click', {
+				label: el.textContent ? el.textContent.trim().substring(0, 50) : '',
+			}, 'cta');
+		});
+	}
+
+	/* --------------------------------------------------
 	   Init
 	   -------------------------------------------------- */
 
@@ -316,6 +377,10 @@
 		initRoomTracking();
 		initPanelTracking();
 		initCartTracking();
+		initProductViewTracking();
+		initExitIntentTracking();
+		initSocialProofTracking();
+		initFloatingCtaTracking();
 
 		// Periodic flush
 		setInterval(flush, CFG.flushInterval);
