@@ -26,7 +26,7 @@ $black_rose_rooms = array(
 	// Room 1 — Moonlit Courtyard
 	array(
 		'name'     => esc_html__( 'Moonlit Courtyard', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-moonlit-courtyard.png',
+		'image'    => get_template_directory_uri() . '/assets/scenes/black-rose/black-rose-moonlit-courtyard.jpg',
 		'alt'      => esc_attr__( 'Moonlit garden courtyard with marble statues, black rose topiaries, and ornate fountains', 'skyyrose-flagship' ),
 		'products' => array(
 			array(
