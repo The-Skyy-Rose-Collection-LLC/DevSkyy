@@ -136,6 +136,7 @@ get_header();
 						alt="<?php echo esc_attr( $room['alt'] ); ?>"
 						loading="<?php echo 0 === $index ? 'eager' : 'lazy'; ?>"
 						<?php if ( 0 === $index ) : ?>fetchpriority="high"<?php endif; ?>
+						onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>';"
 					>
 				</div>
 			<?php endforeach; ?>
@@ -165,7 +166,7 @@ get_header();
 				<button
 					class="room-dot<?php echo 0 === $index ? ' active' : ''; ?>"
 					type="button"
-					aria-label="<?php echo esc_attr( $room['name'] ); ?>"
+					aria-label="<?php echo esc_attr( sprintf( __( 'Room %1$d of %2$d: %3$s', 'skyyrose-flagship' ), $index + 1, count( $love_hurts_rooms ), $room['name'] ) ); ?>"
 				></button>
 			<?php endforeach; ?>
 		</div>
@@ -226,7 +227,7 @@ get_header();
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
-				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="">
+				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>" alt="" onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>';">
 			</div>
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>

@@ -135,10 +135,12 @@
 	 */
 	function enhanceHotspots() {
 		var hotspots = document.querySelectorAll('.hotspot[data-product-sku]');
+		var useSku = true;
 
 		if (!hotspots.length) {
 			// Fall back: try hotspots with data-product-id only.
 			hotspots = document.querySelectorAll('.hotspot[data-product-id]');
+			useSku = false;
 		}
 
 		if (!hotspots.length) {
@@ -150,7 +152,9 @@
 
 		for (var i = 0; i < hotspots.length; i++) {
 			var hotspot = hotspots[i];
-			var sku = hotspot.getAttribute('data-product-sku');
+			var sku = useSku
+				? hotspot.getAttribute('data-product-sku')
+				: hotspot.getAttribute('data-product-id');
 
 			if (!sku) {
 				continue;
