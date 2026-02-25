@@ -50,7 +50,7 @@
    ================================================== */
 
 .cs-heading {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.6rem;
 	font-weight: 600;
 	letter-spacing: 0.22em;
@@ -202,7 +202,7 @@
    ================================================== */
 
 .cs-name {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.65rem;
 	font-weight: 500;
 	letter-spacing: 0.03em;
@@ -219,7 +219,7 @@
 }
 
 .cs-price {
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.7rem;
 	font-weight: 600;
 	color: var(--rose-gold, #B76E79);
@@ -243,7 +243,7 @@
 	border-radius: 6px;
 	background: transparent;
 
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.58rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;

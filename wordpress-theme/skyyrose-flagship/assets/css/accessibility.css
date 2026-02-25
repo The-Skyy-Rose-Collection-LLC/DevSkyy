@@ -1,0 +1,212 @@
+/**
+ * Accessibility Styles — WCAG 2.2 AA
+ *
+ * Focus indicators, screen reader utilities, skip links,
+ * high contrast support, and reduced motion preferences.
+ *
+ * @package SkyyRose_Flagship
+ * @since   3.0.0
+ */
+
+/* ==================================================
+   SKIP LINK
+   ================================================== */
+
+.skip-link {
+	position: absolute;
+	top: -100%;
+	left: 50%;
+	transform: translateX(-50%);
+	z-index: 10000;
+	padding: 12px 24px;
+	background: var(--color-rose-gold, #B76E79);
+	color: #fff;
+	font-family: var(--font-body, 'Inter', sans-serif);
+	font-size: 0.875rem;
+	font-weight: 600;
+	text-decoration: none;
+	border-radius: 0 0 8px 8px;
+	transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+	top: 0;
+	outline: none;
+}
+
+/* ==================================================
+   SCREEN READER TEXT
+   ================================================== */
+
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.screen-reader-text:focus {
+	background-color: var(--color-card-bg, #111);
+	border-radius: 4px;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.6);
+	clip: auto !important;
+	clip-path: none;
+	color: var(--color-text-primary, #fff);
+	display: block;
+	font-size: 0.875rem;
+	font-weight: 600;
+	height: auto;
+	left: 8px;
+	line-height: normal;
+	padding: 16px 24px;
+	text-decoration: none;
+	top: 8px;
+	width: auto;
+	z-index: 100000;
+}
+
+/* ==================================================
+   FOCUS INDICATORS — Visible on keyboard navigation
+   ================================================== */
+
+*:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
+}
+
+/* Remove outline on mouse click but keep for keyboard */
+*:focus:not(:focus-visible) {
+	outline: none;
+}
+
+/* Button and link focus states */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+/* Hotspot focus — larger ring for immersive pages */
+.hotspot:focus-visible {
+	outline: 3px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 4px;
+	border-radius: 50%;
+}
+
+/* Room navigation button focus */
+.room-nav-btn:focus-visible,
+.room-dot:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 3px;
+}
+
+/* Product panel focus indicators */
+.size-btn:focus-visible {
+	outline: 2px solid var(--color-rose-gold, #B76E79);
+	outline-offset: 1px;
+}
+
+/* Tab bar focus */
+.immersive-tab:focus-visible {
+	outline: 2px solid var(--tab-accent, var(--color-rose-gold, #B76E79));
+	outline-offset: -2px;
+}
+
+/* ==================================================
+   HIGH CONTRAST MODE
+   ================================================== */
+
+@media (forced-colors: active) {
+	.hotspot-beacon {
+		border: 2px solid ButtonText;
+		background: ButtonText;
+	}
+
+	.hotspot-beacon::before {
+		border-color: ButtonText;
+	}
+
+	.product-panel {
+		border: 2px solid ButtonText;
+	}
+
+	.btn-add-to-cart {
+		border: 2px solid ButtonText;
+	}
+
+	.room-nav-btn {
+		border: 2px solid ButtonText;
+	}
+
+	.room-dot.active {
+		background: Highlight;
+		border-color: Highlight;
+	}
+}
+
+/* ==================================================
+   REDUCED MOTION
+   ================================================== */
+
+@media (prefers-reduced-motion: reduce) {
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		transition-duration: 0.01ms !important;
+		scroll-behavior: auto !important;
+	}
+}
+
+/* ==================================================
+   ARIA LANDMARKS — Visually hidden section labels
+   ================================================== */
+
+[aria-label],
+[aria-labelledby] {
+	/* These elements are landmarks — ensure they exist in the a11y tree */
+}
+
+/* Hidden but accessible descriptions */
+[aria-describedby] {
+	/* Referenced description elements don't need visual styles */
+}
+
+/* ==================================================
+   FORM ACCESSIBILITY
+   ================================================== */
+
+label {
+	cursor: pointer;
+}
+
+/* Required field indicators */
+[aria-required="true"]::after {
+	content: " *";
+	color: var(--color-crimson, #DC143C);
+}
+
+/* Error states */
+[aria-invalid="true"] {
+	border-color: var(--color-crimson, #DC143C) !important;
+	box-shadow: 0 0 0 1px var(--color-crimson, #DC143C);
+}
+
+/* Live region for dynamic content */
+[aria-live="polite"],
+[aria-live="assertive"],
+[role="status"],
+[role="alert"] {
+	/* These regions announce updates to screen readers */
+}

@@ -25,7 +25,7 @@
 :root {
 	--jge-rose-gold: var(--rose-gold, #B76E79);
 	--jge-gold: var(--gold, #D4AF37);
-	--jge-font-body: var(--font-body, 'Montserrat', sans-serif);
+	--jge-font-body: var(--font-body, 'Inter', sans-serif);
 	--jge-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
 	--jge-glass-bg: rgba(10, 10, 10, 0.7);
 	--jge-glass-blur: blur(12px);

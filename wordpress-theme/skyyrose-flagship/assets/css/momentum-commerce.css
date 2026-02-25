@@ -27,7 +27,7 @@
 	--mc-glass-bg: rgba(17, 17, 17, 0.92);
 	--mc-glass-border: rgba(255, 255, 255, 0.06);
 	--mc-glass-blur: blur(24px) saturate(1.4);
-	--mc-font: var(--font-body, 'Montserrat', sans-serif);
+	--mc-font: var(--font-body, 'Inter', sans-serif);
 	--mc-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
 }
 

@@ -109,7 +109,7 @@
 }
 
 .collection-hero__subtitle {
-	font-family: 'Montserrat', sans-serif;
+	font-family: 'Inter', sans-serif;
 	font-size: 0.85rem;
 	font-weight: 300;
 	letter-spacing: 0.2em;
@@ -169,7 +169,7 @@
 }
 
 .collection-product-card__price {
-	font-family: 'Montserrat', sans-serif;
+	font-family: 'Inter', sans-serif;
 	font-size: 1rem;
 	font-weight: 600;
 	color: var(--rose-gold, #B76E79);
@@ -181,7 +181,7 @@
 	right: 12px;
 	padding: 4px 12px;
 	border-radius: 20px;
-	font-family: 'Montserrat', sans-serif;
+	font-family: 'Inter', sans-serif;
 	font-size: 0.65rem;
 	font-weight: 600;
 	letter-spacing: 0.1em;
@@ -232,7 +232,7 @@
 	padding: 16px 40px;
 	border: 1px solid var(--rose-gold, #B76E79);
 	border-radius: 8px;
-	font-family: 'Montserrat', sans-serif;
+	font-family: 'Inter', sans-serif;
 	font-size: 0.8rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;
@@ -264,7 +264,7 @@
 	border-radius: 8px;
 	background: linear-gradient(135deg, #B76E79, #D4AF37);
 	color: #fff;
-	font-family: 'Montserrat', sans-serif;
+	font-family: 'Inter', sans-serif;
 	font-size: 0.85rem;
 	font-weight: 600;
 	letter-spacing: 0.12em;

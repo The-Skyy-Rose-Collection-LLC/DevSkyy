@@ -62,13 +62,16 @@ add_filter( 'wp_nav_menu_args', 'skyyrose_nav_menu_aria_labels' );
  * @since 1.0.0
  */
 function skyyrose_accessibility_scripts() {
-	wp_enqueue_script(
-		'skyyrose-accessibility',
-		SKYYROSE_ASSETS_URI . '/js/accessibility.js',
-		array( 'jquery' ),
-		SKYYROSE_VERSION,
-		true
-	);
+	$a11y_js_path = SKYYROSE_DIR . '/assets/js/accessibility.js';
+	if ( file_exists( $a11y_js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-accessibility',
+			SKYYROSE_ASSETS_URI . '/js/accessibility.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'skyyrose_accessibility_scripts' );
 

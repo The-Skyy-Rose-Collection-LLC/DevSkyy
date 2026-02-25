@@ -40,7 +40,7 @@
 		0 8px 32px rgba(0, 0, 0, 0.45),
 		0 0 0 1px rgba(183, 110, 121, 0.08) inset;
 	color: #fff;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	transform: translateX(-120%) scale(0.92);
 	opacity: 0;
 	transition:
@@ -178,7 +178,7 @@
 	align-items: center;
 	gap: 0.35rem;
 	padding: 4px 10px;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.6rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;
@@ -237,7 +237,7 @@
 	align-items: center;
 	gap: 0.3rem;
 	padding: 3px 8px;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.6rem;
 	font-weight: 700;
 	letter-spacing: 0.06em;
@@ -337,7 +337,7 @@
 	backdrop-filter: blur(20px);
 	-webkit-backdrop-filter: blur(20px);
 	border-top: 1px solid rgba(212, 175, 55, 0.2);
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	transform: translateY(100%);
 	opacity: 0;
 	transition:
@@ -478,7 +478,7 @@
 	align-items: center;
 	gap: 0.4rem;
 	padding: 5px 12px;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.7rem;
 	font-weight: 500;
 	letter-spacing: 0.03em;
@@ -729,7 +729,7 @@
 	align-items: center;
 	gap: 0.4rem;
 	padding: 8px 14px;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.7rem;
 	font-weight: 500;
 	letter-spacing: 0.03em;
@@ -783,7 +783,7 @@
 	gap: 0.4rem;
 	padding: 8px 0;
 	margin-bottom: 1.5rem;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.7rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;
@@ -819,7 +819,7 @@
 	align-items: center;
 	gap: 0.3rem;
 	padding: 3px 10px;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.6rem;
 	font-weight: 700;
 	letter-spacing: 0.08em;
@@ -860,7 +860,7 @@
 	align-items: center;
 	gap: 0.4rem;
 	padding: 6px 0;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 	font-size: 0.65rem;
 	font-weight: 500;
 	letter-spacing: 0.04em;

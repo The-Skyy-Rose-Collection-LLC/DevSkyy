@@ -30,7 +30,7 @@
 	color: rgba(255, 255, 255, 0.5);
 	cursor: pointer;
 	transition: all 0.3s ease;
-	font-family: var(--font-body, 'Montserrat', sans-serif);
+	font-family: var(--font-body, 'Inter', sans-serif);
 }
 
 .cinematic-toggle:hover {

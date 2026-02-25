@@ -30,7 +30,7 @@
 	--pulse-glass-border: rgba(255, 255, 255, 0.07);
 	--pulse-glass-blur: blur(24px) saturate(1.5);
 	--pulse-font-heading: var(--font-heading, 'Playfair Display', Georgia, serif);
-	--pulse-font-body: var(--font-body, 'Montserrat', 'Helvetica Neue', Arial, sans-serif);
+	--pulse-font-body: var(--font-body, 'Inter', 'Helvetica Neue', Arial, sans-serif);
 
 	/* Spring easing — overshoots slightly for organic feel */
 	--pulse-ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
