@@ -235,7 +235,7 @@ get_header();
 		<!-- Countdown Timer -->
 		<div class="preorder-countdown" aria-label="<?php esc_attr_e( 'Pre-order countdown', 'skyyrose-flagship' ); ?>">
 			<span class="countdown-label"><?php echo esc_html__( 'Pre-Order Window Closes In', 'skyyrose-flagship' ); ?></span>
-			<div class="countdown-timer" data-launch-date="2026-04-01T00:00:00">
+			<div class="countdown-timer" data-launch-date="<?php echo esc_attr( get_option( 'skyyrose_preorder_deadline', '2026-04-01T00:00:00' ) ); ?>">
 				<div class="countdown-unit">
 					<span class="countdown-value" data-unit="days">00</span>
 					<span class="countdown-unit-label"><?php echo esc_html__( 'Days', 'skyyrose-flagship' ); ?></span>
@@ -312,7 +312,7 @@ get_header();
 								src="<?php echo esc_url( $product['image'] ); ?>"
 								alt="<?php echo esc_attr( $product['name'] ); ?>"
 								loading="lazy"
-								onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>';"
+								data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>"
 							>
 							<span class="product-grid-badge <?php echo esc_attr( $badge_class ); ?>">
 								<?php echo esc_html( $product['collection_label'] ); ?>
