@@ -2,10 +2,10 @@
 /**
  * Template Name: Immersive - Love Hurts
  *
- * "The Ballroom" — Baroque ballrooms, gothic cathedrals, enchanted rose
- * shrines, and crimson throne rooms. drakerelated.com-style immersive
- * experience: full-viewport rooms, pulsing beacon hotspots, smooth
- * room-to-room transitions.
+ * "The Ballroom" — Cathedral rose chamber and gothic ballroom.
+ * 2 immersive rooms with prop-specific hotspots.
+ * Extra scenes (crimson-throne-room, enchanted-rose-shrine,
+ * giant-rose-staircase, reflective-ballroom) used as CSS backgrounds.
  *
  * @package SkyyRose_Flagship
  * @since   3.0.0
@@ -18,8 +18,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 /**
  * Multi-room scene data.
- * 4 rooms from the Love Hurts collection, each a full-viewport scene.
+ * 2 rooms from the Love Hurts collection, each a full-viewport scene.
  * Products positioned on contextual props within each ballroom/chamber.
+ *
+ * Extra scene images used as CSS backgrounds elsewhere:
+ * - love-hurts-crimson-throne-room.png
+ * - love-hurts-enchanted-rose-shrine.png
+ * - love-hurts-giant-rose-staircase.png
+ * - love-hurts-reflective-ballroom.png
  */
 $love_hurts_rooms = array(
 	// Room 1 — Cathedral Rose Chamber
@@ -31,7 +37,7 @@ $love_hurts_rooms = array(
 			array(
 				'id'         => 'lh-004',
 				'name'       => esc_html__( 'Love Hurts Varsity Jacket', 'skyyrose-flagship' ),
-				'price'      => '$265',
+				'price'      => 'DRAFT',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-004-varsity.jpg',
@@ -42,17 +48,30 @@ $love_hurts_rooms = array(
 				'prop_label' => esc_html__( 'Draped beside enchanted rose dome', 'skyyrose-flagship' ),
 			),
 			array(
-				'id'         => 'lh-005',
-				'name'       => esc_html__( 'Love Hurts Bomber Jacket', 'skyyrose-flagship' ),
-				'price'      => '$245',
+				'id'         => 'lh-001',
+				'name'       => esc_html__( 'The Fannie', 'skyyrose-flagship' ),
+				'price'      => '$70',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-005-bomber.jpg',
-				'url'        => '/?product_id=lh-005',
+				'sizes'      => 'One Size',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
+				'url'        => '/?product_id=lh-001',
 				'left'       => '68',
 				'top'        => '38',
 				'prop'       => 'candelabra',
 				'prop_label' => esc_html__( 'Hung from gothic candelabra stand', 'skyyrose-flagship' ),
+			),
+			array(
+				'id'         => 'lh-003',
+				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
+				'price'      => '$55',
+				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
+				'url'        => '/?product_id=lh-003',
+				'left'       => '52',
+				'top'        => '60',
+				'prop'       => 'stained-glass-alcove',
+				'prop_label' => esc_html__( 'Displayed in stained glass alcove', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -64,58 +83,29 @@ $love_hurts_rooms = array(
 		'products' => array(
 			array(
 				'id'         => 'lh-002',
-				'name'       => esc_html__( 'Love Hurts Joggers', 'skyyrose-flagship' ),
-				'price'      => '$95',
+				'name'       => esc_html__( 'Love Hurts Joggers (BLACK)', 'skyyrose-flagship' ),
+				'price'      => '$67',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
 				'url'        => '/?product_id=lh-002',
-				'left'       => '55',
-				'top'        => '48',
+				'left'       => '40',
+				'top'        => '45',
 				'prop'       => 'velvet-drape',
 				'prop_label' => esc_html__( 'Folded on purple velvet drape', 'skyyrose-flagship' ),
 			),
-		),
-	),
-	// Room 3 — Crimson Throne Room
-	array(
-		'name'     => esc_html__( 'Crimson Throne Room', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-crimson-throne-room.png',
-		'alt'      => esc_attr__( 'Cloaked figure in golden ballroom with crimson cape, ornate throne, scattered rose petals, and dramatic fog', 'skyyrose-flagship' ),
-		'products' => array(
 			array(
-				'id'         => 'lh-001',
-				'name'       => esc_html__( 'The Fannie Pack', 'skyyrose-flagship' ),
-				'price'      => '$65',
-				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'One Size',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-001-fannie.jpg',
-				'url'        => '/?product_id=lh-001',
-				'left'       => '62',
-				'top'        => '55',
-				'prop'       => 'ornate-throne',
-				'prop_label' => esc_html__( 'Resting on ornate golden throne', 'skyyrose-flagship' ),
-			),
-		),
-	),
-	// Room 4 — Enchanted Rose Shrine
-	array(
-		'name'     => esc_html__( 'Enchanted Rose Shrine', 'skyyrose-flagship' ),
-		'image'    => get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-enchanted-rose-shrine.png',
-		'alt'      => esc_attr__( 'Red-caped figure facing golden shrine with enchanted rose, ornate columns, and warm ethereal light', 'skyyrose-flagship' ),
-		'products' => array(
-			array(
-				'id'         => 'lh-003',
-				'name'       => esc_html__( 'Love Hurts Basketball Shorts', 'skyyrose-flagship' ),
-				'price'      => '$75',
+				'id'         => 'lh-002b',
+				'name'       => esc_html__( 'Love Hurts Joggers (WHITE)', 'skyyrose-flagship' ),
+				'price'      => '$67',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-003-shorts.jpg',
-				'url'        => '/?product_id=lh-003',
-				'left'       => '70',
-				'top'        => '58',
-				'prop'       => 'ornate-column',
-				'prop_label' => esc_html__( 'Draped over ornate column base', 'skyyrose-flagship' ),
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002b-joggers-white.jpg',
+				'url'        => '/?product_id=lh-002b',
+				'left'       => '65',
+				'top'        => '48',
+				'prop'       => 'glass-dome',
+				'prop_label' => esc_html__( 'Displayed beside glass dome', 'skyyrose-flagship' ),
 			),
 		),
 	),

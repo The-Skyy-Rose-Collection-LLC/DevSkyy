@@ -34,8 +34,8 @@
 		countdownTarget: null,        // Set by data attribute or default
 		stockLevels: {
 			'br-004': 12, 'br-005': 5, 'br-006': 8,
-			'lh-004': 6,  'lh-005': 9,
-			'sg-001': 7,  'sg-004': 14,
+			'lh-001': 10, 'lh-002': 8, 'lh-002b': 6, 'lh-003': 9,
+			'sg-001-tee': 7, 'sg-001-shorts': 7, 'sg-009': 5,
 		},
 		preorderGoal: 500,
 		preorderCurrent: 347,
