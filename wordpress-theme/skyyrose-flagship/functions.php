@@ -94,3 +94,16 @@ $skyyrose_brand_styles_path = SKYYROSE_DIR . '/inc/enqueue-brand-styles.php';
 if ( file_exists( $skyyrose_brand_styles_path ) ) {
 	require_once $skyyrose_brand_styles_path;
 }
+
+/*--------------------------------------------------------------
+ * Brand Mascot Widget
+ *
+ * Loads the interactive mascot template part in the footer of
+ * all front-end pages. Skips admin and REST API contexts.
+ *--------------------------------------------------------------*/
+add_action( 'wp_footer', function () {
+	if ( is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return;
+	}
+	get_template_part( 'template-parts/mascot' );
+} );
