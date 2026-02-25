@@ -24,6 +24,7 @@ $product_title = $product->get_name();
 $product_price = $product->get_price_html();
 $on_sale       = $product->is_on_sale();
 $in_stock      = $product->is_in_stock();
+$is_preorder   = function_exists( 'skyyrose_is_preorder' ) && skyyrose_is_preorder( $product_id );
 
 // Determine collection from product categories for accent colors.
 $collection_class = 'collection-signature';
@@ -64,13 +65,17 @@ if ( $terms && ! is_wp_error( $terms ) ) {
 			   class="skyy-product-card__image-link"
 			   aria-label="<?php echo esc_attr( $product_title ); ?>">
 
-				<?php if ( $on_sale ) : ?>
+				<?php if ( $is_preorder ) : ?>
+					<span class="skyy-product-card__badge skyy-product-card__badge--preorder" style="background:#B76E79;">
+						<?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?>
+					</span>
+				<?php elseif ( $on_sale ) : ?>
 					<span class="skyy-product-card__badge skyy-product-card__badge--sale">
 						<?php esc_html_e( 'Sale', 'skyyrose-flagship' ); ?>
 					</span>
 				<?php endif; ?>
 
-				<?php if ( ! $in_stock ) : ?>
+				<?php if ( ! $in_stock && ! $is_preorder ) : ?>
 					<span class="skyy-product-card__badge skyy-product-card__badge--soldout">
 						<?php esc_html_e( 'Sold Out', 'skyyrose-flagship' ); ?>
 					</span>
@@ -124,6 +129,20 @@ if ( $terms && ! is_wp_error( $terms ) ) {
 				<?php if ( $product_price ) : ?>
 					<div class="skyy-product-card__price">
 						<?php echo $product_price; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- WC handles escaping. ?>
+					</div>
+				<?php endif; ?>
+
+				<?php if ( $is_preorder ) :
+					$edition_size = get_post_meta( $product_id, '_preorder_edition_size', true );
+					$available    = get_post_meta( $product_id, '_preorder_available', true );
+				?>
+					<div class="skyy-product-card__preorder-info" style="font-size:11px;color:#B76E79;margin-top:4px;letter-spacing:0.5px;text-transform:uppercase;">
+						<?php if ( $edition_size ) : ?>
+							<?php echo esc_html( $edition_size ); ?> Edition
+						<?php endif; ?>
+						<?php if ( $available ) : ?>
+							&middot; <?php echo esc_html( $available ); ?> left
+						<?php endif; ?>
 					</div>
 				<?php endif; ?>
 			</a>
