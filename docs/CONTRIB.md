@@ -1,9 +1,9 @@
 # DevSkyy Contributor Guide
 
-**Version**: 3.2.0
-**Last Updated**: 2026-02-22
+**Version**: 3.3.0
+**Last Updated**: 2026-02-24
 **Status**: Complete
-**Source of Truth**: `package.json`, `.env.example`
+**Source of Truth**: `package.json`, `frontend/package.json`, `.env.example`
 
 Welcome to the DevSkyy platform! This guide will help you set up your development environment, understand our workflow, and contribute effectively to the codebase.
 
@@ -1071,7 +1071,7 @@ npm run type-check                # TypeScript
 - [ ] Environment variables used (no hardcoded values)
 - [ ] Documentation updated
 
-### NPM Scripts Quick Reference (28 scripts, from package.json)
+### NPM Scripts Quick Reference (46 scripts: 28 root + 18 frontend)
 
 See [SCRIPTS_REFERENCE.md](SCRIPTS_REFERENCE.md) for complete documentation.
 
@@ -1132,7 +1132,7 @@ See [ENV_VARS_REFERENCE.md](ENV_VARS_REFERENCE.md) for complete documentation.
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: When workflow or tools change
-**Last Updated**: 2026-02-22
+**Last Updated**: 2026-02-24
 
 ---
 

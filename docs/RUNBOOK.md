@@ -1,9 +1,9 @@
 # DevSkyy Production Deployment Runbook
 
-**Version**: 3.2.0
-**Last Updated**: 2026-02-22
+**Version**: 3.3.0
+**Last Updated**: 2026-02-24
 **Status**: Production Ready
-**Source of Truth**: `package.json`, `.env.example`
+**Source of Truth**: `package.json`, `frontend/package.json`, `.env.example`
 
 This runbook provides copy/paste ready instructions for deploying DevSkyy to production, including WordPress.com deployment, health checks, and incident response procedures.
 
@@ -962,4 +962,4 @@ curl -I https://skyyrose.co | grep -i content-security-policy | grep -o "cdn.jsd
 
 **Document Owner**: DevSkyy Platform Team
 **Next Review**: After each major deployment
-**Last Updated**: 2026-02-22
+**Last Updated**: 2026-02-24
