@@ -31,7 +31,13 @@ function createMockMesh(overrides: Partial<any> = {}): any {
   Object.defineProperty(material, 'constructor', { value: { name: 'MeshStandardMaterial' } });
 
   return {
-    position: { x: 0, y: 0, z: 0, clone: jest.fn().mockReturnThis() },
+    position: {
+      x: 0, y: 0, z: 0,
+      clone: jest.fn().mockReturnValue({
+        x: 0, y: 0, z: 0,
+        project: jest.fn().mockReturnThis(),
+      }),
+    },
     scale: {
       x: 1, y: 1, z: 1,
       clone: jest.fn().mockReturnValue({
