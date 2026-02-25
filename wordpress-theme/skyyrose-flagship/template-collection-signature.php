@@ -220,7 +220,8 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
 					     loading="lazy"
 					     width="400"
-					     height="533" />
+					     height="533"
+					     onerror="this.onerror=null;this.src='<?php echo esc_url( $skyyrose_sg_placeholder ); ?>';" />
 
 					<div class="collection-product-card__info">
 						<h3 class="collection-product-card__name">

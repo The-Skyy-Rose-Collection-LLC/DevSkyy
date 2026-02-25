@@ -223,7 +223,8 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
 						     loading="lazy"
 						     width="400"
-						     height="480" />
+						     height="480"
+						     onerror="this.onerror=null;this.src='<?php echo esc_url( $skyyrose_kc_placeholder ); ?>';" />
 
 						<div class="product-card__overlay" aria-hidden="true">
 							<span class="product-card__quick-view">
