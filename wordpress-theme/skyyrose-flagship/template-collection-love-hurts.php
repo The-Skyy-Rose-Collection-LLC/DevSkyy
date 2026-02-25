@@ -28,37 +28,37 @@ function skyyrose_get_love_hurts_products() {
 	$static_products = array(
 		array(
 			'sku'   => 'lh-001',
-			'name'  => 'The Fannie',
-			'price' => '$70.00',
-			'desc'  => 'Luxury fanny pack — Oakland grit, passion, and the defiant bloom of a street rose',
+			'name'  => 'The Fannie Pack',
+			'price' => '$65.00',
+			'desc'  => 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose',
 			'badge' => 'Pre-Order',
 		),
 		array(
 			'sku'   => 'lh-002',
 			'name'  => 'Love Hurts Joggers (BLACK)',
-			'price' => '$67.00',
-			'desc'  => 'Where Oakland grit meets luxury — embroidered rose, tapered fit',
-			'badge' => '',
+			'price' => '$95.00',
+			'desc'  => 'Oakland grit meets luxury — embroidered rose, tapered fit',
+			'badge' => 'Pre-Order',
 		),
 		array(
 			'sku'   => 'lh-002b',
 			'name'  => 'Love Hurts Joggers (WHITE)',
-			'price' => '$67.00',
+			'price' => '$95.00',
 			'desc'  => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
 			'badge' => 'New',
 		),
 		array(
 			'sku'   => 'lh-003',
 			'name'  => 'Love Hurts Basketball Shorts',
-			'price' => '$55.00',
-			'desc'  => 'Breathable mesh with defiant rose design, born from Oakland grit',
-			'badge' => '',
+			'price' => '$75.00',
+			'desc'  => 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh',
+			'badge' => 'Pre-Order',
 		),
 		array(
 			'sku'   => 'lh-004',
 			'name'  => 'Love Hurts Varsity Jacket',
 			'price' => 'Coming Soon',
-			'desc'  => 'Black satin shell, fire-red script, secret rose garden lining',
+			'desc'  => 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood',
 			'badge' => 'Draft',
 		),
 	);
@@ -146,7 +146,10 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     PRODUCT GRID
 	     ============================================================ -->
-	<section id="products" class="collection-products">
+	<section id="products" class="collection-products" aria-labelledby="products-heading">
+		<h2 id="products-heading" class="screen-reader-text">
+			<?php echo esc_html__( 'Love Hurts Products', 'skyyrose-flagship' ); ?>
+		</h2>
 		<div class="collection-grid">
 			<?php
 			foreach ( $skyyrose_lh_products as $skyyrose_product ) :
