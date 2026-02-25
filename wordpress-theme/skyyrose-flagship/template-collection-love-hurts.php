@@ -25,6 +25,8 @@ get_header();
 if ( ! function_exists( 'skyyrose_get_love_hurts_products' ) ) :
 function skyyrose_get_love_hurts_products() {
 
+	$img_base = get_template_directory_uri() . '/assets/images/products/';
+
 	$static_products = array(
 		array(
 			'sku'   => 'lh-001',
@@ -32,6 +34,7 @@ function skyyrose_get_love_hurts_products() {
 			'price' => '$65.00',
 			'desc'  => 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'lh-001-fannie.webp',
 		),
 		array(
 			'sku'   => 'lh-002',
@@ -39,6 +42,7 @@ function skyyrose_get_love_hurts_products() {
 			'price' => '$95.00',
 			'desc'  => 'Oakland grit meets luxury — embroidered rose, tapered fit',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'lh-002-joggers.webp',
 		),
 		array(
 			'sku'   => 'lh-002b',
@@ -46,6 +50,7 @@ function skyyrose_get_love_hurts_products() {
 			'price' => '$95.00',
 			'desc'  => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
 			'badge' => 'New',
+			'image' => $img_base . 'lh-002-joggers.webp',
 		),
 		array(
 			'sku'   => 'lh-003',
@@ -53,6 +58,7 @@ function skyyrose_get_love_hurts_products() {
 			'price' => '$75.00',
 			'desc'  => 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'lh-003-shorts.jpg',
 		),
 		array(
 			'sku'   => 'lh-004',
@@ -60,6 +66,15 @@ function skyyrose_get_love_hurts_products() {
 			'price' => 'Coming Soon',
 			'desc'  => 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood',
 			'badge' => 'Draft',
+			'image' => $img_base . 'lh-004-varsity.jpg',
+		),
+		array(
+			'sku'   => 'lh-005',
+			'name'  => 'Love Hurts Windbreaker',
+			'price' => 'Coming Soon',
+			'desc'  => 'Oakland fire meets the elements. Blush pink windbreaker with Love Hurts text and rose detailing',
+			'badge' => 'Draft',
+			'image' => $img_base . 'lh-005-bomber.webp',
 		),
 	);
 
@@ -168,13 +183,23 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 						</span>
 					<?php endif; ?>
 
-					<img class="collection-product-card__image"
-					     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-					     loading="lazy"
-					     width="400"
-					     height="533"
-					     data-fallback="<?php echo esc_url( $skyyrose_lh_placeholder ); ?>" />
+					<div class="collection-product-card__image-container">
+						<img class="collection-product-card__image"
+						     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
+						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
+						     loading="lazy"
+						     width="400"
+						     height="533"
+						     data-fallback="<?php echo esc_url( $skyyrose_lh_placeholder ); ?>" />
+						<?php if ( ! empty( $skyyrose_product['back_image'] ) ) : ?>
+							<img class="collection-product-card__image collection-product-card__image--back"
+							     src="<?php echo esc_url( $skyyrose_product['back_image'] ); ?>"
+							     alt="<?php /* translators: %s: product name */ echo esc_attr( sprintf( __( '%s — back view', 'skyyrose-flagship' ), $skyyrose_product['name'] ) ); ?>"
+							     loading="lazy"
+							     width="400"
+							     height="533" />
+						<?php endif; ?>
+					</div>
 
 					<div class="collection-product-card__info">
 						<h3 class="collection-product-card__name">

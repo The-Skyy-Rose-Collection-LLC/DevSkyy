@@ -25,6 +25,8 @@ get_header();
 if ( ! function_exists( 'skyyrose_get_signature_products' ) ) :
 function skyyrose_get_signature_products() {
 
+	$img_base = get_template_directory_uri() . '/assets/images/products/';
+
 	$static_products = array(
 		array(
 			'sku'   => 'sg-001-tee',
@@ -32,6 +34,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$40.00',
 			'desc'  => 'Iconic blue rose and Bay Area skyline on crisp white premium cotton',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'sg-001-bay-set.webp',
 		),
 		array(
 			'sku'   => 'sg-001-shorts',
@@ -39,6 +42,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$50.00',
 			'desc'  => 'Bay skyline panorama on premium mesh with signature blue rose',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'sg-001-bay-set.webp',
 		),
 		array(
 			'sku'   => 'sg-002-tee',
@@ -46,6 +50,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$40.00',
 			'desc'  => 'Elevated everyday style with golden SkyyRose touch',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'sg-002-stay-golden-tee.jpg',
 		),
 		array(
 			'sku'   => 'sg-002-shorts',
@@ -53,6 +58,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$50.00',
 			'desc'  => 'Luxuriously textured mesh with abstract cityscape',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'sg-010-bridge-shorts.webp',
 		),
 		array(
 			'sku'   => 'sg-003',
@@ -60,6 +66,15 @@ function skyyrose_get_signature_products() {
 			'price' => '$15.00',
 			'desc'  => 'Essential tee with gold SkyyRose label in orchid',
 			'badge' => '',
+			'image' => $img_base . 'sg-003-pink-smoke-crewneck.jpg',
+		),
+		array(
+			'sku'   => 'sg-004',
+			'name'  => 'The Signature Hoodie',
+			'price' => 'Coming Soon',
+			'desc'  => 'The quintessential SkyyRose hoodie in signature colorway with embroidered rose detail',
+			'badge' => 'Draft',
+			'image' => $img_base . 'sg-004-signature-hoodie.webp',
 		),
 		array(
 			'sku'   => 'sg-005',
@@ -67,6 +82,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$40.00',
 			'desc'  => 'Statement tee with opulent rose design symbolizing resilience',
 			'badge' => '',
+			'image' => $img_base . 'sg-005-stay-golden-tee.webp',
 		),
 		array(
 			'sku'   => 'sg-006',
@@ -74,6 +90,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$45.00',
 			'desc'  => 'Refreshing mint base meets opulent lavender artistry',
 			'badge' => 'New',
+			'image' => $img_base . 'sg-006-mint-lavender-hoodie.jpg',
 		),
 		array(
 			'sku'   => 'sg-007',
@@ -81,6 +98,16 @@ function skyyrose_get_signature_products() {
 			'price' => '$25.00',
 			'desc'  => 'Luxurious knit beanie with embroidered rose — Red, Purple, Black',
 			'badge' => '',
+			'image' => $img_base . 'sg-007-signature-beanie.webp',
+		),
+		array(
+			'sku'        => 'sg-008',
+			'name'       => 'Signature Crop Hoodie',
+			'price'      => '$50.00',
+			'desc'       => 'Cropped silhouette meets luxury streetwear. Peach rose-gold front with black rose design on the back',
+			'badge'      => 'Pre-Order',
+			'image'      => $img_base . 'sg-008-crop-hoodie.webp',
+			'back_image' => $img_base . 'sg-008-crop-hoodie-back.webp',
 		),
 		array(
 			'sku'   => 'sg-009',
@@ -88,6 +115,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$80.00',
 			'desc'  => 'Opulent outerwear with signature rose embroidery and Sherpa lining',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'sg-009-sherpa-jacket.webp',
 		),
 		array(
 			'sku'   => 'sg-010',
@@ -95,6 +123,7 @@ function skyyrose_get_signature_products() {
 			'price' => '$25.00',
 			'desc'  => 'Bay Area iconic bridge panorama on premium mesh',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'sg-010-bridge-shorts.webp',
 		),
 		array(
 			'sku'   => 'sg-011',
@@ -102,6 +131,7 @@ function skyyrose_get_signature_products() {
 			'price' => 'Coming Soon',
 			'desc'  => 'The foundational piece featuring the original SkyyRose label',
 			'badge' => 'Draft',
+			'image' => $img_base . 'sg-011-label-tee-white.webp',
 		),
 		array(
 			'sku'   => 'sg-012',
@@ -109,6 +139,7 @@ function skyyrose_get_signature_products() {
 			'price' => 'Coming Soon',
 			'desc'  => 'Original SkyyRose label in a striking orchid colorway',
 			'badge' => 'Draft',
+			'image' => $img_base . 'sg-012-label-tee-orchid.webp',
 		),
 	);
 
@@ -217,13 +248,23 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 						</span>
 					<?php endif; ?>
 
-					<img class="collection-product-card__image"
-					     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-					     loading="lazy"
-					     width="400"
-					     height="533"
-					     data-fallback="<?php echo esc_url( $skyyrose_sg_placeholder ); ?>" />
+					<div class="collection-product-card__image-container">
+						<img class="collection-product-card__image"
+						     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
+						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
+						     loading="lazy"
+						     width="400"
+						     height="533"
+						     data-fallback="<?php echo esc_url( $skyyrose_sg_placeholder ); ?>" />
+						<?php if ( ! empty( $skyyrose_product['back_image'] ) ) : ?>
+							<img class="collection-product-card__image collection-product-card__image--back"
+							     src="<?php echo esc_url( $skyyrose_product['back_image'] ); ?>"
+							     alt="<?php /* translators: %s: product name */ echo esc_attr( sprintf( __( '%s — back view', 'skyyrose-flagship' ), $skyyrose_product['name'] ) ); ?>"
+							     loading="lazy"
+							     width="400"
+							     height="533" />
+						<?php endif; ?>
+					</div>
 
 					<div class="collection-product-card__info">
 						<h3 class="collection-product-card__name">
