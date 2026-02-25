@@ -197,8 +197,9 @@
 				<p class="footer-copyright__text">
 					<?php
 					printf(
-						/* translators: %s: Year */
-						esc_html__( '&copy; 2024 The Skyy Rose Collection LLC. All rights reserved.', 'skyyrose-flagship' )
+						/* translators: %s: current year */
+						esc_html__( '&copy; %s The Skyy Rose Collection LLC. All rights reserved.', 'skyyrose-flagship' ),
+						esc_html( gmdate( 'Y' ) )
 					);
 					?>
 				</p>

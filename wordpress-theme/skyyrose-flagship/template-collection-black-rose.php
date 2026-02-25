@@ -22,6 +22,7 @@ get_header();
  *
  * @return array<int, array{sku:string, name:string, price:string, desc:string, badge:string, url:string, image:string}>
  */
+if ( ! function_exists( 'skyyrose_get_black_rose_products' ) ) :
 function skyyrose_get_black_rose_products() {
 
 	$static_products = array(
@@ -116,6 +117,7 @@ function skyyrose_get_black_rose_products() {
 
 	return $products;
 }
+endif;
 
 $skyyrose_br_products    = skyyrose_get_black_rose_products();
 $skyyrose_br_shop_url    = function_exists( 'wc_get_page_permalink' ) ? wc_get_page_permalink( 'shop' ) : '/shop';
