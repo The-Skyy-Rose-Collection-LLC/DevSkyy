@@ -713,6 +713,47 @@ function skyyrose_enqueue_journey_gamification() {
 }
 
 /**
+ * Enqueue Momentum Commerce Engine — "The Closer".
+ *
+ * Three research-backed conversion techniques:
+ *   1. Smart Price Anchoring (Kahneman & Tversky anchoring bias — 20-50% lift)
+ *   2. Live Activity Ticker (Spiegel Research — 15-34% social proof lift)
+ *   3. Spotlight Moments + Best Seller Glow (Thaler & Sunstein nudge theory)
+ *   4. Momentum Score — engagement rewards that drive repeat interaction
+ *
+ * @since 3.8.0
+ * @return void
+ */
+function skyyrose_enqueue_momentum_commerce() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/momentum-commerce.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-momentum-commerce',
+			SKYYROSE_ASSETS_URI . '/css/momentum-commerce.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/momentum-commerce.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-momentum-commerce',
+			SKYYROSE_ASSETS_URI . '/js/momentum-commerce.js',
+			array( 'skyyrose-conversion-engine' ),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Enqueue Velocity — Scroll-Driven Product Storytelling Engine.
  *
  * Apple-style progressive product reveals, scroll spine, momentum
@@ -859,6 +900,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-cross-sell-engine',
 		'skyyrose-adaptive-personalization',
 		'skyyrose-journey-gamification',
+		'skyyrose-momentum-commerce',
 		'skyyrose-velocity-scroll',
 		'skyyrose-analytics-beacon',
 	);
@@ -965,6 +1007,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 4
 
 // Journey Gamification Engine — room exploration tracking, rewards, cross-sell (priority 44, after personalization).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_journey_gamification', 44 );
+
+// Momentum Commerce — Price Anchoring, Live Ticker, Spotlight Moments (priority 45, after gamification).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_momentum_commerce', 45 );
 
 // Velocity — Scroll-Driven Product Storytelling Engine (priority 46, after gamification).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_velocity_scroll', 46 );
