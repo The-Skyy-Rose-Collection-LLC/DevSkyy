@@ -327,7 +327,7 @@ get_header();
 
 	<!-- Product Modal -->
 	<div class="product-modal-overlay" aria-hidden="true">
-		<div class="product-modal" role="dialog" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
+		<div class="product-modal" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Product details', 'skyyrose-flagship' ); ?>">
 			<button class="product-modal-close" type="button" aria-label="<?php esc_attr_e( 'Close', 'skyyrose-flagship' ); ?>">&times;</button>
 			<div class="modal-360-area">
 				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>" alt="">
@@ -430,17 +430,17 @@ get_header();
 	</aside>
 
 	<!-- Collection Tabs (Fixed Bottom) -->
-	<nav class="collection-tabs" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
-		<button class="collection-tab active" type="button" data-collection="all">
+	<nav class="collection-tabs" role="tablist" aria-label="<?php esc_attr_e( 'Filter by collection', 'skyyrose-flagship' ); ?>">
+		<button class="collection-tab active" type="button" role="tab" aria-selected="true" data-collection="all">
 			<?php echo esc_html__( 'All', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" data-collection="black-rose">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" data-collection="black-rose">
 			<?php echo esc_html__( 'Black Rose', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" data-collection="love-hurts">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" data-collection="love-hurts">
 			<?php echo esc_html__( 'Love Hurts', 'skyyrose-flagship' ); ?>
 		</button>
-		<button class="collection-tab" type="button" data-collection="signature">
+		<button class="collection-tab" type="button" role="tab" aria-selected="false" data-collection="signature">
 			<?php echo esc_html__( 'Signature', 'skyyrose-flagship' ); ?>
 		</button>
 	</nav>
@@ -481,23 +481,7 @@ get_header();
 </main><!-- #primary -->
 
 <?php
-// Enqueue gateway assets.
-wp_enqueue_style(
-	'skyyrose-preorder-gateway',
-	get_template_directory_uri() . '/assets/css/preorder-gateway.css',
-	array( 'skyyrose-style' ),
-	SKYYROSE_VERSION
-);
-
-wp_enqueue_script(
-	'skyyrose-preorder-gateway',
-	get_template_directory_uri() . '/assets/js/preorder-gateway.js',
-	array(),
-	SKYYROSE_VERSION,
-	true
-);
-
-// Pass WooCommerce data to the gateway script.
+// Pass WooCommerce data to the gateway script (assets already enqueued by inc/enqueue.php).
 $gateway_wc_data = array(
 	'ajaxUrl'     => admin_url( 'admin-ajax.php' ),
 	'nonce'       => wp_create_nonce( 'skyyrose_immersive_cart' ),
@@ -505,7 +489,7 @@ $gateway_wc_data = array(
 	'cartUrl'     => function_exists( 'wc_get_cart_url' ) ? wc_get_cart_url() : home_url( '/cart/' ),
 	'wcActive'    => class_exists( 'WooCommerce' ),
 );
-wp_localize_script( 'skyyrose-preorder-gateway', 'skyyRoseGateway', $gateway_wc_data );
+wp_localize_script( 'skyyrose-template-preorder-gateway', 'skyyRoseGateway', $gateway_wc_data );
 
 get_template_part( 'template-parts/cinematic-toggle' );
 
