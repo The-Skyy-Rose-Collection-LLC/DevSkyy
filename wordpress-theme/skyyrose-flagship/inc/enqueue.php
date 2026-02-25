@@ -971,7 +971,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-immersive-wc-bridge',
 	);
 
-	if ( in_array( $handle, $defer_handles, true ) ) {
+	if ( in_array( $handle, $defer_handles, true ) && strpos( $tag, ' defer' ) === false ) {
 		return str_replace( ' src', ' defer src', $tag );
 	}
 

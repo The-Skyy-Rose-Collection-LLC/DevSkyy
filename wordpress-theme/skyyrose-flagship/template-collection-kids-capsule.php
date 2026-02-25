@@ -224,7 +224,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 						     loading="lazy"
 						     width="400"
 						     height="480"
-						     onerror="this.onerror=null;this.src='<?php echo esc_url( $skyyrose_kc_placeholder ); ?>';" />
+						     data-fallback="<?php echo esc_url( $skyyrose_kc_placeholder ); ?>" />
 
 						<div class="product-card__overlay" aria-hidden="true">
 							<span class="product-card__quick-view">
@@ -270,7 +270,7 @@ $skyyrose_kc_placeholder = esc_url( SKYYROSE_ASSETS_URI . '/images/placeholder-p
 	<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:1rem 2rem;"></div>
 
 	<section class="collection-preorder-cta">
-		<div data-cie-countdown="auto" data-cie-countdown-label="Pre-Order Window" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
+		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Window', 'skyyrose-flagship' ); ?>" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 		   class="collection-preorder-cta__btn">
 			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>

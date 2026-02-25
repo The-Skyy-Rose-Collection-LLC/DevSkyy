@@ -13,6 +13,17 @@
 	'use strict';
 
 	/* --------------------------------------------------
+	   Image Fallback (CSP-safe replacement for inline onerror)
+	   -------------------------------------------------- */
+
+	document.addEventListener('error', function (e) {
+		if (e.target.tagName === 'IMG' && e.target.dataset.fallback) {
+			e.target.src = e.target.dataset.fallback;
+			delete e.target.dataset.fallback;
+		}
+	}, true);
+
+	/* --------------------------------------------------
 	   DOM References
 	   -------------------------------------------------- */
 

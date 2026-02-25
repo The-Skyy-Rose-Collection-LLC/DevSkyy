@@ -40,11 +40,11 @@ $signature_rooms = array(
 			// Glass orb display case (left)
 			array(
 				'id'         => 'sg-009',
-				'name'       => esc_html__( 'The Sherpa Jacket', 'skyyrose-flagship' ),
-				'price'      => '$80',
+				'name'       => esc_html__( 'Red Rose Beanie', 'skyyrose-flagship' ),
+				'price'      => '$25',
 				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-004-signature-hoodie.jpg',
+				'sizes'      => esc_html__( 'One Size', 'skyyrose-flagship' ),
+				'image'      => get_template_directory_uri() . '/assets/images/products/sg-009-red-rose-beanie.jpg',
 				'url'        => '/?product_id=sg-009',
 				'left'       => '15',
 				'top'        => '42',
@@ -158,11 +158,11 @@ $signature_rooms = array(
 			// Left marble pedestal — The Signature Beanie
 			array(
 				'id'         => 'sg-007',
-				'name'       => esc_html__( 'The Signature Beanie', 'skyyrose-flagship' ),
-				'price'      => '$25',
+				'name'       => esc_html__( 'Cotton Candy Shorts', 'skyyrose-flagship' ),
+				'price'      => '$40',
 				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'One Size',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-009-red-rose-beanie.jpg',
+				'sizes'      => 'S,M,L,XL,2XL,3XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/sg-007-cotton-candy-shorts.jpg',
 				'url'        => '/?product_id=sg-007',
 				'left'       => '32',
 				'top'        => '48',
@@ -212,14 +212,14 @@ get_header();
 						alt="<?php echo esc_attr( $room['alt'] ); ?>"
 						loading="<?php echo 0 === $index ? 'eager' : 'lazy'; ?>"
 						<?php if ( 0 === $index ) : ?>fetchpriority="high"<?php endif; ?>
-						onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>';"
+						data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder.jpg' ); ?>"
 					>
 				</div>
 			<?php endforeach; ?>
 		</div>
 
 		<!-- Vignette -->
-		<div class="scene-vignette"></div>
+		<div class="scene-vignette" aria-hidden="true"></div>
 
 		<!-- Film Grain -->
 		<div class="scene-film-grain" aria-hidden="true"></div>
@@ -303,7 +303,7 @@ get_header();
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
-				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>" alt="" onerror="this.onerror=null;this.src='<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>';">
+				<img src="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>" alt="" data-fallback="<?php echo esc_url( get_template_directory_uri() . '/assets/images/placeholder-product.jpg' ); ?>">
 			</div>
 			<div class="product-panel-info">
 				<p class="product-panel-collection"></p>
@@ -346,7 +346,7 @@ get_header();
 
 	<!-- Conversion Intelligence: Urgency Countdown -->
 	<div style="position:absolute; bottom:56px; right:16px; z-index:12;">
-		<div data-cie-countdown="auto" data-cie-countdown-label="Pre-Order Closes"></div>
+		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Closes', 'skyyrose-flagship' ); ?>"></div>
 	</div>
 
 </main><!-- #primary -->

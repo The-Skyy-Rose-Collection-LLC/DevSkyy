@@ -9,6 +9,18 @@
 	'use strict';
 
 	/* --------------------------------------------------
+	   Image Fallback (CSP-safe replacement for inline onerror)
+	   Catches broken images site-wide and swaps to data-fallback URL.
+	   -------------------------------------------------- */
+
+	document.addEventListener('error', function (e) {
+		if (e.target.tagName === 'IMG' && e.target.dataset.fallback) {
+			e.target.src = e.target.dataset.fallback;
+			delete e.target.dataset.fallback;
+		}
+	}, true);
+
+	/* --------------------------------------------------
 	   Hamburger Toggle (Mobile)
 	   -------------------------------------------------- */
 

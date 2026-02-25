@@ -26,8 +26,9 @@
 						<?php esc_html_e( 'Exclusive drops, early access, and luxury delivered to your inbox.', 'skyyrose-flagship' ); ?>
 					</p>
 				</div>
-				<form class="footer-newsletter__form" action="<?php echo esc_url( home_url( '/' ) ); ?>" method="post" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose-flagship' ); ?>">
+				<form class="footer-newsletter__form" action="<?php echo esc_url( admin_url( 'admin-ajax.php' ) ); ?>" method="post" aria-label="<?php esc_attr_e( 'Newsletter signup', 'skyyrose-flagship' ); ?>">
 					<?php wp_nonce_field( 'skyyrose_newsletter', 'skyyrose_newsletter_nonce' ); ?>
+					<input type="hidden" name="action" value="skyyrose_newsletter_subscribe">
 					<div class="footer-newsletter__input-group">
 						<label for="footer-newsletter-email" class="screen-reader-text">
 							<?php esc_html_e( 'Email address', 'skyyrose-flagship' ); ?>
@@ -35,7 +36,7 @@
 						<input
 							type="email"
 							id="footer-newsletter-email"
-							name="newsletter_email"
+							name="email"
 							class="footer-newsletter__input"
 							placeholder="<?php esc_attr_e( 'Enter your email', 'skyyrose-flagship' ); ?>"
 							required
@@ -126,7 +127,7 @@
 						<li><a href="<?php echo esc_url( home_url( '/collection-love-hurts/' ) ); ?>"><?php esc_html_e( 'Love Hurts', 'skyyrose-flagship' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/collection-signature/' ) ); ?>"><?php esc_html_e( 'Signature', 'skyyrose-flagship' ); ?></a></li>
 						<li><a href="<?php echo esc_url( home_url( '/collection-kids-capsule/' ) ); ?>"><?php esc_html_e( 'Kids Capsule', 'skyyrose-flagship' ); ?></a></li>
-							<li><a href="<?php echo esc_url( home_url( '/preorder/' ) ); ?>"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></a></li>
+						<li><a href="<?php echo esc_url( home_url( '/preorder/' ) ); ?>"><?php esc_html_e( 'Pre-Order', 'skyyrose-flagship' ); ?></a></li>
 						<?php if ( class_exists( 'WooCommerce' ) ) : ?>
 							<li><a href="<?php echo esc_url( wc_get_page_permalink( 'shop' ) ); ?>"><?php esc_html_e( 'All Products', 'skyyrose-flagship' ); ?></a></li>
 						<?php endif; ?>
