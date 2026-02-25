@@ -1,0 +1,70 @@
+## GARMENT TECHNICAL SPECIFICATION
+
+**1. GARMENT TYPE:**
+   *   Short-Sleeve Crew Neck T-Shirt
+
+**2. BASE COLOR:**
+   *   Descriptive: Dusty Mauve Purple
+   *   Hex Code Approximation: #9A7A97
+
+**3. SECONDARY COLORS:**
+   *   Metallic Gold (for neck label text and sleeve patch graphic)
+   *   Jet Black (for neck label background and sleeve patch background)
+
+**4. FIT:**
+   *   **Silhouette:** Relaxed-Fit / Standard-Fit. Not excessively oversized nor form-fitting. Straight cut through the body.
+   *   **Length:** Regular length, designed to fall at the hip.
+   *   **Proportions:** Standard t-shirt proportions. Sleeves are short, ending mid-bicep.
+
+**5. GRAPHICS:**
+   *   **Neck Label Graphic:** A rectangular woven label featuring text (see TEXT section) in metallic gold on a jet black background.
+   *   **Left Sleeve Patch Graphic:** A small, square woven patch featuring a stylized, intertwined "SR" monogram or custom symbol in metallic gold on a jet black background. The symbol is abstract, appearing as two capital letters potentially overlapping or merged.
+
+**6. TEXT:**
+   *   **Location:** Interior back neck, on a woven label.
+   *   **Content:** "Stay Rise"
+   *   **Font Style:** The word "Stay" appears in a stylized, uppercase serif font with a slightly distressed or artistic finish. The 'S' has a distinctive curved flourish. The word "Rise" appears in an elegant, flowing script font, with the 'R' capitalized and connected to the subsequent letters.
+   *   **Color:** Metallic Gold
+   *   **Placement:** Centered horizontally on the black woven label.
+   *   *(Note: The "M" in a circle with "FRONT" below it at the bottom left of the image is an overlay for product identification and is NOT part of the garment itself.)*
+
+**7. LOGOS & BRANDING:**
+   *   **Primary Branding (Neck Label):**
+        *   **Type:** Woven label, rectangular.
+        *   **Location:** Centrally positioned at the interior back neck.
+        *   **Color:** Jet Black background with Metallic Gold text.
+        *   **Content:** "Stay Rise" (as described in TEXT section).
+        *   **Size:** Approximately 1.5 inches (height) x 3.5 inches (width).
+        *   **Attachment:** Sewn down on all four edges, likely with a fine-gauge single-needle stitch in black thread.
+   *   **Secondary Branding (Left Sleeve Patch):**
+        *   **Type:** Woven patch, square.
+        *   **Location:** Outer left sleeve, positioned approximately 1 inch up from the sleeve cuff hem and centered horizontally on the sleeve panel.
+        *   **Color:** Jet Black background with Metallic Gold stylized "SR" monogram/symbol.
+        *   **Content:** Stylized, intertwined "SR" monogram or custom symbol.
+        *   **Size:** Approximately 0.75 inch (height) x 0.75 inch (width).
+        *   **Attachment:** Sewn down on all four edges, likely with a fine-gauge single-needle stitch in black thread.
+
+**8. HARDWARE:**
+   *   None present.
+
+**9. FABRIC TEXTURE:**
+   *   **Type:** Smooth, soft jersey knit. Likely a single jersey.
+   *   **Sheen:** Low sheen, matte finish.
+   *   **Thickness:** Mid-weight, typical for a standard cotton t-shirt.
+   *   **Ribbing/Mesh/Sherpa:** No visible ribbing on the body, mesh, or sherpa. The collar is a subtle rib-knit.
+   *   **Hand-feel:** Appears soft and drapes fluidly, suggesting a cotton or cotton-blend composition.
+
+**10. SPECIAL DETAILS:**
+    *   **Collar Type:** Rib-knit crew neck. The ribbing is fine-gauge (e.g., 1x1 or 2x2 rib).
+        *   **Collar Width:** Approximately 0.75 - 1 inch.
+        *   **Construction:** Attached with overlock stitch, then topstitched around the neckline with a twin-needle stitch for durability and a clean finish.
+    *   **Cuffs:** Short sleeves with a clean-finished hem.
+        *   **Construction:** Double-folded hem, secured with a twin-needle stitch (typically 0.75 inch width).
+    *   **Waistband/Hems:** Straight hem at the bottom of the garment.
+        *   **Construction:** Double-folded hem, secured with a twin-needle stitch (typically 0.75 inch width).
+    *   **Panels:** Standard two-panel front and back body construction, with separate short sleeve panels.
+    *   **Seams:**
+        *   **Shoulder Seams:** Overlock stitch, reinforced with a twin-needle topstitch or covered seam for flat finish and durability.
+        *   **Side Seams:** Overlock stitch construction.
+        *   **Armhole Seams:** Overlock stitch.
+        *   **Neck Tape:** A self-fabric neck tape may be present along the interior back neck seam for reinforcement, though it is obscured by the brand label.
