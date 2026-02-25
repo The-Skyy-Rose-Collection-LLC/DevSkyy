@@ -29,6 +29,11 @@ import {
   Zap,
   Globe,
   ArrowUpDown,
+  Sparkles,
+  Image,
+  MessageSquare,
+  Video,
+  Palette,
 } from 'lucide-react';
 
 // ---------------------------------------------------------------------------
@@ -81,67 +86,45 @@ interface HFStats {
 // ---------------------------------------------------------------------------
 
 const SIMULATED_STATS: HFStats = {
-  modelsDeployed: 12,
-  spacesActive: 5,
-  inferenceEndpoints: 3,
-  totalDownloads: 284_500,
+  modelsDeployed: 0,
+  spacesActive: 3,
+  inferenceEndpoints: 0,
+  totalDownloads: 0,
 };
 
 const SIMULATED_SPACES: HFSpace[] = [
   {
     id: 'space-001',
-    name: 'skyyrose/product-image-gen',
-    status: 'running',
-    url: 'https://huggingface.co/spaces/skyyrose/product-image-gen',
+    name: 'damBruh/skyyrose-3d-converter',
+    status: 'sleeping',
+    url: 'https://huggingface.co/spaces/damBruh/skyyrose-3d-converter',
     sdk: 'Gradio',
     sdkVersion: '4.44.0',
-    hardware: 'A10G Small',
-    createdAt: '2025-11-15T10:00:00Z',
-    lastUpdated: '2026-02-20T14:30:00Z',
+    hardware: 'CPU Basic',
+    createdAt: '2025-12-01T08:00:00Z',
+    lastUpdated: '2026-01-17T14:30:00Z',
   },
   {
     id: 'space-002',
-    name: 'skyyrose/fashion-classifier',
-    status: 'running',
-    url: 'https://huggingface.co/spaces/skyyrose/fashion-classifier',
+    name: 'damBruh/skyyrose-lora-training-monitor',
+    status: 'sleeping',
+    url: 'https://huggingface.co/spaces/damBruh/skyyrose-lora-training-monitor',
     sdk: 'Gradio',
     sdkVersion: '4.44.0',
-    hardware: 'T4 Medium',
+    hardware: 'CPU Basic',
     createdAt: '2025-12-01T08:00:00Z',
-    lastUpdated: '2026-02-18T09:15:00Z',
+    lastUpdated: '2026-01-17T09:15:00Z',
   },
   {
     id: 'space-003',
-    name: 'skyyrose/brand-voice-chat',
-    status: 'building',
-    url: 'https://huggingface.co/spaces/skyyrose/brand-voice-chat',
-    sdk: 'Streamlit',
-    sdkVersion: '1.40.0',
-    hardware: 'CPU Basic',
-    createdAt: '2026-02-10T12:00:00Z',
-    lastUpdated: '2026-02-24T08:45:00Z',
-  },
-  {
-    id: 'space-004',
-    name: 'skyyrose/collection-recommender',
+    name: 'damBruh/skyyrose-virtual-tryon',
     status: 'sleeping',
-    url: 'https://huggingface.co/spaces/skyyrose/collection-recommender',
+    url: 'https://huggingface.co/spaces/damBruh/skyyrose-virtual-tryon',
     sdk: 'Gradio',
-    sdkVersion: '4.42.0',
+    sdkVersion: '4.44.0',
     hardware: 'CPU Basic',
-    createdAt: '2025-10-20T16:00:00Z',
-    lastUpdated: '2026-01-30T11:20:00Z',
-  },
-  {
-    id: 'space-005',
-    name: 'skyyrose/3d-texture-preview',
-    status: 'stopped',
-    url: 'https://huggingface.co/spaces/skyyrose/3d-texture-preview',
-    sdk: 'Gradio',
-    sdkVersion: '4.40.0',
-    hardware: 'A10G Small',
-    createdAt: '2025-09-05T09:00:00Z',
-    lastUpdated: '2025-12-15T17:00:00Z',
+    createdAt: '2025-12-01T08:00:00Z',
+    lastUpdated: '2026-01-10T11:20:00Z',
   },
 ];
 
@@ -253,7 +236,7 @@ export default function HuggingFacePage() {
 
   // Settings state
   const [tokenStatus, setTokenStatus] = useState<'valid' | 'expired' | 'missing'>('valid');
-  const [defaultOrg, setDefaultOrg] = useState('skyyrose');
+  const [defaultOrg, setDefaultOrg] = useState('damBruh');
   const [autoDeploy, setAutoDeploy] = useState(true);
 
   const fetchData = useCallback(async () => {
@@ -416,6 +399,10 @@ export default function HuggingFacePage() {
             <Zap className="mr-2 h-4 w-4" />
             Inference
           </TabsTrigger>
+          <TabsTrigger value="generate" className="data-[state=active]:bg-gray-700">
+            <Sparkles className="mr-2 h-4 w-4" />
+            Generate
+          </TabsTrigger>
           <TabsTrigger value="settings" className="data-[state=active]:bg-gray-700">
             <Settings className="mr-2 h-4 w-4" />
             Settings
@@ -493,6 +480,206 @@ export default function HuggingFacePage() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        {/* Generate Tab — One-Click Content Generation */}
+        <TabsContent value="generate" className="space-y-4">
+          <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+            <CardHeader>
+              <CardTitle className="text-white flex items-center gap-2">
+                <Sparkles className="h-5 w-5 text-[#FF9D00]" />
+                Content Generation Studio
+              </CardTitle>
+              <CardDescription className="text-gray-400">
+                One-click brand content generation powered by SkyyRose ML pipelines
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {[
+                  {
+                    title: 'Product Photography',
+                    desc: 'AI model wearing SkyyRose clothing',
+                    icon: Image,
+                    gradient: 'from-[#B76E79] to-rose-600',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Social Media Posts',
+                    desc: 'Carousel posts, stories, reels thumbnails',
+                    icon: MessageSquare,
+                    gradient: 'from-purple-500 to-pink-500',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Ad Creatives',
+                    desc: 'Facebook, Instagram, TikTok ad formats',
+                    icon: Sparkles,
+                    gradient: 'from-amber-500 to-orange-500',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Hero & Banner Imagery',
+                    desc: 'Website hero images and collection banners',
+                    icon: Palette,
+                    gradient: 'from-blue-500 to-cyan-500',
+                    status: 'Ready',
+                  },
+                  {
+                    title: 'Mascot Poses',
+                    desc: 'Brand mascot in different outfits and poses',
+                    icon: Brain,
+                    gradient: 'from-emerald-500 to-teal-500',
+                    status: 'Pending Images',
+                  },
+                  {
+                    title: 'Video Content',
+                    desc: 'Short-form video clips and motion graphics',
+                    icon: Video,
+                    gradient: 'from-red-500 to-rose-500',
+                    status: 'Coming Soon',
+                  },
+                ].map((item) => {
+                  const Icon = item.icon;
+                  return (
+                    <Card
+                      key={item.title}
+                      className="bg-gray-800/50 border-gray-700 overflow-hidden hover:border-gray-600 transition-colors cursor-pointer group"
+                    >
+                      <div className={`h-1 bg-gradient-to-r ${item.gradient}`} />
+                      <CardContent className="p-5">
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`h-10 w-10 rounded-lg bg-gradient-to-br ${item.gradient} flex items-center justify-center flex-shrink-0`}
+                          >
+                            <Icon className="h-5 w-5 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-white group-hover:text-[#FF9D00] transition-colors">
+                              {item.title}
+                            </p>
+                            <p className="text-xs text-gray-500 mt-1">{item.desc}</p>
+                            <Badge
+                              variant="outline"
+                              className={`mt-2 text-xs ${
+                                item.status === 'Ready'
+                                  ? 'border-green-500/50 text-green-400'
+                                  : item.status === 'Coming Soon'
+                                  ? 'border-gray-600 text-gray-500'
+                                  : 'border-amber-500/50 text-amber-400'
+                              }`}
+                            >
+                              {item.status}
+                            </Badge>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+
+              <div className="mt-6 p-4 rounded-lg border border-gray-700 bg-gray-800/30">
+                <div className="flex items-center gap-3 mb-3">
+                  <Zap className="h-5 w-5 text-[#FF9D00]" />
+                  <span className="text-sm font-medium text-white">Quick Generate</span>
+                </div>
+                <div className="flex gap-3">
+                  <Input
+                    placeholder="Describe what you need... e.g. 'Instagram post for Black Rose Crewneck launch'"
+                    className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 flex-1"
+                  />
+                  <Button className="bg-gradient-to-r from-[#FF9D00] to-[#B76E79] hover:from-[#e68e00] hover:to-[#a5606a] text-white px-6">
+                    <Sparkles className="mr-2 h-4 w-4" />
+                    Generate
+                  </Button>
+                </div>
+                <p className="text-xs text-gray-500 mt-2">
+                  Uses SkyyRose LoRA model + brand voice for 100% on-brand output
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Pipeline Status */}
+          <div className="grid gap-4 md:grid-cols-2">
+            <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-white flex items-center gap-2">
+                  <Layers className="h-4 w-4 text-[#FF9D00]" />
+                  LoRA Training Status
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Product LoRA</span>
+                    <Badge variant="outline" className="border-amber-500/50 text-amber-400 text-xs">
+                      Not Started
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-800">
+                    <div className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" style={{ width: '0%' }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Mascot Consistency</span>
+                    <Badge variant="outline" className="border-amber-500/50 text-amber-400 text-xs">
+                      Not Started
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-800">
+                    <div className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" style={{ width: '0%' }} />
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-gray-400">Brand Voice</span>
+                    <Badge variant="outline" className="border-amber-500/50 text-amber-400 text-xs">
+                      Not Started
+                    </Badge>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-800">
+                    <div className="h-2 rounded-full bg-gradient-to-r from-[#FF9D00] to-[#B76E79]" style={{ width: '0%' }} />
+                  </div>
+                </div>
+                <p className="text-xs text-gray-500 mt-3">
+                  Training requires product images in assets/2d-25d-assets/ and mascot reference
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-gray-900/80 border-gray-700 backdrop-blur-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base text-white flex items-center gap-2">
+                  <Activity className="h-4 w-4 text-[#FF9D00]" />
+                  Generation Queue
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  <div className="grid grid-cols-3 gap-3 text-center">
+                    <div className="p-3 rounded-lg bg-gray-800/50">
+                      <p className="text-xl font-bold text-white">0</p>
+                      <p className="text-xs text-gray-500">Pending</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-gray-800/50">
+                      <p className="text-xl font-bold text-[#FF9D00]">0</p>
+                      <p className="text-xs text-gray-500">Processing</p>
+                    </div>
+                    <div className="p-3 rounded-lg bg-gray-800/50">
+                      <p className="text-xl font-bold text-green-400">0</p>
+                      <p className="text-xs text-gray-500">Completed</p>
+                    </div>
+                  </div>
+                  <div className="p-3 rounded-lg border border-gray-700 bg-gray-800/30 text-center">
+                    <Sparkles className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+                    <p className="text-sm text-gray-500">No generation jobs yet</p>
+                    <p className="text-xs text-gray-600 mt-1">
+                      Use Quick Generate above to start
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         </TabsContent>
 
         {/* Settings Tab */}
