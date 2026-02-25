@@ -165,7 +165,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL,3XL',
 		'desc'            => esc_html__( 'Sweet pastel vibes meet streetwear luxury. Mint and lavender colorblock with signature rose detail.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-006-cotton-candy-tee.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-006-mint-lavender-hoodie.jpg',
 		'edition'         => '250',
 	),
 	array(
@@ -176,7 +176,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
 		'sizes'           => 'One Size',
 		'desc'            => esc_html__( 'Classic fitted beanie with embroidered signature rose. West Coast luxury meets everyday warmth.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-009-red-rose-beanie.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-007-signature-beanie.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -187,7 +187,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL,3XL',
 		'desc'            => esc_html__( 'Plush sherpa warmth in the SkyyRose signature colorway. Luxury outerwear for the West Coast.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-004-signature-hoodie.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-009-sherpa-jacket.webp',
 		'edition'         => '250',
 	),
 	array(
@@ -198,7 +198,7 @@ $gateway_products = array(
 		'collection_label' => esc_html__( 'Signature', 'skyyrose-flagship' ),
 		'sizes'           => 'S,M,L,XL,2XL',
 		'desc'            => esc_html__( 'From the Bridge Series. Athletic shorts celebrating the iconic Bay Area bridges.', 'skyyrose-flagship' ),
-		'image'           => get_template_directory_uri() . '/assets/images/products/sg-005-signature-shorts.jpg',
+		'image'           => get_template_directory_uri() . '/assets/images/products/sg-010-bridge-shorts.webp',
 		'edition'         => '250',
 	),
 );
