@@ -634,23 +634,41 @@ function skyyrose_flagship_nav_fallback() {
 	$items = array(
 		array(
 			'title'    => __( 'Collections', 'skyyrose-flagship' ),
-			'url'      => home_url( '/collections/' ),
+			'url'      => '#',
 			'children' => array(
 				array(
 					'title' => __( 'Black Rose', 'skyyrose-flagship' ),
-					'url'   => home_url( '/collection/black-rose/' ),
+					'url'   => home_url( '/collection-black-rose/' ),
 				),
 				array(
 					'title' => __( 'Love Hurts', 'skyyrose-flagship' ),
-					'url'   => home_url( '/collection/love-hurts/' ),
+					'url'   => home_url( '/collection-love-hurts/' ),
 				),
 				array(
 					'title' => __( 'Signature', 'skyyrose-flagship' ),
-					'url'   => home_url( '/collection/signature/' ),
+					'url'   => home_url( '/collection-signature/' ),
 				),
 				array(
 					'title' => __( 'Kids Capsule', 'skyyrose-flagship' ),
-					'url'   => home_url( '/collection/kids-capsule/' ),
+					'url'   => home_url( '/collection-kids-capsule/' ),
+				),
+			),
+		),
+		array(
+			'title'    => __( 'Experiences', 'skyyrose-flagship' ),
+			'url'      => '#',
+			'children' => array(
+				array(
+					'title' => __( 'The Garden', 'skyyrose-flagship' ),
+					'url'   => home_url( '/experience-black-rose/' ),
+				),
+				array(
+					'title' => __( 'The Ballroom', 'skyyrose-flagship' ),
+					'url'   => home_url( '/experience-love-hurts/' ),
+				),
+				array(
+					'title' => __( 'The Runway', 'skyyrose-flagship' ),
+					'url'   => home_url( '/experience-signature/' ),
 				),
 			),
 		),
@@ -662,6 +680,11 @@ function skyyrose_flagship_nav_fallback() {
 		array(
 			'title'    => __( 'Contact', 'skyyrose-flagship' ),
 			'url'      => home_url( '/contact/' ),
+			'children' => array(),
+		),
+		array(
+			'title'    => __( 'Shop', 'skyyrose-flagship' ),
+			'url'      => home_url( '/shop/' ),
 			'children' => array(),
 		),
 	);
