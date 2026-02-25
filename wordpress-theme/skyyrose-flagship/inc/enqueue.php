@@ -15,28 +15,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Enqueue Google Fonts (Inter + Playfair Display) with font-display: swap.
+ * Enqueue self-hosted fonts (Inter + Playfair Display).
  *
- * @since 3.0.0
+ * GDPR-compliant: no external requests to Google Fonts.
+ * Font files are served from assets/fonts/ as woff2 variable fonts.
+ *
+ * @since 3.2.1
  * @return void
  */
-function skyyrose_enqueue_google_fonts() {
-	$font_families = array(
-		'Inter:wght@300;400;500;600;700',
-		'Playfair+Display:wght@400;500;600;700;800',
-	);
-
-	$fonts_url = add_query_arg(
-		array(
-			'family'  => implode( '&family=', $font_families ),
-			'display' => 'swap',
-		),
-		'https://fonts.googleapis.com/css2'
-	);
-
+function skyyrose_enqueue_local_fonts() {
 	wp_enqueue_style(
-		'skyyrose-google-fonts',
-		esc_url_raw( $fonts_url ),
+		'skyyrose-fonts',
+		SKYYROSE_ASSETS_URI . '/css/fonts.css',
 		array(),
 		SKYYROSE_VERSION
 	);
@@ -991,38 +981,38 @@ function skyyrose_dequeue_woocommerce_styles( $enqueue_styles ) {
 }
 
 /**
- * Add font-display: swap to Google Fonts link tag for performance.
+ * Add font preload hints for critical above-fold fonts.
  *
- * @since  3.0.0
- * @param  string $html   Full link tag HTML.
- * @param  string $handle Stylesheet handle.
- * @return string Modified HTML.
+ * Preloads latin subsets (used by all page content) for fastest
+ * first-paint. Latin-ext subsets load on demand via unicode-range.
+ *
+ * @since  3.2.1
+ * @return void
  */
-function skyyrose_add_font_display_swap( $html, $handle ) {
-	if ( 'skyyrose-google-fonts' === $handle ) {
-		$html = str_replace( "media='all'", "media='all' crossorigin", $html );
-	}
-	return $html;
+function skyyrose_preload_fonts() {
+	$fonts_dir = SKYYROSE_ASSETS_URI . '/fonts';
+	?>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/inter-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<link rel="preload" href="<?php echo esc_url( $fonts_dir . '/playfair-display-latin.woff2' ); ?>" as="font" type="font/woff2" crossorigin>
+	<?php
 }
 
 /**
- * Preconnect to Google Fonts for faster font loading.
+ * Resource hints for external services.
  *
- * Uses the wp_resource_hints filter instead of raw echo for proper
- * WordPress integration and compatibility with caching plugins.
+ * Google Fonts preconnects removed in 3.2.1 (fonts self-hosted for GDPR).
+ * Kept as filter hook point for future external service preconnects.
  *
- * @since  3.0.0
+ * @since  3.2.1
  * @param  array  $urls          URLs to print for resource hint.
  * @param  string $relation_type The resource hint relation (dns-prefetch, preconnect, etc.).
  * @return array Modified URLs.
  */
-function skyyrose_preconnect_fonts( $urls, $relation_type ) {
+function skyyrose_resource_hints( $urls, $relation_type ) {
+	// Preconnect to Google model-viewer CDN (used on avatar pages).
 	if ( 'preconnect' === $relation_type ) {
 		$urls[] = array(
-			'href' => 'https://fonts.googleapis.com',
-		);
-		$urls[] = array(
-			'href'        => 'https://fonts.gstatic.com',
+			'href'        => 'https://ajax.googleapis.com',
 			'crossorigin' => 'anonymous',
 		);
 	}
@@ -1104,11 +1094,14 @@ function skyyrose_admin_scripts() {
  * Hook Registration
  *--------------------------------------------------------------*/
 
-// Preconnect to Google Fonts (via wp_resource_hints filter).
-add_filter( 'wp_resource_hints', 'skyyrose_preconnect_fonts', 10, 2 );
+// Resource hints for external services (model-viewer CDN, etc.).
+add_filter( 'wp_resource_hints', 'skyyrose_resource_hints', 10, 2 );
 
-// Google Fonts (priority 5 so they load before template styles).
-add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_google_fonts', 5 );
+// Preload critical font files in <head>.
+add_action( 'wp_head', 'skyyrose_preload_fonts', 3 );
+
+// Self-hosted fonts (priority 5 so they load before template styles).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_local_fonts', 5 );
 
 // Global styles (priority 10 - default).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_global_styles', 10 );

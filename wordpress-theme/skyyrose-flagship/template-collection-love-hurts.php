@@ -15,101 +15,73 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 
 /**
- * Build the LOVE HURTS product catalog.
+ * Build the LOVE HURTS product list for template rendering.
  *
- * Attempts a WooCommerce query first; falls back to the static catalog
- * defined in the PRD so the page is never empty.
- *
- * @return array<int, array{sku:string, name:string, price:string, desc:string, badge:string, url:string, image:string}>
+ * Uses the centralized catalog (inc/product-catalog.php) as source of truth.
+ * Adds the lh-002b (white joggers) variant for the collection display.
  */
 if ( ! function_exists( 'skyyrose_get_love_hurts_products' ) ) :
 function skyyrose_get_love_hurts_products() {
 
-	$img_base = get_template_directory_uri() . '/assets/images/products/';
-
-	$static_products = array(
-		array(
-			'sku'   => 'lh-001',
-			'name'  => 'The Fannie Pack',
-			'price' => '$65.00',
-			'desc'  => 'Luxury fanny pack embodying Oakland grit, passion, and the defiant bloom of a street rose',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'lh-001-fannie.webp',
-		),
-		array(
-			'sku'   => 'lh-002',
-			'name'  => 'Love Hurts Joggers (BLACK)',
-			'price' => '$95.00',
-			'desc'  => 'Oakland grit meets luxury — embroidered rose, tapered fit',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'lh-002-joggers.webp',
-		),
-		array(
-			'sku'   => 'lh-002b',
-			'name'  => 'Love Hurts Joggers (WHITE)',
-			'price' => '$95.00',
-			'desc'  => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
-			'badge' => 'New',
-			'image' => $img_base . 'lh-002-joggers.webp',
-		),
-		array(
-			'sku'   => 'lh-003',
-			'name'  => 'Love Hurts Basketball Shorts',
-			'price' => '$75.00',
-			'desc'  => 'Oakland-inspired luxury streetwear. Defiant rose design on breathable mesh',
-			'badge' => 'Pre-Order',
-			'image' => $img_base . 'lh-003-shorts.jpg',
-		),
-		array(
-			'sku'   => 'lh-004',
-			'name'  => 'Love Hurts Varsity Jacket',
-			'price' => 'Coming Soon',
-			'desc'  => 'Oakland street couture. Satin, bold fire-red script, hidden rose garden in hood',
-			'badge' => 'Draft',
-			'image' => $img_base . 'lh-004-varsity.jpg',
-		),
-		array(
-			'sku'   => 'lh-005',
-			'name'  => 'Love Hurts Windbreaker',
-			'price' => 'Coming Soon',
-			'desc'  => 'Oakland fire meets the elements. Blush pink windbreaker with Love Hurts text and rose detailing',
-			'badge' => 'Draft',
-			'image' => $img_base . 'lh-005-bomber.webp',
-		),
-	);
-
-	if ( ! function_exists( 'wc_get_products' ) ) {
-		return $static_products;
-	}
-
-	$wc_products = wc_get_products(
-		array(
-			'limit'    => 5,
-			'category' => array( 'love-hurts' ),
-			'status'   => 'publish',
-			'orderby'  => 'menu_order',
-			'order'    => 'ASC',
-		)
-	);
-
-	if ( empty( $wc_products ) ) {
-		return $static_products;
-	}
-
-	$products = array();
-	foreach ( $wc_products as $wc_product ) {
-		$products[] = array(
-			'sku'   => $wc_product->get_sku(),
-			'name'  => $wc_product->get_name(),
-			'price' => $wc_product->get_price_html(),
-			'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
-			'badge' => $wc_product->get_meta( '_collection_badge' ),
-			'url'   => get_permalink( $wc_product->get_id() ),
-			'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+	// Try WooCommerce first.
+	if ( function_exists( 'wc_get_products' ) ) {
+		$wc_products = wc_get_products(
+			array(
+				'limit'    => 6,
+				'category' => array( 'love-hurts' ),
+				'status'   => 'publish',
+				'orderby'  => 'menu_order',
+				'order'    => 'ASC',
+			)
 		);
+
+		if ( ! empty( $wc_products ) ) {
+			$products = array();
+			foreach ( $wc_products as $wc_product ) {
+				$products[] = array(
+					'sku'   => $wc_product->get_sku(),
+					'name'  => $wc_product->get_name(),
+					'price' => $wc_product->get_price_html(),
+					'desc'  => wp_strip_all_tags( $wc_product->get_short_description() ),
+					'badge' => $wc_product->get_meta( '_collection_badge' ),
+					'url'   => get_permalink( $wc_product->get_id() ),
+					'image' => wp_get_attachment_url( $wc_product->get_image_id() ),
+				);
+			}
+			return $products;
+		}
 	}
 
-	return $products;
+	// Fallback: centralized product catalog.
+	$catalog_products = skyyrose_get_collection_products( 'love-hurts' );
+	$display_products = array();
+
+	foreach ( $catalog_products as $p ) {
+		$display_products[] = array(
+			'sku'        => $p['sku'],
+			'name'       => $p['name'],
+			'price'      => skyyrose_format_price( $p ),
+			'desc'       => $p['description'],
+			'badge'      => $p['badge'],
+			'image'      => skyyrose_product_image_uri( $p['image'] ),
+			'back_image' => ! empty( $p['back_image'] ) ? skyyrose_product_image_uri( $p['back_image'] ) : '',
+		);
+
+		// Insert white joggers variant after the black joggers.
+		if ( 'lh-002' === $p['sku'] ) {
+			$display_products[] = array(
+				'sku'        => 'lh-002b',
+				'name'       => 'Love Hurts Joggers (WHITE)',
+				'price'      => skyyrose_format_price( $p ),
+				'desc'       => 'The same Oakland fire in a fresh white colorway — embroidered rose, tapered fit',
+				'badge'      => 'New',
+				'image'      => skyyrose_product_image_uri( $p['image'] ),
+				'back_image' => '',
+			);
+		}
+	}
+
+	return $display_products;
 }
 endif;
 
