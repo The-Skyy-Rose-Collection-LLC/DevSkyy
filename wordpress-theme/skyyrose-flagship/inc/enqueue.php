@@ -102,6 +102,46 @@ function skyyrose_enqueue_global_scripts() {
 	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
 		wp_enqueue_script( 'comment-reply' );
 	}
+
+	// Brand mascot interactive widget (walks on from right side).
+	$mascot_js_path = SKYYROSE_DIR . '/assets/js/mascot.js';
+	if ( file_exists( $mascot_js_path ) && ! is_admin() ) {
+		wp_enqueue_script(
+			'skyyrose-mascot',
+			SKYYROSE_ASSETS_URI . '/js/mascot.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+
+		// Pass page context for collection-aware outfit switching.
+		$mascot_context = 'default';
+		$template_file  = get_page_template_slug();
+		if ( is_front_page() ) {
+			$mascot_context = 'homepage';
+		} elseif ( is_404() ) {
+			$mascot_context = '404';
+		} elseif ( strpos( $template_file, 'black-rose' ) !== false ) {
+			$mascot_context = 'black-rose';
+		} elseif ( strpos( $template_file, 'love-hurts' ) !== false ) {
+			$mascot_context = 'love-hurts';
+		} elseif ( strpos( $template_file, 'signature' ) !== false ) {
+			$mascot_context = 'signature';
+		} elseif ( strpos( $template_file, 'kids-capsule' ) !== false ) {
+			$mascot_context = 'kids-capsule';
+		} elseif ( strpos( $template_file, 'preorder' ) !== false ) {
+			$mascot_context = 'preorder';
+		}
+
+		wp_localize_script(
+			'skyyrose-mascot',
+			'skyyroseMascotData',
+			array(
+				'context'   => $mascot_context,
+				'assetsUri' => SKYYROSE_ASSETS_URI . '/images/mascot/',
+			)
+		);
+	}
 }
 
 /**
@@ -237,9 +277,8 @@ function skyyrose_enqueue_template_styles() {
 		}
 	}
 
-	// Brand mascot styles — loaded on pages where the mascot appears.
-	$mascot_pages = array( 'collection', '404', 'front-page', 'preorder-gateway' );
-	if ( in_array( $slug, $mascot_pages, true ) && file_exists( $base_css_dir . '/mascot.css' ) ) {
+	// Brand mascot styles — loaded globally (widget appears on all pages).
+	if ( file_exists( $base_css_dir . '/mascot.css' ) ) {
 		wp_enqueue_style(
 			'skyyrose-mascot',
 			$base_css_uri . '/mascot.css',
