@@ -12,6 +12,11 @@
  * @since   3.0.0
  */
 
+// Prevent direct access.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
 get_header();
 ?>
 

@@ -86,9 +86,13 @@
 			tab.addEventListener('click', function () {
 				var collection = tab.dataset.collection;
 
-				// Update active tab
-				tabs.forEach(function (t) { t.classList.remove('active'); });
+				// Update active tab and ARIA state
+				tabs.forEach(function (t) {
+					t.classList.remove('active');
+					t.setAttribute('aria-selected', 'false');
+				});
 				tab.classList.add('active');
+				tab.setAttribute('aria-selected', 'true');
 
 				// Filter cards
 				cards.forEach(function (card) {
@@ -105,6 +109,34 @@
 	/* --------------------------------------------------
 	   Product Modal
 	   -------------------------------------------------- */
+
+	var previousFocusEl = null;
+
+	function trapFocus(container) {
+		var focusable = container.querySelectorAll(
+			'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+		);
+		if (focusable.length === 0) return;
+		var first = focusable[0];
+		var last  = focusable[focusable.length - 1];
+
+		container.addEventListener('keydown', function (e) {
+			if (e.key !== 'Tab') return;
+			if (e.shiftKey) {
+				if (document.activeElement === first) {
+					e.preventDefault();
+					last.focus();
+				}
+			} else {
+				if (document.activeElement === last) {
+					e.preventDefault();
+					first.focus();
+				}
+			}
+		});
+
+		first.focus();
+	}
 
 	function openModal(data) {
 		if (!modalOverlay) return;
@@ -136,11 +168,18 @@
 			});
 		}
 
+		previousFocusEl = document.activeElement;
 		modalOverlay.classList.add('open');
+		var dialog = modalOverlay.querySelector('[role="dialog"]') || modalOverlay;
+		trapFocus(dialog);
 	}
 
 	function closeModal() {
 		if (modalOverlay) modalOverlay.classList.remove('open');
+		if (previousFocusEl) {
+			previousFocusEl.focus();
+			previousFocusEl = null;
+		}
 	}
 
 	function initModal() {
