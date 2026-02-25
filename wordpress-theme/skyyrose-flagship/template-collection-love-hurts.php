@@ -111,14 +111,16 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<!-- ============================================================
 	     HERO SECTION — Rotating 3D Logo
 	     ============================================================ -->
-	<section class="collection-hero" role="banner"
+	<section class="collection-hero" aria-label="<?php esc_attr_e( 'Collection hero', 'skyyrose-flagship' ); ?>"
 		style="background-image: url('<?php echo esc_attr( $skyyrose_lh_scene_url ); ?>'); background-size: cover; background-position: center;">
 
 		<div class="collection-logo-3d collection-logo-3d--love-hurts">
 			<img src="<?php echo esc_url( $skyyrose_lh_logo_url ); ?>"
 			     alt="<?php echo esc_attr__( 'Love Hurts Collection Logo', 'skyyrose-flagship' ); ?>"
 			     width="280"
-			     height="280" />
+			     height="280"
+			     fetchpriority="high"
+			     loading="eager" />
 		</div>
 
 		<h1 class="collection-hero__title">
@@ -172,7 +174,7 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 					     loading="lazy"
 					     width="400"
 					     height="533"
-					     onerror="this.onerror=null;this.src='<?php echo esc_url( $skyyrose_lh_placeholder ); ?>';" />
+					     data-fallback="<?php echo esc_url( $skyyrose_lh_placeholder ); ?>" />
 
 					<div class="collection-product-card__info">
 						<h3 class="collection-product-card__name">
@@ -206,7 +208,7 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	<div data-cie-preorder-progress style="max-width:480px; margin:0 auto; padding:1rem 2rem;"></div>
 
 	<section class="collection-preorder-cta">
-		<div data-cie-countdown="auto" data-cie-countdown-label="Pre-Order Window" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
+		<div data-cie-countdown="auto" data-cie-countdown-label="<?php esc_attr_e( 'Pre-Order Window', 'skyyrose-flagship' ); ?>" style="display:flex; justify-content:center; margin-bottom:1.5rem;"></div>
 		<a href="<?php echo esc_url( home_url( '/pre-order/' ) ); ?>"
 		   class="collection-preorder-cta__btn">
 			<?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?>

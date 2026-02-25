@@ -48,7 +48,7 @@ function skyyrose_send_security_headers() {
 		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
 		"img-src 'self' data: blob: https://*.wp.com https://secure.gravatar.com https://i0.wp.com https://i1.wp.com https://i2.wp.com https://fonts.gstatic.com https://*.skyyrose.co",
 		"font-src 'self' data: https://fonts.gstatic.com https://cdn.jsdelivr.net",
-		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com",
+		"connect-src 'self' https://stats.wp.com https://public-api.wordpress.com https://api.skyyrose.co https://pixel.wp.com https://devskyy.app",
 		"frame-src 'self' https://www.youtube.com https://player.vimeo.com",
 		"worker-src 'self' blob:",
 		"child-src 'self' blob:",
