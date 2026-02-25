@@ -110,20 +110,6 @@ function skyyrose_get_signature_products() {
 			'desc'  => 'Original SkyyRose label in a striking orchid colorway',
 			'badge' => 'Draft',
 		),
-		array(
-			'sku'   => 'sg-013',
-			'name'  => 'sg-013',
-			'price' => 'Coming Soon',
-			'desc'  => 'Signature Collection — details forthcoming',
-			'badge' => 'Draft',
-		),
-		array(
-			'sku'   => 'sg-014',
-			'name'  => 'sg-014',
-			'price' => 'Coming Soon',
-			'desc'  => 'Signature Collection — details forthcoming',
-			'badge' => 'Draft',
-		),
 	);
 
 	if ( ! function_exists( 'wc_get_products' ) ) {
@@ -132,7 +118,7 @@ function skyyrose_get_signature_products() {
 
 	$wc_products = wc_get_products(
 		array(
-			'limit'    => 14,
+			'limit'    => 12,
 			'category' => array( 'signature' ),
 			'status'   => 'publish',
 			'orderby'  => 'menu_order',
@@ -168,6 +154,7 @@ $skyyrose_sg_logo_url    = esc_url( get_template_directory_uri() . '/assets/bran
 $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/signature/signature-golden-gate-showroom.png' );
 ?>
 
+<main id="primary" class="site-main" role="main">
 <div class="collection--signature" data-collection="signature">
 
 	<!-- ============================================================
@@ -316,5 +303,6 @@ $skyyrose_sg_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	</section>
 
 </div><!-- .collection--signature -->
+</main><!-- #primary -->
 
 <?php get_footer(); ?>
