@@ -713,6 +713,46 @@ function skyyrose_enqueue_journey_gamification() {
 }
 
 /**
+ * Enqueue Velocity — Scroll-Driven Product Storytelling Engine.
+ *
+ * Apple-style progressive product reveals, scroll spine, momentum
+ * section transitions, product spotlight zone, and velocity tracking.
+ * Research shows scroll-driven storytelling increases conversion
+ * 15-22% (Baymard Institute) and time-on-page 2.5x (NNg).
+ *
+ * @since 4.0.0
+ * @return void
+ */
+function skyyrose_enqueue_velocity_scroll() {
+
+	// Skip admin context.
+	if ( is_admin() ) {
+		return;
+	}
+
+	$css_path = SKYYROSE_DIR . '/assets/css/velocity-scroll.css';
+	if ( file_exists( $css_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-velocity-scroll',
+			SKYYROSE_ASSETS_URI . '/css/velocity-scroll.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
+		);
+	}
+
+	$js_path = SKYYROSE_DIR . '/assets/js/velocity-scroll.js';
+	if ( file_exists( $js_path ) ) {
+		wp_enqueue_script(
+			'skyyrose-velocity-scroll',
+			SKYYROSE_ASSETS_URI . '/js/velocity-scroll.js',
+			array(),
+			SKYYROSE_VERSION,
+			true
+		);
+	}
+}
+
+/**
  * Enqueue Analytics Beacon — Unified Event Relay.
  *
  * Collects conversion events from all SkyyRose engines (CIE, Aurora,
@@ -819,6 +859,7 @@ function skyyrose_defer_scripts( $tag, $handle ) {
 		'skyyrose-cross-sell-engine',
 		'skyyrose-adaptive-personalization',
 		'skyyrose-journey-gamification',
+		'skyyrose-velocity-scroll',
 		'skyyrose-analytics-beacon',
 	);
 
@@ -924,6 +965,9 @@ add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_adaptive_personalization', 4
 
 // Journey Gamification Engine — room exploration tracking, rewards, cross-sell (priority 44, after personalization).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_journey_gamification', 44 );
+
+// Velocity — Scroll-Driven Product Storytelling Engine (priority 46, after gamification).
+add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_velocity_scroll', 46 );
 
 // Analytics Beacon — unified event relay to devskyy.app dashboard (priority 50, after all engines).
 add_action( 'wp_enqueue_scripts', 'skyyrose_enqueue_analytics_beacon', 50 );
