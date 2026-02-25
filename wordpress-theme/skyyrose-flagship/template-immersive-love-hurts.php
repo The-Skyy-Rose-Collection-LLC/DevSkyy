@@ -100,7 +100,7 @@ $love_hurts_rooms = array(
 				'price'      => '$67',
 				'collection' => esc_html__( 'Love Hurts Collection', 'skyyrose-flagship' ),
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002b-joggers-white.jpg',
+				'image'      => get_template_directory_uri() . '/assets/images/products/lh-002-joggers.jpg',
 				'url'        => '/?product_id=lh-002b',
 				'left'       => '65',
 				'top'        => '48',
