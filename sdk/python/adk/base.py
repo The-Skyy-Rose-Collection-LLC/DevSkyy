@@ -23,10 +23,32 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-from core.telemetry.tracer import get_tracer
-
 logger = logging.getLogger(__name__)
-_tracer = get_tracer("adk.agent")
+
+
+def _get_tracer():
+    """Lazy-load tracer to avoid circular import (adk ← core → adk)."""
+    try:
+        from core.telemetry.tracer import get_tracer
+        return get_tracer("adk.agent")
+    except ImportError:
+        return None
+
+
+class _NullSpanCtx:
+    """No-op context manager when tracing is unavailable."""
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+    def set_attribute(self, key, value):
+        pass
+
+    def record_exception(self, exc):
+        pass
 
 
 # =============================================================================
@@ -269,10 +291,18 @@ class BaseDevSkyyAgent(ABC):
             AgentResult with execution details
         """
         start_time = datetime.now(UTC)
+        tracer = _get_tracer()
 
-        with _tracer.start_as_current_span(f"agent.run.{self.name}") as span:
-            span.set_attribute("agent.name", self.name)
-            span.set_attribute("agent.provider", self.provider)
+        span_ctx = (
+            tracer.start_as_current_span(f"agent.run.{self.name}")
+            if tracer
+            else _NullSpanCtx()
+        )
+
+        with span_ctx as span:
+            if tracer:
+                span.set_attribute("agent.name", self.name)
+                span.set_attribute("agent.provider", self.provider)
 
             try:
                 # Initialize if needed
@@ -296,14 +326,16 @@ class BaseDevSkyyAgent(ABC):
                 if self.config.enable_memory:
                     self._update_memory(prompt, result.content)
 
-                span.set_attribute("agent.status", result.status.value)
-                span.set_attribute("agent.latency_ms", result.latency_ms)
+                if tracer:
+                    span.set_attribute("agent.status", result.status.value)
+                    span.set_attribute("agent.latency_ms", result.latency_ms)
                 return result
 
             except TimeoutError:
                 self._status = AgentStatus.FAILED
-                span.set_attribute("agent.status", "failed")
-                span.set_attribute("agent.error_type", "TimeoutError")
+                if tracer:
+                    span.set_attribute("agent.status", "failed")
+                    span.set_attribute("agent.error_type", "TimeoutError")
                 return AgentResult(
                     agent_name=self.name,
                     agent_provider=self.provider,
@@ -316,9 +348,10 @@ class BaseDevSkyyAgent(ABC):
                 )
             except Exception as e:
                 self._status = AgentStatus.FAILED
-                span.record_exception(e)
-                span.set_attribute("agent.status", "failed")
-                span.set_attribute("agent.error_type", type(e).__name__)
+                if tracer:
+                    span.record_exception(e)
+                    span.set_attribute("agent.status", "failed")
+                    span.set_attribute("agent.error_type", type(e).__name__)
                 logger.error(f"Agent {self.name} failed: {e}", exc_info=True)
                 return AgentResult(
                     agent_name=self.name,
