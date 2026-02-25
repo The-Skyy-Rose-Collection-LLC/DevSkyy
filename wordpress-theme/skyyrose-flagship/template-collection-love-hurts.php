@@ -105,6 +105,7 @@ $skyyrose_lh_logo_url    = esc_url( get_template_directory_uri() . '/assets/bran
 $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scenes/love-hurts/love-hurts-giant-rose-staircase.png' );
 ?>
 
+<main id="primary" class="site-main" role="main">
 <div class="collection--love-hurts" data-collection="love-hurts">
 
 	<!-- ============================================================
@@ -253,5 +254,6 @@ $skyyrose_lh_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 	</section>
 
 </div><!-- .collection--love-hurts -->
+</main><!-- #primary -->
 
 <?php get_footer(); ?>

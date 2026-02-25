@@ -363,14 +363,18 @@
    COLLECTION ACCENT COLORS
    ================================================== */
 
-/* Black Rose — Silver */
-.collection-black-rose { --collection-accent: #C0C0C0; --collection-accent-glow: rgba(192, 192, 192, 0.08); }
+/* Black Rose — Silver (single-dash legacy + double-dash BEM selectors) */
+.collection-black-rose,
+.collection--black-rose { --collection-accent: #C0C0C0; --collection-accent-glow: rgba(192, 192, 192, 0.08); }
 /* Love Hurts — Crimson */
-.collection-love-hurts { --collection-accent: #DC143C; --collection-accent-glow: rgba(220, 20, 60, 0.08); }
+.collection-love-hurts,
+.collection--love-hurts { --collection-accent: #DC143C; --collection-accent-glow: rgba(220, 20, 60, 0.08); }
 /* Signature — Rose Gold */
-.collection-signature { --collection-accent: #B76E79; --collection-accent-glow: rgba(183, 110, 121, 0.08); }
+.collection-signature,
+.collection--signature { --collection-accent: #B76E79; --collection-accent-glow: rgba(183, 110, 121, 0.08); }
 /* Kids Capsule — Pink */
-.collection-kids-capsule { --collection-accent: #FFB6C1; --collection-accent-glow: rgba(255, 182, 193, 0.08); }
+.collection-kids-capsule,
+.collection--kids-capsule { --collection-accent: #FFB6C1; --collection-accent-glow: rgba(255, 182, 193, 0.08); }
 
 /* ==================================================
    RESPONSIVE

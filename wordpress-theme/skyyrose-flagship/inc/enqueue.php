@@ -399,7 +399,18 @@ function skyyrose_enqueue_collection_logos() {
 			'skyyrose-collection-logos',
 			SKYYROSE_ASSETS_URI . '/css/collection-logos.css',
 			array( 'skyyrose-design-tokens' ),
-			'3.0.0'
+			SKYYROSE_VERSION
+		);
+	}
+
+	// Collection color schemes (per-collection CSS custom properties).
+	$colors_path = SKYYROSE_DIR . '/assets/css/collection-colors.css';
+	if ( file_exists( $colors_path ) ) {
+		wp_enqueue_style(
+			'skyyrose-collection-colors',
+			SKYYROSE_ASSETS_URI . '/css/collection-colors.css',
+			array( 'skyyrose-design-tokens' ),
+			SKYYROSE_VERSION
 		);
 	}
 }

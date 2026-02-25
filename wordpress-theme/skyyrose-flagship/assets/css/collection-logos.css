@@ -213,6 +213,33 @@
 }
 
 /* ---------------------------------------------------------------
+   Hero CTA Button
+   --------------------------------------------------------------- */
+
+.collection-hero__cta {
+	display: inline-block;
+	margin-top: 2rem;
+	padding: 14px 36px;
+	border: 1px solid rgba(255, 255, 255, 0.25);
+	border-radius: 8px;
+	font-family: 'Inter', sans-serif;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.15em;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #fff;
+	transition: all 0.3s ease;
+	backdrop-filter: blur(4px);
+}
+
+.collection-hero__cta:hover {
+	background: rgba(255, 255, 255, 0.1);
+	border-color: rgba(255, 255, 255, 0.5);
+	transform: translateY(-2px);
+}
+
+/* ---------------------------------------------------------------
    Immersive CTA
    --------------------------------------------------------------- */
 
@@ -277,6 +304,123 @@
 .collection-preorder-cta__btn:hover {
 	opacity: 0.9;
 	transform: translateY(-2px);
+}
+
+/* ---------------------------------------------------------------
+   Explore Other Collections
+   --------------------------------------------------------------- */
+
+.collection-explore {
+	padding: 6rem 2rem 4rem;
+	text-align: center;
+	background: #0a0a0a;
+}
+
+.collection-explore__heading {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 1.5rem;
+	font-weight: 600;
+	color: #fff;
+	margin: 0 0 2.5rem;
+	letter-spacing: 0.02em;
+}
+
+.collection-explore__grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 1.25rem;
+	max-width: 800px;
+	margin: 0 auto;
+}
+
+.collection-explore__link {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 0.35rem;
+	padding: 2rem 1.5rem;
+	background: rgba(255, 255, 255, 0.02);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	border-radius: 12px;
+	text-decoration: none;
+	transition: all 0.3s ease;
+}
+
+.collection-explore__link:hover {
+	border-color: rgba(183, 110, 121, 0.3);
+	background: rgba(255, 255, 255, 0.04);
+	transform: translateY(-4px);
+}
+
+.collection-explore__link-name {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: 1.1rem;
+	font-weight: 600;
+	color: #fff;
+}
+
+.collection-explore__link-desc {
+	font-family: 'Inter', sans-serif;
+	font-size: 0.7rem;
+	font-weight: 400;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: rgba(255, 255, 255, 0.35);
+}
+
+/* Fade-in-up animation for sections */
+.fade-in-up {
+	opacity: 0;
+	transform: translateY(24px);
+	transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.fade-in-up.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+/* ---------------------------------------------------------------
+   Collection Products Section
+   --------------------------------------------------------------- */
+
+.collection-products {
+	background: #0a0a0a;
+}
+
+/* ---------------------------------------------------------------
+   Responsive
+   --------------------------------------------------------------- */
+
+@media (max-width: 768px) {
+	.collection-hero {
+		min-height: 50vh;
+		padding: 3rem 1.5rem;
+	}
+
+	.collection-grid {
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1rem;
+		padding: 2rem 1rem;
+	}
+
+	.collection-explore__grid {
+		grid-template-columns: 1fr 1fr;
+	}
+
+	.collection-story {
+		padding: 4rem 1.5rem;
+	}
+}
+
+@media (max-width: 480px) {
+	.collection-grid {
+		grid-template-columns: 1fr;
+	}
+
+	.collection-explore__grid {
+		grid-template-columns: 1fr;
+	}
 }
 
 /* ---------------------------------------------------------------
