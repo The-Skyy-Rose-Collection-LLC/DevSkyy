@@ -40,12 +40,14 @@ $skyyrose_mascot_dir = SKYYROSE_DIR . '/assets/images/mascot/';
 $skyyrose_mascot_uri = SKYYROSE_ASSETS_URI . '/images/mascot/';
 $skyyrose_mascot_img = $skyyrose_mascot_uri . 'mascot-fallback.svg';
 
-// Try context-specific PNG first, then reference PNG, then SVG fallback.
+// Try context-specific PNG first, then reference PNG, then idle PNG, then SVG fallback.
 $skyyrose_context_file = 'skyyrose-mascot-' . $skyyrose_mascot_context . '.png';
 if ( file_exists( $skyyrose_mascot_dir . $skyyrose_context_file ) ) {
 	$skyyrose_mascot_img = $skyyrose_mascot_uri . $skyyrose_context_file;
 } elseif ( file_exists( $skyyrose_mascot_dir . 'skyyrose-mascot-reference.png' ) ) {
 	$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyyrose-mascot-reference.png';
+} elseif ( file_exists( $skyyrose_mascot_dir . 'skyy-idle.png' ) ) {
+	$skyyrose_mascot_img = $skyyrose_mascot_uri . 'skyy-idle.png';
 }
 ?>
 
