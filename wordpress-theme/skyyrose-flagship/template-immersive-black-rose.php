@@ -259,7 +259,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<aside class="product-panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
+	<aside class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">
@@ -273,7 +273,7 @@ get_header();
 				<div class="product-panel-sizes" role="group" aria-label="<?php esc_attr_e( 'Available sizes', 'skyyrose-flagship' ); ?>"></div>
 				<div class="product-panel-actions">
 					<button class="btn-add-to-cart" type="button"><?php echo esc_html__( 'Pre-Order Now', 'skyyrose-flagship' ); ?></button>
-					<a class="btn-view-details" href="#"><?php echo esc_html__( 'Details', 'skyyrose-flagship' ); ?></a>
+					<a class="btn-view-details" href="#"><?php echo esc_html__( 'View Details', 'skyyrose-flagship' ); ?></a>
 				</div>
 			</div>
 		</div>

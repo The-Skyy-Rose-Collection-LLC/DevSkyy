@@ -216,7 +216,6 @@ function skyyrose_get_current_template_slug() {
 			'template-collection-love-hurts.php'   => 'collection',
 			'template-collection-signature.php'    => 'collection',
 			'template-collection-kids-capsule.php' => 'collection',
-			'template-love-hurts.php'              => 'immersive',
 			'template-immersive-black-rose.php'    => 'immersive',
 			'template-immersive-love-hurts.php'    => 'immersive',
 			'template-immersive-signature.php'     => 'immersive',

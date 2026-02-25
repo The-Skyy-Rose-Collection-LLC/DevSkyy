@@ -12,7 +12,7 @@
  * drakerelated.com-style immersive experience with hotspot beacons.
  *
  * @package SkyyRose_Flagship
- * @since 2.0.0
+ * @since 3.0.0
  */
 
 // Prevent direct access.
@@ -37,7 +37,7 @@ $signature_rooms = array(
 		'image'    => get_template_directory_uri() . '/assets/scenes/signature/signature-waterfront-runway.png',
 		'alt'      => esc_attr__( 'Bay Bridge waterfront at night with black marble platform floating over water, gold-lit LED display frames with hanging garments, glass orb display case, and stepped marble pedestals', 'skyyrose-flagship' ),
 		'products' => array(
-			// Glass orb display case (left) — beanies
+			// Glass orb display case (left)
 			array(
 				'id'         => 'sg-009',
 				'name'       => esc_html__( 'Red Rose Beanie', 'skyyrose-flagship' ),
@@ -46,50 +46,10 @@ $signature_rooms = array(
 				'sizes'      => 'One Size',
 				'image'      => get_template_directory_uri() . '/assets/images/products/sg-009-red-rose-beanie.jpg',
 				'url'        => '/?product_id=sg-009',
-				'left'       => '15',
-				'top'        => '42',
+				'left'       => '18',
+				'top'        => '45',
 				'prop'       => 'glass-orb',
 				'prop_label' => esc_html__( 'Inside glass orb display case', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-010',
-				'name'       => esc_html__( 'Lavender Rose Beanie', 'skyyrose-flagship' ),
-				'price'      => '$45',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'One Size',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-010-lavender-beanie.jpg',
-				'url'        => '/?product_id=sg-010',
-				'left'       => '20',
-				'top'        => '48',
-				'prop'       => 'glass-orb',
-				'prop_label' => esc_html__( 'Inside glass orb display case', 'skyyrose-flagship' ),
-			),
-			// Stepped marble pedestals (left row)
-			array(
-				'id'         => 'sg-006',
-				'name'       => esc_html__( 'Cotton Candy Tee', 'skyyrose-flagship' ),
-				'price'      => '$65',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-006-cotton-candy-tee.jpg',
-				'url'        => '/?product_id=sg-006',
-				'left'       => '28',
-				'top'        => '55',
-				'prop'       => 'marble-pedestal',
-				'prop_label' => esc_html__( 'Folded on stepped marble pedestal', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-007',
-				'name'       => esc_html__( 'Cotton Candy Shorts', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-007-cotton-candy-shorts.jpg',
-				'url'        => '/?product_id=sg-007',
-				'left'       => '32',
-				'top'        => '62',
-				'prop'       => 'marble-pedestal',
-				'prop_label' => esc_html__( 'Stacked on stepped marble pedestal', 'skyyrose-flagship' ),
 			),
 			// Gold-lit display frames (center)
 			array(
@@ -132,20 +92,7 @@ $signature_rooms = array(
 				'prop'       => 'gold-display-frame',
 				'prop_label' => esc_html__( 'Hanging in gold-lit LED display frame', 'skyyrose-flagship' ),
 			),
-			// Stepped marble pedestals (right row)
-			array(
-				'id'         => 'sg-005',
-				'name'       => esc_html__( 'Signature Shorts', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-005-signature-shorts.jpg',
-				'url'        => '/?product_id=sg-005',
-				'left'       => '70',
-				'top'        => '55',
-				'prop'       => 'marble-pedestal',
-				'prop_label' => esc_html__( 'Displayed on stepped marble pedestal', 'skyyrose-flagship' ),
-			),
+			// Featured marble pedestal (right)
 			array(
 				'id'         => 'sg-001',
 				'name'       => esc_html__( 'The Bay Set', 'skyyrose-flagship' ),
@@ -154,37 +101,10 @@ $signature_rooms = array(
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.jpg',
 				'url'        => '/?product_id=sg-001',
-				'left'       => '75',
-				'top'        => '60',
+				'left'       => '78',
+				'top'        => '55',
 				'prop'       => 'marble-pedestal',
 				'prop_label' => esc_html__( 'Featured on stepped marble pedestal', 'skyyrose-flagship' ),
-			),
-			// Marble platform edge displays
-			array(
-				'id'         => 'sg-011',
-				'name'       => esc_html__( 'Original Label Tee (White)', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-011-label-tee-white.jpg',
-				'url'        => '/?product_id=sg-011',
-				'left'       => '38',
-				'top'        => '72',
-				'prop'       => 'marble-platform-edge',
-				'prop_label' => esc_html__( 'On marble platform edge display', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-012',
-				'name'       => esc_html__( 'Original Label Tee (Orchid)', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-012-label-tee-orchid.jpg',
-				'url'        => '/?product_id=sg-012',
-				'left'       => '58',
-				'top'        => '72',
-				'prop'       => 'marble-platform-edge',
-				'prop_label' => esc_html__( 'On marble platform edge display', 'skyyrose-flagship' ),
 			),
 		),
 	),
@@ -196,19 +116,6 @@ $signature_rooms = array(
 		'products' => array(
 			// Left wall clothing rack
 			array(
-				'id'         => 'sg-004',
-				'name'       => esc_html__( 'Signature Hoodie', 'skyyrose-flagship' ),
-				'price'      => '$145',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-004-signature-hoodie.jpg',
-				'url'        => '/?product_id=sg-004',
-				'left'       => '15',
-				'top'        => '35',
-				'prop'       => 'clothing-rack',
-				'prop_label' => esc_html__( 'Hanging on left wall clothing rack', 'skyyrose-flagship' ),
-			),
-			array(
 				'id'         => 'sg-003',
 				'name'       => esc_html__( 'Pink Smoke Crewneck', 'skyyrose-flagship' ),
 				'price'      => '$95',
@@ -216,94 +123,12 @@ $signature_rooms = array(
 				'sizes'      => 'S,M,L,XL,2XL,3XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/sg-003-pink-smoke-crewneck.jpg',
 				'url'        => '/?product_id=sg-003',
-				'left'       => '22',
-				'top'        => '40',
+				'left'       => '18',
+				'top'        => '38',
 				'prop'       => 'clothing-rack',
 				'prop_label' => esc_html__( 'Hanging on left wall clothing rack', 'skyyrose-flagship' ),
 			),
-			// Right wall clothing rack
-			array(
-				'id'         => 'sg-008',
-				'name'       => esc_html__( 'Crop Hoodie', 'skyyrose-flagship' ),
-				'price'      => '$125',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-008-crop-hoodie.jpg',
-				'url'        => '/?product_id=sg-008',
-				'left'       => '78',
-				'top'        => '35',
-				'prop'       => 'clothing-rack',
-				'prop_label' => esc_html__( 'Hanging on right wall clothing rack', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-002',
-				'name'       => esc_html__( 'Stay Golden Tee', 'skyyrose-flagship' ),
-				'price'      => '$65',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-002-stay-golden-tee.jpg',
-				'url'        => '/?product_id=sg-002',
-				'left'       => '85',
-				'top'        => '40',
-				'prop'       => 'clothing-rack',
-				'prop_label' => esc_html__( 'Hanging on right wall clothing rack', 'skyyrose-flagship' ),
-			),
 			// Center marble display table — featured
-			array(
-				'id'         => 'sg-001',
-				'name'       => esc_html__( 'The Bay Set', 'skyyrose-flagship' ),
-				'price'      => '$225',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL,3XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-001-bay-set.jpg',
-				'url'        => '/?product_id=sg-001',
-				'left'       => '50',
-				'top'        => '52',
-				'prop'       => 'marble-display-table',
-				'prop_label' => esc_html__( 'Featured on center marble display table', 'skyyrose-flagship' ),
-			),
-			// Left marble pedestal — beanie
-			array(
-				'id'         => 'sg-009',
-				'name'       => esc_html__( 'Red Rose Beanie', 'skyyrose-flagship' ),
-				'price'      => '$45',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'One Size',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-009-red-rose-beanie.jpg',
-				'url'        => '/?product_id=sg-009',
-				'left'       => '32',
-				'top'        => '48',
-				'prop'       => 'marble-pedestal',
-				'prop_label' => esc_html__( 'On left marble pedestal', 'skyyrose-flagship' ),
-			),
-			// Right marble pedestal — beanie
-			array(
-				'id'         => 'sg-010',
-				'name'       => esc_html__( 'Lavender Rose Beanie', 'skyyrose-flagship' ),
-				'price'      => '$45',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'One Size',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-010-lavender-beanie.jpg',
-				'url'        => '/?product_id=sg-010',
-				'left'       => '68',
-				'top'        => '48',
-				'prop'       => 'marble-pedestal',
-				'prop_label' => esc_html__( 'On right marble pedestal', 'skyyrose-flagship' ),
-			),
-			// Left wall shelf (lower)
-			array(
-				'id'         => 'sg-005',
-				'name'       => esc_html__( 'Signature Shorts', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-005-signature-shorts.jpg',
-				'url'        => '/?product_id=sg-005',
-				'left'       => '18',
-				'top'        => '58',
-				'prop'       => 'wall-shelf',
-				'prop_label' => esc_html__( 'Folded on left wall shelf', 'skyyrose-flagship' ),
-			),
 			array(
 				'id'         => 'sg-006',
 				'name'       => esc_html__( 'Cotton Candy Tee', 'skyyrose-flagship' ),
@@ -312,10 +137,38 @@ $signature_rooms = array(
 				'sizes'      => 'XS,S,M,L,XL,2XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/sg-006-cotton-candy-tee.jpg',
 				'url'        => '/?product_id=sg-006',
-				'left'       => '25',
-				'top'        => '62',
-				'prop'       => 'wall-shelf',
-				'prop_label' => esc_html__( 'Folded on left wall shelf', 'skyyrose-flagship' ),
+				'left'       => '50',
+				'top'        => '52',
+				'prop'       => 'marble-display-table',
+				'prop_label' => esc_html__( 'Featured on center marble display table', 'skyyrose-flagship' ),
+			),
+			// Left marble pedestal — beanie
+			array(
+				'id'         => 'sg-010',
+				'name'       => esc_html__( 'Lavender Rose Beanie', 'skyyrose-flagship' ),
+				'price'      => '$45',
+				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'One Size',
+				'image'      => get_template_directory_uri() . '/assets/images/products/sg-010-lavender-beanie.jpg',
+				'url'        => '/?product_id=sg-010',
+				'left'       => '32',
+				'top'        => '48',
+				'prop'       => 'marble-pedestal',
+				'prop_label' => esc_html__( 'On left marble pedestal', 'skyyrose-flagship' ),
+			),
+			// Right wall clothing rack
+			array(
+				'id'         => 'sg-005',
+				'name'       => esc_html__( 'Signature Shorts', 'skyyrose-flagship' ),
+				'price'      => '$55',
+				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
+				'sizes'      => 'S,M,L,XL,2XL',
+				'image'      => get_template_directory_uri() . '/assets/images/products/sg-005-signature-shorts.jpg',
+				'url'        => '/?product_id=sg-005',
+				'left'       => '78',
+				'top'        => '38',
+				'prop'       => 'clothing-rack',
+				'prop_label' => esc_html__( 'Hanging on right wall clothing rack', 'skyyrose-flagship' ),
 			),
 			// Right wall display
 			array(
@@ -326,34 +179,8 @@ $signature_rooms = array(
 				'sizes'      => 'S,M,L,XL,2XL',
 				'image'      => get_template_directory_uri() . '/assets/images/products/sg-007-cotton-candy-shorts.jpg',
 				'url'        => '/?product_id=sg-007',
-				'left'       => '75',
-				'top'        => '58',
-				'prop'       => 'wall-display',
-				'prop_label' => esc_html__( 'On right wall display', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-011',
-				'name'       => esc_html__( 'Original Label Tee (White)', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-011-label-tee-white.jpg',
-				'url'        => '/?product_id=sg-011',
 				'left'       => '82',
 				'top'        => '58',
-				'prop'       => 'wall-display',
-				'prop_label' => esc_html__( 'On right wall display', 'skyyrose-flagship' ),
-			),
-			array(
-				'id'         => 'sg-012',
-				'name'       => esc_html__( 'Original Label Tee (Orchid)', 'skyyrose-flagship' ),
-				'price'      => '$55',
-				'collection' => esc_html__( 'Signature Collection', 'skyyrose-flagship' ),
-				'sizes'      => 'XS,S,M,L,XL,2XL',
-				'image'      => get_template_directory_uri() . '/assets/images/products/sg-012-label-tee-orchid.jpg',
-				'url'        => '/?product_id=sg-012',
-				'left'       => '88',
-				'top'        => '62',
 				'prop'       => 'wall-display',
 				'prop_label' => esc_html__( 'On right wall display', 'skyyrose-flagship' ),
 			),
@@ -460,7 +287,7 @@ get_header();
 
 	<!-- Product Detail Panel (Glassmorphism Slide-Up) -->
 	<div class="product-panel-overlay" aria-hidden="true"></div>
-	<aside class="product-panel" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
+	<aside class="product-panel" role="dialog" aria-modal="true" aria-hidden="true" aria-label="<?php esc_attr_e( 'Product Details', 'skyyrose-flagship' ); ?>">
 		<button class="product-panel-close" type="button" aria-label="<?php esc_attr_e( 'Close product details', 'skyyrose-flagship' ); ?>">&times;</button>
 		<div class="product-panel-inner">
 			<div class="product-panel-thumb">

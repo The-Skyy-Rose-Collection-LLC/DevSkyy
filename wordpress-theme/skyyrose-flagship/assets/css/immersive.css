@@ -797,7 +797,8 @@
 /* Prop-specific beacon accent variations */
 .hotspot--prop-glass-bell-jar .hotspot-beacon,
 .hotspot--prop-glass-display .hotspot-beacon,
-.hotspot--prop-glass-vitrine .hotspot-beacon {
+.hotspot--prop-glass-vitrine .hotspot-beacon,
+.hotspot--prop-glass-orb .hotspot-beacon {
 	background: rgba(255, 255, 255, 0.85);
 	box-shadow: 0 0 8px rgba(255, 255, 255, 0.4);
 }
