@@ -16,7 +16,7 @@ get_header();
 	<!-- Hero Section -->
 	<section class="hero luxury-hero">
 		<div class="hero-content">
-			<h1 class="hero-title fade-in">Where Love Meets Luxury</h1>
+			<h1 class="hero-title fade-in"><?php esc_html_e( 'Luxury Grows from Concrete.', 'skyyrose-flagship' ); ?></h1>
 			<p class="hero-subtitle fade-in">Oakland luxury streetwear crafted with passion, designed to make a statement</p>
 			<div class="hero-actions fade-in">
 				<a href="/collections" class="btn btn-primary">Explore Collections</a>

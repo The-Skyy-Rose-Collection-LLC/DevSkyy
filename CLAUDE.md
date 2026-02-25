@@ -240,7 +240,7 @@ pytest -v && npm test && curl http://localhost:8000/health
 ## Quick Reference
 
 ### Brand & Health
-- **Brand**: `#B76E79` (rose gold) | "Where Love Meets Luxury" | `BrandKit.from_config()`
+- **Brand**: `#B76E79` (rose gold) | "Luxury Grows from Concrete." | `BrandKit.from_config()`
 - **Health**: `/health` `/health/ready` `/health/live` `/metrics`
 
 ### Collections & Docs
