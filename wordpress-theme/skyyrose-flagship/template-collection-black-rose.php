@@ -25,6 +25,8 @@ get_header();
 if ( ! function_exists( 'skyyrose_get_black_rose_products' ) ) :
 function skyyrose_get_black_rose_products() {
 
+	$img_base = get_template_directory_uri() . '/assets/images/products/';
+
 	$static_products = array(
 		array(
 			'sku'   => 'br-001',
@@ -32,6 +34,7 @@ function skyyrose_get_black_rose_products() {
 			'price' => 'Coming Soon',
 			'desc'  => 'Premium heavyweight crewneck with embroidered rose detail',
 			'badge' => 'Draft',
+			'image' => $img_base . 'br-001-crewneck.webp',
 		),
 		array(
 			'sku'   => 'br-002',
@@ -39,6 +42,7 @@ function skyyrose_get_black_rose_products() {
 			'price' => '$50.00',
 			'desc'  => 'Tailored jogger silhouette in deep black',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'br-002-joggers.jpg',
 		),
 		array(
 			'sku'   => 'br-003',
@@ -46,6 +50,7 @@ function skyyrose_get_black_rose_products() {
 			'price' => 'Coming Soon',
 			'desc'  => 'Statement athletic jersey with bold branding',
 			'badge' => 'Draft',
+			'image' => $img_base . 'br-003-jersey.webp',
 		),
 		array(
 			'sku'   => 'br-004',
@@ -53,6 +58,7 @@ function skyyrose_get_black_rose_products() {
 			'price' => '$40.00',
 			'desc'  => 'Classic pullover hoodie with silver accents',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'br-004-hoodie.jpg',
 		),
 		array(
 			'sku'   => 'br-005',
@@ -60,13 +66,16 @@ function skyyrose_get_black_rose_products() {
 			'price' => '$65.00',
 			'desc'  => 'Elevated hoodie with signature detailing',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'br-005-hoodie-sig.jpg',
 		),
 		array(
-			'sku'   => 'br-006',
-			'name'  => 'BLACK Rose Sherpa Jacket',
-			'price' => '$95.00',
-			'desc'  => 'Luxe sherpa-lined outerwear with embroidered rose',
-			'badge' => 'Pre-Order',
+			'sku'        => 'br-006',
+			'name'       => 'BLACK Rose Sherpa Jacket',
+			'price'      => '$95.00',
+			'desc'       => 'Luxe sherpa-lined outerwear with embroidered rose',
+			'badge'      => 'Pre-Order',
+			'image'      => $img_base . 'br-006-sherpa.webp',
+			'back_image' => $img_base . 'br-006-sherpa-back.webp',
 		),
 		array(
 			'sku'   => 'br-007',
@@ -74,6 +83,7 @@ function skyyrose_get_black_rose_products() {
 			'price' => '$65.00',
 			'desc'  => 'Cross-collection collaboration piece',
 			'badge' => 'Pre-Order',
+			'image' => $img_base . 'br-007-shorts.jpg',
 		),
 		array(
 			'sku'   => 'br-008',
@@ -81,6 +91,7 @@ function skyyrose_get_black_rose_products() {
 			'price' => 'TBD',
 			'desc'  => 'Feminine hooded dress with gothic silhouette',
 			'badge' => 'Draft',
+			'image' => $img_base . 'br-008-hooded-dress.webp',
 		),
 	);
 
@@ -189,13 +200,23 @@ $skyyrose_br_scene_url   = esc_url( get_template_directory_uri() . '/assets/scen
 						</span>
 					<?php endif; ?>
 
-					<img class="collection-product-card__image"
-					     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
-					     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
-					     loading="lazy"
-					     width="400"
-					     height="533"
-					     data-fallback="<?php echo esc_url( $skyyrose_br_placeholder ); ?>" />
+					<div class="collection-product-card__image-container">
+						<img class="collection-product-card__image"
+						     src="<?php echo esc_url( $skyyrose_p_image ); ?>"
+						     alt="<?php echo esc_attr( $skyyrose_product['name'] ); ?>"
+						     loading="lazy"
+						     width="400"
+						     height="533"
+						     data-fallback="<?php echo esc_url( $skyyrose_br_placeholder ); ?>" />
+						<?php if ( ! empty( $skyyrose_product['back_image'] ) ) : ?>
+							<img class="collection-product-card__image collection-product-card__image--back"
+							     src="<?php echo esc_url( $skyyrose_product['back_image'] ); ?>"
+							     alt="<?php /* translators: %s: product name */ echo esc_attr( sprintf( __( '%s — back view', 'skyyrose-flagship' ), $skyyrose_product['name'] ) ); ?>"
+							     loading="lazy"
+							     width="400"
+							     height="533" />
+						<?php endif; ?>
+					</div>
 
 					<div class="collection-product-card__info">
 						<h3 class="collection-product-card__name">
